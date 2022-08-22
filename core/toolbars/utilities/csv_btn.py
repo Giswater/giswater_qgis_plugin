@@ -154,7 +154,7 @@ class GwCSVButton(GwAction):
                 csvfile.close()
                 del csvfile
         except Exception as e:
-            tools_qgis.show_warning("EXCEPTION: " + str(e))
+            tools_qgis.show_warning("EXCEPTION: " + str(e), dialog=dialog)
 
         if insert_status is False:
             return
@@ -169,8 +169,9 @@ class GwCSVButton(GwAction):
         else:
             if result['status'] == "Accepted":
                 tools_gw.fill_tab_log(dialog, result['body']['data'], close=False)
-            if 'message' in result:
-                msg = result['message']['text']
+            message = result.get('message')
+            if message:
+                msg = message.get('text')
                 tools_qt.show_info_box(msg)
 
 
@@ -229,7 +230,7 @@ class GwCSVButton(GwAction):
             with open(path, "r", encoding=_unicode) as file_input:
                 self._read_csv_file(model, file_input, delimiter, _unicode, _ignoreheader)
         except Exception as e:
-            tools_qgis.show_warning(str(e))
+            tools_qgis.show_warning(str(e), dialog=dialog)
 
 
     def _load_settings_values(self):
@@ -339,7 +340,7 @@ class GwCSVButton(GwAction):
         body = tools_gw.create_body(extras=values)
         result = tools_gw.execute_procedure('gw_fct_setcsv', body)
 
-        if result and 'status' in result and result['status'] == 'Accepted':
+        if result and result.get('status') == 'Accepted':
             return True
 
         return False
@@ -351,11 +352,11 @@ class GwCSVButton(GwAction):
         path = tools_qt.get_text(dialog, dialog.txt_file_csv)
         if path is None or path == 'null' or not os.path.exists(path):
             message = "Please choose a valid path"
-            tools_qgis.show_message(message, message_level=0)
+            tools_qgis.show_message(message, message_level=0, dialog=dialog)
             return None
         if path.find('.csv') == -1:
             message = "Please choose a csv file"
-            tools_qgis.show_message(message, message_level=0)
+            tools_qgis.show_message(message, message_level=0, dialog=dialog)
             return None
 
         return path

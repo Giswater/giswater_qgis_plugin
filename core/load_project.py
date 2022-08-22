@@ -82,10 +82,8 @@ class GwLoadProject(QObject):
         # Removes all deprecated variables defined at giswater.config
         tools_gw.remove_deprecated_config_vars()
 
-
-        # Manage variables not configured
-        if 'project_role' not in global_vars.project_vars or ('project_role' in global_vars.project_vars and global_vars.project_vars['project_role'] in (None, '')):
-            global_vars.project_vars['project_role'] = tools_gw.get_role_permissions(None)
+        project_role = global_vars.project_vars.get('project_role')
+        global_vars.project_vars['project_role'] = tools_gw.get_role_permissions(project_role)
 
         # Check if user has config files 'init' and 'session' and its parameters
         tools_gw.user_params_to_userconfig()
@@ -124,8 +122,15 @@ class GwLoadProject(QObject):
         # Create menu
         tools_gw.create_giswater_menu(True)
 
+        # Get 'utils_use_gw_snapping' parameter
+        use_gw_snapping = tools_gw.get_config_value('utils_use_gw_snapping', table='config_param_system')
+        if use_gw_snapping:
+            use_gw_snapping = tools_os.set_boolean(use_gw_snapping[0])
+            global_vars.use_gw_snapping = use_gw_snapping
+
         # Manage snapping layers
-        self._manage_snapping_layers()
+        if global_vars.use_gw_snapping is True:
+            self._manage_snapping_layers()
 
         # Manage actions of the different plugin_toolbars
         self._manage_toolbars()
@@ -158,6 +163,23 @@ class GwLoadProject(QObject):
         # Manage versions of Giswater and PostgreSQL
         plugin_version = tools_qgis.get_plugin_metadata('version', 0, global_vars.plugin_dir)
         project_version = tools_gw.get_project_version(schema_name)
+        # Only get the x.y.zzz, not x.y.zzz.n
+        try:
+            plugin_version_l = str(plugin_version).split('.')
+            if len(plugin_version_l) >= 4:
+                plugin_version = f'{plugin_version_l[0]}'
+                for i in range(1, 3):
+                    plugin_version = f"{plugin_version}.{plugin_version_l[i]}"
+        except Exception:
+            pass
+        try:
+            project_version_l = str(project_version).split('.')
+            if len(project_version_l) >= 4:
+                project_version = f'{project_version_l[0]}'
+                for i in range(1, 3):
+                    project_version = f"{project_version}.{project_version_l[i]}"
+        except Exception:
+            pass
         if project_version == plugin_version:
             message = "Project read finished"
             tools_log.log_info(message)
@@ -292,17 +314,13 @@ class GwLoadProject(QObject):
                 repeated_layers[layer_source['schema'].replace('"', '')] = 'v_edit_node'
 
         if len(repeated_layers) > 1:
-            if global_vars.project_vars['main_schema'] is None or global_vars.project_vars['add_schema'] is None:
-                self.dlg_dtext = GwDialogTextUi()
-                self.dlg_dtext.btn_accept.hide()
-                self.dlg_dtext.btn_close.clicked.connect(lambda: self.dlg_dtext.close())
+            if global_vars.project_vars['main_schema'] in (None, '', 'null', 'NULL') \
+                    or global_vars.project_vars['add_schema'] in (None, '', 'null', 'NULL'):
                 msg = "QGIS project has more than one v_edit_node layer coming from different schemas. " \
                       "If you are looking to manage two schemas, it is mandatory to define which is the master and " \
                       "which isn't. To do this, you need to configure the QGIS project setting this project's " \
                       "variables: gwMainSchema and gwAddSchema."
-
-                self.dlg_dtext.txt_infolog.setText(msg)
-                self.dlg_dtext.open()
+                tools_qt.show_info_box(msg)
                 return False
 
             # If there are layers with a different schema, the one that the user has in the project variable
@@ -475,9 +493,11 @@ class GwLoadProject(QObject):
         status, result = self._manage_layers()
         if not status:
             return False
-        if result and 'variables' in result['body']:
-            if 'setQgisLayers' in result['body']['variables']:
-                if result['body']['variables']['setQgisLayers'] in (False, 'False', 'false'):
+        if result:
+            variables = result['body'].get('variables')
+            if variables:
+                setQgisLayers = variables.get('setQgisLayers')
+                if setQgisLayers in (False, 'False', 'false'):
                     return
 
         # Set project layers with gw_fct_getinfofromid: This process takes time for user
@@ -524,12 +544,12 @@ class GwLoadProject(QObject):
             # check project
             status, result = self.check_project.fill_check_project_table(layers, "true")
             try:
-                if 'variables' in result['body']:
-                    if 'useGuideMap' in result['body']['variables']:
-                        guided_map = result['body']['variables']['useGuideMap']
-                        if guided_map:
-                            tools_log.log_info("manage_guided_map")
-                            self._manage_guided_map()
+                variables = result['body'].get('variables')
+                if variables:
+                    guided_map = variables.get('useGuidedMap')
+                    if guided_map:
+                        tools_log.log_info("manage_guided_map")
+                        self._manage_guided_map()
             except Exception as e:
                 tools_log.log_info(str(e))
             finally:

@@ -184,7 +184,7 @@ class GwMincut:
             self.dlg_mincut.btn_end.setDisabled(True)
             # Actions
             if self.mincut_class == 1:
-                self.action_mincut.setDisabled(True)
+                self.action_mincut.setDisabled(False)
                 self.action_refresh_mincut.setDisabled(False)
                 self.action_custom_mincut.setDisabled(False)
                 self.action_change_valve_status.setDisabled(False)
@@ -1588,7 +1588,7 @@ class GwMincut:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_connec)
             return
 
         del_id = []
@@ -1641,7 +1641,7 @@ class GwMincut:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_hydro)
             return
 
         del_id = []
@@ -1922,9 +1922,10 @@ class GwMincut:
         if signal[1]:
             complet_result = signal[1]
             real_mincut_id = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
-            if 'mincutOverlap' in complet_result and complet_result['mincutOverlap'] != "":
+            mincutOverlap = complet_result.get('mincutOverlap')
+            if mincutOverlap not in (None, ""):
                 message = "Mincut done, but has conflict and overlaps with"
-                tools_qt.show_info_box(message, parameter=complet_result['mincutOverlap'])
+                tools_qt.show_info_box(message, parameter=mincutOverlap)
             else:
                 message = complet_result.get('message')
                 if not message:
@@ -1966,7 +1967,7 @@ class GwMincut:
 
             # Enable button CustomMincut, ChangeValveStatus and button Start
             self.dlg_mincut.btn_start.setDisabled(False)
-            self.action_mincut.setDisabled(True)
+            self.action_mincut.setDisabled(False)
             self.action_refresh_mincut.setDisabled(False)
             self.action_custom_mincut.setDisabled(False)
             self.action_change_valve_status.setDisabled(False)
@@ -1989,6 +1990,7 @@ class GwMincut:
         self.set_visible_mincut_layers()
         self._remove_selection()
         self.action_mincut.setChecked(False)
+        self.iface.actionPan().trigger()
 
         # Enabled button accept from mincut form
         self.dlg_mincut.btn_accept.setEnabled(True)
@@ -2050,9 +2052,10 @@ class GwMincut:
 
         if signal[1]:
             complet_result = signal[1]
-            if 'mincutOverlap' in complet_result and complet_result['mincutOverlap'] != "":
+            mincutOverlap = complet_result.get('mincutOverlap')
+            if mincutOverlap not in (None, ""):
                 message = "Mincut done, but has conflict and overlaps with"
-                tools_qt.show_info_box(message, parameter=complet_result['mincutOverlap'])
+                tools_qt.show_info_box(message, parameter=mincutOverlap)
             else:
                 message = complet_result.get('message')
                 if not message:
@@ -2280,7 +2283,7 @@ class GwMincut:
         # Check if template is selected
         if str(self.dlg_comp.cbx_template.currentText()) == "":
             message = "You need to select a template"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_comp)
             return
 
         # Check if template file exists
@@ -2291,7 +2294,7 @@ class GwMincut:
 
         if not os.path.exists(template_path):
             message = "File not found"
-            tools_qgis.show_warning(message, parameter=template_path)
+            tools_qgis.show_warning(message, parameter=template_path, dialog=self.dlg_comp)
             return
 
         # Check if composer exist

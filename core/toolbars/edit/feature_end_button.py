@@ -26,7 +26,7 @@ class GwFeatureEndButton(GwAction):
     def __init__(self, icon_path, action_name, text, toolbar, action_group, list_tabs=None, feature_type=None):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.list_tabs = list_tabs if list_tabs else ["node", "arc", "connec", "gully", "element"]
+        self.list_tabs = list_tabs
         self.feature_type = feature_type
 
 
@@ -337,7 +337,7 @@ class GwFeatureEndButton(GwAction):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_work)
             return
 
         row = selected_list[0].row()
@@ -365,7 +365,7 @@ class GwFeatureEndButton(GwAction):
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = "Expression Error"
-            tools_qgis.show_warning(message, parameter=expr.parserErrorString())
+            tools_qgis.show_warning(message, parameter=expr.parserErrorString(), dialog=self.dlg_work)
             return
 
         id_list = None
@@ -446,7 +446,7 @@ class GwFeatureEndButton(GwAction):
 
         # Check for errors
         if model.lastError().isValid():
-            tools_qgis.show_warning(model.lastError().text())
+            tools_qgis.show_warning(model.lastError().text(), dialog=self.dlg_work)
 
         # Attach model to table view
         widget.setModel(model)

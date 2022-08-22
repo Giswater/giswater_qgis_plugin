@@ -793,12 +793,10 @@ def set_completer_rows(widget, rows):
     :param rows: rows to set into the completer (List)["item1","item2","..."]
     """
 
-    if rows is None:
-        return
-
     list_values = []
-    for row in rows:
-        list_values.append(str(row[0]))
+    if rows is not None:
+        for row in rows:
+            list_values.append(str(row[0]))
 
     # Set completer and model: add autocomplete in the widget
     completer = QCompleter()

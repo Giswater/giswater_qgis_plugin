@@ -31,7 +31,21 @@ class GwDscenarioManagerButton(GwAction):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.feature_type = 'node'
-        self.feature_types = ['node_id', 'arc_id', 'feature_id', 'connec_id', 'nodarc_id']
+        self.feature_types = ['node_id', 'arc_id', 'feature_id', 'connec_id', 'nodarc_id', 'rg_id', 'poll_id', 'sector_id', 'lidco_id']
+        self.filter_dict = {"inp_dscenario_conduit": {"filter_table": "inp_conduit", "feature_type": "arc"},
+                            "inp_dscenario_raingage": {"filter_table": "inp_dscenario_raingage", "feature_type": "rg"},
+                            "inp_dscenario_junction": {"filter_table": "inp_junction", "feature_type": "node"},
+                            "inp_dscenario_lid_usage": {"filter_table": "inp_dscenario_lid_usage","feature_type": "lidco"},
+                            "inp_dscenario_controls": {"filter_table": "inp_dscenario_controls","feature_type": "sector"},
+                            "inp_dscenario_outfall": {"filter_table": "inp_outfall", "feature_type": "node"},
+                            "inp_dscenario_storage": {"filter_table": "inp_storage", "feature_type": "node"},
+                            "inp_dscenario_inflows": {"filter_table": "inp_inflows", "feature_type": "node"},
+                            "inp_dscenario_treatment": {"filter_table": "inp_treatment", "feature_type": "node"},
+                            "inp_dscenario_flwreg_pump": {"filter_table": "inp_pump", "feature_type": "arc"},
+                            "inp_dscenario_flwreg_weir": {"filter_table": "inp_weir", "feature_type": "arc"},
+                            "inp_dscenario_flwreg_orifice": {"filter_table": "inp_orifice", "feature_type": "arc"},
+                            "inp_dscenario_flwreg_outlet": {"filter_table": "inp_outlet", "feature_type": "arc"},
+                            "inp_dscenario_inflows_poll": {"filter_table": "inp_pollutant", "feature_type": "poll"}}
         self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
 
 
@@ -66,6 +80,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario))
         self.dlg_dscenario_manager.btn_update.clicked.connect(partial(self._open_toolbox_function, 3042))
         self.dlg_dscenario_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario))
+        self.dlg_dscenario_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
         self.tbl_dscenario.doubleClicked.connect(self._open_dscenario)
 
         self.dlg_dscenario_manager.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dscenario_manager))
@@ -106,7 +121,7 @@ class GwDscenarioManagerButton(GwAction):
         if complet_list is False:
             return False, False
         for field in complet_list['body']['data']['fields']:
-            if 'hidden' in field and field['hidden']: continue
+            if field.get('hidden'): continue
             model = self.tbl_dscenario.model()
             if model is None:
                 model = QStandardItemModel()
@@ -167,7 +182,7 @@ class GwDscenarioManagerButton(GwAction):
         selected_list = self.tbl_dscenario.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_dscenario_manager)
             return
 
         # Get selected dscenario id
@@ -188,7 +203,7 @@ class GwDscenarioManagerButton(GwAction):
         selected_list = self.tbl_dscenario.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_dscenario_manager)
             return
 
         # Get selected dscenario id
@@ -256,7 +271,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario.finished.connect(self._selection_end)
         self.dlg_dscenario.finished.connect(partial(tools_gw.close_dialog, self.dlg_dscenario, True))
 
-        self._fill_dscenario_table()
+        self._manage_current_changed()
 
         sql = f"SELECT name FROM v_edit_cat_dscenario WHERE dscenario_id = {self.selected_dscenario_id}"
         row = tools_db.get_row(sql)
@@ -296,7 +311,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Check for errors
         if model.lastError().isValid():
-            tools_qgis.show_warning(model.lastError().text())
+            tools_qgis.show_warning(model.lastError().text(), dialog=self.dlg_dscenario)
         # Attach model to table view
         if expr:
             widget.setModel(model)
@@ -328,9 +343,20 @@ class GwDscenarioManagerButton(GwAction):
         # Fill current table
         self._fill_dscenario_table()
 
+        # Refresh txt_feature_id
+        tools_qt.set_widget_text(self.dlg_dscenario, self.dlg_dscenario.txt_feature_id, '')
+        self.dlg_dscenario.txt_feature_id.setStyleSheet(None)
+
         # Manage insert typeahead
-        viewname = "v_edit_" + self.feature_type
-        tools_gw.set_completer_widget(viewname, self.dlg_dscenario.txt_feature_id, str(self.feature_type) + "_id")
+        # Get index of selected tab
+        index_tab = self.dlg_dscenario.main_tab.currentIndex()
+        tab_name = self.dlg_dscenario.main_tab.widget(index_tab).objectName()
+
+        if self.filter_dict[tab_name]:
+            table_name = self.filter_dict[tab_name]['filter_table']
+            self.feature_type = self.filter_dict[tab_name]['feature_type']
+            if table_name != "":
+                tools_gw.set_completer_widget(table_name, self.dlg_dscenario.txt_feature_id, str(self.feature_type) + "_id")
 
         # Deactivate btn_snapping functionality
         self._selection_end()
@@ -468,6 +494,12 @@ class GwDscenarioManagerButton(GwAction):
     def _manage_insert(self):
         """ Insert feature to dscenario via the button """
 
+        if self.dlg_dscenario.txt_feature_id.text() == '':
+            message = "Feature_id is mandatory."
+            self.dlg_dscenario.txt_feature_id.setStyleSheet("border: 1px solid red")
+            tools_qgis.show_warning(message, dialog=self.dlg_dscenario)
+            return
+        self.dlg_dscenario.txt_feature_id.setStyleSheet(None)
         tableview = self.dlg_dscenario.main_tab.currentWidget()
         view = tableview.objectName()
 
@@ -492,7 +524,7 @@ class GwDscenarioManagerButton(GwAction):
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_dscenario)
             return
 
         # Get selected feature_id
@@ -514,7 +546,7 @@ class GwDscenarioManagerButton(GwAction):
         answer = tools_qt.show_question(message, "Delete records", values)
         if answer:
             for value in values:
-                sql = f"DELETE FROM {view} WHERE dscenario_id = {self.selected_dscenario_id} AND {feature_type} = '{value}'"
+                sql = f"DELETE FROM {view} WHERE dscenario_id = {self.selected_dscenario_id} AND {self.feature_type}_id = '{value}'"
                 tools_db.execute_sql(sql)
 
             # Refresh tableview

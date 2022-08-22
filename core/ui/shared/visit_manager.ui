@@ -13,8 +13,8 @@
   <property name="windowTitle">
    <string>Visit management</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
-   <item>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string/>
@@ -90,18 +90,18 @@
           </item>
           <item>
            <widget class="QDateEdit" name="date_event_from">
-            <property name="displayFormat">
-             <string>dd/MM/yyyy</string>
-            </property>
-            <property name="calendarPopup">
-             <bool>true</bool>
-            </property>
             <property name="date">
              <date>
               <year>2016</year>
               <month>1</month>
               <day>1</day>
              </date>
+            </property>
+            <property name="displayFormat">
+             <string>dd/MM/yyyy</string>
+            </property>
+            <property name="calendarPopup">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -138,18 +138,18 @@
           </item>
           <item>
            <widget class="QDateEdit" name="date_event_to">
-            <property name="displayFormat">
-             <string>dd/MM/yyyy</string>
-            </property>
-            <property name="calendarPopup">
-             <bool>true</bool>
-            </property>
             <property name="date">
              <date>
               <year>2017</year>
               <month>1</month>
               <day>1</day>
              </date>
+            </property>
+            <property name="displayFormat">
+             <string>dd/MM/yyyy</string>
+            </property>
+            <property name="calendarPopup">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
