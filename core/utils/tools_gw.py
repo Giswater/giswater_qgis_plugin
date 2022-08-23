@@ -3419,7 +3419,9 @@ def set_snapping_type(layer_settings, value):
 
 def get_segment_flag(default_value):
 
-    if Qgis.QGIS_VERSION_INT >= 31200:
+    if Qgis.QGIS_VERSION_INT >= 32600:
+        segment_flag = Qgis.SnappingType.Segment
+    elif Qgis.QGIS_VERSION_INT >= 31200:
         segment_flag = QgsSnappingConfig.SnappingTypes.SegmentFlag
     else:
         segment_flag = default_value
@@ -3429,7 +3431,9 @@ def get_segment_flag(default_value):
 
 def get_vertex_flag(default_value):
 
-    if Qgis.QGIS_VERSION_INT >= 31200:
+    if Qgis.QGIS_VERSION_INT >= 32600:
+        vertex_flag = Qgis.SnappingType.Vertex
+    elif Qgis.QGIS_VERSION_INT >= 31200:
         vertex_flag = QgsSnappingConfig.SnappingTypes.VertexFlag
     else:
         vertex_flag = default_value

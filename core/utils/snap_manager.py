@@ -9,8 +9,8 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QPoint
 from qgis.PyQt.QtGui import QColor
-from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsPointLocator, QgsSnappingConfig, QgsSnappingUtils, \
-    QgsTolerance, QgsFeatureRequest
+from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsPointLocator, QgsSnappingConfig, \
+    QgsSnappingUtils, QgsTolerance, QgsFeatureRequest
 from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint
 
 from ... import global_vars
@@ -99,6 +99,8 @@ class GwSnapManager(object):
 
         if global_vars.use_gw_snapping is not True:
             return
+        if Qgis.QGIS_VERSION_INT >= 32600:
+            mode = Qgis.SnappingMode.AdvancedConfiguration
         snapping_options = self.get_snapping_options()
         if snapping_options:
             QgsProject.instance().blockSignals(True)
@@ -122,7 +124,7 @@ class GwSnapManager(object):
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
-            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, segment_flag, 15, 1)
+            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, segment_flag, 15, 1, 0, 0)
         self.snapping_config.setIndividualLayerSettings(self.layer_arc, layer_settings)
         self.restore_snap_options(self.snapping_config)
 
@@ -140,7 +142,7 @@ class GwSnapManager(object):
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
-            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, vertex_flag, 15, 1)
+            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, vertex_flag, 15, 1, 0, 0)
         self.snapping_config.setIndividualLayerSettings(self.layer_node, layer_settings)
         self.restore_snap_options(self.snapping_config)
 
@@ -160,7 +162,7 @@ class GwSnapManager(object):
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
-            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, vertex_flag, 15, 1)
+            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, vertex_flag, 15, 1, 0, 0)
         snapping_config.setIndividualLayerSettings(tools_qgis.get_layer_by_tablename('v_edit_connec'), layer_settings)
         self.restore_snap_options(self.snapping_config)
 
@@ -180,7 +182,7 @@ class GwSnapManager(object):
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
-            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, vertex_flag, 15, 1)
+            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, vertex_flag, 15, 1, 0, 0)
         snapping_config.setIndividualLayerSettings(tools_qgis.get_layer_by_tablename('v_edit_gully'), layer_settings)
         self.restore_snap_options(self.snapping_config)
 
