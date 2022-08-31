@@ -319,7 +319,7 @@ BEGIN
 	-- manage cross-reference tables
 	IF v_tabname IN('tab_exploitation', 'tab_macroexploitation', 'tab_sector') THEN
 
-		IF v_sectorfromexpl  THEN
+		IF v_sectorfromexpl AND v_id > 0 THEN
 
 			-- checking actually sector id exists with same id than expl_id
 			IF (SELECT count(*) FROM sector WHERE sector_id = v_id) = 1 THEN
@@ -328,7 +328,7 @@ BEGIN
 			END IF;
 		END IF;
 
-		IF v_sectorfrommacroexpl  THEN
+		IF v_sectorfrommacroexpl AND v_id > 0  THEN
 			-- checking actually sector id exists with same id than expl_id
 			IF (SELECT count(*) FROM sector WHERE sector_id = v_id) = 1 THEN
 				DELETE FROM selector_sector WHERE cur_user = current_user;
@@ -336,7 +336,7 @@ BEGIN
 			END IF;
 		END IF;	
 		
-		IF v_explfromsector  THEN
+		IF v_explfromsector AND v_id > 0 THEN
 			-- checking actually expl id exists with same id than sector_id
 			IF (SELECT count(*) FROM exploitation WHERE expl_id = v_id) = 1 THEN
 				DELETE FROM selector_expl WHERE cur_user = current_user;
