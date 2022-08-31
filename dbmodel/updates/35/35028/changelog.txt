@@ -2,3 +2,4 @@
 *************
 - Enhance setselector for undefined mapzone when expl2sector and sector2expl is enabled
 - Force reservoirs on inlets when go2epa for ws
+- Remove pg2epa_inlet_flowtrace function
