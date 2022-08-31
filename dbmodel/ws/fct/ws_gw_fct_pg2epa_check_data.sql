@@ -698,14 +698,15 @@ BEGIN
 
 	v_querytext = 'SELECT * FROM (
 		SELECT DISTINCT t1.node_id as n1, t1.nodecat_id as n1cat, t1.state as state1, t2.node_id as n2, t2.nodecat_id as n2cat, t2.state as state2, t1.expl_id, 411, 
-		t1.the_geom, st_distance(t1.the_geom, t2.the_geom) as dist, ''Mandatory nodarc over other EPA node'' as descript
-		FROM selector_expl e, selector_sector s, node AS t1 JOIN node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.02) 
+		t1.the_geom, st_distance(t1.the_geom, t2.the_geom) as dist, ''Mandatory nodarc over other EPA node'' as descript, t1.sector_id
+		FROM node AS t1 JOIN node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.01) 
 		WHERE t1.node_id != t2.node_id 
-		AND s.sector_id = t1.sector_id AND s.cur_user = current_user 
-		AND e.expl_id = t1.expl_id AND e.cur_user = current_user 
-		AND (t1.epa_type IN (''PUMP'', ''VALVE'') AND t2.epa_type !=''UNDEFINED'') OR (t2.epa_type IN (''PUMP'', ''VALVE'') AND t1.epa_type !=''UNDEFINED'')
-		AND t1.node_id IN (''PUMP'', ''VALVE'')
-		ORDER BY t1.node_id) a where a.state1 > 0 AND a.state2 > 0 ORDER BY dist' ;
+		AND ((t1.epa_type IN (''PUMP'', ''VALVE'') AND t2.epa_type !=''UNDEFINED'') OR (t2.epa_type IN (''PUMP'', ''VALVE'') AND t1.epa_type !=''UNDEFINED''))
+		ORDER BY t1.node_id) a, selector_expl e, selector_sector s
+		WHERE e.expl_id = a.expl_id AND e.cur_user = current_user 
+		AND s.sector_id = a.sector_id AND s.cur_user = current_user 
+		AND a.state1 > 0 AND a.state2 > 0 ORDER BY dist';
+
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
