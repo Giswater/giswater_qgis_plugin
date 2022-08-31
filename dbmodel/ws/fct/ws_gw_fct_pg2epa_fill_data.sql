@@ -22,6 +22,7 @@ v_statetype text;
 v_isoperative boolean;
 v_networkmode integer;
 v_minlength float;
+v_forcereservoirsoninlets boolean;
 
 BEGIN
 
@@ -33,7 +34,8 @@ BEGIN
 	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_buildup_mode' AND cur_user=current_user);
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user);
 	v_minlength := (SELECT value FROM config_param_system WHERE parameter = 'epa_arc_minlength');
-
+	v_forcereservoirsoninlets := (SELECT value::json->>'forceReservoirsOnInlets' FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
+	
 	-- get debug parameters
 	v_isoperative = (SELECT value::json->>'onlyIsOperative' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
@@ -112,23 +114,29 @@ BEGIN
 	'", "energyparam":"', energyparam,'", "energyvalue":"',energyvalue,'", "pump_type":"',pump_type,'"}')
 	FROM inp_pump WHERE temp_node.node_id=inp_pump.node_id;
 
-	-- manage inlets as reservoir (when there are as many pipes as you want but all are related to same sector)
-	UPDATE temp_node SET epa_type = 'RESERVOIR' WHERE node_id IN (
-	SELECT node_id FROM (
-	SELECT a.sector_id, n1.node_id FROM temp_arc a JOIN temp_node n1 ON n1.node_id = node_1	WHERE n1.epa_type ='INLET'
-	UNION
-	SELECT a.sector_id, n2.node_id FROM temp_arc a JOIN temp_node n2 ON n2.node_id = node_2	WHERE n2.epa_type ='INLET')a
-	group by node_id
-	HAVING count(sector_id)=1);
+	IF v_forcereservoirsoninlets THEN
 
-	-- manage inlets as tanks  (when there are as many pipes as you want and there are at least two sectors involved)
-	UPDATE temp_node SET epa_type = 'TANK' WHERE node_id IN (
-	SELECT node_id FROM (
-	SELECT a.sector_id, n1.node_id FROM temp_arc a JOIN temp_node n1 ON n1.node_id = node_1	WHERE n1.epa_type ='INLET'
-	UNION
-	SELECT a.sector_id, n2.node_id FROM temp_arc a JOIN temp_node n2 ON n2.node_id = node_2	WHERE n2.epa_type ='INLET')a
-	group by node_id
-	HAVING count(sector_id)>1);
+		UPDATE temp_node SET epa_type = 'RESERVOIR' WHERE epa_type = 'INLET';
+	ELSE 
+
+		-- manage inlets as reservoir (when there are as many pipes as you want but all are related to same sector)
+		UPDATE temp_node SET epa_type = 'RESERVOIR' WHERE node_id IN (
+		SELECT node_id FROM (
+		SELECT a.sector_id, n1.node_id FROM temp_arc a JOIN temp_node n1 ON n1.node_id = node_1	WHERE n1.epa_type ='INLET'
+		UNION
+		SELECT a.sector_id, n2.node_id FROM temp_arc a JOIN temp_node n2 ON n2.node_id = node_2	WHERE n2.epa_type ='INLET')a
+		group by node_id
+		HAVING count(sector_id)=1);
+
+		-- manage inlets as tanks  (when there are as many pipes as you want and there are at least two sectors involved)
+		UPDATE temp_node SET epa_type = 'TANK' WHERE node_id IN (
+		SELECT node_id FROM (
+		SELECT a.sector_id, n1.node_id FROM temp_arc a JOIN temp_node n1 ON n1.node_id = node_1	WHERE n1.epa_type ='INLET'
+		UNION
+		SELECT a.sector_id, n2.node_id FROM temp_arc a JOIN temp_node n2 ON n2.node_id = node_2	WHERE n2.epa_type ='INLET')a
+		group by node_id
+		HAVING count(sector_id)>1);
+	END IF;
 
 
 	raise notice 'inserting arcs on temp_arc table';
