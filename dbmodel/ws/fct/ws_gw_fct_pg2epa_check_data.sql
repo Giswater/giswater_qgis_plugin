@@ -696,7 +696,7 @@ BEGIN
 
 	RAISE NOTICE '28- Mandatory nodarc over epa node (411)';
 
-	v_querytext = 'SELECT * FROM (
+	v_querytext = 'SELECT a.* FROM (
 		SELECT DISTINCT t1.node_id as n1, t1.nodecat_id as n1cat, t1.state as state1, t2.node_id as n2, t2.nodecat_id as n2cat, t2.state as state2, t1.expl_id, 411, 
 		t1.the_geom, st_distance(t1.the_geom, t2.the_geom) as dist, ''Mandatory nodarc over other EPA node'' as descript, t1.sector_id
 		FROM node AS t1 JOIN node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.01) 
@@ -707,13 +707,12 @@ BEGIN
 		AND s.sector_id = a.sector_id AND s.cur_user = current_user 
 		AND a.state1 > 0 AND a.state2 > 0 ORDER BY dist';
 
-
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 3, '411' ,concat('ERROR-411 (anl_node): There is/are ',v_count,' mandatory nodarcs (VALVE & PUMP) over other EPA nodes.'),v_count);
 
-		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, the_geom, arc_distance, descript) SELECT * FROM ('||v_querytext||') a';
+		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, the_geom, arc_distance, descript, sector_id) SELECT * FROM ('||v_querytext||') a';
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 1, '411','INFO: All mandatory nodarc (PUMP & VALVE) are not on the same position than other EPA nodes.',v_count);
