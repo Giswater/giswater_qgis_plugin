@@ -83,15 +83,12 @@ BEGIN
 				RAISE EXCEPTION 'Function: [%] - %. HINT: % - %', rec_function.function_name, rec_cat_error.error_message, rec_cat_error.hint_message, v_variables ;
 			END IF;
 		ELSIF rec_cat_error.log_level = 3 THEN
-
 			IF v_debug THEN
-				IF v_message IS NOT NULL THEN
-					SELECT  concat('Function: ',function_name,' - ',rec_cat_error.error_message, ' ',v_message,'. HINT: ', rec_cat_error.hint_message,'.')  INTO v_return_text
-					FROM sys_function WHERE sys_function.id=v_function_id;
-				ELSE
-					SELECT  concat('Function: ',function_name,' - ',rec_cat_error.error_message,'. HINT: ', rec_cat_error.hint_message,'.')  INTO v_return_text
-					FROM sys_function WHERE sys_function.id=v_function_id;
-				END IF;
+				SELECT  concat('Function: ',function_name,' - ',rec_cat_error.error_message,'. HINT: ', rec_cat_error.hint_message,'.')  INTO v_return_text
+				FROM sys_function WHERE sys_function.id=v_function_id;
+			ELSE
+				SELECT  rec_cat_error.error_message  INTO v_return_text
+				FROM sys_function WHERE sys_function.id=v_function_id;
 			END IF;
 
 			v_level = 2;
