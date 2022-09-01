@@ -346,7 +346,7 @@ BEGIN
 				"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"workcat_id_plan" }}$$);
 			END IF;
 
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (214, 4, concat('Project have been sucessfully updated from ',v_oldversion,' version to ',v_gwversion, ' version'));
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('Project have been sucessfully updated from ',v_oldversion,' version to ',v_gwversion, ' version'));
 			v_message='Project sucessfully updated';
 
 		END IF;
