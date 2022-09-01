@@ -8,7 +8,7 @@ version=3.5.028
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Adrian Valenciano, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Elies Bertran, Abel García Juanes, Xavier Torret
 
 Changelog=Version 3.5.028
-
+    - Bug fix: insert document from another dialog (info/visit)
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
 homepage=https://www.giswater.org
