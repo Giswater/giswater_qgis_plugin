@@ -9,6 +9,7 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Adrian Valencian
 
 Changelog=Version 3.5.028
     - Bug fix: insert document from another dialog (info/visit)
+    - Bug fix: don't allow role_basic/role_om users to edit in info
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
 homepage=https://www.giswater.org

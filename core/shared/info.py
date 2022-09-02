@@ -682,8 +682,9 @@ class GwInfo(QObject):
         dlg_cf = self.dlg_cf
         layer = self.layer
         fid = self.feature_id
+        can_edit = tools_os.set_boolean(tools_db.check_role_user('role_edit'))
         if layer:
-            if layer.isEditable():
+            if layer.isEditable() and can_edit:
                 tools_gw.enable_all(dlg_cf, complet_result['body']['data'])
             else:
                 tools_gw.enable_widgets(dlg_cf, complet_result['body']['data'], False)
@@ -695,9 +696,9 @@ class GwInfo(QObject):
         self.fct_stop_editing = lambda: self._stop_editing(dlg_cf, self.action_edit, layer, fid, self.my_json, new_feature)
         self._connect_signals()
 
-        self._enable_actions(dlg_cf, layer.isEditable())
+        self._enable_actions(dlg_cf, layer.isEditable() and can_edit)
 
-        self.action_edit.setChecked(layer.isEditable())
+        self.action_edit.setChecked(layer.isEditable() and can_edit)
         child_type = complet_result['body']['feature']['childType']
 
         # Actions signals
@@ -729,6 +730,11 @@ class GwInfo(QObject):
         self.action_help.triggered.connect(partial(self._open_help, self.feature_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
         self.action_interpolate.triggered.connect(partial(self._activate_snapping, complet_result, self.ep))
+
+        # Disable action edit if user can't edit
+        if not can_edit:
+            self.action_edit.setChecked(False)
+            self.action_edit.setEnabled(False)
 
         return dlg_cf, fid
 
