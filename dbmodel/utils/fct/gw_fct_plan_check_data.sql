@@ -57,7 +57,7 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fid=115 AND cur_user=current_user;
 	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (252);
 	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (252,452);
-	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (252, 354, 355,462);
+	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (252, 354, 355,467);
 
 
 	-- Starting process
@@ -474,10 +474,10 @@ BEGIN
 		VALUES (115, 1, '452','INFO: No arc''s with state=1 and without node_1 or node_2 nodes found.', v_count);
 	END IF;
 
-	-- Planified umps with more than two arcs (462);
+	-- Planified umps with more than two arcs (467);
 	IF v_project_type='WS' THEN 
 		INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
-		select 462, b.node_id, nodecat_id, the_geom, 'Planified EPA pump with more than two arcs', expl_id
+		select 467, b.node_id, nodecat_id, the_geom, 'Planified EPA pump with more than two arcs', expl_id
 		FROM(
 		SELECT node_id, count(*) FROM(
 		SELECT node_id FROM arc JOIN inp_pump ON node_1 = node_id 
@@ -491,15 +491,15 @@ BEGIN
 		HAVING count(*)>2)b
 		JOIN node USING (node_id);
 		
-		SELECT count(*) FROM anl_node INTO v_count WHERE fid=462 AND cur_user=current_user;
+		SELECT count(*) FROM anl_node INTO v_count WHERE fid=467 AND cur_user=current_user;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (115, '462', 3, concat(
-			'ERROR-462 (anl_node): There is/are ',v_count,' pumps(s) with more than two arcs .Take a look on temporal table to details'),v_count);
+			VALUES (115, '467', 3, concat(
+			'ERROR-467 (anl_node): There is/are ',v_count,' pumps(s) with more than two arcs .Take a look on temporal table to details'),v_count);
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (115, '462' , 1,  'INFO: EPA pumps checked. No pumps with more than two arcs detected.',v_count);
+			VALUES (115, '467' , 1,  'INFO: EPA pumps checked. No pumps with more than two arcs detected.',v_count);
 		END IF;		
 	END IF;
 
@@ -555,7 +555,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, node_id as feature_id, nodecat_id as feature_catalog, state, expl_id, descript,fid, the_geom FROM anl_node WHERE cur_user="current_user"()
-	AND fid IN (252, 354, 355,462)
+	AND fid IN (252, 354, 355,467)
 	UNION
 	SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom FROM anl_arc WHERE cur_user="current_user"()
 	AND fid IN (252, 452)

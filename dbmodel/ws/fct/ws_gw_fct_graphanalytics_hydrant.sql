@@ -38,7 +38,7 @@ v_audit_result text;
 
 v_fid integer=463;
 v_fid_result integer=464;
-v_fid_proposal integer=465;
+v_fid_proposal integer=468;
 
 v_closest_street text;
 v_street_geom  public.geometry;
