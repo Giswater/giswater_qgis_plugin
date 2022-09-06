@@ -2851,7 +2851,26 @@ def set_completer_object(dialog, tablename, field_id="id"):
     set_completer_widget(tablename, widget, field_id)
 
 
-def set_completer_widget(tablename, widget, field_id):
+def set_completer_widget(tablename, widget, field_id, add_id=False):
+    """ Set autocomplete of widget @table_object + "_id"
+        getting id's from selected @table_object
+    """
+
+    if not widget:
+        return
+    if type(tablename) == list and type(field_id) == list:
+        return set_multi_completer_widget(tablename, widget, field_id, add_id=add_id)
+    if add_id:
+        field_id += '_id'
+
+    sql = (f"SELECT DISTINCT({field_id})"
+           f" FROM {tablename}"
+           f" ORDER BY {field_id}")
+    rows = tools_db.get_rows(sql)
+    tools_qt.set_completer_rows(widget, rows)
+
+
+def set_multi_completer_widget(tablenames: list, widget, fields_id: list, add_id=False):
     """ Set autocomplete of widget @table_object + "_id"
         getting id's from selected @table_object
     """
@@ -2859,9 +2878,19 @@ def set_completer_widget(tablename, widget, field_id):
     if not widget:
         return
 
-    sql = (f"SELECT DISTINCT({field_id})"
-           f" FROM {tablename}"
-           f" ORDER BY {field_id}")
+    sql = ""
+    idx = 0
+    for tablename in tablenames:
+        field_id = fields_id[idx]
+        if add_id:
+            field_id += '_id'
+        if sql != "":
+            sql += " UNION "
+        sql += (f"SELECT DISTINCT({field_id}) as a"
+                f" FROM {tablename}")
+        idx += 1
+    sql += f" ORDER BY a"
+
     rows = tools_db.get_rows(sql)
     tools_qt.set_completer_rows(widget, rows)
 
