@@ -146,9 +146,9 @@ BEGIN
 		v_emb_incid_tip = ((p_data ->>'data')::json->>'fields')::json->>'emb_incid_tip';
 		
 		IF v_node_id IS NOT NULL THEN
-			SELECT count(*) INTO v_count FROM ve_visit_node_incidencia WHERE node_id=v_node_id::text and node_incid_tip=v_node_incid_tip::text and node_incid_status in ('0','1','2','3');
+			SELECT count(*) INTO v_count FROM ve_visit_node_incidencia WHERE node_id=v_node_id::text and node_incid_tip=v_node_incid_tip::text and node_incid_status in ('0','1','2','3') and visit_id<>v_id;
 		ELSIF v_gully_id IS NOT NULL THEN
-			SELECT count(*) INTO v_count FROM ve_visit_emb_incidencia WHERE gully_id=v_gully_id::text and emb_incid_tip=v_emb_incid_tip::text and emb_incid_status in ('0','1','2','3');
+			SELECT count(*) INTO v_count FROM ve_visit_emb_incidencia WHERE gully_id=v_gully_id::text and emb_incid_tip=v_emb_incid_tip::text and emb_incid_status in ('0','1','2','3') and visit_id<>v_id;
 		END IF;
 	
 		IF v_count > 0 THEN
