@@ -546,7 +546,7 @@ class GwLoadProject(QObject):
             try:
                 variables = result['body'].get('variables')
                 if variables:
-                    guided_map = variables.get('useGuidedMap')
+                    guided_map = variables.get('useGuideMap')
                     if guided_map:
                         tools_log.log_info("manage_guided_map")
                         self._manage_guided_map()
