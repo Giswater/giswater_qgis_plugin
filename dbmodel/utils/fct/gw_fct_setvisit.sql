@@ -89,6 +89,10 @@ v_visitclass_arc integer;
 v_visitclass_node integer;
 v_visitclass_gully integer;
 v_feature_id integer;
+v_node_incid_tip integer;
+v_emb_incid_tip integer;
+v_count integer;
+v_message3 json;
 
 
 BEGIN
@@ -134,6 +138,27 @@ BEGIN
 	END IF;
 
 	PERFORM setval('"SCHEMA_NAME".doc_x_visit_id_seq', (SELECT max(id) FROM doc_x_visit), true);
+
+	-- exception for duplicated incidence
+	IF v_tablename='ve_visit_node_incidencia' OR v_tablename='ve_visit_emb_incidencia' THEN
+		-- compare if another incidence with same type and status in 0, 1, 2, 3 exists in the same feature (node, gully)
+		v_node_incid_tip = ((p_data ->>'data')::json->>'fields')::json->>'node_incid_tip';
+		v_emb_incid_tip = ((p_data ->>'data')::json->>'fields')::json->>'emb_incid_tip';
+		
+		IF v_node_id IS NOT NULL THEN
+			SELECT count(*) INTO v_count FROM ve_visit_node_incidencia WHERE node_id=v_node_id::text and node_incid_tip=v_node_incid_tip::text and node_incid_status in ('0','1','2','3');
+		ELSIF v_gully_id IS NOT NULL THEN
+			SELECT count(*) INTO v_count FROM ve_visit_emb_incidencia WHERE gully_id=v_gully_id::text and emb_incid_tip=v_emb_incid_tip::text and emb_incid_status in ('0','1','2','3');
+		END IF;
+	
+		IF v_count > 0 THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3203", "function":"2622","debug_msg":""}}$$);'INTO v_message3;
+			v_message3 = (((v_message3->>'body')::json->>'data')::json->>'info')::json;
+			RETURN ('{"status":"Accepted", "message":'||v_message3||', "apiVersion":'|| v_version ||',
+			"body": {"data":{}}}')::json;
+		END IF;				   
+	END IF;
 
 	-- Get new visit id if not exist
 	RAISE notice 'FIRST ID     -> %',v_id;
