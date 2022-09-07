@@ -71,6 +71,8 @@ class GwProfileButton(GwAction):
         self.rotation_vd_exist = False
         self.lastnode_datatype = 'REAL'
         self.none_values = []
+        self.add_points = False
+        self.add_points_list = []
 
 
     def clicked_event(self):
@@ -94,8 +96,16 @@ class GwProfileButton(GwAction):
         # Toolbar actions
         action = self.dlg_draw_profile.findChild(QAction, "actionProfile")
         tools_gw.add_icon(action, "131", sub_folder="24x24")
+        action.triggered.connect(partial(self._activate_add_points, False))
         action.triggered.connect(partial(self._activate_snapping_node))
         self.action_profile = action
+
+        action = self.dlg_draw_profile.findChild(QAction, "actionAddPoint")
+        tools_gw.add_icon(action, "111", sub_folder="24x24")
+        action.triggered.connect(partial(self._activate_add_points, True))
+        action.triggered.connect(partial(self._activate_snapping_node))
+        self.action_add_point = action
+        self.action_add_point.setDisabled(True)
 
         # Set validators
         self.dlg_draw_profile.txt_min_distance.setValidator(QDoubleValidator())
@@ -137,6 +147,12 @@ class GwProfileButton(GwAction):
         self.initNode = None
         self.endNode = None
         self.first_node = True
+        self.add_points = False
+        self.add_points_list = []
+
+
+    def _activate_add_points(self, activate=True):
+        self.add_points = activate
 
 
     def _get_profile(self):
@@ -156,6 +172,9 @@ class GwProfileButton(GwAction):
         # Create variable with all the content of the form
         extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}", ' \
                  f'"linksDistance":{links_distance}, "scale":{{ "eh":1000, "ev":1000}}'
+        if self.add_points_list:
+            l = str(self.add_points_list).replace("'", "")
+            extras += f', "midNodes":{l}'
 
         body = tools_gw.create_body(extras=extras)
 
@@ -271,11 +290,29 @@ class GwProfileButton(GwAction):
         self.dlg_draw_profile.btn_save_profile.setEnabled(True)
         for profile in parameters['body']['data']:
             if profile['profile_id'] == profile_id:
+                # Get data
                 self.initNode = profile['values']['initNode']
                 self.endNode = profile['values']['endNode']
-
-                self.dlg_draw_profile.txt_profile_id.setText(str(profile_id))
                 list_arcs = profile['values']['listArcs']
+
+                # Get arcs from profile
+                expr_filter = "\"arc_id\" IN ("
+                for arc in list_arcs.strip('][').split(', '):
+                    expr_filter += f"'{arc}', "
+                expr_filter = expr_filter[:-2] + ")"
+                expr = QgsExpression(expr_filter)
+                # Get a featureIterator from this expression:
+                self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+                it = self.layer_arc.getFeatures(QgsFeatureRequest(expr))
+
+                self.id_list = [i.id() for i in it]
+                if not self.id_list:
+                    message = "Couldn't draw profile. You may need to select another exploitation."
+                    tools_qgis.show_warning(message)
+                    return
+
+                # Set data in dialog
+                self.dlg_draw_profile.txt_profile_id.setText(str(profile_id))
                 self.dlg_draw_profile.tbl_list_arc.clear()
 
                 for arc in list_arcs.strip('][').split(', '):
@@ -287,18 +324,8 @@ class GwProfileButton(GwAction):
                 date = QDate.fromString(profile['values']['date'], 'dd-MM-yyyy')
                 tools_qt.set_calendar(self.dlg_draw_profile, self.dlg_draw_profile.date, date)
 
-                self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+                # Select features in map
                 self._remove_selection()
-
-                expr_filter = "\"arc_id\" IN ("
-                for arc in list_arcs.strip('][').split(', '):
-                    expr_filter += f"'{arc}', "
-                expr_filter = expr_filter[:-2] + ")"
-                expr = QgsExpression(expr_filter)
-                # Get a featureIterator from this expression:
-                it = self.layer_arc.getFeatures(QgsFeatureRequest(expr))
-
-                self.id_list = [i.id() for i in it]
                 self.layer_arc.selectByIds(self.id_list)
 
                 # Center shortest path in canvas - ZOOM SELECTION
@@ -313,7 +340,7 @@ class GwProfileButton(GwAction):
         self.endNode = None if not hasattr(self, "endNode") else self.endNode
         self.first_node = True if not hasattr(self, "first_node") else self.first_node
 
-        if self.first_node is False:
+        if self.first_node is False and not self.add_points:
             message = f"First node already selected with id: {self.initNode}. Select second one."
             tools_qgis.show_info(message)
 
@@ -368,13 +395,16 @@ class GwProfileButton(GwAction):
                 element_id = snapped_feat.attribute('node_id')
                 self.element_id = str(element_id)
 
-                if self.first_node:
+                if self.first_node and not self.add_points:
                     self.initNode = element_id
                     self.first_node = False
                     message = f"Node 1 selected"
                     tools_qgis.show_info(message, parameter=element_id)
                 else:
-                    self.endNode = element_id
+                    if self.add_points:
+                        self.add_points_list.append(element_id)
+                    else:
+                        self.endNode = element_id
                     tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
                     tools_gw.disconnect_signal('profile')
                     self.dlg_draw_profile.btn_draw_profile.setEnabled(True)
@@ -385,6 +415,9 @@ class GwProfileButton(GwAction):
 
                     # Populate list arcs
                     extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}"'
+                    if self.add_points and self.add_points_list:
+                        l = str(self.add_points_list).replace("'", "")
+                        extras += f', "midNodes":{l}'
                     body = tools_gw.create_body(extras=extras)
                     result = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
                     if result is None or result['status'] == 'Failed':
@@ -396,6 +429,8 @@ class GwProfileButton(GwAction):
                         level = int(result['message']['level'])
                         tools_qgis.show_message(result['message']['text'], level)
                         if result['message']['level'] != 3:
+                            # If error reset profile
+                            self._clear_profile()
                             return
 
                     self._remove_selection()
@@ -418,6 +453,9 @@ class GwProfileButton(GwAction):
 
                     # Next profile will be done from scratch
                     self.first_node = True
+                    if self.add_points:
+                        self.add_points = False
+                    self.action_add_point.setDisabled(False)
 
 
     def _action_pan(self):
@@ -472,7 +510,7 @@ class GwProfileButton(GwAction):
         self.plot = plt
 
         # If file profile.png exist overwrite
-        temp_folder = f"{global_vars.user_folder_dir}{os.sep}temp"
+        temp_folder = f"{global_vars.user_folder_dir}{os.sep}core{os.sep}temp"
         img_path = f"{temp_folder}{os.sep}profile.png"
         if not os.path.exists(temp_folder):
             os.makedirs(temp_folder)
@@ -887,7 +925,7 @@ class GwProfileButton(GwAction):
         # Fill top_elevation
         s = ' ' + '\n' + str(self.nodes[index].descript['top_elev']) + '\n' + ' '
         xy = (Decimal(start_point), self.min_top_elev - Decimal(self.height_row * Decimal(1.8) + self.height_row / 2))
-        plt.annotate(s=s, xy=xy, fontsize=6, color=text_color, fontweight=text_weight, rotation='vertical',
+        plt.annotate(s, xy=xy, fontsize=6, color=text_color, fontweight=text_weight, rotation='vertical',
                      horizontalalignment='center', verticalalignment='center')
         # Fill code
         plt.text(0 + start_point, self.min_top_elev - Decimal(self.height_row * 5 + self.height_row / 2),
@@ -1023,7 +1061,7 @@ class GwProfileButton(GwAction):
             # Fill top_elevation
             s = ' ' + '\n' + str(self.links[index].descript['top_elev']) + '\n' + ' '
             xy = (Decimal(start_point), self.min_top_elev - Decimal(self.height_row * Decimal(1.8) + self.height_row / 2))
-            plt.annotate(s=s, xy=xy, fontsize=6, color=text_color, fontweight=text_weight, rotation='vertical',
+            plt.annotate(s, xy=xy, fontsize=6, color=text_color, fontweight=text_weight, rotation='vertical',
                          horizontalalignment='center', verticalalignment='center')
 
             # Fill code
@@ -1335,6 +1373,7 @@ class GwProfileButton(GwAction):
         self.dlg_draw_profile.tbl_list_arc.clear()
         self.dlg_draw_profile.txt_profile_id.clear()
         self.action_profile.setDisabled(False)
+        self.action_add_point.setDisabled(True)
         self.dlg_draw_profile.btn_draw_profile.setEnabled(False)
         self.dlg_draw_profile.btn_save_profile.setEnabled(False)
 

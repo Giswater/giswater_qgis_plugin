@@ -24,15 +24,19 @@ class GwSelector:
         pass
 
 
-    def open_selector(self, selector_type='"selector_basic"', reload_dlg=None):
+    def open_selector(self, selector_type="selector_basic", reload_dlg=None):
         """
         :param selector_type: This parameter must be a string between double quotes. Example: '"selector_basic"'
         """
-
         if reload_dlg:
-            current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
+            aux_params = None
+            if selector_type == "selector_mincut":
+                current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_mincut", "user", "session")
+                aux_params = tools_gw.get_config_parser("selector_mincut", f"aux_params", "user", "session")
+            else:
+                current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
             reload_dlg.main_tab.clear()
-            self.get_selector(reload_dlg, selector_type, current_tab=current_tab)
+            self.get_selector(reload_dlg, selector_type, current_tab=current_tab, aux_params=aux_params)
             return
 
         dlg_selector = GwSelectorUi()
@@ -79,7 +83,7 @@ class GwSelector:
                 widget.setFocus()
 
 
-    def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None):
+    def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None, aux_params=None):
         """
         Ask to DB for selectors and make dialog
             :param dialog: Is a standard dialog, from file selector.ui, where put widgets
@@ -103,9 +107,14 @@ class GwSelector:
         # Profilactic control of nones
         if text_filter is None:
             text_filter = ''
+        if '"' in selector_type:
+            selector_type = selector_type.strip('"')
         # Built querytext
         form = f'"currentTab":"{current_tab}"'
-        extras = f'"selectorType":{selector_type}, "filterText":"{text_filter}"'
+        extras = f'"selectorType":"{selector_type}", "filterText":"{text_filter}"'
+        if aux_params:
+            tools_gw.set_config_parser("selector_mincut", f"aux_params", f"{aux_params}", "user", "session")
+            extras = f"{extras}, {aux_params}"
         body = tools_gw.create_body(form=form, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
 
@@ -114,12 +123,11 @@ class GwSelector:
             return False
 
         # Get styles
-        stylesheet = json_result['body']['form']['style'] if 'style' in json_result['body']['form'] else None
+        stylesheet = json_result['body']['form'].get('style')
         color_rows = False
         if stylesheet:
             # Color selectors zebra-styled
-            if 'rowsColor' in stylesheet and stylesheet['rowsColor'] is not None:
-                color_rows = tools_os.set_boolean(stylesheet['rowsColor'], False)
+            color_rows = tools_os.set_boolean(stylesheet.get('rowsColor'), False)
 
         for form_tab in json_result['body']['form']['formTabs']:
 
@@ -137,8 +145,9 @@ class GwSelector:
                 main_tab.insertTab(index, tab_widget, form_tab['tabLabel'])
             else:
                 main_tab.addTab(tab_widget, form_tab['tabLabel'])
-            if 'typeaheadForced' in form_tab and form_tab['typeaheadForced'] is not None:
-                tab_widget.setProperty('typeahead_forced', form_tab['typeaheadForced'])
+            typeaheadForced = form_tab.get('typeaheadForced')
+            if typeaheadForced is not None:
+                tab_widget.setProperty('typeahead_forced', typeaheadForced)
 
             # Create a new QGridLayout and put it into tab
             gridlayout = QGridLayout()
@@ -310,8 +319,17 @@ class GwSelector:
         tools_qgis.set_layer_index('v_edit_plan_psector')
         tools_qgis.refresh_map_canvas()
 
+        # Refresh raster layer
+        layer = tools_qgis.get_layer_by_tablename('v_ext_raster_dem', schema_name='')
+        if layer:
+            layer.dataProvider().reloadData()
+            layer.triggerRepaint()
+            canvas_extent = global_vars.iface.mapCanvas().extent()
+            layer.setExtent(canvas_extent)
+            global_vars.iface.mapCanvas().refresh()
+
         # Reload selectors dlg
-        self.open_selector(reload_dlg=dialog)
+        self.open_selector(selector_type, reload_dlg=dialog)
 
         # Update current_workspace label (status bar)
         tools_gw.manage_current_selections_docker(json_result)

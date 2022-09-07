@@ -74,7 +74,7 @@ class GwGo2EpaManagerButton(GwAction):
         if complet_list is False:
             return False, False
         for field in complet_list['body']['data']['fields']:
-            if 'hidden' in field and field['hidden']: continue
+            if field.get('hidden'): continue
             model = self.dlg_manager.tbl_rpt_cat_result.model()
             if model is None:
                 model = QStandardItemModel()
@@ -179,7 +179,7 @@ class GwGo2EpaManagerButton(GwAction):
 
         sql = "SELECT result_id FROM v_ui_rpt_cat_result ORDER BY result_id"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_box(self.dlg_manager, self.dlg_manager.txt_result_id, rows)
+        tools_qt.fill_combo_values(self.dlg_manager.txt_result_id, rows, add_empty=True)
 
 
     def _filter_by_result_id(self):
@@ -210,14 +210,15 @@ class GwGo2EpaManagerButton(GwAction):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_manager)
             return
 
         inf_text = ""
         list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            id_ = widget.model().record(row).value(str(column_id))
+            col = tools_qt.get_col_index_by_col_name(widget, str(column_id))
+            id_ = widget.model().index(row, col).data()
             inf_text += f"{id_}, "
             list_id += f"'{id_}', "
         inf_text = inf_text[:-2]
@@ -229,6 +230,6 @@ class GwGo2EpaManagerButton(GwAction):
             sql = f"DELETE FROM {table_name}"
             sql += f" WHERE {column_id} IN ({list_id})"
             tools_db.execute_sql(sql)
-            widget.model().select()
+            self._fill_manager_table(self.dlg_manager.txt_result_id.currentText())
 
     # endregion

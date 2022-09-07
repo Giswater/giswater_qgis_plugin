@@ -14,9 +14,10 @@ import traceback
 import webbrowser
 from functools import partial
 from encodings.aliases import aliases
+from warnings import warn
 
 from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal,\
-    QPersistentModelIndex, QCoreApplication, QTranslator
+    QPersistentModelIndex, QCoreApplication, QTranslator, QEvent
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, \
@@ -58,7 +59,23 @@ class GwHyperLinkLabel(QLabel):
         self.setStyleSheet("QLabel{color:purple; text-decoration: underline;}")
 
 
+class GwHyperLinkLineEdit(QLineEdit):
+
+    clicked = pyqtSignal()
+
+    def __init__(self):
+        QLabel.__init__(self)
+        self.setStyleSheet("QLineEdit{color:blue; text-decoration: underline;}")
+
+    def mouseReleaseEvent(self, ev):
+        if self.isReadOnly():
+            self.clicked.emit()
+            self.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:purple; text-decoration: underline; border: none;}")
+
+
 def fill_combo_box(dialog, widget, rows, allow_nulls=True, clear_combo=True):
+
+    warn('This method is deprecated, use fill_combo_values instead.', DeprecationWarning, stacklevel=2)
 
     if rows is None:
         return
@@ -182,7 +199,7 @@ def get_text(dialog, widget, add_quote=False, return_string_null=True):
         widget = dialog.findChild(QWidget, widget)
     text = None
     if widget:
-        if type(widget) in (QLineEdit, QPushButton, QLabel, GwHyperLinkLabel):
+        if type(widget) in (QLineEdit, QPushButton, QLabel, GwHyperLinkLabel, GwHyperLinkLineEdit):
             text = widget.text()
         elif type(widget) in (QDoubleSpinBox, QSpinBox):
             # When the QDoubleSpinbox contains decimals, for example 2,0001 when collecting the value,
@@ -526,7 +543,7 @@ def enable_dialog(dialog, enable, ignore_widgets=['', None]):
 
 
 def set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=QTableView.NoEditTriggers,
-                         sectionResizeMode=3, stretchLastSection=True):
+                         sectionResizeMode=3, stretchLastSection=True, sortingEnabled=True):
     """ Set QTableView configurations """
 
     widget.setSelectionBehavior(selection)
@@ -534,6 +551,7 @@ def set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_tr
     widget.horizontalHeader().setStretchLastSection(stretchLastSection)
     widget.horizontalHeader().setMinimumSectionSize(100)
     widget.setEditTriggers(edit_triggers)
+    widget.setSortingEnabled(sortingEnabled)
 
 
 def get_col_index_by_col_name(qtable, column_name):
@@ -634,7 +652,7 @@ def fill_table(qtable, table_name, expr_filter=None, edit_strategy=QSqlTableMode
     qtable.setModel(model)
 
 
-def add_layer_to_toc(layer, group=None, sub_group=None, create_groups=False):
+def add_layer_to_toc(layer, group=None, sub_group=None, create_groups=False, sub_sub_group=None):
     """ If the function receives a group name, check if it exists or not and put the layer in this group
     :param layer: (QgsVectorLayer)
     :param group: Name of the group that will be created in the toc (string)
@@ -646,20 +664,27 @@ def add_layer_to_toc(layer, group=None, sub_group=None, create_groups=False):
 
     QgsProject.instance().addMapLayer(layer, False)
     root = QgsProject.instance().layerTreeRoot()
-    first_group = root.findGroup(group)
+    first_group = tools_qgis.find_toc_group(root, group)
+
     if create_groups:
         if not first_group:
             first_group = root.insertGroup(0, group)
-        if not first_group.findGroup(sub_group):
-            first_group.insertGroup(0, sub_group)
+        if not tools_qgis.find_toc_group(first_group, sub_group):
+            second_group = first_group.insertGroup(0, sub_group)
+            if sub_sub_group and not tools_qgis.find_toc_group(second_group, sub_sub_group):
+                second_group.insertGroup(0, sub_sub_group)
 
     if first_group and sub_group:
-        for child in first_group.children():
-            second_group = first_group.findGroup(child.name())
-            if second_group and sub_group.lower() == child.name().lower():
-                second_group.insertLayer(0, layer)
+        second_group = tools_qgis.find_toc_group(first_group, sub_group)
+        if second_group:
+            third_group = tools_qgis.find_toc_group(second_group, sub_sub_group)
+            if third_group:
+                third_group.insertLayer(0, layer)
                 global_vars.iface.setActiveLayer(layer)
                 return
+            second_group.insertLayer(0, layer)
+            global_vars.iface.setActiveLayer(layer)
+            return
         first_group.insertLayer(0, layer)
         global_vars.iface.setActiveLayer(layer)
         return
@@ -768,12 +793,10 @@ def set_completer_rows(widget, rows):
     :param rows: rows to set into the completer (List)["item1","item2","..."]
     """
 
-    if rows is None:
-        return
-
     list_values = []
-    for row in rows:
-        list_values.append(str(row[0]))
+    if rows is not None:
+        for row in rows:
+            list_values.append(str(row[0]))
 
     # Set completer and model: add autocomplete in the widget
     completer = QCompleter()
@@ -1087,7 +1110,13 @@ def manage_exception_db(exception=None, sql=None, stack_level=2, stack_level_inc
     description = ""
     if exception:
         description = str(exception)
-        if 'unknown error' in description:
+        dont_show_list = ['unknown error', 'server closed the connection unexpectedly',
+                          'message contents do not agree with length in message', 'unexpected field count in']
+        for dont_show in dont_show_list:
+            if dont_show in description:
+                show_exception_msg = False
+                break
+        if 'server sent data' in description and 'without prior row description' in description:
             show_exception_msg = False
 
     try:

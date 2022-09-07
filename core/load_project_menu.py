@@ -64,7 +64,7 @@ class GwMenuLoad(QObject):
 
                 for index_action in buttons_toolbar:
 
-                    if index_action in project_exclusive:
+                    if project_exclusive and index_action in project_exclusive:
                         continue
 
                     icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}{toolbar}{os.sep}{index_action}.png"
@@ -152,7 +152,7 @@ class GwMenuLoad(QObject):
 
         # region Open user folder
         if global_vars.user_folder_dir:
-            log_folder = os.path.join(global_vars.user_folder_dir, 'log')
+            log_folder = f"{global_vars.user_folder_dir}{os.sep}core{os.sep}log"
             size = tools_os.get_folder_size(log_folder)
             log_folder_volume = f"{round(size / (1024 * 1024), 2)} MB"
             icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}102.png"
@@ -255,14 +255,14 @@ class GwMenuLoad(QObject):
         self.tree_config_files.itemDoubleClicked.connect(partial(self._double_click_event))
         self.tree_config_files.itemChanged.connect(partial(self._set_config_value))
 
-        path = f"{global_vars.user_folder_dir}{os.sep}config"
+        path = f"{global_vars.user_folder_dir}{os.sep}core{os.sep}config"
         files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
         for file in files:
             item = QTreeWidgetItem([f"{file}"])
 
             project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater")
             parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
-            parser.read(f"{global_vars.user_folder_dir}{os.sep}config{os.sep}{file}")
+            parser.read(f"{global_vars.user_folder_dir}{os.sep}core{os.sep}config{os.sep}{file}")
 
             # For each section we create a sub-item and add all the parameters to that sub-item
             for section in parser.sections():

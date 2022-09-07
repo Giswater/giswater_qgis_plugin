@@ -9,8 +9,11 @@ import csv
 import os
 from functools import partial
 import json
+from sip import isdeleted
+from time import time
+from datetime import timedelta
 
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QSpinBox, QWidget, QLineEdit, QComboBox, QCheckBox, QRadioButton, QAbstractItemView, \
     QTreeWidget, QCompleter, QGridLayout, QHBoxLayout, QLabel, QTableWidgetItem, QFileDialog
@@ -19,6 +22,7 @@ from qgis.gui import QgsDateTimeEdit
 
 from ..dialog import GwAction
 from ...threads.toolbox_execute import GwToolBoxTask
+from ...threads.toolbox_report import GwReportTask
 from ...ui.ui_manager import GwToolboxUi, GwToolboxManagerUi, GwToolboxReportsUi
 from ...utils import tools_gw, tools_backend_calls
 from ....lib import tools_qt, tools_qgis, tools_db
@@ -83,12 +87,14 @@ class GwToolBoxButton(GwAction):
         self.dlg_functions.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))
         self.dlg_functions.rejected.connect(partial(tools_gw.close_dialog, self.dlg_functions))
         self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
-        if connect_signal is not None:
-            self.dlg_functions.rejected.connect(connect_signal)
+        if connect_signal:
+            for signal in connect_signal:
+                self.dlg_functions.finished.connect(signal)
 
         # Open form and set title
         self.dlg_functions.setWindowTitle(f"{self.function_selected}")
         tools_gw.open_dialog(self.dlg_functions, dlg_name='toolbox')
+        return self.dlg_functions
 
     def remove_layers(self):
 
@@ -171,7 +177,7 @@ class GwToolBoxButton(GwAction):
         extras = '"isToolbox":true'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body)
-        if json_result or json_result['status'] != 'Failed':
+        if json_result and json_result['status'] != 'Failed':
             self._populate_trv(self.dlg_toolbox.trv, json_result['body']['data'])
             self.dlg_toolbox.txt_filter.textChanged.connect(partial(self._filter_functions))
             self.dlg_toolbox.trv.doubleClicked.connect(partial(self._open_function))
@@ -208,7 +214,7 @@ class GwToolBoxButton(GwAction):
         if self.function_selected in self.no_clickable_items:
             return
 
-        if 'reports' in index.parent().data().lower():
+        if 'reports' in index.parent().parent().data().lower():
 
             # this '1' refers to the index of the item in the selected row
             function_name = index.sibling(index.row(), 0).data()
@@ -217,91 +223,42 @@ class GwToolBoxButton(GwAction):
             self.dlg_reports = GwToolboxReportsUi()
             tools_gw.load_settings(self.dlg_reports)
 
+            # Set description & query labels
+            sql = f"SELECT alias, query_text, descript FROM config_report WHERE id = {self.function_selected}"
+            row = tools_db.get_row(sql)
+            if row:
+                descript = row[2]
+                if descript in (None, 'null', ''):
+                    descript = row[0]
+                tools_qt.set_widget_text(self.dlg_reports, 'lbl_descript', descript)
+                tools_qt.set_widget_text(self.dlg_reports, 'lbl_query', row[1])
+
             # Set listeners
             self.dlg_reports.btn_export_path.clicked.connect(self._select_file_report)
             self.dlg_reports.btn_export.clicked.connect(partial(self._export_reports, self.dlg_reports, self.dlg_reports.tbl_reports, self.dlg_reports.txt_export_path))
             self.dlg_reports.rejected.connect(partial(tools_gw.close_dialog, self.dlg_reports))
             self.dlg_reports.btn_close.clicked.connect(self.dlg_reports.reject)
 
-            extras = f'"filterText":null, "listId":"{self.function_selected}"'
-            body = tools_gw.create_body(extras=extras)
-            json_result = tools_gw.execute_procedure('gw_fct_getreport', body)
-            if not json_result or json_result['status'] == 'Failed':
-                return False
+            # Disable buttons
+            tools_qt.set_widget_enabled(self.dlg_reports, 'btn_export', False)
+            tools_qt.set_widget_enabled(self.dlg_reports, 'btn_close', False)
 
-            layout = self.dlg_reports.findChild(QGridLayout, 'lyt_filters')
+            # Create timer
+            self.t0 = time()
+            self.timer = QTimer()
+            self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_reports))
+            self.timer.start(1000)
 
-            order = 0
-
-            for field in json_result['body']['data']['fields']:
-                label = None
-                widget = None
-
-                if 'label' in field and field['label']:
-                    label = QLabel()
-                    label.setObjectName('lbl_' + field['widgetname'])
-                    label.setText(field['label'].capitalize())
-                    if 'stylesheet' in field and field['stylesheet'] is not None and 'label' in field['stylesheet']:
-                        label = tools_gw.set_stylesheet(field, label)
-                    if 'tooltip' in field:
-                        label.setToolTip(field['tooltip'])
-                    else:
-                        label.setToolTip(field['label'].capitalize())
-
-                if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
-                    completer = QCompleter()
-                    widget = tools_gw.add_lineedit(field)
-                    widget = tools_gw.set_widget_size(widget, field)
-                    widget = tools_gw.set_data_type(field, widget)
-                    widget.textChanged.connect(partial(self._update_tbl_reports))
-                    if field['widgettype'] == 'typeahead':
-                        widget = tools_gw.set_typeahead(field, self.dlg_reports, widget, completer)
-                elif field['widgettype'] == 'combo':
-                    widget = tools_gw.add_combo(field)
-                    widget = tools_gw.set_widget_size(widget, field)
-                    widget.currentIndexChanged.connect(partial(self._update_tbl_reports))
-                elif field['widgettype'] == 'check':
-                    widget = tools_gw.add_checkbox(field)
-                    widget.stateChanged.connect(partial(self._update_tbl_reports))
-                elif field['widgettype'] == 'datetime':
-                    widget = tools_gw.add_calendar(self.dlg_reports, field)
-                    widget.valueChanged.connect(partial(self._update_tbl_reports))
-                elif field['widgettype'] == 'list':
-                    if field['value'] is None:
-                        msg = "No results found. Please check values set on selector of state and exploitation"
-                        tools_qgis.show_warning(msg)
-                        return
-                    numrows = len(field['value'])
-                    numcols = len(field['value'][0])
-
-                    self.dlg_reports.tbl_reports.setColumnCount(numcols)
-                    self.dlg_reports.tbl_reports.setRowCount(numrows)
-
-                    i = 0
-                    dict_keys = {}
-                    for key in field['value'][0].keys():
-                        dict_keys[i] = f"{key}"
-                        self.dlg_reports.tbl_reports.setHorizontalHeaderItem(i, QTableWidgetItem(f"{key}"))
-                        i = i + 1
-
-                    for row in range(numrows):
-                        for column in range(numcols):
-                            column_name = dict_keys[column]
-                            self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem(f"{field['value'][row][column_name]}"))
-
-                    continue
-
-                order = order + 1
-
-                if label:
-                    layout.addWidget(label, 0, order)
-                if widget:
-                    layout.addWidget(widget, 1, order)
+            # Create thread
+            self.report_thread = GwReportTask(function_name, self.dlg_reports, self.function_selected, timer=self.timer)
+            self.report_thread.finished_execute.connect(self._report_finished)
+            QgsApplication.taskManager().addTask(self.report_thread)
+            QgsApplication.taskManager().triggerTask(self.report_thread)
 
             self.dlg_reports.setWindowTitle(f"{function_name}")
             tools_gw.open_dialog(self.dlg_reports, dlg_name='reports')
 
-        elif 'giswater' in index.parent().data().lower():
+        elif 'processes' in index.parent().parent().data().lower():
 
             self.dlg_functions = GwToolboxManagerUi()
             tools_gw.load_settings(self.dlg_functions)
@@ -345,6 +302,95 @@ class GwToolBoxButton(GwAction):
             tools_gw.open_dialog(self.dlg_functions, dlg_name='toolbox')
 
 
+    def _report_finished(self, status, json_result):
+        if not status:
+            return
+
+        layout = self.dlg_reports.findChild(QGridLayout, 'lyt_filters')
+
+        order = 0
+
+        for field in json_result['body']['data']['fields']:
+            label = None
+            widget = None
+
+            if field.get('label'):
+                label = QLabel()
+                label.setObjectName('lbl_' + field['widgetname'])
+                label.setText(field['label'].capitalize())
+                if field.get('stylesheet') is not None and 'label' in field['stylesheet']:
+                    label = tools_gw.set_stylesheet(field, label)
+                if 'tooltip' in field:
+                    label.setToolTip(field['tooltip'])
+                else:
+                    label.setToolTip(field['label'].capitalize())
+
+            if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
+                completer = QCompleter()
+                widget = tools_gw.add_lineedit(field)
+                widget = tools_gw.set_widget_size(widget, field)
+                widget = tools_gw.set_data_type(field, widget)
+                if field.get('filterDefault') is not None:
+                    tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
+                widget.textChanged.connect(partial(self._update_tbl_reports))
+                if field['widgettype'] == 'typeahead':
+                    widget = tools_gw.set_typeahead(field, self.dlg_reports, widget, completer)
+            elif field['widgettype'] == 'combo':
+                widget = tools_gw.add_combo(field)
+                widget = tools_gw.set_widget_size(widget, field)
+                widget.setProperty('filterSign', field.get('filterSign'))
+                if field.get('filterDefault') is not None:
+                    tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
+                widget.currentIndexChanged.connect(partial(self._update_tbl_reports))
+            elif field['widgettype'] == 'check':
+                widget = tools_gw.add_checkbox(field)
+                if field.get('filterDefault') is not None:
+                    tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
+                widget.stateChanged.connect(partial(self._update_tbl_reports))
+            elif field['widgettype'] == 'datetime':
+                widget = tools_gw.add_calendar(self.dlg_reports, field)
+                if field.get('filterDefault') is not None:
+                    tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
+                widget.valueChanged.connect(partial(self._update_tbl_reports))
+            elif field['widgettype'] == 'list':
+                if field['value'] is None:
+                    msg = "No results found. Please check values set on selector of state and exploitation"
+                    tools_qgis.show_warning(msg)
+                    return
+                numrows = len(field['value'])
+                numcols = len(field['value'][0])
+
+                self.dlg_reports.tbl_reports.setColumnCount(numcols)
+                self.dlg_reports.tbl_reports.setRowCount(numrows)
+
+                i = 0
+                dict_keys = {}
+                for key in field['value'][0].keys():
+                    dict_keys[i] = f"{key}"
+                    self.dlg_reports.tbl_reports.setHorizontalHeaderItem(i, QTableWidgetItem(f"{key}"))
+                    i = i + 1
+
+                for row in range(numrows):
+                    for column in range(numcols):
+                        column_name = dict_keys[column]
+                        value = field['value'][row][column_name]
+                        if value is None:
+                            value = ''
+                        self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem(f"{value}"))
+
+                continue
+
+            order = order + 1
+
+            if label:
+                layout.addWidget(label, 0, order)
+            if widget:
+                layout.addWidget(widget, 1, order)
+
+            # Set scale-to-fit
+            tools_qt.set_tableview_config(self.dlg_reports.tbl_reports, sectionResizeMode=0)
+
+
     def _update_tbl_reports(self):
 
         list_widgets = self.dlg_reports.findChildren(QWidget)
@@ -360,7 +406,10 @@ class GwToolBoxButton(GwAction):
                 value = tools_qt.get_calendar_date(self.dlg_reports, widget)
             else:
                 continue
-            _json = {"filterName":f"{widget.objectName()}", "filterValue":f"{value}"}
+            filterSign = widget.property('filterSign')
+            if filterSign is None:
+                filterSign = '='
+            _json = {"filterName": f"{widget.objectName()}", "filterValue": f"{value}", "filterSign": f"{filterSign}"}
             filters.append(_json)
 
         extras = f'"filter":{json.dumps(filters)}, "listId":"{self.function_selected}"'
@@ -371,7 +420,7 @@ class GwToolBoxButton(GwAction):
 
         for field in json_result['body']['data']['fields']:
 
-            if field['widgettype'] == 'list' and 'value' in field and field['value'] is not None:
+            if field['widgettype'] == 'list' and field.get('value') is not None:
                 numrows = len(field['value'])
                 numcols = len(field['value'][0])
                 self.dlg_reports.tbl_reports.setColumnCount(numcols)
@@ -389,7 +438,7 @@ class GwToolBoxButton(GwAction):
                         column_name = dict_keys[column]
                         item = f"{field['value'][row][column_name]}"
                         self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem(item))
-            elif field['widgettype'] == 'list' and 'value' in field and field['value'] is None:
+            elif field['widgettype'] == 'list' and field.get('value') is None:
                 self.dlg_reports.tbl_reports.setRowCount(0)
 
 
@@ -472,10 +521,31 @@ class GwToolBoxButton(GwAction):
                                          "background-color: #E0E0E0;}"
                                          "QProgressBar::chunk {background-color:#0bd82c; width: 10 px; margin: 0.5px;}")
 
+        self.t0 = time()
+        self.timer = QTimer()
+        self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_functions))
+
+        self.timer.start(1000)
         # Set background task 'GwToolBoxTask'
-        self.toolbox_task = GwToolBoxTask(self, description, dialog, combo, result)
+        self.toolbox_task = GwToolBoxTask(self, description, dialog, combo, result, timer=self.timer)
         QgsApplication.taskManager().addTask(self.toolbox_task)
         QgsApplication.taskManager().triggerTask(self.toolbox_task)
+
+
+    def _calculate_elapsed_time(self, dialog):
+
+        tf = time()  # Final time
+        td = tf - self.t0  # Delta time
+        self._update_time_elapsed(f"Exec. time: {timedelta(seconds=round(td))}", dialog)
+
+    def _update_time_elapsed(self, text, dialog):
+
+        if isdeleted(dialog):
+            self.timer.stop()
+            return
+
+        lbl_time = dialog.findChild(QLabel, 'lbl_time')
+        lbl_time.setText(text)
 
 
     def _manage_btn_run(self, index):
@@ -518,17 +588,25 @@ class GwToolBoxButton(GwAction):
                 tools_gw.build_dialog_options(dialog, function, 0, self.function_list, self.temp_layers_added, module)
                 self._load_settings_values(dialog, function)
                 self._load_parametric_values(dialog, function)
+                # Execute any connected signal
+                widgets = function[0].get('return_type')
+                if widgets:
+                    for w in function[0]['return_type']:
+                        signal = w.get('signal')
+                        if signal:
+                            getattr(module, signal)(dialog)
 
                 # We configure functionparams in the table config_toolbox, if we do not find the key "selectionType" or
                 # the length of the key is different from 1, we will do nothing, but if we find it and its length is 1,
                 # it means that the user has configured it to show only one of the two radiobuttons, therefore, we will
                 # hide the other and mark the one that the user tells us.
                 # Options: "selectionType":"selected" //  "selectionType":"all"
-                if 'selectionType' in function[0]['input_params']:
-                    if 'selected' in function[0]['input_params']['selectionType']:
+                selectionType = function[0]['input_params'].get('selectionType')
+                if selectionType:
+                    if 'selected' in selectionType:
                         dialog.rbt_previous.setChecked(True)
                         dialog.rbt_layer.setVisible(False)
-                    elif 'all' in function[0]['input_params']['selectionType']:
+                    elif 'all' in selectionType:
                         dialog.rbt_layer.setChecked(True)
                         dialog.rbt_previous.setVisible(False)
 
@@ -607,8 +685,8 @@ class GwToolBoxButton(GwAction):
         # Section Processes
         section_processes = QStandardItem('{}'.format('Processes'))
         for group, functions in result['processes']['fields'].items():
-            parent1 = QStandardItem(f'{group}   [{len(functions)} Giswater algorithm]')
-            self.no_clickable_items.append(f'{group}   [{len(functions)} Giswater algorithm]')
+            parent1 = QStandardItem(f'{group} [{len(functions)}]')
+            self.no_clickable_items.append(f'{group} [{len(functions)}]')
             functions.sort(key=self._sort_list, reverse=False)
             for function in functions:
                 func_name = QStandardItem(str(function['functionname']))
@@ -627,8 +705,8 @@ class GwToolBoxButton(GwAction):
         # Section Reports
         reports_processes = QStandardItem('{}'.format('Reports'))
         for group, functions in result['reports']['fields'].items():
-            parent1 = QStandardItem(f'{group}   [{len(functions)} Reports functions]')
-            self.no_clickable_items.append(f'{group}   [{len(functions)} Reports functions]')
+            parent1 = QStandardItem(f'{group} [{len(functions)}]')
+            self.no_clickable_items.append(f'{group} [{len(functions)}]')
             functions.sort(key=self._sort_list, reverse=False)
             for function in functions:
                 func_name = QStandardItem(str(function['listname']))
@@ -716,7 +794,8 @@ class GwToolBoxButton(GwAction):
         for rows in range(0, model.rowCount()):
             row = []
             for col in range(0, model.columnCount()):
-                row.append(str(model.data(model.index(rows, col))))
+                value = str(model.data(model.index(rows, col)))
+                row.append(value)
             all_rows.append(row)
 
         # Write list into csv file

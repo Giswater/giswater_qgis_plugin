@@ -47,7 +47,8 @@ def get_feature_by_expr(layer, expr_filter):
     return False
 
 
-def show_message(text, message_level=1, duration=10, context_name=None, parameter=None, title="", logger_file=True):
+def show_message(text, message_level=1, duration=10, context_name=None, parameter=None, title="", logger_file=True,
+                 dialog=iface):
     """
     Show message to the user with selected message level
         :param text: The text to be shown (String)
@@ -62,9 +63,7 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
     global user_parameters
 
     # Get optional parameter 'show_message_durations'
-    dev_duration = None
-    if 'show_message_durations' in user_parameters:
-        dev_duration = user_parameters['show_message_durations']
+    dev_duration = user_parameters.get('show_message_durations')
     # If is set, use this value
     if dev_duration not in (None, "None"):
         if message_level in (1, 2) and int(dev_duration) < 10:
@@ -78,14 +77,15 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
             msg += f": {parameter}"
 
     # Show message
-    iface.messageBar().pushMessage(title, msg, message_level, duration)
+    dialog.messageBar().pushMessage(title, msg, message_level, duration)
 
     # Check if logger to file
     if global_vars.logger and logger_file:
         global_vars.logger.info(text)
 
 
-def show_message_link(text, url, btn_text="Open", message_level=0, duration=10, context_name=None, logger_file=True):
+def show_message_link(text, url, btn_text="Open", message_level=0, duration=10, context_name=None, logger_file=True,
+                      dialog=iface):
     """
     Show message to the user with selected message level and a button to open the url
         :param text: The text to be shown (String)
@@ -100,9 +100,7 @@ def show_message_link(text, url, btn_text="Open", message_level=0, duration=10, 
     global user_parameters
 
     # Get optional parameter 'show_message_durations'
-    dev_duration = None
-    if 'show_message_durations' in user_parameters:
-        dev_duration = user_parameters['show_message_durations']
+    dev_duration = user_parameters.get('show_message_durations')
     # If is set, use this value
     if dev_duration not in (None, "None"):
         if message_level in (1, 2) and int(dev_duration) < 10:
@@ -121,14 +119,14 @@ def show_message_link(text, url, btn_text="Open", message_level=0, duration=10, 
     widget.layout().addWidget(button)
 
     # Show the message
-    iface.messageBar().pushWidget(widget, message_level, duration)
+    dialog.messageBar().pushWidget(widget, message_level, duration)
 
     # Check if logger to file
     if global_vars.logger and logger_file:
         global_vars.logger.info(text)
 
 
-def show_info(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
+def show_info(text, duration=10, context_name=None, parameter=None, logger_file=True, title="", dialog=iface):
     """
     Show information message to the user
         :param text: The text to be shown (String)
@@ -138,10 +136,10 @@ def show_info(text, duration=10, context_name=None, parameter=None, logger_file=
         :param logger_file: Whether it should log the message in a file or not (bool)
         :param title: The title of the message (String) """
 
-    show_message(text, 0, duration, context_name, parameter, title, logger_file)
+    show_message(text, 0, duration, context_name, parameter, title, logger_file, dialog=dialog)
 
 
-def show_warning(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
+def show_warning(text, duration=10, context_name=None, parameter=None, logger_file=True, title="", dialog=iface):
     """
     Show warning message to the user
         :param text: The text to be shown (String)
@@ -151,10 +149,10 @@ def show_warning(text, duration=10, context_name=None, parameter=None, logger_fi
         :param logger_file: Whether it should log the message in a file or not (bool)
         :param title: The title of the message (String) """
 
-    show_message(text, 1, duration, context_name, parameter, title, logger_file)
+    show_message(text, 1, duration, context_name, parameter, title, logger_file, dialog=dialog)
 
 
-def show_critical(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
+def show_critical(text, duration=10, context_name=None, parameter=None, logger_file=True, title="", dialog=iface):
     """
     Show critical message to the user
         :param text: The text to be shown (String)
@@ -164,7 +162,7 @@ def show_critical(text, duration=10, context_name=None, parameter=None, logger_f
         :param logger_file: Whether it should log the message in a file or not (bool)
         :param title: The title of the message (String) """
 
-    show_message(text, 2, duration, context_name, parameter, title, logger_file)
+    show_message(text, 2, duration, context_name, parameter, title, logger_file, dialog=dialog)
 
 
 def get_visible_layers(as_str_list=False, as_list=False):
@@ -204,9 +202,12 @@ def get_visible_layers(as_str_list=False, as_list=False):
     return visible_layer
 
 
-def get_plugin_metadata(parameter, default_value, plugin_dir):
+def get_plugin_metadata(parameter, default_value, plugin_dir=None):
     """ Get @parameter from metadata.txt file """
 
+    if not plugin_dir:
+        plugin_dir = os.path.dirname(__file__)
+        plugin_dir = plugin_dir.rstrip(f'{os.sep}lib')
     # Check if metadata file exists
     metadata_file = os.path.join(plugin_dir, 'metadata.txt')
     if not os.path.exists(metadata_file):
@@ -247,14 +248,14 @@ def get_plugin_version():
     return plugin_version, message
 
 
-def get_major_version(plugin_dir, default_version='3.5'):
+def get_major_version(plugin_dir=None, default_version='3.6'):
     """ Get plugin higher version from metadata.txt file """
 
     major_version = get_plugin_metadata('version', default_version, plugin_dir)[0:3]
     return major_version
 
 
-def get_build_version(plugin_dir, default_version='35001'):
+def get_build_version(plugin_dir, default_version='36001'):
     """ Get plugin build version from metadata.txt file """
 
     build_version = get_plugin_metadata('version', default_version, plugin_dir).replace(".", "")
@@ -295,6 +296,22 @@ def get_project_layers():
     layers = [layer.layer() for layer in QgsProject.instance().layerTreeRoot().findLayers()]
 
     return layers
+
+
+def find_toc_group(root, group, case_sensitive=False):
+    """ Find a group of layers in the ToC """
+
+    for grp in root.findGroups():
+        group1 = grp.name()
+        group2 = group
+        if not case_sensitive:
+            group1 = group1.lower()
+            group2 = group2.lower()
+
+        if group1 == group2:
+            return grp
+
+    return None
 
 
 def get_layer_source(layer):
@@ -490,19 +507,19 @@ def disconnect_snapping(action_pan=True, emit_point=None, vertex_marker=None):
     try:
         global_vars.canvas.xyCoordinates.disconnect()
     except TypeError as e:
-        print(f"{type(e).__name__} --> {e}")
+        tools_log.log_info(f"{type(e).__name__} --> {e}")
 
     if emit_point is not None:
         try:
             emit_point.canvasClicked.disconnect()
         except TypeError as e:
-            print(f"{type(e).__name__} --> {e}")
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
 
     if vertex_marker is not None:
         try:
             vertex_marker.hide()
         except AttributeError as e:
-            print(f"{type(e).__name__} --> {e}")
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
 
     if action_pan:
         iface.actionPan().trigger()
@@ -809,11 +826,14 @@ def set_layer_visible(layer, recursive=True, visible=True):
         :param visible: Whether the layer will be visible or not (bool)
     """
 
-    if layer:
-        if recursive:
-            QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityCheckedParentRecursive(visible)
-        else:
-            QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(visible)
+    try:
+        if layer:
+            if recursive:
+                QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityCheckedParentRecursive(visible)
+            else:
+                QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(visible)
+    except RuntimeError:
+        pass
 
 
 def set_layer_index(layer_name):
@@ -871,7 +891,7 @@ def set_margin(layer, margin):
 def create_qml(layer, style):
     """ Generates a qml file through a json of styles (@style) and puts it in the received @layer """
 
-    config_folder = f'{global_vars.user_folder_dir}{os.sep}temp'
+    config_folder = f'{global_vars.user_folder_dir}{os.sep}core{os.sep}temp'
     if not os.path.exists(config_folder):
         os.makedirs(config_folder)
     path_temp_file = f"{config_folder}{os.sep}temporal_layer.qml"
@@ -966,12 +986,12 @@ def get_locale():
         locale = "en_US"
         tools_log.log_info(f"{type(e).__name__} --> {e}")
     finally:
-        if locale is None:
+        if locale in (None, ''):
             locale = "en_US"
         return locale
 
 
-def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, index):
+def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, index, table_field=None):
     """ Based on the received index and field_id, the id of the received field_id is searched within the table
      and is painted in red on the canvas """
 
@@ -981,7 +1001,9 @@ def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, inde
         return
 
     row = index.row()
-    column_index = tools_qt.get_col_index_by_col_name(qtable, field_id)
+    if not table_field:
+        table_field = field_id
+    column_index = tools_qt.get_col_index_by_col_name(qtable, table_field)
     _id = index.sibling(row, column_index).data()
     feature = tools_qt.get_feature_by_id(layer, _id, field_id)
     try:

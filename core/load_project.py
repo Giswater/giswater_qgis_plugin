@@ -54,19 +54,8 @@ class GwLoadProject(QObject):
         if not self._check_database_connection(show_warning):
             return
 
-        # Removes all deprecated variables defined at giswater.config
-        tools_gw.remove_deprecated_config_vars()
-
-        # Get variables from qgis project
-        self._get_project_variables()
-
-        # Get water software from table 'sys_version'
-        global_vars.project_type = tools_gw.get_project_type()
-        if global_vars.project_type is None:
-            return
-
-        # Check if user has config files 'init' and 'session' and its parameters
-        tools_gw.user_params_to_userconfig()
+        # Get SRID from table node
+        global_vars.data_epsg = tools_db.get_srid('v_edit_node', global_vars.schema_name)
 
         # Manage schema name
         tools_db.get_current_user()
@@ -74,6 +63,30 @@ class GwLoadProject(QObject):
         schema_name = layer_source['schema']
         if schema_name:
             global_vars.schema_name = schema_name.replace('"', '')
+
+        # Set PostgreSQL parameter 'search_path'
+        tools_db.set_search_path(layer_source['schema'])
+
+        # Get water software from table 'sys_version'
+        global_vars.project_type = tools_gw.get_project_type()
+        if global_vars.project_type is None:
+            return
+
+        # Get variables from qgis project
+        self._get_project_variables()
+
+        # Check if loaded project is ud or ws
+        if not self._check_project_type():
+            return
+
+        # Removes all deprecated variables defined at giswater.config
+        tools_gw.remove_deprecated_config_vars()
+
+        project_role = global_vars.project_vars.get('project_role')
+        global_vars.project_vars['project_role'] = tools_gw.get_role_permissions(project_role)
+
+        # Check if user has config files 'init' and 'session' and its parameters
+        tools_gw.user_params_to_userconfig()
 
         # Check for developers options
         value = tools_gw.get_config_parser('log', 'log_sql', "user", "init", False)
@@ -85,16 +98,11 @@ class GwLoadProject(QObject):
         global_vars.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', global_vars.plugin_dir)
         tools_qt.manage_translation(global_vars.plugin_name)
 
-        # Set PostgreSQL parameter 'search_path'
-        tools_db.set_search_path(layer_source['schema'])
 
         # Check if schema exists
         schema_exists = tools_db.check_schema(global_vars.schema_name)
         if not schema_exists:
             tools_qgis.show_warning("Selected schema not found", parameter=global_vars.schema_name)
-
-        # Get SRID from table node
-        global_vars.data_epsg = tools_db.get_srid('v_edit_node', global_vars.schema_name)
 
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
         status = self._check_layers_from_distinct_schema()
@@ -114,8 +122,15 @@ class GwLoadProject(QObject):
         # Create menu
         tools_gw.create_giswater_menu(True)
 
+        # Get 'utils_use_gw_snapping' parameter
+        use_gw_snapping = tools_gw.get_config_value('utils_use_gw_snapping', table='config_param_system')
+        if use_gw_snapping:
+            use_gw_snapping = tools_os.set_boolean(use_gw_snapping[0])
+            global_vars.use_gw_snapping = use_gw_snapping
+
         # Manage snapping layers
-        self._manage_snapping_layers()
+        if global_vars.use_gw_snapping is True:
+            self._manage_snapping_layers()
 
         # Manage actions of the different plugin_toolbars
         self._manage_toolbars()
@@ -148,6 +163,23 @@ class GwLoadProject(QObject):
         # Manage versions of Giswater and PostgreSQL
         plugin_version = tools_qgis.get_plugin_metadata('version', 0, global_vars.plugin_dir)
         project_version = tools_gw.get_project_version(schema_name)
+        # Only get the x.y.zzz, not x.y.zzz.n
+        try:
+            plugin_version_l = str(plugin_version).split('.')
+            if len(plugin_version_l) >= 4:
+                plugin_version = f'{plugin_version_l[0]}'
+                for i in range(1, 3):
+                    plugin_version = f"{plugin_version}.{plugin_version_l[i]}"
+        except Exception:
+            pass
+        try:
+            project_version_l = str(project_version).split('.')
+            if len(project_version_l) >= 4:
+                project_version = f'{project_version_l[0]}'
+                for i in range(1, 3):
+                    project_version = f"{project_version}.{project_version_l[i]}"
+        except Exception:
+            pass
         if project_version == plugin_version:
             message = "Project read finished"
             tools_log.log_info(message)
@@ -215,13 +247,29 @@ class GwLoadProject(QObject):
 
         # Check if table 'v_edit_node' is loaded
         self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
-        if not self.layer_node and show_warning:
-            layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
-            layer_connec = tools_qgis.get_layer_by_tablename("v_edit_connec")
-            if layer_arc or layer_connec:
+        layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+        layer_connec = tools_qgis.get_layer_by_tablename("v_edit_connec")
+        if (self.layer_node, layer_arc, layer_connec) == (None, None, None):  # If no gw layers are present
+            if show_warning:
                 title = "Giswater plugin cannot be loaded"
                 msg = "QGIS project seems to be a Giswater project, but layer 'v_edit_node' is missing"
                 tools_qgis.show_warning(msg, 20, title=title)
+            return False
+
+        return True
+
+
+    def _check_project_type(self):
+        """ Check if loaded project is valid for Giswater """
+        # Check if table 'v_edit_node' is loaded
+        if global_vars.project_type not in ('ws', 'ud'):
+            return False
+
+        addparam = tools_gw.get_sysversion_addparam()
+        if addparam:
+            add_type = addparam.get("type")
+            if add_type and add_type.lower() not in ("ws", "ud"):
+                global_vars.project_loaded = True
                 return False
 
         return True
@@ -266,17 +314,13 @@ class GwLoadProject(QObject):
                 repeated_layers[layer_source['schema'].replace('"', '')] = 'v_edit_node'
 
         if len(repeated_layers) > 1:
-            if global_vars.project_vars['main_schema'] is None or global_vars.project_vars['add_schema'] is None:
-                self.dlg_dtext = GwDialogTextUi()
-                self.dlg_dtext.btn_accept.hide()
-                self.dlg_dtext.btn_close.clicked.connect(lambda: self.dlg_dtext.close())
+            if global_vars.project_vars['main_schema'] in (None, '', 'null', 'NULL') \
+                    or global_vars.project_vars['add_schema'] in (None, '', 'null', 'NULL'):
                 msg = "QGIS project has more than one v_edit_node layer coming from different schemas. " \
                       "If you are looking to manage two schemas, it is mandatory to define which is the master and " \
                       "which isn't. To do this, you need to configure the QGIS project setting this project's " \
                       "variables: gwMainSchema and gwAddSchema."
-
-                self.dlg_dtext.txt_infolog.setText(msg)
-                self.dlg_dtext.open()
+                tools_qt.show_info_box(msg)
                 return False
 
             # If there are layers with a different schema, the one that the user has in the project variable
@@ -412,30 +456,25 @@ class GwLoadProject(QObject):
     def _check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """
 
-        if 'project_role' in global_vars.project_vars:
-            restriction = tools_gw.get_role_permissions(global_vars.project_vars['project_role'])
-        else:
-            restriction = tools_gw.get_role_permissions(None)
-
-        if restriction == 'role_basic':
+        if global_vars.project_vars['project_role'] == 'role_basic':
             return
 
-        elif restriction == 'role_om':
+        elif global_vars.project_vars['project_role'] == 'role_om':
             self._enable_toolbar("om")
             return
 
-        elif restriction == 'role_edit':
+        elif global_vars.project_vars['project_role'] == 'role_edit':
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
             self._enable_toolbar("cad")
 
-        elif restriction == 'role_epa':
+        elif global_vars.project_vars['project_role'] == 'role_epa':
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
             self._enable_toolbar("cad")
             self._enable_toolbar("epa")
 
-        elif restriction == 'role_master' or restriction == 'role_admin':
+        elif global_vars.project_vars['project_role'] == 'role_master' or global_vars.project_vars['project_role'] == 'role_admin':
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
             self._enable_toolbar("cad")
@@ -454,9 +493,11 @@ class GwLoadProject(QObject):
         status, result = self._manage_layers()
         if not status:
             return False
-        if result and 'variables' in result['body']:
-            if 'setQgisLayers' in result['body']['variables']:
-                if result['body']['variables']['setQgisLayers'] in (False, 'False', 'false'):
+        if result:
+            variables = result['body'].get('variables')
+            if variables:
+                setQgisLayers = variables.get('setQgisLayers')
+                if setQgisLayers in (False, 'False', 'false'):
                     return
 
         # Set project layers with gw_fct_getinfofromid: This process takes time for user
@@ -503,12 +544,12 @@ class GwLoadProject(QObject):
             # check project
             status, result = self.check_project.fill_check_project_table(layers, "true")
             try:
-                if 'variables' in result['body']:
-                    if 'useGuideMap' in result['body']['variables']:
-                        guided_map = result['body']['variables']['useGuideMap']
-                        if guided_map:
-                            tools_log.log_info("manage_guided_map")
-                            self._manage_guided_map()
+                variables = result['body'].get('variables')
+                if variables:
+                    guided_map = variables.get('useGuideMap')
+                    if guided_map:
+                        tools_log.log_info("manage_guided_map")
+                        self._manage_guided_map()
             except Exception as e:
                 tools_log.log_info(str(e))
             finally:

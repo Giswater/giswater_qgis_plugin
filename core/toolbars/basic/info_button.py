@@ -183,11 +183,12 @@ class GwInfoButton(GwMaptool):
         main_menu.addSeparator()
 
         # Open/close valve
-        if 'valve' in json_result['body']['data']:
-            valve_id = json_result['body']['data']['valve']['id']
-            valve_text = json_result['body']['data']['valve']['text']
-            valve_table = json_result['body']['data']['valve']['tableName']
-            valve_value = json_result['body']['data']['valve']['value']
+        valve = json_result['body']['data'].get('valve')
+        if valve:
+            valve_id = valve['id']
+            valve_text = valve['text']
+            valve_table = valve['tableName']
+            valve_value = valve['value']
             action_valve = QAction(f"{valve_text}", None)
             action_valve.triggered.connect(partial(self._toggle_valve_state, valve_id, valve_table, valve_value))
             action_valve.hovered.connect(partial(self._reset_rubber_bands))
@@ -247,7 +248,7 @@ class GwInfoButton(GwMaptool):
         # If param is true show question and create thread
         msg = "You closed a valve, this will modify the current mapzones and it may take a little bit of time."
         if global_vars.user_level['level'] in ('1', '2'):
-            msg += "\nWould you like to continue?"
+            msg += " Would you like to continue?"
             answer = tools_qt.show_question(msg)
         else:
             tools_qgis.show_info(msg)

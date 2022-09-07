@@ -1,0 +1,39 @@
+id,system_id,epa_default,isarcdivide,isprofilesurface,choose_hemisphere,code_autofill,double_geom,num_arcs,graf_delimiter,shortcut_key,link_path,descript,active
+PR_BREAK_VALVE,VALVE,VALVE,true,true,true,true,"{""activated"":false,""value"":1}","2",PRESSZONE,,,Pressure break valve,true
+PR_SUSTA_VALVE,VALVE,VALVE,true,true,true,true,"{""activated"":false,""value"":1}","2",PRESSZONE,,,Pressure sustainer valve,true
+CONTROL_REGISTER,REGISTER,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",NONE,,,Control register,true
+FL_CONTR_VALVE,VALVE,VALVE,true,true,true,true,"{""activated"":false,""value"":1}","2",MINSECTOR,,,Flow control valve,false
+GEN_PURP_VALVE,VALVE,VALVE,true,true,true,true,"{""activated"":false,""value"":1}","2",MINSECTOR,,,General purpose valve,false
+THROTTLE_VALVE,VALVE,VALVE,true,true,true,true,"{""activated"":false,""value"":1}","2",MINSECTOR,,,Throttle-valve,false
+ADAPTATION,JUNCTION,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",NONE,,,Adaptation junction,false
+BYPASS_REGISTER,REGISTER,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",NONE,,,Bypass-register,false
+VALVE_REGISTER,REGISTER,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",NONE,,,Valve register,false
+AIR_VALVE,VALVE,UNDEFINED,false,true,true,true,"{""activated"":false,""value"":1}","0",NONE,Alt+A,,Air valve,true
+CHECK_VALVE,VALVE,SHORTPIPE,true,true,true,true,"{""activated"":false,""value"":1}","2",MINSECTOR,C,,Check valve,true
+ENDLINE,JUNCTION,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","1",NONE,E,,End of the line,true
+EXPANTANK,EXPANSIONTANK,JUNCTION,true,true,true,true,"{""activated"":true,""value"":3}","2",NONE,K,,Expansiontank,true
+FILTER,FILTER,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",NONE,F,,Filter,true
+FLEXUNION,FLEXUNION,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",NONE,L,,Flex union,true
+FLOWMETER,METER,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",DMA,W,,Flow meter,true
+GREEN_VALVE,VALVE,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",NONE,G,,Green valve,true
+HYDRANT,HYDRANT,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",NONE,H,,Hydrant,true
+JUNCTION,JUNCTION,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",NONE,J,,Junction,true
+NETELEMENT,NETELEMENT,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",NONE,N,,Netelement,true
+NETSAMPLEPOINT,NETSAMPLEPOINT,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",NONE,S,,Netsamplepoint,true
+OUTFALL_VALVE,VALVE,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",NONE,O,,Outfall valve,true
+PR_REDUC_VALVE,VALVE,VALVE,true,true,true,true,"{""activated"":false,""value"":1}","2",PRESSZONE,Alt+Q,,Pressure reduction valve,true
+PRESSURE_METER,METER,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",NONE,B,,Pressure meter,true
+PUMP,PUMP,PUMP,true,true,true,true,"{""activated"":false,""value"":1}","2",PRESSZONE,U,,Pump,true
+REDUCTION,REDUCTION,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",NONE,Z,,Reduction,true
+REGISTER,REGISTER,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",NONE,R,,Register,true
+SHUTOFF_VALVE,VALVE,SHORTPIPE,true,true,true,true,"{""activated"":false,""value"":1}","2",MINSECTOR,I,,Shutoff valve,true
+SOURCE,SOURCE,RESERVOIR,true,true,true,true,"{""activated"":false,""value"":1}","2",SECTOR,D,,Source,true
+T,JUNCTION,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","3",NONE,T,,Junction where 3 pipes converge,true
+TANK,TANK,TANK,true,true,true,true,"{""activated"":true,""value"":3}","9",SECTOR,Alt+K,,Tank,true
+WATER_CONNECTION,NETWJOIN,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",NONE,Y,,Water connection,true
+WATERWELL,WATERWELL,RESERVOIR,true,true,true,true,"{""activated"":false,""value"":1}","2",SECTOR,Alt+Y,,Waterwell,true
+X,JUNCTION,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","4",NONE,X,,Junction where 4 pipes converge,true
+CLORINATHOR,NETELEMENT,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",DQA,,,Element to reclorate water,false
+CURVE,JUNCTION,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",NONE,V,,Curve,false
+MANHOLE,MANHOLE,JUNCTION,true,true,true,true,"{""activated"":false,""value"":1}","2",NONE,M,,Inspection chamber,false
+WTP,WTP,RESERVOIR,true,true,true,true,"{""activated"":false,""value"":1}","2",SECTOR,P,,Water treatment point,false

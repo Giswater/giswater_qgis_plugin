@@ -23,9 +23,11 @@ from ....lib import tools_qgis, tools_qt, tools_log, tools_db
 class GwFeatureEndButton(GwAction):
     """ Button 68: End feature """
 
-    def __init__(self, icon_path, action_name, text, toolbar, action_group):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group, list_tabs=None, feature_type=None):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
+        self.list_tabs = list_tabs
+        self.feature_type = feature_type
 
 
     def clicked_event(self):
@@ -70,12 +72,19 @@ class GwFeatureEndButton(GwAction):
         for widget in widget_list:
             tools_qt.set_tableview_config(widget)
 
-        # Remove 'gully' for 'WS'
-        self.project_type = tools_gw.get_project_type()
-        if self.project_type == 'ws':
-            tools_qt.remove_tab(self.dlg_work_end.tab_feature, 'tab_gully')
+        # Remove tabs
+        params = ['arc', 'node', 'connec', 'gully', 'element']
+        if self.list_tabs:
+            for i in params:
+                if i not in self.list_tabs:
+                    tools_qt.remove_tab(self.dlg_work_end.tab_feature, f'tab_{i}')
         else:
-            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+            # Remove 'gully' if not 'UD'
+            self.project_type = tools_gw.get_project_type()
+            if self.project_type != 'ud':
+                tools_qt.remove_tab(self.dlg_work_end.tab_feature, 'tab_gully')
+            else:
+                self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
 
         # Set icons
         tools_gw.add_icon(self.dlg_work_end.btn_insert, "111", sub_folder="24x24")
@@ -127,7 +136,10 @@ class GwFeatureEndButton(GwAction):
         self._fill_fields()
 
         # Adding auto-completion to a QLineEdit for default feature
-        tools_gw.set_completer_widget("v_edit_arc", self.dlg_work_end.feature_id, "arc_id")
+        if self.feature_type is None:
+            self.feature_type = "arc"
+        viewname=f"v_edit_{self.feature_type}"
+        tools_gw.set_completer_widget(viewname, self.dlg_work_end.feature_id, str(self.feature_type + "_id"))
 
         # Set default tab 'arc'
         self.dlg_work_end.tab_feature.setCurrentIndex(0)
@@ -172,11 +184,11 @@ class GwFeatureEndButton(GwAction):
             enddate = QDate.currentDate()
         tools_qt.set_calendar(self.dlg_work_end, "enddate", enddate)
 
-        sql = "SELECT id FROM cat_work"
+        sql = "SELECT id, id as idval FROM cat_work"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_box(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, True)
+        tools_qt.fill_combo_values(self.dlg_work_end.workcat_id_end, rows)
         tools_qt.set_autocompleter(self.dlg_work_end.workcat_id_end)
-        row = tools_gw.get_config_value('edit_workcat_vdefault')
+        row = tools_gw.get_config_value('edit_workcat_end_vdefault')
         if row:
             tools_qt.set_widget_text(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
 
@@ -272,6 +284,9 @@ class GwFeatureEndButton(GwAction):
             tools_qt.fill_table(self.tbl_arc_x_relations, table_relations, filter_)
             self.tbl_arc_x_relations.doubleClicked.connect(
                 partial(self._open_selected_object, self.tbl_arc_x_relations))
+            self.tbl_arc_x_relations.clicked.connect(
+                partial(tools_qgis.hilight_feature_by_id, self.tbl_arc_x_relations, 'v_edit_connec', 'connec_id',
+                        self.rubber_band, 10, table_field='feature_id'))
 
             tools_gw.open_dialog(self.dlg_work, dlg_name='feature_end_connec')
 
@@ -325,7 +340,7 @@ class GwFeatureEndButton(GwAction):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_work)
             return
 
         row = selected_list[0].row()
@@ -353,7 +368,7 @@ class GwFeatureEndButton(GwAction):
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = "Expression Error"
-            tools_qgis.show_warning(message, parameter=expr.parserErrorString())
+            tools_qgis.show_warning(message, parameter=expr.parserErrorString(), dialog=self.dlg_work)
             return
 
         id_list = None
@@ -434,7 +449,7 @@ class GwFeatureEndButton(GwAction):
 
         # Check for errors
         if model.lastError().isValid():
-            tools_qgis.show_warning(model.lastError().text())
+            tools_qgis.show_warning(model.lastError().text(), dialog=self.dlg_work)
 
         # Attach model to table view
         widget.setModel(model)
@@ -544,10 +559,10 @@ class GwFeatureEndButton(GwAction):
             if row is None:
                 sql = f"INSERT INTO cat_work ({fields}) VALUES ({values})"
                 tools_db.execute_sql(sql)
-                sql = "SELECT id FROM cat_work ORDER BY id"
+                sql = "SELECT id, id as idval FROM cat_work ORDER BY id"
                 rows = tools_db.get_rows(sql)
                 if rows:
-                    tools_qt.fill_combo_box(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows)
+                    tools_qt.fill_combo_values(self.dlg_work_end.workcat_id_end, rows)
                     aux = self.dlg_work_end.workcat_id_end.findText(str(cat_work_id))
                     self.dlg_work_end.workcat_id_end.setCurrentIndex(aux)
 

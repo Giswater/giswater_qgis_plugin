@@ -14,7 +14,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_log, tools_qt, tools_db, tools_qgis
+from ...lib import tools_log, tools_qt, tools_db, tools_qgis, tools_os
 from .task import GwTask
 
 
@@ -23,7 +23,7 @@ class GwEpaFileManager(GwTask):
 
     fake_progress = pyqtSignal()
 
-    def __init__(self, description, go2epa):
+    def __init__(self, description, go2epa, timer=None):
 
         super().__init__(description)
         self.go2epa = go2epa
@@ -31,6 +31,7 @@ class GwEpaFileManager(GwTask):
         self.rpt_result = None
         self.fid = 140
         self.function_name = None
+        self.timer = timer
         self.initialize_variables()
         self.set_variables_from_go2epa()
 
@@ -43,6 +44,7 @@ class GwEpaFileManager(GwTask):
         self.common_msg = ""
         self.function_failed = False
         self.complet_result = None
+        self.replaced_velocities = False
 
 
     def set_variables_from_go2epa(self):
@@ -97,6 +99,8 @@ class GwEpaFileManager(GwTask):
         self.dlg_go2epa.btn_accept.setEnabled(True)
 
         self._close_file()
+        if self.timer:
+            self.timer.stop()
         if self.isCanceled():
             return
 
@@ -108,36 +112,41 @@ class GwEpaFileManager(GwTask):
         elif result:
 
             if self.go2epa_export_inp and self.complet_result:
-                if 'status' in self.complet_result:
-                    if self.complet_result['status'] == "Accepted":
-                        if 'body' in self.complet_result:
-                            if 'data' in self.complet_result['body']:
-                                tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py' "
-                                                   f"with parameters: '{self.dlg_go2epa}', '{self.complet_result['body']['data']}', "
-                                                   f"'None', 'True', 'True', '1', close=False, call_set_tabs_enabled=False")
-                                tools_gw.add_layer_temp(self.dlg_go2epa, self.complet_result['body']['data'],
-                                                        None, True, True, 1, True, close=False,
-                                                        call_set_tabs_enabled=False)
+                if self.complet_result.get('status') == "Accepted":
+                    if 'body' in self.complet_result:
+                        if 'data' in self.complet_result['body']:
+                            tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py' "
+                                               f"with parameters: '{self.dlg_go2epa}', '{self.complet_result['body']['data']}', "
+                                               f"'None', 'True', 'True', '1', close=False, call_set_tabs_enabled=False")
+                            tools_gw.add_layer_temp(self.dlg_go2epa, self.complet_result['body']['data'],
+                                                    None, True, True, 1, True, close=False,
+                                                    call_set_tabs_enabled=False)
 
             if self.go2epa_import_result and self.rpt_result:
-                if 'status' in self.rpt_result:
-                    if self.rpt_result['status'] == "Accepted":
-                        if 'body' in self.rpt_result:
-                            if 'data' in self.rpt_result['body']:
-                                tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py' "
-                                    f"with parameters: '{self.dlg_go2epa}', '{self.complet_result['body']['data']}', "
-                                                   f"'None', 'True', 'True', '1', close=False, call_set_tabs_enabled=False")
+                if self.rpt_result.get('status') == "Accepted":
+                    if 'body' in self.rpt_result:
+                        if 'data' in self.rpt_result['body']:
+                            tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py' "
+                                f"with parameters: '{self.dlg_go2epa}', '{self.rpt_result['body']['data']}', "
+                                               f"'None', 'True', 'True', '1', close=False, call_set_tabs_enabled=False")
 
-                                tools_gw.add_layer_temp(self.dlg_go2epa, self.rpt_result['body']['data'],
-                                                        None, True, True, 1, True, close=False,
-                                                        call_set_tabs_enabled=False)
-                        self.message = self.rpt_result['message']['text']
+                            tools_gw.add_layer_temp(self.dlg_go2epa, self.rpt_result['body']['data'],
+                                                    None, True, True, 1, True, close=False,
+                                                    call_set_tabs_enabled=False)
+                    self.message = self.rpt_result['message']['text']
             sql = f"SELECT {self.function_name}("
             if self.body:
                 sql += f"{self.body}"
             sql += f");"
             tools_log.log_info(f"Task 'Go2Epa' manage json response with parameters: '{self.complet_result}', '{sql}', 'None'")
             tools_gw.manage_json_response(self.complet_result, sql, None)
+
+            replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init",
+                                                 prefix=False)
+            if tools_os.set_boolean(replace, default=False) and self.replaced_velocities:
+                msg = "There were velocities >50 in the rpt file. You have activated the option to force the import " \
+                      "so they have been set to 50."
+                tools_qt.show_info_box(msg)
 
             if self.common_msg != "":
                 tools_qgis.show_info(self.common_msg)
@@ -150,13 +159,11 @@ class GwEpaFileManager(GwTask):
             if self.json_result is None or not self.json_result:
                 tools_log.log_warning("Function failed finished")
             if self.complet_result:
-                if 'status' in self.complet_result:
-                    if "Failed" in self.complet_result['status']:
-                        tools_gw.manage_json_exception(self.complet_result)
+                if self.complet_result.get('status') == "Failed":
+                    tools_gw.manage_json_exception(self.complet_result)
             if self.rpt_result:
-                if 'status' in self.rpt_result:
-                    if "Failed" in self.rpt_result['status']:
-                        tools_gw.manage_json_exception(self.rpt_result)
+                if "Failed" in self.rpt_result.get('status'):
+                    tools_gw.manage_json_exception(self.rpt_result)
 
         if self.error_msg:
             title = f"Task aborted - {self.description()}"
@@ -321,7 +328,7 @@ class GwEpaFileManager(GwTask):
                 read = False
             elif bool(re.match('\[(.*?)\]', row['text'])):
                 read = True
-            if 'text' in row and row['text'] is not None and read:
+            if row.get('text') is not None and read:
                 line = row['text'].rstrip() + "\n"
                 file_inp.write(line)
 
@@ -331,24 +338,31 @@ class GwEpaFileManager(GwTask):
         if global_vars.project_type == 'ud' and networkmode and networkmode[0] == "2":
 
             # Replace extension .inp
-            aditional_path = folder_path.replace('.inp', f'.gul')
+            aditional_path = folder_path.replace('.inp', f'.dat')
             aditional_file = open(aditional_path, "w")
             read = True
             save_file = False
             for row in all_rows:
                 # Use regexp to check which targets to read (only TITLE and aditional target)
                 if bool(re.match('\[(.*?)\]', row['text'])) and \
-                        ('TITLE' in row['text'] or 'GULLY' in row['text'] or 'LINK' in row['text'] or
+                        ('GULLY' in row['text'] or 'LINK' in row['text'] or
                          'GRATE' in row['text'] or 'LXSECTIONS' in row['text']):
+
                     read = True
                     if 'GULLY' in row['text'] or 'LINK' in row['text'] or \
                        'GRATE' in row['text'] or 'LXSECTIONS' in row['text']:
                         save_file = True
                 elif bool(re.match('\[(.*?)\]', row['text'])):
                     read = False
-                if 'text' in row and row['text'] is not None and read:
+
+                if row.get('text') is not None and read:
+
                     line = row['text'].rstrip() + "\n"
-                    aditional_file.write(line)
+
+                    if not bool(re.match(';;-(.*?)', row['text'])) and not bool(re.match('\[(.*?)', row['text'])):
+                        line = re.sub(';;', '', line)
+                        line = re.sub(' +', ' ', line)
+                        aditional_file.write(line)
 
             self._close_file(aditional_file)
 
@@ -420,6 +434,29 @@ class GwEpaFileManager(GwTask):
 
 
     def _read_rpt_file(self, file_path=None):
+
+        replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init", prefix=False)
+        if tools_os.set_boolean(replace, default=False) and global_vars.project_type == 'ud':
+            # Replace the velocities
+            try:
+                # Read the contents of the file
+                with open(file_path, "r+") as file:
+                    contents = file.read()
+                # Save a backup of the file
+                with open(f"{file_path}.old", 'w', encoding='utf-8') as file:
+                    file.write(contents)
+                # Replace the words
+                old_contents = contents
+                contents = tools_os.ireplace('>50', '50', contents)
+                if contents != old_contents:
+                    self.replaced_velocities = True
+                # Write the file with new contents
+                with open(file_path, "r+") as file:
+                    file.write(contents)
+                with open(f"{file_path}", 'w', encoding='utf-8') as file:
+                    file.write(contents)
+            except Exception as e:
+                tools_log.log_error(f"Exception when replacing rpt velocities: {e}")
 
         self.file_rpt = open(file_path, "r+")
         full_file = self.file_rpt.readlines()
@@ -550,7 +587,7 @@ class GwEpaFileManager(GwTask):
             self.function_failed = True
             return False
 
-        if 'status' in self.json_result and self.json_result['status'] == 'Failed':
+        if self.json_result.get('status') == 'Failed':
             tools_log.log_warning(self.json_result)
             self.function_failed = True
             return False

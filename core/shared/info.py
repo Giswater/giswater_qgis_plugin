@@ -39,6 +39,7 @@ from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi
     GwInfoEpaInflowsPollUi, GwInfoEpaPumpadditionalUi, GwInfoEpaTreatmentUi
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os
+from ...lib.tools_qt import GwHyperLinkLineEdit
 
 global is_inserting
 is_inserting = False
@@ -372,7 +373,7 @@ class GwInfo(QObject):
             else:
                 if widget is None:
                     msg = f"Widget {field['columnname']} is not configured or have a bad config"
-                    tools_qgis.show_message(msg)
+                    tools_qgis.show_message(msg, dialog=dialog)
             if str(value) not in ('', None, -1, "None", "-1") and widget.property('columnname'):
                 self.my_json[str(widget.property('columnname'))] = str(value)
 
@@ -413,6 +414,14 @@ class GwInfo(QObject):
         self.dlg_cf = GwInfoFeatureUi(sub_tag)
         tools_gw.load_settings(self.dlg_cf)
 
+        # Get widget controls
+        self._get_widget_controls(new_feature)
+
+        self._get_features(complet_result)
+        if self.layer is None:
+            tools_qgis.show_message(f"Layer not found: {self.table_parent}", 2)
+            return False, self.dlg_cf
+
         # If in the get_json function we have received a rubberband, it is not necessary to redraw it.
         # But if it has not been received, it is drawn
         # Using variable exist_rb for check if alredy exist rubberband
@@ -421,14 +430,6 @@ class GwInfo(QObject):
             exist_rb = complet_result['body']['returnManager']['style']['ruberband']
         except KeyError:
             tools_gw.draw_by_json(complet_result, self.rubber_band)
-
-        # Get widget controls
-        self._get_widget_controls(new_feature)
-
-        self._get_features(complet_result)
-        if self.layer is None:
-            tools_qgis.show_message(f"Layer not found: {self.table_parent}", 2)
-            return False, self.dlg_cf
 
         # Remove unused tabs
         tabs_to_show = []
@@ -481,6 +482,9 @@ class GwInfo(QObject):
         # Disable tab EPA if epa_type is undefined
         if tools_qt.get_text(self.dlg_cf, 'data_epa_type').lower() == 'undefined':
             tools_qt.enable_tab_by_tab_name(self.tab_main, 'tab_epa', False)
+        # Check elev data consistency
+        if global_vars.project_type == 'ud':
+            self._check_elev_y()
 
         # Connect actions' signals
         dlg_cf, fid = self._manage_actions_signals(complet_result, list_points, new_feature, tab_type, result)
@@ -627,6 +631,12 @@ class GwInfo(QObject):
                                                                          'lyt_epa_data_1', 'lyt_epa_data_2'):
                     layout_list.append(layout)
 
+                if field['layoutorder'] is None:
+                    message = "The field layoutorder is not configured for"
+                    msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
+                    tools_qgis.show_message(message, 2, parameter=msg, dialog=self.dlg_cf)
+                    continue
+
                 # Manage widget and label positions
                 label_pos = field['widgetcontrols']['labelPosition'] if (
                             'widgetcontrols' in field and field['widgetcontrols'] and 'labelPosition' in field[
@@ -672,6 +682,10 @@ class GwInfo(QObject):
                     else:
                         layout.addWidget(widget, 0, widget_pos)
 
+            elif field['layoutname'] != 'lyt_none':
+                message = "The field layoutname is not configured for"
+                msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
+                tools_qgis.show_message(message, 2, parameter=msg, dialog=self.dlg_cf)
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -698,8 +712,9 @@ class GwInfo(QObject):
         dlg_cf = self.dlg_cf
         layer = self.layer
         fid = self.feature_id
+        can_edit = tools_os.set_boolean(tools_db.check_role_user('role_edit'))
         if layer:
-            if layer.isEditable():
+            if layer.isEditable() and can_edit:
                 tools_gw.enable_all(dlg_cf, complet_result['body']['data'])
             else:
                 tools_gw.enable_widgets(dlg_cf, complet_result['body']['data'], False)
@@ -712,9 +727,9 @@ class GwInfo(QObject):
         self.fct_stop_editing = lambda: self._stop_editing(dlg_cf, self.action_edit, layer, fid, self.my_json, new_feature)
         self._connect_signals()
 
-        self._enable_actions(dlg_cf, layer.isEditable())
+        self._enable_actions(dlg_cf, layer.isEditable() and can_edit)
 
-        self.action_edit.setChecked(layer.isEditable())
+        self.action_edit.setChecked(layer.isEditable() and can_edit)
         child_type = complet_result['body']['feature']['childType']
 
         # Actions signals
@@ -747,6 +762,11 @@ class GwInfo(QObject):
         self.ep = QgsMapToolEmitPoint(self.canvas)
         self.action_interpolate.triggered.connect(partial(self._activate_snapping, complet_result, self.ep))
 
+        # Disable action edit if user can't edit
+        if not can_edit:
+            self.action_edit.setChecked(False)
+            self.action_edit.setEnabled(False)
+
         return dlg_cf, fid
 
 
@@ -759,7 +779,7 @@ class GwInfo(QObject):
                 path = widget.text()
                 status, message = tools_os.open_file(path)
                 if status is False and message is not None:
-                    tools_qgis.show_warning(message, parameter=path)
+                    tools_qgis.show_warning(message, parameter=path, dialog=self.dlg_cf)
         except Exception:
             pass
 
@@ -1530,7 +1550,7 @@ class GwInfo(QObject):
         if 'widgettype' in field and not field['widgettype']:
             message = "The field widgettype is not configured for"
             msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
-            tools_qgis.show_message(message, 2, parameter=msg)
+            tools_qgis.show_message(message, 2, parameter=msg, dialog=dialog)
             return label, widget
 
         try:
@@ -1540,7 +1560,7 @@ class GwInfo(QObject):
         except Exception as e:
             msg = (f"{type(e).__name__}: {e} Python function: _set_widgets. WHERE columname='{field['columnname']}' "
                    f"AND widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'")
-            tools_qgis.show_message(msg, 2)
+            tools_qgis.show_message(msg, 2, dialog=dialog)
             return label, widget
 
         try:
@@ -1679,6 +1699,12 @@ class GwInfo(QObject):
         """
 
         field = kwargs['field']
+        # If button text is empty it's because node_1/2 is not present.
+        # Then we create a QLineEdit to input a node to be connected.
+        if not field.get('value'):
+            widget = self._manage_text(**kwargs)
+            widget.editingFinished.connect(partial(self._run_settopology, widget, **kwargs))
+            return widget
         widget = tools_gw.add_button(**kwargs)
         widget = tools_gw.set_widget_size(widget, field)
         return widget
@@ -1690,8 +1716,12 @@ class GwInfo(QObject):
         """
 
         field = kwargs['field']
+        dialog = kwargs['dialog']
+        new_feature = kwargs['new_feature']
         widget = tools_gw.add_hyperlink(field)
         widget = tools_gw.set_widget_size(widget, field)
+        if type(widget) == GwHyperLinkLineEdit:
+            widget = self._set_auto_update_hyperlink(field, dialog, widget, new_feature)
         return widget
 
 
@@ -1819,137 +1849,150 @@ class GwInfo(QObject):
 
         after_insert = False
 
-        if _json != '' and str(_json) != '{}':
-            p_table_id = complet_result['body']['feature']['tableName']
-            id_name = complet_result['body']['feature']['idName']
-            newfeature_id = complet_result['body']['feature']['id']
-            parent_fields = complet_result['body']['data']['parentFields']
-            fields_reload = ""
-            list_mandatory = []
-            for field in complet_result['body']['data']['fields']:
-                if p_widget and (field['widgetname'] == p_widget.objectName()):
-                    if field['widgetcontrols'] and 'autoupdateReloadFields' in field['widgetcontrols']:
-                        fields_reload = field['widgetcontrols']['autoupdateReloadFields']
+        if _json == '' or str(_json) == '{}':
+            if not close_dlg:
+                return None
+            if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
+                global_vars.session_vars['dialog_docker'].setMinimumWidth(dialog.width())
+                tools_gw.close_docker()
+                return None
+            tools_gw.close_dialog(dialog)
+            return None
 
-                if field['ismandatory']:
-                    widget = dialog.findChild(QWidget, field['widgetname'])
-                    widget.setStyleSheet(None)
-                    value = tools_qt.get_text(dialog, widget)
-                    if value in ('null', None, ''):
-                        widget.setStyleSheet("border: 1px solid red")
-                        list_mandatory.append(field['widgetname'])
+        p_table_id = complet_result['body']['feature']['tableName']
+        id_name = complet_result['body']['feature']['idName']
+        newfeature_id = complet_result['body']['feature']['id']
+        parent_fields = complet_result['body']['data']['parentFields']
+        fields_reload = ""
+        list_mandatory = []
+        for field in complet_result['body']['data']['fields']:
+            if p_widget and (field['widgetname'] == p_widget.objectName()):
+                if field['widgetcontrols'] and 'autoupdateReloadFields' in field['widgetcontrols']:
+                    fields_reload = field['widgetcontrols']['autoupdateReloadFields']
 
-            if list_mandatory:
-                msg = "Some mandatory values are missing. Please check the widgets marked in red."
-                tools_qgis.show_warning(msg)
-                tools_qt.set_action_checked("actionEdit", True, dialog)
+            if field['ismandatory']:
+                widget = dialog.findChild(QWidget, field['widgetname'])
+                widget.setStyleSheet(None)
+                value = tools_qt.get_text(dialog, widget)
+                if value in ('null', None, ''):
+                    widget.setStyleSheet("border: 1px solid red")
+                    list_mandatory.append(field['widgetname'])
+
+        if list_mandatory:
+            msg = "Some mandatory values are missing. Please check the widgets marked in red."
+            tools_qgis.show_warning(msg, dialog=dialog)
+            tools_qt.set_action_checked("actionEdit", True, dialog)
+            QgsProject.instance().blockSignals(False)
+            return False
+
+        if self._has_elev_and_y_json(_json):
+            tools_qt.set_action_checked("actionEdit", True, dialog)
+            QgsProject.instance().blockSignals(False)
+            return False
+
+        # If we create a new feature
+        if self.new_feature_id is not None:
+            new_feature.setAttribute(id_name, newfeature_id)
+            after_insert = True
+            for k, v in list(_json.items()):
+                if k in parent_fields:
+                    new_feature.setAttribute(k, v)
+                    _json.pop(k, None)
+
+            if not self.layer_new_feature.isEditable():
+                self.layer_new_feature.startEditing()
+            self.layer_new_feature.updateFeature(new_feature)
+
+            status = self.layer_new_feature.commitChanges()
+            if status is False:
+                error = self.layer_new_feature.commitErrors()
+                tools_log.log_warning(f"{error}")
                 QgsProject.instance().blockSignals(False)
                 return False
 
-            # If we create a new feature
-            if self.new_feature_id is not None:
-                new_feature.setAttribute(id_name, newfeature_id)
-                after_insert = True
-                for k, v in list(_json.items()):
-                    if k in parent_fields:
-                        new_feature.setAttribute(k, v)
-                        _json.pop(k, None)
+            self.new_feature_id = None
+            self._enable_action(dialog, "actionZoom", True)
+            self._enable_action(dialog, "actionZoomOut", True)
+            self._enable_action(dialog, "actionCentered", True)
+            self._enable_action(dialog, "actionSetToArc", True)
+            global is_inserting
+            is_inserting = False
+            my_json = json.dumps(_json)
+            if my_json == '' or str(my_json) == '{}':
+                if close_dlg:
+                    if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
+                        tools_gw.close_docker()
+                        return True
+                    tools_gw.close_dialog(dialog)
+                return True
 
-                if not self.layer_new_feature.isEditable():
-                    self.layer_new_feature.startEditing()
-                self.layer_new_feature.updateFeature(new_feature)
 
-                status = self.layer_new_feature.commitChanges()
-                if status is False:
-                    error = self.layer_new_feature.commitErrors()
-                    tools_log.log_warning(f"{error}")
-                    QgsProject.instance().blockSignals(False)
-                    return False
-
-                self.new_feature_id = None
-                self._enable_action(dialog, "actionZoom", True)
-                self._enable_action(dialog, "actionZoomOut", True)
-                self._enable_action(dialog, "actionCentered", True)
-                self._enable_action(dialog, "actionSetToArc", True)
-                global is_inserting
-                is_inserting = False
-                my_json = json.dumps(_json)
-                if my_json == '' or str(my_json) == '{}':
-                    if close_dlg:
-                        if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
-                            tools_gw.close_docker()
-                            return True
-                        tools_gw.close_dialog(dialog)
-                    return True
-
-                if self.new_feature.attribute(id_name) is not None:
-                    feature = f'"id":"{self.new_feature.attribute(id_name)}", '
-                else:
-                    feature = f'"id":"{self.feature_id}", '
-
-            # If we make an info
+            if self.new_feature.attribute(id_name) is not None:
+                feature = f'"id":"{self.new_feature.attribute(id_name)}", '
             else:
-                my_json = json.dumps(_json)
                 feature = f'"id":"{self.feature_id}", '
 
-            feature += f'"tableName":"{p_table_id}", '
-            feature += f' "featureType":"{self.feature_type}" '
-            extras = f'"fields":{my_json}, "reload":"{fields_reload}", "afterInsert":"{after_insert}"'
-            body = tools_gw.create_body(feature=feature, extras=extras)
+        # If we make an info
+        else:
+            my_json = json.dumps(_json)
+            feature = f'"id":"{self.feature_id}", '
 
-            # Get utils_grafanalytics_automatic_trigger param
-            row = tools_gw.get_config_value("utils_grafanalytics_automatic_trigger", table='config_param_system')
-            thread = row[0] if row else None
+        feature += f'"tableName":"{p_table_id}", '
+        feature += f' "featureType":"{self.feature_type}" '
+        extras = f'"fields":{my_json}, "reload":"{fields_reload}", "afterInsert":"{after_insert}"'
+        body = tools_gw.create_body(feature=feature, extras=extras)
+
+        # Get utils_grafanalytics_automatic_trigger param
+        row = tools_gw.get_config_value("utils_grafanalytics_automatic_trigger", table='config_param_system')
+        thread = row[0] if row else None
+        if thread:
+            thread = json.loads(thread)
+            thread = tools_os.set_boolean(thread['status'], default=False)
+            if 'closed' not in _json:
+                thread = False
+        epa_type_changed = False
+        if 'epa_type' in _json:
+            epa_type_changed = True
+
+        json_result = tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
+        if not json_result:
+            QgsProject.instance().blockSignals(False)
+            return False
+
+        if clear_json:
+            _json = {}
+
+        self._reset_my_json(False)
+
+        if "Accepted" in json_result['status']:
+            msg_text = json_result['message']['text']
+            if msg_text is None:
+                msg_text = 'Feature upserted'
+            msg_level = json_result['message']['level']
+            if msg_level is None:
+                msg_level = 1
+            tools_qgis.show_message(msg_text, message_level=msg_level, dialog=dialog)
+            self._reload_fields(dialog, json_result, p_widget)
+
             if thread:
-                thread = json.loads(thread)
-                thread = tools_os.set_boolean(thread['status'], default=False)
-                if 'closed' not in _json:
-                    thread = False
-            epa_type_changed = False
-            if 'epa_type' in _json:
-                epa_type_changed = True
+                # If param is true show question and create thread
+                msg = "You closed a valve, this will modify the current mapzones and it may take a little bit of time."
+                if global_vars.user_level['level'] in ('1', '2'):
+                    msg += " Would you like to continue?"
+                    answer = tools_qt.show_question(msg)
+                else:
+                    tools_qgis.show_info(msg)
+                    answer = True
 
-            json_result = tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
-            if not json_result:
-                QgsProject.instance().blockSignals(False)
-                return False
-
-            if clear_json:
-                _json = {}
-
-            self._reset_my_json(False)
-
-            if "Accepted" in json_result['status']:
-                msg_text = json_result['message']['text']
-                if msg_text is None:
-                    msg_text = 'Feature upserted'
-                msg_level = json_result['message']['level']
-                if msg_level is None:
-                    msg_level = 1
-                tools_qgis.show_message(msg_text, message_level=msg_level)
-                self._reload_fields(dialog, json_result, p_widget)
-                if epa_type_changed:
-                    self._reload_epa_tab(dialog)
-
-                if thread:
-                    # If param is true show question and create thread
-                    msg = "You closed a valve, this will modify the current mapzones and it may take a little bit of time."
-                    if global_vars.user_level['level'] in ('1', '2'):
-                        msg += "\nWould you like to continue?"
-                        answer = tools_qt.show_question(msg)
-                    else:
-                        tools_qgis.show_info(msg)
-                        answer = True
-
-                    if answer:
-                        params = {"body": body}
-                        self.valve_thread = GwToggleValveTask("Update mapzones", params)
-                        QgsApplication.taskManager().addTask(self.valve_thread)
-                        QgsApplication.taskManager().triggerTask(self.valve_thread)
-            elif "Failed" in json_result['status']:
-                # If json_result['status'] is Failed message from database is showed user by get_json->manage_json_exception
-                QgsProject.instance().blockSignals(False)
-                return False
+                if answer:
+                    params = {"body": body}
+                    self.valve_thread = GwToggleValveTask("Update mapzones", params)
+                    QgsApplication.taskManager().addTask(self.valve_thread)
+                    QgsApplication.taskManager().triggerTask(self.valve_thread)
+        elif "Failed" in json_result['status']:
+            # If json_result['status'] is Failed message from database is showed user by get_json->manage_json_exception
+            QgsProject.instance().blockSignals(False)
+            return False
 
         # Tab EPA
         if self.my_json_epa != '' and str(self.my_json_epa) != '{}':
@@ -1965,6 +2008,10 @@ class GwInfo(QObject):
             if not json_result or "Failed" in json_result['status']:
                 QgsProject.instance().blockSignals(False)
                 return False
+
+        # Force a map refresh
+        tools_qgis.refresh_map_canvas()  # First refresh all the layers
+        global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
 
         if close_dlg:
             if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
@@ -2164,6 +2211,14 @@ class GwInfo(QObject):
         return widget
 
 
+    def _set_auto_update_hyperlink(self, field, dialog, widget, new_feature=None):
+
+        if self._check_tab_data(dialog):
+            widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
+
+        return widget
+
+
     def _reload_fields(self, dialog, result, p_widget):
         """
         :param dialog: QDialog where find and set widgets
@@ -2325,6 +2380,39 @@ class GwInfo(QObject):
         return widget
 
 
+    def _run_settopology(self, widget, **kwargs):
+        """ Sets node_1/2 from lineedit & converts widget into button if function run successfully """
+
+        dialog = kwargs['dialog']
+        field = kwargs['field']
+        complet_result = kwargs['complet_result']
+        feature_id = complet_result['body']['feature']['id']
+        text = tools_qt.get_text(dialog, widget, return_string_null=True)
+
+        feature = f'"id": "{feature_id}"'
+        extras = f'"fields":{{"{widget.property("columnname")}":"{text}"}}'
+        body = tools_gw.create_body(feature=feature, extras=extras)
+        json_response = tools_gw.execute_procedure('gw_fct_settopology', body)
+        if json_response and json_response['status'] != "Failed":
+            # Refresh canvas & send a message
+            tools_qgis.refresh_map_canvas()
+            tools_qgis.show_info("Node set correctly", dialog=dialog)
+
+            # Delete lineedit
+            widget.deleteLater()
+            # Create button with field from kwargs and value from {text}
+            kwargs['field']['value'] = f"{text}"
+            new_widget = self._manage_button(**kwargs)
+            if new_widget is None:
+                return
+            # Add button to layout
+            layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
+            if layout is not None:
+                layout.addWidget(new_widget, int(field['layoutorder']), 2)
+            return
+        tools_qgis.show_warning("Error setting node", dialog=dialog)
+
+
     def _open_catalog(self, tab_type, feature_type, child_type):
 
         self.catalog = GwCatalog()
@@ -2363,6 +2451,257 @@ class GwInfo(QObject):
 
         self._enable_actions(dialog, self.layer.isEditable())
 
+
+    def _check_elev_y(self):
+        """ Show a warning if feature has both y and elev values """
+
+        do_check = tools_gw.get_config_value('edit_check_redundance_y_topelev_elev', table='config_param_system')
+        if do_check is not None and not tools_os.set_boolean(do_check[0], False):
+            return False
+
+        msg = f"This {self.feature_type} has redundant data on "
+        # ARC
+        if self.feature_type == 'arc':
+            msg = f"{msg} both (elev & y) values. Review it and use only one."
+            fields1 = 'y1, custom_y1, elev1, custom_elev1'
+            sql = f"SELECT {fields1} FROM v_edit_arc WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                has_y = (row[0], row[1]) != (None, None)
+                has_elev = (row[2], row[3]) != (None, None)
+                if has_y and has_elev:
+                    tools_qgis.show_warning(msg, dialog=self.dlg_cf)
+                    return False
+
+            fields2 = 'y2, custom_y2, elev2, custom_elev2'
+            sql = f"SELECT {fields2} FROM v_edit_arc WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                has_y = (row[0], row[1]) != (None, None)
+                has_elev = (row[2], row[3]) != (None, None)
+                if has_y and has_elev:
+                    tools_qgis.show_warning(msg, dialog=self.dlg_cf)
+                    return False
+        # NODE
+        elif self.feature_type == 'node':
+            msg = f"{msg} all (elev & ymax & top_elev) values. Review it and use at most two."
+            fields = 'ymax, custom_ymax, elev, custom_elev, top_elev, custom_top_elev'
+            sql = f"SELECT {fields} FROM v_edit_node WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                has_y = (row[0], row[1]) != (None, None)
+                has_elev = (row[2], row[3]) != (None, None)
+                has_top_elev = (row[4], row[5]) != (None, None)
+                if False not in (has_y, has_elev, has_top_elev):
+                    tools_qgis.show_warning(msg, dialog=self.dlg_cf)
+                    return False
+        return True
+
+
+    def _has_elev_and_y_json(self, _json):
+        """ :returns True if feature has both y and elev values. False otherwise  """
+
+        do_check = tools_gw.get_config_value('edit_check_redundance_y_topelev_elev', table='config_param_system')
+        if do_check is not None and not tools_os.set_boolean(do_check[0], False):
+            return False
+
+        keys_list = ("y1", "custom_y1", "elev1", "custom_elev1",
+                     "y2", "custom_y2", "elev2", "custom_elev2",
+                     "ymax", "custom_ymax", "elev", "custom_elev", "top_elev", "custom_top_elev")
+
+        # Check that edited field is y or elev
+        has_modified = any(k in _json for k in keys_list)
+        if not has_modified:
+            return False
+
+        # Get edited fields
+        modified = [k for k in _json if k in keys_list]
+
+        if self.new_feature_id is not None:
+            return self._has_elev_y_json(_json, modified)
+
+        for k in modified:
+            if _json.get(k) in (None, ''):
+                continue
+            if self.feature_type == 'arc':
+                # If edited field is Y check if feature has ELEV field
+                if 'y' in k:
+                    has_elev = self._has_elev(arc_n=k[-1:])
+                    if has_elev:
+                        msg = f"This feature already has ELEV values! Review it and use only one"
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
+                    return has_elev
+                # If edited field is ELEV check if feature has Y field
+                if 'elev' in k:
+                    has_y = self._has_y(arc_n=k[-1:])
+                    if has_y:
+                        msg = f"This feature already has Y values! Review it and use only one"
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
+                    return has_y
+            elif self.feature_type == 'node':
+                # If edited field is Y check if feature has ELEV & TOP_ELEV field
+                if 'y' in k:
+                    has_elev = self._has_elev()
+                    has_top_elev = self._has_top_elev()
+                    if has_elev and has_top_elev:
+                        msg = f"This feature already has ELEV & TOP_ELEV values! Review it and use at most two"
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
+                    return has_elev and has_top_elev
+                # If edited field is TOP_ELEV check if feature has Y & ELEV field
+                if 'top_elev' in k:
+                    has_y = self._has_y()
+                    has_elev = self._has_elev()
+                    if has_y and has_elev:
+                        msg = f"This feature already has Y & ELEV values! Review it and use at most two"
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
+                    return has_y and has_elev
+                # If edited field is ELEV check if feature has Y & TOP_ELEV field
+                elif 'elev' in k:
+                    has_y = self._has_y()
+                    has_top_elev = self._has_top_elev()
+                    if has_y and has_top_elev:
+                        msg = f"This feature already has Y & TOP_ELEV values! Review it and use at most two"
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
+                    return has_y and has_top_elev
+
+        return False
+
+
+    def _has_elev_y_json(self, _json, modified):
+        """If we're creating new feature, check which keys are in json"""
+
+        if self.feature_type == 'node':
+            msg = f"This node has redundant data on (top_elev, ymax & elev) values. Review it and use at most two."
+            # y
+            ymax = _json.get('ymax')
+            custom_ymax = _json.get('custom_ymax')
+            has_ymax = (ymax, custom_ymax) != (None, None)
+            # elev
+            elev = _json.get('elev')
+            custom_elev = _json.get('custom_elev')
+            has_elev = (elev, custom_elev) != (None, None)
+            # top_elev
+            top_elev = _json.get('top_elev')
+            custom_top_elev = _json.get('custom_top_elev')
+            has_top_elev = (top_elev, custom_top_elev) != (None, None)
+
+            for k in modified:
+                if _json.get(k) in (None, ''):
+                    continue
+                if 'ymax' in k:
+                    if has_elev and has_top_elev:
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
+                        return True
+                if 'top_elev' in k:
+                    if has_elev and has_ymax:
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
+                        return True
+                elif 'elev' in k:
+                    if has_top_elev and has_ymax:
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
+                        return True
+
+            return False
+
+        elif self.feature_type == 'arc':
+            msg = f"This arc has redundant data on both (elev & y) values. Review it and use only one."
+            # y1
+            y1 = _json.get('y1')
+            custom_y1 = _json.get('custom_y1')
+            has_y1 = (y1, custom_y1) != (None, None)
+            # elev1
+            elev1 = _json.get('elev1')
+            custom_elev1 = _json.get('custom_elev1')
+            has_elev1 = (elev1, custom_elev1) != (None, None)
+            # y2
+            y2 = _json.get('y2')
+            custom_y2 = _json.get('custom_y2')
+            has_y2 = (y2, custom_y2) != (None, None)
+            # elev2
+            elev2 = _json.get('elev2')
+            custom_elev2 = _json.get('custom_elev2')
+            has_elev2 = (elev2, custom_elev2) != (None, None)
+
+            for k in modified:
+                if _json.get(k) in (None, ''):
+                    continue
+                if 'y1' in k:
+                    if has_elev1:
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
+                        return True
+                if 'elev1' in k:
+                    if has_y1:
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
+                        return True
+                if 'y2' in k:
+                    if has_elev2:
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
+                        return True
+                if 'elev2' in k:
+                    if has_y2:
+                        tools_qgis.show_warning(msg, dialog=self.dlg_cf)
+                        return True
+
+            return False
+
+        return False
+
+
+    def _has_y(self, arc_n=1):
+        """ :returns True if feature has y values. False otherwise """
+
+        if self.feature_type == 'arc':
+            if arc_n not in (1, 2):
+                arc_n = 1
+            fields = f'y{arc_n}, custom_y{arc_n}'
+            sql = f"SELECT {fields} FROM v_edit_arc WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                return (row[0], row[1]) != (None, None)
+
+        elif self.feature_type == 'node':
+            fields = 'ymax, custom_ymax'
+            sql = f"SELECT {fields} FROM v_edit_node WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                return (row[0], row[1]) != (None, None)
+
+        return True
+
+
+    def _has_elev(self, arc_n=1):
+        """ :returns True if feature has elev values. False otherwise """
+
+        if self.feature_type == 'arc':
+            if arc_n not in (1, 2):
+                arc_n = 1
+            fields = f'elev{arc_n}, custom_elev{arc_n}'
+            sql = f"SELECT {fields} FROM v_edit_arc WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                return (row[0], row[1]) != (None, None)
+
+        elif self.feature_type == 'node':
+            fields = 'elev, custom_elev'
+            sql = f"SELECT {fields} FROM v_edit_node WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                return (row[0], row[1]) != (None, None)
+
+        return True
+
+
+    def _has_top_elev(self):
+        """ :returns True if feature has top_elev values. False otherwise """
+
+        if self.feature_type == 'node':
+            fields = 'top_elev, custom_top_elev'
+            sql = f"SELECT {fields} FROM v_edit_node WHERE {self.field_id} = '{self.feature_id}'"
+            row = tools_db.get_row(sql)
+            if row:
+                return (row[0], row[1]) != (None, None)
+
+        return True
 
     """ MANAGE TABS """
 
@@ -2726,25 +3065,31 @@ class GwInfo(QObject):
             self._cancel_snapping_tool(dialog, action)
             return
 
-        # Get coordinates
-        event_point = self.snapper_manager.get_event_point(point=point)
-        # Snapping
-        result = self.snapper_manager.snap_to_current_layer(event_point)
-        if not result.isValid():
-            return
-        # Get the point. Leave selection
-        snapped_feat = self.snapper_manager.get_snapped_feature(result)
-        feat_id = snapped_feat.attribute(f'{options[option][0]}')
-        if option in ('arc', 'node'):
-            widget = dialog.findChild(QWidget, f"{options[option][1]}")
-            widget.setFocus()
-            tools_qt.set_widget_text(dialog, widget, str(feat_id))
-        elif option == 'set_to_arc':
-            # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
-            #       def _set_to_arc(self, feat_id, child_type)
-            getattr(self, options[option][1])(feat_id, child_type)
-        self.snapper_manager.recover_snapping_options()
-        self._cancel_snapping_tool(dialog, action)
+        try:
+            # Refresh all layers to avoid selecting old deleted features
+            global_vars.canvas.refreshAllLayers()
+            # Get coordinates
+            event_point = self.snapper_manager.get_event_point(point=point)
+            # Snapping
+            result = self.snapper_manager.snap_to_current_layer(event_point)
+            if not result.isValid():
+                return
+            # Get the point. Leave selection
+            snapped_feat = self.snapper_manager.get_snapped_feature(result)
+            feat_id = snapped_feat.attribute(f'{options[option][0]}')
+            if option in ('arc', 'node'):
+                widget = dialog.findChild(QWidget, f"{options[option][1]}")
+                widget.setFocus()
+                tools_qt.set_widget_text(dialog, widget, str(feat_id))
+            elif option == 'set_to_arc':
+                # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
+                #       def _set_to_arc(self, feat_id, child_type)
+                getattr(self, options[option][1])(feat_id, child_type)
+        except Exception as e:
+            tools_qgis.show_warning(f"Exception in info (def _get_id)", parameter=e)
+        finally:
+            self.snapper_manager.recover_snapping_options()
+            self._cancel_snapping_tool(dialog, action)
 
 
     def _set_to_arc(self, feat_id, child_type):

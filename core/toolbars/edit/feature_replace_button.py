@@ -23,7 +23,7 @@ class GwFeatureReplaceButton(GwMaptool):
     """ Button 44: Replace feature
     User select one feature. Execute SQL function: 'gw_fct_setfeaturereplace' """
 
-    def __init__(self, icon_path, action_name, text, toolbar, action_group, icon_type=1):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group, icon_type=1, actions=None, list_tables=None):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group, icon_type)
         self.current_date = QDate.currentDate().toString('yyyy-MM-dd')
@@ -34,7 +34,12 @@ class GwFeatureReplaceButton(GwMaptool):
         self.feature_edit_type = None
         self.feature_type_cat = None
         self.feature_id = None
-        self.list_tables = ['v_edit_arc', 'v_edit_node', 'v_edit_connec', 'v_edit_gully']
+        self.actions = actions
+        if not self.actions:
+            self.actions = ['ARC','NODE','CONNEC']
+        self.list_tables = list_tables
+        if not self.list_tables:
+            self.list_tables = ['v_edit_arc', 'v_edit_node', 'v_edit_connec', 'v_edit_gully']
 
         # Create a menu and add all the actions
         if toolbar is not None:
@@ -162,11 +167,10 @@ class GwFeatureReplaceButton(GwMaptool):
             del action
         ag = QActionGroup(self.iface.mainWindow())
 
-        actions = ['ARC', 'NODE', 'CONNEC']
         if global_vars.project_type in ('UD', 'ud'):
-            actions.append('GULLY')
+            self.actions.append('GULLY')
 
-        for action in actions:
+        for action in self.actions:
             obj_action = QAction(f"{action}", ag)
             self.menu.addAction(obj_action)
             obj_action.triggered.connect(partial(super().clicked_event))
@@ -207,10 +211,10 @@ class GwFeatureReplaceButton(GwMaptool):
         tools_gw.add_icon(self.dlg_replace.btn_new_workcat, "193")
         tools_gw.add_icon(self.dlg_replace.btn_catalog, "195")
 
-        sql = "SELECT id FROM cat_work ORDER BY id"
+        sql = "SELECT id, id as idval FROM cat_work ORDER BY id"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_box(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
+            tools_qt.fill_combo_values(self.dlg_replace.workcat_id_end, rows)
             tools_qt.set_autocompleter(self.dlg_replace.workcat_id_end)
 
         row = tools_gw.get_config_value('edit_workcat_vdefault')
@@ -255,7 +259,7 @@ class GwFeatureReplaceButton(GwMaptool):
                            f"ORDER BY id")
                 if sql:
                     rows = tools_db.get_rows(sql)
-                    tools_qt.fill_combo_box(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
+                    tools_qt.fill_combo_values(self.dlg_replace.featurecat_id, rows)
 
         self.dlg_replace.feature_type_new.currentIndexChanged.connect(self._edit_change_elem_type_get_value)
         self.dlg_replace.btn_catalog.clicked.connect(partial(self._open_catalog, self.feature_type))
@@ -384,10 +388,10 @@ class GwFeatureReplaceButton(GwMaptool):
                     sql = f"INSERT INTO cat_work ({fields}) VALUES ({values})"
                     tools_db.execute_sql(sql)
 
-                    sql = "SELECT id FROM cat_work ORDER BY id"
+                    sql = "SELECT id, id as idval FROM cat_work ORDER BY id"
                     rows = tools_db.get_rows(sql)
                     if rows:
-                        tools_qt.fill_combo_box(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
+                        tools_qt.fill_combo_values(self.dlg_replace.workcat_id_end, rows)
                         current_index = self.dlg_replace.workcat_id_end.findText(str(cat_work_id))
                         self.dlg_replace.workcat_id_end.setCurrentIndex(current_index)
 
@@ -407,12 +411,12 @@ class GwFeatureReplaceButton(GwMaptool):
         # Check null values
         if feature_type_new in (None, 'null'):
             message = "Mandatory field is missing. Please, set a value for field"
-            tools_qgis.show_warning(message, parameter="'New feature type'")
+            tools_qgis.show_warning(message, parameter="'New feature type'", dialog=dialog)
             return
 
         if featurecat_id in (None, 'null'):
             message = "Mandatory field is missing. Please, set a value for field"
-            tools_qgis.show_warning(message, parameter="'Catalog id'")
+            tools_qgis.show_warning(message, parameter="'Catalog id'", dialog=dialog)
             return
 
         # Ask question before executing
@@ -489,6 +493,6 @@ class GwFeatureReplaceButton(GwMaptool):
                    f"ORDER BY id")
 
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_box(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
+        tools_qt.fill_combo_values(self.dlg_replace.featurecat_id, rows)
 
     # endregion

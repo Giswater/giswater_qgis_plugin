@@ -25,11 +25,13 @@ class GwProjectCheckTask(GwTask):
 
     task_finished = pyqtSignal(list)
 
-    def __init__(self, description='', params=None):
+    def __init__(self, description='', params=None, timer=None):
 
         super().__init__(description)
         self.params = params
         self.result = None
+        self.dlg_audit_project = None
+        self.timer = timer
 
 
     def run(self):
@@ -38,6 +40,7 @@ class GwProjectCheckTask(GwTask):
 
         layers = self.params['layers']
         init_project = self.params['init_project']
+        self.dlg_audit_project = self.params['dialog']
         tools_log.log_info(f"Task 'Check project' execute function 'fill_check_project_table'")
         status, self.result = self.fill_check_project_table(layers, init_project)
         if not status:
@@ -51,6 +54,9 @@ class GwProjectCheckTask(GwTask):
 
         super().finished(result)
 
+        self.dlg_audit_project.progressBar.setVisible(False)
+        if self.timer:
+            self.timer.stop()
         if self.isCanceled():
             self.setProgress(100)
             return
@@ -85,7 +91,7 @@ class GwProjectCheckTask(GwTask):
             if layer_source['schema'] is None:
                 continue
             layer_source['schema'] = layer_source['schema'].replace('"', '')
-            if 'schema' not in layer_source or layer_source['schema'] != global_vars.schema_name:
+            if layer_source.get('schema') != global_vars.schema_name:
                 continue
 
             schema_name = layer_source['schema']
@@ -130,7 +136,7 @@ class GwProjectCheckTask(GwTask):
         # Get log folder size
         log_folder_volume = 0
         if global_vars.user_folder_dir:
-            log_folder = os.path.join(global_vars.user_folder_dir, 'log')
+            log_folder = f"{global_vars.user_folder_dir}{os.sep}core{os.sep}log"
             size = tools_os.get_folder_size(log_folder)
             log_folder_volume = f"{round(size / (1024*1024), 2)} MB"
 
@@ -149,6 +155,8 @@ class GwProjectCheckTask(GwTask):
 
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_setcheckproject', body, is_thread=True, aux_conn=self.aux_conn)
+        if result:
+            tools_gw.manage_current_selections_docker(result, open=False)
         try:
             if not result or (result['body']['variables']['hideForm'] is True):
                 return result
@@ -162,11 +170,6 @@ class GwProjectCheckTask(GwTask):
     def _show_check_project_result(self, result):
         """ Show dialog with audit check project results """
 
-        # Create dialog
-        self.dlg_audit_project = GwProjectCheckUi()
-        tools_gw.load_settings(self.dlg_audit_project)
-        self.dlg_audit_project.rejected.connect(partial(tools_gw.save_settings, self.dlg_audit_project))
-
         # Populate info_log and missing layers
         critical_level = 0
         text_result = tools_gw.add_layer_temp(self.dlg_audit_project, result['body']['data'],
@@ -177,7 +180,6 @@ class GwProjectCheckTask(GwTask):
         if int(critical_level) > 0 or text_result:
             self.dlg_audit_project.btn_accept.clicked.connect(partial(self._add_selected_layers, self.dlg_audit_project,
                                                                       result['body']['data']['missingLayers']))
-            tools_gw.open_dialog(self.dlg_audit_project, dlg_name='project_check')
 
 
     def _add_selected_layers(self, dialog, m_layers):

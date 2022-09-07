@@ -213,6 +213,38 @@ class GwDscenarioManagerUi(GwDialog, FROM_CLASS):
 FROM_CLASS = _get_ui_class('dscenario.ui')
 class GwDscenarioUi(GwDialog, FROM_CLASS):
     pass
+
+FROM_CLASS = _get_ui_class('nonvisual_manager.ui', 'epa')
+class GwNonVisualManagerUi(GwDialog, FROM_CLASS):
+    pass
+
+FROM_CLASS = _get_ui_class('nonvisual_curve.ui', 'epa')
+class GwNonVisualCurveUi(GwDialog, FROM_CLASS):
+    pass
+
+FROM_CLASS = _get_ui_class('nonvisual_controls.ui', 'epa')
+class GwNonVisualControlsUi(GwDialog, FROM_CLASS):
+    pass
+
+FROM_CLASS = _get_ui_class('nonvisual_pattern_ud.ui', 'epa')
+class GwNonVisualPatternUDUi(GwDialog, FROM_CLASS):
+    pass
+
+FROM_CLASS = _get_ui_class('nonvisual_pattern_ws.ui', 'epa')
+class GwNonVisualPatternWSUi(GwDialog, FROM_CLASS):
+    pass
+
+FROM_CLASS = _get_ui_class('nonvisual_rules.ui', 'epa')
+class GwNonVisualRulesUi(GwDialog, FROM_CLASS):
+    pass
+
+FROM_CLASS = _get_ui_class('nonvisual_timeseries.ui', 'epa')
+class GwNonVisualTimeseriesUi(GwDialog, FROM_CLASS):
+    pass
+
+FROM_CLASS = _get_ui_class('nonvisual_lids.ui', 'epa')
+class GwNonVisualLidsUi(GwDialog, FROM_CLASS):
+    pass
 # endregion
 
 

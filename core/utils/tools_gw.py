@@ -44,22 +44,22 @@ from ..utils.select_manager import GwSelectManager
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
-from ...lib.tools_qt import GwHyperLinkLabel
+from ...lib.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
 
 # These imports are for the add_{widget} functions (modules need to be imported in order to find it by its name)
 # noinspection PyUnresolvedReferences
 from ..shared import info
 
 
-def load_settings(dialog):
+def load_settings(dialog, plugin='core'):
     """ Load user UI settings related with dialog position and size """
 
     # Get user UI config file
     try:
-        x = get_config_parser('dialogs_position', f"{dialog.objectName()}_x", "user", "session")
-        y = get_config_parser('dialogs_position', f"{dialog.objectName()}_y", "user", "session")
-        width = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", "user", "session")
-        height = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", "user", "session")
+        x = get_config_parser('dialogs_position', f"{dialog.objectName()}_x", "user", "session", plugin=plugin)
+        y = get_config_parser('dialogs_position', f"{dialog.objectName()}_y", "user", "session", plugin=plugin)
+        width = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", "user", "session", plugin=plugin)
+        height = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", "user", "session", plugin=plugin)
 
         v_screens = ctypes.windll.user32
         screen_x = v_screens.GetSystemMetrics(78)  # Width of virtual screen
@@ -78,16 +78,23 @@ def load_settings(dialog):
         pass
 
 
-def save_settings(dialog):
+def save_settings(dialog, plugin='core'):
     """ Save user UI related with dialog position and size """
+
+    # Ensure that 'plugin' parameter isn't being populated with int from signal
+    try:
+        plugin = int(plugin)
+        plugin = 'core'
+    except ValueError:
+        pass
 
     try:
         x, y = dialog.geometry().x(), dialog.geometry().y()
         w, h = dialog.geometry().width(), dialog.geometry().height()
-        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{w}")
-        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{h}")
-        set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{x}")
-        set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{y}")
+        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{w}", plugin=plugin)
+        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{h}", plugin=plugin)
+        set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{x}", plugin=plugin)
+        set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{y}", plugin=plugin)
     except Exception:
         pass
 
@@ -102,7 +109,7 @@ def initialize_parsers():
 
 
 def get_config_parser(section: str, parameter: str, config_type, file_name, prefix=True, get_comment=False,
-                      chk_user_params=True, get_none=False, force_reload=False) -> str:
+                      chk_user_params=True, get_none=False, force_reload=False, plugin='core') -> str:
     """ Load a simple parser value """
 
     if config_type not in ("user", "project"):
@@ -113,6 +120,11 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     path = global_vars.configs[file_name][0]
     parser = global_vars.configs[file_name][1]
 
+    if plugin != 'core':
+        path = f"{global_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config{os.sep}{file_name}.config"
+        parser = None
+        chk_user_params = False
+
     # Needed to avoid errors with giswater plugins
     if path is None:
         tools_log.log_warning(f"get_config_parser: Config file is not set")
@@ -121,7 +133,8 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     value = None
     raw_parameter = parameter
     if parser is None:
-        tools_log.log_info(f"Creating parser for file: {path}")
+        if plugin == 'core':
+            tools_log.log_info(f"Creating parser for file: {path}")
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
         parser.read(path)
 
@@ -155,7 +168,7 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
 
 
 def set_config_parser(section: str, parameter: str, value: str = None, config_type="user", file_name="session",
-                      comment=None, prefix=True, chk_user_params=True):
+                      comment=None, prefix=True, chk_user_params=True, plugin='core'):
     """ Save simple parser value """
 
     if config_type not in ("user", "project"):
@@ -164,6 +177,10 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
 
     # Get configuration filepath and parser object
     path = global_vars.configs[file_name][0]
+
+    if plugin != 'core':
+        path = f"{global_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config{os.sep}{file_name}.config"
+        chk_user_params = False
 
     try:
 
@@ -259,10 +276,10 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_wi
         dlg.show()
 
 
-def close_dialog(dlg, delete_dlg=True):
+def close_dialog(dlg, delete_dlg=True, plugin='core'):
     """ Close dialog """
 
-    save_settings(dlg)
+    save_settings(dlg, plugin=plugin)
     global_vars.session_vars['last_focus'] = None
     dlg.close()
     if delete_dlg:
@@ -510,7 +527,7 @@ def set_completer_feature_id(widget, feature_type, viewname):
         completer.setModel(model)
 
 
-def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1", alias=None):
+def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1", alias=None, sub_sub_group=None):
     """
     Put selected layer into TOC
         :param tablename: Postgres table name (String)
@@ -525,8 +542,17 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     schema_name = global_vars.dao_db_credentials['schema'].replace('"', '')
     uri = tools_db.get_uri()
     uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
+    if the_geom:
+        try:
+            uri.setSrid(f"{global_vars.data_epsg}")
+        except:
+            pass
     create_groups = get_config_parser("system", "force_create_qgis_group_layer", "user", "init", prefix=False)
     create_groups = tools_os.set_boolean(create_groups, default=False)
+    if sub_group:
+        sub_group = sub_group.capitalize()
+    if sub_sub_group:
+        sub_sub_group = sub_sub_group.capitalize()
 
     if the_geom == "rast":
         connString = f"PG: dbname={global_vars.dao_db_credentials['db']} host={global_vars.dao_db_credentials['host']} " \
@@ -540,7 +566,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     else:
         if alias: tablename = alias
         layer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
-        tools_qt.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups)
+        tools_qt.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups, sub_sub_group=sub_sub_group)
 
         # The triggered function (action.triggered.connect(partial(...)) as the last parameter sends a boolean,
         # if we define style_id = None, style_id will take the boolean of the triggered action as a fault,
@@ -563,13 +589,13 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
                     qml = style['body']['styles']['style']
                     tools_qgis.create_qml(layer, qml)
 
-            # Set layer config
-            if tablename:
-                feature = '"tableName":"' + str(tablename_og) + '", "id":"", "isLayer":true'
-                extras = '"infoType":"' + str(global_vars.project_vars['info_type']) + '"'
-                body = create_body(feature=feature, extras=extras)
-                json_result = execute_procedure('gw_fct_getinfofromid', body)
-                config_layer_attributes(json_result, layer, alias)
+        # Set layer config
+        if tablename:
+            feature = '"tableName":"' + str(tablename_og) + '", "isLayer":true'
+            extras = '"infoType":"' + str(global_vars.project_vars['info_type']) + '"'
+            body = create_body(feature=feature, extras=extras)
+            json_result = execute_procedure('gw_fct_getinfofromid', body)
+            config_layer_attributes(json_result, layer, alias)
 
     global_vars.iface.mapCanvas().refresh()
 
@@ -594,6 +620,7 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
     text_result = None
     temp_layers_added = []
     srid = global_vars.data_epsg
+    i = 0
     for k, v in list(data.items()):
         if str(k) == "info":
             text_result, change_tab = fill_tab_log(dialog, data, force_tab, reset_text, tab_idx, call_set_tabs_enabled, close)
@@ -614,13 +641,18 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
                     tools_qgis.remove_layer_from_toc(aux_layer_name, group)
                 v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", aux_layer_name, 'memory')
                 # This function already works with GeoJson
-                fill_layer_temp(v_layer, data, k, counter, group)
-                if 'qmlPath' in data[k] and data[k]['qmlPath']:
-                    qml_path = data[k]['qmlPath']
+                fill_layer_temp(v_layer, data, k, counter, group=group, sort_val=i)
+
+                # Increase iterator
+                i = i + 1
+
+                qml_path = data[k].get('qmlPath')
+                category_field = data[k].get('category_field')
+                if qml_path:
                     tools_qgis.load_qml(v_layer, qml_path)
-                elif 'category_field' in data[k] and data[k]['category_field']:
+                elif category_field:
                     cat_field = data[k]['category_field']
-                    size = data[k]['size'] if 'size' in data[k] and data[k]['size'] else 2
+                    size = data[k].get('size', default=2)
                     color_values = {'NEW': QColor(0, 255, 0), 'DUPLICATED': QColor(255, 0, 0),
                                     'EXISTS': QColor(240, 150, 0)}
                     tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values)
@@ -662,17 +694,15 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
             layer.setFieldAlias(field_index, field['label'])
 
         # widgetcontrols
-        if 'widgetcontrols' in field:
+        widgetcontrols = field.get('widgetcontrols')
+        if widgetcontrols:
+            if widgetcontrols.get('setQgisConstraints') is True:
+                layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintNotNull,
+                                         QgsFieldConstraints.ConstraintStrengthSoft)
+                layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintUnique,
+                                         QgsFieldConstraints.ConstraintStrengthHard)
 
-            # Set field constraints
-            if field['widgetcontrols'] and 'setQgisConstraints' in field['widgetcontrols']:
-                if field['widgetcontrols']['setQgisConstraints'] is True:
-                    layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintNotNull,
-                                             QgsFieldConstraints.ConstraintStrengthSoft)
-                    layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintUnique,
-                                             QgsFieldConstraints.ConstraintStrengthHard)
-
-        if 'ismandatory' in field and not field['ismandatory']:
+        if field.get('ismandatory') is False:
             layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintNotNull,
                                      QgsFieldConstraints.ConstraintStrengthSoft)
 
@@ -697,7 +727,7 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
                  and 'valueRelation' in field['widgetcontrols'] and field['widgetcontrols']['valueRelation']
         if use_vr:
             value_relation = field['widgetcontrols']['valueRelation']
-            if 'activated' in value_relation and value_relation['activated']:
+            if value_relation.get('activated'):
                 try:
                     vr_layer = value_relation['layer']
                     vr_layer = tools_qgis.get_layer_by_tablename(vr_layer).id()  # Get layer id
@@ -842,7 +872,7 @@ def disable_tab_log(dialog):
         qtabwidget.setTabEnabled(qtabwidget.count() - 1, False)
 
 
-def fill_layer_temp(virtual_layer, data, layer_type, counter, group='GW Temporal Layers'):
+def fill_layer_temp(virtual_layer, data, layer_type, counter, group='GW Temporal Layers', sort_val=None):
     """
     :param virtual_layer: Memory QgsVectorLayer (QgsVectorLayer)
     :param data: Json
@@ -885,7 +915,7 @@ def fill_layer_temp(virtual_layer, data, layer_type, counter, group='GW Temporal
     my_group = root.findGroup(group)
     if my_group is None:
         my_group = root.insertGroup(0, group)
-    my_group.insertLayer(0, virtual_layer)
+    my_group.insertLayer(sort_val, virtual_layer)
 
 
 def enable_widgets(dialog, result, enable):
@@ -898,9 +928,11 @@ def enable_widgets(dialog, result, enable):
                 if widget.property('columnname') == field['columnname']:
                     # If it's not the main tab we want the widgets to be enabled
                     if not any(substring in field['layoutname'] for substring in ['main', 'data', 'top', 'bot']): continue
-                    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
+                    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
                         widget.setReadOnly(not enable)
                         widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                        if type(widget) == GwHyperLinkLineEdit:
+                            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
                     elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
                         widget.setEnabled(enable)
                         widget.setStyleSheet("QWidget {color: rgb(0, 0, 0)}")
@@ -925,11 +957,13 @@ def enable_all(dialog, result):
                 continue
             for field in result['fields']:
                 if widget.property('columnname') == field['columnname']:
-                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit):
+                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit, GwHyperLinkLineEdit):
                         widget.setReadOnly(not field['iseditable'])
                         if not field['iseditable']:
                             widget.setFocusPolicy(Qt.NoFocus)
                             widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                            if type(widget) == GwHyperLinkLineEdit:
+                                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
                         else:
                             widget.setFocusPolicy(Qt.StrongFocus)
                             widget.setStyleSheet(None)
@@ -948,7 +982,7 @@ def enable_all(dialog, result):
 
 def set_stylesheet(field, widget, wtype='label'):
 
-    if 'stylesheet' in field and field['stylesheet'] is not None:
+    if field.get('stylesheet') is not None:
         if wtype in field['stylesheet']:
             widget.setStyleSheet("QWidget{" + field['stylesheet'][wtype] + "}")
     return widget
@@ -1026,7 +1060,7 @@ def set_style_mapzones():
         categories = []
         status = mapzone['status']
         if status == 'Disable':
-            pass
+            continue
 
         if lyr:
             # Loop for each id returned on json
@@ -1044,7 +1078,7 @@ def set_style_mapzones():
                         R = id['stylesheet']['color'][0]
                         G = id['stylesheet']['color'][1]
                         B = id['stylesheet']['color'][2]
-                    except TypeError:
+                    except (TypeError, KeyError):
                         R = random.randint(0, 255)
                         G = random.randint(0, 255)
                         B = random.randint(0, 255)
@@ -1113,7 +1147,7 @@ def build_dialog_info(dialog, result, my_json=None):
     grid_layout = dialog.findChild(QGridLayout, 'lyt_main_1')
 
     for order, field in enumerate(fields["fields"]):
-        if 'hidden' in field and field['hidden']:
+        if field.get('hidden'):
             continue
 
         label = QLabel()
@@ -1148,9 +1182,11 @@ def build_dialog_info(dialog, result, my_json=None):
         elif field['widgettype'] == 'button':
             kwargs = {"dialog": dialog, "field": field}
             widget = add_button(**kwargs)
-        widget.setProperty('ismandatory', field['ismandatory'])
 
-        if 'layoutorder' in field:
+        if 'ismandatory' in field:
+            widget.setProperty('ismandatory', field['ismandatory'])
+
+        if 'layoutorder' in field and field['layoutorder'] is not None:
             order = field['layoutorder']
         grid_layout.addWidget(label, order, 0)
         grid_layout.addWidget(widget, order, 1)
@@ -1166,9 +1202,8 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
     field_id = ''
     if 'fields' in row[pos]:
         field_id = 'fields'
-    elif 'return_type' in row[pos]:
-        if row[pos]['return_type'] not in ('', None):
-            field_id = 'return_type'
+    elif row[pos].get('return_type') not in ('', None):
+        field_id = 'return_type'
 
     if field_id == '':
         return
@@ -1196,20 +1231,23 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 if 'value' in field:
                     widget.setText(field['value'])
                     widget.setProperty('value', field['value'])
-                if 'widgetcontrols' in field and field['widgetcontrols']:
-                    if 'regexpControl' in field['widgetcontrols']:
-                        if field['widgetcontrols']['regexpControl'] is not None:
-                            pass
+                widgetcontrols = field.get('widgetcontrols')
+                if widgetcontrols and widgetcontrols.get('regexpControl') is not None:
+                    pass
                 widget.editingFinished.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                if 'datatype' in field:
-                    if field['datatype'] == 'int':
-                        widget.setValidator(QIntValidator())
-                    elif field['datatype'] == 'float':
-                        widget.setValidator(QDoubleValidator())
+                datatype = field.get('datatype')
+                if datatype == 'int':
+                    widget.setValidator(QIntValidator())
+                elif datatype == 'float':
+                    widget.setValidator(QDoubleValidator())
             elif field['widgettype'] == 'combo':
                 widget = add_combo(field)
                 widget.currentIndexChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
+                signal = field.get('signal')
+                if signal:
+                    widget.currentIndexChanged.connect(partial(getattr(module, signal), dialog))
+                    getattr(module, signal)(dialog)
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'check':
                 widget = QCheckBox()
@@ -1227,19 +1265,22 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 if global_vars.date_format in ("dd/MM/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "yyyy-MM-dd"):
                     widget.setDisplayFormat(global_vars.date_format)
                 date = QDate.currentDate()
-                if 'value' in field and field['value'] not in ('', None, 'null'):
+                if field.get('value') not in ('', None, 'null'):
                     date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
                 widget.setDate(date)
                 widget.valueChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'spinbox':
                 widget = QDoubleSpinBox()
-                if 'widgetcontrols' in field and field['widgetcontrols']:
-                    if 'spinboxDecimals' in field['widgetcontrols']:
-                        widget.setDecimals(field['widgetcontrols']['spinboxDecimals'])
-                    if 'maximumNumber' in field['widgetcontrols']:
-                        widget.setMaximum(field['widgetcontrols']['maximumNumber'])
-                if 'value' in field and field['value'] not in (None, ""):
+                widgetcontrols = field.get('widgetcontrols')
+                if widgetcontrols:
+                    spinboxDecimals = widgetcontrols.get('spinboxDecimals')
+                    if spinboxDecimals is not None:
+                        widget.setDecimals(spinboxDecimals)
+                    maximumNumber = widgetcontrols.get('maximumNumber')
+                    if maximumNumber is not None:
+                        widget.setMaximum(maximumNumber)
+                if field.get('value') not in (None, ""):
                     value = float(str(field['value']))
                     widget.setValue(value)
                 widget.valueChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
@@ -1253,21 +1294,20 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 continue
 
             # Set editable/readonly
+            iseditable = field.get('iseditable')
             if type(widget) in (QLineEdit, QDoubleSpinBox):
-                if 'iseditable' in field:
-                    if str(field['iseditable']) == "False":
-                        widget.setReadOnly(True)
-                        widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
+                if iseditable in (False, "False"):
+                    widget.setReadOnly(True)
+                    widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
                 if type(widget) == QLineEdit:
                     if 'placeholder' in field:
                         widget.setPlaceholderText(field['placeholder'])
             elif type(widget) in (QComboBox, QCheckBox):
-                if 'iseditable' in field:
-                    if str(field['iseditable']) == "False":
-                        widget.setEnabled(False)
+                if iseditable in (False, "False"):
+                    widget.setEnabled(False)
             widget.setObjectName(field['widgetname'])
-            if 'iseditable' in field:
-                widget.setEnabled(bool(field['iseditable']))
+            if iseditable is not None:
+                widget.setEnabled(bool(iseditable))
 
             add_widget(dialog, field, lbl, widget)
 
@@ -1282,8 +1322,7 @@ def check_parameters(field):
     if 'widgetname' not in field:
         msg += "widgetname not found. "
 
-    if 'widgettype' in field and field['widgettype'] not in ('text', 'linetext', 'combo', 'check', 'datetime',
-                                                             'spinbox', 'button'):
+    if field.get('widgettype') not in ('text', 'linetext', 'combo', 'check', 'datetime', 'spinbox', 'button'):
         msg += "widgettype is wrongly configured. Needs to be in " \
                "('text', 'linetext', 'combo', 'check', 'datetime', 'spinbox', 'button')"
 
@@ -1402,9 +1441,9 @@ def add_button(**kwargs):
     if 'widgetfunction' in field:
         if 'module' in field['widgetfunction']:
             module = globals()[field['widgetfunction']['module']]
-        if 'functionName' in field['widgetfunction']:
-            if field['widgetfunction']['functionName']:
-                function_name = field['widgetfunction']['functionName']
+        function_name = field['widgetfunction'].get('functionName')
+        if function_name is not None:
+            if function_name:
                 exist = tools_os.check_python_function(module, function_name)
                 if not exist:
                     msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
@@ -1447,7 +1486,7 @@ def add_spinbox(field):
         widget = QSpinBox()
     elif field['widgettype'] == 'doubleSpinbox':
         widget = QDoubleSpinBox()
-        if 'widgetcontrols' in field and field['widgetcontrols'] and 'spinboxDecimals' in field['widgetcontrols']:
+        if field.get('widgetcontrols') and 'spinboxDecimals' in field['widgetcontrols']:
             widget.setDecimals(field['widgetcontrols']['spinboxDecimals'])
 
     if 'min' in field['widgetcontrols']['maxMinValues']:
@@ -1476,13 +1515,22 @@ def add_spinbox(field):
 def get_values(dialog, widget, _json=None, ignore_editability=False):
 
     value = None
-    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit) and (widget.isReadOnly() is False or ignore_editability):
+
+    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
+        if widget.isReadOnly() and not ignore_editability:
+            return _json
         value = tools_qt.get_text(dialog, widget, return_string_null=False)
-    elif type(widget) is QComboBox and (widget.isEnabled() or ignore_editability):
+    elif type(widget) is QComboBox:
+        if not widget.isEnabled() and not ignore_editability:
+            return _json
         value = tools_qt.get_combo_value(dialog, widget, 0)
-    elif type(widget) is QCheckBox and (widget.isEnabled() or ignore_editability):
+    elif type(widget) is QCheckBox:
+        if not widget.isEnabled() and not ignore_editability:
+            return _json
         value = tools_qt.is_checked(dialog, widget)
-    elif type(widget) is QgsDateTimeEdit and (widget.isEnabled() or ignore_editability):
+    elif type(widget) is QgsDateTimeEdit:
+        if not widget.isEnabled() and not ignore_editability:
+            return _json
         value = tools_qt.get_calendar_date(dialog, widget)
 
     key = str(widget.property('columnname')) if widget.property('columnname') else widget.objectName()
@@ -1503,9 +1551,8 @@ def add_checkbox(field):
     if 'widgetcontrols' in field and field['widgetcontrols']:
         widget.setProperty('widgetcontrols', field['widgetcontrols'])
     widget.setProperty('columnname', field['columnname'])
-    if 'value' in field:
-        if field['value'] in ("t", "true", True):
-            widget.setChecked(True)
+    if field.get('value') in ("t", "true", True):
+        widget.setChecked(True)
     if 'iseditable' in field:
         widget.setEnabled(field['iseditable'])
     return widget
@@ -1550,7 +1597,11 @@ def add_hyperlink(field):
 
     """
 
-    widget = GwHyperLinkLabel()
+    is_editable = field.get('iseditable')
+    if is_editable:
+        widget = GwHyperLinkLineEdit()
+    else:
+        widget = GwHyperLinkLabel()
     widget.setObjectName(field['widgetname'])
     if 'widgetcontrols' in field and field['widgetcontrols']:
         widget.setProperty('widgetcontrols', field['widgetcontrols'])
@@ -1559,29 +1610,29 @@ def add_hyperlink(field):
     if 'value' in field:
         widget.setText(field['value'])
         widget.setProperty('value', field['value'])
-    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
     func_name = None
     real_name = widget.objectName()
     if 'data_' in widget.objectName():
         real_name = widget.objectName()[5:len(widget.objectName())]
     if 'widgetfunction' in field:
-        if 'functionName' in field['widgetfunction']:
-            if field['widgetfunction']['functionName']:
-                func_name = field['widgetfunction']['functionName']
+        func_name = field['widgetfunction'].get('functionName')
+        if func_name is not None:
+            if func_name:
                 exist = tools_os.check_python_function(tools_backend_calls, func_name)
                 if not exist:
                     msg = f"widget {real_name} have associated function {func_name}, but {func_name} not exist"
                     tools_qgis.show_message(msg, 2)
                     return widget
             else:
-                message = "Parameter widgetfunction is null for widget"
+                message = "Parameter widgetfunction is null for widget hyperlink"
                 tools_qgis.show_message(message, 2, parameter=real_name)
         else:
             tools_log.log_info(field['widgetfunction'])
     else:
-        message = "Parameter  widgetfunction.functionName is null for widget"
-        tools_qgis.show_message(message, 2, parameter=real_name)
+        message = "Parameter widgetfunction not found for widget type hyperlink"
+        tools_qgis.show_message(message, 2)
 
     if func_name is not None:
         # Call function-->func_name(widget) or def no_function_associated(self, widget=None, message_level=1)
@@ -1602,9 +1653,9 @@ def add_calendar(dlg, fld, **kwargs):
     widget.setAllowNull(True)
     widget.setCalendarPopup(True)
     widget.setDisplayFormat('dd/MM/yyyy')
-    if 'value' in fld and fld['value'] not in ('', None, 'null'):
-        date = QDate.fromString(fld['value'].replace('/', '-'), 'yyyy-MM-dd')
-        tools_qt.set_calendar(dlg, widget, date)
+    if field.get('value') not in ('', None, 'null'):
+        date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
+        tools_qt.set_calendar(dialog, widget, date)
     else:
         widget.clear()
 
@@ -1670,7 +1721,7 @@ def fill_typeahead(completer, model, field, dialog, widget):
     extras = f'"queryText":"{field["queryText"]}"'
     extras += f', "queryTextFilter":"{field["queryTextFilter"]}"'
     extras += f', "parentId":"{parent_id}"'
-    extras += f', "parentValue":"{tools_qt.get_text(dialog, "data_" + str(field["parentId"]))}"'
+    extras += f', "parentValue":"{tools_qt.get_text(dialog, "data_" + str(parent_id))}"'
     extras += f', "textToSearch":"{tools_qt.get_text(dialog, widget)}"'
     body = create_body(extras=extras)
     complet_list = execute_procedure('gw_fct_gettypeahead', body)
@@ -1691,10 +1742,9 @@ def set_data_type(field, widget):
 
 def set_widget_size(widget, field):
 
-    if 'widgetcontrols' in field and field['widgetcontrols'] and 'widgetdim' in field['widgetcontrols']:
-        if field['widgetcontrols']['widgetdim']:
-            widget.setMaximumWidth(field['widgetcontrols']['widgetdim'])
-            widget.setMinimumWidth(field['widgetcontrols']['widgetdim'])
+    if field.get('widgetcontrols') and field['widgetcontrols'].get('widgetdim'):
+        widget.setMaximumWidth(field['widgetcontrols']['widgetdim'])
+        widget.setMinimumWidth(field['widgetcontrols']['widgetdim'])
 
     return widget
 
@@ -1748,21 +1798,16 @@ def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]):
     func_params = ""
     if 'data_' in widget.objectName():
         real_name = widget.objectName()[5:len(widget.objectName())]
-    if 'widgetfunction' in field and field['widgetfunction'] and 'functionName' in field['widgetfunction']:
-        function_name = field['widgetfunction']['functionName']
-        if 'module' in field['widgetfunction']:
-            module = globals()[field['widgetfunction']['module']]
-        exist = tools_os.check_python_function(module, function_name)
-        if not exist:
-            msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
-            tools_qgis.show_message(msg, 1)
-            return widget
-        if 'parameters' in field['widgetfunction']:
-            func_params = field['widgetfunction']['parameters']
-    else:
-        return widget
-        message = "Parameter widgetfunction.functionName is null for widget"
-        tools_qgis.show_message(message, 2, parameter=real_name)
+    if 'widgetfunction' in field:
+        if field['widgetfunction'].get('functionName') is not None:
+            function_name = f"_{field['widgetfunction']['functionName']}"
+            if 'module' in field['widgetfunction']:
+                module = globals()[field['widgetfunction']['module']]
+            exist = tools_os.check_python_function(sys.modules[__name__], function_name)
+            if not exist:
+                msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
+                tools_qgis.show_message(msg, 2)
+                return widget
 
     # noinspection PyUnresolvedReferences
     kwargs = {"qtable": widget, "func_params": func_params, "complet_result": complet_result, "dialog": dialog}
@@ -1815,11 +1860,13 @@ def fill_combo(widget, field):
     widget.clear()
     widget.blockSignals(False)
     combolist = []
-    if 'comboIds' in field and 'comboNames' in field:
-        if 'isNullValue' in field and field['isNullValue']:
+    comboIds = field.get('comboIds')
+    comboNames = field.get('comboNames')
+    if comboIds and comboNames:
+        if field.get('isNullValue'):
             combolist.append(['', ''])
         for i in range(0, len(field['comboIds'])):
-            elem = [field['comboIds'][i], field['comboNames'][i]]
+            elem = [comboIds[i], comboNames[i]]
             combolist.append(elem)
     else:
         msg = f"key 'comboIds' or/and comboNames not found WHERE widgetname='{field['widgetname']}' " \
@@ -2026,7 +2073,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
         return False
 
     # If failed, manage exception
-    if 'status' in json_result and json_result['status'] == 'Failed':
+    if json_result.get('status') == 'Failed':
         manage_json_exception(json_result, sql, is_thread=is_thread)
         return json_result
 
@@ -2137,7 +2184,7 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
         tools_qt.manage_exception("Unhandled Error")
 
 
-def manage_json_return(json_result, sql, rubber_band=None):
+def manage_json_return(json_result, sql, rubber_band=None, i=None):
     """
     Manage options for layers (active, visible, zoom and indexing)
     :param json_result: Json result of a query (Json)
@@ -2154,6 +2201,7 @@ def manage_json_return(json_result, sql, rubber_band=None):
     try:
         margin = None
         opacity = 100
+        i = 0
 
         if 'zoom' in return_manager and 'margin' in return_manager['zoom']:
             margin = return_manager['zoom']['margin']
@@ -2179,9 +2227,8 @@ def manage_json_return(json_result, sql, rubber_band=None):
 
                     # Remove the layer if it exists
                     layer_name = f'{key}'
-                    if 'layerName' in json_result['body']['data'][key]:
-                        if json_result['body']['data'][key]['layerName']:
-                            layer_name = json_result['body']['data'][key]['layerName']
+                    if json_result['body']['data'][key].get('layerName'):
+                        layer_name = json_result['body']['data'][key]['layerName']
                     tools_qgis.remove_layer_from_toc(layer_name, 'GW Temporal Layers')
 
                     if 'features' not in json_result['body']['data'][key]:
@@ -2193,8 +2240,10 @@ def manage_json_return(json_result, sql, rubber_band=None):
                     counter = len(json_result['body']['data'][key]['features'])
                     geometry_type = json_result['body']['data'][key]['geometryType']
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
+                    fill_layer_temp(v_layer, json_result['body']['data'], key, counter, sort_val=i)
 
-                    fill_layer_temp(v_layer, json_result['body']['data'], key, counter)
+                    # Increase iterator
+                    i = i+1
 
                     # Get values for set layer style
                     opacity = 100
@@ -2211,11 +2260,11 @@ def manage_json_return(json_result, sql, rubber_band=None):
                             color = QColor(item['color'][0], item['color'][1], item['color'][2], int(opacity * 255))
                             color_values[item['id']] = color
                         cat_field = str(style_type[key]['field'])
-                        size = style_type[key]['width'] if 'width' in style_type[key] and style_type[key]['width'] else 2
+                        size = style_type[key]['width'] if style_type[key].get('width') else 2
                         tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values)
 
                     elif style_type[key]['style'] == 'random':
-                        size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
+                        size = style_type['width'] if style_type.get('width') else 2
                         if geometry_type == 'Point':
                             v_layer.renderer().symbol().setSize(size)
                         else:
@@ -2227,7 +2276,7 @@ def manage_json_return(json_result, sql, rubber_band=None):
                         extras = f'"style_id":"{style_id}"'
                         body = create_body(extras=extras)
                         style = execute_procedure('gw_fct_getstyle', body)
-                        if style is None or style['status'] == 'Failed':
+                        if style is None or style.get('status') == 'Failed':
                             return
                         if 'styles' in style['body']:
                             if 'style' in style['body']['styles']:
@@ -2236,7 +2285,7 @@ def manage_json_return(json_result, sql, rubber_band=None):
 
                     elif style_type[key]['style'] == 'unique':
                         color = style_type[key]['values']['color']
-                        size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
+                        size = style_type['width'] if style_type.get('width') else 2
                         color = QColor(color[0], color[1], color[2])
                         if key == 'point':
                             v_layer.renderer().symbol().setSize(size)
@@ -2766,7 +2815,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
 
     # Set width and alias of visible columns
     columns_to_delete = []
-    sql = (f"SELECT columnindex, width, alias, visible"
+    sql = (f"SELECT columnindex, width, alias, visible, style"
            f" FROM {config_table}"
            f" WHERE tablename = '{table_name}'"
            f" ORDER BY columnindex")
@@ -2779,6 +2828,12 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
         if not row['visible']:
             columns_to_delete.append(row['columnindex'])
         else:
+            style = row.get('style')
+            if style:
+                stretch = style.get('stretch')
+                if stretch is not None:
+                    stretch = 1 if stretch else 0
+                    widget.horizontalHeader().setSectionResizeMode(row['columnindex'], stretch)
             width = row['width']
             if width is None:
                 width = 100
@@ -2925,7 +2980,26 @@ def set_completer_object(dialog, tablename, field_id="id"):
     set_completer_widget(tablename, widget, field_id)
 
 
-def set_completer_widget(tablename, widget, field_id):
+def set_completer_widget(tablename, widget, field_id, add_id=False):
+    """ Set autocomplete of widget @table_object + "_id"
+        getting id's from selected @table_object
+    """
+
+    if not widget:
+        return
+    if type(tablename) == list and type(field_id) == list:
+        return set_multi_completer_widget(tablename, widget, field_id, add_id=add_id)
+    if add_id:
+        field_id += '_id'
+
+    sql = (f"SELECT DISTINCT({field_id})"
+           f" FROM {tablename}"
+           f" ORDER BY {field_id}")
+    rows = tools_db.get_rows(sql)
+    tools_qt.set_completer_rows(widget, rows)
+
+
+def set_multi_completer_widget(tablenames: list, widget, fields_id: list, add_id=False):
     """ Set autocomplete of widget @table_object + "_id"
         getting id's from selected @table_object
     """
@@ -2933,9 +3007,19 @@ def set_completer_widget(tablename, widget, field_id):
     if not widget:
         return
 
-    sql = (f"SELECT DISTINCT({field_id})"
-           f" FROM {tablename}"
-           f" ORDER BY {field_id}")
+    sql = ""
+    idx = 0
+    for tablename in tablenames:
+        field_id = fields_id[idx]
+        if add_id:
+            field_id += '_id'
+        if sql != "":
+            sql += " UNION "
+        sql += (f"SELECT DISTINCT({field_id}) as a"
+                f" FROM {tablename}")
+        idx += 1
+    sql += f" ORDER BY a"
+
     rows = tools_db.get_rows(sql)
     tools_qt.set_completer_rows(widget, rows)
 
@@ -3135,7 +3219,7 @@ def refresh_selectors(tab_name=None):
     """ Refreshes the selectors' UI if it's open """
 
     # Get the selector UI if it's open
-    windows = [x for x in QApplication.allWidgets() if not getattr(x, "isHidden", False)
+    windows = [x for x in QApplication.allWidgets() if getattr(x, "isVisible", False)
                and (issubclass(type(x), GwSelectorUi))]
 
     if windows:
@@ -3222,6 +3306,50 @@ def create_sqlite_conn(file_name):
     return status, cursor
 
 
+def manage_user_config_folder(user_folder_dir):
+    """ Check if user config folder exists. If not create empty files init.config and session.config """
+
+    try:
+        config_folder = f"{user_folder_dir}{os.sep}config{os.sep}"
+        if not os.path.exists(config_folder):
+            tools_log.log_info(f"Creating user config folder: {config_folder}")
+            os.makedirs(config_folder)
+
+        # Check if config files exists. If not create them empty
+        filepath = f"{config_folder}{os.sep}init.config"
+        if not os.path.exists(filepath):
+            open(filepath, 'a').close()
+        filepath = f"{config_folder}{os.sep}session.config"
+        if not os.path.exists(filepath):
+            open(filepath, 'a').close()
+
+    except Exception as e:
+        tools_log.log_warning(f"manage_user_config_folder: {e}")
+
+
+def check_old_userconfig(user_folder_dir):
+    """ Function to transfer user configuration from version 3.5.023 or older to new `.../core/` folder """
+
+    # Move all files in old config folder to new core config folder
+    old_folder_path = f"{user_folder_dir}{os.sep}config"
+    if os.path.exists(old_folder_path):
+        for file in os.listdir(old_folder_path):
+            old = f"{old_folder_path}{os.sep}{file}"
+            new = f"{user_folder_dir}{os.sep}core{os.sep}config{os.sep}{file}"
+            if os.path.exists(new):
+                os.remove(new)
+            os.rename(old, new)
+        os.removedirs(old_folder_path)
+
+    # Remove old log folder
+    old_folder_path = f"{user_folder_dir}{os.sep}log"
+    if os.path.exists(old_folder_path):
+        for file in os.listdir(old_folder_path):
+            path = f"{old_folder_path}{os.sep}{file}"
+            os.remove(path)
+        os.removedirs(old_folder_path)
+
+
 def user_params_to_userconfig():
     """ Function to load all the variables from user_params.config to their respective user config files """
 
@@ -3292,7 +3420,7 @@ def remove_deprecated_config_vars():
     project_types = get_config_parser('system', 'project_types', "project", "giswater").split(',')
 
     # Remove deprecated sections for init
-    path = f"{path_folder}{os.sep}config{os.sep}init.config"
+    path = f"{path_folder}{os.sep}core{os.sep}config{os.sep}init.config"
     if not os.path.exists(path):
         tools_log.log_warning(f"File not found: {path}")
         return
@@ -3311,7 +3439,7 @@ def remove_deprecated_config_vars():
         configfile.close()
 
     # Remove deprecated sections for session
-    path = f"{path_folder}{os.sep}config{os.sep}session.config"
+    path = f"{path_folder}{os.sep}core{os.sep}config{os.sep}session.config"
     if not os.path.exists(path):
         tools_log.log_warning(f"File not found: {path}")
         return
@@ -3330,7 +3458,7 @@ def remove_deprecated_config_vars():
         configfile.close()
 
     # Remove deprecated vars for init
-    path = f"{path_folder}{os.sep}config{os.sep}init.config"
+    path = f"{path_folder}{os.sep}core{os.sep}config{os.sep}init.config"
     if not os.path.exists(path):
         tools_log.log_warning(f"File not found: {path}")
         return
@@ -3354,7 +3482,7 @@ def remove_deprecated_config_vars():
         configfile.close()
 
     # Remove deprecated vars for session
-    path = f"{path_folder}{os.sep}config{os.sep}session.config"
+    path = f"{path_folder}{os.sep}core{os.sep}config{os.sep}session.config"
     if not os.path.exists(path):
         tools_log.log_warning(f"File not found: {path}")
         return
@@ -3449,7 +3577,9 @@ def set_snapping_type(layer_settings, value):
 
 def get_segment_flag(default_value):
 
-    if Qgis.QGIS_VERSION_INT >= 31200:
+    if Qgis.QGIS_VERSION_INT >= 32600:
+        segment_flag = Qgis.SnappingType.Segment
+    elif Qgis.QGIS_VERSION_INT >= 31200:
         segment_flag = QgsSnappingConfig.SnappingTypes.SegmentFlag
     else:
         segment_flag = default_value
@@ -3459,12 +3589,25 @@ def get_segment_flag(default_value):
 
 def get_vertex_flag(default_value):
 
-    if Qgis.QGIS_VERSION_INT >= 31200:
+    if Qgis.QGIS_VERSION_INT >= 32600:
+        vertex_flag = Qgis.SnappingType.Vertex
+    elif Qgis.QGIS_VERSION_INT >= 31200:
         vertex_flag = QgsSnappingConfig.SnappingTypes.VertexFlag
     else:
         vertex_flag = default_value
 
     return vertex_flag
+
+
+def get_sysversion_addparam():
+    """ Gets addparam field from table sys_version """
+    sql = f"SELECT addparam FROM sys_version ORDER BY id DESC limit 1"
+    row = tools_db.get_row(sql, is_admin=True)
+
+    if row:
+        return row[0]
+
+    return None
 
 
 def create_giswater_menu(project_loaded=False):
@@ -3535,7 +3678,7 @@ def _get_parser_from_filename(filename):
     """ Get parser of file @filename.config """
 
     if filename in ('init', 'session'):
-        folder = global_vars.user_folder_dir
+        folder = f"{global_vars.user_folder_dir}{os.sep}core"
     elif filename in ('dev', 'giswater', 'user_params'):
         folder = global_vars.plugin_dir
     else:

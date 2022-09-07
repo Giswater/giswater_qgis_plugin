@@ -10,6 +10,7 @@ import webbrowser
 from functools import partial
 
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog
+from qgis.PyQt.QtCore import pyqtSignal, QObject
 
 from ..utils import tools_gw
 from ..ui.ui_manager import GwDocUi, GwDocManagerUi
@@ -17,11 +18,13 @@ from ... import global_vars
 from ...lib import tools_qt, tools_db, tools_qgis, tools_os
 
 
-class GwDocument:
+class GwDocument(QObject):
+    doc_added = pyqtSignal()
 
     def __init__(self, single_tool=True):
         """ Class to control action 'Add document' of toolbar 'edit' """
 
+        QObject.__init__(self)
         # parameter to set if the document manager is working as
         # single tool or integrated in another tool
         self.single_tool_mode = single_tool
@@ -30,9 +33,12 @@ class GwDocument:
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
         self.files_path = []
+        self.project_type = tools_gw.get_project_type()
+        self.doc_tables = ["doc_x_node","doc_x_arc","doc_x_connec","doc_x_gully"]
 
 
-    def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, feature_type=None, row=None):
+
+    def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, feature_type=None, row=None, list_tabs=None, doc_tables=None):
         """ Button 34: Add document """
 
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
@@ -57,19 +63,24 @@ class GwDocument:
 
         # Setting layers
         self.layers = {'arc': [], 'node': [], 'connec': [], 'element': []}
+        
         self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
         self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
         self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
         self.layers['element'] = tools_gw.get_layers_from_feature_type('element')
 
-        # Remove 'gully' for 'WS'
-        self.project_type = tools_gw.get_project_type()
-        if self.project_type == 'ws':
-            tools_qt.remove_tab(self.dlg_add_doc.tab_feature, 'tab_gully')
-
+        params = ['arc', 'node', 'connec', 'gully']
+        if list_tabs:
+            for i in params:
+                if i not in list_tabs:
+                    tools_qt.remove_tab(self.dlg_add_doc.tab_feature, f'tab_{i}')
         else:
-            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+            # Remove 'gully' if not 'UD'
+            if self.project_type != 'ud':
+                tools_qt.remove_tab(self.dlg_add_doc.tab_feature, 'tab_gully')
 
+        if doc_tables:
+            self.doc_tables = doc_tables
         # Remove all previous selections
         if self.single_tool_mode:
             self.layers = tools_gw.remove_selection(True, layers=self.layers)
@@ -107,7 +118,7 @@ class GwDocument:
 
         # Set signals
         self.excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
-                           "v_edit_element"]
+                                "v_edit_element"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_add_doc.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
         self.dlg_add_doc.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
@@ -245,7 +256,7 @@ class GwDocument:
 
         if doc_type in (None, '', -1):
             message = "You need to insert doc_type"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_add_doc)
             return
 
         # Check if this document already exists
@@ -263,6 +274,7 @@ class GwDocument:
                     sql = (f"INSERT INTO doc (id, doc_type, path, observ, date)"
                            f" VALUES ('{doc_id}', '{doc_type}', '{path}', '{observ}', '{date}');")
                 self._update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
+                self.doc_added.emit()
             else:
                 # Ask question before executing
                 msg = ("You have selected multiple documents. In this case, doc_id will be a sequencial number for "
@@ -272,6 +284,7 @@ class GwDocument:
                     for file in self.files_path:
                         sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file)
                         self._update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
+                        self.doc_added.emit()
         # If document exists perform an UPDATE
         else:
             message = "Are you sure you want to update the data?"
@@ -317,14 +330,10 @@ class GwDocument:
     def _update_doc_tables(self, sql, doc_id, table_object, tablename, item_id, qtable):
 
         # Manage records in tables @table_object_x_@feature_type
-        sql += (f"\nDELETE FROM doc_x_node"
-                f" WHERE doc_id = '{doc_id}';")
-        sql += (f"\nDELETE FROM doc_x_arc"
-                f" WHERE doc_id = '{doc_id}';")
-        sql += (f"\nDELETE FROM doc_x_connec"
-                f" WHERE doc_id = '{doc_id}';")
-        if self.project_type == 'ud':
-            sql += (f"\nDELETE FROM doc_x_gully"
+        for table in self.doc_tables:
+            if table == 'doc_x_gully' and self.project_type != 'ud':
+                continue
+            sql += (f"\nDELETE FROM {table}"
                     f" WHERE doc_id = '{doc_id}';")
 
         if self.list_ids['arc']:
@@ -366,7 +375,7 @@ class GwDocument:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=dialog)
             return
 
         row = selected_list[0].row()

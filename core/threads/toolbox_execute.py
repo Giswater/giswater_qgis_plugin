@@ -20,16 +20,18 @@ class GwToolBoxTask(GwTask):
 
     fake_progress = pyqtSignal()
 
-    def __init__(self, toolbox, description, dialog, combo, result):
+    def __init__(self, toolbox, description, dialog, combo, result, timer=None):
 
         super().__init__(description)
         self.toolbox = toolbox
         self.dialog = dialog
         self.combo = combo
         self.result = result
+        self.body = None
         self.json_result = None
         self.exception = None
         self.function_name = None
+        self.timer = timer
 
 
     def run(self):
@@ -68,15 +70,14 @@ class GwToolBoxTask(GwTask):
             pks = tools_qgis.get_primary_key(layer)
             if pks:
                 pks = pks.split(",")
-            if len(pks) > 1:
-                open_char = '{'
-                close_char = '}'
+                if len(pks) > 1:
+                    open_char = '{'
+                    close_char = '}'
             feature_id_list = f'"id":{open_char}'
             if (selection_mode == 'wholeSelection') or (selection_mode == 'previousSelection' and layer is None):
                 feature_id_list += close_char
             elif selection_mode == 'previousSelection' and layer is not None:
                 features = layer.selectedFeatures()
-                feature_type = tools_qt.get_combo_value(self.dialog, self.dialog.cmb_feature_type, 0)
                 if len(pks) > 1:
                     for pk in pks:
                         feature_id_list += f'"{pk}":[ '
@@ -87,7 +88,7 @@ class GwToolBoxTask(GwTask):
                             feature_id_list = feature_id_list[:-2] + '], '
                 else:
                     for feature in features:
-                        feature_id = feature.attribute(feature_type + "_id")
+                        feature_id = feature.attribute(pks[0])
                         feature_id_list += f'"{feature_id}", '
                 if len(features) > 0:
                     feature_id_list = feature_id_list[:-2] + close_char
@@ -104,7 +105,7 @@ class GwToolBoxTask(GwTask):
         extras += '"parameters":{'
         for group, function in list(self.result['fields'].items()):
             if len(function) != 0:
-                if function[0]['return_type'] not in (None, ''):
+                if function[0].get('return_type') not in (None, ''):
                     for field in function[0]['return_type']:
                         widget = self.dialog.findChild(QWidget, field['widgetname'])
                         param_name = widget.objectName()
@@ -171,6 +172,8 @@ class GwToolBoxTask(GwTask):
         self.dialog.btn_cancel.hide()
         self.dialog.btn_close.show()
         self.dialog.progressBar.setVisible(False)
+        if self.timer:
+            self.timer.stop()
         if self.isCanceled():
             return
 
@@ -194,4 +197,8 @@ class GwToolBoxTask(GwTask):
     def cancel(self):
 
         self.toolbox.remove_layers()
+
+        if self.timer:
+            self.timer.stop()
+
         super().cancel()

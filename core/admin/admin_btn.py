@@ -13,9 +13,10 @@ import sys
 import mmap
 from functools import partial
 from sip import isdeleted
-from time import sleep
+from time import time
+from datetime import timedelta
 
-from qgis.PyQt.QtCore import QSettings, Qt, QDate
+from qgis.PyQt.QtCore import QSettings, Qt, QDate, QTimer
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QAbstractItemView, QTextEdit, QFileDialog, \
@@ -38,6 +39,8 @@ from ...lib import tools_qt, tools_qgis, tools_log, tools_db, tools_os
 from ..ui.docker import GwDocker
 from ..threads.project_schema_create import GwCreateSchemaTask
 from ..threads.project_schema_utils_create import GwCreateSchemaUtilsTask
+from ..threads.project_schema_update import GwUpdateSchemaTask
+from ..threads.project_schema_copy import GwCopySchemaTask
 
 
 class GwAdminButton:
@@ -61,7 +64,7 @@ class GwAdminButton:
         self.form_enabled = True
         self.lower_postgresql_version = int(tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', global_vars.plugin_dir)
                                             .replace('.', ''))
-        self.upper_postgresql_version = int(tools_qgis.get_plugin_metadata('majorPgVersion', '11.99', global_vars.plugin_dir)
+        self.upper_postgresql_version = int(tools_qgis.get_plugin_metadata('majorPgVersion', '14.99', global_vars.plugin_dir)
                                             .replace('.', ''))
         self.total_sql_files = 0    # Total number of SQL files to process
         self.current_sql_file = 0   # Current number of SQL file
@@ -179,14 +182,15 @@ class GwAdminButton:
             if self.locale != 'en_US' or str(self.project_epsg) != '25831':
                 msg = ("This functionality is only allowed with the locality 'en_US' and SRID 25831."
                        "\nDo you want change it and continue?")
-                result = tools_qt.show_question(msg, "Info Message")
+                result = tools_qt.show_question(msg, "Info Message", force_action=True)
                 if result:
                     self.project_epsg = '25831'
+                    project_srid = '25831'
                     self.locale = 'en_US'
                     project_locale = 'en_US'
                     self.folder_locale = os.path.join(self.sql_dir, 'i18n', project_locale)
-                    tools_qt.set_widget_text(self.dlg_readsql_create_project, 'srid_id', self.project_epsg)
-                    tools_qt.set_widget_text(self.dlg_readsql_create_project, 'cmb_locale', self.locale)
+                    tools_qt.set_widget_text(self.dlg_readsql_create_project, 'srid_id', '25831')
+                    tools_qt.set_combo_value(self.cmb_locale, 'en_US', 0)
                 else:
                     return
 
@@ -201,11 +205,17 @@ class GwAdminButton:
         # changed the value of self.schema in the function _rename_project_data_schema or _execute_last_process
         self.schema = project_name_schema
         # Set background task 'GwCreateSchemaTask'
+        self.t0 = time()
+        self.timer = QTimer()
+        self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_readsql_create_project))
+
+        self.timer.start(1000)
+
         description = f"Create schema"
         params = {'is_test': is_test, 'project_type': project_type, 'exec_last_process': exec_last_process,
                   'project_name_schema': project_name_schema, 'project_locale': project_locale,
                   'project_srid': project_srid, 'example_data': example_data}
-        self.task_create_schema = GwCreateSchemaTask(self, description, params)
+        self.task_create_schema = GwCreateSchemaTask(self, description, params, timer=self.timer)
         QgsApplication.taskManager().addTask(self.task_create_schema)
         QgsApplication.taskManager().triggerTask(self.task_create_schema)
 
@@ -328,38 +338,17 @@ class GwAdminButton:
             message_log.setVisible(True)
             QgsMessageLog.logMessage("", f"{global_vars.plugin_name.capitalize()} PY", 0)
 
-            self.task1 = GwTask('Manage schema')
-            QgsApplication.taskManager().addTask(self.task1)
-            self.task1.setProgress(50)
-            self.task1 = GwTask('Manage schema')
-            QgsApplication.taskManager().addTask(self.task1)
-            schema_name = self._get_schema_name()
-            sql = f"DELETE FROM {schema_name}.audit_check_data WHERE fid = 133 AND cur_user = current_user;"
-            tools_db.execute_sql(sql)
-            status = self.load_updates(project_type, update_changelog=True, schema_name=schema_name)
-            if status:
-                # Set info project
-                self._set_info_project()
-                if 'body' in status:
-                    tools_gw.fill_tab_log(self.dlg_readsql_show_info, status['body']['data'], True, True, 1)
-                else:
-                    tools_log.log_warning(f"Key not found: 'body'")
+            # Create timer
+            self.t0 = time()
+            self.timer = QTimer()
+            self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_readsql_show_info))
+            self.timer.start(1000)
 
-            self.task1.setProgress(100)
-        else:
-            return
-
-        status = (self.error_count == 0)
-        self._manage_result_message(status, parameter="Update project")
-
-        if status:
-            global_vars.dao.commit()
-            self.dlg_readsql_show_info.btn_update.hide()
-        else:
-            global_vars.dao.rollback()
-
-        # Reset count error variable to 0
-        self.error_count = 0
+            description = f"Update schema"
+            params = {'project_type': project_type}
+            self.task_update_schema = GwUpdateSchemaTask(self, description, params, timer=self.timer)
+            QgsApplication.taskManager().addTask(self.task_update_schema)
+            QgsApplication.taskManager().triggerTask(self.task_update_schema)
 
 
     def load_updates(self, project_type=None, update_changelog=False, schema_name=None):
@@ -382,8 +371,6 @@ class GwAdminButton:
             status = self.update_31to39(project_type=project_type)
         self.task1.setProgress(60)
         if status:
-            # Check if schema utils exists and execute update
-            self._update_utils(schema_name)
             status = self.execute_last_process(schema_name=schema_name, locale=True)
         self.task1.setProgress(100)
 
@@ -1924,7 +1911,7 @@ class GwAdminButton:
         schema = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
         # Set listeners
-        self.dlg_readsql_copy.btn_accept.clicked.connect(partial(self._copy_project_data_schema, schema))
+        self.dlg_readsql_copy.btn_accept.clicked.connect(partial(self._copy_project_start, schema))
         self.dlg_readsql_copy.btn_cancel.clicked.connect(partial(self._close_dialog_admin, self.dlg_readsql_copy))
 
         # Set shortcut keys
@@ -1935,7 +1922,7 @@ class GwAdminButton:
         tools_gw.open_dialog(self.dlg_readsql_copy, dlg_name='admin_renameproj')
 
 
-    def _copy_project_data_schema(self, schema):
+    def _copy_project_start(self, schema):
         """"""
 
         new_schema_name = tools_qt.get_text(self.dlg_readsql_copy, self.dlg_readsql_copy.schema_rename_copy)
@@ -1950,31 +1937,18 @@ class GwAdminButton:
             else:
                 continue
 
-        self.task1 = GwTask('Manage schema')
-        QgsApplication.taskManager().addTask(self.task1)
-        self.task1.setProgress(0)
-        extras = f'"parameters":{{"source_schema":"{schema}", "dest_schema":"{new_schema_name}"}}'
-        body = tools_gw.create_body(extras=extras)
-        self.task1.setProgress(50)
-        result = tools_gw.execute_procedure('gw_fct_admin_schema_clone', body, schema, commit=False)
-        if not result or result['status'] == 'Failed':
-            return
-        self.task1.setProgress(100)
+        # Create timer
+        self.t0 = time()
+        self.timer = QTimer()
+        self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_readsql_copy))
+        self.timer.start(1000)
 
-        # Show message
-        status = (self.error_count == 0)
-        self._manage_result_message(status, parameter="Copy project")
-        if status:
-            global_vars.dao.commit()
-            self._populate_data_schema_name(self.cmb_project_type)
-            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(new_schema_name))
-            self._set_info_project()
-            self._close_dialog_admin(self.dlg_readsql_copy)
-        else:
-            global_vars.dao.rollback()
-
-        # Reset count error variable to 0
-        self.error_count = 0
+        # Set background task 'GwCopySchemaTask'
+        description = f"Copy schema"
+        params = {'schema': schema}
+        self.task_copy_schema = GwCopySchemaTask(self, description, params, timer=self.timer)
+        QgsApplication.taskManager().addTask(self.task_copy_schema)
+        QgsApplication.taskManager().triggerTask(self.task_copy_schema)
 
 
     def _delete_schema(self):
@@ -2048,13 +2022,14 @@ class GwAdminButton:
 
                 if complet_result['status'] == 'Failed':
                     msg = f'The importation process has failed!'
-                    if 'replace' in complet_result['body']['data']:
+                    replace = complet_result['body']['data'].get('replace')
+                    if replace is not None:
                         msg += f'<br>This can be fixed in the next dialog.'
                     msg += f'<br>See Info log for more details.'
                     self._set_log_text(self.dlg_import_inp, complet_result['body']['data'])
                     tools_qt.show_info_box(msg, "Info")
-                    if 'replace' in complet_result['body']['data']:
-                        retry = self._build_replace_dlg(complet_result['body']['data']['replace'])
+                    if replace is not None:
+                        retry = self._build_replace_dlg(replace)
                         if retry:
                             sql = "DELETE FROM temp_csv WHERE fid = 239;"
                             tools_db.execute_sql(sql, commit=False)
@@ -2181,7 +2156,7 @@ class GwAdminButton:
                             self.dlg_replace.findChild(QLineEdit, f'{old}').setToolTip('Another object has this name')
                             valid, all_valid = False, False
                     except Exception as e:
-                        print(f"{type(e).__name__}: {e}")
+                        tools_log.log_info(f"{type(e).__name__} --> {e}")
             if valid:
                 news.append(new)
                 tools_qt.set_stylesheet(self.dlg_replace.findChild(QLineEdit, f'{old}'), style="")
@@ -2239,7 +2214,7 @@ class GwAdminButton:
             # Get values
             self.folder_path = tools_gw.get_config_parser('system', 'folder_path', "project", "dev", False,
                                                           force_reload=True)
-            self.folder_path = self.folder_path.replace('"', '')
+
             self.text_replace_labels = tools_gw.get_config_parser('qgis_project_text_replace', 'labels', "project",
                                                                   "dev", False, force_reload=True)
             self.text_replace_labels = self.text_replace_labels.split(',')
@@ -2273,10 +2248,8 @@ class GwAdminButton:
                                                                        "project", "dev", False, force_reload=True)
                         self.text_replace = self.text_replace.split(',')
                         tools_log.log_info("Replacing template text", parameter=self.text_replace[1])
-                        # TODO:: Keep replace or remove it and declare 'qgis_project_text_replace' from 'config/dev.config' without '"'.
-                        #  Example: "dbname='giswater3'", "dbname='__DBNAME__'" or dbname='giswater3', dbname='__DBNAME__'
-                        f_to_read = re.sub(str(self.text_replace[0].replace('"', '')),
-                                           str(self.text_replace[1].replace('"', '')), f_to_read)
+                        f_to_read = re.sub(str(self.text_replace[0]),
+                                           str(self.text_replace[1]), f_to_read)
 
                     for text_replace in self.xml_set_labels:
                         text_replace = text_replace.replace(" ", "")
@@ -2284,10 +2257,8 @@ class GwAdminButton:
                                                                        "dev", False, force_reload=True)
                         self.text_replace = self.text_replace.split(',')
                         tools_log.log_info("Replacing template text", parameter=self.text_replace[1])
-                        # TODO:: Keep replace or remove it and declare 'qgis_project_xml_set' from 'config/dev.config' without '"'.
-                        #  Example: "dbname='giswater3'", "dbname='__DBNAME__'" or dbname='giswater3', dbname='__DBNAME__'
-                        f_to_read = re.sub(str(self.text_replace[0].replace('"', '')),
-                                           str(self.text_replace[1].replace('"', '')), f_to_read)
+                        f_to_read = re.sub(str(self.text_replace[0]),
+                                           str(self.text_replace[1]), f_to_read)
 
                     # Close file
                     f.close()
@@ -2874,8 +2845,34 @@ class GwAdminButton:
                     list_aux = row.split("\t")
                     dirty_list = []
                     for x in range(0, len(list_aux)):
+                        # If text in between double-quotes, put all the text in a single column (if tab-separated)
+                        if str(list_aux[x]).startswith('"') and str(list_aux[x]).endswith('"'):
+                            dirty_list.append(list_aux[x].strip('"'))
+
                         aux = list_aux[x].split(" ")
+                        str_aux = ""
                         for i in range(len(aux)):
+                            # If text is between double-quotes, insert it without the quotes
+                            #     This includes "xxxx" and ""
+                            if str(aux[i]).startswith('"') and str(aux[i]).endswith('"'):
+                                if aux[i] == '""':
+                                    aux[i] = '\n'
+                                dirty_list.append(aux[i].strip('"'))
+                                continue
+
+                            # If text starts with '"', initialize str_aux variable
+                            #     This will insert "xxx yy" as a single string
+                            if str(aux[i]).startswith('"'):
+                                str_aux = str(aux[i])
+                                continue
+                            if str_aux:
+                                str_aux = f'{str_aux} {str(aux[i])}'
+                                if str(aux[i]).endswith('"'):
+                                    dirty_list.append(str_aux.strip('"'))
+                                    str_aux = ""
+                                continue
+
+                            # Text without quotes is inserted as-is
                             dirty_list.append(aux[i])
                 else:
                     dirty_list = [row]
@@ -2890,7 +2887,7 @@ class GwAdminButton:
                 sql += "INSERT INTO temp_csv (fid, source, "
                 values = "VALUES(239, $$" + target + "$$, "
                 for x in range(0, len(sp_n)):
-                    if "''" not in sp_n[x]:
+                    if sp_n[x] != "''":
                         sql += "csv" + str(x + 1) + ", "
                         value = "$$" + sp_n[x].strip().replace("\n", "") + "$$, "
                         values += value.replace("$$$$", "null")
@@ -2962,24 +2959,26 @@ class GwAdminButton:
         if status:
             if msg_ok is None:
                 msg_ok = "Process finished successfully"
-            tools_qt.show_info_box(msg_ok, "Info", parameter=parameter)
+            tools_qgis.show_info(msg_ok, parameter=parameter)
         else:
             if msg_error is None:
                 msg_error = "Process finished with some errors"
-            tools_qt.show_info_box(msg_error, "Warning", parameter=parameter)
+            tools_qgis.show_warning(msg_error, parameter=parameter)
 
 
     def _manage_json_message(self, json_result, parameter=None, title=None):
         """ Manage message depending result @status """
 
-        if 'message' in json_result:
+        message = json_result.get('message')
+        if message:
 
-            level = 1
-            if 'level' in json_result['message']:
-                level = int(json_result['message']['level'])
-            if 'text' in json_result['message']:
-                msg = json_result['message']['text']
+            level = message.get('level')
+            if level is not None:
+                level = int(level)
             else:
+                level = 1
+            msg = message.get('text')
+            if msg is None:
                 msg = "Key on returned json from ddbb is missed"
 
             tools_qgis.show_message(msg, level, parameter=parameter, title=title)
@@ -3234,5 +3233,21 @@ class GwAdminButton:
                             return False
 
         return True
+
+
+    def _calculate_elapsed_time(self, dialog):
+
+        tf = time()  # Final time
+        td = tf - self.t0  # Delta time
+        self._update_time_elapsed(f"Exec. time: {timedelta(seconds=round(td))}", dialog)
+
+    def _update_time_elapsed(self, text, dialog):
+
+        if isdeleted(dialog):
+            self.timer.stop()
+            return
+
+        lbl_time = dialog.findChild(QLabel, 'lbl_time')
+        lbl_time.setText(text)
 
     # endregion

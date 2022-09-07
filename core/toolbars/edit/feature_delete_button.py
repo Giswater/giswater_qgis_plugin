@@ -19,10 +19,17 @@ from ....lib import tools_qgis, tools_qt, tools_db
 class GwFeatureDeleteButton(GwAction):
     """ Button 69: Delete feature """
 
-    def __init__(self, icon_path, action_name, text, toolbar, action_group):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group, list_feature_type=None):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.dlg_feature_delete = None
+        self.list_feature_type = list_feature_type
+        if not self.list_feature_type:
+            self.list_feature_type = tuple(['ARC', 'NODE', 'CONNEC'])
+        else:
+            self.list_feature_type = tuple(self.list_feature_type)
+        if len(self.list_feature_type) == 1:
+            self.list_feature_type = f"('{self.list_feature_type[0]}')"
 
 
     def clicked_event(self):
@@ -32,7 +39,7 @@ class GwFeatureDeleteButton(GwAction):
         tools_gw.load_settings(self.dlg_feature_delete)
 
         # Populate combo feature type
-        sql = 'SELECT DISTINCT(feature_type) AS id, feature_type AS idval FROM cat_feature'
+        sql = f"SELECT DISTINCT(feature_type) AS id, feature_type AS idval FROM cat_feature WHERE feature_type in {self.list_feature_type}"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_feature_delete.feature_type, rows, 1)
 
@@ -144,7 +151,7 @@ class GwFeatureDeleteButton(GwAction):
         extras = '"feature_id":"' + feature_id + '"'
         body = tools_gw.create_body(feature=feature, extras=extras)
         result = tools_gw.execute_procedure('gw_fct_getfeaturerelation', body)
-        if not result or ('status' in result and result['status'] == 'Failed'):
+        if not result or result.get('status') == 'Failed':
             return False
 
         # Construct message result
@@ -174,7 +181,7 @@ class GwFeatureDeleteButton(GwAction):
             tools_qgis.show_message("Function gw_fct_setfeaturedelete executed with no result ", 3)
             return
 
-        if 'status' in complet_result and complet_result['status'] == 'Failed':
+        if complet_result.get('status') == 'Failed':
             return False
 
         # Populate tab info

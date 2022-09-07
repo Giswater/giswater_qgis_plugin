@@ -166,6 +166,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionProfile"/>
+   <addaction name="actionAddPoint"/>
   </widget>
   <action name="actionProfile">
    <property name="checkable">
@@ -180,6 +181,18 @@
    </property>
    <property name="toolTip">
     <string>Set nodes</string>
+   </property>
+  </action>
+  <action name="actionAddPoint">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../../../icons/dialogs/24x24/131b.png</normaloff>../../../../icons/dialogs/24x24/131b.png</iconset>
+   </property>
+   <property name="text">
+    <string>addPoint</string>
+   </property>
+   <property name="toolTip">
+    <string>Add additional point</string>
    </property>
   </action>
  </widget>

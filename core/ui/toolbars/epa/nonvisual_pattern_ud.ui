@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>dlg_nonvisual_pattern_ud</class>
+ <widget class="QDialog" name="dlg_nonvisual_pattern_ud">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>695</width>
+    <height>670</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Pattern Editor</string>
+  </property>
+  <layout class="QGridLayout" name="verticalLayout_4">
+   <item row="2" column="0" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetDefaultConstraint</enum>
+     </property>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_accept">
+       <property name="text">
+        <string>OK</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_cancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string/>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="2" column="0" colspan="2">
+       <layout class="QGridLayout" name="lyt_plot"/>
+      </item>
+      <item row="0" column="0" colspan="2">
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="1" column="0">
+         <widget class="QLineEdit" name="txt_pattern_id">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="lbl_pattern_id">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Pattern ID</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLabel" name="lbl_expl_id">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Exploitation ID</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QComboBox" name="cmb_expl_id"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="QComboBox" name="cmb_pattern_type"/>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="lbl_pattern_type">
+          <property name="text">
+           <string>Pattern Type</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0" colspan="3">
+         <widget class="QLineEdit" name="txt_observ">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="3">
+         <widget class="QLabel" name="lbl_observ">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Observation</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="3" column="0">
+         <widget class="QTableWidget" name="tbl_weekend">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>70</height>
+           </size>
+          </property>
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>50</number>
+          </attribute>
+          <row>
+           <property name="text">
+            <string>WEEKEND</string>
+           </property>
+          </row>
+          <column>
+           <property name="text">
+            <string>12AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>1AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>2AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>3AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>4AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>5AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>6AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>7AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>8AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>9AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>10AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>11AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>12PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>1PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>2PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>3PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>4PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>5PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>6PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>7PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>8PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>9PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>10PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>11PM</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QTableWidget" name="tbl_hourly">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>70</height>
+           </size>
+          </property>
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>50</number>
+          </attribute>
+          <row>
+           <property name="text">
+            <string>HOURLY</string>
+           </property>
+          </row>
+          <column>
+           <property name="text">
+            <string>12AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>1AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>2AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>3AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>4AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>5AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>6AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>7AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>8AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>9AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>10AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>11AM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>12PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>1PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>2PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>3PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>4PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>5PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>6PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>7PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>8PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>9PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>10PM</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>11PM</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QTableWidget" name="tbl_monthly">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>70</height>
+           </size>
+          </property>
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>50</number>
+          </attribute>
+          <row>
+           <property name="text">
+            <string>MONTHLY</string>
+           </property>
+          </row>
+          <column>
+           <property name="text">
+            <string>JAN</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>FEB</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>MAR</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>APR</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>MAY</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>JUN</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>JUL</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>AUG</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>SEP</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>OCT</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>NOV</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>DEC</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QTableWidget" name="tbl_daily">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>70</height>
+           </size>
+          </property>
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>50</number>
+          </attribute>
+          <row>
+           <property name="text">
+            <string>DAILY</string>
+           </property>
+          </row>
+          <column>
+           <property name="text">
+            <string>MON</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>TUE</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>WED</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>THU</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>FRI</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>SAT</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>SUN</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -7,13 +7,17 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import sys
-from functools import partial
 import json
 
-from qgis.PyQt.QtCore import QStringListModel, Qt
+from functools import partial
+from sip import isdeleted
+from time import time
+from datetime import timedelta
+
+from qgis.PyQt.QtCore import QStringListModel, Qt, QTimer
 from qgis.PyQt.QtSql import QSqlQueryModel
 from qgis.PyQt.QtWidgets import QWidget, QComboBox, QCompleter, QFileDialog, QTableView, QAbstractItemView, \
-    QGroupBox, QSpacerItem, QSizePolicy, QGridLayout
+    QGroupBox, QSpacerItem, QSizePolicy, QGridLayout, QLabel
 from qgis.core import QgsApplication
 
 from ...shared.selector import GwSelector
@@ -21,7 +25,7 @@ from ...threads.epa_file_manager import GwEpaFileManager
 from ...utils import tools_gw
 from ...ui.ui_manager import GwGo2EpaUI, GwSelectorUi, GwGo2EpaOptionsUi
 from .... import global_vars
-from ....lib import tools_qgis, tools_qt, tools_db
+from ....lib import tools_qgis, tools_qt, tools_db, tools_os
 from ..dialog import GwAction
 
 
@@ -409,9 +413,15 @@ class GwGo2EpaButton(GwAction):
         self.dlg_go2epa.btn_accept.setEnabled(False)
         self.dlg_go2epa.btn_cancel.setEnabled(True)
 
+        # Create timer
+        self.t0 = time()
+        self.timer = QTimer()
+        self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_go2epa))
+        self.timer.start(1000)
+
         # Set background task 'Go2Epa'
         description = f"Go2Epa"
-        self.go2epa_task = GwEpaFileManager(description, self)
+        self.go2epa_task = GwEpaFileManager(description, self, timer=self.timer)
         QgsApplication.taskManager().addTask(self.go2epa_task)
         QgsApplication.taskManager().triggerTask(self.go2epa_task)
 
@@ -522,5 +532,21 @@ class GwGo2EpaButton(GwAction):
         for combo_child in json_result['fields']:
             if combo_child is not None:
                 tools_gw.manage_combo_child(dialog, widget, combo_child)
+
+
+    def _calculate_elapsed_time(self, dialog):
+
+        tf = time()  # Final time
+        td = tf - self.t0  # Delta time
+        self._update_time_elapsed(f"Exec. time: {timedelta(seconds=round(td))}", dialog)
+
+    def _update_time_elapsed(self, text, dialog):
+
+        if isdeleted(dialog):
+            self.timer.stop()
+            return
+
+        lbl_time = dialog.findChild(QLabel, 'lbl_time')
+        lbl_time.setText(text)
 
     # endregion

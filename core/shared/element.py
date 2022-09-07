@@ -30,7 +30,7 @@ class GwElement:
         self.vertex_marker = self.snapper_manager.vertex_marker
 
 
-    def get_element(self, new_element_id=True, feature=None, feature_type=None, selected_object_id=None):
+    def get_element(self, new_element_id=True, feature=None, feature_type=None, selected_object_id=None, list_tabs=None):
         """ Button 33: Add element """
 
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
@@ -73,12 +73,18 @@ class GwElement:
         self.layers['element'] = tools_gw.get_layers_from_feature_type('element')
         self.point_xy = {"x": None, "y": None}
 
-        # Remove 'gully' for 'WS'
-        self.project_type = tools_gw.get_project_type()
-        if self.project_type == 'ws':
-            tools_qt.remove_tab(self.dlg_add_element.tab_feature, 'tab_gully')
+        params = ['arc', 'node', 'connec', 'gully']
+        if list_tabs:
+            for i in params:
+                if i not in list_tabs:
+                    tools_qt.remove_tab(self.dlg_add_element.tab_feature, f'tab_{i}')
         else:
-            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+            # Remove 'gully' if not 'UD'
+            self.project_type = tools_gw.get_project_type()
+            if self.project_type != 'ud':
+                tools_qt.remove_tab(self.dlg_add_element.tab_feature, 'tab_gully')
+            else:
+                self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
 
         # Set icons
         tools_gw.add_icon(self.dlg_add_element.btn_add_geom, "133")
@@ -112,6 +118,7 @@ class GwElement:
         # Set signals
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
                            "v_edit_element"]
+        self.excluded_layers = excluded_layers
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_add_element.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_add_element.btn_accept.clicked.connect(partial(self._manage_element_accept, table_object))
@@ -211,7 +218,10 @@ class GwElement:
             self._set_default_values()
 
         # Adding auto-completion to a QLineEdit for default feature
-        tools_gw.set_completer_widget("v_edit_arc", self.dlg_add_element.feature_id, "arc_id", )
+        if feature_type is None:
+            feature_type = "arc"
+        viewname = f"v_edit_{feature_type}"
+        tools_gw.set_completer_widget(viewname, self.dlg_add_element.feature_id, str(feature_type) + "_id")
 
         if feature:
             self.dlg_add_element.tabWidget.currentChanged.connect(partial(
@@ -219,7 +229,7 @@ class GwElement:
 
         # Set default tab 'arc'
         self.dlg_add_element.tab_feature.setCurrentIndex(0)
-        self.feature_type = "arc"
+        self.feature_type = feature_type
         tools_gw.get_signal_change_tab(self.dlg_add_element, excluded_layers)
 
         # Force layer v_edit_element set active True
@@ -378,15 +388,15 @@ class GwElement:
         # Check mandatory fields
         message = "You need to insert value for field"
         if elementcat_id == '':
-            tools_qgis.show_warning(message, parameter="elementcat_id")
+            tools_qgis.show_warning(message, parameter="elementcat_id", dialog=self.dlg_add_element)
             return
         num_elements = tools_qt.get_text(self.dlg_add_element, "num_elements", return_string_null=False)
         if num_elements == '':
-            tools_qgis.show_warning(message, parameter="num_elements")
+            tools_qgis.show_warning(message, parameter="num_elements", dialog=self.dlg_add_element)
             return
         state = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.state)
         if state == '':
-            tools_qgis.show_warning(message, parameter="state_id")
+            tools_qgis.show_warning(message, parameter="state_id", dialog=self.dlg_add_element)
             return
 
         state_type = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.state_type)
@@ -560,7 +570,7 @@ class GwElement:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=dialog)
             return
 
         row = selected_list[0].row()

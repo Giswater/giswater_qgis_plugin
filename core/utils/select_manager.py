@@ -69,12 +69,10 @@ class GwSelectManager(QgsMapTool):
             self.rubber_band.hide()
             return
 
-        # Disconnect signal to enhance process
-        # We will reconnect it when processing last layer of the group
+        # Reconnect signal to enhance process
         tools_qgis.disconnect_signal_selection_changed()
-
+        tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, query=self.query)
         for i, layer in enumerate(self.class_object.layers[self.class_object.feature_type]):
-            tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, query=self.query)
             # Selection by rectangle
             if rectangle:
                 if selected_rectangle is None:

@@ -222,6 +222,7 @@ class GwVisit(QObject):
         # Force _visit_tab_feature_changed
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
                            "v_edit_element"]
+        self.excluded_layers = excluded_layers
         self._visit_tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=excluded_layers)
 
         # Manage relation locking
@@ -430,7 +431,7 @@ class GwVisit(QObject):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=dialog)
             return
 
         row = selected_list[0].row()
@@ -485,7 +486,7 @@ class GwVisit(QObject):
         self.tabs.currentChanged.connect(partial(self._manage_tab_changed, self.dlg_add_visit))
         self.visit_id.textChanged.connect(partial(self._manage_visit_id_change, self.dlg_add_visit))
         self.dlg_add_visit.btn_doc_insert.clicked.connect(self._document_insert)
-        self.dlg_add_visit.btn_doc_delete.clicked.connect(partial(tools_qt.delete_rows_tableview, self.tbl_document))
+        self.dlg_add_visit.btn_doc_delete.clicked.connect(self._document_delete)
         self.dlg_add_visit.btn_doc_new.clicked.connect(self._manage_document)
         self.dlg_add_visit.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
         self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
@@ -903,6 +904,7 @@ class GwVisit(QObject):
 
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
                           "v_edit_element"]
+        self.excluded_layers = excluded_layers
         if self.feature_type is None:
             return
 
@@ -1075,7 +1077,7 @@ class GwVisit(QObject):
         visit_end = dialog.date_event_to.date()
         if visit_start > visit_end:
             message = "Selected date interval is not valid"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=dialog)
             return
 
         # Create interval dates
@@ -1170,7 +1172,7 @@ class GwVisit(QObject):
                        f"FROM om_visit "
                        f"WHERE id = '{visit_id}'")
                 row = tools_db.get_row(sql)
-                tools_qt.set_combo_value(self.exploitation, row[0], 0)
+                tools_qt.set_combo_value(self.exploitation, str(row[0]), 0)
 
         # Relations tab
         # fill feature_type
@@ -1180,7 +1182,7 @@ class GwVisit(QObject):
                "WHERE classlevel = 1 OR classlevel = 2"
                "ORDER BY id")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_box(self.dlg_add_visit, "feature_type", rows, False)
+        tools_qt.fill_combo_values(self.dlg_add_visit.feature_type, rows)
 
         # Event tab
         # Fill ComboBox parameter_type_id
@@ -1366,7 +1368,7 @@ class GwVisit(QObject):
         path = index.sibling(index.row(), column_index).data()
         status, message = tools_os.open_file(path)
         if status is False and message is not None:
-            tools_qgis.show_warning(message, parameter=path)
+            tools_qgis.show_warning(message, parameter=path, dialog=self.dlg_event)
 
 
     def _populate_tbl_docs_x_event(self, event_id=0):
@@ -1508,7 +1510,7 @@ class GwVisit(QObject):
 
         elif len(selected_list) > 1:
             message = "More then one event selected. Select just one"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_add_visit)
             return
 
         # fetch the record
@@ -1689,11 +1691,11 @@ class GwVisit(QObject):
         # do the action
         if not event.delete(pks=selected_id):
             message = "Error deleting records"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_add_visit)
             return
 
         message = "Records deleted"
-        tools_qgis.show_info(message)
+        tools_qgis.show_info(message, dialog=self.dlg_add_visit)
 
         # update Table
         self.tbl_event.model().select()
@@ -1707,11 +1709,11 @@ class GwVisit(QObject):
         visit_id = self.visit_id.text()
         if not doc_id:
             message = "You need to insert doc_id"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_add_visit)
             return
         if not visit_id:
             message = "You need to insert visit_id"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_add_visit)
             return
 
         # Insert into new table
@@ -1720,9 +1722,38 @@ class GwVisit(QObject):
         status = tools_db.execute_sql(sql)
         if status:
             message = "Document inserted successfully"
-            tools_qgis.show_info(message)
+            tools_qgis.show_info(message, dialog=self.dlg_add_visit)
 
         self.dlg_add_visit.tbl_document.model().select()
+
+
+    def _document_delete(self):
+        """ Delete a document from the current visit. """
+
+        # Get selected rows. 0 is the column of the pk 0 'id'
+        selected_list = self.tbl_document.selectionModel().selectedRows(0)
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qt.show_info_box(message)
+            return
+
+        selected_id = []
+        for index in selected_list:
+            doc_id = index.data()
+            selected_id.append(str(doc_id))
+        message = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = tools_qt.show_question(message, title, ','.join(selected_id))
+        if answer:
+            # Delete from table
+            sql = (f"DELETE FROM doc_x_visit"
+                   f" WHERE id IN ({','.join(selected_id)})")
+            status = tools_db.execute_sql(sql)
+            if status:
+                message = "Documents deleted successfully"
+                tools_qgis.show_info(message, dialog=self.dlg_add_visit)
+
+            self.tbl_document.model().select()
 
 
     def _populate_position_id(self):
@@ -1730,14 +1761,14 @@ class GwVisit(QObject):
         self.dlg_event.position_id.setEnabled(self.feature_type == 'arc')
         self.dlg_event.position_value.setEnabled(self.feature_type == 'arc')
         node_list = []
+        node_1 = None
+        node_2 = None
         if self.feature_type != 'all':
             widget_name = f"tbl_visit_x_{self.feature_type}"
             widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
-            node_1 = widget_table.model().record(0).value('node_1')
-            node_2 = widget_table.model().record(0).value('node_2')
-        else:
-            node_1 = None
-            node_2 = None
+            if widget_table.model():
+                node_1 = widget_table.model().record(0).value('node_1')
+                node_2 = widget_table.model().record(0).value('node_2')
 
         node_list.append([node_1, f"node 1: {node_1}"])
         node_list.append([node_2, f"node 2: {node_2}"])

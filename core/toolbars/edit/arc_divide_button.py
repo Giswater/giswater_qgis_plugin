@@ -232,7 +232,9 @@ class GwArcDivideButton(GwMaptool):
                 log = tools_gw.get_config_parser("user_edit_tricks", "arc_divide_disable_showlog", 'user', 'init')
                 if not tools_os.set_boolean(log, False):
                     self.dlg_dtext = GwDialogTextUi('arc_divide')
+                    tools_gw.load_settings(self.dlg_dtext)
                     tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False, True, 1)
+                    self.dlg_dtext.finished.connect(partial(tools_gw.save_settings, self.dlg_dtext))
                     tools_gw.open_dialog(self.dlg_dtext)
         else:
             message = "Move node: Error updating geometry"

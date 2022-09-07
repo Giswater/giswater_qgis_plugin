@@ -100,7 +100,7 @@ class GwMincutTools:
         selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_mincut_man)
             return
         inf_text = ""
         list_id = ""
@@ -133,9 +133,10 @@ class GwMincutTools:
 
         if len(selected_mincuts) == 0:
             msg = "There are no visible mincuts in the table. Try a different filter or make one"
-            tools_qgis.show_message(msg)
+            tools_qgis.show_message(msg, dialog=self.dlg_mincut_man)
             return
-        selector_values = f'"selector_mincut", "ids":{selected_mincuts}'
+        selector_values = f"selector_mincut"
+        aux_params = f'"ids":{selected_mincuts}'
         mincut_selector = GwSelector()
 
         self.dlg_selector = GwSelectorUi()
@@ -145,7 +146,7 @@ class GwMincutTools:
         self.dlg_selector.rejected.connect(partial(tools_gw.save_settings, self.dlg_selector))
         self.dlg_selector.rejected.connect(partial(tools_gw.save_current_tab, self.dlg_selector, self.dlg_selector.main_tab, 'mincut'))
 
-        mincut_selector.get_selector(self.dlg_selector, selector_values, current_tab=current_tab)
+        mincut_selector.get_selector(self.dlg_selector, selector_values, current_tab=current_tab, aux_params=aux_params)
 
         tools_gw.open_dialog(self.dlg_selector, dlg_name='selector')
 
@@ -172,7 +173,7 @@ class GwMincutTools:
         selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_mincut_man)
             return
 
         row = selected_list[0].row()
@@ -236,7 +237,7 @@ class GwMincutTools:
             date_to = visit_end.toString('yyyyMMdd 23:59:59')
             if date_from > date_to:
                 message = "Selected date interval is not valid"
-                tools_qgis.show_warning(message)
+                tools_qgis.show_warning(message, dialog=self.dlg_mincut_man)
                 return
 
             # Create interval dates
@@ -254,7 +255,7 @@ class GwMincutTools:
             elif str(state_id) in ('1', '2'):
                 tools_qt.set_widget_text(self.dlg_mincut_man, self.dlg_mincut_man.lbl_date_from, 'Date from: exec_start')
                 tools_qt.set_widget_text(self.dlg_mincut_man, self.dlg_mincut_man.lbl_date_to, 'Date to: exec_end')
-                dates_filter = f"AND (exec_start BETWEEN {interval}) AND (exec_end BETWEEN {interval})"
+                dates_filter = f"AND (exec_start BETWEEN {interval})"
             else:
                 tools_qt.set_widget_text(self.dlg_mincut_man, self.dlg_mincut_man.lbl_date_from, 'Date from:')
                 tools_qt.set_widget_text(self.dlg_mincut_man, self.dlg_mincut_man.lbl_date_to, 'Date to:')
@@ -286,7 +287,7 @@ class GwMincutTools:
 
         # Check for errors
         if model.lastError().isValid():
-            tools_qgis.show_warning(model.lastError().text())
+            tools_qgis.show_warning(model.lastError().text(), dialog=self.dlg_mincut_man)
 
         # Attach model to table view
         widget.setModel(model)
@@ -299,7 +300,7 @@ class GwMincutTools:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message)
+            tools_qgis.show_warning(message, dialog=self.dlg_mincut_man)
             return
 
         inf_text = ""

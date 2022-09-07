@@ -50,6 +50,13 @@
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="btn_toc">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="btn_insert">
        <property name="text">
         <string/>
