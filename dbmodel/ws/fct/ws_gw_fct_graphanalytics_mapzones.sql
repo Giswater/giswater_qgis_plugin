@@ -64,8 +64,9 @@ if updatefeature
 ---------------
 TEST EXAMPLE WITHOUT MODIFY SYSTEM VALUES
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_mapzones('{"data":{"parameters":{"graphClass":"DMA", "macroExploitation":[1], "updateFeature":false, "updateMapZone":0, "geomParamUpdate":4}}}');
-DELETE FROM anl_arc
-SELECT arc_id, descript, the_geom FROM anl_arc WHERE fid = 145
+
+select t.*, the_geom from ws.temp_anlgraph t JOIN ws.arc USING (arc_id) WHERE water = 1
+
 ----------------
 UPDATE SCHEMA_NAME.presszone set the_geom = null where expl_id  =1
 
