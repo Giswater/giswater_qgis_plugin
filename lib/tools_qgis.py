@@ -970,7 +970,7 @@ def get_locale():
         locale = "en_US"
         tools_log.log_info(f"{type(e).__name__} --> {e}")
     finally:
-        if locale is None:
+        if locale in (None, ''):
             locale = "en_US"
         return locale
 

@@ -284,6 +284,9 @@ class GwFeatureEndButton(GwAction):
             tools_qt.fill_table(self.tbl_arc_x_relations, table_relations, filter_)
             self.tbl_arc_x_relations.doubleClicked.connect(
                 partial(self._open_selected_object, self.tbl_arc_x_relations))
+            self.tbl_arc_x_relations.clicked.connect(
+                partial(tools_qgis.hilight_feature_by_id, self.tbl_arc_x_relations, 'v_edit_connec', 'connec_id',
+                        self.rubber_band, 10, table_field='feature_id'))
 
             tools_gw.open_dialog(self.dlg_work, dlg_name='feature_end_connec')
 

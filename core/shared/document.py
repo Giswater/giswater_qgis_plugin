@@ -34,7 +34,7 @@ class GwDocument(QObject):
         self.schema_name = global_vars.schema_name
         self.files_path = []
         self.project_type = tools_gw.get_project_type()
-        self.doc_tables =[]
+        self.doc_tables = []
         self.list_tabs = []
         self.feature_type = None
 
