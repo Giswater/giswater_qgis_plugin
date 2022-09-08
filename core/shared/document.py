@@ -34,13 +34,13 @@ class GwDocument(QObject):
         self.schema_name = global_vars.schema_name
         self.files_path = []
         self.project_type = tools_gw.get_project_type()
-        self.doc_tables = []
-        self.list_tabs = []
+        self.doc_tables = ["doc_x_node","doc_x_arc","doc_x_connec","doc_x_gully"]
+        self.list_tabs = ["node", "arc", "connec", "gully"]
         self.feature_type = None
 
 
 
-    def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, row=None):
+    def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, feature_type=None, row=None):
         """ Button 34: Add document """
 
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
@@ -76,7 +76,6 @@ class GwDocument(QObject):
             for i in params:
                 if i not in self.list_tabs:
                     tools_qt.remove_tab(self.dlg_add_doc.tab_feature, f'tab_{i}')
-        else:
             # Remove 'gully' if not 'UD'
             if self.project_type != 'ud':
                 tools_qt.remove_tab(self.dlg_add_doc.tab_feature, 'tab_gully')
@@ -85,6 +84,8 @@ class GwDocument(QObject):
         if self.single_tool_mode:
             self.layers = tools_gw.remove_selection(True, layers=self.layers)
 
+        if feature_type:
+            self.feature_type = feature_type
         if feature is not None:
             layer = self.layers[self.feature_type][0]
             layer.selectByIds([feature.id()])
