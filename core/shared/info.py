@@ -1699,9 +1699,10 @@ class GwInfo(QObject):
         """
 
         field = kwargs['field']
+        stylesheet = field.get('stylesheet') or {}
         # If button text is empty it's because node_1/2 is not present.
         # Then we create a QLineEdit to input a node to be connected.
-        if not field.get('value'):
+        if not field.get('value') and stylesheet.get('icon') is None:
             widget = self._manage_text(**kwargs)
             widget.editingFinished.connect(partial(self._run_settopology, widget, **kwargs))
             return widget
