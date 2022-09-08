@@ -319,6 +319,27 @@ BEGIN
 			UPDATE config_param_system SET value = 'TRUE' WHERE parameter = 'edit_check_redundance_y_topelev_elev';
 
 		ELSIF v_isnew IS FALSE THEN
+		
+		
+			-- profilactic delete to avoid conflicts with sequences and to clean gdb
+			DELETE FROM audit_check_project;
+			DELETE FROM audit_check_data;
+			DELETE FROM temp_arc;
+			DELETE FROM temp_anlgraph;
+			DELETE FROM temp_csv;
+			DELETE FROM temp_data;
+			DELETE FROM temp_node;
+			DELETE FROM temp_go2epa;
+			DELETE FROM temp_table;
+			
+			IF project_type = 'WS
+				DELETE FROM temp_mincut;
+				DELETE FROM temp_demand;
+			ELSE
+				DELETE FROM temp_arc_flowregulator;
+				DELETE FROM temp_gully;			
+				DELETE FROM temp_lid_usage;
+			END IF;	
 
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, 'UPDATE PROJECT SCHEMA');
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '---------------------');
