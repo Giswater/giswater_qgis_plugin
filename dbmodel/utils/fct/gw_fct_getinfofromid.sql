@@ -151,6 +151,9 @@ BEGIN
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
 	v_featuredialog := coalesce((p_data ->> 'form')::json->> 'featureDialog','[]');
 	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
+
+	-- control of nulls
+	IF v_addschema = 'NULL' THEN v_addschema = null; END IF;
 	
 	v_prev_cur_user = current_user;
 	IF v_cur_user IS NOT NULL THEN
