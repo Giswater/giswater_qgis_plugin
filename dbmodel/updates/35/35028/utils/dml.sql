@@ -29,7 +29,16 @@ INSERT INTO config_csv(fid, alias, descript, functionname, active, orderby, addp
 VALUES (469, 'Import scada_x_data', 'Import scada_x_data', 'gw_fct_import_scada_x_data', true,16, null) 
 ON CONFLICT (fid) DO NOTHING;
 
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (470, 'Import hydro_x_data values', 'utils',null, 'core', false, 'Function process',null) 
+ON CONFLICT (fid) DO NOTHING;
 
--- profilactic delete to avoid conflicts with sequences
-DELETE FROM audit_check_project;
-DELETE FROM audit_check_data;
+delete from sys_function where id = 3168;
+INSERT INTO sys_function (id,function_name,project_type,function_type,input_params,return_type,descript,sys_role,"source")
+VALUES (3168,'gw_fct_import_hydrometer_x_data','utils','function','json','json','Function to import scada_x_data values','role_om','core')
+ON CONFLICT (id) DO NOTHING;
+
+delete from config_csv where fid = 470;
+INSERT INTO config_csv(fid, alias, descript, functionname, active, orderby, addparam)
+VALUES (470, 'Import hydrometer_x_data', 'Import hdyrometer_x_data', 'gw_fct_import_hydrometer_x_data', true,16, null) 
+ON CONFLICT (fid) DO NOTHING;
