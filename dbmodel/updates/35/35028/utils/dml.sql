@@ -26,7 +26,7 @@ VALUES (3166,'gw_fct_import_scada_x_data','utils','function','json','json','Func
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_csv(fid, alias, descript, functionname, active, orderby, addparam)
-VALUES (469, 'Import scada_x_data', 'Import scada_x_data', 'gw_fct_import_scada_x_data', true,16, null) 
+VALUES (469, 'Import scada_x_data', 'Import scada_x_data', 'gw_fct_import_scada_x_data', false,16, null) 
 ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
@@ -40,5 +40,5 @@ ON CONFLICT (id) DO NOTHING;
 
 delete from config_csv where fid = 470;
 INSERT INTO config_csv(fid, alias, descript, functionname, active, orderby, addparam)
-VALUES (470, 'Import hydrometer_x_data', 'Import hdyrometer_x_data', 'gw_fct_import_hydrometer_x_data', true,16, null) 
+VALUES (470, 'Import hydrometer_x_data', 'Import hdyrometer_x_data', 'gw_fct_import_hydrometer_x_data', false ,17, null) 
 ON CONFLICT (fid) DO NOTHING;
