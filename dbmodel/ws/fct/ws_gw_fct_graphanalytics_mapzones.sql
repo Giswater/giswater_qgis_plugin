@@ -180,6 +180,7 @@ rec_conflict record;
 v_valuefordisconnected integer;
 v_floodonlymapzone text;
 v_islastupdate boolean;
+v_commitchanges boolean;
 
 BEGIN
 	-- Search path
@@ -207,6 +208,12 @@ BEGIN
 	v_usepsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePlanPsector');
 	v_debug = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'debug');
 	v_parameters = (SELECT ((p_data::json->>'data')::json->>'parameters'));
+	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges');
+
+	IF v_commitchanges IS FALSE THEN
+		v_updatefeature = false;
+		v_updatemapzgeom = 0;
+	END IF;
 
 	IF v_floodonlymapzone = '' THEN v_floodonlymapzone = NULL; END IF;
 
@@ -1004,6 +1011,15 @@ BEGIN
 		END IF;
 
 	ELSE -- all features in order to make a more complex log
+	
+		DELETE FROM anl_arc WHERE fid=v_fid AND cur_user=current_user;
+		DELETE FROM anl_connec WHERE fid=v_fid AND cur_user=current_user;
+	
+		INSERT INTO anl_arc (arc_id, expl_id, fid, cur_user, the_geom, dma_id)
+		SELECT arc_id, expl_id, v_fid, current_user, the_geom, trace FROM temp_anlgraph JOIN arc USING (arc_id) WHERE water=1;
+	
+		INSERT INTO anl_connec (connec_id, expl_id, fid, cur_user, the_geom, dma_id)
+		SELECT connec_id, expl_id, v_fid, current_user, the_geom, trace FROM temp_anlgraph JOIN connec USING (arc_id) WHERE water=1;
 
 		-- arc elements
 		v_result = null;

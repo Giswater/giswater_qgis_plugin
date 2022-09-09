@@ -36,6 +36,7 @@ v_forceopen text;
 v_usepsector text;
 v_valuefordisconnected integer;
 v_floodonlymapzone text;
+v_commitchanges text;
 
 BEGIN
 
@@ -52,6 +53,7 @@ BEGIN
 	v_usepsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePlanPsector');
 	v_valuefordisconnected = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'valueForDisconnected');
 	v_floodonlymapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'floodOnlyMapzone');
+	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges');
 
 
 	-- control of null values
@@ -63,11 +65,12 @@ BEGIN
 	IF v_updatemapzone IS NULL THEN v_updatemapzone = 1; END IF;
 	IF v_valuefordisconnected IS NULL THEN v_valuefordisconnected = 0; END IF;
 	IF v_floodonlymapzone IS NULL THEN v_floodonlymapzone = ''; END IF;
+	IF v_commitchanges IS NULL THEN v_commitchanges = FALSE ; END IF;
 
 	
 	v_data = concat ('{"data":{"parameters":{"graphClass":"',v_class,'", "exploitation": [',v_expl,'], "updateFeature":"TRUE",
 	"updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate, ',"floodFromNode":"',v_floodfromnode,'", "forceOpen": [',v_forceopen,'], "forceClosed":[',v_forceclosed,'], "usePlanPsector": ',v_usepsector,', "debug":"FALSE", 
-	"valueForDisconnected":',v_valuefordisconnected,', "floodOnlyMapzone":"',v_floodonlymapzone,'"}}}');
+	"valueForDisconnected":',v_valuefordisconnected,', "floodOnlyMapzone":"',v_floodonlymapzone,'", "commitChanges":',v_commitchanges,'}}}');
 
 	RETURN gw_fct_graphanalytics_mapzones(v_data);
 

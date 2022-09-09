@@ -5,3 +5,4 @@
 - Remove pg2epa_inlet_flowtrace function
 - New functions to import scada values & hydrometer values (focused on waterbalance)
 - Minor bug fix
+- Add commitChanges parameter in mapzones function to allow running it without change feature table values
