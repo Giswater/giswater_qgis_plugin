@@ -65,7 +65,10 @@ if updatefeature
 TEST EXAMPLE WITHOUT MODIFY SYSTEM VALUES
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_mapzones('{"data":{"parameters":{"graphClass":"DMA", "macroExploitation":[1], "updateFeature":false, "updateMapZone":0, "geomParamUpdate":4}}}');
 
-select t.*, the_geom from ws.temp_anlgraph t JOIN ws.arc USING (arc_id) WHERE water = 1
+SELECT t.id, t.arc_id, t.trace, dma."name", arc.the_geom FROM temp_anlgraph t 
+JOIN arc USING (arc_id)
+JOIN dma ON dma.dma_id = trace
+WHERE water = 1;
 
 ----------------
 UPDATE SCHEMA_NAME.presszone set the_geom = null where expl_id  =1
