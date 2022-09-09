@@ -13,7 +13,6 @@ RETURNS json AS
 $BODY$
 
 /*
-delete from temp_anlgraph
 TO EXECUTE
 
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]", "MaxMinsectors":0, "checkData": false, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2 ,"geomParamUpdate":10}}}');
@@ -233,11 +232,11 @@ BEGIN
 			-- init variable
 			v_cont1 = 0;
 
-			raise notice 'v_cont1 %', v_cont1;
+			raise notice 'counter %', v_cont2;
 
 			-- inundation process
 			LOOP	
-				raise notice 'v_cont1 %', v_cont1;
+				--raise notice 'v_cont1 %', v_cont1;
 
 				v_cont1 = v_cont1+1;
 				UPDATE temp_anlgraph n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graph a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;
