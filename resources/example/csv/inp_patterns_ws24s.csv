@@ -1,0 +1,73 @@
+pattern_id;f1;f2;f3;f4;f5;f6;f7;f8;f9;f10;f11;f12
+pattern_24s01;Pattern fixing 1 for one step and 0 for rest;0
+pattern_24s01;1;0;0;0;0;0;0;0;0;0;0;0
+pattern_24s01;0;0;0;0;0;0;0;0;0;0;0;0
+pattern_24s02;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s02;0;1;0;0;0;0;0;0;0;0;0;0
+pattern_24s02;0;0;0;0;0;0;0;0;0;0;0;0
+pattern_24s03;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s03;0;0;1;0;0;0;0;0;0;0;0;0
+pattern_24s03;0;0;0;0;0;0;0;0;0;0;0;0
+pattern_24s04;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s04;0;0;0;1;0;0;0;0;0;0;0;0
+pattern_24s04;0;0;0;0;0;0;0;0;0;0;0;0
+pattern_24s05;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s05;0;0;0;0;1;0;0;0;0;0;0;0
+pattern_24s05;0;1;0;0;0;0;0;0;0;0;0;0
+pattern_24s06;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s06;0;0;0;0;0;1;0;0;0;0;0;0
+pattern_24s06;0;0;1;0;0;0;0;0;0;0;0;0
+pattern_24s07;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s07;0;0;0;0;0;0;1;0;0;0;0;0
+pattern_24s07;0;0;0;1;0;0;0;0;0;0;0;0
+pattern_24s08;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s08;0;0;0;0;0;0;0;1;0;0;0;0
+pattern_24s08;0;0;0;0;1;0;0;0;0;0;0;0
+pattern_24s09;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s09;0;0;0;0;0;0;0;0;1;0;0;0
+pattern_24s09;0;0;0;0;0;1;0;0;0;0;0;0
+pattern_24s10;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s10;0;0;0;0;0;0;0;0;0;1;0;0
+pattern_24s10;0;0;0;0;0;0;1;0;0;0;0;0
+pattern_24s11;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s11;0;0;0;0;0;0;0;0;0;0;1;0
+pattern_24s11;0;0;0;0;0;0;0;1;0;0;0;0
+pattern_24s12;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s12;0;0;0;0;0;0;0;0;0;0;0;1
+pattern_24s12;0;0;0;0;0;0;0;0;1;0;0;0
+pattern_24s13;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s13;0;0;0;0;0;0;0;0;0;0;0;0
+pattern_24s13;1;0;0;0;0;0;0;0;0;0;0;0
+pattern_24s14;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s14;0;0;0;0;0;0;0;0;0;0;0;0
+pattern_24s14;0;1;0;0;0;0;0;0;0;0;0;0
+pattern_24s15;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s15;0;0;0;0;0;0;0;0;0;0;0;0
+pattern_24s15;0;0;1;0;0;0;0;0;0;0;0;0
+pattern_24s16;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s16;0;0;0;0;0;0;0;0;0;0;0;0
+pattern_24s16;0;0;0;1;0;0;0;0;0;0;0;0
+pattern_24s17;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s17;0;0;0;0;0;0;0;0;0;0;0;0
+pattern_24s17;0;0;0;0;1;0;0;0;0;0;0;0
+pattern_24s18;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s18;0;0;0;0;0;0;0;0;0;0;0;0
+pattern_24s18;0;0;0;0;0;1;0;0;0;0;0;0
+pattern_24s19;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s19;0;0;0;0;0;0;0;0;0;0;0;0
+pattern_24s19;0;0;0;0;0;0;1;0;0;0;0;0
+pattern_24s20;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s20;0;0;0;0;0;0;0;0;0;0;0;0
+pattern_24s20;0;0;0;0;0;0;0;1;0;0;0;0
+pattern_24s21;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s21;0;0;0;0;0;0;0;0;0;0;0;0
+pattern_24s21;0;0;0;0;0;0;0;0;1;0;0;0
+pattern_24s22;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s22;0;0;0;0;0;0;0;0;0;0;0;0
+pattern_24s22;0;0;0;0;0;0;0;0;0;1;0;0
+pattern_24s23;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s23;0;0;0;0;0;0;0;0;0;0;0;0
+pattern_24s23;0;0;0;0;0;0;0;0;0;0;1;0
+pattern_24s24;Pattern fixing 1 for one step and 0 for rest;
+pattern_24s24;0;0;0;0;0;0;0;0;0;0;0;0
+pattern_24s24;0;0;0;0;0;0;0;0;0;0;0;1
