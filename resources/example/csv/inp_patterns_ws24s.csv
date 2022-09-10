@@ -13,28 +13,28 @@ pattern_24s04;0;0;0;1;0;0;0;0;0;0;0;0
 pattern_24s04;0;0;0;0;0;0;0;0;0;0;0;0
 pattern_24s05;Pattern of 24 steps fixing 1 for step 5 and 0 for rest;
 pattern_24s05;0;0;0;0;1;0;0;0;0;0;0;0
-pattern_24s05;0;1;0;0;0;0;0;0;0;0;0;0
+pattern_24s05;0;0;0;0;0;0;0;0;0;0;0;0
 pattern_24s06;Pattern of 24 steps fixing 1 for step 6 and 0 for rest;
 pattern_24s06;0;0;0;0;0;1;0;0;0;0;0;0
-pattern_24s06;0;0;1;0;0;0;0;0;0;0;0;0
+pattern_24s06;0;0;0;0;0;0;0;0;0;0;0;0
 pattern_24s07;Pattern of 24 steps fixing 1 for step 7 and 0 for rest;
 pattern_24s07;0;0;0;0;0;0;1;0;0;0;0;0
-pattern_24s07;0;0;0;1;0;0;0;0;0;0;0;0
+pattern_24s07;0;0;0;0;0;0;0;0;0;0;0;0
 pattern_24s08;Pattern of 24 steps fixing 1 for step 8 and 0 for rest;
 pattern_24s08;0;0;0;0;0;0;0;1;0;0;0;0
-pattern_24s08;0;0;0;0;1;0;0;0;0;0;0;0
+pattern_24s08;0;0;0;0;0;0;0;0;0;0;0;0
 pattern_24s09;Pattern of 24 steps fixing 1 for step 9 and 0 for rest;
 pattern_24s09;0;0;0;0;0;0;0;0;1;0;0;0
-pattern_24s09;0;0;0;0;0;1;0;0;0;0;0;0
+pattern_24s09;0;0;0;0;0;0;0;0;0;0;0;0
 pattern_24s10;Pattern of 24 steps fixing 1 for step 10 and 0 for rest;
 pattern_24s10;0;0;0;0;0;0;0;0;0;1;0;0
-pattern_24s10;0;0;0;0;0;0;1;0;0;0;0;0
+pattern_24s10;0;0;0;0;0;0;0;0;0;0;0;0
 pattern_24s11;Pattern of 24 steps fixing 1 for step 11 and 0 for rest;
 pattern_24s11;0;0;0;0;0;0;0;0;0;0;1;0
-pattern_24s11;0;0;0;0;0;0;0;1;0;0;0;0
+pattern_24s11;0;0;0;0;0;0;0;0;0;0;0;0
 pattern_24s12;Pattern of 24 steps fixing 1 for step 12 and 0 for rest;
 pattern_24s12;0;0;0;0;0;0;0;0;0;0;0;1
-pattern_24s12;0;0;0;0;0;0;0;0;1;0;0;0
+pattern_24s12;0;0;0;0;0;0;0;0;0;0;0;0
 pattern_24s13;Pattern of 24 steps fixing 1 for step 13 and 0 for rest;
 pattern_24s13;0;0;0;0;0;0;0;0;0;0;0;0
 pattern_24s13;1;0;0;0;0;0;0;0;0;0;0;0
