@@ -378,7 +378,7 @@ BEGIN
 		else
 
 			IF v_pluginlot then
-				IF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL then
+				IF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
 
 					-- getting visit class in function: 1st v_lot, 2nd feature_type
 					IF v_lot IS NOT NULL AND p_visittype = 1 AND v_visitclass IS NULL THEN
@@ -976,8 +976,21 @@ BEGIN
 					IF v_userrole LIKE '%role_basic%' THEN
 						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'disabled', True);
 					END IF;
-					
-					IF (aux_json->>'widgettype')='combo' THEN 
+
+					IF (aux_json->>'widgettype')='combo' THEN
+
+						-- TO DO add new combo values for status when status = 5
+						IF (aux_json->>'columnname') = 'status' AND v_fieldvalue = '5' THEN
+							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'comboIds', replace(aux_json->>'comboIds', ']', ',"5"]')::json);
+							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'comboNames', replace(aux_json->>'comboNames', ']', ',"Validada"]')::json);
+							
+							FOREACH aux_json IN ARRAY v_fields 
+							LOOP
+								v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'disabled', True);
+							END LOOP;
+							
+						END IF;
+
 						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_fieldvalue, ''));
 
 						-- setting parameter in case of singleevent visit
