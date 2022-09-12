@@ -93,6 +93,8 @@ v_node_incid_tip integer;
 v_emb_incid_tip integer;
 v_count integer;
 v_message3 json;
+v_user_name text;
+v_visit_type integer;
 
 
 BEGIN
@@ -138,6 +140,17 @@ BEGIN
 	END IF;
 
 	PERFORM setval('"SCHEMA_NAME".doc_x_visit_id_seq', (SELECT max(id) FROM doc_x_visit), true);
+
+	-- only allow visit update to the same user (not valid for incidence visit_type 2)
+	SELECT visit_type, user_name INTO v_visit_type, v_user_name FROM om_visit WHERE id=v_id;
+
+	IF v_visit_type=1 AND v_user_name <> current_user THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"3205", "function":"2622","debug_msg":""}}$$);'INTO v_message3;
+		v_message3 = (((v_message3->>'body')::json->>'data')::json->>'info')::json;
+		RETURN ('{"status":"Accepted", "message":'||v_message3||', "apiVersion":'|| v_version ||',
+		"body": {"data":{}}}')::json;
+	END IF;
 
 	-- exception for duplicated incidence
 	IF v_tablename='ve_visit_node_incidencia' OR v_tablename='ve_visit_emb_incidencia' THEN
