@@ -137,6 +137,9 @@ v_debug_vars json;
 v_debug json;
 v_msgerr json;
 v_epa text;
+v_elevation float;
+v_staticpressure float;
+
 
 BEGIN
 
@@ -200,6 +203,7 @@ BEGIN
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
 	EXECUTE v_active_feature INTO v_catfeature;
+
 
 	--  Starting control process
 	----------------------------
@@ -402,6 +406,17 @@ BEGIN
 		v_muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(p_reduced_geometry, ext_municipality.the_geom,0.001) 
 		AND active IS TRUE LIMIT 1); 
 
+		-- Dem elevation
+		IF v_sys_raster_dem AND v_edit_insert_elevation_from_dem AND p_idname IN ('node_id', 'connec_id', 'gully_id') THEN
+			v_elevation = (SELECT ST_Value(rast,1, p_reduced_geometry, true) FROM v_ext_raster_dem WHERE id = 
+			(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, p_reduced_geometry, 1) LIMIT 1))::numeric (12,3);
+		END IF;
+
+		-- static pressure
+		IF v_project_type = 'WS' AND v_presszone_id IS NOT NULL THEN
+			v_staticpressure = (SELECT head from presszone WHERE presszone_id = v_presszone_id) - v_elevation;
+		END IF;
+
 	ELSIF p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN
 
 		-- getting values from feature
@@ -410,6 +425,7 @@ BEGIN
 		ELSE
 			EXECUTE ('SELECT epa_type FROM ' || substring(p_idname, 0, length(p_idname)-2) || ' WHERE ' || p_idname || ' = ''' || p_id || '''') INTO v_epa;
 		END IF;
+		
 		IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = 'SCHEMA_NAME' AND table_name = concat('ve_epa_',lower(v_epa)))) IS TRUE THEN
 			v_querystring = concat('SELECT (row_to_json(a)) FROM 
 				(SELECT * FROM ',p_table_id,' a LEFT JOIN ve_epa_',lower(v_epa),' b ON a.',quote_ident(p_idname),'=b.',quote_ident(p_idname),' WHERE a.',quote_ident(p_idname),' = CAST(',quote_literal(p_id),' AS ',(p_columntype),'))a');
@@ -420,16 +436,16 @@ BEGIN
 		ELSE
 			v_querystring = concat('SELECT (row_to_json(a)) FROM 
 			(SELECT * FROM ',p_table_id,' WHERE ',quote_ident(p_idname),' = CAST(',quote_literal(p_id),' AS ',(p_columntype),'))a');
-			v_debug_vars := json_build_object('p_table_id', p_table_id, 'p_idname', p_idname, 'p_id', p_id, 'p_columntype', p_columntype);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 25);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-			EXECUTE v_querystring INTO v_values_array;
 		END IF;
 		
+		v_debug_vars := json_build_object('p_table_id', p_table_id, 'p_idname', p_idname, 'p_id', p_id, 'p_columntype', p_columntype);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 20);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO v_values_array;
+
 		-- getting node values in case of arcs (update)
 		v_node1 := (v_values_array->>'node_1');
 		v_node2 := (v_values_array->>'node_2');	
-		
 	END IF;
 
 	-- building the form widgets
@@ -582,7 +598,7 @@ BEGIN
 
 				-- dynamic mapzones
 				WHEN 'presszone_id' THEN
-					field_value = v_presszone_id;			
+					field_value = v_presszone_id;
 				WHEN 'sector_id' THEN 
 					field_value = v_sector_id;
 				WHEN 'dma_id' THEN 
@@ -601,14 +617,13 @@ BEGIN
 					field_value = v_muni_id;
 
 				-- elevation from raster
-				WHEN 'elevation', 'top_elev' THEN 
-					IF v_sys_raster_dem AND v_edit_insert_elevation_from_dem THEN
-						field_value = (SELECT ST_Value(rast,1, p_reduced_geometry, true) FROM v_ext_raster_dem WHERE 
-						id = (SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, p_reduced_geometry, 1) LIMIT 1))::numeric (12,3);
-					ELSE
-						field_value = null;
-					END IF;
-								
+				WHEN 'elevation', 'top_elev' THEN
+					field_value = v_elevation;
+
+				-- staticpressure
+				WHEN 'staticpressure' THEN
+					field_value = v_staticpressure;
+													
 				-- catalog values
 				WHEN 'cat_dnom' THEN
 					field_value = v_dnom;
@@ -718,10 +733,10 @@ BEGIN
 				END IF;
 
 				
-			ELSIF  p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN
+			ELSIF  p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN 
 				field_value := (v_values_array->>(aux_json->>'columnname'));
 			END IF;
-
+		
 			-- setting values
 			IF (aux_json->>'widgettype')='combo' THEN 
 				--check if selected id is on combo list

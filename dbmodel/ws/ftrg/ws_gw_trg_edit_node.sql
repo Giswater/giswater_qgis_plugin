@@ -64,9 +64,9 @@ BEGIN
 	v_man_table:= TG_ARGV[0];
 
 	-- get dynamic mapzones status
-	v_isdma := (SELECT value::json->>'DMA' FROM config_param_system WHERE parameter = 'utils_grafanalytics_status');
-	v_issector:= (SELECT value::json->>'SECTOR' FROM config_param_system WHERE parameter = 'utils_grafanalytics_status');
-	v_ispresszone:= (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'utils_grafanalytics_status');
+	v_isdma := (SELECT value::json->>'DMA' FROM config_param_system WHERE parameter = 'utils_graphanalytics_status');
+	v_issector:= (SELECT value::json->>'SECTOR' FROM config_param_system WHERE parameter = 'utils_graphanalytics_status');
+	v_ispresszone:= (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'utils_graphanalytics_status');
 
 	-- get automatic insert for mapzone
 	v_isautoinsertsector:= (SELECT value::json->>'SECTOR' FROM config_param_system WHERE parameter = 'edit_mapzone_automatic_insert');
@@ -343,7 +343,6 @@ BEGIN
 
 		END IF;
 		
-		
 		--Inventory
 		IF NEW.inventory IS NULL THEN 
 			NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
@@ -398,9 +397,13 @@ BEGIN
 			EXECUTE v_sql INTO v_node_id;
 			NEW.parent_id=v_node_id;
 		END IF;
-		-- link
-		
-		IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
+	
+		-- LINK
+		--google maps style
+		IF (SELECT (value::json->>'google_maps')::boolean FROM config_param_system WHERE parameter='edit_custom_link') IS TRUE THEN
+			NEW.link=CONCAT ('https://www.google.com/maps/place/',(ST_Y(ST_transform(NEW.the_geom,4326))),'N+',(ST_X(ST_transform(NEW.the_geom,4326))),'E');
+		--fid style
+		ELSIF (SELECT (value::json->>'fid')::boolean FROM config_param_system WHERE parameter='edit_custom_link') IS TRUE THEN
 			NEW.link=NEW.node_id;
 		END IF;
 
@@ -576,9 +579,9 @@ BEGIN
 
 		END IF;
 
-		--insert tank into config_graf_inlet
+		--insert tank into config_graph_inlet
 		IF v_man_table='man_tank' THEN
-			INSERT INTO config_graf_inlet(node_id, expl_id, active)
+			INSERT INTO config_graph_inlet(node_id, expl_id, active)
 			VALUES (NEW.node_id, NEW.expl_id, TRUE);
 		END IF;
 
@@ -622,10 +625,23 @@ BEGIN
 			VALUES (NEW.node_id, v_epavdef ->>'valv_type', (v_epavdef ->>'coef_loss')::numeric, (v_epavdef ->>'pressure')::numeric, v_epavdef ->>'status', (v_epavdef ->>'minorloss')::numeric);
 
 		ELSIF (NEW.epa_type = 'SHORTPIPE') THEN
-			INSERT INTO inp_shortpipe (node_id) VALUES (NEW.node_id);
+
+			v_customfeature	:= (SELECT nodetype_id FROM cat_node WHERE id = NEW.nodecat_id);		
+			SELECT vdef INTO v_epavdef FROM (
+			SELECT json_array_elements_text ((value::json->>'catfeatureId')::json) id , (value::json->>'vdefault') vdef FROM config_param_system WHERE parameter like 'epa_shortpipe_vdefault'
+			)a WHERE id = v_customfeature;
+			
+			INSERT INTO inp_shortpipe (node_id, status, minorloss) 
+			VALUES (NEW.node_id,  v_epavdef ->>'status', (v_epavdef ->>'minorloss')::numeric);
+
 				
 		ELSIF (NEW.epa_type = 'INLET') THEN
 			INSERT INTO inp_inlet (node_id) VALUES (NEW.node_id);		
+		END IF;
+
+		-- static pressure
+		IF v_ispresszone AND NEW.presszone_id IS NOT NULL THEN
+			UPDATE node SET staticpressure = (SELECT head from presszone WHERE presszone_id = NEW.presszone_id)-elevation WHERE node_id = NEW.node_id;
 		END IF;
 
 		-- man2inp_values
@@ -635,6 +651,12 @@ BEGIN
 
     -- UPDATE
     ELSIF TG_OP = 'UPDATE' THEN
+
+    	-- static pressure
+		IF v_ispresszone AND (NEW.presszone_id != OLD.presszone_id) THEN
+			UPDATE node SET staticpressure = (SELECT head from presszone WHERE presszone_id = NEW.presszone_id)-elevation 
+			WHERE node_id = NEW.node_id;
+		END IF;
 
 		-- EPA update
 		IF (NEW.epa_type != OLD.epa_type) THEN    
@@ -657,16 +679,28 @@ BEGIN
 
 		    -- specific case to move data between inlet <-> tank
 		    IF (OLD.epa_type = 'TANK') and (NEW.epa_type = 'INLET') THEN
-		        DELETE FROM inp_inlet WHERE node_id = OLD.node_id;
-			INSERT INTO inp_inlet (node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow)
-			SELECT NEW.node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow 
-			FROM inp_tank WHERE node_id = OLD.node_id;
+		      DELETE FROM inp_inlet WHERE node_id = OLD.node_id;
+					INSERT INTO inp_inlet (node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow)
+					SELECT NEW.node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow 
+					FROM inp_tank WHERE node_id = OLD.node_id;
 
 		    ELSIF (OLD.epa_type = 'INLET') and (NEW.epa_type = 'TANK') THEN
-			DELETE FROM inp_tank WHERE node_id = OLD.node_id;
-			INSERT INTO inp_tank 
-			SELECT NEW.node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow  
-			FROM inp_inlet WHERE node_id = OLD.node_id;
+					DELETE FROM inp_tank WHERE node_id = OLD.node_id;
+					INSERT INTO inp_tank 
+					SELECT NEW.node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow  
+					FROM inp_inlet WHERE node_id = OLD.node_id;
+					
+				ELSIF (OLD.epa_type = 'RESERVOIR') and (NEW.epa_type = 'INLET') THEN
+		      DELETE FROM inp_inlet WHERE node_id = OLD.node_id;
+					INSERT INTO inp_inlet (node_id, pattern_id, head)
+					SELECT NEW.node_id, pattern_id, head
+					FROM inp_reservoir WHERE node_id = OLD.node_id;
+
+		    ELSIF (OLD.epa_type = 'INLET') and (NEW.epa_type = 'RESERVOIR') THEN
+					DELETE FROM inp_reservoir WHERE node_id = OLD.node_id;
+					INSERT INTO inp_reservoir (node_id, pattern_id, head)
+					SELECT NEW.node_id, pattern_id, head
+					FROM inp_inlet WHERE node_id = OLD.node_id;
 		    END IF;
 		
 		    IF v_inp_table IS NOT NULL THEN
@@ -830,9 +864,9 @@ BEGIN
 			hmax=NEW.hmax
 			WHERE node_id=OLD.node_id;
 			
-			--update config_graf_inlet if exploitation changes
+			--update config_graph_inlet if exploitation changes
 			IF NEW.expl_id != OLD.expl_id THEN
-				UPDATE config_graf_inlet SET expl_id=NEW.expl_id WHERE node_id=NEW.node_id;
+				UPDATE config_graph_inlet SET expl_id=NEW.expl_id WHERE node_id=NEW.node_id;
 			END IF;
 	
 		ELSIF v_man_table ='man_pump' THEN
@@ -966,8 +1000,8 @@ BEGIN
 		-- restore plan_psector_force_delete
 		UPDATE config_param_user SET value = v_force_delete WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
 
-		--remove node from config_graf_inlet
-		DELETE FROM config_graf_inlet WHERE node_id=OLD.node_id;
+		--remove node from config_graph_inlet
+		DELETE FROM config_graph_inlet WHERE node_id=OLD.node_id;
 
 		--Delete addfields (after or before deletion of node, doesn't matter)
 		DELETE FROM man_addfields_value WHERE feature_id = OLD.node_id  and parameter_id in 

@@ -57,6 +57,13 @@ v_srid integer;
 v_force_delete boolean;
 v_system_id text;
 
+v_gully_outlet_type text;
+v_gully_method text;
+v_gully_weir_cd float;
+v_gully_orifice_cd float;
+v_gully_efficiency float;
+
+
 -- automatic_man2inp_values
 v_man_view text;
 v_input json;
@@ -77,6 +84,14 @@ BEGIN
 	-- get data from config table	
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
+
+
+	-- get user variables
+	v_gully_outlet_type = (SELECT value FROM config_param_user WHERE parameter = 'epa_gully_outlet_type_vdefault' AND cur_user = current_user);
+	v_gully_method = (SELECT value FROM config_param_user WHERE parameter = 'epa_gully_method_vdefault' AND cur_user = current_user);
+	v_gully_weir_cd = (SELECT value FROM config_param_user WHERE parameter = 'epa_gully_weir_cd_vdefault' AND cur_user = current_user);
+	v_gully_orifice_cd = (SELECT value FROM config_param_user WHERE parameter = 'epa_gully_orifice_cd_vdefault' AND cur_user = current_user);
+	v_gully_efficiency = (SELECT value FROM config_param_user WHERE parameter = 'epa_gully_efficiency_vdefault' AND cur_user = current_user);
 
 	
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
@@ -434,8 +449,12 @@ BEGIN
 			END IF;
 		END IF;
 
-		-- Link
-		IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
+		-- LINK
+		--google maps style
+		IF (SELECT (value::json->>'google_maps')::boolean FROM config_param_system WHERE parameter='edit_custom_link') IS TRUE THEN
+			NEW.link=CONCAT ('https://www.google.com/maps/place/',(ST_Y(ST_transform(NEW.the_geom,4326))),'N+',(ST_X(ST_transform(NEW.the_geom,4326))),'E');
+		--fid style
+		ELSIF (SELECT (value::json->>'fid')::boolean FROM config_param_system WHERE parameter='edit_custom_link') IS TRUE THEN
 			NEW.link=NEW.node_id;
 		END IF;
 		
@@ -482,6 +501,11 @@ BEGIN
 			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'node_function_vdefault' AND cur_user = current_user);
 		END IF;
 
+		-- Ymax
+		IF (NEW.ymax IS NULL) THEN
+		    NEW.ymax := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_node_ymax_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
+
 		--elevation from raster
 		IF (SELECT upper(value) FROM config_param_system WHERE parameter='admin_raster_dem') = 'TRUE' AND (NEW.top_elev IS NULL) AND
 			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_insert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
@@ -489,7 +513,6 @@ BEGIN
 				(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
 		END IF; 
 
-		
 		-- feature insert
 		IF v_matfromcat THEN
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
@@ -553,9 +576,9 @@ BEGIN
 						
 		ELSIF v_man_table='man_netgully' THEN
 
-			INSERT INTO man_netgully (node_id,  sander_depth, gratecat_id, units, groove, siphon ) 
+			INSERT INTO man_netgully (node_id,  sander_depth, gratecat_id, units, groove, siphon, gratecat2_id, groove_length, groove_height, units_placement ) 
 			VALUES(NEW.node_id,  NEW.sander_depth, NEW.gratecat_id, NEW.units, 
-			NEW.groove, NEW.siphon );
+			NEW.groove, NEW.siphon, NEW.gratecat2_id, NEW.groove_length, NEW.groove_height, NEW.units_placement);
 									 			
 		ELSIF v_man_table='man_chamber' THEN
 
@@ -618,6 +641,9 @@ BEGIN
 			INSERT INTO inp_outfall (node_id, outfall_type) VALUES (NEW.node_id, 'NORMAL');			
 		ELSIF (NEW.epa_type = 'STORAGE') THEN
 			INSERT INTO inp_storage (node_id, storage_type) VALUES (NEW.node_id, 'TABULAR');	
+		ELSIF (NEW.epa_type = 'NETGULLY') THEN
+			INSERT INTO inp_netgully (node_id, y0, ysur, apond, outlet_type, method, weir_cd, orifice_cd, efficiency) 
+			VALUES (NEW.node_id, 0, 0, 0, v_gully_outlet_type, v_gully_method, v_gully_weir_cd, v_gully_orifice_cd, v_gully_efficiency);
 		END IF;
 
 		-- man2inp_values
@@ -636,7 +662,9 @@ BEGIN
 			ELSIF (OLD.epa_type = 'OUTFALL') THEN
 				v_inp_table:= 'inp_outfall';    
 			ELSIF (OLD.epa_type = 'STORAGE') THEN
-				v_inp_table:= 'inp_storage';    
+				v_inp_table:= 'inp_storage'; 
+			ELSIF (OLD.epa_type = 'NETGULLY') THEN
+				v_inp_table:= 'inp_netgully';    
 			END IF;
 		
 			IF v_inp_table IS NOT NULL THEN
@@ -654,10 +682,20 @@ BEGIN
 				v_inp_table:= 'inp_outfall';  
 			ELSIF (NEW.epa_type = 'STORAGE') THEN
 				v_inp_table:= 'inp_storage';
+			ELSIF (NEW.epa_type = 'NETGULLY') THEN
+				v_inp_table:= 'inp_netgully'; 
 			END IF;
 			IF v_inp_table IS NOT NULL THEN
 				v_sql:= 'INSERT INTO '||v_inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||') ON CONFLICT (node_id) DO NOTHING';
 				EXECUTE v_sql;
+
+				IF (NEW.epa_type = 'NETGULLY') THEN
+					UPDATE inp_netgully SET outlet_type = v_gully_outlet_type, method = v_gully_method, weir_cd = v_gully_weir_cd,
+					orifice_cd = v_gully_orifice_cd, efficiency = v_gully_efficiency
+					WHERE node_id = OLD.node_id;
+
+				END IF;
+
 			END IF;
 		END IF;
 
@@ -791,7 +829,8 @@ BEGIN
 				UPDATE polygon SET the_geom = v_the_geom_pol WHERE feature_id = NEW.node_id;
 			END IF;
 
-			UPDATE man_netgully SET sander_depth=NEW.sander_depth, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon
+			UPDATE man_netgully SET sander_depth=NEW.sander_depth, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon,
+			gratecat2_id=NEW.gratecat2_id, groove_length=NEW.groove_length, groove_height=NEW.groove_height, units_placement=NEW.units_placement
 			WHERE node_id=OLD.node_id;
 			
 		ELSIF v_man_table='man_outfall' THEN
