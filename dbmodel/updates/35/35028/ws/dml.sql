@@ -24,3 +24,5 @@ WHERE id=2768;
 INSERT INTO config_toolbox
 VALUES (3008, 'Arc reverse', TRUE, '{"featureType":["arc"]}',null, null, TRUE)
 ON CONFLICT (id) DO NOTHING;
+
+UPDATE cat_feature_node SET isprofilesurface = false;

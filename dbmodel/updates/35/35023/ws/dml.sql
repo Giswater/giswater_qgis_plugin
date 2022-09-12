@@ -19,8 +19,6 @@ VALUES ('om_profile_guitartext',$${"arc":"SELECT arc_id AS arc_id, concat(v_edit
 INSERT INTO config_param_system ("parameter",value,descript,"label",isenabled,layoutorder,project_type,"datatype",widgettype,ismandatory,layoutname)
 VALUES ('om_profile_vdefault','{"arc":{"cat_geom1":"0.40"}, "node":{"cat_geom1":"1"}}','Default values used on profile tool if any of the values were NULL','Profile default values if NULL:',false,15,'ws','json','linetext',true,'lyt_admin_om');
 
-UPDATE cat_feature_node SET isprofilesurface = false;
-
 INSERT INTO sys_table (id, descript, sys_role, source)
 VALUES ('v_anl_grafanalytics_mapzones', 'Table to work with grafanalytics', 'role_epa', 'giswater') 
 ON CONFLICT (id) DO NOTHING;
