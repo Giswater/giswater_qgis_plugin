@@ -15,7 +15,7 @@ DECLARE
     v_sql varchar;
     v_old_nodetype varchar;
     v_new_nodetype varchar;    
-
+    v_input json;
 	
 	
 BEGIN
@@ -83,7 +83,49 @@ BEGIN
             UPDATE inp_outfall 
 			SET outfall_type=NEW.outfall_type,stage=NEW.stage,curve_id=NEW.curve_id,timser_id=NEW.timser_id,gate=NEW.gate 
 			WHERE node_id=OLD.node_id;
+
+		ELSIF v_node_table = 'inp_netgully' THEN   
+
+			--get default values
+	        IF (NEW.outlet_type IS NULL) THEN
+	            NEW.outlet_type := (SELECT "value" FROM config_param_user WHERE "parameter"='epa_gully_outlet_type_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+	        END IF;
+
+	        IF (NEW.method IS NULL) THEN
+	            NEW.method := (SELECT "value" FROM config_param_user WHERE "parameter"='epa_gully_method_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+	        END IF;
+
+	        IF NEW.weir_cd IS NULL AND NEW.outlet_type='W/0' THEN
+	            NEW.method := (SELECT "value" FROM config_param_user WHERE "parameter"='epa_gully_weir_cd_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+	        ELSIF NEW.orifice_cd IS NULL AND NEW.outlet_type='W/0' THEN
+	            NEW.method := (SELECT "value" FROM config_param_user WHERE "parameter"='epa_gully_orifice_cd_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+	        END IF;
+
+	        IF (NEW.efficiency IS NULL) THEN
+	            NEW.efficiency := (SELECT "value" FROM config_param_user WHERE "parameter"='epa_gully_efficiency_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+	        END IF;
+
+        	UPDATE node 
+	        SET custom_top_elev=NEW.custom_top_elev
+	        WHERE node_id=OLD.node_id;
+
+            UPDATE man_netgully 
+			SET units=NEW.units,units_placement=NEW.units_placement,gratecat_id=NEW.gratecat_id,groove=NEW.groove,groove_height=NEW.groove_height,
+			groove_length=NEW.groove_length
+			WHERE node_id=OLD.node_id;
+
+			UPDATE inp_netgully 
+	        SET custom_length=NEW.custom_length, efficiency=NEW.efficiency,
+	        outlet_type=NEW.outlet_type,  custom_width=NEW.custom_width,
+	        custom_depth=NEW.custom_depth, method=NEW.method, weir_cd=NEW.weir_cd, orifice_cd=NEW.orifice_cd,
+	        custom_a_param=NEW.custom_a_param, custom_b_param=NEW.custom_b_param, ysur=NEW.ysur,y0=NEW.y0,apond=NEW.apond
+	        WHERE node_id=OLD.node_id;
+	        
         END IF;
+
+        v_input = concat('{"feature":{"type":"node", "childLayer":"',v_node_table,'", "id":"',NEW.node_id,'"}}');
+        -- inp2man_values
+		PERFORM gw_fct_man2inp_values(v_input);
 
         RETURN NEW;
 

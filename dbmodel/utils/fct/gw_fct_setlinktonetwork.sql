@@ -67,6 +67,7 @@ v_version text;
 v_autoupdate_dma boolean;
 v_autoupdate_fluid boolean;
 v_forcedarcs text;
+v_ispresszone boolean;
 
 BEGIN
 	
@@ -82,6 +83,7 @@ BEGIN
 	-- control autoupdate_dma
 	SELECT value::boolean INTO v_autoupdate_dma FROM config_param_system WHERE parameter='edit_connect_autoupdate_dma';
 	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid';
+	v_ispresszone:= (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'utils_graphanalytics_status');
 
 	-- get parameters from input json
 	v_feature_type =  ((p_data ->>'data')::json->>'feature_type'::text);
@@ -293,6 +295,10 @@ BEGIN
 						-- update specific fields for ws projects
 						IF v_projecttype = 'WS' THEN
 							UPDATE connec SET dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id,presszone_id=v_arc.presszone_id WHERE connec_id = v_connect_id;
+
+							IF v_ispresszone THEN
+								UPDATE connec SET staticpressure = ((SELECT head from presszone WHERE presszone_id = v_arc.presszone_id)- v_connect.elevation) WHERE connec_id=v_connect_id;
+							END IF;
 						END IF;
 					
 						-- Update state_type if edit_connect_update_statetype is TRUE

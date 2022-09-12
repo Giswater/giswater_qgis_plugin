@@ -47,7 +47,7 @@ BEGIN
     SET search_path = "ws", public;
 
     -- Get debug variable
-    SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='om_mincut_debug';
+    SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='admin_debug';
     SELECT value::int2 INTO v_mincutversion FROM config_param_system WHERE parameter='om_mincut_version';
 	
     -- Starting process

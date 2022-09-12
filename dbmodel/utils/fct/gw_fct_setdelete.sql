@@ -50,6 +50,7 @@ v_message text;
 v_result text;
 v_feature json;
 v_error_context text;
+v_message2 json;
 
 
 BEGIN
@@ -140,12 +141,25 @@ BEGIN
 
 		-- if exists
 		IF v_result IS NOT NULL THEN
+			
+			-- exception for lots with related visits. Show Warning message
+			IF v_tablename='om_visit_lot' THEN
+				SELECT count(*) INTO v_count FROM om_visit WHERE lot_id=v_id::integer;
+				IF v_count > 0 THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3201", "function":"2608","debug_msg":""}}$$);'INTO v_message2;
+					v_message2 = (((v_message2->>'body')::json->>'data')::json->>'info')::json;
+					RETURN ('{"status":"Accepted", "message":'||v_message2||', "apiVersion":'|| v_version ||',
+					"body": {}}')::json; 
+				END IF;				   
+			END IF;
+		
 			v_querytext := 'DELETE FROM ' || quote_ident(v_tablename) ||' WHERE '|| quote_ident(v_idname) ||' = '||quote_literal(v_id);
 			
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3114", "function":"2608","debug_msg":""}}$$)'
 			INTO v_message;
-			EXECUTE v_querytext ;
+			EXECUTE v_querytext;
 		ELSE
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3116", "function":"2608","debug_msg":""}}$$)' 

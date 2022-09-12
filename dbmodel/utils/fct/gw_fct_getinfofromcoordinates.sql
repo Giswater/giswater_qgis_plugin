@@ -91,7 +91,7 @@ v_debug json;
 v_msgerr json;
 v_featuredialog text;
 v_client_epsg integer;
-
+v_field_state text;
 
 BEGIN
 
@@ -224,6 +224,10 @@ BEGIN
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
 		EXECUTE v_querystring INTO v_the_geom;
+
+		EXECUTE 'SELECT column_name FROM information_schema.columns 
+		WHERE table_name='||quote_literal(v_schemaname)||' and column_name=''state'' and table_schema='||quote_literal(v_layer)||''
+		INTO v_field_state;
 	        
 		IF v_layer.geomtype = 'polygon' THEN
 
@@ -235,7 +239,7 @@ BEGIN
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
 			EXECUTE v_querystring INTO v_id;
-		ELSIF v_layer.layer_id ILIKE '%visit' THEN
+		ELSIF v_layer.layer_id ILIKE '%visit' or v_field_state is null THEN
 			--  Get element from active layer, using the distance from the clicked point to order possible multiselection (minor as first)
 			v_querystring = concat('SELECT ',quote_ident(v_idname),' FROM ',quote_ident(v_layer.layer_id),' WHERE st_dwithin (''',v_point,''', ',quote_ident(v_layer.layer_id),'.',quote_ident(v_the_geom),', ',v_sensibility,') 
 			ORDER BY ST_Distance(',v_layer.layer_id,'.',v_the_geom,', ''',v_point,''') asc LIMIT 1');

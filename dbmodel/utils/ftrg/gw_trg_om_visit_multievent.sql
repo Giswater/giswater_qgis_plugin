@@ -54,7 +54,11 @@ BEGIN
 	END IF;
 	
 	-- only for planified visits insert lot_id
-	IF v_pluginlot AND v_visit_type=1 THEN
+	IF v_pluginlot AND v_visit_type=1 AND (SELECT parent_id FROM config_visit_class WHERE id=NEW.class_id) IS NOT NULL THEN
+		INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, enddate, webclient_id, expl_id, the_geom, descript, is_done, class_id, lot_id, status, unit_id) 
+		VALUES (NEW.visit_id, NEW.visitcat_id, NEW.ext_code, NEW.startdate::timestamp, NEW.enddate, NEW.webclient_id, NEW.expl_id, NEW.the_geom, NEW.descript, 
+		NEW.is_done, NEW.class_id, NEW.lot_id, NEW.status, NEW.unit_id);
+	ELSIF v_pluginlot AND v_visit_type=1 THEN
 		INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, enddate, webclient_id, expl_id, the_geom, descript, is_done, class_id, lot_id, status) 
 		VALUES (NEW.visit_id, NEW.visitcat_id, NEW.ext_code, NEW.startdate::timestamp, NEW.enddate, NEW.webclient_id, NEW.expl_id, NEW.the_geom, NEW.descript, 
 		NEW.is_done, NEW.class_id, NEW.lot_id, NEW.status);
@@ -86,9 +90,9 @@ BEGIN
                         END IF;
 
                         SELECT string_agg (concat, ' ') INTO v_num_elem_visit FROM (
-                        SELECT concat('trams:', array_agg(arc_id)) FROM om_visit_lot_x_arc WHERE unit_id=v_unit_id
+                        SELECT concat('trams:', array_agg(arc_id)) FROM om_visit_lot_x_arc WHERE unit_id=v_unit_id AND lot_id=NEW.lot_id
                         UNION 
-                        SELECT concat('nodes:', array_agg(node_id)) FROM om_visit_lot_x_node WHERE unit_id=v_unit_id)b;
+                        SELECT concat('nodes:', array_agg(node_id)) FROM om_visit_lot_x_node WHERE unit_id=v_unit_id AND lot_id=NEW.lot_id)b;
 
                         v_new_value_param=v_num_elem_visit;
                    	END IF;

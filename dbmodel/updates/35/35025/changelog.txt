@@ -1,0 +1,5 @@
+3.5.025
+*************
+- New trigger gw_trg_edit_hydrology for editing data related to hydrology (UD)
+- New trigger gw_trg_edit_inp_dwffor editing data related to cat_dwf_scenario (UD)
+- New function gw_fct_import_cat_feature for importing configuration of cat features from csv files

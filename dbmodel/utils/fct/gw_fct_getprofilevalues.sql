@@ -201,7 +201,7 @@ BEGIN
 
 		IF v_count > 0 THEN
 			v_level = 2;
-			v_message = concat('There is/are ',v_count, ' ',object_rec.idval,'(s) with id''s not integer on the system. It is not possible to build the graf matrix to check shortestpath.');	
+			v_message = concat('There is/are ',v_count, ' ',object_rec.idval,'(s) with id''s not integer on the system. It is not possible to build the graph matrix to check shortestpath.');	
 		END IF;
 	END LOOP;
 
@@ -311,7 +311,7 @@ BEGIN
 			('|| v_query_dijkstra ||')a
 			USING (node_id)';
 
-		-- looking for null values (in case of exists links graf will be disabled as below)
+		-- looking for null values (in case of exists links graph will be disabled as below)
 		IF v_project_type = 'UD' THEN
 			SELECT count(*) INTO v_count FROM anl_node WHERE (elev IS NULL or ymax is null OR top_elev is null) AND fid = 222 and cur_user = current_user;
 		ELSIF v_project_type = 'WS' THEN
@@ -457,7 +457,7 @@ BEGIN
 			WHERE fid=222 AND cur_user = current_user AND '||v_fymax||' IS NULL';
 
 		-- update node catalog
-		UPDATE anl_node SET nodecat_id = 'BOTTOM' FROM cat_feature_node n WHERE n.id = sys_type AND isprofilesurface IS FALSE AND fid=222 AND cur_user = current_user AND nodecat_id !='VNODE';
+		UPDATE anl_node SET nodecat_id = 'BOTTOM' FROM cat_feature_node n WHERE n.type = sys_type AND isprofilesurface IS FALSE AND fid=222 AND cur_user = current_user AND nodecat_id !='VNODE';
 		UPDATE anl_node SET nodecat_id = 'TOP' WHERE nodecat_id NOT IN ('BOTTOM', 'VNODE') AND fid=222 AND cur_user = current_user;
 
 		-- update node type
@@ -572,7 +572,7 @@ BEGIN
 				v_ftopelev||' AS top_elev, elev, '||v_fymax||' AS ymax, total_distance FROM anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id != ''VNODE'' ORDER BY total_distance) row'
 				INTO v_node;
 				/*      
-				SELECT node_id, descript, sys_type, cat_geom1, top_elev, elev, ymax FROM anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id != 'VNODE' ORDER BY total_distance
+				SELECT node_id, nodecat_id as surface_type, descript, sys_type, cat_geom1, top_elev, elev, ymax FROM anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id != 'VNODE' ORDER BY total_distance
 				select * from anl_arc WHERE fid=222 AND cur_user = current_user order by total_length
 				select * from anl_node WHERE fid=222 AND cur_user = current_user ORDER BY total_distance 
 				*/

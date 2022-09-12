@@ -39,6 +39,7 @@ v_result_point json;
 v_result_line json;
 v_selectionmode text;
 v_error_context text;
+v_slopedirection boolean;
 
 BEGIN 
 
@@ -56,6 +57,9 @@ BEGIN
 	v_selectionmode := (p_data ->>'data')::json->>'selectionMode';
 	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
 
+	-- get system values
+	SELECT value INTO v_slopedirection FROM config_param_system WHERE parameter = 'edit_slope_direction';
+
 	-- starting function
 	INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat('ARC REVERSE FUNCTION'));
 	INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat('------------------------------'));
@@ -68,11 +72,15 @@ BEGIN
 			-- execute
 			EXECUTE 'INSERT INTO anl_arc(fid, arc_id, the_geom, descript) 
 			SELECT 357, arc_id, the_geom, ''Arc reversed before reverse'' FROM arc WHERE arc_id IN ' ||v_array || ' ORDER BY arc_id';
-				
+
+			-- set geometry
 			EXECUTE 'UPDATE arc SET the_geom=st_reverse(the_geom) WHERE arc_id IN ' ||v_array;
 
-			INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat ('Reversed arcs: arc_id --> ', 
-			(SELECT array_agg(arc_id) FROM (SELECT arc_id FROM anl_arc WHERE fid=357 AND cur_user=current_user)a )));
+			-- set inverted slope
+			IF v_slopedirection THEN
+				EXECUTE 'UPDATE arc SET inverted_slope = true WHERE sys_elev1 < sys_elev2 AND arc_id IN ' ||v_array;
+				EXECUTE 'UPDATE arc SET inverted_slope = false WHERE sys_elev1 >= sys_elev2 AND arc_id IN ' ||v_array;
+			END IF;
 		END IF;
 	ELSE 
 		INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat ('Selection mode ''Whole selection'' is not enabled in this function'));

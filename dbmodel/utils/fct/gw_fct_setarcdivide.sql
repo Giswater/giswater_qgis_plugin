@@ -102,12 +102,13 @@ v_arc_closest text;
 v_set_arc_obsolete boolean;
 v_set_old_code boolean;
 v_obsoletetype integer;
-v_node1_graf text;
-v_node2_graf text;
+v_node1_graph text;
+v_node2_graph text;
 v_node_1 text;
 v_node_2 text;
-v_new_node_graf text;
-v_graf_arc_id TEXT;
+v_new_node_graph text;
+v_graph_arc_id TEXT;
+v_force_delete text;
 
 BEGIN
 
@@ -270,23 +271,23 @@ BEGIN
 
 					IF v_project_type = 'WS' THEN
 
-						--check if final nodes maybe graf delimiters
-						EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf, node_1 FROM v_edit_arc a 
+						--check if final nodes maybe graph delimiters
+						EXECUTE 'SELECT CASE WHEN lower(graph_delimiter) = ''none'' or lower(graph_delimiter) = ''minsector'' THEN NULL ELSE lower(graph_delimiter) END AS graph, node_1 FROM v_edit_arc a 
 						JOIN v_edit_node n1 ON n1.node_id=node_1
 						JOIN cat_feature_node cf1 ON n1.node_type = cf1.id 
 						WHERE a.arc_id='''||v_arc_id||''';'
-						INTO v_node1_graf, v_node_1;
+						INTO v_node1_graph, v_node_1;
 						
-						EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf,node_2 FROM v_edit_arc a 
+						EXECUTE 'SELECT CASE WHEN lower(graph_delimiter) = ''none'' or lower(graph_delimiter) = ''minsector'' THEN NULL ELSE lower(graph_delimiter) END AS graph,node_2 FROM v_edit_arc a 
 						JOIN v_edit_node n2 ON n2.node_id=node_2
 						JOIN cat_feature_node cf2 ON n2.node_type = cf2.id 
 						WHERE a.arc_id='''||v_arc_id||''';'
-						INTO v_node2_graf, v_node_2;
+						INTO v_node2_graph, v_node_2;
 
-						EXECUTE 'SELECT CASE WHEN lower(graf_delimiter) = ''none'' or lower(graf_delimiter) = ''minsector'' THEN NULL ELSE lower(graf_delimiter) END AS graf FROM v_edit_node
+						EXECUTE 'SELECT CASE WHEN lower(graph_delimiter) = ''none'' or lower(graph_delimiter) = ''minsector'' THEN NULL ELSE lower(graph_delimiter) END AS graph FROM v_edit_node
 						JOIN cat_feature_node cf2 ON node_type = cf2.id 
 						WHERE node_id='''||v_node_id||''';'
-						INTO v_new_node_graf;
+						INTO v_new_node_graph;
 
 					END IF;
 						
@@ -322,6 +323,12 @@ BEGIN
 						-- update node_1 and node_2 because it's not possible to pass using parameters
 						UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
 						UPDATE arc SET node_1=rec_aux2.node_1,node_2=rec_aux2.node_2 where arc_id=rec_aux2.arc_id;
+                        
+						-- update link only with enabled variable
+						IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
+							UPDATE arc SET link=rec_aux1.arc_id where arc_id=rec_aux1.arc_id;
+							UPDATE arc SET link=rec_aux2.arc_id where arc_id=rec_aux2.arc_id;
+						END IF;
 						
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (212, 1,'Update values of arcs node_1 and node_2.');
@@ -553,20 +560,20 @@ BEGIN
 						IF v_project_type = 'WS' THEN
 						
 							--reconfigure mapzones
-							IF v_new_node_graf IS NOT NULL THEN
+							IF v_new_node_graph IS NOT NULL THEN
 								INSERT INTO audit_check_data (fid, criticity, error_message)
 								VALUES (212, 1, concat('New node is a delimiter of a mapzone that needs to be configured.'));
 							END IF;
 
-							IF v_node1_graf IS NOT NULL THEN
+							IF v_node1_graph IS NOT NULL THEN
 								IF rec_aux1.node_1 =v_node_1 OR rec_aux1.node_2 = v_node_1 THEN
-									v_graf_arc_id =  rec_aux1.arc_id;
+									v_graph_arc_id =  rec_aux1.arc_id;
 								ELSIF rec_aux2.node_1 =v_node_1 OR rec_aux2.node_2 = v_node_1 THEN
-									v_graf_arc_id =  rec_aux2.arc_id;
+									v_graph_arc_id =  rec_aux2.arc_id;
 								END IF;
 
 								EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-								"data":{"parameters":{"nodeIdOld":"'||v_node_1||'", "arcIdOld":"'||v_arc_id||'", "arcIdNew":"'||v_graf_arc_id||'", "action":"updateArc"}}}$$);';
+								"data":{"parameters":{"nodeIdOld":"'||v_node_1||'", "arcIdOld":"'||v_arc_id||'", "arcIdNew":"'||v_graph_arc_id||'", "action":"updateArc"}}}$$);';
 
 								INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (212, 0, concat(''));
 								INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (212, 0, concat('-----MAPZONES CONFIGURATION-----'));
@@ -574,15 +581,15 @@ BEGIN
 								VALUES (212, 0, concat('Node_1 is a delimiter of a mapzone if old arc was defined as toArc it has been reconfigured with new arc_id.'));
 							END IF;
 							
-							IF v_node2_graf IS NOT NULL THEN
+							IF v_node2_graph IS NOT NULL THEN
 								IF rec_aux1.node_1 =v_node_2 OR rec_aux1.node_2 = v_node_2 THEN
-									v_graf_arc_id =  rec_aux1.arc_id;
+									v_graph_arc_id =  rec_aux1.arc_id;
 								ELSIF rec_aux2.node_1 =v_node_2 OR rec_aux2.node_2 = v_node_2 THEN
-									v_graf_arc_id =  rec_aux2.arc_id;
+									v_graph_arc_id =  rec_aux2.arc_id;
 								END IF;
 
 								EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-								"data":{"parameters":{"nodeIdOld":"'||v_node_2||'", "arcIdOld":"'||v_arc_id||'", "arcIdNew":"'||v_graf_arc_id||'", "action":"updateArc"}}}$$);';
+								"data":{"parameters":{"nodeIdOld":"'||v_node_2||'", "arcIdOld":"'||v_arc_id||'", "arcIdNew":"'||v_graph_arc_id||'", "action":"updateArc"}}}$$);';
 
 								INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (212, 0, concat(''));
 								INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (212, 0, concat('-----MAPZONES CONFIGURATION-----'));
@@ -595,7 +602,11 @@ BEGIN
 					ELSIF v_state_node = 2 THEN --is psector
 
 						-- set temporary values for config variables in order to enable the insert of arc in spite of due a 'bug' of postgres (it seems that does not recognize the new node inserted)
-						UPDATE config_param_user SET value=TRUE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;				
+						UPDATE config_param_user SET value=TRUE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;
+					
+						-- manage plan_psector_force_delete in order to enable delete from old planified arcs
+						SELECT value INTO v_force_delete FROM config_param_user WHERE parameter = 'plan_psector_force_delete' AND cur_user=current_user;
+						UPDATE config_param_user SET value='true' WHERE parameter = 'plan_psector_force_delete' AND cur_user=current_user;
 
 						IF v_state_arc=1 THEN -- ficticius arc
 
@@ -650,6 +661,12 @@ BEGIN
 						-- update node_1 and node_2 because it's not possible to pass using parameters
 						UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
 						UPDATE arc SET node_1=rec_aux2.node_1,node_2=rec_aux2.node_2 where arc_id=rec_aux2.arc_id;
+                        
+						-- update link only with enabled variable
+						IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
+							UPDATE arc SET link=rec_aux1.arc_id where arc_id=rec_aux1.arc_id;
+							UPDATE arc SET link=rec_aux2.arc_id where arc_id=rec_aux2.arc_id;
+						END IF;
 
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (212, 1,'Insert new values from new arcs into addfields table.');
@@ -810,6 +827,8 @@ BEGIN
 							IF v_count = 0 THEN
 								DELETE FROM arc WHERE arc_id=v_arc_id;
 							END IF;
+						
+						UPDATE config_param_user SET value=v_force_delete WHERE parameter = 'plan_psector_force_delete' AND cur_user=current_user;
 							
 						END IF;
 

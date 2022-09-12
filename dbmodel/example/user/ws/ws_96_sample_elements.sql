@@ -9203,22 +9203,6 @@ INSERT INTO rtc_hydrometer_x_connec VALUES ('3195', '114312');
 INSERT INTO rtc_hydrometer_x_connec VALUES ('3196', '114267');
 INSERT INTO rtc_hydrometer_x_connec VALUES ('3197', '114368');
 
-
-
-
-INSERT INTO rtc_scada_node VALUES ('01', '1080');
-INSERT INTO rtc_scada_node VALUES ('02', '1084');
-
-
-INSERT INTO rtc_scada_x_dma VALUES (1, '01', 2, 1);
-INSERT INTO rtc_scada_x_dma VALUES (2, '02', 3, 1);
-
-
-INSERT INTO rtc_scada_x_sector VALUES (1, '01', 2, 1);
-INSERT INTO rtc_scada_x_sector VALUES (2, '02', 3, 1);
-
-
-
 INSERT INTO man_expansiontank VALUES (131);
 
 INSERT INTO man_filter VALUES (1081);

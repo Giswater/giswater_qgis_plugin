@@ -20,6 +20,7 @@ v_new_nodetype varchar;
 v_tablename varchar;
 v_pol_id varchar;
 v_node_id varchar;
+v_input json;
 
 BEGIN
 
@@ -101,7 +102,6 @@ BEGIN
             UPDATE inp_tank SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id, overflow=NEW.overflow WHERE node_id=OLD.node_id;
 
         ELSIF v_node_table = 'inp_pump' THEN          
-
             UPDATE inp_pump SET power=NEW.power, curve_id=NEW.curve_id, speed=NEW.speed, pattern=NEW.pattern, to_arc=NEW.to_arc, status=NEW.status , pump_type=NEW.pump_type WHERE node_id=OLD.node_id;
 
         ELSIF v_node_table = 'inp_pump_additional' THEN          
@@ -123,6 +123,10 @@ BEGIN
         UPDATE node 
 		SET sector_id=NEW.sector_id, annotation=NEW.annotation, state_type=NEW.state_type 
         WHERE node_id=OLD.node_id;
+
+        v_input = concat('{"feature":{"type":"node", "childLayer":"',v_node_table,'", "id":"',NEW.node_id,'"}}');
+        -- inp2man_values
+		PERFORM gw_fct_man2inp_values(v_input);
 
 		RETURN NEW;
         

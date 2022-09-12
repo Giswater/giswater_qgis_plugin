@@ -102,7 +102,17 @@ BEGIN
 		LEFT JOIN v_edit_node USING (node_id)
 		JOIN inp_outfall ON node.node_id=inp_outfall.node_id
 		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc JOIN value_state_type ON id=state_type WHERE sector_id > 0 AND epa_type !=''UNDEFINED'' '||
+		v_statetype ||' UNION SELECT node_2 FROM vi_parent_arc JOIN value_state_type ON id=state_type WHERE sector_id > 0 AND epa_type !=''UNDEFINED'' '||v_statetype ||')a ON node.node_id=a.node_id
+	UNION
+	SELECT '||quote_literal(result_id_var)||',
+	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, 
+	node.state, node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom, (now()::date-node.builtdate)/30
+	FROM selector_sector, node 
+		LEFT JOIN v_edit_node USING (node_id)
+		JOIN inp_netgully ON node.node_id=inp_netgully.node_id
+		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc JOIN value_state_type ON id=state_type WHERE sector_id > 0 AND epa_type !=''UNDEFINED'' '||
 		v_statetype ||' UNION SELECT node_2 FROM vi_parent_arc JOIN value_state_type ON id=state_type WHERE sector_id > 0 AND epa_type !=''UNDEFINED'' '||v_statetype ||')a ON node.node_id=a.node_id';
+		
 
 	-- node onfly transformation of junctions to outfalls (when outfallparam is fill and junction is node sink)
 	PERFORM gw_fct_anl_node_sink($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"tableName":"v_edit_inp_junction"},"data":{"parameters":{"saveOnDatabase":true}}}$$);
@@ -168,26 +178,40 @@ BEGIN
 
 	-- fill temp_gully in order to work with 1D/2D
 	IF v_networkmode = 2 THEN
-	
+
+		-- netgully
 		EXECUTE 'INSERT INTO temp_gully 
 		SELECT 
-		gully_id, g.gully_type, gratecat_id, g.sector_id, g.state, state_type, top_elev, top_elev-ymax, sandbox, units, groove, annotation, st_x(the_geom), st_y(the_geom),y0, ysur, -- gully
-		c.length, c.width, total_area, effective_area, efficiency, n_barr_l, n_barr_w, n_barr_diag, a_param, b_param, -- grate
-		(case when pjoint_type = ''VNODE'' THEN concat(''VN'',pjoint_id) ELSE pjoint_id end) as pjoint_id,
-		pjoint_type,
-		(case when custom_length is not null then custom_length else connec_length end),
-		shape, 
-		case when custom_n is not null then custom_n else n end, 
-		connec_y1, connec_y2, geom1, geom2, geom3, geom4, q0, qmax, flap, -- connec		
-		the_geom
-		FROM selector_sector, v_edit_inp_gully g 
-		JOIN cat_grate c ON id = gratecat_id 
-		left JOIN cat_connec a ON connec_arccat_id = a.id
-		left JOIN cat_mat_arc m ON m.id = g.connec_matcat_id
-		left JOIN value_state_type s ON state_type = s.id
-		WHERE g.sector_id=selector_sector.sector_id 
-		AND selector_sector.cur_user=current_user
-		AND g.sector_id > 0 '||v_statetype||';';
+		concat(''NG'',node_id), g.node_type, gratecat_id, null, g.node_id, g.sector_id, g.state, state_type, 
+		case when custom_top_elev is null then top_elev else custom_top_elev end, 
+		units, units_placement, outlet_type,
+		case when custom_width is null then total_width else custom_width end, 
+		case when custom_length is null then total_length else custom_length end,
+		case when custom_depth is null then depth else custom_depth end,
+		method, weir_cd, orifice_cd, 
+		case when custom_a_param is null then a_param else custom_a_param end,
+		case when custom_b_param is null then b_param else custom_b_param end,
+		efficiency, the_geom
+		FROM v_edit_inp_netgully g 
+		LEFT JOIN value_state_type ON id=state_type
+		WHERE g.sector_id > 0 '||v_statetype||';';
+
+		-- gully
+		EXECUTE 'INSERT INTO temp_gully 
+		SELECT 
+		gully_id, g.gully_type, gratecat_id, g.arc_id, g.node_id, g.sector_id, g.state, state_type, 
+		case when custom_top_elev is null then top_elev else custom_top_elev end, 
+		units, units_placement, outlet_type,
+		case when custom_width is null then total_width else custom_width end, 
+		case when custom_length is null then total_length else custom_length end,
+		case when custom_depth is null then depth else custom_depth end,
+		method, weir_cd, orifice_cd, 
+		case when custom_a_param is null then a_param else custom_a_param end,
+		case when custom_b_param is null then b_param else custom_b_param end,
+		efficiency, the_geom
+		FROM v_edit_inp_gully g
+		LEFT JOIN value_state_type ON id=state_type
+		WHERE g.sector_id > 0 '||v_statetype||';';
 		
 	END IF;
 

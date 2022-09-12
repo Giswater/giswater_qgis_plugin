@@ -139,7 +139,7 @@ BEGIN
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
     ) AS feature
-    FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
+    FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom,num_arcs
     FROM  anl_node WHERE cur_user="current_user"() AND fid=108) row) features;
 
   	v_result := COALESCE(v_result, '{}'); 

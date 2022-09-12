@@ -30,9 +30,9 @@ BEGIN
 		END IF;
 		
 		-- Gully ID	
-		IF (NEW.gully_id IS NULL) THEN
-			NEW.gully_id:= (SELECT gully_id FROM v_edit_gully WHERE ST_DWithin(NEW.the_geom, v_edit_gully.the_geom,0.001) LIMIT 1);
-			IF (NEW.gully_id IS NULL) THEN
+		IF (NEW.feature_id IS NULL) THEN
+			NEW.feature_id:= (SELECT gully_id FROM v_edit_gully WHERE ST_DWithin(NEW.the_geom, v_edit_gully.the_geom,0.001) LIMIT 1);
+			IF (NEW.feature_id IS NULL) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
       		 	"data":{"message":"2048", "function":"2416","debug_msg":null}}$$);'; 
 			END IF;
@@ -40,12 +40,12 @@ BEGIN
 
 		-- Insert into polygon table
 		INSERT INTO polygon (pol_id, sys_type, the_geom, feature_id, featurecat_id) 
-		SELECT NEW.pol_id, sys_type, NEW.the_geom, NEW.gully_id, gully_type
-		FROM v_edit_gully WHERE gully_id=NEW.gully_id
+		SELECT NEW.pol_id, sys_type, NEW.the_geom, NEW.feature_id, gully_type
+		FROM v_edit_gully WHERE gully_id=NEW.feature_id
 		ON CONFLICT (feature_id) DO UPDATE SET the_geom=NEW.the_geom;
 		
 		-- Update man table
-		UPDATE gully SET pol_id=NEW.pol_id WHERE gully_id=NEW.gully_id;
+		UPDATE gully SET pol_id=NEW.pol_id WHERE gully_id=NEW.feature_id;
 		
 		RETURN NEW;
 		
@@ -55,17 +55,17 @@ BEGIN
 	
 		UPDATE polygon SET pol_id=NEW.pol_id, the_geom=NEW.the_geom WHERE pol_id=OLD.pol_id;
 		
-		IF (NEW.gully_id != OLD.gully_id) THEN
-			IF (SELECT gully_id FROM gully WHERE gully_id=NEW.gully_id) IS NULL THEN
+		IF (NEW.feature_id != OLD.feature_id) THEN
+			IF (SELECT gully_id FROM gully WHERE gully_id=NEW.feature_id) IS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
       		 	"data":{"message":"2050", "function":"2416","debug_msg":null}}$$);';
 			END IF;
 
-			UPDATE polygon SET feature_id=NEW.gully_id, featurecat_id =gully_type 
-			FROM v_edit_gully WHERE gully_id=OLD.gully_id AND pol_id=NEW.pol_id;
+			UPDATE polygon SET feature_id=NEW.feature_id, featurecat_id =gully_type 
+			FROM v_edit_gully WHERE gully_id=OLD.feature_id AND pol_id=NEW.pol_id;
 
-			UPDATE gully SET pol_id=NULL WHERE gully_id=OLD.gully_id;
-			UPDATE gully SET pol_id=NEW.pol_id WHERE gully_id=NEW.gully_id;
+			UPDATE gully SET pol_id=NULL WHERE gully_id=OLD.feature_id;
+			UPDATE gully SET pol_id=NEW.pol_id WHERE gully_id=NEW.feature_id;
 		
 		END IF;
 		
@@ -74,7 +74,7 @@ BEGIN
 	-- DELETE
     ELSIF TG_OP = 'DELETE' THEN
 	
-		UPDATE gully SET pol_id=NULL WHERE gully_id=OLD.gully_id;
+		UPDATE gully SET pol_id=NULL WHERE gully_id=OLD.feature_id;
 		DELETE FROM polygon WHERE pol_id=OLD.pol_id;
 				
 		RETURN NULL;

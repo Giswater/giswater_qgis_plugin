@@ -41,6 +41,11 @@ BEGIN
     IF TG_OP = 'INSERT' THEN
        	
        	IF v_isutils IS FALSE OR v_isutils IS NULL THEN	
+        
+        	-- set id if null
+        	IF NEW.id IS NULL THEN
+        		NEW.id = (SELECT nextval('ext_streetaxis_id_seq'));
+        	END IF;
        	
 	       	--get muni and expl_id value if its null    
 	        IF NEW.expl_id IS NULL THEN
@@ -56,6 +61,11 @@ BEGIN
     		VALUES (NEW.id,NEW.code, NEW.type, NEW.name, NEW.text, NEW.the_geom, NEW.expl_id, NEW.muni_id);
     	ELSE
 
+        	-- set id if null
+        	IF NEW.id IS NULL THEN
+        		NEW.id = (SELECT nextval('ext_streetaxis_id_seq'));
+        	END IF;
+            
 	    	--get muni value if its null
 	        IF NEW.muni_id IS NULL THEN
 	          EXECUTE 'SELECT muni_id FROM '||v_schema_utils||'.municipality 

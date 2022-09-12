@@ -53,7 +53,7 @@ BEGIN
 			factor_7=NEW.factor_7,factor_8=NEW.factor_8,factor_9=NEW.factor_9,factor_10=NEW.factor_10, factor_11=NEW.factor_11,factor_12=NEW.factor_12, 
 			factor_13=NEW.factor_13,factor_14=NEW.factor_14,factor_15=NEW.factor_15,factor_16=NEW.factor_16,factor_17=NEW.factor_17,
 			factor_18=NEW.factor_18
-			WHERE pattern_id=OLD.pattern_id;
+			WHERE id=OLD.id;
 		END IF;
 
 		RETURN NEW;

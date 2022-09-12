@@ -19,7 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":127}}
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"parameters":{}}$$)-- when is called from toolbox or from checkproject
 
 -- fid: main: 225,
-	other: 106,107,111,113,164,175,187,188,294,295,379,427,430
+	other: 106,107,111,113,164,175,187,188,294,295,379,427,430, 440
 
 SELECT * FROM audit_check_data WHERE fid = 225
 
@@ -66,8 +66,8 @@ BEGIN
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=225 AND cur_user=current_user;
-	DELETE FROM anl_arc WHERE fid IN (188, 284, 295, 427) AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fid IN (106, 107, 111, 113, 164, 187, 294, 379) AND cur_user=current_user;
+	DELETE FROM anl_arc WHERE fid IN (284, 295, 427) AND cur_user=current_user;
+	DELETE FROM anl_node WHERE fid IN (106, 107, 111, 113, 164, 294, 379) AND cur_user=current_user;
 
 	-- Header
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, concat('DATA QUALITY ANALYSIS ACORDING EPA RULES'));
@@ -508,11 +508,33 @@ BEGIN
 		VALUES (v_fid, v_result_id , 1,  '427','INFO: All pump flow regulators has lengh wich fits target arc.',v_count);
 	END IF;	
 
-	RAISE NOTICE '20 - Check matcat not null on arc (430)';
+	RAISE NOTICE '20 - Check valid relative timeseries(459)';
+	SELECT count(*) INTO v_count FROM 
+	(SELECT id, timser_id, case when time is not null then time end as time FROM v_edit_inp_timeseries_value) a JOIN
+	(SELECT id-1 as id, timser_id, case when time is not null then time end as time FROM v_edit_inp_timeseries_value)b USING (id)
+	where a.time::time - b.time::time > '0 seconds' AND a.timser_id = b.timser_id;
+	
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '427',concat(
+		'ERROR-459: There is/are ',v_count,' columns on relative timeserires related to this exploitation with errors. '),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id , 1,  '427','INFO: All relative timeseries related ot this exploitation are correctly defined.',v_count);
+	END IF;	
+
+
+	RAISE NOTICE '21 - Check matcat not null on arc (430)';
 	SELECT count(*) INTO v_count FROM v_edit_arc a, selector_sector s WHERE a.sector_id = s.sector_id and cur_user=current_user 
 	AND matcat_id IS NULL AND sys_type !='VARC';
 	
 	IF v_count > 0 THEN
+
+		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, descript, the_geom) SELECT 430, arc_id, ''Arc without material'', the_geom 
+		FROM v_edit_arc a, selector_sector s WHERE a.sector_id = s.sector_id and cur_user=current_user 
+		AND matcat_id IS NULL AND sys_type !=''VARC'''; 
+
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '427',concat(
 		'ERROR-430: There is/are ',v_count,' arcs without matcat_id informed.'),v_count);
@@ -522,10 +544,55 @@ BEGIN
 		VALUES (v_fid, v_result_id , 1,  '427','INFO: All arcs have matcat_id filled.',v_count);
 	END IF;	
 
+	RAISE NOTICE '22 - Check outlet_id assigned to subcatchments (440)';
+	v_querytext = 'WITH query AS (SELECT * FROM (SELECT 440 as fid, subc_id, outlet_id, st_centroid(the_geom) from v_edit_inp_subcatchment where left(outlet_id::text, 1) != ''{''::text 
+	UNION
+	SELECT 440, subc_id, unnest(outlet_id::text[]), st_centroid(the_geom) from v_edit_inp_subcatchment where left(outlet_id::text, 1) = ''{''::text
+	)a
+	WHERE outlet_id not in 
+	(select node_id FROM v_edit_inp_junction UNION select node_id FROM v_edit_inp_outfall UNION
+	select node_id FROM v_edit_inp_storage UNION select node_id FROM v_edit_inp_divider UNION
+	select subc_id FROM v_edit_inp_subcatchment))
+	SELECT q1.* FROM query q1 
+	LEFT JOIN 
+	(SELECT * FROM (
+	SELECT subc_id, outlet_id, the_geom from v_edit_inp_subcatchment where left(outlet_id::text, 1) != ''{''::text 
+	UNION
+	SELECT subc_id, unnest(outlet_id::text[]), the_geom AS outlet_id from v_edit_inp_subcatchment where left(outlet_id::text, 1) = ''{''::text)a)b
+	USING (outlet_id)
+	WHERE b.subc_id IS NULL';
+
+	EXECUTE 'SELECT count(*) FROM ('||v_querytext||')a'
+	INTO v_count;
+
+	IF v_count > 0 THEN
+	
+		EXECUTE 'INSERT INTO anl_node (fid, descript, node_id, the_geom) SELECT * FROM ('||v_querytext||')a';
+			
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '427',concat(
+		'ERROR-440 (anl_node): There is/are ',v_count,' outlets defined on subcatchments view, that are not present on junction, outfall, storage, divider or subcatchment view.'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id , 1,  '427','INFO: All outlets set on subcatchments are correctly defined.',v_count);
+	END IF;	
+
 	IF v_result_id IS NULL THEN
 		UPDATE audit_check_data SET result_id = table_id WHERE cur_user="current_user"() AND fid=v_fid AND result_id IS NULL;
 		UPDATE audit_check_data SET table_id = NULL WHERE cur_user="current_user"() AND fid=v_fid; 
 	END IF;
+
+	-- Removing isaudit false sys_fprocess
+	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
+	LOOP
+		-- remove anl tables
+		DELETE FROM anl_node WHERE fid = v_record.fid AND cur_user = current_user;
+		DELETE FROM anl_arc WHERE fid = v_record.fid AND cur_user = current_user;
+		DELETE FROM anl_connec WHERE fid = v_record.fid AND cur_user = current_user;
+
+		DELETE FROM audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user;
+	END LOOP;
 
 	-- insert spacers for log
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');
@@ -566,7 +633,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT DISTINCT ON (arc_id) id, arc_id, arccat_id, state, expl_id, descript, the_geom, fid
-	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (188, 284, 295, 427)) row) features;
+	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (188, 284, 295, 427,430)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 

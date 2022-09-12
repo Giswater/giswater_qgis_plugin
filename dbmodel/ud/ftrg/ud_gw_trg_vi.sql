@@ -136,7 +136,7 @@ BEGIN
 			
 			IF NEW.storage_type = 'FUNCTIONAL' THEN 
 				INSERT INTO inp_storage(node_id,y0,storage_type,a1,a2,a0,apond, fevap, sh, hc, imd) 
-				VALUES (NEW.node_id,NEW.y0,'FUNCTIONAL', NEW.other1::numeric, NEW.other2, NEW.other3, NEW.other4::numeric, NEW.other5::numeric, NEW.other6::numeric, NEW.other7::numeric, NEW.other8::numeric);
+				VALUES (NEW.node_id,NEW.y0,'FUNCTIONAL', NEW.other1::numeric, NEW.other2::numeric, NEW.other3::numeric, NEW.other4::numeric, NEW.other5::numeric, NEW.other6::numeric, NEW.other7::numeric, NEW.other8::numeric);
 				
 			ELSIF NEW.storage_type like 'TABULAR' THEN
 				INSERT INTO inp_storage(node_id,y0,storage_type,curve_id,apond,fevap, sh, hc, imd) 
@@ -299,17 +299,14 @@ BEGIN
 				END IF;
 				INSERT INTO inp_timeseries_value (timser_id) VALUES (NEW.timser_id);
 				
-			ELSIF  NEW.other1 ilike '%:%' OR NEW.other1 ~ '^\d+$' THEN
-
-				IF NEW.other1 ~ '^\d+$' then
-					NEW.other1 = concat(NEW.other1,':00');
-				END IF;
-				
+			ELSIF  NEW.other1 ilike '%:%' OR NEW.other1 ~ '^\d+$' OR NEW.other1 ilike '%:%' THEN
+			
 				IF NEW.timser_id NOT IN (SELECT id FROM inp_timeseries) THEN
 					INSERT INTO inp_timeseries(id, idval, times_type) VALUES (NEW.timser_id, NEW.timser_id,'RELATIVE');
 				END IF;
+				
 				IF (SELECT times_type FROM inp_timeseries WHERE id = NEW.timser_id) = 'ABSOLUTE' THEN
-					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, null, NEW.other1::time, NEW.other2::numeric);				
+					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, null, NEW.other1, NEW.other2::numeric);				
 				ELSE
 					INSERT INTO inp_timeseries_value (timser_id, "time", value)  VALUES (NEW.timser_id, NEW.other1, NEW.other2::numeric);
 				END IF;				
@@ -320,7 +317,9 @@ BEGIN
 				IF NEW.other2 ~ '^\d+$' then
 					NEW.other2 = concat(NEW.other2,':00');
 				END IF;
-				INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, NEW.other1, NEW.other2::time, NEW.other3::numeric);
+				IF NEW.other3 IS NOT NULL THEN
+					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, NEW.other1, NEW.other2, NEW.other3::numeric);
+				END IF;
 			END IF;
 			
 		ELSIF v_view='vi_lid_controls' THEN 
@@ -360,7 +359,7 @@ BEGIN
 			INSERT INTO inp_backdrop (text) VALUES (NEW.text);
 			
 		ELSIF v_view='vi_labels' THEN
-			INSERT INTO inp_labels (xcoord, ycoord, label, anchor, font, size, bold, italic) 
+			INSERT INTO inp_label (xcoord, ycoord, label, anchor, font, size, bold, italic) 
 			VALUES (NEW.xcoord, NEW.ycoord, NEW.label, NEW.anchor, NEW.font, NEW.size, NEW.bold, NEW.italic);
 	    END IF;
 	END IF;

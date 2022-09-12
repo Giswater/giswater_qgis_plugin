@@ -68,6 +68,7 @@ v_pjoint_type text;
 v_expl_id integer;
 v_dsbl_error boolean;
 v_message text;
+v_ispresszone boolean;
 
 BEGIN
 
@@ -80,7 +81,8 @@ BEGIN
 	SELECT value::boolean INTO v_autoupdate_dma FROM config_param_system WHERE parameter='edit_connect_autoupdate_dma';
 	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;
 	SELECT project_type INTO v_projectype FROM sys_version LIMIT 1;
-	
+	v_ispresszone:= (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'utils_graphanalytics_status');
+
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
      
@@ -311,6 +313,10 @@ BEGIN
 			ELSIF v_projectype='WS' AND NEW.link_class < 3 THEN
 				UPDATE connec SET presszone_id = v_arc.presszone_id, dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id
 				WHERE connec_id=v_connec1.connec_id;
+				
+				IF v_ispresszone THEN
+					UPDATE connec SET staticpressure = ((SELECT head from presszone WHERE presszone_id = v_arc.presszone_id)- v_connec1.elevation) WHERE connec_id=v_connec1.connec_id;
+				END IF;
 			END IF;
 		
 			NEW.exit_type='VNODE';
@@ -364,7 +370,10 @@ BEGIN
 			ELSIF v_projectype='WS' AND NEW.link_class < 3 THEN
 				UPDATE connec SET presszone_id = v_arc.presszone_id, dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id
 				WHERE connec_id=v_connec1.connec_id;
-				
+
+				IF v_ispresszone THEN
+					UPDATE connec SET staticpressure = ((SELECT head from presszone WHERE presszone_id = v_arc.presszone_id)- v_connec1.elevation) WHERE connec_id=v_connec1.connec_id;
+				END IF;
 			END IF;
 				
 			NEW.exit_type='NODE';
@@ -415,7 +424,11 @@ BEGIN
 		
 			ELSIF v_projectype='WS' AND  NEW.link_class < 3 THEN
 				UPDATE connec SET presszone_id = v_connec2.presszone_id, dqa_id=v_connec2.dqa_id, minsector_id=v_connec2.minsector_id
-				WHERE connec_id=v_connec1.connec_id;	
+				WHERE connec_id=v_connec1.connec_id;
+		
+				IF v_ispresszone THEN
+					UPDATE connec SET staticpressure = ((SELECT head from presszone WHERE presszone_id = v_connec2.presszone_id)- v_connec1.elevation) WHERE connec_id=v_connec1.connec_id;
+				END IF;	
 			END IF;
 		
 			NEW.exit_type='CONNEC';

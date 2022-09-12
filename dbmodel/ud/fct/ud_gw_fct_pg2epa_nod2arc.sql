@@ -202,6 +202,7 @@ BEGIN
 				old_to_arc= rec_flowreg.to_arc;
 				old_node_2 = rec_new_arc.node_2;
 
+				UPDATE temp_arc SET node_1 = rec_new_arc.node_2 WHERE arc_id = rec_flowreg.to_arc;
 
 				-- update values on node_2 when flow regulator it's a pump, fixing ysur as maximum as possible
 				IF rec_flowreg.flw_type='PU' THEN

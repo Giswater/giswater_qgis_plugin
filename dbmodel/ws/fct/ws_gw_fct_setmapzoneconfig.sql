@@ -76,10 +76,10 @@ BEGIN
 		LOOP
 
 			--update toArc value with newly created arc id
-			v_querytext = 'UPDATE '||v_zone||' set grafconfig = replace(grafconfig::text,a.toarc,'||v_arc_id_new||'::text)::json FROM (
+			v_querytext = 'UPDATE '||v_zone||' set graphconfig = replace(graphconfig::text,a.toarc,'||v_arc_id_new||'::text)::json FROM (
 			select json_array_elements_text((elem->>''toArc'')::json) as toarc, elem->>''nodeParent'' as nodeparent
 			from '||v_zone||'
-			cross join json_array_elements((grafconfig->>''use'')::json) elem
+			cross join json_array_elements((graphconfig->>''use'')::json) elem
 			where elem->>''nodeParent'' = '||quote_literal(v_node_id_old)||' 
 			AND (elem::json->>''toArc'') ilike ''%'||v_arc_id_old||'%'')a';
 			raise notice ' %', v_querytext;
@@ -92,8 +92,8 @@ BEGIN
 		UPDATE inp_valve SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
 		UPDATE inp_shortpipe SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
 		
-		-- graf
-		UPDATE config_graf_checkvalve SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
+		-- graph
+		UPDATE config_graph_checkvalve SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
 
 	ELSIF v_action = 'updateNode' THEN
 
@@ -101,15 +101,15 @@ BEGIN
 		FOREACH v_zone IN ARRAY '{sector, dma, presszone, dqa}'::text[] LOOP
 
 			--update toArc value with newly created arc id
-			EXECUTE 'UPDATE '||v_zone||' set grafconfig = replace(grafconfig::text,a.nodeparent,'||v_node_id_new||'::text)::json FROM (
+			EXECUTE 'UPDATE '||v_zone||' set graphconfig = replace(graphconfig::text,a.nodeparent,'||v_node_id_new||'::text)::json FROM (
 			select json_array_elements_text((elem->>''toArc'')::json) as toarc, elem->>''nodeParent'' as nodeparent
 			from '||v_zone||'
-			cross join json_array_elements((grafconfig->>''use'')::json) elem
+			cross join json_array_elements((graphconfig->>''use'')::json) elem
 			where elem->>''nodeParent'' = '||quote_literal(v_node_id_old)||')a';
 		END LOOP;
 		
-		-- graf
-		UPDATE config_graf_checkvalve SET node_id = v_node_id_new WHERE node_id = v_node_id_old;
+		-- graph
+		UPDATE config_graph_checkvalve SET node_id = v_node_id_new WHERE node_id = v_node_id_old;
 		
 	END IF;
 

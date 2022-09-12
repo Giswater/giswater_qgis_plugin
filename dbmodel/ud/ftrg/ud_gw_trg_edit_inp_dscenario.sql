@@ -142,25 +142,25 @@ BEGIN
 		ELSIF v_dscenario_type = 'LID-USAGE' THEN
 
 			-- default values
-			IF NEW.numelem IS NULL THEN NEW.numelem = (SELECT elev FROM v_edit_inp_lid_usage 
+			IF NEW.numelem IS NULL THEN NEW.numelem = (SELECT elev FROM v_edit_inp_dscenario_lid_usage 
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id AND lidco_id=NEW.lidco_id );END IF;
-			IF NEW.area IS NULL THEN NEW.area = (SELECT area FROM v_edit_inp_lid_usage
+			IF NEW.area IS NULL THEN NEW.area = (SELECT area FROM v_edit_inp_dscenario_lid_usage
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id AND lidco_id=NEW.lidco_id );END IF;
-			IF NEW.width IS NULL THEN NEW.width = (SELECT width FROM v_edit_inp_lid_usage
+			IF NEW.width IS NULL THEN NEW.width = (SELECT width FROM v_edit_inp_dscenario_lid_usage
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id AND lidco_id=NEW.lidco_id );END IF;
-			IF NEW.initsat IS NULL THEN NEW.initsat = (SELECT initsat FROM v_edit_inp_lid_usage
+			IF NEW.initsat IS NULL THEN NEW.initsat = (SELECT initsat FROM v_edit_inp_dscenario_lid_usage
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id AND lidco_id=NEW.lidco_id );END IF;
-			IF NEW.fromimp IS NULL THEN NEW.fromimp = (SELECT fromimp FROM v_edit_inp_lid_usage
+			IF NEW.fromimp IS NULL THEN NEW.fromimp = (SELECT fromimp FROM v_edit_inp_dscenario_lid_usage
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id AND lidco_id=NEW.lidco_id );END IF;
-			IF NEW.toperv IS NULL THEN NEW.toperv = (SELECT toperv FROM v_edit_inp_lid_usage
+			IF NEW.toperv IS NULL THEN NEW.toperv = (SELECT toperv FROM v_edit_inp_dscenario_lid_usage
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id AND lidco_id=NEW.lidco_id );END IF;
-			IF NEW.rptfile IS NULL THEN NEW.rptfile = (SELECT rptfile FROM v_edit_inp_lid_usage
+			IF NEW.rptfile IS NULL THEN NEW.rptfile = (SELECT rptfile FROM v_edit_inp_dscenario_lid_usage
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id AND lidco_id=NEW.lidco_id );END IF;
-			IF NEW.descript IS NULL THEN NEW.descript = (SELECT descript FROM v_edit_inp_lid_usage
+			IF NEW.descript IS NULL THEN NEW.descript = (SELECT descript FROM v_edit_inp_dscenario_lid_usage
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id AND lidco_id=NEW.lidco_id );END IF;
 	 	
-			INSERT INTO inp_dscenario_lid_usage (dscenario_id, hydrology_id, subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv, rptfile, descript)
-	 		VALUES (NEW.dscenario_id, NEW.hydrology_id, NEW.subc_id, NEW.lidco_id, NEW.numelem, NEW.area, NEW.width, NEW.initsat, NEW.fromimp, NEW.toperv, NEW.rptfile,NEW.descript);
+			INSERT INTO inp_dscenario_lid_usage (dscenario_id, subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv, rptfile, descript)
+	 		VALUES (NEW.dscenario_id, NEW.subc_id, NEW.lidco_id, NEW.numelem, NEW.area, NEW.width, NEW.initsat, NEW.fromimp, NEW.toperv, NEW.rptfile,NEW.descript);
 		
 
  		ELSIF v_dscenario_type = 'OUTFALL' THEN
@@ -219,6 +219,12 @@ BEGIN
 				 	
 			INSERT INTO inp_dscenario_treatment (dscenario_id, node_id, poll_id, function)
 			VALUES (NEW.dscenario_id, NEW.node_id, NEW.poll_id, NEW.function);
+
+		ELSIF v_dscenario_type = 'CONTROLS' THEN
+		
+			INSERT INTO inp_dscenario_controls(dscenario_id, sector_id, text, active)
+			VALUES (NEW.dscenario_id, NEW.sector_id, NEW.text, NEW.active);
+		
 		END IF;
 	
 		RETURN NEW;
@@ -291,6 +297,10 @@ BEGIN
 	 	ELSIF v_dscenario_type = 'TREATMENT' THEN
 			UPDATE inp_dscenario_treatment SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, poll_id=NEW.poll_id, function=NEW.function 
 			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id AND poll_id = OLD.poll_id;
+
+		ELSIF v_dscenario_type = 'CONTROLS' THEN
+			UPDATE inp_dscenario_controls SET dscenario_id = NEW.dscenario_id, sector_id= NEW.sector_id, text= NEW.text, active=NEW.active 
+			WHERE id=OLD.id;
 		END IF;
 
 		RETURN NEW;
@@ -336,6 +346,10 @@ BEGIN
 			
 	 	ELSIF v_dscenario_type = 'TREATMENT' THEN
 			DELETE FROM inp_dscenario_treatment WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id AND poll_id = OLD.poll_id;
+
+		ELSIF v_dscenario_type = 'CONTROLS' THEN
+			DELETE FROM inp_dscenario_controls WHERE id=OLD.id;
+			
 		END IF;
 
 		RETURN OLD;

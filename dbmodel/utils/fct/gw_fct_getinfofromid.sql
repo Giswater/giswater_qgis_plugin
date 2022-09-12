@@ -15,46 +15,46 @@ $BODY$
 UPSERT FEATURE 
 arc no nodes extremals
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "inputGeometry":"0102000020E7640000020000000056560000A083198641000000669A33C041000000E829D880410000D0AE90F0F341" },
 		"data":{}}$$)
 arc with nodes extremals
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "inputGeometry":"0102000020E764000002000000998B3C512F881941B28315AA7F76514105968D7D748819419FDF72D781765141" },
 		"data":{"addSchema":"SCHEMA_NAME"}}$$)
 INFO BASIC
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "id":"2001"},
 		"data":{}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 		"form":{"editable":"True"}, 
 		"feature":{"tableName":"v_edit_arc","id":"2001"},
 		"data":{}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_node_junction", "id":"1001"},
 		"data":{}}$$)
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_connec_wjoin", "id":"3001"},
 		"data":{}}$$)
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_element", "id":"125101"},
 		"data":{}}$$)
 
-SELECT SCHEMA_NAME.gw_fct_getfeatureinsert($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "form":{}, "feature":{"tableName":"ve_node_air_valve"}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "rolePermissions":"full", "coordinates":{"x1":418957.8771109133, "y1":4576670.596288238}}}$$);
+SELECT SCHEMA_NAME.gw_fct_getfeatureinsert($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831, "cur_user":"test_user"}, "form":{}, "feature":{"tableName":"ve_node_air_valve"}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "rolePermissions":"full", "coordinates":{"x1":418957.8771109133, "y1":4576670.596288238}}}$$);
 
 */
 
@@ -114,7 +114,7 @@ v_islayer boolean;
 v_addschema text;
 v_return json;
 v_flag boolean = false;
-v_isgrafdelimiter boolean  = false;
+v_isgraphdelimiter boolean  = false;
 v_isepatoarc boolean  = false;
 v_nodetype text;
 v_isarcdivide boolean = false;
@@ -131,6 +131,8 @@ v_formheader_new_text text;
 v_tabdata_lytname json;
 v_tabdata_lytname_result json;
 v_record record;
+v_cur_user text;
+v_prev_cur_user text;
 
 BEGIN
 	
@@ -148,6 +150,15 @@ BEGIN
 	v_toolbar := (p_data ->> 'data')::json->> 'toolBar';
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
 	v_featuredialog := coalesce((p_data ->> 'form')::json->> 'featureDialog','[]');
+	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
+
+	-- control of nulls
+	IF v_addschema = 'NULL' THEN v_addschema = null; END IF;
+	
+	v_prev_cur_user = current_user;
+	IF v_cur_user IS NOT NULL THEN
+		EXECUTE 'SET ROLE "'||v_cur_user||'"';
+	END IF;
 
 	-- Get values from config
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
@@ -159,9 +170,10 @@ BEGIN
 	END IF;
 
 	-- special case of polygon
-	IF v_tablename = 'v_polygon' THEN
+	IF (v_tablename = 'v_polygon' or v_tablename = 've_pol_node' or v_tablename = 've_pol_connec' or v_tablename = 've_pol_gully') AND v_id IS NOT NULL THEN
 
-		SELECT feature_id, featurecat_id INTO v_id, v_tablename FROM v_polygon WHERE pol_id = v_id;
+		EXECUTE 'SELECT feature_id, featurecat_id  FROM '||v_tablename||' WHERE pol_id = '||quote_literal(v_id)||''
+		INTO v_id, v_tablename;
 		v_tablename = (SELECT concat('v_edit_',lower(feature_type)) FROM cat_feature WHERE system_id = v_tablename LIMIT 1);
 		IF v_tablename IS NULL THEN v_tablename = 'v_edit_element'; END IF;
 		v_editable = true;
@@ -174,7 +186,7 @@ BEGIN
 		EXECUTE 'SELECT ' || v_pkeyfield || ' FROM '|| v_tablename || ' WHERE ' || v_pkeyfield || '::text = ' || v_id || '::text' INTO v_idname;
 		
 		IF v_idname IS NULL THEN
-				
+			EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 			RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "version":'|| v_version 
 			||', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
 			
@@ -183,7 +195,7 @@ BEGIN
 	END IF;
 	
 	-- looking for additional schema 
-	IF v_addschema NOT IN (NULL, 'NULL') AND v_addschema != v_schemaname AND v_flag IS FALSE THEN
+	IF (v_addschema IS NOT NULL OR v_addschema != 'NULL') AND v_addschema != v_schemaname AND v_flag IS FALSE THEN
 		v_querystring = concat('SET search_path = ',v_addschema,', public');
 		v_debug_vars := json_build_object('v_addschema', v_addschema);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 10);
@@ -192,6 +204,7 @@ BEGIN
 
 		SELECT gw_fct_getinfofromid(p_data) INTO v_return;
 		SET search_path = 'SCHEMA_NAME', public;
+		EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 		RETURN v_return;
 	END IF;
 	
@@ -212,9 +225,9 @@ BEGIN
 
 		--check if is delimiter
 		IF upper(v_project_type) = 'WS' AND v_table_parent='v_edit_node' THEN
-			IF (SELECT upper(graf_delimiter) FROM cat_feature_node JOIN cat_feature USING (id)
+			IF (SELECT upper(graph_delimiter) FROM cat_feature_node JOIN cat_feature USING (id)
 				WHERE child_layer=v_tablename) IN ('DMA','PRESSZONE') THEN
-				v_isgrafdelimiter = TRUE;
+				v_isgraphdelimiter = TRUE;
 			ELSIF (SELECT upper(epa_default) FROM cat_feature_node JOIN cat_feature USING (id)
 				WHERE child_layer=v_tablename) IN ('PUMP', 'VALVE', 'SHORTPIPE') THEN
 					v_isepatoarc = TRUE;
@@ -243,8 +256,8 @@ BEGIN
 					v_isarcdivide = TRUE;
 				END IF;
 				IF upper(v_project_type) = 'WS' THEN
-					IF ((SELECT upper(graf_delimiter) FROM cat_feature_node WHERE id=v_nodetype) IN ('DMA','PRESSZONE')) THEN
-						v_isgrafdelimiter = TRUE;
+					IF ((SELECT upper(graph_delimiter) FROM cat_feature_node WHERE id=v_nodetype) IN ('DMA','PRESSZONE')) THEN
+						v_isgraphdelimiter = TRUE;
 					ELSIF (SELECT upper(epa_type) FROM node WHERE node_id = v_id) IN ('PUMP', 'VALVE', 'SHORTPIPE') THEN
 						v_isepatoarc = TRUE;
 					END IF;
@@ -420,7 +433,7 @@ BEGIN
 	END IF;
 			
 	-- Get tabs for form
-	IF v_isgrafdelimiter THEN 
+	IF v_isgraphdelimiter THEN 
 		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", 
 			tabfunction as "tabFunction", b.tab as tabActions 
 			FROM (SELECT json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as tab 
@@ -476,7 +489,7 @@ BEGIN
 	-- IF form_tabs is null and layer it's child layer it's child layer --> parent form_tabs is used
 	IF v_linkpath IS NULL AND v_table_parent IS NOT NULL THEN
         	
-        IF v_isgrafdelimiter THEN 
+        IF v_isgraphdelimiter THEN 
 			-- Get form_tabs
 			v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname) tabname as "tabName", label as "tabLabel", tooltip as "tooltip",
 				tabfunction as "tabFunction", b.tab as tabActions  
@@ -770,6 +783,8 @@ BEGIN
 		v_tabdata_lytname_result := gw_fct_json_object_set_key(v_tabdata_lytname_result,concat('index_', v_record.index), v_record.text);
 	END LOOP;
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo,'tabDataLytNames', v_tabdata_lytname_result);
+	
+	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 	
 	--    Return
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "version":' || v_version ||

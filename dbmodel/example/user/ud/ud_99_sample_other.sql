@@ -6,8 +6,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO inp_gully (gully_id, isepa, efficiency)
-SELECT gully_id, true, 1 FROM gully where state > 0;
+INSERT INTO inp_gully (gully_id, outlet_type, method, weir_cd, orifice_cd, efficiency)
+SELECT gully_id, 'To_network', 'W/O', 1.6, 0.7, 90 FROM gully;
+
+UPDATE man_netgully set gratecat_id = 'SGRT3';
 
 UPDATE gully set connec_matcat_id = 'Concret';
 
@@ -242,11 +244,11 @@ IN ('undelete', 'publish', 'buildercat_id', 'comment', 'num_value', 'svg', 'macr
 UPDATE config_form_fields SET hidden = true WHERE columnname IN ('label_x', 'label_y') AND formname LIKE 've_arc%';
 
 -- reorder sample
-UPDATE config_form_fields SET layoutorder =90, layoutname = 'lyt_data_1' WHERE columnname ='link';
-UPDATE config_form_fields SET layoutorder =1 , layoutname ='lyt_bot_2' WHERE columnname ='sector_id';
-UPDATE config_form_fields SET layoutorder =4 , layoutname ='lyt_bot_1' , label = 'Dqa' WHERE columnname ='dqa_id';
-UPDATE config_form_fields SET layoutorder =70 , layoutname ='lyt_data_1' WHERE columnname ='macrosector_id';
-UPDATE config_form_fields SET stylesheet ='{"label":"color:red; font-weight:bold"}' WHERE columnname IN ('expl_id', 'sector_id');
+UPDATE config_form_fields SET layoutorder =90, layoutname = 'lyt_data_1' WHERE columnname ='link' AND (formname not in ('v_edit_link'));
+UPDATE config_form_fields SET layoutorder =1 , layoutname ='lyt_bot_2' WHERE columnname ='sector_id' AND (formname not in ('v_edit_link','v_edit_inp_subcatchment'));
+UPDATE config_form_fields SET layoutorder =4 , layoutname ='lyt_bot_1' , label = 'Dqa' WHERE columnname ='dqa_id' AND (formname not in ('v_edit_link'));
+UPDATE config_form_fields SET layoutorder =70 , layoutname ='lyt_data_1' WHERE columnname ='macrosector_id' AND (formname not in ('v_edit_link'));
+UPDATE config_form_fields SET stylesheet ='{"label":"color:red; font-weight:bold"}' WHERE columnname IN ('expl_id', 'sector_id') AND (formname not in ('v_edit_link'));
 
 update config_form_fields SET layoutorder = 3 where columnname='state' and formname like '%ve_connec_%';
 update config_form_fields SET layoutorder = 4 where columnname='state_type' and formname like '%ve_connec_%';
@@ -256,7 +258,7 @@ UPDATE cat_feature_node set isprofilesurface = true;
 --refactor of forms
 UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 11 where columnname ='pjoint_id';
 UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 12 where columnname ='pjoint_type';
-UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 13 where columnname ='descript';
+UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 13 where columnname ='descript' AND (formname not in ('v_edit_link','v_edit_inp_subcatchment'));
 UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 14 where columnname = 'annotation';
 UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 15 where columnname = 'observ' AND formname <> 'v_edit_dimensions';
 UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 16 where columnname = 'lastupdate';
@@ -265,7 +267,7 @@ UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 18 where 
 
 UPDATE config_form_fields SET  hidden = true where columnname = 'macrodma_id';
 UPDATE config_form_fields SET  hidden = true where columnname = 'inventory';
-UPDATE config_form_fields SET  hidden = true where columnname = 'feature_id';
+UPDATE config_form_fields SET  hidden = true where columnname = 'feature_id' and formname !='v_edit_link';
 UPDATE config_form_fields SET  hidden = true where columnname = 'featurecat_id';
 UPDATE config_form_fields SET  hidden = true where columnname = 'connec_length';
 
@@ -294,15 +296,15 @@ UPDATE config_form_fields SET  hidden = true where columnname = 'function_type' 
 UPDATE config_form_fields SET  hidden = true where columnname = 'descript' AND formname LIKE '%_connec_%';
 UPDATE config_form_fields SET  hidden = true where columnname = 'annotation' AND formname LIKE '%_connec_%';
 
-UPDATE config_form_fields SET layoutname = 'lyt_bot_1', layoutorder = 3 where columnname ='state' AND formname <> 'v_edit_dimensions';
+UPDATE config_form_fields SET layoutname = 'lyt_bot_1', layoutorder = 3 where columnname ='state' AND (formname not in ('v_edit_dimensions','v_edit_link'));
 UPDATE config_form_fields SET layoutname = 'lyt_bot_1', layoutorder = 4 where columnname ='state_type';
 UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='sector_id';
 UPDATE config_form_fields SET layoutname = 'lyt_data_1',layoutorder = 997 where columnname ='hemisphere';
-UPDATE config_form_fields SET layoutorder = 2 where columnname ='dma_id';
+UPDATE config_form_fields SET layoutorder = 2 where columnname ='dma_id' and formname !='v_edit_link';
 
 UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 30 where columnname ='verified';
 UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 32 where columnname ='dqa_id';
-UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 33 where columnname ='expl_id' AND formname <> 'v_edit_dimensions';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 33 where columnname ='expl_id' AND (formname not in ('v_edit_dimensions','v_edit_link','v_edit_inp_subcatchment','v_edit_raingage'));
 UPDATE config_form_fields SET layoutname = 'lyt_data_1', layoutorder = 998 where columnname ='parent_id';
 
 
@@ -494,12 +496,11 @@ INSERT INTO inp_lid VALUES ('RAIN-GARDEN','RG');
 INSERT INTO inp_lid VALUES ('PAV-PERMEABLE','PP');
 INSERT INTO inp_lid VALUES ('GREEN-ROOF','GR');
 INSERT INTO inp_lid VALUES ('INFIL-TRENCH','IT');
-INSERT INTO inp_lid VALUES ('RAIN-BARREL','IT');
+INSERT INTO inp_lid VALUES ('RAIN-BARREL','RB');
 
 INSERT INTO inp_lid_value VALUES (1,'GREEN-ROOF','SURFACE',3,0,0,0,0);
 INSERT INTO inp_lid_value VALUES (2,'GREEN-ROOF','SOIL',3,0.5,0.1,0.05,1.2,2.4,0);
-INSERT INTO inp_lid_value VALUES (3,'GREEN-ROOF','STORAGE',30,0.5,0,0);
-INSERT INTO inp_lid_value VALUES (4,'GREEN-ROOF','DRAINMAT',5,0.5,0,6);
+INSERT INTO inp_lid_value VALUES (4,'GREEN-ROOF','DRAINMAT',5,0.5,0);
 INSERT INTO inp_lid_value VALUES (5,'PAV-PERMEABLE','SURFACE',3,0,0,0,0);
 INSERT INTO inp_lid_value VALUES (6,'PAV-PERMEABLE','PAVEMENT',40,0.5,0.1,0.5,0);
 INSERT INTO inp_lid_value VALUES (7,'PAV-PERMEABLE','STORAGE',30,0.5,0,0);
@@ -515,6 +516,8 @@ INSERT INTO inp_lid_value VALUES (16,'BIO-RETENTION','STORAGE',30,0.5,0,0);
 INSERT INTO inp_lid_value VALUES (17,'RAIN-BARREL','STORAGE',30,1,0,0);
 INSERT INTO inp_lid_value VALUES (18,'RAIN-BARREL','DRAIN',5,0.5,0,6);
 
-
 SELECT gw_fct_admin_schema_lastprocess($${"client":{"lang":"ES"},
 "data":{"isNewProject":"FALSE", "projectType":"UD", "epsg":25831, "isSample":"TRUE"}}$$);
+
+UPDATE config_param_system SET value = '{"usePsectors":false, "ignoreGrafanalytics":false, "ignoreEpa":false, "ignorePlan":false}'
+WHERE parameter = 'admin_checkproject';

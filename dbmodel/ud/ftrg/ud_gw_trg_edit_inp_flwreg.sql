@@ -29,9 +29,11 @@ BEGIN
 			-- default values
 			IF NEW.geom1 IS NULL THEN NEW.geom1 = 1;END IF;
 			IF NEW.geom2 IS NULL THEN NEW.geom2 = 1; END IF;
+			IF NEW.geom3 IS NULL THEN NEW.geom3 = 0; END IF;
+			IF NEW.geom4 IS NULL THEN NEW.geom4 = 0; END IF;
 			IF NEW.ori_type IS NULL THEN NEW.ori_type = 'SIDE'; END IF;
 			IF NEW.shape IS NULL THEN NEW.shape = 'RECT-CLOSED';END IF;
-		
+			
 			INSERT INTO inp_flwreg_orifice (nodarc_id, node_id, order_id, to_arc, flwreg_length, ori_type, offsetval, cd, orate,
 			flap, shape, geom1, geom2, geom3, geom4, close_time)
 			VALUES (concat(NEW.node_id,'OR',NEW.order_id), NEW.node_id, NEW.order_id, NEW.to_arc, NEW.flwreg_length, NEW.ori_type, NEW.offsetval, NEW.cd, NEW.orate, 
@@ -54,7 +56,9 @@ BEGIN
 
 			-- default values
 			IF NEW.weir_type IS NULL THEN NEW.weir_type = 'SIDEFLOW'; END IF;
-	 	
+			IF NEW.geom3 IS NULL THEN NEW.geom3 = 0; END IF;
+			IF NEW.geom4 IS NULL THEN NEW.geom4 = 0; END IF;
+	 		
 			INSERT INTO inp_flwreg_weir (nodarc_id, node_id, order_id, to_arc, flwreg_length, weir_type, offsetval, cd, ec, 
 			cd2, flap, geom1, geom2, geom3, geom4, surcharge, road_width, road_surf, coef_curve)
 			VALUES (concat(NEW.node_id,'WE',NEW.order_id), NEW.node_id, NEW.order_id, NEW.to_arc, NEW.flwreg_length, NEW.weir_type, NEW.offsetval, NEW.cd, NEW.ec, 

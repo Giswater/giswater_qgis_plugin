@@ -62,6 +62,7 @@ v_msgerr json;
 v_value text;
 v_reports json;
 v_reports_basic json;
+v_reports_om json;
 v_reports_edit json;
 v_reports_epa json;
 v_reports_master json;
@@ -71,6 +72,7 @@ v_inp_dwf text;
 v_inp_dscenario text;
 v_sector text;
 v_process json;
+v_mincut integer;
 
 BEGIN
 
@@ -113,7 +115,10 @@ BEGIN
 	v_inp_dwf = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user limit 1);
 	v_inp_dscenario = (SELECT dscenario_id FROM selector_inp_dscenario WHERE cur_user = current_user limit 1);
 	v_sector = (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0 limit 1 );
-
+	
+	IF v_projectype = 'ws' THEN
+		v_mincut = (SELECT result_id FROM selector_mincut_result WHERE cur_user = current_user limit 1 );	
+	END IF;
 
 	IF v_projectype = 'ws' THEN
 		v_nodetype = (SELECT nodetype_id FROM cat_node JOIN config_param_user ON cat_node.id = config_param_user.value
@@ -218,16 +223,26 @@ BEGIN
 				 FROM config_report
 				 WHERE sys_role = ''role_basic'' 
 				 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-				 AND alias ILIKE ''%', v_filter ,'%'' ORDER BY id) a');
+				 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE ORDER BY id) a');
 				
 		EXECUTE v_querystring INTO v_reports_basic;
 
 		v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 				 SELECT id as listname, alias
 				 FROM config_report
+				 WHERE sys_role = ''role_om'' 
+				 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
+				 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE ORDER BY id) a');
+				
+		EXECUTE v_querystring INTO v_reports_om;
+
+		
+		v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+				 SELECT id as listname, alias
+				 FROM config_report
 				 WHERE sys_role = ''role_edit'' 
 				 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-				 AND alias ILIKE ''%', v_filter ,'%'' ORDER BY id) a');
+				 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE ORDER BY id) a');
 				
 		EXECUTE v_querystring INTO v_reports_edit;
 
@@ -236,7 +251,7 @@ BEGIN
 				 FROM config_report
 				 WHERE sys_role = ''role_epa'' 
 				 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-				 AND alias ILIKE ''%', v_filter ,'%'' ORDER BY id) a');
+				 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE ORDER BY id) a');
 				
 		EXECUTE v_querystring INTO v_reports_epa;
 
@@ -245,7 +260,7 @@ BEGIN
 				 FROM config_report
 				 WHERE sys_role = ''role_master'' 
 				 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-				 AND alias ILIKE ''%', v_filter ,'%'' ORDER BY id) a');
+				 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE ORDER BY id) a');
 				
 		EXECUTE v_querystring INTO v_reports_master;
 
@@ -254,12 +269,13 @@ BEGIN
 				 FROM config_report
 				 WHERE sys_role = ''role_admin'' 
 				 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-				 AND alias ILIKE ''%', v_filter ,'%'' ORDER BY id) a');
+				 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE ORDER BY id) a');
 				
 		EXECUTE v_querystring INTO v_reports_admin;
 	END IF;
 
 	SELECT json_strip_nulls(json_build_object('basic', v_reports_basic, 
+	'om', v_reports_om,
 	'edit', v_reports_edit,
 	'epa', v_reports_epa,
 	'master', v_reports_master,
@@ -303,6 +319,8 @@ BEGIN
 
 				IF v_selectedid = '$userExploitation' THEN
 					v_selectedid = concat('"selectedId":"',v_expl,'"');
+				ELSIF v_selectedid = '$userMincut' THEN
+					v_selectedid = concat('"selectedId":"',v_mincut,'"');
 				ELSIF v_selectedid = '$userState' THEN
 					v_selectedid = concat('"selectedId":"',v_state,'"');
 				ELSIF v_selectedid = '$userSector' THEN

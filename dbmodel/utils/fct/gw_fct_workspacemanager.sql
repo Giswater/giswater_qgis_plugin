@@ -54,6 +54,7 @@ rec_selectorcolumn record;
 v_datatype text;
 v_fid integer=398;
 v_check_config json;
+v_workspace_private boolean=false;
 
 v_return_level integer;
 v_return_status text;
@@ -85,6 +86,7 @@ BEGIN
 	v_workspace_id = json_extract_path_text(p_data,'data','id');
 	v_workspace_name = json_extract_path_text(p_data,'data','name');
 	v_workspace_descript = json_extract_path_text(p_data,'data','descript');
+	v_workspace_private = json_extract_path_text(p_data,'data', 'private');
 
 	IF v_workspace_name IS NULL THEN
 		SELECT name into v_workspace_name FROM cat_workspace WHERE id = v_workspace_id;
@@ -95,7 +97,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-----------------------------');
 
 		
-	IF v_action = 'CREATE' OR v_action = 'CHECK' THEN
+	IF v_action = 'CREATE' OR v_action = 'CHECK' OR v_action = 'UPDATE' THEN
 
 		IF v_action = 'CREATE' AND v_workspace_name IN (SELECT name FROM cat_workspace) THEN
 			
@@ -195,10 +197,14 @@ BEGIN
 
 	IF v_action = 'DELETE' THEN
 		--check if someone uses a workspace at the moment, if not, remove it 
-		IF (SELECT value FROM config_param_user WHERE parameter='utils_workspace_vdefault' AND cur_user = current_user) = v_workspace_id::text THEN
+		IF v_workspace_id::text IN (SELECT value FROM config_param_user WHERE parameter='utils_workspace_vdefault' AND cur_user != current_user) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3186", "function":"3078","debug_msg":null}}$$);'INTO v_audit_result;	
 		ELSE
+			IF (SELECT value FROM config_param_user WHERE parameter='utils_workspace_vdefault' AND cur_user = current_user) = v_workspace_id::text THEN
+				--remove workspace from config_param_user
+				DELETE FROM config_param_user WHERE parameter = 'utils_workspace_vdefault' AND cur_user = current_user;
+			END IF;
 			DELETE FROM cat_workspace WHERE id=v_workspace_id;
 			v_return_msg = 'Workspace successfully deleted';
 
@@ -206,14 +212,18 @@ BEGIN
 		
 	ELSIF v_action = 'CREATE' AND v_audit_result is null THEN
 		--insert new workspace into catalog and set it as vdefault
-		INSERT INTO cat_workspace (name, descript, config)
-		VALUES (v_workspace_name, v_workspace_descript, v_workspace_config) RETURNING id INTO v_workspace_id;
+		INSERT INTO cat_workspace (name, descript, config, private)
+		VALUES (v_workspace_name, v_workspace_descript, v_workspace_config, v_workspace_private) RETURNING id INTO v_workspace_id;
 
 		INSERT INTO config_param_user (parameter,value, cur_user)
 		VALUES ('utils_workspace_vdefault',v_workspace_id, current_user)
 		ON CONFLICT (parameter, cur_user) DO UPDATE SET value=v_workspace_id;
 
 		v_return_msg = 'Workspace successfully created';
+
+	ELSIF v_action = 'UPDATE' THEN
+		-- update configuration of selected workspace
+		UPDATE cat_workspace SET config = v_workspace_config WHERE id = v_workspace_id;
 		
 	ELSIF v_action = 'CURRENT' THEN
 		
@@ -331,8 +341,12 @@ BEGIN
 
     END IF;
 
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result_info 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
+	IF (SELECT id FROM cat_workspace WHERE id=v_workspace_id) is null THEN
+		v_result_info = '{}';
+	ELSE
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result_info 
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
+	END IF;
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
 	-- get uservalues

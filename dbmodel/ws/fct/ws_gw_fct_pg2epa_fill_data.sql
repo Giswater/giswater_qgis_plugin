@@ -22,6 +22,7 @@ v_statetype text;
 v_isoperative boolean;
 v_networkmode integer;
 v_minlength float;
+v_forcereservoirsoninlets boolean;
 
 BEGIN
 
@@ -33,7 +34,8 @@ BEGIN
 	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_buildup_mode' AND cur_user=current_user);
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user);
 	v_minlength := (SELECT value FROM config_param_system WHERE parameter = 'epa_arc_minlength');
-
+	v_forcereservoirsoninlets := (SELECT value::json->>'forceReservoirsOnInlets' FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
+	
 	-- get debug parameters
 	v_isoperative = (SELECT value::json->>'onlyIsOperative' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
@@ -86,7 +88,7 @@ BEGIN
 	UPDATE temp_node SET pattern_id=inp_reservoir.pattern_id FROM inp_reservoir WHERE temp_node.node_id=inp_reservoir.node_id;
 
 	-- update head for those reservoirs head is not null
-	UPDATE temp_node SET elevation = head FROM inp_reservoir WHERE temp_node.node_id=inp_reservoir.node_id AND head is not null;
+	UPDATE temp_node SET elevation = head, elev = head FROM inp_reservoir WHERE temp_node.node_id=inp_reservoir.node_id AND head is not null;
 	
 	-- update child param for inp_junction
 	UPDATE temp_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE temp_node.node_id=inp_junction.node_id;
@@ -108,27 +110,33 @@ BEGIN
 	FROM inp_valve WHERE temp_node.node_id=inp_valve.node_id;
 
 	-- update addparam for inp_pump
-	UPDATE temp_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern_id":"',inp_pump.pattern_id,'", "status":"',status,'", "to_arc":"',to_arc,
-	'", "effic_curve_id":"', effic_curve_id,'", "energy_price":"',energy_price,'", "energy_pattern_id":"',energy_pattern_id,'", "pump_type":"',pump_type,'"}')
+	UPDATE temp_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',pattern,'", "status":"',status,'", "to_arc":"',to_arc,
+	'", "energyparam":"', energyparam,'", "energyvalue":"',energyvalue,'", "pump_type":"',pump_type,'"}')
 	FROM inp_pump WHERE temp_node.node_id=inp_pump.node_id;
 
-	-- manage inlets as reservoir (when there are as many pipes as you want but all are related to same sector)
-	UPDATE temp_node SET epa_type = 'RESERVOIR' WHERE node_id IN (
-	SELECT node_id FROM (
-	SELECT a.sector_id, n1.node_id FROM temp_arc a JOIN temp_node n1 ON n1.node_id = node_1	WHERE n1.epa_type ='INLET'
-	UNION
-	SELECT a.sector_id, n2.node_id FROM temp_arc a JOIN temp_node n2 ON n2.node_id = node_2	WHERE n2.epa_type ='INLET')a
-	group by node_id
-	HAVING count(sector_id)=1);
+	IF v_forcereservoirsoninlets THEN
 
-	-- manage inlets as tanks  (when there are as many pipes as you want and there are at least two sectors involved)
-	UPDATE temp_node SET epa_type = 'TANK' WHERE node_id IN (
-	SELECT node_id FROM (
-	SELECT a.sector_id, n1.node_id FROM temp_arc a JOIN temp_node n1 ON n1.node_id = node_1	WHERE n1.epa_type ='INLET'
-	UNION
-	SELECT a.sector_id, n2.node_id FROM temp_arc a JOIN temp_node n2 ON n2.node_id = node_2	WHERE n2.epa_type ='INLET')a
-	group by node_id
-	HAVING count(sector_id)>1);
+		UPDATE temp_node SET epa_type = 'RESERVOIR' WHERE epa_type = 'INLET';
+	ELSE 
+
+		-- manage inlets as reservoir (when there are as many pipes as you want but all are related to same sector)
+		UPDATE temp_node SET epa_type = 'RESERVOIR' WHERE node_id IN (
+		SELECT node_id FROM (
+		SELECT a.sector_id, n1.node_id FROM temp_arc a JOIN temp_node n1 ON n1.node_id = node_1	WHERE n1.epa_type ='INLET'
+		UNION
+		SELECT a.sector_id, n2.node_id FROM temp_arc a JOIN temp_node n2 ON n2.node_id = node_2	WHERE n2.epa_type ='INLET')a
+		group by node_id
+		HAVING count(sector_id)=1);
+
+		-- manage inlets as tanks  (when there are as many pipes as you want and there are at least two sectors involved)
+		UPDATE temp_node SET epa_type = 'TANK' WHERE node_id IN (
+		SELECT node_id FROM (
+		SELECT a.sector_id, n1.node_id FROM temp_arc a JOIN temp_node n1 ON n1.node_id = node_1	WHERE n1.epa_type ='INLET'
+		UNION
+		SELECT a.sector_id, n2.node_id FROM temp_arc a JOIN temp_node n2 ON n2.node_id = node_2	WHERE n2.epa_type ='INLET')a
+		group by node_id
+		HAVING count(sector_id)>1);
+	END IF;
 
 
 	raise notice 'inserting arcs on temp_arc table';
@@ -190,7 +198,7 @@ BEGIN
 	UPDATE temp_arc SET 
 	minorloss = inp_pipe.minorloss,
 	status = (CASE WHEN inp_pipe.status IS NULL THEN 'OPEN' ELSE inp_pipe.status END),	
-	addparam=concat('{"bulk_coeff":"',inp_pipe.bulk_coeff, '","wall_coeff":"',inp_pipe.wall_coeff,'"}')
+	addparam=concat('{"reactionparam":"',inp_pipe.reactionparam, '","reactionvalue":"',inp_pipe.reactionvalue,'"}')
 	FROM inp_pipe WHERE temp_arc.arc_id=inp_pipe.arc_id;
 
 	raise notice 'updating inp_virtualvalve';
@@ -224,8 +232,8 @@ BEGIN
 	FROM inp_valve_importinp v WHERE temp_arc.arc_id=v.arc_id;
 
 	-- update addparam for inp_pump_importinp
-	UPDATE temp_arc SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern_id":"',p.pattern_id,'", "status":"',p.status,'",
-	"effic_curve_id":"', effic_curve_id,'", "energy_price":"',energy_price,'", "energy_pattern_id":"',energy_pattern_id,'", "pump_type":"FLOWPUMP"}')
+	UPDATE temp_arc SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',pattern,'", "status":"',p.status,'",
+	"energyparam":"', energyparam,'", "energyvalue":"',energyvalue,'", "pump_type":"FLOWPUMP"}')
 	FROM inp_pump_importinp p WHERE temp_arc.arc_id=p.arc_id;
 
     RETURN 1;

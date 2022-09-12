@@ -6,6 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2528
 
+DROP FUNCTION IF EXISTS  SCHEMA_NAME.gw_fct_utils_csv2pg_export_swmm_inp(character varying);
 DROP FUNCTION IF EXISTS  SCHEMA_NAME.gw_fct_utils_csv2pg_export_swmm_inp(character varying, text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_export_inp(p_data json)
 RETURNS json AS
@@ -134,15 +135,16 @@ BEGIN
 		union
 			select id, csv1 as text from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_transects','vi_controls','vi_rules', 'vi_backdrop', 'vi_hydrographs','vi_polygons') 
 		union
-			select id, concat(rpad(csv1,20), ' ', rpad(csv2,20), ' ', rpad(csv3,20), ' ', rpad(csv4,20), ' ', rpad(csv5,20), ' ', rpad(csv6,20), ' ', csv7) as text
+			select id, concat(rpad(csv1,20), ' ', rpad(coalesce(csv2,''),20), ' ', rpad(coalesce(csv3,''),20), ' ', rpad(coalesce(csv4,''),20), ' ', rpad(coalesce(csv5,''),20), ' ', rpad(coalesce(csv6,''),20), ' ', csv7) as text
 			from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_junctions') 
 		union
-			select id, concat(rpad(csv1,20), ' ', rpad(csv2,20), ' ', rpad(csv3,20), ' ', rpad(csv4,20), ' ', rpad(csv5,20), ' ', rpad(csv6,20),' ', rpad(csv7,20) , ' ', rpad(csv8,20), ' ', rpad(csv8,20), ' ',
+			select id, concat(rpad(csv1,20), ' ', rpad(coalesce(csv2,''),20), ' ', rpad(coalesce(csv3,''),20), ' ', rpad(coalesce(csv4,''),20), ' ', rpad(coalesce(csv5,''),20), ' ', rpad(coalesce(csv6,''),20),
+			' ', rpad(coalesce(csv7,''),20) , ' ', rpad(coalesce(csv8,''),20), ' ', rpad(coalesce(csv8,''),20), ' ',
 			csv10) as text from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_conduits') 
 		union
 			select id, concat(rpad(csv1,20), ' ', csv2)as text from temp_csv where fid = 141 and cur_user = current_user and source in ('header', 'vi_evaporation','vi_temperature', 'vi_report', 'vi_map')
 		union
-			select id, concat(rpad(csv1,20), ' ', rpad(csv2,20), ' ', csv3)as text from temp_csv where fid = 141 and cur_user = current_user and source in ('vi_files', 'vi_adjustments')
+			select id, concat(rpad(csv1,20), ' ', rpad(coalesce(csv2,''),20), ' ', csv3)as text from temp_csv where fid = 141 and cur_user = current_user and source in ('vi_files', 'vi_adjustments')
 		union
 			select id, 
 			case when  substring(csv2,0,5) = 'FILE' THEN concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),length(csv2)+2))
@@ -158,8 +160,9 @@ BEGIN
 		union
 			select id, concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),20),' ',rpad(coalesce(csv5,''),20),' ',rpad(coalesce(csv6,''),20),
 			' ',rpad(coalesce(csv7,''),20),' ',rpad(coalesce(csv8,''),20),' ',rpad(coalesce(csv9,''),20),' ',rpad(coalesce(csv10,''),20),' ',rpad(coalesce(csv11,''),20),' ',rpad(coalesce(csv12,''),20),
-			' ',rpad(csv13,20),' ',rpad(csv14,20),' ',rpad(csv15,20),' ', rpad(csv16,20),' ',rpad(csv17,20),' ',rpad(csv18,20),' ', rpad(csv19,20), ' ', rpad(csv20,20),' ',rpad(csv21,20),
-			' ',rpad(csv22,20),' ',rpad(csv23,20),' ',rpad(csv24,20),' ', rpad(csv25,20),' ',rpad(csv26,20),' ',rpad(csv27,20),' ', rpad(csv28,20), ' ', rpad(csv29,20),' ',rpad(csv30,20)) as text
+			' ',rpad(coalesce(csv13,''),20),' ',rpad(coalesce(csv14,''),20),' ',rpad(coalesce(csv15,''),20),' ', rpad(coalesce(csv16,''),20),' ',rpad(coalesce(csv17,''),20),' ',rpad(coalesce(csv18,''),20),
+			' ', rpad(coalesce(csv19,''),20), ' ',rpad(coalesce(csv20,''),20),' ',rpad(coalesce(csv21,''),20),' ',rpad(coalesce(csv22,''),20),' ',rpad(coalesce(csv23,''),20),' ',rpad(coalesce(csv24,''),20),
+			' ', rpad(coalesce(csv25,''),20),' ',rpad(coalesce(csv26,''),20),' ',rpad(coalesce(csv27,''),20),' ', rpad(coalesce(csv28,''),20), ' ', rpad(coalesce(csv29,''),20),' ',rpad(coalesce(csv30,''),20)) as text
 			from temp_csv where fid  = 141 and cur_user = current_user and source not in
 			('header','vi_controls','vi_rules', 'vi_backdrop', 'vi_adjustments','vi_evaporation', 'vi_files','vi_hydrographs','vi_polygons','vi_temperature','vi_transects',
 			'vi_raingages','vi_timeseries','vi_transects', 'vi_report', 'vi_map', 'vi_junctions', 'vi_conduits')

@@ -32,15 +32,15 @@ BEGIN
 			NEW.active = TRUE;
 		END IF;
 
-		INSERT INTO presszone (presszone_id, name, expl_id, the_geom, grafconfig, head, stylesheet, active)
-		VALUES (NEW.presszone_id, NEW.name, NEW.expl_id, NEW.the_geom, NEW.grafconfig::json, NEW.head, NEW.stylesheet::json, NEW.active);
+		INSERT INTO presszone (presszone_id, name, expl_id, the_geom, graphconfig, head, stylesheet, active)
+		VALUES (NEW.presszone_id, NEW.name, NEW.expl_id, NEW.the_geom, NEW.graphconfig::json, NEW.head, NEW.stylesheet::json, NEW.active);
 
 		RETURN NEW;
 		
 	ELSIF TG_OP = 'UPDATE' THEN
    	
 		UPDATE presszone
-		SET presszone_id=NEW.presszone_id, name=NEW.name, expl_id=NEW.expl_id, the_geom=NEW.the_geom, grafconfig=NEW.grafconfig::json,
+		SET presszone_id=NEW.presszone_id, name=NEW.name, expl_id=NEW.expl_id, the_geom=NEW.the_geom, graphconfig=NEW.graphconfig::json,
 		head = NEW.head, stylesheet=NEW.stylesheet::json, active=NEW.active
 		WHERE presszone_id=OLD.presszone_id;
 		

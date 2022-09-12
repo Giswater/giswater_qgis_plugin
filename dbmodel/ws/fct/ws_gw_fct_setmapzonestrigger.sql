@@ -62,8 +62,8 @@ BEGIN
 	v_id := (p_data ->> 'feature')::json->> 'id';
 	v_closedstatus := json_extract_path_text (p_data,'data','fields', 'closed')::text;
 
-	SELECT type INTO v_type FROM cat_feature JOIN cat_feature_node USING (id) WHERE child_layer = v_tablename AND graf_delimiter !='NONE'
-	AND graf_delimiter IS NOT NULL;
+	SELECT type INTO v_type FROM cat_feature JOIN cat_feature_node USING (id) WHERE child_layer = v_tablename AND graph_delimiter !='NONE'
+	AND graph_delimiter IS NOT NULL;
 	
 	-- getting exploitation
 	v_exploitation = (SELECT expl_id FROM node WHERE node_id = v_id);
@@ -71,15 +71,15 @@ BEGIN
 	IF v_type = 'VALVE' AND v_closedstatus IS NOT NULL THEN
 		
 		-- getting system variable
-		v_automaticmapzonetrigger = (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger');		
+		v_automaticmapzonetrigger = (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'utils_graphanalytics_automatic_trigger');		
 		
 		IF v_automaticmapzonetrigger THEN
 
 			-- getting variables for trigger automatic mapzones
-			v_geomparamupdate = (SELECT (value::json->>'parameters')::json->>'geomParamUpdate' FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger'); 
-			v_useplanpsector = (SELECT (value::json->>'parameters')::json->>'usePlanPsector' FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger'); 
-			v_updatemapzone = (SELECT (value::json->>'parameters')::json->>'updateMapZone' FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger'); 
-			v_mapzone_array = (SELECT (value::json->>'mapzone') FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger'); 
+			v_geomparamupdate = (SELECT (value::json->>'parameters')::json->>'geomParamUpdate' FROM config_param_system WHERE parameter = 'utils_graphanalytics_automatic_trigger'); 
+			v_useplanpsector = (SELECT (value::json->>'parameters')::json->>'usePlanPsector' FROM config_param_system WHERE parameter = 'utils_graphanalytics_automatic_trigger'); 
+			v_updatemapzone = (SELECT (value::json->>'parameters')::json->>'updateMapZone' FROM config_param_system WHERE parameter = 'utils_graphanalytics_automatic_trigger'); 
+			v_mapzone_array = (SELECT (value::json->>'mapzone') FROM config_param_system WHERE parameter = 'utils_graphanalytics_automatic_trigger'); 
 			
 			-- FOR v_mapzone
 			FOR v_mapzone IN SELECT json_array_elements_text(v_mapzone_array)
@@ -115,14 +115,14 @@ BEGIN
 
 						RAISE NOTICE 'mapzones %', v_mapzone_id;
 
-						v_querytext = '{"data":{"parameters":{"grafClass":"'||v_mapzone||'", "floodOnlyMapzone":"'||v_mapzone_id||'", "checkData":false, "updateFeature":"true", 
+						v_querytext = '{"data":{"parameters":{"graphClass":"'||v_mapzone||'", "floodOnlyMapzone":"'||v_mapzone_id||'", "checkData":false, "updateFeature":"true", 
 						"updateMapZone":'||v_updatemapzone||', "geomParamUpdate":'||v_geomparamupdate||',"debug":false, "usePlanPsector":'||v_useplanpsector||', "forceOpen":[], "forceClosed":[]}}}';
 					ELSE
-						v_querytext = '{"data":{"parameters":{"grafClass":"'||v_mapzone||'", "exploitation":['||v_exploitation||'], "checkData":false, "updateFeature":"true", 
+						v_querytext = '{"data":{"parameters":{"graphClass":"'||v_mapzone||'", "exploitation":['||v_exploitation||'], "checkData":false, "updateFeature":"true", 
 						"updateMapZone":'||v_updatemapzone||', "geomParamUpdate":'||v_geomparamupdate||',"debug":false, "usePlanPsector":'||v_useplanpsector||', "forceOpen":[], "forceClosed":[]}}}';					
 					END IF;
 
-					PERFORM gw_fct_grafanalytics_mapzones(v_querytext::json);
+					PERFORM gw_fct_graphanalytics_mapzones(v_querytext::json);
 
 					-- return message 
 					IF v_closedstatus IS TRUE THEN

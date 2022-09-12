@@ -16,8 +16,8 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"0"}}$$) -- FULL PROCESS
 
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"1"}}$$) -- STRUCTURE DATA (GRAF AND BOUNDARY)
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"2"}}$$) -- ANALYZE GRAF
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"1"}}$$) -- STRUCTURE DATA (graph AND BOUNDARY)
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"2"}}$$) -- ANALYZE graph
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"3"}}$$) -- CREATE JSON RETURN
 
 --fid: 227
@@ -222,8 +222,7 @@ BEGIN
 		FROM inp_valve_importinp b WHERE t.arc_id = b.arc_id;
 
 		UPDATE temp_arc t SET status = b.status, epa_type ='PUMP',
-		addparam = concat('{"power":"',power,'", "speed":"',speed,'", "curve_id":"',curve_id,'", "pattern_id":"',pattern_id,'", "effic_curve_id":"',effic_curve_id,'", "status":"',b.status,'", "energy_price":"',b.energy_price,'", "energy_pattern_id":"',b.energy_pattern_id,'"}')
-
+		addparam = concat('{"power":"',power,'", "speed":"',speed,'", "curve_id":"',curve_id,'", "pattern":"',pattern,'", "energyparam":"',energyparam,'", "status":"',b.status,'", "energyvalue":"',b.energyvalue,'"}')
 		FROM inp_pump_importinp b WHERE t.arc_id = b.arc_id;
 
 		RAISE NOTICE '19 - Check result previous exportation';
@@ -311,7 +310,7 @@ BEGIN
 	RAISE NOTICE '22 - Manage return';
 	IF v_step=1 THEN
 	
-		v_return = '{"message":{"level":1, "text":"Step-1: Structure data, graf and boundary conditions of inp created succesfully"}}'::json;
+		v_return = '{"message":{"level":1, "text":"Step-1: Structure data, graph and boundary conditions of inp created succesfully"}}'::json;
 		RETURN v_return;	
 
 	ELSIF v_step=0 THEN

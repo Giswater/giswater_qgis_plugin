@@ -6,8 +6,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO inp_timeseries VALUES ('T10-5m', 'Rainfall', 'RELATIVE', 'T10-5m');
-INSERT INTO inp_timeseries VALUES ('T5-5m', 'Rainfall', 'RELATIVE', 'T5-5m');
+INSERT INTO inp_timeseries VALUES ('T10-5m', 'Rainfall', 'RELATIVE', 'T10-5m', null,null, 1);
+INSERT INTO inp_timeseries VALUES ('T5-5m', 'Rainfall', 'RELATIVE', 'T5-5m', null,null, 1);
+INSERT INTO inp_timeseries VALUES ('T10-5m-e2', 'Rainfall', 'RELATIVE', 'T10-5m-e2', null,null, 2);
+INSERT INTO inp_timeseries VALUES ('T5-5m-e2', 'Rainfall', 'RELATIVE', 'T5-5m-e2', null,null, 2);
 
 INSERT INTO raingage VALUES ('RG-01', 'VOLUME', '0:05', 1.0000, 'TIMESERIES', 'T5-5m', NULL, NULL, NULL, 1, '0101000020E764000039A71EA280941941AB5F34D0B8755141');
 
@@ -372,10 +374,10 @@ INSERT INTO inp_conduit (arc_id, barrels, culvert, kentry, kexit, kavg, flap, q0
 INSERT INTO inp_conduit (arc_id, barrels, culvert, kentry, kexit, kavg, flap, q0, qmax, seepage, custom_n) VALUES ('340', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 
-INSERT INTO inp_curve VALUES ('PUMP-01', 'PUMP2');
-INSERT INTO inp_curve VALUES ('EBAR-01', 'STORAGE');
-INSERT INTO inp_curve VALUES ('EBAR-02', 'STORAGE');
-INSERT INTO inp_curve VALUES ('PUMP-02', 'PUMP2');
+INSERT INTO inp_curve VALUES ('PUMP-01', 'PUMP2', null, 1);
+INSERT INTO inp_curve VALUES ('EBAR-01', 'STORAGE', null, 1);
+INSERT INTO inp_curve VALUES ('EBAR-02', 'STORAGE', null, 2);
+INSERT INTO inp_curve VALUES ('PUMP-02', 'PUMP2', null, 2);
 
 
 INSERT INTO inp_curve_value VALUES (8, 'EBAR-01', 0.000000, 17.500000);
@@ -595,7 +597,26 @@ INSERT INTO inp_outfall VALUES ('236', 'NORMAL', NULL, NULL, NULL, NULL);
 INSERT INTO inp_outfall VALUES ('240', 'NORMAL', NULL, NULL, NULL, NULL);
 
 
-INSERT INTO inp_pattern VALUES ('pattern_02');
+INSERT INTO inp_pattern (pattern_id,pattern_type, expl_id) VALUES ('pattern_11', 'MONTHLY', 1);
+INSERT INTO inp_pattern (pattern_id,pattern_type, expl_id) VALUES ('pattern_12', 'HOURLY', 1);
+INSERT INTO inp_pattern (pattern_id,pattern_type, expl_id) VALUES ('pattern_13', 'DAILY', 1);
+INSERT INTO inp_pattern (pattern_id,pattern_type, expl_id) VALUES ('pattern_14', 'WEEKEND', 1);
+INSERT INTO inp_pattern (pattern_id,pattern_type, expl_id) VALUES ('pattern_21', 'MONTHLY', 2);
+INSERT INTO inp_pattern (pattern_id,pattern_type, expl_id) VALUES ('pattern_22', 'HOURLY', 2);
+INSERT INTO inp_pattern (pattern_id,pattern_type, expl_id) VALUES ('pattern_23', 'DAILY', 2);
+INSERT INTO inp_pattern (pattern_id,pattern_type, expl_id) VALUES ('pattern_24', 'WEEKEND', 2);
+
+
+INSERT INTO inp_pattern_value VALUES ('pattern_11', 1,1,1,1,1,1,1,1,1,1,1,1);
+INSERT INTO inp_pattern_value VALUES ('pattern_12', 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
+INSERT INTO inp_pattern_value VALUES ('pattern_13', 1,1,1,1,1,1,1);
+INSERT INTO inp_pattern_value VALUES ('pattern_14', 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
+
+INSERT INTO inp_pattern_value VALUES ('pattern_21', 1,1,1,1,1,1,1,1,1,1,1,1);
+INSERT INTO inp_pattern_value VALUES ('pattern_22', 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
+INSERT INTO inp_pattern_value VALUES ('pattern_23', 1,1,1,1,1,1,1);
+INSERT INTO inp_pattern_value VALUES ('pattern_24', 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
+
 
 INSERT INTO inp_project_id VALUES ('title', NULL, 'Dec-2017');
 
@@ -627,6 +648,31 @@ INSERT INTO inp_timeseries_value VALUES (21, 'T10-5m', NULL, NULL, '0:40', 2.830
 INSERT INTO inp_timeseries_value VALUES (22, 'T10-5m', NULL, NULL, '0:45', 2.2800);
 INSERT INTO inp_timeseries_value VALUES (23, 'T10-5m', NULL, NULL, '0:50', 1.9200);
 INSERT INTO inp_timeseries_value VALUES (24, 'T10-5m', NULL, NULL, '0:55', 1.6600);
+
+INSERT INTO inp_timeseries_value VALUES (31, 'T5-5m-e2', NULL, NULL, '0:00', 0.7800);
+INSERT INTO inp_timeseries_value VALUES (32, 'T5-5m-e2', NULL, NULL, '0:05', 1.1500);
+INSERT INTO inp_timeseries_value VALUES (33, 'T5-5m-e2', NULL, NULL, '0:10', 2.2200);
+INSERT INTO inp_timeseries_value VALUES (34, 'T5-5m-e2', NULL, NULL, '0:15', 3.9900);
+INSERT INTO inp_timeseries_value VALUES (35, 'T5-5m-e2', NULL, NULL, '0:20', 4.8800);
+INSERT INTO inp_timeseries_value VALUES (36, 'T5-5m-e2', NULL, NULL, '0:25', 8.7500);
+INSERT INTO inp_timeseries_value VALUES (37, 'T5-5m-e2', NULL, NULL, '0:30', 5.1500);
+INSERT INTO inp_timeseries_value VALUES (38, 'T5-5m-e2', NULL, NULL, '0:35', 3.2000);
+INSERT INTO inp_timeseries_value VALUES (39, 'T5-5m-e2', NULL, NULL, '0:40', 2.2500);
+INSERT INTO inp_timeseries_value VALUES (40, 'T5-5m-e2', NULL, NULL, '0:45', 1.2500);
+INSERT INTO inp_timeseries_value VALUES (41, 'T5-5m-e2', NULL, NULL, '0:50', 0.9200);
+INSERT INTO inp_timeseries_value VALUES (42, 'T5-5m-e2', NULL, NULL, '0:55', 0.4900);
+INSERT INTO inp_timeseries_value VALUES (43, 'T10-5m-e2', NULL, NULL, '0:00', 1.7800);
+INSERT INTO inp_timeseries_value VALUES (44, 'T10-5m-e2', NULL, NULL, '0:05', 2.0800);
+INSERT INTO inp_timeseries_value VALUES (45, 'T10-5m-e2', NULL, NULL, '0:10', 2.5200);
+INSERT INTO inp_timeseries_value VALUES (46, 'T10-5m-e2', NULL, NULL, '0:15', 3.2500);
+INSERT INTO inp_timeseries_value VALUES (47, 'T10-5m-e2', NULL, NULL, '0:20', 4.7800);
+INSERT INTO inp_timeseries_value VALUES (48, 'T10-5m-e2', NULL, NULL, '0:25', 15.5200);
+INSERT INTO inp_timeseries_value VALUES (49, 'T10-5m-e2', NULL, NULL, '0:30', 6.5800);
+INSERT INTO inp_timeseries_value VALUES (50, 'T10-5m-e2', NULL, NULL, '0:35', 3.8400);
+INSERT INTO inp_timeseries_value VALUES (51, 'T10-5m-e2', NULL, NULL, '0:40', 2.8300);
+INSERT INTO inp_timeseries_value VALUES (52, 'T10-5m-e2', NULL, NULL, '0:45', 2.2800);
+INSERT INTO inp_timeseries_value VALUES (53, 'T10-5m-e2', NULL, NULL, '0:50', 1.9200);
+INSERT INTO inp_timeseries_value VALUES (54, 'T10-5m-e2', NULL, NULL, '0:55', 1.6600);
 
 
 INSERT INTO inp_virtual (arc_id, fusion_node, add_length) VALUES ('18968', '18965', false);

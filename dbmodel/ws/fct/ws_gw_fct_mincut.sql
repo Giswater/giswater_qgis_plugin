@@ -28,7 +28,8 @@ exists_id text;
 polygon_aux public.geometry;
 polygon_aux2 public.geometry;
 arc_aux public.geometry;
-node_aux public.geometry;    
+node_aux public.geometry;
+v_node_type text;
 srid_schema text;
 expl_id_arg integer;
 macroexpl_id_arg integer;
@@ -69,8 +70,8 @@ BEGIN
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='om_mincut_debug';
-	SELECT value::int2 INTO v_mincutversion FROM config_param_system WHERE parameter='om_mincut_version';
+	SELECT json_extract_path_text(value::json,'status')::boolean INTO v_debug FROM config_param_system WHERE parameter='om_mincut_debug';
+	SELECT json_extract_path_text(value::json,'version')::int2 INTO v_mincutversion FROM config_param_system WHERE parameter='om_mincut_config';
 
 	-- Get project version
 	SELECT giswater INTO  v_version FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -84,6 +85,11 @@ BEGIN
 	IF v_debug THEN
 		RAISE NOTICE '1-Delete previous data from same result_id';
 	END IF;
+
+	DELETE FROM temp_data WHERE fid=199 AND cur_user=current_user;
+
+	INSERT INTO temp_data(fid, addparam) SELECT 199, output FROM om_mincut where id=result_id_arg;
+
 	DELETE FROM "om_mincut_node" where result_id=result_id_arg;
 
 	DELETE FROM "om_mincut_arc" where result_id=result_id_arg;
@@ -186,9 +192,9 @@ BEGIN
 			-- call engine to determinate the isolated area
 			IF v_mincutversion = 4 OR v_mincutversion = 5 THEN
 			
-				-- call graf analytics function (step:1)
-				v_data = concat ('{"data":{"grafClass":"MINCUT", "arc":"', element_id_arg ,'", "step":1, "parameters":{"id":', result_id_arg, '}}}');
-				PERFORM gw_fct_grafanalytics_mincut(v_data);
+				-- call graph analytics function (step:1)
+				v_data = concat ('{"data":{"graphClass":"MINCUT", "arc":"', element_id_arg ,'", "step":1, "parameters":{"id":', result_id_arg, '}}}');
+				PERFORM gw_fct_graphanalytics_mincut(v_data);
 			
 			ELSIF v_mincutversion = 3 THEN
 			
@@ -218,7 +224,7 @@ BEGIN
 					
 				ELSE
 					-- Check if extreme if being a inlet
-					SELECT COUNT(*) INTO controlValue FROM config_graf_inlet WHERE node_id = node_1_aux;
+					SELECT COUNT(*) INTO controlValue FROM config_graph_inlet WHERE node_id = node_1_aux;
 				
 					IF controlValue = 0 THEN
 						-- Compute the tributary area using DFS
@@ -246,7 +252,7 @@ BEGIN
 					END IF;
 				ELSE
 					-- Check if extreme if being a inlet
-					SELECT COUNT(*) INTO controlValue FROM config_graf_inlet WHERE node_id = node_2_aux;
+					SELECT COUNT(*) INTO controlValue FROM config_graph_inlet WHERE node_id = node_2_aux;
 					IF controlValue = 0 THEN
 						-- Compute the tributary area using DFS
 						PERFORM gw_fct_mincut_engine(node_2_aux, result_id_arg);	
@@ -300,15 +306,15 @@ BEGIN
 		INSERT INTO selector_mincut_result(cur_user, result_id) VALUES (v_publish_user, result_id_arg);
 	END IF;
 
-	IF v_debug THEN	RAISE NOTICE '11-Insert into om_mincut_connec table ';	END IF;			
+	IF v_debug THEN	RAISE NOTICE '11-Insert into om_mincut_connec table ';	END IF;		
 	
 	-- insert connecs
 	IF p_usepsectors IS TRUE AND 'role_master' IN (SELECT rolname FROM pg_roles WHERE pg_has_role( current_user, oid, 'member')) THEN
-		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom)
-		SELECT result_id_arg, connec_id, c.the_geom FROM v_edit_connec c JOIN om_mincut_arc ON c.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state > 0;
+		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code)
+		SELECT result_id_arg, connec_id, c.the_geom, c.customer_code FROM v_edit_connec c JOIN om_mincut_arc ON c.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state > 0;
 	ELSE
-		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom)
-		SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN om_mincut_arc ON connec.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state = 1;
+		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code)
+		SELECT result_id_arg, connec_id, connec.the_geom, customer_code FROM connec JOIN om_mincut_arc ON connec.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state = 1;
 	END IF;
 
 	IF v_debug THEN RAISE NOTICE '12-Insert into om_mincut_hydrometer table ';	END IF;
@@ -370,6 +376,11 @@ BEGIN
 	select unnest(text_column::integer[]), current_user from temp_table where fid=199 and cur_user=current_user
 	ON CONFLICT (state_id, cur_user) DO NOTHING;
 	
+	-- restore psector selector
+	INSERT INTO selector_psector (psector_id, cur_user)
+	select unnest(text_column::integer[]), current_user from temp_table where fid=287 and cur_user=current_user
+	ON CONFLICT (psector_id, cur_user) DO NOTHING;
+	
 	-- returning
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
@@ -378,7 +389,11 @@ BEGIN
 	v_mincutdetails := COALESCE(v_mincutdetails, '{}'); 
 	v_geometry := COALESCE(v_geometry, '{}'); 
 	
-	IF v_error_message is null THEN
+	IF (SELECT addparam::text FROM temp_data WHERE fid=199 AND cur_user=current_user) != v_mincutdetails::text THEN
+		v_status = 'Accepted';
+		v_level = 3;
+		v_message = 'There were diferences between previously executed mincut and current version of the process. Mincut has been updated.';
+	ELSIF v_error_message is null THEN
 		v_status = 'Accepted';
 		v_level = 3;
 		v_message = 'Mincut done successfully';

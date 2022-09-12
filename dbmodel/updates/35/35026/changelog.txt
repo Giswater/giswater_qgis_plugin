@@ -1,0 +1,24 @@
+3.5.026
+*************
+- Recreate mincut views with geometry saved on mincut tables
+- Add field active on cat_workspace
+- Check OM - check nodes planified duplicated (fid 453)
+- Add fields customer_code on om_mincut_connec and node_type on om_mincut_node
+- Refactor of system parameters related to mincut (config_param_system)
+- 1D/2D coupled model - Generation of csv file with information of gullies to be used on IBER-SWMM
+- Add check relative timeseries control on pg2epa check data
+- Limit the exportation of timeseries, curves and patterns to only those related to active exploitations
+- Enable dscenario strategy for controls and rules
+- Manage staticpressure when insert or update nodes and connecs for ws
+- Minor improvements on mincut (recalculate mincut before start & check overlap only for operative)
+- Various minor bug fix
+- New function gw_fct_admin_reset_sequences for reserting ids and sequences for audit, anl and temp tables
+- UD - New user variable edit_node_ymax_vdefault with default value of ymax for nodes
+- Enhance valve management for ws go2epa exportation
+- Enhance log for go2epa exportation
+- Enable work with crm values on pg2epa using nodes (netwjoin)
+- Add new Check redundant values on y-top_elev-elev (461) for ud
+- Add style to flowreg views in QGIS template and sys_style table
+- WS - Plan check - Find planified EPA pumps with 3 arcs (462)
+- New system parameter - epa_automatic_inp2man_values - Usued for updating inventory tables with EPA values.
+- New user parameter - search municipality vdefault

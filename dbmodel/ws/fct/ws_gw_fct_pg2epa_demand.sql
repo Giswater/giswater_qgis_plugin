@@ -38,8 +38,9 @@ BEGIN
 	EXECUTE 'SELECT (value::json->>'||quote_literal(v_units)||')::float FROM config_param_system WHERE parameter=''epa_units_factor'''
 		INTO v_epaunits;
 
-	-- Reset values of inp_rpt table
-	UPDATE temp_node SET demand=0, pattern_id=null;
+	-- Reset values
+	UPDATE temp_node SET demand = 0;
+	UPDATE temp_node SET pattern_id = null WHERE epa_type = 'JUNCTION';
 
 	-- delete previous results on rpt_inp_pattern_value
 	DELETE FROM rpt_inp_pattern_value WHERE result_id=result_id_var;	
@@ -99,8 +100,6 @@ BEGIN
 
 			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id, demand_type)
 			SELECT 0, node_id, n.demand, c.pattern_id, 'BASE DEMAND' FROM temp_node n JOIN v_edit_inp_connec c ON concat('VN', pjoint_id) = node_id;
-
-			UPDATE temp_node SET demand = 0;
 
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message)
 			VALUES (227, 2, '272', concat('WARNING-227: Network export mode and Pattern method used forces to propagate values from [JUNCTION] to [DEMANDS] sections.'));

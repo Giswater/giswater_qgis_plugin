@@ -64,10 +64,13 @@ BEGIN
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN
 		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state)
-	 			SELECT arc_id, expl_id, 110, the_geom, arccat_id, state FROM '||v_worklayer||' WHERE slope < 0 AND arc_id IN ('||v_array||') AND (inverted_slope IS FALSE OR inverted_slope IS NULL);';
+	 			SELECT arc_id, expl_id, 110, the_geom, arccat_id, state FROM '||v_worklayer||' 
+	 			WHERE ((sys_elev1-sys_elev2)/st_length('||v_worklayer||'.the_geom) * 100::numeric) < 0 AND arc_id IN ('||v_array||') 
+	 			AND (inverted_slope IS FALSE OR inverted_slope IS NULL);';
 	ELSE
 		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state)
-	 			SELECT arc_id, expl_id, 110, the_geom, arccat_id, state FROM '||v_worklayer||' WHERE slope < 0 AND (inverted_slope IS FALSE OR inverted_slope IS NULL);';
+	 			SELECT arc_id, expl_id, 110, the_geom, arccat_id, state FROM '||v_worklayer||' WHERE ((sys_elev1-sys_elev2)/st_length('||v_worklayer||'.the_geom) * 100::numeric) < 0
+	 			AND (inverted_slope IS FALSE OR inverted_slope IS NULL);';
 	END IF;
 
 	-- get results

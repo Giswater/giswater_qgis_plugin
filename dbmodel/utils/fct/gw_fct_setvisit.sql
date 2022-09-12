@@ -79,13 +79,22 @@ v_msgerr json;
 v_lot integer;
 v_unit_id integer;
 v_arc_id integer;
+v_gully_id integer;
 rec_node record;
 rec_arc record;
+rec_gully record;
 id_last integer;
 v_parent_id integer;
 v_visitclass_arc integer;
 v_visitclass_node integer;
+v_visitclass_gully integer;
 v_feature_id integer;
+v_node_incid_tip integer;
+v_emb_incid_tip integer;
+v_count integer;
+v_message3 json;
+v_user_name text;
+v_visit_type integer;
 
 
 BEGIN
@@ -118,6 +127,7 @@ BEGIN
 	v_addphotos = (p_data ->>'data')::json->>'photos';
 	v_lot = ((p_data ->>'data')::json->>'fields')::json->>'lot_id';
 	v_arc_id = ((p_data ->>'data')::json->>'fields')::json->>'arc_id';
+    v_gully_id = ((p_data ->>'data')::json->>'fields')::json->>'gully_id';
 
 	-- setting sequences of related visit tables
 	PERFORM setval('"SCHEMA_NAME".om_visit_event_id_seq', (SELECT max(id) FROM om_visit_event), true);
@@ -131,6 +141,38 @@ BEGIN
 
 	PERFORM setval('"SCHEMA_NAME".doc_x_visit_id_seq', (SELECT max(id) FROM doc_x_visit), true);
 
+	-- only allow visit update to the same user (not valid for incidence visit_type 2)
+	SELECT visit_type, user_name INTO v_visit_type, v_user_name FROM om_visit WHERE id=v_id;
+
+	IF v_visit_type=1 AND v_user_name <> current_user THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"3205", "function":"2622","debug_msg":""}}$$);'INTO v_message3;
+		v_message3 = (((v_message3->>'body')::json->>'data')::json->>'info')::json;
+		RETURN ('{"status":"Accepted", "message":'||v_message3||', "apiVersion":'|| v_version ||',
+		"body": {"data":{}}}')::json;
+	END IF;
+
+	-- exception for duplicated incidence
+	IF v_tablename='ve_visit_node_incidencia' OR v_tablename='ve_visit_emb_incidencia' THEN
+		-- compare if another incidence with same type and status in 0, 1, 2, 3 exists in the same feature (node, gully)
+		v_node_incid_tip = ((p_data ->>'data')::json->>'fields')::json->>'node_incid_tip';
+		v_emb_incid_tip = ((p_data ->>'data')::json->>'fields')::json->>'emb_incid_tip';
+		
+		IF v_node_id IS NOT NULL THEN
+			SELECT count(*) INTO v_count FROM ve_visit_node_incidencia WHERE node_id=v_node_id::text and node_incid_tip=v_node_incid_tip::text and node_incid_status in ('0','1','2','3') and visit_id<>v_id;
+		ELSIF v_gully_id IS NOT NULL THEN
+			SELECT count(*) INTO v_count FROM ve_visit_emb_incidencia WHERE gully_id=v_gully_id::text and emb_incid_tip=v_emb_incid_tip::text and emb_incid_status in ('0','1','2','3') and visit_id<>v_id;
+		END IF;
+	
+		IF v_count > 0 THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3203", "function":"2622","debug_msg":""}}$$);'INTO v_message3;
+			v_message3 = (((v_message3->>'body')::json->>'data')::json->>'info')::json;
+			RETURN ('{"status":"Accepted", "message":'||v_message3||', "apiVersion":'|| v_version ||',
+			"body": {"data":{}}}')::json;
+		END IF;				   
+	END IF;
+
 	-- Get new visit id if not exist
 	RAISE notice 'FIRST ID     -> %',v_id;
 	IF v_id IS NULL THEN
@@ -141,7 +183,12 @@ BEGIN
 	IF v_id IS NULL AND (SELECT count(id) FROM om_visit) = 0 THEN
 		v_id=1;
 	END IF;
-		
+
+    -- set status=4 (finished) when status is null (is hidden or simply missing)
+	IF v_status IS NULL THEN 
+		v_status=4;
+	END IF;
+
 	-- setting output parameter
 	v_outputparameter := concat('{"client":',((p_data)->>'client'),', "feature":',((p_data)->>'feature'),', "data":',((p_data)->>'data'),'}')::json;
 
@@ -321,35 +368,49 @@ BEGIN
 			SELECT unit_id INTO v_unit_id FROM om_visit_lot_x_arc WHERE arc_id=v_arc_id::text AND lot_id=v_lot;
 		ELSIF (SELECT lower(feature_type) FROM config_visit_class WHERE id=v_class) = 'node' THEN
 			SELECT unit_id INTO v_unit_id FROM om_visit_lot_x_node WHERE node_id=v_node_id::text AND lot_id=v_lot;
+		ELSIF (SELECT lower(feature_type) FROM config_visit_class WHERE id=v_class) = 'gully' THEN
+			SELECT unit_id INTO v_unit_id FROM om_visit_lot_x_gully WHERE gully_id=v_gully_id::text AND lot_id=v_lot;
 		END IF;
 		
-		UPDATE om_visit_lot_x_unit SET status=v_status WHERE unit_id=v_unit_id;
+		UPDATE om_visit_lot_x_unit SET status=v_status WHERE unit_id=v_unit_id AND lot_id=v_lot;
 	
 		-- set visit to every feature of the related unit
 		-- get generic v_feature_id whenever is arc or node
 		IF v_arc_id IS NOT NULL THEN
 			v_feature_id=v_arc_id;
-		ELSE
+		ELSIF v_node_id IS NOT NULL THEN
 			v_feature_id=v_node_id;
+		ELSE
+			v_feature_id=v_gully_id;
 		END IF;
 		
 		-- select visitclass for arc and loop for every arc on om_visit_lot_x_arc. Then insert visit and events with same values of the one triggered by this setvisit
 		SELECT id INTO v_visitclass_arc FROM config_visit_class WHERE parent_id=v_parent_id AND lower(feature_type)='arc';
-		FOR rec_arc IN SELECT * FROM om_visit_lot_x_arc WHERE unit_id=v_unit_id AND arc_id::integer <> v_feature_id::integer
+		FOR rec_arc IN SELECT * FROM om_visit_lot_x_arc WHERE unit_id=v_unit_id AND lot_id=v_lot AND arc_id::integer <> v_feature_id::integer
 		LOOP
-			INSERT INTO om_visit (startdate, enddate, expl_id, user_name, lot_id, class_id, status, visit_type, the_geom) 
-			SELECT startdate, enddate, expl_id, user_name, lot_id, v_visitclass_arc, status, visit_type, the_geom FROM om_visit WHERE id=v_id RETURNING id INTO id_last;
+			INSERT INTO om_visit (startdate, enddate, expl_id, user_name, lot_id, class_id, status, visit_type, the_geom, unit_id) 
+			SELECT startdate, enddate, expl_id, user_name, lot_id, v_visitclass_arc, status, visit_type, the_geom, unit_id FROM om_visit WHERE id=v_id RETURNING id INTO id_last;
 			INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES(id_last, rec_arc.arc_id);
 	        INSERT INTO om_visit_event (visit_id, parameter_id, value, xcoord, ycoord) SELECT id_last, parameter_id, value, xcoord, ycoord FROM om_visit_event WHERE visit_id=v_id; 
 		END LOOP;
 		
 		-- select visitclass for node and loop for every node on om_visit_lot_x_node. Then insert visit and events with same values of the one triggered by this setvisit
 		SELECT id INTO v_visitclass_node FROM config_visit_class WHERE parent_id=v_parent_id AND lower(feature_type)='node';
-		FOR rec_node IN SELECT * FROM om_visit_lot_x_node WHERE unit_id=v_unit_id AND node_id::integer <> v_feature_id::integer
+		FOR rec_node IN SELECT * FROM om_visit_lot_x_node WHERE unit_id=v_unit_id AND lot_id=v_lot AND node_id::integer <> v_feature_id::integer
 		LOOP
-			INSERT INTO om_visit (startdate, enddate, expl_id, user_name, lot_id, class_id, status, visit_type, the_geom) 
-			SELECT startdate, enddate, expl_id, user_name, lot_id, v_visitclass_node, status, visit_type, the_geom FROM om_visit WHERE id=v_id RETURNING id INTO id_last;
+			INSERT INTO om_visit (startdate, enddate, expl_id, user_name, lot_id, class_id, status, visit_type, the_geom, unit_id) 
+			SELECT startdate, enddate, expl_id, user_name, lot_id, v_visitclass_node, status, visit_type, the_geom, unit_id FROM om_visit WHERE id=v_id RETURNING id INTO id_last;
 			INSERT INTO om_visit_x_node (visit_id, node_id) VALUES(id_last, rec_node.node_id);
+	        INSERT INTO om_visit_event (visit_id, parameter_id, value, xcoord, ycoord) SELECT id_last, parameter_id, value, xcoord, ycoord FROM om_visit_event WHERE visit_id=v_id; 
+		END LOOP;
+	
+		-- select visitclass for gully and loop for every gully on om_visit_lot_x_gully. Then insert visit and events with same values of the one triggered by this setvisit
+		SELECT id INTO v_visitclass_gully FROM config_visit_class WHERE parent_id=v_parent_id AND lower(feature_type)='gully';
+		FOR rec_gully IN SELECT * FROM om_visit_lot_x_gully WHERE unit_id=v_unit_id AND lot_id=v_lot AND gully_id::integer <> v_feature_id::integer
+		LOOP
+			INSERT INTO om_visit (startdate, enddate, expl_id, user_name, lot_id, class_id, status, visit_type, the_geom, unit_id) 
+			SELECT startdate, enddate, expl_id, user_name, lot_id, v_visitclass_gully, status, visit_type, the_geom, unit_id FROM om_visit WHERE id=v_id RETURNING id INTO id_last;
+			INSERT INTO om_visit_x_gully (visit_id, gully_id) VALUES(id_last, rec_gully.gully_id);
 	        INSERT INTO om_visit_event (visit_id, parameter_id, value, xcoord, ycoord) SELECT id_last, parameter_id, value, xcoord, ycoord FROM om_visit_event WHERE visit_id=v_id; 
 		END LOOP;
 	

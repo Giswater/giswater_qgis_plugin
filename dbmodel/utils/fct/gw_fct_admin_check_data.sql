@@ -124,17 +124,17 @@ BEGIN
 	END IF;
 
 	IF v_project_type = 'WS' THEN
-		--check if all nodes have value on field graf_delimiter (307)
-		SELECT count(*), string_agg(id,', ')  INTO v_count,v_feature_list FROM cat_feature_node WHERE graf_delimiter IS NULL;
+		--check if all nodes have value on field graph_delimiter (307)
+		SELECT count(*), string_agg(id,', ')  INTO v_count,v_feature_list FROM cat_feature_node WHERE graph_delimiter IS NULL;
 
 		IF v_count > 0 THEN
-			v_errortext=concat('ERROR-307: There is/are ',v_count,' nodes without value on field "graf_delimiter" from cat_feature_node. Features - ',v_feature_list::text,'.');
+			v_errortext=concat('ERROR-307: There is/are ',v_count,' nodes without value on field "graph_delimiter" from cat_feature_node. Features - ',v_feature_list::text,'.');
 
 			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
 			VALUES (195, 3, '307',v_errortext, v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-			VALUES (195, 1, '307','INFO: All nodes have value on field "graf_delimiter"', 0);
+			VALUES (195, 1, '307','INFO: All nodes have value on field "graph_delimiter"', 0);
 		END IF;
 	END IF;
 

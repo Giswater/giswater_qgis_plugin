@@ -29,7 +29,6 @@ SELECT "SCHEMA_NAME".gw_fct_pg2epa_fill_data ('r1');
 
 DECLARE
 
-v_networkmode integer = 1;
 v_return json;
 v_result text;
 v_dumpsubcatch boolean;
@@ -41,7 +40,6 @@ v_input json;
 v_vdefault boolean;
 v_error_context text;
 v_count integer;
-v_response text;
 v_message text;
 v_step integer=0;
 v_autorepair boolean;
@@ -66,7 +64,6 @@ BEGIN
 	-- get user parameters
 	v_advancedsettings = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_advancedsettings' AND cur_user=current_user)::boolean;
 	v_vdefault = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
-	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
 	v_autorepair = (SELECT (value::json->>'autoRepair') FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	IF (SELECT count(expl_id) FROM selector_expl WHERE cur_user = current_user) = 1 THEN
 		v_expl = (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
@@ -146,11 +143,7 @@ BEGIN
 	RAISE NOTICE '5 - Call nod2arc function';
 	PERFORM gw_fct_pg2epa_nod2arc(v_result);
 	
-	RAISE NOTICE '6 - Trim arcs';
-	IF v_networkmode = 2 THEN
-		SELECT gw_fct_pg2epa_vnodetrimarcs(v_result) INTO v_response;
-	END IF;
-	
+
 	RAISE NOTICE '7 - Dump subcatchments';
 	IF v_dumpsubcatch THEN
 		PERFORM gw_fct_pg2epa_dump_subcatch(p_data);

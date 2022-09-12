@@ -44,10 +44,10 @@ v_headloss text;
 v_patternmethod integer;
 v_period text;
 v_networkmode integer;
-v_valvemode integer;
+v_dscenario integer;
 v_patternmethodval text;
 v_periodval text;
-v_valvemodeval text;
+v_dscenarioval text;
 v_networkmodeval text;
 v_hydrologyscenario text;
 v_qualitymode text;
@@ -79,6 +79,8 @@ v_outlayer_elevation json;
 v_outlayer_depth json;
 v_minlength float;
 v_workspace text;
+v_dscenarioused integer;
+v_psectorused integer;
 
 
 BEGIN
@@ -130,13 +132,13 @@ BEGIN
 	SELECT  count(*) INTO v_doublen2a FROM v_edit_inp_pump 	WHERE pump_type = 'PRESSPUMP';
 	
 	SELECT value INTO v_patternmethod FROM config_param_user WHERE parameter = 'inp_options_patternmethod' AND cur_user=current_user;
-	SELECT value INTO v_valvemode FROM config_param_user WHERE parameter = 'inp_options_valve_mode' AND cur_user=current_user;
+	SELECT value INTO v_dscenario FROM config_param_user WHERE parameter = 'inp_options_dscenario_priority' AND cur_user=current_user;
 	SELECT value INTO v_networkmode FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user;
 	SELECT value INTO v_qualitymode FROM config_param_user WHERE parameter = 'inp_options_quality_mode' AND cur_user=current_user;
 	SELECT value INTO v_buildupmode FROM config_param_user WHERE parameter = 'inp_options_buildup_mode' AND cur_user=current_user;
 	SELECT name INTO v_workspace FROM config_param_user c JOIN cat_workspace ON value = id::text WHERE parameter = 'utils_workspace_vdefault' AND c.cur_user=current_user;
 	
-	SELECT idval INTO v_valvemodeval FROM inp_typevalue WHERE id=v_valvemode::text AND typevalue ='inp_value_opti_valvemode';
+	SELECT idval INTO v_dscenarioval FROM inp_typevalue WHERE id=v_dscenario::text AND typevalue ='inp_options_dscenario_priority';
 	SELECT idval INTO v_patternmethodval FROM inp_typevalue WHERE id=v_patternmethod::text AND typevalue ='inp_value_patternmethod';
 	SELECT idval INTO v_networkmodeval FROM inp_typevalue WHERE id=v_networkmode::text AND typevalue ='inp_options_networkmode';
 	SELECT idval INTO v_qualmodeval FROM inp_typevalue WHERE id=v_qualitymode::text AND typevalue ='inp_value_opti_qual';
@@ -158,6 +160,9 @@ BEGIN
 
 	v_debug = (SELECT value::json->>'showLog' FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
 	v_debugval = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
+	v_dscenarioused = (SELECT count(dscenario_id) FROM selector_inp_dscenario WHERE cur_user = current_user);
+	v_psectorused = (SELECT count(psector_id) FROM selector_psector WHERE cur_user = current_user);
+
 
 	-- Header
 	INSERT INTO audit_check_data (id, fid, result_id, criticity, error_message)
@@ -178,11 +183,16 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Created by: ', current_user, ', on ', to_char(now(),'YYYY/MM/DD - HH:MM:SS')));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Network export mode: ', v_networkmodeval));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Pattern method: ', v_patternmethodval));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Valve mode: ', v_valvemodeval));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Quality mode: ', v_qualmodeval));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Number of Presspump (Double-n2a): ', v_doublen2a));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Buildup mode: ', v_buildmodeval, '. Parameters:', v_values));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Workspace: ', v_workspace));
+	--INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Buildup mode: ', v_buildmodeval, '. Parameters:', v_values));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Active Workspace: ', v_workspace));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Number of dscenarios used: ', v_dscenarioused));
+	IF v_dscenarioused > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Demand dscenario priority: ', v_dscenarioval));
+	END IF;
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Number of psectors used: ', v_psectorused));
+
 
 	UPDATE rpt_cat_result SET 
 	export_options = concat('{"Network export mode": "', v_networkmodeval,'", "Pattern method": "', v_patternmethodval, '"}')::json
@@ -294,11 +304,12 @@ BEGIN
 				INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
 				VALUES (v_fid, v_result_id , 1,  '414','INFO: No registers found without material on cat_connec table.');
 			END IF;	
-
+			
 
 			RAISE NOTICE '4.3 - Check pjoint_id/pjoint_type on connecs (415)';
 			SELECT count(*) INTO v_count FROM (SELECT DISTINCT ON (connec_id) * FROM v_edit_connec c, selector_sector s 
-			WHERE c.sector_id = s.sector_id AND cur_user=current_user AND pjoint_id IS NULL OR pjoint_type IS NULL) a1;
+			WHERE c.sector_id = s.sector_id AND cur_user=current_user AND epa_type ='JUNCTION' 
+			AND (pjoint_id IS NULL OR pjoint_type IS NULL)) a1;
 
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -307,13 +318,14 @@ BEGIN
 				INSERT INTO anl_node (fid, node_id, descript, the_geom) 
 				SELECT 415, connec_id, 'Connecs with epa_type ''JUNCTION'' and missed information on pjoint_id or pjoint_type', the_geom
 				FROM (SELECT DISTINCT ON (connec_id) * FROM v_edit_connec c, selector_sector s WHERE c.sector_id = s.sector_id AND cur_user=current_user 
-				AND pjoint_id IS NULL OR pjoint_type IS NULL)a;
+				AND epa_type ='JUNCTION' AND (pjoint_id IS NULL OR pjoint_type IS NULL))a;
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
 				VALUES (v_fid, v_result_id , 1,  '415','INFO: No connecs found without pjoint_id or pjoint_type values.');
 			END IF;
-			
+
+
 			RAISE NOTICE '4.4 check dint for cat_connec (400)';
 			SELECT count (*) INTO v_count FROM cat_connec where dint is null;
 			IF v_count > 0 THEN

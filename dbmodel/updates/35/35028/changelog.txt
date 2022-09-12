@@ -1,0 +1,8 @@
+3.5.028
+*************
+- Enhance setselector for undefined mapzone when expl2sector and sector2expl is enabled
+- Force reservoirs on inlets when go2epa for ws
+- Remove pg2epa_inlet_flowtrace function
+- New functions to import scada values & hydrometer values (focused on waterbalance)
+- Minor bug fix
+- Add commitChanges parameter in mapzones function to allow running it without change feature table values

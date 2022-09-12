@@ -8,15 +8,15 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2772
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_flowtrace(p_data json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics_flowtrace(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_flowtrace(p_data json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_flowtrace(p_data json)
 RETURNS json AS
 $BODY$
 
 /*
 --EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_flowtrace('{"data":{"parameters":{"grafClass":"DISCONNECTEDARCS", "exploitation": "[1]", "nodeId":"37"}}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_flowtrace('{"data":{"parameters":{"grafClass":"CONNECTEDARCS","exploitation": "[557]",  "nodeId":"5100"}}}');
+SELECT SCHEMA_NAME.gw_fct_graphanalytics_flowtrace('{"data":{"parameters":{"graphClass":"DISCONNECTEDARCS", "exploitation": "[1]", "nodeId":"37"}}}');
+SELECT SCHEMA_NAME.gw_fct_graphanalytics_flowtrace('{"data":{"parameters":{"graphClass":"CONNECTEDARCS","exploitation": "[557]",  "nodeId":"5100"}}}');
 
 --RESULTS
 SELECT * FROM anl_arc WHERE fid=193 AND cur_user=current_user
@@ -52,7 +52,7 @@ BEGIN
 
 	-- get values
    	v_nodeid = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'nodeId');
-	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'grafClass');
+	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'graphClass');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 
 	-- select config values
@@ -67,10 +67,10 @@ BEGIN
 		v_sign = '>';
 	END IF;
 
-	-- reset graf & audit tables
+	-- reset graph & audit tables
 	DELETE FROM anl_arc where cur_user=current_user AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE fid=v_fid AND cur_user=current_user;
-	TRUNCATE temp_anlgraf;	
+	TRUNCATE temp_anlgraph;	
 
 	-- reset exploitation
 	IF v_expl IS NOT NULL THEN
@@ -85,8 +85,8 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, 'INFO');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, '-------');
 
-	-- fill the graf table
-	INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
+	-- fill the graph table
+	INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
 	SELECT  arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE
 	UNION
@@ -94,39 +94,39 @@ BEGIN
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
 
 	
-	-- set boundary conditions of graf table ONLY FOR WS (flag=1 it means water is disabled to flow)
+	-- set boundary conditions of graph table ONLY FOR WS (flag=1 it means water is disabled to flow)
 	IF v_projectype = 'WS' THEN
 	
-		v_text = 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id from sector WHERE grafconfig IS NOT NULL';
+		v_text = 'SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id from sector WHERE graphconfig IS NOT NULL';
 
-		-- close boundary conditions setting flag=1 for all nodes that fits on graf delimiters and closed valves
-		v_querytext  = 'UPDATE temp_anlgraf SET flag=1 WHERE 
+		-- close boundary conditions setting flag=1 for all nodes that fits on graph delimiters and closed valves
+		v_querytext  = 'UPDATE temp_anlgraph SET flag=1 WHERE 
 			node_1 IN('||v_text||' UNION
 			SELECT (a.node_id) FROM node a 	JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.nodetype_id 
-			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer WHERE (graf_delimiter=''MINSECTOR'' AND closed=TRUE))
+			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN temp_anlgraph e ON a.node_id::integer=e.node_1::integer WHERE (graph_delimiter=''MINSECTOR'' AND closed=TRUE))
 			OR node_2 IN ('||v_text||' UNION
 			SELECT (a.node_id) FROM node a 	JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.nodetype_id 
-			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer WHERE (graf_delimiter=''MINSECTOR'' AND closed=TRUE))';
+			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN temp_anlgraph e ON a.node_id::integer=e.node_1::integer WHERE (graph_delimiter=''MINSECTOR'' AND closed=TRUE))';
 				
 		EXECUTE v_querytext;
 
-		-- open boundary conditions set flag=0 for graf delimiters that have been setted to 1 on query before BUT ONLY ENABLING the right sense (to_arc)
-		UPDATE temp_anlgraf SET flag=0 WHERE id IN (
-			SELECT id FROM temp_anlgraf JOIN (
-			SELECT (json_array_elements_text((grafconfig->>'use')::json))::json->>'nodeParent' as node_id, 
-			json_array_elements_text(((json_array_elements_text((grafconfig->>'use')::json))::json->>'toArc')::json) 
+		-- open boundary conditions set flag=0 for graph delimiters that have been setted to 1 on query before BUT ONLY ENABLING the right sense (to_arc)
+		UPDATE temp_anlgraph SET flag=0 WHERE id IN (
+			SELECT id FROM temp_anlgraph JOIN (
+			SELECT (json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent' as node_id, 
+			json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json) 
 			as to_arc from sector 
-			where grafconfig is not null order by 1,2) a 
+			where graphconfig is not null order by 1,2) a 
 			ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer);
 	END IF;
 		
 	-- init inlet
-	UPDATE temp_anlgraf	SET flag=1, water=1 WHERE node_1 = v_nodeid; 
+	UPDATE temp_anlgraph	SET flag=1, water=1 WHERE node_1 = v_nodeid; 
 
 	-- inundation process
 	LOOP
 		v_count = v_count+1;
-                update temp_anlgraf n set water= 1, flag=n.flag+1 from v_anl_graf a where n.node_1 = a.node_1  and n.arc_id = a.arc_id;
+                update temp_anlgraph n set water= 1, flag=n.flag+1 from v_anl_graph a where n.node_1 = a.node_1  and n.arc_id = a.arc_id;
 
 		GET DIAGNOSTICS affected_rows =row_count;
 		exit when affected_rows = 0;
@@ -138,11 +138,11 @@ BEGIN
 	
 	-- insert into result table
 	EXECUTE 'INSERT INTO anl_arc (fid, arc_id, the_geom, descript)
-		SELECT DISTINCT ON (a.arc_id) '||v_fid||', a.arc_id, the_geom, '''||v_class||'''	FROM temp_anlgraf a
+		SELECT DISTINCT ON (a.arc_id) '||v_fid||', a.arc_id, the_geom, '''||v_class||'''	FROM temp_anlgraph a
 		JOIN arc b ON a.arc_id=b.arc_id GROUP BY a.arc_id, the_geom HAVING max(water) '||v_sign||' 0 ';
 
 	-- count arcs
-	EXECUTE 'SELECT count(*) FROM (SELECT DISTINCT ON (arc_id) count(*) FROM temp_anlgraf GROUP BY arc_id HAVING max(water)'||v_sign||' 0 )a'
+	EXECUTE 'SELECT count(*) FROM (SELECT DISTINCT ON (arc_id) count(*) FROM temp_anlgraph GROUP BY arc_id HAVING max(water)'||v_sign||' 0 )a'
 		INTO v_count;
 
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, '');

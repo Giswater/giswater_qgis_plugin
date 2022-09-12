@@ -37,7 +37,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     -- Get debug variable
-    SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='om_mincut_debug';
+    SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='admin_debug';
 
     -- Starting process
     SELECT * INTO mincut_rec FROM anl_mincut_result_cat WHERE id=result_id_arg;

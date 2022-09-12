@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_result(p_data json)
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fid":227, "dumpSubcatch":true}}}$$) when is called from go2epa_main from toolbox
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fid":227, "dumpSubcatch":true}}}$$)-- when is called from go2epa_main from toolbox
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project"}}}$$) -- when is called from toolbox
 
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
@@ -78,11 +78,14 @@ v_defaultval text;
 v_dwfscenarioval text;
 v_exportmodeval text;
 v_networkmode integer;
+v_setallraingages text;
 
 object_rec record;
 
 v_graphiclog boolean;
 v_workspace text;
+v_dscenarioused integer;
+v_psectorused integer;
 
 BEGIN
 
@@ -101,6 +104,7 @@ BEGIN
 	v_checkresult = (SELECT value::json->>'checkResult' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_graphiclog = (SELECT (value::json->>'graphicLog') FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_networkmode = (SELECT (value) FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user)::integer;
+	v_setallraingages = (SELECT (value) FROM config_param_user WHERE parameter='inp_options_setallraingages' AND cur_user=current_user);
 
 
 	-- manage no found results
@@ -141,6 +145,8 @@ BEGIN
 	v_exportmodeval = (SELECT idval FROM config_param_user, inp_typevalue WHERE id = value AND typevalue = 'inp_options_networkmode' and cur_user = current_user and parameter = 'inp_options_networkmode');
 	SELECT name INTO v_workspace FROM config_param_user c JOIN cat_workspace ON value = id::text WHERE parameter = 'utils_workspace_vdefault' AND c.cur_user=current_user;
 
+	v_dscenarioused = (SELECT count(dscenario_id) FROM selector_inp_dscenario WHERE cur_user = current_user);
+	v_psectorused = (SELECT count(psector_id) FROM selector_psector WHERE cur_user = current_user);
 	
 	-- Header
 	INSERT INTO audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-10, v_fid, v_result_id, 4,
@@ -167,7 +173,9 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Hidrology scenario: ', v_hydroscenarioval));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('DWF scenario: ',v_dwfscenarioval));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Dump subcatchments: ',v_dumpsubc::text));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Workspace: ', v_workspace));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Active Workspace: ', v_workspace));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Number of dscenarios used: ', v_dscenarioused));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Number of psectors used: ', v_psectorused));
 
 	UPDATE rpt_cat_result SET 
 	export_options = concat('{"Hydrology scenario": "', v_hydroscenarioval,'", "DWF scenario":"',v_dwfscenarioval,'"}')::json
@@ -190,6 +198,11 @@ BEGIN
 		IF v_debug::boolean THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Debug: ', v_defaultval));
 		END IF;
+
+		IF v_setallraingages IS NOT NULL THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Enabled set all raingages with ONLY ONE timeseries: ', v_setallraingages));
+		END IF;
+		
 		
 		RAISE NOTICE '1- Check subcatchments';
 		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment WHERE outlet_id is null;
@@ -423,9 +436,10 @@ BEGIN
 	RAISE NOTICE '3 - Check if there are conflicts with dscenarios (396)';
 	IF (SELECT count(*) FROM selector_inp_dscenario WHERE cur_user = current_user) > 0 THEN
 
-		FOR object_rec IN SELECT json_array_elements_text('["junction", "conduit", "raingage", "flwreg_orifice", "flwreg_weir", "flwreg_outlet", "flwreg_pump", "storage", "outfall", "treatment", "lid_usage" ]'::json) as tabname, 
-					 json_array_elements_text('["node_id" ,"arc_id", "rg_id", "nodarc_id", "nodarc_id", "nodarc_id", "nodarc_id", "node_id", "node_id", "node_id", "node_id, lidco_id"]'::json) as colname,
- 					 json_array_elements_text('["anl_node" ,"anl_arc", "", "anl_nodarc", "anl_nodarc", "anl_nodarc", "anl_nodarc", "anl_node", "anl_node", "", "anl_node", "anl_polygon"]'::json) as tablename
+		FOR object_rec IN SELECT 
+		json_array_elements_text('["junction", "conduit", "raingage", "flwreg_orifice", "flwreg_weir", "flwreg_outlet", "flwreg_outlet", "storage",  "outfall",  "treatment", "lid_usage" ]'::json) as tabname, 
+		json_array_elements_text('["node_id" , "arc_id",  "rg_id",    "nodarc_id",      "nodarc_id",   "nodarc_id",     "nodarc_id",     "node_id",  "node_id",  "node_id",   "lidco_id"]'::json) as colname,
+ 		json_array_elements_text('["anl_node" ,"anl_arc", "",        "anl_nodarc",     "anl_nodarc",  "anl_nodarc",    "anl_nodarc",    "anl_node", "anl_node", "anl_node",  "anl_polygon"]'::json) as tablename
 		LOOP
 
 			EXECUTE 'SELECT count(*) FROM (SELECT count(*) FROM v_edit_inp_dscenario_'||object_rec.tabname||' GROUP BY '||object_rec.colname||' HAVING count(*) > 1) a' INTO v_count;
@@ -537,19 +551,59 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, concat('INFO: All CONTROLS has correct arc id values.'));
 	END IF;
 
-	RAISE NOTICE '6 - Check pjoint_id/pjoint_type on gullies (416)';
 	IF v_networkmode = 2 THEN
+	
+		RAISE NOTICE '6 - Check arc_id null for gully (455)';
 		SELECT count(*) INTO v_count FROM (SELECT * FROM v_edit_gully g,  selector_sector s 
-		WHERE g.sector_id = s.sector_id AND cur_user=current_user AND pjoint_id IS NULL OR pjoint_type IS NULL) a1;
+		WHERE g.sector_id = s.sector_id AND cur_user=current_user AND arc_id IS NULL) a1;
 
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-			VALUES (v_fid, v_result_id, 3, '416',concat(
-			'ERROR-416: There is/are ',v_count,' gullies with epa_type ''JUNCTION'' and missed information on pjoint_id or pjoint_type.'),v_count);
+			VALUES (v_fid, v_result_id, 3, '455',concat(
+			'ERROR-455: There is/are ',v_count,' gullies with missed information on arc_id (outlet) values.'),v_count);
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-			VALUES (v_fid, v_result_id , 1,  '416','INFO: No gullies found without pjoint_id or pjoint_type values.', v_count);
+			VALUES (v_fid, v_result_id , 1,  '455','INFO: No gullies found without arc_id (outlet) values.', v_count);
+		END IF;	
+
+		RAISE NOTICE '7 - Check gullies with null values on (custom_)top_elev (456)';
+		SELECT count(*) INTO v_count FROM (SELECT * FROM temp_gully WHERE top_elev IS NULL) a1;
+
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+			VALUES (v_fid, v_result_id, 3, '456',concat(
+			'ERROR-456: There is/are ',v_count,' gullies with null values on top_elev/custom_top_elev columns.'),v_count);
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+			VALUES (v_fid, v_result_id , 1,  '456','INFO: No gullies found with null values on top_elev.', v_count);
+		END IF;	
+
+		RAISE NOTICE '8 - Check gullies with null values on (custom)width (457)';
+		SELECT count(*) INTO v_count FROM (SELECT * FROM temp_gully WHERE width IS NULL) a1;
+
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+			VALUES (v_fid, v_result_id, 3, '457',concat(
+			'ERROR-457: There is/are ',v_count,' gullies with null values on width/custom_width columns.'),v_count);
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+			VALUES (v_fid, v_result_id , 1,  '457','INFO: No gullies found with null values on width.', v_count);
+		END IF;	
+
+		RAISE NOTICE '9 - Check gullies with null values on (custom)length (458)';
+		SELECT count(*) INTO v_count FROM (SELECT * FROM temp_gully WHERE length IS NULL) a1;
+
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+			VALUES (v_fid, v_result_id, 3, '458',concat(
+			'ERROR-458: There is/are ',v_count,' gullies with null values on length/custom_length columns.'),v_count);
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+			VALUES (v_fid, v_result_id , 1,  '458','INFO: No gullies found with null values on length.', v_count);
 		END IF;	
 	END IF;
 

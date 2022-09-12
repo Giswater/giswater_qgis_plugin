@@ -4,14 +4,15 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 3042
+--FUNCTION CODE: 3110
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_create_dscenario_from_crm(p_data json) 
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_crm($${"client":{}, "form":{}, "feature":{}, "data":{"parameters":{"name":"test", "descript":null, "type":"DEMAND", "targetFeature": "NODE", "period":"5", "pattern":1, "flowUnits":"M3H"}}}$$);
+
+SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_crm($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "data":{"parameters":{"name":"t1", "descript":null, "exploitation":"1", "period":"40", "pattern":"1", "demandUnits":"LPS"}}}$$);
 -- fid: 403
 
 */
@@ -76,12 +77,6 @@ BEGIN
 
 	-- create log
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CREATE DSCENARIO FROM CRM'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '--------------------------------------------------');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('New scenario: ',v_name));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Copy from CRM period: ',v_crm_name));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Source pattern: ',v_pattern));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Demand units: ',v_demandunits));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Period seconds: ',v_periodseconds));
 	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
 
@@ -95,7 +90,9 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
 
 	-- inserting on catalog table
-	INSERT INTO cat_dscenario (name, descript, dscenario_type, expl_id, log) VALUES (v_name, v_descript, 'DEMAND', v_expl, concat('Insert by ',current_user,' on ', substring(now()::text,0,20),'. Input params:{·Target feature":"", "Source CRM Period":"',v_crm_name,'", "Source Pattern":"',v_pattern,'", "Demand Units":"',v_demandunits,'"}')) ON CONFLICT (name) DO NOTHING RETURNING dscenario_id INTO v_scenarioid ;
+	INSERT INTO cat_dscenario (name, descript, dscenario_type, expl_id, log) VALUES (v_name, v_descript, 'DEMAND', 
+	v_expl, concat('Insert by ',current_user,' on ', substring(now()::text,0,20),'. Input params:{·Target feature":"", "Source CRM Period":"',v_crm_name,'", "Source Pattern":"',v_pattern,'", "Demand Units":"',v_demandunits,'"}'))
+	ON CONFLICT (name) DO NOTHING RETURNING dscenario_id INTO v_scenarioid ;
 
 	IF v_scenarioid IS NULL THEN
 		SELECT dscenario_id INTO v_scenarioid FROM cat_dscenario where name = v_name;
@@ -103,6 +100,14 @@ BEGIN
 		VALUES (v_fid, null, 3, concat('ERROR: The dscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
 		
 	ELSE
+
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '--------------------------------------------------');
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('New scenario: ',v_name, ' ( ',v_scenarioid,' )'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Copy from CRM period: ',v_crm_name));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Source pattern: ',v_pattern));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Demand units: ',v_demandunits));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Period seconds: ',v_periodseconds));
+	
 		IF (SELECT period_seconds FROM ext_cat_period WHERE id  = v_period) IS NULL THEN
 			SELECT dscenario_id INTO v_scenarioid FROM cat_dscenario where name = v_name;
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
@@ -121,7 +126,8 @@ BEGIN
 		SELECT sum(sum) INTO v_total_vol FROM ext_rtc_hydrometer_x_data JOIN v_rtc_hydrometer USING (hydrometer_id) WHERE  cat_period_id  = v_period AND expl_id = v_expl;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 		VALUES (v_fid, v_result_id, 1, concat('The total volume (m3) for all the hydrometers is ', v_total_vol,'.'));
-				
+
+		-- insert connecs
 		INSERT INTO inp_dscenario_demand (feature_type, dscenario_id, feature_id, demand, source)
 		SELECT 'CONNEC' as feature_type, v_scenarioid, c.connec_id as node_id, (case when custom_sum is null then v_factor*sum else v_factor*custom_sum end) as volume, hc.hydrometer_id
 		FROM ext_rtc_hydrometer_x_data d
@@ -134,7 +140,22 @@ BEGIN
 		-- real number of hydrometers
 		GET DIAGNOSTICS v_count = row_count;	
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
-		VALUES (v_fid, v_result_id, 1, concat(v_count, ' rows with demands have been inserted on inp_dscenario_table, which it means ',v_count,' hydrometers.'));
+		VALUES (v_fid, v_result_id, 1, concat(v_count, ' rows (hydrometers) with demands on CONNEC (wjoin, greentap, fountain or tap) have been inserted on inp_dscenario_demand.'));
+
+		-- insert nodes (netwjoins)
+		INSERT INTO inp_dscenario_demand (feature_type, dscenario_id, feature_id, demand, source)
+		SELECT 'NODE' as feature_type, v_scenarioid, n.node_id, (case when custom_sum is null then v_factor*sum else v_factor*custom_sum end) as volume, h.id as hydrometer_id
+		FROM ext_rtc_hydrometer_x_data d
+		JOIN ext_rtc_hydrometer h ON h.id::text = d.hydrometer_id::text
+		JOIN man_netwjoin n ON connec_id::text = customer_code
+		JOIN node USING (node_id)
+		WHERE cat_period_id  =  v_period AND node.expl_id = v_expl
+		order by 2;
+
+		-- real number of hydrometers
+		GET DIAGNOSTICS v_count = row_count;	
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
+		VALUES (v_fid, v_result_id, 1, concat(v_count, ' rows (hydrometers) with demands on NODE (netwjoin) have been inserted on inp_dscenario_demand.'));
 
 		-- real volume inserted
 		SELECT sum(demand)/v_factor INTO v_count2 FROM inp_dscenario_demand WHERE dscenario_id = v_scenarioid;
@@ -154,16 +175,7 @@ BEGIN
 			WHERE d.source = h.hydrometer_id
 			AND dscenario_id = v_scenarioid;
 		
-		ELSIF v_pattern = 3 THEN -- sector period
-
-			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id 
-			FROM ext_rtc_sector_period s 
-			JOIN connec USING (sector_id) 
-			JOIN rtc_hydrometer_x_connec h USING (connec_id)
-			WHERE d.source = h.hydrometer_id AND cat_period_id = v_period
-			AND dscenario_id = v_scenarioid;
-
-		ELSIF v_pattern = 4 THEN -- dma default
+		ELSIF v_pattern = 3 THEN -- dma default
 
 			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id 
 			FROM dma s 
@@ -172,7 +184,7 @@ BEGIN
 			WHERE d.source = h.hydrometer_id
 			AND dscenario_id = v_scenarioid;
 
-		ELSIF v_pattern = 5 THEN -- dma period
+		ELSIF v_pattern = 4 THEN -- dma period
 
 			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id 
 			FROM ext_rtc_dma_period s 
@@ -181,19 +193,19 @@ BEGIN
 			WHERE d.source = h.hydrometer_id AND cat_period_id = v_period
 			AND dscenario_id = v_scenarioid;
 
-		ELSIF v_pattern = 6 THEN -- hydrometer period
+		ELSIF v_pattern = 5 THEN -- hydrometer period
 
 			UPDATE inp_dscenario_demand d SET pattern_id = h.pattern_id 
 			FROM ext_rtc_hydrometer_x_data h
 			WHERE d.source = h.hydrometer_id AND cat_period_id = v_period
 			AND dscenario_id = v_scenarioid;
 
-		ELSIF v_pattern = 7 THEN -- hydrometer category
+		ELSIF v_pattern = 6 THEN -- hydrometer category
 
 			UPDATE inp_dscenario_demand d SET pattern_id = c.pattern_id 
 			FROM ext_rtc_hydrometer h
 			JOIN ext_hydrometer_category c ON c.id::integer = h.category_id
-			WHERE d.source = h.hydrometer_id
+			WHERE d.source = h.id::text
 			AND dscenario_id = v_scenarioid;
 		END IF;
 

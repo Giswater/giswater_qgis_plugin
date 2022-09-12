@@ -82,7 +82,6 @@ INSERT INTO node_type  VALUES ('FLEXUNION', 'FLEXUNION', 'JUNCTION', 'man_flexun
 INSERT INTO node_type  VALUES ('CAPTEUR_PRESSION', 'METER', 'JUNCTION', 'man_meter', 'inp_junction', true, true, 2, true, 'Pressure meter', NULL);
 INSERT INTO node_type  VALUES ('NETSAMPLEPOINT', 'NETSAMPLEPOINT', 'JUNCTION', 'man_netsamplepoint', 'inp_junction', true, true, 2, true, 'Netsamplepoint', NULL); -- No translate
 INSERT INTO node_type  VALUES ('ELEMENT_RESEAU', 'NETELEMENT', 'JUNCTION', 'man_netelement', 'inp_junction', true, true, 2, true, 'Netelement', NULL);
-INSERT INTO node_type  VALUES ('TAP', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', true, true, 2, true, 'Tap', NULL); -- No translate
 INSERT INTO node_type  VALUES ('ADAPTATION', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', true, true, 2, true, 'Adaptation junction', NULL);
 INSERT INTO node_type  VALUES ('CONTOURNEMENT_COMPTEUR', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', true, true, 2, true, 'Bypass-register', NULL);
 INSERT INTO node_type  VALUES ('COURBE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', true, true, 2, true, 'Curve', NULL);

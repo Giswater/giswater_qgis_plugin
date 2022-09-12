@@ -23,6 +23,8 @@ SELECT * FROM anl_node WHERE fid=115 AND cur_user=current_user;
 */
 
 DECLARE 
+
+v_record record;
 v_project_type 	text;
 v_table_count integer;
 v_count integer;
@@ -38,6 +40,7 @@ v_saveondatabase boolean;
 v_error_context text;
 v_query text;
 v_comment text;
+v_querytext text;
 
 BEGIN 
 
@@ -53,22 +56,22 @@ BEGIN
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=115 AND cur_user=current_user;
 	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (252);
-	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (252);
-	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (252, 354, 355);
+	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (252,452);
+	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (252, 354, 355,467);
 
 
 	-- Starting process
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 4, concat('DATA QUALITY ANALYSIS ACORDING PLAN-PRICE RULES'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 4, '-------------------------------------------------------------');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 4, concat('DATA QUALITY ANALYSIS ACORDING PLAN-PRICE RULES'));
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 4, '-------------------------------------------------------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 3, 'CRITICAL ERRORS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 3, '----------------------');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 3, 'CRITICAL ERRORS');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 3, '----------------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 2, 'WARNINGS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 2, '--------------');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 2, 'WARNINGS');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 2, '--------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 1, 'INFO');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 1, '-------');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 1, 'INFO');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 1, '-------');
 
 	--arc catalog
 	SELECT count(*) INTO v_table_count FROM cat_arc WHERE active=TRUE;
@@ -317,18 +320,6 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 			VALUES (115, '344', 1,'INFO: There is/are no row(s) without values on cat_grate.active column.',v_count);
 		END IF;
-
-		--check cat_grate cost_ut column (345)
-		SELECT count(*) INTO v_count FROM cat_grate WHERE cost_ut IS NOT NULL and active=TRUE;
-		IF v_table_count>v_count THEN
-			INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-			VALUES (115, '345', 'cat_grate', 'cost_ut', 2, FALSE, concat('WARNING-345: There are ',(v_table_count-v_count),' row(s) without values on cat_grate.cost_ut column.'), v_count);
-		ELSE
-			v_count = 0;
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (115, '345', 1,'INFO: There is/are no row(s) without values on cat_grate.cost_ut column.',v_count);
-		END IF;
-	
 	END IF;	
 
 	--table plan_arc_x_pavement
@@ -338,11 +329,11 @@ BEGIN
 	SELECT count(*) INTO v_count FROM plan_arc_x_pavement;
 	IF v_table_count>v_count THEN
 		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '346', 'plan_arc_x_pavement', 'rows number', 1, FALSE, 'INFO: The number of rows of row(s) of the plan_arc_x_pavement table is lower than the arc table.', v_count);
+		VALUES (115, '346', 'plan_arc_x_pavement', 'rows number', 1, FALSE, 'INFO: The number of row(s) of the plan_arc_x_pavement table is lower than the arc table.', v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '346', 1,'INFO: The number of rows of row(s) of the plan_arc_x_pavement table is same than the arc table.',v_count);
+		VALUES (115, '346', 1,'INFO: The number of row(s) of the plan_arc_x_pavement table is same than the arc table.',v_count);
 	END IF;
 
 	--check plan_arc_x_pavemen pavcat_id column (347)
@@ -467,11 +458,83 @@ BEGIN
 		VALUES (115, '355', 1,'INFO: There are no arcs with state=2 with final nodes obsolete in psector.',v_count);
 	END IF;
 
+
+	-- Check node_1 or node_2 nulls for planified features (452)
+	v_querytext = '(SELECT arc_id,arccat_id,the_geom, expl_id FROM arc WHERE state = 2 AND node_1 IS NULL UNION SELECT arc_id, arccat_id, the_geom, expl_id FROM 
+	arc WHERE state = 2 AND node_2 IS NULL) a';
+
+	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+	IF v_count > 0 THEN
+		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id)
+			SELECT 452, arc_id, arccat_id, ''node_1 or node_2 nulls'', the_geom, expl_id FROM ', v_querytext);
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+		VALUES (115, 2, '452', concat('WARNING-452 (anl_arc): There is/are ',v_count,' arc''s with state=1 and without node_1 or node_2.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, fcount)
+		VALUES (115, 1, '452','INFO: No arc''s with state=1 and without node_1 or node_2 nodes found.', v_count);
+	END IF;
+
+	-- Planified umps with more than two arcs (467);
+	IF v_project_type='WS' THEN 
+		INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
+		select 467, b.node_id, nodecat_id, the_geom, 'Planified EPA pump with more than two arcs', expl_id
+		FROM(
+		SELECT node_id, count(*) FROM(
+		SELECT node_id FROM arc JOIN inp_pump ON node_1 = node_id 
+		WHERE (arc.state=1 OR arc.state=2)
+		UNION ALL
+		SELECT node_id FROM arc JOIN inp_pump ON node_2 = node_id
+		WHERE arc.state=1 OR arc.state=2 ) a
+		JOIN node USING (node_id)
+		WHERE node.state=2
+		GROUP BY node_id
+		HAVING count(*)>2)b
+		JOIN node USING (node_id);
+		
+		SELECT count(*) FROM anl_node INTO v_count WHERE fid=467 AND cur_user=current_user;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+			VALUES (115, '467', 3, concat(
+			'ERROR-467 (anl_node): There is/are ',v_count,' pumps(s) with more than two arcs .Take a look on temporal table to details'),v_count);
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+			VALUES (115, '467' , 1,  'INFO: EPA pumps checked. No pumps with more than two arcs detected.',v_count);
+		END IF;		
+	END IF;
+
+	--check if number of rows in plan_price
+	EXECUTE 'SELECT count(*) FROM plan_price'
+	INTO v_count; 
+
+	IF v_count > 700 THEN
+		INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
+		VALUES (115, '465', 3, FALSE, concat('ERROR-465: There are ',v_count,' rows on plan_price table. Revise the data and remove unnecessary rows.'),v_count);
+	ELSIF v_count > 300 THEN
+		INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
+		VALUES (115, '465', 2, FALSE, concat('WARNING-465: There are ',v_count,' rows on plan_price table. Revise the data and remove unnecessary rows.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (115, '465', 1,'INFO: The number of rows on plan price is acceptable.',v_count);
+	END IF;
+
+
+	-- Removing isaudit false sys_fprocess
+	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
+	LOOP
+		-- remove anl tables
+		DELETE FROM anl_node WHERE fid = v_record.fid AND cur_user = current_user;
+		DELETE FROM anl_arc WHERE fid = v_record.fid AND cur_user = current_user;
+		DELETE FROM anl_connec WHERE fid = v_record.fid AND cur_user = current_user;
+
+		DELETE FROM audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user AND fid = 115;		
+	END LOOP;
+
 	-- insert spacers
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 4, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 3, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 2, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (115, null, 1, '');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 4, '');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 3, '');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 2, '');
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (115, 1, '');
 
 	-- get results
 	-- info
@@ -492,7 +555,10 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, node_id as feature_id, nodecat_id as feature_catalog, state, expl_id, descript,fid, the_geom FROM anl_node WHERE cur_user="current_user"()
-	AND fid IN (252)
+	AND fid IN (252, 354, 355,467)
+	UNION
+	SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom FROM anl_arc WHERE cur_user="current_user"()
+	AND fid IN (252, 452)
 	UNION
 	SELECT id, connec_id, connecat_id, state, expl_id, descript,fid, the_geom FROM anl_connec WHERE cur_user="current_user"()
 	AND fid IN (252)) row) features;
@@ -515,7 +581,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (252, 354, 355)) row) features;
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (252, 354, 355, 452)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 

@@ -212,11 +212,11 @@ INSERT INTO config_visit_class_x_feature VALUES ('v_edit_node', 3);
 INSERT INTO config_visit_class_x_feature VALUES ('v_edit_connec', 4);
 INSERT INTO config_visit_class_x_feature VALUES ('v_edit_connec', 2);
 
- -- config_graf_checkvalve
-UPDATE config_graf_checkvalve SET active = TRUE;
+ -- config_graph_checkvalve
+UPDATE config_graph_checkvalve SET active = TRUE;
 
- -- config_graf_inlet  
-UPDATE config_graf_inlet   SET active = TRUE;
+ -- config_graph_inlet  
+UPDATE config_graph_inlet   SET active = TRUE;
 
- -- config_graf_valve
-UPDATE config_graf_valve SET active = TRUE;
+ -- config_graph_valve
+UPDATE config_graph_valve SET active = TRUE;

@@ -41,10 +41,10 @@ BEGIN
 	IF v_breaklegth = NULL THEN v_breaklegth = 1000; END IF;
 	
 	-- count
-	SELECT count(*) INTO v_count FROM (SELECT arc_id, v_breaklegth/st_length(the_geom) as partial, the_geom  FROM temp_arc)a  WHERE partial < 1;
+	SELECT count(*) INTO v_count FROM (SELECT arc_id, v_breaklegth/(st_length(the_geom)+0.001) as partial, the_geom  FROM temp_arc)a  WHERE partial < 1;
 
 	-- insert into vnode table with state  = 0
-	FOR rec_arc IN EXECUTE ' SELECT * FROM (SELECT arc_id, '||v_breaklegth||'/st_length(the_geom) as partial, the_geom  FROM temp_arc)a  WHERE partial < 1'
+	FOR rec_arc IN EXECUTE ' SELECT * FROM (SELECT arc_id, '||v_breaklegth||'/(st_length(the_geom)+0.001) as partial, the_geom  FROM temp_arc)a  WHERE partial < 1'
 	LOOP
 		-- counter
 		i = i+1;

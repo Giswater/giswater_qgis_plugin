@@ -377,17 +377,17 @@ BEGIN
 			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_arc_function_vdefault' AND cur_user = current_user);
 		END IF;
         
-        --Pavement
+		--Pavement
 		IF NEW.pavcat_id IS NULL THEN
 			NEW.pavcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_pavementcat_vdefault' AND cur_user = current_user);
 		END IF;
 
 		-- FEATURE INSERT
-		INSERT INTO arc (arc_id, code, node_1,node_2, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type, location_type,
+		INSERT INTO arc (arc_id, code, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type, location_type,
 					workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate,enddate, ownercat_id, muni_id, postcode, district_id, streetaxis_id, postnumber, postcomplement,
 					streetaxis2_id,postnumber2, postcomplement2,descript,link,verified,the_geom,undelete,label_x,label_y,label_rotation,  publish, inventory, expl_id, num_value, 
 					depth, adate, adescript, lastupdate, lastupdate_user, asset_id, pavcat_id)
-					VALUES (NEW.arc_id, NEW.code, NEW.node_1, NEW.node_2, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, NEW.custom_length,NEW.dma_id,NEW. presszone_id,
+					VALUES (NEW.arc_id, NEW.code, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, NEW.custom_length,NEW.dma_id,NEW. presszone_id,
 					NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id, NEW.builtdate,NEW.enddate, NEW.ownercat_id,
 					NEW.muni_id, NEW.postcode, NEW.district_id,v_streetaxis,NEW.postnumber, NEW.postcomplement, v_streetaxis2, NEW.postnumber2, NEW.postcomplement2, NEW.descript,NEW.link, NEW.verified, 
 					NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, NEW.publish, NEW.inventory, NEW.expl_id, NEW.num_value,
@@ -463,6 +463,16 @@ BEGIN
         RETURN NEW;
     
     ELSIF TG_OP = 'UPDATE' THEN
+
+    		-- this overwrites triger topocontrol arc values (triggered before insertion) just in that moment: In order to make more profilactic this issue only will be overwrited in case of NEW.node_* not nulls
+		IF v_edit_enable_arc_nodes_update IS TRUE THEN
+			IF NEW.node_1 IS NOT NULL THEN
+				UPDATE arc SET node_1=NEW.node_1 WHERE arc_id=NEW.arc_id;
+			END IF;
+			IF NEW.node_2 IS NOT NULL THEN
+				UPDATE arc SET node_2=NEW.node_2 WHERE arc_id=NEW.arc_id;
+			END IF;
+		END IF;
 
 		-- epa type
 		IF (NEW.epa_type != OLD.epa_type) THEN    

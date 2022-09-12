@@ -150,13 +150,20 @@ BEGIN
 				GET DIAGNOSTICS v_count = row_count;
 			ELSIF  v_selectionmode = 'previousSelection' AND v_id NOT IN ('', '()', '[]') THEN
 				v_where = ' WHERE ';
-				FOR _key, _value IN
-			       SELECT * FROM jsonb_each(v_id)
-			    LOOP
-					_value = replace(replace(replace(_value, '"', ''''), '[', ''), ']', '');
-					v_where = concat(v_where, _key, ' IN (', _value, ') AND ');
-				END LOOP;
-				v_where = substr(v_where, 1, length(v_where) - 5);
+				-- Layer has multiple pks so v_id is json
+				IF to_tsvector(v_id) @@ to_tsquery('{ & }') THEN
+					FOR _key, _value IN
+					SELECT * FROM jsonb_each(v_id)
+					LOOP
+						_value = replace(replace(replace(_value, '"', ''''), '[', ''), ']', '');
+						v_where = concat(v_where, _key, ' IN (', _value, ') AND ');
+					END LOOP;
+					v_where = substr(v_where, 1, length(v_where) - 5);
+				-- Layer has one pk so v_id is normal list
+				ELSE
+					v_id = replace(replace(replace(v_id,'[','('),']',')'),'"','');
+					v_where = concat(v_where, lower(v_featuretype), '_id::integer IN ', v_id);
+				END IF;
 				v_querytext = 'INSERT INTO '||quote_ident(v_table)||' SELECT '||v_columns||' FROM '||quote_ident(v_tablename)|| v_where;
 				EXECUTE v_querytext;
 				GET DIAGNOSTICS v_count = row_count;

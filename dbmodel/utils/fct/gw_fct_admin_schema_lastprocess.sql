@@ -208,7 +208,7 @@ BEGIN
 				ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_22;
 				ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_23;
 				ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_24;	
-				ALTER TABLE config_graf_inlet DROP COLUMN if exists _to_arc;
+				ALTER TABLE config_graph_inlet DROP COLUMN if exists _to_arc;
 				ALTER TABLE ext_rtc_hydrometer DROP COLUMN IF EXISTS hydrometer_category;
 				ALTER TABLE ext_rtc_hydrometer DROP COLUMN IF EXISTS cat_hydrometer_id ;
 			ELSE
@@ -312,10 +312,34 @@ BEGIN
 
 			v_message='Project sucessfully created';
 			
-			-- automatize graf analytics config for ws
-			UPDATE config_param_system SET value = 'TRUE' where parameter = 'utils_grafanalytics_automatic_config'; 
+			-- automatize graph analytics config for ws
+			UPDATE config_param_system SET value = 'TRUE' where parameter = 'utils_graphanalytics_automatic_config'; 
+
+			-- UPDATE edit_check_redundance_y_topelev_elev
+			UPDATE config_param_system SET value = 'TRUE' WHERE parameter = 'edit_check_redundance_y_topelev_elev';
 
 		ELSIF v_isnew IS FALSE THEN
+		
+		
+			-- profilactic delete to avoid conflicts with sequences and to clean gdb
+			DELETE FROM audit_check_project;
+			DELETE FROM audit_check_data;
+			DELETE FROM temp_arc;
+			DELETE FROM temp_anlgraph;
+			DELETE FROM temp_csv;
+			DELETE FROM temp_data;
+			DELETE FROM temp_node;
+			DELETE FROM temp_go2epa;
+			DELETE FROM temp_table;
+			
+			IF project_type = 'WS
+				DELETE FROM temp_mincut;
+				DELETE FROM temp_demand;
+			ELSE
+				DELETE FROM temp_arc_flowregulator;
+				DELETE FROM temp_gully;			
+				DELETE FROM temp_lid_usage;
+			END IF;	
 
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, 'UPDATE PROJECT SCHEMA');
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '---------------------');
@@ -343,11 +367,13 @@ BEGIN
 				"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"workcat_id_plan" }}$$);
 			END IF;
 
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (214, 4, concat('Project have been sucessfully updated from ',v_oldversion,' version to ',v_gwversion, ' version'));
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('Project have been sucessfully updated from ',v_oldversion,' version to ',v_gwversion, ' version'));
 			v_message='Project sucessfully updated';
 
 		END IF;
 
+		--reset sequences and id of anl, temp and audit tables
+		PERFORM gw_fct_admin_reset_sequences();
 		
 		-- last process
 		UPDATE config_param_system SET value = v_gwversion WHERE parameter = 'admin_version';

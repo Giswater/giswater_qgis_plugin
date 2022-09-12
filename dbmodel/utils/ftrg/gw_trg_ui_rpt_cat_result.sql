@@ -10,11 +10,13 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_ui_rpt_cat_result() RETURNS trigge
 DECLARE 
     doc_table varchar;
     v_sql varchar;
+	admin_exploitation_x_user boolean;
     
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     doc_table:= TG_ARGV[0];
+	SELECT value::boolean INTO admin_exploitation_x_user FROM config_param_system WHERE parameter = 'admin_exploitation_x_user';
 
     IF TG_OP = 'INSERT' THEN
         RETURN NEW;

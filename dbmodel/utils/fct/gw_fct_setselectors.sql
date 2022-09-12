@@ -12,10 +12,10 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setselectors(p_data json)
 $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"None", "tabName":"tab_exploitation", "forceParent":"True", "checkAll":"True", "addSchema":"None"}}$$);
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"explfrommuni", "id":32, "value":true, "isAlone":true, "addSchema":"SCHEMA_NAME"}}$$)::text
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"None", "tabName":"tab_exploitation", "forceParent":"True", "checkAll":"True", "addSchema":"None"}}$$);
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"explfrommuni", "id":32, "value":true, "isAlone":true, "addSchema":"SCHEMA_NAME"}}$$)::text
 
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_psector", "id":"1", "isAlone":"True", "value":"True", "addSchema":"None", "useAtlas":true}}$$);
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_psector", "id":"1", "isAlone":"True", "value":"True", "addSchema":"None", "useAtlas":true}}$$);
 
 fid: 397
 
@@ -61,6 +61,10 @@ v_explfromsector boolean;
 v_sectorfrommacroexpl boolean;
 v_explmuni text;
 v_zonetable text;
+v_cur_user text;
+v_prev_cur_user text;
+
+
 BEGIN
 
 	-- Set search path to local schema
@@ -82,7 +86,12 @@ BEGIN
 	v_useatlas := (p_data ->> 'data')::json->> 'useAtlas';
 	v_disableparent := (p_data ->> 'data')::json->> 'disableParent';
 	v_data = p_data->>'data';
+	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
 
+	v_prev_cur_user = current_user;
+	IF v_cur_user IS NOT NULL THEN
+		EXECUTE 'SET ROLE "'||v_cur_user||'"';
+	END IF;
 
 	-- profilactic control
 	IF lower(v_selectortype) = 'none' OR v_selectortype = '' OR lower(v_selectortype) ='null' THEN v_selectortype = 'selector_basic'; END IF;
@@ -310,7 +319,7 @@ BEGIN
 	-- manage cross-reference tables
 	IF v_tabname IN('tab_exploitation', 'tab_macroexploitation', 'tab_sector') THEN
 
-		IF v_sectorfromexpl  THEN
+		IF v_sectorfromexpl AND v_id > 0 THEN
 
 			-- checking actually sector id exists with same id than expl_id
 			IF (SELECT count(*) FROM sector WHERE sector_id = v_id) = 1 THEN
@@ -319,7 +328,7 @@ BEGIN
 			END IF;
 		END IF;
 
-		IF v_sectorfrommacroexpl  THEN
+		IF v_sectorfrommacroexpl AND v_id > 0  THEN
 			-- checking actually sector id exists with same id than expl_id
 			IF (SELECT count(*) FROM sector WHERE sector_id = v_id) = 1 THEN
 				DELETE FROM selector_sector WHERE cur_user = current_user;
@@ -327,7 +336,7 @@ BEGIN
 			END IF;
 		END IF;	
 		
-		IF v_explfromsector  THEN
+		IF v_explfromsector AND v_id > 0 THEN
 			-- checking actually expl id exists with same id than sector_id
 			IF (SELECT count(*) FROM exploitation WHERE expl_id = v_id) = 1 THEN
 				DELETE FROM selector_expl WHERE cur_user = current_user;
@@ -358,7 +367,9 @@ BEGIN
 	v_geometry := COALESCE(v_geometry, '{}');
 	v_uservalues := COALESCE(v_uservalues, '{}');
 	v_action := COALESCE(v_action, 'null');
-
+	
+	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
+	
 	-- Return
 	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, "feature":{}, 
 	"data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":',v_action,', "selectorType":"',v_selectortype,'"}}');

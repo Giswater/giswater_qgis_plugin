@@ -80,10 +80,9 @@ BEGIN
 			v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM 
 				(SELECT a.attname as label, 
 				concat(',quote_literal(v_tabname),',''_'',a.attname) AS widgetname,
+				a.attname AS columnname,			   
 				(case when a.atttypid=16 then ''check'' else ''text'' end ) as widgettype, 
 				(case when a.atttypid=16 then ''boolean'' else ''string'' end ) as "datatype", 
-				''::TEXT AS tooltip, 
-				''::TEXT as placeholder, 
 				false AS iseditable,
 				row_number()over() AS orderby, 
 				null as stylesheet, 

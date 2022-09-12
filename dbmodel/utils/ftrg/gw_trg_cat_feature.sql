@@ -47,13 +47,17 @@ BEGIN
 
 	IF v_table = 'cat_feature_node' THEN
 
-		IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_config') IS TRUE THEN
+		IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'utils_graphanalytics_automatic_config') IS TRUE THEN
 
-			IF (NEW.graf_delimiter != 'NONE' AND NEW.graf_delimiter IS NOT NULL) THEN
-				INSERT INTO config_graf_valve VALUES (NEW.id) ON CONFLICT (id) DO NOTHING; 
-			ELSIF (NEW.graf_delimiter = 'NONE') THEN
-				DELETE FROM config_graf_valve WHERE id = NEW.id;
+			IF (NEW.graph_delimiter = 'MINSECTOR') THEN
+				INSERT INTO config_graph_valve VALUES (NEW.id) ON CONFLICT (id) DO NOTHING; 
 			END IF;
+			
+		END IF;
+
+		IF v_projecttype ='WS' AND NEW.type ='VALVE' and NEW.isarcdivide IS TRUE THEN
+			INSERT INTO config_graph_valve (id)
+			VALUES (NEW.id) ON CONFLICT (id) DO NOTHING;
 		END IF;
 		
 		RETURN NEW;
@@ -282,6 +286,9 @@ BEGIN
 
 				--delete definition from config_info_layer_x_type
 				DELETE FROM config_info_layer_x_type where tableinfo_id=OLD.child_layer OR tableinfotype_id=OLD.child_layer;
+				
+				--delete definition from sys_table
+				DELETE FROM sys_table where id=OLD.child_layer;
 
 				EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"form":{}, 	"feature":{"catFeature":"'||NEW.id||'"},
@@ -348,6 +355,9 @@ BEGIN
 
 			--delete definition from config_info_layer_x_type
 			DELETE FROM config_info_layer_x_type where tableinfo_id=OLD.child_layer OR tableinfotype_id=OLD.child_layer;
+
+			--delete definition from sys_table
+			DELETE FROM sys_table where id=OLD.child_layer;
 
 			-- delete sys_param_user parameters
 			DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');
