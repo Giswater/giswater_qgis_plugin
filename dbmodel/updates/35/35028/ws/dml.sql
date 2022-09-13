@@ -73,4 +73,3 @@ WHERE formname = 'v_edit_inp_dscenario_virtualvalve' AND columnname ='dscenario_
 
 UPDATE config_form_fields SET widgetcontrols = '{"valueRelation":{"nullValue":true, "layer": "v_edit_inp_pattern", "activated": true, "keyColumn": "pattern_id", "valueColumn": "pattern_id", "filterExpression": null}}' 
 WHERE formname = 'v_edit_inp_dscenario_demand' AND columnname ='pattern_id';
->>>>>>> 7884f490c... minor bug fix on updates
