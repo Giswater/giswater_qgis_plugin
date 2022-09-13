@@ -13,6 +13,17 @@ WHERE id = 'inp_options_debug';
 
 DELETE FROM sys_function where function_name = 'gw_fct_pg2epa_inlet_flowtrace';
 
+UPDATE config_toolbox SET inputparams = b.inp FROM
+(SELECT json_agg(a.inputs::json) AS inp FROM
+(SELECT json_array_elements_text(inputparams) as inputs
+FROM config_toolbox
+WHERE id=2768
+union select concat('{"widgetname":"commitChanges", "label":"Commit changes:", "widgettype":"check","datatype":"boolean","tooltip":"If true, changes will be applied to DB. If false, algorithm results will be saved in anl tables" , "layoutname":"grl_option_parameters","layoutorder":',maxord+1,',"value":""}')
+from (select max(d.layoutord::integer) as maxord from
+(SELECT json_extract_path_text(json_array_elements(inputparams),'layoutorder') as layoutord
+FROM config_toolbox
+WHERE id=2768)d where layoutord is not null)e)a)b WHERE id=2768;
+
 UPDATE sys_function SET descript='Function to analyze network as a graph. Multiple analysis is avaliable (SECTOR, DQA, PRESSZONE & DMA). Before start you need to configurate:
 - Field graph_delimiter on [cat_feature_node] table. 
 - Field graphconfig on [dma, sector, cat_presszone and dqa] tables.
