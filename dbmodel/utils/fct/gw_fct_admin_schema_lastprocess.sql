@@ -332,7 +332,7 @@ BEGIN
 			DELETE FROM temp_go2epa;
 			DELETE FROM temp_table;
 			
-			IF project_type = 'WS
+			IF project_type = 'WS' THEN
 				DELETE FROM temp_mincut;
 				DELETE FROM temp_demand;
 			ELSE
