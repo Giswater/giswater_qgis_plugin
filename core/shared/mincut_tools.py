@@ -182,9 +182,7 @@ class GwMincutTools:
         result_mincut_id = self.tbl_mincut_edit.model().record(row).value("id")
 
         # Close this dialog and open selected mincut
-        keep_open_form = tools_gw.get_config_parser('dialogs_actions', 'mincut_manager_keep_open', "user", "init", prefix=True)
-        if tools_os.set_boolean(keep_open_form, False) is not True:
-            tools_gw.close_dialog(self.dlg_mincut_man)
+        tools_gw.close_dialog(self.dlg_mincut_man)
         self.mincut.is_new = False
         self.mincut.set_dialog(dlg_mincut)
         self.mincut.init_mincut_form()
