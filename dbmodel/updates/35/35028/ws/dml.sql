@@ -21,8 +21,56 @@ Stop your mouse over labels for more information about input parameters.
 This function could be automatic triggered by valve status (open or closed) by configuring utils_graphanalytics_automatic_trigger variable on [config_param_system] table.'
 WHERE id=2768;
 
-INSERT INTO config_toolbox
-VALUES (3008, 'Arc reverse', TRUE, '{"featureType":["arc"]}',null, null, TRUE)
+INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active)
+VALUES (3008, 'Arc reverse', '{"featureType":["arc"]}',null, null, TRUE)
 ON CONFLICT (id) DO NOTHING;
 
-UPDATE cat_feature_node SET isprofilesurface = false;
+UPDATE cat_feature_node SET isprofilesurface = false WHERE isprofilesurface IS NULL;
+
+
+--2022/09/13
+UPDATE config_form_fields SET widgetcontrols = '{"valueRelation":{"nullValue":false, "layer": "v_edit_cat_dscenario", "activated": true, "keyColumn": "dscenario_id", "valueColumn": "name", "filterExpression": null}}' 
+WHERE formname = 'v_edit_inp_dscenario_demand' AND columnname ='dscenario_id';
+
+UPDATE config_form_fields SET widgetcontrols = '{"valueRelation":{"nullValue":false, "layer": "v_edit_cat_dscenario", "activated": true, "keyColumn": "dscenario_id", "valueColumn": "name", "filterExpression": null}}' 
+WHERE formname = 'v_edit_inp_dscenario_pipe' AND columnname ='dscenario_id';
+
+UPDATE config_form_fields SET widgetcontrols = '{"valueRelation":{"nullValue":false, "layer": "v_edit_cat_dscenario", "activated": true, "keyColumn": "dscenario_id", "valueColumn": "name", "filterExpression": null}}' 
+WHERE formname = 'v_edit_inp_dscenario_connec' AND columnname ='dscenario_id';
+
+UPDATE config_form_fields SET widgetcontrols = '{"valueRelation":{"nullValue":false, "layer": "v_edit_cat_dscenario", "activated": true, "keyColumn": "dscenario_id", "valueColumn": "name", "filterExpression": null}}' 
+WHERE formname = 'v_edit_inp_dscenario_controls' AND columnname ='dscenario_id';
+
+UPDATE config_form_fields SET widgetcontrols = '{"valueRelation":{"nullValue":false, "layer": "v_edit_cat_dscenario", "activated": true, "keyColumn": "dscenario_id", "valueColumn": "name", "filterExpression": null}}' 
+WHERE formname = 'v_edit_inp_dscenario_inlet' AND columnname ='dscenario_id';
+
+UPDATE config_form_fields SET widgetcontrols = '{"valueRelation":{"nullValue":false, "layer": "v_edit_cat_dscenario", "activated": true, "keyColumn": "dscenario_id", "valueColumn": "name", "filterExpression": null}}' 
+WHERE formname = 'v_edit_inp_dscenario_junction' AND columnname ='dscenario_id';
+
+UPDATE config_form_fields SET widgetcontrols = '{"valueRelation":{"nullValue":false, "layer": "v_edit_cat_dscenario", "activated": true, "keyColumn": "dscenario_id", "valueColumn": "name", "filterExpression": null}}' 
+WHERE formname = 'v_edit_inp_dscenario_pump' AND columnname ='dscenario_id';
+
+UPDATE config_form_fields SET widgetcontrols = '{"valueRelation":{"nullValue":false, "layer": "v_edit_cat_dscenario", "activated": true, "keyColumn": "dscenario_id", "valueColumn": "name", "filterExpression": null}}' 
+WHERE formname = 'v_edit_inp_dscenario_pump_additional' AND columnname ='dscenario_id';
+
+UPDATE config_form_fields SET widgetcontrols = '{"valueRelation":{"nullValue":false, "layer": "v_edit_cat_dscenario", "activated": true, "keyColumn": "dscenario_id", "valueColumn": "name", "filterExpression": null}}' 
+WHERE formname = 'v_edit_inp_dscenario_reservoir' AND columnname ='dscenario_id';
+
+UPDATE config_form_fields SET widgetcontrols = '{"valueRelation":{"nullValue":false, "layer": "v_edit_cat_dscenario", "activated": true, "keyColumn": "dscenario_id", "valueColumn": "name", "filterExpression": null}}' 
+WHERE formname = 'v_edit_inp_dscenario_rules' AND columnname ='dscenario_id';
+
+UPDATE config_form_fields SET widgetcontrols = '{"valueRelation":{"nullValue":false, "layer": "v_edit_cat_dscenario", "activated": true, "keyColumn": "dscenario_id", "valueColumn": "name", "filterExpression": null}}' 
+WHERE formname = 'v_edit_inp_dscenario_shortpipe' AND columnname ='dscenario_id';
+
+UPDATE config_form_fields SET widgetcontrols = '{"valueRelation":{"nullValue":false, "layer": "v_edit_cat_dscenario", "activated": true, "keyColumn": "dscenario_id", "valueColumn": "name", "filterExpression": null}}' 
+WHERE formname = 'v_edit_inp_dscenario_tank' AND columnname ='dscenario_id';
+
+UPDATE config_form_fields SET widgetcontrols = '{"valueRelation":{"nullValue":false, "layer": "v_edit_cat_dscenario", "activated": true, "keyColumn": "dscenario_id", "valueColumn": "name", "filterExpression": null}}' 
+WHERE formname = 'v_edit_inp_dscenario_valve' AND columnname ='dscenario_id';
+
+UPDATE config_form_fields SET widgetcontrols = '{"valueRelation":{"nullValue":false, "layer": "v_edit_cat_dscenario", "activated": true, "keyColumn": "dscenario_id", "valueColumn": "name", "filterExpression": null}}' 
+WHERE formname = 'v_edit_inp_dscenario_virtualvalve' AND columnname ='dscenario_id';
+
+UPDATE config_form_fields SET widgetcontrols = '{"valueRelation":{"nullValue":true, "layer": "v_edit_inp_pattern", "activated": true, "keyColumn": "pattern_id", "valueColumn": "pattern_id", "filterExpression": null}}' 
+WHERE formname = 'v_edit_inp_dscenario_demand' AND columnname ='pattern_id';
+>>>>>>> 7884f490c... minor bug fix on updates
