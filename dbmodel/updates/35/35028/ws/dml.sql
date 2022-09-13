@@ -21,7 +21,7 @@ Stop your mouse over labels for more information about input parameters.
 This function could be automatic triggered by valve status (open or closed) by configuring utils_graphanalytics_automatic_trigger variable on [config_param_system] table.'
 WHERE id=2768;
 
-INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active))
+INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active)
 VALUES (3008, 'Arc reverse', '{"featureType":["arc"]}',null, null, TRUE)
 ON CONFLICT (id) DO NOTHING;
 
