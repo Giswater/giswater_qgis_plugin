@@ -68,6 +68,7 @@ class GwInfo(QObject):
         self.snapper_manager = GwSnapManager(self.iface)
         self.snapper_manager.set_snapping_layers()
         self.suppres_form = None
+        self.prev_action = None
 
 
     def get_info_from_coordinates(self, point, tab_type):
@@ -512,6 +513,7 @@ class GwInfo(QObject):
             dlg_cf.dlg_closed.connect(self._remove_layer_selection)
             dlg_cf.dlg_closed.connect(partial(tools_gw.save_settings, dlg_cf))
             dlg_cf.dlg_closed.connect(self._reset_my_json, True)
+            dlg_cf.dlg_closed.connect(self._manage_prev_action)
             dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
             btn_cancel.clicked.connect(partial(self._manage_info_close, dlg_cf))
         btn_accept.clicked.connect(
@@ -2024,6 +2026,11 @@ class GwInfo(QObject):
         return True
 
 
+    def _manage_prev_action(self):
+        if self.prev_action:
+            self.prev_action.action.trigger()
+
+
     def _enable_actions(self, dialog, enabled):
         """ Enable actions according if layer is editable or not """
 
@@ -3179,6 +3186,7 @@ class GwInfo(QObject):
         is_inserting = True
 
         self.info_feature = GwInfo('data')
+        self.info_feature.prev_action = self.prev_action
         result, dialog = self.info_feature._get_feature_insert(point=list_points, feature_cat=self.feature_cat,
                                                                new_feature_id=feature_id, new_feature=feature,
                                                                layer_new_feature=self.info_layer, tab_type='data')
