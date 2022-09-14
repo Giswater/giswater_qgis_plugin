@@ -1219,7 +1219,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 if 'isMandatory' in field:
                     widget.setProperty('ismandatory', field['isMandatory'])
                 else:
-                    widget.setProperty('ismandatory', True)
+                    widget.setProperty('ismandatory', False)
                 if 'value' in field:
                     widget.setText(field['value'])
                     widget.setProperty('value', field['value'])
