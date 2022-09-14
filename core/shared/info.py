@@ -1852,150 +1852,142 @@ class GwInfo(QObject):
 
         after_insert = False
 
-        if _json == '' or str(_json) == '{}':
-            if not close_dlg:
-                return None
-            if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
-                global_vars.session_vars['dialog_docker'].setMinimumWidth(dialog.width())
-                tools_gw.close_docker()
-                return None
-            tools_gw.close_dialog(dialog)
-            return None
+        # Tab data
+        if _json != '' and str(_json) != '{}':
+            p_table_id = complet_result['body']['feature']['tableName']
+            id_name = complet_result['body']['feature']['idName']
+            newfeature_id = complet_result['body']['feature']['id']
+            parent_fields = complet_result['body']['data']['parentFields']
+            fields_reload = ""
+            list_mandatory = []
+            for field in complet_result['body']['data']['fields']:
+                if p_widget and (field['widgetname'] == p_widget.objectName()):
+                    if field['widgetcontrols'] and 'autoupdateReloadFields' in field['widgetcontrols']:
+                        fields_reload = field['widgetcontrols']['autoupdateReloadFields']
 
-        p_table_id = complet_result['body']['feature']['tableName']
-        id_name = complet_result['body']['feature']['idName']
-        newfeature_id = complet_result['body']['feature']['id']
-        parent_fields = complet_result['body']['data']['parentFields']
-        fields_reload = ""
-        list_mandatory = []
-        for field in complet_result['body']['data']['fields']:
-            if p_widget and (field['widgetname'] == p_widget.objectName()):
-                if field['widgetcontrols'] and 'autoupdateReloadFields' in field['widgetcontrols']:
-                    fields_reload = field['widgetcontrols']['autoupdateReloadFields']
+                if field['ismandatory']:
+                    widget = dialog.findChild(QWidget, field['widgetname'])
+                    widget.setStyleSheet(None)
+                    value = tools_qt.get_text(dialog, widget)
+                    if value in ('null', None, ''):
+                        widget.setStyleSheet("border: 1px solid red")
+                        list_mandatory.append(field['widgetname'])
 
-            if field['ismandatory']:
-                widget = dialog.findChild(QWidget, field['widgetname'])
-                widget.setStyleSheet(None)
-                value = tools_qt.get_text(dialog, widget)
-                if value in ('null', None, ''):
-                    widget.setStyleSheet("border: 1px solid red")
-                    list_mandatory.append(field['widgetname'])
-
-        if list_mandatory:
-            msg = "Some mandatory values are missing. Please check the widgets marked in red."
-            tools_qgis.show_warning(msg, dialog=dialog)
-            tools_qt.set_action_checked("actionEdit", True, dialog)
-            QgsProject.instance().blockSignals(False)
-            return False
-
-        if self._has_elev_and_y_json(_json):
-            tools_qt.set_action_checked("actionEdit", True, dialog)
-            QgsProject.instance().blockSignals(False)
-            return False
-
-        # If we create a new feature
-        if self.new_feature_id is not None:
-            new_feature.setAttribute(id_name, newfeature_id)
-            after_insert = True
-            for k, v in list(_json.items()):
-                if k in parent_fields:
-                    new_feature.setAttribute(k, v)
-                    _json.pop(k, None)
-
-            if not self.layer_new_feature.isEditable():
-                self.layer_new_feature.startEditing()
-            self.layer_new_feature.updateFeature(new_feature)
-
-            status = self.layer_new_feature.commitChanges()
-            if status is False:
-                error = self.layer_new_feature.commitErrors()
-                tools_log.log_warning(f"{error}")
+            if list_mandatory:
+                msg = "Some mandatory values are missing. Please check the widgets marked in red."
+                tools_qgis.show_warning(msg, dialog=dialog)
+                tools_qt.set_action_checked("actionEdit", True, dialog)
                 QgsProject.instance().blockSignals(False)
                 return False
 
-            self.new_feature_id = None
-            self._enable_action(dialog, "actionZoom", True)
-            self._enable_action(dialog, "actionZoomOut", True)
-            self._enable_action(dialog, "actionCentered", True)
-            self._enable_action(dialog, "actionSetToArc", True)
-            global is_inserting
-            is_inserting = False
-            my_json = json.dumps(_json)
-            if my_json == '' or str(my_json) == '{}':
-                if close_dlg:
-                    if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
-                        tools_gw.close_docker()
-                        return True
-                    tools_gw.close_dialog(dialog)
-                return True
+            if self._has_elev_and_y_json(_json):
+                tools_qt.set_action_checked("actionEdit", True, dialog)
+                QgsProject.instance().blockSignals(False)
+                return False
+
+            # If we create a new feature
+            if self.new_feature_id is not None:
+                new_feature.setAttribute(id_name, newfeature_id)
+                after_insert = True
+                for k, v in list(_json.items()):
+                    if k in parent_fields:
+                        new_feature.setAttribute(k, v)
+                        _json.pop(k, None)
+
+                if not self.layer_new_feature.isEditable():
+                    self.layer_new_feature.startEditing()
+                self.layer_new_feature.updateFeature(new_feature)
+
+                status = self.layer_new_feature.commitChanges()
+                if status is False:
+                    error = self.layer_new_feature.commitErrors()
+                    tools_log.log_warning(f"{error}")
+                    QgsProject.instance().blockSignals(False)
+                    return False
+
+                self.new_feature_id = None
+                self._enable_action(dialog, "actionZoom", True)
+                self._enable_action(dialog, "actionZoomOut", True)
+                self._enable_action(dialog, "actionCentered", True)
+                self._enable_action(dialog, "actionSetToArc", True)
+                global is_inserting
+                is_inserting = False
+                my_json = json.dumps(_json)
+                if my_json == '' or str(my_json) == '{}':
+                    if close_dlg:
+                        if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
+                            tools_gw.close_docker()
+                            return True
+                        tools_gw.close_dialog(dialog)
+                    return True
 
 
-            if self.new_feature.attribute(id_name) is not None:
-                feature = f'"id":"{self.new_feature.attribute(id_name)}", '
+                if self.new_feature.attribute(id_name) is not None:
+                    feature = f'"id":"{self.new_feature.attribute(id_name)}", '
+                else:
+                    feature = f'"id":"{self.feature_id}", '
+
+            # If we make an info
             else:
+                my_json = json.dumps(_json)
                 feature = f'"id":"{self.feature_id}", '
 
-        # If we make an info
-        else:
-            my_json = json.dumps(_json)
-            feature = f'"id":"{self.feature_id}", '
+            feature += f'"tableName":"{p_table_id}", '
+            feature += f' "featureType":"{self.feature_type}" '
+            extras = f'"fields":{my_json}, "reload":"{fields_reload}", "afterInsert":"{after_insert}"'
+            body = tools_gw.create_body(feature=feature, extras=extras)
 
-        feature += f'"tableName":"{p_table_id}", '
-        feature += f' "featureType":"{self.feature_type}" '
-        extras = f'"fields":{my_json}, "reload":"{fields_reload}", "afterInsert":"{after_insert}"'
-        body = tools_gw.create_body(feature=feature, extras=extras)
-
-        # Get utils_grafanalytics_automatic_trigger param
-        row = tools_gw.get_config_value("utils_grafanalytics_automatic_trigger", table='config_param_system')
-        thread = row[0] if row else None
-        if thread:
-            thread = json.loads(thread)
-            thread = tools_os.set_boolean(thread['status'], default=False)
-            if 'closed' not in _json:
-                thread = False
-        epa_type_changed = False
-        if 'epa_type' in _json:
-            epa_type_changed = True
-
-        json_result = tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
-        if not json_result:
-            QgsProject.instance().blockSignals(False)
-            return False
-
-        if clear_json:
-            _json = {}
-
-        self._reset_my_json(False)
-
-        if "Accepted" in json_result['status']:
-            msg_text = json_result['message']['text']
-            if msg_text is None:
-                msg_text = 'Feature upserted'
-            msg_level = json_result['message']['level']
-            if msg_level is None:
-                msg_level = 1
-            tools_qgis.show_message(msg_text, message_level=msg_level, dialog=dialog)
-            self._reload_fields(dialog, json_result, p_widget)
-
+            # Get utils_grafanalytics_automatic_trigger param
+            row = tools_gw.get_config_value("utils_grafanalytics_automatic_trigger", table='config_param_system')
+            thread = row[0] if row else None
             if thread:
-                # If param is true show question and create thread
-                msg = "You closed a valve, this will modify the current mapzones and it may take a little bit of time."
-                if global_vars.user_level['level'] in ('1', '2'):
-                    msg += " Would you like to continue?"
-                    answer = tools_qt.show_question(msg)
-                else:
-                    tools_qgis.show_info(msg)
-                    answer = True
+                thread = json.loads(thread)
+                thread = tools_os.set_boolean(thread['status'], default=False)
+                if 'closed' not in _json:
+                    thread = False
+            epa_type_changed = False
+            if 'epa_type' in _json:
+                epa_type_changed = True
 
-                if answer:
-                    params = {"body": body}
-                    self.valve_thread = GwToggleValveTask("Update mapzones", params)
-                    QgsApplication.taskManager().addTask(self.valve_thread)
-                    QgsApplication.taskManager().triggerTask(self.valve_thread)
-        elif "Failed" in json_result['status']:
-            # If json_result['status'] is Failed message from database is showed user by get_json->manage_json_exception
-            QgsProject.instance().blockSignals(False)
-            return False
+            json_result = tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
+            if not json_result:
+                QgsProject.instance().blockSignals(False)
+                return False
+
+            if clear_json:
+                _json = {}
+
+            self._reset_my_json(False)
+
+            if "Accepted" in json_result['status']:
+                msg_text = json_result['message']['text']
+                if msg_text is None:
+                    msg_text = 'Feature upserted'
+                msg_level = json_result['message']['level']
+                if msg_level is None:
+                    msg_level = 1
+                tools_qgis.show_message(msg_text, message_level=msg_level, dialog=dialog)
+                self._reload_fields(dialog, json_result, p_widget)
+
+                if thread:
+                    # If param is true show question and create thread
+                    msg = "You closed a valve, this will modify the current mapzones and it may take a little bit of time."
+                    if global_vars.user_level['level'] in ('1', '2'):
+                        msg += " Would you like to continue?"
+                        answer = tools_qt.show_question(msg)
+                    else:
+                        tools_qgis.show_info(msg)
+                        answer = True
+
+                    if answer:
+                        params = {"body": body}
+                        self.valve_thread = GwToggleValveTask("Update mapzones", params)
+                        QgsApplication.taskManager().addTask(self.valve_thread)
+                        QgsApplication.taskManager().triggerTask(self.valve_thread)
+            elif "Failed" in json_result['status']:
+                # If json_result['status'] is Failed message from database is showed user by get_json->manage_json_exception
+                QgsProject.instance().blockSignals(False)
+                return False
 
         # Tab EPA
         if self.my_json_epa != '' and str(self.my_json_epa) != '{}':
