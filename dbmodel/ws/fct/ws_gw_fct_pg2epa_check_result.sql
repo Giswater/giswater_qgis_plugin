@@ -559,7 +559,7 @@ BEGIN
 		) AS feature
 		FROM (SELECT node_id as id, fid, 'ERROR-228: Orphan node' as descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 228
 			UNION
-		      SELECT node_id, fid, 'ERROR-223: Dry node with demand', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 233
+		      SELECT node_id, fid, 'ERROR-233: Dry node with demand', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 233
 		        UNION
 		      SELECT node_id, fid, 'ERROR-411: Mandatory nodarc close to other EPA node (less than 0.02 mts)', the_geom FROM anl_node WHERE cur_user="current_user"() AND fid = 411
 			UNION
