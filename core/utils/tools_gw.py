@@ -1653,9 +1653,9 @@ def add_calendar(dlg, fld, **kwargs):
     widget.setAllowNull(True)
     widget.setCalendarPopup(True)
     widget.setDisplayFormat('dd/MM/yyyy')
-    if field.get('value') not in ('', None, 'null'):
-        date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
-        tools_qt.set_calendar(dialog, widget, date)
+    if fld.get('value') not in ('', None, 'null'):
+        date = QDate.fromString(fld['value'].replace('/', '-'), 'yyyy-MM-dd')
+        tools_qt.set_calendar(dlg, widget, date)
     else:
         widget.clear()
 
@@ -1800,18 +1800,21 @@ def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]):
         real_name = widget.objectName()[5:len(widget.objectName())]
     if 'widgetfunction' in field:
         if field['widgetfunction'].get('functionName') is not None:
-            function_name = f"_{field['widgetfunction']['functionName']}"
+            function_name = field['widgetfunction']['functionName']
             if 'module' in field['widgetfunction']:
                 module = globals()[field['widgetfunction']['module']]
-            exist = tools_os.check_python_function(sys.modules[__name__], function_name)
+            exist = tools_os.check_python_function(module, function_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
                 tools_qgis.show_message(msg, 2)
                 return widget
+            if 'parameters' in field['widgetfunction']:
+                func_params = field['widgetfunction']['parameters']
 
     # noinspection PyUnresolvedReferences
-    kwargs = {"qtable": widget, "func_params": func_params, "complet_result": complet_result, "dialog": dialog}
-    widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
+    if function_name and function_name not in ('', 'None', 'no_function_asociated'):
+        kwargs = {"qtable": widget, "func_params": func_params, "complet_result": complet_result, "dialog": dialog}
+        widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget
 
