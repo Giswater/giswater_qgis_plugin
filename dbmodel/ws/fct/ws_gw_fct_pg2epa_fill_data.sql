@@ -110,8 +110,8 @@ BEGIN
 	FROM inp_valve WHERE temp_node.node_id=inp_valve.node_id;
 
 	-- update addparam for inp_pump
-	UPDATE temp_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',pattern,'", "status":"',status,'", "to_arc":"',to_arc,
-	'", "energyparam":"', energyparam,'", "energyvalue":"',energyvalue,'", "pump_type":"',pump_type,'"}')
+	UPDATE temp_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern_id":"',inp_pump.pattern_id,'", "status":"',status,'", "to_arc":"',to_arc,
+	'", "effic_curve_id":"', effic_curve_id,'", "energy_price":"',energy_price,'", "energy_pattern_id":"',energy_pattern_id,'", "pump_type":"',pump_type,'"}')
 	FROM inp_pump WHERE temp_node.node_id=inp_pump.node_id;
 
 	IF v_forcereservoirsoninlets THEN
@@ -232,8 +232,8 @@ BEGIN
 	FROM inp_valve_importinp v WHERE temp_arc.arc_id=v.arc_id;
 
 	-- update addparam for inp_pump_importinp
-	UPDATE temp_arc SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',pattern,'", "status":"',p.status,'",
-	"energyparam":"', energyparam,'", "energyvalue":"',energyvalue,'", "pump_type":"FLOWPUMP"}')
+	UPDATE temp_arc SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern_id":"',p.pattern_id,'", "status":"',p.status,'",
+	"effic_curve_id":"', effic_curve_id,'", "energy_price":"',energy_price,'", "energy_pattern_id":"',energy_pattern_id,'", "pump_type":"FLOWPUMP"}')
 	FROM inp_pump_importinp p WHERE temp_arc.arc_id=p.arc_id;
 
     RETURN 1;
