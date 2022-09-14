@@ -84,3 +84,16 @@ WHERE formname = 'v_edit_inp_dscenario_virtualvalve' AND columnname ='dscenario_
 
 UPDATE config_form_fields SET widgetcontrols = '{"valueRelation":{"nullValue":true, "layer": "v_edit_inp_pattern", "activated": true, "keyColumn": "pattern_id", "valueColumn": "pattern_id", "filterExpression": null}}' 
 WHERE formname = 'v_edit_inp_dscenario_demand' AND columnname ='pattern_id';
+
+
+INSERT INTO om_typevalue VALUES ('waterbalance_method', 'CPW','CRM PERIOD WINDOW');
+INSERT INTO om_typevalue VALUES ('waterbalance_method', 'DCW','DMA CENTROID WINDOW');
+
+UPDATE config_toolbox SET inputparams = 
+'
+[{"widgetname":"executeGraphDma", "label":"Execute Graph for DMA:", "widgettype":"check","datatype":"boolean","tooltip":"If true, graphaanalytics mapzones will be triggered for DMA and expl selected" , "layoutname":"grl_option_parameters","layoutorder":1,"value":""},
+{"widgetname":"exploitation", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":2, "value":""},
+{"widgetname":"period", "label":"Period:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT id, code as idval FROM ext_cat_period ORDER BY code", "layoutname":"grl_option_parameters","layoutorder":3, "value":""},
+{"widgetname":"method", "label":"Method:","widgettype":"combo","datatype":"text","isMandatory":true,"tooltip":"Water balance method", "dvQueryText":"SELECT id, idval FROM om_typevalue WHERE typevalue = ''waterbalance_method''", "layoutname":"grl_option_parameters","layoutorder":4, "value":""}
+]'
+WHERE id = 3142

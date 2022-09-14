@@ -13,8 +13,7 @@ $BODY$
 /*
 EXAMPLE
 -------
-SELECT SCHEMA_NAME.gw_fct_waterbalance($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, "data":{"parameters":{"executegraphDma":"true", "exploitation":1, "period":"5"}}}$$)::text;
-SELECT SCHEMA_NAME.gw_fct_waterbalance($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, "data":{"parameters":{"executegraphDma":true, "exploitation":2, "period":"5"}}}$$)::text;
+SELECT SCHEMA_NAME.gw_fct_waterbalance($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, "data":{"parameters":{"executegraphDma":"true", "exploitation":1, "period":"5", "method":"CPW"}}}$$)::text;
 
 CHECK
 -----
@@ -44,8 +43,16 @@ v_executegraphdma boolean;
 v_updatemapzone integer;
 v_paramupdate double precision;
 v_data json;
-
 rec_nrw record;
+v_method text;
+v_startdate date;
+v_enddate date;
+v_dma integer;
+v_total_hydro double precision = 0;
+v_total_scada double precision = 0;
+v_centroidday integer;
+v_prevperiod text;
+
 BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
@@ -56,8 +63,8 @@ BEGIN
 	-- getting input data 	
 	v_expl := ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
 	v_period := ((p_data ->>'data')::json->>'parameters')::json->>'period';
-	v_allperiods := (((p_data ->>'data')::json->>'parameters')::json->>'allPeriods')::boolean;
 	v_executegraphdma := ((p_data ->>'data')::json->>'parameters')::json->>'executegraphDma';
+	v_method := ((p_data ->>'data')::json->>'parameters')::json->>'method';
 
 	IF v_executegraphdma THEN
 
@@ -77,44 +84,70 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('WATER BALANCE BY EXPLOITATION AND PERIOD'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
 
-	IF v_allperiods IS TRUE THEN
-		v_querytext ='SELECT DISTINCT id FROM ext_cat_period';
-	ELSE
-		v_querytext ='SELECT DISTINCT id FROM ext_cat_period WHERE id='||quote_literal(v_period)||'';
-	END IF;
 
-	FOR rec IN EXECUTE v_querytext LOOP
-		
-		v_period=rec;
+	-- calculation process
+	INSERT INTO om_waterbalance (expl_id, dma_id, cat_period_id)
+	SELECT v_expl, dma_id, v_period FROM dma WHERE expl_id = v_expl AND dma_id > 0
+	ON CONFLICT (cat_period_id, dma_id) do nothing;
 
-		INSERT INTO om_waterbalance (expl_id, dma_id, cat_period_id)
-		SELECT v_expl, dma_id, v_period FROM dma WHERE expl_id = v_expl AND dma_id > 0
-		ON CONFLICT (cat_period_id, dma_id) do nothing;
+	-- getting dates for period
+	v_startdate = (SELECT start_date FROM ext_cat_period WHERE id = v_period);
+	v_enddate =  (SELECT end_date FROM ext_cat_period WHERE id = v_period);
+
+	IF v_method = 'CPW' THEN -- static period
+
+		UPDATE om_waterbalance SET startdate = v_startdate, enddate = v_enddate WHERE period = v_period;
 
 		UPDATE om_waterbalance n SET total_sys_input =  value FROM (SELECT cat_period_id, dma_id, (sum(coalesce(value,0)*flow_sign))::numeric(12,2) as value 
-						FROM ext_rtc_scada_x_data JOIN om_waterbalance_dma_graph USING (node_id) GROUP BY cat_period_id, dma_id)a
-						WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id;
+			FROM ext_rtc_scada_x_data JOIN om_waterbalance_dma_graph USING (node_id) WHERE value_date > startdate AND value_date < enddate GROUP BY dma_id)a
+			WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id;
 
-		GET DIAGNOSTICS v_count = row_count;
+			GET DIAGNOSTICS v_count = row_count;
 
 		UPDATE om_waterbalance n SET auth_bill_met_hydro = value::numeric(12,2) FROM (SELECT dma_id, cat_period_id, (sum(sum))::numeric(12,2) as value
-							FROM ext_rtc_hydrometer_x_data d
-							JOIN rtc_hydrometer_x_connec USING (hydrometer_id)
-							JOIN connec c USING (connec_id) GROUP BY dma_id, cat_period_id)a
-							WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id;
+			FROM ext_rtc_hydrometer_x_data d
+			JOIN rtc_hydrometer_x_connec USING (hydrometer_id)
+			JOIN connec c USING (connec_id) GROUP BY dma_id, cat_period_id)a
+			WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id;
+		
+	ELSIF  v_method = 'DCW' THEN -- dynamic period acording centroid for dates x vol of dma
 
-		SELECT sum(total_sys_input) as tsi, sum(auth_bill_met_hydro) as bmc,
-			(sum(total_sys_input) - sum(auth_bill_met_hydro))::numeric (12,2) as nrw INTO rec_nrw
-			FROM om_waterbalance WHERE expl_id = v_expl AND cat_period_id  = v_period;
+		FOR v_dma IN SELECT DISTINCT ON (dma_id) dma_id FROM ext_rtc_hydrometer_x_data JOIN rtc_hydrometer_x_connec USING (hydrometer_id) JOIN connec USING (connec_id) where cat_period_id = v_period
+		LOOP
+			v_count = v_count + 1;
+		
+			v_total_hydro = (SELECT sum(sum) FROM ext_rtc_hydrometer_x_data JOIN rtc_hydrometer_x_connec USING (hydrometer_id) JOIN connec USING (connec_id) where cat_period_id = v_period AND dma_id = v_dma);
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Process done succesfully for period: ',v_period));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Number of DMA processed: ', v_count));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Total System Input: ', rec_nrw.tsi::numeric(12,2), ' CMP'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Billed metered consumtion: ', rec_nrw.bmc::numeric(12,2), ' CMP'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Non-revenue water: ', rec_nrw.nrw::numeric(12,2), ' CMP'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
+			v_centroidday = (SELECT (sum*extract(epoch from value_date)/(24*3600))/v_total_hydro FROM ext_rtc_hydrometer_x_data 
+					JOIN rtc_hydrometer_x_connec USING (hydrometer_id) JOIN connec USING (connec_id) where cat_period_id = v_period AND dma_id = v_dma);
 
-	END LOOP;
+			v_prevperiod = (SELECT * FROM ext_cat_period WHERE end_date + interval '5 days' > v_startdate AND start_date <  v_startdate);
+
+			v_startdate = (SELECT enddate FROM om_waterbalance WHERE dma_id = v_dma AND cat_period_id = v_prevperiod);
+			IF v_startdate IS NULL THEN v_startdate = '1970-01-01'::date; END IF;
+			
+			v_enddate = (to_timestamp(v_centroidday*3600*24))::date;
+
+			v_total_scada = (SELECT (sum(coalesce(value,0)*flow_sign))::numeric(12,2)
+					FROM ext_rtc_scada_x_data JOIN om_waterbalance_dma_graph USING (node_id) WHERE dma_id = v_dma AND value_date > v_startdate AND value_date =< v_enddate);
+
+			UPDATE om_waterbalance SET total_sys_input = v_total_scada, auth_bill_met_hydro = v_total_hydro, startdate = v_startdate, enddate = v_enddate WHERE period = v_period AND dma_id = v_dma;
+
+		END LOOP;
+		
+	END IF;
+
+	-- get log data
+	SELECT sum(total_sys_input) as tsi, sum(auth_bill_met_hydro) as bmc, (sum(total_sys_input) - sum(auth_bill_met_hydro))::numeric (12,2) as nrw INTO rec_nrw
+	FROM om_waterbalance WHERE expl_id = v_expl AND cat_period_id  = v_period;
+
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Process done succesfully for period: ',v_period));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Number of DMA processed: ', v_count));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Total System Input: ', rec_nrw.tsi::numeric(12,2), ' CMP'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Billed metered consumtion: ', rec_nrw.bmc::numeric(12,2), ' CMP'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Non-revenue water: ', rec_nrw.nrw::numeric(12,2), ' CMP'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
+
 
 	IF v_executegraphdma THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));

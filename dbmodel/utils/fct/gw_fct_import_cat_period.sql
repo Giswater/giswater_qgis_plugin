@@ -4,18 +4,18 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE:3166
+--FUNCTION CODE:3170
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_scada_x_data(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_cat_period(p_data json)
 RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_import_scada_x_data($${
+SELECT SCHEMA_NAME.gw_fct_import_cat_period($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{}}$$)
 
---fid:469
+--fid:471
 
 */
 
@@ -23,12 +23,12 @@ SELECT SCHEMA_NAME.gw_fct_import_scada_x_data($${
 DECLARE
 
 v_addfields record;
-v_result_id text= 'import ext_rtc_scada_x_data';
+v_result_id text= 'import cat period values';
 v_result json;
 v_result_info json;
 v_project_type text;
 v_version text;
-v_fid integer = 469;
+v_fid integer = 471;
 i integer = 0;
 
 BEGIN
@@ -41,20 +41,20 @@ BEGIN
    
 	-- manage log (fid: v_fid)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('IMPORT SCADA X DATA FILE'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('------------------------------'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('IMPORT CAT-PERIOD VALUES'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('-------------------------------'));
    
  	-- starting process
 	FOR v_addfields IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = v_fid
 	LOOP
 		i = i+1;
-		INSERT INTO ext_rtc_scada_x_data (node_id, value_date, value, value_type, value_status, data_type) VALUES
-		(v_addfields.csv1, v_addfields.csv2::date, v_addfields.csv3::float, v_addfields.csv4::integer, v_addfields.csv5::integer, v_addfields.csv6);			
+		INSERT INTO ext_cat_period (id, start_date, end_date, period_seconds, code) VALUES
+		(v_addfields.csv1, v_addfields.csv2::date, v_addfields.csv3::date, v_addfields.csv4::integer, v_addfields.csv5);			
 	END LOOP;
 
 	-- manage log (fid: v_fid)
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Reading values from temp_csv table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Inserting values on ext_rtc_scada_x_data table -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Inserting values on ext_cat_period table -> Done'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Deleting values from temp_csv -> Done'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Process finished with ',i, ' rows inserted.'));
 
