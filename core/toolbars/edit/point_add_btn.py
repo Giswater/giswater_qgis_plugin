@@ -44,7 +44,7 @@ class GwPointAddButton(GwAction):
     def clicked_event(self):
 
         if self.menu.property('last_selection') is not None:
-            self.info_feature.add_feature(self.menu.property('last_selection'))
+            self.info_feature.add_feature(self.menu.property('last_selection'), action=self)
 
 
     # region private functions
@@ -79,7 +79,7 @@ class GwPointAddButton(GwAction):
                     except Exception:
                         pass
                     self.menu.addAction(obj_action)
-                    obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))
+                    obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat, self))
                     obj_action.triggered.connect(partial(self._save_last_selection, self.menu, feature_cat))
 
             self.menu.addSeparator()
@@ -95,7 +95,7 @@ class GwPointAddButton(GwAction):
                         except Exception:
                             pass
                         self.menu.addAction(obj_action)
-                        obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))
+                        obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat, self))
                         obj_action.triggered.connect(partial(self._save_last_selection, self.menu, feature_cat))
                 self.menu.addSeparator()
                 if features_cat is not None:
@@ -110,7 +110,7 @@ class GwPointAddButton(GwAction):
                             except Exception:
                                 pass
                             self.menu.addAction(obj_action)
-                            obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))
+                            obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat, self))
                             obj_action.triggered.connect(partial(self._save_last_selection, self.menu, feature_cat))
                     self.menu.addSeparator()
 
