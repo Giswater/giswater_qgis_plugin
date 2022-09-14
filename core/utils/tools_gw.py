@@ -1225,9 +1225,9 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
             if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                 widget = QLineEdit()
                 if 'isMandatory' in field:
-                    widget.setProperty('is_mandatory', field['isMandatory'])
+                    widget.setProperty('ismandatory', field['isMandatory'])
                 else:
-                    widget.setProperty('is_mandatory', True)
+                    widget.setProperty('ismandatory', True)
                 if 'value' in field:
                     widget.setText(field['value'])
                     widget.setProperty('value', field['value'])
