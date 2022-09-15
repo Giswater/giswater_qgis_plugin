@@ -49,3 +49,12 @@ WHERE formname = 'v_edit_inp_dscenario_storage' AND columnname ='dscenario_id';
 
 UPDATE config_form_fields SET widgetcontrols = '{"valueRelation":{"nullValue":false, "layer": "v_edit_cat_dscenario", "activated": true, "keyColumn": "dscenario_id", "valueColumn": "name", "filterExpression": null}}' 
 WHERE formname = 'v_edit_inp_dscenario_treatment' AND columnname ='dscenario_id';
+
+--2022/09/15
+UPDATE sys_table
+SET context='{"level_1":"EPA","level_2":"CATALOGS"}', orderby=13
+WHERE id='inp_transects_value';
+
+UPDATE sys_table
+SET context='{"level_1":"EPA","level_2":"CATALOGS"}', orderby=12, alias='Transects catalog'
+WHERE id='inp_transects';
