@@ -65,7 +65,7 @@ BEGIN
 	-- getting input data 	
 	v_expl := ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
 	v_period := ((p_data ->>'data')::json->>'parameters')::json->>'period';
-	v_executegraphdma := ((p_data ->>'data')::json->>'parameters')::json->>'executegraphDma';
+	v_executegraphdma := ((p_data ->>'data')::json->>'parameters')::json->>'executeGraphDma';
 	v_method := ((p_data ->>'data')::json->>'parameters')::json->>'method';
 
 	IF v_executegraphdma THEN
@@ -73,10 +73,10 @@ BEGIN
 		v_updatemapzone = (SELECT (value::json->>'DMA')::json->>'updateMapZone' FROM config_param_system WHERE parameter  = 'utils_graphanalytics_vdefault');
 		v_paramupdate = (SELECT (value::json->>'DMA')::json->>'geomParamUpdate' FROM config_param_system WHERE parameter  = 'utils_graphanalytics_vdefault');
 			
-		v_data =  concat ('{"data":{"parameters":{"graphClass":"DMA", "exploitation": [',v_expl,'], "updateFeature":"TRUE", "updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate,'}}}');
+		v_data =  concat ('{"data":{"parameters":{"graphClass":"DMA", "exploitation": [',v_expl,'], 
+		"commitChanges":"TRUE", "updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate,'}}}');
 		
 		PERFORM gw_fct_graphanalytics_mapzones(v_data);
-		
 	END IF;
 
 	-- Reset values
@@ -85,7 +85,6 @@ BEGIN
 	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('WATER BALANCE BY EXPLOITATION AND PERIOD'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
-
 
 	-- calculation process
 	INSERT INTO om_waterbalance (expl_id, dma_id, cat_period_id)
@@ -102,7 +101,8 @@ BEGIN
 
 		UPDATE om_waterbalance n SET total_sys_input =  value FROM (
 		SELECT p.id, dma_id, (sum(coalesce(value,0)*flow_sign))::numeric(12,2) as value 
-		FROM ext_cat_period p, ext_rtc_scada_x_data JOIN om_waterbalance_dma_graph  USING (node_id) WHERE value_date > start_date AND value_date < end_date GROUP BY p.id, dma_id
+		FROM ext_cat_period p, ext_rtc_scada_x_data JOIN om_waterbalance_dma_graph  USING (node_id)
+		 WHERE value_date > start_date AND value_date < end_date GROUP BY p.id, dma_id
 		)a
 		WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.id;
 
@@ -113,7 +113,7 @@ BEGIN
 			JOIN rtc_hydrometer_x_connec USING (hydrometer_id)
 			JOIN connec c USING (connec_id) GROUP BY dma_id, cat_period_id)a
 			WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id;
-		
+
 	ELSIF  v_method = 'DCW' THEN -- dynamic period acording centroid for dates x vol of dma
 
 		FOR v_dma IN SELECT DISTINCT dma_id FROM ext_rtc_hydrometer_x_data JOIN rtc_hydrometer_x_connec USING (hydrometer_id) JOIN connec USING (connec_id) where cat_period_id = v_period AND expl_id = v_expl

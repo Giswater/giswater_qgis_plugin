@@ -98,7 +98,7 @@ UPDATE config_toolbox SET inputparams =
 ]'
 WHERE id = 3142;
 
-UPDATE SCHEMA_NAME.config_report SET alias = 'Losses & NRW by Exploitation, Dma & Period' , 
+UPDATE config_report SET alias = 'Losses & NRW by Exploitation, Dma & Period' , 
 query_text = 'SELECT w.exploitation as "Exploitation", w.dma as "Dma", period as "Period", n.total::numeric(12,2) as "Total input",
 auth_bill as "Auth. Bill", auth_unbill as "Auth. Unbill", auth as "Authorized", 
 loss_app as "Losses App", loss_real as "Losses Real",loss as "Losses", 
@@ -117,7 +117,7 @@ filterparam = '[{"columnname":"Exploitation", "label":"Exploitation:", "widgetty
 WHERE id =  105;
 
 
-UPDATE SCHEMA_NAME.config_report SET alias = 'Losses & NRW by Dma',
+UPDATE config_report SET alias = 'Losses & NRW by Dma',
 query_text = 'SELECT n.exploitation as "Exploitation", n.dma as "Dma", 
 (sum(n.total))::numeric(12,2) as "Total input", sum(rw) as "Revenue", sum(nrw) as "Non Revenue", 
 (case when sum(n.total) > 0 THEN (sum(rw)/sum(n.total))::numeric(12,2) else 0.00 end) as "Revenue Efficiency",
@@ -136,7 +136,7 @@ vdefault = '{"orderBy":"1", "orderType":"DESC", "groupBy":"n.exploitation, n.dma
 WHERE id =  104;
 
 
-UPDATE SCHEMA_NAME.config_report SET alias = 'Losses & NRW by Exploitation',
+UPDATE config_report SET alias = 'Losses & NRW by Exploitation',
 query_text = 'SELECT n.exploitation as "Exploitation",
 (sum(n.total))::numeric(12,2) as "Total input", sum(rw) as "Revenue", sum(nrw) as "Non Revenue", (sum(rw)/sum(n.total))::numeric(12,2) as "Revenue Efficiency",
 sum(auth) as "Authorized", sum(loss) as "Losses", (sum(auth)/sum(n.total))::numeric(12,2) as "Losses Efficiency" 
@@ -150,3 +150,7 @@ filterparam = '[
 "dvquerytext":"Select end_date::date as id, end_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date","isNullValue":"true", "filterSign":"<=", "showOnTableModel":{"status":true, "position":3}}]',
 vdefault = '{"orderBy":"1", "orderType":"DESC", "groupBy":"n.exploitation"}'
 WHERE id =  103;
+
+DELETE FROM config_report WHERE id IN (102,106);
+
+UPDATE config_report set id = 102 WHERE id = 105;
