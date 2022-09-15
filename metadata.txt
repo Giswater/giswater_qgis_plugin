@@ -8,7 +8,7 @@ version=3.5.028
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Adrian Valenciano, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Elies Bertran, Abel García Juanes, Xavier Torret
 
 Changelog=Version 3.5.028
-    - Highlight connecs that will be disconnected on feature end process
+    - Highlight connecs/gullys that will be disconnected on feature end process
     - Improve performance for inserting features in large tables
     - Improve dscenario filter
     - Bug fix: insert document from another dialog (info/visit)

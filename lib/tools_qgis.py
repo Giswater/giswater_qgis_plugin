@@ -979,9 +979,9 @@ def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, inde
     """ Based on the received index and field_id, the id of the received field_id is searched within the table
      and is painted in red on the canvas """
 
-    rubber_band.reset()
     layer = get_layer_by_tablename(layer_name)
     if not layer:
+        rubber_band.reset()
         return
 
     row = index.row()
@@ -992,6 +992,7 @@ def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, inde
     feature = tools_qt.get_feature_by_id(layer, _id, field_id)
     try:
         geometry = feature.geometry()
+        rubber_band.reset()
         rubber_band.setToGeometry(geometry, None)
         rubber_band.setColor(QColor(255, 0, 0, 100))
         rubber_band.setWidth(width)

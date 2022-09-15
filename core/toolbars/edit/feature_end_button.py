@@ -287,6 +287,10 @@ class GwFeatureEndButton(GwAction):
             self.tbl_arc_x_relations.clicked.connect(
                 partial(tools_qgis.hilight_feature_by_id, self.tbl_arc_x_relations, 'v_edit_connec', 'connec_id',
                         self.rubber_band, 10, table_field='feature_id'))
+            if str(self.project_type) == 'ud':
+                self.tbl_arc_x_relations.clicked.connect(
+                    partial(tools_qgis.hilight_feature_by_id, self.tbl_arc_x_relations, 'v_edit_gully', 'gully_id',
+                            self.rubber_band, 10, table_field='feature_id'))
 
             tools_gw.open_dialog(self.dlg_work, dlg_name='feature_end_connec')
 
