@@ -895,6 +895,7 @@ WHERE connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user 
 
 CREATE OR REPLACE VIEW ve_epa_junction AS 
 SELECT inp_junction.*,
+result_id,
 max_demand, 
 min_demand, 
 max_head, 
@@ -908,6 +909,7 @@ LEFT JOIN v_rpt_node USING (node_id);
 
 CREATE OR REPLACE VIEW ve_epa_tank AS 
 SELECT inp_tank.*, 
+result_id,
 max_demand, 
 min_demand, 
 max_head, 
@@ -921,6 +923,7 @@ LEFT JOIN v_rpt_node USING (node_id);
 
 CREATE OR REPLACE VIEW ve_epa_reservoir AS 
 SELECT inp_reservoir.*, 
+result_id,
 max_demand, 
 min_demand, 
 max_head, 
@@ -934,6 +937,7 @@ LEFT JOIN v_rpt_node USING (node_id);
 
 CREATE OR REPLACE VIEW ve_epa_inlet AS 
 SELECT inp_inlet.*, 
+result_id,
 max_demand, 
 min_demand, 
 max_head, 
@@ -947,6 +951,7 @@ LEFT JOIN v_rpt_node USING (node_id);
 
 CREATE OR REPLACE VIEW ve_epa_pipe AS 
 SELECT inp_pipe.*, 
+result_id,
 max_flow, 
 min_flow, 
 max_vel, 
@@ -965,6 +970,7 @@ LEFT JOIN v_rpt_arc USING (arc_id);
 CREATE OR REPLACE VIEW ve_epa_pump AS 
 SELECT inp_pump.*, 
 concat(node_id,'_n2a') as nodarc_id,
+result_id,
 max_flow, 
 min_flow, 
 max_vel, 
@@ -983,6 +989,7 @@ LEFT JOIN v_rpt_arc ON concat(node_id,'_n2a') = arc_id;
 CREATE OR REPLACE VIEW ve_epa_valve AS 
 SELECT inp_valve.*, 
 concat(node_id,'_n2a') as nodarc_id,
+result_id,
 max_flow, 
 min_flow, 
 max_vel, 
@@ -1001,6 +1008,7 @@ LEFT JOIN v_rpt_arc ON concat(node_id,'_n2a') = arc_id;
 CREATE OR REPLACE VIEW ve_epa_shortpipe AS 
 SELECT inp_shortpipe.*, 
 concat(node_id,'_n2a') as nodarc_id,
+result_id,
 max_flow, 
 min_flow, 
 max_vel, 
@@ -1018,6 +1026,7 @@ LEFT JOIN v_rpt_arc ON concat(node_id,'_n2a') = arc_id;
 
 CREATE OR REPLACE VIEW ve_epa_virtualvalve AS 
 SELECT inp_virtualvalve.*, 
+result_id,
 max_flow, 
 min_flow, 
 max_vel, 
@@ -1036,6 +1045,7 @@ LEFT JOIN v_rpt_arc USING (arc_id);
 CREATE OR REPLACE VIEW ve_epa_pump_additional AS
 SELECT inp_pump_additional.*, 
 concat(node_id,'_n2a') as nodarc_id,
+result_id,
 max_flow, 
 min_flow, 
 max_vel, 
@@ -1053,6 +1063,7 @@ LEFT JOIN v_rpt_arc ON concat(node_id,'_n2a',order_id) = arc_id;
 
 CREATE OR REPLACE VIEW ve_epa_connec AS
 SELECT inp_connec.*, 
+result_id,
 max_demand, 
 min_demand, 
 max_head, 
