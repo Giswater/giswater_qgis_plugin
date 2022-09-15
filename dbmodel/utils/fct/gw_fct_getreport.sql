@@ -40,6 +40,8 @@ v_filtername text;
 v_filtervalue text;
 v_filtersign text;
 v_querytext text;
+v_showontablemodel text;
+v_default text;
 
 v_version text;
 v_error_context text;
@@ -73,19 +75,19 @@ BEGIN
 				EXECUTE 'SELECT json_agg(t.idval) FROM ('||json_extract_path_text(v_filterparam,'dvquerytext')||') t'
 				INTO v_comboidval;
 
-				v_filterdvquery=(v_filterparam::jsonb || json_build_object('comboIds', v_comboid, 'comboNames', v_comboidval, 'widgetname',json_extract_path_text(v_filterparam,'columnname') )::jsonb);
+				v_filterdvquery=(v_filterparam::jsonb || json_build_object('comboIds', v_comboid, 'comboNames', v_comboidval, 
+				'filterSign', json_extract_path_text(v_filterparam,'filterSign'), 
+				'showOnTableModel', json_extract_path_text(v_filterparam,'showOnTableModel'),
+				'widgetName',json_extract_path_text(v_filterparam,'columnname') )::jsonb);
 
 				v_filterlist = array_append(v_filterlist,v_filterdvquery);
-		
 			i=i+1;
 		END LOOP;
 	END IF;
 
 	--list data
 	--execute query 
-	SELECT CASE WHEN vdefault IS NOT NULL THEN concat(query_text, ' ORDER BY ',json_extract_path_text(vdefault,'orderBy'),' ',json_extract_path_text(vdefault,'orderType')) 
-	ELSE  query_text END AS query INTO v_querytext FROM config_report WHERE id = v_list_id;
-
+	SELECT query_text INTO v_querytext FROM config_report WHERE id = v_list_id;
 
 	IF v_filterinput IS NOT NULL THEN
 
@@ -105,7 +107,9 @@ BEGIN
 				v_querytext = concat('SELECT * FROM (',v_querytext,') a WHERE ',v_filtername, v_filtersign, quote_literal(v_filtervalue));
 			END IF;
 		END LOOP;
+		
 	ELSIF (SELECT filterparam FROM config_report WHERE id = v_list_id) IS NOT NULL THEN
+	
 		-- Look for default values in each widget
 		FOR i IN 0..(SELECT jsonb_array_length(filterparam::jsonb)-1 FROM config_report WHERE id = v_list_id) LOOP
 
@@ -113,17 +117,32 @@ BEGIN
 
 			v_filtername = concat('"',json_extract_path_text(v_filterparam::json,'columnname'),'"');
 			v_filtersign = json_extract_path_text(v_filterparam::json,'filterSign');
+			
 			SELECT COALESCE(json_extract_path_text(v_filterparam::json,'filterDefault'), '') INTO v_filterdefault;
-
+			
 			IF v_filtername != '""' AND v_filterdefault != '' THEN
 				v_querytext = concat('SELECT * FROM (',v_querytext,') a WHERE ',v_filtername, v_filtersign, quote_literal(v_filterdefault));
 			END IF;
-
 			i=i+1;
 		END LOOP;
 	END IF;
+
+	-- group by
+	v_default = (SELECT vdefault->>'groupBy' FROM config_report WHERE id = v_list_id);
+	IF v_default IS NOT NULL THEN
+		v_querytext = concat (v_querytext ,' GROUP BY ', v_default);
+	END IF;
+
+	-- order by
+	v_default = (SELECT vdefault->>'orderBy' FROM config_report WHERE id = v_list_id);
+	IF v_default IS NOT NULL THEN
+		v_querytext = concat (v_querytext ,' ORDER BY ', v_default);
+		v_default = (SELECT vdefault->>'orderType' FROM config_report WHERE id = v_list_id);
+		v_querytext = concat (v_querytext ,' ', v_default);
+	END IF;
 	
 	raise notice 'v_querytext,%',v_querytext;
+	
 	EXECUTE 'SELECT json_agg(t) FROM ('||v_querytext||') t'
 	INTO v_fields ;
 
