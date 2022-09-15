@@ -209,9 +209,21 @@ class GwWorkspaceManagerButton(GwAction):
         result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
 
         if result and result['status'] == "Accepted":
+            # Set labels
             self._set_labels_current_workspace(value, result=result)
-            tools_qgis.refresh_map_canvas()  # First refresh all the layers
-            global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
+
+            # Refresh all the layers
+            tools_qgis.refresh_map_canvas()
+            # Refresh the map view itself
+            global_vars.iface.mapCanvas().refresh()
+
+            # Zoom to layer
+            layer = tools_qgis.get_layer_by_tablename('v_edit_inp_junction')
+            if not layer:
+                layer = tools_qgis.get_layer_by_tablename('v_edit_node')
+            tools_qgis.zoom_to_layer(layer)
+
+            # Refresh selector docker if open
             tools_gw.refresh_selectors()
 
 
