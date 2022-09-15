@@ -7,7 +7,11 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
 --2022/09/14
+
+ALTER TABLE _ext_rtc_scada_x_data_ DROP CONSTRAINT ext_rtc_scada_x_data_pkey;
+
 CREATE TABLE ext_rtc_scada_x_data(
   node_id character varying(16) NOT NULL,
   value_date timestamp without time zone,
