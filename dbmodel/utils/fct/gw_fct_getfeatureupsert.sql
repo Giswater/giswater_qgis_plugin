@@ -790,6 +790,8 @@ BEGIN
 					END IF;
 				END IF;
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'selectedId', COALESCE(field_value, ''));
+			ELSIF (aux_json->>'widgettype')='button' and json_extract_path_text(aux_json,'widgetcontrols','text') IS NOT NULL THEN
+				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'value', json_extract_path_text(aux_json,'widgetcontrols','text'));
 			ELSE 
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'value', COALESCE(field_value, ''));
 			END IF;		

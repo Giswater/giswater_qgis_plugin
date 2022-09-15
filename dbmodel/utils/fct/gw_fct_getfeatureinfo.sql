@@ -123,6 +123,8 @@ BEGIN
 			-- Update array
 			IF (aux_json->>'widgettype')='combo' THEN
 				fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'selectedId', field_value);
+			ELSIF (aux_json->>'widgettype')='button' and json_extract_path_text(aux_json,'widgetcontrols','text') IS NOT NULL THEN
+				fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'value', json_extract_path_text(aux_json,'widgetcontrols','text'));
 			ELSE
 				fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'value', field_value);
 			END IF;   
