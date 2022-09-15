@@ -1001,6 +1001,24 @@ def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, inde
         pass
 
 
+def zoom_to_layer(layer):
+    """
+    Zooms to a given layer
+        :param layer:
+        :return:
+    """
+
+    if not layer:
+        msg = "Couldn't find layer to zoom to"
+        show_warning(msg)
+        return
+
+    # Set canvas extent
+    iface.mapCanvas().setExtent(layer.extent())
+    # Refresh canvas
+    iface.mapCanvas().refresh()
+
+
 def check_query_layer(layer):
     """
     Check for query layer and/or bad layer, if layer is a simple table, or an added layer from query, return False
