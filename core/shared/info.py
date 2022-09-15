@@ -250,7 +250,7 @@ class GwInfo(QObject):
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
 
 
-    def add_feature(self, feature_cat):
+    def add_feature(self, feature_cat, action=None):
         """ Button 01, 02: Add 'node' or 'arc' """
 
         global is_inserting
@@ -259,6 +259,11 @@ class GwInfo(QObject):
             tools_qgis.show_message(msg)
             return
 
+        self.prev_action = action
+        keep_active = tools_gw.get_config_parser('user_edit_tricks', 'keep_maptool_active', "user", "init")
+        keep_active = tools_os.set_boolean(keep_active, False)
+        if not keep_active:
+            self.prev_action = None
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
 
@@ -1968,6 +1973,8 @@ class GwInfo(QObject):
                     msg_level = 1
                 tools_qgis.show_message(msg_text, message_level=msg_level, dialog=dialog)
                 self._reload_fields(dialog, json_result, p_widget)
+                if epa_type_changed:
+                    self._reload_epa_tab(dialog)
 
                 if thread:
                     # If param is true show question and create thread
