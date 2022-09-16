@@ -21,7 +21,7 @@ class GwReportTask(GwTask):
     fake_progress = pyqtSignal()
     finished_execute = pyqtSignal(bool, dict)
 
-    def __init__(self, description, dialog, function_selected, timer=None):
+    def __init__(self, description, dialog, function_selected, queryAdd, timer=None):
 
         super().__init__(description)
         self.function_selected = function_selected
@@ -30,6 +30,7 @@ class GwReportTask(GwTask):
         self.json_result = None
         self.exception = None
         self.function_name = 'gw_fct_getreport'
+        self.queryAdd = queryAdd
         self.timer = timer
 
 
@@ -38,6 +39,8 @@ class GwReportTask(GwTask):
         super().run()
 
         extras = f'"filterText":null, "listId":"{self.function_selected}"'
+        if self.queryAdd:
+            extras += f', "queryAdd": "{self.queryAdd}"'
         self.body = tools_gw.create_body(extras=extras)
         self.json_result = tools_gw.execute_procedure('gw_fct_getreport', self.body, is_thread=True, aux_conn=self.aux_conn)
         if not self.json_result or self.json_result['status'] == 'Failed':

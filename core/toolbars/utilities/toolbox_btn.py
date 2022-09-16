@@ -219,6 +219,11 @@ class GwToolBoxButton(GwAction):
             # this '1' refers to the index of the item in the selected row
             function_name = index.sibling(index.row(), 0).data()
             self.function_selected = index.sibling(index.row(), 1).data()
+            queryAdd = None
+            vdefault = index.sibling(index.row(), 2).data()
+            if vdefault:
+                vdefault = json.loads(vdefault.replace("'", '"'))
+                queryAdd = vdefault.get('queryAdd')
 
             self.dlg_reports = GwToolboxReportsUi()
             tools_gw.load_settings(self.dlg_reports)
@@ -250,7 +255,7 @@ class GwToolBoxButton(GwAction):
             self.timer.start(1000)
 
             # Create thread
-            self.report_thread = GwReportTask(function_name, self.dlg_reports, self.function_selected, timer=self.timer)
+            self.report_thread = GwReportTask(function_name, self.dlg_reports, self.function_selected, queryAdd, timer=self.timer)
             self.report_thread.finished_execute.connect(self._report_finished)
             QgsApplication.taskManager().addTask(self.report_thread)
             QgsApplication.taskManager().triggerTask(self.report_thread)
@@ -716,10 +721,11 @@ class GwToolBoxButton(GwAction):
             for function in functions:
                 func_name = QStandardItem(str(function['listname']))
                 label = QStandardItem(str(function['alias']))
+                vdefault = QStandardItem(str(function['vdefault']))
                 font = label.font()
                 font.setPointSize(8)
                 label.setFont(font)
-                parent1.appendRow([label, func_name])
+                parent1.appendRow([label, func_name, vdefault])
                 if os.path.exists(path_icon_blue):
                     icon = QIcon(path_icon_blue)
                     label.setIcon(icon)
