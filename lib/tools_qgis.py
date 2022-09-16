@@ -489,7 +489,7 @@ def disconnect_snapping(action_pan=True, emit_point=None, vertex_marker=None):
     """ Select 'Pan' as current map tool and disconnect snapping """
 
     try:
-        global_vars.canvas.xyCoordinates.disconnect()
+        iface.mapCanvas().xyCoordinates.disconnect()
     except TypeError as e:
         tools_log.log_info(f"{type(e).__name__} --> {e}")
 
@@ -512,8 +512,8 @@ def disconnect_snapping(action_pan=True, emit_point=None, vertex_marker=None):
 def refresh_map_canvas(_restore_cursor=False):
     """ Refresh all layers present in map canvas """
 
-    global_vars.canvas.refreshAllLayers()
-    for layer_refresh in global_vars.canvas.layers():
+    iface.mapCanvas().refreshAllLayers()
+    for layer_refresh in iface.mapCanvas().layers():
         layer_refresh.triggerRepaint()
 
     if _restore_cursor:
@@ -541,7 +541,7 @@ def disconnect_signal_selection_changed():
     """ Disconnect signal selectionChanged """
 
     try:
-        global_vars.canvas.selectionChanged.disconnect()
+        iface.mapCanvas().selectionChanged.disconnect()
     except Exception:
         pass
     finally:
@@ -611,8 +611,8 @@ def zoom_to_rectangle(x1, y1, x2, y2, margin=5, change_crs=True):
 
         rect = tform.transform(rect)
 
-    global_vars.canvas.setExtent(rect)
-    global_vars.canvas.refresh()
+    iface.mapCanvas().setExtent(rect)
+    iface.mapCanvas().refresh()
 
 
 def get_composers_list():
@@ -750,7 +750,8 @@ def remove_layer_from_toc(layer_name, group_name, sub_group=None):
 
     # Force a map refresh
     refresh_map_canvas()  # First refresh all the layers
-    global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
+    iface.mapCanvas().refresh()  # Then refresh the map view itself
+
 
 def clean_layer_group_from_toc(group_name):
     """
