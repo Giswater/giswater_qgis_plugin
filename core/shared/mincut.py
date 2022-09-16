@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from functools import partial
 
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime, QDateTime, QTimer
-from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit, QLabel
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QGridLayout, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit, QLabel, QCheckBox
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsApplication, QgsFeatureRequest, QgsPrintLayout, QgsProject, QgsReadWriteContext, \
     QgsVectorLayer
@@ -55,8 +55,8 @@ class GwMincut:
         self.excluded_layers = []
 
         # Serialize data of mincut states
-        self.states = {}
-        self._set_states()
+        # self.states = {}
+        # self._set_states()
         self.current_state = None
         self.is_new = True
         self.previous_snapping = None
@@ -332,48 +332,81 @@ class GwMincut:
         # Disable tab log
         tools_gw.disable_tab_log(self.dlg_mincut)
 
-        self.search = GwSearch()
-        self.search.open_search(None, self.dlg_mincut)
+        body = tools_gw.create_body()
+        json_result = tools_gw.execute_procedure("gw_fct_getmincut_ff", body)
+        fields = json_result['body']['data']['fields']
+
+        layouts = {}
+        for field in fields:
+            lyt = field['layoutname']
+            if lyt not in layouts:
+                layouts[lyt] = [field]
+            else:
+                layouts[lyt].append(field)
+
+        for l in layouts.keys():
+            layout = self.dlg_mincut.findChild(QGridLayout, l)
+
+            fields = layouts[l]
+            fields.sort(key=lambda x: x['layoutorder'])
+            cur_position = 0
+            for field in fields:
+                if 'label' in field and field['label']:
+                    label = QLabel()
+                    label.setObjectName('lbl_' + field['columnname'])
+                    label.setText(field['label'])
+                    layout.addWidget(label, 0, cur_position)
+                    cur_position += 1
+                if 'value' not in field:
+                    value = tools_gw.get_config_parser('dlg_mincut', field['columnname'], 'user', 'session')
+                    field['value'] = value if value is not None else False
+                widget = self._create_widget(field)
+                layout.addWidget(widget, 0, cur_position)
+                cur_position += 1
+
+
+        # self.search = GwSearch()
+        # self.search.open_search(None, self.dlg_mincut)
 
         # These widgets are put from the database, mysteriously if we do something like:
         # self.dlg_mincut.address_add_muni.text() or self.dlg_mincut.address_add_muni.setDiabled(True) etc...
         # it doesn't count them, and that's why we have to force them
-        self.dlg_mincut.address_add_muni = tools_qt.get_widget(self.dlg_mincut, 'address_add_muni')
-        self.dlg_mincut.address_add_street = tools_qt.get_widget(self.dlg_mincut, 'address_add_street')
-        self.dlg_mincut.address_add_postnumber = tools_qt.get_widget(self.dlg_mincut, 'address_add_postnumber')
+        # self.dlg_mincut.address_add_muni = tools_qt.get_widget(self.dlg_mincut, 'address_add_muni')
+        # self.dlg_mincut.address_add_street = tools_qt.get_widget(self.dlg_mincut, 'address_add_street')
+        # self.dlg_mincut.address_add_postnumber = tools_qt.get_widget(self.dlg_mincut, 'address_add_postnumber')
 
-        self.result_mincut_id = self.dlg_mincut.findChild(QLineEdit, "result_mincut_id")
-        self.customer_state = self.dlg_mincut.findChild(QLineEdit, "customer_state")
-        self.work_order = self.dlg_mincut.findChild(QLineEdit, "work_order")
-        self.pred_description = self.dlg_mincut.findChild(QTextEdit, "pred_description")
-        self.real_description = self.dlg_mincut.findChild(QTextEdit, "real_description")
-        self.distance = self.dlg_mincut.findChild(QLineEdit, "distance")
-        self.depth = self.dlg_mincut.findChild(QLineEdit, "depth")
+        # self.result_mincut_id = self.dlg_mincut.findChild(QLineEdit, "result_mincut_id")
+        # self.customer_state = self.dlg_mincut.findChild(QLineEdit, "customer_state")
+        # self.work_order = self.dlg_mincut.findChild(QLineEdit, "work_order")
+        # self.pred_description = self.dlg_mincut.findChild(QTextEdit, "pred_description")
+        # self.real_description = self.dlg_mincut.findChild(QTextEdit, "real_description")
+        # self.distance = self.dlg_mincut.findChild(QLineEdit, "distance")
+        # self.depth = self.dlg_mincut.findChild(QLineEdit, "depth")
 
         # tools_qt.double_validator(self.distance, 0, 9999999, 3)
         # tools_qt.double_validator(self.depth, 0, 9999999, 3)
         # tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.txt_exec_user, global_vars.current_user)
 
-        # Fill ComboBox type
-        sql = ("SELECT id, descript "
-               "FROM om_mincut_cat_type "
-               "ORDER BY id")
-        rows = tools_db.get_rows(sql)
-        # tools_qt.fill_combo_values(self.dlg_mincut.type, rows, 1)
+        # # Fill ComboBox type
+        # sql = ("SELECT id, descript "
+        #        "FROM om_mincut_cat_type "
+        #        "ORDER BY id")
+        # rows = tools_db.get_rows(sql)
+        # # tools_qt.fill_combo_values(self.dlg_mincut.type, rows, 1)
 
-        # Fill ComboBox cause
-        sql = ("SELECT id, idval "
-               "FROM om_typevalue WHERE typevalue = 'mincut_cause' "
-               "ORDER BY id")
-        rows = tools_db.get_rows(sql)
-        # tools_qt.fill_combo_values(self.dlg_mincut.cause, rows, 1)
+        # # Fill ComboBox cause
+        # sql = ("SELECT id, idval "
+        #        "FROM om_typevalue WHERE typevalue = 'mincut_cause' "
+        #        "ORDER BY id")
+        # rows = tools_db.get_rows(sql)
+        # # tools_qt.fill_combo_values(self.dlg_mincut.cause, rows, 1)
 
-        # Fill ComboBox assigned_to
-        sql = ("SELECT id, name "
-               "FROM cat_users WHERE active is not False "
-               "ORDER BY name")
-        rows = tools_db.get_rows(sql)
-        # tools_qt.fill_combo_values(self.dlg_mincut.assigned_to, rows, 1)
+        # # Fill ComboBox assigned_to
+        # sql = ("SELECT id, name "
+        #        "FROM cat_users WHERE active is not False "
+        #        "ORDER BY name")
+        # rows = tools_db.get_rows(sql)
+        # # tools_qt.fill_combo_values(self.dlg_mincut.assigned_to, rows, 1)
 
         # Toolbar actions
         action = self.dlg_mincut.findChild(QAction, "actionMincut")
@@ -429,6 +462,22 @@ class GwMincut:
         # self._refresh_tab_hydro()
 
         # self._load_widgets_values()
+
+    def _create_widget(self, field):
+        widget = None
+        wt = field['widgettype']
+        if wt == 'text':
+            field['value'] = str(field['value'])
+            widget = tools_gw.add_lineedit(field)
+            widget = tools_gw.set_widget_size(widget, field)
+            widget = tools_gw.set_data_type(field, widget)
+        elif wt == 'check':
+            widget = QCheckBox()
+            if field['value'] is not None:
+                widget.setChecked(field['value'])
+            else:
+                widget.setChecked(False)
+        return widget
 
 
     # def set_id_val(self):
@@ -544,17 +593,17 @@ class GwMincut:
     #     tools_gw.set_config_parser('dlg_mincut', 'cause', f"{cause}")
 
 
-    def _set_states(self):
-        """ Serialize data of mincut states """
+    # def _set_states(self):
+    #     """ Serialize data of mincut states """
 
-        sql = ("SELECT id, idval "
-               "FROM om_typevalue WHERE typevalue = 'mincut_state' "
-               "ORDER BY id")
-        rows = tools_db.get_rows(sql)
-        if rows:
-            for row in rows:
-                if 'idval' in row:
-                    self.states[int(row['id'])] = row['idval']
+    #     sql = ("SELECT id, idval "
+    #            "FROM om_typevalue WHERE typevalue = 'mincut_state' "
+    #            "ORDER BY id")
+    #     rows = tools_db.get_rows(sql)
+    #     if rows:
+    #         for row in rows:
+    #             if 'idval' in row:
+    #                 self.states[int(row['id'])] = row['idval']
 
 
     def _init_mincut_canvas(self):
