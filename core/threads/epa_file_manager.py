@@ -605,7 +605,7 @@ class GwEpaFileManager(GwTask):
             value = json.loads(value[0])
             try:
                 steps = int(value['steps'])
-            except KeyError or ValueError:
+            except (KeyError, ValueError):
                 steps = 0
 
             return steps
