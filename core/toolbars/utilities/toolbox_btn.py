@@ -399,6 +399,9 @@ class GwToolBoxButton(GwAction):
             # Set scale-to-fit
             tools_qt.set_tableview_config(self.dlg_reports.tbl_reports, sectionResizeMode=0)
 
+        # Update tbl in case filters have default value
+        self._update_tbl_reports()
+
 
     def _update_tbl_reports(self):
 
