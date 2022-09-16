@@ -131,9 +131,9 @@ filterparam = '[
 {"columnname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,"dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER by name","isNullValue":"true"},
 {"columnname":"dma", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":2, "dvquerytext":"Select name as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0 ORDER BY name","isNullValue":"true"},
 {"columnname":"crm_startdate", "label":"From Date:", "widgettype":"combo","datatype":"text","layoutorder":3,
-"dvquerytext":"Select start_date::date as id, start_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date","isNullValue":"true", "filterSign":">=", "queryAdd":"GROUP BY n.exploitation, n.dma", "showOnTableModel":{"status":true, "position":3}},
+"dvquerytext":"Select start_date::date as id, start_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date","isNullValue":"true", "filterSign":">=", "showOnTableModel":{"status":true, "position":3}},
 {"columnname":"crm_enddate", "label":"To Date:", "widgettype":"combo","datatype":"text","layoutorder":4,
-"dvquerytext":"Select end_date::date as id, end_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date","isNullValue":"true", "filterSign":"<=", "queryAdd":"GROUP BY n.exploitation, n.dma",  "showOnTableModel":{"status":true, "position":4}}]',
+"dvquerytext":"Select end_date::date as id, end_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date","isNullValue":"true", "filterSign":"<=",  "showOnTableModel":{"status":true, "position":4}}]',
 vdefault = '{"orderBy":"1", "orderType":"DESC", "queryAdd":"GROUP BY n.exploitation, n.dma"}'
 WHERE id =  104;
 
