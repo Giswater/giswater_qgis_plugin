@@ -84,7 +84,7 @@
         <item row="1" column="0">
          <widget class="QTabWidget" name="mainTab">
           <property name="currentIndex">
-           <number>3</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_config">
            <attribute name="title">
@@ -93,35 +93,6 @@
            <layout class="QVBoxLayout" name="verticalLayout">
             <item>
              <layout class="QGridLayout" name="lyt_plan_1"/>
-            </item>
-            <item>
-             <widget class="QTabWidget" name="main_tab">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>110</height>
-               </size>
-              </property>
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="currentIndex">
-               <number>-1</number>
-              </property>
-              <property name="elideMode">
-               <enum>Qt::ElideLeft</enum>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="lbl_msg">
-              <property name="text">
-               <string>No results found</string>
-              </property>
-             </widget>
             </item>
             <item>
              <widget class="QGroupBox" name="grb_plan_details">
