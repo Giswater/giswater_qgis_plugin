@@ -339,6 +339,7 @@ class GwToolBoxButton(GwAction):
                 widget = tools_gw.add_combo(field)
                 widget = tools_gw.set_widget_size(widget, field)
                 widget.setProperty('filterSign', field.get('filterSign'))
+                widget.setProperty('filterWithMissedColumn', field.get('filterWithMissedColumn'))
                 if field.get('filterDefault') is not None:
                     tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
                 widget.currentIndexChanged.connect(partial(self._update_tbl_reports))
@@ -409,7 +410,9 @@ class GwToolBoxButton(GwAction):
             filterSign = widget.property('filterSign')
             if filterSign is None:
                 filterSign = '='
-            _json = {"filterName": f"{widget.objectName()}", "filterValue": f"{value}", "filterSign": f"{filterSign}"}
+            filterWithMissedColumn = widget.property('filterWithMissedColumn')
+            _json = {"filterName": f"{widget.objectName()}", "filterValue": f"{value}", "filterSign": f"{filterSign}",
+                     "filterWithMissedColumn": filterWithMissedColumn}
             filters.append(_json)
 
         extras = f'"filter":{json.dumps(filters)}, "listId":"{self.function_selected}"'
