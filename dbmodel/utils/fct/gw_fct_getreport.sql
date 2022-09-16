@@ -10,7 +10,17 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getreport(p_data json)
   RETURNS json AS
 $BODY$
 	
-/*EXAMPLE:
+/*DESCRIPTION:
+
+This function has two logics with SQL:
+
+1) SQL WITHOUT GROUP BY EXPRESSION
+
+2) SQL WITH GROUP BY EXPRESSION. For use with this strategy:
+	- 'queryAdd' to concatenate after filter fields on initial query
+	- 'showOnTableModel' To show filterfields on tablemodel (as that fields are missed)
+	
+EXAMPLE:
 
 SELECT SCHEMA_NAME.gw_fct_getreport($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
@@ -21,6 +31,8 @@ SELECT SCHEMA_NAME.gw_fct_getreport($${"client":{"device":4, "lang":"en_US", "in
 SELECT SCHEMA_NAME.gw_fct_getreport($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "filter":[{"filterName": "code", "filterValue": "6"}, {"filterName": "dma_id", "filterValue": "5"}], "listId":"102"}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_getreport($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":5367}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "filter":[{"filterName": "init", "filterValue": null}], "listId":"902"}}$$);
+
+SELECT SCHEMA_NAME.gw_fct_getreport($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "filter":[{"filterName": "Exploitation", "filterValue": "expl_01", "filterSign": "=", "filterWithMissedColumn": null}, {"filterName": "Dma", "filterValue": "", "filterSign": "=", "filterWithMissedColumn": null}, {"filterName": "Period", "filterValue": "", "filterSign": "=", "filterWithMissedColumn": null}], "listId":"102"}}$$);
 
 */
 
@@ -46,6 +58,7 @@ v_default text;
 v_version text;
 v_error_context text;
 v_filterdefault text;
+v_queryadd text;
 
 BEGIN
 
@@ -59,6 +72,7 @@ BEGIN
 	-- get input parameter
 	v_list_id := json_extract_path_text(p_data,'data','listId');
 	v_filter := json_extract_path_text(p_data,'data','filter');
+	v_queryadd := json_extract_path_text(p_data,'data','queryAdd');
 
 	SELECT array_agg(a) AS list FROM json_array_elements_text(v_filter) a
 	INTO v_filterinput;
@@ -75,26 +89,31 @@ BEGIN
 				EXECUTE 'SELECT json_agg(t.idval) FROM ('||json_extract_path_text(v_filterparam,'dvquerytext')||') t'
 				INTO v_comboidval;
 
-				v_filterdvquery=(v_filterparam::jsonb || json_build_object('comboIds', v_comboid, 'comboNames', v_comboidval, 
-				'filterSign', json_extract_path_text(v_filterparam,'filterSign'), 
-				'showOnTableModel', json_extract_path_text(v_filterparam,'showOnTableModel'),
-				'widgetName',json_extract_path_text(v_filterparam,'columnname') )::jsonb);
+				v_filterdvquery=(v_filterparam::jsonb || json_build_object(
+				'comboIds', v_comboid, 
+				'comboNames', v_comboidval, 
+				'widgetname',json_extract_path_text(v_filterparam,'columnname'),
+				'filterSign', json_extract_path_text(v_filterparam,'filterSign'),
+				'showOnTableModel', json_extract_path_text(v_filterparam,'showOnTableModel'))::jsonb);
 
 				v_filterlist = array_append(v_filterlist,v_filterdvquery);
 			i=i+1;
 		END LOOP;
 	END IF;
 
+	raise notice 'v_queryadd %', v_queryadd;
+
+
 	--list data
 	--execute query 
 	SELECT query_text INTO v_querytext FROM config_report WHERE id = v_list_id;
 
-	IF v_filterinput IS NOT NULL THEN
+	raise notice 'v_querytext %', v_querytext;
 
-		FOREACH rec_filter IN ARRAY v_filterinput LOOP
-
-			RAISE NOTICE ' rec_filter %', rec_filter;
+	IF v_filterinput IS NOT NULL THEN  -- when filter has not values form client
 		
+		FOREACH rec_filter IN ARRAY v_filterinput LOOP
+	
 			v_filtername = concat('"',json_extract_path_text(rec_filter::json,'filterName'),'"');
 			v_filtersign = json_extract_path_text(rec_filter::json,'filterSign');
 			v_filtervalue = json_extract_path_text(rec_filter::json,'filterValue');
@@ -104,12 +123,28 @@ BEGIN
 			END IF;
 			
 			IF v_filtername != '' AND v_filtervalue != '' THEN
-				v_querytext = concat('SELECT * FROM (',v_querytext,') a WHERE ',v_filtername, v_filtersign, quote_literal(v_filtervalue));
+			
+				IF v_queryadd IS NOT NULL THEN
+
+					v_querytext = concat(v_querytext,' AND ',v_filtername, v_filtersign, quote_literal(v_filtervalue));
+				ELSE 
+					v_querytext = concat('SELECT * FROM (',v_querytext,') a WHERE ',v_filtername, v_filtersign, quote_literal(v_filtervalue));
+
+				END IF;
+			ELSE
+
 			END IF;
+			
 		END LOOP;
+
+		IF v_queryadd IS NOT NULL THEN
+			v_querytext = concat(v_querytext,' ',v_queryadd, ' ');
+		END IF;
+
+		raise notice '33333333333333333333333333333333333333';
 		
-	ELSIF (SELECT filterparam FROM config_report WHERE id = v_list_id) IS NOT NULL THEN
-	
+	ELSIF (SELECT filterparam FROM config_report WHERE id = v_list_id) IS NOT NULL THEN  -- when filter has values form client
+		
 		-- Look for default values in each widget
 		FOR i IN 0..(SELECT jsonb_array_length(filterparam::jsonb)-1 FROM config_report WHERE id = v_list_id) LOOP
 
@@ -117,34 +152,51 @@ BEGIN
 
 			v_filtername = concat('"',json_extract_path_text(v_filterparam::json,'columnname'),'"');
 			v_filtersign = json_extract_path_text(v_filterparam::json,'filterSign');
-			
-			SELECT COALESCE(json_extract_path_text(v_filterparam::json,'filterDefault'), '') INTO v_filterdefault;
+			v_filterdefault  = (COALESCE(json_extract_path_text(v_filterparam::json,'filterDefault'), ''));
 			
 			IF v_filtername != '""' AND v_filterdefault != '' THEN
-				v_querytext = concat('SELECT * FROM (',v_querytext,') a WHERE ',v_filtername, v_filtersign, quote_literal(v_filterdefault));
+			
+				IF v_queryadd IS NOT NULL THEN
+
+					raise notice '1 111111111111111111111111';
+					v_querytext = concat(v_querytext,' AND ',v_filtername, v_filtersign, quote_literal(v_filterdefault));
+				ELSE 
+					raise notice '2 2222222222222222222222222';
+					v_querytext = concat('SELECT * FROM (',v_querytext,') a WHERE ',v_filtername, v_filtersign, quote_literal(v_filtervalue));
+				END IF;
 			END IF;
+		
 			i=i+1;
 		END LOOP;
+
+		IF v_queryadd IS NOT NULL THEN
+			v_querytext = concat(v_querytext,' ',v_queryadd, ' ');
+		END IF;
+
+		raise notice '444444444444444444444444444444444444444444444';
+
 	END IF;
 
-	-- group by
-	v_default = (SELECT vdefault->>'groupBy' FROM config_report WHERE id = v_list_id);
-	IF v_default IS NOT NULL THEN
-		v_querytext = concat (v_querytext ,' GROUP BY ', v_default);
-	END IF;
+	raise notice 'v_querytext -------> %',v_querytext;
 
 	-- order by
 	v_default = (SELECT vdefault->>'orderBy' FROM config_report WHERE id = v_list_id);
+	
 	IF v_default IS NOT NULL THEN
 		v_querytext = concat (v_querytext ,' ORDER BY ', v_default);
 		v_default = (SELECT vdefault->>'orderType' FROM config_report WHERE id = v_list_id);
 		v_querytext = concat (v_querytext ,' ', v_default);
 	END IF;
 	
-	raise notice 'v_querytext,%',v_querytext;
-	
-	EXECUTE 'SELECT json_agg(t) FROM ('||v_querytext||') t'
-	INTO v_fields ;
+	raise notice 'v_querytext -------> %',v_querytext;
+
+	IF v_queryadd IS NOT NULL THEN
+		EXECUTE 'SELECT json_agg(t) FROM (SELECT * FROM ('||v_querytext||') a) t'
+		INTO v_fields ;
+	ELSE
+		EXECUTE 'SELECT json_agg(t) FROM ('||v_querytext||') t'
+		INTO v_fields ;
+	END IF;
 
 	v_fields = json_build_object('widgettype', 'list', 'value',v_fields); 
 	
@@ -158,7 +210,6 @@ BEGIN
 		      ',"feature":{}'||
 		      ',"data":' || v_fields ||'}'||
 	       '}')::json;
-	       
 
 	--EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;

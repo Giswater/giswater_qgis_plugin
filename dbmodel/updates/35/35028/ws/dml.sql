@@ -98,6 +98,10 @@ UPDATE config_toolbox SET inputparams =
 ]'
 WHERE id = 3142;
 
+DELETE FROM config_report WHERE id IN (102,106);
+
+UPDATE config_report set id = 102 WHERE id = 105;
+
 UPDATE config_report SET alias = 'Losses & NRW by Exploitation, Dma & Period' , 
 query_text = 'SELECT w.exploitation as "Exploitation", w.dma as "Dma", period as "Period", n.total::numeric(12,2) as "Total input",
 auth_bill as "Auth. Bill", auth_unbill as "Auth. Unbill", auth as "Authorized", 
@@ -106,51 +110,57 @@ loss_app as "Losses App", loss_real as "Losses Real",loss as "Losses",
 rw as "Revenue", nrw as "Non Revenue", 
 (case when n.total > 0 then (rw/n.total)::numeric(12,2) else 0.00 end) as "Revenue Efficiency"
 FROM v_om_waterbalance w
-JOIN v_om_waterbalance_nrw n USING (dma, period)
-JOIN v_om_waterbalance_loss l USING (dma, period)',
+JOIN v_om_waterbalance_efficiency n USING (dma, period)',
 filterparam = '[{"columnname":"Exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
 "dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER by name","isNullValue":"true"},
 {"columnname":"Dma", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":2,
 "dvquerytext":"Select name as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0 ORDER BY name","isNullValue":"true"},
 {"columnname":"Period", "label":"Period:", "widgettype":"combo","datatype":"text","layoutorder":1,
 "dvquerytext":"Select code as id, code as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY code","isNullValue":"true"}]'
-WHERE id =  105;
+WHERE id =  102;
 
 
-UPDATE config_report SET alias = 'Losses & NRW by Dma',
+UPDATE config_report SET alias = 'Total Losses & NRW by Dma',
 query_text = 'SELECT n.exploitation as "Exploitation", n.dma as "Dma", 
 (sum(n.total))::numeric(12,2) as "Total input", sum(rw) as "Revenue", sum(nrw) as "Non Revenue", 
 (case when sum(n.total) > 0 THEN (sum(rw)/sum(n.total))::numeric(12,2) else 0.00 end) as "Revenue Efficiency",
 sum(auth) as "Authorized", sum(loss) as "Losses", 
 (case when sum(n.total) > 0 THEN (sum(auth)/sum(n.total))::numeric(12,2) else 0.00 end) as "Losses Efficiency" 
-FROM v_om_waterbalance_nrw n
-JOIN v_om_waterbalance_loss l USING (dma, period)',
+FROM v_om_waterbalance_efficiency n WHERE n.dma IS NOT NULL',
 filterparam = '[
-{"columnname":"Exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,"dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER by name","isNullValue":"true"},
-{"columnname":"Dma", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":2, "dvquerytext":"Select name as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0 ORDER BY name","isNullValue":"true"},
-{"columnname":"startdate", "label":"From Date:", "widgettype":"combo","datatype":"text","layoutorder":3,
-"dvquerytext":"Select start_date::date as id, start_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date","isNullValue":"true", "filterSign":">", "showOnTableModel":{"status":true, "position":3}},
-{"columnname":"enddate", "label":"To Date:", "widgettype":"combo","datatype":"text","layoutorder":4,
-"dvquerytext":"Select end_date::date as id, end_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date","isNullValue":"true", "filterSign":"<=", "showOnTableModel":{"status":true, "position":4}}]',
-vdefault = '{"orderBy":"1", "orderType":"DESC", "groupBy":"n.exploitation, n.dma"}'
+{"columnname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,"dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER by name","isNullValue":"true"},
+{"columnname":"dma", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":2, "dvquerytext":"Select name as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0 ORDER BY name","isNullValue":"true"},
+{"columnname":"crm_startdate", "label":"From Date:", "widgettype":"combo","datatype":"text","layoutorder":3,
+"dvquerytext":"Select start_date::date as id, start_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date","isNullValue":"true", "filterSign":">=", "queryAdd":"GROUP BY n.exploitation, n.dma", "showOnTableModel":{"status":true, "position":3}},
+{"columnname":"crm_enddate", "label":"To Date:", "widgettype":"combo","datatype":"text","layoutorder":4,
+"dvquerytext":"Select end_date::date as id, end_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date","isNullValue":"true", "filterSign":"<=", "queryAdd":"GROUP BY n.exploitation, n.dma",  "showOnTableModel":{"status":true, "position":4}}]',
+vdefault = '{"orderBy":"1", "orderType":"DESC", "queryAdd":"GROUP BY n.exploitation, n.dma"}'
 WHERE id =  104;
 
 
-UPDATE config_report SET alias = 'Losses & NRW by Exploitation',
+UPDATE config_report SET alias = 'Total Losses & NRW by Exploitation',
 query_text = 'SELECT n.exploitation as "Exploitation",
 (sum(n.total))::numeric(12,2) as "Total input", sum(rw) as "Revenue", sum(nrw) as "Non Revenue", (sum(rw)/sum(n.total))::numeric(12,2) as "Revenue Efficiency",
 sum(auth) as "Authorized", sum(loss) as "Losses", (sum(auth)/sum(n.total))::numeric(12,2) as "Losses Efficiency" 
-FROM v_om_waterbalance_nrw n
-JOIN v_om_waterbalance_loss l USING (dma, period) ',
+FROM v_om_waterbalance_efficiency n  WHERE n.dma IS NOT NULL',
 filterparam = '[
-{"columnname":"Exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1, "dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER by name","isNullValue":"true"}, 
-{"columnname":"startdate", "label":"From Date:", "widgettype":"combo","datatype":"text","layoutorder":2,
-"dvquerytext":"Select start_date::date as id, start_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date","isNullValue":"true", "filterSign":">", "showOnTableModel":{"status":true, "position":2}},
-{"columnname":"enddate", "label":"To Date:", "widgettype":"combo","datatype":"text","layoutorder":3,
+{"columnname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1, "dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER by name","isNullValue":"true"}, 
+{"columnname":"crm_startdate", "label":"From Date:", "widgettype":"combo","datatype":"text","layoutorder":2,
+"dvquerytext":"Select start_date::date as id, start_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date","isNullValue":"true", "filterSign":">=", "showOnTableModel":{"status":true, "position":2}},
+{"columnname":"crm_enddate", "label":"To Date:", "widgettype":"combo","datatype":"text","layoutorder":3,
 "dvquerytext":"Select end_date::date as id, end_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date","isNullValue":"true", "filterSign":"<=", "showOnTableModel":{"status":true, "position":3}}]',
-vdefault = '{"orderBy":"1", "orderType":"DESC", "groupBy":"n.exploitation"}'
+vdefault = '{"orderBy":"1", "orderType":"DESC", "queryAdd":"GROUP BY n.exploitation"}'
 WHERE id =  103;
 
-DELETE FROM config_report WHERE id IN (102,106);
+UPDATE sys_function SET descript = 
+'Function to calculate water balance according stardards of IWA.
+Before that_
+1) tables ext_cat_period, ext_rtc_hydrometer_x_data, ext_rtc_scada_x_data need to be filled.
+2) DMA graph need to be executed.' 
+WHERE id = 3142;
 
-UPDATE config_report set id = 102 WHERE id = 105;
+DELETE FROM sys_table WHERE id = 'v_om_waterbalance_nrw';
+UPDATE sys_table SET id = 'v_om_waterbalance_efficiency' WHERE id = 'v_om_waterbalance_loss';
+
+
+

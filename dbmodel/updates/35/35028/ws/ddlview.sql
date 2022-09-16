@@ -30,38 +30,28 @@ CREATE OR REPLACE VIEW v_om_waterbalance AS
 
 
 
-CREATE OR REPLACE VIEW v_om_waterbalance_loss AS 
+CREATE OR REPLACE VIEW v_om_waterbalance_efficiency AS
+ 
  SELECT v_om_waterbalance.exploitation,
     v_om_waterbalance.dma,
     v_om_waterbalance.period,
-    v_om_waterbalance.total,
+    crm_startdate,
+crm_enddate,
+wbal_startdate,
+wbal_enddate,
+  v_om_waterbalance.total,  
     (v_om_waterbalance.auth_bill + v_om_waterbalance.auth_unbill)::numeric(12,2) AS auth,
     (v_om_waterbalance.total - v_om_waterbalance.auth_bill::double precision - v_om_waterbalance.auth_unbill::double precision)::numeric(12,2) AS loss,
         CASE
             WHEN v_om_waterbalance.total > 0::double precision THEN ((100::numeric * (v_om_waterbalance.auth_bill + v_om_waterbalance.auth_unbill))::double precision / v_om_waterbalance.total)::numeric(12,2)
             ELSE 0::numeric(12,2)
-        END AS eff,
-	crm_startdate,
-	crm_enddate,
-	wbal_startdate,
-	wbal_enddate,
-        v_om_waterbalance.the_geom
-   FROM v_om_waterbalance;
-
- 
-CREATE OR REPLACE VIEW v_om_waterbalance_nrw AS 
- SELECT v_om_waterbalance.exploitation,
-    v_om_waterbalance.dma,
-    v_om_waterbalance.period,
-    v_om_waterbalance.total,
+        END AS loss_eff,
     v_om_waterbalance.auth_bill AS rw,
     (v_om_waterbalance.total - v_om_waterbalance.auth_bill::double precision)::numeric(12,2) AS nrw,
         CASE
             WHEN v_om_waterbalance.total > 0::double precision THEN ((100::numeric * v_om_waterbalance.auth_bill)::double precision / v_om_waterbalance.total)::numeric(12,2)
             ELSE 0::numeric(12,2)
-        END AS eff,	
-        crm_startdate,
-	crm_enddate,
-	wbal_startdate,
-	wbal_enddate,
-        v_om_waterbalance.the_geom   FROM v_om_waterbalance;
+        END AS nrw_eff,	       
+        v_om_waterbalance.the_geom
+   FROM v_om_waterbalance
+   
