@@ -40,6 +40,7 @@ class GwToolBoxButton(GwAction):
         self.rbt_checked = {}
         self.no_clickable_items = ['Processes', 'Reports']
         self.temp_layers_added = []
+        self.add_columns = {}
         self.queryAdd = None
 
 
@@ -316,6 +317,7 @@ class GwToolBoxButton(GwAction):
 
         order = 0
 
+        self.add_columns = {}
         for field in json_result['body']['data']['fields']:
             label = None
             widget = None
@@ -345,8 +347,7 @@ class GwToolBoxButton(GwAction):
                 widget = tools_gw.add_combo(field)
                 widget = tools_gw.set_widget_size(widget, field)
                 widget.setProperty('filterSign', field.get('filterSign'))
-                widget.setProperty('filterWithMissedColumn', field.get('filterWithMissedColumn'))
-                widget.setProperty('queryAdd', field.get('queryAdd'))
+                widget.setProperty('showOnTableModel', field.get('showOnTableModel'))
                 if field.get('filterDefault') is not None:
                     tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
                 widget.currentIndexChanged.connect(partial(self._update_tbl_reports))
@@ -414,12 +415,14 @@ class GwToolBoxButton(GwAction):
                 value = tools_qt.get_calendar_date(self.dlg_reports, widget)
             else:
                 continue
+            if widget.property('showOnTableModel'):
+                columnname = widget.objectName()
+                position = json.loads(widget.property('showOnTableModel')).get('position')
+                self.add_columns[position] = [columnname, value]
             filterSign = widget.property('filterSign')
             if filterSign is None:
                 filterSign = '='
-            filterWithMissedColumn = widget.property('filterWithMissedColumn')
-            _json = {"filterName": f"{widget.objectName()}", "filterValue": f"{value}", "filterSign": f"{filterSign}",
-                     "filterWithMissedColumn": filterWithMissedColumn}
+            _json = {"filterName": f"{widget.objectName()}", "filterValue": f"{value}", "filterSign": f"{filterSign}"}
             filters.append(_json)
 
         extras = f'"filter":{json.dumps(filters)}, "listId":"{self.function_selected}"'
@@ -433,22 +436,44 @@ class GwToolBoxButton(GwAction):
         for field in json_result['body']['data']['fields']:
 
             if field['widgettype'] == 'list' and field.get('value') is not None:
+                # Calculate max possible rows/cols for table
                 numrows = len(field['value'])
-                numcols = len(field['value'][0])
-                self.dlg_reports.tbl_reports.setColumnCount(numcols)
-                self.dlg_reports.tbl_reports.setRowCount(numrows)
+                numcols = len(field['value'][0]) + len(self.add_columns)
 
                 i = 0
+                skipped = 0
                 dict_keys = {}
+                # Set table headers
                 for key in field['value'][0].keys():
+                    # Add additional columns if needed
+                    while self.add_columns.get(i) is not None:
+                        if self.add_columns.get(i)[1] not in ('', 'null', None):
+                            dict_keys[i] = self.add_columns.get(i)[1]
+                            self.dlg_reports.tbl_reports.setHorizontalHeaderItem(i, QTableWidgetItem(f"{self.add_columns.get(i)[0]}"))
+                        else:
+                            skipped += 1
+                        i += 1
+                    # Subtract the additional columns whose filters that aren't used
+                    i -= skipped
+                    numcols -= skipped
+                    skipped = 0
+                    # Add usual columns
                     dict_keys[i] = f"{key}"
                     self.dlg_reports.tbl_reports.setHorizontalHeaderItem(i, QTableWidgetItem(f"{key}"))
                     i = i + 1
 
+                # Set actual rows/cols for table
+                self.dlg_reports.tbl_reports.setColumnCount(numcols)
+                self.dlg_reports.tbl_reports.setRowCount(numrows)
+
+                # Fill in the cells
                 for row in range(numrows):
                     for column in range(numcols):
                         column_name = dict_keys[column]
-                        item = f"{field['value'][row][column_name]}"
+                        try:
+                            item = f"{field['value'][row][column_name]}"  # Usual column
+                        except (KeyError, TypeError):
+                            item = f"{column_name}"  # Additional column
                         self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem(item))
             elif field['widgettype'] == 'list' and field.get('value') is None:
                 self.dlg_reports.tbl_reports.setRowCount(0)
