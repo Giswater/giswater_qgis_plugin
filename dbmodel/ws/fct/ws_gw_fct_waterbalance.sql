@@ -65,7 +65,7 @@ BEGIN
 	-- getting input data 	
 	v_expl := ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
 	v_period := ((p_data ->>'data')::json->>'parameters')::json->>'period';
-	v_executegraphdma := ((p_data ->>'data')::json->>'parameters')::json->>'executegraphDma';
+	v_executegraphdma := ((p_data ->>'data')::json->>'parameters')::json->>'executeGraphDma';
 	v_method := ((p_data ->>'data')::json->>'parameters')::json->>'method';
 
 	IF v_executegraphdma THEN
@@ -166,20 +166,16 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('INFO: graphanalylitcs mapzones for DMA have been triggered'));
 		DELETE FROM audit_check_data WHERE fid = 145 AND cur_user = current_user AND error_message ='INFO';
 		DELETE FROM audit_check_data WHERE fid = 145 AND cur_user = current_user AND error_message LIKE '---%';
-	END IF;
-	-- get results
 	
-	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT * FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid 
-		UNION
-	     SELECT id+1000 as id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=145 AND criticity = 1)a
-		order by  id asc) row;
-		
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-
-	IF v_executegraphdma THEN
+		-- info
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		FROM (SELECT * FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid 
+			UNION
+		     SELECT id+1000 as id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=145 AND criticity = 1)a
+			order by  id asc) row;
+			
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 		-- disconnected arcs
 		SELECT jsonb_agg(features.feature) INTO v_result
@@ -217,6 +213,13 @@ BEGIN
 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+	ELSE
+
+		-- info
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		FROM (SELECT * FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid) a order by  id asc) row;
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 		
 	END IF;
 
