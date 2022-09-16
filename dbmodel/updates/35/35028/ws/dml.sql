@@ -103,12 +103,16 @@ DELETE FROM config_report WHERE id IN (102,106);
 UPDATE config_report set id = 102 WHERE id = 105;
 
 UPDATE config_report SET alias = 'Losses & NRW by Exploitation, Dma & Period' , 
-query_text = 'SELECT w.exploitation as "Exploitation", w.dma as "Dma", period as "Period", n.total::numeric(12,2) as "Total input",
+query_text = 'SELECT w.exploitation as "Exploitation", w.dma as "Dma", period as "Period", 
+n.total_in::numeric(12,2) as "Total inlet",
+n.total_out::numeric(12,2) as "Total outlet",
+n.total::numeric(12,2) as "Total inyected",
 auth_bill as "Auth. Bill", auth_unbill as "Auth. Unbill", auth as "Authorized", 
 loss_app as "Losses App", loss_real as "Losses Real",loss as "Losses", 
 (case when n.total > 0 then (auth/n.total)::numeric(12,2) else 0 end) as "Losses Efficiency" ,
 rw as "Revenue", nrw as "Non Revenue", 
-(case when n.total > 0 then (rw/n.total)::numeric(12,2) else 0.00 end) as "Revenue Efficiency"
+(case when n.total > 0 then (rw/n.total)::numeric(12,2) else 0.00 end) as "Revenue Efficiency",
+w.ili::numeric(12,2) as "ILI"
 FROM v_om_waterbalance w
 JOIN v_om_waterbalance_efficiency n USING (dma, period)',
 filterparam = '[{"columnname":"Exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
@@ -133,7 +137,7 @@ filterparam = '[
 {"columnname":"crm_startdate", "label":"From Date:", "widgettype":"combo","datatype":"text","layoutorder":3,
 "dvquerytext":"Select start_date::date as id, start_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date","isNullValue":"true", "filterSign":">=", "showOnTableModel":{"status":true, "position":3}},
 {"columnname":"crm_enddate", "label":"To Date:", "widgettype":"combo","datatype":"text","layoutorder":4,
-"dvquerytext":"Select end_date::date as id, end_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date","isNullValue":"true", "filterSign":"<=",  "showOnTableModel":{"status":true, "position":4}}]',
+"dvquerytext":"Select end_date::date as id, end_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY end_date desc","isNullValue":"true", "filterSign":"<=",  "showOnTableModel":{"status":true, "position":4}}]',
 vdefault = '{"orderBy":"1", "orderType":"DESC", "queryAdd":"GROUP BY n.exploitation, n.dma"}'
 WHERE id =  104;
 
@@ -146,9 +150,9 @@ FROM v_om_waterbalance_efficiency n  WHERE n.dma IS NOT NULL',
 filterparam = '[
 {"columnname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1, "dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER by name","isNullValue":"true"}, 
 {"columnname":"crm_startdate", "label":"From Date:", "widgettype":"combo","datatype":"text","layoutorder":2,
-"dvquerytext":"Select start_date::date as id, start_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date","isNullValue":"true", "filterSign":">=", "showOnTableModel":{"status":true, "position":2}},
+"dvquerytext":"Select start_date::date as id, start_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date desc","isNullValue":"true", "filterSign":">=", "showOnTableModel":{"status":true, "position":2}},
 {"columnname":"crm_enddate", "label":"To Date:", "widgettype":"combo","datatype":"text","layoutorder":3,
-"dvquerytext":"Select end_date::date as id, end_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date","isNullValue":"true", "filterSign":"<=", "showOnTableModel":{"status":true, "position":3}}]',
+"dvquerytext":"Select end_date::date as id, end_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY end_date desc","isNullValue":"true", "filterSign":"<=", "showOnTableModel":{"status":true, "position":3}}]',
 vdefault = '{"orderBy":"1", "orderType":"DESC", "queryAdd":"GROUP BY n.exploitation"}'
 WHERE id =  103;
 

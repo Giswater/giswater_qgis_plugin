@@ -14,14 +14,17 @@ CREATE OR REPLACE VIEW v_om_waterbalance AS
     d.name AS dma,
     p.code AS period,
     ((COALESCE(om_waterbalance.auth_bill_met_export, 0::double precision) + COALESCE(om_waterbalance.auth_bill_met_hydro, 0::double precision) + COALESCE(om_waterbalance.auth_bill_unmet, 0::double precision))::numeric(12,2))::numeric(12,2) AS auth_bill,
-    ((COALESCE(om_waterbalance.auth_unbill_met, 0::double precision) + COALESCE(om_waterbalance.auth_unbill_unmet, 0::double precision) + COALESCE(om_waterbalance.loss_app_unath, 0::double precision))::numeric(12,2))::numeric(12,2) AS auth_unbill,
-    ((COALESCE(om_waterbalance.loss_app_met_error, 0::double precision) + COALESCE(om_waterbalance.loss_app_data_error, 0::double precision))::numeric(12,2))::numeric(12,2) AS loss_app,
+    ((COALESCE(om_waterbalance.auth_unbill_met, 0::double precision) + COALESCE(om_waterbalance.auth_unbill_unmet, 0::double precision))::numeric(12,2))::numeric(12,2) AS auth_unbill,
+    (COALESCE(om_waterbalance.loss_app_unath, 0::double precision)+(COALESCE(om_waterbalance.loss_app_met_error, 0::double precision) + COALESCE(om_waterbalance.loss_app_data_error, 0::double precision))::numeric(12,2))::numeric(12,2) AS loss_app,
     ((COALESCE(om_waterbalance.loss_real_leak_main, 0::double precision) + COALESCE(om_waterbalance.loss_real_leak_service, 0::double precision) + COALESCE(om_waterbalance.loss_real_storage, 0::double precision))::numeric(12,2))::numeric(12,2) AS loss_real,
+    (COALESCE(om_waterbalance.total_in, 0::double precision))::numeric(12,2) AS total_in,
+    (COALESCE(om_waterbalance.total_out, 0::double precision))::numeric(12,2) AS total_out,
     (COALESCE(om_waterbalance.total_sys_input, 0::double precision))::numeric(12,2) AS total,
     p.start_date::date as crm_startdate,
     p.end_date::date as crm_enddate,
     startdate as wbal_startdate,
     enddate as wbal_enddate,
+    ili,
     d.the_geom
    FROM om_waterbalance
      JOIN exploitation e USING (expl_id)
@@ -36,10 +39,12 @@ CREATE OR REPLACE VIEW v_om_waterbalance_efficiency AS
     v_om_waterbalance.dma,
     v_om_waterbalance.period,
     crm_startdate,
-crm_enddate,
-wbal_startdate,
-wbal_enddate,
-  v_om_waterbalance.total,  
+    crm_enddate,
+    wbal_startdate,
+    wbal_enddate,
+    total_in,
+    total_out,
+    v_om_waterbalance.total,  
     (v_om_waterbalance.auth_bill + v_om_waterbalance.auth_unbill)::numeric(12,2) AS auth,
     (v_om_waterbalance.total - v_om_waterbalance.auth_bill::double precision - v_om_waterbalance.auth_unbill::double precision)::numeric(12,2) AS loss,
         CASE
@@ -51,7 +56,8 @@ wbal_enddate,
         CASE
             WHEN v_om_waterbalance.total > 0::double precision THEN ((100::numeric * v_om_waterbalance.auth_bill)::double precision / v_om_waterbalance.total)::numeric(12,2)
             ELSE 0::numeric(12,2)
-        END AS nrw_eff,	       
+        END AS nrw_eff,
+        ili,    
         v_om_waterbalance.the_geom
    FROM v_om_waterbalance
    

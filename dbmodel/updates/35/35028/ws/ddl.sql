@@ -23,3 +23,9 @@ CREATE TABLE ext_rtc_scada_x_data(
   
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_waterbalance", "column":"startdate", "dataType":"date", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_waterbalance", "column":"enddate", "dataType":"date", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_waterbalance", "column":"total_in", "dataType":"numeric", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_waterbalance", "column":"total_out", "dataType":"numeric", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_waterbalance", "column":"ili", "dataType":"numeric", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_dma_period", "column":"avg_press", "dataType":"numeric", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"avg_press", "dataType":"numeric", "isUtils":"False"}}$$);
