@@ -129,7 +129,8 @@ query_text = 'SELECT n.exploitation as "Exploitation", n.dma as "Dma",
 (sum(n.total))::numeric(12,2) as "Total input", sum(rw) as "Revenue", sum(nrw) as "Non Revenue", 
 (case when sum(n.total) > 0 THEN (sum(rw)/sum(n.total))::numeric(12,2) else 0.00 end) as "Revenue Efficiency",
 sum(auth) as "Authorized", sum(loss) as "Losses", 
-(case when sum(n.total) > 0 THEN (sum(auth)/sum(n.total))::numeric(12,2) else 0.00 end) as "Losses Efficiency" 
+(case when sum(n.total) > 0 THEN (sum(auth)/sum(n.total))::numeric(12,2) else 0.00 end) as "Losses Efficiency",
+(avg(n.ili))::numeric(12,2) as "ILI"
 FROM v_om_waterbalance_efficiency n WHERE n.dma IS NOT NULL',
 filterparam = '[
 {"columnname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,"dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER by name","isNullValue":"true"},
