@@ -74,11 +74,11 @@ BEGIN
 	v_filter := json_extract_path_text(p_data,'data','filter');
 	v_queryadd := json_extract_path_text(p_data,'data','queryAdd');
 
-	SELECT array_agg(a) AS list FROM json_array_elements_text(v_filter) a
-	INTO v_filterinput;
+	SELECT array_agg(a) AS list FROM json_array_elements_text(v_filter) a INTO v_filterinput;
 
 	--filter widgets
 	IF (SELECT filterparam FROM config_report WHERE id = v_list_id) IS NOT NULL THEN
+	
 		FOR i IN 0..(SELECT jsonb_array_length(filterparam::jsonb)-1 FROM config_report WHERE id = v_list_id) LOOP
 
 			SELECT filterparam::jsonb->>i into v_filterparam FROM config_report WHERE id = v_list_id;
@@ -101,14 +101,8 @@ BEGIN
 		END LOOP;
 	END IF;
 
-	raise notice 'v_queryadd %', v_queryadd;
-
-
-	--list data
 	--execute query 
 	SELECT query_text INTO v_querytext FROM config_report WHERE id = v_list_id;
-
-	raise notice 'v_querytext %', v_querytext;
 
 	IF v_filterinput IS NOT NULL THEN  -- when filter has not values form client
 		
@@ -129,19 +123,13 @@ BEGIN
 					v_querytext = concat(v_querytext,' AND ',v_filtername, v_filtersign, quote_literal(v_filtervalue));
 				ELSE 
 					v_querytext = concat('SELECT * FROM (',v_querytext,') a WHERE ',v_filtername, v_filtersign, quote_literal(v_filtervalue));
-
 				END IF;
-			ELSE
-
 			END IF;
-			
 		END LOOP;
 
 		IF v_queryadd IS NOT NULL THEN
 			v_querytext = concat(v_querytext,' ',v_queryadd, ' ');
 		END IF;
-
-		raise notice '33333333333333333333333333333333333333';
 		
 	ELSIF (SELECT filterparam FROM config_report WHERE id = v_list_id) IS NOT NULL THEN  -- when filter has values form client
 		
@@ -157,15 +145,11 @@ BEGIN
 			IF v_filtername != '""' AND v_filterdefault != '' THEN
 			
 				IF v_queryadd IS NOT NULL THEN
-
-					raise notice '1 111111111111111111111111';
 					v_querytext = concat(v_querytext,' AND ',v_filtername, v_filtersign, quote_literal(v_filterdefault));
 				ELSE 
-					raise notice '2 2222222222222222222222222';
 					v_querytext = concat('SELECT * FROM (',v_querytext,') a WHERE ',v_filtername, v_filtersign, quote_literal(v_filtervalue));
 				END IF;
 			END IF;
-		
 			i=i+1;
 		END LOOP;
 
@@ -173,11 +157,7 @@ BEGIN
 			v_querytext = concat(v_querytext,' ',v_queryadd, ' ');
 		END IF;
 
-		raise notice '444444444444444444444444444444444444444444444';
-
 	END IF;
-
-	raise notice 'v_querytext -------> %',v_querytext;
 
 	-- order by
 	v_default = (SELECT vdefault->>'orderBy' FROM config_report WHERE id = v_list_id);
@@ -188,8 +168,6 @@ BEGIN
 		v_querytext = concat (v_querytext ,' ', v_default);
 	END IF;
 	
-	raise notice 'v_querytext -------> %',v_querytext;
-
 	IF v_queryadd IS NOT NULL THEN
 		EXECUTE 'SELECT json_agg(t) FROM (SELECT * FROM ('||v_querytext||') a) t'
 		INTO v_fields ;
