@@ -40,6 +40,7 @@ class GwToolBoxButton(GwAction):
         self.rbt_checked = {}
         self.no_clickable_items = ['Processes', 'Reports']
         self.temp_layers_added = []
+        self.queryAdd = None
 
 
     def clicked_event(self):
@@ -219,11 +220,11 @@ class GwToolBoxButton(GwAction):
             # this '1' refers to the index of the item in the selected row
             function_name = index.sibling(index.row(), 0).data()
             self.function_selected = index.sibling(index.row(), 1).data()
-            queryAdd = None
             vdefault = index.sibling(index.row(), 2).data()
+            self.queryAdd = None
             if vdefault:
                 vdefault = json.loads(vdefault.replace("'", '"'))
-                queryAdd = vdefault.get('queryAdd')
+                self.queryAdd = vdefault.get('queryAdd')
 
             self.dlg_reports = GwToolboxReportsUi()
             tools_gw.load_settings(self.dlg_reports)
@@ -255,7 +256,7 @@ class GwToolBoxButton(GwAction):
             self.timer.start(1000)
 
             # Create thread
-            self.report_thread = GwReportTask(function_name, self.dlg_reports, self.function_selected, queryAdd, timer=self.timer)
+            self.report_thread = GwReportTask(function_name, self.dlg_reports, self.function_selected, self.queryAdd, timer=self.timer)
             self.report_thread.finished_execute.connect(self._report_finished)
             QgsApplication.taskManager().addTask(self.report_thread)
             QgsApplication.taskManager().triggerTask(self.report_thread)
@@ -417,12 +418,13 @@ class GwToolBoxButton(GwAction):
             if filterSign is None:
                 filterSign = '='
             filterWithMissedColumn = widget.property('filterWithMissedColumn')
-            queryAdd = widget.property('queryAdd')
             _json = {"filterName": f"{widget.objectName()}", "filterValue": f"{value}", "filterSign": f"{filterSign}",
-                     "filterWithMissedColumn": filterWithMissedColumn, "queryAdd": queryAdd}
+                     "filterWithMissedColumn": filterWithMissedColumn}
             filters.append(_json)
 
         extras = f'"filter":{json.dumps(filters)}, "listId":"{self.function_selected}"'
+        if self.queryAdd:
+            extras += f', "queryAdd": "{self.queryAdd}"'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getreport', body)
         if not json_result or json_result['status'] == 'Failed':
