@@ -705,3 +705,6 @@ UPDATE config_param_system SET value = '{"usePsectors":false, "ignoreGrafanalyti
 WHERE parameter = 'admin_checkproject';
 
 UPDATE ext_cat_period SET code  = concat(upper(code),'-2015');
+
+UPDATE ext_rtc_dma_period set avg_press = 30;
+UPDATE dma set avg_press = 30;
