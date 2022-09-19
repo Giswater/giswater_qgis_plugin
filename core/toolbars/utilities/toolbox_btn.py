@@ -385,7 +385,11 @@ class GwToolBoxButton(GwAction):
                         value = field['value'][row][column_name]
                         if value in (None, 'None'):
                             value = ''
-                        self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem(f"{value}"))
+                        # Create a QTableWidgetItem and then set the data so the sorting works properly
+                        # with Strings, Integers and any other type
+                        qtable_item = QTableWidgetItem()
+                        qtable_item.setData(Qt.DisplayRole, value)
+                        self.dlg_reports.tbl_reports.setItem(row, column, qtable_item)
 
                 continue
 
@@ -481,12 +485,16 @@ class GwToolBoxButton(GwAction):
                     for column in range(numcols):
                         column_name = dict_keys[column]
                         try:
-                            item = f"{field['value'][row][column_name]}"  # Usual column
+                            item = field['value'][row][column_name]  # Usual column
                         except (KeyError, TypeError):
-                            item = f"{column_name}"  # Additional column
+                            item = column_name  # Additional column
                         if item in (None, 'None'):
                             item = ''
-                        self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem(item))
+                        # Create a QTableWidgetItem and then set the data so the sorting works properly
+                        # with Strings, Integers and any other type
+                        qtable_item = QTableWidgetItem()
+                        qtable_item.setData(Qt.DisplayRole, item)
+                        self.dlg_reports.tbl_reports.setItem(row, column, qtable_item)
             elif field['widgettype'] == 'list' and field.get('value') is None:
                 self.dlg_reports.tbl_reports.setRowCount(0)
 
