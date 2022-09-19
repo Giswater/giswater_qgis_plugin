@@ -139,7 +139,7 @@ filterparam = '[
 "dvquerytext":"Select start_date::date as id, start_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date","isNullValue":"false", "filterSign":">=", "showOnTableModel":{"status":true, "position":3}},
 {"columnname":"crm_enddate", "label":"To Date:", "widgettype":"combo","datatype":"text","layoutorder":4,
 "dvquerytext":"Select end_date::date as id, end_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY end_date desc","isNullValue":"false", "filterSign":"<=",  "showOnTableModel":{"status":true, "position":4}}]',
-vdefault = '{"orderBy":"1", "orderType":"DESC", "queryAdd":"GROUP BY n.exploitation, n.dma"}'
+addparam = '{"orderBy":"1", "orderType":"DESC", "queryAdd":"GROUP BY n.exploitation, n.dma"}'
 WHERE id =  104;
 
 
@@ -154,7 +154,7 @@ filterparam = '[
 "dvquerytext":"Select start_date::date as id, start_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date desc","isNullValue":"false", "filterSign":">=", "showOnTableModel":{"status":true, "position":2}},
 {"columnname":"crm_enddate", "label":"To Date:", "widgettype":"combo","datatype":"text","layoutorder":3,
 "dvquerytext":"Select end_date::date as id, end_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY end_date desc","isNullValue":"false", "filterSign":"<=", "showOnTableModel":{"status":true, "position":3}}]',
-vdefault = '{"orderBy":"1", "orderType":"DESC", "queryAdd":"GROUP BY n.exploitation"}'
+addparam = '{"orderBy":"1", "orderType":"DESC", "queryAdd":"GROUP BY n.exploitation"}'
 WHERE id =  103;
 
 UPDATE sys_function SET descript = 
