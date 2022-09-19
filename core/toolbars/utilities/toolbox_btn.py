@@ -751,7 +751,7 @@ class GwToolBoxButton(GwAction):
             for function in functions:
                 func_name = QStandardItem(str(function['listname']))
                 label = QStandardItem(str(function['alias']))
-                vdefault = QStandardItem(str(function['vdefault']))
+                vdefault = QStandardItem(str(function['addparam']))
                 font = label.font()
                 font.setPointSize(8)
                 label.setFont(font)
