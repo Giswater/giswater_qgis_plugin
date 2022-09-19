@@ -1333,24 +1333,24 @@ def check_parameters(field):
         tools_qgis.show_warning(msg)
 
 
-def add_widget(dialog, field, lbl, widget):
+def add_widget(dialog, field, lbl, widget, horizontal_layouts=[]):
     """ Insert widget into layout """
+    ishorizontal = field['layoutname'] in horizontal_layouts
     layout = dialog.findChild(QGridLayout, field['layoutname'])
     if layout in (None, 'null', 'NULL', 'Null'):
         return
     row = int(field['layoutorder'])
     col = 0
-    if lbl is None:
-        col = row
-        row = 0
-    elif not isinstance(widget, QTableView):
+    if ishorizontal:
+        row, col = col, row * 2
+    if lbl is not None and not isinstance(widget, QTableView):
         layout.addWidget(lbl, row, col)
-        col = 1
+        col = col + 1 if ishorizontal else 1
     if type(widget) is QSpacerItem:
         layout.addItem(widget, row, col)
     else:
         layout.addWidget(widget, row, col)
-    if lbl is not None:
+    if lbl is not None and not ishorizontal:
         layout.setColumnStretch(col, 1)
 
 
