@@ -160,11 +160,11 @@ BEGIN
 	END IF;
 
 	-- order by
-	v_default = (SELECT vdefault->>'orderBy' FROM config_report WHERE id = v_list_id);
+	v_default = (SELECT addparam->>'orderBy' FROM config_report WHERE id = v_list_id);
 	
 	IF v_default IS NOT NULL THEN
 		v_querytext = concat (v_querytext ,' ORDER BY ', v_default);
-		v_default = (SELECT vdefault->>'orderType' FROM config_report WHERE id = v_list_id);
+		v_default = (SELECT addparam->>'orderType' FROM config_report WHERE id = v_list_id);
 		v_querytext = concat (v_querytext ,' ', v_default);
 	END IF;
 	
