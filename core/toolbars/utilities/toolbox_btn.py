@@ -383,7 +383,7 @@ class GwToolBoxButton(GwAction):
                     for column in range(numcols):
                         column_name = dict_keys[column]
                         value = field['value'][row][column_name]
-                        if value is None:
+                        if value in (None, 'None'):
                             value = ''
                         self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem(f"{value}"))
 
@@ -419,9 +419,9 @@ class GwToolBoxButton(GwAction):
             else:
                 continue
             if widget.property('showOnTableModel'):
-                columnname = widget.objectName()
+                lbl = tools_qt.get_text(self.dlg_reports, f'lbl_{widget.objectName()}')
                 position = json.loads(widget.property('showOnTableModel')).get('position')
-                self.add_columns[position] = [columnname, value]
+                self.add_columns[position] = [lbl, value]
             filterSign = widget.property('filterSign')
             if filterSign is None:
                 filterSign = '='
@@ -442,24 +442,31 @@ class GwToolBoxButton(GwAction):
                 # Calculate max possible rows/cols for table
                 numrows = len(field['value'])
                 numcols = len(field['value'][0]) + len(self.add_columns)
+                self.dlg_reports.tbl_reports.setColumnCount(numcols)
+                self.dlg_reports.tbl_reports.setRowCount(numrows)
 
                 i = 0
-                skipped = 0
+                tot_skipped = 0
+                skipped_dict = {}
                 dict_keys = {}
                 # Set table headers
                 for key in field['value'][0].keys():
                     # Add additional columns if needed
-                    while self.add_columns.get(i) is not None:
+                    skipped = 0
+                    while self.add_columns.get(i) is not None and self.add_columns.get(i)[0] not in skipped_dict:
                         if self.add_columns.get(i)[1] not in ('', 'null', None):
-                            dict_keys[i] = self.add_columns.get(i)[1]
-                            self.dlg_reports.tbl_reports.setHorizontalHeaderItem(i, QTableWidgetItem(f"{self.add_columns.get(i)[0]}"))
+                            dict_keys[i-skipped] = self.add_columns.get(i)[1]
+                            self.dlg_reports.tbl_reports.setHorizontalHeaderItem(i-skipped, QTableWidgetItem(f"{self.add_columns.get(i)[0]}"))
                         else:
                             skipped += 1
+                            if self.add_columns.get(i)[0] not in skipped_dict:
+                                tot_skipped += 1
+                                skipped_dict[self.add_columns.get(i)[0]] = True
                         i += 1
                     # Subtract the additional columns whose filters that aren't used
-                    i -= skipped
-                    numcols -= skipped
-                    skipped = 0
+                    i -= tot_skipped
+                    numcols -= tot_skipped
+                    tot_skipped = 0
                     # Add usual columns
                     dict_keys[i] = f"{key}"
                     self.dlg_reports.tbl_reports.setHorizontalHeaderItem(i, QTableWidgetItem(f"{key}"))
@@ -477,6 +484,8 @@ class GwToolBoxButton(GwAction):
                             item = f"{field['value'][row][column_name]}"  # Usual column
                         except (KeyError, TypeError):
                             item = f"{column_name}"  # Additional column
+                        if item in (None, 'None'):
+                            item = ''
                         self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem(item))
             elif field['widgettype'] == 'list' and field.get('value') is None:
                 self.dlg_reports.tbl_reports.setRowCount(0)
