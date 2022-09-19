@@ -1134,6 +1134,9 @@ class GwInfo(QObject):
             tools_qt.set_widget_text(dialog, "data_hemisphere", str(row[0]))
             message = "Hemisphere of the node has been updated. Value is"
             tools_qgis.show_info(message, parameter=str(row[0]))
+            # Force a map refresh
+            tools_qgis.refresh_map_canvas()  # First refresh all the layers
+            global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
 
         # Disable Rotation
         action_widget = dialog.findChild(QAction, "actionRotation")
