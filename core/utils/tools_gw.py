@@ -1394,6 +1394,19 @@ def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
     list.append(elem)
 
 
+def add_label(field):
+    """ Create a Label Widget """
+
+    lbl = None
+    if 'label' in field and field['label']:
+        lbl = QLabel()
+        lbl.setObjectName('lbl' + field['columnname'])
+        lbl.setText(field['label'])
+        if 'tooltip' in field:
+            lbl.setToolTip(field['tooltip'])
+    return lbl
+
+
 def add_button(**kwargs):
     """
     :param dialog: (QDialog)
