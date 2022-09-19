@@ -7,3 +7,4 @@
 - Minor bug fix
 - Add commitChanges parameter in mapzones function to allow running it without change feature table values
 - Enhance dscenario_id value domain for dscenario relations by using qgis table
+- Use hemisphere change to rotate node 180º
