@@ -135,9 +135,9 @@ FROM v_om_waterbalance_efficiency n WHERE n.dma IS NOT NULL',
 filterparam = '[
 {"columnname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,"dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER by name","isNullValue":"true"},
 {"columnname":"dma", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":2, "dvquerytext":"Select name as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0 ORDER BY name","isNullValue":"true"},
-{"columnname":"crm_startdate", "label":"From Date:", "widgettype":"combo","datatype":"text","layoutorder":3,
+{"columnname":"crm_startdate", "label":"From Date", "widgettype":"combo","datatype":"text","layoutorder":3,
 "dvquerytext":"Select start_date::date as id, start_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date","isNullValue":"false", "filterSign":">=", "showOnTableModel":{"status":true, "position":3}},
-{"columnname":"crm_enddate", "label":"To Date:", "widgettype":"combo","datatype":"text","layoutorder":4,
+{"columnname":"crm_enddate", "label":"To Date", "widgettype":"combo","datatype":"text","layoutorder":4,
 "dvquerytext":"Select end_date::date as id, end_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY end_date desc","isNullValue":"false", "filterSign":"<=",  "showOnTableModel":{"status":true, "position":4}}]',
 addparam = '{"orderBy":"1", "orderType":"DESC", "queryAdd":"GROUP BY n.exploitation, n.dma"}'
 WHERE id =  104;
@@ -150,9 +150,9 @@ sum(auth) as "Authorized", sum(loss) as "Losses", (sum(auth)/sum(n.total))::nume
 FROM v_om_waterbalance_efficiency n  WHERE n.dma IS NOT NULL',
 filterparam = '[
 {"columnname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1, "dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER by name","isNullValue":"true"}, 
-{"columnname":"crm_startdate", "label":"From Date:", "widgettype":"combo","datatype":"text","layoutorder":2,
+{"columnname":"crm_startdate", "label":"From Date", "widgettype":"combo","datatype":"text","layoutorder":2,
 "dvquerytext":"Select start_date::date as id, start_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date desc","isNullValue":"false", "filterSign":">=", "showOnTableModel":{"status":true, "position":2}},
-{"columnname":"crm_enddate", "label":"To Date:", "widgettype":"combo","datatype":"text","layoutorder":3,
+{"columnname":"crm_enddate", "label":"To Date", "widgettype":"combo","datatype":"text","layoutorder":3,
 "dvquerytext":"Select end_date::date as id, end_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY end_date desc","isNullValue":"false", "filterSign":"<=", "showOnTableModel":{"status":true, "position":3}}]',
 addparam = '{"orderBy":"1", "orderType":"DESC", "queryAdd":"GROUP BY n.exploitation"}'
 WHERE id =  103;
