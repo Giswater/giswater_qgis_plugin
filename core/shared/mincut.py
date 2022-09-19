@@ -335,34 +335,17 @@ class GwMincut:
         body = tools_gw.create_body()
         json_result = tools_gw.execute_procedure("gw_fct_getmincut_ff", body)
         fields = json_result['body']['data']['fields']
-
-        layouts = {}
         for field in fields:
-            lyt = field['layoutname']
-            if lyt not in layouts:
-                layouts[lyt] = [field]
-            else:
-                layouts[lyt].append(field)
+            tools_gw.check_parameters(field)
+            label = tools_gw.add_label(field)
+            if 'value' not in field:
+                value = tools_gw.get_config_parser('dlg_mincut', field['columnname'], 'user', 'session')
+                field['value'] = value if value is not None else False
+            elif type(field['value']) == int:
+                field['value'] = str(field['value'])
+            widget = self._create_widget(field)
+            tools_gw.add_widget(self.dlg_mincut, field, label, widget, ['lyt_top_1'])
 
-        for l in layouts.keys():
-            layout = self.dlg_mincut.findChild(QGridLayout, l)
-
-            fields = layouts[l]
-            fields.sort(key=lambda x: x['layoutorder'])
-            cur_position = 0
-            for field in fields:
-                if 'label' in field and field['label']:
-                    label = QLabel()
-                    label.setObjectName('lbl_' + field['columnname'])
-                    label.setText(field['label'])
-                    layout.addWidget(label, 0, cur_position)
-                    cur_position += 1
-                if 'value' not in field:
-                    value = tools_gw.get_config_parser('dlg_mincut', field['columnname'], 'user', 'session')
-                    field['value'] = value if value is not None else False
-                widget = self._create_widget(field)
-                layout.addWidget(widget, 0, cur_position)
-                cur_position += 1
 
 
         # self.search = GwSearch()
@@ -464,19 +447,12 @@ class GwMincut:
         # self._load_widgets_values()
 
     def _create_widget(self, field):
-        widget = None
+        create = {
+            'text': tools_gw.add_lineedit,
+            'check': tools_gw.add_checkbox
+        }
         wt = field['widgettype']
-        if wt == 'text':
-            field['value'] = str(field['value'])
-            widget = tools_gw.add_lineedit(field)
-            widget = tools_gw.set_widget_size(widget, field)
-            widget = tools_gw.set_data_type(field, widget)
-        elif wt == 'check':
-            widget = QCheckBox()
-            if field['value'] is not None:
-                widget.setChecked(field['value'])
-            else:
-                widget.setChecked(False)
+        widget = create[wt](field)
         return widget
 
 
