@@ -65,6 +65,7 @@ class GwInfo(QObject):
         self.snapper_manager = GwSnapManager(self.iface)
         self.snapper_manager.set_snapping_layers()
         self.suppres_form = None
+        self.prev_action = None
 
 
     def get_info_from_coordinates(self, point, tab_type):
@@ -259,7 +260,7 @@ class GwInfo(QObject):
             return
 
 
-    def add_feature(self, feature_cat):
+    def add_feature(self, feature_cat, action=None):
         """ Button 01, 02: Add 'node' or 'arc' """
 
         global is_inserting
@@ -268,6 +269,11 @@ class GwInfo(QObject):
             tools_qgis.show_message(msg)
             return
 
+        self.prev_action = action
+        keep_active = tools_gw.get_config_parser('user_edit_tricks', 'keep_maptool_active', "user", "init")
+        keep_active = tools_os.set_boolean(keep_active, False)
+        if not keep_active:
+            self.prev_action = None
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
 
@@ -513,6 +519,7 @@ class GwInfo(QObject):
             dlg_cf.dlg_closed.connect(self._remove_layer_selection)
             dlg_cf.dlg_closed.connect(partial(tools_gw.save_settings, dlg_cf))
             dlg_cf.dlg_closed.connect(self._reset_my_json)
+            dlg_cf.dlg_closed.connect(self._manage_prev_action)
             dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
             btn_cancel.clicked.connect(partial(self._manage_info_close, dlg_cf))
         btn_accept.clicked.connect(
@@ -682,8 +689,9 @@ class GwInfo(QObject):
         dlg_cf = self.dlg_cf
         layer = self.layer
         fid = self.feature_id
+        can_edit = tools_os.set_boolean(tools_db.check_role_user('role_edit'))
         if layer:
-            if layer.isEditable():
+            if layer.isEditable() and can_edit:
                 tools_gw.enable_all(dlg_cf, complet_result['body']['data'])
             else:
                 tools_gw.enable_widgets(dlg_cf, complet_result['body']['data'], False)
@@ -695,9 +703,9 @@ class GwInfo(QObject):
         self.fct_stop_editing = lambda: self._stop_editing(dlg_cf, self.action_edit, layer, fid, self.my_json, new_feature)
         self._connect_signals()
 
-        self._enable_actions(dlg_cf, layer.isEditable())
+        self._enable_actions(dlg_cf, layer.isEditable() and can_edit)
 
-        self.action_edit.setChecked(layer.isEditable())
+        self.action_edit.setChecked(layer.isEditable() and can_edit)
         child_type = complet_result['body']['feature']['childType']
 
         # Actions signals
@@ -729,6 +737,11 @@ class GwInfo(QObject):
         self.action_help.triggered.connect(partial(self._open_help, self.feature_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
         self.action_interpolate.triggered.connect(partial(self._activate_snapping, complet_result, self.ep))
+
+        # Disable action edit if user can't edit
+        if not can_edit:
+            self.action_edit.setChecked(False)
+            self.action_edit.setEnabled(False)
 
         return dlg_cf, fid
 
@@ -1121,6 +1134,9 @@ class GwInfo(QObject):
             tools_qt.set_widget_text(dialog, "data_hemisphere", str(row[0]))
             message = "Hemisphere of the node has been updated. Value is"
             tools_qgis.show_info(message, parameter=str(row[0]))
+            # Force a map refresh
+            tools_qgis.refresh_map_canvas()  # First refresh all the layers
+            global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
 
         # Disable Rotation
         action_widget = dialog.findChild(QAction, "actionRotation")
@@ -1963,6 +1979,11 @@ class GwInfo(QObject):
             return None
 
         return True
+
+
+    def _manage_prev_action(self):
+        if self.prev_action:
+            self.prev_action.action.trigger()
 
 
     def _enable_actions(self, dialog, enabled):
@@ -4304,6 +4325,7 @@ class GwInfo(QObject):
         is_inserting = True
 
         self.info_feature = GwInfo('data')
+        self.info_feature.prev_action = self.prev_action
         result, dialog = self.info_feature._get_feature_insert(point=list_points, feature_cat=self.feature_cat,
                                                                new_feature_id=feature_id, new_feature=feature,
                                                                layer_new_feature=self.info_layer, tab_type='data')

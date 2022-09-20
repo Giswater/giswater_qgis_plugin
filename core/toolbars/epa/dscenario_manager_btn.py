@@ -32,20 +32,21 @@ class GwDscenarioManagerButton(GwAction):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.feature_type = 'node'
         self.feature_types = ['node_id', 'arc_id', 'feature_id', 'connec_id', 'nodarc_id', 'rg_id', 'poll_id', 'sector_id', 'lidco_id']
-        self.filter_dict = {"inp_dscenario_conduit": {"filter_table": "inp_conduit", "feature_type": "arc"},
-                            "inp_dscenario_raingage": {"filter_table": "inp_dscenario_raingage", "feature_type": "rg"},
-                            "inp_dscenario_junction": {"filter_table": "inp_junction", "feature_type": "node"},
-                            "inp_dscenario_lid_usage": {"filter_table": "inp_dscenario_lid_usage","feature_type": "lidco"},
-                            "inp_dscenario_controls": {"filter_table": "inp_dscenario_controls","feature_type": "sector"},
-                            "inp_dscenario_outfall": {"filter_table": "inp_outfall", "feature_type": "node"},
-                            "inp_dscenario_storage": {"filter_table": "inp_storage", "feature_type": "node"},
-                            "inp_dscenario_inflows": {"filter_table": "inp_inflows", "feature_type": "node"},
-                            "inp_dscenario_treatment": {"filter_table": "inp_treatment", "feature_type": "node"},
-                            "inp_dscenario_flwreg_pump": {"filter_table": "inp_pump", "feature_type": "arc"},
-                            "inp_dscenario_flwreg_weir": {"filter_table": "inp_weir", "feature_type": "arc"},
-                            "inp_dscenario_flwreg_orifice": {"filter_table": "inp_orifice", "feature_type": "arc"},
-                            "inp_dscenario_flwreg_outlet": {"filter_table": "inp_outlet", "feature_type": "arc"},
-                            "inp_dscenario_inflows_poll": {"filter_table": "inp_pollutant", "feature_type": "poll"}}
+        self.filter_dict = {"inp_dscenario_conduit": {"filter_table": "v_edit_inp_conduit", "feature_type": "arc"},
+                            "inp_dscenario_raingage": {"filter_table": "v_edit_inp_dscenario_raingage", "feature_type": "rg"},
+                            "inp_dscenario_junction": {"filter_table": "v_edit_inp_junction", "feature_type": "node"},
+                            "inp_dscenario_lid_usage": {"filter_table": "v_edit_inp_dscenario_lid_usage", "feature_type": "lidco"},
+                            "inp_dscenario_controls": {"filter_table": "v_edit_inp_dscenario_controls", "feature_type": "sector"},
+                            "inp_dscenario_outfall": {"filter_table": "v_edit_inp_outfall", "feature_type": "node"},
+                            "inp_dscenario_storage": {"filter_table": "v_edit_inp_storage", "feature_type": "node"},
+                            "inp_dscenario_inflows": {"filter_table": "v_edit_inp_inflows", "feature_type": "node"},
+                            "inp_dscenario_treatment": {"filter_table": "v_edit_inp_treatment", "feature_type": "node"},
+                            "inp_dscenario_flwreg_pump": {"filter_table": "v_edit_inp_pump", "feature_type": "arc"},
+                            "inp_dscenario_flwreg_weir": {"filter_table": "v_edit_inp_weir", "feature_type": "arc"},
+                            "inp_dscenario_flwreg_orifice": {"filter_table": "v_edit_inp_orifice", "feature_type": "arc"},
+                            "inp_dscenario_flwreg_outlet": {"filter_table": "v_edit_inp_outlet", "feature_type": "arc"},
+                            "inp_dscenario_inflows_poll": {"filter_table": "v_edit_inp_pollutant", "feature_type": "poll"},
+                            "inp_dscenario_demand": {"filter_table": ["v_edit_node", "v_edit_connec"], "feature_type": ["node", "connec"]}}
         self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
 
 
@@ -352,11 +353,11 @@ class GwDscenarioManagerButton(GwAction):
         index_tab = self.dlg_dscenario.main_tab.currentIndex()
         tab_name = self.dlg_dscenario.main_tab.widget(index_tab).objectName()
 
-        if self.filter_dict[tab_name]:
+        if self.filter_dict.get(tab_name):
             table_name = self.filter_dict[tab_name]['filter_table']
-            self.feature_type = self.filter_dict[tab_name]['feature_type']
-            if table_name != "":
-                tools_gw.set_completer_widget(table_name, self.dlg_dscenario.txt_feature_id, str(self.feature_type) + "_id")
+            feature_type = self.filter_dict[tab_name]['feature_type']
+            tools_gw.set_completer_widget(table_name, self.dlg_dscenario.txt_feature_id, feature_type,
+                                          add_id=True)
 
         # Deactivate btn_snapping functionality
         self._selection_end()

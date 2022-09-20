@@ -26,6 +26,7 @@ from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleS
     QToolButton
 from qgis.core import QgsExpression, QgsProject, QgsLayerTreeLayer
 from qgis.gui import QgsDateTimeEdit
+from qgis.utils import iface
 
 from . import tools_log, tools_os, tools_qgis
 from .. import global_vars
@@ -680,13 +681,13 @@ def add_layer_to_toc(layer, group=None, sub_group=None, create_groups=False, sub
             third_group = tools_qgis.find_toc_group(second_group, sub_sub_group)
             if third_group:
                 third_group.insertLayer(0, layer)
-                global_vars.iface.setActiveLayer(layer)
+                iface.setActiveLayer(layer)
                 return
             second_group.insertLayer(0, layer)
-            global_vars.iface.setActiveLayer(layer)
+            iface.setActiveLayer(layer)
             return
         first_group.insertLayer(0, layer)
-        global_vars.iface.setActiveLayer(layer)
+        iface.setActiveLayer(layer)
         return
 
     root = QgsProject.instance().layerTreeRoot()
@@ -943,7 +944,7 @@ def get_feature_by_id(layer, id, field_id=None):
 def show_details(detail_text, title=None, inf_text=None):
     """ Shows a message box with detail information """
 
-    global_vars.iface.messageBar().clearWidgets()
+    iface.messageBar().clearWidgets()
     msg_box = QMessageBox()
     msg_box.setText(detail_text)
     if title:
@@ -961,12 +962,12 @@ def show_details(detail_text, title=None, inf_text=None):
 def show_warning_open_file(text, inf_text, file_path, context_name=None):
     """ Show warning message with a button to open @file_path """
 
-    widget = global_vars.iface.messageBar().createMessage(tr(text, context_name), tr(inf_text))
+    widget = iface.messageBar().createMessage(tr(text, context_name), tr(inf_text))
     button = QPushButton(widget)
     button.setText(tr("Open file"))
     button.clicked.connect(partial(tools_os.open_file, file_path))
     widget.layout().addWidget(button)
-    global_vars.iface.messageBar().pushWidget(widget, 1)
+    iface.messageBar().pushWidget(widget, 1)
 
 
 def show_question(text, title=None, inf_text=None, context_name=None, parameter=None, force_action=False):
@@ -1312,8 +1313,6 @@ def _translate_form(dialog, context_name, aux_context='ui_message'):
     for widget_type in type_widget_list:
         widget_list = dialog.findChildren(widget_type)
         for widget in widget_list:
-            if type(widget) is QPushButton and widget.property('has_icon'):
-                continue
             _translate_widget(context_name, widget, aux_context)
 
     # Translate title of the form

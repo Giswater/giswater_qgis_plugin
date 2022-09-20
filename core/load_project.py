@@ -8,7 +8,7 @@ or (at your option) any later version.
 import os
 from functools import partial
 
-from qgis.core import QgsProject, Qgis, QgsApplication
+from qgis.core import QgsProject, Qgis, QgsApplication, QgsSnappingUtils
 from qgis.gui import QgsFieldExpressionWidget
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QLabel, QApplication, QTableView, QDialog, QComboBox
@@ -159,6 +159,9 @@ class GwLoadProject(QObject):
         tools_gw.connect_signal(QgsProject.instance().crsChanged, tools_gw.set_epsg,
                                 'load_project', 'project_read_crsChanged_set_epsg')
         global_vars.project_loaded = True
+
+        # Set indexing strategy for snapping so that it uses less memory if possible
+        self.iface.mapCanvas().snappingUtils().setIndexingStrategy(QgsSnappingUtils.IndexHybrid)
 
         # Manage versions of Giswater and PostgreSQL
         plugin_version = tools_qgis.get_plugin_metadata('version', 0, global_vars.plugin_dir)
@@ -546,7 +549,7 @@ class GwLoadProject(QObject):
             try:
                 variables = result['body'].get('variables')
                 if variables:
-                    guided_map = variables.get('useGuidedMap')
+                    guided_map = variables.get('useGuideMap')
                     if guided_map:
                         tools_log.log_info("manage_guided_map")
                         self._manage_guided_map()

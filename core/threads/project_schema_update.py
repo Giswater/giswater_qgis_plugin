@@ -67,6 +67,9 @@ class GwUpdateSchemaTask(GwTask):
             self.timer.stop()
 
         if self.status:
+            # Show message
+            status = (self.admin.error_count == 0)
+            self.admin._manage_result_message(status, parameter="Update project")
             # Set info project
             self.admin._set_info_project()
             if 'body' in self.status:
