@@ -22,3 +22,7 @@ CREATE TABLE ext_rtc_scada_x_data(
   data_type text,
   CONSTRAINT ext_rtc_scada_x_data_pkey PRIMARY KEY (node_id, value_date)
 );
+
+
+DROP VIEW IF EXISTS vi_transects;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"inp_transects_value", "column":"text", "dataType":"text"}}$$);
