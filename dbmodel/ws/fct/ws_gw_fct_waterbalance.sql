@@ -45,7 +45,7 @@ v_result_point json;
 v_result_line json;
 v_version text;
 v_error_context text;
-v_count integer;
+v_count integer = 0;
 v_executegraphdma boolean;
 v_updatemapzone integer;
 v_paramupdate double precision;
@@ -73,6 +73,8 @@ v_ili double precision = 0;
 v_uarl double precision = 0;
 v_carl double precision = 0;
 
+v_setmawithperiodmeters boolean = false;
+
 BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
@@ -87,24 +89,39 @@ BEGIN
 	v_executegraphdma := ((p_data ->>'data')::json->>'parameters')::json->>'executeGraphDma';
 	v_method := ((p_data ->>'data')::json->>'parameters')::json->>'method';
 
-	IF v_executegraphdma THEN
-
-		v_updatemapzone = (SELECT (value::json->>'DMA')::json->>'updateMapZone' FROM config_param_system WHERE parameter  = 'utils_graphanalytics_vdefault');
-		v_paramupdate = (SELECT (value::json->>'DMA')::json->>'geomParamUpdate' FROM config_param_system WHERE parameter  = 'utils_graphanalytics_vdefault');
-			
-		v_data =  concat ('{"data":{"parameters":{"graphClass":"DMA", "exploitation": [',v_expl,'], "commitChanges":"TRUE", "updateMapZone":',v_updatemapzone,
-		', "geomParamUpdate":',v_paramupdate,'}}}');
-		
-		PERFORM gw_fct_graphanalytics_mapzones(v_data);
-		
-	END IF;
-
 	-- Reset values
 	DELETE FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid = v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid;	
 	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('WATER BALANCE BY EXPLOITATION AND PERIOD'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
+
+
+	IF v_executegraphdma THEN
+
+		IF v_setmawithperiodmeters THEN 
+
+			UPDATE dma SET active = false, the_geom = null WHERE expl_id = v_expl;
+			
+			UPDATE dma SET active = true FROM 
+			(SELECT * FROM 
+			(SELECT dma_id, (json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent'  as node_id FROM dma) b JOIN 
+			(SELECT DISTINCT (node_id) FROM ext_cat_period, ext_rtc_scada_x_data JOIN node USING (node_id) WHERE  
+			node.expl_id = v_expl AND start_date < value_date AND end_date > value_date) a USING (node_id))c
+			WHERE dma.dma_id = c.dma_id;
+			
+		END IF;
+		
+		v_updatemapzone = (SELECT (value::json->>'DMA')::json->>'updateMapZone' FROM config_param_system WHERE 
+		parameter  = 'utils_graphanalytics_vdefault');
+		v_paramupdate = (SELECT (value::json->>'DMA')::json->>'geomParamUpdate' FROM config_param_system WHERE 
+		parameter  = 'utils_graphanalytics_vdefault');
+			
+		v_data =  concat ('{"data":{"parameters":{"graphClass":"DMA", "exploitation": [',v_expl,'], "updateMapZone":',v_updatemapzone,
+		', "geomParamUpdate":',v_paramupdate,', "updateFeature":true}}}');
+
+		PERFORM gw_fct_graphanalytics_mapzones(v_data);
+	END IF;
 
 	IF v_allperiods IS TRUE THEN
 		v_querytext ='SELECT id FROM ext_cat_period order by start_date asc';
@@ -150,7 +167,7 @@ BEGIN
 			UPDATE om_waterbalance n SET total_out = total_in - total_sys_input
 			WHERE cat_period_id = v_period;
 
-			GET DIAGNOSTICS v_count = row_count;
+ 			SELECT count(*) INTO v_count FROM om_waterbalance WHERE cat_period_id = v_period AND expl_id = v_expl;
 
 			-- auth_bill_met_hydro
 			UPDATE om_waterbalance n SET auth_bill_met_hydro = value::numeric(12,2) FROM (SELECT dma_id, cat_period_id, (sum(sum))::numeric(12,2) as value
@@ -198,7 +215,6 @@ BEGIN
 
 				UPDATE om_waterbalance SET total_sys_input = v_total_input, total_in = v_total_inlet, total_out = v_total_out,
 							auth_bill_met_hydro = v_total_hydro::numeric(12,2), startdate = v_startdate, enddate = v_enddate WHERE cat_period_id = v_period AND dma_id = v_dma;
-
 			END LOOP;
 			
 		END IF;
@@ -245,20 +261,11 @@ BEGIN
 
 
 	IF v_executegraphdma THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('-------------------------------------'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('INFO: graphanalylitcs mapzones for DMA have been triggered'));
-		DELETE FROM audit_check_data WHERE fid = 145 AND cur_user = current_user AND error_message ='INFO';
-		DELETE FROM audit_check_data WHERE fid = 145 AND cur_user = current_user AND error_message LIKE '---%';
-	
+
 		-- info
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT * FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid 
-			UNION
-		     SELECT id+1000 as id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=145 AND criticity = 1)a
-			order by  id asc) row;
-			
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid IN (441, 145) order by criticity desc, id asc) row;
+
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
