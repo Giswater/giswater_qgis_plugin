@@ -53,9 +53,9 @@ BEGIN
 			ON CONFLICT (pattern_id) DO NOTHING;
 		END IF;
 			
-		INSERT INTO dma (dma_id, name, descript,  the_geom, undelete, expl_id, pattern_id, link, minc, maxc, effc, graphconfig, stylesheet, active)
+		INSERT INTO dma (dma_id, name, descript,  the_geom, undelete, expl_id, pattern_id, link, minc, maxc, effc, graphconfig, stylesheet, active, avg_press)
 		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete, NEW.expl_id, NEW.pattern_id, NEW.link, NEW.minc, 
-		NEW.maxc, NEW.effc, NEW.graphconfig::json, NEW.stylesheet::json, NEW.active);
+		NEW.maxc, NEW.effc, NEW.graphconfig::json, NEW.stylesheet::json, NEW.active, NEW.avg_press);
 
 		RETURN NEW;
 		
@@ -64,7 +64,7 @@ BEGIN
 		UPDATE dma 
 		SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete, expl_id=NEW.expl_id, 
 		pattern_id=NEW.pattern_id, link=NEW.link, minc=NEW.minc, maxc=NEW.maxc, effc=NEW.effc, graphconfig=NEW.graphconfig::json, 
-		stylesheet = NEW.stylesheet::json, active=NEW.active
+		stylesheet = NEW.stylesheet::json, active=NEW.active, avg_press=NEW.avg_press
 		WHERE dma_id=OLD.dma_id;
 		
 		RETURN NEW;
