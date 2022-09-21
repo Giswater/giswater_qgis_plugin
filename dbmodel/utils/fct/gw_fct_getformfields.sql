@@ -244,7 +244,7 @@ BEGIN
 		ELSE
 			--removing the not used keys
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
-			'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
+			'queryText', 'orderById', 'parentId', 'queryTextFilter');
 		END IF;
 
 	END LOOP;
