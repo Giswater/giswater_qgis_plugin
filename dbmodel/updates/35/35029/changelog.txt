@@ -2,3 +2,4 @@
 *************
 - Add field avg_pressure on views v_edit_dma, v_rpt_node, v_rpt_comp_node
 - New function (3172) on toolbox - Check nodes T candidates to detect nodes with wrong topology
+- Filter dscenario selector with selected exploitation by user
