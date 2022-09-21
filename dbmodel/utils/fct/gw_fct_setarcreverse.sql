@@ -81,6 +81,11 @@ BEGIN
 				EXECUTE 'UPDATE arc SET inverted_slope = true WHERE sys_elev1 < sys_elev2 AND arc_id IN ' ||v_array;
 				EXECUTE 'UPDATE arc SET inverted_slope = false WHERE sys_elev1 >= sys_elev2 AND arc_id IN ' ||v_array;
 			END IF;
+
+			SELECT count(*) INTO v_count FROM anl_arc WHERE fid=357 AND cur_user=current_user;
+			INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat ('Direction of ',v_count,' arcs has been changed.'));
+
+			INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat ('Reversed arcs:',v_array));
 		END IF;
 	ELSE 
 		INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat ('Selection mode ''Whole selection'' is not enabled in this function'));
