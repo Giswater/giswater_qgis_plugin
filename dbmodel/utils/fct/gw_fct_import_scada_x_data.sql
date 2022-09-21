@@ -30,6 +30,7 @@ v_project_type text;
 v_version text;
 v_fid integer = 469;
 i integer = 0;
+v_count integer;
 
 BEGIN
 
@@ -52,11 +53,14 @@ BEGIN
 		(v_addfields.csv1, v_addfields.csv2::date, v_addfields.csv3::float, v_addfields.csv4::integer, v_addfields.csv5::integer, v_addfields.csv6);			
 	END LOOP;
 
+	SELECT DISTINCT csv1 INTO v_count FROM temp_csv WHERE cur_user=current_user AND fid = v_fid;
+
 	-- manage log (fid: v_fid)
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Reading values from temp_csv table -> Done'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Inserting values on ext_rtc_scada_x_data table -> Done'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Deleting values from temp_csv -> Done'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Process finished with ',i, ' rows inserted.'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Data for ',v_count, ' nodes has been imported.'));
 
 	-- get log (fid: v_fid)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
