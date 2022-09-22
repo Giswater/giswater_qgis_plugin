@@ -154,7 +154,7 @@ BEGIN
 
 			EXECUTE 'ALTER TABLE node ADD CONSTRAINT "node_district_id_fkey" FOREIGN KEY ("district_id") 
 			REFERENCES '|| ext_utils_schema_aux||'."district" ("district_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
-			
+
 
 			EXECUTE 'ALTER TABLE arc ADD CONSTRAINT "arc_muni_id_fkey" FOREIGN KEY ("muni_id") 
 			REFERENCES '|| ext_utils_schema_aux||'."municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
@@ -194,6 +194,7 @@ BEGIN
 			EXECUTE 'ALTER TABLE samplepoint ADD CONSTRAINT "samplepoint_district_id_fkey" FOREIGN KEY ("district_id") 
 			REFERENCES '|| ext_utils_schema_aux||'."district" ("district_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		
+
 		IF project_type_aux='UD' THEN
 
 
@@ -213,9 +214,15 @@ BEGIN
 
 			EXECUTE 'ALTER TABLE gully ADD CONSTRAINT "gully_district_id_fkey" FOREIGN KEY ("district_id") 
 			REFERENCES '|| ext_utils_schema_aux||'."district" ("district_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+
+		ELSIF project_type_aux='WS' THEN
+			ALTER TABLE om_streetaxis DROP CONSTRAINT IF EXISTS "om_streetaxis_muni_id_fkey"; 
+
+			EXECUTE 'ALTER TABLE IF EXISTS om_streetaxis ADD CONSTRAINT "om_streetaxis_muni_id_fkey" FOREIGN KEY ("muni_id") 
+			REFERENCES '|| ext_utils_schema_aux||'."municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 			
 		END IF;
-
+		
 		--DROP NOT NULL ON UTILS
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.municipality ALTER COLUMN name DROP NOT NULL;';
 
@@ -264,6 +271,10 @@ BEGIN
 		(ws_expl_id IS NOT NULL AND ud_expl_id IS NULL OR ws_expl_id IS NULL AND ud_expl_id IS NOT NULL OR 
 		ws_expl_id IS NOT NULL AND ud_expl_id IS NOT NULL  );';
 
+		--RECREATE TRIGGER
+		EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem_insert ON '|| ext_utils_schema_aux||'.raster_dem;';
+		EXECUTE 'CREATE TRIGGER gw_trg_manage_raster_dem_insert BEFORE
+		INSERT ON '|| ext_utils_schema_aux||'.raster_dem FOR EACH ROW EXECUTE PROCEDURE '|| ext_utils_schema_aux||'.gw_trg_manage_raster_dem();';
 	ELSE
 
 
@@ -370,6 +381,10 @@ BEGIN
 			REFERENCES "ext_streetaxis" ("muni_id","id") ON DELETE RESTRICT ON UPDATE CASCADE;
 			ALTER TABLE "gully" ADD CONSTRAINT "gully_district_id_fkey" FOREIGN KEY ("district_id") 
 			REFERENCES "ext_district" ("district_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+		ELSIF project_type_aux='WS' THEN
+			ALTER TABLE om_streetaxis DROP CONSTRAINT IF EXISTS "om_streetaxis_muni_id_fkey"; 
+			ALTER TABLE "om_streetaxis" ADD CONSTRAINT "om_streetaxis_muni_id_fkey" FOREIGN KEY ("muni_id") 
+			REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 		END IF;
 
 
@@ -408,6 +423,11 @@ BEGIN
 		ALTER TABLE ext_plot ALTER COLUMN streetaxis_id SET NOT NULL;
 
 		ALTER TABLE ext_district ALTER COLUMN muni_id SET NOT NULL;
+
+		--RECREATE TRIGGER
+		DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem_insert ON ext_raster_dem;
+		CREATE TRIGGER gw_trg_manage_raster_dem_insert BEFORE
+		INSERT ON ext_raster_dem FOR EACH ROW EXECUTE PROCEDURE gw_trg_manage_raster_dem();
 	END IF;
 
 	return;

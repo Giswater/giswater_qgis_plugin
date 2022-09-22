@@ -9,11 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/08/04
 
-DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem_insert ON ext_raster_dem;
-CREATE TRIGGER gw_trg_manage_raster_dem_insert BEFORE
-INSERT ON ext_raster_dem FOR EACH ROW EXECUTE PROCEDURE gw_trg_manage_raster_dem();
-
-
 DROP TRIGGER IF EXISTS gw_trg_edit_pol_node ON ve_pol_node;
 CREATE TRIGGER gw_trg_edit_pol_node
   INSTEAD OF INSERT OR UPDATE OR DELETE
