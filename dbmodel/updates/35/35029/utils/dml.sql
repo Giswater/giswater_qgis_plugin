@@ -29,8 +29,7 @@ INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, activ
 VALUES (3172, 'Check nodes T candidates', '{"featureType":["node"]}',null, null, true) ON CONFLICT (id) DO NOTHING;
 
 UPDATE config_param_system SET value =
-'{"table":"cat_dscenario","selector":"selector_inp_dscenario","table_id":"dscenario_id","selector_id":"dscenario_id","label":"dscenario_id,'' - '', name, '' ('', dscenario_type,'')''","orderBy":"dscenario_id","manageAll":true,"query_filter":" AND dscenario_id > 0 AND active is true AND (expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl where cur_user = current_user))","typeaheadFilter":" 
-AND lower(concat(dscenario_id, '' - '', name,'' ('',  dscenario_type,'')''))","typeaheadForced":true}'
+'{"table":"cat_dscenario","selector":"selector_inp_dscenario","table_id":"dscenario_id","selector_id":"dscenario_id","label":"dscenario_id,'' - '', name, '' ('', dscenario_type,'')''","orderBy":"dscenario_id","manageAll":true,"query_filter":" AND dscenario_id > 0 AND active is true AND expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl where cur_user = current_user)","typeaheadFilter":" AND lower(concat(dscenario_id, '' - '', name,'' ('',  dscenario_type,'')''))","typeaheadForced":true}'
 WHERE parameter = 'basic_selector_tab_dscenario';
 
 UPDATE sys_fprocess SET fprocess_name=replace(fprocess_name,'graf','graph') WHERE fprocess_name ilike '%graf%';
