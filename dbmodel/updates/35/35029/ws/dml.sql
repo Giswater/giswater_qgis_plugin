@@ -32,10 +32,20 @@ UPDATE config_param_system SET value=replace(value,'ignoreGrafanalytics','ignore
 UPDATE config_param_system SET descript=replace(descript,'graf','graph') WHERE descript ilike '%graf%';
 UPDATE config_param_system SET label=replace(label,'graf','graph') WHERE label ilike '%graf%';
 
-UPDATE dma SET descript=replace(label,'graf','graph') WHERE descript ilike '%graf%';
-UPDATE dqa SET descript=replace(label,'graf','graph') WHERE descript ilike '%graf%';
-UPDATE presszone SET descript=replace(label,'graf','graph') WHERE descript ilike '%graf%';
-UPDATE sector SET descript=replace(label,'graf','graph') WHERE descript ilike '%graf%';
+ALTER TABLE dqa DISABLE RULE dqa_conflict;
+ALTER TABLE dma DISABLE RULE dma_conflict;
+ALTER TABLE presszone DISABLE RULE presszone_conflict;
+ALTER TABLE sector DISABLE RULE sector_conflict;
+
+UPDATE dma SET descript=replace(descript,'graf','graph') WHERE descript ilike '%graf%';
+UPDATE dqa SET descript=replace(descript,'graf','graph') WHERE descript ilike '%graf%';
+UPDATE presszone SET link=replace(link,'graf','graph') WHERE link ilike '%graf%' and presszone_id='-1';
+UPDATE sector SET descript=replace(descript,'graf','graph') WHERE descript ilike '%graf%';
+
+ALTER TABLE dqa ENABLE RULE dqa_conflict;
+ALTER TABLE dma ENABLE RULE dma_conflict;
+ALTER TABLE presszone ENABLE RULE presszone_conflict;
+ALTER TABLE sector ENABLE RULE sector_conflict;
 
 UPDATE sys_function SET descript=replace(descript,'graf','graph') WHERE descript ilike '%graf%';
 
