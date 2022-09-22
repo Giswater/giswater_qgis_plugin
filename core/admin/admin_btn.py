@@ -56,6 +56,7 @@ class GwAdminButton:
         self.plugin_version, self.message = tools_qgis.get_plugin_version()
         self.canvas = global_vars.canvas
         self.project_type = None
+        self.project_epsg = None
         self.dlg_readsql = None
         self.dlg_info = None
         self.dlg_readsql_create_project = None
@@ -1791,7 +1792,11 @@ class GwAdminButton:
             schema_name = schema_name.replace('"', '')
         else:
             schema_name = self.schema.replace('"', '')
-        self.project_epsg = str(self.project_epsg).replace('"', '')
+        if self.project_epsg:
+            self.project_epsg = str(self.project_epsg).replace('"', '')
+        else:
+            msg = "There is no project selected or it is not valid. Please check the first tab..."
+            tools_qgis.show_warning(msg)
 
         # Manage folders 'i18n'
         manage_i18n = i18n
