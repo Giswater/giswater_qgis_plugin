@@ -33,32 +33,11 @@ UPDATE config_param_system SET value =
 AND lower(concat(dscenario_id, '' - '', name,'' ('',  dscenario_type,'')''))","typeaheadForced":true}'
 WHERE parameter = 'basic_selector_tab_dscenario';
 
-UPDATE sys_fprocess SET fprocess_name=replace(fprocess_name,'graf','graph') WHERE fprocess_name ilike '%graf%';
-UPDATE sys_fprocess SET fprocess_name=replace(fprocess_name,'Graf','Graph') WHERE fprocess_name ilike '%Graf%';
+ALTER TABLE temp_anlgraph RENAME CONSTRAINT temp_anlgraf_pkey TO temp_anlgraph_pkey;
+ALTER TABLE temp_anlgraph RENAME CONSTRAINT temp_anlgraf_unique TO temp_anlgraph_unique;
 
-UPDATE sys_function SET descript=replace(descript,'graf','graph') WHERE descript ilike '%graf%';
-UPDATE sys_function SET descript=replace(descript,'Graf','Graph') WHERE descript ilike '%Graf%';
-UPDATE sys_table SET id=replace(id, 'graf','graph') WHERE id ilike '%graf%';
-UPDATE sys_table SET descript=replace(descript, 'graf','graph') WHERE descript ilike '%graf%';
-UPDATE config_form_fields SET columnname=replace(columnname, 'graf','graph') WHERE columnname ilike '%graf%';
-UPDATE config_form_fields SET label=replace(label, 'graf','graph') WHERE label ilike '%graf%';
-UPDATE config_function SET function_name=replace(function_name, 'graf','graph') WHERE function_name ilike '%graf%';
-UPDATE config_form_fields SET columnname=replace(columnname, 'graf','graph') WHERE columnname ilike '%graf%';
-UPDATE config_form_fields SET label=replace(label, 'graf','graph') WHERE label ilike '%graf%';
-UPDATE config_form_fields SET label=replace(label, 'Graf','Graph') WHERE label ilike '%Graf%';
-UPDATE config_form_fields SET dv_querytext=replace(dv_querytext, 'graf','graph') WHERE dv_querytext ilike '%graf%';
+ALTER SEQUENCE temp_anlgraf_id_seq RENAME TO temp_anlgraph_id_seq;
 
-UPDATE config_param_system SET parameter='utils_graphanalytics_lrs_graph' WHERE parameter = 'utils_grafanalytics_lrs_graf';
-
-UPDATE config_param_system SET value=replace(value,'ignoreGrafanalytics','ignoreGraphanalytics') WHERE parameter = 'admin_checkproject';
-UPDATE config_param_system SET descript=replace(descript,'graf','graph') WHERE descript ilike '%graf%';
-UPDATE config_param_system SET label=replace(label,'graf','graph') WHERE label ilike '%graf%';
-UPDATE config_param_system SET parameter=replace(label,'graf','graph') WHERE parameter ilike '%graf%';
-
-UPDATE sys_message SET error_message=replace(error_message,'graf','graph') WHERE error_message ilike '%graf%';
-
-UPDATE sys_param_user SET descript=replace(descript,'graf','graph') WHERE descript ilike '%graf%';
-
-UPDATE edit_typevalue SET typevalue=replace(typevalue, 'graf','graph') WHERE typevalue = 'grafdelimiter_type';
-
-UPDATE config_param_system SET parameter='utils_graphanalytics_lrs_feature' WHERE parameter='Grafanalytics LRS config feature:'
+ALTER INDEX IF EXISTS temp_anlgraf_arc_id RENAME TO temp_anlgraph_arc_id;
+ALTER INDEX IF EXISTS temp_anlgraf_node_1 RENAME TO temp_anlgraph_node_1;
+ALTER INDEX IF EXISTS temp_anlgraf_node_2 RENAME TO temp_anlgraph_node_2;
