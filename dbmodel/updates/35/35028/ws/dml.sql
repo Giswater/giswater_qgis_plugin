@@ -169,5 +169,15 @@ WHERE id = 3142;
 DELETE FROM sys_table WHERE id = 'v_om_waterbalance_nrw';
 UPDATE sys_table SET id = 'v_om_waterbalance_efficiency' WHERE id = 'v_om_waterbalance_loss';
 
+UPDATE sys_table SET id=replace(id, 'graf','graph') WHERE id ilike '%graf%';
+UPDATE config_form_fields SET columnname=replace(columnname, 'graf','graph') WHERE columnname ilike '%graf%';
+UPDATE config_form_fields SET label=replace(label, 'graf','graph') WHERE label ilike '%graf%';
+UPDATE config_function SET function_name=replace(function_name, 'graf','graph') WHERE function_name ilike '%graf%';
+UPDATE config_form_fields SET columnname=replace(columnname, 'graf','graph') WHERE columnname ilike '%graf%';
+UPDATE config_function SET function_name=replace(function_name, 'graf','graph') WHERE columnname ilike '%graf%';
+UPDATE config_form_fields SET label=replace(label, 'graf','graph') WHERE label ilike '%graf%';
+UPDATE config_form_fields SET label=replace(label, 'Graf','Graph') WHERE label ilike '%Graf%';
+UPDATE config_form_fields SET dv_querytext=replace(dv_querytext, 'graf','graph') WHERE label ilike '%graf%';
 
+UPDATE edit_typevalue SET typevalue=replace(typevalue, 'graf','graph') WHERE typevalue = 'grafdelimiter_type';
 
