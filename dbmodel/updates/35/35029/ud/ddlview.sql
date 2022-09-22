@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/09/21
-
+DROP VIEW IF EXISTS v_anl_grafanalytics_upstream;
 CREATE OR REPLACE VIEW v_anl_graphanalytics_upstream AS
  SELECT temp_anlgraph.arc_id,
     temp_anlgraph.node_1,

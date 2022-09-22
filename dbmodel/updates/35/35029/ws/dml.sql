@@ -11,7 +11,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname,  datatype, widgettype, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate,  dv_querytext,  dv_isnullvalue, hidden)
 VALUES ('v_edit_dma', 'form_feature', 'data', 'avg_press', 'numeric', 'text', 'average pressure', null,
-null, false, false, true, false, null,null, false);
+null, false, false, true, false, null,null, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 ALTER TABLE dqa DISABLE RULE dqa_conflict;
 ALTER TABLE dma DISABLE RULE dma_conflict;

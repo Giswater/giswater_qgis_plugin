@@ -23,10 +23,10 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO config_function(id, function_name, style, layermanager, actions)
 VALUES (3172,'gw_fct_anl_node_tcandidate', '{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
 "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
-"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', null, null);
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', null, null) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
-VALUES (3172, 'Check nodes T candidates', '{"featureType":["node"]}',null, null, true);
+VALUES (3172, 'Check nodes T candidates', '{"featureType":["node"]}',null, null, true) ON CONFLICT (id) DO NOTHING;
 
 UPDATE config_param_system SET value =
 '{"table":"cat_dscenario","selector":"selector_inp_dscenario","table_id":"dscenario_id","selector_id":"dscenario_id","label":"dscenario_id,'' - '', name, '' ('', dscenario_type,'')''","orderBy":"dscenario_id","manageAll":true,"query_filter":" AND dscenario_id > 0 AND active is true AND (expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl where cur_user = current_user))","typeaheadFilter":" 
