@@ -93,6 +93,23 @@ BEGIN
 
 			v_level = 2;
 			v_status = 'Failed';
+		
+        -- log_level Accepted just to show message when fct is called from another function
+		ELSIF rec_cat_error.log_level = 0 THEN
+
+			SELECT  rec_cat_error.error_message  INTO v_return_text
+			FROM sys_function WHERE sys_function.id=v_function_id;
+
+			v_level = 3;
+			v_status = 'Accepted';
+		
+			SELECT jsonb_build_object
+			('level', v_level,
+			'status', v_status,
+			'message', v_return_text,
+			'text', v_return_text) INTO v_result_info;
+		
+			RETURN v_result_info::json;
 
 		END IF;
 
