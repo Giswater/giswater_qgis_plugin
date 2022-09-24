@@ -197,6 +197,12 @@ BEGIN
 
 	v_message = '{"level": 3, "text": "Feature have been succesfully updated."}';
 
+	-- trigger automatic mapzones
+	IF v_projecttype = 'WS' AND v_closedstatus IS NOT NULL AND v_afterinsert IS NOT TRUE THEN
+
+		EXECUTE 'SELECT gw_fct_setmapzonestrigger($$'||p_data||'$$)' INTO v_message;
+		
+	END IF;
 	
 	-- Control NULL's
 	v_version := COALESCE(v_version, '[]');
