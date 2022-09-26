@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Go2Epa - options</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
@@ -113,6 +113,76 @@
       <attribute name="title">
        <string>Rpt</string>
       </attribute>
+      <layout class="QGridLayout" name="gridLayout_7">
+       <item row="0" column="0">
+        <widget class="QScrollArea" name="scrollArea_2">
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents_2">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>400</width>
+            <height>335</height>
+           </rect>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_8">
+           <item row="0" column="0">
+            <layout class="QGridLayout" name="gridLayout_5">
+             <item row="1" column="0">
+              <widget class="QGroupBox" name="groupBox">
+               <property name="title">
+                <string>REACTIONS</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_9">
+                <item row="0" column="0">
+                 <layout class="QGridLayout" name="lyt_reactions_1"/>
+                </item>
+                <item row="0" column="1">
+                 <layout class="QGridLayout" name="lyt_reactions_2"/>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QGroupBox" name="groupBox_2">
+               <property name="title">
+                <string>ENERGY</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_15">
+                <item row="0" column="0">
+                 <layout class="QGridLayout" name="lyt_energy_1"/>
+                </item>
+                <item row="0" column="1">
+                 <layout class="QGridLayout" name="lyt_energy_2"/>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QGroupBox" name="grb_reports">
+               <property name="title">
+                <string>REPORTS</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_10">
+                <item row="0" column="1">
+                 <layout class="QGridLayout" name="lyt_reports_2"/>
+                </item>
+                <item row="0" column="0">
+                 <layout class="QGridLayout" name="lyt_reports_1"/>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
