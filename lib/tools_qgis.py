@@ -520,6 +520,13 @@ def refresh_map_canvas(_restore_cursor=False):
         restore_cursor()
 
 
+def force_refresh_map_canvas():
+    """ Refresh all layers & map canvas """
+
+    refresh_map_canvas()  # First refresh all the layers
+    iface.mapCanvas().refresh()  # Then refresh the map view itself
+
+
 def set_cursor_wait():
     """ Change cursor to 'WaitCursor' """
     while get_override_cursor() is not None:
@@ -749,8 +756,7 @@ def remove_layer_from_toc(layer_name, group_name, sub_group=None):
         remove_layer_from_toc(layer_name, group_name)
 
     # Force a map refresh
-    refresh_map_canvas()  # First refresh all the layers
-    iface.mapCanvas().refresh()  # Then refresh the map view itself
+    force_refresh_map_canvas()
 
 
 def clean_layer_group_from_toc(group_name):
