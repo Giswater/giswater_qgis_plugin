@@ -2281,6 +2281,9 @@ class GwInfo(QObject):
         feature_id = complet_result['body']['feature']['id']
         text = tools_qt.get_text(dialog, widget, return_string_null=True)
 
+        if text in (None, 'null'):
+            return
+
         feature = f'"id": "{feature_id}"'
         extras = f'"fields":{{"{widget.property("columnname")}":"{text}"}}'
         body = tools_gw.create_body(feature=feature, extras=extras)
