@@ -522,7 +522,7 @@ BEGIN
 	-- getting provisional visit id if is new visit
 	IF (SELECT id FROM om_visit WHERE id=v_id::int8) IS NULL OR v_id IS NULL THEN
 
-		v_id := (SELECT max(id)+1 FROM om_visit);
+        v_id := (SELECT nextval('om_visit_id_seq'));
 
 		IF v_id IS NULL AND (SELECT count(id) FROM om_visit) = 0 THEN
 			v_id=1;
@@ -1173,7 +1173,7 @@ BEGIN
 	IF p_visittype = 1 AND v_new_visit IS FALSE THEN
 		v_formheader :=concat('EXISTING VISIT - ',v_id);
 	ELSIF p_visittype = 1 AND v_new_visit IS TRUE THEN
-		v_formheader :=concat('NEW VISIT - ',v_id);
+		v_formheader :=concat('NEW VISIT');
 	ELSIF p_visittype = 2 AND v_new_visit IS FALSE THEN
 		v_formheader :=concat('EXISTING INCIDENCY - ',v_id);
 	ELSIF p_visittype = 2 AND v_new_visit IS TRUE THEN
