@@ -1135,8 +1135,7 @@ class GwInfo(QObject):
             message = "Hemisphere of the node has been updated. Value is"
             tools_qgis.show_info(message, parameter=str(row[0]))
             # Force a map refresh
-            tools_qgis.refresh_map_canvas()  # First refresh all the layers
-            global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
+            tools_qgis.force_refresh_map_canvas()
 
         # Disable Rotation
         action_widget = dialog.findChild(QAction, "actionRotation")
@@ -1968,8 +1967,7 @@ class GwInfo(QObject):
             return False
 
         # Force a map refresh
-        tools_qgis.refresh_map_canvas()  # First refresh all the layers
-        global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
+        tools_qgis.force_refresh_map_canvas()
 
         if close_dlg:
             if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():

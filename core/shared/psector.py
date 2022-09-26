@@ -2048,6 +2048,9 @@ class GwPsector:
             cell = row.siblingAtColumn(tools_qt.get_col_index_by_col_name(selected_qtbl, 'arc_id'))
             selected_qtbl.model().setData(cell, self.arc_id)
 
+        # Force a map refresh
+        tools_qgis.force_refresh_map_canvas()
+
 
     def _replace_arc(self):
 
@@ -2156,6 +2159,8 @@ class GwPsector:
         body = tools_gw.create_body(feature=feature, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_setfeaturereplaceplan', body)
 
+        # Force a map refresh
+        tools_qgis.force_refresh_map_canvas()
         # Refresh tableview tbl_psector_x_arc, tbl_psector_x_connec, tbl_psector_x_gully
         self._refresh_tables_relations()
 
@@ -2239,8 +2244,8 @@ class GwPsector:
                 if not result or result['status'] == 'Failed':
                     return
 
-                # Refresh map canvas
-                tools_qgis.refresh_map_canvas()
+                # Force a map refresh
+                tools_qgis.force_refresh_map_canvas()
                 # Refresh tables
                 self._refresh_tables_relations()
 
