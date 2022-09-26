@@ -9,11 +9,13 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QStringListModel
 from qgis.PyQt.QtWidgets import QCompleter
+from qgis.core import QgsVectorLayer
 
 from ..dialog import GwAction
 from ...ui.ui_manager import GwFeatureDeleteUi
 from ...utils import tools_gw
 from ....lib import tools_qgis, tools_qt, tools_db
+from .... import global_vars
 
 
 class GwFeatureDeleteButton(GwAction):
@@ -75,6 +77,7 @@ class GwFeatureDeleteButton(GwAction):
         # Set listeners
         self.dlg_feature_delete.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_feature_delete))
         self.dlg_feature_delete.rejected.connect(partial(tools_gw.disconnect_signal, 'feature_delete'))
+        self.dlg_feature_delete.finished.connect(partial(self._selection_end))
         self.dlg_feature_delete.rejected.connect(partial(tools_gw.save_settings, self.dlg_feature_delete))
         self.dlg_feature_delete.btn_delete_another.clicked.connect(partial(self._delete_another_feature))
 
@@ -205,6 +208,19 @@ class GwFeatureDeleteButton(GwAction):
         tools_gw.disconnect_signal('feature_delete')
         self.iface.actionSelect().trigger()
         self.connect_signal_selection_changed()
+
+
+    def _selection_end(self):
+        """ Set canvas map tool to an instance of class 'GwSelectManager' """
+
+        tools_gw.disconnect_signal('feature_delete')
+
+        for layer in global_vars.canvas.layers():
+            if type(layer) is QgsVectorLayer:
+                layer.removeSelection()
+
+        global_vars.canvas.refresh()
+        global_vars.iface.actionPan().trigger()
 
 
     def _manage_selection(self):
