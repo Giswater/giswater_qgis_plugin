@@ -61,3 +61,7 @@ UPDATE sys_param_user SET descript=replace(descript,'graf','graph') WHERE descri
 UPDATE edit_typevalue SET typevalue=replace(typevalue, 'graf','graph') WHERE typevalue = 'grafdelimiter_type';
 
 UPDATE config_param_system SET parameter='utils_graphanalytics_lrs_feature' WHERE parameter='Grafanalytics LRS config feature:'
+
+UPDATE sys_param_user SET formname='config', descript='Allow automatic delete of planified features when a psector is deleted and this feature is not present in another psector',
+isenabled=true, layoutorder=10, project_type='utils', "datatype"='boolean', widgettype='check', vdefault='false', layoutname='lyt_masterplan', iseditable=true
+WHERE id='plan_psector_force_delete';
