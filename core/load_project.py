@@ -45,6 +45,8 @@ class GwLoadProject(QObject):
             tools_log.log_info("Project read started")
 
         self._get_user_variables()
+        # Get variables from qgis project
+        self._get_project_variables()
 
         # Check if loaded project is valid for Giswater
         if not self._check_project(show_warning):
@@ -71,9 +73,6 @@ class GwLoadProject(QObject):
         global_vars.project_type = tools_gw.get_project_type()
         if global_vars.project_type is None:
             return
-
-        # Get variables from qgis project
-        self._get_project_variables()
 
         # Check if loaded project is ud or ws
         if not self._check_project_type():
