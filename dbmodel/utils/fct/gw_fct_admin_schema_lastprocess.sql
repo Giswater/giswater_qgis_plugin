@@ -333,6 +333,11 @@ BEGIN
 			DELETE FROM temp_node;
 			DELETE FROM temp_go2epa;
 			DELETE FROM temp_table;
+
+			DELETE FROM anl_arc;
+			DELETE FROM anl_arc_x_node;
+			DELETE FROM anl_node;
+			DELETE FROM anl_polygon;
 			
 			IF v_projecttype = 'WS' THEN
 				DELETE FROM temp_mincut;
