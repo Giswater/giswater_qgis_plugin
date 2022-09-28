@@ -209,6 +209,7 @@ BEGIN
 	v_debug = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'debug');
 	v_parameters = (SELECT ((p_data::json->>'data')::json->>'parameters'));
 	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges');
+	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
 
 	IF v_commitchanges IS FALSE THEN
 		v_updatefeature = false;
@@ -221,8 +222,7 @@ BEGIN
 
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
-	v_checkdata = (SELECT (value::json->>'checkData') FROM config_param_system WHERE parameter = 'utils_graphanalytics_status');
-
+	
 	SELECT value::boolean INTO v_islastupdate FROM config_param_system WHERE parameter='edit_mapzones_set_lastupdate';
 
 	-- data quality analysis

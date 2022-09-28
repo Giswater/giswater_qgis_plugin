@@ -566,7 +566,6 @@ UPDATE config_param_system SET value = 'false' WHERE parameter = 'admin_utils_sc
 
 UPDATE config_info_layer SET addparam = '{"forceWhenActive":true}' WHERE layer_id IN ('v_edit_dimensions','v_edit_om_visit');
 
-UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'manageConflict', 'false'::text) WHERE parameter = 'utils_graphanalytics_status';
 
 UPDATE cat_feature SET active = false WHERE id IN ('CURVE','MANHOLE','WTP');
 
