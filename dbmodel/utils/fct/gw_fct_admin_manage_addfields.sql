@@ -214,6 +214,8 @@ BEGIN
 	IF v_action='CREATE' THEN
 		v_unaccent_id = array_to_string(ts_lexize('unaccent',v_param_name),',','*');
 
+		v_param_name=trim(v_param_name);
+
 		IF v_unaccent_id IS NOT NULL THEN
 			v_param_name = v_unaccent_id;
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
