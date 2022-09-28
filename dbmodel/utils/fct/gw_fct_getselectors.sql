@@ -72,6 +72,12 @@ v_action text;
 v_zonetable text;
 v_cur_user text;
 v_prev_cur_user text;
+v_device integer;
+v_layers text;
+v_layer text;
+v_rec record;
+v_columns json;
+v_layerColumns json;
 
 BEGIN
 
@@ -90,6 +96,7 @@ BEGIN
 	v_useatlas := (p_data ->> 'data')::json->> 'useAtlas';
 	v_message := (p_data ->> 'message')::json;
 	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
+	v_device := (p_data ->> 'client')::json->> 'device';
 	
 	v_prev_cur_user = current_user;
 	IF v_cur_user IS NOT NULL THEN
@@ -277,6 +284,18 @@ BEGIN
 	
 	END LOOP;
 
+	-- Manage columns for layers if QWC
+	IF v_device = 5 THEN
+		v_layers := (p_data ->> 'data')::json->> 'layers';
+		v_layerColumns = '{}';
+		FOR v_rec IN SELECT json_array_elements(v_layers::json)
+		LOOP
+			v_layer = replace(replace(replace(v_rec::text, '"', ''), '(', ''), ')', '');
+			SELECT json_agg(column_name) INTO v_columns FROM information_schema.columns WHERE table_schema = 'SCHEMA_NAME' AND table_name = v_layer;
+			v_layerColumns := gw_fct_json_object_set_key(v_layerColumns, v_layer, v_columns);
+		END LOOP;
+	END IF;
+
 	-- Finish the construction of the tabs array
 	v_formTabs := v_formTabs ||']';
 
@@ -287,6 +306,7 @@ BEGIN
 	v_currenttab = COALESCE(v_currenttab, '');
 	v_geometry = COALESCE(v_geometry, '{}');
 	v_stylesheet := COALESCE(v_stylesheet, '{}');
+	v_layerColumns = COALESCE(v_layerColumns, '{}');
 	
 	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 	
@@ -310,7 +330,7 @@ BEGIN
 			',"body":{"message":'||v_message||
 			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_currenttab||'", "formText":"", "formTabs":'||v_formTabs||', "style": '||v_stylesheet||'}'||
 			',"feature":{}'||
-			',"data":{"userValues":'||v_uservalues||',"geometry":'||v_geometry||'}'||
+			',"data":{"userValues":'||v_uservalues||',"geometry":'||v_geometry||',"layerColumns":'||v_layerColumns||'}'||
 			'}'||
 		    '}')::json,2796, null, null, v_action::json);
 	END IF;

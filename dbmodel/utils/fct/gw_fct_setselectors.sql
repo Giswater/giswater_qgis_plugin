@@ -63,6 +63,7 @@ v_explmuni text;
 v_zonetable text;
 v_cur_user text;
 v_prev_cur_user text;
+v_device integer;
 
 
 BEGIN
@@ -87,6 +88,7 @@ BEGIN
 	v_disableparent := (p_data ->> 'data')::json->> 'disableParent';
 	v_data = p_data->>'data';
 	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
+	v_device := (p_data ->> 'client')::json->> 'device';
 
 	v_prev_cur_user = current_user;
 	IF v_cur_user IS NOT NULL THEN
@@ -371,8 +373,9 @@ BEGIN
 	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 	
 	-- Return
-	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, "feature":{}, 
-	"data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":',v_action,', "selectorType":"',v_selectortype,'"}}');
+	v_return = concat('{"client":',(p_data ->> 'client'),', "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, "feature":{}, 
+	"data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":',v_action,', "selectorType":"',v_selectortype,'", 
+	"layers":',COALESCE(((p_data ->> 'data')::json->> 'layers'), '{}'),'}}');
 	RETURN gw_fct_getselectors(v_return);
 
 	
