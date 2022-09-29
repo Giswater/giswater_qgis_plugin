@@ -23,3 +23,8 @@ from (select max(d.layoutord::integer) as maxord from
 (SELECT json_extract_path_text(json_array_elements(inputparams),'layoutorder') as layoutord
 FROM   config_toolbox
 WHERE id=2768)d where layoutord is not null)e)a)b WHERE  id=2768;
+
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
+VALUES (3174, 'gw_trg_edit_setarcdata', 'utils', 'trigger function', 
+'Trigger that fills arc with values captured or calculated based on attributes stored on final nodes', 'role_edit', 'core');
