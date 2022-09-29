@@ -17,7 +17,7 @@ CREATE TRIGGER gw_trg_edit_setarcdata
   EXECUTE PROCEDURE gw_trg_edit_setarcdata('arc');
 
 
-DROP TRIGGER IF EXISTS gw_trg_edit_setarcdata ON arc;
+DROP TRIGGER IF EXISTS gw_trg_edit_setarcdata ON node;
 CREATE TRIGGER gw_trg_edit_setarcdata
   AFTER INSERT OR UPDATE OF node_type, top_elev, ymax
   ON node
