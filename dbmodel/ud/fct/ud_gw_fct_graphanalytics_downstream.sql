@@ -38,7 +38,10 @@ DECLARE
   
   v_cur_user text;
   v_prev_cur_user text;
-
+	v_count_connec integer;
+	v_count_gully integer;
+	v_count_node integer;
+	v_length_arc numeric;
 BEGIN
 
 	-- Search path
@@ -76,6 +79,17 @@ BEGIN
 
 		END IF;
 
+		--affected network
+		SELECT count(*) INTO v_count_connec FROM v_anl_flow_connec;
+		SELECT count(*) INTO v_count_gully FROM v_anl_flow_gully;
+		SELECT count(*) INTO v_count_node FROM v_anl_flow_node JOIN cat_feature_node cn ON cn.id=node_type WHERE isprofilesurface IS TRUE;
+		SELECT round(sum(st_length(the_geom))::numeric,2) INTO v_length_arc FROM v_anl_flow_arc;
+
+		select json_build_object(
+		'affectedNetwork',json_build_object('length',v_length_arc,
+		'nodesIsprofileTrue',v_count_node, 'numConnecs', v_count_connec, 'numGully', v_count_gully) )
+		INTO v_result;
+		
 		v_result_info := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
