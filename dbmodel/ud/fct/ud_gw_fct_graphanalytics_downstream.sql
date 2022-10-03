@@ -42,12 +42,14 @@ DECLARE
 	v_count_gully integer;
 	v_count_node integer;
 	v_length_arc numeric;
+	v_device integer;
 BEGIN
 
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 	
 	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
+	v_device := (p_data ->> 'client')::json->> 'device';
 	
 	v_prev_cur_user = current_user;
 	IF v_cur_user IS NOT NULL THEN
@@ -89,13 +91,52 @@ BEGIN
 		'affectedNetwork',json_build_object('length',v_length_arc,
 		'nodesIsprofileTrue',v_count_node, 'numConnecs', v_count_connec, 'numGully', v_count_gully) )
 		INTO v_result;
-		
+
+		v_result := COALESCE(v_result, '{}'); 
 		v_result_info := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
-		v_result_polygon = '{"geometryType":"", "features":[]}';
-		v_result_line = '{"geometryType":"", "features":[]}';
-		v_result_point = '{"geometryType":"", "features":[]}';
+		IF v_device = 5 THEN
+			SELECT jsonb_agg(features.feature) INTO v_result
+			FROM (
+	  	SELECT jsonb_build_object(
+	     'type',       'Feature',
+	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+	    'properties', to_jsonb(row) - 'the_geom'
+	  	) AS feature
+	  	FROM (SELECT arc_id, arc_type, context, expl_id, st_length(the_geom) as length, the_geom
+	  	FROM  v_anl_flow_arc) row) features;
+
+			v_result := COALESCE(v_result, '{}'); 
+			v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 	
+			
+			SELECT jsonb_agg(features.feature) INTO v_result
+			FROM (
+	  	SELECT jsonb_build_object(
+			'type',       'Feature',
+			'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+			'properties', to_jsonb(row) - 'the_geom'
+	  	) AS feature
+	  	FROM (SELECT node_id as feature_id, node_type as feature_type, context, expl_id, the_geom
+	  	FROM  v_anl_flow_node
+	  	UNION 
+	  	SELECT connec_id,'CONNEC', context, expl_id, the_geom
+	  	FROM  v_anl_flow_connec
+	  	UNION 
+	  	SELECT gully_id,'GULLY', context, expl_id, the_geom
+	  	FROM  v_anl_flow_gully) row) features;
+
+			v_result := COALESCE(v_result, '{}'); 
+			v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+
+			v_result_polygon = '{"geometryType":"", "features":[]}';
+
+		ELSE
+			v_result_polygon = '{"geometryType":"", "features":[]}';
+			v_result_line = '{"geometryType":"", "features":[]}';
+			v_result_point = '{"geometryType":"", "features":[]}';
+
+		END IF;
 		
 		EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 		
