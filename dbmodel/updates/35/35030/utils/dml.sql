@@ -7,6 +7,16 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+--2022/09/27
+UPDATE config_param_system SET value =
+'{"table":"cat_dscenario","selector":"selector_inp_dscenario","table_id":"dscenario_id","selector_id":"dscenario_id","label":"dscenario_id,'' - '', name, '' ('', dscenario_type,'')''","orderBy":"dscenario_id","manageAll":true,"query_filter":" AND dscenario_id > 0 AND active is true AND (expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl where cur_user = current_user))","typeaheadFilter":" AND lower(concat(dscenario_id, '' - '', name,'' ('',  dscenario_type,'')''))","typeaheadForced":true}'
+WHERE parameter = 'basic_selector_tab_dscenario';
+
+UPDATE sys_param_user SET formname='config', descript='Allow automatic delete of planified features when a psector is deleted and this feature is not present in another psector',
+isenabled=true, layoutorder=10, project_type='utils', "datatype"='boolean', widgettype='check', vdefault='false', layoutname='lyt_masterplan', iseditable=true
+WHERE id='plan_psector_force_delete';
+
 --2022/09/26
 UPDATE config_param_system SET value = (value::jsonb - 'manageConflict')::text 
 WHERE parameter='utils_graphanalytics_status';
