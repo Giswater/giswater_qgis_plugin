@@ -14,3 +14,9 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "colu
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"nodetype_2", "dataType":"character varying(30)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"elev2", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"y2", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
+
+--2022/10/03
+ALTER TABLE inp_dscenario_flwreg_outlet ALTER COLUMN outlet_type DROP NOT NULL;
+ALTER TABLE inp_dscenario_flwreg_weir ALTER COLUMN weir_type DROP NOT NULL;
+ALTER TABLE inp_dscenario_flwreg_orifice ALTER COLUMN ori_type DROP NOT NULL;
+
