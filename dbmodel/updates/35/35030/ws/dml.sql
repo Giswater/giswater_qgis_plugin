@@ -14,3 +14,11 @@ FROM config_param_system
 WHERE parameter='utils_graphanalytics_dynamic_symbology' ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM config_param_system WHERE parameter='utils_graphanalytics_dynamic_symbology';
+
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (474, 'Get epa calibration file for pressures', 'ws', NULL, 'GW Epa Tools', true, 'Function process', NULL);
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (475, 'Get epa calibration file for volumes', 'ws', NULL, 'GW Epa Tools', true, 'Function process', NULL);
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (476, 'Get log for epa calibration volumes', 'ws', NULL, 'GW Epa Tools', true, 'Function process', NULL);
