@@ -120,7 +120,7 @@ BEGIN
 	END IF;
 		
 	IF p_filterfield IS NOT NULL AND p_filterfield!='' THEN
-		v_filter_widgets = ' AND columnname NOT IN('||p_filterfield||') ';
+		v_filter_widgets = ' AND columnname NOT IN('||quote_literal(p_filterfield)||') ';
 	END IF;
 
 	-- get user variable to show label as column id or not
@@ -140,10 +140,10 @@ BEGIN
 			SELECT ',v_label,', columnname, columnname as column_id, concat(',quote_literal(p_tabname),',''_'',columnname) AS widgetname, widgettype,
 			widgetfunction,', v_device,' hidden, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layoutname, layoutorder) AS orderby,
 			layoutname, layoutorder, dv_parent_id AS "parentId", isparent, ismandatory, linkedobject, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
-			dv_orderby_id AS "orderById", dv_isnullvalue AS "isNullValue", stylesheet, widgetcontrols
+			dv_orderby_id AS "orderById", dv_isnullvalue AS "isNullValue", stylesheet, widgetcontrols, web_layoutorder
 			FROM config_form_fields 
-			LEFT JOIN typevalue a ON a.id = widgetfunction::json->>''functionName'' AND a.typevalue = ''widgetfunction_typevalue''
-			LEFT JOIN typevalue b ON b.id = widgettype AND b.typevalue = ''widgettype_typevalue''
+			LEFT JOIN config_typevalue a ON a.id = widgetfunction::json->>''functionName'' AND a.typevalue = ''widgetfunction_typevalue''
+			LEFT JOIN config_typevalue b ON b.id = widgettype AND b.typevalue = ''widgettype_typevalue''
 			
 			WHERE formname = ',quote_nullable(p_formname),' AND formtype= ',quote_nullable(p_formtype),' ',v_clause,' ',v_filter_widgets,' ORDER BY orderby) a');
 
@@ -381,6 +381,14 @@ BEGIN
 		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'placeholder');
 	END LOOP;
 
+	IF p_device != 5 THEN
+		-- Remove web_layoutorder if form is not for web
+		FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a
+		LOOP
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'web_layoutorder');
+		END LOOP;
+	END IF;
+
 	-- Convert to json
 	fields := array_to_json(fields_array);
 	
@@ -390,9 +398,9 @@ BEGIN
 	RETURN fields_array;
 
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
+	--EXCEPTION WHEN OTHERS THEN
+--	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
+	--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
 
 END;
 $BODY$
