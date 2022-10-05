@@ -104,7 +104,8 @@ BEGIN
 	  	SELECT jsonb_build_object(
 	     'type',       'Feature',
 	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-	    'properties', to_jsonb(row) - 'the_geom'
+	    'properties', to_jsonb(row) - 'the_geom',
+	    'crs',concat('EPSG:',ST_SRID(the_geom))
 	  	) AS feature
 	  	FROM (SELECT arc_id, arc_type, context, expl_id, st_length(the_geom) as length, the_geom
 	  	FROM  v_anl_flow_arc) row) features;
@@ -117,7 +118,8 @@ BEGIN
 	  	SELECT jsonb_build_object(
 			'type',       'Feature',
 			'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-			'properties', to_jsonb(row) - 'the_geom'
+			'properties', to_jsonb(row) - 'the_geom',
+			'crs',concat('EPSG:',ST_SRID(the_geom))
 	  	) AS feature
 	  	FROM (SELECT node_id as feature_id, node_type as feature_type, context, expl_id, the_geom
 	  	FROM  v_anl_flow_node
