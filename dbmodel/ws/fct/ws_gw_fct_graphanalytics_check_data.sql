@@ -38,7 +38,7 @@ v_result_line json;
 v_result_polygon json;
 v_querytext text;
 v_result_id text;
-v_features text;
+v_selectionmode text;
 v_edit text;
 v_config_param text;
 v_sector boolean;
@@ -56,7 +56,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- getting input data 	
-	v_features := ((p_data ->>'data')::json->>'parameters')::json->>'selectionMode'::text;
+	v_selectionmode := ((p_data ->>'data')::json->>'parameters')::json->>'selectionMode'::text;
 	v_graphclass := ((p_data ->>'data')::json->>'parameters')::json->>'graphClass'::text;
 	
 	-- select config values
@@ -73,9 +73,9 @@ BEGIN
 	v_count=0;
 
 	-- set v_edit_ variable
-	IF v_features='wholeSystem' THEN
+	IF v_selectionmode='wholeSystem' THEN
 		v_edit = '';
-	ELSIF v_features='userSelectors' THEN
+	ELSIF v_selectionmode='userSelectors' THEN
 		v_edit = 'v_edit_';
 	END IF;
 	
@@ -181,6 +181,14 @@ BEGIN
 			VALUES (211, 1, '268', 'INFO: All sectors has graphconfig values not null.',v_count);
 		END IF;	
 
+		-- sector : check coherence against nodetype.graphdelimiter and nodeparent defined on secetor.graphconfig (fid:  180)
+		v_querytext ='SELECT node_id, nodecat_id, the_geom, a.active, '||v_edit||'node.expl_id FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN cat_feature_node n ON n.id=c.nodetype_id
+		LEFT JOIN (SELECT node_id, active FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((graphconfig::json->>''use'')::json))::json->>''nodeParent'' as node_id, 
+		active FROM '||v_edit||'sector WHERE graphconfig IS NOT NULL )a USING (node_id)) a USING (node_id) WHERE graph_delimiter=''SECTOR'' AND (a.node_id IS NULL
+		OR node_id NOT IN (SELECT (json_array_elements_text((graphconfig::json->>''ignore'')::json))::text FROM '||v_edit||'sector WHERE active IS TRUE))
+		AND '||v_edit||'node.state > 0';
+	
+
 	END IF;
 
 	-- graphanalytics dma(269)
@@ -197,12 +205,12 @@ BEGIN
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount) 
 			VALUES (211, 1, '269','INFO: All dma has graphconfig values not null.',v_count);
 		END IF;	
-		
+
 		-- dma : check coherence against nodetype.graphdelimiter and nodeparent defined on dma.graphconfig (fid:  180)
 		v_querytext ='SELECT node_id, nodecat_id, the_geom, a.active, '||v_edit||'node.expl_id FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN cat_feature_node n ON n.id=c.nodetype_id
-		LEFT JOIN (SELECT node_id, active FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id, 
-		active FROM dma WHERE graphconfig IS NOT NULL )a USING (node_id)) a USING (node_id) WHERE graph_delimiter=''DMA'' AND (a.node_id IS NULL
-		OR node_id NOT IN (SELECT (json_array_elements_text((graphconfig->>''ignore'')::json))::text FROM dma WHERE active IS TRUE))
+		LEFT JOIN (SELECT node_id, active FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((graphconfig::json->>''use'')::json))::json->>''nodeParent'' as node_id, 
+		active FROM '||v_edit||'dma WHERE graphconfig IS NOT NULL )a USING (node_id)) a USING (node_id) WHERE graph_delimiter=''DMA'' AND (a.node_id IS NULL
+		OR node_id NOT IN (SELECT (json_array_elements_text((graphconfig::json->>''ignore'')::json))::text FROM '||v_edit||'dma WHERE active IS TRUE))
 		AND '||v_edit||'node.state > 0';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -252,9 +260,9 @@ BEGIN
 
 		-- dqa : check coherence against nodetype.graphdelimiter and nodeparent defined on dqa.graphconfig (fid:  181)
 		v_querytext = 'SELECT node_id, nodecat_id, the_geom, a.active,  '||v_edit||'node.expl_id FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN cat_feature_node n ON n.id=c.nodetype_id
-		LEFT JOIN (SELECT node_id, active FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id, 
-		active FROM dqa WHERE graphconfig IS NOT NULL )a USING (node_id)) a USING (node_id) WHERE graph_delimiter=''DQA'' AND (a.node_id IS NULL
-		OR node_id NOT IN (SELECT (json_array_elements_text((graphconfig->>''ignore'')::json))::text FROM dqa WHERE active IS TRUE))
+		LEFT JOIN (SELECT node_id, active FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((graphconfig::json->>''use'')::json))::json->>''nodeParent'' as node_id, 
+		active FROM '||v_edit||'dqa WHERE graphconfig IS NOT NULL )a USING (node_id)) a USING (node_id) WHERE graph_delimiter=''DQA'' AND (a.node_id IS NULL
+		OR node_id NOT IN (SELECT (json_array_elements_text((graphconfig::json->>''ignore'')::json))::text FROM '||v_edit||'dqa WHERE active IS TRUE))
 		AND '||v_edit||'node.state > 0';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -305,9 +313,9 @@ BEGIN
 
 		-- presszone : check coherence against nodetype.graphdelimiter and nodeparent defined on presszone.graphconfig (fid:  182)
 		v_querytext = 'SELECT node_id, nodecat_id, the_geom, a.active,'||v_edit||'node.expl_id FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN cat_feature_node n ON n.id=c.nodetype_id
-		LEFT JOIN (SELECT node_id, active FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id, 
-		active FROM presszone WHERE graphconfig IS NOT NULL )a USING (node_id)) a USING (node_id) WHERE graph_delimiter=''PRESSZONE'' AND (a.node_id IS NULL
-		OR node_id NOT IN (SELECT (json_array_elements_text((graphconfig->>''ignore'')::json))::text FROM presszone WHERE active IS TRUE))
+		LEFT JOIN (SELECT node_id, active FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((graphconfig::json->>''use'')::json))::json->>''nodeParent'' as node_id, 
+		active FROM '||v_edit||'presszone WHERE graphconfig IS NOT NULL )a USING (node_id)) a USING (node_id) WHERE graph_delimiter=''PRESSZONE'' AND (a.node_id IS NULL
+		OR node_id NOT IN (SELECT (json_array_elements_text((graphconfig::json->>''ignore'')::json))::text FROM '||v_edit||'presszone WHERE active IS TRUE))
 		AND '||v_edit||'node.state > 0';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -355,10 +363,10 @@ BEGIN
 
 	--Check if defined nodes and arcs exist in a database (fid 367)
 
-	FOR rec IN SELECT DISTINCT lower(graph_delimiter) FROM cat_feature_node where graph_delimiter NOT IN ('MINSECTOR','NONE') AND graph_delimiter IS NOT NULL LOOP
+	FOR rec IN SELECT 'sector' UNION SELECT 'dma' UNION SELECT 'dqa' UNION SELECT 'presszone' LOOP
 	
 		v_querytext = 'SELECT b.arc_id, b.'||rec||'_id as zone_id FROM (
-		SELECT '||rec||'_id, json_array_elements_text(((json_array_elements_text((graphconfig->>''use'')::json))::json->>''toArc'')::json) as arc_id FROM '||rec||')b 
+		SELECT '||rec||'_id, json_array_elements_text(((json_array_elements_text((graphconfig::json->>''use'')::json))::json->>''toArc'')::json) as arc_id FROM '||v_edit||rec||')b 
 		WHERE arc_id not in (select arc_id FROM arc WHERE state=1)';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;

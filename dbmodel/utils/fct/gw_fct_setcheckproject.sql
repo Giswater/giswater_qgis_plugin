@@ -15,7 +15,7 @@ $BODY$
 /*
 SELECT SCHEMA_NAME.gw_fct_setcheckproject($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":5367}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, 
 "version":"3.5.021.1", "fid":101, "initProject":false, "addSchema":"NULL", "mainSchema":"NULL", "projecRole":"role_admin", "infoType":"full", "logFolderVolume":"139.56 MB", 
-"projectType":"SCHEMA_NAME", "qgisVersion":"3.16.6-Hannover", "osVersion":"Windows 10"}}$$);
+"projectType":"ws", "qgisVersion":"3.16.6-Hannover", "osVersion":"Windows 10"}}$$);
 
 -- fid: main: 101
 	om: 125
@@ -144,7 +144,7 @@ BEGIN
 	SELECT value INTO v_qgis_layers_setpropierties FROM config_param_user where parameter='qgis_layers_set_propierties' AND cur_user=current_user;
 
 	-- get system parameters
-	SELECT value::json->>'ignoregraphanalytics' INTO v_ignoregraphanalytics FROM config_param_system WHERE parameter = 'admin_checkproject';
+	SELECT value::json->>'ignoreGraphanalytics' INTO v_ignoregraphanalytics FROM config_param_system WHERE parameter = 'admin_checkproject';
 	SELECT value::json->>'ignorePlan' INTO v_ignoreplan FROM config_param_system WHERE parameter = 'admin_checkproject';
 	SELECT value::json->>'ignoreEpa' INTO v_ignoreepa FROM config_param_system WHERE parameter = 'admin_checkproject';
 	SELECT value::json->>'usePsectors' INTO v_usepsector FROM config_param_system WHERE parameter = 'admin_checkproject';
