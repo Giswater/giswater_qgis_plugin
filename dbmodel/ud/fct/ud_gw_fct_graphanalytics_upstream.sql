@@ -18,7 +18,12 @@ example:
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_upstream($${
 "client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 "feature":{"id":["20607"]},
-"data":{}}$$)
+"data":{}}$$);
+
+SELECT SCHEMA_NAME.gw_fct_graphanalytics_upstream($${
+"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"postgres"},
+"feature":{},
+"data":{"coordinates":{"xcoord":419278.0533606678,"ycoord":4576625.482073168,"zoomRatio":437.2725774103561}}}$$)
 
 --fid: 220,221;
 
@@ -46,6 +51,16 @@ v_count_node integer;
 v_length_arc numeric;
 v_device integer;
 
+v_node text;
+v_xcoord double precision;
+v_ycoord double precision;
+v_epsg integer;
+v_client_epsg integer;
+v_point public.geometry;
+
+v_sensibility_f float;
+v_sensibility float;
+v_zoomratio float;
 BEGIN
 
 	-- Search path
@@ -53,6 +68,13 @@ BEGIN
 	
 	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
 	v_device := (p_data ->> 'client')::json->> 'device';
+	v_xcoord := ((p_data ->> 'data')::json->> 'coordinates')::json->>'xcoord';
+	v_ycoord := ((p_data ->> 'data')::json->> 'coordinates')::json->>'ycoord';
+	v_epsg := (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
+	v_client_epsg := (p_data ->> 'client')::json->> 'epsg';
+	v_zoomratio := ((p_data ->> 'data')::json->> 'coordinates')::json->>'zoomRatio';
+
+	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 	
 	v_prev_cur_user = current_user;
 	IF v_cur_user IS NOT NULL THEN
@@ -65,6 +87,20 @@ BEGIN
 
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+
+	--Look for closest node using coordinates
+	IF v_xcoord IS NOT NULL THEN 
+		EXECUTE 'SELECT (value::json->>''web'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
+		INTO v_sensibility_f;
+		v_sensibility = (v_zoomratio / 500 * v_sensibility_f);
+
+		-- Make point
+		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
+	
+		SELECT node_id INTO v_node FROM v_edit_node WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
+		
+		SELECT gw_fct_json_object_set_key (p_data,'feature'::text, jsonb_build_object('id',json_agg(v_node))) INTO p_data;
+	END IF;
 
 	-- Compute the tributary area using recursive function
 	EXECUTE 'SELECT gw_fct_graphanalytics_upstream_recursive($$'||p_data||'$$);'
