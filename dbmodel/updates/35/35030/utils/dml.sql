@@ -137,3 +137,12 @@ union
 SELECT formname, columnname, layoutname, layoutorder, hidden 
 FROM config_form_fields WHERE formname ilike 've_gully%' and layoutname='lyt_data_3' and hidden is false 
 ) a)b WHERE cff.formname=b.formname and cff.columnname=b.columnname;
+
+
+UPDATE config_param_system SET datatype='json', widgettype='linetext', iseditable=TRUE, layoutorder=9 WHERE parameter='admin_raster_dem';
+
+UPDATE config_param_system SET layoutorder=10 WHERE parameter='admin_config_control_trigger';
+
+INSERT INTO sys_message( id, error_message, hint_message, log_level, show_user, project_type, source)
+VALUES (3198,'Field defined as target for DEM data is not related to elevation', 
+'Configure correctly parameter admin_raster_dem on config_param_system table or using configuration button',2, TRUE, 'utils','core') ON CONFLICT (id) DO NOTHING;

@@ -43,36 +43,50 @@ v_feature_type text;
 v_result json;
 v_result_info json;
 v_result_point json;
+v_update_field text;
+v_level integer;
+v_status text;
+v_message text;
 
 BEGIN
 	
-	-- search path
-	SET search_path = "SCHEMA_NAME", public;
+-- search path
+SET search_path = "SCHEMA_NAME", public;
 
-	-- select version
-	SELECT giswater, project_type INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
+-- select version
+SELECT giswater, project_type INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
-	-- get input parameters
-	v_schemaname = 'SCHEMA_NAME';
+-- get input parameters
+v_schemaname = 'SCHEMA_NAME';
 
-	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
-	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
-	v_feature_type := lower(((p_data ->>'feature')::json->>'featureType'))::text;
-	v_updatevalues :=  ((p_data ->>'data')::json->>'parameters')::json->>'updateValues'::text;
-	v_exploitation := ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
+v_id :=  ((p_data ->>'feature')::json->>'id')::json;
+v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
+v_feature_type := lower(((p_data ->>'feature')::json->>'featureType'))::text;
+v_updatevalues :=  ((p_data ->>'data')::json->>'parameters')::json->>'updateValues'::text;
+v_exploitation := ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
 
-	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
+select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
 
-	DELETE FROM selector_expl WHERE cur_user = current_user;
-	INSERT INTO selector_expl VALUES (v_exploitation, current_user);
+DELETE FROM selector_expl WHERE cur_user = current_user;
+INSERT INTO selector_expl VALUES (v_exploitation, current_user);
 	
-	--Execute the process only if admin_raster_dem is true
-	IF (SELECT value FROM config_param_system WHERE parameter='admin_raster_dem')::boolean = TRUE THEN	
+DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=168;
+DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=168;
+
+--Execute the process only if admin_raster_dem is true
+IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE THEN	
 		
-		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=168;
-		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=168;
-				
-		--Select nodes on which the process will be executed - all values or only nulls from selected exploitation
+	--select update field
+	SELECT json_extract_path_text(value::json,'updateField') INTO v_update_field FROM config_param_system WHERE parameter='admin_raster_dem';
+
+	IF v_update_field NOT IN ('elevation', 'custom_top_elev', 'top_elev') THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"3198", "function":"2760","debug_msg":""}}$$)' 
+		INTO v_message;
+		
+	ELSE
+
+			--Select nodes on which the process will be executed - all values or only nulls from selected exploitation
 		IF v_updatevalues = 'allValues' THEN 
 			IF v_project_type = 'WS' and v_feature_type='vnode' THEN
 				v_query = 'SELECT '||v_feature_type||'_id as feature_id, elev as elevation, the_geom, state FROM '||v_worklayer||' WHERE expl_id = '||v_exploitation||'';
@@ -114,8 +128,6 @@ BEGIN
 				VALUES (168,'elevation from raster','There are no features with NULL elevation');
 			END IF;
 
-		END IF;
-
 		--loop over selected nodes, intersect node with raster
 		FOR rec IN EXECUTE v_query LOOP
 
@@ -138,9 +150,9 @@ BEGIN
 					EXECUTE 'UPDATE vnode SET top_elev = '||v_elevation||'::numeric WHERE vnode_id = '||rec.feature_id||';';
 				
 				ELSIF v_project_type = 'WS' AND v_feature_type!='vnode'  THEN 
-					EXECUTE 'UPDATE '||v_worklayer||' SET elevation = '||v_elevation||'::numeric WHERE '||v_feature_type||'_id = '||rec.feature_id||'::text';
+					EXECUTE 'UPDATE '||v_worklayer||' SET '||v_update_field||' = '||v_elevation||'::numeric WHERE '||v_feature_type||'_id = '||rec.feature_id||'::text';
 				ELSIF v_project_type = 'UD' AND v_feature_type!='vnode' THEN
-					EXECUTE 'UPDATE '||v_worklayer||' SET top_elev = '||v_elevation||' ::numeric WHERE '||v_feature_type||'_id = '||rec.feature_id||'::text';
+					EXECUTE 'UPDATE '||v_worklayer||' SET '||v_update_field||' = '||v_elevation||' ::numeric WHERE '||v_feature_type||'_id = '||rec.feature_id||'::text';
 				END IF;
 
 				--temporal insert values into anl_node to create layer with all updated points
@@ -153,6 +165,8 @@ BEGIN
 			
 		END LOOP;
 
+		END IF;
+	END IF;
 		-- get results
 		-- info
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
@@ -171,8 +185,21 @@ BEGIN
 		v_result_info := COALESCE(v_result_info, '{}'); 
 		v_result_point := COALESCE(v_result_point, '{}'); 
 
+		IF v_audit_result is null THEN
+			v_status = 'Accepted';
+			v_level = 3;
+			v_message = 'Arc divide done successfully';
+	        
+		ELSE
+
+			SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+			SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
+			SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+
+		END IF;
+
 		--  Return
-		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":"'||v_version||'"'||
+		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
 	             ',"body":{"form":{}'||
 			     ',"data":{ "info":'||v_result_info||','||
 					'"point":'||v_result_point||

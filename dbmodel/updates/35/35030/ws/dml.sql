@@ -22,3 +22,6 @@ INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, 
 VALUES (475, 'Get epa calibration file for volumes', 'ws', NULL, 'GW Epa Tools', true, 'Function process', NULL);
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
 VALUES (476, 'Get log for epa calibration volumes', 'ws', NULL, 'GW Epa Tools', true, 'Function process', NULL);
+
+UPDATE config_param_system set value = 
+json_build_object('activated', value,'updateField','elevation')::text WHERE parameter='admin_raster_dem';

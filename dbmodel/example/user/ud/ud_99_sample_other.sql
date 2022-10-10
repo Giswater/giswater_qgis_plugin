@@ -422,7 +422,7 @@ UPDATE config_param_system SET value = 'false' WHERE parameter = 'admin_utils_sc
 
 UPDATE config_info_layer SET addparam = '{"forceWhenActive":true}' WHERE layer_id IN ('v_edit_dimensions','v_edit_om_visit');
 
-UPDATE config_param_system SET value = 'TRUE' WHERE parameter  = 'admin_raster_dem';
+UPDATE config_param_system SET value = '{"activated" : "TRUE", "updateField" : "elevation"}' WHERE parameter  = 'admin_raster_dem';
 
 UPDATE gully SET siphon = false where siphon is null;
 UPDATE gully SET groove = false where groove is null;

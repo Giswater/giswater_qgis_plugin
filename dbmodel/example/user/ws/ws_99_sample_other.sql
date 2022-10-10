@@ -571,7 +571,7 @@ UPDATE cat_feature SET active = false WHERE id IN ('CURVE','MANHOLE','WTP');
 
 DELETE FROM inp_junction WHERE node_id = '1007'; -- air valve
 
-UPDATE config_param_system SET value = 'TRUE' WHERE parameter  = 'admin_raster_dem';
+UPDATE config_param_system SET value = '{"activated" : "TRUE", "updateField" : "elevation"}' WHERE parameter  = 'admin_raster_dem';
 
 UPDATE cat_feature_node SET epa_default = 'UNDEFINED' WHERE id = 'AIR_VALVE';
 UPDATE cat_feature_node SET epa_default = 'JUNCTION' WHERE id = 'CLORINATHOR';

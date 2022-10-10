@@ -9,4 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/09/29
 INSERT INTO sys_table(id, descript, sys_role, source)
-VALUES ('temp_lid_usage', 'Table used during pg2epa export for lid usage configuration', 'role_epa','core');
+VALUES ('temp_lid_usage', 'Table used during pg2epa export for lid usage configuration', 'role_epa','core') ON CONFLICT (id) DO NOTHING;
+ 
+UPDATE config_param_system set value = 
+json_build_object('activated', value,'updateField','top_elev')::text WHERE parameter='admin_raster_dem';
