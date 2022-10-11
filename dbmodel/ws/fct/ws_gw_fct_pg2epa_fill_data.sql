@@ -23,6 +23,7 @@ v_isoperative boolean;
 v_networkmode integer;
 v_minlength float;
 v_forcereservoirsoninlets boolean;
+v_forcetanksoninlets boolean;
 
 BEGIN
 
@@ -35,7 +36,8 @@ BEGIN
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user);
 	v_minlength := (SELECT value FROM config_param_system WHERE parameter = 'epa_arc_minlength');
 	v_forcereservoirsoninlets := (SELECT value::json->>'forceReservoirsOnInlets' FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
-	
+	v_forcetanksoninlets := (SELECT value::json->>'forceTanksOnInlets' FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
+
 	-- get debug parameters
 	v_isoperative = (SELECT value::json->>'onlyIsOperative' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
@@ -117,6 +119,10 @@ BEGIN
 	IF v_forcereservoirsoninlets THEN
 
 		UPDATE temp_node SET epa_type = 'RESERVOIR' WHERE epa_type = 'INLET';
+
+	ELSIF v_forcetanksoninlets THEN
+
+		UPDATE temp_node SET epa_type = 'TANK' WHERE epa_type = 'INLET';
 	ELSE 
 
 		-- manage inlets as reservoir (when there are as many pipes as you want but all are related to same sector)
