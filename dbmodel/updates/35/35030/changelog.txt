@@ -2,3 +2,4 @@
 *************
 - Add forcetanksoninlet for pg2epa export
 - Minor bug fix
+- New function gw_graphanalytics_upstream_section_control (UD) -Control of sections inconsistencies between consecutive conduits

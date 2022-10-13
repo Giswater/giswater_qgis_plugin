@@ -13,3 +13,20 @@ VALUES ('temp_lid_usage', 'Table used during pg2epa export for lid usage configu
  
 UPDATE config_param_system set value = 
 json_build_object('activated', value,'updateField','top_elev')::text WHERE parameter='admin_raster_dem';
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (477, 'Control of sections inconsistencies between consecutive conduits', 'ud', NULL, 'core', true, 'Function process', NULL);
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source,input_params,return_type)
+VALUES (3176, 'gw_graphanalytics_upstream_section_control', 'ud', 'function', 
+'Control of sections inconsistencies between consecutive conduits.
+Select a node in order to execute upstream analysis of conduits sections and detect inconsistencies.', 'role_edit', 'core', 'json', 'json');
+
+INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
+VALUES (3176, 'Control conduit sections', '{"featureType":["node"]}', 
+'[{"widgetname":"node", "label":"Node:", "widgettype":"text", "datatype":"text", "layoutname":"grl_option_parameters","layoutorder":1, "value":null}]', null, true);
+
+INSERT INTO config_function(id, function_name, style, layermanager, actions)
+VALUES (3176, 'gw_graphanalytics_upstream_section_control', '{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', null, null);

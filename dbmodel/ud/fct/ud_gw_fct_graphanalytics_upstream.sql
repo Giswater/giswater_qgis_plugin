@@ -61,6 +61,7 @@ v_point public.geometry;
 v_sensibility_f float;
 v_sensibility float;
 v_zoomratio float;
+v_fid integer=220;
 BEGIN
 
 	-- Search path
@@ -101,6 +102,8 @@ BEGIN
 		
 		SELECT gw_fct_json_object_set_key (p_data,'feature'::text, jsonb_build_object('id',json_agg(v_node))) INTO p_data;
 	END IF;
+
+	SELECT gw_fct_json_object_set_key (p_data,'fid'::text, v_fid) INTO p_data;
 
 	-- Compute the tributary area using recursive function
 	EXECUTE 'SELECT gw_fct_graphanalytics_upstream_recursive($$'||p_data||'$$);'
