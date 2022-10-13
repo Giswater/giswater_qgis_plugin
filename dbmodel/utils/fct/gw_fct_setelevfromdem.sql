@@ -13,11 +13,11 @@ $BODY$
 /*
 SELECT gw_fct_setelevfromdem($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 "feature":{"tableName":"v_edit_connec", "featureType":"CONNEC", "id":["3235", "3239", "3197"]}, 
-"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"exploitation":"1", "updateValues":"allValues"}}}$$)::text
+"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"updateValues":"allValues"}}}$$)::text
 
 SELECT SCHEMA_NAME.gw_fct_setelevfromdem($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 "feature":{"tableName":"node", "featureType":"NODE"}, 
-"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"exploitation":"524", "updateValues":"allValues"}}}$$)::text
+"data":{"filterFields":{}, "pageInfo":{}, "parameters":{ "updateValues":"allValues"}}}$$)::text
 
 -- fid: 168
 
@@ -32,7 +32,6 @@ v_worklayer text;
 v_updatevalues text;
 v_saveondatabase boolean;
 v_elevation numeric;
-v_exploitation integer;
 v_query text;
 rec record;
 v_geom text;
@@ -47,7 +46,7 @@ v_update_field text;
 v_level integer;
 v_status text;
 v_message text;
-
+v_audit_result json;
 BEGIN
 	
 -- search path
@@ -63,13 +62,9 @@ v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 v_feature_type := lower(((p_data ->>'feature')::json->>'featureType'))::text;
 v_updatevalues :=  ((p_data ->>'data')::json->>'parameters')::json->>'updateValues'::text;
-v_exploitation := ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
 
 select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
 
-DELETE FROM selector_expl WHERE cur_user = current_user;
-INSERT INTO selector_expl VALUES (v_exploitation, current_user);
-	
 DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=168;
 DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=168;
 
@@ -82,20 +77,20 @@ IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_
 	IF v_update_field NOT IN ('elevation', 'custom_top_elev', 'top_elev') THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3198", "function":"2760","debug_msg":""}}$$)' 
-		INTO v_message;
+		INTO v_audit_result;
 		
 	ELSE
 
 			--Select nodes on which the process will be executed - all values or only nulls from selected exploitation
 		IF v_updatevalues = 'allValues' THEN 
 			IF v_project_type = 'WS' and v_feature_type='vnode' THEN
-				v_query = 'SELECT '||v_feature_type||'_id as feature_id, elev as elevation, the_geom, state FROM '||v_worklayer||' WHERE expl_id = '||v_exploitation||'';
+				v_query = 'SELECT '||v_feature_type||'_id as feature_id, elev as elevation, the_geom, state FROM '||v_worklayer||'';
 
 			ELSIF v_project_type = 'WS' THEN
-				v_query = 'SELECT '||v_feature_type||'_id as feature_id, elevation, the_geom, state FROM '||v_worklayer||' WHERE expl_id = '||v_exploitation||'';
+				v_query = 'SELECT '||v_feature_type||'_id as feature_id, elevation, the_geom, state FROM '||v_worklayer||'';
 
 			ELSE
-				v_query = 'SELECT '||v_feature_type||'_id as feature_id, top_elev as elevation, the_geom, state FROM '||v_worklayer||' WHERE expl_id = '||v_exploitation||'';
+				v_query = 'SELECT '||v_feature_type||'_id as feature_id, top_elev as elevation, the_geom, state FROM '||v_worklayer||'';
 			END IF;
 			
 			--Filter features if there are only some selected
@@ -105,13 +100,13 @@ IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_
 
 		ELSIF v_updatevalues = 'nullValues' THEN 
 			IF v_project_type = 'WS' and v_feature_type='vnode' THEN
-				v_query = 'SELECT '||v_feature_type||'_id as feature_id, elev as elevation, the_geom, state FROM '||v_worklayer||' WHERE elev IS NULL AND expl_id = '||v_exploitation||'';
+				v_query = 'SELECT '||v_feature_type||'_id as feature_id, elev as elevation, the_geom, state, expl_id FROM '||v_worklayer||' WHERE elev IS NULL';
 
 			ELSIF v_project_type = 'WS' and v_feature_type!='vnode' THEN
-				v_query = 'SELECT '||v_feature_type||'_id as feature_id, elevation, the_geom, state FROM '||v_worklayer||' WHERE elevation IS NULL AND expl_id = '||v_exploitation||'';
+				v_query = 'SELECT '||v_feature_type||'_id as feature_id, elevation, the_geom, state, expl_id FROM '||v_worklayer||' WHERE elevation IS NULL';
 
 			ELSE
-				v_query = 'SELECT '||v_feature_type||'_id as feature_id, top_elev as elevation, the_geom, state FROM '||v_worklayer||' WHERE top_elev IS NULL AND expl_id = '||v_exploitation||'';
+				v_query = 'SELECT '||v_feature_type||'_id as feature_id, top_elev as elevation, the_geom, state, expl_id FROM '||v_worklayer||' WHERE top_elev IS NULL';
 			
 			END IF;
 
@@ -156,8 +151,8 @@ IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_
 				END IF;
 
 				--temporal insert values into anl_node to create layer with all updated points
-				INSERT INTO anl_node (node_id, state,   expl_id, fid, the_geom, descript)
-				VALUES (rec.feature_id::text, rec.state::integer, v_exploitation, 168,rec.the_geom, upper(v_feature_type));
+				INSERT INTO anl_node (node_id, state, expl_id, fid, the_geom, descript)
+				VALUES (rec.feature_id::text, rec.state::integer, rec.expl_id, 168,rec.the_geom, upper(v_feature_type));
 
 				INSERT INTO audit_check_data(fid,result_id, error_message)
 				VALUES (168,'elevation from raster',concat('ELEVATION UPDATED - FEATURE TYPE:',upper(v_feature_type),', ID: ', rec.feature_id));

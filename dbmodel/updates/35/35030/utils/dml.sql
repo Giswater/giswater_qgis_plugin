@@ -146,3 +146,8 @@ UPDATE config_param_system SET layoutorder=10 WHERE parameter='admin_config_cont
 INSERT INTO sys_message( id, error_message, hint_message, log_level, show_user, project_type, source)
 VALUES (3198,'Field defined as target for DEM data is not related to elevation', 
 'Configure correctly parameter admin_raster_dem on config_param_system table or using configuration button',2, TRUE, 'utils','core') ON CONFLICT (id) DO NOTHING;
+
+update config_toolbox SET inputparams=
+'[{"widgetname":"updateValues", "label":"Nodes to update:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,
+"comboIds":["allValues", "nullValues"], "comboNames":["ALL NODES", "NODES NULL ELEV"], "selectedId":"nullValues"}]'
+WHERE id=2760;
