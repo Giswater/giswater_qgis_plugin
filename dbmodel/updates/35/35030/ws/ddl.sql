@@ -17,3 +17,4 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "colu
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"depth2", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"staticpress2", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"descript", "dataType":"text"}}$$);
