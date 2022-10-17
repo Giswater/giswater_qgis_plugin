@@ -151,3 +151,6 @@ update config_toolbox SET inputparams=
 '[{"widgetname":"updateValues", "label":"Nodes to update:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,
 "comboIds":["allValues", "nullValues"], "comboNames":["ALL NODES", "NODES NULL ELEV"], "selectedId":"nullValues"}]'
 WHERE id=2760;
+
+UPDATE config_param_system SET value=replace(value, 'ignoregraphanalytics','ignoreGraphanalytics') WHERE parameter = 'admin_checkproject';
+UPDATE config_param_system SET value=replace(value, 'ignoreGrafanalytics','ignoreGraphanalytics') WHERE parameter = 'admin_checkproject';

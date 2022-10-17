@@ -519,5 +519,5 @@ INSERT INTO inp_lid_value VALUES (18,'RAIN-BARREL','DRAIN',5,0.5,0,6);
 SELECT gw_fct_admin_schema_lastprocess($${"client":{"lang":"ES"},
 "data":{"isNewProject":"FALSE", "projectType":"UD", "epsg":25831, "isSample":"TRUE"}}$$);
 
-UPDATE config_param_system SET value = '{"usePsectors":false, "ignoreGrafanalytics":false, "ignoreEpa":false, "ignorePlan":false}'
+UPDATE config_param_system SET value = '{"usePsectors":false, "ignoreGraphanalytics":false, "ignoreEpa":false, "ignorePlan":false}'
 WHERE parameter = 'admin_checkproject';

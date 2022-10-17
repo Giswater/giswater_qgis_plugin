@@ -700,7 +700,7 @@ UPDATE config_toolbox SET inputparams='[
 
 UPDATE config_csv SET active = true WHERE fid in (469,470);
 
-UPDATE config_param_system SET value = '{"usePsectors":false, "ignoreGrafanalytics":false, "ignoreEpa":false, "ignorePlan":false}'
+UPDATE config_param_system SET value = '{"usePsectors":false, "ignoreGraphanalytics":false, "ignoreEpa":false, "ignorePlan":false}'
 WHERE parameter = 'admin_checkproject';
 
 UPDATE ext_cat_period SET code  = concat(upper(code),'-2015');
