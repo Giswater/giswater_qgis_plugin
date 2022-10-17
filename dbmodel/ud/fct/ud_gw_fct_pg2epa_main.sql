@@ -176,10 +176,10 @@ BEGIN
 	UPDATE temp_arc SET result_id  = v_result;
 	UPDATE temp_node SET result_id  = v_result;
 	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, 
-	length, n, the_geom, expl_id, minorloss, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage)
+	length, n, the_geom, expl_id, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage)
 	SELECT
 	result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation,
-	length, n, the_geom, expl_id, minorloss, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage 
+	length, n, the_geom, expl_id, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage 
 	FROM temp_arc;
 	
 	INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id,
