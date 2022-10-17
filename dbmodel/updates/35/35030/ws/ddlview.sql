@@ -109,3 +109,17 @@ WITH query_street AS (
      LEFT JOIN presszone ON presszone.presszone_id::text = arc.presszone_id::text
      LEFT JOIN query_street c ON c.id::text = arc.streetaxis_id::text
      LEFT JOIN query_street d ON d.id::text = arc.streetaxis2_id::text;
+
+
+CREATE OR REPLACE VIEW v_edit_presszone AS 
+ SELECT presszone.presszone_id,
+    presszone.name,
+    presszone.expl_id,
+    presszone.the_geom,
+    presszone.graphconfig::text AS graphconfig,
+    presszone.head,
+    presszone.stylesheet::text AS stylesheet,
+    presszone.active,
+    presszone.descript
+   FROM selector_expl, presszone
+  WHERE presszone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
