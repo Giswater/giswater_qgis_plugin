@@ -195,8 +195,8 @@ BEGIN
 				END IF;
 
 				-- hydrometer control
-				SELECT count(*) INTO v_num_feature FROM ext_rtc_hydrometer h JOIN connec c ON h.connec_id = customer_code WHERE c.connec_id = '3001' AND state IN
-				(SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
+				SELECT count(*) INTO v_num_feature FROM ext_rtc_hydrometer h JOIN connec c ON h.connec_id::varchar = customer_code::varchar WHERE c.connec_id = feature_id_aux 
+                AND state IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
 				
 				IF v_num_feature > 0 THEN 
 					EXECUTE 'SELECT state_type FROM connec WHERE connec_id=$1'
