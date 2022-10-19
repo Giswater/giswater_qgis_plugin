@@ -95,7 +95,7 @@ IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_
 			
 			--Filter features if there are only some selected
 			IF v_array IS NOT NULL  THEN
-				v_query = CONCAT(v_query, ' AND '||v_feature_type||'_id in ('||v_array||')');
+				v_query = CONCAT(v_query, ' WHERE '||v_feature_type||'_id in ('||v_array||')');
 			END IF;
 
 		ELSIF v_updatevalues = 'nullValues' THEN 
