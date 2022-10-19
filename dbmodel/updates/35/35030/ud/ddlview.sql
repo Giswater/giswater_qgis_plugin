@@ -99,3 +99,56 @@ with t as ( SELECT a.timser_id,
 		 SELECT timser_id, date, time, value from t, selector_expl s WHERE (t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text)
 		 UNION
 		 SELECT  timser_id, date, time, value from t WHERE t.expl_id is null;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_gully AS 
+ SELECT g.gully_id,
+    g.code,
+    g.top_elev,
+    g.gully_type,
+    g.gratecat_id,
+    (g.grate_width / 100::numeric)::numeric(12,2) AS grate_width,
+    (g.grate_length / 100::numeric)::numeric(12,2) AS grate_length,
+    g.arc_id,
+    a.node_2 AS node_id,
+    s.sector_id,
+    g.expl_id,
+    g.state,
+    g.state_type,
+    g.the_geom,
+    g.units,
+    g.units_placement,
+    g.groove,
+    g.groove_height,
+    g.groove_length,
+    cat_grate.a_param,
+    cat_grate.b_param,
+        CASE
+            WHEN g.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.grate_width / 100::numeric)::numeric(12,3)
+            WHEN g.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.grate_length / 100::numeric)::numeric(12,3)
+            ELSE (cat_grate.width / 100::numeric)::numeric(12,3)
+        END AS total_width,
+        CASE
+            WHEN g.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.grate_width / 100::numeric)::numeric(12,3)
+            WHEN g.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.grate_length / 100::numeric)::numeric(12,3)
+            ELSE (cat_grate.length / 100::numeric)::numeric(12,3)
+        END AS total_length,
+    g.ymax - COALESCE(g.sandbox, 0::numeric) AS depth,
+    g.annotation,
+    i.outlet_type,
+    i.custom_top_elev,
+    i.custom_width,
+    i.custom_length,
+    i.custom_depth,
+    i.method,
+    i.weir_cd,
+    i.orifice_cd,
+    i.custom_a_param,
+    i.custom_b_param,
+    i.efficiency
+   FROM selector_sector s,
+    v_edit_gully g
+     JOIN inp_gully i USING (gully_id)
+     JOIN cat_grate ON g.gratecat_id::text = cat_grate.id::text
+     LEFT JOIN arc a USING (arc_id)
+  WHERE g.sector_id = s.sector_id AND s.cur_user = CURRENT_USER::text;

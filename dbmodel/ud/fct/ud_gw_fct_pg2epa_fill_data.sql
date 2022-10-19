@@ -211,7 +211,7 @@ BEGIN
 		efficiency, the_geom
 		FROM v_edit_inp_gully g
 		LEFT JOIN value_state_type ON id=state_type
-		WHERE g.sector_id > 0 '||v_statetype||';';
+		WHERE arc_id IS NOT NULL AND g.sector_id > 0 '||v_statetype||';';
 		
 	END IF;
 
