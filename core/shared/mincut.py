@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from functools import partial
 
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime, QDateTime, QTimer
-from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QGridLayout, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit, QLabel, QCheckBox
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QGridLayout, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit, QLabel, QCheckBox, QStackedWidget
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsApplication, QgsFeatureRequest, QgsPrintLayout, QgsProject, QgsReadWriteContext, \
     QgsVectorLayer
@@ -346,10 +346,7 @@ class GwMincut:
             widget = self._create_widget(field)
             tools_gw.add_widget(self.dlg_mincut, field, label, widget, ['lyt_top_1'])
 
-
-
-        # self.search = GwSearch()
-        # self.search.open_search(None, self.dlg_mincut)
+        self.activate_search()
 
         # These widgets are put from the database, mysteriously if we do something like:
         # self.dlg_mincut.address_add_muni.text() or self.dlg_mincut.address_add_muni.setDiabled(True) etc...
@@ -445,6 +442,44 @@ class GwMincut:
         # self._refresh_tab_hydro()
 
         # self._load_widgets_values()
+
+    def activate_search(self):
+        main_tab = QTabWidget()
+        main_tab.setObjectName('main_tab')
+        font = main_tab.font()
+        font.setBold(True)
+        main_tab.setFont(font)
+
+        # FIXME: Remove blank space 
+        # main_tab.setMinimumSize(0, 110)
+        # widget = main_tab.findChild(QStackedWidget)
+        # child = widget.children()[0]
+        # child.deleteLater()
+
+
+        lbl_msg = QLabel()
+        lbl_msg.setObjectName('lbl_msg')
+        lbl_msg.setText('No results found')
+
+        lyt_search = QGridLayout()
+        lyt_search.addWidget(main_tab)
+        lyt_search.addWidget(lbl_msg)
+
+        lyt_plan_1 = self.dlg_mincut.findChild(QGridLayout, 'lyt_plan_1')
+        row = lyt_plan_1.rowCount()
+        col_span = lyt_plan_1.columnCount()
+        lyt_plan_1.addLayout(lyt_search, row, 0, 1, col_span)
+
+        self.dlg_mincut.main_tab = main_tab
+        self.dlg_mincut.lbl_msg = lbl_msg
+
+        self.search = GwSearch()
+        self.search.open_search(None, self.dlg_mincut)
+
+        chld = main_tab.children()
+
+        print(chld[0])
+        print(chld[0].objectName())
 
     def _create_widget(self, field):
         create = {
