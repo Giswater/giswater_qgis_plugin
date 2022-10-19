@@ -85,30 +85,49 @@ BEGIN
 			WHERE n.demand IS NOT NULL AND n.demand <> 0;
 		END IF;
 
-		-- insert node/connec demands from dscenario to temp_demand
+		-- insert node demands from dscenario into temp_demand
 		INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
 		SELECT dscenario_id, feature_id, d.demand, d.pattern_id, d.demand_type, d.source
 		FROM temp_node n, inp_dscenario_demand d WHERE n.node_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0 
 		AND dscenario_id IN (SELECT unnest(v_userscenario));
 
-		-- insert connec demands from dscenario to linked object which is exported	
+		-- insert connec demands from dscenario into temp_demand linking object which is exported	
 		IF v_networkmode IN(1,2) THEN
 
+			-- demands for connec related to arcs
 			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
 			SELECT dscenario_id, node_1 AS node_id, d.demand/2 as demand, d.pattern_id, demand_type, source FROM temp_arc JOIN v_edit_inp_connec USING (arc_id)
 			JOIN inp_dscenario_demand d ON feature_id = connec_id WHERE dscenario_id IN (SELECT unnest(v_userscenario))
 			UNION ALL
 			SELECT dscenario_id, node_2 AS node_id, d.demand/2 as demand, d.pattern_id, demand_type, source  FROM temp_arc JOIN v_edit_inp_connec USING (arc_id)
 			JOIN inp_dscenario_demand d ON feature_id = connec_id WHERE dscenario_id IN (SELECT unnest(v_userscenario));
+
+			-- demands for connec related to nodes
+			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
+			SELECT dscenario_id, pjoint_id, d.demand as demand, d.pattern_id, demand_type, source  FROM v_edit_inp_connec 
+			JOIN inp_dscenario_demand d ON feature_id = connec_id 
+			WHERE pjoint_type = 'NODE'
+			AND dscenario_id IN (SELECT unnest(v_userscenario));
+
 			
 		ELSIF v_networkmode = 3 THEN
-		
+
+			-- demands for connec related to arcs
 			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id,  demand_type, source)
 			SELECT dscenario_id, n.node_id, d.demand, d.pattern_id, demand_type, source 
 			FROM  inp_dscenario_demand d ,temp_node n
 			JOIN connec c ON concat('VN',c.pjoint_id) =  n.node_id
 			WHERE c.connec_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0  
 			AND dscenario_id IN (SELECT unnest(v_userscenario));
+
+			-- demands for connec related to nodes
+			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id,  demand_type, source)
+			SELECT dscenario_id, n.node_id, d.demand, d.pattern_id, demand_type, source 
+			FROM  inp_dscenario_demand d ,temp_node n
+			JOIN connec c ON c.pjoint_id =  n.node_id WHERE pjoint_type = 'NODE'
+			AND c.connec_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0  
+			AND dscenario_id IN (SELECT unnest(v_userscenario));
+			
 		END IF;
 
 		-- remove those demands which for some reason linked node is not exported
