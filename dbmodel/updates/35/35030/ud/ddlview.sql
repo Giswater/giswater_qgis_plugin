@@ -98,7 +98,8 @@ with t as ( SELECT a.timser_id,
           ORDER BY a.id)
 		 SELECT timser_id, date, time, value from t, selector_expl s WHERE (t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text)
 		 UNION
-		 SELECT  timser_id, date, time, value from t WHERE t.expl_id is null;
+		 SELECT  timser_id, date, time, value from t WHERE t.expl_id is null
+        order by timser_id, time;
 
 
 CREATE OR REPLACE VIEW v_edit_inp_gully AS 
