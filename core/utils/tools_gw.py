@@ -1665,7 +1665,10 @@ def add_calendar(dlg, fld, **kwargs):
         widget.setProperty('columnname', fld['columnname'])
     widget.setAllowNull(True)
     widget.setCalendarPopup(True)
-    widget.setDisplayFormat('dd/MM/yyyy')
+    if fld.get('datatype') == 'datetime':
+        widget.setDisplayFormat('dd/MM/yyyy HH:mm')
+    else:
+        widget.setDisplayFormat('dd/MM/yyyy')
     if fld.get('value') not in ('', None, 'null'):
         date = QDate.fromString(fld['value'].replace('/', '-'), 'yyyy-MM-dd')
         tools_qt.set_calendar(dlg, widget, date)
