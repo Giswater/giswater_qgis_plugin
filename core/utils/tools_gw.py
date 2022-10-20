@@ -1348,6 +1348,9 @@ def add_widget(dialog, field, lbl, widget, horizontal_layouts=[]):
         col = col + 1 if ishorizontal else 1
     if type(widget) is QSpacerItem:
         layout.addItem(widget, row, col)
+    # Makes widgets without label span the 2 columns in vertical layouts
+    elif lbl is None and not ishorizontal:
+        layout.addWidget(widget, row, col, 1, 2)
     else:
         layout.addWidget(widget, row, col)
     if lbl is not None and not ishorizontal:
