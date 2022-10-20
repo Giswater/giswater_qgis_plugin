@@ -340,7 +340,7 @@ class GwMincut:
             label = tools_gw.add_label(field)
             if 'value' not in field:
                 value = tools_gw.get_config_parser('dlg_mincut', field['columnname'], 'user', 'session')
-                field['value'] = value if value is not None else False
+                field['value'] = value
             elif type(field['value']) == int:
                 field['value'] = str(field['value'])
             widget = self._create_widget(field)
@@ -484,7 +484,10 @@ class GwMincut:
     def _create_widget(self, field):
         create = {
             'text': tools_gw.add_lineedit,
-            'check': tools_gw.add_checkbox
+            'check': tools_gw.add_checkbox,
+            'combo': tools_gw.add_combo,
+            'datetime': partial(tools_gw.add_calendar, self.dlg_mincut),
+            'textarea': tools_gw.add_textarea
         }
         wt = field['widgettype']
         widget = create[wt](field)
