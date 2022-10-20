@@ -478,9 +478,6 @@ class GwMincut:
 
         chld = main_tab.children()
 
-        print(chld[0])
-        print(chld[0].objectName())
-
     def _create_widget(self, field):
         create = {
             'text': tools_gw.add_lineedit,
