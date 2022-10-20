@@ -1322,9 +1322,9 @@ def check_parameters(field):
     if 'widgetname' not in field:
         msg += "widgetname not found. "
 
-    if field.get('widgettype') not in ('text', 'linetext', 'combo', 'check', 'datetime', 'spinbox', 'button'):
+    if field.get('widgettype') not in ('text', 'linetext', 'textarea', 'combo', 'check', 'datetime', 'spinbox', 'button'):
         msg += "widgettype is wrongly configured. Needs to be in " \
-               "('text', 'linetext', 'combo', 'check', 'datetime', 'spinbox', 'button')"
+               "('text', 'linetext', 'textarea', 'combo', 'check', 'datetime', 'spinbox', 'button')"
 
     if 'layoutorder' not in field:
         msg += "layoutorder not found. "
