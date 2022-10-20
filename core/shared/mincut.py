@@ -487,7 +487,8 @@ class GwMincut:
             'check': tools_gw.add_checkbox,
             'combo': tools_gw.add_combo,
             'datetime': partial(tools_gw.add_calendar, self.dlg_mincut),
-            'textarea': tools_gw.add_textarea
+            'textarea': tools_gw.add_textarea,
+            'button': lambda field: tools_gw.add_button(field=field)
         }
         wt = field['widgettype']
         widget = create[wt](field)
