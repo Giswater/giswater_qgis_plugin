@@ -494,5 +494,6 @@ class GwFeatureReplaceButton(GwMaptool):
 
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_replace.featurecat_id, rows)
+        tools_qt.set_autocompleter(self.dlg_replace.featurecat_id)
 
     # endregion

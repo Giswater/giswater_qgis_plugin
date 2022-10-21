@@ -395,7 +395,7 @@ def set_combo_value(combo, value, item1, add_new=True):
 
     for i in range(0, combo.count()):
         elem = combo.itemData(i)
-        if value == str(elem[item1]):
+        if elem is not None and value == str(elem[item1]):
             combo.setCurrentIndex(i)
             return True
 
