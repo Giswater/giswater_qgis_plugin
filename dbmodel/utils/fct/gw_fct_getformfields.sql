@@ -62,7 +62,7 @@ v_widgetvalue json;
 v_input json;
 v_editability text;
 v_label text;     
-v_clause text;
+v_clause text='';
 v_device text;
 v_debug boolean;
 v_debug_var text;
@@ -100,13 +100,6 @@ BEGIN
 	-- setting tabname
 	IF p_tabname IS NULL THEN
 		p_tabname = 'tabname';
-	END IF;
-	
-	--setting v_clause in function of info type
-	IF p_tgop = 'LAYER' THEN -- used when geinfofromid is called on initproject to shape all widgets on table of attributes (id is null)
-		v_clause = '';
-	ELSE  -- used always for each feature when geinfofromid is called feature by feature
-		v_clause = 'AND hidden IS NOT TRUE';
 	END IF;
 	
 	-- setting device
