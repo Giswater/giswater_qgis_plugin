@@ -564,6 +564,9 @@ BEGIN
 	IF v_extvisitclass <> v_visitclass THEN
 
 		v_isclasschanged = true;
+        -- set existing visitclass to used visitclass
+		v_visitclass=v_extvisitclass;
+        
 		-- update change of class
 		--UPDATE om_visit SET class_id=v_visitclass WHERE id=v_id::int8;
 
