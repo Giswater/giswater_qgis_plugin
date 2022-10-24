@@ -343,15 +343,11 @@ BEGIN
 
 		END IF;
 		
-		--Inventory
-		IF NEW.inventory IS NULL THEN 
-			NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
-		END IF;
+		--Inventory (boolean fields cannot have IF because QGIS only manage true/false and trigger gets a false when checkbox is empty)
+		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
 
-		--Publish
-		IF NEW.publish IS NULL THEN 
-			NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');	
-		END IF;	
+		--Publish (boolean fields cannot have IF because QGIS only manage true/false and trigger gets a false when checkbox is empty)
+		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');
 		
 		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature JOIN cat_node ON cat_feature.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id;
 		

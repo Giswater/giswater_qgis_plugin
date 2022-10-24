@@ -323,15 +323,11 @@ BEGIN
 				"data":{"message":"3036", "function":"1318","debug_msg":"'||v_sql::text||'"}}$$);';
 		END IF;
 
-		--Inventory	
-		IF NEW.inventory IS NULL THEN 
-			NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
-		END IF;
+		--Inventory (boolean fields cannot have IF because QGIS only manage true/false and trigger gets a false when checkbox is empty)
+		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
 
-		--Publish
-		IF NEW.publish IS NULL THEN 
-			NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');	
-		END IF;
+		--Publish (boolean fields cannot have IF because QGIS only manage true/false and trigger gets a false when checkbox is empty)
+		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');
 		
 		-- Workcat_id
 		IF (NEW.workcat_id IS NULL) THEN
