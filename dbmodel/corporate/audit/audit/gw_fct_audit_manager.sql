@@ -19,7 +19,7 @@ BEGIN
 	
 	FOR table_record IN SELECT * FROM sys_table WHERE isaudit  IS TRUE
 	LOOP 
-		DELETE FROM audit.log WHERE (date (now())- date (tstamp)) > table_record.keepauditdays;
+		DELETE FROM audit.log WHERE schema = 'SCHEMA_NAME' and (date (now())- date (tstamp)) > table_record.keepauditdays and table_name =table_record.id;
 	END LOOP;	
 
 RETURN 0;
