@@ -1309,7 +1309,7 @@ def _add_translator(locale_path, log_info=False):
 def _translate_form(dialog, context_name, aux_context='ui_message'):
     """ Translate widgets of the form to current language """
 
-    type_widget_list = [QCheckBox, QGroupBox, QLabel, QPushButton, QRadioButton, QTabWidget]
+    type_widget_list = [QCheckBox, QGroupBox, QLabel, QPushButton, QRadioButton, QTabWidget, QLineEdit, QTextEdit]
     for widget_type in type_widget_list:
         widget_list = dialog.findChildren(widget_type)
         for widget in widget_list:
@@ -1365,6 +1365,8 @@ def _translate_widget(context_name, widget, aux_context='ui_message'):
                 text = tr(widget_title, context_name, aux_context)
                 if text != widget_title:
                     widget.setTitle(text)
+            _translate_tooltip(context_name, widget, aux_context=aux_context)
+        elif type(widget) is QLineEdit or type(widget) is QTextEdit:
             _translate_tooltip(context_name, widget, aux_context=aux_context)
         else:
             widget_name = widget.objectName()
