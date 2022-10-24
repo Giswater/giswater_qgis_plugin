@@ -133,6 +133,13 @@ SET search_path = "SCHEMA_NAME", public;
 					v_line1 := ST_LineSubstring(v_street_geom, 0.0, v_intersect_loc);
 					v_line2 := ST_LineSubstring(v_street_geom, v_intersect_loc, 1.0);
 
+					IF ST_GeometryType(v_line1) = 'ST_Point' THEN
+						v_line1=NULL;
+					END IF;
+					IF ST_GeometryType(v_line2) = 'ST_Point' THEN
+						v_line2=NULL;
+					END IF;
+
 					INSERT INTO temp_arc(result_id, arc_id,the_geom, annotation)
 					SELECT distinct v_fid,row_number()over() as row_id, the_geom, id FROM 
 					(SELECT v_line1  as the_geom,v_closest_street as id
@@ -176,6 +183,13 @@ SET search_path = "SCHEMA_NAME", public;
 						v_line1 := ST_LineSubstring(v_street_geom, 0.0, v_intersect_loc);
 						v_line2 := ST_LineSubstring(v_street_geom, v_intersect_loc, 1.0);
 
+						IF ST_GeometryType(v_line1) = 'ST_Point' THEN
+							v_line1=NULL;
+						END IF;
+						IF ST_GeometryType(v_line2) = 'ST_Point' THEN
+							v_line2=NULL;
+						END IF;
+						
 						INSERT INTO temp_arc(result_id, arc_id,the_geom, annotation)
 						SELECT distinct v_fid,row_number()over() as row_id, the_geom, id FROM 
 						(SELECT v_line1  as the_geom,v_closest_street as id
