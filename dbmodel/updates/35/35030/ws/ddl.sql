@@ -18,3 +18,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "colu
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"staticpress2", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"descript", "dataType":"text"}}$$);
+
+--2022/10/24
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut", "column":"chlorine", "dataType":"character varying(30)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut", "column":"turbidity", "dataType":"character varying(30)", "isUtils":"False"}}$$);
