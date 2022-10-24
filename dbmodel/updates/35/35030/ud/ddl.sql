@@ -22,3 +22,8 @@ ALTER TABLE inp_dscenario_flwreg_orifice ALTER COLUMN ori_type DROP NOT NULL;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_inp_arc", "column":"minorloss", "dataType":"numeric(12,6)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"temp_arc", "column":"minorloss", "dataType":"numeric(12,6)", "isUtils":"False"}}$$);
+
+--2022/10/22
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_dscenario_inflows", "column":"format_type", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_dscenario_inflows", "column":"mfactor", "isUtils":"False"}}$$);
+
