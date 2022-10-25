@@ -41,7 +41,7 @@ class GwMincutTools:
         # Create the dialog and signals
         tools_gw.load_settings(self.dlg_mincut_man)
         tools_gw.set_dates_from_to(self.dlg_mincut_man.date_from, self.dlg_mincut_man.date_to, 'om_mincut',
-                                   'forecast_start, exec_start', 'forecast_end, exec_end')
+                                   'forecast_start, exec_start', 'forecast_end, exec_end', max_back_date='1 year')
         self.dlg_mincut_man.date_from.setEnabled(False)
         self.dlg_mincut_man.date_to.setEnabled(False)
         tools_gw.add_icon(self.dlg_mincut_man.btn_selector_mincut, "191", sub_folder="24x24")
