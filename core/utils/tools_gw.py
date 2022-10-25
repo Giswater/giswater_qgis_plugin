@@ -2895,11 +2895,26 @@ def set_multi_completer_widget(tablenames: list, widget, fields_id: list, add_id
     tools_qt.set_completer_rows(widget, rows)
 
 
-def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to):
+def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to, max_back_date=None, max_fwd_date=None):
+    """
+    Builds query to populate @widget_from & @widget_to dates
+        :param widget_from:
+        :param widget_to:
+        :param table_name:
+        :param field_from:
+        :param field_to:
+        :param max_back_date: a PostgreSQL valid interval (eg. '1 year')
+        :param max_fwd_date: a PostgreSQL valid interval (eg. '1 year')
+    """
 
-    sql = (f"SELECT MIN(LEAST({field_from}, {field_to})),"
-           f" MAX(GREATEST({field_from}, {field_to}))"
-           f" FROM {table_name}")
+    min_sql = f"MIN(LEAST({field_from}, {field_to}))"
+    max_sql = f"MAX(GREATEST({field_from}, {field_to}))"
+    if max_back_date:
+        min_sql = f"GREATEST({min_sql}, now() - interval '{max_back_date}')"
+    if max_fwd_date:
+        max_sql = f"LEAST({max_sql}, now() + interval '{max_fwd_date}')"
+
+    sql = f"SELECT {min_sql}, {max_sql} FROM {table_name}"
     row = tools_db.get_row(sql)
     current_date = QDate.currentDate()
     if row:
