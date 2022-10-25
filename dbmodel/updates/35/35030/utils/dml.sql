@@ -154,3 +154,11 @@ WHERE id=2760;
 
 UPDATE config_param_system SET value=replace(value, 'ignoregraphanalytics','ignoreGraphanalytics') WHERE parameter = 'admin_checkproject';
 UPDATE config_param_system SET value=replace(value, 'ignoreGrafanalytics','ignoreGraphanalytics') WHERE parameter = 'admin_checkproject';
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc', 'form_feature', 'data', 'pavcat_id', 'lyt_data_2', 13, 'string', 'combo', 'pavcat_id', NULL, NULL, false, false, true, false, NULL, 'SELECT id, id as idval FROM cat_pavement', TRUE, TRUE, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('v_edit_arc', 'form_feature', 'data', 'pavcat_id', 'lyt_data_2', 13, 'string', 'combo', 'pavcat_id', NULL, NULL, false, false, true, false, NULL, 'SELECT id, id as idval FROM cat_pavement', TRUE, TRUE, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
