@@ -64,10 +64,29 @@ class GwMincutTools:
 
         model.setStringList(values)
         self.completer.setModel(model)
+
+        # Adding auto-completion to a QLineEdit
+        self.street_completer = QCompleter()
+        self.dlg_mincut_man.txt_streetaxis.setCompleter(self.street_completer)
+        model = QStringListModel()
+
+        sql = "SELECT DISTINCT(streetaxis) FROM v_ui_mincut WHERE streetaxis IS NOT NULL "
+        rows = tools_db.get_rows(sql)
+        values = []
+        if rows:
+            for row in rows:
+                values.append(str(row[0]))
+
+        model.setStringList(values)
+        self.street_completer.setModel(model)
+
+        # Connect signals
         self.txt_mincut_id.textChanged.connect(partial(self._filter_by_id, self.tbl_mincut_edit))
+        self.dlg_mincut_man.txt_streetaxis.textChanged.connect(partial(self._filter_by_id, self.tbl_mincut_edit))
         self.dlg_mincut_man.date_from.dateChanged.connect(partial(self._filter_by_id, self.tbl_mincut_edit))
         self.dlg_mincut_man.date_to.dateChanged.connect(partial(self._filter_by_id, self.tbl_mincut_edit))
         self.dlg_mincut_man.cmb_expl.currentIndexChanged.connect(partial(self._filter_by_id, self.tbl_mincut_edit))
+        self.dlg_mincut_man.cmb_mincut_type.currentIndexChanged.connect(partial(self._filter_by_id, self.tbl_mincut_edit))
         self.dlg_mincut_man.spn_next_days.setRange(-9999, 9999)
         self.dlg_mincut_man.btn_next_days.clicked.connect(self._filter_by_days)
         self.dlg_mincut_man.spn_next_days.valueChanged.connect(self._filter_by_days)
@@ -165,6 +184,11 @@ class GwMincutTools:
         rows = tools_db.get_rows(sql, add_empty_row=True)
         tools_qt.fill_combo_values(self.dlg_mincut_man.cmb_expl, rows, 1)
 
+        # Fill ComboBox mincut type
+        sql = "SELECT id, descript as idval FROM om_mincut_cat_type ORDER BY id"
+        rows = tools_db.get_rows(sql, add_empty_row=True)
+        tools_qt.fill_combo_values(self.dlg_mincut_man.cmb_mincut_type, rows, 1)
+
 
     def _open_mincut(self):
         """ Open mincut form with selected record of the table """
@@ -221,7 +245,9 @@ class GwMincutTools:
         id_ = tools_qt.get_text(self.dlg_mincut_man, self.dlg_mincut_man.txt_mincut_id, False, False)
         state_id = tools_qt.get_combo_value(self.dlg_mincut_man, self.dlg_mincut_man.state_edit, 0)
         state_text = tools_qt.get_combo_value(self.dlg_mincut_man, self.dlg_mincut_man.state_edit, 1)
+        mincut_type = tools_qt.get_combo_value(self.dlg_mincut_man, self.dlg_mincut_man.cmb_mincut_type, 0)
         expl = tools_qt.get_combo_value(self.dlg_mincut_man, self.dlg_mincut_man.cmb_expl, 1)
+        streetaxis = tools_qt.get_text(self.dlg_mincut_man, self.dlg_mincut_man.txt_streetaxis, False, False)
         dates_filter = ""
         if state_id == '':
             self.dlg_mincut_man.date_from.setEnabled(False)
@@ -266,6 +292,9 @@ class GwMincutTools:
         if state_text != '':
             expr += f" AND state::text ILIKE '%{state_text}%' "
         expr += f" AND (exploitation::text ILIKE '%{expl}%' OR exploitation IS null)"
+        expr += f" AND (mincut_type::text ILIKE '%{mincut_type}%')"
+        if streetaxis:
+            expr += f" AND (streetaxis::text ILIKE '%{streetaxis}%')"
 
         # Refresh model with selected filter
         qtable.model().setFilter(expr)
