@@ -35,11 +35,6 @@ FROM   config_toolbox
 WHERE id=2768)d where layoutord is not null)e)a)b WHERE  id=2768;
 
 
-INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
-VALUES (3174, 'gw_trg_edit_setarcdata', 'utils', 'trigger function', 
-'Trigger that fills arc with values captured or calculated based on attributes stored on final nodes', 'role_edit', 'core');
-
-
 UPDATE config_form_fields cff set web_layoutorder = row FROM (SELECT ROW_NUMBER() OVER (PARTITION BY formname ORDER BY formname,
     CASE WHEN layoutname='lyt_none' THEN 1 WHEN layoutname='lyt_top_1' THEN 2 WHEN layoutname='lyt_bot_1' THEN 3
     WHEN layoutname='lyt_data_1' THEN 4 WHEN layoutname='lyt_data_2' THEN 5 WHEN layoutname='lyt_data_3' THEN 6
