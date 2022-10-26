@@ -5,3 +5,4 @@
 - New function gw_graphanalytics_upstream_section_control (UD) -Control of sections inconsistencies between consecutive conduits
 - Minor enhancement on pg2epa for gullies on 1D/2D coupled model
 - Add chlorine and turbidity to om_mincut
+- Get district_id when new feature is inside a district
