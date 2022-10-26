@@ -124,6 +124,8 @@ class GwMincut:
 
         tools_qt.set_widget_text(self.dlg_mincut, "pred_description", row['anl_descript'])
         tools_qt.set_widget_text(self.dlg_mincut, "real_description", row['exec_descript'])
+        tools_qt.set_widget_text(self.dlg_mincut, "txt_chlorine", row['chlorine'])
+        tools_qt.set_widget_text(self.dlg_mincut, "txt_turbidity", row['turbidity'])
         tools_qt.set_widget_text(self.dlg_mincut, "distance", row['exec_from_plot'])
         tools_qt.set_widget_text(self.dlg_mincut, "depth", row['exec_depth'])
         tools_qt.set_checked(self.dlg_mincut, "appropiate", row['exec_appropiate'])
@@ -164,6 +166,8 @@ class GwMincut:
             self.dlg_mincut.cause.setDisabled(False)
             self.dlg_mincut.cbx_recieved_day.setDisabled(False)
             self.dlg_mincut.cbx_recieved_time.setDisabled(False)
+            self.dlg_mincut.txt_chlorine.setDisabled(False)
+            self.dlg_mincut.txt_turbidity.setDisabled(False)
             # Group Prediction
             self.dlg_mincut.cbx_date_start_predict.setDisabled(False)
             self.dlg_mincut.cbx_hours_start_predict.setDisabled(False)
@@ -182,6 +186,8 @@ class GwMincut:
             self.dlg_mincut.real_description.setDisabled(True)
             self.dlg_mincut.btn_start.setDisabled(False)
             self.dlg_mincut.btn_end.setDisabled(True)
+            self.dlg_mincut.txt_chlorine.setDisabled(True)
+            self.dlg_mincut.txt_turbidity.setDisabled(True)
             # Actions
             if self.mincut_class == 1:
                 self.action_mincut.setDisabled(False)
@@ -225,6 +231,8 @@ class GwMincut:
             self.dlg_mincut.cause.setDisabled(True)
             self.dlg_mincut.cbx_recieved_day.setDisabled(True)
             self.dlg_mincut.cbx_recieved_time.setDisabled(True)
+            self.dlg_mincut.txt_chlorine.setDisabled(True)
+            self.dlg_mincut.txt_turbidity.setDisabled(True)
             # Group Prediction dates
             self.dlg_mincut.cbx_date_start_predict.setDisabled(True)
             self.dlg_mincut.cbx_hours_start_predict.setDisabled(True)
@@ -243,6 +251,8 @@ class GwMincut:
             self.dlg_mincut.real_description.setDisabled(False)
             self.dlg_mincut.btn_start.setDisabled(True)
             self.dlg_mincut.btn_end.setDisabled(False)
+            self.dlg_mincut.txt_chlorine.setDisabled(False)
+            self.dlg_mincut.txt_turbidity.setDisabled(False)
             # Actions
             self.action_mincut.setDisabled(True)
             self.action_refresh_mincut.setDisabled(True)
@@ -281,6 +291,8 @@ class GwMincut:
             self.dlg_mincut.real_description.setDisabled(True)
             self.dlg_mincut.btn_start.setDisabled(True)
             self.dlg_mincut.btn_end.setDisabled(True)
+            self.dlg_mincut.txt_chlorine.setDisabled(True)
+            self.dlg_mincut.txt_turbidity.setDisabled(True)
             # Actions
             self.action_mincut.setDisabled(True)
             self.action_refresh_mincut.setDisabled(True)
@@ -349,6 +361,8 @@ class GwMincut:
         self.real_description = self.dlg_mincut.findChild(QTextEdit, "real_description")
         self.distance = self.dlg_mincut.findChild(QLineEdit, "distance")
         self.depth = self.dlg_mincut.findChild(QLineEdit, "depth")
+        self.chlorine = self.dlg_mincut.findChild(QLineEdit, "chlorine")
+        self.turbidity = self.dlg_mincut.findChild(QLineEdit, "turbidity")
 
         tools_qt.double_validator(self.distance, 0, 9999999, 3)
         tools_qt.double_validator(self.depth, 0, 9999999, 3)
@@ -704,6 +718,8 @@ class GwMincut:
         self.dlg_mincut.distance.setEnabled(True)
         self.dlg_mincut.depth.setEnabled(True)
         self.dlg_mincut.real_description.setEnabled(True)
+        self.dlg_mincut.txt_chlorine.setEnabled(True)
+        self.dlg_mincut.txt_turbidity.setEnabled(True)
 
         # Set state to 'In Progress'
         tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.state, str(self.states[1]))
@@ -815,6 +831,10 @@ class GwMincut:
         exec_descript = tools_qt.get_text(self.dlg_mincut, "real_description", return_string_null=False)
         exec_user = tools_qt.get_text(self.dlg_mincut, "exec_user", return_string_null=False)
 
+        # chlorine and turbidity
+        chlorine = tools_qt.get_text(self.dlg_mincut, "txt_chlorine", return_string_null=False)
+        turbidity = tools_qt.get_text(self.dlg_mincut, "txt_turbidity", return_string_null=False)
+
         # Get prediction date - start
         date_start_predict = self.dlg_mincut.cbx_date_start_predict.date()
         time_start_predict = self.dlg_mincut.cbx_hours_start_predict.time()
@@ -882,6 +902,12 @@ class GwMincut:
             sql += f", work_order = $${work_order}$$"
         if anl_descript != "":
             sql += f", anl_descript = $${anl_descript}$$ "
+
+        # Manage fields 'chlorine' and 'turbidity'
+        if chlorine != "":
+            sql += f", chlorine = $${chlorine}$$"
+        if turbidity != "":
+            sql += f", turbidity = $${turbidity}$$"
 
         # Manage address
         if address_exploitation_id != -1:
@@ -2385,6 +2411,8 @@ class GwMincut:
             self.dlg_mincut.real_description.setDisabled(True)
             self.dlg_mincut.btn_start.setDisabled(True)
             self.dlg_mincut.btn_end.setDisabled(True)
+            self.dlg_mincut.txt_chlorine.setDisabled(True)
+            self.dlg_mincut.txt_turbidity.setDisabled(True)
             # Actions
             self.action_mincut.setDisabled(False)
             self.action_refresh_mincut.setDisabled(True)
@@ -2424,6 +2452,8 @@ class GwMincut:
             self.dlg_mincut.real_description.setDisabled(False)
             self.dlg_mincut.btn_start.setDisabled(True)
             self.dlg_mincut.btn_end.setDisabled(False)
+            self.dlg_mincut.txt_chlorine.setDisabled(False)
+            self.dlg_mincut.txt_turbidity.setDisabled(False)
             # Actions
             self.action_mincut.setDisabled(True)
             self.action_refresh_mincut.setDisabled(True)
@@ -2463,6 +2493,8 @@ class GwMincut:
             self.dlg_mincut.real_description.setDisabled(True)
             self.dlg_mincut.btn_start.setDisabled(True)
             self.dlg_mincut.btn_end.setDisabled(True)
+            self.dlg_mincut.txt_chlorine.setDisabled(True)
+            self.dlg_mincut.txt_turbidity.setDisabled(True)
             # Actions
             self.action_mincut.setDisabled(True)
             self.action_refresh_mincut.setDisabled(True)
