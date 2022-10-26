@@ -33,7 +33,7 @@ To work with Giswater you will need at least 2 programs:
 PostgreSQL: Installation process must include the selection pgAdmin component (Data Base Manager) and Postgis application (Spatial Extension)<br>
 QGIS: Geoprocessing software<br>
 <br>
-You also need to have the matplotlib python library installed.
+If you didn't install QGIS using the standalone installer, you may need to install the matplotlib python library manually.
 
 ## INSTALL
 As Giswater is as server-client software you need to install it into two separate environments.
