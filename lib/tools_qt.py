@@ -708,11 +708,8 @@ def set_lazy_init(widget, lazy_widget=None, lazy_init_function=None):
     lazy_init_function(lazy_widget)
 
 
-def filter_by_id(dialog, widget_table, widget_txt, table_object):
+def filter_by_id(dialog, widget_table, widget_txt, table_object, field_object_id="id"):
 
-    field_object_id = "id"
-    if table_object == "element":
-        field_object_id = table_object + "_id"
     object_id = get_text(dialog, widget_txt)
     if object_id != 'null':
         expr = f"{field_object_id}::text ILIKE '%{object_id}%'"

@@ -995,8 +995,8 @@ def delete_selected_rows(widget, table_object):
     list_id = ""
     field_object_id = "id"
 
-    if table_object == "element":
-        field_object_id = table_object + "_id"
+    if table_object == "v_edit_element":
+        field_object_id = "element_id"
     elif "v_ui_om_visitman_x_" in table_object:
         field_object_id = "visit_id"
 
@@ -2839,14 +2839,18 @@ def load_tableview_psector(dialog, feature_type):
 def set_completer_object(dialog, tablename, field_id="id"):
     """ Set autocomplete of widget @table_object + "_id"
         getting id's from selected @table_object
+
+        TODO: Refactor. It should have this params: (dialog, widget, tablename, field_id="id")
+            The widget might not be called '@table_object + "_id"'
     """
 
-    widget = tools_qt.get_widget(dialog, tablename + "_id")
+    widget_name = tablename + "_id"
+    if tablename == "v_edit_element":  # TODO: remove this when refactored
+        widget_name = "element_id"
+
+    widget = tools_qt.get_widget(dialog, widget_name)
     if not widget:
         return
-
-    if tablename == "element":
-        field_id = tablename + "_id"
 
     set_completer_widget(tablename, widget, field_id)
 

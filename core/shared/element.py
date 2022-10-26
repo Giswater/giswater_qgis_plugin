@@ -272,8 +272,8 @@ class GwElement:
         self.dlg_man.tbl_element.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Adding auto-completion to a QLineEdit
-        table_object = "element"
-        tools_gw.set_completer_object(self.dlg_man, table_object)
+        table_object = "v_edit_element"
+        tools_gw.set_completer_object(self.dlg_man, table_object, field_id='element_id')
 
         # Set a model with selected filter. Attach that model to selected table
         message = tools_qt.fill_table(self.dlg_man.tbl_element, f"{self.schema_name}.{table_object}")
@@ -283,7 +283,7 @@ class GwElement:
 
         # Set signals
         self.dlg_man.element_id.textChanged.connect(partial(
-            tools_qt.filter_by_id, self.dlg_man, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object))
+            tools_qt.filter_by_id, self.dlg_man, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object, "element_id"))
         self.dlg_man.tbl_element.doubleClicked.connect(partial(
             self._open_selected_object_element, self.dlg_man, self.dlg_man.tbl_element, table_object))
         self.dlg_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_man))
