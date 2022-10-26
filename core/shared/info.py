@@ -101,6 +101,17 @@ class GwInfo(QObject):
             self.layer = None
             self.feature = None
             self.my_json = {}
+            # Note about self.my_json: this variable is passed to tools_gw.get_values via connected signals.
+            # If it's reassigned after connecting the signal, it will most likely get a new position in memory, but
+            # the self.my_json variable passed to the signal will be pointing to the original self.my_json.
+            # For example, if we do this:
+            #     self.my_json = {'test1': 'test1'}
+            #     widget.signal.connect(partial(tools_gw.get_values, self.my_json))
+            #     self.my_json = {}
+            #     widget.signal.trigger()
+            # Now tools_gw.get_values() will read self.my_json as {'test1': 'test1'}
+            # So to clear the dictionary do this:
+            #     self.my_json.clear()
             self.tab_type = tab_type
 
             # Get project variables
@@ -2116,7 +2127,7 @@ class GwInfo(QObject):
     def _reset_my_json(self):
         """ Delete keys if exist, when widget is autoupdate """
 
-        self.my_json = {}
+        self.my_json.clear()
 
 
     def _set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
