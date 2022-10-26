@@ -1844,6 +1844,8 @@ class GwInfo(QObject):
         fields_reload = ""
         list_mandatory = []
         for field in complet_result['body']['data']['fields']:
+            if field.get('hidden') in (True, 'True', 'true'):
+                continue
             if p_widget and (field['widgetname'] == p_widget.objectName()):
                 if field['widgetcontrols'] and 'autoupdateReloadFields' in field['widgetcontrols']:
                     fields_reload = field['widgetcontrols']['autoupdateReloadFields']
