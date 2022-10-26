@@ -69,8 +69,7 @@ Create qgis project:https://www.youtube.com/watch?v=RwFumKKTB2k&list=PLQ-seRm9Dj
 ## DEPLOYMENT
 
 ### Requirements:
-You need to have permissions to connect to postgreSQL database (compatible versions) and your user need to be a db superuser in order to be allowed. <br>
-to create project schemas, roles, backups, restores among others db admin operations.
+You need to have permissions to connect to postgreSQL database (compatible versions) and your user need to be a db superuser in order to be allowed to create project schemas, roles, backups, restores among others db admin operations.
 
 ### Mandatory information for the project:
 Project works with catalogs and you need to fill at least the mandatory ones [materials, node, arc].<br>
