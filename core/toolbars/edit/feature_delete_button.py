@@ -28,6 +28,8 @@ class GwFeatureDeleteButton(GwAction):
         self.list_feature_type = list_feature_type
         if not self.list_feature_type:
             self.list_feature_type = tuple(['ARC', 'NODE', 'CONNEC'])
+            if global_vars.project_type == 'ud':
+                self.list_feature_type += ('GULLY',)
         else:
             self.list_feature_type = tuple(self.list_feature_type)
         if len(self.list_feature_type) == 1:
