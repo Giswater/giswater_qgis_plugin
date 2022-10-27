@@ -1459,9 +1459,9 @@ class GwInfo(QObject):
             tools_qt.set_action_checked(action_edit, False)
             tools_gw.enable_widgets(dialog, self.complet_result['body']['data'], False)
             self._enable_actions(dialog, False)
-            # Force layers to reindex in order to fix some snapping issues
-            self.iface.mapCanvas().snappingUtils().clearAllLocators()
-            tools_qgis.force_refresh_map_canvas()
+        # Force layers to reindex in order to fix some snapping issues
+        self.iface.mapCanvas().snappingUtils().clearAllLocators()
+        tools_qgis.force_refresh_map_canvas()
 
 
     def _stop_editing(self, dialog, action_edit, layer, fid, my_json, new_feature=None):
