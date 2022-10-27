@@ -25,3 +25,6 @@ VALUES (476, 'Get log for epa calibration volumes', 'ws', NULL, 'GW Epa Tools', 
 
 UPDATE config_param_system set value = 
 json_build_object('activated', value,'updateField','elevation')::text WHERE parameter='admin_raster_dem';
+
+UPDATE config_form_fields SET widgetcontrols='{"valueRelation":{"nullValue":false, "layer": "v_edit_inp_curve", "activated": true, "keyColumn": "id", "valueColumn": "id", "filterExpression": null}}'
+WHERE  formname ilike '%dscenario_pump%' and columnname = 'curve_id';
