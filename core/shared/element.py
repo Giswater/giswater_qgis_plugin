@@ -113,7 +113,7 @@ class GwElement:
 
         # Adding auto-completion to a QLineEdit
         table_object = "element"
-        tools_gw.set_completer_object(self.dlg_add_element, table_object)
+        tools_gw.set_completer_object(self.dlg_add_element, table_object, field_id='element_id')
 
         # Set signals
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
@@ -359,7 +359,7 @@ class GwElement:
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "element"
-        tools_gw.set_completer_object(dialog, self.table_object)
+        tools_gw.set_completer_object(dialog, self.table_object, field_id='element_id')
 
 
     def _manage_element_accept(self, table_object):
