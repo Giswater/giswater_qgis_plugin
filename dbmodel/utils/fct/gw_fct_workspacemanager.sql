@@ -65,6 +65,7 @@ v_version text;
 v_result_info json;
 v_uservalues json;
 v_querytext text;
+v_iseditable boolean;
 
 BEGIN
 
@@ -92,10 +93,11 @@ BEGIN
 		SELECT name into v_workspace_name FROM cat_workspace WHERE id = v_workspace_id;
 	END IF;
 
+	SELECT iseditable into v_iseditable FROM cat_workspace WHERE id = v_workspace_id;
+
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('WORKSPACE MANAGER'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-----------------------------');
-
 		
 	IF v_action = 'CREATE' OR v_action = 'CHECK' OR v_action = 'UPDATE' THEN
 
@@ -200,6 +202,9 @@ BEGIN
 		IF v_workspace_id::text IN (SELECT value FROM config_param_user WHERE parameter='utils_workspace_vdefault' AND cur_user != current_user) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3186", "function":"3078","debug_msg":null}}$$);'INTO v_audit_result;	
+		ELSIF v_iseditable IS NOT TRUE THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3200", "function":"3078","debug_msg":null}}$$);'INTO v_audit_result;	
 		ELSE
 			IF (SELECT value FROM config_param_user WHERE parameter='utils_workspace_vdefault' AND cur_user = current_user) = v_workspace_id::text THEN
 				--remove workspace from config_param_user
@@ -222,8 +227,13 @@ BEGIN
 		v_return_msg = 'Workspace successfully created';
 
 	ELSIF v_action = 'UPDATE' THEN
-		-- update configuration of selected workspace
-		UPDATE cat_workspace SET config = v_workspace_config WHERE id = v_workspace_id;
+		IF v_iseditable IS NOT TRUE THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3200", "function":"3078","debug_msg":null}}$$);'INTO v_audit_result;	
+		ELSE
+			-- update configuration of selected workspace
+			UPDATE cat_workspace SET config = v_workspace_config WHERE id = v_workspace_id;
+		END IF;
 		
 	ELSIF v_action = 'CURRENT' THEN
 		
@@ -243,9 +253,14 @@ BEGIN
 
 		v_config_values = json_extract_path_text(v_workspace_config,'selectors');
 
-	ELSIF v_action = 'TOGGLE' THEN
-
-		UPDATE cat_workspace SET private = (NOT private) WHERE id=v_workspace_id;
+	ELSIF v_action = 'TOGGLE' THEN	
+		IF v_iseditable IS NOT TRUE THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3200", "function":"3078","debug_msg":null}}$$);'INTO v_audit_result;	
+		ELSE
+			UPDATE cat_workspace SET private = (NOT private) WHERE id=v_workspace_id;
+		END IF;
+		
 
 	ELSIF v_action = 'CHECK' THEN 
 

@@ -13,4 +13,6 @@ CREATE INDEX plan_psector_psector_id
   USING btree (psector_id);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_form_fields", "column":"web_layoutorder", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_workspace", "column":"iseditable", "dataType":"boolean", "isUtils":"False"}}$$);
 
+ALTER TABLE cat_workspace ALTER COLUMN iseditable SET DEFAULT TRUE;
