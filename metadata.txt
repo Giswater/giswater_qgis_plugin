@@ -8,6 +8,7 @@ version=3.5.030
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Adrian Valenciano, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Elies Bertran, Abel García Juanes, Xavier Torret
 
 Changelog=Version 3.5.030
+    - Add 'Open plugin folder' action in Giswater menu
     - Allow searching for catalog_id in change feature type & replace feature tools
     - Add editing action in dimensioning dialog
     - Add type & streetaxis filters in mincut manager
