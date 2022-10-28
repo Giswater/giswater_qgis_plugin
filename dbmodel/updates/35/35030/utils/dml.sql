@@ -161,4 +161,4 @@ VALUES('v_edit_arc', 'form_feature', 'data', 'pavcat_id', 'lyt_data_2', 13, 'str
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
 VALUES (3200, 'Workspace is not editable you can''t modify it nor delete it', NULL, 2, TRUE, 'utils',NULL) ON CONFLICT (id) DO NOTHING;
 
-UPDATE cat_workspace SET iseditable=TRUE;
+UPDATE cat_workspace SET iseditable=TRUE WHERE iseditable IS NULL;
