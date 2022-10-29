@@ -153,8 +153,10 @@ BEGIN
 		factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
 	SELECT result_id_var, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, 
 		factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
-		FROM inp_pattern_value WHERE pattern_id IN (SELECT DISTINCT pattern_id FROM temp_node UNION SELECT value FROM config_param_user WHERE parameter = 'inp_options_pattern' and cur_user =current_user)
-		ORDER BY id;
+		FROM inp_pattern_value WHERE pattern_id IN (SELECT DISTINCT pattern_id FROM temp_node UNION
+		SELECT value FROM config_param_user WHERE parameter = 'inp_options_pattern' and cur_user =current_user 
+		AND (SELECT value FROM config_param_user where parameter = 'inp_options_patternmethod' and cur_user =current_user)='11')
+		order by id;
 
 	-- restore hydrometer selector
 	DELETE FROM selector_hydrometer WHERE cur_user = current_user;
