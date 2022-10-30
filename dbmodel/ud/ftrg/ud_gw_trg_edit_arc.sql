@@ -608,7 +608,8 @@ BEGIN
 		   (NEW.elev2 != OLD.elev2) OR (NEW.elev2 IS NULL AND OLD.elev2 IS NOT NULL) OR (NEW.elev2 IS NOT NULL AND OLD.elev2 IS NULL) OR
 		   (NEW.custom_elev1 != OLD.custom_elev1) OR (NEW.custom_elev1 IS NULL AND OLD.custom_elev1 IS NOT NULL) OR (NEW.custom_elev1 IS NOT NULL AND OLD.custom_elev1 IS NULL) OR
 		   (NEW.custom_elev2 != OLD.custom_elev2) OR (NEW.custom_elev2 IS NULL AND OLD.custom_elev2 IS NOT NULL) OR (NEW.custom_elev2 IS NOT NULL AND OLD.custom_elev2 IS NULL) OR
-		   (NEW.inverted_slope::text != OLD.inverted_slope::text)
+		   (NEW.inverted_slope::text != OLD.inverted_slope::text) OR (NEW.inverted_slope is null and OLD.inverted_slope is not null) 
+		   OR (NEW.inverted_slope is not null and OLD.inverted_slope is null)	   
 		   THEN  
 			UPDATE arc SET y1=NEW.y1, y2=NEW.y2, custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2, elev1=NEW.elev1, elev2=NEW.elev2,
 					custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2, inverted_slope=NEW.inverted_slope
