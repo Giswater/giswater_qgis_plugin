@@ -51,7 +51,7 @@ BEGIN
     ELSE 
 		v_psector_id := (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter = 'plan_psector_vdefault');
 	
-		IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE ' THEN
+		IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 
 			-- Checking number of nodes 
 			v_numNodes := (SELECT COUNT(*) FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.state!=0);

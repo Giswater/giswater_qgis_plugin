@@ -75,9 +75,11 @@ BEGIN
     		UPDATE node SET rotation=NEW.hemisphere WHERE node_id=NEW.node_id;
 	END IF;
 
-	IF v_rotation_disable IS FALSE AND v_hemisphere IS TRUE AND ((NEW.hemisphere != OLD.hemisphere) OR (OLD.hemisphere IS NULL AND NEW.hemisphere IS NOT NULL)) THEN 
-    	UPDATE node SET rotation=rotation - 180 where node_id=NEW.node_id;
-	END IF;
+    IF TG_OP = 'UPDATE' THEN
+        IF v_rotation_disable IS FALSE AND v_hemisphere IS TRUE AND ((NEW.hemisphere != OLD.hemisphere) OR (OLD.hemisphere IS NULL AND NEW.hemisphere IS NOT NULL)) THEN 
+            UPDATE node SET rotation=rotation - 180 where node_id=NEW.node_id;
+        END IF;
+    END IF;
 
 	RETURN NEW;
 END; 
