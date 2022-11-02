@@ -395,7 +395,7 @@ def set_combo_value(combo, value, item1, add_new=True):
 
     for i in range(0, combo.count()):
         elem = combo.itemData(i)
-        if value == str(elem[item1]):
+        if elem is not None and value == str(elem[item1]):
             combo.setCurrentIndex(i)
             return True
 
@@ -708,11 +708,8 @@ def set_lazy_init(widget, lazy_widget=None, lazy_init_function=None):
     lazy_init_function(lazy_widget)
 
 
-def filter_by_id(dialog, widget_table, widget_txt, table_object):
+def filter_by_id(dialog, widget_table, widget_txt, table_object, field_object_id="id"):
 
-    field_object_id = "id"
-    if table_object == "element":
-        field_object_id = table_object + "_id"
     object_id = get_text(dialog, widget_txt)
     if object_id != 'null':
         expr = f"{field_object_id}::text ILIKE '%{object_id}%'"
@@ -1309,7 +1306,7 @@ def _add_translator(locale_path, log_info=False):
 def _translate_form(dialog, context_name, aux_context='ui_message'):
     """ Translate widgets of the form to current language """
 
-    type_widget_list = [QCheckBox, QGroupBox, QLabel, QPushButton, QRadioButton, QTabWidget]
+    type_widget_list = [QCheckBox, QGroupBox, QLabel, QPushButton, QRadioButton, QTabWidget, QLineEdit, QTextEdit]
     for widget_type in type_widget_list:
         widget_list = dialog.findChildren(widget_type)
         for widget in widget_list:
@@ -1365,6 +1362,8 @@ def _translate_widget(context_name, widget, aux_context='ui_message'):
                 text = tr(widget_title, context_name, aux_context)
                 if text != widget_title:
                     widget.setTitle(text)
+            _translate_tooltip(context_name, widget, aux_context=aux_context)
+        elif type(widget) is QLineEdit or type(widget) is QTextEdit:
             _translate_tooltip(context_name, widget, aux_context=aux_context)
         else:
             widget_name = widget.objectName()

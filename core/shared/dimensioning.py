@@ -70,6 +70,11 @@ class GwDimensioning:
         else:
             self.fid = int(db_return['body']['feature']['id'])
         # ACTION SIGNALS
+        action_edit = self.dlg_dim.findChild(QAction, "actionEdit")
+        action_edit.setChecked(layer.isEditable())
+        action_edit.triggered.connect(partial(self._manage_edition, action_edit, qgis_feature, layer))
+        tools_gw.add_icon(action_edit, "101")
+
         action_snapping = self.dlg_dim.findChild(QAction, "actionSnapping")
         action_snapping.triggered.connect(partial(self._snapping, action_snapping))
         tools_gw.add_icon(action_snapping, "103")
@@ -88,7 +93,7 @@ class GwDimensioning:
 
         # WIDGETS SIGNALS
         self.dlg_dim.btn_accept.clicked.connect(
-            partial(self._save_dimensioning, qgis_feature, layer))
+            partial(self._save_dimensioning, qgis_feature, layer, True))
         self.dlg_dim.btn_cancel.clicked.connect(partial(self._cancel_dimensioning, action_snapping, action_orientation))
         self.dlg_dim.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_dim))
         self.dlg_dim.dlg_closed.connect(partial(self._cancel_dimensioning, action_snapping, action_orientation))
@@ -161,7 +166,7 @@ class GwDimensioning:
         tools_gw.close_dialog(self.dlg_dim)
 
 
-    def _save_dimensioning(self, qgis_feature, layer):
+    def _save_dimensioning(self, qgis_feature, layer, close_dlg=True):
 
         # Upsert feature into db
         layer.updateFeature(qgis_feature)
@@ -204,7 +209,8 @@ class GwDimensioning:
         tools_gw.execute_procedure('gw_fct_setdimensioning', body)
 
         # Close dialog
-        tools_gw.close_dialog(self.dlg_dim)
+        if close_dlg:
+            tools_gw.close_dialog(self.dlg_dim)
 
 
     def _deactivate_signals(self, action, emit_point=None):
@@ -225,6 +231,22 @@ class GwDimensioning:
             return True
 
         return False
+
+
+    def _manage_edition(self, action, qgis_feature, layer):
+
+        if action.isChecked():
+            self.layer_dimensions.startEditing()
+        else:
+            # ask if want to save changes
+            # if so: self.layer_dimensions.commitChanges()
+            # else: self.layer_dimensions.rollBack()
+            msg = 'Are you sure to save this feature?'
+            answer = tools_qt.show_question(msg, "Save feature", None)
+            if not answer:
+                tools_qt.set_action_checked(action, True)
+                return
+            self._save_dimensioning(qgis_feature, layer, close_dlg=False)
 
 
     def _snapping(self, action):

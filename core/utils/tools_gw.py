@@ -995,8 +995,8 @@ def delete_selected_rows(widget, table_object):
     list_id = ""
     field_object_id = "id"
 
-    if table_object == "element":
-        field_object_id = table_object + "_id"
+    if table_object == "v_edit_element":
+        field_object_id = "element_id"
     elif "v_ui_om_visitman_x_" in table_object:
         field_object_id = "visit_id"
 
@@ -1060,7 +1060,7 @@ def set_style_mapzones():
             for id in mapzone['values']:
                 # initialize the default symbol for this geometry type
                 symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
-                symbol.setOpacity(float(mapzone['opacity']))
+                symbol.setOpacity(float(mapzone['transparency']))
 
                 # Setting simp
                 R = random.randint(0, 255)
@@ -1741,7 +1741,7 @@ def fill_combo(widget, field):
     combolist = []
     comboIds = field.get('comboIds')
     comboNames = field.get('comboNames')
-    if comboIds and comboNames:
+    if 'comboIds' in field and 'comboNames' in field:
         if tools_os.set_boolean(field.get('isNullValue'), True):
             combolist.append(['', ''])
         for i in range(0, len(field['comboIds'])):
@@ -2839,14 +2839,18 @@ def load_tableview_psector(dialog, feature_type):
 def set_completer_object(dialog, tablename, field_id="id"):
     """ Set autocomplete of widget @table_object + "_id"
         getting id's from selected @table_object
+
+        TODO: Refactor. It should have this params: (dialog, widget, tablename, field_id="id")
+            The widget might not be called '@table_object + "_id"'
     """
 
-    widget = tools_qt.get_widget(dialog, tablename + "_id")
+    widget_name = tablename + "_id"
+    if tablename == "v_edit_element":  # TODO: remove this when refactored
+        widget_name = "element_id"
+
+    widget = tools_qt.get_widget(dialog, widget_name)
     if not widget:
         return
-
-    if tablename == "element":
-        field_id = tablename + "_id"
 
     set_completer_widget(tablename, widget, field_id)
 
@@ -2895,11 +2899,26 @@ def set_multi_completer_widget(tablenames: list, widget, fields_id: list, add_id
     tools_qt.set_completer_rows(widget, rows)
 
 
-def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to):
+def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to, max_back_date=None, max_fwd_date=None):
+    """
+    Builds query to populate @widget_from & @widget_to dates
+        :param widget_from:
+        :param widget_to:
+        :param table_name:
+        :param field_from:
+        :param field_to:
+        :param max_back_date: a PostgreSQL valid interval (eg. '1 year')
+        :param max_fwd_date: a PostgreSQL valid interval (eg. '1 year')
+    """
 
-    sql = (f"SELECT MIN(LEAST({field_from}, {field_to})),"
-           f" MAX(GREATEST({field_from}, {field_to}))"
-           f" FROM {table_name}")
+    min_sql = f"MIN(LEAST({field_from}, {field_to}))"
+    max_sql = f"MAX(GREATEST({field_from}, {field_to}))"
+    if max_back_date:
+        min_sql = f"GREATEST({min_sql}, now() - interval '{max_back_date}')"
+    if max_fwd_date:
+        max_sql = f"LEAST({max_sql}, now() + interval '{max_fwd_date}')"
+
+    sql = f"SELECT {min_sql}, {max_sql} FROM {table_name}"
     row = tools_db.get_row(sql)
     current_date = QDate.currentDate()
     if row:

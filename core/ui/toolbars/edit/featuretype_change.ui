@@ -210,7 +210,11 @@
       </spacer>
      </item>
      <item>
-      <widget class="QComboBox" name="featurecat_id"/>
+      <widget class="QComboBox" name="featurecat_id">
+       <property name="editable">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="btn_catalog">

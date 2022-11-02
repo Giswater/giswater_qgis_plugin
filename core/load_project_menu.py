@@ -142,6 +142,15 @@ class GwMenuLoad(QObject):
 
             # endregion
 
+        # region Open plugin folder
+        if global_vars.plugin_dir:
+            icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}108.png"
+            folder_icon = QIcon(icon_path)
+            action_open_plugin_path = self.main_menu.addAction(f"Open plugin folder")
+            action_open_plugin_path.setIcon(folder_icon)
+            action_open_plugin_path.triggered.connect(self._open_plugin_path)
+        # endregion
+
         # region Advanced
         action_manage_file = self.main_menu.addAction(f"Advanced")
         action_manage_file.triggered.connect(self._open_manage_file)
@@ -157,7 +166,7 @@ class GwMenuLoad(QObject):
             log_folder_volume = f"{round(size / (1024 * 1024), 2)} MB"
             icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}102.png"
             folder_icon = QIcon(icon_path)
-            action_open_path = self.main_menu.addAction(f"Open folder ({log_folder_volume})")
+            action_open_path = self.main_menu.addAction(f"Open user folder ({log_folder_volume})")
             action_open_path.setIcon(folder_icon)
             action_open_path.triggered.connect(self._open_config_path)
         # endregion
@@ -183,6 +192,15 @@ class GwMenuLoad(QObject):
         """ Opens the OS-specific Config directory """
 
         path = os.path.realpath(global_vars.user_folder_dir)
+        status, message = tools_os.open_file(path)
+        if status is False and message is not None:
+            tools_qgis.show_warning(message, parameter=path)
+
+
+    def _open_plugin_path(self):
+        """ Opens the OS-specific Plugin directory """
+
+        path = os.path.realpath(global_vars.plugin_dir)
         status, message = tools_os.open_file(path)
         if status is False and message is not None:
             tools_qgis.show_warning(message, parameter=path)

@@ -66,6 +66,7 @@ class GwInfo(QObject):
         self.snapper_manager.set_snapping_layers()
         self.suppres_form = None
         self.prev_action = None
+        self.previous_map_tool = None
 
 
     def get_info_from_coordinates(self, point, tab_type):
@@ -101,6 +102,17 @@ class GwInfo(QObject):
             self.layer = None
             self.feature = None
             self.my_json = {}
+            # Note about self.my_json: this variable is passed to tools_gw.get_values via connected signals.
+            # If it's reassigned after connecting the signal, it will most likely get a new position in memory, but
+            # the self.my_json variable passed to the signal will be pointing to the original self.my_json.
+            # For example, if we do this:
+            #     self.my_json = {'test1': 'test1'}
+            #     widget.signal.connect(partial(tools_gw.get_values, self.my_json))
+            #     self.my_json = {}
+            #     widget.signal.trigger()
+            # Now tools_gw.get_values() will read self.my_json as {'test1': 'test1'}
+            # So to clear the dictionary do this:
+            #     self.my_json.clear()
             self.tab_type = tab_type
 
             # Get project variables
@@ -328,7 +340,7 @@ class GwInfo(QObject):
                 action.setChecked(False)
                 return
         # Block the signals of de dialog so that the key ESC does not close it
-        dialog.blockSignals(True)
+        dialog.key_escape.disconnect()
 
         self.vertex_marker = self.snapper_manager.vertex_marker
 
@@ -350,6 +362,7 @@ class GwInfo(QObject):
 
         tools_gw.disconnect_signal('info_snapping', 'get_snapped_feature_id_ep_canvasClicked_get_id')
         emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.previous_map_tool = global_vars.canvas.mapTool()
         self.canvas.setMapTool(emit_point)
         tools_gw.connect_signal(emit_point.canvasClicked, partial(self._get_id, dialog, action, option, emit_point, child_type),
                                 'info_snapping', 'get_snapped_feature_id_ep_canvasClicked_get_id')
@@ -736,6 +749,7 @@ class GwInfo(QObject):
         self.action_section.triggered.connect(partial(self._open_section_form))
         self.action_help.triggered.connect(partial(self._open_help, self.feature_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
+        self.previous_map_tool = global_vars.canvas.mapTool()
         self.action_interpolate.triggered.connect(partial(self._activate_snapping, complet_result, self.ep))
 
         # Disable action edit if user can't edit
@@ -860,6 +874,16 @@ class GwInfo(QObject):
 
         try:
             tools_gw.disconnect_signal('info', 'connect_signals_action_toggle_editing_triggered_fct_block_action_edit')
+        except Exception:
+            pass
+
+        try:
+            tools_gw.disconnect_signal('info_snapping')
+        except Exception:
+            pass
+
+        try:
+            global_vars.canvas.setMapTool(self.previous_map_tool)
         except Exception:
             pass
 
@@ -1150,6 +1174,7 @@ class GwInfo(QObject):
         # Set map tool emit point and signals
         tools_gw.disconnect_signal('info_snapping', 'manage_action_copy_paste_ep_canvasClicked')
         emit_point = QgsMapToolEmitPoint(global_vars.canvas)
+        self.previous_map_tool = global_vars.canvas.mapTool()
         global_vars.canvas.setMapTool(emit_point)
         tools_gw.disconnect_signal('info_snapping', 'manage_action_copy_paste_xyCoordinates_mouse_move')
         tools_gw.connect_signal(global_vars.canvas.xyCoordinates, self._manage_action_copy_paste_mouse_move,
@@ -1448,6 +1473,9 @@ class GwInfo(QObject):
             tools_qt.set_action_checked(action_edit, False)
             tools_gw.enable_widgets(dialog, self.complet_result['body']['data'], False)
             self._enable_actions(dialog, False)
+        # Force layers to reindex in order to fix some snapping issues
+        self.iface.mapCanvas().snappingUtils().clearAllLocators()
+        tools_qgis.force_refresh_map_canvas()
 
 
     def _stop_editing(self, dialog, action_edit, layer, fid, my_json, new_feature=None):
@@ -1841,6 +1869,8 @@ class GwInfo(QObject):
         fields_reload = ""
         list_mandatory = []
         for field in complet_result['body']['data']['fields']:
+            if field.get('hidden') in (True, 'True', 'true'):
+                continue
             if p_widget and (field['widgetname'] == p_widget.objectName()):
                 if field['widgetcontrols'] and 'autoupdateReloadFields' in field['widgetcontrols']:
                     fields_reload = field['widgetcontrols']['autoupdateReloadFields']
@@ -2111,7 +2141,7 @@ class GwInfo(QObject):
     def _reset_my_json(self):
         """ Delete keys if exist, when widget is autoupdate """
 
-        self.my_json = {}
+        self.my_json.clear()
 
 
     def _set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
@@ -4242,7 +4272,7 @@ class GwInfo(QObject):
 
     def _set_to_arc(self, feat_id, child_type):
         """
-        Function called in def get_id(self, dialog, action, option, point, event):
+        Function called in def _get_id(self, dialog, action, option, emit_point, child_type, point, event):
             getattr(self, options[option][1])(feat_id, child_type)
 
             :param feat_id: Id of the snapped feature
@@ -4283,6 +4313,7 @@ class GwInfo(QObject):
         tools_qgis.disconnect_snapping(False, None, self.vertex_marker)
         tools_gw.disconnect_signal('info_snapping')
         dialog.blockSignals(False)
+        dialog.key_escape.connect(partial(tools_gw.close_dialog, dialog))
         action.setChecked(False)
         self.signal_activate.emit()
 

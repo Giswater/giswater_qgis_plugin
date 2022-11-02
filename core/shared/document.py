@@ -189,7 +189,7 @@ class GwDocument(QObject):
 
         # Set dignals
         self.dlg_man.doc_id.textChanged.connect(
-            partial(tools_qt.filter_by_id, self.dlg_man, self.dlg_man.tbl_document, self.dlg_man.doc_id, table_object))
+            partial(tools_qt.filter_by_id, self.dlg_man, self.dlg_man.tbl_document, self.dlg_man.doc_id, table_object, "id"))
         self.dlg_man.tbl_document.doubleClicked.connect(
             partial(self._open_selected_object_document, self.dlg_man, self.dlg_man.tbl_document, table_object))
         self.dlg_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_man))

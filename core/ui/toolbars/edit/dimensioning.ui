@@ -105,10 +105,11 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionEdit"/>
+   <addaction name="separator"/>
    <addaction name="actionSnapping"/>
    <addaction name="separator"/>
    <addaction name="actionOrientation"/>
-   <addaction name="separator"/>
   </widget>
   <action name="actionSnapping">
    <property name="checkable">
@@ -141,6 +142,24 @@
    </property>
    <property name="toolTip">
     <string>Orientation</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionEdit">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/101.png</normaloff>../icons/101.png</iconset>
+   </property>
+   <property name="text">
+    <string>edit</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit</string>
    </property>
    <property name="visible">
     <bool>true</bool>
