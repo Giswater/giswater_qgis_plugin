@@ -162,3 +162,5 @@ INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, p
 VALUES (3200, 'Workspace is not editable you can''t modify it nor delete it', NULL, 2, TRUE, 'utils',NULL) ON CONFLICT (id) DO NOTHING;
 
 UPDATE cat_workspace SET iseditable=TRUE WHERE iseditable IS NULL;
+
+UPDATE sys_message SET log_level=2 WHERE id=3142;
