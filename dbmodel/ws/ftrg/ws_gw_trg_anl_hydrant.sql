@@ -32,7 +32,7 @@ BEGIN
 		END IF;
 
 		INSERT INTO anl_node (node_id, nodecat_id, expl_id, the_geom, fid)
-		VALUES (NEW.node_id, NEW.nodecat_id, NEW.expl_id, NEW.the_geom, 465);
+		VALUES (NEW.node_id, NEW.nodecat_id, NEW.expl_id, NEW.the_geom, 468);
 
 		RETURN NEW;
 		
@@ -40,13 +40,13 @@ BEGIN
    	
 		UPDATE anl_node 
 		SET node_id=NEW.node_id, nodecat_id=NEW.nodecat_id, expl_id=NEW.expl_id, the_geom=NEW.the_geom
-		WHERE node_id=OLD.node_id AND fid=465 and cur_user=current_user;
+		WHERE node_id=OLD.node_id AND fid=468 and cur_user=current_user;
 		
 		RETURN NEW;
 		
 	ELSIF TG_OP = 'DELETE' THEN  
 	 
-		DELETE FROM anl_node WHERE node_id=OLD.node_id AND fid=465 and cur_user=current_user;
+		DELETE FROM anl_node WHERE node_id=OLD.node_id AND fid=468 and cur_user=current_user;
 		RETURN NULL;
 	END IF;
 END;

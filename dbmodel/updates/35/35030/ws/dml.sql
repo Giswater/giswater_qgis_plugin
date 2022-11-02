@@ -28,3 +28,5 @@ json_build_object('activated', value,'updateField','elevation')::text WHERE para
 
 UPDATE config_form_fields SET widgetcontrols='{"valueRelation":{"nullValue":false, "layer": "v_edit_inp_curve", "activated": true, "keyColumn": "id", "valueColumn": "id", "filterExpression": null}}'
 WHERE  formname ilike '%dscenario_pump%' and columnname = 'curve_id';
+
+UPDATE anl_node SET fid=468 WHERE fid=465;
