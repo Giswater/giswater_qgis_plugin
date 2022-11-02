@@ -102,7 +102,7 @@ SET search_path = "SCHEMA_NAME", public;
 	IF v_node_array is null THEN
 		EXECUTE 'SELECT array_agg(a.node_id) from (SELECT node_id FROM '||v_tablename||' join man_hydrant using (node_id))a'
 		into v_node_array;
-		EXECUTE 'SELECT string_agg(a.node_id,', ') from (SELECT node_id FROM '||v_tablename||' join man_hydrant using (node_id))a'
+		EXECUTE 'SELECT string_agg(a.node_id,'', '') from (SELECT n.node_id FROM '||v_tablename||' n join man_hydrant using (node_id))a'
 		into v_hidrant_array;
 	END IF;
 
