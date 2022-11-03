@@ -72,6 +72,13 @@ v_action text;
 v_zonetable text;
 v_cur_user text;
 v_prev_cur_user text;
+v_device integer;
+v_layers text;
+v_layer text;
+v_rec record;
+v_columns json;
+v_layerColumns json;
+v_loadProject boolean=false;
 
 BEGIN
 
@@ -88,8 +95,10 @@ BEGIN
 	v_filterfrominput := (p_data ->> 'data')::json->> 'filterText';
 	v_geometry := ((p_data ->> 'data')::json->>'geometry');
 	v_useatlas := (p_data ->> 'data')::json->> 'useAtlas';
+	v_loadProject := (p_data ->> 'data')::json->> 'loadProject';
 	v_message := (p_data ->> 'message')::json;
 	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
+	v_device := (p_data ->> 'client')::json->> 'device';
 	
 	v_prev_cur_user = current_user;
 	IF v_cur_user IS NOT NULL THEN
@@ -117,7 +126,9 @@ BEGIN
 
 	v_query = concat('SELECT config_form_tabs.*, value FROM config_form_tabs, config_param_system WHERE formname=',quote_literal(v_selector_type),
 	' AND isenabled IS TRUE AND concat(''basic_selector_'', tabname) = parameter ',(v_querytab),
-	' AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member''))  ORDER BY orderby');
+	' AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member'')',
+	' AND device = ',v_device,
+	')  ORDER BY orderby');
 	v_debug_vars := json_build_object('v_selector_type', v_selector_type, 'v_querytab', v_querytab);
 	v_debug := json_build_object('querystring', v_query, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 10);
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
@@ -277,6 +288,27 @@ BEGIN
 	
 	END LOOP;
 
+	-- Manage QWC
+	IF v_device = 5 THEN
+		-- Get columns for layers
+		v_layers := (p_data ->> 'data')::json->> 'layers';
+		v_layerColumns = '{}';
+		FOR v_rec IN SELECT json_array_elements(v_layers::json)
+		LOOP
+			v_layer = replace(replace(replace(v_rec::text, '"', ''), '(', ''), ')', '');
+			SELECT json_agg(column_name) INTO v_columns FROM information_schema.columns WHERE table_schema = 'SCHEMA_NAME' AND table_name = v_layer;
+			v_layerColumns := gw_fct_json_object_set_key(v_layerColumns, v_layer, v_columns);
+		END LOOP;
+	
+		-- Get active exploitations geometry (to zoom on them)
+		IF v_loadProject IS TRUE AND v_geometry IS NULL THEN
+			SELECT row_to_json (a) 
+			INTO v_geometry
+			FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
+			FROM (SELECT st_expand(st_collect(the_geom), 50.0) as the_geom FROM exploitation where expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) b) a;
+		END IF;
+	END IF;
+
 	-- Finish the construction of the tabs array
 	v_formTabs := v_formTabs ||']';
 
@@ -287,6 +319,7 @@ BEGIN
 	v_currenttab = COALESCE(v_currenttab, '');
 	v_geometry = COALESCE(v_geometry, '{}');
 	v_stylesheet := COALESCE(v_stylesheet, '{}');
+	v_layerColumns = COALESCE(v_layerColumns, '{}');
 	
 	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 	
@@ -310,7 +343,7 @@ BEGIN
 			',"body":{"message":'||v_message||
 			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_currenttab||'", "formText":"", "formTabs":'||v_formTabs||', "style": '||v_stylesheet||'}'||
 			',"feature":{}'||
-			',"data":{"userValues":'||v_uservalues||',"geometry":'||v_geometry||'}'||
+			',"data":{"userValues":'||v_uservalues||',"geometry":'||v_geometry||',"layerColumns":'||v_layerColumns||'}'||
 			'}'||
 		    '}')::json,2796, null, null, v_action::json);
 	END IF;

@@ -10,6 +10,10 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 --2022/09/09
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_connec", "column":"dma_id", "dataType":"text"}}$$);
 
+--2022/09/19
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_report", "column":"vdefault", "newName":"addparam"}}$$);
+
+
 
 
 

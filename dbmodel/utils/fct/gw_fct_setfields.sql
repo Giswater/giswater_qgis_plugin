@@ -238,7 +238,6 @@ BEGIN
 
 	v_message = '{"level": 3, "text": "Feature have been succesfully updated."}';
 
-	
 	-- Control NULL's
 	v_version := COALESCE(v_version, '[]');
 	v_columnfromid := COALESCE(v_columnfromid, '{}');   

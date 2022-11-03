@@ -143,6 +143,12 @@ BEGIN
 
 	IF v_audit_result is null THEN
 		FOREACH rec_id IN ARRAY(v_id_list) LOOP
+
+            -- perform state control for connects
+            IF v_featuretype='connec' or v_featuretype='gully' then
+				PERFORM gw_fct_state_control(upper(v_featuretype::varchar), rec_id::varchar, 0, 'UPDATE');
+			END IF;
+
 			IF v_workcat_id_end IS NOT NULL THEN 
 				EXECUTE 'UPDATE '||v_featuretype||' SET state = 0, state_type='||v_state_type||', 
 				workcat_id_end = '||quote_literal(v_workcat_id_end)||',

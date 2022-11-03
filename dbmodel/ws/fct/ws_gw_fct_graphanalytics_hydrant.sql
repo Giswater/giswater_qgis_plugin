@@ -58,7 +58,7 @@ v_distance numeric;
 v_use_propsal boolean;
 v_use_psector boolean;
 v_query text;
-
+v_hidrant_array text;
 BEGIN
 
 -- Search path
@@ -97,10 +97,13 @@ SET search_path = "SCHEMA_NAME", public;
 
 	--CREATE ARRAY OF HYDRANTS
 	select array_agg(a) into v_node_array from json_array_elements_text(v_node_json) a WHERE a IN (SELECT node_id FROM man_hydrant);
-			
+	select string_agg(a,', ') into v_hidrant_array from json_array_elements_text(v_node_json) a WHERE a IN (SELECT node_id FROM man_hydrant);
+
 	IF v_node_array is null THEN
 		EXECUTE 'SELECT array_agg(a.node_id) from (SELECT node_id FROM '||v_tablename||' join man_hydrant using (node_id))a'
 		into v_node_array;
+		EXECUTE 'SELECT string_agg(a.node_id,'', '') from (SELECT n.node_id FROM '||v_tablename||' n join man_hydrant using (node_id))a'
+		into v_hidrant_array;
 	END IF;
 
 	IF v_node_array IS NOT NULL THEN
@@ -132,6 +135,13 @@ SET search_path = "SCHEMA_NAME", public;
 							
 					v_line1 := ST_LineSubstring(v_street_geom, 0.0, v_intersect_loc);
 					v_line2 := ST_LineSubstring(v_street_geom, v_intersect_loc, 1.0);
+
+					IF ST_GeometryType(v_line1) = 'ST_Point' THEN
+						v_line1=NULL;
+					END IF;
+					IF ST_GeometryType(v_line2) = 'ST_Point' THEN
+						v_line2=NULL;
+					END IF;
 
 					INSERT INTO temp_arc(result_id, arc_id,the_geom, annotation)
 					SELECT distinct v_fid,row_number()over() as row_id, the_geom, id FROM 
@@ -176,6 +186,13 @@ SET search_path = "SCHEMA_NAME", public;
 						v_line1 := ST_LineSubstring(v_street_geom, 0.0, v_intersect_loc);
 						v_line2 := ST_LineSubstring(v_street_geom, v_intersect_loc, 1.0);
 
+						IF ST_GeometryType(v_line1) = 'ST_Point' THEN
+							v_line1=NULL;
+						END IF;
+						IF ST_GeometryType(v_line2) = 'ST_Point' THEN
+							v_line2=NULL;
+						END IF;
+						
 						INSERT INTO temp_arc(result_id, arc_id,the_geom, annotation)
 						SELECT distinct v_fid,row_number()over() as row_id, the_geom, id FROM 
 						(SELECT v_line1  as the_geom,v_closest_street as id
@@ -269,12 +286,12 @@ SET search_path = "SCHEMA_NAME", public;
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
 
 	IF v_use_propsal is true then
-		v_query='SELECT DISTINCT ON (node_id)  node_id, nodecat_id,the_geom
-		 	FROM node WHERE node_id IN (SELECT node_id FROM temp_node where result_id='||v_fid||'::text)
-		 	UNION SELECT node_id, ''HYDRANT PROPOSAL'', the_geom FROM anl_node WHERE fid='||v_fid_proposal||' AND cur_user=current_user';
+		v_query='SELECT DISTINCT ON (node_id)  node_id, nodecat_id, expl_id,the_geom
+		 	FROM node WHERE node_id::integer =ANY(ARRAY['||v_hidrant_array||'])
+		 	UNION SELECT node_id, ''HYDRANT PROPOSAL'',expl_id, the_geom FROM anl_node WHERE fid='||v_fid_proposal||' AND cur_user=current_user';
 	else
-		v_query='SELECT DISTINCT ON (node_id)  node_id, nodecat_id,the_geom
-		 	FROM node WHERE node_id IN (SELECT node_id FROM temp_node where result_id='||v_fid||'::text)';
+		v_query='SELECT DISTINCT ON (node_id)  node_id, nodecat_id, expl_id,the_geom
+		 	FROM node WHERE node_id::integer =ANY(ARRAY['||v_hidrant_array||'])';
 	end if;
 	--points-hydrants
 	v_result = null;

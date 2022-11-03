@@ -1,3 +1,8 @@
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
  
  -- remove join to nodes on arc view
  create or replace view ws1_2802.vu_arc as

@@ -43,7 +43,6 @@ v_geometrytype text;
 v_version text;
 v_the_geom text;
 v_config_layer text;
-xxx text;
 x integer=0;
 y integer=1;
 fields_array json[];
@@ -116,11 +115,9 @@ BEGIN
 		v_sensibility = ((v_zoomScale/5000) * 10 * v_sensibility_f);
 		v_config_layer='config_info_layer';
 
-
 	END IF;
 
 	-- TODO:: REFORMAT v_visiblelayers
-
 	v_visibleLayers = REPLACE (v_visibleLayers, '[', '{');
 	v_visibleLayers = REPLACE (v_visibleLayers, ']', '}');
 
@@ -133,7 +130,6 @@ BEGIN
 	raise notice 'v_sql -> %', v_sql;
 	FOR v_layer IN EXECUTE v_sql 
 	LOOP
-		raise notice 'v_layer -> %', v_layer;
 			v_count=v_count+1;
 				--    Get id column
 			EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
@@ -169,10 +165,6 @@ BEGIN
 			EXECUTE 'SELECT st_geometrytype ('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_layer)||';' 
 			INTO v_geometrytype;
 
-		RAISE NOTICE 'Feature geometry: % ', v_geometry;
-			RAISE NOTICE 'Feature v_geometrytype: % ', v_geometrytype;
-
-
 		-- get icon
 		IF v_geometrytype = 'ST_Point'::text OR v_geometrytype= 'ST_Multipoint'::text THEN
 			v_icon='11';
@@ -181,8 +173,6 @@ BEGIN
 			ELSIF v_geometrytype = 'ST_Polygon'::text OR v_geometrytype= 'ST_Multipolygon'::text THEN
 			v_icon='13';
 		END IF;
-
-		raise notice 'v_icon %', v_icon;
 
 		-- Get element
 		IF v_geometrytype = 'ST_Polygon'::text OR v_geometrytype= 'ST_Multipolygon'::text THEN
@@ -193,10 +183,8 @@ BEGIN
 				ORDER BY  ST_area('||v_layer||'.'||v_the_geom||') asc) a'
 						INTO v_ids
 						USING v_point, v_sensibility;
-					
 			ELSE
-			raise notice 'v_point %',v_point;
-			raise notice 'v_sensibility %',v_sensibility;
+
 				--  Get element's parent type in order to be able to find featuretype'
 				EXECUTE 'SELECT lower(feature_type) FROM 
 				(SELECT parent_layer as layer, feature_type FROM cat_feature UNION SELECT child_layer as layer ,feature_type FROM cat_feature) a WHERE
@@ -243,22 +231,9 @@ BEGIN
 					INTO v_ids
 					USING v_point, v_sensibility;
 				END IF;
-				
-				xxx:='SELECT array_agg(row_to_json(a)) FROM (
-				SELECT '||v_idname||' AS id, '||v_the_geom||' as the_geom FROM '||v_layer||' WHERE st_dwithin ($1, '||v_layer||'.'||v_the_geom||', $2) 
-				ORDER BY  ST_Distance('||v_layer||'.'||v_the_geom||', $1) asc) a';
-				raise notice 'yyyy %',xxx;
 			
 			END IF;
 
-		--     Get geometry (to feature response)
-		------------------------------------------
-		IF v_the_geom IS NOT NULL THEN
-			EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_layer)||' WHERE '||quote_ident(v_idname)||' = ('||quote_nullable(v_ids)||'))row'
-			INTO v_geometry;
-		END IF;
-
-		raise notice 'v_ids  %',v_ids;
 		IF v_ids IS NOT NULL THEN
 			fields_array[(x)::INT] := gw_fct_json_object_set_key(fields_array[(x)::INT], 'layerName', COALESCE(v_layer, '[]'));
 			fields_array[(x)::INT] := gw_fct_json_object_set_key(fields_array[(x)::INT], 'ids', COALESCE(v_ids, '{}'));

@@ -71,6 +71,7 @@ v_expl_id integer;
 v_dma_id integer;
 v_macrodma_id integer;
 v_muni_id integer;
+v_district_id integer;
 v_project_type varchar;
 v_cat_feature_id varchar;
 v_code int8;
@@ -172,7 +173,7 @@ BEGIN
 	SELECT value INTO v_use_fire_code_seq FROM config_param_system WHERE parameter='edit_hydrant_use_firecode_seq';
 	SELECT ((value::json)->>'status') INTO v_automatic_ccode FROM config_param_system WHERE parameter='edit_connec_autofill_ccode';
 	SELECT ((value::json)->>'field') INTO v_automatic_ccode_field FROM config_param_system WHERE parameter='edit_connec_autofill_ccode';
-	SELECT (value)::boolean INTO v_sys_raster_dem FROM config_param_system WHERE parameter='admin_raster_dem';
+	SELECT json_extract_path_text(value::json,'activated')::boolean INTO v_sys_raster_dem FROM config_param_system WHERE parameter='admin_raster_dem';
 
 	--Check if user has migration mode enabled
 	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
@@ -405,6 +406,9 @@ BEGIN
 		-- Municipality 
 		v_muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(p_reduced_geometry, ext_municipality.the_geom,0.001) 
 		AND active IS TRUE LIMIT 1); 
+	
+		-- District 
+		v_district_id := (SELECT district_id FROM ext_district WHERE ST_DWithin(p_reduced_geometry, ext_district.the_geom,0.001) LIMIT 1);
 
 		-- Dem elevation
 		IF v_sys_raster_dem AND v_edit_insert_elevation_from_dem AND p_idname IN ('node_id', 'connec_id', 'gully_id') THEN
@@ -615,6 +619,8 @@ BEGIN
 					field_value = v_expl_id;
 				WHEN 'muni_id' THEN 
 					field_value = v_muni_id;
+				WHEN 'district_id' THEN 
+					field_value = v_district_id;
 
 				-- elevation from raster
 				WHEN 'elevation', 'top_elev' THEN

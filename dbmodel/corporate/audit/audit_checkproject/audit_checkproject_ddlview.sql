@@ -12,6 +12,28 @@ where isaudit is true
 order by 1,2,3
 
 
+CREATE VIEW audit.v_fidlog_aux_ws AS
+SELECT * FROM 
+(SELECT tstamp::date as date, (json_array_elements_text((a.source->>'expl_id')::json))::integer as expl_id,
+((a.source->>'schema')::text) as schema,
+fprocess_type as type, fprocess_name, criticity, fcount as value
+FROM audit.audit_fid_log a LEFT JOIN  ws.sys_fprocess  USING (fid) 
+where isaudit is true )a
+WHERE schema::text='ws'
+order by 1,2,3;
+
+CREATE VIEW audit.v_fidlog_aux_ud AS
+SELECT * FROM 
+(SELECT tstamp::date as date, (json_array_elements_text((a.source->>'expl_id')::json))::integer as expl_id,
+((a.source->>'schema')::text) as schema,
+fprocess_type as type, fprocess_name, criticity, fcount as value
+FROM audit.audit_fid_log a LEFT JOIN  ws.sys_fprocess  USING (fid) 
+where isaudit is true )a
+WHERE schema::text='ud'
+order by 1,2,3;
+
+
+
 CREATE OR REPLACE VIEW audit.v_fidlog_gam AS 
  SELECT ct.date,
     'WARNING' AS criticity,

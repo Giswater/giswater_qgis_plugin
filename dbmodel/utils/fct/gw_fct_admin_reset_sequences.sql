@@ -19,6 +19,7 @@ v_project_type text;
 v_version text;
 v_result json;
 v_error_context text;
+v_max integer;
 
 rec record;
 v_sequence text;
@@ -41,8 +42,16 @@ BEGIN
 
         select pg_get_serial_sequence(rec.table_name, rec.column_name) INTO v_sequence;
 
-        EXECUTE 'SELECT setval('||quote_literal(v_sequence)||',(SELECT max('||rec.column_name||'::integer) FROM '||rec.table_name||'), true);';
+        EXECUTE 'SELECT max('||rec.column_name||'::integer) FROM '||rec.table_name||''
+        INTO v_max;
 
+        EXECUTE 'SELECT max('||rec.column_name||'::integer) FROM '||rec.table_name||''
+        INTO v_max;
+
+        IF v_max IS NULL THEN
+            v_max=1;
+        END IF;
+        EXECUTE 'SELECT setval('||quote_literal(v_sequence)||',('||v_max||'), true);';
 
     END LOOP;
 

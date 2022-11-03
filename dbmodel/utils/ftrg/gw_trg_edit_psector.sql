@@ -310,7 +310,8 @@ BEGIN
 				--loop over network feature types in order to get the data from each plan_psector_x_* table 
 				FOR rec_type IN (SELECT * FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2 ORDER BY id asc) LOOP
 
-					v_sql = 'SELECT '||rec_type.id||'_id as id FROM plan_psector_x_'||lower(rec_type.id)||' WHERE state = 1 AND psector_id = '||OLD.psector_id||';';
+                    v_sql = 'SELECT '||rec_type.id||'_id as id FROM plan_psector_x_'||lower(rec_type.id)||' p
+					JOIN '||rec_type.id||' a USING ('||rec_type.id||'_id) WHERE p.state = 1 AND a.state = 2 AND psector_id = '||OLD.psector_id||';';
 
 					--loop over each feature in plan_psector_x_* table in order to update state values
 					FOR rec IN EXECUTE v_sql LOOP

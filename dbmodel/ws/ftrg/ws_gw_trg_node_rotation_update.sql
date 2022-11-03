@@ -33,7 +33,7 @@ BEGIN
 	-- get parameters;
 	SELECT choose_hemisphere INTO v_hemisphere FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id limit 1;
 	SELECT num_arcs INTO v_numarcs FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id limit 1;
-	SELECT value::boolean INTO v_rotation_disable FROM config_param_user WHERE parameter='edit_noderotation_disable_update' AND cur_user=current_user;
+	SELECT value::boolean INTO v_rotation_disable FROM config_param_user WHERE parameter='edit_noderotation_update_dsbl' AND cur_user=current_user;
 
 	-- for disconnected nodes
 	IF v_numarcs = 0 THEN
@@ -74,6 +74,12 @@ BEGIN
 	IF v_rotation_disable IS TRUE THEN 
     		UPDATE node SET rotation=NEW.hemisphere WHERE node_id=NEW.node_id;
 	END IF;
+
+    IF TG_OP = 'UPDATE' THEN
+        IF v_rotation_disable IS FALSE AND v_hemisphere IS TRUE AND ((NEW.hemisphere != OLD.hemisphere) OR (OLD.hemisphere IS NULL AND NEW.hemisphere IS NOT NULL)) THEN 
+            UPDATE node SET rotation=rotation - 180 where node_id=NEW.node_id;
+        END IF;
+    END IF;
 
 	RETURN NEW;
 END; 

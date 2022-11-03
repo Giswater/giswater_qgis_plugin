@@ -85,30 +85,49 @@ BEGIN
 			WHERE n.demand IS NOT NULL AND n.demand <> 0;
 		END IF;
 
-		-- insert node/connec demands from dscenario to temp_demand
+		-- insert node demands from dscenario into temp_demand
 		INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
 		SELECT dscenario_id, feature_id, d.demand, d.pattern_id, d.demand_type, d.source
 		FROM temp_node n, inp_dscenario_demand d WHERE n.node_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0 
 		AND dscenario_id IN (SELECT unnest(v_userscenario));
 
-		-- insert connec demands from dscenario to linked object which is exported	
+		-- insert connec demands from dscenario into temp_demand linking object which is exported	
 		IF v_networkmode IN(1,2) THEN
 
+			-- demands for connec related to arcs
 			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
 			SELECT dscenario_id, node_1 AS node_id, d.demand/2 as demand, d.pattern_id, demand_type, source FROM temp_arc JOIN v_edit_inp_connec USING (arc_id)
 			JOIN inp_dscenario_demand d ON feature_id = connec_id WHERE dscenario_id IN (SELECT unnest(v_userscenario))
 			UNION ALL
 			SELECT dscenario_id, node_2 AS node_id, d.demand/2 as demand, d.pattern_id, demand_type, source  FROM temp_arc JOIN v_edit_inp_connec USING (arc_id)
 			JOIN inp_dscenario_demand d ON feature_id = connec_id WHERE dscenario_id IN (SELECT unnest(v_userscenario));
+
+			-- demands for connec related to nodes
+			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
+			SELECT dscenario_id, pjoint_id, d.demand as demand, d.pattern_id, demand_type, source  FROM v_edit_inp_connec 
+			JOIN inp_dscenario_demand d ON feature_id = connec_id 
+			WHERE pjoint_type = 'NODE'
+			AND dscenario_id IN (SELECT unnest(v_userscenario));
+
 			
 		ELSIF v_networkmode = 3 THEN
-		
+
+			-- demands for connec related to arcs
 			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id,  demand_type, source)
 			SELECT dscenario_id, n.node_id, d.demand, d.pattern_id, demand_type, source 
 			FROM  inp_dscenario_demand d ,temp_node n
 			JOIN connec c ON concat('VN',c.pjoint_id) =  n.node_id
 			WHERE c.connec_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0  
 			AND dscenario_id IN (SELECT unnest(v_userscenario));
+
+			-- demands for connec related to nodes
+			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id,  demand_type, source)
+			SELECT dscenario_id, n.node_id, d.demand, d.pattern_id, demand_type, source 
+			FROM  inp_dscenario_demand d ,temp_node n
+			JOIN connec c ON c.pjoint_id =  n.node_id WHERE pjoint_type = 'NODE'
+			AND c.connec_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0  
+			AND dscenario_id IN (SELECT unnest(v_userscenario));
+			
 		END IF;
 
 		-- remove those demands which for some reason linked node is not exported
@@ -157,14 +176,24 @@ BEGIN
 		-- updating values for pumps
 		UPDATE temp_arc t SET status = d.status FROM v_edit_inp_dscenario_pump d 
 		WHERE t.arc_id = concat(d.node_id, '_n2a') AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.status IS NOT NULL;
+
+		-- power
 		UPDATE temp_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'power',d.power) FROM v_edit_inp_dscenario_pump d 
-		WHERE t.arc_id = concat(d.node_id, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.power IS NOT NULL;
+		WHERE t.arc_id = concat(d.node_id, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.power IS NOT NULL AND d.power !='';
+		UPDATE temp_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'curve_id',NULL::TEXT) FROM v_edit_inp_dscenario_pump d 
+		WHERE t.arc_id = concat(d.node_id, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.power IS NOT NULL AND d.power !='';
+
+		-- curve_id
 		UPDATE temp_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'curve_id',d.curve_id) FROM v_edit_inp_dscenario_pump d 
 		WHERE t.arc_id = concat(d.node_id, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.curve_id IS NOT NULL;
+		UPDATE temp_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'power',NULL::TEXT) FROM v_edit_inp_dscenario_pump d 
+		WHERE t.arc_id = concat(d.node_id, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.curve_id IS NOT NULL;
+
 		UPDATE temp_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'speed',d.speed) FROM v_edit_inp_dscenario_pump d 
 		WHERE t.arc_id = concat(d.node_id, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.speed IS NOT NULL;
-		UPDATE temp_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'pattern',d.pattern_id) FROM v_edit_inp_dscenario_pump d 
-		WHERE t.arc_id = concat(d.node_id, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.pattern_id IS NOT NULL;	
+
+		UPDATE temp_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'pattern',d.pattern) FROM v_edit_inp_dscenario_pump d 
+		WHERE t.arc_id = concat(d.node_id, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.pattern IS NOT NULL;
 
 		-- updating values for pumps additional
 		FOR v_node IN (SELECT DISTINCT a.node_id FROM v_edit_inp_dscenario_pump_additional a JOIN temp_arc ON concat(node_id,'_n2a')=arc_id 
@@ -217,6 +246,14 @@ BEGIN
 				--create arc
 				record_new_arc.the_geom=ST_makeline(ARRAY[ST_startpoint(arc_rec.the_geom), p1_geom, ST_endpoint(arc_rec.the_geom)]);
 
+				IF pump_rec.curve_id IS NOT NULL THEN
+					pump_rec.power = '';
+				END IF;
+
+				IF pump_rec.power IS NOT NULL AND pump_rec.power !='' THEN
+					pump_rec.curve_id = '';
+				END IF;
+
 				--addparam
 				v_addparam = concat('{"power":"',pump_rec.power,'","curve_id":"',pump_rec.curve_id,'","speed":"',pump_rec.speed,'","pattern":"', pump_rec.pattern_id,'","to_arc":"',
 							 arc_rec.addparam::json->>'to_arc','"}');	
@@ -229,7 +266,8 @@ BEGIN
 				length, diameter, roughness, dma_id, presszone_id, dqa_id, minsector_id) 
 				VALUES (record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, 'NODE2ARC', record_new_arc.epa_type, record_new_arc.sector_id, 
 				record_new_arc.arccat_id, record_new_arc.state, arc_rec.state_type, pump_rec.status, record_new_arc.the_geom, arc_rec.expl_id, v_old_arc_id, v_addparam, 
-				arc_rec.length,	arc_rec.diameter, arc_rec.roughness, record_new_arc.dma_id, record_new_arc.presszone_id, record_new_arc.dqa_id, record_new_arc.minsector_id);			
+				arc_rec.length,	arc_rec.diameter, arc_rec.roughness, record_new_arc.dma_id, record_new_arc.presszone_id, record_new_arc.dqa_id, record_new_arc.minsector_id);
+						
 			END LOOP;
 		END LOOP;
 

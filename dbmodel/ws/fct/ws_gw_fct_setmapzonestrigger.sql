@@ -67,8 +67,10 @@ BEGIN
 	
 	-- getting exploitation
 	v_exploitation = (SELECT expl_id FROM node WHERE node_id = v_id);
+
+	v_count = (SELECT COUNT(*) FROM (SELECT node_1 FROM v_edit_arc WHERE node_1 = v_id UNION ALL SELECT node_2 FROM v_edit_arc WHERE node_2 = v_id)a);
 	
-	IF v_type = 'VALVE' AND v_closedstatus IS NOT NULL THEN
+	IF v_type = 'VALVE' AND v_closedstatus IS NOT NULL AND v_count = 2 THEN
 		
 		-- getting system variable
 		v_automaticmapzonetrigger = (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'utils_graphanalytics_automatic_trigger');		
@@ -153,8 +155,10 @@ BEGIN
 			END LOOP;
 		ELSE 
 			-- return message 
-			v_message = '{"level": 0, "text": "Feature succesfully updated. Valve status have been succesfully updated. Automatic trigger is not enabled to recalculate DYNAMIC MAPZONES"}';			
+			v_message = '{"status": "Accepted", "level": 0, "text": "Feature succesfully updated. Valve status have been succesfully updated. Automatic trigger is not enabled to recalculate DYNAMIC MAPZONES"}';			
 		END IF;
+	ELSE
+		v_message = '{"status": "Accepted", "level": 0, "text": "No changes on mapzones"}';
 	END IF;
 
 	-- Return

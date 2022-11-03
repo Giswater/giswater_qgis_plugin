@@ -16,8 +16,8 @@ $BODY$
 /*example
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"0"}}$$) -- FULL PROCESS
 
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"1"}}$$) -- STRUCTURE DATA (GRAF AND BOUNDARY)
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"2"}}$$) -- ANALYZE GRAF
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"1"}}$$) -- STRUCTURE DATA (GRAPH AND BOUNDARY)
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"2"}}$$) -- ANALYZE GRAPH
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"3"}}$$) -- CREATE JSON
 
 SELECT "SCHEMA_NAME".gw_fct_pg2epa_fill_data ('r1');
@@ -176,10 +176,10 @@ BEGIN
 	UPDATE temp_arc SET result_id  = v_result;
 	UPDATE temp_node SET result_id  = v_result;
 	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, 
-	length, n, the_geom, expl_id, minorloss, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage)
+	length, n, the_geom, expl_id, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage)
 	SELECT
 	result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation,
-	length, n, the_geom, expl_id, minorloss, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage 
+	length, n, the_geom, expl_id, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage 
 	FROM temp_arc;
 	
 	INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id,
@@ -196,7 +196,7 @@ BEGIN
 	RAISE NOTICE '14 - Manage return';
 	IF v_step=1 THEN
 	
-		v_return = '{"message":{"level":1, "text":"Step-1: Structure data, graf and boundary conditions of inp created succesfully"}}'::json;
+		v_return = '{"message":{"level":1, "text":"Step-1: Structure data, graph and boundary conditions of inp created succesfully"}}'::json;
 		RETURN v_return;	
 
 	ELSIF v_step=0 THEN

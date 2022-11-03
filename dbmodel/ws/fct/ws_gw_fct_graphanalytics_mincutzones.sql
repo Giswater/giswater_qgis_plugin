@@ -88,6 +88,9 @@ BEGIN
 		v_input = '{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
 		PERFORM gw_fct_om_check_data(v_input);
 	END IF;
+	
+	-- update anl_arc table
+    	UPDATE anl_arc set result_id = null where cur_user = current_user;
 
 	-- check criticity of data in order to continue or not
 	SELECT count(*) INTO v_count FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 AND criticity=3;
@@ -130,8 +133,8 @@ BEGIN
 		(SELECT distinct(macroexpl_id) FROM exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl)a  ON expl=expl_id);
 	END IF;
 
-	SELECT count(*) into v_count1 FROM arc WHERE state = 1 AND minsector_id IS NOT NULL;
-	SELECT count(*) into v_count2 FROM arc WHERE state = 1 AND minsector_id IS NULL;
+	SELECT count(*) into v_count1 FROM arc WHERE state = 1 AND minsector_id IS NOT null and expl_id IN (select (json_array_elements_text(v_expl))::integer);
+	SELECT count(*) into v_count2 FROM arc WHERE state = 1 AND minsector_id IS null and expl_id = (select (json_array_elements_text(v_expl))::integer);
 
 	IF v_count1 = 0 THEN
 		INSERT INTO audit_check_data (fid, error_message) VALUES

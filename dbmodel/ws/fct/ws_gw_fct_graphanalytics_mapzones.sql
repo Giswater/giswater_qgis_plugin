@@ -209,6 +209,7 @@ BEGIN
 	v_debug = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'debug');
 	v_parameters = (SELECT ((p_data::json->>'data')::json->>'parameters'));
 	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges');
+	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
 
 	IF v_commitchanges IS FALSE THEN
 		v_updatefeature = false;
@@ -221,8 +222,7 @@ BEGIN
 
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
-	v_checkdata = (SELECT (value::json->>'checkData') FROM config_param_system WHERE parameter = 'utils_graphanalytics_status');
-
+	
 	SELECT value::boolean INTO v_islastupdate FROM config_param_system WHERE parameter='edit_mapzones_set_lastupdate';
 
 	-- data quality analysis
@@ -709,19 +709,15 @@ BEGIN
 
 					RAISE NOTICE 'Check for conflicts';
 
-					-- manage conflicts
-					FOR rec_conflict IN EXECUTE 'SELECT concat(quote_literal(m1),'','',quote_literal(m2)) as mapzone, node_id FROM (select n.node_id, n.'||v_field||'::text as m1, a.'||v_field||'::text as m2 from v_edit_node n JOIN 
-					(SELECT json_array_elements_text((graphconfig->>''use'')::json)::json->>''nodeParent'' as node_id, '||v_fieldmp||', name FROM '||v_table||' mpz WHERE active is true)a
-					USING (node_id))a
-					WHERE m1::text != m2::text AND m1::text !=''0'' AND m2::text !=''0'''
-					
-					/*
-					SELECT concat(quote_literal(m1),',',quote_literal(m2)) as mapzone, node_id 
-					FROM (select n.node_id, n.presszone_id::text as m1, a.presszone_id::text as m2 from v_edit_node n 
-					      JOIN (SELECT json_array_elements_text((graphconfig->>'use')::json)::json->>'nodeParent' as node_id, presszone_id, name FROM presszone mpz WHERE active is true)a	USING (node_id))a
-					WHERE m1::text != m2::text AND m1::text !='0' AND m2::text !='0'
-					*/
-
+					-- manage conflicts (nodes no headers and no stoppers with different mapzones)
+					FOR rec_conflict IN EXECUTE 'SELECT DISTINCT mapzone FROM (WITH qt AS (
+								SELECT node_id, mpz FROM (SELECT node_id, mpz FROM 
+								(SELECT arc_id, node_1 as node_id, '||v_field||'::text  as mpz FROM v_edit_arc UNION SELECT arc_id, node_2, '||v_field||'::text FROM v_edit_arc) a JOIN 
+								(SELECT DISTINCT ON (arc_id) arc_id, flag, isheader FROM temp_anlgraph)b USING (arc_id) 
+								WHERE flag = 0 and isheader is not true group by node_id, mpz
+								) a group by node_id, mpz)
+								SELECT DISTINCT ON (node_id) node_id, concat(quote_literal(a.mpz),'','', quote_literal(b.mpz)) as mapzone FROM qt a JOIN qt b USING (node_id)
+								WHERE a.mpz::text != b.mpz::text AND a.mpz::text !=''0'' AND b.mpz::text !=''0'') a'
 	
 					LOOP
 						RAISE NOTICE 'Managing conflicts -> %', rec_conflict;
@@ -737,6 +733,8 @@ BEGIN
 						-- connec
 						EXECUTE 'UPDATE connec t SET '||v_field||'  = -1 FROM v_edit_connec v WHERE t.connec_id = v.connec_id AND t.'||v_field||'::text IN ('||rec_conflict.mapzone||')';
 						GET DIAGNOSTICS v_count = row_count;
+
+						-- log
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (v_fid, 2, concat('WARNING-395: There is a conflict against ',upper(v_table),'''s (',rec_conflict.mapzone,') with ',v_count1,' arc(s) and ',v_count,' connec(s) affected.'));
 								

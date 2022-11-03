@@ -33,7 +33,8 @@ BEGIN
             UPDATE gully SET the_geom=NEW.the_geom WHERE gully_id = NEW.gully_id;
             
             --update top_elev from raster
-            IF (SELECT upper(value) FROM config_param_system WHERE parameter='admin_raster_dem') = 'TRUE' AND (NEW.top_elev IS NULL) AND
+            IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE 
+            AND (NEW.top_elev IS NULL) AND
             (SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_update_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
                 NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM v_ext_raster_dem WHERE id =
                     (SELECT id FROM v_ext_raster_dem WHERE

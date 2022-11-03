@@ -320,6 +320,8 @@ BEGIN
 
 		ELSIF v_isnew IS FALSE THEN
 		
+			SELECT project_type INTO v_projecttype FROM sys_version ORDER BY 1 DESC LIMIT 1;
+		
 		
 			-- profilactic delete to avoid conflicts with sequences and to clean gdb
 			DELETE FROM audit_check_project;
@@ -331,8 +333,14 @@ BEGIN
 			DELETE FROM temp_node;
 			DELETE FROM temp_go2epa;
 			DELETE FROM temp_table;
-			
-			IF project_type = 'WS' THEN
+
+			DELETE FROM anl_arc;
+			DELETE FROM anl_arc_x_node;
+			DELETE FROM anl_node;
+			DELETE FROM anl_polygon;
+
+			IF v_projecttype = 'WS' THEN
+
 				DELETE FROM temp_mincut;
 				DELETE FROM temp_demand;
 			ELSE

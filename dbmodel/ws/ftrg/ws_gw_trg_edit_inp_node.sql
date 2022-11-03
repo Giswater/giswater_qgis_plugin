@@ -68,7 +68,8 @@ BEGIN
 			END IF;
 				
 			--update elevation from raster
-			IF (SELECT upper(value) FROM config_param_system WHERE parameter='admin_raster_dem') = 'TRUE' AND (NEW.elevation IS NULL) AND
+			IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE  
+			AND (NEW.elevation IS NULL) AND
 			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_update_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
 				NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM v_ext_raster_dem WHERE id =
 					(SELECT id FROM v_ext_raster_dem WHERE
@@ -116,7 +117,7 @@ BEGIN
 	
         ELSIF v_node_table = 'inp_inlet' THEN     
             UPDATE inp_inlet SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id,
-            pattern_id=NEW.pattern_id, head = NEW.head WHERE node_id=OLD.node_id;
+            pattern_id=NEW.pattern_id, head = NEW.head, overflow=NEW.overflow WHERE node_id=OLD.node_id;
 			
         END IF;
 

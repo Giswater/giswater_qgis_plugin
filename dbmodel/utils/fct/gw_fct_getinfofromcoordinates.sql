@@ -153,7 +153,7 @@ BEGIN
 		v_sensibility = (v_zoomratio * 10 * v_sensibility_f);
 		v_config_layer='config_web_layer';
 
-	ELSIF  v_device = 4 THEN
+	ELSIF  v_device IN (4, 5) THEN
 		EXECUTE 'SELECT (value::json->>''desktop'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
 		INTO v_sensibility_f;
 

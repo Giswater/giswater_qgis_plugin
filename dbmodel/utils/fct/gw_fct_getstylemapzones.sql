@@ -31,10 +31,10 @@ v_colsector text;
 v_colpresszone text;
 v_coldma text;
 v_coldqa text;
-v_opasector text;
-v_opapresszone text;
-v_opadma text;
-v_opadqa text;
+v_trasector text;
+v_trapresszone text;
+v_tradma text;
+v_tradqa text;
 
 BEGIN
 
@@ -45,33 +45,33 @@ BEGIN
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_version;
+  INTO v_version;
 
-        IF v_project_type = 'WS' THEN
+  IF v_project_type = 'WS' THEN
 
 		-- get mode	
-		v_statussector := (SELECT (value::json->>'SECTOR')::json->>'mode' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
-		v_statuspresszone := (SELECT (value::json->>'PRESSZONE')::json->>'mode' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
-		v_statusdma := (SELECT (value::json->>'DMA')::json->>'mode' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
-		v_statusdqa := (SELECT (value::json->>'DQA')::json->>'mode' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
+		v_statussector := (SELECT (style::json->>'SECTOR')::json->>'mode' FROM config_function WHERE id=2928);
+		v_statuspresszone := (SELECT (style::json->>'PRESSZONE')::json->>'mode' FROM config_function WHERE id=2928);
+		v_statusdma := (SELECT (style::json->>'DMA')::json->>'mode' FROM config_function WHERE id=2928);
+		v_statusdqa := (SELECT (style::json->>'DQA')::json->>'mode' FROM config_function WHERE id=2928);
 
 		-- get column to simbolize
-		v_colsector := (SELECT (value::json->>'SECTOR')::json->>'column' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
-		v_colpresszone := (SELECT (value::json->>'PRESSZONE')::json->>'column' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
-		v_coldma := (SELECT (value::json->>'DMA')::json->>'column' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
-		v_coldqa := (SELECT (value::json->>'DQA')::json->>'column' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
+		v_colsector := (SELECT (style::json->>'SECTOR')::json->>'column' FROM config_function WHERE id=2928);
+		v_colpresszone := (SELECT (style::json->>'PRESSZONE')::json->>'column' FROM config_function WHERE id=2928);
+		v_coldma := (SELECT (style::json->>'DMA')::json->>'column' FROM config_function WHERE id=2928);
+		v_coldqa := (SELECT (style::json->>'DQA')::json->>'column' FROM config_function WHERE id=2928);
 
 		-- get column to simbolize
-		v_opasector := (SELECT (value::json->>'SECTOR')::json->>'opacity' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
-		v_opapresszone := (SELECT (value::json->>'PRESSZONE')::json->>'opacity' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
-		v_opadma := (SELECT (value::json->>'DMA')::json->>'opacity' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
-		v_opadqa := (SELECT (value::json->>'DQA')::json->>'opacity' FROM config_param_system WHERE parameter = 'utils_graphanalytics_dynamic_symbology');
+		v_trasector := (SELECT (style::json->>'SECTOR')::json->>'transparency' FROM config_function WHERE id=2928);
+		v_trapresszone := (SELECT (style::json->>'PRESSZONE')::json->>'transparency' FROM config_function WHERE id=2928);
+		v_tradma := (SELECT (style::json->>'DMA')::json->>'transparency' FROM config_function WHERE id=2928);
+		v_tradqa := (SELECT (style::json->>'DQA')::json->>'transparency' FROM config_function WHERE id=2928);
 
 		-- get mapzone values
-		EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_colsector||' as id, stylesheet::json FROM v_edit_sector WHERE sector_id > 0 and stylesheet IS NOT NULL) row' INTO v_sector ;
-		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id ,  stylesheet::json FROM v_edit_presszone WHERE presszone_id NOT IN (''0'', ''-1'') and stylesheet IS NOT NULL) row' INTO v_presszone ;
-		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, stylesheet::json FROM v_edit_dma WHERE dma_id > 0 and stylesheet IS NOT NULL) row' INTO v_dma ;
-		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldqa||' as id, stylesheet::json FROM v_edit_dqa WHERE dqa_id > 0 and stylesheet IS NOT NULL) row' INTO v_dqa ;
+		EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_colsector||' as id, stylesheet::json FROM v_edit_sector WHERE sector_id > 0 and active IS TRUE) row' INTO v_sector ;
+		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id, stylesheet::json FROM v_edit_presszone WHERE presszone_id NOT IN (''0'', ''-1'') and active IS TRUE) row' INTO v_presszone ;
+		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, stylesheet::json FROM v_edit_dma WHERE dma_id > 0 and active IS TRUE) row' INTO v_dma ;
+		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldqa||' as id, stylesheet::json FROM v_edit_dqa WHERE dqa_id > 0 and active IS TRUE) row' INTO v_dqa ;
 
 	ELSE
 		-- control nulls
@@ -90,20 +90,20 @@ BEGIN
 	v_colpresszone  := COALESCE(v_colpresszone, '{}');
 	v_coldma  := COALESCE(v_coldma, '{}');
 	v_coldqa  := COALESCE(v_coldqa, '{}');
-	v_opasector  := COALESCE(v_opasector, '0.5');
-	v_opapresszone := COALESCE(v_opapresszone, '0.5');
-	v_opadma := COALESCE(v_opadma, '0.5');
-	v_opadqa := COALESCE(v_opadqa, '0.5');
+	v_trasector  := COALESCE(v_trasector, '0.5');
+	v_trapresszone := COALESCE(v_trapresszone, '0.5');
+	v_tradma := COALESCE(v_tradma, '0.5');
+	v_tradqa := COALESCE(v_tradqa, '0.5');
 	
 
 	--    Return
 	RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{}'||
 			',"data":{"mapzones":
-				[{"name":"sector", "status": "'||v_statussector||'", "idname": "'||v_colsector||'", "layer":"v_edit_sector", "opacity":'||v_opasector||', "values":' || v_sector ||'}'||
-				',{"name":"presszone", "status": "'||v_statuspresszone||'", "idname":"'||v_colpresszone||'",  "layer":"v_edit_presszone", "opacity":'||v_opapresszone||',  "values":' || v_presszone ||'}'||
-				',{"name":"dma",  "status": "'||v_statusdma||'", "idname": "'||v_coldma||'", "layer":"v_edit_dma", "opacity":'||v_opadma||', "values":' || v_dma ||'}'||
-				',{"name":"dqa",  "status": "'||v_statusdqa||'", "idname": "'||v_coldqa||'", "layer":"v_edit_dqa", "opacity":'||v_opadqa||', "values":' || v_dqa ||'}'||
+				[{"name":"sector", "status": "'||v_statussector||'", "idname": "'||v_colsector||'", "layer":"v_edit_sector", "transparency":'||v_trasector||', "values":' || v_sector ||'}'||
+				',{"name":"presszone", "status": "'||v_statuspresszone||'", "idname":"'||v_colpresszone||'",  "layer":"v_edit_presszone", "transparency":'||v_trapresszone||',  "values":' || v_presszone ||'}'||
+				',{"name":"dma",  "status": "'||v_statusdma||'", "idname": "'||v_coldma||'", "layer":"v_edit_dma", "transparency":'||v_tradma||', "values":' || v_dma ||'}'||
+				',{"name":"dqa",  "status": "'||v_statusdqa||'", "idname": "'||v_coldqa||'", "layer":"v_edit_dqa", "transparency":'||v_tradqa||', "values":' || v_dqa ||'}'||
 				']}}'||
 	    '}')::json;
 

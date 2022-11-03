@@ -422,7 +422,7 @@ UPDATE config_param_system SET value = 'false' WHERE parameter = 'admin_utils_sc
 
 UPDATE config_info_layer SET addparam = '{"forceWhenActive":true}' WHERE layer_id IN ('v_edit_dimensions','v_edit_om_visit');
 
-UPDATE config_param_system SET value = 'TRUE' WHERE parameter  = 'admin_raster_dem';
+UPDATE config_param_system SET value = '{"activated" : "TRUE", "updateField" : "top_elev"}' WHERE parameter  = 'admin_raster_dem';
 
 UPDATE gully SET siphon = false where siphon is null;
 UPDATE gully SET groove = false where groove is null;
@@ -519,5 +519,5 @@ INSERT INTO inp_lid_value VALUES (18,'RAIN-BARREL','DRAIN',5,0.5,0,6);
 SELECT gw_fct_admin_schema_lastprocess($${"client":{"lang":"ES"},
 "data":{"isNewProject":"FALSE", "projectType":"UD", "epsg":25831, "isSample":"TRUE"}}$$);
 
-UPDATE config_param_system SET value = '{"usePsectors":false, "ignoreGrafanalytics":false, "ignoreEpa":false, "ignorePlan":false}'
+UPDATE config_param_system SET value = '{"usePsectors":false, "ignoreGraphanalytics":false, "ignoreEpa":false, "ignorePlan":false}'
 WHERE parameter = 'admin_checkproject';

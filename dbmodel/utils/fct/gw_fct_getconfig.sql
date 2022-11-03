@@ -23,6 +23,8 @@ SELECT "SCHEMA_NAME".gw_fct_getconfig($${
 "feature":{},"data":{}}$$)
 */
 
+                                                                                              
+
 DECLARE
 
 v_formtabs text;
@@ -205,8 +207,7 @@ BEGIN
 					combo_json = array_to_json(v_array);
 					fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboNames', COALESCE(combo_json, '[]'));
 
-					raise notice ' PARENTTTTTTTTTTTTTTTTT % ', fields_array[(aux_json->>'orderby')::INT];
-
+			
 					-- Get selected value
 					fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectedId', aux_json->>'value'); 
 				END IF;

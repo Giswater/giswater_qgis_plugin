@@ -1182,7 +1182,7 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE '39- Check expl.the_geom is not null when raster DEM is enabled (428)';
-	IF (SELECT value::boolean FROM config_param_system WHERE parameter ='admin_raster_dem') IS true THEN
+	IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE THEN
 		SELECT count(*) INTO v_count FROM exploitation WHERE the_geom IS NULL AND active IS TRUE and expl_id > 0 ;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)

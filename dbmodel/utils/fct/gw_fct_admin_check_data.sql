@@ -360,6 +360,53 @@ BEGIN
 		VALUES (195, 1, '322','INFO: All fields defined in config_form_fields have unduplicated order.', 0);
 	END IF;
 
+	--Check consistency between cat_manager and config_user_x_expl(472)
+	 IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user') IS TRUE THEN
+
+	 	v_querytext='(with exploit as (select id,unnest(username) users from cat_manager where expl_id is not null)
+		select *,concat(explots,''-'',users,''-'',id)  from (
+		select id, unnest(expl_id) explots ,users from cat_manager 
+		join exploit using(id))a 
+		where concat(explots,''-'',users,''-'',id) not in 
+		(select  concat(expl_id,''-'',username,''-'',manager_id) from config_user_x_expl cuxe) and explots!=0)a';
+
+		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+
+		IF v_count > 0 THEN
+			EXECUTE 'INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+			SELECT DISTINCT  195, 3, ''472'', 
+			concat(''ERROR-472: There is/are '','||v_count||','' inconsistent configurations on cat_manager and config_user_x_expl for user: '',string_agg(DISTINCT users,'', '')),
+			'||v_count||' FROM '||v_querytext||';';
+		ELSE
+			INSERT INTO audit_check_data (fid, criticity, result_id,error_message, fcount)
+			VALUES (195, 1, '472','INFO: Configuration of cat_manager and config_user_x_expl is consistent.', v_count);
+		END IF;
+	 END IF;
+
+	 --Check consistency between cat_manager and config_user_x_sector(473)
+	 IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user') IS TRUE THEN
+
+	 	v_querytext='(with sectores as (select id,unnest(username) users from cat_manager where sector_id is not null)
+		select *,concat(sectors,''-'',users,''-'',id)  from (
+		select id,unnest(sector_id) sectors ,users from cat_manager 
+		join sectores using(id))a 
+		where concat(sectors,''-'',users,''-'',id) not in 
+		(select  concat(sector_id,''-'',username,''-'',manager_id) from config_user_x_sector cuxe) and sectors not in (0,-1))a';
+
+		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+
+		IF v_count > 0 THEN
+			EXECUTE 'INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+			SELECT DISTINCT  195, 3, ''473'', 
+			concat(''ERROR-473: There is/are '','||v_count||','' inconsistent configurations on cat_manager and config_user_x_sector for user: '',string_agg(DISTINCT users,'', '')),
+			'||v_count||' FROM '||v_querytext||';';
+		ELSE
+			INSERT INTO audit_check_data (fid, criticity, result_id,error_message, fcount)
+			VALUES (195, 1, '473','INFO: Configuration of cat_manager and config_user_x_sector is consistent.', v_count);
+		END IF;
+	 END IF;
+
+
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 

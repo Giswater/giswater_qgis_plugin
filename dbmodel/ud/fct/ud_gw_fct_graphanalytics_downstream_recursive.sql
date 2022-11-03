@@ -45,8 +45,8 @@ BEGIN
     IF NOT FOUND THEN
 
         -- Update value
-        INSERT INTO anl_node (node_id, expl_id, fid, the_geom)
-        SELECT node_id, expl_id, 221, the_geom FROM v_edit_node WHERE node_id = v_node_id;
+        INSERT INTO anl_node (node_id, nodecat_id, expl_id, fid, the_geom)
+        SELECT node_id, node_type, expl_id, 221, the_geom FROM v_edit_node WHERE node_id = v_node_id;
         
         -- Loop for all the upstream nodes
         FOR rec_table IN SELECT arc_id, arc_type, node_2, the_geom, expl_id FROM v_edit_arc WHERE node_1 = v_node_id

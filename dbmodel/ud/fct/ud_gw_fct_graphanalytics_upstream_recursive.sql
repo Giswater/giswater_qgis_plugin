@@ -27,7 +27,8 @@ v_message text;
 v_version text;
 
 rec_table record;
-
+v_geom1 numeric;
+v_fid integer;
 BEGIN
 
 	-- Search path
@@ -35,30 +36,46 @@ BEGIN
 
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+		
+	v_fid=json_extract_path_text(p_data,'fid')::integer;
 	
-	v_node_json = ((p_data ->>'feature')::json->>'id'::text);
-	v_node_id = (SELECT json_array_elements_text(v_node_json)); 
+	IF v_fid = 477 THEN
+		v_node_id = json_extract_path_text(p_data,'data','parameters','node');
+	ELSE
+		v_node_json = ((p_data ->>'feature')::json->>'id'::text);
+		v_node_id = (SELECT json_array_elements_text(v_node_json)); 
+	END IF;
+	v_geom1 = json_extract_path_text(p_data,'data','parameters','geom1');
 	
+
 	-- Check if the node is already computed
-	SELECT node_id INTO v_exists_id FROM anl_node WHERE node_id = v_node_id AND cur_user="current_user"() AND fid = 220;
+	SELECT node_id INTO v_exists_id FROM anl_node WHERE node_id = v_node_id AND cur_user="current_user"() AND fid = v_fid;
 
 	-- Compute proceed
 	IF NOT FOUND THEN
 	
 		-- Update value
 		INSERT INTO anl_node (node_id, nodecat_id,state, expl_id, fid, the_geom)
-		SELECT node_id, node_type, state, expl_id, 220, the_geom FROM v_edit_node WHERE node_id = v_node_id;
+		SELECT node_id, node_type, state, expl_id, v_fid, the_geom FROM v_edit_node WHERE node_id = v_node_id;
 
 		-- Loop for all the upstream arcs
-		FOR rec_table IN SELECT arc_id, arc_type, node_1, the_geom, expl_id FROM v_edit_arc WHERE node_2 = v_node_id
+		FOR rec_table IN SELECT arc_id, arc_type, node_1, the_geom, expl_id, cat_geom1 FROM v_edit_arc WHERE node_2 = v_node_id
 		LOOP
 		
 			-- Insert into tables
-			INSERT INTO anl_arc (arc_id, arccat_id, expl_id, fid, the_geom) VALUES
-			(rec_table.arc_id, rec_table.arc_type, rec_table.expl_id,220, rec_table.the_geom);
+			IF v_fid = 477 THEN
+				IF v_geom1 < rec_table.cat_geom1 then
+					INSERT INTO anl_arc (arc_id, arccat_id, expl_id, fid, the_geom, descript) VALUES
+					(rec_table.arc_id, rec_table.arc_type, rec_table.expl_id,v_fid, rec_table.the_geom, rec_table.cat_geom1);
+				END IF;
+			ELSE
+				INSERT INTO anl_arc (arc_id, arccat_id, expl_id, fid, the_geom, descript) VALUES
+				(rec_table.arc_id, rec_table.arc_type, rec_table.expl_id,v_fid, rec_table.the_geom, rec_table.cat_geom1);
+			END IF;
 
 			-- Call recursive function weighting with the pipe capacity
-			EXECUTE 'SELECT gw_fct_graphanalytics_upstream_recursive($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["'||rec_table.node_1||'"]},"data":{}}$$);';
+			EXECUTE 'SELECT gw_fct_graphanalytics_upstream_recursive($${"client":{"device":4, "infoType":1, "lang":"ES"},
+			"feature":{"id":["'||rec_table.node_1||'"]},"data":{"parameters":{"node":"'||rec_table.node_1||'","geom1":'||rec_table.cat_geom1||'}},"fid":'||v_fid||'}$$);';
  
 		END LOOP;
 
@@ -67,7 +84,7 @@ BEGIN
 	IF v_audit_result is null THEN
 		v_status = 'Accepted';
 		v_level = 3;
-		v_message = 'Arc fusion done successfully';
+		v_message = 'Process done successfully';
 	ELSE
 
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
