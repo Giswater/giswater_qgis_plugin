@@ -7,6 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
 --2022/09/28
 CREATE OR REPLACE VIEW v_edit_presszone AS 
  SELECT presszone.presszone_id,
