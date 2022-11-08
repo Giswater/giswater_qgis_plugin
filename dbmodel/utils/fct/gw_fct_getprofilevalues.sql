@@ -73,6 +73,7 @@ v_level integer = 3;
 v_message text = 'Profile done successfully';
 v_guitarlegend json;
 v_textarc text;
+v_textnode text;
 v_vdefault json;
 v_leaflet json;
 v_composer text;
@@ -160,6 +161,7 @@ BEGIN
 	SELECT value INTO v_guitarlegend FROM config_param_system WHERE parameter = 'om_profile_guitarlegend';
 	SELECT value INTO v_stylesheet FROM config_param_user WHERE parameter = 'om_profile_stylesheet' AND cur_user = current_user;
 	SELECT value::json->>'arc' INTO v_textarc FROM config_param_system WHERE parameter = 'om_profile_guitartext';
+	SELECT value::json->>'node' INTO v_textnode FROM config_param_system WHERE parameter = 'om_profile_guitartext';
 	SELECT value INTO v_vdefault FROM config_param_system WHERE parameter = 'om_profile_vdefault';
 	SELECT value::json->>'vs' INTO v_vstext FROM config_param_system WHERE parameter = 'om_profile_guitarlegend';
   	SELECT value::json->>'hs' INTO v_hstext FROM config_param_system WHERE parameter = 'om_profile_guitarlegend';
@@ -364,12 +366,17 @@ BEGIN
 			v_message = 'Profile done, but during the execution vnode information have been disabled because only is possible to interpolate missed data on intermediate nodes, but not vnodes.';
 		END IF;
 
-		-- update descript
-		EXECUTE 'UPDATE anl_arc SET descript = a.descript FROM (SELECT arc_id, (row_to_json(row)) AS descript FROM ('||v_textarc||')row)a WHERE a.arc_id = anl_arc.arc_id';
+		-- update descript and code field
+		EXECUTE 'UPDATE anl_arc SET descript = a.descript, code=a.code 
+		FROM (SELECT arc_id, (row_to_json(row)) AS descript, code FROM ('||v_textarc||')row)a WHERE a.arc_id = anl_arc.arc_id AND fid=222';
 		EXECUTE' UPDATE anl_node SET descript = a.descript FROM (SELECT node_id, (row_to_json(row)) AS descript FROM 
 					(SELECT node_id, '||v_ftopelev||' as top_elev, '||v_fymax||' as ymax, elev , code, 
 					total_distance FROM anl_node WHERE fid=222 AND cur_user = current_user)row)a
 					WHERE fid=222 AND cur_user = current_user AND a.node_id = anl_node.node_id';
+
+		EXECUTE 'UPDATE anl_node SET  descript = gw_fct_json_object_set_key(descript::json, ''code'', a.code) 
+		FROM (SELECT node_id, code FROM ('||v_textnode||')row)a WHERE a.node_id = anl_node.node_id AND fid=222 AND cur_user = current_user ';
+	
 		-- delete not used keys
 		UPDATE anl_arc SET descript = gw_fct_json_object_delete_keys(descript::json, 'arc_id') WHERE fid=222 AND cur_user = current_user ;
 		UPDATE anl_node SET descript = gw_fct_json_object_delete_keys(descript::json, 'node_id') WHERE fid=222 AND cur_user = current_user ;
@@ -567,7 +574,6 @@ BEGIN
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_arc
 		FROM (SELECT arc_id, descript, cat_geom1, length, z1, z2, y1, y2, elev1, elev2, node_1, node_2 FROM anl_arc WHERE fid=222 AND cur_user = current_user ORDER BY total_length) row;
 
-
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT DISTINCT node_id, nodecat_id as surface_type, descript, sys_type as data_type, cat_geom1, '||
 				v_ftopelev||' AS top_elev, elev, '||v_fymax||' AS ymax, total_distance FROM anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id != ''VNODE'' ORDER BY total_distance) row'
 				INTO v_node;
@@ -593,7 +599,7 @@ BEGIN
 				*/
 
 	END IF;
-
+	
 	-- control null values
 	IF v_guitarlegend IS NULL THEN v_guitarlegend='{}'; END IF;
 	IF v_stylesheet IS NULL THEN v_stylesheet='{}'; END IF;

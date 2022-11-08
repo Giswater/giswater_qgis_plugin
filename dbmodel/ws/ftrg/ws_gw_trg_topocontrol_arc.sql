@@ -222,7 +222,7 @@ BEGIN
                 v_nodecat:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_nodecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
                 -- get first value (last chance)
                 IF (v_nodecat IS NULL) THEN
-                    v_nodecat := (SELECT * FROM cat_node WHERE active IS TRUE LIMIT 1);
+                    v_nodecat := (SELECT id FROM cat_node WHERE active IS TRUE LIMIT 1);
                 END IF;
 
                 -- Inserting new node

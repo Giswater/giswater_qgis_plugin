@@ -7,7 +7,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
---2022/09/2
+
+--2022/09/28
 CREATE OR REPLACE VIEW v_edit_presszone AS 
  SELECT presszone.presszone_id,
     presszone.name,
@@ -120,3 +121,13 @@ AS SELECT om_mincut.id,
      LEFT JOIN ext_streetaxis ON ext_streetaxis.id::text = om_mincut.streetaxis_id::text
      LEFT JOIN cat_users ON cat_users.id::text = om_mincut.assigned_to::text
   WHERE om_mincut.id > 0;
+
+
+
+CREATE OR REPLACE VIEW v_edit_anl_hydrant AS 
+ SELECT anl_node.node_id,
+    anl_node.nodecat_id,
+    anl_node.expl_id,
+    anl_node.the_geom
+   FROM anl_node
+  WHERE anl_node.fid = 468 AND anl_node.cur_user::name = "current_user"();

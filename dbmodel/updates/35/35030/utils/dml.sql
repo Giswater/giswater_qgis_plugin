@@ -157,3 +157,10 @@ VALUES('ve_arc', 'form_feature', 'data', 'pavcat_id', 'lyt_data_2', 13, 'string'
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('v_edit_arc', 'form_feature', 'data', 'pavcat_id', 'lyt_data_2', 13, 'string', 'combo', 'pavcat_id', NULL, NULL, false, false, true, false, NULL, 'SELECT id, id as idval FROM cat_pavement', TRUE, TRUE, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
+VALUES (3200, 'Workspace is not editable you can''t modify it nor delete it', NULL, 2, TRUE, 'utils',NULL) ON CONFLICT (id) DO NOTHING;
+
+UPDATE cat_workspace SET iseditable=TRUE WHERE iseditable IS NULL;
+
+UPDATE sys_message SET log_level=2 WHERE id=3142;

@@ -7,7 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
 --2022/10/03
 ALTER TABLE inp_dscenario_flwreg_outlet ALTER COLUMN outlet_type DROP NOT NULL;
 ALTER TABLE inp_dscenario_flwreg_weir ALTER COLUMN weir_type DROP NOT NULL;

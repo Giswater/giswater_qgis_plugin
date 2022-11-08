@@ -341,6 +341,12 @@ BEGIN
     
 	-- DELETE
 	ELSIF TG_OP = 'DELETE' THEN
+
+        -- delete related polygon if exists
+    	IF OLD.pol_id IS NOT NULL THEN
+			DELETE FROM polygon WHERE feature_id=OLD.element_id;
+		END IF;
+        
 		DELETE FROM element WHERE element_id=OLD.element_id;
 
         RETURN NULL;

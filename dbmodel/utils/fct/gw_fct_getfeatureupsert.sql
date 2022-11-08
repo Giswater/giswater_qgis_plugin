@@ -71,6 +71,7 @@ v_expl_id integer;
 v_dma_id integer;
 v_macrodma_id integer;
 v_muni_id integer;
+v_district_id integer;
 v_project_type varchar;
 v_cat_feature_id varchar;
 v_code int8;
@@ -403,6 +404,9 @@ BEGIN
 		-- Municipality 
 		v_muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(p_reduced_geometry, ext_municipality.the_geom,0.001) 
 		AND active IS TRUE LIMIT 1); 
+	
+		-- District 
+		v_district_id := (SELECT district_id FROM ext_district WHERE ST_DWithin(p_reduced_geometry, ext_district.the_geom,0.001) LIMIT 1);
 
 		-- Dem elevation
 		IF v_sys_raster_dem AND v_edit_insert_elevation_from_dem AND p_idname IN ('node_id', 'connec_id', 'gully_id') THEN
@@ -597,6 +601,8 @@ BEGIN
 					field_value = v_expl_id;
 				WHEN 'muni_id' THEN 
 					field_value = v_muni_id;
+				WHEN 'district_id' THEN 
+					field_value = v_district_id;
 
 				-- elevation from raster
 				WHEN 'elevation', 'top_elev' THEN
