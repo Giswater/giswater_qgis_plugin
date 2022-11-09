@@ -305,3 +305,16 @@ class GwPgDao(object):
             last_error = e
             status = False
         return {'status': status, 'last_error': last_error}
+
+
+    def check_connection(self):
+        """ Check database connection. Reconnect if needed """
+
+        was_closed = False
+        try:
+            self.cursor.execute("SELECT 1")
+        except psycopg2.OperationalError as e:
+            was_closed = True
+            self.init_db()
+        return was_closed
+

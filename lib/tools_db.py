@@ -217,12 +217,13 @@ def check_db_connection():
 
     opened = True
     try:
-        opened = global_vars.qgis_db_credentials.isOpen()
-        if not opened:
+        was_closed = global_vars.dao.check_connection()
+        if was_closed:
+            tools_log.log_warning(f"Database connection was closed and reconnected")
             opened = global_vars.qgis_db_credentials.open()
             if not opened:
-                details = global_vars.qgis_db_credentials.lastError().databaseText()
-                tools_log.log_warning(f"check_db_connection not opened: {details}")
+                msg = global_vars.qgis_db_credentials.lastError().databaseText()
+                tools_log.log_warning(f"Database connection error (QSqlDatabase): {msg}")
     except Exception as e:
         tools_log.log_warning(f"check_db_connection Exception: {e}")
     finally:
