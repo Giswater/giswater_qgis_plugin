@@ -156,6 +156,7 @@ class GwProfileButton(GwAction):
         if not activate:
             self.add_points_list.clear()
             self.add_points_list = []
+            self.endNode = None
 
     def _get_profile(self):
 
