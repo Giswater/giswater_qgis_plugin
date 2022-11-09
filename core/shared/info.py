@@ -140,9 +140,11 @@ class GwInfo(QObject):
             elif tab_type == 'data':
                 extras = '"toolBar":"basic"'
 
-
             function_name = None
             body = None
+
+            # Check database connection
+            tools_db.check_db_connection()
 
             # Insert new feature
             if point and feature_cat:
