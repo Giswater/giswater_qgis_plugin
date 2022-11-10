@@ -605,3 +605,16 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_connec"], "fieldName":"drainzone_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_gully"], "fieldName":"drainzone_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+--2022/11/09
+CREATE OR REPLACE VIEW ve_pol_gully
+AS SELECT polygon.pol_id,
+    polygon.feature_id,
+    polygon.featurecat_id,
+    polygon.state,
+    polygon.sys_type,
+    polygon.the_geom,
+    gully.fluid_type
+   FROM gully
+     JOIN v_state_gully USING (gully_id)
+     JOIN polygon ON polygon.feature_id::text = gully.gully_id::text;
