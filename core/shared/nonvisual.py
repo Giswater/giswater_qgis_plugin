@@ -2016,6 +2016,11 @@ class GwNonVisual:
         # Show tabs
         for i in range(tab_lidlayers.count()):
             tab_name = tab_lidlayers.widget(i).objectName().upper()
+            
+            # Set the first non-hidden tab selected
+            if tab_name == lidtabs[0]:
+                tab_lidlayers.setCurrentIndex(i)
+
             if tab_name not in lidtabs:
                 if Qgis.QGIS_VERSION_INT >= 32000:
                     tab_lidlayers.setTabVisible(i, False)
