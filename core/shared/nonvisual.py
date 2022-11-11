@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
+import webbrowser
 from functools import partial
 
 try:
@@ -1864,6 +1865,9 @@ class GwNonVisual:
         # Signals
         self.dialog.cmb_lidtype.currentIndexChanged.connect(partial(self._manage_lids_tabs, self.dialog))
         self.dialog.btn_ok.clicked.connect(partial(self._accept_lids, self.dialog, is_new, lidco_id))
+        self.dialog.btn_cancel.clicked.connect(self.dialog.reject)
+        self.dialog.finished.connect(partial(tools_gw.close_dialog, self.dialog))
+        self.dialog.btn_help.clicked.connect(partial(self._open_help))
 
         self._manage_lids_tabs(self.dialog)
 
@@ -1875,6 +1879,9 @@ class GwNonVisual:
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_lids')
 
+
+    def _open_help(self):
+        webbrowser.open('https://giswater.gitbook.io/giswater-manual/7.-export-import-of-the-hydraulic-model')
 
     def _populate_lids_widgets(self, dialog, lidco_id, duplicate=False):
         """ Fills in all the values for lid dialog """
