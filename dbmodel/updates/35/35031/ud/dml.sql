@@ -17,7 +17,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate,  widgetcontrols,  hidden)
 SELECT distinct on (formname) formname, 'form_feature', 'data', 'drainzone_id', 'lyt_data_1', max(layoutorder)+1,
 'integer', 'text', 'drainzone_id', false, false, false, false, '{"setMultiline":false}', false
-FROM ud_sample35.config_form_fields 
+FROM config_form_fields
 WHERE (formname ilike 've_%' or formname in('v_edit_node', 'v_edit_arc', 'v_edit_connec', 'v_edit_gully')) and formname !='ve_config_sysfields' 
 group by formname;
 
