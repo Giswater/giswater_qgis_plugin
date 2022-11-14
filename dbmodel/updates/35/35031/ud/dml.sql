@@ -52,3 +52,9 @@ VALUES (2768, 'Mapzones analysis', '{"featureType":[]}', '[
 "comboIds":[0,1,2,3,4], "comboNames":["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "PLOT & PIPE BUFFER", "LINK & PIPE BUFFER"], "selectedId":""}, 
 {"widgetname":"geomParamUpdate", "label":"Pipe buffer","widgettype":"text","datatype":"float","tooltip":"Buffer from arcs to create mapzone geometry using [PIPE BUFFER] options. Normal values maybe between 3-20 mts.", "layoutname":"grl_option_parameters","layoutorder":11, "isMandatory":false, "placeholder":"5-30", "value":""}
 ]',NULL, TRUE) ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_form_fields SET widgetcontrols='{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1","slope"]}'
+WHERE isautoupdate is true and columnname ilike '%1' and formname ilike '%arc%';
+
+UPDATE config_form_fields SET widgetcontrols='{"autoupdateReloadFields":["node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'
+WHERE isautoupdate is true and columnname ilike '%2' and formname ilike '%arc%';
