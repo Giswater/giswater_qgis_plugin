@@ -21,4 +21,7 @@ INSERT INTO config_param_system(parameter, value, descript, isenabled,  project_
 VALUES ('admin_isproduction' , False, 'If true, deleting the schema using Giswater button will not be possible', FALSE, 'utils', 'boolean');
 
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
-VALUES (478, 'Check features without defined sector_id', 'utils', NULL, 'core', true, 'Function process', NULL);
+VALUES (478, 'Check features without defined sector_id', 'utils', NULL, 'core', true, 'Check om-data', NULL);
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (479, 'Check duplicated arcs', 'utils', NULL, 'core', true, 'Check om-data', NULL);
