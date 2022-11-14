@@ -78,7 +78,7 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fid = 125 AND cur_user=current_user;
 	
 	-- delete old values on anl table
-	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (210,201,202,204,205,257,291);
+	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (210,201,202,204,205,257,291,478);
 	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (103,196,197,188,223,202,372,391,417,418,461);
 	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (106,177,187,202,442,443,461);
 	DELETE FROM temp_arc;
@@ -1303,7 +1303,7 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
-			EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id)
+			EXECUTE concat ('INSERT INTO anl_connec (fid, arc_id, arccat_id, descript, the_geom, expl_id)
 			SELECT 461, arc_id, arccat_id, ''Redundant values on y1/y2-elev1/elev2'', the_geom, expl_id FROM (', v_querytext,')a');
 
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
@@ -1314,6 +1314,26 @@ BEGIN
 		END IF;
 	END IF;
 
+	RAISE NOTICE '45 - Check sector_id 0 or -1 (connec, gully) (478)';
+
+	IF v_project_type = 'WS' THEN
+		v_querytext = '(SELECT connec_id, connecat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE state > 0 AND (sector_id=0 OR sector_id=-1))a';
+  ELSIF v_project_type = 'UD' THEN
+		v_querytext = '(SELECT connec_id, connecat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE state > 0 AND (sector_id=0 OR sector_id=-1)
+		        UNION SELECT gully_id, gratecat_id, the_geom, expl_id FROM '||v_edit||'gully WHERE state > 0 AND (sector_id=0 OR sector_id=-1))a';
+  END IF;
+
+	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+	IF v_count > 0 THEN
+			EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
+			SELECT 478, connec_id, connecat_id, ''Sector_id with 0 or -1 values'', the_geom, expl_id FROM ', v_querytext,'');
+
+		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (125, 2, '478',concat('WARNING-478: There is/are ',v_count,' features (connec, gullys) with sector_id 0 or -1. Please, check your data before continue'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+		VALUES (125, 1, '478', 'INFO: No features (connec, gullys) with 0 or -1 value on sector_id.',v_count);
+	END IF;
 
 	-- Removing isaudit false sys_fprocess
 	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
@@ -1353,7 +1373,7 @@ BEGIN
 	AND fid IN (106,177,187,202,442,443)
 	UNION
 	SELECT connec_id, connecat_id, state, expl_id, descript, fid, the_geom FROM anl_connec WHERE cur_user="current_user"()
-	AND fid IN (210,201,202,204,205,291)) row) features;
+	AND fid IN (210,201,202,204,205,291,478)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 

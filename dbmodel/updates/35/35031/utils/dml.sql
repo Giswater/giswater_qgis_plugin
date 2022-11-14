@@ -19,3 +19,6 @@ VALUES (3174, 'gw_trg_edit_setarcdata', 'utils', 'trigger function',
 
 INSERT INTO config_param_system(parameter, value, descript, isenabled,  project_type, datatype)
 VALUES ('admin_isproduction' , False, 'If true, deleting the schema using Giswater button will not be possible', FALSE, 'utils', 'boolean');
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (478, 'Check features without defined sector_id', 'utils', NULL, 'core', true, 'Function process', NULL);
