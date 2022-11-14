@@ -61,3 +61,5 @@ WHERE isautoupdate is true and columnname ilike '%2' and formname ilike '%arc%';
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
 VALUES (432, 'Check node ''T candidate'' with wrong topology','ws', null, null) ON CONFLICT (fid) DO NOTHING;
+
+update sys_param_user set dv_isnullvalue =null where formname='epaoptions';
