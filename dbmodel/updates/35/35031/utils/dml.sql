@@ -16,3 +16,6 @@ UPDATE sys_function SET project_type='utils' WHERE id =2710 OR id=2768;
 INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
 VALUES (3174, 'gw_trg_edit_setarcdata', 'utils', 'trigger function', 
 'Trigger that fills arc with values captured or calculated based on attributes stored on final nodes', 'role_edit', 'core');
+
+INSERT INTO config_param_system(parameter, value, descript, isenabled,  project_type, datatype)
+VALUES ('admin_isproduction' , False, 'If true, deleting the schema using Giswater button will not be possible', FALSE, 'utils', 'boolean');

@@ -1,2 +1,4 @@
 3.5.031
 *************
+- New trigger gw_trg_edit_setarcdata - Updating values related to final nodes on arc table
+- New parameter on config_param_system 'admin_isproduction' (If true, deleting the schema using Giswater button will not be possible)
