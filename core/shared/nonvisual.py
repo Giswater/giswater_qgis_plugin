@@ -1848,7 +1848,8 @@ class GwNonVisual:
         # Manage decimal validation for QLineEdit
         widget_list = self.dialog.findChildren(QLineEdit)
         for widget in widget_list:
-            tools_qt.double_validator(widget, 0, 9999999, 3)
+            if widget.objectName() != "txt_name":
+                tools_qt.double_validator(widget, 0, 9999999, 3)
 
         # Populate LID Type combo
         sql = f"SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' ORDER BY idval"
