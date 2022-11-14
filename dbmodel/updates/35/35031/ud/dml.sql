@@ -58,3 +58,6 @@ WHERE isautoupdate is true and columnname ilike '%1' and formname ilike '%arc%';
 
 UPDATE config_form_fields SET widgetcontrols='{"autoupdateReloadFields":["node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'
 WHERE isautoupdate is true and columnname ilike '%2' and formname ilike '%arc%';
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
+VALUES (432, 'Check node ''T candidate'' with wrong topology','ws', null, null) ON CONFLICT (fid) DO NOTHING;
