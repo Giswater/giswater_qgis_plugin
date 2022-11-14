@@ -128,37 +128,40 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
 
     value = None
     raw_parameter = parameter
-    if parser is None:
-        if plugin == 'core':
-            tools_log.log_info(f"Creating parser for file: {path}")
-        parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
-        parser.read(path)
+    try:
+        if parser is None:
+            if plugin == 'core':
+                tools_log.log_info(f"Creating parser for file: {path}")
+            parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
+            parser.read(path)
 
-    # If project has already been loaded and filename is 'init' or 'session', always read and parse file
-    if force_reload or (global_vars.project_loaded and file_name in ('init', 'session')):
-        parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
-        parser.read(path)
+        # If project has already been loaded and filename is 'init' or 'session', always read and parse file
+        if force_reload or (global_vars.project_loaded and file_name in ('init', 'session')):
+            parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
+            parser.read(path)
 
-    if config_type == 'user' and prefix and global_vars.project_type is not None:
-        parameter = f"{global_vars.project_type}_{parameter}"
+        if config_type == 'user' and prefix and global_vars.project_type is not None:
+            parameter = f"{global_vars.project_type}_{parameter}"
 
-    if not parser.has_section(section) or not parser.has_option(section, parameter):
+        if not parser.has_section(section) or not parser.has_option(section, parameter):
+            if chk_user_params and config_type in "user":
+                value = _check_user_params(section, raw_parameter, file_name, prefix=prefix)
+                set_config_parser(section, raw_parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
+        else:
+            value = parser[section][parameter]
+
+        # If there is a value and you don't want to get the comment, it only gets the value part
+        if value is not None and not get_comment:
+            value = value.split('#')[0].strip()
+
+        if not get_none and str(value) in "None":
+            value = None
+
+        # Check if the parameter exists in the inventory, if not creates it
         if chk_user_params and config_type in "user":
-            value = _check_user_params(section, raw_parameter, file_name, prefix=prefix)
-            set_config_parser(section, raw_parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
-    else:
-        value = parser[section][parameter]
-
-    # If there is a value and you don't want to get the comment, it only gets the value part
-    if value is not None and not get_comment:
-        value = value.split('#')[0].strip()
-
-    if not get_none and str(value) in "None":
-        value = None
-
-    # Check if the parameter exists in the inventory, if not creates it
-    if chk_user_params and config_type in "user":
-        _check_user_params(section, raw_parameter, file_name, prefix)
+            _check_user_params(section, raw_parameter, file_name, prefix)
+    except Exception as e:
+        tools_log.log_warning(f"get_config_parser exception [{type(e).__name__}]: {e}")
 
     return value
 
@@ -3581,8 +3584,10 @@ def _get_parser_from_filename(filename):
         tools_log.log_warning(f"File not found: {filepath}")
         return filepath, None
 
-    if not parser.read(filepath):
-        tools_log.log_warning(f"Error parsing file: {filepath}")
+    try:
+        parser.read(filepath)
+    except (configparser.DuplicateSectionError, configparser.DuplicateOptionError) as e:
+        tools_qgis.show_critical(f"Error parsing file: {filepath}", parameter=e)
         return filepath, None
 
     return filepath, parser
