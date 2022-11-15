@@ -23,3 +23,17 @@ CREATE TRIGGER gw_trg_edit_setarcdata
   ON node
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_setarcdata('node');
+
+CREATE TRIGGER gw_trg_edit_review_node
+  INSTEAD OF INSERT OR UPDATE
+  ON v_edit_review_node
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_review_node();
+
+
+CREATE TRIGGER gw_trg_edit_review_audit_node
+  INSTEAD OF UPDATE
+  ON v_edit_review_audit_node
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_review_audit_node();
+

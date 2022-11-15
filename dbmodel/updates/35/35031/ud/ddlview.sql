@@ -606,6 +606,16 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_gully"], "fieldName":"drainzone_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
+--add steps and covers on manhole views
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"step_pp", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"step_fe", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"step_replace", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"cover", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
 --2022/11/09
 CREATE OR REPLACE VIEW ve_pol_gully
 AS SELECT polygon.pol_id,
@@ -1192,3 +1202,69 @@ CREATE OR REPLACE VIEW v_edit_inp_weir AS
      JOIN inp_weir USING (arc_id)
      JOIN value_state_type ON id=state_type
   WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND is_operative IS TRUE;
+
+
+--vistas review
+DROP VIEW v_edit_review_node;
+CREATE OR REPLACE VIEW v_edit_review_node AS 
+ SELECT review_node.node_id,
+    review_node.top_elev,
+    review_node.ymax,
+    review_node.node_type,
+    review_node.matcat_id,
+    review_node.nodecat_id,
+    review_node.step_pp,
+    review_node.step_fe,
+    review_node.step_replace,
+    review_node.cover,
+    review_node.annotation,
+    review_node.observ,
+    review_node.review_obs,
+    review_node.expl_id,
+    review_node.the_geom,
+    review_node.field_checked,
+    review_node.is_validated
+   FROM review_node,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_node.expl_id = selector_expl.expl_id;
+
+
+
+DROP VIEW v_edit_review_audit_node;
+CREATE OR REPLACE VIEW v_edit_review_audit_node AS 
+ SELECT review_audit_node.id,
+    review_audit_node.node_id,
+    review_audit_node.old_top_elev,
+    review_audit_node.new_top_elev,
+    review_audit_node.old_ymax,
+    review_audit_node.new_ymax,
+    review_audit_node.old_node_type,
+    review_audit_node.new_node_type,
+    review_audit_node.old_matcat_id,
+    review_audit_node.new_matcat_id,
+    review_audit_node.old_nodecat_id,
+    review_audit_node.new_nodecat_id,
+    review_audit_node.old_step_pp,
+    review_audit_node.new_step_pp,
+    review_audit_node.old_step_fe,
+    review_audit_node.new_step_fe,
+    review_audit_node.old_step_replace,
+    review_audit_node.new_step_replace,
+    review_audit_node.old_cover,
+    review_audit_node.new_cover,
+    review_audit_node.old_annotation,
+    review_audit_node.new_annotation,
+    review_audit_node.old_observ,
+    review_audit_node.new_observ,
+    review_audit_node.review_obs,
+    review_audit_node.expl_id,
+    review_audit_node.the_geom,
+    review_audit_node.review_status_id,
+    review_audit_node.field_date,
+    review_audit_node.field_user,
+    review_audit_node.is_validated
+   FROM review_audit_node,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_audit_node.expl_id = selector_expl.expl_id AND review_audit_node.review_status_id <> 0;
+
+

@@ -19,7 +19,7 @@ SELECT distinct on (formname) formname, 'form_feature', 'data', 'drainzone_id', 
 'integer', 'text', 'drainzone_id', false, false, false, false, '{"setMultiline":false}', false
 FROM config_form_fields
 WHERE (formname ilike 've_%' or formname in('v_edit_node', 'v_edit_arc', 'v_edit_connec', 'v_edit_gully')) and formname !='ve_config_sysfields' 
-group by formname;
+group by formname ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
 VALUES (2710, 'gw_fct_graphanalytics_mapzones', 'utils', 'function', 'json', 'json', 'Function to analyze graph of network. Multiple analysis is avaliable. Dynamic analisys to sectorize network using the flow traceability function. 
@@ -63,3 +63,37 @@ INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source)
 VALUES (432, 'Check node ''T candidate'' with wrong topology','ws', null, null) ON CONFLICT (fid) DO NOTHING;
 
 update sys_param_user set dv_isnullvalue =null where formname='epaoptions';
+
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate,  widgetcontrols,  hidden)
+SELECT distinct on (child_layer) child_layer, 'form_feature', 'data', 'step_pp', 'lyt_data_2', max(layoutorder)+1,
+'integer', 'text', 'step PP', false, false, true, false, '{"setMultiline":false}', false
+FROM cat_feature cf
+join  config_form_fields on child_layer =formname
+WHERE system_id='MANHOLE' group by cf.child_layer ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate,  widgetcontrols,  hidden)
+SELECT distinct on (child_layer) child_layer, 'form_feature', 'data', 'step_fe', 'lyt_data_2', max(layoutorder)+1,
+'integer', 'text', 'step Fe', false, false, true, false, '{"setMultiline":false}', false
+FROM cat_feature cf
+join  config_form_fields on child_layer =formname
+WHERE system_id='MANHOLE' group by cf.child_layer ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate,  widgetcontrols,  hidden)
+SELECT distinct on (child_layer) child_layer, 'form_feature', 'data', 'step_replace', 'lyt_data_2', max(layoutorder)+1,
+'integer', 'text', 'step replace', false, false, true, false, '{"setMultiline":false}', false
+FROM cat_feature cf
+join  config_form_fields on child_layer =formname
+WHERE system_id='MANHOLE' group by cf.child_layer ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate,  widgetcontrols,  hidden)
+SELECT distinct on (child_layer) child_layer, 'form_feature', 'data', 'cover', 'lyt_data_2', max(layoutorder)+1,
+'string', 'text', 'cover', false, false, true, false, '{"setMultiline":false}', false
+FROM cat_feature cf
+join  config_form_fields on child_layer =formname
+WHERE system_id='MANHOLE' group by cf.child_layer ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;

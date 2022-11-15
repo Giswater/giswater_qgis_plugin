@@ -599,8 +599,9 @@ BEGIN
 						
 		ELSIF v_man_table='man_manhole' THEN
 		
-			INSERT INTO man_manhole (node_id,length, width, sander_depth,prot_surface, inlet, bottom_channel, accessibility) 
-			VALUES (NEW.node_id,NEW.length, NEW.width, NEW.sander_depth,NEW.prot_surface, NEW.inlet, NEW.bottom_channel, NEW.accessibility);	
+			INSERT INTO man_manhole (node_id,length, width, sander_depth,prot_surface, inlet, bottom_channel, accessibility, step_pp, step_fe, step_replace, cover) 
+			VALUES (NEW.node_id,NEW.length, NEW.width, NEW.sander_depth,NEW.prot_surface, NEW.inlet, NEW.bottom_channel, NEW.accessibility, NEW.step_pp, NEW.step_fe, 
+			NEW.step_replace, NEW.cover);	
 		
 		ELSIF v_man_table='man_netinit' THEN
 			
@@ -866,7 +867,8 @@ BEGIN
 			
 		ELSIF v_man_table='man_manhole' THEN
 			UPDATE man_manhole SET length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, prot_surface=NEW.prot_surface, 
-			inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility
+			inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility,
+			step_pp=NEW.step_pp, step_fe=NEW.step_fe, step_replace=NEW.step_replace, cover=NEW.cover
 			WHERE node_id=OLD.node_id;
 			
 		ELSIF v_man_table='man_netinit' THEN
