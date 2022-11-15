@@ -378,6 +378,8 @@ UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'arc_id
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'arc_id' and formname like '%v_edit_arc%';
 UPDATE config_form_fields SET placeholder = NULL where formname like '%v_edit_arc%';
 UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_arc%';
+UPDATE config_form_fields SET layoutorder = layoutorder +1  where (formname ilike 've_arc%' or formname='v_edit_arc') AND 
+layoutname='lyt_data_2' and layoutorder > 12 and columnname!='fluid_type';
 
 --node
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'node_id' and formname like '%ve_node_%';
