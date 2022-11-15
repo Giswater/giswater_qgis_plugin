@@ -59,3 +59,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_audi
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_audit_node", "column":"new_step_replace", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_audit_node", "column":"old_cover", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_audit_node", "column":"new_cover", "dataType":"text", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"parent_id", "dataType":"integer", "isUtils":"False"}}$$);
