@@ -213,37 +213,43 @@ class GwNonVisual:
             tools_qgis.show_warning(message, dialog=dialog)
             return
 
-        # Get selected workspace id
-        index = table.selectionModel().currentIndex()
-        value = index.sibling(index.row(), 0).data()
+        # Get selected workspace IDs
+        id_list = []
+        values = []
+        for idx in selected_list:
+            value = idx.sibling(idx.row(), 0).data()
+            id_list.append(value)
 
         message = "Are you sure you want to delete these records?"
-        answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 0).data())
+        answer = tools_qt.show_question(message, "Delete records", id_list)
         if answer:
             # Add quotes to id if not inp_controls/inp_rules
             if tablename not in ('inp_controls', 'inp_rules'):
-                value = f"'{value}'"
+                for value in id_list:
+                    values.append(f"'{value}'")
 
             # Delete values
             id_field = self.dict_ids.get(tablename_value)
             if id_field is not None:
-                sql = f"DELETE FROM {tablename_value} WHERE {id_field} = {value}"
+                for value in values:
+                    sql = f"DELETE FROM {tablename_value} WHERE {id_field} = {value}"
+                    result = tools_db.execute_sql(sql, commit=False)
+                    if not result:
+                        msg = "There was an error deleting object values."
+                        tools_qgis.show_warning(msg, dialog=dialog)
+                        global_vars.dao.rollback()
+                        return
+
+            # Delete object from main table
+            for value in values:
+                id_field = self.dict_ids.get(tablename)
+                sql = f"DELETE FROM {tablename} WHERE {id_field} = {value}"
                 result = tools_db.execute_sql(sql, commit=False)
                 if not result:
-                    msg = "There was an error deleting object values."
+                    msg = "There was an error deleting object."
                     tools_qgis.show_warning(msg, dialog=dialog)
                     global_vars.dao.rollback()
                     return
-
-            # Delete object from main table
-            id_field = self.dict_ids.get(tablename)
-            sql = f"DELETE FROM {tablename} WHERE {id_field} = {value}"
-            result = tools_db.execute_sql(sql, commit=False)
-            if not result:
-                msg = "There was an error deleting object."
-                tools_qgis.show_warning(msg, dialog=dialog)
-                global_vars.dao.rollback()
-                return
 
             # Commit & refresh table
             global_vars.dao.commit()
