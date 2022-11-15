@@ -615,8 +615,6 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"step_replace", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"cover", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"sandbox", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 --2022/11/09
 CREATE OR REPLACE VIEW ve_pol_gully
@@ -1219,7 +1217,6 @@ CREATE OR REPLACE VIEW v_edit_review_node AS
     review_node.step_fe,
     review_node.step_replace,
     review_node.cover,
-    review_node.sandbox,
     review_node.annotation,
     review_node.observ,
     review_node.review_obs,
@@ -1255,8 +1252,6 @@ CREATE OR REPLACE VIEW v_edit_review_audit_node AS
     review_audit_node.new_step_replace,
     review_audit_node.old_cover,
     review_audit_node.new_cover,
-    review_audit_node.old_sandbox,
-    review_audit_node.new_sandbox,
     review_audit_node.old_annotation,
     review_audit_node.new_annotation,
     review_audit_node.old_observ,

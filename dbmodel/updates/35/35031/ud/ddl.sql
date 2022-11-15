@@ -45,13 +45,11 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_manhole
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_manhole", "column":"step_fe", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_manhole", "column":"step_replace", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_manhole", "column":"cover", "dataType":"text", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_manhole", "column":"sandbox", "dataType":"text", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_node", "column":"step_pp", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_node", "column":"step_fe", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_node", "column":"step_replace", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_node", "column":"cover", "dataType":"text", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_node", "column":"sandbox", "dataType":"text", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_audit_node", "column":"old_step_pp", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_audit_node", "column":"new_step_pp", "dataType":"integer", "isUtils":"False"}}$$);
@@ -61,5 +59,3 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_audi
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_audit_node", "column":"new_step_replace", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_audit_node", "column":"old_cover", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_audit_node", "column":"new_cover", "dataType":"text", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_audit_node", "column":"new_sandbox", "dataType":"text", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_audit_node", "column":"old_sandbox", "dataType":"text", "isUtils":"False"}}$$);
