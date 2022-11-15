@@ -1861,7 +1861,7 @@ class GwNonVisual:
         sql = f"SELECT id FROM v_edit_inp_curve; "
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(self.dialog.cmb_control_curve, rows)
+            tools_qt.fill_combo_values(self.dialog.txt_7_cmb_control_curve, rows)
 
         # Signals
         self.dialog.cmb_lidtype.currentIndexChanged.connect(partial(self._manage_lids_tabs, self.dialog))
@@ -2049,16 +2049,16 @@ class GwNonVisual:
         """ Hides widgets that are not necessary in specific tabs """
 
         # List of widgets
-        widgets_hide = {'BC': {'lbl_surface_side_slope', 'txt_surface_side_slope', 'lbl_drain_delay', 'txt_drain_delay'},
-                        'RG': {'lbl_surface_side_slope', 'txt_surface_side_slope'},
-                        'GR': {'lbl_surface_slope', 'txt_surface_slope'},
-                        'IT': {'lbl_surface_side_slope', 'txt_surface_side_slope', 'lbl_drain_delay', 'txt_drain_delay'},
-                        'PP': {'lbl_surface_side_slope', 'txt_surface_side_slope', 'lbl_drain_delay', 'txt_drain_delay'},
-                        'RB': {'lbl_seepage_rate', 'txt_seepage_rate', 'lbl_clogging_factor_storage', 'txt_clogging_factor_storage'},
-                        'RD': {'lbl_vegetation_volume', 'txt_vegetation_volume', 'lbl_surface_side_slope', 'txt_surface_side_slope',
+        widgets_hide = {'BC': {'lbl_surface_side_slope', 'txt_5_surface_side_slope', 'lbl_drain_delay', 'txt_4_drain_delay'},
+                        'RG': {'lbl_surface_side_slope', 'txt_5_surface_side_slope'},
+                        'GR': {'lbl_surface_slope', 'txt_4_surface_slope'},
+                        'IT': {'lbl_surface_side_slope', 'txt_5_surface_side_slope', 'lbl_drain_delay', 'txt_4_drain_delay'},
+                        'PP': {'lbl_surface_side_slope', 'txt_5_surface_side_slope', 'lbl_drain_delay', 'txt_4_drain_delay'},
+                        'RB': {'lbl_seepage_rate', 'txt_3_seepage_rate', 'lbl_clogging_factor_storage', 'txt_4_clogging_factor_storage'},
+                        'RD': {'lbl_vegetation_volume', 'txt_2_vegetation_volume', 'lbl_surface_side_slope', 'txt_5_surface_side_slope',
                                'lbl_flow_exponent','lbl_offset', 'lbl_drain_delay', 'lbl_open_level',
-                               'lbl_closed_level', 'lbl_control_curve', 'lbl_flow_description', 'txt_flow_exponent',
-                               'txt_offset', 'txt_drain_delay', 'txt_open_level', 'txt_closed_level', 'cmb_control_curve',},
+                               'lbl_closed_level', 'lbl_control_curve', 'lbl_flow_description', 'txt_2_flow_exponent',
+                               'txt_3_offset', 'txt_4_drain_delay', 'txt_5_open_level', 'txt_6_closed_level', 'txt_7_cmb_control_curve',},
                         'VS': {''}}
 
         # Hide widgets in list
@@ -2170,14 +2170,14 @@ class GwNonVisual:
 
     def _insert_lids_values(self, dialog, lidco_id, lidco_type):
 
-        control_values = {'BC': {'txt_thickness', 'txt_thickness_storage'},
-                    'RG': {'txt_thickness', 'txt_thickness_storage'},
-                    'GR': {'txt_thickness', 'drainmat_2'},
-                    'IT': {'txt_thickness_storage'},
-                    'PP': {'txt_thinkness_pavement', 'txt_thickness_storage'},
+        control_values = {'BC': {'txt_1_thickness', 'txt_1_thickness_storage'},
+                    'RG': {'txt_1_thickness', 'txt_1_thickness_storage'},
+                    'GR': {'txt_1_thickness', 'drainmat_2'},
+                    'IT': {'txt_1_thickness_storage'},
+                    'PP': {'txt_1_thickness_pavement', 'txt_1_thickness_storage'},
                     'RB': {''},
                     'RD': {''},
-                    'VS': {'txt_berm_height'}}
+                    'VS': {'txt_1_berm_height'}}
 
         for i in range(dialog.tab_lidlayers.count()):
             if dialog.tab_lidlayers.isTabVisible(i):
