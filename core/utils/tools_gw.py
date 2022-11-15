@@ -1416,7 +1416,10 @@ def add_button(**kwargs):
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
     if 'value' in field:
-        widget.setText(field['value'])
+        txt = field['value']
+        if field.get('valueLabel'):
+            txt = field.get('valueLabel')
+        widget.setText(txt)
         # TODO: Check this
         widget.setProperty('value', field['value'])
     if 'widgetcontrols' in field and field['widgetcontrols']:
@@ -1446,11 +1449,11 @@ def add_button(**kwargs):
             if function_name:
                 exist = tools_os.check_python_function(module, function_name)
                 if not exist:
-                    msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
+                    msg = f"widget {real_name} has associated function {function_name}, but {function_name} not exist"
                     tools_qgis.show_message(msg, 2)
                     return widget
             else:
-                message = "Parameter button_function is null for button"
+                message = "Parameter functionName is null for button"
                 tools_qgis.show_message(message, 2, parameter=widget.objectName())
 
     func_params = ""
@@ -1458,7 +1461,7 @@ def add_button(**kwargs):
         function_name = field['widgetfunction']['functionName']
         exist = tools_os.check_python_function(module, function_name)
         if not exist:
-            msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
+            msg = f"widget {real_name} has associated function {function_name}, but {function_name} not exist"
             tools_qgis.show_message(msg, 2)
             return widget
         if 'parameters' in field['widgetfunction']:

@@ -318,6 +318,8 @@ def get_info_node(**kwargs):
     widget = kwargs['widget']
 
     feature_id = tools_qt.get_text(dialog, widget)
+    if widget.property('value') not in (None, ''):
+        feature_id = widget.property('value')
     custom_form = GwInfo('tab_data')
     complet_result, dialog = custom_form.open_form(table_name='v_edit_node', feature_id=feature_id,
                                                        tab_type='tab_data', is_docker=False)
