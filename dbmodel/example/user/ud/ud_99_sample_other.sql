@@ -277,7 +277,10 @@ UPDATE config_form_fields SET  hidden = true where columnname = 'cmanhole_param_
 
 UPDATE config_form_fields SET  hidden = true where columnname IN ('accessibility', 'inlet');
 
-UPDATE config_form_fields SET  layoutname = 'lyt_data_2' where columnname IN ('bottom_channel','sander_depth','length', 'width') AND formname LIKE '%_node_%';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2',  layoutorder = 50 where columnname ='bottom_channel' AND formname LIKE '%_node_%';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2' , layoutorder = 51 where columnname ='sander_depth' AND formname LIKE '%_node_%';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2' , layoutorder = 52 where columnname ='length' AND formname LIKE '%_node_%';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2' , layoutorder = 53 where columnname ='width' AND formname LIKE '%_node_%';
 
 UPDATE config_form_fields SET layoutname = 'lyt_data_2',  layoutorder = 40 where columnname ='workcat_id_end' AND formname LIKE '%_connec_%';
 UPDATE config_form_fields SET layoutname = 'lyt_data_2' , layoutorder = 40 where columnname ='workcat_id_end' AND formname LIKE '%_gully_%';
