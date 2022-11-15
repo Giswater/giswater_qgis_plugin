@@ -97,3 +97,11 @@ SELECT distinct on (child_layer) child_layer, 'form_feature', 'data', 'cover', '
 FROM cat_feature cf
 join  config_form_fields on child_layer =formname
 WHERE system_id='MANHOLE' group by cf.child_layer ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate,  widgetcontrols,  hidden)
+SELECT distinct on (child_layer) child_layer, 'form_feature', 'data', 'sandbox', 'lyt_data_2', max(layoutorder)+1,
+'string', 'text', 'sandbox', false, false, true, false, '{"setMultiline":false}', false
+FROM cat_feature cf
+join  config_form_fields on child_layer =formname
+WHERE system_id='MANHOLE' group by cf.child_layer ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;

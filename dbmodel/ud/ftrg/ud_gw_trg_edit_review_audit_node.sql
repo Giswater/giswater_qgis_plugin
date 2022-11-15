@@ -55,7 +55,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 				NEW.the_geom, NEW.new_matcat_id); 
 
 				IF (SELECT system_id FROM cat_feature WHERE id=NEW.new_node_type) = 'MANHOLE' THEN
-					UPDATE man_manhole SET step_pp=NEW.new_step_pp, step_fe=NEW.new_step_fe, step_replace=NEW.new_step_replace, cover=NEW.new_cover
+					UPDATE man_manhole SET step_pp=NEW.new_step_pp, step_fe=NEW.new_step_fe, step_replace=NEW.new_step_replace, cover=NEW.new_cover, sandbox=NEW.new_sandbox
 					WHERE node_id=NEW.node_id;
 				END IF;
 				
@@ -66,7 +66,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 				WHERE node_id=NEW.node_id;
 				
 				IF (SELECT system_id FROM cat_feature WHERE id=NEW.new_node_type) = 'MANHOLE' THEN
-					UPDATE man_manhole SET step_pp=NEW.new_step_pp, step_fe=NEW.new_step_fe, step_replace=NEW.new_step_replace, cover=NEW.new_cover
+					UPDATE man_manhole SET step_pp=NEW.new_step_pp, step_fe=NEW.new_step_fe, step_replace=NEW.new_step_replace, cover=NEW.new_cover, sandbox=NEW.new_sandbox
 					WHERE node_id=NEW.node_id;
 				END IF;
 
@@ -77,7 +77,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 				WHERE node_id=NEW.node_id;
 				
 				IF (SELECT system_id FROM cat_feature WHERE id=NEW.new_node_type) = 'MANHOLE' THEN
-					UPDATE man_manhole SET step_pp=NEW.new_step_pp, step_fe=NEW.new_step_fe, step_replace=NEW.new_step_replace, cover=NEW.new_cover
+					UPDATE man_manhole SET step_pp=NEW.new_step_pp, step_fe=NEW.new_step_fe, step_replace=NEW.new_step_replace, cover=NEW.new_cover, sandbox=NEW.new_sandbox
 					WHERE node_id=NEW.node_id;
 				END IF;
 				
