@@ -56,6 +56,8 @@ v_numarcs integer;
 v_length double precision;
 v_numconnecs integer;
 v_numhydrometer integer;
+v_numvalveproposed integer;
+v_numvalveclosed integer;
 v_volume float;
 v_priority json;
 
@@ -335,6 +337,10 @@ BEGIN
 	FROM om_mincut_arc JOIN arc USING (arc_id) JOIN cat_arc ON arccat_id=cat_arc.id 
 	WHERE result_id=result_id_arg;
 
+	-- count valves
+	SELECT count(node_id) INTO v_numvalveproposed FROM om_mincut_valve WHERE result_id=result_id_arg AND proposed IS TRUE;
+	SELECT count(node_id) INTO v_numvalveclosed FROM om_mincut_valve WHERE result_id=result_id_arg AND closed IS TRUE;
+
 	-- count connec
 	SELECT count(connec_id) INTO v_numconnecs FROM om_mincut_connec WHERE result_id=result_id_arg;
 
@@ -356,7 +362,8 @@ BEGIN
 	IF v_priority IS NULL THEN v_priority='{}'; END IF;
 	
 	v_mincutdetails = (concat('{"minsector_id":"',element_id_arg,'","psectors":{"used":"',p_usepsectors,'", "unselected":',v_count,'}, "arcs":{"number":"',v_numarcs,'", "length":"',v_length,'", "volume":"', 
-	v_volume, '"}, "connecs":{"number":"',v_numconnecs,'","hydrometers":{"total":"',v_numhydrometer,'","classified":',v_priority,'}}}'));
+	v_volume, '"}, "connecs":{"number":"',v_numconnecs,'","hydrometers":{"total":"',v_numhydrometer,'","classified":',v_priority,'}}, "valve":{"proposed":"'
+	,v_numvalveproposed,'","closed":"',v_numvalveclosed,'"}}'));
 			
 	--update output results
 	UPDATE om_mincut SET output = v_mincutdetails WHERE id = result_id_arg;
