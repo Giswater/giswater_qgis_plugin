@@ -1396,7 +1396,10 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
     if 'value' in field:
-        widget.setText(field['value'])
+        txt = field['value']
+        if field.get('valueLabel'):
+            txt = field.get('valueLabel')
+        widget.setText(txt)
         widget.setProperty('value', field['value'])
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
     function_name = None
@@ -1409,11 +1412,11 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
             if function_name:
                 exist = tools_os.check_python_function(module, function_name)
                 if not exist:
-                    msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
+                    msg = f"widget {real_name} has associated function {function_name}, but {function_name} not exist"
                     tools_qgis.show_message(msg, 2)
                     return widget
             else:
-                message = "Parameter button_function is null for button"
+                message = "Parameter functionName is null for button"
                 tools_qgis.show_message(message, 2, parameter=widget.objectName())
 
     kwargs = {'dialog': dialog, 'widget': widget, 'message_level': 1, 'function_name': function_name,

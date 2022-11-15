@@ -266,6 +266,8 @@ class GwInfo(QObject):
         dialog = kwargs['dialog']
         widget = kwargs['widget']
         feature_id = tools_qt.get_text(dialog, widget)
+        if widget.property('value') not in (None, ''):
+            feature_id = widget.property('value')
         self.customForm = GwInfo(self.tab_type)
         complet_result, dialog = self.customForm.open_form(table_name='v_edit_node', feature_id=feature_id,
                                                            tab_type=self.tab_type, is_docker=False)
