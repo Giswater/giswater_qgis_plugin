@@ -25,3 +25,6 @@ VALUES (478, 'Check features without defined sector_id', 'utils', NULL, 'core', 
 
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
 VALUES (479, 'Check duplicated arcs', 'utils', NULL, 'core', true, 'Check om-data', NULL);
+
+INSERT INTO config_param_system(parameter, value, descript, project_type,  datatype)
+VALUES ('admin_node_code_on_arc', false, 'If true, on codes of final nodes will be visible on arc''s form. If false, node_id would be displayed', 'utils', 'boolean');
