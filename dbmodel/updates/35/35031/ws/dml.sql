@@ -10,3 +10,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE config_param_system set project_type='utils' WHERE parameter='utils_graphanalytics_status';
 
 UPDATE sys_function SET function_name='gw_fct_massivemincut' where id=2712;
+
+UPDATE config_toolbox SET alias = 'Mapzones analysis' WHERE id=2768;

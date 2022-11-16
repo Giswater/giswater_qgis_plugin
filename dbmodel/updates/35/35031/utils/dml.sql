@@ -28,3 +28,5 @@ VALUES (479, 'Check duplicated arcs', 'utils', NULL, 'core', true, 'Check om-dat
 
 INSERT INTO config_param_system(parameter, value, descript, project_type,  datatype)
 VALUES ('admin_node_code_on_arc', false, 'If true, on codes of final nodes will be visible on arc''s form. If false, node_id would be displayed', 'utils', 'boolean');
+
+update sys_param_user set dv_isnullvalue =null where formname='epaoptions';
