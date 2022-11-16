@@ -605,6 +605,8 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_connec"], "fieldName":"drainzone_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_gully"], "fieldName":"drainzone_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"arc_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 --add steps and covers on manhole views
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
@@ -1268,3 +1270,23 @@ CREATE OR REPLACE VIEW v_edit_review_audit_node AS
   WHERE selector_expl.cur_user = "current_user"()::text AND review_audit_node.expl_id = selector_expl.expl_id AND review_audit_node.review_status_id <> 0;
 
 
+CREATE OR REPLACE VIEW v_edit_drainzone AS
+SELECT 
+drainzone_id, 
+name, 
+drainzone.expl_id, 
+macrodma_id, 
+descript, 
+undelete, 
+minc, 
+maxc, 
+effc, 
+avg_press, 
+pattern_id, 
+link, 
+graphconfig, 
+stylesheet, 
+active,
+the_geom
+FROM selector_expl, drainzone
+WHERE drainzone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;

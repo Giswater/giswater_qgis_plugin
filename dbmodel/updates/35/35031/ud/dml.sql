@@ -35,6 +35,7 @@ Stop your mouse over labels for more information about input parameters.
 This function could be automatic triggered by valve status (open or closed) by configuring utils_graphanalytics_automatic_trigger variable on [config_param_system] table.',
 'role_master',null,'core')  ON CONFLICT (id) DO NOTHING;
 
+DELETE FROM config_toolbox WHERE id=2768;
 INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
 VALUES (2768, 'Mapzones analysis', '{"featureType":[]}', '[
 {"widgetname":"graphClass", "label":"Graph class:", "widgettype":"combo","datatype":"text","tooltip": "Graphanalytics method used", "layoutname":"grl_option_parameters","layoutorder":1,"comboIds":["DRAINZONE"],
@@ -49,7 +50,7 @@ VALUES (2768, 'Mapzones analysis', '{"featureType":[]}', '[
 {"widgetname":"commitChanges", "label":"Commit changes:", "widgettype":"check","datatype":"boolean","tooltip":"If true, changes will be applied to DB. If false, algorithm results will be saved in anl tables" , "layoutname":"grl_option_parameters","layoutorder":8,"value":""},
 {"widgetname":"valueForDisconnected", "label":"Value for disconn. and conflict: (*)","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Value to use for disconnected features. Usefull for work in progress with dynamic mpzonesnode" , "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":9, "value":""},
 {"widgetname":"updateMapZone", "label":"Mapzone constructor method:","widgettype":"combo","datatype":"integer","layoutname":"grl_option_parameters","layoutorder":10,
-"comboIds":[0,1,2,3,4], "comboNames":["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "PLOT & PIPE BUFFER", "LINK & PIPE BUFFER"], "selectedId":""}, 
+"comboIds":[0,1,2,6], "comboNames":["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "EPA SUBCATCH"], "selectedId":""}, 
 {"widgetname":"geomParamUpdate", "label":"Pipe buffer","widgettype":"text","datatype":"float","tooltip":"Buffer from arcs to create mapzone geometry using [PIPE BUFFER] options. Normal values maybe between 3-20 mts.", "layoutname":"grl_option_parameters","layoutorder":11, "isMandatory":false, "placeholder":"5-30", "value":""}
 ]',NULL, TRUE) ON CONFLICT (id) DO NOTHING;
 
@@ -61,9 +62,6 @@ WHERE isautoupdate is true and columnname ilike '%2' and formname ilike '%arc%';
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source) 
 VALUES (432, 'Check node ''T candidate'' with wrong topology','ws', null, null) ON CONFLICT (fid) DO NOTHING;
-
-update sys_param_user set dv_isnullvalue =null where formname='epaoptions';
-
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
 datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate,  widgetcontrols,  hidden)
@@ -100,3 +98,21 @@ WHERE system_id='MANHOLE' group by cf.child_layer ON CONFLICT (formname, formtyp
 
 UPDATE sys_table SET context='{"level_1":"INVENTORY","level_2":"CATALOGS"}', orderby=23, alias='Arc shape catalog' WHERE id='cat_arc_shape';
 UPDATE sys_table SET context='{"level_1":"INVENTORY","level_2":"CATALOGS"}', orderby=24, alias='Node shape catalog' WHERE id='cat_node_shape';
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (480, 'Drainzone Sectorization', 'ud', NULL, 'core', true, 'Function process', NULL)  ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO config_function(id, function_name, style, layermanager, actions)
+VALUES (2710, 'gw_fct_graphanalytics_mapzones', '{"style": {"point": {"style": "categorized", "field": "descript", "transparency": 0.5, "width": 2.5, "values": [{"id": "Disconnected", "color": [255,124,64]}, {"id": "Conflict", "color": [14,206,253]}]},
+"line": {"style": "categorized", "field": "descript", "transparency": 0.5, "width": 2.5, "values": [{"id": "Disconnected", "color": [255,124,64]}, {"id": "Conflict", "color": [14,206,253]}]}}}',
+null,'[{"funcName": "set_style_mapzones", "params": {}}]') ON CONFLICT (id) DO NOTHING; 
+
+INSERT INTO sys_table( id, descript, sys_role,  source)
+VALUES ('drainzone', 'Table of spatial objects representing Drainage zones', 'role_edit', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, criticity, context, orderby, alias, source)
+VALUES ('v_edit_drainzone', 'Shows editable information about drainzone.', 'role_edit', 2, '{"level_1":"INVENTORY","level_2":"MAP ZONES"}', 4, 'DRAINZONE','core') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
+VALUES (3178, 'gw_trg_edit_drainzone', 'ud', 'trigger function',  'Trigger for editing view v_edit_drainzone', 'role_edit',  'core');

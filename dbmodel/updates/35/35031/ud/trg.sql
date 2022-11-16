@@ -37,3 +37,9 @@ CREATE TRIGGER gw_trg_edit_review_audit_node
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_review_audit_node();
 
+
+CREATE TRIGGER gw_trg_edit_drainzone
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_drainzone
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_drainzone();
