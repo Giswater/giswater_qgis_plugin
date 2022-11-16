@@ -1531,6 +1531,8 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
         if not widget.isEnabled() and not ignore_editability:
             return _json
         value = tools_qt.is_checked(dialog, widget)
+        if value is not None:
+            value = str(value).lower()
     elif type(widget) is QgsDateTimeEdit:
         if not widget.isEnabled() and not ignore_editability:
             return _json
