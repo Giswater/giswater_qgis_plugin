@@ -25,6 +25,8 @@ CREATE TABLE IF NOT EXISTS drainzone
   active boolean DEFAULT true,
   avg_press numeric);
 
+ALTER TABLE drainzone ALTER COLUMN graphconfig SET DEFAULT '{"use":[{"nodeParent":""}], "ignore":[], "forceClosed":[]}'::json;
+
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"drainzone_id", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"drainzone_id", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"drainzone_id", "dataType":"integer", "isUtils":"False"}}$$);

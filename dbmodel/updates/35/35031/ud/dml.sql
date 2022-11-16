@@ -116,3 +116,9 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
 VALUES (3178, 'gw_trg_edit_drainzone', 'ud', 'trigger function',  'Trigger for editing view v_edit_drainzone', 'role_edit',  'core');
+
+INSERT INTO drainzone(drainzone_id, name, descript,active)
+VALUES (-1, 'Conflict', 'Drainzone used on graphanalytics algorithm when two ore more zones has conflict in terms of some interconnection.',true);
+
+INSERT INTO drainzone(drainzone_id, name, active)
+VALUES (0, 'Undefined', true);

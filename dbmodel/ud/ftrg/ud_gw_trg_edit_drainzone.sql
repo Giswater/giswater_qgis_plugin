@@ -42,7 +42,7 @@ BEGIN
 		
 	ELSIF TG_OP = 'UPDATE' THEN
    	
-		UPDATE dma 
+		UPDATE drainzone 
 		SET drainzone_id=NEW.drainzone_id, name=NEW.name, expl_id=NEW.expl_id, macrodma_id=NEW.macrodma_id, descript=NEW.descript, undelete=NEW.undelete, the_geom=NEW.the_geom, 
 		minc=NEW.minc, maxc=NEW.maxc, effc=NEW.effc, pattern_id=NEW.pattern_id, link=NEW.link, graphconfig=NEW.graphconfig, stylesheet=NEW.stylesheet,
 		active=NEW.active, avg_press=NEW.avg_press
