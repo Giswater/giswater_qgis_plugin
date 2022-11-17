@@ -177,7 +177,8 @@ CREATE OR REPLACE VIEW vu_arc AS
     arc.workcat_id_plan,
     arc.asset_id,
     arc.pavcat_id,
-    arc.drainzone_id
+    arc.drainzone_id,
+    cat_arc.area AS cat_area
    FROM arc
      JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
      LEFT JOIN vu_node a ON a.node_id::text = arc.node_1::text
@@ -607,6 +608,9 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_gully"], "fieldName":"drainzone_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"arc_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"cat_area", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 --add steps and covers on manhole views
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},

@@ -122,3 +122,11 @@ VALUES (-1, 'Conflict', 'Drainzone used on graphanalytics algorithm when two ore
 
 INSERT INTO drainzone(drainzone_id, name, active)
 VALUES (0, 'Undefined', true);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate,  widgetcontrols,  hidden)
+SELECT distinct on (child_layer) child_layer, 'form_feature', 'data', 'cat_area', 'lyt_data_1', max(layoutorder)+1,
+'numeric', 'text', 'Area', false, false, false, false, '{"setMultiline":false}', false
+FROM cat_feature cf
+join  config_form_fields on child_layer =formname
+WHERE feature_type='ARC' and layoutname = 'lyt_data_1' group by cf.child_layer ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
