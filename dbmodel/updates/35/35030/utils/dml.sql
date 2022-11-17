@@ -164,3 +164,14 @@ VALUES (3200, 'Workspace is not editable you can''t modify it nor delete it', NU
 UPDATE cat_workspace SET iseditable=TRUE WHERE iseditable IS NULL;
 
 UPDATE sys_message SET log_level=2 WHERE id=3142;
+
+UPDATE config_param_system SET value = gw_fct_json_object_delete_keys(value::json, 'mode') WHERE parameter = 'plan_psector_execute_action';
+
+INSERT INTO config_param_system  (parameter, value)
+SELECT 'plan_statetype_vdefault',json_object_agg (parameter,value)
+FROM config_param_system where parameter in ('plan_statetype_ficticius', 'plan_statetype_planned', 'plan_statetype_reconstruct');
+
+UPDATE config_param_system  b SET value=b.value::jsonb ||a.value ::jsonb
+FROM config_param_system a where a.parameter ='plan_psector_execute_action' and b.parameter='plan_statetype_vdefault';
+
+DELETE FROM config_param_system where parameter in ('plan_statetype_ficticius', 'plan_statetype_planned', 'plan_statetype_reconstruct','plan_psector_execute_action');
