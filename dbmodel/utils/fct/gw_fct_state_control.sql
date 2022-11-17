@@ -42,15 +42,6 @@ BEGIN
 			SELECT state INTO v_old_state FROM node WHERE node_id=feature_id_aux;
 			IF state_aux!=v_old_state AND (v_downgrade_force IS NOT TRUE) THEN
 
-				-- psector control
-				SELECT count(plan_psector_x_node.node_id) INTO v_num_feature FROM plan_psector_x_node
-				JOIN  plan_psector USING (psector_id) WHERE active IS TRUE and node_id=feature_id_aux;
-
-				IF v_num_feature > 0 THEN 
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3160", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
-				END IF;
-
 				-- arcs control
 				SELECT count(arc.arc_id) INTO v_num_feature FROM arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state = 1;
 
