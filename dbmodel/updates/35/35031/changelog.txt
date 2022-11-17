@@ -5,3 +5,4 @@
 - New fields related to steps and cover on man_manhole table and in the reviews
 - New field on node ud - parent_id, arc_id
 - New system parameter 'admin_node_code_on_arc' - If true, on codes of final nodes will be visible on arc's form. If false, node_id would be displayed
+- Improve address search returning values even if writing mismatch (fuzzystrmatch extension)

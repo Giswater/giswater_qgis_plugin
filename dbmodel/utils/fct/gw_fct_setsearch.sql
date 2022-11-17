@@ -72,6 +72,7 @@ v_muni_geom_field varchar;
 -- street
 v_street_layer varchar;
 v_street_id_field varchar;
+v_street_search_field varchar;
 v_street_display_field varchar;
 v_street_muni_id_field varchar;
 v_street_geom_field varchar;
@@ -251,7 +252,8 @@ BEGIN
 		-- Parameters of the street layer
 		SELECT ((value::json)->>'sys_table_id') INTO v_street_layer FROM config_param_system WHERE parameter='basic_search_street';
 		SELECT ((value::json)->>'sys_id_field') INTO v_street_id_field FROM config_param_system WHERE parameter='basic_search_street';
-		SELECT ((value::json)->>'sys_search_field') INTO v_street_display_field FROM config_param_system WHERE parameter='basic_search_street';
+		SELECT ((value::json)->>'sys_search_field') INTO v_street_search_field FROM config_param_system WHERE parameter='basic_search_street';
+		SELECT ((value::json)->>'sys_display_field') INTO v_street_display_field FROM config_param_system WHERE parameter='basic_search_street';
 		SELECT ((value::json)->>'sys_parent_field') INTO v_street_muni_id_field FROM config_param_system WHERE parameter='basic_search_street';
 		SELECT ((value::json)->>'sys_geom_field') INTO v_street_geom_field FROM config_param_system WHERE parameter='basic_search_street';
 
@@ -273,9 +275,26 @@ BEGIN
 			FROM '||quote_ident(v_street_layer)||'
 			JOIN '||quote_ident(v_muni_layer)||' ON '||quote_ident(v_muni_layer)||'.'||quote_ident(v_muni_id_field)||' = '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_muni_id_field) ||'
 			WHERE lower(unaccent('||quote_ident(v_muni_layer)||'.'||quote_ident(v_muni_display_field)||')) = lower(unaccent('||quote_literal(v_name)||'))
-			AND lower(unaccent('||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||')) ILIKE lower(unaccent('||quote_literal(v_textarg)||')) ORDER BY
-			'||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||' LIMIT 10 )a'
+			AND lower(unaccent('||quote_ident(v_street_layer)||'.'||quote_ident(v_street_search_field)||')) ILIKE lower(unaccent('||quote_literal(v_textarg)||')) ORDER BY
+			'||quote_ident(v_street_layer)||'.'||quote_ident(v_street_search_field)||' LIMIT 10 )a'
 			INTO v_response;
+		
+        -- if textarg mismatch, try use levenshtein function to show similar results
+		IF v_response IS NULL THEN
+			v_textarg := v_edittext->>'text';
+			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
+				FROM (WITH q AS (SELECT lower(unaccent('||quote_literal(v_textarg)||')) AS qsn)
+                SELECT levenshtein(lower('||quote_ident(v_street_layer)||'.'||quote_ident(v_street_search_field)||'),lower(qsn)) AS leven,
+                levenshtein(lower('||quote_ident(v_street_layer)||'.'||quote_ident(v_street_search_field)||'),lower(qsn))::DECIMAL/greatest(length('||quote_ident(v_street_layer)||'.'||quote_ident(v_street_search_field)||'),length(qsn)) as ratio,
+                '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_id_field)||' as id,'||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||' as display_name,
+                st_astext(st_envelope('||quote_ident(v_street_layer)||'.'||quote_ident(v_street_geom_field)||'))
+                FROM q, '||quote_ident(v_street_layer)||'
+                JOIN '||quote_ident(v_muni_layer)||' ON '||quote_ident(v_muni_layer)||'.'||quote_ident(v_muni_id_field)||' = '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_muni_id_field) ||'
+                WHERE lower(unaccent('||quote_ident(v_muni_layer)||'.'||quote_ident(v_muni_display_field)||')) = lower(unaccent('||quote_literal(v_name)||'))
+                AND levenshtein(lower('||quote_ident(v_street_layer)||'.'||quote_ident(v_street_search_field)||'),lower(qsn))::DECIMAL/greatest(length('||quote_ident(v_street_layer)||'.'||quote_ident(v_street_search_field)||'),length(qsn))< 0.6 ORDER BY ratio LIMIT 10)a'
+			INTO v_response;
+
+		END IF;
 
 	-- Hydro tab
 	ELSIF v_tab = 'hydro' THEN

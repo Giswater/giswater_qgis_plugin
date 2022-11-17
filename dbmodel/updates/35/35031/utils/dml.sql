@@ -29,4 +29,6 @@ VALUES (479, 'Check duplicated arcs', 'utils', NULL, 'core', true, 'Check om-dat
 INSERT INTO config_param_system(parameter, value, descript, project_type,  datatype)
 VALUES ('admin_node_code_on_arc', false, 'If true, on codes of final nodes will be visible on arc''s form. If false, node_id would be displayed', 'utils', 'boolean');
 
-update sys_param_user set dv_isnullvalue =null where formname='epaoptions';
+UPDATE sys_param_user SET dv_isnullvalue=NULL WHERE formname='epaoptions';
+
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'sys_display_field','descript'::text) WHERE parameter = 'basic_search_street';
