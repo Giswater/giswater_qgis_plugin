@@ -33,3 +33,11 @@ ON CONFLICT (parameter) DO NOTHING;
 UPDATE sys_param_user SET dv_isnullvalue=NULL WHERE formname='epaoptions';
 
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'sys_display_field','descript'::text) WHERE parameter = 'basic_search_street';
+
+-- execute psector refactor
+UPDATE sys_message SET hint_message='It''s used as init or final node on planified arcs' WHERE id=3142;
+
+INSERT INTO plan_typevalue VALUES('psector_status', '4', 'EXECUTED (On Service)', 'Psector executed. Its elements are set to On Service', NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO plan_typevalue VALUES('psector_status', '5', 'EXECUTED (Do nothing)', 'Psector executed but do nothing', NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+
+UPDATE plan_typevalue SET idval='EXECUTED (Obsolete)', descript='Psector executed. Its elements are set to Obsolete' WHERE typevalue='psector_status' AND id='0';
