@@ -29,7 +29,8 @@ BEGIN
 	v_rev_arc_y2_tol :=(SELECT value::json->>'y2' FROM config_param_system WHERE parameter = 'edit_review_arc_tolerance');		
 
 	--getting original values
-	SELECT arc_id,y1,y2,arc.arc_type, arccat_id, arc.matcat_id, annotation, observ, shape, geom1, geom2, the_geom, expl_id INTO rec_arc 
+	SELECT arc_id,y1,y2,arc.arc_type, arccat_id, CASE WHEN arc.matcat_id IS NOT NULL THEN arc.matcat_id ELSE cat_arc.matcat_id END AS matcat_id , 
+	annotation, observ, shape, geom1, geom2, the_geom, expl_id INTO rec_arc 
 	FROM arc JOIN cat_arc ON cat_arc.id=arc.arccat_id WHERE arc_id=NEW.arc_id;
 	
 

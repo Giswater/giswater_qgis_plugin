@@ -27,7 +27,8 @@ INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, 
 VALUES (479, 'Check duplicated arcs', 'utils', NULL, 'core', true, 'Check om-data', NULL);
 
 INSERT INTO config_param_system(parameter, value, descript, project_type,  datatype)
-VALUES ('admin_node_code_on_arc', false, 'If true, on codes of final nodes will be visible on arc''s form. If false, node_id would be displayed', 'utils', 'boolean');
+VALUES ('admin_node_code_on_arc', false, 'If true, on codes of final nodes will be visible on arc''s form. If false, node_id would be displayed', 'utils', 'boolean')
+ON CONFLICT (parameter) DO NOTHING;
 
 UPDATE sys_param_user SET dv_isnullvalue=NULL WHERE formname='epaoptions';
 
