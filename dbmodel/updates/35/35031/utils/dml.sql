@@ -41,3 +41,14 @@ INSERT INTO plan_typevalue VALUES('psector_status', '4', 'EXECUTED (On Service)'
 INSERT INTO plan_typevalue VALUES('psector_status', '5', 'EXECUTED (Do nothing)', 'Psector executed but do nothing', NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
 UPDATE plan_typevalue SET idval='EXECUTED (Obsolete)', descript='Psector executed. Its elements are set to Obsolete' WHERE typevalue='psector_status' AND id='0';
+
+UPDATE config_param_system SET value = gw_fct_json_object_delete_keys(value::json, 'mode') WHERE parameter = 'plan_psector_execute_action';
+
+INSERT INTO config_param_system  (parameter, value)
+SELECT 'plan_statetype_vdefault',json_object_agg (parameter,value)
+FROM config_param_system where parameter in ('plan_statetype_ficticius', 'plan_statetype_planned', 'plan_statetype_reconstruct');
+
+UPDATE config_param_system  b SET value=b.value::jsonb ||a.value ::jsonb
+FROM config_param_system a where a.parameter ='plan_psector_execute_action' and b.parameter='plan_statetype_vdefault';
+
+DELETE FROM config_param_system where parameter in ('plan_statetype_ficticius', 'plan_statetype_planned', 'plan_statetype_reconstruct','plan_psector_execute_action');
