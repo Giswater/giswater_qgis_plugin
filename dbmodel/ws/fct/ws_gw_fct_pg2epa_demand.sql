@@ -23,6 +23,7 @@ v_sql text;
 v_patternmethod integer;
 v_queryfrom text;
 v_networkmode integer;
+v_deafultpattern text;
       
 BEGIN
 
@@ -33,6 +34,7 @@ BEGIN
 	v_units =  (SELECT value FROM config_param_user WHERE parameter='inp_options_units' AND cur_user=current_user);
 	v_patternmethod = (SELECT value FROM config_param_user WHERE parameter='inp_options_patternmethod' AND cur_user=current_user); 
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user); 
+	v_deafultpattern = Coalesce((SELECT value FROM config_param_user WHERE parameter='inp_options_pattern' AND cur_user=current_user),''); 
 
 
 	EXECUTE 'SELECT (value::json->>'||quote_literal(v_units)||')::float FROM config_param_system WHERE parameter=''epa_units_factor'''
@@ -61,7 +63,10 @@ BEGIN
 		UPDATE temp_node SET demand=inp_junction.demand FROM inp_junction WHERE temp_node.node_id=inp_junction.node_id;	
 
 		-- pattern
-		IF v_patternmethod = 12 THEN -- SECTOR PATTERN (NODE)
+		IF v_patternmethod = 11 THEN -- DEFAULT PATTERN
+			UPDATE temp_node SET pattern_id=v_deafultpattern;
+		
+		ELSIF v_patternmethod = 12 THEN -- SECTOR PATTERN (NODE)
 			UPDATE temp_node SET pattern_id=sector.pattern_id FROM node JOIN sector ON sector.sector_id=node.sector_id WHERE temp_node.node_id=node.node_id;
 		
 		ELSIF v_patternmethod = 13 THEN -- DMA PATTERN (NODE)
@@ -79,8 +84,11 @@ BEGIN
 		-- demand on connecs over arc
 		UPDATE temp_node SET demand=a.demand::float FROM v_edit_inp_connec a WHERE concat('VC', connec_id) = node_id;
 
-		-- pattern	
-		IF v_patternmethod  = 12 THEN -- SECTOR PATTERN (PJOINT)
+		-- pattern
+		IF v_patternmethod = 11 THEN -- DEFAULT PATTERN
+			UPDATE temp_node SET pattern_id=v_deafultpattern;
+		
+		ELSIF v_patternmethod  = 12 THEN -- SECTOR PATTERN (PJOINT)
 			
 			UPDATE temp_node SET pattern_id=sector.pattern_id 
 			FROM v_edit_inp_connec JOIN sector USING (sector_id) WHERE concat('VN', pjoint_id) = node_id ;
@@ -116,7 +124,10 @@ BEGIN
 		UPDATE temp_node SET demand=v.demand FROM v_edit_inp_connec v WHERE concat('VC',connec_id) = node_id;
 
 		-- pattern
-		IF v_patternmethod  = 12 THEN -- SECTOR PATTERN (CONNEC)
+		IF v_patternmethod = 11 THEN -- DEFAULT PATTERN
+			UPDATE temp_node SET pattern_id=v_deafultpattern;
+				
+		ELSIF v_patternmethod  = 12 THEN -- SECTOR PATTERN (CONNEC)
 
 			-- pattern on connecs with associated link
 			UPDATE temp_node SET pattern_id=sector.pattern_id 

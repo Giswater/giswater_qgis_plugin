@@ -46,6 +46,7 @@ v_querytext text;
 v_patternmethod integer;
 v_userscenario integer[];
 v_networkmode integer;
+v_deafultpattern text;
 
 
 BEGIN
@@ -66,6 +67,7 @@ BEGIN
 		v_demandpriority = (SELECT value::integer FROM config_param_user WHERE parameter='inp_options_dscenario_priority' AND cur_user=current_user);
 		v_patternmethod = (SELECT value::integer FROM config_param_user WHERE parameter='inp_options_patternmethod' AND cur_user=current_user);
 		v_userscenario = (SELECT array_agg(dscenario_id) FROM selector_inp_dscenario where cur_user=current_user);
+		v_deafultpattern = Coalesce((SELECT value FROM config_param_user WHERE parameter='inp_options_pattern' AND cur_user=current_user),''); 
 
 		-- base demand management	
 		IF v_demandpriority = 0 THEN -- Remove whole base demand
@@ -140,8 +142,24 @@ BEGIN
 		JOIN connec c ON concat('VC',c.pjoint_id) =  n.node_id
 		WHERE c.connec_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0  
 		AND dscenario_id IN (SELECT unnest(v_userscenario));
+		
+		-- pattern
+		IF v_patternmethod = 11 THEN -- DEFAULT PATTERN
+			UPDATE temp_demand SET pattern_id=v_deafultpattern;
+		
+		ELSIF v_patternmethod = 12 THEN -- SECTOR PATTERN (NODE)
+			UPDATE temp_demand SET pattern_id=sector.pattern_id FROM node JOIN sector ON sector.sector_id=node.sector_id WHERE temp_demand.feature_id=node.node_id;
+			UPDATE temp_demand SET pattern_id=sector.pattern_id FROM connec JOIN sector ON sector.sector_id=connec.sector_id WHERE temp_demand.feature_id=connec.connec_id;
+		
+		ELSIF v_patternmethod = 13 THEN -- DMA PATTERN (NODE)
+			UPDATE temp_demand SET pattern_id=sector.pattern_id FROM node JOIN dma ON dma.sector_id=node.dma_id WHERE temp_demand.feature_id=node.node_id;
+			UPDATE temp_demand SET pattern_id=sector.pattern_id FROM connec JOIN dma ON dma.sector_id=connec.dma_id WHERE temp_demand.feature_id=connec.connec_id;
+			
+		ELSIF v_patternmethod = 14 THEN -- FEATURE PATTERN (NODE)
+			-- do nothing because values have been moved from feature
+		END IF;
 
-				
+		
 		-- move patterns used demands scenario table
 		INSERT INTO rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, 
 			factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
