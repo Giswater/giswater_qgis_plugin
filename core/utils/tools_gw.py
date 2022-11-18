@@ -1060,7 +1060,10 @@ def set_style_mapzones():
             for id in mapzone['values']:
                 # initialize the default symbol for this geometry type
                 symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
-                symbol.setOpacity(float(mapzone['transparency']))
+                try:
+                    symbol.setOpacity(float(mapzone['transparency']))
+                except KeyError:  # backwards compatibility for database < 3.5.030
+                    symbol.setOpacity(float(mapzone['opacity']))
 
                 # Setting simp
                 R = random.randint(0, 255)
