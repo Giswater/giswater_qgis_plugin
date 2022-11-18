@@ -38,10 +38,13 @@ BEGIN
 	END IF;
 	
 	UPDATE arc 
-	SET arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, annotation= NEW.annotation, custom_length=NEW.custom_length, state_type=NEW.state_type
+	SET arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, annotation= NEW.annotation, state_type=NEW.state_type
 	WHERE arc_id = OLD.arc_id;
 
-        IF v_arc_table = 'inp_pipe' THEN   
+        IF v_arc_table = 'inp_pipe' THEN 
+        
+	    UPDATE arc SET custom_length=NEW.custom_length WHERE arc_id = OLD.arc_id;
+          
             UPDATE inp_pipe SET minorloss=NEW.minorloss, status=NEW.status, custom_roughness=NEW.custom_roughness, custom_dint=NEW.custom_dint WHERE arc_id=OLD.arc_id;
 
         ELSIF v_arc_table = 'inp_virtualvalve' THEN   

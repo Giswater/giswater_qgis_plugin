@@ -270,6 +270,8 @@ BEGIN
 	-- other null values
 	UPDATE temp_arc SET minorloss = 0 WHERE minorloss IS NULL;
 
+	UPDATE temp_arc SET epa_type = 'VIRTUALVALVE' FROM arc WHERE arc.epa_type  ='VIRTUALVALVE' AND arc.arc_id = temp_arc.arc_id;
+
 	-- for those elements like filter o flowmeter which they do not have the attribute on the inventory table
 	UPDATE temp_arc SET status = 'OPEN' WHERE status IS NULL OR status = '';
 	
