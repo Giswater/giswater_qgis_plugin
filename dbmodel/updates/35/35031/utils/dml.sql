@@ -42,6 +42,9 @@ INSERT INTO plan_typevalue VALUES('psector_status', '5', 'EXECUTED (Do nothing)'
 
 UPDATE plan_typevalue SET idval='EXECUTED (Obsolete)', descript='Psector executed. Its elements are set to Obsolete' WHERE typevalue='psector_status' AND id='0';
 
+UPDATE plan_psector SET status = 4 where status=0 and (SELECT value::json ->> 'mode' FROM config_param_system WHERE parameter='plan_psector_execute_action')='onService';
+UPDATE plan_psector SET status = 5 where status=0 and (SELECT value::json ->> 'mode' FROM config_param_system WHERE parameter='plan_psector_execute_action')='disabled';
+
 UPDATE config_param_system SET value = gw_fct_json_object_delete_keys(value::json, 'mode') WHERE parameter = 'plan_psector_execute_action';
 
 INSERT INTO config_param_system  (parameter, value, descript, "label", isenabled, layoutorder, project_type, "datatype", widgettype, layoutname)
