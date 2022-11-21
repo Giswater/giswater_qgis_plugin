@@ -44,11 +44,15 @@ UPDATE plan_typevalue SET idval='EXECUTED (Obsolete)', descript='Psector execute
 
 UPDATE config_param_system SET value = gw_fct_json_object_delete_keys(value::json, 'mode') WHERE parameter = 'plan_psector_execute_action';
 
-INSERT INTO config_param_system  (parameter, value)
-SELECT 'plan_statetype_vdefault',json_object_agg (parameter,value)
+INSERT INTO config_param_system  (parameter, value, descript, "label", isenabled, layoutorder, project_type, "datatype", widgettype, layoutname)
+SELECT 'plan_statetype_vdefault',json_object_agg (parameter,value), 'Default state_type when using planified features', 'Plan state_type vdefault:', true, 10, 'utils', 'json', 'text', 'lyt_admin_other'
 FROM config_param_system where parameter in ('plan_statetype_ficticius', 'plan_statetype_planned', 'plan_statetype_reconstruct');
 
 UPDATE config_param_system  b SET value=b.value::jsonb ||a.value ::jsonb
-FROM config_param_system a where a.parameter ='plan_psector_execute_action' and b.parameter='plan_statetype_vdefault';
+FROM config_param_system a where a.parameter ='plan_psector_execute_action' and b.parameter='plan_psector_statetype';
 
 DELETE FROM config_param_system where parameter in ('plan_statetype_ficticius', 'plan_statetype_planned', 'plan_statetype_reconstruct','plan_psector_execute_action');
+
+UPDATE config_param_system SET "parameter"='plan_psector_execute', "label"='Psector execute state_type:' where "parameter"='plan_psector_statetype';
+
+UPDATE config_param_system SET value=replace(value,'plan_obsolete_state_type', 'obsolete_planified') WHERE "parameter"='plan_psector_execute';
