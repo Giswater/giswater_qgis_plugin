@@ -1474,24 +1474,30 @@ class GwPsector:
 
     def show_status_warning(self):
 
-        mode = tools_gw.get_config_value('plan_psector_execute_action', table='config_param_system')
-        if mode is None:
-            return
-
-        mode = json.loads(mode[0])
-        if mode['mode'] == 'obsolete':
-            msg = "WARNING: You have updated the status value. If you click 'Accept' on the main dialog, " \
-                  "a process that updates the state & state_type values of all that features that belong to the " \
-                  "psector, according to the system variables plan_psector_statetype, " \
-                  "plan_statetype_planned and plan_statetype_ficticious, will be triggered."
+        msg = ""
+        status = tools_qt.get_combo_value(self.dlg_plan_psector, self.cmb_status)
+        if status == '0':
+            msg = "WARNING: You have updated the status value to EXECUTED (Obsolete). If you click 'Accept' on " \
+                  "the main dialog, a process will update all the features that belong to the psector changing its " \
+                  "state to OBSOLETE and its state_type according to system variable " \
+                  "'plan_psector_execute', 'done_planified' and 'done_ficticius'."
+        elif status == '2':
+            msg = "WARNING: You have updated the status value to PLANNED. If you click 'Accept' on the main dialog, " \
+                  "a process will update all the features that belong to the psector changing its state to " \
+                  "OBSOLETE and its state_type according to system variable " \
+                  "'plan_statetype_vdefault', 'plan_statetype_planned' and 'plan_statetype_ficticius'."
+        elif status == '3':
+            msg = "WARNING: You have updated the status value to CANCELED. If you click 'Accept' on the main dialog, " \
+                  "a process will update all the features that belong to the psector changing its state to OBSOLETE " \
+                  "and its state_type according to system variable 'plan_psector_execute', 'canceled_planified' and " \
+                  "'canceled_ficticius'."
+        elif status == '4':
+            msg = "WARNING: You have updated the status value to EXECUTED (On Service). If you click 'Accept' on the " \
+                  "main dialog, this psector will be executed. Planified features will turn ON SERVICE and deleted " \
+                  "features will turn OBSOLETE. To mantain traceability, a copy of planified features will be " \
+                  "inserted on the psector."
+        if msg:
             tools_qt.show_details(msg, 'Message warning')
-        elif mode['mode'] == 'onService':
-            if tools_qt.get_combo_value(self.dlg_plan_psector, self.cmb_status) == '0':
-                msg = "WARNING: You have updated the status value. If you click 'Accept' on the main dialog, " \
-                      "this psector will be executed. Planified features will turn on service and deleted features " \
-                      "will turn obsolete. To mantain traceability, a copy of planified features will be inserted " \
-                      "on the psector."
-                tools_qt.show_details(msg, 'Message warning')
 
 
     def master_new_psector(self, psector_id=None):
