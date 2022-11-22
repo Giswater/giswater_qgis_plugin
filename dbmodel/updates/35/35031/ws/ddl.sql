@@ -16,3 +16,57 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "colu
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"elevation2", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"depth2", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"staticpress2", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
+
+ALTER TABLE arc_add RENAME to _arc_add_;
+ALTER TABLE _arc_add_ DROP CONSTRAINT arc_add_pkey;
+ALTER TABLE _arc_add_ DROP CONSTRAINT arc_add_arc_id_fkey;
+
+CREATE TABLE arc_add 
+(arc_id character varying(16) NOT NULl PRIMARY KEY, 
+flow_max numeric(12,2), 
+flow_min numeric(12,2), 
+flow_avg numeric(12,2), 
+vel_max numeric(12,2), 
+vel_min numeric(12,2), 
+vel_avg numeric(12,2));
+
+ALTER TABLE node_add RENAME to _node_add_;
+ALTER TABLE _node_add_ DROP CONSTRAINT node_add_pkey;
+ALTER TABLE _node_add_ DROP CONSTRAINT node_add_node_id_fkey;
+
+CREATE TABLE node_add 
+(node_id character varying(16) NOT NULl PRIMARY KEY, 
+nodarc_id character varying(30), 
+demand_max numeric(12,2), 
+demand_min numeric(12,2), 
+demand_avg numeric(12,2), 
+press_max numeric(12,2), 
+press_min numeric(12,2),
+press_avg numeric(12,2), 
+head_max numeric(12,2),
+head_min numeric(12,2),
+head_avg numeric(12,2),
+quality_max numeric(12,2),
+quality_min numeric(12,2),
+quality_avg numeric(12,2),
+flow_max numeric(12,2), 
+flow_min numeric(12,2), 
+flow_avg numeric(12,2), 
+vel_max numeric(12,2), 
+vel_min numeric(12,2), 
+vel_avg numeric(12,2));
+
+
+
+ALTER TABLE connec_add RENAME to _connec_add_;
+ALTER TABLE _connec_add_ DROP CONSTRAINT connec_add_pkey;
+ALTER TABLE _connec_add_ DROP CONSTRAINT connec_add_connec_id_fkey;
+
+CREATE TABLE connec_add 
+(connec_id character varying(16) NOT NULl PRIMARY KEY, 
+press_max numeric(12,2), 
+press_min numeric(12,2),
+press_avg numeric(12,2));
+
+
+
