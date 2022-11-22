@@ -62,11 +62,13 @@ class GwDocument(QObject):
         self.list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
 
         # Setting layers
-        self.layers = {'arc': [], 'node': [], 'connec': [], 'element': []}
+        self.layers = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
         
         self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
         self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
         self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
+        if self.project_type == 'ud':
+            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
         self.layers['element'] = tools_gw.get_layers_from_feature_type('element')
 
         params = ['arc', 'node', 'connec', 'gully']
