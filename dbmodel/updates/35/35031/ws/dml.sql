@@ -12,3 +12,5 @@ UPDATE config_param_system set project_type='utils' WHERE parameter='utils_graph
 UPDATE sys_function SET function_name='gw_fct_massivemincut' where id=2712;
 
 UPDATE config_toolbox SET alias = 'Mapzones analysis' WHERE id=2768;
+
+UPDATE config_param_system SET value=value::jsonb || '{"node":"SELECT node_id AS node_id, code AS code FROM v_edit_node"}' WHERE parameter='om_profile_guitartext';
