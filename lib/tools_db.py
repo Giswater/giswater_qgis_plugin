@@ -143,6 +143,16 @@ def check_postgis_version():
         return False
 
 
+def check_pg_extension(extension):
+
+    sql = f"SELECT name FROM pg_available_extensions WHERE name = '{extension}'"
+    row = get_row(sql)
+    if row:
+        return row[0]
+    else:
+        return False
+
+
 def get_current_user():
     """ Get current user connected to database """
 

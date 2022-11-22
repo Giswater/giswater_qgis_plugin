@@ -942,6 +942,14 @@ class GwAdminButton:
         elif self.form_enabled:
             self.form_enabled = False
             message = "Unable to create Postgis extension. Packages must be installed, consult your administrator."
+        # Check fuzzystrmatch extension and create if not exist
+        fuzzystrmatch_extension = tools_db.check_pg_extension('fuzzystrmatch')
+        if fuzzystrmatch_extension and self.form_enabled:
+            sql = "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;"
+            tools_db.execute_sql(sql)
+        elif self.form_enabled:
+            self.form_enabled = False
+            message = "Unable to create fuzzystrmatch extension. Packages must be installed, consult your administrator."
 
         if self.form_enabled is False:
             ignore_widgets =  ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name']
@@ -1409,6 +1417,15 @@ class GwAdminButton:
             elif self.form_enabled:
                 message = "Unable to create Postgis extension. Packages must be installed, consult your administrator."
                 self.form_enabled = False
+            # Check fuzzystrmatch extension and create if not exist
+            fuzzystrmatch_extension = tools_db.check_pg_extension('fuzzystrmatch')
+            if fuzzystrmatch_extension and self.form_enabled:
+                sql = "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;"
+                tools_db.execute_sql(sql)
+            elif self.form_enabled:
+                self.form_enabled = False
+                message = "Unable to create fuzzystrmatch extension. Packages must be installed, consult your administrator."
+
             if self.form_enabled is False:
                 ignore_widgets = ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name']
                 tools_qt.enable_dialog(self.dlg_readsql, False, ignore_widgets)
