@@ -57,14 +57,14 @@ class GwMenuLoad(QObject):
                 toolbar_submenu = QMenu(f"{toolbar}", self.iface.mainWindow().menuBar())
                 toolbars_menu.addMenu(toolbar_submenu)
                 buttons_toolbar = global_vars.giswater_settings.value(f"toolbars/{toolbar}")
-                project_exclusive = tools_gw.get_config_parser('project_exclusive', str(global_vars.project_type),
+                project_exclude = tools_gw.get_config_parser('project_exclude', str(global_vars.project_type),
                                                                "project", "giswater")
-                if project_exclusive not in (None, 'None'):
-                    project_exclusive = project_exclusive.replace(' ', '').split(',')
+                if project_exclude not in (None, 'None'):
+                    project_exclude = project_exclude.replace(' ', '').split(',')
 
                 for index_action in buttons_toolbar:
 
-                    if project_exclusive and index_action in project_exclusive:
+                    if project_exclude and index_action in project_exclude:
                         continue
 
                     icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}{toolbar}{os.sep}{index_action}.png"

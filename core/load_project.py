@@ -392,18 +392,18 @@ class GwLoadProject(QObject):
                     attempt = attempt + 1
 
         # Disable buttons which are project type exclusive
-        project_exclusive = None
+        project_exclude = None
         successful = False
         attempt = 0
         while not successful and attempt < 10:
-            project_exclusive = tools_gw.get_config_parser('project_exclusive', global_vars.project_type, "project", "giswater")
-            if project_exclusive not in (None, "None"):
+            project_exclude = tools_gw.get_config_parser('project_exclude', global_vars.project_type, "project", "giswater")
+            if project_exclude not in (None, "None"):
                 successful = True
             attempt = attempt + 1
 
-        if project_exclusive not in (None, 'None'):
-            project_exclusive = project_exclusive.replace(' ', '').split(',')
-            for index in project_exclusive:
+        if project_exclude not in (None, 'None'):
+            project_exclude = project_exclude.replace(' ', '').split(',')
+            for index in project_exclude:
                 self._hide_button(index)
 
         # Hide buttons from buttons_to_hide
