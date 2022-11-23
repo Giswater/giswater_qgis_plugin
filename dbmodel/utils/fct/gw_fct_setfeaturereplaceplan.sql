@@ -98,7 +98,7 @@ BEGIN
 
 				-- profilactic controls	
 				IF rec.state_type IS NULL THEN
-					rec.state_type = (SELECT id FROM value_state_type WHERE state_id = 1 LIMIT 1);
+					rec.state_type = (SELECT id FROM value_state_type WHERE state = 2 LIMIT 1);
 				END IF;
 				IF v_project_type ='WS' THEN
 					-- insert new arc (also insert on psector table) 
