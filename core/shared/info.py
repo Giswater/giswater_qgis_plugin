@@ -2718,7 +2718,7 @@ class GwInfo(QObject):
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "element"
-        tools_gw.set_completer_object(dialog, self.table_object)
+        tools_gw.set_completer_object(dialog, self.table_object, field_id="element_id")
 
 
     def _open_selected_element(self, dialog, widget):
@@ -2835,7 +2835,7 @@ class GwInfo(QObject):
         elem.dlg_add_element.rejected.connect(partial(self._manage_element_new, dialog, elem))
 
         # Set completer
-        tools_gw.set_completer_object(dialog, self.table_object)
+        tools_gw.set_completer_object(dialog, self.table_object, field_id="element_id")
 
         if element_id:
             tools_qt.set_widget_text(elem.dlg_add_element, "element_id", element_id)
