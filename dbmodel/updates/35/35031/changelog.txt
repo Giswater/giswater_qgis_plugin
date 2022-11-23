@@ -7,3 +7,4 @@
 - New system parameter 'admin_node_code_on_arc' - If true, on codes of final nodes will be visible on arc's form. If false, node_id would be displayed
 - Improve address search returning values even if writing mismatch (fuzzystrmatch extension)
 - Refactor trg_edit_psector merging different execution modes
+- New field on review tables - insert_date

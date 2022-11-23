@@ -50,16 +50,21 @@ BEGIN
 		
 				
 		-- insert values on review table
-		INSERT INTO review_arc (arc_id, arccat_id, annotation, observ, review_obs, expl_id, the_geom, field_checked) 
-		VALUES (NEW.arc_id, NEW.arccat_id, NEW.annotation, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, NEW.field_checked);
+		INSERT INTO review_arc (arc_id, arccat_id, annotation, observ, review_obs, expl_id, the_geom, field_checked, field_date)) 
+		VALUES (NEW.arc_id, NEW.arccat_id, NEW.annotation, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, NEW.field_checked, NEW.field_date));
 		
 		
 		--looking for insert values on audit table
-	  	IF NEW.field_checked=TRUE THEN						
+	  IF NEW.field_checked=TRUE THEN						
+
+	  	IF NEW.field_date IS NULL THEN 
+					NEW.field_date = now();
+			END IF;
+
 			INSERT INTO review_audit_arc (arc_id, new_arccat_id, new_annotation, new_observ, review_obs, expl_id, the_geom, 
-			review_status_id, field_date, field_user)
+			review_status_id, field_date, field_user, field_date)
 			VALUES (NEW.arc_id, NEW.arccat_id, NEW.annotation, NEW.observ, NEW.review_obs,
-			NEW.expl_id, NEW.the_geom, 1, now(), current_user);
+			NEW.expl_id, NEW.the_geom, 1, now(), current_user,  NEW.field_date);
 		
 		END IF;
 			
@@ -102,16 +107,20 @@ BEGIN
 				v_review_status=0;	
 			END IF;
 		
+			IF NEW.field_date IS NULL THEN 
+				NEW.field_date = now();
+			END IF;
+
 			-- upserting values on review_audit_arc arc table	
 			IF EXISTS (SELECT arc_id FROM review_audit_arc WHERE arc_id=NEW.arc_id) THEN					
 				UPDATE review_audit_arc	SET  old_arccat_id=rec_arc.arccat_id, new_arccat_id=NEW.arccat_id, old_annotation=rec_arc.annotation, new_annotation=NEW.annotation, 
 				old_observ=rec_arc.observ, new_observ=NEW.observ, review_obs=NEW.review_obs, expl_id=NEW.expl_id, the_geom=NEW.the_geom, 
-				review_status_id=v_review_status, field_date=now(), field_user=current_user WHERE arc_id=NEW.arc_id;
+				review_status_id=v_review_status, field_date=NEW.field_date, field_user=current_user, WHERE arc_id=NEW.arc_id;
 			ELSE
 			
-				INSERT INTO review_audit_arc(arc_id, old_arccat_id, new_arccat_id, old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id ,the_geom ,review_status_id, field_date, field_user)
+				INSERT INTO review_audit_arc(arc_id, old_arccat_id, new_arccat_id, old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id ,the_geom,review_status_id, field_date, field_user)
 				VALUES (NEW.arc_id, rec_arc.arccat_id, NEW.arccat_id, rec_arc.annotation, NEW.annotation, rec_arc.observ, NEW.observ, NEW.review_obs, NEW.expl_id,
-				NEW.the_geom, v_review_status, now(), current_user);
+				NEW.the_geom, v_review_status, NEW.field_date, current_user);
 			END IF;
 				
 		END IF;

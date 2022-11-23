@@ -53,22 +53,27 @@ BEGIN
 				END IF;		
 			END IF;
 		END IF;
-		
 				
 		-- insert values on review table
 		INSERT INTO review_node (node_id, top_elev, ymax, node_type, matcat_id, nodecat_id, annotation, observ, 
-			review_obs, expl_id, the_geom, field_checked, step_pp, step_fe, step_replace, cover)
+		review_obs, expl_id, the_geom, field_checked, step_pp, step_fe, step_replace, cover, field_date)
 		VALUES (NEW.node_id, NEW.top_elev, NEW.ymax, NEW.node_type, NEW.matcat_id, NEW.nodecat_id, NEW.annotation, NEW.observ, 
-			NEW.review_obs, NEW.expl_id, NEW.the_geom, NEW.field_checked, NEW.step_pp, NEW.step_fe, NEW.step_replace, NEW.cover);
+		NEW.review_obs, NEW.expl_id, NEW.the_geom, NEW.field_checked, NEW.step_pp, NEW.step_fe, NEW.step_replace, NEW.cover, NEW.field_date);
 		
 		
 		--looking for insert values on audit table
 	  	IF NEW.field_checked=TRUE THEN						
-			INSERT INTO review_audit_node (node_id, new_top_elev, new_ymax, new_node_type, new_matcat_id, new_nodecat_id,
-			 new_annotation, new_observ, review_obs, expl_id, the_geom, review_status_id, field_date, field_user, step_pp, step_fe, step_replace, cover)
-			VALUES (NEW.node_id, NEW.top_elev, NEW.ymax, NEW.node_type, NEW.matcat_id, NEW.nodecat_id,
-			 NEW.annotation, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, 1, now(), current_user, NEW.step_pp, NEW.step_fe, NEW.step_replace, NEW.cover);
 		
+				IF NEW.field_date IS NULL THEN 
+					NEW.field_date = now();
+				END IF;
+
+				INSERT INTO review_audit_node (node_id, new_top_elev, new_ymax, new_node_type, new_matcat_id, new_nodecat_id,
+				 new_annotation, new_observ, review_obs, expl_id, the_geom, review_status_id, field_date, field_user, step_pp, step_fe, step_replace, cover)
+				VALUES (NEW.node_id, NEW.top_elev, NEW.ymax, NEW.node_type, NEW.matcat_id, NEW.nodecat_id,
+			 	NEW.annotation, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, 1, NEW.field_date, 
+			 	current_user, NEW.step_pp, NEW.step_fe, NEW.step_replace, NEW.cover);
+
 		END IF;
 			
 		RETURN NEW;
@@ -80,7 +85,6 @@ BEGIN
 		 step_pp=NEW.step_pp, step_fe=NEW.step_fe, step_replace=NEW.step_replace, cover=NEW.cover
 		WHERE node_id=NEW.node_id;
 
-		
 		--looking for insert/update/delete values on audit table
 		IF rec_manhole IS NOT NULL AND abs(rec_node.top_elev-NEW.top_elev)>v_rev_node_top_elev_tol OR  (rec_node.top_elev IS NULL AND NEW.top_elev IS NOT NULL) OR
 			abs(rec_node.ymax-NEW.ymax)>v_rev_node_ymax_tol OR  (rec_node.ymax IS NULL AND NEW.ymax IS NOT NULL) OR
@@ -105,7 +109,11 @@ BEGIN
 		ELSE
 			v_tol_filter_bool=FALSE;
 		END IF;
-		
+
+		IF NEW.field_date IS NULL THEN 
+			NEW.field_date = now();
+		END IF;
+
 		-- if user finish review visit
 		IF (NEW.field_checked is TRUE) THEN
 			
@@ -123,16 +131,16 @@ BEGIN
 			ELSIF (v_tol_filter_bool is FALSE) THEN
 				v_review_status=0;	
 			END IF;
-
 		
 			-- upserting values on review_audit_node node table	
-			IF EXISTS (SELECT node_id FROM review_audit_node WHERE node_id=NEW.node_id) AND (SELECT system_id FROM cat_feature WHERE id=rec_node.node_type) = 'MANHOLE' THEN 					
+			IF EXISTS (SELECT node_id FROM review_audit_node WHERE node_id=NEW.node_id) AND rec_manhole.node_id IS NOT NULL THEN 					
 				UPDATE review_audit_node SET old_top_elev=rec_node.top_elev, new_top_elev=NEW.top_elev, old_ymax=rec_node.ymax, new_ymax=NEW.ymax, 
 				old_node_type=rec_node.node_type, new_node_type=NEW.node_type, old_matcat_id=rec_node.matcat_id, new_matcat_id=NEW.matcat_id, 
 				old_nodecat_id=rec_node.nodecat_id, new_nodecat_id=NEW.nodecat_id, old_annotation=rec_node.annotation, new_annotation=NEW.annotation, 
 				old_observ=rec_node.observ, new_observ=NEW.observ, review_obs=NEW.review_obs, expl_id=NEW.expl_id, the_geom=NEW.the_geom, review_status_id=v_review_status, 
-				field_date=now(), field_user=current_user, old_step_pp=rec_manhole.step_pp, new_step_pp=NEW.step_pp, old_step_fe=rec_manhole.step_fe, 
-				new_step_fe=NEW.step_fe, old_step_replace=rec_manhole.step_replace, new_step_replace=NEW.step_replace, old_cover=rec_manhole.cover, new_cover=NEW.cover
+			  field_user=current_user, old_step_pp=rec_manhole.step_pp, new_step_pp=NEW.step_pp, old_step_fe=rec_manhole.step_fe, 
+				new_step_fe=NEW.step_fe, old_step_replace=rec_manhole.step_replace, new_step_replace=NEW.step_replace, old_cover=rec_manhole.cover, new_cover=NEW.cover,
+				field_date=NEW.field_date
        			WHERE node_id=NEW.node_id;
 
       ELSIF EXISTS (SELECT node_id FROM review_audit_node WHERE node_id=NEW.node_id) THEN 					
@@ -140,18 +148,18 @@ BEGIN
 				old_node_type=rec_node.node_type, new_node_type=NEW.node_type, old_matcat_id=rec_node.matcat_id, new_matcat_id=NEW.matcat_id, 
 				old_nodecat_id=rec_node.nodecat_id, new_nodecat_id=NEW.nodecat_id, old_annotation=rec_node.annotation, new_annotation=NEW.annotation, 
 				old_observ=rec_node.observ, new_observ=NEW.observ, review_obs=NEW.review_obs, expl_id=NEW.expl_id, the_geom=NEW.the_geom, review_status_id=v_review_status, 
-				field_date=now(), field_user=current_user
+			  field_user=current_user, field_date=NEW.field_date
        			WHERE node_id=NEW.node_id;
 
 			ELSE
-			
 				INSERT INTO review_audit_node
 				(node_id, old_top_elev, new_top_elev, old_ymax, new_ymax, old_node_type, new_node_type, old_matcat_id, new_matcat_id, old_nodecat_id, 
 				new_nodecat_id, old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id, the_geom, review_status_id, field_date, field_user,
 				old_step_pp, new_step_pp, old_step_fe, new_step_fe, old_step_replace, new_step_replace, old_cover, new_cover)
 				VALUES (NEW.node_id, rec_node.top_elev, NEW.top_elev, rec_node.ymax, NEW.ymax, rec_node.node_type, NEW.node_type, rec_node.matcat_id,
 				NEW.matcat_id, rec_node.nodecat_id, NEW.nodecat_id, rec_node.annotation, NEW.annotation, rec_node.observ, NEW.observ, NEW.review_obs, NEW.expl_id, 
-				NEW.the_geom, v_review_status, now(), current_user, rec_manhole.step_pp, NEW.step_pp, rec_manhole.step_fe, NEW.step_fe, rec_manhole.step_replace, 
+				NEW.the_geom, v_review_status, NEW.field_date, current_user, rec_manhole.step_pp, NEW.step_pp, 
+				rec_manhole.step_fe, NEW.step_fe, rec_manhole.step_replace, 
 				NEW.step_replace, rec_manhole.cover, NEW.cover);
 
 			END IF;

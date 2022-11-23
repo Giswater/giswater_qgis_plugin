@@ -1211,7 +1211,7 @@ CREATE OR REPLACE VIEW v_edit_inp_weir AS
 
 
 --vistas review
-DROP VIEW v_edit_review_node;
+DROP VIEW IF EXISTS v_edit_review_node;
 CREATE OR REPLACE VIEW v_edit_review_node AS 
  SELECT review_node.node_id,
     review_node.top_elev,
@@ -1228,6 +1228,7 @@ CREATE OR REPLACE VIEW v_edit_review_node AS
     review_node.review_obs,
     review_node.expl_id,
     review_node.the_geom,
+    review_node.field_date,
     review_node.field_checked,
     review_node.is_validated
    FROM review_node,
@@ -1236,7 +1237,7 @@ CREATE OR REPLACE VIEW v_edit_review_node AS
 
 
 
-DROP VIEW v_edit_review_audit_node;
+DROP VIEW  IF EXISTS v_edit_review_audit_node;
 CREATE OR REPLACE VIEW v_edit_review_audit_node AS 
  SELECT review_audit_node.id,
     review_audit_node.node_id,
@@ -1272,6 +1273,76 @@ CREATE OR REPLACE VIEW v_edit_review_audit_node AS
    FROM review_audit_node,
     selector_expl
   WHERE selector_expl.cur_user = "current_user"()::text AND review_audit_node.expl_id = selector_expl.expl_id AND review_audit_node.review_status_id <> 0;
+
+
+DROP VIEW IF EXISTS v_edit_review_arc;
+CREATE OR REPLACE VIEW v_edit_review_arc AS 
+ SELECT review_arc.arc_id,
+    arc.node_1,
+    review_arc.y1,
+    arc.node_2,
+    review_arc.y2,
+    review_arc.arc_type,
+    review_arc.matcat_id,
+    review_arc.arccat_id,
+    review_arc.annotation,
+    review_arc.observ,
+    review_arc.review_obs,
+    review_arc.expl_id,
+    review_arc.the_geom,
+    review_arc.field_date,
+    review_arc.field_checked,
+    review_arc.is_validated
+   FROM selector_expl,
+    review_arc
+     JOIN arc ON review_arc.arc_id::text = arc.arc_id::text
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_arc.expl_id = selector_expl.expl_id;
+
+
+DROP VIEW IF EXISTS v_edit_review_connec;
+CREATE OR REPLACE VIEW v_edit_review_connec AS 
+ SELECT review_connec.connec_id,
+    review_connec.y1,
+    review_connec.y2,
+    review_connec.connec_type,
+    review_connec.matcat_id,
+    review_connec.connecat_id,
+    review_connec.annotation,
+    review_connec.observ,
+    review_connec.review_obs,
+    review_connec.expl_id,
+    review_connec.the_geom,
+    review_connec.field_date,
+    review_connec.field_checked,
+    review_connec.is_validated
+   FROM review_connec,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_connec.expl_id = selector_expl.expl_id;
+
+DROP VIEW IF EXISTS v_edit_review_gully;
+CREATE OR REPLACE VIEW v_edit_review_gully AS 
+ SELECT review_gully.gully_id,
+    review_gully.top_elev,
+    review_gully.ymax,
+    review_gully.sandbox,
+    review_gully.matcat_id,
+    review_gully.gully_type,
+    review_gully.gratecat_id,
+    review_gully.units,
+    review_gully.groove,
+    review_gully.siphon,
+    review_gully.connec_arccat_id,
+    review_gully.annotation,
+    review_gully.observ,
+    review_gully.review_obs,
+    review_gully.expl_id,
+    review_gully.the_geom,
+    review_gully.field_date,
+    review_gully.field_checked,
+    review_gully.is_validated
+   FROM review_gully,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_gully.expl_id = selector_expl.expl_id;
 
 
 CREATE OR REPLACE VIEW v_edit_drainzone AS

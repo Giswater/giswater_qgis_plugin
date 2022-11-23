@@ -50,15 +50,20 @@ BEGIN
 		
 				
 		-- insert values on review table
-		INSERT INTO review_connec (connec_id, connecat_id, annotation, observ, review_obs, expl_id, the_geom, field_checked) 
-		VALUES (NEW.connec_id, NEW.connecat_id, NEW.annotation, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, NEW.field_checked);
+		INSERT INTO review_connec (connec_id, connecat_id, annotation, observ, review_obs, expl_id, the_geom, field_checked, field_date) 
+		VALUES (NEW.connec_id, NEW.connecat_id, NEW.annotation, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, NEW.field_checked, NEW.field_date);
 		
 		
 		--looking for insert values on audit table
-	  	IF NEW.field_checked=TRUE THEN						
+	  IF NEW.field_checked=TRUE THEN			
+	  
+	  	IF NEW.field_date IS NULL THEN 
+					NEW.field_date = now();
+			END IF;
+
 			INSERT INTO review_audit_connec (connec_id, new_connecat_id, new_annotation, new_observ, review_obs, expl_id, the_geom, 
 			review_status_id, field_date, field_user)
-			VALUES (NEW.connec_id, NEW.connecat_id, NEW.annotation, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, 1, now(), current_user);
+			VALUES (NEW.connec_id, NEW.connecat_id, NEW.annotation, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, 1,  NEW.field_date, current_user);
 		
 		END IF;
 			
@@ -100,17 +105,22 @@ BEGIN
 			ELSIF (v_tol_filter_bool is FALSE) THEN
 				v_review_status=0;	
 			END IF;
-		
+			
+			IF NEW.field_date IS NULL THEN 
+					NEW.field_date = now();
+			END IF;
+
 			-- upserting values on review_audit_connec connec table	
 			IF EXISTS (SELECT connec_id FROM review_audit_connec WHERE connec_id=NEW.connec_id) THEN					
 				UPDATE review_audit_connec SET old_connecat_id=rec_connec.connecat_id, new_connecat_id=NEW.connecat_id, old_annotation=rec_connec.annotation, new_annotation=NEW.annotation, old_observ=rec_connec.observ, 
-				new_observ=NEW.observ, review_obs=NEW.review_obs, expl_id=NEW.expl_id, the_geom=NEW.the_geom, review_status_id=v_review_status, field_date=now(), field_user=current_user WHERE connec_id=NEW.connec_id;
+				new_observ=NEW.observ, review_obs=NEW.review_obs, expl_id=NEW.expl_id, the_geom=NEW.the_geom, review_status_id=v_review_status, field_date= NEW.field_date, 
+				field_user=current_user WHERE connec_id=NEW.connec_id;
 			ELSE
 			
 				INSERT INTO review_audit_connec(connec_id, old_connecat_id, new_connecat_id, 
 				old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id ,the_geom ,review_status_id, field_date, field_user)
 				VALUES (NEW.connec_id, rec_connec.connecat_id, NEW.connecat_id, rec_connec.annotation, NEW.annotation, rec_connec.observ, NEW.observ, NEW.review_obs, NEW.expl_id,
-				NEW.the_geom, v_review_status, now(), current_user);
+				NEW.the_geom, v_review_status,  NEW.field_date, current_user);
 			END IF;
 				
 		END IF;

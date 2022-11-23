@@ -702,3 +702,52 @@ SELECT * FROM v_connec;
 CREATE OR REPLACE VIEW ve_connec AS 
 SELECT * FROM v_connec;
 
+
+CREATE OR REPLACE VIEW v_edit_review_node AS 
+ SELECT review_node.node_id,
+    review_node.elevation,
+    review_node.depth,
+    review_node.nodecat_id,
+    review_node.annotation,
+    review_node.observ,
+    review_node.review_obs,
+    review_node.expl_id,
+    review_node.the_geom,
+    review_node.field_date,
+    review_node.field_checked,
+    review_node.is_validated
+   FROM review_node,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_node.expl_id = selector_expl.expl_id;
+
+
+CREATE OR REPLACE VIEW v_edit_review_connec AS 
+ SELECT review_connec.connec_id,
+    review_connec.connecat_id,
+    review_connec.annotation,
+    review_connec.observ,
+    review_connec.review_obs,
+    review_connec.expl_id,
+    review_connec.the_geom,
+    review_connec.field_date,
+    review_connec.field_checked,
+    review_connec.is_validated
+   FROM review_connec,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_connec.expl_id = selector_expl.expl_id;
+
+
+CREATE OR REPLACE VIEW v_edit_review_arc AS 
+ SELECT review_arc.arc_id,
+    review_arc.arccat_id,
+    review_arc.annotation,
+    review_arc.observ,
+    review_arc.review_obs,
+    review_arc.expl_id,
+    review_arc.the_geom,
+    review_arc.field_date,
+    review_arc.field_checked,
+    review_arc.is_validated
+   FROM review_arc,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_arc.expl_id = selector_expl.expl_id;

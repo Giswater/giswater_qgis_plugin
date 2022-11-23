@@ -8,3 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 CREATE EXTENSION IF NOT EXISTS fuzzystrmatch SCHEMA "public";
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_node", "column":"field_date", "dataType":"timestamp(6) without time zone", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_arc", "column":"field_date", "dataType":"timestamp(6) without time zone", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_connec", "column":"field_date", "dataType":"timestamp(6) without time zone", "isUtils":"False"}}$$);
