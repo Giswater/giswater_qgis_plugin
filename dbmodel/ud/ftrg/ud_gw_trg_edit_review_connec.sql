@@ -32,6 +32,41 @@ BEGIN
 	SELECT connec_id, y1, y2, connec.connec_type, connecat_id, connec.matcat_id, annotation, observ, expl_id, the_geom INTO rec_connec 
 	FROM connec JOIN cat_connec ON cat_connec.id=connec.connecat_id WHERE connec_id=NEW.connec_id;
 
+	IF (NEW.field_checked is TRUE) THEN
+
+		--looking for insert/update/delete values on audit table
+		IF 	abs(rec_connec.y1-NEW.y1)>v_rev_connec_y1_tol OR  (rec_connec.y1 IS NULL AND NEW.y1 IS NOT NULL) OR
+			abs(rec_connec.y2-NEW.y2)>v_rev_connec_y2_tol OR  (rec_connec.y2 IS NULL AND NEW.y2 IS NOT NULL) OR
+			rec_connec.matcat_id!= NEW.matcat_id OR  (rec_connec.matcat_id IS NULL AND NEW.matcat_id IS NOT NULL) OR
+			rec_connec.annotation != NEW.annotation	or  (rec_connec.annotation IS NULL AND NEW.annotation IS NOT NULL) OR
+			rec_connec.observ != NEW.observ	OR  (rec_connec.observ IS NULL AND NEW.observ IS NOT NULL) OR
+			rec_connec.connecat_id != NEW.connecat_id	OR  (rec_connec.connecat_id IS NULL AND NEW.connecat_id IS NOT NULL) OR
+			rec_connec.the_geom::text<>NEW.the_geom::text THEN
+			v_tol_filter_bool=TRUE;
+		ELSE
+			v_tol_filter_bool=FALSE;
+		END IF;
+
+		-- updating review_status parameter value
+		-- new element, re-updated after its insert
+		IF (SELECT count(connec_id) FROM connec WHERE connec_id=NEW.connec_id)=0 THEN
+			v_review_status=1;
+		-- only data changes
+		ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_connec.the_geom::text) is TRUE THEN
+			v_review_status=3;
+		-- geometry changes	
+		ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_connec.the_geom::text) is FALSE THEN
+			v_review_status=2;
+		-- changes under tolerance
+		ELSIF (v_tol_filter_bool is FALSE) THEN
+			v_review_status=0;	
+		END IF;
+		
+		IF NEW.field_date IS NULL THEN 
+			NEW.field_date = now();
+		END IF;
+
+	END IF;
 	-- starting process
     IF TG_OP = 'INSERT' THEN
 		
@@ -61,15 +96,14 @@ BEGIN
 		
 			
 		--looking for insert values on audit table
-	  	IF NEW.field_checked=TRUE THEN
-	  		IF NEW.field_date IS NULL THEN 
-					NEW.field_date = now();
-				END IF;					
+	  	IF NEW.field_checked=TRUE THEN		
 
-				INSERT INTO review_audit_connec (connec_id, new_y1, new_y2, new_connec_type, new_matcat_id, new_connecat_id, 
-				new_annotation, new_observ, review_obs, expl_id, the_geom, review_status_id, field_date, field_user)
-				VALUES (NEW.connec_id, NEW.y1, NEW.y2, NEW.connec_type, NEW.matcat_id, NEW.connecat_id, 
-				NEW.annotation, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, 1, NEW.field_date, current_user);
+				INSERT INTO review_audit_connec
+				(connec_id, old_y1, new_y1, old_y2, new_y2, old_connec_type, new_connec_type, old_matcat_id, new_matcat_id, old_connecat_id, 
+				new_connecat_id, old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id, the_geom, review_status_id, field_date, field_user)
+				VALUES (NEW.connec_id, rec_connec.y1, NEW.y1, rec_connec.y2, NEW.y2, rec_connec.connec_type, NEW.connec_type, rec_connec.matcat_id,
+				NEW.matcat_id, rec_connec.connecat_id, NEW.connecat_id, rec_connec.annotation, NEW.annotation, rec_connec.observ, NEW.observ, NEW.review_obs, NEW.expl_id, 
+				NEW.the_geom, v_review_status, NEW.field_date, current_user);
 		
 		END IF;
 			
@@ -84,40 +118,9 @@ BEGIN
 		WHERE connec_id=NEW.connec_id;
 
 		
-		--looking for insert/update/delete values on audit table
-		IF 	abs(rec_connec.y1-NEW.y1)>v_rev_connec_y1_tol OR  (rec_connec.y1 IS NULL AND NEW.y1 IS NOT NULL) OR
-			abs(rec_connec.y2-NEW.y2)>v_rev_connec_y2_tol OR  (rec_connec.y2 IS NULL AND NEW.y2 IS NOT NULL) OR
-			rec_connec.matcat_id!= NEW.matcat_id OR  (rec_connec.matcat_id IS NULL AND NEW.matcat_id IS NOT NULL) OR
-			rec_connec.annotation != NEW.annotation	or  (rec_connec.annotation IS NULL AND NEW.annotation IS NOT NULL) OR
-			rec_connec.observ != NEW.observ	OR  (rec_connec.observ IS NULL AND NEW.observ IS NOT NULL) OR
-			rec_connec.connecat_id != NEW.connecat_id	OR  (rec_connec.connecat_id IS NULL AND NEW.connecat_id IS NOT NULL) OR
-			rec_connec.the_geom::text<>NEW.the_geom::text THEN
-			v_tol_filter_bool=TRUE;
-		ELSE
-			v_tol_filter_bool=FALSE;
-		END IF;
 		
 		-- if user finish review visit
 		IF (NEW.field_checked is TRUE) THEN
-			
-			-- updating review_status parameter value
-			-- new element, re-updated after its insert
-			IF (SELECT count(connec_id) FROM connec WHERE connec_id=NEW.connec_id)=0 THEN
-				v_review_status=1;
-			-- only data changes
-			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_connec.the_geom::text) is TRUE THEN
-				v_review_status=3;
-			-- geometry changes	
-			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_connec.the_geom::text) is FALSE THEN
-				v_review_status=2;
-			-- changes under tolerance
-			ELSIF (v_tol_filter_bool is FALSE) THEN
-				v_review_status=0;	
-			END IF;
-			
-			IF NEW.field_date IS NULL THEN 
-					NEW.field_date = now();
-			END IF;
 
 			-- upserting values on a v_edit_review_connec connec table	
 			IF EXISTS (SELECT connec_id FROM review_audit_connec WHERE connec_id=NEW.connec_id) THEN					

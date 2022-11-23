@@ -33,6 +33,39 @@ BEGIN
 	SELECT node_id, elevation, depth,  nodetype_id, nodecat_id, annotation, observ, expl_id, the_geom INTO rec_node 
 	FROM node JOIN cat_node ON cat_node.id=node.nodecat_id WHERE node_id=NEW.node_id;
 	
+	IF NEW.field_checked=TRUE THEN				
+		--looking for insert/update/delete values on audit table
+		IF 
+			abs(rec_node.elevation-NEW.elevation)>v_rev_node_elevation_tol OR  (rec_node.elevation IS NULL AND NEW.elevation IS NOT NULL) OR
+			abs(rec_node.depth-NEW.depth)>v_rev_node_depth_tol OR  (rec_node.depth IS NULL AND NEW.depth IS NOT NULL) OR
+			rec_node.nodecat_id!= NEW.nodecat_id OR  (rec_node.nodecat_id IS NULL AND NEW.nodecat_id IS NOT NULL) OR
+			rec_node.annotation != NEW.annotation	OR  (rec_node.annotation IS NULL AND NEW.annotation IS NOT NULL) OR
+			rec_node.observ != NEW.observ OR  (rec_node.observ IS NULL AND NEW.observ IS NOT NULL) OR
+			rec_node.the_geom::text<>NEW.the_geom::text THEN
+			v_tol_filter_bool=TRUE;
+		ELSE
+			v_tol_filter_bool=FALSE;
+		END IF;
+
+			-- updating review_status parameter value
+			-- new element, re-updated after its insert
+			IF (SELECT count(node_id) FROM node WHERE node_id=NEW.node_id)=0 THEN
+				v_review_status=1;
+			-- only data changes
+			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_node.the_geom::text) is TRUE THEN
+				v_review_status=3;
+			-- geometry changes	
+			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_node.the_geom::text) is FALSE THEN
+				v_review_status=2;
+			-- changes under tolerance
+			ELSIF (v_tol_filter_bool is FALSE) THEN
+				v_review_status=0;	
+			END IF;
+			
+			IF NEW.field_date IS NULL THEN 
+				NEW.field_date = now();
+			END IF;
+	END IF;
 
 	-- starting process
     IF TG_OP = 'INSERT' THEN
@@ -63,14 +96,11 @@ BEGIN
 		--looking for insert values on audit table
 	  IF NEW.field_checked=TRUE THEN				
 	  	
-	  	IF NEW.field_date IS NULL THEN 
-				NEW.field_date = now();
-			END IF;
-
-			INSERT INTO review_audit_node (node_id, new_elevation, new_depth, new_nodecat_id, new_annotation, new_observ, review_obs, expl_id, the_geom, 
-			review_status_id, field_date, field_user)
-			VALUES (NEW.node_id, NEW.elevation, NEW.depth, NEW.nodecat_id, NEW.annotation, NEW.observ, NEW.review_obs,
-			NEW.expl_id, NEW.the_geom, 1, NEW.field_date, current_user);
+			INSERT INTO review_audit_node(node_id, old_elevation, new_elevation, old_depth, new_depth,
+			old_nodecat_id, new_nodecat_id, old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id ,the_geom ,review_status_id, field_date, field_user)
+			VALUES (NEW.node_id, rec_node.elevation, NEW.elevation, rec_node.depth,
+			NEW.depth, rec_node.nodecat_id, NEW.nodecat_id, rec_node.annotation, NEW.annotation, rec_node.observ, NEW.observ, NEW.review_obs, NEW.expl_id,
+			NEW.the_geom, v_review_status, NEW.field_date, current_user);
 		
 		END IF;
 			
@@ -83,41 +113,8 @@ BEGIN
 		observ=NEW.observ, review_obs=NEW.review_obs, expl_id=NEW.expl_id, the_geom=NEW.the_geom, field_checked=NEW.field_checked
 		WHERE node_id=NEW.node_id;
 
-		
-		--looking for insert/update/delete values on audit table
-		IF 
-			abs(rec_node.elevation-NEW.elevation)>v_rev_node_elevation_tol OR  (rec_node.elevation IS NULL AND NEW.elevation IS NOT NULL) OR
-			abs(rec_node.depth-NEW.depth)>v_rev_node_depth_tol OR  (rec_node.depth IS NULL AND NEW.depth IS NOT NULL) OR
-			rec_node.nodecat_id!= NEW.nodecat_id OR  (rec_node.nodecat_id IS NULL AND NEW.nodecat_id IS NOT NULL) OR
-			rec_node.annotation != NEW.annotation	OR  (rec_node.annotation IS NULL AND NEW.annotation IS NOT NULL) OR
-			rec_node.observ != NEW.observ OR  (rec_node.observ IS NULL AND NEW.observ IS NOT NULL) OR
-			rec_node.the_geom::text<>NEW.the_geom::text THEN
-			v_tol_filter_bool=TRUE;
-		ELSE
-			v_tol_filter_bool=FALSE;
-		END IF;
 		-- if user finish review visit
 		IF (NEW.field_checked is TRUE) THEN
-			
-			-- updating review_status parameter value
-			-- new element, re-updated after its insert
-			IF (SELECT count(node_id) FROM node WHERE node_id=NEW.node_id)=0 THEN
-				v_review_status=1;
-			-- only data changes
-			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_node.the_geom::text) is TRUE THEN
-				v_review_status=3;
-			-- geometry changes	
-			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_node.the_geom::text) is FALSE THEN
-				v_review_status=2;
-			-- changes under tolerance
-			ELSIF (v_tol_filter_bool is FALSE) THEN
-				v_review_status=0;	
-			END IF;
-			
-			IF NEW.field_date IS NULL THEN 
-				NEW.field_date = now();
-			END IF;
-
 			-- upserting values on review_audit_node node table	
 			IF EXISTS (SELECT node_id FROM review_audit_node WHERE node_id=NEW.node_id) THEN					
 				UPDATE review_audit_node SET old_elevation=rec_node.elevation, new_elevation=NEW.elevation, old_depth=rec_node.depth, new_depth=NEW.depth, 

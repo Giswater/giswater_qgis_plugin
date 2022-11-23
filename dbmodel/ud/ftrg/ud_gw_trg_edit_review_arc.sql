@@ -9,7 +9,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_review_arc()  RETURNS trigger AS
+CREATE OR REPLACE FUNCTION "sanejament".gw_trg_edit_review_arc()  RETURNS trigger AS
 $BODY$
 
 DECLARE
@@ -33,6 +33,40 @@ BEGIN
 	annotation, observ, shape, geom1, geom2, the_geom, expl_id INTO rec_arc 
 	FROM arc JOIN cat_arc ON cat_arc.id=arc.arccat_id WHERE arc_id=NEW.arc_id;
 	
+	IF NEW.field_checked=TRUE THEN				
+
+	--looking for insert/update/delete values on audit table
+		IF 	abs(rec_arc.y1-NEW.y1)>v_rev_arc_y1_tol OR  (rec_arc.y1 IS NULL AND NEW.y1 IS NOT NULL) OR
+			abs(rec_arc.y2-NEW.y2)>v_rev_arc_y2_tol OR  (rec_arc.y2 IS NULL AND NEW.y2 IS NOT NULL) OR
+			rec_arc.matcat_id!= NEW.matcat_id OR  (rec_arc.matcat_id IS NULL AND NEW.matcat_id IS NOT NULL) OR
+			rec_arc.arccat_id != NEW.arccat_id	OR  (rec_arc.arccat_id IS NULL AND NEW.arccat_id IS NOT NULL) OR
+			rec_arc.annotation != NEW.annotation	OR  (rec_arc.annotation IS NULL AND NEW.annotation IS NOT NULL) OR
+			rec_arc.observ != NEW.observ	OR  (rec_arc.observ IS NULL AND NEW.observ IS NOT NULL) OR
+			rec_arc.the_geom::text<>NEW.the_geom::text THEN
+			v_tol_filter_bool=TRUE;
+		ELSE
+			v_tol_filter_bool=FALSE;
+		END IF;
+
+		-- updating review_status parameter value
+			-- new element, re-updated after its insert
+			IF (SELECT count(arc_id) FROM arc WHERE arc_id=NEW.arc_id)=0 THEN
+				v_review_status=1;
+			-- only data changes
+			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_arc.the_geom::text) is TRUE THEN
+				v_review_status=3;
+			-- geometry changes	
+			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_arc.the_geom::text) is FALSE THEN
+				v_review_status=2;
+			-- changes under tolerance
+			ELSIF (v_tol_filter_bool is FALSE) THEN
+				v_review_status=0;	
+			END IF;
+			
+			IF NEW.field_date IS NULL THEN 
+					NEW.field_date = now();
+			END IF;
+	END IF;
 
 	-- starting process
     IF TG_OP = 'INSERT' THEN
@@ -63,14 +97,11 @@ BEGIN
 		
 		--looking for insert values on audit table
 	  IF NEW.field_checked=TRUE THEN			
-	  	IF NEW.field_date IS NULL THEN 
-					NEW.field_date = now();
-			END IF;
-
-			INSERT INTO review_audit_arc (arc_id, new_y1, new_y2, new_arc_type, new_matcat_id, new_arccat_id, new_annotation, new_observ, review_obs, expl_id, the_geom, 
-			review_status_id, field_date, field_user)
-			VALUES (NEW.arc_id, NEW.y1, NEW.y2, NEW.arc_type, NEW.matcat_id, NEW.arccat_id,NEW.annotation, NEW.observ, 
-			NEW.review_obs, NEW.expl_id, NEW.the_geom, 1, NEW.field_date, current_user );
+			INSERT INTO review_audit_arc(arc_id, old_y1, new_y1, old_y2, new_y2, old_arc_type, new_arc_type, old_matcat_id, new_matcat_id, old_arccat_id ,
+				new_arccat_id, old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id ,the_geom ,review_status_id, field_date, field_user)
+				VALUES (NEW.arc_id, rec_arc.y1,  NEW.y1, rec_arc.y2, NEW.y2, rec_arc.arc_type, NEW.arc_type, rec_arc.matcat_id, NEW.matcat_id,
+				rec_arc.arccat_id, NEW.arccat_id, rec_arc.annotation, NEW.annotation, rec_arc.observ, NEW.observ, NEW.review_obs, NEW.expl_id,
+				NEW.the_geom, v_review_status, NEW.field_date, current_user);
 		
 		END IF;
 			
@@ -83,41 +114,9 @@ BEGIN
 		annotation=NEW.annotation, observ=NEW.observ, review_obs=NEW.review_obs, expl_id=NEW.expl_id, the_geom=NEW.the_geom, field_checked=NEW.field_checked
 		WHERE arc_id=NEW.arc_id;
 		
-		--looking for insert/update/delete values on audit table
-		IF 	abs(rec_arc.y1-NEW.y1)>v_rev_arc_y1_tol OR  (rec_arc.y1 IS NULL AND NEW.y1 IS NOT NULL) OR
-			abs(rec_arc.y2-NEW.y2)>v_rev_arc_y2_tol OR  (rec_arc.y2 IS NULL AND NEW.y2 IS NOT NULL) OR
-			rec_arc.matcat_id!= NEW.matcat_id OR  (rec_arc.matcat_id IS NULL AND NEW.matcat_id IS NOT NULL) OR
-			rec_arc.arccat_id != NEW.arccat_id	OR  (rec_arc.arccat_id IS NULL AND NEW.arccat_id IS NOT NULL) OR
-			rec_arc.annotation != NEW.annotation	OR  (rec_arc.annotation IS NULL AND NEW.annotation IS NOT NULL) OR
-			rec_arc.observ != NEW.observ	OR  (rec_arc.observ IS NULL AND NEW.observ IS NOT NULL) OR
-			rec_arc.the_geom::text<>NEW.the_geom::text THEN
-			v_tol_filter_bool=TRUE;
-		ELSE
-			v_tol_filter_bool=FALSE;
-		END IF;
-		
 		-- if user finish review visit
 		IF (NEW.field_checked is TRUE) THEN
 			
-			-- updating review_status parameter value
-			-- new element, re-updated after its insert
-			IF (SELECT count(arc_id) FROM arc WHERE arc_id=NEW.arc_id)=0 THEN
-				v_review_status=1;
-			-- only data changes
-			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_arc.the_geom::text) is TRUE THEN
-				v_review_status=3;
-			-- geometry changes	
-			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_arc.the_geom::text) is FALSE THEN
-				v_review_status=2;
-			-- changes under tolerance
-			ELSIF (v_tol_filter_bool is FALSE) THEN
-				v_review_status=0;	
-			END IF;
-			
-			IF NEW.field_date IS NULL THEN 
-					NEW.field_date = now();
-			END IF;
-
 			-- upserting values on review_audit_arc arc table	
 			IF EXISTS (SELECT arc_id FROM review_audit_arc WHERE arc_id=NEW.arc_id) THEN					
 				UPDATE review_audit_arc	SET old_y1=rec_arc.y1, new_y1=NEW.y1, old_y2=rec_arc.y2, new_y2=NEW.y2, old_arc_type=rec_arc.arc_type, 

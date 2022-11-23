@@ -38,6 +38,45 @@ BEGIN
 	FROM gully JOIN cat_grate ON cat_grate.id=gully.gratecat_id
 	WHERE gully_id=NEW.gully_id;
 	
+	IF (NEW.field_checked is TRUE) THEN
+		--looking for insert/update/delete values on audit table
+		IF abs(rec_gully.top_elev-NEW.top_elev)>v_rev_gully_top_elev_tol OR  (rec_gully.top_elev IS NULL AND NEW.top_elev IS NOT NULL) OR
+			abs(rec_gully.ymax-NEW.ymax)>v_rev_gully_ymax_tol OR  (rec_gully.ymax IS NULL AND NEW.ymax IS NOT NULL) OR
+			abs(rec_gully.sandbox-NEW.sandbox)>v_rev_gully_sandbox_tol OR  (rec_gully.sandbox IS NULL AND NEW.sandbox IS NOT NULL) OR
+			abs(rec_gully.units-NEW.units)>v_rev_gully_units_tol OR  (rec_gully.units IS NULL AND NEW.units IS NOT NULL) OR
+			rec_gully.matcat_id!= NEW.matcat_id OR  (rec_gully.matcat_id IS NULL AND NEW.matcat_id IS NOT NULL) OR
+			rec_gully.annotation != NEW.annotation OR  (rec_gully.annotation IS NULL AND NEW.annotation IS NOT NULL) OR
+			rec_gully.observ != NEW.observ	OR  (rec_gully.observ IS NULL AND NEW.observ IS NOT NULL) OR
+			rec_gully.gratecat_id != NEW.gratecat_id	OR  (rec_gully.gratecat_id IS NULL AND NEW.gratecat_id IS NOT NULL) OR
+			rec_gully.groove != NEW.groove	OR  (rec_gully.groove IS NULL AND NEW.groove IS NOT NULL) OR
+			rec_gully.siphon != NEW.siphon	OR  (rec_gully.siphon IS NULL AND NEW.siphon IS NOT NULL) OR
+			rec_gully.the_geom::text<>NEW.the_geom::text THEN
+			v_tol_filter_bool=TRUE;
+		ELSE
+			v_tol_filter_bool=FALSE;
+		END IF;
+
+		-- updating review_status parameter value
+			-- new element, re-updated after its insert
+			IF (SELECT count(gully_id) FROM gully WHERE gully_id=NEW.gully_id)=0 THEN
+				v_review_status=1;
+			-- only data changes
+			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_gully.the_geom::text) is TRUE THEN
+				v_review_status=3;
+			-- geometry changes	
+			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_gully.the_geom::text) is FALSE THEN
+				v_review_status=2;
+			-- changes under tolerance
+			ELSIF (v_tol_filter_bool is FALSE) THEN
+				v_review_status=0;	
+			END IF;
+			
+			IF NEW.field_date IS NULL THEN 
+					NEW.field_date = now();
+			END IF;
+
+	END IF;
+
 	-- starting process
 	IF TG_OP = 'INSERT' THEN
 		
@@ -68,9 +107,6 @@ BEGIN
 		
 		--looking for insert values on audit table
 	  	IF NEW.field_checked=TRUE THEN						
-	  		IF NEW.field_date IS NULL THEN 
-					NEW.field_date = now();
-				END IF;
 
 				INSERT INTO review_audit_gully (gully_id, new_top_elev, new_ymax, new_sandbox, new_matcat_id, new_gully_type, new_gratecat_id, new_units, 
 				new_groove, new_siphon,new_connec_arccat_id,new_annotation, new_observ, review_obs, expl_id, the_geom, review_status_id, field_date, field_user)
@@ -89,44 +125,9 @@ BEGIN
 				annotation=NEW.annotation, observ=NEW.observ, review_obs=NEW.review_obs, expl_id=NEW.expl_id, the_geom=NEW.the_geom, field_checked=NEW.field_checked
 		WHERE gully_id=NEW.gully_id;
 		
-		--looking for insert/update/delete values on audit table
-		IF abs(rec_gully.top_elev-NEW.top_elev)>v_rev_gully_top_elev_tol OR  (rec_gully.top_elev IS NULL AND NEW.top_elev IS NOT NULL) OR
-			abs(rec_gully.ymax-NEW.ymax)>v_rev_gully_ymax_tol OR  (rec_gully.ymax IS NULL AND NEW.ymax IS NOT NULL) OR
-			abs(rec_gully.sandbox-NEW.sandbox)>v_rev_gully_sandbox_tol OR  (rec_gully.sandbox IS NULL AND NEW.sandbox IS NOT NULL) OR
-			abs(rec_gully.units-NEW.units)>v_rev_gully_units_tol OR  (rec_gully.units IS NULL AND NEW.units IS NOT NULL) OR
-			rec_gully.matcat_id!= NEW.matcat_id OR  (rec_gully.matcat_id IS NULL AND NEW.matcat_id IS NOT NULL) OR
-			rec_gully.annotation != NEW.annotation OR  (rec_gully.annotation IS NULL AND NEW.annotation IS NOT NULL) OR
-			rec_gully.observ != NEW.observ	OR  (rec_gully.observ IS NULL AND NEW.observ IS NOT NULL) OR
-			rec_gully.gratecat_id != NEW.gratecat_id	OR  (rec_gully.gratecat_id IS NULL AND NEW.gratecat_id IS NOT NULL) OR
-			rec_gully.groove != NEW.groove	OR  (rec_gully.groove IS NULL AND NEW.groove IS NOT NULL) OR
-			rec_gully.siphon != NEW.siphon	OR  (rec_gully.siphon IS NULL AND NEW.siphon IS NOT NULL) OR
-			rec_gully.the_geom::text<>NEW.the_geom::text THEN
-			v_tol_filter_bool=TRUE;
-		ELSE
-			v_tol_filter_bool=FALSE;
-		END IF;
-
 		-- if user finish review visit
 		IF (NEW.field_checked is TRUE) THEN
 			
-			-- updating review_status parameter value
-			-- new element, re-updated after its insert
-			IF (SELECT count(gully_id) FROM gully WHERE gully_id=NEW.gully_id)=0 THEN
-				v_review_status=1;
-			-- only data changes
-			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_gully.the_geom::text) is TRUE THEN
-				v_review_status=3;
-			-- geometry changes	
-			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_gully.the_geom::text) is FALSE THEN
-				v_review_status=2;
-			-- changes under tolerance
-			ELSIF (v_tol_filter_bool is FALSE) THEN
-				v_review_status=0;	
-			END IF;
-			
-			IF NEW.field_date IS NULL THEN 
-					NEW.field_date = now();
-			END IF;
 
 			-- upserting values on review_audit_gully gully table	
 			IF EXISTS (SELECT gully_id FROM review_audit_gully WHERE gully_id=NEW.gully_id) THEN					
