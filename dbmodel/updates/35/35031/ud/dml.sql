@@ -130,3 +130,8 @@ SELECT distinct on (child_layer) child_layer, 'form_feature', 'data', 'cat_area'
 FROM cat_feature cf
 join  config_form_fields on child_layer =formname
 WHERE feature_type='ARC' and layoutname = 'lyt_data_1' group by cf.child_layer ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_function(id, function_name, style, layermanager, actions)
+VALUES (2832, 'gw_fct_getprofilevalues', '{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', null, null);
