@@ -81,8 +81,8 @@ BEGIN
 		
 				
 		-- insert values on review table
-		INSERT INTO review_arc (arc_id, arccat_id, annotation, observ, review_obs, expl_id, the_geom, field_checked, field_date)) 
-		VALUES (NEW.arc_id, NEW.arccat_id, NEW.annotation, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, NEW.field_checked, NEW.field_date));
+		INSERT INTO review_arc (arc_id, arccat_id, annotation, observ, review_obs, expl_id, the_geom, field_checked, field_date)
+		VALUES (NEW.arc_id, NEW.arccat_id, NEW.annotation, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, NEW.field_checked, NEW.field_date);
 		
 		
 		--looking for insert values on audit table
