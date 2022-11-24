@@ -891,7 +891,7 @@ SELECT * FROM v_connec;
 CREATE OR REPLACE VIEW ve_connec AS 
 SELECT * FROM v_connec;
 
-
+DROP VIEW v_edit_review_node;
 CREATE OR REPLACE VIEW v_edit_review_node AS 
  SELECT review_node.node_id,
     review_node.elevation,
@@ -909,7 +909,7 @@ CREATE OR REPLACE VIEW v_edit_review_node AS
     selector_expl
   WHERE selector_expl.cur_user = "current_user"()::text AND review_node.expl_id = selector_expl.expl_id;
 
-
+DROP VIEW v_edit_review_connec;
 CREATE OR REPLACE VIEW v_edit_review_connec AS 
  SELECT review_connec.connec_id,
     review_connec.connecat_id,
@@ -926,6 +926,7 @@ CREATE OR REPLACE VIEW v_edit_review_connec AS
   WHERE selector_expl.cur_user = "current_user"()::text AND review_connec.expl_id = selector_expl.expl_id;
 
 
+DROP VIEW v_edit_review_arc;
 CREATE OR REPLACE VIEW v_edit_review_arc AS 
  SELECT review_arc.arc_id,
     review_arc.arccat_id,
