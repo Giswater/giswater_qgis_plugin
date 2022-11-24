@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION NUMBER: 2466
 
 
-CREATE OR REPLACE FUNCTION "sanejament".gw_trg_edit_review_node()  RETURNS trigger AS
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_review_node()  RETURNS trigger AS
 $BODY$
 
 DECLARE

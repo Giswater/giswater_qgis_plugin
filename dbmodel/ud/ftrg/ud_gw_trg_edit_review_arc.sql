@@ -9,7 +9,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION "sanejament".gw_trg_edit_review_arc()  RETURNS trigger AS
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_review_arc()  RETURNS trigger AS
 $BODY$
 
 DECLARE
