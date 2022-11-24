@@ -1496,13 +1496,17 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
     return _json
 
 
-def add_checkbox(field):
+def add_checkbox(field, is_tristate=False):
 
     widget = QCheckBox()
     widget.setObjectName(field['widgetname'])
     widget.setProperty('columnname', field['columnname'])
     if field.get('value') in ("t", "true", True):
         widget.setChecked(True)
+    if is_tristate:
+        widget.setTristate(is_tristate)
+        if field.get('value') == "":
+            widget.setCheckState(1)
     if 'iseditable' in field:
         widget.setEnabled(field['iseditable'])
     return widget

@@ -1683,7 +1683,7 @@ class GwInfo(QObject):
         dialog = kwargs['dialog']
         field = kwargs['field']
         new_feature = kwargs['new_feature']
-        widget = tools_gw.add_checkbox(field)
+        widget = tools_gw.add_checkbox(field, is_tristate=True)
         widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
         widget = self._set_auto_update_checkbox(field, dialog, widget, new_feature)
         return widget
@@ -1856,16 +1856,6 @@ class GwInfo(QObject):
 
         after_insert = False
 
-        if _json == '' or str(_json) == '{}':
-            if not close_dlg:
-                return None
-            if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
-                global_vars.session_vars['dialog_docker'].setMinimumWidth(dialog.width())
-                tools_gw.close_docker()
-                return None
-            tools_gw.close_dialog(dialog)
-            return None
-
         p_table_id = complet_result['body']['feature']['tableName']
         id_name = complet_result['body']['feature']['idName']
         newfeature_id = complet_result['body']['feature']['id']
@@ -1894,6 +1884,16 @@ class GwInfo(QObject):
             tools_qt.set_action_checked("actionEdit", True, dialog)
             QgsProject.instance().blockSignals(False)
             return False
+
+        if _json == '' or str(_json) == '{}':
+            if not close_dlg:
+                return None
+            if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
+                global_vars.session_vars['dialog_docker'].setMinimumWidth(dialog.width())
+                tools_gw.close_docker()
+                return None
+            tools_gw.close_dialog(dialog)
+            return None
 
         if self._has_elev_and_y_json(_json):
             tools_qt.set_action_checked("actionEdit", True, dialog)

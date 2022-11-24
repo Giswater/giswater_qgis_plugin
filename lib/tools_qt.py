@@ -211,6 +211,12 @@ def get_text(dialog, widget, add_quote=False, return_string_null=True):
             text = widget.toPlainText()
         elif type(widget) is QComboBox:
             text = widget.currentText()
+        elif type(widget) is QCheckBox:
+            value = is_checked(dialog, widget)
+            if type(value) is bool:
+                text = str(text)
+            else:
+                text = None
 
         if not text and return_string_null:
             text = "null"
@@ -262,7 +268,13 @@ def is_checked(dialog, widget):
             widget = dialog.findChild(QRadioButton, widget)
     checked = False
     if widget:
-        checked = widget.isChecked()
+        state = widget.checkState()
+        if state == 0:
+            checked = False
+        elif state == 1:
+            checked = None
+        elif state == 2:
+            checked = True
     return checked
 
 
