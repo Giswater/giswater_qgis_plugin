@@ -1053,3 +1053,51 @@ AS WITH query_text AS (
            FROM query_text
           GROUP BY query_text.link_id) b USING (link_id)
   WHERE a.link_class = b.link_class;
+
+
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"flow_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"flow_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"flow_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"vel_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"vel_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"vel_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"press_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"press_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"press_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"demand_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"demand_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"demand_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"press_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"press_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"press_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"head_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"head_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"head_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"quality_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"quality_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"quality_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+

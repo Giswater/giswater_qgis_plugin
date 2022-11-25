@@ -36,7 +36,6 @@ ALTER TABLE _node_add_ DROP CONSTRAINT node_add_node_id_fkey;
 
 CREATE TABLE node_add 
 (node_id character varying(16) NOT NULl PRIMARY KEY, 
-nodarc_id character varying(30), 
 demand_max numeric(12,2), 
 demand_min numeric(12,2), 
 demand_avg numeric(12,2), 
@@ -48,14 +47,7 @@ head_min numeric(12,2),
 head_avg numeric(12,2),
 quality_max numeric(12,2),
 quality_min numeric(12,2),
-quality_avg numeric(12,2),
-flow_max numeric(12,2), 
-flow_min numeric(12,2), 
-flow_avg numeric(12,2), 
-vel_max numeric(12,2), 
-vel_min numeric(12,2), 
-vel_avg numeric(12,2));
-
+quality_avg numeric(12,2));
 
 
 ALTER TABLE connec_add RENAME to _connec_add_;
