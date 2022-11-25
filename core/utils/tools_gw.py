@@ -1060,8 +1060,7 @@ def set_style_mapzones():
             for id in mapzone['values']:
                 # initialize the default symbol for this geometry type
                 symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
-                if 'transparency' in mapzone:
-                    symbol.setOpacity(float(mapzone['transparency']))
+                symbol.setOpacity(float(mapzone['transparency']))
 
                 # Setting simp
                 R = random.randint(0, 255)
