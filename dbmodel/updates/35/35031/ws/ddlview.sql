@@ -542,7 +542,6 @@ CREATE OR REPLACE VIEW vu_node AS
     presszone.stylesheet ->> 'featureColor'::text AS presszone_style,
     node.workcat_id_plan,
     node.asset_id,
-    e.nodarc_id, 
     e.demand_max, 
     e.demand_min, 
     e.demand_avg, 
@@ -554,13 +553,7 @@ CREATE OR REPLACE VIEW vu_node AS
     e.head_avg, 
     e.quality_max, 
     e.quality_min, 
-    e.quality_avg, 
-    e.flow_max, 
-    e.flow_min, 
-    e.flow_avg, 
-    e.vel_max, 
-    e.vel_min, 
-    e.vel_avg
+    e.quality_avg
    FROM node
      LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
      JOIN cat_feature ON cat_feature.id::text = cat_node.nodetype_id::text
@@ -662,7 +655,6 @@ CREATE OR REPLACE VIEW v_edit_node AS
     man_valve.broken AS broken_valve,
     v_node.workcat_id_plan,
     v_node.asset_id,
-    v_node.nodarc_id, 
     v_node.demand_max, 
     v_node.demand_min, 
     v_node.demand_avg, 
@@ -674,13 +666,7 @@ CREATE OR REPLACE VIEW v_edit_node AS
     v_node.head_avg, 
     v_node.quality_max, 
     v_node.quality_min, 
-    v_node.quality_avg, 
-    v_node.flow_max, 
-    v_node.flow_min, 
-    v_node.flow_avg, 
-    v_node.vel_max, 
-    v_node.vel_min, 
-    v_node.vel_avg
+    v_node.quality_avg
    FROM v_node
      LEFT JOIN man_valve USING (node_id);
 
