@@ -8,3 +8,4 @@
 - Improve address search returning values even if writing mismatch (fuzzystrmatch extension)
 - Refactor trg_edit_psector merging different execution modes
 - New field on review tables - insert_date
+- Add double PK to v_edit_link (manage duplicated psector features)

@@ -941,3 +941,115 @@ CREATE OR REPLACE VIEW v_edit_review_arc AS
    FROM review_arc,
     selector_expl
   WHERE selector_expl.cur_user = "current_user"()::text AND review_arc.expl_id = selector_expl.expl_id;
+
+
+CREATE OR REPLACE VIEW v_edit_link
+AS WITH query_text AS (
+         SELECT a_1.link_id,
+            a_1.feature_type,
+            a_1.feature_id,
+            a_1.macrosector_id,
+            a_1.macrodma_id,
+            a_1.exit_type,
+            a_1.exit_id,
+            a_1.vnode_topelev,
+            a_1.fluid_type,
+            a_1.sector_id,
+            a_1.dma_id,
+            a_1.expl_id,
+            a_1.state,
+            a_1.gis_length,
+            a_1.userdefined_geom,
+            a_1.the_geom,
+            a_1.link_class,
+            a_1.psector_rowid
+           FROM ( SELECT link.link_id,
+                    link.feature_type,
+                    link.feature_id,
+                    sector.macrosector_id,
+                    dma.macrodma_id,
+                    link.exit_type,
+                    link.exit_id,
+                    link.vnode_topelev,
+                    c.fluid_type,
+                    arc.sector_id,
+                    arc.dma_id,
+                    arc.expl_id,
+                    c.state,
+                    st_length2d(link.the_geom) AS gis_length,
+                    link.userdefined_geom,
+                    link.the_geom,
+                    1 AS link_class,
+                    0 AS psector_rowid
+                   FROM selector_state,
+                    v_edit_connec c
+                     LEFT JOIN link ON link.feature_id::text = c.connec_id::text
+                     LEFT JOIN arc USING (arc_id)
+                     LEFT JOIN sector ON sector.sector_id::text = arc.sector_id::text
+                     LEFT JOIN dma ON dma.dma_id::text = arc.dma_id::text
+                  WHERE selector_state.cur_user = "current_user"()::text AND selector_state.state_id = c.state
+                UNION
+                 SELECT l.link_id,
+                    l.feature_type,
+                    l.feature_id,
+                    sector.macrosector_id,
+                    dma.macrodma_id,
+                    l.exit_type,
+                    l.exit_id,
+                    l.vnode_topelev,
+                    c.fluid_type,
+                    a_1_1.sector_id,
+                    a_1_1.dma_id,
+                    a_1_1.expl_id,
+                    p.state,
+                        CASE
+                            WHEN p.link_geom IS NULL THEN st_length2d(l.the_geom)
+                            ELSE st_length2d(p.link_geom)
+                        END AS gis_length,
+                        CASE
+                            WHEN p.userdefined_geom IS NULL THEN l.userdefined_geom
+                            ELSE p.userdefined_geom
+                        END AS userdefined_geom,
+                        CASE
+                            WHEN p.link_geom IS NULL THEN l.the_geom
+                            ELSE p.link_geom
+                        END AS the_geom,
+                        CASE
+                            WHEN p.link_geom IS NULL THEN 2
+                            ELSE 3
+                        END AS link_class,
+                    p.id AS psector_rowid
+                   FROM link l,
+                    selector_psector s,
+                    selector_expl e,
+                    plan_psector_x_connec p
+                     JOIN connec c USING (connec_id)
+                     LEFT JOIN arc a_1_1 ON a_1_1.arc_id::text = p.arc_id::text
+                     LEFT JOIN sector ON sector.sector_id::text = a_1_1.sector_id::text
+                     LEFT JOIN dma ON dma.dma_id::text = a_1_1.dma_id::text
+                  WHERE l.feature_id::text = p.connec_id::text AND p.state = 1 AND s.psector_id = p.psector_id AND s.cur_user = "current_user"()::text AND e.expl_id = c.expl_id AND e.cur_user = "current_user"()::text) a_1
+        )
+ SELECT a.link_id,
+    a.feature_type,
+    a.feature_id,
+    a.macrosector_id,
+    a.macrodma_id,
+    a.exit_type,
+    a.exit_id,
+    a.sector_id,
+    a.dma_id,
+    a.expl_id,
+    a.state,
+    a.gis_length,
+    a.userdefined_geom,
+    a.the_geom,
+    a.link_class,
+    a.psector_rowid,
+    a.fluid_type,
+    a.vnode_topelev
+   FROM query_text a
+     JOIN ( SELECT query_text.link_id,
+            max(query_text.link_class) AS link_class
+           FROM query_text
+          GROUP BY query_text.link_id) b USING (link_id)
+  WHERE a.link_class = b.link_class;
