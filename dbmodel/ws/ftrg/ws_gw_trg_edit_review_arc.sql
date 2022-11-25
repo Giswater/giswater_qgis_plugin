@@ -111,7 +111,7 @@ BEGIN
 			IF EXISTS (SELECT arc_id FROM review_audit_arc WHERE arc_id=NEW.arc_id) THEN					
 				UPDATE review_audit_arc	SET  old_arccat_id=rec_arc.arccat_id, new_arccat_id=NEW.arccat_id, old_annotation=rec_arc.annotation, new_annotation=NEW.annotation, 
 				old_observ=rec_arc.observ, new_observ=NEW.observ, review_obs=NEW.review_obs, expl_id=NEW.expl_id, the_geom=NEW.the_geom, 
-				review_status_id=v_review_status, field_date=NEW.field_date, field_user=current_user, WHERE arc_id=NEW.arc_id;
+				review_status_id=v_review_status, field_date=NEW.field_date, field_user=current_user WHERE arc_id=NEW.arc_id;
 			ELSE
 			
 				INSERT INTO review_audit_arc(arc_id, old_arccat_id, new_arccat_id, old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id ,the_geom,review_status_id, field_date, field_user)
