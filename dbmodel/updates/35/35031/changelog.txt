@@ -9,3 +9,4 @@
 - Refactor trg_edit_psector merging different execution modes
 - New field on review tables - insert_date
 - Add double PK to v_edit_link (manage duplicated psector features)
+- New function gw_fct_epa2data (WS) that copies results from EPA to data form

@@ -179,4 +179,6 @@ select * from t1
   union select * from t12
   order by formname, layoutorder ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
-
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3180, 'gw_fct_epa2data', 'ws', 'function', 'json', 'json', 'Function that copies model results into *_add tables in order to show the information in the info form.',
+'role_epa',null,'core')  ON CONFLICT (id) DO NOTHING;
