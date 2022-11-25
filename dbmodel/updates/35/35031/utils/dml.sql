@@ -61,3 +61,6 @@ UPDATE config_param_system SET "parameter"='plan_psector_execute', "label"='Psec
 UPDATE config_param_system SET value=replace(value,'plan_obsolete_state_type', 'obsolete_planified') WHERE "parameter"='plan_psector_execute';
 
 UPDATE sys_table SET addparam='{"pkey":"link_id, psector_rowid"}' WHERE id='v_edit_link';
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (480, 'Check duplicated connec/gullies on visible psectors', 'utils', NULL, 'core', true, 'Check epa-data', NULL);

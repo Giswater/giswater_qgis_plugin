@@ -67,3 +67,23 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_gull
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"parent_id", "dataType":"integer", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"dma_id", "dataType":"integer", "isUtils":"False"}}$$);
+
+CREATE TABLE anl_gully (
+	id serial4 NOT NULL,
+	gully_id varchar(16) NOT NULL,
+	gratecat_id varchar(30) NULL,
+	state int4 NULL,
+	gully_id_aux varchar(16) NULL,
+	gratecat_id_aux varchar(30) NULL,
+	state_aux int4 NULL,
+	expl_id int4 NULL,
+	fid int4 NOT NULL,
+	cur_user varchar(30) NOT NULL DEFAULT "current_user"(),
+	the_geom public.geometry(point, SRID_VALUE) NULL,
+	descript text NULL,
+	result_id varchar(16) NULL,
+	dma_id text NULL,
+	CONSTRAINT anl_gully_pkey PRIMARY KEY (id)
+);
+CREATE INDEX anl_gully_gully_id ON anl_gully USING btree (gully_id);
+CREATE INDEX anl_gully_index ON anl_gully USING gist (the_geom);

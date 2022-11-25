@@ -135,3 +135,7 @@ INSERT INTO config_function(id, function_name, style, layermanager, actions)
 VALUES (2832, 'gw_fct_getprofilevalues', '{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
 "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
 "polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', null, null);
+
+
+INSERT INTO sys_table( id, descript, sys_role,  source)
+VALUES ('anl_gully', 'Table to analyze gullies', 'role_edit', 'core') ON CONFLICT (id) DO NOTHING;

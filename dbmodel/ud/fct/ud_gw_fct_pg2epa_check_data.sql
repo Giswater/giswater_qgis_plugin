@@ -19,7 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":127}}
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"parameters":{}}$$)-- when is called from toolbox or from checkproject
 
 -- fid: main: 225,
-	other: 106,107,111,113,164,175,187,188,294,295,379,427,430, 440
+	other: 106,107,111,113,164,175,187,188,294,295,379,427,430,440,480
 
 SELECT * FROM audit_check_data WHERE fid = 225
 
@@ -577,6 +577,27 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id , 1,  '427','INFO: All outlets set on subcatchments are correctly defined.',v_count);
 	END IF;	
+
+	RAISE NOTICE '23 - Check duplicated connec/gullies on visible psectors';
+	SELECT count(*) INTO v_count FROM (SELECT feature_id, count(*) from v_edit_link group by feature_id having count(*) > 1)a;
+
+	IF v_count > 0 THEN
+		INSERT INTO anl_connec (connec_id, fid, the_geom) select feature_id, 480, connec.the_geom from v_edit_link 
+		JOIN connec ON connec_id = feature_id group by feature_id, connec.the_geom having count(*) > 1;
+	
+		INSERT INTO anl_gully (gully_id, fid, the_geom) select feature_id, 480, gully.the_geom from v_edit_link 
+		JOIN gully ON gully_id = feature_id group by feature_id, gully.the_geom having count(*) > 1;
+	
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '480', 3, concat(
+		'ERROR-480 (anl_connec/anl_gully): There is/are ',v_count,' connecs/gullies more than once because related psectors are visible.'),v_count);
+		v_count=0;
+	ELSE
+		
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '480', 1, 'INFO: All connecs/gullies are unique on canvas because there are not psector inconsistencies.',v_count);
+	END IF;	
+
 
 	IF v_result_id IS NULL THEN
 		UPDATE audit_check_data SET result_id = table_id WHERE cur_user="current_user"() AND fid=v_fid AND result_id IS NULL;
