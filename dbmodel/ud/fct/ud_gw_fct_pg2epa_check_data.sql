@@ -590,7 +590,7 @@ BEGIN
 	
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '480', 3, concat(
-		'ERROR-480 (anl_connec/anl_gully): There is/are ',v_count,' connecs/gullies more than once because related psectors are visible.'),v_count);
+		'ERROR-480 (anl_connec)(anl_gully): There is/are ',v_count,' connecs/gullies more than once because related psectors are visible.'),v_count);
 		v_count=0;
 	ELSE
 		
