@@ -56,9 +56,9 @@ FROM config_param_system a where a.parameter ='plan_psector_execute_action' and 
 
 DELETE FROM config_param_system where parameter in ('plan_statetype_ficticius', 'plan_statetype_planned', 'plan_statetype_reconstruct','plan_psector_execute_action');
 
-UPDATE config_param_system SET "parameter"='plan_psector_execute', "label"='Psector execute state_type:' where "parameter"='plan_psector_statetype';
+UPDATE config_param_system SET "parameter"='plan_psector_status_action', "label"='Psector execute state_type:' where "parameter"='plan_psector_statetype';
 
-UPDATE config_param_system SET value=replace(value,'plan_obsolete_state_type', 'obsolete_planified') WHERE "parameter"='plan_psector_execute';
+UPDATE config_param_system SET value=replace(value,'plan_obsolete_state_type', 'obsolete_planified') WHERE "parameter"='plan_psector_status_action';
 
 UPDATE sys_table SET addparam='{"pkey":"link_id, psector_rowid"}' WHERE id='v_edit_link';
 

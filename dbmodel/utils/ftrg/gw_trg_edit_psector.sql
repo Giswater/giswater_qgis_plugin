@@ -49,13 +49,13 @@ BEGIN
    
 	--get the values of future state_types 
 	-- status 4 (EXECUTED On Service)
-	v_state_obsolete_planified:= (SELECT value::json ->> 'obsolete_planified' FROM config_param_system WHERE parameter='plan_psector_execute');
+	v_state_obsolete_planified:= (SELECT value::json ->> 'obsolete_planified' FROM config_param_system WHERE parameter='plan_psector_status_action');
 	-- status 0 (EXECUTED Obsolete)
-	v_state_done_planified:= (SELECT value::json->>'done_planified' FROM config_param_system WHERE parameter='plan_psector_execute');
-	v_state_done_ficticious:= (SELECT value::json->>'done_ficticious' FROM config_param_system WHERE parameter='plan_psector_execute');
+	v_state_done_planified:= (SELECT value::json->>'done_planified' FROM config_param_system WHERE parameter='plan_psector_status_action');
+	v_state_done_ficticious:= (SELECT value::json->>'done_ficticious' FROM config_param_system WHERE parameter='plan_psector_status_action');
 	-- status 3 (CANCELED)
-	v_state_canceled_planified:= (SELECT value::json->>'canceled_planified' FROM config_param_system WHERE parameter='plan_psector_execute');
-	v_state_canceled_ficticious:= (SELECT value::json->>'canceled_ficticious' FROM config_param_system WHERE parameter='plan_psector_execute');
+	v_state_canceled_planified:= (SELECT value::json->>'canceled_planified' FROM config_param_system WHERE parameter='plan_psector_status_action');
+	v_state_canceled_ficticious:= (SELECT value::json->>'canceled_ficticious' FROM config_param_system WHERE parameter='plan_psector_status_action');
 	-- status 2 (PLANNED)
 	v_plan_statetype_planned:= (SELECT value::json->>'plan_statetype_planned' FROM config_param_system WHERE parameter='plan_statetype_vdefault');
 	v_plan_statetype_ficticious:= (SELECT value::json->>'plan_statetype_ficticius' FROM config_param_system WHERE parameter='plan_statetype_vdefault');
