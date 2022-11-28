@@ -54,6 +54,8 @@ class GwGo2EpaManagerButton(GwAction):
         model.flags = lambda index: self.flags(index, model)
 
         # Set signals
+        self.dlg_manager.btn_epa2data.clicked.connect(partial(self._epa2data, self.dlg_manager.tbl_rpt_cat_result,
+                                                              'result_id'))
         self.dlg_manager.btn_delete.clicked.connect(partial(self._multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result,
                                                             'v_ui_rpt_cat_result', 'result_id'))
         selection_model = self.dlg_manager.tbl_rpt_cat_result.selectionModel()
@@ -231,5 +233,36 @@ class GwGo2EpaManagerButton(GwAction):
             sql += f" WHERE {column_id} IN ({list_id})"
             tools_db.execute_sql(sql)
             self._fill_manager_table(self.dlg_manager.txt_result_id.currentText())
+
+
+    def _epa2data(self, widget, column_id):
+        """ Delete selected elements of the table
+                :param QTableView widget: origin
+                :param table_name: table origin
+                :param column_id: Refers to the id of the source table
+                """
+
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.dlg_manager)
+            return
+
+        result_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            col = tools_qt.get_col_index_by_col_name(widget, str(column_id))
+            result_id = widget.model().index(row, col).data()
+
+        extras = f'"resultId":"{result_id}"'
+        body = tools_gw.create_body(extras=extras)
+        result = tools_gw.execute_procedure('gw_fct_epa2data', body, log_sql=True)
+        if not result or result.get('status') != 'Accepted':
+            message = "Epa2data execution failed. See logs for more details..."
+            tools_qgis.show_warning(message, dialog=self.dlg_manager)
+            return
+        message = "Epa2data execution successful."
+        tools_qgis.show_info(message, dialog=self.dlg_manager)
 
     # endregion

@@ -77,7 +77,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="3">
+      <item row="1" column="4">
        <widget class="QPushButton" name="btn_delete">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -103,20 +103,6 @@
         </property>
        </spacer>
       </item>
-      <item row="4" column="3">
-       <widget class="QPushButton" name="btn_close">
-        <property name="text">
-         <string>Close</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" colspan="4">
-       <widget class="QTableView" name="tbl_rpt_cat_result">
-        <property name="sortingEnabled">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
       <item row="4" column="0" colspan="3">
        <spacer name="horizontalSpacer">
         <property name="orientation">
@@ -129,6 +115,27 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="2" column="0" colspan="5">
+       <widget class="QTableView" name="tbl_rpt_cat_result">
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="4">
+       <widget class="QPushButton" name="btn_close">
+        <property name="text">
+         <string>Close</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QPushButton" name="btn_epa2data">
+        <property name="text">
+         <string>epa2data</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
