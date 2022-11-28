@@ -398,13 +398,19 @@ BEGIN
 						DELETE FROM node WHERE node_id = v_node_id;
 					
 					END IF;
+				
 				ELSIF v_psector_id IS NOT NULL THEN
 					UPDATE arc SET state = 2 WHERE arc_id = v_new_record.arc_id;
-					INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable) VALUES (v_new_record.arc_id, v_psector_id, 1, false);
-					INSERT INTO plan_psector_x_node (node_id, psector_id, state, doable) VALUES (v_node_id, v_psector_id, 0, true);
+				
+					INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable) VALUES (v_new_record.arc_id, v_psector_id, 1, false) ON CONFLICT (arc_id, psector_id) DO NOTHING;
 
-					INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable) VALUES (v_record1.arc_id, v_psector_id, 0, false);
-					INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable) VALUES (v_record2.arc_id, v_psector_id, 0, false);
+					-- Delete arcs
+					DELETE FROM arc WHERE arc_id = v_record1.arc_id;
+					DELETE FROM arc WHERE arc_id = v_record2.arc_id;
+
+					-- Delete node
+					INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Delete planned node ',v_node_id));
+					DELETE FROM node WHERE node_id = v_node_id;
 
 					-- orphan nodes with arc_id not null
 					SELECT count(*) INTO v_count FROM v_edit_node WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id);
