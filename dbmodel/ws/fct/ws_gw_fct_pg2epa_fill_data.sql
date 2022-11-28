@@ -214,7 +214,7 @@ BEGIN
 	minorloss = inp_virtualvalve.minorloss, 
 	diameter = inp_virtualvalve.diameter, 
 	status = inp_virtualvalve.status, 
-	addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "flow":"',flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "to_arc":"',to_arc,'"}')
+	addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "flow":"',flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'"}')
 	FROM inp_virtualvalve WHERE temp_arc.arc_id=inp_virtualvalve.arc_id;
 
 	raise notice 'updating inp_shortpipe';
