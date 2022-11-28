@@ -193,6 +193,9 @@ BEGIN
 	VALUES (txid_current(),'utils_cur_trans',current_user );
 
 	UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'edit_typevalue_fk_disable' AND cur_user = current_user;
+	
+	-- set variable to skip audit = true
+	UPDATE config_param_system SET value = 'true' WHERE parameter = 'admin_skip_audit';
 
 	-- get variables
 	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'graphClass');
@@ -1191,6 +1194,9 @@ BEGIN
 	ON CONFLICT (expl_id, cur_user) DO NOTHING;
 
 	UPDATE config_param_user SET value = 'FALSE' WHERE parameter = 'edit_typevalue_fk_disable' AND cur_user = current_user;
+
+	-- set variable to skip audit = false
+	UPDATE config_param_system SET value = 'false' WHERE parameter = 'admin_skip_audit';
 	
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
