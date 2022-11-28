@@ -52,7 +52,7 @@ BEGIN
   INSERT INTO connec_add (connec_id, press_max, press_min, press_avg)
   SELECT node_id, press_max, press_min, press_avg
   FROM v_rpt_node a 
-  JOIN connec USING node_id = connec_id WHERE result_id=v_result_id AND arc.arc_id=a.arc_id;
+  JOIN connec ON node_id = connec_id WHERE result_id=v_result_id;
 
 	DELETE FROM selector_rpt_main WHERE cur_user=current_user;
 	INSERT INTO selector_rpt_main(result_id, cur_user) VALUES (v_current_selector, current_user);
