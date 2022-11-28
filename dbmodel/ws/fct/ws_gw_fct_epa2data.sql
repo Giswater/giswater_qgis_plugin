@@ -42,17 +42,17 @@ BEGIN
 
 	INSERT INTO node_add (node_id, demand_max, demand_min, demand_avg, press_max, press_min, press_avg, head_max, head_min, head_avg, quality_max, quality_min, quality_avg)
 	SELECT node_id, demand_max, demand_min, demand_avg, press_max, press_min, press_avg, head_max, head_min, head_avg, quality_max, quality_min, quality_avg
-  FROM v_rpt_node a WHERE result_id=v_result_id;
-
+  FROM v_rpt_node a 
+  JOIN node USING (node_id) WHERE result_id=v_result_id;
 
   INSERT INTO arc_add (arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg)
   SELECT arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg 
   FROM v_rpt_arc a WHERE result_id=v_result_id;
 
-/*  INSERT INTO connec_add (connec_id, press_max, press_min, press_avg)
-  SELECT connec_id, press_max, press_min, press_avg
-  FROM v_rpt_connec a WHERE result_id=v_result_id AND arc.arc_id=a.arc_id;
-*/
+  INSERT INTO connec_add (connec_id, press_max, press_min, press_avg)
+  SELECT node_id, press_max, press_min, press_avg
+  FROM v_rpt_node a 
+  JOIN connec USING node_id = connec_id WHERE result_id=v_result_id AND arc.arc_id=a.arc_id;
 
 	DELETE FROM selector_rpt_main WHERE cur_user=current_user;
 	INSERT INTO selector_rpt_main(result_id, cur_user) VALUES (v_current_selector, current_user);
