@@ -61,4 +61,4 @@ press_min numeric(12,2),
 press_avg numeric(12,2));
 
 
-
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_virtualvalve", "column":"to_arc", "newName":"_to_arc_"}}$$)

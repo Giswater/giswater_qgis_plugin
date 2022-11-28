@@ -49,7 +49,7 @@ BEGIN
 
         ELSIF v_arc_table = 'inp_virtualvalve' THEN   
             UPDATE inp_virtualvalve SET valv_type=NEW.valv_type, pressure=NEW.pressure, flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id,
-            minorloss=NEW.minorloss, to_arc=NEW.to_arc, status=NEW.status WHERE arc_id=OLD.arc_id;
+            minorloss=NEW.minorloss, status=NEW.status WHERE arc_id=OLD.arc_id;
 
         END IF;
 

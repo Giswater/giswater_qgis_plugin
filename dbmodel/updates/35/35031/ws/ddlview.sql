@@ -243,6 +243,8 @@ CREATE OR REPLACE VIEW v_edit_inp_valve AS
      JOIN value_state_type vs ON vs.id=state_type
   WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND is_operative IS TRUE;
 
+DROP VIEW IF EXISTS v_edit_inp_dscenario_virtualvalve;
+DROP VIEW IF EXISTS v_edit_inp_virtualvalve;
 
 CREATE OR REPLACE VIEW v_edit_inp_virtualvalve AS 
  SELECT v_arc.arc_id,
@@ -264,7 +266,6 @@ CREATE OR REPLACE VIEW v_edit_inp_virtualvalve AS
     inp_virtualvalve.coef_loss,
     inp_virtualvalve.curve_id,
     inp_virtualvalve.minorloss,
-    inp_virtualvalve.to_arc,
     inp_virtualvalve.status,
     v_arc.the_geom
    FROM selector_sector,
@@ -272,6 +273,25 @@ CREATE OR REPLACE VIEW v_edit_inp_virtualvalve AS
      JOIN inp_virtualvalve USING (arc_id)
      JOIN value_state_type vs ON vs.id=state_type
   WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND is_operative IS TRUE;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_virtualvalve AS 
+ SELECT d.dscenario_id,
+    v_edit_inp_virtualvalve.arc_id,
+    v.valv_type,
+    v.pressure,
+    v.diameter,
+    v.flow,
+    v.coef_loss,
+    v.curve_id,
+    v.minorloss,
+    v.status,
+    v_edit_inp_virtualvalve.the_geom
+   FROM selector_inp_dscenario,
+    v_edit_inp_virtualvalve
+     JOIN inp_dscenario_virtualvalve v USING (arc_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE v.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
 DROP VIEW v_rpt_arc;
