@@ -183,4 +183,4 @@ INSERT INTO sys_function(id, function_name, project_type, function_type, input_p
 VALUES (3180, 'gw_fct_epa2data', 'ws', 'function', 'json', 'json', 'Function that copies model results into *_add tables in order to show the information in the info form.',
 'role_epa',null,'core')  ON CONFLICT (id) DO NOTHING;
 
-DELETE FROM config_form_fields WHERE columnname='to_arc' AND formname ilike '%virtualvalve'
+DELETE FROM config_form_fields WHERE columnname='to_arc' AND formname ilike '%virtualvalve';
