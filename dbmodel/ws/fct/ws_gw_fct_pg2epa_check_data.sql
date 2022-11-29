@@ -820,6 +820,22 @@ BEGIN
 		VALUES (v_fid, '480', 1, 'INFO: All connecs are unique on canvas because there are not psector inconsistencies.',v_count);
 	END IF;	
 
+	RAISE NOTICE '35 - Check percentage of arcs with custom_length values';
+	WITH cust_len AS (SELECT count(*) FROM v_edit_arc WHERE custom_length IS NOT NULL), arcs AS (SELECT count(*) FROM v_edit_arc)
+	SELECT cust_len.count::numeric / arcs.count::numeric *100 INTO v_count FROM arcs, cust_len;
+
+	IF v_count > (SELECT json_extract_path_text(value::json,'customLength','maxPercent')::NUMERIC FROM config_param_system WHERE parameter = 'epa_outlayer_values') THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '482', 2, concat('WARNING-482: Over ',round(v_count::numeric,2),' percent of arcs have value on custom_length.'),round(v_count::numeric,2));
+	ELSIF v_count=0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '482', 1, 'INFO: No arcs have value on custom_length.',round(v_count::numeric,2));
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '482', 1, concat('INFO: Less then ',round(v_count::numeric,2),' percent of arcs have value on custom_length.'),round(v_count::numeric,2));
+	END IF;
+	v_count=0;
+
 	-- Removing isaudit false sys_fprocess
 	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
 	LOOP
