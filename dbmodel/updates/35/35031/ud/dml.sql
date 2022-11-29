@@ -142,3 +142,5 @@ VALUES ('anl_gully', 'Table to analyze gullies', 'role_edit', 'core') ON CONFLIC
 
 UPDATE sys_function SET descript = concat(descript,' ', 'Value of geom1 (height) from arc catalog is being used to compare the section values.')
 WHERE id = 3176;
+
+UPDATE inp_timeseries SET active=true;
