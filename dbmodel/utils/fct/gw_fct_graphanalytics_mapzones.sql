@@ -315,7 +315,7 @@ BEGIN
 		v_mapzonename = 'name';
 		
 	ELSIF v_class = 'DRAINZONE' THEN 
-		v_fid=480;
+		v_fid=481;
 		v_table = 'drainzone';
 		v_field = 'drainzone_id';
 		v_fieldmp = 'drainzone_id';
@@ -880,7 +880,7 @@ BEGIN
 				VALUES (v_fid, 1, concat('INFO: Mapzone attribute on arc/node/connec features keeps same value previous function. Nothing have been updated by this process'));
 				IF v_class = 'DRAINZONE' THEN
 					INSERT INTO audit_check_data (fid, criticity, error_message)
-					VALUES (v_fid, 1, concat('INFO: To see results you can query using this values (XX): DRAINZONE:480 '));
+					VALUES (v_fid, 1, concat('INFO: To see results you can query using this values (XX): DRAINZONE:481 '));
 				ELSE
 					INSERT INTO audit_check_data (fid, criticity, error_message)
 					VALUES (v_fid, 1, concat('INFO: To see results you can query using this values (XX): SECTOR:130, DQA:144, DMA:145, PRESSZONE:146, STATICPRESSURE:147 '));

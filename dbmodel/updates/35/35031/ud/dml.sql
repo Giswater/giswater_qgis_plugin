@@ -100,7 +100,7 @@ UPDATE sys_table SET context='{"level_1":"INVENTORY","level_2":"CATALOGS"}', ord
 UPDATE sys_table SET context='{"level_1":"INVENTORY","level_2":"CATALOGS"}', orderby=24, alias='Node shape catalog' WHERE id='cat_node_shape';
 
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
-VALUES (480, 'Drainzone Sectorization', 'ud', NULL, 'core', true, 'Function process', NULL)  ON CONFLICT (fid) DO NOTHING;
+VALUES (481, 'Drainzone Sectorization', 'ud', NULL, 'core', true, 'Function process', NULL)  ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO config_function(id, function_name, style, layermanager, actions)
 VALUES (2710, 'gw_fct_graphanalytics_mapzones', '{"style": {"point": {"style": "categorized", "field": "descript", "transparency": 0.5, "width": 2.5, "values": [{"id": "Disconnected", "color": [255,124,64]}, {"id": "Conflict", "color": [14,206,253]}]},
@@ -139,3 +139,6 @@ VALUES (2832, 'gw_fct_getprofilevalues', '{"style":{"point":{"style":"unique", "
 
 INSERT INTO sys_table( id, descript, sys_role,  source)
 VALUES ('anl_gully', 'Table to analyze gullies', 'role_edit', 'core') ON CONFLICT (id) DO NOTHING;
+
+UPDATE sys_function SET descript = concat(descript,' ', 'Value of geom1 (height) from arc catalog is being used to compare the section values.')
+WHERE id = 3176;
