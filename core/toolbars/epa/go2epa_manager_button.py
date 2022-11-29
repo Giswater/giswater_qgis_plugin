@@ -44,6 +44,8 @@ class GwGo2EpaManagerButton(GwAction):
         reg_exp = QRegExp("^[A-Za-z0-9_]{1,16}$")
         self.dlg_manager.txt_result_id.setValidator(QRegExpValidator(reg_exp))
         self.dlg_manager.txt_infolog.setReadOnly(True)
+        enabled = self.project_type == 'ws'
+        tools_qt.set_widget_enabled(self.dlg_manager, self.dlg_manager.btn_epa2data, enabled)
 
         # Fill combo box and table view
         self._fill_combo_result_id()
