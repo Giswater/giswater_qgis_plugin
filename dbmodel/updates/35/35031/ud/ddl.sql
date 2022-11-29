@@ -87,3 +87,8 @@ CREATE TABLE anl_gully (
 );
 CREATE INDEX anl_gully_gully_id ON anl_gully USING btree (gully_id);
 CREATE INDEX anl_gully_index ON anl_gully USING gist (the_geom);
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_timeseries", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+
+ALTER TABLE inp_timeseries ALTER COLUMN active SET DEFAULT TRUE;

@@ -62,3 +62,11 @@ CREATE TRIGGER w_trg_edit_review_gully
   ON v_edit_review_gully
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_review_gully();
+
+
+DROP TRIGGER IF EXISTS gw_trg_vi_timeseries ON vi_timeseries;
+CREATE TRIGGER gw_trg_vi_timeseries
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON vi_timeseries
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_vi('vi_timeseries');

@@ -1543,3 +1543,91 @@ AS WITH query_text AS (
            FROM query_text
           GROUP BY query_text.link_id) b USING (link_id)
   WHERE a.link_class = b.link_class;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_timeseries AS 
+ SELECT DISTINCT p.id,
+    p.timser_type,
+    p.times_type,
+    p.idval,
+    p.descript,
+    p.fname,
+    p.expl_id,
+    p.log,
+    p.active
+   FROM selector_expl s, inp_timeseries p
+  WHERE (p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL) AND active IS TRUE 
+  ORDER BY p.id;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_timeseries_value AS 
+ SELECT DISTINCT p.id,
+    p.timser_id,
+    t.timser_type,
+    t.times_type,
+    t.idval,
+    t.expl_id,
+    p.date,
+    p.hour,
+    p."time",
+    p.value
+   FROM selector_expl s,
+    inp_timeseries t
+     JOIN inp_timeseries_value p ON t.id::text = p.timser_id::text
+  WHERE (t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL ) AND t.active IS TRUE 
+  ORDER BY p.id;
+
+
+CREATE OR REPLACE VIEW vi_timeseries AS 
+ WITH t AS (
+         SELECT a.timser_id,
+            a.other1 AS date,
+            a.other2 AS "time",
+            a.other3 AS value,
+            a.expl_id
+           FROM ( SELECT inp_timeseries_value.id,
+                    inp_timeseries_value.timser_id,
+                    inp_timeseries_value.date AS other1,
+                    inp_timeseries_value.hour AS other2,
+                    inp_timeseries_value.value AS other3,
+                    inp_timeseries.expl_id
+                   FROM inp_timeseries_value
+                     JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+                  WHERE inp_timeseries.times_type::text = 'ABSOLUTE'::text AND active IS TRUE
+                UNION
+                 SELECT inp_timeseries_value.id,
+                    inp_timeseries_value.timser_id,
+                    concat('FILE', ' ', inp_timeseries.fname) AS other1,
+                    NULL::character varying AS other2,
+                    NULL::numeric AS other3,
+                    inp_timeseries.expl_id
+                   FROM inp_timeseries_value
+                     JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+                  WHERE inp_timeseries.times_type::text = 'FILE'::text AND active IS TRUE
+                UNION
+                 SELECT inp_timeseries_value.id,
+                    inp_timeseries_value.timser_id,
+                    NULL::character varying AS other1,
+                    inp_timeseries_value."time" AS other2,
+                    inp_timeseries_value.value AS other3,
+                    inp_timeseries.expl_id
+                   FROM inp_timeseries_value
+                     JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+                  WHERE inp_timeseries.times_type::text = 'RELATIVE'::text AND active IS TRUE) a
+          ORDER BY a.id
+        )
+ SELECT t.timser_id,
+    t.date,
+    t."time",
+    t.value
+   FROM t,
+    selector_expl s
+  WHERE t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text
+UNION
+ SELECT t.timser_id,
+    t.date,
+    t."time",
+    t.value
+   FROM t
+  WHERE t.expl_id IS NULL
+  ORDER BY 1, 3;
