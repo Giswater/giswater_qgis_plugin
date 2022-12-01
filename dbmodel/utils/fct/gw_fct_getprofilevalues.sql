@@ -629,7 +629,7 @@ BEGIN
 			'crs',concat('EPSG:',ST_SRID(the_geom))
 	  	) AS feature
 	  	FROM (SELECT node_id, nodecat_id, descript::json,expl_id, the_geom
-	  	FROM  anl_node WHERE fid=222 AND cur_user = current_user) row) features;
+	  	FROM  anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id!='VNODE') row) features;
 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
