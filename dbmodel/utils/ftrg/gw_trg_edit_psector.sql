@@ -281,13 +281,41 @@ BEGIN
 			SELECT connec_id, pc.arc_id, OLD.psector_id, pc.state, pc.doable, pc.descript, link_geom, pc.userdefined_geom FROM plan_psector_x_connec pc	
 			JOIN arc ON ST_DWithin(st_buffer(st_endpoint(link_geom), 0.5), arc.the_geom,0.001)
 			WHERE pc.psector_id=v_temporal_psector_id AND arc.state=2;
+		
+			--loop over network feature types in order to get the data from each plan_psector_x_* table 
+			FOR rec_type IN (SELECT * FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2 ORDER BY id asc) LOOP
+
+                v_sql = 'SELECT '||rec_type.id||'_id as id FROM plan_psector_x_'||lower(rec_type.id)||' p
+				JOIN '||rec_type.id||' a USING ('||rec_type.id||'_id) WHERE p.state = 1 AND a.state = 2 AND psector_id = '||v_temporal_psector_id||';';
+
+				--loop over each feature in plan_psector_x_* table in order to update state values
+				FOR rec IN EXECUTE v_sql LOOP
+				
+					--get the current state_type of a feature
+					EXECUTE 'SELECT state_type FROM v_edit_'||lower(rec_type.id)||' WHERE '||lower(rec_type.id)||'_id = '''||rec.id||''';'
+					INTO v_current_state_type;
+
+					--set planned features to obsolete and update state_type depending on the new status and current state_type
+					IF v_current_state_type = v_plan_statetype_ficticious OR v_current_state_type = v_state_canceled_ficticious THEN
+						EXECUTE 'UPDATE v_edit_'||lower(rec_type.id)||' SET state = 0, state_type = '||v_state_done_ficticious||'
+						WHERE '||lower(rec_type.id)||'_id = '''||rec.id||''';';
+						
+					ELSE
+						EXECUTE 'UPDATE v_edit_'||lower(rec_type.id)||' SET state = 0, state_type = '||v_state_done_planified||'
+						WHERE '||lower(rec_type.id)||'_id = '''||rec.id||''';';
+					END IF;
+							
+					
+				END LOOP;
+
+			END LOOP;
 			
 			--delete temporal psector after all changes
 			EXECUTE 'SELECT gw_fct_setdelete($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 			"feature":{"id":["'||v_temporal_psector_id||'"], "featureType":"PSECTOR", "tableName":"v_ui_plan_psector", "idName":"psector_id"},
 			"data":{"filterFields":{}, "pageInfo":{}}}$$)';
 			
-			--set the same current psector from before execute
+			--set same current psector previously to execution
 			UPDATE config_param_user SET value=v_current_psector WHERE parameter='plan_psector_vdefault' AND cur_user=current_user;
 
 			PERFORM setval('plan_psector_id_seq', (SELECT max(psector_id) FROM plan_psector));
