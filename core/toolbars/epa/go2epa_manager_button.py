@@ -150,30 +150,39 @@ class GwGo2EpaManagerButton(GwAction):
 
         msg = ""
 
-        # Get column index for column export_options
-        col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'export_options')
-        export_options = json.loads(f'{row[col_ind].data()}')
+        try:
+            # Get column index for column export_options
+            col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'export_options')
+            export_options = json.loads(f'{row[col_ind].data()}')
 
-        # Get column index for column network_stats
-        col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'network_stats')
-        network_stats = json.loads(f'{row[col_ind].data()}')
+            # Construct message with all data rows
+            msg += f"<b>Export Options: </b> <br>"
+            for text in export_options:
+                msg += f"{text} : {export_options[text]} <br>"
+        except Exception:
+            pass
 
-        # Get column index for column inp_options
-        col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'inp_options')
-        inp_options = json.loads(f'{row[col_ind].data()}')
+        try:
+            # Get column index for column network_stats
+            col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'network_stats')
+            network_stats = json.loads(f'{row[col_ind].data()}')
 
-        # Construct message with all data rows
-        msg += f"<b>Export Options: </b> <br>"
-        for text in export_options:
-            msg += f"{text} : {export_options[text]} <br>"
+            msg += f" <br> <b>Network Status: </b> <br>"
+            for text in network_stats:
+                msg += f"{text} : {network_stats[text]} <br>"
+        except Exception:
+            pass
 
-        msg += f" <br> <b>Network Status: </b> <br>"
-        for text in network_stats:
-            msg += f"{text} : {network_stats[text]} <br>"
+        try:
+            # Get column index for column inp_options
+            col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'inp_options')
+            inp_options = json.loads(f'{row[col_ind].data()}')
 
-        msg += f" <br> <b>Inp Options: </b> <br>"
-        for text in inp_options:
-            msg += f"{text} : {inp_options[text]} <br>"
+            msg += f" <br> <b>Inp Options: </b> <br>"
+            for text in inp_options:
+                msg += f"{text} : {inp_options[text]} <br>"
+        except Exception:
+            pass
 
         # Set message text into widget
         tools_qt.set_widget_text(self.dlg_manager, 'txt_infolog', msg)
