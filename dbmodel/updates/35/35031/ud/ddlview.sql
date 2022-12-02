@@ -1556,7 +1556,7 @@ CREATE OR REPLACE VIEW v_edit_inp_timeseries AS
     p.log,
     p.active
    FROM selector_expl s, inp_timeseries p
-  WHERE (p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL) AND active IS TRUE 
+  WHERE (p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL)
   ORDER BY p.id;
 
 
@@ -1574,13 +1574,15 @@ CREATE OR REPLACE VIEW v_edit_inp_timeseries_value AS
    FROM selector_expl s,
     inp_timeseries t
      JOIN inp_timeseries_value p ON t.id::text = p.timser_id::text
-  WHERE (t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL ) AND t.active IS TRUE 
+  WHERE (t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL ) 
   ORDER BY p.id;
 
 
 CREATE OR REPLACE VIEW vi_timeseries AS 
  WITH t AS (
-         SELECT a.timser_id,
+         SELECT 
+		    a.id,
+		    a.timser_id,
             a.other1 AS date,
             a.other2 AS "time",
             a.other3 AS value,
@@ -1630,4 +1632,4 @@ UNION
     t.value
    FROM t
   WHERE t.expl_id IS NULL
-  ORDER BY 1, 3;
+  ORDER BY 1, t.id;
