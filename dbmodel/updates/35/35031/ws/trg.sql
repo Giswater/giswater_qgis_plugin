@@ -53,6 +53,6 @@ CREATE TRIGGER gw_trg_edit_inp_arc_virtualvalve
 
 CREATE TRIGGER gw_trg_edit_inp_dscenario
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON ws_sample35.v_edit_inp_dscenario_virtualvalve
+  ON v_edit_inp_dscenario_virtualvalve
   FOR EACH ROW
-  EXECUTE PROCEDURE ws_sample35.gw_trg_edit_inp_dscenario('VIRTUALVALVE');
+  EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('VIRTUALVALVE');
