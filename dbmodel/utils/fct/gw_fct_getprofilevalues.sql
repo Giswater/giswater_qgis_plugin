@@ -330,6 +330,48 @@ BEGIN
 		
 		IF v_linksdistance > 0 AND v_count = 0 and v_vnode_status IS NOT False THEN
 
+			/*
+			select * from temp_link where link_id = 341
+
+			-- generate arc_x_link values
+			INSERT INTO temp_link_x_arc
+			SELECT * FROM 
+			 (SELECT DISTINCT ON (link_id) a.link_id,
+			   a.vnode_id,
+			    a.arc_id,
+			    a.feature_type,
+			    a.feature_id,
+			    a.node_1,
+			    a.node_2,
+			    (a.length * a.locate::double precision)::numeric(12,3) AS vnode_distfromnode1,
+			    (a.length * (1::numeric - a.locate)::double precision)::numeric(12,3) AS vnode_distfromnode2,
+				CASE
+				    WHEN a.exit_topelev IS NULL THEN (a.elevation1 - a.locate * (a.elevation1 - a.elevation2))::numeric(12,3)::double precision
+				    ELSE a.exit_topelev
+				END AS exit_topelev,
+			    (a.depth1 - a.locate * (a.depth1 - a.depth2))::numeric(12,3) AS exit_ymax,
+			    (a.elev1 - a.locate * (a.elev1 - a.elev2))::numeric(12,3) AS exit_elev
+			   FROM ( SELECT t.link_id,
+				    t.vnode_id,
+				    v_arc.arc_id,
+				    t.feature_type,
+				    t.feature_id,
+				    t.exit_topelev,
+				    st_length(v_arc.the_geom) AS length,
+				    st_linelocatepoint(v_arc.the_geom, t.the_geom_endpoint)::numeric(12,3) AS locate,
+				    v_arc.node_1,
+				    v_arc.node_2,
+				    v_arc.elevation1,
+				    v_arc.elevation2,
+				    v_arc.depth1,
+				    v_arc.depth2,
+				    v_arc.elevation1 - v_arc.depth1 AS elev1,
+				    v_arc.elevation2 - v_arc.depth2 AS elev2
+				   FROM v_arc, temp_link t
+				  WHERE st_dwithin(v_arc.the_geom, t.the_geom_endpoint, 0.01::double precision) AND v_arc.state > 0 AND t.state > 0) a)b
+			  ORDER BY arc_id, node_2 DESC;
+			  */
+
 			-- get vnode values
 			EXECUTE 'INSERT INTO anl_node (fid, sys_type, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, arc_id , arc_distance, total_distance)
 				SELECT 222, feature_type, feature_id, link_id, vnode_topelev, vnode_ymax, vnode_elev, arc_id, dist, dist+total_length
