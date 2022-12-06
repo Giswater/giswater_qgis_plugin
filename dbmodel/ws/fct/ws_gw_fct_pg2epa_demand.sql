@@ -78,42 +78,7 @@ BEGIN
 
 	ELSIF v_networkmode = 3 THEN
 
-		-- demand on vnodes from associated connecs
-		UPDATE temp_node SET demand=sum::float FROM vi_pjoint WHERE concat('VN', pjoint_id) = node_id ;
-		
-		-- demand on connecs over arc
-		UPDATE temp_node SET demand=a.demand::float FROM v_edit_inp_connec a WHERE concat('VC', connec_id) = node_id;
-
-		-- pattern
-		IF v_patternmethod = 11 THEN -- DEFAULT PATTERN
-			UPDATE temp_node SET pattern_id=v_deafultpattern;
-		
-		ELSIF v_patternmethod  = 12 THEN -- SECTOR PATTERN (PJOINT)
-			
-			UPDATE temp_node SET pattern_id=sector.pattern_id 
-			FROM v_edit_inp_connec JOIN sector USING (sector_id) WHERE concat('VN', pjoint_id) = node_id ;
-			
-			UPDATE temp_node SET pattern_id=sector.pattern_id 
-			FROM v_edit_inp_connec JOIN sector USING (sector_id) WHERE concat('VC', connec_id) = node_id;
-			
-		ELSIF v_patternmethod  = 13 THEN -- DMA PATTERN (PJOINT)			
-	
-			UPDATE temp_node SET pattern_id=dma.pattern_id 
-			FROM v_edit_inp_connec JOIN dma USING (dma_id) WHERE concat('VN', pjoint_id) = node_id ;
-			
-			UPDATE temp_node SET pattern_id=dma.pattern_id 
-			FROM v_edit_inp_connec JOIN dma USING (dma_id) WHERE concat('VC', connec_id) = node_id;
-
-		ELSIF v_patternmethod = 14 THEN -- FEATURE PATTERN (PJOINT)
-
-			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id, demand_type)
-			SELECT 0, node_id, n.demand, c.pattern_id, 'BASE DEMAND' FROM temp_node n JOIN v_edit_inp_connec c ON concat('VN', pjoint_id) = node_id;
-
-			INSERT INTO audit_check_data (fid, criticity, result_id, error_message)
-			VALUES (227, 2, '272', concat('WARNING-227: Network export mode and Pattern method used forces to propagate values from [JUNCTION] to [DEMANDS] sections.'));
-			INSERT INTO audit_check_data (fid, criticity, result_id, error_message)
-			VALUES (227, 2, '272', concat('HINT: See EPANET file for more details.'));
-		END IF;	
+		-- due refactor of 2022/12/6 this network mode is deprecated
 		
 	ELSIF v_networkmode = 4 THEN 
 

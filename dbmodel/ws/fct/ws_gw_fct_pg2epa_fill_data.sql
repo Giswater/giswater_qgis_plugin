@@ -70,6 +70,11 @@ BEGIN
 		JOIN (SELECT node_1 AS node_id, sector_id FROM b UNION SELECT node_2, sector_id FROM b)a USING (node_id)
 		JOIN cat_node c ON c.id=nodecat_id';
 
+	-- create link exit vnodes
+	IF v_networkmode in (3,4) THEN
+		PERFORM gw_fct_linkexitgenerator(1);
+	END IF;
+
 	IF v_networkmode = 4 THEN
 	
 		EXECUTE ' INSERT INTO temp_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
@@ -144,7 +149,6 @@ BEGIN
 		HAVING count(sector_id)>1);
 	END IF;
 
-
 	raise notice 'inserting arcs on temp_arc table';
 	
 	EXECUTE 'INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, 
@@ -173,12 +177,13 @@ BEGIN
 			AND v_arc.sector_id > 0
 			AND st_length(v_arc.the_geom) >= '||v_minlength;
 
+
 	IF v_networkmode =  4 THEN
 
 		-- this need to be solved here in spite of fill_data functions because some kind of incosnstency done on this function on previous lines
 		EXECUTE 'INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, length, diameter, the_geom,
 			expl_id, dma_id, presszone_id, dqa_id, minsector_id, status, minorloss, age)
-			SELECT concat(''VP'',connec_id), connec_id as node_1, CASE WHEN pjoint_type = ''VNODE'' THEN concat(''VN'',pjoint_id) ELSE pjoint_id end AS node_2, 
+			SELECT concat(''CO'',connec_id), connec_id as node_1, CASE WHEN vnode_type = ''ARC'' THEN concat(''VN'',vnode_id) WHEN vnode_type = ''NODE'' THEN vnode_id::text ELSE pjoint_id end AS node_2, 
 			''LINK'', connecat_id, ''PIPE'', c.sector_id, c.state, c.state_type, annotation, 
 			(CASE WHEN custom_roughness IS NOT NULL THEN custom_roughness ELSE roughness END) AS roughness,
 			(CASE WHEN custom_length IS NOT NULL THEN custom_length ELSE st_length(l.the_geom) END), 
@@ -186,7 +191,7 @@ BEGIN
 			l.the_geom,
 			c.expl_id, c.dma_id, c.presszone_id, c.dqa_id, c.minsector_id, inp_connec.status, inp_connec.minorloss,
 			(case when c.builtdate is not null then (now()::date-c.builtdate)/30 else 0 end)
-			FROM selector_sector, v_edit_link l 
+			FROM selector_sector, temp_link l 
 			JOIN connec c ON connec_id = feature_id
 			JOIN value_state_type ON value_state_type.id = state_type
 			JOIN cat_connec ON cat_connec.id = connecat_id
@@ -196,7 +201,7 @@ BEGIN
 				AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < cat_mat_roughness.end_age '
 				||v_statetype||' AND c.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
 				AND epa_type = ''JUNCTION''
-				AND l.sector_id > 0
+				AND c.sector_id > 0
 				AND pjoint_id IS NOT NULL AND pjoint_type IS NOT NULL';
 	END IF;
         
