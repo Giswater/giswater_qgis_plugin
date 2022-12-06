@@ -114,21 +114,7 @@ BEGIN
 			
 		ELSIF v_networkmode = 3 THEN
 
-			-- demands for connec related to arcs
-			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id,  demand_type, source)
-			SELECT dscenario_id, n.node_id, d.demand, d.pattern_id, demand_type, source 
-			FROM  inp_dscenario_demand d ,temp_node n
-			JOIN connec c ON concat('VN',c.pjoint_id) =  n.node_id
-			WHERE c.connec_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0  
-			AND dscenario_id IN (SELECT unnest(v_userscenario));
-
-			-- demands for connec related to nodes
-			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id,  demand_type, source)
-			SELECT dscenario_id, n.node_id, d.demand, d.pattern_id, demand_type, source 
-			FROM  inp_dscenario_demand d ,temp_node n
-			JOIN connec c ON c.pjoint_id =  n.node_id WHERE pjoint_type = 'NODE'
-			AND c.connec_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0  
-			AND dscenario_id IN (SELECT unnest(v_userscenario));
+			-- removed due refactor of 2022/6/12
 			
 		END IF;
 
@@ -174,8 +160,7 @@ BEGIN
 		-- set cero where null in order to prevent user's null values on demand table
 		UPDATE temp_node SET demand=0 WHERE demand IS NULL;
 		
-
-		-- updating values for pipes
+		-- updating values for pipes (when are not trimed)
 		UPDATE temp_arc t SET status = d.status FROM v_edit_inp_dscenario_pipe d 
 		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.status IS NOT NULL;
 		UPDATE temp_arc t SET minorloss = d.minorloss FROM v_edit_inp_dscenario_pipe d 
@@ -184,6 +169,23 @@ BEGIN
 		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.dint IS NOT NULL;
 		UPDATE temp_arc t SET roughness = d.roughness FROM v_edit_inp_dscenario_pipe d 
 		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.roughness IS NOT NULL;
+
+		-- updating values for pipes (when are trimed, network mode  = 4)
+		UPDATE temp_arc t SET status = d.status FROM v_edit_inp_dscenario_pipe d 
+		WHERE substring (t.arc_id, 0, (case when position ('P' in t.arc_id) in (0) then 99 else position ('P' in t.arc_id) end)) = d.arc_id 		
+		AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.status IS NOT NULL;
+		
+		UPDATE temp_arc t SET minorloss = d.minorloss FROM v_edit_inp_dscenario_pipe d 
+		WHERE substring (t.arc_id, 0, (case when position ('P' in t.arc_id) in (0) then 99 else position ('P' in t.arc_id) end)) = d.arc_id
+		AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.minorloss IS NOT NULL;
+
+		UPDATE temp_arc t SET diameter = d.dint FROM v_edit_inp_dscenario_pipe d 
+		WHERE substring (t.arc_id, 0, (case when position ('P' in t.arc_id) in (0) then 99 else position ('P' in t.arc_id) end)) = d.arc_id 
+		AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.dint IS NOT NULL;
+
+		UPDATE temp_arc t SET roughness = d.roughness FROM v_edit_inp_dscenario_pipe d 
+		WHERE substring (t.arc_id, 0, (case when position ('P' in t.arc_id) in (0) then 99 else position ('P' in t.arc_id) end)) = d.arc_id 
+		AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.roughness IS NOT NULL;
 
 		-- updating values for shortpipes
 		UPDATE temp_arc t SET status = d.status FROM v_edit_inp_dscenario_shortpipe d 
