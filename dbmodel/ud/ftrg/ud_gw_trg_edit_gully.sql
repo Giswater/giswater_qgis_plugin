@@ -562,7 +562,7 @@ BEGIN
 		END IF;
 
 		IF NEW.state=1 THEN
-			-- Control of automatic insert of link and vnode
+			-- Control of automatic insert of link
 			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_gully_automatic_link'
 			AND cur_user=current_user LIMIT 1) IS TRUE THEN
 
@@ -573,15 +573,22 @@ BEGIN
 			END IF;
 
 		ELSIF NEW.state=2 THEN
-			-- for planned connects always must exits link defined because alternatives will use parameters and rows of that defined link adding only geometry defined on plan_psector
-			EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-			"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';			
-			-- for planned connects always must exits arc_id defined on the default psector because it is impossible to draw a new planned 
-			-- link. Unique option for user is modify the existing automatic link
+		
+			-- Control of automatic insert of link
+			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_automatic_link' AND cur_user=current_user LIMIT 1) IS TRUE THEN
+			
+				EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1},
+				"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';
+			END IF;	
+			
+			-- inserting on psector
 			SELECT arc_id INTO v_arc_id FROM gully WHERE gully_id=NEW.gully_id;
+			
 			v_psector_vdefault=(SELECT value::integer FROM config_param_user WHERE config_param_user.parameter::text = 'plan_psector_vdefault'::text 
 			AND config_param_user.cur_user::name = "current_user"());
-			INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, doable, arc_id) VALUES (NEW.gully_id, v_psector_vdefault, 1, true, v_arc_id);
+			
+			INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, doable, arc_id, link_id) 
+			VALUES (NEW.gully_id, v_psector_vdefault, 1, true, v_arc_id,  (SELECT link_id FROM link WHERE feature_id = NEW.gully_id));
 		END IF;
 
 		-- man addfields insert
@@ -641,13 +648,12 @@ BEGIN
 
 			-- when arc_id comes from psector table
 			IF OLD.arc_id IN (SELECT arc_id FROM plan_psector_x_gully WHERE gully_id=NEW.gully_id) THEN 
-				UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE gully_id=OLD.gully_id AND arc_id = OLD.arc_id;		
-
+				-- this is not enabled from here
 			ELSE
 				-- when arc_id comes from gully table
 				UPDATE gully SET arc_id=NEW.arc_id where gully_id=NEW.gully_id;
 
-				IF (SELECT link_id FROM link WHERE feature_id=NEW.gully_id AND feature_type='GULLY' AND exit_type ='VNODE' LIMIT 1) IS NOT NULL 
+				IF (SELECT link_id FROM link WHERE feature_id=NEW.gully_id AND feature_type='GULLY' LIMIT 1) IS NOT NULL 
 				AND v_disable_linktonetwork IS NOT TRUE THEN				
 
 					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
@@ -658,7 +664,14 @@ BEGIN
 
 					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 					"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';
-				END IF;		
+				END IF;	
+
+				-- reconnecting values
+				IF NEW.arc_id IS NOT NULL THEN
+					NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
+					NEW.dma_id = (SELECT dma_id FROM arc WHERE arc_id = NEW.arc_id);
+					NEW.sector_id = (SELECT sector_id FROM arc WHERE arc_id = NEW.arc_id);
+				END IF;	
 			END IF;
 		END IF;	
 		
@@ -675,10 +688,8 @@ BEGIN
 				END IF;
 			END IF;
 			
-			-- Automatic downgrade of associated link/vnode
+			-- Automatic downgrade of associated link
 			UPDATE link SET state=0 WHERE feature_id=OLD.gully_id;
-			UPDATE vnode SET state=0 WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=OLD.gully_id LIMIT 1)::integer;
-
 		END IF;
 
 		-- Looking for state control and insert planified gully to default psector
@@ -888,18 +899,12 @@ BEGIN
   		DELETE FROM man_addfields_value WHERE feature_id = OLD.gully_id  and parameter_id in 
   		(SELECT id FROM sys_addfields WHERE cat_feature_id IS NULL OR cat_feature_id =OLD.gully_type);
 
-		-- delete links & vnode's
+		-- delete links
 		FOR v_record_link IN SELECT * FROM link WHERE feature_type='GULLY' AND feature_id=OLD.gully_id
 		LOOP
 			-- delete link
 			DELETE FROM link WHERE link_id=v_record_link.link_id;
 
-			-- delete vnode if no more links are related to vnode
-			SELECT count(exit_id) INTO v_count FROM link WHERE exit_id=v_record_link.exit_id;
-							
-			IF v_count =0 THEN 
-				DELETE FROM vnode WHERE vnode_id=v_record_link.exit_id::integer;
-			END IF;
 		END LOOP;
 
 		RETURN NULL;

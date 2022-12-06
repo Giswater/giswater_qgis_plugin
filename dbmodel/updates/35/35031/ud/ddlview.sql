@@ -1367,184 +1367,6 @@ FROM selector_expl, drainzone
 WHERE drainzone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
 
-CREATE OR REPLACE VIEW v_edit_link
-AS WITH query_text AS (
-         SELECT a_1.link_id,
-            a_1.feature_type,
-            a_1.feature_id,
-            a_1.macrosector_id,
-            a_1.macrodma_id,
-            a_1.exit_type,
-            a_1.exit_id,
-            a_1.vnode_topelev,
-            a_1.fluid_type,
-            a_1.sector_id,
-            a_1.dma_id,
-            a_1.expl_id,
-            a_1.state,
-            a_1.gis_length,
-            a_1.userdefined_geom,
-            a_1.the_geom,
-            a_1.link_class,
-            a_1.psector_rowid
-           FROM ( SELECT link.link_id,
-                    link.feature_type,
-                    link.feature_id,
-                    sector.macrosector_id,
-                    dma.macrodma_id,
-                    link.exit_type,
-                    link.exit_id,
-                    link.vnode_topelev,
-                    c.fluid_type,
-                    arc.sector_id,
-                    arc.dma_id,
-                    arc.expl_id,
-                    c.state,
-                    st_length2d(link.the_geom) AS gis_length,
-                    link.userdefined_geom,
-                    link.the_geom,
-                    1 AS link_class,
-                    0 AS psector_rowid
-                   FROM selector_state,
-                    v_edit_connec c
-                     LEFT JOIN link ON link.feature_id::text = c.connec_id::text
-                     LEFT JOIN arc USING (arc_id)
-                     LEFT JOIN sector ON sector.sector_id::text = arc.sector_id::text
-                     LEFT JOIN dma ON dma.dma_id::text = arc.dma_id::text
-                  WHERE selector_state.cur_user = "current_user"()::text AND selector_state.state_id = c.state
-                UNION
-                 SELECT link.link_id,
-                    link.feature_type,
-                    link.feature_id,
-                    sector.macrosector_id,
-                    dma.macrodma_id,
-                    link.exit_type,
-                    link.exit_id,
-                    link.vnode_topelev,
-                    c.fluid_type,
-                    arc.sector_id,
-                    arc.dma_id,
-                    arc.expl_id,
-                    c.state,
-                    st_length2d(link.the_geom) AS gis_length,
-                    link.userdefined_geom,
-                    link.the_geom,
-                    1 AS link_class,
-                    0 AS psector_rowid
-                   FROM selector_state,
-                    v_edit_gully c
-                     LEFT JOIN link ON link.feature_id::text = c.gully_id::text
-                     LEFT JOIN arc USING (arc_id)
-                     LEFT JOIN sector ON sector.sector_id::text = arc.sector_id::text
-                     LEFT JOIN dma ON dma.dma_id::text = arc.dma_id::text
-                  WHERE selector_state.cur_user = "current_user"()::text AND selector_state.state_id = c.state
-                UNION
-                 SELECT l.link_id,
-                    l.feature_type,
-                    l.feature_id,
-                    sector.macrosector_id,
-                    dma.macrodma_id,
-                    l.exit_type,
-                    l.exit_id,
-                    l.vnode_topelev,
-                    c.fluid_type,
-                    a_1_1.sector_id,
-                    a_1_1.dma_id,
-                    a_1_1.expl_id,
-                    p.state,
-                        CASE
-                            WHEN p.link_geom IS NULL THEN st_length2d(l.the_geom)
-                            ELSE st_length2d(p.link_geom)
-                        END AS gis_length,
-                        CASE
-                            WHEN p.userdefined_geom IS NULL THEN l.userdefined_geom
-                            ELSE p.userdefined_geom
-                        END AS userdefined_geom,
-                        CASE
-                            WHEN p.link_geom IS NULL THEN l.the_geom
-                            ELSE p.link_geom
-                        END AS the_geom,
-                        CASE
-                            WHEN p.link_geom IS NULL THEN 2
-                            ELSE 3
-                        END AS link_class,
-                    p.id AS psector_rowid
-                   FROM link l,
-                    selector_psector s,
-                    selector_expl e,
-                    plan_psector_x_connec p
-                     JOIN connec c USING (connec_id)
-                     LEFT JOIN arc a_1_1 ON a_1_1.arc_id::text = p.arc_id::text
-                     LEFT JOIN sector ON sector.sector_id::text = a_1_1.sector_id::text
-                     LEFT JOIN dma ON dma.dma_id::text = a_1_1.dma_id::text
-                  WHERE l.feature_id::text = p.connec_id::text AND p.state = 1 AND s.psector_id = p.psector_id AND s.cur_user = CURRENT_USER::text AND e.expl_id = c.expl_id AND e.cur_user = CURRENT_USER::text
-                UNION
-                 SELECT l.link_id,
-                    l.feature_type,
-                    l.feature_id,
-                    sector.macrosector_id,
-                    dma.macrodma_id,
-                    l.exit_type,
-                    l.exit_id,
-                    l.vnode_topelev,
-                    g.fluid_type,
-                    a_1_1.sector_id,
-                    a_1_1.dma_id,
-                    a_1_1.expl_id,
-                    p.state,
-                        CASE
-                            WHEN p.link_geom IS NULL THEN st_length2d(l.the_geom)
-                            ELSE st_length2d(p.link_geom)
-                        END AS gis_length,
-                        CASE
-                            WHEN p.userdefined_geom IS NULL THEN l.userdefined_geom
-                            ELSE p.userdefined_geom
-                        END AS userdefined_geom,
-                        CASE
-                            WHEN p.link_geom IS NULL THEN l.the_geom
-                            ELSE p.link_geom
-                        END AS the_geom,
-                        CASE
-                            WHEN p.link_geom IS NULL THEN 2
-                            ELSE 3
-                        END AS link_class,
-                    p.id AS psector_rowid
-                   FROM link l,
-                    selector_expl e,
-                    selector_psector s,
-                    plan_psector_x_gully p
-                     JOIN gully g USING (gully_id)
-                     LEFT JOIN arc a_1_1 ON a_1_1.arc_id::text = p.arc_id::text
-                     LEFT JOIN sector ON sector.sector_id::text = a_1_1.sector_id::text
-                     LEFT JOIN dma ON dma.dma_id::text = a_1_1.dma_id::text
-                  WHERE l.feature_id::text = p.gully_id::text AND p.state = 1 AND s.psector_id = p.psector_id AND s.cur_user = CURRENT_USER::text AND e.expl_id = g.expl_id AND e.cur_user = CURRENT_USER::text) a_1
-        )
- SELECT a.link_id,
-    a.feature_type,
-    a.feature_id,
-    a.macrosector_id,
-    a.macrodma_id,
-    a.exit_type,
-    a.exit_id,
-    a.sector_id,
-    a.dma_id,
-    a.expl_id,
-    a.state,
-    a.gis_length,
-    a.userdefined_geom,
-    a.the_geom,
-    a.link_class,
-    a.psector_rowid,
-    a.fluid_type,
-    a.vnode_topelev
-   FROM query_text a
-     JOIN ( SELECT query_text.link_id,
-            max(query_text.link_class) AS link_class
-           FROM query_text
-          GROUP BY query_text.link_id) b USING (link_id)
-  WHERE a.link_class = b.link_class;
-
-
 CREATE OR REPLACE VIEW v_edit_inp_timeseries AS 
  SELECT DISTINCT p.id,
     p.timser_type,
@@ -1621,5 +1443,168 @@ SELECT timser_id, date, "time", value FROM
         )
  SELECT t.id, t.timser_id, t.date, t."time", t.value FROM t, selector_expl s WHERE t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text
 UNION  SELECT t.id, t.timser_id, t.date, t."time", t.value FROM t WHERE t.expl_id IS NULL) a
-ORDER BY id
- 
+ORDER BY id;
+
+
+
+create or replace view vu_link as 
+select link_id, l.feature_type, feature_id, exit_type, exit_id, l.state, l.expl_id, sector_id, dma_id, exit_topelev, exit_elev, fluid_type, st_length2d(l.the_geom) as gis_length, userdefined_geom, l.the_geom, s.name as sector_name, macrosector_id, macrodma_id
+FROM link l
+LEFT JOIN sector s USING (sector_id)
+LEFT JOIN dma d USING (dma_id);
+
+
+
+CREATE OR REPLACE VIEW v_connec AS 
+ SELECT vu_connec.connec_id,
+    vu_connec.code,
+    vu_connec.customer_code,
+    vu_connec.top_elev,
+    vu_connec.y1,
+    vu_connec.y2,
+    vu_connec.connecat_id,
+    vu_connec.connec_type,
+    vu_connec.sys_type,
+    vu_connec.private_connecat_id,
+    vu_connec.matcat_id,
+    vu_connec.expl_id,
+    vu_connec.macroexpl_id,
+    (case when a.sector_id is null then vu_connec.sector_id else a.sector_id end) as sector_id,
+    (case when a.macrosector_id is null then vu_connec.macrosector_id else a.macrosector_id end) as macrosector_id,
+    vu_connec.demand,
+    vu_connec.state,
+    vu_connec.state_type,
+    vu_connec.connec_depth,
+    vu_connec.connec_length,
+    vu_connec.arc_id,
+    vu_connec.annotation,
+    vu_connec.observ,
+    vu_connec.comment,
+    (case when a.dma_id is null then vu_connec.dma_id else a.dma_id end) as dma_id,
+    (case when a.macrodma_id is null then vu_connec.macrodma_id else a.macrodma_id end) as macrodma_id,
+    vu_connec.soilcat_id,
+    vu_connec.function_type,
+    vu_connec.category_type,
+    vu_connec.fluid_type,
+    vu_connec.location_type,
+    vu_connec.workcat_id,
+    vu_connec.workcat_id_end,
+    vu_connec.buildercat_id,
+    vu_connec.builtdate,
+    vu_connec.enddate,
+    vu_connec.ownercat_id,
+    vu_connec.muni_id,
+    vu_connec.postcode,
+    vu_connec.district_id,
+    vu_connec.streetname,
+    vu_connec.postnumber,
+    vu_connec.postcomplement,
+    vu_connec.streetname2,
+    vu_connec.postnumber2,
+    vu_connec.postcomplement2,
+    vu_connec.descript,
+    vu_connec.svg,
+    vu_connec.rotation,
+    vu_connec.link,
+    vu_connec.verified,
+    vu_connec.undelete,
+    vu_connec.label,
+    vu_connec.label_x,
+    vu_connec.label_y,
+    vu_connec.label_rotation,
+    vu_connec.accessibility,
+    vu_connec.diagonal,
+    vu_connec.publish,
+    vu_connec.inventory,
+    vu_connec.uncertain,
+    vu_connec.num_value,
+    (case when a.exit_id is null then vu_connec.pjoint_id else a.exit_id end) as pjoint_id,
+    (case when a.exit_type is null then vu_connec.pjoint_type else a.exit_type end) as pjoint_type,
+    vu_connec.tstamp,
+    vu_connec.insert_user,
+    vu_connec.lastupdate,
+    vu_connec.lastupdate_user,
+    vu_connec.the_geom,
+    vu_connec.workcat_id_plan,
+    vu_connec.asset_id,
+    vu_connec.drainzone_id
+   FROM vu_connec
+     JOIN v_state_connec USING (connec_id)
+     LEFT JOIN (SELECT DISTINCT ON (feature_id) * FROM vu_link WHERE state = 2 AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) a ON feature_id = connec_id;
+
+
+DROP VIEW v_arc_x_vnode;
+DROP VIEW v_vnode;
+
+DROP VIEW v_ui_arc_x_relations;
+
+DROP VIEW v_edit_link;
+
+
+CREATE OR REPLACE VIEW v_state_link AS (
+         SELECT link.link_id
+           FROM selector_state,
+            selector_expl,
+            link
+          WHERE link.state = selector_state.state_id AND link.expl_id = selector_expl.expl_id AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text
+        EXCEPT ALL
+         SELECT plan_psector_x_connec.link_id
+           FROM selector_psector,
+            selector_expl,
+            plan_psector_x_connec
+             JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
+          WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 0 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text
+) UNION ALL
+ SELECT plan_psector_x_connec.link_id
+   FROM selector_psector,
+    selector_expl,
+    plan_psector_x_connec
+     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
+  WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 1 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text;
+
+
+create or replace view v_link as 
+select * from vu_link
+JOIN v_state_link USING (link_id);
+
+
+CREATE OR REPLACE VIEW v_edit_link AS SELECT *
+FROM v_link l;
+
+
+CREATE OR REPLACE VIEW v_ui_arc_x_relations AS 
+ SELECT row_number() OVER () + 1000000 AS rid,
+    v_connec.arc_id,
+    v_connec.connec_type AS featurecat_id,
+    v_connec.connecat_id AS catalog,
+    v_connec.connec_id AS feature_id,
+    v_connec.code AS feature_code,
+    v_connec.sys_type,
+    v_connec.state AS arc_state,
+    v_connec.state AS feature_state,
+    st_x(v_connec.the_geom) AS x,
+    st_y(v_connec.the_geom) AS y,
+    l.exit_type AS proceed_from,
+    l.exit_id AS proceed_from_id,
+    'v_edit_connec'::text AS sys_table_id
+   FROM v_connec
+     LEFT JOIN v_edit_link l ON v_connec.connec_id::text = l.feature_id::text
+  WHERE v_connec.arc_id IS NOT NULL
+UNION
+ SELECT row_number() OVER () + 2000000 AS rid,
+    v_gully.arc_id,
+    v_gully.gully_type AS featurecat_id,
+    v_gully.gratecat_id AS catalog,
+    v_gully.gully_id AS feature_id,
+    v_gully.code AS feature_code,
+    v_gully.sys_type,
+    v_gully.state AS arc_state,
+    v_gully.state AS feature_state,
+    st_x(v_gully.the_geom) AS x,
+    st_y(v_gully.the_geom) AS y,
+    l.exit_type AS proceed_from,
+    l.exit_id AS proceed_from_id,
+    'v_edit_gully'::text AS sys_table_id
+   FROM v_gully
+     LEFT JOIN v_edit_link l ON v_gully.gully_id::text = l.feature_id::text
+  WHERE v_gully.arc_id IS NOT NULL;

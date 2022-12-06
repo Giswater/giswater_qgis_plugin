@@ -97,10 +97,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psecto
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"REMOVE","table":"plan_psector_x_gully", "column":"link_geom"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"REMOVE","table":"plan_psector_x_gully", "column":"userdefined_geom"}}$$);
 
-
-ALTER TABLE plan_psector_x_gully ADD CONSTRAINT plan_psector_x_gully_link_id_fkey FOREIGN KEY (link_id)
-REFERENCES link (link_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-
 -- change pjoint_type (VNODE to ARC)
 ALTER TABLE connec DROP CONSTRAINT connec_pjoint_type_ckeck;
 UPDATE connec SET pjoint_id = arc_id, pjoint_type = 'ARC' WHERE  pjoint_type = 'VNODE';
@@ -119,5 +115,7 @@ ALTER TABLE plan_psector_x_gully ADD CONSTRAINT plan_psector_x_gully_unique UNIQ
 
 ALTER TABLE plan_psector_x_gully ADD CONSTRAINT plan_psector_x_gully_link_id_fkey FOREIGN KEY (link_id)
 REFERENCES link (link_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"exit_elev", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
 
 

@@ -64,9 +64,10 @@ press_avg numeric(12,2));
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_virtualvalve", "column":"to_arc", "newName":"_to_arc_"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"presszone_id", "dataType":"varchar(16)", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"dma_id", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"dqa_id", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"minsector_id", "dataType":"integer", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"link", "column":"vnode_elevation", "newName":"exit_elev"}}$$);
 
 
 -- change pjoint_type (VNODE to ARC)

@@ -14,9 +14,9 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_arc"
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_connec", "column":"field_date", "dataType":"timestamp(6) without time zone", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"sector_id", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"dma_id", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"fluid_type", "dataType":"varchar(16)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"link", "column":"vnode_topelev", "newName":"exit_topelev"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"link", "column":"vnode_elevation", "newName":"exit_elev"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_connec", "column":"link_id", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"REMOVE","table":"plan_psector_x_connec", "column":"link_geom"}}$$);
@@ -47,8 +47,8 @@ CREATE TABLE temp_link(
   dma_id integer,
   exit_topelev float,
   exit_elev float,
-  the_geom geometry(LineString,25831),
-  the_geom_endpoint geometry(point, 25831),
+  the_geom geometry(LineString,SRID_VALUE),
+  the_geom_endpoint geometry(point, SRID_VALUE),
   flag boolean);
 
 
