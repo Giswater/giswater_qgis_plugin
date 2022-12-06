@@ -550,27 +550,24 @@ BEGIN
 	
 	END IF;
 
+
 	RAISE NOTICE '20 - connec/gully without arc_id or with arc_id different than the one to which points its link (257)';
 
-	v_querytext='SELECT count(*) FROM '||v_edit||'arc';
-	EXECUTE v_querytext INTO v_count;
-	IF v_count < 10000 THEN -- too big
-	
-		v_querytext = 'SELECT c.connec_id, c.connecat_id, c.the_geom, c.expl_id, l.feature_type, link_id 
-			FROM '||v_edit||'arc a, '||v_edit||'link l
-			JOIN connec c ON l.feature_id = c.connec_id 
-			WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom), 0.01)
-			AND exit_type = ''VNODE''
-			AND (a.arc_id <> c.arc_id or c.arc_id is null) 
-			AND l.feature_type = ''CONNEC'' AND a.state=1 and c.state = 1
-			EXCEPT
-			SELECT c.connec_id, c.connecat_id, c.the_geom, c.expl_id, l.feature_type, link_id
-			FROM '||v_edit||'node n, '||v_edit||'link l
-			JOIN connec c ON l.feature_id = c.connec_id 
-			WHERE st_dwithin(n.the_geom, st_endpoint(l.the_geom), 0.01)
-			AND exit_type = ''VNODE'' 
-			AND l.feature_type = ''CONNEC'' AND n.state=1 and c.state = 1
-			ORDER BY feature_type, link_id';
+	v_querytext = 'SELECT c.connec_id, c.connecat_id, c.the_geom, c.expl_id, l.feature_type, link_id 
+		FROM '||v_edit||'arc a, '||v_edit||'link l
+		JOIN connec c ON l.feature_id = c.connec_id 
+		WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom), 0.01)
+		AND exit_type = ''ARC''
+		AND (a.arc_id <> c.arc_id or c.arc_id is null) 
+		AND l.feature_type = ''CONNEC'' AND a.state=1 and c.state = 1
+		EXCEPT
+		SELECT c.connec_id, c.connecat_id, c.the_geom, c.expl_id, l.feature_type, link_id
+		FROM '||v_edit||'node n, '||v_edit||'link l
+		JOIN connec c ON l.feature_id = c.connec_id 
+		WHERE st_dwithin(n.the_geom, st_endpoint(l.the_geom), 0.01)
+		AND exit_type = ''ARC'' 
+		AND l.feature_type = ''CONNEC'' AND n.state=1 and c.state = 1
+		ORDER BY feature_type, link_id';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -590,7 +587,7 @@ BEGIN
 				FROM '||v_edit||'arc a, '||v_edit||'link l
 				JOIN gully c ON l.feature_id = c.gully_id 
 				WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom), 0.01)
-				AND exit_type = ''VNODE''
+				AND exit_type = ''ARC''
 				AND (a.arc_id <> c.arc_id or c.arc_id is null) 
 				AND l.feature_type = ''GULLY'' AND a.state=1 and c.state = 1
 				EXCEPT
@@ -598,7 +595,7 @@ BEGIN
 				FROM '||v_edit||'node n, '||v_edit||'link l
 				JOIN gully c ON l.feature_id = c.gully_id 
 				WHERE st_dwithin(n.the_geom, st_endpoint(l.the_geom), 0.01)
-				AND exit_type = ''VNODE'' 
+				AND exit_type = ''ARC'' 
 				AND l.feature_type = ''GULLY'' AND n.state=1 and c.state = 1
 				ORDER BY feature_type, link_id';
 
@@ -615,26 +612,6 @@ BEGIN
 				VALUES (125, 1, '257', 'INFO: All gullies have correct arc_id.', v_count);
 			END IF;
 		END IF;
-	END IF;
-
-	RAISE NOTICE '21 - Check vnode inconsistency (vnode without link) (259)';
-	v_querytext = 'SELECT vnode_id FROM vnode LEFT JOIN '||v_edit||'link ON vnode_id = exit_id::integer where link_id IS NULL';
-	
-	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
-	
-	IF v_count > 0 THEN
-	
-		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (125, 2, '259',concat('WARNING-259: There is/are ',v_count,' vnodes without link. They will be automatically repaired'),v_count);
-		
-		EXECUTE 'DELETE FROM vnode WHERE vnode_id IN ('||v_querytext||')';
-		
-	ELSE
-		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (125, 1, '259', 'INFO: All vnodes have vnode link.', v_count);
-
-	END IF;
-	
 
 	RAISE NOTICE '22 - links without feature_id (260)';
 	v_querytext = 'SELECT link_id, the_geom FROM '||v_edit||'link where feature_id is null and state > 0';
@@ -828,10 +805,10 @@ BEGIN
 	RAISE NOTICE '29 - Check planned connects without reference link (356)';
 
 	IF v_project_type = 'WS' THEN
-		v_querytext = 'SELECT count(*) FROM plan_psector_x_connec LEFT JOIN link ON feature_id = connec_id WHERE link_id IS NULL';
+		v_querytext = 'SELECT count(*) FROM plan_psector_x_connec WHERE link_id IS NULL';
 	ELSIF v_project_type = 'UD' THEN
-		v_querytext = 'SELECT count(*) FROM (SELECT * FROM plan_psector_x_connec LEFT JOIN link ON feature_id = connec_id WHERE link_id IS NULL
-				UNION SELECT * FROM plan_psector_x_gully LEFT JOIN link ON feature_id = gully_id WHERE link_id IS NULL)a';
+		v_querytext = 'SELECT count(*) FROM (SELECT * FROM plan_psector_x_connec WHERE link_id IS NULL
+				UNION SELECT * FROM plan_psector_x_gully WHERE link_id IS NULL)a';
 	END IF;
 
 
