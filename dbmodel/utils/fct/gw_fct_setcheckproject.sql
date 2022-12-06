@@ -408,23 +408,7 @@ BEGIN
 				DELETE FROM audit_check_data WHERE fid=211 AND cur_user=current_user;
 				DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (176,180,181,182,208,209);
 			END IF;
-		END IF;
-
-		IF 'role_edit' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
-
-			-- arrange vnode
-			EXECUTE 'SELECT gw_fct_setvnoderepair($${
-			"client":{"device":4, "infoType":1, "lang":"ES"},
-			"feature":{},"data":{"parameters":{}}}$$)';
-			-- insert results 
-			UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB OM):', split_part(error_message,': ',2))
-			WHERE fid=296 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
-
-			INSERT INTO audit_check_data  (fid, criticity, error_message)
-			SELECT 101, criticity, error_message FROM audit_check_data 
-			WHERE fid=296 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
-		END IF;
-		
+		END IF;		
 
 		IF 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 
