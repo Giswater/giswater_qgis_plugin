@@ -1579,7 +1579,8 @@ CREATE OR REPLACE VIEW v_edit_inp_timeseries_value AS
 
 
 CREATE OR REPLACE VIEW vi_timeseries AS 
- WITH t AS (
+SELECT timser_id, date, "time", value FROM
+ (WITH t AS (
          SELECT 
 		    a.id,
 		    a.timser_id,
@@ -1618,18 +1619,7 @@ CREATE OR REPLACE VIEW vi_timeseries AS
                   WHERE inp_timeseries.times_type::text = 'RELATIVE'::text AND active IS TRUE) a
           ORDER BY a.id
         )
- SELECT t.timser_id,
-    t.date,
-    t."time",
-    t.value
-   FROM t,
-    selector_expl s
-  WHERE t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text
-UNION
- SELECT t.timser_id,
-    t.date,
-    t."time",
-    t.value
-   FROM t
-  WHERE t.expl_id IS NULL
-  ORDER BY 1, t.id;
+ SELECT t.id, t.timser_id, t.date, t."time", t.value FROM t, selector_expl s WHERE t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text
+UNION  SELECT t.id, t.timser_id, t.date, t."time", t.value FROM t WHERE t.expl_id IS NULL) a
+ORDER BY id
+ 

@@ -184,3 +184,7 @@ VALUES (3180, 'gw_fct_epa2data', 'ws', 'function', 'json', 'json', 'Function tha
 'role_epa',null,'core')  ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM config_form_fields WHERE columnname='to_arc' AND formname ilike '%virtualvalve';
+
+ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+UPDATE inp_typevalue SET typevalue = '_inp_options_networkmode' where typevalue = 'inp_options_networkmode' and id ='3';
+ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;

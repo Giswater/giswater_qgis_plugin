@@ -801,6 +801,7 @@ CREATE OR REPLACE VIEW vu_connec AS
      LEFT JOIN connec_add e ON e.connec_id = connec.connec_id;
 
 
+
 CREATE OR REPLACE VIEW v_connec AS 
  SELECT vu_connec.connec_id,
     vu_connec.code,
@@ -811,7 +812,7 @@ CREATE OR REPLACE VIEW v_connec AS
     vu_connec.connecat_id,
     vu_connec.expl_id,
     vu_connec.macroexpl_id,
-    vu_connec.sector_id,
+    (case when a.sector_id is null then vu_connec.sector_id else a.sector_id end) as sector_id,
     vu_connec.sector_name,
     vu_connec.macrosector_id,
     vu_connec.customer_code,
@@ -826,16 +827,16 @@ CREATE OR REPLACE VIEW v_connec AS
     vu_connec.annotation,
     vu_connec.observ,
     vu_connec.comment,
-    vu_connec.minsector_id,
-    vu_connec.dma_id,
-    vu_connec.dma_name,
-    vu_connec.macrodma_id,
-    vu_connec.presszone_id,
-    vu_connec.presszone_name,
+    (case when a.minsector_id is null then vu_connec.minsector_id else a.minsector_id end) as minsector_id,
+    (case when a.dma_id is null then vu_connec.dma_id else a.dma_id end) as dma_id,
+    (case when a.dma_name is null then vu_connec.dma_name else a.dma_name end) as dma_name,
+    (case when a.macrodma_id is null then vu_connec.macrodma_id else a.macrodma_id end) as macrodma_id,
+    (case when a.presszone_id is null then vu_connec.presszone_id::varchar(30) else a.presszone_id::varchar(30) end) as presszone_id,
+    (case when a.presszone_name is null then vu_connec.presszone_name else a.presszone_name end) as presszone_name,
     vu_connec.staticpressure,
-    vu_connec.dqa_id,
-    vu_connec.dqa_name,
-    vu_connec.macrodqa_id,
+    (case when a.dqa_id is null then vu_connec.dqa_id else a.dqa_id end) as dqa_id,
+    (case when a.dqa_name is null then vu_connec.dqa_name else a.dqa_name end) as dqa_name,
+    (case when a.macrodqa_id is null then vu_connec.macrodqa_id else a.macrodqa_id end) as macrodqa_id,
     vu_connec.soilcat_id,
     vu_connec.function_type,
     vu_connec.category_type,
@@ -870,8 +871,8 @@ CREATE OR REPLACE VIEW v_connec AS
     vu_connec.inventory,
     vu_connec.num_value,
     vu_connec.connectype_id,
-    vu_connec.pjoint_id,
-    vu_connec.pjoint_type,
+    (case when a.exit_id is null then vu_connec.pjoint_id else a.exit_id end) as pjoint_id,
+    (case when a.exit_type is null then vu_connec.pjoint_type else a.exit_type end) as pjoint_type,
     vu_connec.tstamp,
     vu_connec.insert_user,
     vu_connec.lastupdate,
@@ -885,11 +886,13 @@ CREATE OR REPLACE VIEW v_connec AS
     vu_connec.dma_style,
     vu_connec.presszone_style,
     vu_connec.epa_type,
-    vu_connec.press_max, 
-    vu_connec.press_min, 
+    vu_connec.press_max,
+    vu_connec.press_min,
     vu_connec.press_avg
    FROM vu_connec
-     JOIN v_state_connec USING (connec_id);
+     JOIN v_state_connec USING (connec_id)
+    LEFT JOIN (SELECT DISTINCT ON (feature_id) * FROM vu_link WHERE state = 2 AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) a ON feature_id = connec_id
+    
 
 CREATE OR REPLACE VIEW v_edit_connec AS 
 SELECT * FROM v_connec;
@@ -949,118 +952,6 @@ CREATE OR REPLACE VIEW v_edit_review_arc AS
   WHERE selector_expl.cur_user = "current_user"()::text AND review_arc.expl_id = selector_expl.expl_id;
 
 
-CREATE OR REPLACE VIEW v_edit_link
-AS WITH query_text AS (
-         SELECT a_1.link_id,
-            a_1.feature_type,
-            a_1.feature_id,
-            a_1.macrosector_id,
-            a_1.macrodma_id,
-            a_1.exit_type,
-            a_1.exit_id,
-            a_1.vnode_topelev,
-            a_1.fluid_type,
-            a_1.sector_id,
-            a_1.dma_id,
-            a_1.expl_id,
-            a_1.state,
-            a_1.gis_length,
-            a_1.userdefined_geom,
-            a_1.the_geom,
-            a_1.link_class,
-            a_1.psector_rowid
-           FROM ( SELECT link.link_id,
-                    link.feature_type,
-                    link.feature_id,
-                    sector.macrosector_id,
-                    dma.macrodma_id,
-                    link.exit_type,
-                    link.exit_id,
-                    link.vnode_topelev,
-                    c.fluid_type,
-                    arc.sector_id,
-                    arc.dma_id,
-                    arc.expl_id,
-                    c.state,
-                    st_length2d(link.the_geom) AS gis_length,
-                    link.userdefined_geom,
-                    link.the_geom,
-                    1 AS link_class,
-                    0 AS psector_rowid
-                   FROM selector_state,
-                    v_edit_connec c
-                     LEFT JOIN link ON link.feature_id::text = c.connec_id::text
-                     LEFT JOIN arc USING (arc_id)
-                     LEFT JOIN sector ON sector.sector_id::text = arc.sector_id::text
-                     LEFT JOIN dma ON dma.dma_id::text = arc.dma_id::text
-                  WHERE selector_state.cur_user = "current_user"()::text AND selector_state.state_id = c.state
-                UNION
-                 SELECT l.link_id,
-                    l.feature_type,
-                    l.feature_id,
-                    sector.macrosector_id,
-                    dma.macrodma_id,
-                    l.exit_type,
-                    l.exit_id,
-                    l.vnode_topelev,
-                    c.fluid_type,
-                    a_1_1.sector_id,
-                    a_1_1.dma_id,
-                    a_1_1.expl_id,
-                    p.state,
-                        CASE
-                            WHEN p.link_geom IS NULL THEN st_length2d(l.the_geom)
-                            ELSE st_length2d(p.link_geom)
-                        END AS gis_length,
-                        CASE
-                            WHEN p.userdefined_geom IS NULL THEN l.userdefined_geom
-                            ELSE p.userdefined_geom
-                        END AS userdefined_geom,
-                        CASE
-                            WHEN p.link_geom IS NULL THEN l.the_geom
-                            ELSE p.link_geom
-                        END AS the_geom,
-                        CASE
-                            WHEN p.link_geom IS NULL THEN 2
-                            ELSE 3
-                        END AS link_class,
-                    p.id AS psector_rowid
-                   FROM link l,
-                    selector_psector s,
-                    selector_expl e,
-                    plan_psector_x_connec p
-                     JOIN connec c USING (connec_id)
-                     LEFT JOIN arc a_1_1 ON a_1_1.arc_id::text = p.arc_id::text
-                     LEFT JOIN sector ON sector.sector_id::text = a_1_1.sector_id::text
-                     LEFT JOIN dma ON dma.dma_id::text = a_1_1.dma_id::text
-                  WHERE l.feature_id::text = p.connec_id::text AND p.state = 1 AND s.psector_id = p.psector_id AND s.cur_user = "current_user"()::text AND e.expl_id = c.expl_id AND e.cur_user = "current_user"()::text) a_1
-        )
- SELECT a.link_id,
-    a.feature_type,
-    a.feature_id,
-    a.macrosector_id,
-    a.macrodma_id,
-    a.exit_type,
-    a.exit_id,
-    a.sector_id,
-    a.dma_id,
-    a.expl_id,
-    a.state,
-    a.gis_length,
-    a.userdefined_geom,
-    a.the_geom,
-    a.link_class,
-    a.psector_rowid,
-    a.fluid_type,
-    a.vnode_topelev
-   FROM query_text a
-     JOIN ( SELECT query_text.link_id,
-            max(query_text.link_class) AS link_class
-           FROM query_text
-          GROUP BY query_text.link_id) b USING (link_id)
-  WHERE a.link_class = b.link_class;
-
-
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_arc"], "fieldName":"flow_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
@@ -1107,3 +998,202 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"quality_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
+
+DROP VIEW v_arc_x_vnode;
+DROP VIEW v_vnode;
+DROP VIEW v_edit_link;
+
+create or replace view vu_link as 
+select link_id, l.feature_type, feature_id, exit_type, exit_id, l.state, l.expl_id, sector_id, dma_id, presszone_id::varchar(16), dqa_id, minsector_id, exit_topelev, exit_elev, fluid_type, st_length2d(l.the_geom) as gis_length, userdefined_geom, l.the_geom, s.name as sector_name, d.name as dma_name, q.name as dqa_name, p.name as presszone_name, macrosector_id, macrodma_id, macrodqa_id
+FROM link l
+LEFT JOIN sector s USING (sector_id)
+LEFT JOIN presszone p USING (presszone_id)
+LEFT JOIN dma d USING (dma_id)
+LEFT JOIN dqa q USING (dqa_id);
+
+
+CREATE OR REPLACE VIEW v_state_link AS 
+         SELECT link.link_id
+           FROM selector_state,
+            selector_expl,
+            link
+          WHERE link.state = selector_state.state_id AND link.expl_id = selector_expl.expl_id AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text
+        EXCEPT
+         SELECT plan_psector_x_connec.link_id
+           FROM selector_psector,
+            selector_expl,
+            state
+            plan_psector_x_connec
+             JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
+          WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 0 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text
+ UNION
+ SELECT plan_psector_x_connec.link_id
+   FROM selector_psector,
+    selector_expl,
+    state
+    plan_psector_x_connec
+     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
+  WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 1 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text;
+
+
+create or replace view v_link as 
+select * from vu_link
+JOIN v_state_link USING (link_id);
+
+
+CREATE OR REPLACE VIEW v_edit_link AS SELECT *
+FROM v_link l;
+
+
+CREATE TRIGGER gw_trg_edit_link
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_link
+  FOR EACH ROW 
+  EXECUTE PROCEDURE gw_trg_edit_link();
+  
+  
+  
+CREATE OR REPLACE VIEW vi_pipes AS 
+ SELECT temp_arc.arc_id,
+    temp_arc.node_1,
+    temp_arc.node_2,
+    temp_arc.length,
+    temp_arc.diameter,
+    temp_arc.roughness,
+    temp_arc.minorloss,
+    temp_arc.status::character varying(30) AS status,
+    concat(';', temp_arc.sector_id, ' ', coalesce(temp_arc.presszone_id,'0'), ' ', coalesce(temp_arc.dma_id,0), ' ', coalesce(temp_arc.dqa_id,0), ' ', coalesce(temp_arc.minsector_id,0), ' ', temp_arc.arccat_id) AS other
+   FROM temp_arc
+  WHERE temp_arc.epa_type::text = ANY (ARRAY['PIPE'::character varying, 'SHORTPIPE'::character varying, 'NODE2NODE'::character varying]::text[]);
+
+
+CREATE OR REPLACE VIEW vi_junctions AS 
+ SELECT temp_node.node_id,
+        CASE
+            WHEN temp_node.elev IS NOT NULL THEN temp_node.elev
+            ELSE temp_node.elevation
+        END AS elevation,
+    temp_node.demand,
+    temp_node.pattern_id,
+    concat(';', temp_node.sector_id, ' ', coalesce(temp_node.presszone_id,'0'), ' ', coalesce(temp_node.dma_id,0), ' ', coalesce(temp_node.dqa_id,0), ' ', coalesce(temp_node.minsector_id,0), ' ', temp_node.node_type) AS other
+   FROM temp_node
+  WHERE temp_node.epa_type::text <> ALL (ARRAY['RESERVOIR'::character varying, 'TANK'::character varying]::text[])
+  ORDER BY temp_node.node_id;
+
+
+
+CREATE OR REPLACE VIEW vi_valves AS 
+ SELECT DISTINCT ON (a.arc_id) a.arc_id,
+    a.node_1,
+    a.node_2,
+    a.diameter,
+    a.valv_type,
+    a.setting,
+    a.minorloss,
+    concat(';', a.sector_id, ' ', coalesce(a.presszone_id,'0'), ' ', coalesce(a.dma_id,0), ' ', coalesce(a.dqa_id,0), ' ', coalesce(a.minsector_id,0), ' ', a.arccat_id) AS other
+   FROM ( SELECT temp_arc.arc_id::text AS arc_id,
+            temp_arc.node_1,
+            temp_arc.node_2,
+            temp_arc.diameter,
+            ((temp_arc.addparam::json ->> 'valv_type'::text))::character varying(18) AS valv_type,
+            temp_arc.addparam::json ->> 'pressure'::text AS setting,
+            temp_arc.minorloss,
+            temp_arc.sector_id,
+            temp_arc.dma_id,
+            temp_arc.presszone_id,
+            temp_arc.dqa_id,
+            temp_arc.minsector_id,
+            temp_arc.arccat_id
+           FROM temp_arc
+          WHERE (temp_arc.addparam::json ->> 'valv_type'::text) = 'PRV'::text OR (temp_arc.addparam::json ->> 'valv_type'::text) = 'PSV'::text OR (temp_arc.addparam::json ->> 'valv_type'::text) = 'PBV'::text
+        UNION
+         SELECT temp_arc.arc_id,
+            temp_arc.node_1,
+            temp_arc.node_2,
+            temp_arc.diameter,
+            temp_arc.addparam::json ->> 'valv_type'::text AS valv_type,
+            temp_arc.addparam::json ->> 'flow'::text AS setting,
+            temp_arc.minorloss,
+            temp_arc.sector_id,
+            temp_arc.dma_id,
+            temp_arc.presszone_id,
+            temp_arc.dqa_id,
+            temp_arc.minsector_id,
+            temp_arc.arccat_id
+           FROM temp_arc
+          WHERE (temp_arc.addparam::json ->> 'valv_type'::text) = 'FCV'::text
+        UNION
+         SELECT temp_arc.arc_id,
+            temp_arc.node_1,
+            temp_arc.node_2,
+            temp_arc.diameter,
+            temp_arc.addparam::json ->> 'valv_type'::text AS valv_type,
+            temp_arc.addparam::json ->> 'coef_loss'::text AS setting,
+            temp_arc.minorloss,
+            temp_arc.sector_id,
+            temp_arc.dma_id,
+            temp_arc.presszone_id,
+            temp_arc.dqa_id,
+            temp_arc.minsector_id,
+            temp_arc.arccat_id
+           FROM temp_arc
+          WHERE (temp_arc.addparam::json ->> 'valv_type'::text) = 'TCV'::text
+        UNION
+         SELECT temp_arc.arc_id,
+            temp_arc.node_1,
+            temp_arc.node_2,
+            temp_arc.diameter,
+            temp_arc.addparam::json ->> 'valv_type'::text AS valv_type,
+            temp_arc.addparam::json ->> 'curve_id'::text AS setting,
+            temp_arc.minorloss,
+            temp_arc.sector_id,
+            temp_arc.dma_id,
+            temp_arc.presszone_id,
+            temp_arc.dqa_id,
+            temp_arc.minsector_id,
+            temp_arc.arccat_id
+           FROM temp_arc
+          WHERE (temp_arc.addparam::json ->> 'valv_type'::text) = 'GPV'::text
+        UNION
+         SELECT temp_arc.arc_id,
+            temp_arc.node_1,
+            temp_arc.node_2,
+            temp_arc.diameter,
+            'PRV'::character varying(18) AS valv_type,
+            temp_arc.addparam::json ->> 'pressure'::text AS setting,
+            temp_arc.minorloss,
+            temp_arc.sector_id,
+            temp_arc.dma_id,
+            temp_arc.presszone_id,
+            temp_arc.dqa_id,
+            temp_arc.minsector_id,
+            temp_arc.arccat_id
+           FROM temp_arc
+             JOIN inp_pump ON temp_arc.arc_id::text = concat(inp_pump.node_id, '_n2a_4')) a;
+
+
+CREATE OR REPLACE VIEW vi_pumps AS 
+ SELECT temp_arc.arc_id,
+    temp_arc.node_1,
+    temp_arc.node_2,
+        CASE
+            WHEN (temp_arc.addparam::json ->> 'power'::text) <> ''::text THEN ('POWER'::text || ' '::text) || (temp_arc.addparam::json ->> 'power'::text)
+            ELSE NULL::text
+        END AS power,
+        CASE
+            WHEN (temp_arc.addparam::json ->> 'curve_id'::text) <> ''::text THEN ('HEAD'::text || ' '::text) || (temp_arc.addparam::json ->> 'curve_id'::text)
+            ELSE NULL::text
+        END AS head,
+        CASE
+            WHEN (temp_arc.addparam::json ->> 'speed'::text) <> ''::text THEN ('SPEED'::text || ' '::text) || (temp_arc.addparam::json ->> 'speed'::text)
+            ELSE NULL::text
+        END AS speed,
+        CASE
+            WHEN (temp_arc.addparam::json ->> 'pattern'::text) <> ''::text THEN ('PATTERN'::text || ' '::text) || (temp_arc.addparam::json ->> 'pattern'::text)
+            ELSE NULL::text
+        END AS pattern,
+    concat(';', temp_arc.sector_id, ' ',  coalesce(temp_arc.presszone_id,'0'), ' ',  coalesce(temp_arc.dma_id,0), ' ',  coalesce(temp_arc.dqa_id,0), ' ',  coalesce(temp_arc.minsector_id,0), ' ', temp_arc.arccat_id) AS other
+   FROM temp_arc
+  WHERE temp_arc.epa_type::text = 'PUMP'::text AND NOT (temp_arc.arc_id::text IN ( SELECT vi_valves.arc_id
+           FROM vi_valves))
+  ORDER BY temp_arc.arc_id;

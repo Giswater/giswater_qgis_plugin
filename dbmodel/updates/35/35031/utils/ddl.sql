@@ -12,3 +12,66 @@ CREATE EXTENSION IF NOT EXISTS fuzzystrmatch SCHEMA "public";
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_node", "column":"field_date", "dataType":"timestamp(6) without time zone", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_arc", "column":"field_date", "dataType":"timestamp(6) without time zone", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"review_connec", "column":"field_date", "dataType":"timestamp(6) without time zone", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"sector_id", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"fluid_type", "dataType":"varchar(16)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"link", "column":"vnode_topelev", "newName":"exit_topelev"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"link", "column":"vnode_elevation", "newName":"exit_elev"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_connec", "column":"link_id", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"REMOVE","table":"plan_psector_x_connec", "column":"link_geom"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"REMOVE","table":"plan_psector_x_connec", "column":"userdefined_geom"}}$$);
+
+
+ALTER TABLE vnode RENAME TO _vnode_;
+
+CREATE TABLE temp_vnode (
+  id serial primary key,
+  l1 integer,
+  v1 integer,
+  l2 integer,
+  v2 integer
+);
+
+CREATE TABLE temp_link(
+  link_id integer primary key,
+  vnode_id integer,
+  vnode_type text,
+  feature_id varchar(16),
+  feature_type character varying(16),
+  exit_id varchar(16),
+  exit_type varchar(16),
+  state smallint,
+  expl_id integer,
+  sector_id integer,
+  dma_id integer,
+  exit_topelev float,
+  exit_elev float,
+  the_geom geometry(LineString,25831),
+  the_geom_endpoint geometry(point, 25831),
+  flag boolean);
+
+
+CREATE TABLE temp_link_x_arc(
+  link_id integer primary key,
+  vnode_id integer,
+  arc_id character varying(16),
+  feature_type character varying(16),
+  feature_id character varying(16),
+  node_1 character varying(16),
+  node_2 character varying(16),
+  vnode_distfromnode1 numeric(12,3),
+  vnode_distfromnode2 numeric(12,3),
+  exit_topelev double precision,
+  exit_ymax numeric(12,3),
+  exit_elev numeric(12,3)
+);
+
+ALTER TABLE plan_psector_x_connec ADD CONSTRAINT plan_psector_x_connec_link_id_fkey FOREIGN KEY (link_id)
+REFERENCES link (link_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE plan_psector_x_connec DROP CONSTRAINT plan_psector_x_connec_unique;
+ALTER TABLE plan_psector_x_connec ADD CONSTRAINT plan_psector_x_connec_unique UNIQUE(connec_id, psector_id, state);
+
+ALTER TABLE plan_psector_x_connec ADD CONSTRAINT plan_psector_x_connec_link_id_fkey FOREIGN KEY (link_id)
+REFERENCES link (link_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;

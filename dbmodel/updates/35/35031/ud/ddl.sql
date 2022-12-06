@@ -92,3 +92,32 @@ CREATE INDEX anl_gully_index ON anl_gully USING gist (the_geom);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_timeseries", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
 
 ALTER TABLE inp_timeseries ALTER COLUMN active SET DEFAULT TRUE;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_gully", "column":"link_id", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"REMOVE","table":"plan_psector_x_gully", "column":"link_geom"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"REMOVE","table":"plan_psector_x_gully", "column":"userdefined_geom"}}$$);
+
+
+ALTER TABLE plan_psector_x_gully ADD CONSTRAINT plan_psector_x_gully_link_id_fkey FOREIGN KEY (link_id)
+REFERENCES link (link_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- change pjoint_type (VNODE to ARC)
+ALTER TABLE connec DROP CONSTRAINT connec_pjoint_type_ckeck;
+UPDATE connec SET pjoint_id = arc_id, pjoint_type = 'ARC' WHERE  pjoint_type = 'VNODE';
+UPDATE link SET exit_id = arc_id, exit_type = 'ARC' FROM connec WHERE feature_id = connec_id and exit_type = 'VNODE';
+ALTER TABLE connec ADD CONSTRAINT connec_pjoint_type_ckeck CHECK (pjoint_type::text = ANY  (ARRAY['NODE', 'ARC', 'CONNEC', 'GULLY']));
+
+-- change pjoint_type (VNODE to ARC)
+ALTER TABLE gully DROP CONSTRAINT gully_pjoint_type_ckeck;
+UPDATE gully SET pjoint_id = arc_id, pjoint_type = 'ARC' WHERE  pjoint_type = 'VNODE';
+UPDATE link SET exit_id = arc_id, exit_type = 'ARC' FROM gully WHERE feature_id = gully_id and exit_type = 'VNODE';
+ALTER TABLE gully ADD CONSTRAINT gully_pjoint_type_ckeck CHECK (pjoint_type::text = ANY (ARRAY['NODE', 'ARC', 'CONNEC', 'GULLY']));
+
+
+ALTER TABLE plan_psector_x_gully DROP CONSTRAINT plan_psector_x_gully_unique;
+ALTER TABLE plan_psector_x_gully ADD CONSTRAINT plan_psector_x_gully_unique UNIQUE(gully_id, psector_id, state);
+
+ALTER TABLE plan_psector_x_gully ADD CONSTRAINT plan_psector_x_gully_link_id_fkey FOREIGN KEY (link_id)
+REFERENCES link (link_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+

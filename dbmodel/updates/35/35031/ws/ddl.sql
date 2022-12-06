@@ -61,4 +61,16 @@ press_min numeric(12,2),
 press_avg numeric(12,2));
 
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_virtualvalve", "column":"to_arc", "newName":"_to_arc_"}}$$)
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_virtualvalve", "column":"to_arc", "newName":"_to_arc_"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"presszone_id", "dataType":"varchar(16)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"dma_id", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"dqa_id", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"minsector_id", "dataType":"integer", "isUtils":"False"}}$$);
+
+
+-- change pjoint_type (VNODE to ARC)
+ALTER TABLE connec DROP CONSTRAINT connec_pjoint_type_ckeck;
+UPDATE connec SET pjoint_id = arc_id, pjoint_type = 'ARC' WHERE  pjoint_type = 'VNODE';
+UPDATE link SET exit_id = arc_id, exit_type = 'ARC' FROM connec WHERE feature_id = connec_id and exit_type = 'VNODE';
+ALTER TABLE connec ADD CONSTRAINT connec_pjoint_type_ckeck CHECK (pjoint_type::text = ANY  (ARRAY['NODE', 'ARC', 'CONNEC']));
