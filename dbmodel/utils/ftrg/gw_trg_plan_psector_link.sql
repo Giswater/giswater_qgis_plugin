@@ -10,10 +10,6 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_plan_psector_link()
   RETURNS trigger AS
 $BODY$
 
-/*
-This trigger CREATES the initial geometry of planned link (always forced for planned connects) working only with links class 3. 
-Also UPDATES the link and vnode geometry for psector tables. On create and update works in combination with arc_id
-*/
 
 DECLARE 
     
@@ -21,16 +17,17 @@ v_link_geom public.geometry;
 v_table_name text;
 v_feature_geom public.geometry;
 v_point_aux public.geometry;
-v_arc_geom public.geometry;
-v_userdefined_geom boolean;
 v_idlink text;
-v_idvnode text;
 v_channel text;
 v_schemaname text;
 v_arc_id text;
 v_projecttype text;
 v_exit_type text;
 v_connect text;
+v_featuretype text;
+v_arc record;
+v_link integer;
+v_feature text;
 	
 BEGIN 
 
@@ -38,79 +35,85 @@ BEGIN
 	
 	v_table_name:= TG_ARGV[0];
 	v_schemaname='SCHEMA_NAME';
-
 	v_projecttype = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
-
+	
 	IF NEW.arc_id='' THEN NEW.arc_id=NULL; END IF;
 
-	-- getting table and exit_type
+	-- getting variables in function of table
 	IF v_table_name = 'connec' THEN
-		SELECT the_geom INTO v_feature_geom FROM connec WHERE connec_id=NEW.connec_id;
-		SELECT exit_type, the_geom INTO v_exit_type, v_link_geom FROM v_edit_link WHERE feature_id =  NEW.connec_id;
-		
+		v_featuretype = 'CONNEC';
+		v_feature = NEW.connec_id;
+		v_feature_geom = (SELECT the_geom FROM connec WHERE connec_id = NEW.connec_id);
+
 	ELSIF v_table_name = 'gully' THEN
-		SELECT the_geom INTO v_feature_geom FROM gully WHERE gully_id=NEW.gully_id;
-		SELECT exit_type, the_geom INTO v_exit_type, v_link_geom FROM v_edit_link WHERE feature_id =  NEW.gully_id;
+		v_featuretype = 'GULLY';
+		v_feature = NEW.gully_id;
+		v_feature_geom = (SELECT the_geom FROM gully WHERE gully_id = NEW.gully_id);
 	END IF;
 
-	IF v_exit_type ='VNODE' THEN -- link_class =  3
+	SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
+
+	-- executing options
+	IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') AND NEW.state = 0 THEN
+
+		IF v_table_name = 'connec' THEN
+			v_link = (SELECT link_id FROM link WHERE feature_id = NEW.connec_id AND state = 1);
+			UPDATE plan_psector_x_connec SET link_id = v_link WHERE id = NEW.id;
+			
+		ELSIF v_table_name = 'gully' THEN
+			v_link = (SELECT link_id FROM link WHERE feature_id = NEW.gully_id AND state = 1);
+			UPDATE plan_psector_x_gully SET link_id = v_link WHERE id = NEW.id;
+		END IF;	
+
+	ELSIF TG_OP = 'INSERT' AND NEW.state = 1 THEN 
 	
-		-- getting arc_geom
 		IF NEW.arc_id IS NOT NULL THEN
-			v_arc_geom =  (SELECT the_geom FROM arc WHERE arc_id=NEW.arc_id);
-		ELSE
+
+			-- link ID
+			v_link := (SELECT nextval('link_link_id_seq'));
+			v_link_geom := ST_ShortestLine(v_feature_geom, v_arc.the_geom);
 		
-			IF v_table_name = 'connec' THEN
-				-- getting closest arc
-				SELECT a.arc_id INTO v_arc_id FROM v_edit_arc a, connec c WHERE st_dwithin(a.the_geom, c.the_geom, 1000) AND connec_id = NEW.connec_id AND a.state > 0
-				ORDER BY st_distance (a.the_geom, c.the_geom) LIMIT 1;
+			IF v_projecttype = 'WS' THEN
+				INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id, dqa_id, 
+				presszone_id, minsector_id)
+				VALUES (v_link, v_featuretype, v_feature, v_arc.expl_id, NEW.arc_id, 'ARC', FALSE, 2, v_link_geom, v_arc.sector_id, v_arc.fluid_type, v_arc.dma_id, v_arc.dqa_id, 
+				v_arc.presszone_id, v_arc.minsector_id);
+			ELSIF  v_projecttype = 'UD' THEN
+				INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id)
+				VALUES (v_link, v_featuretype, v_feature,v_arc.expl_id, NEW.arc_id, 'ARC', FALSE, 2, v_link_geom, v_arc.sector_id, v_arc.fluid_type, v_arc.dma_id);
+			END IF;
 
-				-- this update makes a recall of self.trigger but in this case with NEW.arc_id IS NOT NULL recall will finish next one
-				UPDATE plan_psector_x_connec SET arc_id = v_arc_id WHERE id=NEW.id;
-
-				RETURN NEW;
-				
-			ELSIF v_table_name = 'gully' THEN
-				-- getting closest arc
-				SELECT a.arc_id INTO v_arc_id FROM v_edit_arc a, gully g WHERE st_dwithin(a.the_geom, g.the_geom, 1000) AND gully_id = NEW.gully_id AND a.state > 0
-				ORDER BY st_distance (a.the_geom, g.the_geom) LIMIT 1;
-
-				-- this update makes a recall of self.trigger but in this case with NEW.arc_id IS NOT NULL recall will finish next one
-				UPDATE plan_psector_x_gully SET arc_id = v_arc_id WHERE id=NEW.id;
-
-				RETURN NEW;
-			END IF;	
+			UPDATE plan_psector_x_connec SET link_id = v_link WHERE id = NEW.id;
 		END IF;
 
-		IF v_arc_geom IS NOT NULL THEN
-	   
-			-- update values on plan psector table
-			IF NEW.userdefined_geom IS NOT TRUE THEN
-				v_link_geom := ST_ShortestLine(v_feature_geom, v_arc_geom);
-				v_userdefined_geom=FALSE;
-			ELSE	
-				v_point_aux := St_closestpoint(v_arc_geom, St_endpoint(v_link_geom));
+	ELSIF TG_OP = 'UPDATE' AND NEW.state = 1 AND COALESCE(NEW.arc_id,'') != COALESCE(OLD.arc_id,'') THEN
+
+		SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
+		SELECT the_geom INTO v_link_geom FROM link WHERE link_id = NEW.link_id;
+
+		-- getting the new geometry of link
+		IF  (SELECT exit_type FROM link WHERE link_id = NEW.link_id) = 'ARC' THEN
+			IF (SELECT userdefined_geom FROM link WHERE link_id = NEW.link_id) IS FALSE THEN
+				v_link_geom := ST_ShortestLine(v_feature_geom, v_arc.the_geom);
+
+			ELSIF (SELECT userdefined_geom FROM link WHERE link_id = NEW.link_id) IS TRUE THEN 
+				IF v_link_geom IS NULL THEN v_link_geom := ST_ShortestLine(v_feature_geom, v_arc.the_geom); END IF;
+				v_point_aux := St_closestpoint(v_arc.the_geom, St_endpoint(v_link_geom));
 				v_link_geom  := ST_SetPoint(v_link_geom, ST_NumPoints(v_link_geom) - 1, v_point_aux);
-				v_userdefined_geom = TRUE;
 			END IF;
-					
-			-- update plan_psector table			
-			IF v_table_name = 'connec' THEN
-				UPDATE plan_psector_x_connec SET link_geom=v_link_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
-			ELSIF v_table_name = 'gully' THEN
-				UPDATE plan_psector_x_gully SET link_geom=v_link_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
-			END IF;	
-		ELSE
-			IF v_table_name = 'connec' THEN
-				UPDATE plan_psector_x_connec SET link_geom=NULL, userdefined_geom=NULL WHERE id=NEW.id;
-
-			ELSIF v_table_name = 'gully' THEN
-				UPDATE plan_psector_x_gully SET link_geom=NULL, userdefined_geom=NULL WHERE id=NEW.id;
-
-			END IF;	
+			
+			IF v_projecttype = 'WS' THEN
+				UPDATE link SET the_geom = v_link_geom, exit_id = v_arc.arc_id, exit_type='ARC', sector_id = v_arc.sector_id, fluid_type = v_arc.fluid_type, 
+				dma_id = v_arc.dma_id, dqa_id = v_arc.dqa_id, presszone_id = v_arc.presszone_id, minsector_id = v_arc.minsector_id
+				WHERE link_id = NEW.link_id;
+			
+			ELSIF v_projecttype = 'UD' THEN
+				UPDATE link SET the_geom = v_link_geom, exit_id = v_arc.arc_id, exit_type='ARC', sector_id = v_arc.sector_id, fluid_type = v_arc.fluid_type, 
+				dma_id = v_arc.dma_id WHERE link_id = NEW.link_id;
+			END IF;		
 		END IF;
 	END IF;
-
+		
 	-- reconnect connects
 	IF v_table_name = 'connec' THEN
 	
@@ -146,12 +149,7 @@ BEGIN
 			UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE gully_id = v_connect;
 		END LOOP;
 		
-	END IF;	
-
-	-- notify to qgis in order to reindex geometries for snapping
-	v_channel := replace (current_user::text,'.','_');
-	PERFORM pg_notify (v_channel, '{"functionAction":{"functions":[{"name":"set_layer_index","parameters":{"tableName":"v_edit_link"}},
-	{"name":"refresh_canvas", "parameters":{"tableName":"v_edit_connec"}}],"user":"'	||current_user||'","schema":"'||v_schemaname||'"}}');
+	END IF;		
 
 	RETURN NEW;
 
