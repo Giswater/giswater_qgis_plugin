@@ -92,8 +92,11 @@ BEGIN
 
 	-- Get state_type from default value if this isn't on input json
 	IF v_state_type IS NULL THEN
+	
 		IF v_psector_id IS NULL THEN
-			SELECT value INTO v_state_type FROM config_param_user WHERE parameter='edit_statetype_0_vdefault' AND cur_user=current_user;
+			IF v_action_mode = 1 THEN
+				SELECT value INTO v_state_type FROM config_param_user WHERE parameter='edit_statetype_0_vdefault' AND cur_user=current_user;
+			END IF;
 		ELSE
 			SELECT value INTO v_state_type FROM config_param_user WHERE parameter='edit_statetype_2_vdefault' AND cur_user=current_user;
 		END IF;
@@ -217,16 +220,17 @@ BEGIN
 
 				UPDATE arc SET node_1=v_new_record.node_1, node_2=v_new_record.node_2 where arc_id=v_new_record.arc_id;
                 
-                -- update link only with enabled variable
-                IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
-                    UPDATE arc SET link=v_new_record.arc_id where arc_id=v_new_record.arc_id;
-                END IF;
+				-- update link only with enabled variable
+				IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
+				    UPDATE arc SET link=v_new_record.arc_id where arc_id=v_new_record.arc_id;
+				END IF;
 
 				EXECUTE 'INSERT INTO '||v_man_table||' VALUES ('||v_new_record.arc_id||')';
 				EXECUTE 'INSERT INTO '||v_epa_table||' VALUES ('||v_new_record.arc_id||')';
 					
 				--Insert data on audit_arc_traceability table
 				IF v_psector_id IS NULL THEN
+				
 					INSERT INTO audit_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", cur_user) 
 					VALUES ('ARC FUSION', v_new_record.arc_id, v_record2.arc_id,v_record1.arc_id,v_exists_node_id, CURRENT_TIMESTAMP, CURRENT_USER);
 
@@ -289,7 +293,7 @@ BEGIN
 					END IF;
 				
 					IF v_state_node = 1 THEN
-
+					
 						-- update elements
 						SELECT count(id) INTO v_count FROM element_x_arc WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
 						IF v_count > 0 THEN
@@ -400,17 +404,10 @@ BEGIN
 					END IF;
 				
 				ELSIF v_psector_id IS NOT NULL THEN
+				
 					UPDATE arc SET state = 2 WHERE arc_id = v_new_record.arc_id;
 				
 					INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable) VALUES (v_new_record.arc_id, v_psector_id, 1, false) ON CONFLICT (arc_id, psector_id) DO NOTHING;
-
-					-- Delete arcs
-					DELETE FROM arc WHERE arc_id = v_record1.arc_id;
-					DELETE FROM arc WHERE arc_id = v_record2.arc_id;
-
-					-- Delete node
-					INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Delete planned node ',v_node_id));
-					DELETE FROM node WHERE node_id = v_node_id;
 
 					-- orphan nodes with arc_id not null
 					SELECT count(*) INTO v_count FROM v_edit_node WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id);
@@ -472,6 +469,29 @@ BEGIN
 							INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Reconnect planned ',v_count,' gullies.'));
 						END IF;
 					END IF;
+
+					IF v_record1.state = 1 THEN
+						INSERT INTO plan_psector_x_arc (psector_id, arc_id, state) VALUES (v_psector_id, v_record1.arc_id, 0)
+						ON CONFLICT (psector_id, arc_id) DO NOTHING; 
+					ELSE
+						DELETE FROM arc WHERE arc_id = v_record1.arc_id;
+					END IF;
+
+					IF v_record2.state = 1 THEN
+						INSERT INTO plan_psector_x_arc (psector_id, arc_id, state) VALUES (v_psector_id, v_record2.arc_id, 0)
+						ON CONFLICT (psector_id, arc_id) DO NOTHING; 
+					ELSE
+						DELETE FROM arc WHERE arc_id = v_record2.arc_id;
+					END IF;
+
+					IF v_state_node = 1 THEN
+						INSERT INTO plan_psector_x_node (psector_id, node_id, state) VALUES (v_psector_id, v_node_id, 0)
+						ON CONFLICT (psector_id, node_id) DO NOTHING; 
+					ELSE
+						INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Delete planned node ',v_node_id));
+						DELETE FROM node WHERE node_id = v_node_id;
+					END IF;
+					
 				END IF;
 
 			INSERT INTO audit_check_data (fid,  criticity, error_message)

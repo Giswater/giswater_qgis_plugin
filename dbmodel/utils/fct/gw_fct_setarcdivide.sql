@@ -165,6 +165,7 @@ BEGIN
 	IF v_state_arc=0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"1050", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
+		
 	ELSIF v_state_node=0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"1052", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
@@ -172,7 +173,7 @@ BEGIN
 
 		-- Control if node divides arc
 		IF v_isarcdivide=TRUE THEN 
-
+		
 			-- Check if it's a end/start point node in case of wrong topology without start or end nodes
 			SELECT arc_id INTO v_arc_id FROM v_edit_arc WHERE ST_DWithin(ST_startpoint(the_geom), v_node_geom, v_arc_searchnodes) OR ST_DWithin(ST_endpoint(the_geom), v_node_geom, v_arc_searchnodes) LIMIT 1;
 			IF v_arc_id IS NOT NULL THEN
@@ -513,12 +514,16 @@ BEGIN
 
 						-- reconnect operative links
 						IF v_count_connec > 0  AND v_array_connec IS NOT NULL THEN
+
+							Raise exception 'ashh';
+						
 							EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{"id":'|| array_to_json(v_array_connec)||'},"data":{"feature_type":"CONNEC","forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
 
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
 							VALUES (212, 1, concat('Reconnect ',v_count_connec,' connecs with state 1.'));
 						END IF;
+						
 						IF v_count_gully > 0 AND v_array_gully IS NOT NULL THEN
 							EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{"id":'|| array_to_json(v_array_gully)||'},"data":{"feature_type":"GULLY","forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
@@ -527,9 +532,9 @@ BEGIN
 							VALUES (212, 1, concat('Reconnect ',v_count_gully,' gullies with state 1.'));
 						END IF;
 											
-						-- reconnect planned vnode links
+						-- reconnect planned arc links
 						FOR rec_link IN SELECT link.* FROM v_edit_connec JOIN link ON link.feature_id=connec_id 
-						WHERE link.feature_type='CONNEC' AND exit_type='VNODE' AND arc_id=v_arc_id
+						WHERE link.feature_type='CONNEC' AND exit_type='ARC' AND arc_id=v_arc_id
 						LOOP
 							SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id 
 							AND arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1; 
@@ -540,7 +545,7 @@ BEGIN
 						IF v_project_type ='UD' THEN
 
 							FOR rec_link IN SELECT link.* FROM v_edit_gully JOIN link ON link.feature_id=gully_id 
-							WHERE link.feature_type='GULLY' AND exit_type='VNODE' AND arc_id=v_arc_id
+							WHERE link.feature_type='GULLY' AND exit_type = 'ARC' AND arc_id=v_arc_id
 							LOOP
 								SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
 								UPDATE plan_psector_x_gully SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
@@ -608,7 +613,7 @@ BEGIN
 						SELECT value INTO v_force_delete FROM config_param_user WHERE parameter = 'plan_psector_force_delete' AND cur_user=current_user;
 						UPDATE config_param_user SET value='true' WHERE parameter = 'plan_psector_force_delete' AND cur_user=current_user;
 
-						IF v_state_arc=1 THEN -- ficticius arc
+						IF v_state_arc = 1 THEN -- ficticius arc
 
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
 							VALUES (212, 1, 'Arc with state =1, node with state = 2.');
@@ -699,6 +704,7 @@ BEGIN
 						VALUES (212, 1,'Reconnect disconnected nodes on this alternative');
 
 						IF v_project_type='WS' THEN
+						
 							-- reconnect nodes (update arc_id of disconnected nodes linked to old arc)
 							FOR rec_node IN SELECT node_id, the_geom FROM v_edit_node WHERE arc_id=v_arc_id AND state = 2
 							LOOP												
@@ -724,45 +730,58 @@ BEGIN
 							INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector, v_arc_id, 0, FALSE) 
 							ON CONFLICT (arc_id, psector_id) DO NOTHING;
 
-							-- insert operative connec's on alternative in order to reconnect
-							INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable)
-							SELECT v_psector, connec_id, NULL, 1,false FROM connec WHERE arc_id = v_arc_id AND state=1
+							-- insert operative connec's on alternative in order to reconnect (donwgrade)
+							INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable, link_id)
+							SELECT v_psector, connec_id, v_arc_id, 0, false, link_id FROM connec JOIN link on feature_id = connec_id WHERE arc_id = v_arc_id AND connec.state=1 and link.state = 1
 							ON CONFLICT DO NOTHING;
+
+							-- insert operative connec's on alternative in order to reconnect (upgrade)
+							INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable)
+							SELECT v_psector, connec_id, v_arc_id, 1, false FROM connec WHERE arc_id = v_arc_id AND connec.state=1
+							ON CONFLICT DO NOTHING;					
 
 							-- insert operative gully's on alternative in order to reconnect
 							IF v_project_type='UD' THEN
+
+								-- downgrade
 								INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable)
-								SELECT v_psector, gully_id, NULL, 1, false FROM gully WHERE arc_id = v_arc_id AND state=1
+								SELECT v_psector, gully_id, v_arc_id, 0, false, link_id FROM gully JOIN link on feature_id = gully_id WHERE arc_id = v_arc_id AND gully.state=1 and link.state = 1
 								ON CONFLICT DO NOTHING;
+
+								-- upgrade
+								INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable, link_id)
+								SELECT v_psector, gully_id, v_arc_id, 1, false, link_id FROM gully WHERE arc_id = v_arc_id AND gully.state=1
+								ON CONFLICT DO NOTHING;
+								
 							END IF;
 
-							-- reconnect planned vnode links
-							FOR rec_link IN SELECT link.* FROM v_edit_connec JOIN link ON link.feature_id=connec_id 
-							WHERE link.feature_type='CONNEC' AND exit_type='VNODE' AND arc_id=v_arc_id
+							-- reconnect planned arc links
+							FOR rec_link IN SELECT link.* FROM v_edit_connec JOIN link ON link.feature_id=connec_id WHERE link.feature_type='CONNEC' AND exit_type='ARC' AND arc_id=v_arc_id
 							LOOP
 								SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id 
 								AND arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1; 
-								UPDATE plan_psector_x_connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
+								UPDATE plan_psector_x_connec SET arc_id = v_arc_closest, link_id = rec_link.link_id WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
 								v_arc_closest = null;
+								
 							END LOOP;
 
 							IF v_project_type ='UD' THEN
 							
-								FOR rec_link IN SELECT link.* FROM v_edit_gully JOIN link ON link.feature_id=gully_id 
-								WHERE link.feature_type='GULLY' AND exit_type='VNODE' AND arc_id=v_arc_id
+								FOR rec_link IN SELECT link.* FROM v_edit_gully JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND exit_type='ARC' AND arc_id=v_arc_id
 								LOOP
 									SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
-									UPDATE plan_psector_x_gully SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
+									UPDATE plan_psector_x_gully SET arc_id = v_arc_closest, link_id = rec_link.link_id WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
 									v_arc_closest = null;
+									
 								END LOOP;
 							END IF;						
 
 							-- reconnect planned node links
 							FOR rec_link IN SELECT * FROM v_edit_link WHERE exit_type = 'NODE' AND exit_id = (SELECT node_1 FROM arc WHERE arc_id = rec_aux1.arc_id)
 							LOOP
-								UPDATE plan_psector_x_connec SET arc_id = rec_aux1.arc_id WHERE connec_id = rec_link.feature_id;
+								UPDATE plan_psector_x_connec SET arc_id = rec_aux1.arc_id, link_id = rec_link.link_id WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
 								IF v_project_type ='UD' THEN
-									UPDATE plan_psector_x_gully SET arc_id = rec_aux1.arc_id WHERE gully_id = rec_link.feature_id;
+									UPDATE plan_psector_x_gully SET arc_id = rec_aux1.arc_id, link_id = rec_link.link_id WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
 								END IF;							
 							END LOOP;
 													
@@ -786,27 +805,22 @@ BEGIN
 								VALUES (212, 1, 'Update psector_x_arc as doable for fictitious arcs.');
 							END IF;	
 
-							DELETE FROM plan_psector_x_arc WHERE arc_id=v_arc_id AND psector_id=v_psector;
-
-							-- reconnect planned vnode links
-							FOR rec_link IN SELECT link.* FROM v_edit_connec JOIN link ON link.feature_id=connec_id 
-							WHERE link.feature_type='CONNEC' AND exit_type='VNODE' AND arc_id=v_arc_id
+							-- reconnect planned arc links
+							FOR rec_link IN SELECT link.* FROM v_edit_connec JOIN link ON link.feature_id=connec_id	WHERE link.feature_type='CONNEC' AND exit_type='ARC' AND arc_id=v_arc_id
 							LOOP
 								SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id 
 								AND arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1; 	
-								UPDATE plan_psector_x_connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
-								UPDATE connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
+								UPDATE plan_psector_x_connec SET arc_id = v_arc_closest, link_id = rec_link.link_id WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
 								v_arc_closest = null;
 							END LOOP;
 
 							IF v_project_type ='UD' THEN
 							
 								FOR rec_link IN SELECT link.* FROM v_edit_gully JOIN link ON link.feature_id=gully_id 
-								WHERE link.feature_type='GULLY' AND exit_type='VNODE' AND arc_id=v_arc_id
+								WHERE link.feature_type='GULLY' AND exit_type='ARC' AND arc_id=v_arc_id
 								LOOP
 									SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
-									UPDATE plan_psector_x_gully SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
-									UPDATE gully SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
+									UPDATE plan_psector_x_gully SET arc_id = v_arc_closest, link_id = rec_link.link_id WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
 									v_arc_closest = null;
 								END LOOP;
 							END IF;						
@@ -821,6 +835,8 @@ BEGIN
 									UPDATE plan_psector_x_gully SET arc_id = rec_aux1.arc_id WHERE gully_id = rec_link.feature_id;
 								END IF;							
 							END LOOP;
+
+							DELETE FROM plan_psector_x_arc WHERE arc_id=v_arc_id AND psector_id=v_psector;
 
 							SELECT count(*) INTO v_count FROM plan_psector_x_arc WHERE arc_id=v_arc_id;						
 
