@@ -77,3 +77,5 @@ INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, 
 VALUES (482, 'Check arcs with value of custom length', 'utils', NULL, 'core', true, 'Check epa-data', NULL);
 
 INSERT INTO sys_param_user ('plan_psector_downgrade_feature');
+
+UPDATE sys_function SET function_name = 'gw_fct_linkexitgenerator' WHERE id = 2994;
