@@ -39,7 +39,7 @@ INSERT INTO plan_psector_x_arc VALUES (7, '2065', 2, 0, false, NULL);
 INSERT INTO plan_psector_x_arc VALUES (8, '2085', 1, 0, false, NULL);
 INSERT INTO plan_psector_x_arc VALUES (9, '2086', 1, 0, false, NULL);
 
-INSERT INTO plan_psector_x_node VALUES (2, '1076', 1, 0, false, NULL);
+INSERT INTO plan_psector_x_node VALUES (1, '1076', 1, 0, false, NULL);
 
 
 SELECT gw_fct_setlinktonetwork($${
