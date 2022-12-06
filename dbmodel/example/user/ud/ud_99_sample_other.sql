@@ -523,3 +523,14 @@ SELECT gw_fct_admin_schema_lastprocess($${"client":{"lang":"ES"},
 
 UPDATE config_param_system SET value = '{"usePsectors":false, "ignoreGraphanalytics":false, "ignoreEpa":false, "ignorePlan":false}'
 WHERE parameter = 'admin_checkproject';
+
+DELETE FROM connec WHERE state = 2;
+DELETE FROM plan_psector_x_connec;
+
+DELETE FROM gully WHERE state = 2;
+DELETE FROM plan_psector_x_gully;
+
+
+
+
+
