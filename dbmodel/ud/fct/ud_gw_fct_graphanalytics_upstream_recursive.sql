@@ -74,9 +74,16 @@ BEGIN
 			END IF;
 
 			-- Call recursive function weighting with the pipe capacity
-			EXECUTE 'SELECT gw_fct_graphanalytics_upstream_recursive($${"client":{"device":4, "infoType":1, "lang":"ES"},
-			"feature":{"id":["'||rec_table.node_1||'"]},"data":{"parameters":{"node":"'||rec_table.node_1||'","geom1":'||rec_table.cat_geom1||'}},"fid":'||v_fid||'}$$);';
- 
+			IF rec_table.cat_geom1 IS NOT NULL THEN 
+
+				EXECUTE 'SELECT gw_fct_graphanalytics_upstream_recursive($${"client":{"device":4, "infoType":1, "lang":"ES"},
+				"feature":{"id":["'||rec_table.node_1||'"]},"data":{"parameters":{"node":"'||rec_table.node_1||'","geom1":'||rec_table.cat_geom1||'}},"fid":'||v_fid||'}$$);';
+			ELSE
+					EXECUTE 'SELECT gw_fct_graphanalytics_upstream_recursive($${"client":{"device":4, "infoType":1, "lang":"ES"},
+				"feature":{"id":["'||rec_table.node_1||'"]},"data":{"parameters":{"node":"'||rec_table.node_1||'"}},"fid":'||v_fid||'}$$);';
+	 
+			END IF;
+
 		END LOOP;
 
 	END IF;
