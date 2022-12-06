@@ -117,5 +117,5 @@ ALTER TABLE plan_psector_x_gully ADD CONSTRAINT plan_psector_x_gully_link_id_fke
 REFERENCES link (link_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"exit_elev", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
-
-
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"plan_psector_x_gully", "column":"link_geom", "newName":"_link_geom_" }}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"plan_psector_x_gully", "column":"userdefined_geom", "newName":"_userdefined_geom_"}}$$);

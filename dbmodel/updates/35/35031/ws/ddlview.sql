@@ -1185,3 +1185,7 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"quality_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"quality_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+
+create view  v_edit_plan_psector_x_connec  as
+SELECT distinct on (connec_id, psector_id) , rank(*) over (partition by connec_id order by state desc) FROM plan_psector_x_connec;
