@@ -44,6 +44,7 @@ v_system_id text;
 v_featurecat_id text;
 v_pol_id text;
 v_arc text;
+v_link integer;
 
 BEGIN
 
@@ -533,15 +534,21 @@ BEGIN
 		ELSIF NEW.state=2 THEN
 			-- for planned connects always must exits link defined because alternatives will use parameters and rows of that defined link adding only geometry defined on plan_psector
 
-			EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-			"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
+			-- Control of automatic insert of link and vnode
+			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_automatic_link'
+			AND cur_user=current_user LIMIT 1) IS TRUE THEN
 
-			-- for planned always must exits arc_id defined on default psector because it is impossible to draw a new planned link. Unique option for user is modify the existing automatic link
+				EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+				"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
+				
+			END IF;
+
+			-- inserting on psector
 			SELECT arc_id INTO v_arc_id FROM connec WHERE connec_id=NEW.connec_id;
 			v_psector_vdefault=(SELECT value::integer FROM config_param_user WHERE config_param_user.parameter::text = 'plan_psector_vdefault'::text AND 
 			config_param_user.cur_user::name = "current_user"());
-			INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, arc_id) 
-			VALUES (NEW.connec_id, v_psector_vdefault, 1, true, v_arc_id);
+			INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, arc_id, link_id) 
+			VALUES (NEW.connec_id, v_psector_vdefault, 1, true, v_arc_id, (SELECT link_id FROM link WHERE feature_id = NEW.connec_id));
 		
 		END IF;
 			
@@ -623,7 +630,7 @@ BEGIN
 				-- when arc_id comes from connec table
 				UPDATE connec SET arc_id=NEW.arc_id where connec_id=NEW.connec_id;
 				
-				-- if connec already has link (using vnode)
+				-- if connec already has link
 				IF (SELECT link_id FROM link WHERE feature_id=NEW.connec_id AND feature_type='CONNEC' AND exit_type ='VNODE' LIMIT 1) IS NOT NULL AND v_disable_linktonetwork IS NOT TRUE THEN
 
 					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
@@ -650,16 +657,36 @@ BEGIN
 
 		-- Looking for state control and insert planned connecs to default psector
 		IF (NEW.state != OLD.state) THEN   
+		
 			PERFORM gw_fct_state_control('CONNEC', NEW.connec_id, NEW.state, TG_OP);
+			
 			IF NEW.state = 2 AND OLD.state=1 THEN
-				INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable)
+
+				v_link = (SELECT link_id FROM link WHERE feature_id = NEW.connec_id AND state = 1 LIMIT 1);
+			
+				INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, link_id, arc_id)
 				VALUES (NEW.connec_id, (SELECT config_param_user.value::integer AS value FROM config_param_user WHERE config_param_user.parameter::text
-				= 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
+				= 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true,
+				v_link, NEW.arc_id);
+				
+				UPDATE link SET state = 2 WHERE link_id  = v_link;
 			END IF;
+			
 			IF NEW.state = 1 AND OLD.state=2 THEN
+
+				v_link = (SELECT link_id FROM link WHERE feature_id = NEW.connec_id AND state = 2 LIMIT 1);
+			
+				-- force delete
+				UPDATE config_param_user SET value = 'true' WHERE parameter = 'plan_psector_downgrade_feature' AND cur_user= current_user;
 				DELETE FROM plan_psector_x_connec WHERE connec_id=NEW.connec_id;
+				-- recover values
+				UPDATE config_param_user SET value = 'false' WHERE parameter = 'plan_psector_downgrade_feature' AND cur_user= current_user;
+
+				UPDATE link SET state = 1 WHERE link_id  = v_link;
+
 			END IF;
-			UPDATE connec SET state=NEW.state WHERE connec_id = OLD.connec_id;
+			
+			UPDATE connec SET state=NEW.state WHERE connec_id = NEW.connec_id;
 			
 		END IF;
 		
@@ -678,7 +705,6 @@ BEGIN
 
 			-- Automatic downgrade of associated link/vnode
 			UPDATE link SET state=0 WHERE feature_id=OLD.connec_id;
-			UPDATE vnode SET state=0 WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=OLD.connec_id LIMIT 1)::integer;
 
 			--check if there is any active hydrometer related to connec
 			IF (SELECT count(id) FROM rtc_hydrometer_x_connec rhc JOIN ext_rtc_hydrometer hc ON hc.id::text=hydrometer_id::text
@@ -816,12 +842,6 @@ BEGIN
 			-- delete link
 			DELETE FROM link WHERE link_id=v_record_link.link_id;
 
-			-- delete vnode if no more links are related to vnode
-			SELECT count(exit_id) INTO v_count FROM link WHERE exit_id=v_record_link.exit_id;
-						
-			IF v_count =0 THEN 
-				DELETE FROM vnode WHERE vnode_id=v_record_link.exit_id::integer;
-			END IF;
 		END LOOP;
 
 		--Delete addfields
