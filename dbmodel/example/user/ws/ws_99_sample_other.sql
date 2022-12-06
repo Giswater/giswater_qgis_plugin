@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = 'SCHEMA_NAME', public, pg_catalog;
+SET search_path = 'ws_t2', public, pg_catalog;
 
 
 UPDATE arc SET presszone_id = 0;
@@ -39,7 +39,7 @@ INSERT INTO plan_psector_x_arc VALUES (7, '2065', 2, 0, false, NULL);
 INSERT INTO plan_psector_x_arc VALUES (8, '2085', 1, 0, false, NULL);
 INSERT INTO plan_psector_x_arc VALUES (9, '2086', 1, 0, false, NULL);
 
-INSERT INTO plan_psector_x_node VALUES (1, '1076', 1, 0, false, NULL);
+INSERT INTO plan_psector_x_node VALUES (2, '1076', 1, 0, false, NULL);
 
 
 SELECT gw_fct_setlinktonetwork($${
@@ -532,11 +532,6 @@ UPDATE config_form_fields SET placeholder = 'Top floor of the building (ex: 3)' 
 UPDATE config_form_fields SET placeholder = 'Optional: Arc_id of related arc' where columnname = 'arc_id' AND formname like '%ve_node%';
 UPDATE config_form_fields SET placeholder = 'Optional: Node_id of the parent node' where columnname = 'parent_id' AND formname like '%ve_node%';
 
--- to clean trash must be executed 3 times
-SELECT gw_fct_setvnoderepair($${ "client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"parameters":{"tolerance":"0.01", "forceNodes":true}}}$$);
-SELECT gw_fct_setvnoderepair($${ "client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"parameters":{"tolerance":"0.01", "forceNodes":true}}}$$);
-SELECT gw_fct_setvnoderepair($${ "client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"parameters":{"tolerance":"0.01", "forceNodes":true}}}$$);
-
 INSERT INTO ext_node (fid, node_id, val, tstamp) VALUES (364,'1069',35.4,'2020-01-01 03:05:00');
 INSERT INTO ext_node (fid, node_id, val, tstamp) VALUES (364,'1069',34.4,'2020-01-01 03:10:00');
 INSERT INTO ext_node (fid, node_id, val, tstamp) VALUES (364,'1067',45.4,'2020-01-01 03:05:00');
@@ -603,7 +598,7 @@ UPDATE cat_mat_roughness SET roughness = 0.025 WHERE matcat_id IN ('FC');
 UPDATE inp_pump SET pump_type = 'PRESSPUMP' WHERE node_id = '113951';
 UPDATE inp_pump SET pump_type = 'FLOWPUMP' WHERE node_id = '1105';
 
-SELECT setval('SCHEMA_NAME.urn_id_seq', gw_fct_setvalurn(),true);
+SELECT setval('ws_t2.urn_id_seq', gw_fct_setvalurn(),true);
 
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'sectorFromExpl', false) WHERE parameter = 'basic_selector_tab_exploitation';
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'explFromSector', false) WHERE parameter = 'basic_selector_tab_sector';
@@ -634,7 +629,7 @@ UPDATE cat_arc SET connect_cost = 'N_WATER-CONNECT';
 
 UPDATE arc SET sector_id = 3 WHERE arc_id IN (SELECT arc_id FROM plan_psector_x_arc WHERE state = 1);
 
-SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${"client":{"lang":"ES"},
+SELECT ws_t2.gw_fct_admin_schema_lastprocess($${"client":{"lang":"ES"},
 "data":{"isNewProject":"FALSE", "projectType":"WS", "epsg":25831, "isSample":"TRUE"}}$$);
 
 

@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = "ws_sample", public, pg_catalog;
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 INSERT INTO link VALUES (1, '114257', 'CONNEC', '1', 'ARC', false, 1, 2, '0102000020E764000002000000F6748FD1C0891941F213E5BA6576514185DDDACCB78919417D9A179364765141', '2021-03-28 17:06:35.170994', NULL);
 INSERT INTO link VALUES (2, '114258', 'CONNEC', '2', 'ARC', false, 1, 2, '0102000020E7640000020000009CFC4E98438A1941F06229396676514114A40407468A1941E88BC9E864765141', '2021-03-28 17:06:35.170994', NULL);
