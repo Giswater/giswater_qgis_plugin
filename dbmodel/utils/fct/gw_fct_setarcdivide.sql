@@ -514,16 +514,12 @@ BEGIN
 
 						-- reconnect operative links
 						IF v_count_connec > 0  AND v_array_connec IS NOT NULL THEN
-
-							Raise exception 'ashh';
-						
 							EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{"id":'|| array_to_json(v_array_connec)||'},"data":{"feature_type":"CONNEC","forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
 
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
 							VALUES (212, 1, concat('Reconnect ',v_count_connec,' connecs with state 1.'));
 						END IF;
-						
 						IF v_count_gully > 0 AND v_array_gully IS NOT NULL THEN
 							EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{"id":'|| array_to_json(v_array_gully)||'},"data":{"feature_type":"GULLY","forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';

@@ -56,3 +56,10 @@ CREATE TRIGGER gw_trg_edit_inp_dscenario
   ON v_edit_inp_dscenario_virtualvalve
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('VIRTUALVALVE');
+
+
+CREATE TRIGGER gw_trg_edit_link
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_link
+  FOR EACH ROW 
+  EXECUTE PROCEDURE gw_trg_edit_link();

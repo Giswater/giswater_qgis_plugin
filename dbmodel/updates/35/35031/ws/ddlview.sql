@@ -801,6 +801,14 @@ CREATE OR REPLACE VIEW vu_connec AS
      LEFT JOIN connec_add e ON e.connec_id = connec.connec_id;
 
 
+create or replace view vu_link as 
+select link_id, l.feature_type, feature_id, exit_type, exit_id, l.state, l.expl_id, sector_id, dma_id, presszone_id::varchar(16), dqa_id, minsector_id, exit_topelev, exit_elev, fluid_type, st_length2d(l.the_geom) as gis_length, userdefined_geom, l.the_geom, s.name as sector_name, d.name as dma_name, q.name as dqa_name, p.name as presszone_name, macrosector_id, macrodma_id, macrodqa_id
+FROM link l
+LEFT JOIN sector s USING (sector_id)
+LEFT JOIN presszone p USING (presszone_id)
+LEFT JOIN dma d USING (dma_id)
+LEFT JOIN dqa q USING (dqa_id);
+
 
 CREATE OR REPLACE VIEW v_connec AS 
  SELECT vu_connec.connec_id,
@@ -891,7 +899,7 @@ CREATE OR REPLACE VIEW v_connec AS
     vu_connec.press_avg
    FROM vu_connec
      JOIN v_state_connec USING (connec_id)
-    LEFT JOIN (SELECT DISTINCT ON (feature_id) * FROM vu_link WHERE state = 2 AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) a ON feature_id = connec_id
+    LEFT JOIN (SELECT DISTINCT ON (feature_id) * FROM vu_link WHERE state = 2 AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) a ON feature_id = connec_id;
     
 
 CREATE OR REPLACE VIEW v_edit_connec AS 
@@ -952,85 +960,28 @@ CREATE OR REPLACE VIEW v_edit_review_arc AS
   WHERE selector_expl.cur_user = "current_user"()::text AND review_arc.expl_id = selector_expl.expl_id;
 
 
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_arc"], "fieldName":"flow_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_arc"], "fieldName":"flow_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_arc"], "fieldName":"flow_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_arc"], "fieldName":"vel_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_arc"], "fieldName":"vel_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_arc"], "fieldName":"vel_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "fieldName":"press_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "fieldName":"press_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "fieldName":"press_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"demand_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"demand_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"demand_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"press_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"press_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"press_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"head_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"head_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"head_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"quality_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"quality_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"quality_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-
 DROP VIEW v_arc_x_vnode;
 DROP VIEW v_vnode;
 DROP VIEW v_edit_link;
 
-create or replace view vu_link as 
-select link_id, l.feature_type, feature_id, exit_type, exit_id, l.state, l.expl_id, sector_id, dma_id, presszone_id::varchar(16), dqa_id, minsector_id, exit_topelev, exit_elev, fluid_type, st_length2d(l.the_geom) as gis_length, userdefined_geom, l.the_geom, s.name as sector_name, d.name as dma_name, q.name as dqa_name, p.name as presszone_name, macrosector_id, macrodma_id, macrodqa_id
-FROM link l
-LEFT JOIN sector s USING (sector_id)
-LEFT JOIN presszone p USING (presszone_id)
-LEFT JOIN dma d USING (dma_id)
-LEFT JOIN dqa q USING (dqa_id);
 
-
-CREATE OR REPLACE VIEW v_state_link AS 
+CREATE OR REPLACE VIEW v_state_link AS (
          SELECT link.link_id
            FROM selector_state,
             selector_expl,
             link
           WHERE link.state = selector_state.state_id AND link.expl_id = selector_expl.expl_id AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text
-        EXCEPT
+        EXCEPT ALL
          SELECT plan_psector_x_connec.link_id
            FROM selector_psector,
             selector_expl,
-            state
             plan_psector_x_connec
              JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
           WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 0 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text
- UNION
+) UNION ALL
  SELECT plan_psector_x_connec.link_id
    FROM selector_psector,
     selector_expl,
-    state
     plan_psector_x_connec
      JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
   WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 1 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text;
@@ -1044,15 +995,6 @@ JOIN v_state_link USING (link_id);
 CREATE OR REPLACE VIEW v_edit_link AS SELECT *
 FROM v_link l;
 
-
-CREATE TRIGGER gw_trg_edit_link
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON v_edit_link
-  FOR EACH ROW 
-  EXECUTE PROCEDURE gw_trg_edit_link();
-  
-  
-  
 CREATE OR REPLACE VIEW vi_pipes AS 
  SELECT temp_arc.arc_id,
     temp_arc.node_1,
@@ -1197,3 +1139,49 @@ CREATE OR REPLACE VIEW vi_pumps AS
   WHERE temp_arc.epa_type::text = 'PUMP'::text AND NOT (temp_arc.arc_id::text IN ( SELECT vi_valves.arc_id
            FROM vi_valves))
   ORDER BY temp_arc.arc_id;
+
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"flow_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"flow_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"flow_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"vel_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"vel_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"vel_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"press_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"press_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"press_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"demand_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"demand_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"demand_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"press_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"press_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"press_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"head_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"head_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"head_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"quality_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"quality_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"quality_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);

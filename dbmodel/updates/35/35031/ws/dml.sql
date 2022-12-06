@@ -188,3 +188,7 @@ DELETE FROM config_form_fields WHERE columnname='to_arc' AND formname ilike '%vi
 ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 UPDATE inp_typevalue SET typevalue = '_inp_options_networkmode' where typevalue = 'inp_options_networkmode' and id ='3';
 ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+
+
+DELETE FROM sys_table WHERE id = 'v_arc_x_vnode';
+DELETE FROM sys_table WHERE id = 'v_vnode';

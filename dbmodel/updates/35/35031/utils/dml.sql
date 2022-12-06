@@ -76,6 +76,8 @@ where parameter ='epa_outlayer_values';
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
 VALUES (482, 'Check arcs with value of custom length', 'utils', NULL, 'core', true, 'Check epa-data', NULL);
 
-INSERT INTO sys_param_user ('plan_psector_downgrade_feature');
-
 UPDATE sys_function SET function_name = 'gw_fct_linkexitgenerator' WHERE id = 2994;
+
+DELETE FROM sys_table WHERE id = 'vnode';
+
+
