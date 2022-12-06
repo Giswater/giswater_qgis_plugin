@@ -67,6 +67,6 @@ CREATE TRIGGER gw_trg_edit_link
 
 CREATE TRIGGER gw_trg_edit_plan_psector_connec
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON ud_t4.v_edit_plan_psector_x_connec
+  ON v_edit_plan_psector_x_connec
   FOR EACH ROW
-  EXECUTE PROCEDURE ud_t4.gw_trg_edit_plan_psector_x_connect('plan_psector_x_connec');
+  EXECUTE PROCEDURE gw_trg_edit_plan_psector_x_connect('plan_psector_x_connec');
