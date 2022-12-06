@@ -51,6 +51,8 @@ INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descrip
 INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (6, '92', 1, 0, false, NULL);
 INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (5, '91', 1, 0, false, NULL);
 
+SELECT setval('SCHEMA_NAME.link_link_id_seq', (SELECT max(link_id) FROM link), true);
+
 INSERT INTO plan_psector_x_connec VALUES (1, '3174', '20603', 1, 1, false, NULL, '0102000020E76400000200000071E182D2E8941941ADDF47B1067551415778FF7BBC941941539C918B04755141', false);
 INSERT INTO plan_psector_x_connec VALUES (2, '3175', '20604', 1, 1, false, NULL, '0102000020E764000002000000046B75D5FE9419414AF99C8FFB74514187BF4D741C951941E2C4E01EFD745141', false);
 INSERT INTO plan_psector_x_connec VALUES (3, '3181', '20605', 1, 1, false, NULL, '0102000020E76400000200000030544DCF389619412E91C1AEF4745141B04AF06CF5951941E505873AFD745141', false);
@@ -416,10 +418,6 @@ system_id = 'NETGULLY' AND formname = child_layer and columnname = 'gratecat_id'
 --placeholder
 UPDATE config_form_fields SET placeholder = 'Only when state is obsolete' where columnname = 'workcat_id_end';
 UPDATE config_form_fields SET placeholder = 'Catalog of the private part of connection' where columnname = 'private_connecat_id' AND formname like '%ve_connec%';
-
--- to clean trash must be executed 2 times
-SELECT gw_fct_setvnoderepair($${ "client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"parameters":{"tolerance":"0.01", "forceNodes":true}}}$$);
-SELECT gw_fct_setvnoderepair($${ "client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"parameters":{"tolerance":"0.01", "forceNodes":true}}}$$);
 
 DELETE FROM config_info_layer_x_type where tableinfo_id = 'v_edit_om_visit';
 
