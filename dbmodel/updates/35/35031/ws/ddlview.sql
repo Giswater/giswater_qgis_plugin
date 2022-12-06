@@ -1188,4 +1188,4 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 
 
 create view  v_edit_plan_psector_x_connec  as
-SELECT distinct on (connec_id, psector_id) , rank(*) over (partition by connec_id order by state desc) FROM plan_psector_x_connec;
+SELECT distinct on (connec_id, psector_id) *, rank(*) over (partition by connec_id order by state desc) FROM plan_psector_x_connec;

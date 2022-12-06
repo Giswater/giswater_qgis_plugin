@@ -530,6 +530,8 @@ DELETE FROM plan_psector_x_connec;
 DELETE FROM gully WHERE state = 2;
 DELETE FROM plan_psector_x_gully;
 
+UPDATE connec SET pjoint_id = arc_id WHERE pjoint_type = 'ARC';
+UPDATE gully SET pjoint_id = arc_id WHERE pjoint_type = 'ARC';
 
 
 

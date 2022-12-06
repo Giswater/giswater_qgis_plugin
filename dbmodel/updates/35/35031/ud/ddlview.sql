@@ -1697,7 +1697,7 @@ UNION
   WHERE v_gully.arc_id IS NOT NULL;
   
 create view  v_edit_plan_psector_x_connec  as
-SELECT distinct on (connec_id, psector_id) , rank(*) over (partition by connec_id order by state desc) FROM plan_psector_x_connec;
+SELECT distinct on (connec_id, psector_id) *, rank(*) over (partition by connec_id order by state desc) FROM plan_psector_x_connec;
 
 create view  v_edit_plan_psector_x_gully  as
 SELECT distinct on (gully_id, psector_id) *, rank() over (partition by gully_id order by state desc) FROM plan_psector_x_gully;

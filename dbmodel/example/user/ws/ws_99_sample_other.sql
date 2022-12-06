@@ -702,3 +702,5 @@ UPDATE ext_cat_period SET code  = concat(upper(code),'-2015');
 
 UPDATE ext_rtc_dma_period set avg_press = 30;
 UPDATE dma set avg_press = 30;
+
+UPDATE connec SET pjoint_id = arc_id WHERE pjoint_type = 'ARC';
