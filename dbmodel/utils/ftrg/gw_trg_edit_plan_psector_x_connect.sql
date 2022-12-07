@@ -21,6 +21,7 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 
 		IF v_table = 'plan_psector_x_connec' THEN
+
 			INSERT INTO plan_psector_x_connec (connec_id,  psector_id, state, doable, descript) 
 			VALUES (NEW.connec_id,  NEW.psector_id, NEW.state, NEW.doable, NEW.descript); 
 
@@ -28,6 +29,7 @@ BEGIN
 
 			INSERT INTO plan_psector_x_gully (gully_id,  psector_id, state, doable, descript) 
 			VALUES (NEW.gully_id,  NEW.psector_id, NEW.state, NEW.doable, NEW.descript); 
+
 		END IF;
 
 		RETURN NEW;
