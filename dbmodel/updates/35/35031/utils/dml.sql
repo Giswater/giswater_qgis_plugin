@@ -76,4 +76,11 @@ UPDATE sys_function SET function_name = 'gw_fct_linkexitgenerator' WHERE id = 29
 
 DELETE FROM sys_table WHERE id = 'vnode';
 
+UPDATE plan_psector_x_arc pa SET active = p.active FROM plan_psector p WHERE p.psector_id=pa.psector_id;
+UPDATE plan_psector_x_node pn SET active = p.active FROM plan_psector p WHERE p.psector_id=pn.psector_id;
+UPDATE plan_psector_x_connec pc SET active = p.active FROM plan_psector p WHERE p.psector_id=pc.psector_id;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
+VALUES (3182, 'gw_trg_plan_psector', 'utils', 'trigger function', 
+'Trigger to update active value on plan_psector_x_* tables using plan_psector active value', 'role_master', 'core');
 

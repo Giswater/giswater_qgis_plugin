@@ -72,3 +72,7 @@ REFERENCES link (link_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE plan_psector_x_connec DROP CONSTRAINT plan_psector_x_connec_unique;
 ALTER TABLE plan_psector_x_connec ADD CONSTRAINT plan_psector_x_connec_unique UNIQUE(connec_id, psector_id, state);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_arc", "column":"active", "dataType":"boolean"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_node", "column":"active", "dataType":"boolean"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_connec", "column":"active", "dataType":"boolean"}}$$);
