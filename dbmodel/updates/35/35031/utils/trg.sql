@@ -14,4 +14,4 @@ CREATE TRIGGER gw_trg_plan_psector
 AFTER INSERT OR UPDATE OF active 
 ON plan_psector 
 FOR EACH ROW 
-EXECUTE FUNCTION gw_trg_plan_psector();
+EXECUTE PROCEDURE gw_trg_plan_psector();

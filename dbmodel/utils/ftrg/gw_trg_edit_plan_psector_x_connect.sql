@@ -44,7 +44,7 @@ BEGIN
 			IF (SELECT state FROM connec WHERE connec_id = NEW.connec_id) = 1 THEN
 
 				IF NEW.state = 0 AND OLD.state = 1 THEN
-					DELETE plan_psector_x_connec FROM plan_psector_x_connec 
+					DELETE FROM plan_psector_x_connec 
 					WHERE psector_id = NEW.psector_id AND connec_id = NEW.connec_id AND state = 1;
 
 				ELSIF NEW.state = 1 AND OLD.state = 0 THEN
