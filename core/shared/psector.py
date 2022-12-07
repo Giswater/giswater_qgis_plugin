@@ -2064,7 +2064,7 @@ class GwPsector:
 
         for row in selected_rows:
 		
-		    """	
+            """	
             sql = (f"UPDATE plan_psector_x_connec SET arc_id = "
 			      f"'{self.arc_id}' WHERE id = '{row.id}'")
             
@@ -2073,7 +2073,7 @@ class GwPsector:
     
 			tools_db.execute_sql(sql)
 			
-			"""
+            """
         
         # Force a map refresh
         tools_qgis.force_refresh_map_canvas()
