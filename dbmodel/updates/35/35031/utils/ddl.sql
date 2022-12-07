@@ -76,3 +76,7 @@ ALTER TABLE plan_psector_x_connec ADD CONSTRAINT plan_psector_x_connec_unique UN
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_arc", "column":"active", "dataType":"boolean"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_node", "column":"active", "dataType":"boolean"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_connec", "column":"active", "dataType":"boolean"}}$$);
+
+ALTER TABLE plan_psector_x_arc ALTER COLUMN active SET DEFAULT TRUE;
+ALTER TABLE plan_psector_x_node ALTER COLUMN active SET DEFAULT TRUE;
+ALTER TABLE plan_psector_x_connec ALTER COLUMN active SET DEFAULT TRUE;

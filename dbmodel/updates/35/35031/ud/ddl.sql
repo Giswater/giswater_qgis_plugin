@@ -121,3 +121,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"plan_pse
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"plan_psector_x_gully", "column":"userdefined_geom", "newName":"_userdefined_geom_"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_gully", "column":"active", "dataType":"boolean"}}$$);
+ALTER TABLE plan_psector_x_gully ALTER COLUMN active SET DEFAULT TRUE;
+
