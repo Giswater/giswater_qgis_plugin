@@ -157,7 +157,7 @@
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer legend_exp="" legend_split_behavior="0" id="v_edit_link_bf3255de_b7b9_47f1_b2d1_2275d23b83d7" providerKey="postgres" source=" __DATASOURCE__ sslmode=__SSLMODE__ key='link_id,psector_rowid' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_link&quot; (the_geom)" expanded="1" patch_size="-1,-1" name="Link" checked="Qt::Checked">
+        <layer-tree-layer legend_exp="" legend_split_behavior="0" id="v_edit_link_bf3255de_b7b9_47f1_b2d1_2275d23b83d7" providerKey="postgres" source=" __DATASOURCE__ sslmode=__SSLMODE__ key='link_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_link&quot; (the_geom)" expanded="1" patch_size="-1,-1" name="Link" checked="Qt::Checked">
           <customproperties>
             <Option/>
           </customproperties>
@@ -13086,7 +13086,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_link_bf3255de_b7b9_47f1_b2d1_2275d23b83d7</id>
-      <datasource> __DATASOURCE__ sslmode=__SSLMODE__ key='link_id,psector_rowid' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_link" (the_geom)</datasource>
+      <datasource> __DATASOURCE__ sslmode=__SSLMODE__ key='link_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_link" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
