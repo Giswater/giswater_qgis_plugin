@@ -448,6 +448,8 @@ CREATE OR REPLACE VIEW vu_arc AS
     arc.workcat_id_plan,
     arc.asset_id,
     arc.pavcat_id,
+    arc.om_state,
+    arc.conserv_state,
     e.flow_max, 
     e.flow_min, 
     e.flow_avg, 
@@ -562,6 +564,10 @@ CREATE OR REPLACE VIEW vu_node AS
     presszone.stylesheet ->> 'featureColor'::text AS presszone_style,
     node.workcat_id_plan,
     node.asset_id,
+    node.om_state,
+    node.conserv_state,
+    node.access_type,
+    node.placement_type,
     e.demand_max, 
     e.demand_min, 
     e.demand_avg, 
@@ -675,6 +681,10 @@ CREATE OR REPLACE VIEW v_edit_node AS
     man_valve.broken AS broken_valve,
     v_node.workcat_id_plan,
     v_node.asset_id,
+    v_node.om_state,
+    v_node.conserv_state,
+    v_node.access_type,
+    v_node.placement_type,
     v_node.demand_max, 
     v_node.demand_min, 
     v_node.demand_avg, 
@@ -778,9 +788,18 @@ CREATE OR REPLACE VIEW vu_connec AS
     connec.workcat_id_plan,
     connec.asset_id,
     connec.epa_type,
+    connec.om_state,
+    connec.conserv_state,
+    connec.priority,
+    connec.valve_location,
+    connec.valve_type,
+    connec.shutoff_valve,
+    connec.access_type,
+    connec.placement_type,
     e.press_max, 
     e.press_min, 
-    e.press_avg
+    e.press_avg,
+    e.demand
    FROM connec
      LEFT JOIN ( SELECT connec_1.connec_id,
             count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
@@ -955,9 +974,18 @@ CREATE OR REPLACE VIEW v_connec AS
     vu_connec.dma_style,
     vu_connec.presszone_style,
     vu_connec.epa_type,
+    vu_connec.priority,
+    vu_connec.valve_location,
+    vu_connec.valve_type,
+    vu_connec.shutoff_valve,
+    vu_connec.access_type,
+    vu_connec.placement_type,
     vu_connec.press_max,
     vu_connec.press_min,
-    vu_connec.press_avg
+    vu_connec.press_avg,
+    vu_connec.om_state,
+    vu_connec.conserv_state,
+    vu_connec.demand
    FROM vu_connec
      JOIN v_state_connec USING (connec_id)
     LEFT JOIN (SELECT DISTINCT ON (feature_id) * FROM v_link_connec WHERE state = 2) a ON feature_id = connec_id;
@@ -1174,6 +1202,10 @@ CREATE OR REPLACE VIEW vi_pumps AS
            FROM vi_valves))
   ORDER BY temp_arc.arc_id;
 
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"om_state", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"conserv_state", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_arc"], "fieldName":"flow_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
@@ -1189,11 +1221,32 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_arc"], "fieldName":"vel_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"om_state", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"conserv_state", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_connec"], "fieldName":"press_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_connec"], "fieldName":"press_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_connec"], "fieldName":"press_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"demand", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"valve_type", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"wjoin_type", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"greentap_type", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"cat_valve", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"om_state", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"conserv_state", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"demand_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
@@ -1219,6 +1272,11 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"quality_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"quality_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"hydrant_type", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+
 
 
 create view  v_edit_plan_psector_x_connec  as

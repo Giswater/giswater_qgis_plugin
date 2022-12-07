@@ -58,7 +58,8 @@ CREATE TABLE connec_add
 (connec_id character varying(16) NOT NULl PRIMARY KEY, 
 press_max numeric(12,2), 
 press_min numeric(12,2),
-press_avg numeric(12,2));
+press_avg numeric(12,2),
+demand numeric(12,2));
 
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_virtualvalve", "column":"to_arc", "newName":"_to_arc_"}}$$);
@@ -75,3 +76,26 @@ ALTER TABLE connec DROP CONSTRAINT connec_pjoint_type_ckeck;
 UPDATE connec SET pjoint_id = arc_id, pjoint_type = 'ARC' WHERE  pjoint_type = 'VNODE';
 UPDATE link SET exit_id = arc_id, exit_type = 'ARC' FROM connec WHERE feature_id = connec_id and exit_type = 'VNODE';
 ALTER TABLE connec ADD CONSTRAINT connec_pjoint_type_ckeck CHECK (pjoint_type::text = ANY  (ARRAY['NODE', 'ARC', 'CONNEC']));
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_valve", "column":"valve_type", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_wjoin", "column":"wjoin_type", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_greentap", "column":"greentap_type", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_greentap", "column":"cat_valve", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_hydrant", "column":"hydrant_type", "dataType":"text", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"om_state", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"conserv_state", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"om_state", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"conserv_state", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"om_state", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"conserv_state", "dataType":"text", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"priority", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"valve_location", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"valve_type", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"shutoff_valve", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"access_type", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"placement_type", "dataType":"text", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"access_type", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"placement_type", "dataType":"text", "isUtils":"False"}}$$);

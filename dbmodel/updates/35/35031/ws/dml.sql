@@ -93,10 +93,16 @@ t3 AS
 (SELECT distinct formname, formtype, tabname, 'press_avg', 'lyt_data_1', max(layoutorder)+3, 
             'numeric', 'text', 'press_avg', 'press_avg',  false, false, false, false, false
 FROM config_form_fields
+WHERE  formname ilike 've_connec%' group by formname,formtype, tabname),
+t4 AS
+(SELECT distinct formname, formtype, tabname, 'press_avg', 'lyt_data_1', max(layoutorder)+3, 
+            'numeric', 'text', 'demand', 'demand',  false, false, false, false, false
+FROM config_form_fields
 WHERE  formname ilike 've_connec%' group by formname,formtype, tabname)
 select * from t1
   union select * from t2
-  union select * from t3  order by formname, layoutorder ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+  union select * from t3 
+  union select * from t4 order by formname, layoutorder ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 
 
