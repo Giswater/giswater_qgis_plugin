@@ -47,8 +47,8 @@ class GwPsector:
         self.my_json = {}
         self.tablename_psector_x_arc = "plan_psector_x_arc"
         self.tablename_psector_x_node = "plan_psector_x_node"
-        self.tablename_psector_x_connec = "plan_psector_x_connec"
-        self.tablename_psector_x_gully = "plan_psector_x_gully"
+        self.tablename_psector_x_connec = "v_edit_plan_psector_x_connec"
+        self.tablename_psector_x_gully = "v_edit_plan_psector_x_gully"
 
 
     def get_psector(self, psector_id=None, list_coord=None):
@@ -2063,9 +2063,18 @@ class GwPsector:
         if self.arc_id is None: return
 
         for row in selected_rows:
-            cell = row.siblingAtColumn(tools_qt.get_col_index_by_col_name(selected_qtbl, 'arc_id'))
-            selected_qtbl.model().setData(cell, self.arc_id)
-
+		
+		    """	
+            sql = (f"UPDATE plan_psector_x_connec SET arc_id = "
+			      f"'{self.arc_id}' WHERE id = '{row.id}'")
+            
+			sql = (f"UPDATE plan_psector_x_connec SET arc_id = "
+			      f"'{self.arc_id}' WHERE id = '{row.id}'")
+    
+			tools_db.execute_sql(sql)
+			
+			"""
+        
         # Force a map refresh
         tools_qgis.force_refresh_map_canvas()
 
