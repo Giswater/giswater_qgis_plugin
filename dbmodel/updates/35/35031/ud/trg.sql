@@ -71,6 +71,20 @@ CREATE TRIGGER gw_trg_vi_timeseries
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_vi('vi_timeseries');
 
+
+CREATE TRIGGER gw_trg_edit_link
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_link_connec
+  FOR EACH ROW 
+  EXECUTE PROCEDURE gw_trg_edit_link();
+  
+ 
+ CREATE TRIGGER gw_trg_edit_link
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_link_gully
+  FOR EACH ROW 
+  EXECUTE PROCEDURE gw_trg_edit_link();
+
   
 CREATE TRIGGER gw_trg_edit_link
   INSTEAD OF INSERT OR UPDATE OR DELETE

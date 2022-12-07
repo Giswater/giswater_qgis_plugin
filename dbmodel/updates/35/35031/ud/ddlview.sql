@@ -1447,10 +1447,114 @@ ORDER BY id;
 
 
 create or replace view vu_link as 
-select link_id, l.feature_type, feature_id, exit_type, exit_id, l.state, l.expl_id, sector_id, dma_id, exit_topelev, exit_elev, fluid_type, st_length2d(l.the_geom) as gis_length, userdefined_geom, l.the_geom, s.name as sector_name, macrosector_id, macrodma_id
+select link_id, l.feature_type, feature_id, exit_type, exit_id, l.state, l.expl_id, sector_id, 
+dma_id, exit_topelev, exit_elev, fluid_type, st_length2d(l.the_geom) as gis_length, userdefined_geom, l.the_geom, 
+s.name as sector_name, macrosector_id, macrodma_id
 FROM link l
 LEFT JOIN sector s USING (sector_id)
 LEFT JOIN dma d USING (dma_id);
+
+
+create or replace view vu_link_connec as 
+select link_id, l.feature_type, feature_id, exit_type, exit_id, l.state, l.expl_id, sector_id, 
+dma_id, exit_topelev, exit_elev, fluid_type, st_length2d(l.the_geom) as gis_length, userdefined_geom, l.the_geom, 
+s.name as sector_name, macrosector_id, macrodma_id
+FROM link l
+LEFT JOIN sector s USING (sector_id)
+LEFT JOIN dma d USING (dma_id)
+WHERE feature_type = 'CONNEC';
+
+create or replace view vu_link_gully as 
+select link_id, l.feature_type, feature_id, exit_type, exit_id, l.state, l.expl_id, sector_id, 
+dma_id, exit_topelev, exit_elev, fluid_type, st_length2d(l.the_geom) as gis_length, userdefined_geom, l.the_geom, 
+s.name as sector_name, macrosector_id, macrodma_id
+FROM link l
+LEFT JOIN sector s USING (sector_id)
+LEFT JOIN dma d USING (dma_id)
+WHERE feature_type = 'GULLY';
+
+
+
+CREATE OR REPLACE VIEW v_state_link_connec AS
+SELECT link.link_id FROM selector_state,selector_expl, link
+WHERE link.state = selector_state.state_id AND link.expl_id = selector_expl.expl_id AND selector_state.cur_user = "current_user"()::text 
+AND selector_expl.cur_user = "current_user"()::text AND feature_type = 'CONNEC'
+
+EXCEPT ALL
+
+SELECT plan_psector_x_connec.link_id FROM selector_psector,selector_expl, plan_psector_x_connec JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
+WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 0
+AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text
+
+UNION ALL
+
+SELECT plan_psector_x_connec.link_id FROM selector_psector, selector_expl, plan_psector_x_connec  JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
+WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 1 
+AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text;
+
+
+
+
+
+CREATE OR REPLACE VIEW v_state_link_gully AS
+SELECT link.link_id FROM selector_state,selector_expl, link
+WHERE link.state = selector_state.state_id AND link.expl_id = selector_expl.expl_id AND selector_state.cur_user = "current_user"()::text 
+AND selector_expl.cur_user = "current_user"()::text AND feature_type = 'GULLY'
+
+EXCEPT ALL
+
+SELECT plan_psector_x_gully.link_id FROM selector_psector,selector_expl, plan_psector_x_gully JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_gully.psector_id
+WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_gully.state = 0 
+AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text
+
+UNION ALL
+
+SELECT plan_psector_x_gully.link_id FROM selector_psector, selector_expl, plan_psector_x_gully  JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_gully.psector_id
+WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_gully.state = 1 
+AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text;
+
+
+
+
+
+CREATE OR REPLACE VIEW v_state_link AS
+SELECT link.link_id FROM selector_state,selector_expl, link
+WHERE link.state = selector_state.state_id AND link.expl_id = selector_expl.expl_id AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text
+
+EXCEPT ALL
+
+(SELECT plan_psector_x_connec.link_id FROM selector_psector,selector_expl, plan_psector_x_connec JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
+WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 0 
+AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text
+UNION ALL
+SELECT plan_psector_x_gully.link_id FROM selector_psector,selector_expl, plan_psector_x_gully JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_gully.psector_id
+WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_gully.state = 0 
+AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text)
+
+UNION ALL
+
+(SELECT plan_psector_x_connec.link_id FROM selector_psector, selector_expl, plan_psector_x_connec  JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
+WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 1 
+AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text
+UNION ALL
+SELECT plan_psector_x_gully.link_id FROM selector_psector, selector_expl, plan_psector_x_gully  JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_gully.psector_id
+WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_gully.state = 1 
+AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text);
+
+
+
+create or replace view v_link_connec as 
+select * from vu_link_connec
+JOIN v_state_link_connec USING (link_id);
+
+create or replace view v_link_gully as 
+select * from vu_link_gully
+JOIN v_state_link_gully USING (link_id);
+
+
+create or replace view v_link as 
+select * from vu_link
+JOIN v_state_link USING (link_id);
 
 
 
@@ -1529,7 +1633,7 @@ CREATE OR REPLACE VIEW v_connec AS
     vu_connec.drainzone_id
    FROM vu_connec
      JOIN v_state_connec USING (connec_id)
-     LEFT JOIN (SELECT DISTINCT ON (feature_id) * FROM vu_link WHERE state = 2 AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) a ON feature_id = connec_id;
+     LEFT JOIN (SELECT DISTINCT ON (feature_id) * FROM v_link_connec) a ON feature_id = connec_id;
 
 
 CREATE OR REPLACE VIEW v_gully AS 
@@ -1617,7 +1721,7 @@ CREATE OR REPLACE VIEW v_gully AS
     vu_gully.drainzone_id
    FROM vu_gully
      JOIN v_state_gully USING (gully_id)
-     LEFT JOIN (SELECT DISTINCT ON (feature_id) * FROM vu_link WHERE state = 2 AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) a ON feature_id = gully_id;
+     LEFT JOIN (SELECT DISTINCT ON (feature_id) * FROM v_link_gully) a ON feature_id = gully_id;
 
 
 DROP VIEW v_arc_x_vnode;
@@ -1628,32 +1732,11 @@ DROP VIEW v_ui_arc_x_relations;
 DROP VIEW v_edit_link;
 
 
-CREATE OR REPLACE VIEW v_state_link AS
-SELECT link.link_id FROM selector_state,selector_expl, link
-WHERE link.state = selector_state.state_id AND link.expl_id = selector_expl.expl_id AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text
+CREATE OR REPLACE VIEW v_edit_link_connec AS SELECT *
+FROM v_link_connec l;
 
-EXCEPT ALL
-
-(SELECT plan_psector_x_connec.link_id FROM selector_psector,selector_expl, plan_psector_x_connec JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
-WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 0 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text
-UNION ALL
-SELECT plan_psector_x_gully.link_id FROM selector_psector,selector_expl, plan_psector_x_gully JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_gully.psector_id
-WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_gully.state = 0 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text)
-
-UNION ALL
-
-(SELECT plan_psector_x_connec.link_id FROM selector_psector, selector_expl, plan_psector_x_connec  JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
-WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 1 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text
-UNION ALL
-SELECT plan_psector_x_gully.link_id FROM selector_psector, selector_expl, plan_psector_x_gully  JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_gully.psector_id
-WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_gully.state = 1 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text);
-
-
-
-create or replace view v_link as 
-select * from vu_link
-JOIN v_state_link USING (link_id);
-
+CREATE OR REPLACE VIEW v_edit_link_gully AS SELECT *
+FROM v_link_gully l;
 
 CREATE OR REPLACE VIEW v_edit_link AS SELECT *
 FROM v_link l;
