@@ -45,6 +45,10 @@ class GwPsector:
         self.vertex_marker = None
         self.dict_to_update = {}
         self.my_json = {}
+        self.tablename_psector_x_arc = "plan_psector_x_arc"
+        self.tablename_psector_x_node = "plan_psector_x_node"
+        self.tablename_psector_x_connec = "plan_psector_x_connec"
+        self.tablename_psector_x_gully = "plan_psector_x_gully"
 
 
     def get_psector(self, psector_id=None, list_coord=None):
@@ -208,19 +212,27 @@ class GwPsector:
             self.set_tabs_enabled(True)
             self.enable_buttons(True)
             self.dlg_plan_psector.name.setEnabled(True)
-            self.fill_table(self.dlg_plan_psector, self.qtbl_arc, "plan_psector_x_arc",
+            # tbl_psector_x_arc
+            self.fill_table(self.dlg_plan_psector, self.qtbl_arc, self.tablename_psector_x_arc,
                             set_edit_triggers=QTableView.DoubleClicked)
-            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_arc, "plan_psector_x_arc")
-            self.fill_table(self.dlg_plan_psector, self.qtbl_node, "plan_psector_x_node",
+            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_arc, self.tablename_psector_x_arc)
+            self.qtbl_arc.setProperty('tablename', self.tablename_psector_x_arc)
+            # tbl_psector_x_node
+            self.fill_table(self.dlg_plan_psector, self.qtbl_node, self.tablename_psector_x_node,
                             set_edit_triggers=QTableView.DoubleClicked)
-            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_node, "plan_psector_x_node")
-            self.fill_table(self.dlg_plan_psector, self.qtbl_connec, "v_edit_plan_psector_x_connec",
+            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_node, self.tablename_psector_x_node)
+            self.qtbl_node.setProperty('tablename', self.tablename_psector_x_node)
+            # tbl_psector_x_connec
+            self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec,
                             set_edit_triggers=QTableView.DoubleClicked)
-            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_connec, "v_edit_plan_psector_x_connec")
+            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec)
+            self.qtbl_connec.setProperty('tablename', self.tablename_psector_x_connec)
+            # tbl_psector_x_gully
             if self.project_type.upper() == 'UD':
-                self.fill_table(self.dlg_plan_psector, self.qtbl_gully, "v_edit_plan_psector_x_gully",
+                self.fill_table(self.dlg_plan_psector, self.qtbl_gully, self.tablename_psector_x_gully,
                                 set_edit_triggers=QTableView.DoubleClicked)
-                tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_gully, "v_edit_plan_psector_x_gully")
+                tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_gully, self.tablename_psector_x_gully)
+                self.qtbl_gully.setProperty('tablename', self.tablename_psector_x_gully)
             sql = (f"SELECT psector_id, name, psector_type, expl_id, priority, descript, text1, text2, "
                    f"text3, text4, text5, text6, num_value, observ, atlas_id, scale, rotation, active, ext_code, status, workcat_id, parent_id"
                    f" FROM plan_psector "
@@ -1926,12 +1938,12 @@ class GwPsector:
         tools_gw.load_tableview_psector(self.dlg_plan_psector, 'connec')
         if self.project_type.upper() == 'UD':
             tools_gw.load_tableview_psector(self.dlg_plan_psector, 'gully')
-        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_arc", 'plan_psector_x_arc',
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_arc", self.tablename_psector_x_arc,
                                        isQStandardItemModel=True)
-        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_connec", 'v_edit_plan_psector_x_connec',
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_connec", self.tablename_psector_x_connec,
                                        isQStandardItemModel=True)
         if self.project_type.upper() == 'UD':
-            tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_gully", 'v_edit_plan_psector_x_gully',
+            tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_gully", self.tablename_psector_x_gully,
                                            isQStandardItemModel=True)
 
 

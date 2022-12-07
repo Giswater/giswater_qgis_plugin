@@ -2845,10 +2845,11 @@ def load_tableview_psector(dialog, feature_type):
     value = tools_qt.get_text(dialog, dialog.psector_id)
     expr = f"psector_id = '{value}'"
     qtable = tools_qt.get_widget(dialog, f'tbl_psector_x_{feature_type}')
-    message = tools_qt.fill_table(qtable, f"plan_psector_x_{feature_type}", expr, QSqlTableModel.OnFieldChange)
+    tablename = qtable.property('tablename')
+    message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.OnFieldChange)
     if message:
         tools_qgis.show_warning(message)
-    set_tablemodel_config(dialog, qtable, f"plan_psector_x_{feature_type}")
+    set_tablemodel_config(dialog, qtable, f"{tablename}")
     tools_qgis.refresh_map_canvas()
 
 
@@ -3544,9 +3545,11 @@ def unset_giswater_menu():
 def _insert_feature_psector(dialog, feature_type, ids=None):
     """ Insert features_id to table plan_@feature_type_x_psector """
 
+    widget = tools_qt.get_widget(dialog, f"tbl_psector_x_{feature_type}")
+    tablename = widget.property('tablename')
     value = tools_qt.get_text(dialog, dialog.psector_id)
     for i in range(len(ids)):
-        sql = f"INSERT INTO plan_psector_x_{feature_type} ({feature_type}_id, psector_id) "
+        sql = f"INSERT INTO {tablename} ({feature_type}_id, psector_id) "
         sql += f"VALUES('{ids[i]}', '{value}') ON CONFLICT DO NOTHING;"
         tools_db.execute_sql(sql)
         load_tableview_psector(dialog, feature_type)
@@ -3555,8 +3558,10 @@ def _insert_feature_psector(dialog, feature_type, ids=None):
 def _delete_feature_psector(dialog, feature_type, list_id):
     """ Delete features_id to table plan_@feature_type_x_psector"""
 
+    widget = tools_qt.get_widget(dialog, f"tbl_psector_x_{feature_type}")
+    tablename = widget.property('tablename')
     value = tools_qt.get_text(dialog, dialog.psector_id)
-    sql = (f"DELETE FROM plan_psector_x_{feature_type} "
+    sql = (f"DELETE FROM {tablename} "
            f"WHERE {feature_type}_id IN ({list_id}) AND psector_id = '{value}'")
     tools_db.execute_sql(sql)
 
