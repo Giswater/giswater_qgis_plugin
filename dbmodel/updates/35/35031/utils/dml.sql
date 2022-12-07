@@ -60,15 +60,11 @@ UPDATE config_param_system SET "parameter"='plan_psector_status_action', "label"
 
 UPDATE config_param_system SET value=replace(value,'plan_obsolete_state_type', 'obsolete_planified') WHERE "parameter"='plan_psector_status_action';
 
-UPDATE sys_table SET addparam='{"pkey":"link_id, psector_rowid"}' WHERE id='v_edit_link';
-
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
 VALUES (480, 'Check duplicated connec/gullies on visible psectors', 'utils', NULL, 'core', true, 'Check epa-data', NULL);
 
 INSERT INTO config_param_system ("parameter", value, descript, isenabled, project_type, "datatype")
 VALUES('admin_skip_audit', 'false', 'System parameter to identify processes that need to avoid audit log because of the big amount of data updated. Example: mapzones or daily update crm', false, 'utils', 'string') ON CONFLICT (parameter) DO NOTHING;
-
-DELETE FROM config_info_layer WHERE layer_id='v_edit_link';
 
 UPDATE config_param_system SET value = value::jsonb || '{"customLength":{"maxPercent":10}}'::jsonb
 where parameter ='epa_outlayer_values';
