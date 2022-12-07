@@ -10218,7 +10218,7 @@ INSERT INTO man_wjoin VALUES ('114463', NULL, NULL);
 
 INSERT INTO man_wtp VALUES (18);
 
-SELECT ws_sample.gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, 
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, 
 "data":{"action":"ENABLE TOPO-TRIGGERS"}}$$);
 
 

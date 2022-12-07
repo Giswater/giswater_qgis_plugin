@@ -144,3 +144,5 @@ UPDATE sys_function SET descript = concat(descript,' ', 'Value of geom1 (height)
 WHERE id = 3176;
 
 UPDATE inp_timeseries SET active=true;
+
+UPDATE plan_psector_x_gully pg SET active = p.active FROM plan_psector p WHERE p.psector_id=pg.psector_id;
