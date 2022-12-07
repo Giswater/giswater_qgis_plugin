@@ -35,11 +35,11 @@ UPDATE arc SET pavcat_id = 'Asphalt';
 
 UPDATE plan_psector_x_arc SET psector_id = 2 WHERE arc_id = '20651';
 
-INSERT INTO plan_psector_x_arc VALUES (7, '2065', 2, 0, false, NULL);
-INSERT INTO plan_psector_x_arc VALUES (8, '2085', 1, 0, false, NULL);
-INSERT INTO plan_psector_x_arc VALUES (9, '2086', 1, 0, false, NULL);
+INSERT INTO plan_psector_x_arc VALUES (7, '2065', 2, 0, false, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (8, '2085', 1, 0, false, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (9, '2086', 1, 0, false, NULL, NULL, true);
 
-INSERT INTO plan_psector_x_node VALUES (2, '1076', 1, 0, false, NULL);
+INSERT INTO plan_psector_x_node VALUES (2, '1076', 1, 0, false, NULL, true);
 
 
 SELECT gw_fct_setlinktonetwork($${
@@ -48,13 +48,13 @@ SELECT gw_fct_setlinktonetwork($${
 "data":{"feature_type":"CONNEC"}}$$);
 
 
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript) VALUES ('3103', NULL, 1, 0, false, NULL);
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript) VALUES ('3104', NULL, 1, 0, false, NULL);
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript) VALUES ('3014', NULL, 2, 0, false, NULL);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, active) VALUES ('3103', NULL, 1, 0, false, NULL, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, active) VALUES ('3104', NULL, 1, 0, false, NULL, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, active) VALUES ('3014', NULL, 2, 0, false, NULL, true);
 
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript) VALUES ('114461', '20851', 1, 1, true, NULL);
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript) VALUES ('114462', '20851', 1, 1, true, NULL);
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript) VALUES ('114463', '20651', 2, 1, true, NULL);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, active) VALUES ('114461', '20851', 1, 1, true, NULL, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, active) VALUES ('114462', '20851', 1, 1, true, NULL, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, active) VALUES ('114463', '20651', 2, 1, true, NULL, true);
 
 
 INSERT INTO doc VALUES ('Demo document 1', 'OTHER', 'https://github.com/Giswater/docs/blob/master/user/manual_usuario_giswater3.doc', NULL, '2018-03-11 19:40:20.449663', current_user, '2018-03-11 19:40:20.449663');
@@ -704,3 +704,7 @@ UPDATE ext_rtc_dma_period set avg_press = 30;
 UPDATE dma set avg_press = 30;
 
 UPDATE connec SET pjoint_id = arc_id WHERE pjoint_type = 'ARC';
+
+UPDATE plan_psector_x_arc SET active = true WHERE arc_id in ('20861', '20851', '20651');
+UPDATE plan_psector_x_node SET active = true WHERE node_id in ('10761');
+UPDATE plan_psector_x_connec SET active = true WHERE connec_id in ('3103', '3104', '3014', '3014');
