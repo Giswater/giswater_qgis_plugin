@@ -113,7 +113,8 @@ BEGIN
 	v_isaudit := (p_data ->> 'data')::json->> 'isAudit';
 
 
-	IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user') IS TRUE THEN
+	IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user') IS TRUE 
+	OR (p_data ->> 'data')::json->> 'selectionMode' = 'userSelectors' THEN
 		v_selection_mode = 'userSelectors';
 	ELSE 
 		v_selection_mode = 'wholeSystem';
@@ -277,7 +278,7 @@ BEGIN
 	DELETE FROM config_param_user WHERE parameter NOT IN (SELECT id FROM sys_param_user) AND cur_user = current_user;
 
 	-- reset all exploitations
-	IF v_qgis_init_guide_map THEN
+	IF v_qgis_init_guide_map AND (v_isaudit IS NULL OR v_isaudit = 'false') THEN
 		DELETE FROM selector_expl WHERE cur_user = current_user;
 
 		-- looking for additional schema 
@@ -305,8 +306,10 @@ BEGIN
 		END IF;
 	END IF;
 
-	-- force expl = 0
-	INSERT INTO selector_expl (expl_id, cur_user) SELECT 0, current_user FROM exploitation LIMIT 1 ON CONFLICT (expl_id, cur_user) DO NOTHING;
+	IF v_isaudit IS NULL or v_isaudit='false' THEN
+		-- force expl = 0
+		INSERT INTO selector_expl (expl_id, cur_user) SELECT 0, current_user FROM exploitation LIMIT 1 ON CONFLICT (expl_id, cur_user) DO NOTHING;
+	END IF;
 				
 	-- Force state selector in case of null values
 	IF (SELECT count(*) FROM selector_state WHERE cur_user=current_user) < 1 THEN 
