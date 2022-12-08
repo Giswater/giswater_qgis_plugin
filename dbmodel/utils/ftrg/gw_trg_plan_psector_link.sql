@@ -67,7 +67,7 @@ BEGIN
 		END IF;	
 
 	ELSIF TG_OP = 'INSERT' AND NEW.state = 1 THEN 
-	
+		v_id = NEW.id;
 		IF NEW.arc_id IS NOT NULL THEN
 
 			-- link values definition
@@ -84,7 +84,7 @@ BEGIN
 				INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id)
 				VALUES (v_link, v_featuretype, v_feature,v_arc.expl_id, NEW.arc_id, 'ARC', FALSE, 2, v_link_geom, v_arc.sector_id, v_arc.fluid_type, v_arc.dma_id);
 			END IF;
-			EXECUTE 'UPDATE plan_psector_x_'||v_table_name||' SET link_id = '||v_link||' NULL WHERE ld = '||v_id;
+			EXECUTE 'UPDATE plan_psector_x_'||v_table_name||' SET link_id = '||v_link||' WHERE id = '||v_id;
 		END IF;
 
 	ELSIF TG_OP = 'UPDATE' AND NEW.state = 1 AND COALESCE(NEW.arc_id,'') != COALESCE(OLD.arc_id,'') THEN
