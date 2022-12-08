@@ -198,3 +198,11 @@ ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
 
 DELETE FROM sys_table WHERE id = 'v_arc_x_vnode';
 DELETE FROM sys_table WHERE id = 'v_vnode';
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+SELECT 'v_edit_inp_junction', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
+FROM config_form_fields WHERE formname = 'v_edit_inp_tank' and columnname = 'expl_id';

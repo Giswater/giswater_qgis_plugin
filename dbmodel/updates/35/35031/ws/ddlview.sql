@@ -80,6 +80,7 @@ CREATE OR REPLACE VIEW v_edit_inp_junction AS
     n.state,
     n.state_type,
     n.annotation,
+    n.expl_id,
     inp_junction.demand,
     inp_junction.pattern_id,
     n.the_geom,
