@@ -8,6 +8,8 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_connec()  RETURNS trigger AS $BODY$
 DECLARE 
+
+v_link integer;
 v_sql varchar;
 v_code_autofill_bool boolean;
 v_promixity_buffer double precision;
@@ -30,7 +32,8 @@ v_disable_linktonetwork boolean;
 v_doublegeometry boolean;
 v_doublegeom_buffer double precision;
 v_pol_id varchar(16);
-
+v_arc record;
+v_link_geom public.geometry;
 
 BEGIN
 
@@ -49,6 +52,9 @@ BEGIN
 	v_disable_linktonetwork := (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_disable_linktonetwork' AND cur_user=current_user);
 
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
+
+	v_psector_vdefault = (SELECT config_param_user.value::integer AS value FROM config_param_user WHERE config_paam_user.parameter::text
+	    = 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1);
 	
 	
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
@@ -246,7 +252,7 @@ BEGIN
 		END IF;
 		
 		
-  	   -- Verified
+		-- Verified
 		IF (NEW.verified IS NULL) THEN
 			NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
@@ -463,8 +469,6 @@ BEGIN
 			-- inserting on psector
 			SELECT arc_id INTO v_arc_id FROM connec WHERE connec_id=NEW.connec_id;
 			
-			v_psector_vdefault=(SELECT value::integer FROM config_param_user WHERE config_param_user.parameter::text = 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"());
-
 			INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, arc_id, link_id) 
 			VALUES (NEW.connec_id, v_psector_vdefault, 1, true, v_arc_id,  (SELECT link_id FROM link WHERE feature_id = NEW.connec_id) );
 			
@@ -486,8 +490,7 @@ BEGIN
 			END LOOP;
 		END IF;		
 
-        RETURN NEW;
-
+		RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
 
@@ -508,36 +511,62 @@ BEGIN
 			AND element_id IN (SELECT element_id FROM element_x_connec WHERE connec_id = NEW.connec_id);	
 			
 		END IF;
-		
+
 		-- Reconnect arc_id
-		IF (NEW.arc_id != OLD.arc_id) OR (NEW.arc_id IS NOT NULL AND OLD.arc_id IS NULL) OR (NEW.arc_id IS NULL AND OLD.arc_id IS NOT NULL) THEN
-		
-			-- when arc_id comes from plan psector tables
-			IF (OLD.arc_id IN (SELECT arc_id FROM plan_psector_x_connec WHERE connec_id=NEW.connec_id)) THEN
-				-- this is not enabled from here
-			ELSE
-				-- when arc_id comes from connec table			
-				UPDATE connec SET arc_id=NEW.arc_id where connec_id=NEW.connec_id;
-				
-				IF (SELECT link_id FROM link WHERE feature_id=NEW.connec_id AND feature_type='CONNEC' LIMIT 1) IS NOT NULL 
-				AND v_disable_linktonetwork IS NOT TRUE THEN
+		IF (coalesce (NEW.arc_id,'') != coalesce(OLD.arc_id,'')) THEN
 
-					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-					"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
-				
-				ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_automatic_link' AND cur_user=current_user LIMIT 1) IS TRUE
-				AND v_disable_linktonetwork IS NOT TRUE THEN
+			-- when connec_id comes on psector_table
+			IF NEW.state = 1 AND (SELECT connec_id FROM plan_psector_x_connec WHERE connec_id=NEW.connec_id AND psector_id = v_psector_vdefault AND state = 1) IS NOT NULL THEN
 
-					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-					"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
-				END IF;			
+				RAISE EXCEPTION 'IT IS NOT POSSIBLE TO RELATE ARCS FOR OPERATIVE CONNECS INVOLVED INVOLVED ON SOME VISIBLE PSECTOR. PLEASE, USE PSECTOR DIALOG TO RE-CONNECT';
 
-				-- reconnecting values
+			ELSIF NEW.state = 2 THEN
+
 				IF NEW.arc_id IS NOT NULL THEN
+
+					IF (SELECT connec_id FROM plan_psector_x_connec WHERE connec_id=NEW.connec_id AND psector_id = v_psector_vdefault AND state = 1) IS NOT NULL THEN
+
+						-- link values definition
+						SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
+						v_link := (SELECT nextval('link_link_id_seq'));
+						v_link_geom := ST_ShortestLine(NEW.the_geom, v_arc.the_geom);
+
+						-- insert link
+						INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id, dqa_id, 
+						presszone_id, minsector_id)
+						VALUES (v_link, 'CONNEC', NEW.connec_id, v_arc.expl_id, NEW.arc_id, 'ARC', FALSE, 2, v_link_geom, v_arc.sector_id, v_arc.fluid_type, v_arc.dma_id, v_arc.dqa_id, 
+						v_arc.presszone_id, v_arc.minsector_id);
+
+						UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id, link_id = v_link WHERE connec_id=NEW.connec_id AND psector_id = v_psector_vdefault AND state = 1;
+					END IF;
+				ELSE
+					UPDATE plan_psector_x_connec SET arc_id = null, link_id = null WHERE connec_id=NEW.connec_id AND psector_id = v_psector_vdefault AND state = 1;
+					DELETE FROM link WHERE feature_id = NEW.connec_id AND state  = 2;
+					UPDATE connec SET arc_id = NULL WHERE connec_id = NEW.connec_id;
+				END IF;
+			ELSE
+				-- when arc_id comes from connec table
+				UPDATE connec SET arc_id=NEW.arc_id where connec_id=NEW.connec_id;
+
+				IF NEW.arc_id IS NOT NULL THEN
+				
+					-- if connec already has link
+					IF (SELECT link_id FROM link WHERE feature_id=NEW.connec_id AND feature_type='CONNEC' LIMIT 1) IS NOT NULL AND v_disable_linktonetwork IS NOT TRUE THEN
+
+						EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+						"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
+					ELSE
+						EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+						"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';				
+					END IF;
+					
+					-- reconnecting values
 					NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
 					NEW.dma_id = (SELECT dma_id FROM arc WHERE arc_id = NEW.arc_id);
 					NEW.sector_id = (SELECT sector_id FROM arc WHERE arc_id = NEW.arc_id);
-				END IF;			
+				ELSE
+					DELETE FROM link WHERE feature_id = NEW.connec_id AND state  = 1;
+				END IF;
 			END IF;
 		END IF;
 		
@@ -567,20 +596,39 @@ BEGIN
 
 		-- Looking for state control and insert planified connecs to default psector
 		IF (NEW.state != OLD.state) THEN   
+		
 			PERFORM gw_fct_state_control('CONNEC', NEW.connec_id, NEW.state, TG_OP);
+			
 			IF NEW.state = 2 AND OLD.state=1 THEN
-				INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable)
-				VALUES (NEW.connec_id, (SELECT config_param_user.value::integer AS value FROM config_param_user WHERE config_param_user.parameter::text
-				= 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
+			
+				v_link = (SELECT link_id FROM link WHERE feature_id = NEW.connec_id AND state = 1 LIMIT 1);
+			
+				INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, link_id, arc_id)
+				VALUES (NEW.connec_id, v_psector_vdefault, 1, true,
+				v_link, NEW.arc_id);
+				
+				UPDATE link SET state = 2 WHERE link_id  = v_link;
 			END IF;
+			
 			IF NEW.state = 1 AND OLD.state=2 THEN
-				DELETE FROM plan_psector_x_connec WHERE connec_id=NEW.connec_id;					
+			
+				v_link = (SELECT link_id FROM link WHERE feature_id = NEW.connec_id AND state = 2 LIMIT 1);
+			
+				-- force delete
+				UPDATE config_param_user SET value = 'true' WHERE parameter = 'plan_psector_downgrade_feature' AND cur_user= current_user;
+				DELETE FROM plan_psector_x_connec WHERE connec_id=NEW.connec_id;
+				-- recover values
+				UPDATE config_param_user SET value = 'false' WHERE parameter = 'plan_psector_downgrade_feature' AND cur_user= current_user;
+
+				UPDATE link SET state = 1 WHERE link_id  = v_link;					
 			END IF;
+			
 			UPDATE connec SET state=NEW.state WHERE connec_id = OLD.connec_id;
 		END IF;
 
 		--check relation state - state_type
 		IF (NEW.state_type != OLD.state_type) THEN
+		
 			IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3036", "function":"1204","debug_msg":"'||NEW.state::text||'"}}$$);'; 

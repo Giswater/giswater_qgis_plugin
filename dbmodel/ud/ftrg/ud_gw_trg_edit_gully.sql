@@ -59,6 +59,9 @@ v_epa_gully_method text;
 v_epa_gully_orifice_cd float;
 v_epa_gully_outlet_type text; 
 v_epa_gully_weir_cd float;
+v_arc text;
+v_link integer;
+v_link_geom public.geometry;
 
 BEGIN
 
@@ -85,6 +88,9 @@ BEGIN
 	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 	
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
+
+	v_psector_vdefault = (SELECT config_param_user.value::integer AS value FROM config_param_user WHERE config_param_user.parameter::text
+	= 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1);
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 
@@ -584,9 +590,6 @@ BEGIN
 			-- inserting on psector
 			SELECT arc_id INTO v_arc_id FROM gully WHERE gully_id=NEW.gully_id;
 			
-			v_psector_vdefault=(SELECT value::integer FROM config_param_user WHERE config_param_user.parameter::text = 'plan_psector_vdefault'::text 
-			AND config_param_user.cur_user::name = "current_user"());
-			
 			INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, doable, arc_id, link_id) 
 			VALUES (NEW.gully_id, v_psector_vdefault, 1, true, v_arc_id,  (SELECT link_id FROM link WHERE feature_id = NEW.gully_id));
 		END IF;
@@ -644,36 +647,62 @@ BEGIN
 		END IF;	
 		
 		-- Reconnect arc_id
-		IF (NEW.arc_id != OLD.arc_id) OR (NEW.arc_id IS NOT NULL AND OLD.arc_id IS NULL) OR (NEW.arc_id IS NULL AND OLD.arc_id IS NOT NULL) THEN
+		IF (coalesce (NEW.arc_id,'') != coalesce(OLD.arc_id,'')) THEN
 
-			-- when arc_id comes from psector table
-			IF OLD.arc_id IN (SELECT arc_id FROM plan_psector_x_gully WHERE gully_id=NEW.gully_id) THEN 
-				-- this is not enabled from here
+			-- when connec_id comes on psector_table
+			IF NEW.state = 1 AND (SELECT gully_id FROM plan_psector_x_gully WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND state = 1) IS NOT NULL THEN
+
+				RAISE EXCEPTION 'IT IS NOT POSSIBLE TO RELATE ARCS FOR OPERATIVE GULLY(S) INVOLVED INVOLVED ON SOME VISIBLE PSECTOR. PLEASE, USE PSECTOR DIALOG TO RE-CONNECT';
+
+			ELSIF NEW.state = 2 THEN
+
+				IF NEW.arc_id IS NOT NULL THEN
+
+					IF (SELECT gully_id FROM plan_psector_x_gully WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND state = 1) IS NOT NULL THEN
+
+						-- link values definition
+						SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
+						v_link := (SELECT nextval('link_link_id_seq'));
+						v_link_geom := ST_ShortestLine(NEW.the_geom, v_arc.the_geom);
+
+						-- insert link
+						INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id, dqa_id, 
+						presszone_id, minsector_id)
+						VALUES (v_link, 'GULLY', NEW.gully_id, v_arc.expl_id, NEW.arc_id, 'ARC', FALSE, 2, v_link_geom, v_arc.sector_id, v_arc.fluid_type, v_arc.dma_id, v_arc.dqa_id, 
+						v_arc.presszone_id, v_arc.minsector_id);
+
+						UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id, link_id = v_link WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND state = 1;
+					END IF;
+				ELSE
+					UPDATE plan_psector_x_gully SET arc_id = null, link_id = null WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND state = 1;
+					DELETE FROM link WHERE feature_id = NEW.gully_id AND state  = 2;
+					UPDATE gully SET arc_id = NULL WHERE gully_id = NEW.gully_id;
+				END IF;
 			ELSE
 				-- when arc_id comes from gully table
 				UPDATE gully SET arc_id=NEW.arc_id where gully_id=NEW.gully_id;
 
-				IF (SELECT link_id FROM link WHERE feature_id=NEW.gully_id AND feature_type='GULLY' LIMIT 1) IS NOT NULL 
-				AND v_disable_linktonetwork IS NOT TRUE THEN				
-
-					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-					"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';
-				
-				ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_gully_automatic_link' AND cur_user=current_user LIMIT 1) IS TRUE
-				AND v_disable_linktonetwork IS NOT TRUE THEN
-
-					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-					"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';
-				END IF;	
-
-				-- reconnecting values
 				IF NEW.arc_id IS NOT NULL THEN
+				
+					-- if gully already has link
+					IF (SELECT link_id FROM link WHERE feature_id=NEW.gully_id AND feature_type='GULLY' LIMIT 1) IS NOT NULL AND v_disable_linktonetwork IS NOT TRUE THEN
+
+						EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+						"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';
+					ELSE
+						EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+						"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';				
+					END IF;
+					
+					-- reconnecting values
 					NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
 					NEW.dma_id = (SELECT dma_id FROM arc WHERE arc_id = NEW.arc_id);
 					NEW.sector_id = (SELECT sector_id FROM arc WHERE arc_id = NEW.arc_id);
-				END IF;	
+				ELSE
+					DELETE FROM link WHERE feature_id = NEW.gully_id AND state  = 1;
+				END IF;
 			END IF;
-		END IF;	
+		END IF;
 		
 		-- State_type
 		IF NEW.state=0 AND OLD.state=1 THEN
@@ -692,31 +721,41 @@ BEGIN
 			UPDATE link SET state=0 WHERE feature_id=OLD.gully_id;
 		END IF;
 
-		-- Looking for state control and insert planified gully to default psector
-		IF (NEW.state != OLD.state) THEN   	
-			PERFORM gw_fct_state_control('GULLY', NEW.gully_id, NEW.state, TG_OP);	
+		-- Looking for state control and insert planified connecs to default psector
+		IF (NEW.state != OLD.state) THEN   
+		
+			PERFORM gw_fct_state_control('GULLY', NEW.gully_id, NEW.state, TG_OP);
+			
 			IF NEW.state = 2 AND OLD.state=1 THEN
-				INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, doable)
-				VALUES (NEW.gully_id, (SELECT config_param_user.value::integer AS value FROM config_param_user WHERE config_param_user.parameter::text
-				= 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
+			
+				v_link = (SELECT link_id FROM link WHERE feature_id = NEW.gully_id AND state = 1 LIMIT 1);
+			
+				INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, doable, link_id, arc_id)
+				VALUES (NEW.gully_id, v_psector_vdefault, 1, true,
+				v_link, NEW.arc_id);
+				
+				UPDATE link SET state = 2 WHERE link_id  = v_link;
 			END IF;
+			
 			IF NEW.state = 1 AND OLD.state=2 THEN
-				-- force plan_psector_force_delete
-				SELECT value INTO v_force_delete FROM config_param_user WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
-				UPDATE config_param_user SET value = 'true' WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
+			
+				v_link = (SELECT link_id FROM link WHERE feature_id = NEW.gully_id AND state = 2 LIMIT 1);
+			
+				-- force delete
+				UPDATE config_param_user SET value = 'true' WHERE parameter = 'plan_psector_downgrade_feature' AND cur_user= current_user;
+				DELETE FROM plan_psector_x_gully WHERE gully_id=NEW.gully_id;
+				-- recover values
+				UPDATE config_param_user SET value = 'false' WHERE parameter = 'plan_psector_downgrade_feature' AND cur_user= current_user;
 
-				-- update state to prevent delete gully on gw_trg_plan_psector_delete
-				UPDATE gully SET state=1 WHERE gully_id=NEW.gully_id;
-				DELETE FROM plan_psector_x_gully WHERE gully_id=NEW.gully_id;	
-
-				-- restore plan_psector_force_delete
-				UPDATE config_param_user SET value = v_force_delete WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;				
+				UPDATE link SET state = 1 WHERE link_id  = v_link;					
 			END IF;
+			
+			UPDATE gully SET state=NEW.state WHERE gully_id = OLD.gully_id;
 		END IF;
 
 		--check relation state - state_type
-	    IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-	      	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3036", "function":"1206","debug_msg":"'||NEW.state::text||'"}}$$);'; 
 		END IF;		
 		
