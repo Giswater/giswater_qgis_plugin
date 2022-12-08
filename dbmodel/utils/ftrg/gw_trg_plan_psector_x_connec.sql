@@ -38,8 +38,6 @@ BEGIN
 		NEW.doable=false;
 		NEW.arc_id=v_arcaux;
 		
-		INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, descript) 
-		VALUES (NEW.connec_id, NEW.psector_id, 1, NEW.doable, NEW.descript);
 	ELSIF v_stateaux=2 THEN
 		IF NEW.state = 0 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
