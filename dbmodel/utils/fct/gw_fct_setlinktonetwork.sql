@@ -119,13 +119,13 @@ BEGIN
 	-- Main loop
 	IF v_feature_array IS NOT NULL THEN
 
-	PERFORM setval('link_link_id_seq', (SELECT max(link_id) FROM link),true);
+	PERFORM setval('SCHEMA_NAME.link_link_id_seq', (SELECT max(link_id) FROM link),true);
 	
 	    FOREACH v_connect_id IN ARRAY v_feature_array
 	    LOOP	
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (217, null, 4, concat('Connect ', lower(v_feature_type),' with id ',v_connect_id,'.'));
+		VALUES (217, null, 4, concat('Trying to connect ', lower(v_feature_type),' with id ',v_connect_id,'.'));
 	
 		-- get link information (if exits)
 		SELECT * INTO v_link FROM link WHERE feature_id = v_connect_id AND feature_type=v_feature_type;
@@ -136,7 +136,6 @@ BEGIN
 			
 		ELSIF v_feature_type ='GULLY' THEN 
 			SELECT * INTO v_connect FROM gully WHERE gully_id = v_connect_id;
-			
 		END IF;
 
 		-- exception control. It is not possible to create a link for connec over arc		
@@ -144,19 +143,26 @@ BEGIN
 
 		IF v_arc.arc_id IS NOT NULL THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
-			VALUES (217, null, 4, concat('Link not created because connect ',v_connect_id,' is over arc ', v_arc.arc_id));
+			VALUES (217, null, 4, concat('FAILED: Link not created because connect ',v_connect_id,' is over arc ', v_arc.arc_id));
 		ELSE
 			-- check if exists on same psector links for related connects
-			IF v_feature_type ='CONNEC' AND v_connect.state=2 THEN          
+			IF 
+			v_feature_type ='CONNEC' AND v_connect.state=1 THEN          
+				SELECT count(*) INTO v_count FROM plan_psector_x_connec WHERE connec_id = v_connect_id AND psector_id = v_psector_vdefault AND state = 1;
+
+			ELSIF v_feature_type ='GULLY' AND v_connect.state=1 THEN          
+				SELECT count(*) INTO v_count FROM plan_psector_x_gully WHERE gully_id = v_connect_id AND psector_id = v_psector_vdefault AND state = 1;
+			
+			ELSIF v_feature_type ='CONNEC' AND v_connect.state=2 THEN          
 				SELECT count(*) INTO v_count FROM plan_psector_x_connec WHERE connec_id = v_connect_id AND psector_id = v_psector_vdefault AND link_id IS NOT NULL;
 					
 			ELSIF v_feature_type ='GULLY' AND v_connect.state=2 THEN 
-				SELECT count(*) INTO v_count FROM gully WHERE gully_id = v_connect_id AND psector_id = v_psector_vdefault  AND link_id IS NOT NULL;
+				SELECT count(*) INTO v_count FROM plan_psector_x_gully WHERE gully_id = v_connect_id AND psector_id = v_psector_vdefault  AND link_id IS NOT NULL;
 			END IF;
 
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
-				VALUES (217, null, 4, concat('Link not created because connect ',v_connect_id,' has state 2 and also has link on same psector'));			
+				VALUES (217, null, 4, concat('FAILED: It is not possible to reconnect ',v_connect_id,' because is involved on some visible psector. Please use psector dialog to re-connect'));			
 			ELSE
 				-- get arc_id (if feature does not have) using buffer  
 				IF v_connect.arc_id IS NULL THEN
