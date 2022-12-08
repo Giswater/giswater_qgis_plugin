@@ -43,13 +43,13 @@ INSERT INTO plan_psector_x_arc VALUES (13, '179', 1, 0, false, NULL, NULL, true)
 INSERT INTO plan_psector_x_arc VALUES (12, '339', 1, 0, false, NULL, NULL, true);
 
 TRUNCATE plan_psector_x_node;
-INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (1, '20599', 1, 1, true, NULL, true);
-INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (2, '20596', 1, 1, true, NULL, true);
-INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (3, '20597', 1, 1, true, NULL, true);
-INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (4, '20598', 1, 1, true, NULL, true);
-INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (7, '94', 1, 0, false, NULL, true);
-INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (6, '92', 1, 0, false, NULL, true);
-INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (5, '91', 1, 0, false, NULL, true);
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (1, '20599', 1, 1, true, NULL, true);
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (2, '20596', 1, 1, true, NULL, true);
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (3, '20597', 1, 1, true, NULL, true);
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (4, '20598', 1, 1, true, NULL, true);
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (7, '94', 1, 0, false, NULL, true);
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (6, '92', 1, 0, false, NULL, true);
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (5, '91', 1, 0, false, NULL, true);
 
 SELECT setval('SCHEMA_NAME.link_link_id_seq', (SELECT max(link_id) FROM link), true);
 
