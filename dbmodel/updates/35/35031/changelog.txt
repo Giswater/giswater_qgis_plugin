@@ -14,4 +14,14 @@
 - New fields on WS node, arc, connec - om_state, conserv_state
 - New fields on WS connec - priority, valve_location, valve_type, shutoff_valve, access_type, placement_type
 - New fields on WS node - access_type, placement_type
-- New fields on WS man_valve - valve_type; man_wjoin - wjoin_type; man_greentap - greentap_type, cat_valve; man_hydrant - hydrant_type
+- New fields on WS man_valve - valve_type; man_wjoin - wjoin_type; man_greentap - greentap_type, cat_valve; man_hydrant - hydrant_type- 
+- New fields on WS man_valve - valve_type; man_wjoin - wjoin_type; man_greentap - greentap_type, cat_valve; man_hydrant - hydrant_type- 
+- New field on UD inp_timeseries - active
+- Deep refactor on links to enhance usability and performance. Main changes:
+	- Strategy have been fully rewrited
+	- Links are now giswater object (with dynamic info, own state as well as on service or planned
+	- Remove vnode table and any references
+	- Change exit_type and pjoint_type. New values are: ARC, NODE, CONNEC, GULLY 
+	- It is possible to create planned links related to planned connects by using qgis tools
+	- it is possible to relate any planned connect no any other object of network
+	- Connects mapzones has consistency againts related arc, not only on operative state also on planned state
