@@ -436,7 +436,8 @@ BEGIN
 					SELECT count(connec_id) INTO v_count FROM connec WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
 					IF v_count > 0 THEN
 						INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable) 
-							SELECT v_psector_id, connec_id, arc_id, 1, false FROM v_edit_connec WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id);
+						SELECT v_psector_id, connec_id, arc_id, 1, false FROM v_edit_connec WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id)
+						ON CONFLICT(connec_id, psector_id, state) DO UPDATE SET arc_id = v_new_record.arc_id;
 
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (214, 1, concat('Reconnect operative ',v_count,' connecs.'));
@@ -447,7 +448,8 @@ BEGIN
 						SELECT count(gully_id) INTO v_count FROM gully WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
 						IF v_count > 0 THEN
 							INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable) 
-								SELECT v_psector_id, gully_id, arc_id, 1, false FROM v_edit_gully WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id);
+							SELECT v_psector_id, gully_id, arc_id, 1, false FROM v_edit_gully WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id)
+							ON CONFLICT(gully_id, psector_id, state) DO UPDATE SET arc_id = v_new_record.arc_id;
 
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
 							VALUES (214, 1, concat('Reconnect operative ',v_count,' gullies.'));

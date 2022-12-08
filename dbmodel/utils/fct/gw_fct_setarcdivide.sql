@@ -756,6 +756,7 @@ BEGIN
 							LOOP
 								SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id 
 								AND arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1; 
+								
 								UPDATE plan_psector_x_connec SET arc_id = v_arc_closest, link_id = rec_link.link_id WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
 								v_arc_closest = null;
 								
@@ -766,6 +767,9 @@ BEGIN
 								FOR rec_link IN SELECT link.* FROM v_edit_gully JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND exit_type='ARC' AND arc_id=v_arc_id
 								LOOP
 									SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
+									UPDATE plan_psector_x_gully SET arc_id = v_arc_closest, link_id = rec_link.link_id WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
+									v_arc_closest = null;
+
 									UPDATE plan_psector_x_gully SET arc_id = v_arc_closest, link_id = rec_link.link_id WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
 									v_arc_closest = null;
 									
@@ -801,23 +805,31 @@ BEGIN
 								VALUES (212, 1, 'Update psector_x_arc as doable for fictitious arcs.');
 							END IF;	
 
-							-- reconnect planned arc links
+							-- reconnect planned links
 							FOR rec_link IN SELECT link.* FROM v_edit_connec JOIN link ON link.feature_id=connec_id	WHERE link.feature_type='CONNEC' AND exit_type='ARC' AND arc_id=v_arc_id
 							LOOP
+								raise notice 'conut ';
+							
 								SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id 
-								AND arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1; 	
-								UPDATE plan_psector_x_connec SET arc_id = v_arc_closest, link_id = rec_link.link_id WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
+								AND arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1; 
+								
+								UPDATE plan_psector_x_connec SET arc_id = v_arc_closest, link_id = rec_link.link_id WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id
+								AND psector_id=v_psector;
+								
 								v_arc_closest = null;
 							END LOOP;
 
 							IF v_project_type ='UD' THEN
 							
-								FOR rec_link IN SELECT link.* FROM v_edit_gully JOIN link ON link.feature_id=gully_id 
-								WHERE link.feature_type='GULLY' AND exit_type='ARC' AND arc_id=v_arc_id
+								FOR rec_link IN SELECT link.* FROM v_edit_gully JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND exit_type='ARC' AND arc_id=v_arc_id
 								LOOP
-									SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
-									UPDATE plan_psector_x_gully SET arc_id = v_arc_closest, link_id = rec_link.link_id WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
-									v_arc_closest = null;
+									SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id
+									AND arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1; 
+
+									UPDATE plan_psector_x_gully SET arc_id = v_arc_closest, link_id = rec_link.link_id WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id
+									AND psector_id=v_psector;
+									
+									v_arc_closest = null;									
 								END LOOP;
 							END IF;						
 
@@ -825,10 +837,11 @@ BEGIN
 							FOR rec_link IN SELECT * FROM v_edit_link WHERE exit_type = 'NODE' AND exit_id = (SELECT node_1 FROM arc WHERE arc_id = rec_aux1.arc_id)
 							LOOP
 								UPDATE connec SET arc_id = rec_aux1.arc_id WHERE connec_id = rec_link.feature_id;
-								UPDATE plan_psector_x_connec SET arc_id = rec_aux1.arc_id WHERE connec_id = rec_link.feature_id;
+								UPDATE plan_psector_x_connec SET arc_id = rec_aux1.arc_id WHERE connec_id = rec_link.feature_id AND psector_id=v_psector;
+								
 								IF v_project_type ='UD' THEN
 									UPDATE gully SET arc_id = rec_aux1.arc_id WHERE gully_idn = rec_link.feature_id;
-									UPDATE plan_psector_x_gully SET arc_id = rec_aux1.arc_id WHERE gully_id = rec_link.feature_id;
+									UPDATE plan_psector_x_gully SET arc_id = rec_aux1.arc_id WHERE gully_id = rec_link.feature_id AND psector_id=v_psector;
 								END IF;							
 							END LOOP;
 
@@ -840,8 +853,7 @@ BEGIN
 								DELETE FROM arc WHERE arc_id=v_arc_id;
 							END IF;
 						
-						UPDATE config_param_user SET value=v_force_delete WHERE parameter = 'plan_psector_force_delete' AND cur_user=current_user;
-							
+							UPDATE config_param_user SET value=v_force_delete WHERE parameter = 'plan_psector_force_delete' AND cur_user=current_user;
 						END IF;
 
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
@@ -896,9 +908,7 @@ BEGIN
 		v_status = 'Accepted';
 		v_level = 3;
 		v_message = 'Arc divide done successfully';
-        
 	ELSE
-
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
