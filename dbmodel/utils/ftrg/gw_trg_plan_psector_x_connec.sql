@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2936
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_plan_psector_x_connec()
+CREATE OR REPLACE FUNCTION ud_t1.gw_trg_plan_psector_x_connec()
   RETURNS trigger AS
 $BODY$
 
