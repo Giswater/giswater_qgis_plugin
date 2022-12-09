@@ -71,7 +71,7 @@ v_action_mode integer;
 BEGIN
 
 	-- Search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ud_t1", public;
 
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
@@ -242,19 +242,6 @@ BEGIN
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (214, 1, concat('Reconnect ',v_count,' nodes.'));
 					END IF;
-
-					-- update links related to node
-					IF  (SELECT link_id FROM link WHERE exit_type='NODE' and exit_id=v_node_id LIMIT 1) IS NOT NULL THEN
-						
-						-- insert one vnode (indenpendently of the number of links. Only one vnode must replace the node)
-						INSERT INTO vnode (state, the_geom) 
-						VALUES (v_new_record.state, v_node_geom) 
-						RETURNING vnode_id INTO v_vnode;
-						
-						-- update link with new vnode
-						UPDATE link SET exit_type='VNODE', exit_id=v_vnode WHERE exit_type='NODE' and exit_id=v_node_id;  
-
-					END IF; 
 
 					-- update operative connecs
 					SELECT count(connec_id) INTO v_count FROM connec WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;

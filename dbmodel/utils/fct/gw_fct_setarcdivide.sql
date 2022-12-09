@@ -110,6 +110,7 @@ v_new_node_graph text;
 v_graph_arc_id TEXT;
 v_force_delete text;
 
+
 BEGIN
 
 	-- Search path
@@ -118,6 +119,7 @@ BEGIN
 
 	--set current process as users parameter
 	DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
+	delete from temp_table where fid = 398;
 
 	INSERT INTO config_param_user (value, parameter, cur_user)
 	VALUES (txid_current(),'utils_cur_trans',current_user );
@@ -364,7 +366,14 @@ BEGIN
 						END LOOP;
 
 						-- Capture linked feature information to redraw (later on this function)
-						
+						INSERT INTO temp_table (fid, geom_line, expl_id) 
+						SELECT 398, the_geom,link_id FROM link JOIN plan_psector_x_connec USING (link_id) WHERE arc_id = v_arc_id AND psector_id = v_psector;
+
+						IF v_project_type='UD' THEN
+							INSERT INTO temp_table (fid, geom_line, expl_id) 
+							SELECT 398, the_geom,link_id FROM link JOIN plan_psector_x_gully USING (link_id) WHERE arc_id = v_arc_id AND psector_id = v_psector;
+						END IF;
+
 						-- connec
 						FOR v_connec_id IN 
 						SELECT connec_id FROM v_edit_connec c JOIN link ON link.feature_id=connec_id WHERE link.feature_type='CONNEC' AND arc_id=v_arc_id AND 
@@ -390,6 +399,7 @@ BEGIN
 							SELECT count(gully_id) INTO v_count_gully FROM v_edit_gully WHERE arc_id=v_arc_id AND state > 0;
 
 							UPDATE gully SET arc_id=NULL WHERE arc_id=v_arc_id AND state > 0;
+							UPDATE plan_psector_x_gully SET arc_id=NULL WHERE arc_id=v_arc_id AND psector_id = v_psector;
 						END IF;
 								
 						-- Insert data into traceability table
@@ -879,7 +889,10 @@ BEGIN
 
 	--last process
 	UPDATE node SET arc_id=NULL WHERE node_id=v_node_id;
-			
+
+	-- recover geometry for those links state 2 when arcdivide state 1
+	UPDATE link SET the_geom = geom_line FROM temp_table t WHERE fid = 398 AND t.expl_id = link_id ;
+									
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
