@@ -71,7 +71,7 @@ v_action_mode integer;
 BEGIN
 
 	-- Search path
-	SET search_path = "ud_t1", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
