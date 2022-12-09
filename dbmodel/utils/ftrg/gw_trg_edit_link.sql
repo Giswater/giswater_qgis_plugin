@@ -49,7 +49,7 @@ v_gully1 record;
 v_connec2 record;
 v_gully2 record;
 v_vnode record;
-v_link_searchbuffer double precision;
+v_link_searchbuffer double precision = 0.01;
 v_count integer;
 v_node_id integer;
 v_arc_id text;
@@ -76,9 +76,7 @@ v_feature record;
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-	v_mantable:= TG_ARGV[0];
-	
-	v_link_searchbuffer=0.1; 	
+	v_mantable:= TG_ARGV[0];	
 	
 	-- getting system values
 	SELECT value::boolean INTO v_autoupdate_dma FROM config_param_system WHERE parameter='edit_connect_autoupdate_dma';
@@ -109,7 +107,7 @@ BEGIN
 	END IF;	
 
 	NEW.exit_type = NULL;
-        
+
 	-- topology control
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 
@@ -176,25 +174,25 @@ BEGIN
 		ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom) LIMIT 1;
 
 		-- connec as end point
-		SELECT * INTO v_connec2 FROM v_edit_connec WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_connec.the_geom,v_link_searchbuffer) AND state>0 AND connec_id != v_connec1.connec_id
+		SELECT * INTO v_connec2 FROM v_edit_connec WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_connec.the_geom,v_link_searchbuffer) AND state>0
 		ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_connec.the_geom) LIMIT 1;
 
-			IF v_projectype='UD' then
-		
-				--gully as init point
-				SELECT * INTO v_gully1 FROM v_edit_gully WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom,v_link_searchbuffer) 
-				AND state>0 ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
-
-				--gully as end point
-				SELECT * INTO v_gully2 FROM v_edit_gully WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_gully.the_geom,v_link_searchbuffer) 
-				AND state>0 AND gully_id != v_gully1.gully_id ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
+		IF v_projectype='UD' then
 	
-				IF v_gully1.gully_id IS NOT NULL THEN
-					NEW.feature_id=v_gully1.gully_id;
-					NEW.feature_type='GULLY';
-					v_init_state = v_gully1.state;
-				END IF;
+			--gully as init point
+			SELECT * INTO v_gully1 FROM v_edit_gully WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom,v_link_searchbuffer) 
+			AND state>0 ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
+
+			--gully as end point
+			SELECT * INTO v_gully2 FROM v_edit_gully WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_gully.the_geom,v_link_searchbuffer) 
+			AND state>0 AND gully_id != v_gully1.gully_id ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
+
+			IF v_gully1.gully_id IS NOT NULL THEN
+				NEW.feature_id=v_gully1.gully_id;
+				NEW.feature_type='GULLY';
+				v_init_state = v_gully1.state;
 			END IF;
+		END IF;
 				
 		IF v_connec1.connec_id IS NOT NULL THEN
 			NEW.feature_id=v_connec1.connec_id;
@@ -269,10 +267,13 @@ BEGIN
 			v_expl = v_arc.expl_id;
 			v_arc_id = v_arc.arc_id;
 			v_sector = v_arc.sector_id; 
-			v_presszone = v_arc.presszone_id; 
 			v_dma = v_arc.dma_id; 
-			v_dqa = v_arc.dqa_id; 
-			v_minsector = v_arc.minsector_id; 
+
+			IF v_projectype='WS' THEN
+				v_presszone = v_arc.presszone_id; 
+				v_dqa = v_arc.dqa_id; 
+				v_minsector = v_arc.minsector_id;
+			END IF;
 
 			-- others
 			v_fluidtype = v_arc.fluid_type;
@@ -290,13 +291,14 @@ BEGIN
 
 			-- generic updates
 			IF NEW.state =1 THEN
+			
 				UPDATE connec SET arc_id=v_arc.arc_id, 
-				expl_id=v_node.expl_id, dma_id=v_node.dma_id, sector_id=v_node.sector_id, pjoint_type='ARC', pjoint_id=v_node.arc_id
+				expl_id=v_node.expl_id, dma_id=v_node.dma_id, sector_id=v_node.sector_id, pjoint_type='NODE', pjoint_id=v_node.node_id
 				WHERE connec_id=v_connec1.connec_id;
 
 				IF v_projectype='UD' THEN
 					UPDATE gully SET arc_id=v_arc.arc_id, 
-					expl_id=v_nodeexpl_id, dma_id=v_node.dma_id, sector_id=v_node.sector_id, pjoint_type='ARC', pjoint_id=v_node.arc_id
+					expl_id=v_node.expl_id, dma_id=v_node.dma_id, sector_id=v_node.sector_id, pjoint_type='NODE', pjoint_id=v_node.node_id
 					WHERE gully_id=v_gully1.gully_id;	
 					
 				ELSIF v_projectype='WS' THEN
@@ -315,18 +317,20 @@ BEGIN
 
 			-- mapzones
 			v_expl = v_node.expl_id;
-			v_arc_id = v_node.arc_id;
 			v_sector = v_node.sector_id; 
-			v_presszone = v_node.presszone_id; 
 			v_dma = v_node.dma_id; 
-			v_dqa = v_node.dqa_id; 
-			v_minsector = v_node.minsector_id; 
+			
+			IF v_projectype='WS' THEN
+				v_presszone = v_node.presszone_id; 
+				v_dqa = v_node.dqa_id; 
+				v_minsector = v_node.minsector_id; 
+			END IF;
 
 			-- others
 			v_fluidtype = v_node.fluid_type;
 			v_end_state= v_node.state;
 
-			-- getting v_arc
+			-- getting v_arc			
 			v_arc_id = (SELECT arc_id FROM arc WHERE state > 0 AND node_1 = v_node.node_id LIMIT 1);
 			
 			IF v_arc_id IS NULL AND NEW.state=0 THEN
@@ -338,12 +342,12 @@ BEGIN
 			-- generic updates
 			IF NEW.state =1 THEN
 				UPDATE connec SET arc_id=v_connec2.arc_id, 
-				expl_id=v_connec2.expl_id, dma_id=v_connec2.dma_id, sector_id=v_connec2.sector_id, pjoint_type='ARC', pjoint_id=v_connec2.arc_id
+				expl_id=v_connec2.expl_id, dma_id=v_connec2.dma_id, sector_id=v_connec2.sector_id, pjoint_type='CONNEC', pjoint_id=v_connec2.connec_id
 				WHERE connec_id=v_connec1.connec_id;
 
 				IF v_projectype='UD' THEN
 					UPDATE gully SET arc_id=v_connec2.arc_id, 
-					expl_id=v_connec2.expl_id, dma_id=v_connec2.dma_id, sector_id=v_connec2.sector_id, pjoint_type='ARC', pjoint_id=v_connec2.arc_id
+					expl_id=v_connec2.expl_id, dma_id=v_connec2.dma_id, sector_id=v_connec2.sector_id, pjoint_type='CONNEC', pjoint_id=v_connec2.connec_id
 					WHERE gully_id=v_gully1.gully_id;	
 					
 				ELSIF v_projectype='WS' THEN
@@ -364,10 +368,13 @@ BEGIN
 			v_expl = v_connec2.expl_id;
 			v_arc_id = v_connec2.arc_id;
 			v_sector = v_connec2.sector_id; 
-			v_presszone = v_connec2.presszone_id; 
 			v_dma = v_connec2.dma_id; 
-			v_dqa = v_connec2.dqa_id; 
-			v_minsector = v_connec2.minsector_id; 
+			
+			IF v_projectype='WS' THEN
+				v_presszone = v_connec2.presszone_id; 
+				v_dqa = v_connec2.dqa_id; 
+				v_minsector = v_connec2.minsector_id; 
+			END IF;
 
 			-- others
 			v_fluidtype = v_connec2.fluid_type;
@@ -384,7 +391,7 @@ BEGIN
 					
 					IF v_projectype='UD' THEN
 						UPDATE gully SET arc_id=v_gully2.arc_id, 
-						expl_id=v_gully2.expl_id, dma_id=v_gully2.dma_id, sector_id=v_gully2.sector_id, pjoint_type='ARC', pjoint_id=v_gully2.arc_id
+						expl_id=v_gully2.expl_id, dma_id=v_gully2.dma_id, sector_id=v_gully2.sector_id, pjoint_type='GULLY', pjoint_id=v_gully2.gully_id
 						WHERE gully_id=v_gully1.gully_id;	
 					END IF;				
 				END IF;
@@ -563,9 +570,11 @@ BEGIN
 					SELECT count(*) INTO v_count FROM plan_psector_x_gully WHERE gully_id = NEW.feature_id AND psector_id =  v_currentpsector AND link_id = NEW.link_id;
 				END IF;
 				
-				IF v_count = 0 THEN
+				IF v_count > 0 THEN
 					RAISE EXCEPTION 'IT IS NOT POSSIBLE TO CREATE PLANNED LINK FOR OPERATIVE CONNECT INVOLVED ON SOME VISIBLE PSECTOR. PLEASE, USE PSECTOR DIALOG TO RE-CONNECT';
-
+					
+				ELSIF v_count = 0 THEN
+					RAISE EXCEPTION 'IT IS NOT POSSIBLE TO CREATE PLANNED LINK FOR OPERATIVE CONNECT';
 				END IF;
 			END IF;
 		END IF;
@@ -579,32 +588,52 @@ BEGIN
 
 		-- insert into link table
 		IF v_projectype = 'WS' THEN
+		
 			INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id,
 			 fluid_type, dma_id, dqa_id, presszone_id, minsector_id)
 			VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector, 
 			v_fluidtype, v_dma, v_dqa, v_presszone, v_minsector);
 			
 		ELSIF  v_projectype = 'UD' THEN
+		
 			INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id)
 			VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector, v_fluidtype, v_dma);
 		END IF;
 
 		-- update feature
-		IF NEW.state = 1 THEN 
-		
+		IF NEW.state = 0 THEN 
+
 			IF NEW.feature_type='CONNEC' THEN
-				UPDATE v_edit_connec SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type WHERE connec_id = NEW.feature_id;
+				UPDATE connec SET arc_id = NULL WHERE connec_id = NEW.feature_id; 
+				
 			ELSIF NEW.feature_type='GULLY' THEN
-				UPDATE v_edit_gully SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type WHERE gully_id = NEW.feature_id;
+				UPDATE gully SET arc_id = NULL WHERE gully_id = NEW.feature_id; 
 			END IF;
+
+		ELSIF NEW.state = 1 THEN 
+
+			-- update connect
+			IF NEW.feature_type='CONNEC' THEN
+				UPDATE connec SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, dma_id = v_dma WHERE connec_id = NEW.feature_id;
+			ELSIF NEW.feature_type='GULLY' THEN
+				UPDATE gully SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, dma_id = v_dma WHERE gully_id = NEW.feature_id;
+			END IF;
+
+			-- update specific colums for ws-link
+			IF v_projectype = 'WS' THEN
+				UPDATE connec SET presszone_id = v_presszone, dqa_id = v_dqa, minsector_id = v_minsector WHERE connec = NEW.feature_id;
+			END IF;	
 
 		ELSIF NEW.state = 2 THEN
 		
 			IF NEW.feature_type='CONNEC' THEN
 				UPDATE plan_psector_x_connec SET link_id = NEW.link_id, arc_id = v_arc_id WHERE psector_id = v_currentpsector AND connec_id = NEW.feature_id;
+				UPDATE connec SET arc_id = v_arc_id WHERE connec_id = NEW.feature_id; 
 				
 			ELSIF NEW.feature_type='GULLY' THEN
 				UPDATE plan_psector_x_gully SET link_id = NEW.link_id, arc_id = v_arc_id WHERE psector_id = v_currentpsector AND gully_id = NEW.feature_id;
+				UPDATE gully SET arc_id = v_arc_id WHERE gully_id = NEW.feature_id; 
+
 			END IF;
 		END IF;
 
@@ -614,25 +643,40 @@ BEGIN
 		RETURN NEW;
 		
 	ELSIF TG_OP = 'UPDATE' THEN 
-		
-		IF NEW.state = 1 AND st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
+	
+		IF NEW.state = 0 AND OLD.state = 1 THEN 
+
+			-- delete reconnection on coonecs
+			IF NEW.feature_type = 'CONNEC' THEN
+				UPDATE connec SET arc_id = null, pjoint_type = null, pjoint_id = null, dma_id = 0 WHERE connec_id = NEW.feature_id;
+								
+			ELSIF NEW.feature_type = 'GULLY' THEN
+				UPDATE gully SET arc_id = null, pjoint_type = null, pjoint_id = null, dma_id = 0 WHERE  gully_id = NEW.feature_id;
+			END IF;
+
+			-- update specific colums for ws-link
+			IF v_projectype = 'WS' THEN
+				UPDATE link SET presszone_id = 0, dqa_id = 0, minsector_id = 0 WHERE link_id = NEW.link_id;
+			END IF;	
+			
+		ELSIF NEW.state = 1 AND st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
 
 			-- update link
 			UPDATE link SET userdefined_geom='TRUE', exit_id = NEW.exit_id , exit_type = NEW.exit_type, the_geom=NEW.the_geom, expl_id = v_expl, sector_id = v_sector, dma_id = v_dma 
 			WHERE link_id=NEW.link_id;
-			
+		
+			-- force reconnection on coonecs
+			IF NEW.feature_type = 'CONNEC' THEN
+				UPDATE connec SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id, dma_id = v_dma WHERE connec_id = NEW.feature_id;
+								
+			ELSIF NEW.feature_type = 'GULLY' THEN
+				UPDATE gully SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id, dma_id = v_dma WHERE  gully_id = NEW.feature_id;
+			END IF;
+
 			-- update specific colums for ws-link
 			IF v_projectype = 'WS' THEN
 				UPDATE link SET presszone_id = v_presszone, dqa_id = NEW.dqa_id, minsector_id = NEW.minsector_id WHERE link_id = NEW.link_id;
 			END IF;	
-		
-			-- force reconnection on coonecs
-			IF NEW.feature_type = 'CONNEC' THEN
-				UPDATE connec SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id WHERE connec_id = NEW.feature_id;
-								
-			ELSIF NEW.feature_type = 'GULLY' THEN
-				UPDATE gully SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id WHERE  gully_id = NEW.feature_id;
-			END IF;
 	
 		ELSIF NEW.state = 2 AND st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
 
@@ -685,7 +729,7 @@ BEGIN
 			UPDATE connec SET arc_id = null, pjoint_id=NULL, pjoint_type = NULL WHERE OLD.feature_id = connec_id;
 									
 			IF OLD.feature_type='GULLY' THEN
-				UPDATE gully SET arc_id = nullpjoint_id=NULL, pjoint_type = NULL where OLD.feature_id = gully_id;
+				UPDATE gully SET arc_id = null, pjoint_id=NULL, pjoint_type = NULL where OLD.feature_id = gully_id;
 			END IF;
 
 			DELETE FROM link WHERE link_id = OLD.link_id;
@@ -702,7 +746,7 @@ BEGIN
 				UPDATE plan_psector_x_gully SET link_id = NULL, arc_id = NULL WHERE link_id = OLD.link_id;				
 
 				IF (SELECT state FROM gully WHERE gully_id = OLD.feature_id) = 2 THEN
-					UPDATE gully SET arc_id = null, pjoint_id=NULL, pjoint_type = NULL WHERE OLD.feature_id = connec_id;
+					UPDATE gully SET arc_id = null, pjoint_id=NULL, pjoint_type = NULL WHERE OLD.feature_id = gully_id;
 				END IF;
 			END IF;
 			
@@ -710,9 +754,7 @@ BEGIN
 		END IF;
 
 		RETURN NULL;	   
-
 	END IF;
-    
 END; 
 $BODY$
   LANGUAGE plpgsql VOLATILE
