@@ -136,7 +136,7 @@ BEGIN
 			SELECT * INTO v_connect FROM gully WHERE gully_id = v_connect_id;
 		END IF;
 
-		SELECT * INTO v_link FROM link WHERE feature_id = v_connect_id AND feature_type=v_feature_type;
+		SELECT * INTO v_link FROM v_edit_link WHERE feature_id = v_connect_id AND feature_type=v_feature_type AND state > 0 LIMIT 1;
 
 		-- exception control. It is not possible to create a link for connec over arc		
 		SELECT * INTO v_arc FROM v_edit_arc WHERE ST_DWithin(v_connect.the_geom, v_edit_arc.the_geom, 0.001);
@@ -235,22 +235,31 @@ BEGIN
 						VALUES (217, null, 4, concat('Connect feature with the closest arc.'));
 					END IF;
 				END IF;
-			
-				DELETE FROM link WHERE link_id=v_link.link_id;
 
-				v_link_id = (SELECT nextval('link_link_id_seq'));
-
-				IF v_projecttype = 'WS' THEN
-					INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, userdefined_geom, state, expl_id, sector_id, dma_id, 
-					presszone_id, dqa_id, minsector_id) 
-					VALUES (v_link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id, 
-					v_link.userdefined_geom, v_connect.state, v_arc.expl_id, v_arc.sector_id, v_arc.dma_id, v_arc.presszone_id, v_arc.dqa_id, v_arc.minsector_id);
+				IF v_link.link_id IS NOT NULL THEN
 					
-				ELSIF v_projecttype = 'UD' THEN			
-					INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, userdefined_geom, state, expl_id, sector_id, dma_id) 
-					VALUES (v_link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id, 
-					v_link.userdefined_geom, v_connect.state, v_arc.expl_id, v_arc.sector_id, v_arc.dma_id);
+					UPDATE link SET the_geom=v_link.the_geom, exit_type=v_link.exit_type, exit_id=v_link.exit_id, userdefined_geom=v_link.userdefined_geom, 
+					dma_id = v_arc.dma_id WHERE link_id = v_link.link_id;
+
+					IF v_projecttype = 'WS' THEN
+						UPDATE link SET	presszone_id=v_arc.presszone_id, dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id;
+					END IF;
+				ELSE 
+					v_link_id = (SELECT nextval('link_link_id_seq'));
+
+					IF v_projecttype = 'WS' THEN
+						INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, userdefined_geom, state, expl_id, sector_id, dma_id, 
+						presszone_id, dqa_id, minsector_id) 
+						VALUES (v_link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id, 
+						v_link.userdefined_geom, v_connect.state, v_arc.expl_id, v_arc.sector_id, v_arc.dma_id, v_arc.presszone_id, v_arc.dqa_id, v_arc.minsector_id);
+						
+					ELSIF v_projecttype = 'UD' THEN			
+						INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, userdefined_geom, state, expl_id, sector_id, dma_id) 
+						VALUES (v_link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id, 
+						v_link.userdefined_geom, v_connect.state, v_arc.expl_id, v_arc.sector_id, v_arc.dma_id);
+					END IF;
 				END IF;
+		
 
 				-- update psector tables
 				IF v_connect.state=2 THEN

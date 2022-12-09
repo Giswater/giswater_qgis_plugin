@@ -439,8 +439,8 @@ BEGIN
 						SELECT count(id) INTO v_count FROM om_visit_x_arc WHERE arc_id=v_arc_id;
 
 						IF v_count > 0 THEN
-							FOR rec_visit IN SELECT om_visit.* FROM om_visit_x_arc JOIN om_visit ON om_visit.id=visit_id WHERE arc_id=v_arc_id LOOP
-
+							FOR rec_visit IN SELECT om_visit.* FROM om_visit_x_arc JOIN om_visit ON om_visit.id=visit_id WHERE arc_id=v_arc_id 
+							LOOP
 								IF rec_visit.the_geom IS NULL AND rec_visit.id IS NOT NULL THEN -- if visit does not has geometry, events may have. It's mandatory to distribute one by one
 
 									-- Get visit data into two new visits
@@ -532,6 +532,7 @@ BEGIN
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
 							VALUES (212, 1, concat('Reconnect ',v_count_connec,' connecs '));
 						END IF;
+						
 						IF v_count_gully > 0 AND v_array_gully IS NOT NULL THEN
 							EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{"id":'|| array_to_json(v_array_gully)||'},"data":{"feature_type":"GULLY", "forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
@@ -589,8 +590,10 @@ BEGIN
 								INSERT INTO audit_check_data (fid, criticity, error_message)
 								VALUES (212, 0, concat('Node_2 is a delimiter of a mapzone if old arc was defined as toArc it has been reconfigured with new arc_id.'));
 							END IF;
-
 						END IF;
+						
+						-- recover geometry for those links state 2 when arcdivide state 1
+						UPDATE link SET the_geom = geom_line, userdefined_geom = true FROM temp_table t WHERE fid = 398 AND link_id = t.expl_id;
 	
 					ELSIF v_state_node = 2 THEN --is psector
 
@@ -858,41 +861,35 @@ BEGIN
 						UPDATE plan_psector_x_arc SET addparam='{"arcDivide":"parent"}' WHERE  psector_id=v_psector AND arc_id=v_arc_id;
 						UPDATE plan_psector_x_arc SET addparam='{"arcDivide":"child"}' WHERE  psector_id=v_psector AND arc_id=rec_aux1.arc_id;
 						UPDATE plan_psector_x_arc SET addparam='{"arcDivide":"child"}' WHERE  psector_id=v_psector AND arc_id=rec_aux2.arc_id;
-													
-						
-				ELSIF (v_state_arc=2 AND v_state_node=1) THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3042", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
-				ELSE  
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3044", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
+
+					ELSIF (v_state_arc=2 AND v_state_node=1) THEN
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3042", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
+					ELSE  
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3044", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 				END IF;
 			END IF;
 		ELSE
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3044", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 
-		END IF;
-	ELSE
-		IF v_node_type IS NOT NULL THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3046", "function":"2114","debug_msg":"'||v_node_type||'"}}$$);' INTO v_audit_result;
-		ELSE 
+			END IF;
+		ELSE
+			IF v_node_type IS NOT NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3046", "function":"2114","debug_msg":"'||v_node_type||'"}}$$);' INTO v_audit_result;
+			ELSE 
 
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3046", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3046", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
+			END IF;
 		END IF;
-
-	END IF;
-	
 	END IF;
 
 	--last process
 	UPDATE node SET arc_id=NULL WHERE node_id=v_node_id;
 
-	-- recover geometry for those links state 2 when arcdivide state 1
-	UPDATE link SET the_geom = geom_line FROM temp_table t WHERE fid = 398 AND t.expl_id = link_id ;
-									
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result

@@ -96,6 +96,9 @@ v_node1_graph text;
 v_node_1 text;
 v_node2_graph  text; 
 v_node_2 text;
+rec_connec record;
+rec_link record;
+rec_gully record;
 
 BEGIN
 
@@ -167,6 +170,7 @@ BEGIN
 
 	--capture old feature values for basic attributes
 	IF v_feature_type IN ('node', 'arc') THEN
+
 		EXECUTE 'SELECT epa_type, epa_table FROM '||v_feature_layer||' c JOIN sys_feature_epa_type s ON epa_type=s.id 
 		WHERE '||v_feature_type||'_type='||quote_literal(v_old_featuretype)||' AND feature_type IN (''NODE'', ''ARC'')
 		AND '||v_id_column||'='||quote_literal(v_old_feature_id)||' limit 1'
@@ -293,6 +297,7 @@ BEGIN
 			VALUES (v_fid, v_result_id, concat('New feature (',v_id,') inserted into connec table.'));
 
 		ELSIF v_feature_type = 'gully' THEN
+		
 			INSERT INTO gully (gully_id, code, gully_type,gratecat_id, sector_id, dma_id, expl_id, state, state_type, the_geom,workcat_id, verified, 
 			inventory, category_type, function_type, fluid_type, location_type) 
 			VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_sector_id, v_dma_id,v_expl_id, 0, v_state_type, v_the_geom, v_workcat_id_end, 
@@ -435,8 +440,32 @@ BEGIN
 				INSERT INTO audit_check_data (fid, result_id, error_message)
 				VALUES (v_fid, v_result_id, concat('Reconnect arc ',rec_arc.arc_id,'.'));
 			END LOOP;
+
+			FOR rec_connec IN SELECT connec_id FROM connec WHERE pjoint_id = v_old_feature_id AND  pjoint_type = 'NODE'
+			LOOP
+				UPDATE connec SET pjoint_id=v_id where connec_id=rec_connec.connec_id;
+				INSERT INTO audit_check_data (fid, result_id, error_message)
+				VALUES (v_fid, v_result_id, concat('Reconnect connec ',rec_connec.connec_id,'.'));
+			END LOOP;
+
+			FOR rec_link IN SELECT link_id FROM link WHERE exit_id = v_old_feature_id AND exit_type = 'NODE'
+			LOOP
+				UPDATE link SET exit_id=v_id where link_id=rec_link.link_id;
+				INSERT INTO audit_check_data (fid, result_id, error_message)
+				VALUES (v_fid, v_result_id, concat('Reconnect link ',rec_link.link_id,'.'));
+			END LOOP;
+
+			IF v_project_type = 'UD' THEN
+				FOR rec_gully IN SELECT gully_id FROM gully WHERE pjoint_id = v_old_feature_id AND pjoint_type = 'NODE'
+				LOOP
+					UPDATE gully SET pjoint_id=v_id where gully_id=rec_gully.gully_id;
+					INSERT INTO audit_check_data (fid, result_id, error_message)
+					VALUES (v_fid, v_result_id, concat('Reconnect gully ',rec_gully.gully_id,'.'));
+				END LOOP;
+			END IF;
 			
 		ELSIF v_feature_type='arc' THEN
+		
 			UPDATE connec SET arc_id = v_id WHERE arc_id = v_old_feature_id;
 			GET DIAGNOSTICS v_count = row_count;
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' operative connec(s) have been reconnected'));

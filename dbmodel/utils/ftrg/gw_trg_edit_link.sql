@@ -184,8 +184,8 @@ BEGIN
 			AND state>0 ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
 
 			--gully as end point
-			SELECT * INTO v_gully2 FROM v_edit_gully WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_gully.the_geom,v_link_searchbuffer) 
-			AND state>0 AND gully_id != v_gully1.gully_id ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
+			SELECT * INTO v_gully2 FROM v_edit_gully WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_gully.the_geom, v_link_searchbuffer) 
+			AND state > 0 ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
 
 			IF v_gully1.gully_id IS NOT NULL THEN
 				NEW.feature_id=v_gully1.gully_id;
@@ -193,7 +193,7 @@ BEGIN
 				v_init_state = v_gully1.state;
 			END IF;
 		END IF;
-				
+
 		IF v_connec1.connec_id IS NOT NULL THEN
 			NEW.feature_id=v_connec1.connec_id;
 			NEW.feature_type='CONNEC';
