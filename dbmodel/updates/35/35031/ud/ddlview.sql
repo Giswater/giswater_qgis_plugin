@@ -296,6 +296,7 @@ CREATE OR REPLACE VIEW v_connec AS
 SELECT vu_connec.* FROM vu_connec
 JOIN v_state_connec USING (connec_id);
 
+
 CREATE OR REPLACE VIEW v_edit_connec AS 
 SELECT * FROM v_connec;
 
@@ -497,7 +498,9 @@ CREATE OR REPLACE VIEW vu_node AS
             node.the_geom,
             node.workcat_id_plan,
             node.asset_id,
-            node.drainzone_id
+            node.drainzone_id,
+	    node.parent_id,
+	    node.arc_id
            FROM node
              LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
              LEFT JOIN cat_feature ON cat_feature.id::text = node.node_type::text
@@ -583,7 +586,9 @@ CREATE OR REPLACE VIEW vu_node AS
     vu_node.lastupdate_user,
     vu_node.workcat_id_plan,
     vu_node.asset_id,
-    vu_node.drainzone_id
+    vu_node.drainzone_id,
+    vu_node.parent_id,
+    vu_node.arc_id
    FROM vu_node;
 
 
@@ -605,8 +610,12 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_connec"], "fieldName":"drainzone_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_gully"], "fieldName":"drainzone_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"arc_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"drainzone_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_arc"], "fieldName":"cat_area", "action":"ADD-FIELD","hasChilds":"True"}}$$);
@@ -1587,7 +1596,7 @@ CREATE OR REPLACE VIEW v_connec AS
     vu_connec.state_type,
     vu_connec.connec_depth,
     vu_connec.connec_length,
-    vu_connec.arc_id,
+    v_state_connec.arc_id,
     vu_connec.annotation,
     vu_connec.observ,
     vu_connec.comment,
@@ -1661,7 +1670,7 @@ CREATE OR REPLACE VIEW v_gully AS
     vu_gully.connec_arccat_id,
     vu_gully.connec_length,
     vu_gully.connec_depth,
-    vu_gully.arc_id,
+    v_state_gully.arc_id,
     vu_gully.expl_id,
     vu_gully.macroexpl_id,
     vu_gully.sector_id,
