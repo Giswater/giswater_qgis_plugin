@@ -53,7 +53,7 @@ BEGIN
 
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
 
-	v_psector_vdefault = (SELECT config_param_user.value::integer AS value FROM config_param_user WHERE config_paam_user.parameter::text
+	v_psector_vdefault = (SELECT config_param_user.value::integer AS value FROM config_param_user WHERE config_param_user.parameter::text
 	    = 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1);
 	
 	

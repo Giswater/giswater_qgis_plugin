@@ -96,7 +96,7 @@ BEGIN
 		v_id = NEW.id;
 		SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
 		SELECT * INTO v_link FROM link WHERE link_id = NEW.link_id;
-		
+
 		-- getting the new geometry of link
 		IF (SELECT userdefined_geom FROM link WHERE link_id = NEW.link_id) IS NULL THEN
 
@@ -123,6 +123,7 @@ BEGIN
 			v_link.the_geom := ST_ShortestLine(v_feature_geom, v_arc.the_geom);
 
 		ELSIF (SELECT userdefined_geom FROM link WHERE link_id = NEW.link_id) IS TRUE THEN 
+
 			IF v_link.the_geom IS NULL THEN v_link.the_geom := ST_ShortestLine(v_feature_geom, v_arc.the_geom); END IF;
 			v_point_aux := St_closestpoint(v_arc.the_geom, St_endpoint(v_link.the_geom ));
 			v_link.the_geom  := ST_SetPoint(v_link.the_geom , ST_NumPoints(v_link.the_geom ) - 1, v_point_aux);
@@ -134,7 +135,6 @@ BEGIN
 		END IF;
 			
 		IF v_projecttype = 'WS' THEN
-		
 			UPDATE link SET sector_id = v_arc.sector_id, fluid_type = v_arc.fluid_type, 
 			dma_id = v_arc.dma_id, dqa_id = v_arc.dqa_id, presszone_id = v_arc.presszone_id, minsector_id = v_arc.minsector_id
 			WHERE link_id = NEW.link_id;
