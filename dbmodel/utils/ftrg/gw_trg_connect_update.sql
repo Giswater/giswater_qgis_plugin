@@ -141,7 +141,6 @@ BEGIN
 			END LOOP;
 		END IF;
 
-
 		-- update the rest of the feature parameters for state = 1 connects
 		FOR v_link IN SELECT * FROM link WHERE (exit_type='GULLY' AND exit_id=OLD.gully_id) AND state = 1
 		LOOP
@@ -157,12 +156,11 @@ BEGIN
 			END IF;
 		END LOOP;
 
-
 		-- update planned links (and planned connects as well)
 		FOR v_link IN SELECT * FROM link WHERE (exit_type='GULLY' AND exit_id=OLD.gully_id) AND state = 2
 		LOOP
 			UPDATE link SET expl_id=NEW.expl_id, sector_id=NEW.sector_id, dma_id = NEW.dma_id, fluid_type = NEW.fluid_type
-			WHERE link_id=v_link.feature_id;
+			WHERE link_id=v_link.link_id;
 
 			UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE link_id = v_link.link_id;
 			
