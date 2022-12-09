@@ -43,7 +43,6 @@ v_exit record;
 v_arc record;
 v_vnode record;
 v_connect_id  varchar;
-v_exit_id text;
 point_aux public.geometry;
 aux_geom public.geometry;
 v_node_proximity double precision;
@@ -72,6 +71,7 @@ v_forcedarcs text;
 v_count integer;
 v_psector_vdefault integer;
 v_link_id integer;
+
 
 BEGIN
 	
@@ -127,9 +127,7 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (217, null, 4, concat('Trying to connect ', lower(v_feature_type),' with id ',v_connect_id,'.'));
 	
-		-- get link information (if exits)
-		SELECT * INTO v_link FROM link WHERE feature_id = v_connect_id AND feature_type=v_feature_type;
-
+		
 		-- get feature information
 		IF v_feature_type ='CONNEC' THEN          
 			SELECT * INTO v_connect FROM connec WHERE connec_id = v_connect_id;
@@ -137,6 +135,8 @@ BEGIN
 		ELSIF v_feature_type ='GULLY' THEN 
 			SELECT * INTO v_connect FROM gully WHERE gully_id = v_connect_id;
 		END IF;
+
+		SELECT * INTO v_link FROM link WHERE feature_id = v_connect_id AND feature_type=v_feature_type;
 
 		-- exception control. It is not possible to create a link for connec over arc		
 		SELECT * INTO v_arc FROM v_edit_arc WHERE ST_DWithin(v_connect.the_geom, v_edit_arc.the_geom, 0.001);
@@ -146,8 +146,7 @@ BEGIN
 			VALUES (217, null, 4, concat('FAILED: Link not created because connect ',v_connect_id,' is over arc ', v_arc.arc_id));
 		ELSE
 			-- check if exists on same psector links for related connects
-			IF 
-			v_feature_type ='CONNEC' AND v_connect.state=1 THEN          
+			IF v_feature_type ='CONNEC' AND v_connect.state=1 THEN          
 				SELECT count(*) INTO v_count FROM plan_psector_x_connec WHERE connec_id = v_connect_id AND psector_id = v_psector_vdefault AND state = 1;
 
 			ELSIF v_feature_type ='GULLY' AND v_connect.state=1 THEN          
@@ -162,7 +161,7 @@ BEGIN
 
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
-				VALUES (217, null, 4, concat('FAILED: It is not possible to reconnect ',v_connect_id,' because is involved on some visible psector. Please use psector dialog to re-connect'));			
+				VALUES (217, null, 4, concat('FAILED: It is not possible to reconnect ',v_connect_id,' because is involved on some visible psector. Please use psector dialog to re-connect'));	
 			ELSE
 				-- get arc_id (if feature does not have) using buffer  
 				IF v_connect.arc_id IS NULL THEN
@@ -230,7 +229,8 @@ BEGIN
 						v_link.the_geom := ST_ShortestLine(v_connect.the_geom, v_arc.the_geom);
 						v_link.userdefined_geom = FALSE;
 						v_link.exit_type = 'ARC';
-
+						v_link.exit_id = v_arc.arc_id;
+			
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 						VALUES (217, null, 4, concat('Connect feature with the closest arc.'));
 					END IF;
@@ -246,7 +246,7 @@ BEGIN
 					VALUES (v_link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id, 
 					v_link.userdefined_geom, v_connect.state, v_arc.expl_id, v_arc.sector_id, v_arc.dma_id, v_arc.presszone_id, v_arc.dqa_id, v_arc.minsector_id);
 					
-				ELSIF v_projecttype = 'UD' THEN
+				ELSIF v_projecttype = 'UD' THEN			
 					INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, userdefined_geom, state, expl_id, sector_id, dma_id) 
 					VALUES (v_link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id, 
 					v_link.userdefined_geom, v_connect.state, v_arc.expl_id, v_arc.sector_id, v_arc.dma_id);
@@ -254,9 +254,11 @@ BEGIN
 
 				-- update psector tables
 				IF v_connect.state=2 THEN
+				
 					IF v_feature_type ='CONNEC' THEN
 						UPDATE plan_psector_x_connec SET link_id = v_link_id, arc_id = v_arc.arc_id WHERE psector_id = v_psector_vdefault AND connec_id = v_connect_id;
-					ELSIF v_feature_type ='CONNEC' THEN
+						
+					ELSIF v_feature_type ='GULLY' THEN
 						UPDATE plan_psector_x_gully SET link_id = v_link_id, arc_id = v_arc.arc_id WHERE psector_id = v_psector_vdefault AND gully_id = v_connect_id;
 					END IF;
 				END IF;
@@ -266,7 +268,7 @@ BEGIN
 
 				IF v_pjointtype IS NULL THEN
 					v_pjointtype = 'ARC';
-					v_pjointid = v_exit_id;
+					v_pjointid = v_link.exit_id;
 				END IF;
 
 				-- Update connect attributes
