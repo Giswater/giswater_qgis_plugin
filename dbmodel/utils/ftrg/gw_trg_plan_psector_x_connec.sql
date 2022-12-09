@@ -16,13 +16,12 @@ This trigger controls if connect has link and wich class of link it has as well 
 
 DECLARE 
 v_stateaux smallint;
-v_arcaux text;
 
 BEGIN 
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-	SELECT connec.state, connec.arc_id INTO v_stateaux, v_arcaux FROM connec WHERE connec_id=NEW.connec_id;
+	SELECT connec.state INTO v_stateaux FROM connec WHERE connec_id=NEW.connec_id;
 	
 	IF NEW.state IS NULL AND v_stateaux=1 THEN
 		NEW.state=0;
@@ -36,7 +35,6 @@ BEGIN
 	
 	ELSIF NEW.state = 0 AND v_stateaux=1 THEN
 		NEW.doable=false;
-		NEW.arc_id=v_arcaux;
 		
 	ELSIF v_stateaux=2 THEN
 		IF NEW.state = 0 THEN
