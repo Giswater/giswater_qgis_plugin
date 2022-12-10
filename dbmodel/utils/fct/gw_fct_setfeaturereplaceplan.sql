@@ -139,53 +139,46 @@ BEGIN
 					RETURNING arc_id INTO v_arc;
 				END IF;
 
-				FOR v_link IN SELECT l.* FROM connec c JOIN link l on feature_id = connec_id WHERE l.state = 1 and arc_id = v_id AND c.state=1
+				FOR v_link IN SELECT l.* FROM v_edit_connec c JOIN link l on feature_id = connec_id WHERE l.state = 1 and arc_id = v_id AND c.state > 0
 				LOOP
-
 					INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable, link_id)
 					VALUES (v_currentpsector, v_link.feature_id, v_arc, 0, false, v_link.link_id)
 					ON CONFLICT (connec_id, psector_id, state) DO NOTHING;
 
 					IF v_project_type = 'WS' THEN
 
-						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, sector_id, presszone_id, 
+						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, state, expl_id, the_geom, sector_id, presszone_id, 
 						dma_id, dqa_id, minsector_id, fluid_type) SELECT feature_id, feature_type, v_arc, 'ARC', userdefined_geom, 2, expl_id, the_geom, sector_id, 
 						presszone_id, dma_id, dqa_id, minsector_id, fluid_type FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
 					ELSE
-						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, sector_id, dma_id, fluid_type)
-						SELECT feature_id, feature_type, v_arc, 'ARC', userdefined_geom, 2, expl_id, the_geom, sector_id, dma_id,fluid_type  
+						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, state, expl_id, the_geom, sector_id, dma_id, fluid_type)
+						SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, sector_id, dma_id,fluid_type  
 						FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
 					END IF;
 
 					INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable, link_id)
 					VALUES (v_currentpsector, v_link.feature_id, v_arc, 1, false, v_link_id)
 					ON CONFLICT (connec_id, psector_id, state) DO NOTHING;
+				END LOOP;
+				
+				-- looking for gullies
+				IF v_project_type = 'UD' THEN
 
-					
-					-- looking for gullies
-					IF v_project_type = 'UD' THEN
-
+					FOR v_link IN SELECT l.* FROM v_edit_gully c JOIN link l on feature_id = gully_id WHERE l.state = 1 and arc_id = v_id AND c.state > 0
+					LOOP
 						INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable, link_id)
 						VALUES (v_currentpsector, v_link.feature_id, v_arc, 0, false, v_link.link_id)
 						ON CONFLICT (gully_id, psector_id, state) DO NOTHING;
 
-						IF v_project_type = 'WS' THEN
-
-							INSERT INTO link (feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, sector_id, presszone_id, 
-							dma_id, dqa_id, minsector_id, fluid_type) SELECT feature_id, feature_type, v_arc, 'ARC', userdefined_geom, 2, expl_id, the_geom, sector_id, 
-							presszone_id, dma_id, dqa_id, minsector_id, fluid_type FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
-						ELSE
-							INSERT INTO link (feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, sector_id, dma_id, fluid_type)
-							SELECT feature_id, feature_type, v_arc, 'ARC', userdefined_geom, 2, expl_id, the_geom, sector_id, dma_id,fluid_type  
-							FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
-						END IF;
-
+						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, state, expl_id, the_geom, sector_id, dma_id, fluid_type)
+						SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, sector_id, dma_id,fluid_type  
+						FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
+			
 						INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable, link_id)
 						VALUES (v_currentpsector, v_link.feature_id, v_arc, 1, false, v_link_id)
 						ON CONFLICT (gully_id, psector_id, state) DO NOTHING;
-					END IF;
-					
-				END LOOP;
+					END LOOP;
+				END IF;
 				
 				SELECT count(*) INTO v_count FROM connec WHERE arc_id = v_id AND state=1;
 
@@ -205,7 +198,6 @@ BEGIN
 
 				UPDATE arc SET streetaxis_id = rec.streetaxis_id WHERE arc_id = v_arc;
 				UPDATE arc SET streetaxis2_id = rec.streetaxis_id WHERE arc_id = v_arc;
-				
 			END IF;
 		END LOOP;
 
@@ -218,7 +210,6 @@ BEGIN
 	ELSE
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Replacement on planned mode is only available for arcs'));
 		v_message = 'Replacement on planned mode is only available for arcs';
-	
 	END IF;
 
 	-- get info
@@ -243,8 +234,6 @@ BEGIN
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-
- 
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

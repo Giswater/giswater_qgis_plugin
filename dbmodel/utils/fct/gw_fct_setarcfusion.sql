@@ -139,7 +139,7 @@ BEGIN
 
 			-- Compare arcs
 			IF v_record1.arccat_id = v_record2.arccat_id AND v_record1.sector_id = v_record2.sector_id AND
-			   v_record1.expl_id = v_record2.expl_id AND v_record1.state = v_record2.state THEN
+			   v_record1.expl_id = v_record2.expl_id THEN
 
 				-- Final geometry
 				IF v_record1.node_1 = v_node_id THEN
@@ -266,7 +266,7 @@ BEGIN
 					-- update planned connecs
 					SELECT count(connec_id) INTO v_count FROM plan_psector_x_connec WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
 					IF v_count > 0 THEN
-						UPDATE plan_psector_x_connec SET arc_id=v_new_record.arc_id WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
+						UPDATE plan_psector_x_connec SET arc_id=v_new_record.arc_id WHERE (arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id) AND state = 1;
 						INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Reconnect planned ',v_count,' connecs.'));
 					END IF;
 
@@ -274,7 +274,7 @@ BEGIN
 					IF v_project_type = 'UD' THEN
 						SELECT count(gully_id) INTO v_count FROM plan_psector_x_gully WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
 						IF v_count > 0 THEN
-							UPDATE plan_psector_x_gully SET arc_id=v_new_record.arc_id WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
+							UPDATE plan_psector_x_gully SET arc_id=v_new_record.arc_id WHERE (arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id) AND state = 1;
 							INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Reconnect planned ',v_count,' gullies.'));
 						END IF;
 					END IF;
@@ -420,24 +420,31 @@ BEGIN
 					END LOOP;
 
 					-- update operative connecs
-					SELECT count(connec_id) INTO v_count FROM connec WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
+					SELECT count(connec_id) INTO v_count FROM connec WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id AND state = 1;
 					IF v_count > 0 THEN
+						INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable, link_id) 
+						SELECT v_psector_id, connec_id, arc_id, 0, false, link_id FROM connec c JOIN link l ON connec_id = feature_id 
+						WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND c.state = 1 and l.state = 1;
+						
 						INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable) 
-						SELECT v_psector_id, connec_id, arc_id, 1, false FROM v_edit_connec WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id)
-						ON CONFLICT(connec_id, psector_id, state) DO UPDATE SET arc_id = v_new_record.arc_id;
+						SELECT v_psector_id, connec_id, arc_id, 1, false FROM connec c WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND state = 1;
 
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (214, 1, concat('Reconnect operative ',v_count,' connecs.'));
-					END IF;
-
+					END IF;		
+				
 					-- update operative gullies
 					IF v_project_type='UD' THEN
-						SELECT count(gully_id) INTO v_count FROM gully WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
+						SELECT count(gully_id) INTO v_count FROM gully WHERE (arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id) AND state = 1;
 						IF v_count > 0 THEN
-							INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable) 
-							SELECT v_psector_id, gully_id, arc_id, 1, false FROM v_edit_gully WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id)
-							ON CONFLICT(gully_id, psector_id, state) DO UPDATE SET arc_id = v_new_record.arc_id;
+						
+							INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable, link_id) 
+							SELECT v_psector_id, gully_id, arc_id, 0, false, link_id FROM gully c JOIN link l ON gully_id = feature_id 
+							WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND c.state = 1 and l.state = 1;
 
+							INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable) 
+							SELECT v_psector_id, gully_id, arc_id, 1, false FROM gully c WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND state = 1;
+							
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
 							VALUES (214, 1, concat('Reconnect operative ',v_count,' gullies.'));
 						END IF;
@@ -446,15 +453,17 @@ BEGIN
 					-- update planned connecs
 					SELECT count(connec_id) INTO v_count FROM plan_psector_x_connec WHERE psector_id=v_psector_id AND arc_id IN (v_record1.arc_id, v_record2.arc_id);
 					IF v_count > 0 THEN
-						UPDATE plan_psector_x_connec SET arc_id=v_new_record.arc_id WHERE psector_id=v_psector_id AND arc_id IN (v_record1.arc_id, v_record2.arc_id);
+						UPDATE plan_psector_x_connec SET arc_id=v_new_record.arc_id WHERE psector_id=v_psector_id AND arc_id IN (v_record1.arc_id, v_record2.arc_id)
+						AND state = 1;
 						INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Reconnect planned ',v_count,' connecs.'));
 					END IF;
 
 					-- update planned gullies
 					IF v_project_type = 'UD' THEN
-						SELECT count(gully_id) INTO v_count FROM plan_psector_x_gully WHERE psector_id=v_psector_id AND arc_id IN (v_record1.arc_id, v_record2.arc_id);
+						SELECT count(gully_id) INTO v_count FROM plan_psector_x_gully WHERE psector_id=v_psector_id AND arc_id IN (v_record1.arc_id, v_record2.arc_id) AND state = 1; 
 						IF v_count > 0 THEN
-							UPDATE plan_psector_x_gully SET arc_id=v_new_record.arc_id WHERE psector_id=v_psector_id AND arc_id IN (v_record1.arc_id, v_record2.arc_id);
+							UPDATE plan_psector_x_gully SET arc_id=v_new_record.arc_id WHERE psector_id=v_psector_id AND arc_id IN (v_record1.arc_id, v_record2.arc_id)
+							AND state = 1;
 							INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Reconnect planned ',v_count,' gullies.'));
 						END IF;
 					END IF;
@@ -479,8 +488,7 @@ BEGIN
 					ELSE
 						INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Delete planned node ',v_node_id));
 						DELETE FROM node WHERE node_id = v_node_id;
-					END IF;
-					
+					END IF;					
 				END IF;
 
 			INSERT INTO audit_check_data (fid,  criticity, error_message)

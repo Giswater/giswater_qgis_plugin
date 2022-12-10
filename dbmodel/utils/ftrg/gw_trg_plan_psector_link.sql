@@ -14,7 +14,6 @@ $BODY$
 DECLARE 
 
 v_table_name text;
-v_feature_geom public.geometry;
 v_point_aux public.geometry;
 v_channel text;
 v_schemaname text;
@@ -46,109 +45,39 @@ BEGIN
 	IF v_table_name = 'connec' THEN
 		v_featuretype = 'CONNEC';
 		v_feature = NEW.connec_id;
-		v_feature_geom = (SELECT the_geom FROM connec WHERE connec_id = NEW.connec_id);
 
 	ELSIF v_table_name = 'gully' THEN
 		v_featuretype = 'GULLY';
 		v_feature = NEW.gully_id;
-		v_feature_geom = (SELECT the_geom FROM gully WHERE gully_id = NEW.gully_id);
 	END IF;
 
 	SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
 
 	-- executing options
-	IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') AND NEW.state = 0 THEN
-
-		IF v_table_name = 'connec' THEN
-			v_link.link_id = (SELECT link_id FROM link WHERE feature_id = NEW.connec_id AND state = 1);
-			UPDATE plan_psector_x_connec SET link_id = v_link.link_id WHERE id = NEW.id;
-			
-		ELSIF v_table_name = 'gully' THEN
-			v_link.link_id = (SELECT link_id FROM link WHERE feature_id = NEW.gully_id AND state = 1);
-			UPDATE plan_psector_x_gully SET link_id = v_link.link_id WHERE id = NEW.id;
-		END IF;	
-
-	ELSIF TG_OP = 'INSERT' AND NEW.state = 1 THEN 
+	IF TG_OP = 'INSERT' THEN
 	
-		IF NEW.arc_id IS NOT NULL THEN
-
-			-- link values definition
-			v_link.link_id := (SELECT nextval('SCHEMA_NAME.link_link_id_seq'));
-			v_link.the_geom := ST_ShortestLine(v_feature_geom, v_arc.the_geom);
-					
-			IF v_projecttype = 'WS' THEN
-				INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id, dqa_id, 
-				presszone_id, minsector_id)
-				VALUES (v_link.link_id, v_featuretype, v_feature, v_arc.expl_id, NEW.arc_id, 'ARC', FALSE, 2, v_link.the_geom , v_arc.sector_id, v_arc.fluid_type, v_arc.dma_id, v_arc.dqa_id, 
-				v_arc.presszone_id, v_arc.minsector_id);
-				
-			ELSIF  v_projecttype = 'UD' THEN
-				INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id)
-				VALUES (v_link.link_id, v_featuretype, v_feature,v_arc.expl_id, NEW.arc_id, 'ARC', FALSE, 2, v_link.the_geom , v_arc.sector_id, v_arc.fluid_type, v_arc.dma_id);
-			END IF;
+		IF NEW.state = 0 THEN
 			
-			EXECUTE 'UPDATE plan_psector_x_'||v_table_name||' SET link_id = '||v_link.link_id||' WHERE id = '||v_id;
-		END IF;
-
-	ELSIF TG_OP = 'UPDATE' AND NEW.state = 1 AND COALESCE(NEW.arc_id,'') != COALESCE(OLD.arc_id,'') THEN
-
-		-- getting variables
-		v_id = NEW.id;
-		SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
-		SELECT * INTO v_link FROM link WHERE link_id = NEW.link_id;
-
-		-- getting the new geometry of link
-		IF (SELECT userdefined_geom FROM link WHERE link_id = NEW.link_id) IS NULL THEN
-
-			IF  v_arc.arc_id IS NOT NULL THEN
-
-				-- link values definition
-				v_link.link_id := (SELECT nextval('link_link_id_seq'));
-				v_link.the_geom := ST_ShortestLine(v_feature_geom, v_arc.the_geom);
-
-				IF v_projecttype = 'WS' THEN
-					INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id, dqa_id, 
-					presszone_id, minsector_id)
-					VALUES (v_link.link_id, v_featuretype, v_feature, v_arc.expl_id, NEW.arc_id, 'ARC', FALSE, 2, v_link.the_geom , v_arc.sector_id, v_arc.fluid_type, v_arc.dma_id, v_arc.dqa_id, 
-					v_arc.presszone_id, v_arc.minsector_id);
-					
-				ELSIF  v_projecttype = 'UD' THEN
-					INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id)
-					VALUES (v_link.link_id, v_featuretype, v_feature,v_arc.expl_id, NEW.arc_id, 'ARC', FALSE, 2, v_link.the_geom , v_arc.sector_id, v_arc.fluid_type, v_arc.dma_id);
-				END IF;	
-				EXECUTE 'UPDATE plan_psector_x_'||v_table_name||' SET link_id = '||v_link.link_id||' WHERE id = '||v_id;
-			END IF;
-			
-		ELSIF (SELECT userdefined_geom FROM link WHERE link_id = NEW.link_id) IS FALSE THEN
-			v_link.the_geom := ST_ShortestLine(v_feature_geom, v_arc.the_geom);
-
-		ELSIF (SELECT userdefined_geom FROM link WHERE link_id = NEW.link_id) IS TRUE THEN 
-
-			IF v_link.the_geom IS NULL THEN v_link.the_geom := ST_ShortestLine(v_feature_geom, v_arc.the_geom); END IF;
-			v_point_aux := St_closestpoint(v_arc.the_geom, St_endpoint(v_link.the_geom ));
-			v_link.the_geom  := ST_SetPoint(v_link.the_geom , ST_NumPoints(v_link.the_geom ) - 1, v_point_aux);
-		END IF;
-
-		IF v_link.exit_type = 'ARC' THEN
-			UPDATE link SET the_geom = v_link.the_geom , exit_id = v_arc.arc_id, exit_type='ARC'
-			WHERE link_id = v_link.link_id;
-		END IF;
-			
-		IF v_projecttype = 'WS' THEN
-			UPDATE link SET sector_id = v_arc.sector_id, fluid_type = v_arc.fluid_type, 
-			dma_id = v_arc.dma_id, dqa_id = v_arc.dqa_id, presszone_id = v_arc.presszone_id, minsector_id = v_arc.minsector_id
-			WHERE link_id = NEW.link_id;
-		
-		ELSIF v_projecttype = 'UD' THEN
-			UPDATE link SET sector_id = v_arc.sector_id, fluid_type = v_arc.fluid_type, 
-			dma_id = v_arc.dma_id WHERE link_id = NEW.link_id;
-		END IF;	
+		ELSIF NEW.state = 1 THEN
 	
-		IF NEW.arc_id IS NULL THEN
-			EXECUTE 'UPDATE plan_psector_x_'||v_table_name||' SET link_id = NULL WHERE id = '||v_id;
-			DELETE FROM link WHERE link_id = NEW.link_id;			
-		ELSE
-			EXECUTE 'UPDATE plan_psector_x_'||v_table_name||' SET arc_id = '||NEW.arc_id||' WHERE id = '||v_id;
+			IF NEW.arc_id IS NOT NULL AND NEW.link_id IS NULL THEN
+
+				EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+				"feature":{"id":["'|| v_feature ||'"]},"data":{"feature_type":"'|| v_featuretype ||'", "isPsector":"true", "forceArcs":['||NEW.arc_id||']}}$$)';
+			END IF;
+		END IF;
+
+	ELSIF TG_OP = 'UPDATE' THEN 
+
+		IF NEW.state = 1 AND COALESCE(NEW.arc_id,'') != COALESCE(OLD.arc_id,'') AND COALESCE(NEW.link_id,0) = COALESCE(OLD.link_id,0) THEN
+
+			IF NEW.arc_id IS NULL THEN
+				EXECUTE 'UPDATE plan_psector_x_'||v_table_name||' SET link_id = NULL WHERE id = '||v_id;
+				DELETE FROM link WHERE link_id = NEW.link_id;			
+			ELSE
+				EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+				"feature":{"id":["'|| v_feature ||'"]},"data":{"feature_type":"'|| v_featuretype ||'", "isPsector":"true", "forceArcs":['||NEW.arc_id||']}}$$)';
+			END IF;
 		END IF;
 	END IF;
 
@@ -159,7 +88,7 @@ BEGIN
 		FOR v_connect IN SELECT connec_id FROM connec JOIN link l ON l.feature_id = connec_id WHERE l.feature_type = 'CONNEC' AND exit_type = 'CONNEC' and exit_id = NEW.connec_id
 		LOOP
 			UPDATE connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect;
-			UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect;
+			UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect AND psector_id = NEW.psector_id;
 		END LOOP;
 		
 		-- looking for related gullies
@@ -167,7 +96,7 @@ BEGIN
 			FOR v_connect IN SELECT gully_id FROM gully JOIN link l ON l.feature_id = gully_id WHERE l.feature_type = 'GULLY' AND exit_type = 'CONNEC' and exit_id = NEW.connec_id
 			LOOP
 				UPDATE gully SET arc_id = NEW.arc_id WHERE gully_id = v_connect;
-				UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE gully_id = v_connect;
+				UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE gully_id = v_connect AND psector_id = NEW.psector_id;
 			END LOOP;
 		END IF;	
 	
@@ -177,14 +106,14 @@ BEGIN
 		FOR v_connect IN SELECT connec_id FROM connec JOIN link l ON l.feature_id = connec_id WHERE l.feature_type = 'CONNEC' AND exit_type = 'GULLY' and exit_id = NEW.gully_id
 		LOOP
 			UPDATE connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect;
-			UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect;
+			UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect AND psector_id = NEW.psector_id;
 		END LOOP;
 		
 		-- looking for related gullies
 		FOR v_connect IN SELECT gully_id FROM gully JOIN link l ON l.feature_id = gully_id WHERE l.feature_type = 'GULLY' AND exit_type = 'GULLY' and exit_id = NEW.gully_id
 		LOOP
 			UPDATE gully SET arc_id = NEW.arc_id WHERE gully_id = v_connect;
-			UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE gully_id = v_connect;
+			UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE gully_id = v_connect AND psector_id = NEW.psector_id;
 		END LOOP;
 	END IF;		
 

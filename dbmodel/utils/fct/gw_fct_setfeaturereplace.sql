@@ -168,28 +168,6 @@ BEGIN
 	EXECUTE 'SELECT  '|| v_cat_column||' FROM '|| v_feature_layer  ||'  WHERE '||v_id_column||'='''||v_old_feature_id||''';'
 	INTO v_old_featurecat;
 
-	--capture old feature values for basic attributes
-	IF v_feature_type IN ('node', 'arc') THEN
-
-		EXECUTE 'SELECT epa_type, epa_table FROM '||v_feature_layer||' c JOIN sys_feature_epa_type s ON epa_type=s.id 
-		WHERE '||v_feature_type||'_type='||quote_literal(v_old_featuretype)||' AND feature_type IN (''NODE'', ''ARC'')
-		AND '||v_id_column||'='||quote_literal(v_old_feature_id)||' limit 1'
-		INTO v_epa_type,v_epa_table;
-
-		EXECUTE 'SELECT epa_default, epa_table FROM cat_feature_'||v_feature_type||' c JOIN sys_feature_epa_type s ON epa_default=s.id 
-		WHERE c.id='||quote_literal(v_feature_type_new)||' AND feature_type IN (''NODE'', ''ARC'')'
-		INTO v_epa_type_new, v_epa_table_new;
-
-		IF v_old_featuretype=v_feature_type_new THEN
-			v_epa_type_new=v_epa_type;
-			v_epa_table_new=v_epa_table;
-		END IF;
-		IF  v_feature_type='node' AND v_old_feature_id NOT IN (SELECT node_1 FROM v_edit_arc UNION SELECT node_2 FROM v_edit_arc) THEN
-			v_epa_type_new='UNDEFINED';
-			v_epa_table_new = NULL;
-		END IF;
-	END IF;
-
 	EXECUTE 'SELECT sector_id FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
 	INTO v_sector_id;
 	EXECUTE 'SELECT state_type FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
@@ -223,6 +201,15 @@ BEGIN
 	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_feature_id||''';'
 	INTO v_location;
 
+	-- epa
+	IF v_feature_type ='connec' AND v_project_type = 'UD' THEN
+		-- is not epa
+	ELSE
+		EXECUTE 'SELECT epa_type FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
+		INTO v_epa_type_new;
+		v_epa_table_new = concat ('inp_',lower(v_epa_type_new));
+	END IF;
+	
 	-- Control of state(1)
 	IF (v_state=0 OR v_state=2 OR v_state IS NULL) THEN
 
@@ -248,6 +235,7 @@ BEGIN
 		END IF;
 		-- inserting new feature on parent tables
 		IF v_feature_type='node' THEN
+		
 			IF v_project_type='WS' then
 				INSERT INTO node (node_id, code, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom,
 				category_type, function_type, fluid_type, location_type) 
@@ -264,6 +252,7 @@ BEGIN
 			VALUES (v_fid, v_result_id, concat('New feature (',v_id,') inserted into node table.'));
 
 		ELSIF v_feature_type='arc' THEN
+		
 			IF v_project_type='WS' then
 				INSERT INTO arc (arc_id, code, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom, 
 				verified, category_type, function_type, fluid_type, location_type) 
@@ -283,9 +272,9 @@ BEGIN
 		
 			IF v_project_type='WS' then
 				INSERT INTO connec (connec_id, code, connecat_id, sector_id, dma_id, expl_id, state, state_type, the_geom, workcat_id, verified, 
-				inventory, category_type, function_type, fluid_type, location_type) 
+				inventory, category_type, function_type, fluid_type, location_type,epa_type) 
 				VALUES (v_id, v_code, v_old_featurecat, v_sector_id, v_dma_id,v_expl_id, 0, v_state_type, v_the_geom, v_workcat_id_end, v_verified_id, 
-				v_inventory, v_category, v_function, v_fluid, v_location);
+				v_inventory, v_category, v_function, v_fluid, v_location, v_epa_type_new);
 			ELSE 
 				INSERT INTO connec (connec_id, code, connec_type, connecat_id,  sector_id, dma_id, expl_id, state, state_type, the_geom, workcat_id, 
 				verified, inventory, category_type, function_type, fluid_type, location_type) 
@@ -299,37 +288,29 @@ BEGIN
 		ELSIF v_feature_type = 'gully' THEN
 		
 			INSERT INTO gully (gully_id, code, gully_type,gratecat_id, sector_id, dma_id, expl_id, state, state_type, the_geom,workcat_id, verified, 
-			inventory, category_type, function_type, fluid_type, location_type) 
+			inventory, category_type, function_type, fluid_type, location_type,epa_type) 
 			VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_sector_id, v_dma_id,v_expl_id, 0, v_state_type, v_the_geom, v_workcat_id_end, 
-			v_verified_id, v_inventory, v_category, v_function, v_fluid, v_location);
+			v_verified_id, v_inventory, v_category, v_function, v_fluid, v_location, v_epa_type_new);
 			
 			INSERT INTO audit_check_data (fid, result_id, error_message)
 			VALUES (v_fid, v_result_id, concat('New feature (',v_id,') inserted into gully table.'));
 		END IF;
 
-		-- inserting new feature on table man_table / epa table
-		IF v_feature_type='node' or v_feature_type='arc' or (v_feature_type='connec' AND v_project_type='WS') THEN
-	
+		IF v_feature_type  in ('arc', 'node') or (v_feature_type ='connec' and v_project_type = 'WS') THEN
+
+			-- inserting new feature on table man_table / epa table
 			EXECUTE 'SELECT man_table FROM cat_feature c JOIN sys_feature_cat s ON c.system_id = s.id WHERE c.id='''||v_feature_type_new||''';'
-			INTO v_man_table;
-	
+				INTO v_man_table;
+		
 			v_query_string_insert='INSERT INTO '||v_man_table||' VALUES ('||v_id||');';
 			execute v_query_string_insert;
-
-			/*IF v_feature_type='node' or v_feature_type='arc' THEN
-				EXECUTE 'SELECT epa_table FROM cat_feature_'||v_feature_type||' c JOIN sys_feature_epa_type s ON epa_default=s.id WHERE c.id='||quote_literal(v_old_featuretype)||' 
-				AND feature_type IN (''NODE'', ''ARC'')'
-				INTO v_epa_table;*/
-			IF v_feature_type='connec' THEN
-				v_epa_table_new = 'inp_connec';
-			END IF;
-			
-			IF v_epa_table_new IS NOT NULL THEN
-				v_query_string_insert='INSERT INTO '||v_epa_table_new||' VALUES ('||v_id||');';
-				execute v_query_string_insert;
-			END IF;
 		END IF;
-		
+
+		IF v_epa_table_new IS NOT NULL THEN
+			v_query_string_insert='INSERT INTO '||v_epa_table_new||' VALUES ('||v_id||');';
+			execute v_query_string_insert;
+		END IF;
+				
 		-- updating values on feature parent table from values of old feature
 		v_sql:='select column_name    FROM information_schema.columns 
 							where (table_schema=''SCHEMA_NAME'' and udt_name <> ''inet'' and 
@@ -465,10 +446,10 @@ BEGIN
 			END IF;
 			
 		ELSIF v_feature_type='arc' THEN
-		
+
 			UPDATE connec SET arc_id = v_id WHERE arc_id = v_old_feature_id;
 			GET DIAGNOSTICS v_count = row_count;
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' operative connec(s) have been reconnected'));
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' operative connec(s) have been reconnected'));		
 			
 			UPDATE plan_psector_x_connec SET arc_id = v_id WHERE arc_id = v_old_feature_id;
 			GET DIAGNOSTICS v_count = row_count;
@@ -484,11 +465,11 @@ BEGIN
 				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' planned gully(s) have been reconnected'));
 			END IF;
 
-		ELSIF v_feature_type='connec' THEN
-			-- nothing to do
+		ELSIF v_feature_type='connec' or  v_feature_type='gully' THEN
 
-		ELSIF v_feature_type='gully' THEN
-			-- nothing to do		
+			UPDATE link SET exit_id = v_id WHERE exit_id = v_old_feature_id AND state > 0;
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' operative/planned links(s) have been reconnected'));
+			
 		END IF;
 
 		-- update node_id on on going or planned psectors

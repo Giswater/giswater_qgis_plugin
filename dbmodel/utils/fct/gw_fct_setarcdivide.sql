@@ -293,7 +293,7 @@ BEGIN
 						INTO v_new_node_graph;
 
 					END IF;
-						
+										
 					-- In function of states and user's variables proceed.....
 					IF v_state_node=1 THEN 
 
@@ -365,10 +365,6 @@ BEGIN
 							VALUES (212, 1,concat('Update arc_id for disconnected node: ',rec_node.node_id,'.'));
 						END LOOP;
 
-						-- Capture linked feature information to redraw (later on this function)
-						INSERT INTO temp_table (fid, geom_line, expl_id) 
-						SELECT 398, the_geom,link_id FROM link JOIN plan_psector_x_connec USING (link_id) WHERE arc_id = v_arc_id AND psector_id = v_psector;
-
 						IF v_project_type='UD' THEN
 							INSERT INTO temp_table (fid, geom_line, expl_id) 
 							SELECT 398, the_geom,link_id FROM link JOIN plan_psector_x_gully USING (link_id) WHERE arc_id = v_arc_id AND psector_id = v_psector;
@@ -376,30 +372,34 @@ BEGIN
 
 						-- connec
 						FOR v_connec_id IN 
-						SELECT connec_id FROM v_edit_connec c JOIN link ON link.feature_id=connec_id WHERE link.feature_type='CONNEC' AND arc_id=v_arc_id AND 
-						c.state > 0
+						SELECT connec_id FROM connec c JOIN link ON link.feature_id=connec_id WHERE link.feature_type='CONNEC' AND arc_id=v_arc_id AND 
+						c.state = 1
 						LOOP
 							v_array_connec:= array_append(v_array_connec, v_connec_id);
 						END LOOP;
 
 						SELECT count(connec_id) INTO v_count_connec FROM v_edit_connec WHERE arc_id=v_arc_id AND state > 0;
 
-						UPDATE connec SET arc_id=NULL WHERE arc_id=v_arc_id AND state > 0;
-						UPDATE plan_psector_x_connec SET arc_id=NULL WHERE arc_id=v_arc_id AND psector_id = v_psector;
+						UPDATE connec SET arc_id=NULL WHERE arc_id=v_arc_id AND state = 1;
+
+						UPDATE plan_psector_x_connec SET link_id=NULL WHERE arc_id=v_arc_id;
+						UPDATE plan_psector_x_connec SET arc_id=NULL WHERE arc_id=v_arc_id;
 						
 						-- gully
 						IF v_project_type='UD' THEN
 
-							FOR v_gully_id IN SELECT gully_id FROM v_edit_gully g JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND arc_id=v_arc_id  AND 
-							g.state > 0
+							FOR v_gully_id IN SELECT gully_id FROM gully g JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND arc_id=v_arc_id  AND 
+							g.state = 1
 							LOOP
 								v_array_gully:= array_append(v_array_gully, v_gully_id);
 							END LOOP;
 
 							SELECT count(gully_id) INTO v_count_gully FROM v_edit_gully WHERE arc_id=v_arc_id AND state > 0;
 
-							UPDATE gully SET arc_id=NULL WHERE arc_id=v_arc_id AND state > 0;
-							UPDATE plan_psector_x_gully SET arc_id=NULL WHERE arc_id=v_arc_id AND psector_id = v_psector;
+							UPDATE gully SET arc_id=NULL WHERE arc_id=v_arc_id AND state = 1;
+
+							UPDATE plan_psector_x_gully SET link_id=NULL WHERE arc_id=v_arc_id;
+							UPDATE plan_psector_x_gully SET arc_id=NULL WHERE arc_id=v_arc_id;
 						END IF;
 								
 						-- Insert data into traceability table
@@ -524,7 +524,7 @@ BEGIN
 							VALUES (212, 1, concat('Delete old arc: ',v_arc_id,'.'));
 						END IF;
 						
-						-- reconnect links
+						-- reconnect operative connecs
 						IF v_count_connec > 0  AND v_array_connec IS NOT NULL THEN
 							EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{"id":'|| array_to_json(v_array_connec)||'},"data":{"feature_type":"CONNEC", "forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
@@ -532,7 +532,8 @@ BEGIN
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
 							VALUES (212, 1, concat('Reconnect ',v_count_connec,' connecs '));
 						END IF;
-						
+
+						-- reconnect operative gullies
 						IF v_count_gully > 0 AND v_array_gully IS NOT NULL THEN
 							EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{"id":'|| array_to_json(v_array_gully)||'},"data":{"feature_type":"GULLY", "forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
@@ -550,6 +551,19 @@ BEGIN
 							END IF;							
 						END LOOP;
 
+						-- reconnect planned connec links
+						FOR rec_link IN SELECT * FROM link WHERE exit_type = 'ARC' AND exit_id = v_arc_id AND state = 2 AND feature_type  ='CONNEC'
+						LOOP
+							EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+							"feature":{"id":['|| rec_link.feature_id||']},"data":{"linkId":"'||rec_link.link_id||'", "feature_type":"CONNEC", "forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
+						END LOOP;
+
+						-- reconnect planned gully links
+						FOR rec_link IN SELECT * FROM link WHERE exit_type = 'ARC' AND exit_id = v_arc_id AND state = 2 AND feature_type  ='GULLY'
+						LOOP
+							EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+							"feature":{"id":['|| rec_link.feature_id||']},"data":{"linkId":"'||rec_link.link_id||'", "feature_type":"GULLY", "forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';								
+						END LOOP;
 
 						IF v_project_type = 'WS' THEN
 						
@@ -591,9 +605,6 @@ BEGIN
 								VALUES (212, 0, concat('Node_2 is a delimiter of a mapzone if old arc was defined as toArc it has been reconfigured with new arc_id.'));
 							END IF;
 						END IF;
-						
-						-- recover geometry for those links state 2 when arcdivide state 1
-						UPDATE link SET the_geom = geom_line, userdefined_geom = true FROM temp_table t WHERE fid = 398 AND link_id = t.expl_id;
 	
 					ELSIF v_state_node = 2 THEN --is psector
 
@@ -722,54 +733,55 @@ BEGIN
 							ON CONFLICT (arc_id, psector_id) DO NOTHING;
 
 							-- insert operative connec's on alternative in order to reconnect (donwgrade)
-							INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable, link_id)
-							SELECT v_psector, connec_id, v_arc_id, 0, false, link_id FROM connec JOIN link on feature_id = connec_id WHERE arc_id = v_arc_id AND connec.state=1 and link.state = 1
+							INSERT INTO plan_psector_x_connec (psector_id, connec_id, state, doable, link_id, arc_id)
+							SELECT v_psector, connec_id, 0, false, link_id, arc_id FROM connec JOIN link ON feature_id = connec_id WHERE arc_id = v_arc_id AND connec.state=1
 							ON CONFLICT DO NOTHING;
 
-							-- insert operative connec's on alternative in order to reconnect (upgrade)
-							INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable)
-							SELECT v_psector, connec_id, v_arc_id, 1, false FROM connec WHERE arc_id = v_arc_id AND connec.state=1
-							ON CONFLICT DO NOTHING;					
+							-- insert operative connec's on alternative in order to reconnect
+							INSERT INTO plan_psector_x_connec (psector_id, connec_id, state, doable, arc_id)
+							SELECT v_psector, connec_id, 1, false, null FROM connec WHERE arc_id = v_arc_id AND connec.state=1
+							ON CONFLICT DO NOTHING;
 
-							-- insert operative gully's on alternative in order to reconnect
-							IF v_project_type='UD' THEN
-
-								-- downgrade
-								INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable, link_id)
-								SELECT v_psector, gully_id, v_arc_id, 0, false, link_id FROM gully JOIN link on feature_id = gully_id WHERE arc_id = v_arc_id AND gully.state=1 and link.state = 1
-								ON CONFLICT DO NOTHING;
-
-								-- upgrade
-								INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable)
-								SELECT v_psector, gully_id, v_arc_id, 1, false FROM gully WHERE arc_id = v_arc_id AND gully.state=1
-								ON CONFLICT DO NOTHING;
-								
-							END IF;
-
-							-- reconnect planned arc links
-							FOR rec_link IN SELECT link.* FROM v_edit_connec JOIN link ON link.feature_id=connec_id WHERE link.feature_type='CONNEC' AND exit_type='ARC' AND arc_id=v_arc_id
-							LOOP
-								SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id 
-								AND arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1; 
-								
-								UPDATE plan_psector_x_connec SET arc_id = v_arc_closest, link_id = rec_link.link_id WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
-								v_arc_closest = null;
-								
+							-- reconnect operative connec links
+							FOR rec_link IN SELECT * FROM link WHERE exit_type = 'ARC' AND exit_id = v_arc_id AND state = 1 AND feature_type  ='CONNEC'
+							LOOP							
+								EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+								"feature":{"id":['|| rec_link.feature_id||']},"data":{"feature_type":"CONNEC", "isArcDivide":"true", "forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
 							END LOOP;
 
-							IF v_project_type ='UD' THEN
-							
-								FOR rec_link IN SELECT link.* FROM v_edit_gully JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND exit_type='ARC' AND arc_id=v_arc_id
-								LOOP
-									SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
-									UPDATE plan_psector_x_gully SET arc_id = v_arc_closest, link_id = rec_link.link_id WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
-									v_arc_closest = null;
+							IF v_project_type='UD' THEN
 
-									UPDATE plan_psector_x_gully SET arc_id = v_arc_closest, link_id = rec_link.link_id WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
-									v_arc_closest = null;
-									
-								END LOOP;
-							END IF;						
+								-- insert operative gully's on alternative in order to reconnect (donwgrade)
+								INSERT INTO plan_psector_x_gully (psector_id, gully_id, state, doable, link_id, arc_id)
+								SELECT v_psector, gully_id, 0, false, link_id, arc_id FROM gully JOIN link ON feature_id = gully_id WHERE arc_id = v_arc_id AND gully.state=1
+								ON CONFLICT DO NOTHING;
+
+								-- insert operative connec's on alternative in order to reconnect
+								INSERT INTO plan_psector_x_gully (psector_id, gully_id, state, doable, arc_id)
+								SELECT v_psector, gully_id, 1, false, null FROM gully WHERE arc_id = v_arc_id AND gully.state=1
+								ON CONFLICT DO NOTHING;
+
+								-- reconnect operative gully links
+								FOR rec_link IN SELECT * FROM link WHERE exit_type = 'ARC' AND exit_id = v_arc_id AND state = 1 AND feature_type  ='GULLY'
+								LOOP						
+									EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+									"feature":{"id":['|| rec_link.feature_id||']},"data":{"feature_type":"GULLY", "isArcDivide":"true", "forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
+								END LOOP;								
+							END IF;
+
+							-- reconnect planned connec links
+							FOR rec_link IN SELECT * FROM v_edit_link WHERE exit_type = 'ARC' AND exit_id = v_arc_id AND state = 2 AND feature_type  ='CONNEC'
+							LOOP
+								EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+								"feature":{"id":['|| rec_link.feature_id||']},"data":{"feature_type":"CONNEC", "isArcDivide":"true","forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
+							END LOOP;
+
+							-- reconnect planned gully links
+							FOR rec_link IN SELECT * FROM v_edit_link WHERE exit_type = 'ARC' AND exit_id = v_arc_id AND state = 2 AND feature_type  ='GULLY'
+							LOOP
+								EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+								"feature":{"id":['|| rec_link.feature_id||']},"data":{"feature_type":"GULLY", "isArcDivide":"true","forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';								
+							END LOOP;
 
 							-- reconnect planned node links
 							FOR rec_link IN SELECT * FROM v_edit_link WHERE exit_type = 'NODE' AND exit_id = (SELECT node_1 FROM arc WHERE arc_id = rec_aux1.arc_id)
@@ -779,7 +791,7 @@ BEGIN
 									UPDATE plan_psector_x_gully SET arc_id = rec_aux1.arc_id, link_id = rec_link.link_id WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
 								END IF;							
 							END LOOP;
-													
+									
 							-- Update doability for the new arcs
 							UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux1.arc_id;
 							UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux2.arc_id;
@@ -801,30 +813,20 @@ BEGIN
 							END IF;	
 
 							-- reconnect planned links
-							FOR rec_link IN SELECT link.* FROM v_edit_connec JOIN link ON link.feature_id=connec_id	WHERE link.feature_type='CONNEC' AND exit_type='ARC' AND arc_id=v_arc_id
-							LOOP
-								raise notice 'conut ';
-							
-								SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id 
-								AND arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1; 
-								
-								UPDATE plan_psector_x_connec SET arc_id = v_arc_closest, link_id = rec_link.link_id WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id
-								AND psector_id=v_psector;
-								
-								v_arc_closest = null;
+							FOR rec_link IN SELECT link.* FROM v_edit_connec JOIN link ON link.feature_id=connec_id	WHERE link.feature_type='CONNEC' AND exit_type='ARC' AND arc_id=v_arc_id 
+							AND link.state = 2
+							LOOP							
+								EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+								"feature":{"id":['|| rec_link.feature_id||']},"data":{"feature_type":"CONNEC", "isArcDivide":"true","forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
 							END LOOP;
 
 							IF v_project_type ='UD' THEN
 							
 								FOR rec_link IN SELECT link.* FROM v_edit_gully JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND exit_type='ARC' AND arc_id=v_arc_id
+								AND link.state = 2
 								LOOP
-									SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id
-									AND arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1; 
-
-									UPDATE plan_psector_x_gully SET arc_id = v_arc_closest, link_id = rec_link.link_id WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id
-									AND psector_id=v_psector;
-									
-									v_arc_closest = null;									
+									EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+									"feature":{"id":['|| rec_link.feature_id||']},"data":{"feature_type":"GULLY", "isArcDivide":"true","forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
 								END LOOP;
 							END IF;						
 
