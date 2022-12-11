@@ -518,8 +518,8 @@ BEGIN
 			-- when connec_id comes on psector_table
 			IF NEW.state = 1 AND (SELECT connec_id FROM plan_psector_x_connec WHERE connec_id=NEW.connec_id AND psector_id = v_psector_vdefault AND state = 1) IS NOT NULL THEN
 
-				RAISE EXCEPTION 'IT IS NOT POSSIBLE TO RELATE ARCS FOR OPERATIVE CONNECS INVOLVED INVOLVED ON SOME VISIBLE PSECTOR. PLEASE, USE PSECTOR DIALOG TO RE-CONNECT';
-
+				RAISE EXCEPTION 'IT IS NOT POSSIBLE TO RELATE FOR OPERATIVE CONNECS INVOLVED INVOLVED ON SOME VISIBLE PSECTOR. PLEASE, USE LINK2NETWORK TOOL OR PSECTOR DIALOG TO RE-CONNECT';
+		
 			ELSIF NEW.state = 2 THEN
 
 				IF NEW.arc_id IS NOT NULL THEN
@@ -532,10 +532,8 @@ BEGIN
 						v_link_geom := ST_ShortestLine(NEW.the_geom, v_arc.the_geom);
 
 						-- insert link
-						INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id, dqa_id, 
-						presszone_id, minsector_id)
-						VALUES (v_link, 'CONNEC', NEW.connec_id, v_arc.expl_id, NEW.arc_id, 'ARC', FALSE, 2, v_link_geom, v_arc.sector_id, v_arc.fluid_type, v_arc.dma_id, v_arc.dqa_id, 
-						v_arc.presszone_id, v_arc.minsector_id);
+						INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id)
+						VALUES (v_link, 'CONNEC', NEW.connec_id, v_arc.expl_id, NEW.arc_id, 'ARC', FALSE, 2, v_link_geom, v_arc.sector_id, v_arc.fluid_type, v_arc.dma_id);
 
 						UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id, link_id = v_link WHERE connec_id=NEW.connec_id AND psector_id = v_psector_vdefault AND state = 1;
 					END IF;
@@ -550,16 +548,9 @@ BEGIN
 
 				IF NEW.arc_id IS NOT NULL THEN
 				
-					-- if connec already has link
-					IF (SELECT link_id FROM link WHERE feature_id=NEW.connec_id AND feature_type='CONNEC' LIMIT 1) IS NOT NULL AND v_disable_linktonetwork IS NOT TRUE THEN
-
-						EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-						"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
-					ELSE
-						EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-						"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';				
-					END IF;
-					
+					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+					"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
+				
 					-- reconnecting values
 					NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
 					NEW.dma_id = (SELECT dma_id FROM arc WHERE arc_id = NEW.arc_id);

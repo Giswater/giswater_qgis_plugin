@@ -72,6 +72,7 @@ v_minsector integer;
 v_currentpsector integer;
 v_state_vdefault integer;
 v_feature record;
+v_linkexists integer;
 
 BEGIN
 
@@ -238,25 +239,6 @@ BEGIN
 		-- end control
 		IF ( v_arc.arc_id IS NOT NULL AND v_node.node_id IS NULL) THEN
 
-			-- generic updates
-			IF NEW.state =1 THEN
-				UPDATE connec SET arc_id=v_arc.arc_id, 
-				expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type='ARC', pjoint_id=v_arc.arc_id
-				WHERE connec_id=v_connec1.connec_id;
-
-				IF v_projectype='UD' THEN
-					UPDATE gully SET arc_id=v_arc.arc_id, 
-					expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type='ARC', pjoint_id=v_arc.arc_id
-					WHERE gully_id=v_gully1.gully_id;	
-					
-				ELSIF v_projectype='WS' THEN
-					UPDATE connec SET presszone_id = v_arc.presszone_id, dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id WHERE connec_id=v_connec1.connec_id;
-					IF v_ispresszone THEN
-						UPDATE connec SET staticpressure = ((SELECT head from presszone WHERE presszone_id = v_arc.presszone_id)- v_connec1.elevation) WHERE connec_id=v_connec1.connec_id;
-					END IF;			
-				END IF;				
-			END IF;
-
 			-- exit & pjoint objects (same-same)
 			NEW.exit_id = v_arc.arc_id;
 			NEW.exit_type = 'ARC';
@@ -288,26 +270,6 @@ BEGIN
 			IF v_arc.arc_id IS NULL THEN
 				SELECT * INTO v_arc FROM arc WHERE node_2=v_node.node_id LIMIT 1;
 			END IF;
-
-			-- generic updates
-			IF NEW.state =1 THEN
-			
-				UPDATE connec SET arc_id=v_arc.arc_id, 
-				expl_id=v_node.expl_id, dma_id=v_node.dma_id, sector_id=v_node.sector_id, pjoint_type='NODE', pjoint_id=v_node.node_id
-				WHERE connec_id=v_connec1.connec_id;
-
-				IF v_projectype='UD' THEN
-					UPDATE gully SET arc_id=v_arc.arc_id, 
-					expl_id=v_node.expl_id, dma_id=v_node.dma_id, sector_id=v_node.sector_id, pjoint_type='NODE', pjoint_id=v_node.node_id
-					WHERE gully_id=v_gully1.gully_id;	
-					
-				ELSIF v_projectype='WS' THEN
-					UPDATE connec SET presszone_id = v_arc.presszone_id, dqa_id=v_node.dqa_id, minsector_id=v_arc.minsector_id WHERE connec_id=v_connec1.connec_id;
-					IF v_ispresszone THEN
-						UPDATE connec SET staticpressure = ((SELECT head from presszone WHERE presszone_id = v_arc.presszone_id)- v_connec1.elevation) WHERE connec_id=v_connec1.connec_id;
-					END IF;			
-				END IF;				
-			END IF;
 			
 			-- exit & pjoint objects (same-same)
 			NEW.exit_id = v_node.node_id;
@@ -338,25 +300,6 @@ BEGIN
 			END IF;
 			
 		ELSIF v_connec2.connec_id IS NOT NULL THEN
-		
-			-- generic updates
-			IF NEW.state =1 THEN
-				UPDATE connec SET arc_id=v_connec2.arc_id, 
-				expl_id=v_connec2.expl_id, dma_id=v_connec2.dma_id, sector_id=v_connec2.sector_id, pjoint_type='CONNEC', pjoint_id=v_connec2.connec_id
-				WHERE connec_id=v_connec1.connec_id;
-
-				IF v_projectype='UD' THEN
-					UPDATE gully SET arc_id=v_connec2.arc_id, 
-					expl_id=v_connec2.expl_id, dma_id=v_connec2.dma_id, sector_id=v_connec2.sector_id, pjoint_type='CONNEC', pjoint_id=v_connec2.connec_id
-					WHERE gully_id=v_gully1.gully_id;	
-					
-				ELSIF v_projectype='WS' THEN
-					UPDATE connec SET presszone_id = v_connec2.presszone_id, dqa_id=v_connec2.dqa_id, minsector_id=v_connec2.minsector_id WHERE connec_id=v_connec1.connec_id;
-					IF v_ispresszone THEN
-						UPDATE connec SET staticpressure = ((SELECT head from presszone WHERE presszone_id = v_arc.presszone_id)- v_connec1.elevation) WHERE connec_id=v_connec1.connec_id;
-					END IF;			
-				END IF;				
-			END IF;
 
 			-- exit & pjoint objects (same-same)
 			NEW.exit_id = v_connec2.connec_id;
@@ -385,16 +328,6 @@ BEGIN
 		IF v_projectype='UD' THEN
 		
 			IF v_gully2.gully_id IS NOT NULL THEN
-
-				-- generic updates
-				IF NEW.state =1 THEN
-					
-					IF v_projectype='UD' THEN
-						UPDATE gully SET arc_id=v_gully2.arc_id, 
-						expl_id=v_gully2.expl_id, dma_id=v_gully2.dma_id, sector_id=v_gully2.sector_id, pjoint_type='GULLY', pjoint_id=v_gully2.gully_id
-						WHERE gully_id=v_gully1.gully_id;	
-					END IF;				
-				END IF;
 
 				-- exit & pjoint objects (same-same)
 				NEW.exit_id = v_gully2.gully_id;
@@ -467,8 +400,12 @@ BEGIN
 		-- end state control 
 		IF v_end_state=2 THEN
 
-			IF NEW.state = 1 THEN
-				RAISE EXCEPTION 'IT IS IMPOSSIBLE TO ATACH OPERATIVE LINK TO PLANNED FEATURE';
+			IF NEW.state = 1 AND TG_OP = 'INSERT' THEN
+
+				RAISE EXCEPTION 'IT IS IMPOSSIBLE TO ATACH OPERATIVE LINK TO PLANNED FEATURE. USE LINKTONEWORK TOOL IF YOU ARE WORKING ON ONE PSECTOR WITH THIS CONNECT ARE ON PSECTOR AND THEN MODIFY IT.';
+
+			ELSIF NEW.state = 1 AND TG_OP = 'UPDATE' THEN
+				-- nothing to do (at least on this moment)
 
 			ELSIF NEW.state = 2 THEN
 
@@ -512,36 +449,52 @@ BEGIN
 		-- link state control
 		IF NEW.state = 1 THEN
 		
-			-- exception control. It's no possible to create another link when already exists for the connect
+			IF TG_OP = 'UPDATE' THEN
+				IF OLD.state = 2 THEN
+					RAISE EXCEPTION 'IT IS NOT POSSIBLE TO DOWNGRADE LINK TO OPERATIVE LINK BECAUSE IT IS RELATED TO A PLANNED FEATURE';
+				END IF;
+			END IF;
+		
 			IF (SELECT feature_id FROM link WHERE feature_id=NEW.feature_id AND link_id::text != NEW.link_id::text AND state = 1) IS NOT NULL THEN
 		
 				IF NEW.feature_type = 'CONNEC' THEN
-				
-					IF v_dsbl_error IS NOT TRUE THEN
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"3076", "function":"1116","debug_msg":""}}$$);';
-					ELSE
-						SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3076;
-						INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
+
+					IF (SELECT connec_id FROM plan_psector_x_connec WHERE connec_id = v_connect.connec_id AND psector_id = v_currentpsector AND state = 1 LIMIT 1) IS NOT NULL THEN
+					
+						IF v_dsbl_error IS NOT TRUE THEN
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+							"data":{"message":"3076", "function":"1116","debug_msg":""}}$$);';
+						ELSE
+							SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3076;
+							INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
+						END IF;
 					END IF;
 			
 				ELSIF NEW.feature_type = 'GULLY' THEN
-				
-					IF v_dsbl_error IS NOT TRUE THEN
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"3078", "function":"1116","debug_msg":""}}$$);';
-					ELSE
-						SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3078;
-						INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
+
+					IF (SELECT gully_id FROM plan_psector_x_gully WHERE gully_id = v_connect.gully_id AND psector_id = v_currentpsector AND state = 1 LIMIT 1) IS NOT NULL THEN
+					
+						IF v_dsbl_error IS NOT TRUE THEN
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+							"data":{"message":"3078", "function":"1116","debug_msg":""}}$$);';
+						ELSE
+							SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3078;
+							INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
+						END IF;
 					END IF;
 				END IF;		
 			END IF;
-			
+	
 		ELSIF NEW.state = 2 THEN
 
-			IF TG_OP = 'UPDATE' AND OLD.state = 1 THEN
-				RAISE EXCEPTION 'IT IS NOT POSSIBLE TO UPGRADE STATE OF LINK. USE PLAN PSECTOR DIALOG TO DO IT';
-			
+			IF TG_OP = 'UPDATE' THEN
+				IF OLD.state = 1 THEN
+					RAISE EXCEPTION 'IT IS NOT POSSIBLE TO UPGRADE LINK. IF YOU TRYING TO WORK WITH SOME PLANNED LINK PLEASE CREATE A NEW ONE';
+				END IF;
+			END IF;
+
+			IF TG_OP = 'INSERT' AND v_connect.state = 1 THEN
+				RAISE EXCEPTION 'IT IS NOT POSSIBLE TO CREATE A PLANNED LINK FOR OPERATIVE CONNECT. USE LINKTONEWORK TOOL IF YOU ARE ON PSECTOR AND THEN MODIFY IT';
 			END IF;
 
 			-- looking for same psector
@@ -558,23 +511,6 @@ BEGIN
 				ELSE
 					SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3082;
 					INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
-				END IF;
-			END IF;
-
-			IF TG_OP = 'INSERT' AND v_connect.state = 1 THEN
-
-				-- looking for psector inexistence
-				IF NEW.feature_type =  'CONNEC' THEN
-					SELECT count(*) INTO v_count FROM plan_psector_x_connec WHERE connec_id = NEW.feature_id AND psector_id =  v_currentpsector AND link_id = NEW.link_id; 
-				ELSIF NEW.feature_type =  'GULLY' THEN
-					SELECT count(*) INTO v_count FROM plan_psector_x_gully WHERE gully_id = NEW.feature_id AND psector_id =  v_currentpsector AND link_id = NEW.link_id;
-				END IF;
-				
-				IF v_count > 0 THEN
-					RAISE EXCEPTION 'IT IS NOT POSSIBLE TO CREATE PLANNED LINK FOR OPERATIVE CONNECT INVOLVED ON SOME VISIBLE PSECTOR. PLEASE, USE PSECTOR DIALOG TO RE-CONNECT';
-					
-				ELSIF v_count = 0 THEN
-					RAISE EXCEPTION 'IT IS NOT POSSIBLE TO CREATE PLANNED LINK FOR OPERATIVE CONNECT';
 				END IF;
 			END IF;
 		END IF;
@@ -612,27 +548,39 @@ BEGIN
 
 		ELSIF NEW.state = 1 THEN 
 
-			-- update connect
-			IF NEW.feature_type='CONNEC' THEN
-				UPDATE connec SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, dma_id = v_dma WHERE connec_id = NEW.feature_id;
-			ELSIF NEW.feature_type='GULLY' THEN
-				UPDATE gully SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, dma_id = v_dma WHERE gully_id = NEW.feature_id;
-			END IF;
+			IF (SELECT feature_id FROM link WHERE feature_id=NEW.feature_id AND link_id::text != NEW.link_id::text AND state = 1) IS NOT NULL THEN
 
-			-- update specific colums for ws-link
-			IF v_projectype = 'WS' THEN
-				UPDATE connec SET presszone_id = v_presszone, dqa_id = v_dqa, minsector_id = v_minsector WHERE connec = NEW.feature_id;
-			END IF;	
+				-- update psector
+				IF NEW.feature_type='CONNEC' THEN
+					UPDATE plan_psector_x_connec SET arc_id = v_arc_id, link_id = NEW.link_id
+					WHERE connec_id = v_connect.connec_id AND psector_id = v_currentpsector AND state = 1;
+				ELSIF NEW.feature_type='GULLY' THEN
+					UPDATE plan_psector_x_gully SET arc_id = v_arc_id, link_id = NEW.link_id
+					WHERE gully_id = v_connect.gully_id AND psector_id = v_currentpsector AND state = 1;
+				END IF;
+			ELSE
+				-- update connect
+				IF NEW.feature_type='CONNEC' THEN
+					UPDATE connec SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, dma_id = v_dma WHERE connec_id = NEW.feature_id;
+				ELSIF NEW.feature_type='GULLY' THEN
+					UPDATE gully SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, dma_id = v_dma WHERE gully_id = NEW.feature_id;
+				END IF;
+
+				-- update specific colums for ws-link
+				IF v_projectype = 'WS' THEN
+					UPDATE connec SET presszone_id = v_presszone, dqa_id = v_dqa, minsector_id = v_minsector WHERE connec = NEW.feature_id;
+				END IF;	
+			END IF;
 
 		ELSIF NEW.state = 2 THEN
 		
 			IF NEW.feature_type='CONNEC' THEN
 				UPDATE plan_psector_x_connec SET link_id = NEW.link_id, arc_id = v_arc_id WHERE psector_id = v_currentpsector AND connec_id = NEW.feature_id;
-				UPDATE connec SET arc_id = v_arc_id WHERE connec_id = NEW.feature_id; 
+				UPDATE connec SET arc_id = v_arc_id WHERE connec_id = NEW.feature_id AND state = 1; 
 				
 			ELSIF NEW.feature_type='GULLY' THEN
 				UPDATE plan_psector_x_gully SET link_id = NEW.link_id, arc_id = v_arc_id WHERE psector_id = v_currentpsector AND gully_id = NEW.feature_id;
-				UPDATE gully SET arc_id = v_arc_id WHERE gully_id = NEW.feature_id; 
+				UPDATE gully SET arc_id = v_arc_id WHERE gully_id = NEW.feature_id  AND state = 1; 
 
 			END IF;
 		END IF;
@@ -643,7 +591,7 @@ BEGIN
 		RETURN NEW;
 		
 	ELSIF TG_OP = 'UPDATE' THEN 
-	
+
 		IF NEW.state = 0 AND OLD.state = 1 THEN 
 
 			-- delete reconnection on coonecs
@@ -662,7 +610,7 @@ BEGIN
 		ELSIF NEW.state = 1 AND st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
 
 			-- update link
-			UPDATE link SET userdefined_geom='TRUE', exit_id = NEW.exit_id , exit_type = NEW.exit_type, the_geom=NEW.the_geom, expl_id = v_expl, sector_id = v_sector, dma_id = v_dma 
+			UPDATE link SET exit_id = NEW.exit_id , exit_type = NEW.exit_type, the_geom=NEW.the_geom, expl_id = v_expl, sector_id = v_sector, dma_id = v_dma 
 			WHERE link_id=NEW.link_id;
 		
 			-- force reconnection on coonecs
@@ -680,8 +628,10 @@ BEGIN
 	
 		ELSIF NEW.state = 2 AND st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
 
+			--raise exception ' NEW.exit_id %', NEW.exit_id;
+
 			-- update link
-			UPDATE link SET exit_id = NEW.exit_id, exit_type = NEW.exit_type, userdefined_geom = true, the_geom = NEW.the_geom, expl_id = v_expl, sector_id = v_sector, dma_id = v_dma 
+			UPDATE link SET exit_id = NEW.exit_id, exit_type = NEW.exit_type, the_geom = NEW.the_geom, expl_id = v_expl, sector_id = v_sector, dma_id = v_dma 
 			WHERE link_id = NEW.link_id;
 
 			-- update specific colums for ws-link
@@ -691,19 +641,17 @@ BEGIN
 
 			-- update values on plan_psector tables
 			IF NEW.feature_type='CONNEC' THEN
-
-				-- update plan_psector_x_connec
 				UPDATE plan_psector_x_connec SET arc_id = v_arc_id WHERE plan_psector_x_connec.link_id=NEW.link_id;
 
 			ELSIF NEW.feature_type='GULLY' THEN
-			
-				-- update plan_psector_x_gully
 				UPDATE plan_psector_x_gully SET arc_id = v_arc_id WHERE plan_psector_x_gully.link_id=NEW.link_id;
 			END IF;
 		END IF;
 
 		-- update link state
 		UPDATE link SET state = NEW.state, the_geom = NEW.the_geom WHERE link_id=NEW.link_id;
+
+		--raise exception ' NEW.exit_id %', (SELECT exit_id FROM link WHERE link_id = NEW.link_id);
 	
 		-- Update state_type if edit_connect_update_statetype is TRUE
 		IF (SELECT ((value::json->>'connec')::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') IS TRUE THEN

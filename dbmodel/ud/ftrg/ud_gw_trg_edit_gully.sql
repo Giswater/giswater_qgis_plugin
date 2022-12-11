@@ -684,15 +684,8 @@ BEGIN
 
 				IF NEW.arc_id IS NOT NULL THEN
 				
-					-- if gully already has link
-					IF (SELECT link_id FROM link WHERE feature_id=NEW.gully_id AND feature_type='GULLY' LIMIT 1) IS NOT NULL AND v_disable_linktonetwork IS NOT TRUE THEN
-
-						EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-						"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';
-					ELSE
-						EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-						"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';				
-					END IF;
+					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+					"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';
 					
 					-- reconnecting values
 					NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);

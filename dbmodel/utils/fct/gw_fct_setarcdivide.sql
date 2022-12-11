@@ -737,14 +737,14 @@ BEGIN
 							SELECT v_psector, connec_id, 0, false, link_id, arc_id FROM connec JOIN link ON feature_id = connec_id WHERE arc_id = v_arc_id AND connec.state=1
 							ON CONFLICT DO NOTHING;
 
-							-- insert operative connec's on alternative in order to reconnect
+							-- insert operative connec's on alternative (upgrade)
 							INSERT INTO plan_psector_x_connec (psector_id, connec_id, state, doable, arc_id)
 							SELECT v_psector, connec_id, 1, false, null FROM connec WHERE arc_id = v_arc_id AND connec.state=1
 							ON CONFLICT DO NOTHING;
 
 							-- reconnect operative connec links
 							FOR rec_link IN SELECT * FROM link WHERE exit_type = 'ARC' AND exit_id = v_arc_id AND state = 1 AND feature_type  ='CONNEC'
-							LOOP							
+							LOOP	
 								EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 								"feature":{"id":['|| rec_link.feature_id||']},"data":{"feature_type":"CONNEC", "isArcDivide":"true", "forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
 							END LOOP;
@@ -812,8 +812,50 @@ BEGIN
 								VALUES (212, 1, 'Update psector_x_arc as doable for fictitious arcs.');
 							END IF;	
 
+
+							-- reconnect planned vnode links
+							FOR rec_link IN SELECT link.* FROM v_edit_connec JOIN link ON link.feature_id=connec_id 
+							WHERE link.feature_type='CONNEC' AND exit_type='ARC' AND arc_id=v_arc_id
+							LOOP
+								SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id 
+								AND arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1; 	
+								UPDATE plan_psector_x_connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
+								UPDATE connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
+								v_arc_closest = null;
+							END LOOP;
+
+							IF v_project_type ='UD' THEN
+							
+								FOR rec_link IN SELECT link.* FROM v_edit_gully JOIN link ON link.feature_id=gully_id 
+								WHERE link.feature_type='GULLY' AND exit_type='ARC' AND arc_id=v_arc_id
+								LOOP
+									SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
+									UPDATE plan_psector_x_gully SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
+									UPDATE gully SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
+									v_arc_closest = null;
+								END LOOP;
+							END IF;						
+
+							-- reconnect planned node links
+							FOR rec_link IN SELECT * FROM v_edit_link WHERE exit_type = 'NODE' AND exit_id = (SELECT node_1 FROM arc WHERE arc_id = rec_aux1.arc_id)
+							LOOP
+								UPDATE connec SET arc_id = rec_aux1.arc_id WHERE connec_id = rec_link.feature_id;
+								UPDATE plan_psector_x_connec SET arc_id = rec_aux1.arc_id WHERE connec_id = rec_link.feature_id;
+								IF v_project_type ='UD' THEN
+									UPDATE gully SET arc_id = rec_aux1.arc_id WHERE gully_idn = rec_link.feature_id;
+									UPDATE plan_psector_x_gully SET arc_id = rec_aux1.arc_id WHERE gully_id = rec_link.feature_id;
+								END IF;							
+							END LOOP;
+
+							SELECT count(*) INTO v_count FROM plan_psector_x_arc WHERE arc_id=v_arc_id;						
+
+							IF v_count = 0 THEN
+								DELETE FROM arc WHERE arc_id=v_arc_id;
+							END IF;
+							
+
 							-- reconnect planned links
-							FOR rec_link IN SELECT link.* FROM v_edit_connec JOIN link ON link.feature_id=connec_id	WHERE link.feature_type='CONNEC' AND exit_type='ARC' AND arc_id=v_arc_id 
+							FOR rec_link IN SELECT link.* FROM link WHERE link.feature_type='CONNEC' AND exit_type='ARC' AND exit_id=v_arc_id 
 							AND link.state = 2
 							LOOP							
 								EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
@@ -822,7 +864,7 @@ BEGIN
 
 							IF v_project_type ='UD' THEN
 							
-								FOR rec_link IN SELECT link.* FROM v_edit_gully JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND exit_type='ARC' AND arc_id=v_arc_id
+								FOR rec_link IN SELECT link.* FROM link WHERE link.feature_type='GULLY' AND exit_type='ARC' AND exit_id=v_arc_id
 								AND link.state = 2
 								LOOP
 									EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},

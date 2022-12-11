@@ -627,7 +627,7 @@ BEGIN
 			-- when connec_id comes on psector_table
 			IF NEW.state = 1 AND (SELECT connec_id FROM plan_psector_x_connec WHERE connec_id=NEW.connec_id AND psector_id = v_psector_vdefault AND state = 1) IS NOT NULL THEN
 
-				RAISE EXCEPTION 'IT IS NOT POSSIBLE TO RELATE ARCS FOR OPERATIVE CONNECS INVOLVED INVOLVED ON SOME VISIBLE PSECTOR. PLEASE, USE PSECTOR DIALOG TO RE-CONNECT';
+				RAISE EXCEPTION 'IT IS NOT POSSIBLE TO RELATE FOR OPERATIVE CONNECS INVOLVED INVOLVED ON SOME VISIBLE PSECTOR. PLEASE, USE LINK2NETWORK TOOL OR PSECTOR DIALOG TO RE-CONNECT';
 
 			ELSIF NEW.state = 2 THEN
 
@@ -659,15 +659,8 @@ BEGIN
 
 				IF NEW.arc_id IS NOT NULL THEN
 				
-					-- if connec already has link
-					IF (SELECT link_id FROM link WHERE feature_id=NEW.connec_id AND feature_type='CONNEC' LIMIT 1) IS NOT NULL AND v_disable_linktonetwork IS NOT TRUE THEN
-
-						EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-						"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
-					ELSE
-						EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-						"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';				
-					END IF;
+					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+					"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';				
 					
 					-- reconnecting values
 					NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);

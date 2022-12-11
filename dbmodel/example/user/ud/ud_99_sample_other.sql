@@ -516,6 +516,8 @@ DELETE FROM plan_psector_x_gully;
 UPDATE connec SET pjoint_id = arc_id WHERE pjoint_type = 'ARC';
 UPDATE gully SET pjoint_id = arc_id WHERE pjoint_type = 'ARC';
 
+update link set exit_id = arc_id FROM connec where feature_id = connec_id and exit_type = 'ARC';
+update link set exit_id = arc_id FROM gully where feature_id = gully_id and exit_type = 'ARC';
 
 
 
