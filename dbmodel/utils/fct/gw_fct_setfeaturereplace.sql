@@ -207,7 +207,9 @@ BEGIN
 	ELSE
 		EXECUTE 'SELECT epa_type FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
 		INTO v_epa_type_new;
-		v_epa_table_new = concat ('inp_',lower(v_epa_type_new));
+
+		EXECUTE 'SELECT epa_table FROM sys_feature_epa_type WHERE feature_type = '||quote_literal(v_feature_type)||' AND id = '||quote_literal(v_epa_type_new)
+		INTO v_epa_table_new;
 	END IF;
 	
 	-- Control of state(1)
@@ -303,12 +305,12 @@ BEGIN
 				INTO v_man_table;
 		
 			v_query_string_insert='INSERT INTO '||v_man_table||' VALUES ('||v_id||');';
-			execute v_query_string_insert;
+			EXECUTE v_query_string_insert;
 		END IF;
 
 		IF v_epa_table_new IS NOT NULL THEN
 			v_query_string_insert='INSERT INTO '||v_epa_table_new||' VALUES ('||v_id||');';
-			execute v_query_string_insert;
+			EXECUTE v_query_string_insert;
 		END IF;
 				
 		-- updating values on feature parent table from values of old feature

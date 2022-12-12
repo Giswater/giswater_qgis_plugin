@@ -52,7 +52,6 @@ v_streetaxis2 text;
 v_autorotation_disabled boolean;
 v_force_delete boolean;
 v_autoupdate_fluid boolean;
-v_disable_linktonetwork boolean;
 v_matfromcat boolean = false;
 v_epa_gully_efficiency  float;
 v_epa_gully_method text;
@@ -62,6 +61,8 @@ v_epa_gully_weir_cd float;
 v_arc text;
 v_link integer;
 v_link_geom public.geometry;
+v_connect2network boolean;
+
 
 BEGIN
 
@@ -78,12 +79,11 @@ BEGIN
 	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid';
 
 	v_autorotation_disabled = (SELECT value::boolean FROM config_param_user WHERE "parameter"='edit_gullyrotation_disable' AND cur_user=current_user);
-	v_disable_linktonetwork := (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_disable_linktonetwork' AND cur_user=current_user);
 	v_epa_gully_efficiency := (SELECT value FROM config_param_user WHERE parameter='epa_gully_efficiency_vdefault' AND cur_user=current_user);
 	v_epa_gully_orifice_cd := (SELECT value FROM config_param_user WHERE parameter='epa_gully_orifice_cd_vdefault' AND cur_user=current_user);
 	v_epa_gully_method := (SELECT value FROM config_param_user WHERE parameter='epa_gully_method_vdefault' AND cur_user=current_user);
 	v_epa_gully_outlet_type := (SELECT value FROM config_param_user WHERE parameter='epa_gully_outlet_type_vdefault' AND cur_user=current_user);
-	v_epa_gully_weir_cd := (SELECT value FROM config_param_user WHERE parameter='epa_gully_weir_cd_vdefault' AND cur_user=current_user);
+	SELECT value::boolean INTO v_connect2network FROM config_param_user WHERE parameter='edit_connec_automatic_link' AND cur_user=current_user;
 
 	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 	
@@ -567,31 +567,23 @@ BEGIN
 
 		END IF;
 
-		IF NEW.state=1 THEN
-			-- Control of automatic insert of link
-			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_gully_automatic_link'
-			AND cur_user=current_user LIMIT 1) IS TRUE THEN
+		-- Control of automatic insert of link
+		IF NEW.state=1 OR NEW.state=2 THEN
+			IF v_connect2network THEN
 
-				EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-				"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';
+				IF  NEW.state=1 THEN
+					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+					"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY", "forcedArcs":["'||NEW.arc_id||'"]}}$$)';	
 
-				SELECT arc_id INTO v_arc_id FROM gully WHERE gully_id=NEW.gully_id;
-			END IF;
-
-		ELSIF NEW.state=2 THEN
+					-- recover values in order to do not disturb this workflow
+					SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
+					NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id; 
 		
-			-- Control of automatic insert of link
-			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_automatic_link' AND cur_user=current_user LIMIT 1) IS TRUE THEN
-			
-				EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1},
-				"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';
-			END IF;	
-			
-			-- inserting on psector
-			SELECT arc_id INTO v_arc_id FROM gully WHERE gully_id=NEW.gully_id;
-			
-			INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, doable, arc_id, link_id) 
-			VALUES (NEW.gully_id, v_psector_vdefault, 1, true, v_arc_id,  (SELECT link_id FROM link WHERE feature_id = NEW.gully_id));
+				ELSIF NEW.state=2 THEN
+					INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, doable, arc_id)
+					VALUES (NEW.gully_id, v_psector_vdefault, 1, true, NEW.arc_id);
+				END IF;
+			END IF;
 		END IF;
 
 		-- man addfields insert
@@ -652,7 +644,7 @@ BEGIN
 			-- when connec_id comes on psector_table
 			IF NEW.state = 1 AND (SELECT gully_id FROM plan_psector_x_gully WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND state = 1) IS NOT NULL THEN
 
-				RAISE EXCEPTION 'IT IS NOT POSSIBLE TO RELATE ARCS FOR OPERATIVE GULLY(S) INVOLVED INVOLVED ON SOME VISIBLE PSECTOR. PLEASE, USE PSECTOR DIALOG TO RE-CONNECT';
+				RAISE EXCEPTION 'IT IS NOT POSSIBLE TO RELATE FOR OPERATIVE CONNECS INVOLVED INVOLVED ON SOME VISIBLE PSECTOR. PLEASE, USE LINK2NETWORK TOOL OR PSECTOR DIALOG TO RE-CONNECT';
 
 			ELSIF NEW.state = 2 THEN
 
@@ -660,39 +652,34 @@ BEGIN
 
 					IF (SELECT gully_id FROM plan_psector_x_gully WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND state = 1) IS NOT NULL THEN
 
-						-- link values definition
+						EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+						"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY", "forcedArcs":["'||NEW.arc_id||'"]}}$$)';			
+
+						-- recover values in order to do not disturb this workflow
 						SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
-						v_link := (SELECT nextval('link_link_id_seq'));
-						v_link_geom := ST_ShortestLine(NEW.the_geom, v_arc.the_geom);
-
-						-- insert link
-						INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id, dqa_id, 
-						presszone_id, minsector_id)
-						VALUES (v_link, 'GULLY', NEW.gully_id, v_arc.expl_id, NEW.arc_id, 'ARC', FALSE, 2, v_link_geom, v_arc.sector_id, v_arc.fluid_type, v_arc.dma_id, v_arc.dqa_id, 
-						v_arc.presszone_id, v_arc.minsector_id);
-
-						UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id, link_id = v_link WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND state = 1;
+						NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id; 
 					END IF;
 				ELSE
 					UPDATE plan_psector_x_gully SET arc_id = null, link_id = null WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND state = 1;
-					DELETE FROM link WHERE feature_id = NEW.gully_id AND state  = 2;
-					UPDATE gully SET arc_id = NULL WHERE gully_id = NEW.gully_id;
+					DELETE FROM link WHERE feature_id = NEW.gully_id AND state = 2;
+
+					-- setting values					
+					NEW.sector_id = 0; NEW.dma_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
 				END IF;
 			ELSE
 				-- when arc_id comes from gully table
 				UPDATE gully SET arc_id=NEW.arc_id where gully_id=NEW.gully_id;
 
 				IF NEW.arc_id IS NOT NULL THEN
-				
 					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-					"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';
-					
-					-- reconnecting values
-					NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
-					NEW.dma_id = (SELECT dma_id FROM arc WHERE arc_id = NEW.arc_id);
-					NEW.sector_id = (SELECT sector_id FROM arc WHERE arc_id = NEW.arc_id);
+					"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY", "forcedArcs":["'||NEW.arc_id||'"]}}$$)';	
+
+					-- recover values in order to do not disturb this workflow
+					SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
+					NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id; 		
 				ELSE
-					DELETE FROM link WHERE feature_id = NEW.gully_id AND state  = 1;
+					DELETE FROM link WHERE feature_id = NEW.gully_id AND state = 1;
+					NEW.sector_id = 0; NEW.dma_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
 				END IF;
 			END IF;
 		END IF;

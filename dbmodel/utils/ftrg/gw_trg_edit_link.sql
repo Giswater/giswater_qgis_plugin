@@ -86,10 +86,6 @@ BEGIN
 	v_ispresszone:= (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'utils_graphanalytics_status');
 	v_currentpsector = (SELECT value::integer from config_param_user WHERE cur_user = current_user AND parameter = 'plan_psector_vdefault');
 
-	-- profilactic control of state
-	v_state_vdefault = (SELECT value::integer from config_param_user WHERE cur_user = current_user AND parameter = 'edit_state_vdefault');
-	IF NEW.state IS NULL THEN NEW.state = v_state_vdefault; END IF;
-
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
  
@@ -360,7 +356,7 @@ BEGIN
 		END IF;
 
 		-- force state 2
-		IF v_connect.state = 2 THEN 
+		IF v_connect.state = 2 AND TG_OP = 'INSERT' THEN 
 			NEW.state = 2; 
 		END IF;
 			
@@ -449,10 +445,8 @@ BEGIN
 		-- link state control
 		IF NEW.state = 1 THEN
 		
-			IF TG_OP = 'UPDATE' THEN
-				IF OLD.state = 2 THEN
-					RAISE EXCEPTION 'IT IS NOT POSSIBLE TO DOWNGRADE LINK TO OPERATIVE LINK BECAUSE IT IS RELATED TO A PLANNED FEATURE';
-				END IF;
+			IF TG_OP = 'UPDATE' AND OLD.state = 2 THEN
+				RAISE EXCEPTION 'IT IS NOT POSSIBLE TO DOWNGRADE LINK TO OPERATIVE LINK BECAUSE IT IS RELATED TO A PLANNED FEATURE';
 			END IF;
 		
 			IF (SELECT feature_id FROM link WHERE feature_id=NEW.feature_id AND link_id::text != NEW.link_id::text AND state = 1) IS NOT NULL THEN
@@ -521,6 +515,8 @@ BEGIN
 		
 		-- profilactic control in order to do not crash the mandatory column of expl_id
 		IF v_expl is null then v_expl = NEW.expl_id; END IF;
+		IF NEW.state IS NULL THEN NEW.state =  1; END IF;
+
 
 		-- insert into link table
 		IF v_projectype = 'WS' THEN
@@ -561,14 +557,14 @@ BEGIN
 			ELSE
 				-- update connect
 				IF NEW.feature_type='CONNEC' THEN
-					UPDATE connec SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, dma_id = v_dma WHERE connec_id = NEW.feature_id;
+					UPDATE connec SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, sector_id = v_sector, dma_id = v_dma WHERE connec_id = NEW.feature_id;
 				ELSIF NEW.feature_type='GULLY' THEN
-					UPDATE gully SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, dma_id = v_dma WHERE gully_id = NEW.feature_id;
+					UPDATE gully SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, sector_id = v_sector, dma_id = v_dma WHERE gully_id = NEW.feature_id;
 				END IF;
 
 				-- update specific colums for ws-link
 				IF v_projectype = 'WS' THEN
-					UPDATE connec SET presszone_id = v_presszone, dqa_id = v_dqa, minsector_id = v_minsector WHERE connec = NEW.feature_id;
+					UPDATE connec SET presszone_id = v_presszone, dqa_id = v_dqa, minsector_id = v_minsector WHERE connec_id = NEW.feature_id;
 				END IF;	
 			END IF;
 
@@ -650,8 +646,6 @@ BEGIN
 
 		-- update link state
 		UPDATE link SET state = NEW.state, the_geom = NEW.the_geom WHERE link_id=NEW.link_id;
-
-		--raise exception ' NEW.exit_id %', (SELECT exit_id FROM link WHERE link_id = NEW.link_id);
 	
 		-- Update state_type if edit_connect_update_statetype is TRUE
 		IF (SELECT ((value::json->>'connec')::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') IS TRUE THEN
@@ -674,10 +668,10 @@ BEGIN
 
 		IF OLD.state = 1 THEN
 
-			UPDATE connec SET arc_id = null, pjoint_id=NULL, pjoint_type = NULL WHERE OLD.feature_id = connec_id;
+			UPDATE connec SET arc_id = null, pjoint_id=NULL, pjoint_type = NULL, dma_id = 0, sector_id = 0 WHERE OLD.feature_id = connec_id;
 									
 			IF OLD.feature_type='GULLY' THEN
-				UPDATE gully SET arc_id = null, pjoint_id=NULL, pjoint_type = NULL where OLD.feature_id = gully_id;
+				UPDATE gully SET arc_id = null, pjoint_id=NULL, pjoint_type = NULL,  dma_id = 0, sector_id = 0 where OLD.feature_id = gully_id;
 			END IF;
 
 			DELETE FROM link WHERE link_id = OLD.link_id;
@@ -687,14 +681,18 @@ BEGIN
 			UPDATE plan_psector_x_connec SET link_id = NULL, arc_id=NULL WHERE link_id = OLD.link_id;
 
 			IF (SELECT state FROM connec WHERE connec_id = OLD.feature_id) = 2 THEN
-				UPDATE connec SET arc_id = null, pjoint_id=NULL, pjoint_type = NULL WHERE OLD.feature_id = connec_id;
+				UPDATE connec SET arc_id = null, pjoint_id=NULL, pjoint_type = NULL, dma_id = 0, sector_id = 0 WHERE OLD.feature_id = connec_id;
+			END IF;
+
+			IF v_projectype = 'WS' THEN
+				UPDATE connec SET dqa_id = 0, presszone_id = 0, minsector_id = 0 WHERE OLD.feature_id = connec_id;
 			END IF;
 									
 			IF OLD.feature_type='GULLY' THEN
 				UPDATE plan_psector_x_gully SET link_id = NULL, arc_id = NULL WHERE link_id = OLD.link_id;				
 
 				IF (SELECT state FROM gully WHERE gully_id = OLD.feature_id) = 2 THEN
-					UPDATE gully SET arc_id = null, pjoint_id=NULL, pjoint_type = NULL WHERE OLD.feature_id = gully_id;
+					UPDATE gully SET arc_id = null, pjoint_id=NULL, pjoint_type = NULL,  dma_id = 0, sector_id = 0 where OLD.feature_id = gully_id;
 				END IF;
 			END IF;
 			

@@ -69,12 +69,12 @@ BEGIN
 		LOOP
 			IF v_link.feature_type='CONNEC' THEN
 			
-				IF v_projecttype = 'WS' THEN
-					UPDATE connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, sector_id=NEW.sector_id, presszone_id  = NEW.presszone_id, dqa_id = NEW.dqa_id, 
+				IF v_projectype = 'WS' THEN
+					UPDATE connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, sector_id=NEW.sector_id, presszone_id = NEW.presszone_id, dqa_id = NEW.dqa_id, dma_id = NEW.dma_id, 
 					minsector_id = NEW.minsector_id, fluid_type = NEW.fluid_type
 					WHERE connec_id=v_link.feature_id;
 					
-				ELSIF v_projecttype = 'UD' THEN
+				ELSIF v_projectype = 'UD' THEN
 					UPDATE connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id, fluid_type = NEW.fluid_type
 					WHERE connec_id=v_link.feature_id;
 				END IF;

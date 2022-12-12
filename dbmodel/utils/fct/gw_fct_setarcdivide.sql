@@ -299,7 +299,11 @@ BEGIN
 
 						-- Insert new records into arc table
 						INSERT INTO arc SELECT rec_aux1.*;
-						INSERT INTO arc SELECT rec_aux2.*;
+						INSERT INTO arc SELECT rec_aux2.*;		
+
+						IF rec_aux1.state = 2 THEN
+							RAISE EXCEPTION 'IT IS NOT POSSIBLE TO BREAK PLANNED ARCS BY USING OPERATIVE NODES. HINT: TRY WITH PLANNED NODES.';
+						END IF;
 
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (212, 1,'Insert new arcs into arc table.');

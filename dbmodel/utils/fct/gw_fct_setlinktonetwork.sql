@@ -216,11 +216,12 @@ BEGIN
 				v_link.exit_type = 'GULLY';
 				v_link.exit_id = v_pjointid;
 
-			ELSIF v_link.exit_type='ARC' THEN
+			ELSE  -- it means ARC or NOTHING
 				v_pjointtype='ARC';
 				v_endfeature_geom = v_arc.the_geom;
 				v_link.exit_type = 'ARC';
 				v_link.exit_id = v_arc.arc_id;
+				v_pjointid = v_arc.arc_id;
 			END IF;
 
 			-- compute link

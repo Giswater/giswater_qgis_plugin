@@ -40,7 +40,7 @@ v_force_delete boolean;
 v_autoupdate_fluid boolean;
 v_message text;
 v_dsbl_error boolean;
-v_disable_linktonetwork boolean;
+v_connect2network boolean;
 v_system_id text;
 v_featurecat_id text;
 v_pol_id text;
@@ -61,12 +61,13 @@ BEGIN
 	v_type_man_table:=v_man_table;
 	
 	-- get system and user variables
-	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
+	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE parameter='edit_feature_buffer_on_mapzone');
 	SELECT ((value::json)->>'activated') INTO v_insert_double_geom FROM config_param_system WHERE parameter='insert_double_geometry';
 	SELECT ((value::json)->>'value') INTO v_double_geom_buffer FROM config_param_system WHERE parameter='insert_double_geometry';
 	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid';
 	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;
-	v_disable_linktonetwork := (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_disable_linktonetwork' AND cur_user=current_user);
+
+	SELECT value::boolean INTO v_connect2network FROM config_param_user WHERE parameter='edit_connec_automatic_link' AND cur_user=current_user;
 
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
 	IF v_insert_double_geom IS NULL THEN v_insert_double_geom=FALSE; END IF;
@@ -230,7 +231,6 @@ BEGIN
 			END IF;           
 		END IF;
 			
-			
 		-- Presszone
 		IF (NEW.presszone_id IS NULL) THEN
 			
@@ -261,7 +261,6 @@ BEGIN
 				NEW.presszone_id = 0;
 			END IF;           
 		END IF;
-		
 		
 		-- Municipality 
 		IF (NEW.muni_id IS NULL) THEN
@@ -310,7 +309,6 @@ BEGIN
 				END IF;	
 			END IF;	        
 		END IF;
-			
 			
 		-- State
 		IF (NEW.state IS NULL) THEN
@@ -515,45 +513,36 @@ BEGIN
 		END IF;	
 
 		IF v_man_table='parent' THEN
-		    v_man_table:= (SELECT man_table FROM cat_feature_connec c JOIN sys_feature_cat s ON c.type = s.id JOIN cat_connec ON cat_connec.id=NEW.connecat_id
+			v_man_table:= (SELECT man_table FROM cat_feature_connec c JOIN sys_feature_cat s ON c.type = s.id JOIN cat_connec ON cat_connec.id=NEW.connecat_id
 		    	WHERE c.id = cat_connec.connectype_id LIMIT 1)::text;
 	         
-	        IF v_man_table IS NOT NULL THEN
-	            v_sql:= 'INSERT INTO '||v_man_table||' (connec_id) VALUES ('||quote_literal(NEW.connec_id)||')';
-	            EXECUTE v_sql;
-	        END IF;
-
+			IF v_man_table IS NOT NULL THEN
+			    v_sql:= 'INSERT INTO '||v_man_table||' (connec_id) VALUES ('||quote_literal(NEW.connec_id)||')';
+			    EXECUTE v_sql;
+			END IF;
 	 	END IF;
 
+		-- Control of automatic insert of link
+		IF NEW.state=1 OR NEW.state=2 THEN
 		
-		IF NEW.state=1 THEN
-			-- Control of automatic insert of link
-			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_automatic_link'
-			AND cur_user=current_user LIMIT 1) IS TRUE THEN
-
-				EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-				"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
-				
-			END IF;
-
-		ELSIF NEW.state=2 THEN
-
-			-- Control of automatic insert of link
-			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_automatic_link' AND cur_user=current_user LIMIT 1) IS TRUE THEN
+			IF v_connect2network THEN
 			
-				EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1},
-				"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
-			END IF;
+				IF  NEW.state=1 THEN
+					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+					"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC", "forcedArcs":["'||NEW.arc_id||'"]}}$$)';	
 
-			-- inserting on psector
-			SELECT arc_id INTO v_arc_id FROM connec WHERE connec_id=NEW.connec_id;
-					
-			INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, arc_id, link_id) 
-			VALUES (NEW.connec_id, v_psector_vdefault, 1, true, v_arc_id, (SELECT link_id FROM link WHERE feature_id = NEW.connec_id));
-		
+					-- recover values in order to do not disturb this workflow
+					SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
+					NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id; 
+					NEW.presszone_id = v_arc.presszone_id; NEW.dqa_id = v_arc.dqa_id;  NEW.minsector_id = v_arc.minsector_id; 
+
+				ELSIF NEW.state=2 THEN
+					INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, arc_id)
+					VALUES (NEW.connec_id, v_psector_vdefault, 1, true, NEW.arc_id);
+				END IF;
+			END IF;
 		END IF;
 			
-
 		-- man addfields insert
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM sys_addfields
@@ -574,7 +563,7 @@ BEGIN
 		IF (NEW.epa_type = 'JUNCTION') THEN 
 			INSERT INTO inp_connec (connec_id) VALUES (NEW.connec_id);
 		END IF;
-	
+		
 		RETURN NEW;
 		
 	ELSIF TG_OP = 'UPDATE' THEN
@@ -635,42 +624,36 @@ BEGIN
 
 					IF (SELECT connec_id FROM plan_psector_x_connec WHERE connec_id=NEW.connec_id AND psector_id = v_psector_vdefault AND state = 1) IS NOT NULL THEN
 
-						-- link values definition
+						EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+						"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC", "forcedArcs":["'||NEW.arc_id||'"]}}$$)';		
+
+						-- recover values in order to do not disturb this workflow
 						SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
-						v_link := (SELECT nextval('link_link_id_seq'));
-						v_link_geom := ST_ShortestLine(NEW.the_geom, v_arc.the_geom);
-
-						-- insert link
-						INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id, dqa_id, 
-						presszone_id, minsector_id)
-						VALUES (v_link, 'CONNEC', NEW.connec_id, v_arc.expl_id, NEW.arc_id, 'ARC', FALSE, 2, v_link_geom, v_arc.sector_id, v_arc.fluid_type, v_arc.dma_id, v_arc.dqa_id, 
-						v_arc.presszone_id, v_arc.minsector_id);
-
-						UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id, link_id = v_link WHERE connec_id=NEW.connec_id AND psector_id = v_psector_vdefault AND state = 1;
+						NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id; 
+						NEW.presszone_id = v_arc.presszone_id; NEW.dqa_id = v_arc.dqa_id;  NEW.minsector_id = v_arc.minsector_id; 
 					END IF;
 				ELSE
 					UPDATE plan_psector_x_connec SET arc_id = null, link_id = null WHERE connec_id=NEW.connec_id AND psector_id = v_psector_vdefault AND state = 1;
-					DELETE FROM link WHERE feature_id = NEW.connec_id AND state  = 2;
-					UPDATE connec SET arc_id = NULL WHERE connec_id = NEW.connec_id;
+					DELETE FROM link WHERE feature_id = NEW.connec_id AND state = 2;
+
+					-- setting values					
+					NEW.sector_id = 0; NEW.presszone_id = '0'; NEW.dqa_id = 0; NEW.dma_id = 0; NEW.minsector_id = 0; NEW.minsector_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
 				END IF;
 			ELSE
 				-- when arc_id comes from connec table
 				UPDATE connec SET arc_id=NEW.arc_id where connec_id=NEW.connec_id;
 
 				IF NEW.arc_id IS NOT NULL THEN
-				
 					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-					"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';				
-					
-					-- reconnecting values
-					NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
-					NEW.dma_id = (SELECT dma_id FROM arc WHERE arc_id = NEW.arc_id);
-					NEW.presszone_id = (SELECT presszone_id FROM arc WHERE arc_id = NEW.arc_id);
-					NEW.sector_id = (SELECT sector_id FROM arc WHERE arc_id = NEW.arc_id);
-					NEW.dqa_id = (SELECT dqa_id FROM arc WHERE arc_id = NEW.arc_id);
-					NEW.minsector_id = (SELECT dqa_id FROM arc WHERE arc_id = NEW.arc_id);
+					"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC", "forcedArcs":["'||NEW.arc_id||'"]}}$$)';				
+
+					-- recover values in order to do not disturb this workflow
+					SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
+					NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id; 
+					NEW.presszone_id = v_arc.presszone_id; NEW.dqa_id = v_arc.dqa_id;  NEW.minsector_id = v_arc.minsector_id; 
 				ELSE
-					DELETE FROM link WHERE feature_id = NEW.connec_id AND state  = 1;
+					DELETE FROM link WHERE feature_id = NEW.connec_id AND state = 1;
+					NEW.sector_id = 0; NEW.presszone_id = '0'; NEW.dqa_id = 0; NEW.dma_id = 0; NEW.minsector_id = 0; NEW.minsector_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
 				END IF;
 			END IF;
 		END IF;
@@ -775,7 +758,7 @@ BEGIN
 		END IF;
 
 		UPDATE connec 
-			SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW.depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, 
+			SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW.depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, arc_id  = NEW.arc_id,
 			annotation=NEW.annotation, observ=NEW.observ, "comment"=NEW.comment, rotation=NEW.rotation,dma_id=NEW.dma_id, presszone_id=NEW.presszone_id,
 			soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, 
 			workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, streetaxis2_id=v_streetaxis2, 

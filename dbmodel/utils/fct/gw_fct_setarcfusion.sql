@@ -424,10 +424,12 @@ BEGIN
 					IF v_count > 0 THEN
 						INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable, link_id) 
 						SELECT v_psector_id, connec_id, arc_id, 0, false, link_id FROM connec c JOIN link l ON connec_id = feature_id 
-						WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND c.state = 1 and l.state = 1;
+						WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND c.state = 1 and l.state = 1
+						ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
 						
 						INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable) 
-						SELECT v_psector_id, connec_id, arc_id, 1, false FROM connec c WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND state = 1;
+						SELECT v_psector_id, connec_id, arc_id, 1, false FROM connec c WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND state = 1
+						ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
 
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (214, 1, concat('Reconnect operative ',v_count,' connecs.'));
@@ -440,10 +442,12 @@ BEGIN
 						
 							INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable, link_id) 
 							SELECT v_psector_id, gully_id, arc_id, 0, false, link_id FROM gully c JOIN link l ON gully_id = feature_id 
-							WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND c.state = 1 and l.state = 1;
+							WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND c.state = 1 and l.state = 1
+							ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
 
 							INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable) 
-							SELECT v_psector_id, gully_id, arc_id, 1, false FROM gully c WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND state = 1;
+							SELECT v_psector_id, gully_id, arc_id, 1, false FROM gully c WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND state = 1
+							ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
 							
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
 							VALUES (214, 1, concat('Reconnect operative ',v_count,' gullies.'));

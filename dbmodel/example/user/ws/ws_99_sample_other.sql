@@ -41,12 +41,10 @@ INSERT INTO plan_psector_x_arc VALUES (9, '2086', 1, 0, false, NULL, NULL, true)
 
 INSERT INTO plan_psector_x_node VALUES (2, '1076', 1, 0, false, NULL, true);
 
-
 SELECT gw_fct_setlinktonetwork($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{"id":["3103","3104","3014","114461","114462","114463"]},
+"feature":{"id":["3103","3104"]},
 "data":{"feature_type":"CONNEC"}}$$);
-
 
 INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, active) VALUES ('3103', NULL, 1, 0, false, NULL, true);
 INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, active) VALUES ('3104', NULL, 1, 0, false, NULL, true);
@@ -55,6 +53,11 @@ INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable,
 INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, active) VALUES ('114461', '20851', 1, 1, true, NULL, true);
 INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, active) VALUES ('114462', '20851', 1, 1, true, NULL, true);
 INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, active) VALUES ('114463', '20651', 2, 1, true, NULL, true);
+
+SELECT gw_fct_setlinktonetwork($${
+"client":{"device":4, "infoType":1, "lang":"ES"},
+"feature":{"id":["114461","114462","114463"]},
+"data":{"feature_type":"CONNEC"}}$$);
 
 
 INSERT INTO doc VALUES ('Demo document 1', 'OTHER', 'https://github.com/Giswater/docs/blob/master/user/manual_usuario_giswater3.doc', NULL, '2018-03-11 19:40:20.449663', current_user, '2018-03-11 19:40:20.449663');
@@ -704,7 +707,10 @@ UPDATE ext_rtc_dma_period set avg_press = 30;
 UPDATE dma set avg_press = 30;
 
 UPDATE connec SET pjoint_id = arc_id WHERE pjoint_type = 'ARC';
+UPDATE link SET exit_id = arc_id FROM connec c WHERE connec_id = feature_id and c.state > 0 AND exit_type  ='ARC';
 
 UPDATE plan_psector_x_arc SET active = true WHERE arc_id in ('20861', '20851', '20651');
 UPDATE plan_psector_x_node SET active = true WHERE node_id in ('10761');
 UPDATE plan_psector_x_connec SET active = true WHERE connec_id in ('3103', '3104', '3014', '3014');
+
+SELECT setval('SCHEMA_NAME.urn_id_seq', 114465, true);

@@ -84,3 +84,7 @@ INSERT INTO sys_function(id, function_name, project_type, function_type, descrip
 VALUES (3182, 'gw_trg_plan_psector', 'utils', 'trigger function', 
 'Trigger to update active value on plan_psector_x_* tables using plan_psector active value', 'role_master', 'core');
 
+UPDATE link SET exit_id = arc_id FROM connec c WHERE connec_id = feature_id AND exit_type  ='ARC';
+UPDATE link SET exit_type = 'ARC' WHERE exit_type  ='VNODE';
+
+
