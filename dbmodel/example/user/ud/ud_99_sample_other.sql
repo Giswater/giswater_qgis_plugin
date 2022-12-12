@@ -519,5 +519,10 @@ UPDATE gully SET pjoint_id = arc_id WHERE pjoint_type = 'ARC';
 update link set exit_id = arc_id FROM connec where feature_id = connec_id and exit_type = 'ARC';
 update link set exit_id = arc_id FROM gully where feature_id = gully_id and exit_type = 'ARC';
 
-
+UPDATE arc SET node_sys_top_elev_1 = sys_top_elev FROM vu_node WHERE node_id = node_1;
+UPDATE arc SET node_sys_elev_1 = sys_elev FROM vu_node WHERE node_id = node_1;
+UPDATE arc SET node_sys_top_elev_2 = sys_top_elev FROM vu_node WHERE node_id = node_2;
+UPDATE arc SET node_sys_elev_2 = sys_elev FROM vu_node WHERE node_id = node_2;
+UPDATE arc SET nodetype_1 = node_type FROM vu_node WHERE node_id = node_1;
+UPDATE arc SET nodetype_2 = node_type FROM vu_node WHERE node_id = node_2;
 

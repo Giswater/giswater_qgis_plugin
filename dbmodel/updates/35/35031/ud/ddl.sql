@@ -35,11 +35,12 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "co
 
 --2022/09/28
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"nodetype_1", "dataType":"character varying(30)", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"elev1", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"y1", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"node_sys_top_elev_1", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"node_sys_elev_1", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
+
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"nodetype_2", "dataType":"character varying(30)", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"elev2", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"y2", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"node_sys_top_elev_2", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"node_sys_elev_2", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
 
 
 --2022/11/14
