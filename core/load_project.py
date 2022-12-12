@@ -191,6 +191,9 @@ class GwLoadProject(QObject):
             tools_log.log_warning(message)
             tools_qgis.show_warning(message)
 
+        # Reset dialogs position
+        tools_gw.reset_position_dialog()
+
         # Manage compatibility version of Giswater
         self._check_version_compatibility()
 

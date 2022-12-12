@@ -3537,6 +3537,33 @@ def unset_giswater_menu():
         menu_giswater.deleteLater()
         global_vars.load_project_menu = None
 
+
+def reset_position_dialog(show_message=False):
+    """ Reset position dialog x/y """
+
+    try:
+        parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+        config_folder = f"{global_vars.user_folder_dir}{os.sep}config{os.sep}"
+        if not os.path.exists(config_folder):
+            os.makedirs(config_folder)
+        path = config_folder + f"session.config"
+        parser.read(path)
+
+        # Check if section exists in file
+        if "dialogs_position" in parser:
+            parser.remove_section("dialogs_position")
+
+        msg = "Reset position form done successfully."
+        if show_message:
+            tools_qt.show_info_box(msg, "Info")
+
+        with open(path, 'w') as configfile:
+            parser.write(configfile)
+            configfile.close()
+    except Exception as e:
+        tools_log.log_warning(f"set_config_parser exception [{type(e).__name__}]: {e}")
+        return
+
 # endregion
 
 
