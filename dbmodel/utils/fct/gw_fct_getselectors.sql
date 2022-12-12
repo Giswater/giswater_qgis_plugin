@@ -62,14 +62,18 @@ v_querystring text;
 v_debug_vars json;
 v_debug json;
 v_msgerr json;
-v_count_expl integer;
-rec_macro record;
+v_count_zone integer;
+rec_macro integer;
 v_count_selector integer;
 v_useatlas boolean;
 v_message text;
 v_uservalues json;
 v_action text;
 v_zonetable text;
+v_zoneid text;
+v_macroid text;
+v_macrotable text;
+v_macroselector text;
 v_cur_user text;
 v_prev_cur_user text;
 v_device integer;
@@ -214,11 +218,37 @@ BEGIN
 			
 			IF v_tab.tabname ='tab_macroexploitation' THEN
 				v_zonetable='exploitation';
-				EXECUTE 'SELECT array_agg(macroexpl_id) FROM macroexploitation' INTO v_ids;
+				v_zoneid = 'expl_id';
+				v_macroid = 'macroexpl_id';
+				v_macrotable = 'macroexploitation';
+				v_macroselector = 'selector_expl';
+				--EXECUTE 'SELECT array_agg(macroexpl_id) FROM macroexploitation' INTO v_ids;
 			ELSIF v_tab.tabname='tab_macrosector' THEN
-				EXECUTE 'SELECT array_agg(macrosector_id) FROM v_edit_macrosector' INTO v_ids;
 				v_zonetable='sector';
+				v_zoneid = 'sector_id';
+				v_macroid = 'macrsector_id';
+				v_macrotable = 'macrosector';
+				v_macroselector = 'selector_sector';
+				--EXECUTE 'SELECT array_agg(macrosector_id) FROM v_edit_macrosector' INTO v_ids;
 			END IF;
+
+			FOR rec_macro IN EXECUTE 'SELECT '||v_macroid||' FROM '||v_macrotable||'' LOOP
+				EXECUTE 'SELECT count('||v_zoneid||') as count  FROM '||v_zonetable||' WHERE '||v_macroid||'='||rec_macro||' group by '||v_macroid||''
+				INTO v_count_zone;
+				EXECUTE 'SELECT count(*) FROM '||v_macroselector||' JOIN '||v_zonetable||' USING ('||v_zoneid||') 
+				WHERE '||v_macroid||'='||rec_macro||' AND cur_user=current_user'
+				INTO v_count_selector;
+
+				IF v_count_zone = v_count_selector THEN
+					IF v_ids IS NULL THEN 
+						EXECUTE 'SELECT '||rec_macro||''
+						INTO v_ids;
+					ELSE
+						EXECUTE 'SELECT=concat('||v_ids||','||rec_macro||')'
+						INTO v_ids;
+					END IF;
+				END IF;
+			END LOOP;
 
 			v_ids = replace(v_ids,'{','');
 			v_ids = replace(v_ids,'}','');	
