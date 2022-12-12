@@ -220,204 +220,158 @@ BEGIN
                 
             ELSE
 
-                -- node_1
-                SELECT * INTO nodeRecord1 FROM vu_node WHERE node_id = nodeRecord1.node_id;  -- vu_node is used because topology have been ckecked before and sys_* fields are needed
-                NEW.node_1 := nodeRecord1.node_id; 
+		IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 
-                -- node_2
-                SELECT * INTO nodeRecord2 FROM vu_node WHERE node_id = nodeRecord2.node_id;-- vu_node is used because topology have been ckecked before and sys_* fields are needed
-                NEW.node_2 := nodeRecord2.node_id;
+			SELECT * INTO nodeRecord1 FROM v_node WHERE node_id =NEW.node_1;
+			SELECT * INTO nodeRecord2 FROM v_node WHERE node_id =NEW.node_2; 
 
-                -- the_geom
-                NEW.the_geom := ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
-                NEW.the_geom := ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
+			-- the_geom
+			NEW.the_geom := ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
+			NEW.the_geom := ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
 
-                -- calculate length
-                sys_length_aux:= ST_length(NEW.the_geom);
-            
-                IF NEW.custom_length IS NOT NULL THEN
-                    sys_length_aux=NEW.custom_length;
-                END IF;
+			-- calculate length
+			sys_length_aux:= ST_length(NEW.the_geom);
+			IF NEW.custom_length IS NOT NULL THEN sys_length_aux=NEW.custom_length; END IF;
+			IF sys_length_aux < 0.1 THEN sys_length_aux=0.1; END IF;
+
+			-- sys elev1
+			IF NEW.custom_elev1 IS NOT NULL THEN
+				sys_elev1_aux = NEW.custom_elev1;
+			ELSIF NEW.elev1 IS NOT NULL THEN
+				sys_elev1_aux = NEW.elev1;
+			ELSIF NEW.custom_y1 IS NOT NULL THEN
+				sys_elev1_aux = nodeRecord1.sys_top_elev - NEW.custom_y1;
+			ELSIF NEW.y1 IS NOT NULL THEN
+				sys_elev1_aux = nodeRecord1.sys_top_elev - NEW.y1;
+			ELSE 
+				sys_elev1_aux = nodeRecord1.sys_elev;
+			END IF;
+
+			-- sys_elev2
+			IF NEW.custom_elev2 IS NOT NULL THEN
+				sys_elev2_aux = NEW.custom_elev2;
+			ELSIF NEW.elev2 IS NOT NULL THEN
+				sys_elev2_aux = NEW.elev2;
+			ELSIF NEW.custom_y2 IS NOT NULL THEN
+				sys_elev2_aux = nodeRecord2.sys_top_elev - NEW.custom_y2;
+			ELSIF NEW.y2 IS NOT NULL THEN
+				sys_elev2_aux = nodeRecord2.sys_top_elev - NEW.y2;
+			ELSE
+				sys_elev2_aux = nodeRecord2.sys_elev;
+			END IF;
+
+			NEW.sys_elev1 := sys_elev1_aux;
+			NEW.sys_elev2 := sys_elev2_aux;
+
+		END IF;
                 
-                IF sys_length_aux < 0.1 THEN 
-                    sys_length_aux=0.1;
-                END IF;
+		IF TG_OP = 'UPDATE' THEN
 
-                -- calculate sys_elev_1 & sys_elev_2 when USE top_elevation values from node and depth values from arc
-                IF (nodeRecord1.elev IS NOT NULL OR nodeRecord1.custom_elev IS NOT NULL) AND (nodeRecord1.top_elev IS NULL AND nodeRecord1.custom_top_elev IS NULL) THEN -- when only elev is used on node only elev must be used on arc
-                    sys_elev1_aux = nodeRecord1.sys_elev;
-            
-                ELSE
-                    sys_y1_aux:= (CASE WHEN NEW.custom_y1 IS NOT NULL THEN NEW.custom_y1
-                               WHEN NEW.y1 IS NOT NULL THEN NEW.y1
-                               ELSE nodeRecord1.sys_ymax END);
-                    sys_elev1_aux := nodeRecord1.sys_top_elev - sys_y1_aux;
-                    
-                END IF;
+			-- keep depth values when geometry is forced to reverse by custom operation
+			IF  (geom_slp_direction_bool IS FALSE AND st_orderingequals(NEW.the_geom, OLD.the_geom) IS FALSE 
+			     AND st_equals(NEW.the_geom, OLD.the_geom) IS TRUE AND v_keepdepthvalues IS NOT FALSE)
+			     OR 
+			     geom_slp_direction_bool IS TRUE AND ((NEW.sys_elev1 < NEW.sys_elev2) AND (NEW.inverted_slope IS NOT TRUE)) OR ((NEW.sys_elev1 > NEW.sys_elev2) AND
+			     (NEW.inverted_slope IS TRUE) AND (OLD.inverted_slope IS NOT TRUE)) THEN
 
-                IF (nodeRecord2.elev IS NOT NULL OR nodeRecord2.custom_elev IS NOT NULL) AND (nodeRecord2.top_elev IS NULL AND nodeRecord2.custom_top_elev IS NULL) THEN -- when only elev is used on node only elev must be used on arc
-                    sys_elev2_aux = nodeRecord2.sys_elev;
-                    sys_y2_aux = null;
-                ELSE
-                    sys_y2_aux:= (CASE WHEN NEW.custom_y2 IS NOT NULL THEN NEW.custom_y2
-                               WHEN NEW.y2 IS NOT NULL THEN NEW.y2
-                               ELSE nodeRecord2.sys_ymax END);
-                    sys_elev2_aux := nodeRecord2.sys_top_elev - sys_y2_aux;
-                    
-                END IF;
+				y_aux = 0;
+       
+				-- elevation values for arc
+				y_aux := NEW.y1;
+				NEW.y1 := NEW.y2;
+				NEW.y2 := y_aux;
+			
+				y_aux := NEW.custom_y1;
+				NEW.custom_y1 := NEW.custom_y2;
+				NEW.custom_y2 := y_aux;
+			
+				y_aux := NEW.elev1;
+				NEW.elev1 := NEW.elev2;
+				NEW.elev2 := y_aux;
 
-                -- calculate sys_elev_1 & sys_elev_2 when USE elevation values from arc 
-                IF TG_OP  = 'INSERT' THEN
+				y_aux := NEW.custom_elev1;
+				NEW.custom_elev1 := NEW.custom_elev2;
+				NEW.custom_elev2 := y_aux;
 
-                    -- sys elev1
-                    IF NEW.custom_elev1 IS NOT NULL THEN
-                        sys_elev1_aux = NEW.custom_elev1;
-                    ELSIF NEW.elev1 IS NOT NULL THEN
-                        sys_elev1_aux = NEW.elev1;
-                    END IF;
+				y_aux := NEW.sys_elev1;
+				NEW.sys_elev1 := NEW.sys_elev2;
+				NEW.sys_elev2 := y_aux;
 
-                    -- sys_elev2
-                    IF NEW.custom_elev2 IS NOT NULL THEN
-                        sys_elev2_aux = NEW.custom_elev2;
-                    ELSIF NEW.elev1 IS NOT NULL THEN
-                        sys_elev2_aux = NEW.elev2;
-                    END IF;
-            
-                    NEW.sys_elev1 := sys_elev1_aux;
-                    NEW.sys_elev2 := sys_elev2_aux;
+				y_aux := NEW.node_sys_top_elev_1;	
+				NEW.node_sys_top_elev_1 := NEW.node_sys_top_elev_2;
+				NEW.node_sys_top_elev_2 := y_aux;
+
+				y_aux := NEW.node_sys_elev_1;	
+				NEW.node_sys_elev_1 := NEW.node_sys_elev_2;
+				NEW.node_sys_elev_2 := y_aux;
+
+			END IF;
+
+			-- automatic reverse of geometry
+			IF geom_slp_direction_bool IS TRUE AND ((sys_elev1_aux < sys_elev2_aux) AND (NEW.inverted_slope IS NOT TRUE)) OR ((sys_elev1_aux > sys_elev2_aux) AND
+			(NEW.inverted_slope IS TRUE) AND (OLD.inverted_slope IS NOT TRUE)) THEN
+
+				-- Node 1 & Node 2
+				NEW.node_1 := nodeRecord2.node_id;
+				NEW.node_2 := nodeRecord1.node_id;                             
+			
+				-- Update conduit direction
+				NEW.the_geom := ST_reverse(NEW.the_geom);
+			END IF;
+
+			-- slope
+			NEW.sys_slope:= (NEW.sys_elev1-NEW.sys_elev2)/sys_length_aux;
+		END IF;
+	END IF;
                 
-                ELSIF TG_OP = 'UPDATE' THEN
+	-- Check auto insert end nodes
+	ELSIF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NULL) AND v_nodeinsert_arcendpoint THEN
 
-                    -- sys elev1
-                    IF (NEW.custom_elev1 IS NOT NULL AND OLD.custom_elev1 IS NOT NULL) OR (NEW.custom_elev1 IS NOT NULL AND OLD.custom_elev1 IS NULL) THEN
-                        sys_elev1_aux = NEW.custom_elev1;
-                    ELSIF (NEW.elev1 IS NOT NULL AND OLD.elev1 IS NOT NULL)	OR (NEW.elev1 IS NOT NULL AND OLD.elev1 IS NULL) THEN
-                        sys_elev1_aux = NEW.elev1;
-                    END IF;
+		IF TG_OP = 'INSERT' THEN
 
-                    -- sys elev2
-                    IF (NEW.custom_elev2 IS NOT NULL AND OLD.custom_elev2 IS NOT NULL) OR (NEW.custom_elev2 IS NOT NULL AND OLD.custom_elev2 IS NULL) THEN
-                        sys_elev2_aux = NEW.custom_elev2;
-                    ELSIF (NEW.elev2 IS NOT NULL AND OLD.elev2 IS NOT NULL) OR (NEW.elev2 IS NOT NULL AND OLD.elev2 IS NULL) THEN
-                        sys_elev2_aux = NEW.elev2;
-                    END IF;
+			-- getting nodecat user's value
+			v_nodecat:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_nodecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			-- get first value (last chance)
+			IF (v_nodecat IS NULL) THEN
+			    v_nodecat := (SELECT id FROM cat_node WHERE active IS TRUE LIMIT 1);
+			END IF;
 
-                    -- keep depth values when geometry is forced to reverse by custom operation
-                    IF  geom_slp_direction_bool IS FALSE AND st_orderingequals(NEW.the_geom, OLD.the_geom) IS FALSE 
-                    AND st_equals(NEW.the_geom, OLD.the_geom) IS TRUE AND v_keepdepthvalues IS NOT FALSE THEN
-        
-                        -- Depth values for arc
-                        y_aux := NEW.y1;
-                        NEW.y1 := NEW.y2;
-                        NEW.y2 := y_aux;
-                
-                        y_aux := NEW.custom_y1;
-                        NEW.custom_y1 := NEW.custom_y2;
-                        NEW.custom_y2 := y_aux;
-                
-                        y_aux := NEW.elev1;
-                        NEW.elev1 := NEW.elev2;
-                        NEW.elev2 := y_aux;
-
-                        y_aux := NEW.custom_elev1;
-                        NEW.custom_elev1 := NEW.custom_elev2;
-                        NEW.custom_elev2 := y_aux;
-
-                        y_aux := NEW.sys_elev1;
-                        NEW.sys_elev1 := NEW.sys_elev2;
-                        NEW.sys_elev2 := y_aux;
-                    ELSE 
-                        NEW.sys_elev1 := sys_elev1_aux;
-                        NEW.sys_elev2 := sys_elev2_aux;
-                    
-                    END IF;
-                END IF;
-
-                -- update values when geometry is forced to reverse by geom_slp_direction_bool variable on true
-                IF geom_slp_direction_bool IS TRUE THEN
-
-                    IF ((sys_elev1_aux < sys_elev2_aux) AND (NEW.inverted_slope IS NOT TRUE)) OR ((sys_elev1_aux > sys_elev2_aux) AND (NEW.inverted_slope IS TRUE) AND (OLD.inverted_slope IS NOT TRUE)) THEN
-                        
-                        -- Update conduit direction
-                        -- Geometry
-                        NEW.the_geom := ST_reverse(NEW.the_geom);
-
-                        -- Node 1 & Node 2
-                        NEW.node_1 := nodeRecord2.node_id;
-                        NEW.node_2 := nodeRecord1.node_id;                             
-                
-                        -- Depth values for arc
-                        y_aux := NEW.y1;
-                        NEW.y1 := NEW.y2;
-                        NEW.y2 := y_aux;
-                
-                        y_aux := NEW.custom_y1;
-                        NEW.custom_y1 := NEW.custom_y2;
-                        NEW.custom_y2 := y_aux;
-                
-                        y_aux := NEW.elev1;
-                        NEW.elev1 := NEW.elev2;
-                        NEW.elev2 := y_aux;
-
-                        y_aux := NEW.custom_elev1;
-                        NEW.custom_elev1 := NEW.custom_elev2;
-                        NEW.custom_elev2 := y_aux;
-
-                        y_aux := NEW.sys_elev1;	
-                        NEW.sys_elev1 := NEW.sys_elev2;
-                        NEW.sys_elev2 := y_aux;
-                    END IF;
-                END IF;
-
-                -- slope
-                NEW.sys_slope:= (NEW.sys_elev1-NEW.sys_elev2)/sys_length_aux;
-            END IF;
-            
-        -- Check auto insert end nodes
-        ELSIF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NULL) AND v_nodeinsert_arcendpoint THEN
-            IF TG_OP = 'INSERT' THEN
-
-                -- getting nodecat user's value
-                v_nodecat:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_nodecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-                -- get first value (last chance)
-                IF (v_nodecat IS NULL) THEN
-                    v_nodecat := (SELECT id FROM cat_node WHERE active IS TRUE LIMIT 1);
-                END IF;
-
-                -- Inserting new node
-                INSERT INTO v_edit_node (node_id, sector_id, state, state_type, dma_id, soilcat_id, workcat_id, buildercat_id, builtdate, nodecat_id, ownercat_id, muni_id,
-                postcode, district_id, expl_id, the_geom)
-                VALUES ((SELECT nextval('urn_id_seq')), NEW.sector_id, NEW.state, NEW.state_type, NEW.dma_id, NEW.soilcat_id, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, v_nodecat,
-                NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, NEW.expl_id, st_endpoint(NEW.the_geom))
-                RETURNING node_id INTO v_node2;
-                        
-                -- Update arc
-                NEW.node_1:= nodeRecord1.node_id; 
-                NEW.node_2:= v_node2;
-            END IF;
+			-- Inserting new node
+			INSERT INTO v_edit_node (node_id, sector_id, state, state_type, dma_id, soilcat_id, workcat_id, buildercat_id, builtdate, nodecat_id, ownercat_id, muni_id,
+			postcode, district_id, expl_id, the_geom)
+			VALUES ((SELECT nextval('urn_id_seq')), NEW.sector_id, NEW.state, NEW.state_type, NEW.dma_id, NEW.soilcat_id, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, v_nodecat,
+			NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, NEW.expl_id, st_endpoint(NEW.the_geom))
+			RETURNING node_id INTO v_node2;
+				
+			-- Update arc
+			NEW.node_1:= nodeRecord1.node_id; 
+			NEW.node_2:= v_node2;
+		END IF;
 
         -- Error, no existing nodes
         ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS TRUE) THEN
-            IF v_dsbl_error IS NOT TRUE THEN
-                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                    "data":{"message":"1042", "function":"1244","debug_msg":""}}$$);';
-            ELSE
-                SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1042;
-                INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);				
-            END IF;
+        
+		IF v_dsbl_error IS NOT TRUE THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"1042", "function":"1244","debug_msg":""}}$$);';
+		ELSE
+			SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1042;
+			INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);				
+		END IF;
             
         --Not existing nodes but accepted insertion
         ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS FALSE) THEN
-            RETURN NEW;
+        
+		RETURN NEW;
 
         ELSE
-            IF v_dsbl_error IS NOT TRUE THEN
-                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                    "data":{"message":"1042", "function":"1244","debug_msg":""}}$$);';
-            ELSE
-                SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1042;
-                INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);		
-            END IF;
+		IF v_dsbl_error IS NOT TRUE THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			    "data":{"message":"1042", "function":"1244","debug_msg":""}}$$);';
+		ELSE
+			SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1042;
+			INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);		
+		END IF;
         END IF;
     
     END IF;
