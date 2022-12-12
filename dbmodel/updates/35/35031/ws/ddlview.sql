@@ -300,6 +300,7 @@ CREATE OR REPLACE VIEW v_rpt_arc AS
  SELECT arc.arc_id,
     selector_rpt_main.result_id,
     arc.arc_type,
+    arc.sector_id,
     arc.arccat_id,
     max(rpt_arc.flow) AS flow_max,
     min(rpt_arc.flow) AS flow_min,
@@ -331,6 +332,7 @@ CREATE OR REPLACE VIEW v_rpt_node AS
  SELECT node.node_id,
     selector_rpt_main.result_id,
     node.node_type,
+    node.sector_id,
     node.nodecat_id,
     max(rpt_node.elevation) AS elevation,
     max(rpt_node.demand) AS demand_max,
@@ -355,23 +357,14 @@ CREATE OR REPLACE VIEW v_rpt_node AS
 
 
 CREATE OR REPLACE VIEW vu_arc AS 
- WITH query_node AS (
-         SELECT node.node_id,
-            node.elevation,
-            node.depth,
-            cat_node.nodetype_id,
-            node.staticpressure
-           FROM node
-             JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
-        )
  SELECT arc.arc_id,
     arc.code,
     arc.node_1,
     arc.node_2,
-    a.elevation AS elevation1,
-    a.depth AS depth1,
-    b.elevation AS elevation2,
-    b.depth AS depth2,
+    arc.elevation1,
+    arc.depth1,
+    arc.elevation2,
+    arc.depth2,
     arc.arccat_id,
     cat_arc.arctype_id AS arc_type,
     cat_feature.system_id AS sys_type,
@@ -432,10 +425,10 @@ CREATE OR REPLACE VIEW vu_arc AS
     arc.inventory,
     arc.num_value,
     cat_arc.arctype_id AS cat_arctype_id,
-    a.nodetype_id AS nodetype_1,
-    a.staticpressure AS staticpress1,
-    b.nodetype_id AS nodetype_2,
-    b.staticpressure AS staticpress2,
+    arc.nodetype_1,
+    arc.staticpress1,
+    arc.nodetype_2,
+    arc.staticpress2,
     date_trunc('second'::text, arc.tstamp) AS tstamp,
     arc.insert_user,
     date_trunc('second'::text, arc.lastupdate) AS lastupdate,
@@ -463,8 +456,6 @@ CREATE OR REPLACE VIEW vu_arc AS
      LEFT JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
      JOIN cat_feature ON cat_feature.id::text = cat_arc.arctype_id::text
      LEFT JOIN dma ON arc.dma_id = dma.dma_id
-     LEFT JOIN query_node a ON a.node_id::text = arc.node_1::text
-     LEFT JOIN query_node b ON b.node_id::text = arc.node_2::text
      LEFT JOIN dqa ON arc.dqa_id = dqa.dqa_id
      LEFT JOIN presszone ON presszone.presszone_id::text = arc.presszone_id::text
      LEFT JOIN v_ext_streetaxis c ON c.id::text = arc.streetaxis_id::text
