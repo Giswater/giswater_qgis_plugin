@@ -50,7 +50,7 @@ CREATE OR REPLACE VIEW vu_arc AS
     arc.custom_y2,
     arc.elev2,
     arc.custom_elev2,
-   (CASE WHEN arc.sys_elev2 IS NULL THEN node_sys_elev_2::numeric(12,3) ELSE arc.sys_elev1 END) AS sys_elev2,
+   (CASE WHEN arc.sys_elev2 IS NULL THEN node_sys_elev_2::numeric(12,3) ELSE arc.sys_elev2 END) AS sys_elev2,
     node_sys_top_elev_2 - (CASE WHEN arc.sys_elev2 IS NULL THEN node_sys_elev_2::numeric(12,3) ELSE arc.sys_elev2 END) AS sys_y2,
     node_sys_top_elev_2 - (CASE WHEN arc.sys_elev2 IS NULL THEN node_sys_elev_2::numeric(12,3) ELSE arc.sys_elev2 END) - cat_arc.geom2 AS r2,
     (CASE WHEN arc.sys_elev2 IS NULL THEN node_sys_elev_2::numeric(12,3) ELSE arc.sys_elev2 END) - node_sys_elev_2 AS z2,
