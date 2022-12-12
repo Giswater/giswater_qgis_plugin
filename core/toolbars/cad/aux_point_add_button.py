@@ -174,7 +174,6 @@ class GwAuxPointAddButton(GwMaptool):
         validator = QDoubleValidator(-99999.99, 9999999.00, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
         self.dlg_create_point.dist_y.setValidator(validator)
-        self.dlg_create_point.dist_x.setFocus()
         self.dlg_create_point.btn_accept.clicked.connect(partial(self._get_values, point_1, point_2))
         self.dlg_create_point.btn_cancel.clicked.connect(self.cancel)
 
@@ -184,6 +183,7 @@ class GwAuxPointAddButton(GwMaptool):
             self.dlg_create_point.rb_right.setChecked(True)
 
         tools_gw.open_dialog(self.dlg_create_point, dlg_name='auxpoint')
+        self.dlg_create_point.dist_x.setFocus()
 
 
     def _get_values(self, point_1, point_2):
