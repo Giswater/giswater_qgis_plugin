@@ -88,3 +88,4 @@ UPDATE link SET exit_id = arc_id FROM connec c WHERE connec_id = feature_id AND 
 UPDATE link SET exit_type = 'ARC' WHERE exit_type  ='VNODE';
 
 
+DELETE FROM sys_function where function_name = 'gw_trg_node_update';
