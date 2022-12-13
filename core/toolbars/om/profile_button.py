@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import json
 import math
-import matplotlib.pyplot as plt
+import subprocess
 import os
 from collections import OrderedDict
 from decimal import Decimal
@@ -25,6 +25,20 @@ from ...utils import tools_gw
 from ...utils.snap_manager import GwSnapManager
 from ....lib import tools_qt, tools_log, tools_qgis
 from .... import global_vars
+
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    plt = None
+    if tools_qt.show_question("Matplotlib Python package not found. Do you want to install Matplotlib?"):
+        subprocess.run(["python", "-m", "ensurepip"])
+        install_matplotlib = subprocess.run(['python', '-m', 'pip', 'install', '-U', 'matplotlib'])
+        if install_matplotlib.returncode:
+            tools_qt.show_info_box(
+                "Matplotlib cannot be installed automatically. Please install Matplotlib manually."
+            )
+        else:
+            tools_qt.show_info_box("Matplotlib installed successfully. Please restart QGIS.")
 
 
 class GwNodeData:
