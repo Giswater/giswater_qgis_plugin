@@ -1960,7 +1960,7 @@ class GwInfo(QObject):
             if 'closed' not in _json:
                 thread = False
 
-        json_result = tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
+        json_result = tools_gw.execute_procedure('gw_fct_setfields', body)
         if not json_result:
             QgsProject.instance().blockSignals(False)
             return False
@@ -4189,7 +4189,7 @@ class GwInfo(QObject):
         form = f'"formName":"{form_name}"'
         feature = f'"tableName":"{table_name}", "id":"{feature_id}", "idName":"{id_name}"'
         body = tools_gw.create_body(form, feature, extras=fields)
-        result = tools_gw.execute_procedure('gw_fct_setcatalog', body, log_sql=True)
+        result = tools_gw.execute_procedure('gw_fct_setcatalog', body)
         if result['status'] != 'Accepted':
             return
 

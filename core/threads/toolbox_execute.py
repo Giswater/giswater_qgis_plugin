@@ -144,8 +144,8 @@ class GwToolBoxTask(GwTask):
             extras = extras[:-2]
         extras += '}'
         self.body = tools_gw.create_body(feature=feature_field, extras=extras)
-        tools_log.log_info(f"Task 'Toolbox execute' execute procedure '{self.function_name}' with parameters: '{self.body}', 'log_sql=True', 'aux_conn={self.aux_conn}', 'is_thread=True'")
-        self.json_result = tools_gw.execute_procedure(self.function_name, self.body, log_sql=True,
+        tools_log.log_info(f"Task 'Toolbox execute' execute procedure '{self.function_name}' with parameters: '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+        self.json_result = tools_gw.execute_procedure(self.function_name, self.body,
                                                       aux_conn=self.aux_conn, is_thread=True)
 
         if self.isCanceled():

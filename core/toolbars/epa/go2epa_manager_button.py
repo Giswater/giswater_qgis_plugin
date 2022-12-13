@@ -268,7 +268,7 @@ class GwGo2EpaManagerButton(GwAction):
 
         extras = f'"resultId":"{result_id}"'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_epa2data', body, log_sql=True)
+        result = tools_gw.execute_procedure('gw_fct_epa2data', body)
         if not result or result.get('status') != 'Accepted':
             message = "Epa2data execution failed. See logs for more details..."
             tools_qgis.show_warning(message, dialog=self.dlg_manager)

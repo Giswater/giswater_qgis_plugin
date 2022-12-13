@@ -1915,7 +1915,7 @@ def exec_pg_function(function_name, parameters=None, commit=True, schema_name=No
     return dict_result
 
 
-def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=False, rubber_band=None,
+def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=True, rubber_band=None,
         aux_conn=None, is_thread=False, check_function=True):
     """ Manage execution database function
     :param function_name: Name of function to call (text)

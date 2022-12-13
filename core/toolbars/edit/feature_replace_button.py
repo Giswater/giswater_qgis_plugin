@@ -436,7 +436,7 @@ class GwFeatureReplaceButton(GwMaptool):
             body = tools_gw.create_body(feature=feature, extras=extras)
 
             # Execute SQL function and show result to the user
-            complet_result = tools_gw.execute_procedure('gw_fct_setfeaturereplace', body, log_sql=True)
+            complet_result = tools_gw.execute_procedure('gw_fct_setfeaturereplace', body)
             if not complet_result:
                 message = "Error replacing feature"
                 tools_qgis.show_warning(message)
