@@ -323,7 +323,7 @@ CREATE OR REPLACE VIEW v_rpt_arc AS
     rpt_inp_arc arc
      JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
   WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND arc.result_id::text = selector_rpt_main.result_id::text
-  GROUP BY arc.arc_id, arc.arc_type, arc.arccat_id, selector_rpt_main.result_id, arc.the_geom
+  GROUP BY arc.arc_id, arc.arc_type, arc.sector_id, arc.arccat_id, selector_rpt_main.result_id, arc.the_geom
   ORDER BY arc.arc_id;
 
 
@@ -352,7 +352,7 @@ CREATE OR REPLACE VIEW v_rpt_node AS
     rpt_inp_node node
      JOIN rpt_node ON rpt_node.node_id::text = node.node_id::text
   WHERE rpt_node.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND node.result_id::text = selector_rpt_main.result_id::text
-  GROUP BY node.node_id, node.node_type, node.nodecat_id, selector_rpt_main.result_id, node.the_geom
+  GROUP BY node.node_id, node.node_type, node.sector_id, node.nodecat_id, selector_rpt_main.result_id, node.the_geom
   ORDER BY node.node_id;
 
 
