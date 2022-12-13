@@ -155,7 +155,7 @@ BEGIN
 		END IF;
 
 		EXECUTE 'DELETE FROM selector_expl WHERE cur_user = current_user';
-		EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) VALUES('|| v_explmuni ||', '''|| current_user ||''')';	
+		EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) VALUES('|| v_explmuni ||', '''|| current_user ||''') ON CONFLICT (expl_id, cur_user) DO NOTHING';	
 	END IF;
 
 	-- manage check all
@@ -200,7 +200,7 @@ BEGIN
 			-- manage value
 			IF v_value THEN
 				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) 
-				SELECT '|| v_columnname ||', current_user FROM '||v_zonetable||' WHERE '||v_tableid||' = '||v_id||';';
+				SELECT '|| v_columnname ||', current_user FROM '||v_zonetable||' WHERE '||v_tableid||' = '||v_id||' ON CONFLICT ('|| v_columnname ||', cur_user) DO NOTHING;';
 			ELSE
 				EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user AND 
 				' || v_columnname || ' IN (SELECT '|| v_columnname ||' FROM '||v_zonetable||' WHERE '||v_tableid||' = '||v_id||');';

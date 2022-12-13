@@ -244,7 +244,7 @@ BEGIN
 						EXECUTE 'SELECT '||rec_macro||''
 						INTO v_ids;
 					ELSE
-						EXECUTE 'SELECT=concat('||v_ids||','||rec_macro||')'
+						EXECUTE 'SELECT concat('||v_ids||','||rec_macro||')'
 						INTO v_ids;
 					END IF;
 				END IF;
