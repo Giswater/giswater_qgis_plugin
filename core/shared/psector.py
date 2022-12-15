@@ -309,7 +309,7 @@ class GwPsector:
                 tools_qgis.highlight_features_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band, 10
             ))
             self.qtbl_connec.selectionModel().selectionChanged.connect(partial(
-                self._enable_set_to_arc
+                self._manage_tab_feature_buttons
             ))
 
             if self.project_type.upper() == 'UD':
@@ -320,7 +320,7 @@ class GwPsector:
                     tools_qgis.highlight_features_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", self.rubber_band, 10
                 ))
                 self.qtbl_gully.selectionModel().selectionChanged.connect(partial(
-                    self._enable_set_to_arc
+                    self._manage_tab_feature_buttons
                 ))
 
             self.populate_budget(self.dlg_plan_psector, psector_id)
