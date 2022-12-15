@@ -214,7 +214,7 @@ BEGIN
 		EXECUTE 'select replace('''||rec_trg.event||''', '','', '' OR '')'
 		INTO v_replace_query;
 		
-		rec_trg.definition = replace(replace(rec_trg.definition,'EXECUTE PROCEDURE',''),concat(v_source_schema,'.'),concat(v_dest_schema,'.'));
+		rec_trg.definition = replace(rec_trg.definition,concat(v_source_schema,'.'),concat(v_dest_schema,'.'));
 		IF v_trg_fields IS NULL THEN 
 
 			
