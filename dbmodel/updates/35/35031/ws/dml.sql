@@ -352,3 +352,6 @@ SELECT distinct child_layer, formtype, tabname, 'hydrant_type', 'lyt_data_2', ma
 FROM cat_feature
 join config_form_fields on formname = child_layer
 WHERE  system_id ilike 'HYDRANT' group by child_layer,formname,formtype, tabname ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'manageAll','true'::bool) WHERE parameter = 'basic_selector_tab_mincut';
+
