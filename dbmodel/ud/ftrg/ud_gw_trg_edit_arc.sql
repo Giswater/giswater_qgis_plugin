@@ -395,7 +395,7 @@ BEGIN
 			NEW.location_type, NEW.workcat_id,NEW.workcat_id_end, NEW.workcat_id_plan,NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, 
 			NEW.muni_id, v_streetaxis,  NEW.postcode, NEW.district_id, v_streetaxis2, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x, 
-			NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.pavcat_id
+			NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.pavcat_id,
 			NEW.drainzone_id);
 		ELSE
 			INSERT INTO arc (arc_id, code, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
