@@ -21,6 +21,7 @@ FROM config_form_fields
 WHERE (formname ilike 've_%' or formname in('v_edit_node', 'v_edit_arc', 'v_edit_connec', 'v_edit_gully')) and formname !='ve_config_sysfields' 
 group by formname ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
+DELETE FROM sys_function WHERE id = 2710 OR id = 2768;
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
 VALUES (2710, 'gw_fct_graphanalytics_mapzones', 'utils', 'function', 'json', 'json', 'Function to analyze graph of network. Multiple analysis is avaliable. Dynamic analisys to sectorize network using the flow traceability function. 
 Before work with this funcion it is mandatory to configurate field graph_delimiter on node_type and field graphconfig on [dma, sector, cat_presszone and dqa] tables',
@@ -33,7 +34,7 @@ VALUES (2768, 'gw_fct_graphanalytics_mapzones_advanced', 'utils', 'function', 'j
 - Enable status for variable utils_graphanalytics_status on [config_param_system] table.
 Stop your mouse over labels for more information about input parameters.
 This function could be automatic triggered by valve status (open or closed) by configuring utils_graphanalytics_automatic_trigger variable on [config_param_system] table.',
-'role_master',null,'core')  ON CONFLICT (id) DO NOTHING;
+'role_om',null,'core')  ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM config_toolbox WHERE id=2768;
 INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)

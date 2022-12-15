@@ -233,10 +233,10 @@ BEGIN
 			END IF;
 
 			FOR rec_macro IN EXECUTE 'SELECT '||v_macroid||' FROM '||v_macrotable||'' LOOP
-				EXECUTE 'SELECT count('||v_zoneid||') as count  FROM '||v_zonetable||' WHERE '||v_macroid||'='||rec_macro||' group by '||v_macroid||''
+				EXECUTE 'SELECT count('||v_zoneid||') as count  FROM '||v_zonetable||' WHERE '||v_macroid||'='||rec_macro||' and active IS TRUE group by '||v_macroid||''
 				INTO v_count_zone;
 				EXECUTE 'SELECT count(*) FROM '||v_macroselector||' JOIN '||v_zonetable||' USING ('||v_zoneid||') 
-				WHERE '||v_macroid||'='||rec_macro||' AND cur_user=current_user'
+				WHERE '||v_macroid||'='||rec_macro||'  AND active IS TRUE AND cur_user=current_user'
 				INTO v_count_selector;
 
 				IF v_count_zone = v_count_selector THEN
