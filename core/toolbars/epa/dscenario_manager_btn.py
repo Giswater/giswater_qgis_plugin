@@ -414,7 +414,7 @@ class GwDscenarioManagerButton(GwAction):
                 break
         if feature_type != 'feature_id':
             table = f"v_edit_{feature_type.split('_')[0]}"
-        tools_qgis.hilight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
+        tools_qgis.highlight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
 
 
     def _manage_add_layers(self):

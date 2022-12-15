@@ -148,14 +148,14 @@ class GwElement:
         self.dlg_add_element.btn_add_geom.clicked.connect(self._get_point_xy)
         self.dlg_add_element.state.currentIndexChanged.connect(partial(self._filter_state_type))
 
-        self.dlg_add_element.tbl_element_x_arc.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_element.tbl_element_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
-        self.dlg_add_element.tbl_element_x_node.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_element.tbl_element_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
-        self.dlg_add_element.tbl_element_x_connec.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_element.tbl_element_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
-        self.dlg_add_element.tbl_element_x_gully.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_element.tbl_element_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
+        self.dlg_add_element.tbl_element_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                       self.dlg_add_element.tbl_element_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
+        self.dlg_add_element.tbl_element_x_node.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                        self.dlg_add_element.tbl_element_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
+        self.dlg_add_element.tbl_element_x_connec.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                          self.dlg_add_element.tbl_element_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
+        self.dlg_add_element.tbl_element_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                         self.dlg_add_element.tbl_element_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
 
         # Fill combo boxes of the form and related events
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self._filter_elementcat_id))
