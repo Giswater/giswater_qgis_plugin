@@ -2494,6 +2494,7 @@ def selection_changed(class_object, dialog, table_object, query=False, lazy_widg
         _insert_feature_psector(dialog, class_object.feature_type, ids=ids)
         remove_selection()
         load_tableview_psector(dialog, class_object.feature_type)
+        set_model_signals(class_object)
     else:
         load_tablename(dialog, table_object, class_object.feature_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -2501,6 +2502,37 @@ def selection_changed(class_object, dialog, table_object, query=False, lazy_widg
     enable_feature_type(dialog, table_object, ids=ids)
     class_object.ids = ids
 
+
+def set_model_signals(class_object):
+
+    class_object.rubber_band_point.reset()
+    class_object.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
+
+    filter_ = "psector_id = '" + str(class_object.psector_id.text()) + "'"
+    class_object.fill_table(class_object.dlg_plan_psector, class_object.qtbl_connec, class_object.tablename_psector_x_connec,
+                    set_edit_triggers=QTableView.DoubleClicked, expr=filter_)
+
+    # Set selectionModel signals
+    class_object.qtbl_arc.selectionModel().selectionChanged.connect(partial(
+        tools_qgis.highlight_features_by_id, class_object.qtbl_arc, "v_edit_arc", "arc_id", class_object.rubber_band_point, 5
+    ))
+    class_object.qtbl_node.selectionModel().selectionChanged.connect(partial(
+        tools_qgis.highlight_features_by_id, class_object.qtbl_node, "v_edit_node", "node_id", class_object.rubber_band_point, 10
+    ))
+    class_object.qtbl_connec.selectionModel().selectionChanged.connect(partial(
+        tools_qgis.highlight_features_by_id, class_object.qtbl_connec, "v_edit_connec", "connec_id", class_object.rubber_band_point, 10
+    ))
+    class_object.qtbl_connec.selectionModel().selectionChanged.connect(partial(
+        class_object._manage_tab_feature_buttons
+    ))
+
+    if class_object.project_type.upper() == 'UD':
+        class_object.qtbl_gully.selectionModel().selectionChanged.connect(partial(
+            tools_qgis.highlight_features_by_id, class_object.qtbl_gully, "v_edit_gully", "gully_id", class_object.rubber_band_point, 10
+        ))
+        class_object.qtbl_gully.selectionModel().selectionChanged.connect(partial(
+            class_object._manage_tab_feature_buttons
+        ))
 
 def insert_feature(class_object, dialog, table_object, query=False, remove_ids=True, lazy_widget=None,
                    lazy_init_function=None):
