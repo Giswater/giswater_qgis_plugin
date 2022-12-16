@@ -23,11 +23,11 @@ BEGIN
 
 	SELECT connec.state INTO v_stateaux FROM connec WHERE connec_id=NEW.connec_id;
 	
-	IF NEW.state IS NULL AND v_stateaux=1 THEN
+	/*IF NEW.state IS NULL AND v_stateaux=1 THEN
 		NEW.state=0;
 	ELSIF NEW.state IS NULL AND v_stateaux=2 THEN
 		NEW.state=1;
-	END IF;
+	END IF;*/
 	
 	IF NEW.state = 1 AND v_stateaux = 1 THEN
 		NEW.doable=false;
