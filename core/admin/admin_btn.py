@@ -1983,7 +1983,7 @@ class GwAdminButton:
 
         sql = f"SELECT value FROM {project_name}.config_param_system WHERE parameter='admin_isproduction'"
         row = tools_db.get_row(sql)
-        if tools_os.set_boolean(row[0], default=False):
+        if row and tools_os.set_boolean(row[0], default=False):
             msg = f"The schema '{project_name}' is being used in production! It can't be deleted."
             tools_qt.show_info_box(msg, "Warning")
             return
