@@ -158,3 +158,8 @@ UPDATE arc SET node_sys_top_elev_2 = sys_top_elev FROM vu_node WHERE node_id = n
 UPDATE arc SET node_sys_elev_2 = sys_elev FROM vu_node WHERE node_id = node_2;
 UPDATE arc SET nodetype_1 = node_type FROM vu_node WHERE node_id = node_1;
 UPDATE arc SET nodetype_2 = node_type FROM vu_node WHERE node_id = node_2;
+
+UPDATE ud_35.config_form_fields
+SET widgetcontrols='{"autoupdateReloadFields": ["node_1", "node_2", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2", "slope"]}'
+WHERE formname like 've_arc_%' AND formtype='form_feature' AND tabname='data' AND columnname IN ('elev1', 'y1', 'custom_y1', 'custom_elev1', 'elev2', 'y2', 'custom_y2', 'custom_elev2');
+
