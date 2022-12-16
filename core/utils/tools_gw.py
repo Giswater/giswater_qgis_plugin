@@ -2759,8 +2759,10 @@ def add_icon(widget, icon, sub_folder="20x20"):
         widget.setIcon(QIcon(icon_path))
         if type(widget) is QPushButton:
             widget.setProperty('has_icon', True)
+        return QIcon(icon_path)
     else:
         tools_log.log_info("File not found", parameter=icon_path)
+        return False
 
 
 def add_tableview_header(widget, field):
