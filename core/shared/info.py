@@ -2208,6 +2208,7 @@ class GwInfo(QObject):
         if not p_widget:
             return
 
+        changed_color = "#3ED396"
         # Restore QLineEdit stylesheet
         widget_list = dialog.tab_data.findChildren(QLineEdit)
         for widget in widget_list:
@@ -2228,15 +2229,17 @@ class GwInfo(QObject):
             if widget is None:
                 widget = dialog.findChild(QPushButton, f'{field["widgetname"]}')
             if widget:
-                cur_value = tools_qt.get_text(dialog, widget)
+                cur_value = tools_qt.get_text(dialog, widget, return_string_null=False)
                 value = field["value"]
                 if str(cur_value) != str(value):
                     widget.setText(value)
                     if not isinstance(widget, QPushButton):
-                        widget.setStyleSheet("border: 2px solid #3ED396")
+                        widget.setStyleSheet(f"border: 2px solid {changed_color}")
+                    else:
+                        changed_color = "#EB9438"
                     if getattr(widget, 'isReadOnly', False):
-                        widget.setStyleSheet("QLineEdit {background: rgb(244, 244, 244); color: rgb(100, 100, 100); "
-                                             "border: 2px solid #3ED396}")
+                        widget.setStyleSheet(f"QLineEdit {{background: rgb(244, 244, 244); color: rgb(100, 100, 100); "
+                                             f"border: 2px solid {changed_color}}}")
 
             elif "message" in field:
                 level = field['message']['level'] if 'level' in field['message'] else 0
