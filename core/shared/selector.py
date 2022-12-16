@@ -21,7 +21,7 @@ from ...lib import tools_qgis, tools_qt, tools_os, tools_db
 class GwSelector:
 
     def __init__(self):
-        pass
+        self.checkall = False
 
 
     def open_selector(self, selector_type="selector_basic", reload_dlg=None):
@@ -178,24 +178,31 @@ class GwSelector:
                 gridlayout.addWidget(widget, int(field['layoutorder']), 2)
                 widget.setFocus()
 
-            if 'manageAll' in form_tab:
-                if (form_tab['manageAll']).lower() == 'true':
-                    if tools_qt.get_widget(dialog, f"chk_all_{form_tab['tabName']}") is None:
-                        widget = QCheckBox()
-                        widget.setObjectName('chk_all_' + str(form_tab['tabName']))
-                        widget.stateChanged.connect(partial(self._manage_all, dialog, widget))
-                        widget.setLayoutDirection(Qt.LeftToRight)
-                    else:
-                        widget = tools_qt.get_widget(dialog, f"chk_all_{form_tab['tabName']}")
-                    widget.setText('Check all')
-                    if hasattr(self, 'checkall'):
-                        widget.stateChanged.disconnect()
-                        widget.setChecked(self.checkall)
-                        widget.stateChanged.connect(partial(self._manage_all, dialog, widget))
-                    field['layoutname'] = gridlayout.objectName()
-                    field['layoutorder'] = i
-                    i = i + 1
-                    gridlayout.addWidget(widget, int(field['layoutorder']), 0, 1, -1)
+            if 'manageAll' in form_tab and (form_tab['manageAll']).lower() == 'true':
+                # Check check_all if all selectors are checked
+                self.checkall = True
+                for field in form_tab['fields']:
+                    if not tools_os.set_boolean(field.get('value'), default=False):
+                        self.checkall = False
+
+                if tools_qt.get_widget(dialog, f"chk_all_{form_tab['tabName']}") is None:
+                    widget = QCheckBox()
+                    widget.setObjectName('chk_all_' + str(form_tab['tabName']))
+                    widget.stateChanged.connect(partial(self._manage_all, dialog, widget))
+                    widget.setLayoutDirection(Qt.LeftToRight)
+                    chk_all_tooltip = "Shift+Click to uncheck all"
+                    widget.setToolTip(chk_all_tooltip)
+                else:
+                    widget = tools_qt.get_widget(dialog, f"chk_all_{form_tab['tabName']}")
+                widget.setText('Check all')
+                if self.checkall is not None:
+                    widget.blockSignals(True)
+                    widget.setChecked(self.checkall)
+                    widget.blockSignals(False)
+                field['layoutname'] = gridlayout.objectName()
+                field['layoutorder'] = i
+                i = i + 1
+                gridlayout.addWidget(widget, int(field['layoutorder']), 0, 1, -1)
 
             for order, field in enumerate(form_tab['fields']):
                 try:
@@ -263,7 +270,7 @@ class GwSelector:
         self._set_selector(dialog, widget, is_alone, disable_parent)
 
 
-    def _set_selector(self, dialog, widget, is_alone, disable_parent):
+    def _set_selector(self, dialog, widget, is_alone, disable_parent, check_all_override=None):
         """
         Send values to DB and reload selectors
             :param dialog: QDialog
@@ -279,14 +286,14 @@ class GwSelector:
         widget_all = dialog.findChild(QCheckBox, f'chk_all_{tab_name}')
 
         if widget_all is None or (widget_all is not None and widget.objectName() != widget_all.objectName()):
-            self.checkall = False
             extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "id":"{widget.objectName()}", '
                       f'"isAlone":"{is_alone}", "disableParent":"{disable_parent}", '
                       f'"value":"{tools_qt.is_checked(dialog, widget)}", '
                       f'"addSchema":"{qgis_project_add_schema}"')
         else:
             check_all = tools_qt.is_checked(dialog, widget_all)
-            self.checkall = check_all
+            if check_all_override is not None:
+                check_all = check_all_override
             extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "checkAll":"{check_all}", '
                       f'"addSchema":"{qgis_project_add_schema}"')
 
@@ -376,9 +383,11 @@ class GwSelector:
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
         disable_parent = False
         key_modifier = QApplication.keyboardModifiers()
+        override = None
 
         if key_modifier == Qt.ShiftModifier:
-            disable_parent = True
+            status = False
+            override = False
 
         for widget in widget_list:
             if widget_all is not None:
@@ -388,6 +397,6 @@ class GwSelector:
             tools_qt.set_checked(dialog, widget, status)
             widget.blockSignals(False)
 
-        self._set_selector(dialog, widget_all, False, disable_parent)
+        self._set_selector(dialog, widget_all, False, disable_parent, check_all_override=override)
 
     # endregion
