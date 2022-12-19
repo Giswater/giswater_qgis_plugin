@@ -255,9 +255,22 @@ class GwLoadProject(QObject):
         layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
         layer_connec = tools_qgis.get_layer_by_tablename("v_edit_connec")
         if (self.layer_node, layer_arc, layer_connec) == (None, None, None):  # If no gw layers are present
+            return False
+
+        # Check missing layers
+        missing_layers = {}
+        if self.layer_node is None:
+            missing_layers['v_edit_node'] = True
+        if layer_arc is None:
+            missing_layers['v_edit_arc'] = True
+        if layer_connec is None:
+            missing_layers['v_edit_connec'] = True
+
+        # Show message if layers are missing
+        if missing_layers:
             if show_warning:
                 title = "Giswater plugin cannot be loaded"
-                msg = "QGIS project seems to be a Giswater project, but layer 'v_edit_node' is missing"
+                msg = f"QGIS project seems to be a Giswater project, but layer(s) {[k for k,v in missing_layers.items()]} are missing"
                 tools_qgis.show_warning(msg, 20, title=title)
             return False
 
