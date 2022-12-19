@@ -108,6 +108,7 @@ BEGIN
 
 	END IF;
 	
-END;  
-$function$
-;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
