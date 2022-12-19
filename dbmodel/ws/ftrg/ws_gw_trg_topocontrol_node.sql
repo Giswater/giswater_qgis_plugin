@@ -213,8 +213,8 @@ BEGIN
 						FOR v_connec_id IN 
 						SELECT connec_id FROM connec WHERE arc_id=v_arc.arc_id AND connec.state = 1
 						LOOP
-							INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_geom, userdefined_geom)						
-							SELECT connec_id, v_arcrecordtb.arc_id, v_psector_id, 1, false, l.the_geom, userdefined_geom 
+							INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable)
+							SELECT connec_id, v_arcrecordtb.arc_id, v_psector_id, 1, false
 							FROM link l JOIN connec c ON connec_id = l.feature_id WHERE l.feature_type  ='CONNEC' AND connec_id = v_connec_id;
 						END LOOP;
 					END IF;
