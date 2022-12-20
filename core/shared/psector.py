@@ -408,6 +408,7 @@ class GwPsector:
         self.dlg_plan_psector.btn_accept.clicked.connect(
             partial(self.insert_or_update_new_psector, 'v_edit_plan_psector', True))
         self.dlg_plan_psector.tabWidget.currentChanged.connect(partial(self.check_tab_position))
+        self.dlg_plan_psector.tabWidget.currentChanged.connect(partial(self._reset_snapping))
         self.dlg_plan_psector.btn_cancel.clicked.connect(partial(self.close_psector, cur_active_layer))
         if hasattr(self, 'dlg_psector_mng'):
             self.dlg_plan_psector.rejected.connect(partial(self.fill_table, self.dlg_psector_mng, self.qtbl_psm, 'v_ui_plan_psector'))
@@ -418,6 +419,10 @@ class GwPsector:
         self.dlg_plan_psector.all_rows.clicked.connect(partial(self.show_description))
 
         self.dlg_plan_psector.btn_delete.setShortcut(QKeySequence(Qt.Key_Delete))
+
+        # Reset snapping when any button is clicked
+        for button in self.dlg_plan_psector.findChildren(QPushButton):
+            button.clicked.connect(partial(self._reset_snapping))
 
         self.dlg_plan_psector.btn_insert.clicked.connect(
             partial(tools_gw.insert_feature, self, self.dlg_plan_psector, table_object, True, True, None, None))
@@ -2242,6 +2247,7 @@ class GwPsector:
         self.dlg_replace_arc.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_replace_arc))
         self.dlg_replace_arc.rejected.connect(partial(tools_gw.reset_rubberband, self.rubber_band_point))
         self.dlg_replace_arc.rejected.connect(partial(tools_gw.reset_rubberband, self.rubber_band_line))
+        self.dlg_replace_arc.rejected.connect(self._reset_snapping)
 
         # Open form
         tools_gw.open_dialog(self.dlg_replace_arc, dlg_name="replace_arc")
@@ -2261,16 +2267,28 @@ class GwPsector:
         # Refresh tableview tbl_psector_x_arc, tbl_psector_x_connec, tbl_psector_x_gully
         self._refresh_tables_relations()
 
+        log = tools_gw.get_config_parser("user_edit_tricks", "psector_replace_feature_disable_showlog", 'user', 'init')
+        showlog = not tools_os.set_boolean(log, False)
+
         message = json_result['message']['text']
-        if message is not None:
+        if message is not None and showlog:
             tools_qt.show_info_box(message)
 
-        text_result, change_tab = tools_gw.fill_tab_log(self.dlg_replace_arc, json_result['body']['data'])
+        text_result, change_tab = tools_gw.fill_tab_log(self.dlg_replace_arc, json_result['body']['data'], force_tab=showlog)
 
         if not change_tab:
             self.dlg_replace_arc.close()
             tools_gw.reset_rubberband(self.rubber_band_point)
             tools_gw.reset_rubberband(self.rubber_band_line)
+            self.iface.actionPan().trigger()
+
+        # Activate again if variable is True
+        keep_active = tools_gw.get_config_parser("user_edit_tricks", "psector_replace_feature_keep_active", 'user', 'init')
+        if tools_os.set_boolean(keep_active, False):
+            if not change_tab:
+                self.dlg_plan_psector.btn_select_arc.click()
+                return
+            self.dlg_replace_arc.finished.connect(self.dlg_plan_psector.btn_select_arc.click)
 
 
     def _arc_fusion(self):
@@ -2407,5 +2425,9 @@ class GwPsector:
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if result.isValid():
             self.snapper_manager.add_marker(result, self.vertex_marker)
+
+
+    def _reset_snapping(self):
+        tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
 
     # endregion
