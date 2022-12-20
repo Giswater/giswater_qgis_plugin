@@ -3572,17 +3572,17 @@ def unset_giswater_menu():
         global_vars.load_project_menu = None
 
 
-def reset_position_dialog(show_message=False):
+def reset_position_dialog(show_message=False, plugin='core', file_name='session'):
     """ Reset position dialog x/y """
 
     try:
         parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
-        config_folder = f"{global_vars.user_folder_dir}{os.sep}config{os.sep}"
+        config_folder = f"{global_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config"
+
         if not os.path.exists(config_folder):
             os.makedirs(config_folder)
-        path = config_folder + f"session.config"
+        path = f"{config_folder}{os.sep}{file_name}.config"
         parser.read(path)
-
         # Check if section exists in file
         if "dialogs_position" in parser:
             parser.remove_section("dialogs_position")
