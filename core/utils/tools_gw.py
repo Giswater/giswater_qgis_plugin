@@ -1166,15 +1166,19 @@ def build_dialog_info(dialog, result, my_json=None):
             widget = set_data_type(field, widget)
             if field['widgettype'] == 'typeahead':
                 widget = set_typeahead(field, dialog, widget, completer)
+            widget.editingFinished.connect(partial(get_values, dialog, widget, my_json))
         elif field['widgettype'] == 'datetime':
             widget = add_calendar(dialog, field)
+            widget.valueChanged.connect(partial(get_values, dialog, widget, my_json))
         elif field['widgettype'] == 'hyperlink':
             widget = add_hyperlink(field)
         elif field['widgettype'] == 'textarea':
             widget = add_textarea(field)
+            widget.textChanged.connect(partial(get_values, dialog, widget, my_json))
         elif field['widgettype'] in ('combo', 'combobox'):
             widget = add_combo(field)
             widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            widget.currentIndexChanged.connect(partial(get_values, dialog, widget, my_json))
         elif field['widgettype'] in ('check', 'checkbox'):
             widget = add_checkbox(field)
             widget.stateChanged.connect(partial(get_values, dialog, widget, my_json))
