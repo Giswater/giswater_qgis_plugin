@@ -46,13 +46,15 @@ SELECT gw_fct_setlinktonetwork($${
 "feature":{"id":["3103","3104"]},
 "data":{"feature_type":"CONNEC"}}$$);
 
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, active) VALUES ('3103', NULL, 1, 0, false, NULL, true);
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, active) VALUES ('3104', NULL, 1, 0, false, NULL, true);
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, active) VALUES ('3014', NULL, 2, 0, false, NULL, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES ('3103', '2087', 1, 0, false, 480, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES ('3104', '2078', 1, 0, false, 479, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES ('114461', '20851', 1, 1, true, 483, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES ('114462', '20851', 1, 1, true, 484, true);
 
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, active) VALUES ('114461', '20851', 1, 1, true, NULL, true);
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, active) VALUES ('114462', '20851', 1, 1, true, NULL, true);
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, active) VALUES ('114463', '20651', 2, 1, true, NULL, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES ('3014', '2065', 2, 0, false, 473, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES ('114463', '20651', 2, 1, true, 474, true);
+
+
 
 SELECT gw_fct_setlinktonetwork($${
 "client":{"device":4, "infoType":1, "lang":"ES"},

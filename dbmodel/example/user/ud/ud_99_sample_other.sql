@@ -51,6 +51,27 @@ INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descrip
 INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (6, '92', 1, 0, false, NULL, true);
 INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (5, '91', 1, 0, false, NULL, true);
 
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3182', '20606', 1, 1, false, 708, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3182', '179', 1, 0, false, 314, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3183', '20606', 1, 1, false, 707, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3183', '179', 1, 0, false, 315, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3184', '20606', 1, 1, false, 709, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3184', '179', 1, 0, false, 316, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3181', '20606', 1, 1, false, 710, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3181', '339', 1, 0, false, 443, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3174', '20603', 1, 1, false, 711, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3174', '178', 1, 0, false, 313, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3175', '20604', 1, 1, false, 712, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3175', '339', 1, 0, false, 444, true);
+
+INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, link_id, active) VALUES('30056', '339', 1, 0, false, 526, true);
+INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, link_id, active) VALUES('30057', '178', 1, 0, false, 527, true);
+INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, link_id, active) VALUES('30058', '178', 1, 0, false, 528, true);
+INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, link_id, active) VALUES('30059', '177', 1, 0, false, 529, true);
+INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, link_id, active) VALUES('30053', '179', 1, 0, false, 523, true);
+
+
+
 SELECT setval('SCHEMA_NAME.link_link_id_seq', (SELECT max(link_id) FROM link), true);
 
 INSERT INTO doc VALUES ('Demo document 1', 'OTHER', 'https://github.com/Giswater/docs/blob/master/user/manual_usuario_giswater3.doc', NULL, '2018-03-11 19:40:20.449663', current_user, '2018-03-11 19:40:20.449663');
@@ -506,12 +527,6 @@ SELECT gw_fct_admin_schema_lastprocess($${"client":{"lang":"ES"},
 
 UPDATE config_param_system SET value = '{"usePsectors":false, "ignoreGraphanalytics":false, "ignoreEpa":false, "ignorePlan":false}'
 WHERE parameter = 'admin_checkproject';
-
-DELETE FROM connec WHERE state = 2;
-DELETE FROM plan_psector_x_connec;
-
-DELETE FROM gully WHERE state = 2;
-DELETE FROM plan_psector_x_gully;
 
 UPDATE connec SET pjoint_id = arc_id WHERE pjoint_type = 'ARC';
 UPDATE gully SET pjoint_id = arc_id WHERE pjoint_type = 'ARC';
