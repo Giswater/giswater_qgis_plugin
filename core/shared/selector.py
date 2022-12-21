@@ -22,6 +22,7 @@ class GwSelector:
 
     def __init__(self):
         self.checkall = False
+        self.help_button = None
 
 
     def open_selector(self, selector_type="selector_basic", reload_dlg=None):
@@ -231,15 +232,18 @@ class GwSelector:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
 
-        # Add help tab
-        help_button = QToolButton(None)
-        style = "border: none;"
-        tools_qt.set_stylesheet(help_button, style)
-        help_icon = tools_gw.add_icon(help_button, '73', sub_folder='24x24')
-        action = QAction(help_icon, "Help")
-        action.triggered.connect(partial(self._show_help, dialog, selection_modes))
-        help_button.setDefaultAction(action)
-        main_tab.setCornerWidget(help_button)
+        # Add help button
+        if self.help_button is None:
+            self.help_button = QToolButton(None)
+            style = "border: none;"
+            tools_qt.set_stylesheet(self.help_button, style)
+            help_icon = tools_gw.add_icon(self.help_button, '73', sub_folder='24x24')
+            action = QAction(help_icon, "Help")
+            action.triggered.connect(partial(self._show_help, dialog, selection_modes))
+            self.help_button.setDefaultAction(action)
+            main_tab.setCornerWidget(self.help_button)
+        else:
+            main_tab.cornerWidget().setHidden(False)
 
         # Set last tab used by user as current tab
         tabname = json_result['body']['form']['currentTab']
