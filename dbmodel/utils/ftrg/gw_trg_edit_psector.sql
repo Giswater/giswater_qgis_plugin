@@ -227,21 +227,21 @@ BEGIN
 						END IF;		
 					END IF;
 
-
-
 					-- change arc_id for planified connecs (useful when existing connec changes to planified arc)
 					IF lower(rec_type.id) IN ('connec', 'gully') THEN
 						EXECUTE 'UPDATE '||lower(rec_type.id)||' n SET arc_id = p.arc_id
 						FROM plan_psector_x_'||lower(rec_type.id)||' p WHERE n.'||lower(rec_type.id)||'_id = p.'||lower(rec_type.id)||'_id 
 						AND p.state = 1 AND p.psector_id='||OLD.psector_id||' AND n.'||lower(rec_type.id)||'_id = '''||rec.id||''';';
-
-						EXECUTE 'UPDATE link SET the_geom = link_geom, userdefined_geom = p.userdefined_geom
-						FROM plan_psector_x_'||lower(rec_type.id)||' p WHERE link.feature_id = p.'||lower(rec_type.id)||'_id 
+					
+						-- set links to state 0 when its connec is 0 on psector
+						EXECUTE 'UPDATE link SET state=0
+						FROM plan_psector_x_'||lower(rec_type.id)||' p WHERE link.link_id = p.link_id 
+						AND p.state = 0 AND p.psector_id='||OLD.psector_id||' AND link.feature_id = '''||rec.id||''';';
+					
+						-- set links to state 1 when its connec is 1 on psector
+						EXECUTE 'UPDATE link SET state=1
+						FROM plan_psector_x_'||lower(rec_type.id)||' p WHERE link.link_id = p.link_id 
 						AND p.state = 1 AND p.psector_id='||OLD.psector_id||' AND link.feature_id = '''||rec.id||''';';
-
-						EXECUTE 'UPDATE vnode SET the_geom = st_endpoint(link_geom)	FROM plan_psector_x_'||lower(rec_type.id)||' p 
-						JOIN link ON link.feature_id = p.'||lower(rec_type.id)||'_id AND p.state = 1 AND p.psector_id='||OLD.psector_id||' 
-						AND link.feature_id = '''||rec.id||''' WHERE link.exit_id::integer=vnode.vnode_id;';
 						
 					END IF;
 
@@ -252,10 +252,6 @@ BEGIN
 					-- delete from psector_x_* where state is 1
 					EXECUTE 'DELETE FROM plan_psector_x_'||lower(rec_type.id)||' 
 					WHERE psector_id = '||OLD.psector_id||' AND '||lower(rec_type.id)||'_id = '''||rec.id||''' AND '''||rec.state||''' = 1;';
-
-					-- set link on service to connecs where psector_x_connec state is 1
-					EXECUTE 'UPDATE link SET state=1 WHERE feature_id IN (SELECT connec_id FROM plan_psector_x_connec 
-					WHERE psector_id = '||OLD.psector_id||' AND state= 1);';
 					
 				END LOOP;
 			END LOOP;
@@ -277,9 +273,10 @@ BEGIN
 			SELECT node_id, OLD.psector_id, state, doable, descript FROM plan_psector_x_node WHERE psector_id=v_temporal_psector_id;
 
 			--only new connecs or ones which link's geom have changed
-			INSERT INTO plan_psector_x_connec(connec_id, arc_id, psector_id, state, doable, descript, link_geom, userdefined_geom) 
-			SELECT connec_id, pc.arc_id, OLD.psector_id, pc.state, pc.doable, pc.descript, link_geom, pc.userdefined_geom FROM plan_psector_x_connec pc	
-			JOIN arc ON ST_DWithin(st_buffer(st_endpoint(link_geom), 0.5), arc.the_geom,0.001)
+			INSERT INTO plan_psector_x_connec(connec_id, arc_id, psector_id, state, doable, descript) 
+			SELECT connec_id, pc.arc_id, OLD.psector_id, pc.state, pc.doable, pc.descript FROM plan_psector_x_connec pc
+			JOIN link USING (link_id)
+			JOIN arc ON ST_DWithin(st_buffer(st_endpoint(link.the_geom), 0.5), arc.the_geom,0.001)
 			WHERE pc.psector_id=v_temporal_psector_id AND arc.state=2;
 		
 			--loop over network feature types in order to get the data from each plan_psector_x_* table 
