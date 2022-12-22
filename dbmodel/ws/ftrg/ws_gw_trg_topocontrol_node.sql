@@ -239,7 +239,7 @@ BEGIN
 			END IF; 
 
 			-- values of node
-			v_nodetype = (SELECT nodetype_id FROM cat_node WHERE NEW.nodecat_id = nodecat_id);
+			v_nodetype = (SELECT nodetype_id FROM cat_node WHERE NEW.nodecat_id = id);
 			v_staticpress = coalesce(NEW.staticpressure,0);
 			v_elevation = NEW.elevation;
 			v_depth = coalesce(NEW.depth,0);
@@ -249,8 +249,8 @@ BEGIN
 			FOR arcrec IN EXECUTE v_querytext
 			LOOP
 				-- Initial and final node of the arc
-				SELECT * INTO nodeRecord1 FROM v_node WHERE node.node_id = arcrec.node_1;
-				SELECT * INTO nodeRecord2 FROM v_node WHERE node.node_id = arcrec.node_2;
+				SELECT * INTO nodeRecord1 FROM v_node WHERE v_node.node_id = arcrec.node_1;
+				SELECT * INTO nodeRecord2 FROM v_node WHERE v_node.node_id = arcrec.node_2;
 
 				-- Control de lineas de longitud 0
 				IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
@@ -259,13 +259,13 @@ BEGIN
 					IF (nodeRecord1.node_id = NEW.node_id) THEN
 
 						-- update arc
-						IF v_elevation1 IS NOT NULL THEN
+						IF v_elevation IS NOT NULL THEN
 							EXECUTE 'UPDATE arc SET
-								nodetype_1 = '|| v_nodetype ||',
+								nodetype_1 = '|| quote_literal(v_nodetype) ||',
 								elevation1 = '|| v_elevation ||',
 								depth1 = '|| v_depth||',
 								staticpress1 = '|| v_staticpress ||' 
-								WHERE arc_id = ' || quote_literal(v_arcrecordtb."arc_id");
+								WHERE arc_id = ' || quote_literal(arcrec."arc_id");
 						END IF;
 						EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, 0, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") 
 						USING arcrec.the_geom, NEW.the_geom; 
@@ -273,13 +273,13 @@ BEGIN
 					ELSIF (nodeRecord2.node_id = NEW.node_id) THEN
 
 						-- update arc
-						IF v_elevation1 IS NOT NULL THEN
+						IF v_elevation IS NOT NULL THEN
 							EXECUTE 'UPDATE arc SET
-								nodetype_2 = '|| v_nodetype ||',
+								nodetype_2 = '|| quote_literal(v_nodetype) ||',
 								elevation2 = '|| v_elevation ||',
 								depth2 = '|| v_depth||',
 								staticpress2 = '|| v_staticpress ||' 
-								WHERE arc_id = ' || quote_literal(v_arcrecordtb."arc_id");
+								WHERE arc_id = ' || quote_literal(arcrec."arc_id");
 						END IF;					
 					
 						EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") 
