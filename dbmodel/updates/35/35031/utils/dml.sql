@@ -89,3 +89,5 @@ UPDATE link SET exit_type = 'ARC' WHERE exit_type  ='VNODE';
 
 
 DELETE FROM sys_function where function_name = 'gw_trg_node_update';
+
+INSERT INTO sys_function VALUES (3184, 'gw_fct_connect_link_refactor', 'utils', 'function', NULL, NULL, 'Function to harmonize plan_psector_x_connec/gully values after link refactor in 3.5.031', 'role_admin', NULL, 'core');
