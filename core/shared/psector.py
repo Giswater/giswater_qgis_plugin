@@ -429,7 +429,7 @@ class GwPsector:
         self.dlg_plan_psector.btn_delete.clicked.connect(
             partial(tools_gw.delete_records, self, self.dlg_plan_psector, table_object, True, None, None))
         self.dlg_plan_psector.btn_delete.clicked.connect(
-            partial(self.set_model_signals))
+            partial(tools_gw.set_model_signals, self))
         self.dlg_plan_psector.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_plan_psector, table_object, True))
         self.dlg_plan_psector.btn_select_arc.clicked.connect(
@@ -509,38 +509,6 @@ class GwPsector:
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector')
-
-
-    def set_model_signals(self):
-
-        self.rubber_band_point.reset()
-        self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
-
-        filter_ = "psector_id = '" + str(self.psector_id.text()) + "'"
-        self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec,
-                        set_edit_triggers=QTableView.DoubleClicked, expr=filter_)
-
-        # Set selectionModel signals
-        self.qtbl_arc.selectionModel().selectionChanged.connect(partial(
-            tools_qgis.highlight_features_by_id, self.qtbl_arc, "v_edit_arc", "arc_id", self.rubber_band_point, 5
-        ))
-        self.qtbl_node.selectionModel().selectionChanged.connect(partial(
-            tools_qgis.highlight_features_by_id, self.qtbl_node, "v_edit_node", "node_id", self.rubber_band_point, 10
-        ))
-        self.qtbl_connec.selectionModel().selectionChanged.connect(partial(
-            tools_qgis.highlight_features_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band_point, 10
-        ))
-        self.qtbl_connec.selectionModel().selectionChanged.connect(partial(
-            self._manage_tab_feature_buttons
-        ))
-
-        if self.project_type.upper() == 'UD':
-            self.qtbl_gully.selectionModel().selectionChanged.connect(partial(
-                tools_qgis.highlight_features_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", self.rubber_band_point, 10
-            ))
-            self.qtbl_gully.selectionModel().selectionChanged.connect(partial(
-                self._manage_tab_feature_buttons
-            ))
 
 
     def fill_widget(self, dialog, widget, row):
@@ -1413,7 +1381,7 @@ class GwPsector:
             1: OnRowChange
             2: OnManualSubmit
         """
-        print(f"INFO -> dialog: {dialog} / widget: {widget} / table_name: {table_name} / hidde: {hidde} / set_edit_triggers: {set_edit_triggers} / expr: {expr}")
+
         # Manage exception if dialog is closed
         if isdeleted(dialog):
             return
@@ -1596,7 +1564,10 @@ class GwPsector:
         tools_qt.set_tableview_config(self.qtbl_psm, sectionResizeMode=0)
 
         # Set signals
+        self.dlg_psector_mng.chk_active.stateChanged.connect(partial(self._filter_table, self.dlg_psector_mng,
+            self.qtbl_psm, self.dlg_psector_mng.txt_name, self.dlg_psector_mng.chk_active, table_name))
         self.dlg_psector_mng.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_psector_mng))
+        self.dlg_psector_mng.btn_toggle_active.clicked.connect(partial(self.set_toggle_active, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.rejected.connect(partial(tools_gw.close_dialog, self.dlg_psector_mng))
         self.dlg_psector_mng.btn_delete.clicked.connect(partial(
             self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, table_name, column_id, 'lbl_vdefault_psector', 'psector'))
@@ -1605,9 +1576,10 @@ class GwPsector:
             partial(self.update_current_psector, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.btn_duplicate.clicked.connect(self.psector_duplicate)
         self.dlg_psector_mng.txt_name.textChanged.connect(partial(
-            self.filter_by_text, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name, table_name))
+            self._filter_table, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name,
+            self.dlg_psector_mng.chk_active, table_name))
         self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, self.qtbl_psm))
-        self.fill_table(self.dlg_psector_mng, self.qtbl_psm, table_name)
+        self.fill_table(self.dlg_psector_mng, self.qtbl_psm, table_name, expr=' active is True')
         tools_gw.set_tablemodel_config(self.dlg_psector_mng, self.qtbl_psm, table_name)
         selection_model = self.qtbl_psm.selectionModel()
         selection_model.selectionChanged.connect(partial(self._fill_txt_infolog))
@@ -1615,6 +1587,33 @@ class GwPsector:
         # Open form
         self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
         tools_gw.open_dialog(self.dlg_psector_mng, dlg_name="psector_manager")
+
+
+    def set_toggle_active(self, dialog, qtbl_psm):
+
+        sql = ""
+        selected_list = qtbl_psm.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            return
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+
+            psector_id = qtbl_psm.model().record(row).value("psector_id")
+            active = qtbl_psm.model().record(row).value("active")
+            if psector_id == self.current_psector_id[0]:
+                message = f"The active state of the current psector cannot be changed. Current psector: {self.current_psector_id[1]}"
+                tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+                return
+            if active:
+                sql += f"UPDATE plan_psector SET active = False WHERE psector_id = {psector_id};"
+            else:
+                sql += f"UPDATE plan_psector SET active = True WHERE psector_id = {psector_id};"
+
+        tools_db.execute_sql(sql)
+
+        self._filter_table(dialog, dialog.tbl_psm, dialog.txt_name, dialog.chk_active, 'v_ui_plan_psector')
 
 
     def update_current_psector(self, dialog, qtbl_psm):
@@ -1626,6 +1625,11 @@ class GwPsector:
             return
         row = selected_list[0].row()
         psector_id = qtbl_psm.model().record(row).value("psector_id")
+        active = qtbl_psm.model().record(row).value("active")
+        if active is False:
+            message = f"Cannot set the current psector of an inactive psector. You must activate it before."
+            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            return
         aux_widget = QLineEdit()
         aux_widget.setText(str(psector_id))
         self.upsert_config_param_user(dialog, aux_widget, "plan_psector_vdefault")
@@ -1684,16 +1688,36 @@ class GwPsector:
         tools_db.execute_sql(sql)
 
 
-    def filter_by_text(self, dialog, table, widget_txt, tablename):
+    def _filter_table(self, dialog, table, widget_txt, widget_chk, tablename):
 
         result_select = tools_qt.get_text(dialog, widget_txt)
+        inactive_select = widget_chk.isChecked()
+
+        expr = ""
+
+        if not inactive_select:
+            expr += f" active is true"
+
         if result_select != 'null':
-            expr = f" name ILIKE '%{result_select}%'"
+            if expr != "":
+                expr += f" AND "
+            expr += f" name ILIKE '%{result_select}%'"
+        if expr != "":
             # Refresh model with selected filter
             table.model().setFilter(expr)
             table.model().select()
         else:
             self.fill_table(dialog, table, tablename)
+
+    def filter_by_active(self, dialog, table):
+
+        chk_active_state = dialog.chk_active.isChecked()
+        expr = f" active is {chk_active_state}"
+
+        # Refresh model with selected filter
+        table.model().setFilter(expr)
+        table.model().select()
+
 
 
     def charge_psector(self, qtbl_psm):
@@ -1704,6 +1728,12 @@ class GwPsector:
             tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
             return
         row = selected_list[0].row()
+        active = qtbl_psm.model().record(row).value("active")
+        psector_name = qtbl_psm.model().record(row).value("name")
+        if active is False:
+            message = f"To open psector {psector_name}, it must be activated before."
+            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            return
         psector_id = qtbl_psm.model().record(row).value("psector_id")
         keep_open_form = tools_gw.get_config_parser('dialogs_actions', 'psector_manager_keep_open', "user", "init", prefix=True)
         if tools_os.set_boolean(keep_open_form, False) is not True:
@@ -1837,7 +1867,7 @@ class GwPsector:
     def filter_merm(self, dialog, tablename):
         """ Filter rows from 'manage_prices' dialog from selected tab """
 
-        self.filter_by_text(dialog, dialog.tbl_om_result_cat, dialog.txt_name, tablename)
+        self._filter_table(dialog, dialog.tbl_om_result_cat, dialog.txt_name, dialog.chk_active, tablename)
 
 
     def psector_duplicate(self):
@@ -1863,10 +1893,11 @@ class GwPsector:
                " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
                " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
         row = tools_db.get_row(sql)
+        self.current_psector_id = row
         if not row:
             return
-        tools_qt.set_widget_text(dialog, 'lbl_vdefault_psector', row[1])
-        extras = (f'"selectorType":"selector_basic", "tabName":"tab_psector", "id":{row[0]}, '
+        tools_qt.set_widget_text(dialog, 'lbl_vdefault_psector', self.current_psector_id[1])
+        extras = (f'"selectorType":"selector_basic", "tabName":"tab_psector", "id":{self.current_psector_id[0]}, '
                   f'"isAlone":"False", "disableParent":"False", '
                   f'"value":"True"')
         body = tools_gw.create_body(extras=extras)
@@ -2150,7 +2181,7 @@ class GwPsector:
 
         # Manage signals
         tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
-        self.set_model_signals()
+        tools_gw.set_model_signals(self)
 
 
     def _replace_arc(self):
