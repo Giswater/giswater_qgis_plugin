@@ -121,11 +121,11 @@ INSERT INTO sys_table( id, descript, sys_role, source)
 VALUES ('v_link_connec', 'Filtered view of links type connec', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table( id, descript, sys_role, source)
-VALUES ('v_edit_plan_psector_x_connec', 'Editable view to work with psector and connec', 'role_plan', 'core') ON CONFLICT (id) DO NOTHING;
+VALUES ('v_edit_plan_psector_x_connec', 'Editable view to work with psector and connec', 'role_master', 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
 VALUES (3186, 'gw_trg_edit_plan_psector_x_connect', 'utils', 'trigger function', 
-'Trigger that manages v_edit_plan_psector_x_connec (and gully views)', 'role_plan', 'core');
+'Trigger that manages v_edit_plan_psector_x_connec (and gully views)', 'role_master', 'core');
 
 
 DELETE FROM sys_table WHERE id = 'vnode';

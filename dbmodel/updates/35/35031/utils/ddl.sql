@@ -22,26 +22,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psecto
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"plan_psector_x_connec", "column":"link_geom", "newName":"_link_geom_" }}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"plan_psector_x_connec", "column":"userdefined_geom", "newName":"_userdefined_geom_"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_arc", "column":"tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_node", "column":"tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_connec", "column":"tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_other", "column":"tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_arc", "column":"insert_user", "dataType":"text", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_node", "column":"insert_user", "dataType":"text", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_connec", "column":"insert_user", "dataType":"text", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_other", "column":"insert_user", "dataType":"text", "isUtils":"False"}}$$);
-
-ALTER TABLE plan_psector_x_arc ALTER COLUMN tstamp SET DEFAULT NOW();
-ALTER TABLE plan_psector_x_node ALTER COLUMN tstamp SET DEFAULT NOW();
-ALTER TABLE plan_psector_x_connec ALTER COLUMN tstamp SET DEFAULT NOW();
-ALTER TABLE plan_psector_x_other ALTER COLUMN tstamp SET DEFAULT NOW();
-
-ALTER TABLE plan_psector_x_arc ALTER COLUMN insert_user SET DEFAULT CURRENT_USER;
-ALTER TABLE plan_psector_x_node ALTER COLUMN insert_user SET DEFAULT CURRENT_USER;
-ALTER TABLE plan_psector_x_connec ALTER COLUMN insert_user SET DEFAULT CURRENT_USER;
-ALTER TABLE plan_psector_x_other ALTER COLUMN insert_user SET DEFAULT CURRENT_USER;
-
 
 ALTER TABLE vnode RENAME TO _vnode_;
 
@@ -100,3 +80,23 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psecto
 ALTER TABLE plan_psector_x_arc ALTER COLUMN active SET DEFAULT TRUE;
 ALTER TABLE plan_psector_x_node ALTER COLUMN active SET DEFAULT TRUE;
 ALTER TABLE plan_psector_x_connec ALTER COLUMN active SET DEFAULT TRUE;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_arc", "column":"insert_tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_node", "column":"insert_tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_connec", "column":"insert_tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_other", "column":"insert_tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_arc", "column":"insert_user", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_node", "column":"insert_user", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_connec", "column":"insert_user", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_other", "column":"insert_user", "dataType":"text", "isUtils":"False"}}$$);
+
+ALTER TABLE plan_psector_x_arc ALTER COLUMN insert_tstamp SET DEFAULT NOW();
+ALTER TABLE plan_psector_x_node ALTER COLUMN insert_tstamp SET DEFAULT NOW();
+ALTER TABLE plan_psector_x_connec ALTER COLUMN insert_tstamp SET DEFAULT NOW();
+ALTER TABLE plan_psector_x_other ALTER COLUMN insert_tstamp SET DEFAULT NOW();
+
+ALTER TABLE plan_psector_x_arc ALTER COLUMN insert_user SET DEFAULT CURRENT_USER;
+ALTER TABLE plan_psector_x_node ALTER COLUMN insert_user SET DEFAULT CURRENT_USER;
+ALTER TABLE plan_psector_x_connec ALTER COLUMN insert_user SET DEFAULT CURRENT_USER;
+ALTER TABLE plan_psector_x_other ALTER COLUMN insert_user SET DEFAULT CURRENT_USER;

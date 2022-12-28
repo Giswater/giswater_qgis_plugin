@@ -14,15 +14,8 @@ $BODY$
 
 /*
 GOAL:
-This function have been refactorized on 2019/04/24 changing the full strategy of vnode and links (according with the trigger of v_edit_vnode)
-
+This function have been refactorized on 2022/12 changing the full strategy of links
 	
-
-MAIN CHANGES
-- Vnode geometry is only updateable. It's no posible to create a new one using ToC layer
-- It's forbidden to connec links on vnode without arcs.
-- Connect_to_network works also with node/connec/gully as endpoints (deprecated)
-
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3201","3200"]},"data":{"feature_type":"CONNEC", "forcedArcs":["2001","2002"]}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3203"]},"data":{"feature_type":"CONNEC", "forcedArcs":["2095"]}}$$);

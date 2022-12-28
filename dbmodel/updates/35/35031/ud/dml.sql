@@ -180,4 +180,4 @@ INSERT INTO sys_table( id, descript, sys_role, source)
 VALUES ('v_link_gully', 'Filtered view of links type connec', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table( id, descript, sys_role, source)
-VALUES ('v_edit_plan_psector_x_gully', 'Editable view to work with psector and gully', 'role_plan', 'core') ON CONFLICT (id) DO NOTHING;
+VALUES ('v_edit_plan_psector_x_gully', 'Editable view to work with psector and gully', 'role_master', 'core') ON CONFLICT (id) DO NOTHING;
