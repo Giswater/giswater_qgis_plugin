@@ -829,10 +829,11 @@ BEGIN
 
 							IF v_project_type ='UD' THEN
 							
-								FOR rec_link IN SELECT link.* FROM link JOIN plan_psector_x_connec USING (link_id) 
+								FOR rec_link IN SELECT link.* FROM link JOIN plan_psector_x_gully USING (link_id) 
 								WHERE link.feature_type='GULLY' AND exit_type='ARC' AND arc_id=v_arc_id
 								LOOP
-									SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
+									SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id 
+									AND arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1; 
 									UPDATE plan_psector_x_gully SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
 									v_arc_closest = null;
 								END LOOP;

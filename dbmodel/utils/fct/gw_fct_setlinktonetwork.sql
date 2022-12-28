@@ -144,6 +144,8 @@ BEGIN
 			IF (SELECT gully_id FROM plan_psector_x_gully WHERE gully_id = v_connect.gully_id AND psector_id = v_psector_vdefault AND psector_id IN
 			   (SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1) IS NOT NULL AND v_connect.state = 1 THEN
 				v_isoperative_psector = true;
+				v_linkfrompsector = (SELECT link_id FROM plan_psector_x_gully WHERE gully_id = v_connect.gully_id AND psector_id IN
+						    (SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1);
 			END IF;
 		END IF;
 
@@ -234,7 +236,7 @@ BEGIN
 					point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, v_dfactor));
 				END IF;
 		
-				IF v_link.the_geom IS NULL THEN
+				IF v_link.the_geom IS NULL AND v_pjointtype='ARC' THEN
 
 					IF v_link.the_geom IS NULL THEN
 						SELECT the_geom INTO v_link.the_geom FROM link WHERE feature_id = v_connect_id AND feature_type=v_feature_type AND state=1 LIMIT 1;
@@ -252,7 +254,8 @@ BEGIN
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 						VALUES (217, null, 4, concat('Creating new link by using geometry of existing one.'));
 					END IF;
-				ELSE
+				ELSIF v_link.the_geom IS NOT NULL AND v_pjointtype='ARC' THEN
+				
 					-- Reverse (if it's need) the existing link geometry
 					IF (st_dwithin (st_startpoint(v_link.the_geom), v_connect.the_geom, 0.01)) IS FALSE THEN
 						point_aux := St_closestpoint(v_endfeature_geom, St_startpoint(v_link.the_geom));
@@ -263,6 +266,8 @@ BEGIN
 					ELSE
 						v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1),point_aux); 
 					END IF;
+				ELSE
+					-- do nothing for those links they comes from connec, guly, node
 				END IF;
 			END IF;
 
