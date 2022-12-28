@@ -69,6 +69,13 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "col
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"dma_id", "dataType":"integer", "isUtils":"False"}}$$);
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_gully", "column":"insert_tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_gully", "column":"insert_user", "dataType":"text", "isUtils":"False"}}$$);
+
+ALTER TABLE plan_psector_x_gully ALTER COLUMN insert_tstamp SET DEFAULT NOW();
+ALTER TABLE plan_psector_x_gully ALTER COLUMN insert_user SET DEFAULT CURRENT_USER;
+
+
 CREATE TABLE anl_gully (
 	id serial4 NOT NULL,
 	gully_id varchar(16) NOT NULL,
