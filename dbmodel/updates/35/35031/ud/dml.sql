@@ -163,3 +163,7 @@ UPDATE config_form_fields
 SET widgetcontrols='{"autoupdateReloadFields": ["node_1", "node_2", "y1", "custom_y1", "sys_y1", "elev1", "custom_elev1", "sys_elev1", "z1", "r1", "y2", "custom_y2", "sys_y2", "elev2", "custom_elev2", "sys_elev2", "z2", "r2", "slope"]}'
 WHERE formname like 've_arc_%' AND formtype='form_feature' AND tabname='data' AND columnname IN ('elev1', 'y1', 'custom_y1', 'custom_elev1', 'elev2', 'y2', 'custom_y2', 'custom_elev2');
 
+UPDATE link SET dma_id = c.dma_id, sector_id = c.sector_id FROM connec c WHERE feature_id = connec_id;
+UPDATE link SET dma_id = c.dma_id, sector_id = c.sector_id FROM gully c WHERE feature_id = gully_id;
+
+

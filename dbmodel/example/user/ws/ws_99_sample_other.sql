@@ -716,3 +716,5 @@ UPDATE plan_psector_x_node SET active = true WHERE node_id in ('10761');
 UPDATE plan_psector_x_connec SET active = true WHERE connec_id in ('3103', '3104', '3014', '3014');
 
 SELECT setval('SCHEMA_NAME.urn_id_seq', 114465, true);
+
+UPDATE link SET dma_id = c.dma_id, sector_id = c.sector_id, presszone_id = c.presszone_id, dqa_id = c.dqa_id, minsector_id = c.minsector_id FROM connec c WHERE feature_id = connec_id;

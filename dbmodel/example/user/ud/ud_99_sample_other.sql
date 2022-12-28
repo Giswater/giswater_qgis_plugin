@@ -541,3 +541,6 @@ UPDATE arc SET node_sys_elev_2 = sys_elev FROM vu_node WHERE node_id = node_2;
 UPDATE arc SET nodetype_1 = node_type FROM vu_node WHERE node_id = node_1;
 UPDATE arc SET nodetype_2 = node_type FROM vu_node WHERE node_id = node_2;
 
+UPDATE link SET dma_id = c.dma_id, sector_id = c.sector_id FROM connec c WHERE feature_id = connec_id;
+UPDATE link SET dma_id = c.dma_id, sector_id = c.sector_id FROM gully c WHERE feature_id = gully_id;
+

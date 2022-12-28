@@ -91,3 +91,8 @@ UPDATE link SET exit_type = 'ARC' WHERE exit_type  ='VNODE';
 DELETE FROM sys_function where function_name = 'gw_trg_node_update';
 
 INSERT INTO sys_function VALUES (3184, 'gw_fct_connect_link_refactor', 'utils', 'function', NULL, NULL, 'Function to harmonize plan_psector_x_connec/gully values after link refactor in 3.5.031', 'role_admin', NULL, 'core');
+
+UPDATE config_form_fields SET iseditable = false where columnname ='arc_id' and formname like 've_connec_%' or formname  ='v_edit_connec';
+UPDATE config_form_fields SET iseditable = false where formname like 'v_edit_lin%';
+UPDATE config_form_fields SET iseditable = true where formname like 'v_edit_lin%' AND columnname  ='state';
+

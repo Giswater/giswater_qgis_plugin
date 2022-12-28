@@ -355,3 +355,6 @@ WHERE  system_id ilike 'HYDRANT' group by child_layer,formname,formtype, tabname
 
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'manageAll','true'::bool) WHERE parameter = 'basic_selector_tab_mincut';
 
+UPDATE link SET dma_id = c.dma_id, sector_id = c.sector_id, presszone_id = c.presszone_id, dqa_id = c.dqa_id, minsector_id = c.minsector_id FROM connec c WHERE feature_id = connec_id;
+
+
