@@ -652,7 +652,7 @@ BEGIN
 				IF NEW.arc_id IS NOT NULL THEN
 
 					IF (SELECT gully_id FROM plan_psector_x_gully JOIN selector_psector USING (psector_id)
-						WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND cur_user = current_user AND state = 1 IS NOT NULL THEN
+						WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND cur_user = current_user AND state = 1) IS NOT NULL THEN
 
 						EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 						"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY", "forcedArcs":["'||NEW.arc_id||'"]}}$$)';			
@@ -662,7 +662,8 @@ BEGIN
 						NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id; 
 					END IF;
 				ELSE
-					IF (SELECT count(*)FROM link WHERE feature_id = NEW.connec_id AND state = 1) > 0 THEN
+					IF (SELECT link_id FROM plan_psector_x_gully JOIN selector_psector USING (psector_id)
+						WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND cur_user = current_user AND state = 1) IS NOT NULL THEN
 						RAISE EXCEPTION 'THIS CONNEC HAS AN ASSOCIATED LINK. BEFORE TO SET NULL ON ARC_ID, PLEASE REMOVE THE ASSOCIATED LINK';
 					ELSE
 						UPDATE plan_psector_x_gully SET arc_id = null, link_id = null WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND state = 1;
