@@ -1564,10 +1564,10 @@ class GwPsector:
         tools_qt.set_tableview_config(self.qtbl_psm, sectionResizeMode=0)
 
         # Set signals
-        self.dlg_psector_mng.chk_active.stateChanged.connect(partial(self._filter_table, self.dlg_psector_mng,
-            self.qtbl_psm, self.dlg_psector_mng.txt_name, self.dlg_psector_mng.chk_active, table_name))
+        #self.dlg_psector_mng.chk_active.stateChanged.connect(partial(self._filter_table, self.dlg_psector_mng,
+        #    self.qtbl_psm, self.dlg_psector_mng.txt_name, self.dlg_psector_mng.chk_active, table_name))
         self.dlg_psector_mng.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_psector_mng))
-        self.dlg_psector_mng.btn_toggle_active.clicked.connect(partial(self.set_toggle_active, self.dlg_psector_mng, self.qtbl_psm))
+        #self.dlg_psector_mng.btn_toggle_active.clicked.connect(partial(self.set_toggle_active, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.rejected.connect(partial(tools_gw.close_dialog, self.dlg_psector_mng))
         self.dlg_psector_mng.btn_delete.clicked.connect(partial(
             self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, table_name, column_id, 'lbl_vdefault_psector', 'psector'))
@@ -1575,9 +1575,9 @@ class GwPsector:
         self.dlg_psector_mng.btn_update_psector.clicked.connect(
             partial(self.update_current_psector, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.btn_duplicate.clicked.connect(self.psector_duplicate)
-        self.dlg_psector_mng.txt_name.textChanged.connect(partial(
-            self._filter_table, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name,
-            self.dlg_psector_mng.chk_active, table_name))
+        #self.dlg_psector_mng.txt_name.textChanged.connect(partial(
+        #    self._filter_table, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name,
+        #    self.dlg_psector_mng.chk_active, table_name))
         self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, self.qtbl_psm))
         self.fill_table(self.dlg_psector_mng, self.qtbl_psm, table_name, expr=' active is True')
         tools_gw.set_tablemodel_config(self.dlg_psector_mng, self.qtbl_psm, table_name)
