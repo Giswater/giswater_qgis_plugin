@@ -111,10 +111,10 @@ BEGIN
 		END LOOP;
 		
 		-- set legend for other
-		UPDATE temp_csv SET csv5 = 'sec pzo dma dqa mins' where csv5 like '%other%';
-		UPDATE temp_csv SET csv9 = 'sec pzo dma dqa mins' where csv9 like '%other%';  
-		UPDATE temp_csv SET csv8 = 'sec pzo dma dqa mins' where csv8 like '%other%';  
-		UPDATE temp_csv SET csv4 = 'dscen source' where csv4 like '%other%' and csv1 like '%feature_id%';
+		UPDATE temp_csv SET csv5 = 'sec prz dma dqa mins' where csv5 like '%other%';
+		UPDATE temp_csv SET csv9 = 'sec prz dma dqa mins' where csv9 like '%other%';  
+		UPDATE temp_csv SET csv8 = 'sec prz dma dqa mins' where csv8 like '%other%';  
+		UPDATE temp_csv SET csv4 = 'dscenario source' where csv4 like '%other%' and csv1 like '%feature_id%';
 
 		-- insert values
 		CASE WHEN rec_table.tablename='vi_options' and (SELECT value FROM vi_options WHERE parameter='hydraulics') is null THEN
