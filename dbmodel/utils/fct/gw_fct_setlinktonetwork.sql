@@ -25,7 +25,7 @@ MAIN CHANGES
 
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3201","3200"]},"data":{"feature_type":"CONNEC", "forcedArcs":["2001","2002"]}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["114465"]},"data":{"feature_type":"CONNEC"}}$$);
+SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["114545"]},"data":{"feature_type":"CONNEC", "forcedArcs":["2027"]}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":
 "SELECT array_to_json(array_agg(connec_id::text)) FROM v_edit_connec WHERE connec_id IS NOT NULL AND state=1"},
@@ -175,27 +175,19 @@ BEGIN
 			VALUES (217, null, 4, concat('FAILED: Link not created because connect ',v_connect_id,' is over arc ', v_arc.arc_id));
 		ELSE
 
-			IF v_isarcdivide THEN
-				v_connect.arc_id = NULL;
-			END IF;
+			IF v_link.the_geom IS NULL THEN -- looking for closest arc from connect
+				EXECUTE 'WITH index_query AS(
+				SELECT ST_Distance(the_geom, '||quote_literal(v_connect.the_geom::text)||') as distance, arc_id FROM v_edit_arc WHERE state > 0 '||v_forcedarcs||')
+				SELECT arc_id FROM index_query ORDER BY distance limit 1'
+				INTO v_connect.arc_id;
 			
-			-- get arc_id (if feature does not have) using buffer  
-			IF v_connect.arc_id IS NULL THEN
-
-				IF v_link.the_geom IS NULL THEN -- looking for closest arc from connect
-					EXECUTE 'WITH index_query AS(
-					SELECT ST_Distance(the_geom, '||quote_literal(v_connect.the_geom::text)||') as distance, arc_id FROM v_edit_arc WHERE state > 0 '||v_forcedarcs||')
-					SELECT arc_id FROM index_query ORDER BY distance limit 1'
-					INTO v_connect.arc_id;
-				
-				ELSIF v_link.the_geom IS NOT NULL THEN -- looking for closest arc from link's endpoint
-					EXECUTE 'WITH index_query AS(
-					SELECT ST_Distance(the_geom, st_endpoint('||quote_literal(v_link.the_geom::text)||')) as distance, arc_id FROM v_edit_arc WHERE state > 0 '||v_forcedarcs||')
-					SELECT arc_id FROM index_query ORDER BY distance limit 1'
-					INTO v_connect.arc_id;			
-				END IF;
+			ELSIF v_link.the_geom IS NOT NULL THEN -- looking for closest arc from link's endpoint
+				EXECUTE 'WITH index_query AS(
+				SELECT ST_Distance(the_geom, st_endpoint('||quote_literal(v_link.the_geom::text)||')) as distance, arc_id FROM v_edit_arc WHERE state > 0 '||v_forcedarcs||')
+				SELECT arc_id FROM index_query ORDER BY distance limit 1'
+				INTO v_connect.arc_id;			
 			END IF;
-				
+
 			-- get v_edit_arc information
 			SELECT * INTO v_arc FROM arc WHERE arc_id = v_connect.arc_id;
 			

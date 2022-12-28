@@ -817,25 +817,23 @@ BEGIN
 							END IF;	
 
 
-							-- reconnect planned vnode links
-							FOR rec_link IN SELECT link.* FROM v_edit_connec JOIN link ON link.feature_id=connec_id 
+							-- reconnect planned arc links
+							FOR rec_link IN SELECT link.* FROM link JOIN plan_psector_x_connec USING (link_id) 
 							WHERE link.feature_type='CONNEC' AND exit_type='ARC' AND arc_id=v_arc_id
 							LOOP
 								SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id 
 								AND arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1; 	
 								UPDATE plan_psector_x_connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
-								UPDATE connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
 								v_arc_closest = null;
 							END LOOP;
 
 							IF v_project_type ='UD' THEN
 							
-								FOR rec_link IN SELECT link.* FROM v_edit_gully JOIN link ON link.feature_id=gully_id 
+								FOR rec_link IN SELECT link.* FROM link JOIN plan_psector_x_connec USING (link_id) 
 								WHERE link.feature_type='GULLY' AND exit_type='ARC' AND arc_id=v_arc_id
 								LOOP
 									SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
 									UPDATE plan_psector_x_gully SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
-									UPDATE gully SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
 									v_arc_closest = null;
 								END LOOP;
 							END IF;						
@@ -843,59 +841,20 @@ BEGIN
 							-- reconnect planned node links
 							FOR rec_link IN SELECT * FROM v_edit_link WHERE exit_type = 'NODE' AND exit_id = (SELECT node_1 FROM arc WHERE arc_id = rec_aux1.arc_id)
 							LOOP
-								UPDATE connec SET arc_id = rec_aux1.arc_id WHERE connec_id = rec_link.feature_id;
 								UPDATE plan_psector_x_connec SET arc_id = rec_aux1.arc_id WHERE connec_id = rec_link.feature_id;
 								IF v_project_type ='UD' THEN
-									UPDATE gully SET arc_id = rec_aux1.arc_id WHERE gully_idn = rec_link.feature_id;
 									UPDATE plan_psector_x_gully SET arc_id = rec_aux1.arc_id WHERE gully_id = rec_link.feature_id;
 								END IF;							
 							END LOOP;
 
-							SELECT count(*) INTO v_count FROM plan_psector_x_arc WHERE arc_id=v_arc_id;						
-
-							IF v_count = 0 THEN
-								DELETE FROM arc WHERE arc_id=v_arc_id;
-							END IF;
-							
-
-							-- reconnect planned links
-							FOR rec_link IN SELECT link.* FROM link WHERE link.feature_type='CONNEC' AND exit_type='ARC' AND exit_id=v_arc_id 
-							AND link.state = 2
-							LOOP							
-								EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-								"feature":{"id":['|| rec_link.feature_id||']},"data":{"feature_type":"CONNEC", "isArcDivide":"true","forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
-							END LOOP;
-
-							IF v_project_type ='UD' THEN
-							
-								FOR rec_link IN SELECT link.* FROM link WHERE link.feature_type='GULLY' AND exit_type='ARC' AND exit_id=v_arc_id
-								AND link.state = 2
-								LOOP
-									EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-									"feature":{"id":['|| rec_link.feature_id||']},"data":{"feature_type":"GULLY", "isArcDivide":"true","forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
-								END LOOP;
-							END IF;						
-
-							-- reconnect planned node links
-							FOR rec_link IN SELECT * FROM v_edit_link WHERE exit_type = 'NODE' AND exit_id = (SELECT node_1 FROM arc WHERE arc_id = rec_aux1.arc_id)
-							LOOP
-								UPDATE connec SET arc_id = rec_aux1.arc_id WHERE connec_id = rec_link.feature_id;
-								UPDATE plan_psector_x_connec SET arc_id = rec_aux1.arc_id WHERE connec_id = rec_link.feature_id AND psector_id=v_psector;
-								
-								IF v_project_type ='UD' THEN
-									UPDATE gully SET arc_id = rec_aux1.arc_id WHERE gully_idn = rec_link.feature_id;
-									UPDATE plan_psector_x_gully SET arc_id = rec_aux1.arc_id WHERE gully_id = rec_link.feature_id AND psector_id=v_psector;
-								END IF;							
-							END LOOP;
-
-							DELETE FROM plan_psector_x_arc WHERE arc_id=v_arc_id AND psector_id=v_psector;
+							DELETE FROM plan_psector_x_arc WHERE arc_id  =v_arc_id AND psector_id = v_psector;
 
 							SELECT count(*) INTO v_count FROM plan_psector_x_arc WHERE arc_id=v_arc_id;						
 
 							IF v_count = 0 THEN
 								DELETE FROM arc WHERE arc_id=v_arc_id;
 							END IF;
-						
+							
 							UPDATE config_param_user SET value=v_force_delete WHERE parameter = 'plan_psector_force_delete' AND cur_user=current_user;
 						END IF;
 
@@ -909,6 +868,7 @@ BEGIN
 						UPDATE plan_psector_x_arc SET addparam='{"arcDivide":"parent"}' WHERE  psector_id=v_psector AND arc_id=v_arc_id;
 						UPDATE plan_psector_x_arc SET addparam='{"arcDivide":"child"}' WHERE  psector_id=v_psector AND arc_id=rec_aux1.arc_id;
 						UPDATE plan_psector_x_arc SET addparam='{"arcDivide":"child"}' WHERE  psector_id=v_psector AND arc_id=rec_aux2.arc_id;
+
 
 					ELSIF (v_state_arc=2 AND v_state_node=1) THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
