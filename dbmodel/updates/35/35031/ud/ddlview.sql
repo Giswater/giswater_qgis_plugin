@@ -1400,7 +1400,7 @@ ORDER BY id;
 
 create or replace view vu_link as 
 select link_id, l.feature_type, feature_id, exit_type, exit_id, l.state, l.expl_id, sector_id, 
-dma_id, exit_topelev, exit_elev, fluid_type, st_length2d(l.the_geom) as gis_length, userdefined_geom, l.the_geom, 
+dma_id, exit_topelev, exit_elev, fluid_type, (st_length2d(l.the_geom))::numeric(12,3) as gis_length, l.the_geom, 
 s.name as sector_name, macrosector_id, macrodma_id
 FROM link l
 LEFT JOIN sector s USING (sector_id)
@@ -1409,7 +1409,7 @@ LEFT JOIN dma d USING (dma_id);
 
 create or replace view vu_link_connec as 
 select link_id, l.feature_type, feature_id, exit_type, exit_id, l.state, l.expl_id, sector_id, 
-dma_id, exit_topelev, exit_elev, fluid_type, st_length2d(l.the_geom) as gis_length, userdefined_geom, l.the_geom, 
+dma_id, exit_topelev, exit_elev, fluid_type, (st_length2d(l.the_geom))::numeric(12,3) as gis_length, l.the_geom, 
 s.name as sector_name, macrosector_id, macrodma_id
 FROM link l
 LEFT JOIN sector s USING (sector_id)
@@ -1418,7 +1418,7 @@ WHERE feature_type = 'CONNEC';
 
 create or replace view vu_link_gully as 
 select link_id, l.feature_type, feature_id, exit_type, exit_id, l.state, l.expl_id, sector_id, 
-dma_id, exit_topelev, exit_elev, fluid_type, st_length2d(l.the_geom) as gis_length, userdefined_geom, l.the_geom, 
+dma_id, exit_topelev, exit_elev, fluid_type, (st_length2d(l.the_geom))::numeric(12,3) as gis_length, l.the_geom, 
 s.name as sector_name, macrosector_id, macrodma_id
 FROM link l
 LEFT JOIN sector s USING (sector_id)
