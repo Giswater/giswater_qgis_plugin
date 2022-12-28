@@ -510,7 +510,10 @@ BEGIN
 			||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE)';
 			EXECUTE 'UPDATE temp_anlgraph SET flag = 0 WHERE node_2 IN (SELECT json_array_elements_text((graphconfig->>''forceOpen'')::json) FROM '
 			||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE)';
-
+            
+            -- close customized stoppers acording on graphconfig column on mapzone table
+			EXECUTE 'UPDATE temp_anlgraph SET flag = 1 WHERE node_1 IN (SELECT (json_array_elements_text((graphconfig->>''stopper'')::json)) as node_id FROM '||quote_ident(v_table)||')';
+			EXECUTE 'UPDATE temp_anlgraph SET flag = 1 WHERE node_2 IN (SELECT (json_array_elements_text((graphconfig->>''stopper'')::json)) as node_id FROM '||quote_ident(v_table)||')';
 
 			-- close checkvalves on the opposite sense where they are working
 			IF v_class !='DRAINZONE' THEN
