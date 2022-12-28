@@ -12,44 +12,51 @@ $BODY$
 
 DECLARE 
 v_table text;
-v_connec_state integer;
 v_link_id integer;
-v_arc_id integer;
 v_rec record;
 BEGIN 
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	v_table:= TG_ARGV[0];
 
+	-- force the activation of psector
+	INSERT INTO selector_psector (psector_id, cur_user) VALUES (NEW.psector_id, current_user) ON CONFLICT (psector_id, cur_user) DO NOTHING;
+
 	IF TG_OP = 'INSERT' THEN
 		
 		IF v_table = 'plan_psector_x_connec' then
 		
 			EXECUTE 'SELECT state, arc_id FROM connec where connec_id = '''||new.connec_id||''''
-        	INTO v_rec;
-        
-        	v_connec_state = v_rec.state;
-       		v_arc_id = v_rec.arc_id;
-       		v_link_id = (select link_id from link where feature_id = new.connec_id and feature_Type = 'CONNEC');
-       	
-			--raise exception 'EXCEPTION -> %',v_rec;
-			/*INSERT INTO plan_psector_x_connec (connec_id,  psector_id, state, doable, descript, arc_id) 
-			VALUES (NEW.connec_id,  NEW.psector_id, v_connec_state, NEW.doable, NEW.descript, v_arc_id) on conflict do nothing;*/ 
-			INSERT INTO plan_psector_x_connec (connec_id,  psector_id, state, doable, descript) 
-			VALUES (NEW.connec_id,  NEW.psector_id, v_connec_state, NEW.doable, NEW.descript) on conflict do nothing; 
+			INTO v_rec;
+
+        		v_link_id = (select link_id from link where feature_id = new.connec_id and feature_type = 'CONNEC' AND exit_id = v_rec.arc_id LIMIT 1);
+
+			-- setting null value for arc
+        		IF NEW.arc_id IS NULL THEN NEW.arc_id = v_rec.arc_id; END IF;
+
+			--inserting on tables
+			IF v_rec.state =  1 THEN
+				INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, link_id, arc_id) values (NEW.connec_id,  NEW.psector_id, 0, v_link_id, v_rec.arc_id) 
+				on conflict do nothing;
+				INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, link_id, arc_id) values (NEW.connec_id,  NEW.psector_id, 1, NULL, NEW.arc_id) 
+				on conflict do nothing;
 				
-			if v_connec_state =  1 then
-				insert into plan_psector_x_connec (connec_id, psector_id, state, link_id) values (NEW.connec_id,  NEW.psector_id, 0, v_link_id) on conflict do nothing;
-				--insert into plan_psector_x_connec (connec_id, psector_id, state, link_id, arc_id) values (NEW.connec_id,  NEW.psector_id, 0, v_link_id, v_arc_id) on conflict do nothing;
-				-- COMENTAR ?? insert into plan_psector_x_connec (connec_id, psector_id, state) values (NEW.connec_id,  NEW.psector_id, 1) on conflict do nothing;
-			elsif v_connec_state = 2 then
-				insert into plan_psector_x_connec (connec_id, psector_id, state) values (NEW.connec_id,  NEW.psector_id, 1) on conflict do nothing;
-			end if;
+			ELSIF v_rec.state = 2 THEN
+				INSERT INTO plan_psector_x_connec (connec_id, psector_id, state) values (NEW.connec_id,  NEW.psector_id, 1)
+				on conflict do nothing;
+			END IF;
 		
 		ELSIF v_table = 'plan_psector_x_gully' THEN
 
-			INSERT INTO plan_psector_x_gully (gully_id,  psector_id, state, doable, descript) 
-			VALUES (NEW.gully_id,  NEW.psector_id, NEW.state, NEW.doable, NEW.descript); 
+			EXECUTE 'SELECT state, arc_id FROM gully where gully_id = '''||new.gully_id||''''
+			INTO v_rec;
+			
+			v_link_id = (select link_id from link where feature_id = new.connec_id and feature_type = 'CONNEC' AND exit_id = v_rec.arc_id LIMIT 1);
+
+			-- todo gullies
+
+			
+
 
 		END IF;
 
@@ -60,35 +67,38 @@ BEGIN
 		IF v_table = 'plan_psector_x_connec' then
 
 			EXECUTE 'SELECT state, arc_id FROM connec where connec_id = '''||new.connec_id||''''
-        	INTO v_rec;
+			INTO v_rec;
         
-        	v_connec_state = v_rec.state;
-       		v_arc_id = v_rec.arc_id;
-			v_link_id = (select link_id from link where feature_id = new.connec_id and feature_Type = 'CONNEC');
-			
+			v_link_id = (select link_id from link where feature_id = new.connec_id and feature_type = 'CONNEC' AND exit_id = v_rec.arc_id LIMIT 1);			
+
 			UPDATE plan_psector_x_connec SET doable = NEW.doable, descript = NEW.descript, arc_id = NEW.arc_id
 			WHERE id = NEW.id;
 
-			IF NEW.state  = 0 AND OLD.state = 1 AND v_connec_state = 2 THEN
+			IF NEW.state  = 0 AND OLD.state = 1 AND v_rec.state = 2 THEN
 				RAISE EXCEPTION 'IT DOES NOT MAKE SENSE DOWNGRADE THE STATE OF PLANNED CONNEC.  TO UNLINK IT FROM PSECTOR PLEASE REMOVE ROW OR DELETE CONNEC';
+				
 			ELSIF NEW.state  = 0 AND OLD.state = 1 THEN
+				DELETE FROM link WHERE link_id = OLD.link_id;
 				DELETE FROM plan_psector_x_connec WHERE id = NEW.id;
-			ELSIF NEW.state  = 1 AND OLD.state = 0 THEN
-				INSERT INTO plan_psector_x_connec (psector_id, connec_id, state) VALUES (NEW.psector_id, NEW.connec_id, 1);
+				
+			ELSIF NEW.state  = 1 AND OLD.state = 0 THEN	-- link id null in order to force new link
+				INSERT INTO plan_psector_x_connec (psector_id, connec_id, state, arc_id, link_id) VALUES (NEW.psector_id, NEW.connec_id, 1, NEW.arc_id, null);
 			END IF;
 						
 		ELSIF v_table = 'plan_psector_x_gully' THEN
+
+			EXECUTE 'SELECT state, arc_id FROM gully where gully_id = '''||new.gully_id||''''
+			INTO v_rec;
+        
+			v_link_id = (select link_id from link where feature_id = NEW.gully_id and feature_type = 'GULLY' AND exit_id = v_rec.arc_id LIMIT 1);			
 		
 			UPDATE plan_psector_x_gully SET doable = NEW.doable, descript = NEW.descript, arc_id = NEW.arc_id
 			WHERE id = NEW.id;	
+
+			-- todo gullies
+
+
 			
-			IF NEW.state  = 0 AND OLD.state = 1 and v_connec_state = 2 THEN
-				RAISE EXCEPTION 'IT DOES NOT MAKE SENSE DOWNGRADE THE STATE OF PLANNED GULLY.  TO UNLINK IT FROM PSECTOR PLEASE REMOVE ROW OR DELETE GULLY';
-			ELSIF NEW.state  = 0 AND OLD.state = 1 THEN
-				DELETE FROM plan_psector_x_gully WHERE id = NEW.id;
-			ELSIF NEW.state  = 1 AND OLD.state = 0 THEN
-				INSERT INTO plan_psector_x_gully (psector_id, gully_id, state) VALUES (NEW.psector_id, NEW.gully_id, 1);
-			END IF;
 		
 		END IF;
 		

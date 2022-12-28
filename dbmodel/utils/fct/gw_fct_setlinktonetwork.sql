@@ -71,8 +71,9 @@ v_psector_vdefault integer;
 v_link_id integer;
 v_ispsector boolean;
 v_isarcdivide boolean;
-v_isoperative_psector boolean;
+v_isoperative_psector boolean = false;
 v_linkexists integer;
+v_linkfrompsector integer;
 
 
 BEGIN
@@ -136,29 +137,36 @@ BEGIN
 		IF v_feature_type ='CONNEC' THEN          
 			SELECT * INTO v_connect FROM v_edit_connec WHERE connec_id = v_connect_id;
 
-			IF (SELECT connec_id FROM plan_psector_x_connec WHERE connec_id = v_connect.connec_id AND psector_id IN
-				(SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1) IS NOT NULL AND v_connect.state = 1 THEN
+			IF (SELECT connec_id FROM plan_psector_x_connec WHERE connec_id = v_connect.connec_id AND psector_id = v_psector_vdefault AND psector_id
+				IN (SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1) IS NOT NULL AND v_connect.state = 1 THEN
 				v_isoperative_psector = true;
+				v_linkfrompsector = (SELECT link_id FROM plan_psector_x_connec WHERE connec_id = v_connect.connec_id AND psector_id IN
+						    (SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1);
 			END IF;
 	
 		ELSIF v_feature_type ='GULLY' THEN 
 			SELECT * INTO v_connect FROM v_edit_gully WHERE gully_id = v_connect_id;
 			
-			IF (SELECT gully_id FROM plan_psector_x_gully WHERE gully_id = v_connect.gully_id AND psector_id IN
+			IF (SELECT gully_id FROM plan_psector_x_gully WHERE gully_id = v_connect.gully_id AND psector_id = v_psector_vdefault AND psector_id IN
 			   (SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1) IS NOT NULL AND v_connect.state = 1 THEN
 				v_isoperative_psector = true;
 			END IF;
 		END IF;
-		
-		-- getting previous feature link values
-		SELECT * INTO v_link FROM v_edit_link WHERE feature_id = v_connect_id AND feature_type=v_feature_type AND state > 0 LIMIT 1;
 
-		-- in case to recover existing link set id null to force the creation of it
-		IF v_link.link_id IS NULL THEN
+		-- getting link values
+		IF v_isoperative_psector THEN -- getting values from the operative one
+
+			IF v_linkfrompsector IS NULL THEN
+				SELECT * INTO v_link FROM link WHERE feature_id = v_connect_id and state = 1 limit 1;
+				v_link.link_id = null;
+			
+			ELSIF v_linkfrompsector IS NOT NULL THEN
+				SELECT * INTO v_link FROM link WHERE link_id =  v_linkfrompsector;
+			END IF;
+		ELSE
 			SELECT * INTO v_link FROM link WHERE feature_id = v_connect_id and state = 1 limit 1;
-			v_link.link_id = null;
 		END IF;
-
+	
 		-- exception control. It is not possible to create a link for connec over arc		
 		SELECT * INTO v_arc FROM v_edit_arc WHERE ST_DWithin(v_connect.the_geom, v_edit_arc.the_geom, 0.001);
 
