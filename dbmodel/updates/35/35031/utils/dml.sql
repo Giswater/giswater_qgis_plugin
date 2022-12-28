@@ -13,10 +13,6 @@ DELETE FROM sys_function WHERE id=2766;
 UPDATE sys_function SET project_type='utils' WHERE id =2710 OR id=2768;
 
 
-INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
-VALUES (3174, 'gw_trg_edit_setarcdata', 'utils', 'trigger function', 
-'Trigger that fills arc with values captured or calculated based on attributes stored on final nodes', 'role_edit', 'core');
-
 INSERT INTO config_param_system(parameter, value, descript, isenabled,  project_type, datatype)
 VALUES ('admin_isproduction' , False, 'If true, deleting the schema using Giswater button will not be possible', FALSE, 'utils', 'boolean');
 
@@ -124,7 +120,7 @@ INSERT INTO sys_table( id, descript, sys_role, source)
 VALUES ('v_edit_plan_psector_x_connec', 'Editable view to work with psector and connec', 'role_master', 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
-VALUES (3186, 'gw_trg_edit_plan_psector_x_connect', 'utils', 'trigger function', 
+VALUES (3174, 'gw_trg_edit_plan_psector_x_connect', 'utils', 'trigger function', 
 'Trigger that manages v_edit_plan_psector_x_connec (and gully views)', 'role_master', 'core');
 
 

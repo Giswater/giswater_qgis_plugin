@@ -9,21 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2022/09/29
-DROP TRIGGER IF EXISTS gw_trg_edit_setarcdata ON arc;
-CREATE TRIGGER gw_trg_edit_setarcdata
-  AFTER INSERT OR UPDATE OF node_1, node_2
-  ON arc
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_setarcdata('arc');
-
-
-DROP TRIGGER IF EXISTS gw_trg_edit_setarcdata ON node;
-CREATE TRIGGER gw_trg_edit_setarcdata
-  AFTER INSERT OR UPDATE OF node_type, top_elev, ymax
-  ON node
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_setarcdata('node');
-
 CREATE TRIGGER gw_trg_edit_review_node
   INSTEAD OF INSERT OR UPDATE
   ON v_edit_review_node
