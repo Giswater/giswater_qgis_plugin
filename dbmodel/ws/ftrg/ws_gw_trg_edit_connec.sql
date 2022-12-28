@@ -631,18 +631,14 @@ BEGIN
 
 						EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 						"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC", "forcedArcs":["'||NEW.arc_id||'"]}}$$)';		
-
-						-- recover values in order to do not disturb this workflow
-						SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
-						NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id; 
-						NEW.presszone_id = v_arc.presszone_id; NEW.dqa_id = v_arc.dqa_id;  NEW.minsector_id = v_arc.minsector_id; 
 					END IF;
 				ELSE
-					UPDATE plan_psector_x_connec SET arc_id = null, link_id = null WHERE connec_id=NEW.connec_id AND psector_id = v_psector_vdefault AND state = 1;
-					DELETE FROM link WHERE feature_id = NEW.connec_id AND state = 2;
 
-					-- setting values					
-					NEW.sector_id = 0; NEW.presszone_id = '0'; NEW.dqa_id = 0; NEW.dma_id = 0; NEW.minsector_id = 0; NEW.minsector_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
+					IF (SELECT count(*)FROM link WHERE feature_id = NEW.connec_id AND state = 1) > 0 THEN
+						RAISE EXCEPTION 'THIS CONNEC HAS AN ASSOCIATED LINK. BEFORE TO SET NULL ON ARC_ID, PLEASE REMOVE THE ASSOCIATED LINK';
+					ELSE
+						UPDATE plan_psector_x_connec SET arc_id = null, link_id = null WHERE connec_id=NEW.connec_id AND psector_id = v_psector_vdefault AND state = 1;
+					END IF;
 				END IF;
 			ELSE
 				-- when arc_id comes from connec table
@@ -657,8 +653,11 @@ BEGIN
 					NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id; 
 					NEW.presszone_id = v_arc.presszone_id; NEW.dqa_id = v_arc.dqa_id;  NEW.minsector_id = v_arc.minsector_id; 
 				ELSE
-					DELETE FROM link WHERE feature_id = NEW.connec_id AND state = 1;
-					NEW.sector_id = 0; NEW.presszone_id = '0'; NEW.dqa_id = 0; NEW.dma_id = 0; NEW.minsector_id = 0; NEW.minsector_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
+					IF (SELECT count(*)FROM link WHERE feature_id = NEW.connec_id AND state = 1) > 0 THEN
+						RAISE EXCEPTION 'THIS CONNEC HAS AN ASSOCIATED LINK. BEFORE TO SET NULL ON ARC_ID, PLEASE REMOVE THE ASSOCIATED LINK';
+					ELSE
+						NEW.sector_id = 0; NEW.presszone_id = '0'; NEW.dqa_id = 0; NEW.dma_id = 0; NEW.minsector_id = 0; NEW.minsector_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
+					END IF;
 				END IF;
 			END IF;
 		END IF;

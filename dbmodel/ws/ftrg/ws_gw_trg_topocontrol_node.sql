@@ -261,13 +261,14 @@ BEGIN
 						-- update arc
 						IF v_elevation IS NOT NULL THEN
 							EXECUTE 'UPDATE arc SET
-								nodetype_1 = '|| quote_literal(v_nodetype) ||',
 								elevation1 = '|| v_elevation ||',
 								depth1 = '|| v_depth||',
 								staticpress1 = '|| v_staticpress ||' 
 								WHERE arc_id = ' || quote_literal(arcrec."arc_id");
 						END IF;
-						EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, 0, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") 
+						
+						EXECUTE 'UPDATE arc SET	nodetype_1 = '|| quote_literal(v_nodetype) ||', 
+						the_geom = ST_SetPoint($1, 0, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") 
 						USING arcrec.the_geom, NEW.the_geom; 
 
 					ELSIF (nodeRecord2.node_id = NEW.node_id) THEN
@@ -275,14 +276,14 @@ BEGIN
 						-- update arc
 						IF v_elevation IS NOT NULL THEN
 							EXECUTE 'UPDATE arc SET
-								nodetype_2 = '|| quote_literal(v_nodetype) ||',
 								elevation2 = '|| v_elevation ||',
 								depth2 = '|| v_depth||',
 								staticpress2 = '|| v_staticpress ||' 
 								WHERE arc_id = ' || quote_literal(arcrec."arc_id");
 						END IF;					
 					
-						EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") 
+						EXECUTE 'UPDATE arc SET nodetype_2 = '|| quote_literal(v_nodetype) ||',
+						the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") 
 						USING arcrec.the_geom, NEW.the_geom; 
 					END IF;
 				END IF;

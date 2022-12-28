@@ -812,6 +812,13 @@ CREATE OR REPLACE VIEW vu_connec AS
      LEFT JOIN connec_add e ON e.connec_id = connec.connec_id;
 
 
+drop view v_rtc_period_node;
+drop view v_rtc_period_pjointpattern;
+drop view v_rtc_period_pjoint;
+drop view v_rtc_interval_nodepattern;
+drop view v_rtc_period_nodepattern;
+drop view v_rtc_period_dma;
+
 create or replace view vu_link as 
 select link_id, l.feature_type, feature_id, exit_type, exit_id, l.state, l.expl_id, sector_id, dma_id, presszone_id::varchar(16), dqa_id, minsector_id, exit_topelev, exit_elev, fluid_type, st_length2d(l.the_geom) as gis_length, userdefined_geom, l.the_geom, s.name as sector_name, d.name as dma_name, q.name as dqa_name, p.name as presszone_name, macrosector_id, macrodma_id, macrodqa_id
 FROM link l
