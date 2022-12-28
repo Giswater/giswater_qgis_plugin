@@ -357,4 +357,10 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, '
 
 UPDATE link SET dma_id = c.dma_id, sector_id = c.sector_id, presszone_id = c.presszone_id, dqa_id = c.dqa_id, minsector_id = c.minsector_id FROM connec c WHERE feature_id = connec_id;
 
+DELETE FROM sys_table WHERE id = 'v_rtc_period_node';
+DELETE FROM sys_table WHERE id = 'v_rtc_period_pjointpattern';
+DELETE FROM sys_table WHERE id = 'v_rtc_period_pjoint';
+DELETE FROM sys_table WHERE id = 'v_rtc_interval_nodepattern';
+DELETE FROM sys_table WHERE id = 'v_rtc_period_nodepattern';
+DELETE FROM sys_table WHERE id = 'v_rtc_period_dma';
 

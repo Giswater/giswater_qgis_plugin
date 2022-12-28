@@ -167,3 +167,17 @@ UPDATE link SET dma_id = c.dma_id, sector_id = c.sector_id FROM connec c WHERE f
 UPDATE link SET dma_id = c.dma_id, sector_id = c.sector_id FROM gully c WHERE feature_id = gully_id;
 
 
+INSERT INTO sys_table( id, descript, sys_role, source)
+VALUES ('vu_link_connec', 'Unfiltered view of links', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table( id, descript, sys_role, source)
+VALUES ('vu_link_gully', 'Unfiltered view of gully links ', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table( id, descript, sys_role, source)
+VALUES ('v_state_link_gully', 'View to filter gully links', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table( id, descript, sys_role, source)
+VALUES ('v_link_gully', 'Filtered view of links type connec', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table( id, descript, sys_role, source)
+VALUES ('v_edit_plan_psector_x_gully', 'Editable view to work with psector and gully', 'role_plan', 'core') ON CONFLICT (id) DO NOTHING;

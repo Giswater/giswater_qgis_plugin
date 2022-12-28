@@ -96,3 +96,38 @@ UPDATE config_form_fields SET iseditable = false where columnname ='arc_id' and 
 UPDATE config_form_fields SET iseditable = false where formname like 'v_edit_lin%';
 UPDATE config_form_fields SET iseditable = true where formname like 'v_edit_lin%' AND columnname  ='state';
 
+INSERT INTO sys_table( id, descript, sys_role, source)
+VALUES ('temp_vnode', 'Temporal table to process virtual nodes (for internal use)', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table( id, descript, sys_role, source)
+VALUES ('temp_link', 'Temporal table to process virtual links (for internal use)', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table( id, descript, sys_role, source)
+VALUES ('temp_link_x_arc', 'Temporal table to process virtual links related to arcs (for internal use)', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table( id, descript, sys_role, source)
+VALUES ('vu_link', 'View of links without filters', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table( id, descript, sys_role, source)
+VALUES ('v_state_link', 'View to filter links', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table( id, descript, sys_role, source)
+VALUES ('v_state_link_connec', 'View to filter connec links ', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table( id, descript, sys_role, source)
+VALUES ('v_link', 'Filtered view of links', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table( id, descript, sys_role, source)
+VALUES ('v_link_connec', 'Filtered view of links type connec', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table( id, descript, sys_role, source)
+VALUES ('v_edit_plan_psector_x_connec', 'Editable view to work with psector and connec', 'role_plan', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
+VALUES (3186, 'gw_trg_edit_plan_psector_x_connect', 'utils', 'trigger function', 
+'Trigger that manages v_edit_plan_psector_x_connec (and gully views)', 'role_plan', 'core');
+
+
+DELETE FROM sys_table WHERE id = 'vnode';
+DELETE FROM sys_table WHERE id = 'v_arc_x_vnode';
+DELETE FROM sys_table WHERE id = 'v_vnode';
