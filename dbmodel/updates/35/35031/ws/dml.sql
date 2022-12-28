@@ -364,3 +364,10 @@ DELETE FROM sys_table WHERE id = 'v_rtc_interval_nodepattern';
 DELETE FROM sys_table WHERE id = 'v_rtc_period_nodepattern';
 DELETE FROM sys_table WHERE id = 'v_rtc_period_dma';
 
+
+UPDATE sys_param_user SET label  ='Pattern for null values:' WHERE id  = 'inp_options_patternmethod';
+UPDATE sys_param_user SET label  ='Global pattern:' WHERE id  = 'inp_options_pattern';
+
+UPDATE inp_typevalue SET idval  ='KEEP NULL VALUES' WHERE id  = '14'  AND typevalue  ='inp_value_patternmethod';
+UPDATE inp_typevalue SET idval  ='GLOBAL PATTERN' WHERE id  =  '11' AND typevalue  ='inp_value_patternmethod';
+

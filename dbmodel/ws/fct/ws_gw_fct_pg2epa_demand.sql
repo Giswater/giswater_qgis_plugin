@@ -43,7 +43,7 @@ BEGIN
 	-- Reset values
 	UPDATE temp_node SET demand = 0;
 	UPDATE temp_node SET pattern_id = null WHERE epa_type = 'JUNCTION';
-
+	
 	-- delete previous results on rpt_inp_pattern_value
 	DELETE FROM rpt_inp_pattern_value WHERE result_id=result_id_var;	
 
@@ -59,21 +59,26 @@ BEGIN
 	
 	IF v_networkmode IN (1,2) THEN -- NODE ESTIMATED
 
+		-- update patterns for nodes
+		UPDATE temp_node SET pattern_id=a.pattern_id FROM v_edit_inp_junction a WHERE temp_node.node_id=a.node_id;
+
 		-- demand on nodes
 		UPDATE temp_node SET demand=inp_junction.demand FROM inp_junction WHERE temp_node.node_id=inp_junction.node_id;	
 
 		-- pattern
 		IF v_patternmethod = 11 THEN -- DEFAULT PATTERN
-			UPDATE temp_node SET pattern_id=v_deafultpattern;
+			UPDATE temp_node SET pattern_id=v_deafultpattern WHERE pattern_id IS NULL;
 		
 		ELSIF v_patternmethod = 12 THEN -- SECTOR PATTERN (NODE)
-			UPDATE temp_node SET pattern_id=sector.pattern_id FROM node JOIN sector ON sector.sector_id=node.sector_id WHERE temp_node.node_id=node.node_id;
+			UPDATE temp_node SET pattern_id=sector.pattern_id FROM node JOIN sector ON sector.sector_id=node.sector_id 
+			WHERE temp_node.node_id=node.node_id AND temp_node.pattern_id IS NULL;
 		
 		ELSIF v_patternmethod = 13 THEN -- DMA PATTERN (NODE)
-			UPDATE temp_node SET pattern_id=dma.pattern_id FROM node JOIN dma ON dma.dma_id=node.dma_id WHERE temp_node.node_id=node.node_id;
+			UPDATE temp_node SET pattern_id=dma.pattern_id FROM node JOIN dma ON dma.dma_id=node.dma_id 
+			WHERE temp_node.node_id=node.node_id AND temp_node.pattern_id IS NULL;
 		
 		ELSIF v_patternmethod = 14 THEN -- FEATURE PATTERN (NODE)
-			UPDATE temp_node SET pattern_id=a.pattern_id FROM inp_junction a WHERE temp_node.node_id=a.node_id;
+			-- do nothing
 		END IF;
 
 	ELSIF v_networkmode = 3 THEN
@@ -81,6 +86,12 @@ BEGIN
 		-- due refactor of 2022/12/6 this network mode is deprecated
 		
 	ELSIF v_networkmode = 4 THEN 
+
+		-- update patterns for connecs with associated link
+		UPDATE temp_node SET pattern_id=c.pattern_id FROM v_edit_inp_connec c WHERE connec_id = node_id;
+
+		-- update patterns for pattern on connecs over arc
+		UPDATE temp_node SET pattern_id=c.pattern_id FROM v_edit_inp_connec c WHERE concat('VC',connec_id) = node_id;
 
 		-- demand on connecs with associated link
 		UPDATE temp_node SET demand=v.demand FROM v_edit_inp_connec v WHERE connec_id = node_id;
@@ -90,37 +101,31 @@ BEGIN
 
 		-- pattern
 		IF v_patternmethod = 11 THEN -- DEFAULT PATTERN
-			UPDATE temp_node SET pattern_id=v_deafultpattern;
+			UPDATE temp_node SET pattern_id=v_deafultpattern WHERE temp_node.pattern_id IS NULL ;
 				
 		ELSIF v_patternmethod  = 12 THEN -- SECTOR PATTERN (CONNEC)
 
 			-- pattern on connecs with associated link
 			UPDATE temp_node SET pattern_id=sector.pattern_id 
-			FROM v_edit_inp_connec JOIN sector USING (sector_id) WHERE connec_id = node_id;
+			FROM v_edit_inp_connec JOIN sector USING (sector_id) WHERE connec_id = node_id  AND temp_node.pattern_id IS NULL ;
 
 			-- pattern on connecs over arc
 			UPDATE temp_node SET pattern_id=sector.pattern_id 
-			FROM v_edit_inp_connec JOIN sector USING (sector_id) WHERE concat('VC',connec_id) = node_id;
+			FROM v_edit_inp_connec JOIN sector USING (sector_id) WHERE concat('VC',connec_id) = node_id  AND temp_node.pattern_id IS NULL ;
 
 		ELSIF v_patternmethod  = 13 THEN -- DMA PATTERN (CONNEC)
 
 			-- pattern on connecs with associated link
 			UPDATE temp_node SET pattern_id=dma.pattern_id 
-			FROM v_edit_inp_connec JOIN dma USING (dma_id) WHERE connec_id = node_id;
+			FROM v_edit_inp_connec JOIN dma USING (dma_id) WHERE connec_id = node_id  AND temp_node.pattern_id IS NULL ;
 			
 			-- pattern on connecs over arc
 			UPDATE temp_node SET pattern_id=dma.pattern_id 
-			FROM v_edit_inp_connec JOIN dma USING (dma_id) WHERE concat('VC',connec_id) = node_id;
+			FROM v_edit_inp_connec JOIN dma USING (dma_id) WHERE concat('VC',connec_id) = node_id AND temp_node.pattern_id IS NULL ;
 
 		ELSIF v_patternmethod = 14 THEN -- FEATURE PATTERN (CONNEC)
 
-			-- pattern on connecs with associated link
-			UPDATE temp_node SET pattern_id=c.pattern_id 
-			FROM v_edit_inp_connec c WHERE connec_id = node_id;
-
-			-- pattern on connecs over arc
-			UPDATE temp_node SET pattern_id=c.pattern_id 
-			FROM v_edit_inp_connec c WHERE concat('VC',connec_id) = node_id;
+			-- do nothing
 		END IF;	
 	END IF;
 

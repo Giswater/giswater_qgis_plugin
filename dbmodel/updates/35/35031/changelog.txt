@@ -25,3 +25,4 @@
 	- It is possible to create planned links related to planned connects by using qgis tools
 	- it is possible to relate any planned connect no any other object of network
 	- Connects mapzones has consistency againts related arc, not only on operative state also on planned state
+- Enhancement for patterns managmement by using pattern method only to fill null values for pattern features
