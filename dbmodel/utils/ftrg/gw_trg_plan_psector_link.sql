@@ -72,8 +72,11 @@ BEGIN
 		IF NEW.state = 1 AND COALESCE(NEW.arc_id,'') != COALESCE(OLD.arc_id,'') AND COALESCE(NEW.link_id,0) = COALESCE(OLD.link_id,0) THEN
 
 			IF NEW.arc_id IS NULL THEN
-				EXECUTE 'UPDATE plan_psector_x_'||v_table_name||' SET link_id = NULL WHERE id = '||v_id;
-				DELETE FROM link WHERE link_id = NEW.link_id;			
+
+				IF (SELECT exit_type FROM link WHERE link_id = NEW.link_id) = 'ARC' THEN
+					EXECUTE 'UPDATE plan_psector_x_'||v_table_name||' SET link_id = NULL WHERE id = '||v_id;
+					DELETE FROM link WHERE link_id = NEW.link_id;			
+				END IF;
 			ELSE
 				EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{"id":["'|| v_feature ||'"]},"data":{"feature_type":"'|| v_featuretype ||'", "isPsector":"true", "forceArcs":['||NEW.arc_id||']}}$$)';
