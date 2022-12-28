@@ -260,8 +260,6 @@ BEGIN
 				END IF;
 			END IF;
 
-			--RAISE EXCEPTION ' v_link %', v_link;
-
 			IF v_link.link_id IS NULL THEN
 
 				-- creation of link
@@ -380,8 +378,6 @@ BEGIN
 					END IF;
 				END IF;
 			END IF;
-
-			--raise exception 'hdfsra';
 								
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (217, null, 4, concat('Recreate link'));
