@@ -602,6 +602,9 @@ BEGIN
 			IF v_projectype = 'WS' THEN
 				UPDATE link SET presszone_id = 0, dqa_id = 0, minsector_id = 0 WHERE link_id = NEW.link_id;
 			END IF;	
+		ELSIF NEW.state = 2 AND OLD.state = 1 THEN
+
+			RAISE EXCEPTION 'IT IS NOT POSSIBLE TO UPGRADE LINK. PLEASE CREATE A NEW ONE';
 			
 		ELSIF NEW.state = 1 AND st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
 
@@ -623,8 +626,6 @@ BEGIN
 			END IF;	
 	
 		ELSIF NEW.state = 2 AND st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
-
-			--raise exception ' NEW.exit_id %', NEW.exit_id;
 
 			-- update link
 			UPDATE link SET exit_id = NEW.exit_id, exit_type = NEW.exit_type, the_geom = NEW.the_geom, expl_id = v_expl, sector_id = v_sector, dma_id = v_dma 
