@@ -185,14 +185,16 @@ VALUES ('v_edit_plan_psector_x_gully', 'Editable view to work with psector and g
 -- 2022/12/28
 UPDATE inp_typevalue SET typevalue = 'inp_typevalue_gully_method' where  typevalue  ='typevalue_gully_method';
 UPDATE inp_typevalue SET typevalue = 'inp_typevalue_gully_type' where  typevalue  ='typevalue_gully_outlet_type';
-
 UPDATE inp_typevalue SET id  ='W_O', idval = 'W_O' WHERE id = 'W/O' AND typevalue  ='inp_typevalue_gully_method';
+
+UPDATE sys_foreignkey SET typevalue_name = 'inp_typevalue_gully_method' where  typevalue_name  ='typevalue_gully_method';
+UPDATE sys_foreignkey SET typevalue_name = 'inp_typevalue_gully_type' where  typevalue_name  ='typevalue_gully_outlet_type';
+
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue = ''inp_typevalue_gully_type'''  
 WHERE formname like '%gully%' and columnname ='outlet_type';
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue = ''inp_typevalue_gully_method''' 
 where formname like '%gully%' and columnname ='method';
-
 
 UPDATE inp_gully SET method = 'W_O' WHERE method = 'W/O';
