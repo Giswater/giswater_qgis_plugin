@@ -22,10 +22,10 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psecto
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"plan_psector_x_connec", "column":"link_geom", "newName":"_link_geom_" }}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"plan_psector_x_connec", "column":"userdefined_geom", "newName":"_userdefined_geom_"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_arc", "column":"insert_tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_node", "column":"insert_tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_connec", "column":"insert_tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_other", "column":"insert_tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_arc", "column":"tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_node", "column":"tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_connec", "column":"tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_other", "column":"tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_arc", "column":"insert_user", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_node", "column":"insert_user", "dataType":"text", "isUtils":"False"}}$$);

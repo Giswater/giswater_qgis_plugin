@@ -448,29 +448,26 @@ BEGIN
 				from connec where connec_id=NEW.connec_id), NEW.connec_type, NEW.connec_id);
 		END IF;
 
-		-- Control of automatic insert of link
-		IF NEW.state=1 OR NEW.state=2 THEN
+		-- insertint on psector table
+		IF NEW.state=2 THEN
+			INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, arc_id)
+			VALUES (NEW.connec_id, v_psector_vdefault, 1, true, NEW.arc_id);
+		END IF;
 
-			IF v_connect2network THEN
-
-				IF NEW.state=1 THEN
-					IF NEW.arc_id IS NOT NULL THEN
-						EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-						"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC", "forcedArcs":["'||NEW.arc_id||'"]}}$$)';
-					ELSE
-						EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-						"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
-					END IF;
-									
-					-- recover values in order to do not disturb this workflow
-					SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
-					NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id; 
-
-				ELSIF NEW.state=2 THEN
-					INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, arc_id)
-					VALUES (NEW.connec_id, v_psector_vdefault, 1, true, NEW.arc_id);
-				END IF;
+		-- manage connect2network
+		IF v_connect2network THEN
+		
+			IF NEW.arc_id IS NOT NULL THEN
+				EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+				"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC", "forcedArcs":["'||NEW.arc_id||'"]}}$$)';
+			ELSE
+				EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+				"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
 			END IF;
+
+			-- recover values in order to do not disturb this workflow
+			SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
+			NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id;
 		END IF;
 		
 		-- man addfields insert

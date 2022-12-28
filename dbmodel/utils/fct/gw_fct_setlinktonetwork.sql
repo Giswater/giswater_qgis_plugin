@@ -25,7 +25,7 @@ MAIN CHANGES
 
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3201","3200"]},"data":{"feature_type":"CONNEC", "forcedArcs":["2001","2002"]}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["114545"]},"data":{"feature_type":"CONNEC", "forcedArcs":["2027"]}}$$);
+SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3203"]},"data":{"feature_type":"CONNEC", "forcedArcs":["2095"]}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":
 "SELECT array_to_json(array_agg(connec_id::text)) FROM v_edit_connec WHERE connec_id IS NOT NULL AND state=1"},
@@ -74,6 +74,7 @@ v_isarcdivide boolean;
 v_isoperative_psector boolean = false;
 v_linkexists integer;
 v_linkfrompsector integer;
+v_dfactor double precision;
 
 
 BEGIN
@@ -226,7 +227,20 @@ BEGIN
 
 			-- compute link
 			IF v_arc.the_geom IS NOT NULL THEN
-			
+
+				-- setting variables
+				point_aux := St_closestpoint(v_arc.the_geom, St_endpoint(v_link.the_geom));
+				v_dfactor = 0.3/(st_length(v_arc.the_geom));
+
+				IF v_dfactor > 0.5 THEN v_dfactor = 0.5; END IF;
+					
+				IF st_equals(point_aux, st_endpoint(v_arc.the_geom)) THEN
+					point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, 1-v_dfactor));
+
+				ELSIF st_equals(point_aux, st_startpoint(v_arc.the_geom)) THEN
+					point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, v_dfactor));
+				END IF;
+		
 				IF v_link.the_geom IS NULL THEN
 
 					IF v_link.the_geom IS NULL THEN
@@ -235,7 +249,7 @@ BEGIN
 
 					IF v_link.the_geom IS NULL THEN
 						-- create link geom
-						v_link.the_geom := ST_ShortestLine(v_connect.the_geom, v_arc.the_geom);
+						v_link.the_geom := st_setsrid(ST_makeline(v_connect.the_geom, point_aux), 25831);
 						
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 						VALUES (217, null, 4, concat('Create new link eature with the closest arc.'));
@@ -254,7 +268,6 @@ BEGIN
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 						VALUES (217, null, 4, concat('Reverse the direction of drawn link.'));
 					ELSE
-						point_aux := St_closestpoint(v_endfeature_geom, St_endpoint(v_link.the_geom));
 						v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1),point_aux); 
 					END IF;
 				END IF;

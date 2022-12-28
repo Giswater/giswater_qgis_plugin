@@ -29,10 +29,10 @@ BEGIN
 			EXECUTE 'SELECT state, arc_id FROM connec where connec_id = '''||new.connec_id||''''
 			INTO v_rec;
 
-        	v_link_id = (select link_id from link where feature_id = new.connec_id and feature_type = 'CONNEC' AND exit_id = v_rec.arc_id LIMIT 1);
+			v_link_id = (select link_id from link where feature_id = new.connec_id and feature_type = 'CONNEC' AND exit_id = v_rec.arc_id LIMIT 1);
 
 			-- setting null value for arc
-        	IF NEW.arc_id IS NULL THEN NEW.arc_id = v_rec.arc_id; END IF;
+			IF NEW.arc_id IS NULL THEN NEW.arc_id = v_rec.arc_id; END IF;
 
 			--inserting on tables
 			IF v_rec.state =  1 THEN
@@ -73,6 +73,10 @@ BEGIN
 		RETURN NEW;
 	
 	ELSIF TG_OP = 'UPDATE' THEN
+
+		IF NEW.arc_id IS NULL AND OLD.arc_id IS NOT NULL THEN
+			RAISE EXCEPTION 'THIS CONNEC HAS AN ASSOCIATED LINK. IN SPITE OF TO SET NULL ON ARC_ID, PLEASE REMOVE THE ASSOCIATED LINK AND ARC_ID WILL BE UPDATED TO NULL';
+		END IF;
 
 		IF v_table = 'plan_psector_x_connec' then
 
