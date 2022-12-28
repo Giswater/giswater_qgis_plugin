@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2706
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_minsector(json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_minsector(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_minsector(p_data json)
 RETURNS json AS
 $BODY$

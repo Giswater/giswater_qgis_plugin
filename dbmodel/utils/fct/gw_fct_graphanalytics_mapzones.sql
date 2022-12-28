@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2710
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_mapzones(json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_mapzones(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_mapzones(p_data json)
 RETURNS json AS
 $BODY$

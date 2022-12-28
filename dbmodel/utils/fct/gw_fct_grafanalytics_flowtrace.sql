@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2772
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_flowtrace(p_data json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_flowtrace(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_flowtrace(p_data json)
 RETURNS json AS
 $BODY$
