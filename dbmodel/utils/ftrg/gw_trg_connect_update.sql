@@ -49,14 +49,14 @@ BEGIN
 		IF st_equals (NEW.the_geom, OLD.the_geom) IS FALSE THEN
 
 			--Select links with start on the updated connec
-			querystring := 'SELECT * FROM v_edit_link WHERE (link.feature_id = ' || quote_literal(NEW.connec_id) || ' AND feature_type=''CONNEC'')';
+			querystring := 'SELECT * FROM v_edit_link WHERE feature_id = ' || quote_literal(NEW.connec_id) || ' AND feature_type=''CONNEC''';
 			FOR linkrec IN EXECUTE querystring
 			LOOP
 				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, 0, $2) WHERE link_id = ' || quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom; 
 			END LOOP;
 
 			--Select links with end on the updated connec
-			querystring := 'SELECT * FROM v_edit_link WHERE (link.exit_id = ' || quote_literal(NEW.connec_id) || ' AND exit_type=''CONNEC'')';
+			querystring := 'SELECT * FROM v_edit_link WHERE exit_id = ' || quote_literal(NEW.connec_id) || ' AND exit_type=''CONNEC''';
 			FOR linkrec IN EXECUTE querystring
 			LOOP
 				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(linkrec."link_id") 
@@ -126,14 +126,14 @@ BEGIN
 		IF st_equals (NEW.the_geom, OLD.the_geom) IS FALSE THEN
 	
 			--Select links with start on the updated gully
-			querystring := 'SELECT * FROM v_edit_link WHERE (link.feature_id = ' || quote_literal(NEW.gully_id) || ' AND feature_type=''GULLY'')';
+			querystring := 'SELECT * FROM v_edit_link WHERE feature_id = ' || quote_literal(NEW.gully_id) || ' AND feature_type=''GULLY''';
 			FOR linkrec IN EXECUTE querystring
 			LOOP
 				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, 0, $2) WHERE link_id = ' || quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom; 
 			END LOOP;
 
 			--Select links with end on the updated gully
-			querystring := 'SELECT * FROM v_edit_link WHERE (link.exit_id = ' || quote_literal(NEW.gully_id) || ' AND exit_type=''GULLY'')';
+			querystring := 'SELECT * FROM v_edit_link WHERE exit_id = ' || quote_literal(NEW.gully_id) || ' AND exit_type=''GULLY''';
 			FOR linkrec IN EXECUTE querystring
 			LOOP
 				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(linkrec."link_id") 

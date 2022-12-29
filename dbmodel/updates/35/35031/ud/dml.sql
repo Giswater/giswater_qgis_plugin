@@ -198,3 +198,13 @@ UPDATE config_form_fields SET dv_querytext = 'SELECT id, idval FROM inp_typevalu
 where formname like '%gully%' and columnname ='method';
 
 UPDATE inp_gully SET method = 'W_O' WHERE method = 'W/O';
+
+UPDATE sys_param_user SET dv_querytext ='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue = ''inp_typevalue_gully_type''', 
+vdefault = 'To_network' WHERE id = 'epa_gully_outlet_type_vdefault';
+UPDATE sys_param_user SET dv_querytext ='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue = ''inp_typevalue_gully_method''', 
+vdefault = 'W_O' WHERE id = 'epa_gully_method_vdefault';
+
+UPDATE config_param_user SET value = 'To_network' WHERE parameter = 'epa_gully_outlet_type_vdefault';
+UPDATE config_param_user SET value = 'W_O' WHERE parameter = 'epa_gully_method_vdefault';
+
+

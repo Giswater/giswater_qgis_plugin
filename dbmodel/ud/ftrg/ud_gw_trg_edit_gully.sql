@@ -58,7 +58,7 @@ v_epa_gully_method text;
 v_epa_gully_orifice_cd float;
 v_epa_gully_outlet_type text; 
 v_epa_gully_weir_cd float;
-v_arc text;
+v_arc record;
 v_link integer;
 v_link_geom public.geometry;
 v_connect2network boolean;
@@ -115,8 +115,13 @@ BEGIN
 			END IF;
 		END IF;
 
+		-- setting psector vdefault as visible
+		IF NEW.state = 2 THEN
+			INSERT INTO selector_psector (psector_id, cur_user) VALUES (v_psector_vdefault, current_user) 
+			ON CONFLICT DO NOTHING;
+		END IF;
 	END IF;
-	
+
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
 
@@ -567,7 +572,7 @@ BEGIN
 
 		END IF;
 
-		-- insertint on psector table
+		-- insertint on psector table and setting visible 
 		IF NEW.state=2 THEN
 			INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, doable, arc_id)
 			VALUES (NEW.gully_id, v_psector_vdefault, 1, true, NEW.arc_id);

@@ -73,7 +73,12 @@ BEGIN
 				"data":{"message":"3144", "function":"1204","debug_msg":"'||NEW.arc_id::text||'"}}$$);';
 			END IF;
 		END IF;
-		
+
+		-- setting psector vdefault as visible
+		IF NEW.state = 2 THEN
+			INSERT INTO selector_psector (psector_id, cur_user) VALUES (v_psector_vdefault, current_user) 
+			ON CONFLICT DO NOTHING;
+		END IF;
 	END IF;
         
 	-- Control insertions ID
