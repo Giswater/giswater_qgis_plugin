@@ -651,10 +651,11 @@ BEGIN
 
 			-- when connec_id comes on psector_table
 			IF NEW.state = 1 AND (SELECT gully_id FROM plan_psector_x_gully JOIN selector_psector USING (psector_id)
-						WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND cur_user = current_user AND state = 1) IS NOT NULL THEN
+				WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND cur_user = current_user AND state = 1) IS NOT NULL THEN
 						
-				RAISE EXCEPTION 'IT IS NOT POSSIBLE TO RELATE FOR OPERATIVE CONNECS INVOLVED INVOLVED ON SOME VISIBLE PSECTOR. PLEASE, USE LINK2NETWORK TOOL OR PSECTOR DIALOG TO RE-CONNECT';
-
+				EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+				"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY", "forcedArcs":["'||NEW.arc_id||'"]}}$$)';			
+				
 			ELSIF NEW.state = 2 THEN
 
 				IF NEW.arc_id IS NOT NULL THEN
@@ -664,10 +665,6 @@ BEGIN
 
 						EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 						"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY", "forcedArcs":["'||NEW.arc_id||'"]}}$$)';			
-
-						-- recover values in order to do not disturb this workflow
-						SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
-						NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id; 
 					END IF;
 				ELSE
 					IF (SELECT link_id FROM plan_psector_x_gully JOIN selector_psector USING (psector_id)
