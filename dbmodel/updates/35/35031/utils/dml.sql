@@ -127,3 +127,7 @@ VALUES (3174, 'gw_trg_edit_plan_psector_x_connect', 'utils', 'trigger function',
 DELETE FROM sys_table WHERE id = 'vnode';
 DELETE FROM sys_table WHERE id = 'v_arc_x_vnode';
 DELETE FROM sys_table WHERE id = 'v_vnode';
+
+Update sys_fprocess SET fprocess_name = 'Repair temp_link' WHERE fid = 296;
+Update sys_fprocess SET fprocess_name = 'Repair link' WHERE fid = 301;
+DELETE FROM sys_fprocess  WHERE fid IN (298,300);
