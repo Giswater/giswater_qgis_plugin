@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 INSERT INTO inp_gully (gully_id, outlet_type, method, weir_cd, orifice_cd, efficiency)
-SELECT gully_id, 'To_network', 'W/O', 1.6, 0.7, 90 FROM gully;
+SELECT gully_id, 'To_network', 'W_O', 1.6, 0.7, 90 FROM gully;
 
 UPDATE man_netgully set gratecat_id = 'SGRT3';
 
