@@ -13,39 +13,68 @@ RETURNS json AS
 $BODY$
 
 /*
-GOAL:
+GOAL
+----
 This function have been refactorized on 2022/12 changing the full strategy of links
-	
+
+DESCRIPTION
+-----------
+No doubt this is the most important function for links. Lots of procedures and workflows works with this function. See: https://github.com/Giswater/giswater_dbmodel/wiki/Links-Workflows.
+Main workflows:
+- Create a new link with or without defined target for operative connects
+- Create a new link  with or without defined target for operative connects in order to be used on psector strategy
+- Create a new link with or without defined target for planned connects 
+- Redraw an existing link when target feature have been changed
+- Reverse link geom when need in order to repair it
+
+
+EXAMPLES
+--------
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3201","3200"]},"data":{"feature_type":"CONNEC", "forcedArcs":["2001","2002"]}}$$);
-
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3203"]},"data":{"feature_type":"CONNEC", "forcedArcs":["2095"]}}$$);
-
-SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":
-"SELECT array_to_json(array_agg(connec_id::text)) FROM v_edit_connec WHERE connec_id IS NOT NULL AND state=1"},
-"data":{"feature_type":"CONNEC"}}$$);
+SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":
+{"id":"SELECT array_to_json(array_agg(connec_id::text)) FROM v_edit_connec WHERE connec_id IS NOT NULL AND state=1"},"data":{"feature_type":"CONNEC"}}$$);
 
 --fid: 217
 
 */
 
 DECLARE
-	
-v_connect record;
-v_link record;
-v_exit record;
-v_arc record;
-v_connect_id  varchar;
-point_aux public.geometry;
-aux_geom public.geometry;
-v_node_proximity double precision;
-v_projecttype text;
-v_endfeature_geom public.geometry;
-v_pjointtype text;
-v_pjointid text;
-v_feature_text text;
-v_feature_array text[];
-v_feature_type text;
-	
+
+
+-- input variables
+v_feature_type text;-- Type of features affected
+v_feature_ids text; -- List of feature affected
+v_forcedarcs text; -- Used to force only some specific arcs
+v_ispsector boolean; -- When function is called from psector side (gw_trg_plan_psector_link)
+v_isarcdivide boolean;	-- When function is called for arcdivide procedure (gw_fct_setarcdivide)
+v_link_id integer; -- Id for link
+
+-- standard variables
+v_projecttype text; -- To store project type (UD / WS)
+v_version text; -- To store version of system
+v_psector_current integer; -- Current psector related to user
+
+-- process variables
+v_connect record; -- Record to store the value for the used connect
+v_link record; -- Record to store the value for the used link
+v_arc record; -- Record to store the value for the used arc
+v_connect_id  varchar; -- id for the used connect
+v_point_aux public.geometry; -- Variable to store the geometry of the end of the link
+v_feature_array text[]; -- Transforming v_feature_ids on real array
+
+v_endfeature_geom public.geometry; -- Variable to store the geometry of the end object, as well as node, connec, gully or arc
+v_pjointtype text; -- Type for the destination feature (ARC, NODE, CONNEC, GULLY)
+v_pjointid text; -- Id for the destination feature
+
+v_count integer; -- Counter
+
+v_isoperative_psector boolean = false; -- It shows when the worflow comes from psector but for those existing connects which they are involved on psector
+v_existing_link integer; -- link_id: In case of psector for operative links, we collect the value of the operative link
+v_linkfrompsector integer; -- link_id: It is the id of link stored on psector table
+v_dfactor double precision;  -- Distance factor. Value 0-1 used to separate link from the endpoints of arcs. Only applied to ws. For UD it is more understandable to connect with nodes
+
+-- return variables
 v_result text;
 v_result_info text;
 v_result_point text;
@@ -56,18 +85,6 @@ v_audit_result text;
 v_level integer;
 v_status text;
 v_message text;
-v_version text;
-v_autoupdate_fluid boolean;
-v_forcedarcs text;
-v_count integer;
-v_psector_vdefault integer;
-v_link_id integer;
-v_ispsector boolean;
-v_isarcdivide boolean;
-v_isoperative_psector boolean = false;
-v_linkexists integer;
-v_linkfrompsector integer;
-v_dfactor double precision;
 
 
 BEGIN
@@ -75,18 +92,15 @@ BEGIN
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='edit_node_proximity';
-	IF v_node_proximity IS NULL THEN v_node_proximity=0.01; END IF;
-
 	-- get system variables
 	SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get user variables
-	v_psector_vdefault = (SELECT value::integer FROM config_param_user WHERE parameter = 'plan_psector_vdefault' AND cur_user = current_user);
+	v_psector_current = (SELECT value::integer FROM config_param_user WHERE parameter = 'plan_psector_vdefault' AND cur_user = current_user);
 
 	-- get parameters from input json
 	v_feature_type =  ((p_data ->>'data')::json->>'feature_type'::text);
-	v_feature_text = ((p_data ->>'feature')::json->>'id'::text);
+	v_feature_ids = ((p_data ->>'feature')::json->>'id'::text);
 	v_forcedarcs = (p_data->>'data')::json->>'forcedArcs';
 	v_ispsector = (p_data->>'data')::json->>'isPsector';
 	v_isarcdivide = (p_data->>'data')::json->>'isArcDivide';
@@ -101,11 +115,11 @@ BEGIN
 	end if;
 
 	-- get values from feature array 
-	IF v_feature_text ILIKE '[%]' THEN
-		v_feature_array = ARRAY(SELECT json_array_elements_text(v_feature_text::json)); 		
+	IF v_feature_ids ILIKE '[%]' THEN
+		v_feature_array = ARRAY(SELECT json_array_elements_text(v_feature_ids::json)); 		
 	ELSE 
-		EXECUTE v_feature_text INTO v_feature_text;
-		v_feature_array = ARRAY(SELECT json_array_elements_text(v_feature_text::json)); 
+		EXECUTE v_feature_ids INTO v_feature_ids;
+		v_feature_array = ARRAY(SELECT json_array_elements_text(v_feature_ids::json)); 
 	END IF;
 
 	-- delete old values on result table
@@ -131,7 +145,7 @@ BEGIN
 		IF v_feature_type ='CONNEC' THEN          
 			SELECT * INTO v_connect FROM v_edit_connec WHERE connec_id = v_connect_id;
 
-			IF (SELECT connec_id FROM plan_psector_x_connec WHERE connec_id = v_connect.connec_id AND psector_id = v_psector_vdefault AND psector_id
+			IF (SELECT connec_id FROM plan_psector_x_connec WHERE connec_id = v_connect.connec_id AND psector_id = v_psector_current AND psector_id
 				IN (SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1) IS NOT NULL AND v_connect.state = 1 THEN
 				v_isoperative_psector = true;
 				v_linkfrompsector = (SELECT link_id FROM plan_psector_x_connec WHERE connec_id = v_connect.connec_id AND psector_id IN
@@ -141,7 +155,7 @@ BEGIN
 		ELSIF v_feature_type ='GULLY' THEN 
 			SELECT * INTO v_connect FROM v_edit_gully WHERE gully_id = v_connect_id;
 			
-			IF (SELECT gully_id FROM plan_psector_x_gully WHERE gully_id = v_connect.gully_id AND psector_id = v_psector_vdefault AND psector_id IN
+			IF (SELECT gully_id FROM plan_psector_x_gully WHERE gully_id = v_connect.gully_id AND psector_id = v_psector_current AND psector_id IN
 			   (SELECT psector_id FROM selector_psector WHERE cur_user = current_user) AND state = 1) IS NOT NULL AND v_connect.state = 1 THEN
 				v_isoperative_psector = true;
 				v_linkfrompsector = (SELECT link_id FROM plan_psector_x_gully WHERE gully_id = v_connect.gully_id AND psector_id IN
@@ -224,7 +238,7 @@ BEGIN
 			IF v_arc.the_geom IS NOT NULL THEN
 
 				-- setting point aux
-				point_aux := St_closestpoint(v_arc.the_geom, St_endpoint(v_link.the_geom));
+				v_point_aux := St_closestpoint(v_arc.the_geom, St_endpoint(v_link.the_geom));
 
 				-- setting distance factor
 				IF v_projecttype  ='WS' THEN
@@ -235,11 +249,11 @@ BEGIN
 				END IF;		
 
 				-- updating pjoint
-				IF st_equals(point_aux, st_endpoint(v_arc.the_geom)) THEN
-					point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, 1-v_dfactor));
+				IF st_equals(v_point_aux, st_endpoint(v_arc.the_geom)) THEN
+					v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, 1-v_dfactor));
 
-				ELSIF st_equals(point_aux, st_startpoint(v_arc.the_geom)) THEN
-					point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, v_dfactor));
+				ELSIF st_equals(v_point_aux, st_startpoint(v_arc.the_geom)) THEN
+					v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, v_dfactor));
 				END IF;
 		
 				IF v_link.the_geom IS NULL AND v_pjointtype='ARC' THEN
@@ -250,7 +264,7 @@ BEGIN
 
 					IF v_link.the_geom IS NULL THEN
 						-- create link geom
-						v_link.the_geom := st_setsrid(ST_makeline(v_connect.the_geom, point_aux), 25831);
+						v_link.the_geom := st_setsrid(ST_makeline(v_connect.the_geom, v_point_aux), 25831);
 						
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 						VALUES (217, null, 4, concat('Create new link eature with the closest arc.'));
@@ -265,13 +279,13 @@ BEGIN
 				
 					-- Reverse (if it's need) the existing link geometry
 					IF (st_dwithin (st_startpoint(v_link.the_geom), v_connect.the_geom, 0.01)) IS FALSE THEN
-						point_aux := St_closestpoint(v_endfeature_geom, St_startpoint(v_link.the_geom));
-						v_link.the_geom = ST_SetPoint(v_link.the_geom, 0, point_aux) ; 
+						v_point_aux := St_closestpoint(v_endfeature_geom, St_startpoint(v_link.the_geom));
+						v_link.the_geom = ST_SetPoint(v_link.the_geom, 0, v_point_aux) ; 
 
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 						VALUES (217, null, 4, concat('Reverse the direction of drawn link.'));
 					ELSE
-						v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1),point_aux); 
+						v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1),v_point_aux); 
 					END IF;
 				ELSE
 					-- do nothing for those links coming from connec, guly, node
@@ -310,11 +324,11 @@ BEGIN
 				IF v_ispsector THEN -- then returning link
 
 					IF v_feature_type ='CONNEC' THEN
-						UPDATE plan_psector_x_connec SET link_id = v_link.link_id WHERE psector_id = v_psector_vdefault 
+						UPDATE plan_psector_x_connec SET link_id = v_link.link_id WHERE psector_id = v_psector_current 
 						AND connec_id = v_connect_id AND state = 1;
 						
 					ELSIF v_feature_type ='GULLY' THEN
-						UPDATE plan_psector_x_gully SET link_id = v_link.link_id WHERE psector_id = v_psector_vdefault 
+						UPDATE plan_psector_x_gully SET link_id = v_link.link_id WHERE psector_id = v_psector_current 
 						AND gully_id = v_connect_id  AND state = 1;
 					END IF;
 
@@ -324,26 +338,26 @@ BEGIN
 
 					IF v_feature_type ='CONNEC' THEN
 						UPDATE plan_psector_x_connec SET link_id = v_link.link_id, arc_id = v_arc.arc_id  
-						WHERE psector_id = v_psector_vdefault AND connec_id = v_connect_id AND state = 1;
+						WHERE psector_id = v_psector_current AND connec_id = v_connect_id AND state = 1;
 						
 					ELSIF v_feature_type ='GULLY' THEN
 						UPDATE plan_psector_x_gully SET link_id = v_link.link_id, arc_id = v_arc.arc_id 
-						WHERE psector_id = v_psector_vdefault AND gully_id = v_connect_id  AND state = 1;
+						WHERE psector_id = v_psector_current AND gully_id = v_connect_id  AND state = 1;
 					END IF;
 
 					UPDATE link SET state = 2 WHERE link_id  = v_link.link_id;
 
 					IF v_isoperative_psector THEN
 
-						SELECT link_id INTO v_linkexists FROM link WHERE feature_id = v_connect_id AND state = 1 LIMIT 1;
+						SELECT link_id INTO v_existing_link FROM link WHERE feature_id = v_connect_id AND state = 1 LIMIT 1;
 
 						IF v_feature_type ='CONNEC' THEN
-							INSERT INTO plan_psector_x_connec (psector_id, connec_id, state, link_id) VALUES (v_psector_vdefault, v_connect_id, 0, v_linkexists)
-							ON CONFLICT (psector_id, connec_id, state) DO UPDATE set link_id = v_linkexists;
+							INSERT INTO plan_psector_x_connec (psector_id, connec_id, state, link_id) VALUES (v_psector_current, v_connect_id, 0, v_existing_link)
+							ON CONFLICT (psector_id, connec_id, state) DO UPDATE set link_id = v_existing_link;
 							
 						ELSIF v_feature_type ='GULLY' THEN
-							INSERT INTO plan_psector_x_gully (psector_id, gully_id, state, link_id) VALUES (v_psector_vdefault, v_connect_id, 0, v_linkexists)
-							ON CONFLICT (psector_id, gully_id, state) DO UPDATE set link_id = v_linkexists;
+							INSERT INTO plan_psector_x_gully (psector_id, gully_id, state, link_id) VALUES (v_psector_current, v_connect_id, 0, v_existing_link)
+							ON CONFLICT (psector_id, gully_id, state) DO UPDATE set link_id = v_existing_link;
 						END IF;
 					END IF;					
 					
@@ -375,11 +389,11 @@ BEGIN
 				IF v_ispsector IS TRUE THEN -- then returning link
 
 					IF v_feature_type ='CONNEC' THEN
-						UPDATE plan_psector_x_connec SET link_id = v_link.link_id WHERE psector_id = v_psector_vdefault 
+						UPDATE plan_psector_x_connec SET link_id = v_link.link_id WHERE psector_id = v_psector_current 
 						AND connec_id = v_connect_id AND state = 1;
 					
 					ELSIF v_feature_type ='GULLY' THEN
-						UPDATE plan_psector_x_gully SET link_id = v_link.link_id WHERE psector_id = v_psector_vdefault
+						UPDATE plan_psector_x_gully SET link_id = v_link.link_id WHERE psector_id = v_psector_current
 						 AND gully_id = v_connect_id AND state = 1;
 					END IF;
 
@@ -387,12 +401,12 @@ BEGIN
 
 					IF v_feature_type ='CONNEC' THEN
 						UPDATE plan_psector_x_connec SET link_id = v_link.link_id, arc_id = v_arc.arc_id 
-						WHERE psector_id = v_psector_vdefault AND connec_id = v_connect_id AND state = 1;
+						WHERE psector_id = v_psector_current AND connec_id = v_connect_id AND state = 1;
 					
 					ELSIF v_feature_type ='GULLY' THEN
 						
 						UPDATE plan_psector_x_gully SET link_id = v_link.link_id, arc_id = v_arc.arc_id 
-						WHERE psector_id = v_psector_vdefault AND gully_id = v_connect_id AND state = 1;
+						WHERE psector_id = v_psector_current AND gully_id = v_connect_id AND state = 1;
 					END IF;
 				END IF;
 			END IF;
@@ -403,7 +417,6 @@ BEGIN
 			-- reset values
 			v_connect := null;
 			v_link := null;
-			v_exit := null;
 			v_arc := null;
 		END IF;
 	    END LOOP;
@@ -441,9 +454,9 @@ BEGIN
 		       '}'||
 	    '}')::json, 2124, null, null, null);
 
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$
