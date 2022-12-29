@@ -223,12 +223,18 @@ BEGIN
 			-- compute link
 			IF v_arc.the_geom IS NOT NULL THEN
 
-				-- setting variables
+				-- setting point aux
 				point_aux := St_closestpoint(v_arc.the_geom, St_endpoint(v_link.the_geom));
-				v_dfactor = 0.3/(st_length(v_arc.the_geom));
 
-				IF v_dfactor > 0.5 THEN v_dfactor = 0.5; END IF;
-					
+				-- setting distance factor
+				IF v_projecttype  ='WS' THEN
+					v_dfactor = 0.3/(st_length(v_arc.the_geom));
+					IF v_dfactor > 0.5 THEN v_dfactor = 0.5; END IF;
+				ELSIF  v_projecttype  ='UD' THEN
+					v_dfactor = 0;
+				END IF;		
+
+				-- updating pjoint
 				IF st_equals(point_aux, st_endpoint(v_arc.the_geom)) THEN
 					point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, 1-v_dfactor));
 
@@ -254,6 +260,7 @@ BEGIN
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 						VALUES (217, null, 4, concat('Creating new link by using geometry of existing one.'));
 					END IF;
+					
 				ELSIF v_link.the_geom IS NOT NULL AND v_pjointtype='ARC' THEN
 				
 					-- Reverse (if it's need) the existing link geometry
@@ -267,7 +274,7 @@ BEGIN
 						v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1),point_aux); 
 					END IF;
 				ELSE
-					-- do nothing for those links they comes from connec, guly, node
+					-- do nothing for those links coming from connec, guly, node
 				END IF;
 			END IF;
 
