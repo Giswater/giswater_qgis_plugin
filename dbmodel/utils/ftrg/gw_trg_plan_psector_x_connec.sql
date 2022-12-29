@@ -7,28 +7,19 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2936
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_plan_psector_x_connec()
-  RETURNS trigger AS
+RETURNS trigger AS
 $BODY$
 
-/*
-This trigger controls if connect has link and wich class of link it has as well as sets some values for states
-*/
 
 DECLARE 
 v_stateaux smallint;
 
 BEGIN 
 
-    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	SELECT connec.state INTO v_stateaux FROM connec WHERE connec_id=NEW.connec_id;
-	
-	/*IF NEW.state IS NULL AND v_stateaux=1 THEN
-		NEW.state=0;
-	ELSIF NEW.state IS NULL AND v_stateaux=2 THEN
-		NEW.state=1;
-	END IF;*/
-	
+		
 	IF NEW.state = 1 AND v_stateaux = 1 THEN
 		NEW.doable=false;
 		-- looking for arc_id state=2 closest
@@ -43,7 +34,6 @@ BEGIN
 		END IF;
 		NEW.state = 1;
 		NEW.doable=true;
-		-- looking for arc_id state=2 closest
 	END IF;
 	
 	-- profilactic control of doable
