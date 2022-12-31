@@ -11,19 +11,13 @@ CREATE TABLE IF NOT EXISTS drainzone
 (  drainzone_id serial PRIMARY KEY,
   name character varying(30),
   expl_id integer,
-  macrodma_id integer,
   descript text,
   undelete boolean,
   the_geom geometry(MultiPolygon,SRID_VALUE),
-  minc double precision,
-  maxc double precision,
-  effc double precision,
-  pattern_id character varying(16),
   link text,
-  graphconfig json,
+  graphconfig json DEFAULT '{"use":[{"nodeParent":""}], "ignore":[], "forceClosed":[]}'::json,,
   stylesheet json,
-  active boolean DEFAULT true,
-  avg_press numeric);
+  active boolean DEFAULT true);
 
 ALTER TABLE drainzone ALTER COLUMN graphconfig SET DEFAULT '{"use":[{"nodeParent":""}], "ignore":[], "forceClosed":[]}'::json;
 
