@@ -208,3 +208,21 @@ UPDATE config_param_user SET value = 'To_network' WHERE parameter = 'epa_gully_o
 UPDATE config_param_user SET value = 'W_O' WHERE parameter = 'epa_gully_method_vdefault';
 
 
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3186, 'gw_fct_epa_setjunctionsoutlet', 'ud', 'function', 'json', 'json', 'Function to set junctions as oultets of subcatchments filtering by a minimum distance one each other',
+'role_epa',null,'core')  ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (484, 'Set junctions as outlet', 'ud', NULL, 'core', true, 'Function process', NULL)
+ ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
+VALUES (3186, 'Set junctions as outlet', '{"featureType":["NODE"]}', 
+'[{"widgetname":"minDistance", "label":"Junction minimum distance","widgettype":"linetext","datatype":"text", "isMandatory":true, "tooltip":"Value to set minimum distance for junctions" , "placeholder":"10", "layoutname":"grl_option_parameters","layoutorder":1, "value":""}]',
+NULL, TRUE) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_function
+VALUES (3186, 'gw_fct_epa_setjunctionsoutlet', '{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}')
+ ON CONFLICT (id) DO NOTHING;
