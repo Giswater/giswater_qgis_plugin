@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS drainzone
   undelete boolean,
   the_geom geometry(MultiPolygon,SRID_VALUE),
   link text,
-  graphconfig json DEFAULT '{"use":[{"nodeParent":""}], "ignore":[], "forceClosed":[]}'::json,,
+  graphconfig json DEFAULT '{"use":[{"nodeParent":""}], "ignore":[], "forceClosed":[]}'::json,
   stylesheet json,
   active boolean DEFAULT true);
 
