@@ -789,6 +789,7 @@ CREATE OR REPLACE VIEW vu_connec AS
     connec.access_type,
     connec.placement_type,
     connec.crmzone_id,
+    crm_zone.name AS crmzone_name,
     e.press_max, 
     e.press_min, 
     e.press_avg,
@@ -808,6 +809,7 @@ CREATE OR REPLACE VIEW vu_connec AS
      LEFT JOIN exploitation ON connec.expl_id = exploitation.expl_id
      LEFT JOIN dqa ON connec.dqa_id = dqa.dqa_id
      LEFT JOIN presszone ON presszone.presszone_id::text = connec.presszone_id::text
+     LEFT JOIN crm_zone ON crm_zone.id::text = connec.crmzone_id::text
      LEFT JOIN v_ext_streetaxis c ON c.id::text = connec.streetaxis_id::text
      LEFT JOIN v_ext_streetaxis b ON b.id::text = connec.streetaxis2_id::text
      LEFT JOIN connec_add e ON e.connec_id = connec.connec_id;
@@ -987,7 +989,8 @@ CREATE OR REPLACE VIEW v_connec AS
     vu_connec.demand,
     vu_connec.om_state,
     vu_connec.conserv_state,
-    vu_connec.crmzone_id
+    crmzone_id,
+    crmzone_name
    FROM vu_connec
      JOIN v_state_connec USING (connec_id)
     LEFT JOIN (SELECT DISTINCT ON (feature_id) * FROM v_link_connec WHERE state = 2) a ON feature_id = connec_id;
@@ -1228,6 +1231,8 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_connec"], "fieldName":"conserv_state", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_connec"], "fieldName":"crmzone_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"crmzone_name", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_connec"], "fieldName":"press_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
