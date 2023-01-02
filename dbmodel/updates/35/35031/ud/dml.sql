@@ -226,3 +226,20 @@ VALUES (3186, 'gw_fct_epa_setjunctionsoutlet', '{"style":{"point":{"style":"uniq
 "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
 "polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}')
  ON CONFLICT (id) DO NOTHING;
+ 
+ 
+delete from config_form_tableview where tablename='plan_psector_x_gully';
+
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_gully', 'id', 0, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_gully', 'gully_id', 1, true, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_gully', 'arc_id', 2, true, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_gully', 'psector_id', 3, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_gully', 'state', 4, true, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_gully', 'doable', 5, true, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_gully', 'descript', 6, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_gully', '_link_geom_', 7, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_gully', '_userdefined_geom_', 8, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_gully', 'link_id', 9, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_gully', 'active', 10, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_gully', 'insert_tstamp', 11, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_gully', 'insert_user', 12, false, NULL, NULL, NULL);

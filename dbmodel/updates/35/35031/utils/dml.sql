@@ -179,3 +179,48 @@ UPDATE sys_function SET function_type='function' WHERE function_name='gw_fct_get
 
 UPDATE sys_function SET function_name='gw_trg_edit_inp_dscenario_demand' WHERE function_name='gw_trg_edit_inp_demand';
 UPDATE sys_function SET function_name='gw_fct_setfeaturereplaceplan' WHERE function_name='gw_fct_setreplacefeatureplan';
+
+
+delete from config_form_tableview where tablename='plan_psector_x_connec';
+
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_connec', 'id', 0, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_connec', 'connec_id', 1, true, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_connec', 'arc_id', 2, true, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_connec', 'psector_id', 3, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_connec', 'state', 4, true, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_connec', 'doable', 5, true, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_connec', 'descript', 6, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_connec', '_link_geom_', 7, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_connec', '_userdefined_geom_', 8, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_connec', 'link_id', 9, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_connec', 'active', 10, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_connec', 'insert_tstamp', 11, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_connec', 'insert_user', 12, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_connec', 'rank', 13, false, NULL, NULL, NULL);
+
+
+delete from config_form_tableview where tablename='plan_psector_x_arc';
+
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_arc', 'id', 0, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_arc', 'arc_id', 1, true, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_arc', 'psector_id', 2, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_arc', 'state', 3, true, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_arc', 'doable', 4, true, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_arc', 'descript', 5, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_arc', 'addparam', 6, true, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_arc', 'active', 7, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_arc', 'insert_tstamp', 8, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_arc', 'insert_user', 9, false, NULL, NULL, NULL);
+
+
+delete from config_form_tableview where tablename='plan_psector_x_node';
+
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'id', 0, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'node_id', 1, true, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'psector_id', 2, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'state', 3, true, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'doable', 4, true, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'descript', 5, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'active', 6, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'insert_tstamp', 7, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'insert_user', 8, false, NULL, NULL, NULL);
