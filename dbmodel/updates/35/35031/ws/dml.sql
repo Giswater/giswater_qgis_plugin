@@ -213,12 +213,12 @@ datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isauto
   t1 AS
 (SELECT distinct formname, formtype, tabname, 'om_state' as columnname, 'lyt_data_1' as layoutname, max(layoutorder)+1 as layoutorder, 
             'string' as datatype, 'text' as widgettype, 'om_state' as label, 'om_state' as tooltip,  false as ismandatory, 
-            false as isparent, false as iseditable, false as isautoupdate, false as hidden
+            false as isparent, true as iseditable, false as isautoupdate, false as hidden
 FROM config_form_fields
 WHERE  formname ilike 've_arc%' or formname ilike 'v_edit_arc' group by formname,formtype, tabname),
   t2 AS
 (SELECT distinct formname, formtype, tabname, 'conserv_state', 'lyt_data_1', max(layoutorder)+2, 
-            'string', 'text', 'conserv_state', 'conserv_state',  false, false, false, false, false
+            'string', 'text', 'conserv_state', 'conserv_state',  false, false, true, false, false
 FROM config_form_fields
 WHERE  formname ilike 've_arc%' or formname ilike 'v_edit_arc' group by formname,formtype, tabname)
 select * from t1
