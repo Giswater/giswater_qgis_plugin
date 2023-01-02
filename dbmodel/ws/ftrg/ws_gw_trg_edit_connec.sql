@@ -447,6 +447,15 @@ BEGIN
 			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'connec_function_vdefault' AND cur_user = current_user);
 		END IF;
 
+		-- crmzone_id 
+		IF (NEW.crmzone_id IS NULL) THEN
+			-- getting value from geometry of mapzone
+			IF (NEW.crmzone_id IS NULL) THEN
+				SELECT count(*) INTO v_count FROM crm_zone WHERE ST_DWithin(NEW.the_geom, crm_zone.the_geom,0.001);
+				NEW.district_id = (SELECT crmzone_id FROM crm_zone WHERE ST_DWithin(NEW.the_geom, crm_zone.the_geom,0.001) LIMIT 1);	
+			END IF;	        
+		END IF;
+
 		--elevation from raster
 		IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE 
 		 AND (NEW.elevation IS NULL) AND
@@ -464,13 +473,15 @@ BEGIN
 		function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2, 
 		muni_id, streetaxis_id,  postcode, district_id, postcomplement, postcomplement2, descript, link, verified, rotation,  the_geom, undelete, label_x,label_y,label_rotation, expl_id,
 		publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, staticpressure, pjoint_id, pjoint_type,
-		adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id, epa_type)		
+		adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id, epa_type, om_state, conserv_state, priority, 
+		valve_location, valve_type, shutoff_valve, access_type, placement_type, crmzone_id)
 		VALUES (NEW.connec_id, NEW.code, NEW.elevation, NEW.depth, NEW.connecat_id, NEW.sector_id, NEW.customer_code,  NEW.state, NEW.state_type, NEW.annotation,   NEW.observ, NEW.comment, 
 		NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type,  NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,  NEW.workcat_id_plan, NEW.buildercat_id,
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, v_streetaxis, NEW.postnumber, NEW.postnumber2, NEW.muni_id, v_streetaxis, NEW.postcode, NEW.district_id, NEW.postcomplement, 
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.verified, NEW.rotation, NEW.the_geom,NEW.undelete,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory, 
 		NEW.num_value, NEW.connec_length, NEW.arc_id, NEW.minsector_id, NEW.dqa_id, NEW.staticpressure, NEW.pjoint_id, NEW.pjoint_type,
-		NEW.adate, NEW.adescript, NEW.accessibility, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.epa_type);
+		NEW.adate, NEW.adescript, NEW.accessibility, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.epa_type, NEW.om_state, NEW.conserv_state, NEW.priority,
+		NEW.valve_location, NEW.valve_type, NEW.shutoff_valve, NEW.access_type, NEW.placement_type, NEW.crmzone_id);
 		
 
 		SELECT system_id, cat_feature.id INTO v_system_id, v_featurecat_id FROM cat_feature 
@@ -492,8 +503,8 @@ BEGIN
 
 
 		IF v_man_table='man_greentap' THEN
-			INSERT INTO man_greentap (connec_id, linked_connec, brand, model) 
-			VALUES(NEW.connec_id, NEW.linked_connec, NEW.brand, NEW.model); 
+			INSERT INTO man_greentap (connec_id, linked_connec, brand, model, greentap_type, cat_valve) 
+			VALUES(NEW.connec_id, NEW.linked_connec, NEW.brand, NEW.model, NEW.greentap_type, NEW.cat_valve); 
 		
 		ELSIF v_man_table='man_fountain' THEN 
 			
@@ -507,8 +518,8 @@ BEGIN
 			VALUES (NEW.connec_id, NEW.linked_connec, NEW.cat_valve, NEW.drain_diam, NEW.drain_exit, NEW.drain_gully, NEW.drain_distance, NEW.arq_patrimony, NEW.com_state);
 		  
 		ELSIF v_man_table='man_wjoin' THEN  
-		 	INSERT INTO man_wjoin (connec_id, top_floor, cat_valve, brand, model) 
-			VALUES (NEW.connec_id, NEW.top_floor, NEW.cat_valve, NEW.brand, NEW.model);
+		 	INSERT INTO man_wjoin (connec_id, top_floor, cat_valve, brand, model, wjoin_type) 
+			VALUES (NEW.connec_id, NEW.top_floor, NEW.cat_valve, NEW.brand, NEW.model, NEW.wjoin_type);
 			
 		END IF;	
 
@@ -771,17 +782,20 @@ BEGIN
 			undelete=NEW.undelete, label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,publish=NEW.publish, 
 			inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, connec_length=NEW.connec_length, link=NEW.link, lastupdate=now(), lastupdate_user=current_user,
 			dqa_id=NEW.dqa_id, minsector_id=NEW.minsector_id, staticpressure=NEW.staticpressure, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
-			adate=NEW.adate, adescript=NEW.adescript, accessibility =  NEW.accessibility, asset_id=NEW.asset_id, epa_type = NEW.epa_type
+			adate=NEW.adate, adescript=NEW.adescript, accessibility =  NEW.accessibility, asset_id=NEW.asset_id, epa_type = NEW.epa_type,
+			om_state = NEW.om_state, conserv_state = NEW.conserv_state, priority = NEW.priority,
+			valve_location = NEW.valve_location, valve_type = NEW.valve_type, shutoff_valve = NEW.shutoff_valve, access_type = NEW.access_type, placement_type = NEW.placement_type,
+			crmzone_id=NEW.crmzone_id
 			WHERE connec_id=OLD.connec_id;
 			
 		IF v_man_table ='man_greentap' THEN
 			UPDATE man_greentap SET linked_connec=NEW.linked_connec,
-			brand=NEW.brand, model=NEW.model
+			brand=NEW.brand, model=NEW.model, greentap_type=NEW.greentap_type, cat_valve=NEW.cat_valve
 			WHERE connec_id=OLD.connec_id;
 			
 		ELSIF v_man_table ='man_wjoin' THEN
 			UPDATE man_wjoin SET top_floor=NEW.top_floor,cat_valve=NEW.cat_valve,
-			brand=NEW.brand, model=NEW.model
+			brand=NEW.brand, model=NEW.model, wjoin_type=NEW.wjoin_type
 			WHERE connec_id=OLD.connec_id;
 			
 		ELSIF v_man_table ='man_tap' THEN

@@ -393,7 +393,7 @@ INSERT INTO config_form_fields VALUES('v_edit_link', 'form_feature', 'main', 'fl
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
 datatype, widgettype, dv_querytext, dv_orderby_id, dv_isnullvalue, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate,  hidden)
-SELECT distinct formname, formtype, tabname, 'crmzone_id', 'lyt_data_1', max(layoutorder)+1, 
+SELECT distinct formname, formtype, tabname, 'crmzone_id', 'lyt_data_2', max(layoutorder)+1, 
 'string', 'combo', 'SELECT id, name as idval FROM crm_zone WHERE id IS NOT NULL AND active IS TRUE ', true, true,
 'crmzone_id', 'crmzone_id',  false, false, true, false, false
 FROM config_form_fields
