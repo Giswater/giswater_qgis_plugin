@@ -465,7 +465,7 @@ CREATE OR REPLACE VIEW vu_arc AS
 
 CREATE OR REPLACE VIEW v_arc AS 
 SELECT vu_arc.* FROM vu_arc
-JOIN v_filter_arc USING (arc_id);
+JOIN v_state_arc USING (arc_id);
 
 CREATE OR REPLACE VIEW v_edit_arc AS 
 SELECT * FROM v_arc;
@@ -587,7 +587,7 @@ CREATE OR REPLACE VIEW vu_node AS
 
 CREATE OR REPLACE VIEW v_node AS 
 SELECT vu_node.* FROM vu_node
-JOIN v_filter_node USING (node_id);
+JOIN v_state_node USING (node_id);
 
 
 CREATE OR REPLACE VIEW v_edit_node AS 
@@ -832,7 +832,7 @@ LEFT JOIN dma d USING (dma_id)
 LEFT JOIN dqa q USING (dqa_id);
 
 
-CREATE OR REPLACE VIEW v_filter_link AS (
+CREATE OR REPLACE VIEW v_state_link AS (
          SELECT link.link_id
            FROM selector_state,
             selector_expl,
@@ -858,7 +858,7 @@ CREATE OR REPLACE VIEW v_filter_link AS (
 
 
 
-CREATE OR REPLACE VIEW v_filter_link_connec AS (
+CREATE OR REPLACE VIEW v_state_link_connec AS (
          SELECT link.link_id
            FROM selector_state,
             selector_expl,
@@ -885,12 +885,12 @@ CREATE OR REPLACE VIEW v_filter_link_connec AS (
 
 create or replace view v_link_connec as 
 select * from vu_link
-JOIN v_filter_link_connec USING (link_id);
+JOIN v_state_link_connec USING (link_id);
 
 
 create or replace view v_link as 
 select * from vu_link
-JOIN v_filter_link USING (link_id);
+JOIN v_state_link USING (link_id);
 
 
 CREATE OR REPLACE VIEW v_connec AS 
@@ -914,7 +914,7 @@ CREATE OR REPLACE VIEW v_connec AS
     vu_connec.state,
     vu_connec.state_type,
     vu_connec.n_hydrometer,
-    v_filter_connec.arc_id,
+    v_state_connec.arc_id,
     vu_connec.annotation,
     vu_connec.observ,
     vu_connec.comment,
@@ -992,7 +992,7 @@ CREATE OR REPLACE VIEW v_connec AS
     crmzone_id,
     crmzone_name
    FROM vu_connec
-     JOIN v_filter_connec USING (connec_id)
+     JOIN v_state_connec USING (connec_id)
     LEFT JOIN (SELECT DISTINCT ON (feature_id) * FROM v_link_connec WHERE state = 2) a ON feature_id = connec_id;
     
 

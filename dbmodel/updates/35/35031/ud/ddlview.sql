@@ -8,8 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-ALTER VIEW v_state_gully RENAME TO v_filter_gully;
-
 CREATE OR REPLACE VIEW v_anl_graphanalytics_mapzones AS 
  SELECT temp_anlgraph.arc_id,
     temp_anlgraph.node_1,
@@ -137,7 +135,7 @@ CREATE OR REPLACE VIEW vu_arc AS
 
 CREATE OR REPLACE VIEW v_arc AS 
 SELECT vu_arc.* FROM vu_arc
-JOIN v_filter_arc USING (arc_id);
+JOIN v_state_arc USING (arc_id);
 
 CREATE OR REPLACE VIEW v_edit_arc AS 
 SELECT * FROM v_arc;
@@ -239,7 +237,7 @@ CREATE OR REPLACE VIEW vu_connec AS
 
 CREATE OR REPLACE VIEW v_connec AS 
 SELECT vu_connec.* FROM vu_connec
-JOIN v_filter_connec USING (connec_id);
+JOIN v_state_connec USING (connec_id);
 
 
 CREATE OR REPLACE VIEW v_edit_connec AS 
@@ -350,7 +348,7 @@ CREATE OR REPLACE VIEW vu_gully AS
 
 CREATE OR REPLACE VIEW v_gully AS 
 SELECT vu_gully.* FROM vu_gully
-JOIN v_filter_gully USING (gully_id);
+JOIN v_state_gully USING (gully_id);
 
 CREATE OR REPLACE VIEW v_edit_gully AS 
 SELECT * FROM v_gully;
@@ -539,7 +537,7 @@ CREATE OR REPLACE VIEW vu_node AS
 
 CREATE OR REPLACE VIEW v_node AS 
 SELECT vu_node.* FROM vu_node
-JOIN v_filter_node USING (node_id);
+JOIN v_state_node USING (node_id);
 
 CREATE OR REPLACE VIEW v_edit_node AS 
 SELECT * FROM v_node;
@@ -585,7 +583,7 @@ AS SELECT polygon.pol_id,
     polygon.the_geom,
     gully.fluid_type
    FROM gully
-     JOIN v_filter_gully USING (gully_id)
+     JOIN v_state_gully USING (gully_id)
      JOIN polygon ON polygon.feature_id::text = gully.gully_id::text;
 
 
@@ -1423,7 +1421,7 @@ WHERE feature_type = 'GULLY';
 
 
 
-CREATE OR REPLACE VIEW v_filter_link_connec AS
+CREATE OR REPLACE VIEW v_state_link_connec AS
 SELECT link.link_id FROM selector_state,selector_expl, link
 WHERE link.state = selector_state.state_id AND link.expl_id = selector_expl.expl_id AND selector_state.cur_user = "current_user"()::text 
 AND selector_expl.cur_user = "current_user"()::text AND feature_type = 'CONNEC'
@@ -1445,7 +1443,7 @@ AND plan_psector_x_connec.active is true;
 
 
 
-CREATE OR REPLACE VIEW v_filter_link_gully AS
+CREATE OR REPLACE VIEW v_state_link_gully AS
 SELECT link.link_id FROM selector_state,selector_expl, link
 WHERE link.state = selector_state.state_id AND link.expl_id = selector_expl.expl_id AND selector_state.cur_user = "current_user"()::text 
 AND selector_expl.cur_user = "current_user"()::text AND feature_type = 'GULLY'
@@ -1466,7 +1464,7 @@ AND plan_psector_x_gully.active is true;
 
 
 
-CREATE OR REPLACE VIEW v_filter_link AS
+CREATE OR REPLACE VIEW v_state_link AS
 SELECT link.link_id FROM selector_state,selector_expl, link
 WHERE link.state = selector_state.state_id AND link.expl_id = selector_expl.expl_id AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text
 
@@ -1501,16 +1499,16 @@ AND plan_psector_x_gully.active is true);
 
 create or replace view v_link_connec as 
 select * from vu_link_connec
-JOIN v_filter_link_connec USING (link_id);
+JOIN v_state_link_connec USING (link_id);
 
 create or replace view v_link_gully as 
 select * from vu_link_gully
-JOIN v_filter_link_gully USING (link_id);
+JOIN v_state_link_gully USING (link_id);
 
 
 create or replace view v_link as 
 select * from vu_link
-JOIN v_filter_link USING (link_id);
+JOIN v_state_link USING (link_id);
 
 
 
@@ -1535,7 +1533,7 @@ CREATE OR REPLACE VIEW v_connec AS
     vu_connec.state_type,
     vu_connec.connec_depth,
     vu_connec.connec_length,
-    v_filter_connec.arc_id,
+    v_state_connec.arc_id,
     vu_connec.annotation,
     vu_connec.observ,
     vu_connec.comment,
@@ -1588,7 +1586,7 @@ CREATE OR REPLACE VIEW v_connec AS
     vu_connec.asset_id,
     vu_connec.drainzone_id
    FROM vu_connec
-     JOIN v_filter_connec USING (connec_id)
+     JOIN v_state_connec USING (connec_id)
      LEFT JOIN (SELECT DISTINCT ON (feature_id) * FROM v_link_connec) a ON feature_id = connec_id;
 
 
@@ -1609,7 +1607,7 @@ CREATE OR REPLACE VIEW v_gully AS
     vu_gully.connec_arccat_id,
     vu_gully.connec_length,
     vu_gully.connec_depth,
-    v_filter_gully.arc_id,
+    v_state_gully.arc_id,
     vu_gully.expl_id,
     vu_gully.macroexpl_id,
     vu_gully.sector_id,
@@ -1676,7 +1674,7 @@ CREATE OR REPLACE VIEW v_gully AS
     vu_gully.units_placement,
     vu_gully.drainzone_id
    FROM vu_gully
-     JOIN v_filter_gully USING (gully_id)
+     JOIN v_state_gully USING (gully_id)
      LEFT JOIN (SELECT DISTINCT ON (feature_id) * FROM v_link_gully) a ON feature_id = gully_id;
 
 
