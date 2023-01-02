@@ -105,10 +105,10 @@ INSERT INTO sys_table( id, descript, sys_role, source)
 VALUES ('vu_link', 'View of links without filters', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table( id, descript, sys_role, source)
-VALUES ('v_state_link', 'View to filter links', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+VALUES ('v_filter_link', 'View to filter links', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table( id, descript, sys_role, source)
-VALUES ('v_state_link_connec', 'View to filter connec links ', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+VALUES ('v_filter_link_connec', 'View to filter connec links ', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table( id, descript, sys_role, source)
 VALUES ('v_link', 'Filtered view of links', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
@@ -224,3 +224,5 @@ INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_
 INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'active', 6, false, NULL, NULL, NULL);
 INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'insert_tstamp', 7, false, NULL, NULL, NULL);
 INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'insert_user', 8, false, NULL, NULL, NULL);
+
+UPDATE sys_table SET id = replace(id,'v_state_','v_filter_') where id ilike 'v_state%';

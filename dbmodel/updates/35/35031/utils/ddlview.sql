@@ -21,6 +21,4 @@ ALTER VIEW v_state_node RENAME TO v_filter_node;
 ALTER VIEW v_state_connec RENAME TO v_filter_connec;
 ALTER VIEW v_state_element RENAME TO v_filter_element;
 ALTER VIEW v_state_dimensions RENAME TO v_filter_dimensions;
-ALTER VIEW v_state_link RENAME TO v_filter_link;
-ALTER VIEW v_state_link_connec RENAME TO v_filter_link_connec;
 ALTER VIEW v_state_samplepoint RENAME TO v_filter_samplepoint;

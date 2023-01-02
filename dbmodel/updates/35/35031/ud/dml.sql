@@ -174,7 +174,7 @@ INSERT INTO sys_table( id, descript, sys_role, source)
 VALUES ('vu_link_gully', 'Unfiltered view of gully links ', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table( id, descript, sys_role, source)
-VALUES ('v_state_link_gully', 'View to filter gully links', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+VALUES ('v_filter_link_gully', 'View to filter gully links', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table( id, descript, sys_role, source)
 VALUES ('v_link_gully', 'Filtered view of links type connec', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
