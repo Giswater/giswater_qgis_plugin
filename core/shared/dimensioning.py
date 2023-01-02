@@ -100,7 +100,8 @@ class GwDimensioning:
         self.dlg_dim.dlg_closed.connect(partial(tools_gw.save_settings, self.dlg_dim))
         self.dlg_dim.dlg_closed.connect(rubber_band.reset)
         self.dlg_dim.dlg_closed.connect(self.layer_node.removeSelection)
-        self.dlg_dim.dlg_closed.connect(self.layer_connec.removeSelection)
+        if self.layer_connec:
+            self.dlg_dim.dlg_closed.connect(self.layer_connec.removeSelection)
 
         self._create_map_tips()
 
