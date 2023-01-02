@@ -214,7 +214,7 @@ VALUES (3186, 'gw_fct_epa_setjunctionsoutlet', 'ud', 'function', 'json', 'json',
 
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
 VALUES (484, 'Set junctions as outlet', 'ud', NULL, 'core', true, 'Function process', NULL)
- ON CONFLICT (id) DO NOTHING;
+ ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active)
 VALUES (3186, 'Set junctions as outlet', '{"featureType":["NODE"]}', 
