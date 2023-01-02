@@ -84,7 +84,7 @@ v_fluidtype_value text;
 v_dma_value integer;
 v_fluidtype_autoupdate boolean;
 v_dma_autoupdate boolean;
-v_isveditconnect boolean = false;
+v_forceendpoint boolean = false;
 
 -- return variables
 v_result text;
@@ -119,7 +119,7 @@ BEGIN
 	v_feature_ids = ((p_data ->>'feature')::json->>'id'::text);
 	v_forcedarcs = (p_data->>'data')::json->>'forcedArcs';
 	v_ispsector = (p_data->>'data')::json->>'isPsector';
-	v_isveditconnect = (p_data->>'data')::json->>'isVeditConnect';
+	v_forceendpoint = (p_data->>'data')::json->>'forceEndPoint';
 	v_isarcdivide = (p_data->>'data')::json->>'isArcDivide';
 	v_link_id = (p_data->>'data')::json->>'linkId';
 
@@ -310,7 +310,7 @@ BEGIN
 						v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1),v_point_aux); 
 					END IF;
 
-				ELSIF v_link.the_geom IS NOT NULL AND v_pjointtype !='ARC' AND (v_forcedarcs IS NOT NULL AND v_forcedarcs !='') AND v_isveditconnect IS TRUE THEN
+				ELSIF v_link.the_geom IS NOT NULL AND v_pjointtype !='ARC' AND (v_forcedarcs IS NOT NULL AND v_forcedarcs !='') AND v_forceendpoint IS TRUE THEN
 
 					-- when we are forcing arc_id for those links coming from connec, guly, node
 					v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1),v_point_aux); 
@@ -357,7 +357,7 @@ BEGIN
 			-- update connect values
 			IF v_connect.state=1 then
 
-				IF v_ispsector THEN -- then returning link
+				IF v_ispsector AND v_forceendpoint IS FALSE THEN -- then returning link
 
 					IF v_feature_type ='CONNEC' THEN
 						UPDATE plan_psector_x_connec SET link_id = v_link.link_id WHERE psector_id = v_psector_current 
@@ -370,7 +370,7 @@ BEGIN
 
 					UPDATE link SET state = 2 WHERE link_id  = v_link.link_id;
 					
-				ELSIF v_isarcdivide or v_isoperative_psector or v_isveditconnect THEN -- then returning to psector link & arc_id
+				ELSIF v_isarcdivide or v_isoperative_psector or v_forceendpoint THEN -- then returning to psector link & arc_id
 
 					IF v_feature_type ='CONNEC' THEN
 						UPDATE plan_psector_x_connec SET link_id = v_link.link_id, arc_id = v_arc.arc_id  
