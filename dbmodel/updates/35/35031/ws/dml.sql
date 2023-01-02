@@ -95,7 +95,7 @@ t3 AS
 FROM config_form_fields
 WHERE  formname ilike 've_connec%' group by formname,formtype, tabname),
 t4 AS
-(SELECT distinct formname, formtype, tabname, 'press_avg', 'lyt_data_1', max(layoutorder)+3, 
+(SELECT distinct formname, formtype, tabname, 'demand', 'lyt_data_1', max(layoutorder)+4, 
             'numeric', 'text', 'demand', 'demand',  false, false, false, false, false
 FROM config_form_fields
 WHERE  formname ilike 've_connec%' group by formname,formtype, tabname)
