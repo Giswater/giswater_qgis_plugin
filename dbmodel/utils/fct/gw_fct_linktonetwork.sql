@@ -6,9 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3188
 
-DROP FUNCTION IF EXISTS "ud_sample".gw_fct_connect_to_network(character varying[], character varying);
-DROP FUNCTION IF EXISTS "ud_sample".gw_fct_connect_to_network(json);
-CREATE OR REPLACE FUNCTION ud_sample.gw_fct_linktonetwork(p_data json)
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_connect_to_network(character varying[], character varying);
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_connect_to_network(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_linktonetwork(p_data json)
 RETURNS json AS
 $BODY$
 
@@ -30,14 +30,14 @@ Main workflows:
 
 EXAMPLES
 --------
-SELECT ud_sample.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3201","3200"]},"data":{"feature_type":"CONNEC", "forcedArcs":["2001","2002"]}}$$);
+SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3201","3200"]},"data":{"feature_type":"CONNEC", "forcedArcs":["2001","2002"]}}$$);
 
-SELECT ud_sample.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100013"]},"data":{"feature_type":"CONNEC", "forcedArcs":["221"]}}$$);
+SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100013"]},"data":{"feature_type":"CONNEC", "forcedArcs":["221"]}}$$);
 
-SELECT ud_sample.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100013"]},"data":{"feature_type":"CONNEC"}}$$);
-SELECT ud_sample.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100014"]},"data":{"feature_type":"GULLY"}}$$);
+SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100013"]},"data":{"feature_type":"CONNEC"}}$$);
+SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100014"]},"data":{"feature_type":"GULLY"}}$$);
 
-SELECT ud_sample.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":
+SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":
 {"id":"SELECT array_to_json(array_agg(connec_id::text)) FROM v_edit_connec WHERE connec_id IS NOT NULL AND state=1"},"data":{"feature_type":"CONNEC"}}$$);
 
 
@@ -62,7 +62,6 @@ v_version text; -- To store version of system
 v_psector_current integer; -- Current psector related to user
 
 -- process variables
-v_ispsectorvdef_active boolean = false;
 v_connect record; -- Record to store the value for the used connect
 v_link record; -- Record to store the value for the used link
 v_arc record; -- Record to store the value for the used arc
@@ -81,6 +80,12 @@ v_existing_link integer; -- link_id: In case of psector for operative links, we 
 v_linkfrompsector integer; -- link_id: It is the id of link stored on psector table
 v_dfactor double precision;  -- Distance factor. Value 0-1 used to separate link from the endpoints of arcs. Only applied to ws. For UD it is more understandable to connect with nodes
 
+v_fluidtype_value text;
+v_dma_value integer;
+v_fluidtype_autoupdate boolean;
+v_dma_autoupdate boolean;
+v_isveditconnect boolean = false;
+
 -- return variables
 v_result text;
 v_result_info text;
@@ -93,18 +98,12 @@ v_level integer;
 v_status text;
 v_message text;
 
-v_fluidtype_value text;
-v_dma_value integer;
-
-v_fluidtype_autoupdate boolean;
-v_dma_autoupdate boolean;
-
 
 BEGIN
 
 	
 	-- Search path
-	SET search_path = "ud_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- get system variables
 	SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -120,9 +119,10 @@ BEGIN
 	v_feature_ids = ((p_data ->>'feature')::json->>'id'::text);
 	v_forcedarcs = (p_data->>'data')::json->>'forcedArcs';
 	v_ispsector = (p_data->>'data')::json->>'isPsector';
+	v_isveditconnect = (p_data->>'data')::json->>'isVeditConnect';
 	v_isarcdivide = (p_data->>'data')::json->>'isArcDivide';
 	v_link_id = (p_data->>'data')::json->>'linkId';
-	
+
 	-- create query text for forced arcs
 	if v_forcedarcs is null then
 		v_forcedarcs= '';
@@ -149,11 +149,7 @@ BEGIN
 	-- Main loop
 	IF v_feature_array IS NOT NULL THEN
 
-	     -- psector management
-	     IF (SELECT count(*) FROM selector_psector WHERE psector_id = v_psector_current AND cur_user = current_user) = 1 THEN v_ispsectorvdef_active = true; END IF;
-	     INSERT INTO selector_psector (psector_id, cur_user) values (v_psector_current, current_user) ON CONFLICT DO NOTHING;
-
-	    PERFORM setval('ud_sample.link_link_id_seq', (SELECT max(link_id) FROM link),true);
+	    PERFORM setval('SCHEMA_NAME.link_link_id_seq', (SELECT max(link_id) FROM link),true);
 	
 	    FOREACH v_connect_id IN ARRAY v_feature_array
 	    LOOP
@@ -312,7 +308,7 @@ BEGIN
 						v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1),v_point_aux); 
 					END IF;
 
-				ELSIF v_link.the_geom IS NOT NULL AND v_pjointtype !='ARC' AND (v_forcedarcs IS NOT NULL OR v_forcedarcs !='') THEN
+				ELSIF v_link.the_geom IS NOT NULL AND v_pjointtype !='ARC' AND (v_forcedarcs IS NOT NULL AND v_forcedarcs !='') AND v_isveditconnect IS TRUE THEN
 
 					-- when we are forcing arc_id for those links coming from connec, guly, node
 					v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1),v_point_aux); 
@@ -320,13 +316,11 @@ BEGIN
 					v_endfeature_geom = v_arc.the_geom;
 					v_link.exit_type = 'ARC';
 					v_link.exit_id = v_arc.arc_id;
-					v_pjointid = v_arc.arc_id;			
-					
+					v_pjointid = v_arc.arc_id;						
 				ELSE
 					-- do nothing for those links coming from connec, guly, node and they not are forced with some arc_id
 				END IF;
 			END IF;
-
 
 			-- control of dma and fluidtype automatic values
 			IF  v_dma_autoupdate is true or v_dma_value is null THEN v_dma_value = v_arc.dma_id; ELSE v_dma_value = v_connect.dma_id; END IF;
@@ -460,10 +454,6 @@ BEGIN
 			v_arc := null;
 		END IF;
 	    END LOOP;
-	END IF;
-
-	IF v_ispsectorvdef_active IS FALSE THEN 
-		DELETE FROM selector_psector WHERE psector_id = v_psector AND cur_user = current_user;
 	END IF;
 	   
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
