@@ -260,3 +260,6 @@ update config_form_fields set layoutorder=6 where formname='v_edit_link' and col
 update config_form_fields set layoutorder=7 where formname='v_edit_link' and columnname='expl_id';
 update config_form_fields set layoutorder=13 where formname='v_edit_link' and columnname='gis_length';
 update config_form_fields set layoutname='lyt_data_1' where formname='v_edit_link' and columnname='sector_id';
+
+DELETE FROM config_param_system WHERE "parameter"='Dynamic mapzones';
+DELETE FROM config_param_system WHERE "parameter"='Mapzones dynamic symbology';
