@@ -453,6 +453,12 @@ BEGIN
 				from connec where connec_id=NEW.connec_id), NEW.connec_type, NEW.connec_id);
 		END IF;
 
+		-- insertint on psector table
+		IF NEW.state=2 THEN
+			INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, arc_id)
+			VALUES (NEW.connec_id, v_psector_vdefault, 1, true, NEW.arc_id);
+		END IF;
+
 		-- manage connect2network
 		IF v_connect2network THEN
 		

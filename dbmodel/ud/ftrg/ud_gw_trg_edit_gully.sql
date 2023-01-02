@@ -573,6 +573,12 @@ BEGIN
 
 		END IF;
 
+		-- insertint on psector table and setting visible 
+		IF NEW.state=2 THEN
+			INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, doable, arc_id)
+			VALUES (NEW.gully_id, v_psector_vdefault, 1, true, NEW.arc_id);
+		END IF;
+
 		-- manage connect2network
 		IF v_connect2network THEN
 		
