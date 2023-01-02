@@ -22,6 +22,9 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psecto
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"plan_psector_x_connec", "column":"link_geom", "newName":"_link_geom_" }}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"plan_psector_x_connec", "column":"userdefined_geom", "newName":"_userdefined_geom_"}}$$);
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_node", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
+
+
 
 ALTER TABLE vnode RENAME TO _vnode_;
 
