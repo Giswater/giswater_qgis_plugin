@@ -577,7 +577,7 @@ class GwElement:
         row = selected_list[0].row()
 
         # Get object_id from selected row
-        field_object_id = table_object + "_id"
+        field_object_id = "element_id"
         selected_object_id = widget.model().record(row).value(field_object_id)
 
         # Close this dialog and open selected object
