@@ -262,6 +262,8 @@ BEGIN
 				END IF;		
 
 				-- setting point aux
+				v_point_aux := St_closestpoint(v_arc.the_geom, st_EndPoint(v_link.the_geom));
+				
 				IF st_equals(v_point_aux, st_endpoint(v_arc.the_geom)) THEN
 					v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, 1-v_dfactor));
 
@@ -368,7 +370,7 @@ BEGIN
 
 					UPDATE link SET state = 2 WHERE link_id  = v_link.link_id;
 					
-				ELSIF v_isarcdivide or v_isoperative_psector THEN -- then returning to psector link & arc_id
+				ELSIF v_isarcdivide or v_isoperative_psector or v_isveditconnect THEN -- then returning to psector link & arc_id
 
 					IF v_feature_type ='CONNEC' THEN
 						UPDATE plan_psector_x_connec SET link_id = v_link.link_id, arc_id = v_arc.arc_id  
