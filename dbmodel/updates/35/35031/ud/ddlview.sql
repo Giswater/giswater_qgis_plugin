@@ -1738,3 +1738,6 @@ SELECT distinct on (connec_id, psector_id) *, rank(*) over (partition by connec_
 
 create view  v_edit_plan_psector_x_gully  as
 SELECT distinct on (gully_id, psector_id) *, rank() over (partition by gully_id order by state desc) FROM plan_psector_x_gully;
+
+ALTER VIEW v_state_gully RENAME TO v_filter_gully;
+ALTER VIEW v_state_link_gully RENAME TO v_filter_link_gully;
