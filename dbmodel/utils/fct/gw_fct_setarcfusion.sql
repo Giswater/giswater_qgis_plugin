@@ -68,7 +68,7 @@ v_epa_table text;
 v_state_type integer;
 v_action_mode integer;
 v_psector_current integer;
-v_ispsectorvdef_active boolean false;
+v_ispsectorvdef_active boolean = false;
 
 BEGIN
 
