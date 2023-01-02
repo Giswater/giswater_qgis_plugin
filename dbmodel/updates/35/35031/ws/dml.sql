@@ -398,3 +398,5 @@ SELECT distinct formname, formtype, tabname, 'crmzone_id', 'lyt_data_2', max(lay
 'crmzone_id', 'crmzone_id',  false, false, true, false, false
 FROM config_form_fields
 WHERE  formname ilike 've_connec%' or formname ilike 'v_edit_connec' group by formname,formtype, tabname ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+UPDATE config_form_fields SET label='Sector name' WHERE label='Dma name' AND columnname='sector_name';
