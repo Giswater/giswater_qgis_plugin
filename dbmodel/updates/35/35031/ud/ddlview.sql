@@ -8,6 +8,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+ALTER VIEW v_state_gully RENAME TO v_filter_gully;
+
 CREATE OR REPLACE VIEW v_anl_graphanalytics_mapzones AS 
  SELECT temp_anlgraph.arc_id,
     temp_anlgraph.node_1,
