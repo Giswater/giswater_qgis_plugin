@@ -6,9 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3188
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_connect_to_network(character varying[], character varying);
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_connect_to_network(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_linktonetwork(p_data json)
+DROP FUNCTION IF EXISTS "ud_sample".gw_fct_connect_to_network(character varying[], character varying);
+DROP FUNCTION IF EXISTS "ud_sample".gw_fct_connect_to_network(json);
+CREATE OR REPLACE FUNCTION ud_sample.gw_fct_linktonetwork(p_data json)
 RETURNS json AS
 $BODY$
 
@@ -30,14 +30,14 @@ Main workflows:
 
 EXAMPLES
 --------
-SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3201","3200"]},"data":{"feature_type":"CONNEC", "forcedArcs":["2001","2002"]}}$$);
+SELECT ud_sample.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3201","3200"]},"data":{"feature_type":"CONNEC", "forcedArcs":["2001","2002"]}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100013"]},"data":{"feature_type":"CONNEC", "forcedArcs":["221"]}}$$);
+SELECT ud_sample.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100013"]},"data":{"feature_type":"CONNEC", "forcedArcs":["221"]}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100013"]},"data":{"feature_type":"CONNEC"}}$$);
-SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100014"]},"data":{"feature_type":"GULLY"}}$$);
+SELECT ud_sample.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100013"]},"data":{"feature_type":"CONNEC"}}$$);
+SELECT ud_sample.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100014"]},"data":{"feature_type":"GULLY"}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":
+SELECT ud_sample.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":
 {"id":"SELECT array_to_json(array_agg(connec_id::text)) FROM v_edit_connec WHERE connec_id IS NOT NULL AND state=1"},"data":{"feature_type":"CONNEC"}}$$);
 
 
@@ -104,7 +104,7 @@ BEGIN
 
 	
 	-- Search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ud_sample", public;
 
 	-- get system variables
 	SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -153,7 +153,7 @@ BEGIN
 	     IF (SELECT count(*) FROM selector_psector WHERE psector_id = v_psector_current AND cur_user = current_user) = 1 THEN v_ispsectorvdef_active = true; END IF;
 	     INSERT INTO selector_psector (psector_id, cur_user) values (v_psector_current, current_user) ON CONFLICT DO NOTHING;
 
-	    PERFORM setval('SCHEMA_NAME.link_link_id_seq', (SELECT max(link_id) FROM link),true);
+	    PERFORM setval('ud_sample.link_link_id_seq', (SELECT max(link_id) FROM link),true);
 	
 	    FOREACH v_connect_id IN ARRAY v_feature_array
 	    LOOP
@@ -311,8 +311,19 @@ BEGIN
 					ELSE
 						v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1),v_point_aux); 
 					END IF;
+
+				ELSIF v_link.the_geom IS NOT NULL AND v_pjointtype !='ARC' AND (v_forcedarcs IS NOT NULL OR v_forcedarcs !='') THEN
+
+					-- when we are forcing arc_id for those links coming from connec, guly, node
+					v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1),v_point_aux); 
+					v_pjointtype='ARC';
+					v_endfeature_geom = v_arc.the_geom;
+					v_link.exit_type = 'ARC';
+					v_link.exit_id = v_arc.arc_id;
+					v_pjointid = v_arc.arc_id;			
+					
 				ELSE
-					-- do nothing for those links coming from connec, guly, node
+					-- do nothing for those links coming from connec, guly, node and they not are forced with some arc_id
 				END IF;
 			END IF;
 
