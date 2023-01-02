@@ -115,15 +115,16 @@ BEGIN
 			END IF;
 		END IF;
 
+	END IF;
+
+	-- Control insertions ID
+	IF TG_OP = 'INSERT' THEN
+	
 		-- setting psector vdefault as visible
 		IF NEW.state = 2 THEN
 			INSERT INTO selector_psector (psector_id, cur_user) VALUES (v_psector_vdefault, current_user) 
 			ON CONFLICT DO NOTHING;
 		END IF;
-	END IF;
-
-	-- Control insertions ID
-	IF TG_OP = 'INSERT' THEN
 
 		-- Gully ID
 		IF NEW.gully_id != (SELECT last_value::text FROM urn_id_seq) OR NEW.gully_id IS NULL THEN
@@ -570,12 +571,6 @@ BEGIN
 				NEW.uncertain, NEW.num_value,NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.connec_matcat_id, NEW.gratecat2_id,
 				NEW.epa_type, NEW.units_placement, NEW.groove_height, NEW.groove_length, NEW.drainzone_id);
 
-		END IF;
-
-		-- insertint on psector table and setting visible 
-		IF NEW.state=2 THEN
-			INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, doable, arc_id)
-			VALUES (NEW.gully_id, v_psector_vdefault, 1, true, NEW.arc_id);
 		END IF;
 
 		-- manage connect2network

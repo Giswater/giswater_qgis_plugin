@@ -56,6 +56,7 @@ v_codeautofill boolean;
 v_srid integer;
 v_force_delete boolean;
 v_system_id text;
+v_psector integer;
 
 v_gully_outlet_type text;
 v_gully_method text;
@@ -92,6 +93,7 @@ BEGIN
 	v_gully_weir_cd = (SELECT value FROM config_param_user WHERE parameter = 'epa_gully_weir_cd_vdefault' AND cur_user = current_user);
 	v_gully_orifice_cd = (SELECT value FROM config_param_user WHERE parameter = 'epa_gully_orifice_cd_vdefault' AND cur_user = current_user);
 	v_gully_efficiency = (SELECT value FROM config_param_user WHERE parameter = 'epa_gully_efficiency_vdefault' AND cur_user = current_user);
+	v_psector = (SELECT value::integer FROM config_param_user WHERE "parameter"='plan_psector_vdefault' AND cur_user=current_user);
 
 	
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
@@ -114,9 +116,7 @@ BEGIN
 		IF (SELECT matcat_id FROM cat_node WHERE id = NEW.nodecat_id) IS NOT NULL THEN
 			v_matfromcat = true;
 		END IF;
-               
 	END IF;
-
 
 	-- manage netgully doublegeom in case of exists
 	IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') AND v_doublegeometry AND v_man_table = 'man_netgully' THEN
@@ -183,6 +183,11 @@ BEGIN
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
 
+		-- force current psector
+		IF NEW.state = 2 THEN
+			INSERT INTO selector_psector (psector_id, cur_user) VALUES (v_psector, current_user) ON CONFLICT DO NOTHING;
+		END IF;
+		
 		-- Node ID
 		IF NEW.node_id != (SELECT last_value::text FROM urn_id_seq) OR NEW.node_id IS NULL THEN
 			NEW.node_id:= (SELECT nextval('urn_id_seq'));

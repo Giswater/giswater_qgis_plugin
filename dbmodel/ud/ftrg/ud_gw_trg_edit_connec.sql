@@ -73,16 +73,16 @@ BEGIN
 				"data":{"message":"3144", "function":"1204","debug_msg":"'||NEW.arc_id::text||'"}}$$);';
 			END IF;
 		END IF;
+	END IF;
+        
+	-- Control insertions ID
+	IF TG_OP = 'INSERT' THEN
 
 		-- setting psector vdefault as visible
 		IF NEW.state = 2 THEN
 			INSERT INTO selector_psector (psector_id, cur_user) VALUES (v_psector_vdefault, current_user) 
 			ON CONFLICT DO NOTHING;
 		END IF;
-	END IF;
-        
-	-- Control insertions ID
-	IF TG_OP = 'INSERT' THEN
 
 		-- connec ID
 		IF NEW.connec_id != (SELECT last_value::text FROM urn_id_seq) OR NEW.connec_id IS NULL THEN
@@ -451,12 +451,6 @@ BEGIN
 				INSERT INTO polygon(pol_id, sys_type, the_geom, featurecat_id,feature_id ) 
 				VALUES (v_pol_id, 'CONNEC', (SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_doublegeom_buffer))) 
 				from connec where connec_id=NEW.connec_id), NEW.connec_type, NEW.connec_id);
-		END IF;
-
-		-- insertint on psector table
-		IF NEW.state=2 THEN
-			INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, arc_id)
-			VALUES (NEW.connec_id, v_psector_vdefault, 1, true, NEW.arc_id);
 		END IF;
 
 		-- manage connect2network

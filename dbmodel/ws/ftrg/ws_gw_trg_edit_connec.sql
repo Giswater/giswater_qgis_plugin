@@ -77,6 +77,7 @@ BEGIN
 			    = 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1);
 	
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
+	
 		-- transforming streetaxis name into id
 		v_streetaxis = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname LIMIT 1);
 		v_streetaxis2 = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname2 LIMIT 1);
@@ -107,6 +108,11 @@ BEGIN
 	
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
+
+		-- setting psector vdefault as visible
+		IF NEW.state = 2 THEN
+			INSERT INTO selector_psector (psector_id, cur_user) VALUES (v_psector_vdefault, current_user) ON CONFLICT DO NOTHING;
+		END IF;
 
 		-- connec ID
 		IF NEW.connec_id != (SELECT last_value::text FROM urn_id_seq) OR NEW.connec_id IS NULL THEN
@@ -533,11 +539,6 @@ BEGIN
 			END IF;
 	 	END IF;
 
-	 	-- insertint on psector table
-		IF NEW.state=2 THEN
-			INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, arc_id)
-			VALUES (NEW.connec_id, v_psector_vdefault, 1, true, NEW.arc_id);
-		END IF;
 
 		-- manage connect2network
 		IF v_connect2network THEN

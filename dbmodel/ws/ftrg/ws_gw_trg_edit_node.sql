@@ -41,6 +41,7 @@ v_sys_type text;
 v_force_delete boolean;
 v_system_id text;
 v_featurecat_id text;
+v_psector integer;
 
 -- dynamic mapzones strategy
 v_isdma boolean = false;
@@ -72,6 +73,7 @@ BEGIN
 	v_isautoinsertsector:= (SELECT value::json->>'SECTOR' FROM config_param_system WHERE parameter = 'edit_mapzone_automatic_insert');
 	v_isautoinsertdma := (SELECT value::json->>'DMA' FROM config_param_system WHERE parameter = 'edit_mapzones_automatic_insert');
 	v_isautoinsertpresszone:= (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'edit_mapzones_automatic_insert');
+	v_psector = (SELECT value::integer FROM config_param_user WHERE "parameter"='plan_psector_vdefault' AND cur_user=current_user);
 
 	--modify values for custom view inserts
 	IF v_man_table IN (SELECT id FROM cat_feature WHERE feature_type = 'NODE') THEN
@@ -97,6 +99,11 @@ BEGIN
 	
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
+
+		-- setting psector vdefault as visible
+		IF NEW.state = 2 THEN
+			INSERT INTO selector_psector (psector_id, cur_user) VALUES (v_psector, current_user) ON CONFLICT DO NOTHING;
+		END IF;
 
 		-- Node ID	
 		IF NEW.node_id != (SELECT last_value::text FROM urn_id_seq) OR NEW.node_id IS NULL THEN
