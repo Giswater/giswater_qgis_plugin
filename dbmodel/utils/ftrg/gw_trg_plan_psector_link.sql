@@ -84,14 +84,12 @@ BEGIN
 		END IF;
 	END IF;
 
-
 	-- reconnect connects
 	IF v_table_name = 'connec' THEN
 	
 		-- looking for related connecs
-		FOR v_connect IN SELECT feature_id FROM link WHERE feature_type = 'CONNEC' AND exit_type = 'CONNEC' and exit_id = NEW.connec_id
+		FOR v_connect IN SELECT feature_id FROM v_edit_link WHERE feature_type = 'CONNEC' AND exit_type = 'CONNEC' and exit_id = NEW.connec_id
 		LOOP
-
 			UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect AND psector_id = NEW.psector_id;
 		END LOOP;
 		
