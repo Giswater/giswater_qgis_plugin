@@ -11,7 +11,7 @@
 - Add system variable to skip audit in massive processes
 - New field on UD inp_timeseries - active
 - New fields on WS node, arc, connec - om_state, conserv_state
-- New fields on WS connec - priority, valve_location, valve_type, shutoff_valve, access_type, placement_type
+- New fields on WS connec - priority, valve_location, valve_type, shutoff_valve, access_type, placement_type, crmzone_id
 - New fields on WS node - access_type, placement_type
 - New fields on WS man_valve - valve_type; man_wjoin - wjoin_type; man_greentap - greentap_type, cat_valve; man_hydrant - hydrant_type- 
 - New fields on WS man_valve - valve_type; man_wjoin - wjoin_type; man_greentap - greentap_type, cat_valve; man_hydrant - hydrant_type- 

@@ -99,3 +99,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "c
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"access_type", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"placement_type", "dataType":"text", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"crmzone_id", "dataType":"integer", "isUtils":"False"}}$$);

@@ -788,6 +788,7 @@ CREATE OR REPLACE VIEW vu_connec AS
     connec.shutoff_valve,
     connec.access_type,
     connec.placement_type,
+    connec.crmzone_id,
     e.press_max, 
     e.press_min, 
     e.press_avg,
@@ -983,9 +984,10 @@ CREATE OR REPLACE VIEW v_connec AS
     vu_connec.press_max,
     vu_connec.press_min,
     vu_connec.press_avg,
+    vu_connec.demand,
     vu_connec.om_state,
     vu_connec.conserv_state,
-    vu_connec.demand
+    vu_connec.crmzone_id
    FROM vu_connec
      JOIN v_state_connec USING (connec_id)
     LEFT JOIN (SELECT DISTINCT ON (feature_id) * FROM v_link_connec WHERE state = 2) a ON feature_id = connec_id;
@@ -1224,6 +1226,8 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_connec"], "fieldName":"om_state", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_connec"], "fieldName":"conserv_state", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"crmzone_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_connec"], "fieldName":"press_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);

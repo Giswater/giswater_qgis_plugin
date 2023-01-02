@@ -299,6 +299,11 @@ t8 AS
 (SELECT distinct formname, formtype, tabname, 'shutoff_valve', 'lyt_data_1', max(layoutorder)+8, 
             'string', 'text', 'shutoff_valve', 'shutoff_valve',  false, false, false, false, false
 FROM config_form_fields
+WHERE  formname ilike 've_connec%' or formname ilike 'v_edit_connec' group by formname,formtype, tabname),
+t9 AS
+(SELECT distinct formname, formtype, tabname, 'crmzone_id', 'lyt_data_1', max(layoutorder)+9, 
+            'string', 'text', 'crmzone_id', 'crmzone_id',  false, false, false, false, false
+FROM config_form_fields
 WHERE  formname ilike 've_connec%' or formname ilike 'v_edit_connec' group by formname,formtype, tabname)
 select * from t1
 union select * from t2
@@ -308,6 +313,7 @@ union select * from t5
 union select * from t6
 union select * from t7
 union select * from t8
+union select * from t9
 order by formname, layoutorder ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 
