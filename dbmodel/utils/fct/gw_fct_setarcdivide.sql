@@ -740,7 +740,7 @@ BEGIN
 							INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector, v_arc_id, 0, FALSE) 
 							ON CONFLICT (arc_id, psector_id) DO NOTHING;
 
-							-- insert operative connec's on alternative (upgrade)
+							-- insert operative connec's on alternative in order to reconnect (upgrade)
 							INSERT INTO plan_psector_x_connec (psector_id, connec_id, state, doable, arc_id)
 							SELECT v_psector, connec_id, 1, false, null FROM connec WHERE arc_id = v_arc_id AND connec.state=1
 							ON CONFLICT DO NOTHING;
@@ -750,6 +750,12 @@ BEGIN
 							SELECT v_psector, connec_id, 0, false, link_id, arc_id FROM connec JOIN link ON feature_id = connec_id WHERE arc_id = v_arc_id AND connec.state=1
 							ON CONFLICT DO NOTHING;
 
+							-- reconnect operative connec links related to other connects
+							FOR rec_link IN SELECT * FROM link l JOIN plan_psector_x_connec p USING (link_id) WHERE exit_type != 'ARC' AND p.arc_id = v_arc_id AND feature_type  ='CONNEC'
+							LOOP	
+								EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+								"feature":{"id":['|| rec_link.feature_id||']},"data":{"feature_type":"CONNEC"}}$$)';
+							END LOOP;
 
 							-- reconnect operative connec links
 							FOR rec_link IN SELECT * FROM link WHERE exit_type = 'ARC' AND exit_id = v_arc_id AND state = 1 AND feature_type  ='CONNEC'
@@ -760,7 +766,7 @@ BEGIN
 
 							IF v_project_type='UD' THEN
 
-								-- insert operative connec's on alternative in order to reconnect
+								-- insert operative connec's on alternative in order to reconnect (upgrade)
 								INSERT INTO plan_psector_x_gully (psector_id, gully_id, state, doable, arc_id)
 								SELECT v_psector, gully_id, 1, false, null FROM gully WHERE arc_id = v_arc_id AND gully.state=1
 								ON CONFLICT DO NOTHING;
@@ -769,6 +775,13 @@ BEGIN
 								INSERT INTO plan_psector_x_gully (psector_id, gully_id, state, doable, link_id, arc_id)
 								SELECT v_psector, gully_id, 0, false, link_id, arc_id FROM gully JOIN link ON feature_id = gully_id WHERE arc_id = v_arc_id AND gully.state=1
 								ON CONFLICT DO NOTHING;
+
+								-- reconnect operative connec links related to other connects
+								FOR rec_link IN SELECT * FROM link l JOIN plan_psector_x_gully p USING (link_id) WHERE exit_type != 'ARC' AND p.arc_id = v_arc_id AND feature_type  ='GULLY'
+								LOOP	
+									EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+									"feature":{"id":['|| rec_link.feature_id||']},"data":{"feature_type":"GULLY"}}$$)';
+								END LOOP;
 
 								-- reconnect operative gully links
 								FOR rec_link IN SELECT * FROM link WHERE exit_type = 'ARC' AND exit_id = v_arc_id AND state = 1 AND feature_type  ='GULLY'
