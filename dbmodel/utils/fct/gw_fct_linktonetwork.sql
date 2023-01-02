@@ -62,6 +62,7 @@ v_version text; -- To store version of system
 v_psector_current integer; -- Current psector related to user
 
 -- process variables
+v_ispsectorvdef_active boolean = false;
 v_connect record; -- Record to store the value for the used connect
 v_link record; -- Record to store the value for the used link
 v_arc record; -- Record to store the value for the used arc
@@ -145,11 +146,14 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (217, null, 4, 'CONNECT TO NETWORK');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (217, null, 4, '-------------------------------------------------------------');
 	
-
 	-- Main loop
 	IF v_feature_array IS NOT NULL THEN
 
-	PERFORM setval('SCHEMA_NAME.link_link_id_seq', (SELECT max(link_id) FROM link),true);
+	     -- psector management
+	     IF (SELECT count(*) FROM selector_psector WHERE psector_id = v_psector_current AND cur_user = current_user) = 1 THEN v_ispsectorvdef_active = true; END IF;
+	     INSERT INTO selector_psector (psector_id, cur_user) values (v_psector_current, current_user) ON CONFLICT DO NOTHING;
+
+	    PERFORM setval('SCHEMA_NAME.link_link_id_seq', (SELECT max(link_id) FROM link),true);
 	
 	    FOREACH v_connect_id IN ARRAY v_feature_array
 	    LOOP
@@ -446,7 +450,11 @@ BEGIN
 		END IF;
 	    END LOOP;
 	END IF;
-   
+
+	IF v_ispsectorvdef_active IS FALSE THEN 
+		DELETE FROM selector_psector WHERE psector_id = v_psector AND cur_user = current_user;
+	END IF;
+	   
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data 
 	WHERE cur_user="current_user"() AND fid = 217 ORDER BY criticity desc, id asc) row;

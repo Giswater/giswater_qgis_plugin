@@ -67,6 +67,8 @@ v_man_table text;
 v_epa_table text;
 v_state_type integer;
 v_action_mode integer;
+v_psector_current integer;
+v_ispsectorvdef_active boolean false;
 
 BEGIN
 
@@ -80,6 +82,9 @@ BEGIN
 
 	INSERT INTO config_param_user (value, parameter, cur_user)
 	VALUES (txid_current(),'utils_cur_trans',current_user );
+	
+	-- get psector vdefault
+	v_psector_current = (SELECT value::integer FROM config_param_user WHERE parameter = 'plan_psector_vdefault' AND cur_user = current_user);
 
 	-- Get parameters from input json
 	v_array_node_id = lower(((p_data ->>'feature')::json->>'id')::text);
@@ -125,7 +130,7 @@ BEGIN
 
 		-- Accepted if there are just two distinct arcs
 		IF v_count = 2 THEN
-
+		
 			-- Get both arc features
 			SELECT * INTO v_record1 FROM arc WHERE node_1 = v_node_id OR node_2 = v_node_id ORDER BY arc_id DESC LIMIT 1;
 			SELECT * INTO v_record2 FROM arc WHERE node_1 = v_node_id OR node_2 = v_node_id ORDER BY arc_id ASC LIMIT 1;
@@ -140,6 +145,10 @@ BEGIN
 			-- Compare arcs
 			IF v_record1.arccat_id = v_record2.arccat_id AND v_record1.sector_id = v_record2.sector_id AND
 			   v_record1.expl_id = v_record2.expl_id THEN
+			   
+				-- psector management
+				IF (SELECT count(*) FROM selector_psector WHERE psector_id = v_psector_current AND cur_user = current_user) = 1 THEN v_ispsectorvdef_active = true; END IF;
+				INSERT INTO selector_psector (psector_id, cur_user) values (v_psector_current, current_user) ON CONFLICT DO NOTHING;
 
 				-- Final geometry
 				IF v_record1.node_1 = v_node_id THEN
@@ -497,6 +506,11 @@ BEGIN
 
 			INSERT INTO audit_check_data (fid,  criticity, error_message)
 			VALUES (214, 1, concat('Delete arcs: ',v_record1.arc_id,', ',v_record2.arc_id,'.'));
+			
+			-- restoring values of psector
+			IF v_ispsectorvdef_active IS FALSE THEN 
+				DELETE FROM selector_psector WHERE psector_id = v_psector AND cur_user = current_user;
+			END IF;
 
 			-- Arcs has different types
 			ELSE

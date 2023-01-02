@@ -109,7 +109,7 @@ v_node_2 text;
 v_new_node_graph text;
 v_graph_arc_id TEXT;
 v_force_delete text;
-
+v_ispsectorvdef_active boolean = false;
 
 BEGIN
 
@@ -146,7 +146,7 @@ BEGIN
 
 	-- Get parameters from configs table
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='edit_arc_searchnodes';
-	SELECT value::smallint INTO v_psector FROM config_param_user WHERE "parameter"='plan_psector_vdefault' AND cur_user=current_user;
+	SELECT value::int4 INTO v_psector FROM config_param_user WHERE "parameter"='plan_psector_vdefault' AND cur_user=current_user;
 	v_ficticius:= (SELECT (value::json->>'plan_statetype_ficticius')::smallint FROM config_param_system WHERE parameter='plan_statetype_vdefault');
 	SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
 	SELECT json_extract_path_text (value::json,'setArcObsolete')::boolean INTO v_set_arc_obsolete FROM config_param_system WHERE parameter='edit_arc_divide';
@@ -175,6 +175,10 @@ BEGIN
 
 		-- Control if node divides arc
 		IF v_isarcdivide=TRUE THEN 
+
+			-- psector management
+			IF (SELECT count(*) FROM selector_psector WHERE psector_id = v_psector AND cur_user = current_user) = 1 THEN v_ispsectorvdef_active = true; END IF;
+			INSERT INTO selector_psector (psector_id, cur_user) values (v_psector, current_user) ON CONFLICT DO NOTHING;
 		
 			-- Check if it's a end/start point node in case of wrong topology without start or end nodes
 			SELECT arc_id INTO v_arc_id FROM v_edit_arc WHERE ST_DWithin(ST_startpoint(the_geom), v_node_geom, v_arc_searchnodes) OR ST_DWithin(ST_endpoint(the_geom), v_node_geom, v_arc_searchnodes) LIMIT 1;
@@ -899,6 +903,10 @@ BEGIN
 
 	--last process
 	UPDATE node SET arc_id=NULL WHERE node_id=v_node_id;
+
+	IF v_ispsectorvdef_active IS FALSE THEN 
+		DELETE FROM selector_psector WHERE psector_id = v_psector AND cur_user = current_user;
+	END IF;
 
 	-- get results
 	-- info
