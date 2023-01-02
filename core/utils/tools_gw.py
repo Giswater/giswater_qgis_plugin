@@ -62,7 +62,7 @@ def load_settings(dialog, plugin='core'):
         screen_y = v_screens.GetSystemMetrics(79)  # Height of virtual screen
         monitors = v_screens.GetSystemMetrics(80)  # Will return an integer of the number of display monitors present.
 
-        if (int(x) < 0 and monitors == 1) or (int(y) < 0 and monitors == 1):
+        if None in (x, y) or ((int(x) < 0 and monitors == 1) or (int(y) < 0 and monitors == 1)):
             dialog.resize(int(width), int(height))
         else:
             if int(x) > screen_x:
