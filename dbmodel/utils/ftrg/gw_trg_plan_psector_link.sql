@@ -62,7 +62,7 @@ BEGIN
 	
 			IF NEW.arc_id IS NOT NULL AND NEW.link_id IS NULL THEN
 
-				EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+				EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{"id":["'|| v_feature ||'"]},"data":{"feature_type":"'|| v_featuretype ||'", "isPsector":"true", "forceArcs":['||NEW.arc_id||']}}$$)';
 			END IF;
 		END IF;
@@ -78,7 +78,7 @@ BEGIN
 					DELETE FROM link WHERE link_id = NEW.link_id;			
 				END IF;
 			ELSE
-				EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+				EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{"id":["'|| v_feature ||'"]},"data":{"feature_type":"'|| v_featuretype ||'", "isPsector":"true", "forceArcs":['||NEW.arc_id||']}}$$)';
 			END IF;
 		END IF;

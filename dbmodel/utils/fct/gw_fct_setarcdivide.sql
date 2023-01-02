@@ -530,7 +530,7 @@ BEGIN
 						
 						-- reconnect operative connecs
 						IF v_count_connec > 0  AND v_array_connec IS NOT NULL THEN
-							EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+							EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{"id":'|| array_to_json(v_array_connec)||'},"data":{"feature_type":"CONNEC", "forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
 
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
@@ -539,7 +539,7 @@ BEGIN
 
 						-- reconnect operative gullies
 						IF v_count_gully > 0 AND v_array_gully IS NOT NULL THEN
-							EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+							EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{"id":'|| array_to_json(v_array_gully)||'},"data":{"feature_type":"GULLY", "forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
 
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
@@ -558,14 +558,14 @@ BEGIN
 						-- reconnect planned connec links
 						FOR rec_link IN SELECT * FROM link WHERE exit_type = 'ARC' AND exit_id = v_arc_id AND state = 2 AND feature_type  ='CONNEC'
 						LOOP
-							EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+							EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{"id":['|| rec_link.feature_id||']},"data":{"linkId":"'||rec_link.link_id||'", "feature_type":"CONNEC", "forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
 						END LOOP;
 
 						-- reconnect planned gully links
 						FOR rec_link IN SELECT * FROM link WHERE exit_type = 'ARC' AND exit_id = v_arc_id AND state = 2 AND feature_type  ='GULLY'
 						LOOP
-							EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+							EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{"id":['|| rec_link.feature_id||']},"data":{"linkId":"'||rec_link.link_id||'", "feature_type":"GULLY", "forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';								
 						END LOOP;
 
@@ -750,7 +750,7 @@ BEGIN
 							-- reconnect operative connec links
 							FOR rec_link IN SELECT * FROM link WHERE exit_type = 'ARC' AND exit_id = v_arc_id AND state = 1 AND feature_type  ='CONNEC'
 							LOOP	
-								EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+								EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 								"feature":{"id":['|| rec_link.feature_id||']},"data":{"feature_type":"CONNEC", "isArcDivide":"true", "forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
 							END LOOP;
 
@@ -769,7 +769,7 @@ BEGIN
 								-- reconnect operative gully links
 								FOR rec_link IN SELECT * FROM link WHERE exit_type = 'ARC' AND exit_id = v_arc_id AND state = 1 AND feature_type  ='GULLY'
 								LOOP						
-									EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+									EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 									"feature":{"id":['|| rec_link.feature_id||']},"data":{"feature_type":"GULLY", "isArcDivide":"true", "forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
 								END LOOP;								
 							END IF;
@@ -777,14 +777,14 @@ BEGIN
 							-- reconnect planned connec links
 							FOR rec_link IN SELECT * FROM v_edit_link WHERE exit_type = 'ARC' AND exit_id = v_arc_id AND state = 2 AND feature_type  ='CONNEC'
 							LOOP
-								EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+								EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 								"feature":{"id":['|| rec_link.feature_id||']},"data":{"feature_type":"CONNEC", "isArcDivide":"true","forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
 							END LOOP;
 
 							-- reconnect planned gully links
 							FOR rec_link IN SELECT * FROM v_edit_link WHERE exit_type = 'ARC' AND exit_id = v_arc_id AND state = 2 AND feature_type  ='GULLY'
 							LOOP
-								EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+								EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 								"feature":{"id":['|| rec_link.feature_id||']},"data":{"feature_type":"GULLY", "isArcDivide":"true","forceArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';								
 							END LOOP;
 

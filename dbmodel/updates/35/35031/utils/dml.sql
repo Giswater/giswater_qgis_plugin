@@ -226,3 +226,9 @@ INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_
 INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'insert_user', 8, false, NULL, NULL, NULL);
 
 UPDATE sys_table SET id = replace(id,'v_state_','v_filter_') where id ilike 'v_state%';
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
+VALUES (3188, 'gw_fct_linktonetwork', 'utils', 'function', 
+'Function to work with gw_fct_setlinktonetwork internally', 'role_edit', 'core');
+
+UPDATE config_function SET id = 3188, function_name = 'gw_fct_linktonetwork' WHERE id  =2124;
