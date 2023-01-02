@@ -243,3 +243,20 @@ INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_p
 INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_gully', 'active', 10, false, NULL, NULL, NULL);
 INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_gully', 'insert_tstamp', 11, false, NULL, NULL, NULL);
 INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'v_edit_plan_psector_x_gully', 'insert_user', 12, false, NULL, NULL, NULL);
+
+
+delete from config_form_fields where formname='v_edit_link' and columnname in ('userdefined_geom', 'psector_rowid', 'ispsectorgeom');
+
+INSERT INTO config_form_fields VALUES('v_edit_link', 'form_feature', 'main', 'exit_topelev', 'lyt_data_1', 10, 'double', 'text', 'exit_topelev', NULL, NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, NULL);
+INSERT INTO config_form_fields VALUES('v_edit_link', 'form_feature', 'main', 'exit_elev', 'lyt_data_1', 11, 'double', 'text', 'exit_elev', NULL, NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, NULL);
+INSERT INTO config_form_fields VALUES('v_edit_link', 'form_feature', 'main', 'fluid_type', 'lyt_data_1', 12, 'string', 'text', 'fluid_type', NULL, NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields VALUES('v_edit_link', 'form_feature', 'main', 'sector_name', 'lyt_data_1', 15, 'string', 'text', 'sector_name', NULL, NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, NULL);
+
+update config_form_fields set layoutorder=16 where formname='v_edit_link' and columnname='macrosector_id';
+update config_form_fields set layoutorder=17 where formname='v_edit_link' and columnname='macrodma_id';
+update config_form_fields set layoutorder=4 where formname='v_edit_link' and columnname='exit_type';
+update config_form_fields set layoutorder=5 where formname='v_edit_link' and columnname='exit_id';
+update config_form_fields set layoutorder=6 where formname='v_edit_link' and columnname='state';
+update config_form_fields set layoutorder=7 where formname='v_edit_link' and columnname='expl_id';
+update config_form_fields set layoutorder=13 where formname='v_edit_link' and columnname='gis_length';
+update config_form_fields set layoutname='lyt_data_1' where formname='v_edit_link' and columnname='sector_id';
