@@ -98,6 +98,8 @@ BEGIN
 				UPDATE link SET expl_id=NEW.expl_id, sector_id=NEW.sector_id, dma_id = NEW.dma_id, 
 				fluid_type = NEW.fluid_type
 				WHERE link_id=v_link.link_id;
+				
+				UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE link_id = v_link.link_id;			
 			END IF;
 
 			UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE link_id = v_link.link_id;
