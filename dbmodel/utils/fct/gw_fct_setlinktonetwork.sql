@@ -31,9 +31,15 @@ Main workflows:
 EXAMPLES
 --------
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3201","3200"]},"data":{"feature_type":"CONNEC", "forcedArcs":["2001","2002"]}}$$);
-SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3203"]},"data":{"feature_type":"CONNEC", "forcedArcs":["2095"]}}$$);
+
+SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100013"]},"data":{"feature_type":"CONNEC", "forcedArcs":["221"]}}$$);
+
+SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100013"]},"data":{"feature_type":"CONNEC"}}$$);
+SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100014"]},"data":{"feature_type":"GULLY"}}$$);
+
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":
 {"id":"SELECT array_to_json(array_agg(connec_id::text)) FROM v_edit_connec WHERE connec_id IS NOT NULL AND state=1"},"data":{"feature_type":"CONNEC"}}$$);
+
 
 --fid: 217
 
@@ -86,14 +92,24 @@ v_level integer;
 v_status text;
 v_message text;
 
+v_fluidtype_value text;
+v_dma_value integer;
+
+v_fluidtype_autoupdate boolean;
+v_dma_autoupdate boolean;
+
 
 BEGIN
+
 	
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get system variables
 	SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+	SELECT value INTO v_dma_autoupdate FROM config_param_system WHERE parameter = 'edit_connect_autoupdate_dma';
+	SELECT value INTO v_fluidtype_autoupdate FROM config_param_system WHERE parameter = 'edit_connect_autoupdate_fluid';
+
 
 	-- get user variables
 	v_psector_current = (SELECT value::integer FROM config_param_user WHERE parameter = 'plan_psector_vdefault' AND cur_user = current_user);
@@ -237,9 +253,6 @@ BEGIN
 			-- compute link
 			IF v_arc.the_geom IS NOT NULL THEN
 
-				-- setting point aux
-				v_point_aux := St_closestpoint(v_arc.the_geom, St_endpoint(v_link.the_geom));
-
 				-- setting distance factor
 				IF v_projecttype  ='WS' THEN
 					v_dfactor = 0.3/(st_length(v_arc.the_geom));
@@ -248,12 +261,19 @@ BEGIN
 					v_dfactor = 0;
 				END IF;		
 
-				-- updating pjoint
+				-- setting point aux
 				IF st_equals(v_point_aux, st_endpoint(v_arc.the_geom)) THEN
 					v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, 1-v_dfactor));
 
 				ELSIF st_equals(v_point_aux, st_startpoint(v_arc.the_geom)) THEN
 					v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, v_dfactor));
+				ELSE 
+					v_point_aux := St_closestpoint(v_arc.the_geom, St_endpoint(v_link.the_geom));
+				END IF;
+
+				-- profilactic control for v_point_aux
+				IF v_point_aux IS NULL THEN
+					v_point_aux := St_closestpoint(v_arc.the_geom, v_connect.the_geom);
 				END IF;
 		
 				IF v_link.the_geom IS NULL AND v_pjointtype='ARC' THEN
@@ -292,6 +312,12 @@ BEGIN
 				END IF;
 			END IF;
 
+
+			-- control of dma and fluidtype automatic values
+			IF  v_dma_autoupdate is true or v_dma_value is null THEN v_dma_value = v_arc.dma_id; ELSE v_dma_value = v_connect.dma_id; END IF;
+			IF  v_fluidtype_autoupdate is true or v_fluidtype_value is null THEN v_fluidtype_value = v_arc.fluid_type; ELSE v_fluidtype_value = v_connect.fluid_type; END IF;
+
+
 			IF v_link.link_id IS NULL THEN
 
 				-- creation of link
@@ -299,19 +325,19 @@ BEGIN
 				
 				IF v_projecttype = 'WS' THEN
 					INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, dma_id, 
-					presszone_id, dqa_id, minsector_id) 
+					presszone_id, dqa_id, minsector_id, fluid_type) 
 					VALUES (v_link.link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id, 
-					 v_connect.state, v_arc.expl_id, v_arc.sector_id, v_arc.dma_id, v_arc.presszone_id, v_arc.dqa_id, v_arc.minsector_id);
+					 v_connect.state, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_arc.presszone_id, v_arc.dqa_id, v_arc.minsector_id, v_fluidtype_value);
 					
 				ELSIF v_projecttype = 'UD' THEN		
 
-					INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, dma_id) 
+					INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, dma_id, fluid_type) 
 					VALUES (v_link.link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id, 
-					v_connect.state, v_arc.expl_id, v_arc.sector_id, v_arc.dma_id);
+					v_connect.state, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_fluidtype_value);
 				END IF;
 			ELSE
 				UPDATE link SET the_geom=v_link.the_geom, exit_type=v_link.exit_type, exit_id=v_link.exit_id, userdefined_geom=v_link.userdefined_geom, 
-				dma_id = v_arc.dma_id WHERE link_id = v_link.link_id;
+				dma_id = v_dma_value, fluid_type = v_fluidtype_value WHERE link_id = v_link.link_id;
 
 				IF v_projecttype = 'WS' THEN
 					UPDATE link SET	presszone_id=v_arc.presszone_id, dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id;
@@ -365,8 +391,8 @@ BEGIN
 				
 					IF v_feature_type ='CONNEC' THEN
 						
-						UPDATE connec SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, 
-						pjoint_type=v_pjointtype, pjoint_id=v_pjointid, fluid_type = v_arc.fluid_type 
+						UPDATE connec SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, dma_id=v_dma_value, sector_id=v_arc.sector_id, 
+						pjoint_type=v_pjointtype, pjoint_id=v_pjointid, fluid_type = v_fluidtype_value 
 						WHERE connec_id = v_connect_id;
 						 
 						-- update specific fields for ws projects
@@ -378,8 +404,8 @@ BEGIN
 					
 					ELSIF v_feature_type ='GULLY' THEN 
 					
-						UPDATE gully SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, 
-						pjoint_type=v_pjointtype, pjoint_id=v_pjointid, fluid_type = v_arc.fluid_type 
+						UPDATE gully SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, dma_id=v_dma_value, sector_id=v_arc.sector_id, 
+						pjoint_type=v_pjointtype, pjoint_id=v_pjointid, fluid_type = v_fluidtype_value 
 						WHERE gully_id = v_connect_id;
 					END IF;
 				END IF;

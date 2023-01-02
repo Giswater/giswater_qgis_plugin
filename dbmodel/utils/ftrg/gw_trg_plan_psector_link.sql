@@ -84,37 +84,36 @@ BEGIN
 		END IF;
 	END IF;
 
+
 	-- reconnect connects
 	IF v_table_name = 'connec' THEN
 	
 		-- looking for related connecs
-		FOR v_connect IN SELECT feature_id FROM v_edit_link WHERE feature_type = 'CONNEC' AND exit_type = 'CONNEC' and exit_id = NEW.connec_id
-		AND state = 2
+		FOR v_connect IN SELECT feature_id FROM link WHERE feature_type = 'CONNEC' AND exit_type = 'CONNEC' and exit_id = NEW.connec_id
 		LOOP
+
 			UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect AND psector_id = NEW.psector_id;
 		END LOOP;
 		
 		-- looking for related gullies
 		IF v_projecttype = 'UD' THEN
 			FOR v_connect IN SELECT feature_id FROM v_edit_link WHERE feature_type = 'GULLY' AND exit_type = 'CONNEC' and exit_id = NEW.connec_id
-			AND state = 2
 			LOOP
 				UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE gully_id = v_connect AND psector_id = NEW.psector_id;
 			END LOOP;
 		END IF;
+
 		
 	ELSIF v_table_name = 'gully' THEN
 	
 		-- looking for related connecs
 		FOR v_connect IN SELECT feature_id FROM v_edit_link WHERE feature_type = 'CONNEC' AND exit_type = 'GULLY' and exit_id = NEW.gully_id
-		AND state = 2
 		LOOP
 			UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect AND psector_id = NEW.psector_id;
 		END LOOP;
 		
 		-- looking for related gullies
 		FOR v_connect IN SELECT feature_id FROM v_edit_link WHERE feature_type = 'GULLY' AND exit_type = 'GULLY' and exit_id = NEW.gully_id
-		AND state = 2
 		LOOP
 			UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE gully_id = v_connect AND psector_id = NEW.psector_id;
 		END LOOP;
