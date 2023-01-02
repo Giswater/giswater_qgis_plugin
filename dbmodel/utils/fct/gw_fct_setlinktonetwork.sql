@@ -190,7 +190,7 @@ BEGIN
 				SELECT * INTO v_link FROM link WHERE link_id =  v_linkfrompsector;
 			END IF;
 		ELSE
-			SELECT * INTO v_link FROM link WHERE feature_id = v_connect_id and state = 1 limit 1;
+			SELECT * INTO v_link FROM v_edit_link WHERE feature_id = v_connect_id limit 1;
 		END IF;
 	
 		-- exception control. It is not possible to create a link for connec over arc		
@@ -336,8 +336,7 @@ BEGIN
 					v_connect.state, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_fluidtype_value);
 				END IF;
 			ELSE
-				UPDATE link SET the_geom=v_link.the_geom, exit_type=v_link.exit_type, exit_id=v_link.exit_id, userdefined_geom=v_link.userdefined_geom, 
-				dma_id = v_dma_value, fluid_type = v_fluidtype_value WHERE link_id = v_link.link_id;
+				UPDATE link SET the_geom=v_link.the_geom, exit_type=v_link.exit_type, exit_id=v_link.exit_id, dma_id = v_dma_value, fluid_type = v_fluidtype_value WHERE link_id = v_link.link_id;
 
 				IF v_projecttype = 'WS' THEN
 					UPDATE link SET	presszone_id=v_arc.presszone_id, dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id;
@@ -479,10 +478,6 @@ BEGIN
 				'"polygon":'||v_result_polygon||'}'||
 		       '}'||
 	    '}')::json, 2124, null, null, null);
-
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$
