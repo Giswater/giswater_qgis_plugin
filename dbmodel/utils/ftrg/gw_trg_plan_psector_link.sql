@@ -26,6 +26,7 @@ v_arc record;
 v_feature text;
 v_id integer;
 v_link record;
+v_forceendpoint boolean = false;
 	
 BEGIN 
 
@@ -63,7 +64,7 @@ BEGIN
 			IF NEW.arc_id IS NOT NULL AND NEW.link_id IS NULL THEN
 
 				EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-				"feature":{"id":["'|| v_feature ||'"]},"data":{"feature_type":"'|| v_featuretype ||'", "isPsector":"true", "forceArcs":['||NEW.arc_id||']}}$$)';
+				"feature":{"id":["'|| v_feature ||'"]},"data":{"feature_type":"'|| v_featuretype ||'", "isPsector":"true", "forcedArcs":['||NEW.arc_id||']}}$$)';
 			END IF;
 		END IF;
 
@@ -78,8 +79,11 @@ BEGIN
 					DELETE FROM link WHERE link_id = NEW.link_id;			
 				END IF;
 			ELSE
+				-- get if it is not arc as exit_type
+				IF (SELECT exit_type FROM v_edit_link WHERE feature_id = v_feature) IN ('NODE', 'CONNEC', 'GULLY') THEN v_forceendpoint = true; END IF;
+			
 				EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-				"feature":{"id":["'|| v_feature ||'"]},"data":{"feature_type":"'|| v_featuretype ||'", "isPsector":"true", "forceArcs":['||NEW.arc_id||']}}$$)';
+				"feature":{"id":["'|| v_feature ||'"]},"data":{"feature_type":"'|| v_featuretype ||'", "isPsector":"true", "forceEndPoint": "'||v_forceendpoint||'", "forcedArcs":['||NEW.arc_id||']}}$$)';
 			END IF;
 		END IF;
 	END IF;
