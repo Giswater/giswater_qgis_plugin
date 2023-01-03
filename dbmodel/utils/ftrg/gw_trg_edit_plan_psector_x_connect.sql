@@ -13,7 +13,9 @@ $BODY$
 DECLARE 
 v_table text;
 v_link_id integer;
+v_exit_type text;
 v_rec record;
+
 BEGIN 
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -80,16 +82,19 @@ BEGIN
 
 		IF v_table = 'plan_psector_x_connec' then
 
-			EXECUTE 'SELECT state, arc_id FROM connec where connec_id = '''||new.connec_id||''''
+			EXECUTE 'SELECT state, arc_id FROM v_edit_connec where connec_id = '''||new.connec_id||''''
 			INTO v_rec;
         
-			v_link_id = (select link_id from link where feature_id = new.connec_id and feature_type = 'CONNEC' AND exit_id = v_rec.arc_id LIMIT 1);			
+			select link_id, exit_type INTO v_link_id, v_exit_type from v_edit_link where feature_id = new.connec_id and feature_type = 'CONNEC' AND feature_id = new.connec_id LIMIT 1;			
 
 			UPDATE plan_psector_x_connec SET doable = NEW.doable, descript = NEW.descript, arc_id = NEW.arc_id
 			WHERE id = NEW.id;
 
 			IF NEW.state  = 0 AND OLD.state = 1 AND v_rec.state = 2 THEN
 				RAISE EXCEPTION 'IT DOES NOT MAKE SENSE DOWNGRADE THE STATE OF PLANNED CONNEC.  TO UNLINK IT FROM PSECTOR PLEASE REMOVE ROW OR DELETE CONNEC';
+
+			ELSIF coalesce(NEW.arc_id,'') !=  coalesce(OLD.arc_id,'') AND v_exit_type IN ('NODE', 'CONNEC', 'GULLY') THEN
+				RAISE EXCEPTION 'DUE THIS LINK HAS EXIT TYPE DIFFERENT OF ARC IT IS NOT POSSIBLE TO UPDATE ARC_ID FROM THIS DIALOG. PLEASE USE CONNEC DIALOG TO UPDATE IT';
 				
 			ELSIF NEW.state  = 0 AND OLD.state = 1 THEN
 				DELETE FROM link WHERE link_id = OLD.link_id;
@@ -101,17 +106,20 @@ BEGIN
 						
 		ELSIF v_table = 'plan_psector_x_gully' THEN
 
-			EXECUTE 'SELECT state, arc_id FROM gully where gully_id = '''||new.gully_id||''''
+			EXECUTE 'SELECT state, arc_id FROM v_edit_gully where gully_id = '''||new.gully_id||''''
 			INTO v_rec;
         
-			v_link_id = (select link_id from link where feature_id = NEW.gully_id and feature_type = 'GULLY' AND exit_id = v_rec.arc_id LIMIT 1);			
-		
+			select link_id, exit_type INTO v_link_id, v_exit_type from v_edit_link where feature_id = new.gully_id and feature_type = 'GULLY' AND feature_id = new.gully_id LIMIT 1;	
+
 			UPDATE plan_psector_x_gully SET doable = NEW.doable, descript = NEW.descript, arc_id = NEW.arc_id
 			WHERE id = NEW.id;	
 
 			IF NEW.state  = 0 AND OLD.state = 1 AND v_rec.state = 2 THEN
-				RAISE EXCEPTION 'IT DOES NOT MAKE SENSE DOWNGRADE THE STATE OF PLANNED CONNEC.  TO UNLINK IT FROM PSECTOR PLEASE REMOVE ROW OR DELETE CONNEC';
-				
+				RAISE EXCEPTION 'IT DOES NOT MAKE SENSE DOWNGRADE THE STATE OF PLANNED GULLY.  TO UNLINK IT FROM PSECTOR PLEASE REMOVE ROW OR DELETE GULLY';
+
+			ELSIF coalesce(NEW.arc_id,'') !=  coalesce(OLD.arc_id,'') AND v_exit_type IN ('NODE', 'CONNEC', 'GULLY') THEN
+				RAISE EXCEPTION 'DUE THIS LINK HAS EXIT TYPE DIFFERENT OF ARC IT IS NOT POSSIBLE TO UPDATE ARC_ID FROM THIS DIALOG. PLEASE USE GULLY DIALOG TO UPDATE IT';
+					
 			ELSIF NEW.state  = 0 AND OLD.state = 1 THEN
 				DELETE FROM link WHERE link_id = OLD.link_id;
 				DELETE FROM plan_psector_x_gully WHERE id = NEW.id;

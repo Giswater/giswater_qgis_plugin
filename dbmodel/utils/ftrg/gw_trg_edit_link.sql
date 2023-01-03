@@ -632,15 +632,6 @@ BEGIN
 	
 		ELSIF NEW.state = 2 AND st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
 
-			-- update link
-			UPDATE link SET exit_id = NEW.exit_id, exit_type = NEW.exit_type, the_geom = NEW.the_geom, expl_id = v_expl, sector_id = v_sector, dma_id = v_dma 
-			WHERE link_id = NEW.link_id;
-
-			-- update specific colums for ws-link
-			IF v_projectype = 'WS' THEN
-				UPDATE link SET presszone_id = v_presszone, dqa_id = NEW.dqa_id, minsector_id = NEW.minsector_id  WHERE link_id = NEW.link_id;
-			END IF;	
-
 			-- update values on plan_psector tables
 			IF NEW.feature_type='CONNEC' THEN
 				UPDATE plan_psector_x_connec SET arc_id = v_arc_id WHERE plan_psector_x_connec.link_id=NEW.link_id;
@@ -648,6 +639,16 @@ BEGIN
 			ELSIF NEW.feature_type='GULLY' THEN
 				UPDATE plan_psector_x_gully SET arc_id = v_arc_id WHERE plan_psector_x_gully.link_id=NEW.link_id;
 			END IF;
+
+			-- update specific colums for ws-link
+			IF v_projectype = 'WS' THEN
+				UPDATE link SET presszone_id = v_presszone, dqa_id = NEW.dqa_id, minsector_id = NEW.minsector_id  WHERE link_id = NEW.link_id;
+			END IF;	
+			
+			-- update link
+			UPDATE link SET exit_id = NEW.exit_id, exit_type = NEW.exit_type, the_geom = NEW.the_geom, expl_id = v_expl, sector_id = v_sector, dma_id = v_dma 
+			WHERE link_id = NEW.link_id;
+			
 		END IF;
 
 		-- update link state
