@@ -59,8 +59,9 @@ BEGIN
 	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 	v_project_type = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
 
-	-- get associated feature
+	-- get element_type and associated feature
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
+        SELECT elementtype_id INTO v_elementtype_id FROM cat_element WHERE id=NEW.elementcat_id;
 		SELECT node_id, 'node'::text INTO v_feature, v_tablefeature FROM v_edit_node WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);
 		IF v_feature IS NULL THEN
 			SELECT connec_id, 'connec'::text INTO v_feature, v_tablefeature FROM v_edit_connec WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);
@@ -72,8 +73,6 @@ BEGIN
 			END IF;
 		END IF;
 	END IF;
- 	
- 	SELECT elementtype_id INTO v_elementtype_id FROM cat_element WHERE id=NEW.elementcat_id;
 
 	-- INSERT
 	IF TG_OP = 'INSERT' THEN
