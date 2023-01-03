@@ -232,3 +232,5 @@ VALUES (3188, 'gw_fct_linktonetwork', 'utils', 'function',
 'Function to work with gw_fct_setlinktonetwork internally', 'role_edit', 'core');
 
 UPDATE config_function SET id = 3188, function_name = 'gw_fct_linktonetwork' WHERE id  =2124;
+
+UPDATE sys_message SET error_message=upper(error_message), hint_message=upper(hint_message);
