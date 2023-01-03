@@ -234,20 +234,20 @@ UPDATE config_function SET id = 3188, function_name = 'gw_fct_linktonetwork' WHE
 UPDATE sys_message SET error_message=upper(error_message), hint_message=upper(hint_message);
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
-VALUES (3202, 'IT''S NOT POSSIBLE TO BREAK PLANNED ARCS BY USING OPERATIVE NODES', 'TRY USING PLANNED NODES', 2, true, 'utils', 'core');
+VALUES (3202, 'IT''S NOT POSSIBLE TO BREAK PLANNED ARCS BY USING OPERATIVE NODES', 'TRY IT USING PLANNED NODES', 2, true, 'utils', 'core');
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
-VALUES (3204, 'THIS CONNEC HAS AN ASSOCIATED LINK', 'REMOVE THE ASSOCIATED LINK BEFORE DELETING VALUE OF ARC_ID', 2, true, 'utils', 'core');
+VALUES (3204, 'THIS FEATURE (CONNEC/GULLY) HAS AN ASSOCIATED LINK', 'REMOVE THE ASSOCIATED LINK AND ARC_ID FIELD WILL BE SET TO NULL', 2, true, 'utils', 'core');
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
-VALUES (3208, 'THIS CONNEC HAS AN ASSOCIATED LINK', 'INSTEAD OF DELETING VALUE OF ARC_ID, REMOVE THE ASSOCIATED LINK AND FIELD ARC_ID WILL BE SET TO NULL',
+VALUES (3208, 'THIS FEATURE (CONNEC/GULLY) HAS AN ASSOCIATED LINK', 'REMOVE THE ASSOCIATED LINK AND ARC_ID FIELD WILL BE SET TO NULL',
  2, true, 'utils', 'core');
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
-VALUES (3210, 'IT''S IMPOSSIBLE TO DOWNGRADE THE STATE OF A PLANNED CONNEC', 'TO UNLINK IT FROM PSECTOR REMOVE ROW OR DELETE CONNEC', 2, true, 'utils', 'core');
+VALUES (3210, 'IT''S IMPOSSIBLE TO DOWNGRADE THE STATE OF A PLANNED FEATURE', 'TO UNLINK,  REMOVE FROM PSECTOR DIALOG OR DELETE IT', 2, true, 'utils', 'core');
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
-VALUES (3212, 'IT''S IMPOSSIBLE TO UPDATE ARC_ID AS THIS THIS LINK HAS EXIT TYPE DIFFERENT THEN THE ARC', 'USE CONNEC DIALOG TO UPDATE IT', 2, true, 'utils', 'core');
+VALUES (3212, 'IT''S IMPOSSIBLE TO UPDATE ARC_ID DUE THIS LINK HAS NOT EXIT TYPE ARC', 'USE FEATURE (CONNEC/GULLY) DIALOG TO UPDATE IT', 2, true, 'utils', 'core');
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
 VALUES (3218, 'IT''S IMPOSSIBLE TO ATTACH OPERATIVE LINK TO PLANNED FEATURE', 'SET LINK''S STATE TO PLANNED TO CONTINUE', 2, true, 'utils', 'core');
@@ -261,17 +261,17 @@ VALUES (3222, 'IT''S IMPOSSIBLE TO UPGRADE LINK',
 2, true, 'utils', 'core');
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
-VALUES (3224, 'IT''S IMPOSSIBLE TO CREATE A PLANNED LINK FOR OPERATIVE CONNEC',
+VALUES (3224, 'IT''S IMPOSSIBLE TO CREATE A PLANNED LINK FOR OPERATIVE FEATURE (CONNEC/GULLY)',
 'IF YOU ARE WORKING ON PSECTOR, USE LINK2NETWORK BUTTON OR FEATURE/PSECTOR DIALOGS(SETTING ARC_ID) AND THEN MODIFY IT',
 2, true, 'utils', 'core');
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
 VALUES (3226, 'IT''S IMPOSSIBLE TO DOWNGRADE LINK', ' IF YOU WANT TO REMOVE IT FROM PSECTOR, DELETE IT',2, true, 'utils', 'core');
 
-UPDATE sys_message SET hint_message = 'IN ORDER TO CONNECT LINK WITH PSCETOR USE PSECTOR DIALOG OR LINK2NETWORK BUTTON. YOU CAN''T DRAW IN ON LINK LAYER'
+UPDATE sys_message SET hint_message = 'IN ORDER TO RELATE LINK WITH PSECTOR USE PSECTOR DIALOG OR LINK2NETWORK BUTTON. YOU CAN''T DRAW IN ON LINK LAYER'
 WHERE id=3076;
 
-UPDATE sys_message SET hint_message = 'YOU CAN''T HAVE 2 LINKS RELATED TO THE SAME FEATURE IN ONE PSECTOR'
+UPDATE sys_message SET hint_message = 'YOU CAN''T HAVE TWO LINKS RELATED TO THE SAME FEATURE (CONNEC/GULLY) IN ONE PSECTOR'
 WHERE id=3082;
 
 INSERT INTO inp_typevalue(typevalue, id, idval) VALUES ('inp_pjoint_type','ARC','ARC');
