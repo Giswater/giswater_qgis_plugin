@@ -570,9 +570,9 @@ BEGIN
 				END IF;
 			ELSE
 				-- update connect
-				IF NEW.feature_type='CONNEC' THEN
+				IF NEW.feature_type='CONNEC' AND v_pjoint_id IS NOT NULL THEN
 					UPDATE connec SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, sector_id = v_sector, dma_id = v_dma WHERE connec_id = NEW.feature_id;
-				ELSIF NEW.feature_type='GULLY' THEN
+				ELSIF NEW.feature_type='GULLY' AND v_pjoint_id IS NOT NULL  THEN
 					UPDATE gully SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, sector_id = v_sector, dma_id = v_dma WHERE gully_id = NEW.feature_id;
 				END IF;
 
