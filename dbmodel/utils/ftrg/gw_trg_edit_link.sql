@@ -397,8 +397,8 @@ BEGIN
 		IF v_end_state=2 THEN
 
 			IF NEW.state = 1 AND TG_OP = 'INSERT' THEN
-
-				RAISE EXCEPTION 'IT IS NOT POSSIBLE TO ATACH OPERATIVE LINK TO PLANNED FEATURE. PLEASE SET PLANNED STATE FOR THIS LINK TO CONTINUE.';
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3218", "function":"1116","debug_msg":null}}$$);';
 
 			ELSIF NEW.state = 1 AND TG_OP = 'UPDATE' THEN
 				-- nothing to do (at least on this moment)
@@ -446,7 +446,8 @@ BEGIN
 		IF NEW.state = 1 THEN
 		
 			IF TG_OP = 'UPDATE' AND OLD.state = 2 THEN
-				RAISE EXCEPTION 'IT IS NOT POSSIBLE TO DOWNGRADE LINK TO OPERATIVE LINK BECAUSE IT IS RELATED TO A PLANNED FEATURE';
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3220", "function":"1116","debug_msg":null}}$$);';
 			END IF;
 		
 			IF (SELECT feature_id FROM link WHERE feature_id=NEW.feature_id AND link_id::text != NEW.link_id::text AND state = 1) IS NOT NULL THEN
@@ -483,12 +484,14 @@ BEGIN
 
 			IF TG_OP = 'UPDATE' THEN
 				IF OLD.state = 1 THEN
-					RAISE EXCEPTION 'IT IS NOT POSSIBLE TO UPGRADE LINK. IF YOU TRYING TO WORK WITH SOME PLANNED LINK PLEASE CREATE A NEW ONE. YOU CAN WORK WITH LINKS LAYER, LINK2NETWORK BUTTON OR FEATURE/PSECTOR DIALOGS (SETTING ARC_ID)';
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3222", "function":"1116","debug_msg":null}}$$);';
 				END IF;
 			END IF;
 
 			IF TG_OP = 'INSERT' AND v_connect.state = 1 THEN
-				RAISE EXCEPTION 'IT IS NOT POSSIBLE TO CREATE A PLANNED LINK FOR OPERATIVE CONNECT. IF YOU ARE WORKING ON PSECTOR WITH THIS CONNECT, PLEASE USE LINK2NETWORK BUTTON OR FEATURE/PSECTOR DIALOGS(SETTING ARC_ID) AND THEN MODIFY IT';
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3224", "function":"1116","debug_msg":null}}$$);';
 			END IF;
 
 			-- looking for same psector
@@ -604,13 +607,13 @@ BEGIN
 			END IF;	
 
 		ELSIF NEW.state = 0 AND OLD.state =2 THEN
-		
-			RAISE EXCEPTION 'IT IS NOT POSSIBLE TO DOWNGRADE LINK. IF YOU ARE LOOKING TO REMOVE FROM PSECTOR, PLEASE DELETE IT';
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3226", "function":"1116","debug_msg":null}}$$);';
 
 		ELSIF NEW.state = 2 AND OLD.state = 1 THEN
-
-			RAISE EXCEPTION 'IT IS NOT POSSIBLE TO UPGRADE LINK. IF YOU ARE LOOKING TO PLAN SOMETHING PLEASE CREATE A NEW ONE. YOU CAN WORK WITH LINKS LAYER, LINK2NETWORK BUTTON OR FEATURE/PSECTOR DIALOGS (SETTING ARC_ID)';
-			
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3222", "function":"1116","debug_msg":null}}$$);';
+		
 		ELSIF NEW.state = 1 AND st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
 
 			-- update link

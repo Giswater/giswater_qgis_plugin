@@ -77,7 +77,8 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		IF NEW.arc_id IS NULL AND OLD.arc_id IS NOT NULL THEN
-			RAISE EXCEPTION 'THIS CONNEC HAS AN ASSOCIATED LINK. IN SPITE OF TO SET NULL ON ARC_ID, PLEASE REMOVE THE ASSOCIATED LINK AND ARC_ID WILL BE UPDATED TO NULL';
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3208", "function":"3174","debug_msg":""}}$$);';
 		END IF;
 
 		IF v_table = 'plan_psector_x_connec' then
@@ -91,11 +92,13 @@ BEGIN
 			WHERE id = NEW.id;
 
 			IF NEW.state  = 0 AND OLD.state = 1 AND v_rec.state = 2 THEN
-				RAISE EXCEPTION 'IT DOES NOT MAKE SENSE DOWNGRADE THE STATE OF PLANNED CONNEC.  TO UNLINK IT FROM PSECTOR PLEASE REMOVE ROW OR DELETE CONNEC';
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3210", "function":"3174","debug_msg":""}}$$);';
 
 			ELSIF coalesce(NEW.arc_id,'') !=  coalesce(OLD.arc_id,'') AND v_exit_type IN ('NODE', 'CONNEC', 'GULLY') THEN
-				RAISE EXCEPTION 'DUE THIS LINK HAS EXIT TYPE DIFFERENT OF ARC IT IS NOT POSSIBLE TO UPDATE ARC_ID FROM THIS DIALOG. PLEASE USE CONNEC DIALOG TO UPDATE IT';
-				
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3212", "function":"3174","debug_msg":""}}$$);';
+
 			ELSIF NEW.state  = 0 AND OLD.state = 1 THEN
 				DELETE FROM link WHERE link_id = OLD.link_id;
 				DELETE FROM plan_psector_x_connec WHERE id = NEW.id;
@@ -115,11 +118,13 @@ BEGIN
 			WHERE id = NEW.id;	
 
 			IF NEW.state  = 0 AND OLD.state = 1 AND v_rec.state = 2 THEN
-				RAISE EXCEPTION 'IT DOES NOT MAKE SENSE DOWNGRADE THE STATE OF PLANNED GULLY.  TO UNLINK IT FROM PSECTOR PLEASE REMOVE ROW OR DELETE GULLY';
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3214", "function":"3174","debug_msg":""}}$$);';
 
 			ELSIF coalesce(NEW.arc_id,'') !=  coalesce(OLD.arc_id,'') AND v_exit_type IN ('NODE', 'CONNEC', 'GULLY') THEN
-				RAISE EXCEPTION 'DUE THIS LINK HAS EXIT TYPE DIFFERENT OF ARC IT IS NOT POSSIBLE TO UPDATE ARC_ID FROM THIS DIALOG. PLEASE USE GULLY DIALOG TO UPDATE IT';
-					
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3216", "function":"3174","debug_msg":""}}$$);';
+
 			ELSIF NEW.state  = 0 AND OLD.state = 1 THEN
 				DELETE FROM link WHERE link_id = OLD.link_id;
 				DELETE FROM plan_psector_x_gully WHERE id = NEW.id;

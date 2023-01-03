@@ -266,8 +266,6 @@ BEGIN
                     
                 END IF;
 
-               -- raise exception ' % % ',sys_y1_aux, sys_y2_aux;
-
                 -- calculate sys_elev_1 & sys_elev_2 when USE elevation values from arc 
                 IF TG_OP  = 'INSERT' THEN
 

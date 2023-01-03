@@ -652,7 +652,8 @@ BEGIN
 				ELSE
 					IF (SELECT link_id FROM plan_psector_x_connec JOIN selector_psector USING (psector_id)
 						WHERE connec_id=NEW.connec_id AND psector_id = v_psector_vdefault AND cur_user = current_user AND state = 1) IS NOT NULL THEN
-						RAISE EXCEPTION 'THIS CONNEC HAS AN ASSOCIATED LINK. BEFORE TO SET NULL ON ARC_ID, PLEASE REMOVE THE ASSOCIATED LINK';
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3204", "function":"1304","debug_msg":""}}$$);';
 					ELSE
 						UPDATE plan_psector_x_connec SET arc_id = null, link_id = null WHERE connec_id=NEW.connec_id AND psector_id = v_psector_vdefault AND state = 1;
 					END IF;
@@ -671,7 +672,8 @@ BEGIN
 					NEW.presszone_id = v_arc.presszone_id; NEW.dqa_id = v_arc.dqa_id;  NEW.minsector_id = v_arc.minsector_id; 
 				ELSE
 					IF (SELECT count(*)FROM link WHERE feature_id = NEW.connec_id AND state = 1) > 0 THEN
-						RAISE EXCEPTION 'THIS CONNEC HAS AN ASSOCIATED LINK. BEFORE TO SET NULL ON ARC_ID, PLEASE REMOVE THE ASSOCIATED LINK';
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3204", "function":"1304","debug_msg":""}}$$);';
 					ELSE
 						NEW.sector_id = 0; NEW.presszone_id = '0'; NEW.dqa_id = 0; NEW.dma_id = 0; NEW.minsector_id = 0; NEW.minsector_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
 					END IF;

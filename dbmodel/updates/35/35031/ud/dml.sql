@@ -263,3 +263,12 @@ update config_form_fields set layoutname='lyt_data_1' where formname='v_edit_lin
 
 DELETE FROM config_param_system WHERE "parameter"='Dynamic mapzones';
 DELETE FROM config_param_system WHERE "parameter"='Mapzones dynamic symbology';
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
+VALUES (3206, 'THIS GULLY HAS AN ASSOCIATED LINK', 'REMOVE THE ASSOCIATED LINK BEFORE DELETING VALUE OF ARC_ID', 2, true, 'ud', 'core');
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
+VALUES (3214, 'IT''S IMPOSSIBLE TO DOWNGRADE THE STATE OF A PLANNED GULLY', 'TO UNLINK IT FROM PSECTOR REMOVE ROW OR DELETE GULLY', 2, true, 'ud', 'core');
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
+VALUES (3216, 'IT''S IMPOSSIBLE TO UPDATE ARC_ID AS THIS THIS LINK HAS EXIT TYPE DIFFERENT THEN THE ARC', 'USE GULLY DIALOG TO UPDATE IT', 2, true, 'ud', 'core');

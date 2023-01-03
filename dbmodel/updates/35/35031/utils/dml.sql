@@ -225,12 +225,51 @@ INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_
 INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'insert_tstamp', 7, false, NULL, NULL, NULL);
 INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'insert_user', 8, false, NULL, NULL, NULL);
 
-UPDATE sys_table SET id = replace(id,'v_state_','v_filter_') where id ilike 'v_state%';
-
 INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
 VALUES (3188, 'gw_fct_linktonetwork', 'utils', 'function', 
 'Function to work with gw_fct_setlinktonetwork internally', 'role_edit', 'core');
 
-UPDATE config_function SET id = 3188, function_name = 'gw_fct_linktonetwork' WHERE id  =2124;
+UPDATE config_function SET id = 3188, function_name = 'gw_fct_linktonetwork' WHERE id =2124;
 
 UPDATE sys_message SET error_message=upper(error_message), hint_message=upper(hint_message);
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
+VALUES (3202, 'IT''S NOT POSSIBLE TO BREAK PLANNED ARCS BY USING OPERATIVE NODES', 'TRY USING PLANNED NODES', 2, true, 'utils', 'core');
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
+VALUES (3204, 'THIS CONNEC HAS AN ASSOCIATED LINK', 'REMOVE THE ASSOCIATED LINK BEFORE DELETING VALUE OF ARC_ID', 2, true, 'utils', 'core');
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
+VALUES (3208, 'THIS CONNEC HAS AN ASSOCIATED LINK', 'INSTEAD OF DELETING VALUE OF ARC_ID, REMOVE THE ASSOCIATED LINK AND FIELD ARC_ID WILL BE SET TO NULL',
+ 2, true, 'utils', 'core');
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
+VALUES (3210, 'IT''S IMPOSSIBLE TO DOWNGRADE THE STATE OF A PLANNED CONNEC', 'TO UNLINK IT FROM PSECTOR REMOVE ROW OR DELETE CONNEC', 2, true, 'utils', 'core');
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
+VALUES (3212, 'IT''S IMPOSSIBLE TO UPDATE ARC_ID AS THIS THIS LINK HAS EXIT TYPE DIFFERENT THEN THE ARC', 'USE CONNEC DIALOG TO UPDATE IT', 2, true, 'utils', 'core');
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
+VALUES (3218, 'IT''S IMPOSSIBLE TO ATTACH OPERATIVE LINK TO PLANNED FEATURE', 'SET LINK''S STATE TO PLANNED TO CONTINUE', 2, true, 'utils', 'core');
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
+VALUES (3220, 'IT''S IMPOSSIBLE TO CHANGE LINK''S STATE TO OPERATIVE, BECAUSE IT''S RELATED TO A PLANNED FEATURE', NULL, 2, true, 'utils', 'core');
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
+VALUES (3222, 'IT''S IMPOSSIBLE TO UPGRADE LINK',
+'IN ORDER TO WORK WITH PLANNED LINK, CREATE NEW ONE BY DRAWING IT ON LINK LAYER, USING LINK2NETWORK BUTTON OR FEATURE/PSECTOR DIALOGS (SETTING ARC_ID)',
+2, true, 'utils', 'core');
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
+VALUES (3224, 'IT''S IMPOSSIBLE TO CREATE A PLANNED LINK FOR OPERATIVE CONNEC',
+'IF YOU ARE WORKING ON PSECTOR, USE LINK2NETWORK BUTTON OR FEATURE/PSECTOR DIALOGS(SETTING ARC_ID) AND THEN MODIFY IT',
+2, true, 'utils', 'core');
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
+VALUES (3226, 'IT''S IMPOSSIBLE TO DOWNGRADE LINK', ' IF YOU WANT TO REMOVE IT FROM PSECTOR, DELETE IT',2, true, 'utils', 'core');
+
+UPDATE sys_message SET hint_message = 'IN ORDER TO CONNECT LINK WITH PSCETOR USE PSECTOR DIALOG OR LINK2NETWORK BUTTON. YOU CAN''T DRAW IN ON LINK LAYER'
+WHERE id=3076;
+
+UPDATE sys_message SET hint_message = 'YOU CAN''T HAVE 2 LINKS RELATED TO THE SAME FEATURE IN ONE PSECTOR'
+WHERE id=3082;

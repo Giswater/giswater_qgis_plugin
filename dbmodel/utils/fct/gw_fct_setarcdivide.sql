@@ -301,7 +301,8 @@ BEGIN
 						INSERT INTO arc SELECT rec_aux2.*;		
 
 						IF rec_aux1.state = 2 THEN
-							RAISE EXCEPTION 'IT IS NOT POSSIBLE TO BREAK PLANNED ARCS BY USING OPERATIVE NODES. HINT: TRY WITH PLANNED NODES.';
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+							"data":{"message":"3202", "function":"2114","debug_msg":"'||rec_aux1.arc_id||'"}}$$);' INTO v_audit_result;
 						END IF;
 
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
