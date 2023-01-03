@@ -131,10 +131,10 @@ BEGIN
                 EXECUTE 'SELECT graphconfig FROM '||rec||' WHERE '||rec||'_id::text = '||quote_literal(v_mapzone_id)||'::text'
                 INTO v_check_graphconfig;
 
-                    IF v_check_graphconfig IS NULL THEN 
+                IF v_check_graphconfig IS NULL OR v_check_graphconfig = '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}' THEN 
                 --Define graphconfig in case when its null
                
-                    EXECUTE 'SELECT jsonb_build_object(''use'',ARRAY[a.feature], ''ignore'',''{}''::text[]) FROM (
+                    EXECUTE 'SELECT jsonb_build_object(''use'',ARRAY[a.feature], ''ignore'',''{}''::text[], ''forceClosed'',''{}''::text[]) FROM (
                     SELECT jsonb_build_object(
                     ''nodeParent'','||v_feature_id||'::text,
                     ''toArc'',   ARRAY['||v_arc_id||'::text] ) AS feature)a'

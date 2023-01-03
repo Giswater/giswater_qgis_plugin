@@ -478,8 +478,8 @@ BEGIN
 			||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE)';
 
 			-- set header node for mapzones
-			v_text = 'SELECT ((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'')::integer as node_id 
-			FROM '||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE';
+			v_text = 'SELECT node_id::integer  FROM( SELECT ((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'') as node_id 
+			FROM '||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE)a WHERE node_id ~ ''^[0-9]+$''';
 
 			-- close boundary conditions acording config_graph_valve (flag=1)
 			IF v_class !='DRAINZONE' THEN
@@ -654,7 +654,11 @@ BEGIN
 				v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||' FROM v_edit_arc a WHERE a.arc_id=connec.arc_id';
 				EXECUTE v_querytext;
 
-				IF v_project_type='UD' THEN
+				IF v_project_type='WS' THEN
+					v_querytext = 'UPDATE link SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||' FROM v_edit_connec a WHERE a.connec_id=link.feature_id';
+					EXECUTE v_querytext;
+
+				ELSIF v_project_type='UD' THEN
 					v_querytext = 'UPDATE gully SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||' FROM v_edit_arc a WHERE a.arc_id=gully.arc_id';
 					EXECUTE v_querytext;
 				END IF;	
