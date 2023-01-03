@@ -344,7 +344,11 @@ class GwInfo(QObject):
                 action.setChecked(False)
                 return
         # Block the signals of de dialog so that the key ESC does not close it
-        dialog.key_escape.disconnect()
+        try:
+            dialog.key_escape.disconnect()
+        except Exception as e:
+            self._cancel_snapping_tool(dialog, action)
+            return
 
         self.vertex_marker = self.snapper_manager.vertex_marker
 
