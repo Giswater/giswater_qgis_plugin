@@ -1955,7 +1955,10 @@ class GwInfo(QObject):
             return False
 
         # If we create a new feature
+
         if self.new_feature_id is not None:
+            if new_feature is False:
+                new_feature = tools_qt.get_feature_by_id(self.info_layer, self.new_feature_id)
             new_feature.setAttribute(id_name, newfeature_id)
             after_insert = True
             for k, v in list(_json.items()):
