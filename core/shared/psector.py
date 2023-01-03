@@ -209,32 +209,65 @@ class GwPsector:
         self.doc_id = self.dlg_plan_psector.findChild(QLineEdit, "doc_id")
         self.tbl_document = self.dlg_plan_psector.findChild(QTableView, "tbl_document")
 
+        # Fill tables tbl_arc_plan, tbl_node_plan, tbl_v_plan/om_other_x_psector with selected filter
+
+        expr = " psector_id = " + str(psector_id)
+
+        # tbl_psector_x_arc
+        self.fill_table(self.dlg_plan_psector, self.qtbl_arc, self.tablename_psector_x_arc,
+                        set_edit_triggers=QTableView.DoubleClicked, expr=expr)
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_arc, self.tablename_psector_x_arc)
+        self.qtbl_arc.setProperty('tablename', self.tablename_psector_x_arc)
+
+        self.qtbl_arc.selectionModel().selectionChanged.connect(partial(
+            tools_qgis.highlight_features_by_id, self.qtbl_arc, "v_edit_arc", "arc_id", self.rubber_band_point, 5
+        ))
+
+        # tbl_psector_x_node
+        self.fill_table(self.dlg_plan_psector, self.qtbl_node, self.tablename_psector_x_node,
+                        set_edit_triggers=QTableView.DoubleClicked, expr=expr)
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_node, self.tablename_psector_x_node)
+        self.qtbl_node.setProperty('tablename', self.tablename_psector_x_node)
+
+        self.qtbl_node.selectionModel().selectionChanged.connect(partial(
+            tools_qgis.highlight_features_by_id, self.qtbl_node, "v_edit_node", "node_id", self.rubber_band_point, 10
+        ))
+
+        # tbl_psector_x_connec
+        self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec,
+                        set_edit_triggers=QTableView.DoubleClicked, expr=expr)
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec)
+        self.qtbl_connec.setProperty('tablename', self.tablename_psector_x_connec)
+
+        self.qtbl_connec.selectionModel().selectionChanged.connect(partial(
+            tools_qgis.highlight_features_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band_point,
+            10
+        ))
+        self.qtbl_connec.selectionModel().selectionChanged.connect(partial(
+            self._manage_tab_feature_buttons
+        ))
+
+        # tbl_psector_x_gully
+        if self.project_type.upper() == 'UD':
+            self.fill_table(self.dlg_plan_psector, self.qtbl_gully, self.tablename_psector_x_gully,
+                            set_edit_triggers=QTableView.DoubleClicked, expr=expr)
+            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_gully, self.tablename_psector_x_gully)
+            self.qtbl_gully.setProperty('tablename', self.tablename_psector_x_gully)
+
+            self.qtbl_gully.selectionModel().selectionChanged.connect(partial(
+                tools_qgis.highlight_features_by_id, self.qtbl_gully, "v_edit_gully", "gully_id",
+                self.rubber_band_point, 10
+            ))
+            self.qtbl_gully.selectionModel().selectionChanged.connect(partial(
+                self._manage_tab_feature_buttons
+            ))
+
         if psector_id is not None:
 
             self.set_tabs_enabled(True)
             self.enable_buttons(True)
             self.dlg_plan_psector.name.setEnabled(True)
-            # tbl_psector_x_arc
-            self.fill_table(self.dlg_plan_psector, self.qtbl_arc, self.tablename_psector_x_arc,
-                            set_edit_triggers=QTableView.DoubleClicked)
-            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_arc, self.tablename_psector_x_arc)
-            self.qtbl_arc.setProperty('tablename', self.tablename_psector_x_arc)
-            # tbl_psector_x_node
-            self.fill_table(self.dlg_plan_psector, self.qtbl_node, self.tablename_psector_x_node,
-                            set_edit_triggers=QTableView.DoubleClicked)
-            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_node, self.tablename_psector_x_node)
-            self.qtbl_node.setProperty('tablename', self.tablename_psector_x_node)
-            # tbl_psector_x_connec
-            self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec,
-                            set_edit_triggers=QTableView.DoubleClicked)
-            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec)
-            self.qtbl_connec.setProperty('tablename', self.tablename_psector_x_connec)
-            # tbl_psector_x_gully
-            if self.project_type.upper() == 'UD':
-                self.fill_table(self.dlg_plan_psector, self.qtbl_gully, self.tablename_psector_x_gully,
-                                set_edit_triggers=QTableView.DoubleClicked)
-                tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_gully, self.tablename_psector_x_gully)
-                self.qtbl_gully.setProperty('tablename', self.tablename_psector_x_gully)
+
             sql = (f"SELECT psector_id, name, psector_type, expl_id, priority, descript, text1, text2, "
                    f"text3, text4, text5, text6, num_value, observ, atlas_id, scale, rotation, active, ext_code, status, workcat_id, parent_id"
                    f" FROM plan_psector "
@@ -289,41 +322,7 @@ class GwPsector:
             self.fill_widget(self.dlg_plan_psector, "rotation", row)
             self.fill_widget(self.dlg_plan_psector, "parent_id", row)
 
-            # Fill tables tbl_arc_plan, tbl_node_plan, tbl_v_plan/om_other_x_psector with selected filter
-            expr = " psector_id = " + str(psector_id)
-            self.qtbl_arc.model().setFilter(expr)
-            self.qtbl_arc.model().select()
-            self.qtbl_arc.selectionModel().selectionChanged.connect(partial(
-                tools_qgis.highlight_features_by_id, self.qtbl_arc, "v_edit_arc", "arc_id", self.rubber_band_point, 5
-            ))
 
-            expr = " psector_id = " + str(psector_id)
-            self.qtbl_node.model().setFilter(expr)
-            self.qtbl_node.model().select()
-            self.qtbl_node.selectionModel().selectionChanged.connect(partial(
-                tools_qgis.highlight_features_by_id, self.qtbl_node, "v_edit_node", "node_id", self.rubber_band_point, 10
-            ))
-
-            expr = " psector_id = " + str(psector_id)
-            self.qtbl_connec.model().setFilter(expr)
-            self.qtbl_connec.model().select()
-            self.qtbl_connec.selectionModel().selectionChanged.connect(partial(
-                tools_qgis.highlight_features_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band_point, 10
-            ))
-            self.qtbl_connec.selectionModel().selectionChanged.connect(partial(
-                self._manage_tab_feature_buttons
-            ))
-
-            if self.project_type.upper() == 'UD':
-                expr = " psector_id = " + str(psector_id)
-                self.qtbl_gully.model().setFilter(expr)
-                self.qtbl_gully.model().select()
-                self.qtbl_gully.selectionModel().selectionChanged.connect(partial(
-                    tools_qgis.highlight_features_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", self.rubber_band_point, 10
-                ))
-                self.qtbl_gully.selectionModel().selectionChanged.connect(partial(
-                    self._manage_tab_feature_buttons
-                ))
 
             self.populate_budget(self.dlg_plan_psector, psector_id)
             self.update = True
@@ -990,6 +989,11 @@ class GwPsector:
             tools_qgis.disconnect_snapping()
             tools_gw.disconnect_signal('psector')
             tools_qgis.disconnect_signal_selection_changed()
+
+            # Apply filters on tableview
+            if hasattr(self, 'dlg_psector_mng'):
+                self._filter_table(self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name, self.dlg_psector_mng.chk_active, 'v_ui_plan_psector')
+
         except RuntimeError:
             pass
 
@@ -1564,10 +1568,10 @@ class GwPsector:
         tools_qt.set_tableview_config(self.qtbl_psm, sectionResizeMode=0)
 
         # Set signals
-        #self.dlg_psector_mng.chk_active.stateChanged.connect(partial(self._filter_table, self.dlg_psector_mng,
-        #    self.qtbl_psm, self.dlg_psector_mng.txt_name, self.dlg_psector_mng.chk_active, table_name))
+        self.dlg_psector_mng.chk_active.stateChanged.connect(partial(self._filter_table, self.dlg_psector_mng,
+           self.qtbl_psm, self.dlg_psector_mng.txt_name, self.dlg_psector_mng.chk_active, table_name))
         self.dlg_psector_mng.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_psector_mng))
-        #self.dlg_psector_mng.btn_toggle_active.clicked.connect(partial(self.set_toggle_active, self.dlg_psector_mng, self.qtbl_psm))
+        self.dlg_psector_mng.btn_toggle_active.clicked.connect(partial(self.set_toggle_active, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.rejected.connect(partial(tools_gw.close_dialog, self.dlg_psector_mng))
         self.dlg_psector_mng.btn_delete.clicked.connect(partial(
             self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, table_name, column_id, 'lbl_vdefault_psector', 'psector'))
@@ -1575,9 +1579,9 @@ class GwPsector:
         self.dlg_psector_mng.btn_update_psector.clicked.connect(
             partial(self.update_current_psector, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.btn_duplicate.clicked.connect(self.psector_duplicate)
-        #self.dlg_psector_mng.txt_name.textChanged.connect(partial(
-        #    self._filter_table, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name,
-        #    self.dlg_psector_mng.chk_active, table_name))
+        self.dlg_psector_mng.txt_name.textChanged.connect(partial(
+           self._filter_table, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name,
+           self.dlg_psector_mng.chk_active, table_name))
         self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, self.qtbl_psm))
         self.fill_table(self.dlg_psector_mng, self.qtbl_psm, table_name, expr=' active is True')
         tools_gw.set_tablemodel_config(self.dlg_psector_mng, self.qtbl_psm, table_name)
@@ -1738,7 +1742,10 @@ class GwPsector:
         keep_open_form = tools_gw.get_config_parser('dialogs_actions', 'psector_manager_keep_open', "user", "init", prefix=True)
         if tools_os.set_boolean(keep_open_form, False) is not True:
             tools_gw.close_dialog(self.dlg_psector_mng)
+
+        # Open form
         self.master_new_psector(psector_id)
+        
         # Refresh canvas
         tools_qgis.refresh_map_canvas()
 
