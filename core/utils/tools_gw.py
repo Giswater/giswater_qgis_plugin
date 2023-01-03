@@ -926,12 +926,12 @@ def enable_widgets(dialog, result, enable):
                 if widget.property('columnname') == field['columnname']:
                     if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
                         widget.setReadOnly(not enable)
-                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(110, 110, 110)}")
                         if type(widget) == GwHyperLinkLineEdit:
                             widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
                     elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
                         widget.setEnabled(enable)
-                        widget.setStyleSheet("QWidget {color: rgb(0, 0, 0)}")
+                        widget.setStyleSheet("QWidget {color: rgb(110, 110, 110)}")
                     elif type(widget) is QPushButton:
                         # Manage the clickability of the buttons according to the configuration
                         # in the table config_form_fields simultaneously with the edition,
@@ -957,7 +957,7 @@ def enable_all(dialog, result):
                         widget.setReadOnly(not field['iseditable'])
                         if not field['iseditable']:
                             widget.setFocusPolicy(Qt.NoFocus)
-                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(110, 110, 110)}")
                             if type(widget) == GwHyperLinkLineEdit:
                                 widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
                         else:
