@@ -1493,6 +1493,9 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
     if key == '' or key is None:
         return _json
 
+    if _json is None:
+        _json = {}
+
     if str(value) == '' or value is None:
         _json[key] = None
     else:
