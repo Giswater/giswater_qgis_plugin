@@ -272,3 +272,5 @@ VALUES (3214, 'IT''S IMPOSSIBLE TO DOWNGRADE THE STATE OF A PLANNED GULLY', 'TO 
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
 VALUES (3216, 'IT''S IMPOSSIBLE TO UPDATE ARC_ID AS THIS THIS LINK HAS EXIT TYPE DIFFERENT THEN THE ARC', 'USE GULLY DIALOG TO UPDATE IT', 2, true, 'ud', 'core');
+
+INSERT INTO inp_typevalue(typevalue, id, idval) VALUES ('inp_pjoint_type','GULLY','GULLY');

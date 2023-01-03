@@ -273,3 +273,10 @@ WHERE id=3076;
 
 UPDATE sys_message SET hint_message = 'YOU CAN''T HAVE 2 LINKS RELATED TO THE SAME FEATURE IN ONE PSECTOR'
 WHERE id=3082;
+
+INSERT INTO inp_typevalue(typevalue, id, idval) VALUES ('inp_pjoint_type','ARC','ARC');
+INSERT INTO inp_typevalue(typevalue, id, idval) VALUES ('inp_pjoint_type','CONNEC','CONNEC');
+DELETE FROM inp_typevalue WHERE typevalue = 'inp_pjoint_type' AND id = 'VNODE';
+
+UPDATE config_form_fields SET dv_querytext = 'SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_pjoint_type''' 
+WHERE columnname ='exit_type' and formname='v_edit_link';
