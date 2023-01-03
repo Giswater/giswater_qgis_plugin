@@ -56,7 +56,6 @@ v_arc_id text;
 v_userdefined_geom boolean;
 v_end_state integer;
 v_init_state integer;
-v_autoupdate_dma boolean;
 v_pjoint_id text;
 v_pjoint_type text;
 v_dsbl_error boolean;
@@ -73,6 +72,8 @@ v_currentpsector integer;
 v_state_vdefault integer;
 v_feature record;
 v_linkexists integer;
+v_fluidtype_autoupdate boolean;
+v_dma_autoupdate boolean;
 
 BEGIN
 
@@ -80,7 +81,8 @@ BEGIN
 	v_mantable:= TG_ARGV[0];	
 
 	-- getting system values
-	SELECT value::boolean INTO v_autoupdate_dma FROM config_param_system WHERE parameter='edit_connect_autoupdate_dma';
+	SELECT value::boolean INTO v_dma_autoupdate FROM config_param_system WHERE parameter='edit_connect_autoupdate_dma';
+    SELECT value::boolean INTO v_fluidtype_autoupdate FROM config_param_system WHERE parameter = 'edit_connect_autoupdate_fluid';
 	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;
 	SELECT project_type INTO v_projectype FROM sys_version LIMIT 1;
 	v_ispresszone:= (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'utils_graphanalytics_status');
@@ -245,7 +247,11 @@ BEGIN
 			v_expl = v_arc.expl_id;
 			v_arc_id = v_arc.arc_id;
 			v_sector = v_arc.sector_id; 
-			v_dma = v_arc.dma_id; 
+            
+            -- control of dma and fluidtype automatic values
+			IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma = v_arc.dma_id; ELSE v_dma = NEW.dma_id; END IF;
+			IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN v_fluidtype = v_arc.fluid_type; ELSE v_fluidtype = NEW.fluid_type; END IF;
+
 
 			IF v_projectype='WS' THEN
 				v_presszone = v_arc.presszone_id; 
@@ -254,8 +260,7 @@ BEGIN
 			END IF;
 
 			-- others
-			v_fluidtype = v_arc.fluid_type;
-			v_end_state= v_arc.state;			
+			v_end_state= v_arc.state;
 
 		ELSIF v_node.node_id IS NOT NULL THEN
 	
@@ -276,7 +281,10 @@ BEGIN
 			-- mapzones
 			v_expl = v_node.expl_id;
 			v_sector = v_node.sector_id; 
-			v_dma = v_node.dma_id; 
+            
+            -- control of dma and fluidtype automatic values
+			IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma = v_node.dma_id; ELSE v_dma = NEW.dma_id; END IF;
+			IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN v_fluidtype = v_node.fluid_type; ELSE v_fluidtype = NEW.fluid_type; END IF;
 			
 			IF v_projectype='WS' THEN
 				v_presszone = v_node.presszone_id; 
@@ -285,10 +293,9 @@ BEGIN
 			END IF;
 
 			-- others
-			v_fluidtype = v_node.fluid_type;
 			v_end_state= v_node.state;
 
-			-- getting v_arc			
+			-- getting v_arc
 			v_arc_id = (SELECT arc_id FROM arc WHERE state > 0 AND node_1 = v_node.node_id LIMIT 1);
 			
 			IF v_arc_id IS NULL AND NEW.state=0 THEN
@@ -307,7 +314,10 @@ BEGIN
 			v_expl = v_connec2.expl_id;
 			v_arc_id = v_connec2.arc_id;
 			v_sector = v_connec2.sector_id; 
-			v_dma = v_connec2.dma_id; 
+            
+            -- control of dma and fluidtype automatic values
+			IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma = v_connec2.dma_id; ELSE v_dma = NEW.dma_id; END IF;
+			IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN v_fluidtype = v_connec2.fluid_type; ELSE v_fluidtype = NEW.fluid_type; END IF;
 			
 			IF v_projectype='WS' THEN
 				v_presszone = v_connec2.presszone_id; 
@@ -316,7 +326,6 @@ BEGIN
 			END IF;
 
 			-- others
-			v_fluidtype = v_connec2.fluid_type;
 			v_end_state= v_connec2.state;
 
 		END IF;
@@ -335,10 +344,12 @@ BEGIN
 				v_expl = v_gully2.expl_id;
 				v_arc_id = v_gully2.arc_id;
 				v_sector = v_gully2.sector_id; 
-				v_dma = v_gully2.dma_id; 
+                
+                -- control of dma and fluidtype automatic values
+                IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma = v_gully2.dma_id; ELSE v_dma = NEW.dma_id; END IF;
+                IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN v_fluidtype = v_gully2.fluid_type; ELSE v_fluidtype = NEW.fluid_type; END IF;
 
 				-- others
-				v_fluidtype = v_gully2.fluid_type;
 				v_end_state= v_gully2.state;
 			END IF;
 		END IF;
@@ -593,7 +604,7 @@ BEGIN
 
 		IF NEW.state = 0 AND OLD.state = 1 THEN 
 
-			-- delete reconnection on coonecs
+			-- delete reconnection on connecs
 			IF NEW.feature_type = 'CONNEC' THEN
 				UPDATE connec SET arc_id = null, pjoint_type = null, pjoint_id = null, dma_id = 0 WHERE connec_id = NEW.feature_id;
 								

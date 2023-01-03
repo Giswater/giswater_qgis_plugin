@@ -325,8 +325,8 @@ BEGIN
 			END IF;
 
 			-- control of dma and fluidtype automatic values
-			IF  v_dma_autoupdate is true or v_dma_value is null THEN v_dma_value = v_arc.dma_id; ELSE v_dma_value = v_connect.dma_id; END IF;
-			IF  v_fluidtype_autoupdate is true or v_fluidtype_value is null THEN v_fluidtype_value = v_arc.fluid_type; ELSE v_fluidtype_value = v_connect.fluid_type; END IF;
+			IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma_value = v_arc.dma_id; ELSE v_dma_value = v_connect.dma_id; END IF;
+			IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN v_fluidtype_value = v_arc.fluid_type; ELSE v_fluidtype_value = v_connect.fluid_type; END IF;
 
 
 			IF v_link.link_id IS NULL THEN

@@ -30,18 +30,33 @@ gullyRecord3 record;
 v_link record;
 xvar float;
 yvar float;
-v_autoupdate_dma boolean;
-v_autoupdate_fluid boolean;
+v_dma_autoupdate boolean;
+v_fluidtype_autoupdate boolean;
 v_pol_id text;
+v_fluidtype_value text;
+v_dma_value integer;
+v_arc record;
+
 BEGIN 
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     v_featuretype:= TG_ARGV[0];
 
 	v_move_polgeom = (SELECT value FROM config_param_user WHERE parameter='edit_gully_autoupdate_polgeom' AND cur_user=current_user);
+    v_projectype = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
+    
+    SELECT value INTO v_dma_autoupdate FROM config_param_system WHERE parameter = 'edit_connect_autoupdate_dma';
+	SELECT value INTO v_fluidtype_autoupdate FROM config_param_system WHERE parameter = 'edit_connect_autoupdate_fluid';
+    
+    -- get arc values
+    SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
 
-	v_projectype = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
-
+    -- control of dma and fluidtype automatic values
+    IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma_value = v_arc.dma_id; ELSE v_dma_value = NEW.dma_id; END IF;
+   	IF v_dma_value IS NULL THEN
+   		v_dma_value = NEW.dma_id;
+   	END IF;
+    IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN v_fluidtype_value = v_arc.fluid_type; ELSE v_fluidtype_value = NEW.fluid_type; END IF;
 	
 	IF v_featuretype='connec' THEN
 	
@@ -75,14 +90,14 @@ BEGIN
 					WHERE connec_id=v_link.feature_id;
 					
 				ELSIF v_projectype = 'UD' THEN
-					UPDATE connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id, fluid_type = NEW.fluid_type
+					UPDATE connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= v_dma_value, sector_id=NEW.sector_id, fluid_type = v_fluidtype_value
 					WHERE connec_id=v_link.feature_id;
 				END IF;
 							
 			ELSIF v_link.feature_type='GULLY' THEN
 			
-				UPDATE gully SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id
-				WHERE gully_id=v_link.feature_id;			
+				UPDATE gully SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= v_dma_value, sector_id=NEW.sector_id, fluid_type = v_fluidtype_value
+				WHERE gully_id=v_link.feature_id;
 			END IF;
 		END LOOP;
 
@@ -95,11 +110,11 @@ BEGIN
 				presszone_id = NEW.presszone_id, dqa_id = NEW.dqa_id, minsector_id = NEW.minsector_id, fluid_type = NEW.fluid_type
 				WHERE link_id=v_link.link_id;
 			ELSE
-				UPDATE link SET expl_id=NEW.expl_id, sector_id=NEW.sector_id, dma_id = NEW.dma_id, 
-				fluid_type = NEW.fluid_type
+				UPDATE link SET expl_id=NEW.expl_id, sector_id=NEW.sector_id, dma_id = v_dma_value, 
+				fluid_type = v_fluidtype_value
 				WHERE link_id=v_link.link_id;
 				
-				UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE link_id = v_link.link_id;			
+				UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE link_id = v_link.link_id;
 			END IF;
 
 			UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE link_id = v_link.link_id;
@@ -148,20 +163,20 @@ BEGIN
 		LOOP
 			IF v_link.feature_type='CONNEC' THEN
 			
-				UPDATE connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id, fluid_type = NEW.fluid_type
+				UPDATE connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= v_dma_value, sector_id=NEW.sector_id, fluid_type = v_fluidtype_value
 				WHERE connec_id=v_link.feature_id;
 							
 			ELSIF v_link.feature_type='GULLY' THEN
 			
-				UPDATE gully SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id
-				WHERE gully_id=v_link.feature_id;			
+				UPDATE gully SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= v_dma_value, sector_id=NEW.sector_id, fluid_type = v_fluidtype_value
+				WHERE gully_id=v_link.feature_id;
 			END IF;
 		END LOOP;
 
 		-- update planned links (and planned connects as well)
 		FOR v_link IN SELECT * FROM v_edit_link WHERE (exit_type='GULLY' AND exit_id=OLD.gully_id) AND state = 2
 		LOOP
-			UPDATE link SET expl_id=NEW.expl_id, sector_id=NEW.sector_id, dma_id = NEW.dma_id, fluid_type = NEW.fluid_type
+			UPDATE link SET expl_id=NEW.expl_id, sector_id=NEW.sector_id, dma_id = v_dma_value, fluid_type = v_fluidtype_value
 			WHERE link_id=v_link.link_id;
 
 			UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE link_id = v_link.link_id;

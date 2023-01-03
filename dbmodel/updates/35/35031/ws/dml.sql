@@ -400,3 +400,6 @@ FROM config_form_fields
 WHERE  formname ilike 've_connec%' or formname ilike 'v_edit_connec' group by formname,formtype, tabname ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 UPDATE config_form_fields SET label='Sector name' WHERE label='Dma name' AND columnname='sector_name';
+
+DELETE FROM config_param_system WHERE "parameter"='edit_connect_autoupdate_dma';
+DELETE FROM config_param_system WHERE "parameter"='edit_connect_autoupdate_fluid';

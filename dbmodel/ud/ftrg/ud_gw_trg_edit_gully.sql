@@ -83,7 +83,7 @@ BEGIN
 	v_epa_gully_orifice_cd := (SELECT value FROM config_param_user WHERE parameter='epa_gully_orifice_cd_vdefault' AND cur_user=current_user);
 	v_epa_gully_method := (SELECT value FROM config_param_user WHERE parameter='epa_gully_method_vdefault' AND cur_user=current_user);
 	v_epa_gully_outlet_type := (SELECT value FROM config_param_user WHERE parameter='epa_gully_outlet_type_vdefault' AND cur_user=current_user);
-	SELECT value::boolean INTO v_connect2network FROM config_param_user WHERE parameter='edit_connec_automatic_link' AND cur_user=current_user;
+	SELECT value::boolean INTO v_connect2network FROM config_param_user WHERE parameter='edit_gully_automatic_link' AND cur_user=current_user;
 
 	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 	
