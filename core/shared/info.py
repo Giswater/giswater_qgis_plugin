@@ -451,6 +451,7 @@ class GwInfo(QObject):
         ))
         self.dlg_generic.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_generic))
         self.dlg_generic.dlg_closed.connect(partial(tools_gw.close_dialog, self.dlg_generic))
+        self.dlg_generic.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_generic))
 
         # Disable button accept for info on generic form
         self.dlg_generic.btn_accept.setEnabled(can_edit)
