@@ -274,3 +274,5 @@ INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, p
 VALUES (3216, 'It''s impossible to update arc_id from psector dialog because this planned link has not arc as exit-type', 'Use gully dialog to update it', 2, true, 'ud', 'core');
 
 INSERT INTO inp_typevalue(typevalue, id, idval) VALUES ('inp_pjoint_type','GULLY','GULLY');
+
+UPDATE config_form_fields SET iseditable=false WHERE formname LIKE 've_gully%' AND columnname='arc_id';

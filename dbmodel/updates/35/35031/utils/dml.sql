@@ -280,3 +280,6 @@ DELETE FROM inp_typevalue WHERE typevalue = 'inp_pjoint_type' AND id = 'VNODE';
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_pjoint_type''' 
 WHERE columnname ='exit_type' and formname='v_edit_link';
+
+UPDATE config_form_fields SET iseditable=false WHERE formname LIKE 've_connec%' AND columnname='arc_id';
+UPDATE config_form_fields SET iseditable=false WHERE formname LIKE 've_node%' AND columnname='arc_id';
