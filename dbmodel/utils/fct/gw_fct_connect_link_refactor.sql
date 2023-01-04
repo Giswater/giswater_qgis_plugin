@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_connect_link_refactor() RETURNS js
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_manage_link_refactor();
+SELECT SCHEMA_NAME.gw_fct_connect_link_refactor();
 */
 
 DECLARE
@@ -58,8 +58,10 @@ BEGIN
 		UPDATE plan_psector_x_connec SET link_id=v_new_link_id WHERE connec_id=rec.connec_id;
 		
 		INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, link_id, active)
-		SELECT rec.connec_id, exit_id, rec.psector_id, 0, link_id, true
-		FROM link WHERE feature_id=rec.connec_id AND link.state=1;
+		SELECT rec.connec_id, connec.arc_id, rec.psector_id, 0, link_id, true
+		FROM link 
+        JOIN connec ON link.feature_id=connec_id
+        WHERE feature_id=rec.connec_id AND link.state=1;
 	END LOOP;
 
 	IF v_project_type='UD' THEN
