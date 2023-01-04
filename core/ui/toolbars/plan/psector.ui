@@ -715,12 +715,22 @@
          </item>
          <item>
           <widget class="QPushButton" name="btn_snapping">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
            <property name="text">
             <string/>
            </property>
            <property name="icon">
             <iconset>
              <normaloff>../../../../Users/user/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/icons/137.png</normaloff>../../../../Users/user/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/icons/137.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_toggle">
+           <property name="text">
+            <string/>
            </property>
           </widget>
          </item>
@@ -884,8 +894,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>98</width>
-            <height>61</height>
+            <width>916</width>
+            <height>246</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">

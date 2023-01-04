@@ -19,7 +19,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
-    QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout
+    QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu
 from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry
 from qgis.gui import QgsMapToolEmitPoint
 
@@ -63,6 +63,9 @@ class GwPsector:
         # Create the dialog and signals
         self.dlg_plan_psector = GwPsectorUi()
         tools_gw.load_settings(self.dlg_plan_psector)
+
+        # Manage btn create
+        self._manage_btn_toggle(self.dlg_plan_psector)
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
@@ -116,6 +119,7 @@ class GwPsector:
         tools_gw.add_icon(self.dlg_plan_psector.btn_select_arc, "310", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_plan_psector.btn_arc_fusion, "17", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_plan_psector.btn_set_to_arc, "209")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_toggle, "100", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_insert, "111", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_delete, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_new, "34", sub_folder="24x24")
@@ -2467,5 +2471,67 @@ class GwPsector:
 
     def _reset_snapping(self):
         tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
+
+
+    def _manage_btn_toggle(self, dialog):
+        """ Fill btn_toggle QMenu """
+
+        # Functions
+        values = [[0, "Toggle state"], [1, "Toggle doable"]]
+
+        # Create and populate QMenu
+        toggle_menu = QMenu()
+        for value in values:
+            idx = value[0]
+            label = value[1]
+            action = toggle_menu.addAction(f"{label}")
+            action.triggered.connect(partial(self._toggle_feature_psector, dialog, idx))
+
+        dialog.btn_toggle.setMenu(toggle_menu)
+
+
+    def _toggle_feature_psector(self, dialog, idx):
+        """ Delete features_id to table plan_@feature_type_x_psector"""
+
+        tab_idx = dialog.tab_feature.currentIndex()
+        feature_type = dialog.tab_feature.tabText(tab_idx).lower()
+        qtbl_feature = dialog.findChild(QTableView, f"tbl_psector_x_{feature_type}")
+        selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
+        list_tables = {'arc':self.tablename_psector_x_arc, 'node':self.tablename_psector_x_node,
+                       'connec':self.tablename_psector_x_connec, 'gully':self.tablename_psector_x_gully}
+
+        sql = ""
+        selected_list = qtbl_feature.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            return
+
+        if idx == 0:
+            for i in range(0, len(selected_list)):
+                row = selected_list[i].row()
+                feature_id = qtbl_feature.model().record(row).value(f"{feature_type}_id")
+                state = qtbl_feature.model().record(row).value("state")
+                if state == 1:
+                    sql += f"UPDATE {list_tables[feature_type]} SET state = 0 WHERE {feature_type}_id = '{feature_id}' AND psector_id = {selected_psector};"
+                elif state == 0:
+                    sql += f"UPDATE {list_tables[feature_type]} SET state = 1 WHERE {feature_type}_id = '{feature_id}' AND psector_id = {selected_psector};"
+
+
+        elif idx == 1:
+            for i in range(0, len(selected_list)):
+                row = selected_list[i].row()
+                feature_id = qtbl_feature.model().record(row).value(f"{feature_type}_id")
+                doable = qtbl_feature.model().record(row).value("doable")
+                if doable:
+                    sql += f"UPDATE {list_tables[feature_type]} SET doable = False WHERE {feature_type}_id = '{feature_id}' AND psector_id = {selected_psector};"
+                else:
+                    sql += f"UPDATE {list_tables[feature_type]} SET doable = True WHERE {feature_type}_id = '{feature_id}' AND psector_id = {selected_psector};"
+        else:
+            return
+
+        tools_db.execute_sql(sql)
+        tools_gw.load_tableview_psector(dialog, feature_type)
+
 
     # endregion
