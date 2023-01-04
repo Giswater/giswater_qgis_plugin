@@ -265,12 +265,12 @@ DELETE FROM config_param_system WHERE "parameter"='Dynamic mapzones';
 DELETE FROM config_param_system WHERE "parameter"='Mapzones dynamic symbology';
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
-VALUES (3206, 'THIS GULLY HAS AN ASSOCIATED LINK', 'REMOVE THE ASSOCIATED LINK AND ARC_ID FIELD WILL BE SET TO NULL', 2, true, 'ud', 'core');
+VALUES (3206, 'This gully has an associated link', 'Remove the associated link and arc_id field will be set to null', 2, true, 'ud', 'core');
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
-VALUES (3214, 'IT''S IMPOSSIBLE TO DOWNGRADE THE STATE OF A PLANNED GULLY', 'TO UNLINK IT FROM PSECTOR REMOVE ROW OR DELETE GULLY', 2, true, 'ud', 'core');
+VALUES (3214, 'It''s impossible to downgrade the state of a planned gully', 'To unlink it from psector remove row or delete gully', 2, true, 'ud', 'core');
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, source)
-VALUES (3216, 'IT''S IMPOSSIBLE TO UPDATE ARC_ID FROM PSECTOR DIALOG BECAUSE THIS PLANNED LINK HAS NOT ARC AS EXIT-TYPE', 'USE GULLY DIALOG TO UPDATE IT', 2, true, 'ud', 'core');
+VALUES (3216, 'It''s impossible to update arc_id from psector dialog because this planned link has not arc as exit-type', 'Use gully dialog to update it', 2, true, 'ud', 'core');
 
 INSERT INTO inp_typevalue(typevalue, id, idval) VALUES ('inp_pjoint_type','GULLY','GULLY');
