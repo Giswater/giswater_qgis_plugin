@@ -69,7 +69,7 @@ class GwArcAddButton(GwAction):
         if features_cat is not None:
             list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
             for feature_cat in list_feature_cat:
-                if feature_cat.feature_type.upper() == 'ARC':
+                if feature_cat.feature_type.upper() == 'ARC' or feature_cat.feature_type.upper() == 'LINK':
                     obj_action = QAction(str(feature_cat.id), action_group)
                     obj_action.setObjectName(feature_cat.id)
                     obj_action.setProperty('action_group', action_group)
