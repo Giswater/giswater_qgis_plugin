@@ -221,9 +221,10 @@ INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_
 INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'state', 3, true, NULL, NULL, NULL);
 INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'doable', 4, true, NULL, NULL, NULL);
 INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'descript', 5, false, NULL, NULL, NULL);
-INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'active', 6, false, NULL, NULL, NULL);
-INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'insert_tstamp', 7, false, NULL, NULL, NULL);
-INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'insert_user', 8, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'addparam', 6, true, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'active', 7, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'insert_tstamp', 8, false, NULL, NULL, NULL);
+INSERT INTO config_form_tableview VALUES('plan toolbar', 'utils', 'plan_psector_x_node', 'insert_user', 9, false, NULL, NULL, NULL);
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
 VALUES (3188, 'gw_fct_linktonetwork', 'utils', 'function', 
