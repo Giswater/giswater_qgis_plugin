@@ -20,12 +20,11 @@ from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColo
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
     QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu
-from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry
+from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry, QgsMapToPixel
 from qgis.gui import QgsMapToolEmitPoint
 
 from .document import GwDocument, global_vars
 from ..shared.psector_duplicate import GwPsectorDuplicate
-from ..toolbars.edit.arc_fusion_button import GwArcFusionButton
 from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi, GwReplaceArc
 from ..utils import tools_gw
 from ...lib import tools_db, tools_qgis, tools_qt, tools_log, tools_os
@@ -64,8 +63,10 @@ class GwPsector:
         self.dlg_plan_psector = GwPsectorUi()
         tools_gw.load_settings(self.dlg_plan_psector)
 
-        # Manage btn create
+        # Manage btn toggle
         self._manage_btn_toggle(self.dlg_plan_psector)
+        # Manage btn set to arc
+        self._manage_btn_set_to_arc(self.dlg_plan_psector)
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
@@ -439,8 +440,6 @@ class GwPsector:
             partial(self._replace_arc))
         self.dlg_plan_psector.btn_arc_fusion.clicked.connect(
             partial(self._arc_fusion))
-        self.dlg_plan_psector.btn_set_to_arc.clicked.connect(
-            partial(self._set_to_arc))
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_plan_psector, excluded_layers))
@@ -2079,7 +2078,7 @@ class GwPsector:
         return all_checked
 
 
-    def _set_to_arc(self):
+    def _set_to_arc(self, idx):
 
         if hasattr(self, 'emit_point') and self.emit_point is not None:
             tools_gw.disconnect_signal('psector', 'set_to_arc_ep_canvasClicked_set_arc_id')
@@ -2100,11 +2099,11 @@ class GwPsector:
         # Set signals
         tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_arc, 'psector',
                                 'set_to_arc_xyCoordinates_mouse_move_arc')
-        tools_gw.connect_signal(self.emit_point.canvasClicked, partial(self._set_arc_id),
+        tools_gw.connect_signal(self.emit_point.canvasClicked, partial(self._set_arc_id, idx),
                                 'psector', 'set_to_arc_ep_canvasClicked_set_arc_id')
 
 
-    def _set_arc_id(self, point, event):
+    def _set_arc_id(self, idx, point, event):
 
         # Manage right click
         if event == 2:
@@ -2177,12 +2176,18 @@ class GwPsector:
 
         if self.arc_id is None: return
 
+        the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {global_vars.data_epsg})"
+
         for row in selected_rows:
+            sql = ""
+            if idx == 1:
+                sql += (f"INSERT INTO temp_table (fid, geom_point) VALUES (485, {the_geom});\n")
 
             row_id = self.qtbl_connec.model().record(row.row()).value("id")
 
-            sql = (f"UPDATE {self.tablename_psector_x_connec} SET arc_id = "
+            sql += (f"UPDATE {self.tablename_psector_x_connec} SET arc_id = "
                   f"'{self.arc_id}' WHERE id = '{row_id}'")
+
             tools_db.execute_sql(sql)
 
         filter_ = "psector_id = '" + str(self.psector_id.text()) + "'"
@@ -2490,6 +2495,23 @@ class GwPsector:
             action.triggered.connect(partial(self._toggle_feature_psector, dialog, idx))
 
         dialog.btn_toggle.setMenu(toggle_menu)
+
+
+    def _manage_btn_set_to_arc(self, dialog):
+        """ Fill btn_set_to_arc QMenu """
+
+        # Functions
+        values = [[0, "Set closest point"], [1, "Set user click"]]
+
+        # Create and populate QMenu
+        set_to_arc_menu = QMenu()
+        for value in values:
+            idx = value[0]
+            label = value[1]
+            action = set_to_arc_menu.addAction(f"{label}")
+            action.triggered.connect(partial(self._set_to_arc, idx))
+
+        dialog.btn_set_to_arc.setMenu(set_to_arc_menu)
 
 
     def _toggle_feature_psector(self, dialog, idx):
