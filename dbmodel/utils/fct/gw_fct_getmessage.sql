@@ -66,7 +66,7 @@ BEGIN
 		-- log_level of type 'WARNING' (mostly applied to functions)
 		ELSIF rec_cat_error.log_level = 1 THEN
 			IF v_debug THEN
-				SELECT  concat('Function: ',function_name,' - ',upper(rec_cat_error.error_message),' ',v_message,'. HINT: ', upper(rec_cat_error.hint_message),'.')  INTO v_return_text
+				SELECT  concat('Function: ',function_name,' - ',rec_cat_error.error_message,' ',v_message,'. HINT: ', rec_cat_error.hint_message,'.')  INTO v_return_text
 				FROM sys_function WHERE sys_function.id=v_function_id;
 			END IF;
 			v_level = 1;
@@ -78,16 +78,16 @@ BEGIN
 			FROM sys_function WHERE sys_function.id=v_function_id;
 
 			IF v_message IS NOT NULL THEN
-				RAISE EXCEPTION 'Function: [%] - %. HINT: % - % ', rec_function.function_name, concat(upper(rec_cat_error.error_message), ' ',v_message), upper(rec_cat_error.hint_message), v_variables ;
+				RAISE EXCEPTION 'Function: [%] - %. HINT: % - % ', rec_function.function_name, concat(rec_cat_error.error_message, ' ',v_message), rec_cat_error.hint_message, v_variables ;
 			ELSE
-				RAISE EXCEPTION 'Function: [%] - %. HINT: % - %', rec_function.function_name, upper(rec_cat_error.error_message), upper(rec_cat_error.hint_message), v_variables ;
+				RAISE EXCEPTION 'Function: [%] - %. HINT: % - %', rec_function.function_name, rec_cat_error.error_message, rec_cat_error.hint_message, v_variables ;
 			END IF;
 		ELSIF rec_cat_error.log_level = 3 THEN
 			IF v_debug THEN
-				SELECT  concat('Function: ',function_name,' - ',upper(rec_cat_error.error_message),'. HINT: ', upper(rec_cat_error.hint_message),'.')  INTO v_return_text
+				SELECT  concat('Function: ',function_name,' - ',rec_cat_error.error_message,'. HINT: ', rec_cat_error.hint_message,'.')  INTO v_return_text
 				FROM sys_function WHERE sys_function.id=v_function_id;
 			ELSE
-				SELECT  upper(rec_cat_error.error_message)  INTO v_return_text
+				SELECT  rec_cat_error.error_message  INTO v_return_text
 				FROM sys_function WHERE sys_function.id=v_function_id;
 			END IF;
 
@@ -97,7 +97,7 @@ BEGIN
         -- log_level Accepted just to show message when fct is called from another function
 		ELSIF rec_cat_error.log_level = 0 THEN
 
-			SELECT  upper(rec_cat_error.error_message)  INTO v_return_text
+			SELECT  rec_cat_error.error_message  INTO v_return_text
 			FROM sys_function WHERE sys_function.id=v_function_id;
 
 			v_level = 3;
@@ -124,7 +124,7 @@ BEGIN
 
 			SELECT * INTO rec_function
 			FROM sys_function WHERE sys_function.id=v_function_id;
-			RAISE WARNING 'Function: [%] - %. HINT: %', rec_function.function_name, upper(rec_cat_error.error_message), upper(rec_cat_error.hint_message) ;
+			RAISE WARNING 'Function: [%] - %. HINT: %', rec_function.function_name, rec_cat_error.error_message, rec_cat_error.hint_message ;
 
 		-- log_level of type 'ERROR' (mostly applied to trigger functions)
 		ELSIF rec_cat_error.log_level = 2 THEN
@@ -132,9 +132,9 @@ BEGIN
 			FROM sys_function WHERE sys_function.id=v_function_id;
 
 			IF v_message IS NOT NULL THEN
-				RAISE EXCEPTION 'Function: [%] - %. HINT: % - % ', rec_function.function_name, concat(upper(rec_cat_error.error_message), ' ',v_message), upper(rec_cat_error.hint_message), v_variables ;
+				RAISE EXCEPTION 'Function: [%] - %. HINT: % - % ', rec_function.function_name, concat(rec_cat_error.error_message, ' ',v_message), rec_cat_error.hint_message, v_variables ;
 			ELSE
-				RAISE EXCEPTION 'Function: [%] - %. HINT: % - %', rec_function.function_name, upper(rec_cat_error.error_message), upper(rec_cat_error.hint_message), v_variables ;
+				RAISE EXCEPTION 'Function: [%] - %. HINT: % - %', rec_function.function_name, rec_cat_error.error_message, rec_cat_error.hint_message, v_variables ;
 			END IF;
 		ELSIF rec_cat_error.log_level = 3 THEN
 
@@ -142,10 +142,10 @@ BEGIN
 			FROM sys_function WHERE sys_function.id=v_function_id;
 
 			IF v_debug THEN
-				SELECT  concat('Function: ',function_name,' - ',upper(rec_cat_error.error_message),'. HINT: ', upper(rec_cat_error.hint_message),'.')  INTO v_return_text
+				SELECT  concat('Function: ',function_name,' - ',rec_cat_error.error_message,'. HINT: ', rec_cat_error.hint_message,'.')  INTO v_return_text
 				FROM sys_function WHERE sys_function.id=v_function_id;
 			ELSE
-				SELECT  upper(rec_cat_error.error_message)  INTO v_return_text
+				SELECT  rec_cat_error.error_message  INTO v_return_text
 				FROM sys_function WHERE sys_function.id=v_function_id;
 			END IF;
 			v_level = 2;
@@ -155,10 +155,10 @@ BEGIN
 		ELSIF rec_cat_error.log_level = 0 THEN
 
 			IF v_debug THEN
-				SELECT  concat('Function: ',function_name,' - ',upper(rec_cat_error.error_message),'. HINT: ', upper(rec_cat_error.hint_message),'.')  INTO v_return_text
+				SELECT  concat('Function: ',function_name,' - ',rec_cat_error.error_message,'. HINT: ', rec_cat_error.hint_message,'.')  INTO v_return_text
 				FROM sys_function WHERE sys_function.id=v_function_id;
 			ELSE
-				SELECT  upper(rec_cat_error.error_message)  INTO v_return_text
+				SELECT  rec_cat_error.error_message  INTO v_return_text
 				FROM sys_function WHERE sys_function.id=v_function_id;
 			END IF;
 			v_level = 3;
