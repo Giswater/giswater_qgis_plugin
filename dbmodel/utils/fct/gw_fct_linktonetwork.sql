@@ -32,6 +32,9 @@ EXAMPLES
 --------
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3201","3200"]},"data":{"feature_type":"CONNEC", "forcedArcs":["2001","2002"]}}$$);
 
+SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3136"]},"data":{"feature_type":"CONNEC"}}$$);
+
+
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100013"]},"data":{"feature_type":"CONNEC", "forcedArcs":["221"]}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100013"]},"data":{"feature_type":"CONNEC"}}$$);
@@ -180,6 +183,11 @@ BEGIN
 			END IF;
 		END IF;
 
+		-- choosing value for forced arcs
+		IF v_forcedarcs = '' AND  v_connect.arc_id IS NOT NULL THEN
+			v_forcedarcs = concat (' AND arc_id::integer IN (', v_connect.arc_id, ')');
+		END IF;
+		
 		-- getting link values
 		IF v_isoperative_psector THEN -- getting values from the operative one
 
@@ -264,28 +272,26 @@ BEGIN
 
 				-- setting point aux
 				SELECT geom_point INTO v_geom_point FROM temp_table WHERE fid = 485 and cur_user = current_user;
-				v_point_aux := v_geom_point;
-				raise notice 'ASDFASDFASDFASDF -> %',v_point_aux;
+				v_point_aux := St_closestpoint(v_arc.the_geom, v_geom_point);
 				DELETE FROM temp_table WHERE fid = 485 AND cur_user=current_user;
-                IF v_point_aux IS NULL THEN
+				
+				IF v_point_aux IS NULL THEN
+					v_point_aux := St_closestpoint(v_arc.the_geom, st_EndPoint(v_link.the_geom));
 
-                    v_point_aux := St_closestpoint(v_arc.the_geom, st_EndPoint(v_link.the_geom));
+					IF st_equals(v_point_aux, st_endpoint(v_arc.the_geom)) THEN
+						v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, 1-v_dfactor));
 
-                    IF st_equals(v_point_aux, st_endpoint(v_arc.the_geom)) THEN
-                        v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, 1-v_dfactor));
+					ELSIF st_equals(v_point_aux, st_startpoint(v_arc.the_geom)) THEN
+						v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, v_dfactor));
+					ELSE
+						v_point_aux := St_closestpoint(v_arc.the_geom, St_endpoint(v_link.the_geom));
+					END IF;
 
-                    ELSIF st_equals(v_point_aux, st_startpoint(v_arc.the_geom)) THEN
-                        v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, v_dfactor));
-                    ELSE
-                        v_point_aux := St_closestpoint(v_arc.the_geom, St_endpoint(v_link.the_geom));
-                    END IF;
-
-                    -- profilactic control for v_point_aux
-                    IF v_point_aux IS NULL THEN
-                        v_point_aux := St_closestpoint(v_arc.the_geom, v_connect.the_geom);
-                    END IF;
-
-                END IF;
+					-- profilactic control for v_point_aux
+					IF v_point_aux IS NULL THEN
+						v_point_aux := St_closestpoint(v_arc.the_geom, v_connect.the_geom);
+					END IF;
+				END IF;
 
 				IF v_link.the_geom IS NULL AND v_pjointtype='ARC' THEN
 
@@ -337,7 +343,6 @@ BEGIN
 			IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma_value = v_arc.dma_id; ELSE v_dma_value = v_connect.dma_id; END IF;
 			IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN v_fluidtype_value = v_arc.fluid_type; ELSE v_fluidtype_value = v_connect.fluid_type; END IF;
 
-
 			IF v_link.link_id IS NULL THEN
 
 				-- creation of link
@@ -379,7 +384,7 @@ BEGIN
 
 					UPDATE link SET state = 2 WHERE link_id  = v_link.link_id;
 
-				ELSIF v_isarcdivide or v_isoperative_psector or v_forceendpoint THEN -- then returning to psector link & arc_id
+				ELSIF v_isarcdivide or v_isoperative_psector or (v_ispsector and v_forceendpoint) THEN -- then returning to psector link & arc_id
 
 					IF v_feature_type ='CONNEC' THEN
 						UPDATE plan_psector_x_connec SET link_id = v_link.link_id, arc_id = v_arc.arc_id
