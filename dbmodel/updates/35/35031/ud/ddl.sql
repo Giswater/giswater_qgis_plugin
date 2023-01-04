@@ -89,6 +89,9 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_timeser
 
 ALTER TABLE inp_timeseries ALTER COLUMN active SET DEFAULT TRUE;
 
+ALTER TABLE connec DISABLE TRIGGER gw_trg_connect_update;
+ALTER TABLE gully DISABLE TRIGGER gw_trg_connect_update;
+
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_gully", "column":"link_id", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"REMOVE","table":"plan_psector_x_gully", "column":"link_geom"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"REMOVE","table":"plan_psector_x_gully", "column":"userdefined_geom"}}$$);
@@ -124,4 +127,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psecto
 
 ALTER TABLE plan_psector_x_gully ALTER COLUMN insert_tstamp SET DEFAULT NOW();
 ALTER TABLE plan_psector_x_gully ALTER COLUMN insert_user SET DEFAULT CURRENT_USER;
+
+ALTER TABLE connec ENABLE TRIGGER gw_trg_connect_update;
+ALTER TABLE gully ENABLE TRIGGER gw_trg_connect_update;
 

@@ -70,6 +70,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "col
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"link", "column":"vnode_elevation", "newName":"exit_elev"}}$$);
 
+ALTER TABLE connec DISABLE TRIGGER gw_trg_connect_update;
 
 -- change pjoint_type (VNODE to ARC)
 ALTER TABLE connec DROP CONSTRAINT connec_pjoint_type_ckeck;
@@ -109,3 +110,5 @@ ALTER TABLE dma ALTER COLUMN graphconfig SET DEFAULT '{"use":[{"nodeParent":"", 
 ALTER TABLE dqa ALTER COLUMN graphconfig SET DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}';
 ALTER TABLE sector ALTER COLUMN graphconfig SET DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}';
 ALTER TABLE presszone ALTER COLUMN graphconfig SET DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}';
+
+ALTER TABLE connec ENABLE TRIGGER gw_trg_connect_update;
