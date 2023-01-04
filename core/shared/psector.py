@@ -2534,6 +2534,7 @@ class GwPsector:
 
         tools_db.execute_sql(sql)
         tools_gw.load_tableview_psector(dialog, feature_type)
+        tools_gw.set_model_signals(self)
 
 
     # endregion
