@@ -21,9 +21,6 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	v_table:= TG_ARGV[0];
 
-	-- force the activation of psector
-	INSERT INTO selector_psector (psector_id, cur_user) VALUES (NEW.psector_id, current_user) ON CONFLICT (psector_id, cur_user) DO NOTHING;
-
 	IF TG_OP = 'INSERT' THEN
 		
 		IF v_table = 'plan_psector_x_connec' then
