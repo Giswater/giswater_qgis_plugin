@@ -2045,6 +2045,8 @@ class GwPsector:
             tools_gw.load_tableview_psector(self.dlg_plan_psector, 'gully')
         tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_arc", self.tablename_psector_x_arc,
                                        isQStandardItemModel=True)
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_node", self.tablename_psector_x_node,
+                                       isQStandardItemModel=True)
         tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_connec", self.tablename_psector_x_connec,
                                        isQStandardItemModel=True)
         if self.project_type.upper() == 'UD':
