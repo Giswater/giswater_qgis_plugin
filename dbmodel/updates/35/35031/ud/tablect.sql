@@ -27,7 +27,7 @@ REFERENCES drainzone (drainzone_id) MATCH SIMPLE
 ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
-ALTER TABLE IF EXISTS ud_sample.sys_feature_cat
+ALTER TABLE IF EXISTS sys_feature_cat
 ADD CONSTRAINT sys_feature_cat_check CHECK (id::text = ANY (ARRAY['CHAMBER'::character varying, 'CONDUIT'::character varying, 
 	'CONNEC'::character varying, 'GULLY'::character varying, 'JUNCTION'::character varying, 'MANHOLE'::character varying, 
 	'NETELEMENT'::character varying, 'NETGULLY'::character varying, 'NETINIT'::character varying, 'OUTFALL'::character varying, 
