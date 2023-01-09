@@ -183,11 +183,6 @@ BEGIN
 			END IF;
 		END IF;
 
-		-- choosing value for forced arcs
-		IF v_forcedarcs = '' AND  v_connect.arc_id IS NOT NULL THEN
-			v_forcedarcs = concat (' AND arc_id::integer IN (', v_connect.arc_id, ')');
-		END IF;
-		
 		-- getting link values
 		IF v_isoperative_psector THEN -- getting values from the operative one
 
@@ -272,26 +267,27 @@ BEGIN
 
 				-- setting point aux
 				SELECT geom_point INTO v_geom_point FROM temp_table WHERE fid = 485 and cur_user = current_user;
-				v_point_aux := St_closestpoint(v_arc.the_geom, v_geom_point);
+				v_point_aux := v_geom_point;
 				DELETE FROM temp_table WHERE fid = 485 AND cur_user=current_user;
-				
-				IF v_point_aux IS NULL THEN
-					v_point_aux := St_closestpoint(v_arc.the_geom, st_EndPoint(v_link.the_geom));
+                IF v_point_aux IS NULL THEN
 
-					IF st_equals(v_point_aux, st_endpoint(v_arc.the_geom)) THEN
-						v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, 1-v_dfactor));
+                    v_point_aux := St_closestpoint(v_arc.the_geom, st_EndPoint(v_link.the_geom));
 
-					ELSIF st_equals(v_point_aux, st_startpoint(v_arc.the_geom)) THEN
-						v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, v_dfactor));
-					ELSE
-						v_point_aux := St_closestpoint(v_arc.the_geom, St_endpoint(v_link.the_geom));
-					END IF;
+                    IF st_equals(v_point_aux, st_endpoint(v_arc.the_geom)) THEN
+                        v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, 1-v_dfactor));
 
-					-- profilactic control for v_point_aux
-					IF v_point_aux IS NULL THEN
-						v_point_aux := St_closestpoint(v_arc.the_geom, v_connect.the_geom);
-					END IF;
-				END IF;
+                    ELSIF st_equals(v_point_aux, st_startpoint(v_arc.the_geom)) THEN
+                        v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, v_dfactor));
+                    ELSE
+                        v_point_aux := St_closestpoint(v_arc.the_geom, St_endpoint(v_link.the_geom));
+                    END IF;
+
+                    -- profilactic control for v_point_aux
+                    IF v_point_aux IS NULL THEN
+                        v_point_aux := St_closestpoint(v_arc.the_geom, v_connect.the_geom);
+                    END IF;
+
+                END IF;
 
 				IF v_link.the_geom IS NULL AND v_pjointtype='ARC' THEN
 
@@ -503,7 +499,7 @@ BEGIN
 				'"polygon":'||v_result_polygon||'}'||
 		       '}'||
 	    '}')::json, 3188, null, null, null);
-	    
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
