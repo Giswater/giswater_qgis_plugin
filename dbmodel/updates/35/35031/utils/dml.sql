@@ -291,14 +291,7 @@ VALUES (485, 'Connect link to arc id with specific coordinates', 'utils', NULL, 
  ON CONFLICT (fid) DO NOTHING;
 
 ALTER TABLE sys_feature_cat DROP CONSTRAINT IF EXISTS sys_feature_cat_check;
-ALTER TABLE sys_feature_cat
-ADD CONSTRAINT sys_feature_cat_check CHECK (((id)::text = ANY ((
-ARRAY['ELEMENT'::character varying, 'EXPANSIONTANK'::character varying, 'FILTER'::character varying, 'FLEXUNION'::character varying,
-'FOUNTAIN'::character varying, 'GREENTAP'::character varying, 'HYDRANT'::character varying, 'JUNCTION'::character varying,
-'MANHOLE'::character varying, 'METER'::character varying, 'NETELEMENT'::character varying, 'NETSAMPLEPOINT'::character varying,
-'NETWJOIN'::character varying, 'PIPE'::character varying, 'PUMP'::character varying, 'REDUCTION'::character varying, 'REGISTER'::character varying,
-'SOURCE'::character varying, 'TANK'::character varying, 'TAP'::character varying, 'VALVE'::character varying, 'VARC'::character varying,
-'WATERWELL'::character varying, 'WJOIN'::character varying, 'WTP'::character varying, 'LINK'::character varying])::text[])));
+
 INSERT INTO sys_feature_cat (id, "type", epa_default) VALUES('LINK', 'LINK', 'UNDEFINED');
 INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, child_layer, descript, active)
 VALUES('LINK', 'LINK', 'LINK', 'v_edit_link', 'v_edit_link', 'Link', true);
