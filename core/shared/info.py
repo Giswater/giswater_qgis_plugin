@@ -1956,9 +1956,8 @@ class GwInfo(QObject):
 
         # If we create a new feature
 
-        if self.new_feature_id is not None:
-            if new_feature is False:
-                new_feature = tools_qt.get_feature_by_id(self.info_layer, self.new_feature_id)
+        # if self.new_feature_id is not (None, False):
+        if self.new_feature_id is not None and new_feature is not False:
             new_feature.setAttribute(id_name, newfeature_id)
             after_insert = True
             for k, v in list(_json.items()):
@@ -2057,6 +2056,8 @@ class GwInfo(QObject):
             QgsProject.instance().blockSignals(False)
             return False
 
+        is_inserting = False
+
         # Force a map refresh
         tools_qgis.force_refresh_map_canvas()
 
@@ -2065,7 +2066,6 @@ class GwInfo(QObject):
                 self._manage_docker_close()
             else:
                 tools_gw.close_dialog(dialog)
-            return None
 
         return True
 
