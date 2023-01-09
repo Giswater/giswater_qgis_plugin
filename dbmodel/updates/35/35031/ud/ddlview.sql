@@ -1738,3 +1738,26 @@ SELECT distinct on (connec_id, psector_id) *, rank(*) over (partition by connec_
 
 create view  v_edit_plan_psector_x_gully  as
 SELECT distinct on (gully_id, psector_id) *, rank() over (partition by gully_id order by state desc) FROM plan_psector_x_gully;
+
+
+CREATE OR REPLACE VIEW vi_curves
+as 
+select curve_id, curve_type, x_value, y_value from (
+with qt as (SELECT inp_curve_value.id, inp_curve_value.curve_id,
+        CASE
+            WHEN inp_curve_value.id = (( SELECT min(sub.id) AS min
+               FROM inp_curve_value sub
+              WHERE sub.curve_id::text = inp_curve_value.curve_id::text)) THEN inp_typevalue.idval
+            ELSE NULL::character varying
+        END AS curve_type,
+    inp_curve_value.x_value,
+    inp_curve_value.y_value,
+    expl_id
+   FROM inp_curve c
+     JOIN inp_curve_value ON c.id::text = inp_curve_value.curve_id::text
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = c.curve_type::text
+  WHERE inp_typevalue.typevalue::text = 'inp_value_curve'::text)
+  select qt.* from qt join selector_expl s using (expl_id) where s.cur_user = "current_user"()::text
+  union
+  select qt.* from qt where expl_id is null) a
+  ORDER BY id;

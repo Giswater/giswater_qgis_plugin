@@ -103,3 +103,5 @@ ALTER TABLE plan_psector_x_arc ALTER COLUMN insert_user SET DEFAULT CURRENT_USER
 ALTER TABLE plan_psector_x_node ALTER COLUMN insert_user SET DEFAULT CURRENT_USER;
 ALTER TABLE plan_psector_x_connec ALTER COLUMN insert_user SET DEFAULT CURRENT_USER;
 ALTER TABLE plan_psector_x_other ALTER COLUMN insert_user SET DEFAULT CURRENT_USER;
+
+  CREATE INDEX inp_curve_value_curve_id ON inp_curve_value USING btree (curve_id);
