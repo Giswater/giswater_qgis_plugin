@@ -212,10 +212,11 @@ BEGIN
 							PROCEDURE gw_trg_edit_'||lower(NEW.feature_type)||'('||quote_literal(NEW.id)||');';
 
 						ELSE
-
-							v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"},
-							"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
-							PERFORM gw_fct_admin_manage_child_views(v_query::json);
+							IF NEW.id <>'LINK' THEN
+								v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"},
+								"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
+								PERFORM gw_fct_admin_manage_child_views(v_query::json);
+							END IF;
 
 							--insert definition into config_info_layer_x_type if its not present already
 							IF NEW.child_layer NOT IN (SELECT tableinfo_id from config_info_layer_x_type)
