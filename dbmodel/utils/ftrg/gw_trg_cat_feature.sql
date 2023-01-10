@@ -135,11 +135,13 @@ BEGIN
 				DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');        
 			END IF;
 
-			INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
-			dv_querytext, feature_field_id, project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, iseditable)
-			VALUES (concat('feat_',v_id,'_vdefault'),'config',concat ('Value default catalog for ',v_id,' cat_feature'), 'role_edit', concat ('Default catalog for ', v_id), true, v_layout ,v_layoutorder,
-			v_querytext, v_feature_field_id, lower(v_projecttype),false,false,'text', 'combo', true, true)
-			ON CONFLICT (id) DO NOTHING;
+			IF NEW.system_id <>'LINK' THEN
+				INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
+				dv_querytext, feature_field_id, project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, iseditable)
+				VALUES (concat('feat_',v_id,'_vdefault'),'config',concat ('Value default catalog for ',v_id,' cat_feature'), 'role_edit', concat ('Default catalog for ', v_id), true, v_layout ,v_layoutorder,
+				v_querytext, v_feature_field_id, lower(v_projecttype),false,false,'text', 'combo', true, true)
+				ON CONFLICT (id) DO NOTHING;
+			END IF;
 			
 		END IF;
 
@@ -166,8 +168,9 @@ BEGIN
 				EXECUTE 'INSERT INTO cat_feature_gully (id, type)
 				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||');';
 			END IF;
+			
 			--create child view
-			IF NEW.id <>'LINK' THEN
+			IF NEW.system_id <>'LINK' THEN
 				v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"},
 				"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
 				PERFORM gw_fct_admin_manage_child_views(v_query::json);
@@ -212,7 +215,7 @@ BEGIN
 							PROCEDURE gw_trg_edit_'||lower(NEW.feature_type)||'('||quote_literal(NEW.id)||');';
 
 						ELSE
-							IF NEW.id <>'LINK' THEN
+							IF NEW.system_id <>'LINK' THEN
 								v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"},
 								"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
 								PERFORM gw_fct_admin_manage_child_views(v_query::json);
