@@ -8,6 +8,12 @@ version=3.5.031
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Adrian Valenciano, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Elies Bertran, Abel García Juanes, Xavier Torret
 
 Changelog=Version 3.5.031
+    - Add link features on "Add arc" toolbar button
+    - Enhance Check all widget on selector form with help button and new functionalities
+    - Reset dialog positions when load Giswater
+    - Add button "Toggle active" and checkbox "Show inactive" on psector manager form
+    - Add button "Toggle state / Toggle doable" on psector form (tab_relations)
+    - Update button "set_to_arc" on psector form, now there are two possibilities, closing point or user click coordinates (tab_relations)
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
