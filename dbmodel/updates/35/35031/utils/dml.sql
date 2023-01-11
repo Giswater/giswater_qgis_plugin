@@ -297,3 +297,15 @@ INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, child_layer,
 VALUES('LINK', 'LINK', 'LINK', 'v_edit_link', 'v_edit_link', 'Link', true);
 
 UPDATE sys_function SET function_name = 'gw_trg_arc_link_update' WHERE id = 2542; 
+
+INSERT INTO sys_table(id, descript, sys_role, source)
+VALUES ('v_expl_node', 'View that filter nodes for exploitation', 'role_basic', 'core');
+
+UPDATE sys_table SET descript='View that filter nodes for state' WHERE id='v_state_node';
+
+INSERT INTO sys_table(id, descript, sys_role, source)
+VALUES ('node_border_expl', 'Table that stores relation between node and it''s additional exploitation.', 'role_basic', 'core');
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
+VALUES (3190, 'gw_trg_node_border', 'utils', 'function trigger', 
+'Trigger that configures nodes that are located on the border between mapzones', 'role_edit', 'core');

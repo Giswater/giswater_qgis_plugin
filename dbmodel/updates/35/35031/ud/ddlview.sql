@@ -536,8 +536,10 @@ CREATE OR REPLACE VIEW vu_node AS
 
 
 CREATE OR REPLACE VIEW v_node AS 
-SELECT vu_node.* FROM vu_node
-JOIN v_state_node USING (node_id);
+SELECT vu_node.*
+FROM vu_node
+JOIN v_state_node USING (node_id)
+JOIN v_expl_node e on e.node_id = vu_node.node_id;
 
 CREATE OR REPLACE VIEW v_edit_node AS 
 SELECT * FROM v_node;

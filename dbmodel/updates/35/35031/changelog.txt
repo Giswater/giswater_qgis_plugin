@@ -22,3 +22,5 @@
 	- it is possible to relate any planned connect no any other object of network
 	- Connects mapzones has consistency againts related arc, not only on operative state also on planned state
 - Enhancement for patterns managmement by using pattern method only to fill null values for pattern features
+- New table node_border_expl, that stores relation between node and it''s additional exploitation.
+- New trigger gw_trg_node_border to configure nodes that are located on the border between mapzones

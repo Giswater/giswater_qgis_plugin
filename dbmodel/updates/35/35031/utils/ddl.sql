@@ -104,4 +104,17 @@ ALTER TABLE plan_psector_x_node ALTER COLUMN insert_user SET DEFAULT CURRENT_USE
 ALTER TABLE plan_psector_x_connec ALTER COLUMN insert_user SET DEFAULT CURRENT_USER;
 ALTER TABLE plan_psector_x_other ALTER COLUMN insert_user SET DEFAULT CURRENT_USER;
 
-  CREATE INDEX inp_curve_value_curve_id ON inp_curve_value USING btree (curve_id);
+CREATE INDEX inp_curve_value_curve_id ON inp_curve_value USING btree (curve_id);
+
+
+CREATE TABLE node_border_expl (
+  node_id varchar(16),
+  expl_id int4,
+  CONSTRAINT node_border_expl_pkey PRIMARY KEY (node_id, expl_id)
+);
+
+ALTER TABLE node_border_expl ADD CONSTRAINT node_border_expl_expl_id_fkey FOREIGN KEY (expl_id)
+REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE node_border_expl ADD CONSTRAINT node_border_expl_node_id_fkey FOREIGN KEY (node_id)
+REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
