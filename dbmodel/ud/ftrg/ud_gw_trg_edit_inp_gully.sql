@@ -55,12 +55,12 @@ BEGIN
                 NEW.method := (SELECT "value" FROM config_param_user WHERE "parameter"='epa_gully_method_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         END IF;
 
-        IF NEW.weir_cd IS NULL AND NEW.outlet_type='W/0' THEN
-                NEW.method := (SELECT "value" FROM config_param_user WHERE "parameter"='epa_gully_weir_cd_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+        IF NEW.weir_cd IS NULL AND NEW.outlet_type='W_0' THEN
+                NEW.weir_cd := (SELECT "value" FROM config_param_user WHERE "parameter"='epa_gully_weir_cd_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         END IF;
 
-        IF NEW.orifice_cd IS NULL AND NEW.outlet_type='W/0' THEN
-                NEW.method := (SELECT "value" FROM config_param_user WHERE "parameter"='epa_gully_orifice_cd_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+        IF NEW.orifice_cd IS NULL AND NEW.outlet_type='W_0' THEN
+                NEW.orifice_cd := (SELECT "value" FROM config_param_user WHERE "parameter"='epa_gully_orifice_cd_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         END IF;
 
         IF (NEW.efficiency IS NULL) THEN
