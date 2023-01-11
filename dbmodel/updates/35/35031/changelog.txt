@@ -2,18 +2,16 @@
 *************
 - New parameter on config_param_system 'admin_isproduction' (If true, deleting the schema using Giswater button will not be possible)
 - New fields related to steps and cover on man_manhole table and in the reviews
-- New field on node ud - parent_id, arc_id
-- New system parameter 'admin_node_code_on_arc' - If true, on codes of final nodes will be visible on arc's form. If false, node_id would be displayed
+- New field on review tables - insert_date
+- New system parameter 'admin_node_code_on_arc' - If true, codes of final nodes will be visible on arc's form. If false, node_id would be displayed
 - Improve address search returning values even if writing mismatch (fuzzystrmatch extension)
 - Refactor trg_edit_psector merging different execution modes
-- New field on review tables - insert_date
 - New function gw_fct_epa2data (WS) that copies results from EPA to data form
 - Add system variable to skip audit in massive processes
-- New field on UD inp_timeseries - active
+- New fields on UD node - parent_id, arc_id
 - New fields on WS node, arc, connec - om_state, conserv_state
 - New fields on WS connec - priority, valve_location, valve_type, shutoff_valve, access_type, placement_type, crmzone_id
 - New fields on WS node - access_type, placement_type
-- New fields on WS man_valve - valve_type; man_wjoin - wjoin_type; man_greentap - greentap_type, cat_valve; man_hydrant - hydrant_type- 
 - New fields on WS man_valve - valve_type; man_wjoin - wjoin_type; man_greentap - greentap_type, cat_valve; man_hydrant - hydrant_type- 
 - New field on UD inp_timeseries - active
 - Deep refactor on links to enhance usability and performance. Main changes:
@@ -24,4 +22,3 @@
 	- it is possible to relate any planned connect no any other object of network
 	- Connects mapzones has consistency againts related arc, not only on operative state also on planned state
 - Enhancement for patterns managmement by using pattern method only to fill null values for pattern features
-- Rename views v_state_* to v_filter_*

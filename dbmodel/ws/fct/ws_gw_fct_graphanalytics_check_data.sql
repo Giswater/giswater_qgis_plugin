@@ -311,7 +311,7 @@ BEGIN
 			VALUES (211, 1, '271','INFO: All presszones has graphconfig values not null.',v_count);
 		END IF;	
 
-		-- presszone : check coherence against nodetype.graphdelimiter and nodeparent defined on presszone.graphconfig (fid:  182)
+		-- presszone : check coherence between nodetype.graphdelimiter and nodeparent defined on presszone.graphconfig (fid:  182)
 		v_querytext = 'SELECT node_id, nodecat_id, the_geom, a.active,'||v_edit||'node.expl_id FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN cat_feature_node n ON n.id=c.nodetype_id
 		LEFT JOIN (SELECT node_id, active FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((graphconfig::json->>''use'')::json))::json->>''nodeParent'' as node_id, 
 		active FROM '||v_edit||'presszone WHERE graphconfig IS NOT NULL )a USING (node_id)) a USING (node_id) WHERE graph_delimiter=''PRESSZONE'' AND (a.node_id IS NULL

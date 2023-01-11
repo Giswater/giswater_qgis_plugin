@@ -762,14 +762,14 @@ BEGIN
 
 	RAISE NOTICE '27 - Automatic links with more than 100 mts (longitude out-of-range) (265)';
 
-	EXECUTE 'SELECT count(*) FROM '||v_edit||'link where userdefined_geom  = false AND st_length(the_geom) > 100'
+	EXECUTE 'SELECT count(*) FROM '||v_edit||'link where st_length(the_geom) > 100'
 	INTO v_count;
 
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, fcount)
 		VALUES (125, 2, '265', concat('WARNING-265: There is/are ',v_count,' automatic links with longitude out-of-range found.'),v_count);
 		INSERT INTO audit_check_data (fid, criticity, error_message, fcount)
-		VALUES (125, 2, concat('HINT: If link is ok, change userdefined_geom from false to true. Does not make sense automatic link with this longitude.'),v_count);
+		VALUES (125, 2, concat('HINT: Links with this longitudes doesn''t make sense.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, fcount)
 		VALUES (125, 1,'265', 'INFO: No automatic links with out-of-range Longitude found.',v_count);
