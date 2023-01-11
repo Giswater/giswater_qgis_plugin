@@ -121,16 +121,16 @@ class GwFeatureEndButton(GwAction):
         self.dlg_work_end.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_work_end, excluded_layers))
 
-        self.dlg_work_end.tbl_cat_work_x_arc.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_work_end.tbl_cat_work_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
-        self.dlg_work_end.tbl_cat_work_x_node.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_work_end.tbl_cat_work_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
-        self.dlg_work_end.tbl_cat_work_x_connec.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_work_end.tbl_cat_work_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
-        self.dlg_work_end.tbl_cat_work_x_gully.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_work_end.tbl_cat_work_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
-        self.dlg_work_end.tbl_cat_work_x_element.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_work_end.tbl_cat_work_x_element, "v_edit_element", "element_id", self.rubber_band, 10))
+        self.dlg_work_end.tbl_cat_work_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                     self.dlg_work_end.tbl_cat_work_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
+        self.dlg_work_end.tbl_cat_work_x_node.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                      self.dlg_work_end.tbl_cat_work_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
+        self.dlg_work_end.tbl_cat_work_x_connec.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                        self.dlg_work_end.tbl_cat_work_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
+        self.dlg_work_end.tbl_cat_work_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                       self.dlg_work_end.tbl_cat_work_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
+        self.dlg_work_end.tbl_cat_work_x_element.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                         self.dlg_work_end.tbl_cat_work_x_element, "v_edit_element", "element_id", self.rubber_band, 10))
 
         # Set values
         self._fill_fields()
@@ -285,8 +285,12 @@ class GwFeatureEndButton(GwAction):
             self.tbl_arc_x_relations.doubleClicked.connect(
                 partial(self._open_selected_object, self.tbl_arc_x_relations))
             self.tbl_arc_x_relations.clicked.connect(
-                partial(tools_qgis.hilight_feature_by_id, self.tbl_arc_x_relations, 'v_edit_connec', 'connec_id',
+                partial(tools_qgis.highlight_feature_by_id, self.tbl_arc_x_relations, 'v_edit_connec', 'connec_id',
                         self.rubber_band, 10, table_field='feature_id'))
+            if str(self.project_type) == 'ud':
+                self.tbl_arc_x_relations.clicked.connect(
+                    partial(tools_qgis.highlight_feature_by_id, self.tbl_arc_x_relations, 'v_edit_gully', 'gully_id',
+                            self.rubber_band, 10, table_field='feature_id'))
 
             tools_gw.open_dialog(self.dlg_work, dlg_name='feature_end_connec')
 

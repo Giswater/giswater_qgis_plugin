@@ -114,7 +114,7 @@ class GwConfigButton(GwAction):
         my_json = json.dumps(self.list_update)
         extras = f'"fields":{my_json}'
         body = tools_gw.create_body(form='"formName":"config"', extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_setconfig', body, log_sql=True)
+        json_result = tools_gw.execute_procedure('gw_fct_setconfig', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
 

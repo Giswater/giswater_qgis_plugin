@@ -56,6 +56,7 @@ class GwAdminButton:
         self.plugin_version, self.message = tools_qgis.get_plugin_version()
         self.canvas = global_vars.canvas
         self.project_type = None
+        self.project_epsg = None
         self.dlg_readsql = None
         self.dlg_info = None
         self.dlg_readsql_create_project = None
@@ -275,8 +276,7 @@ class GwAdminButton:
         client = '"client":{"device":4, "lang":"' + str(locale) + '"}, '
         data = '"data":{' + extras + '}'
         body = "$${" + client + data + "}$$"
-        result = tools_gw.execute_procedure('gw_fct_admin_schema_lastprocess', body, self.schema_name, commit=False,
-            log_sql=True)
+        result = tools_gw.execute_procedure('gw_fct_admin_schema_lastprocess', body, self.schema_name, commit=False)
         if result is None or ('status' in result and result['status'] == 'Failed'):
             self.error_count = self.error_count + 1
 
@@ -941,6 +941,14 @@ class GwAdminButton:
         elif self.form_enabled:
             self.form_enabled = False
             message = "Unable to create Postgis extension. Packages must be installed, consult your administrator."
+        # Check fuzzystrmatch extension and create if not exist
+        fuzzystrmatch_extension = tools_db.check_pg_extension('fuzzystrmatch')
+        if fuzzystrmatch_extension and self.form_enabled:
+            sql = "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;"
+            tools_db.execute_sql(sql)
+        elif self.form_enabled:
+            self.form_enabled = False
+            message = "Unable to create fuzzystrmatch extension. Packages must be installed, consult your administrator."
 
         if self.form_enabled is False:
             ignore_widgets =  ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name']
@@ -1408,6 +1416,15 @@ class GwAdminButton:
             elif self.form_enabled:
                 message = "Unable to create Postgis extension. Packages must be installed, consult your administrator."
                 self.form_enabled = False
+            # Check fuzzystrmatch extension and create if not exist
+            fuzzystrmatch_extension = tools_db.check_pg_extension('fuzzystrmatch')
+            if fuzzystrmatch_extension and self.form_enabled:
+                sql = "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;"
+                tools_db.execute_sql(sql)
+            elif self.form_enabled:
+                self.form_enabled = False
+                message = "Unable to create fuzzystrmatch extension. Packages must be installed, consult your administrator."
+
             if self.form_enabled is False:
                 ignore_widgets = ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name']
                 tools_qt.enable_dialog(self.dlg_readsql, False, ignore_widgets)
@@ -1791,7 +1808,11 @@ class GwAdminButton:
             schema_name = schema_name.replace('"', '')
         else:
             schema_name = self.schema.replace('"', '')
-        self.project_epsg = str(self.project_epsg).replace('"', '')
+        if self.project_epsg:
+            self.project_epsg = str(self.project_epsg).replace('"', '')
+        else:
+            msg = "There is no project selected or it is not valid. Please check the first tab..."
+            tools_qgis.show_warning(msg)
 
         # Manage folders 'i18n'
         manage_i18n = i18n
@@ -1958,6 +1979,13 @@ class GwAdminButton:
         if project_name is None:
             msg = "Please, select a project to delete"
             tools_qt.show_info_box(msg, "Info")
+            return
+
+        sql = f"SELECT value FROM {project_name}.config_param_system WHERE parameter='admin_isproduction'"
+        row = tools_db.get_row(sql)
+        if row and tools_os.set_boolean(row[0], default=False):
+            msg = f"The schema '{project_name}' is being used in production! It can't be deleted."
+            tools_qt.show_info_box(msg, "Warning")
             return
 
         msg = f"Are you sure you want delete schema '{project_name}' ?"

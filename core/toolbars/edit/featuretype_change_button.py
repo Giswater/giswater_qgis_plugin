@@ -195,7 +195,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
                 body = tools_gw.create_body(feature=feature, extras=extras)
 
                 # Execute SQL function and show result to the user
-                complet_result = tools_gw.execute_procedure('gw_fct_setchangefeaturetype', body, log_sql=True)
+                complet_result = tools_gw.execute_procedure('gw_fct_setchangefeaturetype', body)
                 if not complet_result:
                     message = "Error replacing feature"
                     tools_qgis.show_warning(message)
@@ -273,6 +273,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
             featurecat_id = tools_gw.get_config_parser("btn_featuretype_change", "featurecat_id", "user", "session")
             if featurecat_id not in (None, "None"):
                 tools_qt.set_combo_value(self.dlg_change.featurecat_id, featurecat_id, 1, add_new=False)
+            tools_qt.set_autocompleter(self.dlg_change.featurecat_id)
 
         # Get feature type from current feature
         feature_type = feature.attribute(self.feature_edit_type)
@@ -318,6 +319,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
         featurecat_id = tools_gw.get_config_parser("btn_featuretype_change", "featurecat_id", "user", "session")
         if featurecat_id not in (None, "None"):
             tools_qt.set_combo_value(self.dlg_change.featurecat_id, featurecat_id, 1, add_new=False)
+        tools_qt.set_autocompleter(self.dlg_change.featurecat_id)
 
 
     def _featuretype_change(self, event):

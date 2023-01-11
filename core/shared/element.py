@@ -113,7 +113,7 @@ class GwElement:
 
         # Adding auto-completion to a QLineEdit
         table_object = "element"
-        tools_gw.set_completer_object(self.dlg_add_element, table_object)
+        tools_gw.set_completer_object(self.dlg_add_element, table_object, field_id='element_id')
 
         # Set signals
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
@@ -148,14 +148,14 @@ class GwElement:
         self.dlg_add_element.btn_add_geom.clicked.connect(self._get_point_xy)
         self.dlg_add_element.state.currentIndexChanged.connect(partial(self._filter_state_type))
 
-        self.dlg_add_element.tbl_element_x_arc.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_element.tbl_element_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
-        self.dlg_add_element.tbl_element_x_node.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_element.tbl_element_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
-        self.dlg_add_element.tbl_element_x_connec.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_element.tbl_element_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
-        self.dlg_add_element.tbl_element_x_gully.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_element.tbl_element_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
+        self.dlg_add_element.tbl_element_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                       self.dlg_add_element.tbl_element_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
+        self.dlg_add_element.tbl_element_x_node.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                        self.dlg_add_element.tbl_element_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
+        self.dlg_add_element.tbl_element_x_connec.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                          self.dlg_add_element.tbl_element_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
+        self.dlg_add_element.tbl_element_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                         self.dlg_add_element.tbl_element_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
 
         # Fill combo boxes of the form and related events
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self._filter_elementcat_id))
@@ -272,8 +272,8 @@ class GwElement:
         self.dlg_man.tbl_element.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Adding auto-completion to a QLineEdit
-        table_object = "element"
-        tools_gw.set_completer_object(self.dlg_man, table_object)
+        table_object = "v_edit_element"
+        tools_gw.set_completer_object(self.dlg_man, table_object, field_id='element_id')
 
         # Set a model with selected filter. Attach that model to selected table
         message = tools_qt.fill_table(self.dlg_man.tbl_element, f"{self.schema_name}.{table_object}")
@@ -283,7 +283,7 @@ class GwElement:
 
         # Set signals
         self.dlg_man.element_id.textChanged.connect(partial(
-            tools_qt.filter_by_id, self.dlg_man, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object))
+            tools_qt.filter_by_id, self.dlg_man, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object, "element_id"))
         self.dlg_man.tbl_element.doubleClicked.connect(partial(
             self._open_selected_object_element, self.dlg_man, self.dlg_man.tbl_element, table_object))
         self.dlg_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_man))
@@ -359,7 +359,7 @@ class GwElement:
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "element"
-        tools_gw.set_completer_object(dialog, self.table_object)
+        tools_gw.set_completer_object(dialog, self.table_object, field_id='element_id')
 
 
     def _manage_element_accept(self, table_object):
@@ -576,7 +576,7 @@ class GwElement:
         row = selected_list[0].row()
 
         # Get object_id from selected row
-        field_object_id = table_object + "_id"
+        field_object_id = "element_id"
         selected_object_id = widget.model().record(row).value(field_object_id)
 
         # Close this dialog and open selected object

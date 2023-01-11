@@ -540,8 +540,8 @@ class GwSearch:
         tools_gw.load_settings(self.hydro_info_dlg)
 
         self.hydro_info_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
-        self.hydro_info_dlg.rejected.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
-        self.hydro_info_dlg.rejected.connect(self._reset_rubber_band)
+        self.hydro_info_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
+        self.hydro_info_dlg.dlg_closed.connect(self._reset_rubber_band)
         tools_gw.build_dialog_info(self.hydro_info_dlg, result)
         tools_gw.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
 

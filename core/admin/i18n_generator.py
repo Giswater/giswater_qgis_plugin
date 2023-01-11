@@ -216,8 +216,8 @@ class GwI18NGenerator:
             # Create child for tooltip
             line += f"\t\t<message>\n"
             line += f"\t\t\t<source>tooltip_{py_dlg['source']}</source>\n"
-            if py_dlg[key_label] is None:
-                py_dlg[key_tooltip] = py_dlg['lb_en_us']
+            if py_dlg[key_tooltip] is None:
+                py_dlg[key_tooltip] = py_dlg['tt_en_us']
             line += f"\t\t\t<translation>{py_dlg[key_tooltip]}</translation>\n"
             line += f"\t\t</message>\n"
 

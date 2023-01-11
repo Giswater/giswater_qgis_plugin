@@ -32,21 +32,25 @@ class GwDscenarioManagerButton(GwAction):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.feature_type = 'node'
         self.feature_types = ['node_id', 'arc_id', 'feature_id', 'connec_id', 'nodarc_id', 'rg_id', 'poll_id', 'sector_id', 'lidco_id']
-        self.filter_dict = {"inp_dscenario_conduit": {"filter_table": "v_edit_inp_conduit", "feature_type": "arc"},
-                            "inp_dscenario_raingage": {"filter_table": "v_edit_inp_dscenario_raingage", "feature_type": "rg"},
-                            "inp_dscenario_junction": {"filter_table": "v_edit_inp_junction", "feature_type": "node"},
-                            "inp_dscenario_lid_usage": {"filter_table": "v_edit_inp_dscenario_lid_usage", "feature_type": "lidco"},
-                            "inp_dscenario_controls": {"filter_table": "v_edit_inp_dscenario_controls", "feature_type": "sector"},
-                            "inp_dscenario_outfall": {"filter_table": "v_edit_inp_outfall", "feature_type": "node"},
-                            "inp_dscenario_storage": {"filter_table": "v_edit_inp_storage", "feature_type": "node"},
-                            "inp_dscenario_inflows": {"filter_table": "v_edit_inp_inflows", "feature_type": "node"},
-                            "inp_dscenario_treatment": {"filter_table": "v_edit_inp_treatment", "feature_type": "node"},
-                            "inp_dscenario_flwreg_pump": {"filter_table": "v_edit_inp_pump", "feature_type": "arc"},
-                            "inp_dscenario_flwreg_weir": {"filter_table": "v_edit_inp_weir", "feature_type": "arc"},
-                            "inp_dscenario_flwreg_orifice": {"filter_table": "v_edit_inp_orifice", "feature_type": "arc"},
-                            "inp_dscenario_flwreg_outlet": {"filter_table": "v_edit_inp_outlet", "feature_type": "arc"},
-                            "inp_dscenario_inflows_poll": {"filter_table": "v_edit_inp_pollutant", "feature_type": "poll"},
-                            "inp_dscenario_demand": {"filter_table": ["v_edit_node", "v_edit_connec"], "feature_type": ["node", "connec"]}}
+        self.filter_dict = {"inp_dscenario_controls": {"filter_table": "v_edit_sector", "feature_type": "sector"},
+                            "inp_dscenario_rules": {"filter_table": "v_edit_sector", "feature_type": "sector"},
+                            "inp_dscenario_demand": {"filter_table": ["v_edit_inp_junction", "v_edit_inp_connec"], "feature_type": ["node", "connec"]},
+                            "inp_dscenario_raingage": {"filter_table": "v_edit_raingage", "feature_type": "rg"},
+                            # DISABLED:
+                            # "inp_dscenario_lid_usage": {"filter_table": "v_edit_inp_dscenario_lid_usage", "feature_type": "lidco"},
+                            # "inp_dscenario_inflows": {"filter_table": "v_edit_inp_inflows", "feature_type": "node"},
+                            # "inp_dscenario_treatment": {"filter_table": "v_edit_inp_treatment", "feature_type": "node"},
+                            # "inp_dscenario_flwreg_pump": {"filter_table": "v_edit_inp_pump", "feature_type": "arc"},
+                            # "inp_dscenario_flwreg_weir": {"filter_table": "v_edit_inp_weir", "feature_type": "arc"},
+                            # "inp_dscenario_flwreg_orifice": {"filter_table": "v_edit_inp_orifice", "feature_type": "arc"},
+                            # "inp_dscenario_flwreg_outlet": {"filter_table": "v_edit_inp_outlet", "feature_type": "arc"},
+                            # "inp_dscenario_inflows_poll": {"filter_table": "v_edit_inp_inflows_poll", "feature_type": "poll"},
+                            # "inp_dscenario_pump_additional": {"filter_table": "v_edit_inp_pump_additional", "feature_type": "node"},
+                            }
+        self.filter_disabled = ["inp_dscenario_lid_usage", "inp_dscenario_inflows", "inp_dscenario_treatment",
+                                "inp_dscenario_flwreg_pump", "inp_dscenario_flwreg_weir", "inp_dscenario_flwreg_orifice",
+                                "inp_dscenario_flwreg_outlet", "inp_dscenario_inflows_poll", "inp_dscenario_pump_additional"
+                                ]
         self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
 
 
@@ -352,15 +356,32 @@ class GwDscenarioManagerButton(GwAction):
         # Get index of selected tab
         index_tab = self.dlg_dscenario.main_tab.currentIndex()
         tab_name = self.dlg_dscenario.main_tab.widget(index_tab).objectName()
+        enable = tab_name not in self.filter_disabled
 
-        if self.filter_dict.get(tab_name):
-            table_name = self.filter_dict[tab_name]['filter_table']
-            feature_type = self.filter_dict[tab_name]['feature_type']
-            tools_gw.set_completer_widget(table_name, self.dlg_dscenario.txt_feature_id, feature_type,
-                                          add_id=True)
+        # Populate typeahead
+        if enable:
+            self._manage_feature_type()
+            table_name = f"v_edit_{tab_name.replace('dscenario_', '')}"
+            feature_type = self.feature_type
+            if self.filter_dict.get(tab_name):
+                table_name = self.filter_dict[tab_name]['filter_table']
+                feature_type = self.filter_dict[tab_name]['feature_type']
+            tools_gw.set_completer_widget(table_name, self.dlg_dscenario.txt_feature_id, feature_type, add_id=True)
 
         # Deactivate btn_snapping functionality
         self._selection_end()
+
+        # Enable/disable filter & buttons
+        self._enable_widgets(enable)
+
+
+    def _enable_widgets(self, enable):
+        """  """
+
+        tools_qt.set_widget_enabled(self.dlg_dscenario, 'txt_feature_id', enable)
+        tools_qt.set_widget_enabled(self.dlg_dscenario, 'btn_insert', enable)
+        tools_qt.set_widget_enabled(self.dlg_dscenario, 'btn_delete', enable)
+        tools_qt.set_widget_enabled(self.dlg_dscenario, 'btn_snapping', enable)
 
 
     def _manage_feature_type(self):
@@ -393,7 +414,7 @@ class GwDscenarioManagerButton(GwAction):
                 break
         if feature_type != 'feature_id':
             table = f"v_edit_{feature_type.split('_')[0]}"
-        tools_qgis.hilight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
+        tools_qgis.highlight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
 
 
     def _manage_add_layers(self):
@@ -505,10 +526,22 @@ class GwDscenarioManagerButton(GwAction):
         view = tableview.objectName()
 
         sql = f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{self.table_name[len(f'{self.schema_name}.'):]}';"
-        rows = tools_db.get_rows(sql, add_empty_row=True)
+        rows = tools_db.get_rows(sql)
 
         if rows[0][0] == 'id':
-            sql = f"INSERT INTO {view} ({rows[1][0]}, {rows[2][0]})VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}');"
+            # FIELDS
+            sql = f"INSERT INTO {view} ({rows[1][0]}, {rows[2][0]}"
+            if view in ("inp_dscenario_controls", "inp_dscenario_rules"):
+                sql += f", {rows[3][0]}"
+            elif view == "inp_dscenario_demand":
+                sql += f", feature_type"
+            # VALUES
+            sql += f")VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}'"
+            if view in ("inp_dscenario_controls", "inp_dscenario_rules"):
+                sql += f", ''"
+            elif view == "inp_dscenario_demand":
+                sql += f", '{self.feature_type.upper()}'"
+            sql += f");"
         else:
             sql = f"INSERT INTO {view} VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}');"
         tools_db.execute_sql(sql)

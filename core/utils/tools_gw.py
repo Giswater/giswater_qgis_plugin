@@ -66,7 +66,7 @@ def load_settings(dialog, plugin='core'):
         screen_y = v_screens.GetSystemMetrics(79)  # Height of virtual screen
         monitors = v_screens.GetSystemMetrics(80)  # Will return an integer of the number of display monitors present.
 
-        if (int(x) < 0 and monitors == 1) or (int(y) < 0 and monitors == 1):
+        if None in (x, y) or ((int(x) < 0 and monitors == 1) or (int(y) < 0 and monitors == 1)):
             dialog.resize(int(width), int(height))
         else:
             if int(x) > screen_x:
@@ -132,37 +132,40 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
 
     value = None
     raw_parameter = parameter
-    if parser is None:
-        if plugin == 'core':
-            tools_log.log_info(f"Creating parser for file: {path}")
-        parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
-        parser.read(path)
+    try:
+        if parser is None:
+            if plugin == 'core':
+                tools_log.log_info(f"Creating parser for file: {path}")
+            parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
+            parser.read(path)
 
-    # If project has already been loaded and filename is 'init' or 'session', always read and parse file
-    if force_reload or (global_vars.project_loaded and file_name in ('init', 'session')):
-        parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
-        parser.read(path)
+        # If project has already been loaded and filename is 'init' or 'session', always read and parse file
+        if force_reload or (global_vars.project_loaded and file_name in ('init', 'session')):
+            parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
+            parser.read(path)
 
-    if config_type == 'user' and prefix and global_vars.project_type is not None:
-        parameter = f"{global_vars.project_type}_{parameter}"
+        if config_type == 'user' and prefix and global_vars.project_type is not None:
+            parameter = f"{global_vars.project_type}_{parameter}"
 
-    if not parser.has_section(section) or not parser.has_option(section, parameter):
+        if not parser.has_section(section) or not parser.has_option(section, parameter):
+            if chk_user_params and config_type in "user":
+                value = _check_user_params(section, raw_parameter, file_name, prefix=prefix)
+                set_config_parser(section, raw_parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
+        else:
+            value = parser[section][parameter]
+
+        # If there is a value and you don't want to get the comment, it only gets the value part
+        if value is not None and not get_comment:
+            value = value.split('#')[0].strip()
+
+        if not get_none and str(value) in "None":
+            value = None
+
+        # Check if the parameter exists in the inventory, if not creates it
         if chk_user_params and config_type in "user":
-            value = _check_user_params(section, raw_parameter, file_name, prefix=prefix)
-            set_config_parser(section, raw_parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
-    else:
-        value = parser[section][parameter]
-
-    # If there is a value and you don't want to get the comment, it only gets the value part
-    if value is not None and not get_comment:
-        value = value.split('#')[0].strip()
-
-    if not get_none and str(value) in "None":
-        value = None
-
-    # Check if the parameter exists in the inventory, if not creates it
-    if chk_user_params and config_type in "user":
-        _check_user_params(section, raw_parameter, file_name, prefix)
+            _check_user_params(section, raw_parameter, file_name, prefix)
+    except Exception as e:
+        tools_log.log_warning(f"get_config_parser exception [{type(e).__name__}]: {e}")
 
     return value
 
@@ -930,12 +933,12 @@ def enable_widgets(dialog, result, enable):
                     if not any(substring in field['layoutname'] for substring in ['main', 'data', 'top', 'bot']): continue
                     if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
                         widget.setReadOnly(not enable)
-                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(110, 110, 110)}")
                         if type(widget) == GwHyperLinkLineEdit:
                             widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
                     elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
                         widget.setEnabled(enable)
-                        widget.setStyleSheet("QWidget {color: rgb(0, 0, 0)}")
+                        widget.setStyleSheet("QWidget {color: rgb(110, 110, 110)}")
                     elif type(widget) is QPushButton:
                         # Manage the clickability of the buttons according to the configuration
                         # in the table config_form_fields simultaneously with the edition,
@@ -961,7 +964,7 @@ def enable_all(dialog, result):
                         widget.setReadOnly(not field['iseditable'])
                         if not field['iseditable']:
                             widget.setFocusPolicy(Qt.NoFocus)
-                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(110, 110, 110)}")
                             if type(widget) == GwHyperLinkLineEdit:
                                 widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
                         else:
@@ -1002,8 +1005,8 @@ def delete_selected_rows(widget, table_object):
     list_id = ""
     field_object_id = "id"
 
-    if table_object == "element":
-        field_object_id = table_object + "_id"
+    if table_object == "v_edit_element":
+        field_object_id = "element_id"
     elif "v_ui_om_visitman_x_" in table_object:
         field_object_id = "visit_id"
 
@@ -1067,7 +1070,10 @@ def set_style_mapzones():
             for id in mapzone['values']:
                 # initialize the default symbol for this geometry type
                 symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
-                symbol.setOpacity(float(mapzone['opacity']))
+                try:
+                    symbol.setOpacity(float(mapzone['transparency']))
+                except KeyError:  # backwards compatibility for database < 3.5.030
+                    symbol.setOpacity(float(mapzone['opacity']))
 
                 # Setting simp
                 R = random.randint(0, 255)
@@ -1167,15 +1173,19 @@ def build_dialog_info(dialog, result, my_json=None):
             widget = set_data_type(field, widget)
             if field['widgettype'] == 'typeahead':
                 widget = set_typeahead(field, dialog, widget, completer)
+            widget.editingFinished.connect(partial(get_values, dialog, widget, my_json))
         elif field['widgettype'] == 'datetime':
             widget = add_calendar(dialog, field)
+            widget.valueChanged.connect(partial(get_values, dialog, widget, my_json))
         elif field['widgettype'] == 'hyperlink':
             widget = add_hyperlink(field)
         elif field['widgettype'] == 'textarea':
             widget = add_textarea(field)
+            widget.textChanged.connect(partial(get_values, dialog, widget, my_json))
         elif field['widgettype'] in ('combo', 'combobox'):
             widget = add_combo(field)
             widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            widget.currentIndexChanged.connect(partial(get_values, dialog, widget, my_json))
         elif field['widgettype'] in ('check', 'checkbox'):
             widget = add_checkbox(field)
             widget.stateChanged.connect(partial(get_values, dialog, widget, my_json))
@@ -1227,7 +1237,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 if 'isMandatory' in field:
                     widget.setProperty('ismandatory', field['isMandatory'])
                 else:
-                    widget.setProperty('ismandatory', True)
+                    widget.setProperty('ismandatory', False)
                 if 'value' in field:
                     widget.setText(field['value'])
                     widget.setProperty('value', field['value'])
@@ -1420,7 +1430,6 @@ def add_button(**kwargs):
         if field.get('valueLabel'):
             txt = field.get('valueLabel')
         widget.setText(txt)
-        # TODO: Check this
         widget.setProperty('value', field['value'])
     if 'widgetcontrols' in field and field['widgetcontrols']:
         widget.setProperty('widgetcontrols', field['widgetcontrols'])
@@ -1542,6 +1551,9 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
     if key == '' or key is None:
         return _json
 
+    if _json is None:
+        _json = {}
+
     if str(value) == '' or value is None:
         _json[key] = None
     else:
@@ -1549,7 +1561,7 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
     return _json
 
 
-def add_checkbox(field):
+def add_checkbox(field, is_tristate=False):
 
     widget = QCheckBox()
     widget.setObjectName(field['widgetname'])
@@ -1558,6 +1570,10 @@ def add_checkbox(field):
     widget.setProperty('columnname', field['columnname'])
     if field.get('value') in ("t", "true", True):
         widget.setChecked(True)
+    if is_tristate:
+        widget.setTristate(is_tristate)
+        if field.get('value') == "":
+            widget.setCheckState(1)
     if 'iseditable' in field:
         widget.setEnabled(field['iseditable'])
     return widget
@@ -1870,8 +1886,8 @@ def fill_combo(widget, field):
     combolist = []
     comboIds = field.get('comboIds')
     comboNames = field.get('comboNames')
-    if comboIds and comboNames:
-        if field.get('isNullValue'):
+    if 'comboIds' in field and 'comboNames' in field:
+        if tools_os.set_boolean(field.get('isNullValue'), False):
             combolist.append(['', ''])
         for i in range(0, len(field['comboIds'])):
             elem = [comboIds[i], comboNames[i]]
@@ -2029,7 +2045,7 @@ def exec_pg_function(function_name, parameters=None, commit=True, schema_name=No
     return dict_result
 
 
-def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=False, rubber_band=None,
+def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=True, rubber_band=None,
         aux_conn=None, is_thread=False, check_function=True):
     """ Manage execution database function
     :param function_name: Name of function to call (text)
@@ -2449,6 +2465,7 @@ def get_role_permissions(qgis_project_role):
 
 def get_config_value(parameter='', columns='value', table='config_param_user', sql_added=None, log_info=True):
 
+    tools_db.check_db_connection()
     if not tools_db.check_table(table):
         tools_log.log_warning(f"Table not found: {table}")
         return None
@@ -2607,6 +2624,7 @@ def selection_changed(class_object, dialog, table_object, query=False, lazy_widg
         _insert_feature_psector(dialog, class_object.feature_type, ids=ids)
         remove_selection()
         load_tableview_psector(dialog, class_object.feature_type)
+        set_model_signals(class_object)
     else:
         load_tablename(dialog, table_object, class_object.feature_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -2614,6 +2632,37 @@ def selection_changed(class_object, dialog, table_object, query=False, lazy_widg
     enable_feature_type(dialog, table_object, ids=ids)
     class_object.ids = ids
 
+
+def set_model_signals(class_object):
+
+    class_object.rubber_band_point.reset()
+    class_object.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
+
+    filter_ = "psector_id = '" + str(class_object.psector_id.text()) + "'"
+    class_object.fill_table(class_object.dlg_plan_psector, class_object.qtbl_connec, class_object.tablename_psector_x_connec,
+                    set_edit_triggers=QTableView.DoubleClicked, expr=filter_)
+
+    # Set selectionModel signals
+    class_object.qtbl_arc.selectionModel().selectionChanged.connect(partial(
+        tools_qgis.highlight_features_by_id, class_object.qtbl_arc, "v_edit_arc", "arc_id", class_object.rubber_band_point, 5
+    ))
+    class_object.qtbl_node.selectionModel().selectionChanged.connect(partial(
+        tools_qgis.highlight_features_by_id, class_object.qtbl_node, "v_edit_node", "node_id", class_object.rubber_band_point, 10
+    ))
+    class_object.qtbl_connec.selectionModel().selectionChanged.connect(partial(
+        tools_qgis.highlight_features_by_id, class_object.qtbl_connec, "v_edit_connec", "connec_id", class_object.rubber_band_point, 10
+    ))
+    class_object.qtbl_connec.selectionModel().selectionChanged.connect(partial(
+        class_object._manage_tab_feature_buttons
+    ))
+
+    if class_object.project_type.upper() == 'UD':
+        class_object.qtbl_gully.selectionModel().selectionChanged.connect(partial(
+            tools_qgis.highlight_features_by_id, class_object.qtbl_gully, "v_edit_gully", "gully_id", class_object.rubber_band_point, 10
+        ))
+        class_object.qtbl_gully.selectionModel().selectionChanged.connect(partial(
+            class_object._manage_tab_feature_buttons
+        ))
 
 def insert_feature(class_object, dialog, table_object, query=False, remove_ids=True, lazy_widget=None,
                    lazy_init_function=None):
@@ -2873,8 +2922,10 @@ def add_icon(widget, icon, sub_folder="20x20"):
         widget.setIcon(QIcon(icon_path))
         if type(widget) is QPushButton:
             widget.setProperty('has_icon', True)
+        return QIcon(icon_path)
     else:
         tools_log.log_info("File not found", parameter=icon_path)
+        return False
 
 
 def add_tableview_header(widget, field):
@@ -2966,24 +3017,29 @@ def load_tableview_psector(dialog, feature_type):
     value = tools_qt.get_text(dialog, dialog.psector_id)
     expr = f"psector_id = '{value}'"
     qtable = tools_qt.get_widget(dialog, f'tbl_psector_x_{feature_type}')
-    message = tools_qt.fill_table(qtable, f"plan_psector_x_{feature_type}", expr, QSqlTableModel.OnFieldChange)
+    tablename = qtable.property('tablename')
+    message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.OnFieldChange)
     if message:
         tools_qgis.show_warning(message)
-    set_tablemodel_config(dialog, qtable, f"plan_psector_x_{feature_type}")
+    set_tablemodel_config(dialog, qtable, f"{tablename}")
     tools_qgis.refresh_map_canvas()
 
 
 def set_completer_object(dialog, tablename, field_id="id"):
     """ Set autocomplete of widget @table_object + "_id"
         getting id's from selected @table_object
+
+        TODO: Refactor. It should have this params: (dialog, widget, tablename, field_id="id")
+            The widget might not be called '@table_object + "_id"'
     """
 
-    widget = tools_qt.get_widget(dialog, tablename + "_id")
+    widget_name = tablename + "_id"
+    if tablename == "v_edit_element":  # TODO: remove this when refactored
+        widget_name = "element_id"
+
+    widget = tools_qt.get_widget(dialog, widget_name)
     if not widget:
         return
-
-    if tablename == "element":
-        field_id = tablename + "_id"
 
     set_completer_widget(tablename, widget, field_id)
 
@@ -3032,11 +3088,26 @@ def set_multi_completer_widget(tablenames: list, widget, fields_id: list, add_id
     tools_qt.set_completer_rows(widget, rows)
 
 
-def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to):
+def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to, max_back_date=None, max_fwd_date=None):
+    """
+    Builds query to populate @widget_from & @widget_to dates
+        :param widget_from:
+        :param widget_to:
+        :param table_name:
+        :param field_from:
+        :param field_to:
+        :param max_back_date: a PostgreSQL valid interval (eg. '1 year')
+        :param max_fwd_date: a PostgreSQL valid interval (eg. '1 year')
+    """
 
-    sql = (f"SELECT MIN(LEAST({field_from}, {field_to})),"
-           f" MAX(GREATEST({field_from}, {field_to}))"
-           f" FROM {table_name}")
+    min_sql = f"MIN(LEAST({field_from}, {field_to}))"
+    max_sql = f"MAX(GREATEST({field_from}, {field_to}))"
+    if max_back_date:
+        min_sql = f"GREATEST({min_sql}, now() - interval '{max_back_date}')"
+    if max_fwd_date:
+        max_sql = f"LEAST({max_sql}, now() + interval '{max_fwd_date}')"
+
+    sql = f"SELECT {min_sql}, {max_sql} FROM {table_name}"
     row = tools_db.get_row(sql)
     current_date = QDate.currentDate()
     if row:
@@ -3609,6 +3680,10 @@ def get_vertex_flag(default_value):
 
 def get_sysversion_addparam():
     """ Gets addparam field from table sys_version """
+
+    if not tools_db.check_column('sys_version', 'addparam'):
+        return None
+
     sql = f"SELECT addparam FROM sys_version ORDER BY id DESC limit 1"
     row = tools_db.get_row(sql, is_admin=True)
 
@@ -3634,6 +3709,33 @@ def unset_giswater_menu():
         menu_giswater.deleteLater()
         global_vars.load_project_menu = None
 
+
+def reset_position_dialog(show_message=False, plugin='core', file_name='session'):
+    """ Reset position dialog x/y """
+
+    try:
+        parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+        config_folder = f"{global_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config"
+
+        if not os.path.exists(config_folder):
+            os.makedirs(config_folder)
+        path = f"{config_folder}{os.sep}{file_name}.config"
+        parser.read(path)
+        # Check if section exists in file
+        if "dialogs_position" in parser:
+            parser.remove_section("dialogs_position")
+
+        msg = "Reset position form done successfully."
+        if show_message:
+            tools_qt.show_info_box(msg, "Info")
+
+        with open(path, 'w') as configfile:
+            parser.write(configfile)
+            configfile.close()
+    except Exception as e:
+        tools_log.log_warning(f"set_config_parser exception [{type(e).__name__}]: {e}")
+        return
+
 # endregion
 
 
@@ -3642,9 +3744,11 @@ def unset_giswater_menu():
 def _insert_feature_psector(dialog, feature_type, ids=None):
     """ Insert features_id to table plan_@feature_type_x_psector """
 
+    widget = tools_qt.get_widget(dialog, f"tbl_psector_x_{feature_type}")
+    tablename = widget.property('tablename')
     value = tools_qt.get_text(dialog, dialog.psector_id)
     for i in range(len(ids)):
-        sql = f"INSERT INTO plan_psector_x_{feature_type} ({feature_type}_id, psector_id) "
+        sql = f"INSERT INTO {tablename} ({feature_type}_id, psector_id) "
         sql += f"VALUES('{ids[i]}', '{value}') ON CONFLICT DO NOTHING;"
         tools_db.execute_sql(sql)
         load_tableview_psector(dialog, feature_type)
@@ -3653,8 +3757,10 @@ def _insert_feature_psector(dialog, feature_type, ids=None):
 def _delete_feature_psector(dialog, feature_type, list_id):
     """ Delete features_id to table plan_@feature_type_x_psector"""
 
+    widget = tools_qt.get_widget(dialog, f"tbl_psector_x_{feature_type}")
+    tablename = widget.property('tablename')
     value = tools_qt.get_text(dialog, dialog.psector_id)
-    sql = (f"DELETE FROM plan_psector_x_{feature_type} "
+    sql = (f"DELETE FROM {tablename} "
            f"WHERE {feature_type}_id IN ({list_id}) AND psector_id = '{value}'")
     tools_db.execute_sql(sql)
 
@@ -3698,8 +3804,10 @@ def _get_parser_from_filename(filename):
         tools_log.log_warning(f"File not found: {filepath}")
         return filepath, None
 
-    if not parser.read(filepath):
-        tools_log.log_warning(f"Error parsing file: {filepath}")
+    try:
+        parser.read(filepath)
+    except (configparser.DuplicateSectionError, configparser.DuplicateOptionError) as e:
+        tools_qgis.show_critical(f"Error parsing file: {filepath}", parameter=e)
         return filepath, None
 
     return filepath, parser

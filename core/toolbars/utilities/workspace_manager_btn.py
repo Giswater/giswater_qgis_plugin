@@ -155,7 +155,7 @@ class GwWorkspaceManagerButton(GwAction):
         action = "INFO"
         extras = f'"action":"{action}", "id":"{workspace_id}"'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
+        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
 
         if result and result['status'] == "Accepted":
             tools_gw.fill_tab_log(self.dlg_workspace_manager, result['body']['data'],
@@ -180,7 +180,7 @@ class GwWorkspaceManagerButton(GwAction):
 
         extras = f'"action":"{action}", "name":"{name}", "descript":{descript}, "private":"{private}"'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
+        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
 
         if result and result['status'] == "Accepted":
             tools_gw.fill_tab_log(self.dlg_create_workspace, result['body']['data'])
@@ -206,12 +206,24 @@ class GwWorkspaceManagerButton(GwAction):
 
         extras = f'"action":"{action}", "id": "{value}"'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
+        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
 
         if result and result['status'] == "Accepted":
+            # Set labels
             self._set_labels_current_workspace(value, result=result)
-            tools_qgis.refresh_map_canvas()  # First refresh all the layers
-            global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
+
+            # Refresh all the layers
+            tools_qgis.refresh_map_canvas()
+            # Refresh the map view itself
+            global_vars.iface.mapCanvas().refresh()
+
+            # Zoom to layer
+            layer = tools_qgis.get_layer_by_tablename('v_edit_inp_junction')
+            if not layer:
+                layer = tools_qgis.get_layer_by_tablename('v_edit_node')
+            tools_qgis.zoom_to_layer(layer)
+
+            # Refresh selector docker if open
             tools_gw.refresh_selectors()
 
 
@@ -233,7 +245,7 @@ class GwWorkspaceManagerButton(GwAction):
 
         extras = f'"action":"{action}", "id": "{value}"'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
+        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
 
         if result and result['status'] == "Accepted":
             message = result.get('message')
@@ -263,7 +275,7 @@ class GwWorkspaceManagerButton(GwAction):
         if answer:
             extras = f'"action":"{action}", "id": "{value}"'
             body = tools_gw.create_body(extras=extras)
-            result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
+            result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
 
             if result and result['status'] == "Accepted":
                 message = result.get('message')
@@ -299,7 +311,7 @@ class GwWorkspaceManagerButton(GwAction):
         if answer:
             extras = f'"action":"{action}", "id": "{value}"'
             body = tools_gw.create_body(extras=extras)
-            result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
+            result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
 
             if result and result['status'] == "Accepted":
                 message = result.get('message')

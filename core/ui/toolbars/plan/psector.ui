@@ -20,7 +20,7 @@
    <string>Plan psector</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_5">
-   <item row="0" column="0">
+   <item row="1" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="toolTip">
       <string/>
@@ -687,45 +687,136 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_13">
+        <layout class="QHBoxLayout" name="horizontalLayout_17">
          <item>
           <widget class="QLineEdit" name="feature_id"/>
          </item>
          <item>
           <widget class="QPushButton" name="btn_insert">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>32</width>
+             <height>23</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>32</width>
+             <height>23</height>
+            </size>
+           </property>
            <property name="text">
             <string/>
-           </property>
-           <property name="icon">
-            <iconset>
-             <normaloff>../../../../Users/user/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/icons/111b.png</normaloff>../../../../Users/user/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/icons/111b.png</iconset>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="btn_delete">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>32</width>
+             <height>23</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>32</width>
+             <height>23</height>
+            </size>
+           </property>
            <property name="text">
             <string/>
-           </property>
-           <property name="icon">
-            <iconset>
-             <normaloff>../../../../Users/user/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/icons/112b.png</normaloff>../../../../Users/user/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/icons/112b.png</iconset>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="btn_snapping">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>32</width>
+             <height>23</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>32</width>
+             <height>23</height>
+            </size>
+           </property>
            <property name="text">
             <string/>
            </property>
-           <property name="icon">
-            <iconset>
-             <normaloff>../../../../Users/user/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/icons/137.png</normaloff>../../../../Users/user/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/icons/137.png</iconset>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_toggle">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>32</width>
+             <height>23</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>32</width>
+             <height>23</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="btn_select_arc">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>32</width>
+             <height>23</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>32</width>
+             <height>23</height>
+            </size>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -733,6 +824,24 @@
          </item>
          <item>
           <widget class="QPushButton" name="btn_arc_fusion">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>32</width>
+             <height>23</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>32</width>
+             <height>23</height>
+            </size>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -742,6 +851,24 @@
           <widget class="QPushButton" name="btn_set_to_arc">
            <property name="enabled">
             <bool>true</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>32</width>
+             <height>23</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>32</width>
+             <height>23</height>
+            </size>
            </property>
            <property name="text">
             <string/>
@@ -884,8 +1011,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>98</width>
-            <height>61</height>
+            <width>916</width>
+            <height>246</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
@@ -1635,7 +1762,7 @@
      </widget>
     </widget>
    </item>
-   <item row="1" column="0">
+   <item row="2" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">

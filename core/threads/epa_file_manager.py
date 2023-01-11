@@ -215,41 +215,41 @@ class GwEpaFileManager(GwTask):
         if steps == 3:
             self.body = tools_gw.create_body(extras=(extras + f', "step": 1'))
             tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 1 with parameters: "
-                               f"'gw_fct_pg2epa_main', '{self.body}', 'log_sql=True', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+                               f"'gw_fct_pg2epa_main', '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
 
-            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
                                                      aux_conn=self.aux_conn, is_thread=True)
             if self.isCanceled():
                 return False
             if json_result is not None:
                 self.body = tools_gw.create_body(extras=(extras + f', "step": 2'))
                 tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 2 with parameters: "
-                                   f"'gw_fct_pg2epa_main', '{self.body}', 'log_sql=True', 'aux_conn={self.aux_conn}', 'is_thread=True'")
-                json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                                   f"'gw_fct_pg2epa_main', '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+                json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
                                                          aux_conn=self.aux_conn, is_thread=True)
                 if self.isCanceled():
                     return False
                 if json_result is not None:
                     self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
                     tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 3 with parameters: "
-                                       f"'gw_fct_pg2epa_main', '{self.body}', 'log_sql=True', 'aux_conn={self.aux_conn}', 'is_thread=True'")
-                    json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                                       f"'gw_fct_pg2epa_main', '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+                    json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
                                                              aux_conn=self.aux_conn, is_thread=True)
                     if self.isCanceled():
                         return False
         elif steps == 2:
             self.body = tools_gw.create_body(extras=(extras + f', "step": 1'))
             tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 1 with parameters: "
-                               f"'gw_fct_pg2epa_main', '{self.body}', 'log_sql=True', 'aux_conn={self.aux_conn}', 'is_thread=True'")
-            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                               f"'gw_fct_pg2epa_main', '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
                                                      aux_conn=self.aux_conn, is_thread=True)
             if self.isCanceled():
                 return False
             if json_result is not None:
                 self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
                 tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 3 with parameters: "
-                                   f"'gw_fct_pg2epa_main', '{self.body}', 'log_sql=True', 'aux_conn={self.aux_conn}', 'is_thread=True'")
-                json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                                   f"'gw_fct_pg2epa_main', '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+                json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
                                                          aux_conn=self.aux_conn, is_thread=True)
                 if self.isCanceled():
                     return False
@@ -257,8 +257,8 @@ class GwEpaFileManager(GwTask):
         elif steps == 1:
             self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
             tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 3 with parameters: "
-                               f"'gw_fct_pg2epa_main', '{self.body}', 'log_sql=True', 'aux_conn={self.aux_conn}', 'is_thread=True'")
-            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                               f"'gw_fct_pg2epa_main', '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
                                                      aux_conn=self.aux_conn, is_thread=True)
             if self.isCanceled():
                 return False
@@ -266,8 +266,8 @@ class GwEpaFileManager(GwTask):
             extras += f', "step": 0'
             self.body = tools_gw.create_body(extras=extras)
             tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 0 with parameters: "
-                               f"'gw_fct_pg2epa_main', '{self.body}', 'log_sql=True', 'aux_conn={self.aux_conn}', 'is_thread=True'")
-            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body, log_sql=True,
+                               f"'gw_fct_pg2epa_main', '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
                                                      aux_conn=self.aux_conn, is_thread=True)
             if self.isCanceled():
                 return False
@@ -605,7 +605,7 @@ class GwEpaFileManager(GwTask):
             value = json.loads(value[0])
             try:
                 steps = int(value['steps'])
-            except KeyError or ValueError:
+            except (KeyError, ValueError):
                 steps = 0
 
             return steps

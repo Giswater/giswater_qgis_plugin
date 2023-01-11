@@ -19,13 +19,12 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
-    QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout
-from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry
+    QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu
+from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry, QgsMapToPixel
 from qgis.gui import QgsMapToolEmitPoint
 
 from .document import GwDocument, global_vars
 from ..shared.psector_duplicate import GwPsectorDuplicate
-from ..toolbars.edit.arc_fusion_button import GwArcFusionButton
 from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi, GwReplaceArc
 from ..utils import tools_gw
 from ...lib import tools_db, tools_qgis, tools_qt, tools_log, tools_os
@@ -40,11 +39,17 @@ class GwPsector:
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
-        self.rubber_band = tools_gw.create_rubberband(self.canvas)
+        self.rubber_band_point = tools_gw.create_rubberband(self.canvas)
+        self.rubber_band_line = tools_gw.create_rubberband(self.canvas)
+        self.rubber_band_rectangle = tools_gw.create_rubberband(self.canvas)
         self.emit_point = None
         self.vertex_marker = None
         self.dict_to_update = {}
         self.my_json = {}
+        self.tablename_psector_x_arc = "plan_psector_x_arc"
+        self.tablename_psector_x_node = "plan_psector_x_node"
+        self.tablename_psector_x_connec = "v_edit_plan_psector_x_connec"
+        self.tablename_psector_x_gully = "v_edit_plan_psector_x_gully"
 
 
     def get_psector(self, psector_id=None, list_coord=None):
@@ -57,6 +62,11 @@ class GwPsector:
         # Create the dialog and signals
         self.dlg_plan_psector = GwPsectorUi()
         tools_gw.load_settings(self.dlg_plan_psector)
+
+        # Manage btn toggle
+        self._manage_btn_toggle(self.dlg_plan_psector)
+        # Manage btn set to arc
+        self._manage_btn_set_to_arc(self.dlg_plan_psector)
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
@@ -110,6 +120,7 @@ class GwPsector:
         tools_gw.add_icon(self.dlg_plan_psector.btn_select_arc, "310", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_plan_psector.btn_arc_fusion, "17", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_plan_psector.btn_set_to_arc, "209")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_toggle, "101")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_insert, "111", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_delete, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_plan_psector.btn_doc_new, "34", sub_folder="24x24")
@@ -203,24 +214,65 @@ class GwPsector:
         self.doc_id = self.dlg_plan_psector.findChild(QLineEdit, "doc_id")
         self.tbl_document = self.dlg_plan_psector.findChild(QTableView, "tbl_document")
 
+        # Fill tables tbl_arc_plan, tbl_node_plan, tbl_v_plan/om_other_x_psector with selected filter
+
+        expr = " psector_id = " + str(psector_id)
+
+        # tbl_psector_x_arc
+        self.fill_table(self.dlg_plan_psector, self.qtbl_arc, self.tablename_psector_x_arc,
+                        set_edit_triggers=QTableView.DoubleClicked, expr=expr)
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_arc, self.tablename_psector_x_arc)
+        self.qtbl_arc.setProperty('tablename', self.tablename_psector_x_arc)
+
+        self.qtbl_arc.selectionModel().selectionChanged.connect(partial(
+            tools_qgis.highlight_features_by_id, self.qtbl_arc, "v_edit_arc", "arc_id", self.rubber_band_point, 5
+        ))
+
+        # tbl_psector_x_node
+        self.fill_table(self.dlg_plan_psector, self.qtbl_node, self.tablename_psector_x_node,
+                        set_edit_triggers=QTableView.DoubleClicked, expr=expr)
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_node, self.tablename_psector_x_node)
+        self.qtbl_node.setProperty('tablename', self.tablename_psector_x_node)
+
+        self.qtbl_node.selectionModel().selectionChanged.connect(partial(
+            tools_qgis.highlight_features_by_id, self.qtbl_node, "v_edit_node", "node_id", self.rubber_band_point, 10
+        ))
+
+        # tbl_psector_x_connec
+        self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec,
+                        set_edit_triggers=QTableView.DoubleClicked, expr=expr)
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec)
+        self.qtbl_connec.setProperty('tablename', self.tablename_psector_x_connec)
+
+        self.qtbl_connec.selectionModel().selectionChanged.connect(partial(
+            tools_qgis.highlight_features_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band_point,
+            10
+        ))
+        self.qtbl_connec.selectionModel().selectionChanged.connect(partial(
+            self._manage_tab_feature_buttons
+        ))
+
+        # tbl_psector_x_gully
+        if self.project_type.upper() == 'UD':
+            self.fill_table(self.dlg_plan_psector, self.qtbl_gully, self.tablename_psector_x_gully,
+                            set_edit_triggers=QTableView.DoubleClicked, expr=expr)
+            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_gully, self.tablename_psector_x_gully)
+            self.qtbl_gully.setProperty('tablename', self.tablename_psector_x_gully)
+
+            self.qtbl_gully.selectionModel().selectionChanged.connect(partial(
+                tools_qgis.highlight_features_by_id, self.qtbl_gully, "v_edit_gully", "gully_id",
+                self.rubber_band_point, 10
+            ))
+            self.qtbl_gully.selectionModel().selectionChanged.connect(partial(
+                self._manage_tab_feature_buttons
+            ))
+
         if psector_id is not None:
 
             self.set_tabs_enabled(True)
             self.enable_buttons(True)
             self.dlg_plan_psector.name.setEnabled(True)
-            self.fill_table(self.dlg_plan_psector, self.qtbl_arc, "plan_psector_x_arc",
-                            set_edit_triggers=QTableView.DoubleClicked)
-            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_arc, "plan_psector_x_arc")
-            self.fill_table(self.dlg_plan_psector, self.qtbl_node, "plan_psector_x_node",
-                            set_edit_triggers=QTableView.DoubleClicked)
-            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_node, "plan_psector_x_node")
-            self.fill_table(self.dlg_plan_psector, self.qtbl_connec, "plan_psector_x_connec",
-                            set_edit_triggers=QTableView.DoubleClicked)
-            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_connec, "plan_psector_x_connec")
-            if self.project_type.upper() == 'UD':
-                self.fill_table(self.dlg_plan_psector, self.qtbl_gully, "plan_psector_x_gully",
-                                set_edit_triggers=QTableView.DoubleClicked)
-                tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_gully, "plan_psector_x_gully")
+
             sql = (f"SELECT psector_id, name, psector_type, expl_id, priority, descript, text1, text2, "
                    f"text3, text4, text5, text6, num_value, observ, atlas_id, scale, rotation, active, ext_code, status, workcat_id, parent_id"
                    f" FROM plan_psector "
@@ -275,33 +327,7 @@ class GwPsector:
             self.fill_widget(self.dlg_plan_psector, "rotation", row)
             self.fill_widget(self.dlg_plan_psector, "parent_id", row)
 
-            # Fill tables tbl_arc_plan, tbl_node_plan, tbl_v_plan/om_other_x_psector with selected filter
-            expr = " psector_id = " + str(psector_id)
-            self.qtbl_arc.model().setFilter(expr)
-            self.qtbl_arc.model().select()
-            self.qtbl_arc.clicked.connect(
-                partial(tools_qgis.hilight_feature_by_id, self.qtbl_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
 
-            expr = " psector_id = " + str(psector_id)
-            self.qtbl_node.model().setFilter(expr)
-            self.qtbl_node.model().select()
-            self.qtbl_node.clicked.connect(partial(
-                tools_qgis.hilight_feature_by_id, self.qtbl_node, "v_edit_node", "node_id", self.rubber_band, 10))
-
-            expr = " psector_id = " + str(psector_id)
-            self.qtbl_connec.model().setFilter(expr)
-            self.qtbl_connec.model().select()
-            self.qtbl_connec.clicked.connect(partial(
-                tools_qgis.hilight_feature_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
-            self.qtbl_connec.clicked.connect(partial(self._enable_set_to_arc))
-
-            if self.project_type.upper() == 'UD':
-                expr = " psector_id = " + str(psector_id)
-                self.qtbl_gully.model().setFilter(expr)
-                self.qtbl_gully.model().select()
-                self.qtbl_gully.clicked.connect(partial(
-                    tools_qgis.hilight_feature_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
-                self.qtbl_gully.clicked.connect(partial(self._enable_set_to_arc))
 
             self.populate_budget(self.dlg_plan_psector, psector_id)
             self.update = True
@@ -316,7 +342,7 @@ class GwPsector:
             tools_db.execute_sql(sql)
             self.insert_psector_selector('selector_psector', 'psector_id', psector_id_aux)
 
-            self.dlg_plan_psector.rejected.connect(self.rubber_band.reset)
+            self.dlg_plan_psector.rejected.connect(self.rubber_band_point.reset)
 
             if not list_coord:
 
@@ -337,10 +363,10 @@ class GwPsector:
                 points = tools_qgis.get_geometry_vertex(list_coord)
                 polygon = QgsGeometry.fromPolygonXY([points])
                 psector_rec = polygon.boundingBox()
-                tools_gw.reset_rubberband(self.rubber_band)
+                tools_gw.reset_rubberband(self.rubber_band_rectangle)
                 rb_duration = tools_gw.get_config_parser("system", "show_psector_ruberband_duration", "user", "init", prefix=False)
                 if rb_duration == "0": rb_duration = None
-                tools_qgis.draw_polygon(points, self.rubber_band, duration_time=rb_duration)
+                tools_qgis.draw_polygon(points, self.rubber_band_rectangle, duration_time=rb_duration)
 
                 # Manage Zoom to rectangle
                 if not canvas_rec.intersects(psector_rec) or (psector_rec.width() < (canvas_width * 10) / 100 or psector_rec.height() < (canvas_height * 10) / 100):
@@ -386,6 +412,7 @@ class GwPsector:
         self.dlg_plan_psector.btn_accept.clicked.connect(
             partial(self.insert_or_update_new_psector, 'v_edit_plan_psector', True))
         self.dlg_plan_psector.tabWidget.currentChanged.connect(partial(self.check_tab_position))
+        self.dlg_plan_psector.tabWidget.currentChanged.connect(partial(self._reset_snapping))
         self.dlg_plan_psector.btn_cancel.clicked.connect(partial(self.close_psector, cur_active_layer))
         if hasattr(self, 'dlg_psector_mng'):
             self.dlg_plan_psector.rejected.connect(partial(self.fill_table, self.dlg_psector_mng, self.qtbl_psm, 'v_ui_plan_psector'))
@@ -397,20 +424,22 @@ class GwPsector:
 
         self.dlg_plan_psector.btn_delete.setShortcut(QKeySequence(Qt.Key_Delete))
 
+        # Reset snapping when any button is clicked
+        for button in self.dlg_plan_psector.findChildren(QPushButton):
+            button.clicked.connect(partial(self._reset_snapping))
+
         self.dlg_plan_psector.btn_insert.clicked.connect(
             partial(tools_gw.insert_feature, self, self.dlg_plan_psector, table_object, True, True, None, None))
         self.dlg_plan_psector.btn_delete.clicked.connect(
             partial(tools_gw.delete_records, self, self.dlg_plan_psector, table_object, True, None, None))
+        self.dlg_plan_psector.btn_delete.clicked.connect(
+            partial(tools_gw.set_model_signals, self))
         self.dlg_plan_psector.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_plan_psector, table_object, True))
         self.dlg_plan_psector.btn_select_arc.clicked.connect(
             partial(self._replace_arc))
         self.dlg_plan_psector.btn_arc_fusion.clicked.connect(
             partial(self._arc_fusion))
-        self.dlg_plan_psector.btn_set_to_arc.clicked.connect(
-            partial(self._set_to_arc))
-
-
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_plan_psector, excluded_layers))
@@ -946,7 +975,8 @@ class GwPsector:
         """ Close dialog and disconnect snapping """
 
         try:
-            tools_gw.reset_rubberband(self.rubber_band)
+            tools_gw.reset_rubberband(self.rubber_band_point)
+            tools_gw.reset_rubberband(self.rubber_band_line)
             self._clear_my_json()
             self.reload_states_selector()
             if cur_active_layer:
@@ -962,6 +992,11 @@ class GwPsector:
             tools_qgis.disconnect_snapping()
             tools_gw.disconnect_signal('psector')
             tools_qgis.disconnect_signal_selection_changed()
+
+            # Apply filters on tableview
+            if hasattr(self, 'dlg_psector_mng'):
+                self._filter_table(self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name, self.dlg_psector_mng.chk_active, 'v_ui_plan_psector')
+
         except RuntimeError:
             pass
 
@@ -1212,7 +1247,7 @@ class GwPsector:
                     lbl = QLabel()
                     lbl.setObjectName(f"lbl_{key}_{self.count}")
                     lbl.setText(f"  {key}  ")
-    
+
                     layout = dialog.findChild(QGridLayout, 'lyt_price')
                     layout.addWidget(lbl, self.count, pos)
                     layout.setColumnStretch(2, 1)
@@ -1370,7 +1405,7 @@ class GwPsector:
 
         # When change some field we need to refresh Qtableview and filter by psector_id
         model.beforeUpdate.connect(partial(self.manage_update_state, model))
-        model.dataChanged.connect(partial(self.refresh_table, dialog, widget))
+        # model.dataChanged.connect(partial(self.refresh_table, dialog, widget))
         widget.setEditTriggers(set_edit_triggers)
 
         # Check for errors
@@ -1407,24 +1442,39 @@ class GwPsector:
             :param record: QSqlRecord (passed by signal)
         """
 
-        # Get table name via current tab name (arc, node, connec or gully)
-        index_tab = self.dlg_plan_psector.tab_feature.currentIndex()
-        tab_name = self.dlg_plan_psector.tab_feature.tabText(index_tab)
-        table_name = tab_name.lower()
+        sql = (f"UPDATE {self.tablename_psector_x_connec} SET state = "
+               f"{record.value('state')} WHERE id = '{record.value('id')}'")
+        tools_db.execute_sql(sql)
 
-        # Get selected feature's state
-        feature_id = record.value(f'{table_name}_id')  # Get the id
-        sql = f"SELECT {table_name}.state FROM {table_name} WHERE {table_name}_id='{feature_id}';"
-        sql_row = tools_db.get_row(sql)
-        if sql_row:
-            old_state = sql_row[0]  # Original state
-            new_state = record.value('state')  # New state
-            if old_state == 2 and new_state == 0:
-                msg = "This value is mandatory for planned feature. If you are looking to unlink feature from this " \
-                      "psector please delete row. If delete is not allowed its because feature is only used on this " \
-                      "psector and needs to be removed from canvas"
-                tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
-                model.revert()
+        # self._refresh_tables_relations()
+        filter_ = "psector_id = '" + str(self.psector_id.text()) + "'"
+        self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec,
+                        set_edit_triggers=QTableView.DoubleClicked, expr=filter_)
+
+        # Force a map refresh
+        tools_qgis.force_refresh_map_canvas()
+
+
+        # self.refresh_table(dialog, widget)
+
+        # Get table name via current tab name (arc, node, connec or gully)
+        # index_tab = self.dlg_plan_psector.tab_feature.currentIndex()
+        # tab_name = self.dlg_plan_psector.tab_feature.tabText(index_tab)
+        # table_name = tab_name.lower()
+        #
+        # # Get selected feature's state
+        # feature_id = record.value(f'{table_name}_id')  # Get the id
+        # sql = f"SELECT {table_name}.state FROM {table_name} WHERE {table_name}_id='{feature_id}';"
+        # sql_row = tools_db.get_row(sql)
+        # if sql_row:
+        #     old_state = sql_row[0]  # Original state
+        #     new_state = record.value('state')  # New state
+        #     if old_state == 2 and new_state == 0:
+        #         msg = "This value is mandatory for planned feature. If you are looking to unlink feature from this " \
+        #               "psector please delete row. If delete is not allowed its because feature is only used on this " \
+        #               "psector and needs to be removed from canvas"
+        #         tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
+        #         model.revert()
 
 
     def document_insert(self):
@@ -1474,24 +1524,30 @@ class GwPsector:
 
     def show_status_warning(self):
 
-        mode = tools_gw.get_config_value('plan_psector_execute_action', table='config_param_system')
-        if mode is None:
-            return
-
-        mode = json.loads(mode[0])
-        if mode['mode'] == 'obsolete':
-            msg = "WARNING: You have updated the status value. If you click 'Accept' on the main dialog, " \
-                  "a process that updates the state & state_type values of all that features that belong to the " \
-                  "psector, according to the system variables plan_psector_statetype, " \
-                  "plan_statetype_planned and plan_statetype_ficticious, will be triggered."
+        msg = ""
+        status = tools_qt.get_combo_value(self.dlg_plan_psector, self.cmb_status)
+        if status == '0':
+            msg = "WARNING: You have updated the status value to EXECUTED (Obsolete). If you click 'Accept' on " \
+                  "the main dialog, a process will update all the features that belong to the psector changing its " \
+                  "state to OBSOLETE and its state_type according to system variable " \
+                  "'plan_psector_execute', 'done_planified' and 'done_ficticius'."
+        elif status == '2':
+            msg = "WARNING: You have updated the status value to PLANNED. If you click 'Accept' on the main dialog, " \
+                  "a process will update all the features that belong to the psector changing its state to " \
+                  "OBSOLETE and its state_type according to system variable " \
+                  "'plan_statetype_vdefault', 'plan_statetype_planned' and 'plan_statetype_ficticius'."
+        elif status == '3':
+            msg = "WARNING: You have updated the status value to CANCELED. If you click 'Accept' on the main dialog, " \
+                  "a process will update all the features that belong to the psector changing its state to OBSOLETE " \
+                  "and its state_type according to system variable 'plan_psector_execute', 'canceled_planified' and " \
+                  "'canceled_ficticius'."
+        elif status == '4':
+            msg = "WARNING: You have updated the status value to EXECUTED (On Service). If you click 'Accept' on the " \
+                  "main dialog, this psector will be executed. Planified features will turn ON SERVICE and deleted " \
+                  "features will turn OBSOLETE. To mantain traceability, a copy of planified features will be " \
+                  "inserted on the psector."
+        if msg:
             tools_qt.show_details(msg, 'Message warning')
-        elif mode['mode'] == 'onService':
-            if tools_qt.get_combo_value(self.dlg_plan_psector, self.cmb_status) == '0':
-                msg = "WARNING: You have updated the status value. If you click 'Accept' on the main dialog, " \
-                      "this psector will be executed. Planified features will turn on service and deleted features " \
-                      "will turn obsolete. To mantain traceability, a copy of planified features will be inserted " \
-                      "on the psector."
-                tools_qt.show_details(msg, 'Message warning')
 
 
     def master_new_psector(self, psector_id=None):
@@ -1515,7 +1571,10 @@ class GwPsector:
         tools_qt.set_tableview_config(self.qtbl_psm, sectionResizeMode=0)
 
         # Set signals
+        self.dlg_psector_mng.chk_active.stateChanged.connect(partial(self._filter_table, self.dlg_psector_mng,
+           self.qtbl_psm, self.dlg_psector_mng.txt_name, self.dlg_psector_mng.chk_active, table_name))
         self.dlg_psector_mng.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_psector_mng))
+        self.dlg_psector_mng.btn_toggle_active.clicked.connect(partial(self.set_toggle_active, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.rejected.connect(partial(tools_gw.close_dialog, self.dlg_psector_mng))
         self.dlg_psector_mng.btn_delete.clicked.connect(partial(
             self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, table_name, column_id, 'lbl_vdefault_psector', 'psector'))
@@ -1524,9 +1583,10 @@ class GwPsector:
             partial(self.update_current_psector, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.btn_duplicate.clicked.connect(self.psector_duplicate)
         self.dlg_psector_mng.txt_name.textChanged.connect(partial(
-            self.filter_by_text, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name, table_name))
+           self._filter_table, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name,
+           self.dlg_psector_mng.chk_active, table_name))
         self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, self.qtbl_psm))
-        self.fill_table(self.dlg_psector_mng, self.qtbl_psm, table_name)
+        self.fill_table(self.dlg_psector_mng, self.qtbl_psm, table_name, expr=' active is True')
         tools_gw.set_tablemodel_config(self.dlg_psector_mng, self.qtbl_psm, table_name)
         selection_model = self.qtbl_psm.selectionModel()
         selection_model.selectionChanged.connect(partial(self._fill_txt_infolog))
@@ -1534,6 +1594,33 @@ class GwPsector:
         # Open form
         self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
         tools_gw.open_dialog(self.dlg_psector_mng, dlg_name="psector_manager")
+
+
+    def set_toggle_active(self, dialog, qtbl_psm):
+
+        sql = ""
+        selected_list = qtbl_psm.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            return
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+
+            psector_id = qtbl_psm.model().record(row).value("psector_id")
+            active = qtbl_psm.model().record(row).value("active")
+            if psector_id == self.current_psector_id[0]:
+                message = f"The active state of the current psector cannot be changed. Current psector: {self.current_psector_id[1]}"
+                tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+                return
+            if active:
+                sql += f"UPDATE plan_psector SET active = False WHERE psector_id = {psector_id};"
+            else:
+                sql += f"UPDATE plan_psector SET active = True WHERE psector_id = {psector_id};"
+
+        tools_db.execute_sql(sql)
+
+        self._filter_table(dialog, dialog.tbl_psm, dialog.txt_name, dialog.chk_active, 'v_ui_plan_psector')
 
 
     def update_current_psector(self, dialog, qtbl_psm):
@@ -1545,6 +1632,11 @@ class GwPsector:
             return
         row = selected_list[0].row()
         psector_id = qtbl_psm.model().record(row).value("psector_id")
+        active = qtbl_psm.model().record(row).value("active")
+        if active is False:
+            message = f"Cannot set the current psector of an inactive psector. You must activate it before."
+            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            return
         aux_widget = QLineEdit()
         aux_widget.setText(str(psector_id))
         self.upsert_config_param_user(dialog, aux_widget, "plan_psector_vdefault")
@@ -1603,16 +1695,36 @@ class GwPsector:
         tools_db.execute_sql(sql)
 
 
-    def filter_by_text(self, dialog, table, widget_txt, tablename):
+    def _filter_table(self, dialog, table, widget_txt, widget_chk, tablename):
 
         result_select = tools_qt.get_text(dialog, widget_txt)
+        inactive_select = widget_chk.isChecked()
+
+        expr = ""
+
+        if not inactive_select:
+            expr += f" active is true"
+
         if result_select != 'null':
-            expr = f" name ILIKE '%{result_select}%'"
+            if expr != "":
+                expr += f" AND "
+            expr += f" name ILIKE '%{result_select}%'"
+        if expr != "":
             # Refresh model with selected filter
             table.model().setFilter(expr)
             table.model().select()
         else:
             self.fill_table(dialog, table, tablename)
+
+    def filter_by_active(self, dialog, table):
+
+        chk_active_state = dialog.chk_active.isChecked()
+        expr = f" active is {chk_active_state}"
+
+        # Refresh model with selected filter
+        table.model().setFilter(expr)
+        table.model().select()
+
 
 
     def charge_psector(self, qtbl_psm):
@@ -1623,11 +1735,20 @@ class GwPsector:
             tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
             return
         row = selected_list[0].row()
+        active = qtbl_psm.model().record(row).value("active")
+        psector_name = qtbl_psm.model().record(row).value("name")
+        if active is False:
+            message = f"To open psector {psector_name}, it must be activated before."
+            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            return
         psector_id = qtbl_psm.model().record(row).value("psector_id")
         keep_open_form = tools_gw.get_config_parser('dialogs_actions', 'psector_manager_keep_open', "user", "init", prefix=True)
         if tools_os.set_boolean(keep_open_form, False) is not True:
             tools_gw.close_dialog(self.dlg_psector_mng)
+
+        # Open form
         self.master_new_psector(psector_id)
+        
         # Refresh canvas
         tools_qgis.refresh_map_canvas()
 
@@ -1756,7 +1877,7 @@ class GwPsector:
     def filter_merm(self, dialog, tablename):
         """ Filter rows from 'manage_prices' dialog from selected tab """
 
-        self.filter_by_text(dialog, dialog.tbl_om_result_cat, dialog.txt_name, tablename)
+        self._filter_table(dialog, dialog.tbl_om_result_cat, dialog.txt_name, dialog.chk_active, tablename)
 
 
     def psector_duplicate(self):
@@ -1782,10 +1903,11 @@ class GwPsector:
                " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
                " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
         row = tools_db.get_row(sql)
+        self.current_psector_id = row
         if not row:
             return
-        tools_qt.set_widget_text(dialog, 'lbl_vdefault_psector', row[1])
-        extras = (f'"selectorType":"selector_basic", "tabName":"tab_psector", "id":{row[0]}, '
+        tools_qt.set_widget_text(dialog, 'lbl_vdefault_psector', self.current_psector_id[1])
+        extras = (f'"selectorType":"selector_basic", "tabName":"tab_psector", "id":{self.current_psector_id[0]}, '
                   f'"isAlone":"False", "disableParent":"False", '
                   f'"value":"True"')
         body = tools_gw.create_body(extras=extras)
@@ -1920,12 +2042,14 @@ class GwPsector:
         tools_gw.load_tableview_psector(self.dlg_plan_psector, 'connec')
         if self.project_type.upper() == 'UD':
             tools_gw.load_tableview_psector(self.dlg_plan_psector, 'gully')
-        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_arc", 'plan_psector_x_arc',
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_arc", self.tablename_psector_x_arc,
                                        isQStandardItemModel=True)
-        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_connec", 'plan_psector_x_connec',
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_node", self.tablename_psector_x_node,
+                                       isQStandardItemModel=True)
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_connec", self.tablename_psector_x_connec,
                                        isQStandardItemModel=True)
         if self.project_type.upper() == 'UD':
-            tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_gully", 'plan_psector_x_gully',
+            tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_gully", self.tablename_psector_x_gully,
                                            isQStandardItemModel=True)
 
 
@@ -1954,10 +2078,12 @@ class GwPsector:
         return all_checked
 
 
-    def _set_to_arc(self):
+    def _set_to_arc(self, idx):
 
         if hasattr(self, 'emit_point') and self.emit_point is not None:
             tools_gw.disconnect_signal('psector', 'set_to_arc_ep_canvasClicked_set_arc_id')
+            tools_gw.disconnect_signal('psector', 'set_to_arc_xyCoordinates_mouse_move_arc')
+
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
         self.snapper_manager = GwSnapManager(self.iface)
@@ -1973,11 +2099,17 @@ class GwPsector:
         # Set signals
         tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_arc, 'psector',
                                 'set_to_arc_xyCoordinates_mouse_move_arc')
-        tools_gw.connect_signal(self.emit_point.canvasClicked, partial(self._set_arc_id),
+        tools_gw.connect_signal(self.emit_point.canvasClicked, partial(self._set_arc_id, idx),
                                 'psector', 'set_to_arc_ep_canvasClicked_set_arc_id')
 
 
-    def _set_arc_id(self, point):
+    def _set_arc_id(self, idx, point, event):
+
+        # Manage right click
+        if event == 2:
+            tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
+            tools_qgis.disconnect_signal_selection_changed()
+            return
 
         # Check if there is a connec/gully selected
         tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
@@ -2035,18 +2167,39 @@ class GwPsector:
                 feature = tools_qt.get_feature_by_id(layer, self.arc_id, 'arc_id')
                 try:
                     geometry = feature.geometry()
-                    self.rubber_band.setToGeometry(geometry, None)
-                    self.rubber_band.setColor(QColor(255, 0, 0, 100))
-                    self.rubber_band.setWidth(5)
-                    self.rubber_band.show()
+                    self.rubber_band_line.setToGeometry(geometry, None)
+                    self.rubber_band_line.setColor(QColor(255, 0, 0, 100))
+                    self.rubber_band_line.setWidth(5)
+                    self.rubber_band_line.show()
                 except AttributeError:
                     pass
 
         if self.arc_id is None: return
 
+        the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {global_vars.data_epsg})"
+
         for row in selected_rows:
-            cell = row.siblingAtColumn(tools_qt.get_col_index_by_col_name(selected_qtbl, 'arc_id'))
-            selected_qtbl.model().setData(cell, self.arc_id)
+            sql = ""
+            if idx == 1:
+                sql += (f"INSERT INTO temp_table (fid, geom_point) VALUES (485, {the_geom});\n")
+
+            row_id = self.qtbl_connec.model().record(row.row()).value("id")
+
+            sql += (f"UPDATE {self.tablename_psector_x_connec} SET arc_id = "
+                  f"'{self.arc_id}' WHERE id = '{row_id}'")
+
+            tools_db.execute_sql(sql)
+
+        filter_ = "psector_id = '" + str(self.psector_id.text()) + "'"
+        self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec,
+                        set_edit_triggers=QTableView.DoubleClicked, expr=filter_)
+
+        # Force a map refresh
+        tools_qgis.force_refresh_map_canvas()
+
+        # Manage signals
+        tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
+        tools_gw.set_model_signals(self)
 
 
     def _replace_arc(self):
@@ -2113,10 +2266,10 @@ class GwPsector:
                 feature = tools_qt.get_feature_by_id(layer, self.arc_id, 'arc_id')
                 try:
                     geometry = feature.geometry()
-                    self.rubber_band.setToGeometry(geometry, None)
-                    self.rubber_band.setColor(QColor(255, 0, 0, 100))
-                    self.rubber_band.setWidth(5)
-                    self.rubber_band.show()
+                    self.rubber_band_point.setToGeometry(geometry, None)
+                    self.rubber_band_point.setColor(QColor(255, 0, 0, 100))
+                    self.rubber_band_point.setWidth(5)
+                    self.rubber_band_point.show()
                 except AttributeError:
                     pass
 
@@ -2141,7 +2294,9 @@ class GwPsector:
         # Triggers
         self.dlg_replace_arc.btn_accept.clicked.connect(partial(self._set_plan_replace_feature))
         self.dlg_replace_arc.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_replace_arc))
-        self.dlg_replace_arc.rejected.connect(partial(tools_gw.reset_rubberband, self.rubber_band))
+        self.dlg_replace_arc.rejected.connect(partial(tools_gw.reset_rubberband, self.rubber_band_point))
+        self.dlg_replace_arc.rejected.connect(partial(tools_gw.reset_rubberband, self.rubber_band_line))
+        self.dlg_replace_arc.rejected.connect(self._reset_snapping)
 
         # Open form
         tools_gw.open_dialog(self.dlg_replace_arc, dlg_name="replace_arc")
@@ -2156,18 +2311,33 @@ class GwPsector:
         body = tools_gw.create_body(feature=feature, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_setfeaturereplaceplan', body)
 
+        # Force a map refresh
+        tools_qgis.force_refresh_map_canvas()
         # Refresh tableview tbl_psector_x_arc, tbl_psector_x_connec, tbl_psector_x_gully
         self._refresh_tables_relations()
 
+        log = tools_gw.get_config_parser("user_edit_tricks", "psector_replace_feature_disable_showlog", 'user', 'init')
+        showlog = not tools_os.set_boolean(log, False)
+
         message = json_result['message']['text']
-        if message is not None:
+        if message is not None and showlog:
             tools_qt.show_info_box(message)
 
-        text_result, change_tab = tools_gw.fill_tab_log(self.dlg_replace_arc, json_result['body']['data'])
+        text_result, change_tab = tools_gw.fill_tab_log(self.dlg_replace_arc, json_result['body']['data'], force_tab=showlog)
 
         if not change_tab:
             self.dlg_replace_arc.close()
-            tools_gw.reset_rubberband(self.rubber_band)
+            tools_gw.reset_rubberband(self.rubber_band_point)
+            tools_gw.reset_rubberband(self.rubber_band_line)
+            self.iface.actionPan().trigger()
+
+        # Activate again if variable is True
+        keep_active = tools_gw.get_config_parser("user_edit_tricks", "psector_replace_feature_keep_active", 'user', 'init')
+        if tools_os.set_boolean(keep_active, False):
+            if not change_tab:
+                self.dlg_plan_psector.btn_select_arc.click()
+                return
+            self.dlg_replace_arc.finished.connect(self.dlg_plan_psector.btn_select_arc.click)
 
 
     def _arc_fusion(self):
@@ -2239,8 +2409,8 @@ class GwPsector:
                 if not result or result['status'] == 'Failed':
                     return
 
-                # Refresh map canvas
-                tools_qgis.refresh_map_canvas()
+                # Force a map refresh
+                tools_qgis.force_refresh_map_canvas()
                 # Refresh tables
                 self._refresh_tables_relations()
 
@@ -2304,5 +2474,89 @@ class GwPsector:
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if result.isValid():
             self.snapper_manager.add_marker(result, self.vertex_marker)
+
+
+    def _reset_snapping(self):
+        tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
+
+
+    def _manage_btn_toggle(self, dialog):
+        """ Fill btn_toggle QMenu """
+
+        # Functions
+        values = [[0, "Toggle state"], [1, "Toggle doable"]]
+
+        # Create and populate QMenu
+        toggle_menu = QMenu()
+        for value in values:
+            idx = value[0]
+            label = value[1]
+            action = toggle_menu.addAction(f"{label}")
+            action.triggered.connect(partial(self._toggle_feature_psector, dialog, idx))
+
+        dialog.btn_toggle.setMenu(toggle_menu)
+
+
+    def _manage_btn_set_to_arc(self, dialog):
+        """ Fill btn_set_to_arc QMenu """
+
+        # Functions
+        values = [[0, "Set closest point"], [1, "Set user click"]]
+
+        # Create and populate QMenu
+        set_to_arc_menu = QMenu()
+        for value in values:
+            idx = value[0]
+            label = value[1]
+            action = set_to_arc_menu.addAction(f"{label}")
+            action.triggered.connect(partial(self._set_to_arc, idx))
+
+        dialog.btn_set_to_arc.setMenu(set_to_arc_menu)
+
+
+    def _toggle_feature_psector(self, dialog, idx):
+        """ Delete features_id to table plan_@feature_type_x_psector"""
+
+        tab_idx = dialog.tab_feature.currentIndex()
+        feature_type = dialog.tab_feature.tabText(tab_idx).lower()
+        qtbl_feature = dialog.findChild(QTableView, f"tbl_psector_x_{feature_type}")
+        selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
+        list_tables = {'arc':self.tablename_psector_x_arc, 'node':self.tablename_psector_x_node,
+                       'connec':self.tablename_psector_x_connec, 'gully':self.tablename_psector_x_gully}
+
+        sql = ""
+        selected_list = qtbl_feature.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            return
+
+        if idx == 0:
+            for i in range(0, len(selected_list)):
+                row = selected_list[i].row()
+                feature_id = qtbl_feature.model().record(row).value(f"{feature_type}_id")
+                state = qtbl_feature.model().record(row).value("state")
+                if state == 1:
+                    sql += f"UPDATE {list_tables[feature_type]} SET state = 0 WHERE {feature_type}_id = '{feature_id}' AND psector_id = {selected_psector};"
+                elif state == 0:
+                    sql += f"UPDATE {list_tables[feature_type]} SET state = 1 WHERE {feature_type}_id = '{feature_id}' AND psector_id = {selected_psector};"
+
+
+        elif idx == 1:
+            for i in range(0, len(selected_list)):
+                row = selected_list[i].row()
+                feature_id = qtbl_feature.model().record(row).value(f"{feature_type}_id")
+                doable = qtbl_feature.model().record(row).value("doable")
+                if doable:
+                    sql += f"UPDATE {list_tables[feature_type]} SET doable = False WHERE {feature_type}_id = '{feature_id}' AND psector_id = {selected_psector};"
+                else:
+                    sql += f"UPDATE {list_tables[feature_type]} SET doable = True WHERE {feature_type}_id = '{feature_id}' AND psector_id = {selected_psector};"
+        else:
+            return
+
+        tools_db.execute_sql(sql)
+        tools_gw.load_tableview_psector(dialog, feature_type)
+        tools_gw.set_model_signals(self)
+
 
     # endregion

@@ -505,7 +505,7 @@ def disconnect_snapping(action_pan=True, emit_point=None, vertex_marker=None):
     """ Select 'Pan' as current map tool and disconnect snapping """
 
     try:
-        global_vars.canvas.xyCoordinates.disconnect()
+        iface.mapCanvas().xyCoordinates.disconnect()
     except TypeError as e:
         tools_log.log_info(f"{type(e).__name__} --> {e}")
 
@@ -528,12 +528,19 @@ def disconnect_snapping(action_pan=True, emit_point=None, vertex_marker=None):
 def refresh_map_canvas(_restore_cursor=False):
     """ Refresh all layers present in map canvas """
 
-    global_vars.canvas.refreshAllLayers()
-    for layer_refresh in global_vars.canvas.layers():
+    iface.mapCanvas().refreshAllLayers()
+    for layer_refresh in iface.mapCanvas().layers():
         layer_refresh.triggerRepaint()
 
     if _restore_cursor:
         restore_cursor()
+
+
+def force_refresh_map_canvas():
+    """ Refresh all layers & map canvas """
+
+    refresh_map_canvas()  # First refresh all the layers
+    iface.mapCanvas().refresh()  # Then refresh the map view itself
 
 
 def set_cursor_wait():
@@ -557,7 +564,7 @@ def disconnect_signal_selection_changed():
     """ Disconnect signal selectionChanged """
 
     try:
-        global_vars.canvas.selectionChanged.disconnect()
+        iface.mapCanvas().selectionChanged.disconnect()
     except Exception:
         pass
     finally:
@@ -627,8 +634,8 @@ def zoom_to_rectangle(x1, y1, x2, y2, margin=5, change_crs=True):
 
         rect = tform.transform(rect)
 
-    global_vars.canvas.setExtent(rect)
-    global_vars.canvas.refresh()
+    iface.mapCanvas().setExtent(rect)
+    iface.mapCanvas().refresh()
 
 
 def get_composers_list():
@@ -765,8 +772,8 @@ def remove_layer_from_toc(layer_name, group_name, sub_group=None):
         remove_layer_from_toc(layer_name, group_name)
 
     # Force a map refresh
-    refresh_map_canvas()  # First refresh all the layers
-    global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
+    force_refresh_map_canvas()
+
 
 def clean_layer_group_from_toc(group_name):
     """
@@ -967,7 +974,7 @@ def get_geometry_from_json(feature):
         type_ = feature['geometry']['type']
         geometry = f"{type_}{coordinates}"
         return QgsGeometry.fromWkt(geometry)
-    except AttributeError or TypeError as e:
+    except (AttributeError, TypeError) as e:
         tools_log.log_info(f"{type(e).__name__} --> {e}")
         return None
 
@@ -991,13 +998,20 @@ def get_locale():
         return locale
 
 
-def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, index, table_field=None):
+def highlight_features_by_id(qtable, layer_name, field_id, rubber_band, width, selected, deselected):
+
+    rubber_band.reset()
+    for idx, index in enumerate(qtable.selectionModel().selectedRows()):
+        highlight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, index, add=(idx > 0))
+
+
+def highlight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, index, table_field=None, add=False):
     """ Based on the received index and field_id, the id of the received field_id is searched within the table
      and is painted in red on the canvas """
 
-    rubber_band.reset()
     layer = get_layer_by_tablename(layer_name)
     if not layer:
+        rubber_band.reset()
         return
 
     row = index.row()
@@ -1008,12 +1022,34 @@ def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, inde
     feature = tools_qt.get_feature_by_id(layer, _id, field_id)
     try:
         geometry = feature.geometry()
-        rubber_band.setToGeometry(geometry, None)
+        if add:
+            rubber_band.addGeometry(geometry, None)
+        else:
+            rubber_band.reset()
+            rubber_band.setToGeometry(geometry, None)
         rubber_band.setColor(QColor(255, 0, 0, 100))
         rubber_band.setWidth(width)
         rubber_band.show()
     except AttributeError:
         pass
+
+
+def zoom_to_layer(layer):
+    """
+    Zooms to a given layer
+        :param layer:
+        :return:
+    """
+
+    if not layer:
+        msg = "Couldn't find layer to zoom to"
+        show_warning(msg)
+        return
+
+    # Set canvas extent
+    iface.mapCanvas().setExtent(layer.extent())
+    # Refresh canvas
+    iface.mapCanvas().refresh()
 
 
 def check_query_layer(layer):

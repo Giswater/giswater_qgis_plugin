@@ -222,7 +222,7 @@ class GwInfoButton(GwMaptool):
 
 
     def _toggle_valve_state(self, valve_id, table_name, value):
-        """ Open or closes a valve. If parameter 'utils_grafanalytics_automatic_trigger' is true,
+        """ Open or closes a valve. If parameter 'utils_graphanalytics_automatic_trigger' is true,
         also updates mapzones in a thread """
 
         # Build function body
@@ -232,8 +232,8 @@ class GwInfoButton(GwMaptool):
         extras = f'"fields":{{"closed": "{value}"}}'
         body = tools_gw.create_body(feature=feature, extras=extras)
 
-        # Get utils_grafanalytics_automatic_trigger param
-        row = tools_gw.get_config_value("utils_grafanalytics_automatic_trigger", table='config_param_system')
+        # Get utils_graphanalytics_automatic_trigger param
+        row = tools_gw.get_config_value("utils_graphanalytics_automatic_trigger", table='config_param_system')
         thread = row[0] if row else None
         if thread:
             thread = json.loads(thread)
@@ -241,7 +241,7 @@ class GwInfoButton(GwMaptool):
 
         # If param is false don't create thread
         if not thread:
-            tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
+            tools_gw.execute_procedure('gw_fct_setfields', body)
             tools_qgis.refresh_map_canvas()
             return
 

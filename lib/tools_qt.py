@@ -26,6 +26,7 @@ from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleS
     QToolButton
 from qgis.core import QgsExpression, QgsProject, QgsLayerTreeLayer
 from qgis.gui import QgsDateTimeEdit
+from qgis.utils import iface
 
 from . import tools_log, tools_os, tools_qgis
 from .. import global_vars
@@ -210,6 +211,12 @@ def get_text(dialog, widget, add_quote=False, return_string_null=True):
             text = widget.toPlainText()
         elif type(widget) is QComboBox:
             text = widget.currentText()
+        elif type(widget) is QCheckBox:
+            value = is_checked(dialog, widget)
+            if type(value) is bool:
+                text = str(text)
+            else:
+                text = None
 
         if not text and return_string_null:
             text = "null"
@@ -261,7 +268,13 @@ def is_checked(dialog, widget):
             widget = dialog.findChild(QRadioButton, widget)
     checked = False
     if widget:
-        checked = widget.isChecked()
+        state = widget.checkState()
+        if state == 0:
+            checked = False
+        elif state == 1:
+            checked = None
+        elif state == 2:
+            checked = True
     return checked
 
 
@@ -394,7 +407,7 @@ def set_combo_value(combo, value, item1, add_new=True):
 
     for i in range(0, combo.count()):
         elem = combo.itemData(i)
-        if value == str(elem[item1]):
+        if elem is not None and value == str(elem[item1]):
             combo.setCurrentIndex(i)
             return True
 
@@ -680,13 +693,13 @@ def add_layer_to_toc(layer, group=None, sub_group=None, create_groups=False, sub
             third_group = tools_qgis.find_toc_group(second_group, sub_sub_group)
             if third_group:
                 third_group.insertLayer(0, layer)
-                global_vars.iface.setActiveLayer(layer)
+                iface.setActiveLayer(layer)
                 return
             second_group.insertLayer(0, layer)
-            global_vars.iface.setActiveLayer(layer)
+            iface.setActiveLayer(layer)
             return
         first_group.insertLayer(0, layer)
-        global_vars.iface.setActiveLayer(layer)
+        iface.setActiveLayer(layer)
         return
 
     root = QgsProject.instance().layerTreeRoot()
@@ -707,11 +720,8 @@ def set_lazy_init(widget, lazy_widget=None, lazy_init_function=None):
     lazy_init_function(lazy_widget)
 
 
-def filter_by_id(dialog, widget_table, widget_txt, table_object):
+def filter_by_id(dialog, widget_table, widget_txt, table_object, field_object_id="id"):
 
-    field_object_id = "id"
-    if table_object == "element":
-        field_object_id = table_object + "_id"
     object_id = get_text(dialog, widget_txt)
     if object_id != 'null':
         expr = f"{field_object_id}::text ILIKE '%{object_id}%'"
@@ -943,7 +953,7 @@ def get_feature_by_id(layer, id, field_id=None):
 def show_details(detail_text, title=None, inf_text=None):
     """ Shows a message box with detail information """
 
-    global_vars.iface.messageBar().clearWidgets()
+    iface.messageBar().clearWidgets()
     msg_box = QMessageBox()
     msg_box.setText(detail_text)
     if title:
@@ -961,12 +971,12 @@ def show_details(detail_text, title=None, inf_text=None):
 def show_warning_open_file(text, inf_text, file_path, context_name=None):
     """ Show warning message with a button to open @file_path """
 
-    widget = global_vars.iface.messageBar().createMessage(tr(text, context_name), tr(inf_text))
+    widget = iface.messageBar().createMessage(tr(text, context_name), tr(inf_text))
     button = QPushButton(widget)
     button.setText(tr("Open file"))
     button.clicked.connect(partial(tools_os.open_file, file_path))
     widget.layout().addWidget(button)
-    global_vars.iface.messageBar().pushWidget(widget, 1)
+    iface.messageBar().pushWidget(widget, 1)
 
 
 def show_question(text, title=None, inf_text=None, context_name=None, parameter=None, force_action=False):
@@ -1308,12 +1318,10 @@ def _add_translator(locale_path, log_info=False):
 def _translate_form(dialog, context_name, aux_context='ui_message'):
     """ Translate widgets of the form to current language """
 
-    type_widget_list = [QCheckBox, QGroupBox, QLabel, QPushButton, QRadioButton, QTabWidget]
+    type_widget_list = [QCheckBox, QGroupBox, QLabel, QPushButton, QRadioButton, QTabWidget, QLineEdit, QTextEdit]
     for widget_type in type_widget_list:
         widget_list = dialog.findChildren(widget_type)
         for widget in widget_list:
-            if type(widget) is QPushButton and widget.property('has_icon'):
-                continue
             _translate_widget(context_name, widget, aux_context)
 
     # Translate title of the form
@@ -1366,6 +1374,8 @@ def _translate_widget(context_name, widget, aux_context='ui_message'):
                 text = tr(widget_title, context_name, aux_context)
                 if text != widget_title:
                     widget.setTitle(text)
+            _translate_tooltip(context_name, widget, aux_context=aux_context)
+        elif type(widget) is QLineEdit or type(widget) is QTextEdit:
             _translate_tooltip(context_name, widget, aux_context=aux_context)
         else:
             widget_name = widget.objectName()

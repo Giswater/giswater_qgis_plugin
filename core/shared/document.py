@@ -62,11 +62,13 @@ class GwDocument(QObject):
         self.list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
 
         # Setting layers
-        self.layers = {'arc': [], 'node': [], 'connec': [], 'element': []}
+        self.layers = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
         
         self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
         self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
         self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
+        if self.project_type == 'ud':
+            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
         self.layers['element'] = tools_gw.get_layers_from_feature_type('element')
 
         params = ['arc', 'node', 'connec', 'gully']
@@ -144,14 +146,14 @@ class GwDocument(QObject):
         self.dlg_add_doc.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_add_doc, table_object, False))
 
-        self.dlg_add_doc.tbl_doc_x_arc.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-             self.dlg_add_doc.tbl_doc_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
-        self.dlg_add_doc.tbl_doc_x_node.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_doc.tbl_doc_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
-        self.dlg_add_doc.tbl_doc_x_connec.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_doc.tbl_doc_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
-        self.dlg_add_doc.tbl_doc_x_gully.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_doc.tbl_doc_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
+        self.dlg_add_doc.tbl_doc_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                               self.dlg_add_doc.tbl_doc_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
+        self.dlg_add_doc.tbl_doc_x_node.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                self.dlg_add_doc.tbl_doc_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
+        self.dlg_add_doc.tbl_doc_x_connec.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                  self.dlg_add_doc.tbl_doc_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
+        self.dlg_add_doc.tbl_doc_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                 self.dlg_add_doc.tbl_doc_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
 
         if feature:
             self.dlg_add_doc.tabWidget.currentChanged.connect(
@@ -189,7 +191,7 @@ class GwDocument(QObject):
 
         # Set dignals
         self.dlg_man.doc_id.textChanged.connect(
-            partial(tools_qt.filter_by_id, self.dlg_man, self.dlg_man.tbl_document, self.dlg_man.doc_id, table_object))
+            partial(tools_qt.filter_by_id, self.dlg_man, self.dlg_man.tbl_document, self.dlg_man.doc_id, table_object, "id"))
         self.dlg_man.tbl_document.doubleClicked.connect(
             partial(self._open_selected_object_document, self.dlg_man, self.dlg_man.tbl_document, table_object))
         self.dlg_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_man))

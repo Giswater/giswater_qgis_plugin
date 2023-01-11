@@ -17,7 +17,7 @@ from datetime import timedelta
 from qgis.PyQt.QtCore import QStringListModel, Qt, QTimer
 from qgis.PyQt.QtSql import QSqlQueryModel
 from qgis.PyQt.QtWidgets import QWidget, QComboBox, QCompleter, QFileDialog, QTableView, QAbstractItemView, \
-    QGroupBox, QSpacerItem, QSizePolicy, QGridLayout, QLabel
+    QGroupBox, QSpacerItem, QSizePolicy, QGridLayout, QLabel, QTabWidget
 from qgis.core import QgsApplication
 
 from ...shared.selector import GwSelector
@@ -288,6 +288,9 @@ class GwGo2EpaButton(GwAction):
         # Create the common signals
         go2epa_selector.get_selector(dlg_selector, '"selector_basic"', current_tab='tab_dscenario')
         tools_gw.save_current_tab(dlg_selector, dlg_selector.main_tab, 'basic')
+
+        dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
+            tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'basic'))
 
         # Open form
         if global_vars.session_vars['dialog_docker']:

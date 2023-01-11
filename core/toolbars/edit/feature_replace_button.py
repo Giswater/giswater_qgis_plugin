@@ -436,7 +436,7 @@ class GwFeatureReplaceButton(GwMaptool):
             body = tools_gw.create_body(feature=feature, extras=extras)
 
             # Execute SQL function and show result to the user
-            complet_result = tools_gw.execute_procedure('gw_fct_setfeaturereplace', body, log_sql=True)
+            complet_result = tools_gw.execute_procedure('gw_fct_setfeaturereplace', body)
             if not complet_result:
                 message = "Error replacing feature"
                 tools_qgis.show_warning(message)
@@ -494,5 +494,6 @@ class GwFeatureReplaceButton(GwMaptool):
 
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_replace.featurecat_id, rows)
+        tools_qt.set_autocompleter(self.dlg_replace.featurecat_id)
 
     # endregion

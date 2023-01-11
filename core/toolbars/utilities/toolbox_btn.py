@@ -40,6 +40,8 @@ class GwToolBoxButton(GwAction):
         self.rbt_checked = {}
         self.no_clickable_items = ['Processes', 'Reports']
         self.temp_layers_added = []
+        self.add_columns = {}
+        self.queryAdd = None
 
 
     def clicked_event(self):
@@ -219,6 +221,11 @@ class GwToolBoxButton(GwAction):
             # this '1' refers to the index of the item in the selected row
             function_name = index.sibling(index.row(), 0).data()
             self.function_selected = index.sibling(index.row(), 1).data()
+            vdefault = index.sibling(index.row(), 2).data()
+            self.queryAdd = None
+            if vdefault:
+                vdefault = json.loads(vdefault.replace("'", '"'))
+                self.queryAdd = vdefault.get('queryAdd')
 
             self.dlg_reports = GwToolboxReportsUi()
             tools_gw.load_settings(self.dlg_reports)
@@ -250,7 +257,7 @@ class GwToolBoxButton(GwAction):
             self.timer.start(1000)
 
             # Create thread
-            self.report_thread = GwReportTask(function_name, self.dlg_reports, self.function_selected, timer=self.timer)
+            self.report_thread = GwReportTask(function_name, self.dlg_reports, self.function_selected, self.queryAdd, timer=self.timer)
             self.report_thread.finished_execute.connect(self._report_finished)
             QgsApplication.taskManager().addTask(self.report_thread)
             QgsApplication.taskManager().triggerTask(self.report_thread)
@@ -310,6 +317,7 @@ class GwToolBoxButton(GwAction):
 
         order = 0
 
+        self.add_columns = {}
         for field in json_result['body']['data']['fields']:
             label = None
             widget = None
@@ -339,6 +347,7 @@ class GwToolBoxButton(GwAction):
                 widget = tools_gw.add_combo(field)
                 widget = tools_gw.set_widget_size(widget, field)
                 widget.setProperty('filterSign', field.get('filterSign'))
+                widget.setProperty('showOnTableModel', field.get('showOnTableModel'))
                 if field.get('filterDefault') is not None:
                     tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
                 widget.currentIndexChanged.connect(partial(self._update_tbl_reports))
@@ -374,9 +383,13 @@ class GwToolBoxButton(GwAction):
                     for column in range(numcols):
                         column_name = dict_keys[column]
                         value = field['value'][row][column_name]
-                        if value is None:
+                        if value in (None, 'None'):
                             value = ''
-                        self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem(f"{value}"))
+                        # Create a QTableWidgetItem and then set the data so the sorting works properly
+                        # with Strings, Integers and any other type
+                        qtable_item = QTableWidgetItem()
+                        qtable_item.setData(Qt.DisplayRole, value)
+                        self.dlg_reports.tbl_reports.setItem(row, column, qtable_item)
 
                 continue
 
@@ -389,6 +402,9 @@ class GwToolBoxButton(GwAction):
 
             # Set scale-to-fit
             tools_qt.set_tableview_config(self.dlg_reports.tbl_reports, sectionResizeMode=0)
+
+        # Update tbl in case filters have default value
+        self._update_tbl_reports()
 
 
     def _update_tbl_reports(self):
@@ -406,6 +422,10 @@ class GwToolBoxButton(GwAction):
                 value = tools_qt.get_calendar_date(self.dlg_reports, widget)
             else:
                 continue
+            if widget.property('showOnTableModel'):
+                lbl = tools_qt.get_text(self.dlg_reports, f'lbl_{widget.objectName()}')
+                position = json.loads(widget.property('showOnTableModel')).get('position')
+                self.add_columns[position] = [lbl, value]
             filterSign = widget.property('filterSign')
             if filterSign is None:
                 filterSign = '='
@@ -413,6 +433,8 @@ class GwToolBoxButton(GwAction):
             filters.append(_json)
 
         extras = f'"filter":{json.dumps(filters)}, "listId":"{self.function_selected}"'
+        if self.queryAdd:
+            extras += f', "queryAdd": "{self.queryAdd}"'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getreport', body)
         if not json_result or json_result['status'] == 'Failed':
@@ -421,23 +443,58 @@ class GwToolBoxButton(GwAction):
         for field in json_result['body']['data']['fields']:
 
             if field['widgettype'] == 'list' and field.get('value') is not None:
+                # Calculate max possible rows/cols for table
                 numrows = len(field['value'])
-                numcols = len(field['value'][0])
+                numcols = len(field['value'][0]) + len(self.add_columns)
                 self.dlg_reports.tbl_reports.setColumnCount(numcols)
                 self.dlg_reports.tbl_reports.setRowCount(numrows)
 
                 i = 0
+                tot_skipped = 0
+                skipped_dict = {}
                 dict_keys = {}
+                # Set table headers
                 for key in field['value'][0].keys():
+                    # Add additional columns if needed
+                    skipped = 0
+                    while self.add_columns.get(i) is not None and self.add_columns.get(i)[0] not in skipped_dict:
+                        if self.add_columns.get(i)[1] not in ('', 'null', None):
+                            dict_keys[i-skipped] = self.add_columns.get(i)[1]
+                            self.dlg_reports.tbl_reports.setHorizontalHeaderItem(i-skipped, QTableWidgetItem(f"{self.add_columns.get(i)[0]}"))
+                        else:
+                            skipped += 1
+                            if self.add_columns.get(i)[0] not in skipped_dict:
+                                tot_skipped += 1
+                                skipped_dict[self.add_columns.get(i)[0]] = True
+                        i += 1
+                    # Subtract the additional columns whose filters that aren't used
+                    i -= tot_skipped
+                    numcols -= tot_skipped
+                    tot_skipped = 0
+                    # Add usual columns
                     dict_keys[i] = f"{key}"
                     self.dlg_reports.tbl_reports.setHorizontalHeaderItem(i, QTableWidgetItem(f"{key}"))
                     i = i + 1
 
+                # Set actual rows/cols for table
+                self.dlg_reports.tbl_reports.setColumnCount(numcols)
+                self.dlg_reports.tbl_reports.setRowCount(numrows)
+
+                # Fill in the cells
                 for row in range(numrows):
                     for column in range(numcols):
                         column_name = dict_keys[column]
-                        item = f"{field['value'][row][column_name]}"
-                        self.dlg_reports.tbl_reports.setItem(row, column, QTableWidgetItem(item))
+                        try:
+                            item = field['value'][row][column_name]  # Usual column
+                        except (KeyError, TypeError):
+                            item = column_name  # Additional column
+                        if item in (None, 'None'):
+                            item = ''
+                        # Create a QTableWidgetItem and then set the data so the sorting works properly
+                        # with Strings, Integers and any other type
+                        qtable_item = QTableWidgetItem()
+                        qtable_item.setData(Qt.DisplayRole, item)
+                        self.dlg_reports.tbl_reports.setItem(row, column, qtable_item)
             elif field['widgettype'] == 'list' and field.get('value') is None:
                 self.dlg_reports.tbl_reports.setRowCount(0)
 
@@ -636,8 +693,8 @@ class GwToolBoxButton(GwAction):
                F" UNION "
                f"SELECT concat('v_edit_',epa_table), feature_type as type, 4 as c FROM sys_feature_epa_type "
                f"WHERE epa_table IS NOT NULL AND epa_table NOT IN ('inp_virtualvalve', 'inp_inlet')"
-			   f"UNION SELECT 'v_edit_inp_subcatchment', 'SUBCATCHMENT', 6"
-			   f"UNION SELECT 'v_edit_raingage', 'RAINGAGE', 8 ) t "
+			   f" UNION SELECT 'v_edit_inp_subcatchment', 'SUBCATCHMENT', 6"
+			   f" UNION SELECT 'v_edit_raingage', 'RAINGAGE', 8 ) t "
                f" WHERE type = '{feature_type.upper()}' ORDER BY c, tablename")
         rows = tools_db.get_rows(sql)
         if rows:
@@ -711,10 +768,11 @@ class GwToolBoxButton(GwAction):
             for function in functions:
                 func_name = QStandardItem(str(function['listname']))
                 label = QStandardItem(str(function['alias']))
+                vdefault = QStandardItem(str(function['addparam']))
                 font = label.font()
                 font.setPointSize(8)
                 label.setFont(font)
-                parent1.appendRow([label, func_name])
+                parent1.appendRow([label, func_name, vdefault])
                 if os.path.exists(path_icon_blue):
                     icon = QIcon(path_icon_blue)
                     label.setIcon(icon)

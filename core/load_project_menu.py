@@ -57,14 +57,14 @@ class GwMenuLoad(QObject):
                 toolbar_submenu = QMenu(f"{toolbar}", self.iface.mainWindow().menuBar())
                 toolbars_menu.addMenu(toolbar_submenu)
                 buttons_toolbar = global_vars.giswater_settings.value(f"toolbars/{toolbar}")
-                project_exclusive = tools_gw.get_config_parser('project_exclusive', str(global_vars.project_type),
+                project_exclude = tools_gw.get_config_parser('project_exclude', str(global_vars.project_type),
                                                                "project", "giswater")
-                if project_exclusive not in (None, 'None'):
-                    project_exclusive = project_exclusive.replace(' ', '').split(',')
+                if project_exclude not in (None, 'None'):
+                    project_exclude = project_exclude.replace(' ', '').split(',')
 
                 for index_action in buttons_toolbar:
 
-                    if project_exclusive and index_action in project_exclusive:
+                    if project_exclude and index_action in project_exclude:
                         continue
 
                     icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}{toolbar}{os.sep}{index_action}.png"
@@ -142,6 +142,15 @@ class GwMenuLoad(QObject):
 
             # endregion
 
+        # region Open plugin folder
+        if global_vars.plugin_dir:
+            icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}108.png"
+            folder_icon = QIcon(icon_path)
+            action_open_plugin_path = self.main_menu.addAction(f"Open plugin folder")
+            action_open_plugin_path.setIcon(folder_icon)
+            action_open_plugin_path.triggered.connect(self._open_plugin_path)
+        # endregion
+
         # region Advanced
         action_manage_file = self.main_menu.addAction(f"Advanced")
         action_manage_file.triggered.connect(self._open_manage_file)
@@ -157,7 +166,7 @@ class GwMenuLoad(QObject):
             log_folder_volume = f"{round(size / (1024 * 1024), 2)} MB"
             icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}102.png"
             folder_icon = QIcon(icon_path)
-            action_open_path = self.main_menu.addAction(f"Open folder ({log_folder_volume})")
+            action_open_path = self.main_menu.addAction(f"Open user folder ({log_folder_volume})")
             action_open_path.setIcon(folder_icon)
             action_open_path.triggered.connect(self._open_config_path)
         # endregion
@@ -183,6 +192,15 @@ class GwMenuLoad(QObject):
         """ Opens the OS-specific Config directory """
 
         path = os.path.realpath(global_vars.user_folder_dir)
+        status, message = tools_os.open_file(path)
+        if status is False and message is not None:
+            tools_qgis.show_warning(message, parameter=path)
+
+
+    def _open_plugin_path(self):
+        """ Opens the OS-specific Plugin directory """
+
+        path = os.path.realpath(global_vars.plugin_dir)
         status, message = tools_os.open_file(path)
         if status is False and message is not None:
             tools_qgis.show_warning(message, parameter=path)
@@ -222,28 +240,7 @@ class GwMenuLoad(QObject):
 
     def _reset_position_dialog(self):
         """ Reset position dialog x/y """
-
-        try:
-            parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
-            config_folder = f"{global_vars.user_folder_dir}{os.sep}config{os.sep}"
-            if not os.path.exists(config_folder):
-                os.makedirs(config_folder)
-            path = config_folder + f"session.config"
-            parser.read(path)
-
-            # Check if section exists in file
-            if "dialogs_position" in parser:
-                parser.remove_section("dialogs_position")
-
-            msg = "Reset position form done successfully."
-            tools_qt.show_info_box(msg, "Info")
-
-            with open(path, 'w') as configfile:
-                parser.write(configfile)
-                configfile.close()
-        except Exception as e:
-            tools_log.log_warning(f"set_config_parser exception [{type(e).__name__}]: {e}")
-            return
+        tools_gw.reset_position_dialog(True)
 
 
     def _fill_tbl_config_files(self):
