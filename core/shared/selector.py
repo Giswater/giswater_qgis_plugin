@@ -63,6 +63,12 @@ class GwSelector:
             # Set shortcut keys
             dlg_selector.key_escape.connect(partial(tools_gw.close_dialog, dlg_selector))
 
+        # Manage tab focus
+        dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(self._set_focus, dlg_selector))
+        # Save the name of current tab used by the user
+        dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
+            tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'basic'))
+
         # Set typeahead focus if configured
         self._set_focus(dlg_selector)
 
@@ -88,12 +94,6 @@ class GwSelector:
 
         index = 0
         main_tab = dialog.findChild(QTabWidget, 'main_tab')
-
-        # Manage tab focus
-        dialog.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(self._set_focus, dialog))
-        # Save the name of current tab used by the user
-        dialog.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
-            tools_gw.save_current_tab, dialog, dialog.main_tab, 'basic'))
 
         # Set filter
         if filter is not False:
