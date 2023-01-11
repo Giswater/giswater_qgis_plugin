@@ -295,3 +295,5 @@ ALTER TABLE sys_feature_cat DROP CONSTRAINT IF EXISTS sys_feature_cat_check;
 INSERT INTO sys_feature_cat (id, "type", epa_default) VALUES('LINK', 'LINK', 'UNDEFINED');
 INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, child_layer, descript, active)
 VALUES('LINK', 'LINK', 'LINK', 'v_edit_link', 'v_edit_link', 'Link', true);
+
+UPDATE sys_function SET function_name = 'gw_trg_arc_link_update' WHERE id = 2542; 

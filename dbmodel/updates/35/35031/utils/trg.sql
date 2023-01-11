@@ -8,10 +8,17 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-
 DROP TRIGGER IF EXISTS gw_trg_plan_psector ON plan_psector;
 CREATE TRIGGER gw_trg_plan_psector
 AFTER INSERT OR UPDATE OF active 
 ON plan_psector 
 FOR EACH ROW 
 EXECUTE PROCEDURE gw_trg_plan_psector();
+
+DROP TRIGGER IF EXISTS gw_trg_arc_vnodelink_update ON arc;
+CREATE TRIGGER gw_trg_arc_link_update
+  AFTER UPDATE OF the_geom
+  ON arc
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_arc_link_update();
+
