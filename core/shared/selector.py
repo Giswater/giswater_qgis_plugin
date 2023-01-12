@@ -113,10 +113,11 @@ class GwSelector:
             selector_type = selector_type.strip('"')
         # Built querytext
         form = f'"currentTab":"{current_tab}"'
-        extras = f'"selectorType":"{selector_type}", "filterText":"{text_filter}"'
+        extras = f'"selectorType":"{selector_type}", "filterText":"{text_filter}",'
         if aux_params:
             tools_gw.set_config_parser("selector_mincut", f"aux_params", f"{aux_params}", "user", "session")
             extras = f"{extras}, {aux_params}"
+        extras += f'"addSchema":"{global_vars.project_vars["add_schema"]}"'
         body = tools_gw.create_body(form=form, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
 
