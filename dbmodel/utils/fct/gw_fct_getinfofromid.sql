@@ -434,52 +434,52 @@ BEGIN
 			
 	-- Get tabs for form
 	IF v_isgraphdelimiter THEN 
-		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", 
-			tabfunction as "tabFunction", b.tab as tabActions 
+		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname, orderby) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", 
+			tabfunction as "tabFunction", b.tab as tabActions, orderby 
 			FROM (SELECT json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as tab 
 			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
 			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and formname =',quote_nullable(v_tablename),'
 			and item_object->>''actionName'' != ''actionGetArcId'' 
 			and item_object->>''actionName''::text = id group by tabname) b,
-			config_form_tabs WHERE formname =',quote_nullable(v_tablename),' AND device = ', v_device,')a');
+			config_form_tabs WHERE formname =',quote_nullable(v_tablename),' AND device = ', v_device,' AND orderby IS NOT NULL ORDER BY orderby, tabname)a');
 		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_device', v_device);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 150);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO form_tabs;
 	ELSIF v_isepatoarc THEN
-		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", 
-			tabfunction as "tabFunction", b.tab as tabActions 
+		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname, orderby) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", 
+			tabfunction as "tabFunction", b.tab as tabActions, orderby 
 			FROM (SELECT json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as tab 
 			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
 			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and formname =',quote_nullable(v_tablename),'
 			and item_object->>''actionName'' != ''actionMapZone'' and item_object->>''actionName'' != ''actionGetArcId'' 
 			and item_object->>''actionName''::text = id group by tabname) b,
-			config_form_tabs WHERE formname =',quote_nullable(v_tablename),' AND device = ', v_device,')a');
+			config_form_tabs WHERE formname =',quote_nullable(v_tablename),' AND device = ', v_device,' AND orderby IS NOT NULL ORDER BY orderby, tabname)a');
 		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_device', v_device);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 160);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO form_tabs;
 	ELSIF v_isarcdivide THEN
-		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
-			b.tab as tabActions  FROM (SELECT json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as tab 
+		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname, orderby) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
+			b.tab as tabActions, orderby  FROM (SELECT json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as tab 
 			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
 			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and  formname =',quote_nullable(v_tablename),'
 			and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone'' 
 			and item_object->>''actionName'' != ''actionGetArcId'' 
 			and item_object->>''actionName''::text = id group by tabname) b,
-			config_form_tabs WHERE formname =',quote_nullable(v_tablename),' AND device = ', v_device,')a');
+			config_form_tabs WHERE formname =',quote_nullable(v_tablename),' AND device = ', v_device,' AND orderby IS NOT NULL ORDER BY orderby, tabname)a');
 		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_device', v_device);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 170);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO form_tabs;
 	ELSE
-		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
-			b.tab as tabActions  FROM (SELECT json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as tab 
+		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname, orderby) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
+			b.tab as tabActions, orderby  FROM (SELECT json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as tab 
 			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
 			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and  formname =',quote_nullable(v_tablename),'
 			and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone'' 
 			and item_object->>''actionName''::text = id group by tabname) b,
-			config_form_tabs WHERE formname =',quote_nullable(v_tablename),' AND device = ', v_device,')a');
+			config_form_tabs WHERE formname =',quote_nullable(v_tablename),' AND device = ', v_device,' AND orderby IS NOT NULL ORDER BY orderby, tabname)a');
 		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_device', v_device);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 180);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
@@ -491,54 +491,54 @@ BEGIN
         	
         IF v_isgraphdelimiter THEN 
 			-- Get form_tabs
-			v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname) tabname as "tabName", label as "tabLabel", tooltip as "tooltip",
-				tabfunction as "tabFunction", b.tab as tabActions  
+			v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname, orderby) tabname as "tabName", label as "tabLabel", tooltip as "tooltip",
+				tabfunction as "tabFunction", b.tab as tabActions, orderby  
 				FROM (SELECT json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as tab 
 				FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
 				with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and  formname =',quote_nullable(v_table_parent),'
 				and item_object->>''actionName'' != ''actionGetArcId'' 
 				and item_object->>''actionName''::text = id group by tabname) b,
-				config_form_tabs WHERE formname =',quote_nullable(v_table_parent),' AND device = ', v_device,')a');
+				config_form_tabs WHERE formname =',quote_nullable(v_table_parent),' AND device = ', v_device,' AND orderby IS NOT NULL ORDER BY orderby, tabname)a');
 			v_debug_vars := json_build_object('v_table_parent', v_table_parent, 'v_device', v_device);
 			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 190);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 			EXECUTE v_querystring INTO form_tabs;
 		ELSIF v_isepatoarc THEN
-			v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", 
-				tabfunction as "tabFunction", b.tab as tabActions
+			v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname, orderby) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", 
+				tabfunction as "tabFunction", b.tab as tabActions, orderby
 				FROM (SELECT json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as tab 
 				FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
 				with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and  formname =',quote_nullable(v_table_parent),'
 				and item_object->>''actionName'' != ''actionMapZone'' and item_object->>''actionName'' != ''actionGetArcId'' 
 				and item_object->>''actionName''::text = id group by tabname) b,
-				config_form_tabs WHERE formname =',quote_nullable(v_table_parent),' AND device = ', v_device,')a');
+				config_form_tabs WHERE formname =',quote_nullable(v_table_parent),' AND device = ', v_device,' AND orderby IS NOT NULL ORDER BY orderby, tabname)a');
 			v_debug_vars := json_build_object('v_table_parent', v_table_parent, 'v_device', v_device);
 			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 200);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 			EXECUTE v_querystring INTO form_tabs;
 		ELSIF v_isarcdivide THEN
-			v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", 
-		    	tabfunction as "tabFunction", b.tab as tabActions  
+			v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname, orderby) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", 
+		    	tabfunction as "tabFunction", b.tab as tabActions, orderby 
 		    	FROM (SELECT json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as tab 
 				FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
 				with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and  formname =',quote_nullable(v_table_parent),'
 				and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone'' 
 				and item_object->>''actionName'' != ''actionGetArcId''
 				and item_object->>''actionName''::text = id group by tabname) b,
-				config_form_tabs WHERE formname =',quote_nullable(v_table_parent),' AND device = ', v_device,')a');
+				config_form_tabs WHERE formname =',quote_nullable(v_table_parent),' AND device = ', v_device,' AND orderby IS NOT NULL ORDER BY orderby, tabname)a');
 			v_debug_vars := json_build_object('v_table_parent', v_table_parent, 'v_device', v_device);
 			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 210);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 			EXECUTE v_querystring INTO form_tabs;
 		ELSE
-			v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", 
-		    	tabfunction as "tabFunction", b.tab as tabActions 
+			v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname, orderby) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", 
+		    	tabfunction as "tabFunction", b.tab as tabActions, orderby
 		    	FROM (SELECT json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as tab 
 				FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
 				with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and  formname =',quote_nullable(v_table_parent),'
 				and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone'' 
 				and item_object->>''actionName''::text = id group by tabname) b,
-				config_form_tabs WHERE formname =',quote_nullable(v_table_parent),' AND device = ', v_device,')a');
+				config_form_tabs WHERE formname =',quote_nullable(v_table_parent),' AND device = ', v_device,' AND orderby IS NOT NULL ORDER BY orderby, tabname)a');
 			v_debug_vars := json_build_object('v_table_parent', v_table_parent, 'v_device', v_device);
 			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 220);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
