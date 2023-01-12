@@ -665,7 +665,7 @@ class GwSearch:
 
         current_tab = tools_gw.get_config_parser('dialogs_tab', 'selector_basic', "user", "session")
         form = f'"currentTab":"{current_tab}"'
-        extras = f'"selectorType":"selector_basic", "filterText":""'
+        extras = f'"selectorType":"selector_basic", "filterText":"", '
         extras += f'"addSchema":"{global_vars.project_vars["add_schema"]}"'
         body = tools_gw.create_body(form=form, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
