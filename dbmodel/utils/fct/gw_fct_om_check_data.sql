@@ -513,9 +513,15 @@ BEGIN
 
 	END IF;
 	
+    
 	RAISE NOTICE '19 - connec/gully without link (204)';
-	v_querytext = 'SELECT connec_id,connecat_id,the_geom, expl_id from '||v_edit||'connec WHERE state= 1 
-					AND connec_id NOT IN (select feature_id from link)';
+    
+	v_querytext = 'SELECT connec_id, connecat_id, c.the_geom, c.expl_id from '||v_edit||'connec c WHERE c.state= 1 
+					AND connec_id NOT IN (SELECT feature_id FROM link)
+					EXCEPT 
+					SELECT connec_id, connecat_id, c.the_geom, c.expl_id FROM '||v_edit||'connec c
+					LEFT JOIN '||v_edit||'arc a USING (arc_id) WHERE c.state= 1 
+					AND arc_id IS NOT NULL AND st_dwithin(c.the_geom, a.the_geom, 0.1)';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -524,15 +530,20 @@ BEGIN
 		SELECT 204, connec_id, connecat_id, ''Connecs without links'', the_geom, expl_id FROM (', v_querytext,')a');
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (125, '204', 2, concat('WARNING-204 (anl_connec): There is/are ',v_count,' connecs without links.'),v_count);
+		VALUES (125, '204', 2, concat('WARNING-204 (anl_connec): There is/are ',v_count,' connecs without links or connecs over arc without arc_id'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (125, '204',1, 'INFO: All connecs have links.',v_count);
+		VALUES (125, '204',1, 'INFO: All connecs have links or are over arc with arc_id.',v_count);
 	END IF;
 
 	IF v_project_type = 'UD' THEN 
-		v_querytext = 'SELECT gully_id,gratecat_id,the_geom, expl_id from '||v_edit||'gully WHERE state= 1 
-						AND gully_id NOT IN (select feature_id from link)';
+					
+		v_querytext = 'SELECT gully_id, gratecat_id, c.the_geom, c.expl_id from '||v_edit||'gully c WHERE c.state= 1 
+						AND gully_id NOT IN (SELECT feature_id FROM link)
+						EXCEPT 
+						SELECT gully_id, gratecat_id, c.the_geom, c.expl_id FROM '||v_edit||'gully c
+						LEFT JOIN '||v_edit||'arc a USING (arc_id) WHERE c.state= 1 
+						AND arc_id IS NOT NULL AND st_dwithin(c.the_geom, a.the_geom, 0.1)';
 	
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -542,10 +553,10 @@ BEGIN
 			SELECT 204, gully_id, gratecat_id, ''Gullies without links'', the_geom, expl_id FROM (', v_querytext,')a');
 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (125, '204',2, concat('WARNING-204 (anl_connec): There is/are ',v_count,' gullies without links.'), v_count);
+			VALUES (125, '204',2, concat('WARNING-204 (anl_connec): There is/are ',v_count,' gullies without links or gullies over arc without arc_id.'), v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (125,'204', 1, 'INFO: All gullies have links.', v_count);
+			VALUES (125,'204', 1, 'INFO: All gullies have links or are over arc with arc_id.', v_count);
 		END IF;
 	
 	END IF;
