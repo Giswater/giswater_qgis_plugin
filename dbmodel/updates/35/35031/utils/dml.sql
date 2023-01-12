@@ -116,6 +116,10 @@ VALUES ('v_link', 'Filtered view of links', 'role_basic', 'core') ON CONFLICT (i
 INSERT INTO sys_table( id, descript, sys_role, source)
 VALUES ('v_link_connec', 'Filtered view of links type connec', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
 
+INSERT INTO sys_table( id, descript, sys_role, context, orderby, alias,source)
+VALUES ('v_edit_link_connec', 'Editable view of links type connec', 'role_basic', '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"LINK"}', 2,
+'Link connec', 'core') ON CONFLICT (id) DO NOTHING;
+
 INSERT INTO sys_table( id, descript, sys_role, source)
 VALUES ('v_edit_plan_psector_x_connec', 'Editable view to work with psector and connec', 'role_master', 'core') ON CONFLICT (id) DO NOTHING;
 
@@ -309,3 +313,11 @@ VALUES ('node_border_expl', 'Table that stores relation between node and it''s a
 INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
 VALUES (3190, 'gw_trg_node_border', 'utils', 'function trigger', 
 'Trigger that configures nodes that are located on the border between mapzones', 'role_edit', 'core');
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+SELECT 'v_edit_link_connec', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
+FROM config_form_fields WHERE formname = 'v_edit_link' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;

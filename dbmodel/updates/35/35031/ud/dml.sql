@@ -179,6 +179,10 @@ VALUES ('v_filter_link_gully', 'View to filter gully links', 'role_basic', 'core
 INSERT INTO sys_table( id, descript, sys_role, source)
 VALUES ('v_link_gully', 'Filtered view of links type connec', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
 
+INSERT INTO sys_table( id, descript, sys_role, context, orderby, alias, source)
+VALUES ('v_edit_link_gully', 'Editable view of links type connec', 'role_basic', '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"LINK"}', 3,
+'Link gully','core') ON CONFLICT (id) DO NOTHING;
+
 INSERT INTO sys_table( id, descript, sys_role, source)
 VALUES ('v_edit_plan_psector_x_gully', 'Editable view to work with psector and gully', 'role_master', 'core') ON CONFLICT (id) DO NOTHING;
 
@@ -276,3 +280,11 @@ VALUES (3216, 'It''s impossible to update arc_id from psector dialog because thi
 INSERT INTO inp_typevalue(typevalue, id, idval) VALUES ('inp_pjoint_type','GULLY','GULLY');
 
 UPDATE config_form_fields SET iseditable=false WHERE formname LIKE 've_gully%' AND columnname='arc_id';
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+SELECT 'v_edit_link_gully', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
+FROM config_form_fields WHERE formname = 'v_edit_link' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
