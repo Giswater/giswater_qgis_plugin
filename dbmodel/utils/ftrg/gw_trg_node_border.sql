@@ -14,9 +14,12 @@ DECLARE
 	v_count integer;
 	rec text;
 	v_final_nodes text[];
+	v_feature_type text;
 BEGIN
 
   EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
+	v_feature_type:= upper(TG_ARGV[0]);
 
   -- Control insertions ID
   IF TG_OP = 'INSERT' THEN
@@ -36,7 +39,7 @@ BEGIN
 
     RETURN NEW;
 
-  ELSIF TG_OP = 'UPDATE' THEN
+  ELSIF TG_OP = 'UPDATE' AND v_feature_type = 'ARC' THEN
 	
 		INSERT INTO node_border_expl
 		WITH 
@@ -77,6 +80,24 @@ BEGIN
   
 	RETURN NEW;
 
+	ELSIF TG_OP = 'UPDATE' AND v_feature_type = 'NODE' THEN
+
+		DELETE FROM node_border_expl WHERE node_id=OLD.node_id;
+
+		INSERT INTO node_border_expl
+		WITH 
+		arcs AS (SELECT arc_id, node_1, node_2, expl_id FROM arc WHERE state=1)
+		SELECT node_id, a1.expl_id
+		FROM node 
+		JOIN arcs a1 ON node_id=node_1 
+		where a1.expl_id != node.expl_id and node_id=NEW.node_id
+		UNION 
+		SELECT node_id, a2.expl_id
+		FROM node 
+		JOIN arcs a2 ON node_id=node_2 
+		where a2.expl_id != node.expl_id and node_id=NEW.node_id ON CONFLICT (node_id, expl_id) DO NOTHING;	
+
+		RETURN NEW;
   ELSIF TG_OP = 'DELETE' THEN
    
 		v_final_nodes = string_to_array(OLD.node_1,'') ||string_to_array(OLD.node_2,'');

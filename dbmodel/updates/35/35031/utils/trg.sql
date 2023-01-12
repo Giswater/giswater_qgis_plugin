@@ -24,7 +24,14 @@ CREATE TRIGGER gw_trg_arc_link_update
 
 DROP TRIGGER IF EXISTS gw_trg_node_border ON arc;
 CREATE TRIGGER gw_trg_node_border
-    AFTER INSERT OR DELETE OR UPDATE OF expl_id,the_geom
+    AFTER INSERT OR DELETE OR UPDATE OF expl_id, the_geom
     ON arc
     FOR EACH ROW
-    EXECUTE FUNCTION gw_trg_node_border();
+    EXECUTE FUNCTION gw_trg_node_border('ARC');
+
+DROP TRIGGER IF EXISTS gw_trg_node_border ON node;
+CREATE TRIGGER gw_trg_node_border
+    AFTER UPDATE OF expl_id
+    ON node
+    FOR EACH ROW
+    EXECUTE FUNCTION gw_trg_node_border('NODE');
