@@ -14,7 +14,7 @@ CREATE OR REPLACE RULE cat_feature_del_link AS
     WHERE (old.id = 'LINK')
     DO INSTEAD NOTHING;
     
-CREATE OR REPLACE RULE cat_feature_del_link AS
+CREATE OR REPLACE RULE cat_feature_upd_link AS
     ON UPDATE TO cat_feature
     WHERE (old.id = 'LINK')
     DO INSTEAD NOTHING;
