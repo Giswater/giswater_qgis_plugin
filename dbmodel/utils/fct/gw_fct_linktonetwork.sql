@@ -200,6 +200,11 @@ BEGIN
 		-- exception control. It is not possible to create a link for connec over arc
 		SELECT * INTO v_arc FROM v_edit_arc WHERE ST_DWithin(v_connect.the_geom, v_edit_arc.the_geom, 0.001);
 
+		-- Use connect.arc_id as forced arcs in case of exists
+		IF v_connect.arc_id IS NOT NULL AND v_forcedarcs = '' THEN
+			v_forcedarcs = concat (' AND arc_id::integer = ',v_connect.arc_id,' ');
+		END IF;
+
 		IF v_arc.arc_id IS NOT NULL THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (217, null, 4, concat('FAILED: Link not created because connect ',v_connect_id,' is over arc ', v_arc.arc_id));
@@ -269,6 +274,7 @@ BEGIN
 				SELECT geom_point INTO v_geom_point FROM temp_table WHERE fid = 485 and cur_user = current_user;
 				v_point_aux := v_geom_point;
 				DELETE FROM temp_table WHERE fid = 485 AND cur_user=current_user;
+				
                 IF v_point_aux IS NULL THEN
 
                     v_point_aux := St_closestpoint(v_arc.the_geom, st_EndPoint(v_link.the_geom));

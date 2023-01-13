@@ -684,12 +684,17 @@ BEGIN
 				UPDATE gully SET arc_id=NEW.arc_id where gully_id=NEW.gully_id;
 
 				IF NEW.arc_id IS NOT NULL THEN
-					EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-					"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY", "forceEndPoint":"true",  "forcedArcs":["'||NEW.arc_id||'"]}}$$)';	
+
+					-- when link exists
+					IF (SELECT link_id FROM link WHERE state = 1 and feature_id =  NEW.gully_id) IS NOT NULL THEN
+						EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+						"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY", "forceEndPoint":"true",  "forcedArcs":["'||NEW.arc_id||'"]}}$$)';	
+					END IF;
 
 					-- recover values in order to do not disturb this workflow
 					SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
-					NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id; 		
+					NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id;
+					
 				ELSE
 					IF (SELECT count(*)FROM link WHERE feature_id = NEW.gully_id AND state = 1) > 0 THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},

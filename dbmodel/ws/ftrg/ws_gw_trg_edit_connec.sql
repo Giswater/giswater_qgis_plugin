@@ -658,8 +658,12 @@ BEGIN
 				UPDATE connec SET arc_id=NEW.arc_id where connec_id=NEW.connec_id;
 
 				IF NEW.arc_id IS NOT NULL THEN
-					EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-					"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC", "forceEndPoint":"true", "forcedArcs":["'||NEW.arc_id||'"]}}$$)';				
+				
+					-- when link exists
+					IF (SELECT link_id FROM link WHERE state = 1 and feature_id =  NEW.connec_id) IS NOT NULL THEN
+						EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+						"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC", "forceEndPoint":"true",  "forcedArcs":["'||NEW.arc_id||'"]}}$$)';	
+					END IF;			
 
 					-- recover values in order to do not disturb this workflow
 					SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
