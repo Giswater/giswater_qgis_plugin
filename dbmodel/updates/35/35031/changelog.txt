@@ -24,3 +24,4 @@
 - Enhancement for patterns managmement by using pattern method only to fill null values for pattern features
 - New table node_border_expl, that stores relation between node and it''s additional exploitation.
 - New trigger gw_trg_node_border to configure nodes that are located on the border between mapzones
+- Change pk serial for polygons excluding urn sequence

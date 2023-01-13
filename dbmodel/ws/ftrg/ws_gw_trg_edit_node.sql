@@ -499,8 +499,9 @@ BEGIN
 		INTO v_insert_double_geom, v_double_geom_buffer;
 
 		IF (v_insert_double_geom IS TRUE) THEN
+		
 				IF (v_pol_id IS NULL) THEN
-					v_pol_id:= (SELECT nextval('urn_id_seq'));
+					v_pol_id:= (SELECT nextval('pol_pol_id_seq'));
 				END IF;
 					
 				INSERT INTO polygon(pol_id, sys_type, the_geom, featurecat_id,feature_id ) 
@@ -796,7 +797,7 @@ BEGIN
 			
 			-- Parent id
 			SELECT pol_id INTO v_pol_id FROM polygon JOIN cat_feature ON cat_feature.id=polygon.featurecat_id
-		WHERE ST_DWithin(NEW.the_geom, polygon.the_geom, 0.001) LIMIT 1;
+			WHERE ST_DWithin(NEW.the_geom, polygon.the_geom, 0.001) LIMIT 1;
 	
 			IF v_pol_id IS NOT NULL THEN
 				v_sql:= 'SELECT feature_id FROM polygon WHERE pol_id::integer='||v_pol_id||' LIMIT 1';

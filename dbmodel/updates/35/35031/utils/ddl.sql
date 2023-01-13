@@ -118,3 +118,8 @@ REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTR
 
 ALTER TABLE node_border_expl ADD CONSTRAINT node_border_expl_node_id_fkey FOREIGN KEY (node_id)
 REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- change pk serial for polygons
+CREATE SEQUENCE pol_pol_id_seq  INCREMENT 1  MINVALUE 1  MAXVALUE 9999999999  START 1  CACHE 1;
+SELECT setval('SCHEMA_NAME.pol_pol_id_seq',(select max(pol_id::integer) from polygon),true);
+ALTER TABLE polygon ALTER COLUMN pol_id SET DEFAULT nextval('SCHEMA_NAME.pol_pol_id_seq'::regclass);

@@ -81,7 +81,7 @@ BEGIN
 	v_autorotation_disabled = (SELECT value::boolean FROM config_param_user WHERE "parameter"='edit_gullyrotation_disable' AND cur_user=current_user);
 	v_epa_gully_efficiency := (SELECT value FROM config_param_user WHERE parameter='epa_gully_efficiency_vdefault' AND cur_user=current_user);
 	v_epa_gully_orifice_cd := (SELECT value FROM config_param_user WHERE parameter='epa_gully_orifice_cd_vdefault' AND cur_user=current_user);
-    v_epa_gully_weir_cd := (SELECT value FROM config_param_user WHERE parameter='epa_gully_weir_cd_vdefault' AND cur_user=current_user);
+	v_epa_gully_weir_cd := (SELECT value FROM config_param_user WHERE parameter='epa_gully_weir_cd_vdefault' AND cur_user=current_user);
 	v_epa_gully_method := (SELECT value FROM config_param_user WHERE parameter='epa_gully_method_vdefault' AND cur_user=current_user);
 	v_epa_gully_outlet_type := (SELECT value FROM config_param_user WHERE parameter='epa_gully_outlet_type_vdefault' AND cur_user=current_user);
 	SELECT value::boolean INTO v_connect2network FROM config_param_user WHERE parameter='edit_gully_automatic_link' AND cur_user=current_user;
@@ -529,10 +529,9 @@ BEGIN
 					p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
 					INTO v_the_geom_pol;
 				
-				v_new_pol_id:= (SELECT nextval('urn_id_seq'));
-
-				INSERT INTO polygon(pol_id, sys_type, the_geom, featurecat_id,feature_id ) 
-				VALUES (v_new_pol_id, 'GULLY', v_the_geom_pol, NEW.gully_type, NEW.gully_id);
+				INSERT INTO polygon(sys_type, the_geom, featurecat_id,feature_id ) 
+				VALUES ('GULLY', v_the_geom_pol, NEW.gully_type, NEW.gully_id)
+				RETURNING pol_id INTO v_new_pol_id;
 			END IF;
 		END IF;
 
@@ -832,12 +831,9 @@ BEGIN
 						p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
 						INTO v_the_geom_pol;
 
-					v_new_pol_id:= (SELECT nextval('urn_id_seq'));
-
 					IF (SELECT pol_id FROM gully WHERE gully_id = NEW.gully_id) IS NULL THEN
-						INSERT INTO polygon(pol_id, sys_type, the_geom, featurecat_id,feature_id ) 
-						VALUES (v_new_pol_id, 'GULLY', v_the_geom_pol, NEW.gully_type, NEW.gully_id);
-
+						INSERT INTO polygon(sys_type, the_geom, featurecat_id,feature_id ) 
+						VALUES ('GULLY', v_the_geom_pol, NEW.gully_type, NEW.gully_id);
 					ELSE
 						UPDATE polygon SET the_geom = v_the_geom_pol WHERE feature_id =NEW.gully_id;
 					END IF;

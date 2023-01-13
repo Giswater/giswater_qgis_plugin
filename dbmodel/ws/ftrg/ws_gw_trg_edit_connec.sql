@@ -43,7 +43,6 @@ v_dsbl_error boolean;
 v_connect2network boolean;
 v_system_id text;
 v_featurecat_id text;
-v_pol_id text;
 v_arc record;
 v_link integer;
 v_link_geom public.geometry;
@@ -497,14 +496,10 @@ BEGIN
 		FROM cat_feature_connec WHERE id='||quote_literal(v_featurecat_id)||''
 		INTO v_insert_double_geom, v_double_geom_buffer;
 
-		IF (v_insert_double_geom IS TRUE) THEN
-				IF (v_pol_id IS NULL) THEN
-					v_pol_id:= (SELECT nextval('urn_id_seq'));
-				END IF;
-					
-				INSERT INTO polygon(pol_id, sys_type, the_geom, featurecat_id, feature_id ) 
-				VALUES (v_pol_id, v_system_id, (SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_double_geom_buffer))) 
-				from connec where connec_id=NEW.connec_id), v_featurecat_id, NEW.connec_id);
+		IF (v_insert_double_geom IS TRUE) THEN					
+			INSERT INTO polygon(sys_type, the_geom, featurecat_id, feature_id ) 
+			VALUES (v_system_id, (SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_double_geom_buffer))) 
+			from connec where connec_id=NEW.connec_id), v_featurecat_id, NEW.connec_id);
 		END IF;
 
 

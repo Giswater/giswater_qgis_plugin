@@ -5,9 +5,6 @@ The program is free software: you can redistribute it and/or modify it under the
 
 --FUNCTION CODE: 2460
 
-
--- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_man_connec_pol();
-
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_connec_pol() RETURNS trigger AS
 $BODY$
 
@@ -16,29 +13,24 @@ man_table varchar;
 
 BEGIN
 
-    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	man_table:= TG_ARGV[0];
 	
 	-- INSERT
 	IF TG_OP = 'INSERT' THEN
-	
-		-- Pol ID	
-		IF (NEW.pol_id IS NULL) THEN
-			NEW.pol_id:= (SELECT nextval('urn_id_seq'));
-		END IF;
 		
 		-- Connec ID	
 		IF (NEW.feature_id IS NULL) THEN
 			NEW.feature_id:= (SELECT connec_id FROM v_edit_connec WHERE ST_DWithin(NEW.the_geom, v_edit_connec.the_geom,0.001) LIMIT 1);
 			IF (NEW.feature_id IS NULL) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       	"data":{"message":"2094", "function":"2460","debug_msg":null}}$$);';
+				"data":{"message":"2094", "function":"2460","debug_msg":null}}$$);';
 			END IF;	
 		END IF;
 
 		-- Insert into polygon table
-		INSERT INTO polygon (pol_id, sys_type, the_geom, feature_id, featurecat_id) 
-		SELECT NEW.pol_id, sys_type, NEW.the_geom, NEW.feature_id, connec_type
+		INSERT INTO polygon (sys_type, the_geom, feature_id, featurecat_id) 
+		SELECT sys_type, NEW.the_geom, NEW.feature_id, connec_type
 		FROM v_edit_connec WHERE connec_id=NEW.feature_id
 		ON CONFLICT (feature_id) DO UPDATE SET the_geom=NEW.the_geom;
 		
@@ -46,7 +38,7 @@ BEGIN
 		
     
 	-- UPDATE
-    ELSIF TG_OP = 'UPDATE' THEN
+	ELSIF TG_OP = 'UPDATE' THEN
 	
 		UPDATE polygon SET pol_id=NEW.pol_id, the_geom=NEW.the_geom WHERE pol_id=OLD.pol_id;
 		
@@ -55,17 +47,15 @@ BEGIN
 			FROM v_edit_connec WHERE connec_id=OLD.feature_id AND pol_id=NEW.pol_id;
 		END IF;
 		
-		
 		RETURN NEW;
     
 	-- DELETE
-    ELSIF TG_OP = 'DELETE' THEN
+	ELSIF TG_OP = 'DELETE' THEN
 	
-			DELETE FROM polygon WHERE pol_id=OLD.pol_id;
-				
+		DELETE FROM polygon WHERE pol_id=OLD.pol_id;		
+		
 		RETURN NULL;
-   
-    END IF;
+	END IF;
     
 END;
 $BODY$

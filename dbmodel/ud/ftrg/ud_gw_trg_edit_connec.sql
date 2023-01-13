@@ -30,7 +30,6 @@ v_force_delete boolean;
 v_autoupdate_fluid boolean;
 v_doublegeometry boolean;
 v_doublegeom_buffer double precision;
-v_pol_id varchar(16);
 v_arc record;
 v_link_geom public.geometry;
 v_connect2network boolean;
@@ -443,14 +442,9 @@ BEGIN
 		
 		-- set and get id for polygon
 		IF (v_doublegeometry IS TRUE) THEN
-		
-				IF (v_pol_id IS NULL) THEN
-					v_pol_id:= (SELECT nextval('urn_id_seq'));
-				END IF;
-					
-				INSERT INTO polygon(pol_id, sys_type, the_geom, featurecat_id,feature_id ) 
-				VALUES (v_pol_id, 'CONNEC', (SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_doublegeom_buffer))) 
-				from connec where connec_id=NEW.connec_id), NEW.connec_type, NEW.connec_id);
+			INSERT INTO polygon(sys_type, the_geom, featurecat_id,feature_id ) 
+			VALUES ('CONNEC', (SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_doublegeom_buffer))) 
+			from connec where connec_id=NEW.connec_id), NEW.connec_type, NEW.connec_id);
 		END IF;
 
 		-- insertint on psector table
