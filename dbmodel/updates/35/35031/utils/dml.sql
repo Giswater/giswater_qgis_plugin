@@ -328,3 +328,6 @@ VALUES ('basic_selector_tab_macroexploitation_add','{"table":"macroexploitation"
 
 INSERT INTO config_form_tabs(formname, tabname, label, sys_role,  device, orderby)
 VALUES ('selector_basic','tab_macroexploitation_add','Macroexpl Add','role_basic',4, 0) ON CONFLICT (formname, tabname, device) DO NOTHING;
+
+INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam)
+VALUES ('tabname_typevalue','tab_macroexploitation_add', 'Macroexploitation add', 'Macroexploitation add', null) ON CONFLICT (typevalue, id) DO NOTHING;
