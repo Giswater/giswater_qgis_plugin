@@ -352,23 +352,25 @@ BEGIN
 			RETURN NEW;
 
 		ELSIF TG_OP = 'DELETE' THEN
+        
+            IF OLD.system_id <>'LINK' THEN
+                -- delete child views
+                IF OLD.child_layer IS NOT NULL THEN
+                    EXECUTE 'DROP VIEW IF EXISTS '||OLD.child_layer||';';
+                END IF;
+                
+                --delete configuration from config_form_fields
+                DELETE FROM config_form_fields where formname=OLD.child_layer AND formtype = 'form_feature';
 
-			-- delete child views
-			IF OLD.child_layer IS NOT NULL THEN
-				EXECUTE 'DROP VIEW IF EXISTS '||OLD.child_layer||';';
-			END IF;
-			
-			--delete configuration from config_form_fields
-			DELETE FROM config_form_fields where formname=OLD.child_layer AND formtype = 'form_feature';
+                --delete definition from config_info_layer_x_type
+                DELETE FROM config_info_layer_x_type where tableinfo_id=OLD.child_layer OR tableinfotype_id=OLD.child_layer;
 
-			--delete definition from config_info_layer_x_type
-			DELETE FROM config_info_layer_x_type where tableinfo_id=OLD.child_layer OR tableinfotype_id=OLD.child_layer;
+                --delete definition from sys_table
+                DELETE FROM sys_table where id=OLD.child_layer;
 
-			--delete definition from sys_table
-			DELETE FROM sys_table where id=OLD.child_layer;
-
-			-- delete sys_param_user parameters
-			DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');
+                -- delete sys_param_user parameters
+                DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');
+            END IF;
 
 			RETURN NULL;
 		END IF;
