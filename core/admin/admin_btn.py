@@ -183,7 +183,7 @@ class GwAdminButton:
             if self.locale != 'en_US' or str(self.project_epsg) != '25831':
                 msg = ("This functionality is only allowed with the locality 'en_US' and SRID 25831."
                        "\nDo you want change it and continue?")
-                result = tools_qt.show_question(msg, "Info Message", force_action=True)
+                result = tools_qt.show_question(msg, force_action=True)
                 if result:
                     self.project_epsg = '25831'
                     project_srid = '25831'
@@ -331,7 +331,7 @@ class GwAdminButton:
         """"""
 
         msg = "Are you sure to update the project schema to last version?"
-        result = tools_qt.show_question(msg, "Info")
+        result = tools_qt.show_question(msg)
         if result:
             # Manage Log Messages panel and open tab Giswater PY
             message_log = self.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
@@ -1190,7 +1190,7 @@ class GwAdminButton:
         new_name = self._bk_schema_name(list_schemas, f"{project_name}_bk_", 0)
 
         msg = f"This 'Project_name' is already exist. Do you want rename old schema to '{new_name}"
-        result = tools_qt.show_question(msg, "Info", force_action=True)
+        result = tools_qt.show_question(msg, force_action=True)
         if result:
             self._rename_project_data_schema(str(project_name), str(new_name))
             return True
@@ -1989,7 +1989,7 @@ class GwAdminButton:
             return
 
         msg = f"Are you sure you want delete schema '{project_name}' ?"
-        result = tools_qt.show_question(msg, "Info", force_action=True)
+        result = tools_qt.show_question(msg, force_action=True)
         if result:
             sql = f'DROP SCHEMA {project_name} CASCADE;'
             status = tools_db.execute_sql(sql)
@@ -2226,7 +2226,7 @@ class GwAdminButton:
 
         msg = ("Warning: Are you sure to continue?. This button will update your plugin qgis templates file replacing "
                "all strings defined on the config/dev.config file. Be sure your config file is OK before continue")
-        result = tools_qt.show_question(msg, "Info")
+        result = tools_qt.show_question(msg)
         if result:
             # Get dev config file
             setting_file = os.path.join(self.plugin_dir, 'config', 'dev.config')
