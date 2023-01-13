@@ -70,7 +70,7 @@ BEGIN
 		JOIN (SELECT node_1 AS node_id, sector_id FROM b UNION SELECT node_2, sector_id FROM b)a USING (node_id)
 		JOIN cat_node c ON c.id=nodecat_id';
 
-	-- create link exit vnodes
+	-- create link exit
 	IF v_networkmode in (3,4) THEN
 		PERFORM gw_fct_linkexitgenerator(1);
 	END IF;
@@ -90,37 +90,6 @@ BEGIN
 			AND selector_sector.cur_user = "current_user"()::text '
 			||v_statetype;		
 	END IF;
-
-	-- update child param for inp_reservoir
-	UPDATE temp_node SET pattern_id=inp_reservoir.pattern_id FROM inp_reservoir WHERE temp_node.node_id=inp_reservoir.node_id;
-
-	-- update head for those reservoirs head is not null
-	UPDATE temp_node SET elevation = head, elev = head FROM inp_reservoir WHERE temp_node.node_id=inp_reservoir.node_id AND head is not null;
-	
-	-- update child param for inp_junction
-	UPDATE temp_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE temp_node.node_id=inp_junction.node_id;
-
-	-- update child param for inp_tank
-	UPDATE temp_node SET addparam=concat('{"initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
-	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'", "overflow":"',overflow,'"}')
-	FROM inp_tank WHERE temp_node.node_id=inp_tank.node_id;
-	
-	-- update child param for inp_inlet
-	UPDATE temp_node SET  elevation = head, elev = head, 
-	addparam=concat('{"pattern_id":"',inp_inlet.pattern_id,'", "initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
-	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'", "overflow":"',overflow,'"}')
-	FROM inp_inlet WHERE temp_node.node_id=inp_inlet.node_id;
-	
-	-- update child param for inp_valve
-	UPDATE temp_node SET addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "diameter":"',custom_dint,'", "flow":"',
-	flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "minorloss":"',minorloss,'", "status":"',status,
-	'", "to_arc":"',to_arc,'", "add_settings":"',add_settings,'"}')
-	FROM inp_valve WHERE temp_node.node_id=inp_valve.node_id;
-
-	-- update addparam for inp_pump
-	UPDATE temp_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',pattern,'", "status":"',status,'", "to_arc":"',to_arc,
-	'", "energyparam":"', energyparam,'", "energyvalue":"',energyvalue,'", "pump_type":"',pump_type,'"}')
-	FROM inp_pump WHERE temp_node.node_id=inp_pump.node_id;
 
 	IF v_forcereservoirsoninlets THEN
 
@@ -149,6 +118,40 @@ BEGIN
 		group by node_id
 		HAVING count(sector_id)>1);
 	END IF;
+
+	-- update child param for inp_reservoir
+	UPDATE temp_node SET pattern_id=inp_reservoir.pattern_id FROM inp_reservoir WHERE temp_node.node_id=inp_reservoir.node_id;
+	
+	-- update child param for inp_junction
+	UPDATE temp_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE temp_node.node_id=inp_junction.node_id;
+
+	-- update child param for inp_tank
+	UPDATE temp_node SET addparam=concat('{"initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
+	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'", "overflow":"',overflow,'"}')
+	FROM inp_tank WHERE temp_node.node_id=inp_tank.node_id;
+	
+	-- update child param for inp_inlet
+	UPDATE temp_node SET
+	addparam=concat('{"pattern_id":"',i.pattern_id,'", "initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
+	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'", "overflow":"',overflow,'"}')
+	FROM inp_inlet i WHERE temp_node.node_id=i.node_id;
+
+	-- update head for those inlet acting as reservoir with head not null
+	UPDATE temp_node SET elevation = head, elev = head FROM inp_inlet WHERE temp_node.node_id=inp_inlet.node_id AND head is not null AND epa_type = 'RESERVOIR';
+
+	-- update head for those reservoirs with head is not null
+	UPDATE temp_node SET elevation = head, elev = head FROM inp_reservoir WHERE temp_node.node_id=inp_reservoir.node_id AND head is not null;
+
+	-- update child param for inp_valve
+	UPDATE temp_node SET addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "diameter":"',custom_dint,'", "flow":"',
+	flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "minorloss":"',minorloss,'", "status":"',status,
+	'", "to_arc":"',to_arc,'", "add_settings":"',add_settings,'"}')
+	FROM inp_valve WHERE temp_node.node_id=inp_valve.node_id;
+
+	-- update addparam for inp_pump
+	UPDATE temp_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',pattern,'", "status":"',status,'", "to_arc":"',to_arc,
+	'", "energyparam":"', energyparam,'", "energyvalue":"',energyvalue,'", "pump_type":"',pump_type,'"}')
+	FROM inp_pump WHERE temp_node.node_id=inp_pump.node_id;
 
 	raise notice 'inserting arcs on temp_arc table';
 	
