@@ -100,13 +100,13 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"REMOVE","table":"plan_pse
 ALTER TABLE connec DROP CONSTRAINT connec_pjoint_type_ckeck;
 UPDATE connec SET pjoint_id = arc_id, pjoint_type = 'ARC' WHERE  pjoint_type = 'VNODE';
 UPDATE link SET exit_id = arc_id, exit_type = 'ARC' FROM connec WHERE feature_id = connec_id and exit_type = 'VNODE';
-ALTER TABLE connec ADD CONSTRAINT connec_pjoint_type_ckeck CHECK (pjoint_type::text = ANY  (ARRAY['NODE', 'ARC', 'CONNEC', 'GULLY']));
+ALTER TABLE connec ADD CONSTRAINT connec_pjoint_type_check CHECK (pjoint_type::text = ANY  (ARRAY['NODE', 'ARC', 'CONNEC', 'GULLY']));
 
 -- change pjoint_type (VNODE to ARC)
 ALTER TABLE gully DROP CONSTRAINT gully_pjoint_type_ckeck;
 UPDATE gully SET pjoint_id = arc_id, pjoint_type = 'ARC' WHERE  pjoint_type = 'VNODE';
 UPDATE link SET exit_id = arc_id, exit_type = 'ARC' FROM gully WHERE feature_id = gully_id and exit_type = 'VNODE';
-ALTER TABLE gully ADD CONSTRAINT gully_pjoint_type_ckeck CHECK (pjoint_type::text = ANY (ARRAY['NODE', 'ARC', 'CONNEC', 'GULLY']));
+ALTER TABLE gully ADD CONSTRAINT gully_pjoint_type_check CHECK (pjoint_type::text = ANY (ARRAY['NODE', 'ARC', 'CONNEC', 'GULLY']));
 
 
 ALTER TABLE plan_psector_x_gully DROP CONSTRAINT plan_psector_x_gully_unique;

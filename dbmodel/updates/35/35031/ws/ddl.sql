@@ -76,7 +76,7 @@ ALTER TABLE connec DISABLE TRIGGER gw_trg_connect_update;
 ALTER TABLE connec DROP CONSTRAINT connec_pjoint_type_ckeck;
 UPDATE connec SET pjoint_id = arc_id, pjoint_type = 'ARC' WHERE  pjoint_type = 'VNODE';
 UPDATE link SET exit_id = arc_id, exit_type = 'ARC' FROM connec WHERE feature_id = connec_id and exit_type = 'VNODE';
-ALTER TABLE connec ADD CONSTRAINT connec_pjoint_type_ckeck CHECK (pjoint_type::text = ANY  (ARRAY['NODE', 'ARC', 'CONNEC']));
+ALTER TABLE connec ADD CONSTRAINT connec_pjoint_type_check CHECK (pjoint_type::text = ANY  (ARRAY['NODE', 'ARC', 'CONNEC']));
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_valve", "column":"valve_type", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_wjoin", "column":"wjoin_type", "dataType":"text", "isUtils":"False"}}$$);
