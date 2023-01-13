@@ -773,7 +773,8 @@ BEGIN
 	
 	RAISE NOTICE '32 - Check nodes ''T candidate'' with wrong topology (fid: 432)';
 
-	v_querytext = 'SELECT b.* FROM (SELECT n1.node_id, n1.sector_id, 432, ''Node ''''T candidate'''' with wrong topology'', n1.nodecat_id, n1.the_geom FROM v_edit_arc a, node n1 JOIN v_state_node USING (node_id)
+	v_querytext = 'SELECT b.* FROM (SELECT n1.node_id, n1.sector_id, 432, ''Node ''''T candidate'''' with wrong topology'', n1.nodecat_id, n1.the_geom FROM v_edit_arc a, node n1 
+					JOIN v_state_node USING (node_id) JOIN v_expl_node USING (node_id)
 		      JOIN (SELECT node_1 node_id FROM arc WHERE state = 1 UNION SELECT node_2 FROM arc WHERE state = 1) b USING (node_id)
 		      WHERE st_dwithin(a.the_geom, n1.the_geom,0.01) AND n1.node_id NOT IN (node_1, node_2))b, selector_sector s WHERE s.sector_id = b.sector_id AND cur_user=current_user';
 

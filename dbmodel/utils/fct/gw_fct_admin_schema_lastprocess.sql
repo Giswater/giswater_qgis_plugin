@@ -384,8 +384,8 @@ BEGIN
 						INTO v_definition;
 
 						v_definition = replace(v_definition,concat('JOIN ',v_schemaname,'.v_state_node ON node_id = feature_id'), 
-						concat('JOIN ',v_schemaname,'.v_state_node ON node_id = feature_id 
-							JOIN ',v_schemaname,'.v_expl_node ON node_id = feature_id'));
+						concat('JOIN ',v_schemaname,'.v_state_node s ON s.node_id = feature_id 
+							JOIN ',v_schemaname,'.v_expl_node e ON e.node_id = feature_id'));
 
 						EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||rec_viewname||' AS '||v_definition||'';
 					END IF;

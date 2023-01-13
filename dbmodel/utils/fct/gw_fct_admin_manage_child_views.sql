@@ -94,7 +94,7 @@ BEGIN
 
 	IF v_action = 'MULTI-DELETE' THEN
 
-		FOR v_childview IN SELECT child_layer FROM cat_feature WHERE id <> 'LINK' AND child_layer IS NOT NULL
+		FOR v_childview IN SELECT child_layer FROM cat_feature WHERE system_id <> 'LINK' AND child_layer IS NOT NULL
 		LOOP
 			EXECUTE 'DROP VIEW IF EXISTS '||v_childview||'';
 			PERFORM gw_fct_debug(concat('{"data":{"msg":"Deleted layer: ", "variables":"',v_childview,'"}}')::json);
@@ -108,13 +108,13 @@ BEGIN
 	ELSIF v_action = 'MULTI-UPDATE' THEN
 	
 		IF v_system_id IS NOT NULL THEN			
-			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE id <> ''LINK'' AND child_layer IS NOT NULL AND system_id = '||quote_literal(v_system_id); 	
+			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE system_id <> ''LINK'' AND child_layer IS NOT NULL AND system_id = '||quote_literal(v_system_id); 	
 			
 		ELSIF v_feature_type IS NOT NULL THEN
-			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE id <> ''LINK'' AND child_layer IS NOT NULL AND feature_type = '||quote_literal(v_feature_type); 	
+			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE system_id <> ''LINK'' AND child_layer IS NOT NULL AND feature_type = '||quote_literal(v_feature_type); 	
 		
 		ELSIF v_feature_type IS NULL THEN
-			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE id <> ''LINK'' AND child_layer IS NOT NULL'; 	
+			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE system_id <> ''LINK'' AND child_layer IS NOT NULL'; 	
 		
 		END IF;
 
@@ -192,7 +192,7 @@ BEGIN
 	
 	ELSIF v_action = 'MULTI-CREATE' THEN 
 	
-		v_querytext = 'SELECT cat_feature.* FROM cat_feature WHERE id <> ''LINK'' ORDER BY id';
+		v_querytext = 'SELECT cat_feature.* FROM cat_feature WHERE system_id <> ''LINK'' ORDER BY id';
 
 		FOR rec IN EXECUTE v_querytext LOOP
 	
