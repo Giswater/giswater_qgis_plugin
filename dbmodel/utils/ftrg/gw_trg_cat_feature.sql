@@ -353,6 +353,9 @@ BEGIN
 
 		ELSIF TG_OP = 'DELETE' THEN
         
+        IF v_table = 'DELETE' AND OLD.system_id <>'LINK' THEN
+        	RETURN OLD;
+        ELSE
             IF OLD.system_id <>'LINK' THEN
                 -- delete child views
                 IF OLD.child_layer IS NOT NULL THEN
@@ -361,7 +364,7 @@ BEGIN
                 
                 --delete configuration from config_form_fields
                 DELETE FROM config_form_fields where formname=OLD.child_layer AND formtype = 'form_feature';
-
+                
                 --delete definition from config_info_layer_x_type
                 DELETE FROM config_info_layer_x_type where tableinfo_id=OLD.child_layer OR tableinfotype_id=OLD.child_layer;
 
@@ -372,7 +375,8 @@ BEGIN
                 DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');
             END IF;
 
-			RETURN NULL;
+					RETURN NULL;
+				END IF;
 		END IF;
 	END IF;
 

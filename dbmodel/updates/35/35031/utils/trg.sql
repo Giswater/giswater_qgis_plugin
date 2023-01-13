@@ -35,3 +35,17 @@ CREATE TRIGGER gw_trg_node_border
     ON node
     FOR EACH ROW
     EXECUTE FUNCTION gw_trg_node_border('NODE');
+
+DROP TRIGGER IF EXISTS gw_trg_cat_feature ON cat_feature;
+
+CREATE TRIGGER gw_trg_cat_feature_after
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON cat_feature
+    FOR EACH ROW
+    EXECUTE FUNCTION gw_trg_cat_feature();
+    
+    CREATE TRIGGER gw_trg_cat_feature_delete
+    BEFORE DELETE
+    ON cat_feature
+    FOR EACH ROW
+    EXECUTE FUNCTION gw_trg_cat_feature('DELETE');
