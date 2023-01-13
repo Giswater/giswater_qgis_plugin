@@ -56,7 +56,8 @@ v_status text;
 v_rectable record;
 v_max_seq_id integer;
 v_querytext text;
-
+v_definition text;
+rec_viewname text;
 BEGIN 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
@@ -372,6 +373,23 @@ BEGIN
 			IF v_oldversion < '3.4.032' AND v_gwversion > '3.4.030' THEN
 				PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 				"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"workcat_id_plan" }}$$);
+			END IF;
+
+			-- recreate child views adding workcat_id_plan on parent tables
+			IF v_oldversion < '3.5.031'  THEN
+				FOR rec_viewname IN (SELECT child_layer FROM cat_feature WHERE feature_type = 'NODE') LOOP
+					IF (SELECT EXISTS ( SELECT 1 FROM  information_schema.tables WHERE  table_schema = v_schemaname AND table_name = rec_viewname)) 
+					IS TRUE THEN
+						EXECUTE 'SELECT pg_get_viewdef('''||v_schemaname||'.'||rec_viewname||''', true);'
+						INTO v_definition;
+
+						v_definition = replace(v_definition,concat('JOIN ',v_schemaname,'.v_state_node ON node_id = feature_id'), 
+						concat('JOIN ',v_schemaname,'.v_state_node ON node_id = feature_id 
+							JOIN ',v_schemaname,'.v_expl_node ON node_id = feature_id'));
+
+						EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||rec_viewname||' AS '||v_definition||'';
+					END IF;
+				END LOOP;
 			END IF;
 
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('Project have been sucessfully updated from ',v_oldversion,' version to ',v_gwversion, ' version'));
