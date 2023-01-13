@@ -293,32 +293,32 @@ BEGIN
 			END IF;
 			
 		ELSIF v_view='vi_timeseries' THEN 
-			IF NEW.other1 ilike 'FILE' THEN
+			IF NEW.date ilike 'FILE' THEN
 				IF NEW.timser_id NOT IN (SELECT id FROM inp_timeseries) THEN
-					INSERT INTO inp_timeseries(id, idval, times_type,fname) VALUES (NEW.timser_id, NEW.timser_id,'FILE',NEW.other2) ;
+					INSERT INTO inp_timeseries(id, idval, times_type,fname) VALUES (NEW.timser_id, NEW.timser_id,'FILE',NEW.time) ;
 				END IF;
 				INSERT INTO inp_timeseries_value (timser_id) VALUES (NEW.timser_id);
 				
-			ELSIF  NEW.other1 ilike '%:%' OR NEW.other1 ~ '^\d+$' OR NEW.other1 ilike '%:%' THEN
+			ELSIF  NEW.date ilike '%:%' OR NEW.date ~ '^\d+$' OR NEW.date ilike '%:%' THEN
 			
 				IF NEW.timser_id NOT IN (SELECT id FROM inp_timeseries) THEN
 					INSERT INTO inp_timeseries(id, idval, times_type) VALUES (NEW.timser_id, NEW.timser_id,'RELATIVE');
 				END IF;
 				
 				IF (SELECT times_type FROM inp_timeseries WHERE id = NEW.timser_id) = 'ABSOLUTE' THEN
-					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, null, NEW.other1, NEW.other2::numeric);				
+					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, null, NEW.date, NEW.time::numeric);				
 				ELSE
-					INSERT INTO inp_timeseries_value (timser_id, "time", value)  VALUES (NEW.timser_id, NEW.other1, NEW.other2::numeric);
+					INSERT INTO inp_timeseries_value (timser_id, "time", value)  VALUES (NEW.timser_id, NEW.date, NEW.time::numeric);
 				END IF;				
 			ELSE	
 				IF NEW.timser_id NOT IN (SELECT id FROM inp_timeseries) THEN
 					INSERT INTO inp_timeseries(id, idval, times_type) VALUES (NEW.timser_id, NEW.timser_id,'ABSOLUTE');
 				END IF;
-				IF NEW.other2 ~ '^\d+$' then
-					NEW.other2 = concat(NEW.other2,':00');
+				IF NEW.time ~ '^\d+$' then
+					NEW.time = concat(NEW.time,':00');
 				END IF;
-				IF NEW.other3 IS NOT NULL THEN
-					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, NEW.other1, NEW.other2, NEW.other3::numeric);
+				IF NEW.value IS NOT NULL THEN
+					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, NEW.date, NEW.time, NEW.value::numeric);
 				END IF;
 			END IF;
 			
