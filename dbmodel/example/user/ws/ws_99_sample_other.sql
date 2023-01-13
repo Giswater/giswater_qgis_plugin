@@ -720,3 +720,6 @@ UPDATE plan_psector_x_connec SET active = true WHERE connec_id in ('3103', '3104
 SELECT setval('SCHEMA_NAME.urn_id_seq', 114465, true);
 
 UPDATE link SET dma_id = c.dma_id, sector_id = c.sector_id, presszone_id = c.presszone_id, dqa_id = c.dqa_id, minsector_id = c.minsector_id FROM connec c WHERE feature_id = connec_id;
+
+DELETE FROM v_edit_link where link_id in (482,481);
+SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3076", "3177"]},"data":{"feature_type":"CONNEC"}}$$);
