@@ -19,6 +19,7 @@ class GwToolBoxTask(GwTask):
     """ This shows how to subclass QgsTask """
 
     fake_progress = pyqtSignal()
+    finished_execute = pyqtSignal(bool)
 
     def __init__(self, toolbox, description, dialog, combo, result, timer=None):
 
@@ -138,6 +139,7 @@ class GwToolBoxTask(GwTask):
         if widget_is_void:
             message = "This param is mandatory. Please, set a value"
             tools_log.log_info(message, parameter='')
+            self.finished_execute.emit(False)
             return False
 
         if len(widget_list) > 0:
@@ -149,12 +151,16 @@ class GwToolBoxTask(GwTask):
                                                       aux_conn=self.aux_conn, is_thread=True)
 
         if self.isCanceled():
+            self.finished_execute.emit(False)
             return False
         if self.json_result['status'] == 'Failed':
+            self.finished_execute.emit(False)
             return False
         if not self.json_result or self.json_result is None:
+            self.finished_execute.emit(False)
             return False
 
+        self.finished_execute.emit(True)
         return True
 
 
