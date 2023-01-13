@@ -322,12 +322,12 @@ isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_is
 widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
 FROM config_form_fields WHERE formname = 'v_edit_link' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
+INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam)
+VALUES ('tabname_typevalue','tab_macroexploitation_add', 'Macroexploitation add', 'Macroexploitation add', null) ON CONFLICT (typevalue, id) DO NOTHING;
+
 INSERT INTO config_param_system(parameter, value, descript, label, isenabled, project_type,  datatype)
 VALUES ('basic_selector_tab_macroexploitation_add','{"table":"macroexploitation","selector":"selector_expl","table_id":"macroexpl_id","selector_id":"expl_id","label":"m.macroexpl_id, '' - '', m.name","orderBy":"macroexpl_id","manageAll":true,"query_filter":" AND m.macroexpl_id > 0","typeaheadForced":true,"sectorFromMacroexpl":true,"explFromMacroexpl":false}',
 'Variable to configura all options related to search for the specificic tab', 'Selector variables', FALSE, 'utils', 'json') ON CONFLICT (parameter) DO NOTHING;
 
 INSERT INTO config_form_tabs(formname, tabname, label, sys_role,  device, orderby)
 VALUES ('selector_basic','tab_macroexploitation_add','Macroexpl Add','role_basic',4, 0) ON CONFLICT (formname, tabname, device) DO NOTHING;
-
-INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam)
-VALUES ('tabname_typevalue','tab_macroexploitation_add', 'Macroexploitation add', 'Macroexploitation add', null) ON CONFLICT (typevalue, id) DO NOTHING;
