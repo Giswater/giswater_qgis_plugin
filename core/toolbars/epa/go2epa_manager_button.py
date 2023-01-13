@@ -44,8 +44,8 @@ class GwGo2EpaManagerButton(GwAction):
         reg_exp = QRegExp("^[A-Za-z0-9_]{1,16}$")
         self.dlg_manager.txt_result_id.setValidator(QRegExpValidator(reg_exp))
         self.dlg_manager.txt_infolog.setReadOnly(True)
-        enabled = self.project_type == 'ws'
-        tools_qt.set_widget_enabled(self.dlg_manager, self.dlg_manager.btn_epa2data, enabled)
+        if self.project_type != 'ws':
+            self.dlg_manager.btn_set_corporate.setVisible(False)
 
         # Fill combo box and table view
         self._fill_combo_result_id()
@@ -56,7 +56,7 @@ class GwGo2EpaManagerButton(GwAction):
         model.flags = lambda index: self.flags(index, model)
 
         # Set signals
-        self.dlg_manager.btn_epa2data.clicked.connect(partial(self._epa2data, self.dlg_manager.tbl_rpt_cat_result,
+        self.dlg_manager.btn_set_corporate.clicked.connect(partial(self._epa2data, self.dlg_manager.tbl_rpt_cat_result,
                                                               'result_id'))
         self.dlg_manager.btn_delete.clicked.connect(partial(self._multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result,
                                                             'v_ui_rpt_cat_result', 'result_id'))
@@ -258,6 +258,12 @@ class GwGo2EpaManagerButton(GwAction):
         if len(selected_list) == 0:
             message = "Any record selected"
             tools_qgis.show_warning(message, dialog=self.dlg_manager)
+            return
+
+        msg = ("You are going to make this result corporate. From now on the result values will appear on feature form. "
+               "Do you want to continue?")
+        answer = tools_qt.show_question(msg)
+        if not answer:
             return
 
         result_id = ""

@@ -131,9 +131,9 @@
        </widget>
       </item>
       <item row="1" column="3">
-       <widget class="QPushButton" name="btn_epa2data">
+       <widget class="QPushButton" name="btn_set_corporate">
         <property name="text">
-         <string>epa2data</string>
+         <string>Set corporate</string>
         </property>
        </widget>
       </item>
