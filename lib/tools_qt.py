@@ -18,7 +18,7 @@ from warnings import warn
 
 from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal,\
     QPersistentModelIndex, QCoreApplication, QTranslator, QEvent
-from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QTextCharFormat, QFont
+from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QTextCharFormat, QFont, QIcon
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, \
     QDateEdit, QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, \
@@ -1005,6 +1005,13 @@ def show_question(text, title=None, inf_text=None, context_name=None, parameter=
     msg_box.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
     msg_box.setDefaultButton(QMessageBox.Ok)
     msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
+
+    # Set window icon
+    icon_folder = f"{global_vars.plugin_dir}{os.sep}icons"
+    icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}giswater.png"
+    giswater_icon = QIcon(icon_path)
+    msg_box.setWindowIcon(giswater_icon)
+
     ret = msg_box.exec_()
     if ret == QMessageBox.Ok:
         return True
