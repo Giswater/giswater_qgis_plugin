@@ -271,7 +271,7 @@ BEGIN
 
 			-- CATALOGS
 			--cat_feature
-			ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature;
+			ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature_after;
 			--node
 			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, code_autofill) VALUES ('JUNCTION','JUNCTION','NODE', 'v_edit_node', TRUE);
 			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, code_autofill) VALUES ('OUTFALL','OUTFALL','NODE', 'v_edit_node', TRUE);
@@ -302,7 +302,7 @@ BEGIN
 			INSERT INTO cat_feature_node VALUES ('STORAGE', 'STORAGE', 'STORAGE', 9, TRUE, TRUE, TRUE, 2);
 			INSERT INTO cat_feature_node VALUES ('MANHOLE', 'MANHOLE', 'DIVIDER', 3, TRUE, TRUE, TRUE, 2);
 			
-			ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature;
+			ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature_after;
 			
 			--cat_mat_node 
 			INSERT INTO cat_mat_arc VALUES ('VIRTUAL', 'VIRTUAL');

@@ -275,7 +275,7 @@ BEGIN
 
 			-- CATALOGS
 			--cat_feature
-			ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature;
+			ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature_after;
 			--node
 			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
 			VALUES ('JUNCTION','JUNCTION','NODE', 'v_edit_node', 'Junction', true) ON CONFLICT (id) DO NOTHING;
@@ -353,7 +353,7 @@ BEGIN
 			INSERT INTO cat_feature_node VALUES ('PUMP', 'PUMP', 'PUMP', 2, FALSE, TRUE, 'PRESSZONE') ON CONFLICT (id) DO NOTHING;
 			INSERT INTO cat_feature_node VALUES ('SHORTPIPE', 'VALVE', 'SHORTPIPE', 2, FALSE, TRUE, 'MINSECTOR') ON CONFLICT (id) DO NOTHING;
 
-			ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature;
+			ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature_after;
 			--Materials
 			INSERT INTO cat_mat_arc 
 			SELECT DISTINCT csv6, csv6 FROM temp_csv WHERE source='[PIPES]' AND csv6 IS NOT NULL;
