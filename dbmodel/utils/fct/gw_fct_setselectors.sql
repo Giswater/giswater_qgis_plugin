@@ -156,7 +156,7 @@ BEGIN
 
 			EXECUTE 'DELETE FROM selector_expl WHERE cur_user = current_user';
 			IF v_addschema is not null THEN
-				EXECUTE 'DELETE FROM '||v_addschema||'.'|| v_tablename || ' WHERE cur_user = current_user';
+				EXECUTE 'DELETE FROM '||v_addschema||'.selector_expl WHERE cur_user = current_user';
 			END IF;
 			EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) VALUES('|| v_explmuni ||', '''|| current_user ||''') ON CONFLICT (expl_id, cur_user) DO NOTHING';	
 		END IF;
