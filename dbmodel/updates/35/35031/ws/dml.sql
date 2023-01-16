@@ -37,34 +37,34 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
             datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate,  hidden)
  WITH
   t1 AS
-(SELECT distinct formname, formtype, tabname, 'flow_max' as columnname, 'lyt_data_1' as layoutname, max(layoutorder)+1 as layoutorder, 
+(SELECT distinct formname, formtype, tabname, 'flow_max' as columnname, 'lyt_data_2' as layoutname, max(layoutorder)+1 as layoutorder, 
             'numeric' as datatype, 'text' as widgettype, 'flow_max' as label, 'flow_max' as tooltip,  false as ismandatory, 
-            false as isparent, false as iseditable, false as isautoupdate, false as hidden
+            false as isparent, false as iseditable, false as isautoupdate, true as hidden
 FROM config_form_fields
 WHERE  formname ilike 've_arc%' group by formname,formtype, tabname),
   t2 AS
-(SELECT distinct formname, formtype, tabname, 'flow_min', 'lyt_data_1', max(layoutorder)+2, 
-            'numeric', 'text', 'flow_min', 'flow_min',  false, false, false, false, false
+(SELECT distinct formname, formtype, tabname, 'flow_min', 'lyt_data_2', max(layoutorder)+2, 
+            'numeric', 'text', 'flow_min', 'flow_min',  false, false, false, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_arc%' group by formname,formtype, tabname),
 t3 AS
-(SELECT distinct formname, formtype, tabname, 'flow_avg', 'lyt_data_1', max(layoutorder)+3, 
-            'numeric', 'text', 'flow_avg', 'flow_avg',  false, false, false, false, false
+(SELECT distinct formname, formtype, tabname, 'flow_avg', 'lyt_data_2', max(layoutorder)+3, 
+            'numeric', 'text', 'flow_avg', 'flow_avg',  false, false, false, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_arc%' group by formname,formtype, tabname),
 t4 AS
-(SELECT distinct formname, formtype, tabname, 'vel_max', 'lyt_data_1', max(layoutorder)+4, 
-            'numeric', 'text', 'vel_max', 'vel_max',  false, false, false, false, false
+(SELECT distinct formname, formtype, tabname, 'vel_max', 'lyt_data_2', max(layoutorder)+4, 
+            'numeric', 'text', 'vel_max', 'vel_max',  false, false, false, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_arc%' group by formname,formtype, tabname),
 t5 AS
-(SELECT distinct formname, formtype, tabname, 'vel_min', 'lyt_data_1', max(layoutorder)+5, 
-            'numeric', 'text', 'vel_min', 'vel_min',  false, false, false, false, false
+(SELECT distinct formname, formtype, tabname, 'vel_min', 'lyt_data_2', max(layoutorder)+5, 
+            'numeric', 'text', 'vel_min', 'vel_min',  false, false, false, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_arc%' group by formname,formtype, tabname),
 t6 AS
-(SELECT distinct formname, formtype, tabname, 'vel_avg', 'lyt_data_1', max(layoutorder)+6, 
-            'numeric', 'text', 'vel_avg', 'vel_avg',  false, false, false, false, false
+(SELECT distinct formname, formtype, tabname, 'vel_avg', 'lyt_data_2', max(layoutorder)+6, 
+            'numeric', 'text', 'vel_avg', 'vel_avg',  false, false, false, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_arc%' group by formname,formtype, tabname)
 select * from t1
@@ -79,24 +79,24 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
             datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate,  hidden)
  WITH
   t1 AS
-(SELECT distinct formname, formtype, tabname, 'press_max' as columnname, 'lyt_data_1' as layoutname, max(layoutorder)+1 as layoutorder, 
+(SELECT distinct formname, formtype, tabname, 'press_max' as columnname, 'lyt_data_2' as layoutname, max(layoutorder)+1 as layoutorder, 
             'numeric' as datatype, 'text' as widgettype, 'press_max' as label, 'press_max' as tooltip,  false as ismandatory, 
-            false as isparent, false as iseditable, false as isautoupdate, false as hidden
+            false as isparent, false as iseditable, false as isautoupdate, true as hidden
 FROM config_form_fields
 WHERE  formname ilike 've_connec%' group by formname,formtype, tabname),
   t2 AS
-(SELECT distinct formname, formtype, tabname, 'press_min', 'lyt_data_1', max(layoutorder)+2, 
-            'numeric', 'text', 'press_min', 'press_min',  false, false, false, false, false
+(SELECT distinct formname, formtype, tabname, 'press_min', 'lyt_data_2', max(layoutorder)+2, 
+            'numeric', 'text', 'press_min', 'press_min',  false, false, false, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_connec%' group by formname,formtype, tabname),
 t3 AS
-(SELECT distinct formname, formtype, tabname, 'press_avg', 'lyt_data_1', max(layoutorder)+3, 
-            'numeric', 'text', 'press_avg', 'press_avg',  false, false, false, false, false
+(SELECT distinct formname, formtype, tabname, 'press_avg', 'lyt_data_2', max(layoutorder)+3, 
+            'numeric', 'text', 'press_avg', 'press_avg',  false, false, false, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_connec%' group by formname,formtype, tabname),
 t4 AS
-(SELECT distinct formname, formtype, tabname, 'demand', 'lyt_data_1', max(layoutorder)+4, 
-            'numeric', 'text', 'demand', 'demand',  false, false, false, false, false
+(SELECT distinct formname, formtype, tabname, 'demand', 'lyt_data_2', max(layoutorder)+4, 
+            'numeric', 'text', 'demand', 'demand',  false, false, false, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_connec%' group by formname,formtype, tabname)
 select * from t1
@@ -110,64 +110,64 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
             datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate,  hidden)
  WITH
   t1 AS
-(SELECT distinct formname, formtype, tabname, 'demand_max' as columnname, 'lyt_data_1' as layoutname, max(layoutorder)+1 as layoutorder, 
+(SELECT distinct formname, formtype, tabname, 'demand_max' as columnname, 'lyt_data_2' as layoutname, max(layoutorder)+1 as layoutorder, 
             'numeric' as datatype, 'text' as widgettype, 'demand_max' as label, 'demand_max' as tooltip,  false as ismandatory, 
-            false as isparent, false as iseditable, false as isautoupdate, false as hidden
+            false as isparent, false as iseditable, false as isautoupdate, true as hidden
 FROM config_form_fields
 WHERE  formname ilike 've_node%' group by formname,formtype, tabname),
   t2 AS
-(SELECT distinct formname, formtype, tabname, 'demand_min', 'lyt_data_1', max(layoutorder)+2, 
-            'numeric', 'text', 'demand_min', 'demand_min',  false, false, false, false, false
+(SELECT distinct formname, formtype, tabname, 'demand_min', 'lyt_data_2', max(layoutorder)+2, 
+            'numeric', 'text', 'demand_min', 'demand_min',  false, false, false, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_node%' group by formname,formtype, tabname),
 t3 AS
-(SELECT distinct formname, formtype, tabname, 'demand_avg', 'lyt_data_1', max(layoutorder)+3, 
-            'numeric', 'text', 'demand_avg', 'demand_avg',  false, false, false, false, false
+(SELECT distinct formname, formtype, tabname, 'demand_avg', 'lyt_data_2', max(layoutorder)+3, 
+            'numeric', 'text', 'demand_avg', 'demand_avg',  false, false, false, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_node%' group by formname,formtype, tabname),
 t4 AS
-(SELECT distinct formname, formtype, tabname, 'press_max', 'lyt_data_1', max(layoutorder)+4, 
-            'numeric', 'text', 'press_max', 'press_max',  false, false, false, false, false
+(SELECT distinct formname, formtype, tabname, 'press_max', 'lyt_data_2', max(layoutorder)+4, 
+            'numeric', 'text', 'press_max', 'press_max',  false, false, false, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_node%' group by formname,formtype, tabname),
 t5 AS
-(SELECT distinct formname, formtype, tabname, 'press_min', 'lyt_data_1', max(layoutorder)+5, 
-            'numeric', 'text', 'press_min', 'press_min',  false, false, false, false, false
+(SELECT distinct formname, formtype, tabname, 'press_min', 'lyt_data_2', max(layoutorder)+5, 
+            'numeric', 'text', 'press_min', 'press_min',  false, false, false, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_node%' group by formname,formtype, tabname),
 t6 AS
-(SELECT distinct formname, formtype, tabname, 'press_avg', 'lyt_data_1', max(layoutorder)+6, 
-            'numeric', 'text', 'press_avg', 'press_avg',  false, false, false, false, false
+(SELECT distinct formname, formtype, tabname, 'press_avg', 'lyt_data_2', max(layoutorder)+6, 
+            'numeric', 'text', 'press_avg', 'press_avg',  false, false, false, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_node%' group by formname,formtype, tabname),
 t7 AS
-(SELECT distinct formname, formtype, tabname, 'head_max', 'lyt_data_1', max(layoutorder)+7, 
-            'numeric', 'text', 'head_max', 'head_max',  false, false, false, false, false
+(SELECT distinct formname, formtype, tabname, 'head_max', 'lyt_data_2', max(layoutorder)+7, 
+            'numeric', 'text', 'head_max', 'head_max',  false, false, false, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_node%' group by formname,formtype, tabname),
 t8 AS
-(SELECT distinct formname, formtype, tabname, 'head_min', 'lyt_data_1', max(layoutorder)+8, 
-            'numeric', 'text', 'head_min', 'head_min',  false, false, false, false, false
+(SELECT distinct formname, formtype, tabname, 'head_min', 'lyt_data_2', max(layoutorder)+8, 
+            'numeric', 'text', 'head_min', 'head_min',  false, false, false, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_node%' group by formname,formtype, tabname),
 t9 AS
-(SELECT distinct formname, formtype, tabname, 'head_avg', 'lyt_data_1', max(layoutorder)+9, 
-            'numeric', 'text', 'head_avg', 'head_avg',  false, false, false, false, false
+(SELECT distinct formname, formtype, tabname, 'head_avg', 'lyt_data_2', max(layoutorder)+9, 
+            'numeric', 'text', 'head_avg', 'head_avg',  false, false, false, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_node%' group by formname,formtype, tabname),
 t10 AS
-(SELECT distinct formname, formtype, tabname, 'quality_max', 'lyt_data_1', max(layoutorder)+10, 
-            'numeric', 'text', 'quality_max', 'quality_max',  false, false, false, false, false
+(SELECT distinct formname, formtype, tabname, 'quality_max', 'lyt_data_2', max(layoutorder)+10, 
+            'numeric', 'text', 'quality_max', 'quality_max',  false, false, false, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_node%' group by formname,formtype, tabname),
 t11 AS
-(SELECT distinct formname, formtype, tabname, 'quality_min', 'lyt_data_1', max(layoutorder)+11, 
-            'numeric', 'text', 'quality_min', 'quality_min',  false, false, false, false, false
+(SELECT distinct formname, formtype, tabname, 'quality_min', 'lyt_data_2', max(layoutorder)+11, 
+            'numeric', 'text', 'quality_min', 'quality_min',  false, false, false, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_node%' group by formname,formtype, tabname),
 t12 AS
-(SELECT distinct formname, formtype, tabname, 'quality_avg', 'lyt_data_1', max(layoutorder)+12, 
-            'numeric', 'text', 'quality_avg', 'quality_avg',  false, false, false, false, false
+(SELECT distinct formname, formtype, tabname, 'quality_avg', 'lyt_data_2', max(layoutorder)+12, 
+            'numeric', 'text', 'quality_avg', 'quality_avg',  false, false, false, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_node%' group by formname,formtype, tabname)
 select * from t1
