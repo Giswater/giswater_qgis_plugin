@@ -331,3 +331,5 @@ VALUES ('basic_selector_tab_macroexploitation_add','{"table":"macroexploitation"
 
 INSERT INTO config_form_tabs(formname, tabname, label, sys_role,  device, orderby)
 VALUES ('selector_basic','tab_macroexploitation_add','Macroexpl Add','role_basic',4, 0) ON CONFLICT (formname, tabname, device) DO NOTHING;
+
+UPDATE config_form_tableview SET columnindex = columnindex + 1 WHERE location_type = 'epa_toolbar';
