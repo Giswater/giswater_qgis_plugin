@@ -197,7 +197,7 @@ BEGIN
 		ELSIF v_checkall IS FALSE THEN
 			EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
 			
-			IF v_tabname='tab_macroexploitation_add' THEN
+			IF v_addschema is not null THEN
 				EXECUTE 'DELETE FROM '||v_addschema||'.'|| v_tablename || ' WHERE cur_user = current_user';
 			END IF;
 		ELSE
@@ -208,7 +208,10 @@ BEGIN
 				IF v_isalone THEN
 					EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
 				END IF;
-			
+			IF v_addschema is not null THEN
+				EXECUTE 'DELETE FROM '||v_addschema||'.'|| v_tablename || ' WHERE cur_user = current_user';
+			END IF;
+
 				-- manage value
 				IF v_value IS NOT NULL AND v_tabname='tab_macroexploitation_add' THEN
 					EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';

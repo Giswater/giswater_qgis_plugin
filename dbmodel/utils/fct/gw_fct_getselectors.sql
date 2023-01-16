@@ -234,7 +234,6 @@ BEGIN
 			END IF;
 
 			FOR rec_macro IN EXECUTE 'SELECT '||v_macroid||' FROM '||v_addschema||'.'||v_macrotable||'' LOOP
-			raise notice 'rec_macro,%',rec_macro;
 				IF v_tab.tabname ='tab_macroexploitation_add' THEN
 					
 					EXECUTE 'SELECT count('||v_zoneid||') as count  FROM '||v_addschema||'.'||v_zonetable||' 
@@ -258,12 +257,9 @@ BEGIN
 				IF v_count_zone = v_count_selector THEN
 
 					IF v_ids IS NULL THEN 
-						EXECUTE 'SELECT '||rec_macro||''
-						INTO v_ids;
+						v_ids = rec_macro::text;
 					ELSE
-						EXECUTE 'SELECT concat('||v_ids||','','','||rec_macro||')'
-						INTO v_ids;
-				
+						v_ids = concat(v_ids,',',rec_macro::text );
 					END IF;
 				END IF;
 			END LOOP;
@@ -273,20 +269,6 @@ BEGIN
 
 			IF v_ids IS NULL THEN v_ids='0'; END IF;
 				IF v_tab.tabname ='tab_macroexploitation_add' THEN
-					/*v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-						SELECT m.',quote_ident(v_table_id),', concat(' , v_label , ') AS label, m.',v_orderby,' as orderby , m.',v_name,' as name, m.', v_table_id , '::text as widgetname, ''' , 
-						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
-						FROM ',v_addschema,'.', v_table , ' m 
-						JOIN  ',v_addschema,'.', v_zonetable , ' a USING (',v_table_id,') 
-						JOIN  ' , v_zonetable , ' e USING (',v_zoneid,') 
-						WHERE m.',v_table_id ,' IN (' , v_ids, ') ', v_fullfilter ,' UNION 
-						SELECT m.',quote_ident(v_table_id),', concat(' , v_label , ') AS label, m.',v_orderby,' as orderby , m.',v_name,' as name, m.', v_table_id , '::text as widgetname, ''' , 
-						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
-						FROM ',v_addschema,'.', v_table , ' m 
-						JOIN  ',v_addschema,'.', v_zonetable , ' a USING (',v_table_id,') 
-						JOIN  ' , v_zonetable , ' e USING (',v_zoneid,') 
-						WHERE m.',v_table_id ,' NOT IN (' , v_ids, ') ',
-						 v_fullfilter ,' ORDER BY orderby asc) a');*/
 					v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , 
 						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
@@ -297,7 +279,6 @@ BEGIN
 						FROM ',v_addschema,'.', v_table , ' m JOIN   ',v_addschema,'.', v_zonetable , '    USING (',v_table_id,')
 						WHERE ',v_table_id ,' NOT IN (' , v_ids, ') ',
 						 v_fullfilter ,' ORDER BY orderby asc) a');
-					raise notice 'v_finalquery,%',v_finalquery;
 				ELSE
 
 				v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
