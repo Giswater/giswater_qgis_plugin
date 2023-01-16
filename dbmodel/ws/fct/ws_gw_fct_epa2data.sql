@@ -36,27 +36,33 @@ BEGIN
 	DELETE FROM selector_rpt_main WHERE cur_user=current_user;
 	INSERT INTO selector_rpt_main(result_id, cur_user) VALUES (v_result_id, current_user);
 
-	DELETE FROM arc_add;
-	DELETE FROM node_add;
-	DELETE FROM connec_add;
-
 	INSERT INTO node_add (node_id, demand_max, demand_min, demand_avg, press_max, press_min, press_avg, head_max, head_min, head_avg, quality_max, quality_min, quality_avg)
 	SELECT node_id, avg(demand_max)::numeric(12,2), avg(demand_min)::numeric(12,2), avg(demand_avg)::numeric(12,2), avg(press_max)::numeric(12,2), avg(press_min)::numeric(12,2), avg(press_avg)::numeric(12,2),
 	avg(head_max)::numeric(12,2), avg(head_min)::numeric(12,2), avg(head_avg)::numeric(12,2), avg(quality_max)::numeric(12,2), avg(quality_min)::numeric(12,2), avg(quality_avg)::numeric(12,2) FROM
 	(SELECT split_part(node_id,'_',1) as node_id, demand_max, demand_min, demand_avg, press_max, press_min, press_avg, head_max, head_min, head_avg, quality_max, quality_min, quality_avg 
 	FROM v_rpt_node a WHERE result_id=v_result_id) a
 	JOIN node USING (node_id)
-	GROUP BY node_id;
+	GROUP BY node_id
+	ON CONFLICT (node_id) DO UPDATE SET 
+	demand_max = EXCLUDED.demand_max, demand_min = EXCLUDED.demand_min, demand_avg = EXCLUDED.demand_avg, 
+	press_max = EXCLUDED.press_max, press_min = EXCLUDED.press_min, press_avg = EXCLUDED.press_avg,
+	head_max = EXCLUDED.head_max, head_min = EXCLUDED.head_min, head_avg = EXCLUDED.head_avg, 
+	quality_max = EXCLUDED.quality_max, quality_min = EXCLUDED.quality_min, quality_avg=EXCLUDED.quality_avg;
 
 	INSERT INTO arc_add (arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg)
 	SELECT arc_id, avg(flow_max)::numeric(12,2), avg(flow_min)::numeric(12,2), avg(flow_avg)::numeric(12,2), avg(vel_max)::numeric(12,2), avg(vel_min)::numeric(12,2), avg(vel_avg)::numeric(12,2) FROM
 	(SELECT split_part(arc_id, 'P',1) as arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg FROM v_rpt_arc a WHERE result_id=v_result_id)a
-	GROUP by arc_id;
+	GROUP by arc_id
+	ON CONFLICT (arc_id) DO UPDATE SET 
+	flow_max = EXCLUDED.flow_max, flow_min = EXCLUDED.flow_min, flow_avg = EXCLUDED.flow_avg,
+	vel_max = EXCLUDED.vel_max, vel_min = EXCLUDED.vel_min, vel_avg = EXCLUDED.vel_avg;
 
 	INSERT INTO connec_add (connec_id, press_max, press_min, press_avg)
 	SELECT node_id, press_max, press_min, press_avg
 	FROM v_rpt_node a 
-	JOIN connec ON node_id = connec_id WHERE result_id=v_result_id;
+	JOIN connec ON node_id = connec_id WHERE result_id=v_result_id
+	ON CONFLICT (connec_id) DO UPDATE SET 
+	press_max = EXCLUDED.press_max, press_min=EXCLUDED.press_min, press_avg=EXCLUDED.press_avg;
 
 	IF v_current_selector IS NOT NULL THEN
 		DELETE FROM selector_rpt_main WHERE cur_user=current_user;
