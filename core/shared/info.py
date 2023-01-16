@@ -1513,7 +1513,6 @@ class GwInfo(QObject):
                     self._manage_docker_close()
                 else:
                     tools_gw.close_dialog(dialog)
-            self._reset_my_json()
         else:
             tools_qt.set_action_checked(action_edit, True)
             tools_gw.enable_all(dialog, self.complet_result['body']['data'])
@@ -1527,7 +1526,6 @@ class GwInfo(QObject):
             return
 
         self._manage_accept(dialog, action_edit, new_feature, my_json, True, generic)
-        self._reset_my_json()
 
 
     def _manage_accept(self, dialog, action_edit, new_feature, my_json, close_dlg, generic=False):
@@ -1554,9 +1552,7 @@ class GwInfo(QObject):
         else:
             save = self._ask_for_save(action_edit, fid)
             if save:
-                self._reset_my_json()
                 self._manage_accept(dialog, action_edit, new_feature, my_json, False)
-            self._reset_my_json()
 
             return save
 
