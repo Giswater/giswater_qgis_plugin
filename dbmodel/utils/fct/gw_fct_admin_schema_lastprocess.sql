@@ -333,6 +333,9 @@ BEGIN
 				columnname IN ('om_state', 'conserv_state', 'priority', 'valve_location', 'valve_type', 'shutoff_valve', 'access_type', 'placement_type', 'crmzone_id')) 
 				AND formname ilike 've_connec%';
 
+				--hide presszone_style from form
+				update config_form_fields set hidden = true WHERE columnname ='presszone_style' and formname='form_feature';
+					
 			ELSIF v_projecttype = 'UD' THEN
 				UPDATE config_form_fields SET hidden = false where 
 				columnname IN ('step_pp', 'step_fe', 'step_replace', 'cover') AND formname ilike 've_node%';
