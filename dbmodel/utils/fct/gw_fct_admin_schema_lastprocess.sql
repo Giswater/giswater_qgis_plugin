@@ -321,20 +321,18 @@ BEGIN
 
 			-- Make visible fields on feature forms
 			IF v_projecttype = 'WS' THEN 
-				UPDATE config_form_fields SET hidden = false where (columnname ILIKE 'press_%' OR columnname ILIKE 'head%' OR columnname ILIKE 'demand_%' OR 
+				UPDATE config_form_fields SET hidden = false where (columnname IN ('press_max', 'press_min', 'press_avg') OR columnname IN ('head_max', 'head_min', 'head_avg') OR columnname IN ('demand_max', 'demand_min', 'demand_avg') OR 
 				columnname IN ('om_state', 'conserv_state', 'access_type', 'placement_type', 'hydrant_type', 'valve_type')) 
 				AND formname ilike 've_node%';
 
-				UPDATE config_form_fields SET hidden = false where (columnname ILIKE 'flow_%' OR columnname ILIKE 'vel_%' OR 
+				UPDATE config_form_fields SET hidden = false where (columnname IN ('flow_max', 'flow_min', 'flow_avg') OR columnname IN ('vel_max', 'vel_min', 'vel_avg') OR 
 				columnname IN ('om_state', 'conserv_state')) 
 				AND formname ilike 've_arc%';
 
-				UPDATE config_form_fields SET hidden = false where (columnname ILIKE 'demand%' OR columnname ILIKE 'press_%' OR 
+				UPDATE config_form_fields SET hidden = false where (columnname IN ('demand_max', 'demand_min', 'demand_avg') OR columnname IN ('press_max', 'press_min', 'press_avg') OR 
 				columnname IN ('om_state', 'conserv_state', 'priority', 'valve_location', 'valve_type', 'shutoff_valve', 'access_type', 'placement_type', 'crmzone_id')) 
 				AND formname ilike 've_connec%';
 
-				--hide presszone_style from form
-				update config_form_fields set hidden = true WHERE columnname ='presszone_style' and formname='form_feature';
 					
 			ELSIF v_projecttype = 'UD' THEN
 				UPDATE config_form_fields SET hidden = false where 
