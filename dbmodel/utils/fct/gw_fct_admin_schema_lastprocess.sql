@@ -319,6 +319,25 @@ BEGIN
 			-- UPDATE edit_check_redundance_y_topelev_elev
 			UPDATE config_param_system SET value = 'TRUE' WHERE parameter = 'edit_check_redundance_y_topelev_elev';
 
+			-- Make visible fields on feature forms
+			IF v_projecttype = 'WS' THEN 
+				UPDATE config_form_fields SET hidden = false where (columnname ILIKE 'press_%' OR columnname ILIKE 'head%' OR columnname ILIKE 'demand_%' OR 
+				columnname IN ('om_state', 'conserv_state', 'access_type', 'placement_type', 'hydrant_type', 'valve_type')) 
+				AND formname ilike 've_node%';
+
+				UPDATE config_form_fields SET hidden = false where (columnname ILIKE 'flow_%' OR columnname ILIKE 'vel_%' OR 
+				columnname IN ('om_state', 'conserv_state')) 
+				AND formname ilike 've_arc%';
+
+				UPDATE config_form_fields SET hidden = false where (columnname ILIKE 'demand%' OR columnname ILIKE 'press_%' OR 
+				columnname IN ('om_state', 'conserv_state', 'priority', 'valve_location', 'valve_type', 'shutoff_valve', 'access_type', 'placement_type', 'crmzone_id')) 
+				AND formname ilike 've_connec%';
+
+			ELSIF v_projecttype = 'UD' THEN
+				UPDATE config_form_fields SET hidden = false where 
+				columnname IN ('step_pp', 'step_fe', 'step_replace', 'cover') AND formname ilike 've_node%';
+			END IF;
+
 		ELSIF v_isnew IS FALSE THEN
 		
 			SELECT project_type INTO v_projecttype FROM sys_version ORDER BY 1 DESC LIMIT 1;

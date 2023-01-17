@@ -213,12 +213,12 @@ datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isauto
   t1 AS
 (SELECT distinct formname, formtype, tabname, 'om_state' as columnname, 'lyt_data_1' as layoutname, max(layoutorder)+1 as layoutorder, 
             'string' as datatype, 'text' as widgettype, 'om_state' as label, 'om_state' as tooltip,  false as ismandatory, 
-            false as isparent, true as iseditable, false as isautoupdate, false as hidden
+            false as isparent, true as iseditable, false as isautoupdate, true as hidden
 FROM config_form_fields
 WHERE  formname ilike 've_arc%' or formname ilike 'v_edit_arc' group by formname,formtype, tabname),
   t2 AS
 (SELECT distinct formname, formtype, tabname, 'conserv_state', 'lyt_data_1', max(layoutorder)+2, 
-            'string', 'text', 'conserv_state', 'conserv_state',  false, false, true, false, false
+            'string', 'text', 'conserv_state', 'conserv_state',  false, false, true, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_arc%' or formname ilike 'v_edit_arc' group by formname,formtype, tabname)
 select * from t1
@@ -232,22 +232,22 @@ WITH
 t1 AS
 (SELECT distinct formname, formtype, tabname, 'om_state' as columnname, 'lyt_data_1' as layoutname, max(layoutorder)+1 as layoutorder, 
             'string' as datatype, 'text' as widgettype, 'om_state' as label, 'om_state' as tooltip,  false as ismandatory, 
-            false as isparent, true as iseditable, false as isautoupdate, false as hidden
+            false as isparent, true as iseditable, false as isautoupdate, true as hidden
 FROM config_form_fields
 WHERE  formname ilike 've_node%' or formname ilike 'v_edit_node' group by formname,formtype, tabname),
 t2 AS
 (SELECT distinct formname, formtype, tabname, 'conserv_state', 'lyt_data_1', max(layoutorder)+2, 
-            'string', 'text', 'conserv_state', 'conserv_state',  false, false, true, false, false
+            'string', 'text', 'conserv_state', 'conserv_state',  false, false, true, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_node%' or formname ilike 'v_edit_node' group by formname,formtype, tabname),
 t3 AS
 (SELECT distinct formname, formtype, tabname, 'access_type', 'lyt_data_1', max(layoutorder)+3, 
-            'string', 'text', 'access_type', 'access_type',  false, false, true, false, false
+            'string', 'text', 'access_type', 'access_type',  false, false, true, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_node%' or formname ilike 'v_edit_node' group by formname,formtype, tabname),
 t4 AS
 (SELECT distinct formname, formtype, tabname, 'placement_type', 'lyt_data_1', max(layoutorder)+4, 
-            'string', 'text', 'placement_type', 'placement_type',  false, false, true, false, false
+            'string', 'text', 'placement_type', 'placement_type',  false, false, true, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_node%' or formname ilike 'v_edit_node' group by formname,formtype, tabname)
 select * from t1
@@ -262,42 +262,42 @@ WITH
 t1 AS
 (SELECT distinct formname, formtype, tabname, 'om_state' as columnname, 'lyt_data_1' as layoutname, max(layoutorder)+1 as layoutorder, 
             'string' as datatype, 'text' as widgettype, 'om_state' as label, 'om_state' as tooltip,  false as ismandatory, 
-            false as isparent, true as iseditable, false as isautoupdate, false as hidden
+            false as isparent, true as iseditable, false as isautoupdate, true as hidden
 FROM config_form_fields
 WHERE  formname ilike 've_connec%' or formname ilike 'v_edit_connec' group by formname,formtype, tabname),
 t2 AS
 (SELECT distinct formname, formtype, tabname, 'conserv_state', 'lyt_data_1', max(layoutorder)+2, 
-            'string', 'text', 'conserv_state', 'conserv_state',  false, false, true, false, false
+            'string', 'text', 'conserv_state', 'conserv_state',  false, false, true, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_connec%' or formname ilike 'v_edit_connec' group by formname,formtype, tabname),
 t3 AS
 (SELECT distinct formname, formtype, tabname, 'access_type', 'lyt_data_1', max(layoutorder)+3, 
-            'string', 'text', 'access_type', 'access_type',  false, false, true, false, false
+            'string', 'text', 'access_type', 'access_type',  false, false, true, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_connec%' or formname ilike 'v_edit_connec' group by formname,formtype, tabname),
 t4 AS
 (SELECT distinct formname, formtype, tabname, 'placement_type', 'lyt_data_1', max(layoutorder)+4, 
-            'string', 'text', 'placement_type', 'placement_type',  false, false, true, false, false
+            'string', 'text', 'placement_type', 'placement_type',  false, false, true, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_connec%' or formname ilike 'v_edit_connec' group by formname,formtype, tabname),
 t5 AS
 (SELECT distinct formname, formtype, tabname, 'priority', 'lyt_data_1', max(layoutorder)+5, 
-            'string', 'text', 'priority', 'priority',  false, false, true, false, false
+            'string', 'text', 'priority', 'priority',  false, false, true, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_connec%' or formname ilike 'v_edit_connec' group by formname,formtype, tabname),
 t6 AS
 (SELECT distinct formname, formtype, tabname, 'valve_location', 'lyt_data_1', max(layoutorder)+6, 
-            'string', 'text', 'valve_location', 'valve_location',  false, false, true, false, false
+            'string', 'text', 'valve_location', 'valve_location',  false, false, true, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_connec%' or formname ilike 'v_edit_connec' group by formname,formtype, tabname),
 t7 AS
 (SELECT distinct formname, formtype, tabname, 'valve_type', 'lyt_data_1', max(layoutorder)+7, 
-            'string', 'text', 'valve_type', 'valve_type',  false, false, true, false, false
+            'string', 'text', 'valve_type', 'valve_type',  false, false, true, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_connec%' or formname ilike 'v_edit_connec' group by formname,formtype, tabname),
 t8 AS
 (SELECT distinct formname, formtype, tabname, 'shutoff_valve', 'lyt_data_1', max(layoutorder)+8, 
-            'string', 'text', 'shutoff_valve', 'shutoff_valve',  false, false, true, false, false
+            'string', 'text', 'shutoff_valve', 'shutoff_valve',  false, false, true, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_connec%' or formname ilike 'v_edit_connec' group by formname,formtype, tabname),
 t9 AS
@@ -320,7 +320,7 @@ order by formname, layoutorder ON CONFLICT (formname, formtype, columnname, tabn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
 datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate,  hidden)
 SELECT distinct child_layer, formtype, tabname, 'valve_type', 'lyt_data_2', max(layoutorder)+1, 
-'string', 'text', 'valve_type', 'valve_type',  false, false, true, false, false
+'string', 'text', 'valve_type', 'valve_type',  false, false, true, false, true
 FROM cat_feature
 join config_form_fields on formname = child_layer
 WHERE  system_id ilike 'VALVE' group by child_layer,formname,formtype, tabname ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
@@ -328,7 +328,7 @@ WHERE  system_id ilike 'VALVE' group by child_layer,formname,formtype, tabname O
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
 datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate,  hidden)
 SELECT distinct child_layer, formtype, tabname, 'wjoin_type', 'lyt_data_2', max(layoutorder)+1, 
-'string', 'text', 'wjoin_type', 'wjoin_type',  false, false, true, false, false
+'string', 'text', 'wjoin_type', 'wjoin_type',  false, false, true, false, true
 FROM cat_feature
 join config_form_fields on formname = child_layer
 WHERE  system_id ilike 'WJOIN' group by child_layer,formname,formtype, tabname ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
@@ -338,12 +338,12 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate,  hidden)
 WITH
 t1 AS (SELECT distinct child_layer, formtype, tabname, 'greentap_type', 'lyt_data_2', max(layoutorder)+1 AS layoutorder,  
-'string', 'text', 'greentap_type', 'greentap_type',  false, false, true, false, false
+'string', 'text', 'greentap_type', 'greentap_type',  false, false, true, false, true
 FROM cat_feature
 join config_form_fields on formname = child_layer
 WHERE  system_id ilike 'GREENTAP' group by formname,formtype, tabname, child_layer),
 t2 AS (SELECT distinct child_layer, formtype, tabname, 'cat_valve', 'lyt_data_2', max(layoutorder)+2, 
-'string', 'text', 'cat_valve', 'cat_valve',  false, false, true, false, false
+'string', 'text', 'cat_valve', 'cat_valve',  false, false, true, false, true
 FROM cat_feature
 join config_form_fields on formname = child_layer
 WHERE  system_id ilike 'GREENTAP' group by formname,formtype, tabname,child_layer)
@@ -354,7 +354,7 @@ order by child_layer, layoutorder ON CONFLICT (formname, formtype, columnname, t
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
 datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate,  hidden)
 SELECT distinct child_layer, formtype, tabname, 'hydrant_type', 'lyt_data_2', max(layoutorder)+1, 
-'string', 'text', 'hydrant_type', 'hydrant_type',  false, false, true, false, false
+'string', 'text', 'hydrant_type', 'hydrant_type',  false, false, true, false, true
 FROM cat_feature
 join config_form_fields on formname = child_layer
 WHERE  system_id ilike 'HYDRANT' group by child_layer,formname,formtype, tabname ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
@@ -395,7 +395,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 datatype, widgettype, dv_querytext, dv_orderby_id, dv_isnullvalue, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate,  hidden)
 SELECT distinct formname, formtype, tabname, 'crmzone_id', 'lyt_data_2', max(layoutorder)+1, 
 'string', 'combo', 'SELECT id, name as idval FROM crm_zone WHERE id IS NOT NULL AND active IS TRUE ', true, true,
-'crmzone_id', 'crmzone_id',  false, false, true, false, false
+'crmzone_id', 'crmzone_id',  false, false, true, false, true
 FROM config_form_fields
 WHERE  formname ilike 've_connec%' or formname ilike 'v_edit_connec' group by formname,formtype, tabname ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
