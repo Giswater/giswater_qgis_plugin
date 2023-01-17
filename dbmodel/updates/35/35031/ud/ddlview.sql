@@ -557,6 +557,8 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_gully"], "fieldName":"drainzone_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"parent_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"arc_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"drainzone_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
