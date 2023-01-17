@@ -57,14 +57,14 @@ class GwMenuLoad(QObject):
                 toolbar_submenu = QMenu(f"{toolbar}", self.iface.mainWindow().menuBar())
                 toolbars_menu.addMenu(toolbar_submenu)
                 buttons_toolbar = global_vars.giswater_settings.value(f"toolbars/{toolbar}")
-                project_exclusive = tools_gw.get_config_parser('project_exclusive', str(global_vars.project_type),
+                project_exclude = tools_gw.get_config_parser('project_exclude', str(global_vars.project_type),
                                                                "project", "giswater")
-                if project_exclusive not in (None, 'None'):
-                    project_exclusive = project_exclusive.replace(' ', '').split(',')
+                if project_exclude not in (None, 'None'):
+                    project_exclude = project_exclude.replace(' ', '').split(',')
 
                 for index_action in buttons_toolbar:
 
-                    if project_exclusive and index_action in project_exclusive:
+                    if project_exclude and index_action in project_exclude:
                         continue
 
                     icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}{toolbar}{os.sep}{index_action}.png"
@@ -240,28 +240,7 @@ class GwMenuLoad(QObject):
 
     def _reset_position_dialog(self):
         """ Reset position dialog x/y """
-
-        try:
-            parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
-            config_folder = f"{global_vars.user_folder_dir}{os.sep}config{os.sep}"
-            if not os.path.exists(config_folder):
-                os.makedirs(config_folder)
-            path = config_folder + f"session.config"
-            parser.read(path)
-
-            # Check if section exists in file
-            if "dialogs_position" in parser:
-                parser.remove_section("dialogs_position")
-
-            msg = "Reset position form done successfully."
-            tools_qt.show_info_box(msg, "Info")
-
-            with open(path, 'w') as configfile:
-                parser.write(configfile)
-                configfile.close()
-        except Exception as e:
-            tools_log.log_warning(f"set_config_parser exception [{type(e).__name__}]: {e}")
-            return
+        tools_gw.reset_position_dialog(True)
 
 
     def _fill_tbl_config_files(self):

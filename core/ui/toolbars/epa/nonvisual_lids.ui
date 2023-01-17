@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>783</width>
+    <width>775</width>
     <height>375</height>
    </rect>
   </property>
@@ -152,7 +152,7 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLineEdit" name="txt_berm_height">
+            <widget class="QLineEdit" name="txt_1_berm_height">
              <property name="text">
               <string>0.0</string>
              </property>
@@ -192,21 +192,21 @@
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QLineEdit" name="txt_surface_roughness">
+            <widget class="QLineEdit" name="txt_3_surface_roughness">
              <property name="text">
               <string>0.1</string>
              </property>
             </widget>
            </item>
            <item row="3" column="1">
-            <widget class="QLineEdit" name="txt_surface_slope">
+            <widget class="QLineEdit" name="txt_4_surface_slope">
              <property name="text">
               <string>1.0</string>
              </property>
             </widget>
            </item>
            <item row="4" column="1">
-            <widget class="QLineEdit" name="txt_surface_side_slope">
+            <widget class="QLineEdit" name="txt_5_surface_side_slope">
              <property name="text">
               <string>5</string>
              </property>
@@ -226,7 +226,7 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLineEdit" name="txt_vegetation_volume">
+            <widget class="QLineEdit" name="txt_2_vegetation_volume">
              <property name="text">
               <string>0.0</string>
              </property>
@@ -253,7 +253,7 @@
           </attribute>
           <layout class="QGridLayout" name="gridLayout_7">
            <item row="2" column="1">
-            <widget class="QLineEdit" name="txt_field_capacity">
+            <widget class="QLineEdit" name="txt_3_field_capacity">
              <property name="text">
               <string>0.2</string>
              </property>
@@ -263,7 +263,7 @@
             </widget>
            </item>
            <item row="3" column="1">
-            <widget class="QLineEdit" name="txt_wilting_point">
+            <widget class="QLineEdit" name="txt_4_wilting_point">
              <property name="text">
               <string>0.1</string>
              </property>
@@ -273,7 +273,7 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLineEdit" name="txt_porosity">
+            <widget class="QLineEdit" name="txt_2_porosity">
              <property name="text">
               <string>0.5</string>
              </property>
@@ -303,7 +303,7 @@
             </widget>
            </item>
            <item row="4" column="1">
-            <widget class="QLineEdit" name="txt_conductivity">
+            <widget class="QLineEdit" name="txt_5_conductivity">
              <property name="text">
               <string>0.5</string>
              </property>
@@ -336,7 +336,7 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLineEdit" name="txt_thickness">
+            <widget class="QLineEdit" name="txt_1_thickness">
              <property name="text">
               <string>0</string>
              </property>
@@ -366,7 +366,7 @@
             </widget>
            </item>
            <item row="5" column="1">
-            <widget class="QLineEdit" name="txt_conducticity_slope">
+            <widget class="QLineEdit" name="txt_6_conducticity_slope">
              <property name="text">
               <string>10.0</string>
              </property>
@@ -376,7 +376,7 @@
             </widget>
            </item>
            <item row="6" column="1">
-            <widget class="QLineEdit" name="txt_suction_head">
+            <widget class="QLineEdit" name="txt_7_suction_head">
              <property name="text">
               <string>3.5</string>
              </property>
@@ -416,7 +416,7 @@
           </attribute>
           <layout class="QGridLayout" name="gridLayout_8">
            <item row="0" column="1">
-            <widget class="QLineEdit" name="txt_thinkness_pavement">
+            <widget class="QLineEdit" name="txt_1_thickness_pavement">
              <property name="text">
               <string>0</string>
              </property>
@@ -433,7 +433,7 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLineEdit" name="txt_void_ratio_pavement">
+            <widget class="QLineEdit" name="txt_2_void_ratio_pavement">
              <property name="text">
               <string>0.15</string>
              </property>
@@ -460,7 +460,7 @@
             </widget>
            </item>
            <item row="6" column="1">
-            <widget class="QLineEdit" name="txt_regeneration_fraction">
+            <widget class="QLineEdit" name="txt_7_regeneration_fraction">
              <property name="text">
               <string>0</string>
              </property>
@@ -490,14 +490,14 @@
             </widget>
            </item>
            <item row="3" column="1">
-            <widget class="QLineEdit" name="txt_permeability">
+            <widget class="QLineEdit" name="txt_4_permeability">
              <property name="text">
               <string>100</string>
              </property>
             </widget>
            </item>
            <item row="4" column="1">
-            <widget class="QLineEdit" name="txt_clogging_factor_pavement">
+            <widget class="QLineEdit" name="txt_5_clogging_factor_pavement">
              <property name="text">
               <string>0</string>
              </property>
@@ -514,7 +514,7 @@
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QLineEdit" name="txt_imprevious_surface">
+            <widget class="QLineEdit" name="txt_3_imprevious_surface">
              <property name="text">
               <string>0</string>
              </property>
@@ -531,7 +531,7 @@
             </widget>
            </item>
            <item row="5" column="1">
-            <widget class="QLineEdit" name="txt_regeneration_interval">
+            <widget class="QLineEdit" name="txt_6_regeneration_interval">
              <property name="text">
               <string>0</string>
              </property>
@@ -558,14 +558,14 @@
           </attribute>
           <layout class="QGridLayout" name="gridLayout_9">
            <item row="2" column="1">
-            <widget class="QLineEdit" name="txt_seepage_rate">
+            <widget class="QLineEdit" name="txt_3_seepage_rate">
              <property name="text">
               <string>0.5</string>
              </property>
             </widget>
            </item>
            <item row="3" column="1">
-            <widget class="QLineEdit" name="txt_clogging_factor_storage">
+            <widget class="QLineEdit" name="txt_4_clogging_factor_storage">
              <property name="text">
               <string>0</string>
              </property>
@@ -582,14 +582,14 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLineEdit" name="txt_thickness_storage">
+            <widget class="QLineEdit" name="txt_1_thickness_storage">
              <property name="text">
               <string>0</string>
              </property>
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLineEdit" name="txt_void_ratio_storage">
+            <widget class="QLineEdit" name="txt_2_void_ratio_storage">
              <property name="text">
               <string>0.75</string>
              </property>
@@ -679,7 +679,7 @@
             </widget>
            </item>
            <item row="2" column="2">
-            <widget class="QLineEdit" name="txt_offset">
+            <widget class="QLineEdit" name="txt_3_offset">
              <property name="text">
               <string>6</string>
              </property>
@@ -696,28 +696,28 @@
             </widget>
            </item>
            <item row="0" column="2">
-            <widget class="QLineEdit" name="txt_flow_coefficient">
+            <widget class="QLineEdit" name="txt_1_flow_coefficient">
              <property name="text">
               <string>0</string>
              </property>
             </widget>
            </item>
            <item row="1" column="2">
-            <widget class="QLineEdit" name="txt_flow_exponent">
+            <widget class="QLineEdit" name="txt_2_flow_exponent">
              <property name="text">
               <string>0.5</string>
              </property>
             </widget>
            </item>
            <item row="5" column="2">
-            <widget class="QLineEdit" name="txt_closed_level">
+            <widget class="QLineEdit" name="txt_6_closed_level">
              <property name="text">
               <string>0</string>
              </property>
             </widget>
            </item>
            <item row="6" column="1" colspan="2">
-            <widget class="QComboBox" name="cmb_control_curve">
+            <widget class="QComboBox" name="txt_7_cmb_control_curve">
              <property name="editable">
               <bool>false</bool>
              </property>
@@ -744,14 +744,14 @@
             </widget>
            </item>
            <item row="3" column="2">
-            <widget class="QLineEdit" name="txt_drain_delay">
+            <widget class="QLineEdit" name="txt_4_drain_delay">
              <property name="text">
               <string>6</string>
              </property>
             </widget>
            </item>
            <item row="4" column="2">
-            <widget class="QLineEdit" name="txt_open_level">
+            <widget class="QLineEdit" name="txt_5_open_level">
              <property name="text">
               <string>0</string>
              </property>
@@ -801,21 +801,21 @@
           </attribute>
           <layout class="QGridLayout" name="gridLayout_11">
            <item row="1" column="1">
-            <widget class="QLineEdit" name="txt_void_fraction">
+            <widget class="QLineEdit" name="txt_2_void_fraction">
              <property name="text">
               <string>0.5</string>
              </property>
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QLineEdit" name="txt_roughness">
+            <widget class="QLineEdit" name="txt_3_roughness">
              <property name="text">
               <string>0.1</string>
              </property>
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLineEdit" name="txt_thickness_drainage">
+            <widget class="QLineEdit" name="txt_1_thickness_drainage">
              <property name="text">
               <string>3</string>
              </property>

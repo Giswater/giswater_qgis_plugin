@@ -155,7 +155,7 @@ class GwWorkspaceManagerButton(GwAction):
         action = "INFO"
         extras = f'"action":"{action}", "id":"{workspace_id}"'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
+        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
 
         if result and result['status'] == "Accepted":
             tools_gw.fill_tab_log(self.dlg_workspace_manager, result['body']['data'],
@@ -180,7 +180,7 @@ class GwWorkspaceManagerButton(GwAction):
 
         extras = f'"action":"{action}", "name":"{name}", "descript":{descript}, "private":"{private}"'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
+        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
 
         if result and result['status'] == "Accepted":
             tools_gw.fill_tab_log(self.dlg_create_workspace, result['body']['data'])
@@ -206,7 +206,7 @@ class GwWorkspaceManagerButton(GwAction):
 
         extras = f'"action":"{action}", "id": "{value}"'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
+        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
 
         if result and result['status'] == "Accepted":
             # Set labels
@@ -245,7 +245,7 @@ class GwWorkspaceManagerButton(GwAction):
 
         extras = f'"action":"{action}", "id": "{value}"'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
+        result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
 
         if result and result['status'] == "Accepted":
             message = result.get('message')
@@ -275,7 +275,7 @@ class GwWorkspaceManagerButton(GwAction):
         if answer:
             extras = f'"action":"{action}", "id": "{value}"'
             body = tools_gw.create_body(extras=extras)
-            result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
+            result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
 
             if result and result['status'] == "Accepted":
                 message = result.get('message')
@@ -311,7 +311,7 @@ class GwWorkspaceManagerButton(GwAction):
         if answer:
             extras = f'"action":"{action}", "id": "{value}"'
             body = tools_gw.create_body(extras=extras)
-            result = tools_gw.execute_procedure('gw_fct_workspacemanager', body, log_sql=True)
+            result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
 
             if result and result['status'] == "Accepted":
                 message = result.get('message')

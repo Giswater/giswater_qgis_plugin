@@ -385,7 +385,7 @@ class GwInfoCatalogUi(GwMainWindow, FORM_CLASS):
     pass
 
 FORM_CLASS = _get_ui_class('info_generic.ui')
-class GwInfoGenericUi(GwDialog, FORM_CLASS):
+class GwInfoGenericUi(GwMainWindow, FORM_CLASS):
     pass
 
 FORM_CLASS = _get_ui_class('info_workcat.ui')

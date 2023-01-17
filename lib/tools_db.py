@@ -143,6 +143,16 @@ def check_postgis_version():
         return False
 
 
+def check_pg_extension(extension):
+
+    sql = f"SELECT name FROM pg_available_extensions WHERE name = '{extension}'"
+    row = get_row(sql)
+    if row:
+        return row[0]
+    else:
+        return False
+
+
 def get_current_user():
     """ Get current user connected to database """
 
@@ -217,12 +227,13 @@ def check_db_connection():
 
     opened = True
     try:
-        opened = global_vars.qgis_db_credentials.isOpen()
-        if not opened:
+        was_closed = global_vars.dao.check_connection()
+        if was_closed:
+            tools_log.log_warning(f"Database connection was closed and reconnected")
             opened = global_vars.qgis_db_credentials.open()
             if not opened:
-                details = global_vars.qgis_db_credentials.lastError().databaseText()
-                tools_log.log_warning(f"check_db_connection not opened: {details}")
+                msg = global_vars.qgis_db_credentials.lastError().databaseText()
+                tools_log.log_warning(f"Database connection error (QSqlDatabase): {msg}")
     except Exception as e:
         tools_log.log_warning(f"check_db_connection Exception: {e}")
     finally:

@@ -33,7 +33,7 @@ class GwCatalog:
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{child_type}"'
         body = tools_gw.create_body(form, feature)
-        json_result = tools_gw.execute_procedure('gw_fct_getcatalog', body, log_sql=True)
+        json_result = tools_gw.execute_procedure('gw_fct_getcatalog', body)
         if json_result is None:
             return
 
@@ -118,7 +118,7 @@ class GwCatalog:
             extras = f'"fields":{{"matcat_id":"{matcat_id_value}", "shape":"{pn_value}", "geom1":"{dn_value}"}}'
 
         body = tools_gw.create_body(form=form, feature=feature, extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_getcatalog', body, log_sql=True)
+        json_result = tools_gw.execute_procedure('gw_fct_getcatalog', body)
         if json_result is None:
             return
 
@@ -142,7 +142,7 @@ class GwCatalog:
         feature = f'"feature_type":"{child_type}"'
         extras = f'"fields":{{"matcat_id":"{matcat_id_value}"}}'
         body = tools_gw.create_body(form=form, feature=feature, extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_getcatalog', body, log_sql=True)
+        json_result = tools_gw.execute_procedure('gw_fct_getcatalog', body)
         if json_result is None:
             return
 

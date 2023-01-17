@@ -10,7 +10,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTabWidget,\
-    QWidget, QApplication, QDockWidget
+    QWidget, QApplication, QDockWidget, QToolButton, QAction
 
 from ..ui.ui_manager import GwSelectorUi
 from ..utils import tools_gw
@@ -21,7 +21,8 @@ from ...lib import tools_qgis, tools_qt, tools_os, tools_db
 class GwSelector:
 
     def __init__(self):
-        pass
+        self.checkall = False
+        self.help_button = None
 
 
     def open_selector(self, selector_type="selector_basic", reload_dlg=None):
@@ -62,6 +63,7 @@ class GwSelector:
             # Set shortcut keys
             dlg_selector.key_escape.connect(partial(tools_gw.close_dialog, dlg_selector))
 
+        # Manage tab focus
         dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(self._set_focus, dlg_selector))
         # Save the name of current tab used by the user
         dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(
@@ -111,10 +113,11 @@ class GwSelector:
             selector_type = selector_type.strip('"')
         # Built querytext
         form = f'"currentTab":"{current_tab}"'
-        extras = f'"selectorType":"{selector_type}", "filterText":"{text_filter}"'
+        extras = f'"selectorType":"{selector_type}", "filterText":"{text_filter}",'
         if aux_params:
             tools_gw.set_config_parser("selector_mincut", f"aux_params", f"{aux_params}", "user", "session")
-            extras = f"{extras}, {aux_params}"
+            extras = f"{extras}, {aux_params}, "
+        extras += f'"addSchema":"{global_vars.project_vars["add_schema"]}"'
         body = tools_gw.create_body(form=form, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
 
@@ -129,16 +132,19 @@ class GwSelector:
             # Color selectors zebra-styled
             color_rows = tools_os.set_boolean(stylesheet.get('rowsColor'), False)
 
+        selection_modes = {}
         for form_tab in json_result['body']['form']['formTabs']:
 
-            if filter and form_tab['tabName'] != str(current_tab):
+            tab_name = form_tab['tabName']
+            if filter and tab_name != str(current_tab):
                 continue
 
             selection_mode = form_tab['selectionMode']
+            selection_modes[tab_name] = selection_mode
 
             # Create one tab for each form_tab and add to QTabWidget
             tab_widget = QWidget(main_tab)
-            tab_widget.setObjectName(form_tab['tabName'])
+            tab_widget.setObjectName(tab_name)
             tab_widget.setProperty('selector_type', form_tab['selectorType'])
             if filter:
                 main_tab.removeTab(index)
@@ -151,7 +157,7 @@ class GwSelector:
 
             # Create a new QGridLayout and put it into tab
             gridlayout = QGridLayout()
-            gridlayout.setObjectName("lyt" + form_tab['tabName'])
+            gridlayout.setObjectName("lyt" + tab_name)
             tab_widget.setLayout(gridlayout)
             field = {}
             i = 0
@@ -160,16 +166,16 @@ class GwSelector:
                 label = QLabel()
                 label.setObjectName('lbl_filter')
                 label.setText('Filter:')
-                if tools_qt.get_widget(dialog, 'txt_filter_' + str(form_tab['tabName'])) is None:
+                if tools_qt.get_widget(dialog, 'txt_filter_' + str(tab_name)) is None:
                     widget = QLineEdit()
-                    widget.setObjectName('txt_filter_' + str(form_tab['tabName']))
+                    widget.setObjectName('txt_filter_' + str(tab_name))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                     widget.textChanged.connect(partial(self.get_selector, dialog, selector_type, filter=True,
                                                        widget=widget, current_tab=current_tab))
                     widget.setLayoutDirection(Qt.RightToLeft)
 
                 else:
-                    widget = tools_qt.get_widget(dialog, 'txt_filter_' + str(form_tab['tabName']))
+                    widget = tools_qt.get_widget(dialog, 'txt_filter_' + str(tab_name))
 
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = i
@@ -178,24 +184,31 @@ class GwSelector:
                 gridlayout.addWidget(widget, int(field['layoutorder']), 2)
                 widget.setFocus()
 
-            if 'manageAll' in form_tab:
-                if (form_tab['manageAll']).lower() == 'true':
-                    if tools_qt.get_widget(dialog, f"chk_all_{form_tab['tabName']}") is None:
-                        widget = QCheckBox()
-                        widget.setObjectName('chk_all_' + str(form_tab['tabName']))
-                        widget.stateChanged.connect(partial(self._manage_all, dialog, widget))
-                        widget.setLayoutDirection(Qt.LeftToRight)
-                    else:
-                        widget = tools_qt.get_widget(dialog, f"chk_all_{form_tab['tabName']}")
-                    widget.setText('Check all')
-                    if hasattr(self, 'checkall'):
-                        widget.stateChanged.disconnect()
-                        widget.setChecked(self.checkall)
-                        widget.stateChanged.connect(partial(self._manage_all, dialog, widget))
-                    field['layoutname'] = gridlayout.objectName()
-                    field['layoutorder'] = i
-                    i = i + 1
-                    gridlayout.addWidget(widget, int(field['layoutorder']), 0, 1, -1)
+            if 'manageAll' in form_tab and (form_tab['manageAll']).lower() == 'true':
+                # Check check_all if all selectors are checked
+                self.checkall = True
+                for field in form_tab['fields']:
+                    if not tools_os.set_boolean(field.get('value'), default=False):
+                        self.checkall = False
+
+                if tools_qt.get_widget(dialog, f"chk_all_{tab_name}") is None:
+                    widget = QCheckBox()
+                    widget.setObjectName('chk_all_' + str(tab_name))
+                    widget.stateChanged.connect(partial(self._manage_all, dialog, widget))
+                    widget.setLayoutDirection(Qt.LeftToRight)
+                    chk_all_tooltip = "Shift+Click to uncheck all"
+                    widget.setToolTip(chk_all_tooltip)
+                else:
+                    widget = tools_qt.get_widget(dialog, f"chk_all_{tab_name}")
+                widget.setText('Check all')
+                if self.checkall is not None:
+                    widget.blockSignals(True)
+                    widget.setChecked(self.checkall)
+                    widget.blockSignals(False)
+                field['layoutname'] = gridlayout.objectName()
+                field['layoutorder'] = i
+                i = i + 1
+                gridlayout.addWidget(widget, int(field['layoutorder']), 0, 1, -1)
 
             for order, field in enumerate(form_tab['fields']):
                 try:
@@ -221,6 +234,19 @@ class GwSelector:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
 
+        # Add help button
+        if self.help_button is None:
+            self.help_button = QToolButton(None)
+            style = "border: none;"
+            tools_qt.set_stylesheet(self.help_button, style)
+            help_icon = tools_gw.add_icon(self.help_button, '73', sub_folder='24x24')
+            action = QAction(help_icon, "Help")
+            action.triggered.connect(partial(self._show_help, dialog, selection_modes))
+            self.help_button.setDefaultAction(action)
+            main_tab.setCornerWidget(self.help_button)
+        else:
+            main_tab.cornerWidget().setHidden(False)
+
         # Set last tab used by user as current tab
         tabname = json_result['body']['form']['currentTab']
         tab = main_tab.findChild(QWidget, tabname)
@@ -229,6 +255,26 @@ class GwSelector:
             main_tab.setCurrentWidget(tab)
 
     # region private functions
+
+    def _show_help(self, dialog, selection_modes):
+        """
+        Show help dialog depending on current tab's selection mode
+            :param dialog:
+        """
+        index = dialog.main_tab.currentIndex()
+        tab_name = dialog.main_tab.widget(index).objectName()
+        selection_mode = selection_modes[tab_name]
+
+        msg = "Clicking an item will check/uncheck it. "
+        if selection_mode == 'keepPrevious':
+            msg += "Checking any item will not uncheck any other item.\n"
+        elif selection_mode == 'keepPreviousUsingShift':
+            msg += "Checking any item will uncheck all other items unless Shift is pressed.\n"
+        elif selection_mode == 'removePrevious':
+            msg += "Checking any item will uncheck all other items.\n"
+        msg += f"This behaviour can be configured in the table 'config_param_system' (parameter = 'basic_selector_{tab_name}')."
+        tools_qt.show_info_box(msg, "Selector help")
+
 
     def _set_selection_mode(self, dialog, widget, selection_mode):
         """
@@ -263,7 +309,7 @@ class GwSelector:
         self._set_selector(dialog, widget, is_alone, disable_parent)
 
 
-    def _set_selector(self, dialog, widget, is_alone, disable_parent):
+    def _set_selector(self, dialog, widget, is_alone, disable_parent, check_all_override=None):
         """
         Send values to DB and reload selectors
             :param dialog: QDialog
@@ -279,14 +325,14 @@ class GwSelector:
         widget_all = dialog.findChild(QCheckBox, f'chk_all_{tab_name}')
 
         if widget_all is None or (widget_all is not None and widget.objectName() != widget_all.objectName()):
-            self.checkall = False
             extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "id":"{widget.objectName()}", '
                       f'"isAlone":"{is_alone}", "disableParent":"{disable_parent}", '
                       f'"value":"{tools_qt.is_checked(dialog, widget)}", '
                       f'"addSchema":"{qgis_project_add_schema}"')
         else:
             check_all = tools_qt.is_checked(dialog, widget_all)
-            self.checkall = check_all
+            if check_all_override is not None:
+                check_all = check_all_override
             extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "checkAll":"{check_all}", '
                       f'"addSchema":"{qgis_project_add_schema}"')
 
@@ -376,9 +422,11 @@ class GwSelector:
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
         disable_parent = False
         key_modifier = QApplication.keyboardModifiers()
+        override = None
 
         if key_modifier == Qt.ShiftModifier:
-            disable_parent = True
+            status = False
+            override = False
 
         for widget in widget_list:
             if widget_all is not None:
@@ -388,6 +436,6 @@ class GwSelector:
             tools_qt.set_checked(dialog, widget, status)
             widget.blockSignals(False)
 
-        self._set_selector(dialog, widget_all, False, disable_parent)
+        self._set_selector(dialog, widget_all, False, disable_parent, check_all_override=override)
 
     # endregion

@@ -5,17 +5,37 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import matplotlib
+import subprocess
+from ...lib import tools_qt
 
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-from matplotlib.figure import Figure
+try:
+    import matplotlib
+    from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+    from matplotlib.figure import Figure
 
-matplotlib.use('Qt5Agg')
+    matplotlib.use('Qt5Agg')
+
+except ImportError:
+    matplotlib = None
+    FigureCanvasQTAgg = None
+    Figure = None
+    if tools_qt.show_question("Matplotlib Python package not found. Do you want to install Matplotlib?"):
+        subprocess.run(["python", "-m", "ensurepip"])
+        install_matplotlib = subprocess.run(['python', '-m', 'pip', 'install', '-U', 'matplotlib'])
+        if install_matplotlib.returncode:
+            tools_qt.show_info_box(
+                "Matplotlib cannot be installed automatically. Please install Matplotlib manually."
+            )
+        else:
+            tools_qt.show_info_box("Matplotlib installed successfully. Please restart QGIS.")
+
 
 
 class MplCanvas(FigureCanvasQTAgg):
 
     def __init__(self, parent=None, width=5, height=4, dpi=100):
+        if not Figure:
+            return
         fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = fig.add_subplot(111)
         super(MplCanvas, self).__init__(fig)

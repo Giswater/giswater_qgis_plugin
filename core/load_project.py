@@ -191,6 +191,9 @@ class GwLoadProject(QObject):
             tools_log.log_warning(message)
             tools_qgis.show_warning(message)
 
+        # Reset dialogs position
+        tools_gw.reset_position_dialog()
+
         # Manage compatibility version of Giswater
         self._check_version_compatibility()
 
@@ -252,9 +255,22 @@ class GwLoadProject(QObject):
         layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
         layer_connec = tools_qgis.get_layer_by_tablename("v_edit_connec")
         if (self.layer_node, layer_arc, layer_connec) == (None, None, None):  # If no gw layers are present
+            return False
+
+        # Check missing layers
+        missing_layers = {}
+        if self.layer_node is None:
+            missing_layers['v_edit_node'] = True
+        if layer_arc is None:
+            missing_layers['v_edit_arc'] = True
+        if layer_connec is None:
+            missing_layers['v_edit_connec'] = True
+
+        # Show message if layers are missing
+        if missing_layers:
             if show_warning:
                 title = "Giswater plugin cannot be loaded"
-                msg = "QGIS project seems to be a Giswater project, but layer 'v_edit_node' is missing"
+                msg = f"QGIS project seems to be a Giswater project, but layer(s) {[k for k,v in missing_layers.items()]} are missing"
                 tools_qgis.show_warning(msg, 20, title=title)
             return False
 
@@ -392,18 +408,18 @@ class GwLoadProject(QObject):
                     attempt = attempt + 1
 
         # Disable buttons which are project type exclusive
-        project_exclusive = None
+        project_exclude = None
         successful = False
         attempt = 0
         while not successful and attempt < 10:
-            project_exclusive = tools_gw.get_config_parser('project_exclusive', global_vars.project_type, "project", "giswater")
-            if project_exclusive not in (None, "None"):
+            project_exclude = tools_gw.get_config_parser('project_exclude', global_vars.project_type, "project", "giswater")
+            if project_exclude not in (None, "None"):
                 successful = True
             attempt = attempt + 1
 
-        if project_exclusive not in (None, 'None'):
-            project_exclusive = project_exclusive.replace(' ', '').split(',')
-            for index in project_exclusive:
+        if project_exclude not in (None, 'None'):
+            project_exclude = project_exclude.replace(' ', '').split(',')
+            for index in project_exclude:
                 self._hide_button(index)
 
         # Hide buttons from buttons_to_hide

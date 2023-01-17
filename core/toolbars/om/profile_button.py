@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import json
 import math
-import matplotlib.pyplot as plt
+import subprocess
 import os
 from collections import OrderedDict
 from decimal import Decimal
@@ -25,6 +25,20 @@ from ...utils import tools_gw
 from ...utils.snap_manager import GwSnapManager
 from ....lib import tools_qt, tools_log, tools_qgis
 from .... import global_vars
+
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    plt = None
+    if tools_qt.show_question("Matplotlib Python package not found. Do you want to install Matplotlib?"):
+        subprocess.run(["python", "-m", "ensurepip"])
+        install_matplotlib = subprocess.run(['python', '-m', 'pip', 'install', '-U', 'matplotlib'])
+        if install_matplotlib.returncode:
+            tools_qt.show_info_box(
+                "Matplotlib cannot be installed automatically. Please install Matplotlib manually."
+            )
+        else:
+            tools_qt.show_info_box("Matplotlib installed successfully. Please restart QGIS.")
 
 
 class GwNodeData:
@@ -153,7 +167,10 @@ class GwProfileButton(GwAction):
 
     def _activate_add_points(self, activate=True):
         self.add_points = activate
-
+        if not activate:
+            self.add_points_list.clear()
+            self.add_points_list = []
+            self.endNode = None
 
     def _get_profile(self):
 
@@ -401,61 +418,76 @@ class GwProfileButton(GwAction):
                     message = f"Node 1 selected"
                     tools_qgis.show_info(message, parameter=element_id)
                 else:
-                    if self.add_points:
-                        self.add_points_list.append(element_id)
+                    if self.element_id == self.initNode or self.element_id == self.endNode \
+                            or self.element_id in self.add_points_list:
+                        tools_qgis.show_warning(f"Node already selected: {element_id}")
+                        if not self.add_points:
+                            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+                            tools_gw.disconnect_signal('profile')
+                            self.dlg_draw_profile.btn_save_profile.setEnabled(False)
+                            self.dlg_draw_profile.btn_draw_profile.setEnabled(False)
+                            self.action_add_point.setDisabled(True)
+                            # Clear old list arcs
+                            self.dlg_draw_profile.tbl_list_arc.clear()
+
+                            self._remove_selection()
                     else:
-                        self.endNode = element_id
-                    tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-                    tools_gw.disconnect_signal('profile')
-                    self.dlg_draw_profile.btn_draw_profile.setEnabled(True)
-                    self.dlg_draw_profile.btn_save_profile.setEnabled(True)
+                        if self.add_points:
+                            self.add_points_list.append(element_id)
+                        else:
+                            self.endNode = element_id
+                        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+                        tools_gw.disconnect_signal('profile')
+                        self.dlg_draw_profile.btn_draw_profile.setEnabled(True)
+                        self.dlg_draw_profile.btn_save_profile.setEnabled(True)
 
-                    # Clear old list arcs
-                    self.dlg_draw_profile.tbl_list_arc.clear()
+                        # Clear old list arcs
+                        self.dlg_draw_profile.tbl_list_arc.clear()
 
-                    # Populate list arcs
-                    extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}"'
-                    if self.add_points and self.add_points_list:
-                        l = str(self.add_points_list).replace("'", "")
-                        extras += f', "midNodes":{l}'
-                    body = tools_gw.create_body(extras=extras)
-                    result = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
-                    if result is None or result['status'] == 'Failed':
-                        return
-                    self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
-
-                    # Manage level and message from query result
-                    if result['message']:
-                        level = int(result['message']['level'])
-                        tools_qgis.show_message(result['message']['text'], level)
-                        if result['message']['level'] != 3:
-                            # If error reset profile
-                            self._clear_profile()
+                        # Populate list arcs
+                        extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}"'
+                        if self.add_points and self.add_points_list:
+                            l = str(self.add_points_list).replace("'", "")
+                            extras += f', "midNodes":{l}'
+                        body = tools_gw.create_body(extras=extras)
+                        result = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
+                        if result is None or result['status'] == 'Failed':
                             return
+                        self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
 
-                    self._remove_selection()
-                    list_arcs = []
-                    for arc in result['body']['data']['arc']:
-                        item_arc = QListWidgetItem(str(arc['arc_id']))
-                        self.dlg_draw_profile.tbl_list_arc.addItem(item_arc)
-                        list_arcs.append(arc['arc_id'])
+                        # Manage level and message from query result
+                        if result['message']:
+                            level = int(result['message']['level'])
+                            tools_qgis.show_message(result['message']['text'], level)
+                            if result['message']['level'] != 3:
+                                # If error reset profile
+                                self._clear_profile()
+                                return
 
-                    expr_filter = "\"arc_id\" IN ("
-                    for arc in result['body']['data']['arc']:
-                        expr_filter += f"'{arc['arc_id']}', "
-                    expr_filter = expr_filter[:-2] + ")"
-                    expr = QgsExpression(expr_filter)
-                    # Get a featureIterator from this expression:
-                    it = self.layer_arc.getFeatures(QgsFeatureRequest(expr))
+                        self._remove_selection()
+                        list_arcs = []
+                        for arc in result['body']['data']['arc']:
+                            item_arc = QListWidgetItem(str(arc['arc_id']))
+                            self.dlg_draw_profile.tbl_list_arc.addItem(item_arc)
+                            list_arcs.append(arc['arc_id'])
 
-                    self.id_list = [i.id() for i in it]
-                    self.layer_arc.selectByIds(self.id_list)
+                        expr_filter = "\"arc_id\" IN ("
+                        for arc in result['body']['data']['arc']:
+                            expr_filter += f"'{arc['arc_id']}', "
+                        expr_filter = expr_filter[:-2] + ")"
+                        expr = QgsExpression(expr_filter)
+                        # Get a featureIterator from this expression:
+                        it = self.layer_arc.getFeatures(QgsFeatureRequest(expr))
+
+                        self.id_list = [i.id() for i in it]
+                        self.layer_arc.selectByIds(self.id_list)
+
+                        self.action_add_point.setDisabled(False)
 
                     # Next profile will be done from scratch
                     self.first_node = True
                     if self.add_points:
                         self.add_points = False
-                    self.action_add_point.setDisabled(False)
 
 
     def _action_pan(self):

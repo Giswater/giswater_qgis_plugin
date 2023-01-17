@@ -19,6 +19,7 @@ class GwToolBoxTask(GwTask):
     """ This shows how to subclass QgsTask """
 
     fake_progress = pyqtSignal()
+    finished_execute = pyqtSignal(bool)
 
     def __init__(self, toolbox, description, dialog, combo, result, timer=None):
 
@@ -138,23 +139,28 @@ class GwToolBoxTask(GwTask):
         if widget_is_void:
             message = "This param is mandatory. Please, set a value"
             tools_log.log_info(message, parameter='')
+            self.finished_execute.emit(False)
             return False
 
         if len(widget_list) > 0:
             extras = extras[:-2]
         extras += '}'
         self.body = tools_gw.create_body(feature=feature_field, extras=extras)
-        tools_log.log_info(f"Task 'Toolbox execute' execute procedure '{self.function_name}' with parameters: '{self.body}', 'log_sql=True', 'aux_conn={self.aux_conn}', 'is_thread=True'")
-        self.json_result = tools_gw.execute_procedure(self.function_name, self.body, log_sql=True,
+        tools_log.log_info(f"Task 'Toolbox execute' execute procedure '{self.function_name}' with parameters: '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+        self.json_result = tools_gw.execute_procedure(self.function_name, self.body,
                                                       aux_conn=self.aux_conn, is_thread=True)
 
         if self.isCanceled():
+            self.finished_execute.emit(False)
             return False
         if self.json_result['status'] == 'Failed':
+            self.finished_execute.emit(False)
             return False
         if not self.json_result or self.json_result is None:
+            self.finished_execute.emit(False)
             return False
 
+        self.finished_execute.emit(True)
         return True
 
 

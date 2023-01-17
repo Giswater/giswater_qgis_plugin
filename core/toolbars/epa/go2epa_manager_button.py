@@ -44,9 +44,12 @@ class GwGo2EpaManagerButton(GwAction):
         reg_exp = QRegExp("^[A-Za-z0-9_]{1,16}$")
         self.dlg_manager.txt_result_id.setValidator(QRegExpValidator(reg_exp))
         self.dlg_manager.txt_infolog.setReadOnly(True)
+        self.dlg_manager.btn_set_corporate.setEnabled(False)
+        if self.project_type != 'ws':
+            self.dlg_manager.btn_set_corporate.setVisible(False)
 
         # Fill combo box and table view
-        self._fill_combo_result_id()
+        # self._fill_combo_result_id()
         self.dlg_manager.tbl_rpt_cat_result.setSelectionBehavior(QAbstractItemView.SelectRows)
         self._fill_manager_table()
         model = self.dlg_manager.tbl_rpt_cat_result.model()
@@ -54,13 +57,16 @@ class GwGo2EpaManagerButton(GwAction):
         model.flags = lambda index: self.flags(index, model)
 
         # Set signals
+        self.dlg_manager.btn_set_corporate.clicked.connect(partial(self._epa2data, self.dlg_manager.tbl_rpt_cat_result,
+                                                              'result_id'))
         self.dlg_manager.btn_delete.clicked.connect(partial(self._multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result,
                                                             'v_ui_rpt_cat_result', 'result_id'))
         selection_model = self.dlg_manager.tbl_rpt_cat_result.selectionModel()
         selection_model.selectionChanged.connect(partial(self._fill_txt_infolog))
+        selection_model.selectionChanged.connect(partial(self._enable_btn_corporate))
         self.dlg_manager.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_manager))
         self.dlg_manager.rejected.connect(partial(tools_gw.close_dialog, self.dlg_manager))
-        self.dlg_manager.txt_result_id.editTextChanged.connect(partial(self._fill_manager_table))
+        self.dlg_manager.txt_result_id.textChanged.connect(partial(self._fill_manager_table))
 
         # Open form
         tools_gw.open_dialog(self.dlg_manager, dlg_name='go2epa_manager')
@@ -97,7 +103,7 @@ class GwGo2EpaManagerButton(GwAction):
         feature = f'"tableName":"{table_name}"'
         filter_fields = f'"limit": -1'
         if filter_id:
-            filter_fields += f', "result_id": {{"filterSign":"=", "value":"{filter_id}"}}'
+            filter_fields += f', "result_id": {{"filterSign":"ILIKE", "value":"{filter_id}"}}'
         body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
         json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
         if json_result is None or json_result['status'] == 'Failed':
@@ -146,33 +152,54 @@ class GwGo2EpaManagerButton(GwAction):
 
         msg = ""
 
-        # Get column index for column export_options
-        col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'export_options')
-        export_options = json.loads(f'{row[col_ind].data()}')
+        try:
+            # Get column index for column export_options
+            col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'export_options')
+            export_options = json.loads(f'{row[col_ind].data()}')
 
-        # Get column index for column network_stats
-        col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'network_stats')
-        network_stats = json.loads(f'{row[col_ind].data()}')
+            # Construct message with all data rows
+            msg += f"<b>Export Options: </b> <br>"
+            for text in export_options:
+                msg += f"{text} : {export_options[text]} <br>"
+        except Exception:
+            pass
 
-        # Get column index for column inp_options
-        col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'inp_options')
-        inp_options = json.loads(f'{row[col_ind].data()}')
+        try:
+            # Get column index for column network_stats
+            col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'network_stats')
+            network_stats = json.loads(f'{row[col_ind].data()}')
 
-        # Construct message with all data rows
-        msg += f"<b>Export Options: </b> <br>"
-        for text in export_options:
-            msg += f"{text} : {export_options[text]} <br>"
+            msg += f" <br> <b>Network Status: </b> <br>"
+            for text in network_stats:
+                msg += f"{text} : {network_stats[text]} <br>"
+        except Exception:
+            pass
 
-        msg += f" <br> <b>Network Status: </b> <br>"
-        for text in network_stats:
-            msg += f"{text} : {network_stats[text]} <br>"
+        try:
+            # Get column index for column inp_options
+            col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'inp_options')
+            inp_options = json.loads(f'{row[col_ind].data()}')
 
-        msg += f" <br> <b>Inp Options: </b> <br>"
-        for text in inp_options:
-            msg += f"{text} : {inp_options[text]} <br>"
+            msg += f" <br> <b>Inp Options: </b> <br>"
+            for text in inp_options:
+                msg += f"{text} : {inp_options[text]} <br>"
+        except Exception:
+            pass
 
         # Set message text into widget
         tools_qt.set_widget_text(self.dlg_manager, 'txt_infolog', msg)
+
+
+    def _enable_btn_corporate(self, selected):
+        valid = True
+        for idx, index in enumerate(self.dlg_manager.tbl_rpt_cat_result.selectionModel().selectedRows()):
+            col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'rpt_stats')
+            row = index.row()
+            status = index.sibling(row, col_idx).data()
+            if not status:
+                valid = False
+
+        self.dlg_manager.btn_set_corporate.setEnabled(valid)
 
 
     def _fill_combo_result_id(self):
@@ -231,5 +258,42 @@ class GwGo2EpaManagerButton(GwAction):
             sql += f" WHERE {column_id} IN ({list_id})"
             tools_db.execute_sql(sql)
             self._fill_manager_table(self.dlg_manager.txt_result_id.currentText())
+
+
+    def _epa2data(self, widget, column_id):
+        """ Delete selected elements of the table
+                :param QTableView widget: origin
+                :param table_name: table origin
+                :param column_id: Refers to the id of the source table
+                """
+
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.dlg_manager)
+            return
+
+        msg = ("You are going to make this result corporate. From now on the result values will appear on feature form. "
+               "Do you want to continue?")
+        answer = tools_qt.show_question(msg)
+        if not answer:
+            return
+
+        result_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            col = tools_qt.get_col_index_by_col_name(widget, str(column_id))
+            result_id = widget.model().index(row, col).data()
+
+        extras = f'"resultId":"{result_id}"'
+        body = tools_gw.create_body(extras=extras)
+        result = tools_gw.execute_procedure('gw_fct_epa2data', body)
+        if not result or result.get('status') != 'Accepted':
+            message = "Epa2data execution failed. See logs for more details..."
+            tools_qgis.show_warning(message, dialog=self.dlg_manager)
+            return
+        message = "Epa2data execution successful."
+        tools_qgis.show_info(message, dialog=self.dlg_manager)
 
     # endregion

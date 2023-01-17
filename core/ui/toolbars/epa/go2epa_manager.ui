@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>784</width>
+    <width>843</width>
     <height>786</height>
    </rect>
   </property>
@@ -57,27 +57,7 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="1">
-       <widget class="QComboBox" name="txt_result_id">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="editable">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="lbl_result_id">
-        <property name="text">
-         <string>Filter by: Result id</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3">
+      <item row="1" column="4">
        <widget class="QPushButton" name="btn_delete">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -103,14 +83,28 @@
         </property>
        </spacer>
       </item>
-      <item row="4" column="3">
+      <item row="1" column="0">
+       <widget class="QLabel" name="lbl_result_id">
+        <property name="text">
+         <string>Filter by: Result id</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="4">
        <widget class="QPushButton" name="btn_close">
         <property name="text">
          <string>Close</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="4">
+      <item row="1" column="3">
+       <widget class="QPushButton" name="btn_set_corporate">
+        <property name="text">
+         <string>Set corporate</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="5">
        <widget class="QTableView" name="tbl_rpt_cat_result">
         <property name="sortingEnabled">
          <bool>true</bool>
@@ -129,6 +123,16 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="txt_result_id">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

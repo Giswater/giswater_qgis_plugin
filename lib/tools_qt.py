@@ -18,7 +18,7 @@ from warnings import warn
 
 from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal,\
     QPersistentModelIndex, QCoreApplication, QTranslator, QEvent
-from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QTextCharFormat, QFont
+from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QTextCharFormat, QFont, QIcon
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, \
     QDateEdit, QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, \
@@ -211,6 +211,12 @@ def get_text(dialog, widget, add_quote=False, return_string_null=True):
             text = widget.toPlainText()
         elif type(widget) is QComboBox:
             text = widget.currentText()
+        elif type(widget) is QCheckBox:
+            value = is_checked(dialog, widget)
+            if type(value) is bool:
+                text = str(text)
+            else:
+                text = None
 
         if not text and return_string_null:
             text = "null"
@@ -262,7 +268,13 @@ def is_checked(dialog, widget):
             widget = dialog.findChild(QRadioButton, widget)
     checked = False
     if widget:
-        checked = widget.isChecked()
+        state = widget.checkState()
+        if state == 0:
+            checked = False
+        elif state == 1:
+            checked = None
+        elif state == 2:
+            checked = True
     return checked
 
 
@@ -967,7 +979,7 @@ def show_warning_open_file(text, inf_text, file_path, context_name=None):
     iface.messageBar().pushWidget(widget, 1)
 
 
-def show_question(text, title=None, inf_text=None, context_name=None, parameter=None, force_action=False):
+def show_question(text, title="Info", inf_text=None, context_name=None, parameter=None, force_action=False):
     """ Ask question to the user """
 
     # Expert mode does not ask and accept all actions
@@ -993,6 +1005,13 @@ def show_question(text, title=None, inf_text=None, context_name=None, parameter=
     msg_box.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
     msg_box.setDefaultButton(QMessageBox.Ok)
     msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
+
+    # Set window icon
+    icon_folder = f"{global_vars.plugin_dir}{os.sep}icons"
+    icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}giswater.png"
+    giswater_icon = QIcon(icon_path)
+    msg_box.setWindowIcon(giswater_icon)
+
     ret = msg_box.exec_()
     if ret == QMessageBox.Ok:
         return True

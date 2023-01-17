@@ -241,7 +241,7 @@ class GwInfoButton(GwMaptool):
 
         # If param is false don't create thread
         if not thread:
-            tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
+            tools_gw.execute_procedure('gw_fct_setfields', body)
             tools_qgis.refresh_map_canvas()
             return
 

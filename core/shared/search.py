@@ -540,8 +540,8 @@ class GwSearch:
         tools_gw.load_settings(self.hydro_info_dlg)
 
         self.hydro_info_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
-        self.hydro_info_dlg.rejected.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
-        self.hydro_info_dlg.rejected.connect(self._reset_rubber_band)
+        self.hydro_info_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
+        self.hydro_info_dlg.dlg_closed.connect(self._reset_rubber_band)
         tools_gw.build_dialog_info(self.hydro_info_dlg, result)
         tools_gw.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
 
@@ -665,7 +665,8 @@ class GwSearch:
 
         current_tab = tools_gw.get_config_parser('dialogs_tab', 'selector_basic', "user", "session")
         form = f'"currentTab":"{current_tab}"'
-        extras = f'"selectorType":"selector_basic", "filterText":""'
+        extras = f'"selectorType":"selector_basic", "filterText":"", '
+        extras += f'"addSchema":"{global_vars.project_vars["add_schema"]}"'
         body = tools_gw.create_body(form=form, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
         return json_result

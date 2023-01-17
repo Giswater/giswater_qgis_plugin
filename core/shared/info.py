@@ -140,9 +140,11 @@ class GwInfo(QObject):
             elif tab_type == 'data':
                 extras = '"toolBar":"basic"'
 
-
             function_name = None
             body = None
+
+            # Check database connection
+            tools_db.check_db_connection()
 
             # Insert new feature
             if point and feature_cat:
@@ -264,6 +266,8 @@ class GwInfo(QObject):
         dialog = kwargs['dialog']
         widget = kwargs['widget']
         feature_id = tools_qt.get_text(dialog, widget)
+        if widget.property('value') not in (None, ''):
+            feature_id = widget.property('value')
         self.customForm = GwInfo(self.tab_type)
         complet_result, dialog = self.customForm.open_form(table_name='v_edit_node', feature_id=feature_id,
                                                            tab_type=self.tab_type, is_docker=False)
@@ -340,7 +344,11 @@ class GwInfo(QObject):
                 action.setChecked(False)
                 return
         # Block the signals of de dialog so that the key ESC does not close it
-        dialog.key_escape.disconnect()
+        try:
+            dialog.key_escape.disconnect()
+        except Exception as e:
+            self._cancel_snapping_tool(dialog, action)
+            return
 
         self.vertex_marker = self.snapper_manager.vertex_marker
 
@@ -407,19 +415,62 @@ class GwInfo(QObject):
     def _open_generic_form(self, complet_result):
 
         tools_gw.draw_by_json(complet_result, self.rubber_band)
-        self.hydro_info_dlg = GwInfoGenericUi()
-        tools_gw.load_settings(self.hydro_info_dlg)
-        self.hydro_info_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
-        self.hydro_info_dlg.rejected.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
-        result = tools_gw.build_dialog_info(self.hydro_info_dlg, complet_result, self.my_json)
+        # Dialog
+        self.dlg_generic = GwInfoGenericUi()
+        tools_gw.load_settings(self.dlg_generic)
+        result = tools_gw.build_dialog_info(self.dlg_generic, complet_result, self.my_json)
+
+        # Set variables
+        self._get_features(complet_result)
+        layer = self.layer
+        fid = self.feature_id = complet_result['body']['feature']['id']
+        new_feature = False
+        can_edit = tools_os.set_boolean(tools_db.check_role_user('role_edit'))
+        if layer:
+            if layer.isEditable() and can_edit:
+                tools_gw.enable_all(self.dlg_generic, complet_result['body']['data'])
+            else:
+                tools_gw.enable_widgets(self.dlg_generic, complet_result['body']['data'], False)
+
+        # Manage actions
+        action_edit = self.dlg_generic.findChild(QAction, "actionEdit")
+        tools_gw.add_icon(action_edit, "101")
+        is_enabled = False
+        try:
+            is_enabled = complet_result['body']['feature']['permissions']['isEditable']
+        except (KeyError, TypeError):
+            try:
+                is_enabled = complet_result['body']['data']['editable']
+            except (KeyError, TypeError):
+                pass
+        finally:
+            action_edit.setEnabled(is_enabled)
+
+        action_edit.triggered.connect(partial(self._manage_edition, self.dlg_generic, action_edit, fid, new_feature, True))
+        action_edit.setChecked(layer.isEditable() and can_edit)
+
+        # Signals
+        self.dlg_generic.btn_accept.clicked.connect(partial(
+            self._accept_from_btn, self.dlg_generic, action_edit, new_feature, self.my_json, complet_result, True
+        ))
+        self.dlg_generic.dlg_closed.connect(self._roll_back)
+        self.dlg_generic.dlg_closed.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
+        self.dlg_generic.dlg_closed.connect(self._remove_layer_selection)
+        self.dlg_generic.dlg_closed.connect(partial(tools_gw.save_settings, self.dlg_generic))
+        self.dlg_generic.dlg_closed.connect(self._reset_my_json)
+        self.dlg_generic.dlg_closed.connect(self._manage_prev_action)
+        self.dlg_generic.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_generic))
+        self.dlg_generic.btn_close.clicked.connect(partial(self._manage_info_close, self.dlg_generic))
+        self.dlg_generic.dlg_closed.connect(partial(tools_gw.close_dialog, self.dlg_generic))
+        self.dlg_generic.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_generic))
 
         # Disable button accept for info on generic form
-        self.hydro_info_dlg.btn_accept.setEnabled(False)
+        self.dlg_generic.btn_accept.setEnabled(can_edit)
 
-        self.hydro_info_dlg.rejected.connect(self.rubber_band.reset)
-        tools_gw.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
+        self.dlg_generic.dlg_closed.connect(self.rubber_band.reset)
+        tools_gw.open_dialog(self.dlg_generic, dlg_name='info_generic')
 
-        return result, self.hydro_info_dlg
+        return result, self.dlg_generic
 
 
     def _open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True, new_feature=None):
@@ -536,9 +587,9 @@ class GwInfo(QObject):
             dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
             btn_cancel.clicked.connect(partial(self._manage_info_close, dlg_cf))
         btn_accept.clicked.connect(
-            partial(self._accept_from_btn, dlg_cf, self.action_edit, new_feature, self.my_json, complet_result))
+            partial(self._accept_from_btn, dlg_cf, self.action_edit, new_feature, self.my_json, complet_result, False))
         dlg_cf.key_enter.connect(
-            partial(self._accept_from_btn, dlg_cf, self.action_edit, new_feature, self.my_json, complet_result))
+            partial(self._accept_from_btn, dlg_cf, self.action_edit, new_feature, self.my_json, complet_result, False))
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_cf, dlg_name='info_feature')
@@ -722,7 +773,7 @@ class GwInfo(QObject):
         child_type = complet_result['body']['feature']['childType']
 
         # Actions signals
-        self.action_edit.triggered.connect(partial(self._manage_edition, dlg_cf, self.action_edit, fid, new_feature))
+        self.action_edit.triggered.connect(partial(self._manage_edition, dlg_cf, self.action_edit, fid, new_feature, False))
         self.action_catalog.triggered.connect(partial(self._open_catalog, tab_type, self.feature_type, child_type))
         self.action_workcat.triggered.connect(
             partial(self._get_catalog, 'new_workcat', self.tablename, child_type, self.feature_id, list_points,
@@ -884,6 +935,11 @@ class GwInfo(QObject):
 
         try:
             global_vars.canvas.setMapTool(self.previous_map_tool)
+        except Exception:
+            pass
+
+        try:
+            self.rubber_band.reset()
         except Exception:
             pass
 
@@ -1405,36 +1461,45 @@ class GwInfo(QObject):
         return self.feature
 
 
-    def _get_last_value(self):
+    def _get_last_value(self, dialog, generic=False):
 
-        try:
-            # Widgets in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2')
-            other_widgets = []
-            for field in self.complet_result['body']['data']['fields']:
-                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
-                    widget = self.dlg_cf.findChild(QWidget, field['widgetname'])
-                    if widget:
-                        other_widgets.append(widget)
-            # Widgets in tab_data
-            widgets = self.dlg_cf.tab_data.findChildren(QWidget)
-            widgets.extend(other_widgets)
+        if generic:
+            widgets = dialog.findChildren(QWidget)
             for widget in widgets:
                 if widget.hasFocus():
-                    value = tools_qt.get_text(self.dlg_cf, widget)
+                    value = tools_qt.get_text(dialog, widget)
                     if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
                         self.my_json[str(widget.property('columnname'))] = str(value)
                     widget.clearFocus()
-        except RuntimeError:
-            pass
+        else:
+            try:
+                # Widgets in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2')
+                other_widgets = []
+                for field in self.complet_result['body']['data']['fields']:
+                    if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
+                        widget = dialog.findChild(QWidget, field['widgetname'])
+                        if widget:
+                            other_widgets.append(widget)
+                # Widgets in tab_data
+                widgets = dialog.tab_data.findChildren(QWidget)
+                widgets.extend(other_widgets)
+                for widget in widgets:
+                    if widget.hasFocus():
+                        value = tools_qt.get_text(dialog, widget)
+                        if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
+                            self.my_json[str(widget.property('columnname'))] = str(value)
+                        widget.clearFocus()
+            except RuntimeError:
+                pass
 
 
-    def _manage_edition(self, dialog, action_edit, fid, new_feature=None):
+    def _manage_edition(self, dialog, action_edit, fid, new_feature=None, generic=False):
 
         # With the editing QAction we need to collect the last modified value (self.get_last_value()),
         # since the "editingFinished" signals of the widgets are not detected.
         # Therefore whenever the cursor enters a widget, it will ask if we want to save changes
         if not action_edit.isChecked():
-            self._get_last_value()
+            self._get_last_value(dialog, generic)
             if str(self.my_json) == '{}':
                 tools_qt.set_action_checked(action_edit, False)
                 tools_gw.enable_widgets(dialog, self.complet_result['body']['data'], False)
@@ -1442,33 +1507,31 @@ class GwInfo(QObject):
                 return
             save = self._ask_for_save(action_edit, fid)
             if save:
-                self._manage_accept(dialog, action_edit, new_feature, self.my_json, False)
+                self._manage_accept(dialog, action_edit, new_feature, self.my_json, False, generic)
             elif self.new_feature_id is not None:
                 if global_vars.session_vars['dialog_docker'] and global_vars.session_vars['info_docker']:
                     self._manage_docker_close()
                 else:
                     tools_gw.close_dialog(dialog)
-            self._reset_my_json()
         else:
             tools_qt.set_action_checked(action_edit, True)
             tools_gw.enable_all(dialog, self.complet_result['body']['data'])
             self._enable_actions(dialog, True)
 
 
-    def _accept_from_btn(self, dialog, action_edit, new_feature, my_json, last_json):
+    def _accept_from_btn(self, dialog, action_edit, new_feature, my_json, last_json, generic=False):
 
         if not action_edit.isChecked():
             tools_gw.close_dialog(dialog)
             return
 
-        self._manage_accept(dialog, action_edit, new_feature, my_json, True)
-        self._reset_my_json()
+        self._manage_accept(dialog, action_edit, new_feature, my_json, True, generic)
 
 
-    def _manage_accept(self, dialog, action_edit, new_feature, my_json, close_dlg):
+    def _manage_accept(self, dialog, action_edit, new_feature, my_json, close_dlg, generic=False):
 
-        self._get_last_value()
-        status = self._accept(dialog, self.complet_result, my_json, close_dlg=close_dlg, new_feature=new_feature)
+        self._get_last_value(dialog, generic)
+        status = self._accept(dialog, self.complet_result, my_json, close_dlg=close_dlg, new_feature=new_feature, generic=generic)
         if status:  # Commit succesfull and dialog keep opened
             tools_qt.set_action_checked(action_edit, False)
             tools_gw.enable_widgets(dialog, self.complet_result['body']['data'], False)
@@ -1489,9 +1552,7 @@ class GwInfo(QObject):
         else:
             save = self._ask_for_save(action_edit, fid)
             if save:
-                self._reset_my_json()
                 self._manage_accept(dialog, action_edit, new_feature, my_json, False)
-            self._reset_my_json()
 
             return save
 
@@ -1679,7 +1740,7 @@ class GwInfo(QObject):
         dialog = kwargs['dialog']
         field = kwargs['field']
         new_feature = kwargs['new_feature']
-        widget = tools_gw.add_checkbox(field)
+        widget = tools_gw.add_checkbox(field, is_tristate=True)
         widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
         widget = self._set_auto_update_checkbox(field, dialog, widget, new_feature)
         return widget
@@ -1833,7 +1894,7 @@ class GwInfo(QObject):
         tools_gw.open_dialog(dlg_sections, dlg_name='info_crossect')
 
 
-    def _accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True, new_feature=None):
+    def _accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True, new_feature=None, generic=False):
         """
         :param dialog:
         :param complet_result:
@@ -1851,16 +1912,6 @@ class GwInfo(QObject):
             return False
 
         after_insert = False
-
-        if _json == '' or str(_json) == '{}':
-            if not close_dlg:
-                return None
-            if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
-                global_vars.session_vars['dialog_docker'].setMinimumWidth(dialog.width())
-                tools_gw.close_docker()
-                return None
-            tools_gw.close_dialog(dialog)
-            return None
 
         p_table_id = complet_result['body']['feature']['tableName']
         id_name = complet_result['body']['feature']['idName']
@@ -1891,13 +1942,26 @@ class GwInfo(QObject):
             QgsProject.instance().blockSignals(False)
             return False
 
-        if self._has_elev_and_y_json(_json):
+        if _json == '' or str(_json) == '{}':
+            if not close_dlg:
+                return None
+            if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
+                global_vars.session_vars['dialog_docker'].setMinimumWidth(dialog.width())
+                tools_gw.close_docker()
+                return None
+            tools_gw.close_dialog(dialog)
+            return None
+
+        if not generic and self._has_elev_and_y_json(_json):
             tools_qt.set_action_checked("actionEdit", True, dialog)
             QgsProject.instance().blockSignals(False)
             return False
 
         # If we create a new feature
+
         if self.new_feature_id is not None:
+            if new_feature is False:
+                new_feature = tools_qt.get_feature_by_id(self.iface.activeLayer(), self.new_feature_id)
             new_feature.setAttribute(id_name, newfeature_id)
             after_insert = True
             for k, v in list(_json.items()):
@@ -1956,7 +2020,7 @@ class GwInfo(QObject):
             if 'closed' not in _json:
                 thread = False
 
-        json_result = tools_gw.execute_procedure('gw_fct_setfields', body, log_sql=True)
+        json_result = tools_gw.execute_procedure('gw_fct_setfields', body)
         if not json_result:
             QgsProject.instance().blockSignals(False)
             return False
@@ -1996,6 +2060,8 @@ class GwInfo(QObject):
             QgsProject.instance().blockSignals(False)
             return False
 
+        is_inserting = False
+
         # Force a map refresh
         tools_qgis.force_refresh_map_canvas()
 
@@ -2004,7 +2070,6 @@ class GwInfo(QObject):
                 self._manage_docker_close()
             else:
                 tools_gw.close_dialog(dialog)
-            return None
 
         return True
 
@@ -2204,6 +2269,7 @@ class GwInfo(QObject):
         if not p_widget:
             return
 
+        changed_color = "#3ED396"
         # Restore QLineEdit stylesheet
         widget_list = dialog.tab_data.findChildren(QLineEdit)
         for widget in widget_list:
@@ -2224,15 +2290,17 @@ class GwInfo(QObject):
             if widget is None:
                 widget = dialog.findChild(QPushButton, f'{field["widgetname"]}')
             if widget:
-                cur_value = tools_qt.get_text(dialog, widget)
+                cur_value = tools_qt.get_text(dialog, widget, return_string_null=False)
                 value = field["value"]
                 if str(cur_value) != str(value):
                     widget.setText(value)
                     if not isinstance(widget, QPushButton):
-                        widget.setStyleSheet("border: 2px solid #3ED396")
+                        widget.setStyleSheet(f"border: 2px solid {changed_color}")
+                    else:
+                        changed_color = "#EB9438"
                     if getattr(widget, 'isReadOnly', False):
-                        widget.setStyleSheet("QLineEdit {background: rgb(244, 244, 244); color: rgb(100, 100, 100); "
-                                             "border: 2px solid #3ED396}")
+                        widget.setStyleSheet(f"QLineEdit {{background: rgb(244, 244, 244); color: rgb(100, 100, 100); "
+                                             f"border: 2px solid {changed_color}}}")
 
             elif "message" in field:
                 level = field['message']['level'] if 'level' in field['message'] else 0
@@ -2714,7 +2782,7 @@ class GwInfo(QObject):
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "element"
-        tools_gw.set_completer_object(dialog, self.table_object)
+        tools_gw.set_completer_object(dialog, self.table_object, field_id="element_id")
 
 
     def _open_selected_element(self, dialog, widget):
@@ -2831,7 +2899,7 @@ class GwInfo(QObject):
         elem.dlg_add_element.rejected.connect(partial(self._manage_element_new, dialog, elem))
 
         # Set completer
-        tools_gw.set_completer_object(dialog, self.table_object)
+        tools_gw.set_completer_object(dialog, self.table_object, field_id="element_id")
 
         if element_id:
             tools_qt.set_widget_text(elem.dlg_add_element, "element_id", element_id)
@@ -2877,8 +2945,8 @@ class GwInfo(QObject):
         index = index[0]
         table_name = qtable.model().record(index.row()).value("sys_table_id")
         # Highlight feature
-        tools_qgis.hilight_feature_by_id(qtable, table_name, f"{table_name.split('_')[-1]}_id", self.rubber_band, 5,
-                                         index, table_field="feature_id")
+        tools_qgis.highlight_feature_by_id(qtable, table_name, f"{table_name.split('_')[-1]}_id", self.rubber_band, 5,
+                                           index, table_field="feature_id")
 
 
     def _open_selected_feature(self, qtable):
@@ -3157,14 +3225,16 @@ class GwInfo(QObject):
 
         self.dlg_generic_visit = GwInfoGenericUi()
         tools_gw.load_settings(self.dlg_generic_visit)
+        action_edit = self.dlg_generic_visit.findChild(QAction, "actionEdit")
+        tools_gw.add_icon(action_edit, "101")
         self.dlg_generic_visit.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_generic_visit))
-        self.dlg_generic_visit.rejected.connect(partial(tools_gw.close_dialog, self.dlg_generic_visit))
+        self.dlg_generic_visit.dlg_closed.connect(partial(tools_gw.close_dialog, self.dlg_generic_visit))
         tools_gw.build_dialog_info(self.dlg_generic_visit, result_json)
 
         # Disable button accept for info on generic form
         self.dlg_generic_visit.btn_accept.setEnabled(False)
 
-        self.dlg_generic_visit.rejected.connect(self.rubber_band.reset)
+        self.dlg_generic_visit.dlg_closed.connect(self.rubber_band.reset)
         tools_gw.open_dialog(self.dlg_generic_visit, dlg_name='info_generic')
 
 
@@ -4137,10 +4207,12 @@ class GwInfo(QObject):
 
         dlg_generic = GwInfoGenericUi()
         tools_gw.load_settings(dlg_generic)
+        action_edit = dlg_generic.findChild(QAction, "actionEdit")
+        tools_gw.add_icon(action_edit, "101")
 
         # Set signals
         dlg_generic.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_generic))
-        dlg_generic.rejected.connect(partial(tools_gw.close_dialog, dlg_generic))
+        dlg_generic.dlg_closed.connect(partial(tools_gw.close_dialog, dlg_generic))
         dlg_generic.btn_accept.clicked.connect(partial(self._set_catalog, dlg_generic, form_name, table_name, feature_id, id_name))
 
         tools_gw.build_dialog_info(dlg_generic, json_result)
@@ -4185,7 +4257,7 @@ class GwInfo(QObject):
         form = f'"formName":"{form_name}"'
         feature = f'"tableName":"{table_name}", "id":"{feature_id}", "idName":"{id_name}"'
         body = tools_gw.create_body(form, feature, extras=fields)
-        result = tools_gw.execute_procedure('gw_fct_setcatalog', body, log_sql=True)
+        result = tools_gw.execute_procedure('gw_fct_setcatalog', body)
         if result['status'] != 'Accepted':
             return
 
@@ -4259,6 +4331,8 @@ class GwInfo(QObject):
                 widget = dialog.findChild(QWidget, f"{options[option][1]}")
                 widget.setFocus()
                 tools_qt.set_widget_text(dialog, widget, str(feat_id))
+                # Insert result into self.my_json regardless of widget editing
+                self.my_json[f"{option}_id"] = f"{feat_id}"
             elif option == 'set_to_arc':
                 # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
                 #       def _set_to_arc(self, feat_id, child_type)

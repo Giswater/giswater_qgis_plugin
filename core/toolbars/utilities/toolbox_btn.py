@@ -309,6 +309,12 @@ class GwToolBoxButton(GwAction):
             tools_gw.open_dialog(self.dlg_functions, dlg_name='toolbox')
 
 
+    def _finished_execute(self, status):
+
+        if status is False:
+            self.dlg_functions.btn_run.setEnabled(True)
+
+
     def _report_finished(self, status, json_result):
         if not status:
             return
@@ -585,6 +591,7 @@ class GwToolBoxButton(GwAction):
         self.timer.start(1000)
         # Set background task 'GwToolBoxTask'
         self.toolbox_task = GwToolBoxTask(self, description, dialog, combo, result, timer=self.timer)
+        self.toolbox_task.finished_execute.connect(self._finished_execute)
         QgsApplication.taskManager().addTask(self.toolbox_task)
         QgsApplication.taskManager().triggerTask(self.toolbox_task)
 
@@ -693,8 +700,8 @@ class GwToolBoxButton(GwAction):
                F" UNION "
                f"SELECT concat('v_edit_',epa_table), feature_type as type, 4 as c FROM sys_feature_epa_type "
                f"WHERE epa_table IS NOT NULL AND epa_table NOT IN ('inp_virtualvalve', 'inp_inlet')"
-			   f"UNION SELECT 'v_edit_inp_subcatchment', 'SUBCATCHMENT', 6"
-			   f"UNION SELECT 'v_edit_raingage', 'RAINGAGE', 8 ) t "
+			   f" UNION SELECT 'v_edit_inp_subcatchment', 'SUBCATCHMENT', 6"
+			   f" UNION SELECT 'v_edit_raingage', 'RAINGAGE', 8 ) t "
                f" WHERE type = '{feature_type.upper()}' ORDER BY c, tablename")
         rows = tools_db.get_rows(sql)
         if rows:

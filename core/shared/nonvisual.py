@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
+import webbrowser
 from functools import partial
 
 try:
@@ -212,37 +213,43 @@ class GwNonVisual:
             tools_qgis.show_warning(message, dialog=dialog)
             return
 
-        # Get selected workspace id
-        index = table.selectionModel().currentIndex()
-        value = index.sibling(index.row(), 0).data()
+        # Get selected workspace IDs
+        id_list = []
+        values = []
+        for idx in selected_list:
+            value = idx.sibling(idx.row(), 0).data()
+            id_list.append(value)
 
         message = "Are you sure you want to delete these records?"
-        answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 0).data())
+        answer = tools_qt.show_question(message, "Delete records", id_list)
         if answer:
             # Add quotes to id if not inp_controls/inp_rules
             if tablename not in ('inp_controls', 'inp_rules'):
-                value = f"'{value}'"
+                for value in id_list:
+                    values.append(f"'{value}'")
 
             # Delete values
             id_field = self.dict_ids.get(tablename_value)
             if id_field is not None:
-                sql = f"DELETE FROM {tablename_value} WHERE {id_field} = {value}"
+                for value in values:
+                    sql = f"DELETE FROM {tablename_value} WHERE {id_field} = {value}"
+                    result = tools_db.execute_sql(sql, commit=False)
+                    if not result:
+                        msg = "There was an error deleting object values."
+                        tools_qgis.show_warning(msg, dialog=dialog)
+                        global_vars.dao.rollback()
+                        return
+
+            # Delete object from main table
+            for value in values:
+                id_field = self.dict_ids.get(tablename)
+                sql = f"DELETE FROM {tablename} WHERE {id_field} = {value}"
                 result = tools_db.execute_sql(sql, commit=False)
                 if not result:
-                    msg = "There was an error deleting object values."
+                    msg = "There was an error deleting object."
                     tools_qgis.show_warning(msg, dialog=dialog)
                     global_vars.dao.rollback()
                     return
-
-            # Delete object from main table
-            id_field = self.dict_ids.get(tablename)
-            sql = f"DELETE FROM {tablename} WHERE {id_field} = {value}"
-            result = tools_db.execute_sql(sql, commit=False)
-            if not result:
-                msg = "There was an error deleting object."
-                tools_qgis.show_warning(msg, dialog=dialog)
-                global_vars.dao.rollback()
-                return
 
             # Commit & refresh table
             global_vars.dao.commit()
@@ -1847,7 +1854,8 @@ class GwNonVisual:
         # Manage decimal validation for QLineEdit
         widget_list = self.dialog.findChildren(QLineEdit)
         for widget in widget_list:
-            tools_qt.double_validator(widget, 0, 9999999, 3)
+            if widget.objectName() != "txt_name":
+                tools_qt.double_validator(widget, 0, 9999999, 3)
 
         # Populate LID Type combo
         sql = f"SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' ORDER BY idval"
@@ -1859,11 +1867,14 @@ class GwNonVisual:
         sql = f"SELECT id FROM v_edit_inp_curve; "
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(self.dialog.cmb_control_curve, rows)
+            tools_qt.fill_combo_values(self.dialog.txt_7_cmb_control_curve, rows)
 
         # Signals
         self.dialog.cmb_lidtype.currentIndexChanged.connect(partial(self._manage_lids_tabs, self.dialog))
         self.dialog.btn_ok.clicked.connect(partial(self._accept_lids, self.dialog, is_new, lidco_id))
+        self.dialog.btn_cancel.clicked.connect(self.dialog.reject)
+        self.dialog.finished.connect(partial(tools_gw.close_dialog, self.dialog))
+        self.dialog.btn_help.clicked.connect(partial(self._open_help))
 
         self._manage_lids_tabs(self.dialog)
 
@@ -1875,6 +1886,9 @@ class GwNonVisual:
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_lids')
 
+
+    def _open_help(self):
+        webbrowser.open('https://giswater.gitbook.io/giswater-manual/7.-export-import-of-the-hydraulic-model')
 
     def _populate_lids_widgets(self, dialog, lidco_id, duplicate=False):
         """ Fills in all the values for lid dialog """
@@ -2009,6 +2023,11 @@ class GwNonVisual:
         # Show tabs
         for i in range(tab_lidlayers.count()):
             tab_name = tab_lidlayers.widget(i).objectName().upper()
+            
+            # Set the first non-hidden tab selected
+            if tab_name == lidtabs[0]:
+                tab_lidlayers.setCurrentIndex(i)
+
             if tab_name not in lidtabs:
                 if Qgis.QGIS_VERSION_INT >= 32000:
                     tab_lidlayers.setTabVisible(i, False)
@@ -2036,16 +2055,16 @@ class GwNonVisual:
         """ Hides widgets that are not necessary in specific tabs """
 
         # List of widgets
-        widgets_hide = {'BC': {'lbl_surface_side_slope', 'txt_surface_side_slope', 'lbl_drain_delay', 'txt_drain_delay'},
-                        'RG': {'lbl_surface_side_slope', 'txt_surface_side_slope'},
-                        'GR': {'lbl_surface_slope', 'txt_surface_slope'},
-                        'IT': {'lbl_surface_side_slope', 'txt_surface_side_slope', 'lbl_drain_delay', 'txt_drain_delay'},
-                        'PP': {'lbl_surface_side_slope', 'txt_surface_side_slope', 'lbl_drain_delay', 'txt_drain_delay'},
-                        'RB': {'lbl_seepage_rate', 'txt_seepage_rate', 'lbl_clogging_factor_storage', 'txt_clogging_factor_storage'},
-                        'RD': {'lbl_vegetation_volume', 'txt_vegetation_volume', 'lbl_surface_side_slope', 'txt_surface_side_slope',
+        widgets_hide = {'BC': {'lbl_surface_side_slope', 'txt_5_surface_side_slope', 'lbl_drain_delay', 'txt_4_drain_delay'},
+                        'RG': {'lbl_surface_side_slope', 'txt_5_surface_side_slope'},
+                        'GR': {'lbl_surface_slope', 'txt_4_surface_slope'},
+                        'IT': {'lbl_surface_side_slope', 'txt_5_surface_side_slope', 'lbl_drain_delay', 'txt_4_drain_delay'},
+                        'PP': {'lbl_surface_side_slope', 'txt_5_surface_side_slope', 'lbl_drain_delay', 'txt_4_drain_delay'},
+                        'RB': {'lbl_seepage_rate', 'txt_3_seepage_rate', 'lbl_clogging_factor_storage', 'txt_4_clogging_factor_storage'},
+                        'RD': {'lbl_vegetation_volume', 'txt_2_vegetation_volume', 'lbl_surface_side_slope', 'txt_5_surface_side_slope',
                                'lbl_flow_exponent','lbl_offset', 'lbl_drain_delay', 'lbl_open_level',
-                               'lbl_closed_level', 'lbl_control_curve', 'lbl_flow_description', 'txt_flow_exponent',
-                               'txt_offset', 'txt_drain_delay', 'txt_open_level', 'txt_closed_level', 'cmb_control_curve',},
+                               'lbl_closed_level', 'lbl_control_curve', 'lbl_flow_description', 'txt_2_flow_exponent',
+                               'txt_3_offset', 'txt_4_drain_delay', 'txt_5_open_level', 'txt_6_closed_level', 'txt_7_cmb_control_curve',},
                         'VS': {''}}
 
         # Hide widgets in list
@@ -2157,21 +2176,23 @@ class GwNonVisual:
 
     def _insert_lids_values(self, dialog, lidco_id, lidco_type):
 
-        control_values = {'BC': {'txt_thickness', 'txt_thickness_storage'},
-                    'RG': {'txt_thickness', 'txt_thickness_storage'},
-                    'GR': {'txt_thickness', 'drainmat_2'},
-                    'IT': {'txt_thickness_storage'},
-                    'PP': {'txt_thinkness_pavement', 'txt_thickness_storage'},
+        control_values = {'BC': {'txt_1_thickness', 'txt_1_thickness_storage'},
+                    'RG': {'txt_1_thickness', 'txt_1_thickness_storage'},
+                    'GR': {'txt_1_thickness', 'drainmat_2'},
+                    'IT': {'txt_1_thickness_storage'},
+                    'PP': {'txt_1_thickness_pavement', 'txt_1_thickness_storage'},
                     'RB': {''},
                     'RD': {''},
-                    'VS': {'txt_berm_height'}}
+                    'VS': {'txt_1_berm_height'}}
 
         for i in range(dialog.tab_lidlayers.count()):
             if dialog.tab_lidlayers.isTabVisible(i):
                 tab_name = dialog.tab_lidlayers.widget(i).objectName().upper()
                 # List with all QLineEdit children
                 child_list = dialog.tab_lidlayers.widget(i).children()
-                visible_widgets = [widget for widget in child_list if type(widget) == QLineEdit or type(widget) == QComboBox]
+                widgets_list = [widget for widget in child_list if type(widget) == QLineEdit or type(widget) == QComboBox]
+                # Get QLineEdits and QComboBox that are visible
+                visible_widgets = [widget for widget in widgets_list if not widget.isHidden()]
                 visible_widgets = self._order_list(visible_widgets)
 
                 sql = f"INSERT INTO inp_lid_value (lidco_id, lidlayer,"

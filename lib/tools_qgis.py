@@ -982,7 +982,14 @@ def get_locale():
         return locale
 
 
-def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, index, table_field=None):
+def highlight_features_by_id(qtable, layer_name, field_id, rubber_band, width, selected, deselected):
+
+    rubber_band.reset()
+    for idx, index in enumerate(qtable.selectionModel().selectedRows()):
+        highlight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, index, add=(idx > 0))
+
+
+def highlight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, index, table_field=None, add=False):
     """ Based on the received index and field_id, the id of the received field_id is searched within the table
      and is painted in red on the canvas """
 
@@ -999,8 +1006,11 @@ def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, inde
     feature = tools_qt.get_feature_by_id(layer, _id, field_id)
     try:
         geometry = feature.geometry()
-        rubber_band.reset()
-        rubber_band.setToGeometry(geometry, None)
+        if add:
+            rubber_band.addGeometry(geometry, None)
+        else:
+            rubber_band.reset()
+            rubber_band.setToGeometry(geometry, None)
         rubber_band.setColor(QColor(255, 0, 0, 100))
         rubber_band.setWidth(width)
         rubber_band.show()

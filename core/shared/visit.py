@@ -498,14 +498,14 @@ class GwVisit(QObject):
             partial(self._event_feature_type_selected, self.dlg_add_visit, None))
         self.cmb_feature_type.currentIndexChanged.connect(partial(self._manage_tabs_enabled, True))
         self.parameter_id.currentIndexChanged.connect(self._get_feature_type_of_parameter)
-        self.dlg_add_visit.tbl_visit_x_arc.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_visit.tbl_visit_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
-        self.dlg_add_visit.tbl_visit_x_node.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_visit.tbl_visit_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
-        self.dlg_add_visit.tbl_visit_x_connec.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_visit.tbl_visit_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
-        self.dlg_add_visit.tbl_visit_x_gully.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_visit.tbl_visit_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
+        self.dlg_add_visit.tbl_visit_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                   self.dlg_add_visit.tbl_visit_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
+        self.dlg_add_visit.tbl_visit_x_node.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                    self.dlg_add_visit.tbl_visit_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
+        self.dlg_add_visit.tbl_visit_x_connec.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                      self.dlg_add_visit.tbl_visit_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
+        self.dlg_add_visit.tbl_visit_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                     self.dlg_add_visit.tbl_visit_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
 
 
     def _add_feature_clicked(self):

@@ -183,7 +183,7 @@ class GwAdminButton:
             if self.locale != 'en_US' or str(self.project_epsg) != '25831':
                 msg = ("This functionality is only allowed with the locality 'en_US' and SRID 25831."
                        "\nDo you want change it and continue?")
-                result = tools_qt.show_question(msg, "Info Message", force_action=True)
+                result = tools_qt.show_question(msg, force_action=True)
                 if result:
                     self.project_epsg = '25831'
                     project_srid = '25831'
@@ -276,8 +276,7 @@ class GwAdminButton:
         client = '"client":{"device":4, "lang":"' + str(locale) + '"}, '
         data = '"data":{' + extras + '}'
         body = "$${" + client + data + "}$$"
-        result = tools_gw.execute_procedure('gw_fct_admin_schema_lastprocess', body, self.schema_name, commit=False,
-            log_sql=True)
+        result = tools_gw.execute_procedure('gw_fct_admin_schema_lastprocess', body, self.schema_name, commit=False)
         if result is None or ('status' in result and result['status'] == 'Failed'):
             self.error_count = self.error_count + 1
 
@@ -332,7 +331,7 @@ class GwAdminButton:
         """"""
 
         msg = "Are you sure to update the project schema to last version?"
-        result = tools_qt.show_question(msg, "Info")
+        result = tools_qt.show_question(msg)
         if result:
             # Manage Log Messages panel and open tab Giswater PY
             message_log = self.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
@@ -942,6 +941,14 @@ class GwAdminButton:
         elif self.form_enabled:
             self.form_enabled = False
             message = "Unable to create Postgis extension. Packages must be installed, consult your administrator."
+        # Check fuzzystrmatch extension and create if not exist
+        fuzzystrmatch_extension = tools_db.check_pg_extension('fuzzystrmatch')
+        if fuzzystrmatch_extension and self.form_enabled:
+            sql = "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;"
+            tools_db.execute_sql(sql)
+        elif self.form_enabled:
+            self.form_enabled = False
+            message = "Unable to create fuzzystrmatch extension. Packages must be installed, consult your administrator."
 
         if self.form_enabled is False:
             ignore_widgets =  ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name']
@@ -1183,7 +1190,7 @@ class GwAdminButton:
         new_name = self._bk_schema_name(list_schemas, f"{project_name}_bk_", 0)
 
         msg = f"This 'Project_name' is already exist. Do you want rename old schema to '{new_name}"
-        result = tools_qt.show_question(msg, "Info", force_action=True)
+        result = tools_qt.show_question(msg, force_action=True)
         if result:
             self._rename_project_data_schema(str(project_name), str(new_name))
             return True
@@ -1409,6 +1416,15 @@ class GwAdminButton:
             elif self.form_enabled:
                 message = "Unable to create Postgis extension. Packages must be installed, consult your administrator."
                 self.form_enabled = False
+            # Check fuzzystrmatch extension and create if not exist
+            fuzzystrmatch_extension = tools_db.check_pg_extension('fuzzystrmatch')
+            if fuzzystrmatch_extension and self.form_enabled:
+                sql = "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;"
+                tools_db.execute_sql(sql)
+            elif self.form_enabled:
+                self.form_enabled = False
+                message = "Unable to create fuzzystrmatch extension. Packages must be installed, consult your administrator."
+
             if self.form_enabled is False:
                 ignore_widgets = ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name']
                 tools_qt.enable_dialog(self.dlg_readsql, False, ignore_widgets)
@@ -1965,8 +1981,15 @@ class GwAdminButton:
             tools_qt.show_info_box(msg, "Info")
             return
 
+        sql = f"SELECT value FROM {project_name}.config_param_system WHERE parameter='admin_isproduction'"
+        row = tools_db.get_row(sql)
+        if row and tools_os.set_boolean(row[0], default=False):
+            msg = f"The schema '{project_name}' is being used in production! It can't be deleted."
+            tools_qt.show_info_box(msg, "Warning")
+            return
+
         msg = f"Are you sure you want delete schema '{project_name}' ?"
-        result = tools_qt.show_question(msg, "Info", force_action=True)
+        result = tools_qt.show_question(msg, force_action=True)
         if result:
             sql = f'DROP SCHEMA {project_name} CASCADE;'
             status = tools_db.execute_sql(sql)
@@ -2203,7 +2226,7 @@ class GwAdminButton:
 
         msg = ("Warning: Are you sure to continue?. This button will update your plugin qgis templates file replacing "
                "all strings defined on the config/dev.config file. Be sure your config file is OK before continue")
-        result = tools_qt.show_question(msg, "Info")
+        result = tools_qt.show_question(msg)
         if result:
             # Get dev config file
             setting_file = os.path.join(self.plugin_dir, 'config', 'dev.config')
