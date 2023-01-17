@@ -288,3 +288,5 @@ SELECT 'v_edit_link_gully', formtype, tabname, columnname, layoutname, layoutord
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
 widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
 FROM config_form_fields WHERE formname = 'v_edit_link' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+SELECT gw_fct_connect_link_refactor();

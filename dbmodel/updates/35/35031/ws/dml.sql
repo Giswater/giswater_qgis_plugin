@@ -412,3 +412,5 @@ UPDATE arc SET depth1 = vu_node.depth FROM vu_node WHERE node_id = node_1;
 UPDATE arc SET depth2 = vu_node.depth FROM vu_node WHERE node_id = node_2;
 UPDATE arc SET staticpress1 = vu_node.staticpressure FROM vu_node WHERE node_id = node_1;
 UPDATE arc SET staticpress2 = vu_node.staticpressure FROM vu_node WHERE node_id = node_2;
+
+SELECT gw_fct_connect_link_refactor();

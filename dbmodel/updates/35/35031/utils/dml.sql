@@ -288,7 +288,6 @@ WHERE columnname ='exit_type' and formname='v_edit_link';
 UPDATE config_form_fields SET iseditable=false WHERE formname LIKE 've_connec%' AND columnname='arc_id';
 UPDATE config_form_fields SET iseditable=false WHERE formname LIKE 've_node%' AND columnname='arc_id';
 
-SELECT gw_fct_connect_link_refactor();
 
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
 VALUES (485, 'Connect link to arc id with specific coordinates', 'utils', NULL, 'core', true, NULL, NULL)
