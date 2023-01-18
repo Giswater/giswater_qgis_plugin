@@ -35,26 +35,31 @@ UPDATE arc SET pavcat_id = 'Asphalt';
 
 UPDATE plan_psector_x_arc SET psector_id = 2 WHERE arc_id = '20651';
 
-INSERT INTO plan_psector_x_arc VALUES (7, '2065', 2, 0, false, NULL);
-INSERT INTO plan_psector_x_arc VALUES (8, '2085', 1, 0, false, NULL);
-INSERT INTO plan_psector_x_arc VALUES (9, '2086', 1, 0, false, NULL);
+INSERT INTO plan_psector_x_arc VALUES (7, '2065', 2, 0, false, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (8, '2085', 1, 0, false, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (9, '2086', 1, 0, false, NULL, NULL, true);
 
-INSERT INTO plan_psector_x_node VALUES (2, '1076', 1, 0, false, NULL);
+INSERT INTO plan_psector_x_node VALUES (2, '1076', 1, 0, false, NULL, NULL, true);
+
+SELECT gw_fct_setlinktonetwork($${
+"client":{"device":4, "infoType":1, "lang":"ES"},
+"feature":{"id":["3103","3104"]},
+"data":{"feature_type":"CONNEC"}}$$);
+
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES ('3103', '2087', 1, 0, false, 480, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES ('3104', '2078', 1, 0, false, 479, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES ('114461', '20851', 1, 1, true, 483, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES ('114462', '20851', 1, 1, true, 484, true);
+
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES ('3014', '2065', 2, 0, false, 473, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES ('114463', '20651', 2, 1, true, 474, true);
+
 
 
 SELECT gw_fct_setlinktonetwork($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{"id":["3103","3104","3014","114461","114462","114463"]},
+"feature":{"id":["114461","114462","114463"]},
 "data":{"feature_type":"CONNEC"}}$$);
-
-
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom) VALUES ('3103', NULL, 1, 0, false, NULL, NULL);
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom) VALUES ('3104', NULL, 1, 0, false, NULL, NULL);
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom) VALUES ('3014', NULL, 2, 0, false, NULL, NULL);
-
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom) VALUES ('114461', '20851', 1, 1, true, NULL, NULL);
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom) VALUES ('114462', '20851', 1, 1, true, NULL, NULL);
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom) VALUES ('114463', '20651', 2, 1, true, NULL, NULL);
 
 
 INSERT INTO doc VALUES ('Demo document 1', 'OTHER', 'https://github.com/Giswater/docs/blob/master/user/manual_usuario_giswater3.doc', NULL, '2018-03-11 19:40:20.449663', current_user, '2018-03-11 19:40:20.449663');
@@ -532,11 +537,6 @@ UPDATE config_form_fields SET placeholder = 'Top floor of the building (ex: 3)' 
 UPDATE config_form_fields SET placeholder = 'Optional: Arc_id of related arc' where columnname = 'arc_id' AND formname like '%ve_node%';
 UPDATE config_form_fields SET placeholder = 'Optional: Node_id of the parent node' where columnname = 'parent_id' AND formname like '%ve_node%';
 
--- to clean trash must be executed 3 times
-SELECT gw_fct_setvnoderepair($${ "client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"parameters":{"tolerance":"0.01", "forceNodes":true}}}$$);
-SELECT gw_fct_setvnoderepair($${ "client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"parameters":{"tolerance":"0.01", "forceNodes":true}}}$$);
-SELECT gw_fct_setvnoderepair($${ "client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"parameters":{"tolerance":"0.01", "forceNodes":true}}}$$);
-
 INSERT INTO ext_node (fid, node_id, val, tstamp) VALUES (364,'1069',35.4,'2020-01-01 03:05:00');
 INSERT INTO ext_node (fid, node_id, val, tstamp) VALUES (364,'1069',34.4,'2020-01-01 03:10:00');
 INSERT INTO ext_node (fid, node_id, val, tstamp) VALUES (364,'1067',45.4,'2020-01-01 03:05:00');
@@ -595,6 +595,7 @@ DELETE FROM connec WHERE connec_id = '3175';
 -- fill missed data for connecs
 UPDATE v_edit_connec SET epa_type = 'JUNCTION';
 UPDATE connec SET sector_id = a.sector_id FROM arc a WHERE a.arc_id = connec.arc_id;
+UPDATE connec SET sector_id=3 WHERE connec_id IN ('114461', '114462', '114463');
 
 UPDATE cat_mat_roughness SET roughness = 0.0025 WHERE matcat_id IN ('PVC', 'PE-HD', 'PE-LD');
 UPDATE cat_mat_roughness SET roughness = 0.025 WHERE matcat_id IN ('FC');
@@ -634,12 +635,13 @@ UPDATE cat_arc SET connect_cost = 'N_WATER-CONNECT';
 
 UPDATE arc SET sector_id = 3 WHERE arc_id IN (SELECT arc_id FROM plan_psector_x_arc WHERE state = 1);
 
-SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${"client":{"lang":"ES"},
+SELECT gw_fct_admin_schema_lastprocess($${"client":{"lang":"ES"},
 "data":{"isNewProject":"FALSE", "projectType":"WS", "epsg":25831, "isSample":"TRUE"}}$$);
 
 
 update man_netwjoin set customer_code = 'cc3122';
 delete from connec where customer_code = 'cc3122';
+delete from link where link_id=313;
 
 INSERT INTO om_streetaxis (id, code, type, name, text, the_geom, expl_id, muni_id) VALUES ('1', '10240C', NULL, 'Calle de la Mare de Deu de Montserrat', NULL, '0105000020E7640000010000000102000000140000001B100C6B6A991941DFEB69D952755141E2F80131EA981941D1D777B5497551414AF890C3B898194130F24C4346755141AE94C41E9F9819413053B08B44755141F03517FF84981941D99C90DB42755141E2C0688540981941021414F13E755141820FFC619D97194157F27B0136755141A726769C7297194106F1BEA9337551419CB6B622489719415088454D317551416B2475C13E971941AE0BA4CF30755141387077EB349719418E27F259307551418FBBEEA82A9719414B50C3EC2F75514107DD2A07209719414EFAAA882F7551410787751215971941AA372C2E2F755141FB6B18D709971941FF55A9DD2E75514191626362FE96194157DE63972E7551414E9CD147EF961941C817DF4C2E75514124CC840ED7961941A2C128182E7551418CAFC115BB961941A79349F82D755141A6CB3FA438961941D8E10D682E755141', 1, 1);
 INSERT INTO om_streetaxis (id, code, type, name, text, the_geom, expl_id, muni_id) VALUES ('2', '10222C', NULL, 'Calle de Menorca', NULL, '0105000020E7640000010000000102000000020000005D078893C89219412E2FCA23A17551413CAC9708CB9119411C0093E588755141', 1, 1);
@@ -707,3 +709,17 @@ UPDATE ext_cat_period SET code  = concat(upper(code),'-2015');
 
 UPDATE ext_rtc_dma_period set avg_press = 30;
 UPDATE dma set avg_press = 30;
+
+UPDATE connec SET pjoint_id = arc_id WHERE pjoint_type = 'ARC';
+UPDATE link SET exit_id = arc_id FROM connec c WHERE connec_id = feature_id and c.state > 0 AND exit_type  ='ARC';
+
+UPDATE plan_psector_x_arc SET active = true WHERE arc_id in ('20861', '20851', '20651');
+UPDATE plan_psector_x_node SET active = true WHERE node_id in ('10761');
+UPDATE plan_psector_x_connec SET active = true WHERE connec_id in ('3103', '3104', '3014', '3014');
+
+SELECT setval('SCHEMA_NAME.urn_id_seq', 114465, true);
+
+UPDATE link SET dma_id = c.dma_id, sector_id = c.sector_id, presszone_id = c.presszone_id, dqa_id = c.dqa_id, minsector_id = c.minsector_id FROM connec c WHERE feature_id = connec_id;
+
+DELETE FROM v_edit_link where link_id in (482,481);
+SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3076", "3177"]},"data":{"feature_type":"CONNEC"}}$$);

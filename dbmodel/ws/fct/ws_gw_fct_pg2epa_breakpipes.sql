@@ -30,7 +30,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- set sequence with value of vnode sequences in order to create vnode correlatives to do not crash epanet
-	PERFORM setval('SCHEMA_NAME.temp_table_id_seq', (SELECT nextval ('SCHEMA_NAME.vnode_vnode_id_seq'::regclass)), true);
+	PERFORM setval('SCHEMA_NAME.temp_table_id_seq', (SELECT max(vnode_id) FROM temp_link), true);
 	
 	-- get values
 	v_maxlength = (SELECT value::json->>'breakPipes' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user);
@@ -62,7 +62,8 @@ BEGIN
 	END LOOP;
 
 	-- delete those are overlaped with real vnodes
-	UPDATE temp_table a SET fid = 296 FROM vnode b WHERE st_dwithin(the_geom, geom_point, v_removevnodebuffer);
+	UPDATE temp_table a SET fid = 296 FROM temp_link WHERE st_dwithin(st_endpoint(the_geom), geom_point, v_removevnodebuffer);
+	UPDATE temp_table a SET fid = 296 FROM temp_node WHERE st_dwithin((the_geom), geom_point, v_removevnodebuffer);
 	DELETE FROM temp_table WHERE fid = 296;
 
 RETURN 0;

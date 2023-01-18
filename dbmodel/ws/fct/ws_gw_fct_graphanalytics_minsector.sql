@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2706
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_minsector(json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_minsector(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_minsector(p_data json)
 RETURNS json AS
 $BODY$
@@ -271,6 +271,7 @@ BEGIN
 								
 			-- used v_edit_connec to the exploitation filter. Row before is not neeeded because on table anl_* is data filtered by the process...
 			UPDATE v_edit_connec c SET minsector_id = a.minsector_id FROM arc a WHERE a.arc_id=c.arc_id;
+			UPDATE link SET minsector_id = a.minsector_id FROM v_edit_connec a WHERE a.connec_id=link.feature_id;
 
 			-- insert into minsector table
 			DELETE FROM minsector WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user);

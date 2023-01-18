@@ -40,6 +40,8 @@ v_feature_array text[];
 i integer = 0;
 v_project_type text;
 v_arc_type text;
+v_link record;
+v_link_id integer;
 
 BEGIN
 
@@ -98,7 +100,7 @@ BEGIN
 
 				-- profilactic controls	
 				IF rec.state_type IS NULL THEN
-					rec.state_type = (SELECT id FROM value_state_type WHERE state_id = 1 LIMIT 1);
+					rec.state_type = (SELECT id FROM value_state_type WHERE state = 2 LIMIT 1);
 				END IF;
 				IF v_project_type ='WS' THEN
 					-- insert new arc (also insert on psector table) 
@@ -136,23 +138,58 @@ BEGIN
 					rec.elev1, rec.elev2, rec.custom_elev1, rec.custom_elev2, rec.matcat_id, rec.inverted_slope)
 					RETURNING arc_id INTO v_arc;
 				END IF;
-	
-				INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable)
-				SELECT v_currentpsector, connec_id, v_arc, 1,false FROM connec WHERE arc_id = v_id AND state=1
-				ON CONFLICT (connec_id, psector_id) DO NOTHING;
 
+				FOR v_link IN SELECT l.* FROM v_edit_connec c JOIN link l on feature_id = connec_id WHERE l.state = 1 and arc_id = v_id AND c.state > 0
+				LOOP
+					INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable, link_id)
+					VALUES (v_currentpsector, v_link.feature_id, v_arc, 0, false, v_link.link_id)
+					ON CONFLICT (connec_id, psector_id, state) DO NOTHING;
+
+					IF v_project_type = 'WS' THEN
+
+						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, state, expl_id, the_geom, sector_id, presszone_id, 
+						dma_id, dqa_id, minsector_id, fluid_type) SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, sector_id, 
+						presszone_id, dma_id, dqa_id, minsector_id, fluid_type FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
+					ELSE
+						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, state, expl_id, the_geom, sector_id, dma_id, fluid_type)
+						SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, sector_id, dma_id,fluid_type  
+						FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
+					END IF;
+
+					INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable, link_id)
+					VALUES (v_currentpsector, v_link.feature_id, v_arc, 1, false, v_link_id)
+					ON CONFLICT (connec_id, psector_id, state) DO NOTHING;
+				END LOOP;
+				
+				-- looking for gullies
+				IF v_project_type = 'UD' THEN
+
+					FOR v_link IN SELECT l.* FROM v_edit_gully c JOIN link l on feature_id = gully_id WHERE l.state = 1 and arc_id = v_id AND c.state > 0
+					LOOP
+						INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable, link_id)
+						VALUES (v_currentpsector, v_link.feature_id, v_arc, 0, false, v_link.link_id)
+						ON CONFLICT (gully_id, psector_id, state) DO NOTHING;
+
+						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, state, expl_id, the_geom, sector_id, dma_id, fluid_type)
+						SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, sector_id, dma_id,fluid_type  
+						FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
+			
+						INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable, link_id)
+						VALUES (v_currentpsector, v_link.feature_id, v_arc, 1, false, v_link_id)
+						ON CONFLICT (gully_id, psector_id, state) DO NOTHING;
+					END LOOP;
+				END IF;
+				
 				SELECT count(*) INTO v_count FROM connec WHERE arc_id = v_id AND state=1;
 
 				INSERT INTO audit_check_data (fid, error_message) 
 				VALUES (v_fid, concat('Arc (',v_id,') have been downgraded, new planned arc have been created (',v_arc,')'));
+
 				INSERT INTO audit_check_data (fid, error_message) 
 				VALUES (v_fid, concat(v_count,' connec(s) have been reconnected.'));
 
 				IF v_project_type ='UD' THEN
-					INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable)
-					SELECT v_currentpsector, gully_id, v_arc, 1,false FROM gully WHERE arc_id = v_id AND state=1
-					ON CONFLICT (gully_id, psector_id) DO NOTHING;
-
+				
 					SELECT count(*) INTO v_count FROM gully WHERE arc_id = v_id AND state=1;
 
 					INSERT INTO audit_check_data (fid, error_message) 
@@ -161,7 +198,6 @@ BEGIN
 
 				UPDATE arc SET streetaxis_id = rec.streetaxis_id WHERE arc_id = v_arc;
 				UPDATE arc SET streetaxis2_id = rec.streetaxis_id WHERE arc_id = v_arc;
-				
 			END IF;
 		END LOOP;
 
@@ -174,7 +210,6 @@ BEGIN
 	ELSE
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Replacement on planned mode is only available for arcs'));
 		v_message = 'Replacement on planned mode is only available for arcs';
-	
 	END IF;
 
 	-- get info
@@ -199,8 +234,6 @@ BEGIN
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-
- 
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

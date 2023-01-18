@@ -183,7 +183,7 @@ BEGIN
 
 	--CHECK CHILD VIEWS FOR ACTIVE FEATURES
 	--list active cat_feature
-	v_querytext = 'SELECT * FROM cat_feature WHERE active IS TRUE;';
+	v_querytext = 'SELECT * FROM cat_feature WHERE active IS TRUE AND id <> ''LINK'';';
 	FOR rec IN EXECUTE v_querytext LOOP
 
 	--check if all the views defined in cat_feature exist (313) :

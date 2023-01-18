@@ -239,7 +239,7 @@ BEGIN
 			VALUES (218, null, 4, 'Update old parameter name.');
 		END IF;
 
-		v_active_feature = 'SELECT cat_feature.* FROM cat_feature WHERE active IS TRUE ORDER BY id';
+		v_active_feature = 'SELECT cat_feature.* FROM cat_feature WHERE system_id != ''LINK'' AND active IS TRUE ORDER BY id';
 
 		FOR rec IN EXECUTE v_active_feature LOOP
 

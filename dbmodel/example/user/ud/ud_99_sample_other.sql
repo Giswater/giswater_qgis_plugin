@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 INSERT INTO inp_gully (gully_id, outlet_type, method, weir_cd, orifice_cd, efficiency)
-SELECT gully_id, 'To_network', 'W/O', 1.6, 0.7, 90 FROM gully;
+SELECT gully_id, 'To_network', 'W_O', 1.6, 0.7, 90 FROM gully;
 
 UPDATE man_netgully set gratecat_id = 'SGRT3';
 
@@ -28,45 +28,51 @@ INSERT INTO cat_users VALUES ('user4','user4');
 INSERT INTO cat_manager (idval, expl_id, username, active) VALUES ('general manager', '{1,2}', concat('{',current_user,'}')::text[], true);
 
 TRUNCATE plan_psector_x_arc;
-INSERT INTO plan_psector_x_arc VALUES (1, '20603', 1, 1, true, NULL);
-INSERT INTO plan_psector_x_arc VALUES (2, '20604', 1, 1, true, NULL);
-INSERT INTO plan_psector_x_arc VALUES (3, '20605', 1, 1, true, NULL);
-INSERT INTO plan_psector_x_arc VALUES (5, '20602', 1, 1, true, NULL);
-INSERT INTO plan_psector_x_arc VALUES (6, '20606', 1, 1, true, NULL);
-INSERT INTO plan_psector_x_arc VALUES (4, '252', 2, 1, true, NULL);
-INSERT INTO plan_psector_x_arc VALUES (7, '251', 2, 1, true, NULL);
-INSERT INTO plan_psector_x_arc VALUES (8, '20608', 2, 0, false, NULL);
-INSERT INTO plan_psector_x_arc VALUES (9, '157', 2, 0, false, NULL);
-INSERT INTO plan_psector_x_arc VALUES (10, '177', 1, 0, false, NULL);
-INSERT INTO plan_psector_x_arc VALUES (11, '178', 1, 0, false, NULL);
-INSERT INTO plan_psector_x_arc VALUES (13, '179', 1, 0, false, NULL);
-INSERT INTO plan_psector_x_arc VALUES (12, '339', 1, 0, false, NULL);
+INSERT INTO plan_psector_x_arc VALUES (1, '20603', 1, 1, true, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (2, '20604', 1, 1, true, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (3, '20605', 1, 1, true, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (5, '20602', 1, 1, true, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (6, '20606', 1, 1, true, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (4, '252', 2, 1, true, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (7, '251', 2, 1, true, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (8, '20608', 2, 0, false, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (9, '157', 2, 0, false, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (10, '177', 1, 0, false, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (11, '178', 1, 0, false, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (13, '179', 1, 0, false, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (12, '339', 1, 0, false, NULL, NULL, true);
 
 TRUNCATE plan_psector_x_node;
-INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (1, '20599', 1, 1, true, NULL);
-INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (2, '20596', 1, 1, true, NULL);
-INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (3, '20597', 1, 1, true, NULL);
-INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (4, '20598', 1, 1, true, NULL);
-INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (7, '94', 1, 0, false, NULL);
-INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (6, '92', 1, 0, false, NULL);
-INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (5, '91', 1, 0, false, NULL);
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (1, '20599', 1, 1, true, NULL, true);
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (2, '20596', 1, 1, true, NULL, true);
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (3, '20597', 1, 1, true, NULL, true);
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (4, '20598', 1, 1, true, NULL, true);
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (7, '94', 1, 0, false, NULL, true);
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (6, '92', 1, 0, false, NULL, true);
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (5, '91', 1, 0, false, NULL, true);
 
-INSERT INTO plan_psector_x_connec VALUES (1, '3174', '20603', 1, 1, false, NULL, '0102000020E76400000200000071E182D2E8941941ADDF47B1067551415778FF7BBC941941539C918B04755141', false);
-INSERT INTO plan_psector_x_connec VALUES (2, '3175', '20604', 1, 1, false, NULL, '0102000020E764000002000000046B75D5FE9419414AF99C8FFB74514187BF4D741C951941E2C4E01EFD745141', false);
-INSERT INTO plan_psector_x_connec VALUES (3, '3181', '20605', 1, 1, false, NULL, '0102000020E76400000200000030544DCF389619412E91C1AEF4745141B04AF06CF5951941E505873AFD745141', false);
-INSERT INTO plan_psector_x_connec VALUES (4, '3182', '20606', 1, 1, false, NULL, '0102000020E764000002000000CC1A77AA4B96194179A847BEF57451412F9AE8F608961941169357D9FD745141', false);
-INSERT INTO plan_psector_x_connec VALUES (5, '3183', '20606', 1, 1, false, NULL, '0102000020E764000002000000BC063C5982961941272C83B0F8745141EA43A061479619418070F7DAFF745141', false);
-INSERT INTO plan_psector_x_connec VALUES (6, '3184', '20606', 1, 1, false, NULL, '0102000020E764000002000000A3561C17979619416E3409C0F97451414CA3BCAF5E9619411831BE9A00755141', false);
-INSERT INTO plan_psector_x_connec VALUES (8, '3029', '158',   2, 0, false, NULL, '0102000020E76400000200000050AF19AEE0931941D07042A06A75514174A28732C89319411CE10E0263755141', false);
-INSERT INTO plan_psector_x_connec VALUES (10, '100014','252', 2, 1, true, NULL, '0102000020E7640000020000003A3AFDE9A7931941047959F36875514164C4E4443E931941CC4795396A755141', false);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3182', '20606', 1, 1, false, 708, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3182', '179', 1, 0, false, 314, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3183', '20606', 1, 1, false, 707, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3183', '179', 1, 0, false, 315, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3184', '20606', 1, 1, false, 709, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3184', '179', 1, 0, false, 316, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3181', '20606', 1, 1, false, 710, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3181', '339', 1, 0, false, 443, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3174', '20603', 1, 1, false, 711, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3174', '178', 1, 0, false, 313, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3175', '20604', 1, 1, false, 712, true);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES('3175', '339', 1, 0, false, 444, true);
 
-INSERT INTO plan_psector_x_gully VALUES (1, '30053', '20606', 1, 1, false, NULL, '0102000020E764000002000000BCB9BE0B5996194125D47F89F7745141933718381F9619417B5C7990FE745141', false);
-INSERT INTO plan_psector_x_gully VALUES (2, '30056', '20604', 1, 1, false, NULL, '0102000020E764000002000000C9CE8A002F9519414D50F69AF8745141FD947A9B3E9519416A41C44BFB745141', false);
-INSERT INTO plan_psector_x_gully VALUES (3, '30057', '20603', 1, 1, false, NULL, '0102000020E7640000020000006D67FE5DF8941941313447A80275514141155E93E1941941F02BB48D01755141', false);
-INSERT INTO plan_psector_x_gully VALUES (4, '30058', '20603', 1, 1, false, NULL, '0102000020E764000002000000657E1E6ECB9419412635F3C800755141B7609638DF9419410E7152BE01755141', false);
-INSERT INTO plan_psector_x_gully VALUES (5, '30059', '20602', 1, 1, false, NULL, '0102000020E764000002000000381E1D8A469419416EA9DE4C11755141170CBCC42F941941FE4DB33F10755141', false);
-INSERT INTO plan_psector_x_gully VALUES (11, '100012', '252', 2, 1, true, NULL, '0102000020E764000002000000E1A04978289319411915328C697551416EB749783B93194130F3855169755141', false);
-INSERT INTO plan_psector_x_gully VALUES (12, '100013', '251', 2, 1, true, NULL, '0102000020E764000002000000DEB292FD4A9319413F1519DF62755141EB2CC71750931941468E795864755141', false);
+INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, link_id, active) VALUES('30056', '339', 1, 0, false, 526, true);
+INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, link_id, active) VALUES('30057', '178', 1, 0, false, 527, true);
+INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, link_id, active) VALUES('30058', '178', 1, 0, false, 528, true);
+INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, link_id, active) VALUES('30059', '177', 1, 0, false, 529, true);
+INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, link_id, active) VALUES('30053', '179', 1, 0, false, 523, true);
+
+
+
+SELECT setval('SCHEMA_NAME.link_link_id_seq', (SELECT max(link_id) FROM link), true);
 
 INSERT INTO doc VALUES ('Demo document 1', 'OTHER', 'https://github.com/Giswater/docs/blob/master/user/manual_usuario_giswater3.doc', NULL, '2018-03-11 19:40:20.449663', current_user, '2018-03-11 19:40:20.449663');
 INSERT INTO doc VALUES ('Demo document 3', 'OTHER', 'https://github.com/Giswater/giswater/blob/master-2.1/legal/Licensing.txt', NULL, '2018-03-14 17:09:59.762257', current_user, '2018-03-14 17:09:59.762257');
@@ -277,7 +283,10 @@ UPDATE config_form_fields SET  hidden = true where columnname = 'cmanhole_param_
 
 UPDATE config_form_fields SET  hidden = true where columnname IN ('accessibility', 'inlet');
 
-UPDATE config_form_fields SET  layoutname = 'lyt_data_2' where columnname IN ('bottom_channel','sander_depth','length', 'width') AND formname LIKE '%_node_%';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2',  layoutorder = 50 where columnname ='bottom_channel' AND formname LIKE '%_node_%';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2' , layoutorder = 51 where columnname ='sander_depth' AND formname LIKE '%_node_%';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2' , layoutorder = 52 where columnname ='length' AND formname LIKE '%_node_%';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2' , layoutorder = 53 where columnname ='width' AND formname LIKE '%_node_%';
 
 UPDATE config_form_fields SET layoutname = 'lyt_data_2',  layoutorder = 40 where columnname ='workcat_id_end' AND formname LIKE '%_connec_%';
 UPDATE config_form_fields SET layoutname = 'lyt_data_2' , layoutorder = 40 where columnname ='workcat_id_end' AND formname LIKE '%_gully_%';
@@ -375,6 +384,8 @@ UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'arc_id
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'arc_id' and formname like '%v_edit_arc%';
 UPDATE config_form_fields SET placeholder = NULL where formname like '%v_edit_arc%';
 UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_arc%';
+UPDATE config_form_fields SET layoutorder = layoutorder +1  where (formname ilike 've_arc%' or formname='v_edit_arc') AND 
+layoutname='lyt_data_2' and layoutorder > 12 and columnname!='fluid_type';
 
 --node
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'node_id' and formname like '%ve_node_%';
@@ -411,10 +422,6 @@ system_id = 'NETGULLY' AND formname = child_layer and columnname = 'gratecat_id'
 --placeholder
 UPDATE config_form_fields SET placeholder = 'Only when state is obsolete' where columnname = 'workcat_id_end';
 UPDATE config_form_fields SET placeholder = 'Catalog of the private part of connection' where columnname = 'private_connecat_id' AND formname like '%ve_connec%';
-
--- to clean trash must be executed 2 times
-SELECT gw_fct_setvnoderepair($${ "client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"parameters":{"tolerance":"0.01", "forceNodes":true}}}$$);
-SELECT gw_fct_setvnoderepair($${ "client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"parameters":{"tolerance":"0.01", "forceNodes":true}}}$$);
 
 DELETE FROM config_info_layer_x_type where tableinfo_id = 'v_edit_om_visit';
 
@@ -509,7 +516,6 @@ INSERT INTO inp_lid_value VALUES (9,'INFIL-TRENCH','STORAGE',30,0.5,0,0);
 INSERT INTO inp_lid_value VALUES (10,'RAIN-GARDEN','SURFACE',3,0,0,0,0);
 INSERT INTO inp_lid_value VALUES (11,'RAIN-GARDEN','SOIL',3,0.5,0.1,0.05,1.2,2.4,0);
 INSERT INTO inp_lid_value VALUES (12,'VEGE-SWALE','SURFACE',3,0.5,0.03,0.5,0.5);
-INSERT INTO inp_lid_value VALUES (13,'VEGE-SWALE','STORAGE',30,0.5,0,0);
 INSERT INTO inp_lid_value VALUES (14,'BIO-RETENTION','SURFACE',3,0,0,0,0);
 INSERT INTO inp_lid_value VALUES (15,'BIO-RETENTION','SOIL',3,0.5,0.1,0.05,1.2,2.4,0);
 INSERT INTO inp_lid_value VALUES (16,'BIO-RETENTION','STORAGE',30,0.5,0,0);
@@ -521,3 +527,21 @@ SELECT gw_fct_admin_schema_lastprocess($${"client":{"lang":"ES"},
 
 UPDATE config_param_system SET value = '{"usePsectors":false, "ignoreGraphanalytics":false, "ignoreEpa":false, "ignorePlan":false}'
 WHERE parameter = 'admin_checkproject';
+
+UPDATE connec SET pjoint_id = arc_id WHERE pjoint_type = 'ARC';
+UPDATE gully SET pjoint_id = arc_id WHERE pjoint_type = 'ARC';
+
+update link set exit_id = arc_id FROM connec where feature_id = connec_id and exit_type = 'ARC';
+update link set exit_id = arc_id FROM gully where feature_id = gully_id and exit_type = 'ARC';
+
+UPDATE arc SET node_sys_top_elev_1 = sys_top_elev FROM vu_node WHERE node_id = node_1;
+UPDATE arc SET node_sys_elev_1 = sys_elev FROM vu_node WHERE node_id = node_1;
+UPDATE arc SET node_sys_top_elev_2 = sys_top_elev FROM vu_node WHERE node_id = node_2;
+UPDATE arc SET node_sys_elev_2 = sys_elev FROM vu_node WHERE node_id = node_2;
+UPDATE arc SET nodetype_1 = node_type FROM vu_node WHERE node_id = node_1;
+UPDATE arc SET nodetype_2 = node_type FROM vu_node WHERE node_id = node_2;
+
+UPDATE link SET dma_id = c.dma_id, sector_id = c.sector_id FROM connec c WHERE feature_id = connec_id;
+UPDATE link SET dma_id = c.dma_id, sector_id = c.sector_id FROM gully c WHERE feature_id = gully_id;
+
+UPDATE inp_gully SET method = 'W_O' WHERE method = 'W/O';

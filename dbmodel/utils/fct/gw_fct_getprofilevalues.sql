@@ -15,6 +15,7 @@ current petition from client:
 SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"data":{"initNode":"6970", "endNode":"147", "linksDistance":5}}$$);
 SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"data":{"initNode":"6970", "endNode":"147", "linksDistance":5}}$$);
 
+SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{}, "form":{}, "feature":{}, "data":{"initNode":"64", "endNode":"38", "linksDistance":1, "scale":{ "eh":1000, "ev":1000}}}$$);
 
 ----------- 
 further petitions from client:
@@ -135,6 +136,11 @@ v_querytext2 text;
 v_count_int integer;
 object_rec record;
 v_vnode_status boolean;
+v_result json; 
+v_result_line json;
+v_result_point json;
+v_result_polygon json;
+v_device integer;
 
 BEGIN
 
@@ -156,6 +162,7 @@ BEGIN
 	v_composer := (p_data ->> 'data')::json->> 'composer';
 	v_templates := (p_data ->> 'data')::json->> 'ComposerTemplates';
 	v_papersize := ((p_data ->> 'data')::json->> 'papersize')::json->>'id';
+	v_device := (p_data ->> 'client')::json->> 'device';
 
 	-- get systemvalues
 	SELECT value INTO v_guitarlegend FROM config_param_system WHERE parameter = 'om_profile_guitarlegend';
@@ -217,19 +224,19 @@ BEGIN
 			v_fslope = 'slope'; 
 			v_fsystopelev = 'sys_top_elev';	v_fsyselev = 'sys_elev'; v_fsysymax = 'sys_ymax';
 
-			v_querytext1 = ' UNION SELECT c.arc_id, vnode_id,link_id,''LINK'',gully_id, vnode_topelev, vnode_ymax, vnode_elev, vnode_distfromnode1, total_length
-				FROM v_arc_x_vnode 
+			v_querytext1 = ' UNION SELECT c.arc_id, vnode_id,link_id,''LINK'',gully_id, exit_topelev, exit_ymax, exit_elev, vnode_distfromnode1, total_length
+				FROM temp_link_x_arc 
 				JOIN anl_arc USING (arc_id)
-				JOIN gully c ON c.gully_id = v_arc_x_vnode.feature_id
+				JOIN gully c ON c.gully_id = temp_link_x_arc.feature_id
 				WHERE fid=222 AND cur_user = current_user
-				AND anl_arc.node_1 = v_arc_x_vnode.node_1';
+				AND anl_arc.node_1 = temp_link_x_arc.node_1';
 
-			v_querytext2 = ' UNION SELECT c.arc_id, vnode_id,link_id,''LINK'',gully_id, vnode_topelev, vnode_ymax, vnode_elev, vnode_distfromnode2, total_length
-				FROM v_arc_x_vnode 
+			v_querytext2 = ' UNION SELECT c.arc_id, vnode_id,link_id,''LINK'',gully_id, exit_topelev, exit_ymax, exit_elev, vnode_distfromnode2, total_length
+				FROM temp_link_x_arc 
 				JOIN anl_arc USING (arc_id)
-				JOIN gully c ON c.gully_id = v_arc_x_vnode.feature_id
+				JOIN gully c ON c.gully_id = temp_link_x_arc.feature_id
 				WHERE fid=222 AND cur_user = current_user
-				AND anl_arc.node_1 = v_arc_x_vnode.node_2';
+				AND anl_arc.node_1 = temp_link_x_arc.node_2';
 
 			v_elev1 = 'case when node_1=node_id then sys_elev1 else sys_elev2 end';
 			v_elev2 = 'case when node_1=node_id then sys_elev2 else sys_elev1 end';
@@ -275,17 +282,18 @@ BEGIN
 				
 				-- We need to insert values each dijkstra for the total_length to keep accumulating
 				-- insert edge values on anl_arc table
-				EXECUTE 'INSERT INTO anl_arc (fid, arc_id, code, node_1, node_2, sys_type, arccat_id, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2)
+				EXECUTE 'INSERT INTO anl_arc (fid, arc_id, code, node_1, node_2, sys_type, arccat_id, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2, expl_id, the_geom)
 					SELECT  222, arc_id, code, node_id, case when node_1=node_id then node_2 else node_1 end as node_2, sys_type, arccat_id, '||v_fcatgeom||', 
 					gis_length, '||v_fslope||', total_length, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
-					||v_elev1||', '||v_elev2||' FROM v_edit_arc b JOIN cat_arc ON arccat_id = id JOIN 
+					||v_elev1||', '||v_elev2||', expl_id, the_geom FROM v_edit_arc b JOIN cat_arc ON arccat_id = id JOIN 
 					('|| v_query_dijkstra ||')a
 					USING (arc_id)
 					WHERE b.state > 0';
 		
 				-- insert node values on anl_node table
-				EXECUTE 'INSERT INTO anl_node (fid, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, sys_type, nodecat_id, cat_geom1, arc_id, arc_distance, total_distance)
-					SELECT  222, node_id, n.code, '||v_fsystopelev||', '||v_fsysymax||', '||v_fsyselev||', n.sys_type, nodecat_id, null, a.arc_id, 0, total_length FROM v_edit_node n JOIN cat_node ON nodecat_id = id JOIN
+				EXECUTE 'INSERT INTO anl_node (fid, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, sys_type, nodecat_id, cat_geom1, arc_id, arc_distance, total_distance, expl_id, the_geom)
+					SELECT  222, node_id, n.code, '||v_fsystopelev||', '||v_fsysymax||', '||v_fsyselev||', n.sys_type, nodecat_id, null, a.arc_id, 0, total_length, expl_id, the_geom
+					FROM v_edit_node n JOIN cat_node ON nodecat_id = id JOIN
 					('|| v_query_dijkstra ||')a
 					USING (node_id)';
 
@@ -299,17 +307,18 @@ BEGIN
 		END IF;
 
 		-- insert edge values on anl_arc table
-		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, code, node_1, node_2, sys_type, arccat_id, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2)
+		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, code, node_1, node_2, sys_type, arccat_id, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2, expl_id, the_geom)
 			SELECT  222, arc_id, code, node_id, case when node_1=node_id then node_2 else node_1 end as node_2, sys_type, arccat_id, '||v_fcatgeom||', gis_length, 
 			'||v_fslope||', total_length, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
-			||v_elev1||', '||v_elev2||' FROM v_edit_arc b JOIN cat_arc ON arccat_id = id JOIN 
+			||v_elev1||', '||v_elev2||', expl_id, the_geom FROM v_edit_arc b JOIN cat_arc ON arccat_id = id JOIN 
 			('|| v_query_dijkstra ||')a
 			USING (arc_id)
 			WHERE b.state > 0';
 
 		-- insert node values on anl_node table
-		EXECUTE 'INSERT INTO anl_node (fid, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, sys_type, nodecat_id, cat_geom1, arc_id, arc_distance, total_distance)
-			SELECT  222, node_id, n.code, '||v_fsystopelev||', '||v_fsysymax||', '||v_fsyselev||', n.sys_type, nodecat_id, null, a.arc_id, 0, total_length FROM v_edit_node n JOIN cat_node ON nodecat_id = id JOIN
+		EXECUTE 'INSERT INTO anl_node (fid, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, sys_type, nodecat_id, cat_geom1, arc_id, arc_distance, total_distance, expl_id, the_geom)
+			SELECT  222, node_id, n.code, '||v_fsystopelev||', '||v_fsysymax||', '||v_fsyselev||', n.sys_type, nodecat_id, null, a.arc_id, 0, total_length, expl_id, the_geom
+			FROM v_edit_node n JOIN cat_node ON nodecat_id = id JOIN
 			('|| v_query_dijkstra ||')a
 			USING (node_id)';
 
@@ -322,26 +331,79 @@ BEGIN
 		
 		IF v_linksdistance > 0 AND v_count = 0 and v_vnode_status IS NOT False THEN
 
+			-- generate temp link table
+			PERFORM gw_fct_linkexitgenerator(1);
+
+			-- generate arc_x_link values
+			IF v_project_type = 'UD' THEN
+
+				DELETE FROM temp_link_x_arc;
+				INSERT INTO temp_link_x_arc
+				select * FROM (
+				 SELECT DISTINCT ON (link_id) a.link_id, a.vnode_id, a.arc_id, a.feature_type,a.feature_id, a.node_1,  a.node_2,
+				    (a.length * a.locate::double precision)::numeric(12,3) AS vnode_distfromnode1,
+				    (a.length * (1::numeric - a.locate)::double precision)::numeric(12,3) AS vnode_distfromnode2,
+					CASE
+					    WHEN a.exit_topelev IS NULL THEN (a.top_elev1 - a.locate * (a.top_elev1 - a.top_elev2))::numeric(12,3)::double precision
+					    ELSE a.exit_topelev
+					END AS exit_topelev,
+				    (a.sys_y1 - a.locate * (a.sys_y1 - a.sys_y2))::numeric(12,3) AS exit_ymax,
+				    (a.sys_elev1 - a.locate * (a.sys_elev1 - a.sys_elev2))::numeric(12,3) AS exit_elev
+				   FROM ( SELECT t.link_id,
+					    t.exit_id::integer AS vnode_id,
+					    v_edit_arc.arc_id, t.feature_type, t.feature_id, t.exit_topelev,st_length(v_edit_arc.the_geom) AS length,
+					    st_linelocatepoint(v_edit_arc.the_geom, st_endpoint(t.the_geom))::numeric(12,3) AS locate,
+					    v_edit_arc.node_1, v_edit_arc.node_2, v_edit_arc.sys_elev1, v_edit_arc.sys_elev2,v_edit_arc.sys_y1,  v_edit_arc.sys_y2,
+					    v_edit_arc.sys_elev1 + v_edit_arc.sys_y1 AS top_elev1,
+					    v_edit_arc.sys_elev2 + v_edit_arc.sys_y2 AS top_elev2
+					   FROM v_edit_arc, temp_link t
+					    WHERE st_dwithin(v_edit_arc.the_geom, t.the_geom_endpoint, 0.01::double precision) AND v_edit_arc.state > 0 AND t.state > 0) a)b
+					    ORDER BY arc_id, node_2 DESC;		
+				  
+			ELSIF v_project_type = 'WS' THEN
+
+				DELETE FROM temp_link_x_arc;
+				INSERT INTO temp_link_x_arc
+				select * FROM (
+				SELECT DISTINCT ON (link_id) a.link_id, a.vnode_id,  a.arc_id, a.feature_type, a.feature_id, a.node_1, a.node_2,
+				    (a.length * a.locate::double precision)::numeric(12,3) AS vnode_distfromnode1,
+				    (a.length * (1::numeric - a.locate)::double precision)::numeric(12,3) AS vnode_distfromnode2,
+					CASE
+					    WHEN a.exit_topelev IS NULL THEN (a.elevation1 - a.locate * (a.elevation1 - a.elevation2))::numeric(12,3)::double precision
+					    ELSE a.exit_topelev
+					END AS exit_topelev,
+				    (a.depth1 - a.locate * (a.depth1 - a.depth2))::numeric(12,3) AS exit_ymax,
+				    (a.elev1 - a.locate * (a.elev1 - a.elev2))::numeric(12,3) AS exit_elev
+				   FROM ( SELECT t.link_id, t.vnode_id, v_arc.arc_id, t.feature_type, t.feature_id,  t.exit_topelev,  st_length(v_arc.the_geom) AS length,
+					    st_linelocatepoint(v_arc.the_geom, t.the_geom_endpoint)::numeric(12,3) AS locate, v_arc.node_1, v_arc.node_2, v_arc.elevation1,
+					    v_arc.elevation2,  v_arc.depth1,  v_arc.depth2, v_arc.elevation1 - v_arc.depth1 AS elev1,  v_arc.elevation2 - v_arc.depth2 AS elev2
+					   FROM v_arc, temp_link t
+					  WHERE st_dwithin(v_arc.the_geom, t.the_geom_endpoint, 0.01::double precision) AND v_arc.state > 0 AND t.state > 0) a)b
+				  ORDER BY arc_id, node_2 DESC;
+			END IF;
+
+				  
 			-- get vnode values
 			EXECUTE 'INSERT INTO anl_node (fid, sys_type, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, arc_id , arc_distance, total_distance)
-				SELECT 222, feature_type, feature_id, link_id, vnode_topelev, vnode_ymax, vnode_elev, arc_id, dist, dist+total_length FROM (SELECT DISTINCT ON (dist) * FROM 
+				SELECT 222, feature_type, feature_id, link_id, exit_topelev, exit_ymax, exit_elev, arc_id, dist, dist+total_length
+				FROM (SELECT DISTINCT ON (dist) * FROM 
 				(
 				-- connec on same sense (pg_routing & arc)
-				SELECT c.arc_id, vnode_id,link_id,''LINK'' as feature_type, connec_id as feature_id,vnode_topelev, vnode_ymax, vnode_elev, vnode_distfromnode1 as dist, total_length
-					FROM v_arc_x_vnode 
+				SELECT c.arc_id, vnode_id,link_id,''LINK'' as feature_type, connec_id as feature_id, exit_topelev, exit_ymax, exit_elev, vnode_distfromnode1 as dist, total_length
+					FROM temp_link_x_arc 
 					JOIN anl_arc USING (arc_id)
-					JOIN connec c ON c.connec_id = v_arc_x_vnode.feature_id
+					JOIN connec c ON c.connec_id = temp_link_x_arc.feature_id
 					WHERE fid=222 AND cur_user = current_user
-					AND anl_arc.node_1 = v_arc_x_vnode.node_1
+					AND anl_arc.node_1 = temp_link_x_arc.node_1
 				'||v_querytext1||'-- gully on same sense (pg_routing & arc)
 				UNION
 				-- connec on reverse sense (pg_routing & arc)
-				SELECT c.arc_id, vnode_id,link_id,''LINK'' as feature_type, connec_id as feature_id,vnode_topelev, vnode_ymax, vnode_elev, vnode_distfromnode2 as dist, total_length
-					FROM v_arc_x_vnode 
+				SELECT c.arc_id, vnode_id,link_id,''LINK'' as feature_type, connec_id as feature_id,exit_topelev, exit_ymax, exit_elev, vnode_distfromnode2 as dist, total_length
+					FROM temp_link_x_arc 
 					JOIN anl_arc USING (arc_id)
-					JOIN connec c ON c.connec_id = v_arc_x_vnode.feature_id
+					JOIN connec c ON c.connec_id = temp_link_x_arc.feature_id
 					WHERE fid=222 AND cur_user = current_user
-					AND anl_arc.node_1 = v_arc_x_vnode.node_2
+					AND anl_arc.node_1 = temp_link_x_arc.node_2
 				'||v_querytext2||' -- gully on reverse sense (pg_routing & arc)
 				)a
 			)b 
@@ -434,19 +496,14 @@ BEGIN
 			
 			--elev values
 			IF v_elev[i] IS NULL THEN
-				raise notice 'elev';
 				IF v_elev[i+1] IS NOT NULL AND v_elev[i-1] IS NOT NULL THEN
 					UPDATE anl_node SET elev = (v_elev[i-1]+ ((v_dist[i]-v_dist[i-1])*(v_elev[i+1]-v_elev[i-1])/(v_dist[i+1]-v_dist[i-1])))::numeric(12,3) WHERE node_id = v_nid[i];
-					raise notice 'elev11';
 				ELSIF v_elev[i+1] IS NOT NULL AND v_elev[i-2] IS NOT NULL THEN
 					UPDATE anl_node SET elev = (v_elev[i-2]+ ((v_dist[i]-v_dist[i-2])*(v_elev[i+1]-v_elev[i-2])/(v_dist[i+1]-v_dist[i-2])))::numeric(12,3) WHERE node_id = v_nid[i];
-					raise notice 'elev12';
 				ELSIF v_elev[i+2] IS NOT NULL AND v_elev[i-1] IS NOT NULL THEN
 					UPDATE anl_node SET elev = (v_elev[i-1]+ ((v_dist[i]-v_dist[i-1])*(v_elev[i+2]-v_elev[i-1])/(v_dist[i+2]-v_dist[i-1])))::numeric(12,3) WHERE node_id = v_nid[i];
-					raise notice 'elev21';
 				ELSIF v_elev[i+2] IS NOT NULL AND v_elev[i-2] IS NOT NULL THEN
 					UPDATE anl_node SET elev = (v_elev[i-2]+ ((v_dist[i]-v_dist[i-2])*(v_elev[i+2]-v_elev[i-2])/(v_dist[i+2]-v_dist[i-2])))::numeric(12,3) WHERE node_id = v_nid[i];
-					raise notice 'elev22';
 				ELSE
 					v_level  = 2;
 					v_message = 'Interpolation tool it is designed to interpolate with data missed maximun at two consecutives nodes. Please check your data!';
@@ -600,6 +657,45 @@ BEGIN
 
 	END IF;
 	
+	IF v_device = 5 THEN
+		SELECT jsonb_agg(features.feature) INTO v_result
+		FROM (
+	  	SELECT jsonb_build_object(
+	     'type',       'Feature',
+	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+	    'properties', to_jsonb(row) - 'the_geom',
+	    'crs',concat('EPSG:',ST_SRID(the_geom))
+	  	) AS feature
+	  	FROM (SELECT arc_id, arccat_id, descript::json,expl_id, the_geom
+	  	FROM  anl_arc WHERE fid=222 AND cur_user = current_user) row) features;
+	  	
+
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 	
+			
+		SELECT jsonb_agg(features.feature) INTO v_result
+		FROM (
+	  	SELECT jsonb_build_object(
+			'type',       'Feature',
+			'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+			'properties', to_jsonb(row) - 'the_geom',
+			'crs',concat('EPSG:',ST_SRID(the_geom))
+	  	) AS feature
+	  	FROM (SELECT node_id, nodecat_id, descript::json,expl_id, the_geom
+	  	FROM  anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id!='VNODE') row) features;
+
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+
+		v_result_polygon = '{"geometryType":"", "features":[]}';
+
+	ELSE
+		v_result_polygon = '{"geometryType":"", "features":[]}';
+		v_result_line = '{"geometryType":"", "features":[]}';
+		v_result_point = '{"geometryType":"", "features":[]}';
+
+	END IF;
+
 	-- control null values
 	IF v_guitarlegend IS NULL THEN v_guitarlegend='{}'; END IF;
 	IF v_stylesheet IS NULL THEN v_stylesheet='{}'; END IF;
@@ -611,7 +707,6 @@ BEGIN
 	v_node := COALESCE(v_node, '{}'); 
 	v_terrain := COALESCE(v_terrain, '{}'); 
 
-
 	--  Return
 	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
                ',"body":{"form":{}'||
@@ -622,7 +717,10 @@ BEGIN
 			'"stylesheet":'||v_stylesheet||','||
 			'"node":'||v_node||','||
 			'"terrain":'||v_terrain||','||
-			'"arc":'||v_arc||'}}}')::json;
+			'"arc":'||v_arc||','||
+			'"point":'||v_result_point||','||
+			'"line":'||v_result_line||','||
+			'"polygon":'||v_result_polygon||'}}}')::json;
 	
 	--EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;

@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/08/31
-UPDATE sys_param_user SET vdefault = '{"forceReservoirsOnInlets":true,"setDemand":true,"checkResult":true,"onlyIsOperative":true,"delDisconnNetwork":false,"removeDemandOnDryNodes":false,"breakPipes":{"status":false, "maxLength":10, "removeVnodeBuffer":1},"graphicLog":"true","steps":0,"autoRepair":true}'
+UPDATE sys_param_user SET vdefault = '{"forceReservoirsOnInlets":false, "forceTanksOnInlets":false, "setDemand":true,"checkResult":true,"onlyIsOperative":true,"delDisconnNetwork":false,"removeDemandOnDryNodes":false,"breakPipes":{"status":false, "maxLength":10, "removeVnodeBuffer":1},"graphicLog":"true","steps":0,"autoRepair":true}'
 WHERE id = 'inp_options_debug';
 
 DELETE FROM sys_function where function_name = 'gw_fct_pg2epa_inlet_flowtrace';

@@ -42,6 +42,7 @@ v_isarcdivide text;
 v_error_context text;
 v_count1 integer;
 v_count2 integer;
+v_partialquery2 text;
 
 BEGIN
 
@@ -111,7 +112,13 @@ BEGIN
                    	v_closest_arc_id,v_closest_arc_distance, 'Orphan nodes with isarcdivide=TRUE');
                 END LOOP;
                
-                FOR rec_node IN EXECUTE 'SELECT  * FROM '||v_worklayer||' a '||v_partialquery||'  WHERE a.state>0 AND isarcdivide=''false'' AND arc_id IS NULL' 
+	            IF v_projectype = 'WS' THEN
+					v_partialquery2 = 'AND arc_id IS NULL';
+				ELSE
+					v_partialquery2 = '';
+				END IF;
+			
+                FOR rec_node IN EXECUTE 'SELECT  * FROM '||v_worklayer||' a '||v_partialquery||'  WHERE a.state>0 AND isarcdivide=''false'' '||v_partialquery2||' ' 
                 LOOP
                     --find the closest arc and the distance between arc and node
                     SELECT ST_Distance(arc.the_geom, rec_node.the_geom) as d, arc.arc_id INTO v_closest_arc_distance, v_closest_arc_id 

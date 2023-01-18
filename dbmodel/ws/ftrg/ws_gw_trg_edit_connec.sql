@@ -12,6 +12,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_connec()
 $BODY$
 
 DECLARE 
+
 v_sql varchar;
 v_man_table varchar; 
 v_code_autofill_bool boolean;
@@ -39,11 +40,12 @@ v_force_delete boolean;
 v_autoupdate_fluid boolean;
 v_message text;
 v_dsbl_error boolean;
-v_disable_linktonetwork boolean;
+v_connect2network boolean;
 v_system_id text;
 v_featurecat_id text;
-v_pol_id text;
-v_arc text;
+v_arc record;
+v_link integer;
+v_link_geom public.geometry;
 
 BEGIN
 
@@ -58,18 +60,23 @@ BEGIN
 	v_type_man_table:=v_man_table;
 	
 	-- get system and user variables
-	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
+	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE parameter='edit_feature_buffer_on_mapzone');
 	SELECT ((value::json)->>'activated') INTO v_insert_double_geom FROM config_param_system WHERE parameter='insert_double_geometry';
 	SELECT ((value::json)->>'value') INTO v_double_geom_buffer FROM config_param_system WHERE parameter='insert_double_geometry';
 	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid';
 	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;
-	v_disable_linktonetwork := (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_disable_linktonetwork' AND cur_user=current_user);
+
+	SELECT value::boolean INTO v_connect2network FROM config_param_user WHERE parameter='edit_connec_automatic_link' AND cur_user=current_user;
 
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
 	IF v_insert_double_geom IS NULL THEN v_insert_double_geom=FALSE; END IF;
 	IF v_double_geom_buffer IS NULL THEN v_double_geom_buffer=1; END IF;
+
+	v_psector_vdefault = (SELECT config_param_user.value::integer AS value FROM config_param_user WHERE config_param_user.parameter::text
+			    = 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1);
 	
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
+	
 		-- transforming streetaxis name into id
 		v_streetaxis = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname LIMIT 1);
 		v_streetaxis2 = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname2 LIMIT 1);
@@ -89,9 +96,9 @@ BEGIN
 		END IF;
 		
 		-- setting pjoint_id, pjoint_type and arc_id and removing link in case of connec is over arc
-		v_arc = (SELECT arc_id FROM v_edit_arc WHERE st_dwithin(the_geom, NEW.the_geom, 0.01) AND state > 0 LIMIT 1);
-		IF v_arc IS NOT NULL THEN
-			NEW.arc_id = v_arc;
+		v_arc_id = (SELECT arc_id FROM v_edit_arc WHERE st_dwithin(the_geom, NEW.the_geom, 0.01) AND state > 0 LIMIT 1);
+		IF v_arc_id IS NOT NULL THEN
+			NEW.arc_id = v_arc_id;
 			NEW.pjoint_id = NEW.connec_id;
 			NEW.pjoint_type = 'CONNEC';
 			DELETE FROM link WHERE feature_id = NEW.connec_id;
@@ -100,6 +107,11 @@ BEGIN
 	
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
+
+		-- setting psector vdefault as visible
+		IF NEW.state = 2 THEN
+			INSERT INTO selector_psector (psector_id, cur_user) VALUES (v_psector_vdefault, current_user) ON CONFLICT DO NOTHING;
+		END IF;
 
 		-- connec ID
 		IF NEW.connec_id != (SELECT last_value::text FROM urn_id_seq) OR NEW.connec_id IS NULL THEN
@@ -224,7 +236,6 @@ BEGIN
 			END IF;           
 		END IF;
 			
-			
 		-- Presszone
 		IF (NEW.presszone_id IS NULL) THEN
 			
@@ -255,7 +266,6 @@ BEGIN
 				NEW.presszone_id = 0;
 			END IF;           
 		END IF;
-		
 		
 		-- Municipality 
 		IF (NEW.muni_id IS NULL) THEN
@@ -304,7 +314,6 @@ BEGIN
 				END IF;	
 			END IF;	        
 		END IF;
-			
 			
 		-- State
 		IF (NEW.state IS NULL) THEN
@@ -443,6 +452,15 @@ BEGIN
 			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'connec_function_vdefault' AND cur_user = current_user);
 		END IF;
 
+		-- crmzone_id 
+		IF (NEW.crmzone_id IS NULL) THEN
+			-- getting value from geometry of mapzone
+			IF (NEW.crmzone_id IS NULL) THEN
+				SELECT count(*) INTO v_count FROM crm_zone WHERE ST_DWithin(NEW.the_geom, crm_zone.the_geom,0.001);
+				NEW.crmzone_id = (SELECT id FROM crm_zone WHERE ST_DWithin(NEW.the_geom, crm_zone.the_geom,0.001) LIMIT 1);	
+			END IF;	        
+		END IF;
+
 		--elevation from raster
 		IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE 
 		 AND (NEW.elevation IS NULL) AND
@@ -460,13 +478,15 @@ BEGIN
 		function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2, 
 		muni_id, streetaxis_id,  postcode, district_id, postcomplement, postcomplement2, descript, link, verified, rotation,  the_geom, undelete, label_x,label_y,label_rotation, expl_id,
 		publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, staticpressure, pjoint_id, pjoint_type,
-		adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id, epa_type)		
+		adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id, epa_type, om_state, conserv_state, priority, 
+		valve_location, valve_type, shutoff_valve, access_type, placement_type, crmzone_id)
 		VALUES (NEW.connec_id, NEW.code, NEW.elevation, NEW.depth, NEW.connecat_id, NEW.sector_id, NEW.customer_code,  NEW.state, NEW.state_type, NEW.annotation,   NEW.observ, NEW.comment, 
 		NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type,  NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,  NEW.workcat_id_plan, NEW.buildercat_id,
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, v_streetaxis, NEW.postnumber, NEW.postnumber2, NEW.muni_id, v_streetaxis, NEW.postcode, NEW.district_id, NEW.postcomplement, 
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.verified, NEW.rotation, NEW.the_geom,NEW.undelete,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory, 
 		NEW.num_value, NEW.connec_length, NEW.arc_id, NEW.minsector_id, NEW.dqa_id, NEW.staticpressure, NEW.pjoint_id, NEW.pjoint_type,
-		NEW.adate, NEW.adescript, NEW.accessibility, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.epa_type);
+		NEW.adate, NEW.adescript, NEW.accessibility, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.epa_type, NEW.om_state, NEW.conserv_state, NEW.priority,
+		NEW.valve_location, NEW.valve_type, NEW.shutoff_valve, NEW.access_type, NEW.placement_type, NEW.crmzone_id);
 		
 
 		SELECT system_id, cat_feature.id INTO v_system_id, v_featurecat_id FROM cat_feature 
@@ -476,20 +496,16 @@ BEGIN
 		FROM cat_feature_connec WHERE id='||quote_literal(v_featurecat_id)||''
 		INTO v_insert_double_geom, v_double_geom_buffer;
 
-		IF (v_insert_double_geom IS TRUE) THEN
-				IF (v_pol_id IS NULL) THEN
-					v_pol_id:= (SELECT nextval('urn_id_seq'));
-				END IF;
-					
-				INSERT INTO polygon(pol_id, sys_type, the_geom, featurecat_id, feature_id ) 
-				VALUES (v_pol_id, v_system_id, (SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_double_geom_buffer))) 
-				from connec where connec_id=NEW.connec_id), v_featurecat_id, NEW.connec_id);
+		IF (v_insert_double_geom IS TRUE) THEN					
+			INSERT INTO polygon(sys_type, the_geom, featurecat_id, feature_id ) 
+			VALUES (v_system_id, (SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_double_geom_buffer))) 
+			from connec where connec_id=NEW.connec_id), v_featurecat_id, NEW.connec_id);
 		END IF;
 
 
 		IF v_man_table='man_greentap' THEN
-			INSERT INTO man_greentap (connec_id, linked_connec, brand, model) 
-			VALUES(NEW.connec_id, NEW.linked_connec, NEW.brand, NEW.model); 
+			INSERT INTO man_greentap (connec_id, linked_connec, brand, model, greentap_type, cat_valve) 
+			VALUES(NEW.connec_id, NEW.linked_connec, NEW.brand, NEW.model, NEW.greentap_type, NEW.cat_valve); 
 		
 		ELSIF v_man_table='man_fountain' THEN 
 			
@@ -503,48 +519,43 @@ BEGIN
 			VALUES (NEW.connec_id, NEW.linked_connec, NEW.cat_valve, NEW.drain_diam, NEW.drain_exit, NEW.drain_gully, NEW.drain_distance, NEW.arq_patrimony, NEW.com_state);
 		  
 		ELSIF v_man_table='man_wjoin' THEN  
-		 	INSERT INTO man_wjoin (connec_id, top_floor, cat_valve, brand, model) 
-			VALUES (NEW.connec_id, NEW.top_floor, NEW.cat_valve, NEW.brand, NEW.model);
+		 	INSERT INTO man_wjoin (connec_id, top_floor, cat_valve, brand, model, wjoin_type) 
+			VALUES (NEW.connec_id, NEW.top_floor, NEW.cat_valve, NEW.brand, NEW.model, NEW.wjoin_type);
 			
 		END IF;	
 
 		IF v_man_table='parent' THEN
-		    v_man_table:= (SELECT man_table FROM cat_feature_connec c JOIN sys_feature_cat s ON c.type = s.id JOIN cat_connec ON cat_connec.id=NEW.connecat_id
+			v_man_table:= (SELECT man_table FROM cat_feature_connec c JOIN sys_feature_cat s ON c.type = s.id JOIN cat_connec ON cat_connec.id=NEW.connecat_id
 		    	WHERE c.id = cat_connec.connectype_id LIMIT 1)::text;
 	         
-	        IF v_man_table IS NOT NULL THEN
-	            v_sql:= 'INSERT INTO '||v_man_table||' (connec_id) VALUES ('||quote_literal(NEW.connec_id)||')';
-	            EXECUTE v_sql;
-	        END IF;
-
+			IF v_man_table IS NOT NULL THEN
+			    v_sql:= 'INSERT INTO '||v_man_table||' (connec_id) VALUES ('||quote_literal(NEW.connec_id)||')';
+			    EXECUTE v_sql;
+			END IF;
 	 	END IF;
 
-		
-		IF NEW.state=1 THEN
-			-- Control of automatic insert of link and vnode
-			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_automatic_link'
-			AND cur_user=current_user LIMIT 1) IS TRUE THEN
+	 	-- insertint on psector table
+		IF NEW.state=2 THEN
+			INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, arc_id)
+			VALUES (NEW.connec_id, v_psector_vdefault, 1, true, NEW.arc_id);
+		END IF;
 
-				EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+		-- manage connect2network
+		IF v_connect2network THEN
+		
+			IF NEW.arc_id IS NOT NULL THEN
+				EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+				"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC", "forcedArcs":["'||NEW.arc_id||'"]}}$$)';
+			ELSE
+				EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
-				
 			END IF;
 
-		ELSIF NEW.state=2 THEN
-			-- for planned connects always must exits link defined because alternatives will use parameters and rows of that defined link adding only geometry defined on plan_psector
-
-			EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-			"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
-
-			-- for planned always must exits arc_id defined on default psector because it is impossible to draw a new planned link. Unique option for user is modify the existing automatic link
-			SELECT arc_id INTO v_arc_id FROM connec WHERE connec_id=NEW.connec_id;
-			v_psector_vdefault=(SELECT value::integer FROM config_param_user WHERE config_param_user.parameter::text = 'plan_psector_vdefault'::text AND 
-			config_param_user.cur_user::name = "current_user"());
-			INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, arc_id) 
-			VALUES (NEW.connec_id, v_psector_vdefault, 1, true, v_arc_id);
-		
+			-- recover values in order to do not disturb this workflow
+			SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
+			NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id; 
+			NEW.presszone_id = v_arc.presszone_id; NEW.dqa_id = v_arc.dqa_id;  NEW.minsector_id = v_arc.minsector_id; 
 		END IF;
-			
 
 		-- man addfields insert
 		IF v_customfeature IS NOT NULL THEN
@@ -566,7 +577,7 @@ BEGIN
 		IF (NEW.epa_type = 'JUNCTION') THEN 
 			INSERT INTO inp_connec (connec_id) VALUES (NEW.connec_id);
 		END IF;
-	
+		
 		RETURN NEW;
 		
 	ELSIF TG_OP = 'UPDATE' THEN
@@ -598,8 +609,8 @@ BEGIN
 			AND element_id IN (SELECT element_id FROM element_x_connec WHERE connec_id = NEW.connec_id);		
 
 			-- setting pjoint_id, pjoint_type and arc_id and removing link in case of connec is over arc
-			v_arc = (SELECT arc_id FROM v_edit_arc WHERE st_dwithin(the_geom, NEW.the_geom, 0.01) AND state > 0 LIMIT 1);
-			IF v_arc IS NULL AND OLD.pjoint_type = 'CONNEC' THEN
+			v_arc_id = (SELECT arc_id FROM v_edit_arc WHERE st_dwithin(the_geom, NEW.the_geom, 0.01) AND state > 0 LIMIT 1);
+			IF v_arc_id IS NULL AND OLD.pjoint_type = 'CONNEC' THEN
 				NEW.arc_id = NULL;
 				NEW.pjoint_id = NULL;
 				NEW.pjoint_type = NULL;
@@ -614,35 +625,56 @@ BEGIN
 		END IF;
 
 		-- Reconnect arc_id
-		IF (NEW.arc_id != OLD.arc_id) OR (NEW.arc_id IS NOT NULL AND OLD.arc_id IS NULL) OR (NEW.arc_id IS NULL AND OLD.arc_id IS NOT NULL) THEN
+		IF (coalesce (NEW.arc_id,'') != coalesce(OLD.arc_id,'')) THEN
 
-			-- when arc_id comes from plan psector tables
-			IF (OLD.arc_id IN (SELECT arc_id FROM plan_psector_x_connec WHERE connec_id=NEW.connec_id)) THEN
-				UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE connec_id=OLD.connec_id AND arc_id = OLD.arc_id;		
+			-- when connec_id comes from psector_table
+			IF NEW.state = 1 AND (SELECT connec_id FROM plan_psector_x_connec JOIN selector_psector USING (psector_id)
+				WHERE connec_id=NEW.connec_id AND psector_id = v_psector_vdefault AND cur_user = current_user AND state = 1) IS NOT NULL THEN
+
+				EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+				"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC", "forceEndPoint":"true", "forcedArcs":["'||NEW.arc_id||'"]}}$$)';	
+
+			ELSIF NEW.state = 2 THEN
+
+				IF NEW.arc_id IS NOT NULL THEN
+
+					IF (SELECT connec_id FROM plan_psector_x_connec JOIN selector_psector USING (psector_id)
+						WHERE connec_id=NEW.connec_id AND psector_id = v_psector_vdefault AND cur_user = current_user AND state = 1) IS NOT NULL THEN
+
+						EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+						"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC", "forceEndPoint":"true", "forcedArcs":["'||NEW.arc_id||'"]}}$$)';		
+					END IF;
+				ELSE
+					IF (SELECT link_id FROM plan_psector_x_connec JOIN selector_psector USING (psector_id)
+						WHERE connec_id=NEW.connec_id AND psector_id = v_psector_vdefault AND cur_user = current_user AND state = 1) IS NOT NULL THEN
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3204", "function":"1304","debug_msg":""}}$$);';
+					ELSE
+						UPDATE plan_psector_x_connec SET arc_id = null, link_id = null WHERE connec_id=NEW.connec_id AND psector_id = v_psector_vdefault AND state = 1;
+					END IF;
+				END IF;
 			ELSE
 				-- when arc_id comes from connec table
 				UPDATE connec SET arc_id=NEW.arc_id where connec_id=NEW.connec_id;
+
+				IF NEW.arc_id IS NOT NULL THEN
 				
-				-- if connec already has link (using vnode)
-				IF (SELECT link_id FROM link WHERE feature_id=NEW.connec_id AND feature_type='CONNEC' AND exit_type ='VNODE' LIMIT 1) IS NOT NULL AND v_disable_linktonetwork IS NOT TRUE THEN
+					-- when link exists
+					IF (SELECT link_id FROM link WHERE state = 1 and feature_id =  NEW.connec_id) IS NOT NULL THEN
+						EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+						"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC", "forceEndPoint":"true",  "forcedArcs":["'||NEW.arc_id||'"]}}$$)';	
+					END IF;			
 
-					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-					"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
-
-				-- if variable to trigger link is enabled
-				ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_automatic_link' AND cur_user=current_user LIMIT 1) IS TRUE AND v_disable_linktonetwork IS NOT TRUE THEN
-
-					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-					"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
+					-- recover values in order to do not disturb this workflow
+					SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
+					NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id; 
+					NEW.presszone_id = v_arc.presszone_id; NEW.dqa_id = v_arc.dqa_id;  NEW.minsector_id = v_arc.minsector_id; 
 				ELSE
-					IF NEW.arc_id IS NOT NULL THEN
-						IF v_autoupdate_fluid IS TRUE THEN 
-							NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
-						END IF;
-						NEW.dma_id = (SELECT dma_id FROM arc WHERE arc_id = NEW.arc_id);
-						NEW.presszone_id = (SELECT presszone_id FROM arc WHERE arc_id = NEW.arc_id);
-						NEW.sector_id = (SELECT sector_id FROM arc WHERE arc_id = NEW.arc_id);
-						NEW.dqa_id = (SELECT dqa_id FROM arc WHERE arc_id = NEW.arc_id);
+					IF (SELECT count(*)FROM link WHERE feature_id = NEW.connec_id AND state = 1) > 0 THEN
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3204", "function":"1304","debug_msg":""}}$$);';
+					ELSE
+						NEW.sector_id = 0; NEW.presszone_id = '0'; NEW.dqa_id = 0; NEW.dma_id = 0; NEW.minsector_id = 0; NEW.minsector_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
 					END IF;
 				END IF;
 			END IF;
@@ -650,16 +682,35 @@ BEGIN
 
 		-- Looking for state control and insert planned connecs to default psector
 		IF (NEW.state != OLD.state) THEN   
+		
 			PERFORM gw_fct_state_control('CONNEC', NEW.connec_id, NEW.state, TG_OP);
+			
 			IF NEW.state = 2 AND OLD.state=1 THEN
-				INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable)
-				VALUES (NEW.connec_id, (SELECT config_param_user.value::integer AS value FROM config_param_user WHERE config_param_user.parameter::text
-				= 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
+
+				v_link = (SELECT link_id FROM link WHERE feature_id = NEW.connec_id AND state = 1 LIMIT 1);
+			
+				INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, link_id, arc_id)
+				VALUES (NEW.connec_id, v_psector_vdefault, 1, true,
+				v_link, NEW.arc_id);
+				
+				UPDATE link SET state = 2 WHERE link_id  = v_link;
 			END IF;
+			
 			IF NEW.state = 1 AND OLD.state=2 THEN
+
+				v_link = (SELECT link_id FROM link WHERE feature_id = NEW.connec_id AND state = 2 LIMIT 1);
+			
+				-- force delete
+				UPDATE config_param_user SET value = 'true' WHERE parameter = 'plan_psector_downgrade_feature' AND cur_user= current_user;
 				DELETE FROM plan_psector_x_connec WHERE connec_id=NEW.connec_id;
+				-- recover values
+				UPDATE config_param_user SET value = 'false' WHERE parameter = 'plan_psector_downgrade_feature' AND cur_user= current_user;
+
+				UPDATE link SET state = 1 WHERE link_id  = v_link;
+
 			END IF;
-			UPDATE connec SET state=NEW.state WHERE connec_id = OLD.connec_id;
+			
+			UPDATE connec SET state=NEW.state WHERE connec_id = NEW.connec_id;
 			
 		END IF;
 		
@@ -676,9 +727,8 @@ BEGIN
 				END IF;
 			END IF;
 
-			-- Automatic downgrade of associated link/vnode
+			-- Automatic downgrade of associated link
 			UPDATE link SET state=0 WHERE feature_id=OLD.connec_id;
-			UPDATE vnode SET state=0 WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=OLD.connec_id LIMIT 1)::integer;
 
 			--check if there is any active hydrometer related to connec
 			IF (SELECT count(id) FROM rtc_hydrometer_x_connec rhc JOIN ext_rtc_hydrometer hc ON hc.id::text=hydrometer_id::text
@@ -730,7 +780,7 @@ BEGIN
 		END IF;
 
 		UPDATE connec 
-			SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW.depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, 
+			SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW.depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id,
 			annotation=NEW.annotation, observ=NEW.observ, "comment"=NEW.comment, rotation=NEW.rotation,dma_id=NEW.dma_id, presszone_id=NEW.presszone_id,
 			soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, 
 			workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, streetaxis2_id=v_streetaxis2, 
@@ -739,17 +789,20 @@ BEGIN
 			undelete=NEW.undelete, label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,publish=NEW.publish, 
 			inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, connec_length=NEW.connec_length, link=NEW.link, lastupdate=now(), lastupdate_user=current_user,
 			dqa_id=NEW.dqa_id, minsector_id=NEW.minsector_id, staticpressure=NEW.staticpressure, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
-			adate=NEW.adate, adescript=NEW.adescript, accessibility =  NEW.accessibility, asset_id=NEW.asset_id, epa_type = NEW.epa_type
+			adate=NEW.adate, adescript=NEW.adescript, accessibility =  NEW.accessibility, asset_id=NEW.asset_id, epa_type = NEW.epa_type,
+			om_state = NEW.om_state, conserv_state = NEW.conserv_state, priority = NEW.priority,
+			valve_location = NEW.valve_location, valve_type = NEW.valve_type, shutoff_valve = NEW.shutoff_valve, access_type = NEW.access_type, placement_type = NEW.placement_type,
+			crmzone_id=NEW.crmzone_id
 			WHERE connec_id=OLD.connec_id;
 			
 		IF v_man_table ='man_greentap' THEN
 			UPDATE man_greentap SET linked_connec=NEW.linked_connec,
-			brand=NEW.brand, model=NEW.model
+			brand=NEW.brand, model=NEW.model, greentap_type=NEW.greentap_type, cat_valve=NEW.cat_valve
 			WHERE connec_id=OLD.connec_id;
 			
 		ELSIF v_man_table ='man_wjoin' THEN
 			UPDATE man_wjoin SET top_floor=NEW.top_floor,cat_valve=NEW.cat_valve,
-			brand=NEW.brand, model=NEW.model
+			brand=NEW.brand, model=NEW.model, wjoin_type=NEW.wjoin_type
 			WHERE connec_id=OLD.connec_id;
 			
 		ELSIF v_man_table ='man_tap' THEN
@@ -810,18 +863,12 @@ BEGIN
 
 		DELETE FROM polygon WHERE feature_id = OLD.connec_id;
 
-		-- delete links & vnode's
+		-- delete links
 		FOR v_record_link IN SELECT * FROM link WHERE feature_type='CONNEC' AND feature_id=OLD.connec_id
 		LOOP
 			-- delete link
 			DELETE FROM link WHERE link_id=v_record_link.link_id;
 
-			-- delete vnode if no more links are related to vnode
-			SELECT count(exit_id) INTO v_count FROM link WHERE exit_id=v_record_link.exit_id;
-						
-			IF v_count =0 THEN 
-				DELETE FROM vnode WHERE vnode_id=v_record_link.exit_id::integer;
-			END IF;
 		END LOOP;
 
 		--Delete addfields

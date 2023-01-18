@@ -56,7 +56,8 @@ v_status text;
 v_rectable record;
 v_max_seq_id integer;
 v_querytext text;
-
+v_definition text;
+rec_viewname text;
 BEGIN 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
@@ -318,6 +319,26 @@ BEGIN
 			-- UPDATE edit_check_redundance_y_topelev_elev
 			UPDATE config_param_system SET value = 'TRUE' WHERE parameter = 'edit_check_redundance_y_topelev_elev';
 
+			-- Make visible fields on feature forms
+			IF v_projecttype = 'WS' THEN 
+				UPDATE config_form_fields SET hidden = false where (columnname IN ('press_max', 'press_min', 'press_avg') OR columnname IN ('head_max', 'head_min', 'head_avg') OR columnname IN ('demand_max', 'demand_min', 'demand_avg') OR 
+				columnname IN ('om_state', 'conserv_state', 'access_type', 'placement_type', 'hydrant_type', 'valve_type')) 
+				AND formname ilike 've_node%';
+
+				UPDATE config_form_fields SET hidden = false where (columnname IN ('flow_max', 'flow_min', 'flow_avg') OR columnname IN ('vel_max', 'vel_min', 'vel_avg') OR 
+				columnname IN ('om_state', 'conserv_state')) 
+				AND formname ilike 've_arc%';
+
+				UPDATE config_form_fields SET hidden = false where (columnname IN ('demand_max', 'demand_min', 'demand_avg') OR columnname IN ('press_max', 'press_min', 'press_avg') OR 
+				columnname IN ('om_state', 'conserv_state', 'priority', 'valve_location', 'valve_type', 'shutoff_valve', 'access_type', 'placement_type', 'crmzone_id')) 
+				AND formname ilike 've_connec%';
+
+					
+			ELSIF v_projecttype = 'UD' THEN
+				UPDATE config_form_fields SET hidden = false where 
+				columnname IN ('step_pp', 'step_fe', 'step_replace', 'cover') AND formname ilike 've_node%';
+			END IF;
+
 		ELSIF v_isnew IS FALSE THEN
 		
 			SELECT project_type INTO v_projecttype FROM sys_version ORDER BY 1 DESC LIMIT 1;
@@ -373,6 +394,22 @@ BEGIN
 			IF v_oldversion < '3.4.032' AND v_gwversion > '3.4.030' THEN
 				PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 				"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"workcat_id_plan" }}$$);
+			END IF;
+
+			-- recreate child views adding workcat_id_plan on parent tables
+			IF v_oldversion < '3.5.031'  THEN
+				FOR rec_viewname IN (SELECT child_layer FROM cat_feature WHERE feature_type = 'NODE') LOOP
+					IF (SELECT EXISTS ( SELECT 1 FROM  information_schema.tables WHERE  table_schema = v_schemaname AND table_name = rec_viewname)) 
+					IS TRUE THEN
+						EXECUTE 'SELECT pg_get_viewdef('''||v_schemaname||'.'||rec_viewname||''', true);'
+						INTO v_definition;
+
+						v_definition = replace(v_definition,concat('JOIN ',v_schemaname,'.v_state_node ON node_id = feature_id'), 
+						concat('JOIN ',v_schemaname,'.v_state_node s ON s.node_id = feature_id JOIN ',v_schemaname,'.v_expl_node e ON e.node_id = feature_id'));
+
+						EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||rec_viewname||' AS '||v_definition||'';
+					END IF;
+				END LOOP;
 			END IF;
 
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('Project have been sucessfully updated from ',v_oldversion,' version to ',v_gwversion, ' version'));

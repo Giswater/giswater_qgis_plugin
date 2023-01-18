@@ -78,8 +78,8 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fid = 125 AND cur_user=current_user;
 	
 	-- delete old values on anl table
-	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (210,201,202,204,205,257,291);
-	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (103,196,197,188,223,202,372,391,417,418,461);
+	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (210,201,202,204,205,257,291,478);
+	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (103,196,197,188,223,202,372,391,417,418,461,381, 479);
 	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (106,177,187,202,442,443,461);
 	DELETE FROM temp_arc;
 
@@ -513,9 +513,15 @@ BEGIN
 
 	END IF;
 	
+    
 	RAISE NOTICE '19 - connec/gully without link (204)';
-	v_querytext = 'SELECT connec_id,connecat_id,the_geom, expl_id from '||v_edit||'connec WHERE state= 1 
-					AND connec_id NOT IN (select feature_id from link)';
+    
+	v_querytext = 'SELECT connec_id, connecat_id, c.the_geom, c.expl_id from '||v_edit||'connec c WHERE c.state= 1 
+					AND connec_id NOT IN (SELECT feature_id FROM link)
+					EXCEPT 
+					SELECT connec_id, connecat_id, c.the_geom, c.expl_id FROM '||v_edit||'connec c
+					LEFT JOIN '||v_edit||'arc a USING (arc_id) WHERE c.state= 1 
+					AND arc_id IS NOT NULL AND st_dwithin(c.the_geom, a.the_geom, 0.1)';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -524,15 +530,20 @@ BEGIN
 		SELECT 204, connec_id, connecat_id, ''Connecs without links'', the_geom, expl_id FROM (', v_querytext,')a');
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (125, '204', 2, concat('WARNING-204 (anl_connec): There is/are ',v_count,' connecs without links.'),v_count);
+		VALUES (125, '204', 2, concat('WARNING-204 (anl_connec): There is/are ',v_count,' connecs without links or connecs over arc without arc_id'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (125, '204',1, 'INFO: All connecs have links.',v_count);
+		VALUES (125, '204',1, 'INFO: All connecs have links or are over arc with arc_id.',v_count);
 	END IF;
 
 	IF v_project_type = 'UD' THEN 
-		v_querytext = 'SELECT gully_id,gratecat_id,the_geom, expl_id from '||v_edit||'gully WHERE state= 1 
-						AND gully_id NOT IN (select feature_id from link)';
+					
+		v_querytext = 'SELECT gully_id, gratecat_id, c.the_geom, c.expl_id from '||v_edit||'gully c WHERE c.state= 1 
+						AND gully_id NOT IN (SELECT feature_id FROM link)
+						EXCEPT 
+						SELECT gully_id, gratecat_id, c.the_geom, c.expl_id FROM '||v_edit||'gully c
+						LEFT JOIN '||v_edit||'arc a USING (arc_id) WHERE c.state= 1 
+						AND arc_id IS NOT NULL AND st_dwithin(c.the_geom, a.the_geom, 0.1)';
 	
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -542,35 +553,32 @@ BEGIN
 			SELECT 204, gully_id, gratecat_id, ''Gullies without links'', the_geom, expl_id FROM (', v_querytext,')a');
 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (125, '204',2, concat('WARNING-204 (anl_connec): There is/are ',v_count,' gullies without links.'), v_count);
+			VALUES (125, '204',2, concat('WARNING-204 (anl_connec): There is/are ',v_count,' gullies without links or gullies over arc without arc_id.'), v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (125,'204', 1, 'INFO: All gullies have links.', v_count);
+			VALUES (125,'204', 1, 'INFO: All gullies have links or are over arc with arc_id.', v_count);
 		END IF;
 	
 	END IF;
 
+
 	RAISE NOTICE '20 - connec/gully without arc_id or with arc_id different than the one to which points its link (257)';
 
-	v_querytext='SELECT count(*) FROM '||v_edit||'arc';
-	EXECUTE v_querytext INTO v_count;
-	IF v_count < 10000 THEN -- too big
-	
-		v_querytext = 'SELECT c.connec_id, c.connecat_id, c.the_geom, c.expl_id, l.feature_type, link_id 
-			FROM '||v_edit||'arc a, '||v_edit||'link l
-			JOIN connec c ON l.feature_id = c.connec_id 
-			WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom), 0.01)
-			AND exit_type = ''VNODE''
-			AND (a.arc_id <> c.arc_id or c.arc_id is null) 
-			AND l.feature_type = ''CONNEC'' AND a.state=1 and c.state = 1
-			EXCEPT
-			SELECT c.connec_id, c.connecat_id, c.the_geom, c.expl_id, l.feature_type, link_id
-			FROM '||v_edit||'node n, '||v_edit||'link l
-			JOIN connec c ON l.feature_id = c.connec_id 
-			WHERE st_dwithin(n.the_geom, st_endpoint(l.the_geom), 0.01)
-			AND exit_type = ''VNODE'' 
-			AND l.feature_type = ''CONNEC'' AND n.state=1 and c.state = 1
-			ORDER BY feature_type, link_id';
+	v_querytext = 'SELECT c.connec_id, c.connecat_id, c.the_geom, c.expl_id, l.feature_type, link_id 
+		FROM '||v_edit||'arc a, '||v_edit||'link l
+		JOIN connec c ON l.feature_id = c.connec_id 
+		WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom), 0.01)
+		AND exit_type = ''ARC''
+		AND (a.arc_id <> c.arc_id or c.arc_id is null) 
+		AND l.feature_type = ''CONNEC'' AND a.state=1 and c.state = 1
+		EXCEPT
+		SELECT c.connec_id, c.connecat_id, c.the_geom, c.expl_id, l.feature_type, link_id
+		FROM '||v_edit||'node n, '||v_edit||'link l
+		JOIN connec c ON l.feature_id = c.connec_id 
+		WHERE st_dwithin(n.the_geom, st_endpoint(l.the_geom), 0.01)
+		AND exit_type = ''ARC'' 
+		AND l.feature_type = ''CONNEC'' AND n.state=1 and c.state = 1
+		ORDER BY feature_type, link_id';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -590,7 +598,7 @@ BEGIN
 				FROM '||v_edit||'arc a, '||v_edit||'link l
 				JOIN gully c ON l.feature_id = c.gully_id 
 				WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom), 0.01)
-				AND exit_type = ''VNODE''
+				AND exit_type = ''ARC''
 				AND (a.arc_id <> c.arc_id or c.arc_id is null) 
 				AND l.feature_type = ''GULLY'' AND a.state=1 and c.state = 1
 				EXCEPT
@@ -598,7 +606,7 @@ BEGIN
 				FROM '||v_edit||'node n, '||v_edit||'link l
 				JOIN gully c ON l.feature_id = c.gully_id 
 				WHERE st_dwithin(n.the_geom, st_endpoint(l.the_geom), 0.01)
-				AND exit_type = ''VNODE'' 
+				AND exit_type = ''ARC'' 
 				AND l.feature_type = ''GULLY'' AND n.state=1 and c.state = 1
 				ORDER BY feature_type, link_id';
 
@@ -615,26 +623,6 @@ BEGIN
 				VALUES (125, 1, '257', 'INFO: All gullies have correct arc_id.', v_count);
 			END IF;
 		END IF;
-	END IF;
-
-	RAISE NOTICE '21 - Check vnode inconsistency (vnode without link) (259)';
-	v_querytext = 'SELECT vnode_id FROM vnode LEFT JOIN '||v_edit||'link ON vnode_id = exit_id::integer where link_id IS NULL';
-	
-	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
-	
-	IF v_count > 0 THEN
-	
-		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (125, 2, '259',concat('WARNING-259: There is/are ',v_count,' vnodes without link. They will be automatically repaired'),v_count);
-		
-		EXECUTE 'DELETE FROM vnode WHERE vnode_id IN ('||v_querytext||')';
-		
-	ELSE
-		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (125, 1, '259', 'INFO: All vnodes have vnode link.', v_count);
-
-	END IF;
-	
 
 	RAISE NOTICE '22 - links without feature_id (260)';
 	v_querytext = 'SELECT link_id, the_geom FROM '||v_edit||'link where feature_id is null and state > 0';
@@ -785,14 +773,14 @@ BEGIN
 
 	RAISE NOTICE '27 - Automatic links with more than 100 mts (longitude out-of-range) (265)';
 
-	EXECUTE 'SELECT count(*) FROM '||v_edit||'link where userdefined_geom  = false AND st_length(the_geom) > 100'
+	EXECUTE 'SELECT count(*) FROM '||v_edit||'link where st_length(the_geom) > 100'
 	INTO v_count;
 
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, fcount)
 		VALUES (125, 2, '265', concat('WARNING-265: There is/are ',v_count,' automatic links with longitude out-of-range found.'),v_count);
 		INSERT INTO audit_check_data (fid, criticity, error_message, fcount)
-		VALUES (125, 2, concat('HINT: If link is ok, change userdefined_geom from false to true. Does not make sense automatic link with this longitude.'),v_count);
+		VALUES (125, 2, concat('HINT: Links with this longitudes doesn''t make sense.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, fcount)
 		VALUES (125, 1,'265', 'INFO: No automatic links with out-of-range Longitude found.',v_count);
@@ -828,10 +816,10 @@ BEGIN
 	RAISE NOTICE '29 - Check planned connects without reference link (356)';
 
 	IF v_project_type = 'WS' THEN
-		v_querytext = 'SELECT count(*) FROM plan_psector_x_connec LEFT JOIN link ON feature_id = connec_id WHERE link_id IS NULL';
+		v_querytext = 'SELECT count(*) FROM plan_psector_x_connec WHERE link_id IS NULL';
 	ELSIF v_project_type = 'UD' THEN
-		v_querytext = 'SELECT count(*) FROM (SELECT * FROM plan_psector_x_connec LEFT JOIN link ON feature_id = connec_id WHERE link_id IS NULL
-				UNION SELECT * FROM plan_psector_x_gully LEFT JOIN link ON feature_id = gully_id WHERE link_id IS NULL)a';
+		v_querytext = 'SELECT count(*) FROM (SELECT * FROM plan_psector_x_connec WHERE link_id IS NULL
+				UNION SELECT * FROM plan_psector_x_gully WHERE link_id IS NULL)a';
 	END IF;
 
 
@@ -1303,7 +1291,7 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
-			EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id)
+			EXECUTE concat ('INSERT INTO anl_connec (fid, arc_id, arccat_id, descript, the_geom, expl_id)
 			SELECT 461, arc_id, arccat_id, ''Redundant values on y1/y2-elev1/elev2'', the_geom, expl_id FROM (', v_querytext,')a');
 
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
@@ -1314,6 +1302,46 @@ BEGIN
 		END IF;
 	END IF;
 
+	RAISE NOTICE '45 - Check sector_id 0 or -1 (connec, gully) (478)';
+
+	IF v_project_type = 'WS' THEN
+		v_querytext = '(SELECT connec_id, connecat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE state > 0 AND (sector_id=0 OR sector_id=-1))a';
+  ELSIF v_project_type = 'UD' THEN
+		v_querytext = '(SELECT connec_id, connecat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE state > 0 AND (sector_id=0 OR sector_id=-1)
+		        UNION SELECT gully_id, gratecat_id, the_geom, expl_id FROM '||v_edit||'gully WHERE state > 0 AND (sector_id=0 OR sector_id=-1))a';
+  END IF;
+
+	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+	IF v_count > 0 THEN
+			EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
+			SELECT 478, connec_id, connecat_id, ''Sector_id with 0 or -1 values'', the_geom, expl_id FROM ', v_querytext,'');
+
+		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (125, 2, '478',concat('WARNING-478: There is/are ',v_count,' features (connec, gullys) with sector_id 0 or -1.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+		VALUES (125, 1, '478', 'INFO: No features (connec, gullys) with 0 or -1 value on sector_id.',v_count);
+	END IF;
+
+	RAISE NOTICE '46 - Check arcs with the same geometry (479)';
+
+	v_querytext = '(SELECT arc_id, arccat_id, state1, arc_id_aux, node_1, node_2, expl_id, the_geom FROM (
+					SELECT DISTINCT t1.arc_id, t1.arccat_id, t1.state as state1, t2.arc_id as arc_id_aux, 
+					t2.state as state2, t1.node_1, t1.node_2, t1.expl_id, t1.the_geom
+					FROM '||v_edit||'arc AS t1 JOIN '||v_edit||'arc AS t2 USING(the_geom)
+					WHERE t1.arc_id != t2.arc_id ORDER BY t1.arc_id ) a where a.state1 > 0 AND a.state2 > 0) a';
+
+	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+	IF v_count > 0 THEN
+			EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id)
+			SELECT 479, arc_id, arccat_id,''Arcs with duplicated geometry'', the_geom, expl_id FROM ', v_querytext,'');
+
+		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (125, 3, '479',concat('ERROR-479: There is/are ',v_count,' arcs with duplicated geometry.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+		VALUES (125, 1, '479', 'INFO: No arcs with duplicated geometry.',v_count);
+	END IF;
 
 	-- Removing isaudit false sys_fprocess
 	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
@@ -1353,7 +1381,7 @@ BEGIN
 	AND fid IN (106,177,187,202,442,443)
 	UNION
 	SELECT connec_id, connecat_id, state, expl_id, descript, fid, the_geom FROM anl_connec WHERE cur_user="current_user"()
-	AND fid IN (210,201,202,204,205,291)) row) features;
+	AND fid IN (210,201,202,204,205,291,478)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 
@@ -1373,7 +1401,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (
-  	SELECT id, arccat_id, state, expl_id, descript, fid, the_geom FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (103, 196, 197, 188, 223, 202, 372, 391, 417, 418)
+  	SELECT id, arccat_id, state, expl_id, descript, fid, the_geom FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (103, 196, 197, 188, 223, 202, 372, 391, 417, 418, 479)
   	) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 

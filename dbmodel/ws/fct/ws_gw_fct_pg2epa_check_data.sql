@@ -17,7 +17,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data('{"parameters":{}}')-- when is calle
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{ "resultId":"test_bgeo_b1", "useNetworkGeom":"false"}}$$)
 
 -- fid: main: 225
-		other: 107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,293,294,295,371,379,433,411,412,430,432
+		other: 107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,293,294,295,371,379,433,411,412,430,432,480
 
 */
 
@@ -773,7 +773,8 @@ BEGIN
 	
 	RAISE NOTICE '32 - Check nodes ''T candidate'' with wrong topology (fid: 432)';
 
-	v_querytext = 'SELECT b.* FROM (SELECT n1.node_id, n1.sector_id, 432, ''Node ''''T candidate'''' with wrong topology'', n1.nodecat_id, n1.the_geom FROM v_edit_arc a, node n1 JOIN v_state_node USING (node_id)
+	v_querytext = 'SELECT b.* FROM (SELECT n1.node_id, n1.sector_id, 432, ''Node ''''T candidate'''' with wrong topology'', n1.nodecat_id, n1.the_geom FROM v_edit_arc a, node n1 
+					JOIN v_state_node USING (node_id) JOIN v_expl_node USING (node_id)
 		      JOIN (SELECT node_1 node_id FROM arc WHERE state = 1 UNION SELECT node_2 FROM arc WHERE state = 1) b USING (node_id)
 		      WHERE st_dwithin(a.the_geom, n1.the_geom,0.01) AND n1.node_id NOT IN (node_1, node_2))b, selector_sector s WHERE s.sector_id = b.sector_id AND cur_user=current_user';
 
@@ -803,6 +804,38 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '427', 1, 'INFO: All arcs have matcat_id filled.',v_count);
 	END IF;	
+	
+	RAISE NOTICE '34 - Check duplicated connec on visible psectors';
+	SELECT count(*) INTO v_count FROM (SELECT feature_id, count(*) from v_edit_link group by feature_id having count(*) > 1)a;
+
+	IF v_count > 0 THEN
+		INSERT INTO anl_connec (connec_id, fid, the_geom) select feature_id, 480, connec.the_geom from v_edit_link 
+		JOIN connec ON connec_id = feature_id group by feature_id, connec.the_geom having count(*) > 1;
+		
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '480', 3, concat(
+		'ERROR-480 (anl_connec): There is/are ',v_count,' connecs more than once because related psectors are visible.'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '480', 1, 'INFO: All connecs are unique on canvas because there are not psector inconsistencies.',v_count);
+	END IF;	
+
+	RAISE NOTICE '35 - Check percentage of arcs with custom_length values';
+	WITH cust_len AS (SELECT count(*) FROM v_edit_arc WHERE custom_length IS NOT NULL), arcs AS (SELECT count(*) FROM v_edit_arc)
+	SELECT cust_len.count::numeric / arcs.count::numeric *100 INTO v_count FROM arcs, cust_len;
+
+	IF v_count > (SELECT json_extract_path_text(value::json,'customLength','maxPercent')::NUMERIC FROM config_param_system WHERE parameter = 'epa_outlayer_values') THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '482', 2, concat('WARNING-482: Over ',round(v_count::numeric,2),' percent of arcs have value on custom_length.'),round(v_count::numeric,2));
+	ELSIF v_count=0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '482', 1, 'INFO: No arcs have value on custom_length.',round(v_count::numeric,2));
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '482', 1, concat('INFO: Less then ',round(v_count::numeric,2),' percent of arcs have value on custom_length.'),round(v_count::numeric,2));
+	END IF;
+	v_count=0;
 
 	-- Removing isaudit false sys_fprocess
 	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false

@@ -46,6 +46,7 @@ v_querytext text;
 v_patternmethod integer;
 v_userscenario integer[];
 v_networkmode integer;
+v_deafultpattern text;
 
 
 BEGIN
@@ -66,6 +67,7 @@ BEGIN
 		v_demandpriority = (SELECT value::integer FROM config_param_user WHERE parameter='inp_options_dscenario_priority' AND cur_user=current_user);
 		v_patternmethod = (SELECT value::integer FROM config_param_user WHERE parameter='inp_options_patternmethod' AND cur_user=current_user);
 		v_userscenario = (SELECT array_agg(dscenario_id) FROM selector_inp_dscenario where cur_user=current_user);
+		v_deafultpattern = Coalesce((SELECT value FROM config_param_user WHERE parameter='inp_options_pattern' AND cur_user=current_user),''); 
 
 		-- base demand management	
 		IF v_demandpriority = 0 THEN -- Remove whole base demand
@@ -112,21 +114,7 @@ BEGIN
 			
 		ELSIF v_networkmode = 3 THEN
 
-			-- demands for connec related to arcs
-			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id,  demand_type, source)
-			SELECT dscenario_id, n.node_id, d.demand, d.pattern_id, demand_type, source 
-			FROM  inp_dscenario_demand d ,temp_node n
-			JOIN connec c ON concat('VN',c.pjoint_id) =  n.node_id
-			WHERE c.connec_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0  
-			AND dscenario_id IN (SELECT unnest(v_userscenario));
-
-			-- demands for connec related to nodes
-			INSERT INTO temp_demand (dscenario_id, feature_id, demand, pattern_id,  demand_type, source)
-			SELECT dscenario_id, n.node_id, d.demand, d.pattern_id, demand_type, source 
-			FROM  inp_dscenario_demand d ,temp_node n
-			JOIN connec c ON c.pjoint_id =  n.node_id WHERE pjoint_type = 'NODE'
-			AND c.connec_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0  
-			AND dscenario_id IN (SELECT unnest(v_userscenario));
+			-- removed due refactor of 2022/6/12
 			
 		END IF;
 
@@ -140,8 +128,28 @@ BEGIN
 		JOIN connec c ON concat('VC',c.pjoint_id) =  n.node_id
 		WHERE c.connec_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0  
 		AND dscenario_id IN (SELECT unnest(v_userscenario));
+		
+		-- pattern
+		IF v_patternmethod = 11 THEN -- DEFAULT PATTERN
+			UPDATE temp_demand SET pattern_id=v_deafultpattern WHERE pattern_id IS NULL;
+		
+		ELSIF v_patternmethod = 12 THEN -- SECTOR PATTERN (NODE)
+			UPDATE temp_demand SET pattern_id=sector.pattern_id FROM node JOIN sector ON sector.sector_id=node.sector_id WHERE temp_demand.feature_id=node.node_id
+			 AND temp_demand.pattern_id IS NULL;
+			UPDATE temp_demand SET pattern_id=sector.pattern_id FROM connec JOIN sector ON sector.sector_id=connec.sector_id WHERE temp_demand.feature_id=connec.connec_id
+			 AND temp_demand.pattern_id IS NULL;
+		
+		ELSIF v_patternmethod = 13 THEN -- DMA PATTERN (NODE)
+			UPDATE temp_demand SET pattern_id=sector.pattern_id FROM node JOIN dma ON dma.sector_id=node.dma_id WHERE temp_demand.feature_id=node.node_id
+			 AND temp_demand.pattern_id IS NULL;
+			UPDATE temp_demand SET pattern_id=sector.pattern_id FROM connec JOIN dma ON dma.sector_id=connec.dma_id WHERE temp_demand.feature_id=connec.connec_id
+			 AND temp_demand.pattern_id IS NULL;
+			
+		ELSIF v_patternmethod = 14 THEN -- FEATURE PATTERN (NODE)
+			-- do nothing because values have been moved from feature
+		END IF;
 
-				
+		
 		-- move patterns used demands scenario table
 		INSERT INTO rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, 
 			factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
@@ -156,8 +164,7 @@ BEGIN
 		-- set cero where null in order to prevent user's null values on demand table
 		UPDATE temp_node SET demand=0 WHERE demand IS NULL;
 		
-
-		-- updating values for pipes
+		-- updating values for pipes (when are not trimed)
 		UPDATE temp_arc t SET status = d.status FROM v_edit_inp_dscenario_pipe d 
 		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.status IS NOT NULL;
 		UPDATE temp_arc t SET minorloss = d.minorloss FROM v_edit_inp_dscenario_pipe d 
@@ -166,6 +173,23 @@ BEGIN
 		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.dint IS NOT NULL;
 		UPDATE temp_arc t SET roughness = d.roughness FROM v_edit_inp_dscenario_pipe d 
 		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.roughness IS NOT NULL;
+
+		-- updating values for pipes (when are trimed, network mode  = 4)
+		UPDATE temp_arc t SET status = d.status FROM v_edit_inp_dscenario_pipe d 
+		WHERE substring (t.arc_id, 0, (case when position ('P' in t.arc_id) in (0) then 99 else position ('P' in t.arc_id) end)) = d.arc_id 		
+		AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.status IS NOT NULL;
+		
+		UPDATE temp_arc t SET minorloss = d.minorloss FROM v_edit_inp_dscenario_pipe d 
+		WHERE substring (t.arc_id, 0, (case when position ('P' in t.arc_id) in (0) then 99 else position ('P' in t.arc_id) end)) = d.arc_id
+		AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.minorloss IS NOT NULL;
+
+		UPDATE temp_arc t SET diameter = d.dint FROM v_edit_inp_dscenario_pipe d 
+		WHERE substring (t.arc_id, 0, (case when position ('P' in t.arc_id) in (0) then 99 else position ('P' in t.arc_id) end)) = d.arc_id 
+		AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.dint IS NOT NULL;
+
+		UPDATE temp_arc t SET roughness = d.roughness FROM v_edit_inp_dscenario_pipe d 
+		WHERE substring (t.arc_id, 0, (case when position ('P' in t.arc_id) in (0) then 99 else position ('P' in t.arc_id) end)) = d.arc_id 
+		AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.roughness IS NOT NULL;
 
 		-- updating values for shortpipes
 		UPDATE temp_arc t SET status = d.status FROM v_edit_inp_dscenario_shortpipe d 

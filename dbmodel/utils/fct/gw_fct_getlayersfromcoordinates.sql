@@ -187,7 +187,8 @@ BEGIN
 
 				--  Get element's parent type in order to be able to find featuretype'
 				EXECUTE 'SELECT lower(feature_type) FROM 
-				(SELECT parent_layer as layer, feature_type FROM cat_feature UNION SELECT child_layer as layer ,feature_type FROM cat_feature) a WHERE
+				(SELECT parent_layer as layer, feature_type FROM cat_feature WHERE id <> ''LINK'' 
+				UNION SELECT child_layer as layer ,feature_type FROM cat_feature WHERE id <> ''LINK'') a WHERE
 				layer =  '||quote_literal(v_layer)||';'
 				INTO v_parenttype;
 

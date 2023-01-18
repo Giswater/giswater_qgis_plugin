@@ -44,6 +44,11 @@ v_schemaname text;
 v_connec_id varchar;
 v_linkrec record;
 v_message text;
+v_nodetype text;
+v_staticpress double precision;
+v_elevation double precision;
+v_depth double precision;
+v_elev  double precision;
 
 BEGIN
 
@@ -138,7 +143,7 @@ BEGIN
 						v_arcrecordtb.arc_id:= (SELECT nextval('urn_id_seq'));
 						v_arcrecordtb.code = v_arcrecordtb.arc_id;
 						v_arcrecordtb.state=2;
-						v_arcrecordtb.state_type := (SELECT value::smallint FROM config_param_system WHERE parameter='plan_statetype_ficticius' LIMIT 1);
+						v_arcrecordtb.state_type := (SELECT (value::json->>'plan_statetype_ficticius')::smallint FROM config_param_system WHERE parameter='plan_statetype_vdefault');
 
 						-- set temporary values for config variables in order to enable the insert of arc in spite of due a 'bug' of postgres it seems that does not recognize the new node inserted
 						UPDATE config_param_user SET value=TRUE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;				
@@ -208,8 +213,8 @@ BEGIN
 						FOR v_connec_id IN 
 						SELECT connec_id FROM connec WHERE arc_id=v_arc.arc_id AND connec.state = 1
 						LOOP
-							INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_geom, userdefined_geom)						
-							SELECT connec_id, v_arcrecordtb.arc_id, v_psector_id, 1, false, l.the_geom, userdefined_geom 
+							INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable)
+							SELECT connec_id, v_arcrecordtb.arc_id, v_psector_id, 1, false
 							FROM link l JOIN connec c ON connec_id = l.feature_id WHERE l.feature_type  ='CONNEC' AND connec_id = v_connec_id;
 						END LOOP;
 					END IF;
@@ -231,24 +236,55 @@ BEGIN
 				xvar= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
 				yvar= (st_y(NEW.the_geom)-st_y(OLD.the_geom));		
 				UPDATE polygon SET the_geom=ST_translate(the_geom, xvar, yvar) WHERE pol_id=pol_id_var;
-			END IF;      
+			END IF; 
+
+			-- values of node
+			v_nodetype = (SELECT nodetype_id FROM cat_node WHERE NEW.nodecat_id = id);
+			v_staticpress = coalesce(NEW.staticpressure,0);
+			v_elevation = NEW.elevation;
+			v_depth = coalesce(NEW.depth,0);
 									
 			-- Select arcs with start-end on the updated node
 			v_querytext := 'SELECT * FROM arc WHERE arc.node_1 = ' || quote_literal(NEW.node_id) || ' OR arc.node_2 = ' || quote_literal(NEW.node_id); 
 			FOR arcrec IN EXECUTE v_querytext
 			LOOP
 				-- Initial and final node of the arc
-				SELECT * INTO nodeRecord1 FROM node WHERE node.node_id = arcrec.node_1;
-				SELECT * INTO nodeRecord2 FROM node WHERE node.node_id = arcrec.node_2;
+				SELECT * INTO nodeRecord1 FROM v_node WHERE v_node.node_id = arcrec.node_1;
+				SELECT * INTO nodeRecord2 FROM v_node WHERE v_node.node_id = arcrec.node_2;
 
 				-- Control de lineas de longitud 0
 				IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
 
 					-- Update arc node coordinates, node_id and direction
 					IF (nodeRecord1.node_id = NEW.node_id) THEN
-						EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, 0, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom, NEW.the_geom; 
-					ELSE
-						EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom, NEW.the_geom; 
+
+						-- update arc
+						IF v_elevation IS NOT NULL THEN
+							EXECUTE 'UPDATE arc SET
+								elevation1 = '|| v_elevation ||',
+								depth1 = '|| v_depth||',
+								staticpress1 = '|| v_staticpress ||' 
+								WHERE arc_id = ' || quote_literal(arcrec."arc_id");
+						END IF;
+						
+						EXECUTE 'UPDATE arc SET	nodetype_1 = '|| quote_literal(v_nodetype) ||', 
+						the_geom = ST_SetPoint($1, 0, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") 
+						USING arcrec.the_geom, NEW.the_geom; 
+
+					ELSIF (nodeRecord2.node_id = NEW.node_id) THEN
+
+						-- update arc
+						IF v_elevation IS NOT NULL THEN
+							EXECUTE 'UPDATE arc SET
+								elevation2 = '|| v_elevation ||',
+								depth2 = '|| v_depth||',
+								staticpress2 = '|| v_staticpress ||' 
+								WHERE arc_id = ' || quote_literal(arcrec."arc_id");
+						END IF;					
+					
+						EXECUTE 'UPDATE arc SET nodetype_2 = '|| quote_literal(v_nodetype) ||',
+						the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") 
+						USING arcrec.the_geom, NEW.the_geom; 
 					END IF;
 				END IF;
 			

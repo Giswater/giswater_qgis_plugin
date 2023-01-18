@@ -53,19 +53,34 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 				INSERT INTO v_edit_node (node_id, top_elev, ymax, node_type, nodecat_id, annotation, observ, expl_id, the_geom, matcat_id)
 				VALUES (NEW.node_id, NEW.new_top_elev, NEW.new_ymax, NEW.new_node_type, NEW.new_nodecat_id, NEW.new_annotation, NEW.new_observ, NEW.expl_id, 
 				NEW.the_geom, NEW.new_matcat_id); 
+
+				IF (SELECT system_id FROM cat_feature WHERE id=NEW.new_node_type) = 'MANHOLE' THEN
+					UPDATE man_manhole SET step_pp=NEW.new_step_pp, step_fe=NEW.new_step_fe, step_replace=NEW.new_step_replace, cover=NEW.new_cover
+					WHERE node_id=NEW.node_id;
+				END IF;
 				
 		
 			ELSIF v_review_status=2 THEN
 				UPDATE v_edit_node SET the_geom=NEW.the_geom, top_elev=NEW.new_top_elev, ymax=NEW.new_ymax, nodecat_id=NEW.new_nodecat_id, 
 				node_type=NEW.new_node_type, annotation=NEW.new_annotation, observ=NEW.new_observ, matcat_id=NEW.new_matcat_id
 				WHERE node_id=NEW.node_id;
-					
+				
+				IF (SELECT system_id FROM cat_feature WHERE id=NEW.new_node_type) = 'MANHOLE' THEN
+					UPDATE man_manhole SET step_pp=NEW.new_step_pp, step_fe=NEW.new_step_fe, step_replace=NEW.new_step_replace, cover=NEW.new_cover
+					WHERE node_id=NEW.node_id;
+				END IF;
+
 			ELSIF  v_review_status=3 THEN
 
 				UPDATE v_edit_node SET top_elev=NEW.new_top_elev, ymax=NEW.new_ymax, nodecat_id=NEW.new_nodecat_id, node_type=NEW.new_node_type,
 				annotation=NEW.new_annotation, observ=NEW.new_observ, matcat_id=NEW.new_matcat_id
 				WHERE node_id=NEW.node_id;
-	
+				
+				IF (SELECT system_id FROM cat_feature WHERE id=NEW.new_node_type) = 'MANHOLE' THEN
+					UPDATE man_manhole SET step_pp=NEW.new_step_pp, step_fe=NEW.new_step_fe, step_replace=NEW.new_step_replace, cover=NEW.new_cover
+					WHERE node_id=NEW.node_id;
+				END IF;
+				
 			END IF;	
 			
 			

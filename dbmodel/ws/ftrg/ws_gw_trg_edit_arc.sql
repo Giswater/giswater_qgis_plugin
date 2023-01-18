@@ -29,6 +29,7 @@ v_streetaxis text;
 v_streetaxis2 text;
 v_force_delete boolean;
 v_autoupdate_fluid boolean;
+v_psector integer;
 
 BEGIN
 
@@ -43,7 +44,8 @@ BEGIN
 
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 	v_edit_enable_arc_nodes_update = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_arc_enable nodes_update');
-    v_autoupdate_fluid = (SELECT value::boolean FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid');
+	v_autoupdate_fluid = (SELECT value::boolean FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid');
+	v_psector = (SELECT value::integer FROM config_param_user WHERE "parameter"='plan_psector_vdefault' AND cur_user=current_user);
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 		-- transforming streetaxis name into id
@@ -53,6 +55,11 @@ BEGIN
 
 	
 	IF TG_OP = 'INSERT' THEN
+
+		-- setting psector vdefault as visible
+		IF NEW.state = 2 THEN
+			INSERT INTO selector_psector (psector_id, cur_user) VALUES (v_psector, current_user) ON CONFLICT DO NOTHING;
+		END IF;
     
 		-- Arc ID
 		IF NEW.arc_id != (SELECT last_value::text FROM urn_id_seq) OR NEW.arc_id IS NULL THEN
@@ -397,12 +404,12 @@ BEGIN
 		INSERT INTO arc (arc_id, code, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type, location_type,
 					workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate,enddate, ownercat_id, muni_id, postcode, district_id, streetaxis_id, postnumber, postcomplement,
 					streetaxis2_id,postnumber2, postcomplement2,descript,link,verified,the_geom,undelete,label_x,label_y,label_rotation,  publish, inventory, expl_id, num_value, 
-					depth, adate, adescript, lastupdate, lastupdate_user, asset_id, pavcat_id)
+					depth, adate, adescript, lastupdate, lastupdate_user, asset_id, pavcat_id, om_state, conserv_state)
 					VALUES (NEW.arc_id, NEW.code, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, NEW.custom_length,NEW.dma_id,NEW. presszone_id,
 					NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id, NEW.builtdate,NEW.enddate, NEW.ownercat_id,
 					NEW.muni_id, NEW.postcode, NEW.district_id,v_streetaxis,NEW.postnumber, NEW.postcomplement, v_streetaxis2, NEW.postnumber2, NEW.postcomplement2, NEW.descript,NEW.link, NEW.verified, 
 					NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, NEW.publish, NEW.inventory, NEW.expl_id, NEW.num_value,
-					NEW.depth, NEW.adate, NEW.adescript, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.pavcat_id);
+					NEW.depth, NEW.adate, NEW.adescript, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.pavcat_id, NEW.om_state, NEW.conserv_state);
 
 		-- this overwrites triger topocontrol arc values (triggered before insertion) just in that moment: In order to make more profilactic this issue only will be overwrited in case of NEW.node_* not nulls
 		IF v_edit_enable_arc_nodes_update IS TRUE THEN
@@ -581,7 +588,8 @@ BEGIN
 				undelete=NEW.undelete, label_x=NEW.label_x,
 				postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, 
 				expl_id=NEW.expl_id,num_value=NEW.num_value, link=NEW.link, lastupdate=now(), lastupdate_user=current_user,
-				depth=NEW.depth, adate=NEW.adate, adescript=NEW.adescript, asset_id=NEW.asset_id, pavcat_id=NEW.pavcat_id
+				depth=NEW.depth, adate=NEW.adate, adescript=NEW.adescript, asset_id=NEW.asset_id, pavcat_id=NEW.pavcat_id,
+				om_state=NEW.om_state, conserv_state=NEW.conserv_state
 				WHERE arc_id=OLD.arc_id;
 
 

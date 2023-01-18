@@ -140,6 +140,7 @@ v_msgerr json;
 v_epa text;
 v_elevation float;
 v_staticpressure float;
+label_value text;
 
 
 BEGIN
@@ -523,14 +524,14 @@ BEGIN
 		SELECT (a->>'vdef'), (a->>'param') INTO v_catalog, v_catalogtype FROM json_array_elements(v_values_array) AS a 
 			WHERE (a->>'param') = 'arccat_id' OR (a->>'param') = 'nodecat_id' OR (a->>'param') = 'connecat_id' OR (a->>'param') = 'gratecat_id';
 
-		IF v_project_type ='WS' AND v_catfeature.feature_type IS NOT NULL THEN 
+		IF v_project_type ='WS' AND v_catfeature.feature_type IS NOT NULL AND v_catfeature.feature_type != 'LINK' THEN 
 			v_querystring = concat('SELECT pnom::integer, dnom::integer, matcat_id FROM cat_',lower(v_catfeature.feature_type),' WHERE id=',quote_nullable(v_catalog));
 			v_debug_vars := json_build_object('v_catfeature.feature_type', v_catfeature.feature_type, 'v_catalog', v_catalog);
 			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 40);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 			EXECUTE v_querystring INTO v_pnom, v_dnom, v_matcat_id;
 				
-		ELSIF v_project_type ='UD' AND v_catfeature.feature_type IS NOT NULL THEN 
+		ELSIF v_project_type ='UD' AND v_catfeature.feature_type IS NOT NULL AND v_catfeature.feature_type != 'LINK'THEN 
 			IF (v_catfeature.feature_type) ='GULLY' THEN
 				v_querystring = concat('SELECT matcat_id FROM cat_grate WHERE id=',quote_nullable(v_catalog));
 				v_debug_vars := json_build_object('v_catalog', v_catalog);
@@ -800,6 +801,13 @@ BEGIN
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'value', json_extract_path_text(aux_json,'widgetcontrols','text'));
 			ELSE 
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'value', COALESCE(field_value, ''));
+
+				IF (aux_json->>'widgettype')='button' and ((aux_json->>'columnname') = 'node_1' OR (aux_json->>'columnname') = 'node_2') and
+					(SELECT value::boolean FROM config_param_system WHERE parameter='admin_node_code_on_arc' ) is true THEN 
+					SELECT code into label_value FROM node WHERE node_id = field_value;
+					label_value := COALESCE(label_value, ''); 
+					v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'valueLabel', label_value);
+				END IF;
 			END IF;		
 			
 			-- setting widgetcontrols
@@ -839,11 +847,6 @@ BEGIN
 				'}'||
 			'}')::json;
 	END IF;
-
-	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
 		
 END;
 $BODY$

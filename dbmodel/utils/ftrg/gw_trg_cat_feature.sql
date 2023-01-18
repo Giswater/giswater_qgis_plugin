@@ -135,11 +135,13 @@ BEGIN
 				DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');        
 			END IF;
 
-			INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
-			dv_querytext, feature_field_id, project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, iseditable)
-			VALUES (concat('feat_',v_id,'_vdefault'),'config',concat ('Value default catalog for ',v_id,' cat_feature'), 'role_edit', concat ('Default catalog for ', v_id), true, v_layout ,v_layoutorder,
-			v_querytext, v_feature_field_id, lower(v_projecttype),false,false,'text', 'combo', true, true)
-			ON CONFLICT (id) DO NOTHING;
+			IF NEW.system_id <>'LINK' THEN
+				INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
+				dv_querytext, feature_field_id, project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, iseditable)
+				VALUES (concat('feat_',v_id,'_vdefault'),'config',concat ('Value default catalog for ',v_id,' cat_feature'), 'role_edit', concat ('Default catalog for ', v_id), true, v_layout ,v_layoutorder,
+				v_querytext, v_feature_field_id, lower(v_projecttype),false,false,'text', 'combo', true, true)
+				ON CONFLICT (id) DO NOTHING;
+			END IF;
 			
 		END IF;
 
@@ -166,25 +168,28 @@ BEGIN
 				EXECUTE 'INSERT INTO cat_feature_gully (id, type)
 				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||');';
 			END IF;
+			
 			--create child view
-			v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"}, 
-			"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
-			PERFORM gw_fct_admin_manage_child_views(v_query::json);
-				
+			IF NEW.system_id <>'LINK' THEN
+				v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"},
+				"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
+				PERFORM gw_fct_admin_manage_child_views(v_query::json);
+			END IF;
+
 			--insert definition into config_info_layer_x_type if its not present already
 			IF NEW.child_layer NOT IN (SELECT tableinfo_id from config_info_layer_x_type)
 			and NEW.child_layer IS NOT NULL THEN
 				INSERT INTO config_info_layer_x_type (tableinfo_id,infotype_id,tableinfotype_id)
 				VALUES (NEW.child_layer,1,NEW.child_layer);
 			END IF;
-		
+
 			RETURN NEW;
 
 		ELSIF TG_OP = 'UPDATE' THEN
 			SELECT child_layer INTO v_viewname FROM cat_feature WHERE id = NEW.id;
 			-- update child views
 			--on update and change of cat_feature.id or child layer name
-			IF NEW.id != OLD.id THEN	
+			IF NEW.id != OLD.id THEN
 
 				--if cat_feature has changed, rename the id in the definition of a child view
 				IF NEW.id != OLD.id THEN
@@ -202,18 +207,19 @@ BEGIN
 							v_definition = replace(v_definition,quote_literal(OLD.id),quote_literal(NEW.id));
 
 							--replace the existing view and drop the old trigger
-							EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||NEW.child_layer||' AS '||v_definition||';';   
+							EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||NEW.child_layer||' AS '||v_definition||';';
 							EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||lower(NEW.feature_type)||'_'||lower(OLD.id)||' ON '||v_viewname||';';
 
 							EXECUTE 'CREATE TRIGGER gw_trg_edit_'||lower(NEW.feature_type)||'_'||lower(NEW.id)||'
-							INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_viewname||' FOR EACH ROW EXECUTE 
+							INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_viewname||' FOR EACH ROW EXECUTE
 							PROCEDURE gw_trg_edit_'||lower(NEW.feature_type)||'('||quote_literal(NEW.id)||');';
 
 						ELSE
-			
-							v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"}, 
-							"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
-							PERFORM gw_fct_admin_manage_child_views(v_query::json);
+							IF NEW.system_id <>'LINK' THEN
+								v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"},
+								"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
+								PERFORM gw_fct_admin_manage_child_views(v_query::json);
+							END IF;
 
 							--insert definition into config_info_layer_x_type if its not present already
 							IF NEW.child_layer NOT IN (SELECT tableinfo_id from config_info_layer_x_type)
@@ -228,13 +234,13 @@ BEGIN
 
 					END IF;
 
-					
+
 				END IF;
-				
+
 			END IF;
 
 			--if child layer name has changed OR id has changed and p, rename it
-			IF (NEW.child_layer != OLD.child_layer  AND NEW.child_layer IS NOT NULL ) OR 
+			IF (NEW.child_layer != OLD.child_layer  AND NEW.child_layer IS NOT NULL ) OR
 			(NEW.id != OLD.id AND v_isrenameview IS TRUE )THEN
 
 				IF (NEW.child_layer != OLD.child_layer  AND NEW.child_layer IS NOT NULL ) THEN
@@ -248,25 +254,25 @@ BEGIN
 				IF v_viewname IS NOT NULL THEN
 					IF  (SELECT EXISTS (SELECT FROM information_schema.tables WHERE  table_schema = 'SCHEMA_NAME'
 					AND table_name = v_old_child_layer)) = true THEN
-			
+
 						--get the old view definition
 						EXECUTE 'SELECT pg_get_viewdef('''||v_schemaname||'.'||v_old_child_layer||''', true);'
-						INTO v_definition;	
+						INTO v_definition;
 
 						--replace the existing view
-						EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS '||v_definition||';';   
+						EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS '||v_definition||';';
 						EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_old_child_layer||';';
 						EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||lower(NEW.feature_type)||'_'||lower(OLD.id)||' ON '||v_viewname||';';
 
 						EXECUTE 'CREATE TRIGGER gw_trg_edit_'||lower(NEW.feature_type)||'_'||lower(NEW.id)||'
-						INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_viewname||' FOR EACH ROW EXECUTE 
+						INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_viewname||' FOR EACH ROW EXECUTE
 						PROCEDURE gw_trg_edit_'||lower(NEW.feature_type)||'('||quote_literal(NEW.id)||');';
 
-						EXECUTE 'UPDATE cat_feature SET child_layer='||quote_literal(v_viewname)||' WHERE id='||quote_literal(NEW.id)||';';	
+						EXECUTE 'UPDATE cat_feature SET child_layer='||quote_literal(v_viewname)||' WHERE id='||quote_literal(NEW.id)||';';
 					ELSE
-		
+
 						EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_old_child_layer||';';
-						v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"}, 
+						v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"},
 						"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
 						PERFORM gw_fct_admin_manage_child_views(v_query::json);
 
@@ -286,36 +292,36 @@ BEGIN
 
 				--delete definition from config_info_layer_x_type
 				DELETE FROM config_info_layer_x_type where tableinfo_id=OLD.child_layer OR tableinfotype_id=OLD.child_layer;
-				
+
 				--delete definition from sys_table
 				DELETE FROM sys_table where id=OLD.child_layer;
 
 				EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"form":{}, 	"feature":{"catFeature":"'||NEW.id||'"},
-				"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", 
+				"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'",
 				"feature_type":"'||lower(NEW.feature_type)||'" }}$$);';
 
 
 			ELSIF NEW.feature_type !=OLD.feature_type or NEW.system_id !=OLD.system_id THEN
 
 				EXECUTE 'DROP VIEW IF EXISTS '||NEW.child_layer||';';
-				
+
 				--delete configuration from config_form_fields
 				DELETE FROM config_form_fields where formname=NEW.child_layer AND formtype = 'form_feature';
 
 				--delete definition from config_info_layer_x_type
 				DELETE FROM config_info_layer_x_type where tableinfo_id=NEW.child_layer OR tableinfo_id=OLD.child_layer;
-				
-				EXECUTE 'SELECT lower(id) as id,type, concat(''man_'',lower(id)) as man_table, epa_default, 
-				CASE WHEN epa_default IS NOT NULL THEN concat(''inp_'',lower(epa_default)) END AS epa_table 
+
+				EXECUTE 'SELECT lower(id) as id,type, concat(''man_'',lower(id)) as man_table, epa_default,
+				CASE WHEN epa_default IS NOT NULL THEN concat(''inp_'',lower(epa_default)) END AS epa_table
 				FROM sys_feature_cat WHERE id='||quote_literal(NEW.system_id)||';'
 				INTO v_feature;
-				
+
 				v_new_child_layer = replace(NEW.child_layer,lower(OLD.feature_type),lower(NEW.feature_type));
-				
+
 				EXECUTE 'UPDATE cat_feature SET parent_layer = concat(''v_edit_'',lower('||quote_literal(NEW.feature_type)||')),
 				child_layer = '||quote_literal(v_new_child_layer)||' WHERE id = '||quote_literal(NEW.id)||';';
-				
+
 				EXECUTE 'DELETE FROM cat_feature_'||lower(OLD.feature_type)||' WHERE id = '||quote_literal(NEW.id)||';';
 
 				IF lower(NEW.feature_type)='arc' THEN
@@ -336,33 +342,41 @@ BEGIN
 				DELETE FROM config_form_fields where formname=OLD.child_layer AND formtype = 'form_feature';
 
 				--create child view
-				v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"}, 
+				v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"},
 				"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
 				PERFORM gw_fct_admin_manage_child_views(v_query::json);
 
-		
+
 			END IF;
 
 			RETURN NEW;
 
 		ELSIF TG_OP = 'DELETE' THEN
+        
+        IF v_table = 'DELETE' AND OLD.system_id <>'LINK' THEN
+        	RETURN OLD;
+        ELSE
+            IF OLD.system_id <>'LINK' THEN
+                -- delete child views
+                IF OLD.child_layer IS NOT NULL THEN
+                    EXECUTE 'DROP VIEW IF EXISTS '||OLD.child_layer||';';
+                END IF;
+                
+                --delete configuration from config_form_fields
+                DELETE FROM config_form_fields where formname=OLD.child_layer AND formtype = 'form_feature';
+                
+                --delete definition from config_info_layer_x_type
+                DELETE FROM config_info_layer_x_type where tableinfo_id=OLD.child_layer OR tableinfotype_id=OLD.child_layer;
 
-			-- delete child views
-			EXECUTE 'DROP VIEW IF EXISTS '||OLD.child_layer||';';
-			
-			--delete configuration from config_form_fields
-			DELETE FROM config_form_fields where formname=OLD.child_layer AND formtype = 'form_feature';
+                --delete definition from sys_table
+                DELETE FROM sys_table where id=OLD.child_layer;
 
-			--delete definition from config_info_layer_x_type
-			DELETE FROM config_info_layer_x_type where tableinfo_id=OLD.child_layer OR tableinfotype_id=OLD.child_layer;
+                -- delete sys_param_user parameters
+                DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');
+            END IF;
 
-			--delete definition from sys_table
-			DELETE FROM sys_table where id=OLD.child_layer;
-
-			-- delete sys_param_user parameters
-			DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');
-
-			RETURN NULL;
+					RETURN NULL;
+				END IF;
 		END IF;
 	END IF;
 

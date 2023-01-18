@@ -52,13 +52,17 @@ v_streetaxis2 text;
 v_autorotation_disabled boolean;
 v_force_delete boolean;
 v_autoupdate_fluid boolean;
-v_disable_linktonetwork boolean;
 v_matfromcat boolean = false;
 v_epa_gully_efficiency  float;
 v_epa_gully_method text;
 v_epa_gully_orifice_cd float;
 v_epa_gully_outlet_type text; 
 v_epa_gully_weir_cd float;
+v_arc record;
+v_link integer;
+v_link_geom public.geometry;
+v_connect2network boolean;
+
 
 BEGIN
 
@@ -75,16 +79,19 @@ BEGIN
 	SELECT value::boolean INTO v_autoupdate_fluid FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid';
 
 	v_autorotation_disabled = (SELECT value::boolean FROM config_param_user WHERE "parameter"='edit_gullyrotation_disable' AND cur_user=current_user);
-	v_disable_linktonetwork := (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_disable_linktonetwork' AND cur_user=current_user);
 	v_epa_gully_efficiency := (SELECT value FROM config_param_user WHERE parameter='epa_gully_efficiency_vdefault' AND cur_user=current_user);
 	v_epa_gully_orifice_cd := (SELECT value FROM config_param_user WHERE parameter='epa_gully_orifice_cd_vdefault' AND cur_user=current_user);
+	v_epa_gully_weir_cd := (SELECT value FROM config_param_user WHERE parameter='epa_gully_weir_cd_vdefault' AND cur_user=current_user);
 	v_epa_gully_method := (SELECT value FROM config_param_user WHERE parameter='epa_gully_method_vdefault' AND cur_user=current_user);
 	v_epa_gully_outlet_type := (SELECT value FROM config_param_user WHERE parameter='epa_gully_outlet_type_vdefault' AND cur_user=current_user);
-	v_epa_gully_weir_cd := (SELECT value FROM config_param_user WHERE parameter='epa_gully_weir_cd_vdefault' AND cur_user=current_user);
+	SELECT value::boolean INTO v_connect2network FROM config_param_user WHERE parameter='edit_gully_automatic_link' AND cur_user=current_user;
 
 	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 	
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
+
+	v_psector_vdefault = (SELECT config_param_user.value::integer AS value FROM config_param_user WHERE config_param_user.parameter::text
+	= 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1);
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 
@@ -110,9 +117,15 @@ BEGIN
 		END IF;
 
 	END IF;
-	
+
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
+	
+		-- setting psector vdefault as visible
+		IF NEW.state = 2 THEN
+			INSERT INTO selector_psector (psector_id, cur_user) VALUES (v_psector_vdefault, current_user) 
+			ON CONFLICT DO NOTHING;
+		END IF;
 
 		-- Gully ID
 		IF NEW.gully_id != (SELECT last_value::text FROM urn_id_seq) OR NEW.gully_id IS NULL THEN
@@ -516,10 +529,9 @@ BEGIN
 					p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
 					INTO v_the_geom_pol;
 				
-				v_new_pol_id:= (SELECT nextval('urn_id_seq'));
-
-				INSERT INTO polygon(pol_id, sys_type, the_geom, featurecat_id,feature_id ) 
-				VALUES (v_new_pol_id, 'GULLY', v_the_geom_pol, NEW.gully_type, NEW.gully_id);
+				INSERT INTO polygon(sys_type, the_geom, featurecat_id,feature_id ) 
+				VALUES ('GULLY', v_the_geom_pol, NEW.gully_type, NEW.gully_id)
+				RETURNING pol_id INTO v_new_pol_id;
 			END IF;
 		END IF;
 
@@ -531,7 +543,7 @@ BEGIN
 				category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, muni_id, 
 				postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation, 
 				link,verified, the_geom, undelete,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value,
-				lastupdate, lastupdate_user, asset_id, gratecat2_id, epa_type, units_placement, groove_height, groove_length)
+				lastupdate, lastupdate_user, asset_id, gratecat2_id, epa_type, units_placement, groove_height, groove_length, drainzone_id)
 			VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, 
 				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, v_new_pol_id, NEW.sector_id, NEW."state", 
 				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, 
@@ -540,7 +552,7 @@ BEGIN
 				NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, 
 				NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory, 
 				NEW.uncertain, NEW.num_value,NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.gratecat2_id, NEW.epa_type, NEW.units_placement,
-				NEW.groove_height, NEW.groove_length);
+				NEW.groove_height, NEW.groove_length, NEW.drainzone_id);
 		ELSE
 
 			INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, 
@@ -548,7 +560,7 @@ BEGIN
 				category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, muni_id, 
 				postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation, 
 				link,verified, the_geom, undelete,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value,
-				lastupdate, lastupdate_user, asset_id, connec_matcat_id, gratecat2_id, epa_type, units_placement, groove_height, groove_length)
+				lastupdate, lastupdate_user, asset_id, connec_matcat_id, gratecat2_id, epa_type, units_placement, groove_height, groove_length, drainzone_id)
 			VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, 
 				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, v_new_pol_id, NEW.sector_id, NEW."state", 
 				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, 
@@ -557,31 +569,30 @@ BEGIN
 				NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, 
 				NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory, 
 				NEW.uncertain, NEW.num_value,NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.connec_matcat_id, NEW.gratecat2_id,
-				NEW.epa_type, NEW.units_placement, NEW.groove_height, NEW.groove_length);
+				NEW.epa_type, NEW.units_placement, NEW.groove_height, NEW.groove_length, NEW.drainzone_id);
 
 		END IF;
 
-		IF NEW.state=1 THEN
-			-- Control of automatic insert of link and vnode
-			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_gully_automatic_link'
-			AND cur_user=current_user LIMIT 1) IS TRUE THEN
+		-- insertint on psector table and setting visible 
+		IF NEW.state=2 THEN
+			INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, doable, arc_id)
+			VALUES (NEW.gully_id, v_psector_vdefault, 1, true, NEW.arc_id);
+		END IF;
 
-				EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+		-- manage connect2network
+		IF v_connect2network THEN
+		
+			IF NEW.arc_id IS NOT NULL THEN
+				EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+				"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY", "forcedArcs":["'||NEW.arc_id||'"]}}$$)';
+			ELSE
+				EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';
-
-				SELECT arc_id INTO v_arc_id FROM gully WHERE gully_id=NEW.gully_id;
 			END IF;
 
-		ELSIF NEW.state=2 THEN
-			-- for planned connects always must exits link defined because alternatives will use parameters and rows of that defined link adding only geometry defined on plan_psector
-			EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-			"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';			
-			-- for planned connects always must exits arc_id defined on the default psector because it is impossible to draw a new planned 
-			-- link. Unique option for user is modify the existing automatic link
-			SELECT arc_id INTO v_arc_id FROM gully WHERE gully_id=NEW.gully_id;
-			v_psector_vdefault=(SELECT value::integer FROM config_param_user WHERE config_param_user.parameter::text = 'plan_psector_vdefault'::text 
-			AND config_param_user.cur_user::name = "current_user"());
-			INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, doable, arc_id) VALUES (NEW.gully_id, v_psector_vdefault, 1, true, v_arc_id);
+			-- recover values in order to do not disturb this workflow
+			SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
+			NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id; 
 		END IF;
 
 		-- man addfields insert
@@ -637,30 +648,63 @@ BEGIN
 		END IF;	
 		
 		-- Reconnect arc_id
-		IF (NEW.arc_id != OLD.arc_id) OR (NEW.arc_id IS NOT NULL AND OLD.arc_id IS NULL) OR (NEW.arc_id IS NULL AND OLD.arc_id IS NOT NULL) THEN
+		IF (coalesce (NEW.arc_id,'') != coalesce(OLD.arc_id,'')) THEN
 
-			-- when arc_id comes from psector table
-			IF OLD.arc_id IN (SELECT arc_id FROM plan_psector_x_gully WHERE gully_id=NEW.gully_id) THEN 
-				UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE gully_id=OLD.gully_id AND arc_id = OLD.arc_id;		
+			-- when connec_id comes on psector_table
+			IF NEW.state = 1 AND (SELECT gully_id FROM plan_psector_x_gully JOIN selector_psector USING (psector_id)
+				WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND cur_user = current_user AND state = 1) IS NOT NULL THEN
+						
+				EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+				"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY", "forceEndPoint":"true", "forcedArcs":["'||NEW.arc_id||'"]}}$$)';			
+				
+			ELSIF NEW.state = 2 THEN
 
+				IF NEW.arc_id IS NOT NULL THEN
+
+					IF (SELECT gully_id FROM plan_psector_x_gully JOIN selector_psector USING (psector_id)
+						WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND cur_user = current_user AND state = 1) IS NOT NULL THEN
+
+						EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+						"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY", "forceEndPoint":"true", "forcedArcs":["'||NEW.arc_id||'"]}}$$)';			
+					END IF;
+				ELSE
+					IF (SELECT link_id FROM plan_psector_x_gully JOIN selector_psector USING (psector_id)
+						WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND cur_user = current_user AND state = 1) IS NOT NULL THEN
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3206", "function":"1204","debug_msg":""}}$$);';
+					ELSE
+						UPDATE plan_psector_x_gully SET arc_id = null, link_id = null WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND state = 1;
+					END IF;
+				
+					-- setting values					
+					NEW.sector_id = 0; NEW.dma_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
+				END IF;
 			ELSE
 				-- when arc_id comes from gully table
 				UPDATE gully SET arc_id=NEW.arc_id where gully_id=NEW.gully_id;
 
-				IF (SELECT link_id FROM link WHERE feature_id=NEW.gully_id AND feature_type='GULLY' AND exit_type ='VNODE' LIMIT 1) IS NOT NULL 
-				AND v_disable_linktonetwork IS NOT TRUE THEN				
+				IF NEW.arc_id IS NOT NULL THEN
 
-					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-					"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';
-				
-				ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_gully_automatic_link' AND cur_user=current_user LIMIT 1) IS TRUE
-				AND v_disable_linktonetwork IS NOT TRUE THEN
+					-- when link exists
+					IF (SELECT link_id FROM link WHERE state = 1 and feature_id =  NEW.gully_id) IS NOT NULL THEN
+						EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+						"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY", "forceEndPoint":"true",  "forcedArcs":["'||NEW.arc_id||'"]}}$$)';	
+					END IF;
 
-					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-					"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';
-				END IF;		
+					-- recover values in order to do not disturb this workflow
+					SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
+					NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id;
+					
+				ELSE
+					IF (SELECT count(*)FROM link WHERE feature_id = NEW.gully_id AND state = 1) > 0 THEN
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3206", "function":"1206","debug_msg":""}}$$);';
+					ELSE
+						NEW.sector_id = 0; NEW.dma_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
+					END IF;
+				END IF;
 			END IF;
-		END IF;	
+		END IF;
 		
 		-- State_type
 		IF NEW.state=0 AND OLD.state=1 THEN
@@ -675,37 +719,45 @@ BEGIN
 				END IF;
 			END IF;
 			
-			-- Automatic downgrade of associated link/vnode
+			-- Automatic downgrade of associated link
 			UPDATE link SET state=0 WHERE feature_id=OLD.gully_id;
-			UPDATE vnode SET state=0 WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=OLD.gully_id LIMIT 1)::integer;
-
 		END IF;
 
-		-- Looking for state control and insert planified gully to default psector
-		IF (NEW.state != OLD.state) THEN   	
-			PERFORM gw_fct_state_control('GULLY', NEW.gully_id, NEW.state, TG_OP);	
+		-- Looking for state control and insert planified connecs to default psector
+		IF (NEW.state != OLD.state) THEN   
+		
+			PERFORM gw_fct_state_control('GULLY', NEW.gully_id, NEW.state, TG_OP);
+			
 			IF NEW.state = 2 AND OLD.state=1 THEN
-				INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, doable)
-				VALUES (NEW.gully_id, (SELECT config_param_user.value::integer AS value FROM config_param_user WHERE config_param_user.parameter::text
-				= 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
+			
+				v_link = (SELECT link_id FROM link WHERE feature_id = NEW.gully_id AND state = 1 LIMIT 1);
+			
+				INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, doable, link_id, arc_id)
+				VALUES (NEW.gully_id, v_psector_vdefault, 1, true,
+				v_link, NEW.arc_id);
+				
+				UPDATE link SET state = 2 WHERE link_id  = v_link;
 			END IF;
+			
 			IF NEW.state = 1 AND OLD.state=2 THEN
-				-- force plan_psector_force_delete
-				SELECT value INTO v_force_delete FROM config_param_user WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
-				UPDATE config_param_user SET value = 'true' WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
+			
+				v_link = (SELECT link_id FROM link WHERE feature_id = NEW.gully_id AND state = 2 LIMIT 1);
+			
+				-- force delete
+				UPDATE config_param_user SET value = 'true' WHERE parameter = 'plan_psector_downgrade_feature' AND cur_user= current_user;
+				DELETE FROM plan_psector_x_gully WHERE gully_id=NEW.gully_id;
+				-- recover values
+				UPDATE config_param_user SET value = 'false' WHERE parameter = 'plan_psector_downgrade_feature' AND cur_user= current_user;
 
-				-- update state to prevent delete gully on gw_trg_plan_psector_delete
-				UPDATE gully SET state=1 WHERE gully_id=NEW.gully_id;
-				DELETE FROM plan_psector_x_gully WHERE gully_id=NEW.gully_id;	
-
-				-- restore plan_psector_force_delete
-				UPDATE config_param_user SET value = v_force_delete WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;				
+				UPDATE link SET state = 1 WHERE link_id  = v_link;					
 			END IF;
+			
+			UPDATE gully SET state=NEW.state WHERE gully_id = OLD.gully_id;
 		END IF;
 
 		--check relation state - state_type
-	    IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-	      	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3036", "function":"1206","debug_msg":"'||NEW.state::text||'"}}$$);'; 
 		END IF;		
 		
@@ -784,12 +836,9 @@ BEGIN
 						p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
 						INTO v_the_geom_pol;
 
-					v_new_pol_id:= (SELECT nextval('urn_id_seq'));
-
 					IF (SELECT pol_id FROM gully WHERE gully_id = NEW.gully_id) IS NULL THEN
-						INSERT INTO polygon(pol_id, sys_type, the_geom, featurecat_id,feature_id ) 
-						VALUES (v_new_pol_id, 'GULLY', v_the_geom_pol, NEW.gully_type, NEW.gully_id);
-
+						INSERT INTO polygon(sys_type, the_geom, featurecat_id,feature_id ) 
+						VALUES ('GULLY', v_the_geom_pol, NEW.gully_type, NEW.gully_id);
 					ELSE
 						UPDATE polygon SET the_geom = v_the_geom_pol WHERE feature_id =NEW.gully_id;
 					END IF;
@@ -814,7 +863,7 @@ BEGIN
 			label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis, 
 			postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user,
 			asset_id=NEW.asset_id, gratecat2_id = NEW.gratecat2_id, epa_type=NEW.epa_type, units_placement=NEW.units_placement, groove_height=NEW.groove_height, 
-			groove_length=NEW.groove_length
+			groove_length=NEW.groove_length, drainzone_id=NEW.drainzone_id
 			WHERE gully_id = OLD.gully_id;
 
 		ELSE
@@ -829,7 +878,7 @@ BEGIN
 			label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis, 
 			postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user,
 			asset_id=NEW.asset_id, gratecat2_id = NEW.gratecat2_id, epa_type=NEW.epa_type, units_placement=NEW.units_placement, groove_height=NEW.groove_height, 
-			groove_length=NEW.groove_length
+			groove_length=NEW.groove_length, drainzone_id=NEW.drainzone_id
 			WHERE gully_id = OLD.gully_id;
 
 		END IF;
@@ -888,18 +937,12 @@ BEGIN
   		DELETE FROM man_addfields_value WHERE feature_id = OLD.gully_id  and parameter_id in 
   		(SELECT id FROM sys_addfields WHERE cat_feature_id IS NULL OR cat_feature_id =OLD.gully_type);
 
-		-- delete links & vnode's
+		-- delete links
 		FOR v_record_link IN SELECT * FROM link WHERE feature_type='GULLY' AND feature_id=OLD.gully_id
 		LOOP
 			-- delete link
 			DELETE FROM link WHERE link_id=v_record_link.link_id;
 
-			-- delete vnode if no more links are related to vnode
-			SELECT count(exit_id) INTO v_count FROM link WHERE exit_id=v_record_link.exit_id;
-							
-			IF v_count =0 THEN 
-				DELETE FROM vnode WHERE vnode_id=v_record_link.exit_id::integer;
-			END IF;
 		END LOOP;
 
 		RETURN NULL;

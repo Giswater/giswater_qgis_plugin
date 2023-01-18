@@ -6,8 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2826
 
--- FUNCTION: SCHEMA_NAME.gw_fct_graphanalytics_lrs(json)
-
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_lrs(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_lrs(
 	p_data json)
     RETURNS json

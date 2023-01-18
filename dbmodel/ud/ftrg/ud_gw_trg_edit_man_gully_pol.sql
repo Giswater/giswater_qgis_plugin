@@ -6,29 +6,21 @@ The program is free software: you can redistribute it and/or modify it under the
 --FUNCTION CODE: 2416
 
 
--- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_man_gully_pol();
-
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_gully_pol() RETURNS trigger AS
 $BODY$
 
 DECLARE 
-    v_man_table varchar;
-
+v_man_table varchar;
 
 BEGIN
 
-    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	v_man_table:= TG_ARGV[0];
 		
 	
 	-- INSERT
 	IF TG_OP = 'INSERT' THEN
-	
-		-- Pol ID	
-		IF (NEW.pol_id IS NULL) THEN
-			NEW.pol_id:= (SELECT nextval('urn_id_seq'));
-		END IF;
-		
+			
 		-- Gully ID	
 		IF (NEW.feature_id IS NULL) THEN
 			NEW.feature_id:= (SELECT gully_id FROM v_edit_gully WHERE ST_DWithin(NEW.the_geom, v_edit_gully.the_geom,0.001) LIMIT 1);
@@ -39,8 +31,8 @@ BEGIN
 		END IF;
 
 		-- Insert into polygon table
-		INSERT INTO polygon (pol_id, sys_type, the_geom, feature_id, featurecat_id) 
-		SELECT NEW.pol_id, sys_type, NEW.the_geom, NEW.feature_id, gully_type
+		INSERT INTO polygon (sys_type, the_geom, feature_id, featurecat_id) 
+		SELECT sys_type, NEW.the_geom, NEW.feature_id, gully_type
 		FROM v_edit_gully WHERE gully_id=NEW.feature_id
 		ON CONFLICT (feature_id) DO UPDATE SET the_geom=NEW.the_geom;
 		
@@ -51,7 +43,7 @@ BEGIN
 		
     
 	-- UPDATE
-    ELSIF TG_OP = 'UPDATE' THEN
+	ELSIF TG_OP = 'UPDATE' THEN
 	
 		UPDATE polygon SET pol_id=NEW.pol_id, the_geom=NEW.the_geom WHERE pol_id=OLD.pol_id;
 		
@@ -66,20 +58,18 @@ BEGIN
 
 			UPDATE gully SET pol_id=NULL WHERE gully_id=OLD.feature_id;
 			UPDATE gully SET pol_id=NEW.pol_id WHERE gully_id=NEW.feature_id;
-		
 		END IF;
 		
 		RETURN NEW;
     
 	-- DELETE
-    ELSIF TG_OP = 'DELETE' THEN
+	ELSIF TG_OP = 'DELETE' THEN
 	
 		UPDATE gully SET pol_id=NULL WHERE gully_id=OLD.feature_id;
 		DELETE FROM polygon WHERE pol_id=OLD.pol_id;
 				
 		RETURN NULL;
-   
-    END IF;
+	END IF;	
     
 END;
 $BODY$

@@ -22,7 +22,7 @@ v_version text;
 v_psector integer;
 v_query text;
 v_count integer;
-v_plan_obsolete_state_type integer;
+v_state_obsolete_planified integer;
 v_uservalues json;
 
 v_audit_result text;
@@ -40,7 +40,7 @@ BEGIN
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	v_psector := json_extract_path_text (p_data,'data','psectorId')::integer;
-	v_plan_obsolete_state_type:= (SELECT value::json ->> 'plan_obsolete_state_type' FROM config_param_system WHERE parameter='plan_psector_execute_action');
+	v_state_obsolete_planified:= (SELECT value::json ->> 'obsolete_planified' FROM config_param_system WHERE parameter='plan_psector_status_action');
 
 
 	--set current process as users parameter
@@ -53,11 +53,11 @@ BEGIN
 	IF v_psector IS NOT NULL THEN
 		v_query = 'SELECT pa.arc_id, pa.psector_id , node_1 as node FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
 		JOIN plan_psector_x_node pn1 ON pn1.node_id = arc.node_1
-		WHERE pa.psector_id = pn1.psector_id AND pa.state = 1 AND pn1.state = 0 AND pa.psector_id = '|| v_psector ||' AND arc.state_type<>'|| v_plan_obsolete_state_type ||'
+		WHERE pa.psector_id = pn1.psector_id AND pa.state = 1 AND pn1.state = 0 AND pa.psector_id = '|| v_psector ||' AND arc.state_type<>'|| v_state_obsolete_planified ||'
 		UNION
 		SELECT pa.arc_id, pa.psector_id, node_2 FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
 		JOIN plan_psector_x_node pn2 ON pn2.node_id = arc.node_2
-		WHERE pa.psector_id = pn2.psector_id AND pa.state = 1 AND pn2.state = 0  AND pa.psector_id = '|| v_psector ||' AND arc.state_type<>'|| v_plan_obsolete_state_type ||'';
+		WHERE pa.psector_id = pn2.psector_id AND pa.state = 1 AND pn2.state = 0  AND pa.psector_id = '|| v_psector ||' AND arc.state_type<>'|| v_state_obsolete_planified ||'';
 
 
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')c'

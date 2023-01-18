@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS om_streetaxis
   type character varying(18),
   name character varying(100) NOT NULL,
   text text,
-  the_geom geometry(MultiLineString,25831),
+  the_geom geometry(MultiLineString,SRID_VALUE),
   expl_id integer NOT NULL,
   muni_id integer NOT NULL
 );

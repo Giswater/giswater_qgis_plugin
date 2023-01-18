@@ -10,10 +10,6 @@ DROP TRIGGER IF EXISTS gw_trg_arc_orphannode_delete on "SCHEMA_NAME".arc;
 CREATE TRIGGER gw_trg_arc_orphannode_delete AFTER DELETE ON "SCHEMA_NAME".arc
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_arc_orphannode_delete();
 
-DROP TRIGGER IF EXISTS gw_trg_arc_vnodelink_update ON "SCHEMA_NAME".arc;
-CREATE TRIGGER gw_trg_arc_vnodelink_update AFTER UPDATE OF the_geom ON "SCHEMA_NAME".arc 
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_arc_vnodelink_update();
-
 DROP TRIGGER IF EXISTS gw_trg_connec_proximity_insert ON "SCHEMA_NAME".connec;
 CREATE TRIGGER gw_trg_connec_proximity_insert BEFORE INSERT ON "SCHEMA_NAME".connec  
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_connec_proximity();

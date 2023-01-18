@@ -98,3 +98,17 @@ CREATE INDEX anl_arc_index
   USING gist
   (the_geom);
 
+
+CREATE TABLE audit.log (
+  id bigserial NOT NULL,
+  "schema" text NULL,
+  table_name text NULL,
+  id_name text NULL,
+  user_name text NULL,
+  "action" text NULL,
+  olddata json NULL,
+  newdata json NULL,
+  query text NULL,
+  tstamp timestamp NULL DEFAULT now(),
+  CONSTRAINT log_pkey PRIMARY KEY (id)
+);

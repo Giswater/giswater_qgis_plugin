@@ -80,7 +80,7 @@ BEGIN
 
 	INSERT INTO config_param_user (value, parameter, cur_user)
 	VALUES (txid_current(),'utils_cur_trans',current_user );
-
+	
 	-- Get parameters from input json
 	v_array_node_id = lower(((p_data ->>'feature')::json->>'id')::text);
 	v_node_id = (SELECT json_array_elements_text(v_array_node_id)); 
@@ -92,8 +92,11 @@ BEGIN
 
 	-- Get state_type from default value if this isn't on input json
 	IF v_state_type IS NULL THEN
+	
 		IF v_psector_id IS NULL THEN
-			SELECT value INTO v_state_type FROM config_param_user WHERE parameter='edit_statetype_0_vdefault' AND cur_user=current_user;
+			IF v_action_mode = 1 THEN
+				SELECT value INTO v_state_type FROM config_param_user WHERE parameter='edit_statetype_0_vdefault' AND cur_user=current_user;
+			END IF;
 		ELSE
 			SELECT value INTO v_state_type FROM config_param_user WHERE parameter='edit_statetype_2_vdefault' AND cur_user=current_user;
 		END IF;
@@ -122,7 +125,7 @@ BEGIN
 
 		-- Accepted if there are just two distinct arcs
 		IF v_count = 2 THEN
-
+		
 			-- Get both arc features
 			SELECT * INTO v_record1 FROM arc WHERE node_1 = v_node_id OR node_2 = v_node_id ORDER BY arc_id DESC LIMIT 1;
 			SELECT * INTO v_record2 FROM arc WHERE node_1 = v_node_id OR node_2 = v_node_id ORDER BY arc_id ASC LIMIT 1;
@@ -136,7 +139,8 @@ BEGIN
 
 			-- Compare arcs
 			IF v_record1.arccat_id = v_record2.arccat_id AND v_record1.sector_id = v_record2.sector_id AND
-			   v_record1.expl_id = v_record2.expl_id AND v_record1.state = v_record2.state THEN
+			   v_record1.expl_id = v_record2.expl_id THEN
+			   
 
 				-- Final geometry
 				IF v_record1.node_1 = v_node_id THEN
@@ -217,16 +221,17 @@ BEGIN
 
 				UPDATE arc SET node_1=v_new_record.node_1, node_2=v_new_record.node_2 where arc_id=v_new_record.arc_id;
                 
-                -- update link only with enabled variable
-                IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
-                    UPDATE arc SET link=v_new_record.arc_id where arc_id=v_new_record.arc_id;
-                END IF;
+				-- update link only with enabled variable
+				IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
+				    UPDATE arc SET link=v_new_record.arc_id where arc_id=v_new_record.arc_id;
+				END IF;
 
 				EXECUTE 'INSERT INTO '||v_man_table||' VALUES ('||v_new_record.arc_id||')';
 				EXECUTE 'INSERT INTO '||v_epa_table||' VALUES ('||v_new_record.arc_id||')';
 					
 				--Insert data on audit_arc_traceability table
 				IF v_psector_id IS NULL THEN
+				
 					INSERT INTO audit_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", cur_user) 
 					VALUES ('ARC FUSION', v_new_record.arc_id, v_record2.arc_id,v_record1.arc_id,v_exists_node_id, CURRENT_TIMESTAMP, CURRENT_USER);
 
@@ -238,19 +243,6 @@ BEGIN
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (214, 1, concat('Reconnect ',v_count,' nodes.'));
 					END IF;
-
-					-- update links related to node
-					IF  (SELECT link_id FROM link WHERE exit_type='NODE' and exit_id=v_node_id LIMIT 1) IS NOT NULL THEN
-						
-						-- insert one vnode (indenpendently of the number of links. Only one vnode must replace the node)
-						INSERT INTO vnode (state, the_geom) 
-						VALUES (v_new_record.state, v_node_geom) 
-						RETURNING vnode_id INTO v_vnode;
-						
-						-- update link with new vnode
-						UPDATE link SET exit_type='VNODE', exit_id=v_vnode WHERE exit_type='NODE' and exit_id=v_node_id;  
-
-					END IF; 
 
 					-- update operative connecs
 					SELECT count(connec_id) INTO v_count FROM connec WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
@@ -275,7 +267,7 @@ BEGIN
 					-- update planned connecs
 					SELECT count(connec_id) INTO v_count FROM plan_psector_x_connec WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
 					IF v_count > 0 THEN
-						UPDATE plan_psector_x_connec SET arc_id=v_new_record.arc_id WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
+						UPDATE plan_psector_x_connec SET arc_id=v_new_record.arc_id WHERE (arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id) AND state = 1;
 						INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Reconnect planned ',v_count,' connecs.'));
 					END IF;
 
@@ -283,13 +275,13 @@ BEGIN
 					IF v_project_type = 'UD' THEN
 						SELECT count(gully_id) INTO v_count FROM plan_psector_x_gully WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
 						IF v_count > 0 THEN
-							UPDATE plan_psector_x_gully SET arc_id=v_new_record.arc_id WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
+							UPDATE plan_psector_x_gully SET arc_id=v_new_record.arc_id WHERE (arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id) AND state = 1;
 							INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Reconnect planned ',v_count,' gullies.'));
 						END IF;
 					END IF;
 				
 					IF v_state_node = 1 THEN
-
+					
 						-- update elements
 						SELECT count(id) INTO v_count FROM element_x_arc WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
 						IF v_count > 0 THEN
@@ -398,13 +390,12 @@ BEGIN
 						DELETE FROM node WHERE node_id = v_node_id;
 					
 					END IF;
+				
 				ELSIF v_psector_id IS NOT NULL THEN
+				
 					UPDATE arc SET state = 2 WHERE arc_id = v_new_record.arc_id;
-					INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable) VALUES (v_new_record.arc_id, v_psector_id, 1, false);
-					INSERT INTO plan_psector_x_node (node_id, psector_id, state, doable) VALUES (v_node_id, v_psector_id, 0, true);
-
-					INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable) VALUES (v_record1.arc_id, v_psector_id, 0, false);
-					INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable) VALUES (v_record2.arc_id, v_psector_id, 0, false);
+				
+					INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable) VALUES (v_new_record.arc_id, v_psector_id, 1, false) ON CONFLICT (arc_id, psector_id) DO NOTHING;
 
 					-- orphan nodes with arc_id not null
 					SELECT count(*) INTO v_count FROM v_edit_node WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id);
@@ -430,22 +421,35 @@ BEGIN
 					END LOOP;
 
 					-- update operative connecs
-					SELECT count(connec_id) INTO v_count FROM connec WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
+					SELECT count(connec_id) INTO v_count FROM connec WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id AND state = 1;
 					IF v_count > 0 THEN
+						INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable, link_id) 
+						SELECT v_psector_id, connec_id, arc_id, 0, false, link_id FROM connec c JOIN link l ON connec_id = feature_id 
+						WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND c.state = 1 and l.state = 1
+						ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
+						
 						INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable) 
-							SELECT v_psector_id, connec_id, arc_id, 1, false FROM v_edit_connec WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id);
+						SELECT v_psector_id, connec_id, arc_id, 1, false FROM connec c WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND state = 1
+						ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
 
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (214, 1, concat('Reconnect operative ',v_count,' connecs.'));
-					END IF;
-
+					END IF;		
+				
 					-- update operative gullies
 					IF v_project_type='UD' THEN
-						SELECT count(gully_id) INTO v_count FROM gully WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
+						SELECT count(gully_id) INTO v_count FROM gully WHERE (arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id) AND state = 1;
 						IF v_count > 0 THEN
-							INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable) 
-								SELECT v_psector_id, gully_id, arc_id, 1, false FROM v_edit_gully WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id);
+						
+							INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable, link_id) 
+							SELECT v_psector_id, gully_id, arc_id, 0, false, link_id FROM gully c JOIN link l ON gully_id = feature_id 
+							WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND c.state = 1 and l.state = 1
+							ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
 
+							INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable) 
+							SELECT v_psector_id, gully_id, arc_id, 1, false FROM gully c WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND state = 1
+							ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
+							
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
 							VALUES (214, 1, concat('Reconnect operative ',v_count,' gullies.'));
 						END IF;
@@ -454,18 +458,42 @@ BEGIN
 					-- update planned connecs
 					SELECT count(connec_id) INTO v_count FROM plan_psector_x_connec WHERE psector_id=v_psector_id AND arc_id IN (v_record1.arc_id, v_record2.arc_id);
 					IF v_count > 0 THEN
-						UPDATE plan_psector_x_connec SET arc_id=v_new_record.arc_id WHERE psector_id=v_psector_id AND arc_id IN (v_record1.arc_id, v_record2.arc_id);
+						UPDATE plan_psector_x_connec SET arc_id=v_new_record.arc_id WHERE psector_id=v_psector_id AND arc_id IN (v_record1.arc_id, v_record2.arc_id)
+						AND state = 1;
 						INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Reconnect planned ',v_count,' connecs.'));
 					END IF;
 
 					-- update planned gullies
 					IF v_project_type = 'UD' THEN
-						SELECT count(gully_id) INTO v_count FROM plan_psector_x_gully WHERE psector_id=v_psector_id AND arc_id IN (v_record1.arc_id, v_record2.arc_id);
+						SELECT count(gully_id) INTO v_count FROM plan_psector_x_gully WHERE psector_id=v_psector_id AND arc_id IN (v_record1.arc_id, v_record2.arc_id) AND state = 1; 
 						IF v_count > 0 THEN
-							UPDATE plan_psector_x_gully SET arc_id=v_new_record.arc_id WHERE psector_id=v_psector_id AND arc_id IN (v_record1.arc_id, v_record2.arc_id);
+							UPDATE plan_psector_x_gully SET arc_id=v_new_record.arc_id WHERE psector_id=v_psector_id AND arc_id IN (v_record1.arc_id, v_record2.arc_id)
+							AND state = 1;
 							INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Reconnect planned ',v_count,' gullies.'));
 						END IF;
 					END IF;
+
+					IF v_record1.state = 1 THEN
+						INSERT INTO plan_psector_x_arc (psector_id, arc_id, state) VALUES (v_psector_id, v_record1.arc_id, 0)
+						ON CONFLICT (psector_id, arc_id) DO NOTHING; 
+					ELSE
+						DELETE FROM arc WHERE arc_id = v_record1.arc_id;
+					END IF;
+
+					IF v_record2.state = 1 THEN
+						INSERT INTO plan_psector_x_arc (psector_id, arc_id, state) VALUES (v_psector_id, v_record2.arc_id, 0)
+						ON CONFLICT (psector_id, arc_id) DO NOTHING; 
+					ELSE
+						DELETE FROM arc WHERE arc_id = v_record2.arc_id;
+					END IF;
+
+					IF v_state_node = 1 THEN
+						INSERT INTO plan_psector_x_node (psector_id, node_id, state) VALUES (v_psector_id, v_node_id, 0)
+						ON CONFLICT (psector_id, node_id) DO NOTHING; 
+					ELSE
+						INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Delete planned node ',v_node_id));
+						DELETE FROM node WHERE node_id = v_node_id;
+					END IF;					
 				END IF;
 
 			INSERT INTO audit_check_data (fid,  criticity, error_message)

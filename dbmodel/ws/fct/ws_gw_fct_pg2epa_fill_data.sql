@@ -70,6 +70,11 @@ BEGIN
 		JOIN (SELECT node_1 AS node_id, sector_id FROM b UNION SELECT node_2, sector_id FROM b)a USING (node_id)
 		JOIN cat_node c ON c.id=nodecat_id';
 
+	-- create link exit
+	IF v_networkmode in (3,4) THEN
+		PERFORM gw_fct_linkexitgenerator(1);
+	END IF;
+
 	IF v_networkmode = 4 THEN
 	
 		EXECUTE ' INSERT INTO temp_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
@@ -144,6 +149,39 @@ BEGIN
 		HAVING count(sector_id)>1);
 	END IF;
 
+	-- update child param for inp_reservoir
+	UPDATE temp_node SET pattern_id=inp_reservoir.pattern_id FROM inp_reservoir WHERE temp_node.node_id=inp_reservoir.node_id;
+	
+	-- update child param for inp_junction
+	UPDATE temp_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE temp_node.node_id=inp_junction.node_id;
+
+	-- update child param for inp_tank
+	UPDATE temp_node SET addparam=concat('{"initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
+	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'", "overflow":"',overflow,'"}')
+	FROM inp_tank WHERE temp_node.node_id=inp_tank.node_id;
+	
+	-- update child param for inp_inlet
+	UPDATE temp_node SET
+	addparam=concat('{"pattern_id":"',i.pattern_id,'", "initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
+	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'", "overflow":"',overflow,'"}')
+	FROM inp_inlet i WHERE temp_node.node_id=i.node_id;
+
+	-- update head for those inlet acting as reservoir with head not null
+	UPDATE temp_node SET elevation = head, elev = head FROM inp_inlet WHERE temp_node.node_id=inp_inlet.node_id AND head is not null AND epa_type = 'RESERVOIR';
+
+	-- update head for those reservoirs with head is not null
+	UPDATE temp_node SET elevation = head, elev = head FROM inp_reservoir WHERE temp_node.node_id=inp_reservoir.node_id AND head is not null;
+
+	-- update child param for inp_valve
+	UPDATE temp_node SET addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "diameter":"',custom_dint,'", "flow":"',
+	flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "minorloss":"',minorloss,'", "status":"',status,
+	'", "to_arc":"',to_arc,'", "add_settings":"',add_settings,'"}')
+	FROM inp_valve WHERE temp_node.node_id=inp_valve.node_id;
+
+	-- update addparam for inp_pump
+	UPDATE temp_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',pattern,'", "status":"',status,'", "to_arc":"',to_arc,
+	'", "energyparam":"', energyparam,'", "energyvalue":"',energyvalue,'", "pump_type":"',pump_type,'"}')
+	FROM inp_pump WHERE temp_node.node_id=inp_pump.node_id;
 
 	raise notice 'inserting arcs on temp_arc table';
 	
@@ -178,7 +216,7 @@ BEGIN
 		-- this need to be solved here in spite of fill_data functions because some kind of incosnstency done on this function on previous lines
 		EXECUTE 'INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, length, diameter, the_geom,
 			expl_id, dma_id, presszone_id, dqa_id, minsector_id, status, minorloss, age)
-			SELECT concat(''VP'',connec_id), connec_id as node_1, CASE WHEN pjoint_type = ''VNODE'' THEN concat(''VN'',pjoint_id) ELSE pjoint_id end AS node_2, 
+			SELECT concat(''CO'',connec_id), connec_id as node_1, CASE WHEN vnode_type = ''ARC'' THEN concat(''VN'',vnode_id) WHEN vnode_type = ''NODE'' THEN vnode_id::text ELSE pjoint_id end AS node_2, 
 			''LINK'', connecat_id, ''PIPE'', c.sector_id, c.state, c.state_type, annotation, 
 			(CASE WHEN custom_roughness IS NOT NULL THEN custom_roughness ELSE roughness END) AS roughness,
 			(CASE WHEN custom_length IS NOT NULL THEN custom_length ELSE st_length(l.the_geom) END), 
@@ -186,7 +224,7 @@ BEGIN
 			l.the_geom,
 			c.expl_id, c.dma_id, c.presszone_id, c.dqa_id, c.minsector_id, inp_connec.status, inp_connec.minorloss,
 			(case when c.builtdate is not null then (now()::date-c.builtdate)/30 else 0 end)
-			FROM selector_sector, v_edit_link l 
+			FROM selector_sector, temp_link l 
 			JOIN connec c ON connec_id = feature_id
 			JOIN value_state_type ON value_state_type.id = state_type
 			JOIN cat_connec ON cat_connec.id = connecat_id
@@ -196,7 +234,7 @@ BEGIN
 				AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < cat_mat_roughness.end_age '
 				||v_statetype||' AND c.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
 				AND epa_type = ''JUNCTION''
-				AND l.sector_id > 0
+				AND c.sector_id > 0
 				AND pjoint_id IS NOT NULL AND pjoint_type IS NOT NULL';
 	END IF;
         
@@ -214,7 +252,7 @@ BEGIN
 	minorloss = inp_virtualvalve.minorloss, 
 	diameter = inp_virtualvalve.diameter, 
 	status = inp_virtualvalve.status, 
-	addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "flow":"',flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "to_arc":"',to_arc,'"}')
+	addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "flow":"',flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'"}')
 	FROM inp_virtualvalve WHERE temp_arc.arc_id=inp_virtualvalve.arc_id;
 
 	raise notice 'updating inp_shortpipe';

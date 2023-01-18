@@ -109,9 +109,9 @@ BEGIN
 		THEN v_addschema = null; 
 	ELSE
 		IF (select schemaname from pg_tables WHERE schemaname = v_addschema LIMIT 1) IS NULL THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-            "data":{"message":"3132", "function":"2870","debug_msg":null}}$$)';
-			-- todo: send message to response
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	            "data":{"message":"3132", "function":"2870","debug_msg":null}}$$)';
+		-- todo: send message to response
 		END IF;
 	END IF;
 
@@ -132,7 +132,7 @@ BEGIN
 	v_explfromsector = v_parameter_selector->>'explFromSector';
 	v_sectorfrommacroexpl = v_parameter_selector->>'sectorFromMacroexpl';
 
-	IF v_tabname='tab_macroexploitation' THEN
+	IF v_tabname='tab_macroexploitation' or v_tabname='tab_macroexploitation_add' THEN
 		v_zonetable = 'exploitation';
 	ELSIF v_tabname='tab_macrosector' THEN
 		v_zonetable = 'sector';
@@ -147,87 +147,123 @@ BEGIN
 		v_columnname = v_parameter_selector->>'selector_id'; 
 
 		v_explmuni = (SELECT expl_id FROM exploitation e, ext_municipality m 
-			WHERE e.active IS TRUE AND st_dwithin(st_centroid(e.the_geom), m.the_geom, 0) AND muni_id::text = v_id::text limit 1);
+		WHERE e.active IS TRUE AND st_dwithin(st_centroid(e.the_geom), m.the_geom, 0) AND muni_id::text = v_id::text limit 1);
 
 		IF v_explmuni IS NULL THEN 
 			v_explmuni = (SELECT expl_id FROM exploitation e, ext_municipality m 
 			WHERE e.active IS TRUE AND st_dwithin(ST_GeneratePoints(e.the_geom, 1), m.the_geom, 0) AND muni_id::text = v_id::text limit 1);
 		END IF;
 
-		EXECUTE 'DELETE FROM selector_expl WHERE cur_user = current_user';
-		EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) VALUES('|| v_explmuni ||', '''|| current_user ||''')';	
-	END IF;
+			EXECUTE 'DELETE FROM selector_expl WHERE cur_user = current_user';
+			IF v_addschema is not null THEN
+				EXECUTE 'DELETE FROM '||v_addschema||'.selector_expl WHERE cur_user = current_user';
+			END IF;
+			EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) VALUES('|| v_explmuni ||', '''|| current_user ||''') ON CONFLICT (expl_id, cur_user) DO NOTHING';	
+		END IF;
 
-	-- manage check all
-	IF v_checkall THEN
-	
-		IF v_table ='plan_psector' THEN -- to manage only those psectors related to selected exploitations
-			EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||
-			' WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user) ON CONFLICT DO NOTHING';
-		ELSE
+		-- manage check all
+		IF v_checkall THEN
 		
-			IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user') IS TRUE THEN
+			IF v_table ='plan_psector' THEN -- to manage only those psectors related to selected exploitations
+				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||
+				' WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user) ON CONFLICT DO NOTHING';
+			ELSE
 			
-				IF v_tabname = 'tab_exploitation' THEN
-					EXECUTE 'INSERT INTO selector_expl SELECT expl_id, current_user FROM config_user_x_expl WHERE username = current_user ON CONFLICT DO NOTHING';
-				ELSIF  v_tabname = 'tab_macrosector' THEN
-					EXECUTE 'INSERT INTO selector_sector SELECT sector_id, current_user FROM config_user_x_sector  WHERE username = current_user ON CONFLICT DO NOTHING';
-				ELSIF  v_tabname = 'tab_sector' THEN
-					EXECUTE 'INSERT INTO selector_sector SELECT sector_id, current_user FROM config_user_x_sector WHERE username = current_user ON CONFLICT DO NOTHING';
-				END IF;
+				IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user') IS TRUE THEN
+					IF v_tabname = 'tab_exploitation' THEN
+						EXECUTE 'INSERT INTO selector_expl SELECT expl_id, current_user FROM config_user_x_expl WHERE username = current_user ON CONFLICT DO NOTHING';
+					ELSIF  v_tabname = 'tab_macrosector' THEN
+						EXECUTE 'INSERT INTO selector_sector SELECT sector_id, current_user FROM config_user_x_sector  WHERE username = current_user ON CONFLICT DO NOTHING';
+					ELSIF  v_tabname = 'tab_sector' THEN
+						EXECUTE 'INSERT INTO selector_sector SELECT sector_id, current_user FROM config_user_x_sector WHERE username = current_user ON CONFLICT DO NOTHING';
+					END IF;
+					
+				ELSIF v_tabname='tab_macroexploitation' OR v_tabname='tab_macrosector' THEN
+					EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) 
+					SELECT '|| v_columnname ||', current_user FROM '||v_zonetable||' ON CONFLICT ('|| v_columnname ||', cur_user) DO NOTHING';
 				
-			ELSIF v_tabname='tab_macroexploitation' OR v_tabname='tab_macrosector' THEN
-				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) 
-				SELECT '|| v_columnname ||', current_user FROM '||v_zonetable||' ON CONFLICT ('|| v_columnname ||', cur_user) DO NOTHING';
-			ELSE
-				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||' 
-				ON CONFLICT ('|| v_columnname ||', cur_user) DO NOTHING';
-			END IF;		
-		END IF;
-		
-	ELSIF v_checkall IS FALSE THEN
-		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
-		
-	ELSE
-		
-		IF v_tabname='tab_macroexploitation' OR v_tabname='tab_macrosector' THEN
-
-			-- manage isalone
-			IF v_isalone THEN
-				EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
+				ELSIF v_tabname='tab_macroexploitation_add' THEN
+					EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) 
+					SELECT e.'|| v_columnname ||', current_user 
+					FROM '||v_zonetable||' e
+					JOIN '||v_addschema||'.'||v_zonetable||' a using ('|| v_columnname ||')
+					ON CONFLICT ('|| v_columnname ||', cur_user) DO NOTHING';
+					
+					EXECUTE 'INSERT INTO '||v_addschema||'.'|| v_tablename || ' ('|| v_columnname ||', cur_user) 
+					SELECT '|| v_columnname ||', current_user FROM '||v_addschema||'.'||v_zonetable||' ON CONFLICT ('|| v_columnname ||', cur_user) DO NOTHING';
+				ELSE
+					EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||' 
+					ON CONFLICT ('|| v_columnname ||', cur_user) DO NOTHING';
+				END IF;		
 			END IF;
-		
-			-- manage value
-			IF v_value THEN
-				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) 
-				SELECT '|| v_columnname ||', current_user FROM '||v_zonetable||' WHERE '||v_tableid||' = '||v_id||';';
-			ELSE
-				EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user AND 
-				' || v_columnname || ' IN (SELECT '|| v_columnname ||' FROM '||v_zonetable||' WHERE '||v_tableid||' = '||v_id||');';
+			
+		ELSIF v_checkall IS FALSE THEN
+			EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
+			
+			IF v_addschema is not null THEN
+				EXECUTE 'DELETE FROM '||v_addschema||'.'|| v_tablename || ' WHERE cur_user = current_user';
 			END IF;
-
 		ELSE
-			-- manage isalone
-			IF v_isalone THEN
-				EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
-			END IF;
-		
-			-- manage value
-			IF v_value THEN
-				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
-			ELSE
-				EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE ' || v_columnname || ' = '|| v_id ||' AND cur_user = current_user';
-			END IF;
-		END IF;
+			
+			IF v_tabname='tab_macroexploitation' OR v_tabname='tab_macrosector' OR v_tabname='tab_macroexploitation_add' THEN
 
-	END IF;
+				-- manage isalone
+				IF v_isalone THEN
+					EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
+				END IF;
+			IF v_addschema is not null THEN
+				EXECUTE 'DELETE FROM '||v_addschema||'.'|| v_tablename || ' WHERE cur_user = current_user';
+			END IF;
+
+				-- manage value
+				IF v_value IS NOT NULL AND v_tabname='tab_macroexploitation_add' THEN
+					EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
+					EXECUTE  'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) 
+					SELECT '|| v_columnname ||', current_user 
+					FROM '||v_zonetable||' e
+					JOIN '||v_addschema||'.'||v_zonetable||' a using ('|| v_columnname ||')
+					WHERE a.'||v_tableid||' = '||v_id||' ON CONFLICT ('|| v_columnname ||', cur_user) DO NOTHING;';	
+
+					EXECUTE 'DELETE FROM '||v_addschema||'.' || v_tablename || ' WHERE cur_user = current_user';
+					EXECUTE 'INSERT INTO '||v_addschema||'.' || v_tablename || ' ('|| v_columnname ||', cur_user) 
+					SELECT '|| v_columnname ||', current_user FROM '||v_addschema||'.'||v_zonetable||' 
+					WHERE '||v_tableid||' = '||v_id||' ON CONFLICT ('|| v_columnname ||', cur_user) DO NOTHING;';
+
+				ELSIF v_value THEN
+					EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
+					EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) 
+					SELECT '|| v_columnname ||', current_user FROM '||v_zonetable||' WHERE '||v_tableid||' = '||v_id||' ON CONFLICT ('|| v_columnname ||', cur_user) DO NOTHING;';
+				ELSE
+					EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user AND 
+					' || v_columnname || ' IN (SELECT '|| v_columnname ||' FROM '||v_zonetable||' WHERE '||v_tableid||' = '||v_id||');';
+				END IF;
+
+			ELSE
+				-- manage isalone
+				IF v_isalone THEN
+					EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
+				END IF;
+				IF v_addschema is not null THEN
+					EXECUTE 'DELETE FROM '||v_addschema||'.'|| v_tablename || ' WHERE cur_user = current_user';
+				END IF;
+
+			
+				-- manage value
+				IF v_value THEN
+					EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
+				ELSE
+					EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE ' || v_columnname || ' = '|| v_id ||' AND cur_user = current_user';
+				END IF;
+			END IF;
+
+		END IF;
 
 	-- manage parents
 	IF v_tabname IN ('tab_psector', 'tab_dscenario', 'tab_sector') AND v_checkall is null AND v_disableparent IS NOT TRUE THEN
 
 		-- getting name
 		v_name = substring (v_tabname,5,99);
-	
+		
 		IF v_value THEN
 			-- getting parent_id for selected row
 			EXECUTE 'SELECT parent_id FROM '||v_table||' WHERE active IS TRUE AND parent_id IS NOT NULL AND '||v_tableid||' = '||v_id
@@ -369,27 +405,29 @@ BEGIN
 	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
 	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault')
 	AND cur_user = current_user ORDER BY parameter)a);
-	
+		
 	-- Control NULL's
 	v_geometry := COALESCE(v_geometry, '{}');
 	v_uservalues := COALESCE(v_uservalues, '{}');
 	v_action := COALESCE(v_action, 'null');
-	
+		
 	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
-	
+		
 	-- Return
 	v_return = concat('{"client":',(p_data ->> 'client'),', "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, "feature":{}, 
-	"data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":',v_action,', "selectorType":"',v_selectortype,'", 
+	"data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":',v_action,', 
+	"selectorType":"',v_selectortype,'", "addSchema":"', v_addschema,'",
 	"layers":',COALESCE(((p_data ->> 'data')::json->> 'layers'), '{}'),'}}');
 	RETURN gw_fct_getselectors(v_return);
 
-	
-	-- Exception handling
+		
+	--Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
+	
 $BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+LANGUAGE plpgsql VOLATILE
+COST 100;

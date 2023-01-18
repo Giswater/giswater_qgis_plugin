@@ -201,10 +201,6 @@ DROP TRIGGER IF EXISTS gw_trg_gully_update ON "SCHEMA_NAME"."gully";
 CREATE TRIGGER gw_trg_gully_update AFTER UPDATE OF the_geom ON "SCHEMA_NAME"."gully" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_gully_update"();
 
-DROP TRIGGER IF EXISTS gw_trg_node_update ON "SCHEMA_NAME"."node";
-CREATE TRIGGER gw_trg_node_update AFTER INSERT OR UPDATE OF the_geom, top_elev, custom_top_elev, "state" ON "SCHEMA_NAME"."node" 
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_node_update"();
-
 DROP TRIGGER IF EXISTS gw_trg_edit_review_audit_arc ON "SCHEMA_NAME".v_edit_review_audit_arc;
 CREATE TRIGGER gw_trg_edit_review_audit_arc INSTEAD OF UPDATE ON "SCHEMA_NAME".v_edit_review_audit_arc 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_review_audit_arc();

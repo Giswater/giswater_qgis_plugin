@@ -7,6 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2708
 
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_mincut(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_mincut(p_data json)
 RETURNS integer AS
 $BODY$

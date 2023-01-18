@@ -295,6 +295,7 @@ BEGIN
                         sys_elev1_aux = NEW.elev1;
                     END IF;
 
+
                     -- sys elev2
                     IF (NEW.custom_elev2 IS NOT NULL AND OLD.custom_elev2 IS NOT NULL) OR (NEW.custom_elev2 IS NOT NULL AND OLD.custom_elev2 IS NULL) THEN
                         sys_elev2_aux = NEW.custom_elev2;
