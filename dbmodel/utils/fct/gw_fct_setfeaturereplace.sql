@@ -264,6 +264,12 @@ BEGIN
 				the_geom, category_type, function_type, fluid_type, location_type, drainzone_id) 
 				VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_epa_type_new, v_sector_id, v_dma_id, v_expl_id, 
 				0, v_state_type, v_workcat_id_end, v_the_geom, v_category, v_function, v_fluid, v_location, v_drainzone_id);
+
+				IF v_epa_type_new = 'OUTFALL' THEN
+					DELETE FROM drainzone WHERE name = v_old_feature_id;
+					INSERT INTO drainzone (name,expl_id, graphconfig)
+					VALUES (v_id,v_expl_id, concat('{"use":[{"nodeParent":"',v_id,'"}], "ignore":[], "forceClosed":[]}')::json);
+				END IF;
 			END IF;
 
 			INSERT INTO audit_check_data (fid, result_id, error_message)
