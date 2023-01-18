@@ -26,7 +26,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psecto
 
 
 
-ALTER TABLE vnode RENAME TO _vnode_;
+ALTER TABLE IF EXISTS vnode RENAME TO _vnode_;
 
 CREATE TABLE temp_vnode (
   id serial primary key,
@@ -104,7 +104,7 @@ ALTER TABLE plan_psector_x_node ALTER COLUMN insert_user SET DEFAULT CURRENT_USE
 ALTER TABLE plan_psector_x_connec ALTER COLUMN insert_user SET DEFAULT CURRENT_USER;
 ALTER TABLE plan_psector_x_other ALTER COLUMN insert_user SET DEFAULT CURRENT_USER;
 
-CREATE INDEX inp_curve_value_curve_id ON inp_curve_value USING btree (curve_id);
+CREATE INDEX IF NOT EXISTS inp_curve_value_curve_id ON inp_curve_value USING btree (curve_id);
 
 
 CREATE TABLE node_border_expl (
