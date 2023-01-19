@@ -54,7 +54,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_9">
          <item>
-          <widget class="QLabel" name="label_2">
+          <widget class="QLabel" name="lbl_name">
            <property name="toolTip">
             <string/>
            </property>
@@ -96,7 +96,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_3">
+          <widget class="QLabel" name="lbl_priority">
            <property name="text">
             <string>Priority:</string>
            </property>
@@ -133,7 +133,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
-          <widget class="QLabel" name="label_4">
+          <widget class="QLabel" name="lbl_ext_code">
            <property name="toolTip">
             <string/>
            </property>
@@ -162,7 +162,7 @@
           <widget class="QLineEdit" name="ext_code"/>
          </item>
          <item>
-          <widget class="QLabel" name="label_8">
+          <widget class="QLabel" name="lbl_status">
            <property name="text">
             <string>Status:</string>
            </property>
@@ -199,7 +199,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_7">
          <item>
-          <widget class="QLabel" name="label_5">
+          <widget class="QLabel" name="lbl_exploitation">
            <property name="text">
             <string>Exploitation:</string>
            </property>
@@ -232,7 +232,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_9">
+          <widget class="QLabel" name="lbl_type">
            <property name="text">
             <string>Type:</string>
            </property>
@@ -269,7 +269,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_6">
          <item>
-          <widget class="QLabel" name="label_6">
+          <widget class="QLabel" name="lbl_workcat_id">
            <property name="text">
             <string>Workcat id:</string>
            </property>
@@ -305,7 +305,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="lbl_parent_id">
            <property name="text">
             <string>Parent id:</string>
            </property>
@@ -335,7 +335,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
-          <widget class="QLabel" name="label_7">
+          <widget class="QLabel" name="lbl_descript">
            <property name="text">
             <string>Descript:</string>
            </property>
@@ -365,7 +365,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
-          <widget class="QLabel" name="label_11">
+          <widget class="QLabel" name="lbl_text1">
            <property name="text">
             <string>Text 1:</string>
            </property>
@@ -395,7 +395,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QLabel" name="label_12">
+          <widget class="QLabel" name="lbl_text2">
            <property name="text">
             <string>Text 2:</string>
            </property>
@@ -425,7 +425,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="QLabel" name="label_13">
+          <widget class="QLabel" name="lbl_observation">
            <property name="text">
             <string>Observation</string>
            </property>
@@ -503,7 +503,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox">
+        <widget class="QGroupBox" name="grb_map_details">
          <property name="title">
           <string>Map details</string>
          </property>
@@ -511,7 +511,7 @@
           <item row="0" column="0">
            <layout class="QHBoxLayout" name="horizontalLayout_12">
             <item>
-             <widget class="QLabel" name="label_15">
+             <widget class="QLabel" name="lbl_scale">
               <property name="text">
                <string>Scale:</string>
               </property>
@@ -537,7 +537,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QLabel" name="label_14">
+             <widget class="QLabel" name="lbl_rotation">
               <property name="text">
                <string>Rotation:</string>
               </property>
@@ -563,7 +563,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QLabel" name="label_16">
+             <widget class="QLabel" name="lbl_atlas_id">
               <property name="text">
                <string>Atlas id:</string>
               </property>
@@ -1102,7 +1102,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="gexpenses_label_10">
+          <widget class="QLabel" name="lbl_total_arcs">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -1158,7 +1158,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_15">
          <item>
-          <widget class="QLabel" name="gexpenses_label_3">
+          <widget class="QLabel" name="lbl_total_nodes">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -1266,7 +1266,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="QLabel" name="gexpenses_label_8">
+          <widget class="QLabel" name="lbl_total_2">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -1297,7 +1297,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_27">
          <item>
-          <widget class="QLabel" name="gexpenses_label">
+          <widget class="QLabel" name="lbl_general_expenses">
            <property name="text">
             <string>General expenses</string>
            </property>
@@ -1405,7 +1405,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_22">
          <item>
-          <widget class="QLabel" name="vat_label">
+          <widget class="QLabel" name="lbl_vat">
            <property name="text">
             <string>VAT:</string>
            </property>
@@ -1513,7 +1513,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_24">
          <item>
-          <widget class="QLabel" name="other_label_2">
+          <widget class="QLabel" name="lbl_other_expenses">
            <property name="text">
             <string>Other expenses</string>
            </property>
