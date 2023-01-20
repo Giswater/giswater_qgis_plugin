@@ -10,6 +10,7 @@ import psycopg2
 import psycopg2.extras
 import subprocess
 from functools import partial
+from qgis import utils
 
 from ..ui.ui_manager import GwAdminTranslationUi
 from ..utils import tools_gw
@@ -61,7 +62,9 @@ class GwI18NGenerator:
             self.dlg_qm.btn_translate.setEnabled(False)
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', self.last_error)
             return
+
         self._populate_cmb_language()
+        self._populate_cmb_scode()
 
 
     def _populate_cmb_language(self):
@@ -74,8 +77,32 @@ class GwI18NGenerator:
         rows = self._get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_qm.cmb_language, rows, 1)
         language = tools_gw.get_config_parser('i18n_generator', 'qm_lang_language', "user", "init", False)
+        if language:
+            tools_qt.set_combo_value(self.dlg_qm.cmb_language, language, 0)
 
-        tools_qt.set_combo_value(self.dlg_qm.cmb_language, language, 0)
+
+    def _populate_cmb_scode(self):
+        """ Populate combo with source codes """
+
+        sql = "select distinct(source_code) from i18n.dbdialog union " \
+              "select distinct(source_code) from i18n.dbmessage union " \
+              "select distinct(source_code) from i18n.pydialog union " \
+              "select distinct(source_code) from i18n.pymessage union " \
+              "select distinct(source_code) from i18n.pytoolbar"
+        rows = self._get_rows(sql)
+
+        self.plugin_info = {}
+        accepted_plugins = []
+
+        for plugin in utils.active_plugins:
+            self.plugin_info[f"{utils.plugins_metadata_parser[plugin].get('general', 'name')}"] = f"{plugin}"
+        for row in rows:
+            if row[0] in self.plugin_info.keys():
+                accepted_plugins.append(row)
+        tools_qt.fill_combo_values(self.dlg_qm.cmb_scode, accepted_plugins, 0)
+        source_code = tools_gw.get_config_parser('i18n_generator', 'qm_source_code', "user", "init", False)
+        if source_code:
+            tools_qt.set_combo_value(self.dlg_qm.cmb_scode, source_code, 0)
 
 
     def _check_translate_options(self):
@@ -86,8 +113,9 @@ class GwI18NGenerator:
         self.dlg_qm.lbl_info.clear()
         msg = ''
         self.language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
+        self.scode = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_scode, 0)
         self.lower_lang = self.language.lower()
-        if py_msg:
+        if py_msg and self.lower_lang and self.scode:
             status_py_msg = self._create_py_files()
             if status_py_msg is True:
                 msg += "Python translation successful\n"
@@ -120,20 +148,20 @@ class GwI18NGenerator:
         key_message = f'ms_{self.lower_lang}'
 
         # Get python messages values
-        sql = f"SELECT source, ms_en_us, {key_message} FROM i18n.pymessage;"
+        sql = f"SELECT source, ms_en_us, {key_message} FROM i18n.pymessage where source_code = '{self.scode}';"
         py_messages = self._get_rows(sql)
 
         # Get python toolbars and buttons values
-        sql = f"SELECT source, lb_en_us, {key_label} FROM i18n.pytoolbar;"
+        sql = f"SELECT source, lb_en_us, {key_label} FROM i18n.pytoolbar where source_code = '{self.scode}';"
         py_toolbars = self._get_rows(sql)
 
         # Get python dialog values
         sql = (f"SELECT dialog_name, source, lb_en_us, {key_label}, tt_en_us, {key_tooltip} "
-               f" FROM i18n.pydialog "
+               f" FROM i18n.pydialog  where source_code = '{self.scode}'"
                f" ORDER BY dialog_name;")
         py_dialogs = self._get_rows(sql)
 
-        ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_{self.language}.ts'
+        ts_path = os.path.join(self.plugin_dir + os.sep + '..' + os.sep + self.plugin_info[self.scode] + os.sep + 'i18n' + os.sep + f'{self.scode}_{self.language}.ts')
 
         # Check if file exist
         if os.path.exists(ts_path):
@@ -152,7 +180,7 @@ class GwI18NGenerator:
         # Create children for toolbars and actions
         line = '\t<!-- TOOLBARS AND ACTIONS -->\n'
         line += '\t<context>\n'
-        line += '\t\t<name>giswater</name>\n'
+        line += f'\t\t<name>{self.scode}</name>\n'
         ts_file.write(line)
         for py_tlb in py_toolbars:
             line = f"\t\t<message>\n"
@@ -288,7 +316,7 @@ class GwI18NGenerator:
 
         sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_us, lb_{self.lower_lang}, tt_en_us, "
                f"tt_{self.lower_lang} "
-               f"FROM i18n.dbdialog "
+               f"FROM i18n.dbdialog WHERE source_code = '{self.scode}' "
                f"ORDER BY context, formname;")
         rows = self._get_rows(sql)
         if not rows:
@@ -300,7 +328,7 @@ class GwI18NGenerator:
         """ Get db messages values """
 
         sql = (f"SELECT source, project_type, context, ms_en_us, ms_{self.lower_lang}, ht_en_us, ht_{self.lower_lang}"
-               f" FROM i18n.dbmessage "
+               f" FROM i18n.dbmessage WHERE source_code = '{self.scode}' "
                f" ORDER BY context;")
         rows = self._get_rows(sql)
         if not rows:

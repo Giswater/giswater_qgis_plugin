@@ -15,14 +15,11 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0" colspan="2">
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="grb_info_connection">
      <property name="title">
       <string>Connection information</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="txt_db"/>
-      </item>
       <item row="3" column="1">
        <widget class="QLineEdit" name="txt_user"/>
       </item>
@@ -43,8 +40,15 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="txt_port"/>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="txt_db"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lbl_database">
+        <property name="text">
+         <string>Data base:</string>
+        </property>
+       </widget>
       </item>
       <item row="0" column="1">
        <widget class="QLineEdit" name="txt_host"/>
@@ -56,10 +60,23 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="lbl_database">
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="txt_port"/>
+      </item>
+      <item row="7" column="1">
+       <widget class="QComboBox" name="cmb_language"/>
+      </item>
+      <item row="5" column="1">
+       <widget class="QPushButton" name="btn_connection">
         <property name="text">
-         <string>Data base:</string>
+         <string>Test connection</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="lbl_language">
+        <property name="text">
+         <string>Language:</string>
         </property>
        </widget>
       </item>
@@ -70,13 +87,6 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="lbl_language">
-        <property name="text">
-         <string>Language:</string>
-        </property>
-       </widget>
-      </item>
       <item row="4" column="0">
        <widget class="QLabel" name="lbl_pass">
         <property name="text">
@@ -84,15 +94,15 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="1">
-       <widget class="QPushButton" name="btn_connection">
+      <item row="6" column="0">
+       <widget class="QLabel" name="lbl_scode">
         <property name="text">
-         <string>Test connection</string>
+         <string>Source code:</string>
         </property>
        </widget>
       </item>
       <item row="6" column="1">
-       <widget class="QComboBox" name="cmb_language"/>
+       <widget class="QComboBox" name="cmb_scode"/>
       </item>
      </layout>
     </widget>
@@ -149,7 +159,7 @@
     </widget>
    </item>
    <item row="1" column="0" colspan="2">
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="grb_translate_files">
      <property name="title">
       <string>Translate files</string>
      </property>
