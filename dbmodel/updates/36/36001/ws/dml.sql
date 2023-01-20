@@ -925,4 +925,4 @@ widgetcontrols=a.widgetcontrols FROM config_form_fields a
 WHERE a.formname='v_edit_inp_valve' AND a.columnname='valv_type' AND c.columnname='valv_type' AND 
 (c.formname ILIKE 've_epa_valve' OR c.formname ILIKE 've_epa_virtualvalve');
 
-UPDATE config_param_system SET value = gw_fct_json_object_set_key(value, 'node', 'SELECT node_id AS node_id, code AS code FROM v_edit_node') WHERE parameter = 'om_profile_guitar_text';
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value, 'node', 'SELECT node_id AS node_id, code AS code FROM v_edit_node') WHERE parameter = 'om_profile_guitartext';
