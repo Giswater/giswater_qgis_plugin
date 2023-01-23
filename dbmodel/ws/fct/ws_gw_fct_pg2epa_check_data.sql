@@ -493,16 +493,16 @@ BEGIN
 
 	RAISE NOTICE '19.2 - Check dint value for cat_node acting as [SHORTPIPE or VALVE or PUMP] (142)';
 	SELECT count(*) INTO v_count FROM cat_node WHERE dint IS NULL AND id IN 
-	(SELECT DISTINCT(nodecat_id) from v_edit_node WHERE epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP'));
+	(SELECT DISTINCT(nodecat_id) from v_edit_node WHERE epa_type IN ('SHORTPIPE', 'VALVE'));
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '142', 2, concat(
 		'WARNING-142: There is/are ',v_count,
-		' register(s) on node''s catalog acting as [SHORTPIPE or VALVE or PUMP] with dint not defined.'), v_count);
+		' register(s) on node''s catalog acting as [SHORTPIPE or VALVE] with dint not defined.'), v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '142', 1, 'INFO: Dint for node''s catalog checked. No values missed for SHORTPIPES VALVES & PUMPS',v_count);
+		VALUES (v_fid, '142', 1, 'INFO: Dint for node''s catalog checked. No values missed for SHORTPIPES OR VALVES',v_count);
 	END IF;
 	
 		
