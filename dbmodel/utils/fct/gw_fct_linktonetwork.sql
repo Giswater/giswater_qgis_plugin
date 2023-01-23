@@ -67,6 +67,7 @@ v_psector_current integer; -- Current psector related to user
 -- process variables
 v_connect record; -- Record to store the value for the used connect
 v_link record; -- Record to store the value for the used link
+v_link_point public.geometry;
 v_arc record; -- Record to store the value for the used arc
 v_connect_id  varchar; -- id for the used connect
 v_point_aux public.geometry; -- Variable to store the geometry of the end of the link
@@ -273,27 +274,30 @@ BEGIN
 				-- setting point aux
 				SELECT geom_point INTO v_geom_point FROM temp_table WHERE fid = 485 and cur_user = current_user;
 				v_point_aux := v_geom_point;
-				DELETE FROM temp_table WHERE fid = 485 AND cur_user=current_user;
 				
-                IF v_point_aux IS NULL THEN
+				DELETE FROM temp_table WHERE fid = 485 AND cur_user=current_user;
+						
+				IF v_point_aux IS NULL THEN
 
-                    v_point_aux := St_closestpoint(v_arc.the_geom, st_EndPoint(v_link.the_geom));
+					-- getting the appropiate vertex of link to check distance againts arc
+					select geom INTO v_link_point from (select (st_dumppoints(the_geom)).geom, (st_dumppoints(the_geom)).path, the_geom 
+					from link where link.link_id = v_link.link_id) a where path[1] = st_numpoints(the_geom)-1;
+					v_point_aux := St_closestpoint(v_arc.the_geom, v_link_point);
 
-                    IF st_equals(v_point_aux, st_endpoint(v_arc.the_geom)) THEN
-                        v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, 1-v_dfactor));
+					-- changing closest point
+					IF st_equals(v_point_aux, st_endpoint(v_arc.the_geom)) THEN
+						v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, 1-v_dfactor));
 
-                    ELSIF st_equals(v_point_aux, st_startpoint(v_arc.the_geom)) THEN
-                        v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, v_dfactor));
-                    ELSE
-                        v_point_aux := St_closestpoint(v_arc.the_geom, St_endpoint(v_link.the_geom));
-                    END IF;
+					ELSIF st_equals(v_point_aux, st_startpoint(v_arc.the_geom)) THEN
+						v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, v_dfactor));
+					END IF;
 
-                    -- profilactic control for v_point_aux
-                    IF v_point_aux IS NULL THEN
-                        v_point_aux := St_closestpoint(v_arc.the_geom, v_connect.the_geom);
-                    END IF;
+					-- profilactic control for v_point_aux
+					IF v_point_aux IS NULL THEN
+						v_point_aux := St_closestpoint(v_arc.the_geom, v_connect.the_geom);
+					END IF;
 
-                END IF;
+				END IF;
 
 				IF v_link.the_geom IS NULL AND v_pjointtype='ARC' THEN
 
