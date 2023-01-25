@@ -8,6 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_connect_to_network(character varying[], character varying);
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_connect_to_network(json);
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_setlinktonetwork(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setlinktonetwork(p_data json)
 RETURNS json AS
 $BODY$

@@ -273,10 +273,11 @@ BEGIN
 
 				-- setting point aux
 				SELECT geom_point INTO v_geom_point FROM temp_table WHERE fid = 485 and cur_user = current_user;
-				v_point_aux := v_geom_point;
+			
+				if v_geom_point is not null then v_point_aux := v_geom_point; end if;
 				
 				DELETE FROM temp_table WHERE fid = 485 AND cur_user=current_user;
-						
+												
 				IF v_point_aux IS NULL THEN
 
 					-- getting the appropiate vertex of link to check distance againts arc
@@ -284,21 +285,27 @@ BEGIN
 					from link where link.link_id = v_link.link_id) a where path[1] = st_numpoints(the_geom)-1;
 					v_point_aux := St_closestpoint(v_arc.the_geom, v_link_point);
 
+					-- profilactic control for v_point_aux
+					IF v_point_aux IS NULL THEN
+						v_point_aux := St_closestpoint(v_arc.the_geom, v_connect.the_geom);
+					END IF;
+
 					-- changing closest point
 					IF st_equals(v_point_aux, st_endpoint(v_arc.the_geom)) THEN
 						v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, 1-v_dfactor));
-
+									
 					ELSIF st_equals(v_point_aux, st_startpoint(v_arc.the_geom)) THEN
 						v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, v_dfactor));
-					END IF;
 
+					END IF;
+		
 					-- profilactic control for v_point_aux
 					IF v_point_aux IS NULL THEN
 						v_point_aux := St_closestpoint(v_arc.the_geom, v_connect.the_geom);
 					END IF;
 
 				END IF;
-
+			
 				IF v_link.the_geom IS NULL AND v_pjointtype='ARC' THEN
 
 					IF v_link.the_geom IS NULL THEN
