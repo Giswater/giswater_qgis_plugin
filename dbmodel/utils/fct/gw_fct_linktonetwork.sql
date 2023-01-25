@@ -481,6 +481,7 @@ BEGIN
 			v_connect := null;
 			v_link := null;
 			v_arc := null;
+			v_point_aux := null;
 		END IF;
 	    END LOOP;
 	END IF;
