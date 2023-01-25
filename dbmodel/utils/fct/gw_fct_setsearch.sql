@@ -276,7 +276,7 @@ BEGIN
 			JOIN '||quote_ident(v_muni_layer)||' ON '||quote_ident(v_muni_layer)||'.'||quote_ident(v_muni_id_field)||' = '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_muni_id_field) ||'
 			WHERE lower(unaccent('||quote_ident(v_muni_layer)||'.'||quote_ident(v_muni_display_field)||')) = lower(unaccent('||quote_literal(v_name)||'))
 			AND lower(unaccent('||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||')) ILIKE lower(unaccent('||quote_literal(v_textarg)||')) ORDER BY
-			'||quote_ident(v_street_layer)||'.'||quote_ident(v_street_search_field)||' LIMIT 10 )a'
+			'||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||' LIMIT 10 )a'
 			INTO v_response;
 		
         -- if textarg mismatch, try use levenshtein function to show similar results
