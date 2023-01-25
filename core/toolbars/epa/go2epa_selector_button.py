@@ -97,11 +97,11 @@ class GwGo2EpaSelectorButton(GwAction):
 
         if self.project_type == 'ws':
 
-            sql = ("SELECT DISTINCT time, time FROM rpt_arc "
-                   "WHERE result_id ILIKE '%%' ORDER BY time")
+            sql = ("SELECT DISTINCT time, time, split_part(time, ':', 1)::int as split_hour "
+                   "FROM rpt_arc WHERE result_id ILIKE '%%' order by split_hour")
             rows = tools_db.get_rows(sql, add_empty_row=True)
-            tools_qt.fill_combo_values(self.dlg_go2epa_result.cmb_time_to_show, rows)
-            tools_qt.fill_combo_values(self.dlg_go2epa_result.cmb_time_to_compare, rows)
+            tools_qt.fill_combo_values(self.dlg_go2epa_result.cmb_time_to_show, rows, sort_combo=False)
+            tools_qt.fill_combo_values(self.dlg_go2epa_result.cmb_time_to_compare, rows, sort_combo=False)
 
             tools_qt.set_combo_value(self.dlg_go2epa_result.cmb_time_to_show,
                                      tools_gw.get_config_parser('btn_go2epa_selector', 'time_to_show', 'user',

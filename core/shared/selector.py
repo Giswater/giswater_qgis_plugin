@@ -200,7 +200,7 @@ class GwSelector:
                     widget.setToolTip(chk_all_tooltip)
                 else:
                     widget = tools_qt.get_widget(dialog, f"chk_all_{tab_name}")
-                widget.setText('Check all')
+                widget.setText(tools_qt.tr('Check all', 'search'))
                 if self.checkall is not None:
                     widget.blockSignals(True)
                     widget.setChecked(self.checkall)

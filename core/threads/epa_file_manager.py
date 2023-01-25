@@ -538,7 +538,7 @@ class GwEpaFileManager(GwTask):
                 try:
                     if k in (f'{sp_n[0]} {sp_n[1]}', f'{sp_n[0]}'):
                         target = "'" + v + "'"
-                        _time = re.compile('^([012]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$')
+                        _time = re.compile('^([0-9]?[0-9]?[0-9]?[0-9]?[0-9]):[0-5][0-9]:[0-5][0-9]$')
                         if _time.search(sp_n[3]):
                             col40 = "'" + sp_n[3] + "'"
                 except IndexError:
