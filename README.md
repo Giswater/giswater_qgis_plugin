@@ -32,7 +32,8 @@ To work with Giswater you will need at least 2 programs:
 
 PostgreSQL: Installation process must include the selection pgAdmin component (Data Base Manager) and Postgis application (Spatial Extension)<br>
 QGIS: Geoprocessing software<br>
-
+<br>
+If you didn't install QGIS using the standalone installer, you may need to install the matplotlib python library manually.
 
 ## INSTALL
 As Giswater is as server-client software you need to install it into two separate environments.
@@ -68,8 +69,7 @@ Create qgis project:https://www.youtube.com/watch?v=RwFumKKTB2k&list=PLQ-seRm9Dj
 ## DEPLOYMENT
 
 ### Requirements:
-You need to have permissions to connect to postgreSQL database (compatible versions) and your user need to be a db superuser in order to be allowed. <br>
-to create project schemas, roles, backups, restores among others db admin operations.
+You need to have permissions to connect to postgreSQL database (compatible versions) and your user need to be a db superuser in order to be allowed to create project schemas, roles, backups, restores among others db admin operations.
 
 ### Mandatory information for the project:
 Project works with catalogs and you need to fill at least the mandatory ones [materials, node, arc].<br>
