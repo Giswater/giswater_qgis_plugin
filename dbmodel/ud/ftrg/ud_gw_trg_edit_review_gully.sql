@@ -32,6 +32,11 @@ BEGIN
 	v_rev_gully_sandbox_tol :=(SELECT value::json->'sandbox' FROM config_param_system WHERE "parameter"='edit_review_gully_tolerance');	
 	v_rev_gully_units_tol :=(SELECT value::json->'units' FROM config_param_system WHERE "parameter"='edit_review_gully_tolerance');	
 
+--get value from edit_review_auto_field_checked
+	IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'edit_review_auto_field_checked') IS TRUE THEN
+		NEW.field_checked=TRUE;
+	END IF;
+	
 	--getting original values
 	SELECT gully_id, top_elev, ymax, sandbox, gully.matcat_id, gully.gully_type, gratecat_id, units, groove, siphon,
 		connec_arccat_id, annotation, observ, expl_id, the_geom INTO rec_gully 

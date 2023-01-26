@@ -28,6 +28,11 @@ BEGIN
 	v_rev_arc_y1_tol :=(SELECT value::json->>'y1' FROM config_param_system WHERE parameter = 'edit_review_arc_tolerance');
 	v_rev_arc_y2_tol :=(SELECT value::json->>'y2' FROM config_param_system WHERE parameter = 'edit_review_arc_tolerance');		
 
+--get value from edit_review_auto_field_checked
+	IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'edit_review_auto_field_checked') IS TRUE THEN
+		NEW.field_checked=TRUE;
+	END IF;
+	
 	--getting original values
 	SELECT arc_id,y1,y2,arc.arc_type, arccat_id, CASE WHEN arc.matcat_id IS NOT NULL THEN arc.matcat_id ELSE cat_arc.matcat_id END AS matcat_id , 
 	annotation, observ, shape, geom1, geom2, the_geom, expl_id INTO rec_arc 

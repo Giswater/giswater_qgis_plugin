@@ -27,6 +27,11 @@ BEGIN
 	v_rev_node_top_elev_tol :=(SELECT value::json->'topelev' FROM config_param_system WHERE "parameter"='edit_review_node_tolerance');
 	v_rev_node_ymax_tol :=(SELECT value::json->'ymax' FROM config_param_system WHERE "parameter"='edit_review_node_tolerance');		
 
+--get value from edit_review_auto_field_checked
+	IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'edit_review_auto_field_checked') IS TRUE THEN
+		NEW.field_checked=TRUE;
+	END IF;
+	
 	--getting original values
 	SELECT node_id, top_elev, ymax, node.node_type, nodecat_id, node.matcat_id, annotation, observ, expl_id, the_geom INTO rec_node 
 	FROM node JOIN cat_node ON id=node.nodecat_id WHERE node_id=NEW.node_id;

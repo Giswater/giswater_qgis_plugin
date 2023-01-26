@@ -27,6 +27,11 @@ BEGIN
 	SELECT arc_id, arc.arccat_id, matcat_id, pnom, dnom, annotation, observ, expl_id, the_geom INTO rec_arc 
 	FROM arc JOIN cat_arc ON cat_arc.id=arc.arccat_id WHERE arc_id=NEW.arc_id;
 	
+	--get value from edit_review_auto_field_checked
+	IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'edit_review_auto_field_checked') IS TRUE THEN
+		NEW.field_checked=TRUE;
+	END IF;
+	
 	IF NEW.field_checked=TRUE THEN	
 			--looking for insert/update/delete values on audit table
 		IF 

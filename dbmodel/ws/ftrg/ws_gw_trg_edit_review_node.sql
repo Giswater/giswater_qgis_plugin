@@ -29,6 +29,11 @@ BEGIN
 	v_rev_node_elevation_tol :=(SELECT value::json->'elevation' FROM config_param_system WHERE "parameter"='edit_review_node_tolerance');
 	v_rev_node_depth_tol :=(SELECT value::json->'depth' FROM config_param_system WHERE "parameter"='edit_review_node_tolerance');
 	
+	--get value from edit_review_auto_field_checked
+	IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'edit_review_auto_field_checked') IS TRUE THEN
+		NEW.field_checked=TRUE;
+	END IF;
+
 	--getting original values
 	SELECT node_id, elevation, depth,  nodetype_id, nodecat_id, annotation, observ, expl_id, the_geom INTO rec_node 
 	FROM node JOIN cat_node ON cat_node.id=node.nodecat_id WHERE node_id=NEW.node_id;

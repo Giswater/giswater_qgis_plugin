@@ -1,0 +1,3 @@
+3.5.033
+*************
+- New system parameter edit_review_auto_field_checked - If true, at saving review data, it would be automatically set as finished
