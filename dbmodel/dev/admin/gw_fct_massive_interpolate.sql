@@ -1,8 +1,8 @@
--- FUNCTION: ud.gw_fct_massive_interpolate(json)
+-- FUNCTION: SHCEMA_NAME.gw_fct_massive_interpolate(json)
 
--- DROP FUNCTION IF EXISTS ud.gw_fct_massive_interpolate(json);
+-- DROP FUNCTION IF EXISTS SHCEMA_NAME.gw_fct_massive_interpolate(json);
 --9900
-CREATE OR REPLACE FUNCTION ud.gw_fct_massive_interpolate(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_massive_interpolate(
 	p_data json)
     RETURNS json
     LANGUAGE 'plpgsql'
@@ -10,13 +10,13 @@ CREATE OR REPLACE FUNCTION ud.gw_fct_massive_interpolate(
     VOLATILE PARALLEL UNSAFE
 AS $BODY$
 /*
-SELECT ud.gw_fct_massive_interpolate ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+SELECT SHCEMA_NAME.gw_fct_massive_interpolate ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"action":"INTERPOLATE"}}}$$);
 
-SELECT ud.gw_fct_node_interpolate ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+SELECT SHCEMA_NAME.gw_fct_node_interpolate ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"action":"INTERPOLATE","x":419161.98499003565, "y":4576782.72778585, "node1":"117", "node2":"119"}}}$$);
 
-SELECT ud.gw_fct_node_interpolate ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+SELECT SHCEMA_NAME.gw_fct_node_interpolate ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"action":"EXTRAPOLATE", "x":419161.98499003565, "y":4576782.72778585, "node1":"117", "node2":"119"}}}$$);
 
 SELECT * FROM audit_check_data WHERE fid=213
@@ -70,18 +70,18 @@ v_data_custom_elev text;
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "ud", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- get system variables
 	SELECT  giswater, upper(project_type) INTO v_version, v_project FROM sys_version order by id desc limit 1;
-	v_srid = (SELECT epsg FROM ud.sys_version limit 1);
+	v_srid = (SELECT epsg FROM SHCEMA_NAME.sys_version limit 1);
 	
 	SELECT value INTO v_value FROM config_param_user WHERE parameter = 'edit_node_interpolate' AND cur_user = current_user;
 
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
-raise notice 'v_selectionmode,%',v_selectionmode;
+
 	-- manage log (fid: 980)
 	DELETE FROM audit_check_data WHERE fid=980 AND cur_user=current_user;
 	INSERT INTO audit_check_data (fid, error_message) VALUES (980,  concat('MASSIVE NODE INTERPOLATE'));
@@ -105,7 +105,7 @@ raise notice 'v_selectionmode,%',v_selectionmode;
 
 		IF v_sys_top_elev1 IS NOT NULL AND v_sys_elev1 IS NOT NULL AND v_sys_top_elev2 IS NOT NULL AND v_sys_elev2 IS NOT NULL AND 
 		v_sys_top_elev1 !=0 AND v_sys_elev1  !=0 AND v_sys_top_elev2  !=0 AND v_sys_elev2  !=0 THEN
-		RAISE NOTICE '1';
+
 			EXECUTE 'SELECT gw_fct_node_interpolate($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":'||v_srid||'}, 
 			"form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, 
 			"parameters":{"action":"INTERPOLATE", "x":'||ST_X(rec.the_geom)||', "y":'||ST_Y(rec.the_geom)||', 
@@ -115,7 +115,7 @@ raise notice 'v_selectionmode,%',v_selectionmode;
 
 		ELSIF v_sys_top_elev1 IS NOT NULL AND v_sys_elev1 IS NOT NULL AND ((v_sys_top_elev2 IS NULL OR v_sys_elev2 IS NULL) OR (v_sys_top_elev2 = 0 OR v_sys_elev2= 0)) THEN
 		
-		RAISE NOTICE '2';
+
 			SELECT arc_id, node_1 as node_id  INTO rec_arc_2 FROM v_edit_arc WHERE state=1 and node_2 = rec_arc_1.node_id;
 			SELECT sys_top_elev, sys_elev INTO v_sys_top_elev2, v_sys_elev2 FROM v_edit_node WHERE state=1 and node_id=rec_arc_2.node_id;
 
@@ -131,7 +131,6 @@ raise notice 'v_selectionmode,%',v_selectionmode;
 			end if;
 		ELSIF ((v_sys_top_elev1 IS NULL OR v_sys_elev1 IS NULL) OR (v_sys_top_elev1 = 0 OR v_sys_elev1 = 0) ) AND v_sys_top_elev2 IS NOT NULL AND v_sys_elev2 IS NOT NULL THEN
 		
-		RAISE NOTICE '3';
 
 			SELECT arc_id, node_2 AS node_id  INTO rec_arc_1 FROM v_edit_arc WHERE state=1 and node_1 = rec_arc_2.node_id;
 			SELECT sys_top_elev, sys_elev INTO v_sys_top_elev1, v_sys_elev1 FROM v_edit_node WHERE state=1 and node_id=rec_arc_1.node_id;
@@ -250,30 +249,30 @@ raise notice 'v_selectionmode,%',v_selectionmode;
 END;
 $BODY$;
 
-ALTER FUNCTION ud.gw_fct_massive_interpolate(json)
+ALTER FUNCTION SHCEMA_NAME.gw_fct_massive_interpolate(json)
     OWNER TO role_admin;
 
-GRANT EXECUTE ON FUNCTION ud.gw_fct_massive_interpolate(json) TO PUBLIC;
+GRANT EXECUTE ON FUNCTION SHCEMA_NAME.gw_fct_massive_interpolate(json) TO PUBLIC;
 
-GRANT EXECUTE ON FUNCTION ud.gw_fct_massive_interpolate(json) TO role_admin;
+GRANT EXECUTE ON FUNCTION SHCEMA_NAME.gw_fct_massive_interpolate(json) TO role_admin;
 
-GRANT EXECUTE ON FUNCTION ud.gw_fct_massive_interpolate(json) TO role_basic;
+GRANT EXECUTE ON FUNCTION SHCEMA_NAME.gw_fct_massive_interpolate(json) TO role_basic;
 
 /*
 
-INSERT INTO ud.sys_function(
+INSERT INTO SHCEMA_NAME.sys_function(
 id, function_name, project_type, function_type, input_params, return_type, descript, sys_role,  source)
 VALUES (9900, 'gw_fct_massive_interpolate', 'ud', 'function', 'json', 'json', 'Function for executing massive interpolation process', 'role_admin',  'core');
 
-INSERT INTO ud.sys_fprocess(fid, fprocess_name, project_type,  source, isaudit, fprocess_type)
+INSERT INTO SHCEMA_NAME.sys_fprocess(fid, fprocess_name, project_type,  source, isaudit, fprocess_type)
 VALUES (980, 'Massive interpolate', 'ud', 'core', false, 'Function process');
 
-INSERT INTO ud.config_function(	id, function_name, style )
+INSERT INTO SHCEMA_NAME.config_function(	id, function_name, style )
 VALUES (9900,'gw_fct_massive_interpolate', '{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
 "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
 "polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}');
 
-INSERT INTO ud.config_toolbox(id, alias, functionparams,   active)
+INSERT INTO SHCEMA_NAME.config_toolbox(id, alias, functionparams,   active)
 VALUES (9900, 'Massive interpolate', '{"featureType":["node"]}',true);
 
 */
