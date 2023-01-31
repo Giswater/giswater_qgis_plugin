@@ -55,6 +55,7 @@ DECLARE
 v_feature_type text;-- Type of features affected
 v_feature_ids text; -- List of feature affected
 v_forcedarcs text; -- Used to force only some specific arcs
+v_isforcedarcs boolean; -- Check if forced arcs strategy is being used
 v_ispsector boolean; -- When function is called from psector side (gw_trg_plan_psector_link)
 v_isarcdivide boolean;	-- When function is called for arcdivide procedure (gw_fct_setarcdivide)
 v_link_id integer; -- Id for link
@@ -131,9 +132,11 @@ BEGIN
 	-- create query text for forced arcs
 	if v_forcedarcs is null then
 		v_forcedarcs= '';
+		v_isforcedarcs = False;
 	else
 		v_forcedarcs = replace(ARRAY(SELECT json_array_elements_text(((p_data::json->>'data')::json->>'forcedArcs')::json))::text, '{','(');
 		v_forcedarcs = concat (' AND arc_id::integer IN ', replace (v_forcedarcs, '}',')'));
+		v_isforcedarcs = True;
 	end if;
 
 	-- get values from feature array
@@ -158,6 +161,10 @@ BEGIN
 
 	    FOREACH v_connect_id IN ARRAY v_feature_array
 	    LOOP
+
+	    IF v_isforcedarcs IS FALSE THEN
+	    	v_forcedarcs= '';
+	    END IF; 
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (217, null, 4, concat('Trying to connect ', lower(v_feature_type),' with id ',v_connect_id,'.'));
@@ -202,10 +209,10 @@ BEGIN
 		SELECT * INTO v_arc FROM v_edit_arc WHERE ST_DWithin(v_connect.the_geom, v_edit_arc.the_geom, 0.001);
 
 		-- Use connect.arc_id as forced arcs in case of exists
-		IF v_connect.arc_id IS NOT NULL AND v_forcedarcs = '' THEN
+		IF v_connect.arc_id IS NOT NULL AND v_isforcedarcs is False THEN
 			v_forcedarcs = concat (' AND arc_id::integer = ',v_connect.arc_id,' ');
 		END IF;
-
+		
 		IF v_arc.arc_id IS NOT NULL THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (217, null, 4, concat('FAILED: Link not created because connect ',v_connect_id,' is over arc ', v_arc.arc_id));
