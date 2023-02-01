@@ -289,10 +289,8 @@ BEGIN
 			
 			v_uarl = (v_a*v_kmarc + v_b*v_kmconnec + v_c*v_numconnec)*v_avgpress;	
 			
-			v_carl = (SELECT loss FROM v_om_waterbalance_efficiency 
-					JOIN dma ON name = dma 
-					JOIN ext_cat_period ON period = code
-					WHERE id = v_period AND dma_id = v_dma)*(365/(SELECT extract (day from end_date - start_date) FROM ext_cat_period WHERE id = v_period));
+			v_carl = (SELECT loss FROM om_waterbalance WHERE cat_period_id = v_period AND 
+				dma_id = v_dma)*(365/(SELECT extract (day from end_date - start_date) FROM ext_cat_period WHERE id = v_period));
 
 			v_ili = v_carl/v_uarl;
 
