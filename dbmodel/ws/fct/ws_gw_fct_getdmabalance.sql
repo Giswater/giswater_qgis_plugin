@@ -4,82 +4,110 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 --FUNCTION CODE: XXXX
-drop FUNCTION "SHCEMA_NAME".gw_fct_getwaterbalance(json);
-CREATE OR REPLACE FUNCTION "SHCEMA_NAME".gw_fct_getdmabalance(p_data json) RETURNS json AS 
+
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_getwaterbalance(json);
+
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_getdmabalance(p_data json) RETURNS json AS 
 $BODY$
 /*EXAMPLE
-SELECT SHCEMA_NAME.gw_fct_getdmabalance($${"client":{"device":4, "infoType":1, "lang":"ES"},
+SELECT SCHEMA_NAME.gw_fct_getdmabalance($${"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},"feature":{"tableName":"v_edit_dma", "id":"1"}, 
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
-"parameters":{}}}$$)::JSON
--- fid: v_fid
+"parameters":{},"coordinates":{"xcoord":419254.77166562714,"ycoord":4576827.482150269, "zoomRatio":449.27899973010625}}}$$)::JSON
+
 
 */
 
 DECLARE
-	    
-v_id json;
-v_selectionmode text;
-v_worklayer text;
+
 v_result json;
 v_result_info json;
 v_result_line json;
-v_array text;
 v_version text;
 v_error_context text;
-v_count integer;
-v_checktype text;
-v_fid integer = 479;
 v_dmaid integer;
 v_dmaname text;
 v_explname text;
 v_period_list text;
+
+v_point public.geometry;
+v_xcoord double precision;
+v_ycoord double precision;
+v_epsg integer;
+v_zoomratio double precision; 
+v_client_epsg integer;
+
+
 BEGIN
 
 	-- Search path
-	SET search_path = "SHCEMA_NAME", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 		
 	-- getting input data 	
 	v_dmaid :=  ((p_data ->>'feature')::json->>'id')::json;
+	v_xcoord := ((p_data ->> 'data')::json->> 'coordinates')::json->>'xcoord';
+	v_ycoord := ((p_data ->> 'data')::json->> 'coordinates')::json->>'ycoord';
+	v_epsg := (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
+	v_zoomratio := ((p_data ->> 'data')::json->> 'coordinates')::json->>'zoomRatio';
+	v_client_epsg := (p_data ->> 'client')::json->> 'epsg';
 
-	select name INTO v_dmaname FROM dma WHERE dma_id = v_dmaid;
+	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
+	-- Make point
+	SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
+
+	select dma_id, name INTO v_dmaid, v_dmaname FROM dma WHERE ST_Dwithin(dma.the_geom, v_point, 0.1)  LIMIT 1;
 	select e.name INTO v_explname FROM dma JOIN exploitation e USING (expl_id) WHERE dma_id = v_dmaid;
 
 	EXECUTE 'SELECT string_agg(quote_literal(period), '','') FROM 
 	(select distinct period, crm_startdate from v_om_waterbalance where dma = '||quote_literal(v_dmaname)||' order by crm_startdate desc limit 4)a'
 	INTO v_period_list;
 
-	EXECUTE 'WITH balance AS (SELECT jsonb_build_object('||quote_literal(v_dmaname)||', json_agg(jsonb_build_object(period, jsonb_build_object(crm_startdate::date, total)))) as chart_dma
-	FROM v_om_waterbalance WHERE dma = '||quote_literal(v_dmaname)||' AND period IN  ('||v_period_list||') ),
-	balance_expl AS (SELECT jsonb_build_object('||quote_literal(v_explname)||', json_agg(jsonb_build_object(period, jsonb_build_object(a.crm_startdate::date,a.suma)))) as chart_expl from
-	(SELECT crm_startdate::date, period, sum(total) AS suma
-	FROM v_om_waterbalance WHERE exploitation = '||quote_literal(v_explname)||' AND  period IN  ('||v_period_list||')  group by crm_startdate,period)a)
+	EXECUTE  'WITH balance AS (SELECT jsonb_build_object('||quote_literal(v_dmaname)||', json_agg(jsonb_build_object(period, jsonb_build_object(start_date::date, dma_rw_eff::numeric(12,3))))) as chart_dma
+	FROM v_om_waterbalance_report WHERE dma = '||quote_literal(v_dmaname)||' AND period IN  ('||v_period_list||') ),
+	balance_expl AS (SELECT jsonb_build_object('||quote_literal(v_explname)||', json_agg(jsonb_build_object(period, jsonb_build_object(a.start_date::date,expl_rw_eff)))) as chart_expl from
+	(SELECT DISTINCT  start_date::date, period, expl_rw_eff 
+	FROM v_om_waterbalance_report WHERE exploitation = '||quote_literal(v_explname)||' AND  period IN  ('||v_period_list||') )a)
 	SELECT jsonb_build_object(
 	''info'', to_jsonb(row) ,
 	''chart'', (chart_dma::jsonb ||chart_expl::jsonb ))
 	FROM balance, balance_expl,
 	(SELECT DISTINCT 
-	expl_name, 
-	dma_name,
+	exploitation, 
+	dma,
+	period, 
+	start_date,
+	concat(start_date::date,'' - '',end_date::date) as period_dates,
 	meters_in,
 	meters_out,
 	n_connec,
 	n_hydro,
 	arc_length,
-	link_length
-	FROM 
-	 v_om_waterbalance_report
+	link_length,
+	total_in, 
+	total_out, 
+	total, 
+	auth, 
+	nrw, 
+	dma_rw_eff, 
+	dma_nrw_eff, 
+	dma_ili, 
+	dma_nightvol, 
+	dma_m4day, 
+	expl_rw_eff, 
+	expl_nrw_eff,
+	expl_nightvol, 
+	expl_ili, 
+	expl_m4day
+	FROM v_om_waterbalance_report
 	join dma using(dma_id) 
-	WHERE dma_id = '||v_dmaid||') row'
+	WHERE dma_id = '||v_dmaid||' order by start_date desc limit 1) row'
 	INTO v_result;
 
 raise notice 'v_result,%',v_result;
 	-- info
---	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
---	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 		
@@ -103,5 +131,3 @@ END;
 $BODY$
 LANGUAGE plpgsql VOLATILE
 COST 100;
-
-
