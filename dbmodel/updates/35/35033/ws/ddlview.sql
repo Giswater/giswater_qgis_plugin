@@ -23,35 +23,85 @@ CREATE OR REPLACE VIEW v_minsector
   WHERE minsector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
 
-CREATE VIEW v_om_waterbalance_report as 
-WITH met_in AS (SELECT string_agg (node_id, ', ') as meters, dma_id FROM om_waterbalance_dma_graph WHERE flow_sign = 1 group by dma_id),
-met_out AS (SELECT string_agg (node_id, ', ') as meters, dma_id FROM om_waterbalance_dma_graph WHERE flow_sign = -1 group by dma_id)
-SELECT 
+CREATE OR REPLACE VIEW v_om_waterbalance_report as 
+WITH expl_data AS (SELECT sum(w.auth) / sum(w.total) AS expl_rw_eff,  1 - (sum(w.auth) / sum(w.total)) AS expl_nrw_eff,
+NULL AS expl_nightvol, 
+CASE WHEN sum(arc_length) = 0 THEN NULL ELSE 
+sum(w.nrw)/sum(arc_length)/(EXTRACT(epoch FROM AGE(end_date, start_date))/3600) END as expl_m4day,
+CASE WHEN sum(arc_length) = 0 AND sum(n_connec) = 0 AND sum(link_length)=0 THEN NULL ELSE 
+(sum(w.loss)*(365/extract(day from end_date - start_date))) / ((6.57 * sum(arc_length)) + (9.13 * sum(link_length)) + (0.256*sum(n_connec)) * avg(avg_press)) END as expl_ili, 
+w.expl_id, cat_period_id, start_date
+FROM om_waterbalance w
+join ext_cat_period p on w.cat_period_id = p.id 
+join dma d on d.dma_id = w.dma_id
+GROUP BY w.expl_id, cat_period_id,end_date, start_date)
+SELECT DISTINCT 
+e.name as exploitation,
 w.expl_id,
-e.name as expl_name,
+d.name as dma,
 w.dma_id,
-d.name as dma_name,
-cat_period_id as period,
-concat(startdate,' - ',enddate) as period_dates,
-mi.meters as meters_in,
-mo.meters as meters_out,
+w.cat_period_id,
+p.code as period,
+concat(p.start_date,' - ',end_date) as period_dates,
+w.meters_in,
+w.meters_out,
 n_connec,
 n_hydro,
 arc_length,
 link_length,
-total_in,
-total_out,
-COALESCE(w.total_sys_input, 0::double precision)::numeric(12,2) AS total,
-NULL AS auth,
-NULL AS nrw,
-dma_rw_eff,
-dma_nrw_eff,
-dma_ili,
-dma_nightvol,
-dma_m4day
+w.total_in,
+w.total_out,
+w.total,
+w.auth,
+w.nrw,
+CASE WHEN w.total != 0 then w.auth /w.total end AS dma_rw_eff,
+CASE WHEN w.total != 0 then 1 - (w.auth /w.total) end AS dma_nrw_eff,
+w.ili as dma_ili,
+null as dma_nightvol,
+w.nrw/arc_length/(EXTRACT(epoch FROM AGE(end_date, p.start_date))/3600) as dma_m4day,
+ed.expl_rw_eff,
+ed.expl_nrw_eff,
+expl_nightvol,
+expl_ili,
+expl_m4day
 from om_waterbalance w
 join exploitation e using (expl_id)
 join dma d using (dma_id)
 join ext_cat_period p on w.cat_period_id = p.id
-join met_in mi on w.dma_id = mi.dma_id
-join met_out mo on w.dma_id = mo.dma_id;
+join expl_data ed on ed.expl_id=w.expl_id and w.cat_period_id = p.id where ed.start_date = p.start_date;
+
+drop view v_om_waterbalance cascade;
+CREATE OR REPLACE VIEW v_om_waterbalance AS
+ SELECT e.name AS exploitation,
+    d.name AS dma,
+    p.code AS period,
+    auth_bill,
+    auth_unbill,
+    loss_app,
+    loss_real,
+    total_in,
+    total_out,
+    total,
+    p.start_date::date AS crm_startdate,
+    p.end_date::date AS crm_enddate,
+    startdate AS wbal_startdate,
+    enddate AS wbal_enddate,
+    ili,
+    auth,
+    loss,
+        CASE
+            WHEN total::double precision > 0::double precision THEN ((100::numeric * (auth_bill + auth_unbill))::double precision / total::double precision)::numeric(12,2)
+            ELSE 0::numeric(12,2)
+        END AS loss_eff,
+    auth_bill AS rw,
+    (total::double precision - auth_bill::double precision)::numeric(12,2) AS nrw,
+        CASE
+            WHEN total::double precision > 0::double precision THEN ((100::numeric * auth_bill)::double precision / total::double precision)::numeric(12,2)
+            ELSE 0::numeric(12,2)
+        END AS nrw_eff,
+    d.the_geom
+   FROM om_waterbalance
+     JOIN exploitation e USING (expl_id)
+     JOIN dma d USING (dma_id)
+     JOIN ext_cat_period p ON p.id::text = om_waterbalance.cat_period_id::text;
+
