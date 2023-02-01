@@ -10,7 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE config_report set query_text = 'SELECT w.exploitation as "Exploitation", w.dma as "Dma", period as "Period", 
 total_in::numeric(12,2) as "Total inlet",
 total_out::numeric(12,2) as "Total outlet",
-total::numeric(12,2) as "Total inyected",
+total::numeric(12,2) as "Total injected",
 auth_bill as "Auth. Bill", auth_unbill as "Auth. Unbill", auth as "Authorized", 
 loss_app as "Losses App", loss_real as "Losses Real",loss as "Losses", 
 (case when total > 0 then (auth/total)::numeric(12,2) else 0 end) as "Losses Efficiency" ,
