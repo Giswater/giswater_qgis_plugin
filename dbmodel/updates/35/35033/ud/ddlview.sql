@@ -98,3 +98,47 @@ CREATE OR REPLACE VIEW vi_subareas AS
                     inp_subcatchment.subc_id
                    FROM inp_subcatchment
                   WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id);
+
+
+CREATE OR REPLACE VIEW vi_timeseries AS 
+SELECT DISTINCT t.timser_id,
+    t.other1,
+    t.other2,
+    t.other3
+   FROM selector_expl s,
+    ( SELECT a.timser_id,
+            a.other1,
+            a.other2,
+            a.other3,
+            a.expl_id
+           FROM ( SELECT inp_timeseries_value.id,
+                    inp_timeseries_value.timser_id,
+                    inp_timeseries_value.date AS other1,
+                    inp_timeseries_value.hour AS other2,
+                    inp_timeseries_value.value AS other3,
+                    inp_timeseries.expl_id
+                   FROM inp_timeseries_value
+                     JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+                  WHERE inp_timeseries.times_type::text = 'ABSOLUTE'::text
+                UNION
+                 SELECT inp_timeseries_value.id,
+                    inp_timeseries_value.timser_id,
+                    concat('FILE', ' ', inp_timeseries.fname) AS other1,
+                    NULL::character varying AS other2,
+                    NULL::numeric AS other3,
+                    inp_timeseries.expl_id
+                   FROM inp_timeseries_value
+                     JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+                  WHERE inp_timeseries.times_type::text = 'FILE'::text
+                UNION
+                 SELECT inp_timeseries_value.id,
+                    inp_timeseries_value.timser_id,
+                    NULL::TEXT AS other1,
+                    inp_timeseries_value."time" AS other2,
+                    inp_timeseries_value.value::numeric AS other3,
+                    inp_timeseries.expl_id
+                   FROM inp_timeseries_value
+                     JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+                  WHERE inp_timeseries.times_type::text = 'RELATIVE'::text) a
+          ORDER BY a.id) t
+  WHERE t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL ORDER BY 1,2,3;
