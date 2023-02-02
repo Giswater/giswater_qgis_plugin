@@ -55,29 +55,32 @@ BEGIN
 		where a2.expl_id != node.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
 		
 		v_final_nodes = string_to_array(OLD.node_1,'') ||string_to_array(OLD.node_2,'');
-	
-		FOREACH rec IN ARRAY (v_final_nodes) LOOP
+		
+		IF v_final_nodes IS NOT NULL THEN
 
-			EXECUTE 'WITH 
-				arcs AS (SELECT arc_id, node_1, node_2, expl_id FROM arc WHERE state=1 AND  expl_id='||OLD.expl_id||')
-				select count(*) from
-				(SELECT node_id, a1.expl_id
-				FROM node 
-				JOIN arcs a1 ON node_id=node_1 
-				where a1.expl_id != node.expl_id AND node_id='||quote_literal(rec)||'
-				UNION all
-				SELECT node_id, a2.expl_id
-				FROM node 
-				JOIN arcs a2 ON node_id=node_2 
-				where a2.expl_id != node.expl_id AND node_id='||quote_literal(rec)||' )a'
-				INTO v_count;
+			FOREACH rec IN ARRAY (v_final_nodes) LOOP
+
+				EXECUTE 'WITH 
+					arcs AS (SELECT arc_id, node_1, node_2, expl_id FROM arc WHERE state=1 AND  expl_id='||OLD.expl_id||')
+					select count(*) from
+					(SELECT node_id, a1.expl_id
+					FROM node 
+					JOIN arcs a1 ON node_id=node_1 
+					where a1.expl_id != node.expl_id AND node_id='||quote_literal(rec)||'
+					UNION all
+					SELECT node_id, a2.expl_id
+					FROM node 
+					JOIN arcs a2 ON node_id=node_2 
+					where a2.expl_id != node.expl_id AND node_id='||quote_literal(rec)||' )a'
+					INTO v_count;
+
 
 		  IF v_count is null OR v_count = 0 THEN
 				EXECUTE 'DELETE FROM node_border_expl WHERE node_id='||quote_literal(rec)||' AND expl_id='||OLD.expl_id||'';
 		  END IF;
 
     	END LOOP;  
-  
+  END IF;
 	RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' AND v_feature_type = 'NODE' THEN
@@ -101,27 +104,29 @@ BEGIN
   ELSIF TG_OP = 'DELETE' THEN
    
 		v_final_nodes = string_to_array(OLD.node_1,'') ||string_to_array(OLD.node_2,'');
-	
-		FOREACH rec IN ARRAY (v_final_nodes) LOOP
+		
+			IF v_final_nodes IS NOT NULL THEN
+			FOREACH rec IN ARRAY (v_final_nodes) LOOP
 
-			EXECUTE 'WITH 
-				arcs AS (SELECT arc_id, node_1, node_2, expl_id FROM arc WHERE state=1 AND expl_id='||OLD.expl_id||')
-				select count(*) from
-				(SELECT node_id, a1.expl_id
-				FROM node 
-				JOIN arcs a1 ON node_id=node_1 
-				where a1.expl_id != node.expl_id AND node_id='||quote_literal(rec)||'
-				UNION all
-				SELECT node_id, a2.expl_id
-				FROM node 
-				JOIN arcs a2 ON node_id=node_2 
-				where a2.expl_id != node.expl_id AND node_id='||quote_literal(rec)||')a'
-				INTO v_count;
+				EXECUTE 'WITH 
+					arcs AS (SELECT arc_id, node_1, node_2, expl_id FROM arc WHERE state=1 AND expl_id='||OLD.expl_id||')
+					select count(*) from
+					(SELECT node_id, a1.expl_id
+					FROM node 
+					JOIN arcs a1 ON node_id=node_1 
+					where a1.expl_id != node.expl_id AND node_id='||quote_literal(rec)||'
+					UNION all
+					SELECT node_id, a2.expl_id
+					FROM node 
+					JOIN arcs a2 ON node_id=node_2 
+					where a2.expl_id != node.expl_id AND node_id='||quote_literal(rec)||')a'
+					INTO v_count;
 
-			IF v_count is null OR v_count = 0 THEN
-				EXECUTE 'DELETE FROM node_border_expl WHERE node_id='||quote_literal(rec)||' AND expl_id='||OLD.expl_id||'';
-			END IF;
-		END LOOP;
+				IF v_count is null OR v_count = 0 THEN
+					EXECUTE 'DELETE FROM node_border_expl WHERE node_id='||quote_literal(rec)||' AND expl_id='||OLD.expl_id||'';
+				END IF;
+			END LOOP;
+		END IF;
 	  RETURN NULL;
 	END IF;
 
