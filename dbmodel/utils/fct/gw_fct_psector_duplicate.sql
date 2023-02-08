@@ -175,7 +175,7 @@ BEGIN
 		EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'')
 		FROM information_schema.columns where table_name=''v_edit_'||lower(rec_type.id)||''' and table_schema='''||v_schemaname||'''
 		and column_name IN (SELECT column_name FROM information_schema.columns where table_name='''||lower(rec_type.id)||''' and table_schema='''||v_schemaname||''') 
-		AND column_name!='''||lower(rec_type.id)||'_id'' and column_name!=''state'' and column_name != ''node_1'' and  column_name != ''node_2'';'
+		AND column_name!='''||lower(rec_type.id)||'_id'' and column_name!=''state'' and column_name != ''node_1'' and  column_name != ''node_2'' and column_name != ''code'';'
 		INTO v_insert_fields;
 
 		FOR rec IN EXECUTE 'SELECT * FROM plan_psector_x_'||lower(rec_type.id)||' WHERE psector_id='||v_old_psector_id||' and state=1 AND doable = true' LOOP
