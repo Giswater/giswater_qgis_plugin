@@ -8,3 +8,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"gully", "column":"pol_id", "newName":"_pol_id_"}}$$);
+
+ALTER TABLE cat_arc ALTER COLUMN geom5 DROP DEFAULT;
+ALTER TABLE cat_arc ALTER COLUMN geom6 DROP DEFAULT;
+ALTER TABLE cat_arc ALTER COLUMN geom7 DROP DEFAULT;
+ALTER TABLE cat_arc ALTER COLUMN geom8 DROP DEFAULT;
