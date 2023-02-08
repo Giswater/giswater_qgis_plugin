@@ -353,7 +353,7 @@ BEGIN
 		END IF;
 	
 		-- LINK
-		IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
+		IF (SELECT (value::json->>'fid')::boolean FROM config_param_system WHERE parameter='edit_custom_link') IS TRUE THEN
 			NEW.link=NEW.arc_id;
 		END IF;
 		

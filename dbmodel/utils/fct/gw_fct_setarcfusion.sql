@@ -222,7 +222,7 @@ BEGIN
 				UPDATE arc SET node_1=v_new_record.node_1, node_2=v_new_record.node_2 where arc_id=v_new_record.arc_id;
                 
 				-- update link only with enabled variable
-				IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
+				IF (SELECT (value::json->>'fid')::boolean FROM config_param_system WHERE parameter='edit_custom_link') IS TRUE THEN
 				    UPDATE arc SET link=v_new_record.arc_id where arc_id=v_new_record.arc_id;
 				END IF;
 
