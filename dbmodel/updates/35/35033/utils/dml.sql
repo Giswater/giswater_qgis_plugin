@@ -12,3 +12,7 @@ label,  isenabled,  project_type, datatype, widgettype, ismandatory, iseditable)
 VALUES ('edit_review_auto_field_checked', 'false', 'If true, at saving review data it would be automatically set as finished.',
 'Review automatic field check:',
 false, 'utils', 'boolean', 'check', false,true);
+
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
+VALUES (3194, 'gw_fct_infofromid', 'utils', 'function', 'Function that works internally with gw_fct_getinfofromid', 'role_basic', 'core');
