@@ -30,4 +30,15 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_waterbal
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_waterbalance", "column":"arc_length", "dataType":"double precision"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_waterbalance", "column":"link_length", "dataType":"double precision"}}$$);
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc_add", "column":"real_flow_max", "dataType":"numeric(12,2)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc_add", "column":"real_flow_min", "dataType":"numeric(12,2)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc_add", "column":"real_flow_avg", "dataType":"numeric(12,2)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc_add", "column":"real_vel_max", "dataType":"numeric(12,2)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc_add", "column":"real_vel_min", "dataType":"numeric(12,2)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc_add", "column":"real_vel_avg", "dataType":"numeric(12,2)"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node_add", "column":"real_press_max", "dataType":"numeric(12,2)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node_add", "column":"real_press_min", "dataType":"numeric(12,2)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node_add", "column":"real_press_avg", "dataType":"numeric(12,2)"}}$$);
+
 

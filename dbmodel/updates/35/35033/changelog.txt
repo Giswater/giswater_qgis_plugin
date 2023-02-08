@@ -1,3 +1,5 @@
 3.5.033
 *************
 - New system parameter edit_review_auto_field_checked - If true, at saving review data, it would be automatically set as finished
+- Add new editable fields on arc_add: real_flow_max, real_flow_min, real_flow_avg, real_vel_max, real_vel_min, real_vel_avg
+- Add new editable fields on node_add: real_press_max, real_press_min, real_press_avg
