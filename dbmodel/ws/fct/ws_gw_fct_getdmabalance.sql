@@ -3,9 +3,7 @@ This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
---FUNCTION CODE: XXXX
-
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_getwaterbalance(json);
+--FUNCTION CODE: 3196
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_getdmabalance(p_data json) RETURNS json AS 
 $BODY$
@@ -106,7 +104,6 @@ BEGIN
 	WHERE dma_id = '||v_dmaid||' order by start_date desc limit 1) row'
 	INTO v_result;
 
-raise notice 'v_result,%',v_result;
 	-- info
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
@@ -121,11 +118,11 @@ raise notice 'v_result,%',v_result;
 			     ',"data":{ "info":'||v_result_info||','||
 					'"line":'||v_result_line||
 				'}}'||
-		    '}')::json, 3040, null, null, null);
+		    '}')::json, 3196, null, null, null);
 
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

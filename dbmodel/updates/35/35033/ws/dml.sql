@@ -22,3 +22,6 @@ FROM v_om_waterbalance w' WHERE id=102;
 
 UPDATE config_report set query_text = replace (query_text,'v_om_waterbalance_efficiency','v_om_waterbalance') WHERE id=103 or id=104;
 
+INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
+VALUES (3196, 'gw_fct_getdmabalance', 'ws', 'function', 'Function that returns data related to water balance results for dma for further visualization', 'role_basic', 'core')
+ON CONFLICT (id) DO NOTHING;
