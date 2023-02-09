@@ -471,3 +471,185 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{}, "data"
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{}, "data":{"viewName":["v_edit_node"], "fieldName":"real_press_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{}, "data":{"viewName":["v_edit_node"], "fieldName":"real_press_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{}, "data":{"viewName":["v_edit_node"], "fieldName":"real_press_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+
+DROP VIEW IF EXISTS v_rpt_arc_all;
+CREATE OR REPLACE VIEW v_rpt_arc_all
+AS SELECT rpt_arc.id,
+    arc.arc_id,
+    selector_rpt_main.result_id,
+    arc.arc_type,
+    arc.sector_id,
+    arc.arccat_id,
+    rpt_arc.flow,
+    rpt_arc.vel,
+    rpt_arc.headloss,
+    rpt_arc.setting,
+    rpt_arc.ffactor,
+    now()::date + rpt_arc."time"::interval AS "time",
+    arc.the_geom
+   FROM selector_rpt_main,
+    rpt_inp_arc arc
+     JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
+  WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND arc.result_id::text = selector_rpt_main.result_id::text
+  ORDER BY rpt_arc.setting, arc.arc_id;
+  
+ 
+DROP VIEW IF EXISTS v_rpt_arc_hourly;
+CREATE OR REPLACE VIEW v_rpt_arc_hourly
+AS SELECT rpt_arc.id,
+    arc.arc_id,
+    arc.sector_id,
+    selector_rpt_main.result_id,
+    rpt_arc.flow,
+    rpt_arc.vel,
+    rpt_arc.headloss,
+    rpt_arc.setting,
+    rpt_arc.ffactor,
+    rpt_arc."time",
+    arc.the_geom
+   FROM selector_rpt_main,
+    selector_rpt_main_tstep,
+    rpt_inp_arc arc
+     JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
+  WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text AND rpt_arc."time"::text = selector_rpt_main_tstep.timestep::text AND selector_rpt_main.cur_user = "current_user"()::text AND selector_rpt_main_tstep.cur_user = "current_user"()::text AND arc.result_id::text = selector_rpt_main.result_id::text
+  ORDER BY rpt_arc."time", arc.arc_id;
+ 
+ 
+DROP VIEW IF EXISTS v_rpt_comp_arc;
+CREATE OR REPLACE VIEW v_rpt_comp_arc
+AS SELECT arc.arc_id,
+	arc.sector_id,
+    selector_rpt_compare.result_id,
+    max(rpt_arc.flow) AS max_flow,
+    min(rpt_arc.flow) AS min_flow,
+    max(rpt_arc.vel) AS max_vel,
+    min(rpt_arc.vel) AS min_vel,
+    max(rpt_arc.headloss) AS max_headloss,
+    min(rpt_arc.headloss) AS min_headloss,
+    max(rpt_arc.headloss::double precision / (st_length2d(arc.the_geom) * 10::double precision + 0.1::double precision))::numeric(12,2) AS max_uheadloss,
+    min(rpt_arc.headloss::double precision / (st_length2d(arc.the_geom) * 10::double precision + 0.1::double precision))::numeric(12,2) AS min_uheadloss,
+    max(rpt_arc.setting) AS max_setting,
+    min(rpt_arc.setting) AS min_setting,
+    max(rpt_arc.reaction) AS max_reaction,
+    min(rpt_arc.reaction) AS min_reaction,
+    max(rpt_arc.ffactor) AS max_ffactor,
+    min(rpt_arc.ffactor) AS min_ffactor,
+    arc.the_geom
+   FROM selector_rpt_compare,
+    rpt_inp_arc arc
+     JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
+  WHERE rpt_arc.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND arc.result_id::text = selector_rpt_compare.result_id::text
+  GROUP BY arc.arc_id, arc.sector_id, arc.arc_type, arc.arccat_id, selector_rpt_compare.result_id, arc.the_geom
+  ORDER BY arc.arc_id;
+ 
+ 
+DROP VIEW IF EXISTS v_rpt_comp_arc_hourly;
+CREATE OR REPLACE VIEW v_rpt_comp_arc_hourly
+AS SELECT rpt_arc.id,
+    arc.arc_id,
+    arc.sector_id,
+    selector_rpt_compare.result_id,
+    rpt_arc.flow,
+    rpt_arc.vel,
+    rpt_arc.headloss,
+    rpt_arc.setting,
+    rpt_arc.ffactor,
+    rpt_arc."time",
+    arc.the_geom
+   FROM selector_rpt_compare,
+    selector_rpt_main_tstep,
+    rpt_inp_arc arc
+     JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
+  WHERE rpt_arc.result_id::text = selector_rpt_compare.result_id::text AND rpt_arc."time"::text = selector_rpt_main_tstep.timestep::text AND selector_rpt_compare.cur_user = "current_user"()::text AND selector_rpt_main_tstep.cur_user = "current_user"()::text AND arc.result_id::text = selector_rpt_compare.result_id::text;
+
+
+DROP VIEW IF EXISTS v_rpt_comp_node;
+CREATE OR REPLACE VIEW v_rpt_comp_node
+AS SELECT node.node_id,
+    selector_rpt_compare.result_id,
+    node.node_type,
+    node.sector_id,
+    node.nodecat_id,
+    max(rpt_node.elevation) AS elevation,
+    max(rpt_node.demand) AS max_demand,
+    min(rpt_node.demand) AS min_demand,
+    max(rpt_node.head) AS max_head,
+    min(rpt_node.head) AS min_head,
+    max(rpt_node.press) AS max_pressure,
+    min(rpt_node.press) AS min_pressure,
+    avg(rpt_node.press) AS avg_pressure,
+    max(rpt_node.quality) AS max_quality,
+    min(rpt_node.quality) AS min_quality,
+    node.the_geom
+   FROM selector_rpt_compare,
+    rpt_inp_node node
+     JOIN rpt_node ON rpt_node.node_id::text = node.node_id::text
+  WHERE rpt_node.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND node.result_id::text = selector_rpt_compare.result_id::text
+  GROUP BY node.node_id, node.node_type, node.sector_id, node.nodecat_id, selector_rpt_compare.result_id, node.the_geom
+  ORDER BY node.node_id;
+ 
+ 
+DROP VIEW IF EXISTS v_rpt_comp_node_hourly;
+CREATE OR REPLACE VIEW v_rpt_comp_node_hourly
+AS SELECT rpt_node.id,
+    node.node_id,
+    node.sector_id,
+    selector_rpt_compare.result_id,
+    rpt_node.elevation,
+    rpt_node.demand,
+    rpt_node.head,
+    rpt_node.press,
+    rpt_node.quality,
+    rpt_node."time",
+    node.the_geom
+   FROM selector_rpt_compare,
+    selector_rpt_main_tstep,
+    rpt_inp_node node
+     JOIN rpt_node ON rpt_node.node_id::text = node.node_id::text
+  WHERE rpt_node.result_id::text = selector_rpt_compare.result_id::text AND rpt_node."time"::text = selector_rpt_main_tstep.timestep::text AND selector_rpt_compare.cur_user = "current_user"()::text AND selector_rpt_main_tstep.cur_user = "current_user"()::text AND node.result_id::text = selector_rpt_compare.result_id::text;
+
+ 
+DROP VIEW IF EXISTS v_rpt_node_all;
+CREATE OR REPLACE VIEW v_rpt_node_all
+AS SELECT rpt_node.id,
+    node.node_id,
+    node.node_type,
+    node.sector_id,
+    node.nodecat_id,
+    selector_rpt_main.result_id,
+    rpt_node.elevation,
+    rpt_node.demand,
+    rpt_node.head,
+    rpt_node.press,
+    rpt_node.quality,
+    now()::date + rpt_node."time"::interval AS "time",
+    node.the_geom
+   FROM selector_rpt_main,
+    rpt_inp_node node
+     JOIN rpt_node ON rpt_node.node_id::text = node.node_id::text
+  WHERE rpt_node.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND node.result_id::text = selector_rpt_main.result_id::text
+  ORDER BY rpt_node.press, node.node_id;
+ 
+ 
+DROP VIEW IF EXISTS v_rpt_node_hourly;
+CREATE OR REPLACE VIEW v_rpt_node_hourly
+AS SELECT rpt_node.id,
+    node.node_id,
+    node.sector_id,
+    selector_rpt_main.result_id,
+    rpt_node.elevation,
+    rpt_node.demand,
+    rpt_node.head,
+    rpt_node.press,
+    rpt_node.quality,
+    rpt_node."time",
+    node.the_geom
+   FROM selector_rpt_main,
+    selector_rpt_main_tstep,
+    rpt_inp_node node
+     JOIN rpt_node ON rpt_node.node_id::text = node.node_id::text
+  WHERE rpt_node.result_id::text = selector_rpt_main.result_id::text AND rpt_node."time"::text = selector_rpt_main_tstep.timestep::text AND selector_rpt_main.cur_user = "current_user"()::text AND selector_rpt_main_tstep.cur_user = "current_user"()::text AND node.result_id::text = selector_rpt_main.result_id::text
+  ORDER BY rpt_node."time", node.node_id;
+
+
