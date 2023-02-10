@@ -1645,6 +1645,7 @@ class GwPsector:
         tools_qgis.show_info(message, dialog=dialog)
 
         self.fill_table(dialog, qtbl_psm, "v_ui_plan_psector")
+        self._filter_table(self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name,self.dlg_psector_mng.chk_active, 'v_ui_plan_psector')
         tools_gw.set_tablemodel_config(dialog, qtbl_psm, "v_ui_plan_psector")
         self.set_label_current_psector(dialog)
         tools_gw.open_dialog(dialog)
