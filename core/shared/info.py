@@ -2894,7 +2894,7 @@ class GwInfo(QObject):
         """ Execute action of button 33 """
 
         elem = GwElement()
-        elem.get_element(False, feature, self.feature_type)
+        elem.get_element(True, feature, self.feature_type)
         elem.dlg_add_element.accepted.connect(partial(self._manage_element_new, dialog, elem))
         elem.dlg_add_element.rejected.connect(partial(self._manage_element_new, dialog, elem))
 
