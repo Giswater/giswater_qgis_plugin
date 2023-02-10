@@ -227,8 +227,8 @@ BEGIN
 						FOR v_gully_id IN 
 						SELECT gully_id FROM gully WHERE arc_id=v_arc.arc_id AND gully.state = 1
 						LOOP
-							INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, link_geom, userdefined_geom)						
-							SELECT gully_id, v_arcrecordtb.arc_id, v_psector_id, 1, false, l.the_geom, userdefined_geom 
+							INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable)
+							SELECT gully_id, v_arcrecordtb.arc_id, v_psector_id, 1, false
 							FROM link l JOIN gully c ON gully_id = l.feature_id WHERE l.feature_type  ='GULLY' AND gully_id = v_gully_id;
 						END LOOP;
 					END IF;

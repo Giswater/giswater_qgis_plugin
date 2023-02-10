@@ -13,6 +13,7 @@ VALUES ('edit_review_auto_field_checked', 'false', 'If true, at saving review da
 'Review automatic field check:',
 false, 'utils', 'boolean', 'check', false,true);
 
-
 INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)
 VALUES (3194, 'gw_fct_infofromid', 'utils', 'function', 'Function that works internally with gw_fct_getinfofromid', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+
+ALTER TABLE arc ALTER COLUMN state_type SET NOT NULL;
