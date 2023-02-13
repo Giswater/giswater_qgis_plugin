@@ -27,3 +27,5 @@ VALUES(3198, 'gw_fct_setclosestaddress', 'utils', 'function', NULL, NULL, 'Funct
 
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) 
 VALUES(486, 'Get address values from closest street number', 'utils', NULL, 'core', false, 'Function process', NULL);
+
+UPDATE sys_fprocess SET project_type = 'utils', source = 'core', fprocess_type = 'Function process' WHERE fid = 432;
