@@ -101,3 +101,14 @@ select * from t1
   union select * from t2
   union select * from t3 
   order by formname, layoutorder ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active) VALUES(3198, 'Get address values from closest street number', '{"featureType":["node","connec"]}'::json, 
+'[{"widgetname":"catFeature", "label":"Type:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,
+"comboIds":["ALL NODES", "ALL CONNECS", "HYDRANT", "JUNCTION", "METER", "PUMP", "TANK", "VALVE", "WJOIN"], 
+"comboNames":["ALL NODES", "ALL CONNECS", "HYDRANT", "JUNCTION", "METER", "PUMP", "TANK", "VALVE", "WJOIN"], "selectedId":"ALL NODES"},
+{"widgetname":"fieldToUpdate", "label":"Field to update:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2,
+"comboIds":["postnumber", "postcomplement"], "comboNames":["POSTNUMBER", "POSTCOMPLEMENT"], "selectedId":"postnumber"},
+{"widgetname":"searchBuffer", "label":"Search buffer (meters):","widgettype":"text","datatype":"float", "layoutname":"grl_option_parameters","layoutorder":3, "isMandatory":true, "value":"50"},
+{"widgetname":"updateValues", "label":"Elements to update:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4,
+"comboIds":["allValues", "nullStreet", "nullPostnumber", "nullPostcomplement"], "comboNames":["ALL ELEMENTS", "ELEMENTS WITH NULL STREETAXIS", "ELEMENTS WITH NULL POSTNUMBER", "ELEMENTS WITH NULL POSTCOMPLEMENT"], "selectedId":"nullStreet"}]'::json, NULL, true);
