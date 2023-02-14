@@ -21,7 +21,7 @@ from ...ui.ui_manager import GwDscenarioManagerUi, GwDscenarioUi
 from ...utils import tools_gw
 from ...models.item_delegates import ReadOnlyDelegate, EditableDelegate
 from .... import global_vars
-from ....lib import tools_qgis, tools_qt, tools_db
+from ....lib import tools_qgis, tools_qt, tools_db, tools_os
 
 
 class GwDscenarioManagerButton(GwAction):
@@ -73,15 +73,19 @@ class GwDscenarioManagerButton(GwAction):
 
         # Apply filter validator
         self.filter_name = self.dlg_dscenario_manager.findChild(QLineEdit, 'txt_name')
+        self.chk_active = self.dlg_dscenario_manager.findChild(QCheckBox, 'chk_active')
         reg_exp = QRegExp('([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
         self.filter_name.setValidator(QRegExpValidator(reg_exp))
 
         # Fill table
         self.tbl_dscenario = self.dlg_dscenario_manager.findChild(QTableView, 'tbl_dscenario')
-        self._fill_manager_table()
+        self._filter_table(self.dlg_dscenario_manager, self.dlg_dscenario_manager.txt_name,
+                           self.dlg_dscenario_manager.chk_active)
 
         # Connect main dialog signals
-        self.dlg_dscenario_manager.txt_name.textChanged.connect(partial(self._fill_manager_table))
+        self.dlg_dscenario_manager.txt_name.textChanged.connect(partial(self._filter_table, self.dlg_dscenario_manager,
+                                                                     self.dlg_dscenario_manager.txt_name,
+                                                                     self.dlg_dscenario_manager.chk_active))
         self.dlg_dscenario_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario))
         self.dlg_dscenario_manager.btn_update.clicked.connect(partial(self._open_toolbox_function, 3042))
         self.dlg_dscenario_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario))
@@ -92,19 +96,66 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario_manager.finished.connect(partial(tools_gw.save_settings, self.dlg_dscenario_manager))
         self.dlg_dscenario_manager.finished.connect(partial(self.save_user_values))
 
+        self.dlg_dscenario_manager.chk_active.stateChanged.connect(partial(self._filter_table, self.dlg_dscenario_manager,
+                                                                     self.dlg_dscenario_manager.txt_name,
+                                                                     self.dlg_dscenario_manager.chk_active))
+        self.dlg_dscenario_manager.btn_toggle_active.clicked.connect(
+            partial(self.set_toggle_active, self.dlg_dscenario_manager, self.tbl_dscenario))
+
         # Open dialog
         tools_gw.open_dialog(self.dlg_dscenario_manager, 'dscenario_manager')
+
+
+    def set_toggle_active(self, dialog, qtbl):
+
+        sql = ""
+        selected_list = qtbl.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=dialog)
+            return
+        for index in selected_list:
+
+            column_index = tools_qt.get_col_index_by_col_name(self.tbl_dscenario, 'dscenario_id')
+            dscenario_id = index.sibling(index.row(), column_index).data()
+
+            column_index = tools_qt.get_col_index_by_col_name(self.tbl_dscenario, 'active')
+            active = index.sibling(index.row(), column_index).data()
+
+            if tools_os.set_boolean(active):
+                sql += f"UPDATE v_edit_cat_dscenario SET active = False WHERE dscenario_id = {dscenario_id};"
+            else:
+                sql += f"UPDATE v_edit_cat_dscenario SET active = True WHERE dscenario_id = {dscenario_id};"
+
+        tools_db.execute_sql(sql)
+
+        self._filter_table(dialog, dialog.txt_name, dialog.chk_active)
+
+
+    def _filter_table(self, dialog, widget_txt, widget_chk):
+
+        result_select = tools_qt.get_text(dialog, widget_txt)
+        inactive_select = widget_chk.isChecked()
+
+        expr = ""
+
+        if not inactive_select:
+            expr += f'"active":true'
+
+        self._fill_manager_table(filter_name=result_select, filter_aux=expr)
 
 
     def save_user_values(self):
         pass
 
 
-    def _get_list(self, table_name='v_ui_cat_dscenario', filter_name="", filter_id=None):
+    def _get_list(self, table_name='v_ui_cat_dscenario', filter_name="", filter_aux="", filter_id=None):
         """ Mount and execute the query for gw_fct_getlist """
 
         feature = f'"tableName":"{table_name}"'
         filter_fields = f'"limit": -1, "name": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'
+        if filter_aux is not "":
+            filter_fields += f', {filter_aux}'
         if filter_id is not None:
             filter_fields += f', "dscenario_id": {{"filterSign":"=", "value":"{filter_id}"}}'
         body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
@@ -118,10 +169,10 @@ class GwDscenarioManagerButton(GwAction):
         return complet_list
 
 
-    def _fill_manager_table(self, filter_name=""):
+    def _fill_manager_table(self, filter_name="", filter_aux=""):
         """ Fill dscenario manager table with data from v_ui_cat_dscenario """
 
-        complet_list = self._get_list("v_ui_cat_dscenario", filter_name)
+        complet_list = self._get_list("v_ui_cat_dscenario", filter_name, filter_aux=filter_aux)
 
         if complet_list is False:
             return False, False
@@ -172,7 +223,7 @@ class GwDscenarioManagerButton(GwAction):
 
         toolbox_btn = GwToolBoxButton(None, None, None, None, None)
         if connect is None:
-            connect = [partial(self._fill_manager_table, self.filter_name.text()), partial(tools_gw.refresh_selectors)]
+            connect = [partial(self._filter_table, self.dlg_dscenario_manager, self.filter_name, self.chk_active), partial(tools_gw.refresh_selectors)]
         else:
             if type(connect) != list:
                 connect = [connect]
@@ -222,7 +273,7 @@ class GwDscenarioManagerButton(GwAction):
             tools_db.execute_sql(sql)
 
             # Refresh tableview
-            self._fill_manager_table(self.filter_name.text())
+            self._filter_table(self.dlg_dscenario_manager, self.filter_name, self.chk_active)
 
     # endregion
 

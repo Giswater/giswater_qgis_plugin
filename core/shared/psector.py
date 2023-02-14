@@ -1602,7 +1602,7 @@ class GwPsector:
         selected_list = qtbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            tools_qgis.show_warning(message, dialog=dialog)
             return
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
@@ -1611,7 +1611,7 @@ class GwPsector:
             active = qtbl_psm.model().record(row).value("active")
             if psector_id == self.current_psector_id[0]:
                 message = f"The active state of the current psector cannot be changed. Current psector: {self.current_psector_id[1]}"
-                tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+                tools_qgis.show_warning(message, dialog=dialog)
                 return
             if active:
                 sql += f"UPDATE plan_psector SET active = False WHERE psector_id = {psector_id};"
@@ -1635,7 +1635,7 @@ class GwPsector:
         active = qtbl_psm.model().record(row).value("active")
         if active is False:
             message = f"Cannot set the current psector of an inactive psector. You must activate it before."
-            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            tools_qgis.show_warning(message, dialog=dialog)
             return
         aux_widget = QLineEdit()
         aux_widget.setText(str(psector_id))
@@ -1716,16 +1716,6 @@ class GwPsector:
             table.model().select()
         else:
             self.fill_table(dialog, table, tablename)
-
-    def filter_by_active(self, dialog, table):
-
-        chk_active_state = dialog.chk_active.isChecked()
-        expr = f" active is {chk_active_state}"
-
-        # Refresh model with selected filter
-        table.model().setFilter(expr)
-        table.model().select()
-
 
 
     def charge_psector(self, qtbl_psm):

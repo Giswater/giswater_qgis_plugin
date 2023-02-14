@@ -20,26 +20,6 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="verticalLayout_3">
-      <item row="4" column="0">
-       <widget class="QLabel" name="lbl_dscenario_name">
-        <property name="text">
-         <string>Filter by: Dscenario name</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="2" colspan="2">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>5000</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
       <item row="5" column="0" colspan="2">
        <widget class="QLineEdit" name="txt_name">
         <property name="sizePolicy">
@@ -66,7 +46,14 @@
         </property>
        </spacer>
       </item>
-      <item row="5" column="9">
+      <item row="4" column="0">
+       <widget class="QLabel" name="lbl_dscenario_name">
+        <property name="text">
+         <string>Filter by: Dscenario name</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="10">
        <widget class="QPushButton" name="btn_delete">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -79,21 +66,21 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="0" colspan="10">
+      <item row="6" column="0" colspan="11">
        <widget class="QTableView" name="tbl_dscenario">
         <property name="selectionMode">
          <enum>QAbstractItemView::SingleSelection</enum>
         </property>
        </widget>
       </item>
-      <item row="7" column="9">
-       <widget class="QPushButton" name="btn_cancel">
+      <item row="5" column="9">
+       <widget class="QPushButton" name="btn_update">
         <property name="text">
-         <string>Close</string>
+         <string>Update</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="6">
+      <item row="5" column="7">
        <widget class="QToolButton" name="btn_create">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -119,16 +106,43 @@
        </widget>
       </item>
       <item row="5" column="8">
-       <widget class="QPushButton" name="btn_update">
-        <property name="text">
-         <string>Update</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="7">
        <widget class="QPushButton" name="btn_duplicate">
         <property name="text">
          <string>Duplicate</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="10">
+       <widget class="QPushButton" name="btn_cancel">
+        <property name="text">
+         <string>Close</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="4">
+       <widget class="QCheckBox" name="chk_active">
+        <property name="text">
+         <string>Show inactive</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="5">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>5000</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="5" column="6">
+       <widget class="QPushButton" name="btn_toggle_active">
+        <property name="text">
+         <string>Toggle active</string>
         </property>
        </widget>
       </item>
