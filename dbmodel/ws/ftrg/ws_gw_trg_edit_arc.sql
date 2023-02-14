@@ -411,10 +411,6 @@ BEGIN
 					NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, NEW.publish, NEW.inventory, NEW.expl_id, NEW.num_value,
 					NEW.depth, NEW.adate, NEW.adescript, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.pavcat_id, NEW.om_state, NEW.conserv_state);
 
-		--insert into arc_add
-		INSERT INTO arc_add (arc_id, real_flow_max, real_flow_min, real_flow_avg, real_vel_max, real_vel_min, real_vel_avg)
-		VALUES (NEW.arc_id, NEW.real_flow_max, NEW.real_flow_min, NEW.real_flow_avg, NEW.real_vel_max, NEW.real_vel_min, NEW.real_vel_avg);
-
 		-- this overwrites triger topocontrol arc values (triggered before insertion) just in that moment: In order to make more profilactic this issue only will be overwrited in case of NEW.node_* not nulls
 		IF v_edit_enable_arc_nodes_update IS TRUE THEN
 			IF NEW.node_1 IS NOT NULL THEN
@@ -595,12 +591,7 @@ BEGIN
 				depth=NEW.depth, adate=NEW.adate, adescript=NEW.adescript, asset_id=NEW.asset_id, pavcat_id=NEW.pavcat_id,
 				om_state=NEW.om_state, conserv_state=NEW.conserv_state
 				WHERE arc_id=OLD.arc_id;
-
-		--update arc_add
-		UPDATE arc_add SET  real_flow_max = NEW.real_flow_max, real_flow_min = NEW.real_flow_min, real_flow_avg = NEW.real_flow_avg, real_vel_max = NEW.real_vel_max, 
-		real_vel_min = NEW.real_vel_min, real_vel_avg = NEW.real_vel_avg
-		WHERE arc_id = OLD.arc_id;
-
+				
 		-- man addfields update
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM sys_addfields

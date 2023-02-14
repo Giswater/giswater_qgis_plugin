@@ -490,9 +490,6 @@ BEGIN
 		NEW.adate, NEW.adescript, NEW.accessibility, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id,
 		NEW.om_state, NEW.conserv_state, NEW.access_type, NEW.placement_type);
 
-		--insert into node_add
-		INSERT INTO node_add (node_id, real_press_max, real_press_min, real_press_avg)
-		VALUES (NEW.node_id, NEW.real_press_max, NEW.real_press_min, NEW.real_press_avg);
 
 		SELECT system_id, cat_feature.id INTO v_system_id, v_featurecat_id FROM cat_feature 
 		JOIN cat_node ON cat_feature.id=nodetype_id where cat_node.id=NEW.nodecat_id;
@@ -553,8 +550,8 @@ BEGIN
 			INSERT INTO man_manhole (node_id, name) VALUES(NEW.node_id, NEW.name);
 		
 		ELSIF v_man_table='man_meter' THEN
-			INSERT INTO man_meter (node_id, brand, model) 
-			VALUES(NEW.node_id, NEW.brand, NEW.model);
+			INSERT INTO man_meter (node_id, brand, model, real_press_max, real_press_min, real_press_avg) 
+			VALUES(NEW.node_id, NEW.brand, NEW.model, NEW.real_press_max, NEW.real_press_min, NEW.real_press_avg);
 		
 		ELSIF v_man_table='man_source' THEN	
 				INSERT INTO man_source (node_id, name) VALUES(NEW.node_id, NEW.name);
@@ -881,9 +878,6 @@ BEGIN
 		om_state=NEW.om_state, conserv_state=NEW.conserv_state, access_type=NEW.access_type, placement_type=NEW.placement_type
 		WHERE node_id = OLD.node_id;
 		
-		--update  node_add
-		UPDATE node_add SET real_press_max = NEW.real_press_max, real_press_min=NEW.real_press_min, real_press_avg=NEW.real_press_avg
-		WHERE node_id = OLD.node_id;
 
 		IF v_man_table ='man_junction' THEN
 			UPDATE man_junction SET node_id=NEW.node_id
@@ -920,7 +914,7 @@ BEGIN
 
 		ELSIF v_man_table ='man_meter' THEN
 			UPDATE man_meter SET
-			brand=NEW.brand, model=NEW.model
+			brand=NEW.brand, model=NEW.model, real_press_max = NEW.real_press_max, real_press_min=NEW.real_press_min, real_press_avg=NEW.real_press_avg
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_waterwell' THEN
