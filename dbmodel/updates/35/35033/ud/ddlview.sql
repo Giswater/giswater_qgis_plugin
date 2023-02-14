@@ -55,7 +55,7 @@ CREATE OR REPLACE VIEW vi_subareas AS
                    FROM inp_subcatchment
                   WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id);
 
-
+DROP VIEW IF EXISTS vi_timeseries;
 CREATE OR REPLACE VIEW vi_timeseries AS 
 SELECT DISTINCT t.timser_id,
     t.other1,
