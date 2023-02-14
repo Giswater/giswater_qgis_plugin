@@ -60,3 +60,17 @@ VALUES ('v_sector_node', 'View that filter nodes by sector', 'role_basic', 'core
 
 INSERT INTO sys_table(id, descript, sys_role, source)
 VALUES ('node_border_sector', 'Table that stores relation between node and it''s additional sectors.', 'role_basic', 'core');
+
+
+UPDATE config_form_tabs
+	SET tabactions='[{"actionName":"actionEdit", "disabled":false},
+{"actionName":"actionZoom", "disabled":false},
+{"actionName":"actionCentered", "disabled":false},
+{"actionName":"actionZoomOut", "disabled":false},
+{"actionName":"actionCatalog", "disabled":false},
+{"actionName":"actionWorkcat", "disabled":false},
+{"actionName":"actionCopyPaste","disabled":false},
+{"actionName":"actionSection", "disabled":false},
+{"actionName":"actionGetParentId", "disabled":false},
+{"actionName":"actionLink",  "disabled":false}]'::json
+	WHERE formname='v_edit_arc' AND device=4;
