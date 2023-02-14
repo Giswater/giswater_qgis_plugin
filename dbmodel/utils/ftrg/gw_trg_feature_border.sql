@@ -133,7 +133,7 @@ BEGIN
 		  IF v_count is null OR v_count = 0 THEN
 				EXECUTE 'DELETE FROM node_border_sector WHERE node_id='||quote_literal(rec)||' AND sector_id='||OLD.sector_id||'';
 		  END IF;
-
+		 END LOOP;
 			--exploitation
 			FOREACH rec IN ARRAY (v_final_nodes) LOOP
 	
@@ -240,6 +240,7 @@ BEGIN
 		  IF v_count is null OR v_count = 0 THEN
 				EXECUTE 'DELETE FROM node_border_sector WHERE node_id='||quote_literal(rec)||' AND sector_id='||OLD.sector_id||'';
 		  END IF;
+		 END LOOP;
 		  --exploitation
 			FOREACH rec IN ARRAY (v_final_nodes) LOOP
 
