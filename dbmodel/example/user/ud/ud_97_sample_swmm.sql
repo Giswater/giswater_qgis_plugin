@@ -686,6 +686,9 @@ INSERT INTO inp_virtual (arc_id, fusion_node, add_length) VALUES ('20589', '2058
 INSERT INTO inp_virtual (arc_id, fusion_node, add_length) VALUES ('20591', '20590', false);
 INSERT INTO inp_virtual (arc_id, fusion_node, add_length) VALUES ('20594', '20593', false);
 
+INSERT INTO inp_netgully (node_id) VALUES('63');
+INSERT INTO inp_netgully (node_id) VALUES('86');
+INSERT INTO inp_netgully (node_id) VALUES('18830');
 
 
 

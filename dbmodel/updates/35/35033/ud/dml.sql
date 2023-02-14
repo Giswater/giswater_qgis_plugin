@@ -17,4 +17,8 @@ INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, acti
 {"widgetname":"updateValues", "label":"Elements to update:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4,
 "comboIds":["allValues", "nullStreet", "nullPostnumber", "nullPostcomplement"], "comboNames":["ALL ELEMENTS", "ELEMENTS WITH NULL STREETAXIS", "ELEMENTS WITH NULL POSTNUMBER", "ELEMENTS WITH NULL POSTCOMPLEMENT"], "selectedId":"nullStreet"}]'::json, NULL, true);
 
+INSERT INTO inp_gully SELECT gully_id FROM gully ON CONFLICT DO NOTHING;
+INSERT INTO inp_netgully SELECT node_id FROM man_netgully ON CONFLICT DO NOTHING;
 
+UPDATE gully SET epa_type='GULLY' WHERE epa_type IS NULL;
+UPDATE node SET epa_type='NETGULLY' WHERE node_id in (SELECT node_id FROM node JOIN cat_feature ON node_type=id AND system_id='NETGULLY');
