@@ -55,3 +55,8 @@ WHERE feature_type = 'NODE' AND  (formname ilike 'v_edit_node' and columnname = 
 datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,  hidden 
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
+INSERT INTO sys_table(id, descript, sys_role, source)
+VALUES ('v_sector_node', 'View that filter nodes by sector', 'role_basic', 'core');
+
+INSERT INTO sys_table(id, descript, sys_role, source)
+VALUES ('node_border_sector', 'Table that stores relation between node and it''s additional sectors.', 'role_basic', 'core');

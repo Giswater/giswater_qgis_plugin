@@ -217,3 +217,312 @@ SELECT * FROM v_arc;
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_arc"], "fieldName":"parent_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+
+
+CREATE OR REPLACE VIEW v_edit_inp_junction
+ AS
+ SELECT n.node_id,
+    n.top_elev,
+    n.custom_top_elev,
+    n.ymax,
+    n.custom_ymax,
+    n.elev,
+    n.custom_elev,
+    n.sys_elev,
+    n.nodecat_id,
+    n.sector_id,
+    n.macrosector_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    n.expl_id,
+    inp_junction.y0,
+    inp_junction.ysur,
+    inp_junction.apond,
+    inp_junction.outfallparam::text AS outfallparam,
+    n.the_geom
+   FROM v_sector_node 
+    JOIN  v_edit_node n USING (node_id)
+     JOIN inp_junction USING (node_id)
+     JOIN value_state_type vs ON vs.id = n.state_type
+  WHERE vs.is_operative IS TRUE;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_flwreg_outlet
+ AS
+ SELECT f.nodarc_id,
+    f.node_id,
+    f.order_id,
+    f.to_arc,
+    f.flwreg_length,
+    f.outlet_type,
+    f.offsetval,
+    f.curve_id,
+    f.cd1,
+    f.cd2,
+    f.flap,
+    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), 25831)::geometry(LineString,25831) AS the_geom
+   FROM v_sector_node 
+    JOIN inp_flwreg_outlet f USING (node_id)
+     JOIN v_edit_node n USING (node_id)
+     JOIN value_state_type vs ON vs.id = n.state_type
+     LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
+  WHERE vs.is_operative IS TRUE;
+
+CREATE OR REPLACE VIEW v_edit_inp_flwreg_orifice
+ AS
+ SELECT f.nodarc_id,
+    f.node_id,
+    f.order_id,
+    f.to_arc,
+    f.flwreg_length,
+    f.ori_type,
+    f.offsetval,
+    f.cd,
+    f.orate,
+    f.flap,
+    f.shape,
+    f.geom1,
+    f.geom2,
+    f.geom3,
+    f.geom4,
+    f.close_time,
+    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), 25831)::geometry(LineString,25831) AS the_geom
+   FROM v_sector_node
+    join inp_flwreg_orifice f  USING (node_id)
+     JOIN v_edit_node n USING (node_id)
+     JOIN value_state_type vs ON vs.id = n.state_type
+     LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
+  WHERE vs.is_operative IS TRUE;
+
+  CREATE OR REPLACE VIEW v_edit_inp_flwreg_outlet
+ AS
+ SELECT f.nodarc_id,
+    f.node_id,
+    f.order_id,
+    f.to_arc,
+    f.flwreg_length,
+    f.outlet_type,
+    f.offsetval,
+    f.curve_id,
+    f.cd1,
+    f.cd2,
+    f.flap,
+    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), 25831)::geometry(LineString,25831) AS the_geom
+   FROM v_sector_node
+    JOIN inp_flwreg_outlet f USING (node_id)
+     JOIN v_edit_node n USING (node_id)
+     JOIN value_state_type vs ON vs.id = n.state_type
+     LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
+  WHERE vs.is_operative IS TRUE;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_flwreg_weir
+ AS
+ SELECT f.nodarc_id,
+    f.node_id,
+    f.order_id,
+    f.to_arc,
+    f.flwreg_length,
+    f.weir_type,
+    f.offsetval,
+    f.cd,
+    f.ec,
+    f.cd2,
+    f.flap,
+    f.geom1,
+    f.geom2,
+    f.geom3,
+    f.geom4,
+    f.surcharge,
+    f.road_width,
+    f.road_surf,
+    f.coef_curve,
+    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), 25831)::geometry(LineString,25831) AS the_geom
+   FROM v_sector_node 
+    JOIN inp_flwreg_weir f USING (node_id)
+     JOIN v_edit_node n USING (node_id)
+     JOIN value_state_type vs ON vs.id = n.state_type
+     LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
+  WHERE  vs.is_operative IS TRUE;
+
+CREATE OR REPLACE VIEW v_edit_inp_flwreg_pump
+ AS
+ SELECT f.nodarc_id,
+    f.node_id,
+    f.order_id,
+    f.to_arc,
+    f.flwreg_length,
+    f.curve_id,
+    f.status,
+    f.startup,
+    f.shutoff,
+    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), 25831)::geometry(LineString,25831) AS the_geom
+   FROM v_sector_node
+    JOIN inp_flwreg_pump f USING (node_id)
+     JOIN v_edit_node n USING (node_id)
+     JOIN value_state_type vs ON vs.id = n.state_type
+     LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
+  WHERE  vs.is_operative IS TRUE;
+
+CREATE OR REPLACE VIEW v_edit_inp_divider
+ AS
+ SELECT v_node.node_id,
+    v_node.top_elev,
+    v_node.custom_top_elev,
+    v_node.ymax,
+    v_node.custom_ymax,
+    v_node.elev,
+    v_node.custom_elev,
+    v_node.sys_elev,
+    v_node.nodecat_id,
+    v_node.sector_id,
+    v_node.macrosector_id,
+    v_node.state,
+    v_node.state_type,
+    v_node.annotation,
+    v_node.expl_id,
+    inp_divider.divider_type,
+    inp_divider.arc_id,
+    inp_divider.curve_id,
+    inp_divider.qmin,
+    inp_divider.ht,
+    inp_divider.cd,
+    inp_divider.y0,
+    inp_divider.ysur,
+    inp_divider.apond,
+    v_node.the_geom
+   FROM v_sector_node
+    JOIN v_node USING (node_id)
+     JOIN inp_divider ON v_node.node_id::text = inp_divider.node_id::text
+     JOIN value_state_type ON value_state_type.id = v_node.state_type
+  WHERE value_state_type.is_operative IS TRUE;
+
+CREATE OR REPLACE VIEW v_edit_inp_netgully
+ AS
+ SELECT n.node_id,
+    n.code,
+    n.top_elev,
+    n.custom_top_elev,
+    n.ymax,
+    n.custom_ymax,
+    n.elev,
+    n.custom_elev,
+    n.sys_elev,
+    n.node_type,
+    n.nodecat_id,
+    man_netgully.gratecat_id,
+    (cat_grate.width / 100::numeric)::numeric(12,3) AS grate_width,
+    (cat_grate.length / 100::numeric)::numeric(12,3) AS grate_length,
+    n.sector_id,
+    n.macrosector_id,
+    n.expl_id,
+    n.state,
+    n.state_type,
+    n.the_geom,
+    man_netgully.units,
+    man_netgully.units_placement,
+    man_netgully.groove,
+    man_netgully.groove_height,
+    man_netgully.groove_length,
+    cat_grate.a_param,
+    cat_grate.b_param,
+        CASE
+            WHEN man_netgully.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.width / 100::numeric)::numeric(12,3)
+            WHEN man_netgully.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.length / 100::numeric)::numeric(12,3)
+            ELSE (cat_grate.width / 100::numeric)::numeric(12,3)
+        END AS total_width,
+        CASE
+            WHEN man_netgully.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.width / 100::numeric)::numeric(12,3)
+            WHEN man_netgully.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.length / 100::numeric)::numeric(12,3)
+            ELSE (cat_grate.length / 100::numeric)::numeric(12,3)
+        END AS total_length,
+    n.ymax - COALESCE(man_netgully.sander_depth, 0::numeric) AS depth,
+    n.annotation,
+    i.y0,
+    i.ysur,
+    i.apond,
+    i.outlet_type,
+    i.custom_width,
+    i.custom_length,
+    i.custom_depth,
+    i.method,
+    i.weir_cd,
+    i.orifice_cd,
+    i.custom_a_param,
+    i.custom_b_param,
+    i.efficiency
+   FROM v_sector_node
+    join v_node n USING (node_id)
+     JOIN inp_netgully i USING (node_id)
+     JOIN value_state_type vs ON vs.id = n.state_type
+     LEFT JOIN man_netgully USING (node_id)
+     LEFT JOIN cat_grate ON man_netgully.gratecat_id::text = cat_grate.id::text
+  WHERE  vs.is_operative IS TRUE;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_outfall
+ AS
+ SELECT v_node.node_id,
+    v_node.top_elev,
+    v_node.custom_top_elev,
+    v_node.ymax,
+    v_node.custom_ymax,
+    v_node.elev,
+    v_node.custom_elev,
+    v_node.sys_elev,
+    v_node.nodecat_id,
+    v_node.sector_id,
+    v_node.macrosector_id,
+    v_node.state,
+    v_node.state_type,
+    v_node.annotation,
+    v_node.expl_id,
+    inp_outfall.outfall_type,
+    inp_outfall.stage,
+    inp_outfall.curve_id,
+    inp_outfall.timser_id,
+    inp_outfall.gate,
+    v_node.the_geom
+   FROM v_sector_node
+    join v_node USING (node_id)
+     JOIN inp_outfall USING (node_id)
+     JOIN value_state_type ON value_state_type.id = v_node.state_type
+  WHERE  value_state_type.is_operative IS TRUE;
+
+CREATE OR REPLACE VIEW v_edit_inp_storage
+ AS
+ SELECT v_node.node_id,
+    v_node.top_elev,
+    v_node.custom_top_elev,
+    v_node.ymax,
+    v_node.custom_ymax,
+    v_node.elev,
+    v_node.custom_elev,
+    v_node.sys_elev,
+    v_node.nodecat_id,
+    v_node.sector_id,
+    v_node.macrosector_id,
+    v_node.state,
+    v_node.state_type,
+    v_node.annotation,
+    v_node.expl_id,
+    inp_storage.storage_type,
+    inp_storage.curve_id,
+    inp_storage.a1,
+    inp_storage.a2,
+    inp_storage.a0,
+    inp_storage.fevap,
+    inp_storage.sh,
+    inp_storage.hc,
+    inp_storage.imd,
+    inp_storage.y0,
+    inp_storage.ysur,
+    inp_storage.apond,
+    v_node.the_geom
+   FROM v_sector_node
+    join v_node USING (node_id)
+     JOIN inp_storage USING (node_id)
+     JOIN value_state_type ON value_state_type.id = v_node.state_type
+  WHERE value_state_type.is_operative IS TRUE;

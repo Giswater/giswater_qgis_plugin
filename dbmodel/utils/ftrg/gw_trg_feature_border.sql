@@ -41,14 +41,14 @@ BEGIN
 		INSERT INTO node_border_expl
 		SELECT n.node_id, e.expl_id
 		FROM node  n
-		JOIN node_border_expl e ON parent_id = e.node_id
-		WHERE parent_id = v_node_id AND n.expl_id != e.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
+		JOIN node_border_expl e ON parent_id::text = e.node_id
+		WHERE parent_id::text= v_node_id AND n.expl_id != e.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
 
 		INSERT INTO arc_border_expl
 		SELECT arc_id, e.expl_id
 		FROM arc a
-		JOIN node_border_expl e ON a.parent_id = e.node_id
-		WHERE parent_id = v_node_id AND a.expl_id != e.expl_id ON CONFLICT (arc_id, expl_id) DO NOTHING;
+		JOIN node_border_expl e ON a.parent_id::text = e.node_id
+		WHERE parent_id::text = v_node_id AND a.expl_id != e.expl_id ON CONFLICT (arc_id, expl_id) DO NOTHING;
 
     RETURN NEW;
 
@@ -70,14 +70,14 @@ BEGIN
 		INSERT INTO node_border_expl
 		SELECT n.node_id,e.expl_id
 		FROM node  n
-		JOIN node_border_expl e ON parent_id = e.node_id
-		WHERE parent_id = v_node_id AND n.expl_id != e.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
+		JOIN node_border_expl e ON parent_id::text = e.node_id
+		WHERE parent_id::text = v_node_id AND n.expl_id != e.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
 
 		INSERT INTO arc_border_expl
 		SELECT arc_id, e.expl_id
 		FROM arc a
-		JOIN node_border_expl e ON a.parent_id = e.node_id
-		WHERE parent_id = v_node_id AND a.expl_id != e.expl_id ON CONFLICT (arc_id, expl_id) DO NOTHING;
+		JOIN node_border_expl e ON a.parent_id::text = e.node_id
+		WHERE parent_id::text = v_node_id AND a.expl_id != e.expl_id ON CONFLICT (arc_id, expl_id) DO NOTHING;
 
 
 		v_final_nodes = string_to_array(OLD.node_1,'') ||string_to_array(OLD.node_2,'');
@@ -104,9 +104,9 @@ raise notice 'arcv_v_count,%',v_count;
 		  IF v_count is null OR v_count = 0 THEN
 				EXECUTE 'DELETE FROM node_border_expl WHERE node_id='||quote_literal(rec)||' AND expl_id='||OLD.expl_id||'';
 
-				EXECUTE 'DELETE from node_border_expl where node_id in (SELECT node_id FROM node WHERE parent_id='||quote_literal(rec)||') AND expl_id='||OLD.expl_id||'';
+				EXECUTE 'DELETE from node_border_expl where node_id in (SELECT node_id FROM node WHERE parent_id::text='||quote_literal(rec)||') AND expl_id='||OLD.expl_id||'';
 
-				EXECUTE 'DELETE from arc_border_expl where arc_id in (SELECT arc_id FROM arc WHERE parent_id='||quote_literal(rec)||') AND expl_id='||OLD.expl_id||'';
+				EXECUTE 'DELETE from arc_border_expl where arc_id in (SELECT arc_id FROM arc WHERE parent_id::text='||quote_literal(rec)||') AND expl_id='||OLD.expl_id||'';
 
 		  END IF;
 
@@ -119,7 +119,7 @@ raise notice 'arcv_v_count,%',v_count;
 		DELETE FROM node_border_expl WHERE node_id=OLD.node_id;
 
 		DELETE from node_border_expl where node_id in 
-		(SELECT node_id FROM node WHERE parent_id=OLD.node_id);
+		(SELECT node_id FROM node WHERE parent_id::text=OLD.node_id);
 
 
 		INSERT INTO node_border_expl
@@ -138,14 +138,14 @@ raise notice 'arcv_v_count,%',v_count;
 		INSERT INTO node_border_expl
 		SELECT n.node_id,e.expl_id
 		FROM node  n
-		JOIN node_border_expl e ON parent_id = e.node_id
-		WHERE parent_id = v_node_id AND n.expl_id != e.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
+		JOIN node_border_expl e ON parent_id::text = e.node_id
+		WHERE parent_id::text = v_node_id AND n.expl_id != e.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
 
 		INSERT INTO arc_border_expl
 		SELECT arc_id, e.expl_id
 		FROM arc a
-		JOIN node_border_expl e ON a.parent_id = e.node_id
-		WHERE parent_id = v_node_id AND a.expl_id != e.expl_id ON CONFLICT (arc_id, expl_id) DO NOTHING;
+		JOIN node_border_expl e ON a.parent_id::text = e.node_id
+		WHERE parent_id::text = v_node_id AND a.expl_id != e.expl_id ON CONFLICT (arc_id, expl_id) DO NOTHING;
 		
 		RETURN NEW;
   ELSIF TG_OP = 'DELETE' THEN
@@ -171,8 +171,8 @@ raise notice 'arcv_v_count,%',v_count;
 
 				IF v_count is null OR v_count = 0 THEN
 					EXECUTE 'DELETE FROM node_border_expl WHERE node_id='||quote_literal(rec)||' AND expl_id='||OLD.expl_id||'';
-					EXECUTE 'DELETE from node_border_expl where node_id in (SELECT node_id FROM node WHERE parent_id='||quote_literal(rec)||') AND expl_id='||OLD.expl_id||'';
-					EXECUTE 'DELETE from arc_border_expl where arc_id in (SELECT arc_id FROM arc WHERE parent_id='||quote_literal(rec)||') AND expl_id='||OLD.expl_id||'';
+					EXECUTE 'DELETE from node_border_expl where node_id in (SELECT node_id FROM node WHERE parent_id::text='||quote_literal(rec)||') AND expl_id='||OLD.expl_id||'';
+					EXECUTE 'DELETE from arc_border_expl where arc_id in (SELECT arc_id FROM arc WHERE parent_id::text='||quote_literal(rec)||') AND expl_id='||OLD.expl_id||'';
 
 				END IF;
 			END LOOP;

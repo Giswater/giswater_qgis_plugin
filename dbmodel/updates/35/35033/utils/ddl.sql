@@ -9,7 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"parent_id", "dataType":"character varying(16)"}}$$);
 
-CREATE TABLE arc_border_expl (
+CREATE TABLE IF NOT EXISTS arc_border_expl (
   arc_id varchar(16),
   expl_id int4,
   CONSTRAINT arc_border_expl_pkey PRIMARY KEY (arc_id, expl_id)
@@ -21,3 +21,16 @@ REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTR
 ALTER TABLE arc_border_expl ADD CONSTRAINT arc_border_expl_arc_id_fkey FOREIGN KEY (arc_id)
 REFERENCES arc (arc_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
+CREATE TABLE IF NOT EXISTS node_border_sector (
+  node_id varchar(16),
+  sector_id int4,
+  CONSTRAINT node_border_sector_pkey PRIMARY KEY (node_id, sector_id)
+);
+
+ALTER TABLE node_border_sector ADD CONSTRAINT node_border_expl_sector_id_fkey FOREIGN KEY (sector_id)
+REFERENCES sector (sector_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE node_border_sector ADD CONSTRAINT arc_border_expl_node_id_fkey FOREIGN KEY (node_id)
+REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+--SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"node", "column":"parent_id", "dataType":"character varying(16)"}}$$);

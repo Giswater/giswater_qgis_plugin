@@ -44,3 +44,14 @@ UNION
   WHERE selector_expl.cur_user = "current_user"()::text AND arc_border_expl.expl_id = selector_expl.expl_id;
 
 
+CREATE OR REPLACE VIEW v_sector_node
+ AS
+ SELECT node.node_id
+   FROM selector_sector,
+    node
+  WHERE selector_sector.cur_user = "current_user"()::text AND node.sector_id = selector_sector.sector_id
+UNION
+ SELECT node_border_sector.node_id
+   FROM selector_sector,
+    node_border_sector
+  WHERE selector_sector.cur_user = "current_user"()::text AND node_border_sector.sector_id = selector_sector.sector_id;
