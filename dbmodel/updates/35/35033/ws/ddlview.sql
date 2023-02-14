@@ -417,3 +417,189 @@ SELECT * FROM v_arc;
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_arc"], "fieldName":"parent_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+CREATE OR REPLACE VIEW v_edit_inp_inlet
+ AS
+ SELECT n.node_id,
+    n.elevation,
+    n.depth,
+    n.nodecat_id,
+    n.sector_id,
+    n.macrosector_id,
+    n.dma_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    n.expl_id,
+    inp_inlet.initlevel,
+    inp_inlet.minlevel,
+    inp_inlet.maxlevel,
+    inp_inlet.diameter,
+    inp_inlet.minvol,
+    inp_inlet.curve_id,
+    inp_inlet.pattern_id,
+    n.the_geom,
+    inp_inlet.overflow,
+    inp_inlet.head
+   FROM v_sector_node sn
+     JOIN v_node n USING (node_id)
+     JOIN inp_inlet USING (node_id)
+     JOIN value_state_type vs ON vs.id = n.state_type
+  WHERE vs.is_operative IS TRUE;
+
+
+
+CREATE OR REPLACE VIEW v_edit_inp_junction
+ AS
+ SELECT n.node_id,
+    n.elevation,
+    n.depth,
+    n.nodecat_id,
+    n.sector_id,
+    n.macrosector_id,
+    n.dma_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    inp_junction.demand,
+    inp_junction.pattern_id,
+    n.the_geom,
+    inp_junction.peak_factor,
+    n.expl_id
+   FROM v_sector_node sn
+     JOIN v_edit_node n USING (node_id)
+     JOIN inp_junction USING (node_id)
+     JOIN value_state_type vs ON vs.id = n.state_type
+  WHERE vs.is_operative IS TRUE;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_pump
+ AS
+ SELECT n.node_id,
+    n.elevation,
+    n.depth,
+    n.nodecat_id,
+    n.sector_id,
+    n.macrosector_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    n.expl_id,
+    n.dma_id,
+    inp_pump.power,
+    inp_pump.curve_id,
+    inp_pump.speed,
+    inp_pump.pattern,
+    inp_pump.to_arc,
+    inp_pump.status,
+    inp_pump.pump_type,
+    n.the_geom
+   FROM v_sector_node sn
+   JOIN v_node n USING (node_id)
+     JOIN inp_pump USING (node_id)
+     JOIN value_state_type vs ON vs.id = n.state_type
+  WHERE vs.is_operative IS TRUE;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_reservoir
+ AS
+ SELECT n.node_id,
+    n.elevation,
+    n.depth,
+    n.nodecat_id,
+    n.sector_id,
+    n.macrosector_id,
+    n.dma_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    n.expl_id,
+    inp_reservoir.pattern_id,
+    inp_reservoir.head,
+    n.the_geom
+   FROM v_sector_node sn
+   JOIN v_node n USING (node_id)
+     JOIN inp_reservoir USING (node_id)
+     JOIN value_state_type vs ON vs.id = n.state_type
+  WHERE vs.is_operative IS TRUE;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_shortpipe
+ AS
+ SELECT n.node_id,
+    n.elevation,
+    n.depth,
+    n.nodecat_id,
+    n.sector_id,
+    n.macrosector_id,
+    n.dma_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    n.expl_id,
+    inp_shortpipe.minorloss,
+    inp_shortpipe.to_arc,
+    inp_shortpipe.status,
+    n.the_geom
+   FROM v_sector_node sn
+   JOIN v_node n USING (node_id)
+     JOIN inp_shortpipe USING (node_id)
+     JOIN value_state_type vs ON vs.id = n.state_type
+  WHERE vs.is_operative IS TRUE;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_tank
+ AS
+ SELECT n.node_id,
+    n.elevation,
+    n.depth,
+    n.nodecat_id,
+    n.sector_id,
+    n.macrosector_id,
+    n.dma_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    n.expl_id,
+    inp_tank.initlevel,
+    inp_tank.minlevel,
+    inp_tank.maxlevel,
+    inp_tank.diameter,
+    inp_tank.minvol,
+    inp_tank.curve_id,
+    n.the_geom,
+    inp_tank.overflow
+   FROM v_sector_node sn
+   JOIN v_node n USING (node_id)
+     JOIN inp_tank USING (node_id)
+     JOIN value_state_type vs ON vs.id = n.state_type
+  WHERE vs.is_operative IS TRUE;
+
+CREATE OR REPLACE VIEW v_edit_inp_valve
+ AS
+ SELECT v_node.node_id,
+    v_node.elevation,
+    v_node.depth,
+    v_node.nodecat_id,
+    v_node.sector_id,
+    v_node.macrosector_id,
+    v_node.state,
+    v_node.state_type,
+    v_node.annotation,
+    v_node.expl_id,
+    inp_valve.valv_type,
+    inp_valve.pressure,
+    inp_valve.flow,
+    inp_valve.coef_loss,
+    inp_valve.curve_id,
+    inp_valve.minorloss,
+    inp_valve.to_arc,
+    inp_valve.status,
+    v_node.the_geom,
+    inp_valve.custom_dint,
+    inp_valve.add_settings
+   FROM v_sector_node sn
+   JOIN v_node USING (node_id)
+     JOIN inp_valve USING (node_id)
+     JOIN value_state_type vs ON vs.id = v_node.state_type
+  WHERE vs.is_operative IS TRUE;
