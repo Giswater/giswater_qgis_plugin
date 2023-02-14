@@ -292,13 +292,11 @@ class GwGo2EpaSelectorButton(GwAction):
         else:
             field = "resulttime"
 
-        sql = (f"SELECT DISTINCT {field}, {field} "
-               f"FROM rpt_arc "
-               f"WHERE result_id ILIKE '{result_id}' "
-               f"ORDER BY {field};")
+        sql = (f"SELECT DISTINCT {field}, {field}, split_part({field}, ':', 1)::int as split_hour "
+               f"FROM rpt_arc WHERE result_id ILIKE '{result_id}' order by split_hour")
 
         rows = tools_db.get_rows(sql, add_empty_row=True)
-        tools_qt.fill_combo_values(combo_time, rows)
+        tools_qt.fill_combo_values(combo_time, rows, sort_combo=False)
 
 
     def _populate_date_time(self, combo_date):
