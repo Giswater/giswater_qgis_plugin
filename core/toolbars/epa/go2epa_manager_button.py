@@ -257,7 +257,7 @@ class GwGo2EpaManagerButton(GwAction):
             sql = f"DELETE FROM {table_name}"
             sql += f" WHERE {column_id} IN ({list_id})"
             tools_db.execute_sql(sql)
-            self._fill_manager_table(self.dlg_manager.txt_result_id.currentText())
+            self._fill_manager_table(self.dlg_manager.txt_result_id.text())
 
 
     def _epa2data(self, widget, column_id):
