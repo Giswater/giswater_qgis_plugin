@@ -62,3 +62,19 @@ INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, acti
 {"widgetname":"searchBuffer", "label":"Search buffer (meters):","widgettype":"text","datatype":"float", "layoutname":"grl_option_parameters","layoutorder":3, "isMandatory":true, "value":"50"},
 {"widgetname":"updateValues", "label":"Elements to update:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4,
 "comboIds":["allValues", "nullStreet", "nullPostnumber", "nullPostcomplement"], "comboNames":["ALL ELEMENTS", "ELEMENTS WITH NULL STREETAXIS", "ELEMENTS WITH NULL POSTNUMBER", "ELEMENTS WITH NULL POSTCOMPLEMENT"]}]'::json, NULL, true);
+
+
+INSERT INTO config_form_tableview (location_type,project_type,tablename,columnname,columnindex,visible)
+	VALUES ('epa_toolbar','utils','v_ui_rpt_cat_result','iscorporate',5,true);
+UPDATE config_form_tableview
+	SET columnindex=6
+	WHERE tablename='v_ui_rpt_cat_result' AND columnname='export_options';
+UPDATE config_form_tableview
+	SET columnindex=7
+	WHERE tablename='v_ui_rpt_cat_result' AND columnname='network_stats';
+UPDATE config_form_tableview
+	SET columnindex=8
+	WHERE tablename='v_ui_rpt_cat_result' AND columnname='inp_options';
+UPDATE config_form_tableview
+	SET columnindex=9
+	WHERE tablename='v_ui_rpt_cat_result' AND columnname='rpt_stats';
