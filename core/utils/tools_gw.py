@@ -846,7 +846,7 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
         try:
             dialog.btn_accept.disconnect()
             dialog.btn_accept.hide()
-        except AttributeError:
+        except:
             pass
 
         try:
