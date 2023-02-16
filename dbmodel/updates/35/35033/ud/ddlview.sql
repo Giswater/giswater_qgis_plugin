@@ -527,6 +527,8 @@ CREATE OR REPLACE VIEW v_edit_inp_storage
      JOIN value_state_type ON value_state_type.id = v_node.state_type
   WHERE value_state_type.is_operative IS TRUE;
 
+DROP VIEW vi_gully2node;
+
 drop view if exists v_edit_inp_gully;
 CREATE OR REPLACE VIEW v_edit_inp_gully
  AS
@@ -548,6 +550,8 @@ CREATE OR REPLACE VIEW v_edit_inp_gully
     g.groove,
     g.groove_height,
     g.groove_length,
+    g.pjoint_id,
+    g.pjoint_type,
     cat_grate.a_param,
     cat_grate.b_param,
         CASE
@@ -579,3 +583,15 @@ CREATE OR REPLACE VIEW v_edit_inp_gully
      JOIN cat_grate ON g.gratecat_id::text = cat_grate.id::text
      JOIN value_state_type vs ON vs.id = g.state_type
   WHERE g.sector_id = s.sector_id AND s.cur_user = "current_user"()::text AND vs.is_operative IS TRUE;
+
+  
+CREATE OR REPLACE VIEW vi_gully2node AS 
+ SELECT *, 
+    st_makeline(a.the_geom, n.the_geom) AS the_geom FROM 
+    (SELECT g.gully_id,
+    case when pjoint_type = 'NODE' then pjoint_id else a.node_2 END AS node_id, 
+    a.expl_id,
+    g.the_geom
+   FROM v_edit_inp_gully g
+     LEFT JOIN arc a USING (arc_id))a
+     JOIN node n USING (node_id);
