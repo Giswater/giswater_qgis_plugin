@@ -448,6 +448,7 @@ class GwPsector:
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(self._manage_tab_feature_buttons))
         self.dlg_plan_psector.name.textChanged.connect(partial(self.enable_relation_tab, 'plan_psector'))
+        self.dlg_plan_psector.expl_id.currentIndexChanged.connect(partial(self.enable_relation_tab, 'plan_psector'))
         viewname = 'v_edit_plan_psector_x_other'
         self.dlg_plan_psector.txt_name.textChanged.connect(
             partial(self.query_like_widget_text, self.dlg_plan_psector, self.dlg_plan_psector.txt_name,
@@ -859,7 +860,8 @@ class GwPsector:
     def enable_relation_tab(self, tablename):
 
         psector_name = f"{tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.name)}"
-        sql = f"SELECT name FROM {tablename} WHERE LOWER(name) = '{psector_name}'"
+        psector_expl = tools_qt.get_combo_value(self.dlg_plan_psector, "expl_id", 0)
+        sql = f"SELECT name FROM {tablename} WHERE LOWER(name) = '{psector_name}' AND expl_id = {psector_expl}"
         rows = tools_db.get_rows(sql)
         if not rows:
             if self.dlg_plan_psector.name.text() != '':
@@ -1011,11 +1013,11 @@ class GwPsector:
             widget.setModel(None)
 
 
-    def check_name(self, psector_name):
+    def check_name(self, psector_name, expl_id):
         """ Check if name of new psector exist or not """
 
-        sql = (f"SELECT name FROM plan_psector"
-               f" WHERE name = '{psector_name}'")
+        sql = (f"SELECT name, expl_id FROM plan_psector"
+               f" WHERE name = '{psector_name}' AND expl_id = '{expl_id}'")
         row = tools_db.get_row(sql)
         if row is None:
             return False
@@ -1030,14 +1032,20 @@ class GwPsector:
             tools_qgis.show_warning(message, parameter='Name', dialog=self.dlg_plan_psector)
             return
 
+        expl_id = tools_qt.get_combo_value(self.dlg_plan_psector, "expl_id", 0)
+        if expl_id == -1:
+            message = "Mandatory field is missing. Please, set a value"
+            tools_qgis.show_warning(message, parameter='Exploitation', dialog=self.dlg_plan_psector)
+            return
+
         rotation = tools_qt.get_text(self.dlg_plan_psector, "rotation", return_string_null=False)
         if rotation == "":
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.rotation, 0)
 
-        name_exist = self.check_name(psector_name)
+        name_exist = self.check_name(psector_name, expl_id)
 
         if name_exist and not self.update:
-            message = "The name is current in use"
+            message = "The name is currently in use"
             tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
             return
         else:
