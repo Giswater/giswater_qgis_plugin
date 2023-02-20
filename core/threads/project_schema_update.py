@@ -9,7 +9,7 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal
 
 from .task import GwTask
 from ..utils import tools_gw
-from ...lib import tools_qt, tools_log, tools_db
+from ...lib import tools_qt, tools_log, tools_db, tools_qgis
 
 
 class GwUpdateSchemaTask(GwTask):
@@ -76,6 +76,11 @@ class GwUpdateSchemaTask(GwTask):
                 tools_gw.fill_tab_log(self.admin.dlg_readsql_show_info, self.status['body']['data'], True, True, 1)
             else:
                 tools_log.log_warning(f"Key not found: 'body'")
+        else:
+            tools_qgis.show_warning("Update project failed.", dialog=self.admin.dlg_readsql_show_info)
+            # Show message
+            status = (self.admin.error_count == 0)
+            self.admin._manage_result_message(status, parameter="Update project")
 
         # Reset count error variable to 0
         self.admin.error_count = 0
