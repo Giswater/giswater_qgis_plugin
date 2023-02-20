@@ -24,3 +24,7 @@ ALTER TABLE IF EXISTS arc
     REFERENCES node (node_id) MATCH SIMPLE
     ON UPDATE CASCADE
     ON DELETE RESTRICT;
+	
+
+ALTER TABLE plan_psector ADD CONSTRAINT plan_psector_name_unique UNIQUE(name, expl_id);
+
