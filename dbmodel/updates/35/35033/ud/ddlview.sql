@@ -595,3 +595,17 @@ CREATE OR REPLACE VIEW vi_gully2node AS
    FROM v_edit_inp_gully g
      LEFT JOIN arc a USING (arc_id))a
      JOIN node n USING (node_id);
+
+create or replace view v_link_connec as 
+select distinct on (link_id) * from vu_link_connec
+JOIN v_state_link_connec USING (link_id);
+
+create or replace view v_link_gully as 
+select distinct on (link_id) * from vu_link_gully
+JOIN v_state_link_gully USING (link_id);
+
+create or replace view v_link as 
+select distinct on (link_id) * from vu_link
+JOIN v_state_link USING (link_id);
+
+

@@ -620,3 +620,8 @@ AS SELECT DISTINCT ON (rpt_cat_result.result_id) rpt_cat_result.result_id,
     rpt_cat_result
      JOIN inp_typevalue ON rpt_cat_result.status::text = inp_typevalue.id::text
   WHERE inp_typevalue.typevalue::text = 'inp_result_status'::text AND (s.expl_id = rpt_cat_result.expl_id AND s.cur_user = CURRENT_USER OR rpt_cat_result.expl_id IS NULL);
+  
+
+create or replace view v_link as 
+select distinct on (link_id) * from vu_link
+JOIN v_state_link USING (link_id);
