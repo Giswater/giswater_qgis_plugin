@@ -283,6 +283,18 @@ class GwAdminButton:
         return result
 
 
+    def execute_reset_sequences(self, schema_name=None):
+        """ Execute last process function """
+
+        self.schema_name = schema_name
+
+        result = tools_gw.execute_procedure('gw_fct_admin_reset_sequences', self.schema_name, commit=False)
+        if result is None or ('status' in result and result['status'] == 'Failed'):
+            self.error_count = self.error_count + 1
+
+        return result
+
+
     def execute_import_inp_data(self, project_name, project_type):
         """ Executed when option 'Import INP data' has been selected """
 
@@ -372,6 +384,8 @@ class GwAdminButton:
         self.task1.setProgress(60)
         if status:
             status = self.execute_last_process(schema_name=schema_name, locale=True)
+        if status:
+            status = self.execute_reset_sequences(schema_name=schema_name)
         self.task1.setProgress(100)
 
         if update_changelog is False:
