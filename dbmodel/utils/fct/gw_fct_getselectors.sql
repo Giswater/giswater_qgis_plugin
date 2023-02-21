@@ -232,37 +232,44 @@ BEGIN
 				v_macroselector = 'selector_sector';
 				--EXECUTE 'SELECT array_agg(macrosector_id) FROM v_edit_macrosector' INTO v_ids;
 			END IF;
+	
+	
+			if v_addschema is null or v_addschema ='null' OR v_addschema='NULL' or v_addschema='' then
+				-- do nothing
+			else
+			
+				raise EXCEPTION 'macro % add schema %  table %',v_macroid , v_addschema, v_macrotable;
 
-			FOR rec_macro IN EXECUTE 'SELECT '||v_macroid||' FROM '||v_addschema||'.'||v_macrotable||'' LOOP
-				IF v_tab.tabname ='tab_macroexploitation_add' THEN
-					
-					EXECUTE 'SELECT count('||v_zoneid||') as count  FROM '||v_addschema||'.'||v_zonetable||' 
-					WHERE '||v_macroid||'='||rec_macro||' and active IS TRUE group by '||v_macroid||''
-					INTO v_count_zone;
-
-					EXECUTE 'SELECT count(*) FROM '||v_addschema||'.'||v_macroselector||' JOIN '||v_addschema||'.'||v_zonetable||' USING ('||v_zoneid||') 
-					WHERE '||v_macroid||'='||rec_macro||'  AND active IS TRUE AND cur_user=current_user'
-					INTO v_count_selector;
-				ELSE
-
-					EXECUTE 'SELECT count('||v_zoneid||') as count  FROM '||v_zonetable||' WHERE '||v_macroid||'='||rec_macro||' and active IS TRUE group by '||v_macroid||''
-					INTO v_count_zone;
-
-					EXECUTE 'SELECT count(*) FROM '||v_macroselector||' JOIN '||v_zonetable||' USING ('||v_zoneid||') 
-					WHERE '||v_macroid||'='||rec_macro||'  AND active IS TRUE AND cur_user=current_user'
-					INTO v_count_selector;
-				END IF;
-
-
-				IF v_count_zone = v_count_selector THEN
-
-					IF v_ids IS NULL THEN 
-						v_ids = rec_macro::text;
+				FOR rec_macro IN EXECUTE 'SELECT '||v_macroid||' FROM '||v_addschema||'.'||v_macrotable||'' LOOP
+					IF v_tab.tabname ='tab_macroexploitation_add' THEN
+						
+						EXECUTE 'SELECT count('||v_zoneid||') as count  FROM '||v_addschema||'.'||v_zonetable||' 
+						WHERE '||v_macroid||'='||rec_macro||' and active IS TRUE group by '||v_macroid||''
+						INTO v_count_zone;
+	
+						EXECUTE 'SELECT count(*) FROM '||v_addschema||'.'||v_macroselector||' JOIN '||v_addschema||'.'||v_zonetable||' USING ('||v_zoneid||') 
+						WHERE '||v_macroid||'='||rec_macro||'  AND active IS TRUE AND cur_user=current_user'
+						INTO v_count_selector;
 					ELSE
-						v_ids = concat(v_ids,',',rec_macro::text );
+	
+						EXECUTE 'SELECT count('||v_zoneid||') as count  FROM '||v_zonetable||' WHERE '||v_macroid||'='||rec_macro||' and active IS TRUE group by '||v_macroid||''
+						INTO v_count_zone;
+	
+						EXECUTE 'SELECT count(*) FROM '||v_macroselector||' JOIN '||v_zonetable||' USING ('||v_zoneid||') 
+						WHERE '||v_macroid||'='||rec_macro||'  AND active IS TRUE AND cur_user=current_user'
+						INTO v_count_selector;
 					END IF;
-				END IF;
-			END LOOP;
+				
+					IF v_count_zone = v_count_selector THEN
+	
+						IF v_ids IS NULL THEN 
+							v_ids = rec_macro::text;
+						ELSE
+							v_ids = concat(v_ids,',',rec_macro::text );
+						END IF;
+					END IF;
+				  END LOOP;		
+				end if;
 
 			v_ids = replace(v_ids,'{','');
 			v_ids = replace(v_ids,'}','');	
