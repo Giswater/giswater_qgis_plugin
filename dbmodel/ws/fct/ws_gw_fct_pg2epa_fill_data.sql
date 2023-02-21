@@ -179,7 +179,7 @@ BEGIN
 	FROM inp_valve WHERE temp_node.node_id=inp_valve.node_id;
 
 	-- update addparam for inp_pump
-	UPDATE temp_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',pattern,'", "status":"',status,'", "to_arc":"',to_arc,
+	UPDATE temp_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',inp_pump.pattern_id,'", "status":"',status,'", "to_arc":"',to_arc,
 	'", "energyparam":"', energyparam,'", "energyvalue":"',energyvalue,'", "pump_type":"',pump_type,'"}')
 	FROM inp_pump WHERE temp_node.node_id=inp_pump.node_id;
 
