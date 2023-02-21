@@ -284,11 +284,13 @@ BEGIN
 				-- setting point aux
 				SELECT geom_point INTO v_geom_point FROM temp_table WHERE fid = 485 and cur_user = current_user;
 			
-				if v_geom_point is not null then v_point_aux := v_geom_point; end if;
+				if v_geom_point is not null then
+					v_point_aux := St_closestpoint(v_arc.the_geom, v_geom_point);
+				end if;
 				
 				DELETE FROM temp_table WHERE fid = 485 AND cur_user=current_user;
 												
-				IF v_point_aux IS NOT NULL THEN
+				IF v_point_aux IS NULL THEN
 
 					-- getting the appropiate vertex of link to check distance againts arc
 					select geom INTO v_link_point from (select (st_dumppoints(the_geom)).geom, (st_dumppoints(the_geom)).path, the_geom 
@@ -345,7 +347,6 @@ BEGIN
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 						VALUES (217, null, 4, concat('Reverse the direction of drawn link.'));
 					ELSE
-						v_point_aux := St_closestpoint(v_endfeature_geom, St_endpoint(v_link.the_geom));
 						v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1),v_point_aux);
 					END IF;
 
