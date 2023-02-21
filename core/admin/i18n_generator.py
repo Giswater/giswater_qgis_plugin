@@ -197,6 +197,7 @@ class GwI18NGenerator:
         line = '\t</context>\n\n'
         line += '\t<!-- PYTHON MESSAGES -->\n'
         line += '\t<context>\n'
+        line += f'\t\t<name>{self.scode}</name>\n'
         ts_file.write(line)
 
         # Create children for message
