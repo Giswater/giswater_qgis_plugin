@@ -285,7 +285,7 @@ BEGIN
 				
 				DELETE FROM temp_table WHERE fid = 485 AND cur_user=current_user;
 												
-				IF v_point_aux IS NULL THEN
+				IF v_point_aux IS NOT NULL THEN
 
 					-- getting the appropiate vertex of link to check distance againts arc
 					select geom INTO v_link_point from (select (st_dumppoints(the_geom)).geom, (st_dumppoints(the_geom)).path, the_geom 
