@@ -128,8 +128,8 @@ BEGIN
 	END IF;
 
 	-- starting process - get fields	
-	IF p_formname!='infoplan' THEN 
-	
+	IF p_formname ILIKE 've%' or p_formname ILIKE 'v_edit%' THEN 
+
 		IF p_tgop = 'INSERT' THEN
 			v_featuretype = lower(replace(p_idname,'_id',''));
 			EXECUTE 'SELECT concat(''ve_epa_'',lower(epa_default)) 
@@ -137,6 +137,7 @@ BEGIN
 			JOIN cat_feature_'||v_featuretype||' f ON cf.id = f.id
 			WHERE child_layer = '||quote_literal(p_formname)||''
 			INTO v_epa_table;
+			
 		ELSIF p_tgop='UPDATE' THEN
 			IF p_idname = 'connec_id' THEN
 				v_epa_table='ve_epa_connec';
@@ -166,7 +167,8 @@ BEGIN
 		RAISE NOTICE 'v_querystring111,%',v_querystring;
 		EXECUTE v_querystring INTO fields_array;
 
-	ELSE
+	ELSIF p_formname='infoplan' THEN
+
 		v_querystring = concat('SELECT array_agg(row_to_json(b)) FROM (
 			SELECT (row_number()over(ORDER BY 1)) AS layoutorder, (row_number()over(ORDER BY 1)) AS orderby, * FROM
 				(SELECT concat(unit, ''. '', descript) AS label, identif AS columnname, ''label'' AS widgettype,
@@ -189,6 +191,28 @@ BEGIN
 		v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getformfields', 'flag', 20);
 		SELECT gw_fct_debugsql(v_debug_sql) INTO v_msgerr;
 		EXECUTE v_querystring INTO fields_array;
+
+	ELSE 
+	--catalogs
+		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (
+			
+			WITH typevalue AS (SELECT * FROM config_typevalue)
+		
+			SELECT ',v_label,', columnname, columnname as column_id, concat(',quote_literal(p_tabname),',''_'',columnname) AS widgetname, widgettype,
+			widgetfunction,', v_device,' hidden, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layoutname, layoutorder) AS orderby,
+			layoutname, layoutorder, dv_parent_id AS "parentId", isparent, ismandatory, linkedobject, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
+			dv_orderby_id AS "orderById", dv_isnullvalue AS "isNullValue", stylesheet, widgetcontrols, web_layoutorder
+			FROM config_form_fields 
+			LEFT JOIN config_typevalue a ON a.id = widgetfunction::json->>''functionName'' AND a.typevalue = ''widgetfunction_typevalue''
+			LEFT JOIN config_typevalue b ON b.id = widgettype AND b.typevalue = ''widgettype_typevalue''
+			
+			WHERE formname = ',quote_nullable(p_formname),' AND formtype= ',quote_nullable(p_formtype),' ',v_clause,' ',v_filter_widgets,' ORDER BY orderby) a');
+
+		v_debug_vars := json_build_object('v_label', v_label, 'p_tabname', p_tabname, 'v_device', v_device, 'p_formname', p_formname, 'p_formtype', p_formtype, 'v_clause', v_clause);
+		v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getformfields', 'flag', 10);
+		SELECT gw_fct_debugsql(v_debug_sql) INTO v_msgerr;
+		EXECUTE v_querystring INTO fields_array;
+	
 	END IF;
 	
 	fields_array := COALESCE(fields_array, '{}');  
