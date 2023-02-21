@@ -129,6 +129,9 @@ BEGIN
 	v_isarcdivide = (p_data->>'data')::json->>'isArcDivide';
 	v_link_id = (p_data->>'data')::json->>'linkId';
 
+	--profilactic values
+	if v_forceendpoint IS NULL THEN v_forceendpoint = FALSE; END IF;
+
 	-- create query text for forced arcs
 	if v_forcedarcs is null then
 		v_forcedarcs= '';
@@ -342,6 +345,7 @@ BEGIN
 						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 						VALUES (217, null, 4, concat('Reverse the direction of drawn link.'));
 					ELSE
+						v_point_aux := St_closestpoint(v_endfeature_geom, St_endpoint(v_link.the_geom));
 						v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1),v_point_aux);
 					END IF;
 
@@ -404,7 +408,7 @@ BEGIN
 
 					UPDATE link SET state = 2 WHERE link_id  = v_link.link_id;
 
-				ELSIF v_isarcdivide or v_isoperative_psector or (v_ispsector and v_forceendpoint) THEN -- then returning to psector link & arc_id
+				ELSIF v_isarcdivide or v_isoperative_psector or (v_ispsector and v_forceendpoint) THEN -- then returning link & arc_id
 
 					IF v_feature_type ='CONNEC' THEN
 						UPDATE plan_psector_x_connec SET link_id = v_link.link_id, arc_id = v_arc.arc_id
