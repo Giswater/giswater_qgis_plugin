@@ -423,11 +423,10 @@ BEGIN
 		END IF;
 
 	ELSIF p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN
-
 		-- getting values from feature
 		IF p_idname = 'connec_id' THEN
 			v_epa = 'connec';
-		ELSE
+		ELSIF p_idname IN ('arc_id', 'node_id', 'gully_id') THEN
 			EXECUTE ('SELECT epa_type FROM ' || substring(p_idname, 0, length(p_idname)-2) || ' WHERE ' || p_idname || ' = ''' || p_id || '''') INTO v_epa;
 		END IF;
 		
