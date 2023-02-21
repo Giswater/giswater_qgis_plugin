@@ -288,6 +288,7 @@
 
 	<!-- PYTHON MESSAGES -->
 	<context>
+		<name>giswater</name>
 		<message>
 			<source>The selected INP file does not match with a 'UD' project. Please check it before continuing...</source>
 			<translation>The selected INP file does not match with a 'UD' project. Please check it before continuing...</translation>
