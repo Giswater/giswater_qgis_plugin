@@ -221,8 +221,8 @@ BEGIN
 
 	
 	RAISE NOTICE '10 - Check sense of cv pipes only to warning to user about the sense of the geometry (169)';
-	INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom, expl_id)
-	SELECT 169, arc_id, arccat_id, the_geom, expl_id FROM v_edit_inp_pipe WHERE status='CV';
+	INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom, sector_id)
+	SELECT 169, arc_id, arccat_id, the_geom, sector_id FROM v_edit_inp_pipe WHERE status='CV';
 
 	SELECT count(*) INTO v_count FROM anl_arc WHERE fid = 169 AND cur_user=current_user;
 	IF v_count > 0 THEN
@@ -256,15 +256,15 @@ BEGIN
 	
 	-- to_arc wrong values (170)
 	IF (SELECT value FROM config_param_system WHERE parameter = 'epa_shutoffvalve') = 'VALVE' THEN
-		INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
-		select 170, node_id, nodecat_id, the_geom, 'To arc is null or does not exists as closest arc for valve', expl_id FROM v_edit_inp_valve JOIN(
+		INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, sector_id)
+		select 170, node_id, nodecat_id, the_geom, 'To arc is null or does not exists as closest arc for valve', sector_id FROM v_edit_inp_valve JOIN(
 		select node_id FROM v_edit_inp_valve JOIN arc on arc_id=to_arc AND node_id=node_1 where valv_type !='TCV'
 		union
 		select node_id FROM v_edit_inp_valve JOIN arc on arc_id=to_arc AND node_id=node_2 where valv_type !='TCV')a USING (node_id)
 		WHERE a.node_id IS NULL;			
 	ELSE 
-		INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
-		select 170, node_id, nodecat_id, the_geom, 'To arc is null or does not exists as closest arc for valve', expl_id FROM v_edit_inp_valve JOIN(
+		INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, sector_id)
+		select 170, node_id, nodecat_id, the_geom, 'To arc is null or does not exists as closest arc for valve', sector_id FROM v_edit_inp_valve JOIN(
 		select node_id FROM v_edit_inp_valve JOIN arc on arc_id=to_arc AND node_id=node_1
 		union
 		select node_id FROM v_edit_inp_valve JOIN arc on arc_id=to_arc AND node_id=node_2)a USING (node_id)
@@ -373,8 +373,8 @@ BEGIN
 	END IF;
 	
 	-- to_arc wrong values (171)
-	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
-	select 171, node_id, nodecat_id , the_geom,  'To arc is null or does not exists as closest arc for pump', expl_id FROM v_edit_inp_pump WHERE node_id NOT IN(
+	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, sector_id)
+	select 171, node_id, nodecat_id , the_geom,  'To arc is null or does not exists as closest arc for pump', sector_id FROM v_edit_inp_pump WHERE node_id NOT IN(
 		select node_id FROM v_edit_inp_pump JOIN v_edit_inp_pipe on arc_id=to_arc AND node_id=node_1
 		union
 		select node_id FROM v_edit_inp_pump JOIN v_edit_inp_pipe on arc_id=to_arc AND node_id=node_2);
@@ -433,8 +433,8 @@ BEGIN
 	SELECT count(*) INTO v_count FROM (SELECT st_length(the_geom) AS length FROM v_edit_inp_pipe) a WHERE length < v_nodeproximity;
 
 	IF v_count > 0 THEN
-		INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom, descript, expl_id)
-		SELECT 229, arc_id, arccat_id , the_geom, concat('Length less than node proximity: ', (st_length(the_geom))::numeric (12,3)), expl_id FROM v_edit_inp_pipe 
+		INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom, descript, sector_id)
+		SELECT 229, arc_id, arccat_id , the_geom, concat('Length less than node proximity: ', (st_length(the_geom))::numeric (12,3)), sector_id FROM v_edit_inp_pipe 
 		WHERE st_length(the_geom) < v_nodeproximity;
 		
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -450,8 +450,8 @@ BEGIN
 	SELECT count(*) INTO v_count FROM (SELECT st_length(the_geom) AS length FROM v_edit_inp_pipe) a WHERE length < v_minlength;
 
 	IF v_count > 0 THEN
-		INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom, descript, expl_id)
-		SELECT 230, arc_id, arccat_id , the_geom, concat('Length less than minimum distance: ', (st_length(the_geom))::numeric (12,3)), expl_id FROM v_edit_inp_pipe where st_length(the_geom) < v_minlength;
+		INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom, descript, sector_id)
+		SELECT 230, arc_id, arccat_id , the_geom, concat('Length less than minimum distance: ', (st_length(the_geom))::numeric (12,3)), sector_id FROM v_edit_inp_pipe where st_length(the_geom) < v_minlength;
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '230', 3, concat('ERROR-230 (anl_arc): There is/are ',v_count,' pipe(s) with length less than configured minimum length (',v_minlength,') which are not exported.'),v_count);
@@ -507,8 +507,8 @@ BEGIN
 	
 		
 	RAISE NOTICE '20 - Tanks with null mandatory values(fid: 198)';
-	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
-	SELECT 198, a.node_id, nodecat_id, the_geom, 'Tank with null mandatory values', expl_id FROM v_edit_inp_tank a
+	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, sector_id)
+	SELECT 198, a.node_id, nodecat_id, the_geom, 'Tank with null mandatory values', sector_id FROM v_edit_inp_tank a
 	WHERE (initlevel IS NULL) OR (minlevel IS NULL) OR (maxlevel IS NULL) OR (diameter IS NULL) OR (minvol IS NULL);
 	
 	SELECT count(*) FROM anl_node INTO v_count WHERE fid=198 AND cur_user=current_user;
@@ -523,8 +523,8 @@ BEGIN
 	END IF;	
 
 	RAISE NOTICE '20.2 - Inlets with null mandatory values(fid: 153)';
-	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
-	SELECT 153, a.node_id, nodecat_id, the_geom, 'Inlet with null mandatory values', expl_id FROM v_edit_inp_inlet a
+	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, sector_id)
+	SELECT 153, a.node_id, nodecat_id, the_geom, 'Inlet with null mandatory values', sector_id FROM v_edit_inp_inlet a
 	WHERE (initlevel IS NULL) OR (minlevel IS NULL) OR (maxlevel IS NULL) OR (diameter IS NULL) OR (minvol IS NULL);
 	
 	SELECT count(*) FROM anl_node INTO v_count WHERE fid=153 AND cur_user=current_user;
@@ -591,18 +591,18 @@ BEGIN
 
 	
 	RAISE NOTICE '23 - Inconsistency on inp node tables (294)';
-	INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id)
-		SELECT 294, n.node_id, n.nodecat_id, concat(epa_type, ' using inp_junction table') AS epa_table, n.the_geom, n.expl_id FROM v_edit_inp_junction JOIN node n USING (node_id) WHERE epa_type !='JUNCTION'
+	INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom, sector_id)
+		SELECT 294, n.node_id, n.nodecat_id, concat(epa_type, ' using inp_junction table') AS epa_table, n.the_geom, n.sector_id FROM v_edit_inp_junction JOIN node n USING (node_id) WHERE epa_type !='JUNCTION'
 		UNION
-		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_tank table') AS epa_table, n.the_geom, n.expl_id FROM v_edit_inp_tank JOIN node n USING (node_id) WHERE epa_type !='TANK'
+		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_tank table') AS epa_table, n.the_geom, n.sector_id FROM v_edit_inp_tank JOIN node n USING (node_id) WHERE epa_type !='TANK'
 		UNION
-		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_reservoir table') AS epa_table, n.the_geom, n.expl_id FROM v_edit_inp_reservoir JOIN node n USING (node_id) WHERE epa_type !='RESERVOIR'
+		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_reservoir table') AS epa_table, n.the_geom, n.sector_id FROM v_edit_inp_reservoir JOIN node n USING (node_id) WHERE epa_type !='RESERVOIR'
 		UNION
-		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_valve table') AS epa_table, n.the_geom, n.expl_id FROM v_edit_inp_valve JOIN node n USING (node_id) WHERE epa_type !='VALVE'
+		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_valve table') AS epa_table, n.the_geom, n.sector_id FROM v_edit_inp_valve JOIN node n USING (node_id) WHERE epa_type !='VALVE'
 		UNION
-		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_pump table') AS epa_table, n.the_geom, n.expl_id FROM v_edit_inp_pump JOIN node n USING (node_id) WHERE epa_type !='PUMP'
+		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_pump table') AS epa_table, n.the_geom, n.sector_id FROM v_edit_inp_pump JOIN node n USING (node_id) WHERE epa_type !='PUMP'
 		UNION
-		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_shortpipe table') AS epa_table, n.the_geom, n.expl_id FROM v_edit_inp_shortpipe JOIN node n USING (node_id) WHERE epa_type !='SHORTPIPE';
+		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_shortpipe table') AS epa_table, n.the_geom, n.sector_id FROM v_edit_inp_shortpipe JOIN node n USING (node_id) WHERE epa_type !='SHORTPIPE';
 
 		
 	SELECT count(*) FROM anl_node INTO v_count WHERE fid=294 AND cur_user=current_user;
@@ -618,9 +618,9 @@ BEGIN
 
 	RAISE NOTICE '24 - Inconsistency on inp arc tables (295)';
 	INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id)
-		SELECT 295, a.arc_id, a.arccat_id, concat(epa_type, ' using inp_pipe table') AS epa_table, a.the_geom, a.expl_id FROM v_edit_inp_virtualvalve JOIN arc a USING (arc_id) WHERE epa_type !='VIRTUAL'
+		SELECT 295, a.arc_id, a.arccat_id, concat(epa_type, ' using inp_pipe table') AS epa_table, a.the_geom, a.sector_id FROM v_edit_inp_virtualvalve JOIN arc a USING (arc_id) WHERE epa_type !='VIRTUAL'
 		UNION
-		SELECT 295, a.arc_id, a.arccat_id,  concat(epa_type, ' using inp_virtualvalve table') AS epa_table, a.the_geom, a.expl_id FROM v_edit_inp_pipe JOIN arc a USING (arc_id) WHERE epa_type !='PIPE';
+		SELECT 295, a.arc_id, a.arccat_id,  concat(epa_type, ' using inp_virtualvalve table') AS epa_table, a.the_geom, a.sector_id FROM v_edit_inp_pipe JOIN arc a USING (arc_id) WHERE epa_type !='PIPE';
 
 		
 	SELECT count(*) FROM anl_node INTO v_count WHERE fid=295 AND cur_user=current_user;
