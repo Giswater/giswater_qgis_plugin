@@ -3034,7 +3034,7 @@ class GwInfo(QObject):
 
         # Set signals
         dlg_generic.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_generic))
-        dlg_generic.rejected.connect(partial(tools_gw.close_dialog, dlg_generic))
+        dlg_generic.dlg_closed.connect(partial(tools_gw.close_dialog, dlg_generic))
         dlg_generic.btn_accept.clicked.connect(partial(self._set_catalog, dlg_generic, form_name, table_name, feature_id, id_name))
 
         tools_gw.build_dialog_info(dlg_generic, json_result)
