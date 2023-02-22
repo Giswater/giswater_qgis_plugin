@@ -967,24 +967,26 @@ LEFT JOIN v_rpt_node USING (node_id);
 CREATE OR REPLACE VIEW ve_epa_pipe AS 
 SELECT inp_pipe.*, 
 result_id,
-flow_max, 
-flow_min, 
-flow_avg,
-vel_max, 
-vel_min,
-vel_avg, 
-headloss_max, 
-headloss_min,
-uheadloss_max,
-uheadloss_min, 
-setting_max, 
-setting_min, 
-reaction_max, 
-reaction_min, 
-ffactor_max, 
-ffactor_min
+round(avg(flow_max), 2) as flow_max, 
+round(avg(flow_min), 2) as flow_min, 
+round(avg(flow_avg), 2) as flow_avg,
+round(avg(vel_max), 2) as vel_max, 
+round(avg(vel_min), 2) as vel_min,
+round(avg(vel_avg), 2) as vel_avg, 
+round(avg(headloss_max), 2) as headloss_max, 
+round(avg(headloss_min), 2) as headloss_min,
+round(avg(uheadloss_max), 2) as uheadloss_max,
+round(avg(uheadloss_min), 2) as uheadloss_min, 
+round(avg(setting_max), 2) as setting_max, 
+round(avg(setting_min), 2) as setting_min, 
+round(avg(reaction_max), 2) as reaction_max, 
+round(avg(reaction_min), 2) as reaction_min, 
+round(avg(ffactor_max), 2) as ffactor_max, 
+round(avg(ffactor_min), 2) as ffactor_min
 FROM inp_pipe 
-LEFT JOIN v_rpt_arc USING (arc_id);
+LEFT JOIN v_rpt_arc on split_part(v_rpt_arc.arc_id, 'P',1) = inp_pipe.arc_id 
+group by inp_pipe.arc_id, result_id;
+
 
 CREATE OR REPLACE VIEW ve_epa_pump AS 
 SELECT inp_pump.*, 
@@ -1033,27 +1035,40 @@ FROM inp_valve
 LEFT JOIN v_rpt_arc ON concat(node_id,'_n2a') = arc_id;
 
 CREATE OR REPLACE VIEW ve_epa_shortpipe AS 
-SELECT inp_shortpipe.*, 
-concat(node_id,'_n2a') as nodarc_id,
-result_id,
-flow_max, 
-flow_min, 
-flow_avg,
-vel_max, 
-vel_min,
-vel_avg, 
-headloss_max, 
-headloss_min, 
-uheadloss_max,
-uheadloss_min,
-setting_max, 
-setting_min, 
-reaction_max, 
-reaction_min, 
-ffactor_max, 
-ffactor_min
-FROM inp_shortpipe 
-LEFT JOIN v_rpt_arc ON concat(node_id,'_n2a') = arc_id;
+ SELECT inp_shortpipe.*,
+concat(inp_shortpipe.node_id, '_n2a') AS nodarc_id,
+v_rpt_arc.result_id,
+v_rpt_arc.flow_max,
+v_rpt_arc.flow_min,
+v_rpt_arc.flow_avg,
+v_rpt_arc.vel_max,
+v_rpt_arc.vel_min,
+v_rpt_arc.vel_avg,
+v_rpt_arc.headloss_max,
+v_rpt_arc.headloss_min,
+v_rpt_arc.uheadloss_max,
+v_rpt_arc.uheadloss_min,
+v_rpt_arc.setting_max,
+v_rpt_arc.setting_min,
+v_rpt_arc.reaction_max,
+v_rpt_arc.reaction_min,
+v_rpt_arc.ffactor_max,
+v_rpt_arc.ffactor_min,
+v_rpt_node.demand_max,
+v_rpt_node.demand_min,
+v_rpt_node.demand_avg,
+v_rpt_node.head_max,
+v_rpt_node.head_min,
+v_rpt_node.head_avg,
+v_rpt_node.press_max,
+v_rpt_node.press_min,
+v_rpt_node.press_avg,
+v_rpt_node.quality_max,
+v_rpt_node.quality_min,
+v_rpt_node.quality_avg
+FROM ws_sample36.inp_shortpipe
+LEFT JOIN ws_sample36.v_rpt_node ON inp_shortpipe.node_id = v_rpt_node.node_id::text
+LEFT JOIN ws_sample36.v_rpt_arc ON concat(inp_shortpipe.node_id, '_n2a') = v_rpt_arc.arc_id::text;
 
 CREATE OR REPLACE VIEW ve_epa_virtualvalve AS 
 SELECT inp_virtualvalve.*, 
