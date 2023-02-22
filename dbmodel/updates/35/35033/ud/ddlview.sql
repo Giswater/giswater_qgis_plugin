@@ -586,7 +586,7 @@ CREATE OR REPLACE VIEW v_edit_inp_gully
 
   
 CREATE OR REPLACE VIEW vi_gully2node AS 
- SELECT *, 
+ SELECT gully_id, n.node_id, 
     st_makeline(a.the_geom, n.the_geom) AS the_geom FROM 
     (SELECT g.gully_id,
     case when pjoint_type = 'NODE' then pjoint_id else a.node_2 END AS node_id, 
