@@ -329,6 +329,10 @@ VALUES ('connec', 'form_feature', 'document', 'doc_type', 'lyt_document_1', 3, '
 
 -- SET TOP & BOT WIDGETS' LABELS ON-TOP OF THE WIDGET
 UPDATE config_form_fields
+SET widgetcontrols = '{"labelPosition": "top"}'
+WHERE formname LIKE 've_%' AND (layoutname LIKE 'lyt_top%' OR layoutname LIKE 'lyt_bot%') AND widgetcontrols IS NULL;
+
+UPDATE config_form_fields
 SET widgetcontrols = jsonb_set(widgetcontrols::jsonb, '{labelPosition}', '"top"', true)
 WHERE formname LIKE 've_%' AND (layoutname LIKE 'lyt_top%' OR layoutname LIKE 'lyt_bot%');
 
