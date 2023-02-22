@@ -1066,9 +1066,9 @@ v_rpt_node.press_avg,
 v_rpt_node.quality_max,
 v_rpt_node.quality_min,
 v_rpt_node.quality_avg
-FROM ws_sample36.inp_shortpipe
-LEFT JOIN ws_sample36.v_rpt_node ON inp_shortpipe.node_id = v_rpt_node.node_id::text
-LEFT JOIN ws_sample36.v_rpt_arc ON concat(inp_shortpipe.node_id, '_n2a') = v_rpt_arc.arc_id::text;
+FROM inp_shortpipe
+LEFT JOIN v_rpt_node ON inp_shortpipe.node_id = v_rpt_node.node_id::text
+LEFT JOIN v_rpt_arc ON concat(inp_shortpipe.node_id, '_n2a') = v_rpt_arc.arc_id::text;
 
 CREATE OR REPLACE VIEW ve_epa_virtualvalve AS 
 SELECT inp_virtualvalve.*, 
