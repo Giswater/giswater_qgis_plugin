@@ -65,3 +65,7 @@ min_shear,
 day_min, 
 time_min
 FROM inp_conduit LEFT JOIN v_rpt_arcflow_sum USING (arc_id);
+
+CREATE OR REPLACE VIEW ve_epa_gully AS
+SELECT inp_gully.*
+FROM inp_gully;

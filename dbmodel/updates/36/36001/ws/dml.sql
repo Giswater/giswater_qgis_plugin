@@ -524,6 +524,35 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'ffactor_min', 'lyt_epa_data_2', 17, 'string', 'text', 'Min Ffactor:', 'Min Ffactor', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
 
+
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'demand_max', 'lyt_epa_data_2', 18, 'string', 'text', 'Max demand:', 'Max demand', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'demand_min', 'lyt_epa_data_2', 19, 'string', 'text', 'Min demand:', 'Min demand', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'demand_avg', 'lyt_epa_data_2', 20, 'string', 'text', 'Avg demand:', 'Avg demand', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'head_max', 'lyt_epa_data_2', 21, 'string', 'text', 'Max head:', 'Max head', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'head_min', 'lyt_epa_data_2', 22, 'string', 'text', 'Min head:', 'Min head', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'head_avg', 'lyt_epa_data_2', 23, 'string', 'text', 'Avg head:', 'Avg demand', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'press_max', 'lyt_epa_data_2', 24, 'string', 'text', 'Max pressure:', 'Max pressure', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'press_min', 'lyt_epa_data_2', 25, 'string', 'text', 'Min pressure:', 'Min pressure', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'press_avg', 'lyt_epa_data_2', 26, 'string', 'text', 'Avg pressure:', 'Min pressure', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'quality_max', 'lyt_epa_data_2', 27, 'string', 'text', 'Max quality:', 'Max quality', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'quality_min', 'lyt_epa_data_2', 28, 'string', 'text', 'Min quality:', 'Min quality', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'quality_avg', 'lyt_epa_data_2', 29, 'string', 'text', 'Avg quality:', 'Avg quality', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+
+
+
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, widgetcontrols, widgetfunction, isfilter, linkedobject)
     VALUES ('ve_epa_shortpipe', 'form_feature', 'epa', 'tbl_inp_shortpipe', 'lyt_epa_3', 1, 'tableview', false, false, false, false, '{"saveValue": false}', NULL, false, 'tbl_inp_shortpipe');
 
