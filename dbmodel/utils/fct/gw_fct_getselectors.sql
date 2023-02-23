@@ -110,6 +110,10 @@ BEGIN
 		EXECUTE 'SET ROLE "'||v_cur_user||'"';
 	END IF;
 
+	-- profilactic control of schema name
+	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null' OR v_addschema is null OR v_addschema='NULL' THEN 
+		v_addschema = null; 
+	END IF;
 	-- profilactic control of message
 	IF v_message is null THEN
 		v_message = '{"level":111, "text":"Process done successfully"}';
@@ -227,21 +231,22 @@ BEGIN
 			ELSIF v_tab.tabname='tab_macrosector' THEN
 				v_zonetable='sector';
 				v_zoneid = 'sector_id';
-				v_macroid = 'macrsector_id';
+				v_macroid = 'macrosector_id';
 				v_macrotable = 'macrosector';
 				v_macroselector = 'selector_sector';
 				--EXECUTE 'SELECT array_agg(macrosector_id) FROM v_edit_macrosector' INTO v_ids;
 			END IF;
 	
 	
-			if v_addschema is null or v_addschema ='null' OR v_addschema='NULL' or v_addschema='' then
-				-- do nothing
+			if v_addschema is NULL then
+				v_query = 'SELECT '||v_macroid||' FROM '||v_macrotable||'';
 			else
+				v_query = 'SELECT '||v_macroid||' FROM '||v_addschema||'.'||v_macrotable||'';
+			end if;
 			
-				raise EXCEPTION 'macro % add schema %  table %',v_macroid , v_addschema, v_macrotable;
+				FOR rec_macro IN EXECUTE v_query LOOP
 
-				FOR rec_macro IN EXECUTE 'SELECT '||v_macroid||' FROM '||v_addschema||'.'||v_macrotable||'' LOOP
-					IF v_tab.tabname ='tab_macroexploitation_add' THEN
+					IF v_tab.tabname ='tab_macroexploitation_add' and (v_addschema IS NOT NULL THEN
 						
 						EXECUTE 'SELECT count('||v_zoneid||') as count  FROM '||v_addschema||'.'||v_zonetable||' 
 						WHERE '||v_macroid||'='||rec_macro||' and active IS TRUE group by '||v_macroid||''
@@ -268,14 +273,13 @@ BEGIN
 							v_ids = concat(v_ids,',',rec_macro::text );
 						END IF;
 					END IF;
-				  END LOOP;		
-				end if;
+				 END LOOP;	
 
 			v_ids = replace(v_ids,'{','');
 			v_ids = replace(v_ids,'}','');	
 
 			IF v_ids IS NULL THEN v_ids='0'; END IF;
-				IF v_tab.tabname ='tab_macroexploitation_add' THEN
+				IF v_tab.tabname ='tab_macroexploitation_add' and v_addschema IS NOT NULL THEN
 					v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , 
 						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
@@ -315,7 +319,10 @@ BEGIN
 		v_debug := json_build_object('querystring', v_finalquery, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 30);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
+
 		EXECUTE  v_finalquery INTO v_formTabsAux;
+		--reset v_ids
+		v_ids= null;
 
 		-- Add tab name to json
 		IF v_formTabsAux IS NULL THEN
