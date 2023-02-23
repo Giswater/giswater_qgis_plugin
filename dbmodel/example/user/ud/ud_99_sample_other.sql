@@ -545,3 +545,11 @@ UPDATE link SET dma_id = c.dma_id, sector_id = c.sector_id FROM connec c WHERE f
 UPDATE link SET dma_id = c.dma_id, sector_id = c.sector_id FROM gully c WHERE feature_id = gully_id;
 
 UPDATE inp_gully SET method = 'W_O' WHERE method = 'W/O';
+
+UPDATE config_form_fields
+SET widgetcontrols = '{"labelPosition": "top"}'
+WHERE formname LIKE 've_%' AND (layoutname LIKE 'lyt_top%' OR layoutname LIKE 'lyt_bot%') AND widgetcontrols IS NULL;
+
+UPDATE config_form_fields
+SET widgetcontrols = jsonb_set(widgetcontrols::jsonb, '{labelPosition}', '"top"', true)
+WHERE formname LIKE 've_%' AND (layoutname LIKE 'lyt_top%' OR layoutname LIKE 'lyt_bot%');

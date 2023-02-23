@@ -723,3 +723,11 @@ UPDATE link SET dma_id = c.dma_id, sector_id = c.sector_id, presszone_id = c.pre
 
 DELETE FROM v_edit_link where link_id in (482,481);
 SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3076", "3177"]},"data":{"feature_type":"CONNEC"}}$$);
+
+UPDATE config_form_fields
+SET widgetcontrols = '{"labelPosition": "top"}'
+WHERE formname LIKE 've_%' AND (layoutname LIKE 'lyt_top%' OR layoutname LIKE 'lyt_bot%') AND widgetcontrols IS NULL;
+
+UPDATE config_form_fields
+SET widgetcontrols = jsonb_set(widgetcontrols::jsonb, '{labelPosition}', '"top"', true)
+WHERE formname LIKE 've_%' AND (layoutname LIKE 'lyt_top%' OR layoutname LIKE 'lyt_bot%');
