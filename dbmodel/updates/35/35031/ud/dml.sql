@@ -152,12 +152,16 @@ UPDATE plan_psector_x_gully pg SET active = p.active FROM plan_psector p WHERE p
 update link set exit_id = arc_id FROM gully where feature_id = gully_id and exit_type = 'ARC';
 UPDATE link SET exit_id = arc_id FROM connec c WHERE connec_id = feature_id AND exit_type  ='ARC';
 
+ALTER TABLE arc DISABLE TRIGGER ALL;
+
 UPDATE arc SET node_sys_top_elev_1 = sys_top_elev FROM vu_node WHERE node_id = node_1;
 UPDATE arc SET node_sys_elev_1 = sys_elev FROM vu_node WHERE node_id = node_1;
 UPDATE arc SET node_sys_top_elev_2 = sys_top_elev FROM vu_node WHERE node_id = node_2;
 UPDATE arc SET node_sys_elev_2 = sys_elev FROM vu_node WHERE node_id = node_2;
 UPDATE arc SET nodetype_1 = node_type FROM vu_node WHERE node_id = node_1;
 UPDATE arc SET nodetype_2 = node_type FROM vu_node WHERE node_id = node_2;
+
+ALTER TABLE arc ENABLE TRIGGER ALL;
 
 UPDATE config_form_fields
 SET widgetcontrols='{"autoupdateReloadFields": ["node_1", "node_2", "y1", "custom_y1", "sys_y1", "elev1", "custom_elev1", "sys_elev1", "z1", "r1", "y2", "custom_y2", "sys_y2", "elev2", "custom_elev2", "sys_elev2", "z2", "r2", "slope"]}'
