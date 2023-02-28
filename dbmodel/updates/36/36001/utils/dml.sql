@@ -369,3 +369,7 @@ INSERT INTO config_form_tabs VALUES ('v_edit_connec','tab_epa','EPA results',NUL
 {"actionName":"actionMapZone", "actionTooltip":"Add Mapzone",  "disabled":false}, {"actionName":"actionSetToArc", "actionTooltip":"Set to_arc",  "disabled":false},
 {"actionName":"actionGetParentId", "actionTooltip":"Set parent_id",  "disabled":false}, {"actionName":"actionGetArcId", "actionTooltip":"Set arc_id",  "disabled":false},
 {"actionName": "actionRotation", "actionTooltip": "Rotation","disabled": false}]',4, 1) ON CONFLICT (formname, tabname, device) DO NOTHING;
+
+INSERT INTO sys_function
+(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES(3194, 'gw_fct_checknode', 'utils', 'function', 'json', 'json', 'Function to get node from coordinate', 'role_basic', NULL, 'core');
