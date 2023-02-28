@@ -20,17 +20,18 @@ if 'nt' in sys.builtin_module_names:
 from collections import OrderedDict
 from functools import partial
 
-from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, QLocale
+from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, QLocale, QRegularExpression, QRegExp
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon, QStandardItem, \
-    QIntValidator, QDoubleValidator
+    QIntValidator, QDoubleValidator, QRegExpValidator
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
     QToolButton, QWidget, QApplication, QDockWidget, QMenu
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
-    QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
+    QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, QgsVectorFileWriter, \
-    QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsDataSourceUri, QgsProviderRegistry
+    QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsDataSourceUri, \
+    QgsProviderRegistry
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand
 
 from ..models.cat_feature import GwCatFeature
@@ -48,8 +49,7 @@ from ...lib.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
 
 # These imports are for the add_{widget} functions (modules need to be imported in order to find it by its name)
 # noinspection PyUnresolvedReferences
-from ..shared import info
-
+from ..shared import info, mincut_tools
 
 def load_settings(dialog, plugin='core'):
     """ Load user UI settings related with dialog position and size """
@@ -1476,23 +1476,23 @@ def add_button(**kwargs):
         if 'parameters' in field['widgetfunction']:
             func_params = field['widgetfunction']['parameters']
     else:
-        return widget
         message = "Parameter widgetfunction.functionName is null for button"
         tools_qgis.show_message(message, 2, parameter=widget.objectName())
+        return widget
 
     kwargs['widget'] = widget
     kwargs['message_level'] = 1
     kwargs['function_name'] = function_name
     kwargs['func_params'] = func_params
-    # widget.clicked.connect(partial(getattr(tools_backend_calls, function_name), **kwargs))
     if function_name:
         widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget
 
 
-def add_spinbox(field):
-
+def add_spinbox(**kwargs):
+    field = kwargs['field']
+    module = tools_backend_calls
     widget = None
     if field['widgettype'] == 'spinbox':
         widget = QSpinBox()
@@ -1561,7 +1561,12 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
     return _json
 
 
-def add_checkbox(field, is_tristate=False):
+def add_checkbox(**kwargs):
+    dialog = kwargs.get('dialog')
+    field = kwargs.get('field')
+    is_tristate = kwargs.get('is_tristate')
+    class_info = kwargs.get('class')
+    connect_signal = kwargs.get('connectsignal')
 
     widget = QCheckBox()
     widget.setObjectName(field['widgetname'])
@@ -1576,6 +1581,50 @@ def add_checkbox(field, is_tristate=False):
             widget.setCheckState(1)
     if 'iseditable' in field:
         widget.setEnabled(field['iseditable'])
+
+    if connect_signal is not None and connect_signal is False:
+        return widget
+
+    if 'widgetfunction' in field:
+        if 'module' in field['widgetfunction']:
+            module = globals()[field['widgetfunction']['module']]
+        function_name = field['widgetfunction'].get('functionName')
+        if function_name is not None:
+            if function_name:
+                exist = tools_os.check_python_function(module, function_name)
+                if not exist:
+                    msg = f"widget {field['widgetname']} has associated function {function_name}, but {function_name} not exist"
+                    tools_qgis.show_message(msg, 2)
+                    return widget
+            else:
+                message = "Parameter functionName is null for check"
+                tools_qgis.show_message(message, 2, parameter=widget.objectName())
+
+    func_params = ""
+
+    if 'widgetfunction' in field and field['widgetfunction'] and 'functionName' in field['widgetfunction']:
+        function_name = field['widgetfunction']['functionName']
+
+        exist = tools_os.check_python_function(module, function_name)
+        if not exist:
+            msg = f"widget {field['widgetname']} has associated function {function_name}, but {function_name} not exist"
+            tools_qgis.show_message(msg, 2)
+            return widget
+        if 'parameters' in field['widgetfunction']:
+            func_params = field['widgetfunction']['parameters']
+    else:
+        message = "Parameter widgetfunction.functionName is null for button"
+        tools_qgis.show_message(message, 2, parameter=widget.objectName())
+        return widget
+
+    kwargs['widget'] = widget
+    kwargs['message_level'] = 1
+    kwargs['function_name'] = function_name
+    kwargs['func_params'] = func_params
+    if function_name:
+        widget.stateChanged.connect(partial(getattr(module, function_name), **kwargs))
+    else:
+        widget.stateChanged.connect(partial(get_values, dialog, widget, class_info.my_json))
     return widget
 
 
@@ -1795,7 +1844,7 @@ def add_lineedit(field):
     return widget
 
 
-def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]):
+def add_tableview(complet_result, field, dialog, module=sys.modules[__name__], class_self=None):
     """
     Add widgets QTableView type.
         Function called in -> widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
@@ -1834,7 +1883,7 @@ def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]):
 
     # noinspection PyUnresolvedReferences
     if function_name and function_name not in ('', 'None', 'no_function_asociated'):
-        kwargs = {"qtable": widget, "func_params": func_params, "complet_result": complet_result, "dialog": dialog}
+        kwargs = {"qtable": widget, "func_params": func_params, "complet_result": complet_result, "dialog": dialog, "class": class_self}
         widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget
@@ -1855,8 +1904,7 @@ def add_frame(field, x=None):
     return widget
 
 
-def add_combo(field):
-
+def add_combo(field, dialog=None, complet_result=None):
     widget = QComboBox()
     widget.setObjectName(field['widgetname'])
     if 'widgetcontrols' in field and field['widgetcontrols']:
@@ -1873,6 +1921,39 @@ def add_combo(field):
         widget.setEnabled(bool(field['iseditable']))
         if not field['iseditable']:
             widget.setStyleSheet("QComboBox { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
+
+    if 'widgetfunction' in field and field['widgetfunction']:
+        widgetfunction = field['widgetfunction']
+        functions = None
+        if isinstance(widgetfunction, list):
+            functions = widgetfunction
+        else:
+            if 'isfilter' in field and field['isfilter']:
+                return widget
+            functions = [widgetfunction]
+        for f in functions:
+            if 'isFilter' in f and f['isFilter']: continue
+            columnname = field['columnname']
+            parameters = f['parameters']
+
+            kwargs = {"complet_result": complet_result, "dialog": dialog, "columnname": columnname, "widget": widget,
+                      "func_params": parameters}
+            if 'module' in f:
+                module = globals()[f['module']]
+            else:
+                module = tools_backend_calls
+            function_name = f.get('functionName')
+            if function_name is not None:
+                if function_name:
+                    exist = tools_os.check_python_function(module, function_name)
+                    if not exist:
+                        msg = f"widget {widget.property('widgetname')} has associated function {function_name}, but {function_name} not exist"
+                        tools_qgis.show_message(msg, 2)
+                        return widget
+                else:
+                    message = "Parameter functionName is null for button"
+                    tools_qgis.show_message(message, 2, parameter=widget.objectName())
+            widget.currentIndexChanged.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget
 
@@ -2874,7 +2955,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
     columns_to_delete = []
     sql = (f"SELECT columnindex, width, alias, visible, style"
            f" FROM {config_table}"
-           f" WHERE tablename = '{table_name}'"
+           f" WHERE objectname = '{table_name}'"
            f" ORDER BY columnindex")
     rows = tools_db.get_rows(sql)
 
@@ -3811,5 +3892,440 @@ def _get_parser_from_filename(filename):
         return filepath, None
 
     return filepath, parser
+
+
+# endregion
+
+
+def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
+    """ Put filter widgets into layout and set headers into QTableView """
+
+    complet_list = _get_list(complet_result, '', '', widgetname, 'form_feature', linkedobject)
+    print("complet_list")
+    print(complet_list)
+    tab_name = 'main'
+    if complet_list is False:
+        return False, False
+    for field in complet_list['body']['data']['fields']:
+        if 'hidden' in field and field['hidden']: continue
+        short_name = f'{tab_name}_{field["widgetname"]}'
+        widget = dialog.findChild(QTableView, short_name)
+        if widget is None: continue
+        widget = add_tableview_header(widget, field)
+        widget = fill_tableview_rows(widget, field)
+        widget = set_tablemodel_config(dialog, widget, short_name, 1, True)
+        tools_qt.set_tableview_config(widget, edit_triggers=QTableView.DoubleClicked)
+
+    widget_list = []
+    widget_list.extend(dialog.findChildren(QComboBox, QRegularExpression(f"{tab_name}_")))
+    widget_list.extend(dialog.findChildren(QTableView, QRegularExpression(f"{tab_name}_")))
+    widget_list.extend(dialog.findChildren(QLineEdit, QRegularExpression(f"{tab_name}_")))
+    widget_list.extend(dialog.findChildren(QSpinBox, QRegularExpression(f"{tab_name}_")))
+    widget_list.extend(
+        dialog.findChildren(QgsDateTimeEdit, QRegularExpression(f"{tab_name}_")))
+    return complet_list, widget_list
+
+
+def _get_list(complet_result, form_name='', filter_fields='', widgetname='', formtype='',
+              linkedobject=''):
+
+    form = f'"formName":"{form_name}", "tabName":"main", "widgetname":"{widgetname}", "formtype":"{formtype}"'
+    feature = f'"tableName":"{linkedobject}"'
+    filter_fields = ''
+    body = create_body(form, feature, filter_fields)
+    json_result = execute_procedure('gw_fct_getlist', body)
+    if json_result is None or json_result['status'] == 'Failed':
+        return False
+    complet_list = json_result
+    if not complet_list:
+        return False
+
+    return complet_list
+
+# startregion
+# Info buttons
+
+
+def set_filter_listeners(complet_result, dialog, widget_list, columnname, widgetname, feature_id=None):
+    """
+    functions called in -> widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+                        -> widget.currentIndexChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+       module = tools_backend_calls -> def open_rpt_result(**kwargs)
+                                    -> def filter_table(self, **kwargs)
+     """
+
+    model = None
+    for widget in widget_list:
+        if type(widget) is QTableView:
+            model = widget.model()
+
+    # Emitting the text changed signal of a widget slows down the process, so instead of emitting a signal for each
+    # widget, we will emit only the one of the last widget. This is enough for the correct filtering of the
+    # QTableView and we gain in performance
+    last_widget = None
+    for widget in widget_list:
+        if widget.property('isfilter') is not True: continue
+        module = tools_backend_calls
+        functions = None
+        if widget.property('widgetfunction') is not None and isinstance(widget.property('widgetfunction'), list):
+            functions = []
+            for function in widget.property('widgetfunction'):
+                func_names = []
+                widgetfunction = function['functionName']
+                if 'isFilter' in function:
+                    if function['isFilter']:
+                        functions.append(function)
+
+        if widget.property('widgetfunction') is not None and 'functionName' in widget.property('widgetfunction'):
+            widgetfunction = widget.property('widgetfunction')['functionName']
+            functions = [widget.property('widgetfunction')]
+        if widgetfunction is False: continue
+
+        linkedobject = ""
+        if widget.property('linkedobject') is not None:
+            linkedobject = widget.property('linkedobject')
+
+        if feature_id is None:
+            feature_id = ""
+
+        if isinstance(widget.property('widgetfunction'), list):
+            widgetfunction = widget.property('widgetfunction')
+        else:
+            widgetfunction = [widget.property('widgetfunction')]
+
+
+        for i in range(len(functions)):
+            kwargs = {"complet_result": complet_result, "model": model, "dialog": dialog, "linkedobject": linkedobject,
+                      "columnname": columnname, "widget": widget, "widgetname": widgetname, "widget_list": widget_list,
+                      "feature_id": feature_id, "func_params": functions[i]['parameters']}
+
+            if functions[i] is not None:
+                if 'module' in functions[i]:
+                    module = globals()[functions[i]['module']]
+                function_name = functions[i].get('functionName')
+                if function_name is not None:
+                    if function_name:
+                        exist = tools_os.check_python_function(module, function_name)
+                        if not exist:
+                            msg = f"widget {widget.property('widgetname')} has associated function {function_name}, but {function_name} not exist"
+                            tools_qgis.show_message(msg, 2)
+                            return widget
+                    else:
+                        message = "Parameter functionName is null for button"
+                        tools_qgis.show_message(message, 2, parameter=widget.objectName())
+
+            func_params = ""
+            function_name = ""
+            if widgetfunction[i] is not None and 'functionName' in widgetfunction[i]:
+                function_name = widgetfunction[i]['functionName']
+
+                exist = tools_os.check_python_function(module, function_name)
+                if not exist:
+                    msg = f"widget {widget.property('widgetname')} has associated function {function_name}, but {function_name} not exist"
+                    tools_qgis.show_message(msg, 2)
+                    return widget
+                if 'parameters' in widgetfunction[i]:
+                    func_params = widgetfunction[i]['parameters']
+            else:
+                message = "Parameter widgetfunction.functionName is null for button"
+                tools_qgis.show_message(message, 2, parameter=widget.objectName())
+
+            kwargs['widget'] = widget
+            kwargs['message_level'] = 1
+            kwargs['function_name'] = function_name
+            kwargs['func_params'] = func_params
+            if function_name:
+                if type(widget) is QLineEdit:
+                    widget.textChanged.connect(partial(getattr(module, function_name), **kwargs))
+                elif type(widget) is QComboBox:
+                    widget.currentIndexChanged.connect(partial(getattr(module, function_name), **kwargs))
+                elif type(widget) is QgsDateTimeEdit:
+                    widget.setDate(QDate.currentDate())
+                    widget.dateChanged.connect(partial(getattr(module, function_name), **kwargs))
+                elif type(widget) is QSpinBox:
+                    widget.valueChanged.connect(partial(getattr(module, function_name), **kwargs))
+                else:
+                    continue
+
+            last_widget = widget
+
+    # Emit signal changed
+    if last_widget is not None:
+        if type(last_widget) is QLineEdit:
+            text = tools_qt.get_text(dialog, last_widget, False, False)
+            last_widget.textChanged.emit(text)
+        elif type(last_widget) is QComboBox:
+            last_widget.currentIndexChanged.emit(last_widget.currentIndex())
+
+def set_widgets(dialog, complet_result, field, tablename, class_info):
+    """
+    functions called in -> widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
+        def manage_text(self, **kwargs)
+        def manage_typeahead(self, **kwargs)
+        def manage_combo(self, **kwargs)
+        def manage_check(self, **kwargs)
+        def manage_datetime(self, **kwargs)
+        def manage_button(self, **kwargs)
+        def manage_hyperlink(self, **kwargs)
+        def manage_hspacer(self, **kwargs)
+        def manage_vspacer(self, **kwargs)
+        def manage_textarea(self, **kwargs)
+        def manage_spinbox(self, **kwargs)
+        def manage_doubleSpinbox(self, **kwargs)
+        def manage_tableview(self, **kwargs)
+     """
+    widget = None
+    label = None
+    if 'label' in field and field['label']:
+        label = QLabel()
+        label.setObjectName('lbl_' + field['widgetname'])
+        label.setText(field['label'].capitalize())
+        if 'stylesheet' in field and field['stylesheet'] is not None and 'label' in field['stylesheet']:
+            label = set_stylesheet(field, label)
+        if 'tooltip' in field:
+            label.setToolTip(field['tooltip'])
+        else:
+            label.setToolTip(field['label'].capitalize())
+
+    if 'widgettype' in field and not field['widgettype']:
+        message = "The field widgettype is not configured for"
+        msg = f"formname:{tablename}, columnname:{field['columnname']}"
+        tools_qgis.show_message(message, 2, parameter=msg, dialog=dialog)
+        return label, widget
+
+    try:
+        kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field,
+                  "class": class_info}
+        widget = globals()[f"_manage_{field['widgettype']}"](**kwargs)
+    except Exception as e:
+        msg = (f"{type(e).__name__}: {e} Python function: _set_widgets. WHERE columname='{field['columnname']}' "
+               f"AND widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'")
+        tools_qgis.show_message(msg, 2, dialog=dialog)
+        return label, widget
+
+    try:
+        widget.setProperty('isfilter', False)
+        if 'isfilter' in field and field['isfilter'] is True:
+            widget.setProperty('isfilter', True)
+
+        widget.setProperty('widgetfunction', False)
+        if 'widgetfunction' in field and field['widgetfunction'] is not None:
+            widget.setProperty('widgetfunction', field['widgetfunction'])
+        if 'linkedobject' in field and field['linkedobject']:
+            widget.setProperty('linkedobject', field['linkedobject'])
+        if field['widgetcontrols'] is not None and 'saveValue' in field['widgetcontrols']:
+            if field['widgetcontrols']['saveValue'] is False:
+                widget.setProperty('saveValue', False)
+        if field['widgetcontrols'] is not None and 'isEnabled' in field['widgetcontrols']:
+            if field['widgetcontrols']['isEnabled'] is False:
+                widget.setEnabled(False)
+    except Exception:
+        # AttributeError: 'QSpacerItem' object has no attribute 'setProperty'
+        pass
+
+    return label, widget
+
+
+def _manage_text(**kwargs):
+    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
+    """
+
+    field = kwargs['field']
+
+    widget = add_lineedit(field)
+    widget = set_widget_size(widget, field)
+    widget = _set_min_max_values(widget, field)
+    widget = _set_reg_exp(widget, field)
+    widget = set_data_type(field, widget)
+    widget = _set_max_length(widget, field)
+
+    return widget
+
+
+def _set_min_max_values(widget, field):
+    """ Set max and min values allowed """
+
+    if field['widgetcontrols'] and 'maxMinValues' in field['widgetcontrols']:
+        if 'min' in field['widgetcontrols']['maxMinValues']:
+            widget.setProperty('minValue', field['widgetcontrols']['maxMinValues']['min'])
+
+    if field['widgetcontrols'] and 'maxMinValues' in field['widgetcontrols']:
+        if 'max' in field['widgetcontrols']['maxMinValues']:
+            widget.setProperty('maxValue', field['widgetcontrols']['maxMinValues']['max'])
+
+    return widget
+
+
+def _set_max_length(widget, field):
+    """ Set max and min values allowed """
+
+    if field['widgetcontrols'] and 'maxLength' in field['widgetcontrols']:
+        if field['widgetcontrols']['maxLength'] is not None:
+            widget.setProperty('maxLength', field['widgetcontrols']['maxLength'])
+
+    return widget
+
+
+def _set_reg_exp(widget, field):
+    """ Set regular expression """
+
+    if 'widgetcontrols' in field and field['widgetcontrols']:
+        if field['widgetcontrols'] and 'regexpControl' in field['widgetcontrols']:
+            if field['widgetcontrols']['regexpControl'] is not None:
+                reg_exp = QRegExp(str(field['widgetcontrols']['regexpControl']))
+                widget.setValidator(QRegExpValidator(reg_exp))
+
+    return widget
+
+
+def _manage_typeahead(**kwargs):
+    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+        """
+
+    dialog = kwargs['dialog']
+    field = kwargs['field']
+    completer = QCompleter()
+    widget = _manage_text(**kwargs)
+    widget = set_typeahead(field, dialog, widget, completer)
+    return widget
+
+
+def _manage_combo(**kwargs):
+    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+        """
+    dialog = kwargs['dialog']
+    field = kwargs['field']
+    complet_result = kwargs['complet_result']
+
+    widget = add_combo(field, dialog, complet_result)
+    widget = set_widget_size(widget, field)
+    return widget
+
+
+def _manage_check(**kwargs):
+    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+        """
+
+    dialog = kwargs['dialog']
+    field = kwargs['field']
+    class_info = kwargs['class']
+    widget = add_checkbox(**kwargs)
+    #widget.stateChanged.connect(partial(get_values, dialog, widget, class_info.my_json))
+    return widget
+
+
+def _manage_datetime(**kwargs):
+    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+        widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """
+
+    dialog = kwargs['dialog']
+    field = kwargs['field']
+    widget = add_calendar(dialog, field, **kwargs)
+    return widget
+
+
+def _manage_button(**kwargs):
+    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+        widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """
+
+    field = kwargs['field']
+    stylesheet = field.get('stylesheet') or {}
+    info_class = kwargs['class']
+    # If button text is empty it's because node_1/2 is not present.
+    # Then we create a QLineEdit to input a node to be connected.
+    if not field.get('value') and stylesheet.get('icon') is None:
+        widget = _manage_text(**kwargs)
+        widget.editingFinished.connect(partial(info_class.run_settopology, widget, **kwargs))
+        return widget
+    widget = add_button(**kwargs)
+    widget = set_widget_size(widget, field)
+    return widget
+
+
+def _manage_hyperlink(**kwargs):
+    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+        """
+
+    field = kwargs['field']
+    widget = add_hyperlink(field)
+    widget = set_widget_size(widget, field)
+    return widget
+
+
+def _manage_hspacer(**kwargs):
+    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+        widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """
+
+    widget = tools_qt.add_horizontal_spacer()
+    return widget
+
+
+def _manage_vspacer(**kwargs):
+    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+        widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """
+
+    widget = tools_qt.add_verticalspacer()
+    return widget
+
+
+def _manage_textarea(**kwargs):
+    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+        """
+
+    field = kwargs['field']
+    widget = add_textarea(field)
+    return widget
+
+
+def _manage_spinbox(**kwargs):
+    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+        """
+
+    widget = add_spinbox(**kwargs)
+    return widget
+
+
+def _manage_doubleSpinbox(**kwargs):
+    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+        widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """
+
+    dialog = kwargs['dialog']
+    field = kwargs['field']
+    info = kwargs['info']
+    widget = add_spinbox(**kwargs)
+    return widget
+
+
+def _manage_list(self, **kwargs):
+    _manage_tableview(**kwargs)
+
+
+def _manage_tableview(**kwargs):
+    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+        widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """
+    complet_result = kwargs['complet_result']
+    field = kwargs['field']
+    dialog = kwargs['dialog']
+    class_self = kwargs['class']
+    module = tools_backend_calls
+    widget = add_tableview(complet_result, field, dialog, module, class_self)
+    widget = add_tableview_header(widget, field)
+    widget = fill_tableview_rows(widget, field)
+    widget = set_tablemodel_config(dialog, widget, field['columnname'], 1, True)
+    tools_qt.set_tableview_config(widget)
+    return widget
 
 # endregion

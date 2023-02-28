@@ -12,7 +12,7 @@ import webbrowser
 
 from functools import partial
 from qgis.PyQt.QtCore import QDate, QRegExp, Qt
-from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QLineEdit, QMessageBox, QTableView, QWidget
+from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QLineEdit, QMessageBox, QTableView, QWidget, QDoubleSpinBox, QSpinBox
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer, QgsVectorLayer, QgsDataSourceUri
 from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtWidgets import QComboBox
@@ -25,6 +25,7 @@ from ..shared.visit import GwVisit
 from ..utils import tools_gw
 from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
 
+from ..shared.mincut_tools import filter_by_days, filter_by_dates
 
 def add_object(**kwargs):
     """
@@ -102,16 +103,24 @@ def delete_object(**kwargs):
         at lines:   widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
     """
     dialog = kwargs['dialog']
-    index_tab = dialog.tab_main.currentIndex()
-    tab_name = dialog.tab_main.widget(index_tab).objectName()
+    try:
+        index_tab = dialog.tab_main.currentIndex()
+        tab_name = dialog.tab_main.widget(index_tab).objectName()
+    except:
+        tab_name = 'main'
     func_params = kwargs['func_params']
     complet_result = kwargs['complet_result']
-    feature_type = complet_result['body']['feature']['featureType']
+
+    if 'featureType' in complet_result['body']['feature']:
+        feature_type = complet_result['body']['feature']['featureType']
+        tablename = f"v_ui_{func_params['sourceview']}_x_{feature_type}"
+    else:
+        tablename = f"v_ui_{func_params['sourceview']}"
 
     qtable_name = func_params['targetwidget']
     qtable = tools_qt.get_widget(dialog, f"{qtable_name}")
 
-    tablename = f"v_ui_{func_params['sourceview']}_x_{feature_type}"
+
 
     # Get selected rows
     selected_list = qtable.selectionModel().selectedRows()
@@ -241,12 +250,19 @@ def filter_table(**kwargs):
     linkedobject = kwargs['linkedobject']
     feature_id = kwargs['feature_id']
     func_params = kwargs.get('func_params')
+
+    field_id = str(complet_result['body']['feature']['idName'])
+    feature_id = complet_result['body']['feature']['id']
+    filter_fields = f'"{field_id}":{{"value":"{feature_id}","filterSign":"="}}, '
     colname = None
     if func_params:
         colname = func_params.get('columnfind')
-    filter_fields = get_filter_qtableview(dialog, widget_list, complet_result)
-    index_tab = dialog.tab_main.currentIndex()
-    tab_name = dialog.tab_main.widget(index_tab).objectName()
+    filter_fields = get_filter_qtableview(dialog, widget_list, complet_result, filter_fields)
+    try:
+        index_tab = dialog.tab_main.currentIndex()
+        tab_name = dialog.tab_main.widget(index_tab).objectName()
+    except:
+        tab_name = 'main'
     complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject, feature_id)
     if complet_list is False:
         return False
@@ -264,6 +280,44 @@ def filter_table(**kwargs):
 
     return complet_list
 
+def filter_table_mincut(**kwargs):
+    """
+         Function called in module GwInfo: def _set_filter_listeners(self, complet_result, dialog, widget_list, columnname, widgetname)
+         at lines:  widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+                    widget.currentIndexChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+     """
+
+    complet_result = kwargs['complet_result']
+    model = kwargs['model']
+    dialog = kwargs['dialog']
+    widget_list = kwargs['widget_list']
+    widgetname = kwargs['widgetname']
+    linkedobject = kwargs['linkedobject']
+    feature_id = kwargs['feature_id']
+    func_params = kwargs['func_params']
+
+    filter_fields = get_filter_qtableview_mincut(dialog, widget_list, func_params)
+    try:
+        index_tab = dialog.tab_main.currentIndex()
+        tab_name = dialog.tab_main.widget(index_tab).objectName()
+    except:
+        tab_name = 'main'
+    complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject, feature_id)
+    if complet_list is False:
+        return False
+    for field in complet_list['body']['data']['fields']:
+        qtable = dialog.findChild(QTableView, field['widgetname'])
+        if qtable:
+            if field['value'] is None:
+                model.removeRows(0, model.rowCount())
+                return complet_list
+            model.clear()
+            tools_gw.add_tableview_header(qtable, field)
+            tools_gw.fill_tableview_rows(qtable, field)
+            tools_gw.set_tablemodel_config(dialog, qtable, field['widgetname'], 1, True)
+            tools_qt.set_tableview_config(qtable)
+
+    return complet_list
 
 def open_rpt_result(**kwargs):
     """
@@ -575,9 +629,13 @@ def open_url(widget):
 
 def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     """ Put filter widgets into layout and set headers into QTableView """
-
-    index_tab = dialog.tab_main.currentIndex()
-    tab_name = dialog.tab_main.widget(index_tab).objectName()
+    no_tabs = False
+    try:
+        index_tab = dialog.tab_main.currentIndex()
+        tab_name = dialog.tab_main.widget(index_tab).objectName()
+    except:
+        tab_name = 'main'
+        no_tabs = True
     complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject)
 
     if complet_list is False:
@@ -593,17 +651,18 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
         tools_qt.set_tableview_config(widget)
 
     widget_list = []
-    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QComboBox, QRegExp(f"{tab_name}_")))
-    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QTableView, QRegExp(f"{tab_name}_")))
-    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QLineEdit, QRegExp(f"{tab_name}_")))
+    if no_tabs:
+        widget_list.extend(dialog.findChildren(QComboBox, QRegExp(f"{tab_name}_")))
+        widget_list.extend(dialog.findChildren(QTableView, QRegExp(f"{tab_name}_")))
+        widget_list.extend(dialog.findChildren(QLineEdit, QRegExp(f"{tab_name}_")))
+    else:
+        widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QComboBox, QRegExp(f"{tab_name}_")))
+        widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QTableView, QRegExp(f"{tab_name}_")))
+        widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QLineEdit, QRegExp(f"{tab_name}_")))
     return complet_list, widget_list
 
 
-def get_filter_qtableview(dialog, widget_list, complet_result):
-
-    field_id = str(complet_result['body']['feature']['idName'])
-    feature_id = complet_result['body']['feature']['id']
-    filter_fields = f'"{field_id}":{{"value":"{feature_id}","filterSign":"="}}, '
+def get_filter_qtableview(dialog, widget_list, complet_result, filter_fields = ''):
 
     for widget in widget_list:
         if widget.property('isfilter'):
@@ -613,17 +672,23 @@ def get_filter_qtableview(dialog, widget_list, complet_result):
                         and 'columnfind' in widget.property('widgetfunction')['parameters']:
                     columnname = widget.property('widgetfunction')['parameters']['columnfind']
             filter_sign = "ILIKE"
+            column_id = 0
             if widget.property('widgetcontrols') is not None and 'filterSign' in widget.property('widgetcontrols'):
                 if widget.property('widgetcontrols')['filterSign'] is not None:
                     filter_sign = widget.property('widgetcontrols')['filterSign']
+            if widget.property('widgetcontrols') is not None and 'columnId' in widget.property('widgetcontrols'):
+                if widget.property('widgetcontrols')['columnId'] is not None:
+                    column_id = widget.property('widgetcontrols')['columnId']
             if type(widget) == QComboBox:
-                value = tools_qt.get_combo_value(dialog, widget, 0)
+                value = tools_qt.get_combo_value(dialog, widget, column_id)
+                if value == -1:
+                    value = None
             elif type(widget) is QgsDateTimeEdit:
                 value = tools_qt.get_calendar_date(dialog, widget, date_format='yyyy-MM-dd')
             else:
                 value = tools_qt.get_text(dialog, widget, False, False)
 
-            if not value or value == -1:
+            if not value:
                 continue
 
             filter_fields += f'"{columnname}":{{"value":"{value}","filterSign":"{filter_sign}"}}, '
@@ -634,7 +699,65 @@ def get_filter_qtableview(dialog, widget_list, complet_result):
     return filter_fields
 
 
+def get_filter_qtableview_mincut(dialog, widget_list, func_params, filter_fields = ''):
+
+    for widget in widget_list:
+        if widget.property('isfilter'):
+            functions = None
+            if widget.property('widgetfunction') is not None:
+                widgetfunction = widget.property('widgetfunction')
+                if isinstance(widgetfunction, list):
+                    functions = widgetfunction
+                else:
+                    functions = [widgetfunction]
+
+                for f in functions:
+                    if 'isFilter' in f and f['isFilter']: continue
+                    columnname = widget.property('columnname')
+                    parameters = f['parameters']
+                    filter_sign = "ILIKE"
+                    column_id = 0
+
+                    if 'columnfind' in parameters:
+                        columnname = parameters['columnfind']
+
+                    if widget.property('widgetcontrols') is not None and 'filterSign' in widget.property('widgetcontrols'):
+                        if widget.property('widgetcontrols')['filterSign'] is not None:
+                            filter_sign = widget.property('widgetcontrols')['filterSign']
+                    if widget.property('widgetcontrols') is not None and 'columnId' in widget.property('widgetcontrols'):
+                        if widget.property('widgetcontrols')['columnId'] is not None:
+                            column_id = widget.property('widgetcontrols')['columnId']
+                    if type(widget) == QComboBox:
+                        value = tools_qt.get_combo_value(dialog, widget, column_id)
+                        if value == -1:
+                            value = None
+                    elif type(widget) is QgsDateTimeEdit:
+                        value = tools_qt.get_calendar_date(dialog, widget, date_format='yyyy-MM-dd')
+                    else:
+                        value = tools_qt.get_text(dialog, widget, False, False)
+
+                    if value in (None, ''):
+                        continue
+
+                    if type(widget) in (QDoubleSpinBox, QSpinBox, QgsDateTimeEdit):
+                        if not widget.isEnabled():
+                            continue
+
+                    if widget.objectName() == "main_spm_next_days":
+                        filter_fields += filter_by_days(dialog, widget)
+                    elif type(widget) is QgsDateTimeEdit:
+                        filter_fields += filter_by_dates(dialog, widget)
+                    else:
+                        filter_fields += f'"{columnname}":{{"value":"{value}","filterSign":"{filter_sign}"}}, '
+
+    if filter_fields != "":
+        filter_fields = filter_fields[:-2]
+
+    return filter_fields
+
 # region private functions
+
+
 def _get_list(complet_result, form_name='', tab_name='', filter_fields='', widgetname='', formtype='', linkedobject='', feature_id=''):
 
     form = f'"formName":"{form_name}", "tabName":"{tab_name}", "widgetname":"{widgetname}", "formtype":"{formtype}"'
@@ -668,23 +791,38 @@ def _manage_document_new(doc, **kwargs):
 def _reload_table(**kwargs):
     """ Get inserted element_id and add it to current feature """
     dialog = kwargs['dialog']
-    index_tab = dialog.tab_main.currentIndex()
-    tab_name = dialog.tab_main.widget(index_tab).objectName()
+    no_tabs = False
+    try:
+        index_tab = dialog.tab_main.currentIndex()
+        tab_name = dialog.tab_main.widget(index_tab).objectName()
+        list_tables = dialog.tab_main.widget(index_tab).findChildren(QTableView)
+    except:
+        no_tabs = True
+        tab_name = 'main'
+        list_tables = dialog.findChildren(QTableView)
 
-    list_tables = dialog.tab_main.widget(index_tab).findChildren(QTableView)
+
     complet_result = kwargs['complet_result']
     feature_id = complet_result['body']['feature']['id']
     field_id = str(complet_result['body']['feature']['idName'])
     widget_list = []
-    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QComboBox, QRegExp(f"{tab_name}_")))
-    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QTableView, QRegExp(f"{tab_name}_")))
-    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QLineEdit, QRegExp(f"{tab_name}_")))
+    if no_tabs:
+        widget_list.extend(dialog.findChildren(QComboBox, QRegExp(f"{tab_name}_")))
+        widget_list.extend(dialog.findChildren(QTableView, QRegExp(f"{tab_name}_")))
+        widget_list.extend(dialog.findChildren(QLineEdit, QRegExp(f"{tab_name}_")))
+    else:
+        widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QComboBox, QRegExp(f"{tab_name}_")))
+        widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QTableView, QRegExp(f"{tab_name}_")))
+        widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QLineEdit, QRegExp(f"{tab_name}_")))
 
     for table in list_tables:
         widgetname = table.objectName()
         columnname = table.property('columnname')
         if columnname is None:
-            msg = f"widget {widgetname} in tab {dialog.tab_main.widget(index_tab).objectName()} has not columnname and cant be configured"
+            if no_tabs:
+                msg = f"widget {widgetname} has not columnname and cant be configured"
+            else:
+                msg = f"widget {widgetname} in tab {dialog.tab_main.widget(index_tab).objectName()} has not columnname and cant be configured"
             tools_qgis.show_info(msg, 1)
             continue
 
@@ -695,6 +833,9 @@ def _reload_table(**kwargs):
         if filter_fields in ('', None):
             filter_fields = f'"{field_id}":{{"value":"{feature_id}","filterSign":"="}}'
 
+        if no_tabs:
+            filter_fields = f''
+            widgetname = columnname
         linkedobject = table.property('linkedobject')
         complet_list, widget_list = fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields)
         if complet_list is False:

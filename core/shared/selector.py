@@ -212,7 +212,8 @@ class GwSelector:
             for order, field in enumerate(form_tab['fields']):
                 try:
                     # Create checkbox
-                    widget = tools_gw.add_checkbox(field)
+                    kwargs = {'field': field, 'connectsignal': False}
+                    widget = tools_gw.add_checkbox(**kwargs)
                     widget.setText(field['label'])
                     widget.stateChanged.connect(partial(self._set_selection_mode, dialog, widget, selection_mode))
                     widget.setLayoutDirection(Qt.LeftToRight)

@@ -655,14 +655,27 @@ class GwInfo(QObject):
         layout_list = []
         widget_offset = 0
         prev_layout = ""
+        widget_dict = {'text':'lineedit','combo':'combobox','check':'checkbox','datetime':'dateedit',
+                     'hyperlink':'hyperlink','textarea':'textarea','spinbox':'spinbox','doublespinbox':'spinbox'}
         for field in complet_result['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
                 continue
             if reload_epa and 'lyt_epa' not in field['layoutname']:
                 continue
-            label, widget = self._set_widgets(self.dlg_cf, complet_result, field, new_feature)
+            label, widget = tools_gw.set_widgets(self.dlg_cf, complet_result, field, self.tablename, self)
             if widget is None:
                 continue
+
+            # Create connections
+            if field['widgettype'] not in ('tableview','vspacer','list','hspacer','button','typeahead'):
+                if field['widgettype'] == 'hyperlink':
+                     if type(widget) == GwHyperLinkLineEdit:
+                        widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf, widget,
+                                                                                        new_feature)
+                else:
+                    widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf,
+                                                                                                   widget,
+                                                                                                   new_feature)
             layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
             if layout is not None:
                 if layout.objectName() != prev_layout:
@@ -1562,7 +1575,6 @@ class GwInfo(QObject):
 
     def _roll_back(self):
         """ Discard changes in current layer """
-
         self._disconnect_signals()
         try:
             self.iface.actionRollbackEdits().trigger()
@@ -1580,292 +1592,6 @@ class GwInfo(QObject):
             pass
         except RuntimeError:
             pass
-
-
-    def _set_widgets(self, dialog, complet_result, field, new_feature):
-        """
-        functions called in -> widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-            def _manage_text(self, **kwargs)
-            def _manage_typeahead(self, **kwargs)
-            def _manage_combo(self, **kwargs)
-            def _manage_check(self, **kwargs)
-            def _manage_datetime(self, **kwargs)
-            def _manage_button(self, **kwargs)
-            def _manage_hyperlink(self, **kwargs)
-            def _manage_hspacer(self, **kwargs)
-            def _manage_vspacer(self, **kwargs)
-            def _manage_textarea(self, **kwargs)
-            def _manage_spinbox(self, **kwargs)
-            def _manage_doubleSpinbox(self, **kwargs)
-            def _manage_tableview(self, **kwargs)
-         """
-
-        widget = None
-        label = None
-        if 'label' in field and field['label']:
-            label = QLabel()
-            label.setObjectName('lbl_' + field['widgetname'])
-            label.setText(field['label'].capitalize())
-            if 'stylesheet' in field and field['stylesheet'] is not None and 'label' in field['stylesheet']:
-                label = tools_gw.set_stylesheet(field, label)
-            if 'tooltip' in field:
-                label.setToolTip(field['tooltip'])
-            else:
-                label.setToolTip(field['label'].capitalize())
-
-        if 'widgettype' in field and not field['widgettype']:
-            message = "The field widgettype is not configured for"
-            msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
-            tools_qgis.show_message(message, 2, parameter=msg, dialog=dialog)
-            return label, widget
-
-        try:
-            kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field, "new_feature": new_feature,
-                      "info": self}
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        except Exception as e:
-            msg = (f"{type(e).__name__}: {e} Python function: _set_widgets. WHERE columname='{field['columnname']}' "
-                   f"AND widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'")
-            tools_qgis.show_message(msg, 2, dialog=dialog)
-            return label, widget
-
-        try:
-            widget.setProperty('isfilter', False)
-            if 'isfilter' in field and field['isfilter'] is True:
-                widget.setProperty('isfilter', True)
-
-            widget.setProperty('widgetfunction', False)
-            if 'widgetfunction' in field and field['widgetfunction'] is not None:
-                widget.setProperty('widgetfunction', field['widgetfunction'])
-            if 'linkedobject' in field and field['linkedobject']:
-                widget.setProperty('linkedobject', field['linkedobject'])
-            if field['widgetcontrols'] is not None and 'saveValue' in field['widgetcontrols']:
-                if field['widgetcontrols']['saveValue'] is False:
-                    widget.setProperty('saveValue', False)
-        except Exception:
-            # AttributeError: 'QSpacerItem' object has no attribute 'setProperty'
-            pass
-
-        return label, widget
-
-
-    def _manage_text(self, **kwargs):
-        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
-
-        dialog = kwargs['dialog']
-        field = kwargs['field']
-        new_feature = kwargs['new_feature']
-
-        widget = tools_gw.add_lineedit(field)
-        widget = tools_gw.set_widget_size(widget, field)
-        widget = self._set_min_max_values(widget, field)
-        widget = self._set_reg_exp(widget, field)
-        widget = self._set_auto_update_lineedit(field, dialog, widget, new_feature)
-        widget = tools_gw.set_data_type(field, widget)
-        widget = self._set_max_length(widget, field)
-
-        return widget
-
-
-    def _set_min_max_values(self, widget, field):
-        """ Set max and min values allowed """
-
-        if field['widgetcontrols'] and 'maxMinValues' in field['widgetcontrols']:
-            if 'min' in field['widgetcontrols']['maxMinValues']:
-                widget.setProperty('minValue', field['widgetcontrols']['maxMinValues']['min'])
-
-        if field['widgetcontrols'] and 'maxMinValues' in field['widgetcontrols']:
-            if 'max' in field['widgetcontrols']['maxMinValues']:
-                widget.setProperty('maxValue', field['widgetcontrols']['maxMinValues']['max'])
-
-        return widget
-
-
-    def _set_max_length(self, widget, field):
-        """ Set max and min values allowed """
-
-        if field['widgetcontrols'] and 'maxLength' in field['widgetcontrols']:
-            if field['widgetcontrols']['maxLength'] is not None:
-                widget.setProperty('maxLength', field['widgetcontrols']['maxLength'])
-
-        return widget
-
-
-    def _set_reg_exp(self, widget, field):
-        """ Set regular expression """
-
-        if 'widgetcontrols' in field and field['widgetcontrols']:
-            if field['widgetcontrols'] and 'regexpControl' in field['widgetcontrols']:
-                if field['widgetcontrols']['regexpControl'] is not None:
-                    reg_exp = QRegExp(str(field['widgetcontrols']['regexpControl']))
-                    widget.setValidator(QRegExpValidator(reg_exp))
-
-        return widget
-
-
-    def _manage_typeahead(self, **kwargs):
-        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
-
-        dialog = kwargs['dialog']
-        field = kwargs['field']
-        completer = QCompleter()
-        widget = self._manage_text(**kwargs)
-        widget = tools_gw.set_typeahead(field, dialog, widget, completer)
-        return widget
-
-
-    def _manage_combo(self, **kwargs):
-        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
-
-        dialog = kwargs['dialog']
-        field = kwargs['field']
-        new_feature = kwargs['new_feature']
-        widget = tools_gw.add_combo(field)
-        widget = tools_gw.set_widget_size(widget, field)
-        widget = self._set_auto_update_combobox(field, dialog, widget, new_feature)
-        return widget
-
-
-    def _manage_check(self, **kwargs):
-        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
-
-        dialog = kwargs['dialog']
-        field = kwargs['field']
-        new_feature = kwargs['new_feature']
-        widget = tools_gw.add_checkbox(field)
-        widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
-        widget = self._set_auto_update_checkbox(field, dialog, widget, new_feature)
-        return widget
-
-
-    def _manage_datetime(self, **kwargs):
-        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
-
-        dialog = kwargs['dialog']
-        field = kwargs['field']
-        new_feature = kwargs['new_feature']
-        widget = tools_gw.add_calendar(dialog, field, **kwargs)
-        widget = self._set_auto_update_dateedit(field, dialog, widget, new_feature)
-        return widget
-
-
-    def _manage_button(self, **kwargs):
-        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
-
-        field = kwargs['field']
-        stylesheet = field.get('stylesheet') or {}
-        # If button text is empty it's because node_1/2 is not present.
-        # Then we create a QLineEdit to input a node to be connected.
-        if not field.get('value') and stylesheet.get('icon') is None:
-            widget = self._manage_text(**kwargs)
-            widget.editingFinished.connect(partial(self._run_settopology, widget, **kwargs))
-            return widget
-        widget = tools_gw.add_button(**kwargs)
-        widget = tools_gw.set_widget_size(widget, field)
-        return widget
-
-
-    def _manage_hyperlink(self, **kwargs):
-        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
-
-        field = kwargs['field']
-        dialog = kwargs['dialog']
-        new_feature = kwargs['new_feature']
-        widget = tools_gw.add_hyperlink(field)
-        widget = tools_gw.set_widget_size(widget, field)
-        if type(widget) == GwHyperLinkLineEdit:
-            widget = self._set_auto_update_hyperlink(field, dialog, widget, new_feature)
-        return widget
-
-
-    def _manage_hspacer(self, **kwargs):
-        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
-
-        widget = tools_qt.add_horizontal_spacer()
-        return widget
-
-
-    def _manage_vspacer(self, **kwargs):
-        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
-
-        widget = tools_qt.add_verticalspacer()
-        return widget
-
-
-    def _manage_textarea(self, **kwargs):
-        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
-
-        dialog = kwargs['dialog']
-        field = kwargs['field']
-        new_feature = kwargs['new_feature']
-        widget = tools_gw.add_textarea(field)
-        widget = self._set_auto_update_textarea(field, dialog, widget, new_feature)
-        return widget
-
-
-    def _manage_spinbox(self, **kwargs):
-        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
-
-        dialog = kwargs['dialog']
-        field = kwargs['field']
-        new_feature = kwargs['new_feature']
-        widget = tools_gw.add_spinbox(field)
-        widget = self._set_auto_update_spinbox(field, dialog, widget, new_feature)
-        return widget
-
-
-    def _manage_doubleSpinbox(self, **kwargs):
-        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
-
-        dialog = kwargs['dialog']
-        field = kwargs['field']
-        new_feature = kwargs['new_feature']
-        widget = tools_gw.add_spinbox(field)
-        widget = self._set_auto_update_spinbox(field, dialog, widget, new_feature)
-        return widget
-
-    def _manage_list(self, **kwargs):
-        self._manage_tableview(**kwargs)
-
-    def _manage_tableview(self, **kwargs):
-        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
-
-        complet_result = kwargs['complet_result']
-        field = kwargs['field']
-        dialog = kwargs['dialog']
-        module = tools_backend_calls
-        widget = tools_gw.add_tableview(complet_result, field, dialog, module)
-        widget = tools_gw.add_tableview_header(widget, field)
-        widget = tools_gw.fill_tableview_rows(widget, field)
-        widget = tools_gw.set_tablemodel_config(dialog, widget, field['columnname'], 1, True)
-        tools_qt.set_tableview_config(widget)
-        return widget
 
 
     def _open_section_form(self):
@@ -2452,7 +2178,7 @@ class GwInfo(QObject):
         return widget
 
 
-    def _run_settopology(self, widget, **kwargs):
+    def run_settopology(self, widget, **kwargs):
         """ Sets node_1/2 from lineedit & converts widget into button if function run successfully """
 
         dialog = kwargs['dialog']
@@ -2474,7 +2200,7 @@ class GwInfo(QObject):
             widget.deleteLater()
             # Create button with field from kwargs and value from {text}
             kwargs['field']['value'] = f"{text}"
-            new_widget = self._manage_button(**kwargs)
+            new_widget = tools_gw._manage_button(**kwargs)
             if new_widget is None:
                 return
             # Add button to layout
@@ -2852,7 +2578,7 @@ class GwInfo(QObject):
             complet_list, widget_list = self._fill_tbl(complet_result, self.dlg_cf, widgetname, linkedobject, filter_fields)
             if complet_list is False:
                 return False
-            self._set_filter_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname)
+            tools_gw.set_filter_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname, self.feature_id)
         return complet_list
 
 
@@ -3440,7 +3166,6 @@ def save_tbl_changes(complet_list, info):
         extras = f'"fields":{fields}'
         body = tools_gw.create_body(feature=feature, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_setfields', body)
-        print(f"{json_result}")
 
 
 # endregion

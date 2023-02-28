@@ -214,13 +214,13 @@ def get_text(dialog, widget, add_quote=False, return_string_null=True):
         elif type(widget) is QCheckBox:
             value = is_checked(dialog, widget)
             if type(value) is bool:
-                text = str(text)
+                text = str(value)
             else:
                 text = None
 
-        if not text and return_string_null:
+        if text in (None, '') and return_string_null:
             text = "null"
-        elif not text:
+        elif text in (None, ''):
             text = ""
         if add_quote and text != "null":
             text = "'" + text + "'"

@@ -76,7 +76,6 @@ class GwMincut:
 
         self.action = "manage_mincuts"
         self.mincut_tools.set_dialog(dialog)
-        self.mincut_tools.get_mincut_manager()
 
 
     def load_mincut(self, result_mincut_id):
