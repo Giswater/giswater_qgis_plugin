@@ -982,3 +982,244 @@ WHERE a.formname='v_edit_inp_valve' AND a.columnname='valv_type' AND c.columnnam
 (c.formname ILIKE 've_epa_valve' OR c.formname ILIKE 've_epa_virtualvalve');
 
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'node'::text, 'SELECT node_id AS node_id, code AS code FROM v_edit_node'::text) WHERE parameter = 'om_profile_guitartext';
+
+INSERT INTO sys_function
+(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES(3192, 'gw_fct_getmincut_manager', 'ws', 'function', 'json', 'json', 'Get mincut manager values', 'role_om', NULL, 'core');
+
+
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('formtype_typevalue', 'form_mincut', 'form_mincut', 'formMincut', NULL);
+
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('layout_name_typevalue', 'lyt_mincut_mng_1', 'lyt_mincut_mng_1', 'layoutMincutManager1', '{"createAddfield":"TRUE"}'::json);
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('layout_name_typevalue', 'lyt_mincut_mng_2', 'lyt_mincut_mng_2', 'layoutMincutManager2', '{"createAddfield":"TRUE"}'::json);
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('layout_name_typevalue', 'lyt_mincut_mng_3', 'lyt_mincut_mng_3', 'layoutMincutManager3', '{"createAddfield":"TRUE"}'::json);
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mincut_manager', 'form_mincut', 'main', 'cancel', 'lyt_mincut_mng_3', 2, NULL, 'button', NULL, 'Close', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue":false, "text":"Close"}'::json, '{"functionName": "close_mincut_manager", "module":"mincut_tools", "parameters":{}}'::json, NULL, false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mincut_manager', 'form_mincut', 'main', 'cancel_mincut', 'lyt_mincut_mng_1', 12, NULL, 'button', NULL, 'Cancel mincut', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue":false,"text":"Cancel mincut"}'::json, '{"functionName": "cancel_mincut", "module":"mincut_tools", "parameters":{}}'::json, 'tbl_mincut_manager', false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mincut_manager', 'form_mincut', 'main', 'delete', 'lyt_mincut_mng_1', 13, NULL, 'button', NULL, 'Delete', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue":false,"text":"Delete"}'::json, '{"functionName": "delete_mincut", "module":"mincut_tools", "parameters":{}}'::json, 'tbl_mincut_manager', false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mincut_manager', 'form_mincut', 'main', 'hspacer_lyt_bot_3', 'lyt_mincut_mng_3', 1, NULL, 'hspacer', NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mincut_manager', 'form_mincut', 'main', 'hspacer_lyt_top_2', 'lyt_mincut_mng_1', 9, NULL, 'hspacer', NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mincut_manager', 'form_mincut', 'main', 'mincut_id', 'lyt_mincut_mng_1', 1, 'string', 'typeahead', 'Filter by: id OR work_order', NULL, NULL, false, false, true, false, true, 'SELECT id, id::varchar as idval FROM v_ui_mincut ', NULL, NULL, NULL, NULL, NULL, '{"saveValue": false, "filterSign":"ILIKE", "labelPosition":"top"}'::json, '{"functionName": "filter_table_mincut", "parameters":{"columnfind":"id, work_order"}}'::json, 'tbl_mincut_manager', false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mincut_manager', 'form_mincut', 'main', 'mincut_type', 'lyt_mincut_mng_1', 4, 'string', 'combo', 'Type:', NULL, NULL, false, false, true, false, true, 'SELECT id, descript as idval FROM om_mincut_cat_type WHERE id is not null ', true, true, NULL, NULL, NULL, '{"labelPosition": "top", "columnId": 0}'::json, '{"functionName": "filter_table_mincut", "parameters":{}}'::json, 'tbl_mincut_manager', false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mincut_manager', 'form_mincut', 'main', 'next_days', 'lyt_mincut_mng_1', 10, 'boolean', 'check', 'Next days', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"labelPosition": "top","saveValue":false}'::json, '{"functionName": "check_filter_days","module":"mincut_tools", "parameters":{}}'::json, NULL, false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mincut_manager', 'form_mincut', 'main', 'selector_mincut', 'lyt_mincut_mng_1', 2, NULL, 'button', NULL, NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{"icon":"191", "size":"24x24"}'::json, '{"saveValue":false}'::json, '{"functionName": "mincut_selector", "module":"mincut_tools", "parameters":{}}'::json, 'tbl_mincut_manager', false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mincut_manager', 'form_mincut', 'main', 'date_from', 'lyt_mincut_mng_1', 5, 'date', 'datetime', 'From:', NULL, NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"labelPosition": "top", "filterSign":">=", "isEnabled":false}'::json, '{"functionName": "filter_table_mincut", "parameters":{}}'::json, 'tbl_mincut_manager', false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mincut_manager', 'form_mincut', 'main', 'date_to', 'lyt_mincut_mng_1', 6, 'date', 'datetime', 'To:', NULL, NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"labelPosition": "top", "filterSign":"<=", "isEnabled":false}'::json, '{"functionName": "filter_table_mincut", "parameters":{}}'::json, 'tbl_mincut_manager', false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mincut_manager', 'form_mincut', 'main', 'spm_next_days', 'lyt_mincut_mng_1', 11, 'integer', 'spinbox', 'spmdays', NULL, NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "labelPosition":"top", "maxMinValues": {"min":-9999,"max":9999}, "filterSign":"BETWEEN", "filterType": "timestamp", "isEnabled":false}'::json, '{"functionName": "filter_table_mincut", "parameters":{}}'::json, 'tbl_mincut_manager', false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mincut_manager', 'form_mincut', 'main', 'streetaxis', 'lyt_mincut_mng_1', 8, 'string', 'typeahead', 'Streetaxis:', NULL, NULL, false, false, true, false, true, 'SELECT id, streetaxis as idval FROM v_ui_mincut where id is not null ', NULL, NULL, NULL, NULL, NULL, '{"saveValue": false, "filterSign":"=", "labelPosition":"top"}'::json, '{"functionName": "filter_table_mincut", "parameters":{"columnfind":"streetaxis"}}'::json, 'tbl_mincut_manager', false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mincut_manager', 'form_mincut', 'main', 'tbl_mincut_edit', 'lyt_mincut_mng_2', 1, NULL, 'tableview', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue": false}'::json, '{"functionName": "open_mincut", "module":"mincut_tools", "parameters":{}}'::json, 'tbl_mincut_manager', false, 1);
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mincut_manager', 'form_mincut', 'main', 'exploitation', 'lyt_mincut_mng_1', 7, 'string', 'combo', 'Exploitation:', NULL, NULL, false, false, true, false, true, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id > 0 ', false, true, NULL, NULL, NULL, '{"labelPosition": "top", "columnId": 0,  "getIndex": false}'::json, '{"functionName": "filter_table_mincut", "parameters":{}}'::json, 'tbl_mincut_manager', false, NULL);
+
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mincut_manager', 'form_mincut', 'main', 'state', 'lyt_mincut_mng_1', 3, 'string', 'combo', 'State:', NULL, NULL, false, false, true, false, true, 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''mincut_state'' ', true, true, NULL, NULL, NULL, '{"labelPosition": "top", "columnId": 1, "getIndex": false}'::json, '[{"functionName": "filter_table_mincut", "parameters": {}, "isFilter": true}, {"functionName": "combo_tweaks", "module":"mincut_tools", "parameters": {}, "isFilter": false}]'::json, 'tbl_mincut_manager', false, NULL); 
+
+ALTER TABLE config_form_list 
+ADD COLUMN addparam json;
+
+ALTER TABLE config_form_tableview
+ADD COLUMN addparam json;
+
+ALTER TABLE config_form_tableview 
+RENAME COLUMN tablename TO objectname;
+
+UPDATE config_form_tableview
+SET objectname = 'tbl_mincut_manager'
+WHERE objectname = 'v_ui_mincut';
+
+UPDATE config_form_tableview
+SET location_type='om toolbar', project_type='ws', columnindex=14, visible=true, width=NULL, alias=NULL, "style"=NULL, addparam='{
+      "accessorKey": "anl_tstamp",
+ 
+      "filterVariant": "datetime",
+      "filterFn": "greaterThanOrEqualTo",
+      "sortingFn": "datetime",
+      "enableSorting": true,
+      "enableColumnOrdering": true,
+      "enableColumnFilter": true,
+      "enableClickToCopy": false
+    }'::json
+WHERE objectname='tbl_mincut_manager' AND columnname='anl_tstamp';
+UPDATE config_form_tableview
+SET location_type='om toolbar', project_type='ws', columnindex=1, visible=true, width=NULL, alias=NULL, "style"=NULL, addparam='{
+      "accessorKey": "name",
+      "header": "NAME",
+      "enableSorting": true,
+      "enableColumnOrdering": true,
+      "enableColumnFilter": true,
+      "enableClickToCopy": false,
+      "size":50
+    }'::json
+WHERE objectname='tbl_mincut_manager' AND columnname='name';
+UPDATE config_form_tableview
+SET location_type='om toolbar', project_type='ws', columnindex=0, visible=true, width=NULL, alias=NULL, "style"=NULL, addparam='{
+      "accessorKey": "id",
+      "header": "Id",
+      "filterVariant": "text",
+      "enableSorting": true,
+      "enableColumnOrdering": true,
+      "enableColumnFilter": true,
+      "enableClickToCopy": false
+    }'::json
+WHERE objectname='tbl_mincut_manager' AND columnname='id';
+
+
+INSERT INTO config_form_list
+(listname, query_text, device, listtype, listclass, vdefault, addparam)
+VALUES('tbl_mincut_manager', 'SELECT id, name, work_order, state, class, mincut_type, received_date, exploitation, municipality, postcode, streetaxis, postnumber, anl_cause, anl_tstamp, anl_user, anl_descript, anl_feature_id, anl_feature_type, forecast_start, forecast_end, assigned_to, exec_start, exec_end, exec_user, exec_descript, exec_from_plot, exec_depth, exec_appropiate, chlorine, turbidity, notified FROM v_ui_mincut WHERE id IS NOT NULL ', 5, 'tab', 'list', NULL, '{
+    "enableGlobalFilter": false,
+    "enableStickyHeader": true,
+    "positionToolbarAlertBanner": "bottom",
+    "enableGrouping": false,
+    "enablePinning": true,
+    "enableColumnOrdering": true,
+    "enableColumnFilterModes": true,
+    "enableFullScreenToggle": false,
+    "enablePagination": true,
+    "enableExporting": true,
+    "muiTablePaginationProps": {
+      "rowsPerPageOptions": [5, 10, 15, 20, 50, 100],
+      "showFirstButton": true,
+      "showLastButton": true
+    },
+    "enableRowSelection": true,
+    "multipleRowSelection": true,
+    "initialState": {
+      "showColumnFilters": false,
+      "pagination": {
+        "pageSize": 10,
+        "pageIndex": 0
+      },
+      "density": "compact",
+      "columnFilters": [
+      	{
+          "id": "anl_tstamp",
+          "value": "",
+          "range": {
+          	"value": -24,
+          	"timePeriod": "day"
+         	}
+         }
+      ],
+      "sorting": [
+        {
+          "id": "id",
+          "desc": false
+        }
+      ]
+    },
+    "modifyTopToolBar": true,
+    "renderTopToolbarCustomActions": [
+    	{
+    	  "widgetfunction": {
+    	  	"functionName": "selector",
+    	  	"params": {}
+    	  },
+    	  "color": "success",
+    	  "text": "Open Selector",
+    	  "disableOnSelect": false,
+    	  "getAllRows": true
+    	},
+		{
+    	  "widgetfunction": {
+    	  	"functionName": "open",
+    	  	"params": {}
+    	  },
+    	  "color": "success",
+    	  "text": "Open",
+    	  "disableOnSelect": true,
+    	  "moreThanOneDisable": true
+    	},
+    	{
+    	  "widgetfunction": {
+    	  	"functionName": "cancel",
+    	  	"params": {}
+    	  },
+    	  "color": "info",
+    	  "text": "Cancel",
+    	  "disableOnSelect": true
+    	},
+    	{
+    	  "widgetfunction": {
+    	  	"functionName": "delete",
+    	  	"params": {}
+    	  },
+    	  "color": "error",
+    	  "text": "Delete",
+    	  "disableOnSelect": true
+    	}
+    ],
+    "enableRowActions": false,
+    "renderRowActionMenuItems": [
+      {
+        "widgetfunction": {
+    	  	"functionName": "open",
+    	  	"params": {}
+    	  },
+        "icon": "OpenInBrowser",
+        "text": "Open"
+      },
+      {
+        "widgetfunction": {
+    	  	"functionName": "cancel",
+    	  	"params": {}
+    	  },
+        "icon": "Cancel",
+        "text": "Cancel"
+      },
+      {
+        "widgetfunction": {
+    	  	"functionName": "delete",
+    	  	"params": {}
+    	  },
+        "icon": "Delete",
+        "text": "Delete"
+      }
+    ]
+  }'::json);
+
+INSERT INTO config_form_tabs
+(formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby)
+VALUES('selector_mincut', 'tab_mincut', 'Mincut', 'Mincut Selector', 'role_basic', NULL, NULL, 5, 1);
+
+

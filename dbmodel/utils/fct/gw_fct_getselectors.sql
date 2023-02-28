@@ -168,6 +168,9 @@ BEGIN
 		IF v_orderby IS NULL THEN v_orderby = v_pkeyfield; end if;
 		IF v_name IS NULL THEN v_name = v_orderby; end if;
 
+		-- control of manageall
+		v_manageall := COALESCE(v_manageall, FALSE);
+
 		-- profilactic control of selection mode
 		IF v_selectionMode = '' OR v_selectionMode is null then
 			v_selectionMode = 'keepPrevious';
@@ -371,7 +374,6 @@ BEGIN
 
 	-- Check null
 	v_formTabs := COALESCE(v_formTabs, '[]');
-	v_manageall := COALESCE(v_manageall, FALSE);	
 	v_selectionMode = COALESCE(v_selectionMode, '');
 	v_currenttab = COALESCE(v_currenttab, '');
 	v_geometry = COALESCE(v_geometry, '{}');

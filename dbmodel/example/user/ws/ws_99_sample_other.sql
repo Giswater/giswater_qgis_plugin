@@ -352,7 +352,7 @@ UPDATE config_form_fields SET  hidden = true where columnname = 'function_type' 
 UPDATE config_form_fields SET  hidden = true where columnname = 'descript' AND formname LIKE '%_connec_%';
 UPDATE config_form_fields SET  hidden = true where columnname = 'annotation' AND formname LIKE '%_connec_%';
 
-UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='state' AND (formname not in ('v_edit_link','v_edit_dimensions'));
+UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='state' AND (formname not in ('v_edit_link','v_edit_dimensions','mincut_manager'));
 UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='state_type';
 UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='sector_id' AND (formname not in ('v_edit_link','v_edit_dimensions'));
 UPDATE config_form_fields SET layoutname = 'lyt_data_1',layoutorder = 997 where columnname ='hemisphere';

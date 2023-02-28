@@ -108,7 +108,9 @@ v_device integer;
 v_infotype integer;
 v_idname varchar;
 v_column_type varchar;
+v_fields varchar[];
 v_field varchar;
+v_length integer;
 v_value text;
 v_orderby varchar;
 v_ordertype varchar;
@@ -139,6 +141,10 @@ v_pageinfo json;
 v_vdefault text;
 v_listclass text;
 v_sign text;
+v_type text;
+v_logical text;
+v_logicalleft text;
+v_logicalright text;
 v_data json;
 v_default json;
 v_listtype text;
@@ -151,6 +157,13 @@ v_message text;
 v_value_type text;
 v_widgetname text;
 v_pkey json;
+v_table_params json;
+v_headers_list json[];
+v_headers_params json[];
+v_headers_json json;
+v_columnname text;
+v_addparam json;
+v_table_headers text[];
 BEGIN
 
 	-- Set search path to local schema
@@ -195,6 +208,9 @@ BEGIN
 	IF v_tablename IS NULL THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3156", "function":"2592","debug_msg":"tableName"}}$$);'INTO v_audit_result;
+	else
+		execute 'SELECT addparam FROM config_form_list where listname = $1' into v_table_params using v_tablename;
+		raise notice 'v_table_paramse -> %', v_table_params;
 	END IF;
 
 	RAISE NOTICE 'gw_fct_getlist - Init Values: v_tablename %  v_filter_values  % v_filter_feature %', v_tablename, v_filter_values, v_filter_feature;
@@ -304,11 +320,26 @@ BEGIN
 		LOOP
 			-- Get field and value from json
 			SELECT v_text [i] into v_json_field;
-			v_field:= (SELECT (v_json_field ->> 'key')) ;
+			v_fields:= string_to_array((SELECT (v_json_field ->> 'key')), ', ') ;
+			raise notice 'v_fields %', v_fields;
 			v_value:= (SELECT (v_json_field ->> 'value')) ;
-
+			v_length := array_length(v_fields, 1);
+			raise notice 'v_length %', v_length;
+		
+			if (v_length = 1) then
+				v_field:= v_fields [1];
+			end if;
+		
+			raise notice 'v_field %', v_field;
 			-- Getting the sign of the filter
-			IF (SELECT v_value WHERE v_value ILIKE '%'||'filterSign'||'%') IS NOT NULL THEN
+			IF (SELECT v_value WHERE v_value ILIKE '%'||'filterSign'||'%') IS NOT NULL then
+			    -- Getting the type of the filter
+			    IF (SELECT v_value WHERE v_value ILIKE '%'||'filterType'||'%') IS NOT NULL then
+					v_type = v_value::json->>'filterType';
+				else
+					v_type = 'text';
+				END IF;
+
 				v_sign = v_value::json->>'filterSign';
 				v_value = v_value::json->>'value';
 				IF upper(v_sign) IN ('LIKE', 'ILIKE') THEN
@@ -321,26 +352,42 @@ BEGIN
 					v_sign = '=';
 				END IF;
 			END IF;
-			
+		
 			i=i+1;
 
 			raise notice 'v_field % v_value %', v_field, v_value;
-	
 			
+			if v_length = 1 then
+				IF v_value IS NOT NULL AND v_field != 'limit' then
+				-- v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '''||v_value ||'''::text';
+				 	IF upper(v_type) = 'BETWEEN' then
+				 		v_query_result := v_query_result || ' AND '||v_field||'::'||v_type||' '||v_sign||' '||v_value||'::'||v_type||' ';
+				 	else
+				 		v_query_result := v_query_result || ' AND '||v_field||'::'||v_type||' '||v_sign||' '''||v_value||'''::'||v_type||' ';
+				 	end if;
+				ELSIF v_field='limit' THEN
+					v_query_result := v_query_result;
+					v_limit := v_value;
+				END IF;
+			else
+				v_query_result := v_query_result || ' AND (';
+				FOR i IN array_lower(v_fields, 1)..array_upper(v_fields, 1) loop
+					v_logical := 'OR';
+			        if i = 1 then
+			        	v_logical := '';
+			        end if;
+			       	v_query_result := v_query_result || ' '||v_logical||' '||v_fields[i]||'::'||v_type||' '||v_sign||' '''||v_value||'''::'||v_type||' ';
+			    END LOOP;
+				v_query_result := v_query_result || ')';
+			end if;
 			-- creating the query_text
-			IF v_value IS NOT NULL AND v_field != 'limit' THEN
-				v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '''||v_value ||'''::text';
-
-			ELSIF v_field='limit' THEN
-				v_query_result := v_query_result;
-				v_limit := v_value;
-			END IF;
+			
 		END LOOP;
 	END IF;
 	raise notice '00 -> %',v_query_result;
 	-- add feature filter
 	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_feature) a;
-	IF v_text IS NOT NULL THEN
+	IF v_text IS NOT NULL and v_length = 1 THEN
 		FOREACH text IN ARRAY v_text
 		LOOP
 			-- Get field and value from json
@@ -417,6 +464,33 @@ BEGIN
 
 	RAISE NOTICE '--- gw_fct_getlist - List: % ---', v_result_list;
 
+	-- Building headers
+	i = 1;
+  	v_table_headers := array(SELECT json_object_keys(v_result_list->1));
+	SELECT array_agg(row_to_json(merged_cols)) INTO v_headers_list
+		FROM (
+		  SELECT COALESCE(cftv.columnname, t.columnname) AS columnname, cftv.addparam, cftv.visible
+		  FROM unnest(v_table_headers) AS t(columnname)
+		  LEFT JOIN config_form_tableview AS cftv
+		  ON t.columnname = cftv.columnname AND cftv.objectname = v_tablename
+		) AS merged_cols
+		where merged_cols.visible is not false ;
+	IF v_headers_list IS NOT NULL THEN
+		FOREACH text IN ARRAY v_headers_list
+		loop
+			SELECT v_headers_list[i] into v_json_field;
+			v_columnname:= (SELECT (v_json_field ->> 'columnname'));
+			v_addparam:= (SELECT (v_json_field ->> 'addparam'));
+			if v_addparam is not null and (select (v_addparam ->> 'header')) is null then
+				v_addparam := gw_fct_json_object_set_key(v_addparam, 'header', v_columnname);
+			end if;
+			v_headers_params := v_headers_params || coalesce(v_addparam, json_build_object('accessorKey', v_columnname, 'header', v_columnname, 'enableColumnActions', false, 'enableColumnFilter', false, 'columnFilterModeOptions', false));
+			
+			i = i + 1;
+		end loop;
+	end if;
+	v_headers_json = array_to_json (v_headers_params);
+
 	-- building pageinfo
 	v_pageinfo := json_build_object('orderBy',v_orderby, 'orderType', v_ordertype, 'currentPage', v_currentpage, 'lastPage', v_lastpage);
 raise notice 'AAA - % --- %',v_tablename, v_tabname;
@@ -444,8 +518,6 @@ raise notice 'AAA - % --- %',v_tablename, v_tabname;
 						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'value', v_value);
 					END IF;
 				END IF;
-
-				--raise notice 'v_value % v_filter_fields %', v_value, v_filter_fields[i];
 
 				i=i+1;
 
@@ -484,6 +556,8 @@ raise notice 'AAA - % --- %',v_tablename, v_tabname;
 	v_fields_json := COALESCE(v_fields_json, '{}');
 	v_pageinfo := COALESCE(v_pageinfo, '{}');
 	v_pkey := COALESCE(v_pkey, '{}');
+	v_table_params := COALESCE(v_table_params, '{}');
+	v_headers_json := COALESCE(v_headers_json, '{}');
 
 
 	IF v_audit_result is null THEN
@@ -500,7 +574,7 @@ raise notice 'AAA - % --- %',v_tablename, v_tabname;
 
 	-- Return
     RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":'||v_version||
-             ',"body":{"form":{}'||
+             ',"body":{"form":{"table":' || v_table_params ||', "headers":' || v_headers_json|| '}'||
 		     ',"feature":{"featureType":"' || v_featuretype || '","tableName":"' || v_tablename ||'","idName":"'|| v_idname ||'","addparams":'|| v_pkey ||'}'||
 		     ',"data":{"fields":' || v_fields_json ||
 			     ',"pageInfo":' || v_pageinfo ||
