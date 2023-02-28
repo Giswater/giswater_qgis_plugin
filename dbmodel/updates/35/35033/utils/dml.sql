@@ -74,3 +74,11 @@ UPDATE config_form_tabs
 {"actionName":"actionGetParentId", "disabled":false},
 {"actionName":"actionLink",  "disabled":false}]'::json
 	WHERE formname='v_edit_arc' AND device=4;
+
+
+
+INSERT INTO config_typevalue (typevalue,id,idval,camelstyle)
+VALUES ('formtemplate_typevalue','element','element','element');
+
+INSERT INTO config_info_layer (layer_id, is_parent, tableparent_id, is_editable, formtemplate, headertext, orderby, tableparentepa_id, addparam) 
+VALUES('v_edit_element', false, NULL, true, 'element', 'Element', 6, NULL, '{"forceWhenActive":true}'::json);
