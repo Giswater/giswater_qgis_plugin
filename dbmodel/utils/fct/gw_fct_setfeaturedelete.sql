@@ -171,8 +171,13 @@ BEGIN
 			VALUES (152, v_result_id, concat('Delete node: ', v_feature_id));	
 		ELSE 
 			--set final nodes to NULL and delete node
-			EXECUTE'UPDATE arc SET node_1=NULL WHERE node_1='''||v_feature_id||''';';
-			EXECUTE'UPDATE arc SET node_2=NULL WHERE node_2='''||v_feature_id||''';';
+			IF v_project_type = 'WS' THEN
+				EXECUTE'UPDATE arc SET node_1=NULL, nodetype_1=NULL, elevation1=NULL, depth1=NULL, staticpress1 = NULL WHERE node_1='''||v_feature_id||''';';
+				EXECUTE'UPDATE arc SET node_2=NULL, nodetype_2=NULL, elevation2=NULL, depth2=NULL, staticpress2 = NULL WHERE node_2='''||v_feature_id||''';';
+			ELSE
+				EXECUTE'UPDATE arc SET node_1=NULL WHERE node_1='''||v_feature_id||''';';
+				EXECUTE'UPDATE arc SET node_2=NULL WHERE node_2='''||v_feature_id||''';';
+			END IF;
 			EXECUTE 'DELETE FROM node WHERE node_id='''||v_feature_id||''';';
 
 			INSERT INTO audit_check_data (fid, result_id, error_message)
