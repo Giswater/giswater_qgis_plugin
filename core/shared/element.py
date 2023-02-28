@@ -28,6 +28,7 @@ class GwElement:
         self.canvas = global_vars.canvas
         self.snapper_manager = GwSnapManager(self.iface)
         self.vertex_marker = self.snapper_manager.vertex_marker
+        self.dlg_add_element = None
 
 
     def get_element(self, new_element_id=True, feature=None, feature_type=None, selected_object_id=None, list_tabs=None):
@@ -249,6 +250,9 @@ class GwElement:
         tools_gw.open_dialog(self.dlg_add_element, dlg_name='element', hide_config_widgets=True)
         return self.dlg_add_element
 
+
+    def get_element_dialog(self):
+        return self.dlg_add_element
 
     def _update_location_cmb(self):
 
