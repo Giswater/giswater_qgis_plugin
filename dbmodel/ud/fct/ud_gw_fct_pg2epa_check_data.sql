@@ -345,7 +345,7 @@ BEGIN
 	END IF;		
 
 	RAISE NOTICE '15- Manning values for cat_mat_arc';
-	SELECT count(*) INTO v_count FROM cat_mat_arc JOIN v_edit_arc ON matcat_id = id where sys_type !='VARC' AND n is null;
+	SELECT COUNT(DISTINCT cat_mat_arc.*)  INTO v_count FROM cat_mat_arc JOIN v_edit_arc ON matcat_id = id where sys_type !='VARC' AND n is null;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '383', concat('ERROR-383: There is/are ',v_count,

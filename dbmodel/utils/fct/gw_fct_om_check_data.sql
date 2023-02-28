@@ -429,7 +429,7 @@ BEGIN
 		
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-			VALUES (125, 3, '254', concat('ERROR-254: There is/are ',v_count,' with code with NULL values. Please, check your data before continue'),v_count);
+			VALUES (125, 3, '254', concat('ERROR-254: There is/are ',v_count,' features with code with NULL values. Please, check your data before continue'),v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 			VALUES (125, 1, '254', 'INFO: No features (arc, node, connec, gully, element) with NULL values on code found.',v_count);
