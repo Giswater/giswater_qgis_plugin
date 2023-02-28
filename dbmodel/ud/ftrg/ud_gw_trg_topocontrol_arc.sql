@@ -269,22 +269,41 @@ BEGIN
                 -- calculate sys_elev_1 & sys_elev_2 when USE elevation values from arc 
                 IF TG_OP  = 'INSERT' THEN
 
-                    -- sys elev1
-                    IF NEW.custom_elev1 IS NOT NULL THEN
-                        sys_elev1_aux = NEW.custom_elev1;
-                    ELSIF NEW.elev1 IS NOT NULL THEN
-                        sys_elev1_aux = NEW.elev1;
-                    END IF;
+			-- sys elev1
+			IF NEW.custom_elev1 IS NOT NULL THEN
+				sys_elev1_aux = NEW.custom_elev1;
+			ELSIF NEW.elev1 IS NOT NULL THEN
+				sys_elev1_aux = NEW.elev1;
+			END IF;
 
-                    -- sys_elev2
-                    IF NEW.custom_elev2 IS NOT NULL THEN
-                        sys_elev2_aux = NEW.custom_elev2;
-                    ELSIF NEW.elev1 IS NOT NULL THEN
-                        sys_elev2_aux = NEW.elev2;
-                    END IF;
-            
-                    NEW.sys_elev1 := sys_elev1_aux;
-                    NEW.sys_elev2 := sys_elev2_aux;
+			-- sys_elev2
+			IF NEW.custom_elev2 IS NOT NULL THEN
+				sys_elev2_aux = NEW.custom_elev2;
+			ELSIF NEW.elev1 IS NOT NULL THEN
+				sys_elev2_aux = NEW.elev2;
+			END IF;
+		    
+			NEW.sys_elev1 := sys_elev1_aux;
+			NEW.sys_elev2 := sys_elev2_aux;
+
+			NEW.sys_elev1 := sys_elev1_aux;
+			NEW.sys_elev2 := sys_elev2_aux;
+
+			NEW.sys_elev1 := sys_elev1_aux;
+			NEW.sys_elev2 := sys_elev2_aux;
+
+			NEW.sys_elev1 := sys_elev1_aux;
+			NEW.sys_elev2 := sys_elev2_aux;
+
+			-- node columns
+			NEW.nodetype_1 := nodeRecord1.node_type;
+			NEW.nodetype_2 := nodeRecord2.node_type;
+	
+			NEW.node_sys_top_elev_1 := nodeRecord1.sys_top_elev;
+			NEW.node_sys_top_elev_2 := nodeRecord2.sys_top_elev; 
+	
+			NEW.node_sys_elev_1 := nodeRecord1.sys_elev;
+			NEW.node_sys_elev_2 := nodeRecord2.sys_elev;                     
                 
                 ELSIF TG_OP = 'UPDATE' THEN
 
@@ -372,7 +391,18 @@ BEGIN
 
                 -- slope
                 NEW.sys_slope:= (NEW.sys_elev1-NEW.sys_elev2)/sys_length_aux;
-            END IF;
+
+			-- node columns
+			NEW.nodetype_1 := nodeRecord1.node_type;
+			NEW.nodetype_2 := nodeRecord2.node_type;
+
+			NEW.node_sys_top_elev_1 := nodeRecord1.sys_top_elev;
+			NEW.node_sys_top_elev_2 := nodeRecord2.sys_top_elev; 
+
+			NEW.node_sys_elev_1 := nodeRecord1.sys_elev;
+			NEW.node_sys_elev_2 := nodeRecord2.sys_elev;  
+			
+        END IF;
             
         -- Check auto insert end nodes
         ELSIF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NULL) AND v_nodeinsert_arcendpoint THEN
