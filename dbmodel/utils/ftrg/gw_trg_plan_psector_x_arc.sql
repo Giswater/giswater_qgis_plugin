@@ -12,6 +12,7 @@ $BODY$
 DECLARE 
 
 v_stateaux smallint;
+num_connec integer;
 
 BEGIN 
 
@@ -21,6 +22,13 @@ BEGIN
 	IF v_stateaux=1	THEN 
 		NEW.state=0;
 		NEW.doable=false;
+		-- do not allow set arc to obsolete when it has on service connecs
+		SELECT count(connec_id) INTO num_connec FROM connec WHERE arc_id=NEW.arc_id AND state=1 AND connec_id NOT IN 
+		(SELECT connec_id FROM plan_psector_x_connec WHERE psector_id=NEW.psector_id AND state=0);
+		IF num_connec > 0 THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3228", "function":"1130","debug_msg":""}}$$);';
+		END IF;
 	ELSIF v_stateaux=2 THEN
 		IF NEW.state = 0 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
