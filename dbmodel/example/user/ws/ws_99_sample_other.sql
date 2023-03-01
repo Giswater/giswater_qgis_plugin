@@ -33,12 +33,6 @@ INSERT INTO config_graph_inlet VALUES (113952, 2);
 
 UPDATE arc SET pavcat_id = 'Asphalt';
 
-UPDATE plan_psector_x_arc SET psector_id = 2 WHERE arc_id = '20651';
-
-INSERT INTO plan_psector_x_arc VALUES (7, '2065', 2, 0, false, NULL, NULL, true);
-INSERT INTO plan_psector_x_arc VALUES (8, '2085', 1, 0, false, NULL, NULL, true);
-INSERT INTO plan_psector_x_arc VALUES (9, '2086', 1, 0, false, NULL, NULL, true);
-
 INSERT INTO plan_psector_x_node VALUES (2, '1076', 1, 0, false, NULL, NULL, true);
 
 SELECT gw_fct_setlinktonetwork($${
@@ -54,12 +48,16 @@ INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable,
 INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES ('3014', '2065', 2, 0, false, 473, true);
 INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id, active) VALUES ('114463', '20651', 2, 1, true, 474, true);
 
-
-
 SELECT gw_fct_setlinktonetwork($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"id":["114461","114462","114463"]},
 "data":{"feature_type":"CONNEC"}}$$);
+
+UPDATE plan_psector_x_arc SET psector_id = 2 WHERE arc_id = '20651';
+
+INSERT INTO plan_psector_x_arc VALUES (7, '2065', 2, 0, false, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (8, '2085', 1, 0, false, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (9, '2086', 1, 0, false, NULL, NULL, true);
 
 
 INSERT INTO doc VALUES ('Demo document 1', 'OTHER', 'https://github.com/Giswater/docs/blob/master/user/manual_usuario_giswater3.doc', NULL, '2018-03-11 19:40:20.449663', current_user, '2018-03-11 19:40:20.449663');
