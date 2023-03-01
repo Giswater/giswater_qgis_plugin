@@ -2098,8 +2098,9 @@ class GwPsector:
         # Set signals
         tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_arc, 'psector',
                                 'set_to_arc_xyCoordinates_mouse_move_arc')
-        tools_gw.connect_signal(self.emit_point.canvasClicked, partial(self._set_arc_id, idx),
-                                'psector', 'set_to_arc_ep_canvasClicked_set_arc_id')
+        # To activate action pan and not move the canvas accidentally we have to override the canvasReleaseEvent.
+        # The "e" is the QgsMapMouseEvent given by the function
+        self.emit_point.canvasReleaseEvent = lambda e: self._set_arc_id(idx, e.mapPoint(), 1)
 
 
     def _set_arc_id(self, idx, point, event):
