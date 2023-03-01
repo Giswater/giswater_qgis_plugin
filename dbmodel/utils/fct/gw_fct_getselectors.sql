@@ -165,8 +165,8 @@ BEGIN
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 20);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO v_pkeyfield;
-		IF v_orderby IS NULL THEN v_orderby = v_pkeyfield; end if;
-		IF v_name IS NULL THEN v_name = v_orderby; end if;
+		IF v_orderby IS NULL THEN v_orderby = ' row_number() over ()'; end if;
+		IF v_name IS NULL THEN v_name = v_pkeyfield; end if;
 
 		-- control of manageall
 		v_manageall := COALESCE(v_manageall, FALSE);
@@ -298,13 +298,15 @@ BEGIN
 
 		ELSE 
 			v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' ,
+					SELECT *, ',v_orderby,' as orderby FROM
+					(SELECT * FROM
+					(SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' ,
 					 v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
 					FROM ', v_table ,' WHERE ' , v_table_id , ' IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' UNION 
-					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , 
+					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , 
 					v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
 					FROM ', v_table ,' WHERE ' , v_table_id , ' NOT IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ',
-					 v_fullfilter ,' ORDER BY orderby asc) a');
+					 v_fullfilter ,') c ORDER BY name asc) b ORDER BY orderby asc) a');
 		END IF;
 		v_debug_vars := json_build_object('v_table_id', v_table_id, 'v_label', v_label, 'v_orderby', v_orderby, 'v_name', v_name, 'v_selector_id', v_selector_id, 
 						  'v_table', v_table, 'v_selector', v_selector, 'current_user', current_user, 'v_fullfilter', v_fullfilter);
