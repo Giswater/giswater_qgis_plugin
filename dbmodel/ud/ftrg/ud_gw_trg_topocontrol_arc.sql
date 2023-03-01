@@ -269,41 +269,41 @@ BEGIN
                 -- calculate sys_elev_1 & sys_elev_2 when USE elevation values from arc 
                 IF TG_OP  = 'INSERT' THEN
 
-			-- sys elev1
-			IF NEW.custom_elev1 IS NOT NULL THEN
-				sys_elev1_aux = NEW.custom_elev1;
-			ELSIF NEW.elev1 IS NOT NULL THEN
-				sys_elev1_aux = NEW.elev1;
-			END IF;
+					-- sys elev1
+					IF NEW.custom_elev1 IS NOT NULL THEN
+						sys_elev1_aux = NEW.custom_elev1;
+					ELSIF NEW.elev1 IS NOT NULL THEN
+						sys_elev1_aux = NEW.elev1;
+					END IF;
 
-			-- sys_elev2
-			IF NEW.custom_elev2 IS NOT NULL THEN
-				sys_elev2_aux = NEW.custom_elev2;
-			ELSIF NEW.elev1 IS NOT NULL THEN
-				sys_elev2_aux = NEW.elev2;
-			END IF;
-		    
-			NEW.sys_elev1 := sys_elev1_aux;
-			NEW.sys_elev2 := sys_elev2_aux;
+					-- sys_elev2
+					IF NEW.custom_elev2 IS NOT NULL THEN
+						sys_elev2_aux = NEW.custom_elev2;
+					ELSIF NEW.elev1 IS NOT NULL THEN
+						sys_elev2_aux = NEW.elev2;
+					END IF;
+					
+					NEW.sys_elev1 := sys_elev1_aux;
+					NEW.sys_elev2 := sys_elev2_aux;
 
-			NEW.sys_elev1 := sys_elev1_aux;
-			NEW.sys_elev2 := sys_elev2_aux;
+					NEW.sys_elev1 := sys_elev1_aux;
+					NEW.sys_elev2 := sys_elev2_aux;
 
-			NEW.sys_elev1 := sys_elev1_aux;
-			NEW.sys_elev2 := sys_elev2_aux;
+					NEW.sys_elev1 := sys_elev1_aux;
+					NEW.sys_elev2 := sys_elev2_aux;
 
-			NEW.sys_elev1 := sys_elev1_aux;
-			NEW.sys_elev2 := sys_elev2_aux;
+					NEW.sys_elev1 := sys_elev1_aux;
+					NEW.sys_elev2 := sys_elev2_aux;
 
-			-- node columns
-			NEW.nodetype_1 := nodeRecord1.node_type;
-			NEW.nodetype_2 := nodeRecord2.node_type;
-	
-			NEW.node_sys_top_elev_1 := nodeRecord1.sys_top_elev;
-			NEW.node_sys_top_elev_2 := nodeRecord2.sys_top_elev; 
-	
-			NEW.node_sys_elev_1 := nodeRecord1.sys_elev;
-			NEW.node_sys_elev_2 := nodeRecord2.sys_elev;                     
+					-- node columns
+					NEW.nodetype_1 := nodeRecord1.node_type;
+					NEW.nodetype_2 := nodeRecord2.node_type;
+			
+					NEW.node_sys_top_elev_1 := nodeRecord1.sys_top_elev;
+					NEW.node_sys_top_elev_2 := nodeRecord2.sys_top_elev; 
+			
+					NEW.node_sys_elev_1 := nodeRecord1.sys_elev;
+					NEW.node_sys_elev_2 := nodeRecord2.sys_elev;                     
                 
                 ELSIF TG_OP = 'UPDATE' THEN
 
@@ -322,35 +322,61 @@ BEGIN
                         sys_elev2_aux = NEW.elev2;
                     END IF;
 
-                    -- keep depth values when geometry is forced to reverse by custom operation
+                    -- update values when geometry is forced to reverse by custom operation
                     IF  geom_slp_direction_bool IS FALSE AND st_orderingequals(NEW.the_geom, OLD.the_geom) IS FALSE 
-                    AND st_equals(NEW.the_geom, OLD.the_geom) IS TRUE AND v_keepdepthvalues IS NOT FALSE THEN
+                    AND st_equals(NEW.the_geom, OLD.the_geom) IS TRUE
         
-                        -- Depth values for arc
-                        y_aux := NEW.y1;
-                        NEW.y1 := NEW.y2;
-                        NEW.y2 := y_aux;
-                
-                        y_aux := NEW.custom_y1;
-                        NEW.custom_y1 := NEW.custom_y2;
-                        NEW.custom_y2 := y_aux;
-                
-                        y_aux := NEW.elev1;
-                        NEW.elev1 := NEW.elev2;
-                        NEW.elev2 := y_aux;
+						IF v_keepdepthvalues IS NOT FALSE THEN -- change depth values 
+						
+							-- Depth values for arc
+							y_aux := NEW.y1;
+							NEW.y1 := NEW.y2;
+							NEW.y2 := y_aux;
+					
+							y_aux := NEW.custom_y1;
+							NEW.custom_y1 := NEW.custom_y2;
+							NEW.custom_y2 := y_aux;
+					
+							y_aux := NEW.elev1;
+							NEW.elev1 := NEW.elev2;
+							NEW.elev2 := y_aux;
 
-                        y_aux := NEW.custom_elev1;
-                        NEW.custom_elev1 := NEW.custom_elev2;
-                        NEW.custom_elev2 := y_aux;
+							y_aux := NEW.custom_elev1;
+							NEW.custom_elev1 := NEW.custom_elev2;
+							NEW.custom_elev2 := y_aux;
 
-                        y_aux := NEW.sys_elev1;
-                        NEW.sys_elev1 := NEW.sys_elev2;
-                        NEW.sys_elev2 := y_aux;
+							y_aux := NEW.sys_elev1;
+							NEW.sys_elev1 := NEW.sys_elev2;
+							NEW.sys_elev2 := y_aux;
+							
+						END IF;
+						
+						-- node columns
+						NEW.nodetype_1 := nodeRecord2.node_type;
+						NEW.nodetype_2 := nodeRecord1.node_type;
+
+						NEW.node_sys_top_elev_1 := nodeRecord2.sys_top_elev;
+						NEW.node_sys_top_elev_2 := nodeRecord1.sys_top_elev; 
+
+						NEW.node_sys_elev_1 := nodeRecord2.sys_elev;
+						NEW.node_sys_elev_2 := nodeRecord1.sys_elev;  
+						
                     ELSE 
                         NEW.sys_elev1 := sys_elev1_aux;
                         NEW.sys_elev2 := sys_elev2_aux;
+						
+						-- node columns
+						NEW.nodetype_1 := nodeRecord1.node_type;
+						NEW.nodetype_2 := nodeRecord2.node_type;
+
+						NEW.node_sys_top_elev_1 := nodeRecord1.sys_top_elev;
+						NEW.node_sys_top_elev_2 := nodeRecord2.sys_top_elev; 
+
+						NEW.node_sys_elev_1 := nodeRecord1.sys_elev;
+						NEW.node_sys_elev_2 := nodeRecord2.sys_elev;  
                     
                     END IF;
+					
                 END IF;
 
                 -- update values when geometry is forced to reverse by geom_slp_direction_bool variable on true
@@ -386,26 +412,29 @@ BEGIN
                         y_aux := NEW.sys_elev1;	
                         NEW.sys_elev1 := NEW.sys_elev2;
                         NEW.sys_elev2 := y_aux;
+						
+						-- node columns
+						NEW.nodetype_1 := nodeRecord2.node_type;
+						NEW.nodetype_2 := nodeRecord1.node_type;
+
+						NEW.node_sys_top_elev_1 := nodeRecord2.sys_top_elev;
+						NEW.node_sys_top_elev_2 := nodeRecord1.sys_top_elev; 
+
+						NEW.node_sys_elev_1 := nodeRecord2.sys_elev;
+						NEW.node_sys_elev_2 := nodeRecord1.sys_elev;  
+
                     END IF;
+					
                 END IF;
 
                 -- slope
                 NEW.sys_slope:= (NEW.sys_elev1-NEW.sys_elev2)/sys_length_aux;
-
-			-- node columns
-			NEW.nodetype_1 := nodeRecord1.node_type;
-			NEW.nodetype_2 := nodeRecord2.node_type;
-
-			NEW.node_sys_top_elev_1 := nodeRecord1.sys_top_elev;
-			NEW.node_sys_top_elev_2 := nodeRecord2.sys_top_elev; 
-
-			NEW.node_sys_elev_1 := nodeRecord1.sys_elev;
-			NEW.node_sys_elev_2 := nodeRecord2.sys_elev;  
-			
-        END IF;
+				
+			END IF;
             
         -- Check auto insert end nodes
         ELSIF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NULL) AND v_nodeinsert_arcendpoint THEN
+		
             IF TG_OP = 'INSERT' THEN
 
                 -- getting nodecat user's value
@@ -425,6 +454,7 @@ BEGIN
                 -- Update arc
                 NEW.node_1:= nodeRecord1.node_id; 
                 NEW.node_2:= v_node2;
+				
             END IF;
 
         -- Error, no existing nodes
