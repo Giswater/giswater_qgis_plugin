@@ -324,7 +324,7 @@ BEGIN
 
                     -- update values when geometry is forced to reverse by custom operation
                     IF  geom_slp_direction_bool IS FALSE AND st_orderingequals(NEW.the_geom, OLD.the_geom) IS FALSE 
-                    AND st_equals(NEW.the_geom, OLD.the_geom) IS TRUE
+                    AND st_equals(NEW.the_geom, OLD.the_geom) IS TRUE THEN
         
 						IF v_keepdepthvalues IS NOT FALSE THEN -- change depth values 
 						
