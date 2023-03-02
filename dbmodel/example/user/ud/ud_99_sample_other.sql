@@ -27,20 +27,6 @@ INSERT INTO cat_users VALUES ('user4','user4');
 
 INSERT INTO cat_manager (idval, expl_id, username, active) VALUES ('general manager', '{1,2}', concat('{',current_user,'}')::text[], true);
 
-TRUNCATE plan_psector_x_arc;
-INSERT INTO plan_psector_x_arc VALUES (1, '20603', 1, 1, true, NULL, NULL, true);
-INSERT INTO plan_psector_x_arc VALUES (2, '20604', 1, 1, true, NULL, NULL, true);
-INSERT INTO plan_psector_x_arc VALUES (3, '20605', 1, 1, true, NULL, NULL, true);
-INSERT INTO plan_psector_x_arc VALUES (5, '20602', 1, 1, true, NULL, NULL, true);
-INSERT INTO plan_psector_x_arc VALUES (6, '20606', 1, 1, true, NULL, NULL, true);
-INSERT INTO plan_psector_x_arc VALUES (4, '252', 2, 1, true, NULL, NULL, true);
-INSERT INTO plan_psector_x_arc VALUES (7, '251', 2, 1, true, NULL, NULL, true);
-INSERT INTO plan_psector_x_arc VALUES (8, '20608', 2, 0, false, NULL, NULL, true);
-INSERT INTO plan_psector_x_arc VALUES (9, '157', 2, 0, false, NULL, NULL, true);
-INSERT INTO plan_psector_x_arc VALUES (10, '177', 1, 0, false, NULL, NULL, true);
-INSERT INTO plan_psector_x_arc VALUES (11, '178', 1, 0, false, NULL, NULL, true);
-INSERT INTO plan_psector_x_arc VALUES (13, '179', 1, 0, false, NULL, NULL, true);
-INSERT INTO plan_psector_x_arc VALUES (12, '339', 1, 0, false, NULL, NULL, true);
 
 TRUNCATE plan_psector_x_node;
 INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (1, '20599', 1, 1, true, NULL, true);
@@ -71,6 +57,20 @@ INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, l
 INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, link_id, active) VALUES('30053', '179', 1, 0, false, 523, true);
 
 
+TRUNCATE plan_psector_x_arc;
+INSERT INTO plan_psector_x_arc VALUES (1, '20603', 1, 1, true, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (2, '20604', 1, 1, true, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (3, '20605', 1, 1, true, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (5, '20602', 1, 1, true, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (6, '20606', 1, 1, true, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (4, '252', 2, 1, true, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (7, '251', 2, 1, true, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (8, '20608', 2, 0, false, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (9, '157', 2, 0, false, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (10, '177', 1, 0, false, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (11, '178', 1, 0, false, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (13, '179', 1, 0, false, NULL, NULL, true);
+INSERT INTO plan_psector_x_arc VALUES (12, '339', 1, 0, false, NULL, NULL, true);
 
 SELECT setval('SCHEMA_NAME.link_link_id_seq', (SELECT max(link_id) FROM link), true);
 
