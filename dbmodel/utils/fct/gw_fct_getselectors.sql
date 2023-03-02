@@ -246,7 +246,7 @@ BEGIN
 			
 				FOR rec_macro IN EXECUTE v_query LOOP
 
-					IF v_tab.tabname ='tab_macroexploitation_add' and (v_addschema IS NOT NULL THEN
+					IF v_tab.tabname ='tab_macroexploitation_add' and (v_addschema IS NOT NULL) THEN
 						
 						EXECUTE 'SELECT count('||v_zoneid||') as count  FROM '||v_addschema||'.'||v_zonetable||' 
 						WHERE '||v_macroid||'='||rec_macro||' and active IS TRUE group by '||v_macroid||''
