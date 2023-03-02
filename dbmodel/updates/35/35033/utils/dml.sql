@@ -84,4 +84,4 @@ INSERT INTO config_info_layer (layer_id, is_parent, tableparent_id, is_editable,
 VALUES('v_edit_element', false, NULL, true, 'element', 'Element', 6, NULL, '{"forceWhenActive":true}'::json);
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source")
-VALUES(3228, 'It is not possible to insert arc into psector because has operative connecs associated', 'You need to previously insert related connecs into psector', 2, true, 'utils', 'core');
+VALUES(3228, 'It is not possible to insert arc into psector because has operative connects associated', 'You need to previously insert related connects into psector', 2, true, 'utils', 'core');

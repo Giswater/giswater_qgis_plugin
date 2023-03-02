@@ -732,10 +732,6 @@ BEGIN
 							INSERT INTO audit_arc_traceability ("type", arc_id, code, arc_id1, arc_id2, node_id, tstamp, cur_user) 
 							VALUES ('DIVIDE EXISTING ARC WITH PLANNED NODE',  v_arc_id, v_code, rec_aux1.arc_id, rec_aux2.arc_id, v_node_id, now(), current_user);
 
-							-- Insert existig arc (downgraded) to the current alternative
-							INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector, v_arc_id, 0, FALSE) 
-							ON CONFLICT (arc_id, psector_id) DO NOTHING;
-
 							-- insert operative connec's on alternative in order to reconnect (upgrade)
 							INSERT INTO plan_psector_x_connec (psector_id, connec_id, state, doable, arc_id)
 							SELECT v_psector, connec_id, 1, false, null FROM connec WHERE arc_id = v_arc_id AND connec.state=1
@@ -745,7 +741,25 @@ BEGIN
 							INSERT INTO plan_psector_x_connec (psector_id, connec_id, state, doable, link_id, arc_id)
 							SELECT v_psector, connec_id, 0, false, link_id, arc_id FROM connec JOIN link ON feature_id = connec_id WHERE arc_id = v_arc_id AND connec.state=1
 							ON CONFLICT DO NOTHING;
+						
+							IF v_project_type='UD' THEN
+	
+								-- insert operative connec's on alternative in order to reconnect (upgrade)
+								INSERT INTO plan_psector_x_gully (psector_id, gully_id, state, doable, arc_id)
+								SELECT v_psector, gully_id, 1, false, null FROM gully WHERE arc_id = v_arc_id AND gully.state=1
+								ON CONFLICT DO NOTHING;
 
+								-- insert operative gully's on alternative in order to reconnect (donwgrade)
+								INSERT INTO plan_psector_x_gully (psector_id, gully_id, state, doable, link_id, arc_id)
+								SELECT v_psector, gully_id, 0, false, link_id, arc_id FROM gully JOIN link ON feature_id = gully_id WHERE arc_id = v_arc_id AND gully.state=1
+								ON CONFLICT DO NOTHING;
+							
+							END IF;
+						
+							-- Insert existig arc (downgraded) to the current alternative
+							INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector, v_arc_id, 0, FALSE) 
+							ON CONFLICT (arc_id, psector_id) DO NOTHING;
+					
 							-- reconnect operative connec links related to other connects
 							FOR rec_link IN SELECT * FROM link l JOIN plan_psector_x_connec p USING (link_id) WHERE exit_type != 'ARC' AND p.arc_id = v_arc_id AND feature_type  ='CONNEC'
 							LOOP	
@@ -761,16 +775,6 @@ BEGIN
 							END LOOP;
 
 							IF v_project_type='UD' THEN
-
-								-- insert operative connec's on alternative in order to reconnect (upgrade)
-								INSERT INTO plan_psector_x_gully (psector_id, gully_id, state, doable, arc_id)
-								SELECT v_psector, gully_id, 1, false, null FROM gully WHERE arc_id = v_arc_id AND gully.state=1
-								ON CONFLICT DO NOTHING;
-
-								-- insert operative gully's on alternative in order to reconnect (donwgrade)
-								INSERT INTO plan_psector_x_gully (psector_id, gully_id, state, doable, link_id, arc_id)
-								SELECT v_psector, gully_id, 0, false, link_id, arc_id FROM gully JOIN link ON feature_id = gully_id WHERE arc_id = v_arc_id AND gully.state=1
-								ON CONFLICT DO NOTHING;
 
 								-- reconnect operative connec links related to other connects
 								FOR rec_link IN SELECT * FROM link l JOIN plan_psector_x_gully p USING (link_id) WHERE exit_type != 'ARC' AND p.arc_id = v_arc_id AND feature_type  ='GULLY'
