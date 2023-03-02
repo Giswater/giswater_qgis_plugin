@@ -331,7 +331,9 @@ def get_layer_source(layer):
     if 'dbname' in splt_dct:
         splt_dct['db'] = splt_dct['dbname']
     if 'table' in splt_dct:
-        splt_dct['schema'], splt_dct['table'] = splt_dct['table'].split('.')
+        table_parts = splt_dct['table'].split('.')
+        splt_dct['schema'] = table_parts[0]
+        splt_dct['table'] = '.'.join(table_parts[1:])
 
     for key in layer_source.keys():
         layer_source[key] = splt_dct.get(key)
