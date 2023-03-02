@@ -486,7 +486,7 @@ BEGIN
 	IF v_project_type ='UD' THEN
 
 		v_querytext = 'SELECT * FROM man_addfields_value a LEFT JOIN 
-			      (SELECT arc_id as feature_id FROM '||v_edit||'arc UNION SELECT node_id FROM '||v_edit||'node UNION SELECT connec_id FROM '||v_edit||'connec UNION SELECT gully_id FROM '||v_edit||'gully) b USING (feature_id) WHERE b.feature_id IS NULL';
+			      (SELECT arc_id as feature_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec UNION SELECT gully_id FROM gully) b USING (feature_id) WHERE b.feature_id IS NULL';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	
@@ -499,7 +499,7 @@ BEGIN
 		END IF;	
 	ELSIF v_project_type='WS' THEN
 		v_querytext = 'SELECT * FROM man_addfields_value a LEFT JOIN 
-			      (SELECT arc_id as feature_id FROM '||v_edit||'arc UNION SELECT node_id FROM '||v_edit||'node UNION SELECT connec_id FROM '||v_edit||'connec) b USING (feature_id) WHERE b.feature_id IS NULL';
+			      (SELECT arc_id as feature_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec) b USING (feature_id) WHERE b.feature_id IS NULL';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	
