@@ -294,6 +294,7 @@ class GwNonVisual:
 
         # Connect dialog signals
         cmb_curve_type.currentIndexChanged.connect(partial(self._manage_curve_type, self.dialog, curve_type_headers, tbl_curve_value))
+        cmb_curve_type.currentIndexChanged.connect(partial(self._manage_curve_plot, self.dialog, tbl_curve_value, plot_widget))
         tbl_curve_value.cellChanged.connect(partial(self._onCellChanged, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._manage_curve_value, self.dialog, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._manage_curve_plot, self.dialog, tbl_curve_value, plot_widget))
@@ -302,7 +303,7 @@ class GwNonVisual:
 
         # Set initial curve_value table headers
         self._manage_curve_type(self.dialog, curve_type_headers, tbl_curve_value, 0)
-        self._manage_curve_plot(self.dialog, tbl_curve_value, plot_widget, None, None)
+        self._manage_curve_plot(self.dialog, tbl_curve_value, plot_widget)
         # Set scale-to-fit
         tools_qt.set_tableview_config(tbl_curve_value, sectionResizeMode=1, edit_triggers=QTableView.DoubleClicked)
 
@@ -473,11 +474,14 @@ class GwNonVisual:
                 self.valid = (valid, "Invalid curve. Values must go in pairs.")
 
 
-    def _manage_curve_plot(self, dialog, table, plot_widget, row, column):
+    def _manage_curve_plot(self, dialog, table, plot_widget):
         """ Note: row & column parameters are passed by the signal """
 
         # Clear plot
         plot_widget.axes.cla()
+
+        # Check combo type
+        curve_type = tools_qt.get_combo_value(dialog, dialog.cmb_curve_type)
 
         # Read row values
         values = self._read_tbl_values(table)
@@ -514,7 +518,6 @@ class GwNonVisual:
         y_list = [x[1] for x in float_list]  # y_list = [y1, y2, y3]
 
         # Create curve if only one value with curve_type 'PUMP'
-        curve_type = tools_qt.get_combo_value(dialog, dialog.cmb_curve_type)
         if scipy_imported and len(x_list) == 1 and curve_type == 'PUMP':
             # Draw curve with points (0, 1.33y), (x, y), (2x, 0)
             x = x_list[0]
@@ -532,8 +535,22 @@ class GwNonVisual:
             x_list = xnew
             y_list = y_smooth
 
-        # Create and draw plot
-        plot_widget.axes.plot(x_list, y_list, color='indianred')
+        # Manage inverted plot and mirror plot for SHAPE type
+        if curve_type == 'SHAPE':
+
+            # Get inverted points from y_lits
+            y_list_inverted = [-y for y in y_list]
+
+            # Get figure
+            fig = plot_widget.figure
+            # Create inverted plot
+            plot_widget.axes.plot(y_list, x_list, color="blue")
+            # Create mirror plot
+            plot_widget.axes.plot(y_list_inverted, x_list, color="grey")
+        else:
+            plot_widget.axes.plot(x_list, y_list, color='indianred')
+
+        # Draw plot
         plot_widget.draw()
 
 
