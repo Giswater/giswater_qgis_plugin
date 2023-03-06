@@ -13,3 +13,8 @@ CREATE TRIGGER gw_trg_edit_inp_gully
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_inp_gully();
 
+CREATE TRIGGER gw_trg_arc_node_values
+    AFTER INSERT OR UPDATE OF node_1, node_2
+    ON arc
+    FOR EACH ROW
+    EXECUTE FUNCTION gw_trg_arc_node_values();

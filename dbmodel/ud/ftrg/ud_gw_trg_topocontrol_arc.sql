@@ -294,16 +294,7 @@ BEGIN
 
 					NEW.sys_elev1 := sys_elev1_aux;
 					NEW.sys_elev2 := sys_elev2_aux;
-
-					-- node columns
-					NEW.nodetype_1 := nodeRecord1.node_type;
-					NEW.nodetype_2 := nodeRecord2.node_type;
-			
-					NEW.node_sys_top_elev_1 := nodeRecord1.sys_top_elev;
-					NEW.node_sys_top_elev_2 := nodeRecord2.sys_top_elev; 
-			
-					NEW.node_sys_elev_1 := nodeRecord1.sys_elev;
-					NEW.node_sys_elev_2 := nodeRecord2.sys_elev;                     
+               
                 
                 ELSIF TG_OP = 'UPDATE' THEN
 
@@ -350,30 +341,11 @@ BEGIN
 							NEW.sys_elev2 := y_aux;
 							
 						END IF;
-						
-						-- node columns
-						NEW.nodetype_1 := nodeRecord2.node_type;
-						NEW.nodetype_2 := nodeRecord1.node_type;
-
-						NEW.node_sys_top_elev_1 := nodeRecord2.sys_top_elev;
-						NEW.node_sys_top_elev_2 := nodeRecord1.sys_top_elev; 
-
-						NEW.node_sys_elev_1 := nodeRecord2.sys_elev;
-						NEW.node_sys_elev_2 := nodeRecord1.sys_elev;  
-						
+										
                     ELSE 
                         NEW.sys_elev1 := sys_elev1_aux;
                         NEW.sys_elev2 := sys_elev2_aux;
 						
-						-- node columns
-						NEW.nodetype_1 := nodeRecord1.node_type;
-						NEW.nodetype_2 := nodeRecord2.node_type;
-
-						NEW.node_sys_top_elev_1 := nodeRecord1.sys_top_elev;
-						NEW.node_sys_top_elev_2 := nodeRecord2.sys_top_elev; 
-
-						NEW.node_sys_elev_1 := nodeRecord1.sys_elev;
-						NEW.node_sys_elev_2 := nodeRecord2.sys_elev;  
                     
                     END IF;
 					
@@ -412,17 +384,7 @@ BEGIN
                         y_aux := NEW.sys_elev1;	
                         NEW.sys_elev1 := NEW.sys_elev2;
                         NEW.sys_elev2 := y_aux;
-						
-						-- node columns
-						NEW.nodetype_1 := nodeRecord2.node_type;
-						NEW.nodetype_2 := nodeRecord1.node_type;
-
-						NEW.node_sys_top_elev_1 := nodeRecord2.sys_top_elev;
-						NEW.node_sys_top_elev_2 := nodeRecord1.sys_top_elev; 
-
-						NEW.node_sys_elev_1 := nodeRecord2.sys_elev;
-						NEW.node_sys_elev_2 := nodeRecord1.sys_elev;  
-
+	
                     END IF;
 					
                 END IF;
