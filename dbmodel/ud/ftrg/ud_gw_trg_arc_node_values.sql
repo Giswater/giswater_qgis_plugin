@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 3202
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_arc_node_values() RETURNS trigger AS $BODY$
 DECLARE 
@@ -17,7 +17,6 @@ BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
-	
 	UPDATE arc a SET nodetype_1 = node_type, node_sys_top_elev_1 =sys_top_elev,
 	node_sys_elev_1 = sys_elev
 	FROM vu_node

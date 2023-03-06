@@ -85,3 +85,13 @@ VALUES('v_edit_element', false, NULL, true, 'element', 'Element', 6, NULL, '{"fo
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source")
 VALUES(3228, 'It is not possible to insert arc into psector because has operative connects associated', 'You need to previously insert related connects into psector', 2, true, 'utils', 'core');
+
+INSERT INTO sys_param_user VALUES('edit_plan_order_control', 'dynamic', 'To manage if plan order control is executed or not. On some automatic processes is set to FALSE, on manual process is TRUE', 'role_edit', NULL, NULL, NULL, NULL, true, NULL, 'utils', false, NULL, NULL, NULL, false, 'boolean', NULL, true, NULL, 'true', NULL, NULL, NULL, NULL, NULL, NULL, 'core');
+
+INSERT INTO sys_function
+(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES(3200, 'gw_trg_arc_node_values', 'ws', 'function trigger', NULL, NULL, 'Trigger that updates arc node related values such as type, elevation, depth', 'role_edit', NULL, 'core');
+
+INSERT INTO sys_function
+(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES(3202, 'gw_trg_arc_node_values', 'ud', 'function trigger', NULL, NULL, 'Trigger that updates arc node related values such as type, elevation, depth', 'role_edit', NULL, 'core');
