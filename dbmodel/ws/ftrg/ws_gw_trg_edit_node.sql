@@ -831,11 +831,12 @@
 			END IF;
 			
 
-			v_new_node_type= (SELECT system_id FROM cat_feature JOIN cat_node ON cat_feature.id=nodetype_id where cat_node.id=NEW.nodecat_id);
+			
 		  IF (NEW.nodecat_id != OLD.nodecat_id) THEN
 
 			-- man tables
 			v_old_node_type= (SELECT system_id FROM cat_feature JOIN cat_node ON cat_feature.id=nodetype_id where cat_node.id=OLD.nodecat_id);
+			v_new_node_type= (SELECT system_id FROM cat_feature JOIN cat_node ON cat_feature.id=nodetype_id where cat_node.id=NEW.nodecat_id);
 			-- Man and epa epa tables when parent is used
 				IF v_man_table='parent' THEN
 					IF v_new_node_type != v_old_node_type THEN
@@ -1000,6 +1001,8 @@
 				END LOOP;
 			END IF;
 			
+			v_new_node_type= (SELECT nodetype_id FROM  cat_node where cat_node.id=NEW.nodecat_id);
+
 			UPDATE arc SET nodetype_1 = v_new_node_type, elevation1=NEW.elevation, depth1=NEW.depth, staticpress1 = NEW.staticpressure WHERE node_1 = NEW.node_id;
 			UPDATE arc SET nodetype_2 = v_new_node_type, elevation2=NEW.elevation, depth2=NEW.depth, staticpress2 = NEW.staticpressure WHERE node_2 = NEW.node_id;
 			
