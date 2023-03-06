@@ -203,9 +203,13 @@ BEGIN
 						UPDATE plan_psector_x_arc SET doable=FALSE, addparam='{"nodeReplace":"generated"}' 
 						WHERE arc_id=v_arcrecordtb.arc_id AND psector_id=v_psector_id;
 
-						-- insert old arc on the alternative							
+						-- insert old arc on the alternative
+						UPDATE config_param_user SET value='false' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
+					
 						INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable,addparam)
 						VALUES (v_psector_id, v_arc.arc_id, 0, FALSE, '{"nodeReplace":"deprecated"}') ON CONFLICT (psector_id, arc_id) DO NOTHING;
+					
+						UPDATE config_param_user SET value='true' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
 
 						-- update parent on node is not enabled
 						
