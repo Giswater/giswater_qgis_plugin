@@ -242,15 +242,6 @@ BEGIN
                 -- Update arc
                 NEW.node_1:= nodeRecord1.node_id; 
                 NEW.node_2:= v_node2;
-
-                SELECT nodetype_id INTO NEW.nodetype_1 FROM node JOIN cat_node on nodecat_id = id WHERE node_id=NEW.node_1;
-                SELECT nodetype_id INTO NEW.nodetype_2 FROM node JOIN cat_node on nodecat_id = id WHERE node_id=NEW.node_2;
-                NEW.elevation1:= nodeRecord1.elevation;
-                NEW.elevation2:= nodeRecord2.elevation;
-                NEW.depth1:= nodeRecord1.depth;
-                NEW.depth2:= nodeRecord2.depth;
-                NEW.staticpress1:= nodeRecord1.staticpressure;
-                NEW.staticpress2:= nodeRecord2.staticpressure;
             END IF;
             
         --Error, no existing nodes
