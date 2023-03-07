@@ -34,9 +34,9 @@ BEGIN
 	END IF;
 	
 	--getting original values
-	SELECT arc_id,y1,y2,arc.arc_type, arccat_id, CASE WHEN arc.matcat_id IS NOT NULL THEN arc.matcat_id ELSE cat_arc.matcat_id END AS matcat_id , 
-	annotation, observ, shape, geom1, geom2, the_geom, expl_id INTO rec_arc 
-	FROM arc JOIN cat_arc ON cat_arc.id=arc.arccat_id WHERE arc_id=NEW.arc_id;
+	SELECT arc_id,y1,y2,arc_type, arccat_id, matcat_id, 
+	annotation, observ, cat_shape, cat_geom1, cat_geom2, the_geom, expl_id INTO rec_arc 
+	FROM vu_arc WHERE arc_id=NEW.arc_id;
 	
 	IF NEW.field_checked=TRUE THEN				
 
