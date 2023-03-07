@@ -444,11 +444,11 @@ BEGIN
 							INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable, link_id) 
 							SELECT v_psector_id, gully_id, arc_id, 0, false, link_id FROM gully c JOIN link l ON gully_id = feature_id 
 							WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND c.state = 1 and l.state = 1
-							ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
+							ON CONFLICT (psector_id, gully_id, state) DO NOTHING;
 
 							INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable) 
 							SELECT v_psector_id, gully_id, arc_id, 1, false FROM gully c WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND state = 1
-							ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
+							ON CONFLICT (psector_id, gully_id, state) DO NOTHING;
 							
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
 							VALUES (214, 1, concat('Reconnect operative ',v_count,' gullies.'));
