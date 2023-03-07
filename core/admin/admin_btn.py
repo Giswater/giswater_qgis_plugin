@@ -288,7 +288,7 @@ class GwAdminButton:
 
         self.schema_name = schema_name
 
-        result = tools_gw.execute_procedure('gw_fct_admin_reset_sequences', self.schema_name, commit=False)
+        result = tools_gw.execute_procedure('gw_fct_admin_reset_sequences', schema_name=self.schema_name, commit=False)
         if result is None or ('status' in result and result['status'] == 'Failed'):
             self.error_count = self.error_count + 1
 
