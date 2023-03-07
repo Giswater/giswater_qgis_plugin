@@ -401,7 +401,7 @@ BEGIN
 				
 				ELSIF v_psector_id IS NOT NULL THEN
 				
-					UPDATE arc SET state = 2 WHERE arc_id = v_new_record.arc_id;
+					UPDATE arc SET state = 2, state_type = v_state_type WHERE arc_id = v_new_record.arc_id;
 				
 					INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable) VALUES (v_new_record.arc_id, v_psector_id, 1, false) ON CONFLICT (arc_id, psector_id) DO NOTHING;
 
