@@ -33,8 +33,8 @@ BEGIN
 	END IF;
 	
 	--getting original values
-	SELECT node_id, top_elev, ymax, node.node_type, nodecat_id, node.matcat_id, annotation, observ, expl_id, the_geom INTO rec_node 
-	FROM node JOIN cat_node ON id=node.nodecat_id WHERE node_id=NEW.node_id;
+	SELECT node_id, top_elev, ymax, node_type, nodecat_id, matcat_id, annotation, observ, expl_id, the_geom INTO rec_node 
+	FROM vu_node WHERE node_id=NEW.node_id;
 	
 	SELECT node_id, step_pp, step_fe,step_replace, cover INTO rec_manhole
 	FROM man_manhole WHERE node_id=NEW.node_id;
