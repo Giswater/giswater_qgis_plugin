@@ -33,7 +33,7 @@ v_matfromcat boolean = false;
 v_force_delete boolean;
 v_autoupdate_fluid boolean;
 v_psector integer;
-
+v_auto_sander boolean;
 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -51,7 +51,9 @@ BEGIN
 	v_edit_enable_arc_nodes_update = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_arc_enable nodes_update');
 	v_autoupdate_fluid = (SELECT value::boolean FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid');
 	v_psector = (SELECT value::integer FROM config_param_user WHERE "parameter"='plan_psector_vdefault' AND cur_user=current_user);
-		
+	
+	SELECT value::boolean into v_auto_sander FROM config_param_system WHERE parameter='edit_node_automatic_sander';
+
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 		-- transforming streetaxis name into id
 		v_streetaxis = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname LIMIT 1);
@@ -454,7 +456,11 @@ BEGIN
 		EXECUTE v_sql;				
 		
 		END IF;
-						
+
+		--sander calculation
+		IF v_auto_sander IS TRUE THEN
+			EXECUTE 'SELECT gw_fct_calculate_sander($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":"'||NEW.node_1||'"}}$$)';
+		END IF;				
 							
 		-- EPA INSERT
 		IF (NEW.epa_type = 'CONDUIT') THEN 
@@ -678,6 +684,11 @@ BEGIN
 			UPDATE man_varc SET arc_id=NEW.arc_id
 			WHERE arc_id=OLD.arc_id;
 			
+		END IF;
+
+		--sander calculation
+		IF (NEW.y1 <> OLD.y2) AND v_auto_sander IS TRUE THEN
+			EXECUTE 'SELECT gw_fct_calculate_sander($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":"'||NEW.node_1||'"}}$$)';
 		END IF;
 
 		-- custom addfields 

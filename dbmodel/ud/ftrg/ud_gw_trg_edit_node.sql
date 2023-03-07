@@ -67,6 +67,7 @@ v_gully_efficiency float;
 -- automatic_man2inp_values
 v_man_view text;
 v_input json;
+v_auto_sander boolean;
 
 BEGIN
 
@@ -85,6 +86,7 @@ BEGIN
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 
+	SELECT value::boolean into v_auto_sander FROM config_param_system WHERE parameter='edit_node_automatic_sander';
 
 	-- get user variables
 	v_gully_outlet_type = (SELECT value FROM config_param_user WHERE parameter = 'epa_gully_outlet_type_vdefault' AND cur_user = current_user);
@@ -631,6 +633,11 @@ BEGIN
 			EXECUTE v_sql;
 		END IF;
 
+		--sander calculation
+		IF (v_man_table='man_chamber' OR  v_man_table='man_manhole' OR  v_man_table='man_wjump') AND v_auto_sander IS TRUE THEN
+			EXECUTE 'SELECT gw_fct_calculate_sander($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":"'||NEW.node_id||'"}}$$)';
+		END IF;
+
 		-- man addfields insert
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM sys_addfields
@@ -895,6 +902,11 @@ BEGIN
 		ELSIF v_man_table ='man_netelement' THEN
 			UPDATE man_netelement SET serial_number=NEW.serial_number
 			WHERE node_id=OLD.node_id;
+		END IF;
+
+		--sander calculation
+		IF (v_man_table='man_chamber' OR  v_man_table='man_manhole' OR  v_man_table='man_wjump') AND (NEW.ymax <> OLD.ymax) AND v_auto_sander IS TRUE THEN
+			EXECUTE 'SELECT gw_fct_calculate_sander($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":"'||NEW.node_id||'"}}$$)';
 		END IF;
 
 		-- man addfields update
