@@ -385,7 +385,8 @@ class GwAdminButton:
         if status:
             status = self.execute_last_process(schema_name=schema_name, locale=True)
         if status:
-            status = self.execute_reset_sequences(schema_name=schema_name)
+            self.execute_reset_sequences(schema_name=schema_name)
+
         self.task1.setProgress(100)
 
         if update_changelog is False:
