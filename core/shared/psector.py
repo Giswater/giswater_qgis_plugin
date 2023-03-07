@@ -2178,21 +2178,10 @@ class GwPsector:
 
         the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {global_vars.data_epsg})"
 
-        for row in selected_rows:
-            sql = ""
-            if idx == 1:
-                sql += (f"INSERT INTO temp_table (fid, geom_point) VALUES (485, {the_geom});\n")
-
-            row_id = self.qtbl_connec.model().record(row.row()).value("id")
-
-            sql += (f"UPDATE {self.tablename_psector_x_connec} SET arc_id = "
-                  f"'{self.arc_id}' WHERE id = '{row_id}'")
-
-            tools_db.execute_sql(sql)
-
-        filter_ = "psector_id = '" + str(self.psector_id.text()) + "'"
-        self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec,
-                        set_edit_triggers=QTableView.DoubleClicked, expr=filter_)
+        if tab_idx == 2:
+            self._update_tbl_relations(selected_rows, idx, the_geom, self.qtbl_connec, "id", self.tablename_psector_x_connec, self.arc_id, self.qtbl_connec)
+        elif tab_idx == 3:
+            self._update_tbl_relations(selected_rows, idx, the_geom, self.qtbl_gully, "id", self.tablename_psector_x_gully, self.arc_id, self.qtbl_gully)
 
         # Force a map refresh
         tools_qgis.force_refresh_map_canvas()
@@ -2201,6 +2190,23 @@ class GwPsector:
         tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
         tools_gw.set_model_signals(self)
 
+
+    def _update_tbl_relations(self, selected_rows, idx, the_geom, table_name, id_column, tablename_psector_x_connec, arc_id, qtbl):
+        for row in selected_rows:
+            sql = ""
+            if idx == 1:
+                sql += (f"INSERT INTO temp_table (fid, geom_point) VALUES (485, {the_geom});\n")
+
+            row_id = qtbl.model().record(row.row()).value(id_column)
+
+            sql += (f"UPDATE {tablename_psector_x_connec} SET arc_id = "
+                    f"'{arc_id}' WHERE id = '{row_id}'")
+
+            tools_db.execute_sql(sql)
+
+        filter_ = "psector_id = '" + str(self.psector_id.text()) + "'"
+        self.fill_table(self.dlg_plan_psector, table_name, tablename_psector_x_connec,
+                        set_edit_triggers=QTableView.DoubleClicked, expr=filter_)
 
     def _replace_arc(self):
 
