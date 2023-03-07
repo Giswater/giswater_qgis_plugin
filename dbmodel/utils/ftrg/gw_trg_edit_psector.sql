@@ -124,20 +124,20 @@ BEGIN
 		IF (OLD.status != NEW.status) AND (NEW.status = 4) THEN
 
 			--make a copy of the psector to mantain traceability
-			EXECUTE 'SELECT ws_531.gw_fct_psector_duplicate($${
+			EXECUTE 'SELECT SCHEMA_NAME.gw_fct_psector_duplicate($${
 			"client":{"device":4, "infoType":1, "lang":"ES"},
 			"form":{},"feature":{"type":"PSECTOR"},
 			"data":{"psector_id":"'||OLD.psector_id||'","new_psector_name":"temporal_psector"}}$$);';
 
 			SELECT value::integer INTO v_statetype_obsolete FROM config_param_user WHERE parameter='edit_statetype_0_vdefault' AND cur_user=current_user;
 			IF v_statetype_obsolete IS NULL THEN
-			        EXECUTE 'SELECT ws_531.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			        EXECUTE 'SELECT SCHEMA_NAME.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3134", "function":"2446","debug_msg":null}}$$);';
 			END IF;
 			
 			SELECT value::integer INTO v_statetype_onservice FROM config_param_user WHERE parameter='edit_statetype_1_vdefault' AND cur_user=current_user;
 			IF v_statetype_onservice IS NULL THEN
-			        EXECUTE 'SELECT ws_531.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			        EXECUTE 'SELECT SCHEMA_NAME.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3136", "function":"2446","debug_msg":null}}$$);';
 			END IF;
 			

@@ -112,10 +112,14 @@ BEGIN
 	SELECT string_agg(arc_id,',') INTO v_feature_list FROM plan_psector_x_arc  WHERE psector_id=v_old_psector_id AND (state=0 OR (state=1 and doable = false));
 
 	IF v_feature_list IS NOT NULL THEN
+		UPDATE config_param_user SET value='false' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
+	
 		PERFORM setval('SCHEMA_NAME.plan_psector_x_arc_id_seq', (select max(id) from plan_psector_x_arc) , true);
 		INSERT INTO plan_psector_x_arc(arc_id, psector_id, state, doable, descript, addparam) 
 		SELECT arc_id, v_new_psector_id, state, doable, descript, addparam FROM plan_psector_x_arc 
 		WHERE psector_id=v_old_psector_id AND (state=0 OR (state=1 and doable = false));
+	
+		UPDATE config_param_user SET value='true' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
 
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied arcs with state 0: ', v_feature_list ));
 	END IF;
