@@ -127,8 +127,8 @@ BEGIN
 		IF v_count = 2 THEN
 		
 			-- Get both arc features
-			SELECT * INTO v_record1 FROM arc WHERE node_1 = v_node_id OR node_2 = v_node_id ORDER BY arc_id DESC LIMIT 1;
-			SELECT * INTO v_record2 FROM arc WHERE node_1 = v_node_id OR node_2 = v_node_id ORDER BY arc_id ASC LIMIT 1;
+			SELECT * INTO v_record1 FROM arc WHERE (node_1 = v_node_id OR node_2 = v_node_id) AND state > 0 ORDER BY arc_id DESC LIMIT 1;
+			SELECT * INTO v_record2 FROM arc WHERE (node_1 = v_node_id OR node_2 = v_node_id) AND state > 0 ORDER BY arc_id ASC LIMIT 1;
 
 			-- get states
 			SELECT state INTO v_state_node FROM node WHERE node_id = v_node_id;
@@ -140,7 +140,6 @@ BEGIN
 			-- Compare arcs
 			IF v_record1.arccat_id = v_record2.arccat_id AND v_record1.sector_id = v_record2.sector_id AND
 			   v_record1.expl_id = v_record2.expl_id THEN
-			   
 
 				-- Final geometry
 				IF v_record1.node_1 = v_node_id THEN
@@ -170,6 +169,15 @@ BEGIN
 				v_new_record.node_1 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_StartPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
 				v_new_record.node_2 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
 				v_new_record.arc_id := (SELECT nextval('urn_id_seq'));
+
+				IF v_project_type = 'UD' THEN
+
+					v_new_record.y1 := (SELECT y1 FROM arc WHERE node_2 = v_node_id AND arc_id IN ( v_record1.arc_id, v_record2.arc_id));
+					v_new_record.custom_y1 := (SELECT custom_y1 FROM arc WHERE node_2 = v_node_id AND arc_id IN ( v_record1.arc_id, v_record2.arc_id));
+					v_new_record.y2 := (SELECT y2 FROM arc WHERE node_1 = v_node_id AND arc_id IN ( v_record1.arc_id, v_record2.arc_id));
+					v_new_record.custom_y2 := (SELECT custom_y2 FROM arc WHERE node_1 = v_node_id AND arc_id IN ( v_record1.arc_id, v_record2.arc_id));
+			
+				END IF;
 
 				-- get man and epa tables
 				IF v_project_type = 'UD' THEN
