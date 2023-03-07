@@ -625,3 +625,74 @@ AS SELECT DISTINCT ON (rpt_cat_result.result_id) rpt_cat_result.result_id,
 create or replace view v_link as 
 select distinct on (link_id) * from vu_link
 JOIN v_state_link USING (link_id);
+
+
+
+CREATE OR REPLACE VIEW v_edit_review_audit_arc
+ AS
+ SELECT review_audit_arc.id,
+    review_audit_arc.arc_id,
+    review_audit_arc.old_arccat_id,
+    review_audit_arc.new_arccat_id,
+    review_audit_arc.old_annotation,
+    review_audit_arc.new_annotation,
+    review_audit_arc.old_observ,
+    review_audit_arc.new_observ,
+    review_audit_arc.review_obs,
+    review_audit_arc.expl_id,
+    review_audit_arc.the_geom,
+    review_audit_arc.review_status_id,
+    review_audit_arc.field_date,
+    review_audit_arc.field_user,
+    review_audit_arc.is_validated
+   FROM review_audit_arc,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_audit_arc.expl_id = selector_expl.expl_id AND review_audit_arc.review_status_id <> 0 AND is_validated IS NULL;
+
+
+CREATE OR REPLACE VIEW v_edit_review_audit_connec
+ AS
+ SELECT review_audit_connec.id,
+    review_audit_connec.connec_id,
+    review_audit_connec.old_connecat_id,
+    review_audit_connec.new_connecat_id,
+    review_audit_connec.old_annotation,
+    review_audit_connec.new_annotation,
+    review_audit_connec.old_observ,
+    review_audit_connec.new_observ,
+    review_audit_connec.review_obs,
+    review_audit_connec.expl_id,
+    review_audit_connec.the_geom,
+    review_audit_connec.review_status_id,
+    review_audit_connec.field_date,
+    review_audit_connec.field_user,
+    review_audit_connec.is_validated
+   FROM review_audit_connec,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_audit_connec.expl_id = selector_expl.expl_id AND review_audit_connec.review_status_id <> 0 AND is_validated IS NULL;
+
+
+CREATE OR REPLACE VIEW v_edit_review_audit_node
+ AS
+ SELECT review_audit_node.id,
+    review_audit_node.node_id,
+    review_audit_node.old_elevation,
+    review_audit_node.new_elevation,
+    review_audit_node.old_depth,
+    review_audit_node.new_depth,
+    review_audit_node.old_nodecat_id,
+    review_audit_node.new_nodecat_id,
+    review_audit_node.old_annotation,
+    review_audit_node.new_annotation,
+    review_audit_node.old_observ,
+    review_audit_node.new_observ,
+    review_audit_node.review_obs,
+    review_audit_node.expl_id,
+    review_audit_node.the_geom,
+    review_audit_node.review_status_id,
+    review_audit_node.field_date,
+    review_audit_node.field_user,
+    review_audit_node.is_validated
+   FROM review_audit_node,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_audit_node.expl_id = selector_expl.expl_id AND review_audit_node.review_status_id <> 0 AND is_validated IS NULL;
