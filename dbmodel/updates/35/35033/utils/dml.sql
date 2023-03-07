@@ -95,3 +95,6 @@ VALUES(3200, 'gw_trg_arc_node_values', 'ws', 'function trigger', NULL, NULL, 'Tr
 INSERT INTO sys_function
 (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES(3202, 'gw_trg_arc_node_values', 'ud', 'function trigger', NULL, NULL, 'Trigger that updates arc node related values such as type, elevation, depth', 'role_edit', NULL, 'core');
+
+INSERT INTO edit_typevalue (typevalue, id, idval)
+VALUES ('value_review_status', 4, 'Only review observations') ON CONFLICT  (typevalue, id) DO NOTHING;
