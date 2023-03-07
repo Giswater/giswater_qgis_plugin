@@ -5,3 +5,4 @@
 - New function on toolbox to capture address values from closest street number (3198)
 - New table node_border_sector, that stores relation between node and it''s additional sectors.
 - Rename trigger gw_trg_node_border to  gw_trg_feature_border as it configures nodes and arcs that are located on the border between mapzones
+- Add new review status - only review observations added, no data modifications
