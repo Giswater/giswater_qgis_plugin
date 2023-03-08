@@ -416,8 +416,7 @@ BEGIN
 	-- Return
 	v_return = concat('{"client":',(p_data ->> 'client'),', "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, "feature":{}, 
 	"data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":',v_action,', 
-	"selectorType":"',v_selectortype,'", "addSchema":"', v_addschema,'",
-	"layers":',COALESCE(((p_data ->> 'data')::json->> 'layers'), '{}'),'}}');
+	"selectorType":"',v_selectortype,'", "addSchema":"', v_addschema,'"}}');
 	RETURN gw_fct_getselectors(v_return);
 
 		

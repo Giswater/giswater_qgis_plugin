@@ -77,11 +77,6 @@ v_macroselector text;
 v_cur_user text;
 v_prev_cur_user text;
 v_device integer;
-v_layers text;
-v_layer text;
-v_rec record;
-v_columns json;
-v_layerColumns json;
 v_loadProject boolean=false;
 v_addschema text;
 BEGIN
@@ -352,16 +347,6 @@ BEGIN
 
 	-- Manage QWC
 	IF v_device = 5 THEN
-		-- Get columns for layers
-		v_layers := (p_data ->> 'data')::json->> 'layers';
-		v_layerColumns = '{}';
-		FOR v_rec IN SELECT json_array_elements(v_layers::json)
-		LOOP
-			v_layer = replace(replace(replace(v_rec::text, '"', ''), '(', ''), ')', '');
-			SELECT json_agg(column_name) INTO v_columns FROM information_schema.columns WHERE table_schema = 'SCHEMA_NAME' AND table_name = v_layer;
-			v_layerColumns := gw_fct_json_object_set_key(v_layerColumns, v_layer, v_columns);
-		END LOOP;
-	
 		-- Get active exploitations geometry (to zoom on them)
 		IF v_loadProject IS TRUE AND v_geometry IS NULL THEN
 			SELECT row_to_json (a) 
@@ -380,7 +365,6 @@ BEGIN
 	v_currenttab = COALESCE(v_currenttab, '');
 	v_geometry = COALESCE(v_geometry, '{}');
 	v_stylesheet := COALESCE(v_stylesheet, '{}');
-	v_layerColumns = COALESCE(v_layerColumns, '{}');
 	
 	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 	
@@ -404,7 +388,7 @@ BEGIN
 			',"body":{"message":'||v_message||
 			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_currenttab||'", "formText":"", "formTabs":'||v_formTabs||', "style": '||v_stylesheet||'}'||
 			',"feature":{}'||
-			',"data":{"userValues":'||v_uservalues||',"geometry":'||v_geometry||',"layerColumns":'||v_layerColumns||'}'||
+			',"data":{"userValues":'||v_uservalues||',"geometry":'||v_geometry||'}'||
 			'}'||
 		    '}')::json,2796, null, null, v_action::json);
 	END IF;
