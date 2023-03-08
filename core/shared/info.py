@@ -246,6 +246,13 @@ class GwInfo(QObject):
                 dlg_add_visit = manage_visit.get_visit_dialog()
                 dlg_add_visit.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
 
+            elif template == 'element':
+                element_id = self.complet_result['body']['feature']['id']
+                manage_element = GwElement()
+                manage_element.get_element(new_element_id=False, selected_object_id=element_id)
+                dlg_add_element = manage_element.get_element_dialog()
+                dlg_add_element.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
+
             else:
                 tools_log.log_warning(f"template not managed: {template}")
                 return False, None
@@ -2894,7 +2901,8 @@ class GwInfo(QObject):
         """ Execute action of button 33 """
 
         elem = GwElement()
-        elem.get_element(False, feature, self.feature_type)
+        new_element = element_id is None
+        elem.get_element(new_element, feature, self.feature_type)
         elem.dlg_add_element.accepted.connect(partial(self._manage_element_new, dialog, elem))
         elem.dlg_add_element.rejected.connect(partial(self._manage_element_new, dialog, elem))
 
@@ -4331,8 +4339,9 @@ class GwInfo(QObject):
                 widget = dialog.findChild(QWidget, f"{options[option][1]}")
                 widget.setFocus()
                 tools_qt.set_widget_text(dialog, widget, str(feat_id))
-                # Insert result into self.my_json regardless of widget editing
-                self.my_json[f"{option}_id"] = f"{feat_id}"
+                if action == self.action_get_arc_id:
+                    # Insert result into self.my_json regardless of widget editing
+                    self.my_json[f"{option}_id"] = f"{feat_id}"
             elif option == 'set_to_arc':
                 # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
                 #       def _set_to_arc(self, feat_id, child_type)

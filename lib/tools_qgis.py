@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import configparser
+import re
 from functools import partial
 
 import console
@@ -330,7 +331,9 @@ def get_layer_source(layer):
     if 'dbname' in splt_dct:
         splt_dct['db'] = splt_dct['dbname']
     if 'table' in splt_dct:
-        splt_dct['schema'], splt_dct['table'] = splt_dct['table'].split('.')
+        table_parts = splt_dct['table'].split('.')
+        splt_dct['schema'] = table_parts[0]
+        splt_dct['table'] = '.'.join(table_parts[1:])
 
     for key in layer_source.keys():
         layer_source[key] = splt_dct.get(key)
@@ -581,21 +584,16 @@ def get_max_rectangle_from_coords(list_coord):
 
     coords = list_coord.group(1)
     polygon = coords.split(',')
-    x, y = polygon[0].split(' ')
-    min_x = x  # start with something much higher than expected min
-    min_y = y
-    max_x = x  # start with something much lower than expected max
-    max_y = y
-    for i in range(0, len(polygon)):
-        x, y = polygon[i].split(' ')
-        if x < min_x:
-            min_x = x
-        if x > max_x:
-            max_x = x
-        if y < min_y:
-            min_y = y
-        if y > max_y:
-            max_y = y
+    x_vals = []
+    y_vals = []
+    for p in polygon:
+        x, y = re.findall(r'\d+\.\d+', p)
+        x_vals.append(float(x))
+        y_vals.append(float(y))
+    min_x = min(x_vals)
+    max_x = max(x_vals)
+    min_y = min(y_vals)
+    max_y = max(y_vals)
 
     return max_x, max_y, min_x, min_y
 
@@ -893,7 +891,7 @@ def create_qml(layer, style):
     load_qml(layer, path_temp_file)
 
 
-def draw_point(point, rubber_band=None, color=QColor(255, 0, 0, 100), width=3, duration_time=None):
+def draw_point(point, rubber_band=None, color=QColor(255, 0, 0, 100), width=3, duration_time=None, reset_rb=True):
     """
     Draw a point on the canvas
         :param point: (QgsPointXY)
@@ -903,18 +901,23 @@ def draw_point(point, rubber_band=None, color=QColor(255, 0, 0, 100), width=3, d
         :param duration_time: Time in milliseconds that the point will be visible. Ex: 3000 for 3 seconds (int)
     """
 
-    rubber_band.reset(0)
+    if reset_rb:
+        rubber_band.reset(0)
     rubber_band.setIconSize(10)
     rubber_band.setColor(color)
     rubber_band.setWidth(width)
-    rubber_band.addPoint(point)
+    point = QgsGeometry.fromPointXY(point)
+    if rubber_band.size() == 0:
+        rubber_band.setToGeometry(point, None)
+    else:
+        rubber_band.addGeometry(point, None)
 
     # wait to simulate a flashing effect
     if duration_time is not None:
         QTimer.singleShot(duration_time, rubber_band.reset)
 
 
-def draw_polyline(points, rubber_band, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
+def draw_polyline(points, rubber_band, color=QColor(255, 0, 0, 100), width=5, duration_time=None, reset_rb=True):
     """
     Draw 'line' over canvas following list of points
         :param points: list of QgsPointXY (points[QgsPointXY_1, QgsPointXY_2, ..., QgsPointXY_x])
@@ -924,9 +927,14 @@ def draw_polyline(points, rubber_band, color=QColor(255, 0, 0, 100), width=5, du
         :param duration_time: Time in milliseconds that the point will be visible. Ex: 3000 for 3 seconds (int)
      """
 
+    if reset_rb:
+        rubber_band.reset(1)
     rubber_band.setIconSize(20)
     polyline = QgsGeometry.fromPolylineXY(points)
-    rubber_band.setToGeometry(polyline, None)
+    if rubber_band.size() == 0:
+        rubber_band.setToGeometry(polyline, None)
+    else:
+        rubber_band.addGeometry(polyline, None)
     rubber_band.setColor(color)
     rubber_band.setWidth(width)
     rubber_band.show()
@@ -934,6 +942,31 @@ def draw_polyline(points, rubber_band, color=QColor(255, 0, 0, 100), width=5, du
     # wait to simulate a flashing effect
     if duration_time is not None:
         QTimer.singleShot(duration_time, rubber_band.reset)
+
+
+def draw_polygon(points, rubber_band, border=QColor(255, 0, 0, 100), width=3, duration_time=None, reset_rb=True):
+    """
+    Draw 'polygon' over canvas following list of points
+        :param duration_time: integer milliseconds ex: 3000 for 3 seconds
+    """
+
+    if reset_rb:
+        rubber_band.reset(2)
+    rubber_band.setIconSize(20)
+    polygon = QgsGeometry.fromPolygonXY([points])
+    if rubber_band.size() == 0:
+        rubber_band.setToGeometry(polygon, None)
+    else:
+        rubber_band.addGeometry(polygon, None)
+    rubber_band.setColor(border)
+    rubber_band.setFillColor(QColor(0, 0, 0, 0))
+    rubber_band.setWidth(width)
+    rubber_band.show()
+
+    # wait to simulate a flashing effect
+    if duration_time is not None:
+        # Qtimer singleShot works with ms, we manage transformation to seconds
+        QTimer.singleShot(int(duration_time)*1000, rubber_band.reset)
 
 
 def get_geometry_from_json(feature):
@@ -1170,25 +1203,5 @@ def _get_multi_coordinates(feature):
         coordinates = coordinates[:-2] + "), "
     coordinates = coordinates[:-2] + ")"
     return coordinates
-
-
-def draw_polygon(points, rubber_band, border=QColor(255, 0, 0, 100), width=3, duration_time=None):
-    """
-    Draw 'polygon' over canvas following list of points
-        :param duration_time: integer milliseconds ex: 3000 for 3 seconds
-    """
-
-    rubber_band.setIconSize(20)
-    polygon = QgsGeometry.fromPolygonXY([points])
-    rubber_band.setToGeometry(polygon, None)
-    rubber_band.setColor(border)
-    rubber_band.setFillColor(QColor(0, 0, 0, 0))
-    rubber_band.setWidth(width)
-    rubber_band.show()
-
-    # wait to simulate a flashing effect
-    if duration_time is not None:
-        # Qtimer singleShot works with ms, we manage transformation to seconds
-        QTimer.singleShot(int(duration_time)*1000, rubber_band.reset)
 
 # endregion

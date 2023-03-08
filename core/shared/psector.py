@@ -448,6 +448,7 @@ class GwPsector:
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(self._manage_tab_feature_buttons))
         self.dlg_plan_psector.name.textChanged.connect(partial(self.enable_relation_tab, 'plan_psector'))
+        self.dlg_plan_psector.expl_id.currentIndexChanged.connect(partial(self.enable_relation_tab, 'plan_psector'))
         viewname = 'v_edit_plan_psector_x_other'
         self.dlg_plan_psector.txt_name.textChanged.connect(
             partial(self.query_like_widget_text, self.dlg_plan_psector, self.dlg_plan_psector.txt_name,
@@ -859,7 +860,8 @@ class GwPsector:
     def enable_relation_tab(self, tablename):
 
         psector_name = f"{tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.name)}"
-        sql = f"SELECT name FROM {tablename} WHERE LOWER(name) = '{psector_name}'"
+        psector_expl = tools_qt.get_combo_value(self.dlg_plan_psector, "expl_id", 0)
+        sql = f"SELECT name FROM {tablename} WHERE LOWER(name) = '{psector_name}' AND expl_id = {psector_expl}"
         rows = tools_db.get_rows(sql)
         if not rows:
             if self.dlg_plan_psector.name.text() != '':
@@ -1011,11 +1013,11 @@ class GwPsector:
             widget.setModel(None)
 
 
-    def check_name(self, psector_name):
+    def check_name(self, psector_name, expl_id):
         """ Check if name of new psector exist or not """
 
-        sql = (f"SELECT name FROM plan_psector"
-               f" WHERE name = '{psector_name}'")
+        sql = (f"SELECT name, expl_id FROM plan_psector"
+               f" WHERE name = '{psector_name}' AND expl_id = '{expl_id}'")
         row = tools_db.get_row(sql)
         if row is None:
             return False
@@ -1030,14 +1032,20 @@ class GwPsector:
             tools_qgis.show_warning(message, parameter='Name', dialog=self.dlg_plan_psector)
             return
 
+        expl_id = tools_qt.get_combo_value(self.dlg_plan_psector, "expl_id", 0)
+        if expl_id == -1:
+            message = "Mandatory field is missing. Please, set a value"
+            tools_qgis.show_warning(message, parameter='Exploitation', dialog=self.dlg_plan_psector)
+            return
+
         rotation = tools_qt.get_text(self.dlg_plan_psector, "rotation", return_string_null=False)
         if rotation == "":
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.rotation, 0)
 
-        name_exist = self.check_name(psector_name)
+        name_exist = self.check_name(psector_name, expl_id)
 
         if name_exist and not self.update:
-            message = "The name is current in use"
+            message = "The name is currently in use"
             tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
             return
         else:
@@ -1602,7 +1610,7 @@ class GwPsector:
         selected_list = qtbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            tools_qgis.show_warning(message, dialog=dialog)
             return
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
@@ -1611,7 +1619,7 @@ class GwPsector:
             active = qtbl_psm.model().record(row).value("active")
             if psector_id == self.current_psector_id[0]:
                 message = f"The active state of the current psector cannot be changed. Current psector: {self.current_psector_id[1]}"
-                tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+                tools_qgis.show_warning(message, dialog=dialog)
                 return
             if active:
                 sql += f"UPDATE plan_psector SET active = False WHERE psector_id = {psector_id};"
@@ -1635,7 +1643,7 @@ class GwPsector:
         active = qtbl_psm.model().record(row).value("active")
         if active is False:
             message = f"Cannot set the current psector of an inactive psector. You must activate it before."
-            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            tools_qgis.show_warning(message, dialog=dialog)
             return
         aux_widget = QLineEdit()
         aux_widget.setText(str(psector_id))
@@ -1645,6 +1653,7 @@ class GwPsector:
         tools_qgis.show_info(message, dialog=dialog)
 
         self.fill_table(dialog, qtbl_psm, "v_ui_plan_psector")
+        self._filter_table(self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name,self.dlg_psector_mng.chk_active, 'v_ui_plan_psector')
         tools_gw.set_tablemodel_config(dialog, qtbl_psm, "v_ui_plan_psector")
         self.set_label_current_psector(dialog)
         tools_gw.open_dialog(dialog)
@@ -1715,16 +1724,6 @@ class GwPsector:
             table.model().select()
         else:
             self.fill_table(dialog, table, tablename)
-
-    def filter_by_active(self, dialog, table):
-
-        chk_active_state = dialog.chk_active.isChecked()
-        expr = f" active is {chk_active_state}"
-
-        # Refresh model with selected filter
-        table.model().setFilter(expr)
-        table.model().select()
-
 
 
     def charge_psector(self, qtbl_psm):
@@ -2099,8 +2098,9 @@ class GwPsector:
         # Set signals
         tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_arc, 'psector',
                                 'set_to_arc_xyCoordinates_mouse_move_arc')
-        tools_gw.connect_signal(self.emit_point.canvasClicked, partial(self._set_arc_id, idx),
-                                'psector', 'set_to_arc_ep_canvasClicked_set_arc_id')
+        # To activate action pan and not move the canvas accidentally we have to override the canvasReleaseEvent.
+        # The "e" is the QgsMapMouseEvent given by the function
+        self.emit_point.canvasReleaseEvent = lambda e: self._set_arc_id(idx, e.mapPoint(), 1)
 
 
     def _set_arc_id(self, idx, point, event):
@@ -2178,21 +2178,10 @@ class GwPsector:
 
         the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {global_vars.data_epsg})"
 
-        for row in selected_rows:
-            sql = ""
-            if idx == 1:
-                sql += (f"INSERT INTO temp_table (fid, geom_point) VALUES (485, {the_geom});\n")
-
-            row_id = self.qtbl_connec.model().record(row.row()).value("id")
-
-            sql += (f"UPDATE {self.tablename_psector_x_connec} SET arc_id = "
-                  f"'{self.arc_id}' WHERE id = '{row_id}'")
-
-            tools_db.execute_sql(sql)
-
-        filter_ = "psector_id = '" + str(self.psector_id.text()) + "'"
-        self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec,
-                        set_edit_triggers=QTableView.DoubleClicked, expr=filter_)
+        if tab_idx == 2:
+            self._update_tbl_relations(selected_rows, idx, the_geom, self.qtbl_connec, "id", self.tablename_psector_x_connec, self.arc_id, self.qtbl_connec)
+        elif tab_idx == 3:
+            self._update_tbl_relations(selected_rows, idx, the_geom, self.qtbl_gully, "id", self.tablename_psector_x_gully, self.arc_id, self.qtbl_gully)
 
         # Force a map refresh
         tools_qgis.force_refresh_map_canvas()
@@ -2201,6 +2190,23 @@ class GwPsector:
         tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
         tools_gw.set_model_signals(self)
 
+
+    def _update_tbl_relations(self, selected_rows, idx, the_geom, table_name, id_column, tablename_psector_x_connec, arc_id, qtbl):
+        for row in selected_rows:
+            sql = ""
+            if idx == 1:
+                sql += (f"INSERT INTO temp_table (fid, geom_point) VALUES (485, {the_geom});\n")
+
+            row_id = qtbl.model().record(row.row()).value(id_column)
+
+            sql += (f"UPDATE {tablename_psector_x_connec} SET arc_id = "
+                    f"'{arc_id}' WHERE id = '{row_id}'")
+
+            tools_db.execute_sql(sql)
+
+        filter_ = "psector_id = '" + str(self.psector_id.text()) + "'"
+        self.fill_table(self.dlg_plan_psector, table_name, tablename_psector_x_connec,
+                        set_edit_triggers=QTableView.DoubleClicked, expr=filter_)
 
     def _replace_arc(self):
 
