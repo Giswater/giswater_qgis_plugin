@@ -22,6 +22,13 @@ BEGIN
 
 	v_feature_type:= upper(TG_ARGV[0]);
 
+	IF TG_OP = 'UPDATE' AND NEW.parent_id IS NULL AND v_feature_type = 'ARC' THEN
+		DELETE FROM arc_border_expl WHERE arc_id = NEW.arc_id;
+	ELSIF TG_OP = 'UPDATE' AND NEW.parent_id IS NULL AND v_feature_type = 'NODE' THEN
+		DELETE FROM node_border_expl WHERE node_id = NEW.node_id;
+		DELETE FROM node_border_sector WHERE node_id = NEW.node_id;
+	END IF;
+
   -- Control insertions ID
   IF TG_OP = 'INSERT' THEN
   	--sector
@@ -67,7 +74,6 @@ BEGIN
     RETURN NEW;
 
   ELSIF TG_OP = 'UPDATE' AND v_feature_type = 'ARC' THEN
-	raise notice 'arc';
 
 		--sector
   	INSERT INTO node_border_sector
@@ -95,24 +101,24 @@ BEGIN
 		SELECT node_id, a2.expl_id
 		FROM node 
 		JOIN arcs a2 ON node_id=node_2 
-		where a2.expl_id != node.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING RETURNING node_id INTO v_node_id;	
+		where a2.expl_id != node.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
 		
 		INSERT INTO node_border_expl
 		SELECT n.node_id,e.expl_id
-		FROM node  n
+		FROM v_edit_node  n
 		JOIN node_border_expl e ON parent_id::text = e.node_id
-		WHERE parent_id::text = v_node_id AND n.expl_id != e.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
+		WHERE n.expl_id != e.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
 
 		INSERT INTO arc_border_expl
 		SELECT arc_id, e.expl_id
-		FROM arc a
+		FROM v_edit_arc a
 		JOIN node_border_expl e ON a.parent_id::text = e.node_id
-		WHERE parent_id::text = v_node_id AND a.expl_id != e.expl_id ON CONFLICT (arc_id, expl_id) DO NOTHING;
-
+		WHERE a.expl_id != e.expl_id ON CONFLICT (arc_id, expl_id) DO NOTHING;
 
 		v_final_nodes = string_to_array(OLD.node_1,'') ||string_to_array(OLD.node_2,'');
 
 		IF v_final_nodes IS NOT NULL THEN
+
 			--sector
 			FOREACH rec IN ARRAY (v_final_nodes) LOOP
 	
@@ -134,6 +140,7 @@ BEGIN
 				EXECUTE 'DELETE FROM node_border_sector WHERE node_id='||quote_literal(rec)||' AND sector_id='||OLD.sector_id||'';
 		  END IF;
 		 END LOOP;
+
 			--exploitation
 			FOREACH rec IN ARRAY (v_final_nodes) LOOP
 	
@@ -203,15 +210,15 @@ BEGIN
 
 		INSERT INTO node_border_expl
 		SELECT n.node_id,e.expl_id
-		FROM node  n
+		FROM v_edit_node  n
 		JOIN node_border_expl e ON parent_id::text = e.node_id
-		WHERE parent_id::text = v_node_id AND n.expl_id != e.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
+		WHERE  n.expl_id != e.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
 
 		INSERT INTO arc_border_expl
 		SELECT arc_id, e.expl_id
-		FROM arc a
+		FROM v_edit_arc a
 		JOIN node_border_expl e ON a.parent_id::text = e.node_id
-		WHERE parent_id::text = v_node_id AND a.expl_id != e.expl_id ON CONFLICT (arc_id, expl_id) DO NOTHING;
+		WHERE a.expl_id != e.expl_id ON CONFLICT (arc_id, expl_id) DO NOTHING;
 		
 		RETURN NEW;
   ELSIF TG_OP = 'DELETE' THEN
