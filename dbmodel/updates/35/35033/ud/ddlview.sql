@@ -262,7 +262,7 @@ CREATE OR REPLACE VIEW v_edit_inp_flwreg_outlet
     f.cd1,
     f.cd2,
     f.flap,
-    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), 25831)::geometry(LineString,25831) AS the_geom
+    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
    FROM v_sector_node 
     JOIN inp_flwreg_outlet f USING (node_id)
      JOIN v_edit_node n USING (node_id)
@@ -288,7 +288,7 @@ CREATE OR REPLACE VIEW v_edit_inp_flwreg_orifice
     f.geom3,
     f.geom4,
     f.close_time,
-    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), 25831)::geometry(LineString,25831) AS the_geom
+    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
    FROM v_sector_node
     join inp_flwreg_orifice f  USING (node_id)
      JOIN v_edit_node n USING (node_id)
@@ -309,7 +309,7 @@ CREATE OR REPLACE VIEW v_edit_inp_flwreg_orifice
     f.cd1,
     f.cd2,
     f.flap,
-    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), 25831)::geometry(LineString,25831) AS the_geom
+    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
    FROM v_sector_node
     JOIN inp_flwreg_outlet f USING (node_id)
      JOIN v_edit_node n USING (node_id)
@@ -339,7 +339,7 @@ CREATE OR REPLACE VIEW v_edit_inp_flwreg_weir
     f.road_width,
     f.road_surf,
     f.coef_curve,
-    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), 25831)::geometry(LineString,25831) AS the_geom
+    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
    FROM v_sector_node 
     JOIN inp_flwreg_weir f USING (node_id)
      JOIN v_edit_node n USING (node_id)
@@ -358,7 +358,7 @@ CREATE OR REPLACE VIEW v_edit_inp_flwreg_pump
     f.status,
     f.startup,
     f.shutoff,
-    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), 25831)::geometry(LineString,25831) AS the_geom
+    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
    FROM v_sector_node
     JOIN inp_flwreg_pump f USING (node_id)
      JOIN v_edit_node n USING (node_id)
