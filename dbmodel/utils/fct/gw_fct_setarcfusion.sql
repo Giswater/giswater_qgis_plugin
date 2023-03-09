@@ -182,10 +182,10 @@ BEGIN
 				-- get man and epa tables
 				IF v_project_type = 'UD' THEN
 					SELECT man_table INTO v_man_table FROM sys_feature_cat s JOIN cat_feature_arc c ON s.id=c.type WHERE c.id=v_record1.arc_type;
-					SELECT epa_table INTO v_epa_table FROM sys_feature_epa_type s JOIN cat_feature_arc c ON s.id=c.type WHERE c.id=v_record1.arc_type;
+					SELECT epa_table INTO v_epa_table FROM sys_feature_epa_type s JOIN cat_feature_arc c ON s.id=c.epa_default WHERE c.id=v_record1.arc_type;
 				ELSE
 					SELECT man_table INTO v_man_table FROM sys_feature_cat s JOIN cat_feature_arc c ON s.id=c.type JOIN cat_arc ON arctype_id=c.id WHERE cat_arc.id=v_record1.arccat_id;
-					SELECT epa_table INTO v_epa_table FROM sys_feature_epa_type s JOIN cat_feature_arc c ON s.id=c.type JOIN cat_arc ON arctype_id=c.id WHERE cat_arc.id=v_record1.arccat_id;
+					SELECT epa_table INTO v_epa_table FROM sys_feature_epa_type s JOIN cat_feature_arc c ON s.id=c.epa_default JOIN cat_arc ON arctype_id=c.id WHERE cat_arc.id=v_record1.arccat_id;
 				END IF;
 
 				--Compare addfields and assign them to new arc
