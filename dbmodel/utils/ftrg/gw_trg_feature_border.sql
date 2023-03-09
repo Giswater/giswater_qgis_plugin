@@ -57,19 +57,19 @@ BEGIN
 		SELECT node_id, a2.expl_id
 		FROM node 
 		JOIN arcs a2 ON node_id=node_2 
-		where a2.expl_id != node.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING RETURNING node_id INTO v_node_id;	
+		where a2.expl_id != node.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
 
 		INSERT INTO node_border_expl
-		SELECT n.node_id, e.expl_id
-		FROM node  n
-		JOIN node_border_expl e ON parent_id::text = e.node_id
-		WHERE parent_id::text= v_node_id AND n.expl_id != e.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
+		SELECT a.node_id,  n.expl_id
+		FROM v_edit_node a
+		JOIN v_edit_node  n ON n.node_id=a.parent_id::text
+		WHERE a.expl_id != n.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
 
 		INSERT INTO arc_border_expl
-		SELECT arc_id, e.expl_id
-		FROM arc a
-		JOIN node_border_expl e ON a.parent_id::text = e.node_id
-		WHERE parent_id::text = v_node_id AND a.expl_id != e.expl_id ON CONFLICT (arc_id, expl_id) DO NOTHING;
+		SELECT a.arc_id,  n.expl_id
+		FROM v_edit_arc a
+		JOIN v_edit_node  n ON n.node_id=a.parent_id::text
+		WHERE a.expl_id != n.expl_id ON CONFLICT (arc_id, expl_id) DO NOTHING;
 
     RETURN NEW;
 
@@ -104,16 +104,16 @@ BEGIN
 		where a2.expl_id != node.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
 		
 		INSERT INTO node_border_expl
-		SELECT n.node_id,e.expl_id
-		FROM v_edit_node  n
-		JOIN node_border_expl e ON parent_id::text = e.node_id
-		WHERE n.expl_id != e.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
+		SELECT a.node_id,  n.expl_id
+		FROM v_edit_node a
+		JOIN v_edit_node  n ON n.node_id=a.parent_id::text
+		WHERE a.expl_id != n.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
 
 		INSERT INTO arc_border_expl
-		SELECT arc_id, e.expl_id
+		SELECT a.arc_id,  n.expl_id
 		FROM v_edit_arc a
-		JOIN node_border_expl e ON a.parent_id::text = e.node_id
-		WHERE a.expl_id != e.expl_id ON CONFLICT (arc_id, expl_id) DO NOTHING;
+		JOIN v_edit_node  n ON n.node_id=a.parent_id::text
+		WHERE a.expl_id != n.expl_id ON CONFLICT (arc_id, expl_id) DO NOTHING;
 
 		v_final_nodes = string_to_array(OLD.node_1,'') ||string_to_array(OLD.node_2,'');
 
@@ -209,16 +209,16 @@ BEGIN
 		where a2.expl_id != node.expl_id and node_id=NEW.node_id ON CONFLICT (node_id, expl_id) DO NOTHING;	
 
 		INSERT INTO node_border_expl
-		SELECT n.node_id,e.expl_id
-		FROM v_edit_node  n
-		JOIN node_border_expl e ON parent_id::text = e.node_id
-		WHERE  n.expl_id != e.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
+		SELECT a.node_id, n.expl_id
+		FROM v_edit_node  a
+		JOIN v_edit_node  n ON n.node_id=a.parent_id::text
+		WHERE  n.expl_id != a.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
 
 		INSERT INTO arc_border_expl
-		SELECT arc_id, e.expl_id
+		SELECT a.arc_id,  n.expl_id
 		FROM v_edit_arc a
-		JOIN node_border_expl e ON a.parent_id::text = e.node_id
-		WHERE a.expl_id != e.expl_id ON CONFLICT (arc_id, expl_id) DO NOTHING;
+		JOIN v_edit_node  n ON n.node_id=a.parent_id::text
+		WHERE a.expl_id != n.expl_id ON CONFLICT (arc_id, expl_id) DO NOTHING;
 		
 		RETURN NEW;
   ELSIF TG_OP = 'DELETE' THEN
