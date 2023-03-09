@@ -106,3 +106,6 @@ INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source"
 VALUES(487, 'Configuration of border nodes', 'utils', NULL, 'core', false, 'Function process', NULL);
 
 INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active) VALUES (3204, 'Configuration of border nodes', '{"featureType":[]}', null, NULL, false);
+
+INSERT INTO sys_table(id, descript, sys_role, source)
+VALUES ('arc_border_expl', 'Table that stores relation between arc and it''s additional exploitation.', 'role_basic', 'core');
