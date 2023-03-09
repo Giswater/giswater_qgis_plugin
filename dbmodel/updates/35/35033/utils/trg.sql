@@ -16,7 +16,7 @@ CREATE TRIGGER gw_trg_feature_border
     FOR EACH ROW
     EXECUTE PROCEDURE gw_trg_feature_border('ARC');
         
-DROP TRIGGER gw_trg_feature_border ON node;
+DROP TRIGGER  IF EXISTS gw_trg_feature_border ON node;
 CREATE TRIGGER gw_trg_feature_border
     AFTER UPDATE OF sector_id, expl_id, parent_id
     ON node
