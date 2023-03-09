@@ -587,7 +587,7 @@ def get_max_rectangle_from_coords(list_coord):
     x_vals = []
     y_vals = []
     for p in polygon:
-        x, y = re.findall(r'\d+\.\d+', p)
+        x, y = re.findall(r'\d+\.?\d*', p)
         x_vals.append(float(x))
         y_vals.append(float(y))
     min_x = min(x_vals)
