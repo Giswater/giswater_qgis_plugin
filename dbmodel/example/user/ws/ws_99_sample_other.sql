@@ -263,7 +263,7 @@ UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=23 WHERE colu
 -- hidden
 UPDATE config_form_fields SET hidden = true WHERE columnname 
 IN ('undelete', 'publish', 'buildercat_id', 'comment', 'num_value', 'svg', 'macrodqa_id', 'macrosector_id',
-'macroexpl_id', 'custom_length', 'staticpressure1', 'staticpressure2', 'pipe_param_1');
+'macroexpl_id', 'custom_length', 'staticpressure1', 'staticpressure2', 'pipe_param_1') and (formname ILIKE 've_arc%' or formname ILIKE 've_node%' or formname ILIKE 've_connec%');
 
 UPDATE config_form_fields SET hidden = true WHERE columnname IN ('label_x', 'label_y') AND formname LIKE 've_arc%';
 
