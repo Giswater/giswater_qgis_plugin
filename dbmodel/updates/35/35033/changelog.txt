@@ -7,3 +7,4 @@
 - Rename trigger gw_trg_node_border to  gw_trg_feature_border as it configures nodes and arcs that are located on the border between mapzones
 - Add new review status - only review observations added, no data modifications
 - New function gw_fct_calculate_sander for UD - calculates the depth of sander depending on node sys_ymax and arc sys_y1
+- New function gw_fct_config_feature_border for initial configuration of border nodes

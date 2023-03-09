@@ -84,17 +84,25 @@ INSERT INTO config_info_layer (layer_id, is_parent, tableparent_id, is_editable,
 VALUES('v_edit_element', false, NULL, true, 'element', 'Element', 6, NULL, '{"forceWhenActive":true}'::json);
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source")
-VALUES(3228, 'It is not possible to insert arc into psector because has operative connects associated', 'You need to previously insert related connects into psector', 2, true, 'utils', 'core');
+VALUES(3228, 'It is not possible to insert arc into psector because has operative connects associated', 'You need to previously insert related connects into psector', 2, true, 'utils', 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_param_user VALUES('edit_plan_order_control', 'dynamic', 'To manage if plan order control is executed or not. On some automatic processes is set to FALSE, on manual process is TRUE', 'role_edit', NULL, NULL, NULL, NULL, true, NULL, 'utils', false, NULL, NULL, NULL, false, 'boolean', NULL, true, NULL, 'true', NULL, NULL, NULL, NULL, NULL, NULL, 'core');
 
 INSERT INTO sys_function
 (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
-VALUES(3200, 'gw_trg_arc_node_values', 'ws', 'function trigger', NULL, NULL, 'Trigger that updates arc node related values such as type, elevation, depth', 'role_edit', NULL, 'core');
+VALUES(3200, 'gw_trg_arc_node_values', 'ws', 'function trigger', NULL, NULL, 'Trigger that updates arc node related values such as type, elevation, depth', 'role_edit', NULL, 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function
 (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
-VALUES(3202, 'gw_trg_arc_node_values', 'ud', 'function trigger', NULL, NULL, 'Trigger that updates arc node related values such as type, elevation, depth', 'role_edit', NULL, 'core');
+VALUES(3202, 'gw_trg_arc_node_values', 'ud', 'function trigger', NULL, NULL, 'Trigger that updates arc node related values such as type, elevation, depth', 'role_edit', NULL, 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO edit_typevalue (typevalue, id, idval)
 VALUES ('value_review_status', 4, 'Only review observations') ON CONFLICT  (typevalue, id) DO NOTHING;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES(3204, 'gw_fct_config_feature_border', 'utils', 'function', NULL, NULL, 'Function that configures nodes located on sector and exploitation border', 'role_master', NULL, 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) 
+VALUES(487, 'Configuration of border nodes', 'utils', NULL, 'core', false, 'Function process', NULL);
+
+INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active) VALUES (3204, 'Configuration of border nodes', '{"featureType":[]}', null, NULL, false);
