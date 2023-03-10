@@ -860,9 +860,9 @@
 					END IF;
 				END IF;
 
-				IF NEW.closed_valve != OLD.closed_valve THEN
+				IF NEW.closed != OLD.closed THEN
 					UPDATE man_valve 
-					SET closed=NEW.closed_valve
+					SET closed=NEW.closed
 					WHERE node_id=OLD.node_id;
 				END IF;
 			END IF;
