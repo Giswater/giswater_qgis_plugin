@@ -1,0 +1,3 @@
+3.5.034
+*************
+- Rename v_plan_current_psector_* views to v_plan_psector_*
