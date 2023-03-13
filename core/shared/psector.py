@@ -208,7 +208,7 @@ class GwPsector:
         # if psector_id has a value other than 0, it is that the sector already exists and we want to do an update.
         if isinstance(psector_id, bool):
             psector_id = 0
-        self.delete_psector_selector('selector_plan_psector')
+        # self.delete_psector_selector('selector_plan_psector')
 
         # tab 'Document'
         self.doc_id = self.dlg_plan_psector.findChild(QLineEdit, "doc_id")
@@ -646,7 +646,7 @@ class GwPsector:
         # Generate csv detail
         if tools_qt.is_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail):
             file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_csv_path')
-            viewname = f"v_plan_current_psector_budget_detail"
+            viewname = f"v_plan_psector_budget_detail"
             if file_name is None or file_name == 'null':
                 message = "Price list csv file name is required"
                 tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
@@ -658,7 +658,7 @@ class GwPsector:
         # Generate csv
         if tools_qt.is_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv):
             file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_csv_detail_path')
-            viewname = f"v_plan_current_psector_budget"
+            viewname = f"v_plan_psector_budget"
             if file_name is None or file_name == 'null':
                 message = "Price list csv file name is required"
                 tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
@@ -748,7 +748,7 @@ class GwPsector:
     def populate_budget(self, dialog, psector_id):
 
         sql = (f"SELECT DISTINCT(column_name) FROM information_schema.columns"
-               f" WHERE table_name = 'v_plan_current_psector'")
+               f" WHERE table_name = 'v_plan_psector'")
         rows = tools_db.get_rows(sql)
         columns = []
         for i in range(0, len(rows)):
@@ -756,7 +756,7 @@ class GwPsector:
             columns.append(str(column_name[0]))
 
         sql = (f"SELECT total_arc, total_node, total_other, pem, pec, pec_vat, gexpenses, vat, other, pca"
-               f" FROM v_plan_current_psector"
+               f" FROM v_plan_psector"
                f" WHERE psector_id = '{psector_id}'")
         row = tools_db.get_row(sql)
         if row:
