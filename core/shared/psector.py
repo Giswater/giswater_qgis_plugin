@@ -208,7 +208,6 @@ class GwPsector:
         # if psector_id has a value other than 0, it is that the sector already exists and we want to do an update.
         if isinstance(psector_id, bool):
             psector_id = 0
-        # self.delete_psector_selector('selector_plan_psector')
 
         # tab 'Document'
         self.doc_id = self.dlg_plan_psector.findChild(QLineEdit, "doc_id")
@@ -332,15 +331,6 @@ class GwPsector:
             self.populate_budget(self.dlg_plan_psector, psector_id)
             self.update = True
             psector_id_aux = tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)
-            if psector_id_aux != 'null':
-                sql = (f"DELETE FROM selector_plan_psector "
-                       f"WHERE cur_user = current_user")
-                tools_db.execute_sql(sql)
-                self.insert_psector_selector('selector_plan_psector', 'psector_id', psector_id_aux)
-            sql = (f"DELETE FROM selector_psector "
-                   f"WHERE cur_user = current_user AND psector_id = '{psector_id_aux}'")
-            tools_db.execute_sql(sql)
-            self.insert_psector_selector('selector_psector', 'psector_id', psector_id_aux)
 
             self.dlg_plan_psector.rejected.connect(self.rubber_band_point.reset)
 
@@ -397,8 +387,6 @@ class GwPsector:
         sql = "SELECT state_id FROM selector_state WHERE cur_user = current_user"
         rows = tools_db.get_rows(sql)
         self.all_states = rows
-        self.delete_psector_selector('selector_state')
-        self.insert_psector_selector('selector_state', 'state_id', '1')
 
         # Exclude the layer v_edit_element for adding relations
         self.excluded_layers = ['v_edit_element']
@@ -870,22 +858,7 @@ class GwPsector:
             self.set_tabs_enabled(False)
 
 
-    def delete_psector_selector(self, tablename):
-
-        sql = (f"DELETE FROM {tablename}"
-               f" WHERE cur_user = current_user;")
-        tools_db.execute_sql(sql)
-
-
-    def insert_psector_selector(self, tablename, field, value):
-
-        sql = (f"INSERT INTO {tablename} ({field}, cur_user) "
-               f"VALUES ('{value}', current_user);")
-        tools_db.execute_sql(sql)
-
-
-    def check_tab_position(self):
-
+    def check_tab_position(self)
         self.dlg_plan_psector.name.setEnabled(False)
         self.insert_or_update_new_psector(tablename=f'v_edit_plan_psector', close_dlg=False)
         self.update = True
@@ -960,7 +933,6 @@ class GwPsector:
 
     def reload_states_selector(self):
 
-        self.delete_psector_selector('selector_state')
         try:
             for x in range(0, len(self.all_states)):
                 sql = (f"INSERT INTO selector_state (state_id, cur_user)"
@@ -1107,9 +1079,6 @@ class GwPsector:
             tools_db.execute_sql(sql)
 
         self.dlg_plan_psector.tabWidget.setTabEnabled(1, True)
-        self.delete_psector_selector('selector_plan_psector')
-        psector_id = tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)
-        self.insert_psector_selector('selector_plan_psector', 'psector_id', psector_id)
 
         if close_dlg:
             json_result = self.set_plan()
