@@ -77,6 +77,11 @@ v_macroselector text;
 v_cur_user text;
 v_prev_cur_user text;
 v_device integer;
+v_layers text;
+v_layer text;
+v_rec record;
+v_columns json;
+v_layerColumns json;
 v_loadProject boolean=false;
 v_addschema text;
 BEGIN
@@ -164,11 +169,8 @@ BEGIN
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 20);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO v_pkeyfield;
-		IF v_orderby IS NULL THEN v_orderby = ' row_number() over ()'; end if;
-		IF v_name IS NULL THEN v_name = v_pkeyfield; end if;
-
-		-- control of manageall
-		v_manageall := COALESCE(v_manageall, FALSE);
+		IF v_orderby IS NULL THEN v_orderby = v_pkeyfield; end if;
+		IF v_name IS NULL THEN v_name = v_orderby; end if;
 
 		-- profilactic control of selection mode
 		IF v_selectionMode = '' OR v_selectionMode is null then
@@ -304,15 +306,13 @@ BEGIN
 
 		ELSE 
 			v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-					SELECT *, ',v_orderby,' as orderby FROM
-					(SELECT * FROM
-					(SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' ,
+					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' ,
 					 v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
 					FROM ', v_table ,' WHERE ' , v_table_id , ' IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' UNION 
-					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , 
+					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , 
 					v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
 					FROM ', v_table ,' WHERE ' , v_table_id , ' NOT IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ',
-					 v_fullfilter ,') c ORDER BY name asc) b ORDER BY orderby asc) a');
+					 v_fullfilter ,' ORDER BY orderby asc) a');
 		END IF;
 		v_debug_vars := json_build_object('v_table_id', v_table_id, 'v_label', v_label, 'v_orderby', v_orderby, 'v_name', v_name, 'v_selector_id', v_selector_id, 
 						  'v_table', v_table, 'v_selector', v_selector, 'current_user', current_user, 'v_fullfilter', v_fullfilter);
@@ -361,6 +361,16 @@ BEGIN
 
 	-- Manage QWC
 	IF v_device = 5 THEN
+		-- Get columns for layers
+		v_layers := (p_data ->> 'data')::json->> 'layers';
+		v_layerColumns = '{}';
+		FOR v_rec IN SELECT json_array_elements(v_layers::json)
+		LOOP
+			v_layer = replace(replace(replace(v_rec::text, '"', ''), '(', ''), ')', '');
+			SELECT json_agg(column_name) INTO v_columns FROM information_schema.columns WHERE table_schema = 'SCHEMA_NAME' AND table_name = v_layer;
+			v_layerColumns := gw_fct_json_object_set_key(v_layerColumns, v_layer, v_columns);
+		END LOOP;
+	
 		-- Get active exploitations geometry (to zoom on them)
 		IF v_loadProject IS TRUE AND v_geometry IS NULL THEN
 			SELECT row_to_json (a) 
@@ -375,10 +385,12 @@ BEGIN
 
 	-- Check null
 	v_formTabs := COALESCE(v_formTabs, '[]');
+	v_manageall := COALESCE(v_manageall, FALSE);	
 	v_selectionMode = COALESCE(v_selectionMode, '');
 	v_currenttab = COALESCE(v_currenttab, '');
 	v_geometry = COALESCE(v_geometry, '{}');
 	v_stylesheet := COALESCE(v_stylesheet, '{}');
+	v_layerColumns = COALESCE(v_layerColumns, '{}');
 	
 	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 	
@@ -402,7 +414,7 @@ BEGIN
 			',"body":{"message":'||v_message||
 			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_currenttab||'", "formText":"", "formTabs":'||v_formTabs||', "style": '||v_stylesheet||'}'||
 			',"feature":{}'||
-			',"data":{"userValues":'||v_uservalues||',"geometry":'||v_geometry||'}'||
+			',"data":{"userValues":'||v_uservalues||',"geometry":'||v_geometry||',"layerColumns":'||v_layerColumns||'}'||
 			'}'||
 		    '}')::json,2796, null, null, v_action::json);
 	END IF;
