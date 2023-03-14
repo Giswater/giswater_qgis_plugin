@@ -1,0 +1,4 @@
+3.5.032
+*************
+- New function gw_fct_dateselector
+- New field iscorporate on rpt_cat_result

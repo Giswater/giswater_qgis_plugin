@@ -211,7 +211,7 @@ BEGIN
                 NEW.the_geom:= ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
                 NEW.node_1:= nodeRecord1.node_id; 
                 NEW.node_2:= nodeRecord2.node_id;
-
+                
             END IF;
                 
         -- Check auto insert end nodes

@@ -3516,7 +3516,7 @@ WHERE id = 'cat_mat_node';
 --2020/07/27
 UPDATE config_form_tabs SET orderby = 1 WHERE formname ='v_edit_gully' AND tabname='tab_data';
 UPDATE config_form_tabs SET orderby = 2 WHERE formname ='v_edit_gully' AND tabname='tab_elements';
-UPDATE config_form_tabs SET orderby = 3 WHERE formname ='v_edit_gully' AND tabname='tab_om';
+UPDATE config_form_tabs SET orderby = 3 WHERE formname ='v_edit_gully' AND tabname='tab_event';
 UPDATE config_form_tabs SET orderby = 4 WHERE formname ='v_edit_gully' AND tabname='tab_visit';
 UPDATE config_form_tabs SET orderby = 5 WHERE formname ='v_edit_gully' AND tabname='tab_documents';
 

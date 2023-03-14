@@ -36,8 +36,6 @@ BEGIN
 		FROM v_edit_gully WHERE gully_id=NEW.feature_id
 		ON CONFLICT (feature_id) DO UPDATE SET the_geom=NEW.the_geom;
 		
-		-- Update man table
-		UPDATE gully SET pol_id=NEW.pol_id WHERE gully_id=NEW.feature_id;
 		
 		RETURN NEW;
 		
@@ -55,9 +53,6 @@ BEGIN
 
 			UPDATE polygon SET feature_id=NEW.feature_id, featurecat_id =gully_type 
 			FROM v_edit_gully WHERE gully_id=OLD.feature_id AND pol_id=NEW.pol_id;
-
-			UPDATE gully SET pol_id=NULL WHERE gully_id=OLD.feature_id;
-			UPDATE gully SET pol_id=NEW.pol_id WHERE gully_id=NEW.feature_id;
 		END IF;
 		
 		RETURN NEW;
@@ -65,7 +60,6 @@ BEGIN
 	-- DELETE
 	ELSIF TG_OP = 'DELETE' THEN
 	
-		UPDATE gully SET pol_id=NULL WHERE gully_id=OLD.feature_id;
 		DELETE FROM polygon WHERE pol_id=OLD.pol_id;
 				
 		RETURN NULL;

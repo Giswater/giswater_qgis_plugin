@@ -208,9 +208,13 @@ BEGIN
 						UPDATE plan_psector_x_arc SET doable=FALSE, addparam='{"nodeReplace":"generated"}' 
 						WHERE arc_id=v_arcrecordtb.arc_id AND psector_id=v_psector_id;
 
-						-- insert old arc on the alternative							
+						-- insert old arc on the alternative
+						UPDATE config_param_user SET value='false' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
+					
 						INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable,addparam)
-						VALUES (v_psector_id, v_arc.arc_id, 0, FALSE, '{"nodeReplace":"deprecated"}');
+						VALUES (v_psector_id, v_arc.arc_id, 0, FALSE, '{"nodeReplace":"deprecated"}') ON CONFLICT (psector_id, arc_id) DO NOTHING;
+					
+						UPDATE config_param_user SET value='true' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
 
 						-- update parent on node is not enabled
 
@@ -227,8 +231,8 @@ BEGIN
 						FOR v_gully_id IN 
 						SELECT gully_id FROM gully WHERE arc_id=v_arc.arc_id AND gully.state = 1
 						LOOP
-							INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, link_geom, userdefined_geom)						
-							SELECT gully_id, v_arcrecordtb.arc_id, v_psector_id, 1, false, l.the_geom, userdefined_geom 
+							INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable)
+							SELECT gully_id, v_arcrecordtb.arc_id, v_psector_id, 1, false
 							FROM link l JOIN gully c ON gully_id = l.feature_id WHERE l.feature_type  ='GULLY' AND gully_id = v_gully_id;
 						END LOOP;
 					END IF;

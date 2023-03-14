@@ -91,8 +91,12 @@ BEGIN
 				i = i+1;
 
 				-- downgrade existing arc on this psector
+				UPDATE config_param_user SET value='false' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
+				
 				INSERT INTO plan_psector_x_arc (arc_id, state, psector_id)
 				VALUES (rec.arc_id, 0, v_currentpsector);
+			
+				UPDATE config_param_user SET value='true' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
 
 				-- setting values of new arc
 				rec.state_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_statetype_2_vdefault' AND cur_user=current_user);	

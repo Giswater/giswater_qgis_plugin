@@ -429,7 +429,7 @@ BEGIN
 		
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-			VALUES (125, 3, '254', concat('ERROR-254: There is/are ',v_count,' with code with NULL values. Please, check your data before continue'),v_count);
+			VALUES (125, 3, '254', concat('ERROR-254: There is/are ',v_count,' features with code with NULL values. Please, check your data before continue'),v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 			VALUES (125, 1, '254', 'INFO: No features (arc, node, connec, gully, element) with NULL values on code found.',v_count);
@@ -486,7 +486,7 @@ BEGIN
 	IF v_project_type ='UD' THEN
 
 		v_querytext = 'SELECT * FROM man_addfields_value a LEFT JOIN 
-			      (SELECT arc_id as feature_id FROM '||v_edit||'arc UNION SELECT node_id FROM '||v_edit||'node UNION SELECT connec_id FROM '||v_edit||'connec UNION SELECT gully_id FROM '||v_edit||'gully) b USING (feature_id) WHERE b.feature_id IS NULL';
+			      (SELECT arc_id as feature_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec UNION SELECT gully_id FROM gully) b USING (feature_id) WHERE b.feature_id IS NULL';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	
@@ -499,7 +499,7 @@ BEGIN
 		END IF;	
 	ELSIF v_project_type='WS' THEN
 		v_querytext = 'SELECT * FROM man_addfields_value a LEFT JOIN 
-			      (SELECT arc_id as feature_id FROM '||v_edit||'arc UNION SELECT node_id FROM '||v_edit||'node UNION SELECT connec_id FROM '||v_edit||'connec) b USING (feature_id) WHERE b.feature_id IS NULL';
+			      (SELECT arc_id as feature_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec) b USING (feature_id) WHERE b.feature_id IS NULL';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	

@@ -127,8 +127,8 @@ BEGIN
 		IF v_count = 2 THEN
 		
 			-- Get both arc features
-			SELECT * INTO v_record1 FROM arc WHERE node_1 = v_node_id OR node_2 = v_node_id ORDER BY arc_id DESC LIMIT 1;
-			SELECT * INTO v_record2 FROM arc WHERE node_1 = v_node_id OR node_2 = v_node_id ORDER BY arc_id ASC LIMIT 1;
+			SELECT * INTO v_record1 FROM arc WHERE (node_1 = v_node_id OR node_2 = v_node_id) AND state > 0 ORDER BY arc_id DESC LIMIT 1;
+			SELECT * INTO v_record2 FROM arc WHERE (node_1 = v_node_id OR node_2 = v_node_id) AND state > 0 ORDER BY arc_id ASC LIMIT 1;
 
 			-- get states
 			SELECT state INTO v_state_node FROM node WHERE node_id = v_node_id;
@@ -140,7 +140,6 @@ BEGIN
 			-- Compare arcs
 			IF v_record1.arccat_id = v_record2.arccat_id AND v_record1.sector_id = v_record2.sector_id AND
 			   v_record1.expl_id = v_record2.expl_id THEN
-			   
 
 				-- Final geometry
 				IF v_record1.node_1 = v_node_id THEN
@@ -171,13 +170,22 @@ BEGIN
 				v_new_record.node_2 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
 				v_new_record.arc_id := (SELECT nextval('urn_id_seq'));
 
+				IF v_project_type = 'UD' THEN
+
+					v_new_record.y1 := (SELECT y1 FROM arc WHERE node_2 = v_node_id AND arc_id IN ( v_record1.arc_id, v_record2.arc_id));
+					v_new_record.custom_y1 := (SELECT custom_y1 FROM arc WHERE node_2 = v_node_id AND arc_id IN ( v_record1.arc_id, v_record2.arc_id));
+					v_new_record.y2 := (SELECT y2 FROM arc WHERE node_1 = v_node_id AND arc_id IN ( v_record1.arc_id, v_record2.arc_id));
+					v_new_record.custom_y2 := (SELECT custom_y2 FROM arc WHERE node_1 = v_node_id AND arc_id IN ( v_record1.arc_id, v_record2.arc_id));
+			
+				END IF;
+
 				-- get man and epa tables
 				IF v_project_type = 'UD' THEN
 					SELECT man_table INTO v_man_table FROM sys_feature_cat s JOIN cat_feature_arc c ON s.id=c.type WHERE c.id=v_record1.arc_type;
-					SELECT epa_table INTO v_epa_table FROM sys_feature_epa_type s JOIN cat_feature_arc c ON s.id=c.type WHERE c.id=v_record1.arc_type;
+					SELECT epa_table INTO v_epa_table FROM sys_feature_epa_type s JOIN cat_feature_arc c ON s.id=c.epa_default WHERE c.id=v_record1.arc_type;
 				ELSE
 					SELECT man_table INTO v_man_table FROM sys_feature_cat s JOIN cat_feature_arc c ON s.id=c.type JOIN cat_arc ON arctype_id=c.id WHERE cat_arc.id=v_record1.arccat_id;
-					SELECT epa_table INTO v_epa_table FROM sys_feature_epa_type s JOIN cat_feature_arc c ON s.id=c.type JOIN cat_arc ON arctype_id=c.id WHERE cat_arc.id=v_record1.arccat_id;
+					SELECT epa_table INTO v_epa_table FROM sys_feature_epa_type s JOIN cat_feature_arc c ON s.id=c.epa_default JOIN cat_arc ON arctype_id=c.id WHERE cat_arc.id=v_record1.arccat_id;
 				END IF;
 
 				--Compare addfields and assign them to new arc
@@ -222,7 +230,7 @@ BEGIN
 				UPDATE arc SET node_1=v_new_record.node_1, node_2=v_new_record.node_2 where arc_id=v_new_record.arc_id;
                 
 				-- update link only with enabled variable
-				IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
+				IF (SELECT (value::json->>'fid')::boolean FROM config_param_system WHERE parameter='edit_custom_link') IS TRUE THEN
 				    UPDATE arc SET link=v_new_record.arc_id where arc_id=v_new_record.arc_id;
 				END IF;
 
@@ -393,7 +401,7 @@ BEGIN
 				
 				ELSIF v_psector_id IS NOT NULL THEN
 				
-					UPDATE arc SET state = 2 WHERE arc_id = v_new_record.arc_id;
+					UPDATE arc SET state = 2, state_type = v_state_type WHERE arc_id = v_new_record.arc_id;
 				
 					INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable) VALUES (v_new_record.arc_id, v_psector_id, 1, false) ON CONFLICT (arc_id, psector_id) DO NOTHING;
 
@@ -444,11 +452,11 @@ BEGIN
 							INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable, link_id) 
 							SELECT v_psector_id, gully_id, arc_id, 0, false, link_id FROM gully c JOIN link l ON gully_id = feature_id 
 							WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND c.state = 1 and l.state = 1
-							ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
+							ON CONFLICT (psector_id, gully_id, state) DO NOTHING;
 
 							INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable) 
 							SELECT v_psector_id, gully_id, arc_id, 1, false FROM gully c WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id) AND state = 1
-							ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
+							ON CONFLICT (psector_id, gully_id, state) DO NOTHING;
 							
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
 							VALUES (214, 1, concat('Reconnect operative ',v_count,' gullies.'));

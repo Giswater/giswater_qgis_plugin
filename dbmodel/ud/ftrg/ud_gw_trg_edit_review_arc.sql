@@ -28,10 +28,15 @@ BEGIN
 	v_rev_arc_y1_tol :=(SELECT value::json->>'y1' FROM config_param_system WHERE parameter = 'edit_review_arc_tolerance');
 	v_rev_arc_y2_tol :=(SELECT value::json->>'y2' FROM config_param_system WHERE parameter = 'edit_review_arc_tolerance');		
 
+--get value from edit_review_auto_field_checked
+	IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'edit_review_auto_field_checked') IS TRUE THEN
+		NEW.field_checked=TRUE;
+	END IF;
+	
 	--getting original values
-	SELECT arc_id,y1,y2,arc.arc_type, arccat_id, CASE WHEN arc.matcat_id IS NOT NULL THEN arc.matcat_id ELSE cat_arc.matcat_id END AS matcat_id , 
-	annotation, observ, shape, geom1, geom2, the_geom, expl_id INTO rec_arc 
-	FROM arc JOIN cat_arc ON cat_arc.id=arc.arccat_id WHERE arc_id=NEW.arc_id;
+	SELECT arc_id,y1,y2,arc_type, arccat_id, matcat_id, 
+	annotation, observ, cat_shape, cat_geom1, cat_geom2, the_geom, expl_id INTO rec_arc 
+	FROM vu_arc WHERE arc_id=NEW.arc_id;
 	
 	IF NEW.field_checked=TRUE THEN				
 
@@ -58,6 +63,9 @@ BEGIN
 			-- geometry changes	
 			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_arc.the_geom::text) is FALSE THEN
 				v_review_status=2;
+			--only review comment
+			ELSIF (v_tol_filter_bool is FALSE) AND NEW.review_obs IS NOT NULL THEN
+				v_review_status=4;	
 			-- changes under tolerance
 			ELSIF (v_tol_filter_bool is FALSE) THEN
 				v_review_status=0;	

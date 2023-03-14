@@ -42,14 +42,14 @@ BEGIN
 		EXECUTE 'SELECT table_name FROM information_schema.TABLES WHERE table_schema = '|| quote_literal(v_schema)||' AND table_type = ''BASE TABLE'' ORDER BY table_name'
 	LOOP
 
-		EXECUTE 'ALTER TABLE '|| v_schema ||'.'|| rec ||' OWNER TO '|| v_owner ||';';
+		EXECUTE 'ALTER TABLE '|| v_schema ||'."'|| rec ||'" OWNER TO '|| v_owner ||';';
 	END LOOP;
 
 	FOR rec IN
 		EXECUTE 'SELECT table_name, view_definition as definition  FROM information_schema.views WHERE table_schema = '|| quote_literal(v_schema)||''
 	LOOP
 
-		EXECUTE 'ALTER TABLE '|| v_schema ||'.'|| rec ||' OWNER TO '|| v_owner ||';';
+		EXECUTE 'ALTER TABLE '|| v_schema ||'."'|| rec ||'" OWNER TO '|| v_owner ||';';
 	END LOOP;
 
 FOR rec IN

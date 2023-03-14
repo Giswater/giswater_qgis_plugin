@@ -279,6 +279,11 @@ BEGIN
 			SELECT distinct ON (minsector_id) minsector_id, dma_id, dqa_id, sector_id, expl_id FROM v_edit_arc WHERE minsector_id is not null
 			ON CONFLICT (minsector_id) DO NOTHING;
 
+			UPDATE minsector SET num_valve = a.num FROM 
+			(SELECT a.minsector_id,   count(node_id) AS num FROM v_edit_node n, v_edit_arc a 
+			WHERE  (a.node_1 = n.node_id OR a.node_2 = n.node_id) AND  n.minsector_id = 0 AND n.sys_type='VALVE'
+			GROUP BY a.minsector_id)a WHERE a.minsector_id=minsector.minsector_id;
+
 			-- message
 			INSERT INTO audit_check_data (fid, error_message)
 			VALUES (v_fid, concat('WARNING-',v_fid,': Minsector attribute (minsector_id) on arc/node/connec features have been updated by this process'));

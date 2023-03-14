@@ -22,30 +22,16 @@ CREATE TRIGGER gw_trg_arc_link_update
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_arc_link_update();
 
-DROP TRIGGER IF EXISTS gw_trg_node_border ON arc;
-CREATE TRIGGER gw_trg_node_border
-    AFTER INSERT OR DELETE OR UPDATE OF expl_id, the_geom
-    ON arc
-    FOR EACH ROW
-    EXECUTE FUNCTION gw_trg_node_border('ARC');
-
-DROP TRIGGER IF EXISTS gw_trg_node_border ON node;
-CREATE TRIGGER gw_trg_node_border
-    AFTER UPDATE OF expl_id
-    ON node
-    FOR EACH ROW
-    EXECUTE FUNCTION gw_trg_node_border('NODE');
-
 DROP TRIGGER IF EXISTS gw_trg_cat_feature ON cat_feature;
 
 CREATE TRIGGER gw_trg_cat_feature_after
     AFTER INSERT OR DELETE OR UPDATE 
     ON cat_feature
     FOR EACH ROW
-    EXECUTE FUNCTION gw_trg_cat_feature();
+    EXECUTE PROCEDURE gw_trg_cat_feature();
     
     CREATE TRIGGER gw_trg_cat_feature_delete
     BEFORE DELETE
     ON cat_feature
     FOR EACH ROW
-    EXECUTE FUNCTION gw_trg_cat_feature('DELETE');
+    EXECUTE PROCEDURE gw_trg_cat_feature('DELETE');

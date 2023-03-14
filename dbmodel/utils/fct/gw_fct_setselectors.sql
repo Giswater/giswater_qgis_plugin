@@ -105,7 +105,7 @@ BEGIN
 	IF v_useatlas IS null then v_useatlas = true; END IF;
 
 	-- profilactic control of schema name
-	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null'
+	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null' OR v_addschema is null OR v_addschema='NULL'
 		THEN v_addschema = null; 
 	ELSE
 		IF (select schemaname from pg_tables WHERE schemaname = v_addschema LIMIT 1) IS NULL THEN
@@ -182,7 +182,7 @@ BEGIN
 					EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) 
 					SELECT '|| v_columnname ||', current_user FROM '||v_zonetable||' ON CONFLICT ('|| v_columnname ||', cur_user) DO NOTHING';
 				
-				ELSIF v_tabname='tab_macroexploitation_add' THEN
+				ELSIF v_tabname='tab_macroexploitation_add' AND v_addschema IS NOT NULL THEN
 					EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) 
 					SELECT e.'|| v_columnname ||', current_user 
 					FROM '||v_zonetable||' e
@@ -216,7 +216,7 @@ BEGIN
 			END IF;
 
 				-- manage value
-				IF v_value IS NOT NULL AND v_tabname='tab_macroexploitation_add' THEN
+				IF v_value IS NOT NULL AND v_tabname='tab_macroexploitation_add' AND v_addschema IS NOT NULL THEN
 					EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
 					EXECUTE  'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) 
 					SELECT '|| v_columnname ||', current_user 

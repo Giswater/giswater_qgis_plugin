@@ -334,8 +334,8 @@ BEGIN
 
 	IF v_count > 0 THEN
 		v_errortext=concat('ERROR-321: There is/are ',v_count,' addfields that are not defined in config_form_fields. Addfields: ',v_view_list,'.');
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message)
-		VALUES (195, 3, '321',v_errortext);
+		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (195, 3, '321',v_errortext, v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
 		VALUES (195, 1, '321','INFO: All addfields are defined in config_form_fields.', 0);

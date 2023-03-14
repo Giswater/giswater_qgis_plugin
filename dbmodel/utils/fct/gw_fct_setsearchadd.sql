@@ -52,6 +52,7 @@ v_projecttype character varying;
 -- Street
 v_street_layer varchar;
 v_street_id_field varchar;
+v_street_search_field varchar;
 v_street_display_field varchar;
 v_street_muni_id_field varchar;
 v_street_geom_id_field varchar;
@@ -86,7 +87,8 @@ BEGIN
 		-- Parameters of the street layer
 		SELECT ((value::json)->>'sys_table_id') INTO v_street_layer FROM config_param_system WHERE parameter='basic_search_street';
 		SELECT ((value::json)->>'sys_id_field') INTO v_street_id_field FROM config_param_system WHERE parameter='basic_search_street';
-		SELECT ((value::json)->>'sys_search_field') INTO v_street_display_field FROM config_param_system WHERE parameter='basic_search_street';
+		SELECT ((value::json)->>'sys_search_field') INTO v_street_search_field FROM config_param_system WHERE parameter='basic_search_street';
+		SELECT ((value::json)->>'sys_display_field') INTO v_street_display_field FROM config_param_system WHERE parameter='basic_search_street';
 		SELECT ((value::json)->>'sys_parent_field') INTO v_street_muni_id_field FROM config_param_system WHERE parameter='basic_search_street';
 		SELECT ((value::json)->>'sys_geom_field') INTO v_street_geom_id_field FROM config_param_system WHERE parameter='basic_search_street';
 

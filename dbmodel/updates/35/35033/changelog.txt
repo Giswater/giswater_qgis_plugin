@@ -1,0 +1,10 @@
+3.5.033
+*************
+- New system parameter edit_review_auto_field_checked - If true, at saving review data, it would be automatically set as finished
+- Add new editable fields on man_meter: real_press_max, real_press_min, real_press_avg
+- New function on toolbox to capture address values from closest street number (3198)
+- New table node_border_sector, that stores relation between node and it''s additional sectors.
+- Rename trigger gw_trg_node_border to  gw_trg_feature_border as it configures nodes and arcs that are located on the border between mapzones
+- Add new review status - only review observations added, no data modifications
+- New function gw_fct_calculate_sander for UD - calculates the depth of sander depending on node sys_ymax and arc sys_y1
+- New function gw_fct_config_feature_border for initial configuration of border nodes

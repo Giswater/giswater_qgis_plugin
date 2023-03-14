@@ -30,10 +30,10 @@ BEGIN
 	
 		-- check if there are not-selected psector affected
 		IF (SELECT count (*) FROM plan_psector_x_connec JOIN plan_psector USING (psector_id) 
-		WHERE arc_id = NEW.arc_id AND state = 1 AND status IN (1,2) AND psector_id NOT IN (SELECT psector_id FROM selector_psector)) > 0 THEN
+		WHERE arc_id = NEW.arc_id AND state = 1 AND status IN (1,2) AND psector_id NOT IN (SELECT psector_id FROM selector_psector WHERE cur_user=current_user)) > 0 THEN
 			
 			SELECT concat('Psector: ',string_agg(distinct name::text, ', ')) into v_debugmsg FROM plan_psector_x_connec JOIN plan_psector USING (psector_id) 
-			WHERE arc_id = NEW.arc_id AND state = 1 AND status IN (1,2) AND psector_id NOT IN (SELECT psector_id FROM selector_psector);
+			WHERE arc_id = NEW.arc_id AND state = 1 AND status IN (1,2) AND psector_id NOT IN (SELECT psector_id FROM selector_psector WHERE cur_user=current_user);
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3180", "function":"2542","debug_msg":"'||v_debugmsg||'"}}$$);';								

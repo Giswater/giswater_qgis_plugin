@@ -55,6 +55,7 @@ DECLARE
 v_feature_type text;-- Type of features affected
 v_feature_ids text; -- List of feature affected
 v_forcedarcs text; -- Used to force only some specific arcs
+v_isforcedarcs boolean; -- Check if forced arcs strategy is being used
 v_ispsector boolean; -- When function is called from psector side (gw_trg_plan_psector_link)
 v_isarcdivide boolean;	-- When function is called for arcdivide procedure (gw_fct_setarcdivide)
 v_link_id integer; -- Id for link
@@ -67,6 +68,7 @@ v_psector_current integer; -- Current psector related to user
 -- process variables
 v_connect record; -- Record to store the value for the used connect
 v_link record; -- Record to store the value for the used link
+v_link_point public.geometry;
 v_arc record; -- Record to store the value for the used arc
 v_connect_id  varchar; -- id for the used connect
 v_point_aux public.geometry; -- Variable to store the geometry of the end of the link
@@ -127,12 +129,17 @@ BEGIN
 	v_isarcdivide = (p_data->>'data')::json->>'isArcDivide';
 	v_link_id = (p_data->>'data')::json->>'linkId';
 
+	--profilactic values
+	if v_forceendpoint IS NULL THEN v_forceendpoint = FALSE; END IF;
+
 	-- create query text for forced arcs
 	if v_forcedarcs is null then
 		v_forcedarcs= '';
+		v_isforcedarcs = False;
 	else
 		v_forcedarcs = replace(ARRAY(SELECT json_array_elements_text(((p_data::json->>'data')::json->>'forcedArcs')::json))::text, '{','(');
 		v_forcedarcs = concat (' AND arc_id::integer IN ', replace (v_forcedarcs, '}',')'));
+		v_isforcedarcs = True;
 	end if;
 
 	-- get values from feature array
@@ -157,6 +164,10 @@ BEGIN
 
 	    FOREACH v_connect_id IN ARRAY v_feature_array
 	    LOOP
+
+	    IF v_isforcedarcs IS FALSE THEN
+	    	v_forcedarcs= '';
+	    END IF; 
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (217, null, 4, concat('Trying to connect ', lower(v_feature_type),' with id ',v_connect_id,'.'));
@@ -201,10 +212,10 @@ BEGIN
 		SELECT * INTO v_arc FROM v_edit_arc WHERE ST_DWithin(v_connect.the_geom, v_edit_arc.the_geom, 0.001);
 
 		-- Use connect.arc_id as forced arcs in case of exists
-		IF v_connect.arc_id IS NOT NULL AND v_forcedarcs = '' THEN
+		IF v_connect.arc_id IS NOT NULL AND v_isforcedarcs is False THEN
 			v_forcedarcs = concat (' AND arc_id::integer = ',v_connect.arc_id,' ');
 		END IF;
-
+		
 		IF v_arc.arc_id IS NOT NULL THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (217, null, 4, concat('FAILED: Link not created because connect ',v_connect_id,' is over arc ', v_arc.arc_id));
@@ -272,29 +283,41 @@ BEGIN
 
 				-- setting point aux
 				SELECT geom_point INTO v_geom_point FROM temp_table WHERE fid = 485 and cur_user = current_user;
-				v_point_aux := v_geom_point;
-				DELETE FROM temp_table WHERE fid = 485 AND cur_user=current_user;
+			
+				if v_geom_point is not null then
+					v_point_aux := St_closestpoint(v_arc.the_geom, v_geom_point);
+				end if;
 				
-                IF v_point_aux IS NULL THEN
+				DELETE FROM temp_table WHERE fid = 485 AND cur_user=current_user;
+												
+				IF v_point_aux IS NULL THEN
 
-                    v_point_aux := St_closestpoint(v_arc.the_geom, st_EndPoint(v_link.the_geom));
+					-- getting the appropiate vertex of link to check distance againts arc
+					select geom INTO v_link_point from (select (st_dumppoints(the_geom)).geom, (st_dumppoints(the_geom)).path, the_geom 
+					from link where link.link_id = v_link.link_id) a where path[1] = st_numpoints(the_geom)-1;
+					v_point_aux := St_closestpoint(v_arc.the_geom, v_link_point);
 
-                    IF st_equals(v_point_aux, st_endpoint(v_arc.the_geom)) THEN
-                        v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, 1-v_dfactor));
+					-- profilactic control for v_point_aux
+					IF v_point_aux IS NULL THEN
+						v_point_aux := St_closestpoint(v_arc.the_geom, v_connect.the_geom);
+					END IF;
 
-                    ELSIF st_equals(v_point_aux, st_startpoint(v_arc.the_geom)) THEN
-                        v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, v_dfactor));
-                    ELSE
-                        v_point_aux := St_closestpoint(v_arc.the_geom, St_endpoint(v_link.the_geom));
-                    END IF;
+					-- changing closest point
+					IF st_equals(v_point_aux, st_endpoint(v_arc.the_geom)) THEN
+						v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, 1-v_dfactor));
+									
+					ELSIF st_equals(v_point_aux, st_startpoint(v_arc.the_geom)) THEN
+						v_point_aux = (ST_lineinterpolatepoint(v_arc.the_geom, v_dfactor));
 
-                    -- profilactic control for v_point_aux
-                    IF v_point_aux IS NULL THEN
-                        v_point_aux := St_closestpoint(v_arc.the_geom, v_connect.the_geom);
-                    END IF;
+					END IF;
+		
+					-- profilactic control for v_point_aux
+					IF v_point_aux IS NULL THEN
+						v_point_aux := St_closestpoint(v_arc.the_geom, v_connect.the_geom);
+					END IF;
 
-                END IF;
-
+				END IF;
+			
 				IF v_link.the_geom IS NULL AND v_pjointtype='ARC' THEN
 
 					IF v_link.the_geom IS NULL THEN
@@ -386,7 +409,7 @@ BEGIN
 
 					UPDATE link SET state = 2 WHERE link_id  = v_link.link_id;
 
-				ELSIF v_isarcdivide or v_isoperative_psector or (v_ispsector and v_forceendpoint) THEN -- then returning to psector link & arc_id
+				ELSIF v_isarcdivide or v_isoperative_psector or (v_ispsector and v_forceendpoint) THEN -- then returning link & arc_id
 
 					IF v_feature_type ='CONNEC' THEN
 						UPDATE plan_psector_x_connec SET link_id = v_link.link_id, arc_id = v_arc.arc_id
@@ -470,6 +493,7 @@ BEGIN
 			v_connect := null;
 			v_link := null;
 			v_arc := null;
+			v_point_aux := null;
 		END IF;
 	    END LOOP;
 	END IF;

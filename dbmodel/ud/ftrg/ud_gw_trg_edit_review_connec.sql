@@ -28,6 +28,11 @@ BEGIN
 	v_rev_connec_y1_tol :=(SELECT value::json->'y1' FROM config_param_system WHERE "parameter"='edit_review_connec_tolerance');
 	v_rev_connec_y2_tol :=(SELECT value::json->'y2' FROM config_param_system WHERE "parameter"='edit_review_connec_tolerance');		
 
+--get value from edit_review_auto_field_checked
+	IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'edit_review_auto_field_checked') IS TRUE THEN
+		NEW.field_checked=TRUE;
+	END IF;
+	
 	--getting original values
 	SELECT connec_id, y1, y2, connec.connec_type, connecat_id, connec.matcat_id, annotation, observ, expl_id, the_geom INTO rec_connec 
 	FROM connec JOIN cat_connec ON cat_connec.id=connec.connecat_id WHERE connec_id=NEW.connec_id;
@@ -57,6 +62,9 @@ BEGIN
 		-- geometry changes	
 		ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_connec.the_geom::text) is FALSE THEN
 			v_review_status=2;
+		--only review comment
+		ELSIF (v_tol_filter_bool is FALSE) AND NEW.review_obs IS NOT NULL THEN
+			v_review_status=4;	
 		-- changes under tolerance
 		ELSIF (v_tol_filter_bool is FALSE) THEN
 			v_review_status=0;	

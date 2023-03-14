@@ -67,6 +67,7 @@ v_gully_efficiency float;
 -- automatic_man2inp_values
 v_man_view text;
 v_input json;
+v_auto_sander boolean;
 
 BEGIN
 
@@ -85,6 +86,7 @@ BEGIN
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 
+	SELECT value::boolean into v_auto_sander FROM config_param_system WHERE parameter='edit_node_automatic_sander';
 
 	-- get user variables
 	v_gully_outlet_type = (SELECT value FROM config_param_user WHERE parameter = 'epa_gully_outlet_type_vdefault' AND cur_user = current_user);
@@ -575,7 +577,10 @@ BEGIN
 		ELSIF v_man_table='man_outfall' THEN
 
 			INSERT INTO man_outfall (node_id, name) VALUES (NEW.node_id,NEW.name);
-        
+      
+			INSERT INTO drainzone (name,expl_id, graphconfig)
+			VALUES (NEW.node_id,NEW.expl_id, concat('{"use":[{"nodeParent":"',NEW.node_id,'"}], "ignore":[], "forceClosed":[]}')::json);
+
 		ELSIF v_man_table='man_valve' THEN
 
 			INSERT INTO man_valve (node_id, name) VALUES (NEW.node_id,NEW.name);	
@@ -628,6 +633,11 @@ BEGIN
 			EXECUTE v_sql;
 		END IF;
 
+		--sander calculation
+		IF (v_man_table='man_chamber' OR  v_man_table='man_manhole' OR  v_man_table='man_wjump') AND v_auto_sander IS TRUE THEN
+			EXECUTE 'SELECT gw_fct_calculate_sander($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":"'||NEW.node_id||'"}}$$)';
+		END IF;
+
 		-- man addfields insert
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM sys_addfields
@@ -650,7 +660,11 @@ BEGIN
 		ELSIF (NEW.epa_type = 'DIVIDER') THEN
 			INSERT INTO inp_divider (node_id, divider_type) VALUES (NEW.node_id, 'CUTOFF');
 		ELSIF (NEW.epa_type = 'OUTFALL') THEN
-			INSERT INTO inp_outfall (node_id, outfall_type) VALUES (NEW.node_id, 'NORMAL');			
+			INSERT INTO inp_outfall (node_id, outfall_type) VALUES (NEW.node_id, 'NORMAL');
+
+			INSERT INTO drainzone (name,expl_id, graphconfig)
+			VALUES (NEW.node_id,NEW.expl_id, concat('{"use":[{"nodeParent":"',NEW.node_id,'"}], "ignore":[], "forceClosed":[]}')::json);
+
 		ELSIF (NEW.epa_type = 'STORAGE') THEN
 			INSERT INTO inp_storage (node_id, storage_type) VALUES (NEW.node_id, 'TABULAR');	
 		ELSIF (NEW.epa_type = 'NETGULLY') THEN
@@ -672,7 +686,8 @@ BEGIN
 			ELSIF (OLD.epa_type = 'DIVIDER') THEN
 				v_inp_table:= 'inp_divider';                
 			ELSIF (OLD.epa_type = 'OUTFALL') THEN
-				v_inp_table:= 'inp_outfall';    
+				v_inp_table:= 'inp_outfall';   
+				DELETE FROM drainzone WHERE name = OLD.node_id;
 			ELSIF (OLD.epa_type = 'STORAGE') THEN
 				v_inp_table:= 'inp_storage'; 
 			ELSIF (OLD.epa_type = 'NETGULLY') THEN
@@ -692,6 +707,8 @@ BEGIN
 				v_inp_table:= 'inp_divider';     
 			ELSIF (NEW.epa_type = 'OUTFALL') THEN
 				v_inp_table:= 'inp_outfall';  
+				INSERT INTO drainzone (name,expl_id, graphconfig)
+				VALUES (NEW.node_id,NEW.expl_id, concat('{"use":[{"nodeParent":"',NEW.node_id,'"}], "ignore":[], "forceClosed":[]}')::json);
 			ELSIF (NEW.epa_type = 'STORAGE') THEN
 				v_inp_table:= 'inp_storage';
 			ELSIF (NEW.epa_type = 'NETGULLY') THEN
@@ -887,6 +904,11 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 		END IF;
 
+		--sander calculation
+		IF (v_man_table='man_chamber' OR  v_man_table='man_manhole' OR  v_man_table='man_wjump') AND (NEW.ymax <> OLD.ymax) AND v_auto_sander IS TRUE THEN
+			EXECUTE 'SELECT gw_fct_calculate_sander($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":"'||NEW.node_id||'"}}$$)';
+		END IF;
+
 		-- man addfields update
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM sys_addfields
@@ -941,7 +963,8 @@ BEGIN
 
 		--Delete addfields (after or before deletion of node, doesn't matter)
 		DELETE FROM man_addfields_value WHERE feature_id = OLD.node_id;
-
+	--Delete drainzone config values
+		DELETE FROM drainzone WHERE name = OLD.node_id;
 		RETURN NULL;	
 	END IF;
 END;

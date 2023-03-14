@@ -36,6 +36,9 @@ BEGIN
 	DELETE FROM selector_rpt_main WHERE cur_user=current_user;
 	INSERT INTO selector_rpt_main(result_id, cur_user) VALUES (v_result_id, current_user);
 
+	UPDATE rpt_cat_result SET iscorporate=false;
+	UPDATE rpt_cat_result SET iscorporate=true WHERE result_id = v_result_id;
+
 	INSERT INTO node_add (node_id, demand_max, demand_min, demand_avg, press_max, press_min, press_avg, head_max, head_min, head_avg, quality_max, quality_min, quality_avg)
 	SELECT node_id, avg(demand_max)::numeric(12,2), avg(demand_min)::numeric(12,2), avg(demand_avg)::numeric(12,2), avg(press_max)::numeric(12,2), avg(press_min)::numeric(12,2), avg(press_avg)::numeric(12,2),
 	avg(head_max)::numeric(12,2), avg(head_min)::numeric(12,2), avg(head_avg)::numeric(12,2), avg(quality_max)::numeric(12,2), avg(quality_min)::numeric(12,2), avg(quality_avg)::numeric(12,2) FROM
