@@ -293,4 +293,6 @@ isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_is
 widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
 FROM config_form_fields WHERE formname = 'v_edit_link' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
+UPDATE link SET exit_id = arc_id FROM gully g WHERE gully_id = feature_id and g.state > 0 AND exit_type  ='ARC';
+
 SELECT gw_fct_connect_link_refactor();

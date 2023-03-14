@@ -332,3 +332,5 @@ INSERT INTO config_form_tabs(formname, tabname, label, sys_role,  device, orderb
 VALUES ('selector_basic','tab_macroexploitation_add','Macroexpl Add','role_basic',4, 0) ON CONFLICT (formname, tabname, device) DO NOTHING;
 
 UPDATE config_form_tableview SET columnindex = columnindex + 1 WHERE location_type = 'epa_toolbar';
+
+UPDATE link SET exit_id = arc_id FROM connec c WHERE connec_id = feature_id and c.state > 0 AND exit_type  ='ARC';
