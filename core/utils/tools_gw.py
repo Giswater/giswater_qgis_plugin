@@ -1613,8 +1613,6 @@ def add_checkbox(**kwargs):
         if 'parameters' in field['widgetfunction']:
             func_params = field['widgetfunction']['parameters']
     else:
-        message = "Parameter widgetfunction.functionName is null for button"
-        tools_qgis.show_message(message, 2, parameter=widget.objectName())
         return widget
 
     kwargs['widget'] = widget
@@ -4026,9 +4024,6 @@ def set_filter_listeners(complet_result, dialog, widget_list, columnname, widget
                     return widget
                 if 'parameters' in widgetfunction[i]:
                     func_params = widgetfunction[i]['parameters']
-            else:
-                message = "Parameter widgetfunction.functionName is null for button"
-                tools_qgis.show_message(message, 2, parameter=widget.objectName())
 
             kwargs['widget'] = widget
             kwargs['message_level'] = 1
