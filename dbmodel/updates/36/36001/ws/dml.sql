@@ -985,7 +985,7 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, '
 
 INSERT INTO sys_function
 (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
-VALUES(3192, 'gw_fct_getmincut_manager', 'ws', 'function', 'json', 'json', 'Get mincut manager values', 'role_om', NULL, 'core');
+VALUES(3208, 'gw_fct_getmincut_manager', 'ws', 'function', 'json', 'json', 'Get mincut manager values', 'role_om', NULL, 'core') ON CONFLICT (id) DO NOTHING;
 
 
 INSERT INTO config_typevalue
