@@ -858,7 +858,7 @@ class GwPsector:
             self.set_tabs_enabled(False)
 
 
-    def check_tab_position(self)
+    def check_tab_position(self):
         self.dlg_plan_psector.name.setEnabled(False)
         self.insert_or_update_new_psector(tablename=f'v_edit_plan_psector', close_dlg=False)
         self.update = True
