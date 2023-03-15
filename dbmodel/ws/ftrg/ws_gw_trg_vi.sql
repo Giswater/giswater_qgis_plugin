@@ -58,8 +58,8 @@ BEGIN
 			NEW.power=NULL;	   
 	    END IF;
 	    
-	    INSERT INTO inp_pump_importinp (arc_id,power,curve_id,speed,pattern)
-	    VALUES (NEW.arc_id,NEW.power, NEW.head, NEW.speed::numeric, NEW.pattern);
+	    INSERT INTO inp_pump_importinp (arc_id,power,curve_id,speed,pattern_id)
+	    VALUES (NEW.arc_id,NEW.power, NEW.head, NEW.speed::numeric, NEW.pattern_id);
 	    INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id); 
 	    
 	  ELSIF v_view='vi_valves' THEN
@@ -97,21 +97,31 @@ BEGIN
 		INSERT INTO inp_curve_value(curve_id, x_value, y_value) VALUES (NEW.curve_id, NEW.x_value, NEW.y_value);
 	    
 	  ELSIF v_view='vi_emitters' THEN
-		INSERT INTO inp_emitter(node_id, coef) VALUES (NEW.node_id, NEW.coef);
+		--INSERT INTO inp_emitter(node_id, coef) VALUES (NEW.node_id, NEW.coef);
+		UPDATE inp_junction SET emitter_coeff = NEW.coef WHERE node_id=NEW.node_id;
 	    
 	  ELSIF v_view='vi_quality' THEN
-		INSERT INTO inp_quality (node_id,initqual) VALUES (NEW.node_id,NEW.initqual);
+		--INSERT INTO inp_quality (node_id,initqual) VALUES (NEW.node_id,NEW.initqual);
+		UPDATE inp_junction SET init_quality = NEW.initqual WHERE node_id = NEW.node_id;
+		UPDATE inp_tank SET init_quality = NEW.initqual WHERE node_id = NEW.node_id;
+		UPDATE inp_reservoir SET init_quality = NEW.initqual WHERE node_id = NEW.node_id;
+		UPDATE inp_inlet SET init_quality = NEW.initqual WHERE node_id = NEW.node_id;
 	    
 	  ELSIF v_view='vi_sources' THEN
-		INSERT INTO inp_source(node_id, sourc_type, quality, pattern_id) VALUES (NEW.node_id, NEW.sourc_type, NEW.quality, NEW.pattern_id);
-	    
+		--INSERT INTO inp_source(node_id, sourc_type, quality, pattern_id) VALUES (NEW.node_id, NEW.sourc_type, NEW.quality, NEW.pattern_id);
+
+		UPDATE inp_junction SET source_type = NEW.source_type, source_quality = NEW.source_quality, source_pattern_id = NEW.source_pattern_id WHERE node_id = NEW.node_id;
+		UPDATE inp_tank SET source_type = NEW.source_type, source_quality = NEW.source_quality, source_pattern_id = NEW.source_pattern_id WHERE node_id = NEW.node_id;
+		UPDATE inp_reservoir SET source_type = NEW.source_type, source_quality = NEW.source_quality, source_pattern_id = NEW.source_pattern_id WHERE node_id = NEW.node_id;
+		UPDATE inp_inlet SET source_type = NEW.source_type, source_quality = NEW.source_quality, source_pattern_id = NEW.source_pattern_id WHERE node_id = NEW.node_id;
+
 	  ELSIF v_view='vi_reactions' THEN
 
-	  	IF NEW.arc_id IN (SELECT arc_id FROM inp_pipe) THEN
+	  	/*IF NEW.arc_id IN (SELECT arc_id FROM inp_pipe) THEN
 	  		UPDATE inp_pipe SET reactionparam = NEW.idval, reactionvalue = NEW.reactionvalue WHERE arc_id=NEW.arc_id;
 	  	ELSE 
 	  		INSERT INTO inp_reactions (descript) VALUES (concat(NEW.idval,' ', NEW.arc_id,' ',NEW.reactionvalue));
-	  	END IF;
+	  	END IF;*/
 
 	  ELSIF v_view='vi_energy' THEN
 	  	IF NEW.pump_id ilike 'PUMP%' THEN
