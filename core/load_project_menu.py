@@ -66,13 +66,12 @@ class GwMenuLoad(QObject):
 
                     if project_exclude and index_action in project_exclude:
                         continue
-
                     icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}{toolbar}{os.sep}{index_action}.png"
                     icon = QIcon(icon_path)
                     button_def = global_vars.giswater_settings.value(f"buttons_def/{index_action}")
                     text = ""
                     if button_def:
-                        text = self._translate(f'{index_action}_text')
+                        text = self._translate(f'{button_def}')
                     parent = self.iface.mainWindow()
                     ag = QActionGroup(parent)
                     ag.setProperty('gw_name', 'gw_QActionGroup')
