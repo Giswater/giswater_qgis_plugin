@@ -53,6 +53,7 @@ BEGIN
 	IF (v_man_table='man_chamber' OR  v_man_table='man_manhole' OR  v_man_table='man_wjump') THEN
 
 		FOR rec_arc IN (SELECT * FROM v_edit_arc WHERE node_1 = v_id AND state=1) LOOP 
+
 			v_calc = v_sys_ymax - rec_arc.sys_y1;
 
 			IF i = 1 THEN
@@ -63,12 +64,15 @@ BEGIN
 
 			i= i+1;
 		END LOOP;
-				
-			IF  v_valmin < 0 THEN
-				v_valmin=0;
-			END IF;
+					
+		IF v_valmin < 0 THEN
+			v_valmin=0;
+		END IF;
 
-			EXECUTE 'UPDATE '||v_man_table||' SET sander_depth = '||v_valmin||' WHERE node_id = '||quote_literal(v_id)||';';
+		IF v_valmin IS NOT NULL THEN
+				EXECUTE 'UPDATE '||v_man_table||' SET sander_depth = '||v_valmin||' WHERE node_id = '||quote_literal(v_id)||';';
+		END IF;
+
 	END IF;
 
 	-- info
