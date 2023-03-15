@@ -313,7 +313,7 @@ BEGIN
 						round(st_length(rec_aux1.the_geom)::numeric,2),'.'));
 						
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
-						VALUES (212, 1, concat('Arc1: arc_id:', rec_aux2.arc_id,', code:',rec_aux2.code,' length:',
+						VALUES (212, 1, concat('Arc2: arc_id:', rec_aux2.arc_id,', code:',rec_aux2.code,' length:',
 						round(st_length(rec_aux2.the_geom)::numeric,2),'.'));
 
 						-- insert new records into man_table
