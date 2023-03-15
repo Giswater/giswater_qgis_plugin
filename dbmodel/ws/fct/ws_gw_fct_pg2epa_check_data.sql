@@ -570,9 +570,9 @@ BEGIN
 	select 293, b.node_id, nodecat_id, the_geom, 'EPA valve with more than two arcs', expl_id
 	FROM(
 	SELECT node_id, count(*) FROM(
-	SELECT node_id FROM arc JOIN v_edit_inp_valve ON node_1 = node_id 
+	SELECT node_id FROM arc JOIN v_edit_inp_valve ON node_1 = node_id and arc.state = 1 
 	UNION ALL
-	SELECT node_id FROM arc JOIN v_edit_inp_valve ON node_2 = node_id ) a
+	SELECT node_id FROM arc JOIN v_edit_inp_valve ON node_2 = node_id and arc.state = 1) a
 	GROUP BY node_id
 	HAVING count(*)>2)b
 	JOIN node USING (node_id)
