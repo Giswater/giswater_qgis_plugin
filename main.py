@@ -50,10 +50,13 @@ class Giswater(QObject):
             self._project_read(False, False)
 
 
-    def unload(self, hide_gw_button=True):
+    def unload(self, hide_gw_button=None):
         """
         Removes plugin menu items and icons from QGIS GUI
-            :param hide_gw_button: is True when plugin is disabled or reloaded
+            :param hide_gw_button:
+                                is True when you want to hide the admin button.
+                                is False when you want to show the admin button.
+                                is None when called from QGIS.
         """
 
         try:
@@ -78,6 +81,14 @@ class Giswater(QObject):
         except Exception as e:
             tools_log.log_info(f"Exception in unload when self._close_open_dialogs(): {e}")
             raise e
+
+        if hide_gw_button is None:
+            try:
+                # Manage unset signals
+                self._unset_signals()
+            except Exception as e:
+                tools_log.log_info(f"Exception in unload when unset signals: {e}")
+                raise e
 
         try:
             # Force action pan
@@ -270,16 +281,12 @@ class Giswater(QObject):
         """ Define iface event signals on Project Read / New Project / Save Project """
 
         try:
-            self._unset_signals()
-
             tools_gw.connect_signal(self.iface.projectRead, self._project_read,
                                     'main', 'projectRead')
             tools_gw.connect_signal(self.iface.newProjectCreated, self._project_new,
                                     'main', 'newProjectCreated')
             tools_gw.connect_signal(self.iface.actionSaveProject().triggered, self._save_toolbars_position,
                                     'main', 'actionSaveProject_save_toolbars_position')
-            tools_gw.connect_signal(self.iface.actionSaveProject().triggered, self.save_project,
-                                    'main', 'actionSaveProject_save_project')
         except AttributeError:
             pass
 
@@ -288,15 +295,15 @@ class Giswater(QObject):
         """ Disconnect iface event signals on Project Read / New Project / Save Project """
 
         try:
-            self.iface.projectRead.disconnect()
+            tools_gw.disconnect_signal('main', 'projectRead')
         except TypeError:
             pass
         try:
-            self.iface.newProjectCreated.disconnect()
+            tools_gw.disconnect_signal('main', 'newProjectCreated')
         except TypeError:
             pass
         try:
-            self.iface.actionSaveProject().triggered.disconnect()
+            tools_gw.disconnect_signal('main', 'actionSaveProject_save_toolbars_position')
         except TypeError:
             pass
 
