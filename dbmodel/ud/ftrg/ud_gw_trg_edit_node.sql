@@ -905,7 +905,7 @@ BEGIN
 		END IF;
 
 		--sander calculation
-		IF (v_man_table='man_chamber' OR  v_man_table='man_manhole' OR  v_man_table='man_wjump') AND (NEW.ymax <> OLD.ymax) AND v_auto_sander IS TRUE THEN
+		IF (v_man_table='man_chamber' OR  v_man_table='man_manhole' OR  v_man_table='man_wjump') AND v_auto_sander IS TRUE THEN
 			EXECUTE 'SELECT gw_fct_calculate_sander($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":"'||NEW.node_id||'"}}$$)';
 		END IF;
 
