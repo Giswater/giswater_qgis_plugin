@@ -373,3 +373,8 @@ INSERT INTO config_form_tabs VALUES ('v_edit_connec','tab_epa','EPA results',NUL
 INSERT INTO sys_function
 (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES(3206, 'gw_fct_checknode', 'utils', 'function', 'json', 'json', 'Function to get node from coordinate', 'role_basic', NULL, 'core') ON CONFLICT (id) DO NOTHING;
+
+-- 15/03/2023
+UPDATE config_toolbox SET device = '{4,5}';
+UPDATE config_report SET device = '{4,5}';
+
