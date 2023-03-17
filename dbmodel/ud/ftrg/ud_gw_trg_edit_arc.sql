@@ -687,7 +687,7 @@ BEGIN
 		END IF;
 
 		--sander calculation
-		IF (NEW.y1 <> OLD.y2) AND v_auto_sander IS TRUE THEN
+		IF v_auto_sander IS TRUE THEN
 			EXECUTE 'SELECT gw_fct_calculate_sander($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":"'||NEW.node_1||'"}}$$)';
 		END IF;
 
