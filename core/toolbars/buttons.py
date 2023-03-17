@@ -63,3 +63,4 @@ from .utilities.workspace_manager_btn import GwWorkspaceManagerButton
 
 # ToC
 from .toc.add_child_layer_button import GwAddChildLayerButton
+from .toc.epa_world_button import GwEpaWorldButton

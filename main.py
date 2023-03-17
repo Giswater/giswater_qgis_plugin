@@ -114,10 +114,10 @@ class Giswater(QObject):
             tools_log.log_info(f"Exception in unload when self._unset_info_button(): {e}")
 
         try:
-            # Remove 'Add child layer button'
-            self._unset_child_layer_button()
+            # Remove ToC buttons
+            self._unset_toc_buttons()
         except Exception as e:
-            tools_log.log_info(f"Exception in unload when self._unset_child_layer_button(): {e}")
+            tools_log.log_info(f"Exception in unload when self._unset_toc_buttons(): {e}")
 
         try:
             # Remove file handler when reloading
@@ -347,12 +347,15 @@ class Giswater(QObject):
         self.action_info = None
 
 
-    def _unset_child_layer_button(self):
-        """ Unset Add Child Layer button (when plugin is disabled or reloaded) """
+    def _unset_toc_buttons(self):
+        """ Unset Add Child Layer and Toggle EPA World buttons (when plugin is disabled or reloaded) """
 
-        action = self.iface.mainWindow().findChild(QAction, "GwAddChildLayerButton")
-        if action not in (None, "None"):
-            action.deleteLater()
+        toolbar = self.iface.mainWindow().findChild(QDockWidget, 'Layers').findChildren(QToolBar)[-1]
+        for action in toolbar.actions():
+            if action.objectName() not in ('GwAddChildLayerButton', 'GwEpaWorldButton'):
+                continue
+            toolbar.removeAction(action)  # Remove from toolbar
+            action.deleteLater()  # Schedule for deletion
 
 
     def _project_new(self):
