@@ -1054,14 +1054,7 @@ INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('mincut_manager', 'form_mincut', 'main', 'state', 'lyt_mincut_mng_1', 3, 'string', 'combo', 'State:', NULL, NULL, false, false, true, false, true, 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''mincut_state'' ', true, true, NULL, NULL, NULL, '{"labelPosition": "top", "columnId": 1, "getIndex": false}'::json, '[{"functionName": "filter_table_mincut", "parameters": {}, "isFilter": true}, {"functionName": "combo_tweaks", "module":"mincut_tools", "parameters": {}, "isFilter": false}]'::json, 'tbl_mincut_manager', false, NULL); 
 
-ALTER TABLE config_form_list 
-ADD COLUMN addparam json;
 
-ALTER TABLE config_form_tableview
-ADD COLUMN addparam json;
-
-ALTER TABLE config_form_tableview 
-RENAME COLUMN tablename TO objectname;
 
 UPDATE config_form_tableview
 SET objectname = 'tbl_mincut_manager'
