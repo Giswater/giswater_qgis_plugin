@@ -21,3 +21,10 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('outfall');
 
 CREATE TRIGGER gw_trg_edit_ve_epa_storage INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_storage
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('storage');
+
+DROP TRIGGER IF EXISTS gw_trg_vi_timeseries ON vi_timeseries;
+CREATE TRIGGER   gw_trg_vi_timeseries
+    INSTEAD OF INSERT OR DELETE OR UPDATE 
+    ON vi_timeseries
+    FOR EACH ROW
+    EXECUTE FUNCTION gw_trg_vi('vi_timeseries');
