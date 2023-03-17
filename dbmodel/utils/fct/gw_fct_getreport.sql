@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 3068
+--FUNCTION CODE: 3212
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getreport(p_data json)
   RETURNS json AS

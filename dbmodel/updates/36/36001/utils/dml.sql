@@ -378,3 +378,10 @@ VALUES(3206, 'gw_fct_checknode', 'utils', 'function', 'json', 'json', 'Function 
 UPDATE config_toolbox SET device = '{4,5}';
 UPDATE config_report SET device = '{4,5}';
 
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
+VALUES (3210, 'gw_fct_getprocess', 'utils', 'function','json', 'json',
+'Function to manage open form for specific process execution on toolbox', 'role_basic', NULL) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
+VALUES (3212, 'gw_fct_getreport', 'utils', 'function','json', 'json',
+'Function to manage open form for specific report execution on toolbox', 'role_basic', NULL) ON CONFLICT (id) DO NOTHING;
