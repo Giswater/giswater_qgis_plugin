@@ -3007,6 +3007,18 @@ def add_icon(widget, icon, sub_folder="20x20"):
         return False
 
 
+def get_icon(icon, folder="dialogs", sub_folder="20x20"):
+    # Get icons folder
+    icons_folder = os.path.join(global_vars.plugin_dir, f"icons{os.sep}{folder}{os.sep}{sub_folder}")
+    icon_path = os.path.join(icons_folder, str(icon) + ".png")
+
+    if os.path.exists(icon_path):
+        return QIcon(icon_path)
+    else:
+        tools_log.log_info("File not found", parameter=icon_path)
+        return None
+
+
 def add_tableview_header(widget, field):
 
     model = widget.model()
