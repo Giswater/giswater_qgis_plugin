@@ -17,7 +17,7 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 
 		-- overwrite id values (in case of user fill something)
-		PERFORM setval('ws.inp_dscenario_demand_id_seq',(SELECT max(id) FROM inp_dscenario_demand), true);
+		PERFORM setval('SCHEMA_NAME.inp_dscenario_demand_id_seq',(SELECT max(id) FROM inp_dscenario_demand), true);
 	
 		INSERT INTO inp_dscenario_demand (feature_id, demand, pattern_id, demand_type, dscenario_id, feature_type, source) 
 		VALUES (NEW.feature_id, NEW.demand, NEW.pattern_id, NEW.demand_type, NEW.dscenario_id, NEW.feature_type, NEW.source);
