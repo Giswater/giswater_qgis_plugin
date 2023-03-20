@@ -10,12 +10,17 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_config_feature_border(p_data json)
   RETURNS json AS
 $BODY$
+
+/*EXAMPLE
+ SELECT gw_fct_config_feature_border($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"configZone":"EXPL"}}}$$);
+*/
 DECLARE 
 v_fid integer = 487;
 v_result json;
 v_result_info json;
 v_error_context text;
 v_version text;
+v_zone text;
 BEGIN
 
   SET search_path = "SCHEMA_NAME", public;
@@ -23,6 +28,8 @@ BEGIN
   -- select version
   SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
+	v_zone=json_extract_path_text(p_data, 'data','parameters','configZone')::TEXT;
+  
   -- Reset values
   DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
   DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid; 
@@ -31,22 +38,25 @@ BEGIN
   INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
   INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '');
 
-  INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CONFIGURATION OF SECTORS'));
-  INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('SECTOR_ID - NUMBER OF NODES'));
+  
+  IF v_zone = 'SECTOR' OR v_zone='ALL' THEN 
+  	DELETE FROM node_border_sector WHERE node_id IN (SELECT node_id FROM v_edit_node);
 
+  	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CONFIGURATION OF SECTORS'));
+  	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('SECTOR_ID - NUMBER OF FEATURES'));
 
   	--sector
   	INSERT INTO audit_check_data(fid,  error_message)
   	WITH 
 		arcs AS (SELECT arc_id, node_1, node_2, sector_id FROM arc WHERE state=1 )
-		select v_fid, concat(sector_id, ' - ', sum(count)) from (
+		select v_fid, concat(sector_id, ' - ', sum(count), ' nodes') from (
 		SELECT a1.sector_id, COUNT(*) as count
-		FROM node 
+		FROM v_edit_node node 
 		JOIN arcs a1 ON node_id=node_1 
 		where a1.sector_id != node.sector_id group by a1.sector_id
 		UNION 
 		SELECT  a2.sector_id, COUNT(*)
-		FROM node 
+		FROM v_edit_node node 
 		JOIN arcs a2 ON node_id=node_2 
 		where a2.sector_id != node.sector_id group by a2.sector_id)a
 		group by sector_id order by 1;
@@ -55,40 +65,43 @@ BEGIN
 		WITH 
 		arcs AS (SELECT arc_id, node_1, node_2, sector_id FROM arc WHERE state=1)
 		SELECT node_id, a1.sector_id
-		FROM node 
+		FROM v_edit_node node 
 		JOIN arcs a1 ON node_id=node_1 
 		where a1.sector_id != node.sector_id
 		UNION 
 		SELECT node_id, a2.sector_id
-		FROM node 
+		FROM v_edit_node node 
 		JOIN arcs a2 ON node_id=node_2 
 		where a2.sector_id != node.sector_id ON CONFLICT (node_id, sector_id) DO NOTHING;	
+	END IF;
 
+	IF v_zone = 'EXPL' OR v_zone='ALL' THEN 
+
+		--exploitation
 	  INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
 	  INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '');
 	  INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CONFIGURATION OF EXPLOITATIONS'));
-	  INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('EXPL_ID - NUMBER OF NODES'));
+	  INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('EXPL_ID - NUMBER OF FEATURES'));
 
-  	--exploitation
-  	INSERT INTO audit_check_data(fid,  error_message)
-  	WITH 
-		arcs AS (SELECT arc_id, node_1, node_2, expl_id FROM arc WHERE state=1 )
-		select v_fid, concat(expl_id,' - ',  sum(count)) from (
-		SELECT a1.expl_id, COUNT(*) as count
-		FROM node 
-		JOIN arcs a1 ON node_id=node_1 
-		where a1.expl_id != node.expl_id group by a1.expl_id
-		UNION 
-		SELECT  a2.expl_id, COUNT(*)
-		FROM node 
-		JOIN arcs a2 ON node_id=node_2 
-		where a2.expl_id != node.expl_id group by a2.expl_id)a
-		group by expl_id order by 1;
-
+    DELETE FROM node_border_expl WHERE node_id IN (SELECT node_id FROM v_edit_node);
+	  DELETE FROM arc_border_expl WHERE arc_id IN (SELECT arc_id FROM v_edit_arc);
 
 		INSERT INTO node_border_expl
 		WITH 
 		arcs AS (SELECT arc_id, node_1, node_2, expl_id FROM arc WHERE state=1)
+		SELECT node_id, a1.expl_id
+		FROM v_edit_node node 
+		JOIN arcs a1 ON node_id=node_1 
+		where a1.expl_id != node.expl_id
+		UNION 
+		SELECT node_id, a2.expl_id
+		FROM v_edit_node node 
+		JOIN arcs a2 ON node_id=node_2 
+		where a2.expl_id != node.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
+
+		INSERT INTO node_border_expl
+		WITH 
+		arcs AS (SELECT arc_id, node_1, node_2, expl_id FROM v_edit_arc WHERE state=1)
 		SELECT node_id, a1.expl_id
 		FROM node 
 		JOIN arcs a1 ON node_id=node_1 
@@ -99,7 +112,34 @@ BEGIN
 		JOIN arcs a2 ON node_id=node_2 
 		where a2.expl_id != node.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
 
-	-- get results
+		INSERT INTO arc_border_expl
+		select arc_id,  expl_id from
+		(SELECT a.arc_id,  n.expl_id
+		FROM arc a
+		JOIN v_edit_node n ON n.node_id=a.parent_id::text
+		WHERE a.expl_id != n.expl_id
+		union	
+		SELECT a.arc_id,  n.expl_id
+		FROM v_edit_arc a
+		JOIN node n ON n.node_id=a.parent_id::text
+		WHERE a.expl_id != n.expl_id)a ON CONFLICT (arc_id, expl_id) DO NOTHING;
+		
+		INSERT INTO audit_check_data(fid,  error_message)
+		select v_fid, concat(a.expl_id,' - ',   COUNT(a.node_id), ' nodes') from 
+		(SELECT b.expl_id, b.node_id 
+		FROM node_border_expl b
+		JOIN v_edit_node USING (node_id))a
+		group by expl_id;
+
+		INSERT INTO audit_check_data(fid,  error_message)
+		select v_fid, concat(a.expl_id,' - ',   COUNT(a.arc_id), ' arc') from 
+		(SELECT b.expl_id, b.arc_id 
+		FROM arc_border_expl b
+		JOIN v_edit_arc USING (arc_id))a
+		group by expl_id;
+	END IF;
+
+	-- get results	
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by id) row;

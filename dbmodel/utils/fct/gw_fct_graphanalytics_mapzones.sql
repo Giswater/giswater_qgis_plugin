@@ -228,10 +228,6 @@ BEGIN
 	
 	SELECT value::boolean INTO v_islastupdate FROM config_param_system WHERE parameter='edit_mapzones_set_lastupdate';
 
-	-- disable border trigger
-	ALTER TABLE arc DISABLE TRIGGER gw_trg_feature_border;
-	ALTER TABLE node DISABLE TRIGGER gw_trg_feature_border;
-
 	-- data quality analysis
 	IF v_checkdata = 'FULL' THEN
 	
@@ -927,6 +923,10 @@ BEGIN
 				)
 				) ON CONFLICT (node_id, dma_id) DO NOTHING';
 				EXECUTE v_querytext;
+			ELSIF v_class = 'SECTOR' THEN
+
+				PERFORM gw_fct_config_feature_border($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, 
+					"form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"configZone":"SECTOR"}}}$$);
 			END IF;
 
 			RAISE NOTICE 'Generate geometries';		
@@ -1082,6 +1082,7 @@ BEGIN
 		END IF;
 	END IF;
 	
+
 	RAISE NOTICE 'Getting results';
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
@@ -1209,9 +1210,6 @@ BEGIN
 	-- set variable to skip audit = false
 	UPDATE config_param_system SET value = 'false' WHERE parameter = 'admin_skip_audit';
 
-	-- enable border trigger
-	ALTER TABLE arc ENABLE TRIGGER gw_trg_feature_border;
-	ALTER TABLE node ENABLE TRIGGER gw_trg_feature_border;
 	
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
