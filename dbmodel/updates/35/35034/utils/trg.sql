@@ -10,4 +10,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 DROP TRIGGER IF EXISTS gw_trg_feature_border ON arc;
 DROP TRIGGER IF EXISTS gw_trg_feature_border ON node;
 
-
+DROP FUNCTION IF EXISTS gw_trg_feature_border;
