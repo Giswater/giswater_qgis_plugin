@@ -12,7 +12,7 @@ VALUES('edit_connec_downgrade_force', 'false', 'If true allow downgrade connecs 
 
 UPDATE sys_function SET input_params='json', return_type='json' WHERE id=3204;
 
-UPDATE config_toolbox SET inputparams = 
+UPDATE config_toolbox SET alias = 'Configuration of border features', inputparams = 
 '[{"widgetname":"configZone", "label":"Configurate zone:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,
 "comboIds":["EXPL", "SECTOR", "ALL"], 
-"comboNames":["EXPLOITATION", "SECTOR", "EXPLOITATION & SECTOR"]}]' WHERE id=3204;
+"comboNames":["EXPLOITATION", "SECTOR", "EXPLOITATION & SECTOR"]}]', active = true WHERE id=3204;
