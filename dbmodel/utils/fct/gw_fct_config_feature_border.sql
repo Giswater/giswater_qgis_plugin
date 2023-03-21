@@ -132,7 +132,7 @@ BEGIN
 		group by expl_id;
 
 		INSERT INTO audit_check_data(fid,  error_message)
-		select v_fid, concat(a.expl_id,' - ',   COUNT(a.arc_id), ' arc') from 
+		select v_fid, concat(a.expl_id,' - ',   COUNT(a.arc_id), ' arcs') from 
 		(SELECT b.expl_id, b.arc_id 
 		FROM arc_border_expl b
 		JOIN v_edit_arc USING (arc_id))a
