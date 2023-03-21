@@ -254,8 +254,13 @@ AS SELECT d.arc_id,
                   
                   
 DROP VIEW IF EXISTS v_ui_arc_x_relations;
-CREATE OR REPLACE VIEW v_ui_arc_x_relations
-AS SELECT row_number() OVER () + 1000000 AS rid,
+
+CREATE OR REPLACE VIEW v_ui_arc_x_relations AS 
+WITH links_node as (select n.node_id, l.feature_id, l.exit_type AS proceed_from, l.exit_id AS proceed_from_id,
+l.state as l_state,n.state as n_state
+FROM v_node n
+JOIN v_edit_link l ON n.node_id::text = l.exit_id::text)
+SELECT row_number() OVER () + 1000000 AS rid,
     v_connec.arc_id,
     v_connec.connec_type AS featurecat_id,
     v_connec.connecat_id AS catalog,
@@ -269,10 +274,11 @@ AS SELECT row_number() OVER () + 1000000 AS rid,
     l.exit_id AS proceed_from_id,
     'v_edit_connec'::text AS sys_table_id
    FROM v_connec
-     JOIN v_edit_link l ON v_connec.connec_id::text = l.feature_id::text AND l.exit_type<>'NODE'
-  WHERE v_connec.arc_id IS NOT NULL
+     JOIN v_edit_link l ON v_connec.connec_id::text = l.feature_id::text
+  WHERE v_connec.arc_id IS NOT NULL AND l.exit_type<>'NODE'
 UNION
-  SELECT row_number() OVER () + 2000000 AS rid,
+  SELECT distinct on (feature_id)
+  	row_number() OVER () + 2000000 AS rid,
     a.arc_id,
     connec_type AS featurecat_id,
     connecat_id AS catalog,
@@ -282,13 +288,12 @@ UNION
     c.state AS feature_state,
     st_x(c.the_geom) AS x,
     st_y(c.the_geom) AS y,
-    l.exit_type AS proceed_from,
-    l.exit_id AS proceed_from_id,
+     proceed_from,
+     proceed_from_id,
     'v_edit_connec'::text AS sys_table_id
    FROM v_arc a
-   	JOIN v_node n on a.node_1=n.node_id
-    JOIN v_edit_link l ON n.node_id::text = l.exit_id::text AND l.state = n.state
-    JOIN v_connec c ON c.connec_id::text = l.feature_id::text AND l.state = c.state
+   	JOIN links_node n on a.node_1=n.node_id
+    JOIN v_connec c ON c.connec_id::text = n.feature_id::text
 UNION
  SELECT row_number() OVER () + 3000000 AS rid,
     v_gully.arc_id,
@@ -304,10 +309,12 @@ UNION
     l.exit_id AS proceed_from_id,
     'v_edit_gully'::text AS sys_table_id
    FROM v_gully
-     JOIN v_edit_link l ON v_gully.gully_id::text = l.feature_id::text AND l.state = v_gully.state AND l.exit_type<>'NODE'
-  WHERE v_gully.arc_id IS NOT NULL
+     JOIN v_edit_link l ON v_gully.gully_id::text = l.feature_id::text
+  WHERE v_gully.arc_id IS NOT NULL AND l.state = v_gully.state
+	 AND l.exit_type<>'NODE'
 UNION
-  SELECT row_number() OVER () + 4000000 AS rid,
+  SELECT distinct on (feature_id)
+  	row_number() OVER () + 4000000 AS rid,
     a.arc_id,
     gully_type AS featurecat_id,
     gratecat_id AS catalog,
@@ -317,11 +324,87 @@ UNION
     g.state AS feature_state,
     st_x(g.the_geom) AS x,
     st_y(g.the_geom) AS y,
-    l.exit_type AS proceed_from,
-    l.exit_id AS proceed_from_id,
+    proceed_from,
+    proceed_from_id,
     'v_edit_gully'::text AS sys_table_id
    FROM v_arc a
-   	JOIN v_node n on a.node_1=n.node_id
-    JOIN v_edit_link l ON n.node_id::text = l.exit_id::text AND l.state = n.state
-    JOIN v_gully g ON g.gully_id::text = l.feature_id::text AND l.state = g.state;
+   	JOIN links_node n on a.node_1=n.node_id
+    JOIN v_gully g ON g.gully_id::text = n.feature_id::text;
+    
+    
+CREATE OR REPLACE VIEW v_ui_node_x_connection_upstream
+AS SELECT row_number() OVER (ORDER BY v_arc.node_2) + 1000000 AS rid,
+    v_arc.node_2 AS node_id,
+    v_arc.arc_id AS feature_id,
+    v_arc.code AS feature_code,
+    v_arc.arc_type AS featurecat_id,
+    v_arc.arccat_id,
+    v_arc.y1 AS depth,
+    st_length2d(v_arc.the_geom)::numeric(12,2) AS length,
+    node.node_id AS upstream_id,
+    node.code AS upstream_code,
+    node.node_type AS upstream_type,
+    v_arc.y2 AS upstream_depth,
+    v_arc.sys_type,
+    st_x(st_lineinterpolatepoint(v_arc.the_geom, 0.5::double precision)) AS x,
+    st_y(st_lineinterpolatepoint(v_arc.the_geom, 0.5::double precision)) AS y,
+    cat_arc.descript,
+    value_state.name AS state,
+    'v_edit_arc'::text AS sys_table_id
+   FROM v_arc
+     JOIN node ON v_arc.node_1::text = node.node_id::text
+     LEFT JOIN cat_arc ON v_arc.arccat_id::text = cat_arc.id::text
+     JOIN value_state ON v_arc.state = value_state.id
+UNION
+ SELECT DISTINCT ON (feature_id)
+ 	row_number() OVER (ORDER BY node.node_id) + 2000000 AS rid,
+    node.node_id,
+    v_connec.connec_id AS feature_id,
+    v_connec.code::text AS feature_code,
+    v_connec.connec_type AS featurecat_id,
+    v_connec.connecat_id AS arccat_id,
+    v_connec.y1 AS depth,
+    st_length2d(link.the_geom)::numeric(12,2) AS length,
+    v_connec.connec_id AS upstream_id,
+    v_connec.code AS upstream_code,
+    v_connec.connec_type AS upstream_type,
+    v_connec.y2 AS upstream_depth,
+    v_connec.sys_type,
+    st_x(v_connec.the_geom) AS x,
+    st_y(v_connec.the_geom) AS y,
+    cat_connec.descript,
+    value_state.name AS state,
+    'v_edit_connec'::text AS sys_table_id
+   FROM v_connec
+     JOIN link ON link.feature_id::text = v_connec.connec_id::text AND link.feature_type::text = 'CONNEC'::text
+     JOIN node ON v_connec.pjoint_id::text = node.node_id::text AND v_connec.pjoint_type::text = 'NODE'::text
+     LEFT JOIN cat_connec ON v_connec.connecat_id::text = cat_connec.id::text
+     JOIN value_state ON v_connec.state = value_state.id
+UNION
+ SELECT DISTINCT ON (feature_id)
+ 	row_number() OVER (ORDER BY node.node_id) + 3000000 AS rid,
+    node.node_id,
+    v_gully.gully_id AS feature_id,
+    v_gully.code::text AS feature_code,
+    v_gully.gully_type AS featurecat_id,
+    v_gully.connec_arccat_id AS arccat_id,
+    v_gully.ymax - v_gully.sandbox AS depth,
+    v_gully.connec_length AS length,
+    v_gully.gully_id AS upstream_id,
+    v_gully.code AS upstream_code,
+    v_gully.gully_type AS upstream_type,
+    v_gully.connec_depth AS upstream_depth,
+    v_gully.sys_type,
+    st_x(v_gully.the_geom) AS x,
+    st_y(v_gully.the_geom) AS y,
+    cat_connec.descript,
+    value_state.name AS state,
+    'v_edit_gully'::text AS sys_table_id
+   FROM v_gully
+     JOIN link ON link.feature_id::text = v_gully.gully_id::text AND link.feature_type::text = 'GULLY'::text
+     JOIN node ON v_gully.pjoint_id::text = node.node_id::text AND v_gully.pjoint_type::text = 'NODE'::text
+     LEFT JOIN cat_connec ON v_gully.connec_arccat_id::text = cat_connec.id::text
+     JOIN value_state ON v_gully.state = value_state.id;
+
+
 
