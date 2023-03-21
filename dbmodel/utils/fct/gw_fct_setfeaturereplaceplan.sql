@@ -143,7 +143,7 @@ BEGIN
 					RETURNING arc_id INTO v_arc;
 				END IF;
 
-				FOR v_link IN SELECT l.* FROM v_edit_connec c JOIN link l on feature_id = connec_id WHERE l.state = 1 and arc_id = v_id AND c.state > 0
+				FOR v_link IN SELECT l.* FROM v_edit_connec c JOIN link l on feature_id = connec_id WHERE l.state = 1 and arc_id = v_id AND c.state > 0 AND exit_type <> 'NODE'
 				LOOP
 					INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable, link_id)
 					VALUES (v_currentpsector, v_link.feature_id, v_arc, 0, false, v_link.link_id)
@@ -168,7 +168,7 @@ BEGIN
 				-- looking for gullies
 				IF v_project_type = 'UD' THEN
 
-					FOR v_link IN SELECT l.* FROM v_edit_gully c JOIN link l on feature_id = gully_id WHERE l.state = 1 and arc_id = v_id AND c.state > 0
+					FOR v_link IN SELECT l.* FROM v_edit_gully c JOIN link l on feature_id = gully_id WHERE l.state = 1 and arc_id = v_id AND c.state > 0 AND exit_type <> 'NODE'
 					LOOP
 						INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable, link_id)
 						VALUES (v_currentpsector, v_link.feature_id, v_arc, 0, false, v_link.link_id)
