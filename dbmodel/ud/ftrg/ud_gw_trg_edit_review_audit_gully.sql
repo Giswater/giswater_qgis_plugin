@@ -77,7 +77,10 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			
 		END IF;
 		
-	END IF;	
+	ELSIF TG_OP = 'DELETE' THEN
+		DELETE FROM review_audit_gully WHERE gully_id=OLD.gully_id;
+	END IF;
+
 
 RETURN NEW;
 

@@ -75,7 +75,8 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			UPDATE review_connec SET field_checked=FALSE, is_validated=2 WHERE connec_id=NEW.connec_id;
 			UPDATE review_audit_connec SET is_validated=NEW.is_validated WHERE connec_id=NEW.connec_id;
 		END IF;
-		
+	ELSIF TG_OP = 'DELETE' THEN
+		DELETE FROM review_audit_connec WHERE connec_id=OLD.connec_id;	
 	END IF;	
 
 RETURN NEW;

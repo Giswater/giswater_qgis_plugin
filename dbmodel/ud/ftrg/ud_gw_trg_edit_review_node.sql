@@ -183,7 +183,8 @@ BEGIN
 			END IF;
 				
 		END IF;
-		
+	ELSIF TG_OP = 'DELETE' THEN 
+    	DELETE FROM review_node WHERE node_id=OLD.node_id;
     END IF;
 
     RETURN NEW;

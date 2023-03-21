@@ -46,27 +46,27 @@ BEGIN
 		END IF;
 
 		-- updating review_status parameter value
-			-- new element, re-updated after its insert
-			IF (SELECT count(connec_id) FROM connec WHERE connec_id=NEW.connec_id)=0 THEN
-				v_review_status=1;
-			-- only data changes
-			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_connec.the_geom::text) is TRUE THEN
-				v_review_status=3;
-			-- geometry changes	
-			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_connec.the_geom::text) is FALSE THEN
-				v_review_status=2;
-			--only review comment
-			ELSIF (v_tol_filter_bool is FALSE) AND NEW.review_obs IS NOT NULL THEN
-				v_review_status=4;
-			-- changes under tolerance
-			ELSIF (v_tol_filter_bool is FALSE) THEN
-				v_review_status=0;	
-			END IF;
-			
-			IF NEW.field_date IS NULL THEN 
-					NEW.field_date = now();
-			END IF;
+		-- new element, re-updated after its insert
+		IF (SELECT count(connec_id) FROM connec WHERE connec_id=NEW.connec_id)=0 THEN
+			v_review_status=1;
+		-- only data changes
+		ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_connec.the_geom::text) is TRUE THEN
+			v_review_status=3;
+		-- geometry changes	
+		ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, rec_connec.the_geom::text) is FALSE THEN
+			v_review_status=2;
+		--only review comment
+		ELSIF (v_tol_filter_bool is FALSE) AND NEW.review_obs IS NOT NULL THEN
+			v_review_status=4;
+		-- changes under tolerance
+		ELSIF (v_tol_filter_bool is FALSE) THEN
+			v_review_status=0;	
 		END IF;
+		
+		IF NEW.field_date IS NULL THEN 
+				NEW.field_date = now();
+		END IF;
+	END IF;
 
 	-- starting process
     IF TG_OP = 'INSERT' THEN
@@ -130,7 +130,8 @@ BEGIN
 			END IF;
 				
 		END IF;
-		
+	ELSIF TG_OP = 'DELETE' THEN
+		DELETE from review_connec WHERE connec_id=OLD.connec_id;
     END IF;
  
     RETURN NEW;

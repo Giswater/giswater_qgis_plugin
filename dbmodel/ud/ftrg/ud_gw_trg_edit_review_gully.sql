@@ -162,7 +162,8 @@ BEGIN
 			END IF;
 				
 		END IF;
-		
+	ELSIF TG_OP = 'DELETE' THEN 
+	  	DELETE FROM review_gully WHERE gully_id=OLD.gully_id;
     END IF;
 
     RETURN NEW;

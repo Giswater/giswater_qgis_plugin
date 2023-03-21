@@ -151,7 +151,8 @@ BEGIN
 			END IF;
 				
 		END IF;
-		
+	ELSIF TG_OP = 'DELETE' THEN 
+		DELETE FROM review_connec WHERE connec_id=OLD.connec_id;	
     END IF;
 
     RETURN NEW;

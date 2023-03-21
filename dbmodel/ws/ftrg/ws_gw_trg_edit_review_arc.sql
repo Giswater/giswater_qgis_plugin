@@ -129,7 +129,9 @@ BEGIN
 				
 		END IF;
 		
-    END IF;
+	ELSIF TG_OP = 'DELETE' THEN 
+	    DELETE from review_arc WHERE arc_id=OLD.arc_id;
+	END IF;
  
     RETURN NEW;
 END;

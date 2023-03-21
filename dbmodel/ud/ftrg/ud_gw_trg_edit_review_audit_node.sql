@@ -92,7 +92,8 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			UPDATE review_audit_node SET is_validated=NEW.is_validated WHERE node_id=NEW.node_id;
 		
 		END IF;
-		
+	ELSIF TG_OP = 'DELETE' THEN
+		DELETE FROM review_audit_node WHERE node_id=OLD.node_id;	
 	END IF;	
 
 RETURN NEW;
