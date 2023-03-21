@@ -12,7 +12,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", 
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_form_list", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_form_tableview", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_form_tableview", "column":"tablename", "newName":"objectname"}}$$)
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_form_tableview", "column":"tablename", "newName":"objectname"}}$$);
 
 -- 15/03/2023
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_report", "column":"device", "dataType":"int[]", "isUtils":"False"}}$$);
