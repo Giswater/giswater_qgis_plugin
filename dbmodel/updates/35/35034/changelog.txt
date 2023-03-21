@@ -1,3 +1,5 @@
 3.5.034
 *************
 - Rename v_plan_current_psector_* views to v_plan_psector_*
+- Bug fix from refactor links. Insert connects with state 0 on psector when planified node over operative node
+- Enhance v_ui_arc_x_relations (UD)
