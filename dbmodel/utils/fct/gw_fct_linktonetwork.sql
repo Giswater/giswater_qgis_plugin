@@ -250,6 +250,11 @@ BEGIN
 				v_link.exit_type = 'NODE';
 				v_link.exit_id = v_pjointid;
 
+				-- case when planned node over existing node
+				IF (SELECT node_id FROM v_edit_node WHERE node_id = v_link.exit_id) IS NULL AND v_ispsector IS TRUE THEN
+					SELECT node_id INTO v_link.exit_id FROM node ORDER BY tstamp DESC LIMIT 1;
+				END IF;
+
 			ELSIF v_link.exit_type='CONNEC' THEN
 				SELECT pjoint_type, connec_id, the_geom INTO v_pjointtype, v_pjointid, v_endfeature_geom FROM connec WHERE connec_id=v_link.exit_id;
 				v_pjointtype='CONNEC';
@@ -380,7 +385,6 @@ BEGIN
 					 v_connect.state, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_arc.presszone_id, v_arc.dqa_id, v_arc.minsector_id, v_fluidtype_value);
 
 				ELSIF v_projecttype = 'UD' THEN
-
 					INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, dma_id, fluid_type)
 					VALUES (v_link.link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id,
 					v_connect.state, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_fluidtype_value);
