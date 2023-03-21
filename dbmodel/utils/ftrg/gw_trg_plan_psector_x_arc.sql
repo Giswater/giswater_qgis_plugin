@@ -33,22 +33,31 @@ BEGIN
         
 		IF v_user_planordercontrol IS TRUE THEN
         
-			-- do not allow set arc to obsolete when it has on service connecs
-			SELECT count(connec_id) INTO num_connec FROM connec WHERE arc_id=NEW.arc_id AND state=1 AND connec_id NOT IN 
-			(SELECT connec_id FROM plan_psector_x_connec WHERE psector_id=NEW.psector_id AND state=0);
-			IF num_connec > 0 THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3228", "function":"1130","debug_msg":""}}$$);';
-			END IF;
 	        
-	        -- do not allow set arc to obsolete when it has on service gullys
 	        IF v_project_type = 'UD' THEN
-	            SELECT count(gully_id) INTO num_connec FROM gully WHERE arc_id=NEW.arc_id AND state=1 AND gully_id NOT IN 
+	        	-- do not allow set arc to obsolete when it has on service gullys
+	            SELECT count(*) INTO num_connec FROM v_ui_arc_x_relations WHERE arc_id=NEW.arc_id AND feature_state=1 AND sys_type='GULLY' AND proceed_from='ARC' AND feature_id NOT IN 
 	            (SELECT gully_id FROM plan_psector_x_gully WHERE psector_id=NEW.psector_id AND state=0);
 	            IF num_connec > 0 THEN
 	                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 	                "data":{"message":"3228", "function":"1130","debug_msg":""}}$$);';
 	            END IF;
+	           
+	           	-- do not allow set arc to obsolete when it has on service connecs
+	            SELECT count(*) INTO num_connec FROM v_ui_arc_x_relations WHERE arc_id=NEW.arc_id AND feature_state=1 AND sys_type='CONNEC' AND proceed_from='ARC' AND feature_id NOT IN 
+	            (SELECT connec_id FROM plan_psector_x_connec WHERE psector_id=NEW.psector_id AND state=0);
+	            IF num_connec > 0 THEN
+	                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	                "data":{"message":"3228", "function":"1130","debug_msg":""}}$$);';
+	            END IF;
+	        ELSIF v_project_type = 'WS' THEN
+		        -- do not allow set arc to obsolete when it has on service connecs
+				SELECT count(connec_id) INTO num_connec FROM connec WHERE arc_id=NEW.arc_id AND state=1 AND connec_id NOT IN 
+				(SELECT connec_id FROM plan_psector_x_connec WHERE psector_id=NEW.psector_id AND state=0);
+				IF num_connec > 0 THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3228", "function":"1130","debug_msg":""}}$$);';
+				END IF;
 	        END IF;
 	       
 		END IF;

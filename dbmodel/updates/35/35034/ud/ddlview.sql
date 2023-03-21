@@ -251,3 +251,77 @@ AS SELECT d.arc_id,
                      LEFT JOIN v_price_compost p ON cat_arc.connect_cost = p.id::text
                      where arc_id is not null
                   GROUP BY c.arc_id) v_plan_aux_arc_gully ON v_plan_aux_arc_gully.arc_id::text = v_plan_aux_arc_cost.arc_id::text) d;
+                  
+                  
+DROP VIEW IF EXISTS v_ui_arc_x_relations;
+CREATE OR REPLACE VIEW v_ui_arc_x_relations
+AS SELECT row_number() OVER () + 1000000 AS rid,
+    v_connec.arc_id,
+    v_connec.connec_type AS featurecat_id,
+    v_connec.connecat_id AS catalog,
+    v_connec.connec_id AS feature_id,
+    v_connec.code AS feature_code,
+    v_connec.sys_type,
+    v_connec.state AS feature_state,
+    st_x(v_connec.the_geom) AS x,
+    st_y(v_connec.the_geom) AS y,
+    l.exit_type AS proceed_from,
+    l.exit_id AS proceed_from_id,
+    'v_edit_connec'::text AS sys_table_id
+   FROM v_connec
+     JOIN v_edit_link l ON v_connec.connec_id::text = l.feature_id::text AND l.exit_type<>'NODE'
+  WHERE v_connec.arc_id IS NOT NULL
+UNION
+  SELECT row_number() OVER () + 2000000 AS rid,
+    a.arc_id,
+    connec_type AS featurecat_id,
+    connecat_id AS catalog,
+    connec_id AS feature_id,
+    c.code AS feature_code,
+    c.sys_type,
+    c.state AS feature_state,
+    st_x(c.the_geom) AS x,
+    st_y(c.the_geom) AS y,
+    l.exit_type AS proceed_from,
+    l.exit_id AS proceed_from_id,
+    'v_edit_connec'::text AS sys_table_id
+   FROM v_arc a
+   	JOIN v_node n on a.node_1=n.node_id
+    JOIN v_edit_link l ON n.node_id::text = l.exit_id::text AND l.state = n.state
+    JOIN v_connec c ON c.connec_id::text = l.feature_id::text AND l.state = c.state
+UNION
+ SELECT row_number() OVER () + 3000000 AS rid,
+    v_gully.arc_id,
+    v_gully.gully_type AS featurecat_id,
+    v_gully.gratecat_id AS catalog,
+    v_gully.gully_id AS feature_id,
+    v_gully.code AS feature_code,
+    v_gully.sys_type,
+    v_gully.state AS feature_state,
+    st_x(v_gully.the_geom) AS x,
+    st_y(v_gully.the_geom) AS y,
+    l.exit_type AS proceed_from,
+    l.exit_id AS proceed_from_id,
+    'v_edit_gully'::text AS sys_table_id
+   FROM v_gully
+     JOIN v_edit_link l ON v_gully.gully_id::text = l.feature_id::text AND l.state = v_gully.state AND l.exit_type<>'NODE'
+  WHERE v_gully.arc_id IS NOT NULL
+UNION
+  SELECT row_number() OVER () + 4000000 AS rid,
+    a.arc_id,
+    gully_type AS featurecat_id,
+    gratecat_id AS catalog,
+    gully_id AS feature_id,
+    g.code AS feature_code,
+    g.sys_type,
+    g.state AS feature_state,
+    st_x(g.the_geom) AS x,
+    st_y(g.the_geom) AS y,
+    l.exit_type AS proceed_from,
+    l.exit_id AS proceed_from_id,
+    'v_edit_gully'::text AS sys_table_id
+   FROM v_arc a
+   	JOIN v_node n on a.node_1=n.node_id
+    JOIN v_edit_link l ON n.node_id::text = l.exit_id::text AND l.state = n.state
+    JOIN v_gully g ON g.gully_id::text = l.feature_id::text AND l.state = g.state;
+
