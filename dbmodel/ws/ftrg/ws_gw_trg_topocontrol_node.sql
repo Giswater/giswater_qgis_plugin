@@ -220,6 +220,11 @@ BEGIN
 							INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable)
 							SELECT connec_id, v_arcrecordtb.arc_id, v_psector_id, 1, false
 							FROM link l JOIN connec c ON connec_id = l.feature_id WHERE l.feature_type  ='CONNEC' AND connec_id = v_connec_id;
+						
+							INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_id)
+							SELECT connec_id, v_arc.arc_id, v_psector_id, 0, false, l.link_id
+							FROM link l JOIN connec c ON connec_id = l.feature_id WHERE l.feature_type  ='CONNEC' AND connec_id = v_connec_id AND l.state=1
+							ON CONFLICT (connec_id, psector_id, state) DO NOTHING;
 						END LOOP;
 					END IF;
 				END LOOP;			
