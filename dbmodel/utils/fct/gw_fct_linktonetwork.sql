@@ -252,7 +252,7 @@ BEGIN
 
 				-- case when planned node over existing node
 				IF (SELECT node_id FROM v_edit_node WHERE node_id = v_link.exit_id) IS NULL AND v_ispsector IS TRUE THEN
-					SELECT node_id INTO v_link.exit_id FROM node ORDER BY tstamp DESC LIMIT 1;
+					SELECT node_id INTO v_link.exit_id FROM node WHERE state = 2 AND st_dwithin(the_geom,v_link.the_geom,0.01) ORDER BY tstamp DESC LIMIT 1;
 				END IF;
 
 			ELSIF v_link.exit_type='CONNEC' THEN
