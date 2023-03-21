@@ -3082,7 +3082,7 @@ def fill_tbl(complet_list, tbl, info, view):
 def open_epa_dlg(**kwargs):
     # Get variables
     complet_result = kwargs['complet_result']
-    info = kwargs['info']
+    info = kwargs['class']
     func_params = kwargs['func_params']
     ui = func_params['ui']
     ui_name = func_params['uiName']
