@@ -125,7 +125,7 @@ BEGIN
 	END IF;
 	
 	-- get process parameters
-	v_querystring = concat('SELECT row_to_json(a) FROM (
+	v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 			 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, function_name as functionname
 			 FROM sys_function 
 			 JOIN config_toolbox USING (id)
