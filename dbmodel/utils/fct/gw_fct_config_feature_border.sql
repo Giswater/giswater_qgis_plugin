@@ -40,16 +40,15 @@ BEGIN
 
   
   IF v_zone = 'SECTOR' OR v_zone='ALL' THEN 
-  	DELETE FROM node_border_sector WHERE node_id IN (SELECT node_id FROM v_edit_node);
+  	DELETE FROM node_border_sector WHERE node_id IN (SELECT node_id FROM v_edit_node JOIN selector_sector USING (sector_id) WHERE cur_user = current_user);
 
   	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CONFIGURATION OF SECTORS'));
-  	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('SECTOR_ID - NUMBER OF FEATURES'));
 
   	--sector
   	INSERT INTO audit_check_data(fid,  error_message)
   	WITH 
 		arcs AS (SELECT arc_id, node_1, node_2, sector_id FROM arc WHERE state=1 )
-		select v_fid, concat(sector_id, ' - ', sum(count), ' nodes') from (
+		select v_fid, concat('Sector ',sector_id, ' - ', sum(count), ' border nodes.') from (
 		SELECT a1.sector_id, COUNT(*) as count
 		FROM v_edit_node node 
 		JOIN arcs a1 ON node_id=node_1 
@@ -81,10 +80,9 @@ BEGIN
 	  INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
 	  INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '');
 	  INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CONFIGURATION OF EXPLOITATIONS'));
-	  INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('EXPL_ID - NUMBER OF FEATURES'));
 
-    DELETE FROM node_border_expl WHERE node_id IN (SELECT node_id FROM v_edit_node);
-	  DELETE FROM arc_border_expl WHERE arc_id IN (SELECT arc_id FROM v_edit_arc);
+    DELETE FROM node_border_expl WHERE node_id IN (SELECT node_id FROM v_edit_node JOIN selector_expl USING (expl_id) WHERE cur_user = current_user);
+	  DELETE FROM arc_border_expl WHERE arc_id IN (SELECT arc_id FROM v_edit_arc JOIN selector_expl USING (expl_id) WHERE cur_user = current_user);
 
 		INSERT INTO node_border_expl
 		WITH 
@@ -112,31 +110,27 @@ BEGIN
 		JOIN arcs a2 ON node_id=node_2 
 		where a2.expl_id != node.expl_id ON CONFLICT (node_id, expl_id) DO NOTHING;
 
+		INSERT INTO node_border_expl
+		select node_id,  expl_id from
+		(SELECT a.node_id,  n.expl_id
+		FROM v_edit_node a
+		JOIN node_border_expl n ON n.node_id=a.parent_id::text
+		WHERE a.expl_id != n.expl_id)a ON CONFLICT (node_id, expl_id) DO NOTHING;
+		
 		INSERT INTO arc_border_expl
 		select arc_id,  expl_id from
 		(SELECT a.arc_id,  n.expl_id
-		FROM arc a
-		JOIN v_edit_node n ON n.node_id=a.parent_id::text
-		WHERE a.expl_id != n.expl_id
-		union	
-		SELECT a.arc_id,  n.expl_id
 		FROM v_edit_arc a
-		JOIN node n ON n.node_id=a.parent_id::text
+		JOIN node_border_expl n ON n.node_id=a.parent_id::text
 		WHERE a.expl_id != n.expl_id)a ON CONFLICT (arc_id, expl_id) DO NOTHING;
 		
 		INSERT INTO audit_check_data(fid,  error_message)
-		select v_fid, concat(a.expl_id,' - ',   COUNT(a.node_id), ' nodes') from 
+		select v_fid, concat('Exploítation ',a.expl_id,' - ',   COUNT(a.node_id), ' border nodes') from 
 		(SELECT b.expl_id, b.node_id 
 		FROM node_border_expl b
 		JOIN v_edit_node USING (node_id))a
 		group by expl_id;
 
-		INSERT INTO audit_check_data(fid,  error_message)
-		select v_fid, concat(a.expl_id,' - ',   COUNT(a.arc_id), ' arcs') from 
-		(SELECT b.expl_id, b.arc_id 
-		FROM arc_border_expl b
-		JOIN v_edit_arc USING (arc_id))a
-		group by expl_id;
 	END IF;
 
 	-- get results	
