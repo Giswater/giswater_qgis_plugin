@@ -627,43 +627,47 @@ class GwToolBoxButton(GwAction):
 
     def _populate_functions_dlg(self, dialog, result, module=tools_backend_calls):
 
-        dialog.setWindowTitle(result['fields']['alias'])
-        dialog.txt_info.setText(str(result['fields']['descript']))
+        status = False
+        if len(result['fields']) != 0:
+            dialog.setWindowTitle(result['fields'][0]['alias'])
+            dialog.txt_info.setText(str(result['fields'][0]['descript']))
 
-        if not result['fields']['input_params']['featureType']:
-            dialog.grb_input_layer.setVisible(False)
-            dialog.grb_selection_type.setVisible(False)
-        else:
-            feature_types = result['fields']['input_params']['featureType']
-            self._populate_cmb_type(feature_types)
-            self.dlg_functions.cmb_feature_type.currentIndexChanged.connect(partial(self._populate_layer_combo))
-            self._populate_layer_combo()
-        tools_gw.build_dialog_options(dialog, result['fields'], 0, self.function_list, self.temp_layers_added, module)
-        self._load_settings_values(dialog, result['fields'])
-        self._load_parametric_values(dialog, result['fields'])
-        # Execute any connected signal
-        widgets = result['fields'].get('return_type')
-        if widgets:
-            for w in result['fields']['return_type']:
-                signal = w.get('signal')
-                if signal:
-                    getattr(module, signal)(dialog)
+            if not result['fields'][0]['input_params']['featureType']:
+                dialog.grb_input_layer.setVisible(False)
+                dialog.grb_selection_type.setVisible(False)
+            else:
+                feature_types = result['fields'][0]['input_params']['featureType']
+                self._populate_cmb_type(feature_types)
+                self.dlg_functions.cmb_feature_type.currentIndexChanged.connect(partial(self._populate_layer_combo))
+                self._populate_layer_combo()
+            tools_gw.build_dialog_options(dialog, result['fields'], 0, self.function_list, self.temp_layers_added, module)
+            self._load_settings_values(dialog, result['fields'][0])
+            self._load_parametric_values(dialog, result['fields'][0])
+            # Execute any connected signal
+            widgets = result['fields'][0].get('return_type')
+            if widgets:
+                for w in result['fields'][0]['return_type']:
+                    signal = w.get('signal')
+                    if signal:
+                        getattr(module, signal)(dialog)
 
-        # We configure functionparams in the table config_toolbox, if we do not find the key "selectionType" or
-        # the length of the key is different from 1, we will do nothing, but if we find it and its length is 1,
-        # it means that the user has configured it to show only one of the two radiobuttons, therefore, we will
-        # hide the other and mark the one that the user tells us.
-        # Options: "selectionType":"selected" //  "selectionType":"all"
-        selectionType = result['fields']['input_params'].get('selectionType')
-        if selectionType:
-            if 'selected' in selectionType:
-                dialog.rbt_previous.setChecked(True)
-                dialog.rbt_layer.setVisible(False)
-            elif 'all' in selectionType:
-                dialog.rbt_layer.setChecked(True)
-                dialog.rbt_previous.setVisible(False)
+            # We configure functionparams in the table config_toolbox, if we do not find the key "selectionType" or
+            # the length of the key is different from 1, we will do nothing, but if we find it and its length is 1,
+            # it means that the user has configured it to show only one of the two radiobuttons, therefore, we will
+            # hide the other and mark the one that the user tells us.
+            # Options: "selectionType":"selected" //  "selectionType":"all"
+            selectionType = result['fields'][0]['input_params'].get('selectionType')
+            if selectionType:
+                if 'selected' in selectionType:
+                    dialog.rbt_previous.setChecked(True)
+                    dialog.rbt_layer.setVisible(False)
+                elif 'all' in selectionType:
+                    dialog.rbt_layer.setChecked(True)
+                    dialog.rbt_previous.setVisible(False)
 
-        return True
+            status = True
+
+        return status
 
 
     def _populate_cmb_type(self, feature_types):
