@@ -27,6 +27,7 @@ INSERT INTO cat_users VALUES ('user4','user4');
 
 INSERT INTO cat_manager (idval, expl_id, username, active) VALUES ('general manager', '{1,2}', concat('{',current_user,'}')::text[], true);
 
+UPDATE config_param_user SET value='false' WHERE "parameter"='edit_plan_order_control' AND cur_user=current_user;
 
 TRUNCATE plan_psector_x_node;
 INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript,active) VALUES (1, '20599', 1, 1, true, NULL, true);
@@ -553,3 +554,6 @@ WHERE formname LIKE 've_%' AND (layoutname LIKE 'lyt_top%' OR layoutname LIKE 'l
 UPDATE config_form_fields
 SET widgetcontrols = jsonb_set(widgetcontrols::jsonb, '{labelPosition}', '"top"', true)
 WHERE formname LIKE 've_%' AND (layoutname LIKE 'lyt_top%' OR layoutname LIKE 'lyt_bot%');
+
+UPDATE config_param_user SET value='true' WHERE "parameter"='edit_plan_order_control' AND cur_user=current_user;
+
