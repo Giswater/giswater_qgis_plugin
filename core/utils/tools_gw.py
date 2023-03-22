@@ -43,6 +43,7 @@ from . import tools_backend_calls
 from ..load_project_menu import GwMenuLoad
 from ..utils.select_manager import GwSelectManager
 from ..utils.snap_manager import GwSnapManager
+from ..toolbars.toc import epa_world_button
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
 from ...lib.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
@@ -3401,6 +3402,11 @@ def refresh_selectors(tab_name=None):
             selector.get_selector(dialog, '"selector_basic"', filter=True, current_tab=tab_name)
         except Exception:
             pass
+
+
+def set_epa_world(_set_epa_world=None):
+    """ Activate or deactivate EPA world. If @_set_epa_world is None it will just refresh the filters """
+    epa_world_button.set_epa_world(_set_epa_world)
 
 
 def open_dlg_help():
