@@ -380,9 +380,33 @@ UNION
      JOIN node ON v_connec.pjoint_id::text = node.node_id::text AND v_connec.pjoint_type::text = 'NODE'::text
      LEFT JOIN cat_connec ON v_connec.connecat_id::text = cat_connec.id::text
      JOIN value_state ON v_connec.state = value_state.id
+ UNION
+ SELECT DISTINCT ON (v_connec.connec_id) row_number() OVER (ORDER BY node.node_id) + 3000000 AS rid,
+    node.node_id,
+    v_connec.connec_id AS feature_id,
+    v_connec.code::text AS feature_code,
+    v_connec.connec_type AS featurecat_id,
+    v_connec.connecat_id AS arccat_id,
+    v_connec.y1 AS depth,
+    st_length2d(link.the_geom)::numeric(12,2) AS length,
+    v_connec.connec_id AS upstream_id,
+    v_connec.code AS upstream_code,
+    v_connec.connec_type AS upstream_type,
+    v_connec.y2 AS upstream_depth,
+    v_connec.sys_type,
+    st_x(v_connec.the_geom) AS x,
+    st_y(v_connec.the_geom) AS y,
+    cat_connec.descript,
+    value_state.name AS state,
+    'v_edit_connec'::text AS sys_table_id
+   FROM v_connec
+     JOIN link ON link.feature_id::text = v_connec.connec_id::text AND link.feature_type::text = 'CONNEC'::text AND link.exit_type='CONNEC'
+     join connec on connec.connec_id=link.exit_id AND connec.pjoint_type::text = 'NODE'::text
+     JOIN node ON connec.pjoint_id::text = node.node_id::text
+     LEFT JOIN cat_connec ON v_connec.connecat_id::text = cat_connec.id::text
+     JOIN value_state ON v_connec.state = value_state.id
 UNION
- SELECT DISTINCT ON (feature_id)
- 	row_number() OVER (ORDER BY node.node_id) + 3000000 AS rid,
+ SELECT DISTINCT ON (v_gully.gully_id) row_number() OVER (ORDER BY node.node_id) + 4000000 AS rid,
     node.node_id,
     v_gully.gully_id AS feature_id,
     v_gully.code::text AS feature_code,
@@ -403,6 +427,31 @@ UNION
    FROM v_gully
      JOIN link ON link.feature_id::text = v_gully.gully_id::text AND link.feature_type::text = 'GULLY'::text
      JOIN node ON v_gully.pjoint_id::text = node.node_id::text AND v_gully.pjoint_type::text = 'NODE'::text
+     LEFT JOIN cat_connec ON v_gully.connec_arccat_id::text = cat_connec.id::text
+     JOIN value_state ON v_gully.state = value_state.id
+ UNION
+ SELECT DISTINCT ON (v_gully.gully_id) row_number() OVER (ORDER BY node.node_id) + 5000000 AS rid,
+    node.node_id,
+    v_gully.gully_id AS feature_id,
+    v_gully.code::text AS feature_code,
+    v_gully.gully_type AS featurecat_id,
+    v_gully.connec_arccat_id AS arccat_id,
+    v_gully.ymax - v_gully.sandbox AS depth,
+    v_gully.connec_length AS length,
+    v_gully.gully_id AS upstream_id,
+    v_gully.code AS upstream_code,
+    v_gully.gully_type AS upstream_type,
+    v_gully.connec_depth AS upstream_depth,
+    v_gully.sys_type,
+    st_x(v_gully.the_geom) AS x,
+    st_y(v_gully.the_geom) AS y,
+    cat_connec.descript,
+    value_state.name AS state,
+    'v_edit_gully'::text AS sys_table_id
+   FROM v_gully
+     JOIN link ON link.feature_id::text = v_gully.gully_id::text AND link.feature_type::text = 'GULLY'::text AND link.exit_type='GULLY'
+     join gully on gully.gully_id=link.exit_id AND gully.pjoint_type::text = 'NODE'::text
+     JOIN node ON gully.pjoint_id::text = node.node_id::text
      LEFT JOIN cat_connec ON v_gully.connec_arccat_id::text = cat_connec.id::text
      JOIN value_state ON v_gully.state = value_state.id;
 
