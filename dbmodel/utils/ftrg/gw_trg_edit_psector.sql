@@ -227,11 +227,19 @@ BEGIN
 						END IF;		
 					END IF;
 
-					-- change arc_id for planified connecs (useful when existing connec changes to planified arc)
 					IF lower(rec_type.id) IN ('connec', 'gully') THEN
+						-- change arc_id for planified connecs (useful when existing connec changes to planified arc)
 						EXECUTE 'UPDATE '||lower(rec_type.id)||' n SET arc_id = p.arc_id
 						FROM plan_psector_x_'||lower(rec_type.id)||' p WHERE n.'||lower(rec_type.id)||'_id = p.'||lower(rec_type.id)||'_id 
 						AND p.state = 1 AND p.psector_id='||OLD.psector_id||' AND n.'||lower(rec_type.id)||'_id = '''||rec.id||''';';
+					
+						-- set pjoint_id when pjoint_type=NODE getting it from exit_id on planified link
+						EXECUTE 'UPDATE '||lower(rec_type.id)||' n SET pjoint_id = link.exit_id
+						FROM plan_psector_x_'||lower(rec_type.id)||' p 
+						JOIN link USING (link_id)
+						WHERE n.'||lower(rec_type.id)||'_id = p.'||lower(rec_type.id)||'_id 
+						AND p.state = 1 AND p.psector_id='||OLD.psector_id||' AND n.'||lower(rec_type.id)||'_id = '''||rec.id||'''
+						AND n.pjoint_type=''NODE'';';
 					
 						-- set links to state 0 when its connec is 0 on psector
 						EXECUTE 'UPDATE link SET state=0
