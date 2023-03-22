@@ -492,6 +492,8 @@ class GwNonVisual:
     def _manage_curve_value(self, dialog, table, row, column):
         """ Validate data in curve values table """
 
+        # Get curve_type
+        curve_type = tools_qt.get_text(dialog, 'cmb_curve_type')
         # Control data depending on curve type
         valid = True
         self.valid = (True, "")
@@ -504,12 +506,13 @@ class GwNonVisual:
                     if cur_cell.data(0) not in (None, '') and prev_cell.data(0) not in (None, ''):
                         cur_value = float(cur_cell.data(0))
                         prev_value = float(prev_cell.data(0))
-                        if cur_value < prev_value:
+                        if (cur_value < prev_value) and (curve_type != 'SHAPE' and global_vars.project_type != 'ud'):
                             valid = False
                             self.valid = (False, "Invalid curve. First column values must be ascending.")
 
         # If first check is valid, check all rows for column for final validation
         if valid:
+
             # Create list with column values
             x_values = []
             y_values = []
@@ -537,13 +540,13 @@ class GwNonVisual:
             for i, n in enumerate(x_values):
                 if i == 0 or n is None:
                     continue
-                if n > x_values[i-1]:
+                if (n > x_values[i-1]) or (curve_type == 'SHAPE' and global_vars.project_type == 'ud'):
                     continue
                 valid = False
                 self.valid = (False, "Invalid curve. First column values must be ascending.")
                 break
             # If PUMP, check that y_values are descending
-            curve_type = tools_qt.get_text(dialog, 'cmb_curve_type')
+
             if curve_type == 'PUMP':
                 for i, n in enumerate(y_values):
                     if i == 0 or n is None:
