@@ -28,3 +28,10 @@ CREATE TRIGGER   gw_trg_vi_timeseries
     ON vi_timeseries
     FOR EACH ROW
     EXECUTE FUNCTION gw_trg_vi('vi_timeseries');
+
+
+CREATE TRIGGER gw_trg_link_data AFTER INSERT OR UPDATE OF epa_type, state_type
+ON gully FOR EACH ROW EXECUTE FUNCTION gw_trg_link_data('gully');
+
+CREATE TRIGGER gw_trg_link_data AFTER INSERT OR UPDATE OF  state_type
+ON connec FOR EACH ROW EXECUTE FUNCTION gw_trg_link_data('connec');

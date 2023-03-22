@@ -827,3 +827,43 @@ SELECT * FROM v_node;
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"is_operative", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+
+CREATE OR REPLACE VIEW vu_link AS
+ SELECT l.link_id,
+    l.feature_type,
+    l.feature_id,
+    l.exit_type,
+    l.exit_id,
+    l.state,
+    l.expl_id,
+    l.sector_id,
+    l.dma_id,
+    l.exit_topelev,
+    l.exit_elev,
+    l.fluid_type,
+    st_length2d(l.the_geom)::numeric(12,3) AS gis_length,
+    l.the_geom,
+    s.name AS sector_name,
+    s.macrosector_id,
+    d.macrodma_id,
+    l.epa_type,
+    l.is_operative
+   FROM link l
+     LEFT JOIN sector s USING (sector_id)
+     LEFT JOIN dma d USING (dma_id);
+
+create or replace view v_link_connec as 
+select distinct on (link_id) * from vu_link_connec
+JOIN v_state_link_connec USING (link_id);
+
+create or replace view v_link_gully as 
+select distinct on (link_id) * from vu_link_gully
+JOIN v_state_link_gully USING (link_id);
+
+create or replace view v_link as 
+select distinct on (link_id) * from vu_link
+JOIN v_state_link USING (link_id);
+
+CREATE OR REPLACE VIEW v_edit_link AS SELECT *
+FROM v_link l;

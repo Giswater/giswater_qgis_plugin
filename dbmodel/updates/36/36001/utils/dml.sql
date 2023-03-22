@@ -385,3 +385,12 @@ VALUES (3210, 'gw_fct_getprocess', 'utils', 'function','json', 'json',
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
 VALUES (3212, 'gw_fct_getreport', 'utils', 'function','json', 'json',
 'Function to manage open form for specific report execution on toolbox', 'role_basic', NULL) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_form_fields VALUES('v_edit_link', 'form_feature', 'main', 'epa_type', 'lyt_data_1', 18, 'string', 'text', 'epa_type', NULL, NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+'{"setMultiline":false}'::json, NULL, NULL, false, NULL) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+INSERT INTO config_form_fields VALUES('v_edit_link', 'form_feature', 'main', 'is_operative', 'lyt_data_1', 19, 'boolean', 'check', 'is_operative', NULL, NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+'{"setMultiline":false}'::json, NULL, NULL, false, NULL) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3214, 'gw_trg_link_data', 'utils', 'trigger function', null, null,
+'Triggers that fills data related to connect on link table', 'role_edit', null, 'core') ON CONFLICT (id) DO NOTHING;

@@ -1729,3 +1729,50 @@ SELECT * FROM v_connec;
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_connec"], "fieldName":"is_operative", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+
+CREATE OR REPLACE VIEW vu_link AS
+ SELECT l.link_id,
+    l.feature_type,
+    l.feature_id,
+    l.exit_type,
+    l.exit_id,
+    l.state,
+    l.expl_id,
+    l.sector_id,
+    l.dma_id,
+    presszone_id::character varying(16) AS presszone_id,
+    l.dqa_id,
+    l.minsector_id,
+    l.exit_topelev,
+    l.exit_elev,
+    l.fluid_type,
+    st_length2d(l.the_geom)::numeric(12,3) AS gis_length,
+    l.the_geom,
+    s.name AS sector_name,
+    d.name AS dma_name,
+    q.name AS dqa_name,
+    p.name AS presszone_name,
+    s.macrosector_id,
+    d.macrodma_id,
+    q.macrodqa_id,
+    l.epa_type,
+    l.is_operative
+   FROM link l
+     LEFT JOIN sector s USING (sector_id)
+     LEFT JOIN presszone p USING (presszone_id)
+     LEFT JOIN dma d USING (dma_id)
+     LEFT JOIN dqa q USING (dqa_id);
+
+
+create or replace view v_link_connec as 
+select * from vu_link
+JOIN v_state_link_connec USING (link_id);
+
+
+create or replace view v_link as 
+select * from vu_link
+JOIN v_state_link USING (link_id);
+
+CREATE OR REPLACE VIEW v_edit_link AS SELECT *
+FROM v_link l;

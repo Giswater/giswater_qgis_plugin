@@ -256,3 +256,11 @@ WHERE a.formname='v_edit_inp_dscenario_outfall' AND a.columnname='timser_id' AND
 UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
 widgetcontrols=a.widgetcontrols FROM config_form_fields a
 WHERE a.formname='v_edit_inp_dscenario_outfall' AND a.columnname='outfall_type' AND c.columnname='outfall_type' AND c.formname ILIKE 've_epa%';
+
+UPDATE link l SET epa_type = c.epa_type, is_operative = v.is_operative 
+FROM gully c
+JOIN value_state_type v ON v.id = c.state_type WHERE l.feature_id = c.gully_id;
+
+UPDATE link l SET is_operative = v.is_operative 
+FROM connec c
+JOIN value_state_type v ON v.id = c.state_type WHERE l.feature_id = c.connec_id;

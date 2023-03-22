@@ -17,3 +17,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_f
 -- 15/03/2023
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_report", "column":"device", "dataType":"int[]", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_toolbox", "column":"device", "dataType":"int[]", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"epa_type", "dataType":"character varying(16)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"is_operative", "dataType":"boolean", "isUtils":"False"}}$$);

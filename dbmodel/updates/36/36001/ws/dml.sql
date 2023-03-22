@@ -1216,3 +1216,6 @@ INSERT INTO config_form_tabs
 VALUES('selector_mincut', 'tab_mincut', 'Mincut', 'Mincut Selector', 'role_basic', NULL, NULL, 5, 1);
 
 
+UPDATE link l SET epa_type = c.epa_type, is_operative = v.is_operative 
+FROM connec c
+JOIN value_state_type v ON v.id = c.state_type WHERE l.feature_id = c.connec_id;
