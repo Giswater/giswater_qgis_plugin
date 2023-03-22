@@ -1188,7 +1188,8 @@ def build_dialog_info(dialog, result, my_json=None):
             widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             widget.currentIndexChanged.connect(partial(get_values, dialog, widget, my_json))
         elif field['widgettype'] in ('check', 'checkbox'):
-            widget = add_checkbox(field)
+            kwargs = {"dialog": dialog, "field": field}
+            widget = add_checkbox(**kwargs)
             widget.stateChanged.connect(partial(get_values, dialog, widget, my_json))
         elif field['widgettype'] == 'button':
             kwargs = {"dialog": dialog, "field": field}

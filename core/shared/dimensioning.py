@@ -503,7 +503,8 @@ class GwDimensioning:
             widget = tools_gw.add_combo(field)
             widget = tools_gw.set_widget_size(widget, field)
         elif field['widgettype'] == 'check':
-            widget = tools_gw.add_checkbox(field)
+            kwargs = {"dialog": dialog,  "field": field}
+            widget = tools_gw.add_checkbox(**kwargs)
         elif field['widgettype'] == 'datetime':
             widget = tools_gw.add_calendar(dialog, field)
         elif field['widgettype'] == 'button':
@@ -520,9 +521,10 @@ class GwDimensioning:
         elif field['widgettype'] == 'textarea':
             widget = tools_gw.add_textarea(field)
         elif field['widgettype'] in 'spinbox':
-            widget = tools_gw.add_spinbox(field)
+            kwargs = {"dialog": dialog,  "field": field}
+            widget = tools_gw.add_spinbox(**kwargs)
         elif field['widgettype'] == 'tableview':
-            widget = tools_gw.add_tableview(db_return, field)
+            widget = tools_gw.add_tableview(db_return, field, dialog)
             widget = tools_gw.add_tableview_header(widget, field)
             widget = tools_gw.fill_tableview_rows(widget, field)
             widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], sort_order=1,

@@ -112,7 +112,8 @@ class GwSearch:
                     elif field['widgettype'] == 'combo':
                         widget = self._add_combobox(field)
                     elif field['widgettype'] == 'check':
-                        widget = tools_gw.add_checkbox(field)
+                        kwargs = {"dialog": self.dlg_search,  "field": field}
+                        widget = tools_gw.add_checkbox(**kwargs)
                     gridlayout.addWidget(label, x, 0)
                     gridlayout.addWidget(widget, x, 1)
                     x += 1

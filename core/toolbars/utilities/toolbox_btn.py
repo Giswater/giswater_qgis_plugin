@@ -351,7 +351,8 @@ class GwToolBoxButton(GwAction):
                     tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
                 widget.currentIndexChanged.connect(partial(self._update_tbl_reports))
             elif field['widgettype'] == 'check':
-                widget = tools_gw.add_checkbox(field)
+                kwargs = {"dialog": self.dlg_reports, "field": field}
+                widget = tools_gw.add_checkbox(**kwargs)
                 if field.get('filterDefault') is not None:
                     tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
                 widget.stateChanged.connect(partial(self._update_tbl_reports))
