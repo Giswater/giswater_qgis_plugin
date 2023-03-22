@@ -183,7 +183,7 @@ BEGIN
 		END IF;
 		
 		-- Check an existing arc
-		SELECT COUNT(*) INTO controlValue FROM v_edit_arc JOIN value_state_type ON state_type=value_state_type.id 
+		SELECT COUNT(*) INTO controlValue FROM v_edit_arc 
 		WHERE (arc_id = element_id_arg) AND (is_operative IS TRUE);
 		
 		IF controlValue = 1 THEN
@@ -326,7 +326,7 @@ BEGIN
 	JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id 
 	JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
 	JOIN v_edit_connec ON om_mincut_connec.connec_id=v_edit_connec.connec_id
-	WHERE result_id=result_id_arg AND is_operative=TRUE AND v_rtc_hydrometer.connec_id=om_mincut_connec.connec_id;
+	WHERE result_id=result_id_arg AND v_edit_connec.is_operative=TRUE AND v_rtc_hydrometer.connec_id=om_mincut_connec.connec_id;
 
 	-- fill connnec & hydrometer details on om_mincut.output
 	-- count arcs
