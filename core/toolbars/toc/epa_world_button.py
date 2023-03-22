@@ -49,7 +49,13 @@ def set_epa_world(_set_epa_world=None):
             layer.setSubsetString(None)
     else:
         sectors = _get_sectors()
+        # Get inp_options_networkmode
         inp_options_networkmode = tools_gw.get_config_value('inp_options_networkmode')
+        try:
+            inp_options_networkmode = int(inp_options_networkmode[0])
+        except (ValueError, IndexError, TypeError):
+            pass
+
         sql = f"is_operative = true AND epa_type != 'UNDEFINED' AND sector_id IN ({sectors})"
         # arc and node
         for layer in arc_layers + node_layers:
@@ -66,7 +72,7 @@ def set_epa_world(_set_epa_world=None):
             # ws link
             for layer in link_layers:
                 if inp_options_networkmode == 4:
-                    layer.setSubsetString(sql.replace('is_operative = true AND epa_type != \'UNDEFINED\' AND ', ''))
+                    layer.setSubsetString(sql)
                 else:
                     layer.setSubsetString("FALSE")
 
@@ -84,7 +90,10 @@ def set_epa_world(_set_epa_world=None):
 
             # ud link
             for layer in link_layers:
-                layer.setSubsetString("FALSE")
+                if inp_options_networkmode == 2:
+                    layer.setSubsetString(sql + ' AND feature_type = \'GULLY\'')
+                else:
+                    layer.setSubsetString("FALSE")
 
     return _set_epa_world
 
