@@ -153,7 +153,7 @@ class GwInfo(QObject):
                 visible_layer = tools_qgis.get_visible_layers(as_str_list=True)
                 scale_zoom = self.iface.mapCanvas().scale()
                 extras += f', "activeLayer":"{active_layer}"'
-                extras += f', "visibleLayer":{visible_layer}'
+                extras += f', "visibleLayers":{visible_layer}'
                 extras += f', "mainSchema":"{qgis_project_main_schema}"'
                 extras += f', "addSchema":"{qgis_project_add_schema}"'
                 extras += f', "projecRole":"{qgis_project_role}"'
