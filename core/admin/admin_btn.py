@@ -2876,6 +2876,7 @@ class GwAdminButton:
                         # If text in between double-quotes, put all the text in a single column (if tab-separated)
                         if str(list_aux[x]).startswith('"') and str(list_aux[x]).endswith('"'):
                             dirty_list.append(list_aux[x].strip('"'))
+                            continue
 
                         aux = list_aux[x].split(" ")
                         str_aux = ""
