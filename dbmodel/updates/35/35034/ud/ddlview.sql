@@ -456,4 +456,126 @@ UNION
      JOIN value_state ON v_gully.state = value_state.id;
 
 
+CREATE OR REPLACE VIEW v_gully
+AS SELECT vu_gully.gully_id,
+    vu_gully.code,
+    vu_gully.top_elev,
+    vu_gully.ymax,
+    vu_gully.sandbox,
+    vu_gully.matcat_id,
+    vu_gully.gully_type,
+    vu_gully.sys_type,
+    vu_gully.gratecat_id,
+    vu_gully.cat_grate_matcat,
+    vu_gully.units,
+    vu_gully.groove,
+    vu_gully.siphon,
+    vu_gully.connec_arccat_id,
+    vu_gully.connec_length,
+    vu_gully.connec_depth,
+    v_state_gully.arc_id,
+    vu_gully.expl_id,
+    vu_gully.macroexpl_id,
+    CASE
+        WHEN a.sector_id IS NULL THEN vu_gully.sector_id
+        ELSE a.sector_id
+    END AS sector_id,
+    CASE
+        WHEN a.macrosector_id IS NULL THEN vu_gully.macrosector_id
+        ELSE a.macrosector_id
+    END AS macrosector_id,
+    vu_gully.state,
+    vu_gully.state_type,
+    vu_gully.annotation,
+    vu_gully.observ,
+    vu_gully.comment,
+    CASE
+        WHEN a.dma_id IS NULL THEN vu_gully.dma_id
+        ELSE a.dma_id
+    END AS dma_id,
+    CASE
+        WHEN a.macrodma_id IS NULL THEN vu_gully.macrodma_id
+        ELSE a.macrodma_id
+    END AS macrodma_id,
+    vu_gully.soilcat_id,
+    vu_gully.function_type,
+    vu_gully.category_type,
+    vu_gully.fluid_type,
+    vu_gully.location_type,
+    vu_gully.workcat_id,
+    vu_gully.workcat_id_end,
+    vu_gully.buildercat_id,
+    vu_gully.builtdate,
+    vu_gully.enddate,
+    vu_gully.ownercat_id,
+    vu_gully.muni_id,
+    vu_gully.postcode,
+    vu_gully.district_id,
+    vu_gully.streetname,
+    vu_gully.postnumber,
+    vu_gully.postcomplement,
+    vu_gully.streetname2,
+    vu_gully.postnumber2,
+    vu_gully.postcomplement2,
+    vu_gully.descript,
+    vu_gully.svg,
+    vu_gully.rotation,
+    vu_gully.link,
+    vu_gully.verified,
+    vu_gully.undelete,
+    vu_gully.label,
+    vu_gully.label_x,
+    vu_gully.label_y,
+    vu_gully.label_rotation,
+    vu_gully.publish,
+    vu_gully.inventory,
+    vu_gully.uncertain,
+    vu_gully.num_value,
+    CASE
+        WHEN a.exit_id IS NULL THEN vu_gully.pjoint_id
+        ELSE a.exit_id
+    END AS pjoint_id,
+    CASE
+        WHEN a.exit_type IS NULL THEN vu_gully.pjoint_type
+        ELSE a.exit_type
+    END AS pjoint_type,
+    vu_gully.tstamp,
+    vu_gully.insert_user,
+    vu_gully.lastupdate,
+    vu_gully.lastupdate_user,
+    vu_gully.the_geom,
+    vu_gully.workcat_id_plan,
+    vu_gully.asset_id,
+    vu_gully.connec_matcat_id,
+    vu_gully.gratecat2_id,
+    vu_gully.connec_y1,
+    vu_gully.connec_y2,
+    vu_gully.epa_type,
+    vu_gully.groove_height,
+    vu_gully.groove_length,
+    vu_gully.grate_width,
+    vu_gully.grate_length,
+    vu_gully.units_placement,
+    vu_gully.drainzone_id
+   FROM vu_gully
+     JOIN v_state_gully USING (gully_id)
+     LEFT JOIN ( SELECT DISTINCT ON (v_link_gully.feature_id) v_link_gully.link_id,
+            v_link_gully.feature_type,
+            v_link_gully.feature_id,
+            v_link_gully.exit_type,
+            v_link_gully.exit_id,
+            v_link_gully.state,
+            v_link_gully.expl_id,
+            v_link_gully.sector_id,
+            v_link_gully.dma_id,
+            v_link_gully.exit_topelev,
+            v_link_gully.exit_elev,
+            v_link_gully.fluid_type,
+            v_link_gully.gis_length,
+            v_link_gully.the_geom,
+            v_link_gully.sector_name,
+            v_link_gully.macrosector_id,
+            v_link_gully.macrodma_id
+           FROM v_link_gully
+          WHERE v_link_gully.state = 2) a ON a.feature_id::text = vu_gully.gully_id::text;
 
