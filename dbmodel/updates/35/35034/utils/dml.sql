@@ -16,3 +16,11 @@ UPDATE config_toolbox SET alias = 'Configuration of border features', inputparam
 '[{"widgetname":"configZone", "label":"Configurate zone:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,
 "comboIds":["EXPL", "SECTOR", "ALL"], 
 "comboNames":["EXPLOITATION", "SECTOR", "EXPLOITATION & SECTOR"]}]', active = true WHERE id=3204;
+
+ALTER TABLE connec DISABLE TRIGGER gw_trg_connect_update;
+
+UPDATE connec set pjoint_type=a.exit_type, pjoint_id=a.exit_id
+from (select feature_id, exit_type, exit_id from link)a
+where a.feature_id=connec_id and pjoint_id is null and state=1;
+
+ALTER TABLE connec ENABLE TRIGGER gw_trg_connect_update;
