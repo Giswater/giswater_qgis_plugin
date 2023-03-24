@@ -80,7 +80,9 @@ BEGIN
 		INSERT INTO inp_tags(feature_type, feature_id, tag) VALUES (NEW.feature_type, NEW.feature_id, NEW.tag);
 	    
 	  ELSIF v_view='vi_demands' THEN 
-		INSERT INTO inp_dscenario_demand (feature_id, demand, pattern_id, demand_type) VALUES (NEW.feature_id, NEW.demand, NEW.pattern_id, NEW.other);
+	  	INSERT INTO inp_pattern (pattern_id) VALUES (NEW.pattern_id) ON CONFLICT (pattern_id) DO NOTHING;
+	 	 	INSERT INTO cat_dscenario (dscenario_id, name) VALUES (1, 'IMPORTINP') ON CONFLICT (dscenario_id) DO NOTHING;
+			INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, demand, pattern_id, demand_type) VALUES (1, NEW.feature_id, NEW.demand, NEW.pattern_id, NEW.other);
       	    
 	  ELSIF v_view='vi_patterns' THEN 
 		INSERT INTO inp_pattern_value (pattern_id, factor_1,factor_2,factor_3,factor_4,factor_5,factor_6,factor_7,factor_8, factor_9,factor_10,

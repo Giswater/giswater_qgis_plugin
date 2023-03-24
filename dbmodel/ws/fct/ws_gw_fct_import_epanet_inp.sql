@@ -677,7 +677,7 @@ BEGIN
 			update dqa SET the_geom=v_extend_val;
 			update ext_municipality SET the_geom=v_extend_val;
 
-			INSERT INTO inp_pattern SELECT DISTINCT pattern_id FROM inp_pattern_value;
+			INSERT INTO inp_pattern SELECT DISTINCT pattern_id FROM inp_pattern_value ON CONFLICT (pattern_id) DO NOTHING;
 
 			RAISE NOTICE 'step-6/7';
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Creating arc geometries -> Done');
