@@ -310,8 +310,7 @@ UNION
     'v_edit_gully'::text AS sys_table_id
    FROM v_gully
      JOIN v_edit_link l ON v_gully.gully_id::text = l.feature_id::text
-  WHERE v_gully.arc_id IS NOT NULL AND l.state = v_gully.state
-	 AND l.exit_type<>'NODE'
+  WHERE v_gully.arc_id IS NOT NULL AND l.exit_type<>'NODE'
 UNION
   SELECT distinct on (feature_id)
   	row_number() OVER () + 4000000 AS rid,
