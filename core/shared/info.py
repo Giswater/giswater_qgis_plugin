@@ -236,6 +236,7 @@ class GwInfo(QObject):
                 manage_visit.get_visit(visit_id=visit_id, tag='info')
                 dlg_add_visit = manage_visit.get_visit_dialog()
                 dlg_add_visit.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
+                return self.complet_result, dlg_add_visit
 
             elif template == 'element':
                 element_id = self.complet_result['body']['feature']['id']
@@ -243,6 +244,7 @@ class GwInfo(QObject):
                 manage_element.get_element(new_element_id=False, selected_object_id=element_id)
                 dlg_add_element = manage_element.get_element_dialog()
                 dlg_add_element.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
+                return self.complet_result, dlg_add_element
 
             else:
                 tools_log.log_warning(f"template not managed: {template}")
