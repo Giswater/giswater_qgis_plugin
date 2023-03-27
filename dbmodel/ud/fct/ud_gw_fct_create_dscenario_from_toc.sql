@@ -124,17 +124,17 @@ BEGIN
 			v_columns = v_scenarioid||', node_id, elev, ymax, divider_type, arc_id, curve_id, qmin, ht, cd, y0, ysur, apond';
 
 		ELSIF v_targettable = 'inp_dscenario_flwreg_orifice' THEN
-			v_columns = v_scenarioid||', node_id, order_id, to_arc, flwreg_length,  ori_type, "offset", cd, orate, flap, shape,
+			v_columns = v_scenarioid||', node_id, order_id, to_arc, flwreg_length,  ori_type, offsetval, cd, orate, flap, shape,
 			geom1, geom2, geom3, geom4, close_time';
 			
 	 	ELSIF v_targettable = 'inp_dscenario_flwreg_outlet' THEN
-			v_columns = v_scenarioid||', node_id, order_id, to_arc, flwreg_length, outlet_type, "offset", curve_id, cd1, cd2';
+			v_columns = v_scenarioid||', node_id, order_id, to_arc, flwreg_length, outlet_type, offsetval, curve_id, cd1, cd2';
 
 	 	ELSIF v_targettable = 'inp_dscenario_flwreg_pump' THEN
 			v_columns = v_scenarioid||', node_id, order_id, to_arc, flwreg_length, curve_id, status, startup, shutoff';
 
 	 	ELSIF v_targettable = 'inp_dscenario_flwreg_weir' THEN
-			v_columns = v_scenarioid||', node_id, order_id, to_arc, flwreg_length, weir_type, "offset", cd, ec, 
+			v_columns = v_scenarioid||', node_id, order_id, to_arc, flwreg_length, weir_type, offsetval, cd, ec, 
 			cd2, flap, geom1, geom2, geom3, geom4, surcharge, road_width, road_surf, coef_curve';
 			
 		ELSIF v_targettable = 'inp_dscenario_inflows' THEN

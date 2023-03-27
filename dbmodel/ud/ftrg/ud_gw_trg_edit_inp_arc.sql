@@ -71,17 +71,17 @@ BEGIN
 			
 		ELSIF (v_epa_table = 'inp_orifice') THEN 
 			UPDATE inp_orifice 
-			SET ori_type=NEW.ori_type,"offset"=NEW."offset",cd=NEW.cd,orate=NEW.orate,flap=NEW.flap,shape=NEW.shape,geom1=NEW.geom1,geom2=NEW.geom2,geom3=NEW.geom3,geom4=NEW.geom4 
+			SET ori_type=NEW.ori_type,offsetval=NEW.offsetval,cd=NEW.cd,orate=NEW.orate,flap=NEW.flap,shape=NEW.shape,geom1=NEW.geom1,geom2=NEW.geom2,geom3=NEW.geom3,geom4=NEW.geom4 
 			WHERE arc_id=OLD.arc_id;
 			
 		ELSIF (v_epa_table = 'inp_weir') THEN 
 			UPDATE inp_weir 
-			SET weir_type=NEW.weir_type,"offset"=NEW."offset",cd=NEW.cd,ec=NEW.ec,cd2=NEW.cd2,flap=NEW.flap,geom1=NEW.geom1,geom2=NEW.geom2,geom3=NEW.geom3,geom4=NEW.geom4,surcharge=NEW.surcharge 
+			SET weir_type=NEW.weir_type,offsetval=NEW.offsetval,cd=NEW.cd,ec=NEW.ec,cd2=NEW.cd2,flap=NEW.flap,geom1=NEW.geom1,geom2=NEW.geom2,geom3=NEW.geom3,geom4=NEW.geom4,surcharge=NEW.surcharge 
 			WHERE arc_id=OLD.arc_id;
 			
 		ELSIF (v_epa_table = 'inp_outlet') THEN 
 			UPDATE inp_outlet 
-			SET  outlet_type=NEW.outlet_type, "offset"=NEW."offset", curve_id=NEW.curve_id, cd1=NEW.cd1,cd2=NEW.cd2,flap=NEW.flap 
+			SET  outlet_type=NEW.outlet_type, offsetval=NEW.offsetval, curve_id=NEW.curve_id, cd1=NEW.cd1,cd2=NEW.cd2,flap=NEW.flap 
 			WHERE arc_id=OLD.arc_id;
 			
 		ELSIF (v_epa_table = 'inp_virtual') THEN 
