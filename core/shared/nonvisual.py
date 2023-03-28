@@ -20,10 +20,10 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTa
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.core import Qgis
 from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
-    GwNonVisualPatternWSUi, GwNonVisualRulesUi, GwNonVisualTimeseriesUi, GwNonVisualLidsUi
+    GwNonVisualPatternWSUi, GwNonVisualRulesUi, GwNonVisualTimeseriesUi, GwNonVisualLidsUi, GwNonVisualPrint
 from ..utils.matplotlib_widget import MplCanvas
 from ..utils import tools_gw
-from ...lib import tools_qgis, tools_qt, tools_db, tools_os, tools_log
+from ...lib import tools_qgis, tools_qt, tools_db, tools_log
 from ... import global_vars
 
 
@@ -81,6 +81,10 @@ class GwNonVisual:
         self.manager_dlg.btn_delete.clicked.connect(partial(self._delete_object, self.manager_dlg))
         self.manager_dlg.btn_cancel.clicked.connect(self.manager_dlg.reject)
         self.manager_dlg.finished.connect(partial(tools_gw.close_dialog, self.manager_dlg))
+        self.manager_dlg.btn_print.clicked.connect(partial(self._print_object))
+
+        self.manager_dlg.main_tab.currentChanged.connect(
+            partial(self._manage_tabs_changed))
 
         # Open dialog
         tools_gw.open_dialog(self.manager_dlg, dlg_name=f'dlg_nonvisual_manager')
@@ -103,6 +107,16 @@ class GwNonVisual:
             self._fill_manager_table(qtableview, key)
 
             qtableview.doubleClicked.connect(partial(self._get_nonvisual_object, qtableview, function_name))
+
+
+    def _manage_tabs_changed(self):
+
+        tab_idx = self.manager_dlg.main_tab.currentIndex()
+        if tab_idx == 0:
+            self.manager_dlg.btn_print.setVisible(True)
+
+        else:
+            self.manager_dlg.btn_print.setVisible(False)
 
 
     def _get_nonvisual_object(self, tbl_view, function_name):
@@ -255,6 +269,57 @@ class GwNonVisual:
             global_vars.dao.commit()
             self._reload_manager_table()
 
+    def _print_object(self):
+
+        # Get dialog
+        self.dlg_print = GwNonVisualPrint()
+        tools_gw.load_settings(self.dlg_print)
+
+        # Set values
+        value = tools_gw.get_config_parser('nonvisual_print', 'print_path', "user", "session")
+        tools_qt.set_widget_text(self.dlg_print, self.dlg_print.txt_path, value)
+
+        # Triggers
+        self.dlg_print.btn_path.clicked.connect(
+            partial(tools_qt.get_folder_path, self.dlg_print, self.dlg_print.txt_path))
+        self.dlg_print.btn_accept.clicked.connect(partial(self._exec_print))
+
+        # Open dialog
+        tools_gw.open_dialog(self.dlg_print, dlg_name=f'dlg_nonvisual_print')
+
+
+    def _exec_print(self):
+
+        path = tools_qt.get_text(self.dlg_print, 'txt_path')
+
+        if path in (None, 'null', '') or not os.path.exists(path):
+            msg = "Please choose a valid path"
+            tools_qgis.show_warning(msg)
+            return
+
+        tools_gw.set_config_parser('nonvisual_print', 'print_path', path)
+        filter = tools_qt.get_text(self.manager_dlg, 'txt_filter', return_string_null=False)
+        cross_arccat = tools_qt.is_checked(self.dlg_print, 'chk_cross_arccat')
+
+        if cross_arccat:
+            sql = f"select ic.id as curve_id, ca.id as arccat_id, geom1, geom2 from ud.v_edit_inp_curve ic join ud.cat_arc ca on ca.curve_id = ic.id " \
+                  f"WHERE ic.curve_type = 'SHAPE' and ca.shape = 'CUSTOM' and ic.id ILIKE '%{filter}%'"
+            curve_results = tools_db.get_rows(sql)
+            for curve in curve_results:
+                geom1 = curve[2]
+                name = f"{curve[0]} - {curve[1]}"
+                self.get_print_curves(curve[0], path, name, geom1)
+        else:
+            sql = f"select id as curve_id from ud.v_edit_inp_curve ic " \
+                  f"WHERE ic.curve_type = 'SHAPE' and ic.id ILIKE '%{filter}%'"
+            curve_results = tools_db.get_rows(sql)
+            for curve in curve_results:
+                name = f"{curve[0]}"
+                self.get_print_curves(curve[0], path, name)
+
+        tools_gw.close_dialog(self.dlg_print)
+
+
     # endregion
 
     # region curves
@@ -298,7 +363,7 @@ class GwNonVisual:
         tbl_curve_value.cellChanged.connect(partial(self._onCellChanged, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._manage_curve_value, self.dialog, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._manage_curve_plot, self.dialog, tbl_curve_value, plot_widget))
-        self.dialog.btn_accept.clicked.connect(partial(self._accept_curves, self.dialog, is_new, curve_id))
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_curves, self.dialog, is_new))
         self._connect_dialog_signals()
 
         # Set initial curve_value table headers
@@ -310,6 +375,30 @@ class GwNonVisual:
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_curve')
 
+    def get_print_curves(self, curve_id, path, file_name, geom1=None):
+        """ Opens dialog for curve """
+
+        # Get dialog
+        self.dialog = GwNonVisualCurveUi()
+        tools_gw.load_settings(self.dialog)
+
+        # Create plot widget
+        plot_widget = self._create_plot_widget(self.dialog)
+
+        # Define variables
+        tbl_curve_value = self.dialog.tbl_curve_value
+        cmb_curve_type = self.dialog.cmb_curve_type
+
+        # Create & fill cmb_curve_type
+        curve_type_headers, curve_type_list = self._create_curve_type_lists()
+        tools_qt.fill_combo_values(cmb_curve_type, curve_type_list)
+
+        self._populate_curve_widgets(curve_id)
+
+        # Set initial curve_value table headers
+        self._manage_curve_plot(self.dialog, tbl_curve_value, plot_widget, file_name, geom1)
+        output_path = os.path.join(path, file_name)
+        plot_widget.figure.savefig(output_path)
 
     def _create_curve_type_lists(self):
         """ Creates a list & dict to manage curve_values table headers """
@@ -404,6 +493,8 @@ class GwNonVisual:
     def _manage_curve_value(self, dialog, table, row, column):
         """ Validate data in curve values table """
 
+        # Get curve_type
+        curve_type = tools_qt.get_text(dialog, 'cmb_curve_type')
         # Control data depending on curve type
         valid = True
         self.valid = (True, "")
@@ -416,12 +507,13 @@ class GwNonVisual:
                     if cur_cell.data(0) not in (None, '') and prev_cell.data(0) not in (None, ''):
                         cur_value = float(cur_cell.data(0))
                         prev_value = float(prev_cell.data(0))
-                        if cur_value < prev_value:
+                        if (cur_value < prev_value) and (curve_type != 'SHAPE' and global_vars.project_type != 'ud'):
                             valid = False
                             self.valid = (False, "Invalid curve. First column values must be ascending.")
 
         # If first check is valid, check all rows for column for final validation
         if valid:
+
             # Create list with column values
             x_values = []
             y_values = []
@@ -449,13 +541,13 @@ class GwNonVisual:
             for i, n in enumerate(x_values):
                 if i == 0 or n is None:
                     continue
-                if n > x_values[i-1]:
+                if (n > x_values[i-1]) or (curve_type == 'SHAPE' and global_vars.project_type == 'ud'):
                     continue
                 valid = False
                 self.valid = (False, "Invalid curve. First column values must be ascending.")
                 break
             # If PUMP, check that y_values are descending
-            curve_type = tools_qt.get_text(dialog, 'cmb_curve_type')
+
             if curve_type == 'PUMP':
                 for i, n in enumerate(y_values):
                     if i == 0 or n is None:
@@ -474,7 +566,7 @@ class GwNonVisual:
                 self.valid = (valid, "Invalid curve. Values must go in pairs.")
 
 
-    def _manage_curve_plot(self, dialog, table, plot_widget):
+    def _manage_curve_plot(self, dialog, table, plot_widget, file_name=None, geom1=None):
         """ Note: row & column parameters are passed by the signal """
 
         # Clear plot
@@ -485,6 +577,7 @@ class GwNonVisual:
 
         # Read row values
         values = self._read_tbl_values(table)
+
         temp_list = []  # String list with all table values
         for v in values:
             temp_list.append(v)
@@ -538,15 +631,43 @@ class GwNonVisual:
         # Manage inverted plot and mirror plot for SHAPE type
         if curve_type == 'SHAPE':
 
+            if [] in (x_list, y_list):
+                if file_name:
+                    fig_title = f"{file_name}"
+                    plot_widget.axes.text(0, 1.02, f"{fig_title}", fontsize=12)
+                return
+
+            if geom1:
+                for i in range(len(x_list)):
+                    x_list[i] *= float(geom1)
+                for i in range(len(y_list)):
+                    y_list[i] *= float(geom1)
+
+            # Calcule el área
+            area = np.trapz(y_list, x_list)
+
+            # Create inverted plot
+            plot_widget.axes.plot(y_list, x_list, color="blue")
+
             # Get inverted points from y_lits
             y_list_inverted = [-y for y in y_list]
 
-            # Get figure
-            fig = plot_widget.figure
-            # Create inverted plot
-            plot_widget.axes.plot(y_list, x_list, color="blue")
             # Create mirror plot
-            plot_widget.axes.plot(y_list_inverted, x_list, color="grey")
+            plot_widget.axes.plot(y_list_inverted, x_list, color="blue")
+
+            # Manage close figure
+            aux_x_list = [x_list[0], x_list[0]]
+            aux_y_list = [y_list_inverted[0], y_list[0]]
+            plot_widget.axes.plot(aux_y_list, aux_x_list, color="blue")
+
+            # Manage separation figure
+            aux_x_list = [x_list[0], x_list[-1]]
+            aux_y_list = [y_list[-1], y_list[-1]]
+            plot_widget.axes.plot(aux_y_list, aux_x_list, color="grey", alpha=0.5, linestyle="dashed")
+
+            if file_name:
+                fig_title = f"{file_name} (S: {round(area*100, 2)} dm2)"
+                plot_widget.axes.text(min(y_list_inverted)*1.1, max(x_list)*1.07, f"{fig_title}", fontsize=12)
         else:
             plot_widget.axes.plot(x_list, y_list, color='indianred')
 
@@ -554,7 +675,7 @@ class GwNonVisual:
         plot_widget.draw()
 
 
-    def _accept_curves(self, dialog, is_new, curve_id):
+    def _accept_curves(self, dialog, is_new):
         """ Manage accept button (insert & update) """
 
         # Variables
