@@ -223,10 +223,6 @@ BEGIN
 	SELECT arc_id, 'ORIFICE', ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4, close_time
 	FROM v_edit_inp_orifice;
 
-	INSERT INTO temp_arc (arc_id, node_1, node_2, arccat_id, arc_type, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id )
-	SELECT arc_id, a.node_1, a.node_2, a.arccat_id, arc_type, epa_type, a.sector_id, a.state, a.state_type, a.annotation, a.the_geom, a.expl_id 
-	FROM v_edit_inp_orifice JOIN arc a USING (arc_id);
-
 	INSERT INTO temp_arc_flowregulator (arc_id, type, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4, close_time)
 	SELECT nodarc_id, 'ORIFICE', ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4, close_time
 	FROM v_edit_inp_flwreg_orifice;
