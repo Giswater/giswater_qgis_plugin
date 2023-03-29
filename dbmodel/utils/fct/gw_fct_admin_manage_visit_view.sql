@@ -64,30 +64,31 @@ BEGIN
 		-- create a new view if doesn't exist
 	EXECUTE 'SELECT DISTINCT string_agg(concat(''om_visit_x_'||v_feature_system_id||'.'',column_name)::text,'', '')
 		FROM information_schema.columns where table_name=''om_visit_x_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
-		and column_name!=''is_last'''
+		and column_name NOT IN (''is_last'', ''id'')'
 		INTO v_om_visit_x_feature_fields;
 		    		    
 		EXECUTE 'SELECT DISTINCT string_agg(concat(''om_visit.'',column_name)::text,'', '')
-		FROM information_schema.columns where table_name=''om_visit'' and table_schema='''||v_schemaname||''' and column_name!=''publish'' and column_name!=''id'''
+		FROM information_schema.columns where table_name=''om_visit'' and table_schema='''||v_schemaname||''' and column_name!=''publish'' and column_name NOT IN (''id'', ''vehicle_id'', ''unit_id'', ''visit_type'', ''the_geom'')'
 		INTO v_om_visit_fields;
 		
 		raise notice 'v_new_parameters.id_param,%',v_new_parameters.id_param;
 			
 		EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||lower(v_viewname)||' AS
 			SELECT '||v_om_visit_x_feature_fields||',
+            '||v_feature_system_id||'.code,
+            '||v_feature_system_id||'.the_geom,
 			'||v_om_visit_fields||',
 			'||v_new_parameters.a_param||'
 			FROM om_visit
 			JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
 			JOIN om_visit_x_'||v_feature_system_id||' ON om_visit.id = om_visit_x_'||v_feature_system_id||'.visit_id
+			JOIN '||v_feature_system_id||' ON '||v_feature_system_id||'.'||v_feature_system_id||'_id::text = om_visit_x_'||v_feature_system_id||'.'||v_feature_system_id||'_id::text
 			LEFT JOIN ( SELECT ct.visit_id,
 		    '||v_new_parameters.ct_param||'
 			    FROM crosstab(''SELECT visit_id, om_visit_event.parameter_id, value 
-			    FROM '||v_schemaname||'.om_visit 
-			    LEFT JOIN '||v_schemaname||'.om_visit_event ON om_visit.id= om_visit_event.visit_id 
+			    FROM '||v_schemaname||'.om_visit JOIN '||v_schemaname||'.om_visit_event ON om_visit.id=om_visit_event.visit_id 
 			    LEFT JOIN '||v_schemaname||'.config_visit_class on config_visit_class.id=om_visit.class_id
-			    LEFT JOIN '||v_schemaname||'.config_visit_class_x_parameter on config_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id
-			    where config_visit_class.ismultievent = TRUE AND config_visit_parameter.active IS TRUE AND config_visit_parameter_action.active IS TRUE 
+			    WHERE config_visit_class.ismultievent = TRUE AND config_visit_class.id='||v_class_id||'
 			    ORDER  BY 1,2''::text, '' VALUES '||v_new_parameters.id_param||'''::text) 
 			    ct(visit_id integer, '||v_new_parameters.datatype||')) a ON a.visit_id = om_visit.id
 				WHERE config_visit_class.ismultievent = true AND config_visit_class.id='||v_class_id||';';

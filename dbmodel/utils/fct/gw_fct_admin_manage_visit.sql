@@ -13,31 +13,48 @@ $BODY$
 
 /*EXAMPLE
 
-	SINGLE EVENT
-	SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
-	"data":{"action":"CREATE", "action_type":"class", "parameters":{"class_name":"LEAK_NODE67","parameter_id":"param_leak_node67", "active":"True","ismultifeature":"false","ismultievent":"False",
-	"visit_type":1,  "parameter_type":"INSPECTION", "data_type":"text", "code":"123", 
-	"v_param_options":null, "form_type":"event_standard","vdefault":null, "short_descript":null, "viewname":"aaa_ve_node_leak67"}}}$$);
+SINGLE EVENT
+SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
+"data":{"action":"CREATE", "action_type":"class", "parameters":{"class_name":"LEAK_NODE67","parameter_id":"param_leak_node67", "active":"True","ismultifeature":"false","ismultievent":"False",
+"visit_type":1,  "parameter_type":"INSPECTION", "data_type":"text", "code":"123", 
+"v_param_options":null, "form_type":"event_standard","vdefault":null, "short_descript":null, "viewname":"aaa_ve_node_leak67"}}}$$);
 
-		SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
-		"data":{"action":"CREATE", "action_type":"parameter", "parameters":{"class_name":"LEAK_NODE67","parameter_id":"param_leak_node67", "active":"True","ismultifeature":"false","ismultievent":"False",
-		"visit_type":1,  "parameter_type":"INSPECTION", "data_type":"integer", "code":"123", 
-		"v_param_options":null, "form_type":"event_standard","vdefault":1, "short_descript":null, "viewname":"aaa_ve_node_leak67",
-		"widgettype":"text",  "iseditable":"True", "ismandatory":"True", "dv_querytext":null}}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
+"data":{"action":"CREATE", "action_type":"parameter", "parameters":{"class_name":"LEAK_NODE67","parameter_id":"param_leak_node67", "active":"True","ismultifeature":"false","ismultievent":"False",
+"visit_type":1,  "parameter_type":"INSPECTION", "data_type":"integer", "code":"123", 
+"v_param_options":null, "form_type":"event_standard","vdefault":1, "short_descript":null, "viewname":"aaa_ve_node_leak67",
+"widgettype":"text",  "iseditable":"True", "ismandatory":"True", "dv_querytext":null}}}$$);
 
 -------------
 
+-- create new visit class
+SELECT gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
+"data":{"action":"CREATE", "action_type":"class", "parameters":{"class_name":"Valve inspection",
+"active":"True","ismultifeature":"false","ismultievent":"True","visit_type":1,"v_param_options":{"sysType":"VALVE"}, 
+"viewname":"ve_visit_valve_insp", "ui_viewname":"v_ui_visit_valve_insp"}}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
-"data":{"action":"CREATE", "action_type":"class", "parameters":{"class_name":"LEAK_NODE","parameter_id":"param_leak_node", "active":"True","ismultifeature":"false","ismultievent":"True",
-"visit_type":1,  "parameter_type":"INSPECTION", "data_type":"text", "code":"123", 
-"v_param_options":null, "form_type":"event_standard","vdefault":null, "short_descript":null, "viewname":"aaa_ve_node_leak"}}}$$);
+-- create parameter boolean
+SELECT gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
+"data":{"action":"CREATE", "action_type":"parameter", "parameters":{"class_name":"Valve inspection",
+"parameter_id":"correct_conserv", 
+"descript":"Correct conservation of the element",
+"active":"True","ismultifeature":"false","ismultievent":"True",
+"visit_type":1,  "parameter_type":"INSPECTION", "data_type":"boolean", "code":"", "v_param_options":null, 
+"form_type":"event_standard","vdefault":"", "viewname":"ve_visit_valve_insp",
+"widgettype":"check",  "iseditable":"True", "ismandatory":"True", "dv_querytext":null}}}$$);
 
-		SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
-		"data":{"action":"CREATE", "action_type":"parameter", "parameters":{"class_name":"LEAK_NODE","parameter_id":"param_leak_node28", "active":"True","ismultifeature":"false","ismultievent":"True",
-		"visit_type":1,  "parameter_type":"INSPECTION", "data_type":"text", "code":"123", 
-		"v_param_options":null, "form_type":"event_standard","vdefault":1, "short_descript":null, "viewname":"aaa_ve_node_leak",
-		"widgettype":"text",  "iseditable":"True", "ismandatory":"True", "dv_querytext":null}}}$$);
+-- create parameter text with querytext
+SELECT gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
+"data":{"action":"CREATE", "action_type":"parameter", "parameters":{"class_name":"Valve inspection",
+"parameter_id":"descr_conserv_elem",
+"descript":"Description of the conservation of the element",
+"active":"True","ismultifeature":"false","ismultievent":"True",
+"visit_type":1,  "parameter_type":"INSPECTION", "data_type":"text", "code":"", "v_param_options":null, 
+"form_type":"event_standard","vdefault":"", "viewname":"ve_visit_valve_insp",
+"widgettype":"text",  "iseditable":"True", "ismandatory":"True", "dv_querytext":"SELECT id, idval FROM om_typevalue WHERE typevalue='xxxx'"}}}$$);
+
+
+--------------
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
 "data":{"action":"UPDATE", "action_type":"parameter", "parameters":{"class_name":"LEAK_NODE","parameter_id":"param_leak_node3", "active":"True","ismultifeature":"false","ismultievent":"True",
@@ -101,6 +118,7 @@ v_om_visit_fields text;
 v_old_parameters record;
 v_new_parameters record;
 v_viewname text;
+v_ui_viewname text;
 v_definition text;
 v_old_viewname text;
 v_config_fields text;
@@ -143,7 +161,8 @@ BEGIN
 	v_action = ((p_data ->>'data')::json->>'action')::text;
 	v_action_type = ((p_data ->>'data')::json->>'action_type')::text;
 
-	v_viewname = (((p_data ->>'data')::json->>'parameters')::json->>'viewname')::text; 
+	v_viewname = (((p_data ->>'data')::json->>'parameters')::json->>'viewname')::text;
+	v_ui_viewname = (((p_data ->>'data')::json->>'parameters')::json->>'ui_viewname')::text;
 	v_class_id = (((p_data ->>'data')::json->>'parameters')::json->>'class_id')::integer; 
 	v_class_name = (((p_data ->>'data')::json->>'parameters')::json->>'class_name')::text; 
 	v_feature_system_id = lower(((p_data ->>'feature')::json->>'feature_type')::text);
@@ -202,9 +221,9 @@ BEGIN
 		--insert new class and parameter
 		IF v_action_type = 'class' THEN
 			INSERT INTO config_visit_class (idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role, 
-				visit_type, param_options, formname, tablename)
+				visit_type, param_options, formname, tablename, ui_tablename)
 			VALUES (v_class_name, v_descript, v_active, v_ismultifeature, v_ismultievent,upper(v_feature_system_id), 'role_om', 
-				v_visit_type, v_param_options::json, v_viewname, v_viewname)
+				v_visit_type, v_param_options::json, v_viewname, v_viewname, v_ui_viewname)
 			RETURNING id INTO v_class_id;
 
 			IF v_ismultievent = FALSE THEN
@@ -284,7 +303,7 @@ BEGIN
 			INSERT INTO config_visit_parameter(id, code, parameter_type, feature_type, data_type, descript, form_type, vdefault, 
 			ismultifeature, short_descript, active)
 			VALUES (v_param_name, v_code, v_parameter_type, upper(v_feature_system_id),v_data_type, v_descript, v_form_type, v_vdefault,
-			v_ismultifeature, v_short_descript, TRUE);
+			v_ismultifeature, v_short_descript, TRUE) ON CONFLICT (id) DO NOTHING;
 
 			--relate new parameters with new class
 			INSERT INTO config_visit_class_x_parameter (class_id, parameter_id, active)
@@ -296,12 +315,12 @@ BEGIN
 			--add configuration of new parameters to config_form_fields
 			IF v_ismultievent = TRUE THEN
 				EXECUTE 'SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname='''||v_viewname||'''
-				AND layoutname = ''data_1'';'
+				AND layoutname = ''lyt_data_1'';'
 				INTO v_layoutorder;
 
 				INSERT INTO config_form_fields (formname, formtype, columnname, tabname, layoutorder, datatype, widgettype, label, layoutname,
 				iseditable, ismandatory, dv_querytext, hidden)
-				VALUES (v_viewname, 'visit', v_param_name, 'form_visit', v_layoutorder,  v_data_type, v_widgettype, v_param_name, 'data_1',
+				VALUES (v_viewname, 'form_visit', v_param_name, 'form_visit', v_layoutorder,  v_data_type, v_widgettype, v_param_name, 'lyt_data_1',
 				v_iseditable, v_ismandatory, v_dv_querytext, false)
 				ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
@@ -526,7 +545,7 @@ raise notice 'v_config_fields,%',v_config_fields;
 				WHERE class_id = v_class_id ) LOOP
 
 					EXECUTE 'SELECT max(layout_order) + 1 FROM config_form_fields  WHERE formname='''||v_viewname||'''
-					AND layout_name = ''data_1'';'
+					AND layout_name = ''lyt_data_1'';'
 					INTO v_layout_order;
 					
 					IF lower(rec.data_type) = 'text' THEN
@@ -541,7 +560,7 @@ raise notice 'v_config_fields,%',v_config_fields;
 					
 					INSERT INTO config_form_fields  (formname, formtype, column_id, layout_id, layout_order, datatype, widgettype, label, layout_name,
 					iseditable, ismandatory)
-					VALUES (v_viewname, 'visit', rec.parameter_id,1,v_layout_order, v_data_type, v_widgettype, rec.parameter_id, 'data_1',
+					VALUES (v_viewname, 'form_visit', rec.parameter_id,1,v_layout_order, v_data_type, v_widgettype, rec.parameter_id, 'lyt_data_1',
 					true, false)
 					ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 				END LOOP;
