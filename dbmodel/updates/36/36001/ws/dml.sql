@@ -987,7 +987,7 @@ INSERT INTO sys_function
 (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES(3208, 'gw_fct_getmincut_manager', 'ws', 'function', 'json', 'json', 'Get mincut manager values', 'role_om', NULL, 'core') ON CONFLICT (id) DO NOTHING;
 
-
+-- Mincut manager form
 INSERT INTO config_typevalue
 (typevalue, id, idval, camelstyle, addparam)
 VALUES('formtype_typevalue', 'form_mincut', 'form_mincut', 'formMincut', NULL);
@@ -1137,7 +1137,7 @@ VALUES('tbl_mincut_manager', 'SELECT id, name, work_order, state, class, mincut_
       "sorting": [
         {
           "id": "id",
-          "desc": false
+          "desc": true
         }
       ]
     },
@@ -1219,3 +1219,128 @@ VALUES('selector_mincut', 'tab_mincut', 'Mincut', 'Mincut Selector', 'role_basic
 UPDATE link l SET epa_type = c.epa_type, is_operative = v.is_operative 
 FROM connec c
 JOIN value_state_type v ON v.id = c.state_type WHERE l.feature_id = c.connec_id;
+
+-- Mincut form
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) 
+    VALUES('layout_name_typevalue', 'lyt_plan_1', 'lyt_plan_1', 'lytPlan1', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) 
+    VALUES('layout_name_typevalue', 'lyt_plan_details', 'lyt_plan_details', 'lytPlanDetails', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) 
+    VALUES('layout_name_typevalue', 'lyt_plan_fdates', 'lyt_plan_fdates', 'lytPlanFdates', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) 
+    VALUES('layout_name_typevalue', 'lyt_exec_1', 'lyt_exec_1', 'lytExec1', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) 
+    VALUES('layout_name_typevalue', 'lyt_log_1', 'lyt_log_1', 'lytLog1', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) 
+    VALUES('layout_name_typevalue', 'lyt_files_1', 'lyt_files_1', 'lytFiles1', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) 
+    VALUES('layout_name_typevalue', 'lyt_files_2', 'lyt_files_2', 'lytFiles2', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) 
+    VALUES('layout_name_typevalue', 'lyt_toolbar', 'lyt_toolbar', 'layoutToolbar', '{"createAddfield":"TRUE"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) 
+    VALUES('layout_name_typevalue', 'lyt_hydro_1', 'lyt_hydro_1', 'lytHydro1', NULL);
+
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'chk_use_planified', 'lyt_plan_1', 0, 'boolean', 'check', 'Usar red planificada:', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'forecast_start', 'lyt_plan_fdates', 0, 'datetime', 'datetime', 'Desde:', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'forecast_end', 'lyt_plan_fdates', 1, 'datetime', 'datetime', 'Hasta:', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 1);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'mincut_state', 'lyt_top_1', 1, 'string', 'text', 'Estado:', NULL, NULL, true, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 1);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'mincut_type', 'lyt_plan_details', 0, 'string', 'combo', 'Tipo:', NULL, NULL, false, false, true, false, false, 'SELECT id, descript AS idval FROM om_mincut_cat_type', true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'anl_cause', 'lyt_plan_details', 1, 'string', 'combo', 'Causa:', NULL, NULL, false, false, true, false, false, 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''mincut_cause''', true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 1);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'received_date', 'lyt_plan_details', 2, 'datetime', 'datetime', 'Fecha de recibo:', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 2);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'anl_descript', 'lyt_plan_details', 3, 'string', 'text', 'Descripción:', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 3);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'work_order', 'lyt_top_1', 2, 'string', 'text', 'Orden de trabajo:', NULL, NULL, true, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 2);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'btn_end', 'lyt_exec_1', 8, NULL, 'button', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"text":"Fin"}'::json, '{
+  "functionName": "real_end",
+  "params": {}
+}'::json, NULL, false, 8);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'btn_start', 'lyt_exec_1', 0, NULL, 'button', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"text":"Inicio"}'::json, '{
+  "functionName": "real_start",
+  "params": {}
+}'::json, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'assigned_to', 'lyt_plan_fdates', 2, 'string', 'combo', 'Asignado a:', NULL, NULL, false, false, true, false, false, 'SELECT id, name AS idval FROM cat_users WHERE active is not False', true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 2);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'exec_start', 'lyt_exec_1', 1, 'date', 'datetime', 'Fecha inicial:', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 1);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'exec_descript', 'lyt_exec_1', 2, 'string', 'textarea', 'Descripción:', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 2);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'exec_user', 'lyt_exec_1', 3, 'string', 'text', 'Usuario ejecutivo:', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 3);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'exec_from_plot', 'lyt_exec_1', 4, 'double', 'text', 'Distancia fachada:', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 4);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'exec_depth', 'lyt_exec_1', 5, 'double', 'text', 'Profundidad:', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 5);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'exec_appropiate', 'lyt_exec_1', 6, 'boolean', 'check', 'Apropiado:', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 6);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'exec_end', 'lyt_exec_1', 7, 'datetime', 'datetime', 'Fecha final:', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 7);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'txt_infolog', 'lyt_log_1', 0, 'string', 'textarea', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'btn_cancel', 'lyt_bot_1', 1, NULL, 'button', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"text":"Cancelar"}'::json, '{
+  "functionName": "cancel",
+  "params": {}
+}'::json, NULL, false, 1);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'id', 'lyt_top_1', 0, 'integer', 'text', 'Id:', NULL, NULL, true, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'tbl_hydro', 'lyt_hydro_1', 0, NULL, 'tableview', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'v_om_mincut_hydrometer', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'btn_valve_status', 'lyt_toolbar', 2, NULL, 'button', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, '{
+  "icon": "124",
+  "size": "24x24"
+}'::json, '{
+  "icon": "change-valve-status"
+}'::json, '{
+  "functionName": "change_valve_status",
+  "params": {}
+}'::json, NULL, false, 2);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'btn_refresh_mincut', 'lyt_toolbar', 3, NULL, 'button', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, '{
+  "icon": "125",
+  "size": "24x24"
+}'::json, '{
+  "icon": "refresh"
+}'::json, '{
+  "functionName": "refresh_mincut",
+  "params": {}
+}'::json, NULL, false, 3);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'btn_accept', 'lyt_bot_1', 0, NULL, 'button', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"text":"Aceptar"}'::json, '{
+  "functionName": "accept",
+  "params": {}
+}'::json, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'btn_custom_mincut', 'lyt_toolbar', 1, NULL, 'button', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, '{
+  "icon": "123",
+  "size": "24x24"
+}'::json, '{
+  "icon": "custom-mincut"
+}'::json, '{
+  "functionName": "custom_mincut",
+  "params": {}
+}'::json, NULL, false, 1);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'btn_mincut', 'lyt_toolbar', 0, NULL, 'button', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, '{
+  "icon": "126",
+  "size": "24x24"
+}'::json, '{
+  "icon": "mincut"
+}'::json, '{
+  "functionName": "auto_mincut", 
+  "params": {}
+}'::json, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+    VALUES('mincut', 'form_mincut', 'mincut', 'hspacer_lyt_toolbar', 'lyt_toolbar', 4, NULL, 'hspacer', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 4);
+
