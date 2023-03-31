@@ -18,3 +18,10 @@ CREATE TRIGGER gw_trg_arc_node_values
     ON arc
     FOR EACH ROW
     EXECUTE FUNCTION gw_trg_arc_node_values();
+    
+DROP TRIGGER IF EXISTS gw_trg_vi_timeseries ON vi_timeseries;
+CREATE TRIGGER gw_trg_vi_timeseries
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON vi_timeseries
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_vi('vi_timeseries');
