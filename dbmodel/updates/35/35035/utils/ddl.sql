@@ -13,3 +13,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "c
 CREATE INDEX IF NOT EXISTS arc_exploitation2 ON arc USING btree (expl_id2 ASC NULLS LAST) TABLESPACE pg_default;
 CREATE INDEX IF NOT EXISTS node_exploitation2 ON node USING btree (expl_id2 ASC NULLS LAST) TABLESPACE pg_default;
 CREATE INDEX IF NOT EXISTS connec_exploitation2 ON connec USING btree (expl_id2 ASC NULLS LAST) TABLESPACE pg_default;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"expl_id2", "dataType":"integer"}}$$);
+
+CREATE INDEX IF NOT EXISTS link_exploitation2 ON link USING btree (expl_id2 ASC NULLS LAST) TABLESPACE pg_default;

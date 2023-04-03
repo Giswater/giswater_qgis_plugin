@@ -23,3 +23,29 @@ CREATE OR REPLACE VIEW v_expl_node
     node
   WHERE selector_expl.cur_user = "current_user"()::text AND (node.expl_id = selector_expl.expl_id OR node.expl_id2 = selector_expl.expl_id);
 
+
+
+
+CREATE OR REPLACE VIEW v_state_link_connec
+ AS
+(
+         SELECT link.link_id
+           FROM selector_state,
+            selector_expl,
+            link
+          WHERE link.state = selector_state.state_id AND (link.expl_id = selector_expl.expl_id OR link.expl_id2 = selector_expl.expl_id) AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text AND link.feature_type::text = 'CONNEC'::text
+        EXCEPT ALL
+         SELECT plan_psector_x_connec.link_id
+           FROM selector_psector,
+            selector_expl,
+            plan_psector_x_connec
+             JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
+          WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 0 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text AND plan_psector_x_connec.active IS TRUE
+) UNION ALL
+ SELECT plan_psector_x_connec.link_id
+   FROM selector_psector,
+    selector_expl,
+    plan_psector_x_connec
+     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
+  WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 1 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text AND plan_psector_x_connec.active IS TRUE;
+

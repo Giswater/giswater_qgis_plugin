@@ -689,3 +689,102 @@ SELECT * FROM v_connec;
  SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},"data":{"viewName":["v_edit_node"], "fieldName":"expl_id2", "action":"ADD-FIELD","hasChilds":"True"}}$$);
  SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},"data":{"viewName":["v_edit_connec"], "fieldName":"expl_id2", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
+
+
+CREATE OR REPLACE VIEW v_state_link
+ AS
+(
+         SELECT link.link_id
+           FROM selector_state,
+            selector_expl,
+            link
+          WHERE link.state = selector_state.state_id AND (link.expl_id = selector_expl.expl_id OR link.expl_id2 = selector_expl.expl_id) AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text
+        EXCEPT ALL
+         SELECT plan_psector_x_connec.link_id
+           FROM selector_psector,
+            selector_expl,
+            plan_psector_x_connec
+             JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
+          WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 0 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text AND plan_psector_x_connec.active IS TRUE
+) UNION ALL
+ SELECT plan_psector_x_connec.link_id
+   FROM selector_psector,
+    selector_expl,
+    plan_psector_x_connec
+     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
+  WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 1 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text AND plan_psector_x_connec.active IS TRUE;
+
+
+CREATE OR REPLACE VIEW v_state_link_connec AS (
+         SELECT link.link_id
+           FROM selector_state,
+            selector_expl,
+            link
+          WHERE link.state = selector_state.state_id AND (link.expl_id = selector_expl.expl_id OR link.expl_id2 = selector_expl.expl_id)  AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text
+        EXCEPT ALL
+         SELECT plan_psector_x_connec.link_id
+           FROM selector_psector,
+            selector_expl,
+            plan_psector_x_connec
+             JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
+          WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 0 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text
+          AND plan_psector_x_connec.active is true
+
+) UNION ALL
+ SELECT plan_psector_x_connec.link_id
+   FROM selector_psector,
+    selector_expl,
+    plan_psector_x_connec
+     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
+  WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 1 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text
+  AND plan_psector_x_connec.active is true;
+
+
+
+CREATE OR REPLACE VIEW vu_link
+ AS
+ SELECT l.link_id,
+    l.feature_type,
+    l.feature_id,
+    l.exit_type,
+    l.exit_id,
+    l.state,
+    l.expl_id,
+    l.sector_id,
+    l.dma_id,
+    presszone_id::character varying(16) AS presszone_id,
+    l.dqa_id,
+    l.minsector_id,
+    l.exit_topelev,
+    l.exit_elev,
+    l.fluid_type,
+    st_length2d(l.the_geom)::numeric(12,3) AS gis_length,
+    l.the_geom,
+    s.name AS sector_name,
+    d.name AS dma_name,
+    q.name AS dqa_name,
+    p.name AS presszone_name,
+    s.macrosector_id,
+    d.macrodma_id,
+    q.macrodqa_id,
+    l.expl_id2
+   FROM link l
+     LEFT JOIN sector s USING (sector_id)
+     LEFT JOIN presszone p USING (presszone_id)
+     LEFT JOIN dma d USING (dma_id)
+     LEFT JOIN dqa q USING (dqa_id);
+
+
+create or replace view v_link as 
+select distinct on (link_id) * from vu_link
+JOIN v_state_link USING (link_id);
+
+
+CREATE OR REPLACE VIEW v_link_connec  AS
+ select distinct on (link_id) * 
+   FROM vu_link
+     JOIN v_state_link_connec USING (link_id);
+
+
+CREATE OR REPLACE VIEW v_edit_link  AS
+ SELECT * FROM v_link l;
