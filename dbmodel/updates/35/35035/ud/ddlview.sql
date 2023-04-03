@@ -7,7 +7,41 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-CREATE OR REPLACE VIEW ud_sample.v_state_gully
+
+CREATE OR REPLACE VIEW ud_sample.v_state_connec
+ AS
+ SELECT DISTINCT ON ((a.connec_id::character varying(30))) a.connec_id::character varying(30) AS connec_id,
+    a.arc_id
+   FROM ((
+                 SELECT connec.connec_id,
+                    connec.arc_id,
+                    1 AS flag
+                   FROM ud_sample.selector_state,
+                    ud_sample.selector_expl,
+                    ud_sample.connec
+                  WHERE connec.state = selector_state.state_id AND (connec.expl_id = selector_expl.expl_id OR connec.expl_id2 = selector_expl.expl_id) AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text
+                EXCEPT
+                 SELECT plan_psector_x_connec.connec_id,
+                    plan_psector_x_connec.arc_id,
+                    1 AS flag
+                   FROM ud_sample.selector_psector,
+                    ud_sample.selector_expl,
+                    ud_sample.plan_psector_x_connec
+                     JOIN ud_sample.plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
+                  WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 0 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text
+        ) UNION
+         SELECT plan_psector_x_connec.connec_id,
+            plan_psector_x_connec.arc_id,
+            2 AS flag
+           FROM ud_sample.selector_psector,
+            ud_sample.selector_expl,
+            ud_sample.plan_psector_x_connec
+             JOIN ud_sample.plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
+          WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 1 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text
+  ORDER BY 1, 3 DESC) a;
+
+
+CREATE OR REPLACE VIEW v_state_gully
  AS
  SELECT DISTINCT ON (a.gully_id) a.gully_id,
     a.arc_id
@@ -15,32 +49,32 @@ CREATE OR REPLACE VIEW ud_sample.v_state_gully
                  SELECT gully.gully_id,
                     gully.arc_id,
                     1 AS flag
-                   FROM ud_sample.selector_state,
-                    ud_sample.selector_expl,
-                    ud_sample.gully
+                   FROM selector_state,
+                    selector_expl,
+                    gully
                   WHERE gully.state = selector_state.state_id AND (gully.expl_id = selector_expl.expl_id OR gully.expl_id2 = selector_expl.expl_id) AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text
                 EXCEPT
                  SELECT plan_psector_x_gully.gully_id,
                     plan_psector_x_gully.arc_id,
                     1 AS flag
-                   FROM ud_sample.selector_psector,
-                    ud_sample.selector_expl,
-                    ud_sample.plan_psector_x_gully
-                     JOIN ud_sample.plan_psector ON plan_psector.psector_id = plan_psector_x_gully.psector_id
+                   FROM selector_psector,
+                    selector_expl,
+                    plan_psector_x_gully
+                     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_gully.psector_id
                   WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_gully.state = 0 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text
         ) UNION
          SELECT plan_psector_x_gully.gully_id,
             plan_psector_x_gully.arc_id,
             2 AS flag
-           FROM ud_sample.selector_psector,
-            ud_sample.selector_expl,
-            ud_sample.plan_psector_x_gully
-             JOIN ud_sample.plan_psector ON plan_psector.psector_id = plan_psector_x_gully.psector_id
+           FROM selector_psector,
+            selector_expl,
+            plan_psector_x_gully
+             JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_gully.psector_id
           WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_gully.state = 1 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text
   ORDER BY 1, 3 DESC) a;
 
 
-CREATE OR REPLACE VIEW ud_sample.vu_arc
+CREATE OR REPLACE VIEW vu_arc
  AS
  SELECT arc.arc_id,
     arc.code,
@@ -177,14 +211,14 @@ CREATE OR REPLACE VIEW ud_sample.vu_arc
     cat_arc.area AS cat_area,
     arc.parent_id,
     arc.expl_id2
-   FROM ud_sample.arc
-     JOIN ud_sample.cat_arc ON arc.arccat_id::text = cat_arc.id::text
-     JOIN ud_sample.cat_feature ON arc.arc_type::text = cat_feature.id::text
-     JOIN ud_sample.sector s ON s.sector_id = arc.sector_id
-     JOIN ud_sample.exploitation e USING (expl_id)
-     JOIN ud_sample.dma m USING (dma_id)
-     LEFT JOIN ud_sample.v_ext_streetaxis c ON c.id::text = arc.streetaxis_id::text
-     LEFT JOIN ud_sample.v_ext_streetaxis d ON d.id::text = arc.streetaxis2_id::text;
+   FROM arc
+     JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
+     JOIN cat_feature ON arc.arc_type::text = cat_feature.id::text
+     JOIN sector s ON s.sector_id = arc.sector_id
+     JOIN exploitation e USING (expl_id)
+     JOIN dma m USING (dma_id)
+     LEFT JOIN v_ext_streetaxis c ON c.id::text = arc.streetaxis_id::text
+     LEFT JOIN v_ext_streetaxis d ON d.id::text = arc.streetaxis2_id::text;
 
 
 
@@ -204,7 +238,7 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 
 
 
-CREATE OR REPLACE VIEW ud_sample.vu_connec
+CREATE OR REPLACE VIEW vu_connec
  AS
  SELECT connec.connec_id,
     connec.code,
@@ -285,15 +319,15 @@ CREATE OR REPLACE VIEW ud_sample.vu_connec
     connec.asset_id,
     connec.drainzone_id,
     connec.expl_id2
-   FROM ud_sample.connec
-     JOIN ud_sample.cat_connec ON connec.connecat_id::text = cat_connec.id::text
-     LEFT JOIN ud_sample.ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
-     LEFT JOIN ud_sample.dma ON connec.dma_id = dma.dma_id
-     LEFT JOIN ud_sample.exploitation ON connec.expl_id = exploitation.expl_id
-     LEFT JOIN ud_sample.sector ON connec.sector_id = sector.sector_id
-     LEFT JOIN ud_sample.cat_feature ON connec.connec_type::text = cat_feature.id::text
-     LEFT JOIN ud_sample.v_ext_streetaxis c ON c.id::text = connec.streetaxis_id::text
-     LEFT JOIN ud_sample.v_ext_streetaxis d ON d.id::text = connec.streetaxis2_id::text;
+   FROM connec
+     JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
+     LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
+     LEFT JOIN dma ON connec.dma_id = dma.dma_id
+     LEFT JOIN exploitation ON connec.expl_id = exploitation.expl_id
+     LEFT JOIN sector ON connec.sector_id = sector.sector_id
+     LEFT JOIN cat_feature ON connec.connec_type::text = cat_feature.id::text
+     LEFT JOIN v_ext_streetaxis c ON c.id::text = connec.streetaxis_id::text
+     LEFT JOIN v_ext_streetaxis d ON d.id::text = connec.streetaxis2_id::text;
 
 
 
@@ -387,7 +421,7 @@ CREATE OR REPLACE VIEW v_connec AS
     vu_connec.the_geom,
     vu_connec.workcat_id_plan,
     vu_connec.asset_id,
-    vu_connec.drainzone_id
+    vu_connec.drainzone_id,
     vu_connec.expl_id2
    FROM vu_connec
      JOIN v_state_connec USING (connec_id)
@@ -420,7 +454,7 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_connec"], "fieldName":"expl_id2", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 
-CREATE OR REPLACE VIEW ud_sample.vu_gully
+CREATE OR REPLACE VIEW vu_gully
  AS
  SELECT gully.gully_id,
     gully.code,
@@ -511,15 +545,15 @@ CREATE OR REPLACE VIEW ud_sample.vu_gully
     gully.units_placement,
     gully.drainzone_id,
     gully.expl_id2
-   FROM ud_sample.gully
-     LEFT JOIN ud_sample.cat_grate ON gully.gratecat_id::text = cat_grate.id::text
-     LEFT JOIN ud_sample.dma ON gully.dma_id = dma.dma_id
-     LEFT JOIN ud_sample.sector ON gully.sector_id = sector.sector_id
-     LEFT JOIN ud_sample.exploitation ON gully.expl_id = exploitation.expl_id
-     LEFT JOIN ud_sample.cat_feature ON gully.gully_type::text = cat_feature.id::text
-     LEFT JOIN ud_sample.v_ext_streetaxis c ON c.id::text = gully.streetaxis_id::text
-     LEFT JOIN ud_sample.v_ext_streetaxis d ON d.id::text = gully.streetaxis2_id::text
-     LEFT JOIN ud_sample.cat_connec cc ON cc.id::text = gully.connec_arccat_id::text;
+   FROM gully
+     LEFT JOIN cat_grate ON gully.gratecat_id::text = cat_grate.id::text
+     LEFT JOIN dma ON gully.dma_id = dma.dma_id
+     LEFT JOIN sector ON gully.sector_id = sector.sector_id
+     LEFT JOIN exploitation ON gully.expl_id = exploitation.expl_id
+     LEFT JOIN cat_feature ON gully.gully_type::text = cat_feature.id::text
+     LEFT JOIN v_ext_streetaxis c ON c.id::text = gully.streetaxis_id::text
+     LEFT JOIN v_ext_streetaxis d ON d.id::text = gully.streetaxis2_id::text
+     LEFT JOIN cat_connec cc ON cc.id::text = gully.connec_arccat_id::text;
 
 
 CREATE OR REPLACE VIEW v_gully
@@ -648,16 +682,16 @@ AS SELECT vu_gully.gully_id,
 
 
 CREATE OR REPLACE VIEW v_edit_gully AS 
-SELECT * FROM v_connec;
+SELECT * FROM v_gully;
 
 CREATE OR REPLACE VIEW ve_gully AS 
-SELECT * FROM v_connec;
+SELECT * FROM v_gully;
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_gully"], "fieldName":"expl_id2", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 
-CREATE OR REPLACE VIEW ud_sample.vu_node
+CREATE OR REPLACE VIEW vu_node
  AS
  WITH vu_node AS (
          SELECT node.node_id,
@@ -747,14 +781,14 @@ CREATE OR REPLACE VIEW ud_sample.vu_node
             node.parent_id,
             node.arc_id,
             node.expl_id2
-           FROM ud_sample.node
-             LEFT JOIN ud_sample.cat_node ON node.nodecat_id::text = cat_node.id::text
-             LEFT JOIN ud_sample.cat_feature ON cat_feature.id::text = node.node_type::text
-             LEFT JOIN ud_sample.dma ON node.dma_id = dma.dma_id
-             LEFT JOIN ud_sample.sector ON node.sector_id = sector.sector_id
-             LEFT JOIN ud_sample.exploitation ON node.expl_id = exploitation.expl_id
-             LEFT JOIN ud_sample.v_ext_streetaxis c ON c.id::text = node.streetaxis_id::text
-             LEFT JOIN ud_sample.v_ext_streetaxis d ON d.id::text = node.streetaxis2_id::text
+           FROM node
+             LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
+             LEFT JOIN cat_feature ON cat_feature.id::text = node.node_type::text
+             LEFT JOIN dma ON node.dma_id = dma.dma_id
+             LEFT JOIN sector ON node.sector_id = sector.sector_id
+             LEFT JOIN exploitation ON node.expl_id = exploitation.expl_id
+             LEFT JOIN v_ext_streetaxis c ON c.id::text = node.streetaxis_id::text
+             LEFT JOIN v_ext_streetaxis d ON d.id::text = node.streetaxis2_id::text
         )
  SELECT vu_node.node_id,
     vu_node.code,
