@@ -690,9 +690,13 @@ BEGIN
 			    
 				--workcat_id_plan
 				WHEN 'workcat_id_plan' THEN
-					SELECT (a->>'vdef') INTO v_state_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = 'state';		
+					SELECT (a->>'vdef') INTO v_state_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = 'state';	
+					-- use this variable only when state=2
 					IF v_state_value = 2 THEN 
 						SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = 'workcat_id_plan';
+					-- when state <> set variable to NULL
+					ELSE
+						SELECT NULL INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = 'workcat_id_plan';
 					END IF;
 
 				-- state type
