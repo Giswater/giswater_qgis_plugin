@@ -24,6 +24,7 @@ CREATE OR REPLACE VIEW v_expl_node
   WHERE selector_expl.cur_user = "current_user"()::text AND (node.expl_id = selector_expl.expl_id OR node.expl_id2 = selector_expl.expl_id);
 
 
+DROP TABLE IF EXISTS node_border_expl ;
 
 
 CREATE OR REPLACE VIEW v_state_link_connec
