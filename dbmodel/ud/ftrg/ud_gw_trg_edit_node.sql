@@ -583,9 +583,6 @@ BEGIN
 
 			INSERT INTO man_outfall (node_id, name) VALUES (NEW.node_id,NEW.name);
       
-			INSERT INTO drainzone (name,expl_id, graphconfig)
-			VALUES (NEW.node_id,NEW.expl_id, concat('{"use":[{"nodeParent":"',NEW.node_id,'"}], "ignore":[], "forceClosed":[]}')::json);
-
 		ELSIF v_man_table='man_valve' THEN
 
 			INSERT INTO man_valve (node_id, name) VALUES (NEW.node_id,NEW.name);	
@@ -666,10 +663,6 @@ BEGIN
 			INSERT INTO inp_divider (node_id, divider_type) VALUES (NEW.node_id, 'CUTOFF');
 		ELSIF (NEW.epa_type = 'OUTFALL') THEN
 			INSERT INTO inp_outfall (node_id, outfall_type) VALUES (NEW.node_id, 'NORMAL');
-
-			INSERT INTO drainzone (name,expl_id, graphconfig)
-			VALUES (NEW.node_id,NEW.expl_id, concat('{"use":[{"nodeParent":"',NEW.node_id,'"}], "ignore":[], "forceClosed":[]}')::json);
-
 		ELSIF (NEW.epa_type = 'STORAGE') THEN
 			INSERT INTO inp_storage (node_id, storage_type) VALUES (NEW.node_id, 'TABULAR');	
 		ELSIF (NEW.epa_type = 'NETGULLY') THEN
@@ -692,7 +685,6 @@ BEGIN
 				v_inp_table:= 'inp_divider';                
 			ELSIF (OLD.epa_type = 'OUTFALL') THEN
 				v_inp_table:= 'inp_outfall';   
-				DELETE FROM drainzone WHERE name = OLD.node_id;
 			ELSIF (OLD.epa_type = 'STORAGE') THEN
 				v_inp_table:= 'inp_storage'; 
 			ELSIF (OLD.epa_type = 'NETGULLY') THEN
@@ -712,8 +704,6 @@ BEGIN
 				v_inp_table:= 'inp_divider';     
 			ELSIF (NEW.epa_type = 'OUTFALL') THEN
 				v_inp_table:= 'inp_outfall';  
-				INSERT INTO drainzone (name,expl_id, graphconfig)
-				VALUES (NEW.node_id,NEW.expl_id, concat('{"use":[{"nodeParent":"',NEW.node_id,'"}], "ignore":[], "forceClosed":[]}')::json);
 			ELSIF (NEW.epa_type = 'STORAGE') THEN
 				v_inp_table:= 'inp_storage';
 			ELSIF (NEW.epa_type = 'NETGULLY') THEN
@@ -968,8 +958,7 @@ BEGIN
 
 		--Delete addfields (after or before deletion of node, doesn't matter)
 		DELETE FROM man_addfields_value WHERE feature_id = OLD.node_id;
-	--Delete drainzone config values
-		DELETE FROM drainzone WHERE name = OLD.node_id;
+		
 		RETURN NULL;	
 	END IF;
 END;
