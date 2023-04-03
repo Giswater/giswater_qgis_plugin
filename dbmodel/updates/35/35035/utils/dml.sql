@@ -32,3 +32,8 @@ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
 VALUES (3214, 'gw_trg_link_data', 'utils', 'trigger function', null, null,
 'Triggers that fills data related to connect on link table', 'role_edit', null, 'core') ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_toolbox SET  inputparams = 
+'[{"widgetname":"configZone", "label":"Configurate zone:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,
+"comboIds":["SECTOR"], 
+"comboNames":["SECTOR"]}]', active = true WHERE id=3204;
