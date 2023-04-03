@@ -4,9 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"expl_id2", "dataType":"integer"}}$$);
 
-CREATE INDEX IF NOT EXISTS gully_exploitation2 ON gully USING btree (expl_id2 ASC NULLS LAST) TABLESPACE pg_default;
+ALTER TABLE IF EXISTS gully ADD CONSTRAINT gully_expl_id2_fkey FOREIGN KEY (expl_id2)
+REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
