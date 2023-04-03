@@ -391,10 +391,6 @@ INSERT INTO config_form_fields VALUES('v_edit_link', 'form_feature', 'main', 'ep
 INSERT INTO config_form_fields VALUES('v_edit_link', 'form_feature', 'main', 'is_operative', 'lyt_data_1', 19, 'boolean', 'check', 'is_operative', NULL, NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
 '{"setMultiline":false}'::json, NULL, NULL, false, NULL) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
-INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
-VALUES (3214, 'gw_trg_link_data', 'utils', 'trigger function', null, null,
-'Triggers that fills data related to connect on link table', 'role_edit', null, 'core') ON CONFLICT (id) DO NOTHING;
-
 -- 29/03/2023
 INSERT INTO config_typevalue (typevalue,id,idval,camelstyle)
 	VALUES ('widgettype_typevalue','tablewidget','tablewidget','tablewidget');

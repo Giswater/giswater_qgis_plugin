@@ -29,9 +29,10 @@ CREATE TRIGGER   gw_trg_vi_timeseries
     FOR EACH ROW
     EXECUTE FUNCTION gw_trg_vi('vi_timeseries');
 
-
-CREATE TRIGGER gw_trg_link_data AFTER INSERT OR UPDATE OF epa_type, state_type
+DROP TRIGGER IF EXISTS gw_trg_link_data ON gully;
+CREATE TRIGGER gw_trg_link_data AFTER INSERT OR UPDATE OF epa_type, state_type, expl_id2
 ON gully FOR EACH ROW EXECUTE FUNCTION gw_trg_link_data('gully');
 
-CREATE TRIGGER gw_trg_link_data AFTER INSERT OR UPDATE OF  state_type
+DROP TRIGGER IF EXISTS gw_trg_link_data ON connec;
+CREATE TRIGGER gw_trg_link_data AFTER INSERT OR UPDATE OF  state_type, expl_id2
 ON connec FOR EACH ROW EXECUTE FUNCTION gw_trg_link_data('connec');

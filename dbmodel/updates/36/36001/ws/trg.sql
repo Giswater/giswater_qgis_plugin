@@ -106,5 +106,6 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('pipe');
 CREATE TRIGGER gw_trg_edit_ve_epa_virtualvalve INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_virtualvalve
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('virtualvalve');
 
-CREATE TRIGGER gw_trg_link_data AFTER INSERT OR UPDATE OF epa_type, state_type
+DROP TRIGGER IF EXISTS gw_trg_link_data ON connec;
+CREATE TRIGGER gw_trg_link_data AFTER INSERT OR UPDATE OF epa_type, state_type, expl_id2
 ON connec FOR EACH ROW EXECUTE FUNCTION gw_trg_link_data('connec');
