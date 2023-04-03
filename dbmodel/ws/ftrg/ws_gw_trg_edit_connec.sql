@@ -358,6 +358,11 @@ BEGIN
 			NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_workcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 		
+		--Workcat_id_plan
+		IF (NEW.workcat_id_plan IS NULL AND NEW.state = 2) THEN
+			NEW.workcat_id_plan := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_workcat_id_plan' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
+		
 		-- Ownercat_id
 		IF (NEW.ownercat_id IS NULL) THEN
 			NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);

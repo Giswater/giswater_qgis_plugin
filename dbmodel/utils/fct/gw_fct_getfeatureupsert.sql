@@ -688,7 +688,13 @@ BEGIN
 						WHERE ((a->>'param') = (aux_json->>'columnname') AND a->>'parameter' = concat('edit_', lower(v_catfeature.feature_type), '_location_vdefault'));
 					END IF;
 			    
-                
+				--workcat_id_plan
+				WHEN 'workcat_id_plan' THEN
+					SELECT (a->>'vdef') INTO v_state_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = 'state';		
+					IF v_state_value = 2 THEN 
+						SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = 'workcat_id_plan';
+					END IF;
+
 				-- state type
 				WHEN 'state_type' THEN
 					-- getting parent value
