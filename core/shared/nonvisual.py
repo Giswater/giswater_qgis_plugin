@@ -302,13 +302,14 @@ class GwNonVisual:
         cross_arccat = tools_qt.is_checked(self.dlg_print, 'chk_cross_arccat')
 
         if cross_arccat:
-            sql = f"select ic.id as curve_id, ca.id as arccat_id, geom1 from ud.v_edit_inp_curve ic join ud.cat_arc ca on ca.curve_id = ic.id " \
+            sql = f"select ic.id as curve_id, ca.id as arccat_id, geom1, geom2 from ud.v_edit_inp_curve ic join ud.cat_arc ca on ca.curve_id = ic.id " \
                   f"WHERE ic.curve_type = 'SHAPE' and ca.shape = 'CUSTOM' and ic.id ILIKE '%{filter}%'"
             curve_results = tools_db.get_rows(sql)
             for curve in curve_results:
                 geom1 = curve[2]
+                geom2 = curve[3]
                 name = f"{curve[0]} - {curve[1]}"
-                self.get_print_curves(curve[0], path, name, geom1)
+                self.get_print_curves(curve[0], path, name, geom1, geom2)
         else:
             sql = f"select id as curve_id from ud.v_edit_inp_curve ic " \
                   f"WHERE ic.curve_type = 'SHAPE' and ic.id ILIKE '%{filter}%'"
@@ -374,7 +375,7 @@ class GwNonVisual:
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_curve')
 
-    def get_print_curves(self, curve_id, path, file_name, geom1=None):
+    def get_print_curves(self, curve_id, path, file_name, geom1=None, geom2=None):
         """ Opens dialog for curve """
 
         # Get dialog
@@ -395,7 +396,7 @@ class GwNonVisual:
         self._populate_curve_widgets(curve_id)
 
         # Set initial curve_value table headers
-        self._manage_curve_plot(self.dialog, tbl_curve_value, plot_widget, file_name, geom1)
+        self._manage_curve_plot(self.dialog, tbl_curve_value, plot_widget, file_name, geom1, geom2)
         output_path = os.path.join(path, file_name)
         plot_widget.figure.savefig(output_path)
 
@@ -565,7 +566,7 @@ class GwNonVisual:
                 self.valid = (valid, "Invalid curve. Values must go in pairs.")
 
 
-    def _manage_curve_plot(self, dialog, table, plot_widget, file_name=None, geom1=None):
+    def _manage_curve_plot(self, dialog, table, plot_widget, file_name=None, geom1=None, geom2=None):
         """ Note: row & column parameters are passed by the signal """
 
         # Clear plot
@@ -663,8 +664,8 @@ class GwNonVisual:
             plot_widget.axes.plot(aux_y_list, aux_x_list, color="grey", alpha=0.5, linestyle="dashed")
 
             if file_name:
-                fig_title = f"{file_name} (S: {round(area*100, 2)} dm2)"
-                plot_widget.axes.text(min(y_list_inverted)*1.1, max(x_list)*1.07, f"{fig_title}", fontsize=12)
+                fig_title = f"{file_name} (S: {round(area*100, 2)} dm2 ({round(geom1, 2)}x{round(geom2, 2)}))"
+                plot_widget.axes.text(min(y_list_inverted)*1.1, max(x_list)*1.07, f"{fig_title}", fontsize=8)
         else:
             plot_widget.axes.plot(x_list, y_list, color='indianred')
 
