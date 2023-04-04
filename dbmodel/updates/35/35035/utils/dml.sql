@@ -12,9 +12,9 @@ VALUES('edit_workcat_id_plan', 'config', 'Default value of workcat id plan', 'ro
 INSERT INTO config_form_fields(	formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, hidden)
 WITH lyt as (SELECT distinct formname, max(layoutorder) as lytorder from config_form_fields 
-		  where formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully') group by formname )
+		  where layoutname ='lyt_data_2' and formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully') group by formname )
 SELECT c.formname, formtype, tabname, 'expl_id2',  'lyt_data_2', lytorder+1, datatype, widgettype, 'Exploitation 2', tooltip, placeholder, ismandatory, false, 
-iseditable, isautoupdate,  'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL and expl_id !=0', dv_orderby_id, true, null, null, hidden
+iseditable, isautoupdate,  'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL and expl_id !=0', dv_orderby_id, true, null, null, true
 FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully') 
 AND columnname = 'expl_id'
 group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
@@ -22,11 +22,14 @@ iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue,   lytord
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
 datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,  hidden)
-SELECT distinct child_layer,formtype, tabname, columnname, 'lyt_data_2', max(layoutorder)+1, datatype, widgettype, label, tooltip,  ismandatory, 
-isparent, iseditable, isautoupdate, isfilter, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL and expl_id !=0', dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, hidden
+WITH lyt as (SELECT distinct formname, max(layoutorder) as lytorder from config_form_fields join cat_feature on child_layer = formname
+		  where layoutname ='lyt_data_2'  group by formname )
+SELECT distinct child_layer,formtype, tabname, columnname, 'lyt_data_2', lytorder+1, datatype, widgettype, label, tooltip,  ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL and expl_id !=0', dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, true
 FROM config_form_fields, cat_feature
-WHERE  (formname ilike 've_node' and columnname = 'expl_id2')  group by child_layer,formtype, tabname, columnname, layoutname,
-datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,  hidden 
+join lyt on child_layer = formname
+WHERE  (config_form_fields.formname ilike 've_node' and columnname = 'expl_id2')
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
