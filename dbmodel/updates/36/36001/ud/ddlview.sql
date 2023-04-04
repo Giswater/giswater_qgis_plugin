@@ -164,6 +164,7 @@ CREATE OR REPLACE VIEW vu_arc AS
     arc.drainzone_id,
     cat_arc.area AS cat_area,
     arc.parent_id,
+    arc.expl_id2,
     vst.is_operative
    FROM arc
      JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
@@ -272,6 +273,7 @@ CREATE OR REPLACE VIEW vu_connec AS
     connec.workcat_id_plan,
     connec.asset_id,
     connec.drainzone_id,
+    connec.expl_id2,
     vst.is_operative
    FROM connec
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
@@ -376,6 +378,7 @@ CREATE OR REPLACE VIEW v_connec AS
     vu_connec.workcat_id_plan,
     vu_connec.asset_id,
     vu_connec.drainzone_id,
+    vu_connec.expl_id2,
     vu_connec.is_operative
    FROM vu_connec
      JOIN v_state_connec USING (connec_id)
@@ -501,6 +504,7 @@ CREATE OR REPLACE VIEW vu_gully
     cat_grate.length AS grate_length,
     gully.units_placement,
     gully.drainzone_id,
+    gully.expl_id2,
     vst.is_operative
    FROM gully
      LEFT JOIN cat_grate ON gully.gratecat_id::text = cat_grate.id::text
@@ -598,6 +602,7 @@ CREATE OR REPLACE VIEW v_gully AS
     vu_gully.grate_length,
     vu_gully.units_placement,
     vu_gully.drainzone_id,
+    vu_gully.expl_id2,
     vu_gully.is_operative
    FROM vu_gully
      JOIN v_state_gully USING (gully_id)
@@ -720,6 +725,7 @@ CREATE OR REPLACE VIEW vu_node AS
             node.drainzone_id,
             node.parent_id,
             node.arc_id,
+            node.expl_id2,
             vst.is_operative
            FROM node
              LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
@@ -810,6 +816,7 @@ CREATE OR REPLACE VIEW vu_node AS
     vu_node.drainzone_id,
     vu_node.parent_id,
     vu_node.arc_id,
+    vu_node.expl_id2,
     vu_node.is_operative
    FROM vu_node;
 
@@ -847,6 +854,7 @@ CREATE OR REPLACE VIEW vu_link AS
     s.name AS sector_name,
     s.macrosector_id,
     d.macrodma_id,
+    l.expl_id2,
     l.epa_type,
     l.is_operative
    FROM link l
