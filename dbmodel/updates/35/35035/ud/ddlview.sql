@@ -999,3 +999,56 @@ JOIN v_state_link_gully USING (link_id);
 
 CREATE OR REPLACE VIEW v_edit_link_gully AS
  SELECT * FROM v_link_gully l;
+ 
+ 
+ 
+CREATE OR REPLACE VIEW vi_xsections
+AS SELECT temp_arc.arc_id,
+    cat_arc_shape.epa AS shape,
+    cat_arc.geom1::text AS other1,
+    cat_arc.curve_id AS other2,
+    0::text AS other3,
+    0::text AS other4,
+    temp_arc.barrels AS other5,
+    NULL::text AS other6
+   FROM temp_arc
+     JOIN cat_arc ON temp_arc.arccat_id::text = cat_arc.id::text
+     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
+  WHERE cat_arc_shape.epa::text = 'CUSTOM'::text and arc_id not in (select arc_id from temp_arc_flowregulator)
+UNION
+ SELECT temp_arc.arc_id,
+    cat_arc_shape.epa AS shape,
+    cat_arc.geom1::text AS other1,
+    cat_arc.geom2::text AS other2,
+    cat_arc.geom3::text AS other3,
+    cat_arc.geom4::text AS other4,
+    temp_arc.barrels AS other5,
+    temp_arc.culvert::text AS other6
+   FROM temp_arc
+     JOIN cat_arc ON temp_arc.arccat_id::text = cat_arc.id::text
+     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
+  WHERE cat_arc_shape.epa::text <> ALL (ARRAY['CUSTOM'::text, 'IRREGULAR'::text]) and arc_id not in (select arc_id from temp_arc_flowregulator)
+UNION
+ SELECT temp_arc.arc_id,
+    cat_arc_shape.epa AS shape,
+    cat_arc.tsect_id AS other1,
+    0::character varying AS other2,
+    0::text AS other3,
+    0::text AS other4,
+    temp_arc.barrels AS other5,
+    NULL::text AS other6
+   FROM temp_arc
+     JOIN cat_arc ON temp_arc.arccat_id::text = cat_arc.id::text
+     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
+  WHERE cat_arc_shape.epa::text = 'IRREGULAR'::text and arc_id not in (select arc_id from temp_arc_flowregulator)
+UNION
+ SELECT temp_arc_flowregulator.arc_id,
+    temp_arc_flowregulator.shape,
+    temp_arc_flowregulator.geom1::text AS other1,
+    temp_arc_flowregulator.geom2::text AS other2,
+    temp_arc_flowregulator.geom3::text AS other3,
+    temp_arc_flowregulator.geom4::text AS other4,
+    NULL::integer AS other5,
+    NULL::text AS other6
+   FROM temp_arc_flowregulator
+  WHERE temp_arc_flowregulator.type::text = ANY (ARRAY['ORIFICE'::character varying::text, 'WEIR'::character varying::text]);
