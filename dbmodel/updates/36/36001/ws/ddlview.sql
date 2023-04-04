@@ -1229,6 +1229,7 @@ CREATE OR REPLACE VIEW vu_arc  AS
     e.vel_min,
     e.vel_avg,
     arc.parent_id,
+    arc.expl_id2,
     vst.is_operative
    FROM arc
      LEFT JOIN sector ON arc.sector_id = sector.sector_id
@@ -1360,6 +1361,7 @@ CREATE OR REPLACE VIEW vu_node AS
     e.quality_max,
     e.quality_min,
     e.quality_avg,
+    node.expl_id2,
     vst.is_operative
    FROM node
      LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
@@ -1481,6 +1483,7 @@ CREATE OR REPLACE VIEW v_edit_node AS
     v_node.quality_max, 
     v_node.quality_min, 
     v_node.quality_avg,
+    v_node.expl_id2,
     v_node.is_operative
    FROM v_node
      LEFT JOIN man_valve USING (node_id);
@@ -1592,6 +1595,7 @@ CREATE OR REPLACE VIEW vu_connec  AS
     e.press_min,
     e.press_avg,
     e.demand,
+    connec.expl_id2,
     vst.is_operative
    FROM connec
      LEFT JOIN ( SELECT connec_1.connec_id,
@@ -1714,6 +1718,7 @@ CREATE OR REPLACE VIEW v_connec AS
     vu_connec.conserv_state,
     crmzone_id,
     crmzone_name,
+    vu_connec.expl_id2,
     vu_connec.is_operative
    FROM vu_connec
      JOIN v_state_connec USING (connec_id)
@@ -1756,6 +1761,7 @@ CREATE OR REPLACE VIEW vu_link AS
     s.macrosector_id,
     d.macrodma_id,
     q.macrodqa_id,
+    l.expl_id2,
     l.epa_type,
     l.is_operative
    FROM link l
