@@ -791,8 +791,8 @@ BEGIN
 						select string_agg(quote_ident(a),',') into v_new_id from json_array_elements_text(v_current_id::json) a ;
 						--remove current combo Ids from return json
 						v_fields_array[array_index] = v_fields_array[array_index]::jsonb - 'comboIds'::text;
-						v_new_id = '['||v_new_id || ','|| quote_ident(v_selected_id)||']';
-						raise notice 'MISSING v_new_id1,%',v_new_id;
+						EXECUTE 'SELECT  array_to_json(''{'||v_selected_id||'}''::text[])'
+						INTO v_new_id;
 						--add new combo Ids to return json
 						v_fields_array[array_index] = gw_fct_json_object_set_key(v_fields_array[array_index],'comboIds',v_new_id::json);
 		
@@ -800,7 +800,8 @@ BEGIN
 						select string_agg(quote_ident(a),',') into v_new_id from json_array_elements_text(v_current_id::json) a ;
 						--remove current combo names from return json
 						v_fields_array[array_index] = v_fields_array[array_index]::jsonb - 'comboNames'::text;
-						v_new_id = '['||v_new_id || ','|| quote_ident(v_selected_idval)||']';
+						EXECUTE 'SELECT  array_to_json(''{'||v_selected_idval||'}''::text[])'
+						INTO v_new_id;
 						--add new combo names to return json
 						v_fields_array[array_index] = gw_fct_json_object_set_key(v_fields_array[array_index],'comboNames',v_new_id::json);
 					END IF;
