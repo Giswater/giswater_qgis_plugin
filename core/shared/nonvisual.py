@@ -508,7 +508,7 @@ class GwNonVisual:
                     if cur_cell.data(0) not in (None, '') and prev_cell.data(0) not in (None, ''):
                         cur_value = float(cur_cell.data(0))
                         prev_value = float(prev_cell.data(0))
-                        if (cur_value < prev_value) and (curve_type != 'SHAPE' and global_vars.project_type != 'ud'):
+                        if cur_value < prev_value:
                             valid = False
                             self.valid = (False, "Invalid curve. First column values must be ascending.")
 
@@ -542,7 +542,7 @@ class GwNonVisual:
             for i, n in enumerate(x_values):
                 if i == 0 or n is None:
                     continue
-                if (n > x_values[i-1]) or (curve_type == 'SHAPE' and global_vars.project_type == 'ud'):
+                if n > x_values[i-1]:
                     continue
                 valid = False
                 self.valid = (False, "Invalid curve. First column values must be ascending.")
