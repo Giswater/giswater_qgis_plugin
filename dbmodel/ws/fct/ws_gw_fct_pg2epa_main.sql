@@ -303,8 +303,21 @@ BEGIN
 	SELECT result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, 
 	status, the_geom, expl_id, flw_code, minorloss, addparam, arcparent,dma_id, presszone_id, dqa_id, minsector_id
 	FROM temp_arc;
-
-	-- recover sector 0 (if exists previously)
+	
+	
+	-- move patterns used
+	DELETE FROM rpt_inp_pattern_value WHERE result_id=v_result;	
+	INSERT INTO rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, 
+		factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
+	SELECT  v_result, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, 
+		factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
+		from inp_pattern_value p 
+		WHERE 
+		pattern_id IN (SELECT distinct (pattern_id) FROM inp_dscenario_demand d, selector_inp_dscenario s WHERE cur_user = current_user AND d.dscenario_id = s.dscenario_id
+					   AND pattern_id IS NOT NULL UNION SELECT distinct (pattern_id) FROM temp_node WHERE pattern_id IS NOT NULL)
+		order by pattern_id, id;	
+	
+		-- recover sector 0 (if exists previously)
 	IF v_sector_0 = true THEN
 		INSERT INTO selector_sector VALUES (0,current_user);
 	END IF;

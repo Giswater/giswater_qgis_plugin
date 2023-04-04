@@ -149,17 +149,6 @@ BEGIN
 			-- do nothing because values have been moved from feature
 		END IF;
 
-		
-		-- move patterns used demands scenario table
-		INSERT INTO rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, 
-			factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
-		SELECT  result_id_var, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, 
-			factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
-			from inp_pattern_value p 
-			WHERE 
-			pattern_id IN (SELECT distinct (pattern_id) FROM inp_dscenario_demand d, selector_inp_dscenario s WHERE cur_user = current_user AND d.dscenario_id = s.dscenario_id) AND 
-			pattern_id NOT IN (SELECT distinct (pattern_id) FROM temp_node WHERE pattern_id IS NOT NULL)
-			order by pattern_id, id;	
 
 		-- set cero where null in order to prevent user's null values on demand table
 		UPDATE temp_node SET demand=0 WHERE demand IS NULL;

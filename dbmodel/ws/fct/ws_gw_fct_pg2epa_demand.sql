@@ -44,9 +44,6 @@ BEGIN
 	UPDATE temp_node SET demand = 0;
 	UPDATE temp_node SET pattern_id = null WHERE epa_type = 'JUNCTION';
 	
-	-- delete previous results on rpt_inp_pattern_value
-	DELETE FROM rpt_inp_pattern_value WHERE result_id=result_id_var;	
-
 	-- save previous values to set hydrometer selector
 	DELETE FROM temp_table WHERE fid=435 AND cur_user=current_user;
 	INSERT INTO temp_table (fid, text_column)
@@ -128,16 +125,6 @@ BEGIN
 			-- do nothing
 		END IF;	
 	END IF;
-
-	-- move patterns from inp_pattern_value to rpt_pattern_value
-	INSERT INTO rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, 
-		factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
-	SELECT result_id_var, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, 
-		factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
-		FROM inp_pattern_value WHERE pattern_id IN (SELECT DISTINCT pattern_id FROM temp_node UNION
-		SELECT value FROM config_param_user WHERE parameter = 'inp_options_pattern' and cur_user =current_user 
-		AND (SELECT value FROM config_param_user where parameter = 'inp_options_patternmethod' and cur_user =current_user)='11')
-		order by id;
 
 	-- restore hydrometer selector
 	DELETE FROM selector_hydrometer WHERE cur_user = current_user;
