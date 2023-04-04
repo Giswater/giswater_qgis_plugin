@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 3072
+--FUNCTION CODE: 3226
    
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_inp_gully() 
 RETURNS trigger AS 
@@ -23,7 +23,7 @@ BEGIN
     
     IF TG_OP = 'INSERT' THEN
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        "data":{"message":"1030", "function":"3072","debug_msg":null}}$$);';
+        "data":{"message":"1030", "function":"3226","debug_msg":null}}$$);';
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -87,7 +87,7 @@ BEGIN
 
     ELSIF TG_OP = 'DELETE' THEN
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        "data":{"message":"1032", "function":"3072","debug_msg":null}}$$);';
+        "data":{"message":"1032", "function":"3226","debug_msg":null}}$$);';
         RETURN NEW;
 
     END IF;

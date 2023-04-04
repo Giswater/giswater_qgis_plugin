@@ -40,3 +40,20 @@ UPDATE config_toolbox SET  inputparams =
 '[{"widgetname":"configZone", "label":"Configurate zone:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,
 "comboIds":["SECTOR"], 
 "comboNames":["SECTOR"]}]', active = true WHERE id=3204;
+
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3218, 'gw_fct_getreport', 'utils', 'function', 'json', 'json', 'Function that returns the form and data of a report tool' , 'role_edit', null, 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3220, 'gw_fct_getstyle', 'utils', 'function', 'json', 'json', 'Function that sets style defined o sys_style table' , 'role_basic', null, 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3222, 'gw_fct_vnode_repair', 'utils', 'function', 'json', 'json', 'Function that inserts missing vnodes.' , 'role_edit', null, 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_function(	id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3228, 'gw_fct_anl_node_proximity', 'utils', 'function', 'json', 'json', 'Function that analysis the distyance between two nodes.', 'role_edit', null, 'core')
+ON CONFLICT (id) DO NOTHING;
+
+DELETE FROM sys_function WHERE function_name = 'gw_trg_feature_border';
+	

@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2914
+--FUNCTION CODE: 3228
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_anl_node_proximity(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_anl_node_proximity(p_data json)
@@ -116,7 +116,7 @@ v_result = null;
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||
 			'}}'||
-	    '}')::json, 2914, null, null, null);
+	    '}')::json, 3228, null, null, null);
 
   EXCEPTION WHEN OTHERS THEN
    GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
