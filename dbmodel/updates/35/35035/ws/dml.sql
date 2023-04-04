@@ -12,3 +12,9 @@ VALUES (3230, 'gw_fct_setmapzonestrigger', 'ws', 'function', 'json', 'json', 'Fu
 ON CONFLICT (id) DO NOTHING;
  
 update config_function set id = 3230 where function_name='gw_fct_setmapzonestrigger';
+
+INSERT INTO sys_table(id, descript, sys_role, source)
+VALUES ('om_streetaxis', 'Segmented streetaxis table, used for hydrant analysis', 'role_edit', 'core');
+
+INSERT INTO sys_table(id, descript, sys_role, source)
+VALUES ('v_om_waterbalance_report', 'View to show the general water balance report by period and DMA', 'role_edit', 'core');

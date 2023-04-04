@@ -19,3 +19,7 @@ VALUES (3224, 'gw_trg_edit_hydrology', 'ud', 'trigger function', null, null, 'Tr
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
 VALUES (3226, 'gw_trg_edit_inp_gully', 'ud', 'trigger function', null, null, 'Trigger that allows editing data using v_edit_inp_gully view.' , 'role_epa', null, 'core') ON CONFLICT (id) DO NOTHING;
+
+
+INSERT INTO sys_table(id, descript, sys_role, source)
+VALUES ('v_state_link_gully', 'View that filters links related to gully by state and exploitation', 'role_basic', 'core');

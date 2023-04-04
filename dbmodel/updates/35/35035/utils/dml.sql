@@ -56,4 +56,15 @@ VALUES (3228, 'gw_fct_anl_node_proximity', 'utils', 'function', 'json', 'json', 
 ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM sys_function WHERE function_name = 'gw_trg_feature_border';
+
+INSERT INTO sys_table(id, descript, sys_role, source)
+VALUES ('v_expl_arc', 'View that filters arcs by exploitation', 'role_basic', 'core');
+
+INSERT INTO sys_table(id, descript, sys_role, source)
+VALUES ('v_state_link', 'View that filters links by state and exploitation', 'role_basic', 'core');
+
+INSERT INTO sys_table(id, descript, sys_role, source)
+VALUES ('v_state_link_connec', 'View that filters links related to connecs by state and exploitation', 'role_basic', 'core');
 	
+update sys_table SET id = 'v_plan_psector_budget' WHERE id = 'v_plan_current_psector_budget';
+update sys_table SET id = 'v_plan_psector_budget_detail' WHERE id = 'v_plan_current_psector_budget_detail';
