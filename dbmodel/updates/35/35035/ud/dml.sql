@@ -22,4 +22,4 @@ VALUES (3226, 'gw_trg_edit_inp_gully', 'ud', 'trigger function', null, null, 'Tr
 
 
 INSERT INTO sys_table(id, descript, sys_role, source)
-VALUES ('v_state_link_gully', 'View that filters links related to gully by state and exploitation', 'role_basic', 'core');
+VALUES ('v_state_link_gully', 'View that filters links related to gully by state and exploitation', 'role_basic', 'core') ON CONFLICT(id) DO NOTHING;

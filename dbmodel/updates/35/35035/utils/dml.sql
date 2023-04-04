@@ -7,7 +7,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 INSERT INTO sys_param_user (id, formname, descript, sys_role, idval, "label", dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, dv_querytext_filterc, feature_field_id, feature_dv_parent_value, isautoupdate, "datatype", widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, placeholder, "source") 
-VALUES('edit_workcat_id_plan', 'config', 'Default value of workcat id plan', 'role_edit', NULL, 'Workcat id plan:', 'SELECT cat_work.id AS id,cat_work.id as idval FROM cat_work WHERE id IS NOT NULL AND active IS TRUE ', NULL, true, 25, 'utils', false, NULL, 'workcat_id_plan', NULL, false, 'string', 'combo', false, NULL, NULL, 'lyt_inventory', true, NULL, NULL, NULL, NULL, 'core');
+VALUES('edit_workcat_id_plan', 'config', 'Default value of workcat id plan', 'role_edit', NULL, 'Workcat id plan:', 'SELECT cat_work.id AS id,cat_work.id as idval FROM cat_work WHERE id IS NOT NULL AND active IS TRUE ', NULL, true, 25, 'utils', false, NULL, 'workcat_id_plan', NULL, false, 'string', 'combo', false, NULL, NULL, 'lyt_inventory', true, NULL, NULL, NULL, NULL, 'core')
+ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_form_fields(	formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, hidden)
@@ -18,7 +19,8 @@ iseditable, isautoupdate,  'SELECT expl_id as id, name as idval FROM exploitatio
 FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully') 
 AND columnname = 'expl_id'
 group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
-iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue,   lytorder, hidden;
+iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue,   lytorder, hidden
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
 datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,  hidden)
@@ -58,13 +60,13 @@ ON CONFLICT (id) DO NOTHING;
 DELETE FROM sys_function WHERE function_name = 'gw_trg_feature_border';
 
 INSERT INTO sys_table(id, descript, sys_role, source)
-VALUES ('v_expl_arc', 'View that filters arcs by exploitation', 'role_basic', 'core');
+VALUES ('v_expl_arc', 'View that filters arcs by exploitation', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table(id, descript, sys_role, source)
-VALUES ('v_state_link', 'View that filters links by state and exploitation', 'role_basic', 'core');
+VALUES ('v_state_link', 'View that filters links by state and exploitation', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table(id, descript, sys_role, source)
-VALUES ('v_state_link_connec', 'View that filters links related to connecs by state and exploitation', 'role_basic', 'core');
+VALUES ('v_state_link_connec', 'View that filters links related to connecs by state and exploitation', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
 	
 update sys_table SET id = 'v_plan_psector_budget' WHERE id = 'v_plan_current_psector_budget';
 update sys_table SET id = 'v_plan_psector_budget_detail' WHERE id = 'v_plan_current_psector_budget_detail';
