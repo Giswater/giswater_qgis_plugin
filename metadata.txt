@@ -7,8 +7,7 @@ about=Disclaimer: This plugin is released using the open source GNU-GPL3 license
 version=3.5.035
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Adrian Valenciano, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Elies Bertran, Abel García Juanes, Xavier Torret
 
-Changelog=Version 3.5.035
-    - Add button "print" on NonVisualObject for export SHAPES png
+Changelog=Version 3.5.036
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
