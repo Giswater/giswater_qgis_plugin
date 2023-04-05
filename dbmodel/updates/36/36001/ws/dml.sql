@@ -1344,3 +1344,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
     VALUES('mincut', 'form_mincut', 'mincut', 'hspacer_lyt_toolbar', 'lyt_toolbar', 4, NULL, 'hspacer', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 4);
 
+UPDATE sys_function set descript = 'Function to create dscenarios from CRM. 
+This function store values on CONNEC features. 
+When the network geometry generator works with [NODE] demands are moved 50% to node_1 and node_2.'
+WHERE id =3110;

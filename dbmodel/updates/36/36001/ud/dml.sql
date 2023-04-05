@@ -264,3 +264,7 @@ JOIN value_state_type v ON v.id = c.state_type WHERE l.feature_id = c.gully_id;
 UPDATE link l SET is_operative = v.is_operative 
 FROM connec c
 JOIN value_state_type v ON v.id = c.state_type WHERE l.feature_id = c.connec_id;
+
+UPDATE config_form_fields SET iseditable= true WHERE columnname='order_id' AND formname='v_edit_inp_inflows';
+
+UPDATE sys_param_user SET dv_isnullvalue= true WHERE id='inp_options_dwfscenario';
