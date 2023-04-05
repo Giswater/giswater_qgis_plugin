@@ -18,3 +18,11 @@ VALUES ('om_streetaxis', 'Segmented streetaxis table, used for hydrant analysis'
 
 INSERT INTO sys_table(id, descript, sys_role, source)
 VALUES ('v_om_waterbalance_report', 'View to show the general water balance report by period and DMA', 'role_edit', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate,  hidden)
+SELECT distinct child_layer, formtype, tabname, 'wjoin_type', 'lyt_data_2', max(layoutorder)+1, 
+'string', 'text', 'wjoin_type', 'wjoin_type',  false, false, true, false, true
+FROM cat_feature
+join config_form_fields on formname = child_layer
+WHERE  system_id ilike 'NETWJOIN' AND layoutname = 'lyt_data_2' group by child_layer,formname,formtype, tabname ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;

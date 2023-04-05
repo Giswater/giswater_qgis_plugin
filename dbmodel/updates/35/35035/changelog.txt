@@ -4,3 +4,4 @@
 - Bug fix from refactor links. Insert connects with state 0 on psector when planified node over operative node
 - Enhance v_ui_arc_x_relations (UD)
 - Add new field expl_id2
+- New field on WS man_netwjoin - wjoin_type;
