@@ -667,7 +667,7 @@ class GwNonVisual:
             plot_widget.axes.plot(aux_y_list, aux_x_list, color="grey", alpha=0.5, linestyle="dashed")
 
             if file_name:
-                fig_title = f"{file_name} (S: {round(area*100, 2)} dm2 ({round(geom1, 2)}x{round(geom2, 2)}))"
+                fig_title = f"{file_name} (S: {round(area*100, 2)} dm2 - {round(geom1, 2)}x{round(geom2, 2)})"
                 plot_widget.axes.text(min(y_list_inverted)*1.1, max(x_list)*1.07, f"{fig_title}", fontsize=8)
         else:
             plot_widget.axes.plot(x_list, y_list, color='indianred')
