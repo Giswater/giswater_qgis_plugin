@@ -5,3 +5,4 @@
 - Enhance v_ui_arc_x_relations (UD)
 - Add new field expl_id2
 - New field on WS man_netwjoin - wjoin_type;
+- New vdefault on config for workcat_id_plan
