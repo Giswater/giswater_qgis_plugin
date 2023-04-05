@@ -302,15 +302,16 @@ class GwNonVisual:
         cross_arccat = tools_qt.is_checked(self.dlg_print, 'chk_cross_arccat')
 
         if cross_arccat:
-            sql = f"select ic.id as curve_id, ca.id as arccat_id, geom1, geom2 from ud.v_edit_inp_curve ic join ud.cat_arc ca on ca.curve_id = ic.id " \
+            sql = f"select ic.id as curve_id, ca.id as arccat_id, geom1, geom2 from v_edit_inp_curve ic join cat_arc ca on ca.curve_id = ic.id " \
                   f"WHERE ic.curve_type = 'SHAPE' and ca.shape = 'CUSTOM' and ic.id ILIKE '%{filter}%'"
             curve_results = tools_db.get_rows(sql)
             for curve in curve_results:
                 geom1 = curve[2]
+                geom2 = curve[3]
                 name = f"{curve[0]} - {curve[1]}"
-                self.get_print_curves(curve[0], path, name, geom1)
+                self.get_print_curves(curve[0], path, name, geom1, geom2)
         else:
-            sql = f"select id as curve_id from ud.v_edit_inp_curve ic " \
+            sql = f"select id as curve_id from v_edit_inp_curve ic " \
                   f"WHERE ic.curve_type = 'SHAPE' and ic.id ILIKE '%{filter}%'"
             curve_results = tools_db.get_rows(sql)
             for curve in curve_results:
@@ -375,7 +376,7 @@ class GwNonVisual:
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_curve')
 
-    def get_print_curves(self, curve_id, path, file_name, geom1=None):
+    def get_print_curves(self, curve_id, path, file_name, geom1=None, geom2=None):
         """ Opens dialog for curve """
 
         # Get dialog
@@ -396,7 +397,7 @@ class GwNonVisual:
         self._populate_curve_widgets(curve_id)
 
         # Set initial curve_value table headers
-        self._manage_curve_plot(self.dialog, tbl_curve_value, plot_widget, file_name, geom1)
+        self._manage_curve_plot(self.dialog, tbl_curve_value, plot_widget, file_name, geom1, geom2)
         output_path = os.path.join(path, file_name)
         plot_widget.figure.savefig(output_path)
 
@@ -507,7 +508,7 @@ class GwNonVisual:
                     if cur_cell.data(0) not in (None, '') and prev_cell.data(0) not in (None, ''):
                         cur_value = float(cur_cell.data(0))
                         prev_value = float(prev_cell.data(0))
-                        if (cur_value < prev_value) and (curve_type != 'SHAPE' and global_vars.project_type != 'ud'):
+                        if cur_value < prev_value:
                             valid = False
                             self.valid = (False, "Invalid curve. First column values must be ascending.")
 
@@ -541,7 +542,7 @@ class GwNonVisual:
             for i, n in enumerate(x_values):
                 if i == 0 or n is None:
                     continue
-                if (n > x_values[i-1]) or (curve_type == 'SHAPE' and global_vars.project_type == 'ud'):
+                if n > x_values[i-1]:
                     continue
                 valid = False
                 self.valid = (False, "Invalid curve. First column values must be ascending.")
@@ -566,7 +567,7 @@ class GwNonVisual:
                 self.valid = (valid, "Invalid curve. Values must go in pairs.")
 
 
-    def _manage_curve_plot(self, dialog, table, plot_widget, file_name=None, geom1=None):
+    def _manage_curve_plot(self, dialog, table, plot_widget, file_name=None, geom1=None, geom2=None):
         """ Note: row & column parameters are passed by the signal """
 
         # Clear plot
@@ -644,8 +645,8 @@ class GwNonVisual:
                     y_list[i] *= float(geom1)
 
             # Calcule el área
-            area = np.trapz(y_list, x_list)
-
+            area = np.trapz(y_list, x_list) * 2
+            
             # Create inverted plot
             plot_widget.axes.plot(y_list, x_list, color="blue")
 
@@ -666,8 +667,8 @@ class GwNonVisual:
             plot_widget.axes.plot(aux_y_list, aux_x_list, color="grey", alpha=0.5, linestyle="dashed")
 
             if file_name:
-                fig_title = f"{file_name} (S: {round(area*100, 2)} dm2)"
-                plot_widget.axes.text(min(y_list_inverted)*1.1, max(x_list)*1.07, f"{fig_title}", fontsize=12)
+                fig_title = f"{file_name} (S: {round(area*100, 2)} dm2 - {round(geom1, 2)}x{round(geom2, 2)})"
+                plot_widget.axes.text(min(y_list_inverted)*1.1, max(x_list)*1.07, f"{fig_title}", fontsize=8)
         else:
             plot_widget.axes.plot(x_list, y_list, color='indianred')
 
