@@ -302,7 +302,7 @@ class GwNonVisual:
         cross_arccat = tools_qt.is_checked(self.dlg_print, 'chk_cross_arccat')
 
         if cross_arccat:
-            sql = f"select ic.id as curve_id, ca.id as arccat_id, geom1, geom2 from ud.v_edit_inp_curve ic join ud.cat_arc ca on ca.curve_id = ic.id " \
+            sql = f"select ic.id as curve_id, ca.id as arccat_id, geom1, geom2 from v_edit_inp_curve ic join cat_arc ca on ca.curve_id = ic.id " \
                   f"WHERE ic.curve_type = 'SHAPE' and ca.shape = 'CUSTOM' and ic.id ILIKE '%{filter}%'"
             curve_results = tools_db.get_rows(sql)
             for curve in curve_results:
@@ -311,7 +311,7 @@ class GwNonVisual:
                 name = f"{curve[0]} - {curve[1]}"
                 self.get_print_curves(curve[0], path, name, geom1, geom2)
         else:
-            sql = f"select id as curve_id from ud.v_edit_inp_curve ic " \
+            sql = f"select id as curve_id from v_edit_inp_curve ic " \
                   f"WHERE ic.curve_type = 'SHAPE' and ic.id ILIKE '%{filter}%'"
             curve_results = tools_db.get_rows(sql)
             for curve in curve_results:
