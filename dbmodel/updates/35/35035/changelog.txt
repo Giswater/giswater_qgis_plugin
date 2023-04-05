@@ -1,8 +1,5 @@
-3.5.034
+3.5.035
 *************
-- Rename v_plan_current_psector_* views to v_plan_psector_*
-- Bug fix from refactor links. Insert connects with state 0 on psector when planified node over operative node
-- Enhance v_ui_arc_x_relations (UD)
 - Add new field expl_id2
 - New field on WS man_netwjoin - wjoin_type;
 - New vdefault on config for workcat_id_plan
