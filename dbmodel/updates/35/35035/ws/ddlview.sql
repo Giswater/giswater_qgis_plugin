@@ -765,4 +765,4 @@ CREATE OR REPLACE VIEW v_edit_link  AS
  SELECT * FROM v_link l;
 
  SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"wjoin_type", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_node"], "systemId":"NETWJOIN","fieldName":"wjoin_type", "action":"ADD-FIELD","hasChilds":"True"}}$$);

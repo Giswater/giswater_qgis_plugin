@@ -14,7 +14,7 @@ $BODY$
 /*EXAMPLE
 "action":"SAVE-VIEW"
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-   "data":{"viewName":["v_vnode","v_arc_x_vnode","v_edit_link"], "action":"SAVE-VIEW","hasChilds":"False"}}$$);
+"data":{"viewName":["v_vnode","v_arc_x_vnode","v_edit_link"], "action":"SAVE-VIEW","hasChilds":"False"}}$$);
 
 "action":"DELETE-FIELD"
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
@@ -26,7 +26,7 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 
 "action":"ADD-FIELD"
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node], "fieldName":"asset_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_node], "fieldName":"asset_id", "systemId":"METER", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 	
 "action":"RENAME-VIEW"
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
@@ -61,7 +61,8 @@ rec_trg record;
 v_replace_query text;
 v_trg_fields text;
 v_gwversion text;
-
+v_systemid text;
+v_cur_system_id text;
 BEGIN
 
 	-- search path
@@ -76,6 +77,7 @@ BEGIN
 	v_action=json_extract_path_text(p_data,'data','action');
 	v_gwversion=json_extract_path_text(p_data,'client','gwVersion');
 	v_haschilds=json_extract_path_text(p_data,'data','hasChilds')::boolean;
+	v_systemid = json_extract_path_text(p_data,'data','systemId');
 	
 	--change viewnames into list
 	v_viewlist = ARRAY(SELECT json_array_elements_text(v_viewname::json)); 	
@@ -173,20 +175,25 @@ BEGIN
 
 	ELSIF v_action='ADD-FIELD' THEN
 		--save view definition on the temp table and delete the view. Order of saving is the order defined in input array
-		FOREACH rec_view IN ARRAY(v_viewlist) LOOP
+			FOREACH rec_view IN ARRAY(v_viewlist) LOOP
+			EXECUTE 'SELECT system_id FROM cat_feature WHERE child_layer = '||quote_literal(rec_view)||''
+			into v_cur_system_id;
+		
+				IF v_systemid IS NULL  OR upper(v_cur_system_id) = upper(v_systemid) THEN
+				raise notice 'create';
+					EXECUTE 'INSERT INTO temp_csv (fid, source, csv1, csv2)
+					SELECT ''380'', '||quote_literal(rec_view)||',  definition, 
+					replace(replace(replace(replace(replace(definition,''FROM '||v_schemaname||'.ve'', '','||v_fieldname||' FROM '||v_schemaname||'.ve''),
+					''FROM (ve'', '','||v_fieldname||' FROM (ve''),''FROM ((ve'', '','||v_fieldname||' FROM ((ve''),
+					''FROM (('||v_schemaname||'.ve'', '','||v_fieldname||' FROM (('||v_schemaname||'.ve''),''FROM ve'','','||v_fieldname||' FROM ve'') FROM pg_views 
+					WHERE schemaname='||quote_literal(v_schemaname)||' and viewname = '||quote_literal(rec_view)||'
+					AND definition not ilike ''%'||v_fieldname||'%'';';
 
-			EXECUTE 'INSERT INTO temp_csv (fid, source, csv1, csv2)
-			SELECT ''380'', '||quote_literal(rec_view)||',  definition, 
-			replace(replace(replace(replace(replace(definition,''FROM '||v_schemaname||'.ve'', '','||v_fieldname||' FROM '||v_schemaname||'.ve''),
-			''FROM (ve'', '','||v_fieldname||' FROM (ve''),''FROM ((ve'', '','||v_fieldname||' FROM ((ve''),
-			''FROM (('||v_schemaname||'.ve'', '','||v_fieldname||' FROM (('||v_schemaname||'.ve''),''FROM ve'','','||v_fieldname||' FROM ve'') FROM pg_views 
-			WHERE schemaname='||quote_literal(v_schemaname)||' and viewname = '||quote_literal(rec_view)||'
-			AND definition not ilike ''%'||v_fieldname||'%'';';
+					EXECUTE 'SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+					"data":{"viewName":["'||rec_view||'"], "action":"RESTORE-VIEW","hasChilds":"False"}}$$);';
+				END IF;
 
-			EXECUTE 'SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-			"data":{"viewName":["'||rec_view||'"], "action":"RESTORE-VIEW","hasChilds":"False"}}$$);';
-
-		END LOOP;
+			END LOOP;
 
 
 	ELSIF v_action='RESTORE-VIEW' THEN

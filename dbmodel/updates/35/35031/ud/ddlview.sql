@@ -569,13 +569,13 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 
 --add steps and covers on manhole views
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"step_pp", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_node"], "systemId":"MANHOLE", "fieldName":"step_pp", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"step_fe", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_node"], "systemId":"MANHOLE","fieldName":"step_fe", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"step_replace", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_node"], "systemId":"MANHOLE","fieldName":"step_replace", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"cover", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_node"], "systemId":"MANHOLE","fieldName":"cover", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 --2022/11/09
 CREATE OR REPLACE VIEW ve_pol_gully

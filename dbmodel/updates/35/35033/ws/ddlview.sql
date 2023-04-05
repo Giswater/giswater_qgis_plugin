@@ -107,9 +107,9 @@ CREATE OR REPLACE VIEW v_om_waterbalance AS
      JOIN ext_cat_period p ON p.id::text = om_waterbalance.cat_period_id::text;
 
 
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{}, "data":{"viewName":["v_edit_node"], "fieldName":"real_press_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{}, "data":{"viewName":["v_edit_node"], "fieldName":"real_press_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{}, "data":{"viewName":["v_edit_node"], "fieldName":"real_press_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{}, "data":{"viewName":["v_edit_node"], "systemId":"METER","fieldName":"real_press_max", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{}, "data":{"viewName":["v_edit_node"], "systemId":"METER","fieldName":"real_press_min", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{}, "data":{"viewName":["v_edit_node"], "systemId":"METER","fieldName":"real_press_avg", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 
 DROP VIEW IF EXISTS v_rpt_arc_all;
