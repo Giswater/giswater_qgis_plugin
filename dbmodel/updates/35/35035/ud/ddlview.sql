@@ -891,7 +891,7 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 CREATE OR REPLACE VIEW v_state_link
  AS
 (
-         SELECT link.link_id
+         SELECT DISTINCT link.link_id
            FROM selector_state,
             selector_expl,
             link
@@ -931,7 +931,7 @@ CREATE OR REPLACE VIEW v_state_link
 CREATE OR REPLACE VIEW v_state_link_gully
  AS
 (
-         SELECT link.link_id
+         SELECT DISTINCT link.link_id
            FROM selector_state,
             selector_expl,
             link

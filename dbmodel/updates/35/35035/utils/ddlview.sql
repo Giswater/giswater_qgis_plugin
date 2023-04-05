@@ -10,7 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 CREATE OR REPLACE VIEW v_expl_arc
  AS
- SELECT arc.arc_id
+ SELECT DISTINCT arc.arc_id
    FROM selector_expl,
     arc
   WHERE selector_expl.cur_user = "current_user"()::text AND (arc.expl_id = selector_expl.expl_id OR arc.expl_id2 = selector_expl.expl_id);
@@ -18,7 +18,7 @@ CREATE OR REPLACE VIEW v_expl_arc
 
 CREATE OR REPLACE VIEW v_expl_node
  AS
- SELECT node.node_id
+ SELECT DISTINCT node.node_id
    FROM selector_expl,
     node
   WHERE selector_expl.cur_user = "current_user"()::text AND (node.expl_id = selector_expl.expl_id OR node.expl_id2 = selector_expl.expl_id);
@@ -30,7 +30,7 @@ DROP TABLE IF EXISTS node_border_expl ;
 CREATE OR REPLACE VIEW v_state_link_connec
  AS
 (
-         SELECT link.link_id
+         SELECT DISTINCT link.link_id
            FROM selector_state,
             selector_expl,
             link
