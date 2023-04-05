@@ -752,7 +752,7 @@ class GwToolBoxButton(GwAction):
                 if os.path.exists(path_icon_blue):
                     icon = QIcon(path_icon_blue)
                     label.setIcon(icon)
-                    label.setToolTip(function['functionname'])
+                    label.setToolTip(f"{function['alias']} - {function['functionname']}")
 
                 parent1.appendRow([label, func_name, id])
             section_processes.appendRow(parent1)
