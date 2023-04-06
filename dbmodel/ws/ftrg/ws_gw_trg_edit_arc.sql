@@ -466,8 +466,10 @@ BEGIN
 			v_inp_table:= 'inp_virtual';
         END IF;
 		
-		v_sql:= 'INSERT INTO '||v_inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
-        EXECUTE v_sql;
+       	IF v_inp_table IS NOT NULL THEN
+			v_sql:= 'INSERT INTO '||v_inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
+	        EXECUTE v_sql;
+       	END IF;
 		
 		--in case a project is dhc, insert cable
 		IF (SELECT value FROM config_param_system WHERE parameter='dhc_plugin_version') is not null then
