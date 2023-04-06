@@ -742,54 +742,6 @@ BEGIN
 
 				IF v_floodonlymapzone IS NULL THEN
 
-					RAISE NOTICE 'Disconnected';
-
-					-- disconnected arcs
-					select count(*) INTO v_count FROM 
-					(SELECT arc_id, count(*) FROM temp_anlgraph WHERE trace is null GROUP BY arc_id HAVING count(*) > 1)a;
-					IF v_count > 0 THEN
-						INSERT INTO audit_check_data (fid, criticity, error_message)
-						VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' arc''s have been disconnected'));
-					ELSE
-						INSERT INTO audit_check_data (fid, criticity, error_message)
-						VALUES (v_fid, 1, concat('INFO: 0 arc''s have been disconnected'));
-					END IF;
-
-					-- disconnected connecs
-					IF v_count > 0 THEN 
-						select count(*) INTO v_count FROM 
-						(SELECT arc_id, count(*) FROM temp_anlgraph JOIN v_edit_connec USING (arc_id) WHERE trace is null GROUP BY arc_id HAVING count(*) > 1)a;
-						IF v_count > 0 THEN
-							INSERT INTO audit_check_data (fid, criticity, error_message)
-							VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' connec''s have been disconnected'));
-						ELSE
-							INSERT INTO audit_check_data (fid, criticity, error_message)
-							VALUES (v_fid, 1, concat('INFO: 0 connec''s have been disconnected'));
-						END IF;
-					ELSE
-						INSERT INTO audit_check_data (fid, criticity, error_message)
-						VALUES (v_fid, 1, concat('INFO: 0 connec''s have been disconnected'));
-					END IF;
-					
-					IF v_project_type='UD' THEN
-						-- disconnected gullies
-						IF v_count > 0 THEN 
-							select count(*) INTO v_count FROM 
-							(SELECT arc_id, count(*) FROM temp_anlgraph JOIN v_edit_gully USING (arc_id) WHERE trace is null GROUP BY arc_id HAVING count(*) > 1)a;
-							IF v_count > 0 THEN
-								INSERT INTO audit_check_data (fid, criticity, error_message)
-								VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' gullies have been disconnected'));
-							ELSE
-								INSERT INTO audit_check_data (fid, criticity, error_message)
-								VALUES (v_fid, 1, concat('INFO: 0 gullies have been disconnected'));
-							END IF;
-						ELSE
-							INSERT INTO audit_check_data (fid, criticity, error_message)
-							VALUES (v_fid, 1, concat('INFO: 0 gullies have been disconnected'));
-						END IF;
-					END IF;
-
-
 					RAISE NOTICE 'Check for conflicts';
 					
 					IF v_class != 'DRAINZONE' THEN
@@ -1073,6 +1025,53 @@ BEGIN
 				EXECUTE v_querytext;
 			ELSIF v_updatemapzgeom = 6 THEN --EPA SUBCATCH
 
+			END IF;
+		
+			RAISE NOTICE 'Disconnected';
+
+			-- disconnected arcs
+			select count(*) INTO v_count FROM 
+			(SELECT DISTINCT arc_id FROM v_edit_arc JOIN temp_anlgraph USING (arc_id) WHERE water = 0)a;
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fid, criticity, error_message)
+				VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' arc''s have been disconnected'));
+			ELSE
+				INSERT INTO audit_check_data (fid, criticity, error_message)
+				VALUES (v_fid, 1, concat('INFO: 0 arc''s have been disconnected'));
+			END IF;
+		
+			-- disconnected connecs
+			IF v_count > 0 THEN 
+				select count(*) INTO v_count FROM 
+				(SELECT DISTINCT connec_id FROM v_edit_connec JOIN temp_anlgraph USING (arc_id) WHERE water = 0)a;
+				IF v_count > 0 THEN
+					INSERT INTO audit_check_data (fid, criticity, error_message)
+					VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' connec''s have been disconnected'));
+				ELSE
+					INSERT INTO audit_check_data (fid, criticity, error_message)
+					VALUES (v_fid, 1, concat('INFO: 0 connec''s have been disconnected'));
+				END IF;
+			ELSE
+				INSERT INTO audit_check_data (fid, criticity, error_message)
+				VALUES (v_fid, 1, concat('INFO: 0 connec''s have been disconnected'));
+			END IF;
+			
+			IF v_project_type='UD' THEN
+				-- disconnected gullies
+				IF v_count > 0 THEN 
+					select count(*) INTO v_count FROM 
+					(SELECT DISTINCT gully_id FROM v_edit_gully JOIN temp_anlgraph USING (arc_id) WHERE water = 0)a;
+					IF v_count > 0 THEN
+						INSERT INTO audit_check_data (fid, criticity, error_message)
+						VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' gullies have been disconnected'));
+					ELSE
+						INSERT INTO audit_check_data (fid, criticity, error_message)
+						VALUES (v_fid, 1, concat('INFO: 0 gullies have been disconnected'));
+					END IF;
+				ELSE
+					INSERT INTO audit_check_data (fid, criticity, error_message)
+					VALUES (v_fid, 1, concat('INFO: 0 gullies have been disconnected'));
+				END IF;
 			END IF;
 
 			-- insert spacer for warning and info
