@@ -19,7 +19,15 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "action":"DELETE-FIELD"
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_connec"], "fieldName":"featurecat_id","action":"DELETE-FIELD","hasChilds":"True"}}$$);
-	
+
+"action":"DELETE-FIELD" onlyChilds modifica sólo vistas childs
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"_pol_id_","action":"DELETE-FIELD","hasChilds":"True","onlyChilds":"True"}}$$);
+
+"action":"DELETE-FIELD" delete field that has alias 
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_man_register"], "fieldName":"_pol_id_","alias":"man_register._pol_id_ AS pol_id","action":"DELETE-FIELD","hasChilds":"False"}}$$);
+
 "action":"RESTORE-VIEW"
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["vu_connec", "v_connec", "ve_connec","vi_parent_connec"], "action":"RESTORE-VIEW","hasChilds":"False"}}$$);
@@ -63,6 +71,8 @@ v_trg_fields text;
 v_gwversion text;
 v_systemid text;
 v_cur_system_id text;
+v_alias text;
+v_onlychilds boolean;
 BEGIN
 
 	-- search path
@@ -74,10 +84,12 @@ BEGIN
 	-- get info from version table
 	v_viewname=json_extract_path_text(p_data,'data','viewName');
 	v_fieldname=json_extract_path_text(p_data,'data','fieldName');
+	v_alias=json_extract_path_text(p_data,'data','alias');
 	v_action=json_extract_path_text(p_data,'data','action');
 	v_gwversion=json_extract_path_text(p_data,'client','gwVersion');
 	v_haschilds=json_extract_path_text(p_data,'data','hasChilds')::boolean;
 	v_systemid = json_extract_path_text(p_data,'data','systemId');
+	v_onlychilds = json_extract_path_text(p_data,'data','onlyChilds');
 	
 	--change viewnames into list
 	v_viewlist = ARRAY(SELECT json_array_elements_text(v_viewname::json)); 	
@@ -124,22 +136,27 @@ BEGIN
 			AND column_name = '||quote_literal(v_fieldname)||''
 			INTO v_fieldposition;
 
-			--replace text in a view definition, depending on whether the file is last or not
+			--replace text in a view definition, depending on whether the field is last or not
 			IF v_maxposition = v_fieldposition THEN
+
 				FOR rec IN (select * from information_schema.view_table_usage WHERE table_schema=v_schemaname and view_name = rec_view AND table_name not ilike 'selector%') LOOP
-					
-					EXECUTE 'select replace(csv1,concat('||quote_literal(rec.table_name)||',''.'','||quote_literal(v_fieldname)||'),'''') 
-					from temp_csv WHERE fid=380 AND source='||quote_literal(rec_view)||''
-					into v_viewdefinition;
+					if v_alias is null then
+						EXECUTE 'select replace(csv1,concat('||quote_literal(rec.table_name)||',''.'','||quote_literal(v_fieldname)||'),'''') 
+						from temp_csv WHERE fid=380 AND source='||quote_literal(rec_view)||''
+						into v_viewdefinition;
+					else
+						EXECUTE 'select replace(csv1,'||quote_literal(v_alias)||','''') 
+						from temp_csv WHERE fid=380 AND source='||quote_literal(rec_view)||''
+						into v_viewdefinition;
+					end if;
 					
 					--find penultiate field and remove , before FROM
 					EXECUTE 'SELECT column_name FROM information_schema.columns 
 					WHERE table_schema='||quote_literal(v_schemaname)||' and table_name = '||quote_literal(rec_view)||' AND 
 					ordinal_position = '||v_maxposition||' -1 ;'
 					INTO v_penultimate_field;
-
 					v_viewdefinition = replace(v_viewdefinition,concat(v_penultimate_field,','),v_penultimate_field);
-				
+			
 					IF  position(v_fieldname in v_viewdefinition) = 0 then --v_fieldposition = 0 THEN
 						EXECUTE 'UPDATE temp_csv set csv2 = '||quote_literal(v_viewdefinition)||' WHERE fid=380 AND source='||quote_literal(rec_view)||';';
 					END IF;
@@ -147,10 +164,16 @@ BEGIN
 				END LOOP;
 			ELSE
 				FOR rec IN (select * from information_schema.view_table_usage WHERE table_schema=v_schemaname and view_name = rec_view AND table_name not ilike 'selector%') LOOP
-				
-					EXECUTE 'select replace(csv1,concat('||quote_literal(rec.table_name)||',''.'','||quote_literal(v_fieldname)||','',''),'''') 
-					from temp_csv WHERE fid=380 AND source='||quote_literal(rec_view)||''
-					into v_viewdefinition;
+		
+					IF v_alias is null THEN
+						EXECUTE 'select replace(csv1,concat('||quote_literal(rec.table_name)||',''.'','||quote_literal(v_fieldname)||','',''),'''') 
+						from temp_csv WHERE fid=380 AND source='||quote_literal(rec_view)||''
+						into v_viewdefinition;
+					ELSE
+						EXECUTE 'select replace(csv1,concat('||quote_literal(v_alias)||','',''),'''')
+						from temp_csv WHERE fid=380 AND source='||quote_literal(rec_view)||''
+						into v_viewdefinition;
+					END IF;
 					
 					IF  position(v_fieldname in v_viewdefinition) = 0 then 
 						EXECUTE 'UPDATE temp_csv set csv2 = '||quote_literal(v_viewdefinition)||' 
@@ -166,7 +189,7 @@ BEGIN
 	ELSIF v_action='SAVE-VIEW' THEN
 		--save view definition on the temp table and delete the view. Order of saving is the order defined in input array
 		FOREACH rec_view IN ARRAY(v_viewlist) LOOP
-		raise notice'rec_view,%',rec_view;
+
 			EXECUTE 'INSERT INTO temp_csv (fid, source, csv1, csv2)
 			SELECT ''380'', '||quote_literal(rec_view)||',  definition, definition FROM pg_views 
 			WHERE schemaname='||quote_literal(v_schemaname)||' and viewname = '||quote_literal(rec_view)||';';
@@ -180,7 +203,7 @@ BEGIN
 			into v_cur_system_id;
 		
 				IF v_systemid IS NULL  OR upper(v_cur_system_id) = upper(v_systemid) THEN
-				raise notice 'create';
+
 					EXECUTE 'INSERT INTO temp_csv (fid, source, csv1, csv2)
 					SELECT ''380'', '||quote_literal(rec_view)||',  definition, 
 					replace(replace(replace(replace(replace(definition,''FROM '||v_schemaname||'.ve'', '','||v_fieldname||' FROM '||v_schemaname||'.ve''),
@@ -252,8 +275,11 @@ BEGIN
 				--insert trigger into temp table
 				EXECUTE 'UPDATE temp_csv SET csv3 = '||quote_literal(v_trgquery)||' WHERE fid=380 AND source = '||quote_literal(rec_view)||'';
 			END LOOP;
-			
-			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||rec_view||';';
+			IF rec_view  IN ('v_edit_node', 'v_edit_arc', 'v_edit_connec', 'v_edit_') and v_onlychilds is true then
+						DELETE FROM temp_csv WHERE fid=380 and source IN ('v_edit_node', 'v_edit_arc', 'v_edit_connec', 'v_edit_');
+			else
+				EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||rec_view||';';
+			end if;
 		END LOOP;
 	END IF;
 
@@ -277,4 +303,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
