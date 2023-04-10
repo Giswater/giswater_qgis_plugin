@@ -10,4 +10,4 @@ CREATE TRIGGER gw_trg_link_data AFTER INSERT OR UPDATE OF expl_id2
 ON gully FOR EACH ROW EXECUTE FUNCTION gw_trg_link_data('gully');
 
 create trigger gw_trg_vi_xsections instead of insert or delete or update on
-vi_xsections for each row execute function ud.gw_trg_vi('vi_xsections');
+vi_xsections for each row execute function gw_trg_vi('vi_xsections');
