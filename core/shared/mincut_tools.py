@@ -235,6 +235,17 @@ def delete_mincut(**kwargs):
     list_id = list_id[:-2]
     message = "Are you sure you want to delete these mincuts?"
     title = "Delete mincut"
+
+    # Check for mincuts not allowed to be deleted
+    sql = (f"SELECT * FROM {table_name}"
+           f" WHERE {column_id} IN ({list_id}) AND (anl_user != current_user OR mincut_state != 0)")
+    rows = tools_db.execute_returning(sql, show_exception=False)
+    if rows:
+        message = "You can't delete these mincuts because they aren't planified \n" \
+                  "or they were created by another user:"
+        tools_qt.show_info_box(message, title, inf_text)
+        return
+
     answer = tools_qt.show_question(message, title, inf_text)
     if answer:
         sql = (f"DELETE FROM {table_name}"
