@@ -113,7 +113,7 @@ INSERT INTO sys_table( id, descript, sys_role,  source)
 VALUES ('drainzone', 'Table of spatial objects representing Drainage zones', 'role_edit', 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table(id, descript, sys_role, criticity, context, orderby, alias, source)
-VALUES ('v_edit_drainzone', 'Shows editable information about drainzone.', 'role_edit', 2, '{"level_1":"INVENTORY","level_2":"MAP ZONES"}', 4, 'DRAINZONE','core') 
+VALUES ('v_edit_drainzone', 'Shows editable information about drainzone.', 'role_edit', 2, '{"level_1":"INVENTORY","level_2":"MAP ZONES"}', 4, 'Drainzone','core') 
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, descript, sys_role,  source)

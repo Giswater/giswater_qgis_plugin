@@ -35,6 +35,10 @@ v_trasector text;
 v_trapresszone text;
 v_tradma text;
 v_tradqa text;
+v_drainzone json;
+v_statusdrainzone text;
+v_coldrainzone text;
+v_tradrainzone text;
 
 BEGIN
 
@@ -61,7 +65,7 @@ BEGIN
 		v_coldma := (SELECT (style::json->>'DMA')::json->>'column' FROM config_function WHERE id=2928);
 		v_coldqa := (SELECT (style::json->>'DQA')::json->>'column' FROM config_function WHERE id=2928);
 
-		-- get column to simbolize
+		-- get transparency
 		v_trasector := (SELECT (style::json->>'SECTOR')::json->>'transparency' FROM config_function WHERE id=2928);
 		v_trapresszone := (SELECT (style::json->>'PRESSZONE')::json->>'transparency' FROM config_function WHERE id=2928);
 		v_tradma := (SELECT (style::json->>'DMA')::json->>'transparency' FROM config_function WHERE id=2928);
@@ -72,13 +76,20 @@ BEGIN
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id, stylesheet::json FROM v_edit_presszone WHERE presszone_id NOT IN (''0'', ''-1'') and active IS TRUE) row' INTO v_presszone ;
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, stylesheet::json FROM v_edit_dma WHERE dma_id > 0 and active IS TRUE) row' INTO v_dma ;
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldqa||' as id, stylesheet::json FROM v_edit_dqa WHERE dqa_id > 0 and active IS TRUE) row' INTO v_dqa ;
-
-	ELSE
-		-- control nulls
-		v_statussector := COALESCE(v_sector, '{}');
-		v_statuspresszone := COALESCE(v_sector, '{}');
-		v_statusdma := COALESCE(v_sector, '{}');
-		v_statusdqa := COALESCE(v_sector, '{}');	
+	
+	ELSIF v_project_type = 'UD' THEN
+	
+		-- get mode	
+		v_statusdrainzone := (SELECT (style::json->>'DRAINZONE')::json->>'mode' FROM config_function WHERE id=2928);
+	
+		-- get column to simbolize
+		v_coldrainzone := (SELECT (style::json->>'DRAINZONE')::json->>'column' FROM config_function WHERE id=2928);
+	
+		-- get transparency
+		v_tradrainzone := (SELECT (style::json->>'DRAINZONE')::json->>'transparency' FROM config_function WHERE id=2928);
+	
+		-- get mapzone values
+		EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_coldrainzone||' as id, stylesheet::json FROM v_edit_drainzone WHERE drainzone_id > 0 and active IS TRUE) row' INTO v_drainzone;
 
 	END IF;
 
@@ -86,14 +97,17 @@ BEGIN
 	v_dma  := COALESCE(v_dma, '{}');
 	v_presszone := COALESCE(v_presszone, '{}');
 	v_dqa  := COALESCE(v_dqa, '{}');
+	v_drainzone  := COALESCE(v_drainzone, '{}');
 	v_colsector  := COALESCE(v_colsector, '{}');
 	v_colpresszone  := COALESCE(v_colpresszone, '{}');
 	v_coldma  := COALESCE(v_coldma, '{}');
 	v_coldqa  := COALESCE(v_coldqa, '{}');
+	v_coldrainzone  := COALESCE(v_coldrainzone, '{}');
 	v_trasector  := COALESCE(v_trasector, '0.5');
 	v_trapresszone := COALESCE(v_trapresszone, '0.5');
 	v_tradma := COALESCE(v_tradma, '0.5');
 	v_tradqa := COALESCE(v_tradqa, '0.5');
+	v_tradrainzone := COALESCE(v_tradrainzone, '0.5');
 	
 
 	--    Return
@@ -104,6 +118,7 @@ BEGIN
 				',{"name":"presszone", "status": "'||v_statuspresszone||'", "idname":"'||v_colpresszone||'",  "layer":"v_edit_presszone", "transparency":'||v_trapresszone||',  "values":' || v_presszone ||'}'||
 				',{"name":"dma",  "status": "'||v_statusdma||'", "idname": "'||v_coldma||'", "layer":"v_edit_dma", "transparency":'||v_tradma||', "values":' || v_dma ||'}'||
 				',{"name":"dqa",  "status": "'||v_statusdqa||'", "idname": "'||v_coldqa||'", "layer":"v_edit_dqa", "transparency":'||v_tradqa||', "values":' || v_dqa ||'}'||
+				',{"name":"drainzone",  "status": "'||v_statusdrainzone||'", "idname": "'||v_coldrainzone||'", "layer":"v_edit_drainzone", "transparency":'||v_tradrainzone||', "values":' || v_drainzone ||'}'||
 				']}}'||
 	    '}')::json;
 
