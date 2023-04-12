@@ -14,7 +14,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"test1","fid":227}}}$$) --when is called from go2epa_main from toolbox
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"test_20201016"}}}$$) -- when is called from toolbox
 
--- fid: 114, 159, 230, 297, 396, 404, 400, 405, 413, 414, 415, 432. Number 227 is passed by input parameters
+-- fid: 114, 230, 297, 396, 404, 400, 413, 414, 415, 432. Number 227 is passed by input parameters
 
 */
 
@@ -119,7 +119,7 @@ BEGIN
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid = 114 AND cur_user=current_user;
 	DELETE FROM audit_check_data WHERE id < 0;
-	DELETE FROM anl_node WHERE fid IN (159, 297, 396, 413, 415) AND cur_user=current_user;
+	DELETE FROM anl_node WHERE fid IN (297, 396, 413, 415) AND cur_user=current_user;
 	DELETE FROM anl_arc WHERE fid IN (297, 373, 396) AND cur_user=current_user;
 
 	-- get user parameters

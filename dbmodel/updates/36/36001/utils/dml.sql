@@ -395,3 +395,27 @@ INSERT INTO config_typevalue (typevalue,id,idval,camelstyle)
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) 
     VALUES('datatype_typevalue', 'datetime', 'datetime', 'datetime', '{"createAddfield":"TRUE"}'::json);
 
+UPDATE sys_fprocess SET fprocess_name='Repair nodes duplicated', project_type='utils', fprocess_type='Function process' WHERE fid=405;
+
+UPDATE sys_function
+SET descript='It allows to repair the problem of having two nodes on the same location.
+- Node: the node_id where we want to perform the action.
+- Target node: the other node_id on the process. It is optative. If NULL, system will try to find the closest node.
+- Action: 5 actions can be performed: 
+DELETE: Node is deleted. Target node gets topology.
+DOWNGRADE: Node is downgraded. Target node gets topology.
+MOVE AND LOSE TOPOLOGY: Node is moved and lose topology. Target node gets topology.
+MOVE AND KEEP TOPOLOGY: Node is moved and keep topology. Target node lose topology.
+MOVE AND GET TOPOLOGY: Node is moved and get topology. Target node lose topology.
+- For moving actions, set the X and Y axis movement (in meters) where node will be displaced.'
+WHERE id=3080;
+
+UPDATE config_toolbox
+SET inputparams='[{"widgetname":"node", "label":"Node:", "widgettype":"text", "datatype":"text", "layoutname":"grl_option_parameters","layoutorder":1, "value":null},
+  {"widgetname":"action", "label":"Action:", "widgettype":"combo", "datatype":"text", "comboIds":["DELETE", "DOWNGRADE", "MOVE-LOSE-TOPO", "MOVE-KEEP-TOPO", "MOVE-GET-TOPO"], "comboNames":["DELETE", "DOWNGRADE", "MOVE & LOSE TOPOLOGY", "MOVE & KEEP TOPOLOGY", "MOVE & GET TOPOLOGY"], "layoutname":"grl_option_parameters","layoutorder":3, "selectedId":null},
+  {"widgetname":"targetNode", "label":"Target node (optional):", "tooltip": "Value for target node is optative. If null system will try to check closest node.", "widgettype":"text", "datatype":"text", "layoutname":"grl_option_parameters","layoutorder":2, "value":null},
+  {"widgetname":"dx", "label":"Movement on X axis (m):", "tooltip": "Node displacement on X axis (m)", "widgettype":"text", "datatype":"float", "layoutname":"grl_option_parameters","layoutorder":4, "value":null},
+  {"widgetname":"dy", "label":"Movement on Y axis (m):", "tooltip": "Node displacement on Y axis (m)", "widgettype":"text", "datatype":"float", "layoutname":"grl_option_parameters","layoutorder":5, "value":null}
+  ]'::json
+WHERE id=3080;
+
