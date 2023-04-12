@@ -576,9 +576,10 @@ def get_col_index_by_col_name(qtable, column_name):
         record = model.record(0)
         column_index = record.indexOf(column_name)
     except AttributeError:
-        for column in range(model.columnCount()):
-            if model.horizontalHeaderItem(column).text() == column_name:
-                return column
+        for x in range(0, model.columnCount()):
+            if model.headerData(x, Qt.Horizontal) == column_name:
+                column_index = x
+                break
 
     if column_index == -1:
         column_index = None
