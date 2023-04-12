@@ -1291,7 +1291,7 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
-			EXECUTE concat ('INSERT INTO anl_connec (fid, arc_id, arccat_id, descript, the_geom, expl_id)
+			EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id)
 			SELECT 461, arc_id, arccat_id, ''Redundant values on y1/y2-elev1/elev2'', the_geom, expl_id FROM (', v_querytext,')a');
 
 			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
