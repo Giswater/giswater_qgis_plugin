@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION NODE: 3140
+--FUNCTION NODE: 3212
 
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_ve_epa() 
@@ -24,7 +24,7 @@ BEGIN
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        "data":{"message":"1030", "function":"3140","debug_msg":null}}$$);';
+        "data":{"message":"1030", "function":"3212","debug_msg":null}}$$);';
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -88,7 +88,7 @@ BEGIN
         
     ELSIF TG_OP = 'DELETE' THEN
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        "data":{"message":"1032", "function":"3140","debug_msg":null}}$$);';
+        "data":{"message":"1032", "function":"3212","debug_msg":null}}$$);';
         RETURN NEW;
     
     END IF;
