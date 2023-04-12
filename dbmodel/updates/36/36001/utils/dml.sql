@@ -419,3 +419,8 @@ SET inputparams='[{"widgetname":"node", "label":"Node:", "widgettype":"text", "d
   ]'::json
 WHERE id=3080;
 
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES(3232, 'gw_trg_dscenario_demand_feature', 'ws', 'function trigger', NULL, NULL, 'Trigger that controls if node or connec set as feature_id exists on inventory tables', 'role_epa', NULL, 'core');
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source")
+VALUES(3230, 'Inserted feature_id does not exist on node/connec table', 'Review your data', 2, true, 'utils', 'core');

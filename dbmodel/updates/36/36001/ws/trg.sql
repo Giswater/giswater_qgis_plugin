@@ -109,3 +109,6 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('virtualvalve');
 DROP TRIGGER IF EXISTS gw_trg_link_data ON connec;
 CREATE TRIGGER gw_trg_link_data AFTER INSERT OR UPDATE OF epa_type, state_type, expl_id2
 ON connec FOR EACH ROW EXECUTE FUNCTION gw_trg_link_data('connec');
+
+CREATE TRIGGER gw_trg_dscenario_demand_feature AFTER INSERT ON inp_dscenario_demand 
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_dscenario_demand_feature();
