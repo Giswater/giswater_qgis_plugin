@@ -103,10 +103,9 @@ v_audit_result text;
 v_level integer;
 v_status text;
 v_message text;
-v_check_arcdint_status boolean;
-v_check_arcdint integer;
+v_check_arcdnom_status boolean;
+v_check_arcdnom integer;
 v_checkeddiam text;
-v_subquery text;
 
 
 BEGIN
@@ -119,8 +118,8 @@ BEGIN
 	SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 	SELECT value INTO v_dma_autoupdate FROM config_param_system WHERE parameter = 'edit_connect_autoupdate_dma';
 	SELECT value INTO v_fluidtype_autoupdate FROM config_param_system WHERE parameter = 'edit_connect_autoupdate_fluid';
-	v_check_arcdint_status:= (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'edit_link_check_arcdint');
-	v_check_arcdint:= (SELECT value::json->>'dint' FROM config_param_system WHERE parameter = 'edit_link_check_arcdint');
+	v_check_arcdnom_status:= (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'edit_link_check_arcdnom');
+	v_check_arcdnom:= (SELECT value::json->>'diameter' FROM config_param_system WHERE parameter = 'edit_link_check_arcdnom');
 
 
 	-- get user variables
@@ -221,9 +220,9 @@ BEGIN
 		IF v_connect.arc_id IS NOT NULL AND v_isforcedarcs is False THEN
 			v_forcedarcs = concat (' AND arc_id::integer = ',v_connect.arc_id,' ');
 			-- check if forced arc diameter is smaller than configured
-			IF (SELECT dint FROM arc JOIN cat_arc ON id=arccat_id WHERE arc_id=v_connect.arc_id) >= v_check_arcdint AND v_check_arcdint_status IS TRUE THEN
+			IF (SELECT cat_dnom::integer FROM v_edit_arc WHERE arc_id=v_connect.arc_id) >= v_check_arcdnom AND v_check_arcdnom_status IS TRUE THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3232", "function":"3188","debug_msg":'||v_check_arcdint||'}}$$);';
+				"data":{"message":"3232", "function":"3188","debug_msg":'||v_check_arcdnom||'}}$$);';
 			END IF;
 		END IF;	
 		
@@ -233,23 +232,22 @@ BEGIN
 		ELSE
 
 			-- Use check arc diameter variable 
-			IF v_check_arcdint_status IS TRUE THEN	
-				v_checkeddiam = concat(' AND dint<',v_check_arcdint,' ');
-				v_subquery = ' JOIN cat_arc ON arccat_id=id ';
-			ELSE v_checkeddiam = ''; v_subquery = '';
+			IF v_check_arcdnom_status IS TRUE THEN	
+				v_checkeddiam = concat(' AND cat_dnom::integer<',v_check_arcdnom,' ');
+			ELSE v_checkeddiam = '';
 			END IF;
 		
 			IF v_link.the_geom IS NULL THEN -- looking for closest arc from connect
 				EXECUTE 'WITH index_query AS(
 				SELECT ST_Distance(the_geom, '||quote_literal(v_connect.the_geom::text)||') as distance, arc_id 
-				FROM v_edit_arc '||v_subquery||' WHERE state > 0 '||v_checkeddiam||''||v_forcedarcs||')
+				FROM v_edit_arc WHERE state > 0 '||v_checkeddiam||''||v_forcedarcs||')
 				SELECT arc_id FROM index_query ORDER BY distance limit 1'
 				INTO v_connect.arc_id;
 			
 			ELSIF v_link.the_geom IS NOT NULL THEN -- looking for closest arc from link's endpoint
 				EXECUTE 'WITH index_query AS(
 				SELECT ST_Distance(the_geom, st_endpoint('||quote_literal(v_link.the_geom::text)||')) as distance, arc_id 
-				FROM v_edit_arc '||v_subquery||' WHERE state > 0 '||v_checkeddiam||''||v_forcedarcs||')
+				FROM v_edit_arc WHERE state > 0 '||v_checkeddiam||''||v_forcedarcs||')
 				SELECT arc_id FROM index_query ORDER BY distance limit 1'
 				INTO v_connect.arc_id;
 
@@ -354,9 +352,9 @@ BEGIN
 						-- create link geom
 						v_link.the_geom := st_setsrid(ST_makeline(v_connect.the_geom, v_point_aux), 25831);
 					
-						IF v_check_arcdint_status IS TRUE THEN
+						IF v_check_arcdnom_status IS TRUE THEN
 							INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-							VALUES (217, null, 4, concat('Create new link connected to the closest arc with diameter smaller than ',v_check_arcdint,'.'));
+							VALUES (217, null, 4, concat('Create new link connected to the closest arc with diameter smaller than ',v_check_arcdnom,'.'));
 						ELSE
 							INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 							VALUES (217, null, 4, concat('Create new link connected to the closest arc.'));
