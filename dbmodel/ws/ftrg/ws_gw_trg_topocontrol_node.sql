@@ -86,7 +86,7 @@ BEGIN
 			
 					IF v_dsbl_error IS NOT TRUE THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"1097", "function":"1334","debug_msg":"'||NEW.node_id||'"}}$$);';
+						"data":{"message":"1097", "function":"1136","debug_msg":"'||NEW.node_id||'"}}$$);';
 					ELSE
 
 						SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1097;
@@ -105,7 +105,7 @@ BEGIN
 			
 					IF v_dsbl_error IS NOT TRUE THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"1096", "function":"1334","debug_msg":"'||NEW.node_id||'"}}$$);';
+						"data":{"message":"1096", "function":"1136","debug_msg":"'||NEW.node_id||'"}}$$);';
 					ELSE
 						SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1097;
 						INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (106, NEW.node_id, v_message);
