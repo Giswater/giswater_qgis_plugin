@@ -1,0 +1,3 @@
+3.6.001
+*************
+- New variable edit_link_check_arcdint to check if link is connected to an arc with dint smaller than defined value

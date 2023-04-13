@@ -74,6 +74,8 @@ v_feature record;
 v_linkexists integer;
 v_fluidtype_autoupdate boolean;
 v_dma_autoupdate boolean;
+v_check_arcdint_status boolean;
+v_check_arcdint integer;
 
 BEGIN
 
@@ -87,6 +89,8 @@ BEGIN
 	SELECT project_type INTO v_projectype FROM sys_version LIMIT 1;
 	v_ispresszone:= (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'utils_graphanalytics_status');
 	v_currentpsector = (SELECT value::integer from config_param_user WHERE cur_user = current_user AND parameter = 'plan_psector_vdefault');
+	v_check_arcdint_status:= (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'edit_link_check_arcdint');
+	v_check_arcdint:= (SELECT value::json->>'dint' FROM config_param_system WHERE parameter = 'edit_link_check_arcdint');
 
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
@@ -149,6 +153,12 @@ BEGIN
 		-- arc as end point
 		SELECT * INTO v_arc FROM v_edit_arc WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_arc.the_geom, v_link_searchbuffer) AND state>0
 		ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_arc.the_geom) LIMIT 1;
+		
+		-- check if arc diameter is bigger than configured
+		IF (SELECT dint FROM arc JOIN cat_arc ON id=arccat_id WHERE arc_id=v_arc.arc_id) >= v_check_arcdint AND v_check_arcdint_status IS TRUE THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3232", "function":"1116","debug_msg":'||v_check_arcdint||'}}$$);';
+		END IF;
 		
 		-- node as end point
 		SELECT * INTO v_node FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_node.the_geom, v_link_searchbuffer) AND state>0
