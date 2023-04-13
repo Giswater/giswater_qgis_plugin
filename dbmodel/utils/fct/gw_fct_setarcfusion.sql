@@ -402,6 +402,8 @@ BEGIN
 				ELSIF v_psector_id IS NOT NULL THEN
 				
 					UPDATE arc SET state = 2, state_type = v_state_type WHERE arc_id = v_new_record.arc_id;
+                    
+                    UPDATE config_param_user SET value='false' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
 				
 					INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable) VALUES (v_new_record.arc_id, v_psector_id, 1, false) ON CONFLICT (arc_id, psector_id) DO NOTHING;
 
@@ -494,6 +496,8 @@ BEGIN
 					ELSE
 						DELETE FROM arc WHERE arc_id = v_record2.arc_id;
 					END IF;
+                    
+                    UPDATE config_param_user SET value='true' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
 
 					IF v_state_node = 1 THEN
 						INSERT INTO plan_psector_x_node (psector_id, node_id, state) VALUES (v_psector_id, v_node_id, 0)
