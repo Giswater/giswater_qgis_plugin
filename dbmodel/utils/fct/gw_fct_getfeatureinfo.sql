@@ -87,6 +87,7 @@ BEGIN
 				row_number()over() AS orderby, 
 				null as stylesheet, 
 				row_number()over() AS layoutorder,
+				row_number()over() AS web_layoutorder,
 				FALSE AS isparent, 
 				null AS widgetfunction, 
 				null AS linkedaction, 
