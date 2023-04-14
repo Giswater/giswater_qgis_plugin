@@ -664,8 +664,9 @@ class GwInfo(QObject):
         layout_list = []
         widget_offset = 0
         prev_layout = ""
-        widget_dict = {'text':'lineedit','combo':'combobox','check':'checkbox','datetime':'dateedit',
-                     'hyperlink':'hyperlink','textarea':'textarea','spinbox':'spinbox','doublespinbox':'spinbox'}
+        widget_dict = {'text': 'lineedit', 'typeahead': 'lineedit', 'textarea': 'textarea', 'combo': 'combobox',
+                       'check': 'checkbox', 'datetime': 'dateedit', 'hyperlink': 'hyperlink', 'spinbox': 'spinbox',
+                       'doublespinbox': 'spinbox'}
         for field in complet_result['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
                 continue
@@ -676,15 +677,13 @@ class GwInfo(QObject):
                 continue
 
             # Create connections
-            if field['widgettype'] not in ('tableview','vspacer','list','hspacer','button','typeahead'):
+            if field['widgettype'] not in ('tableview', 'vspacer', 'list', 'hspacer', 'button'):
                 if field['widgettype'] == 'hyperlink':
-                     if type(widget) == GwHyperLinkLineEdit:
-                        widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf, widget,
-                                                                                        new_feature)
+                    if type(widget) == GwHyperLinkLineEdit:
+                        widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf, widget, new_feature)
                 else:
-                    widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf,
-                                                                                                   widget,
-                                                                                                   new_feature)
+                    widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf, widget, new_feature)
+
             layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
             if layout is not None:
                 if layout.objectName() != prev_layout:
