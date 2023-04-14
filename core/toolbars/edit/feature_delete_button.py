@@ -203,6 +203,9 @@ class GwFeatureDeleteButton(GwAction):
         if not change_tab:
             tools_gw.close_dialog(self.dlg_feature_delete)
 
+        # Refresh canvas
+        tools_qgis.refresh_map_canvas()
+
 
     def _selection_init(self):
         """ Set canvas map tool to an instance of class 'GwSelectManager' """
