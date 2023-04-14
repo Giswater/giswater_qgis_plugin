@@ -926,7 +926,7 @@ AS SELECT DISTINCT t.timser_id,
   
   
 CREATE OR REPLACE VIEW vi_curves
-SELECT a.curve_id,
+AS SELECT a.curve_id,
     a.curve_type,
     a.x_value,
     a.y_value
