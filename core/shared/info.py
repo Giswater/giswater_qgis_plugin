@@ -511,8 +511,6 @@ class GwInfo(QObject):
         self._get_actions()
 
         if self.new_feature_id is not None:
-            self._enable_action(self.dlg_cf, "actionZoom", False)
-            self._enable_action(self.dlg_cf, "actionZoomOut", False)
             self._enable_action(self.dlg_cf, "actionCentered", False)
             self._enable_action(self.dlg_cf, "actionSetToArc", False)
         self._show_actions(self.dlg_cf, 'tab_data')
@@ -626,8 +624,6 @@ class GwInfo(QObject):
         self.action_set_to_arc = self.dlg_cf.findChild(QAction, "actionSetToArc")
         self.action_get_arc_id = self.dlg_cf.findChild(QAction, "actionGetArcId")
         self.action_get_parent_id = self.dlg_cf.findChild(QAction, "actionGetParentId")
-        self.action_zoom_in = self.dlg_cf.findChild(QAction, "actionZoom")
-        self.action_zoom_out = self.dlg_cf.findChild(QAction, "actionZoomOut")
         self.action_centered = self.dlg_cf.findChild(QAction, "actionCentered")
         self.action_link = self.dlg_cf.findChild(QAction, "actionLink")
         self.action_help = self.dlg_cf.findChild(QAction, "actionHelp")
@@ -649,8 +645,6 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.action_set_to_arc, "212", sub_folder="24x24")
         tools_gw.add_icon(self.action_get_arc_id, "209")
         tools_gw.add_icon(self.action_get_parent_id, "210")
-        tools_gw.add_icon(self.action_zoom_in, "103")
-        tools_gw.add_icon(self.action_zoom_out, "107")
         tools_gw.add_icon(self.action_centered, "104")
         tools_gw.add_icon(self.action_link, "173", sub_folder="24x24")
         tools_gw.add_icon(self.action_section, "207")
@@ -813,9 +807,7 @@ class GwInfo(QObject):
         self.action_get_parent_id.triggered.connect(
             partial(self.get_snapped_feature_id, dlg_cf, self.action_get_parent_id, 'v_edit_node', 'node',
                     'data_parent_id', child_type))
-        self.action_zoom_in.triggered.connect(partial(self._manage_action_zoom_in, self.canvas, self.layer))
         self.action_centered.triggered.connect(partial(self._manage_action_centered, self.canvas, self.layer))
-        self.action_zoom_out.triggered.connect(partial(self._manage_action_zoom_out, self.canvas, self.layer))
         self.action_copy_paste.triggered.connect(
             partial(self._manage_action_copy_paste, self.dlg_cf, self.feature_type, tab_type))
         self.action_rotation.triggered.connect(partial(self._change_hemisphere, self.dlg_cf, self.action_rotation))
@@ -1431,16 +1423,6 @@ class GwInfo(QObject):
         return self.feature
 
 
-    def _manage_action_zoom_in(self, canvas, layer):
-        """ Zoom in """
-
-        if not self.feature:
-            self._get_feature(self.tab_type)
-        layer.selectByIds([self.feature.id()])
-        canvas.zoomToSelected(layer)
-        canvas.zoomIn()
-
-
     def _manage_action_centered(self, canvas, layer):
         """ Center map to current feature """
 
@@ -1448,19 +1430,6 @@ class GwInfo(QObject):
             self._get_feature(self.tab_type)
         layer.selectByIds([self.feature.id()])
         canvas.zoomToSelected(layer)
-
-
-    def _manage_action_zoom_out(self, canvas, layer):
-        """ Zoom out """
-
-        if not self.feature:
-            self._get_feature(self.tab_type)
-        layer.selectByIds([self.feature.id()])
-        canvas.zoomToSelected(layer)
-        canvas.zoomOut()
-        expr_filter = f"{self.field_id} = '{self.feature_id}'"
-        self.feature = tools_qgis.get_feature_by_expr(self.layer, expr_filter)
-        return self.feature
 
 
     def _get_last_value(self, dialog, generic=False):
@@ -1707,8 +1676,6 @@ class GwInfo(QObject):
                     return False
 
                 self.new_feature_id = None
-                self._enable_action(dialog, "actionZoom", True)
-                self._enable_action(dialog, "actionZoomOut", True)
                 self._enable_action(dialog, "actionCentered", True)
                 self._enable_action(dialog, "actionSetToArc", True)
                 global is_inserting
@@ -1831,7 +1798,7 @@ class GwInfo(QObject):
 
         try:
             actions_list = dialog.findChildren(QAction)
-            static_actions = ('actionEdit', 'actionCentered', 'actionZoomOut', 'actionZoom', 'actionLink', 'actionHelp',
+            static_actions = ('actionEdit', 'actionCentered', 'actionLink', 'actionHelp',
                               'actionSection', 'actionSetToArc')
 
             for action in actions_list:
