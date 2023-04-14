@@ -430,3 +430,7 @@ VALUES('edit_link_check_arcdnom', '{"status":false , "diameter":250}', 'If true,
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source")
 VALUES(3232, 'It''s not possible to connect to this arc because it exceed the maximum diameter configured:', 'Connect to a smaller arc or change system configuration', 2, true, 'utils', 'core');
+
+UPDATE config_param_system
+SET value='{"rowsColor":true}'
+WHERE "parameter"='qgis_form_selector_stylesheet';
