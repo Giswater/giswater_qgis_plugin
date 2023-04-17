@@ -434,3 +434,7 @@ VALUES(3232, 'It''s not possible to connect to this arc because it exceed the ma
 UPDATE config_param_system
 SET value='{"rowsColor":true}'
 WHERE "parameter"='qgis_form_selector_stylesheet';
+
+INSERT INTO sys_fprocess
+(fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
+VALUES(488, 'Check connecs related to arcs with diameter bigger than defined value', 'ws', NULL, 'core', true, 'Check om-data', NULL);

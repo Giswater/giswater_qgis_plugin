@@ -51,6 +51,7 @@ v_arc_array text[];
 rec_arc text;
 v_node_1 text;
 v_partialquery text;
+v_check_arcdnom integer;
 
 BEGIN
 
@@ -1342,6 +1343,29 @@ BEGIN
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (125, 1, '479', 'INFO: No arcs with duplicated geometry.',v_count);
 	END IF;
+    
+    RAISE NOTICE '47 - Check connecs related to arcs with diameter bigger than defined value (488) (WS)';
+    
+    IF v_project_type = 'WS' THEN
+        IF (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'edit_link_check_arcdnom')::boolean IS TRUE THEN
+            v_check_arcdnom:= (SELECT value::json->>'diameter' FROM config_param_system WHERE parameter = 'edit_link_check_arcdnom');
+
+            v_querytext = '(SELECT connec_id, connecat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE state>0 AND arc_id IN (
+                            SELECT arc_id FROM '||v_edit||'arc JOIN cat_arc ON arccat_id=id WHERE dnom::integer>'||v_check_arcdnom||')) a';
+                        
+            EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+            IF v_count > 0 THEN
+                    EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
+                    SELECT 488, connec_id, connecat_id, ''Connecs related to arcs with diameter bigger than defined'', the_geom, expl_id FROM ', v_querytext,'');
+        
+                INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
+                VALUES (125, 2, '488',concat('WARNING-488: There is/are ',v_count,' connecs related to arcs with diameter bigger than defined value (',v_check_arcdnom,')'),v_count);
+            ELSE
+                INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+                VALUES (125, 1, '488', 'INFO: No connecs related to arcs with diameter bigger than defined value',v_count);
+            END IF;
+        END IF;
+    END IF;
 
 	-- Removing isaudit false sys_fprocess
 	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
@@ -1381,7 +1405,7 @@ BEGIN
 	AND fid IN (106,177,187,202,442,443)
 	UNION
 	SELECT connec_id, connecat_id, state, expl_id, descript, fid, the_geom FROM anl_connec WHERE cur_user="current_user"()
-	AND fid IN (210,201,202,204,205,291,478)) row) features;
+	AND fid IN (210,201,202,204,205,291,478,488)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 
