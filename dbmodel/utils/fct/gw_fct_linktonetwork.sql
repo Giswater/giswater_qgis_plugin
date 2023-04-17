@@ -220,10 +220,12 @@ BEGIN
 		IF v_connect.arc_id IS NOT NULL AND v_isforcedarcs is False THEN
 			v_forcedarcs = concat (' AND arc_id::integer = ',v_connect.arc_id,' ');
 			-- check if forced arc diameter is smaller than configured
-			IF (SELECT cat_dnom::integer FROM v_edit_arc WHERE arc_id=v_connect.arc_id) >= v_check_arcdnom AND v_check_arcdnom_status IS TRUE THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3232", "function":"3188","debug_msg":'||v_check_arcdnom||'}}$$);';
-			END IF;
+            IF v_projecttype  ='WS' THEN
+                IF (SELECT cat_dnom::integer FROM v_edit_arc WHERE arc_id=v_connect.arc_id) >= v_check_arcdnom AND v_check_arcdnom_status IS TRUE THEN
+                    EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                    "data":{"message":"3232", "function":"3188","debug_msg":'||v_check_arcdnom||'}}$$);';
+                END IF;
+            END IF;
 		END IF;	
 		
 		IF v_arc.arc_id IS NOT NULL THEN
@@ -232,7 +234,7 @@ BEGIN
 		ELSE
 
 			-- Use check arc diameter variable 
-			IF v_check_arcdnom_status IS TRUE THEN	
+			IF v_projecttype = 'WS' AND v_check_arcdnom_status IS TRUE THEN	
 				v_checkeddiam = concat(' AND cat_dnom::integer<',v_check_arcdnom,' ');
 			ELSE v_checkeddiam = '';
 			END IF;
@@ -352,7 +354,7 @@ BEGIN
 						-- create link geom
 						v_link.the_geom := st_setsrid(ST_makeline(v_connect.the_geom, v_point_aux), 25831);
 					
-						IF v_check_arcdnom_status IS TRUE THEN
+						IF v_projecttype = 'WS' AND v_check_arcdnom_status IS TRUE THEN	
 							INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 							VALUES (217, null, 4, concat('Create new link connected to the closest arc with diameter smaller than ',v_check_arcdnom,'.'));
 						ELSE

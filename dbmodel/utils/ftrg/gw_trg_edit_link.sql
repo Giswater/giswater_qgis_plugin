@@ -155,10 +155,12 @@ BEGIN
 		ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_arc.the_geom) LIMIT 1;
 		
 		-- check if arc diameter is bigger than configured
-		IF (SELECT cat_dnom FROM v_edit_arc WHERE arc_id=v_arc.arc_id) >= v_check_arcdnom AND v_check_arcdnom_status IS TRUE THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3232", "function":"1116","debug_msg":'||v_check_arcdnom||'}}$$);';
-		END IF;
+        IF v_projectype = 'WS' THEN
+            IF (SELECT cat_dnom FROM v_edit_arc WHERE arc_id=v_arc.arc_id) >= v_check_arcdnom AND v_check_arcdnom_status IS TRUE THEN
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                "data":{"message":"3232", "function":"1116","debug_msg":'||v_check_arcdnom||'}}$$);';
+            END IF;
+        END IF;
 		
 		-- node as end point
 		SELECT * INTO v_node FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_node.the_geom, v_link_searchbuffer) AND state>0

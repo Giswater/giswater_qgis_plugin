@@ -426,7 +426,7 @@ INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, p
 VALUES(3230, 'Inserted feature_id does not exist on node/connec table', 'Review your data', 2, true, 'utils', 'core');
 
 INSERT INTO config_param_system("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname)
-VALUES('edit_link_check_arcdnom', '{"status":false , "diameter":250}', 'If true, inserted links could not connect to arcs with diameter bigger or equal than the configured', 'Links check arc diameter', NULL, NULL, false, NULL, 'utils', NULL, NULL, 'json', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+VALUES('edit_link_check_arcdnom', '{"status":false , "diameter":250}', 'If true, inserted links could not connect to arcs with diameter bigger or equal than the configured', 'Links check arc diameter', NULL, NULL, false, NULL, 'ws', NULL, NULL, 'json', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source")
 VALUES(3232, 'It''s not possible to connect to this arc because it exceed the maximum diameter configured:', 'Connect to a smaller arc or change system configuration', 2, true, 'utils', 'core');
