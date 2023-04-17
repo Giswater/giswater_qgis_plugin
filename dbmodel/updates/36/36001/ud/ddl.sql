@@ -15,6 +15,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_timeser
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_curve", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_lid", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pattern", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_timeseries", "column":"addparam", "dataType":"boolean", "isUtils":"False"}}$$);
+
 
 -- create vdefault
 ALTER TABLE inp_timeseries ALTER column active SET default true;
