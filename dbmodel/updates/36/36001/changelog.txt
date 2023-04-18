@@ -4,3 +4,4 @@
 - New process to check existing connecs related to arcs with diameter bigger than defined value (WS)
 - New process to check existing connects with more than 1 link on service
 - Drop obsolete table selector_plan_psector
+- Add region and province tables and add region_id and province_id fields to municipality and inventory tables
