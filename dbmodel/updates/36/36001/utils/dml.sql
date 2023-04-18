@@ -438,3 +438,7 @@ WHERE "parameter"='qgis_form_selector_stylesheet';
 INSERT INTO sys_fprocess
 (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
 VALUES(488, 'Check connecs related to arcs with diameter bigger than defined value', 'ws', NULL, 'core', true, 'Check om-data', NULL);
+
+INSERT INTO sys_fprocess
+(fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
+VALUES(489, 'Check connects with more than 1 link on service', 'utils', NULL, 'core', true, 'Check om-data', NULL);

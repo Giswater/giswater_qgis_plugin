@@ -1359,13 +1359,38 @@ BEGIN
                     SELECT 488, connec_id, connecat_id, ''Connecs related to arcs with diameter bigger than defined'', the_geom, expl_id FROM ', v_querytext,'');
         
                 INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-                VALUES (125, 2, '488',concat('WARNING-488: There is/are ',v_count,' connecs related to arcs with diameter bigger than defined value (',v_check_arcdnom,')'),v_count);
+                VALUES (125, 2, '488',concat('WARNING-488 (anl_connec): There is/are ',v_count,' connecs related to arcs with diameter bigger than defined value (',v_check_arcdnom,')'),v_count);
             ELSE
                 INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
                 VALUES (125, 1, '488', 'INFO: No connecs related to arcs with diameter bigger than defined value',v_count);
             END IF;
         END IF;
     END IF;
+   
+    RAISE NOTICE '48 - Check connects with more than 1 link on service (489)';
+ 
+    IF v_project_type = 'WS' THEN
+	    v_querytext = '(SELECT connec_id, connecat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE connec_id 
+		IN (SELECT feature_id FROM link WHERE state=1 GROUP BY feature_id HAVING count(*) > 1)) a';
+	ELSIF v_project_type = 'UD' THEN
+	    v_querytext = '(SELECT connec_id, connecat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE connec_id 
+		IN (SELECT feature_id FROM link WHERE state=1 GROUP BY feature_id HAVING count(*) > 1)
+		UNION SELECT gully_id, gratecat_id, the_geom, expl_id FROM '||v_edit||'gully WHERE gully_id 
+		IN (SELECT feature_id FROM link WHERE state=1 GROUP BY feature_id HAVING count(*) > 1)) a';
+	END IF;
+                
+    EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+    IF v_count > 0 THEN
+            EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
+            SELECT 489, connec_id, connecat_id, ''Connects with more than 1 link on service'', the_geom, expl_id FROM ', v_querytext,'');
+
+        INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
+        VALUES (125, 2, '489',concat('WARNING-489 (anl_connec): There is/are ',v_count,' connects with more than 1 link on service'),v_count);
+    ELSE
+        INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+        VALUES (125, 1, '489', 'INFO: No connects with more than 1 link on service',v_count);
+    END IF;
+
 
 	-- Removing isaudit false sys_fprocess
 	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
@@ -1405,7 +1430,7 @@ BEGIN
 	AND fid IN (106,177,187,202,442,443)
 	UNION
 	SELECT connec_id, connecat_id, state, expl_id, descript, fid, the_geom FROM anl_connec WHERE cur_user="current_user"()
-	AND fid IN (210,201,202,204,205,291,478,488)) row) features;
+	AND fid IN (210,201,202,204,205,291,478,488,489)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 

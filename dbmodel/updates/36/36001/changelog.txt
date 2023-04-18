@@ -2,3 +2,4 @@
 *************
 - New variable edit_link_check_arcdnom to check if new link is connected to an arc with smaller diameter than defined value (WS)
 - New process to check existing connecs related to arcs with diameter bigger than defined value (WS)
+- New process to check existing connects with more than 1 link on service
