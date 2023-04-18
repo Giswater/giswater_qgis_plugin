@@ -91,8 +91,6 @@ BEGIN
  	SELECT v_new_psector_name, psector_type, descript, expl_id, priority, text1, text2, observ, rotation, scale,  atlas_id, gexpenses, 
  	vat, other, active, the_geom, enable_all, status, ext_code, text3, text4, text5, text6, num_value 
  	FROM plan_psector WHERE psector_id=v_old_psector_id RETURNING psector_id INTO v_new_psector_id;
-
- 	INSERT INTO selector_plan_psector(psector_id,cur_user) VALUES (v_new_psector_id, current_user);
 	
 	INSERT INTO audit_check_data (fid, result_id, error_message)
 	VALUES (153, v_result_id, concat('Copy psector ',v_old_psector_id,' as ',v_new_psector_name,'.' ));

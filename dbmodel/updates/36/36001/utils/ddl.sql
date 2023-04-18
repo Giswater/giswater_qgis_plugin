@@ -20,3 +20,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_tool
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"epa_type", "dataType":"character varying(16)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"is_operative", "dataType":"boolean", "isUtils":"False"}}$$);
+
+DROP TABLE IF EXISTS selector_plan_psector;

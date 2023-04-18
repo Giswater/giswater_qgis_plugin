@@ -442,3 +442,5 @@ VALUES(488, 'Check connecs related to arcs with diameter bigger than defined val
 INSERT INTO sys_fprocess
 (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
 VALUES(489, 'Check connects with more than 1 link on service', 'utils', NULL, 'core', true, 'Check om-data', NULL);
+
+DELETE FROM sys_table WHERE id='selector_plan_psector';

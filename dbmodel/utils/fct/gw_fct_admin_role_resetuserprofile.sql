@@ -161,15 +161,13 @@ BEGIN
 					-- plan selectors
 					IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE pg_has_role( v_user, oid, 'member')) THEN
 
-						DELETE FROM selector_plan_psector WHERE cur_user=v_user;
 						DELETE FROM selector_plan_result WHERE cur_user=v_user;
 						DELETE FROM selector_psector WHERE cur_user=v_user;
 				
-						INSERT INTO selector_plan_psector (psector_id, cur_user) SELECT psector_id, v_user FROM selector_plan_psector WHERE cur_user=v_copyfromuser;
 						INSERT INTO selector_plan_result (result_id, cur_user) SELECT result_id, v_user FROM selector_plan_result WHERE cur_user=v_copyfromuser;
 						INSERT INTO selector_psector (psector_id, cur_user) SELECT psector_id, v_user FROM selector_psector WHERE cur_user=v_copyfromuser;
 
-						INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('INFO: Plan selectors have been copied (selector_plan_psector, selector_plan_result,selector_psector)'));
+						INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('INFO: Plan selectors have been copied (selector_plan_result,selector_psector)'));
 
 					END IF;					
 
