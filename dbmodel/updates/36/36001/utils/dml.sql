@@ -444,3 +444,14 @@ INSERT INTO sys_fprocess
 VALUES(489, 'Check connects with more than 1 link on service', 'utils', NULL, 'core', true, 'Check om-data', NULL);
 
 DELETE FROM sys_table WHERE id='selector_plan_psector';
+
+UPDATE config_form_tabs
+	SET orderby=3
+	WHERE formname='selector_basic' AND tabname='tab_network_state' AND device=4;
+UPDATE config_form_tabs
+	SET orderby=4
+	WHERE formname='selector_basic' AND tabname='tab_hydro_state' AND device=4;
+UPDATE config_form_tabs
+	SET orderby=2
+	WHERE formname='selector_basic' AND tabname='tab_sector' AND device=4;
+
