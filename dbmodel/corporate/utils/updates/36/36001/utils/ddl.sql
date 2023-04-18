@@ -25,4 +25,6 @@ CREATE TABLE province (
 	active bool NULL DEFAULT true,
 	CONSTRAINT ext_province_pkey PRIMARY KEY (province_id));
     
+ALTER TABLE municipality ADD COLUMN region_id integer;
+ALTER TABLE municipality ADD COLUMN province_id integer;
 
