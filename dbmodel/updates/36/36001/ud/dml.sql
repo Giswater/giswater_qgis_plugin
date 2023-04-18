@@ -278,3 +278,8 @@ inputparams = '[{"widgetname":"target", "label":"Target:", "widgettype":"combo",
   {"widgetname":"action", "label":"Action:", "widgettype":"combo", "datatype":"text", "comboIds":["DELETE-COPY", "KEEP-COPY", "DELETE-ONLY"], "comboNames":["DELETE & COPY", "KEEP & COPY", "DELETE ONLY"], "layoutname":"grl_option_parameters","layoutorder":3, "selectedId":"DELETE-ONLY"},
   {"widgetname":"copyFrom", "label":"Copy from:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT distinct(hydrology_id) as id, name as idval FROM cat_hydrology WHERE active IS TRUE", "layoutname":"grl_option_parameters", "layoutorder":4, "selectedId":"$userHydrology"}  ]'::json WHERE
 id = 3100;
+
+
+INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3232, 'gw_fct_settimeseries', 'utils', 'function', json, json, 'Set timeseries values for any objects (1st version for raingage)', 'role_epa', NULL, 'core')
+ON CONFLICT (id) DO NOTHING

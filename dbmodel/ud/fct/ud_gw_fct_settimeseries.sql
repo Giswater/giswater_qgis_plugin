@@ -1,0 +1,88 @@
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+--FUNCTION CODE: 3232
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_settimeseries(p_data json)
+ RETURNS json
+AS $BODY$
+
+/*EXAMPLE
+SELECT SCHEMA_NAME.gw_fct_settimeseries($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
+"feature":{},"data":{"timserId":"P2009_E06"}}$$);
+
+select * from inp_timeseries
+select * from raingage
+select * from config_param_user where (parameter like 'inp_options_start%' or parameter like 'inp_options_end%') and cur_user = current_user;
+
+*/
+
+DECLARE 
+
+v_project_type text;
+v_timser text;
+v_timeseries record;
+
+v_return_level integer=1;
+v_return_status text='Accepted';
+v_return_msg text;
+v_error_context text;
+v_version text;
+v_querytext text;
+
+BEGIN
+
+	-- search path
+	SET search_path = "SCHEMA_NAME", public;
+
+	-- get project type
+	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+	
+	-- get parameters
+	v_timser = json_extract_path_text(p_data,'data','timserId');
+
+	-- update raingage
+	update raingage set timser_id = v_timser;
+
+	-- set active only form current timeseries
+	update inp_timeseries set active = false;
+	update inp_timeseries set active = true where id=v_timser;
+
+	-- set start-end date-times for options 
+	select * into v_timeseries from inp_timeseries it where id = v_timser;
+
+	update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'start_date') 
+	where cur_user = current_user and parameter = 'inp_options_start_date';
+	update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'start_time')
+	where cur_user = current_user and parameter = 'inp_options_start_time';
+	update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'end_date')
+	where cur_user = current_user and parameter = 'inp_options_end_date';
+	update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'end_time')
+	where cur_user = current_user and parameter = 'inp_options_end_time';
+	update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'start_date')
+	where cur_user = current_user and parameter = 'inp_options_report_start_date';
+	update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'start_time')
+	where cur_user = current_user and parameter = 'inp_options_report_start_time';
+
+	-- Control nulls
+	v_version := COALESCE(v_version, '{}'); 
+
+	-- Return
+	RETURN gw_fct_json_create_return(('{"status":"'||v_return_status||'", "message":{"level":'||v_return_level||', "text":"'||v_return_msg||'"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}'||
+		     ',"data":{}'||
+	    '}}')::json, 3192, null, null, null);
+
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
