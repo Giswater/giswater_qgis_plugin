@@ -269,6 +269,9 @@ UPDATE config_form_fields SET iseditable= true WHERE columnname='order_id' AND f
 
 UPDATE sys_param_user SET dv_isnullvalue= true WHERE id='inp_options_dwfscenario';
 
+INSERT INTO config_function(id, function_name, "style", layermanager, actions)
+VALUES(2928, 'gw_fct_getstylemapzones', '{"DRAINZONE":{"mode":"Random", "column":"drainzone_id"}}'::json, NULL, NULL);
+
 UPDATE config_toolbox SET
 inputparams = '[{"widgetname":"target", "label":"Target:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT distinct(hydrology_id) as id, name as idval FROM cat_hydrology WHERE active IS TRUE", "layoutname":"grl_option_parameters", "layoutorder":1, "selectedId":""},
   {"widgetname":"sector", "label":"Sector:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT sector_id AS id, name as idval FROM sector JOIN selector_sector USING (sector_id) WHERE cur_user = current_user UNION SELECT -999,''ALL VISIBLE SECTORS'' ORDER BY 1 DESC", "layoutname":"grl_option_parameters","layoutorder":2, "selectedId":"$userSector"},
