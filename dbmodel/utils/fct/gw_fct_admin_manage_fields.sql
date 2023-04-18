@@ -57,8 +57,19 @@ BEGIN
 	-- check if column not exists
 	IF v_action='ADD' AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column) IS NULL THEN
 
-		v_querytext = 'ALTER TABLE '||quote_ident(v_schemaname) ||'.'|| quote_ident(v_table) ||' ADD COLUMN '||quote_ident(v_column)||' '||v_datatype;
-		EXECUTE v_querytext;
+        IF v_isutils IS FALSE THEN
+            v_querytext = 'ALTER TABLE '||quote_ident(v_schemaname) ||'.'|| quote_ident(v_table) ||' ADD COLUMN '||quote_ident(v_column)||' '||v_datatype;
+            EXECUTE v_querytext;
+        ELSIF v_isutils IS TRUE THEN
+            -- alter table from utils schema if admin_utils_schema is TRUE
+            IF (select value::boolean from config_param_system where parameter='admin_utils_schema') IS TRUE THEN
+                -- the utils schema table is assumed to have the same name except ext_
+                v_table = replace(v_table, 'ext_', '');
+                v_querytext = 'ALTER TABLE utils.'|| quote_ident(v_table) ||' ADD COLUMN '||quote_ident(v_column)||' '||v_datatype;
+            ELSE
+                v_querytext = 'ALTER TABLE '||quote_ident(v_schemaname) ||'.'|| quote_ident(v_table) ||' ADD COLUMN '||quote_ident(v_column)||' '||v_datatype;
+            END IF;
+        END IF;
 		
 	ELSIF v_action='RENAME' AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column) IS NOT NULL  
 				AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_newname) IS NULL THEN

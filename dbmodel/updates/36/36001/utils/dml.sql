@@ -455,3 +455,28 @@ UPDATE config_form_tabs
 	SET orderby=2
 	WHERE formname='selector_basic' AND tabname='tab_sector' AND device=4;
 
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, hidden)
+WITH lyt as (SELECT distinct formname, max(layoutorder) as lytorder from config_form_fields 
+where layoutname ='lyt_data_3' and formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully') group by formname)
+SELECT c.formname, formtype, tabname, 'region_id', 'lyt_data_3', lytorder+1, datatype, widgettype, 'Region', 'region_id', NULL, false, false, 
+false, false, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, null, null, true
+FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully')
+AND columnname='muni_id'
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, lytorder, hidden
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, hidden)
+WITH lyt as (SELECT distinct formname, max(layoutorder) as lytorder from config_form_fields 
+where layoutname ='lyt_data_3' and formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully') group by formname)
+SELECT c.formname, formtype, tabname, 'province_id', 'lyt_data_3', lytorder+1, datatype, widgettype, 'Province', 'province_id', NULL, false, false, 
+false, false, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, null, null, true
+FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully')
+AND columnname='muni_id'
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, lytorder, hidden
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;

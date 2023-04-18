@@ -1230,7 +1230,9 @@ CREATE OR REPLACE VIEW vu_arc  AS
     e.vel_avg,
     arc.parent_id,
     arc.expl_id2,
-    vst.is_operative
+    vst.is_operative,
+    mu.region_id,
+    mu.province_id
    FROM arc
      LEFT JOIN sector ON arc.sector_id = sector.sector_id
      LEFT JOIN exploitation ON arc.expl_id = exploitation.expl_id
@@ -1242,7 +1244,8 @@ CREATE OR REPLACE VIEW vu_arc  AS
      LEFT JOIN v_ext_streetaxis c ON c.id::text = arc.streetaxis_id::text
      LEFT JOIN v_ext_streetaxis d ON d.id::text = arc.streetaxis2_id::text
      LEFT JOIN arc_add e ON arc.arc_id::text = e.arc_id::text
-     LEFT JOIN value_state_type vst ON vst.id = state_type;
+     LEFT JOIN value_state_type vst ON vst.id = state_type
+     LEFT JOIN ext_municipality mu ON arc.muni_id = mu.muni_id;
 
 
 CREATE OR REPLACE VIEW v_arc AS 
@@ -1262,6 +1265,11 @@ SELECT * FROM v_arc;
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_arc"], "fieldName":"is_operative", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"region_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"province_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 
 CREATE OR REPLACE VIEW vu_node AS
@@ -1362,7 +1370,9 @@ CREATE OR REPLACE VIEW vu_node AS
     e.quality_min,
     e.quality_avg,
     node.expl_id2,
-    vst.is_operative
+    vst.is_operative,
+    mu.region_id,
+    mu.province_id
    FROM node
      LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
      JOIN cat_feature ON cat_feature.id::text = cat_node.nodetype_id::text
@@ -1374,7 +1384,8 @@ CREATE OR REPLACE VIEW vu_node AS
      LEFT JOIN v_ext_streetaxis a ON a.id::text = node.streetaxis_id::text
      LEFT JOIN v_ext_streetaxis b ON b.id::text = node.streetaxis2_id::text
      LEFT JOIN node_add e ON e.node_id::text = node.node_id::text
-     LEFT JOIN value_state_type vst ON vst.id = state_type;
+     LEFT JOIN value_state_type vst ON vst.id = state_type
+     LEFT JOIN ext_municipality mu ON node.muni_id = mu.muni_id;
 
 
 CREATE OR REPLACE VIEW v_node AS 
@@ -1484,7 +1495,9 @@ CREATE OR REPLACE VIEW v_edit_node AS
     v_node.quality_min, 
     v_node.quality_avg,
     v_node.expl_id2,
-    v_node.is_operative
+    v_node.is_operative,
+    v_node.region_id,
+    v_node.province_id
    FROM v_node
      LEFT JOIN man_valve USING (node_id);
 
@@ -1494,6 +1507,12 @@ SELECT * FROM v_node;
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"is_operative", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"region_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"province_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 
 
@@ -1596,7 +1615,9 @@ CREATE OR REPLACE VIEW vu_connec  AS
     e.press_avg,
     e.demand,
     connec.expl_id2,
-    vst.is_operative
+    vst.is_operative,
+    mu.region_id,
+    mu.province_id
    FROM connec
      LEFT JOIN ( SELECT connec_1.connec_id,
             count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
@@ -1616,7 +1637,8 @@ CREATE OR REPLACE VIEW vu_connec  AS
      LEFT JOIN v_ext_streetaxis c ON c.id::text = connec.streetaxis_id::text
      LEFT JOIN v_ext_streetaxis b ON b.id::text = connec.streetaxis2_id::text
      LEFT JOIN connec_add e ON e.connec_id::text = connec.connec_id::text
-     LEFT JOIN value_state_type vst ON vst.id = state_type;
+     LEFT JOIN value_state_type vst ON vst.id = state_type
+     LEFT JOIN ext_municipality mu ON connec.muni_id = mu.muni_id;
 
 
 
@@ -1719,7 +1741,9 @@ CREATE OR REPLACE VIEW v_connec AS
     crmzone_id,
     crmzone_name,
     vu_connec.expl_id2,
-    vu_connec.is_operative
+    vu_connec.is_operative,
+    vu_connec.region_id,
+    vu_connec.province_id
    FROM vu_connec
      JOIN v_state_connec USING (connec_id)
     LEFT JOIN (SELECT DISTINCT ON (feature_id) * FROM v_link_connec WHERE state = 2) a ON feature_id = connec_id;
@@ -1734,6 +1758,12 @@ SELECT * FROM v_connec;
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_connec"], "fieldName":"is_operative", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"region_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"province_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 
 CREATE OR REPLACE VIEW vu_link AS

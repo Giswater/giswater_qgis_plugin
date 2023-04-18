@@ -22,3 +22,23 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "col
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"is_operative", "dataType":"boolean", "isUtils":"False"}}$$);
 
 DROP TABLE IF EXISTS selector_plan_psector;
+
+CREATE TABLE IF NOT EXISTS ext_region (
+	region_id int4 NOT NULL,
+	name text NOT NULL,
+	descript text NULL,
+	province_id int4 NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	active bool NULL DEFAULT true,
+	CONSTRAINT ext_region_pkey PRIMARY KEY (region_id));
+
+CREATE TABLE IF NOT EXISTS ext_province (
+	province_id int4 NOT NULL,
+	name text NOT NULL,
+	descript text NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	active bool NULL DEFAULT true,
+	CONSTRAINT ext_province_pkey PRIMARY KEY (province_id));
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_municipality", "column":"region_id", "dataType":"integer", "isUtils":"True"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_municipality", "column":"province_id", "dataType":"integer", "isUtils":"True"}}$$);
