@@ -1367,7 +1367,7 @@ BEGIN
         END IF;
     END IF;
    
-    RAISE NOTICE '48 - Check connects with more than 1 link on service (489)';
+    RAISE NOTICE '48 - Check connects with more than 1 link on service (480)';
  
     IF v_project_type = 'WS' THEN
 	    v_querytext = '(SELECT connec_id, connecat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE connec_id 
@@ -1382,13 +1382,13 @@ BEGIN
     EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
     IF v_count > 0 THEN
             EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
-            SELECT 489, connec_id, connecat_id, ''Connects with more than 1 link on service'', the_geom, expl_id FROM ', v_querytext,'');
+            SELECT 480, connec_id, connecat_id, ''Connects with more than 1 link on service'', the_geom, expl_id FROM ', v_querytext,'');
 
         INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-        VALUES (125, 2, '489',concat('WARNING-489 (anl_connec): There is/are ',v_count,' connects with more than 1 link on service'),v_count);
+        VALUES (125, 2, '480',concat('WARNING-480 (anl_connec): There is/are ',v_count,' connects with more than 1 link on service'),v_count);
     ELSE
         INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-        VALUES (125, 1, '489', 'INFO: No connects with more than 1 link on service',v_count);
+        VALUES (125, 1, '480', 'INFO: No connects with more than 1 link on service',v_count);
     END IF;
 
 
@@ -1430,7 +1430,7 @@ BEGIN
 	AND fid IN (106,177,187,202,442,443)
 	UNION
 	SELECT connec_id, connecat_id, state, expl_id, descript, fid, the_geom FROM anl_connec WHERE cur_user="current_user"()
-	AND fid IN (210,201,202,204,205,291,478,488,489)) row) features;
+	AND fid IN (210,201,202,204,205,291,478,488,480)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 

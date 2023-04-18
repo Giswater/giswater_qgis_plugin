@@ -804,22 +804,6 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '427', 1, 'INFO: All arcs have matcat_id filled.',v_count);
 	END IF;	
-	
-	RAISE NOTICE '34 - Check duplicated connec on visible psectors';
-	SELECT count(*) INTO v_count FROM (SELECT feature_id, count(*) from v_edit_link group by feature_id having count(*) > 1)a;
-
-	IF v_count > 0 THEN
-		INSERT INTO anl_connec (connec_id, fid, the_geom) select feature_id, 480, connec.the_geom from v_edit_link 
-		JOIN connec ON connec_id = feature_id group by feature_id, connec.the_geom having count(*) > 1;
-		
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '480', 3, concat(
-		'ERROR-480 (anl_connec): There is/are ',v_count,' connecs more than once because related psectors are visible.'),v_count);
-		v_count=0;
-	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '480', 1, 'INFO: All connecs are unique on canvas because there are not psector inconsistencies.',v_count);
-	END IF;	
 
 	RAISE NOTICE '35 - Check percentage of arcs with custom_length values';
 	WITH cust_len AS (SELECT count(*) FROM v_edit_arc WHERE custom_length IS NOT NULL), arcs AS (SELECT count(*) FROM v_edit_arc)
