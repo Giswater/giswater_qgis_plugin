@@ -17,7 +17,7 @@ SET client_min_messages = warning;
 
 CREATE SCHEMA utils;
 
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
+SET search_path = "utils", public, pg_catalog;
 
 -- ----------------------------
 -- TABLES
