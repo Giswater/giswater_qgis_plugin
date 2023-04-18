@@ -32,20 +32,19 @@ BEGIN
 		IF NEW.active IS NULL THEN
 			NEW.active = TRUE;
 		END IF;
-			
-		INSERT INTO drainzone (drainzone_id, name, expl_id, macrodma_id, descript, undelete, the_geom, minc, maxc, effc, pattern_id, link, graphconfig, stylesheet, 
-    active, avg_press)
-		VALUES (NEW.drainzone_id, NEW.name, NEW.expl_id, NEW.macrodma_id, NEW.descript, NEW.undelete, NEW.the_geom, NEW.minc, NEW.maxc, NEW.effc, NEW.pattern_id, 
-		NEW.link, NEW.graphconfig, NEW.stylesheet, NEW.active, NEW.avg_press);
+	
+		INSERT INTO drainzone (drainzone_id, "name", expl_id, descript, undelete, the_geom, link, graphconfig, stylesheet, active)
+		VALUES (NEW.drainzone_id, NEW.name, NEW.expl_id, NEW.descript, NEW.undelete, NEW.the_geom, 
+		NEW.link, NEW.graphconfig, NEW.stylesheet, NEW.active);
 
 		RETURN NEW;
 		
 	ELSIF TG_OP = 'UPDATE' THEN
    	
 		UPDATE drainzone 
-		SET drainzone_id=NEW.drainzone_id, name=NEW.name, expl_id=NEW.expl_id, macrodma_id=NEW.macrodma_id, descript=NEW.descript, undelete=NEW.undelete, the_geom=NEW.the_geom, 
-		minc=NEW.minc, maxc=NEW.maxc, effc=NEW.effc, pattern_id=NEW.pattern_id, link=NEW.link, graphconfig=NEW.graphconfig, stylesheet=NEW.stylesheet,
-		active=NEW.active, avg_press=NEW.avg_press
+		SET drainzone_id=NEW.drainzone_id, name=NEW.name, expl_id=NEW.expl_id, descript=NEW.descript, undelete=NEW.undelete, the_geom=NEW.the_geom, 
+		link=NEW.link, graphconfig=NEW.graphconfig, stylesheet=NEW.stylesheet,
+		active=NEW.active
 		WHERE drainzone_id=OLD.drainzone_id;
 		
 		RETURN NEW;
