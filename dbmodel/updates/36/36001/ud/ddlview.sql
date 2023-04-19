@@ -959,8 +959,7 @@ AS SELECT DISTINCT t.timser_id,
                      JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
                   WHERE inp_timeseries.times_type::text = 'RELATIVE'::text and active) a
           ORDER BY a.id) t
-  WHERE (t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL) AND (t.timser_id::text IN ( SELECT raingage.timser_id
-           FROM raingage))
+  WHERE (t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL) 
   ORDER BY t.timser_id, t.other1, t.other2;
   
   

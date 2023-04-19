@@ -108,6 +108,7 @@ BEGIN
 	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Hours' and csv2='Above';
 	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Node' and csv2='Type';
 	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum'  and csv1='nodes' or csv2='nodes';
+	DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='No' and csv2='nodes';
 
 	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Node' and csv2='Flooding';
 	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Flooding' and csv2='refers';
@@ -116,6 +117,7 @@ BEGIN
 	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Node' and csv2='Flooded';
 	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Total' and csv2='Maximum';
 	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='nodes' or csv2='nodes';
+	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='No' and csv2='nodes';
 
 	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Storage' and csv2='Volume';
 	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Average' and csv2='Avg';
@@ -146,6 +148,7 @@ BEGIN
 	DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Hours' and csv2='Hours';
 	DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Conduit' and csv2='Both';
 	DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Pollutant';
+	DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='No' and csv2='conduits';
 	DELETE FROM temp_csv WHERE id >= (SELECT id FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv2='Pollutant'and csv3='Load')
 				AND id <= (SELECT id FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Link'and csv2='kg');	
 
@@ -364,9 +367,9 @@ BEGIN
 			
 		ELSIF type_aux='rpt_nodeinflow_sum' then
 			INSERT INTO rpt_nodeinflow_sum(result_id, node_id, swnod_type, max_latinf, max_totinf, time_days, 
-			time_hour, latinf_vol, totinf_vol, flow_balance_error, other_info)
+			time_hour, flow_balance_error, other_info)
 			VALUES (v_result_id,rpt_rec.csv1,rpt_rec.csv2,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5,rpt_rec.csv6,
-			rpt_rec.csv7::numeric,rpt_rec.csv8::numeric,rpt_rec.csv9::numeric,rpt_rec.csv10);
+			rpt_rec.csv9::numeric,rpt_rec.csv10);
 
 		ELSIF type_aux='rpt_nodesurcharge_sum' then
 			INSERT INTO rpt_nodesurcharge_sum(result_id, node_id, swnod_type, hour_surch, max_height, min_depth)

@@ -5,14 +5,13 @@ This version of Giswater is provided by Giswater Association
 */
 
 --FUNCTION CODE: 3232
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_settimeseries(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_settimeseries(v_timser character varying)
  RETURNS json
 AS $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_settimeseries($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
-"feature":{},"data":{"timserId":"P2009_E06"}}$$);
+
+SELECT SCHEMA_NAME.gw_fct_settimeseries('P2009_E06');
 
 select * from inp_timeseries
 select * from raingage
@@ -23,7 +22,6 @@ select * from config_param_user where (parameter like 'inp_options_start%' or pa
 DECLARE 
 
 v_project_type text;
-v_timser text;
 v_timeseries record;
 
 v_return_level integer=1;
@@ -40,9 +38,6 @@ BEGIN
 
 	-- get project type
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-	
-	-- get parameters
-	v_timser = json_extract_path_text(p_data,'data','timserId');
 
 	-- update raingage
 	update raingage set timser_id = v_timser;
@@ -50,6 +45,10 @@ BEGIN
 	-- set active only form current timeseries
 	update inp_timeseries set active = false;
 	update inp_timeseries set active = true where id=v_timser;
+
+	-- disable setallraingages
+	update config_param_user set value = null 
+	where cur_user = current_user and parameter = 'inp_options_setallraingages';
 
 	-- set start-end date-times for options 
 	select * into v_timeseries from inp_timeseries it where id = v_timser;
