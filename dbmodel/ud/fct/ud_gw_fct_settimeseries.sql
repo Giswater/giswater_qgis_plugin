@@ -39,8 +39,11 @@ BEGIN
 	-- get project type
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
+	-- set start-end date-times for options 
+	select * into v_timeseries from inp_timeseries it where id = v_timser;
+
 	-- update raingage
-	update raingage set timser_id = v_timser;
+	update raingage set timser_id = v_timser, form_type = json_extract_path_text(v_timeseries.addparam,'type') ;
 
 	-- set active only form current timeseries
 	update inp_timeseries set active = false;
@@ -49,9 +52,6 @@ BEGIN
 	-- disable setallraingages
 	update config_param_user set value = null 
 	where cur_user = current_user and parameter = 'inp_options_setallraingages';
-
-	-- set start-end date-times for options 
-	select * into v_timeseries from inp_timeseries it where id = v_timser;
 
 	update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'start_date') 
 	where cur_user = current_user and parameter = 'inp_options_start_date';
