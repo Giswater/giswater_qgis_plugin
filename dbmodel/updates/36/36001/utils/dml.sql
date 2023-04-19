@@ -466,7 +466,6 @@ group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label
 iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
-
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, hidden)
 WITH lyt as (SELECT distinct formname, max(layoutorder) as lytorder from config_form_fields 
@@ -478,3 +477,11 @@ AND columnname='muni_id'
 group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
 iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+INSERT INTO sys_table(id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", style_id, addparam)
+VALUES('ext_region', 'Table of regions', 'role_edit', 2, '{"level_1":"INVENTORY","level_2":"MAP ZONES"}', 10, 'Region', NULL, NULL, NULL, 'core', NULL, NULL);
+
+INSERT INTO sys_table(id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", style_id, addparam)
+VALUES('ext_province', 'Table of provinces', 'role_edit', 2, '{"level_1":"INVENTORY","level_2":"MAP ZONES"}', 11, 'Province', NULL, NULL, NULL, 'core', NULL, NULL);
+
