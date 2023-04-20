@@ -146,7 +146,7 @@ BEGIN
 				FOR v_link IN SELECT l.* FROM v_edit_connec c JOIN link l on feature_id = connec_id WHERE l.state = 1 and arc_id = v_id AND c.state > 0 AND exit_type <> 'NODE'
 				LOOP
 					INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable, link_id)
-					VALUES (v_currentpsector, v_link.feature_id, v_arc, 0, false, v_link.link_id)
+					VALUES (v_currentpsector, v_link.feature_id, rec.arc_id, 0, false, v_link.link_id)
 					ON CONFLICT (connec_id, psector_id, state) DO NOTHING;
 
 					IF v_project_type = 'WS' THEN
@@ -171,7 +171,7 @@ BEGIN
 					FOR v_link IN SELECT l.* FROM v_edit_gully c JOIN link l on feature_id = gully_id WHERE l.state = 1 and arc_id = v_id AND c.state > 0 AND exit_type <> 'NODE'
 					LOOP
 						INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable, link_id)
-						VALUES (v_currentpsector, v_link.feature_id, v_arc, 0, false, v_link.link_id)
+						VALUES (v_currentpsector, v_link.feature_id, rec.arc_id, 0, false, v_link.link_id)
 						ON CONFLICT (gully_id, psector_id, state) DO NOTHING;
 
 						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, state, expl_id, the_geom, sector_id, dma_id, fluid_type)
