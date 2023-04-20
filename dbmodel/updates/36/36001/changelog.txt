@@ -5,3 +5,9 @@
 - New process to check existing connects with more than 1 link on service
 - Drop obsolete table selector_plan_psector
 - Add region and province tables and add region_id and province_id fields to municipality and inventory tables
+- Add new fields on inventory tables for UD: 
+    - node, arc, connec, gully: adate, adescript
+    - gully: siphon_type, odorflap
+    - man_manhole, man_conduit: bottom_mat
+    - man_chamber: bottom_mat, slope
+    - cat_arc: visitability

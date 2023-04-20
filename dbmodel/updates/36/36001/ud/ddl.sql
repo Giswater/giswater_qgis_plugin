@@ -23,3 +23,24 @@ ALTER TABLE inp_timeseries ALTER column active SET default true;
 ALTER TABLE inp_curve ALTER column active SET default true;
 ALTER TABLE inp_lid ALTER column active SET default true;
 ALTER TABLE inp_pattern ALTER column active SET default true;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_conduit", "column":"bottom_mat", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_chamber", "column":"bottom_mat", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_manhole", "column":"bottom_mat", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_chamber", "column":"slope", "dataType":"numeric", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"adate", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"adescript", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"siphon_type", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"odorflap", "dataType":"text", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"adate", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"adescript", "dataType":"text", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"adate", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"adescript", "dataType":"text", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"adate", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"adescript", "dataType":"text", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_arc", "column":"visitability", "dataType":"boolean", "isUtils":"False"}}$$);

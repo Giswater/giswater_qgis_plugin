@@ -403,7 +403,7 @@ BEGIN
 			annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, 
 			builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, district_id, streetaxis2_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, link, verified, 
 			the_geom,undelete,label_x,label_y, label_rotation, expl_id, publish, inventory, uncertain, num_value, lastupdate, lastupdate_user, asset_id, pavcat_id, 
-			drainzone_id, parent_id, expl_id2) 
+			drainzone_id, parent_id, expl_id2, adate, adescript) 
 			VALUES (NEW.arc_id, NEW.code, NEW.node_1, NEW.node_2, NEW.y1, NEW.y2, NEW.custom_y1, NEW.custom_y2, NEW.elev1, NEW.elev2, 
 			NEW.custom_elev1, NEW.custom_elev2,NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, 
 			NEW.inverted_slope, NEW.custom_length, NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, 
@@ -411,13 +411,13 @@ BEGIN
 			NEW.muni_id, v_streetaxis,  NEW.postcode, NEW.district_id, v_streetaxis2, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x, 
 			NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.pavcat_id,
-			NEW.drainzone_id, NEW.parent_id, NEW.expl_id2);
+			NEW.drainzone_id, NEW.parent_id, NEW.expl_id2, NEW.adate, NEW.adescript);
 		ELSE
 			INSERT INTO arc (arc_id, code, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
 			annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, 
 			builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, district_id, streetaxis2_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, link, verified, 
 			the_geom,undelete,label_x,label_y, label_rotation, expl_id, publish, inventory,	uncertain, num_value, matcat_id, lastupdate, lastupdate_user, asset_id, pavcat_id,
-			drainzone_id, parent_id, expl_id2) 
+			drainzone_id, parent_id, expl_id2, adate, adescript) 
 			VALUES (NEW.arc_id, NEW.code, NEW.y1, NEW.y2, NEW.custom_y1, NEW.custom_y2, NEW.elev1, NEW.elev2, 
 			NEW.custom_elev1, NEW.custom_elev2,NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, 
 			NEW.inverted_slope, NEW.custom_length, NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, 
@@ -425,7 +425,7 @@ BEGIN
 			NEW.muni_id, v_streetaxis,  NEW.postcode, NEW.district_id, v_streetaxis2, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x, 
 			NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.matcat_id, NEW.lastupdate, NEW.lastupdate_user, 
-			NEW.asset_id, NEW.pavcat_id, NEW.drainzone_id, NEW.parent_id, NEW.expl_id2);		
+			NEW.asset_id, NEW.pavcat_id, NEW.drainzone_id, NEW.parent_id, NEW.expl_id2, NEW.adate, NEW.adescript);		
 		END IF;
 		
 		-- this overwrites triger topocontrol arc values (triggered before insertion) just in that moment: In order to make more profilactic this issue only will be overwrited in case of NEW.node_* not nulls
@@ -440,7 +440,7 @@ BEGIN
 			
 		IF v_man_table='man_conduit' THEN
 			
-			INSERT INTO man_conduit VALUES (NEW.arc_id, NEW.inlet_offset);
+			INSERT INTO man_conduit VALUES (NEW.arc_id, NEW.inlet_offset, NEW.bottom_mat);
 		
 		ELSIF v_man_table='man_siphon' THEN
 							
@@ -652,7 +652,7 @@ BEGIN
 			verified=NEW.verified, undelete=NEW.undelete,label_x=NEW.label_x,
 			label_y=NEW.label_y, label_rotation=NEW.label_rotation,workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, 
 			enddate=NEW.enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id, num_value = NEW.num_value,lastupdate=now(), lastupdate_user=current_user,
-			asset_id=NEW.asset_id, pavcat_id=NEW.pavcat_id, drainzone_id=NEW.drainzone_id, parent_id=NEW.parent_id, expl_id2=NEW.expl_id2
+			asset_id=NEW.asset_id, pavcat_id=NEW.pavcat_id, drainzone_id=NEW.drainzone_id, parent_id=NEW.parent_id, expl_id2=NEW.expl_id2, adate=NEW.adate, adescript=NEW.adescript
 			WHERE arc_id=OLD.arc_id;	
 		ELSE
 			UPDATE arc
@@ -664,14 +664,14 @@ BEGIN
 			postnumber2=NEW.postnumber2,  descript=NEW.descript, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete,label_x=NEW.label_x,
 			label_y=NEW.label_y, label_rotation=NEW.label_rotation,workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, 
 			enddate=NEW.enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id, num_value = NEW.num_value,lastupdate=now(), lastupdate_user=current_user, matcat_id=NEW.matcat_id,
-			asset_id=NEW.asset_id, pavcat_id=NEW.pavcat_id, drainzone_id=NEW.drainzone_id, parent_id=NEW.parent_id, expl_id2=NEW.expl_id2
+			asset_id=NEW.asset_id, pavcat_id=NEW.pavcat_id, drainzone_id=NEW.drainzone_id, parent_id=NEW.parent_id, expl_id2=NEW.expl_id2, adate=NEW.adate, adescript=NEW.adescript
 			WHERE arc_id=OLD.arc_id;	
 		END IF;
 
 		-- child tables fields
 		IF v_man_table='man_conduit' THEN
 
-			UPDATE man_conduit SET arc_id=NEW.arc_id, inlet_offset = NEW.inlet_offset WHERE arc_id=OLD.arc_id;
+			UPDATE man_conduit SET arc_id=NEW.arc_id, inlet_offset = NEW.inlet_offset, bottom_mat=NEW.bottom_mat WHERE arc_id=OLD.arc_id;
 			
 		ELSIF v_man_table='man_siphon' THEN			
 

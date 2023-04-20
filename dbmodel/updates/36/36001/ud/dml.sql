@@ -282,4 +282,92 @@ id = 3100;
 
 INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
 VALUES (3232, 'gw_fct_settimeseries', 'utils', 'function', 'varchar', 'json', 'Set timeseries values for any objects (1st version for raingage)', 'role_epa', NULL, 'core')
-ON CONFLICT (id) DO NOTHING
+ON CONFLICT (id) DO NOTHING;
+
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate,  hidden)
+SELECT distinct child_layer, formtype, tabname, 'bottom_mat', 'lyt_data_1', max(layoutorder)+1, 
+'string', 'text', 'bottom_mat', 'bottom_mat',  false, false, true, false, true
+FROM cat_feature
+join config_form_fields on formname = child_layer
+WHERE  system_id ilike 'CONDUIT' group by child_layer,formname,formtype, tabname ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate,  hidden)
+SELECT distinct child_layer, formtype, tabname, 'bottom_mat', 'lyt_data_1', max(layoutorder)+1, 
+'string', 'text', 'bottom_mat', 'bottom_mat',  false, false, true, false, true
+FROM cat_feature
+join config_form_fields on formname = child_layer
+WHERE  system_id ilike 'CHAMBER' group by child_layer,formname,formtype, tabname ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate,  hidden)
+SELECT distinct child_layer, formtype, tabname, 'bottom_mat', 'lyt_data_1', max(layoutorder)+1, 
+'string', 'text', 'bottom_mat', 'bottom_mat',  false, false, true, false, true
+FROM cat_feature
+join config_form_fields on formname = child_layer
+WHERE  system_id ilike 'MANHOLE' group by child_layer,formname,formtype, tabname ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate,  hidden)
+SELECT distinct child_layer, formtype, tabname, 'slope', 'lyt_data_2', max(layoutorder)+1, 
+'string', 'text', 'slope', 'slope',  false, false, true, false, true
+FROM cat_feature
+join config_form_fields on formname = child_layer
+WHERE  system_id ilike 'CHAMBER' group by child_layer,formname,formtype, tabname ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, hidden)
+WITH lyt as (SELECT distinct formname, max(layoutorder) as lytorder from config_form_fields 
+where layoutname ='lyt_data_2' and formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully') group by formname)
+SELECT c.formname, formtype, tabname, 'adate', 'lyt_data_2', lytorder+1, datatype, widgettype, 'Adate', 'adate', NULL, false, false, true, false, true
+FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully')
+AND columnname='observ'
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, lytorder, hidden
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, hidden)
+WITH lyt as (SELECT distinct formname, max(layoutorder) as lytorder from config_form_fields 
+where layoutname ='lyt_data_2' and formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully') group by formname)
+SELECT c.formname, formtype, tabname, 'adescript', 'lyt_data_2', lytorder+1, datatype, widgettype, 'Adescript', 'adescript', NULL, false, false, true, false, true
+FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully')
+AND columnname='observ'
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+iseditable, isautoupdate, lytorder, hidden
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, hidden)
+WITH lyt as (SELECT distinct formname, max(layoutorder) as lytorder from config_form_fields 
+where layoutname ='lyt_data_2' and formname  in ('v_edit_gully', 've_gully') group by formname)
+SELECT c.formname, formtype, tabname, 'siphon_type', 'lyt_data_2', lytorder+1, datatype, widgettype, 'Siphon_type', 'siphon_type', NULL, false, false, true, false, true
+FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_gully', 've_gully') AND columnname='observ'
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+iseditable, isautoupdate, lytorder, hidden
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, hidden)
+WITH lyt as (SELECT distinct formname, max(layoutorder) as lytorder from config_form_fields 
+where layoutname ='lyt_data_2' and formname  in ('v_edit_gully', 've_gully') group by formname)
+SELECT c.formname, formtype, tabname, 'odorflap', 'lyt_data_2', lytorder+1, datatype, widgettype, 'Odorflap', 'odorflap', NULL, false, false, true, false, true
+FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_gully', 've_gully') AND columnname='observ'
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+iseditable, isautoupdate, lytorder, hidden
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, hidden)
+WITH lyt as (SELECT distinct formname, max(layoutorder) as lytorder from config_form_fields 
+where layoutname ='lyt_data_2' and formname  in ('v_edit_arc', 've_arc') group by formname)
+SELECT c.formname, formtype, tabname, 'visitability', 'lyt_data_2', lytorder+1, datatype, widgettype, 'Visitability', 'visitability', NULL, false, false, false, false, true
+FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_arc', 've_arc') AND columnname='inventory'
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+iseditable, isautoupdate, lytorder, hidden
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;

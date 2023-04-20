@@ -541,27 +541,27 @@ BEGIN
 			dma_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id,
 			muni_id, streetaxis_id, postcode, district_id, streetaxis2_id,postnumber, postnumber2, postcomplement, postcomplement2, descript,rotation,link,verified,
 			undelete,label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value, lastupdate, lastupdate_user,
-			asset_id, drainzone_id, parent_id, arc_id, expl_id2)
+			asset_id, drainzone_id, parent_id, arc_id, expl_id2, adate, adescript)
 			VALUES (NEW.node_id,NEW.code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax, NEW. custom_ymax, NEW. elev, NEW. custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id, 
 			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,NEW.dma_id,NEW.soilcat_id, NEW. function_type, NEW.category_type,NEW.fluid_type,NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id,NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.muni_id, v_streetaxis, NEW.postcode, NEW.district_id,v_streetaxis2,NEW.postnumber,NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation,NEW.link, NEW.verified, NEW.undelete, NEW.label_x,NEW.label_y,NEW.label_rotation,NEW.the_geom,
 			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value, NEW.lastupdate, NEW.lastupdate_user,
-			NEW.asset_id, NEW.drainzone_id, NEW.parent_id, NEW.arc_id, NEW.expl_id2);	
+			NEW.asset_id, NEW.drainzone_id, NEW.parent_id, NEW.arc_id, NEW.expl_id2, NEW.adate, NEW.adescript);	
 		ELSE
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
 			dma_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id,
 			muni_id, streetaxis_id, postcode, district_id, streetaxis2_id,postnumber, postnumber2, postcomplement, postcomplement2, descript,rotation,link,verified,
 			undelete,label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value, lastupdate, lastupdate_user, matcat_id,
-			asset_id, drainzone_id, parent_id, arc_id, expl_id2)
+			asset_id, drainzone_id, parent_id, arc_id, expl_id2, adate, adescript)
 			VALUES (NEW.node_id,NEW.code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax, NEW. custom_ymax, NEW. elev, NEW. custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id, 
 			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,NEW.dma_id,NEW.soilcat_id, NEW. function_type, NEW.category_type,NEW.fluid_type,NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id,NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.muni_id, v_streetaxis, NEW.postcode, NEW.district_id, v_streetaxis2,NEW.postnumber,NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation,NEW.link, NEW.verified, NEW.undelete, NEW.label_x,NEW.label_y,NEW.label_rotation,NEW.the_geom,
 			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value,  NEW.lastupdate, NEW.lastupdate_user,NEW.matcat_id,
-			NEW.asset_id, NEW.drainzone_id, NEW.parent_id, NEW.arc_id, NEW.expl_id2);	
+			NEW.asset_id, NEW.drainzone_id, NEW.parent_id, NEW.arc_id, NEW.expl_id2, NEW.adate, NEW.adescript);	
 		END IF;
 		
 		--check if feature is double geom	
@@ -600,15 +600,15 @@ BEGIN
 									 			
 		ELSIF v_man_table='man_chamber' THEN
 
-			INSERT INTO man_chamber (node_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name)
+			INSERT INTO man_chamber (node_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name, bottom_mat, slope)
 			VALUES (NEW.node_id, NEW.length,NEW.width, NEW.sander_depth, NEW.max_volume, NEW.util_volume, 
-			NEW.inlet, NEW.bottom_channel, NEW.accessibility,NEW.name);
+			NEW.inlet, NEW.bottom_channel, NEW.accessibility,NEW.name, NEW.bottom_mat, NEW.slope);
 						
 		ELSIF v_man_table='man_manhole' THEN
 		
-			INSERT INTO man_manhole (node_id,length, width, sander_depth,prot_surface, inlet, bottom_channel, accessibility, step_pp, step_fe, step_replace, cover) 
+			INSERT INTO man_manhole (node_id,length, width, sander_depth, prot_surface, inlet, bottom_channel, accessibility, step_pp, step_fe, step_replace, cover, bottom_mat) 
 			VALUES (NEW.node_id,NEW.length, NEW.width, NEW.sander_depth,NEW.prot_surface, NEW.inlet, NEW.bottom_channel, NEW.accessibility, NEW.step_pp, NEW.step_fe, 
-			NEW.step_replace, NEW.cover);	
+			NEW.step_replace, NEW.cover, NEW.bottom_mat);	
 		
 		ELSIF v_man_table='man_netinit' THEN
 			
@@ -826,7 +826,7 @@ BEGIN
 			streetaxis2_id=v_streetaxis2, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, descript=NEW.descript, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete, 
 			label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, rotation=NEW.rotation, uncertain=NEW.uncertain,
 			xyz_date=NEW.xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user,
-			asset_id=NEW.asset_id, drainzone_id=NEW.drainzone_id, parent_id=NEW.parent_id, arc_id = NEW.arc_id, expl_id2=NEW.expl_id2
+			asset_id=NEW.asset_id, drainzone_id=NEW.drainzone_id, parent_id=NEW.parent_id, arc_id = NEW.arc_id, expl_id2=NEW.expl_id2, adate=NEW.adate, adescript=NEW.adescript
 			WHERE node_id = OLD.node_id;
 		ELSE
 			UPDATE node 
@@ -838,7 +838,7 @@ BEGIN
 			streetaxis2_id=v_streetaxis2, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, descript=NEW.descript, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete, 
 			label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, rotation=NEW.rotation, uncertain=NEW.uncertain,
 			xyz_date=NEW.xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user, matcat_id = NEW.matcat_id,
-			asset_id=NEW.asset_id, drainzone_id=NEW.drainzone_id, parent_id=NEW.parent_id, arc_id = NEW.arc_id, expl_id2=NEW.expl_id2
+			asset_id=NEW.asset_id, drainzone_id=NEW.drainzone_id, parent_id=NEW.parent_id, arc_id = NEW.arc_id, expl_id2=NEW.expl_id2, adate=NEW.adate, adescript=NEW.adescript
 			WHERE node_id = OLD.node_id;		
 		END IF;
 			
@@ -873,13 +873,13 @@ BEGIN
 		
 		ELSIF v_man_table='man_chamber' THEN
 			UPDATE man_chamber SET length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, max_volume=NEW.max_volume, util_volume=NEW.util_volume,
-			inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility, name=NEW.name
+			inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility, name=NEW.name, bottom_mat=NEW.bottom_mat, slope=NEW.slope
 			WHERE node_id=OLD.node_id;
 			
 		ELSIF v_man_table='man_manhole' THEN
 			UPDATE man_manhole SET length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, prot_surface=NEW.prot_surface, 
 			inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility,
-			step_pp=NEW.step_pp, step_fe=NEW.step_fe, step_replace=NEW.step_replace, cover=NEW.cover
+			step_pp=NEW.step_pp, step_fe=NEW.step_fe, step_replace=NEW.step_replace, cover=NEW.cover, bottom_mat=NEW.bottom_mat
 			WHERE node_id=OLD.node_id;
 			
 		ELSIF v_man_table='man_netinit' THEN

@@ -167,7 +167,10 @@ CREATE OR REPLACE VIEW vu_arc AS
     arc.expl_id2,
     vst.is_operative,
     mu.region_id,
-    mu.province_id
+    mu.province_id,
+    arc.adate,
+    arc.adescript,
+    cat_arc.visitability
    FROM arc
      JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
      JOIN cat_feature ON arc.arc_type::text = cat_feature.id::text
@@ -200,6 +203,15 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_arc"], "fieldName":"province_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"adate", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"adescript", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "fieldName":"visitability", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 
 
@@ -285,7 +297,9 @@ CREATE OR REPLACE VIEW vu_connec AS
     connec.expl_id2,
     vst.is_operative,
     mu.region_id,
-    mu.province_id
+    mu.province_id,
+    connec.adate,
+    connec.adescript
    FROM connec
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
@@ -393,7 +407,9 @@ CREATE OR REPLACE VIEW v_connec AS
     vu_connec.expl_id2,
     vu_connec.is_operative,
     vu_connec.region_id,
-    vu_connec.province_id
+    vu_connec.province_id,
+    vu_connec.adate,
+    vu_connec.adescript
    FROM vu_connec
      JOIN v_state_connec USING (connec_id)
      LEFT JOIN ( SELECT DISTINCT ON (v_link_connec.feature_id) v_link_connec.link_id,
@@ -431,6 +447,12 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_connec"], "fieldName":"province_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"adate", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_connec"], "fieldName":"adescript", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 
 
@@ -527,7 +549,11 @@ CREATE OR REPLACE VIEW vu_gully
     gully.expl_id2,
     vst.is_operative,
     mu.region_id,
-    mu.province_id
+    mu.province_id,
+    gully.adate,
+    gully.adescript,
+    gully.siphon_type,
+    gully.odorflap
    FROM gully
      LEFT JOIN cat_grate ON gully.gratecat_id::text = cat_grate.id::text
      LEFT JOIN dma ON gully.dma_id = dma.dma_id
@@ -627,7 +653,11 @@ CREATE OR REPLACE VIEW v_gully AS
     vu_gully.expl_id2,
     vu_gully.is_operative,
     vu_gully.region_id,
-    vu_gully.province_id
+    vu_gully.province_id,
+    vu_gully.adate,
+    vu_gully.adescript,
+    vu_gully.siphon_type,
+    vu_gully.odorflap
    FROM vu_gully
      JOIN v_state_gully USING (gully_id)
      LEFT JOIN ( SELECT DISTINCT ON (v_link_gully.feature_id) v_link_gully.link_id,
@@ -665,6 +695,18 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_gully"], "fieldName":"province_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_gully"], "fieldName":"adate", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_gully"], "fieldName":"adescript", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_gully"], "fieldName":"siphon_type", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_gully"], "fieldName":"odorflap", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 
 CREATE OR REPLACE VIEW vu_node AS
@@ -758,7 +800,9 @@ CREATE OR REPLACE VIEW vu_node AS
             node.expl_id2,
             vst.is_operative,
             mu.region_id,
-            mu.province_id
+            mu.province_id,
+            node.adate,
+            node.adescript
            FROM node
              LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
              LEFT JOIN cat_feature ON cat_feature.id::text = node.node_type::text
@@ -852,7 +896,9 @@ CREATE OR REPLACE VIEW vu_node AS
     vu_node.expl_id2,
     vu_node.is_operative,
     vu_node.region_id,
-    vu_node.province_id
+    vu_node.province_id,
+    vu_node.adate,
+    vu_node.adescript
    FROM vu_node;
 
 
@@ -875,6 +921,12 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"province_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"adate", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "fieldName":"adescript", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 
 CREATE OR REPLACE VIEW vu_link AS
@@ -1084,3 +1136,16 @@ AS SELECT a.lidco_id,
              LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_lid_value.lidlayer::text
           WHERE active and inp_typevalue.typevalue::text = 'inp_value_lidlayer'::text) a
   ORDER BY a.lidco_id, a.id;
+  
+  
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "systemId":"CONDUIT","fieldName":"bottom_mat", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_arc"], "systemId":"CHAMBER","fieldName":"bottom_mat", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "systemId":"MANHOLE","fieldName":"bottom_mat", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "systemId":"CHAMBER","fieldName":"slope", "action":"ADD-FIELD","hasChilds":"True"}}$$);
