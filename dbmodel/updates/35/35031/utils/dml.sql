@@ -80,9 +80,6 @@ INSERT INTO sys_function(id, function_name, project_type, function_type, descrip
 VALUES (3182, 'gw_trg_plan_psector', 'utils', 'trigger function', 
 'Trigger to update active value on plan_psector_x_* tables using plan_psector active value', 'role_master', 'core');
 
-UPDATE link SET exit_id = arc_id FROM connec c WHERE connec_id = feature_id AND exit_type  ='ARC';
-UPDATE link SET exit_type = 'ARC' WHERE exit_type  ='VNODE';
-
 
 DELETE FROM sys_function where function_name = 'gw_trg_node_update';
 
@@ -333,4 +330,3 @@ VALUES ('selector_basic','tab_macroexploitation_add','Macroexpl Add','role_basic
 
 UPDATE config_form_tableview SET columnindex = columnindex + 1 WHERE location_type = 'epa_toolbar';
 
-UPDATE link SET exit_id = arc_id FROM connec c WHERE connec_id = feature_id and c.state > 0 AND exit_type  ='ARC';
