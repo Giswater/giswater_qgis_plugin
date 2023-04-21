@@ -14,7 +14,7 @@ AS $function$
 /*EXAMPLE:
 SELECT SCHEMA_NAME.gw_fct_gettoolbox($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
-"data":{"isToolbox":false, "function":2522, "filterText":"Import inp epanet file"}}$$)
+"data":{"filterText":"Import inp epanet file"}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_gettoolbox($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
@@ -233,116 +233,7 @@ BEGIN
 	'epa', v_reports_epa,
 	'master', v_reports_master,
 	'admin', v_reports_admin)) INTO v_reports;
-	
-	/*
-	-- refactor dvquerytext			
-	FOR rec IN SELECT json_array_elements(inputparams::json) as inputparams
-	FROM sys_function JOIN config_toolbox USING (id) 
-	WHERE alias = v_filter  AND config_toolbox.active IS TRUE AND (project_type=v_projectype OR project_type='utils')
-	LOOP
-		v_querytext = rec.inputparams::json->>'dvQueryText';
 
-		v_value =  rec.inputparams::json->>'value';
-
-		IF v_querytext IS NOT NULL THEN
-
-			IF v_querytext ilike '%$userNodetype%' THEN
-				v_querytext_mod = REPLACE (v_querytext::text, '$userNodetype', quote_literal(v_nodetype));
-			ELSE 
-				v_querytext_mod = v_querytext;
-			END IF;
-		
-			v_selectedid = rec.inputparams::json->>'selectedId';
-
-			v_querytext = concat('SELECT array_agg(id::text) FROM (',v_querytext_mod,')a');
-			v_debug_vars := json_build_object('v_querytext_mod', v_querytext_mod);
-			v_debug := json_build_object('querystring', v_querytext, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 60);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-	 
-			EXECUTE v_querytext INTO v_arrayresult;
-	
-			IF (rec.inputparams::json->>'isNullValue')::boolean IS TRUE THEN
-				v_arrayresult = array_prepend('',v_arrayresult);
-			END IF;
-
-			IF v_selectedid ~ '^[0-9]+$'THEN
-				
-				v_selectedid = concat('"selectedId":"',v_arrayresult[v_selectedid::integer],'"');
-
-			ELSIF v_selectedid ilike '$user%' then
-
-				IF v_selectedid = '$userExploitation' THEN
-					v_selectedid = concat('"selectedId":"',v_expl,'"');
-				ELSIF v_selectedid = '$userMincut' THEN
-					v_selectedid = concat('"selectedId":"',v_mincut,'"');
-				ELSIF v_selectedid = '$userState' THEN
-					v_selectedid = concat('"selectedId":"',v_state,'"');
-				ELSIF v_selectedid = '$userSector' THEN
-					v_selectedid = concat('"selectedId":"',v_sector,'"');
-				ELSIF v_selectedid = '$userHydrology' THEN
-					v_selectedid = concat('"selectedId":"',v_inp_hydrology,'"');
-				ELSIF v_selectedid = '$userDwf' THEN
-					v_selectedid = concat('"selectedId":"',v_inp_dwf,'"');
-				ELSIF v_selectedid = '$userDscenario' THEN
-					v_selectedid = concat('"selectedId":"',v_inp_dscenario,'"');
-				ELSIF v_selectedid = '$userInpResult' THEN
-					v_selectedid = concat('"selectedId":"',v_inp_result,'"');
-				ELSIF v_selectedid = '$userRptResult' THEN
-					v_selectedid = concat('"selectedId":"',v_rpt_result,'"');
-				ELSIF v_selectedid = '$userNodetype' THEN
-					v_selectedid = concat('"selectedId":"',v_nodetype,'"');
-				ELSIF v_selectedid = '$userNodecat' THEN
-					IF v_nodecat = any(v_arrayresult) THEN
-						v_selectedid = concat('"selectedId":"',v_nodecat,'"');
-					ELSE
-						v_selectedid = concat('"selectedId":"',v_arrayresult[1],'"');
-					END IF;
-				END IF;
-			END IF;
-
-			IF v_selectedid IS NULL OR  v_selectedid = '' THEN v_selectedid = '"selectedId":""';END IF;
-
-			EXECUTE v_querytext INTO v_queryresult;	
-
-			IF v_queryresult IS NOT NULL THEN
-				v_querytext = concat('SELECT concat (''"comboIds":'',array_to_json(array_agg(to_json(id::text))) , '', 
-					"comboNames":'',array_to_json(array_agg(to_json(idval::text)))) FROM (',v_querytext_mod,')a');
-				v_debug_vars := json_build_object('v_querytext_mod', v_querytext_mod);
-				v_debug := json_build_object('querystring', v_querytext, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 70);
-				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-				EXECUTE v_querytext INTO v_queryresult;	
-			ELSE
-				v_queryresult = '"comboIds":[], "comboNames":[]';
-			END IF;
-			
-			v_rec_replace = (REPLACE(rec.inputparams::text, concat('"dvQueryText":"', rec.inputparams::json->>'dvQueryText','"') , v_queryresult))::json;
-			v_rec_replace = (REPLACE(v_rec_replace::text, concat('"selectedId":"', rec.inputparams::json->>'selectedId','"'), v_selectedid))::json;
-		
-			v_om_fields = (REPLACE(v_om_fields::text::text,  rec.inputparams::text , v_rec_replace::text))::json;
-			v_edit_fields = (REPLACE(v_edit_fields::text::text,  rec.inputparams::text , v_rec_replace::text))::json;
-			v_epa_fields = (REPLACE(v_epa_fields::text::text,  rec.inputparams::text , v_rec_replace::text))::json;
-			v_master_fields = (REPLACE(v_master_fields::text::text,  rec.inputparams::text , v_rec_replace::text))::json;
-			v_admin_fields = (REPLACE(v_admin_fields::text::text,  rec.inputparams::text , v_rec_replace::text))::json;
-									
-		ELSIF v_value ilike '$user%' THEN
-			IF v_value = '$userExploitation' THEN
-				v_value = concat('"value":"',v_expl,'"');
-			ELSIF v_value = '$userState' THEN
-				v_value = concat('"value":"',v_state,'"');
-			ELSIF v_value = '$userInpResult' THEN
-				v_value = concat('"value":"',v_inp_result,'"');
-			END IF;			
-			v_rec_replace = (REPLACE(rec.inputparams::text, concat('"value":"', rec.inputparams::json->>'value','"'), v_value))::json;
-			
-			v_om_fields = (REPLACE(v_om_fields::text::text,  rec.inputparams::text , v_rec_replace::text))::json;
-			v_edit_fields = (REPLACE(v_edit_fields::text::text,  rec.inputparams::text , v_rec_replace::text))::json;
-			v_epa_fields = (REPLACE(v_epa_fields::text::text,  rec.inputparams::text , v_rec_replace::text))::json;
-			v_master_fields = (REPLACE(v_master_fields::text::text,  rec.inputparams::text , v_rec_replace::text))::json;
-			v_admin_fields = (REPLACE(v_admin_fields::text::text,  rec.inputparams::text , v_rec_replace::text))::json;
-		END IF;
-
-	END LOOP;
-	*/
 --    Control NULL's
 	SELECT json_strip_nulls(json_build_object('om', v_om_fields, 
 	'edit', v_edit_fields,

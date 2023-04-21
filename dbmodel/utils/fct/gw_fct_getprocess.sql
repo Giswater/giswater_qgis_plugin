@@ -13,7 +13,10 @@ AS $function$
 	
 /*EXAMPLE:
 
-SELECT SCHEMA_NAME.gw_fct_getprocess($${"client":{"device":4, "lang":"CA", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"functionId":2522}}$$);
+
+
+SELECT SCHEMA_NAME.gw_fct_getprocess($${"client":{"device":4, "lang":"CA", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "functionId":2522}}$$);
+
 
 */
 
@@ -63,6 +66,8 @@ v_mincut integer;
 v_device integer;
 v_function_id integer;
 
+v_functionparams json;
+v_feature_type text;
 
 BEGIN
 
@@ -125,8 +130,8 @@ BEGIN
 	END IF;
 	
 	-- get process parameters
-	v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-			 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, function_name as functionname
+	v_querystring = concat('SELECT row_to_json(a) FROM (
+			 SELECT id, alias, descript, functionparams, inputparams, observ AS isnotparammsg, sys_role, function_name as functionname
 			 FROM sys_function 
 			 JOIN config_toolbox USING (id)
 			 WHERE id = '||v_function_id||') a');
@@ -136,11 +141,10 @@ BEGIN
 	EXECUTE v_querystring INTO v_fields;
 
 	-- refactor dvquerytext			
-	FOR rec IN SELECT json_array_elements(inputparams::json) as inputparams
+	FOR rec IN SELECT json_array_elements(inputparams::json) as inputparams, functionparams
 	FROM sys_function JOIN config_toolbox USING (id) 
 	WHERE id = v_function_id  AND config_toolbox.active IS TRUE AND (project_type=v_projectype OR project_type='utils')
 	loop
-		raise notice 'asdf -> %',rec.inputparams;
 		v_querytext = rec.inputparams::json->>'dvQueryText';
 		
 		v_value =  rec.inputparams::json->>'value';
@@ -247,7 +251,6 @@ BEGIN
 	RETURN v_return;
        
 	-- Exception handling
-
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
 	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
@@ -255,5 +258,3 @@ BEGIN
 END;
 $function$
 ;
-
-SELECT SCHEMA_NAME.gw_fct_getprocess($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "functionId":"3160"}}$$);
