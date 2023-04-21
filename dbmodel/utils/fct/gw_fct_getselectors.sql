@@ -361,16 +361,6 @@ BEGIN
 
 	-- Manage QWC
 	IF v_device = 5 THEN
-		-- Get columns for layers
-		v_layers := (p_data ->> 'data')::json->> 'layers';
-		v_layerColumns = '{}';
-		FOR v_rec IN SELECT json_array_elements(v_layers::json)
-		LOOP
-			v_layer = replace(replace(replace(v_rec::text, '"', ''), '(', ''), ')', '');
-			SELECT json_agg(column_name) INTO v_columns FROM information_schema.columns WHERE table_schema = 'SCHEMA_NAME' AND table_name = v_layer;
-			v_layerColumns := gw_fct_json_object_set_key(v_layerColumns, v_layer, v_columns);
-		END LOOP;
-	
 		-- Get active exploitations geometry (to zoom on them)
 		IF v_loadProject IS TRUE AND v_geometry IS NULL THEN
 			SELECT row_to_json (a) 
