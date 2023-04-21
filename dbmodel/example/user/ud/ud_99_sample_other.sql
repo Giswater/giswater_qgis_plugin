@@ -557,3 +557,7 @@ WHERE formname LIKE 've_%' AND (layoutname LIKE 'lyt_top%' OR layoutname LIKE 'l
 
 UPDATE config_param_user SET value='true' WHERE "parameter"='edit_plan_order_control' AND cur_user=current_user;
 
+UPDATE config_form_fields SET web_layoutorder=NULL
+	WHERE columnname='asset_id';
+UPDATE config_form_fields SET web_layoutorder=4
+	WHERE columnname='connec_id';

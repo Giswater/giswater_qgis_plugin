@@ -729,3 +729,8 @@ WHERE formname LIKE 've_%' AND (layoutname LIKE 'lyt_top%' OR layoutname LIKE 'l
 UPDATE config_form_fields
 SET widgetcontrols = jsonb_set(widgetcontrols::jsonb, '{labelPosition}', '"top"', true)
 WHERE formname LIKE 've_%' AND (layoutname LIKE 'lyt_top%' OR layoutname LIKE 'lyt_bot%');
+
+UPDATE config_form_fields SET web_layoutorder=NULL
+	WHERE columnname='asset_id';
+UPDATE config_form_fields SET web_layoutorder=4
+	WHERE columnname='connec_id';
