@@ -167,14 +167,15 @@ BEGIN
 
 			-- default values
 			IF NEW.elev IS NULL THEN NEW.elev = (SELECT elev FROM v_edit_inp_outfall WHERE node_id = NEW.node_id);END IF;
+			IF NEW.ymax IS NULL THEN NEW.ymax = (SELECT ymax FROM v_edit_inp_outfall WHERE node_id = NEW.node_id);END IF;
 			IF NEW.outfall_type IS NULL OR NEW.outfall_type='' THEN NEW.outfall_type = (SELECT outfall_type FROM v_edit_inp_outfall WHERE node_id = NEW.node_id);END IF;
 			IF NEW.stage IS NULL THEN NEW.stage = (SELECT stage FROM v_edit_inp_outfall WHERE node_id = NEW.node_id);END IF;
 			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_outfall WHERE node_id = NEW.node_id);END IF;
 			IF NEW.timser_id IS NULL OR NEW.timser_id='' THEN NEW.timser_id = (SELECT timser_id FROM v_edit_inp_outfall WHERE node_id = NEW.node_id);END IF;
 			IF NEW.gate IS NULL OR NEW.gate='' THEN NEW.gate = (SELECT gate FROM v_edit_inp_outfall WHERE node_id = NEW.node_id);END IF;
  		
-			INSERT INTO inp_dscenario_outfall(dscenario_id, node_id, outfall_type, stage, curve_id, timser_id, gate)
-			VALUES (NEW.dscenario_id, NEW.node_id, NEW.outfall_type, NEW.stage, NEW.curve_id, NEW.timser_id, NEW.gate);
+			INSERT INTO inp_dscenario_outfall(dscenario_id, node_id, outfall_type, stage, curve_id, timser_id, gate, elev, ymax)
+			VALUES (NEW.dscenario_id, NEW.node_id, NEW.outfall_type, NEW.stage, NEW.curve_id, NEW.timser_id, NEW.gate, NEW.elev, NEW.ymax);
 			
 		ELSIF v_dscenario_type = 'RAINGAGE' THEN
 			
@@ -281,7 +282,7 @@ BEGIN
 
 		ELSIF v_dscenario_type = 'OUTFALL' THEN
 			UPDATE inp_dscenario_outfall SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, outfall_type=NEW.outfall_type, stage=NEW.stage, 
-			curve_id=NEW.curve_id, timser_id=NEW.timser_id, gate=NEW.gate 
+			curve_id=NEW.curve_id, timser_id=NEW.timser_id, gate=NEW.gate, elev=NEW.elev, ymax=NEW.ymax
 			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 			
 		ELSIF v_dscenario_type = 'RAINGAGE' THEN
