@@ -371,3 +371,5 @@ FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edi
 group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
 iseditable, isautoupdate, lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+UPDATE config_form_fields SET iseditable = true WHERE  formname ilike 'v_edit_inp_dscenario%' and columnname ='node_id';
