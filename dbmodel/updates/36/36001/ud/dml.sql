@@ -281,7 +281,7 @@ id = 3100;
 
 
 INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
-VALUES (3232, 'gw_fct_settimeseries', 'utils', 'function', 'varchar', 'json', 'Set timeseries values for any objects (1st version for raingage)', 'role_epa', NULL, 'core')
+VALUES (3234, 'gw_fct_settimeseries', 'utils', 'function', 'varchar', 'json', 'Set timeseries values for any objects (1st version for raingage)', 'role_epa', NULL, 'core')
 ON CONFLICT (id) DO NOTHING;
 
 

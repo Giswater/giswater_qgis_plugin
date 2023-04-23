@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 3232
+--FUNCTION CODE: 3234
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_settimeseries(v_timser character varying)
  RETURNS json
 AS $BODY$
