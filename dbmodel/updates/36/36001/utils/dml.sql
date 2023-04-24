@@ -485,3 +485,4 @@ VALUES('ext_region', 'Table of regions', 'role_edit', 2, '{"level_1":"INVENTORY"
 INSERT INTO sys_table(id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", style_id, addparam)
 VALUES('ext_province', 'Table of provinces', 'role_edit', 2, '{"level_1":"INVENTORY","level_2":"MAP ZONES"}', 11, 'Province', NULL, NULL, NULL, 'core', NULL, NULL);
 
+UPDATE config_function SET id=3228 WHERE function_name='gw_fct_anl_node_proximity';
