@@ -43,14 +43,14 @@ BEGIN
   SELECT gw_fct_getformfields(
     'mincut_manager',
     'form_mincut',
-    'main',
     NULL,
     NULL,
     NULL,
     NULL,
     NULL,
     NULL,
-    4,
+    NULL,
+    NULL,
     NULL
   ) INTO v_fields_array;
   
