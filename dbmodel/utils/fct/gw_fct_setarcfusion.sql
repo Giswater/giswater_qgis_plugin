@@ -505,7 +505,17 @@ BEGIN
 					ELSE
 						INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Delete planned node ',v_node_id));
 						DELETE FROM node WHERE node_id = v_node_id;
-					END IF;					
+					END IF;		
+				
+					-- set link_id NULL when connect doesn't has previous link but previous insert has triggered one
+					UPDATE plan_psector_x_connec SET link_id = NULL WHERE connec_id NOT IN (SELECT distinct(connec_id) FROM plan_psector_x_connec 
+					JOIN link USING (link_id) WHERE psector_id=v_psector_id AND link.state=1) AND psector_id=v_psector_id;
+					
+					IF v_project_type = 'UD' THEN
+						UPDATE plan_psector_x_gully SET link_id = NULL WHERE gully_id NOT IN (SELECT distinct(gully_id) FROM plan_psector_x_gully 
+						JOIN link USING (link_id) WHERE psector_id=v_psector_id AND link.state=1) AND psector_id=v_psector_id;
+					END IF;
+				
 				END IF;
 
 			INSERT INTO audit_check_data (fid,  criticity, error_message)
