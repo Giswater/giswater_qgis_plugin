@@ -40,20 +40,16 @@ class GwToolBoxTask(GwTask):
         extras = ''
         feature_field = ''
 
-        # Get function name
-        function = None
+        self.function_name = self.result.get("functionname")
 
-        for group, function in list(self.result['fields'].items()):
-            if len(function) != 0:
-                self.toolbox.save_settings_values(self.dialog, function)
-                self.toolbox.save_parametric_values(self.dialog, function)
-                self.function_name = function[0]['functionname']
-                break
-
-        if self.function_name is None:
+        if self.function_name is not None:
+            print("FUNCTION", self.result.get("functionname"))
+            self.toolbox.save_settings_values(self.dialog, self.function_name)
+            self.toolbox.save_parametric_values(self.dialog, self.function_name)
+        else:
             return False
 
-        if function[0]['input_params']['featureType']:
+        if self.result['functionparams'].get('featureType'):
             layer = None
 
             layer_name = tools_qt.get_combo_value(self.dialog, self.combo, 1)
@@ -103,37 +99,36 @@ class GwToolBoxTask(GwTask):
         widget_list = self.dialog.grb_parameters.findChildren(QWidget)
         widget_is_void = False
         extras += '"parameters":{'
-        for group, function in list(self.result['fields'].items()):
-            if len(function) != 0:
-                if function[0].get('return_type') not in (None, ''):
-                    for field in function[0]['return_type']:
-                        widget = self.dialog.findChild(QWidget, field['widgetname'])
-                        param_name = widget.objectName()
-                        if type(widget) in ('', QLineEdit):
-                            widget.setStyleSheet(None)
-                            value = tools_qt.get_text(self.dialog, widget, False, False)
-                            extras += f'"{param_name}":"{value}", '.replace('""', 'null')
-                            if value == '' and widget.property('ismandatory'):
-                                widget_is_void = True
-                                widget.setStyleSheet("border: 1px solid red")
-                        elif type(widget) in ('', QSpinBox, QDoubleSpinBox):
-                            value = tools_qt.get_text(self.dialog, widget, False, False)
-                            if value == '':
-                                value = 0
-                            extras += f'"{param_name}":"{value}", '
-                        elif type(widget) in ('', QComboBox):
-                            value = tools_qt.get_combo_value(self.dialog, widget, 0)
-                            if value not in (None, ''):
-                                extras += f'"{param_name}":"{value}", '
-                        elif type(widget) in ('', QCheckBox):
-                            value = tools_qt.is_checked(self.dialog, widget)
-                            extras += f'"{param_name}":"{str(value).lower()}", '
-                        elif type(widget) in ('', QgsDateTimeEdit):
-                            value = tools_qt.get_calendar_date(self.dialog, widget)
-                            if value == "" or value is None:
-                                extras += f'"{param_name}":null, '
-                            else:
-                                extras += f'"{param_name}":"{value}", '
+
+        if self.result.get('fields') is not None:
+            for field in self.result.get('fields'):
+                widget = self.dialog.findChild(QWidget, field['widgetname'])
+                param_name = widget.objectName()
+                if type(widget) in ('', QLineEdit):
+                    widget.setStyleSheet(None)
+                    value = tools_qt.get_text(self.dialog, widget, False, False)
+                    extras += f'"{param_name}":"{value}", '.replace('""', 'null')
+                    if value == '' and widget.property('ismandatory'):
+                        widget_is_void = True
+                        widget.setStyleSheet("border: 1px solid red")
+                elif type(widget) in ('', QSpinBox, QDoubleSpinBox):
+                    value = tools_qt.get_text(self.dialog, widget, False, False)
+                    if value == '':
+                        value = 0
+                    extras += f'"{param_name}":"{value}", '
+                elif type(widget) in ('', QComboBox):
+                    value = tools_qt.get_combo_value(self.dialog, widget, 0)
+                    if value not in (None, ''):
+                        extras += f'"{param_name}":"{value}", '
+                elif type(widget) in ('', QCheckBox):
+                    value = tools_qt.is_checked(self.dialog, widget)
+                    extras += f'"{param_name}":"{str(value).lower()}", '
+                elif type(widget) in ('', QgsDateTimeEdit):
+                    value = tools_qt.get_calendar_date(self.dialog, widget)
+                    if value == "" or value is None:
+                        extras += f'"{param_name}":null, '
+                    else:
+                        extras += f'"{param_name}":"{value}", '
 
         if widget_is_void:
             message = "This param is mandatory. Please, set a value"

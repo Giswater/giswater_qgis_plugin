@@ -131,10 +131,9 @@ class GwToolBoxButton(GwAction):
         return layer
 
 
-    def save_parametric_values(self, dialog, function):
+    def save_parametric_values(self, dialog, function_name):
         """ Save QGIS settings related with toolbox options """
 
-        function_name = function[0]['functionname']
         layout = dialog.findChild(QWidget, 'grb_parameters')
         widgets = layout.findChildren(QWidget)
         for widget in widgets:
@@ -149,10 +148,9 @@ class GwToolBoxButton(GwAction):
                 tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{value}")
 
 
-    def save_settings_values(self, dialog, function):
+    def save_settings_values(self, dialog, function_name):
         """ Save QGIS settings related with toolbox options """
 
-        function_name = function[0]['functionname']
         feature_type = tools_qt.get_combo_value(dialog, dialog.cmb_feature_type, 0)
         tools_gw.set_config_parser('btn_toolbox', f"{function_name}_cmb_feature_type", f"{feature_type}")
         layer = tools_qt.get_combo_value(dialog, dialog.cmb_layers, 0)
