@@ -131,7 +131,7 @@ BEGIN
 	
 	-- get process parameters
 	v_querystring = concat('SELECT row_to_json(a) FROM (
-			 SELECT id, alias, descript, functionparams, inputparams, observ AS isnotparammsg, sys_role, function_name as functionname
+			 SELECT id, alias, descript, functionparams, inputparams AS fields, observ AS isnotparammsg, sys_role, function_name as functionname
 			 FROM sys_function 
 			 JOIN config_toolbox USING (id)
 			 WHERE id = '||v_function_id||') a');
@@ -246,7 +246,7 @@ BEGIN
 	-- make return
 	v_return ='{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":'||v_version||',"body":{"form":{}'||
 		     ',"feature":{}'||
-		     ',"data":{"fields": '|| v_fields ||'}}}';
+		     ',"data":'|| v_fields ||'}}';
 
 	RETURN v_return;
        
