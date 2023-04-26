@@ -12,6 +12,8 @@ $BODY$
 DECLARE 
 
 v_stateaux smallint;
+v_explaux smallint;
+v_psector_expl smallint;
 num_connec integer;
 v_project_type text;
 v_user_planordercontrol boolean;
@@ -26,7 +28,15 @@ BEGIN
 	-- get user variables
 	SELECT value::boolean INTO v_user_planordercontrol FROM config_param_user WHERE parameter='edit_plan_order_control' AND cur_user = current_user;
 
-	SELECT arc.state INTO v_stateaux FROM arc WHERE arc_id=NEW.arc_id;
+	SELECT expl_id INTO v_psector_expl FROM plan_psector WHERE psector_id=NEW.psector_id;
+	SELECT arc.state, arc.expl_id INTO v_stateaux, v_explaux FROM arc WHERE arc_id=NEW.arc_id;
+
+	-- do not allow to insert features with expl diferent from psector expl
+	IF v_explaux<>v_psector_expl THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"3234", "function":"1130","debug_msg":""}}$$);';
+	END IF;
+	
 	IF v_stateaux=1	THEN 
 		NEW.state=0;
 		NEW.doable=false;

@@ -13,12 +13,21 @@ $BODY$
 
 DECLARE 
 v_stateaux smallint;
+v_explaux smallint;
+v_psector_expl smallint;
 
 BEGIN 
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-	SELECT connec.state INTO v_stateaux FROM connec WHERE connec_id=NEW.connec_id;
+	SELECT expl_id INTO v_psector_expl FROM plan_psector WHERE psector_id=NEW.psector_id;
+	SELECT connec.state, connec.expl_id INTO v_stateaux, v_explaux FROM connec WHERE connec_id=NEW.connec_id;
+
+	-- do not allow to insert features with expl diferent from psector expl
+	IF v_explaux<>v_psector_expl THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"3234", "function":"1130","debug_msg":""}}$$);';
+	END IF;
 		
 	IF NEW.state = 1 AND v_stateaux = 1 THEN
 		NEW.doable=false;

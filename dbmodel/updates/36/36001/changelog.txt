@@ -11,3 +11,4 @@
     - man_manhole, man_conduit: bottom_mat
     - man_chamber: bottom_mat, slope
     - cat_arc: visitability
+- Do not allow to insert features with diferent expl_id than the psector

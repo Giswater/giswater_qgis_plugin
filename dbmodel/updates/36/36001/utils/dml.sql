@@ -486,3 +486,7 @@ INSERT INTO sys_table(id, descript, sys_role, criticity, context, orderby, alias
 VALUES('ext_province', 'Table of provinces', 'role_edit', 2, '{"level_1":"INVENTORY","level_2":"MAP ZONES"}', 11, 'Province', NULL, NULL, NULL, 'core', NULL, NULL);
 
 UPDATE config_function SET id=3228 WHERE function_name='gw_fct_anl_node_proximity';
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source")
+VALUES(3234, 'The inserted feature has a diferent exploitation than the psector',
+'Only features with the same exploitation as the psector are allowed', 2, true, 'utils', 'core');
