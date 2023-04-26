@@ -1211,16 +1211,20 @@ def build_dialog_info(dialog, result, my_json=None):
 
 def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module=sys.modules[__name__]):
 
+    try:
+        fields = row[pos]
+    except:
+        fields = row
     field_id = ''
-    if 'fields' in row[pos]:
+    if 'fields' in fields:
         field_id = 'fields'
-    elif row[pos].get('return_type') not in ('', None):
+    elif fields.get('return_type') not in ('', None):
         field_id = 'return_type'
 
     if field_id == '':
         return
 
-    for field in row[pos][field_id]:
+    for field in fields[field_id]:
 
         check_parameters(field)
 
