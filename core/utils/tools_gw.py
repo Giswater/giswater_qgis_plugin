@@ -3243,7 +3243,7 @@ def manage_close(dialog, table_object, cur_active_layer=None, single_tool_mode=N
     return layers
 
 
-def delete_records(class_object, dialog, table_object, query=False, lazy_widget=None, lazy_init_function=None):
+def delete_records(class_object, dialog, table_object, query=False, lazy_widget=None, lazy_init_function=None, extra_field=None):
     """ Delete selected elements of the table """
 
     tools_qgis.disconnect_signal_selection_changed()
@@ -3320,7 +3320,10 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
 
     # Update model of the widget with selected expr_filter
     if query:
-        _delete_feature_psector(dialog, feature_type, list_id)
+        state = None
+        if extra_field is not None and len(selected_list) == 1:
+            state = widget.model().record(selected_list[0].row()).value(extra_field)
+        _delete_feature_psector(dialog, feature_type, list_id, state)
         load_tableview_psector(dialog, feature_type)
     else:
         load_tablename(dialog, table_object, feature_type, expr_filter)
@@ -3857,14 +3860,18 @@ def _insert_feature_psector(dialog, feature_type, ids=None):
         load_tableview_psector(dialog, feature_type)
 
 
-def _delete_feature_psector(dialog, feature_type, list_id):
+def _delete_feature_psector(dialog, feature_type, list_id, state=None):
     """ Delete features_id to table plan_@feature_type_x_psector"""
 
     widget = tools_qt.get_widget(dialog, f"tbl_psector_x_{feature_type}")
     tablename = widget.property('tablename')
     value = tools_qt.get_text(dialog, dialog.psector_id)
+
     sql = (f"DELETE FROM {tablename} "
            f"WHERE {feature_type}_id IN ({list_id}) AND psector_id = '{value}'")
+    # Add state if needed
+    if state is not None:
+        sql += f' AND "state" = \'{state}\''
     tools_db.execute_sql(sql)
 
 
