@@ -86,6 +86,9 @@ BEGIN
 	
 	v_hour=null;
 
+	-- clenaning data
+	DELETE FROM temp_csv WHERE csv1 like '========%';
+
 	v_ffactor = (SELECT value FROM config_param_user WHERE parameter = 'inp_report_f_factor' AND cur_user = current_user);
 
 	IF v_ffactor = 'NO' THEN
