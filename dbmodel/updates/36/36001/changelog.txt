@@ -12,3 +12,4 @@
     - man_chamber: bottom_mat, slope
     - cat_arc: visitability
 - Do not allow to insert features with diferent expl_id than the psector
+- New functionality: get address and postnumber automatically when inserting node and connec

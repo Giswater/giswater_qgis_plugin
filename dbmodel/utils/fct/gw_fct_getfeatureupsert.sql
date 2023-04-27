@@ -142,6 +142,14 @@ v_elevation float;
 v_staticpressure float;
 label_value text;
 
+v_streetname varchar;
+v_postnumber integer;
+v_postcomplement varchar;
+
+v_auto_streetvalues_status boolean;
+v_auto_streetvalues_field varchar;
+v_auto_streetvalues_buffer integer;
+
 
 BEGIN
 
@@ -175,6 +183,9 @@ BEGIN
 	SELECT ((value::json)->>'status') INTO v_automatic_ccode FROM config_param_system WHERE parameter='edit_connec_autofill_ccode';
 	SELECT ((value::json)->>'field') INTO v_automatic_ccode_field FROM config_param_system WHERE parameter='edit_connec_autofill_ccode';
 	SELECT json_extract_path_text(value::json,'activated')::boolean INTO v_sys_raster_dem FROM config_param_system WHERE parameter='admin_raster_dem';
+	SELECT (value::json->>'status')::boolean INTO v_auto_streetvalues_status FROM config_param_system WHERE parameter = 'edit_auto_streetvalues';
+	SELECT (value::json->>'field')::text INTO v_auto_streetvalues_field FROM config_param_system WHERE parameter = 'edit_auto_streetvalues';
+	SELECT (value::json->>'buffer')::integer INTO v_auto_streetvalues_buffer FROM config_param_system WHERE parameter = 'edit_auto_streetvalues';
 
 	--Check if user has migration mode enabled
 	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
@@ -410,6 +421,20 @@ BEGIN
 	
 		-- District 
 		v_district_id := (SELECT district_id FROM ext_district WHERE ST_DWithin(p_reduced_geometry, ext_district.the_geom,0.001) LIMIT 1);
+
+		--Address
+		v_streetname :=(select v_ext_streetaxis.descript from v_ext_streetaxis 
+				where ST_DWithin(p_reduced_geometry, v_ext_streetaxis.the_geom, v_auto_streetvalues_buffer)
+				order by ST_Distance(p_reduced_geometry, v_ext_streetaxis.the_geom) LIMIT 1);
+			
+		--Postnumber/postcomplement
+		v_postnumber := (select ext_address.postnumber from ext_address
+						where ST_DWithin(p_reduced_geometry, ext_address.the_geom, v_auto_streetvalues_buffer)
+						order by ST_Distance(p_reduced_geometry, ext_address.the_geom) LIMIT 1);	
+					
+		v_postcomplement := (select ext_address.postnumber from ext_address
+						where ST_DWithin(p_reduced_geometry, ext_address.the_geom, v_auto_streetvalues_buffer)
+						order by ST_Distance(p_reduced_geometry, ext_address.the_geom) LIMIT 1);
 
 		-- Dem elevation
 		IF v_sys_raster_dem AND v_edit_insert_elevation_from_dem AND p_idname IN ('node_id', 'connec_id', 'gully_id') THEN
@@ -724,6 +749,27 @@ BEGIN
 					IF (SELECT value::boolean FROM config_param_system WHERE parameter='edit_feature_auto_builtdate') IS TRUE AND field_value IS NULL  THEN
 						EXECUTE 'SELECT date(now())' INTO field_value;
 					END IF;
+
+				WHEN 'streetname' THEN
+					IF (v_auto_streetvalues_status is true) then
+						field_value = v_streetname;	
+					END IF;
+					
+				WHEN 'postnumber' THEN
+					IF (v_auto_streetvalues_status is true) THEN
+						IF (v_auto_streetvalues_field = 'postnumber') THEN
+							field_value = v_postnumber;
+						ELSE field_value = NULL;
+					END IF;
+				END IF;
+
+				WHEN 'postcomplement' THEN
+					IF (v_auto_streetvalues_status IS TRUE) THEN
+						IF (v_auto_streetvalues_field = 'postcomplement') THEN
+							field_value = v_postnumber;
+						ELSE field_value = NULL;
+					END IF;
+				END IF;
 
 				-- rest (including addfields)
 				ELSE SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = (aux_json->>'columnname'); 

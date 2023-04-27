@@ -61,7 +61,9 @@ v_arc record;
 v_link integer;
 v_link_geom public.geometry;
 v_connect2network boolean;
-
+v_auto_streetvalues_status boolean;
+v_auto_streetvalues_buffer integer;
+v_auto_streetvalues_field text;
 
 BEGIN
 
@@ -84,6 +86,9 @@ BEGIN
 	v_epa_gully_method := (SELECT value FROM config_param_user WHERE parameter='epa_gully_method_vdefault' AND cur_user=current_user);
 	v_epa_gully_outlet_type := (SELECT value FROM config_param_user WHERE parameter='epa_gully_outlet_type_vdefault' AND cur_user=current_user);
 	SELECT value::boolean INTO v_connect2network FROM config_param_user WHERE parameter='edit_gully_automatic_link' AND cur_user=current_user;
+	v_auto_streetvalues_status := (SELECT (value::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
+	v_auto_streetvalues_buffer := (SELECT (value::json->>'buffer')::integer FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
+	v_auto_streetvalues_field := (SELECT (value::json->>'field')::text FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
 
 	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 	
@@ -370,8 +375,34 @@ BEGIN
 			IF (NEW.builtdate IS NULL) AND (SELECT value::boolean FROM config_param_system WHERE parameter='edit_feature_auto_builtdate') IS TRUE THEN
 				NEW.builtdate :=date(now());
 			END IF;
-		END IF;  
+		END IF;
+		
+		--Address
+		IF (v_streetaxis IS NULL) THEN 
+			IF (v_auto_streetvalues_status is true) THEN				
+				v_streetaxis := (select v_ext_streetaxis.id from v_ext_streetaxis
+								join node on ST_DWithin(NEW.the_geom, v_ext_streetaxis.the_geom, v_auto_streetvalues_buffer)
+								order by ST_Distance(NEW.the_geom, v_ext_streetaxis.the_geom) LIMIT 1);
+			END IF;
+		END IF;
 
+		--Postnumber/postcomplement
+		IF (v_auto_streetvalues_status) IS TRUE THEN 
+			IF (v_auto_streetvalues_field = 'postcomplement') THEN
+				IF (NEW.postcomplement IS NULL) THEN
+					NEW.postcomplement = (select ext_address.postnumber from ext_address
+						join node on ST_DWithin(NEW.the_geom, ext_address.the_geom, v_auto_streetvalues_buffer)
+						order by ST_Distance(NEW.the_geom, ext_address.the_geom) LIMIT 1);
+				END IF;
+			ELSIF (v_auto_streetvalues_field = 'postnumber') THEN
+				IF (NEW.postnumber IS NULL) THEN
+					NEW.postnumber= (select ext_address.postnumber from ext_address
+						join node on ST_DWithin(NEW.the_geom, ext_address.the_geom, v_auto_streetvalues_buffer)
+						order by ST_Distance(NEW.the_geom, ext_address.the_geom) LIMIT 1);
+				END IF;
+			END IF;	
+		END IF;
+		
 		--Inventory (boolean fields cannot have IF because QGIS only manage true/false and trigger gets a false when checkbox is empty)
 		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
 

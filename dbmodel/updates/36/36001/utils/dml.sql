@@ -494,3 +494,8 @@ VALUES(3234, 'The inserted feature has a diferent exploitation than the psector'
 -- code reservation for gw_fct_setepacorporate_val
 --INSERT INTO sys_function(id) VALUES (3232);
 -- INSERT INTO sys_fprocess (fid) VALUES(489);
+
+
+--27/04/2023
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) 
+VALUES('edit_auto_streetvalues', '{"status":false, "field":"postnumber","buffer":60}', 'Insert street values automatically on field ''postnumber'' or ''postcomplement''', 'Auto-insert street values', NULL, NULL, true, 31, 'utils', NULL, NULL, 'json', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_inventory');

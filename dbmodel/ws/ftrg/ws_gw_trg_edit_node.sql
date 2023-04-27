@@ -42,6 +42,9 @@
 	v_system_id text;
 	v_featurecat_id text;
 	v_psector integer;
+	v_auto_streetvalues_status boolean;
+	v_auto_streetvalues_buffer integer;
+	v_auto_streetvalues_field text;
 
 	-- dynamic mapzones strategy
 	v_isdma boolean = false;
@@ -86,6 +89,9 @@
 		--Get data from config table
 		v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 		v_edit_node_reduction_auto_d1d2 = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_node_reduction_auto_d1d2');
+		v_auto_streetvalues_status := (SELECT (value::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
+		v_auto_streetvalues_buffer := (SELECT (value::json->>'buffer')::integer FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
+		v_auto_streetvalues_field := (SELECT (value::json->>'field')::text FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
 
 		IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 			-- man2inp_values
@@ -405,6 +411,33 @@
 					NEW.builtdate :=date(now());
 				END IF;
 			END IF;
+			
+			--Address
+			IF (v_streetaxis IS NULL) THEN 
+				IF (v_auto_streetvalues_status is true) THEN				
+					v_streetaxis := (select v_ext_streetaxis.id from v_ext_streetaxis
+									join node on ST_DWithin(NEW.the_geom, v_ext_streetaxis.the_geom, v_auto_streetvalues_buffer)
+									order by ST_Distance(NEW.the_geom, v_ext_streetaxis.the_geom) LIMIT 1);
+				END IF;
+			END IF;
+
+			--Postnumber/postcomplement
+			IF (v_auto_streetvalues_status) IS TRUE THEN 
+				IF (v_auto_streetvalues_field = 'postcomplement') THEN
+					IF (NEW.postcomplement IS NULL) THEN
+						NEW.postcomplement = (select ext_address.postnumber from ext_address
+							join node on ST_DWithin(NEW.the_geom, ext_address.the_geom, v_auto_streetvalues_buffer)
+							order by ST_Distance(NEW.the_geom, ext_address.the_geom) LIMIT 1);
+					END IF;
+				ELSIF (v_auto_streetvalues_field = 'postnumber') THEN
+					IF (NEW.postnumber IS NULL) THEN
+						NEW.postnumber= (select ext_address.postnumber from ext_address
+							join node on ST_DWithin(NEW.the_geom, ext_address.the_geom, v_auto_streetvalues_buffer)
+							order by ST_Distance(NEW.the_geom, ext_address.the_geom) LIMIT 1);
+					END IF;
+				END IF;	
+			END IF;
+			
 			
 			-- Verified
 			IF (NEW.verified IS NULL) THEN
