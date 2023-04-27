@@ -142,9 +142,31 @@ BEGIN
 					rec.elev1, rec.elev2, rec.custom_elev1, rec.custom_elev2, rec.matcat_id, rec.inverted_slope)
 					RETURNING arc_id INTO v_arc;
 				END IF;
+			
+				-- add connecs from related arc_id but without link
+				FOR v_connec IN select connec_id, arc_id from connec where arc_id=v_id and connec_id not in 
+				(SELECT l.feature_id FROM v_edit_connec c JOIN link l on feature_id = connec_id 
+				WHERE l.state = 1 and arc_id = v_id AND c.state > 0 AND exit_type <> 'NODE')
+				LOOP	
 
-				FOR v_link IN SELECT l.* FROM v_edit_connec c JOIN link l on feature_id = connec_id WHERE l.state = 1 and arc_id = v_id AND c.state > 0 AND exit_type <> 'NODE'
+					INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable, link_id)
+					VALUES (v_currentpsector, v_connec.connec_id, rec.arc_id, 0, false, NULL)
+					ON CONFLICT (connec_id, psector_id, state) DO NOTHING;
+				
+					INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable)
+					VALUES (v_currentpsector, v_connec.connec_id, v_arc, 1, false)
+					ON CONFLICT (connec_id, psector_id, state) DO NOTHING;
+				
+					-- delete automatically generated link from previous insert
+					UPDATE plan_psector_x_connec SET link_id=NULL FROM link WHERE feature_id=v_connec.connec_id AND feature_id NOT IN 
+					(SELECT feature_id FROM link WHERE feature_id=v_connec.connec_id AND state=1);
+				END LOOP;
+			
+				-- add connecs and links from related arc_id 
+				FOR v_link IN SELECT l.* FROM v_edit_connec c JOIN link l on feature_id = connec_id 
+				WHERE l.state = 1 and arc_id = v_id AND c.state > 0 AND exit_type <> 'NODE'
 				LOOP
+				
 					INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable, link_id)
 					VALUES (v_currentpsector, v_link.feature_id, rec.arc_id, 0, false, v_link.link_id)
 					ON CONFLICT (connec_id, psector_id, state) DO NOTHING;
@@ -165,10 +187,31 @@ BEGIN
 					ON CONFLICT (connec_id, psector_id, state) DO NOTHING;
 				END LOOP;
 				
+				
 				-- looking for gullies
 				IF v_project_type = 'UD' THEN
 
-					FOR v_link IN SELECT l.* FROM v_edit_gully c JOIN link l on feature_id = gully_id WHERE l.state = 1 and arc_id = v_id AND c.state > 0 AND exit_type <> 'NODE'
+					-- add gullys from related arc_id but without link
+					FOR v_gully IN select gully_id, arc_id from gully where arc_id=v_id and gully_id not in 
+					(SELECT l.feature_id FROM v_edit_gully g JOIN link l on feature_id = gully_id 
+					WHERE l.state = 1 and arc_id = v_id AND g.state > 0 AND exit_type <> 'NODE')
+					LOOP	
+				
+						INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable, link_id)
+						VALUES (v_currentpsector, v_gully.gully_id, rec.arc_id, 0, false, NULL)
+						ON CONFLICT (gully_id, psector_id, state) DO NOTHING;
+					
+						INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable)
+						VALUES (v_currentpsector, v_gully.gully_id, v_arc, 1, false)
+						ON CONFLICT (gully_id, psector_id, state) DO NOTHING;
+					
+						-- delete automatically generated link from previous insert
+						UPDATE plan_psector_x_gully SET link_id=NULL FROM link WHERE feature_id=v_gully.gully_id AND feature_id NOT IN 
+						(SELECT feature_id FROM link WHERE feature_id=v_gully.gully_id AND state=1);
+					END LOOP;					
+				
+					-- add gullys and links from related arc_id 
+					FOR v_link IN SELECT l.* FROM v_edit_gully g JOIN link l on feature_id = gully_id WHERE l.state = 1 and arc_id = v_id AND g.state > 0 AND exit_type <> 'NODE'
 					LOOP
 						INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable, link_id)
 						VALUES (v_currentpsector, v_link.feature_id, rec.arc_id, 0, false, v_link.link_id)
