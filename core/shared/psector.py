@@ -251,6 +251,7 @@ class GwPsector:
         self.qtbl_connec.selectionModel().selectionChanged.connect(partial(
             self._manage_tab_feature_buttons
         ))
+        self.qtbl_connec.model().flags = lambda index: self.flags(index, self.qtbl_connec.model(), ['arc_id', 'link_id'])
 
         # tbl_psector_x_gully
         if self.project_type.upper() == 'UD':
@@ -266,6 +267,7 @@ class GwPsector:
             self.qtbl_gully.selectionModel().selectionChanged.connect(partial(
                 self._manage_tab_feature_buttons
             ))
+            self.qtbl_gully.model().flags = lambda index: self.flags(index, self.qtbl_gully.model(), ['arc_id', 'link_id'])
 
         if psector_id is not None:
 
@@ -431,7 +433,7 @@ class GwPsector:
         self.dlg_plan_psector.btn_insert.clicked.connect(
             partial(tools_gw.insert_feature, self, self.dlg_plan_psector, table_object, True, True, None, None))
         self.dlg_plan_psector.btn_delete.clicked.connect(
-            partial(tools_gw.delete_records, self, self.dlg_plan_psector, table_object, True, None, None))
+            partial(tools_gw.delete_records, self, self.dlg_plan_psector, table_object, True, None, None, "state"))
         self.dlg_plan_psector.btn_delete.clicked.connect(
             partial(tools_gw.set_model_signals, self))
         self.dlg_plan_psector.btn_snapping.clicked.connect(
@@ -512,6 +514,16 @@ class GwPsector:
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector')
+
+
+    def flags(self, index, model, editable_columns=None):
+
+        column_name = model.headerData(index.column(), Qt.Horizontal, Qt.DisplayRole)
+        if editable_columns and column_name not in editable_columns:
+            flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
+            return flags
+
+        return QSqlTableModel.flags(model, index)
 
 
     def fill_widget(self, dialog, widget, row):
@@ -2490,7 +2502,7 @@ class GwPsector:
         """ Fill btn_toggle QMenu """
 
         # Functions
-        values = [[0, "Toggle state"], [1, "Toggle doable"]]
+        values = [[0, "Toggle doable"]]
 
         # Create and populate QMenu
         toggle_menu = QMenu()
@@ -2538,17 +2550,6 @@ class GwPsector:
             return
 
         if idx == 0:
-            for i in range(0, len(selected_list)):
-                row = selected_list[i].row()
-                feature_id = qtbl_feature.model().record(row).value(f"{feature_type}_id")
-                state = qtbl_feature.model().record(row).value("state")
-                if state == 1:
-                    sql += f"UPDATE {list_tables[feature_type]} SET state = 0 WHERE {feature_type}_id = '{feature_id}' AND psector_id = {selected_psector};"
-                elif state == 0:
-                    sql += f"UPDATE {list_tables[feature_type]} SET state = 1 WHERE {feature_type}_id = '{feature_id}' AND psector_id = {selected_psector};"
-
-
-        elif idx == 1:
             for i in range(0, len(selected_list)):
                 row = selected_list[i].row()
                 feature_id = qtbl_feature.model().record(row).value(f"{feature_type}_id")
