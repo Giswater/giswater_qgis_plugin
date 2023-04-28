@@ -811,17 +811,21 @@ BEGIN
 					v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 100);
 					SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 					EXECUTE v_querystring INTO v_querytext;
-					
-					v_querytext = replace(lower(v_querytext),'active is true','1=1');
 
-					--select values for missing id
-					v_querystring = concat('SELECT id, idval FROM (',v_querytext,')a
-					WHERE id::text = ',quote_literal(field_value),'');
-					v_debug_vars := json_build_object('v_querytext', v_querytext, 'field_value', field_value);
-					v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 110);
-					SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-					EXECUTE v_querystring INTO v_selected_id,v_selected_idval;
-					
+					if v_querytext is not null then
+						v_querytext = replace(lower(v_querytext),'active is true','1=1');
+
+						--select values for missing id
+						v_querystring = concat('SELECT id, idval FROM (',v_querytext,')a
+						WHERE id::text = ',quote_literal(field_value),'');
+						v_debug_vars := json_build_object('v_querytext', v_querytext, 'field_value', field_value);
+						v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 110);
+						SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
+						EXECUTE v_querystring INTO v_selected_id,v_selected_idval;
+
+					end if;
+
 					v_current_id =json_extract_path_text(v_fields_array[array_index],'comboIds');
 		
 					IF v_current_id='[]' THEN
@@ -833,23 +837,24 @@ BEGIN
 						INTO v_new_id;
 						v_fields_array[array_index] = gw_fct_json_object_set_key(v_fields_array[array_index],'comboNames',v_new_id::json);
 					ELSE
-					
-						select string_agg(quote_ident(a),',') into v_new_id from json_array_elements_text(v_current_id::json) a ;
-						--remove current combo Ids from return json
-						v_fields_array[array_index] = v_fields_array[array_index]::jsonb - 'comboIds'::text;
-						EXECUTE 'SELECT  array_to_json(''{'||v_selected_id||'}''::text[])'
-						INTO v_new_id;
-						--add new combo Ids to return json
-						v_fields_array[array_index] = gw_fct_json_object_set_key(v_fields_array[array_index],'comboIds',v_new_id::json);
-		
-						v_current_id =json_extract_path_text(v_fields_array[array_index],'comboNames');
-						select string_agg(quote_ident(a),',') into v_new_id from json_array_elements_text(v_current_id::json) a ;
-						--remove current combo names from return json
-						v_fields_array[array_index] = v_fields_array[array_index]::jsonb - 'comboNames'::text;
-						EXECUTE 'SELECT  array_to_json(''{'||v_selected_idval||'}''::text[])'
-						INTO v_new_id;
-						--add new combo names to return json
-						v_fields_array[array_index] = gw_fct_json_object_set_key(v_fields_array[array_index],'comboNames',v_new_id::json);
+					    IF v_selected_id IS NOT NULL THEN
+                            select string_agg(quote_ident(a),',') into v_new_id from json_array_elements_text(v_current_id::json) a ;
+                            --remove current combo Ids from return json
+                            v_fields_array[array_index] = v_fields_array[array_index]::jsonb - 'comboIds'::text;
+                            EXECUTE 'SELECT  array_to_json(''{'||v_selected_id||'}''::text[])'
+                            INTO v_new_id;
+                            --add new combo Ids to return json
+                            v_fields_array[array_index] = gw_fct_json_object_set_key(v_fields_array[array_index],'comboIds',v_new_id::json);
+
+                            v_current_id =json_extract_path_text(v_fields_array[array_index],'comboNames');
+                            select string_agg(quote_ident(a),',') into v_new_id from json_array_elements_text(v_current_id::json) a ;
+                            --remove current combo names from return json
+                            v_fields_array[array_index] = v_fields_array[array_index]::jsonb - 'comboNames'::text;
+                            EXECUTE 'SELECT  array_to_json(''{'||v_selected_idval||'}''::text[])'
+                            INTO v_new_id;
+                            --add new combo names to return json
+                            v_fields_array[array_index] = gw_fct_json_object_set_key(v_fields_array[array_index],'comboNames',v_new_id::json);
+					    END IF;
 					END IF;
 				END IF;
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'selectedId', COALESCE(field_value, ''));

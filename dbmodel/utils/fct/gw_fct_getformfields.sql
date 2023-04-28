@@ -236,7 +236,7 @@ BEGIN
 		END IF;
 
 		-- Get combo id's
-		IF  (aux_json->>'queryText') IS NOT NULL THEN
+		IF  (aux_json->>'queryText') is not null and (aux_json->>'queryText') != '' then
 			v_querystring = concat('SELECT (array_agg(id)) FROM (', (aux_json->>'queryText') ,' ORDER BY ',v_orderby,')a');
 			v_debug_vars := json_build_object('aux_json->>''queryText''', (aux_json->>'queryText'), 'v_orderby', v_orderby);
 			v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getformfields', 'flag', 30);
@@ -249,7 +249,7 @@ BEGIN
 		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));
 
 		-- Get combo values
-		IF  (aux_json->>'queryText') IS NOT NULL THEN
+		IF  (aux_json->>'queryText') is not null and (aux_json->>'queryText') != '' then
 			v_querystring = concat('SELECT (array_agg(idval)) FROM (',(aux_json->>'queryText'),' ORDER BY ',v_orderby,')a');
 			v_debug_vars := json_build_object('aux_json->>''queryText''', (aux_json->>'queryText'), 'v_orderby', v_orderby);
 			v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getformfields', 'flag', 40);
