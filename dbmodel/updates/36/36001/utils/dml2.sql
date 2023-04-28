@@ -41,3 +41,6 @@ INSERT INTO config_param_system ("parameter", value, descript, "label", dv_query
     VALUES('basic_search_v2_network_node', '{"sys_display_name":"concat(node_id, '' : '', nodecat_id)", "sys_tablename":"v_edit_node", "sys_pk":"node_id", "sys_fct":"gw_fct_getinfofromid", "sys_filter":""}', 'Search configuration parameteres', 'Node:', NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) 
     VALUES('basic_search_v2_workcat', '{"sys_display_name":"id", "sys_tablename":"cat_work", "sys_pk":"id", "sys_filter":""}', 'Search configuration parameteres', 'Workcat:', NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+-- epa rpt widgets
+UPDATE config_form_fields SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols, 'hiddenWhenNull', true) WHERE layoutname = 'lyt_epa_data_2' AND columnname != 'result_id';
