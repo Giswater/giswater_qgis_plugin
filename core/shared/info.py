@@ -667,7 +667,7 @@ class GwInfo(QObject):
             if reload_epa and 'lyt_epa' not in field['layoutname']:
                 continue
             if field.get('widgetcontrols') and field['widgetcontrols'].get('hiddenWhenNull') \
-                    and field.get('value') is None:
+                    and field.get('value') in (None, ''):
                 continue
             label, widget = tools_gw.set_widgets(self.dlg_cf, complet_result, field, self.tablename, self)
             if widget is None:
