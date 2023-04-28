@@ -1460,6 +1460,15 @@ class GwInfo(QObject):
                         if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
                             self.my_json[str(widget.property('columnname'))] = str(value)
                         widget.clearFocus()
+                # Widgets in tab_epa
+                widgets = dialog.tab_epa.findChildren(QWidget)
+                widgets.extend(other_widgets)
+                for widget in widgets:
+                    if widget.hasFocus():
+                        value = tools_qt.get_text(dialog, widget)
+                        if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
+                            self.my_json_epa[str(widget.property('columnname'))] = str(value)
+                        widget.clearFocus()
             except RuntimeError:
                 pass
 
@@ -1471,7 +1480,7 @@ class GwInfo(QObject):
         # Therefore whenever the cursor enters a widget, it will ask if we want to save changes
         if not action_edit.isChecked():
             self._get_last_value(dialog, generic)
-            if str(self.my_json) == '{}':
+            if str(self.my_json) == '{}' and str(self.my_json_epa) == '{}':
                 tools_qt.set_action_checked(action_edit, False)
                 tools_gw.enable_widgets(dialog, self.complet_result['body']['data'], False)
                 self._enable_actions(dialog, False)
@@ -1513,7 +1522,7 @@ class GwInfo(QObject):
 
     def _stop_editing(self, dialog, action_edit, layer, fid, my_json, new_feature=None):
 
-        if my_json == '' or str(my_json) == '{}':
+        if (my_json == '' or str(my_json) == '{}') and (self.my_json_epa == '' or str(self.my_json_epa) == '{}'):
             QgsProject.instance().blockSignals(True)
             tools_qt.set_action_checked(action_edit, False)
             tools_gw.enable_widgets(dialog, self.complet_result['body']['data'], False)
