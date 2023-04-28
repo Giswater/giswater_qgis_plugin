@@ -23,12 +23,9 @@ SELECT SCHEMA_NAME.gw_fct_getprocess($${"client":{"device":4, "lang":"CA", "info
 DECLARE
 
 v_version text;
-v_role text;
 v_projectype text;
 v_filter text;
 v_fields json;
-v_isepa boolean = false;
-v_epa_user text;
 rec record;
 v_querytext text;
 v_querytext_mod text;
@@ -38,7 +35,6 @@ v_state text;
 v_inp_result text; 
 v_rpt_result text;
 v_return json;
-v_return2 text;
 v_nodetype text;
 v_nodecat text;
 v_arrayresult text[];
@@ -50,13 +46,6 @@ v_debug_vars json;
 v_debug json;
 v_msgerr json;
 v_value text;
-v_reports json;
-v_reports_basic json;
-v_reports_om json;
-v_reports_edit json;
-v_reports_epa json;
-v_reports_master json;
-v_reports_admin json;
 v_inp_hydrology text;
 v_inp_dwf text;
 v_inp_dscenario text;
@@ -66,8 +55,11 @@ v_mincut integer;
 v_device integer;
 v_function_id integer;
 
-v_functionparams json;
-v_feature_type text;
+v_value_element text;
+v_value_array text[];
+v_value_json json;
+v_response_array text[];
+v_fields_aux json;
 
 BEGIN
 
@@ -240,6 +232,17 @@ BEGIN
 		END IF;
 
 	END LOOP;
+
+	if json_typeof(((v_fields->>'functionparams')::json->>'featureType')::json) = 'array' and (v_fields->>'functionparams')::json->>'featureType' != '[]' then
+
+			v_value_array := ARRAY(SELECT json_array_elements(((v_fields->>'functionparams')::json->>'featureType')::json));
+			FOREACH v_value_element IN ARRAY v_value_array loop
+				SELECT array_agg(child_layer) FROM cat_feature WHERE feature_type = UPPER(replace(v_value_element, '"', '')) AND active IS TRUE into v_response_array;
+				v_value_json = gw_fct_json_object_set_key(v_value_json, replace(v_value_element, '"', ''), v_response_array);
+			end loop;
+			v_fields_aux = gw_fct_json_object_set_key(((v_fields->>'functionparams')::json), 'featureType', v_value_json);
+			v_fields = gw_fct_json_object_set_key(v_fields, 'functionparams', v_fields_aux);
+	end if;
 
 	v_process := COALESCE(v_process, '[]');
 	
