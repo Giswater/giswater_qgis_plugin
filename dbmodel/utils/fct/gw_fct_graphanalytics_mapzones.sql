@@ -460,14 +460,14 @@ BEGIN
 			IF v_class = 'DRAINZONE' THEN
 				INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
 				SELECT  arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
-				WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE AND v_edit_arc.state > 0;
+				WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND value_state_type.is_operative=TRUE AND v_edit_arc.state > 0;
 			ELSE
 				INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
 				SELECT  arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
-				WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE AND v_edit_arc.state > 0
+				WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND value_state_type.is_operative=TRUE AND v_edit_arc.state > 0
 				UNION
 				SELECT  arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
-				WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE AND v_edit_arc.state > 0;
+				WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND value_state_type.is_operative=TRUE AND v_edit_arc.state > 0;
 
 			END IF;
 
