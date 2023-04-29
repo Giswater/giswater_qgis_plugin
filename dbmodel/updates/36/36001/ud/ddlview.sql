@@ -71,6 +71,85 @@ SELECT inp_gully.*
 FROM inp_gully;
 
 
+CREATE OR REPLACE VIEW ve_epa_pump AS
+SELECT inp_pump.*, 
+percent, 
+num_startup, 
+min_flow, 
+avg_flow, 
+max_flow, 
+vol_ltr, 
+powus_kwh, 
+timoff_min,
+timoff_max
+FROM inp_pump 
+LEFT JOIN v_rpt_pumping_sum USING (arc_id);
+
+CREATE OR REPLACE VIEW ve_epa_virtual AS
+SELECT inp_virtual.*
+FROM inp_virtual;
+
+CREATE OR REPLACE VIEW ve_epa_netgully AS
+SELECT inp_netgully.*
+FROM inp_netgully;
+
+CREATE OR REPLACE VIEW ve_epa_orifice AS
+SELECT inp_orifice.*,
+max_flow, 
+time_days, 
+time_hour, 
+max_veloc, 
+mfull_flow, 
+mfull_dept, 
+max_shear, 
+max_hr, 
+max_slope, 
+day_max, 
+time_max, 
+min_shear, 
+day_min, 
+time_min
+FROM inp_orifice
+LEFT JOIN rpt_arcflow_sum USING (arc_id);
+
+CREATE OR REPLACE VIEW ve_epa_weir AS
+SELECT inp_weir.*,
+max_flow, 
+time_days, 
+time_hour, 
+max_veloc, 
+mfull_flow, 
+mfull_dept, 
+max_shear, 
+max_hr, 
+max_slope, 
+day_max, 
+time_max, 
+min_shear, 
+day_min, 
+time_min
+FROM inp_weir
+LEFT JOIN rpt_arcflow_sum USING (arc_id);
+
+CREATE OR REPLACE VIEW ve_epa_outlet AS
+SELECT inp_outlet.*,
+max_flow, 
+time_days, 
+time_hour, 
+max_veloc, 
+mfull_flow, 
+mfull_dept, 
+max_shear, 
+max_hr, 
+max_slope, 
+day_max, 
+time_max, 
+min_shear, 
+day_min, 
+time_min
+FROM inp_outlet
+LEFT JOIN rpt_arcflow_sum USING (arc_id);
+
 
 CREATE OR REPLACE VIEW vu_arc AS 
  SELECT arc.arc_id,

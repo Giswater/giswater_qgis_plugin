@@ -373,3 +373,130 @@ iseditable, isautoupdate, lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 UPDATE config_form_fields SET iseditable = true WHERE  formname ilike 'v_edit_inp_dscenario%' and columnname ='node_id';
+
+
+    
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'curve_id', 'lyt_epa_data_1', 1, 'string', 'combo', 'curve_id:', 'curve_id', false, false, true, false, 'SELECT id, id AS idval FROM inp_curve 
+WHERE id IS NOT NULL','{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'status', 'lyt_epa_data_1', 2, 'string', 'combo', 'status:', 'status', false, false, true, false, 'SELECT  id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_status''','{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'startup', 'lyt_epa_data_1', 3, 'double', 'text', 'startup:', 'startup', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'shutoff', 'lyt_epa_data_1', 4, 'double', 'text', 'shutoff:', 'shutoff', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'percent', 'lyt_epa_data_2', 1, 'string', 'text', 'percent:', 'percent', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'num_startup', 'lyt_epa_data_2', 2, 'string', 'text', 'num_startup :', 'num_startup', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'min_flow', 'lyt_epa_data_2', 3, 'string', 'text', 'min_flow:', 'min_flow', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'avg_flow', 'lyt_epa_data_2', 4, 'string', 'text', 'avg_flow:', 'avg_flow', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'max_flow', 'lyt_epa_data_2', 5, 'string', 'text', 'max_flow:', 'max_flow', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'vol_ltr', 'lyt_epa_data_2', 6, 'string', 'text', 'vol_ltr:', 'vol_ltr', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'powus_kwh', 'lyt_epa_data_2', 7, 'string', 'text', 'powus_kwh:', 'powus_kwh', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'timoff_min', 'lyt_epa_data_2', 8, 'string', 'text', 'timoff_min:', 'timoff_min', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'timoff_max', 'lyt_epa_data_2', 9, 'string', 'text', 'timoff_max:', 'timoff_max', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, 
+ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+SELECT 've_epa_netgully', formtype, tabname, columnname, 'lyt_epa_data_1', layoutorder, datatype, widgettype, label, tooltip, placeholder, 
+ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
+FROM config_form_fields
+where formname ='v_edit_inp_netgully' and columnname in ('y0', 'ysur', 'apond', 'outlet_type', 'custom_width', 'custom_length', 'custom_depth',
+'method', 'weir_cd', 'orifice_cd', 'custom_a_param', 'custom_b_param', 'efficiency') 
+order by columnname ;
+
+UPDATE config_form_fields SET  layoutorder = ordinal_position -1 
+FROM  information_schema.columns
+WHERE table_schema = 'SCHEMA_NAME'
+AND table_name   = 've_epa_netgully' AND table_name=formname AND columnname=column_name  ;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, 
+ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+SELECT 've_epa_orifice', formtype, tabname, columnname, 'lyt_epa_data_1', layoutorder, datatype, widgettype, label, tooltip, placeholder, 
+ismandatory, isparent, TRUE, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
+FROM config_form_fields
+where formname ='v_edit_inp_orifice' and columnname in ('ori_type', 'offsetval', 'cd', 'orate', 'flap', 'shape', 'geom1',
+'geom2', 'geom3', 'geom4', 'close_time') 
+order by columnname ;
+
+UPDATE config_form_fields SET  layoutorder = ordinal_position -1 
+FROM  information_schema.columns
+WHERE table_schema = 'SCHEMA_NAME'
+AND table_name   = 've_epa_orifice' AND table_name=formname AND columnname=column_name ;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, 
+ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+SELECT 've_epa_orifice', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, 
+ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
+FROM config_form_fields
+where formname ='ve_epa_conduit' and layoutname = 'lyt_epa_data_2' order by columnname ;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, 
+ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+SELECT 've_epa_weir', formtype, tabname, columnname, 'lyt_epa_data_1', layoutorder, datatype, widgettype, label, tooltip, placeholder, 
+ismandatory, isparent, TRUE, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
+FROM config_form_fields
+where formname ='v_edit_inp_weir' and columnname in ('weir_type', 'offsetval', 'cd', 'ec', 'cd2','flap',  'geom1',
+'geom2', 'geom3', 'geom4', 'surcharge', 'road_width', 'road_surf', 'coef_curve') 
+order by columnname ;
+
+UPDATE config_form_fields SET  layoutorder = ordinal_position -1 
+FROM  information_schema.columns
+WHERE table_schema = 'SCHEMA_NAME'
+AND table_name   = 've_epa_weir' AND table_name=formname AND columnname=column_name ;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, 
+ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+SELECT 've_epa_weir', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, 
+ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
+FROM config_form_fields
+where formname ='ve_epa_conduit' and layoutname = 'lyt_epa_data_2' order by columnname ;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, 
+ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+SELECT 've_epa_outlet', formtype, tabname, columnname, 'lyt_epa_data_1', layoutorder, datatype, widgettype, label, tooltip, placeholder, 
+ismandatory, isparent, TRUE, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
+FROM config_form_fields
+where formname ='v_edit_inp_outlet' and columnname in ('outlet_type', 'offsetval', 'curve_id', 'cd1', 'cd2','flap') 
+order by columnname ;
+
+UPDATE config_form_fields SET  layoutorder = ordinal_position -1 
+FROM  information_schema.columns
+WHERE table_schema = 'SCHEMA_NAME'
+AND table_name   = 've_epa_outlet' AND table_name=formname AND columnname=column_name ;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, 
+ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+SELECT 've_epa_outlet', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, 
+ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
+FROM config_form_fields
+where formname ='ve_epa_conduit' and layoutname = 'lyt_epa_data_2' order by columnname ;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+VALUES ('ve_epa_virtual', 'form_feature', 'epa', 'fusion_node', 'lyt_epa_data_1', 1, 'string', 'text', 'fusion_node:', 'fusion_node', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+VALUES ('ve_epa_virtual', 'form_feature', 'epa', 'add_length', 'lyt_epa_data_1', 2, 'boolean', 'check', 'add_length:', 'add_length', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);

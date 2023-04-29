@@ -48,6 +48,39 @@ BEGIN
             UPDATE inp_conduit 
             SET barrels=NEW.barrels,culvert=NEW.culvert,kentry=NEW.kentry,kexit=NEW.kexit,kavg=NEW.kavg,flap=NEW.flap,q0=NEW.q0 
             WHERE arc_id=OLD.arc_id; 
+
+        ELSIF v_epatype = 'pump' THEN
+            UPDATE inp_pump 
+            SET curve_id=NEW.curve_id,status=NEW.status,startup=NEW.startup,shutoff=NEW.shutoff 
+            WHERE arc_id=OLD.arc_id;
+
+        ELSIF v_epatype = 'virtual' THEN
+            UPDATE inp_virtual
+            SET fusion_node=NEW.fusion_node,add_length=NEW.add_length
+            WHERE arc_id=OLD.arc_id;
+
+        ELSIF v_epatype = 'netgully' THEN
+            UPDATE inp_netgully
+            SET y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond, close_timeç=NEW.outlet_type, custom_width=NEW.custom_width, custom_length=NEW.custom_length, custom_depth=NEW.custom_depth,
+            method=NEW.method, weir_cd=NEW.weir_cd, orifice_cd=NEW.orifice_cd, custom_a_param=NEW.custom_a_param, custom_b_param=NEW.custom_b_param, efficiency=NEW.efficiency
+            WHERE node_id=OLD.node_id;
+
+        ELSIF v_epatype = 'orifice' THEN
+            UPDATE inp_orifice
+            SET ori_type=NEW.ori_type, offsetval=NEW.offsetval, cd=NEW.cd, orate=NEW.orate, flap=NEW.flap, shape=NEW.shape, geom1=NEW.geom1,
+            geom2=NEW.geom2, geom3=NEW.geom3, geom4=NEW.geom4, close_time=NEW.close_time
+            WHERE arc_id=OLD.arc_id;
+
+        ELSIF v_epatype = 'weir' THEN
+            UPDATE inp_weir
+            SET weir_type=NEW.weir_type, offsetval=NEW.offsetval, cd=NEW.cd, ec=NEW.ec, cd2=NEW.cd2, flap=NEW.flap, geom1=NEW.geom1,
+            geom2=NEW.geom2, geom3=NEW.geom3, geom4=NEW.geom4, surcharge=NEW.surcharge, road_width=NEW.road_width, road_surf=NEW.road_surf, coef_curve=NEW.coef_curve
+            WHERE arc_id=OLD.arc_id;
+
+        ELSIF v_epatype = 'outlet' THEN
+            UPDATE inp_outlet
+            SET outlet_type=NEW.outlet_type, offsetval=NEW.offsetval, curve_id=NEW.curve_id, cd1=NEW.cd1,  cd2=NEW.cd2, flap=NEW.flap
+            WHERE arc_id=OLD.arc_id;
         END IF;
 
 		RETURN NEW;
