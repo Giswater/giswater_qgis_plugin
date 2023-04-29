@@ -46,7 +46,7 @@ INSERT INTO config_param_system ("parameter", value, descript, "label", dv_query
 UPDATE config_form_fields SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols, 'hiddenWhenNull', true) WHERE layoutname = 'lyt_epa_data_2' AND columnname != 'result_id';
 
 -- manage datatype for epa widgets
-UPDATE ws_36.config_form_fields c
+UPDATE config_form_fields c
 SET "datatype" = CASE
                     WHEN format_type(atttypid, atttypmod) IN ('integer') THEN 'integer'
                     WHEN format_type(atttypid, atttypmod) IN ('double precision', 'numeric') THEN 'double'
