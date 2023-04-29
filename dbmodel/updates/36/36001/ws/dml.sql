@@ -1348,3 +1348,19 @@ UPDATE sys_function set descript = 'Function to create dscenarios from CRM.
 This function store values on CONNEC features. 
 When the network geometry generator works with [NODE] demands are moved 50% to node_1 and node_2.'
 WHERE id =3110;
+
+INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+ VALUES (3236, 'gw_fct_mincut_show_current', 'ws', 'function', 'json', 'json', 
+'Visualize mincuts that are being currently executed in the field.', 'role_om', NULL, 'core')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device) 
+VALUES(3236, 'Show current mincuts', '{"featureType":[]}'::json, 
+'[{"widgetname":"explId", "label":"Exploitation:","widgettype":"combo","datatype":"text","tooltip": "Exploitation", "layoutname":"grl_option_parameters","layoutorder":2, 
+"dvQueryText":"select expl_id as id, name as idval from exploitation where active is not false order by name", "selectedId":"$userExploitation"}]'::json, NULL, true,
+'{4,5}'  );
+
+INSERT INTO config_function(id, function_name, style, layermanager, actions)
+VALUES (3236, 'gw_fct_mincut_show_current', '{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5},
+"line":{"style":"random","field":"result_id","width":2,"transparency":0.5},
+"polygon":{"style":"random","field":"fid","width":2,"transparency":0.5}}}', null, null);

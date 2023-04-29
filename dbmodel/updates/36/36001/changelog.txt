@@ -13,3 +13,4 @@
     - cat_arc: visitability
 - Do not allow to insert features with diferent expl_id than the psector
 - New functionality: get address and postnumber automatically when inserting node and connec
+- New function: gw_fct_mincut_show_current to show mincuts that are currently beeing executed in a field.
