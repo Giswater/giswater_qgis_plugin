@@ -496,7 +496,8 @@ FROM config_form_fields
 where formname ='ve_epa_conduit' and layoutname = 'lyt_epa_data_2' order by columnname ;
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
-VALUES ('ve_epa_virtual', 'form_feature', 'epa', 'fusion_node', 'lyt_epa_data_1', 1, 'string', 'text', 'fusion_node:', 'fusion_node', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+VALUES ('ve_epa_virtual', 'form_feature', 'epa', 'fusion_node', 'lyt_epa_data_1', 1, 'string', 'typeahead', 'fusion_node:', 'fusion_node', false, false, true, false, 'SELECT node_id as id, node_id as idval FROM v_edit_node WHERE 1=1 ','{"filterSign":"ILIKE"}', NULL, false);
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
-VALUES ('ve_epa_virtual', 'form_feature', 'epa', 'add_length', 'lyt_epa_data_1', 2, 'boolean', 'check', 'add_length:', 'add_length', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+VALUES ('ve_epa_virtual', 'form_feature', 'epa', 'add_length', 'lyt_epa_data_1', 2, 'boolean', 'check', 'add_length:', 'add_length', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+
