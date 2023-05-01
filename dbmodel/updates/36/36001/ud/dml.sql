@@ -501,3 +501,4 @@ VALUES ('ve_epa_virtual', 'form_feature', 'epa', 'fusion_node', 'lyt_epa_data_1'
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
 VALUES ('ve_epa_virtual', 'form_feature', 'epa', 'add_length', 'lyt_epa_data_1', 2, 'boolean', 'check', 'add_length:', 'add_length', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
 
+UPDATE sys_table SET context = NULL, orderby=NULL WHERE id='v_edit_inp_divider';
