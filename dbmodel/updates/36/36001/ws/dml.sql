@@ -1364,3 +1364,8 @@ INSERT INTO config_function(id, function_name, style, layermanager, actions)
 VALUES (3236, 'gw_fct_mincut_show_current', '{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5},
 "line":{"style":"random","field":"result_id","width":2,"transparency":0.5},
 "polygon":{"style":"random","field":"fid","width":2,"transparency":0.5}}}', null, null);
+
+
+INSERT INTO sys_fprocess
+(fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
+VALUES(490, 'Show current mincuts', 'ws', NULL, 'core', true, 'Function process', NULL);

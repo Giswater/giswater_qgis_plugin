@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_mincut_show_current($${
 "form":{}, "feature":{}, "data":{"filterFields":{}, 
 "pageInfo":{}, "parameters":{"explId":"1"}}}$$);
 
---fid: 488
+--fid: 490
 */
 
 DECLARE
@@ -37,7 +37,7 @@ v_array text;
 v_node_aux record;
 v_error_context text;
 v_count integer;
-v_fid integer = 488;
+v_fid integer = 490;
 BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
