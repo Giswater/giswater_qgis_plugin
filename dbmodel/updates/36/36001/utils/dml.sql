@@ -499,3 +499,13 @@ VALUES(3234, 'The inserted feature has a diferent exploitation than the psector'
 --27/04/2023
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) 
 VALUES('edit_auto_streetvalues', '{"status":false, "field":"postnumber","buffer":60}', 'Insert street values automatically on field ''postnumber'' or ''postcomplement''', 'Auto-insert street values', NULL, NULL, true, 31, 'utils', NULL, NULL, 'json', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_inventory');
+
+--01/06/2023
+-- code reservation for checkdemands algorithm (epatools plugin)
+INSERT INTO sys_fprocess
+(fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
+VALUES(491, 'Check demands export input file', 'ws', NULL, 'core', true, 'Function process', NULL);
+
+INSERT INTO sys_fprocess
+(fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
+VALUES(492, 'Check demands import results', 'ws', NULL, 'core', true, 'Function process', NULL);
