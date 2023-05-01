@@ -47,11 +47,29 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_arc", "
 
 
 DROP VIEW IF EXISTS v_edit_man_chamber_pol;
+DROP VIEW IF EXISTS v_edit_man_storage_pol;
+DROP VIEW IF EXISTS v_edit_man_wwtp_pol;
+DROP VIEW IF EXISTS v_edit_man_netgully_pol;
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"_pol_id_","action":"DELETE-FIELD","hasChilds":"True","onlyChilds":"True"}}$$);
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "action":"RESTORE-VIEW","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_man_chamber"], "fieldName":"_pol_id_","action":"DELETE-FIELD","hasChilds":"False","onlyChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_man_wwtp"], "fieldName":"_pol_id_","action":"DELETE-FIELD","hasChilds":"False","onlyChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_man_storage"], "fieldName":"_pol_id_","action":"DELETE-FIELD","hasChilds":"False","onlyChilds":"True"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_man_netgully"], "fieldName":"_pol_id_","action":"DELETE-FIELD","hasChilds":"False","onlyChilds":"True"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_chamber", "column":"_pol_id_", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_storage", "column":"_pol_id_", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_wwtp", "column":"_pol_id_", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_netgully", "column":"_pol_id_", "dataType":"integer"}}$$);
+
+SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+"data":{"viewName":["v_edit_node"], "action":"RESTORE-VIEW","hasChilds":"True"}}$$);
