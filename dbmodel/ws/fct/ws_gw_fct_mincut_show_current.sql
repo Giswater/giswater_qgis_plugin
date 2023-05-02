@@ -87,7 +87,7 @@ BEGIN
 		VALUES (v_fid,  'No mincuts are being executed right now.', v_count);
 	ELSE
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (v_fid,  concat ('There are ',v_count,' mincuts being executed at the moemnt.'), v_count);
+		VALUES (v_fid,  concat ('There are ',v_count,' mincuts being executed at the moment.'), v_count);
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
 		SELECT v_fid,  concat ('Mincut_id: ',string_agg(id::text, ', '), '.' ), v_count 
