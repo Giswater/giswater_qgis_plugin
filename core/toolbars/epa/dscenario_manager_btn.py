@@ -382,11 +382,11 @@ class GwDscenarioManagerButton(GwAction):
 
         # Hide unwanted columns
         col_idx = tools_qt.get_col_index_by_col_name(widget, 'dscenario_id')
-        if col_idx is not False:
+        if col_idx not in (None, False):
             widget.setColumnHidden(col_idx, True)
 
         geom_col_idx = tools_qt.get_col_index_by_col_name(widget, 'the_geom')
-        if geom_col_idx is not False:
+        if geom_col_idx not in (None, False):
             widget.setColumnHidden(geom_col_idx, True)
 
         # Sort the table by feature id
