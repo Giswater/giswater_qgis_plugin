@@ -182,7 +182,7 @@ BEGIN
 		-- netgully
 		EXECUTE 'INSERT INTO temp_gully 
 		SELECT 
-		concat(''NG'',node_id), g.node_type, gratecat_id, null, g.node_id, g.sector_id, g.state, state_type, 
+		concat(''NG'',node_id), g.node_type, gratecat_id, null, g.node_id, g.sector_id, g.state, g.state_type, 
 		case when custom_top_elev is null then top_elev else custom_top_elev end, 
 		units, units_placement, outlet_type,
 		case when custom_width is null then total_width else custom_width end, 
@@ -193,7 +193,7 @@ BEGIN
 		case when custom_b_param is null then b_param else custom_b_param end,
 		efficiency, the_geom
 		FROM v_edit_inp_netgully g 
-		LEFT JOIN value_state_type ON id=state_type
+		LEFT JOIN value_state_type ON id=g.state_type
 		WHERE g.sector_id > 0 '||v_statetype||';';
 
 		-- gully
@@ -201,19 +201,19 @@ BEGIN
 		SELECT 
 		gully_id, g.gully_type, gratecat_id, g.arc_id, 
 		case when pjoint_type = ''NODE'' then pjoint_id else a.node_2 END AS node_id, 
-		g.sector_id, g.state, state_type, 
+		g.sector_id, g.state, g.state_type, 
 		case when custom_top_elev is null then top_elev else custom_top_elev end, 
 		units, units_placement, outlet_type,
 		case when custom_width is null then total_width else custom_width end, 
-		case when custom_length is null then total_length else custom_length end,
+		case when g.custom_length is null then total_length else g.custom_length end,
 		case when custom_depth is null then depth else custom_depth end,
 		method, weir_cd, orifice_cd, 
 		case when custom_a_param is null then a_param else custom_a_param end,
 		case when custom_b_param is null then b_param else custom_b_param end,
-		efficiency, the_geom
+		efficiency, g.the_geom
 		FROM v_edit_inp_gully g
 		LEFT JOIN arc a USING (arc_id)
-		LEFT JOIN value_state_type ON id=state_type
+		LEFT JOIN value_state_type ON id=g.state_type
 		WHERE arc_id IS NOT NULL AND g.sector_id > 0 '||v_statetype||';';
 		
 	END IF;
