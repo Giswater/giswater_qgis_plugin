@@ -4124,7 +4124,7 @@ def set_widgets(dialog, complet_result, field, tablename, class_info):
                   "class": class_info}
         widget = globals()[f"_manage_{field['widgettype']}"](**kwargs)
     except Exception as e:
-        msg = (f"{type(e).__name__}: {e} Python function: _set_widgets. WHERE columname='{field['columnname']}' "
+        msg = (f"{type(e).__name__}: {e} Python function: tools_gw.set_widgets. WHERE columname='{field['columnname']}' "
                f"AND widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'")
         tools_qgis.show_message(msg, 2, dialog=dialog)
         return label, widget
@@ -4153,7 +4153,7 @@ def set_widgets(dialog, complet_result, field, tablename, class_info):
 
 
 def _manage_text(**kwargs):
-    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
     """
 
@@ -4206,7 +4206,7 @@ def _set_reg_exp(widget, field):
 
 
 def _manage_typeahead(**kwargs):
-    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
 
@@ -4219,7 +4219,7 @@ def _manage_typeahead(**kwargs):
 
 
 def _manage_combo(**kwargs):
-    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
     dialog = kwargs['dialog']
@@ -4232,7 +4232,7 @@ def _manage_combo(**kwargs):
 
 
 def _manage_check(**kwargs):
-    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
 
@@ -4245,7 +4245,7 @@ def _manage_check(**kwargs):
 
 
 def _manage_datetime(**kwargs):
-    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
         widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
 
@@ -4256,7 +4256,7 @@ def _manage_datetime(**kwargs):
 
 
 def _manage_button(**kwargs):
-    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
         widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
 
@@ -4275,7 +4275,7 @@ def _manage_button(**kwargs):
 
 
 def _manage_hyperlink(**kwargs):
-    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
 
@@ -4286,7 +4286,7 @@ def _manage_hyperlink(**kwargs):
 
 
 def _manage_hspacer(**kwargs):
-    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
         widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
 
@@ -4295,7 +4295,7 @@ def _manage_hspacer(**kwargs):
 
 
 def _manage_vspacer(**kwargs):
-    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
         widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
 
@@ -4304,7 +4304,7 @@ def _manage_vspacer(**kwargs):
 
 
 def _manage_textarea(**kwargs):
-    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
 
@@ -4314,7 +4314,7 @@ def _manage_textarea(**kwargs):
 
 
 def _manage_spinbox(**kwargs):
-    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
 
@@ -4323,7 +4323,7 @@ def _manage_spinbox(**kwargs):
 
 
 def _manage_doubleSpinbox(**kwargs):
-    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
         widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
 
@@ -4339,7 +4339,7 @@ def _manage_list(self, **kwargs):
 
 
 def _manage_tableview(**kwargs):
-    """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
         widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
     complet_result = kwargs['complet_result']
