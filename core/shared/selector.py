@@ -23,6 +23,7 @@ class GwSelector:
     def __init__(self):
         self.checkall = False
         self.help_button = None
+        self.scrolled_amount = 0
 
 
     def open_selector(self, selector_type="selector_basic", reload_dlg=None):
@@ -37,6 +38,8 @@ class GwSelector:
             else:
                 current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
             reload_dlg.main_tab.clear()
+            if self.scrolled_amount:
+                reload_dlg.scrollArea.verticalScrollBar().setValue(self.scrolled_amount)
             self.get_selector(reload_dlg, selector_type, current_tab=current_tab, aux_params=aux_params)
             return
 
@@ -374,6 +377,7 @@ class GwSelector:
             layer.setExtent(canvas_extent)
             global_vars.iface.mapCanvas().refresh()
 
+        self.scrolled_amount = dialog.scrollArea.verticalScrollBar().value()
         # Reload selectors dlg
         self.open_selector(selector_type, reload_dlg=dialog)
 
