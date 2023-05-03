@@ -98,7 +98,7 @@ BEGIN
 	v_zoomratio := ((p_data ->> 'data')::json->> 'coordinates')::json->>'zoomRatio';
 
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
-	IF v_cur_user IS NULL THEN v_cur_user = v_cur_user; END IF;
+	IF v_cur_user IS NULL THEN v_cur_user = current_user; END IF;
 
 	-- delete previous
 	DELETE FROM audit_check_data WHERE fid = 216 and cur_user=v_cur_user;
@@ -132,7 +132,9 @@ BEGIN
 			end if;
 		END IF;
 
-		IF v_device = 5 THEN
+        IF v_device = 4 THEN
+            RETURN gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut, v_usepsectors);
+		ELSIF v_device = 5 THEN
 			SELECT gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut, v_usepsectors) INTO v_response;
 			p_data = jsonb_set(p_data::jsonb, '{data,mincutId}', to_jsonb(v_mincut))::json;
 			v_mincut_class = 1;
