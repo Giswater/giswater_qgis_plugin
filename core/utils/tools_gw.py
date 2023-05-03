@@ -2366,7 +2366,7 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
                         if 'transparency' in return_manager['style'][key]:
                             opacity = return_manager['style'][key]['transparency']
                         color_values = {}
-                        for item in json_result['body']['returnManager']['style'][key]['values']:
+                        for item in json_result['body']['returnManager']['style'][key].get('values', []):
                             color = QColor(item['color'][0], item['color'][1], item['color'][2], int(opacity * 255))
                             color_values[item['id']] = color
                         cat_field = str(style_type[key]['field'])
