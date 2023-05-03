@@ -936,11 +936,6 @@ class GwMincut:
 
         sql += f" WHERE id = '{result_mincut_id}';\n"
 
-        # Update table 'selector_mincut_result'
-        sql += (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;\n"
-                f"INSERT INTO selector_mincut_result (cur_user, result_id) VALUES "
-                f"(current_user, {result_mincut_id});")
-
         # Check if any 'connec' or 'hydro' associated
         if self.sql_connec != "":
             sql += self.sql_connec
@@ -2001,10 +1996,7 @@ class GwMincut:
             self.action_mincut_composer.setDisabled(False)
 
             # Update table 'selector_mincut_result'
-            sql = (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;\n"
-                   f"INSERT INTO selector_mincut_result (cur_user, result_id) VALUES"
-                   f" (current_user, {real_mincut_id});")
-            tools_db.execute_sql(sql, log_error=True)
+            self._update_result_selector(real_mincut_id)
 
             # Refresh map canvas
             tools_qgis.refresh_map_canvas()
