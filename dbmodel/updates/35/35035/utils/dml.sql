@@ -18,7 +18,7 @@ SELECT c.formname, formtype, tabname, 'expl_id2',  'lyt_data_2', lytorder+1, dat
 iseditable, isautoupdate,  'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL and expl_id !=0', dv_orderby_id, true, null, null, true
 FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully') 
 AND columnname = 'expl_id'
-group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue,   lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 

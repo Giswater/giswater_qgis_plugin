@@ -325,7 +325,7 @@ where layoutname ='lyt_data_2' and formname  in ('v_edit_node','v_edit_arc','v_e
 SELECT c.formname, formtype, tabname, 'adate', 'lyt_data_2', lytorder+1, datatype, widgettype, 'Adate', 'adate', NULL, false, false, true, false, true
 FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully')
 AND columnname='observ'
-group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
@@ -336,7 +336,7 @@ where layoutname ='lyt_data_2' and formname  in ('v_edit_node','v_edit_arc','v_e
 SELECT c.formname, formtype, tabname, 'adescript', 'lyt_data_2', lytorder+1, datatype, widgettype, 'Adescript', 'adescript', NULL, false, false, true, false, true
 FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully')
 AND columnname='observ'
-group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate, lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
@@ -347,7 +347,7 @@ WITH lyt as (SELECT distinct formname, max(layoutorder) as lytorder from config_
 where layoutname ='lyt_data_2' and formname  in ('v_edit_gully', 've_gully') group by formname)
 SELECT c.formname, formtype, tabname, 'siphon_type', 'lyt_data_2', lytorder+1, datatype, widgettype, 'Siphon_type', 'siphon_type', NULL, false, false, true, false, true
 FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_gully', 've_gully') AND columnname='observ'
-group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate, lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
@@ -357,7 +357,7 @@ WITH lyt as (SELECT distinct formname, max(layoutorder) as lytorder from config_
 where layoutname ='lyt_data_2' and formname  in ('v_edit_gully', 've_gully') group by formname)
 SELECT c.formname, formtype, tabname, 'odorflap', 'lyt_data_2', lytorder+1, datatype, widgettype, 'Odorflap', 'odorflap', NULL, false, false, true, false, true
 FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_gully', 've_gully') AND columnname='observ'
-group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate, lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
@@ -368,7 +368,7 @@ WITH lyt as (SELECT distinct formname, max(layoutorder) as lytorder from config_
 where layoutname ='lyt_data_2' and formname  in ('v_edit_arc', 've_arc') group by formname)
 SELECT c.formname, formtype, tabname, 'visitability', 'lyt_data_2', lytorder+1, datatype, widgettype, 'Visitability', 'visitability', NULL, false, false, false, false, true
 FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_arc', 've_arc') AND columnname='inventory'
-group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate, lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
