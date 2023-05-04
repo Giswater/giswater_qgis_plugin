@@ -21,8 +21,8 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 		
 		IF v_table = 'inp_pattern' THEN
-			INSERT INTO inp_pattern (pattern_id, observ, pattern_type, tsparameters,expl_id) 
-			VALUES (NEW.pattern_id, NEW.observ, NEW.pattern_type, NEW.tsparameters::json, NEW.expl_id) ;
+			INSERT INTO inp_pattern (pattern_id, observ, pattern_type, tsparameters,expl_id, active) 
+			VALUES (NEW.pattern_id, NEW.observ, NEW.pattern_type, NEW.tsparameters::json, NEW.expl_id, NEW.active) ;
 		
 		ELSIF v_table = 'inp_pattern_value' THEN
 			INSERT INTO inp_pattern_value (pattern_id,factor_1,factor_2,factor_3,factor_4,factor_5,factor_6,factor_7,factor_8,factor_9,
@@ -39,7 +39,8 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 		
 		IF v_table = 'inp_pattern' THEN
-			UPDATE inp_pattern SET pattern_id=NEW.pattern_id, observ=NEW.observ, pattern_type=NEW.pattern_type, tsparameters=NEW.tsparameters::json, expl_id=NEW.expl_id
+			UPDATE inp_pattern SET pattern_id=NEW.pattern_id, observ=NEW.observ, pattern_type=NEW.pattern_type, tsparameters=NEW.tsparameters::json, expl_id=NEW.expl_id,
+			active=NEW.active
 			WHERE pattern_id=OLD.pattern_id;
 		END IF;
 

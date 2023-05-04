@@ -325,7 +325,7 @@ where layoutname ='lyt_data_2' and formname  in ('v_edit_node','v_edit_arc','v_e
 SELECT c.formname, formtype, tabname, 'adate', 'lyt_data_2', lytorder+1, datatype, widgettype, 'Adate', 'adate', NULL, false, false, true, false, true
 FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully')
 AND columnname='observ'
-group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
@@ -336,7 +336,7 @@ where layoutname ='lyt_data_2' and formname  in ('v_edit_node','v_edit_arc','v_e
 SELECT c.formname, formtype, tabname, 'adescript', 'lyt_data_2', lytorder+1, datatype, widgettype, 'Adescript', 'adescript', NULL, false, false, true, false, true
 FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully')
 AND columnname='observ'
-group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate, lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
@@ -347,7 +347,7 @@ WITH lyt as (SELECT distinct formname, max(layoutorder) as lytorder from config_
 where layoutname ='lyt_data_2' and formname  in ('v_edit_gully', 've_gully') group by formname)
 SELECT c.formname, formtype, tabname, 'siphon_type', 'lyt_data_2', lytorder+1, datatype, widgettype, 'Siphon_type', 'siphon_type', NULL, false, false, true, false, true
 FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_gully', 've_gully') AND columnname='observ'
-group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate, lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
@@ -357,7 +357,7 @@ WITH lyt as (SELECT distinct formname, max(layoutorder) as lytorder from config_
 where layoutname ='lyt_data_2' and formname  in ('v_edit_gully', 've_gully') group by formname)
 SELECT c.formname, formtype, tabname, 'odorflap', 'lyt_data_2', lytorder+1, datatype, widgettype, 'Odorflap', 'odorflap', NULL, false, false, true, false, true
 FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_gully', 've_gully') AND columnname='observ'
-group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate, lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
@@ -368,7 +368,7 @@ WITH lyt as (SELECT distinct formname, max(layoutorder) as lytorder from config_
 where layoutname ='lyt_data_2' and formname  in ('v_edit_arc', 've_arc') group by formname)
 SELECT c.formname, formtype, tabname, 'visitability', 'lyt_data_2', lytorder+1, datatype, widgettype, 'Visitability', 'visitability', NULL, false, false, false, false, true
 FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_arc', 've_arc') AND columnname='inventory'
-group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate, lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
@@ -502,3 +502,15 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 VALUES ('ve_epa_virtual', 'form_feature', 'epa', 'add_length', 'lyt_epa_data_1', 2, 'boolean', 'check', 'add_length:', 'add_length', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
 
 UPDATE sys_table SET context = NULL, orderby=NULL WHERE id='v_edit_inp_divider';
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname,datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
+VALUES ('v_edit_inp_curve', 'form_feature', 'main','active','boolean','check','active',false, false, true, false, false);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
+VALUES ('v_edit_inp_pattern', 'form_feature', 'main','active','boolean','check','active',false, false, true, false, false);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname,datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
+VALUES ('v_edit_inp_timeseries', 'form_feature', 'main','active','boolean','check','active',false, false, true, false, false);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
+VALUES ('inp_lid', 'form_feature', 'main','active','boolean','check','active',false, false, true, false, false);

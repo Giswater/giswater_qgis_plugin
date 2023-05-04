@@ -462,7 +462,7 @@ SELECT c.formname, formtype, tabname, 'region_id', 'lyt_data_3', lytorder+1, dat
 false, false, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, null, null, true
 FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully')
 AND columnname='muni_id'
-group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
@@ -474,7 +474,7 @@ SELECT c.formname, formtype, tabname, 'province_id', 'lyt_data_3', lytorder+1, d
 false, false, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, null, null, true
 FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully')
 AND columnname='muni_id'
-group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, false, 
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 

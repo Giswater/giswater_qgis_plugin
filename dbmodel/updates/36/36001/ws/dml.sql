@@ -1361,9 +1361,9 @@ VALUES(3236, 'Show current mincuts', '{"featureType":[]}'::json,
 '{4,5}'  );
 
 INSERT INTO config_function(id, function_name, style, layermanager, actions)
-VALUES (3236, 'gw_fct_mincut_show_current', '{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5},
-"line":{"style":"random","field":"result_id","width":2,"transparency":0.5},
-"polygon":{"style":"random","field":"fid","width":2,"transparency":0.5}}}', null, null);
+VALUES (3236, 'gw_fct_mincut_show_current', '{"style":{"point":{"style":"categorized","field":"fid","width":2,"transparency":0.5},
+"line":{"style":"categorized","field":"result_id","width":2,"transparency":0.5},
+"polygon":{"style":"categorized","field":"fid","width":2,"transparency":0.5}}}', null, null);
 
 
 INSERT INTO sys_fprocess
