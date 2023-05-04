@@ -503,14 +503,14 @@ VALUES ('ve_epa_virtual', 'form_feature', 'epa', 'add_length', 'lyt_epa_data_1',
 
 UPDATE sys_table SET context = NULL, orderby=NULL WHERE id='v_edit_inp_divider';
 
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname,datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
 VALUES ('v_edit_inp_curve', 'form_feature', 'main','active','boolean','check','active',false, false, true, false, false);
 
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
 VALUES ('v_edit_inp_pattern', 'form_feature', 'main','active','boolean','check','active',false, false, true, false, false);
 
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname,datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
 VALUES ('v_edit_inp_timeseries', 'form_feature', 'main','active','boolean','check','active',false, false, true, false, false);
 
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
 VALUES ('inp_lid', 'form_feature', 'main','active','boolean','check','active',false, false, true, false, false);

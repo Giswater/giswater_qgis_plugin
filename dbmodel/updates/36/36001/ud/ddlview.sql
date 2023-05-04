@@ -1272,6 +1272,6 @@ CREATE OR REPLACE VIEW v_edit_inp_timeseries
     p.active
    FROM selector_expl s,
     inp_timeseries p
-  WHERE and p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
+  WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
   ORDER BY p.id;
 
