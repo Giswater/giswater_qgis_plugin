@@ -23,7 +23,10 @@ BEGIN
 		IF v_table = 'inp_curve' THEN
 			INSERT INTO inp_curve (id, curve_type, descript, expl_id) 
 			VALUES (NEW.id, NEW.curve_type, NEW.descript, NEW.expl_id);
-		
+			
+			IF (SELECT project_type FROM sys_version LIMIT 1) = 'UD' THEN
+				UPDATE inp_curve SET active=NEW.active WHERE id = NEW.id;
+			END IF;
 		ELSIF v_table = 'inp_curve_value' THEN
 
 			IF NEW.id IS NULL THEN
@@ -40,9 +43,13 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		IF v_table = 'inp_curve' THEN
-			UPDATE inp_curve SET id=NEW.id, curve_type=NEW.curve_type, descript=NEW.descript, expl_id=NEW.expl_id
+			UPDATE inp_curve SET id=NEW.id, curve_type=NEW.curve_type, descript=NEW.descript, expl_id=NEW.expl_id, active=NEW.active
 			WHERE id=OLD.id;
 
+			IF (SELECT project_type FROM sys_version LIMIT 1) = 'UD' THEN
+				UPDATE inp_curve SET active=NEW.active
+				WHERE id=OLD.id;
+			END IF;
 		ELSIF v_table = 'inp_curve_value' THEN
 			UPDATE inp_curve_value SET curve_id = curve_id, x_value=NEW.x_value,y_value=NEW.y_value
 			WHERE id=OLD.id;

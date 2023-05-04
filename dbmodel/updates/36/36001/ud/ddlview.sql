@@ -1228,3 +1228,50 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "systemId":"CHAMBER","fieldName":"slope", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+
+
+CREATE OR REPLACE VIEW v_edit_inp_pattern
+ AS
+ SELECT DISTINCT p.pattern_id,
+    p.pattern_type,
+    p.observ,
+    p.tsparameters::text AS tsparameters,
+    p.expl_id,
+    p.log,
+    p.active
+   FROM selector_expl s,
+    inp_pattern p
+  WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
+  ORDER BY p.pattern_id;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_curve
+ AS
+ SELECT DISTINCT c.id,
+    c.curve_type,
+    c.descript,
+    c.expl_id,
+    c.log,
+    c.active
+   FROM selector_expl s,
+    inp_curve c
+  WHERE c.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR c.expl_id IS NULL
+  ORDER BY c.id;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_timeseries
+ AS
+ SELECT DISTINCT p.id,
+    p.timser_type,
+    p.times_type,
+    p.idval,
+    p.descript,
+    p.fname,
+    p.expl_id,
+    p.log,
+    p.active
+   FROM selector_expl s,
+    inp_timeseries p
+  WHERE and p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
+  ORDER BY p.id;
+

@@ -502,3 +502,15 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 VALUES ('ve_epa_virtual', 'form_feature', 'epa', 'add_length', 'lyt_epa_data_1', 2, 'boolean', 'check', 'add_length:', 'add_length', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
 
 UPDATE sys_table SET context = NULL, orderby=NULL WHERE id='v_edit_inp_divider';
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
+VALUES ('v_edit_inp_curve', 'form_feature', 'main','active','boolean','check','active',false, false, true, false, false);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
+VALUES ('v_edit_inp_pattern', 'form_feature', 'main','active','boolean','check','active',false, false, true, false, false);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
+VALUES ('v_edit_inp_timeseries', 'form_feature', 'main','active','boolean','check','active',false, false, true, false, false);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
+VALUES ('inp_lid', 'form_feature', 'main','active','boolean','check','active',false, false, true, false, false);
