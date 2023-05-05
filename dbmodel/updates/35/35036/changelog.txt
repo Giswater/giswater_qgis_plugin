@@ -1,0 +1,3 @@
+3.5.036
+*************
+- Refactor strategy of execute psector. New traceability tables for executed and canceled psectors
