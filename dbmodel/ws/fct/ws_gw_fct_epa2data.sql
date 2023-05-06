@@ -59,15 +59,13 @@ BEGIN
 	flow_max = EXCLUDED.flow_max, flow_min = EXCLUDED.flow_min, flow_avg = EXCLUDED.flow_avg,
 	vel_max = EXCLUDED.vel_max, vel_min = EXCLUDED.vel_min, vel_avg = EXCLUDED.vel_avg, result_id=EXCLUDED.result_id;
 
-	INSERT INTO connec_add (connec_id, demand, press_max, press_min, press_avg, quality_max, quality_min, quality_avg, result_id)
-	SELECT node_id, demand_avg, press_max::numeric(12,2), press_min::numeric(12,2), press_avg::numeric(12,2),
+	INSERT INTO connec_add (connec_id, press_max, press_min, press_avg, quality_max, quality_min, quality_avg, result_id)
+	SELECT node_id, press_max::numeric(12,2), press_min::numeric(12,2), press_avg::numeric(12,2),
 	quality_max::numeric(12,4), quality_min::numeric(12,4), quality_avg::numeric(12,4), result_id
 	FROM v_rpt_node a 
 	JOIN connec ON node_id = connec_id
 	ON CONFLICT (connec_id) DO UPDATE SET 
-	demand_max = EXCLUDED.demand_max, demand_min = EXCLUDED.demand_min, demand_avg = EXCLUDED.demand_avg, 
 	press_max = EXCLUDED.press_max, press_min = EXCLUDED.press_min, press_avg = EXCLUDED.press_avg,
-	head_max = EXCLUDED.head_max, head_min = EXCLUDED.head_min, head_avg = EXCLUDED.head_avg, 
 	quality_max = EXCLUDED.quality_max, quality_min = EXCLUDED.quality_min, quality_avg=EXCLUDED.quality_avg, result_id=EXCLUDED.result_id;
 
 	IF v_current_selector IS NOT NULL THEN
@@ -76,7 +74,7 @@ BEGIN
 	END IF;
 
   	--  Return
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":{}'||
 			'}}'||
