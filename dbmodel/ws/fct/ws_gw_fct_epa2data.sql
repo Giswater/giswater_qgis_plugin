@@ -59,8 +59,8 @@ BEGIN
 	flow_max = EXCLUDED.flow_max, flow_min = EXCLUDED.flow_min, flow_avg = EXCLUDED.flow_avg,
 	vel_max = EXCLUDED.vel_max, vel_min = EXCLUDED.vel_min, vel_avg = EXCLUDED.vel_avg, result_id=EXCLUDED.result_id;
 
-	INSERT INTO connec_add (connec_id, demand_max, demand_min, demand_avg, press_max, press_min, press_avg, head_max, head_min, head_avg, quality_max, quality_min, quality_avg, result_id)
-	SELECT node_id, demand_max, demand_min, demand_avg, press_max::numeric(12,2), press_min::numeric(12,2), press_avg::numeric(12,2), head_max::numeric(12,2), head_min::numeric(12,2), head_avg::numeric(12,2), 
+	INSERT INTO connec_add (connec_id, demand, press_max, press_min, press_avg, quality_max, quality_min, quality_avg, result_id)
+	SELECT node_id, demand_avg, press_max::numeric(12,2), press_min::numeric(12,2), press_avg::numeric(12,2),
 	quality_max::numeric(12,4), quality_min::numeric(12,4), quality_avg::numeric(12,4), result_id
 	FROM v_rpt_node a 
 	JOIN connec ON node_id = connec_id
