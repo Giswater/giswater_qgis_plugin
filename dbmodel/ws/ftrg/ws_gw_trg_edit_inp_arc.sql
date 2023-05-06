@@ -45,11 +45,15 @@ BEGIN
         
 	    UPDATE arc SET custom_length=NEW.custom_length WHERE arc_id = OLD.arc_id;
           
-            UPDATE inp_pipe SET minorloss=NEW.minorloss, status=NEW.status, custom_roughness=NEW.custom_roughness, custom_dint=NEW.custom_dint WHERE arc_id=OLD.arc_id;
+            UPDATE inp_pipe SET minorloss=NEW.minorloss, status=NEW.status, custom_roughness=NEW.custom_roughness, custom_dint=NEW.custom_dint,
+            bulk_coeff=NEW.bulk_coeff, wall_coeff = NEW.wall_coeff
+            WHERE arc_id=OLD.arc_id;
+            
 
         ELSIF v_arc_table = 'inp_virtualvalve' THEN   
             UPDATE inp_virtualvalve SET valv_type=NEW.valv_type, pressure=NEW.pressure, flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id,
-            minorloss=NEW.minorloss, status=NEW.status WHERE arc_id=OLD.arc_id;
+            minorloss=NEW.minorloss, status=NEW.status, init_quality=NEW.init_quality
+            WHERE arc_id=OLD.arc_id;
 
         END IF;
 

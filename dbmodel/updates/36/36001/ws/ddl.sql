@@ -28,6 +28,19 @@ UPDATE inp_junction j SET source_type = sourc_type FROM inp_source s WHERE s.nod
 UPDATE inp_junction j SET source_quality = quality FROM inp_source s WHERE s.node_id = j.node_id;
 UPDATE inp_junction j SET source_pattern_id = s.pattern_id FROM inp_source s WHERE s.node_id = j.node_id;
 
+-- CONNEC REFACTOR
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_connec", "column":"emitter_coeff", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_connec", "column":"init_quality", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_connec", "column":"source_type", "dataType":"character varying(18)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_connec", "column":"source_quality", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_connec", "column":"source_pattern_id", "dataType":"character varying(16)", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_connec", "column":"emitter_coeff", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_connec", "column":"init_quality", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_connec", "column":"source_type", "dataType":"character varying(18)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_connec", "column":"source_quality", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_connec", "column":"source_pattern_id", "dataType":"character varying(16)", "isUtils":"False"}}$$);
+
 
 --PUMP REFACTOR 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_pump", "column":"pattern", "newName":"pattern_id"}}$$);
@@ -151,7 +164,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenar
 UPDATE inp_virtualvalve j SET init_quality = initqual FROM inp_quality s WHERE s.node_id = j.arc_id;
 
 --INLET REFACTOR
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet", "column":"head", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet", "column":"mixing_model", "dataType":"character varying(18)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet", "column":"mixing_fraction", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet", "column":"reaction_coeff", "dataType":"float", "isUtils":"False"}}$$);

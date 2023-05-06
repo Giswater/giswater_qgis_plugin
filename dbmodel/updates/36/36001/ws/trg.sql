@@ -10,6 +10,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/01/03
 
+CREATE TRIGGER gw_trg_edit_inp_connec INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_connec 
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_connec();
+
 CREATE TRIGGER gw_trg_edit_inp_node_junction INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_junction 
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_junction');
 

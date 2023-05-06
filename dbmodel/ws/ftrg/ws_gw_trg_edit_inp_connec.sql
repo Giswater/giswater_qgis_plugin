@@ -25,11 +25,6 @@ BEGIN
 
 	ELSIF TG_OP = 'UPDATE' THEN
 		
-		-- EPA update
-		IF (NEW.epa_type != OLD.epa_type) AND NEW.epa_type = 'UNDEFINED' THEN   
-			DELETE FROM inp_connec WHERE connec_id = NEW.connec_id;
-		END IF;
-
 		-- The geom
 		IF (ST_equals (NEW.the_geom, OLD.the_geom)) IS FALSE THEN
 			UPDATE connec SET the_geom=NEW.the_geom WHERE connec_id = OLD.connec_id;
@@ -50,12 +45,13 @@ BEGIN
 
 		UPDATE inp_connec 
 			SET demand=NEW.demand, pattern_id=NEW.pattern_id, peak_factor=NEW.peak_factor, custom_roughness = NEW.custom_roughness ,custom_length = NEW.custom_length, custom_dint = NEW.custom_dint,
-			status = NEW.status, minorloss = NEW.minorloss
+			status = NEW.status, minorloss = NEW.minorloss, emitter_coeff = NEW.emitter_coeff, init_quality= NEW.init_quality, source_type= NEW.source_type, source_quality= NEW.source_quality,
+			source_pattern_id= NEW.source_pattern_id
 			WHERE connec_id=OLD.connec_id;
 	   
-		IF (OLD.elevation::TEXT!=NEW.elevation::TEXT) or (OLD.depth::TEXT!=NEW.depth::TEXT) OR (OLD.connecat_id!=NEW.connecat_id) OR (OLD.annotation!=NEW.annotation) or(OLD.epa_type != NEW.epa_type) THEN
+		IF (OLD.elevation::TEXT!=NEW.elevation::TEXT) or (OLD.depth::TEXT!=NEW.depth::TEXT) OR (OLD.connecat_id!=NEW.connecat_id) OR (OLD.annotation!=NEW.annotation) THEN
 			UPDATE connec
-			SET elevation=NEW.elevation, "depth"=NEW."depth", connecat_id=NEW.connecat_id, annotation=NEW.annotation, epa_type = NEW.epa_type
+			SET elevation=NEW.elevation, "depth"=NEW."depth", connecat_id=NEW.connecat_id, annotation=NEW.annotation
 			WHERE connec_id=OLD.connec_id;
 		END IF;
 
