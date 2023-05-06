@@ -74,5 +74,10 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_netgul
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "action":"RESTORE-VIEW","hasChilds":"True"}}$$);
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"drainzone", "column":"tstamp", "dataType":"timestamp", "isUtils":"True"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"drainzone", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"True"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"drainzone", "column":"lastupdate", "dataType":"timestamp", "isUtils":"True"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"drainzone", "column":"lastupdate_user", "dataType":"varchar(15)", "isUtils":"True"}}$$);
+
 ALTER TABLE drainzone ALTER COLUMN tstamp SET DEFAULT now();
 ALTER TABLE drainzone ALTER COLUMN insert_user SET DEFAULT current_user;
