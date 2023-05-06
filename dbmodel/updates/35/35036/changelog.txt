@@ -1,3 +1,5 @@
 3.5.036
 *************
+- Minor bug fix when arc_id is not null and link does not exists
 - Refactor strategy of execute psector. New traceability tables for executed and canceled psectors
+- Enhance stats for minsector table adding num_border, num_connec, num_hydro and length

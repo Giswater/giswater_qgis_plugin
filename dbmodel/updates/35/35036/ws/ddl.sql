@@ -265,5 +265,9 @@ CREATE TABLE audit_psector_connec_traceability (
 	CONSTRAINT audit_psector_connec_traceability_pkey PRIMARY KEY (id)
 );
 
-
+ALTER TABLE minsector RENAME num_valve TO num_border;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector", "column":"num_connec", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector", "column":"num_hydro", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector", "column":"length", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
 

@@ -275,14 +275,25 @@ BEGIN
 
 			-- insert into minsector table
 			DELETE FROM minsector WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user);
-			INSERT INTO minsector (minsector_id, dma_id, dqa_id, sector_id, expl_id)
-			SELECT distinct ON (minsector_id) minsector_id, dma_id, dqa_id, sector_id, expl_id FROM v_edit_arc WHERE minsector_id is not null
+			INSERT INTO minsector (minsector_id, dma_id, dqa_id, sector_id, expl_id, presszone_id)
+			SELECT distinct ON (minsector_id) minsector_id, dma_id, dqa_id, sector_id, expl_id, presszone_id FROM v_edit_arc WHERE minsector_id is not null
 			ON CONFLICT (minsector_id) DO NOTHING;
 
-			UPDATE minsector SET num_valve = a.num FROM 
-			(SELECT a.minsector_id,   count(node_id) AS num FROM v_edit_node n, v_edit_arc a 
-			WHERE  (a.node_1 = n.node_id OR a.node_2 = n.node_id) AND  n.minsector_id = 0 AND n.sys_type='VALVE'
+			-- update minsector parameters
+			UPDATE minsector SET num_border = a.num FROM 
+			(SELECT a.minsector_id,   CASE WHEN count(node_id)=1 then 2 else count(node_id) end AS num FROM node n, v_edit_arc a 
+			WHERE  (a.node_1 = n.node_id OR a.node_2 = n.node_id) AND  n.minsector_id = 0
 			GROUP BY a.minsector_id)a WHERE a.minsector_id=minsector.minsector_id;
+
+			UPDATE minsector SET num_connec = a.c FROM (SELECT minsector_id, case when count(*) is not null then count(*) else 0 end as c
+			FROM v_edit_connec GROUP by minsector_id)a WHERE a.minsector_id=minsector.minsector_id;
+			UPDATE minsector SET num_connec = 0 where num_connec is null and expl_id in (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
+
+			UPDATE minsector SET num_hydro = a.c FROM (SELECT minsector_id, case when count(*) is not null then count(*) else 0 end as c
+			 FROM v_rtc_hydrometer JOIN connec USING (connec_id) GROUP by minsector_id)a WHERE a.minsector_id=minsector.minsector_id;
+ 			UPDATE minsector SET num_hydro = 0 where num_hydro is null and expl_id in (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
+
+			UPDATE minsector SET length = a.length FROM (SELECT minsector_id, sum(gis_length) as length FROM v_edit_arc GROUP by minsector_id)a WHERE a.minsector_id=minsector.minsector_id;
 
 			-- message
 			INSERT INTO audit_check_data (fid, error_message)
