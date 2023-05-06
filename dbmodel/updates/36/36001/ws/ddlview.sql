@@ -142,6 +142,10 @@ SELECT 'BULK' as param, inp_pipe.arc_id, inp_pipe.bulk_coeff::text as coeff FROM
 UNION
 SELECT 'WALL' as param, inp_pipe.arc_id, inp_pipe.wall_coeff::text as coeff FROM inp_pipe JOIN temp_arc ON inp_pipe.arc_id::text = temp_arc.arc_id::text WHERE wall_coeff is not null 
 UNION
+SELECT 'BULK' as param, p.arc_id, p.bulk_coeff::text as coeff FROM inp_dscenario_pipe p LEFT JOIN temp_arc ON p.arc_id::text = temp_arc.arc_id::text WHERE bulk_coeff is not null
+UNION
+SELECT 'WALL' as param, p.arc_id, p.wall_coeff::text as coeff FROM inp_dscenario_pipe p JOIN temp_arc ON p.arc_id::text = temp_arc.arc_id::text WHERE wall_coeff is not null 
+UNION
 SELECT idval as  param, NULL AS arc_id, value::character varying AS coeff FROM config_param_user JOIN sys_param_user ON id=parameter 
 WHERE (parameter='inp_reactions_bulk_order' OR parameter = 'inp_reactions_wall_order' OR parameter = 'inp_reactions_global_bulk' OR  
 parameter = 'inp_reactions_global_wall' OR parameter = 'inp_reactions_limit_concentration' OR parameter ='inp_reactions_wall_coeff_correlation') 
@@ -158,6 +162,18 @@ UNION
 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id, 'EFFIC' as idval, effic_curve_id AS energyvalue FROM inp_pump_additional LEFT JOIN temp_arc ON concat(inp_pump_additional.node_id, '_n2a') = temp_arc.arc_id::text WHERE effic_curve_id IS NOT NULL
 UNION
 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id, 'PRICE' as idval, energy_price::TEXT AS energyvalue FROM inp_pump_additional LEFT JOIN temp_arc ON concat(inp_pump_additional.node_id, '_n2a') = temp_arc.arc_id::text WHERE energy_price IS NOT NULL
+UNION
+SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id, 'PATTERN' as idval, energy_pattern_id AS energyvalue FROM inp_pump_additional p LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text WHERE energy_pattern_id IS NOT NULL
+UNION
+SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id, 'EFFIC' as idval, effic_curve_id AS energyvalue FROM inp_dscenario_pump p LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text WHERE effic_curve_id IS NOT NULL
+UNION
+SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id, 'PRICE' as idval, energy_price::TEXT AS energyvalue FROM inp_dscenario_pump p LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text WHERE energy_price IS NOT NULL
+UNION
+SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id, 'PATTERN' as idval, energy_pattern_id AS energyvalue FROM inp_dscenario_pump p LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text WHERE energy_pattern_id IS NOT NULL
+UNION
+SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id, 'EFFIC' as idval, effic_curve_id AS energyvalue FROM inp_dscenario_pump_additional p LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text WHERE effic_curve_id IS NOT NULL
+UNION
+SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id, 'PRICE' as idval, energy_price::TEXT AS energyvalue FROM inp_dscenario_pump_additional p LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text WHERE energy_price IS NOT NULL
 UNION
 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id, 'PATTERN' as idval, energy_pattern_id AS energyvalue FROM inp_pump_additional p LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text WHERE energy_pattern_id IS NOT NULL
 UNION
