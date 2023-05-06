@@ -36,7 +36,6 @@ BEGIN
 	DELETE FROM selector_rpt_main WHERE cur_user=current_user;
 	INSERT INTO selector_rpt_main(result_id, cur_user) VALUES (v_result_id, current_user);
 
-	UPDATE rpt_cat_result SET iscorporate=false;
 	UPDATE rpt_cat_result SET iscorporate=true WHERE result_id = v_result_id;
 
 	INSERT INTO node_add (node_id, demand_max, demand_min, demand_avg, press_max, press_min, press_avg, head_max, head_min, head_avg, quality_max, quality_min, quality_avg)
@@ -63,7 +62,7 @@ BEGIN
 	INSERT INTO connec_add (connec_id, press_max, press_min, press_avg)
 	SELECT node_id, press_max, press_min, press_avg
 	FROM v_rpt_node a 
-	JOIN connec ON node_id = connec_id WHERE result_id=v_result_id
+	JOIN connec ON node_id = connec_id
 	ON CONFLICT (connec_id) DO UPDATE SET 
 	press_max = EXCLUDED.press_max, press_min=EXCLUDED.press_min, press_avg=EXCLUDED.press_avg;
 
