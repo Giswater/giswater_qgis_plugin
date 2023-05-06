@@ -1615,7 +1615,10 @@ CREATE OR REPLACE VIEW vu_connec  AS
     e.press_avg,
     e.demand,
     connec.expl_id2,
-    vst.is_operative,
+    e.quality_max,
+    e.quality_min,
+    e.quality_avg,
+	vst.is_operative,
     mu.region_id,
     mu.province_id
    FROM connec
@@ -1741,6 +1744,9 @@ CREATE OR REPLACE VIEW v_connec AS
     crmzone_id,
     crmzone_name,
     vu_connec.expl_id2,
+    vu_connec.quality_max,
+    vu_connec.quality_min,
+    vu_connec.quality_avg,	
     vu_connec.is_operative,
     vu_connec.region_id,
     vu_connec.province_id
