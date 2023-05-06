@@ -207,6 +207,17 @@ BEGIN
 			JOIN ext_hydrometer_category c ON c.id::integer = h.category_id
 			WHERE d.source = h.id::text
 			AND dscenario_id = v_scenarioid;
+
+		ELSIF v_pattern = 7 THEN -- connec pattern
+
+			UPDATE inp_dscenario_demand d SET pattern_id = i.pattern_id 
+			FROM inp_connec i
+			JOIN connec c USING (connec_id)
+			JOIN rtc_hydrometer_x_connec h ON h.connec_id = c.connec_id
+			WHERE d.source = h.hydrometer_id
+			AND dscenario_id = v_scenarioid;
+
+
 		END IF;
 
 		IF v_pattern > 1 THEN
