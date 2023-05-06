@@ -9,6 +9,44 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2022/01/03
+-- dscenario
+CREATE TRIGGER gw_trg_edit_inp_dscenario_valve INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_valve
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('VALVE');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_tank
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('TANK');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_shortpipe
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('SHORTPIPE');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_reservoir
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('RESERVOIR');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_pump
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('PUMP');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_pipe
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('PIPE');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_junction
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('JUNCTION');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_connec
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('CONNEC');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_inlet
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('INLET');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_junction
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('JUNCTION');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_virtualvalve
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('VIRTUALVALVE');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_pump_additional
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('PUMP_ADDITIONAL');
+
+
 
 CREATE TRIGGER gw_trg_edit_inp_connec INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_connec 
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_connec();

@@ -55,11 +55,11 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF NEW.overflow IS NULL OR NEW.overflow='' THEN NEW.overflow = (SELECT overflow FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
 			
 			IF NEW.mixing_model IS NULL OR NEW.mixing_model='' THEN NEW.mixing_model = (SELECT mixing_model FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
-			IF NEW.mixing_fraction IS NULL OR NEW.mixing_fraction='' THEN NEW.mixing_fraction = (SELECT mixing_fraction FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
-			IF NEW.reaction_coeff IS NULL OR NEW.reaction_coeff='' THEN NEW.reaction_coeff = (SELECT reaction_coeff FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
-			IF NEW.init_quality IS NULL OR NEW.init_quality='' THEN NEW.init_quality = (SELECT init_quality FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
+			IF NEW.mixing_fraction IS NULL THEN NEW.mixing_fraction = (SELECT mixing_fraction FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
+			IF NEW.reaction_coeff IS NULL THEN NEW.reaction_coeff = (SELECT reaction_coeff FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
+			IF NEW.init_quality IS NULL THEN NEW.init_quality = (SELECT init_quality FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
 			IF NEW.source_type IS NULL OR NEW.source_type='' THEN NEW.source_type = (SELECT source_type FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
-			IF NEW.source_quality IS NULL OR NEW.source_quality='' THEN NEW.source_quality = (SELECT source_quality FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
+			IF NEW.source_quality IS NULL THEN NEW.source_quality = (SELECT source_quality FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
 			IF NEW.source_pattern_id IS NULL OR NEW.source_pattern_id='' THEN NEW.source_pattern_id = (SELECT source_pattern_id FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
 
 			INSERT INTO inp_dscenario_tank (dscenario_id, node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow, 
@@ -73,8 +73,8 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF NEW.minorloss IS NULL THEN NEW.minorloss = (SELECT minorloss FROM v_edit_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
 			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM v_edit_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
 			
-			IF NEW.bulk_coeff IS NULL OR NEW.bulk_coeff='' THEN NEW.bulk_coeff = (SELECT bulk_coeff FROM v_edit_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
-			IF NEW.wall_coeff IS NULL OR NEW.wall_coeff='' THEN NEW.wall_coeff = (SELECT wall_coeff FROM v_edit_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
+			IF NEW.bulk_coeff IS NULL THEN NEW.bulk_coeff = (SELECT bulk_coeff FROM v_edit_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
+			IF NEW.wall_coeff IS NULL THEN NEW.wall_coeff = (SELECT wall_coeff FROM v_edit_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
 		
 			INSERT INTO inp_dscenario_shortpipe(dscenario_id, node_id, minorloss, status, bulk_coeff, wall_coeff )
 			VALUES (NEW.dscenario_id, NEW.node_id, NEW.minorloss, NEW.status, NEW.bulk_coeff, NEW.wall_coeff);
@@ -84,9 +84,9 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			-- default values
 			IF NEW.pattern_id IS NULL OR NEW.pattern_id='' THEN NEW.pattern_id = (SELECT pattern_id FROM v_edit_inp_reservoir WHERE node_id = NEW.node_id);END IF;
 			IF NEW.head IS NULL THEN NEW.head = (SELECT head FROM v_edit_inp_reservoir WHERE node_id = NEW.node_id);END IF;
-			IF NEW.init_quality IS NULL OR NEW.init_quality='' THEN NEW.init_quality = (SELECT init_quality FROM v_edit_inp_reservoir WHERE node_id = NEW.node_id);END IF;
+			IF NEW.init_quality IS NULL THEN NEW.init_quality = (SELECT init_quality FROM v_edit_inp_reservoir WHERE node_id = NEW.node_id);END IF;
 			IF NEW.source_type IS NULL OR NEW.source_type='' THEN NEW.source_type = (SELECT source_type FROM v_edit_inp_reservoir WHERE node_id = NEW.node_id);END IF;
-			IF NEW.source_quality IS NULL OR NEW.source_quality='' THEN NEW.source_quality = (SELECT source_quality FROM v_edit_inp_reservoir WHERE node_id = NEW.node_id);END IF;
+			IF NEW.source_quality IS NULL THEN NEW.source_quality = (SELECT source_quality FROM v_edit_inp_reservoir WHERE node_id = NEW.node_id);END IF;
 			IF NEW.source_pattern_id IS NULL OR NEW.source_pattern_id='' THEN NEW.source_pattern_id = (SELECT source_pattern_id FROM v_edit_inp_reservoir WHERE node_id = NEW.node_id);END IF;
 		
 			INSERT INTO inp_dscenario_reservoir(dscenario_id, node_id, pattern_id, head, init_quality, source_type, source_quality, source_pattern_id)
@@ -97,15 +97,15 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			-- default values
 			IF NEW.power IS NULL THEN NEW.power = (SELECT power FROM v_edit_inp_pump WHERE node_id = NEW.node_id);END IF;
 			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_pump WHERE node_id = NEW.node_id);END IF;
-			IF NEW.pattern IS NULL OR NEW.pattern='' THEN NEW.pattern = (SELECT pattern FROM v_edit_inp_pump WHERE node_id = NEW.node_id);END IF;
+			IF NEW.pattern_id IS NULL OR NEW.pattern_id='' THEN NEW.pattern_id = (SELECT pattern_id FROM v_edit_inp_pump WHERE node_id = NEW.node_id);END IF;
 			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM v_edit_inp_pump WHERE node_id = NEW.node_id);END IF;
 
 			IF NEW.effic_curve_id IS NULL OR NEW.effic_curve_id='' THEN NEW.effic_curve_id = (SELECT effic_curve_id FROM v_edit_inp_pump WHERE node_id = NEW.node_id);END IF;
-			IF NEW.energy_price IS NULL OR NEW.energy_price='' THEN NEW.energy_price = (SELECT energy_price FROM v_edit_inp_pump WHERE node_id = NEW.node_id);END IF;
+			IF NEW.energy_price IS NULL THEN NEW.energy_price = (SELECT energy_price FROM v_edit_inp_pump WHERE node_id = NEW.node_id);END IF;
 			IF NEW.energy_pattern_id IS NULL OR NEW.energy_pattern_id='' THEN NEW.energy_pattern_id = (SELECT energy_pattern_id FROM v_edit_inp_pump WHERE node_id = NEW.node_id);END IF;
 	
-			INSERT INTO inp_dscenario_pump(dscenario_id, node_id, power, curve_id, speed, pattern, status, effic_curve_id, energy_price, energy_pattern_id)
-			VALUES (NEW.dscenario_id, NEW.node_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern, NEW.status, NEW.effic_curve_id, NEW.energy_price, NEW.energy_pattern_id);
+			INSERT INTO inp_dscenario_pump(dscenario_id, node_id, power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id)
+			VALUES (NEW.dscenario_id, NEW.node_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern_id, NEW.status, NEW.effic_curve_id, NEW.energy_price, NEW.energy_pattern_id);
 
 		ELSIF v_dscenario_type = 'PIPE' THEN
 
@@ -115,8 +115,8 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF NEW.roughness IS NULL THEN NEW.roughness = (SELECT roughness FROM temp_arc WHERE arc_id = NEW.arc_id);END IF;
 			IF NEW.dint IS NULL THEN NEW.dint = (SELECT diameter FROM temp_arc WHERE arc_id = NEW.arc_id);END IF;
 
-			IF NEW.bulk_coeff IS NULL OR NEW.bulk_coeff='' THEN NEW.bulk_coeff = (SELECT bulk_coeff FROM v_edit_inp_pipe WHERE node_id = NEW.node_id);END IF;
-			IF NEW.wall_coeff IS NULL OR NEW.wall_coeff='' THEN NEW.wall_coeff = (SELECT wall_coeff FROM v_edit_inp_pipe WHERE node_id = NEW.node_id);END IF;
+			IF NEW.bulk_coeff IS NULL THEN NEW.bulk_coeff = (SELECT bulk_coeff FROM v_edit_inp_pipe WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.wall_coeff IS NULL THEN NEW.wall_coeff = (SELECT wall_coeff FROM v_edit_inp_pipe WHERE arc_id = NEW.arc_id);END IF;
 		
 		
 			INSERT INTO inp_dscenario_pipe(dscenario_id, arc_id, minorloss, status, roughness, dint, bulk_coeff, wall_coeff)
@@ -128,9 +128,9 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF NEW.demand IS NULL THEN NEW.demand = (SELECT demand FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
 			IF NEW.pattern_id IS NULL OR NEW.pattern_id='' THEN NEW.pattern_id = (SELECT pattern_id FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
 
-			IF NEW.init_quality IS NULL OR NEW.init_quality='' THEN NEW.init_quality = (SELECT init_quality FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
+			IF NEW.init_quality IS NULL THEN NEW.init_quality = (SELECT init_quality FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
 			IF NEW.source_type IS NULL OR NEW.source_type='' THEN NEW.source_type = (SELECT source_type FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
-			IF NEW.source_quality IS NULL OR NEW.source_quality='' THEN NEW.source_quality = (SELECT source_quality FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
+			IF NEW.source_quality IS NULL THEN NEW.source_quality = (SELECT source_quality FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
 			IF NEW.source_pattern_id IS NULL OR NEW.source_pattern_id='' THEN NEW.source_pattern_id = (SELECT source_pattern_id FROM v_edit_inp_junction WHERE node_id = NEW.node_id);END IF;
 		
 			INSERT INTO inp_dscenario_junction(dscenario_id, node_id, demand, pattern_id, init_quality, source_type, source_quality, source_pattern_id)
@@ -145,10 +145,10 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF NEW.custom_length IS NULL THEN NEW.custom_length = (SELECT custom_length FROM v_edit_inp_connec WHERE connec_id = NEW.connec_id);END IF;
 			IF NEW.custom_dint IS NULL THEN NEW.custom_dint = (SELECT custom_dint FROM v_edit_inp_connec WHERE connec_id = NEW.connec_id);END IF;
 
-			IF NEW.init_quality IS NULL OR NEW.init_quality='' THEN NEW.init_quality = (SELECT init_quality FROM v_edit_inp_connec WHERE node_id = NEW.node_id);END IF;
-			IF NEW.source_type IS NULL OR NEW.source_type='' THEN NEW.source_type = (SELECT source_type FROM v_edit_inp_connec WHERE node_id = NEW.node_id);END IF;
-			IF NEW.source_quality IS NULL OR NEW.source_quality='' THEN NEW.source_quality = (SELECT source_quality FROM v_edit_inp_connec WHERE node_id = NEW.node_id);END IF;
-			IF NEW.source_pattern_id IS NULL OR NEW.source_pattern_id='' THEN NEW.source_pattern_id = (SELECT source_pattern_id FROM v_edit_inp_connec WHERE node_id = NEW.node_id);END IF;
+			IF NEW.init_quality IS NULL THEN NEW.init_quality = (SELECT init_quality FROM v_edit_inp_connec WHERE connec_id = NEW.connec_id);END IF;
+			IF NEW.source_type IS NULL OR NEW.source_type='' THEN NEW.source_type = (SELECT source_type FROM v_edit_inp_connec WHERE connec_id = NEW.connec_id);END IF;
+			IF NEW.source_quality IS NULL THEN NEW.source_quality = (SELECT source_quality FROM v_edit_inp_connec WHERE connec_id = NEW.connec_id);END IF;
+			IF NEW.source_pattern_id IS NULL OR NEW.source_pattern_id='' THEN NEW.source_pattern_id = (SELECT source_pattern_id FROM v_edit_inp_connec WHERE connec_id = NEW.connec_id);END IF;
 				
 			INSERT INTO inp_dscenario_connec(dscenario_id, connec_id, demand, pattern_id, custom_roughness, custom_length, custom_dint, init_quality, source_type, source_quality, source_pattern_id)
 			VALUES (NEW.dscenario_id, NEW.connec_id, NEW.demand, NEW.pattern_id, NEW.custom_roughness, NEW.custom_length, NEW.custom_dint
@@ -168,11 +168,11 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF NEW.head IS NULL THEN NEW.head = (SELECT head FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
 
 			IF NEW.mixing_model IS NULL OR NEW.mixing_model='' THEN NEW.mixing_model = (SELECT mixing_model FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
-			IF NEW.mixing_fraction IS NULL OR NEW.mixing_fraction='' THEN NEW.mixing_fraction = (SELECT mixing_fraction FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
-			IF NEW.reaction_coeff IS NULL OR NEW.reaction_coeff='' THEN NEW.reaction_coeff = (SELECT reaction_coeff FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
-			IF NEW.init_quality IS NULL OR NEW.init_quality='' THEN NEW.init_quality = (SELECT init_quality FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.mixing_fraction IS NULL THEN NEW.mixing_fraction = (SELECT mixing_fraction FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.reaction_coeff IS NULL THEN NEW.reaction_coeff = (SELECT reaction_coeff FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.init_quality IS NULL THEN NEW.init_quality = (SELECT init_quality FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
 			IF NEW.source_type IS NULL OR NEW.source_type='' THEN NEW.source_type = (SELECT source_type FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
-			IF NEW.source_quality IS NULL OR NEW.source_quality='' THEN NEW.source_quality = (SELECT source_quality FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.source_quality IS NULL THEN NEW.source_quality = (SELECT source_quality FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
 			IF NEW.source_pattern_id IS NULL OR NEW.source_pattern_id='' THEN NEW.source_pattern_id = (SELECT source_pattern_id FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;	
 
 			INSERT INTO inp_dscenario_inlet (dscenario_id, node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow, pattern_id, head,
@@ -190,25 +190,25 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_virtualvalve WHERE arc_id = NEW.arc_id);END IF;
 			IF NEW.minorloss IS NULL THEN NEW.minorloss = (SELECT minorloss FROM v_edit_inp_virtualvalve WHERE arc_id = NEW.arc_id);END IF;
 			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM v_edit_inp_virtualvalve WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.init_quality IS NULL THEN NEW.init_quality = (SELECT init_quality FROM v_edit_inp_virtualvalve WHERE node_id = NEW.node_id);END IF;
+			IF NEW.init_quality IS NULL THEN NEW.init_quality = (SELECT init_quality FROM v_edit_inp_virtualvalve WHERE arc_id = NEW.arc_id);END IF;
 		
 			INSERT INTO inp_dscenario_virtualvalve (dscenario_id, arc_id, valv_type, pressure, flow, coef_loss, curve_id, minorloss, status, init_quality)
-			VALUES (NEW.dscenario_id, NEW.node_id, NEW.valv_type, NEW.pressure, NEW.flow, NEW.coef_loss, NEW.curve_id, NEW.minorloss, NEW.status, NEW.init_quality);
+			VALUES (NEW.dscenario_id, NEW.arc_id, NEW.valv_type, NEW.pressure, NEW.flow, NEW.coef_loss, NEW.curve_id, NEW.minorloss, NEW.status, NEW.init_quality);
 	
 		ELSIF v_dscenario_type = 'PUMP_ADDITIONAL' THEN
 
 			-- default values
 			IF NEW.power IS NULL THEN NEW.power = (SELECT power FROM v_edit_inp_pump WHERE node_id = NEW.node_id);END IF;
 			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
-			IF NEW.pattern IS NULL OR NEW.pattern='' THEN NEW.pattern = (SELECT pattern FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
+			IF NEW.pattern_id IS NULL OR NEW.pattern_id='' THEN NEW.pattern_id = (SELECT pattern_id FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
 			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
 			
 			IF NEW.effic_curve_id IS NULL OR NEW.effic_curve_id='' THEN NEW.effic_curve_id = (SELECT effic_curve_id FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
-			IF NEW.energy_price IS NULL OR NEW.energy_price='' THEN NEW.energy_price = (SELECT energy_price FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
+			IF NEW.energy_price IS NULL THEN NEW.energy_price = (SELECT energy_price FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
 			IF NEW.energy_pattern_id IS NULL OR NEW.energy_pattern_id='' THEN NEW.energy_pattern_id = (SELECT energy_pattern_id FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
 	
-			INSERT INTO inp_dscenario_pump_additional (dscenario_id, node_id, power, curve_id, speed, pattern, status, effic_curve_id, energy_price, energy_pattern_id)
-			VALUES (NEW.dscenario_id, NEW.node_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern, NEW.status, NEW.effic_curve_id, NEW.energy_price, NEW.energy_pattern_id);
+			INSERT INTO inp_dscenario_pump_additional (dscenario_id, node_id, order_id, power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id)
+			VALUES (NEW.dscenario_id, NEW.node_id, NEW.order_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern_id, NEW.status, NEW.effic_curve_id, NEW.energy_price, NEW.energy_pattern_id);
 		
 		ELSIF v_dscenario_type = 'RULES' THEN
 			INSERT INTO inp_dscenario_rules(dscenario_id, sector_id, text, active)
