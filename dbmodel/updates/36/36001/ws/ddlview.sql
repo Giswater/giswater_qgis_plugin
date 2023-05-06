@@ -73,41 +73,6 @@ WHERE temp_arc.epa_type::text = 'PUMP'::text AND NOT (temp_arc.arc_id::text IN (
 FROM vi_valves))
 ORDER BY temp_arc.arc_id;
 
--- curves
-CREATE OR REPLACE VIEW vi_curves AS 
-SELECT
-CASE WHEN a.x_value IS NULL THEN a.curve_type::character varying(16)
-ELSE a.curve_id
-END AS curve_id,
-a.x_value::numeric(12,4) AS x_value,
-a.y_value::numeric(12,4) AS y_value,
-NULL::text AS other
-FROM ( SELECT DISTINCT ON (inp_curve_value.curve_id) ( SELECT min(sub.id) AS min
-    FROM inp_curve_value sub
-    WHERE sub.curve_id::text = inp_curve_value.curve_id::text) AS id,
-    inp_curve_value.curve_id,
-    concat(';', inp_curve.curve_type, ':', inp_curve.descript) AS curve_type,
-    NULL::numeric AS x_value,
-    NULL::numeric AS y_value
-    FROM inp_curve
-    JOIN inp_curve_value ON inp_curve_value.curve_id::text = inp_curve.id::text
-    UNION
-    SELECT inp_curve_value.id,
-    inp_curve_value.curve_id,
-    inp_curve.curve_type,
-    inp_curve_value.x_value,
-    inp_curve_value.y_value
-    FROM inp_curve_value
-    JOIN inp_curve ON inp_curve_value.curve_id::text = inp_curve.id::text
-    ORDER BY 1, 4 DESC) a
-WHERE (a.curve_id::text IN ( SELECT vi_tanks.curve_id
-FROM vi_tanks)) OR (concat('HEAD ', a.curve_id) IN ( SELECT vi_pumps.head
-FROM vi_pumps)) OR (a.curve_id::text IN ( SELECT vi_valves.setting
-FROM vi_valves)) OR (a.curve_id::text IN ( SELECT vi_energy.energyvalue
-FROM vi_energy
-WHERE vi_energy.idval::text = 'EFFIC'::text)) OR ((( SELECT config_param_user.value
-FROM config_param_user
-WHERE config_param_user.parameter::text = 'inp_options_buildup_mode'::text AND config_param_user.cur_user::name = "current_user"()))::integer) = 1;
 
 -- emitters
 CREATE OR REPLACE VIEW vi_emitters AS 

@@ -1097,52 +1097,7 @@ SELECT
   WHERE (t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL))b
   ORDER BY id;
   
-  
-  
-CREATE OR REPLACE VIEW vi_curves
-AS SELECT a.curve_id,
-    a.curve_type,
-    a.x_value,
-    a.y_value
-   FROM ( WITH qt AS (
-                 SELECT inp_curve_value.id,
-                    inp_curve_value.curve_id,
-                        CASE
-                            WHEN inp_curve_value.id = (( SELECT min(sub.id) AS min
-                               FROM inp_curve_value sub
-                              WHERE sub.curve_id::text = inp_curve_value.curve_id::text)) THEN inp_typevalue.idval
-                            ELSE NULL::character varying
-                        END AS curve_type,
-                    inp_curve_value.x_value,
-                    inp_curve_value.y_value,
-                    c.expl_id
-                   FROM inp_curve c
-                     JOIN inp_curve_value ON c.id::text = inp_curve_value.curve_id::text
-                     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = c.curve_type::text
-                  WHERE inp_typevalue.typevalue::text = 'inp_value_curve'::text and active
-                )
-         SELECT qt.id,
-            qt.curve_id,
-            qt.curve_type,
-            qt.x_value,
-            qt.y_value,
-            qt.expl_id
-           FROM qt
-             JOIN selector_expl s USING (expl_id)
-          WHERE s.cur_user = "current_user"()::text
-        UNION
-         SELECT qt.id,
-            qt.curve_id,
-            qt.curve_type,
-            qt.x_value,
-            qt.y_value,
-            qt.expl_id
-           FROM qt
-          WHERE qt.expl_id IS NULL) a
-  ORDER BY a.id;
-  
-
-
+    
 CREATE OR REPLACE VIEW vi_patterns
 AS SELECT p.pattern_id,
     p.pattern_type,
