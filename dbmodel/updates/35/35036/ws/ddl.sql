@@ -271,3 +271,20 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector",
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector", "column":"length", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec_add", "column":"demand_max", "dataType":"numeric", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec_add", "column":"demand_avg", "dataType":"numeric", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec_add", "column":"demand_min", "dataType":"numeric", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec_add", "column":"head_max", "dataType":"numeric(12,2)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec_add", "column":"head_avg", "dataType":"numeric(12,2)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec_add", "column":"head_min", "dataType":"numeric(12,2)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec_add", "column":"quality_max", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec_add", "column":"quality_avg", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec_add", "column":"quality_min", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec_add", "column":"result_id", "dataType":"text", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node_add", "column":"result_id", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc_add", "column":"result_id", "dataType":"text", "isUtils":"False"}}$$);
+
+
+
+
