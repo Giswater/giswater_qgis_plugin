@@ -134,7 +134,7 @@ CREATE OR REPLACE VIEW vu_connec  AS
      LEFT JOIN crm_zone ON crm_zone.id::text = connec.crmzone_id::text
      LEFT JOIN v_ext_streetaxis c ON c.id::text = connec.streetaxis_id::text
      LEFT JOIN v_ext_streetaxis b ON b.id::text = connec.streetaxis2_id::text
-     LEFT JOIN connec_add e ON e.connec_id::text = connec.connec_id::text
+     LEFT JOIN connec_add e ON e.connec_id::text = connec.connec_id::text;
      
 
 CREATE OR REPLACE VIEW v_connec AS 

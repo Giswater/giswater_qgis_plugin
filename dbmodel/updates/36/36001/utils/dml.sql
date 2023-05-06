@@ -575,15 +575,6 @@ ALTER TABLE sector ALTER COLUMN insert_user SET DEFAULT current_user;
 ALTER TABLE dma ALTER COLUMN tstamp SET DEFAULT now();
 ALTER TABLE dma ALTER COLUMN insert_user SET DEFAULT current_user;
 
-ALTER TABLE presszone ALTER COLUMN tstamp SET DEFAULT now();
-ALTER TABLE presszone ALTER COLUMN insert_user SET DEFAULT current_user;
-
-ALTER TABLE dqa ALTER COLUMN tstamp SET DEFAULT now();
-ALTER TABLE dqa ALTER COLUMN insert_user SET DEFAULT current_user;
-
-ALTER TABLE drainzone ALTER COLUMN tstamp SET DEFAULT now();
-ALTER TABLE drainzone ALTER COLUMN insert_user SET DEFAULT current_user;
-
 ALTER TABLE psector ALTER COLUMN tstamp SET DEFAULT now();
 ALTER TABLE psector ALTER COLUMN insert_user SET DEFAULT current_user;
 

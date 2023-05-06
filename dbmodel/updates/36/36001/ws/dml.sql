@@ -1369,3 +1369,10 @@ VALUES (3236, 'gw_fct_mincut_show_current', '{"style":{"point":{"style":"categor
 INSERT INTO sys_fprocess
 (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
 VALUES(490, 'Show current mincuts', 'ws', NULL, 'core', true, 'Function process', NULL);
+
+
+ALTER TABLE presszone ALTER COLUMN tstamp SET DEFAULT now();
+ALTER TABLE presszone ALTER COLUMN insert_user SET DEFAULT current_user;
+
+ALTER TABLE dqa ALTER COLUMN tstamp SET DEFAULT now();
+ALTER TABLE dqa ALTER COLUMN insert_user SET DEFAULT current_user;
