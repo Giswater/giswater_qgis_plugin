@@ -398,6 +398,7 @@ BEGIN
 
 			-- recreate child views adding workcat_id_plan on parent tables
 			IF v_oldversion < '3.5.031'  THEN
+			
 				FOR rec_viewname IN (SELECT child_layer FROM cat_feature WHERE feature_type = 'NODE') LOOP
 					IF (SELECT EXISTS ( SELECT 1 FROM  information_schema.tables WHERE  table_schema = v_schemaname AND table_name = rec_viewname)) 
 					IS TRUE THEN
@@ -405,11 +406,51 @@ BEGIN
 						INTO v_definition;
 
 						v_definition = replace(v_definition,concat('JOIN ',v_schemaname,'.v_state_node ON node_id = feature_id'), 
-						concat('JOIN ',v_schemaname,'.v_state_node s ON s.node_id = feature_id JOIN ',v_schemaname,'.v_expl_node e ON e.node_id = feature_id'));
+						concat('JOIN ',v_schemaname,'.v_expl_node e ON e.node_id = feature_id'));
 
 						EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||rec_viewname||' AS '||v_definition||'';
 					END IF;
 				END LOOP;
+				
+				FOR rec_viewname IN (SELECT child_layer FROM cat_feature WHERE feature_type = 'ARC') LOOP
+					IF (SELECT EXISTS ( SELECT 1 FROM  information_schema.tables WHERE  table_schema = v_schemaname AND table_name = rec_viewname)) 
+					IS TRUE THEN
+						EXECUTE 'SELECT pg_get_viewdef('''||v_schemaname||'.'||rec_viewname||''', true);'
+						INTO v_definition;
+
+						v_definition = replace(v_definition,concat('JOIN ',v_schemaname,'.v_state_arc ON arc_id = feature_id'), 
+						concat('JOIN ',v_schemaname,'.v_expl_arc e ON e.arc_id = feature_id'));
+
+						EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||rec_viewname||' AS '||v_definition||'';
+					END IF;
+				END LOOP;
+				
+				FOR rec_viewname IN (SELECT child_layer FROM cat_feature WHERE feature_type = 'CONNEC') LOOP
+					IF (SELECT EXISTS ( SELECT 1 FROM  information_schema.tables WHERE  table_schema = v_schemaname AND table_name = rec_viewname)) 
+					IS TRUE THEN
+						EXECUTE 'SELECT pg_get_viewdef('''||v_schemaname||'.'||rec_viewname||''', true);'
+						INTO v_definition;
+
+						v_definition = replace(v_definition,concat('JOIN ',v_schemaname,'.v_state_connec ON connec_id = feature_id'), 
+						concat('JOIN ',v_schemaname,'.v_expl_connec e ON e.connec_id = feature_id'));
+
+						EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||rec_viewname||' AS '||v_definition||'';
+					END IF;
+				END LOOP;
+				
+				FOR rec_viewname IN (SELECT child_layer FROM cat_feature WHERE feature_type = 'GULLY') LOOP
+					IF (SELECT EXISTS ( SELECT 1 FROM  information_schema.tables WHERE  table_schema = v_schemaname AND table_name = rec_viewname)) 
+					IS TRUE THEN
+						EXECUTE 'SELECT pg_get_viewdef('''||v_schemaname||'.'||rec_viewname||''', true);'
+						INTO v_definition;
+
+						v_definition = replace(v_definition,concat('JOIN ',v_schemaname,'.v_state_gully ON gully_id = feature_id'), 
+						concat('JOIN ',v_schemaname,'.v_expl_gully e ON e.gully_id = feature_id'));
+
+						EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||rec_viewname||' AS '||v_definition||'';
+					END IF;
+				END LOOP;
+			
 			END IF;
 
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('Project have been sucessfully updated from ',v_oldversion,' version to ',v_gwversion, ' version'));

@@ -53,3 +53,5 @@ UPDATE config_param_system SET value = gw_fct_json_object_delete_keys(value::jso
 UPDATE config_param_system SET value = gw_fct_json_object_delete_keys(value::json, 'canceled_planified') WHERE parameter = 'plan_psector_status_action';
 UPDATE config_param_system SET value = gw_fct_json_object_delete_keys(value::json, 'canceled_ficticious') WHERE parameter = 'plan_psector_status_action';
 
+INSERT INTO sys_table (id, descript, sys_role, source)
+VALUES('v_expl_connec', 'Filter view for connecs', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;

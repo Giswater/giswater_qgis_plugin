@@ -12,3 +12,7 @@ INSERT INTO sys_table (id, descript, sys_role, context, orderby, alias, source)
 VALUES('audit_psector_gully_traceability', 'Traceability of executed planified gullys', 'role_basic', 
 '{"level_1":"MASTERPLAN","level_2":"TRACEABILITY"}', 4, 'Psector gully traceability', 'core') ON CONFLICT (id) DO NOTHING;
 
+INSERT INTO sys_table (id, descript, sys_role, source)
+VALUES('v_expl_gully', 'Filter view for gully', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+
+

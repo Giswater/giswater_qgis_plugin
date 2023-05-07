@@ -23,3 +23,10 @@ CREATE OR REPLACE VIEW v_edit_plan_psector_x_gully AS
     plan_psector_x_gully.insert_tstamp,
     plan_psector_x_gully.insert_user
    FROM plan_psector_x_gully;
+   
+ 
+CREATE OR REPLACE VIEW v_expl_gully AS 
+ SELECT gully.gully_id
+ FROM selector_expl, gully
+ WHERE selector_expl.cur_user = "current_user"()::text AND (gully.expl_id = selector_expl.expl_id);
+

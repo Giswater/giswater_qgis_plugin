@@ -22,3 +22,9 @@ CREATE OR REPLACE VIEW v_edit_plan_psector_x_connec AS
     plan_psector_x_connec.insert_tstamp,
     plan_psector_x_connec.insert_user
    FROM plan_psector_x_connec;
+   
+   
+CREATE OR REPLACE VIEW v_expl_connec AS 
+ SELECT connec.connec_id
+ FROM selector_expl, connec
+ WHERE selector_expl.cur_user = "current_user"()::text AND (connec.expl_id = selector_expl.expl_id);
