@@ -492,7 +492,7 @@ VALUES(3234, 'The inserted feature has a diferent exploitation than the psector'
 'Only features with the same exploitation as the psector are allowed', 2, true, 'utils', 'core');
 
 -- code reservation for gw_fct_setepacorporate_val
---INSERT INTO sys_function(id) VALUES (3232);
+--INSERT INTO sys_function(id) VALUES (3240);
 -- INSERT INTO sys_fprocess (fid) VALUES(489);
 
 
@@ -510,7 +510,8 @@ INSERT INTO sys_fprocess
 (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
 VALUES(492, 'Check demands import results', 'ws', NULL, 'core', true, 'Function process', NULL);
 
-
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES(3238, 'gw_fct_getnodeborder', 'utils', 'function',  'JSON', 'JSON', 'Function to return those noder that are sector border', 'role_basic', NULL, 'core');
 
 
 

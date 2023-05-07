@@ -4,7 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 3234DROP FUNCTION IF EXISTS ws_corp.gw_fct_setepacorporate_val(json);
+--FUNCTION CODE: 3240
+DROP FUNCTION IF EXISTS ws_corp.gw_fct_setepacorporate_val(json);
 CREATE OR REPLACE FUNCTION ws_corp.gw_fct_setepacorporate_val(p_data json)
 RETURNS json AS
 $BODY$
@@ -13,7 +14,7 @@ $BODY$
 
 -- to config 
 INSERT INTO ws_corp.sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
-VALUES(3234, 'gw_fct_setepacorporate_val', 'utils', 'function', 'json', 'json', 'Function to move corporate values from productions schema to publish schema', 'role_admin', NULL, 'corporate');
+VALUES(3240, 'gw_fct_setepacorporate_val', 'utils', 'function', 'json', 'json', 'Function to move corporate values from productions schema to publish schema', 'role_admin', NULL, 'corporate');
 
 INSERT INTO ws_corp.config_toolbox (id, alias, functionparams, inputparams, observ, active) VALUES(3234, 'Set EPA values from productions to publish', '{"featureType":[]}'::json, 
 '[{"widgetname":"resultId", "label":"Result Id:","widgettype":"text","datatype":"text", "layoutname":"grl_option_parameters","layoutorder":1, "isMandatory":true, "value":""}]'::json, NULL, true);
