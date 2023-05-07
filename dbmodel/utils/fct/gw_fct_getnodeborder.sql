@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_getnodeborder(p_data json) RETUR
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_getnodeborder($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},"feature":{}, "data":{"sectorId":"1,2,3"}}$$)::JSON
+SELECT SCHEMA_NAME.gw_fct_getnodeborder($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},"feature":{}, "data":{}}$$)::JSON
 -- fid: v_fid
 
 SELECT array_agg(node_id) FROM (SELECT DISTINCT node_id FROM node_border_sector WHERE sector_id IN (1,2,3)) row
@@ -36,11 +36,10 @@ BEGIN
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version order by id desc limit 1;
 	
-	-- getting input data 	
-	v_sector :=  ((p_data ->>'data')::json->>'sectorId')::text;
-
+	
 	-- Computing process
-	v_querytext = 'SELECT array_agg(node_id) FROM (SELECT DISTINCT node_id FROM node_border_sector WHERE sector_id IN ('||v_sector||')) row';
+	v_querytext = 'SELECT array_agg(node_id) FROM (SELECT DISTINCT node_id FROM node_border_sector 
+	               WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user)) row';
 
 	EXECUTE v_querytext INTO v_result;
 	v_result = REPLACE(REPLACE(v_result, '{','['),'}',']');
