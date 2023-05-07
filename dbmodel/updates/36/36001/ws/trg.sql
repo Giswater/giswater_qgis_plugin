@@ -28,9 +28,6 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('PUMP');
 CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_pipe
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('PIPE');
 
-CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_junction
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('JUNCTION');
-
 CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_connec
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('CONNEC');
 
