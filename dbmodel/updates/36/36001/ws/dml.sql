@@ -1342,4 +1342,9 @@ ALTER TABLE dqa ALTER COLUMN tstamp SET DEFAULT now();
 ALTER TABLE dqa ALTER COLUMN insert_user SET DEFAULT current_user;
 
 UPDATE config_form_fields set hidden = False  where formname = 'v_edit_inp_dscenario_demand' 
-and columnname ='feature_id'
+and columnname ='feature_id';
+
+UPDATE config_form_list SET query_text = 
+'SELECT  hydrometer_id, hydrometer_customer_code,catalog_id, madeby, class, cat_period_id, sum, custom_sum, value_type, value_status, value_state
+FROM v_ui_hydroval_x_connec WHERE hydrometer_id IS NOT NULL '
+WHERE listname = 'tbl_hydrometer_value';
