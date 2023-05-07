@@ -23,59 +23,96 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "col
 
 DROP TABLE IF EXISTS selector_plan_psector;
 
-CREATE TABLE IF NOT EXISTS ext_region (
-	region_id int4 NOT NULL,
-	name text NOT NULL,
-	descript text NULL,
-	province_id int4 NULL,
-	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
-	active bool NULL DEFAULT true,
-	CONSTRAINT ext_region_pkey PRIMARY KEY (region_id));
-
-CREATE TABLE IF NOT EXISTS ext_province (
-	province_id int4 NOT NULL,
-	name text NOT NULL,
-	descript text NULL,
-	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
-	active bool NULL DEFAULT true,
-	CONSTRAINT ext_province_pkey PRIMARY KEY (province_id));
-
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_municipality", "column":"region_id", "dataType":"integer", "isUtils":"True"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_municipality", "column":"province_id", "dataType":"integer", "isUtils":"True"}}$$);
+
+do $$ 
+declare
+    v_utils boolean; 
+begin
+     SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+	 
+	 if v_utils is true then
+
+		CREATE TABLE IF NOT EXISTS utils.region (
+			region_id int4 NOT NULL,
+			name text NOT NULL,
+			descript text NULL,
+			province_id int4 NULL,
+			the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+			active bool NULL DEFAULT true,
+			CONSTRAINT region_pkey PRIMARY KEY (region_id));
+
+		CREATE TABLE IF NOT EXISTS utils.province (
+			province_id int4 NOT NULL,
+			name text NOT NULL,
+			descript text NULL,
+			the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+			active bool NULL DEFAULT true,
+			CONSTRAINT province_pkey PRIMARY KEY (province_id));
+			
+		CREATE VIEW SCHEMA_NAME.ext_region AS SELECT * FROM utils.region;
+		CREATE VIEW SCHEMA_NAME.ext_province AS SELECT * FROM utils.province;
+		CREATE OR REPLACE VIEW SCHEMA_NAME.ext_municipality AS SELECT * FROM utils.municipality;
+			
+     else
+     	CREATE TABLE IF NOT EXISTS SCHEMA_NAME.ext_region (
+			region_id int4 NOT NULL,
+			name text NOT NULL,
+			descript text NULL,
+			province_id int4 NULL,
+			the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+			active bool NULL DEFAULT true,
+			CONSTRAINT ext_region_pkey PRIMARY KEY (region_id));
+
+		CREATE TABLE IF NOT EXISTS SCHEMA_NAME.ext_province (
+			province_id int4 NOT NULL,
+			name text NOT NULL,
+			descript text NULL,
+			the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+			active bool NULL DEFAULT true,
+			CONSTRAINT ext_province_pkey PRIMARY KEY (province_id));
+	
+	 end if;
+end; $$;
+
+
+-- restoring path
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 
 --04/05/2023
 --add fields tstamp, insert_user, lastupdate and lastupdate_user to some tables and set default values:
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dimensions", "column":"tstamp", "dataType":"timestamp", "isUtils":"True"}}$$);;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dimensions", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"True"}}$$);;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dimensions", "column":"lastupdate", "dataType":"timestamp", "isUtils":"True"}}$$);;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dimensions", "column":"lastupdate_user", "dataType":"varchar(15)", "isUtils":"True"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dimensions", "column":"tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dimensions", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dimensions", "column":"lastupdate", "dataType":"timestamp", "isUtils":"False"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dimensions", "column":"lastupdate_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);;
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"tstamp", "dataType":"timestamp", "isUtils":"True"}}$$);;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"True"}}$$);;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"lastupdate", "dataType":"timestamp", "isUtils":"True"}}$$);;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"lastupdate_user", "dataType":"varchar(15)", "isUtils":"True"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"lastupdate", "dataType":"timestamp", "isUtils":"False"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"lastupdate_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);;
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"exploitation", "column":"tstamp", "dataType":"timestamp", "isUtils":"True"}}$$);;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"exploitation", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"True"}}$$);;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"exploitation", "column":"lastupdate", "dataType":"timestamp", "isUtils":"True"}}$$);;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"exploitation", "column":"lastupdate_user", "dataType":"varchar(15)", "isUtils":"True"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"exploitation", "column":"tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"exploitation", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"exploitation", "column":"lastupdate", "dataType":"timestamp", "isUtils":"False"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"exploitation", "column":"lastupdate_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);;
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"tstamp", "dataType":"timestamp", "isUtils":"True"}}$$);;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"True"}}$$);;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"lastupdate", "dataType":"timestamp", "isUtils":"True"}}$$);;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"lastupdate_user", "dataType":"varchar(15)", "isUtils":"True"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"lastupdate", "dataType":"timestamp", "isUtils":"False"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"lastupdate_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);;
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"tstamp", "dataType":"timestamp", "isUtils":"True"}}$$);;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"True"}}$$);;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"lastupdate", "dataType":"timestamp", "isUtils":"True"}}$$);;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"lastupdate_user", "dataType":"varchar(15)", "isUtils":"True"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"lastupdate", "dataType":"timestamp", "isUtils":"False"}}$$);;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"lastupdate_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);;
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"tstamp", "dataType":"timestamp", "isUtils":"True"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"True"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"lastupdate", "dataType":"timestamp", "isUtils":"True"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"lastupdate_user", "dataType":"varchar(15)", "isUtils":"True"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"lastupdate", "dataType":"timestamp", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"lastupdate_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);
 
 
 ALTER TABLE dimensions ALTER COLUMN tstamp SET DEFAULT now();

@@ -199,6 +199,8 @@ DROP VIEW IF EXISTS v_edit_man_fountain_pol;
 DROP VIEW IF EXISTS v_edit_man_register_pol;
 DROP VIEW IF EXISTS v_edit_man_tank_pol;
 
+/*
+
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"_pol_id_","action":"DELETE-FIELD","hasChilds":"True","onlyChilds":"True"}}$$);
 
@@ -233,15 +235,17 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_regist
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_fountain", "column":"_pol_id_", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_tank", "column":"_pol_id_", "dataType":"integer"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"tstamp", "dataType":"timestamp", "isUtils":"True"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"True"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"lastupdate", "dataType":"timestamp", "isUtils":"True"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"lastupdate_user", "dataType":"varchar(15)", "isUtils":"True"}}$$);
+*/
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"tstamp", "dataType":"timestamp", "isUtils":"True"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"True"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"lastupdate", "dataType":"timestamp", "isUtils":"True"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"lastupdate_user", "dataType":"varchar(15)", "isUtils":"True"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"lastupdate", "dataType":"timestamp", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"lastupdate_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"lastupdate", "dataType":"timestamp", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"lastupdate_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);
 
 
 ALTER TABLE presszone ALTER COLUMN tstamp SET DEFAULT now();

@@ -139,7 +139,6 @@ v_filter_key text;
 v_filter_value text;
 v_exec_func text;
 v_table_name text;
-v_value text;
 v_search_add text;
 v_device integer;
 

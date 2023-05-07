@@ -42,6 +42,8 @@ v_project_type text;
 v_arc_type text;
 v_link record;
 v_link_id integer;
+v_connec record;
+v_gully record;
 
 BEGIN
 

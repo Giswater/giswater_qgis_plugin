@@ -23,7 +23,7 @@ DECLARE
     v_field jsonb;
     v_fields_array json[];
     v_fieldsjson jsonb := '[]';
-    v_mincut ws_36_release.om_mincut;
+    v_mincut record;
     v_mincutid text;
     v_response json;
     v_values jsonb;
@@ -65,7 +65,7 @@ DECLARE
 
 BEGIN
     -- Set search path to local schema
-    SET search_path = "ws_36_release", public;
+    SET search_path = "SCHEMA_NAME", public;
 
     -- Get input data
     v_device := p_data -> 'client' ->> 'device';
