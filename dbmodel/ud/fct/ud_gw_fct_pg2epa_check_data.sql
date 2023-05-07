@@ -87,7 +87,7 @@ BEGIN
 			(SELECT node_1 as node_id FROM v_edit_arc UNION SELECT node_2 FROM v_edit_arc))a JOIN v_edit_node USING (node_id)
 			JOIN selector_sector USING (sector_id) 
 			JOIN value_state_type v ON state_type = v.id
-			WHERE epa_type != ''UNDEFINED'' and is_operative = true and cur_user = current_user ) b';	
+			WHERE epa_type != ''UNDEFINED'' and v_edit_node.is_operative = true and cur_user = current_user ) b';	
 		
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
