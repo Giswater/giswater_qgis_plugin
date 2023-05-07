@@ -143,9 +143,9 @@ INSERT INTO config_form_list(listname, query_text, device, listtype, listclass)
     VALUES ('tbl_hydrometer_value', 'SELECT * FROM v_ui_hydroval_x_connec WHERE hydrometer_id IS NOT NULL', 4, 'tab', 'list');
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_isnullvalue, widgetfunction, linkedobject, web_layoutorder)
-    VALUES ('connec', 'form_feature', 'hydro_val', 'cat_period_id', 'lyt_hydro_val_1', 0, 'string', 'typeahead', 'Cat period filter:', false, false, true, false, true, 'SELECT id, id as idval FROM ext_cat_period AS t1 ORDER BY idval', True, '{"functionName": "filter_table", "parameters":{}}', 'tbl_hydrometer_value', 1);
+    VALUES ('connec', 'form_feature', 'hydro_val', 'cat_period_id', 'lyt_hydro_val_1', 0, 'string', 'combo', 'Cat period filter:', false, false, true, false, true, 'SELECT DISTINCT(t1.id) as id, t2.cat_period_id as idval FROM ext_cat_period AS t1 JOIN (SELECT * FROM v_ui_hydroval_x_connec) AS t2 on t1.id = t2.cat_period_id ', True, '{"functionName": "filter_table", "parameters":{}}', 'tbl_hydrometer_value', 1);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_isnullvalue, widgetfunction, linkedobject, web_layoutorder)
-    VALUES ('connec', 'form_feature', 'hydro_val', 'hydrometer_id', 'lyt_hydro_val_1', 2, 'string', 'typeahead', 'Customer code:', false, false, true, false, true, 'SELECT hydrometer_customer_code as id, hydrometer_customer_code as idval FROM v_rtc_hydrometer ', True, '{"functionName": "filter_table", "parameters":{}}', 'tbl_hydrometer_value', 2);
+    VALUES ('connec', 'form_feature', 'hydro_val', 'hydrometer_id', 'lyt_hydro_val_1', 2, 'string', 'combo', 'Customer code:', false, false, true, false, true, 'SELECT hydrometer_id as id, hydrometer_customer_code as idval FROM v_rtc_hydrometer ', True, '{"functionName": "filter_table", "parameters":{}}', 'tbl_hydrometer_value', 2);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate)
     VALUES ('connec', 'form_feature', 'hydro_val', 'hspacer_lyt_hydro_val_1', 'lyt_hydro_val_1', 10, 'hspacer', false, false, true, false);
 
@@ -514,4 +514,6 @@ INSERT INTO sys_function(id, function_name, project_type, function_type, input_p
 VALUES(3238, 'gw_fct_getnodeborder', 'utils', 'function',  'JSON', 'JSON', 'Function to return those noder that are sector border', 'role_basic', NULL, 'core');
 
 
+UPDATE config_form_fields set iseditable = TRUE  where formname = 'v_edit_inp_dscenario_junction';
 
+UPDATE config_form_fields set iseditable = TRUE  where formname = 'v_edit_inp_dscenario_virtualvalve';

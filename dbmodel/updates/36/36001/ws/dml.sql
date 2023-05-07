@@ -137,40 +137,6 @@ widgetcontrols, widgetfunction, linkedobject, hidden
 FROM config_form_fields WHERE formname ='v_edit_inp_junction' AND columnname in ('connec_id','demand','pattern_id','demand_type', 'emitter_coeff',
 'init_quality', 'source_type', 'source_quality', 'source_pattern_id') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
---tank
-INSERT INTO config_form_fields 
-SELECT 'v_edit_inp_tank', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
-isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
-widgetcontrols, widgetfunction, linkedobject, hidden 
-FROM config_form_fields WHERE formname ='v_edit_inp_junction' AND 
-columnname in ('init_quality', 'source_type', 'source_quality', 'source_pattern_id', 'mixing_model','mixing_fraction', 'reaction_coeff') 
-ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
-
-INSERT INTO config_form_fields 
-SELECT 'v_edit_inp_dscenario_tank', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
-isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
-widgetcontrols, widgetfunction, linkedobject, hidden 
-FROM config_form_fields WHERE formname ='v_edit_inp_tank' 
-AND columnname in ('init_quality', 'source_type', 'source_quality', 'source_pattern_id', 'mixing_model','mixing_fraction', 'reaction_coeff')
-ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
-
---inlet
-INSERT INTO config_form_fields 
-SELECT 'v_edit_inp_dscenario_inlet', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
-isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
-widgetcontrols, widgetfunction, linkedobject, hidden 
-FROM config_form_fields WHERE formname ='v_edit_inp_tank' 
-AND columnname in ('init_quality', 'source_type', 'source_quality', 'source_pattern_id', 'mixing_model','mixing_fraction','reaction_coeff')
-ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
-
-INSERT INTO config_form_fields 
-SELECT 'v_edit_inp_inlet', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
-isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
-widgetcontrols, widgetfunction, linkedobject, hidden 
-FROM config_form_fields WHERE formname ='v_edit_inp_tank' 
-AND columnname in ('init_quality', 'source_type', 'source_quality', 'source_pattern_id', 'mixing_model','mixing_fraction', 'reaction_coeff')
-ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
-
 
 --reservoir
 INSERT INTO config_form_fields 
@@ -890,6 +856,41 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
     VALUES ('ve_epa_connec', 'form_feature', 'epa', 'tbl_inp_connec', 'lyt_epa_3', 1, 'tableview', false, false, false, false, '{"saveValue": false}', NULL, false, 'tbl_inp_connec');
 
 
+--tank
+INSERT INTO config_form_fields 
+SELECT 'v_edit_inp_tank', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden 
+FROM config_form_fields WHERE formname ='ve_epa_tank' AND 
+columnname in ('init_quality', 'source_type', 'source_quality', 'source_pattern_id', 'mixing_model','mixing_fraction', 'reaction_coeff') 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields 
+SELECT 'v_edit_inp_dscenario_tank', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden 
+FROM config_form_fields WHERE formname ='ve_epa_tank' 
+AND columnname in ('init_quality', 'source_type', 'source_quality', 'source_pattern_id', 'mixing_model','mixing_fraction', 'reaction_coeff')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+--inlet
+INSERT INTO config_form_fields 
+SELECT 'v_edit_inp_dscenario_inlet', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden 
+FROM config_form_fields WHERE formname ='v_edit_inp_tank' 
+AND columnname in ('init_quality', 'source_type', 'source_quality', 'source_pattern_id', 'mixing_model','mixing_fraction','reaction_coeff')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields 
+SELECT 'v_edit_inp_inlet', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
+isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
+widgetcontrols, widgetfunction, linkedobject, hidden 
+FROM config_form_fields WHERE formname ='v_edit_inp_tank' 
+AND columnname in ('init_quality', 'source_type', 'source_quality', 'source_pattern_id', 'mixing_model','mixing_fraction', 'reaction_coeff')
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
 UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=a.dv_isnullvalue,
 widgetcontrols=a.widgetcontrols FROM config_form_fields a
 WHERE a.formname='v_edit_inp_junction' AND a.columnname='pattern_id' AND c.columnname='pattern_id' AND c.formname ILIKE 've_epa_%';
@@ -932,7 +933,7 @@ WHERE a.formname='v_edit_inp_shortpipe' AND a.columnname='status' AND c.columnna
 
 UPDATE config_form_fields c SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_value_mixing''' ,
 dv_orderby_id=TRUE, dv_isnullvalue=true FROM config_form_fields a
-WHERE  c.columnname='mixing_model' AND (c.formname ILIKE 've_epa%' OR c.formname ILIKE 'v_edit_inp_%');
+WHERE  c.columnname='mixing_model';
 
 UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
 widgetcontrols=a.widgetcontrols FROM config_form_fields a
@@ -1340,5 +1341,5 @@ ALTER TABLE presszone ALTER COLUMN insert_user SET DEFAULT current_user;
 ALTER TABLE dqa ALTER COLUMN tstamp SET DEFAULT now();
 ALTER TABLE dqa ALTER COLUMN insert_user SET DEFAULT current_user;
 
-UPDATE ws_sample36.config_form_fields set hidden = False  where formname = 'v_edit_inp_dscenario_demand' 
+UPDATE config_form_fields set hidden = False  where formname = 'v_edit_inp_dscenario_demand' 
 and columnname ='feature_id'
