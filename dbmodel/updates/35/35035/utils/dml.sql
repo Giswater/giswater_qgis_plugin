@@ -54,7 +54,7 @@ INSERT INTO sys_function(id, function_name, project_type, function_type, input_p
 VALUES (3222, 'gw_fct_vnode_repair', 'utils', 'function', 'json', 'json', 'Function that inserts missing vnodes.' , 'role_edit', null, 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function(	id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
-VALUES (3228, 'gw_fct_anl_node_proximity', 'utils', 'function', 'json', 'json', 'Function that analysis the distyance between two nodes.', 'role_edit', null, 'core')
+VALUES (2914, 'gw_fct_anl_node_proximity', 'utils', 'function', 'json', 'json', 'Function that analysis the distyance between two nodes.', 'role_edit', null, 'core')
 ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM sys_function WHERE function_name = 'gw_trg_feature_border';
