@@ -64,7 +64,7 @@ BEGIN
 		UPDATE dma 
 		SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete, expl_id=NEW.expl_id, 
 		pattern_id=NEW.pattern_id, link=NEW.link, minc=NEW.minc, maxc=NEW.maxc, effc=NEW.effc, graphconfig=NEW.graphconfig::json, 
-		stylesheet = NEW.stylesheet::json, active=NEW.active, avg_press=NEW.avg_press
+		stylesheet = NEW.stylesheet::json, active=NEW.active, avg_press=NEW.avg_press, lastupdate=now(), lastupdate_user = current_user
 		WHERE dma_id=OLD.dma_id;
 		
 		RETURN NEW;

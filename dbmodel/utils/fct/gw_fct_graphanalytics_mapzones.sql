@@ -883,6 +883,10 @@ BEGIN
 
 			RAISE NOTICE 'Generate geometries';		
 
+			--update of fields 'lastupdate' and 'lastupdate_user'
+			v_querytext = 'UPDATE '||quote_ident(v_table)||' set lastupdate=now(), lastupdate_user=current_user where '||quote_ident(v_field)||'='||quote_ident(v_field)||'';
+			execute v_querytext;
+
 			-- update geometry of mapzones
 			IF v_updatemapzgeom = 0 THEN
 				-- do nothing

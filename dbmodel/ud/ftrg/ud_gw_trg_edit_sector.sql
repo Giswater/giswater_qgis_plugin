@@ -34,7 +34,7 @@ BEGIN
 
 		UPDATE sector 
 		SET sector_id=NEW.sector_id, name=NEW.name, descript=NEW.descript, macrosector_id=NEW.macrosector_id, the_geom=NEW.the_geom, 
-		undelete=NEW.undelete, active=NEW.active
+		undelete=NEW.undelete, active=NEW.active, lastupdate=now(), lastupdate_user = current_user
 		WHERE sector_id=OLD.sector_id;
 
 	ELSIF TG_OP = 'DELETE' THEN  

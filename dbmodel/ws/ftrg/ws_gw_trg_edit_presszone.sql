@@ -41,7 +41,7 @@ BEGIN
    	
 		UPDATE presszone
 		SET presszone_id=NEW.presszone_id, name=NEW.name, expl_id=NEW.expl_id, the_geom=NEW.the_geom, graphconfig=NEW.graphconfig::json,
-		head = NEW.head, stylesheet=NEW.stylesheet::json, active=NEW.active, descript=NEW.descript
+		head = NEW.head, stylesheet=NEW.stylesheet::json, active=NEW.active, descript=NEW.descript, lastupdate=now(), lastupdate_user = current_user
 		WHERE presszone_id=OLD.presszone_id;
 		
 		RETURN NEW;

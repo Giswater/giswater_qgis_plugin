@@ -43,7 +43,7 @@ BEGIN
 		UPDATE dqa 
 		SET dqa_id=NEW.dqa_id, name=NEW.name, expl_id=NEW.expl_id, macrodqa_id=NEW.macrodqa_id, descript=NEW.descript, undelete=NEW.undelete, 
 		the_geom=NEW.the_geom, pattern_id=NEW.pattern_id, dqa_type=NEW.dqa_type, link=NEW.link, graphconfig=NEW.graphconfig::json, 
-		stylesheet = NEW.stylesheet::json, active=NEW.active
+		stylesheet = NEW.stylesheet::json, active=NEW.active, lastupdate=now(), lastupdate_user = current_user
 		WHERE dqa_id=OLD.dqa_id;
 		
 		RETURN NEW;

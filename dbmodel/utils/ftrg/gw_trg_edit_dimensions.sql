@@ -65,7 +65,7 @@ BEGIN
 		SET id=NEW.id, distance=NEW.distance, depth=NEW.depth, the_geom=NEW.the_geom, x_label=NEW.x_label, y_label=NEW.y_label, 
 		rotation_label=NEW.rotation_label, offset_label=NEW.offset_label, direction_arrow=NEW.direction_arrow, x_symbol=NEW.x_symbol, 
 		y_symbol=NEW.y_symbol, feature_id=NEW.feature_id, feature_type=NEW.feature_type, 
-		expl_id=NEW.expl_id, observ=NEW.observ, state=NEW.state, comment=NEW.comment
+		expl_id=NEW.expl_id, observ=NEW.observ, state=NEW.state, comment=NEW.comment, lastupdate=now(), lastupdate_user = current_user
 		WHERE id=NEW.id;
 
 		RETURN NEW;
