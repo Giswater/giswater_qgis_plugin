@@ -106,6 +106,7 @@ v_message text;
 v_check_arcdnom_status boolean;
 v_check_arcdnom integer;
 v_checkeddiam text;
+v_querytext text;
 
 
 BEGIN
@@ -135,17 +136,25 @@ BEGIN
 	v_link_id = (p_data->>'data')::json->>'linkId';
 
 	--profilactic values
-	if v_forceendpoint IS NULL THEN v_forceendpoint = FALSE; END IF;
+	IF v_forceendpoint IS NULL THEN v_forceendpoint = FALSE; END IF;
 
 	-- create query text for forced arcs
-	if v_forcedarcs is null then
+	IF v_forcedarcs IS NULL THEN
 		v_forcedarcs= '';
 		v_isforcedarcs = False;
-	else
+	ELSE
 		v_forcedarcs = replace(ARRAY(SELECT json_array_elements_text(((p_data::json->>'data')::json->>'forcedArcs')::json))::text, '{','(');
 		v_forcedarcs = concat (' AND arc_id::integer IN ', replace (v_forcedarcs, '}',')'));
 		v_isforcedarcs = True;
-	end if;
+	
+		-- check if forced arcs really exists on v_edit_arc
+		v_querytext = 'SELECT count(arc_id) FROM v_edit_arc WHERE arc_id IS NOT NULL '||v_forcedarcs||';';
+		EXECUTE v_querytext INTO v_count;
+		IF v_count=0 THEN
+			v_forcedarcs= '';
+			v_isforcedarcs = False;
+		END IF;
+	END IF;
 
 	-- get values from feature array
 	IF v_feature_ids ILIKE '[%]' THEN
