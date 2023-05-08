@@ -350,4 +350,4 @@ CREATE TABLE audit_psector_gully_traceability (
 	CONSTRAINT audit_psector_gully_traceability_pkey PRIMARY KEY (id)
 );
 
-SELECT ws.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_gully", "column":"addparam", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_gully", "column":"addparam", "dataType":"text"}}$$);

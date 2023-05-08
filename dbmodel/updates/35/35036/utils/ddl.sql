@@ -8,6 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-SELECT ws.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"addparam", "dataType":"text"}}$$);
-SELECT ws.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"addparam", "dataType":"text"}}$$);
-SELECT ws.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_connec", "column":"addparam", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"addparam", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"addparam", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_connec", "column":"addparam", "dataType":"text"}}$$);
