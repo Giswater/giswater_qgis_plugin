@@ -118,7 +118,7 @@ BEGIN
 		
 			IF v_projectype = 'UD' THEN
 				INSERT INTO audit_psector_gully_traceability
-				SELECT nextval('SCHEMA_NAME.audit_psector_gully_traceability_id_seq'), psector_id, pg.state, doable, pc.arc_id, l.link_id, l.the_geom, now(), current_user, 'Execute psector', gully.*
+				SELECT nextval('SCHEMA_NAME.audit_psector_gully_traceability_id_seq'), psector_id, pg.state, doable, pg.arc_id, l.link_id, l.the_geom, now(), current_user, 'Execute psector', gully.*
 				FROM plan_psector_x_gully pg JOIN gully USING (gully_id)
 				JOIN link l USING (link_id)
 				WHERE psector_id=NEW.psector_id;

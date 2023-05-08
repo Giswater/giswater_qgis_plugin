@@ -287,6 +287,7 @@ CREATE TABLE audit_psector_gully_traceability (
 	connec_length numeric(12, 3) NULL,
 	connec_depth numeric(12, 3) NULL,
 	arc_id varchar(16) NULL,
+	"_pol_id_" varchar(16) NULL,
 	sector_id int4 NOT NULL,
 	state int2 NOT NULL,
 	state_type int2 NOT NULL,
