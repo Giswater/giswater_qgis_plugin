@@ -1547,25 +1547,19 @@ class GwPsector:
         msg = ""
         status = tools_qt.get_combo_value(self.dlg_plan_psector, self.cmb_status)
         if status == '0':
-            msg = "WARNING: You have updated the status value to EXECUTED (Obsolete). If you click 'Accept' on " \
-                  "the main dialog, a process will update all the features that belong to the psector changing its " \
-                  "state to OBSOLETE and its state_type according to system variable " \
-                  "'plan_psector_execute', 'done_planified' and 'done_ficticius'."
-        elif status == '2':
-            msg = "WARNING: You have updated the status value to PLANNED. If you click 'Accept' on the main dialog, " \
-                  "a process will update all the features that belong to the psector changing its state to " \
-                  "OBSOLETE and its state_type according to system variable " \
-                  "'plan_statetype_vdefault', 'plan_statetype_planned' and 'plan_statetype_ficticius'."
+            msg = "WARNING: You have updated the status value to EXECUTED (Save Trace). If you click 'Accept' on " \
+                  "the main dialog, this psector relations will be deleted. Previously they will be saved into " \
+                  "psector traceability tables indicating that features belog to an Executed psector."
         elif status == '3':
-            msg = "WARNING: You have updated the status value to CANCELED. If you click 'Accept' on the main dialog, " \
-                  "a process will update all the features that belong to the psector changing its state to OBSOLETE " \
-                  "and its state_type according to system variable 'plan_psector_execute', 'canceled_planified' and " \
-                  "'canceled_ficticius'."
+            msg = "WARNING: You have updated the status value to CANCELED (Save Trace). If you click 'Accept' on " \
+                  "the main dialog, this psector relations will be deleted. Previously they will be saved into " \
+                  "psector traceability tables indicating that features belog to a Canceled psector."
         elif status == '4':
-            msg = "WARNING: You have updated the status value to EXECUTED (On Service). If you click 'Accept' on the " \
-                  "main dialog, this psector will be executed. Planified features will turn ON SERVICE and deleted " \
-                  "features will turn OBSOLETE. To mantain traceability, a copy of planified features will be " \
-                  "inserted on the psector."
+            msg = "WARNING: You have updated the status value to EXECUTED (Set OPERATIVE and Save Trace). If you " \
+                  "click 'Accept' on the main dialog, this psector will be executed. Planified features will turn " \
+                  "OPERATIVE and deleted features will turn OBSOLETE. Finally, psector relations will be deleted " \
+                  "but saving them into psector traceability tables indicating that features belog to an Executed " \
+                  "psector."
         if msg:
             tools_qt.show_details(msg, 'Message warning')
 
