@@ -1519,7 +1519,7 @@ class GwPsector:
             msg = "WARNING: You have updated the status value to EXECUTED (Set OPERATIVE and Save Trace). If you " \
                   "click 'Accept' on the main dialog, this psector will be executed. Planified features will turn " \
                   "OPERATIVE and deleted features will turn OBSOLETE. Finally, psector relations will be deleted " \
-                  "but saving them into psector traceability tables indicating that features belog to an Executed " \
+                  "but saving them into psector traceability tables indicating that features belong to an Executed " \
                   "psector."
         if msg:
             tools_qt.show_details(msg, 'Message warning')
