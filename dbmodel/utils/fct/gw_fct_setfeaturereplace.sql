@@ -407,7 +407,7 @@ BEGIN
 		value_param
 		FROM man_addfields_value WHERE feature_id=v_old_feature_id;
 
-		IF (SELECT count(parameter_id) FROM man_addfields_value WHERE feature_id = v_id::text) > 0THEN
+		IF (SELECT count(parameter_id) FROM man_addfields_value WHERE feature_id = v_id::text) > 0 THEN
 			FOR rec_addfields IN (SELECT parameter_id, value_param FROM man_addfields_value WHERE feature_id = v_id::text)
 			LOOP
 				INSERT INTO audit_check_data (fid, result_id, error_message)

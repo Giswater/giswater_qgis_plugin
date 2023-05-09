@@ -232,6 +232,20 @@ BEGIN
 							FROM link l JOIN connec c ON connec_id = l.feature_id WHERE l.feature_type  ='CONNEC' AND connec_id = v_connec_id AND l.state=1
 							ON CONFLICT (connec_id, psector_id, state) DO NOTHING;
 						END LOOP;
+                        
+						-- connecs without link but with arc_id
+						FOR v_connec_id IN 
+						SELECT connec_id FROM connec WHERE arc_id=v_arc.arc_id AND state = 1 AND connec_id 
+						NOT IN (SELECT DISTINCT feature_id FROM link WHERE exit_id=v_arc.arc_id)
+						LOOP
+							INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable)
+							SELECT connec_id, v_arcrecordtb.arc_id, v_psector_id, 1, false
+							FROM connec WHERE connec_id = v_connec_id
+                            ON CONFLICT (connec_id, psector_id, state) DO NOTHING;
+						
+							UPDATE plan_psector_x_connec SET link_id= NULL WHERE connec_id=v_connec_id;
+							DELETE FROM link WHERE feature_id=v_connec_id;
+						END LOOP;
 
 						-- manage gully linked feature
 						FOR v_gully_id IN 
@@ -247,6 +261,21 @@ BEGIN
 							FROM link l JOIN gully c ON gully_id = l.feature_id WHERE l.feature_type  ='GULLY' AND gully_id = v_gully_id AND l.state=1
 							ON CONFLICT (gully_id, psector_id, state) DO NOTHING;
 						END LOOP;
+                        
+						-- connecs without link but with arc_id
+						FOR v_gully_id IN 
+						SELECT gully_id FROM gully WHERE arc_id=v_arc.arc_id AND state = 1 AND gully_id 
+						NOT IN (SELECT DISTINCT feature_id FROM link WHERE exit_id=v_arc.arc_id)
+						LOOP
+							INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable)
+							SELECT gully_id, v_arcrecordtb.arc_id, v_psector_id, 1, false
+							FROM gully WHERE gully_id = v_gully_id
+                            ON CONFLICT (gully_id, psector_id, state) DO NOTHING;
+						
+							UPDATE plan_psector_x_gully SET link_id= NULL WHERE gully_id=v_gully_id;
+							DELETE FROM link WHERE feature_id=v_gully_id;
+						END LOOP;
+                        
 					END IF;
 				END LOOP;				
 			END IF;
