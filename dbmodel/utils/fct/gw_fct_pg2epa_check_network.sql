@@ -162,7 +162,7 @@ BEGIN
 		SELECT 290, n1, concat(''Duplicated node with '', n2 ), the_geom FROM ', v_querytext);
 		INSERT INTO audit_check_data (fid, criticity, error_message)
 		VALUES (v_fid, 3, concat('ERROR-290: There is/are ',v_count,
-		' node(s) duplicated on this result. Reason maybe some (connec, node or vnode) over other (connec, node or vnode) due wrong (state)topology issue.'));
+		' node(s) duplicated on this result. Reason maybe some (connec or node) over other (connec or node) or due wrong state-topology issue.'));
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 1, 'INFO: No duplicated node(s) found on this result.');
