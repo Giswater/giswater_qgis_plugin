@@ -109,6 +109,8 @@ v_node_2 text;
 v_new_node_graph text;
 v_graph_arc_id TEXT;
 v_force_delete text;
+rec_connec record;
+rec_gully record;
 
 BEGIN
 
@@ -384,8 +386,6 @@ BEGIN
 
 						SELECT count(connec_id) INTO v_count_connec FROM v_edit_connec WHERE arc_id=v_arc_id AND state > 0;
 
-						UPDATE connec SET arc_id=NULL WHERE arc_id=v_arc_id AND state = 1;
-
 						UPDATE plan_psector_x_connec SET link_id=NULL WHERE arc_id=v_arc_id;
 						UPDATE plan_psector_x_connec SET arc_id=NULL WHERE arc_id=v_arc_id;
 						
@@ -399,8 +399,6 @@ BEGIN
 							END LOOP;
 
 							SELECT count(gully_id) INTO v_count_gully FROM v_edit_gully WHERE arc_id=v_arc_id AND state > 0;
-
-							UPDATE gully SET arc_id=NULL WHERE arc_id=v_arc_id AND state = 1;
 
 							UPDATE plan_psector_x_gully SET link_id=NULL WHERE arc_id=v_arc_id;
 							UPDATE plan_psector_x_gully SET arc_id=NULL WHERE arc_id=v_arc_id;
@@ -513,37 +511,51 @@ BEGIN
 							VALUES (212, 1, concat('Copy ',v_count,' visits from old to new arcs.'));
 
 						END IF;
-
-						--set arc to obsolete or delete it
-						IF v_set_arc_obsolete IS TRUE THEN
-							UPDATE arc SET state=0, state_type=v_obsoletetype  WHERE arc_id=v_arc_id;
-							INSERT INTO audit_check_data (fid,  criticity, error_message)
-							VALUES (212, 1, concat('Set old arc to obsolete: ',v_arc_id,'.'));
-							
-						ELSE
-							EXECUTE 'SELECT gw_fct_setfeaturedelete($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
-							"feature":{"type":"ARC"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_id":"'||v_arc_id||'"}}$$);';
-							
-							INSERT INTO audit_check_data (fid,  criticity, error_message)
-							VALUES (212, 1, concat('Delete old arc: ',v_arc_id,'.'));
-						END IF;
-						
 						-- reconnect operative connecs
-						IF v_count_connec > 0  AND v_array_connec IS NOT NULL THEN
-							EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-							"feature":{"id":'|| array_to_json(v_array_connec)||'},"data":{"feature_type":"CONNEC", "forcedArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
-
+						IF v_count_connec > 0 THEN
+							-- connecs on v_array_connec (with link)
+							IF v_array_connec IS NOT NULL THEN
+								EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+								"feature":{"id":'|| array_to_json(v_array_connec)||'},"data":{"feature_type":"CONNEC", "forcedArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
+							END IF;
+						
+							-- connecs without link but with arc_id
+							FOR rec_connec IN SELECT connec_id FROM connec WHERE arc_id=v_arc_id AND state = 1 AND connec_id 
+							NOT IN (SELECT DISTINCT feature_id FROM link WHERE exit_id=v_arc_id)
+							LOOP
+								UPDATE connec SET arc_id=q.arc_id FROM (
+								SELECT a.arc_id FROM arc a JOIN connec c ON st_dwithin(c.the_geom, a.the_geom, 100)
+								WHERE a.arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) AND c.connec_id=rec_connec.connec_id
+								order by ST_Distance(c.the_geom, a.the_geom) LIMIT 1
+								)q WHERE connec_id=rec_connec.connec_id;
+							END LOOP;
+						
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
 							VALUES (212, 1, concat('Reconnect ',v_count_connec,' connecs '));
 						END IF;
 
 						-- reconnect operative gullies
-						IF v_count_gully > 0 AND v_array_gully IS NOT NULL THEN
-							EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-							"feature":{"id":'|| array_to_json(v_array_gully)||'},"data":{"feature_type":"GULLY", "forcedArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
-
+						IF v_count_gully > 0 THEN
+							-- gullys on v_array_gully (with link)
+							IF v_array_gully IS NOT NULL THEN
+								EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+								"feature":{"id":'|| array_to_json(v_array_gully)||'},"data":{"feature_type":"GULLY", "forcedArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
+							END IF;
+						
+							-- gullys without link but with arc_id
+							FOR rec_gully IN SELECT gully_id FROM gully WHERE arc_id=v_arc_id AND state = 1 AND gully_id 
+							NOT IN (SELECT DISTINCT feature_id FROM link WHERE exit_id=v_arc_id)
+							LOOP
+								UPDATE gully SET arc_id=q.arc_id FROM (
+								SELECT a.arc_id FROM arc a JOIN gully c ON st_dwithin(c.the_geom, a.the_geom, 100)
+								WHERE a.arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) AND c.gully_id=rec_gully.gully_id
+								order by ST_Distance(c.the_geom, a.the_geom) LIMIT 1
+								)q WHERE gully_id=rec_gully.gully_id;
+							END LOOP;
+						
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
-							VALUES (212, 1, concat('Reconnect ',v_count_gully,' gullies .'));
+							VALUES (212, 1, concat('Reconnect ',v_count_gully,' gullys'));
+							
 						END IF;
 						
 						-- reconnect planned node links
@@ -608,6 +620,20 @@ BEGIN
 								INSERT INTO audit_check_data (fid, criticity, error_message)
 								VALUES (212, 0, concat('Node_2 is a delimiter of a mapzone if old arc was defined as toArc it has been reconfigured with new arc_id.'));
 							END IF;
+						END IF;
+                        
+						--set arc to obsolete or delete it
+						IF v_set_arc_obsolete IS TRUE THEN
+							UPDATE arc SET state=0, state_type=v_obsoletetype  WHERE arc_id=v_arc_id;
+							INSERT INTO audit_check_data (fid,  criticity, error_message)
+							VALUES (212, 1, concat('Set old arc to obsolete: ',v_arc_id,'.'));
+							
+						ELSE
+							EXECUTE 'SELECT gw_fct_setfeaturedelete($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
+							"feature":{"type":"ARC"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_id":"'||v_arc_id||'"}}$$);';
+							
+							INSERT INTO audit_check_data (fid,  criticity, error_message)
+							VALUES (212, 1, concat('Delete old arc: ',v_arc_id,'.'));
 						END IF;
 	
 					ELSIF v_state_node = 2 THEN --is psector
