@@ -271,6 +271,9 @@ BEGIN
 							VALUES (214, 1, concat('Reconnect operative ',v_count,' gullies.'));
 						END IF;
 					END IF;   
+					
+					-- set new exit_id for operative connects
+					UPDATE link SET exit_id=v_new_record.arc_id WHERE exit_id=v_record1.arc_id OR exit_id=v_record2.arc_id;
 
 					-- update planned connecs
 					SELECT count(connec_id) INTO v_count FROM plan_psector_x_connec WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
