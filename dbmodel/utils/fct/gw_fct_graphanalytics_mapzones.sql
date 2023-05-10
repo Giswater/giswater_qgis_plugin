@@ -817,8 +817,8 @@ BEGIN
 						 case when gullies is null then 0 else gullies end, '' Gullies'')
 						FROM (SELECT '||(v_field)||', count(*) as arcs FROM v_edit_arc  WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')a
 						LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM v_edit_node  WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')b USING ('||(v_field)||')
-						LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM v_edit_connec  WHERE '||(v_field)||'::integer > 0GROUP BY '||(v_field)||')c USING ('||(v_field)||')
-						LEFT JOIN (SELECT '||(v_field)||', count(*) as gullies FROM v_edit_gully  WHERE '||(v_field)||'::integer > 0GROUP BY '||(v_field)||')d USING ('||(v_field)||')
+						LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM v_edit_connec  WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')c USING ('||(v_field)||')
+						LEFT JOIN (SELECT '||(v_field)||', count(*) as gullies FROM v_edit_gully  WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')d USING ('||(v_field)||')
 						JOIN '||(v_table)||' p ON a.'||(v_field)||' = p.'||(v_field)||'
 						WHERE a.'||(v_field)||'::text = '||quote_literal(v_floodonlymapzone);
 						EXECUTE v_querytext;
@@ -827,7 +827,7 @@ BEGIN
 						SELECT '||v_fid||', 1, concat('||v_mapzonename||','' with '', arcs, '' Arcs, '',nodes, '' Nodes and '', case when connecs is null then 0 else connecs end, '' Connecs'')
 						FROM (SELECT '||(v_field)||', count(*) as arcs FROM v_edit_arc  WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')a
 						LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM v_edit_node  WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')b USING ('||(v_field)||')
-						LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM v_edit_connec  WHERE '||(v_field)||'::integer > 0GROUP BY '||(v_field)||')c USING ('||(v_field)||')
+						LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM v_edit_connec  WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')c USING ('||(v_field)||')
 						JOIN '||(v_table)||' p ON a.'||(v_field)||' = p.'||(v_field)||'
 						WHERE a.'||(v_field)||'::text = '||quote_literal(v_floodonlymapzone);
 						EXECUTE v_querytext;
