@@ -44,7 +44,9 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Checking exisiting pattern id on table inp_pattern -> Done'));
 
 	-- reset sequence
-	PERFORM setval('inp_pattern_value_id_seq', (SELECT max(id) FROM inp_pattern_value), true);
+	IF v_project_type = 'WS' THEN
+		PERFORM setval('inp_pattern_value_id_seq', (SELECT max(id) FROM inp_pattern_value), true);
+	END IF;
 
   	-- starting process
  	FOR rec_csv IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = v_fid
