@@ -19,7 +19,7 @@ from qgis.PyQt.QtGui import QColor, QRegExpValidator, QStandardItem, QStandardIt
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
-    QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton
+    QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox
 from qgis.core import QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY, QgsProject
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
 
@@ -751,6 +751,15 @@ class GwInfo(QObject):
         for layout in layout_list:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             layout.addItem(vertical_spacer1)
+
+        # Manage dscenario sub-tab from epa tab
+        lyt_dscenario = self.dlg_cf.findChild(QGridLayout, "lyt_epa_3")
+        epa_toolbox = self.dlg_cf.findChild(QToolBox, "epa_toolbox")
+        if lyt_dscenario is not None and lyt_dscenario.count() == 0:
+            epa_toolbox.setItemEnabled(1, False)
+        else:
+            epa_toolbox.setItemEnabled(1, True)
+
         if reload_epa:
             return
         # Manage combo parents and children:
