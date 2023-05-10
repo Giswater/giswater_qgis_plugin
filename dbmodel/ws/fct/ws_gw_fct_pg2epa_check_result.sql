@@ -402,7 +402,9 @@ BEGIN
 				
 					EXECUTE 'INSERT INTO anl_'||object_rec.colname||' ('||object_rec.colname||'_id, fid, descript, the_geom) 
 					SELECT '||object_rec.colname||'_id, 396, concat(''Present on '',count(*),'' enabled dscenarios''), the_geom FROM v_edit_inp_dscenario_'||object_rec.tabname||' JOIN '||
-					object_rec.colname||' USING ('||object_rec.colname||'_id) GROUP BY '||object_rec.colname||'_id, the_geom  having count(arc_id) > 1';
+					object_rec.colname||' USING ('||object_rec.colname||'_id) GROUP BY '||object_rec.colname||'_id, v_edit_inp_dscenario_'||object_rec.tabname||'.the_geom having count(arc_id) > 1';
+
+
 
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (v_fid, v_result_id, 3, concat('ERROR-396 (anl_',object_rec.colname,'): There is/are ', v_count, ' ',
