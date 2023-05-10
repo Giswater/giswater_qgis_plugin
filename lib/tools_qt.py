@@ -570,8 +570,16 @@ def set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_tr
 def get_col_index_by_col_name(qtable, column_name):
     """ Return column index searching by column name """
 
-    record = qtable.model().record(0)
-    column_index = record.indexOf(column_name)
+    model = qtable.model()
+    column_index = -1
+    try:
+        record = model.record(0)
+        column_index = record.indexOf(column_name)
+    except AttributeError:
+        for x in range(0, model.columnCount()):
+            if model.headerData(x, Qt.Horizontal) == column_name:
+                column_index = x
+                break
 
     if column_index == -1:
         column_index = None

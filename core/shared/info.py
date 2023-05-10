@@ -3206,8 +3206,8 @@ class GwInfo(QObject):
             tools_qt.fill_table(widget, table_name, filter_)
             self._set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to,
                                    column_filter=feature_key, value_filter=self.feature_id, widget=widget)
-        # Manage config_form_tableview
-        tools_gw.set_tablemodel_config(self.dlg_cf, widget, table_name)
+            # Manage config_form_tableview
+            tools_gw.set_tablemodel_config(self.dlg_cf, widget, table_name)
 
 
     def _open_generic_visit(self, widget, table_name):
@@ -3259,8 +3259,9 @@ class GwInfo(QObject):
             tools_qgis.show_warning(message, dialog=self.dlg_cf)
             return
 
-        if type(table_name) is dict:
-            table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
+        cmb_visit_class_value = tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)
+        if type(table_name) is dict and cmb_visit_class_value not in (None, ''):
+            table_name = str(table_name[cmb_visit_class_value])
 
         # Set model of selected widget
         if visit_class:
@@ -3275,7 +3276,8 @@ class GwInfo(QObject):
                 tbl_name = table_name.split(".")[1]
             else:
                 tbl_name = table_name
-            tools_gw.set_tablemodel_config(self.dlg_cf, widget, tbl_name)
+            if type(tbl_name) is not dict:
+                tools_gw.set_tablemodel_config(self.dlg_cf, widget, tbl_name)
 
         # Set filter to model
         expr = self.field_id + " = '" + self.feature_id + "'"

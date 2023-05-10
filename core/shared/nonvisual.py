@@ -82,9 +82,11 @@ class GwNonVisual:
         self.manager_dlg.btn_cancel.clicked.connect(self.manager_dlg.reject)
         self.manager_dlg.finished.connect(partial(tools_gw.close_dialog, self.manager_dlg))
         self.manager_dlg.btn_print.clicked.connect(partial(self._print_object))
+        self.manager_dlg.chk_active.stateChanged.connect(partial(self._filter_active, self.manager_dlg))
 
-        self.manager_dlg.main_tab.currentChanged.connect(
-            partial(self._manage_tabs_changed))
+        self.manager_dlg.main_tab.currentChanged.connect(partial(self._manage_tabs_changed))
+        self.manager_dlg.main_tab.currentChanged.connect(partial(self._filter_active, self.manager_dlg, None))
+        self._manage_tabs_changed()
 
         # Open dialog
         tools_gw.open_dialog(self.manager_dlg, dlg_name=f'dlg_nonvisual_manager')
@@ -111,12 +113,19 @@ class GwNonVisual:
 
     def _manage_tabs_changed(self):
 
-        tab_idx = self.manager_dlg.main_tab.currentIndex()
-        if tab_idx == 0:
-            self.manager_dlg.btn_print.setVisible(True)
+        tab_name = self.manager_dlg.main_tab.currentWidget().objectName()
 
-        else:
-            self.manager_dlg.btn_print.setVisible(False)
+        visibility_settings = {  # tab_name: (chk_active, btn_print)
+            'v_edit_inp_curve': (False, True),
+            'v_edit_inp_pattern': (False, False),
+            'inp_lid': (False, False),
+        }
+        default_visibility = (True, False)
+
+        chk_active_visible, btn_print_visible = visibility_settings.get(tab_name, default_visibility)
+
+        self.manager_dlg.chk_active.setVisible(chk_active_visible)
+        self.manager_dlg.btn_print.setVisible(btn_print_visible)
 
 
     def _get_nonvisual_object(self, tbl_view, function_name):
@@ -171,6 +180,24 @@ class GwNonVisual:
             text = tools_qt.get_text(dialog, dialog.txt_filter, return_string_null=False)
 
         expr = f"{id_field}::text ILIKE '%{text}%'"
+        # Refresh model with selected filter
+        widget_table.model().setFilter(expr)
+        widget_table.model().select()
+
+
+    def _filter_active(self, dialog, active):
+        """ Filters manager table by active """
+
+        widget_table = dialog.main_tab.currentWidget()
+        id_field = 'active'
+        if active is None:
+            active = dialog.chk_active.checkState()
+        active = 'true' if active == 2 else None
+
+        expr = ""
+        if active is not None:
+            expr = f"{id_field} = {active}"
+
         # Refresh model with selected filter
         widget_table.model().setFilter(expr)
         widget_table.model().select()
@@ -667,7 +694,7 @@ class GwNonVisual:
             plot_widget.axes.plot(aux_y_list, aux_x_list, color="grey", alpha=0.5, linestyle="dashed")
 
             if file_name:
-                fig_title = f"{file_name} (S: {round(area*100, 2)} dm2 - {round(geom1, 2)}x{round(geom2, 2)})"
+                fig_title = f"{file_name} (S: {round(area*100, 2)} dm2 - {round(geom1, 2)} x {round(geom2, 2)})"
                 plot_widget.axes.text(min(y_list_inverted)*1.1, max(x_list)*1.07, f"{fig_title}", fontsize=8)
         else:
             plot_widget.axes.plot(x_list, y_list, color='indianred')

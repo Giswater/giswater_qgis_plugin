@@ -16,7 +16,7 @@ from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
 from ..dialog import GwAction
 from ...ui.ui_manager import GwEpaManagerUi
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_db, tools_qgis
+from ....lib import tools_qt, tools_db, tools_qgis, tools_os
 
 
 class GwGo2EpaManagerButton(GwAction):
@@ -281,12 +281,16 @@ class GwGo2EpaManagerButton(GwAction):
             return
 
         result_id = ""
+        set_corporate = True
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             col = tools_qt.get_col_index_by_col_name(widget, str(column_id))
             result_id = widget.model().index(row, col).data()
+            col = tools_qt.get_col_index_by_col_name(widget, "iscorporate")
+            set_corporate = widget.model().index(row, col).data()
+        set_corporate = not tools_os.set_boolean(set_corporate, False)
 
-        extras = f'"resultId":"{result_id}"'
+        extras = f'"resultId":"{result_id}", "isCorporate": {str(set_corporate).lower()}'
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_epa2data', body)
         if not result or result.get('status') != 'Accepted':
@@ -295,5 +299,7 @@ class GwGo2EpaManagerButton(GwAction):
             return
         message = "Epa2data execution successful."
         tools_qgis.show_info(message, dialog=self.dlg_manager)
+        # Refresh table
+        self._fill_manager_table()
 
     # endregion
