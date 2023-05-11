@@ -99,7 +99,7 @@ BEGIN
 				END IF;
 
 				--check isparent/dv_parent_id
-				IF NEW.isparent IS TRUE THEN
+				IF NEW.isparent IS TRUE  AND NEW.widgettype = 'combo' THEN
 				
 						--count if dv_parent_id exists before set isparent=TRUE
 						SELECT count(*) FROM config_form_fields WHERE formname=NEW.formname AND dv_parent_id=NEW.columnname INTO v_count;
