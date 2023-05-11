@@ -156,7 +156,7 @@ BEGIN
 		
 		-- check if arc diameter is bigger than configured
         IF v_projectype = 'WS' THEN
-            IF (SELECT cat_dnom FROM v_edit_arc WHERE arc_id=v_arc.arc_id) >= v_check_arcdnom AND v_check_arcdnom_status IS TRUE THEN
+            IF (SELECT cat_dnom::integer FROM v_edit_arc WHERE arc_id=v_arc.arc_id) >= v_check_arcdnom AND v_check_arcdnom_status IS TRUE THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                 "data":{"message":"3232", "function":"1116","debug_msg":'||v_check_arcdnom||'}}$$);';
             END IF;
