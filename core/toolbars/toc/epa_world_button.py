@@ -62,8 +62,6 @@ def set_epa_world(_set_epa_world=None):
 
         sql = f"is_operative = true AND epa_type != 'UNDEFINED' AND sector_id IN ({sectors})"
 
-        print(sql)
-
         # arc
         for layer in arc_layers:
             layer.setSubsetString(sql)
