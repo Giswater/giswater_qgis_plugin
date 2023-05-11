@@ -884,8 +884,15 @@ BEGIN
 			RAISE NOTICE 'Generate geometries';		
 
 			--update of fields 'lastupdate' and 'lastupdate_user'
-			v_querytext = 'UPDATE '||quote_ident(v_table)||' set lastupdate=now(), lastupdate_user=current_user where '||quote_ident(v_field)||'='||quote_ident(v_field)||'';
-			execute v_querytext;
+			IF v_floodonlymapzone IS NULL THEN
+	            v_querytext = 'UPDATE '||quote_ident(v_table)||' set lastupdate=now(), lastupdate_user=current_user 
+	            where '||quote_ident(v_field)||' IN (SELECT distinct '||quote_ident(v_field)||' FROM arc JOIN temp_anlgraph USING (arc_id))';
+	        ELSE
+	        	v_querytext = 'UPDATE '||quote_ident(v_table)||' set lastupdate=now(), lastupdate_user=current_user 
+	            where '||quote_ident(v_field)||'='||v_floodonlymapzone||'';
+	        END IF;
+	       
+            EXECUTE v_querytext;
 
 			-- update geometry of mapzones
 			IF v_updatemapzgeom = 0 THEN
