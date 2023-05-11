@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_plan_check_data($${}$$)
 SELECT * FROM anl_arc WHERE fid=115 AND cur_user=current_user;
 SELECT * FROM anl_node WHERE fid=115 AND cur_user=current_user;
 
--- fid: 115
+-- fid: 115, 252,354,355,452, 467
 
 */
 
@@ -351,17 +351,17 @@ BEGIN
 	--check if features with state = 2 are related to any psector (252)
 	IF v_project_type = 'WS' THEN
 		v_query = 'SELECT a.feature_id, a.feature, a.catalog, a.the_geom, count(*) FROM (
-		SELECT node_id as feature_id, ''NODE'' as feature, nodecat_id as catalog, the_geom FROM node WHERE state=2 AND node_id NOT IN (select node_id FROM plan_psector_x_node) UNION
-		SELECT arc_id as feature_id, ''ARC'' as feature, arccat_id as catalog, the_geom  FROM arc WHERE state=2 AND arc_id NOT IN (select arc_id FROM plan_psector_x_arc) UNION
-		SELECT connec_id as feature_id, ''CONNEC'' as feature, connecat_id  as catalog, the_geom  FROM connec WHERE state=2 AND connec_id NOT IN (select connec_id FROM plan_psector_x_connec)) a 
+		SELECT node_id as feature_id, ''NODE'' as feature, nodecat_id as catalog, the_geom FROM v_edit_node WHERE state=2 AND node_id NOT IN (select node_id FROM plan_psector_x_node) UNION
+		SELECT arc_id as feature_id, ''ARC'' as feature, arccat_id as catalog, the_geom  FROM v_edit_arc WHERE state=2 AND arc_id NOT IN (select arc_id FROM plan_psector_x_arc) UNION
+		SELECT connec_id as feature_id, ''CONNEC'' as feature, connecat_id  as catalog, the_geom  FROM v_edit_connec WHERE state=2 AND connec_id NOT IN (select connec_id FROM plan_psector_x_connec)) a 
 		GROUP BY a.feature_id, a.feature , a.catalog, a.the_geom';
 
 	ELSE	
 		v_query = 'SELECT a.feature_id, a.feature , a.catalog, a.the_geom, count(*) FROM (
-		SELECT node_id as feature_id, ''NODE'' as feature, nodecat_id as catalog, the_geom FROM node WHERE state=2 AND node_id NOT IN (select node_id FROM plan_psector_x_node) UNION
-		SELECT arc_id as feature_id, ''ARC'' as feature, arccat_id as catalog, the_geom  FROM arc WHERE state=2 AND arc_id NOT IN (select arc_id FROM plan_psector_x_arc) UNION
-		SELECT connec_id as feature_id, ''CONNEC'' as feature, connecat_id  as catalog, the_geom  FROM connec WHERE state=2 AND connec_id NOT IN (select connec_id FROM plan_psector_x_connec) UNION
-		SELECT gully_id as feature_id, ''GULLY'' as feature , gratecat_id as catalog, the_geom FROM gully WHERE state=2 AND gully_id NOT IN (select gully_id FROM plan_psector_x_gully)) a 
+		SELECT node_id as feature_id, ''NODE'' as feature, nodecat_id as catalog, the_geom FROM v_edit_node WHERE state=2 AND node_id NOT IN (select node_id FROM plan_psector_x_node) UNION
+		SELECT arc_id as feature_id, ''ARC'' as feature, arccat_id as catalog, the_geom  FROM v_edit_arc WHERE state=2 AND arc_id NOT IN (select arc_id FROM plan_psector_x_arc) UNION
+		SELECT connec_id as feature_id, ''CONNEC'' as feature, connecat_id  as catalog, the_geom  FROM v_edit_connec WHERE state=2 AND connec_id NOT IN (select connec_id FROM plan_psector_x_connec) UNION
+		SELECT gully_id as feature_id, ''GULLY'' as feature , gratecat_id as catalog, the_geom FROM v_edit_gully WHERE state=2 AND gully_id NOT IN (select gully_id FROM plan_psector_x_gully)) a 
 		GROUP BY a.feature_id, a.feature ,a.catalog, a.the_geom';
 	END IF;
 
@@ -402,21 +402,21 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (115, '252', 1,'INFO: There are no features with state=2 without psector.',v_count);
 	END IF;
-
+/*
 	--check if arcs with state = 2 have final nodes state = 2 in the psector (354)
 	v_query =  'SELECT * FROM
-	(SELECT pa.arc_id, a.arccat_id, pa.psector_id , node_1 as node, a.the_geom FROM plan_psector_x_arc pa JOIN arc a USING (arc_id)
-		JOIN node n ON node_id = node_1 where n.state = 2 AND a.state=2
+	(SELECT pa.arc_id, a.arccat_id, pa.psector_id , node_1 as node, a.the_geom FROM plan_psector_x_arc pa JOIN v_edit_arc a USING (arc_id)
+		JOIN v_edit_node n ON node_id = node_1 where n.state = 2 AND a.state=2
 	EXCEPT
-	SELECT pa.arc_id, arc.arccat_id, pa.psector_id , node_1 as node,  arc.the_geom FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
-		JOIN plan_psector_x_node pn1 ON pn1.node_id = arc.node_1
+	SELECT pa.arc_id, a.arccat_id, pa.psector_id , node_1 as node, a.the_geom FROM plan_psector_x_arc pa JOIN v_edit_arc a USING (arc_id)
+		JOIN plan_psector_x_node pn1 ON pn1.node_id = a.node_1
 		WHERE pa.psector_id = pn1.psector_id and pa.state = 1 AND pn1.state = 1)a
 	UNION
 	SELECT * FROM
-	(SELECT pa.arc_id, a.arccat_id, pa.psector_id , node_2 as node,  a.the_geom FROM plan_psector_x_arc pa JOIN arc a USING (arc_id)
-		JOIN node n ON node_id = node_2 where n.state = 2 AND a.state=2
+	(SELECT pa.arc_id, a.arccat_id, pa.psector_id , node_2 as node,  a.the_geom FROM plan_psector_x_arc pa JOIN v_edit_arc a USING (arc_id)
+		JOIN v_edit_node n ON node_id = node_2 where n.state = 2 AND a.state=2
 	EXCEPT
-	SELECT pa.arc_id, arc.arccat_id, pa.psector_id , node_2 as node,  arc.the_geom FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
+	SELECT pa.arc_id, a.arccat_id, pa.psector_id , node_2 as node,  a.the_geom FROM plan_psector_x_arc pa JOIN v_edit_arc USING (arc_id)
 		JOIN plan_psector_x_node pn2 ON pn2.node_id = arc.node_2
 		WHERE pa.psector_id = pn2.psector_id AND pa.state = 1 AND pn2.state = 1)b';
 
@@ -433,19 +433,32 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (115, '354', 1,'INFO: There are no arcs with state=2 with planned final nodes not defined psector.',v_count);
 	END IF;
+	
+	SELECT pa.arc_id, pa.psector_id , node_1 as node FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
+		JOIN plan_psector_x_node pn1 ON pn1.node_id = arc.node_1
+		WHERE pa.psector_id = pn1.psector_id AND pa.state = 1 AND pn1.state = 0 AND pa.psector_id 
+		in (select psector_id from selector_psector where cur_user = 'jdelgado') AND arc.state_type<> 24
+		UNION
+		SELECT pa.arc_id, pa.psector_id, node_2 FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
+		JOIN plan_psector_x_node pn2 ON pn2.node_id = arc.node_2
+		WHERE pa.psector_id = pn2.psector_id AND pa.state = 1 AND pn2.state = 0 AND pa.psector_id 
+		in (select psector_id from selector_psector where cur_user = 'jdelgado')   AND arc.state_type<> 24
+		
+		*/
 
-	--check if arcs with state = 2 have final nodes state = 1 or 2 operative in psector (355)
+	--check if arcs with state = 2 have final nodes state = 1 or 2 enabled in psector (355)
 	v_query =  'SELECT * FROM (
-	SELECT pa.arc_id, arc.arccat_id, pa.psector_id , node_1 as node, arc.the_geom FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
-	JOIN plan_psector_x_node pn1 ON pn1.node_id = arc.node_1
+	SELECT pa.arc_id, a.arccat_id, pa.psector_id , node_1 as node, a.the_geom FROM plan_psector_x_arc pa JOIN v_edit_arc a USING (arc_id)
+	JOIN plan_psector_x_node pn1 ON pn1.node_id = a.node_1
 	WHERE pa.psector_id = pn1.psector_id AND pa.state = 1 AND pn1.state = 0
 	UNION
-	SELECT pa.arc_id, arc.arccat_id, pa.psector_id, node_2, arc.the_geom FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
-	JOIN plan_psector_x_node pn2 ON pn2.node_id = arc.node_2
+	SELECT pa.arc_id, a.arccat_id, pa.psector_id, node_2, a.the_geom FROM plan_psector_x_arc pa JOIN v_edit_arc a USING (arc_id)
+	JOIN plan_psector_x_node pn2 ON pn2.node_id = a.node_2
 	WHERE pa.psector_id = pn2.psector_id AND pa.state = 1 AND pn2.state = 0) b';
 
 	EXECUTE 'SELECT count(*) FROM ('||v_query||')c'
 	INTO v_count; 
+	
 
 	IF v_count > 0 THEN
 
@@ -460,8 +473,9 @@ BEGIN
 
 
 	-- Check node_1 or node_2 nulls for planified features (452)
-	v_querytext = '(SELECT arc_id,arccat_id,the_geom, expl_id FROM arc WHERE state = 2 AND node_1 IS NULL UNION SELECT arc_id, arccat_id, the_geom, expl_id FROM 
-	arc WHERE state = 2 AND node_2 IS NULL) a';
+	v_querytext = '(SELECT arc_id,arccat_id,the_geom, expl_id FROM v_edit_arc WHERE state = 2 AND node_1 IS NULL 
+	               UNION
+ 				   SELECT arc_id, arccat_id, the_geom, expl_id FROM v_edit_arc WHERE state = 2 AND node_2 IS NULL) a';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN

@@ -62,8 +62,10 @@ BEGIN
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fid IN (107, 153, 164, 165, 166, 167, 170, 171, 198, 292, 293, 294, 379, 411, 412, 432) AND cur_user=current_user;
+	DELETE FROM anl_node WHERE fid IN (107, 153, 164, 165, 166, 167, 170, 171, 198, 292, 293, 294, 379, 411, 412, 432, 480)
+	AND cur_user=current_user;
 	DELETE FROM anl_arc WHERE fid IN (169, 229, 230, 295) AND cur_user=current_user;
+	DELETE FROM anl_connec WHERE fid IN (480) AND cur_user=current_user;
 
 
 	-- Header
@@ -814,10 +816,8 @@ BEGIN
 		JOIN connec ON connec_id = feature_id group by feature_id, connec.the_geom having count(*) > 1;
 		
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '480', 3, concat(
-		'ERROR-480 (anl_connec): There is/are ',v_count,
-		' connecs more than once because maybe are related to more than one visible psector or maybe there are more than one link visibe for that connec.')
-		,v_count);
+		VALUES (v_fid, '480', 2, concat(
+		'WARNING-480 (anl_connec): There is/are ',v_count,' connecs more than once because related psectors are visible.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)

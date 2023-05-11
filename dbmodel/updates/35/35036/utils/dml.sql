@@ -55,3 +55,8 @@ UPDATE config_param_system SET value = gw_fct_json_object_delete_keys(value::jso
 
 INSERT INTO sys_table (id, descript, sys_role, source)
 VALUES('v_expl_connec', 'Filter view for connecs', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_toolbox set alias = 'Check plan data' WHERE id = 2436;
+
+UPDATE sys_message SET hint_message = 'Make sure that arcs finales are on service or check by using toolbox function Check plan data (fid= 355)'
+WHERE id = 3164;
