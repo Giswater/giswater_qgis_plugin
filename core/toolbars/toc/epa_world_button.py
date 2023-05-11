@@ -25,7 +25,6 @@ def _get_sectors():
 
 
 def _get_layers():
-
     arc_layers = tools_gw.get_layers_from_feature_type('arc')
     node_layers = tools_gw.get_layers_from_feature_type('node')
     connec_layers = tools_gw.get_layers_from_feature_type('connec')
@@ -41,7 +40,8 @@ def set_epa_world(_set_epa_world=None):
 
     # Get set_epa_world from config
     if _set_epa_world is None:
-        _set_epa_world = tools_os.set_boolean(tools_gw.get_config_parser("epa_world", "epa_world_active", 'user', 'session'), False)
+        _set_epa_world = tools_os.set_boolean(
+            tools_gw.get_config_parser("epa_world", "epa_world_active", 'user', 'session'), False)
 
     if not _set_epa_world:
         # disable filters
@@ -56,9 +56,24 @@ def set_epa_world(_set_epa_world=None):
         except (ValueError, IndexError, TypeError):
             pass
 
+        body = tools_gw.create_body()
+        json_result = tools_gw.execute_procedure('gw_fct_getnodeborder', body)
+        nodes = json_result.get('body', {}).get('data', {}).get('nodes', [])
+
         sql = f"is_operative = true AND epa_type != 'UNDEFINED' AND sector_id IN ({sectors})"
-        # arc and node
-        for layer in arc_layers + node_layers:
+
+        print(sql)
+
+        # arc
+        for layer in arc_layers:
+            layer.setSubsetString(sql)
+
+        if nodes:
+            node_ids = "','".join(str(node) for node in nodes)
+            sql += " OR node_id IN ('{}')".format(node_ids)
+
+        # node
+        for layer in node_layers:
             layer.setSubsetString(sql)
 
         if global_vars.project_type == 'ws':
@@ -110,18 +125,16 @@ class GwEpaWorldButton(GwAction):
         # Set action checked
         self._action_set_checked(checked)
 
-
     def clicked_event(self):
 
         self._switch_epa_world()
 
-
     # region private functions
-
 
     def _switch_epa_world(self):
         # Check world type
-        epa_world_active = tools_os.set_boolean(tools_gw.get_config_parser("epa_world", "epa_world_active", 'user', 'session'))
+        epa_world_active = tools_os.set_boolean(
+            tools_gw.get_config_parser("epa_world", "epa_world_active", 'user', 'session'))
 
         # Apply filters
         _set_epa_world = not epa_world_active
