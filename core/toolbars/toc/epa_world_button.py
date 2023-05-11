@@ -147,11 +147,10 @@ class GwEpaWorldButton(GwAction):
 
         # Show message
         if _set_epa_world:
-            msg = "Epa world activated"
+            msg = "EPA point of view activated"
         else:
-            msg = "Epa world deactivated"
+            msg = "EPA point of view deactivated"
         tools_qgis.show_info(msg)
-
 
     def _action_set_checked(self, checked):
         # Set checked
