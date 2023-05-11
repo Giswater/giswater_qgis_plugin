@@ -435,6 +435,7 @@ class GwLoadProject(QObject):
         self._enable_toolbar("basic")
         self._enable_toolbar("utilities")
         self._enable_toolbar("toc")
+        self._hide_button("308")
 
 
     def _create_toolbar(self, toolbar_id):
@@ -491,6 +492,7 @@ class GwLoadProject(QObject):
             self._enable_toolbar("edit")
             self._enable_toolbar("cad")
             self._enable_toolbar("epa")
+            self._hide_button("308", False)
 
         elif global_vars.project_vars['project_role'] == 'role_master' or global_vars.project_vars['project_role'] == 'role_admin':
             self._enable_toolbar("om")
@@ -498,6 +500,7 @@ class GwLoadProject(QObject):
             self._enable_toolbar("cad")
             self._enable_toolbar("epa")
             self._enable_toolbar("plan")
+            self._hide_button("308", False)
 
         # Check if exist some feature_cat with active True on cat_feature table
         if global_vars.feature_cat is None:
