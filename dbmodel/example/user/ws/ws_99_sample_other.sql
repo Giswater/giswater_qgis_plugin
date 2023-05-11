@@ -734,3 +734,7 @@ UPDATE config_form_fields SET web_layoutorder=NULL
 	WHERE columnname='asset_id';
 UPDATE config_form_fields SET web_layoutorder=4
 	WHERE columnname='connec_id';
+
+INSERT INTO node_border_sector VALUES (113766 , 1);
+INSERT INTO node_border_sector VALUES (113766 , 2);
+INSERT INTO node_border_sector VALUES (113952 , 4);
