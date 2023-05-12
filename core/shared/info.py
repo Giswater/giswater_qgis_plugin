@@ -753,12 +753,15 @@ class GwInfo(QObject):
             layout.addItem(vertical_spacer1)
 
         # Manage dscenario sub-tab from epa tab
-        lyt_dscenario = self.dlg_cf.findChild(QGridLayout, "lyt_epa_3")
-        epa_toolbox = self.dlg_cf.findChild(QToolBox, "epa_toolbox")
-        if lyt_dscenario is not None and lyt_dscenario.count() == 0:
-            epa_toolbox.setItemEnabled(1, False)
-        else:
-            epa_toolbox.setItemEnabled(1, True)
+        try:
+            lyt_dscenario = self.dlg_cf.findChild(QGridLayout, "lyt_epa_3")
+            epa_toolbox = self.dlg_cf.findChild(QToolBox, "epa_toolbox")
+            if lyt_dscenario.count() == 0:
+                epa_toolbox.setItemEnabled(1, False)
+            else:
+                epa_toolbox.setItemEnabled(1, True)
+        except Exception:
+            pass
 
         if reload_epa:
             return
