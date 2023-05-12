@@ -1769,19 +1769,19 @@ def add_calendar(dlg, fld, **kwargs):
     return widget
 
 
-def set_typeahead(field, dialog, widget, completer):
+def set_typeahead(field, dialog, widget, completer, feature_id=None):
 
     if field['widgettype'] == 'typeahead':
         if 'queryText' not in field or 'queryTextFilter' not in field:
             return widget
         widget.setProperty('typeahead', True)
         model = QStringListModel()
-        widget.textChanged.connect(partial(fill_typeahead, completer, model, field, dialog, widget))
+        widget.textChanged.connect(partial(fill_typeahead, completer, model, field, dialog, widget, feature_id))
 
     return widget
 
 
-def fill_typeahead(completer, model, field, dialog, widget):
+def fill_typeahead(completer, model, field, dialog, widget, feature_id=None):
     """ Set autocomplete of widget @table_object + "_id"
         getting id's from selected @table_object.
         WARNING: Each QLineEdit needs their own QCompleter and their own QStringListModel!!!
@@ -1793,10 +1793,16 @@ def fill_typeahead(completer, model, field, dialog, widget):
     if 'parentId' in field:
         parent_id = field["parentId"]
 
+    # Get parentValue from widget or from feature_id if parentWidget not configured
+    if dialog.findChild(QWidget, "data_" + str(parent_id)):
+        parent_value = tools_qt.get_text(dialog, "data_" + str(parent_id))
+    else:
+        parent_value = feature_id
+
     extras = f'"queryText":"{field["queryText"]}"'
     extras += f', "queryTextFilter":"{field["queryTextFilter"]}"'
     extras += f', "parentId":"{parent_id}"'
-    extras += f', "parentValue":"{tools_qt.get_text(dialog, "data_" + str(parent_id))}"'
+    extras += f', "parentValue":"{parent_value}"'
     extras += f', "textToSearch":"{tools_qt.get_text(dialog, widget)}"'
     body = create_body(extras=extras)
     complet_list = execute_procedure('gw_fct_gettypeahead', body)
@@ -4212,9 +4218,11 @@ def _manage_typeahead(**kwargs):
 
     dialog = kwargs['dialog']
     field = kwargs['field']
+    complet_result = kwargs['complet_result']
+    feature_id = complet_result['body']['feature']['id']
     completer = QCompleter()
     widget = _manage_text(**kwargs)
-    widget = set_typeahead(field, dialog, widget, completer)
+    widget = set_typeahead(field, dialog, widget, completer, feature_id=feature_id)
     return widget
 
 
