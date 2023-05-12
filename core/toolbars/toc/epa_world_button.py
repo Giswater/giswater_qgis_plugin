@@ -12,6 +12,8 @@ from ....lib import tools_qgis, tools_db, tools_os
 from .... import global_vars
 
 
+layers_subsetstrings = {}
+
 def _get_sectors():
     sectors = "NULL"
 
@@ -44,10 +46,17 @@ def set_epa_world(_set_epa_world=None):
             tools_gw.get_config_parser("epa_world", "epa_world_active", 'user', 'session'), False)
 
     if not _set_epa_world:
-        # disable filters
+        # Disable current filters and set previous layer fitlers
         for layer in arc_layers + node_layers + connec_layers + gully_layers + link_layers:
-            layer.setSubsetString(None)
+            if layer.name() in layers_subsetstrings and bool(layers_subsetstrings[layer.name()]):
+                layer.setSubsetString(layers_subsetstrings[layer.name()])
+            else:
+                layer.setSubsetString(None)
     else:
+        # Get layers subsetStrings
+        for layer in arc_layers + node_layers + connec_layers + gully_layers + link_layers:
+            layers_subsetstrings[layer.name()] = layer.subsetString()
+
         sectors = _get_sectors()
         # Get inp_options_networkmode
         inp_options_networkmode = tools_gw.get_config_value('inp_options_networkmode')
