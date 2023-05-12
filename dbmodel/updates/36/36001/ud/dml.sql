@@ -194,11 +194,11 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_conduit', 'form_feature', 'epa', 'q0', 'lyt_epa_data_1', 7, 'string', 'text', 'q0:', 'q0', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
-    VALUES ('ve_epa_conduit', 'form_feature', 'epa', 'qmax', 'lyt_epa_data_1', 8, 'string', 'text', 'qmax:', 'qmax', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+    VALUES ('ve_epa_conduit', 'form_feature', 'epa', 'qmax', 'lyt_epa_data_1', 8, 'string', 'text', 'qmax:', 'qmax', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
-    VALUES ('ve_epa_conduit', 'form_feature', 'epa', 'seepage', 'lyt_epa_data_1', 9, 'string', 'text', 'seepage:', 'seepage', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+    VALUES ('ve_epa_conduit', 'form_feature', 'epa', 'seepage', 'lyt_epa_data_1', 9, 'string', 'text', 'seepage:', 'seepage', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
-    VALUES ('ve_epa_conduit', 'form_feature', 'epa', 'custom_n', 'lyt_epa_data_1', 10, 'string', 'text', 'custom_n:', 'custom_n', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+    VALUES ('ve_epa_conduit', 'form_feature', 'epa', 'custom_n', 'lyt_epa_data_1', 10, 'string', 'text', 'custom_n:', 'custom_n', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_conduit', 'form_feature', 'epa', 'max_flow', 'lyt_epa_data_2', 1, 'string', 'text', 'max_flow:', 'max_flow', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
