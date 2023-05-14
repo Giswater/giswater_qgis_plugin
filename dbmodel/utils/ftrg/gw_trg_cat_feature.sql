@@ -301,6 +301,11 @@ BEGIN
 				"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'",
 				"feature_type":"'||lower(NEW.feature_type)||'" }}$$);';
 
+				--manage tab hydrometer on netwjoin
+				IF  v_projecttype = 'WS' and OLD.system_id = 'NETWJOIN' THEN
+					DELETE FROM config_form_tabs where formname=v_old_child_layer and tabname in ('tab_hydrometer', 'tab_hydrometer_val');
+				END IF;
+
 
 			ELSIF NEW.feature_type !=OLD.feature_type or NEW.system_id !=OLD.system_id THEN
 
@@ -346,7 +351,9 @@ BEGIN
 				"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
 				PERFORM gw_fct_admin_manage_child_views(v_query::json);
 
-
+				IF  v_projecttype = 'WS' and OLD.system_id = 'NETWJOIN' THEN
+					DELETE FROM config_form_tabs where formname=OLD.child_layer and tabname in ('tab_hydrometer', 'tab_hydrometer_val');
+				END IF;
 			END IF;
 
 			RETURN NEW;
@@ -373,6 +380,10 @@ BEGIN
 
                 -- delete sys_param_user parameters
                 DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');
+
+                IF  v_projecttype = 'WS' and OLD.system_id = 'NETWJOIN' THEN
+					DELETE FROM config_form_tabs where formname=OLD.child_layer and tabname in ('tab_hydrometer', 'tab_hydrometer_val');
+				END IF;
             END IF;
 
 					RETURN NULL;

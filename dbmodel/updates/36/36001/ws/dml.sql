@@ -1382,3 +1382,8 @@ INSERT INTO config_param_system ("parameter", value, descript, "label", dv_query
 UPDATE config_form_fields 
 SET widgetfunction = NULL, widgetcontrols = gw_fct_json_object_set_key(widgetcontrols, 'setMultiline', false)
 WHERE columnname = 'epa_type' and formname like '%connec%';
+
+INSERT INTO config_form_tabs ( formname, tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby)
+SELECT child_layer,  tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby
+FROM config_form_tabs,cat_feature WHERE tabname in ('tab_hydrometer', 'tab_hydrometer_val') 
+and system_id = 'NETWJOIN' ON CONFLICT (formname, tabname, device) DO NOTHING;
