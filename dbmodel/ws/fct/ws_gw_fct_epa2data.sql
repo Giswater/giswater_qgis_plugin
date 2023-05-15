@@ -39,6 +39,8 @@ BEGIN
 	--  Get system & user variables
 	v_result_id = ((p_data ->>'data')::json->>'resultId')::text;
 	v_iscorporate = ((p_data ->>'data')::json->>'isCorporate');
+    
+    UPDATE rpt_cat_result SET iscorporate=v_iscorporate WHERE result_id = v_result_id;
 
 	IF v_iscorporate THEN
 
@@ -46,8 +48,6 @@ BEGIN
 
 		DELETE FROM selector_rpt_main WHERE cur_user=current_user;
 		INSERT INTO selector_rpt_main(result_id, cur_user) VALUES (v_result_id, current_user);
-
-		UPDATE rpt_cat_result SET iscorporate=true WHERE result_id = v_result_id;
 
 		INSERT INTO node_add (node_id, demand_max, demand_min, demand_avg, press_max, press_min, press_avg, head_max, head_min, head_avg, quality_max, quality_min, quality_avg, result_id)
 		SELECT node_id, avg(demand_max)::numeric(12,2), avg(demand_min)::numeric(12,2), avg(demand_avg)::numeric(12,2), avg(press_max)::numeric(12,2), avg(press_min)::numeric(12,2), avg(press_avg)::numeric(12,2),
