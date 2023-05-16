@@ -49,6 +49,7 @@ v_link_geom public.geometry;
 v_auto_streetvalues_status boolean;
 v_auto_streetvalues_buffer integer;
 v_auto_streetvalues_field text;
+v_ispresszone boolean = false;
 
 BEGIN
 
@@ -71,6 +72,7 @@ BEGIN
 	v_auto_streetvalues_status := (SELECT (value::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
 	v_auto_streetvalues_buffer := (SELECT (value::json->>'buffer')::integer FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
 	v_auto_streetvalues_field := (SELECT (value::json->>'field')::text FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
+	v_ispresszone:= (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'utils_graphanalytics_status');
 
 	SELECT value::boolean INTO v_connect2network FROM config_param_user WHERE parameter='edit_connec_automatic_link' AND cur_user=current_user;
 
@@ -514,14 +516,14 @@ BEGIN
 		INSERT INTO connec (connec_id, code, elevation, depth,connecat_id,  sector_id, customer_code,  state, state_type, annotation, observ, comment,dma_id, presszone_id, soilcat_id,
 		function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2, 
 		muni_id, streetaxis_id,  postcode, district_id, postcomplement, postcomplement2, descript, link, verified, rotation,  the_geom, undelete, label_x,label_y,label_rotation, expl_id,
-		publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, staticpressure, pjoint_id, pjoint_type,
+		publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, pjoint_id, pjoint_type,
 		adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id, epa_type, om_state, conserv_state, priority, 
 		valve_location, valve_type, shutoff_valve, access_type, placement_type, crmzone_id, expl_id2)
 		VALUES (NEW.connec_id, NEW.code, NEW.elevation, NEW.depth, NEW.connecat_id, NEW.sector_id, NEW.customer_code,  NEW.state, NEW.state_type, NEW.annotation,   NEW.observ, NEW.comment, 
 		NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type,  NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,  NEW.workcat_id_plan, NEW.buildercat_id,
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, v_streetaxis, NEW.postnumber, NEW.postnumber2, NEW.muni_id, v_streetaxis, NEW.postcode, NEW.district_id, NEW.postcomplement, 
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.verified, NEW.rotation, NEW.the_geom,NEW.undelete,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory, 
-		NEW.num_value, NEW.connec_length, NEW.arc_id, NEW.minsector_id, NEW.dqa_id, NEW.staticpressure, NEW.pjoint_id, NEW.pjoint_type,
+		NEW.num_value, NEW.connec_length, NEW.arc_id, NEW.minsector_id, NEW.dqa_id, NEW.pjoint_id, NEW.pjoint_type,
 		NEW.adate, NEW.adescript, NEW.accessibility, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.epa_type, NEW.om_state, NEW.conserv_state, NEW.priority,
 		NEW.valve_location, NEW.valve_type, NEW.shutoff_valve, NEW.access_type, NEW.placement_type, NEW.crmzone_id, NEW.expl_id2);
 		
@@ -614,10 +616,22 @@ BEGIN
 		IF (NEW.epa_type = 'JUNCTION') THEN 
 			INSERT INTO inp_connec (connec_id) VALUES (NEW.connec_id);
 		END IF;
+	
+		-- static pressure
+		IF v_ispresszone AND NEW.presszone_id IS NOT NULL THEN
+			UPDATE connec SET staticpressure = (SELECT head from presszone WHERE presszone_id = NEW.presszone_id)-elevation WHERE connec_id = NEW.connec_id;
+		END IF;
 		
 		RETURN NEW;
 		
 	ELSIF TG_OP = 'UPDATE' THEN
+	
+    	-- static pressure
+		IF v_ispresszone AND (NEW.presszone_id != OLD.presszone_id) THEN
+			raise notice '2 NEW.presszone_id ---> %', NEW.presszone_id;
+			UPDATE connec SET staticpressure = (SELECT head from presszone WHERE presszone_id = NEW.presszone_id)-elevation 
+			WHERE connec_id = NEW.connec_id;
+		END IF;
 
 		-- EPA update
 		IF (NEW.epa_type != OLD.epa_type) THEN   
@@ -825,7 +839,7 @@ BEGIN
 			district_id =NEW.district_id, descript=NEW.descript, verified=NEW.verified, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, 
 			undelete=NEW.undelete, label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,publish=NEW.publish, 
 			inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, connec_length=NEW.connec_length, link=NEW.link, lastupdate=now(), lastupdate_user=current_user,
-			dqa_id=NEW.dqa_id, minsector_id=NEW.minsector_id, staticpressure=NEW.staticpressure, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
+			dqa_id=NEW.dqa_id, minsector_id=NEW.minsector_id, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
 			adate=NEW.adate, adescript=NEW.adescript, accessibility =  NEW.accessibility, asset_id=NEW.asset_id, epa_type = NEW.epa_type,
 			om_state = NEW.om_state, conserv_state = NEW.conserv_state, priority = NEW.priority,
 			valve_location = NEW.valve_location, valve_type = NEW.valve_type, shutoff_valve = NEW.shutoff_valve, access_type = NEW.access_type, placement_type = NEW.placement_type,
