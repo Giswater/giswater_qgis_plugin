@@ -947,6 +947,10 @@ class GwPsector:
 
         try:
             for x in range(0, len(self.all_states)):
+                sql = (f"DELETE FROM selector_state "
+                       f" WHERE state_id = '{self.all_states[x][0]}' AND cur_user = current_user")
+                tools_db.execute_sql(sql)
+
                 sql = (f"INSERT INTO selector_state (state_id, cur_user)"
                        f" VALUES ('{self.all_states[x][0]}', current_user)")
                 tools_db.execute_sql(sql)
