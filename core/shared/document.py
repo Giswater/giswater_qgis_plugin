@@ -198,6 +198,7 @@ class GwDocument(QObject):
         self.dlg_man.rejected.connect(partial(tools_gw.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(
             partial(tools_gw.delete_selected_rows, self.dlg_man.tbl_document, table_object))
+        self.dlg_man.btn_create.clicked.connect(partial(self.open_document_dialog))
 
         # Open form
         tools_gw.open_dialog(self.dlg_man, dlg_name='doc_manager')
@@ -205,6 +206,8 @@ class GwDocument(QObject):
 
     # region private functions
 
+    def open_document_dialog(self):
+        self.get_document()
 
     def _fill_combo_doc_type(self, widget):
         """ Executes query and fill combo box """

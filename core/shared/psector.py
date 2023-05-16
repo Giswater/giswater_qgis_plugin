@@ -1569,7 +1569,10 @@ class GwPsector:
         # Open form
         self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
         tools_gw.open_dialog(self.dlg_psector_mng, dlg_name="psector_manager")
+        self.dlg_psector_mng.btn_create.clicked.connect(partial(self.open_psector_dlg))
 
+    def open_psector_dlg(self):
+        self.get_psector()
 
     def set_toggle_active(self, dialog, qtbl_psm):
 

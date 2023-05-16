@@ -250,6 +250,8 @@ class GwElement:
         tools_gw.open_dialog(self.dlg_add_element, dlg_name='element', hide_config_widgets=True)
         return self.dlg_add_element
 
+    def open_element_dialog(self):
+        self.get_element()
 
     def get_element_dialog(self):
         return self.dlg_add_element
@@ -294,6 +296,7 @@ class GwElement:
         self.dlg_man.rejected.connect(partial(tools_gw.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(partial(
             tools_gw.delete_selected_rows, self.dlg_man.tbl_element, table_object))
+        self.dlg_man.btn_create.clicked.connect(partial(self.open_element_dialog))
 
         # Open form
         tools_gw.open_dialog(self.dlg_man, dlg_name='element_manager')

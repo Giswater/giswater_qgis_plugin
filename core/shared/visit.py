@@ -306,6 +306,8 @@ class GwVisit(QObject):
         self.dlg_visit_manager.txt_filter.textChanged.connect(partial(self._filter_visit, self.dlg_visit_manager,
             self.dlg_visit_manager.tbl_visit, self.dlg_visit_manager.txt_filter, table_object, expr_filter, filed_to_filter))
 
+        self.dlg_visit_manager.btn_create.clicked.connect(partial(self.get_visit_dialog))
+
         # set timeStart and timeEnd as the min/max dave values get from model
         tools_gw.set_dates_from_to(self.dlg_visit_manager.date_event_from, self.dlg_visit_manager.date_event_to,
                                    'om_visit', 'startdate', 'enddate')
@@ -321,8 +323,7 @@ class GwVisit(QObject):
 
 
     def get_visit_dialog(self):
-        return self.dlg_add_visit
-
+        self.get_visit(tag='add')
 
     # region private functions
 
