@@ -132,12 +132,12 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
         if parser is None:
             if plugin == 'core':
                 tools_log.log_info(f"Creating parser for file: {path}")
-            parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
+            parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True, strict=False)
             parser.read(path)
 
         # If project has already been loaded and filename is 'init' or 'session', always read and parse file
         if force_reload or (global_vars.project_loaded and file_name in ('init', 'session')):
-            parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
+            parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True, strict=False)
             parser.read(path)
 
         if config_type == 'user' and prefix and global_vars.project_type is not None:
@@ -183,7 +183,7 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
 
     try:
 
-        parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
+        parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True, strict=False)
         parser.read(path)
 
         raw_parameter = parameter
@@ -3215,7 +3215,7 @@ def refresh_selectors(tab_name=None):
 def open_dlg_help():
     """ Opens the help page for the last focused dialog """
 
-    parser = configparser.ConfigParser()
+    parser = configparser.ConfigParser(strict=False)
     path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}giswater.config"
     if not os.path.exists(path):
         webbrowser.open_new_tab('https://giswater.gitbook.io/giswater-manual')
@@ -3393,8 +3393,8 @@ def remove_deprecated_config_vars():
     if global_vars.user_folder_dir is None:
         return
 
-    init_parser = configparser.ConfigParser()
-    session_parser = configparser.ConfigParser()
+    init_parser = configparser.ConfigParser(strict=False)
+    session_parser = configparser.ConfigParser(strict=False)
     path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
     project_types = get_config_parser('system', 'project_types', "project", "giswater").split(',')
 
@@ -3614,7 +3614,7 @@ def reset_position_dialog(show_message=False, plugin='core', file_name='session'
     """ Reset position dialog x/y """
 
     try:
-        parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+        parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True, strict=False)
         config_folder = f"{global_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config"
 
         if not os.path.exists(config_folder):
@@ -3702,7 +3702,7 @@ def _get_parser_from_filename(filename):
     else:
         return None, None
 
-    parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
+    parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True, strict=False)
     filepath = f"{folder}{os.sep}config{os.sep}{filename}.config"
     if not os.path.exists(filepath):
         tools_log.log_warning(f"File not found: {filepath}")
