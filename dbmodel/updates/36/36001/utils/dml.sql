@@ -567,3 +567,7 @@ FROM pg_attribute a
 WHERE a.attname = c.columnname
   AND a.attrelid = (SELECT oid FROM pg_class WHERE relname = c.formname LIMIT 1)
   AND formname like 've_epa%' AND widgettype = 'text';
+
+
+UPDATE config_toolbox SET device = '{4}' 
+WHERE id IN (2496,3008,2118,3066,2776,2106,2431,2790,2670,2302,2212,2436,3204,3118,3156,2772,3198,2760,2524,2826,3042,3102,3080,2922,3186,3130,2998,2104,3064,3134,3100,2890,2986,2206,2712,2102,2970,3110,3112,3108,3158,2522,2706,2430,2848,2680)
