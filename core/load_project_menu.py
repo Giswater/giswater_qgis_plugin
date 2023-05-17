@@ -257,7 +257,7 @@ class GwMenuLoad(QObject):
             item = QTreeWidgetItem([f"{file}"])
 
             project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater")
-            parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+            parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True, strict=False)
             parser.read(f"{global_vars.user_folder_dir}{os.sep}core{os.sep}config{os.sep}{file}")
 
             # For each section we create a sub-item and add all the parameters to that sub-item
