@@ -466,7 +466,7 @@ BEGIN
 
 	-- Building headers
 	i = 1;
-	v_table_headers := array(SELECT json_object_keys(v_result_list->1));
+	v_table_headers := array(SELECT json_object_keys(v_result_list->0));
 		IF v_table_headers = '{}' THEN
 		EXECUTE 'SELECT array_agg(column_name)
 			FROM (
