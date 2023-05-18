@@ -466,7 +466,16 @@ BEGIN
 
 	-- Building headers
 	i = 1;
-  	v_table_headers := array(SELECT json_object_keys(v_result_list->1));
+	v_table_headers := array(SELECT json_object_keys(v_result_list->1));
+		IF v_table_headers = '{}' THEN
+		EXECUTE 'SELECT array_agg(column_name)
+			FROM (
+				SELECT DISTINCT column_name, ordinal_position
+				FROM information_schema.columns
+				WHERE table_name = ''' || v_tablename || '''
+				ORDER BY ordinal_position
+			) a' INTO v_table_headers;
+	END IF;
 	SELECT array_agg(row_to_json(merged_cols)) INTO v_headers_list
 		FROM (
 		  SELECT COALESCE(cftv.columnname, t.columnname) AS columnname, cftv.addparam, cftv.visible
