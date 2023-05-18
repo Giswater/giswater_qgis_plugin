@@ -1387,3 +1387,5 @@ INSERT INTO config_form_tabs ( formname, tabname, label, tooltip, sys_role, tabf
 SELECT child_layer,  tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby
 FROM config_form_tabs,cat_feature WHERE tabname in ('tab_hydrometer', 'tab_hydrometer_val') 
 and system_id = 'NETWJOIN' ON CONFLICT (formname, tabname, device) DO NOTHING;
+
+DELETE FROM config_toolbox where id IN (SELECT id FROM sys_function WHERE project_type  ='ud');
