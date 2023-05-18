@@ -149,13 +149,18 @@ BEGIN
             END IF;
         END IF;
 		
+		v_orderby = 'layoutname, layoutorder';
+		IF p_device = 5 THEN 
+			v_orderby = 'web_layoutorder'; 
+		END IF;
+
 		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (
 			
 			WITH typevalue AS (SELECT * FROM config_typevalue)
 		
 			SELECT ',v_label,', columnname, columnname as column_id, concat(tabname,''_'',columnname) AS widgetname, widgettype,
 			widgetfunction, widgetfunction as  widgetAction, widgetfunction as updateAction, widgetfunction as changeAction,
-			',v_device,' hidden, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layoutname, layoutorder) AS orderby, tabname,
+			',v_device,' hidden, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY '', v_orderby ,'') AS orderby, tabname,
 			layoutname, layoutorder, dv_parent_id AS "parentId", isparent, ismandatory, linkedobject, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
 
 			dv_orderby_id AS "orderById", dv_isnullvalue AS "isNullValue", stylesheet, widgetcontrols, isfilter, web_layoutorder
