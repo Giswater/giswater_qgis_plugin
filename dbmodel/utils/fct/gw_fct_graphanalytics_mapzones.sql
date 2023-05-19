@@ -1091,7 +1091,23 @@ BEGIN
 			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, '');
 		END IF;
 	END IF;
-	
+
+	-- node border
+	IF v_class = 'SECTOR' THEN 
+  	DELETE FROM node_border_sector WHERE node_id IN (SELECT node_id FROM v_edit_node JOIN selector_sector USING (sector_id) WHERE cur_user = current_user);
+
+  	INSERT INTO node_border_sector
+		WITH arcs AS (SELECT arc_id, node_1, node_2, sector_id FROM arc WHERE state>0)
+		SELECT node_id, a1.sector_id
+		FROM v_edit_node node 
+		JOIN arcs a1 ON node_id=node_1 
+		where a1.sector_id != node.sector_id
+		UNION 
+		SELECT node_id, a2.sector_id
+		FROM v_edit_node node 
+		JOIN arcs a2 ON node_id=node_2 
+		where a2.sector_id != node.sector_id ON CONFLICT (node_id, sector_id) DO NOTHING;	
+	END IF;
 
 	RAISE NOTICE 'Getting results';
 	-- info
@@ -1198,7 +1214,7 @@ BEGIN
 		EXECUTE 'UPDATE connec t SET '||v_field||'  = '||v_valuefordisconnected||' FROM v_edit_connec v WHERE t.connec_id = v.connec_id AND t.'||v_field||'::text  IN (''0'',''-1'')';
 	END IF;
 			
-    -- restore state selector (if it's needed)
+	-- restore state selector (if it's needed)
 	IF v_usepsector IS NOT TRUE THEN
 		INSERT INTO selector_psector (psector_id, cur_user)
 		select unnest(text_column::integer[]), current_user from temp_table where fid=288 and cur_user=current_user
