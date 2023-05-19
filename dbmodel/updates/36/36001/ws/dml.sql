@@ -1388,4 +1388,47 @@ SELECT child_layer,  tabname, label, tooltip, sys_role, tabfunction, tabactions,
 FROM config_form_tabs,cat_feature WHERE tabname in ('tab_hydrometer', 'tab_hydrometer_val') 
 and system_id = 'NETWJOIN' ON CONFLICT (formname, tabname, device) DO NOTHING;
 
+
 DELETE FROM config_toolbox where id IN (SELECT id FROM sys_function WHERE project_type  ='ud');
+
+
+-- update sys_table registers according current relations
+/*
+SELECT * FROM information_schema.tables WHERE table_schema='SCHEMA_NAME' and table_name NOT IN (SELECT id FROM sys_table);
+SELECT * FROM sys_table WHERE id NOT IN (SELECT table_name FROM information_schema.tables WHERE table_schema='SCHEMA_NAME');
+*/
+
+DELETE FROM sys_table where id not in (SELECT table_name FROM information_schema.tables WHERE table_schema='SCHEMA_NAME');
+
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_junction', 'Editable view for epa junction', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_reservoir', 'Editable view for epa junction', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_tank', 'Editable view for epa junction', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_inlet', 'Editable view for epa junction', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_connec', 'Editable view for epa junction', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_pipe', 'Editable view for epa junction', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_pump', 'Editable view for epa junction', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_shortpipe', 'Editable view for epa junction', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_virtualvalve', 'Editable view for epa junction', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_valve', 'Editable view for epa junction', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_pump_additional', 'Editable view for epa junction', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+
+-- update sys_function registers according current relations
+/*
+SELECT routine_name FROM information_schema.routines WHERE routine_type='FUNCTION' AND specific_schema='SCHEMA_NAME' and routine_name not in (select function_name FROM sys_function);
+select id, function_name FROM sys_function WHERE function_name NOT IN (SELECT routine_name FROM information_schema.routines WHERE routine_type='FUNCTION' AND specific_schema='SCHEMA_NAME');
+*/
+DELETE FROM config_toolbox WHERE id in (2202,2204,2206,2208,2210);
+
+UPDATE sys_function SET project_type = 'utils' WHERE id in (3064, 3066, 2212);
+DELETE FROM sys_function WHERE project_type ='ud';
+
+DELETE FROM sys_function WHERE id IN(2400);
+
+INSERT INTO sys_function (id, function_name, project_type, function_type) VALUES (3240, 'gw_fct_getvisit_manager', 'utils', 'function')ON CONFLICT (id) DO NOTHING;
+
+
+
+
+
+
+

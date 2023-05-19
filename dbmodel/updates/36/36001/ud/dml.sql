@@ -755,3 +755,41 @@ INSERT INTO config_param_system ("parameter", value, descript, "label", dv_query
     VALUES('basic_search_v2_network_gully', '{"sys_display_name":"concat(gully_id, '' : '', gratecat_id)", "sys_tablename":"v_edit_gully", "sys_pk":"gully_id", "sys_fct":"gw_fct_getinfofromid", "sys_filter":""}', 'Search configuration parameteres', 'Gully:', NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 DELETE FROM config_toolbox where id IN (SELECT id FROM sys_function WHERE project_type  ='ws');
+
+
+-- update sys_table registers according current relations
+/*
+SELECT * FROM information_schema.tables WHERE table_schema='SCHEMA_NAME' and table_name NOT IN (SELECT id FROM sys_table);
+SELECT * FROM sys_table WHERE id NOT IN (SELECT table_name FROM information_schema.tables WHERE table_schema='SCHEMA_NAME');
+*/
+
+DELETE FROM sys_table where id not in (SELECT table_name FROM information_schema.tables WHERE table_schema='SCHEMA_NAME');
+
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ext_rtc_scada_x_data', 'Data for external data of scada', 'role_basic', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('v_anl_graphanalytics_mapzones', 'View for graphanalytics', 'role_om', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_gully', 'Editable view for epa gully', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_junction', 'Editable view for epa junction', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_conduit', 'Editable view for epa counduit', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_outfall', 'Editable view for epa outfall', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_storage', 'Editable view for epa storage', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_pump', 'Editable view for epa pump', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_virtual', 'Editable view for epa virtual', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_netgully', 'Editable view for epa netgully', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_weir', 'Editable view for epa weir', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_orifice', 'Editable view for epa orifice', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('ve_epa_outlet', 'Editable view for epa outlet', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+
+
+-- update sys_function registers according current relations
+/*
+SELECT routine_name FROM information_schema.routines WHERE routine_type='FUNCTION' AND specific_schema='SCHEMA_NAME' and routine_name not in (select function_name FROM sys_function);
+select project_type, id, function_name FROM sys_function WHERE function_name NOT IN (SELECT routine_name FROM information_schema.routines WHERE routine_type='FUNCTION' AND specific_schema='SCHEMA_NAME');
+*/
+
+DELETE FROM config_toolbox WHERE id in (2302, 2706, 2712, 2790);
+
+DELETE FROM sys_function WHERE project_type ='ws';
+
+INSERT INTO sys_function (id, function_name, project_type, function_type) VALUES (3240, 'gw_fct_getvisit_manager', 'utils', 'function')ON CONFLICT (id) DO NOTHING;
+
+
