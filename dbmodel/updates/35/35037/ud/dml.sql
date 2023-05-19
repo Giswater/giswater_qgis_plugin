@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog,
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- update for tstep variables
 UPDATE sys_param_user SET vdefault = '0.75', layoutname = 'lyt_hydraulics_1', layoutorder = 99, widgettype = 'linetext' WHERE id = 'inp_options_variable_step';
