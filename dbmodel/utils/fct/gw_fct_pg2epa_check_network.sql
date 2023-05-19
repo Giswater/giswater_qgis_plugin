@@ -170,12 +170,12 @@ BEGIN
 
 	RAISE NOTICE '3 - Check links over nodarcs (404)';
 
-	SELECT count(*) INTO v_count FROM v_edit_link l, temp_arc a WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND epa_type NOT IN ('CONDUIT', 'PIPE');
+	SELECT count(*) INTO v_count FROM v_edit_link l, temp_arc a WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND a.epa_type NOT IN ('CONDUIT', 'PIPE');
 	
 	IF v_count > 0 THEN
 		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, arccat_id, state, expl_id, the_geom, descript)
 			SELECT 404, link_id, ''LINK'', l.state, l.expl_id, l.the_geom, ''Link over nodarc'' FROM v_edit_link l, temp_arc a 
-			WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND epa_type NOT IN (''CONDUIT'', ''PIPE'')';
+			WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND a.epa_type NOT IN (''CONDUIT'', ''PIPE'')';
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, concat('ERROR-404: There is/are ',v_count,' link(s) with endpoint over nodarcs.'),v_count);
 	ELSE
@@ -519,8 +519,9 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for pipe roughness. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
-		v_networkstats = concat('{"Total length (Km) ":"',v_sumlength,'"}');
-		
+		v_networkstats = gw_fct_json_object_set_key((select json_build_object('sector', array_agg(sector_id)) FROM selector_sector where cur_user=current_user and sector_id > 0)
+		 ,'Total Length (Km)', v_sumlength);
+				
 	ELSIF v_project_type  ='UD' THEN
 
 		SELECT sum(length)/1000 INTO v_sumlength FROM temp_arc;
@@ -558,11 +559,12 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));	
 
-		v_networkstats = concat('{"Total length (Km) ":',coalesce(v_sumlength,0::numeric),'}');
+		v_networkstats = gw_fct_json_object_set_key((select json_build_object('sector', array_agg(sector_id)) FROM selector_sector where cur_user=current_user and sector_id > 0),
+		'Total Length (Km)', v_sumlength);
 	END IF;
 
 	UPDATE rpt_cat_result SET network_stats = v_networkstats WHERE result_id = v_result_id;
-	
+
 	-- insert spacers on log	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 3, '');
