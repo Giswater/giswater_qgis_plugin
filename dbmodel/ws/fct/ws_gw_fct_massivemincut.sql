@@ -134,7 +134,7 @@ BEGIN
 	END IF;
 
 	SELECT count(*) into v_count1 FROM arc WHERE state = 1 AND minsector_id IS NOT null and expl_id IN (select (json_array_elements_text(v_expl))::integer);
-	SELECT count(*) into v_count2 FROM arc WHERE state = 1 AND minsector_id IS null and expl_id = (select (json_array_elements_text(v_expl))::integer);
+	SELECT count(*) into v_count2 FROM arc WHERE state = 1 AND minsector_id IS null and expl_id IN (select (json_array_elements_text(v_expl))::integer);
 
 	IF v_count1 = 0 THEN
 		INSERT INTO audit_check_data (fid, error_message) VALUES
