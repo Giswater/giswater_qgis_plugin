@@ -133,7 +133,7 @@ v_tabdata_lytname_result json;
 v_record record;
 v_cur_user text;
 v_prev_cur_user text;
-
+v_table_child text;
 BEGIN
 	
 	-- Set search path to local schema
@@ -251,6 +251,8 @@ BEGIN
 				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 20);
 				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 				EXECUTE v_querystring INTO v_nodetype;
+
+				SELECT child_layer INTO v_table_child FROM cat_feature WHERE id =v_nodetype;
 				
 				IF (SELECT isarcdivide FROM cat_feature_node WHERE id=v_nodetype) IS TRUE THEN
 					v_isarcdivide = TRUE;
@@ -501,7 +503,7 @@ BEGIN
 				with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and  formname =',quote_nullable(v_table_parent),'
 				and item_object->>''actionName'' != ''actionGetArcId'' 
 				and item_object->>''actionName''::text = id group by tabname) b,
-				config_form_tabs WHERE formname =',quote_nullable(v_table_parent),' AND device = ', v_device,' AND orderby IS NOT NULL ORDER BY orderby, tabname)a');
+				config_form_tabs WHERE (formname =',quote_nullable(v_table_parent),' OR  formname =',quote_nullable(v_table_child),') AND device = ', v_device,' AND orderby IS NOT NULL ORDER BY orderby, tabname)a');
 			v_debug_vars := json_build_object('v_table_parent', v_table_parent, 'v_device', v_device);
 			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 190);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
@@ -514,7 +516,7 @@ BEGIN
 				with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and  formname =',quote_nullable(v_table_parent),'
 				and item_object->>''actionName'' != ''actionMapZone'' and item_object->>''actionName'' != ''actionGetArcId'' 
 				and item_object->>''actionName''::text = id group by tabname) b,
-				config_form_tabs WHERE formname =',quote_nullable(v_table_parent),' AND device = ', v_device,' AND orderby IS NOT NULL ORDER BY orderby, tabname)a');
+				config_form_tabs WHERE (formname =',quote_nullable(v_table_parent),' OR  formname =',quote_nullable(v_table_child),') AND device = ', v_device,' AND orderby IS NOT NULL ORDER BY orderby, tabname)a');
 			v_debug_vars := json_build_object('v_table_parent', v_table_parent, 'v_device', v_device);
 			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 200);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
@@ -528,7 +530,7 @@ BEGIN
 				and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone'' 
 				and item_object->>''actionName'' != ''actionGetArcId''
 				and item_object->>''actionName''::text = id group by tabname) b,
-				config_form_tabs WHERE formname =',quote_nullable(v_table_parent),' AND device = ', v_device,' AND orderby IS NOT NULL ORDER BY orderby, tabname)a');
+				config_form_tabs WHERE (formname =',quote_nullable(v_table_parent),' OR  formname =',quote_nullable(v_table_child),') AND device = ', v_device,' AND orderby IS NOT NULL ORDER BY orderby, tabname)a');
 			v_debug_vars := json_build_object('v_table_parent', v_table_parent, 'v_device', v_device);
 			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 210);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
@@ -541,14 +543,14 @@ BEGIN
 				with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and  formname =',quote_nullable(v_table_parent),'
 				and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone'' 
 				and item_object->>''actionName''::text = id group by tabname) b,
-				config_form_tabs WHERE formname =',quote_nullable(v_table_parent),' AND device = ', v_device,' AND orderby IS NOT NULL ORDER BY orderby, tabname)a');
+				config_form_tabs WHERE (formname =',quote_nullable(v_table_parent),' OR  formname =',quote_nullable(v_table_child),') AND device = ', v_device,' AND orderby IS NOT NULL ORDER BY orderby, tabname)a');
 			v_debug_vars := json_build_object('v_table_parent', v_table_parent, 'v_device', v_device);
 			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 220);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 			EXECUTE v_querystring INTO form_tabs;
 		END IF;
 	END IF;
-
+	
 	-- Check if it is parent table 
 	IF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS TRUE) AND v_id IS NOT NULL THEN
 
