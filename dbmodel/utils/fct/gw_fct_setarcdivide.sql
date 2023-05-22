@@ -801,8 +801,8 @@ BEGIN
 							END LOOP;
 						
 							-- connecs without link but with arc_id
-							FOR rec_connec IN SELECT connec_id FROM connec WHERE arc_id=v_arc_id AND state = 1 AND connec_id 
-							NOT IN (SELECT DISTINCT feature_id FROM link WHERE exit_id=v_arc_id)
+							FOR rec_connec IN SELECT connec_id FROM connec WHERE arc_id=v_arc_id AND state = 1 AND pjoint_type='ARC' 
+							AND connec_id NOT IN (SELECT DISTINCT feature_id FROM link WHERE exit_id=v_arc_id)
 							LOOP
 								UPDATE plan_psector_x_connec pc SET arc_id=q.arc_id FROM (
 								SELECT a.arc_id FROM arc a JOIN connec c ON st_dwithin(c.the_geom, a.the_geom, 100)
@@ -832,8 +832,8 @@ BEGIN
 								END LOOP;
 							
 								-- gullys without link but with arc_id
-								FOR rec_gully IN SELECT gully_id FROM gully WHERE arc_id=v_arc_id AND state = 1 AND gully_id 
-								NOT IN (SELECT DISTINCT feature_id FROM link WHERE exit_id=v_arc_id)
+								FOR rec_gully IN SELECT gully_id FROM gully WHERE arc_id=v_arc_id AND state = 1 AND pjoint_type='ARC' 
+								AND gully_id NOT IN (SELECT DISTINCT feature_id FROM link WHERE exit_id=v_arc_id)
 								LOOP
 									UPDATE plan_psector_x_gully pg SET arc_id=q.arc_id FROM (
 									SELECT a.arc_id FROM arc a JOIN gully c ON st_dwithin(c.the_geom, a.the_geom, 100)
@@ -901,8 +901,8 @@ BEGIN
 							END LOOP;
 						
 							-- connecs without link but with arc_id
-							FOR rec_connec IN SELECT connec_id FROM v_edit_connec WHERE arc_id=v_arc_id AND state = 1 AND connec_id 
-							NOT IN (SELECT DISTINCT feature_id FROM link WHERE exit_id=v_arc_id)
+							FOR rec_connec IN SELECT connec_id FROM v_edit_connec WHERE arc_id=v_arc_id AND state = 1 AND pjoint_type='ARC' 
+							AND connec_id NOT IN (SELECT DISTINCT feature_id FROM link WHERE exit_id=v_arc_id)
 							LOOP
 								UPDATE plan_psector_x_connec pc SET arc_id=q.arc_id FROM (
 								SELECT a.arc_id FROM arc a JOIN connec c ON st_dwithin(c.the_geom, a.the_geom, 100)
@@ -927,8 +927,8 @@ BEGIN
 								END LOOP;
 							
 								-- gullys without link but with arc_id
-								FOR rec_gully IN SELECT gully_id FROM v_edit_gully WHERE arc_id=v_arc_id AND state = 1 AND gully_id 
-								NOT IN (SELECT DISTINCT feature_id FROM link WHERE exit_id=v_arc_id)
+								FOR rec_gully IN SELECT gully_id FROM v_edit_gully WHERE arc_id=v_arc_id AND state = 1 AND pjoint_type='ARC' 
+								AND gully_id NOT IN (SELECT DISTINCT feature_id FROM link WHERE exit_id=v_arc_id)
 								LOOP
 									UPDATE plan_psector_x_gully pg SET arc_id=q.arc_id FROM (
 									SELECT a.arc_id FROM arc a JOIN gully c ON st_dwithin(c.the_geom, a.the_geom, 100)
