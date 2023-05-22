@@ -573,3 +573,7 @@ UPDATE config_toolbox SET device = '{4}'
 WHERE id IN (2496,3008,2118,3066,2776,2106,2431,2790,2670,2302,2212,2436,3204,3118,3156,2772,3198,2760,2524,2826,3042,3102,3080,2922,3186,3130,2998,2104,3064,3134,3100,2890,2986,2206,2712,2102,2970,3110,3112,3108,3158,2522,2706,2430,2848,2680);
 
 DELETE FROM config_toolbox WHERE id = 2680;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, descript) 
+VALUES (3244, 'gw_fct_setinitproject', 'utils', 'function', 'Function used to initialize database for each user')
+ON CONFLICT (id) DO NOTHING;

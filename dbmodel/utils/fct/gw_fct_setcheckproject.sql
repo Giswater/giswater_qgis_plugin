@@ -239,29 +239,7 @@ BEGIN
 	
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 
-	--Set hydrology_selector when null values from user
-	IF v_project_type='UD' THEN
-		IF (SELECT hydrology_id FROM cat_hydrology LIMIT 1) IS NOT NULL THEN
-			INSERT INTO config_param_user 
-			SELECT 'inp_options_hydrology_scenario', hydrology_id, current_user FROM cat_hydrology LIMIT 1
-			ON CONFLICT (parameter, cur_user) DO NOTHING;
-			UPDATE config_param_user SET value = hydrology_id FROM (SELECT hydrology_id FROM cat_hydrology LIMIT 1) a
-			WHERE parameter =  'inp_options_hydrology_scenario' and value is null;
-		END IF;
-	END IF;
-   
-	-- set mandatory values of config_param_user in case of not exists (for new users or for updates)
-	FOR v_rectable IN SELECT * FROM sys_param_user WHERE ismandatory IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member'))
-	LOOP
-		IF v_rectable.id NOT IN (SELECT parameter FROM config_param_user WHERE cur_user=current_user) THEN
-			INSERT INTO config_param_user (parameter, value, cur_user) 
-			SELECT sys_param_user.id, vdefault, current_user FROM sys_param_user WHERE sys_param_user.id = v_rectable.id;	
-
-			v_errortext=concat('Set value for new variable in config param user: ',v_rectable.id,'.');
-
-			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
-		END IF;
-	END LOOP;
+  
 
 	-- manage mandatory values of config_param_user where feature is deprecated
 	IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
@@ -274,49 +252,12 @@ BEGIN
 		
 	END IF;
 
-	-- delete on config_param_user fron updated values on sys_param_user
-	DELETE FROM config_param_user WHERE parameter NOT IN (SELECT id FROM sys_param_user) AND cur_user = current_user;
-
-	-- reset all exploitations
-	IF v_qgis_init_guide_map AND (v_isaudit IS NULL OR v_isaudit = 'false') THEN
-		DELETE FROM selector_expl WHERE cur_user = current_user;
-
-		-- looking for additional schema 
-		IF v_addschema IS NOT NULL AND v_addschema != v_schemaname THEN
-			EXECUTE 'SET search_path = '||v_addschema||', public';
-			DELETE FROM selector_expl WHERE cur_user = current_user;			
-			SET search_path = 'SCHEMA_NAME', public;
-		END IF;
-	ELSE
-		-- Force exploitation selector in case of null values
-		IF (SELECT count(*) FROM selector_expl WHERE cur_user=current_user) < 1 THEN 
-
-			IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user') IS NOT TRUE THEN
-
-				INSERT INTO selector_expl (expl_id, cur_user) 
-				SELECT expl_id, current_user FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 limit 1;
-				v_errortext=concat('Set visible exploitation for user ',(SELECT expl_id FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 limit 1));
-				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
-			ELSE
-				INSERT INTO selector_expl (expl_id, cur_user) 
-				SELECT expl_id, current_user FROM config_user_x_expl WHERE username = current_user AND expl_id > 0 limit 1;
-				v_errortext=concat('Set visible exploitation for user ',(SELECT expl_id FROM config_user_x_expl WHERE username = current_user AND expl_id > 0 limit 1));
-				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
-			END IF;
-		END IF;
-	END IF;
 
 	IF v_isaudit IS NULL or v_isaudit='false' THEN
 		-- force expl = 0
 		INSERT INTO selector_expl (expl_id, cur_user) SELECT 0, current_user FROM exploitation LIMIT 1 ON CONFLICT (expl_id, cur_user) DO NOTHING;
 	END IF;
 				
-	-- Force state selector in case of null values
-	IF (SELECT count(*) FROM selector_state WHERE cur_user=current_user) < 1 THEN 
-	  	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
-		v_errortext=concat('Set feature state = 1 for user');
-		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
-	END IF;
 	
 	-- Force state selector in case of null values for addschema
 	IF v_addschema IS NOT NULL THEN
@@ -342,13 +283,10 @@ BEGIN
 		DELETE FROM selector_psector WHERE cur_user=current_user;
 	END IF;
 	
-	-- Force hydrometer selector in case of null values
-	IF (SELECT count(*) FROM selector_hydrometer WHERE cur_user=current_user) < 1 THEN 
-	  	INSERT INTO selector_hydrometer (state_id, cur_user) VALUES (1, current_user);
-		v_errortext=concat('Set hydrometer state = 1 for user');
-		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
-	END IF;
 
+	-- get uservalues
+	PERFORM gw_fct_setinitproject($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":5367}, "form":{}, "feature":{}, "data":{}}$$);
+	
 
 	-- Force psector vdefault visible to current_user (only to => role_master)
 	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
@@ -479,12 +417,6 @@ BEGIN
 		AND error_message NOT LIKE 'DATA%'
 		AND error_message NOT LIKE '---%' AND cur_user=current_user;
 			
-	END IF;
-
-	-- force hydrometer_selector
-	IF (select cur_user FROM selector_hydrometer WHERE cur_user = current_user limit 1) IS NULL THEN
-		INSERT INTO selector_hydrometer (state_id, cur_user) 
-		SELECT id, current_user FROM ext_rtc_hydrometer_state ON CONFLICT (state_id, cur_user) DO NOTHING;
 	END IF;
 
 	-- get uservalues
