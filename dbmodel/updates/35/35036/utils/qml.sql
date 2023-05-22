@@ -10,7 +10,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/02/15
 
-INSERT INTO sys_style VALUES('186','audit_psector_node_traceability','qml',
+SELECT setval('sys_style_id_seq', (select max(id) from sys_style));
+
+INSERT INTO sys_style (idval, styletype, stylevalue, active) VALUES('audit_psector_node_traceability','qml',
 '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis version="3.28.4-Firenze" styleCategories="Symbology">
   <renderer-v2 symbollevels="0" referencescale="-1" type="RuleRenderer" enableorderby="0" forceraster="0">
@@ -183,9 +185,9 @@ INSERT INTO sys_style VALUES('186','audit_psector_node_traceability','qml',
   <featureBlendMode>0</featureBlendMode>
   <layerGeometryType>0</layerGeometryType>
 </qgis>
-', true) ON CONFLICT (id) DO NOTHING;
+', true);
 
-INSERT INTO sys_style VALUES('187','audit_psector_connec_traceability','qml',
+INSERT INTO sys_style (idval, styletype, stylevalue, active) VALUES('audit_psector_connec_traceability','qml',
 '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis version="3.28.4-Firenze" styleCategories="Symbology">
   <renderer-v2 symbollevels="0" referencescale="-1" type="RuleRenderer" enableorderby="0" forceraster="0">
@@ -810,10 +812,10 @@ INSERT INTO sys_style VALUES('187','audit_psector_connec_traceability','qml',
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
   <layerGeometryType>0</layerGeometryType>
-</qgis>', true) ON CONFLICT (id) DO NOTHING;
+</qgis>', true);
 
 
-INSERT INTO sys_style VALUES('188','audit_psector_arc_traceability','qml',
+INSERT INTO sys_style (idval, styletype, stylevalue, active) VALUES('audit_psector_arc_traceability','qml',
 '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis version="3.28.4-Firenze" styleCategories="Symbology">
   <renderer-v2 symbollevels="0" referencescale="-1" type="RuleRenderer" enableorderby="0" forceraster="0">
@@ -1113,4 +1115,4 @@ INSERT INTO sys_style VALUES('188','audit_psector_arc_traceability','qml',
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
   <layerGeometryType>1</layerGeometryType>
-</qgis>', true) ON CONFLICT (id) DO NOTHING;
+</qgis>', true);

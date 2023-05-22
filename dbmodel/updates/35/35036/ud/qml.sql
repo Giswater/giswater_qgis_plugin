@@ -10,7 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2022/02/15
 
-INSERT INTO sys_style VALUES('189','audit_psector_gully_traceability','qml',
+INSERT INTO sys_style (idval, styletype, stylevalue, active) VALUES('audit_psector_gully_traceability','qml',
 '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis styleCategories="Symbology" version="3.28.4-Firenze">
   <renderer-v2 forceraster="0" type="RuleRenderer" enableorderby="0" referencescale="-1" symbollevels="0">
@@ -317,4 +317,5 @@ INSERT INTO sys_style VALUES('189','audit_psector_gully_traceability','qml',
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
   <layerGeometryType>0</layerGeometryType>
-</qgis>', true) ON CONFLICT (id) DO NOTHING;
+</qgis>', true);
+
