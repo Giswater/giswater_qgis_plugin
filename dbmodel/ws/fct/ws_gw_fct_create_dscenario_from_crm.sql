@@ -136,7 +136,7 @@ BEGIN
 		JOIN connec c ON c.connec_id = hc.connec_id
 		WHERE cat_period_id  = v_period AND c.expl_id = v_expl
 		order by 2;
-
+		
 		-- real number of hydrometers
 		GET DIAGNOSTICS v_count = row_count;	
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
@@ -147,9 +147,9 @@ BEGIN
 		SELECT 'NODE' as feature_type, v_scenarioid, n.node_id, (case when custom_sum is null then v_factor*sum else v_factor*custom_sum end) as volume, h.id as hydrometer_id
 		FROM ext_rtc_hydrometer_x_data d
 		JOIN ext_rtc_hydrometer h ON h.id::text = d.hydrometer_id::text
-		JOIN man_netwjoin n ON connec_id::text = customer_code
+		JOIN rtc_hydrometer_x_node USING (hydrometer_id) 
 		JOIN node USING (node_id)
-		WHERE cat_period_id  =  v_period AND node.expl_id = v_expl
+		WHERE cat_period_id = v_period AND node.expl_id = v_expl
 		order by 2;
 
 		-- real number of hydrometers
@@ -208,12 +208,21 @@ BEGIN
 			WHERE d.source = h.id::text
 			AND dscenario_id = v_scenarioid;
 
-		ELSIF v_pattern = 7 THEN -- connec pattern
+		ELSIF v_pattern = 7 THEN -- feature pattern
 
+			-- update wjoins (connec)
 			UPDATE inp_dscenario_demand d SET pattern_id = i.pattern_id 
 			FROM inp_connec i
 			JOIN connec c USING (connec_id)
 			JOIN rtc_hydrometer_x_connec h ON h.connec_id = c.connec_id
+			WHERE d.source = h.hydrometer_id
+			AND dscenario_id = v_scenarioid;
+			
+			-- update netwjoins (node)
+			UPDATE inp_dscenario_demand d SET pattern_id = i.pattern_id 
+			FROM inp_junction i
+			JOIN node n USING (node_id)
+			JOIN rtc_hydrometer_x_node h ON h.node_id = n.node_id
 			WHERE d.source = h.hydrometer_id
 			AND dscenario_id = v_scenarioid;
 

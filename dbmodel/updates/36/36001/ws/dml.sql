@@ -1196,10 +1196,6 @@ INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam)
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) 
     VALUES('layout_name_typevalue', 'lyt_log_1', 'lyt_log_1', 'lytLog1', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) 
-    VALUES('layout_name_typevalue', 'lyt_files_1', 'lyt_files_1', 'lytFiles1', NULL);
-INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) 
-    VALUES('layout_name_typevalue', 'lyt_files_2', 'lyt_files_2', 'lytFiles2', NULL);
-INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) 
     VALUES('layout_name_typevalue', 'lyt_toolbar', 'lyt_toolbar', 'layoutToolbar', '{"createAddfield":"TRUE"}'::json);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) 
     VALUES('layout_name_typevalue', 'lyt_hydro_1', 'lyt_hydro_1', 'lytHydro1', NULL);
@@ -1434,3 +1430,14 @@ placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_query
 dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder 
 from config_form_fields where tabname in ('hydro_val', 'hydrometer') and formname ='connec'
 ON CONFLICT  (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+update config_toolbox
+set inputparams='
+[{"widgetname":"name", "label":"Scenario name:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":""},
+{"widgetname":"descript", "label":"Scenario descript:", "widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2,"value":""}, 
+{"widgetname":"exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4, "dvQueryText":"SELECT expl_id as id, name as idval FROM v_edit_exploitation", "selectedId":""}, 
+{"widgetname":"period", "label":"Source CRM period:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":6, "dvQueryText":"SELECT id, code as idval FROM ext_cat_period", "selectedId":""},
+{"widgetname":"pattern", "label":"Feature pattern:","widgettype":"combo","tooltip":"This value will be stored on pattern_id of inp_dscenario_demand table in order to be used on the inp file exportation ONLY with the pattern method FEATURE PATTERN.", "datatype":"text","layoutname":"grl_option_parameters","layoutorder":7,"comboIds":[1,2,3,4,5,6,7], "comboNames":["NONE", "SECTOR-DEFAULT", "DMA-DEFAULT", "DMA-PERIOD","HYDROMETER-PERIOD","HYDROMETER-CATEGORY", "FEATURE-PATTERN"], "selectedId":""}, 
+{"widgetname":"demandUnits", "label":"Demand units:","tooltip": "Choose units to insert volume data on demand column. <br> This value need to be the same that flow units used on EPANET. On the other hand, it is assumed that volume from hydrometer data table is expresed on m3/period and column period_seconds is filled.", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":8 ,"comboIds":["LPS","LPM","MLD","CMH","CMD","CFS","GPM","MGD","AFD"], "comboNames":["LPS","LPM","MLD","CMH","CMD","CFS","GPM","MGD","AFD"], "selectedId":""}]'
+WHERE id=3110;

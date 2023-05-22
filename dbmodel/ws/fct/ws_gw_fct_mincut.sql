@@ -321,12 +321,21 @@ BEGIN
 
 	IF v_debug THEN RAISE NOTICE '12-Insert into om_mincut_hydrometer table ';	END IF;
 	
+	-- insert hydrometer from connec
 	INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 	SELECT result_id_arg,rtc_hydrometer_x_connec.hydrometer_id FROM rtc_hydrometer_x_connec 
 	JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id 
 	JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
 	JOIN v_edit_connec ON om_mincut_connec.connec_id=v_edit_connec.connec_id
 	WHERE result_id=result_id_arg AND v_edit_connec.is_operative=TRUE AND v_rtc_hydrometer.connec_id=om_mincut_connec.connec_id;
+
+	-- insert hydrometer from node
+	INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
+	SELECT result_id_arg,rtc_hydrometer_x_node.hydrometer_id FROM rtc_hydrometer_x_node 
+	JOIN om_mincut_node ON rtc_hydrometer_x_node.node_id=om_mincut_node.node_id 
+	JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_node.hydrometer_id
+	JOIN v_edit_node ON om_mincut_node.node_id=v_edit_node.node_id
+	WHERE result_id=result_id_arg AND v_edit_node.is_operative=TRUE AND v_rtc_hydrometer.node_id=om_mincut_node.node_id;
 
 	-- fill connnec & hydrometer details on om_mincut.output
 	-- count arcs
@@ -345,10 +354,7 @@ BEGIN
 	SELECT count(connec_id) INTO v_numconnecs FROM om_mincut_connec WHERE result_id=result_id_arg;
 
 	-- count hydrometers
-	SELECT count (rtc_hydrometer_x_connec.hydrometer_id) INTO v_numhydrometer 
-	FROM rtc_hydrometer_x_connec JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id 
-	JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
-	JOIN connec ON connec.connec_id=v_rtc_hydrometer.connec_id WHERE result_id=result_id_arg;
+	SELECT count (*) INTO v_numhydrometer FROM om_mincut_hydrometer WHERE result_id=result_id_arg;
 
 	-- priority hydrometers
 	v_priority = 	(SELECT (array_to_json(array_agg((b)))) FROM 

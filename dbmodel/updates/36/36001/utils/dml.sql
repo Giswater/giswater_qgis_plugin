@@ -589,6 +589,8 @@ VALUES('widgettype_typevalue', 'fileselector', 'fileselector', 'fileselector', '
 
 -- INSERT WIDGETS VISIT_ARC_INSP--
 
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_files_1', 'lyt_files_1', 'lytFiles1', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_files_2', 'lyt_files_2', 'lytFiles2', NULL);
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('visit_arc_insp', 'form_visit', 'tab_data', 'backbutton', 'lyt_data_2', 2, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "setFilterClass":null, "text":"Close"}'::json, '{"functionName": "set_previous_form_back", "text":"Close"}'::json, NULL, false, 2);
