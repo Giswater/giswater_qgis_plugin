@@ -1090,3 +1090,7 @@ VALUES('visit_valve_insp', 'tab_data', 'Data', 'Data', 'role_om', '{"name":"gwGe
 INSERT INTO config_form_tabs
 (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby, device_new)
 VALUES('visit_valve_insp', 'tab_file', 'Files', 'Files', 'role_om', '{"name":"gwGetVisit", "parameters":{"form":{"tabData":{"active":false},"tabFiles":{"active":true, "feature":{"tableName":"om_visit_event_photo"}}}}}'::json, '[{"actionName":"actionAddFile", "actionFunction":"gwSetFileInsert", "actionTooltip":"Add file", "disabled":false},{"actionName":"actionDeleteFile", "actionFunction":"gwSetDelete", "actionTooltip":"Delete file", "disabled":false}]'::json, 5, 2, '{5}');
+
+UPDATE config_visit_class
+SET formname = 'visit_valve_insp'
+WHERE id = 7;

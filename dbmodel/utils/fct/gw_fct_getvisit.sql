@@ -110,7 +110,7 @@ BEGIN
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 
 	-- Make point
-	if v_visit_id IS NULL THEN
+	if v_visit_id IS null and v_xcoord is not null THEN
 	SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
 
 -- Sensibility factor
@@ -240,6 +240,8 @@ BEGIN
 				field_value = v_cur_user;
 			elsif aux_json->>'columnname' = 'feature_id' or aux_json->>'columnname' = v_idname then
 				field_value = v_id;
+			elsif aux_json->>'columnname' = 'class_id' then
+				field_value = v_visitclass;
 			else
 				field_value := (v_values_array->>(aux_json->>'columnname'));
 			end if;
