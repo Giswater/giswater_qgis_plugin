@@ -25,6 +25,8 @@ v_user_statetopocontrol boolean;
 v_node2 text;
 v_nodecat text;
 v_message text;
+v_msg boolean = false;
+v_check_conflictmapzones boolean = false;
 
 	
 BEGIN 
@@ -32,6 +34,7 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
 	-- Get system variables
+	SELECT value::boolean INTO v_check_conflictmapzones FROM config_param_system WHERE parameter='edit_arc_check_conflictmapzones';
 	SELECT value::boolean INTO v_sys_statetopocontrol FROM config_param_system WHERE parameter='edit_state_topocontrol';
 	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;
 	SELECT value::boolean INTO v_samenode_init_end_control FROM config_param_system WHERE parameter='edit_arc_samenode_control' ;
@@ -175,6 +178,31 @@ BEGIN
 		END IF;
 	END IF;
 
+	-- check mapzones conflict
+    IF v_check_conflictmapzones IS TRUE then
+    	if nodeRecord1.sector_id != nodeRecord2.sector_id and nodeRecord1.sector_id > 0 and nodeRecord2.sector_id > 0 then 
+    		v_msg  = true;
+    	end if;
+    
+        if nodeRecord1.presszone_id != nodeRecord2.presszone_id and nodeRecord1.presszone_id::integer > 0 and nodeRecord2.presszone_id::integer > 0 then 
+    		v_msg  = true;
+    	end if;
+    
+        if nodeRecord1.dma_id != nodeRecord2.dma_id and nodeRecord1.dma_id > 0 and nodeRecord2.dma_id > 0 then 
+    		v_msg  = true;
+    	end if;
+    
+        if nodeRecord1.dqa_id != nodeRecord2.dqa_id and nodeRecord1.dqa_id > 0 and nodeRecord2.dqa_id > 0 then 
+    		v_msg  = true;
+    	end if;
+    
+    	if v_msg THEN
+     			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                "data":{"message":"3236", "function":"1344","debug_msg":""}}$$);';
+		end if;    
+    end if;
+    
+
     -- only if user variable is not disabled
     IF v_user_statetopocontrol IS FALSE THEN
     
@@ -256,3 +284,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+

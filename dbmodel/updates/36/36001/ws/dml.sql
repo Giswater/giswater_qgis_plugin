@@ -1441,3 +1441,16 @@ set inputparams='
 {"widgetname":"pattern", "label":"Feature pattern:","widgettype":"combo","tooltip":"This value will be stored on pattern_id of inp_dscenario_demand table in order to be used on the inp file exportation ONLY with the pattern method FEATURE PATTERN.", "datatype":"text","layoutname":"grl_option_parameters","layoutorder":7,"comboIds":[1,2,3,4,5,6,7], "comboNames":["NONE", "SECTOR-DEFAULT", "DMA-DEFAULT", "DMA-PERIOD","HYDROMETER-PERIOD","HYDROMETER-CATEGORY", "FEATURE-PATTERN"], "selectedId":""}, 
 {"widgetname":"demandUnits", "label":"Demand units:","tooltip": "Choose units to insert volume data on demand column. <br> This value need to be the same that flow units used on EPANET. On the other hand, it is assumed that volume from hydrometer data table is expresed on m3/period and column period_seconds is filled.", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":8 ,"comboIds":["LPS","LPM","MLD","CMH","CMD","CFS","GPM","MGD","AFD"], "comboNames":["LPS","LPM","MLD","CMH","CMD","CFS","GPM","MGD","AFD"], "selectedId":""}]'
 WHERE id=3110;
+
+
+INSERT INTO config_param_system (parameter, value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) 
+    VALUES('edit_arc_check_conflictmapzones', '{"active":true)', 'parameter to be used to check conflict of mapzones on insert or update of arc', 
+    NULL, NULL, NULL, false, NULL, 'ws', NULL, NULL, 'json', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source")
+VALUES(3236, 'It''s not possible to edit the arc because there is/are some conflict with the mapzones of the extremal nodes:', 'check it before continue', 2, true, 'utils', 'core');
+
+
+
+
