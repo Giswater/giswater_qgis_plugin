@@ -12,4 +12,4 @@ UPDATE sys_param_user SET vdefault = '0.75', layoutname = 'lyt_hydraulics_1', la
 UPDATE config_param_user SET value = '0.75' WHERE parameter = 'inp_options_variable_step';
 
 INSERT INTO sys_param_user VALUES ('inp_options_minimum_step', 'epaoptions', 'Value of minimum step for routing timestep.', 'role_epa','MINIMUM_STEP','Minimum step:',null,null,TRUE,99,
-'ud',FALSE,null,null,null,FALSE,'integer','linetext',TRUE,null,'0.5','lyt_hydraulics_2',TRUE,null,null,null,null,'core');
+'ud',FALSE,null,null,null,FALSE,'integer','linetext',TRUE,null,'0.5','lyt_hydraulics_2',TRUE,null,null,null,null,'core') ON CONFLICT (id) DO NOTHING;
