@@ -105,8 +105,6 @@ BEGIN
 			WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 			AND ((NEW.state=1 AND node.state=1)
 
-					-- looking for arc that are trying to connect with planified node
-						OR (NEW.state=1 AND node.state=2)
 
 					-- looking for existing nodes that not belongs on the same alternatives that arc
 					OR (NEW.state=2 AND node.state=1 AND node_id NOT IN 
@@ -122,15 +120,13 @@ BEGIN
 							(SELECT value::integer FROM config_param_user 
 							WHERE parameter='plan_psector_vdefault' AND cur_user="current_user"() LIMIT 1))))
 
-					ORDER BY (case when isarcdivide is true then 1 else 2 end),ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
+					ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 	
 			SELECT * INTO nodeRecord2 FROM node 
 			JOIN cat_feature_node ON cat_feature_node.id = node_type 
 			WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) 
 			AND ((NEW.state=1 AND node.state=1)
 
-					-- looking for arc that are trying to connect with planified node
-						OR (NEW.state=1 AND node.state=2)
 
 					-- looking for existing nodes that not belongs on the same alternatives that arc
 					OR (NEW.state=2 AND node.state=1 AND node_id NOT IN 
@@ -146,7 +142,7 @@ BEGIN
 							(SELECT value::integer FROM config_param_user 
 							WHERE parameter='plan_psector_vdefault' AND cur_user="current_user"() LIMIT 1 ))))
 
-					ORDER BY (case when isarcdivide is true then 1 else 2 end), ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
+					ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
 
 		ELSIF TG_OP='UPDATE' THEN
 
@@ -155,8 +151,6 @@ BEGIN
 			WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 			AND ((NEW.state=1 AND node.state=1)
 
-					-- looking for arc that are trying to connect with planified node
-						OR (NEW.state=1 AND node.state=2)
 
 					-- looking for existing nodes that not belongs on the same alternatives that arc
 					OR (NEW.state=2 AND node.state=1 AND node_id NOT IN 
@@ -171,15 +165,13 @@ BEGIN
 						 WHERE plan_psector_x_node.node_id=node.node_id AND  state=1 AND psector_id IN
 							(SELECT psector_id FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id))))
 
-					ORDER BY (case when isarcdivide is true then 1 else 2 end), ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
+					ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 	
 			SELECT * INTO nodeRecord2 FROM node 
 			JOIN cat_feature_node ON cat_feature_node.id = node_type 
 			WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) 
 			AND ((NEW.state=1 AND node.state=1)
 
-					-- looking for arc that are trying to connect with planified node
-						OR (NEW.state=1 AND node.state=2)
 
 					-- looking for existing nodes that not belongs on the same alternatives that arc
 					OR (NEW.state=2 AND node.state=1 AND node_id NOT IN 
@@ -193,7 +185,7 @@ BEGIN
 						 WHERE plan_psector_x_node.node_id=node.node_id AND  state=1 AND psector_id IN
 							(SELECT psector_id FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id))))
 
-					ORDER BY (case when isarcdivide is true then 1 else 2 end),  ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
+					ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
 		END IF;
 	
 	END IF;
