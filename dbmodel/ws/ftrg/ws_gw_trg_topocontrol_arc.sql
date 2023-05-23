@@ -34,7 +34,7 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
 	-- Get system variables
-	SELECT value::boolean INTO v_check_conflictmapzones FROM config_param_system WHERE parameter='edit_arc_check_conflictmapzones';
+	SELECT ((value::json)->>'activated') INTO v_check_conflictmapzones FROM config_param_system WHERE parameter='edit_arc_check_conflictmapzones';
 	SELECT value::boolean INTO v_sys_statetopocontrol FROM config_param_system WHERE parameter='edit_state_topocontrol';
 	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;
 	SELECT value::boolean INTO v_samenode_init_end_control FROM config_param_system WHERE parameter='edit_arc_samenode_control' ;
@@ -47,9 +47,9 @@ BEGIN
 
 	--Check if user has migration mode enabled
 	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
-  	v_samenode_init_end_control = FALSE;
-  	v_dsbl_error = TRUE;
-  END IF;
+		v_samenode_init_end_control = FALSE;
+		v_dsbl_error = TRUE;
+	END IF;
 
 	-- disable trigger
 	IF v_arc_searchnodes_control IS FALSE THEN
