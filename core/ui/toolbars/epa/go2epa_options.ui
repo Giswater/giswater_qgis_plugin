@@ -73,8 +73,11 @@
              </item>
              <item>
               <widget class="QGroupBox" name="grb_time_steps">
-               <property name="title">
+               <property name="toolTip">
                 <string>DATE &amp; TIME STEPS</string>
+               </property>
+               <property name="title">
+                <string>DATE &amp;&amp; TIME STEPS</string>
                </property>
                <layout class="QGridLayout" name="gridLayout_19">
                 <item row="0" column="1">
@@ -124,8 +127,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>400</width>
-            <height>335</height>
+            <width>98</width>
+            <height>137</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_8">
