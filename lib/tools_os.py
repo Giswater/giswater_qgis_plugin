@@ -159,7 +159,7 @@ def manage_pg_service(section):
         tools_log.log_warning(f"File defined in environment variable 'PGSERVICEFILE' not found: {service_file}")
         return None
 
-    config_parser = configparser.ConfigParser()
+    config_parser = configparser.ConfigParser(strict=False)
     credentials = {'host': None, 'port': None, 'dbname': None, 'user': None, 'password': None, 'sslmode': None}
     try:
         config_parser.read(service_file)

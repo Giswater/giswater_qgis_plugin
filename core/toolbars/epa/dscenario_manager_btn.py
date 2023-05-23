@@ -444,7 +444,7 @@ class GwDscenarioManagerButton(GwAction):
 
         for x in self.feature_types:
             col_idx = tools_qt.get_col_index_by_col_name(tableview, x)
-            if col_idx is not False:
+            if col_idx not in (False, -1, None):
                 feature_type = x
                 break
 
@@ -460,7 +460,7 @@ class GwDscenarioManagerButton(GwAction):
 
         for x in self.feature_types:
             col_idx = tools_qt.get_col_index_by_col_name(qtableview, x)
-            if col_idx is not False:
+            if col_idx not in (False, -1, None):
                 feature_type = x
                 break
         if feature_type != 'feature_id':
@@ -619,7 +619,7 @@ class GwDscenarioManagerButton(GwAction):
 
         for x in self.feature_types:
             col_idx = tools_qt.get_col_index_by_col_name(tableview, x)
-            if col_idx is not False:
+            if col_idx not in (False, -1, None):
                 feature_type = x
                 break
 

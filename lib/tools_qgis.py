@@ -202,7 +202,7 @@ def get_plugin_metadata(parameter, default_value, plugin_dir=None):
 
     value = None
     try:
-        metadata = configparser.ConfigParser()
+        metadata = configparser.ConfigParser(strict=False)
         metadata.read(metadata_file)
         value = metadata.get('general', parameter)
     except configparser.NoOptionError:
@@ -224,7 +224,7 @@ def get_plugin_version():
         message = f"Metadata file not found: {metadata_file}"
         return plugin_version, message
 
-    metadata = configparser.ConfigParser()
+    metadata = configparser.ConfigParser(strict=False)
     metadata.read(metadata_file)
     plugin_version = metadata.get('general', 'version')
     if plugin_version is None:
