@@ -253,3 +253,23 @@ ALTER TABLE presszone ALTER COLUMN insert_user SET DEFAULT current_user;
 
 ALTER TABLE dqa ALTER COLUMN tstamp SET DEFAULT now();
 ALTER TABLE dqa ALTER COLUMN insert_user SET DEFAULT current_user;
+
+CREATE TABLE IF NOT EXISTS rtc_hydrometer_x_node
+(
+    hydrometer_id character varying(16) COLLATE pg_catalog."default" NOT NULL,
+    node_id character varying(16) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT rtc_hydrometer_x_node_pkey PRIMARY KEY (hydrometer_id),
+    CONSTRAINT rtc_hydrometer_x_node_node_id_fkey FOREIGN KEY (node_id)
+        REFERENCES node (node_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT rtc_hydrometer_x_node_hydrometer_id_fkey FOREIGN KEY (hydrometer_id)
+        REFERENCES rtc_hydrometer (hydrometer_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS rtc_hydrometer_x_node_index_node_id
+    ON rtc_hydrometer_x_node USING btree
+    (node_id COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
