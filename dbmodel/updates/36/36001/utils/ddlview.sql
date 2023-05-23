@@ -5,6 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 -- 22/05/2023
+
 CREATE OR REPLACE VIEW ve_visit_arc_leak
 AS SELECT om_visit_x_arc.id,
     om_visit_x_arc.visit_id,
@@ -240,9 +241,6 @@ AS SELECT om_visit_x_node.visit_id,
      LEFT JOIN om_typevalue d ON d.id::text = a.param_1 AND d.typevalue = 'visit_defect'::text
      LEFT JOIN om_typevalue c ON c.id::text = a.param_2 AND c.typevalue = 'visit_cleaned'::text
   WHERE config_visit_class.ismultievent = true AND config_visit_class.id = 7;
-
-
-  -- GRANT PERMISIONS --
 
 GRANT SELECT, TRIGGER, UPDATE, DELETE, REFERENCES, INSERT, TRUNCATE ON TABLE ve_visit_arc_insp TO role_om;
 GRANT SELECT, TRIGGER, UPDATE, DELETE, REFERENCES, INSERT, TRUNCATE ON TABLE ve_visit_connec_insp TO role_om;

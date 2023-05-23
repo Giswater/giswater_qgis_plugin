@@ -77,6 +77,7 @@ v_formname text;
 v_ismultievent boolean;
 v_featuretype text;
 
+v_errcontext text;
 
 
 BEGIN

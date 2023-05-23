@@ -580,14 +580,9 @@ ON CONFLICT (id) DO NOTHING;
 
 -- 22/05/2023
 
--- Step 1
 INSERT INTO config_typevalue
 (typevalue, id, idval, camelstyle, addparam)
 VALUES('widgettype_typevalue', 'fileselector', 'fileselector', 'fileselector', '{"createAddfield":"TRUE"}'::json);
-
-
-
--- INSERT WIDGETS VISIT_ARC_INSP--
 
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_files_1', 'lyt_files_1', 'lytFiles1', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_files_2', 'lyt_files_2', 'lytFiles2', NULL);
@@ -658,9 +653,6 @@ INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('visit_arc_insp', 'form_visit', 'tab_data', 'status', 'lyt_data_1', 15, 'integer', 'combo', 'Status:', NULL, NULL, false, false, true, false, NULL, 'SELECT DISTINCT (id) AS id,  idval  AS idval FROM om_typevalue WHERE id IS NOT NULL AND typevalue=''visit_status'' ', true, false, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 14);
 
-
--- INSERT WIDGETS VISIT_ARC_LEAK--
-
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('visit_arc_leak', 'form_visit', 'tab_file', 'tbl_files', 'lyt_files_1', 2, NULL, 'tableview', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue": false}'::json, NULL, 'om_visit_event_photo', false, 2);
@@ -718,10 +710,6 @@ VALUES('visit_arc_leak', 'form_visit', 'tab_data', 'visitcat_id', 'lyt_data_1', 
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('visit_arc_leak', 'form_visit', 'tab_data', 'status', 'lyt_data_1', 15, 'integer', 'combo', 'Status:', NULL, NULL, false, false, true, false, NULL, 'SELECT DISTINCT (id) AS id,  idval  AS idval FROM om_typevalue WHERE id IS NOT NULL AND typevalue=''visit_status'' ', true, false, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 14);
-
-
-
--- INSERT WIDGETS VISIT_NODE_INSP--
 
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
@@ -789,9 +777,6 @@ VALUES('visit_node_insp', 'form_visit', 'tab_file', 'addfile', 'lyt_files_1', 1,
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('visit_node_insp', 'form_visit', 'tab_data', 'startdate', 'lyt_data_1', 13, 'date', 'datetime', 'Start date:', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 12);
-
-
--- INSERT WIDGETS VISIT_VALVE_INSP --
 
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
@@ -863,9 +848,6 @@ INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('visit_valve_insp', 'form_visit', 'tab_data', 'startdate', 'lyt_data_1', 13, 'date', 'datetime', 'Start date:', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 12);
 
-
--- INSERT WIDGETS VISIT_NODE_LEAK--
-
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('visit_node_leak', 'form_visit', 'tab_data', 'backbutton', 'lyt_data_2', 2, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false,"text":"Close"}'::json, '{"functionName": "set_previous_form_back", "text":"Close"}'::json, NULL, false, 2);
@@ -923,9 +905,6 @@ VALUES('visit_node_leak', 'form_visit', 'tab_file', 'addfile', 'lyt_files_1', 1,
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('visit_node_leak', 'form_visit', 'tab_data', 'startdate', 'lyt_data_1', 13, 'date', 'datetime', 'Start date:', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 12);
-
-
--- INSERT WIDGETS VISIT_CONNEC_INSP--
 
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
@@ -994,9 +973,6 @@ INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('visit_connec_insp', 'form_visit', 'tab_data', 'defect_connec', 'lyt_data_1', 11, 'string', 'text', 'Defect connec:', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 17);
 
-
--- INSERT WIDGETS VISIT_CONNEC_LEAK--
-
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('visit_connec_leak', 'form_visit', 'tab_data', 'backbutton', 'lyt_data_2', 2, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false,"text":"Close"}'::json, '{"functionName": "set_previous_form_back", "text":"Close"}'::json, NULL, false, 2);
@@ -1055,24 +1031,14 @@ INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('visit_connec_leak', 'form_visit', 'tab_data', 'startdate', 'lyt_data_1', 13, 'date', 'datetime', 'Start date:', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 12);
 
-
--- PREVIOUS
-
 INSERT INTO config_typevalue
 (typevalue, id, idval, camelstyle, addparam)
 VALUES('layout_name_typevalue', 'lyt_visit_mng_1', 'lyt_visit_mng_1', 'layoutVisitManager1', '{"createAddfield":"True"}'::json);
-
-
--- INSERT VISIT MANAGER
 
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('visit_manager', 'form_visit', 'main', 'tbl_visit_edit', 'lyt_visit_mng_1', 1, NULL, 'tablewidget', NULL, NULL, NULL, false, false, false, false, false, NULL, false, false, NULL, NULL, NULL, NULL, NULL, 'tbl_visit_manager', false, 1);
 
-
-
-
--- CONFIG_FORM_TABS
 ALTER TABLE config_form_tabs ADD device_new _int4 NULL;
 
 INSERT INTO config_form_tabs
