@@ -1444,12 +1444,12 @@ WHERE id=3110;
 
 
 INSERT INTO config_param_system (parameter, value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) 
-    VALUES('edit_arc_check_conflictmapzones', '{"active":true)', 'parameter to be used to check conflict of mapzones on insert or update of arc', 
+    VALUES('edit_arc_check_conflictmapzones', '{"activated":true}', 'parameter to be used to check conflict of mapzones on insert or update of arc', 
     NULL, NULL, NULL, false, NULL, 'ws', NULL, NULL, 'json', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source")
-VALUES(3236, 'It''s not possible to edit the arc because there is/are some conflict with the mapzones of the extremal nodes:', 'check it before continue', 2, true, 'utils', 'core');
+VALUES(3236, 'It''s not possible to upsert the arc because node_1 and node_2 belong to different mapzones.', 'check it before continue', 2, true, 'utils', 'core');
 
 
 
