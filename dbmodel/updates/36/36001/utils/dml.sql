@@ -1092,3 +1092,20 @@ INSERT INTO config_form_tabs
 VALUES('visit_valve_insp', 'tab_file', 'Files', 'Files', 'role_om', '{"name":"gwGetVisit", "parameters":{"form":{"tabData":{"active":false},"tabFiles":{"active":true, "feature":{"tableName":"om_visit_event_photo"}}}}}'::json, '[{"actionName":"actionAddFile", "actionFunction":"gwSetFileInsert", "actionTooltip":"Add file", "disabled":false},{"actionName":"actionDeleteFile", "actionFunction":"gwSetDelete", "actionTooltip":"Delete file", "disabled":false}]'::json, 5, 2, '{5}');
 
 
+
+-- harmonize tabs 24/05/2023
+ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
+
+--UPDATE config_form_fields set tabname = 'tab_data' where tabname = 'data';
+UPDATE config_form_fields set tabname = 'tab_documents' where tabname = 'document';
+UPDATE config_form_fields set tabname = 'tab_hydrometer' where tabname = 'hydrometer';
+UPDATE config_form_fields set tabname = 'tab_elements' where tabname = 'element';
+UPDATE config_form_fields set tabname = 'tab_mincut' where tabname = 'mincut';
+UPDATE config_form_fields set tabname = 'tab_epa' where tabname = 'epa';
+UPDATE config_form_fields set tabname = 'tab_hydrometer_val' where tabname = 'hydro_val';
+UPDATE config_form_fields set tabname = 'tab_hydrometer_val' where tabname = 'hydro_val';
+UPDATE config_form_fields set tabname = 'tab_none' where tabname = 'main';
+UPDATE config_form_fields set tabname = 'tab_visit' where tabname = 'visit';
+UPDATE config_form_fields set tabname = 'tab_event' where tabname = 'event';
+
+ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
