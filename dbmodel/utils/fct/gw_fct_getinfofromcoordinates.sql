@@ -131,7 +131,7 @@ BEGIN
 		
 	v_activelayer := (p_data ->> 'data')::json->> 'activeLayer';
 	v_featuredialog := coalesce((p_data ->> 'data')::json->> 'featureDialog','[]');
-	v_visiblelayer := (p_data ->> 'data')::json->> 'visibleLayers';
+	v_visiblelayer := (p_data ->> 'data')::json->> 'visibleLayer';
 
 	--  Harmonize v_visiblelayer
 	v_visiblelayer = concat('{',substring((v_visiblelayer) from 2 for LENGTH(v_visiblelayer)));
