@@ -25,7 +25,6 @@ SELECT * FROM connec_add
 DECLARE     
 
 v_count_sector integer = 0;
-v_count_result integer = 0;
 v_result_id text;
 v_current_selector text;
 v_error_context text;
@@ -33,6 +32,7 @@ v_version text;
 v_projectype text;
 v_iscorporate boolean;
 v_action text;
+v_affected_result text;
 
 BEGIN
 
@@ -52,12 +52,16 @@ BEGIN
 		(SELECT result_id, json_array_elements_text((network_stats->>'sector')::json) as sector FROM rpt_cat_result) a
 		JOIN (SELECT result_id, iscorporate, json_array_elements_text((network_stats->>'sector')::json) as sector FROM rpt_cat_result) b USING (sector) 
 		WHERE a.result_id = v_result_id AND b.result_id != v_result_id and b.iscorporate)a;
-
-		SELECT count(*) INTO v_count_result FROM (SELECT count(*) FROM 
+	
+		SELECT  to_json(array_agg (result_id)) INTO v_affected_result FROM (
+		select distinct b.result_id FROM 
 		(SELECT result_id, json_array_elements_text((network_stats->>'sector')::json) as sector FROM rpt_cat_result) a
 		JOIN (SELECT result_id, iscorporate, json_array_elements_text((network_stats->>'sector')::json) as sector FROM rpt_cat_result) b USING (sector) 
 		WHERE a.result_id = v_result_id AND b.result_id != v_result_id and b.iscorporate
 		GROUP BY b.result_id) a;
+	
+		v_affected_result = replace (replace (v_affected_result,'{','['), '}' ,']');
+		
 	ELSE
 
 		UPDATE rpt_cat_result SET iscorporate=v_iscorporate WHERE result_id = v_result_id;
@@ -113,7 +117,7 @@ BEGIN
   	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
-		     ',"data":{ "info":{"currentSectors":'||v_count_sector||', "currentResults":'||v_count_result||'}'||
+		     ',"data":{ "info":{"currentSectors":'||v_count_sector||', "affectedResults":'||v_affected_result||'}'||
 			'}}'||
 	    '}')::json, 3180, null, null, null);
 
