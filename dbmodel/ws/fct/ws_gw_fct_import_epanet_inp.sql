@@ -467,6 +467,7 @@ BEGIN
 
 			-- update status
 			UPDATE inp_virtualvalve SET status = upper(csv2) FROM temp_csv where source='[STATUS]'  and arc_id = csv1;
+			UPDATE inp_virtualvalve SET status = 'ACTIVE' WHERE status IS NULL;
 			UPDATE inp_pump_importinp SET status = upper(csv2) FROM temp_csv where source='[STATUS]' and arc_id = csv1;
 
 			--set options configuration
