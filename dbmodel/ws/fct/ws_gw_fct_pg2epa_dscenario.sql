@@ -140,9 +140,9 @@ BEGIN
 			 AND temp_demand.pattern_id IS NULL;
 		
 		ELSIF v_patternmethod = 13 THEN -- DMA PATTERN (NODE)
-			UPDATE temp_demand SET pattern_id=sector.pattern_id FROM node JOIN dma ON dma.sector_id=node.dma_id WHERE temp_demand.feature_id=node.node_id
+			UPDATE temp_demand SET pattern_id=sector.pattern_id FROM node JOIN dma ON dma.dma_id=node.dma_id WHERE temp_demand.feature_id=node.node_id
 			 AND temp_demand.pattern_id IS NULL;
-			UPDATE temp_demand SET pattern_id=sector.pattern_id FROM connec JOIN dma ON dma.sector_id=connec.dma_id WHERE temp_demand.feature_id=connec.connec_id
+			UPDATE temp_demand SET pattern_id=sector.pattern_id FROM connec JOIN dma ON dma.dma_id=connec.dma_id WHERE temp_demand.feature_id=connec.connec_id
 			 AND temp_demand.pattern_id IS NULL;
 			
 		ELSIF v_patternmethod = 14 THEN -- FEATURE PATTERN (NODE)
