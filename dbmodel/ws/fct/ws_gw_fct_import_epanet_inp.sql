@@ -326,13 +326,13 @@ BEGIN
 			--arc
 			INSERT INTO cat_feature_arc VALUES ('PIPE', 'PIPE', 'PIPE') ON CONFLICT (id) DO NOTHING;
 			--nodarc
-			INSERT INTO cat_feature_arc VALUES ('ARCCHV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_arc VALUES ('ARCFCV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_arc VALUES ('ARCGPV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_arc VALUES ('ARCPBV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_arc VALUES ('ARCPSV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_arc VALUES ('ARCPRV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_arc VALUES ('ARCTCV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_arc VALUES ('ARCCHV', 'VARC', 'VIRTUALVALVE') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_arc VALUES ('ARCFCV', 'VARC', 'VIRTUALVALVE') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_arc VALUES ('ARCGPV', 'VARC', 'VIRTUALVALVE') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_arc VALUES ('ARCPBV', 'VARC', 'VIRTUALVALVE') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_arc VALUES ('ARCPSV', 'VARC', 'VIRTUALVALVE') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_arc VALUES ('ARCPRV', 'VARC', 'VIRTUALVALVE') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_arc VALUES ('ARCTCV', 'VARC', 'VIRTUALVALVE') ON CONFLICT (id) DO NOTHING;
 			INSERT INTO cat_feature_arc VALUES ('ARCPUMP', 'VARC', 'PUMP-IMPORTINP') ON CONFLICT (id) DO NOTHING;
 
 			--cat_feature_node
@@ -466,7 +466,7 @@ BEGIN
 			UPDATE node SET state_type = 2;
 
 			-- update status
-			UPDATE inp_valve_importinp SET status = upper(csv2) FROM temp_csv where source='[STATUS]'  and arc_id = csv1;
+			UPDATE inp_virtualvalve SET status = upper(csv2) FROM temp_csv where source='[STATUS]'  and arc_id = csv1;
 			UPDATE inp_pump_importinp SET status = upper(csv2) FROM temp_csv where source='[STATUS]' and arc_id = csv1;
 
 			--set options configuration
@@ -499,22 +499,22 @@ BEGIN
 			IF v_isgwproject THEN -- manage pumps & valves as a reverse nod2arc. It means transforming lines into points reversing sintaxis applied on Giswater exportation
 
 				-- to_arc on pumps
-				UPDATE inp_pump_importinp SET to_arc = b.to_arc FROM
-					(select a.arc_id, n.arc_id AS to_arc from inp_pump_importinp 
+				UPDATE inp_virtualvalve SET to_arc = b.to_arc FROM
+					(select a.arc_id, n.arc_id AS to_arc from inp_virtualvalve 
 					JOIN arc a USING (arc_id) 
 					JOIN (SELECT arc_id, node_1 FROM arc)n ON a.node_2 = n.node_1
-					WHERE a.arc_id NOT IN (SELECT arc_id FROM inp_pump_importinp WHERE substring(reverse(arc_id),0,2) ~ '^\d+$')
+					WHERE a.arc_id NOT IN (SELECT arc_id FROM inp_virtualvalve WHERE substring(reverse(arc_id),0,2) ~ '^\d+$')
 					AND a.arc_id != n.arc_id)b
-				WHERE  b.arc_id = inp_pump_importinp.arc_id;
+				WHERE  b.arc_id = inp_virtualvalve.arc_id;
 
 				-- to_arc on valves
-				UPDATE inp_valve_importinp SET to_arc = b.to_arc FROM
-					(select a.arc_id, n.arc_id AS to_arc from inp_valve_importinp 
+				UPDATE inp_virtualvalve SET to_arc = b.to_arc FROM
+					(select a.arc_id, n.arc_id AS to_arc from inp_virtualvalve 
 					JOIN arc a USING (arc_id) 
 					JOIN (SELECT arc_id, node_1 FROM arc UNION SELECT arc_id, node_2 FROM arc)n ON a.node_2 = n.node_1
-					WHERE a.arc_id NOT IN (SELECT arc_id FROM inp_valve_importinp WHERE substring(reverse(arc_id),0,2) ~ '^\d+$')
+					WHERE a.arc_id NOT IN (SELECT arc_id FROM inp_virtualvalve WHERE substring(reverse(arc_id),0,2) ~ '^\d+$')
 					AND a.arc_id != n.arc_id)b
-				WHERE  b.arc_id = inp_valve_importinp.arc_id;
+				WHERE  b.arc_id = inp_virtualvalve.arc_id;
 
 				-- to_arc on pressurepump
 				UPDATE inp_pump_importinp SET to_arc = b.to_arc FROM
@@ -527,8 +527,8 @@ BEGIN
 
 				FOR v_data IN SELECT * FROM arc WHERE arc_id like '%_n2a' OR arc_id like '%_n2a_5'
 				LOOP
-					IF v_data.epa_type = 'VALVE-IMPORTINP' THEN 
-						v_nodecat = (SELECT valv_type FROM inp_valve_importinp WHERE arc_id = v_data.arc_id);
+					IF v_data.epa_type = 'VIRTUALVALVE' THEN 
+						v_nodecat = (SELECT valv_type FROM inp_virtualvalve WHERE arc_id = v_data.arc_id);
 						v_epatype = 'VALVE';
 						
 					ELSIF v_data.epa_type = 'PUMP-IMPORTINP' THEN 
@@ -581,7 +581,7 @@ BEGIN
 
 					ELSIF v_epatablename = 'inp_valve' THEN
 						INSERT INTO inp_valve (node_id, valv_type, pressure, custom_dint, flow, coef_loss, curve_id, minorloss, status, to_arc)
-						SELECT v_node_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status, to_arc FROM inp_valve_importinp WHERE arc_id=v_data.arc_id;
+						SELECT v_node_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status, to_arc FROM inp_virtualvalve WHERE arc_id=v_data.arc_id;
 
 					ELSE						
 						INSERT INTO inp_shortpipe (node_id, status) SELECT v_node_id, status FROM inp_pipe WHERE arc_id=v_data.arc_id;
@@ -629,9 +629,7 @@ BEGIN
 				-- update state=0 pump additionals 
 				UPDATE arc SET state = 0 WHERE arc_id IN (SELECT arc_id FROM inp_pump_importinp);
 							
-				-- delete objects
-				--DELETE FROM inp_pump_importinp;
-				--DELETE FROM inp_valve_importinp;
+				-- delete objects;
 				DELETE FROM inp_pipe WHERE substring(reverse(arc_id),0,5) = 'a2n_';
 
 				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 

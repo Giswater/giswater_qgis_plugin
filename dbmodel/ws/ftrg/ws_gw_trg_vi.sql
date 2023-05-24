@@ -64,16 +64,16 @@ BEGIN
 	    
 	  ELSIF v_view='vi_valves' THEN
 	    INSERT INTO arc (arc_id, node_1, node_2, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
-	    VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, concat('ARC',NEW.valv_type),'VALVE-IMPORTINP',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1));
-	    INSERT INTO inp_valve_importinp (arc_id, diameter, valv_type, minorloss) VALUES (NEW.arc_id,NEW.diameter, NEW.valv_type, NEW.minorloss);
+	    VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, concat('ARC',NEW.valv_type),'VIRTUALVALVE',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1));
+	    INSERT INTO inp_virtualvalve (arc_id, diameter, valv_type, minorloss) VALUES (NEW.arc_id,NEW.diameter, NEW.valv_type, NEW.minorloss);
 	      IF NEW.valv_type IN ('PRV','PSV','PBV') THEN
-		UPDATE inp_valve_importinp SET pressure=NEW.setting::numeric WHERE arc_id=NEW.arc_id;
+		UPDATE inp_virtualvalve SET pressure=NEW.setting::numeric WHERE arc_id=NEW.arc_id;
 	      ELSIF NEW.valv_type='FCV' THEN 
-		UPDATE inp_valve_importinp SET flow=NEW.setting::numeric WHERE arc_id=NEW.arc_id;
+		UPDATE inp_virtualvalve SET flow=NEW.setting::numeric WHERE arc_id=NEW.arc_id;
 	      ELSIF NEW.valv_type='TCV' THEN
-		UPDATE inp_valve_importinp SET coef_loss=NEW.setting::numeric WHERE arc_id=NEW.arc_id;
+		UPDATE inp_virtualvalve SET coef_loss=NEW.setting::numeric WHERE arc_id=NEW.arc_id;
 	      ELSIF NEW.valv_type='GPV' THEN
-		UPDATE inp_valve_importinp SET curve_id=NEW.setting WHERE arc_id=NEW.arc_id;
+		UPDATE inp_virtualvalve SET curve_id=NEW.setting WHERE arc_id=NEW.arc_id;
 	      END IF;         
 	    
 	  ELSIF v_view='vi_tags' THEN 
