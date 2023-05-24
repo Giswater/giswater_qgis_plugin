@@ -49,24 +49,20 @@ FORM_CLASS = _get_ui_class('info_epa_dwf.ui', 'basic')
 class GwInfoEpaDwfUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = _get_ui_class('info_epa_flow_regulator.ui', 'basic')
-class GwInfoEpaFlowRegulatorUi(GwDialog, FORM_CLASS):
+FORM_CLASS = _get_ui_class('info_epa_orifice.ui', 'basic')
+class GwInfoEpaOrificeUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = _get_ui_class('info_epa_inflows.ui', 'basic')
-class GwInfoEpaInflowsUi(GwDialog, FORM_CLASS):
+FORM_CLASS = _get_ui_class('info_epa_outlet.ui', 'basic')
+class GwInfoEpaOutletUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = _get_ui_class('info_epa_inflows_poll.ui', 'basic')
-class GwInfoEpaInflowsPollUi(GwDialog, FORM_CLASS):
+FORM_CLASS = _get_ui_class('info_epa_pump.ui', 'basic')
+class GwInfoEpaPumpUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = _get_ui_class('info_epa_pumpadditional.ui', 'basic')
-class GwInfoEpaPumpadditionalUi(GwDialog, FORM_CLASS):
-    pass
-
-FORM_CLASS = _get_ui_class('info_epa_treatment.ui', 'basic')
-class GwInfoEpaTreatmentUi(GwDialog, FORM_CLASS):
+FORM_CLASS = _get_ui_class('info_epa_weir.ui', 'basic')
+class GwInfoEpaWeirUi(GwDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = _get_ui_class('search.ui', 'basic')

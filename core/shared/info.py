@@ -35,8 +35,8 @@ from ..threads.toggle_valve_state import GwToggleValveTask
 
 from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, \
-    GwInfoCrossectUi, GwInterpolate, GwInfoEpaDemandUi, GwInfoEpaDwfUi, GwInfoEpaFlowRegulatorUi, GwInfoEpaInflowsUi, \
-    GwInfoEpaInflowsPollUi, GwInfoEpaPumpadditionalUi, GwInfoEpaTreatmentUi
+    GwInfoCrossectUi, GwInterpolate, GwInfoEpaDemandUi, GwInfoEpaOrificeUi, GwInfoEpaOutletUi, GwInfoEpaPumpUi, \
+    GwInfoEpaWeirUi, GwInfoEpaDwfUi
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os
 from ...lib.tools_qt import GwHyperLinkLineEdit
@@ -631,6 +631,11 @@ class GwInfo(QObject):
         self.action_interpolate = self.dlg_cf.findChild(QAction, "actionInterpolate")
         # action_switch_arc_id = self.dlg_cf.findChild(QAction, "actionSwicthArcid")
         self.action_section = self.dlg_cf.findChild(QAction, "actionSection")
+        self.action_orifice = self.dlg_cf.findChild(QAction, "actionOrifice")
+        self.action_outlet = self.dlg_cf.findChild(QAction, "actionOutlet")
+        self.action_pump = self.dlg_cf.findChild(QAction, "actionPump")
+        self.action_weir = self.dlg_cf.findChild(QAction, "actionWeir")
+        self.action_demand = self.dlg_cf.findChild(QAction, "actionDemand")
 
 
     def _manage_icons(self):
@@ -651,6 +656,11 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.action_section, "207")
         tools_gw.add_icon(self.action_help, "73", sub_folder="24x24")
         tools_gw.add_icon(self.action_interpolate, "194")
+        tools_gw.add_icon(self.action_orifice, "250", sub_folder="24x24")
+        tools_gw.add_icon(self.action_outlet, "251", sub_folder="24x24")
+        tools_gw.add_icon(self.action_pump, "252", sub_folder="24x24")
+        tools_gw.add_icon(self.action_weir, "253", sub_folder="24x24")
+        tools_gw.add_icon(self.action_demand, "254", sub_folder="24x24")
 
 
     def _manage_dlg_widgets(self, complet_result, result, new_feature, reload_epa=False):
@@ -833,12 +843,101 @@ class GwInfo(QObject):
         self.ep = QgsMapToolEmitPoint(self.canvas)
         self.action_interpolate.triggered.connect(partial(self._activate_snapping, complet_result, self.ep))
 
+        # EPA Actions
+        self.action_orifice.triggered.connect(partial(self._open_orifice_dlg))
+        self.action_outlet.triggered.connect(partial(self._open_outlet_dlg))
+        self.action_pump.triggered.connect(partial(self._open_pump_dlg))
+        self.action_weir.triggered.connect(partial(self._open_weir_dlg))
+        if global_vars.project_type == 'ws':
+            self.action_demand.triggered.connect(partial(self._open_demand_dlg))
+        elif global_vars.project_type == 'ud':
+            self.action_demand.triggered.connect(partial(self._open_dwf_dlg))
+
         # Disable action edit if user can't edit
         if not can_edit:
             self.action_edit.setChecked(False)
             self.action_edit.setEnabled(False)
 
         return dlg_cf, fid
+
+    def _open_orifice_dlg(self):
+        print("_open_orifice_dlg")
+
+        # kwargs
+        func_params = {"ui": "GwInfoEpaOrificeUi", "uiName": "info_epa_orifice",
+                       "tableviews": [
+                        {"tbl": "tbl_orifice", "view": "v_edit_inp_flwreg_orifice"},
+                        {"tbl": "tbl_dscenario_orifice", "view": "v_edit_inp_dscenario_flwreg_orifice"}
+                       ]}
+        kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
+        open_epa_dlg(**kwargs)
+
+
+    def _open_outlet_dlg(self):
+        print("_open_outlet_dlg")
+
+        # kwargs
+        func_params = {"ui": "GwInfoEpaOutletUi", "uiName": "info_epa_outlet",
+                       "tableviews": [
+                        {"tbl": "tbl_outlet", "view": "v_edit_inp_flwreg_outlet"},
+                        {"tbl": "tbl_dscenario_outlet", "view": "v_edit_inp_dscenario_flwreg_outlet"}
+                       ]}
+        kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
+        open_epa_dlg(**kwargs)
+
+
+    def _open_pump_dlg(self):
+        print("_open_pump_dlg")
+
+        # kwargs
+        func_params = {"ui": "GwInfoEpaPumpUi", "uiName": "info_epa_pump",
+                       "tableviews": [
+                        {"tbl": "tbl_pump", "view": "v_edit_inp_flwreg_pump"},
+                        {"tbl": "tbl_dscenario_pump", "view": "v_edit_inp_dscenario_flwreg_pump"}
+                       ]}
+        kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
+        open_epa_dlg(**kwargs)
+
+
+    def _open_weir_dlg(self):
+        print("_open_weir_dlg")
+
+        # kwargs
+        func_params = {"ui": "GwInfoEpaWeirUi", "uiName": "info_epa_weir",
+                       "tableviews": [
+                        {"tbl": "tbl_weir", "view": "v_edit_inp_flwreg_weir"},
+                        {"tbl": "tbl_dscenario_weir", "view": "v_edit_inp_dscenario_flwreg_weir"}
+                       ]}
+        kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
+        open_epa_dlg(**kwargs)
+
+
+    def _open_demand_dlg(self):
+        print("_open_demand_dlg")
+
+        # kwargs
+        func_params = {"ui": "GwInfoEpaDemandUi", "uiName": "info_epa_demand",
+                       "tableviews": [
+                        {"tbl": "tbl_dscenario_demand", "view": "v_edit_inp_dscenario_demand"}
+                       ]}
+        kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
+        open_epa_dlg(**kwargs)
+
+
+    def _open_dwf_dlg(self):
+        print("_open_dwf_dlg")
+
+        # kwargs
+        func_params = {"ui": "GwInfoEpaDwfUi", "uiName": "info_epa_dwf",
+                       "widgets": [
+                           "dwfscenario_id", "node_id", "value", "pat1", "pat2", "pat3", "pat4"
+                       ],
+                       "widgetsTablename": "v_edit_inp_dwf",
+                       "tableviews": [
+                        {"tbl": "tbl_dscenario_inflows", "view": "v_edit_inp_dscenario_inflows"}
+                       ]}
+        kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
+        open_epa_dlg(**kwargs)
 
 
     def action_open_link(self):
@@ -3055,6 +3154,26 @@ def fill_tbl(complet_list, tbl, info, view):
             addparam = addparam.get('pkey')
 
     setattr(info, f"my_json_{view}", {})
+    # headers
+    headers = complet_list['body']['form'].get('headers')
+    if headers:
+        model = tbl.model()
+        if model is None:
+            model = QStandardItemModel()
+
+        # Related by Qtable
+        model.clear()
+        tbl.setModel(model)
+        tbl.horizontalHeader().setStretchLastSection(True)
+        try:
+            # Get headers
+            headers = [item['header'] for item in headers]
+            # Set headers
+            model.setHorizontalHeaderLabels(headers)
+        except Exception as e:
+            # if field['value'][0] is None
+            pass
+    # values
     for field in complet_list['body']['data']['fields']:
         if 'hidden' in field and field['hidden']: continue
         model = tbl.model()
@@ -3068,6 +3187,7 @@ def fill_tbl(complet_list, tbl, info, view):
             tbl = tools_gw.fill_tableview_rows(tbl, field)
         tools_qt.set_tableview_config(tbl, edit_triggers=QTableView.DoubleClicked)
         model.dataChanged.connect(partial(tbl_data_changed, info, view, tbl, model, addparam))
+        _manage_new_row(model)
 
 # region Tab epa
 
@@ -3114,7 +3234,18 @@ def open_epa_dlg(**kwargs):
 
         complet_list = get_list(view, pk, feature_id)
         fill_tbl(complet_list, tbl, info, view)
-        info.dlg.accepted.connect(partial(save_tbl_changes, complet_list, info))
+        # info.dlg.accepted.connect(partial(save_tbl_changes, complet_list, info))
+        info.dlg.btn_accept.clicked.connect(partial(save_tbl_changes, complet_list, info, info.dlg))
+
+    # Delete buttons
+    btn_delete_base = info.dlg.findChild(QPushButton, 'btn_delete_base')
+    btn_delete_dscenario = info.dlg.findChild(QPushButton, 'btn_delete_dscenario')
+    if btn_delete_base:
+        tools_gw.add_icon(btn_delete_base, '112b', "24x24")
+        btn_delete_base.clicked.connect(partial(delete_tbl_row))
+    if btn_delete_dscenario:
+        tools_gw.add_icon(btn_delete_dscenario, '112b', "24x24")
+        btn_delete_dscenario.clicked.connect(partial(delete_tbl_row))
 
     info.dlg.finished.connect(partial(tools_gw.save_settings, info.dlg))
     # Open dlg
@@ -3147,8 +3278,27 @@ def tbl_data_changed(info, view, tbl, model, addparam, index):
     else:
         getattr(info, f"my_json_{view}")[ids][fieldname] = str(field)
 
+    # Manage new row
+    _manage_new_row(model, index.row())
 
-def save_tbl_changes(complet_list, info):
+
+def _manage_new_row(model, row=None):
+    if row is None:
+        row = model.rowCount() - 1
+    # Add a new row if the edited row is the last one
+    if row >= (model.rowCount() - 1):
+        model.insertRow(model.rowCount())
+    # Remove "last" row (empty one) if the real last row is empty
+    elif row == (model.rowCount() - 2):
+        for n in range(0, model.columnCount()):
+            item = model.item(row, n)
+            if item is not None:
+                if item.data(0) not in (None, ''):
+                    return
+        model.setRowCount(model.rowCount() - 1)
+
+
+def save_tbl_changes(complet_list, info, dialog):
 
     view = complet_list['body']['feature']['tableName']
     my_json = getattr(info, f"my_json_{view}")
@@ -3165,8 +3315,31 @@ def save_tbl_changes(complet_list, info):
         feature += f'"tableName":"{view}"'
         extras = f'"fields":{fields}'
         body = tools_gw.create_body(feature=feature, extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_setfields', body)
+        json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
+        if json_result and json_result.get('status') == 'Accepted':
+            tools_gw.close_dialog(dialog)
+            return
+        tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
 
+
+def delete_tbl_row(complet_list, info):
+
+    view = complet_list['body']['feature']['tableName']
+    my_json = getattr(info, f"my_json_{view}")
+    if not my_json:
+        return
+
+    # For each edited row
+    for k, v in my_json.items():
+        fields = json.dumps(v)
+        if not fields:
+            continue
+
+        feature = f'"id":"{k}", '
+        feature += f'"tableName":"{view}"'
+        extras = f'"fields":{fields}'
+        body = tools_gw.create_body(feature=feature, extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_setdelete', body)
 
 # endregion
 

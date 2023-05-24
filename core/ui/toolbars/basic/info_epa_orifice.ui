@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>info_epa_dwf</class>
- <widget class="QDialog" name="info_epa_dwf">
+ <class>info_epa_orifice</class>
+ <widget class="QDialog" name="info_epa_orifice">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>DWF</string>
+   <string>Orifice</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_5">
    <item row="0" column="0">
@@ -31,105 +31,39 @@
       <attribute name="label">
        <string>Base</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
-        <layout class="QGridLayout" name="lyt_base_1">
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="2" column="0">
+        <layout class="QGridLayout" name="lyt_base">
          <item row="0" column="0">
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>DWF scenario id:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Value:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="node_id"/>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Node id:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QLineEdit" name="value"/>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="dwfscenario_id"/>
-         </item>
-         <item row="3" column="0" colspan="2">
-          <spacer name="verticalSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
+          <widget class="QTableView" name="tbl_orifice"/>
          </item>
         </layout>
        </item>
-       <item row="0" column="1">
-        <layout class="QGridLayout" name="lyt_base_2" rowstretch="0,0,0,0,0">
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="pat2"/>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="pat1"/>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_7">
+       <item row="0" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QPushButton" name="btn_add_base">
            <property name="text">
-            <string>Pat 4:</string>
+            <string/>
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
-          <widget class="QLineEdit" name="pat4"/>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_6">
+         <item>
+          <widget class="QPushButton" name="btn_delete_base">
            <property name="text">
-            <string>Pat 3:</string>
+            <string/>
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Pat 1:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QLineEdit" name="pat3"/>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>Pat 2:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0" colspan="2">
-          <spacer name="verticalSpacer_2">
+         <item>
+          <spacer name="horizontalSpacer">
            <property name="orientation">
-            <enum>Qt::Vertical</enum>
+            <enum>Qt::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>20</width>
-             <height>40</height>
+             <width>40</width>
+             <height>20</height>
             </size>
            </property>
           </spacer>
@@ -151,10 +85,10 @@
        <string>Dscenario</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
-       <item row="1" column="0">
+       <item row="2" column="0">
         <layout class="QGridLayout" name="lyt_dscenario">
          <item row="0" column="0">
-          <widget class="QTableView" name="tbl_dscenario_inflows"/>
+          <widget class="QTableView" name="tbl_dscenario_orifice"/>
          </item>
         </layout>
        </item>
@@ -193,10 +127,10 @@
      </widget>
     </widget>
    </item>
-   <item row="1" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout">
+   <item row="4" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <spacer name="horizontalSpacer">
+      <spacer name="horizontalSpacer_3">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>

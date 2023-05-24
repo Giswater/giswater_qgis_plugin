@@ -587,6 +587,26 @@ def get_col_index_by_col_name(qtable, column_name):
     return column_index
 
 
+def onCellChanged(table, row, column):
+    """ Function to be connected to a QTableWidget cellChanged signal.
+
+    Note: row & column parameters are passed by the signal """
+
+    # Add a new row if the edited row is the last one
+    if row >= (table.rowCount()-1):
+        headers = [n for n in range(0, table.rowCount()+1)]
+        table.insertRow(table.rowCount())
+        table.setVerticalHeaderLabels(headers)
+    # Remove "last" row (empty one) if the real last row is empty
+    elif row == (table.rowCount()-2):
+        for n in range(0, table.columnCount()):
+            item = table.item(row, n)
+            if item is not None:
+                if item.data(0) not in (None, ''):
+                    return
+        table.setRowCount(table.rowCount()-1)
+
+
 def set_completer_object(completer, model, widget, list_items, max_visible=10):
     """ Set autocomplete of widget @table_object + "_id"
         getting id's from selected @table_object.
