@@ -170,12 +170,12 @@ BEGIN
 
 	RAISE NOTICE '3 - Check links over nodarcs (404)';
 
-	SELECT count(*) INTO v_count FROM v_edit_link l, temp_arc a WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND a.epa_type NOT IN ('CONDUIT', 'PIPE');
+	SELECT count(*) INTO v_count FROM v_edit_link l, temp_arc a WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND a.epa_type NOT IN ('CONDUIT', 'PIPE', 'VIRTUALVALVE');
 	
 	IF v_count > 0 THEN
 		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, arccat_id, state, expl_id, the_geom, descript)
 			SELECT 404, link_id, ''LINK'', l.state, l.expl_id, l.the_geom, ''Link over nodarc'' FROM v_edit_link l, temp_arc a 
-			WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND a.epa_type NOT IN (''CONDUIT'', ''PIPE'')';
+			WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND a.epa_type NOT IN (''CONDUIT'', ''PIPE'', ''VIRTUALVALVE'')';
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, concat('ERROR-404: There is/are ',v_count,' link(s) with endpoint over nodarcs.'),v_count);
 	ELSE
