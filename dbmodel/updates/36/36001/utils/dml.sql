@@ -1103,9 +1103,28 @@ UPDATE config_form_fields set tabname = 'tab_elements' where tabname = 'element'
 UPDATE config_form_fields set tabname = 'tab_mincut' where tabname = 'mincut';
 UPDATE config_form_fields set tabname = 'tab_epa' where tabname = 'epa';
 UPDATE config_form_fields set tabname = 'tab_hydrometer_val' where tabname = 'hydro_val';
-UPDATE config_form_fields set tabname = 'tab_hydrometer_val' where tabname = 'hydro_val';
 UPDATE config_form_fields set tabname = 'tab_none' where tabname = 'main';
 UPDATE config_form_fields set tabname = 'tab_visit' where tabname = 'visit';
 UPDATE config_form_fields set tabname = 'tab_event' where tabname = 'event';
 
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
+
+-- utils
+UPDATE config_form_tabs SET device_new = '{4,5}' where formname = 'selector_basic' and tabname in ('tab_exploitation','tab_network_state');
+UPDATE config_form_tabs SET device_new = '{4}' where formname = 'selector_basic' and device_new is null;
+UPDATE config_form_tabs SET device_new = '{4,5}' where formname = 'v_edit_arc' and device = 4;
+UPDATE config_form_tabs SET device_new = '{4,5}' where formname = 'v_edit_node' and device = 4;
+UPDATE config_form_tabs SET device_new = '{4,5}' where formname = 'v_edit_connec' and device = 4;
+UPDATE config_form_tabs SET device_new = '{4,5}' where formname = 'v_edit_gully' and device = 4;
+UPDATE config_form_tabs SET device_new = '{4}' where formname in ('search', 'config');
+UPDATE config_form_tabs SET device_new = '{4,5}' where formname in ('selector_mincut');
+UPDATE config_form_tabs SET device_new = '{4,5}' where formname in ('selector_mincut');
+UPDATE config_form_tabs SET device_new = '{1,2,3,4}' where formname in ('visit');
+
+DELETE FROM config_form_tabs WHERE formname = 'selector_basic' and device = 5;
+DELETE FROM config_form_tabs WHERE formname = 'selector_mincut' and device = 5;
+DELETE FROM config_form_tabs WHERE formname in ('v_edit_arc','v_edit_node','v_edit_connec','v_edit_gully') and device = 5;
+DELETE FROM config_form_tabs WHERE formname in ('visit') and device in (2,3,4);
+
+ALTER TABLE config_form_tabs DROP column device;
+ALTER TABLE config_form_tabs RENAME column device_new TO device;
