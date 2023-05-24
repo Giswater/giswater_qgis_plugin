@@ -14,7 +14,7 @@ AS $function$
 /*EXAMPLE:
 
 SELECT SCHEMA_NAME.gw_fct_getvisit($${"client":{"device":5, "lang":"es_ES", "cur_user": "bgeo", "infoType":1, "epsg":25831}, "form":{"visit_id": null, "visit_type": 1}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "coordinates": {"xcoord": 418980.68916666665, "ycoord": 4576904.783750001, "zoomRatio": 10000}}}$$);
- 
+
 
 */
 
@@ -38,7 +38,7 @@ v_querytext text;
 v_selected_id text;
 v_selected_idval text;
 v_current_id text;
-v_new_id text; 
+v_new_id text;
 v_widgetcontrols json;
 v_values_array json;
 v_widgetvalues json;
@@ -47,13 +47,13 @@ v_visit_type_name text;
 v_header_text text;
 v_id integer;
 v_cur_user text;
- 
+
 v_fields_array json[];
 v_fieldsjson jsonb := '[]';
 
 form_tabs json[];
 form_tabs_json json;
-v_forminfo json; 
+v_forminfo json;
 v_tablename text;
 v_xcoord double precision;
 v_ycoord double precision;
@@ -68,7 +68,7 @@ v_activelayer text;
 v_visiblelayer text;
 v_sensibility float;
 v_sensibility_f float;
-v_zoomratio double precision; 
+v_zoomratio double precision;
 v_the_geom text;
 v_schemaname text;
 
@@ -76,6 +76,7 @@ v_visitclass integer;
 v_formname text;
 v_ismultievent boolean;
 v_featuretype text;
+v_fields json;
 
 v_errcontext text;
 
@@ -103,40 +104,41 @@ BEGIN
 	v_zoomratio := ((p_data ->> 'data')::json->> 'coordinates')::json->>'zoomRatio';
 	v_client_epsg := (p_data ->> 'client')::json->> 'epsg';
 	v_epsg := (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
+	v_fields = ((p_data ->>'data')::json->>'fields')::json;
 	v_visitclass = ((p_data ->>'data')::json->>'fields')::json->>'class_id';
 
 
 
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 
-	-- Make point
-	if v_visit_id IS null and v_xcoord is not null THEN
-	SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
+		-- Make point
+		if v_visit_id IS null and v_xcoord is not null THEN
+			SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
 
--- Sensibility factor
-	IF v_device = 1 OR v_device = 2 THEN
-		EXECUTE 'SELECT (value::json->>''mobile'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
-		INTO v_sensibility_f;
-		-- 10 pixels of base sensibility
-		v_sensibility = (v_zoomratio * 10 * v_sensibility_f);
-		v_config_layer='config_web_layer';
+		-- Sensibility factor
+		IF v_device = 1 OR v_device = 2 THEN
+			EXECUTE 'SELECT (value::json->>''mobile'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
+			INTO v_sensibility_f;
+			-- 10 pixels of base sensibility
+			v_sensibility = (v_zoomratio * 10 * v_sensibility_f);
+			v_config_layer='config_web_layer';
 
-	ELSIF  v_device = 3 THEN
-		EXECUTE 'SELECT (value::json->>''web'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
-		INTO v_sensibility_f;
-		-- 10 pixels of base sensibility
-		v_sensibility = (v_zoomratio * 10 * v_sensibility_f);
-		v_config_layer='config_web_layer';
+		ELSIF  v_device = 3 THEN
+			EXECUTE 'SELECT (value::json->>''web'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
+			INTO v_sensibility_f;
+			-- 10 pixels of base sensibility
+			v_sensibility = (v_zoomratio * 10 * v_sensibility_f);
+			v_config_layer='config_web_layer';
 
-	ELSIF  v_device IN (4, 5) THEN
-		EXECUTE 'SELECT (value::json->>''desktop'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
-		INTO v_sensibility_f;
+		ELSIF  v_device IN (4, 5) THEN
+			EXECUTE 'SELECT (value::json->>''desktop'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
+			INTO v_sensibility_f;
 
-		--v_sensibility_f = 1;
+			--v_sensibility_f = 1;
 
-		-- ESCALE 1:5000 as base sensibility
-		v_sensibility = ((v_zoomratio/5000) * 10 * v_sensibility_f);
-		v_config_layer='config_info_layer';
+			-- ESCALE 1:5000 as base sensibility
+			v_sensibility = ((v_zoomratio/5000) * 10 * v_sensibility_f);
+			v_config_layer='config_info_layer';
 
 	END IF;
 	-- Get feature
@@ -168,7 +170,6 @@ BEGIN
 		--  Get element from active layer, using the distance from the clicked point to order possible multiselection (minor as first)
 		v_querystring = concat('SELECT ',quote_ident(v_idname),' FROM ',quote_ident(v_layer.layer_id),' WHERE st_dwithin (''',v_point,''', ',quote_ident(v_layer.layer_id),'.',quote_ident(v_the_geom),', ',v_sensibility,')
 		ORDER BY ST_Distance(',v_layer.layer_id,'.',v_the_geom,', ''',v_point,''') asc LIMIT 1');
-
 		EXECUTE v_querystring INTO v_id;
 
 	if v_id is not null then
@@ -183,6 +184,7 @@ BEGIN
 		v_visit_id := (SELECT max(id)+1 FROM om_visit);
 	end if;
 	end if;
+
 	if v_visit_type = 2 then
 		v_visit_type_name = 'unexpected_visit';
 		v_header_text = 'INCIDENCIA - '||v_visit_id||'';
@@ -194,12 +196,17 @@ BEGIN
 	IF v_visitclass IS NULL THEN
 		v_visitclass := (SELECT id FROM config_visit_class WHERE visit_type=v_visit_type AND feature_type = upper(v_featuretype) LIMIT 1)::integer;
 	END IF;
+
 	--  get formname and tablename
 	v_formname := (SELECT formname FROM config_visit_class WHERE id=v_visitclass);
 	v_tablename := (SELECT tablename FROM config_visit_class WHERE id=v_visitclass);
 	v_ismultievent := (SELECT ismultievent FROM config_visit_class WHERE id=v_visitclass);
 
--- Get tabs
+	if v_featuretype is null then
+		v_featuretype := (SELECT feature_type FROM config_visit_class WHERE id=v_visitclass);
+	end if;
+
+	-- Get tabs
 	v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname, orderby) tabname as "tabName", label as "tabLabel", tooltip as "tooltip",NULL as "tabFunction", NULL AS "tabactions",  orderby
 							FROM config_form_tabs WHERE formname =''',v_formname,''' AND device = ', v_device,' AND orderby IS NOT NULL ORDER BY orderby, tabname)a');
 
@@ -234,16 +241,20 @@ BEGIN
 		LOOP
 			array_index := array_index + 1;
 
-			if aux_json->>'columnname' = 'visit_id' then
-				field_value = v_visit_id;
-			elsif aux_json->>'columnname' = 'user_name' then
-				field_value = v_cur_user;
-			elsif aux_json->>'columnname' = 'feature_id' or aux_json->>'columnname' = v_idname then
-				field_value = v_id;
-			elsif aux_json->>'columnname' = 'class_id' then
-				field_value = v_visitclass;
+			if v_fields is not null then
+				field_value = v_fields::json->>quote_ident(aux_json->>'columnname');
 			else
-				field_value := (v_values_array->>(aux_json->>'columnname'));
+				if aux_json->>'columnname' = 'visit_id' then
+					field_value = v_visit_id;
+				elsif aux_json->>'columnname' = 'user_name' then
+					field_value = v_cur_user;
+				elsif aux_json->>'columnname' = 'feature_id' or aux_json->>'columnname' = v_idname then
+					field_value = v_id;
+				elsif aux_json->>'columnname' = 'class_id' then
+					field_value = v_visitclass;
+				else
+					field_value := (v_values_array->>(aux_json->>'columnname'));
+				end if;
 			end if;
 
 			-- setting values
