@@ -14,11 +14,10 @@ from qgis.PyQt.QtGui import QIcon, QKeySequence
 from qgis.PyQt.QtWidgets import QActionGroup, QMenu, QPushButton, QTreeWidget, QTreeWidgetItem
 from qgis.core import QgsApplication
 
-from .toolbars import buttons
 from .ui.ui_manager import GwLoadMenuUi
 from .utils import tools_gw
 from .. import global_vars
-from ..lib import tools_log, tools_qt, tools_qgis, tools_os, tools_db
+from ..lib import tools_qt, tools_qgis, tools_os, tools_db
 from .threads.project_layers_config import GwProjectLayersConfig
 
 
@@ -46,51 +45,6 @@ class GwMenuLoad(QObject):
         config_icon = QIcon(icon_path)
 
         if project_loaded:
-            # region Toolbar
-            toolbars_menu = QMenu(f"Toolbars", self.iface.mainWindow().menuBar())
-            icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}24x24{os.sep}36.png"
-            toolbars_icon = QIcon(icon_path)
-            toolbars_menu.setIcon(toolbars_icon)
-            self.main_menu.addMenu(toolbars_menu)
-
-            for toolbar in global_vars.giswater_settings.value(f"toolbars/list_toolbars"):
-                toolbar_submenu = QMenu(f"{toolbar}", self.iface.mainWindow().menuBar())
-                toolbars_menu.addMenu(toolbar_submenu)
-                buttons_toolbar = global_vars.giswater_settings.value(f"toolbars/{toolbar}")
-                project_exclude = tools_gw.get_config_parser('project_exclude', str(global_vars.project_type),
-                                                               "project", "giswater")
-                if project_exclude not in (None, 'None'):
-                    project_exclude = project_exclude.replace(' ', '').split(',')
-
-                for index_action in buttons_toolbar:
-
-                    if project_exclude and index_action in project_exclude:
-                        continue
-                    icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}{toolbar}{os.sep}{index_action}.png"
-                    icon = QIcon(icon_path)
-                    button_def = global_vars.giswater_settings.value(f"buttons_def/{index_action}")
-                    text = ""
-                    if button_def:
-                        text = self._translate(f'{button_def}')
-                    parent = self.iface.mainWindow()
-                    ag = QActionGroup(parent)
-                    ag.setProperty('gw_name', 'gw_QActionGroup')
-                    if button_def is None:
-                        continue
-
-                    # Check if the class associated to the button definition exists
-                    if hasattr(buttons, button_def):
-                        button_class = getattr(buttons, button_def)
-                        action_function = button_class(icon_path, button_def, text, None, ag)
-                        action = toolbar_submenu.addAction(icon, f"{text}")
-                        shortcut_key = tools_gw.get_config_parser("toolbars_shortcuts", f"{index_action}", "user", "init", prefix=False)
-                        if shortcut_key:
-                            action.setShortcuts(QKeySequence(f"{shortcut_key}"))
-                            global_vars.shortcut_keys.append(shortcut_key)
-                        action.triggered.connect(partial(self._clicked_event, action_function))
-                    else:
-                        tools_log.log_warning(f"Class '{button_def}' not imported in file '{buttons.__file__}'")
-            # endregion
 
             # region Actions
             actions_menu = QMenu(f"Actions", self.iface.mainWindow().menuBar())
