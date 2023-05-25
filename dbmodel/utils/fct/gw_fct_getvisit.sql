@@ -208,7 +208,7 @@ BEGIN
 
 	-- Get tabs
 	v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname, orderby) tabname as "tabName", label as "tabLabel", tooltip as "tooltip",NULL as "tabFunction", NULL AS "tabactions",  orderby
-							FROM config_form_tabs WHERE formname =''',v_formname,''' AND device = ', v_device,' AND orderby IS NOT NULL ORDER BY orderby, tabname)a');
+							FROM config_form_tabs WHERE formname =''',v_formname,''' AND ',v_device, ' = ANY(device) AND orderby IS NOT NULL ORDER BY orderby, tabname)a');
 
 	v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_device', v_device);
 	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 180);
