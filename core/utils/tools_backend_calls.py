@@ -240,6 +240,12 @@ def filter_table(**kwargs):
          Function called in module GwInfo: def _set_filter_listeners(self, complet_result, dialog, widget_list, columnname, widgetname)
          at lines:  widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
                     widget.currentIndexChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+
+         Might be called in tools_gw also: def set_filter_listeners(complet_result, dialog, widget_list, columnname, widgetname, feature_id=None)
+         at lines:  widget.textChanged.connect(partial(getattr(module, function_name), **kwargs))
+                    widget.currentIndexChanged.connect(partial(getattr(module, function_name), **kwargs))
+                    widget.dateChanged.connect(partial(getattr(module, function_name), **kwargs))
+                    widget.valueChanged.connect(partial(getattr(module, function_name), **kwargs))
      """
 
     complet_result = kwargs['complet_result']
@@ -251,7 +257,9 @@ def filter_table(**kwargs):
     feature_id = kwargs['feature_id']
     func_params = kwargs.get('func_params')
 
-    field_id = str(complet_result['body']['feature']['idName'])
+    field_id = func_params.get('field_id')
+    if field_id is None:
+        field_id = str(complet_result['body']['feature']['idName'])
     feature_id = complet_result['body']['feature']['id']
     filter_fields = f'"{field_id}":{{"value":"{feature_id}","filterSign":"="}}, '
     colname = None
@@ -263,7 +271,7 @@ def filter_table(**kwargs):
         tab_name = dialog.tab_main.widget(index_tab).objectName()
     except:
         tab_name = 'main'
-    complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject, feature_id)
+    complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject, feature_id, id_name=field_id)
     if complet_list is False:
         return False
     for field in complet_list['body']['data']['fields']:
@@ -758,10 +766,10 @@ def get_filter_qtableview_mincut(dialog, widget_list, func_params, filter_fields
 # region private functions
 
 
-def _get_list(complet_result, form_name='', tab_name='', filter_fields='', widgetname='', formtype='', linkedobject='', feature_id=''):
+def _get_list(complet_result, form_name='', tab_name='', filter_fields='', widgetname='', formtype='', linkedobject='', feature_id='', id_name=None):
 
     form = f'"formName":"{form_name}", "tabName":"{tab_name}", "widgetname":"{widgetname}", "formtype":"{formtype}"'
-    id_name = complet_result['body']['feature']['idName']
+    id_name = complet_result['body']['feature']['idName'] if id_name is None else id_name
     feature = f'"tableName":"{linkedobject}", "idName":"{id_name}", "id":"{feature_id}"'
     body = tools_gw.create_body(form, feature, filter_fields)
     json_result = tools_gw.execute_procedure('gw_fct_getlist', body, log_sql=True)
