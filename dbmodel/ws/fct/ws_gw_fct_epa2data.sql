@@ -114,6 +114,9 @@ BEGIN
 		END IF;
 	END IF;
 
+    -- Manage nulls
+	v_affected_result := COALESCE(v_affected_result, '[]');
+
   	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
