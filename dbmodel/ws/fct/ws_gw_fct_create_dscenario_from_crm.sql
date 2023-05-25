@@ -77,9 +77,9 @@ BEGIN
 
 	-- create log
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CREATE DSCENARIO FROM CRM'));
-	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '--------------------------------------------------');
 
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, concat(''));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'ERRORS');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '--------');
 	
@@ -101,7 +101,6 @@ BEGIN
 		
 	ELSE
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '--------------------------------------------------');
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('New scenario: ',v_name, ' ( ',v_scenarioid,' )'));
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Copy from CRM period: ',v_crm_name));
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Source pattern: ',v_pattern));
@@ -117,13 +116,22 @@ BEGIN
 		-- this factor is calculated assuming period value is on M3
 		v_factor = 1000*(SELECT value::json->>v_demandunits FROM config_param_system WHERE parameter = 'epa_units_factor')::float/v_periodseconds::float;		
 
+
 		-- total number of hydrometers
-		SELECT count(*) INTO v_total_hydro FROM ext_rtc_hydrometer_x_data JOIN v_rtc_hydrometer USING (hydrometer_id) WHERE  cat_period_id  = v_period AND expl_id = v_expl;
+		SELECT count(*) INTO v_total_hydro FROM ext_rtc_hydrometer_x_data 
+		JOIN ext_rtc_hydrometer erh on erh.id::varchar = hydrometer_id
+		JOIN rtc_hydrometer_x_connec hc USING (hydrometer_id) 
+		JOIN connec c ON c.connec_id = hc.connec_id
+		WHERE  cat_period_id  = v_period AND c.expl_id = v_expl;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 		VALUES (v_fid, v_result_id, 1, concat('There are ', v_total_hydro, ' hydrometers with data for this period and this exploitation.'));
-
+	
 		-- total volume of hydrometers
-		SELECT sum(sum) INTO v_total_vol FROM ext_rtc_hydrometer_x_data JOIN v_rtc_hydrometer USING (hydrometer_id) WHERE  cat_period_id  = v_period AND expl_id = v_expl;
+		SELECT sum(sum) INTO v_total_vol FROM ext_rtc_hydrometer_x_data 
+		JOIN ext_rtc_hydrometer erh on erh.id::varchar = hydrometer_id
+		JOIN rtc_hydrometer_x_connec hc USING (hydrometer_id) 
+		JOIN connec c ON c.connec_id = hc.connec_id	
+		WHERE  cat_period_id  = v_period AND c.expl_id = v_expl;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 		VALUES (v_fid, v_result_id, 1, concat('The total volume (m3) for all the hydrometers is ', v_total_vol,'.'));
 
@@ -134,7 +142,7 @@ BEGIN
 		JOIN ext_rtc_hydrometer h ON h.id::text = d.hydrometer_id::text
 		JOIN rtc_hydrometer_x_connec hc USING (hydrometer_id) 
 		JOIN connec c ON c.connec_id = hc.connec_id
-		WHERE cat_period_id  = v_period AND c.expl_id = v_expl
+		WHERE cat_period_id  = v_period AND c.expl_id = v_expl and c.state > 0
 		order by 2;
 		
 		-- real number of hydrometers
@@ -149,7 +157,7 @@ BEGIN
 		JOIN ext_rtc_hydrometer h ON h.id::text = d.hydrometer_id::text
 		JOIN rtc_hydrometer_x_node USING (hydrometer_id) 
 		JOIN node USING (node_id)
-		WHERE cat_period_id = v_period AND node.expl_id = v_expl
+		WHERE cat_period_id = v_period AND node.expl_id = v_expl AND node.state > 0
 		order by 2;
 
 		-- real number of hydrometers
@@ -164,7 +172,10 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 		VALUES (v_fid, v_result_id, 1, concat('The volume water inserted is ',v_count2,', wich it means that lossed water percentatge due leak of data have been ', 
 		(100-100*v_count2::float/v_total_vol::float)::numeric(12,2),' %.'));
-		
+
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
+		VALUES (v_fid, v_result_id, 1, concat('The water loss could be motivated by current connecs with state = 0 which they was operative for that period with some hydrometer linked'));
+	
 		-- update patterns  (1 -> none)
 		IF v_pattern = 2 THEN -- sector default
 
