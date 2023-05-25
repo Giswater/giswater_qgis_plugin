@@ -327,7 +327,7 @@ BEGIN
 	JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id 
 	JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
 	JOIN v_edit_connec ON om_mincut_connec.connec_id=v_edit_connec.connec_id
-	WHERE result_id=result_id_arg AND v_edit_connec.is_operative=TRUE AND v_rtc_hydrometer.connec_id=om_mincut_connec.connec_id;
+	WHERE result_id=result_id_arg AND v_edit_connec.is_operative=TRUE AND v_rtc_hydrometer.feature_id=om_mincut_connec.connec_id;
 
 	-- insert hydrometer from node
 	INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
@@ -335,7 +335,7 @@ BEGIN
 	JOIN om_mincut_node ON rtc_hydrometer_x_node.node_id=om_mincut_node.node_id 
 	JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_node.hydrometer_id
 	JOIN v_edit_node ON om_mincut_node.node_id=v_edit_node.node_id
-	WHERE result_id=result_id_arg AND v_edit_node.is_operative=TRUE AND v_rtc_hydrometer.node_id=om_mincut_node.node_id;
+	WHERE result_id=result_id_arg AND v_edit_node.is_operative=TRUE AND v_rtc_hydrometer.feature_id=om_mincut_node.node_id;
 
 	-- fill connnec & hydrometer details on om_mincut.output
 	-- count arcs
@@ -362,7 +362,7 @@ BEGIN
 			JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id 
 			JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
 			LEFT JOIN ext_hydrometer_category hc ON hc.id::text=v_rtc_hydrometer.category_id::text
-			JOIN connec ON connec.connec_id=v_rtc_hydrometer.connec_id WHERE result_id=result_id_arg 
+			JOIN connec ON connec.connec_id=v_rtc_hydrometer.feature_id WHERE result_id=result_id_arg
 			GROUP BY hc.observ ORDER BY hc.observ)a);
 				
 	IF v_priority IS NULL THEN v_priority='{}'; END IF;
