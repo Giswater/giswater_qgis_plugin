@@ -172,6 +172,11 @@ class Giswater(QObject):
         except Exception as e:
             tools_log.log_info(f"Exception in unload when self._set_info_button(): {e}")
 
+        try:
+            tools_gw.set_epa_world(False, True)
+        except Exception as e:
+            tools_log.log_info(f"Exception in unload when self._set_info_button(): {e}")
+
         self.load_project = None
 
 

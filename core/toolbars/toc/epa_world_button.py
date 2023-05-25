@@ -36,20 +36,22 @@ def _get_layers():
     return arc_layers, node_layers, connec_layers, gully_layers, link_layers
 
 
-def set_epa_world(_set_epa_world=None):
+def set_epa_world(_set_epa_world=None, unload_plugin=None):
     # Get layers
     arc_layers, node_layers, connec_layers, gully_layers, link_layers = _get_layers()
-
     # Get set_epa_world from config
     if _set_epa_world is None:
         _set_epa_world = tools_os.set_boolean(
             tools_gw.get_config_parser("epa_world", "epa_world_active", 'user', 'session'), False)
-
     if not _set_epa_world:
-        # Disable current filters and set previous layer filters
-        for layer in arc_layers + node_layers + connec_layers + gully_layers + link_layers:
-            layer.setSubsetString(layers_subsetstrings.get(layer.name()))
-
+        if unload_plugin:
+            # Disable current filters and set previous layer filters
+            for layer in arc_layers + node_layers + connec_layers + gully_layers + link_layers:
+                layer.setSubsetString("")
+        else:
+            # Disable current filters and set previous layer filters
+            for layer in arc_layers + node_layers + connec_layers + gully_layers + link_layers:
+                layer.setSubsetString(layers_subsetstrings.get(layer.name()))
     else:
         # Get layers subsetStrings
         for layer in arc_layers + node_layers + connec_layers + gully_layers + link_layers:
@@ -136,26 +138,27 @@ class GwEpaWorldButton(GwAction):
 
     # region private functions
 
-    def _switch_epa_world(self):
+    def _switch_epa_world(self, unload_plugin=None):
         # Check world type
         epa_world_active = tools_os.set_boolean(
             tools_gw.get_config_parser("epa_world", "epa_world_active", 'user', 'session'))
 
         # Apply filters
         _set_epa_world = not epa_world_active
-        set_epa_world(_set_epa_world)
 
-        tools_gw.set_config_parser("epa_world", "epa_world_active", str(not epa_world_active), 'user', 'session')
+        set_epa_world(_set_epa_world, unload_plugin)
+        if unload_plugin is None:
+            tools_gw.set_config_parser("epa_world", "epa_world_active", str(not epa_world_active), 'user', 'session')
 
-        # Set action checked
-        self._action_set_checked(_set_epa_world)
+            # Set action checked
+            self._action_set_checked(_set_epa_world)
 
-        # Show message
-        if _set_epa_world:
-            msg = "EPA point of view activated"
-        else:
-            msg = "EPA point of view deactivated"
-        tools_qgis.show_info(msg)
+            # Show message
+            if _set_epa_world:
+                msg = "EPA point of view activated"
+            else:
+                msg = "EPA point of view deactivated"
+            tools_qgis.show_info(msg)
 
     def _action_set_checked(self, checked):
         # Set checked
