@@ -1441,3 +1441,17 @@ UPDATE config_form_fields set tabname = 'tab_relation' where tabname = 'relation
 
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
 
+-- 2023/05/25
+UPDATE config_form_fields
+	SET dv_querytext_filterc=NULL
+	WHERE formtype='form_feature' AND columnname='cat_period_id' AND tabname='tab_hydrometer_val';
+UPDATE config_form_fields
+	SET dv_querytext_filterc='WHERE feature_id '
+	WHERE formtype='form_feature' AND columnname='hydrometer_customer_code' AND tabname='tab_hydrometer_val';
+
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName": "filter_table", "parameters": {"field_id": "feature_id"}}'::json
+	WHERE formtype='form_feature' AND columnname IN ('cat_period_id', 'hydrometer_customer_code') AND tabname='tab_hydrometer_val';
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName": "filter_table", "parameters": {"columnfind": "hydrometer_customer_code", "field_id": "feature_id"}}'::json
+	WHERE formtype='form_feature' AND columnname='hydrometer_id' AND tabname='tab_hydrometer';
