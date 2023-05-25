@@ -1175,11 +1175,6 @@ VALUES('tbl_mincut_manager', 'SELECT id, name, work_order, state, class, mincut_
     ]
   }'::json);
 
-INSERT INTO config_form_tabs
-(formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby)
-VALUES('selector_mincut', 'tab_mincut', 'Mincut', 'Mincut Selector', 'role_basic', NULL, NULL, '{5}', 1);
-
-
 UPDATE link l SET epa_type = c.epa_type, is_operative = v.is_operative 
 FROM connec c
 JOIN value_state_type v ON v.id = c.state_type WHERE l.feature_id = c.connec_id;
@@ -1345,31 +1340,6 @@ UPDATE config_form_list SET query_text =
 FROM v_ui_hydroval_x_connec WHERE hydrometer_id IS NOT NULL '
 WHERE listname = 'tbl_hydrometer_value';
 
-INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,device,orderby)
-	VALUES ('v_edit_arc','tab_documents','Doc','List of documents','role_basic','[{"actionName":"actionEdit", "disabled":false}, {"actionName":"actionZoom", "disabled":false}, {"actionName":"actionCentered", "disabled":false}, {"actionName":"actionZoomOut", "disabled":false}, {"actionName":"actionCatalog", "disabled":false}, {"actionName":"actionWorkcat", "disabled":false}, {"actionName":"actionCopyPaste","disabled":false}, {"actionName":"actionSection", "disabled":false}, {"actionName":"actionGetParentId", "disabled":false}, {"actionName":"actionLink",  "disabled":false}]'::json,'{5}',4);
-INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,device,orderby)
-	VALUES ('v_edit_arc','tab_relations','Relations','List of relations','role_basic','[{"actionName":"actionEdit", "disabled":false}, {"actionName":"actionZoom", "disabled":false}, {"actionName":"actionCentered", "disabled":false}, {"actionName":"actionZoomOut", "disabled":false}, {"actionName":"actionCatalog", "disabled":false}, {"actionName":"actionWorkcat", "disabled":false}, {"actionName":"actionCopyPaste","disabled":false}, {"actionName":"actionSection", "disabled":false}, {"actionName":"actionGetParentId", "disabled":false}, {"actionName":"actionLink",  "disabled":false}]'::json,'{5}',3);
-INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,device,orderby)
-	VALUES ('v_edit_arc','tab_data','Data','Data','role_basic','[{"actionName":"actionEdit", "disabled":false}, {"actionName":"actionZoom", "disabled":false}, {"actionName":"actionCentered", "disabled":false}, {"actionName":"actionZoomOut", "disabled":false}, {"actionName":"actionCatalog", "disabled":false}, {"actionName":"actionWorkcat", "disabled":false}, {"actionName":"actionCopyPaste","disabled":false}, {"actionName":"actionSection", "disabled":false}, {"actionName":"actionGetParentId", "disabled":false}, {"actionName":"actionLink", "disabled":false}]'::json,'{5}',1);
-INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,device,orderby)
-	VALUES ('v_edit_arc','tab_elements','Elem','List of related elements','role_basic','[{"actionName":"actionEdit", "disabled":false}, {"actionName":"actionZoom", "disabled":false}, {"actionName":"actionCentered", "disabled":false}, {"actionName":"actionZoomOut", "disabled":false}, {"actionName":"actionCatalog", "disabled":false}, {"actionName":"actionWorkcat", "disabled":false}, {"actionName":"actionCopyPaste","disabled":false}, {"actionName":"actionSection", "disabled":false}, {"actionName":"actionGetParentId", "disabled":false}, {"actionName":"actionLink",  "disabled":false}]'::json,'{5}',2);
-
-INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,device,orderby)
-	VALUES ('v_edit_node','tab_data','Data','Data','role_basic','[{"actionName":"actionEdit",  "disabled":false}, {"actionName":"actionZoom",  "disabled":false}, {"actionName":"actionCentered",  "disabled":false}, {"actionName":"actionZoomOut" , "disabled":false}, {"actionName":"actionCatalog",  "disabled":false}, {"actionName":"actionWorkcat",  "disabled":false}, {"actionName":"actionCopyPaste",  "disabled":false}, {"actionName":"actionLink",  "disabled":false}, {"actionName":"actionMapZone",  "disabled":false}, {"actionName":"actionSetToArc",  "disabled":false}, {"actionName":"actionGetParentId",  "disabled":false}, {"actionName":"actionGetArcId", "disabled":false}, {"actionName": "actionRotation","disabled": false}, {"actionName":"actionInterpolate", "disabled":false}]'::json,'{5}',1);
-INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,device,orderby)
-	VALUES ('v_edit_node','tab_elements','Elem','List of related elements','role_basic','[{"actionName":"actionEdit",  "disabled":false}, {"actionName":"actionZoom",  "disabled":false}, {"actionName":"actionCentered",  "disabled":false}, {"actionName":"actionZoomOut" , "disabled":false}, {"actionName":"actionCatalog",  "disabled":false}, {"actionName":"actionWorkcat",  "disabled":false}, {"actionName":"actionCopyPaste",  "disabled":false}, {"actionName":"actionLink",  "disabled":false}, {"actionName":"actionMapZone",  "disabled":false}, {"actionName":"actionSetToArc",  "disabled":false}, {"actionName":"actionGetParentId",  "disabled":false}, {"actionName":"actionGetArcId", "disabled":false}, {"actionName": "actionRotation","disabled": false}, {"actionName":"actionInterpolate", "disabled":false}]'::json,'{5}',2);
-INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,device,orderby)
-	VALUES ('v_edit_node','tab_documents','Doc','List of documents','role_basic','[{"actionName":"actionEdit",  "disabled":false}, {"actionName":"actionZoom",  "disabled":false}, {"actionName":"actionCentered",  "disabled":false}, {"actionName":"actionZoomOut" , "disabled":false}, {"actionName":"actionCatalog",  "disabled":false}, {"actionName":"actionWorkcat",  "disabled":false}, {"actionName":"actionCopyPaste",  "disabled":false}, {"actionName":"actionLink",  "disabled":false}, {"actionName":"actionMapZone",  "disabled":false}, {"actionName":"actionSetToArc",  "disabled":false}, {"actionName":"actionGetParentId",  "disabled":false}, {"actionName":"actionGetArcId", "disabled":false}, {"actionName": "actionRotation","disabled": false}, {"actionName":"actionInterpolate", "disabled":false}]'::json,'{5}',3);
-
-INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,device,orderby)
-	VALUES ('v_edit_connec','tab_data','Data','Data','role_basic','[{"actionName":"actionEdit", "disabled":false}, {"actionName":"actionZoom", "disabled":false}, {"actionName":"actionCentered", "disabled":false}, {"actionName":"actionZoomOut", "disabled":false}, {"actionName":"actionCatalog", "disabled":false}, {"actionName":"actionWorkcat","disabled":false}, {"actionName":"actionCopyPaste",  "disabled":false}, {"actionName":"actionLink",  "disabled":false}, {"actionName":"actionGetArcId", "disabled":false}]'::json,'{5}',1);
-INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,device,orderby)
-	VALUES ('v_edit_connec','tab_elements','Elem','List of related elements','role_basic','[{"actionName":"actionEdit", "disabled":false}, {"actionName":"actionZoom", "disabled":false}, {"actionName":"actionCentered", "disabled":false}, {"actionName":"actionZoomOut", "disabled":false}, {"actionName":"actionCatalog", "disabled":false}, {"actionName":"actionWorkcat","disabled":false}, {"actionName":"actionCopyPaste",  "disabled":false}, {"actionName":"actionLink",  "disabled":false}, {"actionName":"actionGetArcId", "disabled":false}]'::json,'{5}',2);
-INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,device,orderby)
-	VALUES ('v_edit_connec','tab_hydrometer','Hydro','List of hydrometers','role_basic','[{"actionName":"actionEdit", "disabled":false}, {"actionName":"actionZoom", "disabled":false}, {"actionName":"actionCentered", "disabled":false}, {"actionName":"actionZoomOut", "disabled":false}, {"actionName":"actionCatalog", "disabled":false}, {"actionName":"actionWorkcat","disabled":false}, {"actionName":"actionCopyPaste",  "disabled":false}, {"actionName":"actionLink",  "disabled":false}, {"actionName":"actionGetArcId", "disabled":false}]'::json,'{5}',3);
-INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,device,orderby)
-    VALUES ('v_edit_connec','tab_documents','Doc','List of documents','role_basic','[{"actionName":"actionEdit", "disabled":false}, {"actionName":"actionZoom", "disabled":false}, {"actionName":"actionCentered", "disabled":false}, {"actionName":"actionZoomOut", "disabled":false}, {"actionName":"actionCatalog", "disabled":false}, {"actionName":"actionWorkcat","disabled":false}, {"actionName":"actionCopyPaste",  "disabled":false}, {"actionName":"actionLink",  "disabled":false}, {"actionName":"actionGetArcId", "disabled":false}]'::json,'{5}',4);
-
 -- search
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) 
     VALUES('basic_search_v2_mincut', '{"sys_display_name": "concat(id, '' - '', street_name,'', '',  postnumber, '' - '', state_name)","sys_tablename": "vu_om_mincut","sys_filter": "state = 0 OR state = 1","sys_orderby": "id","sys_pk": "id","sys_fct": "gw_fct_getmincut"}', 'Search configuration parameteres', 'Mincut:', NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -1382,7 +1352,7 @@ WHERE columnname = 'epa_type' and formname like '%connec%';
 INSERT INTO config_form_tabs ( formname, tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby)
 SELECT child_layer,  tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby
 FROM config_form_tabs,cat_feature WHERE tabname in ('tab_hydrometer', 'tab_hydrometer_val') 
-and system_id = 'NETWJOIN' ON CONFLICT (formname, tabname, device) DO NOTHING;
+and system_id = 'NETWJOIN' ON CONFLICT (formname, tabname) DO NOTHING;
 
 
 DELETE FROM config_toolbox where id IN (SELECT id FROM sys_function WHERE project_type  ='ud');

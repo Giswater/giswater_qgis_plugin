@@ -77,7 +77,7 @@ BEGIN
 	IF v_view_name IS NOT NULL AND v_project_type = 'WS' and v_feature_system_id = 'netwjoin' THEN
 		INSERT INTO config_form_tabs ( formname, tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby)
 		SELECT v_view_name,  tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby
-		FROM config_form_tabs WHERE tabname in ('tab_hydrometer', 'tab_hydrometer_val') ON CONFLICT (formname, tabname, device) DO NOTHING;
+		FROM config_form_tabs WHERE tabname in ('tab_hydrometer', 'tab_hydrometer_val') ON CONFLICT (formname, tabname) DO NOTHING;
 	END IF;
 
 	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_info_layer_x_type) THEN

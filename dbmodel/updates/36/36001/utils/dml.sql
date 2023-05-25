@@ -532,13 +532,6 @@ UPDATE config_form_fields
 UPDATE config_form_tabs SET "label"='Hydro'
 	WHERE formname='v_edit_connec' AND tabname='tab_hydrometer' AND device=4;
 
--- web
--- selector
-INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,device,orderby)
-	VALUES ('selector_basic','tab_exploitation','Expl','Active exploitation','role_basic',5,1);
-INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,device,orderby)
-	VALUES ('selector_basic','tab_network_state','State','Network','role_basic',5,3);
-
 -- search
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) 
     VALUES('basic_search_v2_address', '{"sys_display_name":"concat(s.name, '', '', m.name)","sys_filter_fields":"s.name", "sys_tablename":"v_ext_streetaxis s join ext_municipality m using(muni_id)","sys_tablename_aux":"v_ext_streetaxis", "sys_pk":"s.name", "sys_query_text_add":"SELECT distinct(concat(s.name, '', '', m.name, '', '', a.postnumber)) as display_name FROM v_ext_streetaxis s join ext_municipality m using(muni_id) join v_ext_address a on s.id = a.streetaxis_id WHERE concat(s.name, '', '', m.name, '', '', a.postnumber) ILIKE "}', 'Search configuration parameteres', 'Address:', NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -1121,10 +1114,9 @@ UPDATE config_form_tabs SET device_new = '{4,5}' where formname in ('selector_mi
 UPDATE config_form_tabs SET device_new = '{4,5}' where formname in ('selector_mincut');
 UPDATE config_form_tabs SET device_new = '{1,2,3,4}' where formname in ('visit');
 
-DELETE FROM config_form_tabs WHERE formname = 'selector_basic' and device = 5;
-DELETE FROM config_form_tabs WHERE formname = 'selector_mincut' and device = 5;
-DELETE FROM config_form_tabs WHERE formname in ('v_edit_arc','v_edit_node','v_edit_connec','v_edit_gully') and device = 5;
 DELETE FROM config_form_tabs WHERE formname in ('visit') and device in (2,3,4);
 
 ALTER TABLE config_form_tabs DROP column device;
 ALTER TABLE config_form_tabs RENAME column device_new TO device;
+
+ALTER TABLE config_form_tabs ADD CONSTRAINT config_form_tabs_pkey PRIMARY KEY (formname, tabname);

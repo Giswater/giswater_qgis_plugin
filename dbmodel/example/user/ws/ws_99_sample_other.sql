@@ -994,5 +994,5 @@ GRANT SELECT, TRIGGER, UPDATE, DELETE, REFERENCES, INSERT, TRUNCATE ON TABLE ve_
 GRANT SELECT, TRIGGER, UPDATE, DELETE, REFERENCES, INSERT, TRUNCATE ON TABLE ve_visit_node_leak TO role_om;
 GRANT SELECT, TRIGGER, UPDATE, DELETE, REFERENCES, INSERT, TRUNCATE ON TABLE ve_visit_connec_leak TO role_om;
 
-UPDATE config_form_tabs SET device_new = '{4,5}' where formname = 've_node_water_connection';
-UPDATE config_form_tabs SET device_new = '{5}' where formname like 'visit_%';
+UPDATE config_form_tabs SET device = '{4,5}' where formname = 've_node_water_connection';
+UPDATE config_form_tabs SET device = '{5}' where formname like 'visit_%';
