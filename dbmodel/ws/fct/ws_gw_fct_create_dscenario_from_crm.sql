@@ -251,13 +251,17 @@ BEGIN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 				VALUES (v_fid, v_result_id, 2, concat('WARNING-403: ',v_count-v_count2,' rows have not been updated. This may be for missed data from source pattern table.'));
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
-				VALUES (v_fid, v_result_id, 2, concat('SECTOR PERIOD: ext_rtc_sector_period table.'));
+				VALUES (v_fid, v_result_id, 2, concat('SECTOR DEFAULT: sector table.'));
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
+				VALUES (v_fid, v_result_id, 2, concat('DMA DEFAULT: dma table.'));
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 				VALUES (v_fid, v_result_id, 2, concat('DMA PERIOD: ext_rtc_dma_period table.'));
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 				VALUES (v_fid, v_result_id, 2, concat('HYDROMETER PERIOD: ext_rtc_hydrometer_x_data table.'));
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
-				VALUES (v_fid, v_result_id, 2, concat('HYDROMETER PERIOD: hydrometer_category table.'));
+				VALUES (v_fid, v_result_id, 2, concat('HYDROMETER CATEGORY: hydrometer_category table.'));
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
+				VALUES (v_fid, v_result_id, 2, concat('FEATURE PATTERN: inp_junction & inp_connec tables.'));
 			END IF;
 		END IF;
 				
