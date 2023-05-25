@@ -795,7 +795,7 @@ INSERT INTO sys_function (id, function_name, project_type, function_type) VALUES
 -- harmonize tabs 24/05/2023
 ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
 
---UPDATE config_form_fields set tabname = 'tab_data' where tabname = 'data';
+UPDATE config_form_fields set tabname = 'tab_data' where tabname = 'data';
 UPDATE config_form_fields set tabname = 'tab_documents' where tabname = 'document';
 UPDATE config_form_fields set tabname = 'tab_hydrometer' where tabname = 'hydrometer';
 UPDATE config_form_fields set tabname = 'tab_elements' where tabname = 'element';
@@ -805,5 +805,6 @@ UPDATE config_form_fields set tabname = 'tab_hydrometer_val' where tabname = 'hy
 UPDATE config_form_fields set tabname = 'tab_none' where tabname = 'main';
 UPDATE config_form_fields set tabname = 'tab_visit' where tabname = 'visit';
 UPDATE config_form_fields set tabname = 'tab_event' where tabname = 'event';
+UPDATE config_form_fields set tabname = 'tab_relation' where tabname = 'relation';
 
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
