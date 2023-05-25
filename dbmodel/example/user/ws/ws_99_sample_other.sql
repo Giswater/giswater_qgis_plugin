@@ -746,7 +746,7 @@ SET formname = 'visit_valve_insp'
 WHERE id = 7;
 
 UPDATE config_visit_class
-SET formname = 've_visit_arc_leak'
+SET formname = 'visit_arc_leak'
 WHERE id = 1;
 
 CREATE OR REPLACE VIEW ve_visit_arc_leak
