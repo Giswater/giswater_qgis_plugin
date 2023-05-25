@@ -33,7 +33,7 @@ INSERT INTO config_form_tabs VALUES ('v_edit_gully','tab_epa','EPA results',NULL
 {"actionName":"actionLink", "actionTooltip":"Open Link",  "disabled":false}, {"actionName":"actionHelp", "actionTooltip":"Help",  "disabled":false},
 {"actionName":"actionMapZone", "actionTooltip":"Add Mapzone",  "disabled":false}, {"actionName":"actionSetToArc", "actionTooltip":"Set to_arc",  "disabled":false},
 {"actionName":"actionGetParentId", "actionTooltip":"Set parent_id",  "disabled":false}, {"actionName":"actionGetArcId", "actionTooltip":"Set arc_id",  "disabled":false},
-{"actionName": "actionRotation", "actionTooltip": "Rotation","disabled": false}]',4, 1) ON CONFLICT (formname, tabname, device) DO NOTHING;
+{"actionName": "actionRotation", "actionTooltip": "Rotation","disabled": false}]','{4}', 1) ON CONFLICT (formname, tabname, device) DO NOTHING;
 
 --junction
 INSERT INTO config_form_list(listname, query_text, device, listtype, listclass)
@@ -500,7 +500,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName":"actionCopyPaste", "disabled":false},
 {"actionName":"actionSection", "disabled":false},
 {"actionName":"actionLink", "disabled":false},
-{"actionName":"actionHelp", "disabled":false}]'::json, 5, 5);
+{"actionName":"actionHelp", "disabled":false}]'::json, '{5}', 5);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_arc', 'tab_documents', 'Doc', 'List of documents', 'role_basic', NULL, '[{"actionName":"actionEdit", "disabled":false},
 {"actionName":"actionZoom", "disabled":false},
 {"actionName":"actionCentered", "disabled":false},
@@ -510,7 +510,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName":"actionCopyPaste", "disabled":false},
 {"actionName":"actionSection", "disabled":false},
 {"actionName":"actionLink", "disabled":false},
-{"actionName":"actionHelp", "disabled":false}]'::json, 5, 4);
+{"actionName":"actionHelp", "disabled":false}]'::json, '{5}', 4);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_arc', 'tab_epa', 'EPA inp', 'List of Result EPA values', 'role_basic', NULL, '[{"actionName":"actionEdit", "disabled":false},
 {"actionName":"actionZoom", "disabled":false},
 {"actionName":"actionCentered", "disabled":false},
@@ -520,7 +520,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName":"actionCopyPaste", "disabled":false},
 {"actionName":"actionSection", "disabled":false},
 {"actionName":"actionLink", "disabled":false},
-{"actionName":"actionHelp", "disabled":false}]'::json, 5, NULL);
+{"actionName":"actionHelp", "disabled":false}]'::json, '{5}', NULL);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_arc', 'tab_plan', 'Cost', 'List of costs', 'role_basic', NULL, '[{"actionName":"actionEdit", "disabled":false},
 {"actionName":"actionZoom", "disabled":false},
 {"actionName":"actionCentered", "disabled":false},
@@ -530,7 +530,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName":"actionCopyPaste", "disabled":false},
 {"actionName":"actionSection", "disabled":false},
 {"actionName":"actionLink", "disabled":false},
-{"actionName":"actionHelp", "disabled":false}]'::json, 5, NULL);
+{"actionName":"actionHelp", "disabled":false}]'::json, '{5}', NULL);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_arc', 'tab_relations', 'Relations', 'List of relations', 'role_basic', NULL, '[{"actionName":"actionEdit", "disabled":false},
 {"actionName":"actionZoom", "disabled":false},
 {"actionName":"actionCentered", "disabled":false},
@@ -540,7 +540,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName":"actionCopyPaste", "disabled":false},
 {"actionName":"actionSection", "disabled":false},
 {"actionName":"actionLink", "disabled":false},
-{"actionName":"actionHelp", "disabled":false}]'::json, 5, 3);
+{"actionName":"actionHelp", "disabled":false}]'::json, '{5}', 3);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_arc', 'tab_elements', 'Elem', 'List of related elements', 'role_basic', NULL, '[{"actionName":"actionEdit", "disabled":false},
 {"actionName":"actionZoom", "disabled":false},
 {"actionName":"actionCentered", "disabled":false},
@@ -550,7 +550,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName":"actionCopyPaste", "disabled":false},
 {"actionName":"actionSection", "disabled":false},
 {"actionName":"actionLink", "disabled":false},
-{"actionName":"actionHelp", "disabled":false}]'::json, 5, 2);
+{"actionName":"actionHelp", "disabled":false}]'::json, '{5}', 2);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_arc', 'tab_data', 'Data', 'Data', 'role_basic', NULL, '[{"actionName":"actionEdit", "disabled":false},
 {"actionName":"actionZoom", "disabled":false},
 {"actionName":"actionCentered", "disabled":false},
@@ -560,7 +560,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName":"actionCopyPaste", "disabled":false},
 {"actionName":"actionSection", "disabled":false},
 {"actionName":"actionLink", "disabled":false},
-{"actionName":"actionHelp", "disabled":false}]'::json, 5, 1);
+{"actionName":"actionHelp", "disabled":false}]'::json, '{5}', 1);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_connec', 'tab_hydrometer_val', 'Consumption', 'List of consumption values', 'role_basic', NULL, '[{"actionName":"actionEdit", "disabled":false},
 {"actionName":"actionZoom", "disabled":false},
 {"actionName":"actionCentered", "disabled":false},
@@ -570,7 +570,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName":"actionCopyPaste", "disabled":false},
 {"actionName":"actionLink", "disabled":false},
 {"actionName":"actionHelp", "disabled":false}, 
-{"actionName":"actionGetArcId", "disabled":false}]'::json, 5, NULL);
+{"actionName":"actionGetArcId", "disabled":false}]'::json, '{5}', NULL);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_connec', 'tab_data', 'Data', 'Data', 'role_basic', NULL, '[{"actionName":"actionEdit", "disabled":false},
 {"actionName":"actionZoom", "disabled":false},
 {"actionName":"actionCentered", "disabled":false},
@@ -580,7 +580,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName":"actionCopyPaste", "disabled":false},
 {"actionName":"actionLink", "disabled":false},
 {"actionName":"actionHelp", "disabled":false}, 
-{"actionName":"actionGetArcId", "disabled":false}]'::json, 5, 1);
+{"actionName":"actionGetArcId", "disabled":false}]'::json, '{5}', 1);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_connec', 'tab_elements', 'Elem', 'List of related elements', 'role_basic', NULL, '[{"actionName":"actionEdit", "disabled":false},
 {"actionName":"actionZoom", "disabled":false},
 {"actionName":"actionCentered", "disabled":false},
@@ -590,7 +590,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName":"actionCopyPaste", "disabled":false},
 {"actionName":"actionLink", "disabled":false},
 {"actionName":"actionHelp", "disabled":false}, 
-{"actionName":"actionGetArcId", "disabled":false}]'::json, 5, 2);
+{"actionName":"actionGetArcId", "disabled":false}]'::json, '{5}', 2);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_connec', 'tab_epa', 'EPA inp', NULL, 'role_basic', NULL, '[{"actionName":"actionEdit", "disabled":false},
 {"actionName":"actionZoom", "disabled":false},
 {"actionName":"actionCentered", "disabled":false},
@@ -600,7 +600,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName":"actionCopyPaste", "disabled":false},
 {"actionName":"actionLink", "disabled":false},
 {"actionName":"actionHelp", "disabled":false}, 
-{"actionName":"actionGetArcId", "disabled":false}]'::json, 5, NULL);
+{"actionName":"actionGetArcId", "disabled":false}]'::json, '{5}', NULL);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_connec', 'tab_hydrometer', 'Subscriber', 'List of hydrometers', 'role_basic', NULL, '[{"actionName":"actionEdit", "disabled":false},
 {"actionName":"actionZoom", "disabled":false},
 {"actionName":"actionCentered", "disabled":false},
@@ -610,7 +610,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName":"actionCopyPaste", "disabled":false},
 {"actionName":"actionLink", "disabled":false},
 {"actionName":"actionHelp", "disabled":false}, 
-{"actionName":"actionGetArcId", "disabled":false}]'::json, 5, NULL);
+{"actionName":"actionGetArcId", "disabled":false}]'::json, '{5}', NULL);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_connec', 'tab_documents', 'Doc', 'List of documents', 'role_basic', NULL, '[{"actionName":"actionEdit", "disabled":false},
 {"actionName":"actionZoom", "disabled":false},
 {"actionName":"actionCentered", "disabled":false},
@@ -620,7 +620,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName":"actionCopyPaste", "disabled":false},
 {"actionName":"actionLink", "disabled":false},
 {"actionName":"actionHelp", "disabled":false}, 
-{"actionName":"actionGetArcId", "disabled":false}]'::json, 5, 5);
+{"actionName":"actionGetArcId", "disabled":false}]'::json, '{5}', 5);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_connec', 'tab_event', 'OM', 'List of events', 'role_basic', NULL, '[{"actionName":"actionEdit", "disabled":false},
 {"actionName":"actionZoom", "disabled":false},
 {"actionName":"actionCentered", "disabled":false},
@@ -630,7 +630,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName":"actionCopyPaste", "disabled":false},
 {"actionName":"actionLink", "disabled":false},
 {"actionName":"actionHelp", "disabled":false}, 
-{"actionName":"actionGetArcId", "disabled":false}]'::json, 5, 6);
+{"actionName":"actionGetArcId", "disabled":false}]'::json, '{5}', 6);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_gully', 'tab_elements', 'Elem', 'List of related elements', 'role_basic', NULL, '[{"actionName":"actionEdit", "disabled":true},
 {"actionName":"actionZoom", "disabled":false},
 {"actionName":"actionCentered", "disabled":false},
@@ -639,7 +639,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName":"actionCopyPaste", "disabled":false},
 {"actionName":"actionLink", "disabled":false},
 {"actionName":"actionHelp", "disabled":false}, 
-{"actionName":"actionGetArcId", "disabled":false}]'::json, 5, NULL);
+{"actionName":"actionGetArcId", "disabled":false}]'::json, '{5}', NULL);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_gully', 'tab_data', 'Data', 'Data', 'role_basic', NULL, '[{"actionName":"actionEdit", "disabled":true},
 {"actionName":"actionZoom", "disabled":false},
 {"actionName":"actionCentered", "disabled":false},
@@ -648,7 +648,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName":"actionCopyPaste", "disabled":false},
 {"actionName":"actionLink", "disabled":false},
 {"actionName":"actionHelp", "disabled":false}, 
-{"actionName":"actionGetArcId", "disabled":false}]'::json, 5, 1);
+{"actionName":"actionGetArcId", "disabled":false}]'::json, '{5}', 1);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_gully', 'tab_event', 'OM', 'List of events', 'role_basic', NULL, '[{"actionName":"actionEdit", "disabled":true},
 {"actionName":"actionZoom", "disabled":false},
 {"actionName":"actionCentered", "disabled":false},
@@ -657,7 +657,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName":"actionCopyPaste", "disabled":false},
 {"actionName":"actionLink", "disabled":false},
 {"actionName":"actionHelp", "disabled":false}, 
-{"actionName":"actionGetArcId", "disabled":false}]'::json, 5, NULL);
+{"actionName":"actionGetArcId", "disabled":false}]'::json, '{5}', NULL);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_gully', 'tab_documents', 'Doc', 'List of documents', 'role_basic', NULL, '[{"actionName":"actionEdit", "disabled":true},
 {"actionName":"actionZoom", "disabled":false},
 {"actionName":"actionCentered", "disabled":false},
@@ -666,7 +666,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName":"actionCopyPaste", "disabled":false},
 {"actionName":"actionLink", "disabled":false},
 {"actionName":"actionHelp", "disabled":false}, 
-{"actionName":"actionGetArcId", "disabled":false}]'::json, 5, NULL);
+{"actionName":"actionGetArcId", "disabled":false}]'::json, '{5}', NULL);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_gully', 'tab_epa', 'EPA results', NULL, 'role_basic', NULL, '[{"actionName":"actionEdit", "actionTooltip":"Edit",  "disabled":false},
 {"actionName":"actionZoom", "actionTooltip":"Zoom In",  "disabled":false}, {"actionName":"actionCentered", "actionTooltip":"Center",  "disabled":false},
 {"actionName":"actionZoomOut", "actionTooltip":"Zoom Out",  "disabled":false}, {"actionName":"actionCatalog", "actionTooltip":"Change Catalog",  "disabled":false},
@@ -674,7 +674,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName":"actionLink", "actionTooltip":"Open Link",  "disabled":false}, {"actionName":"actionHelp", "actionTooltip":"Help",  "disabled":false},
 {"actionName":"actionMapZone", "actionTooltip":"Add Mapzone",  "disabled":false}, {"actionName":"actionSetToArc", "actionTooltip":"Set to_arc",  "disabled":false},
 {"actionName":"actionGetParentId", "actionTooltip":"Set parent_id",  "disabled":false}, {"actionName":"actionGetArcId", "actionTooltip":"Set arc_id",  "disabled":false},
-{"actionName": "actionRotation", "actionTooltip": "Rotation","disabled": false}]'::json, 5, NULL);
+{"actionName": "actionRotation", "actionTooltip": "Rotation","disabled": false}]'::json, '{5}', NULL);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_node', 'tab_documents', 'Doc', 'List of documents', 'role_basic', NULL, '[{"actionName": "actionEdit", "disabled": false}, 
 {"actionName": "actionZoom", "disabled": false}, 
 {"actionName": "actionCentered", "disabled": false}, 
@@ -685,7 +685,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName": "actionLink", "disabled": false},
 {"actionName":"actionGetArcId", "disabled":false},
 {"actionName":"actionInterpolate", "disabled":false},
-{"actionName": "actionHelp", "disabled": false}]'::json, 5, 4);
+{"actionName": "actionHelp", "disabled": false}]'::json, '{5}', 4);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_node', 'tab_event', 'OM', 'List of events', 'role_basic', NULL, '[{"actionName": "actionEdit", "disabled": false}, 
 {"actionName": "actionZoom", "disabled": false}, 
 {"actionName": "actionCentered", "disabled": false}, 
@@ -696,7 +696,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName": "actionLink", "disabled": false},
 {"actionName":"actionGetArcId", "disabled":false},
 {"actionName":"actionInterpolate", "disabled":false},
-{"actionName": "actionHelp", "disabled": false}]'::json, 5, 5);
+{"actionName": "actionHelp", "disabled": false}]'::json, '{5}', 5);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_node', 'tab_plan', 'Cost', 'List of costs', 'role_basic', NULL, '[{"actionName": "actionEdit", "disabled": false}, 
 {"actionName": "actionZoom", "disabled": false}, 
 {"actionName": "actionCentered", "disabled": false}, 
@@ -707,7 +707,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName": "actionLink", "disabled": false},
 {"actionName":"actionGetArcId", "disabled":false},
 {"actionName":"actionInterpolate", "disabled":false},
-{"actionName": "actionHelp", "disabled": false}]'::json, 5, NULL);
+{"actionName": "actionHelp", "disabled": false}]'::json, '{5}', NULL);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_node', 'tab_data', 'Data', 'Data', 'role_basic', NULL, '[{"actionName": "actionEdit", "disabled": false}, 
 {"actionName": "actionZoom", "disabled": false}, 
 {"actionName": "actionCentered", "disabled": false}, 
@@ -718,7 +718,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName": "actionLink", "disabled": false},
 {"actionName":"actionGetArcId", "disabled":false},
 {"actionName":"actionInterpolate", "disabled":false},
-{"actionName": "actionHelp", "disabled": false}]'::json, 5, 1);
+{"actionName": "actionHelp", "disabled": false}]'::json, '{5}', 1);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_node', 'tab_connections', 'Connections', 'Connections', 'role_basic', NULL, '[{"actionName": "actionEdit", "disabled": false}, 
 {"actionName": "actionZoom", "disabled": false}, 
 {"actionName": "actionCentered", "disabled": false}, 
@@ -729,18 +729,18 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 {"actionName": "actionLink", "disabled": false},
 {"actionName":"actionGetArcId", "disabled":false},
 {"actionName":"actionInterpolate", "disabled":false},
-{"actionName": "actionHelp", "disabled": false}]'::json, 5, NULL);
+{"actionName": "actionHelp", "disabled": false}]'::json, '{5}', NULL);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_node', 'tab_elements', 'Elem', 'List of related elements', 'role_basic', NULL, '[{"actionName": "actionEdit", "disabled": false}, 
 {"actionName": "actionZoom", "disabled": false}, 
 {"actionName": "actionCentered", "disabled": false}, 
 {"actionName": "actionZoomOut", "disabled": false}, 
 {"actionName": "actionCatalog", "disabled": false}, 
 {"actionName": "actionWorkcat", "disabled": false}, 
-{"actionName": "actionCopyPaste", "disabled": false}, 
+{"actionName": "actionCopyPaste", "disabled": false},
 {"actionName": "actionLink", "disabled": false},
 {"actionName":"actionGetArcId", "disabled":false},
 {"actionName":"actionInterpolate", "disabled":false},
-{"actionName": "actionHelp", "disabled": false}]'::json, 5, 2);
+{"actionName": "actionHelp", "disabled": false}]'::json, '{5}', 2);
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, device, orderby) VALUES('v_edit_node', 'tab_epa', 'EPA results', NULL, 'role_basic', NULL, '[{"actionName":"actionEdit", "actionTooltip":"Edit",  "disabled":false},
 {"actionName":"actionZoom", "actionTooltip":"Zoom In",  "disabled":false}, {"actionName":"actionCentered", "actionTooltip":"Center",  "disabled":false},
 {"actionName":"actionZoomOut", "actionTooltip":"Zoom Out",  "disabled":false}, {"actionName":"actionCatalog", "actionTooltip":"Change Catalog",  "disabled":false},
