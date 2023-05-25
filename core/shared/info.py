@@ -370,7 +370,7 @@ class GwInfo(QObject):
                 continue
             if 'layoutname' in field and field['layoutname'] == 'lyt_none':
                 continue
-            if field.get('tabname') != 'data':
+            if field.get('tabname') != 'tab_data':
                 continue
             if 'spacer' in field['widgettype']:
                 continue
@@ -1923,7 +1923,7 @@ class GwInfo(QObject):
     def _check_tab_data(self, field):
         """ Check if current tab name is tab_data """
 
-        if field.get('tabname') != 'data':
+        if field.get('tabname') != 'tab_data':
             return False
         return True
 
