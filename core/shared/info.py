@@ -3237,6 +3237,18 @@ def open_epa_dlg(**kwargs):
         # info.dlg.accepted.connect(partial(save_tbl_changes, complet_list, info))
         info.dlg.btn_accept.clicked.connect(partial(save_tbl_changes, complet_list, info, info.dlg))
 
+        # Add buttons
+        if 'dscenario' not in view:
+            btn_add_base = info.dlg.findChild(QPushButton, 'btn_add_base')
+            if btn_add_base:
+                tools_gw.add_icon(btn_add_base, '111b', "24x24")
+                btn_add_base.clicked.connect(partial(add_row_epa, view, pk, **kwargs))
+        else:
+            btn_add_dscenario = info.dlg.findChild(QPushButton, 'btn_add_dscenario')
+            if btn_add_dscenario:
+                tools_gw.add_icon(btn_add_dscenario, '111b', "24x24")
+                btn_add_dscenario.clicked.connect(partial(add_row_epa, view, pk, **kwargs))
+
     # Delete buttons
     btn_delete_base = info.dlg.findChild(QPushButton, 'btn_delete_base')
     btn_delete_dscenario = info.dlg.findChild(QPushButton, 'btn_delete_dscenario')
@@ -3250,6 +3262,49 @@ def open_epa_dlg(**kwargs):
     info.dlg.finished.connect(partial(tools_gw.save_settings, info.dlg))
     # Open dlg
     tools_gw.open_dialog(info.dlg, dlg_name=ui_name)
+
+
+def add_row_epa(tablename, pkey, **kwargs):
+    # Get variables
+    complet_result = kwargs['complet_result']
+    info = kwargs['class']
+    func_params = kwargs['func_params']
+    ui = func_params['ui']
+    ui_name = func_params['uiName']
+    tableviews = func_params['tableviews']
+    widgets = func_params.get('widgets')
+    widgets_tablename = func_params.get('widgetsTablename')
+
+    feature_id = complet_result['body']['feature']['id']
+    id_name = complet_result['body']['feature']['idName']
+
+    feature = f'"tableName":"{tablename}", "id":"{feature_id}"'
+    body = tools_gw.create_body(feature=feature)
+    json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
+    if json_result is None or json_result['status'] == 'Failed':
+        return
+    result = json_result
+
+    # Build dlg
+    info.add_dlg = GwInfoGenericUi()
+    tools_gw.load_settings(info.add_dlg)
+    info.my_json_add = {}
+    tools_gw.build_dialog_info(info.add_dlg, result, my_json=info.my_json_add)
+    # Populate node_id
+
+    # Signals
+    info.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, info.add_dlg))
+    info.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, info.add_dlg))
+    info.add_dlg.btn_accept.clicked.connect(partial(accept_add_dlg, tablename, pkey, info.my_json_add))
+
+    # Open dlg
+    tools_gw.open_dialog(info.add_dlg, dlg_name='info_generic')
+
+
+def accept_add_dlg(tablename, pkey, my_json):
+    print(f"{tablename=}")
+    print(f"{pkey=}")
+    print(f"{my_json=}")
 
 
 def tbl_data_changed(info, view, tbl, model, addparam, index):
