@@ -108,7 +108,7 @@ BEGIN
 		v_sensibility = (v_zoomScale * 10 * v_sensibility_f);
 		v_config_layer='config_web_layer';
 
-	ELSIF  v_device = 4 THEN
+	ELSIF  v_device IN (4, 5) THEN
 		EXECUTE 'SELECT value::json->>''desktop'' FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
 		INTO v_sensibility_f;
 		-- ESCALE 1:5000 as base sensibility
@@ -127,7 +127,6 @@ BEGIN
 	v_sql := 'SELECT layer_id, 0 as orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id= '''' UNION 
               SELECT layer_id, orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id = any('||quote_literal(v_visibleLayers)||'::text[]) ORDER BY orderby';
 
-	raise notice 'v_sql -> %', v_sql;
 	FOR v_layer IN EXECUTE v_sql 
 	LOOP
 			v_count=v_count+1;
@@ -158,8 +157,6 @@ BEGIN
 					ORDER BY a.attnum' 
 				INTO v_the_geom
 				USING v_layer, schemas_array[1];
-				raise notice 'v_the_geom -> %',v_the_geom;
-
 
 			--  Indentify geometry type
 			EXECUTE 'SELECT st_geometrytype ('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_layer)||';' 
@@ -187,13 +184,12 @@ BEGIN
 
 				--  Get element's parent type in order to be able to find featuretype'
 				EXECUTE 'SELECT lower(feature_type) FROM 
-				(SELECT parent_layer as layer, feature_type FROM cat_feature WHERE id <> ''LINK'' 
-				UNION SELECT child_layer as layer ,feature_type FROM cat_feature WHERE id <> ''LINK'') a WHERE
+				(SELECT parent_layer as layer, feature_type FROM cat_feature UNION SELECT child_layer as layer ,feature_type FROM cat_feature) a WHERE
 				layer =  '||quote_literal(v_layer)||';'
 				INTO v_parenttype;
 
 				--  Get element from active layer, using the distance from the clicked point to order possible multiselection (minor as first)
-				IF v_parenttype IS NOT NULL THEN 
+				IF v_parenttype IS NOT NULL and v_parenttype != 'link' THEN
 					EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
 					SELECT '||quote_ident(v_idname)||' AS id, CONCAT('||v_idname||','' : '','||v_parenttype||'_type) AS label, 
 					'||quote_ident(v_the_geom)||' as the_geom, 
@@ -212,7 +208,6 @@ BEGIN
                             EXECUTE v_sql2 INTO v_featuretype;
                             IF (SELECT system_id FROM cat_feature WHERE id = v_featuretype) = 'VALVE' AND v_valve_text IS NULL THEN
 	                            EXECUTE 'SELECT child_layer FROM cat_feature WHERE id = '''||v_featuretype||'''' INTO v_valve_tablename;
-                                raise notice 'VALVE FOUND!! ->> %',v_id;
                                 v_valve_id := v_id;
                                 EXECUTE 'SELECT closed_valve FROM '||quote_ident(v_layer)||' WHERE '||v_idname||' = '''||v_id||'''' INTO v_closed_valve;
                                 IF v_closed_valve IS True THEN
