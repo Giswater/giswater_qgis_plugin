@@ -631,10 +631,12 @@
 				JOIN sys_feature_cat s ON n.type = s.id
 				JOIN cat_node ON cat_node.id=NEW.nodecat_id WHERE n.id = cat_node.nodetype_id LIMIT 1)::text;
 		         
-				IF v_man_table IS NOT NULL THEN
-				    v_sql:= 'INSERT INTO '||v_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
-				    EXECUTE v_sql;
-				END IF;
+				IF v_man_table='man_valve' THEN
+					v_sql:= 'INSERT INTO man_valve (node_id, closed, broken) VALUES ('||quote_literal(NEW.node_id)||', '||(NEW.closed_valve)||', '||(NEW.broken_valve)||')';
+				ELSE
+			    	v_sql:= 'INSERT INTO '||v_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+                END IF;
+			    EXECUTE v_sql;
 
 			END IF;
 
@@ -1001,6 +1003,16 @@
 			ELSIF v_man_table ='man_filter' THEN
 				UPDATE man_filter SET node_id=NEW.node_id
 				WHERE node_id=OLD.node_id;
+			
+			ELSIF v_man_table='parent' THEN
+			    v_man_table:= (SELECT man_table FROM cat_feature_node n 
+				JOIN sys_feature_cat s ON n.type = s.id
+				JOIN cat_node ON cat_node.id=NEW.nodecat_id WHERE n.id = cat_node.nodetype_id LIMIT 1)::text;
+		         
+				IF v_man_table='man_valve' THEN
+			    	v_sql:= 'UPDATE man_valve SET closed='||(NEW.closed_valve)||', broken='||(NEW.broken_valve)||' WHERE node_id='||quote_literal(NEW.node_id)||'';
+			    	EXECUTE v_sql;
+                END IF;
 			
 			END IF;
 
