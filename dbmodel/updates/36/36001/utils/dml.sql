@@ -1121,3 +1121,90 @@ ALTER TABLE config_form_tabs DROP column device;
 ALTER TABLE config_form_tabs RENAME column device_new TO device;
 
 ALTER TABLE config_form_tabs ADD CONSTRAINT config_form_tabs_pkey PRIMARY KEY (formname, tabname);
+
+
+-- 26/05/2023
+INSERT INTO config_form_list (listname,query_text,device,listtype,listclass,vdefault,addparam) VALUES
+('tbl_visit_manager','SELECT id, visit_catalog, startdate, enddate, user_name, exploitation, descript, visit_type FROM v_ui_om_visit WHERE id IS NOT NULL',5,'tab','list',NULL,'{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": true,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": true,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": true,
+  "multipleRowSelection": true,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 10,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": true
+      }
+    ]
+  },
+  "modifyTopToolBar": true,
+  "renderTopToolbarCustomActions": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "color": "success",
+      "text": "Open",
+      "disableOnSelect": true,
+      "moreThanOneDisable": true
+    },
+    {
+      "widgetfunction": {
+        "functionName": "delete",
+        "params": {}
+      },
+      "color": "error",
+      "text": "Delete",
+      "disableOnSelect": true
+    }
+  ],
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    },
+    {
+      "widgetfunction": {
+        "functionName": "delete",
+        "params": {}
+      },
+      "icon": "Delete",
+      "text": "Delete"
+    }
+  ]
+}'::json);
