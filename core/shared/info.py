@@ -3338,6 +3338,7 @@ def tbl_data_changed(info, view, tbl, model, addparam, index):
 
 
 def _manage_new_row(model, row=None):
+    return None
     if row is None:
         row = model.rowCount() - 1
     # Add a new row if the edited row is the last one
