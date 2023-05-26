@@ -1208,3 +1208,26 @@ INSERT INTO config_form_list (listname,query_text,device,listtype,listclass,vdef
     }
   ]
 }'::json);
+
+UPDATE config_form_tabs SET label = 'EPA' where tabname = 'tab_epa';
+
+UPDATE config_form_tabs SET orderby = '2' where formname = 'v_edit_arc' and tabname = 'tab_epa';
+UPDATE config_form_tabs SET orderby = '3' where formname = 'v_edit_arc' and tabname = 'tab_elements';
+UPDATE config_form_tabs SET orderby = '4' where formname = 'v_edit_arc' and tabname = 'tab_relations';
+UPDATE config_form_tabs SET orderby = '5' where formname = 'v_edit_arc' and tabname = 'tab_event';
+UPDATE config_form_tabs SET orderby = '6' where formname = 'v_edit_arc' and tabname = 'tab_documents';
+UPDATE config_form_tabs SET orderby = '7' where formname = 'v_edit_arc' and tabname = 'tab_plan';
+
+UPDATE config_form_tabs SET orderby = '2' where formname = 'v_edit_node' and tabname = 'tab_epa';
+UPDATE config_form_tabs SET orderby = '3' where formname = 'v_edit_node' and tabname = 'tab_elements';
+UPDATE config_form_tabs SET orderby = '4' where formname = 'v_edit_node' and tabname = 'tab_relations';
+UPDATE config_form_tabs SET orderby = '5' where formname = 'v_edit_node' and tabname = 'tab_event';
+UPDATE config_form_tabs SET orderby = '6' where formname = 'v_edit_node' and tabname = 'tab_documents';
+UPDATE config_form_tabs SET orderby = '7' where formname = 'v_edit_node' and tabname = 'tab_plan';
+
+UPDATE config_form_tabs SET orderby = '2' where formname = 'v_edit_connec' and tabname = 'tab_epa';
+UPDATE config_form_tabs SET orderby = '3' where formname = 'v_edit_connec' and tabname = 'tab_elements';
+UPDATE config_form_tabs SET orderby = '4' where formname = 'v_edit_connec' and tabname = 'tab_hydrometer';
+UPDATE config_form_tabs SET orderby = '5' where formname = 'v_edit_connec' and tabname = 'tab_hydrometer_val';
+UPDATE config_form_tabs SET orderby = '6' where formname = 'v_edit_connec' and tabname = 'tab_event';
+UPDATE config_form_tabs SET orderby = '7' where formname = 'v_edit_connec' and tabname = 'tab_documents';
