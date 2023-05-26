@@ -3291,20 +3291,38 @@ def add_row_epa(tablename, pkey, **kwargs):
     info.my_json_add = {}
     tools_gw.build_dialog_info(info.add_dlg, result, my_json=info.my_json_add)
     # Populate node_id
+    tools_qt.set_widget_text(info.add_dlg, 'tab_none_node_id', feature_id)
+    tools_gw.get_values(info.add_dlg, tools_qt.get_widget(info.add_dlg, 'tab_none_node_id'), info.my_json_add, ignore_editability=True)
+    # tools_qt.get_widget(info.add_dlg, 'tab_none_node_id').editingFinished.emit()
 
     # Signals
     info.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, info.add_dlg))
     info.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, info.add_dlg))
-    info.add_dlg.btn_accept.clicked.connect(partial(accept_add_dlg, tablename, pkey, info.my_json_add))
+    info.add_dlg.btn_accept.clicked.connect(partial(accept_add_dlg, info.add_dlg, tablename, pkey, feature_id, info.my_json_add))
 
     # Open dlg
     tools_gw.open_dialog(info.add_dlg, dlg_name='info_generic')
 
 
-def accept_add_dlg(tablename, pkey, my_json):
+def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json):
     print(f"{tablename=}")
     print(f"{pkey=}")
     print(f"{my_json=}")
+
+    if not my_json:
+        return
+
+    fields = json.dumps(my_json)
+
+    feature = f'"id":"{feature_id}", '
+    feature += f'"tableName":"{tablename}"'
+    extras = f'"fields":{fields}'
+    body = tools_gw.create_body(feature=feature, extras=extras)
+    json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
+    if json_result and json_result.get('status') == 'Accepted':
+        tools_gw.close_dialog(dialog)
+        return
+    tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
 
 
 def tbl_data_changed(info, view, tbl, model, addparam, index):
