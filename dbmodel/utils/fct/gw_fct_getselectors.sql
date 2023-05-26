@@ -137,7 +137,7 @@ BEGIN
 	'SELECT formname, tabname, label, tooltip, tabfunction, tabactions, value
 	 FROM (SELECT formname, tabname, f.label, f.tooltip, tabfunction, tabactions, unnest(device) AS device, value, orderby FROM config_form_tabs f, config_param_system
 	 WHERE formname=',quote_literal(v_selector_type),' AND isenabled IS TRUE AND concat(''basic_selector_'', tabname) = parameter ',(v_querytab),
-	' AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member'')))a WHERE ',v_device, ' = ANY(device) ORDER BY orderby');
+	' AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member'')))a WHERE device = ',v_device,' ORDER BY orderby');
 	v_debug_vars := json_build_object('v_selector_type', v_selector_type, 'v_querytab', v_querytab);
 	v_debug := json_build_object('querystring', v_query, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 10);
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
