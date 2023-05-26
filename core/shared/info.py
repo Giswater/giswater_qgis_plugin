@@ -866,7 +866,7 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaOrificeUi", "uiName": "info_epa_orifice",
                        "tableviews": [
-                        {"tbl": "tbl_orifice", "view": "v_edit_inp_flwreg_orifice"},
+                        {"tbl": "tbl_orifice", "view": "v_edit_inp_flwreg_orifice", "pk": "nodarc_id"},
                         {"tbl": "tbl_dscenario_orifice", "view": "v_edit_inp_dscenario_flwreg_orifice"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
@@ -879,7 +879,7 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaOutletUi", "uiName": "info_epa_outlet",
                        "tableviews": [
-                        {"tbl": "tbl_outlet", "view": "v_edit_inp_flwreg_outlet"},
+                        {"tbl": "tbl_outlet", "view": "v_edit_inp_flwreg_outlet", "pk": "nodarc_id"},
                         {"tbl": "tbl_dscenario_outlet", "view": "v_edit_inp_dscenario_flwreg_outlet"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
@@ -892,7 +892,7 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaPumpUi", "uiName": "info_epa_pump",
                        "tableviews": [
-                        {"tbl": "tbl_pump", "view": "v_edit_inp_flwreg_pump"},
+                        {"tbl": "tbl_pump", "view": "v_edit_inp_flwreg_pump", "pk": "nodarc_id"},
                         {"tbl": "tbl_dscenario_pump", "view": "v_edit_inp_dscenario_flwreg_pump"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
@@ -905,7 +905,7 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaWeirUi", "uiName": "info_epa_weir",
                        "tableviews": [
-                        {"tbl": "tbl_weir", "view": "v_edit_inp_flwreg_weir"},
+                        {"tbl": "tbl_weir", "view": "v_edit_inp_flwreg_weir", "pk": "nodarc_id"},
                         {"tbl": "tbl_dscenario_weir", "view": "v_edit_inp_dscenario_flwreg_weir"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
@@ -3232,39 +3232,37 @@ def open_epa_dlg(**kwargs):
         if not pk:
             pk = id_name
 
-        complet_list = get_list(view, pk, feature_id)
+        complet_list = get_list(view, id_name, feature_id)
         fill_tbl(complet_list, tbl, info, view)
         # info.dlg.accepted.connect(partial(save_tbl_changes, complet_list, info))
         info.dlg.btn_accept.clicked.connect(partial(save_tbl_changes, complet_list, info, info.dlg))
 
-        # Add buttons
+        # Add & Delete buttons
         if 'dscenario' not in view:
             btn_add_base = info.dlg.findChild(QPushButton, 'btn_add_base')
             if btn_add_base:
                 tools_gw.add_icon(btn_add_base, '111b', "24x24")
-                btn_add_base.clicked.connect(partial(add_row_epa, view, pk, **kwargs))
+                btn_add_base.clicked.connect(partial(add_row_epa, tbl, view, pk, **kwargs))
+            btn_delete_base = info.dlg.findChild(QPushButton, 'btn_delete_base')
+            if btn_delete_base:
+                tools_gw.add_icon(btn_delete_base, '112b', "24x24")
+                btn_delete_base.clicked.connect(partial(delete_tbl_row, tbl, view, pk, **kwargs))
         else:
             btn_add_dscenario = info.dlg.findChild(QPushButton, 'btn_add_dscenario')
             if btn_add_dscenario:
                 tools_gw.add_icon(btn_add_dscenario, '111b', "24x24")
-                btn_add_dscenario.clicked.connect(partial(add_row_epa, view, pk, **kwargs))
-
-    # Delete buttons
-    btn_delete_base = info.dlg.findChild(QPushButton, 'btn_delete_base')
-    btn_delete_dscenario = info.dlg.findChild(QPushButton, 'btn_delete_dscenario')
-    if btn_delete_base:
-        tools_gw.add_icon(btn_delete_base, '112b', "24x24")
-        btn_delete_base.clicked.connect(partial(delete_tbl_row))
-    if btn_delete_dscenario:
-        tools_gw.add_icon(btn_delete_dscenario, '112b', "24x24")
-        btn_delete_dscenario.clicked.connect(partial(delete_tbl_row))
+                btn_add_dscenario.clicked.connect(partial(add_row_epa, tbl, view, pk, **kwargs))
+            btn_delete_dscenario = info.dlg.findChild(QPushButton, 'btn_delete_dscenario')
+            if btn_delete_dscenario:
+                tools_gw.add_icon(btn_delete_dscenario, '112b', "24x24")
+                btn_delete_dscenario.clicked.connect(partial(delete_tbl_row, tbl, view, pk, **kwargs))
 
     info.dlg.finished.connect(partial(tools_gw.save_settings, info.dlg))
     # Open dlg
     tools_gw.open_dialog(info.dlg, dlg_name=ui_name)
 
 
-def add_row_epa(tablename, pkey, **kwargs):
+def add_row_epa(tbl, tablename, pkey, **kwargs):
     # Get variables
     complet_result = kwargs['complet_result']
     info = kwargs['class']
@@ -3304,11 +3302,45 @@ def add_row_epa(tablename, pkey, **kwargs):
     tools_gw.open_dialog(info.add_dlg, dlg_name='info_generic')
 
 
-def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json):
-    print(f"{tablename=}")
-    print(f"{pkey=}")
-    print(f"{my_json=}")
+def delete_tbl_row(tbl, tablename, pkey, **kwargs):
+    # Get variables
+    complet_result = kwargs['complet_result']
+    info = kwargs['class']
+    func_params = kwargs['func_params']
+    ui = func_params['ui']
+    ui_name = func_params['uiName']
+    tableviews = func_params['tableviews']
+    widgets = func_params.get('widgets')
+    widgets_tablename = func_params.get('widgetsTablename')
 
+    # Get selected row
+    selected_list = tbl.selectionModel().selectedRows()
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        tools_qgis.show_warning(message, dialog=info.dlg)
+        return
+
+    # Get primary key
+    col_idx = tools_qt.get_col_index_by_col_name(tbl, pkey)
+    if col_idx is None:
+        col_idx = 0
+
+    values = []
+    for index in selected_list:
+        values.append(index.sibling(index.row(), col_idx).data())
+
+    message = "Are you sure you want to delete these records?"
+    answer = tools_qt.show_question(message, "Delete records", values, force_action=True)
+    if answer:
+        for value in values:
+            sql = f"DELETE FROM {tablename} WHERE {pkey} = '{value}'"
+            tools_db.execute_sql(sql)
+
+        # Refresh tableview
+        # self._fill_dscenario_table()
+
+
+def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json):
     if not my_json:
         return
 
@@ -3394,26 +3426,6 @@ def save_tbl_changes(complet_list, info, dialog):
             tools_gw.close_dialog(dialog)
             return
         tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
-
-
-def delete_tbl_row(complet_list, info):
-
-    view = complet_list['body']['feature']['tableName']
-    my_json = getattr(info, f"my_json_{view}")
-    if not my_json:
-        return
-
-    # For each edited row
-    for k, v in my_json.items():
-        fields = json.dumps(v)
-        if not fields:
-            continue
-
-        feature = f'"id":"{k}", '
-        feature += f'"tableName":"{view}"'
-        extras = f'"fields":{fields}'
-        body = tools_gw.create_body(feature=feature, extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_setdelete', body)
 
 # endregion
 
