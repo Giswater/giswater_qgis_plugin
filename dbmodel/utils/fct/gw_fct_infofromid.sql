@@ -470,9 +470,9 @@ BEGIN
 			,quote_nullable(v_tablename),'
 			and item_object->>''actionName'' != ''actionMapZone'' and item_object->>''actionName'' != ''actionGetArcId'' 
 			and item_object->>''actionName''::text = id group by tabname) b,
-			config_form_tabs WHERE formname =',quote_nullable(v_tablename),
+			config_form_tabs WHERE (formname =',quote_nullable(v_tablename),' OR  formname =',quote_nullable(v_table_child),')
 			
-			' AND orderby IS NOT NULL )a WHERE device = ', v_device,' ORDER BY orderby, tabname)a');
+			 AND orderby IS NOT NULL )a WHERE device = ', v_device,' ORDER BY orderby, tabname)a');
 			
 		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_device', v_device);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 160);
@@ -491,14 +491,15 @@ BEGIN
 			and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone'' 
 			and item_object->>''actionName'' != ''actionGetArcId'' 
 			and item_object->>''actionName''::text = id group by tabname) b,
-			config_form_tabs WHERE formname =',quote_nullable(v_tablename),
+			config_form_tabs WHERE (formname =',quote_nullable(v_tablename),' OR  formname =',quote_nullable(v_table_child),')
 			
-			' AND orderby IS NOT NULL )a WHERE device = ', v_device,' ORDER BY orderby, tabname)a');
+			 AND orderby IS NOT NULL )a WHERE device = ', v_device,' ORDER BY orderby, tabname)a');
 			
 		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_device', v_device);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 170);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO form_tabs;
+
 	ELSE
 		v_querystring = concat(
 		
@@ -511,9 +512,9 @@ BEGIN
 			,quote_nullable(v_tablename),'
 			and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone'' 
 			and item_object->>''actionName''::text = id group by tabname) b,
-			config_form_tabs WHERE formname =',quote_nullable(v_tablename),
+			config_form_tabs WHERE (formname =',quote_nullable(v_tablename),' OR  formname =',quote_nullable(v_table_child),')
 			
-			' AND orderby IS NOT NULL )a WHERE device = ', v_device,' ORDER BY orderby, tabname)a');
+			 AND orderby IS NOT NULL )a WHERE device = ', v_device,' ORDER BY orderby, tabname)a');
 					
 		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_device', v_device);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 180);
