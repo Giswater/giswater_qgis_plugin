@@ -1455,3 +1455,12 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET widgetfunction='{"functionName": "filter_table", "parameters": {"columnfind": "hydrometer_customer_code", "field_id": "feature_id"}}'::json
 	WHERE formtype='form_feature' AND columnname='hydrometer_id' AND tabname='tab_hydrometer';
+
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, 
+tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
+dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols,
+widgetfunction, linkedobject, hidden, web_layoutorder)
+select 'node', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
+dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
+from  config_form_fields where formname = 'connec' and tabname ilike '%hydro%' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
