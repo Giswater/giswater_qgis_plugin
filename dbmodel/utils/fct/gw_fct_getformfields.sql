@@ -27,12 +27,12 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getformfields(
 
 AS $BODY$
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_getformfields( 've_arc_pipe','form_feature','data','ve_arc_pipe','arc_id',	'2088','character varying(16)',	'UPDATE',	1,	'4',	'{}' )
-SELECT SCHEMA_NAME.gw_fct_getformfields('visit_arc_insp', 'form_visit', 'data', NULL,	 NULL, 		NULL, 	NULL, 			'INSERT', 	null, 	3,	null)
-SELECT "SCHEMA_NAME".gw_fct_getformfields('go2epa', 'form_generic', 'data', null, null, null, null, null, null,null, '{}')
-SELECT "SCHEMA_NAME".gw_fct_getformfields('ve_arc_conduit', 'form_feature', 'data', 've_arc_conduit', 'arc_id', '2001', NULL, 'SELECT', null, 4, NULL)
+SELECT SCHEMA_NAME.gw_fct_getformfields( 've_arc_pipe','form_feature','tab_data','ve_arc_pipe','arc_id',	'2088','character varying(16)',	'UPDATE',	1,	'4',	'{}' )
+SELECT SCHEMA_NAME.gw_fct_getformfields('visit_arc_insp', 'form_visit', 'tab_data', NULL,	 NULL, 		NULL, 	NULL, 			'INSERT', 	null, 	3,	null)
+SELECT "SCHEMA_NAME".gw_fct_getformfields('go2epa', 'form_generic', 'tab_data', null, null, null, null, null, null,null, '{}')
+SELECT "SCHEMA_NAME".gw_fct_getformfields('ve_arc_conduit', 'form_feature', 'tab_data', 've_arc_conduit', 'arc_id', '2001', NULL, 'SELECT', null, 4, NULL)
 SELECT "SCHEMA_NAME".gw_fct_getformfields('ve_arc_pipe', 'form_feature', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 4, '{}')
-SELECT "SCHEMA_NAME".gw_fct_getformfields( 'print', 'form_generic', 'data', null, null, null, null, 'SELECT', null, 3);
+SELECT "SCHEMA_NAME".gw_fct_getformfields( 'print', 'form_generic', 'tab_data', null, null, null, null, 'SELECT', null, 3);
 
 PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_fct_getformfields: ", "variables":"',v_debug,'"}}')::json);
 PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_fct_getformfields: ", "variables":"',v_debug,'"}}')::json);

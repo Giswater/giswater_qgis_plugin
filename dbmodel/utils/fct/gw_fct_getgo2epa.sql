@@ -38,7 +38,7 @@ BEGIN
 	v_formname := (p_data ->> 'form')::json->> 'formName';
 
 	-- getting the form widgets
-	SELECT gw_fct_getformfields(v_formname, 'form_generic', 'data', null, null, null, null, null,null, null, null)
+	SELECT gw_fct_getformfields(v_formname, 'form_generic', 'tab_data', null, null, null, null, null,null, null, null)
 		INTO v_fields; 
 
 	v_fields_json = array_to_json (v_fields);

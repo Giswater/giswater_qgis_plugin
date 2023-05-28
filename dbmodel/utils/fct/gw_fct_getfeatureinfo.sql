@@ -36,7 +36,7 @@ field_value character varying;
 v_version json;
 v_values_array json;
 v_formtype text;
-v_tabname text = 'data';
+v_tabname text = 'tab_data';
 v_errcontext text;
 v_querystring text;
 v_debug_vars json;
@@ -68,7 +68,7 @@ BEGIN
 
 		-- Call the function of feature fields generation
 		v_formtype = 'form_feature';
-		SELECT gw_fct_getformfields( p_table_id, v_formtype, 'data', p_table_id, p_idname, p_id, null, 'SELECT',null, p_device, v_values_array) INTO fields_array;
+		SELECT gw_fct_getformfields( p_table_id, v_formtype, 'tab_data', p_table_id, p_idname, p_id, null, 'SELECT',null, p_device, v_values_array) INTO fields_array;
 	ELSE
 		raise notice 'Configuration fields are NOT defined on config_info_layer_field. System values will be used';
 		

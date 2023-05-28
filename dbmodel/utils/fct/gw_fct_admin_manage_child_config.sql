@@ -73,7 +73,7 @@ BEGIN
 	
 	END IF;
 
---manage tab hydrometer on netwjoin
+	--manage tab hydrometer on netwjoin
 	IF v_view_name IS NOT NULL AND v_project_type = 'WS' and v_feature_system_id = 'netwjoin' THEN
 		INSERT INTO config_form_tabs ( formname, tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby)
 		SELECT v_view_name,  tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby
@@ -151,7 +151,7 @@ BEGIN
 		--insert into config_form_fields
 		INSERT INTO config_form_fields (formname, formtype, columnname, tabname, datatype, widgettype, layoutname, layoutorder,
 			label, ismandatory, isparent, iseditable, isautoupdate) 
-		VALUES (v_view_name,'form_feature', rec.column_name, 'data', v_datatype, v_widgettype, 'lyt_data_1',v_orderby, 
+		VALUES (v_view_name,'form_feature', rec.column_name, 'tab_data', v_datatype, v_widgettype, 'lyt_data_1',v_orderby, 
 			rec.column_name, false, false,true,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 	END LOOP;
@@ -184,7 +184,7 @@ BEGIN
 		INSERT INTO config_form_fields (formname,formtype,columnname,datatype,widgettype, layoutname,layoutorder,
 			label, ismandatory,isparent,iseditable,isautoupdate, tabname) 
 		VALUES (v_view_name,'form_feature',rec.param_name, v_datatype,v_widgettype, 'lyt_data_1',v_orderby,
-			rec.param_name, rec.is_mandatory, false,rec.iseditable,false, 'data') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+			rec.param_name, rec.is_mandatory, false,rec.iseditable,false, 'tab_data') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 				
 	END LOOP;
 

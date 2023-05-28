@@ -25,7 +25,7 @@ $BODY$
 
 /*EXAMPLE
 
-SELECT SCHEMA_NAME.gw_fct_getformfields('ve_arc_pipe',	'form_feature',	'data',	've_arc_pipe',	'arc_id',	'2088','character varying(16)',	'UPDATE',	'1',	4,	'{}'::json )
+SELECT SCHEMA_NAME.gw_fct_getformfields('ve_arc_pipe',	'form_feature',	'tab_data',	've_arc_pipe',	'arc_id',	'2088','character varying(16)',	'UPDATE',	'1',	4,	'{}'::json )
 
 SELECT SCHEMA_NAME.gw_fct_getconfig($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"formName":"config"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}}}$$);
 
@@ -84,7 +84,7 @@ v_gully_proximity_control boolean;
 v_arc_searchnodes double precision;
 v_samenode_init_end_control boolean;
 v_arc_searchnodes_control boolean;
-v_tabname text = 'data';
+v_tabname text = 'tab_data';
 v_formname text;
 v_tablename text;
 v_visit_tablename text;
