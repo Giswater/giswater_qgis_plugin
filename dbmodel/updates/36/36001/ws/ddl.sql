@@ -199,8 +199,6 @@ DROP VIEW IF EXISTS v_edit_man_fountain_pol;
 DROP VIEW IF EXISTS v_edit_man_register_pol;
 DROP VIEW IF EXISTS v_edit_man_tank_pol;
 
-/*
-
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"_pol_id_","action":"DELETE-FIELD","hasChilds":"True","onlyChilds":"True"}}$$);
 
@@ -234,8 +232,6 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_register", "column":"_pol_id_", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_fountain", "column":"_pol_id_", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_tank", "column":"_pol_id_", "dataType":"integer"}}$$);
-
-*/
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);
@@ -273,3 +269,48 @@ CREATE INDEX IF NOT EXISTS rtc_hydrometer_x_node_index_node_id
     ON rtc_hydrometer_x_node USING btree
     (node_id COLLATE pg_catalog."default" ASC NULLS LAST)
     TABLESPACE pg_default;
+
+
+-- 28/05/2023
+ALTER TABLE inp_pump_importinp RENAME TO _inp_pump_importinp_;
+ALTER TABLE inp_valve_importinp RENAME TO _inp_valve_importinp_;
+
+CREATE TABLE inp_virtualpump(
+  arc_id character varying(16) NOT NULL,
+  power character varying,
+  curve_id character varying,
+  speed numeric(12,6),
+  pattern_id character varying,
+  status character varying(12),
+  energyparam character varying(30),
+  energyvalue character varying(30),
+  effic_curve_id character varying(18),
+  energy_price double precision,
+  energy_pattern_id character varying(18),
+  pump_type character varying(16) DEFAULT 'FLOWPUMP'::character varying,
+  CONSTRAINT inp_virtualpump_pkey PRIMARY KEY (arc_id),
+  CONSTRAINT inp_virtualpump_curve_id_fkey FOREIGN KEY (curve_id)
+      REFERENCES inp_curve (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+
+CREATE TABLE inp_dscenario_virtualpump( 
+  dscenario_id integer NOT NULL,
+  arc_id character varying(16) NOT NULL,
+  power character varying,
+  curve_id character varying,
+  speed numeric(12,6),
+  pattern_id character varying,
+  status character varying(12),
+  energyparam character varying(30),
+  energyvalue character varying(30),
+  effic_curve_id character varying(18),
+  energy_price double precision,
+  energy_pattern_id character varying(18),
+  pump_type character varying(16) DEFAULT 'FLOWPUMP'::character varying,
+  CONSTRAINT inp_dscenario_virtualpump_pkey PRIMARY KEY (dscenario_id, arc_id),
+  CONSTRAINT inp_dscenario_virtualpump_curve_id_fkey FOREIGN KEY (curve_id)
+      REFERENCES inp_curve (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE
+);

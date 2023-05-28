@@ -156,9 +156,8 @@ BEGIN
 			DELETE FROM inp_pump;
 			DELETE FROM inp_tank;
 			DELETE FROM inp_valve;
-			DELETE FROM inp_pump_importinp;
+			DELETE FROM inp_virtualpump;
 			DELETE FROM inp_pump_additional;
-			DELETE FROM inp_valve_importinp ;
 			
 			DELETE FROM inp_tags;
 			DELETE FROM inp_dscenario_demand;
@@ -333,7 +332,7 @@ BEGIN
 			INSERT INTO cat_feature_arc VALUES ('ARCPSV', 'VARC', 'VIRTUALVALVE') ON CONFLICT (id) DO NOTHING;
 			INSERT INTO cat_feature_arc VALUES ('ARCPRV', 'VARC', 'VIRTUALVALVE') ON CONFLICT (id) DO NOTHING;
 			INSERT INTO cat_feature_arc VALUES ('ARCTCV', 'VARC', 'VIRTUALVALVE') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature_arc VALUES ('ARCPUMP', 'VARC', 'PUMP-IMPORTINP') ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_feature_arc VALUES ('ARCPUMP', 'VARC', 'VIRTUALPUMP') ON CONFLICT (id) DO NOTHING;
 
 			--cat_feature_node
 			--node
@@ -468,7 +467,7 @@ BEGIN
 			-- update status
 			UPDATE inp_virtualvalve SET status = upper(csv2) FROM temp_csv where source='[STATUS]'  and arc_id = csv1;
 			UPDATE inp_virtualvalve SET status = 'ACTIVE' WHERE status IS NULL;
-			UPDATE inp_pump_importinp SET status = upper(csv2) FROM temp_csv where source='[STATUS]' and arc_id = csv1;
+			UPDATE inp_virtualpump SET status = upper(csv2) FROM temp_csv where source='[STATUS]' and arc_id = csv1;
 
 			--set options configuration
 			UPDATE config_param_user set value=NULL WHERE cur_user=current_user AND parameter ILIKE 'inp_options%';
@@ -518,13 +517,13 @@ BEGIN
 				WHERE  b.arc_id = inp_virtualvalve.arc_id;
 
 				-- to_arc on pressurepump
-				UPDATE inp_pump_importinp SET to_arc = b.to_arc FROM
-					(select a.arc_id, n.arc_id AS to_arc from inp_pump_importinp 
+				UPDATE inp_virtualpump SET to_arc = b.to_arc FROM
+					(select a.arc_id, n.arc_id AS to_arc from inp_virtualpump 
 					JOIN arc a USING (arc_id) 
 					JOIN (SELECT arc_id, node_1 FROM arc UNION SELECT arc_id, node_2 FROM arc)n ON a.node_2 = n.node_1
-					WHERE a.arc_id NOT IN (SELECT arc_id FROM inp_pump_importinp WHERE substring(reverse(arc_id),0,4) ~ '^\d+$')
+					WHERE a.arc_id NOT IN (SELECT arc_id FROM inp_virtualpump WHERE substring(reverse(arc_id),0,4) ~ '^\d+$')
 					AND a.arc_id != n.arc_id)b
-				WHERE  b.arc_id = inp_pump_importinp.arc_id;
+				WHERE  b.arc_id = inp_virtualpump.arc_id;
 
 				FOR v_data IN SELECT * FROM arc WHERE arc_id like '%_n2a' OR arc_id like '%_n2a_5'
 				LOOP
@@ -532,7 +531,7 @@ BEGIN
 						v_nodecat = (SELECT valv_type FROM inp_virtualvalve WHERE arc_id = v_data.arc_id);
 						v_epatype = 'VALVE';
 						
-					ELSIF v_data.epa_type = 'PUMP-IMPORTINP' THEN 
+					ELSIF v_data.epa_type = 'VIRTUALPUMP' THEN 
 						IF v_data.arc_id like '%_n2a_5' THEN 
 							v_pumptype  = 'PRESSPUMP';	
 						ELSE 
@@ -578,7 +577,7 @@ BEGIN
 
 					IF v_epatablename = 'inp_pump' THEN
 						INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern_id, status, energyparam, energyvalue, to_arc, pump_type)
-						SELECT v_node_id, power, curve_id, speed, pattern_id, status, energyparam, energyvalue, to_arc, v_pumptype FROM inp_pump_importinp WHERE arc_id=v_data.arc_id;
+						SELECT v_node_id, power, curve_id, speed, pattern_id, status, energyparam, energyvalue, to_arc, v_pumptype FROM inp_virtualpump WHERE arc_id=v_data.arc_id;
 
 					ELSIF v_epatablename = 'inp_valve' THEN
 						INSERT INTO inp_valve (node_id, valv_type, pressure, custom_dint, flow, coef_loss, curve_id, minorloss, status, to_arc)
@@ -625,10 +624,10 @@ BEGIN
 				replace(arc_id, reverse(substring(reverse(arc_id),0,6)), ''), 
 				(substring(reverse(arc_id),0,2))::integer,
 				power, curve_id, speed, pattern_id, status, energyparam, energyvalue
-				from inp_pump_importinp WHERE substring(reverse(arc_id),0,2) ~ '^\d+$' AND substring(reverse(arc_id),2,1) !='_';
+				from inp_virtualpump WHERE substring(reverse(arc_id),0,2) ~ '^\d+$' AND substring(reverse(arc_id),2,1) !='_';
 
 				-- update state=0 pump additionals 
-				UPDATE arc SET state = 0 WHERE arc_id IN (SELECT arc_id FROM inp_pump_importinp);
+				UPDATE arc SET state = 0 WHERE arc_id IN (SELECT arc_id FROM inp_virtualpump);
 							
 				-- delete objects;
 				DELETE FROM inp_pipe WHERE substring(reverse(arc_id),0,5) = 'a2n_';

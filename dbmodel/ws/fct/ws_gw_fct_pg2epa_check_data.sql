@@ -119,8 +119,7 @@ BEGIN
 
 	RAISE NOTICE '5 - Check for missed features on inp tables (272)';
 	v_querytext = '(SELECT arc_id, ''arc'' FROM v_edit_arc LEFT JOIN 
-			(SELECT arc_id from inp_pipe UNION SELECT arc_id FROM inp_virtualvalve UNION SELECT arc_id 
-			FROM inp_valve_importinp UNION SELECT arc_id FROM inp_pump_importinp) b using (arc_id)
+			(SELECT arc_id from inp_pipe UNION SELECT arc_id FROM inp_virtualvalve UNION SELECT arc_id FROM inp_virtualpump) b using (arc_id)
 			WHERE b.arc_id IS NULL AND state > 0 AND epa_type !=''UNDEFINED''
 			UNION 
 		SELECT node_id, ''node'' FROM v_edit_node LEFT JOIN 
@@ -287,7 +286,6 @@ BEGIN
 
 	RAISE NOTICE '12 - Valve_type (273)';
 	SELECT count(*) INTO v_count FROM v_edit_inp_valve WHERE valv_type IS NULL;
-
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '273', 3, concat(
@@ -295,8 +293,20 @@ BEGIN
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '273', 1, 'INFO: Valve type checked. No mandatory values missed.',v_count);
+		VALUES (v_fid, '273', 1, 'INFO: Valve valv_type checked. No mandatory values missed.',v_count);
 	END IF;
+
+	SELECT count(*) INTO v_count FROM v_edit_inp_virtualvalve WHERE valv_type IS NULL;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '273', 3, concat(
+		'ERROR-273: There is/are ',v_count,' virtualvalve(s) with null values on valv_type column.'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '273', 1, 'INFO: Virtualvalve valv_type checked. No mandatory values missed.',v_count);
+	END IF;
+
 
 	RAISE NOTICE '13 - Valve status (274), to_arc (368), pressure (275), curve_id (276), coef_loss (277), flow (278)';
 
@@ -305,11 +315,22 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '274', 3, concat(
-		'ERROR-274: There is/are ',v_count,' valve(s) with null values at least on mandatory column status.'), v_count);
+		'ERROR-274: There is/are ',v_count,' valve(s) with null values on mandatory column status.'), v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '274', 1, 'INFO: Valve status checked. No mandatory values missed.',v_count);
+	END IF;
+
+	SELECT count(*) INTO v_count FROM v_edit_inp_virtualvalve WHERE status IS NULL AND state > 0;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '274', 3, concat(
+		'ERROR-274: There is/are ',v_count,' virtualvalve(s) with null values on mandatory column status.'), v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '274', 1, 'INFO: Virtualvalve status checked. No mandatory values missed.',v_count);
 	END IF;
 
 	-- pressure (275)
@@ -317,11 +338,22 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '275', 3, concat(
-		'ERROR-275: There is/are ',v_count,' PBV-PRV-PSV valve(s) with null values at least on the mandatory column for Pressure valves.'),v_count);
+		'ERROR-275: There is/are ',v_count,' PBV-PRV-PSV valve(s) with null values on the mandatory column for Pressure valves.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '275', 1, 'INFO: PBC-PRV-PSV valves checked. No mandatory values missed.',v_count);
+	END IF;	
+
+	SELECT count(*) INTO v_count FROM v_edit_inp_virtualvalve WHERE ((valv_type='PBV' OR valv_type='PRV' OR valv_type='PSV') AND (pressure IS NULL));
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '275', 3, concat(
+		'ERROR-275: There is/are ',v_count,' PBV-PRV-PSV virtualvalve(s) with null values on mandatory column for Pressure valves.'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '275', 1, 'INFO: PBC-PRV-PSV virtualvalves checked. No mandatory values missed.',v_count);
 	END IF;				
 
 	-- curve_id (276)';
@@ -329,33 +361,64 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '276', 3, concat(
-		'ERROR-276: There is/are ',v_count,' GPV valve(s) with null values at least on the mandatory column for General purpose valves.'),v_count);
+		'ERROR-276: There is/are ',v_count,' GPV valve(s) with null values on mandatory column for General purpose valves.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '276', 1, 'INFO: GPV valves checked. No mandatory values missed.',v_count);
 	END IF;	
 
+	SELECT count(*) INTO v_count FROM v_edit_inp_virtualvalve WHERE ((valv_type='GPV') AND (curve_id IS NULL));
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '276', 3, concat(
+		'ERROR-276: There is/are ',v_count,' GPV virtualvalve(s) with null values on mandatory column for General purpose valves.'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '276', 1, 'INFO: GPV virtualvalves checked. No mandatory values missed.',v_count);
+	END IF;	
+
 	-- coef_loss (277)
 	SELECT count(*) INTO v_count FROM v_edit_inp_valve WHERE valv_type='TCV' AND coef_loss IS NULL;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '277', 3, concat('ERROR-277: There is/are ',v_count,' TCV valve(s) with null values at least on mandatory column for Losses Valves.'),v_count);
+		VALUES (v_fid, '277', 3, concat('ERROR-277: There is/are ',v_count,' TCV valve(s) with null values on mandatory column for Losses Valves.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '277', 1, 'INFO: TCV valves checked. No mandatory values missed.',v_count);
+	END IF;	
+
+	SELECT count(*) INTO v_count FROM v_edit_inp_virtualvalve WHERE valv_type='TCV' AND coef_loss IS NULL;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '277', 3, concat('ERROR-277: There is/are ',v_count,' TCV virtualvalve(s) with null values on mandatory column for Losses Valves.'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '277', 1, 'INFO: TCV virtualvalves checked. No mandatory values missed.',v_count);
 	END IF;				
 
 	-- flow (278)
 	SELECT count(*) INTO v_count FROM v_edit_inp_valve WHERE ((valv_type='FCV') AND (flow IS NULL));
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '278', 3, concat('ERROR-278: There is/are ',v_count,' FCV valve(s) with null values at least on mandatory column for Flow Control Valves.'),v_count);
+		VALUES (v_fid, '278', 3, concat('ERROR-278: There is/are ',v_count,' FCV valve(s) with null values on mandatory column for Flow Control Valves.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '278', 1, 'INFO: FCV valves checked. No mandatory values missed.',v_count);
+	END IF;	
+
+	SELECT count(*) INTO v_count FROM v_edit_inp_virtualvalve WHERE ((valv_type='FCV') AND (flow IS NULL));
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '278', 3, concat('ERROR-278: There is/are ',v_count,' FCV virtualvalve(s) with null values on mandatory column for Flow Control Valves.'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '278', 1, 'INFO: FCV virtualvalves checked. No mandatory values missed.',v_count);
 	END IF;		
 	
 
@@ -405,6 +468,16 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '279', 1, 'INFO: Pumps checked. No mandatory values for pump_type missed.',v_count);
 	END IF;
+
+	SELECT count(*) INTO v_count FROM v_edit_inp_virtualpump WHERE pump_type IS NULL;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '279', 3, concat('ERROR-279: There is/are ',v_count,' virtualpump''s with null values on pump_type column.'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '279', 1, 'INFO: Virtualpumps checked. No mandatory values for pump_type missed.',v_count);
+	END IF;
 	
 	--pump curve(280)
 	SELECT count(*) INTO v_count FROM v_edit_inp_pump WHERE curve_id IS NULL;
@@ -416,6 +489,18 @@ BEGIN
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '280', 1, 'INFO: Pumps checked. No mandatory values for curve_id missed.',v_count);
+	END IF;	
+
+	--pump curve(280)
+	SELECT count(*) INTO v_count FROM v_edit_inp_virtualpump WHERE curve_id IS NULL;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '280', 3, concat(
+		'ERROR-280: There is/are ',v_count,' virtualpump(s) with null values at least on mandatory column curve_id.'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '280', 1, 'INFO: Virtualpumps checked. No mandatory values for curve_id missed.',v_count);
 	END IF;	
 
 	--pump additional(281)

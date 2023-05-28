@@ -107,6 +107,22 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			INSERT INTO inp_dscenario_pump(dscenario_id, node_id, power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id)
 			VALUES (NEW.dscenario_id, NEW.node_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern_id, NEW.status, NEW.effic_curve_id, NEW.energy_price, NEW.energy_pattern_id);
 
+
+		ELSIF v_dscenario_type = 'VIRTUALPUMP' THEN
+
+			-- default values
+			IF NEW.power IS NULL THEN NEW.power = (SELECT power FROM v_edit_inp_virtualpump WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_virtualpump WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.pattern_id IS NULL OR NEW.pattern_id='' THEN NEW.pattern_id = (SELECT pattern_id FROM v_edit_inp_virtualpump WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM v_edit_inp_virtualpump WHERE arc_id = NEW.arc_id);END IF;
+
+			IF NEW.effic_curve_id IS NULL OR NEW.effic_curve_id='' THEN NEW.effic_curve_id = (SELECT effic_curve_id FROM v_edit_inp_virtualpump WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.energy_price IS NULL THEN NEW.energy_price = (SELECT energy_price FROM v_edit_inp_virtualpump WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.energy_pattern_id IS NULL OR NEW.energy_pattern_id='' THEN NEW.energy_pattern_id = (SELECT energy_pattern_id FROM v_edit_inp_virtualpump WHERE arc_id = NEW.arc_id);END IF;
+	
+			INSERT INTO inp_dscenario_virtualpump(dscenario_id, arc_id, power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id)
+			VALUES (NEW.dscenario_id, NEW.arc_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern_id, NEW.status, NEW.effic_curve_id, NEW.energy_price, NEW.energy_pattern_id);
+
 		ELSIF v_dscenario_type = 'PIPE' THEN
 
 			-- default values
@@ -277,11 +293,16 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			mixing_model=NEW.mixing_model, mixing_fraction=NEW.mixing_fraction, reaction_coeff=NEW.reaction_coeff,  init_quality=NEW.init_quality, source_type=NEW.source_type,
 			source_quality=NEW.source_quality, source_pattern_id=NEW.source_pattern_id
 			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
+
+		ELSIF v_dscenario_type = 'VIRTUALPUMP' THEN
+			UPDATE inp_dscenario_virtualpump SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, power=NEW.power, curve_id=NEW.curve_id,
+			speed=NEW.speed, pattern=NEW.pattern, status=NEW.status,
+			effic_curve_id = NEW.effic_curve_id, energy_price = NEW.energy_price, energy_pattern_id = NEW.energy_pattern_id
+			WHERE dscenario_id=OLD.dscenario_id AND arc_id=OLD.arc_id;
 			
 		ELSIF v_dscenario_type = 'VIRTUALVALVE' THEN
 			UPDATE inp_dscenario_virtualvalve SET dscenario_id=NEW.dscenario_id, arc_id=NEW.arc_id, valv_type=NEW.valv_type, pressure=NEW.pressure, 
-			flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id, minorloss=NEW.minorloss, status=NEW.status,
-			minorloss=NEW.minorloss, status=NEW.status, init_quality=NEW.init_quality
+			flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id, minorloss=NEW.minorloss, status=NEW.status, init_quality=NEW.init_quality
 			WHERE dscenario_id=OLD.dscenario_id AND arc_id=OLD.arc_id;
 	
 		ELSIF v_dscenario_type = 'PUMP_ADDITIONAL' THEN

@@ -1456,7 +1456,6 @@ UPDATE config_form_fields
 	SET widgetfunction='{"functionName": "filter_table", "parameters": {"columnfind": "hydrometer_customer_code", "field_id": "feature_id"}}'::json
 	WHERE formtype='form_feature' AND columnname='hydrometer_id' AND tabname='tab_hydrometer';
 
-
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, 
 tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols,
@@ -1464,3 +1463,29 @@ widgetfunction, linkedobject, hidden, web_layoutorder)
 select 'node', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
 from  config_form_fields where formname = 'connec' and tabname ilike '%hydro%' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+-- 28/05/2023
+INSERT INTO inp_virtualpump 
+SELECT arc_id, power, curve_id, speed, pattern_id, status, energyparam, energyvalue, effic_curve_id, energy_price, energy_pattern_id 
+FROM _inp_pump_importinp_ ;
+
+INSERT INTO inp_virtualvalve SELECT * FROM _inp_valve_importinp_ ;
+
+UPDATE sys_table SET id = 'inp_virtualpump' WHERE id = 'inp_pump_importinp';
+
+INSERT INTO sys_table VALUES ('v_edit_inp_virtualpump', 'Shows editable information about virtualpumps', 'role_epa', null,'{"level_1":"EPA","level_2":"HYDRAULICS"}', 11, 
+'Inp Virtualpump',null, null, null, 'core', null, null);
+
+INSERT INTO sys_table VALUES ('ve_epa_virtualpump', 'Shows editable information about virtualpumps', 'role_epa', null, null,null, null,null, null, null, 'core', null, null);
+
+INSERT INTO sys_table VALUES ('v_edit_inp_dscenario_virtualpump', 'Shows editable information about dscenario for virtualpumps', 'role_epa', null,'{"level_1":"EPA","level_2":"DSCENARIO"}', 9, 
+'Virtualpump Dscenario',null, null, null, 'core', null, '{"pkey":"dscenario_id, arc_id"}');
+
+DELETE FROM sys_feature_epa_type WHERE id IN ('PUMP-IMPORTINP','VALVE-IMPORTINP');
+
+INSERT INTO sys_feature_epa_type VALUES ('VIRTUALPUMP', 'ARC', 'inp_virtualpump',null,TRUE);
+
+ALTER TABLE arc DROP CONSTRAINT arc_epa_type_check;
+
+ALTER TABLE arc ADD CONSTRAINT arc_epa_type_check CHECK (epa_type::text = ANY (ARRAY['PIPE'::text, 'UNDEFINED'::text, 'VIRTUALPUMP'::text, 'VIRTUALVALVE'::text]));

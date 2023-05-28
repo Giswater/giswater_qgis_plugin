@@ -58,7 +58,7 @@ BEGIN
 			NEW.power=NULL;	   
 	    END IF;
 	    
-	    INSERT INTO inp_pump_importinp (arc_id,power,curve_id,speed,pattern_id)
+	    INSERT INTO inp_virtualpump (arc_id,power,curve_id,speed,pattern_id)
 	    VALUES (NEW.arc_id,NEW.power, NEW.head, NEW.speed::numeric, NEW.pattern_id);
 	    INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id); 
 	    
@@ -127,7 +127,7 @@ BEGIN
 
 	  ELSIF v_view='vi_energy' THEN
 	  	IF NEW.pump_id ilike 'PUMP%' THEN
-	  		UPDATE inp_pump_importinp SET energyparam = NEW.idval , energyvalue = NEW.energyvalue 
+	  		UPDATE inp_virtualpump SET energyparam = NEW.idval , energyvalue = NEW.energyvalue 
 	  		WHERE arc_id = REGEXP_REPLACE(LTRIM (NEW.pump_id, 'PUMP '),' ','');
 	  	ELSE
 	  		INSERT INTO inp_energy(descript) select concat(NEW.pump_id, ' ',NEW.idval); 

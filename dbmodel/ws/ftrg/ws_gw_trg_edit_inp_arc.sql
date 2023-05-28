@@ -54,6 +54,11 @@ BEGIN
             UPDATE inp_virtualvalve SET valv_type=NEW.valv_type, pressure=NEW.pressure, flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id,
             minorloss=NEW.minorloss, status=NEW.status, init_quality=NEW.init_quality
             WHERE arc_id=OLD.arc_id;
+           
+        ELSIF v_arc_table = 'inp_virtualpump' THEN   
+            UPDATE inp_virtualpump  SET power=NEW.power, curve_id=NEW.curve_id, speed=NEW.speed, pattern_id=NEW.pattern_id, status=NEW.status , pump_type=NEW.pump_type,
+            effic_curve_id = NEW.effic_curve_id, energy_price = NEW.energy_price, energy_pattern_id = NEW.energy_pattern_id
+            WHERE arc_id=OLD.arc_id;
 
         END IF;
 

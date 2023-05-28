@@ -1957,3 +1957,112 @@ UNION
   ORDER BY 1;
 
 
+-- 28/05/2023
+CREATE OR REPLACE VIEW v_edit_inp_virtualpump AS 
+ SELECT
+    a.arc_id,
+    a.node_1,
+    a.node_2,
+    a.arccat_id,
+    a.sector_id,
+    a.macrosector_id,
+    a.state,
+    a.state_type,
+    a.annotation,
+    a.expl_id,
+    a.dma_id,
+    p.power,
+    p.curve_id,
+    p.speed,
+    p.pattern_id,
+    p.status,
+    energyparam,
+    energyvalue,
+    effic_curve_id,
+    energy_price,
+    energy_pattern_id,
+    p.pump_type,
+    a.the_geom
+   FROM selector_sector ss, v_arc a
+     JOIN inp_virtualpump p USING (arc_id)
+     WHERE a.sector_id = ss.sector_id AND ss.cur_user = "current_user"()::text AND a.is_operative IS TRUE;
+
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_virtualpump AS 
+ SELECT
+    v.dscenario_id,
+    p.arc_id,
+    v.power,
+    v.curve_id,
+    v.speed,
+    v.pattern_id,
+    v.status,
+    v.pump_type,
+    v.energyparam,
+    v.energyvalue,
+    v.effic_curve_id,
+    v.energy_price,
+    v.energy_pattern_id,
+    p.the_geom
+   FROM selector_inp_dscenario, v_edit_inp_virtualpump p 
+     JOIN inp_dscenario_virtualpump v USING (arc_id)
+  WHERE v.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW ve_epa_virtualpump AS 
+ SELECT p.arc_id,
+    p.power,
+    p.curve_id,
+    p.speed,
+    p.pattern_id,
+    p.status,
+    p.energyparam,
+    p.energyvalue,
+    p.pump_type,
+    p.effic_curve_id,
+    p.energy_price,
+    p.energy_pattern_id,
+    v_rpt_arc.result_id,
+    v_rpt_arc.flow_max AS flowmax,
+    v_rpt_arc.flow_min AS flowmin,
+    v_rpt_arc.flow_avg AS flowavg,
+    v_rpt_arc.vel_max AS velmax,
+    v_rpt_arc.vel_min AS velmin,
+    v_rpt_arc.vel_avg AS velavg,
+    v_rpt_arc.headloss_max,
+    v_rpt_arc.headloss_min,
+    v_rpt_arc.setting_max,
+    v_rpt_arc.setting_min,
+    v_rpt_arc.reaction_max,
+    v_rpt_arc.reaction_min,
+    v_rpt_arc.ffactor_max,
+    v_rpt_arc.ffactor_min
+   FROM ws36.inp_virtualpump p
+     LEFT JOIN ws36.v_rpt_arc USING (arc_id);
+
+
+CREATE OR REPLACE VIEW vi_pumps AS 
+ SELECT temp_arc.arc_id,
+    temp_arc.node_1,
+    temp_arc.node_2,
+        CASE
+            WHEN (temp_arc.addparam::json ->> 'power'::text) <> ''::text THEN ('POWER'::text || ' '::text) || (temp_arc.addparam::json ->> 'power'::text)
+            ELSE NULL::text
+        END AS power,
+        CASE
+            WHEN (temp_arc.addparam::json ->> 'curve_id'::text) <> ''::text THEN ('HEAD'::text || ' '::text) || (temp_arc.addparam::json ->> 'curve_id'::text)
+            ELSE NULL::text
+        END AS head,
+        CASE
+            WHEN (temp_arc.addparam::json ->> 'speed'::text) <> ''::text THEN ('SPEED'::text || ' '::text) || (temp_arc.addparam::json ->> 'speed'::text)
+            ELSE NULL::text
+        END AS speed,
+        CASE
+            WHEN (temp_arc.addparam::json ->> 'pattern'::text) <> ''::text THEN ('PATTERN'::text || ' '::text) || (temp_arc.addparam::json ->> 'pattern'::text)
+            ELSE NULL::text
+        END AS pattern_id,
+    concat(';', temp_arc.sector_id, ' ', temp_arc.dma_id, ' ', temp_arc.presszone_id, ' ', temp_arc.dqa_id, ' ', temp_arc.minsector_id, ' ', temp_arc.arccat_id) AS other
+   FROM temp_arc
+  WHERE temp_arc.epa_type::text IN('PUMP', 'VIRTUALPUMP') AND NOT (temp_arc.arc_id::text IN ( SELECT vi_valves.arc_id
+           FROM vi_valves))
+  ORDER BY temp_arc.arc_id;
+ 

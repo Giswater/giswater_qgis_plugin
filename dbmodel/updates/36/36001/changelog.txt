@@ -1,5 +1,6 @@
 3.6.001
 *************
+- Full refactor of inp database objects
 - New variable edit_link_check_arcdnom to check if new link is connected to an arc with smaller diameter than defined value (WS)
 - New process to check existing connecs related to arcs with diameter bigger than defined value (WS)
 - New process to check existing connects with more than 1 link on service
@@ -15,3 +16,4 @@
 - New functionality: get address and postnumber automatically when inserting node and connec
 - New function: gw_fct_mincut_show_current to show mincuts that are currently beeing executed in a field.
 - Add staticpressure update on trg_edit_connec (harmonize with node)
+- Create new object ws-virtualpump and remove import inppump and import inpvalves

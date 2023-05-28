@@ -461,9 +461,14 @@ BEGIN
 
         -- EPA INSERT
         IF (NEW.epa_type = 'PIPE') THEN 
-            v_inp_table:= 'inp_pipe';
-		ELSIF (NEW.epa_type = 'VIRTUAL') THEN 
-			v_inp_table:= 'inp_virtual';
+		v_inp_table:= 'inp_pipe';
+		
+	ELSIF (NEW.epa_type = 'VIRTUALPUMP') THEN
+	 	v_inp_table:= 'inp_virtualpump';
+
+	ELSIF (NEW.epa_type = 'VIRTUALVALVE') THEN
+		v_inp_table:= 'inp_virtualvalve';
+
         END IF;
 		
        	IF v_inp_table IS NOT NULL THEN
@@ -507,6 +512,8 @@ BEGIN
 				v_inp_table:= 'inp_pipe';
 			ELSIF (OLD.epa_type = 'VIRTUALVALVE') THEN
 				v_inp_table:= 'inp_virtualvalve';
+			ELSIF (OLD.epa_type = 'VIRTUALPUMP') THEN
+				v_inp_table:= 'inp_virtualpump';
 			END IF;
 			IF v_inp_table IS NOT NULL THEN
 				v_sql:= 'DELETE FROM '||v_inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
@@ -519,7 +526,9 @@ BEGIN
 			IF (NEW.epa_type = 'PIPE') THEN
 				INSERT INTO inp_pipe VALUES (NEW.arc_id) ON CONFLICT (arc_id) DO NOTHING;
 			ELSIF (NEW.epa_type = 'VIRTUALVALVE') THEN
-				INSERT INTO inp_virtualvalve (arc_id, status, valv_type) VALUES (NEW.arc_id, 'ACTIVE', 'FCV') ON CONFLICT (arc_id) DO NOTHING;
+				INSERT INTO inp_virtualvalve (arc_id, status) VALUES (NEW.arc_id, 'ACTIVE') ON CONFLICT (arc_id) DO NOTHING;
+			ELSIF (NEW.epa_type = 'VIRTUALPUMP') THEN
+				INSERT INTO inp_virtualpump (arc_id, status) VALUES (NEW.arc_id, 'ACTIVE') ON CONFLICT (arc_id) DO NOTHING;
 			END IF;
 		END IF;
 	

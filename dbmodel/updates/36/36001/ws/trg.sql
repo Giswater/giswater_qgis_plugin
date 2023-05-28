@@ -150,3 +150,11 @@ ON connec FOR EACH ROW EXECUTE FUNCTION gw_trg_link_data('connec');
 
 CREATE TRIGGER gw_trg_dscenario_demand_feature AFTER INSERT ON inp_dscenario_demand 
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_dscenario_demand_feature();
+
+
+-- 28/05/2023
+CREATE TRIGGER gw_trg_edit_inp_arc_pump INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_virtualpump
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_virtualpump');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_virtualpump INSTEAD OF INSERT OR UPDATE OR DELETE  ON v_edit_inp_dscenario_virtualpump
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('VIRTUALPUMP');

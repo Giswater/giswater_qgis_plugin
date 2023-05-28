@@ -215,22 +215,12 @@ BEGIN
 		RAISE NOTICE '17 - Check result network';
 		PERFORM gw_fct_pg2epa_check_network(v_input);
 		
-		RAISE NOTICE '18- update values from inp_*_importinp tables';-- when delete network is enabled
-
-		UPDATE temp_arc t SET status = b.status, diameter = b.diameter, epa_type ='VALVE',
-		addparam = concat('{"valv_type":"',valv_type,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "flow":"',flow,'", "pressure":"',pressure,'", "status":"',b.status,'", "minorloss":"',b.minorloss,'"}')
-		FROM inp_valve_importinp b WHERE t.arc_id = b.arc_id;
-
-		UPDATE temp_arc t SET status = b.status, epa_type ='PUMP',
-		addparam = concat('{"power":"',power,'", "speed":"',speed,'", "curve_id":"',curve_id,'", "pattern_id":"',pattern_id,'", "effic_curve_id":"',effic_curve_id,'", "status":"',b.status,'", "energy_price":"',b.energy_price,'", "energy_pattern_id":"',b.energy_pattern_id,'"}')
-		FROM inp_pump_importinp b WHERE t.arc_id = b.arc_id;
-
-		RAISE NOTICE '19 - Check result previous exportation';
+		RAISE NOTICE '18 - Check result previous exportation';
 		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return;
 		
 	END IF;
 
-	RAISE NOTICE '20 - Profilactic last control';
+	RAISE NOTICE '19 - Profilactic last control';
 
 	-- arcs without nodes
 	UPDATE temp_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM temp_arc a LEFT JOIN temp_node ON node_1=node_id WHERE temp_node.node_id is null) a WHERE t.id = a.id;

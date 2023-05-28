@@ -159,30 +159,16 @@ BEGIN
 		DELETE FROM inp_connec WHERE connec_id NOT IN (SELECT connec_id FROM connec);
 		
 		-- arc ws
-		INSERT INTO inp_virtualvalve
-		SELECT arc_id FROM arc WHERE state >0 and epa_type = 'VIRTUALVALVE'
-		ON CONFLICT (arc_id) DO NOTHING;
-
-		INSERT INTO inp_pump_importinp
-		SELECT arc_id FROM arc WHERE state >0 and epa_type = 'PUMP-IMPORTINP'
-		ON CONFLICT (arc_id) DO NOTHING;
-
-		INSERT INTO inp_valve_importinp
-		SELECT arc_id FROM arc WHERE state >0 and epa_type = 'VALVE-IMPORTINP'
-		ON CONFLICT (arc_id) DO NOTHING;
-		
-		INSERT INTO inp_pipe
-		SELECT arc_id FROM arc WHERE state >0 and epa_type = 'PIPE'
-		ON CONFLICT (arc_id) DO NOTHING;
+		INSERT INTO inp_virtualvalve SELECT arc_id FROM arc WHERE state >0 and epa_type = 'VIRTUALVALVE' ON CONFLICT (arc_id) DO NOTHING;
+		INSERT INTO inp_virtualpump SELECT arc_id FROM arc WHERE state >0 and epa_type = 'VIRTUALPUMP' ON CONFLICT (arc_id) DO NOTHING;
+		INSERT INTO inp_pipe SELECT arc_id FROM arc WHERE state >0 and epa_type = 'PIPE' ON CONFLICT (arc_id) DO NOTHING;
 
 		DELETE FROM inp_virtualvalve WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'UNDEFINED');
-		DELETE FROM inp_pump_importinp WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'UNDEFINED');
-		DELETE FROM inp_valve_importinp WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'UNDEFINED');
+		DELETE FROM inp_virtualpump WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'UNDEFINED');
 		DELETE FROM inp_pipe WHERE arc_id IN (SELECT arc_id FROM arc WHERE epa_type = 'UNDEFINED');
 
 		DELETE FROM inp_virtualvalve WHERE arc_id NOT IN (SELECT arc_id FROM arc WHERE epa_type = 'VIRTUALVALVE');
-		DELETE FROM inp_pump_importinp WHERE arc_id NOT IN (SELECT arc_id FROM arc WHERE epa_type = 'PUMP-IMPORTINP');
-		DELETE FROM inp_valve_importinp WHERE arc_id NOT IN (SELECT arc_id FROM arc WHERE epa_type = 'VALVE-IMPORTINP');
+		DELETE FROM inp_virtualpump WHERE arc_id NOT IN (SELECT arc_id FROM arc WHERE epa_type = 'VIRTUALPUMP');
 		DELETE FROM inp_pipe WHERE arc_id NOT IN (SELECT arc_id FROM arc WHERE epa_type = 'PIPE');	
 
 	ELSE 
