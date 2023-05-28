@@ -372,15 +372,13 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_pump', 'form_feature', 'epa', 'to_arc', 'lyt_epa_data_1', 6, 'string', 'text', 'To arc:', 'To arc', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
-    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'energyparam', 'lyt_epa_data_1', 7, 'string', 'combo', 'Energy parameter:', 'Energy parameter', false, false, true, false, 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''inp_value_param_energy''','{"filterSign":"ILIKE"}', NULL, false);
+    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'energyvalue', 'lyt_epa_data_1', 7, 'string', 'text', 'Energy value:', 'Energy value', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
-    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'energyvalue', 'lyt_epa_data_1', 8, 'string', 'text', 'Energy value:', 'Energy value', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'pump_type', 'lyt_epa_data_1', 8, 'string', 'combo', 'Pump type:', 'Pump type', false, false, true, false, 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''inp_typevalue_pumptype''','{"filterSign":"ILIKE"}', NULL, false);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
-    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'pump_type', 'lyt_epa_data_1', 9, 'string', 'combo', 'Pump type:', 'Pump type', false, false, true, false, 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''inp_typevalue_pumptype''','{"filterSign":"ILIKE"}', NULL, false);
+    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'energy_price', 'lyt_epa_data_1', 9, 'string', 'text', 'Energy price:', 'Energy price', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
-    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'energy_price', 'lyt_epa_data_1', 10, 'string', 'text', 'Energy price:', 'Energy price', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
-    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'price_pattern', 'lyt_epa_data_1', 11, 'string', 'text', 'Price pattern:', 'Price pattern', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+    VALUES ('ve_epa_pump', 'form_feature', 'epa', 'price_pattern', 'lyt_epa_data_1', 10, 'string', 'text', 'Price pattern:', 'Price pattern', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_pump', 'form_feature', 'epa', 'result_id', 'lyt_epa_data_2', 1, 'string', 'text', 'Result id:', 'Result id', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
@@ -891,60 +889,6 @@ AND columnname in ('init_quality', 'source_type', 'source_quality', 'source_patt
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 
-UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=a.dv_isnullvalue,
-widgetcontrols=a.widgetcontrols FROM config_form_fields a
-WHERE a.formname='v_edit_inp_junction' AND a.columnname='pattern_id' AND c.columnname='pattern_id' AND c.formname ILIKE 've_epa_%';
-
-UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=a.dv_isnullvalue,
-widgetcontrols=a.widgetcontrols FROM config_form_fields a
-WHERE a.formname='v_edit_inp_junction' AND a.columnname='source_type' AND c.columnname='source_type' AND c.formname ILIKE 've_epa_%';
-
-UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
-widgetcontrols=a.widgetcontrols FROM config_form_fields a
-WHERE a.formname='v_edit_inp_pipe' AND a.columnname='status' AND c.columnname='status' AND c.formname ILIKE 've_epa_pipe';
-
-UPDATE config_form_fields c SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_value_reactions''' ,
-dv_orderby_id=TRUE, dv_isnullvalue=true FROM config_form_fields a
-WHERE  c.columnname='reactionparam' AND c.formname ILIKE 've_epa_%';
-
-UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
-widgetcontrols=a.widgetcontrols FROM config_form_fields a
-WHERE a.formname='v_edit_inp_dscenario_junction' AND a.columnname='source_pattern_id' AND c.columnname='source_pattern_id' AND c.formname ILIKE 've_epa%';
-
-UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
-widgetcontrols=a.widgetcontrols FROM config_form_fields a
-WHERE a.formname='v_edit_inp_dscenario_pump' AND a.columnname='curve_id' AND c.columnname='curve_id' AND c.formname ILIKE 've_epa%';
-
-UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
-widgetcontrols=a.widgetcontrols FROM config_form_fields a
-WHERE a.formname='v_edit_inp_pump' AND a.columnname='energy_pattern_id' AND c.columnname='energy_pattern_id' AND c.formname ILIKE 've_epa%';
-
-UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
-widgetcontrols=a.widgetcontrols FROM config_form_fields a
-WHERE a.formname='v_edit_inp_pump' AND a.columnname='status' AND c.columnname='status' AND c.formname ILIKE 've_epa_pump';
-
-UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
-widgetcontrols=a.widgetcontrols FROM config_form_fields a
-WHERE a.formname='v_edit_inp_pump' AND a.columnname='pump_type' AND c.columnname='pump_type' AND c.formname ILIKE 've_epa_pump';
-
-UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
-widgetcontrols=a.widgetcontrols FROM config_form_fields a
-WHERE a.formname='v_edit_inp_shortpipe' AND a.columnname='status' AND c.columnname='status' AND c.formname ILIKE 've_epa_shortpipe';
-
-UPDATE config_form_fields c SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_value_mixing''' ,
-dv_orderby_id=TRUE, dv_isnullvalue=true FROM config_form_fields a
-WHERE  c.columnname='mixing_model';
-
-UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
-widgetcontrols=a.widgetcontrols FROM config_form_fields a
-WHERE a.formname='v_edit_inp_valve' AND a.columnname='status' AND c.columnname='status' AND 
-(c.formname ILIKE 've_epa_valve' OR c.formname ILIKE 've_epa_virtualvalve');
-
-UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
-widgetcontrols=a.widgetcontrols FROM config_form_fields a
-WHERE a.formname='v_edit_inp_valve' AND a.columnname='valv_type' AND c.columnname='valv_type' AND 
-(c.formname ILIKE 've_epa_valve' OR c.formname ILIKE 've_epa_virtualvalve');
-
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'node'::text, 'SELECT node_id AS node_id, code AS code FROM v_edit_node'::text) WHERE parameter = 'om_profile_guitartext';
 
 INSERT INTO sys_function
@@ -1451,7 +1395,7 @@ from  config_form_fields where formname = 'connec' and tabname ilike '%hydro%' O
 
 -- 28/05/2023
 INSERT INTO inp_virtualpump 
-SELECT arc_id, power, curve_id, speed, pattern_id, status, energyparam, energyvalue, effic_curve_id, energy_price, energy_pattern_id 
+SELECT arc_id, power, curve_id, speed, pattern_id, status, energyvalue, effic_curve_id, energy_price, energy_pattern_id 
 FROM _inp_pump_importinp_ ;
 
 INSERT INTO inp_virtualvalve SELECT * FROM _inp_valve_importinp_ ;
@@ -1493,8 +1437,6 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_virtualpump', 'form_feature', 'epa', 'status', 'lyt_epa_data_1', 5, 'string', 'text', 'Status:', 'Status', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
-    VALUES ('ve_epa_virtualpump', 'form_feature', 'epa', 'energyparam', 'lyt_epa_data_1', 7, 'string', 'combo', 'Energy parameter:', 'Energy parameter', false, false, true, false, 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''inp_value_param_energy''','{"filterSign":"ILIKE"}', NULL, false);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_virtualpump', 'form_feature', 'epa', 'energyvalue', 'lyt_epa_data_1', 8, 'string', 'text', 'Energy value:', 'Energy value', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_virtualpump', 'form_feature', 'epa', 'pump_type', 'lyt_epa_data_1', 9, 'string', 'combo', 'Pump type:', 'Pump type', false, false, true, false, 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''inp_typevalue_pumptype''','{"filterSign":"ILIKE"}', NULL, false);
@@ -1504,9 +1446,11 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
     VALUES ('ve_epa_virtualpump', 'form_feature', 'epa', 'energy_price', 'lyt_epa_data_1', 11, 'string', 'text', 'Energy price:', 'Energy price', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_virtualpump', 'form_feature', 'epa', 'price_pattern', 'lyt_epa_data_1', 12, 'string', 'text', 'Price pattern:', 'Price pattern', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
+    VALUES ('ve_epa_virtualpump', 'form_feature', 'epa', 'energy_pattern_id', 'lyt_epa_data_1', 12, 'string', 'text', 'Energy pattern:', 'Energy pattern', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
-    VALUES ('ve_epa_virtualpump', 'form_feature', 'epa', 'result_id', 'lyt_epa_data_2', 1, 'string', 'text', 'Result id:', 'Result id', false, false, true, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
+    VALUES ('ve_epa_virtualpump', 'form_feature', 'epa', 'result_id', 'lyt_epa_data_2', 1, 'string', 'text', 'Result id:', 'Result id', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_epa_virtualpump', 'form_feature', 'epa', 'flowmax', 'lyt_epa_data_2', 2, 'string', 'text', 'Max flow:', 'Max Flow', false, false, false, false, NULL,'{"filterSign":"ILIKE"}', NULL, false);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
@@ -1556,7 +1500,7 @@ widgetfunction, linkedobject, hidden, web_layoutorder)
 SELECT 'v_edit_inp_dscenario_virtualpump', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, 
 widgetfunction, linkedobject, hidden, web_layoutorder FROM config_form_fields 
-where formname = 've_epa_virtualpump' and columnname in ('pump_type', 'energyparam', 'energyvalue') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+where formname = 've_epa_virtualpump' and columnname in ('pump_type',  'energyvalue') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, 
@@ -1564,8 +1508,9 @@ widgetfunction, linkedobject, hidden, web_layoutorder)
 SELECT 'v_edit_inp_virtualpump', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, 
 widgetfunction, linkedobject, hidden, web_layoutorder FROM config_form_fields 
-where formname = 've_epa_virtualpump' and columnname in ('power', 'curve_id', 'speed', 'pattern_id', 'status', 'energyparam', 'energyvalue', 'pump_type', 
+where formname = 've_epa_virtualpump' and columnname in ('power', 'curve_id', 'speed', 'pattern_id', 'status', 'energyvalue', 'pump_type', 
 'effic_curve_id', 'energy_price', 'energy_pattern_id') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, 
 isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, 
@@ -1603,3 +1548,60 @@ UPDATE config_form_fields set tabname = 'tab_relation' where tabname = 'relation
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
 
 
+UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=a.dv_isnullvalue,
+widgetcontrols=a.widgetcontrols FROM config_form_fields a
+WHERE a.formname='v_edit_inp_junction' AND a.columnname='pattern_id' AND c.columnname='pattern_id' AND (c.formname ILIKE 've_epa_%' OR c.formname ='v_edit_inp_virtualpump');
+
+UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=a.dv_isnullvalue,
+widgetcontrols=a.widgetcontrols FROM config_form_fields a
+WHERE a.formname='v_edit_inp_junction' AND a.columnname='source_type' AND c.columnname='source_type' AND c.formname ILIKE 've_epa_%';
+
+UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
+widgetcontrols=a.widgetcontrols FROM config_form_fields a
+WHERE a.formname='v_edit_inp_pipe' AND a.columnname='status' AND c.columnname='status' AND c.formname ILIKE 've_epa_pipe';
+
+UPDATE config_form_fields c SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_value_reactions''' ,
+dv_orderby_id=TRUE, dv_isnullvalue=true FROM config_form_fields a
+WHERE  c.columnname='reactionparam' AND c.formname ILIKE 've_epa_%';
+
+UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
+widgetcontrols=a.widgetcontrols FROM config_form_fields a
+WHERE a.formname='v_edit_inp_dscenario_junction' AND a.columnname='source_pattern_id' AND c.columnname='source_pattern_id' AND c.formname ILIKE 've_epa%';
+
+UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
+widgetcontrols=a.widgetcontrols FROM config_form_fields a
+WHERE a.formname='v_edit_inp_dscenario_pump' AND a.columnname='curve_id' AND c.columnname='curve_id' AND (c.formname ILIKE 've_epa%' OR c.formname ilike '%virtualpump');
+
+UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
+widgetcontrols=a.widgetcontrols FROM config_form_fields a
+WHERE a.formname='v_edit_inp_pump' AND a.columnname='energy_pattern_id' AND c.columnname='energy_pattern_id' AND (c.formname ILIKE 've_epa%' OR  c.formname ilike '%virtualpump');
+
+UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
+widgetcontrols=a.widgetcontrols FROM config_form_fields a
+WHERE a.formname='v_edit_inp_pump' AND a.columnname='status' AND c.columnname='status' AND (c.formname ILIKE 've_epa_pump' OR  c.formname ilike '%virtualpump');
+
+UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
+widgetcontrols=a.widgetcontrols FROM config_form_fields a
+WHERE a.formname='v_edit_inp_pump' AND a.columnname='pump_type' AND c.columnname='pump_type' AND c.formname ILIKE 've_epa_pump';
+
+UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
+widgetcontrols=a.widgetcontrols FROM config_form_fields a
+WHERE a.formname='v_edit_inp_shortpipe' AND a.columnname='status' AND c.columnname='status' AND c.formname ILIKE 've_epa_shortpipe';
+
+UPDATE config_form_fields c SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_value_mixing''' ,
+dv_orderby_id=TRUE, dv_isnullvalue=true FROM config_form_fields a
+WHERE  c.columnname='mixing_model';
+
+UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
+widgetcontrols=a.widgetcontrols FROM config_form_fields a
+WHERE a.formname='v_edit_inp_valve' AND a.columnname='status' AND c.columnname='status' AND 
+(c.formname ILIKE 've_epa_valve' OR c.formname ILIKE 've_epa_virtualvalve');
+
+UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
+widgetcontrols=a.widgetcontrols FROM config_form_fields a
+WHERE a.formname='v_edit_inp_valve' AND a.columnname='valv_type' AND c.columnname='valv_type' AND 
+(c.formname ILIKE 've_epa_valve' OR c.formname ILIKE 've_epa_virtualvalve');
+
+UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
+widgetcontrols=a.widgetcontrols FROM config_form_fields a
+WHERE a.formname='v_edit_inp_dscenario_pump' AND a.columnname='effic_curve_id' AND c.columnname='effic_curve_id' AND (c.formname ILIKE 've_epa%' OR c.formname ilike '%virtualpump');
