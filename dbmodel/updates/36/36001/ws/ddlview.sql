@@ -2036,8 +2036,8 @@ CREATE OR REPLACE VIEW ve_epa_virtualpump AS
     v_rpt_arc.reaction_min,
     v_rpt_arc.ffactor_max,
     v_rpt_arc.ffactor_min
-   FROM ws36.inp_virtualpump p
-     LEFT JOIN ws36.v_rpt_arc USING (arc_id);
+   FROM inp_virtualpump p
+     LEFT JOIN v_rpt_arc USING (arc_id);
 
 
 CREATE OR REPLACE VIEW vi_pumps AS 
