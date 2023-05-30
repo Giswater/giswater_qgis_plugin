@@ -2586,7 +2586,7 @@ class GwInfo(QObject):
         """ Put filter widgets into layout and set headers into QTableView """
 
         index_tab = self.tab_main.currentIndex()
-        tab_name = self.tab_main.widget(index_tab).findChildren(QGridLayout)[1].objectName().replace('lyt_', "")[:-2]
+        tab_name = self.tab_main.widget(index_tab).objectName().replace('tab_', "")
         complet_list = self._get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject, id_name)
 
         if complet_list is False:
