@@ -23,12 +23,30 @@ v_schemaname text;
 v_rectable record;
 v_error_context text;
 v_errortext text;
+v_qgis_init_guide_map boolean;
+v_isaudit text;
+v_project_type text;
+v_version text;
+v_epsg integer;
+v_return json;
+
 
 BEGIN 
 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
+
+    SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_epsg FROM sys_version order by id desc limit 1;
+
+	-- Get input parameters
+    v_isaudit := (p_data ->> 'data')::json->> 'isAudit';
+
+    -- get user parameters
+    SELECT value INTO v_qgis_init_guide_map FROM config_param_user where parameter='qgis_init_guide_map' AND cur_user=current_user;
+
+    -- profilactic null control
+	IF v_qgis_init_guide_map IS NULL THEN v_qgis_init_guide_map = FALSE; END IF;
 
 	-- set mandatory values of config_param_user in case of not exists (for new users or for updates)
 	FOR v_rectable IN SELECT * FROM sys_param_user WHERE ismandatory IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member'))
@@ -100,6 +118,8 @@ BEGIN
 		END IF;
 	END IF;
 
+    --    Control null
+	v_return:=COALESCE(v_return,'{}');
 
 	--  Return	   
 	RETURN v_return;
