@@ -1236,26 +1236,6 @@ UPDATE config_form_tabs SET orderby = '5' where formname = 'v_edit_connec' and t
 UPDATE config_form_tabs SET orderby = '6' where formname = 'v_edit_connec' and tabname = 'tab_event';
 UPDATE config_form_tabs SET orderby = '7' where formname = 'v_edit_connec' and tabname = 'tab_documents';
 
-INSERT INTO config_visit_class
-(id, idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role, visit_type, param_options, formname, tablename, ui_tablename, parent_id, inherit_values)
-VALUES(7, 'Incident arc', NULL, true, false, true, 'ARC', 'role_om', 2, NULL, 'incident_arc', 've_incident_arc', NULL, NULL, NULL);
-INSERT INTO config_visit_class
-(id, idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role, visit_type, param_options, formname, tablename, ui_tablename, parent_id, inherit_values)
-VALUES(8, 'Incident node', NULL, true, false, true, 'NODE', 'role_om', 2, NULL, 'incident_node', 've_incident_node', NULL, NULL, NULL);
-INSERT INTO config_visit_class
-(id, idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role, visit_type, param_options, formname, tablename, ui_tablename, parent_id, inherit_values)
-VALUES(9, 'Incident connec', NULL, true, false, true, 'CONNEC', 'role_om', 2, NULL, 'incident_connec', 've_incident_arc', NULL, NULL, NULL);
-
-INSERT INTO config_visit_class_x_parameter
-(class_id, parameter_id, active)
-VALUES(7, 'incident_type', true);
-INSERT INTO config_visit_class_x_parameter
-(class_id, parameter_id, active)
-VALUES(8, 'incident_type', true);
-INSERT INTO config_visit_class_x_parameter
-(class_id, parameter_id, active)
-VALUES(9, 'incident_type', true);
-
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('incident_arc', 'form_visit', 'tab_file', 'backbutton', 'lyt_files_2', 1, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Back"}'::json, '{

@@ -820,3 +820,23 @@ GRANT SELECT, TRIGGER, UPDATE, DELETE, REFERENCES, INSERT, TRUNCATE ON TABLE ve_
 UPDATE config_form_tabs SET device = '{4,5}' where formname = 've_node_water_connection';
 UPDATE config_form_tabs SET device = '{5}' where formname like 'visit_%';
 UPDATE config_form_tabs SET device = '{4}' where formname like 'v_edit_%' and tabname = 'tab_plan';
+
+INSERT INTO config_visit_class
+(id, idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role, visit_type, param_options, formname, tablename, ui_tablename, parent_id, inherit_values)
+VALUES(10, 'Incident arc', NULL, true, false, true, 'ARC', 'role_om', 2, NULL, 'incident_arc', 've_incident_arc', NULL, NULL, NULL);
+INSERT INTO config_visit_class
+(id, idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role, visit_type, param_options, formname, tablename, ui_tablename, parent_id, inherit_values)
+VALUES(11, 'Incident node', NULL, true, false, true, 'NODE', 'role_om', 2, NULL, 'incident_node', 've_incident_node', NULL, NULL, NULL);
+INSERT INTO config_visit_class
+(id, idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role, visit_type, param_options, formname, tablename, ui_tablename, parent_id, inherit_values)
+VALUES(12, 'Incident connec', NULL, true, false, true, 'CONNEC', 'role_om', 2, NULL, 'incident_connec', 've_incident_arc', NULL, NULL, NULL);
+
+INSERT INTO config_visit_class_x_parameter
+(class_id, parameter_id, active)
+VALUES(10, 'incident_type', true);
+INSERT INTO config_visit_class_x_parameter
+(class_id, parameter_id, active)
+VALUES(11, 'incident_type', true);
+INSERT INTO config_visit_class_x_parameter
+(class_id, parameter_id, active)
+VALUES(12, 'incident_type', true);
