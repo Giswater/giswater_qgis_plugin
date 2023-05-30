@@ -1605,3 +1605,18 @@ WHERE a.formname='v_edit_inp_valve' AND a.columnname='valv_type' AND c.columnnam
 UPDATE config_form_fields c SET widgettype=a.widgettype, dv_querytext=a.dv_querytext, dv_orderby_id=a.dv_orderby_id, dv_isnullvalue=true,
 widgetcontrols=a.widgetcontrols FROM config_form_fields a
 WHERE a.formname='v_edit_inp_dscenario_pump' AND a.columnname='effic_curve_id' AND c.columnname='effic_curve_id' AND (c.formname ILIKE 've_epa%' OR c.formname ilike '%virtualpump');
+
+--2023/05/30
+UPDATE config_form_fields
+	SET dv_querytext_filterc=NULL
+	WHERE formtype='form_feature' AND columnname='cat_period_id';
+UPDATE config_form_fields
+	SET dv_querytext_filterc='WHERE feature_id '
+	WHERE formtype='form_feature' AND columnname='hydrometer_customer_code';
+
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName": "filter_table", "parameters": {"field_id": "feature_id"}}'::json
+	WHERE formtype='form_feature' AND columnname IN ('cat_period_id', 'hydrometer_customer_code');
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName": "filter_table", "parameters": {"columnfind": "hydrometer_customer_code", "field_id": "feature_id"}}'::json
+	WHERE formtype='form_feature' AND columnname='hydrometer_id';
