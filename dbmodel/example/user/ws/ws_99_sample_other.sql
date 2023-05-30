@@ -468,7 +468,7 @@ ON CONFLICT (parameter, cur_user) DO NOTHING;
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'qgis_form_docker' AND cur_user = current_user;
 
-UPDATE config_form_fields SET  layoutname = 'lyt_top_1' where columnname = 'arc_id'AND formname LIKE '%_arc_%';
+UPDATE config_form_fields SET  layoutname = 'lyt_top_1' where columnname = 'arc_id'AND formname LIKE '%_arc_%' and formname not LIKE 'visit_arc_%';
 
 UPDATE config_form_fields SET layoutorder = 20 where columnname ='minsector_id' and formname like '%_node_%';
 UPDATE config_form_fields SET layoutorder = 23 where columnname ='rotation' and formname like '%_node_%';
