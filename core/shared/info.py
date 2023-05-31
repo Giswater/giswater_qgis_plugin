@@ -3234,7 +3234,6 @@ def open_epa_dlg(**kwargs):
 
         complet_list = get_list(view, id_name, feature_id)
         fill_tbl(complet_list, tbl, info, view)
-        # info.dlg.accepted.connect(partial(save_tbl_changes, complet_list, info))
         info.dlg.btn_accept.clicked.connect(partial(save_tbl_changes, complet_list, info, info.dlg))
 
         # Add & Delete buttons
@@ -3291,15 +3290,39 @@ def add_row_epa(tbl, tablename, pkey, **kwargs):
     # Populate node_id
     tools_qt.set_widget_text(info.add_dlg, 'tab_none_node_id', feature_id)
     tools_gw.get_values(info.add_dlg, tools_qt.get_widget(info.add_dlg, 'tab_none_node_id'), info.my_json_add, ignore_editability=True)
-    # tools_qt.get_widget(info.add_dlg, 'tab_none_node_id').editingFinished.emit()
 
     # Signals
     info.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, info.add_dlg))
     info.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, info.add_dlg))
+    info.add_dlg.dlg_closed.connect(partial(refresh_epa_tbl, tablename, **kwargs))
     info.add_dlg.btn_accept.clicked.connect(partial(accept_add_dlg, info.add_dlg, tablename, pkey, feature_id, info.my_json_add))
 
     # Open dlg
     tools_gw.open_dialog(info.add_dlg, dlg_name='info_generic')
+
+
+def refresh_epa_tbl(tablename, **kwargs):
+    # Get variables
+    complet_result = kwargs['complet_result']
+    info = kwargs['class']
+    func_params = kwargs['func_params']
+    tableviews = func_params['tableviews']
+
+    feature_id = complet_result['body']['feature']['id']
+    id_name = complet_result['body']['feature']['idName']
+
+    # Fill tableviews
+    for tableview in tableviews:
+        tbl = tableview['tbl']
+        tbl = info.dlg.findChild(QTableView, tbl)
+        if not tbl:
+            continue
+        view = tableview['view']
+        if view != tablename:
+            continue
+
+        complet_list = get_list(view, id_name, feature_id)
+        fill_tbl(complet_list, tbl, info, view)
 
 
 def delete_tbl_row(tbl, tablename, pkey, **kwargs):
@@ -3337,7 +3360,7 @@ def delete_tbl_row(tbl, tablename, pkey, **kwargs):
             tools_db.execute_sql(sql)
 
         # Refresh tableview
-        # self._fill_dscenario_table()
+        refresh_epa_tbl(tablename, **kwargs)
 
 
 def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json):
