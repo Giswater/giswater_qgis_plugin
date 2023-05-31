@@ -3256,6 +3256,7 @@ def open_epa_dlg(**kwargs):
                 tools_gw.add_icon(btn_delete_dscenario, '112b', "24x24")
                 btn_delete_dscenario.clicked.connect(partial(delete_tbl_row, tbl, view, pk, **kwargs))
 
+    info.dlg.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, info.dlg, True))
     info.dlg.finished.connect(partial(tools_gw.save_settings, info.dlg))
     # Open dlg
     tools_gw.open_dialog(info.dlg, dlg_name=ui_name)
@@ -3453,6 +3454,7 @@ def save_tbl_changes(complet_list, info, dialog):
     view = complet_list['body']['feature']['tableName']
     my_json = getattr(info, f"my_json_{view}")
     if not my_json:
+        tools_gw.close_dialog(dialog)
         return
 
     # For each edited row
