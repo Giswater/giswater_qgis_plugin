@@ -3287,9 +3287,30 @@ def add_row_epa(tbl, tablename, pkey, **kwargs):
     tools_gw.load_settings(info.add_dlg)
     info.my_json_add = {}
     tools_gw.build_dialog_info(info.add_dlg, result, my_json=info.my_json_add)
+
     # Populate node_id
     tools_qt.set_widget_text(info.add_dlg, 'tab_none_node_id', feature_id)
-    tools_gw.get_values(info.add_dlg, tools_qt.get_widget(info.add_dlg, 'tab_none_node_id'), info.my_json_add, ignore_editability=True)
+    layout = info.add_dlg.findChild(QGridLayout, 'lyt_main_1')
+
+    # Get every widget in the layout
+    widgets = []
+    for row in range(layout.rowCount()):
+        for column in range(layout.columnCount()):
+            item = layout.itemAtPosition(row, column)
+            if item is not None:
+                widget = item.widget()
+                if widget is not None and type(widget) != QLabel:
+                    widgets.append(widget)
+    # Get all widget's values
+    for widget in widgets:
+        tools_gw.get_values(info.add_dlg, widget, info.my_json_add, ignore_editability=True)
+    # Remove Nones from info.my_json_add
+    keys_to_remove = []
+    for key, value in info.my_json_add.items():
+        if value is None:
+            keys_to_remove.append(key)
+    for key in keys_to_remove:
+        del info.my_json_add[key]
 
     # Signals
     info.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, info.add_dlg))
