@@ -200,6 +200,12 @@ BEGIN
 
 	RAISE NOTICE '--- Returning from (gw_fct_setinsert) with this message :: % ---', v_message;
 
+	-- manage nulls
+	v_message = COALESCE(v_message, '{}');
+	v_version = COALESCE(v_version, '""');
+	v_tablename = COALESCE(v_tablename, '');
+	v_newid = COALESCE(v_newid, '');
+
 	-- Return
     RETURN ('{"status":"Accepted", "message":'|| v_message ||', "version":'|| v_version ||
 	    ', "body": {"feature":{"tableName":"'||v_tablename||'", "id":"'||v_newid||'"}}}')::json;
