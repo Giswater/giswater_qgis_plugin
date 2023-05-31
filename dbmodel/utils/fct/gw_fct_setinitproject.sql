@@ -121,8 +121,8 @@ BEGIN
     --    Control null
 	v_return:=COALESCE(v_return,'{}');
 
-	--  Return	   
-	RETURN v_return;
+	--  Return
+	RETURN ('{"status":"Accepted", "version":"'|| v_version ||'"}')::json;
 	
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
