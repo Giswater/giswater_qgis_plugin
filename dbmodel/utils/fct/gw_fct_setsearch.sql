@@ -87,7 +87,7 @@ v_address_geom_id_field varchar;
 --hydro
 v_hydro_layer varchar;
 v_hydro_id_field varchar;
-v_hydro_connec_field varchar;
+v_hydro_feature_field varchar;
 v_hydro_search_field_1 varchar;
 v_hydro_search_field_2 varchar;
 v_hydro_search_field_3 varchar;
@@ -183,26 +183,26 @@ BEGIN
 			' WHERE '||quote_ident(v_filter_key)||' = ('||quote_nullable(v_filter_value)||'))row'
 			INTO v_geometry;
 		elsif v_section = 'basic_search_v2_address' and v_search_add = 'true' then
-			
+
 			EXECUTE 'SELECT row_to_json(row) FROM (SELECT st_x (a.the_geom) as xcoord, st_y (a.the_geom) as  ycoord, St_AsText(a.the_geom) FROM v_ext_streetaxis s join ext_municipality m using(muni_id) join v_ext_address a on s.id = a.streetaxis_id
 			 WHERE concat(s.name, '', '', m.name, '', '', a.postnumber) = ('||quote_nullable(v_filter_value)||'))row'
 			INTO v_geometry;
-			
+
 		elsif v_section = 'basic_search_v2_address' then
 			EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM v_ext_streetaxis '||
 			' s WHERE '||v_filter_key||' = ('||quote_nullable(v_filter_value)||'))row'
-			INTO v_geometry;		
+			INTO v_geometry;
 		elsif v_section = 'basic_search_v2_psector' then
 			EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM '||quote_ident(v_table_name)||
 			' WHERE '||quote_ident(v_filter_key)||' = ('||quote_nullable(v_filter_value)||'))row'
 			INTO v_geometry;
 		elsif v_section = 'basic_search_v2_hydrometer' then
-			EXECUTE 'SELECT connec_id FROM '||quote_ident(v_table_name)||
+			EXECUTE 'SELECT feature_id FROM '||quote_ident(v_table_name)||
 			' WHERE '||quote_ident(v_filter_key)||' = ('||quote_nullable(v_filter_value)||')'
 			INTO v_result;
 
 			EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM v_edit_connec
-			WHERE connec_id = ('||quote_nullable(v_result)||'))row'
+			WHERE feature_id = ('||quote_nullable(v_result)||'))row'
 			INTO v_geometry;
 		elsif v_section = 'basic_search_v2_workcat' then
 
@@ -398,7 +398,7 @@ BEGIN
 			-- Parameters of the hydro layer
 			SELECT ((value::json)->>'sys_table_id') INTO v_hydro_layer FROM config_param_system WHERE parameter='basic_search_hydrometer';
 			SELECT ((value::json)->>'sys_id_field') INTO v_hydro_id_field FROM config_param_system WHERE parameter='basic_search_hydrometer';
-			SELECT ((value::json)->>'sys_connec_id') INTO v_hydro_connec_field FROM config_param_system WHERE parameter='basic_search_hydrometer';
+			SELECT ((value::json)->>'sys_feature_id') INTO v_hydro_feature_field FROM config_param_system WHERE parameter='basic_search_hydrometer';
 			SELECT ((value::json)->>'sys_search_field_1') INTO v_hydro_search_field_1 FROM config_param_system WHERE parameter='basic_search_hydrometer';
 			SELECT ((value::json)->>'sys_search_field_2') INTO v_hydro_search_field_2 FROM config_param_system WHERE parameter='basic_search_hydrometer';
 			SELECT ((value::json)->>'sys_search_field_3') INTO v_hydro_search_field_3 FROM config_param_system WHERE parameter='basic_search_hydrometer';
@@ -428,7 +428,7 @@ BEGIN
 				'||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_3)||')
 				 AS display_name, '||quote_literal(v_hydro_layer)||' AS sys_table_id, '||quote_literal(v_hydro_id_field)||' AS sys_idname
 				FROM '||quote_ident(v_hydro_layer)||'
-				JOIN connec ON (connec.connec_id = '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_connec_field)||')
+				JOIN connec ON (connec.connec_id = '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_feature_field)||')
 				WHERE '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_exploitation_display_field)||' = '||quote_literal(v_name)||'
 						AND concat ('||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_1)||','' - '',
 						'||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_2)||','' - '',
