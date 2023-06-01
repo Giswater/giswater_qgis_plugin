@@ -1439,3 +1439,9 @@ VALUES('incident_connec', 'tab_file', 'Files', 'Files', 'role_om', '{"name":"gwG
 UPDATE config_param_system
 SET value='{"sys_table_id":"v_ui_hydrometer", "sys_id_field":"hydrometer_id", "sys_feature_id":"feature_id", "sys_search_field_1":"hydrometer_customer_code",  "sys_search_field_2":"feature_customer_code",  "sys_search_field_3":"state", "sys_parent_field":"expl_name"}'
 WHERE "parameter"='basic_search_hydrometer';
+
+UPDATE config_form_fields SET web_layoutorder = layoutorder
+WHERE tabname = 'tab_epa';
+
+UPDATE config_form_fields SET tabname = 'tab_relations'
+WHERE tabname = 'tab_relation';
