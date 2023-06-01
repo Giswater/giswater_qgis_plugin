@@ -3157,6 +3157,7 @@ def fill_tbl(complet_list, tbl, info, view):
     setattr(info, f"my_json_{view}", {})
     # headers
     headers = complet_list['body']['form'].get('headers')
+    non_editable_columns = []
     if headers:
         model = tbl.model()
         if model is None:
@@ -3166,6 +3167,8 @@ def fill_tbl(complet_list, tbl, info, view):
         model.clear()
         tbl.setModel(model)
         tbl.horizontalHeader().setStretchLastSection(True)
+        # Non-editable columns
+        non_editable_columns = [item['header'] for item in headers if item.get('editable') is False]
         try:
             # Get headers
             headers = [item['header'] for item in headers]
@@ -3189,6 +3192,18 @@ def fill_tbl(complet_list, tbl, info, view):
         tools_qt.set_tableview_config(tbl, edit_triggers=QTableView.DoubleClicked)
         model.dataChanged.connect(partial(tbl_data_changed, info, view, tbl, model, addparam))
         _manage_new_row(model)
+    # editability
+    tbl.model().flags = lambda index: epa_tbl_flags(index, model, non_editable_columns)
+
+
+def epa_tbl_flags(index, model, non_editable_columns=None):
+
+    column_name = model.headerData(index.column(), Qt.Horizontal, Qt.DisplayRole)
+    if non_editable_columns and column_name in non_editable_columns:
+        flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
+        return flags
+
+    return QStandardItemModel.flags(model, index)
 
 # region Tab epa
 
