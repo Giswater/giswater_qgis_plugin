@@ -2178,6 +2178,8 @@ class GwInfo(QObject):
         function_name = 'gw_fct_getinfofromid'
         complet_result = tools_gw.execute_procedure(function_name, body)
         if complet_result:
+            if complet_result['body']['form'].get('visibleTabs'):
+                self.visible_tabs = complet_result['body']['form']['visibleTabs']
             for lyt in dialog.findChildren(QGridLayout, QRegularExpression('lyt_epa')):
                 i = 0
                 while i < lyt.count():
