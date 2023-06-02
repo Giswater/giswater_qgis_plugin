@@ -3172,14 +3172,7 @@ def fill_tbl(complet_list, tbl, info, view):
         tbl.horizontalHeader().setStretchLastSection(True)
         # Non-editable columns
         non_editable_columns = [item['header'] for item in headers if item.get('editable') is False]
-        try:
-            # Get headers
-            headers = [item['header'] for item in headers]
-            # Set headers
-            model.setHorizontalHeaderLabels(headers)
-        except Exception as e:
-            # if field['value'][0] is None
-            pass
+
     # values
     for field in complet_list['body']['data']['fields']:
         if 'hidden' in field and field['hidden']: continue
