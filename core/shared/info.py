@@ -529,7 +529,7 @@ class GwInfo(QObject):
         # Build and populate all the widgets
         self._manage_dlg_widgets(complet_result, result, new_feature)
         # Disable tab EPA if epa_type is undefined
-        if tools_qt.get_text(self.dlg_cf, 'data_epa_type').lower() == 'undefined':
+        if tools_qt.get_text(self.dlg_cf, 'tab_data_epa_type').lower() == 'undefined':
             tools_qt.enable_tab_by_tab_name(self.tab_main, 'tab_epa', False)
         # Check elev data consistency
         if global_vars.project_type == 'ud':
@@ -1886,7 +1886,7 @@ class GwInfo(QObject):
         # Tab EPA
         if not generic and self.my_json_epa != '' and str(self.my_json_epa) != '{}':
             feature = f'"id":"{self.feature_id}", '
-            epa_table_id = 've_epa_' + tools_qt.get_text(dialog, 'data_epa_type').lower()
+            epa_table_id = 've_epa_' + tools_qt.get_text(dialog, 'tab_data_epa_type').lower()
             my_json = json.dumps(self.my_json_epa)
             feature += f'"tableName":"{epa_table_id}", '
             feature += f' "featureType":"{self.feature_type}" '
@@ -2168,10 +2168,10 @@ class GwInfo(QObject):
 
     def _reload_epa_tab(self, dialog):
         # call getinfofromid
-        if tools_qt.get_text(dialog, 'data_epa_type').lower() == 'undefined':
+        if tools_qt.get_text(dialog, 'tab_data_epa_type').lower() == 'undefined':
             tools_qt.enable_tab_by_tab_name(self.tab_main, 'tab_epa', False)
             return
-        tablename = 've_epa_' + tools_qt.get_text(dialog, 'data_epa_type').lower()
+        tablename = 've_epa_' + tools_qt.get_text(dialog, 'tab_data_epa_type').lower()
         feature = f'"tableName":"{tablename}", "id":"{self.feature_id}"'
         body = tools_gw.create_body(feature=feature)
         function_name = 'gw_fct_getinfofromid'
