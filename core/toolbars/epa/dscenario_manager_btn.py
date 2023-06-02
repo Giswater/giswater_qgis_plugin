@@ -393,7 +393,7 @@ class GwDscenarioManagerButton(GwAction):
 
         for x in self.feature_types:
             col_idx = tools_qt.get_col_index_by_col_name(tableview, x)
-            if col_idx is not None:
+            if col_idx not in (None, False):
                 feature_type = x
                 break
 
@@ -409,7 +409,7 @@ class GwDscenarioManagerButton(GwAction):
 
         for x in self.feature_types:
             col_idx = tools_qt.get_col_index_by_col_name(qtableview, x)
-            if col_idx is not None:
+            if col_idx not in (None, False):
                 feature_type = x
                 break
         if feature_type != 'feature_id':
@@ -568,7 +568,7 @@ class GwDscenarioManagerButton(GwAction):
 
         for x in self.feature_types:
             col_idx = tools_qt.get_col_index_by_col_name(tableview, x)
-            if col_idx is not False:
+            if col_idx not in (None, False):
                 feature_type = x
                 break
 
@@ -580,7 +580,7 @@ class GwDscenarioManagerButton(GwAction):
         answer = tools_qt.show_question(message, "Delete records", values)
         if answer:
             for value in values:
-                sql = f"DELETE FROM {view} WHERE dscenario_id = {self.selected_dscenario_id} AND {self.feature_type}_id = '{value}'"
+                sql = f"DELETE FROM {view} WHERE dscenario_id = {self.selected_dscenario_id} AND {feature_type} = '{value}'"
                 tools_db.execute_sql(sql)
 
             # Refresh tableview
