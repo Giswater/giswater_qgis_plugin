@@ -959,6 +959,11 @@ class GwInfo(QObject):
             pass
 
         try:
+            tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
+        except Exception:
+            pass
+
+        try:
             tools_gw.disconnect_signal('info_snapping')
         except Exception:
             pass
