@@ -107,6 +107,7 @@ class GwInfo(QObject):
             self.my_json = {}
             self.my_json_epa = {}
             self.tab_type = tab_type
+            self.visible_tabs = []
 
             # Get project variables
             qgis_project_add_schema = global_vars.project_vars['add_schema']
@@ -500,9 +501,9 @@ class GwInfo(QObject):
             except:
                 pass
 
-        if 'visibleTabs' in complet_result['body']['form']:
-            for tab in complet_result['body']['form']['visibleTabs']:
-                tabs_to_show.append(tab['tabName'])
+        self.visible_tabs = complet_result['body']['form'].get('visibleTabs', [])
+        for tab in self.visible_tabs:
+            tabs_to_show.append(tab['tabName'])
 
         for x in range(self.tab_main.count() - 1, 0, -1):
             if self.tab_main.widget(x).objectName() not in tabs_to_show:
@@ -1940,7 +1941,7 @@ class GwInfo(QObject):
             index_tab = self.tab_main.currentIndex()
             tab_name = self.tab_main.widget(index_tab).objectName()
 
-            for tab in self.complet_result['body']['form']['visibleTabs']:
+            for tab in self.visible_tabs:
                 if tab['tabName'] == tab_name:
                     if tab['tabactions'] is not None:
                         for act in tab['tabactions']:
@@ -2335,10 +2336,10 @@ class GwInfo(QObject):
         for action in actions_list:
             action.setVisible(False)
 
-        if 'visibleTabs' not in self.complet_result['body']['form']:
+        if not self.visible_tabs:
             return
 
-        for tab in self.complet_result['body']['form']['visibleTabs']:
+        for tab in self.visible_tabs:
             if tab['tabName'] == tab_name:
                 if tab['tabactions'] is not None:
                     for act in tab['tabactions']:
