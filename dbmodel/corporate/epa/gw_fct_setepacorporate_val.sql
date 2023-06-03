@@ -61,7 +61,7 @@ select node_id, custom_demand from rpt_node order by 2 desc
 
 -- to execute
 SELECT gw_fct_setepacorporate_val('{"data":{"parameters":{"resultId":"gam_oeste_v11"}}}');
-SELECT gw_fct_setepacorporate_val('{"data":{"parameters":{"resultId":"gam_este_v01"}}}');
+SELECT ws_corp.gw_fct_setepacorporate_val('{"data":{"parameters":{"resultId":"gam_este_v01"}}}');
 
 */
 
@@ -103,7 +103,6 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, 'INFO');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, '-------');
 
-
 	DELETE FROM rpt_cat_result WHERE result_id = v_result;
 	INSERT INTO rpt_cat_result SELECT * FROM ws.rpt_cat_result WHERE result_id = v_result;
 
@@ -118,6 +117,11 @@ BEGIN
 	
 	INSERT INTO rpt_node SELECT * from ws.rpt_node WHERE result_id = v_result;
 	GET DIAGNOSTICS v_nodes = row_count;
+
+	-- Upsert selector
+	INSERT INTO selector_rpt_main 
+	SELECT v_result, id FROM cat_users
+	ON CONFLICT (result_id, cur_user) DO NOTHING;
 
 	-- get log
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, 'INFO: Process have been executed');
@@ -148,3 +152,6 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
+
+  grant all on all functions in schema ws_corp to role_basic
