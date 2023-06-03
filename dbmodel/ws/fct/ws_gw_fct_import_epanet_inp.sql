@@ -576,8 +576,8 @@ BEGIN
 					EXECUTE 'INSERT INTO man_'||v_mantype||' VALUES ('||quote_literal(v_node_id)||')';
 
 					IF v_epatablename = 'inp_pump' THEN
-						INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern_id, status, energyparam, energyvalue, to_arc, pump_type)
-						SELECT v_node_id, power, curve_id, speed, pattern_id, status, energyparam, energyvalue, to_arc, v_pumptype FROM inp_virtualpump WHERE arc_id=v_data.arc_id;
+						INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern_id, status,  energyvalue, to_arc, pump_type)
+						SELECT v_node_id, power, curve_id, speed, pattern_id, status, energyvalue, to_arc, v_pumptype FROM inp_virtualpump WHERE arc_id=v_data.arc_id;
 
 					ELSIF v_epatablename = 'inp_valve' THEN
 						INSERT INTO inp_valve (node_id, valv_type, pressure, custom_dint, flow, coef_loss, curve_id, minorloss, status, to_arc)
@@ -619,11 +619,11 @@ BEGIN
 				WHERE  b.arc_id = concat(inp_shortpipe.node_id,'_n2a');
 
 				-- transform pump additional from node to inp_pump_additional table		
-				INSERT INTO inp_pump_additional (node_id, order_id, power, curve_id, speed, pattern_id, status, energyparam, energyvalue)
+				INSERT INTO inp_pump_additional (node_id, order_id, power, curve_id, speed, pattern_id, status, energyvalue)
 				select 
 				replace(arc_id, reverse(substring(reverse(arc_id),0,6)), ''), 
 				(substring(reverse(arc_id),0,2))::integer,
-				power, curve_id, speed, pattern_id, status, energyparam, energyvalue
+				power, curve_id, speed, pattern_id, status, energyvalue
 				from inp_virtualpump WHERE substring(reverse(arc_id),0,2) ~ '^\d+$' AND substring(reverse(arc_id),2,1) !='_';
 
 				-- update state=0 pump additionals 

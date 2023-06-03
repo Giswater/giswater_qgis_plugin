@@ -127,7 +127,7 @@ BEGIN
 
 	  ELSIF v_view='vi_energy' THEN
 	  	IF NEW.pump_id ilike 'PUMP%' THEN
-	  		UPDATE inp_virtualpump SET energyparam = NEW.idval , energyvalue = NEW.energyvalue 
+	  		UPDATE inp_virtualpump SET energyvalue = NEW.energyvalue 
 	  		WHERE arc_id = REGEXP_REPLACE(LTRIM (NEW.pump_id, 'PUMP '),' ','');
 	  	ELSE
 	  		INSERT INTO inp_energy(descript) select concat(NEW.pump_id, ' ',NEW.idval); 
