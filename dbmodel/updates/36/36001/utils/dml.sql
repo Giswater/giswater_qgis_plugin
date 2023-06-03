@@ -439,9 +439,6 @@ UPDATE config_param_system
 SET value='{"rowsColor":true}'
 WHERE "parameter"='qgis_form_selector_stylesheet';
 
-INSERT INTO sys_fprocess
-(fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
-VALUES(488, 'Check connecs related to arcs with diameter bigger than defined value', 'ws', NULL, 'core', true, 'Check om-data', NULL);
 
 UPDATE sys_fprocess SET fprocess_name='Check connects with more than 1 link on service', fprocess_type='Check om-data' WHERE fid=480;
 
@@ -504,15 +501,6 @@ VALUES(3234, 'The inserted feature has a diferent exploitation than the psector'
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) 
 VALUES('edit_auto_streetvalues', '{"status":false, "field":"postnumber","buffer":60}', 'Insert street values automatically on field ''postnumber'' or ''postcomplement''', 'Auto-insert street values', NULL, NULL, true, 31, 'utils', NULL, NULL, 'json', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_inventory');
 
---01/06/2023
--- code reservation for checkdemands algorithm (epatools plugin)
-INSERT INTO sys_fprocess
-(fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
-VALUES(491, 'Check demands export input file', 'ws', NULL, 'core', true, 'Function process', NULL);
-
-INSERT INTO sys_fprocess
-(fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
-VALUES(492, 'Check demands import results', 'ws', NULL, 'core', true, 'Function process', NULL);
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES(3238, 'gw_fct_getnodeborder', 'utils', 'function',  'JSON', 'JSON', 'Function to return those noder that are sector border', 'role_basic', NULL, 'core');

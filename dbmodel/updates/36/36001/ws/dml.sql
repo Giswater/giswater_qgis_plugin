@@ -1620,3 +1620,26 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET widgetfunction='{"functionName": "filter_table", "parameters": {"columnfind": "hydrometer_customer_code", "field_id": "feature_id"}}'::json
 	WHERE formtype='form_feature' AND columnname='hydrometer_id';
+	
+
+INSERT INTO sys_fprocess
+(fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
+VALUES(488, 'Check connecs related to arcs with diameter bigger than defined value', 'ws', NULL, 'core', true, 'Check om-data', NULL);
+
+--01/06/2023
+-- code reservation for checkdemands algorithm (epatools plugin)
+INSERT INTO sys_fprocess
+(fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
+VALUES(491, 'Check demands export input file', 'ws', NULL, 'core', true, 'Function process', NULL);
+
+INSERT INTO sys_fprocess
+(fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
+VALUES(492, 'Check demands import results', 'ws', NULL, 'core', true, 'Function process', NULL);
+	
+INSERT INTO sys_fprocess
+(fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
+VALUES(493, 'Check valve status export input file', 'ws', NULL, 'core', true, 'Function process', NULL);
+
+INSERT INTO sys_fprocess
+(fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
+VALUES(494, 'Check valve status demands import results', 'ws', NULL, 'core', true, 'Function process', NULL);
