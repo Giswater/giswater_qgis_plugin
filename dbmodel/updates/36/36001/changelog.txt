@@ -17,3 +17,4 @@
 - New function: gw_fct_mincut_show_current to show mincuts that are currently beeing executed in a field.
 - Add staticpressure update on trg_edit_connec (harmonize with node)
 - Create new object ws-virtualpump and remove import inppump and import inpvalves
+- New function setoptimunoutlet and refactor of sutchament view  for ud projects

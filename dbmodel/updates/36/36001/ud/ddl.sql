@@ -81,3 +81,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"drainzone",
 
 ALTER TABLE drainzone ALTER COLUMN tstamp SET DEFAULT now();
 ALTER TABLE drainzone ALTER COLUMN insert_user SET DEFAULT current_user;
+
+-- add minelev for subcatchments
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_subcatchment", "column":"minelev", "dataType":"float", "isUtils":"False"}}$$);
+

@@ -1251,4 +1251,23 @@ CREATE OR REPLACE VIEW v_edit_inp_timeseries
     inp_timeseries p
   WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
   ORDER BY p.id;
-
+  
+drop view if exists vi_subcatch2outlet;
+CREATE OR REPLACE VIEW vi_subcatch2outlet
+AS 
+SELECT subc_id, outlet_id, outlet_type, st_length2d(the_geom) as length, hydrology_id, the_geom FROM (
+SELECT s1.subc_id,
+	s1.outlet_id,
+	'JUNCTION' as outlet_type,
+    s1.hydrology_id,
+    st_makeline(st_centroid(s1.the_geom), node.the_geom)::geometry(LineString,SRID_VALUE) AS the_geom
+   FROM v_edit_inp_subcatchment s1
+     JOIN node ON node.node_id::text = s1.outlet_id::text
+UNION
+ SELECT s1.subc_id,
+	s1.outlet_id,
+	'SUBCATCHMENT' as outlet_type,
+	s1.hydrology_id,
+    st_makeline(st_centroid(s1.the_geom), st_centroid(s2.the_geom))::geometry(LineString,SRID_VALUE) AS the_geom
+   FROM v_edit_inp_subcatchment s1
+     JOIN v_edit_inp_subcatchment s2 ON s1.outlet_id::text = s2.subc_id::text) a;
