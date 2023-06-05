@@ -18,3 +18,4 @@
 - Add staticpressure update on trg_edit_connec (harmonize with node)
 - Create new object ws-virtualpump and remove import inppump and import inpvalves
 - New function setoptimunoutlet and refactor of sutchament view  for ud projects
+- Add lastupdate and lastupdate_user to v_edit_element
