@@ -1845,6 +1845,8 @@ class GwInfo(QObject):
             index_tab = self.tab_main.currentIndex()
             tab_name = self.tab_main.widget(index_tab).objectName()
 
+            if 'visibleTabs' not in self.complet_result['body']['form']:
+                return
             for tab in self.complet_result['body']['form']['visibleTabs']:
                 if tab['tabName'] == tab_name:
                     if tab['tabactions'] is not None:
