@@ -1794,8 +1794,8 @@ def fill_typeahead(completer, model, field, dialog, widget, feature_id=None):
         parent_id = field["parentId"]
 
     # Get parentValue from widget or from feature_id if parentWidget not configured
-    if dialog.findChild(QWidget, "data_" + str(parent_id)):
-        parent_value = tools_qt.get_text(dialog, "data_" + str(parent_id))
+    if dialog.findChild(QWidget, "tab_data_" + str(parent_id)):
+        parent_value = tools_qt.get_text(dialog, "tab_data_" + str(parent_id))
     else:
         parent_value = feature_id
 
