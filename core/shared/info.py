@@ -867,8 +867,8 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaOrificeUi", "uiName": "info_epa_orifice",
                        "tableviews": [
-                        {"tbl": "tbl_orifice", "view": "inp_flwreg_orifice"},
-                        {"tbl": "tbl_dscenario_orifice", "view": "inp_dscenario_flwreg_orifice"}
+                        {"tbl": "tbl_orifice", "view": "inp_flwreg_orifice", "add_view": "v_edit_inp_flwreg_orifice"},
+                        {"tbl": "tbl_dscenario_orifice", "view": "inp_dscenario_flwreg_orifice", "add_view": "v_edit_inp_dscenario_flwreg_orifice"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg(**kwargs)
@@ -880,8 +880,8 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaOutletUi", "uiName": "info_epa_outlet",
                        "tableviews": [
-                        {"tbl": "tbl_outlet", "view": "inp_flwreg_outlet"},
-                        {"tbl": "tbl_dscenario_outlet", "view": "inp_dscenario_flwreg_outlet"}
+                        {"tbl": "tbl_outlet", "view": "inp_flwreg_outlet", "add_view": "v_edit_inp_flwreg_outlet"},
+                        {"tbl": "tbl_dscenario_outlet", "view": "inp_dscenario_flwreg_outlet", "add_view": "v_edit_inp_dscenario_flwreg_outlet"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg(**kwargs)
@@ -893,8 +893,8 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaPumpUi", "uiName": "info_epa_pump",
                        "tableviews": [
-                        {"tbl": "tbl_pump", "view": "inp_flwreg_pump"},
-                        {"tbl": "tbl_dscenario_pump", "view": "inp_dscenario_flwreg_pump"}
+                        {"tbl": "tbl_pump", "view": "inp_flwreg_pump", "add_view": "v_edit_inp_flwreg_pump"},
+                        {"tbl": "tbl_dscenario_pump", "view": "inp_dscenario_flwreg_pump", "add_view": "v_edit_inp_dscenario_flwreg_pump"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg(**kwargs)
@@ -906,8 +906,8 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaWeirUi", "uiName": "info_epa_weir",
                        "tableviews": [
-                        {"tbl": "tbl_weir", "view": "inp_flwreg_weir"},
-                        {"tbl": "tbl_dscenario_weir", "view": "inp_dscenario_flwreg_weir"}
+                        {"tbl": "tbl_weir", "view": "inp_flwreg_weir", "add_view": "v_edit_inp_flwreg_weir"},
+                        {"tbl": "tbl_dscenario_weir", "view": "inp_dscenario_flwreg_weir", "add_view": "v_edit_inp_dscenario_flwreg_weir"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg(**kwargs)
@@ -919,7 +919,7 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaDemandUi", "uiName": "info_epa_demand",
                        "tableviews": [
-                        {"tbl": "tbl_dscenario_demand", "view": "inp_dscenario_demand"}
+                        {"tbl": "tbl_dscenario_demand", "view": "inp_dscenario_demand", "add_view": "v_edit_inp_dscenario_demand"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg(**kwargs)
@@ -3240,6 +3240,7 @@ def open_epa_dlg(**kwargs):
         if not tbl:
             continue
         view = tableview['view']
+        add_view = tableview.get('add_view', view)
         pk = tableview.get('pk')
         if not pk:
             pk = id_name
@@ -3253,7 +3254,7 @@ def open_epa_dlg(**kwargs):
             btn_add_base = info.dlg.findChild(QPushButton, 'btn_add_base')
             if btn_add_base:
                 tools_gw.add_icon(btn_add_base, '111b', "24x24")
-                btn_add_base.clicked.connect(partial(add_row_epa, tbl, view, pk, **kwargs))
+                btn_add_base.clicked.connect(partial(add_row_epa, tbl, add_view, pk, **kwargs))
             btn_delete_base = info.dlg.findChild(QPushButton, 'btn_delete_base')
             if btn_delete_base:
                 tools_gw.add_icon(btn_delete_base, '112b', "24x24")
@@ -3262,7 +3263,7 @@ def open_epa_dlg(**kwargs):
             btn_add_dscenario = info.dlg.findChild(QPushButton, 'btn_add_dscenario')
             if btn_add_dscenario:
                 tools_gw.add_icon(btn_add_dscenario, '111b', "24x24")
-                btn_add_dscenario.clicked.connect(partial(add_row_epa, tbl, view, pk, **kwargs))
+                btn_add_dscenario.clicked.connect(partial(add_row_epa, tbl, add_view, pk, **kwargs))
             btn_delete_dscenario = info.dlg.findChild(QPushButton, 'btn_delete_dscenario')
             if btn_delete_dscenario:
                 tools_gw.add_icon(btn_delete_dscenario, '112b', "24x24")
@@ -3328,14 +3329,14 @@ def add_row_epa(tbl, tablename, pkey, **kwargs):
     # Signals
     info.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, info.add_dlg))
     info.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, info.add_dlg))
-    info.add_dlg.dlg_closed.connect(partial(refresh_epa_tbl, tablename, **kwargs))
+    info.add_dlg.dlg_closed.connect(partial(refresh_epa_tbl, tbl, **kwargs))
     info.add_dlg.btn_accept.clicked.connect(partial(accept_add_dlg, info.add_dlg, tablename, pkey, feature_id, info.my_json_add))
 
     # Open dlg
     tools_gw.open_dialog(info.add_dlg, dlg_name='info_generic')
 
 
-def refresh_epa_tbl(tablename, **kwargs):
+def refresh_epa_tbl(tblview, **kwargs):
     # Get variables
     complet_result = kwargs['complet_result']
     info = kwargs['class']
@@ -3352,7 +3353,7 @@ def refresh_epa_tbl(tablename, **kwargs):
         if not tbl:
             continue
         view = tableview['view']
-        if view != tablename:
+        if tbl != tblview:
             continue
 
         complet_list = get_list(view, id_name, feature_id)
