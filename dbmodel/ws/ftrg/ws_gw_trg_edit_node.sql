@@ -638,15 +638,20 @@
 					if NEW.broken_valve is null then NEW.broken_valve = false; end if;
 									
 					v_sql:= 'INSERT INTO man_valve (node_id, closed, broken) VALUES ('||quote_literal(NEW.node_id)||', '||(NEW.closed_valve)||', '||(NEW.broken_valve)||')';		
-	                EXECUTE v_sql;				
+				
+				ELSE
+					v_sql:= 'INSERT INTO '||v_man_table||' (node_id) VALUES ('||(NEW.node_id)||')';		
 				END IF;
-			    
-				--insert tank into config_graph_inlet
-				IF v_man_table='man_tank' THEN
-					INSERT INTO config_graph_inlet(node_id, expl_id, active)
-					VALUES (NEW.node_id, NEW.expl_id, TRUE);
-				END IF;
+				
+				EXECUTE v_sql;				
 
+			END IF;
+			
+			--insert tank into config_graph_inlet
+			IF v_man_table='man_tank' THEN 
+				
+				INSERT INTO config_graph_inlet(node_id, expl_id, active)
+				VALUES (NEW.node_id, NEW.expl_id, TRUE);	
 			END IF;
 
 			-- man addfields insert
