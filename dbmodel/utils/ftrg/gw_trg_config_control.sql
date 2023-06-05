@@ -49,7 +49,7 @@ BEGIN
 				END IF;
 
 				FOREACH rec_feature IN array(NEW.featurecat_id::text[]) LOOP
-					IF rec_feature NOT IN (SELECT id FROM cat_feature) THEN
+					IF rec_feature NOT IN (SELECT id FROM cat_feature UNION SELECT id FROM element_type) THEN
 						v_variables = concat('table: ',v_configtable,', featurecat: ',rec_feature);
 						v_message = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3172",
 						"function":"2816", "debug":null, "variables":"',v_variables,'"}}');

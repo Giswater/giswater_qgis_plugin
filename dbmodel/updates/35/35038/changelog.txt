@@ -1,0 +1,3 @@
+3.5.038
+*************
+- Enhance trg_config_control adding element_type to allowed values on featurecat_id field
