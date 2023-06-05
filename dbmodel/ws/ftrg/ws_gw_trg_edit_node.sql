@@ -625,25 +625,28 @@
 				INSERT INTO man_wtp (node_id, name) VALUES(NEW.node_id, NEW.name);
 			
 			END IF;
-
-			IF v_man_table='parent' THEN
+		
+			IF v_man_table='parent' then
+			
 			    v_man_table:= (SELECT man_table FROM cat_feature_node n 
 				JOIN sys_feature_cat s ON n.type = s.id
 				JOIN cat_node ON cat_node.id=NEW.nodecat_id WHERE n.id = cat_node.nodetype_id LIMIT 1)::text;
-		         
-				IF v_man_table='man_valve' THEN
-					v_sql:= 'INSERT INTO man_valve (node_id, closed, broken) VALUES ('||quote_literal(NEW.node_id)||', '||(NEW.closed_valve)||', '||(NEW.broken_valve)||')';
-				ELSE
-			    	v_sql:= 'INSERT INTO '||v_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
-                END IF;
-			    EXECUTE v_sql;
 
-			END IF;
+				--insert valve values for valve objects
+				IF v_man_table='man_valve' then
+					if NEW.closed_valve is null then NEW.closed_valve = false; end if;
+					if NEW.broken_valve is null then NEW.broken_valve = false; end if;
+									
+					v_sql:= 'INSERT INTO man_valve (node_id, closed, broken) VALUES ('||quote_literal(NEW.node_id)||', '||(NEW.closed_valve)||', '||(NEW.broken_valve)||')';		
+	                EXECUTE v_sql;				
+				END IF;
+			    
+				--insert tank into config_graph_inlet
+				IF v_man_table='man_tank' THEN
+					INSERT INTO config_graph_inlet(node_id, expl_id, active)
+					VALUES (NEW.node_id, NEW.expl_id, TRUE);
+				END IF;
 
-			--insert tank into config_graph_inlet
-			IF v_man_table='man_tank' THEN
-				INSERT INTO config_graph_inlet(node_id, expl_id, active)
-				VALUES (NEW.node_id, NEW.expl_id, TRUE);
 			END IF;
 
 			-- man addfields insert
