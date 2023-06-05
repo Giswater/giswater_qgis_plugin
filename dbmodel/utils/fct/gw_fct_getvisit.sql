@@ -192,6 +192,10 @@ BEGIN
 		v_visit_type_name = 'visit';
 		v_header_text = 'VISIT - '||v_visit_id||'';
 	end if;
+    
+    if v_visit_id is not null then
+		v_visitclass = (SELECT class_id FROM om_visit WHERE id=v_visit_id);
+	end if;
 
 	IF v_visitclass IS NULL THEN
 		v_visitclass := (SELECT id FROM config_visit_class WHERE visit_type=v_visit_type AND feature_type = upper(v_featuretype) LIMIT 1)::integer;
