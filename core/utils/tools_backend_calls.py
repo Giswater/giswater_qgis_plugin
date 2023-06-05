@@ -618,10 +618,6 @@ def update_catfeaturevalues(**kwargs):
     """
     Reload global_vars.feature_cat
 
-    Called from PostgreSQL -> PERFORM pg_notify(v_channel, '{"functionAction":{"functions":[
-                              {"name":"update_catfeaturevalues", "parameters":{}}]} ,
-                              "user":"'||current_user||'","schema":"'||v_schemaname||'"}');
-                IN TRIGGER -> gw_trg_cat_feature
     """
     global_vars.feature_cat = tools_gw.manage_feature_cat()
 
@@ -856,10 +852,6 @@ def get_selector(**kwargs):
     """
     Refreshes the selectors if the selector dialog is open
 
-    Called form PostgreSQL -> PERFORM pg_notify(v_channel,
-                              '{"functionAction":{"functions":[
-                              {"name":"get_selector","parameters":{"tab":"tab_psector"}}]}
-                              ,"user":"'||current_user||'", "schema":"'||v_schemaname||'"}');
     Function connected -> global_vars.signal_manager.refresh_selectors.connect(tools_gw.refresh_selectors)
     """
 
@@ -871,10 +863,6 @@ def show_message(**kwargs):
     """
     Shows a message in the message bar.
 
-    Called from PostgreSQL -> PERFORM pg_notify(v_channel,
-                              '{"functionAction":{"functions":[{"name":"show_message", "parameters":
-                              {"level":1, "duration":10, "text":"Current psector have been selected"}}]}
-                              ,"user":"'||current_user||'", "schema":"'||v_schemaname||'"}');
     Function connected -> global_vars.signal_manager.show_message.connect(tools_qgis.show_message)
     """
 

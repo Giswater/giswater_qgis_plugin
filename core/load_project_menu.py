@@ -285,7 +285,6 @@ class GwMenuLoad(QObject):
     def _reset_plugin(self):
         """ Called in reset plugin action """
 
-        self._reset_notify()
         self._reset_snapping_managers()
         self._reset_all_rubberbands()
         tools_qgis.restore_cursor()  # Restore cursor in case it's stuck with an overridden one
@@ -337,14 +336,5 @@ class GwMenuLoad(QObject):
         for i in range(0, len(global_vars.active_rubberbands)):
             global_vars.active_rubberbands[0].reset()
             global_vars.active_rubberbands.pop(0)
-
-
-    def _reset_notify(self):
-        """ Reset notify class """
-
-        if global_vars.notify:
-            global_vars.notify.stop_listening()
-            global_vars.notify.start_listening()
-
 
     # endregion

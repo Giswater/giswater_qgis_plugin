@@ -15,7 +15,6 @@ class GwSignalManager(QObject):
     def __init__(self):
         """
         This class has signals that are needed to bypass the limitation of threads working with Qt objects.
-        Mainly used in tools_backend_calls.py as the notify from PostgreSQL is in a thread.
         An instance of this class always exists in global_vars
                                 (signal_manager, created in main.py -> global_vars.signal_manager = GwSignalManager())
 

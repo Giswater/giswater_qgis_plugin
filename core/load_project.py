@@ -143,11 +143,6 @@ class GwLoadProject(QObject):
         # Check roles of this user to show or hide toolbars
         self._check_user_roles()
 
-        # Create a thread to listen selected database channels
-        # global_vars.notify = GwNotify()
-        # list_channels = ['desktop', global_vars.current_user]
-        # global_vars.notify.start_listening(list_channels)
-
         # Check parameter 'force_tab_expl'
         force_tab_expl = tools_gw.get_config_parser('system', 'force_tab_expl', 'user', 'init', prefix=False)
         if tools_os.set_boolean(force_tab_expl, False):
