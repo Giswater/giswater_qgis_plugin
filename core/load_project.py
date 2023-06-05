@@ -9,18 +9,14 @@ import os
 from functools import partial
 
 from qgis.core import QgsProject, Qgis, QgsApplication, QgsSnappingUtils
-from qgis.gui import QgsFieldExpressionWidget
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QLabel, QApplication, QTableView, QDialog, QComboBox
 
 from .models.plugin_toolbar import GwPluginToolbar
 from .toolbars import buttons
-from .ui.ui_manager import GwDialogTextUi, GwSearchUi
-from .shared.search import GwSearch
 from .utils import tools_gw
 from .threads.project_layers_config import GwProjectLayersConfig
 from .threads.project_check import GwProjectCheckTask
-from .threads.notify import GwNotify
 from .. import global_vars
 from ..lib import tools_qgis, tools_log, tools_db, tools_qt, tools_os
 
