@@ -2964,8 +2964,8 @@ class GwAdminButton:
         status = False
         for group, function in result['fields'].items():
             if len(function) != 0:
-                dialog.setWindowTitle(function[0]['alias'])
-                dialog.txt_info.setText(str(function[0]['descript']))
+                dialog.setWindowTitle(function[0].get('alias'))
+                dialog.txt_info.setText(str(function[0].get('descript')))
                 self.function_list = []
                 tools_gw.build_dialog_options(dialog, function, 0, self.function_list)
                 status = True
