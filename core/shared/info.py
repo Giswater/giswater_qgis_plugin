@@ -529,7 +529,7 @@ class GwInfo(QObject):
         # Build and populate all the widgets
         self._manage_dlg_widgets(complet_result, result, new_feature)
         # Disable tab EPA if epa_type is undefined
-        if tools_qt.get_text(self.dlg_cf, 'data_epa_type').lower() == 'undefined':
+        if tools_qt.get_text(self.dlg_cf, 'tab_data_epa_type').lower() == 'undefined':
             tools_qt.enable_tab_by_tab_name(self.tab_main, 'tab_epa', False)
         # Check elev data consistency
         if global_vars.project_type == 'ud':
@@ -818,11 +818,11 @@ class GwInfo(QObject):
             partial(self.get_snapped_feature_id, dlg_cf, self.action_set_to_arc, 'v_edit_arc', 'set_to_arc', None,
                     child_type))
         self.action_get_arc_id.triggered.connect(
-            partial(self.get_snapped_feature_id, dlg_cf, self.action_get_arc_id, 'v_edit_arc', 'arc', 'data_arc_id',
+            partial(self.get_snapped_feature_id, dlg_cf, self.action_get_arc_id, 'v_edit_arc', 'arc', 'tab_data_arc_id',
                     child_type))
         self.action_get_parent_id.triggered.connect(
             partial(self.get_snapped_feature_id, dlg_cf, self.action_get_parent_id, 'v_edit_node', 'node',
-                    'data_parent_id', child_type))
+                    'tab_data_parent_id', child_type))
         self.action_centered.triggered.connect(partial(self._manage_action_centered, self.canvas, self.layer))
         self.action_copy_paste.triggered.connect(
             partial(self._manage_action_copy_paste, self.dlg_cf, self.feature_type, tab_type))
@@ -1240,13 +1240,13 @@ class GwInfo(QObject):
                f" WHERE node_id = '{self.feature_id}'")
         row = tools_db.get_row(sql)
         if row:
-            tools_qt.set_widget_text(dialog, "data_rotation", str(row[0]))
+            tools_qt.set_widget_text(dialog, "tab_data_rotation", str(row[0]))
 
         sql = (f"SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}),"
                f" ST_Point({point.x()}, {point.y()})))")
         row = tools_db.get_row(sql)
         if row:
-            tools_qt.set_widget_text(dialog, "data_hemisphere", str(row[0]))
+            tools_qt.set_widget_text(dialog, "tab_data_hemisphere", str(row[0]))
             message = "Hemisphere of the node has been updated. Value is"
             tools_qgis.show_info(message, parameter=str(row[0]))
 
@@ -1792,7 +1792,7 @@ class GwInfo(QObject):
         # Tab EPA
         if not generic and self.my_json_epa != '' and str(self.my_json_epa) != '{}':
             feature = f'"id":"{self.feature_id}", '
-            epa_table_id = 've_epa_' + tools_qt.get_text(dialog, 'data_epa_type').lower()
+            epa_table_id = 've_epa_' + tools_qt.get_text(dialog, 'tab_data_epa_type').lower()
             my_json = json.dumps(self.my_json_epa)
             feature += f'"tableName":"{epa_table_id}", '
             feature += f' "featureType":"{self.feature_type}" '
@@ -2075,10 +2075,10 @@ class GwInfo(QObject):
 
     def _reload_epa_tab(self, dialog):
         # call getinfofromid
-        if tools_qt.get_text(dialog, 'data_epa_type').lower() == 'undefined':
+        if tools_qt.get_text(dialog, 'tab_data_epa_type').lower() == 'undefined':
             tools_qt.enable_tab_by_tab_name(self.tab_main, 'tab_epa', False)
             return
-        tablename = 've_epa_' + tools_qt.get_text(dialog, 'data_epa_type').lower()
+        tablename = 've_epa_' + tools_qt.get_text(dialog, 'tab_data_epa_type').lower()
         feature = f'"tableName":"{tablename}", "id":"{self.feature_id}"'
         body = tools_gw.create_body(feature=feature)
         function_name = 'gw_fct_getinfofromid'
@@ -2865,7 +2865,7 @@ class GwInfo(QObject):
         """ Get selected attribute from snapped feature """
 
         # @options{'key':['att to get from snapped feature', 'widget name destination']}
-        options = {'arc': ['arc_id', 'data_arc_id'], 'node': ['node_id', 'data_parent_id'],
+        options = {'arc': ['arc_id', 'tab_data_arc_id'], 'node': ['node_id', 'tab_data_parent_id'],
                    'set_to_arc': ['arc_id', '_set_to_arc']}
 
         if event == Qt.RightButton:
@@ -2907,16 +2907,16 @@ class GwInfo(QObject):
             :param feat_id: Id of the snapped feature
         """
 
-        w_dma_id = self.dlg_cf.findChild(QWidget, 'data_dma_id')
+        w_dma_id = self.dlg_cf.findChild(QWidget, 'tab_data_dma_id')
         if isinstance(w_dma_id, QComboBox):
             dma_id = tools_qt.get_combo_value(self.dlg_cf, w_dma_id)
         else:
             dma_id = tools_qt.get_text(self.dlg_cf, w_dma_id)
-        w_presszone_id = self.dlg_cf.findChild(QComboBox, 'data_presszone_id')
+        w_presszone_id = self.dlg_cf.findChild(QComboBox, 'tab_data_presszone_id')
         presszone_id = tools_qt.get_combo_value(self.dlg_cf, w_presszone_id)
-        w_sector_id = self.dlg_cf.findChild(QComboBox, 'data_sector_id')
+        w_sector_id = self.dlg_cf.findChild(QComboBox, 'tab_data_sector_id')
         sector_id = tools_qt.get_combo_value(self.dlg_cf, w_sector_id)
-        w_dqa_id = self.dlg_cf.findChild(QComboBox, 'data_dqa_id')
+        w_dqa_id = self.dlg_cf.findChild(QComboBox, 'tab_data_dqa_id')
         dqa_id = tools_qt.get_combo_value(self.dlg_cf, w_dqa_id)
         if dqa_id == -1:
             dqa_id = "null"
@@ -3412,7 +3412,7 @@ def new_visit(**kwargs):
     feature_type = kwargs['complet_result']['body']['feature']['childType']
     feature_id = kwargs['complet_result']['body']['feature']['id']
     # Get expl_id to save it on om_visit and show the geometry of visit
-    expl_id = tools_qt.get_combo_value(dlg_cf, 'data_expl_id', 0)
+    expl_id = tools_qt.get_combo_value(dlg_cf, 'tab_data_expl_id', 0)
     if expl_id == -1:
         msg = "Widget expl_id not found"
         tools_qgis.show_warning(msg)
