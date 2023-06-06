@@ -2240,6 +2240,8 @@ class GwInfo(QObject):
 
         actions_list = dialog.findChildren(QAction)
         for action in actions_list:
+            if not action.objectName():
+                continue
             action.setVisible(False)
 
         if 'visibleTabs' not in self.complet_result['body']['form']:
