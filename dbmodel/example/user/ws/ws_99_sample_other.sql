@@ -839,7 +839,7 @@ AS SELECT om_visit_x_node.id,
       FROM om_visit LEFT JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id
       LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
       LEFT JOIN config_visit_class_x_parameter on config_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id
-      where config_visit_class.ismultievent = TRUE AND config_visit_class.id = 3 ORDER  BY 1,2'::text, ' VALUES (''leak_node'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
+      where config_visit_class.ismultievent = TRUE AND config_visit_class.id = 3 ORDER  BY 1,2'::text, ' VALUES (''leak_node'')'::text) ct(visit_id integer, param_1 text)) a ON a.visit_id = om_visit.id
   WHERE config_visit_class.ismultievent = true AND config_visit_class.id = 3;
 
 
@@ -985,6 +985,95 @@ AS SELECT om_visit_x_node.visit_id,
      LEFT JOIN om_typevalue c ON c.id::text = a.param_2 AND c.typevalue = 'visit_cleaned'::text
   WHERE config_visit_class.ismultievent = true AND config_visit_class.id = 7;
 
+CREATE OR REPLACE VIEW ve_incident_arc
+AS SELECT om_visit_x_arc.id,
+    om_visit_x_arc.visit_id,
+    om_visit_x_arc.arc_id,
+    om_visit.visitcat_id,
+    om_visit.ext_code,
+    om_visit.startdate,
+    om_visit.enddate,
+    om_visit.user_name,
+    om_visit.webclient_id,
+    om_visit.expl_id,
+    om_visit.the_geom,
+    om_visit.descript,
+    om_visit.is_done,
+    om_visit.class_id,
+    om_visit.status,
+    a.param_1 AS incident_type
+   FROM om_visit
+     JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
+     JOIN om_visit_x_arc ON om_visit.id = om_visit_x_arc.visit_id
+     LEFT JOIN ( SELECT ct.visit_id,
+            ct.param_1
+           FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value
+      FROM om_visit LEFT JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id
+      LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
+      LEFT JOIN config_visit_class_x_parameter on config_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id
+      where config_visit_class.ismultievent = TRUE AND config_visit_class.id = 7 ORDER  BY 1,2'::text, ' VALUES (''incident_type'')'::text) ct(visit_id integer, param_1 text)) a ON a.visit_id = om_visit.id
+  WHERE config_visit_class.ismultievent = true AND config_visit_class.id = 7;
+
+
+CREATE OR REPLACE VIEW ve_incident_node
+AS SELECT om_visit_x_node.id,
+    om_visit_x_node.visit_id,
+    om_visit_x_node.node_id,
+    om_visit.visitcat_id,
+    om_visit.ext_code,
+    om_visit.startdate,
+    om_visit.enddate,
+    om_visit.user_name,
+    om_visit.webclient_id,
+    om_visit.expl_id,
+    om_visit.the_geom,
+    om_visit.descript,
+    om_visit.is_done,
+    om_visit.class_id,
+    om_visit.status,
+    a.param_1 AS incident_type
+   FROM om_visit
+     JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
+     JOIN om_visit_x_node ON om_visit.id = om_visit_x_node.visit_id
+     LEFT JOIN ( SELECT ct.visit_id,
+            ct.param_1
+           FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value
+      FROM om_visit LEFT JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id
+      LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
+      LEFT JOIN config_visit_class_x_parameter on config_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id
+      where config_visit_class.ismultievent = TRUE AND config_visit_class.id = 8 ORDER  BY 1,2'::text, ' VALUES (''incident_type'')'::text) ct(visit_id integer, param_1 text)) a ON a.visit_id = om_visit.id
+  WHERE config_visit_class.ismultievent = true AND config_visit_class.id = 8;
+
+CREATE OR REPLACE VIEW ve_incident_connec
+AS SELECT om_visit_x_connec.id,
+    om_visit_x_connec.visit_id,
+    om_visit_x_connec.connec_id,
+    om_visit.visitcat_id,
+    om_visit.ext_code,
+    om_visit.startdate,
+    om_visit.enddate,
+    om_visit.user_name,
+    om_visit.webclient_id,
+    om_visit.expl_id,
+    om_visit.the_geom,
+    om_visit.descript,
+    om_visit.is_done,
+    om_visit.class_id,
+    om_visit.status,
+    a.param_1 AS incident_type
+   FROM om_visit
+     JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
+     JOIN om_visit_x_connec ON om_visit.id = om_visit_x_connec.visit_id
+     LEFT JOIN ( SELECT ct.visit_id,
+            ct.param_1
+           FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value
+      FROM om_visit LEFT JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id
+      LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
+      LEFT JOIN config_visit_class_x_parameter on config_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id
+      where config_visit_class.ismultievent = TRUE AND config_visit_class.id = 9 ORDER  BY 1,2'::text, ' VALUES (''incident_type'')'::text) ct(visit_id integer, param_1 text)) a ON a.visit_id = om_visit.id
+  WHERE config_visit_class.ismultievent = true AND config_visit_class.id = 9;
+
+
 GRANT SELECT, TRIGGER, UPDATE, DELETE, REFERENCES, INSERT, TRUNCATE ON TABLE ve_visit_arc_insp TO role_om;
 GRANT SELECT, TRIGGER, UPDATE, DELETE, REFERENCES, INSERT, TRUNCATE ON TABLE ve_visit_connec_insp TO role_om;
 GRANT SELECT, TRIGGER, UPDATE, DELETE, REFERENCES, INSERT, TRUNCATE ON TABLE ve_visit_node_insp TO role_om;
@@ -1006,7 +1095,7 @@ INSERT INTO config_visit_class
 VALUES(8, 'Incident node', NULL, true, false, true, 'NODE', 'role_om', 2, NULL, 'incident_node', 've_incident_node', NULL, NULL, NULL);
 INSERT INTO config_visit_class
 (id, idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role, visit_type, param_options, formname, tablename, ui_tablename, parent_id, inherit_values)
-VALUES(9, 'Incident connec', NULL, true, false, true, 'CONNEC', 'role_om', 2, NULL, 'incident_connec', 've_incident_arc', NULL, NULL, NULL);
+VALUES(9, 'Incident connec', NULL, true, false, true, 'CONNEC', 'role_om', 2, NULL, 'incident_connec', 've_incident_connec', NULL, NULL, NULL);
 
 INSERT INTO config_visit_class_x_parameter
 (class_id, parameter_id, active)
@@ -1017,3 +1106,4 @@ VALUES(8, 'incident_type', true);
 INSERT INTO config_visit_class_x_parameter
 (class_id, parameter_id, active)
 VALUES(9, 'incident_type', true);
+
