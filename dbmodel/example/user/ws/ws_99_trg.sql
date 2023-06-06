@@ -39,6 +39,21 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
   for each row execute function gw_trg_om_visit_multievent('3');
 
   CREATE TRIGGER gw_trg_om_visit_multievent
+  instead of insert or delete or update
+  on ve_incident_arc
+  for each row execute function gw_trg_om_visit_multievent('7');
+
+  CREATE TRIGGER gw_trg_om_visit_multievent
+  instead of insert or delete or update
+  on ve_incident_node
+  for each row execute function gw_trg_om_visit_multievent('8');
+
+  CREATE TRIGGER gw_trg_om_visit_multievent
+  instead of insert or delete or update
+  on ve_incident_connec
+  for each row execute function gw_trg_om_visit_multievent('9');
+
+  CREATE TRIGGER gw_trg_om_visit_multievent
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON SCHEMA_NAME.ve_visit_noinfra
   FOR EACH ROW
