@@ -2336,6 +2336,8 @@ class GwInfo(QObject):
 
         actions_list = dialog.findChildren(QAction)
         for action in actions_list:
+            if not action.objectName():
+                continue
             action.setVisible(False)
 
         if not self.visible_tabs:
