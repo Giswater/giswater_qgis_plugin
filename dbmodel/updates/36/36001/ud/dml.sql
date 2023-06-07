@@ -36,7 +36,7 @@ VALUES('v_edit_gully', 'tab_epa', 'EPA inp', NULL, 'role_basic', NULL, '[{"actio
 {"actionName":"actionCopyPaste", "disabled":false},
 {"actionName":"actionLink", "disabled":false},
 {"actionName":"actionHelp", "disabled":false}, 
-{"actionName":"actionGetArcId", "disabled":false}]'::json, 8, '{4,5}') ON CONFLICT (formname, tabname) DO NOTHING;
+{"actionName":"actionGetArcId", "disabled":false}]'::json, 8, '{4}') ON CONFLICT (formname, tabname) DO NOTHING;
 
 --junction
 INSERT INTO config_form_list(listname, query_text, device, listtype, listclass)
