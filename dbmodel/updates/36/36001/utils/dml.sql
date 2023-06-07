@@ -1440,3 +1440,69 @@ UPDATE config_form_tabs SET device = '{4}' where tabname = 'tab_epa';
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") 
     VALUES(3246, 'gw_fct_upsertfields', 'utils', 'function', 'json', 'json', 'Function to insert or update values into a table', 'role_basic', NULL, 'core');
 
+-- typevalue
+INSERT INTO config_typevalue (typevalue,id,idval)
+    VALUES ('formactions_typevalue','actionOrifice','Orifice');
+INSERT INTO config_typevalue (typevalue,id,idval)
+    VALUES ('formactions_typevalue','actionOutlet','Outlet');
+INSERT INTO config_typevalue (typevalue,id,idval)
+    VALUES ('formactions_typevalue','actionPump','Pump');
+INSERT INTO config_typevalue (typevalue,id,idval)
+    VALUES ('formactions_typevalue','actionWeir','Weir');
+INSERT INTO config_typevalue (typevalue,id,idval)
+    VALUES ('formactions_typevalue','actionDemand','Demand');
+
+-- epa actions
+UPDATE config_form_tabs SET tabactions='[{"actionName":"actionEdit","actionTooltip":"Edit","disabled":false},{"actionName":"actionZoom","actionTooltip":"Zoom In","disabled":false},{"actionName":"actionCentered","actionTooltip":"Center","disabled":false},{"actionName":"actionZoomOut","actionTooltip":"Zoom Out","disabled":false},{"actionName":"actionCatalog","actionTooltip":"Change Catalog","disabled":false},{"actionName":"actionWorkcat","actionTooltip":"Add Workcat","disabled":false},{"actionName":"actionCopyPaste","actionTooltip":"Copy Paste","disabled":false},{"actionName":"actionLink","actionTooltip":"Open Link","disabled":false},{"actionName":"actionHelp","actionTooltip":"Help","disabled":false},{"actionName":"actionMapZone","actionTooltip":"Add Mapzone","disabled":false},{"actionName":"actionSetToArc","actionTooltip":"Set to_arc","disabled":false},{"actionName":"actionGetParentId","actionTooltip":"Set parent_id","disabled":false},{"actionName":"actionGetArcId","actionTooltip":"Set arc_id","disabled":false},{"actionName":"actionRotation","actionTooltip":"Rotation","disabled":false},{"actionName":"actionOrifice","actionTooltip":"Orifice","disabled":false},{"actionName":"actionOutlet","actionTooltip":"Outlet","disabled":false},{"actionName":"actionPump","actionTooltip":"Pump","disabled":false},{"actionName":"actionWeir","actionTooltip":"Weir","disabled":false},{"actionName":"actionDemand","actionTooltip":"DWF","disabled":false}]'::json 
+WHERE formname='v_edit_node' AND tabname='tab_epa';
+
+
+-- set layoutorder for flwreg widgets
+UPDATE config_form_fields 
+SET layoutorder = (SELECT attnum FROM pg_attribute WHERE attrelid = formname::regclass AND attname = columnname and attnum > 0 AND NOT attisdropped ORDER BY attnum LIMIT 1)
+WHERE formname like 'v_edit_inp%flwreg%';
+-- make widgets not editable
+UPDATE config_form_fields 
+SET iseditable = false 
+WHERE formname like 'v_edit_inp%flwreg%' and columnname IN ('nodarc_id', 'node_id');
+
+-- insert flwreg tables into config_form_tableview
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, addparam)
+SELECT 'epa form', 'utils', v.table_name, c.column_name, c.ordinal_position, true, NULL
+FROM information_schema.tables v
+JOIN information_schema.columns c ON v.table_schema = c.table_schema AND v.table_name = c.table_name
+WHERE v.table_schema = 'SCHEMA_NAME'
+  AND v.table_name LIKE 'inp%flwreg%'
+ORDER BY v.table_name, c.ordinal_position;
+
+-- disable columns
+UPDATE config_form_tableview SET addparam = '{"editable": false}' WHERE objectname like 'inp%flwreg%' AND columnname IN ('id', 'node_id', 'nodarc_id', 'dscenario_id');
+
+-- config_form_fields
+-- add node_id widget
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutorder,"datatype",widgettype,"label",ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
+	VALUES ('v_edit_inp_dscenario_flwreg_orifice','form_feature','tab_none','node_id',3,'string','text','node_id',false,false,false,false,'{"setMultiline":false}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutorder,"datatype",widgettype,"label",ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
+	VALUES ('v_edit_inp_dscenario_flwreg_outlet','form_feature','tab_none','node_id',3,'string','text','node_id',false,false,false,false,'{"setMultiline":false}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutorder,"datatype",widgettype,"label",ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
+	VALUES ('v_edit_inp_dscenario_flwreg_pump','form_feature','tab_none','node_id',3,'string','text','node_id',false,false,false,false,'{"setMultiline":false}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutorder,"datatype",widgettype,"label",ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
+	VALUES ('v_edit_inp_dscenario_flwreg_weir','form_feature','tab_none','node_id',3,'string','text','node_id',false,false,false,false,'{"setMultiline":false}'::json,false);
+
+-- hide order_id in dscenarios
+UPDATE config_form_fields
+	SET hidden=true
+	WHERE formname like 'v_edit_inp_dscenario_flwreg%' AND columnname='order_id';
+-- nodarc_id combos
+UPDATE config_form_fields
+	SET ismandatory=true,iseditable=true,dv_querytext_filterc='AND node_id',dv_parent_id='node_id',dv_querytext='SELECT nodarc_id as id, nodarc_id as idval FROM inp_flwreg_orifice WHERE nodarc_id IS NOT NULL',widgettype='combo',dv_isnullvalue=false,dv_orderby_id=true
+	WHERE formname='v_edit_inp_dscenario_flwreg_orifice' AND columnname='nodarc_id';
+UPDATE config_form_fields
+	SET ismandatory=true,iseditable=true,dv_querytext_filterc='AND node_id',dv_parent_id='node_id',dv_querytext='SELECT nodarc_id as id, nodarc_id as idval FROM inp_flwreg_outlet WHERE nodarc_id IS NOT NULL',widgettype='combo',dv_isnullvalue=false,dv_orderby_id=true
+	WHERE formname='v_edit_inp_dscenario_flwreg_outlet' AND columnname='nodarc_id';
+UPDATE config_form_fields
+	SET ismandatory=true,iseditable=true,dv_querytext_filterc='AND node_id',dv_parent_id='node_id',dv_querytext='SELECT nodarc_id as id, nodarc_id as idval FROM inp_flwreg_pump WHERE nodarc_id IS NOT NULL',widgettype='combo',dv_isnullvalue=false,dv_orderby_id=true
+	WHERE formname='v_edit_inp_dscenario_flwreg_pump' AND columnname='nodarc_id';
+UPDATE config_form_fields
+	SET ismandatory=true,iseditable=true,dv_querytext_filterc='AND node_id',dv_parent_id='node_id',dv_querytext='SELECT nodarc_id as id, nodarc_id as idval FROM inp_flwreg_weir WHERE nodarc_id IS NOT NULL',widgettype='combo',dv_isnullvalue=false,dv_orderby_id=true
+	WHERE formname='v_edit_inp_dscenario_flwreg_weir' AND columnname='nodarc_id';

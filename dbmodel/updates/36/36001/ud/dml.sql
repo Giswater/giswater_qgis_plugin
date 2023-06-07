@@ -562,3 +562,38 @@ VALUES(495, 'Set optimum outlet', 'ud', NULL, 'core', true, 'Function process', 
 INSERT INTO sys_function (id, function_name, project_type, function_type) 
 VALUES (3242, 'gw_fct_epa_setoptimumoutlet', 'ud', 'function')ON CONFLICT (id) DO NOTHING;
 
+-- 2023/06/07
+-- FLWREG LISTS
+-- orifice
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam)
+ VALUES('inp_flwreg_orifice', 'SELECT nodarc_id, to_arc, order_id, flwreg_length, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4, close_time FROM inp_flwreg_orifice WHERE id IS NOT NULL', 4, 'tab', 'list', NULL, NULL);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam)
+ VALUES('inp_dscenario_flwreg_orifice', 'SELECT d.dscenario_id, d.nodarc_id, f.node_id, d.ori_type, d.offsetval, d.cd, d.orate, d.flap, d.shape, d.geom1, d.geom2, d.geom3, d.geom4, d.close_time 
+FROM inp_dscenario_flwreg_orifice d
+JOIN inp_flwreg_orifice f USING (nodarc_id)
+WHERE dscenario_id IS NOT NULL AND nodarc_id IS NOT NULL', 4, 'tab', 'list', NULL, NULL);
+-- outlet
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam)
+ VALUES('inp_flwreg_outlet', 'SELECT nodarc_id, to_arc, order_id, flwreg_length, outlet_type, offsetval, curve_id, cd1, cd2, flap FROM inp_flwreg_outlet WHERE id IS NOT NULL', 4, 'tab', 'list', NULL, NULL);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam)
+ VALUES('inp_dscenario_flwreg_outlet', 'SELECT d.dscenario_id, d.nodarc_id, f.node_id, d.outlet_type, d.offsetval, d.curve_id, d.cd1, d.cd2, d.flap 
+FROM inp_dscenario_flwreg_outlet d
+JOIN inp_flwreg_outlet f USING (nodarc_id)
+WHERE dscenario_id IS NOT NULL AND nodarc_id IS NOT NULL', 4, 'tab', 'list', NULL, NULL);
+-- pump
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam)
+ VALUES('inp_flwreg_pump', 'SELECT nodarc_id, to_arc, order_id, flwreg_length, curve_id, status, startup, shutoff FROM inp_flwreg_pump WHERE id IS NOT NULL', 4, 'tab', 'list', NULL, NULL);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam)
+ VALUES('inp_dscenario_flwreg_pump', 'SELECT d.dscenario_id, d.nodarc_id, f.node_id, d.curve_id, d.status, d.startup, d.shutoff 
+FROM inp_dscenario_flwreg_pump d
+JOIN inp_flwreg_pump f USING (nodarc_id)
+WHERE dscenario_id IS NOT NULL AND nodarc_id IS NOT NULL', 4, 'tab', 'list', NULL, NULL);
+-- weir
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam)
+ VALUES('inp_flwreg_weir', 'SELECT nodarc_id, to_arc, order_id, flwreg_length, weir_type, offsetval, cd, ec, cd2, flap, geom1, geom2, geom3, geom4, surcharge, road_width, road_surf, coef_curve FROM inp_flwreg_weir WHERE id IS NOT NULL', 4, 'tab', 'list', NULL, NULL);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam)
+ VALUES('inp_dscenario_flwreg_weir', 'SELECT d.dscenario_id, d.nodarc_id, f.node_id, d.weir_type, d.offsetval, d.cd, d.ec, d.cd2, d.flap, d.geom1, d.geom2, d.geom3, d.geom4, d.surcharge, d.road_width, d.road_surf, d.coef_curve 
+FROM inp_dscenario_flwreg_weir d
+JOIN inp_flwreg_weir f USING (nodarc_id)
+WHERE dscenario_id IS NOT NULL AND nodarc_id IS NOT NULL', 4, 'tab', 'list', NULL, NULL);
+
