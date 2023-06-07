@@ -60,7 +60,8 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
 
 
-	INSERT INTO temp_node (node_id, the_geom, elev) SELECT node_id, the_geom, elev FROM node WHERE sector_id = v_sector;
+	INSERT INTO temp_node (node_id, the_geom, elev) SELECT node_id, the_geom, elev FROM v_edit_node 
+	WHERE epa_type = 'JUNCTION' AND state > 0 AND sector_id = v_sector;
 
 	SELECT value::integer INTO v_hydrology FROM config_param_user where parameter = 'inp_options_hydrology_scenario' and cur_user = current_user;
 
