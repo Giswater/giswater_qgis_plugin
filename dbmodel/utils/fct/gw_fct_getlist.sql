@@ -439,7 +439,7 @@ BEGIN
 		INTO v_lastpage;
 
 	-- add limit
-	IF v_device != 4 THEN
+	IF v_device != 4 AND v_limit != -1 THEN
 	    v_query_result := v_query_result || ' LIMIT '|| v_limit;
 	END IF;
 
