@@ -185,7 +185,7 @@ BEGIN
 	ELSIF v_field = 'sys_pol_id' THEN
 		v_field := 'pol_id';
 	END IF;
-	v_querytext := concat ((v_querytext),' ) RETURNING ',quote_ident(v_idname));
+	v_querytext := concat ((v_querytext),' ) RETURNING (',v_idname,')');
 
 	RAISE NOTICE '--- Insert new file with query:: % ---', v_querytext;
 
