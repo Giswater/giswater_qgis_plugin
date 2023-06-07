@@ -365,7 +365,6 @@ BEGIN
 				 	IF upper(v_type) = 'BETWEEN' then
 				 		v_query_result := v_query_result || ' AND '||v_field||'::'||v_type||' '||v_sign||' '||v_value||'::'||v_type||' ';
 				 	else
-				 		raise notice 'ASDF ---->>> %',v_type;
 				 		v_query_result := v_query_result || ' AND '||v_field||'::'||v_type||' '||v_sign||' '''||v_value||'''::'||v_type||' ';
 
 				 	end if;
