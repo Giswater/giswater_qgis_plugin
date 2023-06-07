@@ -71,6 +71,8 @@ v_visitclass_gully integer;
 v_feature_id integer;
 v_schemaname text;
 v_idname text;
+v_client_epsg integer;
+v_epsg integer;
 
 
 
@@ -91,6 +93,12 @@ BEGIN
 	--  get input values
 	v_fields := ((p_data ->> 'data')::json->> 'fields');
 	v_visit_id := ((p_data ->> 'feature')::json->> 'visitId');
+	v_xcoord := ((p_data ->> 'data')::json->> 'coordinates')::json->>'xcoord';
+	v_ycoord := ((p_data ->> 'data')::json->> 'coordinates')::json->>'ycoord';
+	v_client_epsg := (p_data ->> 'client')::json->> 'epsg';
+	v_addphotos := ((p_data ->> 'data')::json->> 'files');
+	v_epsg := (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
+
 	-- Get table_name
 
 	EXECUTE 'SELECT tablename FROM config_visit_class WHERE id = '||(v_fields->>'class_id')::integer||''
@@ -168,8 +176,13 @@ BEGIN
 		-- updating v_feature setting new id
 		v_feature =  gw_fct_json_object_set_key (v_feature, 'id', v_id);
 
-		-- updating visit
-		UPDATE om_visit SET the_geom=v_thegeom WHERE id=v_id;
+		-- Make point
+		if v_xcoord is not null THEN
+			SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_thegeom;
+
+			-- updating visit
+			UPDATE om_visit SET the_geom=v_thegeom WHERE id=v_id;
+		end if;
 
 		-- message
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -210,17 +223,20 @@ BEGIN
 		v_querystring = concat('SELECT id FROM om_visit_event WHERE visit_id = ',v_id);
 		v_debug_vars := json_build_object('v_id', v_id);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_setvisit', 'flag', 20);
+
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO v_event_id;
+
 		FOREACH v_addphotos IN ARRAY v_addphotos_array
-		LOOP
+		loop
 			-- Inserting data
-			v_querystring = concat('INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, hash, fextension)
-			 VALUES(',quote_nullable(v_id),', ',quote_nullable(v_event_id),', ',quote_nullable(NOW()),', ',quote_nullable(CONCAT((v_addphotos->>'json_array_elements')::json->>'photo_url'::text, (v_addphotos->>'json_array_elements')::json->>'hash'::text)),',
-			 ',quote_nullable(((v_addphotos->>'json_array_elements')::json->>'hash'::text)::text),',',quote_nullable(((v_addphotos->>'json_array_elements')::json->>'fextension'::text)::text),')');
+			v_querystring = concat('INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value)
+			 VALUES(',quote_nullable(v_id),', ',quote_nullable(v_event_id),', ',quote_nullable(NOW()),',', quote_nullable(v_addphotos::json->>'json_array_elements'), ')');
+
 			v_debug_vars := json_build_object('v_id', v_id, 'v_event_id', v_event_id, 'v_addphotos', v_addphotos, 'v_addphotos', v_addphotos);
 			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_setvisit', 'flag', 30);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
 			EXECUTE v_querystring;
 
 			-- message
