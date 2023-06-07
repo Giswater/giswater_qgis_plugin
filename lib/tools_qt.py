@@ -194,6 +194,28 @@ def get_widget_type(dialog, widget):
     return type(widget)
 
 
+def get_widget_value(dialog, widget):
+
+    value = None
+    if type(widget) is str:
+        widget = dialog.findChild(QWidget, widget)
+    if not widget:
+        return value
+
+    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
+        value = get_text(dialog, widget, return_string_null=False)
+    elif type(widget) is QComboBox:
+        value = get_combo_value(dialog, widget, 0)
+    elif type(widget) is QCheckBox:
+        value = is_checked(dialog, widget)
+        if value is not None:
+            value = str(value).lower()
+    elif type(widget) is QgsDateTimeEdit:
+        value = get_calendar_date(dialog, widget)
+
+    return value
+
+
 def get_text(dialog, widget, add_quote=False, return_string_null=True):
 
     if type(widget) is str:
