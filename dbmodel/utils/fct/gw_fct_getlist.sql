@@ -210,7 +210,6 @@ BEGIN
 		"data":{"message":"3156", "function":"2592","debug_msg":"tableName"}}$$);'INTO v_audit_result;
 	else
 		execute 'SELECT addparam FROM config_form_list where listname = $1' into v_table_params using v_tablename;
-		raise notice 'v_table_paramse -> %', v_table_params;
 	END IF;
 
 	RAISE NOTICE 'gw_fct_getlist - Init Values: v_tablename %  v_filter_values  % v_filter_feature %', v_tablename, v_filter_values, v_filter_feature;
@@ -320,26 +319,30 @@ BEGIN
 		LOOP
 			-- Get field and value from json
 			SELECT v_text [i] into v_json_field;
+
 			v_fields:= string_to_array((SELECT (v_json_field ->> 'key')), ', ') ;
-			raise notice 'v_fields %', v_fields;
 			v_value:= (SELECT (v_json_field ->> 'value')) ;
 			v_length := array_length(v_fields, 1);
-			raise notice 'v_length %', v_length;
-		
+
 			if (v_length = 1) then
 				v_field:= v_fields [1];
 			end if;
-		
-			raise notice 'v_field %', v_field;
+
+			if v_field='limit' and v_value = '-1' then
+				i=i+1;
+				continue;
+			end if;
+
+			-- Getting the type of the filter
+			IF (SELECT v_value WHERE v_value ILIKE '%'||'filterType'||'%') IS NOT NULL then
+				v_type = v_value::json->>'filterType';
+			else
+				v_type = 'text';
+			END IF;
+
 			-- Getting the sign of the filter
 			IF (SELECT v_value WHERE v_value ILIKE '%'||'filterSign'||'%') IS NOT NULL then
 			    -- Getting the type of the filter
-			    IF (SELECT v_value WHERE v_value ILIKE '%'||'filterType'||'%') IS NOT NULL then
-					v_type = v_value::json->>'filterType';
-				else
-					v_type = 'text';
-				END IF;
-
 				v_sign = v_value::json->>'filterSign';
 				v_value = v_value::json->>'value';
 				IF upper(v_sign) IN ('LIKE', 'ILIKE') THEN
@@ -355,17 +358,18 @@ BEGIN
 		
 			i=i+1;
 
-			raise notice 'v_field % v_value %', v_field, v_value;
-			
 			if v_length = 1 then
+
 				IF v_value IS NOT NULL AND v_field != 'limit' then
-				-- v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '''||v_value ||'''::text';
+
 				 	IF upper(v_type) = 'BETWEEN' then
 				 		v_query_result := v_query_result || ' AND '||v_field||'::'||v_type||' '||v_sign||' '||v_value||'::'||v_type||' ';
 				 	else
+				 		raise notice 'ASDF ---->>> %',v_type;
 				 		v_query_result := v_query_result || ' AND '||v_field||'::'||v_type||' '||v_sign||' '''||v_value||'''::'||v_type||' ';
+
 				 	end if;
-				ELSIF v_field='limit' THEN
+				ELSIF v_field='limit' and v_value != '-1' THEN
 					v_query_result := v_query_result;
 					v_limit := v_value;
 				END IF;
@@ -384,7 +388,6 @@ BEGIN
 			
 		END LOOP;
 	END IF;
-	raise notice '00 -> %',v_query_result;
 	-- add feature filter
 	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_feature) a;
 	IF v_text IS NOT NULL and v_length = 1 THEN
@@ -502,7 +505,6 @@ BEGIN
 
 	-- building pageinfo
 	v_pageinfo := json_build_object('orderBy',v_orderby, 'orderType', v_ordertype, 'currentPage', v_currentpage, 'lastPage', v_lastpage);
-raise notice 'AAA - % --- %',v_tablename, v_tabname;
 	-- getting filter fields
 	SELECT gw_fct_getformfields(v_tablename, 'form_list_header', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
 		INTO v_filter_fields;
