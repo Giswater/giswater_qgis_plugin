@@ -2168,12 +2168,14 @@ class GwInfo(QObject):
 
 
     def _reload_epa_tab(self, dialog):
+        epa_type = tools_qt.get_text(dialog, 'tab_data_epa_type')
         # call getinfofromid
-        if tools_qt.get_text(dialog, 'tab_data_epa_type').lower() == 'undefined':
+        if epa_type.lower() == 'undefined':
             tools_qt.enable_tab_by_tab_name(self.tab_main, 'tab_epa', False)
             return
-        tablename = 've_epa_' + tools_qt.get_text(dialog, 'tab_data_epa_type').lower()
-        feature = f'"tableName":"{tablename}", "id":"{self.feature_id}"'
+
+        tablename = 've_epa_' + epa_type.lower()
+        feature = f'"tableName":"{tablename}", "id":"{self.feature_id}", "epaType": "{epa_type}"'
         body = tools_gw.create_body(feature=feature)
         function_name = 'gw_fct_getinfofromid'
         complet_result = tools_gw.execute_procedure(function_name, body)
