@@ -868,7 +868,7 @@ class GwInfo(QObject):
         func_params = {"ui": "GwInfoEpaOrificeUi", "uiName": "info_epa_orifice",
                        "tableviews": [
                         {"tbl": "tbl_orifice", "view": "inp_flwreg_orifice", "add_view": "v_edit_inp_flwreg_orifice", "pk": "nodarc_id"},
-                        {"tbl": "tbl_dscenario_orifice", "view": "inp_dscenario_flwreg_orifice", "add_view": "v_edit_inp_dscenario_flwreg_orifice"}
+                        {"tbl": "tbl_dscenario_orifice", "view": "inp_dscenario_flwreg_orifice", "add_view": "v_edit_inp_dscenario_flwreg_orifice", "pk": ["dscenario_id", "nodarc_id"]}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg(**kwargs)
@@ -881,7 +881,7 @@ class GwInfo(QObject):
         func_params = {"ui": "GwInfoEpaOutletUi", "uiName": "info_epa_outlet",
                        "tableviews": [
                         {"tbl": "tbl_outlet", "view": "inp_flwreg_outlet", "add_view": "v_edit_inp_flwreg_outlet", "pk": "nodarc_id"},
-                        {"tbl": "tbl_dscenario_outlet", "view": "inp_dscenario_flwreg_outlet", "add_view": "v_edit_inp_dscenario_flwreg_outlet"}
+                        {"tbl": "tbl_dscenario_outlet", "view": "inp_dscenario_flwreg_outlet", "add_view": "v_edit_inp_dscenario_flwreg_outlet", "pk": ["dscenario_id", "nodarc_id"]}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg(**kwargs)
@@ -894,7 +894,7 @@ class GwInfo(QObject):
         func_params = {"ui": "GwInfoEpaPumpUi", "uiName": "info_epa_pump",
                        "tableviews": [
                         {"tbl": "tbl_pump", "view": "inp_flwreg_pump", "add_view": "v_edit_inp_flwreg_pump", "pk": "nodarc_id"},
-                        {"tbl": "tbl_dscenario_pump", "view": "inp_dscenario_flwreg_pump", "add_view": "v_edit_inp_dscenario_flwreg_pump"}
+                        {"tbl": "tbl_dscenario_pump", "view": "inp_dscenario_flwreg_pump", "add_view": "v_edit_inp_dscenario_flwreg_pump", "pk": ["dscenario_id", "nodarc_id"]}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg(**kwargs)
@@ -907,7 +907,7 @@ class GwInfo(QObject):
         func_params = {"ui": "GwInfoEpaWeirUi", "uiName": "info_epa_weir",
                        "tableviews": [
                         {"tbl": "tbl_weir", "view": "inp_flwreg_weir", "add_view": "v_edit_inp_flwreg_weir", "pk": "nodarc_id"},
-                        {"tbl": "tbl_dscenario_weir", "view": "inp_dscenario_flwreg_weir", "add_view": "v_edit_inp_dscenario_flwreg_weir"}
+                        {"tbl": "tbl_dscenario_weir", "view": "inp_dscenario_flwreg_weir", "add_view": "v_edit_inp_dscenario_flwreg_weir", "pk": ["dscenario_id", "nodarc_id"]}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg(**kwargs)
@@ -3405,8 +3405,19 @@ def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json):
         return
 
     fields = json.dumps(my_json)
+    id_val = ""
+    if pkey:
+        if not isinstance(pkey, list):
+            pkey = [pkey]
+        for pk in pkey:
+            widget_name = f"tab_none_{pk}"
+            value = tools_qt.get_widget_value(dialog, widget_name)
+            id_val += f"{value}, "
+        id_val = id_val[:-2]
+    if not id_val:
+        id_val = feature_id
 
-    feature = f'"id":"{feature_id}", '
+    feature = f'"id":"{id_val}", '
     feature += f'"tableName":"{tablename}"'
     extras = f'"fields":{fields}'
     body = tools_gw.create_body(feature=feature, extras=extras)
