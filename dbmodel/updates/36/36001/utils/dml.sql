@@ -1435,3 +1435,8 @@ UPDATE config_form_fields SET tabname = 'tab_relations'
 WHERE tabname = 'tab_relation';
 
 UPDATE config_form_tabs SET device = '{4}' where tabname = 'tab_epa';
+
+--2023/06/07
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") 
+    VALUES(3246, 'gw_fct_upsertfields', 'utils', 'function', 'json', 'json', 'Function to insert or update values into a table', 'role_basic', NULL, 'core');
+
