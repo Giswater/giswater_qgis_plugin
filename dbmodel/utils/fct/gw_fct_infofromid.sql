@@ -110,6 +110,7 @@ v_status text ='Accepted';
 v_childtype text;
 v_errcontext text;
 v_islayer boolean;
+v_isepa boolean;
 v_addschema text;
 v_return json;
 v_flag boolean = false;
@@ -133,9 +134,12 @@ v_record record;
 v_cur_user text;
 v_prev_cur_user text;
 v_table_child text;
+v_table_epa text;
+v_epatype text;
+v_tablename_aux text;
 
 BEGIN
-
+	
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname := 'SCHEMA_NAME';
@@ -143,9 +147,11 @@ BEGIN
 	-- input parameters
 	v_device := (p_data ->> 'client')::json->> 'device';
 	v_tablename := (p_data ->> 'feature')::json->> 'tableName';
+	v_epatype := (p_data ->> 'feature')::json->> 'epaType';
 	v_id := (p_data ->> 'feature')::json->> 'id';
 	v_inputgeometry := (p_data ->> 'feature')::json->> 'inputGeometry';
 	v_islayer := (p_data ->> 'feature')::json->> 'isLayer';
+	v_isepa := (p_data ->> 'feature')::json->> 'isEpa';
 	v_editable = (p_data ->> 'form')::json->> 'editable';
 	v_toolbar := (p_data ->> 'data')::json->> 'toolBar';
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
@@ -180,18 +186,20 @@ BEGIN
 	END IF;
 
 	-- Check if feature exist
-	IF v_id NOT IN ('', NULL) THEN
-
+	IF v_id is not null or v_id != '' then
 		EXECUTE 'SELECT gw_fct_getpkeyfield('''||v_tablename||''');' INTO v_pkeyfield;
 		EXECUTE 'SELECT ' || v_pkeyfield || ' FROM '|| v_tablename || ' WHERE ' || v_pkeyfield || '::text = ' || v_id || '::text' INTO v_idname;
-
 		IF v_idname IS NULL THEN
 			EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 			RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "version":'|| v_version
 			||', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
 
 		END IF;
-
+	
+		-- Get Epa Type
+		if v_epatype is null then
+			EXECUTE 'SELECT epa_type FROM '|| v_tablename || ' WHERE ' || v_pkeyfield || '::text = ' || v_id || '::text' INTO v_epatype;
+		end if;
 	END IF;
 
 	-- looking for additional schema
@@ -218,10 +226,11 @@ BEGIN
 
 	-- get project type
 	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
-
+	
 	-- check layer if it's child layer
-	IF (SELECT child_layer FROM cat_feature WHERE child_layer=v_tablename)IS NOT NULL THEN
+	IF (SELECT child_layer FROM cat_feature WHERE child_layer=v_tablename) IS NOT NULL THEN
 		v_table_parent := (SELECT parent_layer FROM cat_feature WHERE child_layer=v_tablename);
+		
 
 		--check if is delimiter
 		IF upper(v_project_type) = 'WS' AND v_table_parent='v_edit_node' THEN
@@ -237,6 +246,12 @@ BEGIN
 		IF (SELECT isarcdivide FROM cat_feature_node JOIN cat_feature USING (id) WHERE child_layer=v_tablename) IS TRUE THEN
 				v_isarcdivide = TRUE;
 		END IF;
+	ELSIF (select feature_type from sys_feature_epa_type where id = v_epatype) is not null then
+
+		v_table_epa = concat('ve_epa_', lower(v_epatype));
+		v_querystring = concat('SELECT concat(''v_edit_'', lower(feature_type)) FROM sys_feature_epa_type WHERE id =''', v_epatype,'''');
+		execute v_querystring into v_table_parent;
+	
 	ELSE
 		-- tablename is used as table parent.
 		v_table_parent = v_tablename;
@@ -436,22 +451,14 @@ BEGIN
 				USING v_schemaname, v_tablename, v_idname
 				INTO column_type;
 	END IF;
+	
+	if v_table_epa is not null then
+		v_tablename_aux = v_tablename;
+		v_tablename = v_table_epa;
+	end if;
 
 	-- Get tabs for form
 	IF v_isgraphdelimiter THEN
-		/*v_querystring = concat(
-			'SELECT array_agg(row_to_json(a)) FROM (
-			SELECT DISTINCT ON (tabname, orderby) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", tab as tabActions, orderby FROM
-			(SELECT tabname,orderby,label,tooltip,tabfunction,tab, unnest(device) as device FROM
-			(SELECT json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as tab FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
-			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and formname ='
-
-			,quote_nullable(v_tablename),'
-			and item_object->>''actionName'' != ''actionGetArcId''
-			and item_object->>''actionName''::text = id group by tabname) b,
-			config_form_tabs WHERE formname =',quote_nullable(v_tablename),
-
-			' AND orderby IS NOT NULL )a WHERE device = ', v_device,' ORDER BY orderby, tabname)a');*/
 
 		v_querystring = concat(
 			'SELECT array_agg(row_to_json(a)) FROM(
@@ -462,26 +469,27 @@ BEGIN
 			and item_object->>''actionName'' != ''actionGetArcId''
 			and item_object->>''actionName''::text = id group by "formname","tabName", "tabLabel",  "tooltip", "orderby"
 			order by orderby
-			)b WHERE (b.formname =',quote_nullable(v_tablename),' OR  formname =NULL) and ', v_device,' = any(device))a');
+			)b WHERE (b.formname =',quote_nullable(v_tablename),' OR  formname =NULL) and ', v_device,' = any(device)',
+			
+			' UNION ALL ',
+		
+			'SELECT "tabName", "tabLabel", "tooltip", "tabactions", orderby from(
+			SELECT formname, tabname as "tabName", label as "tabLabel", tooltip as "tooltip", json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as "tabactions", orderby, device
+			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
+			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and formname =',quote_nullable(v_table_parent),'
+			and item_object->>''actionName'' != ''actionGetArcId''
+			and item_object->>''actionName''::text = id group by "formname","tabName", "tabLabel",  "tooltip", "orderby"
+			order by orderby
+			)b WHERE (b.formname =',quote_nullable(v_table_parent),' OR  formname =NULL) and ', v_device,' = any(device) and "tabName" not in (
+			SELECT tabname
+		  	FROM config_form_tabs
+		  	WHERE formname = ',quote_nullable(v_tablename),'))a');
 
 		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_device', v_device);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 150);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO form_tabs;
 	ELSIF v_isepatoarc THEN
-		/*v_querystring = concat(
-			'SELECT array_agg(row_to_json(a)) FROM (
-			SELECT DISTINCT ON (tabname, orderby) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", tab as tabActions, orderby FROM
-			(SELECT tabname,orderby,label,tooltip,tabfunction,tab, unnest(device) as device FROM
-			(SELECT json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as tab FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
-			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and formname ='
-
-			,quote_nullable(v_tablename),'
-			and item_object->>''actionName'' != ''actionMapZone'' and item_object->>''actionName'' != ''actionGetArcId''
-			and item_object->>''actionName''::text = id group by tabname) b,
-			config_form_tabs WHERE (formname =',quote_nullable(v_tablename),' OR  formname =',quote_nullable(v_table_child),')
-
-			 AND orderby IS NOT NULL )a WHERE device = ', v_device,' ORDER BY orderby, tabname)a');*/
 
 		v_querystring = concat(
 			'SELECT array_agg(row_to_json(a)) FROM(
@@ -492,28 +500,28 @@ BEGIN
 			and item_object->>''actionName'' != ''actionMapZone'' and item_object->>''actionName'' != ''actionGetArcId''
 			and item_object->>''actionName''::text = id group by "formname","tabName", "tabLabel",  "tooltip", "orderby"
 			order by orderby
-			)b WHERE (b.formname =',quote_nullable(v_tablename),' OR  formname =NULL) and ', v_device,' = any(device))a');
+			)b WHERE (b.formname =',quote_nullable(v_tablename),' OR  formname =NULL) and ', v_device,' = any(device)',
+		
+			' UNION ALL ',
+		
+			'SELECT "tabName", "tabLabel", "tooltip", "tabactions", orderby from(
+			SELECT formname, tabname as "tabName", label as "tabLabel", tooltip as "tooltip", json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as "tabactions", orderby, device
+			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
+			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and formname =',quote_nullable(v_table_parent),'
+			and item_object->>''actionName'' != ''actionMapZone'' and item_object->>''actionName'' != ''actionGetArcId''
+			and item_object->>''actionName''::text = id group by "formname","tabName", "tabLabel",  "tooltip", "orderby"
+			order by orderby
+			)b WHERE (b.formname =',quote_nullable(v_table_parent),' OR  formname =NULL) and ', v_device,' = any(device) and "tabName" not in (
+			SELECT tabname
+		  	FROM config_form_tabs
+		  	WHERE formname = ',quote_nullable(v_tablename),'))a');
 
 		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_device', v_device);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 160);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO form_tabs;
 	ELSIF v_isarcdivide THEN
-		/*v_querystring = concat(
-
-			'SELECT array_agg(row_to_json(a)) FROM (
-			SELECT DISTINCT ON (tabname, orderby) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", tab as tabActions, orderby FROM
-			(SELECT tabname,orderby,label,tooltip,tabfunction,tab, unnest(device) as device FROM
-			(SELECT json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as tab FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
-			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and formname ='
-
-			,quote_nullable(v_tablename),'
-			and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone''
-			and item_object->>''actionName'' != ''actionGetArcId''
-			and item_object->>''actionName''::text = id group by tabname) b,
-			config_form_tabs WHERE (formname =',quote_nullable(v_tablename),' OR  formname =',quote_nullable(v_table_child),')
-
-			 AND orderby IS NOT NULL )a WHERE device = ', v_device,' ORDER BY orderby, tabname)a');*/
+			
 		v_querystring = concat(
 			'SELECT array_agg(row_to_json(a)) FROM(
 			SELECT "tabName", "tabLabel", "tooltip", "tabactions", orderby from(
@@ -523,28 +531,29 @@ BEGIN
 			and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone'' and item_object->>''actionName'' != ''actionGetArcId''
 			and item_object->>''actionName''::text = id group by "formname","tabName", "tabLabel",  "tooltip", "orderby"
 			order by orderby
-			)b WHERE (b.formname =',quote_nullable(v_tablename),' OR  formname =NULL) and ', v_device,' = any(device))a');
+			)b WHERE (b.formname =',quote_nullable(v_tablename),' OR  formname =NULL) and ', v_device,' = any(device)',
+		
+			' UNION ALL ',
+		
+			'SELECT "tabName", "tabLabel", "tooltip", "tabactions", orderby from(
+			SELECT formname, tabname as "tabName", label as "tabLabel", tooltip as "tooltip", json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as "tabactions", orderby, device
+			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
+			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and formname =',quote_nullable(v_table_parent),'
+			and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone'' and item_object->>''actionName'' != ''actionGetArcId''
+			and item_object->>''actionName''::text = id group by "formname","tabName", "tabLabel",  "tooltip", "orderby"
+			order by orderby
+			)b WHERE (b.formname =',quote_nullable(v_table_parent),' OR  formname =NULL) and ', v_device,' = any(device) and "tabName" not in (
+			SELECT tabname
+		  	FROM config_form_tabs
+		  	WHERE formname = ',quote_nullable(v_tablename),'))a');
 
-		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_device', v_device);
+		  v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_device', v_device);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 170);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO form_tabs;
 
 	else
 
-		/*v_querystring = concat(
-
-			'SELECT array_agg(row_to_json(a)) FROM (
-			SELECT DISTINCT ON (tabname, orderby) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", tab as tabActions, orderby FROM
-			(SELECT tabname,orderby,label,tooltip,tabfunction,tab, unnest(device) as device FROM
-			(SELECT json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as tab
-			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
-			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and formname =',quote_nullable(v_tablename),'
-			and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone''
-			and item_object->>''actionName''::text = id group by tabname) b,
-			config_form_tabs WHERE (formname =',quote_nullable(v_tablename),' OR  formname =',quote_nullable(v_table_child),')
-			AND orderby IS NOT NULL )a WHERE device = ', v_device,' ORDER BY orderby, tabname)a');*/
-
 		v_querystring = concat(
 			'SELECT array_agg(row_to_json(a)) FROM(
 			SELECT "tabName", "tabLabel", "tooltip", "tabactions", orderby from(
@@ -554,88 +563,32 @@ BEGIN
 			and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone''
 			and item_object->>''actionName''::text = id group by "formname","tabName", "tabLabel",  "tooltip", "orderby"
 			order by orderby
-			)b WHERE (b.formname =',quote_nullable(v_tablename),' OR  formname =NULL) and ', v_device,' = any(device))a');
-
-		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_device', v_device);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 180);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-		EXECUTE v_querystring INTO form_tabs;
-	END IF;
-
-	-- IF form_tabs is null and layer it's child layer it's child layer --> parent form_tabs is used
-	IF form_tabs IS NULL AND v_table_parent IS NOT NULL THEN
-
-        IF v_isgraphdelimiter THEN
-
-			-- Get form_tabs
-        	v_querystring = concat(
-			'SELECT array_agg(row_to_json(a)) FROM(
-			SELECT "tabName", "tabLabel", "tooltip", "tabactions", orderby from(
-			SELECT formname, tabname as "tabName", label as "tabLabel", tooltip as "tooltip", json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as "tabactions", orderby, device
-			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
-			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and formname =',quote_nullable(v_table_parent),'
-			and item_object->>''actionName'' != ''actionGetArcId''
-			and item_object->>''actionName''::text = id group by "formname","tabName", "tabLabel",  "tooltip", "orderby"
-			order by orderby
-			)b WHERE (b.formname =',quote_nullable(v_table_parent),' OR  formname =NULL) and ', v_device,' = any(device))a');
-
-			v_debug_vars := json_build_object('v_table_parent', v_table_parent, 'v_device', v_device);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 190);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-			EXECUTE v_querystring INTO form_tabs;
-		ELSIF v_isepatoarc THEN
-
-			v_querystring = concat(
-			'SELECT array_agg(row_to_json(a)) FROM(
-			SELECT "tabName", "tabLabel", "tooltip", "tabactions", orderby from(
-			SELECT formname, tabname as "tabName", label as "tabLabel", tooltip as "tooltip", json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as "tabactions", orderby, device
-			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
-			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and formname =',quote_nullable(v_table_parent),'
-			and item_object->>''actionName'' != ''actionMapZone'' and item_object->>''actionName'' != ''actionGetArcId''
-			and item_object->>''actionName''::text = id group by "formname","tabName", "tabLabel",  "tooltip", "orderby"
-			order by orderby
-			)b WHERE (b.formname =',quote_nullable(v_table_parent),' OR  formname =NULL) and ', v_device,' = any(device))a');
-
-			v_debug_vars := json_build_object('v_table_parent', v_table_parent, 'v_device', v_device);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 200);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-			EXECUTE v_querystring INTO form_tabs;
-		ELSIF v_isarcdivide THEN
-
-			v_querystring = concat(
-			'SELECT array_agg(row_to_json(a)) FROM(
-			SELECT "tabName", "tabLabel", "tooltip", "tabactions", orderby from(
-			SELECT formname, tabname as "tabName", label as "tabLabel", tooltip as "tooltip", json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as "tabactions", orderby, device
-			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
-			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and formname =',quote_nullable(v_table_parent),'
-			and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone'' and item_object->>''actionName'' != ''actionGetArcId''
-			and item_object->>''actionName''::text = id group by "formname","tabName", "tabLabel",  "tooltip", "orderby"
-			order by orderby
-			)b WHERE (b.formname =',quote_nullable(v_table_parent),' OR  formname =NULL) and ', v_device,' = any(device))a');
-
-			v_debug_vars := json_build_object('v_table_parent', v_table_parent, 'v_device', v_device);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 210);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-			EXECUTE v_querystring INTO form_tabs;
-		ELSE
-
-			v_querystring = concat(
-			'SELECT array_agg(row_to_json(a)) FROM(
-			SELECT "tabName", "tabLabel", "tooltip", "tabactions", orderby from(
+			)b WHERE (b.formname =',quote_nullable(v_tablename),' OR  formname =NULL) and ', v_device,' = any(device)',
+		
+			' UNION ALL ',
+		
+			'SELECT "tabName", "tabLabel", "tooltip", "tabactions", orderby from(
 			SELECT formname, tabname as "tabName", label as "tabLabel", tooltip as "tooltip", json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as "tabactions", orderby, device
 			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
 			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and formname =',quote_nullable(v_table_parent),'
 			and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone''
 			and item_object->>''actionName''::text = id group by "formname","tabName", "tabLabel",  "tooltip", "orderby"
 			order by orderby
-			)a WHERE (a.formname =',quote_nullable(v_table_parent),' OR  formname =NULL) and ', v_device,' = any(device))a');
+			)b WHERE (b.formname =',quote_nullable(v_table_parent),' OR  formname =NULL) and ', v_device,' = any(device) and "tabName" not in (
+			SELECT tabname
+		  	FROM config_form_tabs
+		  	WHERE formname = ',quote_nullable(v_tablename),'))a');
 
-			v_debug_vars := json_build_object('v_table_parent', v_table_parent, 'v_device', v_device);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 180);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-			EXECUTE v_querystring INTO form_tabs;
-		END IF;
+		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_device', v_device);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 180);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO form_tabs;
 	END IF;
+	raise notice 'v_querystring -> %',v_querystring;
+	
+	if v_tablename_aux is not null then
+		v_tablename = v_tablename_aux;
+	end if;
 
 	-- Check if it is parent table
 	IF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS TRUE) AND v_id IS NOT NULL THEN
@@ -768,7 +721,7 @@ BEGIN
 		ELSIF v_editable THEN
 
 			-- getting id from URN
-			IF v_id IS NULL AND v_islayer is not true THEN
+			IF v_id IS NULL AND v_islayer is not true AND v_isepa is not true  THEN
 				v_id = (SELECT nextval('SCHEMA_NAME.urn_id_seq'));
 			END IF;
 
