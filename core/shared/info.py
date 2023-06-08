@@ -3383,20 +3383,31 @@ def delete_tbl_row(tbl, tablename, pkey, **kwargs):
         tools_qgis.show_warning(message, dialog=info.dlg)
         return
 
-    # Get primary key
-    col_idx = tools_qt.get_col_index_by_col_name(tbl, pkey)
-    if col_idx is None:
-        col_idx = 0
-
     values = []
-    for index in selected_list:
-        values.append(index.sibling(index.row(), col_idx).data())
+    if pkey:
+        if not isinstance(pkey, list):
+            pkey = [pkey]
+        values = []
+        for index in selected_list:
+            value = {}
+            for pk in pkey:
+                col_idx = tools_qt.get_col_index_by_col_name(tbl, pk)
+                if col_idx is None:
+                    col_idx = 0
+                value[pk] = index.sibling(index.row(), col_idx).data()
+            if value:
+                values.append(value)
 
     message = "Are you sure you want to delete these records?"
     answer = tools_qt.show_question(message, "Delete records", values, force_action=True)
     if answer:
         for value in values:
-            sql = f"DELETE FROM {tablename} WHERE {pkey} = '{value}'"
+            conditions = []
+            for key, val in value.items():
+                condition = f"{key} = '{val}'"
+                conditions.append(condition)
+            condition_str = " AND ".join(conditions)
+            sql = f"DELETE FROM {tablename} WHERE {condition_str}"
             tools_db.execute_sql(sql)
 
         # Refresh tableview
