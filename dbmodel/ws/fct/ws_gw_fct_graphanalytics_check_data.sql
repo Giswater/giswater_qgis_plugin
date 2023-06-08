@@ -158,8 +158,8 @@ BEGIN
 
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (211, 3, '177', concat('ERROR-177: There is/are at least ',v_count,' 
-		exploitation(s) bad configured on the config_graph_inlet table. Please check your data before continue'),v_count);
+		VALUES (211, 3, '177', concat('ERROR-177: There is/are at least ',v_count,
+		' row(s) with exploitation bad configured on the config_graph_inlet table. Please check your data before continue'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (211, 1, '177', 'INFO: It seems config_graph_inlet table is well configured. At least, table is filled with nodes from all exploitations.',v_count);

@@ -598,7 +598,30 @@ BEGIN
 		UPDATE audit_check_data SET result_id = table_id WHERE cur_user="current_user"() AND fid=v_fid AND result_id IS NULL;
 		UPDATE audit_check_data SET table_id = NULL WHERE cur_user="current_user"() AND fid=v_fid; 
 	END IF;
+	
 
+	RAISE NOTICE '25 - Check shape with null values on arc catalog';
+	SELECT count(*) INTO v_count FROM cat_arc WHERE shape is null;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '482', 3, concat('ERROR-482: There is/are ',v_count,' rows on arc catalog without values on shape column.'), v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '482', 1, 'INFO: No rows on arc catalog without values on shape column.', v_count);
+	END IF;
+	v_count=0;
+	
+	RAISE NOTICE '26 - Check geom1 with null values on arc catalog';
+	SELECT count(*) INTO v_count FROM cat_arc WHERE geom1 is null;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '482', 3, concat('ERROR-482: There is/are ',v_count,' rows on arc catalog without values on geom1 column.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '482', 1, 'INFO: No rows on arc catalog without values on shape column.', v_count);
+	END IF;
+	v_count=0;
+	
 	-- Removing isaudit false sys_fprocess
 	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
 	LOOP
