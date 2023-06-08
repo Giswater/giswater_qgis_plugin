@@ -584,8 +584,7 @@ BEGIN
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO form_tabs;
 	END IF;
-	raise notice 'v_querystring -> %',v_querystring;
-	
+
 	if v_tablename_aux is not null then
 		v_tablename = v_tablename_aux;
 	end if;
@@ -723,6 +722,8 @@ BEGIN
 			-- getting id from URN
 			IF v_id IS NULL AND v_islayer is not true AND v_isepa is not true  THEN
 				v_id = (SELECT nextval('SCHEMA_NAME.urn_id_seq'));
+			ELSE
+				v_id = '';
 			END IF;
 
 			RAISE NOTICE 'User has permissions to edit table % using id %', v_tablename, v_id;
