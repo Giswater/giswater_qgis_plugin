@@ -338,8 +338,7 @@ BEGIN
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo,'headerText',v_header_text);
 
 
-
-		-- Return
+	-- Return
 	return ('{
 	"status": "Accepted",
 	"version": '|| v_version ||',
@@ -348,9 +347,9 @@ BEGIN
 		"form": '|| v_forminfo ||',
 	    "fields": '|| v_fieldsjson ||'
 	      },
-		  "feature": {
-			"idName": "",
-			"id": ""
+	  "feature": {
+		"idName": "",
+		"visitId": "'||v_visit_id||'"
 	      }
 	    }
 	  }')::JSON;
