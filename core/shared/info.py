@@ -3294,7 +3294,7 @@ def add_row_epa(tbl, tablename, pkey, **kwargs):
     feature_id = complet_result['body']['feature']['id']
     id_name = complet_result['body']['feature']['idName']
 
-    feature = f'"tableName":"{tablename}", "id":"{feature_id}"'
+    feature = f'"tableName":"{tablename}"'
     body = tools_gw.create_body(feature=feature)
     json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
     if json_result is None or json_result['status'] == 'Failed':
