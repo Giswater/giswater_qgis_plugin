@@ -720,10 +720,10 @@ BEGIN
 		ELSIF v_editable THEN
 
 			-- getting id from URN
-			IF v_id IS NULL AND v_islayer is not true AND v_isepa is not true  THEN
-				v_id = (SELECT nextval('SCHEMA_NAME.urn_id_seq'));
-			ELSE
-				v_id = '';
+			IF v_id IS NULL AND v_isepa IS true THEN
+			    v_id = '';
+			ELSIF v_id IS NULL AND v_islayer is not true then
+				v_id = (SELECT nextval('ud_36.urn_id_seq'));
 			END IF;
 
 			RAISE NOTICE 'User has permissions to edit table % using id %', v_tablename, v_id;
