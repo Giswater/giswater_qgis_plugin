@@ -1506,3 +1506,8 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET ismandatory=true,iseditable=true,dv_querytext_filterc='AND node_id',dv_parent_id='node_id',dv_querytext='SELECT nodarc_id as id, nodarc_id as idval FROM inp_flwreg_weir WHERE nodarc_id IS NOT NULL',widgettype='combo',dv_isnullvalue=false,dv_orderby_id=true
 	WHERE formname='v_edit_inp_dscenario_flwreg_weir' AND columnname='nodarc_id';
+
+INSERT INTO config_form_list
+(listname, query_text, device, listtype, listclass, vdefault, addparam)
+VALUES('om_visit_event_photo', 'SELECT  value as url FROM om_visit_event_photo WHERE id IS NOT NULL', 5, 'tab', 'iconList', '{"orderBy":"1", "orderType": "DESC"}'::json, NULL);
+
