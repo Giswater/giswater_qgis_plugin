@@ -329,6 +329,7 @@ BEGIN
 			end if;
 
 			if v_field='limit' and v_value = '-1' then
+				v_limit = -1;
 				i=i+1;
 				continue;
 			end if;
@@ -505,9 +506,8 @@ BEGIN
 	-- building pageinfo
 	v_pageinfo := json_build_object('orderBy',v_orderby, 'orderType', v_ordertype, 'currentPage', v_currentpage, 'lastPage', v_lastpage);
 	-- getting filter fields
-	SELECT gw_fct_getformfields(v_tablename, 'form_list_header', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
-		INTO v_filter_fields;
-		
+	/*SELECT gw_fct_getformfields(v_tablename, 'form_list_header', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
+		INTO v_filter_fields;*/
 		--  setting values of filter fields
 		
 		SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_values) a;
