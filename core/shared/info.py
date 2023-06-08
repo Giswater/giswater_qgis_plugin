@@ -35,8 +35,8 @@ from ..threads.toggle_valve_state import GwToggleValveTask
 
 from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, \
-    GwInfoCrossectUi, GwInterpolate, GwInfoEpaDemandUi, GwInfoEpaDwfUi, GwInfoEpaFlowRegulatorUi, GwInfoEpaInflowsUi, \
-    GwInfoEpaInflowsPollUi, GwInfoEpaPumpadditionalUi, GwInfoEpaTreatmentUi
+    GwInfoCrossectUi, GwInterpolate, GwInfoEpaDemandUi, GwInfoEpaOrificeUi, GwInfoEpaOutletUi, GwInfoEpaPumpUi, \
+    GwInfoEpaWeirUi, GwInfoEpaDwfUi
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os
 from ...lib.tools_qt import GwHyperLinkLineEdit
@@ -107,6 +107,7 @@ class GwInfo(QObject):
             self.my_json = {}
             self.my_json_epa = {}
             self.tab_type = tab_type
+            self.visible_tabs = []
 
             # Get project variables
             qgis_project_add_schema = global_vars.project_vars['add_schema']
@@ -500,9 +501,9 @@ class GwInfo(QObject):
             except:
                 pass
 
-        if 'visibleTabs' in complet_result['body']['form']:
-            for tab in complet_result['body']['form']['visibleTabs']:
-                tabs_to_show.append(tab['tabName'])
+        self.visible_tabs = complet_result['body']['form'].get('visibleTabs', [])
+        for tab in self.visible_tabs:
+            tabs_to_show.append(tab['tabName'])
 
         for x in range(self.tab_main.count() - 1, 0, -1):
             if self.tab_main.widget(x).objectName() not in tabs_to_show:
@@ -631,6 +632,11 @@ class GwInfo(QObject):
         self.action_interpolate = self.dlg_cf.findChild(QAction, "actionInterpolate")
         # action_switch_arc_id = self.dlg_cf.findChild(QAction, "actionSwicthArcid")
         self.action_section = self.dlg_cf.findChild(QAction, "actionSection")
+        self.action_orifice = self.dlg_cf.findChild(QAction, "actionOrifice")
+        self.action_outlet = self.dlg_cf.findChild(QAction, "actionOutlet")
+        self.action_pump = self.dlg_cf.findChild(QAction, "actionPump")
+        self.action_weir = self.dlg_cf.findChild(QAction, "actionWeir")
+        self.action_demand = self.dlg_cf.findChild(QAction, "actionDemand")
 
 
     def _manage_icons(self):
@@ -651,6 +657,11 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.action_section, "207")
         tools_gw.add_icon(self.action_help, "73", sub_folder="24x24")
         tools_gw.add_icon(self.action_interpolate, "194")
+        tools_gw.add_icon(self.action_orifice, "250", sub_folder="24x24")
+        tools_gw.add_icon(self.action_outlet, "251", sub_folder="24x24")
+        tools_gw.add_icon(self.action_pump, "252", sub_folder="24x24")
+        tools_gw.add_icon(self.action_weir, "253", sub_folder="24x24")
+        tools_gw.add_icon(self.action_demand, "254", sub_folder="24x24")
 
 
     def _manage_dlg_widgets(self, complet_result, result, new_feature, reload_epa=False):
@@ -833,12 +844,101 @@ class GwInfo(QObject):
         self.ep = QgsMapToolEmitPoint(self.canvas)
         self.action_interpolate.triggered.connect(partial(self._activate_snapping, complet_result, self.ep))
 
+        # EPA Actions
+        self.action_orifice.triggered.connect(partial(self._open_orifice_dlg))
+        self.action_outlet.triggered.connect(partial(self._open_outlet_dlg))
+        self.action_pump.triggered.connect(partial(self._open_pump_dlg))
+        self.action_weir.triggered.connect(partial(self._open_weir_dlg))
+        if global_vars.project_type == 'ws':
+            self.action_demand.triggered.connect(partial(self._open_demand_dlg))
+        elif global_vars.project_type == 'ud':
+            self.action_demand.triggered.connect(partial(self._open_dwf_dlg))
+
         # Disable action edit if user can't edit
         if not can_edit:
             self.action_edit.setChecked(False)
             self.action_edit.setEnabled(False)
 
         return dlg_cf, fid
+
+    def _open_orifice_dlg(self):
+        print("_open_orifice_dlg")
+
+        # kwargs
+        func_params = {"ui": "GwInfoEpaOrificeUi", "uiName": "info_epa_orifice",
+                       "tableviews": [
+                        {"tbl": "tbl_orifice", "view": "inp_flwreg_orifice", "add_view": "v_edit_inp_flwreg_orifice", "pk": "nodarc_id"},
+                        {"tbl": "tbl_dscenario_orifice", "view": "inp_dscenario_flwreg_orifice", "add_view": "v_edit_inp_dscenario_flwreg_orifice", "pk": ["dscenario_id", "nodarc_id"]}
+                       ]}
+        kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
+        open_epa_dlg(**kwargs)
+
+
+    def _open_outlet_dlg(self):
+        print("_open_outlet_dlg")
+
+        # kwargs
+        func_params = {"ui": "GwInfoEpaOutletUi", "uiName": "info_epa_outlet",
+                       "tableviews": [
+                        {"tbl": "tbl_outlet", "view": "inp_flwreg_outlet", "add_view": "v_edit_inp_flwreg_outlet", "pk": "nodarc_id"},
+                        {"tbl": "tbl_dscenario_outlet", "view": "inp_dscenario_flwreg_outlet", "add_view": "v_edit_inp_dscenario_flwreg_outlet", "pk": ["dscenario_id", "nodarc_id"]}
+                       ]}
+        kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
+        open_epa_dlg(**kwargs)
+
+
+    def _open_pump_dlg(self):
+        print("_open_pump_dlg")
+
+        # kwargs
+        func_params = {"ui": "GwInfoEpaPumpUi", "uiName": "info_epa_pump",
+                       "tableviews": [
+                        {"tbl": "tbl_pump", "view": "inp_flwreg_pump", "add_view": "v_edit_inp_flwreg_pump", "pk": "nodarc_id"},
+                        {"tbl": "tbl_dscenario_pump", "view": "inp_dscenario_flwreg_pump", "add_view": "v_edit_inp_dscenario_flwreg_pump", "pk": ["dscenario_id", "nodarc_id"]}
+                       ]}
+        kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
+        open_epa_dlg(**kwargs)
+
+
+    def _open_weir_dlg(self):
+        print("_open_weir_dlg")
+
+        # kwargs
+        func_params = {"ui": "GwInfoEpaWeirUi", "uiName": "info_epa_weir",
+                       "tableviews": [
+                        {"tbl": "tbl_weir", "view": "inp_flwreg_weir", "add_view": "v_edit_inp_flwreg_weir", "pk": "nodarc_id"},
+                        {"tbl": "tbl_dscenario_weir", "view": "inp_dscenario_flwreg_weir", "add_view": "v_edit_inp_dscenario_flwreg_weir", "pk": ["dscenario_id", "nodarc_id"]}
+                       ]}
+        kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
+        open_epa_dlg(**kwargs)
+
+
+    def _open_demand_dlg(self):
+        print("_open_demand_dlg")
+
+        # kwargs
+        func_params = {"ui": "GwInfoEpaDemandUi", "uiName": "info_epa_demand",
+                       "tableviews": [
+                        {"tbl": "tbl_dscenario_demand", "view": "inp_dscenario_demand", "add_view": "v_edit_inp_dscenario_demand"}
+                       ]}
+        kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
+        open_epa_dlg(**kwargs)
+
+
+    def _open_dwf_dlg(self):
+        print("_open_dwf_dlg")
+
+        # kwargs
+        func_params = {"ui": "GwInfoEpaDwfUi", "uiName": "info_epa_dwf",
+                       "widgets": [
+                           "dwfscenario_id", "node_id", "value", "pat1", "pat2", "pat3", "pat4"
+                       ],
+                       "widgetsTablename": "inp_dwf",
+                       "tableviews": [
+                        {"tbl": "tbl_dscenario_inflows", "view": "v_edit_inp_dscenario_inflows"}
+                       ]}
+        kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
+        open_epa_dlg(**kwargs)
 
 
     def action_open_link(self):
@@ -1829,7 +1929,8 @@ class GwInfo(QObject):
         try:
             actions_list = dialog.findChildren(QAction)
             static_actions = ('actionEdit', 'actionCentered', 'actionLink', 'actionHelp',
-                              'actionSection', 'actionSetToArc')
+                              'actionSection', 'actionSetToArc',
+                              'actionOrifice', 'actionOutlet', 'actionPump', 'actionWeir', 'actionDemand')
 
             for action in actions_list:
                 if action.objectName() not in static_actions:
@@ -1847,7 +1948,7 @@ class GwInfo(QObject):
 
             if 'visibleTabs' not in self.complet_result['body']['form']:
                 return
-            for tab in self.complet_result['body']['form']['visibleTabs']:
+            for tab in self.visible_tabs:
                 if tab['tabName'] == tab_name:
                     if tab['tabactions'] is not None:
                         for act in tab['tabactions']:
@@ -2074,16 +2175,21 @@ class GwInfo(QObject):
 
 
     def _reload_epa_tab(self, dialog):
+        epa_type = tools_qt.get_text(dialog, 'tab_data_epa_type')
         # call getinfofromid
-        if tools_qt.get_text(dialog, 'tab_data_epa_type').lower() == 'undefined':
+        if epa_type.lower() == 'undefined':
             tools_qt.enable_tab_by_tab_name(self.tab_main, 'tab_epa', False)
             return
-        tablename = 've_epa_' + tools_qt.get_text(dialog, 'tab_data_epa_type').lower()
-        feature = f'"tableName":"{tablename}", "id":"{self.feature_id}"'
+
+        tablename = 've_epa_' + epa_type.lower()
+        feature = f'"tableName":"{tablename}", "id":"{self.feature_id}", "epaType": "{epa_type}"'
         body = tools_gw.create_body(feature=feature)
         function_name = 'gw_fct_getinfofromid'
         complet_result = tools_gw.execute_procedure(function_name, body)
         if complet_result:
+            if complet_result['body']['form'].get('visibleTabs'):
+                self.visible_tabs = complet_result['body']['form']['visibleTabs']
+                self._show_actions(self.dlg_cf, 'tab_epa')
             for lyt in dialog.findChildren(QGridLayout, QRegularExpression('lyt_epa')):
                 i = 0
                 while i < lyt.count():
@@ -2244,10 +2350,10 @@ class GwInfo(QObject):
                 continue
             action.setVisible(False)
 
-        if 'visibleTabs' not in self.complet_result['body']['form']:
+        if not self.visible_tabs:
             return
 
-        for tab in self.complet_result['body']['form']['visibleTabs']:
+        for tab in self.visible_tabs:
             if tab['tabName'] == tab_name:
                 if tab['tabactions'] is not None:
                     for act in tab['tabactions']:
@@ -3066,6 +3172,22 @@ def fill_tbl(complet_list, tbl, info, view):
             addparam = addparam.get('pkey')
 
     setattr(info, f"my_json_{view}", {})
+    # headers
+    headers = complet_list['body']['form'].get('headers')
+    non_editable_columns = []
+    if headers:
+        model = tbl.model()
+        if model is None:
+            model = QStandardItemModel()
+
+        # Related by Qtable
+        model.clear()
+        tbl.setModel(model)
+        tbl.horizontalHeader().setStretchLastSection(True)
+        # Non-editable columns
+        non_editable_columns = [item['header'] for item in headers if item.get('editable') is False]
+
+    # values
     for field in complet_list['body']['data']['fields']:
         if 'hidden' in field and field['hidden']: continue
         model = tbl.model()
@@ -3079,6 +3201,19 @@ def fill_tbl(complet_list, tbl, info, view):
             tbl = tools_gw.fill_tableview_rows(tbl, field)
         tools_qt.set_tableview_config(tbl, edit_triggers=QTableView.DoubleClicked)
         model.dataChanged.connect(partial(tbl_data_changed, info, view, tbl, model, addparam))
+        _manage_new_row(model)
+    # editability
+    tbl.model().flags = lambda index: epa_tbl_flags(index, model, non_editable_columns)
+
+
+def epa_tbl_flags(index, model, non_editable_columns=None):
+
+    column_name = model.headerData(index.column(), Qt.Horizontal, Qt.DisplayRole)
+    if non_editable_columns and column_name in non_editable_columns:
+        flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
+        return flags
+
+    return QStandardItemModel.flags(model, index)
 
 # region Tab epa
 
@@ -3119,17 +3254,201 @@ def open_epa_dlg(**kwargs):
         if not tbl:
             continue
         view = tableview['view']
+        add_view = tableview.get('add_view', view)
         pk = tableview.get('pk')
         if not pk:
             pk = id_name
 
-        complet_list = get_list(view, pk, feature_id)
+        complet_list = get_list(view, id_name, feature_id)
         fill_tbl(complet_list, tbl, info, view)
-        info.dlg.accepted.connect(partial(save_tbl_changes, complet_list, info))
+        info.dlg.btn_accept.clicked.connect(partial(save_tbl_changes, complet_list, info, info.dlg))
 
+        # Add & Delete buttons
+        if 'dscenario' not in view:
+            btn_add_base = info.dlg.findChild(QPushButton, 'btn_add_base')
+            if btn_add_base:
+                tools_gw.add_icon(btn_add_base, '111b', "24x24")
+                btn_add_base.clicked.connect(partial(add_row_epa, tbl, add_view, pk, **kwargs))
+            btn_delete_base = info.dlg.findChild(QPushButton, 'btn_delete_base')
+            if btn_delete_base:
+                tools_gw.add_icon(btn_delete_base, '112b', "24x24")
+                btn_delete_base.clicked.connect(partial(delete_tbl_row, tbl, view, pk, **kwargs))
+        else:
+            btn_add_dscenario = info.dlg.findChild(QPushButton, 'btn_add_dscenario')
+            if btn_add_dscenario:
+                tools_gw.add_icon(btn_add_dscenario, '111b', "24x24")
+                btn_add_dscenario.clicked.connect(partial(add_row_epa, tbl, add_view, pk, **kwargs))
+            btn_delete_dscenario = info.dlg.findChild(QPushButton, 'btn_delete_dscenario')
+            if btn_delete_dscenario:
+                tools_gw.add_icon(btn_delete_dscenario, '112b', "24x24")
+                btn_delete_dscenario.clicked.connect(partial(delete_tbl_row, tbl, view, pk, **kwargs))
+
+    info.dlg.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, info.dlg, True))
     info.dlg.finished.connect(partial(tools_gw.save_settings, info.dlg))
     # Open dlg
     tools_gw.open_dialog(info.dlg, dlg_name=ui_name)
+
+
+def add_row_epa(tbl, tablename, pkey, **kwargs):
+    # Get variables
+    complet_result = kwargs['complet_result']
+    info = kwargs['class']
+    func_params = kwargs['func_params']
+    ui = func_params['ui']
+    ui_name = func_params['uiName']
+    tableviews = func_params['tableviews']
+    widgets = func_params.get('widgets')
+    widgets_tablename = func_params.get('widgetsTablename')
+
+    feature_id = complet_result['body']['feature']['id']
+    id_name = complet_result['body']['feature']['idName']
+
+    feature = f'"tableName":"{tablename}", "isEpa": true'
+    body = tools_gw.create_body(feature=feature)
+    json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
+    if json_result is None or json_result['status'] == 'Failed':
+        return
+    result = json_result
+
+    # Build dlg
+    info.add_dlg = GwInfoGenericUi()
+    tools_gw.load_settings(info.add_dlg)
+    info.my_json_add = {}
+    tools_gw.build_dialog_info(info.add_dlg, result, my_json=info.my_json_add)
+
+    # Populate node_id
+    tools_qt.set_widget_text(info.add_dlg, 'tab_none_node_id', feature_id)
+    layout = info.add_dlg.findChild(QGridLayout, 'lyt_main_1')
+
+    # Get every widget in the layout
+    widgets = []
+    for row in range(layout.rowCount()):
+        for column in range(layout.columnCount()):
+            item = layout.itemAtPosition(row, column)
+            if item is not None:
+                widget = item.widget()
+                if widget is not None and type(widget) != QLabel:
+                    widgets.append(widget)
+    # Get all widget's values
+    for widget in widgets:
+        tools_gw.get_values(info.add_dlg, widget, info.my_json_add, ignore_editability=True)
+    # Remove Nones from info.my_json_add
+    keys_to_remove = []
+    for key, value in info.my_json_add.items():
+        if value is None:
+            keys_to_remove.append(key)
+    for key in keys_to_remove:
+        del info.my_json_add[key]
+
+    # Signals
+    info.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, info.add_dlg))
+    info.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, info.add_dlg))
+    info.add_dlg.dlg_closed.connect(partial(refresh_epa_tbl, tbl, **kwargs))
+    info.add_dlg.btn_accept.clicked.connect(partial(accept_add_dlg, info.add_dlg, tablename, pkey, feature_id, info.my_json_add))
+
+    # Open dlg
+    tools_gw.open_dialog(info.add_dlg, dlg_name='info_generic')
+
+
+def refresh_epa_tbl(tblview, **kwargs):
+    # Get variables
+    complet_result = kwargs['complet_result']
+    info = kwargs['class']
+    func_params = kwargs['func_params']
+    tableviews = func_params['tableviews']
+
+    feature_id = complet_result['body']['feature']['id']
+    id_name = complet_result['body']['feature']['idName']
+
+    # Fill tableviews
+    for tableview in tableviews:
+        tbl = tableview['tbl']
+        tbl = info.dlg.findChild(QTableView, tbl)
+        if not tbl:
+            continue
+        view = tableview['view']
+        if tbl != tblview:
+            continue
+
+        complet_list = get_list(view, id_name, feature_id)
+        fill_tbl(complet_list, tbl, info, view)
+
+
+def delete_tbl_row(tbl, tablename, pkey, **kwargs):
+    # Get variables
+    complet_result = kwargs['complet_result']
+    info = kwargs['class']
+    func_params = kwargs['func_params']
+    ui = func_params['ui']
+    ui_name = func_params['uiName']
+    tableviews = func_params['tableviews']
+    widgets = func_params.get('widgets')
+    widgets_tablename = func_params.get('widgetsTablename')
+
+    # Get selected row
+    selected_list = tbl.selectionModel().selectedRows()
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        tools_qgis.show_warning(message, dialog=info.dlg)
+        return
+
+    values = []
+    if pkey:
+        if not isinstance(pkey, list):
+            pkey = [pkey]
+        values = []
+        for index in selected_list:
+            value = {}
+            for pk in pkey:
+                col_idx = tools_qt.get_col_index_by_col_name(tbl, pk)
+                if col_idx is None:
+                    col_idx = 0
+                value[pk] = index.sibling(index.row(), col_idx).data()
+            if value:
+                values.append(value)
+
+    message = "Are you sure you want to delete these records?"
+    answer = tools_qt.show_question(message, "Delete records", values, force_action=True)
+    if answer:
+        for value in values:
+            conditions = []
+            for key, val in value.items():
+                condition = f"{key} = '{val}'"
+                conditions.append(condition)
+            condition_str = " AND ".join(conditions)
+            sql = f"DELETE FROM {tablename} WHERE {condition_str}"
+            tools_db.execute_sql(sql)
+
+        # Refresh tableview
+        refresh_epa_tbl(tablename, **kwargs)
+
+
+def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json):
+    if not my_json:
+        return
+
+    fields = json.dumps(my_json)
+    id_val = ""
+    if pkey:
+        if not isinstance(pkey, list):
+            pkey = [pkey]
+        for pk in pkey:
+            widget_name = f"tab_none_{pk}"
+            value = tools_qt.get_widget_value(dialog, widget_name)
+            id_val += f"{value}, "
+        id_val = id_val[:-2]
+    if not id_val:
+        id_val = feature_id
+
+    feature = f'"id":"{id_val}", '
+    feature += f'"tableName":"{tablename}"'
+    extras = f'"fields":{fields}'
+    body = tools_gw.create_body(feature=feature, extras=extras)
+    json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
+    if json_result and json_result.get('status') == 'Accepted':
+        tools_gw.close_dialog(dialog)
+        return
+    tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
 
 
 def tbl_data_changed(info, view, tbl, model, addparam, index):
@@ -3158,12 +3477,33 @@ def tbl_data_changed(info, view, tbl, model, addparam, index):
     else:
         getattr(info, f"my_json_{view}")[ids][fieldname] = str(field)
 
+    # Manage new row
+    _manage_new_row(model, index.row())
 
-def save_tbl_changes(complet_list, info):
+
+def _manage_new_row(model, row=None):
+    return None
+    if row is None:
+        row = model.rowCount() - 1
+    # Add a new row if the edited row is the last one
+    if row >= (model.rowCount() - 1):
+        model.insertRow(model.rowCount())
+    # Remove "last" row (empty one) if the real last row is empty
+    elif row == (model.rowCount() - 2):
+        for n in range(0, model.columnCount()):
+            item = model.item(row, n)
+            if item is not None:
+                if item.data(0) not in (None, ''):
+                    return
+        model.setRowCount(model.rowCount() - 1)
+
+
+def save_tbl_changes(complet_list, info, dialog):
 
     view = complet_list['body']['feature']['tableName']
     my_json = getattr(info, f"my_json_{view}")
     if not my_json:
+        tools_gw.close_dialog(dialog)
         return
 
     # For each edited row
@@ -3176,8 +3516,11 @@ def save_tbl_changes(complet_list, info):
         feature += f'"tableName":"{view}"'
         extras = f'"fields":{fields}'
         body = tools_gw.create_body(feature=feature, extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_setfields', body)
-
+        json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
+        if json_result and json_result.get('status') == 'Accepted':
+            tools_gw.close_dialog(dialog)
+            return
+        tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
 
 # endregion
 

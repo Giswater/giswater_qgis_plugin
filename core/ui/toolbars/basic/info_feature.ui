@@ -396,6 +396,12 @@
    <addaction name="actionLink"/>
    <addaction name="actionSection"/>
    <addaction name="separator"/>
+   <addaction name="actionOrifice"/>
+   <addaction name="actionOutlet"/>
+   <addaction name="actionPump"/>
+   <addaction name="actionWeir"/>
+   <addaction name="actionDemand"/>
+   <addaction name="separator"/>
    <addaction name="actionHelp"/>
   </widget>
   <action name="actionCentered">
@@ -561,6 +567,31 @@
   <action name="actionMapZone">
    <property name="text">
     <string>MapZone</string>
+   </property>
+  </action>
+  <action name="actionOrifice">
+   <property name="text">
+    <string>Orifice</string>
+   </property>
+  </action>
+  <action name="actionOutlet">
+   <property name="text">
+    <string>Outlet</string>
+   </property>
+  </action>
+  <action name="actionPump">
+   <property name="text">
+    <string>Pump</string>
+   </property>
+  </action>
+  <action name="actionWeir">
+   <property name="text">
+    <string>Weir</string>
+   </property>
+  </action>
+  <action name="actionDemand">
+   <property name="text">
+    <string>Demand</string>
    </property>
   </action>
  </widget>

@@ -194,6 +194,28 @@ def get_widget_type(dialog, widget):
     return type(widget)
 
 
+def get_widget_value(dialog, widget):
+
+    value = None
+    if type(widget) is str:
+        widget = dialog.findChild(QWidget, widget)
+    if not widget:
+        return value
+
+    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
+        value = get_text(dialog, widget, return_string_null=False)
+    elif type(widget) is QComboBox:
+        value = get_combo_value(dialog, widget, 0)
+    elif type(widget) is QCheckBox:
+        value = is_checked(dialog, widget)
+        if value is not None:
+            value = str(value).lower()
+    elif type(widget) is QgsDateTimeEdit:
+        value = get_calendar_date(dialog, widget)
+
+    return value
+
+
 def get_text(dialog, widget, add_quote=False, return_string_null=True):
 
     if type(widget) is str:
@@ -585,6 +607,26 @@ def get_col_index_by_col_name(qtable, column_name):
         column_index = None
 
     return column_index
+
+
+def onCellChanged(table, row, column):
+    """ Function to be connected to a QTableWidget cellChanged signal.
+
+    Note: row & column parameters are passed by the signal """
+
+    # Add a new row if the edited row is the last one
+    if row >= (table.rowCount()-1):
+        headers = [n for n in range(0, table.rowCount()+1)]
+        table.insertRow(table.rowCount())
+        table.setVerticalHeaderLabels(headers)
+    # Remove "last" row (empty one) if the real last row is empty
+    elif row == (table.rowCount()-2):
+        for n in range(0, table.columnCount()):
+            item = table.item(row, n)
+            if item is not None:
+                if item.data(0) not in (None, ''):
+                    return
+        table.setRowCount(table.rowCount()-1)
 
 
 def set_completer_object(completer, model, widget, list_items, max_visible=10):
