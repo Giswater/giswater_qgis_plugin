@@ -274,12 +274,6 @@ class GwGo2EpaManagerButton(GwAction):
             tools_qgis.show_warning(message, dialog=self.dlg_manager)
             return
 
-        msg = ("You are going to make this result corporate. From now on the result values will appear on feature form. "
-               "Do you want to continue?")
-        answer = tools_qt.show_question(msg)
-        if not answer:
-            return
-
         result_id = ""
         set_corporate = True
         for i in range(0, len(selected_list)):
@@ -289,6 +283,30 @@ class GwGo2EpaManagerButton(GwAction):
             col = tools_qt.get_col_index_by_col_name(widget, "iscorporate")
             set_corporate = widget.model().index(row, col).data()
         set_corporate = not tools_os.set_boolean(set_corporate, False)
+
+        # check corporate
+        extras = f'"resultId":"{result_id}", "action": "CHECK"'
+        body = tools_gw.create_body(extras=extras)
+        result = tools_gw.execute_procedure('gw_fct_epa2data', body)
+
+        if not result or result.get('status') != 'Accepted':
+            message = "Epa2data execution failed. See logs for more details..."
+            tools_qgis.show_warning(message, dialog=self.dlg_manager)
+            return
+
+        current_sectors = result['body']['data']['info']['currentSectors']
+        affected_results = result['body']['data']['info']['affectedResults']
+
+        if current_sectors and current_sectors > 0:
+            msg = (f"There are {current_sectors} sectors with affected results: {affected_results}. "
+                   "Would you like to conitnue?")
+        else:
+            msg = ("You are going to make this result corporate. From now on the result values will appear on feature form. "
+                   "Do you want to continue?")
+
+        answer = tools_qt.show_question(msg)
+        if not answer:
+            return
 
         extras = f'"resultId":"{result_id}", "isCorporate": {str(set_corporate).lower()}'
         body = tools_gw.create_body(extras=extras)

@@ -41,7 +41,6 @@ current_user = None                     # Current user connected with PostgreSql
 qgis_db_credentials = None              # Instance of class QSqlDatabase (QPSQL) used to manage QTableView widgets
 dao = None                              # Instance of class GwPgDao. Found in "/lib/tools_db.py"
 dao_db_credentials = None               # Credentials used to establish the connection with PostgreSql. Saving {db, schema, table, service, host, port, user, password, sslmode}
-notify = None                           # Instance of class GwNotify. Found in "/core/threads/notify.py"
 exec_procedure_max_retries = None       # Maximum number of execution retries of a PostgreSQL function
 project_vars = {}                       # Project variables from QgsProject related to Giswater
 project_vars['info_type'] = None        # gwInfoType

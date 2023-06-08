@@ -1059,6 +1059,11 @@ class GwInfo(QObject):
             pass
 
         try:
+            tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
+        except Exception:
+            pass
+
+        try:
             tools_gw.disconnect_signal('info_snapping')
         except Exception:
             pass
@@ -1941,6 +1946,8 @@ class GwInfo(QObject):
             index_tab = self.tab_main.currentIndex()
             tab_name = self.tab_main.widget(index_tab).objectName()
 
+            if 'visibleTabs' not in self.complet_result['body']['form']:
+                return
             for tab in self.visible_tabs:
                 if tab['tabName'] == tab_name:
                     if tab['tabactions'] is not None:
@@ -2641,13 +2648,13 @@ class GwInfo(QObject):
             self.tab_connections_loaded = True
         # Tab 'Hydrometer'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_hydrometer' and not self.tab_hydrometer_loaded:
-            filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
-            self._init_tab(self.complet_result, filter_fields)
+            filter_fields = f'"feature_id":{{"value":"{self.feature_id}","filterSign":"="}}'
+            self._init_tab(self.complet_result, filter_fields, id_name="feature_id")
             self.tab_hydrometer_loaded = True
         # Tab 'Hydrometer values'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_hydrometer_val' and not self.tab_hydrometer_val_loaded:
-            filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
-            self._init_tab(self.complet_result, filter_fields)
+            filter_fields = f'"feature_id":{{"value":"{self.feature_id}","filterSign":"="}}'
+            self._init_tab(self.complet_result, filter_fields, id_name="feature_id")
             self.tab_hydrometer_val_loaded = True
         # Tab 'Visit'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_visit' and not self.tab_visit_loaded:
@@ -2670,7 +2677,7 @@ class GwInfo(QObject):
             self.tab_plan_loaded = True
 
 
-    def _init_tab(self, complet_result, filter_fields=''):
+    def _init_tab(self, complet_result, filter_fields='', id_name=None):
 
         index_tab = self.tab_main.currentIndex()
         list_tables = self.tab_main.widget(index_tab).findChildren(QTableView)
@@ -2683,19 +2690,19 @@ class GwInfo(QObject):
                 tools_qgis.show_info(msg, 3)
                 continue
             linkedobject = table.property('linkedobject')
-            complet_list, widget_list = self._fill_tbl(complet_result, self.dlg_cf, widgetname, linkedobject, filter_fields)
+            complet_list, widget_list = self._fill_tbl(complet_result, self.dlg_cf, widgetname, linkedobject, filter_fields, id_name)
             if complet_list is False:
                 return False
             tools_gw.set_filter_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname, self.feature_id)
         return complet_list
 
 
-    def _fill_tbl(self, complet_result, dialog, widgetname, linkedobject, filter_fields):
+    def _fill_tbl(self, complet_result, dialog, widgetname, linkedobject, filter_fields, id_name=None):
         """ Put filter widgets into layout and set headers into QTableView """
 
         index_tab = self.tab_main.currentIndex()
-        tab_name = self.tab_main.widget(index_tab).findChildren(QGridLayout)[1].objectName().replace('lyt_', "")[:-2]
-        complet_list = self._get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject)
+        tab_name = self.tab_main.widget(index_tab).objectName().replace('tab_', "")
+        complet_list = self._get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject, id_name)
 
         if complet_list is False:
             return False, False
@@ -2744,13 +2751,17 @@ class GwInfo(QObject):
                 func_params = widget.property('widgetfunction').get('parameters')
             if widgetfunction is False: continue
 
+            field_id = None
+            if func_params is not None:
+                field_id = func_params.get('field_id')
+
             linkedobject = ""
             if widget.property('linkedobject') is not None:
                 linkedobject = widget.property('linkedobject')
 
             kwargs = {"complet_result": complet_result, "model": model, "dialog": dialog, "linkedobject": linkedobject,
                       "columnname": columnname, "widget": widget, "widgetname": widgetname, "widget_list": widget_list,
-                      "feature_id": self.feature_id, "func_params": func_params}
+                      "feature_id": self.feature_id, "func_params": func_params, "field_id": field_id}
             if type(widget) is QLineEdit:
                 widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
             elif type(widget) is QComboBox:
@@ -2772,10 +2783,10 @@ class GwInfo(QObject):
                 last_widget.currentIndexChanged.emit(last_widget.currentIndex())
 
 
-    def _get_list(self, complet_result, form_name='', tab_name='', filter_fields='', widgetname='', formtype='', linkedobject=''):
+    def _get_list(self, complet_result, form_name='', tab_name='', filter_fields='', widgetname='', formtype='', linkedobject='', id_name=None):
 
         form = f'"formName":"{form_name}", "tabName":"{tab_name}", "widgetname":"{widgetname}", "formtype":"{formtype}"'
-        id_name = complet_result['body']['feature']['idName']
+        id_name = complet_result['body']['feature']['idName'] if id_name is None else id_name
         feature = f'"tableName":"{linkedobject}", "idName":"{id_name}", "id":"{self.feature_id}"'
         body = tools_gw.create_body(form, feature, filter_fields)
         json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
@@ -2898,7 +2909,6 @@ class GwInfo(QObject):
 
         # Form handling so that the user cannot change values until the process is finished
         self.dlg_cf.setEnabled(False)
-        # global_vars.notify.task_finished.connect(self._enable_buttons)
 
         # Get widgets values
         values = {}
@@ -2936,7 +2946,6 @@ class GwInfo(QObject):
 
     def _enable_buttons(self):
         self.dlg_cf.setEnabled(True)
-        # global_vars.notify.task_finished.disconnect()
 
 
     def _mouse_moved(self, layer, point):

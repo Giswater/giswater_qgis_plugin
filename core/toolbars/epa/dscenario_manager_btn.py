@@ -251,7 +251,8 @@ class GwDscenarioManagerButton(GwAction):
         default_tab_idx = 0
         # Select all dscenario views
         sql = f"SELECT table_name FROM INFORMATION_SCHEMA.tables WHERE table_schema = ANY (current_schemas(false)) " \
-              f"AND table_name LIKE 'inp_dscenario%'"
+              f"AND table_name LIKE 'inp_dscenario%'" \
+              f"ORDER BY array_position(ARRAY['inp_dscenario_virtualvalve', 'inp_dscenario_pump', 'inp_dscenario_pump_additional', 'inp_dscenario_controls', 'inp_dscenario_rules'], table_name);"
         rows = tools_db.get_rows(sql)
         if rows:
             views = [x[0] for x in rows]
@@ -393,7 +394,7 @@ class GwDscenarioManagerButton(GwAction):
 
         for x in self.feature_types:
             col_idx = tools_qt.get_col_index_by_col_name(tableview, x)
-            if col_idx is not False:
+            if col_idx not in (None, False):
                 feature_type = x
                 break
 
@@ -409,7 +410,7 @@ class GwDscenarioManagerButton(GwAction):
 
         for x in self.feature_types:
             col_idx = tools_qt.get_col_index_by_col_name(qtableview, x)
-            if col_idx is not False:
+            if col_idx not in (None, False):
                 feature_type = x
                 break
         if feature_type != 'feature_id':
@@ -568,7 +569,7 @@ class GwDscenarioManagerButton(GwAction):
 
         for x in self.feature_types:
             col_idx = tools_qt.get_col_index_by_col_name(tableview, x)
-            if col_idx is not False:
+            if col_idx not in (None, False):
                 feature_type = x
                 break
 
@@ -580,7 +581,7 @@ class GwDscenarioManagerButton(GwAction):
         answer = tools_qt.show_question(message, "Delete records", values)
         if answer:
             for value in values:
-                sql = f"DELETE FROM {view} WHERE dscenario_id = {self.selected_dscenario_id} AND {self.feature_type}_id = '{value}'"
+                sql = f"DELETE FROM {view} WHERE dscenario_id = {self.selected_dscenario_id} AND {feature_type} = '{value}'"
                 tools_db.execute_sql(sql)
 
             # Refresh tableview

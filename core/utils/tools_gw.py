@@ -3419,9 +3419,10 @@ def refresh_selectors(tab_name=None):
             pass
 
 
-def set_epa_world(_set_epa_world=None):
+def set_epa_world(_set_epa_world=None, selector_change=None):
     """ Activate or deactivate EPA world. If @_set_epa_world is None it will just refresh the filters """
-    epa_world_button.set_epa_world(_set_epa_world)
+
+    epa_world_button.set_epa_world(_set_epa_world, selector_change)
 
 
 def open_dlg_help():

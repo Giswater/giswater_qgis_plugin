@@ -294,21 +294,20 @@ class GwAdminButton:
         self.dlg_import_inp.progressBar.setVisible(False)
 
         if project_type.lower() == 'ws':
-            extras = '"function":2522'
+            extras = '"functionId":2522'
         elif project_type.lower() == 'ud':
-            extras = '"function":2524'
+            extras = '"functionId":2524'
         else:
             self.error_count = self.error_count + 1
             return
 
         schema_name = tools_qt.get_text(self.dlg_readsql_create_project, 'project_name')
 
-        extras += ', "isToolbox":false'
         body = tools_gw.create_body(extras=extras)
-        complet_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body, schema_name, commit=False)
+        complet_result = tools_gw.execute_procedure('gw_fct_getprocess', body, schema_name, commit=False)
         if not complet_result or complet_result['status'] == 'Failed':
             return False
-        self._populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data']['processes'])
+        self._populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data'])
 
         # Disable tab log
         tools_gw.disable_tab_log(self.dlg_import_inp)
@@ -2962,14 +2961,12 @@ class GwAdminButton:
         """"""
 
         status = False
-        for group, function in result['fields'].items():
-            if len(function) != 0:
-                dialog.setWindowTitle(function[0]['alias'])
-                dialog.txt_info.setText(str(function[0]['descript']))
-                self.function_list = []
-                tools_gw.build_dialog_options(dialog, function, 0, self.function_list)
-                status = True
-                break
+        if len(result) != 0:
+            dialog.setWindowTitle(result['alias'])
+            dialog.txt_info.setText(str(result['descript']))
+            self.function_list = []
+            tools_gw.build_dialog_options(dialog, result, 0, self.function_list)
+            status = True
 
         return status
 
