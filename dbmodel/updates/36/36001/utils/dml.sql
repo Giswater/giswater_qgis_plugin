@@ -1452,11 +1452,6 @@ INSERT INTO config_typevalue (typevalue,id,idval)
 INSERT INTO config_typevalue (typevalue,id,idval)
     VALUES ('formactions_typevalue','actionDemand','Demand');
 
--- epa actions
-UPDATE config_form_tabs SET tabactions='[{"actionName":"actionEdit","actionTooltip":"Edit","disabled":false},{"actionName":"actionZoom","actionTooltip":"Zoom In","disabled":false},{"actionName":"actionCentered","actionTooltip":"Center","disabled":false},{"actionName":"actionZoomOut","actionTooltip":"Zoom Out","disabled":false},{"actionName":"actionCatalog","actionTooltip":"Change Catalog","disabled":false},{"actionName":"actionWorkcat","actionTooltip":"Add Workcat","disabled":false},{"actionName":"actionCopyPaste","actionTooltip":"Copy Paste","disabled":false},{"actionName":"actionLink","actionTooltip":"Open Link","disabled":false},{"actionName":"actionHelp","actionTooltip":"Help","disabled":false},{"actionName":"actionMapZone","actionTooltip":"Add Mapzone","disabled":false},{"actionName":"actionSetToArc","actionTooltip":"Set to_arc","disabled":false},{"actionName":"actionGetParentId","actionTooltip":"Set parent_id","disabled":false},{"actionName":"actionGetArcId","actionTooltip":"Set arc_id","disabled":false},{"actionName":"actionRotation","actionTooltip":"Rotation","disabled":false},{"actionName":"actionOrifice","actionTooltip":"Orifice","disabled":false},{"actionName":"actionOutlet","actionTooltip":"Outlet","disabled":false},{"actionName":"actionPump","actionTooltip":"Pump","disabled":false},{"actionName":"actionWeir","actionTooltip":"Weir","disabled":false},{"actionName":"actionDemand","actionTooltip":"DWF","disabled":false}]'::json 
-WHERE formname='v_edit_node' AND tabname='tab_epa';
-
-
 -- set layoutorder for flwreg widgets
 UPDATE config_form_fields 
 SET layoutorder = (SELECT attnum FROM pg_attribute WHERE attrelid = formname::regclass AND attname = columnname and attnum > 0 AND NOT attisdropped ORDER BY attnum LIMIT 1)
