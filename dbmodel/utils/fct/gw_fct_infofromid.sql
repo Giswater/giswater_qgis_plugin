@@ -246,7 +246,7 @@ BEGIN
 		IF (SELECT isarcdivide FROM cat_feature_node JOIN cat_feature USING (id) WHERE child_layer=v_tablename) IS TRUE THEN
 				v_isarcdivide = TRUE;
 		END IF;
-	ELSIF (select feature_type from sys_feature_epa_type where id = v_epatype) is not null then
+	ELSIF (select feature_type from sys_feature_epa_type where id = v_epatype LIMIT 1) is not null then
 
 		v_table_epa = concat('ve_epa_', lower(v_epatype));
 		v_querystring = concat('SELECT concat(''v_edit_'', lower(feature_type)) FROM sys_feature_epa_type WHERE id =''', v_epatype,'''');

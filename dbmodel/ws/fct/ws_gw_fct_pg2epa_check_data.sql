@@ -440,9 +440,9 @@ BEGIN
 	-- to_arc wrong values (171)
 	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, sector_id)
 	select 171, node_id, nodecat_id , the_geom,  'To arc is null or does not exists as closest arc for pump', sector_id FROM v_edit_inp_pump WHERE node_id NOT IN(
-		select node_id FROM ws.v_edit_inp_pump JOIN ws.arc on arc_id=to_arc AND node_id=node_1
+		select node_id FROM v_edit_inp_pump JOIN arc on arc_id=to_arc AND node_id=node_1
 		union
-		select node_id FROM ws.v_edit_inp_pump JOIN ws.arc on arc_id=to_arc AND node_id=node_2);
+		select node_id FROM v_edit_inp_pump JOIN arc on arc_id=to_arc AND node_id=node_2);
 	
 	SELECT count(*) INTO v_count FROM anl_node WHERE fid = 171 AND cur_user=current_user;
 	IF v_count > 0 THEN
