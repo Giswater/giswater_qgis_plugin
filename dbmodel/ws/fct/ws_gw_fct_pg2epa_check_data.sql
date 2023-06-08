@@ -440,9 +440,9 @@ BEGIN
 	-- to_arc wrong values (171)
 	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript, sector_id)
 	select 171, node_id, nodecat_id , the_geom,  'To arc is null or does not exists as closest arc for pump', sector_id FROM v_edit_inp_pump WHERE node_id NOT IN(
-		select node_id FROM v_edit_inp_pump JOIN v_edit_inp_pipe on arc_id=to_arc AND node_id=node_1
+		select node_id FROM ws.v_edit_inp_pump JOIN ws.arc on arc_id=to_arc AND node_id=node_1
 		union
-		select node_id FROM v_edit_inp_pump JOIN v_edit_inp_pipe on arc_id=to_arc AND node_id=node_2);
+		select node_id FROM ws.v_edit_inp_pump JOIN ws.arc on arc_id=to_arc AND node_id=node_2);
 	
 	SELECT count(*) INTO v_count FROM anl_node WHERE fid = 171 AND cur_user=current_user;
 	IF v_count > 0 THEN
@@ -810,11 +810,11 @@ BEGIN
 	v_querytext = 'SELECT * FROM (
 		SELECT DISTINCT t1.node_id as n1, t1.nodecat_id as n1cat, t1.state as state1, t2.node_id as n2, t2.nodecat_id as n2cat, t2.state as state2, t1.expl_id, 412, 
 		t1.the_geom, st_distance(t1.the_geom, t2.the_geom) as dist, ''Shortpipe nodarc over other EPA node'' as descript
-		FROM selector_expl e, selector_sector s, node AS t1 JOIN node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.02) 
+		FROM selector_expl e, selector_sector s, node AS t1 JOIN node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.01) 
 		WHERE t1.node_id != t2.node_id 
 		AND s.sector_id = t1.sector_id AND s.cur_user = current_user
 		AND e.expl_id = t1.expl_id AND e.cur_user = current_user 
-		AND ((t1.epa_type = ''SHORTPIPE'' AND t2.epa_type !=''UNDEFINED'') OR (t2.epa_type = ''SHORTPIPE'' AND t1.epa_type !=''UNDEFINED''))
+		AND ((t1.epa_type = ''SHORTPIPE'' AND t2.epa_type =''JUNCTION'') OR (t2.epa_type = ''SHORTPIPE'' AND t1.epa_type !=''JUNCTION''))
 		AND t1.node_id =''SHORTPIPE''
 		ORDER BY t1.node_id) a where a.state1 > 0 AND a.state2 > 0 ORDER BY dist' ;
 
