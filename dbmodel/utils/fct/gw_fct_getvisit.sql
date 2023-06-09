@@ -108,12 +108,11 @@ BEGIN
 	v_visitclass = ((p_data ->>'data')::json->>'fields')::json->>'class_id';
 
 
-
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 
-		-- Make point
-		if v_visit_id IS null and v_xcoord is not null THEN
-			SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
+	-- Make point
+	if v_visit_id IS null and v_xcoord is not null THEN
+		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
 
 		-- Sensibility factor
 		IF v_device = 1 OR v_device = 2 THEN
@@ -140,49 +139,50 @@ BEGIN
 			v_sensibility = ((v_zoomratio/5000) * 10 * v_sensibility_f);
 			v_config_layer='config_info_layer';
 
-	END IF;
-	-- Get feature
-	v_sql = concat('SELECT DISTINCT(layer_id), orderby+100 orderby, addparam->>''geomType'' as geomtype, lower(headertext) as feature_type FROM  ',quote_ident(v_config_layer),' JOIN cat_feature ON parent_layer=layer_id  ORDER BY orderby');
+		END IF;
 
-	FOR v_layer IN EXECUTE v_sql
-	loop
+		-- Get feature
+		v_sql = concat('SELECT DISTINCT(layer_id), orderby+100 orderby, addparam->>''geomType'' as geomtype, lower(headertext) as feature_type FROM  ',quote_ident(v_config_layer),' JOIN cat_feature ON parent_layer=layer_id  ORDER BY orderby');
 
-		-- For views it suposse pk is the first column
-		v_querystring = concat('SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
-		AND t.relname = ''',v_layer.layer_id,'''
-		AND s.nspname = ''',v_schemaname,'''
-		ORDER BY a.attnum LIMIT 1');
+		FOR v_layer IN EXECUTE v_sql
+		loop
 
-		EXECUTE v_querystring INTO v_idname;
+			-- For views it suposse pk is the first column
+			v_querystring = concat('SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
+			AND t.relname = ''',v_layer.layer_id,'''
+			AND s.nspname = ''',v_schemaname,'''
+			ORDER BY a.attnum LIMIT 1');
 
-		-- Get geometry_column
-		v_querystring = concat('SELECT attname FROM pg_attribute a
-        JOIN pg_class t on a.attrelid = t.oid
-        JOIN pg_namespace s on t.relnamespace = s.oid
-        WHERE a.attnum > 0
-        AND NOT a.attisdropped
-        AND t.relname = ',quote_nullable(v_layer.layer_id),'
-        AND s.nspname = ',quote_nullable(v_schemaname),'
-        AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
-        ORDER BY a.attnum');
-		EXECUTE v_querystring INTO v_the_geom;
+			EXECUTE v_querystring INTO v_idname;
 
-		--  Get element from active layer, using the distance from the clicked point to order possible multiselection (minor as first)
-		v_querystring = concat('SELECT ',quote_ident(v_idname),' FROM ',quote_ident(v_layer.layer_id),' WHERE st_dwithin (''',v_point,''', ',quote_ident(v_layer.layer_id),'.',quote_ident(v_the_geom),', ',v_sensibility,')
-		ORDER BY ST_Distance(',v_layer.layer_id,'.',v_the_geom,', ''',v_point,''') asc LIMIT 1');
-		EXECUTE v_querystring INTO v_id;
+			-- Get geometry_column
+			v_querystring = concat('SELECT attname FROM pg_attribute a
+	        JOIN pg_class t on a.attrelid = t.oid
+	        JOIN pg_namespace s on t.relnamespace = s.oid
+	        WHERE a.attnum > 0
+	        AND NOT a.attisdropped
+	        AND t.relname = ',quote_nullable(v_layer.layer_id),'
+	        AND s.nspname = ',quote_nullable(v_schemaname),'
+	        AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
+	        ORDER BY a.attnum');
+			EXECUTE v_querystring INTO v_the_geom;
 
-	if v_id is not null then
-		v_featuretype = v_layer.feature_type;
-		EXIT;
-	end if;
+			--  Get element from active layer, using the distance from the clicked point to order possible multiselection (minor as first)
+			v_querystring = concat('SELECT ',quote_ident(v_idname),' FROM ',quote_ident(v_layer.layer_id),' WHERE st_dwithin (''',v_point,''', ',quote_ident(v_layer.layer_id),'.',quote_ident(v_the_geom),', ',v_sensibility,')
+			ORDER BY ST_Distance(',v_layer.layer_id,'.',v_the_geom,', ''',v_point,''') asc LIMIT 1');
+			EXECUTE v_querystring INTO v_id;
 
-	end loop;
+		if v_id is not null then
+			v_featuretype = v_layer.feature_type;
+			EXIT;
+		end if;
 
-	-- Get id
-	if v_visit_id is null then
-		v_visit_id := (SELECT max(id)+1 FROM om_visit);
-	end if;
+		end loop;
+
+		-- Get id
+		if v_visit_id is null then
+			v_visit_id := (SELECT max(id)+1 FROM om_visit);
+		end if;
 	end if;
 
 	if v_visit_type = 2 then
@@ -192,8 +192,10 @@ BEGIN
 		v_visit_type_name = 'visit';
 		v_header_text = 'VISIT - '||v_visit_id||'';
 	end if;
-    
-    if v_visit_id is not null then
+
+
+	-- Manage visit class
+    if v_visit_id is not null and v_visitclass is null then
 		v_visitclass = (SELECT class_id FROM om_visit WHERE id=v_visit_id);
 	end if;
 
@@ -208,6 +210,12 @@ BEGIN
 
 	if v_featuretype is null then
 		v_featuretype := (SELECT feature_type FROM config_visit_class WHERE id=v_visitclass);
+	end if;
+
+	-- Manage fields
+	if v_visit_id is not null and v_tablename is not null and v_fields is null then
+		v_querystring = concat('SELECT row_to_json(a) FROM (SELECT * FROM ',quote_ident(v_tablename),' WHERE visit_id=',quote_nullable(v_visit_id),')a');
+		EXECUTE v_querystring INTO v_fields;
 	end if;
 
 	-- Get tabs
@@ -240,7 +248,7 @@ BEGIN
 	    NULL
 	) INTO v_fields_array;
 
-	 -- looping the array setting values and widgetcontrols
+	-- looping the array setting values and widgetcontrols
 		FOREACH aux_json IN ARRAY v_fields_array
 		LOOP
 			array_index := array_index + 1;
