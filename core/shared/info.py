@@ -847,11 +847,12 @@ class GwInfo(QObject):
         # EPA Actions
         self.action_orifice.triggered.connect(partial(self._open_orifice_dlg))
         self.action_outlet.triggered.connect(partial(self._open_outlet_dlg))
-        self.action_pump.triggered.connect(partial(self._open_pump_dlg))
         self.action_weir.triggered.connect(partial(self._open_weir_dlg))
         if global_vars.project_type == 'ws':
+            self.action_pump.triggered.connect(partial(self._open_pump_additional_dlg))
             self.action_demand.triggered.connect(partial(self._open_demand_dlg))
         elif global_vars.project_type == 'ud':
+            self.action_pump.triggered.connect(partial(self._open_pump_dlg))
             self.action_demand.triggered.connect(partial(self._open_dwf_dlg))
 
         # Disable action edit if user can't edit
@@ -895,6 +896,19 @@ class GwInfo(QObject):
                        "tableviews": [
                         {"tbl": "tbl_pump", "view": "inp_flwreg_pump", "add_view": "v_edit_inp_flwreg_pump", "pk": "nodarc_id"},
                         {"tbl": "tbl_dscenario_pump", "view": "inp_dscenario_flwreg_pump", "add_view": "v_edit_inp_dscenario_flwreg_pump", "pk": ["dscenario_id", "nodarc_id"]}
+                       ]}
+        kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
+        open_epa_dlg(**kwargs)
+
+
+    def _open_pump_additional_dlg(self):
+        print("_open_pump_additional_dlg")
+
+        # kwargs
+        func_params = {"ui": "GwInfoEpaPumpUi", "uiName": "info_epa_pump",
+                       "tableviews": [
+                        {"tbl": "tbl_pump", "view": "inp_pump_additional", "add_view": "v_edit_inp_pump_additional", "pk": "id"},
+                        {"tbl": "tbl_dscenario_pump", "view": "inp_dscenario_pump_additional", "add_view": "v_edit_inp_dscenario_pump_additional", "pk": "id"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg(**kwargs)
