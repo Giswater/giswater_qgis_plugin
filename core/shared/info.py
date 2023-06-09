@@ -2189,7 +2189,7 @@ class GwInfo(QObject):
         if complet_result:
             if complet_result['body']['form'].get('visibleTabs'):
                 self.visible_tabs = complet_result['body']['form']['visibleTabs']
-                self._show_actions(self.dlg_cf, 'tab_epa')
+                self._show_actions(self.dlg_cf, self.tab_main.currentWidget().objectName())
             for lyt in dialog.findChildren(QGridLayout, QRegularExpression('lyt_epa')):
                 i = 0
                 while i < lyt.count():
