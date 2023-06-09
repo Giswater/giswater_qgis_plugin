@@ -1446,16 +1446,6 @@ ORDER BY v.table_name, c.ordinal_position;
 UPDATE config_form_tableview SET addparam = '{"editable": false}' WHERE objectname like 'inp%flwreg%' AND columnname IN ('id', 'node_id', 'nodarc_id', 'dscenario_id');
 
 -- config_form_fields
--- add node_id widget
-INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutorder,"datatype",widgettype,"label",ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
-	VALUES ('v_edit_inp_dscenario_flwreg_orifice','form_feature','tab_none','node_id',3,'string','text','node_id',false,false,false,false,'{"setMultiline":false}'::json,false);
-INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutorder,"datatype",widgettype,"label",ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
-	VALUES ('v_edit_inp_dscenario_flwreg_outlet','form_feature','tab_none','node_id',3,'string','text','node_id',false,false,false,false,'{"setMultiline":false}'::json,false);
-INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutorder,"datatype",widgettype,"label",ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
-	VALUES ('v_edit_inp_dscenario_flwreg_pump','form_feature','tab_none','node_id',3,'string','text','node_id',false,false,false,false,'{"setMultiline":false}'::json,false);
-INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutorder,"datatype",widgettype,"label",ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
-	VALUES ('v_edit_inp_dscenario_flwreg_weir','form_feature','tab_none','node_id',3,'string','text','node_id',false,false,false,false,'{"setMultiline":false}'::json,false);
-
 -- hide order_id in dscenarios
 UPDATE config_form_fields
 	SET hidden=true

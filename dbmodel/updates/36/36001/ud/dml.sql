@@ -617,3 +617,13 @@ VALUES('ve_epa_storage', 'tab_epa', 'EPA', NULL, 'role_basic', NULL,
 {"actionName":"actionOutlet","actionTooltip":"Outlet","disabled":false},
 {"actionName":"actionPump","actionTooltip":"Pump","disabled":false},
 {"actionName":"actionWeir","actionTooltip":"Weir","disabled":false}]'::json, 2, '{4}');
+
+-- add node_id widget
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutorder,"datatype",widgettype,"label",ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
+	VALUES ('v_edit_inp_dscenario_flwreg_orifice','form_feature','tab_none','node_id',3,'string','text','node_id',false,false,false,false,'{"setMultiline":false}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutorder,"datatype",widgettype,"label",ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
+	VALUES ('v_edit_inp_dscenario_flwreg_outlet','form_feature','tab_none','node_id',3,'string','text','node_id',false,false,false,false,'{"setMultiline":false}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutorder,"datatype",widgettype,"label",ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
+	VALUES ('v_edit_inp_dscenario_flwreg_pump','form_feature','tab_none','node_id',3,'string','text','node_id',false,false,false,false,'{"setMultiline":false}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutorder,"datatype",widgettype,"label",ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
+	VALUES ('v_edit_inp_dscenario_flwreg_weir','form_feature','tab_none','node_id',3,'string','text','node_id',false,false,false,false,'{"setMultiline":false}'::json,false);
