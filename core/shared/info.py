@@ -919,7 +919,7 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaDemandUi", "uiName": "info_epa_demand",
                        "tableviews": [
-                        {"tbl": "tbl_dscenario_demand", "view": "inp_dscenario_demand", "add_view": "v_edit_inp_dscenario_demand"}
+                        {"tbl": "tbl_dscenario_demand", "view": "inp_dscenario_demand", "add_view": "v_edit_inp_dscenario_demand", "id_name": "feature_id", "pk": "id"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg(**kwargs)
@@ -3258,6 +3258,7 @@ def open_epa_dlg(**kwargs):
         pk = tableview.get('pk')
         if not pk:
             pk = id_name
+        id_name = tableview.get('id_name', id_name)
 
         complet_list = get_list(view, id_name, feature_id)
         fill_tbl(complet_list, tbl, info, view)
@@ -3369,6 +3370,7 @@ def refresh_epa_tbl(tblview, **kwargs):
         view = tableview['view']
         if tbl != tblview:
             continue
+        id_name = tableview.get('id_name', id_name)
 
         complet_list = get_list(view, id_name, feature_id)
         fill_tbl(complet_list, tbl, info, view)
