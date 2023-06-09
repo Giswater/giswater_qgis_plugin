@@ -1424,46 +1424,6 @@ INSERT INTO config_typevalue (typevalue,id,idval)
 INSERT INTO config_typevalue (typevalue,id,idval)
     VALUES ('formactions_typevalue','actionDemand','Demand');
 
--- set layoutorder for flwreg widgets
-UPDATE config_form_fields 
-SET layoutorder = (SELECT attnum FROM pg_attribute WHERE attrelid = formname::regclass AND attname = columnname and attnum > 0 AND NOT attisdropped ORDER BY attnum LIMIT 1)
-WHERE formname like 'v_edit_inp%flwreg%';
--- make widgets not editable
-UPDATE config_form_fields 
-SET iseditable = false 
-WHERE formname like 'v_edit_inp%flwreg%' and columnname IN ('nodarc_id', 'node_id');
-
--- insert flwreg tables into config_form_tableview
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, addparam)
-SELECT 'epa form', 'utils', v.table_name, c.column_name, c.ordinal_position, true, NULL
-FROM information_schema.tables v
-JOIN information_schema.columns c ON v.table_schema = c.table_schema AND v.table_name = c.table_name
-WHERE v.table_schema = 'SCHEMA_NAME'
-  AND v.table_name LIKE 'inp%flwreg%'
-ORDER BY v.table_name, c.ordinal_position;
-
--- disable columns
-UPDATE config_form_tableview SET addparam = '{"editable": false}' WHERE objectname like 'inp%flwreg%' AND columnname IN ('id', 'node_id', 'nodarc_id', 'dscenario_id');
-
--- config_form_fields
--- hide order_id in dscenarios
-UPDATE config_form_fields
-	SET hidden=true
-	WHERE formname like 'v_edit_inp_dscenario_flwreg%' AND columnname='order_id';
--- nodarc_id combos
-UPDATE config_form_fields
-	SET ismandatory=true,iseditable=true,dv_querytext_filterc='AND node_id',dv_parent_id='node_id',dv_querytext='SELECT nodarc_id as id, nodarc_id as idval FROM inp_flwreg_orifice WHERE nodarc_id IS NOT NULL',widgettype='combo',dv_isnullvalue=false,dv_orderby_id=true
-	WHERE formname='v_edit_inp_dscenario_flwreg_orifice' AND columnname='nodarc_id';
-UPDATE config_form_fields
-	SET ismandatory=true,iseditable=true,dv_querytext_filterc='AND node_id',dv_parent_id='node_id',dv_querytext='SELECT nodarc_id as id, nodarc_id as idval FROM inp_flwreg_outlet WHERE nodarc_id IS NOT NULL',widgettype='combo',dv_isnullvalue=false,dv_orderby_id=true
-	WHERE formname='v_edit_inp_dscenario_flwreg_outlet' AND columnname='nodarc_id';
-UPDATE config_form_fields
-	SET ismandatory=true,iseditable=true,dv_querytext_filterc='AND node_id',dv_parent_id='node_id',dv_querytext='SELECT nodarc_id as id, nodarc_id as idval FROM inp_flwreg_pump WHERE nodarc_id IS NOT NULL',widgettype='combo',dv_isnullvalue=false,dv_orderby_id=true
-	WHERE formname='v_edit_inp_dscenario_flwreg_pump' AND columnname='nodarc_id';
-UPDATE config_form_fields
-	SET ismandatory=true,iseditable=true,dv_querytext_filterc='AND node_id',dv_parent_id='node_id',dv_querytext='SELECT nodarc_id as id, nodarc_id as idval FROM inp_flwreg_weir WHERE nodarc_id IS NOT NULL',widgettype='combo',dv_isnullvalue=false,dv_orderby_id=true
-	WHERE formname='v_edit_inp_dscenario_flwreg_weir' AND columnname='nodarc_id';
-
 INSERT INTO config_form_list
 (listname, query_text, device, listtype, listclass, vdefault, addparam)
 VALUES('om_visit_event_photo', 'SELECT  value as url FROM om_visit_event_photo WHERE id IS NOT NULL', 5, 'tab', 'iconList', '{"orderBy":"1", "orderType": "DESC"}'::json, NULL);
