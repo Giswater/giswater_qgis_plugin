@@ -2046,16 +2046,16 @@ class GwInfo(QObject):
 
 
     def _reset_my_json(self, reset_epa=True):
-        """ Delete keys if exist, when widget is autoupdate """
+        """ Clear the my_json dictionary """
 
-        self.my_json = {}
+        self.my_json.clear()
         if reset_epa:
             self._reset_my_json_epa()
 
 
     def _reset_my_json_epa(self):
-        """ Delete keys if exist, when widget is autoupdate """
-        self.my_json_epa = {}
+        """ Clear the my_json_epa dictionary """
+        self.my_json_epa.clear()
 
 
     def _set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
