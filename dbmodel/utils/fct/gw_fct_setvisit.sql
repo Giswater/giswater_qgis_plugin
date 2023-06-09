@@ -154,8 +154,8 @@ BEGIN
 	IF v_visit_id IS NULL THEN
 
 		-- setting the insert
-		v_visit_id = (SELECT nextval('SCHEMA_NAME.om_visit_id_seq'::regclass));
-		v_feature = gw_fct_json_object_set_key (v_feature, 'visitId', v_visit_id);
+		v_id = (SELECT nextval('SCHEMA_NAME.om_visit_id_seq'::regclass));
+		v_feature = gw_fct_json_object_set_key (v_feature, 'visitId', v_id);
 		-- CHECK THIS
 		v_feature = gw_fct_json_object_set_key (v_feature, 'tableName',v_tablename);
 		v_feature = gw_fct_json_object_set_key (v_feature, 'idName', 'visit_id'::text);
@@ -167,11 +167,11 @@ BEGIN
 			return v_insertresult;
 		end if;
 		-- getting new id
-		IF (((v_insertresult->>'body')::json->>'feature')::json->>'id')::integer IS NOT NULL THEN
+		/*IF (((v_insertresult->>'body')::json->>'feature')::json->>'id')::integer IS NOT NULL THEN
 
 			v_id=(((v_insertresult->>'body')::json->>'feature')::json->>'id')::integer;
 
-		END IF;
+		END IF;*/
 
 		-- updating v_feature setting new id
 		v_feature =  gw_fct_json_object_set_key (v_feature, 'id', v_id);
@@ -191,7 +191,7 @@ BEGIN
 		RAISE NOTICE '--- INSERT NEW VISIT gw_fct_setinsert WITH MESSAGE: % ---', v_message;
 
 	ELSE
-
+		v_id = v_visit_id;
 		-- refactorize om_visit and om_visit_event in case of update of class the change of parameters is need)
 		v_querystring = concat('SELECT visit_id FROM ',quote_ident(v_tablename),' WHERE visit_id = ',quote_literal(v_id));
 		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_id', v_id);
