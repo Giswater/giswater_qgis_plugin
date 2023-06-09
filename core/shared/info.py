@@ -863,8 +863,6 @@ class GwInfo(QObject):
         return dlg_cf, fid
 
     def _open_orifice_dlg(self):
-        print("_open_orifice_dlg")
-
         # kwargs
         func_params = {"ui": "GwInfoEpaOrificeUi", "uiName": "info_epa_orifice",
                        "tableviews": [
@@ -876,8 +874,6 @@ class GwInfo(QObject):
 
 
     def _open_outlet_dlg(self):
-        print("_open_outlet_dlg")
-
         # kwargs
         func_params = {"ui": "GwInfoEpaOutletUi", "uiName": "info_epa_outlet",
                        "tableviews": [
@@ -889,8 +885,6 @@ class GwInfo(QObject):
 
 
     def _open_pump_dlg(self):
-        print("_open_pump_dlg")
-
         # kwargs
         func_params = {"ui": "GwInfoEpaPumpUi", "uiName": "info_epa_pump",
                        "tableviews": [
@@ -902,8 +896,6 @@ class GwInfo(QObject):
 
 
     def _open_pump_additional_dlg(self):
-        print("_open_pump_additional_dlg")
-
         # kwargs
         func_params = {"ui": "GwInfoEpaPumpUi", "uiName": "info_epa_pump",
                        "tableviews": [
@@ -915,8 +907,6 @@ class GwInfo(QObject):
 
 
     def _open_weir_dlg(self):
-        print("_open_weir_dlg")
-
         # kwargs
         func_params = {"ui": "GwInfoEpaWeirUi", "uiName": "info_epa_weir",
                        "tableviews": [
@@ -928,8 +918,6 @@ class GwInfo(QObject):
 
 
     def _open_demand_dlg(self):
-        print("_open_demand_dlg")
-
         # kwargs
         func_params = {"ui": "GwInfoEpaDemandUi", "uiName": "info_epa_demand",
                        "tableviews": [
@@ -940,8 +928,6 @@ class GwInfo(QObject):
 
 
     def _open_dwf_dlg(self):
-        print("_open_dwf_dlg")
-
         # kwargs
         func_params = {"ui": "GwInfoEpaDwfUi", "uiName": "info_epa_dwf",
                        "widgets": [
@@ -3215,7 +3201,6 @@ def fill_tbl(complet_list, tbl, info, view):
             tbl = tools_gw.fill_tableview_rows(tbl, field)
         tools_qt.set_tableview_config(tbl, edit_triggers=QTableView.DoubleClicked)
         model.dataChanged.connect(partial(tbl_data_changed, info, view, tbl, model, addparam))
-        _manage_new_row(model)
     # editability
     tbl.model().flags = lambda index: epa_tbl_flags(index, model, non_editable_columns)
 
@@ -3308,12 +3293,6 @@ def add_row_epa(tbl, tablename, pkey, **kwargs):
     # Get variables
     complet_result = kwargs['complet_result']
     info = kwargs['class']
-    func_params = kwargs['func_params']
-    ui = func_params['ui']
-    ui_name = func_params['uiName']
-    tableviews = func_params['tableviews']
-    widgets = func_params.get('widgets')
-    widgets_tablename = func_params.get('widgetsTablename')
 
     feature_id = complet_result['body']['feature']['id']
     id_name = complet_result['body']['feature']['idName']
@@ -3394,12 +3373,6 @@ def delete_tbl_row(tbl, tablename, pkey, **kwargs):
     # Get variables
     complet_result = kwargs['complet_result']
     info = kwargs['class']
-    func_params = kwargs['func_params']
-    ui = func_params['ui']
-    ui_name = func_params['uiName']
-    tableviews = func_params['tableviews']
-    widgets = func_params.get('widgets')
-    widgets_tablename = func_params.get('widgetsTablename')
 
     # Get selected row
     selected_list = tbl.selectionModel().selectedRows()
@@ -3492,26 +3465,6 @@ def tbl_data_changed(info, view, tbl, model, addparam, index):
         getattr(info, f"my_json_{view}")[ids][fieldname] = None
     else:
         getattr(info, f"my_json_{view}")[ids][fieldname] = str(field)
-
-    # Manage new row
-    _manage_new_row(model, index.row())
-
-
-def _manage_new_row(model, row=None):
-    return None
-    if row is None:
-        row = model.rowCount() - 1
-    # Add a new row if the edited row is the last one
-    if row >= (model.rowCount() - 1):
-        model.insertRow(model.rowCount())
-    # Remove "last" row (empty one) if the real last row is empty
-    elif row == (model.rowCount() - 2):
-        for n in range(0, model.columnCount()):
-            item = model.item(row, n)
-            if item is not None:
-                if item.data(0) not in (None, ''):
-                    return
-        model.setRowCount(model.rowCount() - 1)
 
 
 def save_tbl_changes(complet_list, info, dialog):
