@@ -1137,13 +1137,18 @@ def tr(message, context_name=None, aux_context='ui_message'):
     return value
 
 
-def manage_translation(context_name, dialog=None, log_info=False):
+def manage_translation(context_name, dialog=None, log_info=False, plugin_dir=None, plugin_name=None):
     """ Manage locale and corresponding 'i18n' file """
 
     # Get locale of QGIS application
     locale = tools_qgis.get_locale()
 
-    locale_path = os.path.join(global_vars.plugin_dir, 'i18n', f'{global_vars.plugin_name}_{locale}.qm')
+    if plugin_dir is None:
+        plugin_dir = global_vars.plugin_dir
+    if plugin_name is None:
+        plugin_name = global_vars.plugin_name
+
+    locale_path = os.path.join(plugin_dir, 'i18n', f'{plugin_name}_{locale}.qm')
     if not os.path.exists(locale_path):
         if log_info:
             tools_log.log_info("Locale not found", parameter=locale_path)
