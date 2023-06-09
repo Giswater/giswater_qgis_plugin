@@ -166,12 +166,6 @@ BEGIN
 		if v_insertresult->>'status' = 'Failed' then
 			return v_insertresult;
 		end if;
-		-- getting new id
-		/*IF (((v_insertresult->>'body')::json->>'feature')::json->>'id')::integer IS NOT NULL THEN
-
-			v_id=(((v_insertresult->>'body')::json->>'feature')::json->>'id')::integer;
-
-		END IF;*/
 
 		-- updating v_feature setting new id
 		v_feature =  gw_fct_json_object_set_key (v_feature, 'id', v_id);
@@ -204,8 +198,14 @@ BEGIN
 			FROM config_visit_class_x_parameter WHERE class_id=v_class and active IS TRUE;
 			UPDATE om_visit SET class_id=v_class WHERE id = v_id;
 		END IF;
-
 		--setting the update
+
+		-- CHECK THIS
+		v_feature = gw_fct_json_object_set_key (v_feature, 'tableName',v_tablename);
+		v_feature = gw_fct_json_object_set_key (v_feature, 'id', v_id);
+		v_feature = gw_fct_json_object_set_key (v_feature, 'idName', 'visit_id'::text);
+
+		v_outputparameter = gw_fct_json_object_set_key (v_outputparameter, 'feature', v_feature);
 		PERFORM gw_fct_setfields (v_outputparameter);
 
 		-- message
