@@ -26,6 +26,6 @@ AS SELECT om_visit.id,
     om_visit.is_done,
     om_visit.visit_type
    FROM om_visit
-     JOIN om_visit_cat ON om_visit.visitcat_id = om_visit_cat.id
+     LEFT JOIN om_visit_cat ON om_visit.visitcat_id = om_visit_cat.id
      LEFT JOIN exploitation ON exploitation.expl_id = om_visit.expl_id;
      
