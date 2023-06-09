@@ -9,6 +9,10 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 
 Changelog=Version 3.6.001
+    - Info is now fully configurable via database (widgets from all tabs, actions, tableviews, etc.)
+    - Added tab EPA in info
+    - Added new actions in info to manage flow regulators & demands for EPA objects
+    - New button: Toggle EPA World. Toggle an "EPA Point of View" to show the network as it would be exported to EPA software
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
