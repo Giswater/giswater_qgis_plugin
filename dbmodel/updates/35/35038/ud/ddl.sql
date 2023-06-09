@@ -8,11 +8,9 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME ,public;
 
 
-ALTER TABLE inp_subcatchment ADD CONSTRAINT subcatchment_rg_id_fkey;
 ALTER TABLE inp_subcatchment ADD CONSTRAINT subcatchment_rg_id_fkey
 FOREIGN KEY (rg_id) REFERENCES raingage(rg_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
-ALTER TABLE raingage ADD CONSTRAINT raingage_timser_id_fkey;
-ALTER TABLE raingage ADD CONSTRAINT raingage_timser_id_fkey FOREIGN KEY (timser_id) 
-REFERENCES inp_timeseries(id) ON UPDATE CASCADE ON DELETE ON DELETE RESTRICT; 
+ALTER TABLE raingage ADD CONSTRAINT raingage_timser_id_fkey
+FOREIGN KEY (timser_id) REFERENCES inp_timeseries(id) ON UPDATE CASCADE ON DELETE RESTRICT;
