@@ -195,7 +195,7 @@ BEGIN
 			||', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
 
 		END IF;
-	
+
 		-- Get Epa Type
 		if v_epatype is null then
 			EXECUTE 'SELECT epa_type FROM '|| v_tablename || ' WHERE ' || v_pkeyfield || '::text = ' || v_id || '::text' INTO v_epatype;
@@ -226,11 +226,11 @@ BEGIN
 
 	-- get project type
 	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
-	
+
 	-- check layer if it's child layer
 	IF (SELECT child_layer FROM cat_feature WHERE child_layer=v_tablename) IS NOT NULL THEN
 		v_table_parent := (SELECT parent_layer FROM cat_feature WHERE child_layer=v_tablename);
-		
+
 
 		--check if is delimiter
 		IF upper(v_project_type) = 'WS' AND v_table_parent='v_edit_node' THEN
@@ -246,12 +246,21 @@ BEGIN
 		IF (SELECT isarcdivide FROM cat_feature_node JOIN cat_feature USING (id) WHERE child_layer=v_tablename) IS TRUE THEN
 				v_isarcdivide = TRUE;
 		END IF;
-	ELSIF (select feature_type from sys_feature_epa_type where id = v_epatype LIMIT 1) is not null then
 
-		v_table_epa = concat('ve_epa_', lower(v_epatype));
-		v_querystring = concat('SELECT concat(''v_edit_'', lower(feature_type)) FROM sys_feature_epa_type WHERE id =''', v_epatype,'''');
-		execute v_querystring into v_table_parent;
-	
+	ELSIF POSITION('epa' IN v_tablename) > 0 then
+
+		if v_tablename = 've_epa_junction' then
+			v_table_epa = v_tablename;
+			v_table_parent = 'v_edit_node';
+		elsif v_tablename = 've_epa_connec' then
+			v_table_epa = v_tablename;
+			v_table_parent = 'v_edit_connec';
+		else
+			v_table_epa = concat('ve_epa_', lower(v_epatype));
+			v_querystring = concat('SELECT concat(''v_edit_'', lower(feature_type)) FROM sys_feature_epa_type WHERE id =''', v_epatype,'''');
+			execute v_querystring into v_table_parent;
+		end if;
+
 	ELSE
 		-- tablename is used as table parent.
 		v_table_parent = v_tablename;
@@ -281,6 +290,10 @@ BEGIN
 				END IF;
 			END IF;
 		END IF;
+
+		if v_table_epa is null then
+			v_table_epa = concat('ve_epa_', lower(v_epatype));
+		end if;
 	END IF;
 
 	-- get tableparent fields
@@ -295,7 +308,7 @@ BEGIN
 	v_parentfields = replace (v_parentfields::text, '{', '[');
 	v_parentfields = replace (v_parentfields::text, '}', ']');
 
-        -- to build json
+    -- to build json
 	v_querystring = concat('SELECT row_to_json(row) FROM (SELECT formtemplate AS template, headertext AS "headerText"
 				FROM config_info_layer WHERE layer_id = ',quote_nullable(v_tablename),' LIMIT 1) row');
 	v_debug_vars := json_build_object('v_tablename', v_tablename);
@@ -303,15 +316,15 @@ BEGIN
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 	EXECUTE v_querystring INTO v_forminfo;
 
-        -- IF v_forminfo is null and it's layer it's child layer --> parent form info is used
-        IF v_forminfo IS NULL AND v_table_parent IS NOT NULL THEN
-		v_querystring = concat('SELECT row_to_json(row) FROM (SELECT formtemplate AS template , headertext AS "headerText"
-					FROM config_info_layer WHERE layer_id = ',quote_nullable(v_table_parent),' LIMIT 1) row');
-		v_debug_vars := json_build_object('v_table_parent', v_table_parent);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 50);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-		EXECUTE v_querystring INTO v_forminfo;
-        END IF;
+    -- IF v_forminfo is null and it's layer it's child layer --> parent form info is used
+    IF v_forminfo IS NULL AND v_table_parent IS NOT NULL THEN
+	v_querystring = concat('SELECT row_to_json(row) FROM (SELECT formtemplate AS template , headertext AS "headerText"
+				FROM config_info_layer WHERE layer_id = ',quote_nullable(v_table_parent),' LIMIT 1) row');
+	v_debug_vars := json_build_object('v_table_parent', v_table_parent);
+	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 50);
+	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+	EXECUTE v_querystring INTO v_forminfo;
+    END IF;
 
 	-- Get feature type
 	v_querystring = concat('SELECT lower(feature_type) FROM cat_feature WHERE  (parent_layer = ',quote_nullable(v_tablename),' OR child_layer = ',quote_nullable(v_tablename),') LIMIT 1');
@@ -451,7 +464,7 @@ BEGIN
 				USING v_schemaname, v_tablename, v_idname
 				INTO column_type;
 	END IF;
-	
+
 	if v_table_epa is not null then
 		v_tablename_aux = v_tablename;
 		v_tablename = v_table_epa;
@@ -470,9 +483,9 @@ BEGIN
 			and item_object->>''actionName''::text = id group by "formname","tabName", "tabLabel",  "tooltip", "orderby"
 			order by orderby
 			)b WHERE (b.formname =',quote_nullable(v_tablename),' OR  formname =NULL) and ', v_device,' = any(device)',
-			
+
 			' UNION ALL ',
-		
+
 			'SELECT "tabName", "tabLabel", "tooltip", "tabactions", orderby from(
 			SELECT formname, tabname as "tabName", label as "tabLabel", tooltip as "tooltip", json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as "tabactions", orderby, device
 			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
@@ -501,9 +514,9 @@ BEGIN
 			and item_object->>''actionName''::text = id group by "formname","tabName", "tabLabel",  "tooltip", "orderby"
 			order by orderby
 			)b WHERE (b.formname =',quote_nullable(v_tablename),' OR  formname =NULL) and ', v_device,' = any(device)',
-		
+
 			' UNION ALL ',
-		
+
 			'SELECT "tabName", "tabLabel", "tooltip", "tabactions", orderby from(
 			SELECT formname, tabname as "tabName", label as "tabLabel", tooltip as "tooltip", json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as "tabactions", orderby, device
 			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
@@ -521,7 +534,7 @@ BEGIN
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO form_tabs;
 	ELSIF v_isarcdivide THEN
-			
+
 		v_querystring = concat(
 			'SELECT array_agg(row_to_json(a)) FROM(
 			SELECT "tabName", "tabLabel", "tooltip", "tabactions", orderby from(
@@ -532,9 +545,9 @@ BEGIN
 			and item_object->>''actionName''::text = id group by "formname","tabName", "tabLabel",  "tooltip", "orderby"
 			order by orderby
 			)b WHERE (b.formname =',quote_nullable(v_tablename),' OR  formname =NULL) and ', v_device,' = any(device)',
-		
+
 			' UNION ALL ',
-		
+
 			'SELECT "tabName", "tabLabel", "tooltip", "tabactions", orderby from(
 			SELECT formname, tabname as "tabName", label as "tabLabel", tooltip as "tooltip", json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as "tabactions", orderby, device
 			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
@@ -564,9 +577,9 @@ BEGIN
 			and item_object->>''actionName''::text = id group by "formname","tabName", "tabLabel",  "tooltip", "orderby"
 			order by orderby
 			)b WHERE (b.formname =',quote_nullable(v_tablename),' OR  formname =NULL) and ', v_device,' = any(device)',
-		
+
 			' UNION ALL ',
-		
+
 			'SELECT "tabName", "tabLabel", "tooltip", "tabactions", orderby from(
 			SELECT formname, tabname as "tabName", label as "tabLabel", tooltip as "tooltip", json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as "tabactions", orderby, device
 			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
