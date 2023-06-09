@@ -1677,19 +1677,30 @@ VALUES('ve_epa_connec', 'tab_epa', 'EPA', NULL, 'role_basic', NULL, '[
 {"actionName":"actionGetArcId","actionTooltip":"Set arc_id","disabled":false},
 {"actionName":"actionDemand","actionTooltip":"Demands","disabled":false}]'::json, 2, '{4}');
 
--- set layoutorder for dscenario demand widgets
+-- set layoutorder for dscenario widgets
 UPDATE config_form_fields 
 SET layoutorder = (SELECT attnum FROM pg_attribute WHERE attrelid = formname::regclass AND attname = columnname and attnum > 0 AND NOT attisdropped ORDER BY attnum LIMIT 1)
-WHERE formname = 'v_edit_inp_dscenario_demand';
+WHERE formname IN ('v_edit_inp_dscenario_demand', 'v_edit_inp_dscenario_pump_additional');
+UPDATE config_form_fields 
+SET iseditable = false
+WHERE formname IN ('v_edit_inp_dscenario_demand', 'v_edit_inp_dscenario_pump_additional', 'v_edit_inp_pump_additional') AND columnname IN ('node_id', 'feature_id');
+UPDATE config_form_fields 
+SET hidden = true
+WHERE formname = 'v_edit_inp_dscenario_pump_additional' AND columnname = 'overflow';
 
--- insert dscenario demand table into config_form_tableview
+UPDATE config_form_fields 
+SET layoutorder = (SELECT c.ordinal_position FROM information_schema.columns c WHERE c.table_schema = 'ws_36' AND c.table_name = 'v_edit_inp_pump_additional' AND c.column_name = columnname LIMIT 1)
+WHERE formname = 'v_edit_inp_pump_additional';
+
+-- insert dscenario demand & pump tables into config_form_tableview
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, addparam)
 SELECT 'epa form', 'ws', v.table_name, c.column_name, c.ordinal_position, true, NULL
 FROM information_schema.tables v
 JOIN information_schema.columns c ON v.table_schema = c.table_schema AND v.table_name = c.table_name
 WHERE v.table_schema = 'SCHEMA_NAME'
-  AND v.table_name = 'inp_dscenario_demand'
+  AND v.table_name IN ('inp_dscenario_demand', 'inp_dscenario_pump_additional', 'inp_pump_additional')
 ORDER BY v.table_name, c.ordinal_position;
 
 -- disable columns
 UPDATE config_form_tableview SET addparam = '{"editable": false}' WHERE objectname = 'inp_dscenario_demand' AND columnname IN ('id', 'feature_id');
+UPDATE config_form_tableview SET addparam = '{"editable": false}' WHERE objectname IN ('inp_dscenario_pump_additional', 'inp_pump_additional') AND columnname IN ('id', 'node_id');
