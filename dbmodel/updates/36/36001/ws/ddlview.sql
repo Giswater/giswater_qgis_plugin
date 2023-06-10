@@ -282,7 +282,7 @@ FROM selector_sector,selector_inp_dscenario, v_node n
 JOIN inp_dscenario_junction p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
 WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
-AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text AND is_operative is true;
 
 
 DROP VIEW IF EXISTS v_edit_inp_junction;
@@ -308,7 +308,7 @@ source_pattern_id,
 n.the_geom
 FROM selector_sector, v_edit_node n
 JOIN inp_junction USING (node_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND is_operative is true;
 
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_pump;
@@ -324,11 +324,11 @@ effic_curve_id,
 energy_price,
 energy_pattern_id,
 n.the_geom
-FROM selector_sector,
-selector_inp_dscenario,v_node n
+FROM selector_inp_dscenario,v_node n
 JOIN inp_dscenario_pump p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id 
+AND selector_inp_dscenario.cur_user = "current_user"()::text AND is_operative is true;
 
 
 
@@ -356,7 +356,7 @@ energy_pattern_id,
 n.the_geom
 FROM selector_sector,v_node n
 JOIN inp_pump_additional p USING (node_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND is_operative is true;
 
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_pump_additional;
@@ -377,7 +377,8 @@ FROM selector_sector,
 selector_inp_dscenario,v_node n
 JOIN inp_dscenario_pump_additional p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id 
+AND selector_inp_dscenario.cur_user = "current_user"()::text AND is_operative is true;
 
 DROP VIEW IF EXISTS v_edit_inp_pump;
 CREATE OR REPLACE VIEW v_edit_inp_pump AS 
@@ -405,7 +406,7 @@ energy_pattern_id,
 n.the_geom
 FROM selector_sector, v_node n
 JOIN inp_pump USING (node_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND is_operative is true;
 
 
 
@@ -424,7 +425,7 @@ FROM selector_sector,selector_inp_dscenario, v_arc a
 JOIN inp_dscenario_pipe p USING (arc_id)
 JOIN cat_dscenario d USING (dscenario_id)
 WHERE a.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
-AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text AND is_operative is true;
 
 
 DROP VIEW IF EXISTS v_edit_inp_pipe;
@@ -449,7 +450,7 @@ wall_coeff,
 arc.the_geom
 FROM selector_sector,v_arc arc
 JOIN inp_pipe USING (arc_id)
-WHERE arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+WHERE arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND is_operative is true;
 
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_shortpipe;
@@ -465,7 +466,7 @@ FROM selector_sector, selector_inp_dscenario, v_node n
 JOIN inp_dscenario_shortpipe p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
 WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND 
-p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text AND is_operative is true;
 
 
 DROP VIEW IF EXISTS v_edit_inp_shortpipe;
@@ -489,7 +490,7 @@ wall_coeff,
 n.the_geom
 FROM selector_sector, v_node n
 JOIN inp_shortpipe USING (node_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND is_operative is true;
   
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_tank;
@@ -511,11 +512,11 @@ source_type,
 source_quality,
 source_pattern_id,
 n.the_geom
-FROM selector_sector, selector_inp_dscenario, v_node n
+FROM selector_inp_dscenario, v_node n
 JOIN inp_dscenario_tank p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
-AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+JOIN v_sector_node s ON s.node_id = n. node_id
+WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text AND is_operative is true;
 
   
 DROP VIEW IF EXISTS v_edit_inp_tank;
@@ -545,9 +546,11 @@ source_type,
 source_quality,
 source_pattern_id,
 n.the_geom
-FROM selector_sector, v_node n
+FROM v_node n
 JOIN inp_tank USING (node_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+JOIN v_sector_node s ON s.node_id = n. node_id
+WHERE is_operative is true;
+
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_reservoir;
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_reservoir AS 
@@ -565,7 +568,7 @@ selector_inp_dscenario, v_node n
 JOIN inp_dscenario_reservoir p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
 WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
-AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text AND is_operative is true;
 
   
 DROP VIEW IF EXISTS v_edit_inp_reservoir;
@@ -589,7 +592,8 @@ source_pattern_id,
 n.the_geom
 FROM selector_sector, v_node n
 JOIN inp_reservoir USING (node_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND is_operative is true;
+
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_valve;
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_valve AS 
@@ -609,7 +613,8 @@ n.the_geom
 FROM selector_sector, selector_inp_dscenario, v_node n
 JOIN inp_dscenario_valve p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id 
+AND selector_inp_dscenario.cur_user = "current_user"()::text AND is_operative is true;
 
   
 DROP VIEW IF EXISTS v_edit_inp_valve;
@@ -639,7 +644,7 @@ init_quality,
 n.the_geom
 FROM selector_sector, v_node n
 JOIN inp_valve USING (node_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND is_operative is true;
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_virtualvalve;
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_virtualvalve AS 
@@ -659,7 +664,7 @@ FROM selector_sector, selector_inp_dscenario, v_arc a
 JOIN inp_dscenario_virtualvalve p USING (arc_id)
 JOIN cat_dscenario d USING (dscenario_id)
 WHERE a.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
-AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text AND is_operative is true;
 
 
 DROP VIEW IF EXISTS v_edit_inp_virtualvalve;
@@ -688,13 +693,13 @@ init_quality,
 v_arc.the_geom
 FROM selector_sector,v_arc
 JOIN inp_virtualvalve USING (arc_id)
-WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND is_operative is true;
 
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_inlet;
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_inlet AS 
 SELECT p.dscenario_id, 
-node_id, 
+n.node_id, 
 initlevel, 
 minlevel, 
 maxlevel,
@@ -712,11 +717,11 @@ source_type,
 source_quality,
 source_pattern_id,
 n.the_geom
-FROM selector_sector, selector_inp_dscenario, v_node n
+FROM selector_inp_dscenario, v_node n
 JOIN inp_dscenario_inlet p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
-AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
+JOIN v_sector_node s ON s.node_id = n. node_id
+WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text AND is_operative is true;
 
 
 DROP VIEW IF EXISTS v_edit_inp_inlet;
@@ -748,12 +753,13 @@ source_type,
 source_quality,
 source_pattern_id,
 n.the_geom
-FROM selector_sector,v_node n
+FROM v_node n
 JOIN inp_inlet USING (node_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+JOIN v_sector_node s ON s.node_id = n. node_id
+WHERE is_operative is true;
+
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_connec;
-
 DROP VIEW IF EXISTS v_edit_inp_connec;
 CREATE OR REPLACE VIEW v_edit_inp_connec AS 
  SELECT connec.connec_id,
@@ -785,7 +791,7 @@ source_pattern_id,
 connec.the_geom
 FROM selector_sector,v_connec connec
 JOIN inp_connec USING (connec_id)
-WHERE connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+WHERE connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND is_operative is true;
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_connec AS 
 SELECT d.dscenario_id,

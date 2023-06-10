@@ -1,3 +1,4 @@
 3.6.002
 *************
 - Add styles for EPA point of view for parent layers
+- Add isoperative = true and use strategy of v_sector_node for inp views
