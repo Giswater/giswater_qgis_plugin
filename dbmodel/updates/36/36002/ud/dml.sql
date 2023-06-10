@@ -596,7 +596,7 @@ UPDATE sys_style SET stylevalue =
                 <Option value="0" type="QString" name="angle"/>
                 <Option value="P" type="QString" name="chr"/>
                 <Option value="0,0,0,255" type="QString" name="color"/>
-                <Option value="Dingbats" type="QString" name="font"/>
+                <Option value="MS Shell Dlg 2" type="QString" name="font"/>
                 <Option value="" type="QString" name="font_style"/>
                 <Option value="1" type="QString" name="horizontal_anchor_point"/>
                 <Option value="bevel" type="QString" name="joinstyle"/>
@@ -615,7 +615,7 @@ UPDATE sys_style SET stylevalue =
               <prop v="0" k="angle"/>
               <prop v="P" k="chr"/>
               <prop v="0,0,0,255" k="color"/>
-              <prop v="Dingbats" k="font"/>
+              <prop v="MS Shell Dlg 2" k="font"/>
               <prop v="" k="font_style"/>
               <prop v="1" k="horizontal_anchor_point"/>
               <prop v="bevel" k="joinstyle"/>
@@ -828,7 +828,7 @@ UPDATE sys_style SET stylevalue =
                 <Option value="0" type="QString" name="angle"/>
                 <Option value="W" type="QString" name="chr"/>
                 <Option value="0,0,0,255" type="QString" name="color"/>
-                <Option value="Dingbats" type="QString" name="font"/>
+                <Option value="MS Shell Dlg 2" type="QString" name="font"/>
                 <Option value="" type="QString" name="font_style"/>
                 <Option value="1" type="QString" name="horizontal_anchor_point"/>
                 <Option value="bevel" type="QString" name="joinstyle"/>
@@ -847,7 +847,7 @@ UPDATE sys_style SET stylevalue =
               <prop v="0" k="angle"/>
               <prop v="W" k="chr"/>
               <prop v="0,0,0,255" k="color"/>
-              <prop v="Dingbats" k="font"/>
+              <prop v="MS Shell Dlg 2" k="font"/>
               <prop v="" k="font_style"/>
               <prop v="1" k="horizontal_anchor_point"/>
               <prop v="bevel" k="joinstyle"/>
@@ -1060,7 +1060,7 @@ UPDATE sys_style SET stylevalue =
                 <Option value="0" type="QString" name="angle"/>
                 <Option value="O" type="QString" name="chr"/>
                 <Option value="0,0,0,255" type="QString" name="color"/>
-                <Option value="Dingbats" type="QString" name="font"/>
+                <Option value="MS Shell Dlg 2" type="QString" name="font"/>
                 <Option value="" type="QString" name="font_style"/>
                 <Option value="1" type="QString" name="horizontal_anchor_point"/>
                 <Option value="bevel" type="QString" name="joinstyle"/>
@@ -1079,7 +1079,7 @@ UPDATE sys_style SET stylevalue =
               <prop v="0" k="angle"/>
               <prop v="O" k="chr"/>
               <prop v="0,0,0,255" k="color"/>
-              <prop v="Dingbats" k="font"/>
+              <prop v="MS Shell Dlg 2" k="font"/>
               <prop v="" k="font_style"/>
               <prop v="1" k="horizontal_anchor_point"/>
               <prop v="bevel" k="joinstyle"/>
@@ -1292,7 +1292,7 @@ UPDATE sys_style SET stylevalue =
                 <Option value="0" type="QString" name="angle"/>
                 <Option value="L" type="QString" name="chr"/>
                 <Option value="0,0,0,255" type="QString" name="color"/>
-                <Option value="Dingbats" type="QString" name="font"/>
+                <Option value="MS Shell Dlg 2" type="QString" name="font"/>
                 <Option value="" type="QString" name="font_style"/>
                 <Option value="1" type="QString" name="horizontal_anchor_point"/>
                 <Option value="bevel" type="QString" name="joinstyle"/>
@@ -1311,7 +1311,7 @@ UPDATE sys_style SET stylevalue =
               <prop v="0" k="angle"/>
               <prop v="L" k="chr"/>
               <prop v="0,0,0,255" k="color"/>
-              <prop v="Dingbats" k="font"/>
+              <prop v="MS Shell Dlg 2" k="font"/>
               <prop v="" k="font_style"/>
               <prop v="1" k="horizontal_anchor_point"/>
               <prop v="bevel" k="joinstyle"/>
