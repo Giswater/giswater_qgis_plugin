@@ -62,8 +62,8 @@ BEGIN
 		UPDATE temp_arc a SET status=v.status FROM inp_valve v WHERE a.arc_id=concat(v.node_id,'_n2a') AND a.status = 'OPEN';
 
 		-- cv valves 
-		UPDATE temp_arc a SET status='CV' FROM inp_shortpipe v WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.status = 'CV';
-		UPDATE temp_arc a SET status='CV' FROM inp_valve v WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.status = 'CV';	
+		UPDATE temp_arc a SET status='CV' FROM inp_shortpipe v WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.status = 'CV' AND a.status = 'OPEN';
+		UPDATE temp_arc a SET status='CV' FROM inp_valve v WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.status = 'CV' AND a.status = 'OPEN';
 
     END IF;
     
