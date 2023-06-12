@@ -245,7 +245,8 @@ def save_current_tab(dialog, tab_widget, selector_name):
         pass
 
 
-def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_widgets=False):
+def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_widgets=False, plugin_dir=global_vars.plugin_dir, plugin_name=global_vars.plugin_name):
+
     """ Open dialog """
 
     # Check database connection before opening dialog
@@ -254,7 +255,7 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_wi
 
     # Manage translate
     if dlg_name:
-        tools_qt.manage_translation(dlg_name, dlg)
+        tools_qt.manage_translation(dlg_name, dlg, plugin_dir=plugin_dir, plugin_name=plugin_name)
 
     # Set window title
     if title is not None:
