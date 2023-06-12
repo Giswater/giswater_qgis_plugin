@@ -129,7 +129,7 @@ BEGIN
 
 	ELSE
 		--  Combo rows child
-		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT columnname, widgettype, datatype, concat(''data_'',columnname) as widgetname,
+		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT columnname, widgettype, datatype, concat(''tab_data_'',columnname) as widgetname,
 				dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layoutname, layoutorder) AS orderby , dv_querytext_filterc, isautoupdate, placeholder, dv_orderby_id, tooltip, dv_isnullvalue AS "isNullValue", widgetcontrols
 				FROM config_form_fields WHERE formname = ',quote_nullable(v_tablename),' AND dv_parent_id=',quote_literal(v_comboparent),' ORDER BY orderby) a WHERE widgettype = ''combo''');
 		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_comboparent', v_comboparent);
