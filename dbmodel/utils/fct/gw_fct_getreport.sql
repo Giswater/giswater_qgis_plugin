@@ -53,6 +53,7 @@ v_filterinput text[];
 v_filtername text;
 v_filtervalue text;
 v_filtersign text;
+v_record record;
 v_querytext text;
 v_showontablemodel text;
 v_default text;
@@ -103,9 +104,10 @@ BEGIN
 		END LOOP;
 	END IF;
 
-	--execute query 
-	SELECT query_text INTO v_querytext FROM config_report WHERE id = v_list_id;
+	--execute query
+	SELECT * INTO v_record FROM config_report WHERE id = v_list_id;
 
+	v_querytext = v_record.query_text;
 	IF v_filterinput IS NOT NULL THEN  -- when filter has not values form client
 		
 		FOREACH rec_filter IN ARRAY v_filterinput LOOP
@@ -178,12 +180,12 @@ BEGIN
 		INTO v_fields ;
 	END IF;
 
-	v_fields = json_build_object('widgettype', 'list', 'value',v_fields); 
-	
-	v_fields=json_build_object('fields',v_fields||v_filterlist);
-	
-	v_fields := COALESCE(v_fields, '{}'); 
-	    	
+	v_fields = json_build_object('widgettype', 'list', 'value',v_fields);
+
+	v_fields:=json_build_object('id',v_record.id, 'alias',v_record.alias, 'descript',v_record.descript, 'sys_role',v_record.sys_role, 'fields', v_fields||v_filterlist);
+
+	v_fields := COALESCE(v_fields, '{}');
+
 	RETURN ('{"status":"Accepted", "version":'||v_version||
 	      ',"body":{"message":{"level":1, "text":"Process done successfully"}'||
 		      ',"form":{}'||
