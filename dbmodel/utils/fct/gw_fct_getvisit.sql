@@ -182,6 +182,9 @@ BEGIN
 		-- Get id
 		if v_visit_id is null then
 			v_visit_id := (SELECT max(id)+1 FROM om_visit);
+			if v_visit_id is null then
+				v_visit_id = nextval('om_visit_id_seq');
+			end if;
 		end if;
 	end if;
 
