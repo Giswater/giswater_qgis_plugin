@@ -31,7 +31,7 @@ from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, Qg
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsDataSourceUri, \
-    QgsProviderRegistry
+    QgsProviderRegistry, QgsMapLayerStyle
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand
 
 from ..models.cat_feature import GwCatFeature
@@ -542,7 +542,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         :param group: Name of the group that will be created in the toc (String)
         :param style_id: Id of the style we want to load (integer or String)
     """
-
+    style_id_epa = "-1"
     tablename_og = tablename
     schema_name = global_vars.dao_db_credentials['schema'].replace('"', '')
     uri = tools_db.get_uri()
@@ -583,16 +583,25 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
             if row:
                 style_id = row[0]
 
+            # Get style_id for Gw Epa Style
+            sql = f"SELECT id FROM sys_style WHERE idval = '{tablename_og} SWMM point of view'"
+            row = tools_db.get_row(sql)
+            if row:
+                style_id_epa = row[0]
+            else:
+                sql = f"SELECT id FROM sys_style WHERE idval = '{tablename_og} EPANET point of view'"
+                row = tools_db.get_row(sql)
+                if row:
+                    style_id_epa = row[0]
+
         # Apply style to layer if it has one configured
         if style_id not in (None, "-1"):
-            body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
-            style = execute_procedure('gw_fct_getstyle', body)
-            if style is None or style['status'] == 'Failed':
-                return
-            if 'styles' in style['body']:
-                if 'style' in style['body']['styles']:
-                    qml = style['body']['styles']['style']
-                    tools_qgis.create_qml(layer, qml)
+            set_layer_style(style_id, layer)
+
+        # Apply Gw EPA style to layer if it has one configured
+        if style_id_epa not in (None, "-1"):
+            set_layer_style(style_id_epa, layer, True)
+
 
         # Set layer config
         if tablename:
@@ -603,6 +612,31 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
             config_layer_attributes(json_result, layer, alias)
 
     global_vars.iface.mapCanvas().refresh()
+
+
+def set_layer_style(style_id, layer, is_epa=False):
+    body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
+    style = execute_procedure('gw_fct_getstyle', body)
+    if style is None or style['status'] == 'Failed':
+        return
+    if 'styles' in style['body']:
+        if 'style' in style['body']['styles']:
+            qml = style['body']['styles']['style']
+
+            style_manager = layer.styleManager()
+
+            # read valid style from layer
+            style = QgsMapLayerStyle()
+            style.readFromLayer(layer)
+
+            style_name = "GwEpaStyle" if is_epa else "GwStyle"
+            # add style with new name
+            style_manager.addStyle(style_name, style)
+            # set new style as current
+            style_manager.setCurrentStyle(style_name)
+
+            tools_qgis.create_qml(layer, qml)
+            style_manager.setCurrentStyle("GwStyle")
 
 
 def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
