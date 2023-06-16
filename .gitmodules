@@ -1,3 +1,6 @@
 [submodule "dbmodel"]
 	path = dbmodel
 	url = https://github.com/Giswater/giswater_dbmodel.git
+[submodule "lib"]
+	path = lib
+	url = https://github.com/giswater/lib.git
