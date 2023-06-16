@@ -91,7 +91,7 @@ class GwGo2EpaButton(GwAction):
 
         self._set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
         self.check_result_id()
-        if global_vars.session_vars['dialog_docker']:
+        if lib_vars.session_vars['dialog_docker']:
             tools_qt.manage_translation('go2epa', self.dlg_go2epa)
             tools_gw.docker_dialog(self.dlg_go2epa)
             self.dlg_go2epa.btn_close.clicked.disconnect()
@@ -293,7 +293,7 @@ class GwGo2EpaButton(GwAction):
             tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'basic'))
 
         # Open form
-        if global_vars.session_vars['dialog_docker']:
+        if lib_vars.session_vars['dialog_docker']:
             # Set signals when have docker form
             dlg_selector.btn_close.clicked.connect(partial(tools_gw.docker_dialog, self.dlg_go2epa))
             dlg_selector.btn_close.clicked.connect(partial(self._manage_form_settings, 'restore'))
@@ -336,7 +336,7 @@ class GwGo2EpaButton(GwAction):
         self.file_inp = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
         # Set default value if necessary
         if self.file_inp is None or self.file_inp == '':
-            self.file_inp = global_vars.plugin_dir
+            self.file_inp = lib_vars.plugin_dir
 
         # Get directory of that file
         folder_path = os.path.dirname(self.file_inp)
@@ -357,7 +357,7 @@ class GwGo2EpaButton(GwAction):
 
         # Set default value if necessary
         if self.file_rpt is None or self.file_rpt == '':
-            self.file_rpt = global_vars.plugin_dir
+            self.file_rpt = lib_vars.plugin_dir
 
         # Get directory of that file
         folder_path = os.path.dirname(self.file_rpt)

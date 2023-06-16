@@ -63,10 +63,10 @@ class GwTestQgis:
         """ Connect to a database providing a service_name set in .pg_service.conf """
 
         status = tools_db.connect_to_database_service(service_name)
-        global_vars.session_vars['logged_status'] = status
+        lib_vars.session_vars['logged_status'] = status
 
-        if self.test_giswater.global_vars.session_vars['last_error']:
-            msg = self.test_giswater.global_vars.session_vars['last_error']
+        if self.test_giswater.lib_vars.session_vars['last_error']:
+            msg = self.test_giswater.lib_vars.session_vars['last_error']
             tools_log.log_info(f"Database connection error: {msg}")
             return False
 

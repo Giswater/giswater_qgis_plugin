@@ -84,8 +84,8 @@ class GwReportTask(GwTask):
             msg += f"<b>Python function:</b> {self.__class__.__name__} <br>"
             tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg)
         # If database fail
-        elif result is False and global_vars.session_vars['last_error_msg'] is not None:
-            tools_qt.show_exception_message(msg=global_vars.session_vars['last_error_msg'])
+        elif result is False and lib_vars.session_vars['last_error_msg'] is not None:
+            tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
         # If sql function return null
         elif result is False:
             msg = f"Database returned null. Check postgres function 'gw_fct_getinfofromid'"

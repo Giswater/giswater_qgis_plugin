@@ -38,7 +38,7 @@ class GwPsector:
 
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
-        self.schema_name = global_vars.schema_name
+        self.schema_name = lib_vars.schema_name
         self.rubber_band_point = tools_gw.create_rubberband(self.canvas)
         self.rubber_band_line = tools_gw.create_rubberband(self.canvas)
         self.rubber_band_rectangle = tools_gw.create_rubberband(self.canvas)
@@ -909,7 +909,7 @@ class GwPsector:
             :param restriction: roles that do not have access. tuple = ('role1', 'role1', 'role1', ...)
         """
 
-        role = global_vars.project_vars['project_role']
+        role = lib_vars.project_vars['project_role']
         role = tools_gw.get_role_permissions(role)
         if role in restriction:
             widget_list = dialog.findChildren(QWidget)
@@ -1356,7 +1356,7 @@ class GwPsector:
         """
 
         model = QSqlQueryModel()
-        model.setQuery(query, db=global_vars.qgis_db_credentials)
+        model.setQuery(query, db=lib_vars.qgis_db_credentials)
         qtable.setModel(model)
         qtable.show()
 
@@ -1382,7 +1382,7 @@ class GwPsector:
             table_name = self.schema_name + "." + table_name
 
         # Set model
-        model = QSqlTableModel(db=global_vars.qgis_db_credentials)
+        model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)
@@ -2158,7 +2158,7 @@ class GwPsector:
 
         if self.arc_id is None: return
 
-        the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {global_vars.data_epsg})"
+        the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {lib_vars.data_epsg})"
 
         for row in selected_rows:
             sql = ""

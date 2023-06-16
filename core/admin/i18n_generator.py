@@ -20,7 +20,7 @@ from ...lib import tools_qt, tools_qgis
 class GwI18NGenerator:
 
     def __init__(self):
-        self.plugin_dir = global_vars.plugin_dir
+        self.plugin_dir = lib_vars.plugin_dir
 
 
     def init_dialog(self):

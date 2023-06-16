@@ -230,10 +230,10 @@ class GwTable(object):
         # Execute UPSERT
         tools_log.log_info(sql, stack_level_increase=1)
         result = global_vars.dao.execute_sql(sql, commit)
-        global_vars.session_vars['last_error'] = global_vars.dao.last_error
+        lib_vars.session_vars['last_error'] = global_vars.dao.last_error
         if not result:
             # Check if any error has been raised
-            if global_vars.session_vars['last_error']:
-                tools_qt.manage_exception_db(global_vars.session_vars['last_error'], sql, schema_name=global_vars.schema_name)
+            if lib_vars.session_vars['last_error']:
+                tools_qt.manage_exception_db(lib_vars.session_vars['last_error'], sql, schema_name=lib_vars.schema_name)
 
         return result

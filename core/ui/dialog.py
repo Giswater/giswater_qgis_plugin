@@ -48,7 +48,7 @@ class GwDialog(QDialog):
         sh = QShortcut(QKeySequence(f"{action_help_shortcut}"), self)
         sh.activated.connect(tools_gw.open_dlg_help)
         # Set window icon
-        icon_folder = f"{global_vars.plugin_dir}{os.sep}icons"
+        icon_folder = f"{lib_vars.plugin_dir}{os.sep}icons"
         icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}giswater.png"
         giswater_icon = QIcon(icon_path)
         self.setWindowIcon(giswater_icon)
@@ -63,7 +63,7 @@ class GwDialog(QDialog):
             tag = str(self.objectName())
 
         if event.type() == QtCore.QEvent.ActivationChange and self.isActiveWindow():
-            global_vars.session_vars['last_focus'] = tag
+            lib_vars.session_vars['last_focus'] = tag
             return True
         return False
 

@@ -247,7 +247,7 @@ class GwInfoButton(GwMaptool):
 
         # If param is true show question and create thread
         msg = "You closed a valve, this will modify the current mapzones and it may take a little bit of time."
-        if global_vars.user_level['level'] in ('1', '2'):
+        if lib_vars.user_level['level'] in ('1', '2'):
             msg += " Would you like to continue?"
             answer = tools_qt.show_question(msg)
         else:
@@ -295,7 +295,7 @@ class GwInfoButton(GwMaptool):
             info_feature.signal_activate.connect(self._reactivate_map_tool)
             info_feature.get_info_from_id(table_name=layer_source['table'], feature_id=action.property('feature_id'), tab_type=tab_type)
             # Remove previous rubberband when open new docker
-            if isinstance(self.previous_info_feature, GwInfo) and global_vars.session_vars['dialog_docker'] is not None:
+            if isinstance(self.previous_info_feature, GwInfo) and lib_vars.session_vars['dialog_docker'] is not None:
                 tools_gw.reset_rubberband(self.previous_info_feature.rubber_band)
             self.previous_info_feature = info_feature
 
@@ -319,7 +319,7 @@ class GwInfoButton(GwMaptool):
             info_feature.signal_activate.connect(self._reactivate_map_tool)
             info_feature.get_info_from_coordinates(point, tab_type=self.tab_type)
             # Remove previous rubberband when open new docker
-            if isinstance(self.previous_info_feature, GwInfo) and global_vars.session_vars['dialog_docker'] is not None:
+            if isinstance(self.previous_info_feature, GwInfo) and lib_vars.session_vars['dialog_docker'] is not None:
                 tools_gw.reset_rubberband(self.previous_info_feature.rubber_band)
             self.previous_info_feature = info_feature
 

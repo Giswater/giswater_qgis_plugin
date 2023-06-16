@@ -26,7 +26,7 @@ class GwDimensioning:
 
         self.iface = global_vars.iface
         self.settings = global_vars.giswater_settings
-        self.plugin_dir = global_vars.plugin_dir
+        self.plugin_dir = lib_vars.plugin_dir
         self.canvas = global_vars.canvas
         self.points = None
         self.snapper_manager = GwSnapManager(self.iface)

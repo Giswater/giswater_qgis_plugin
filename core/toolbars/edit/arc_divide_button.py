@@ -219,7 +219,7 @@ class GwArcDivideButton(GwMaptool):
         """ Move selected node to the current point """
 
         # Update node geometry
-        the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {global_vars.data_epsg})"
+        the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {lib_vars.data_epsg})"
         sql = (f"UPDATE node SET the_geom = {the_geom} "
                f"WHERE node_id = '{node_id}'")
         status = tools_db.execute_sql(sql, log_sql=True)

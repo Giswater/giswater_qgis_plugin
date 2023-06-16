@@ -187,7 +187,7 @@ class GwToolBoxButton(GwAction):
 
         # Show form in docker
         tools_gw.init_docker('qgis_form_docker')
-        if global_vars.session_vars['dialog_docker']:
+        if lib_vars.session_vars['dialog_docker']:
             tools_gw.docker_dialog(self.dlg_toolbox)
         else:
             tools_gw.open_dialog(self.dlg_toolbox)
@@ -813,7 +813,7 @@ class GwToolBoxButton(GwAction):
         file_report = tools_qt.get_text(self.dlg_reports, 'txt_export_path')
         # Set default value if necessary
         if file_report is None or file_report == '':
-            file_report = global_vars.plugin_dir
+            file_report = lib_vars.plugin_dir
         # Get directory of that file
         folder_path = os.path.dirname(file_report)
         if not os.path.exists(folder_path):

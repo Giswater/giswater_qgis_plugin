@@ -24,7 +24,7 @@ class GwElement:
         """ Class to control 'Add element' of toolbar 'edit' """
 
         self.iface = global_vars.iface
-        self.schema_name = global_vars.schema_name
+        self.schema_name = lib_vars.schema_name
         self.canvas = global_vars.canvas
         self.snapper_manager = GwSnapManager(self.iface)
         self.vertex_marker = self.snapper_manager.vertex_marker
@@ -410,7 +410,7 @@ class GwElement:
         expl_id = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.expl_id)
 
         # Get SRID
-        srid = global_vars.data_epsg
+        srid = lib_vars.data_epsg
 
         # Check if this element already exists
         sql = (f"SELECT DISTINCT(element_id)"

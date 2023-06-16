@@ -32,9 +32,9 @@ class GwNonVisual:
     def __init__(self):
         """ Class to control 'Add element' of toolbar 'edit' """
 
-        self.plugin_dir = global_vars.plugin_dir
+        self.plugin_dir = lib_vars.plugin_dir
         self.iface = global_vars.iface
-        self.schema_name = global_vars.schema_name
+        self.schema_name = lib_vars.schema_name
         self.canvas = global_vars.canvas
         self.dialog = None
         self.manager_dlg = None
@@ -143,7 +143,7 @@ class GwNonVisual:
             table_name = self.schema_name + "." + table_name
 
         # Set model
-        model = QSqlTableModel(db=global_vars.qgis_db_credentials)
+        model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)

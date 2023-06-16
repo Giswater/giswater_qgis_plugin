@@ -66,7 +66,7 @@ class GwTest(QObject):
         tools_log.set_logger(self.plugin_dir)
         global_vars.plugin_name = self.plugin_dir
         if schema_name:
-            global_vars.schema_name = schema_name
+            lib_vars.schema_name = schema_name
 
         # Set test classes
         self.gw_admin = GwAdminButton()

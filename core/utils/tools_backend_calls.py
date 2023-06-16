@@ -436,7 +436,7 @@ def refresh_attribute_table(**kwargs):
             continue
 
         # Get sys variale
-        qgis_project_infotype = global_vars.project_vars['info_type']
+        qgis_project_infotype = lib_vars.project_vars['info_type']
 
         feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
         extras = f'"infoType":"{qgis_project_infotype}"'

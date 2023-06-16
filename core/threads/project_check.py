@@ -91,7 +91,7 @@ class GwProjectCheckTask(GwTask):
             if layer_source['schema'] is None:
                 continue
             layer_source['schema'] = layer_source['schema'].replace('"', '')
-            if layer_source.get('schema') != global_vars.schema_name:
+            if layer_source.get('schema') != lib_vars.schema_name:
                 continue
 
             schema_name = layer_source['schema']
@@ -122,11 +122,11 @@ class GwProjectCheckTask(GwTask):
         """ Execute function 'gw_fct_setcheckproject' """
 
         # Get project variables
-        add_schema = global_vars.project_vars['add_schema']
-        main_schema = global_vars.project_vars['main_schema']
-        project_role = global_vars.project_vars['project_role']
-        info_type = global_vars.project_vars['info_type']
-        project_type = global_vars.project_vars['project_type']
+        add_schema = lib_vars.project_vars['add_schema']
+        main_schema = lib_vars.project_vars['main_schema']
+        project_role = lib_vars.project_vars['project_role']
+        info_type = lib_vars.project_vars['info_type']
+        project_type = lib_vars.project_vars['project_type']
 
         plugin_version, message = tools_qgis.get_plugin_version()
         if plugin_version is None:
@@ -135,8 +135,8 @@ class GwProjectCheckTask(GwTask):
 
         # Get log folder size
         log_folder_volume = 0
-        if global_vars.user_folder_dir:
-            log_folder = f"{global_vars.user_folder_dir}{os.sep}core{os.sep}log"
+        if lib_vars.user_folder_dir:
+            log_folder = f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}log"
             size = tools_os.get_folder_size(log_folder)
             log_folder_volume = f"{round(size / (1024*1024), 2)} MB"
 

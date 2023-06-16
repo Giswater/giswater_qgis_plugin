@@ -51,8 +51,8 @@ class GwAdminButton:
         # Initialize instance attributes
         self.iface = global_vars.iface
         self.settings = global_vars.giswater_settings
-        self.plugin_dir = global_vars.plugin_dir
-        self.schema_name = global_vars.schema_name
+        self.plugin_dir = lib_vars.plugin_dir
+        self.schema_name = lib_vars.schema_name
         self.plugin_version, self.message = tools_qgis.get_plugin_version()
         self.canvas = global_vars.canvas
         self.project_type = None
@@ -63,9 +63,9 @@ class GwAdminButton:
         self.project_type_selected = None
         self.schema_type = None
         self.form_enabled = True
-        self.lower_postgresql_version = int(tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', global_vars.plugin_dir)
+        self.lower_postgresql_version = int(tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', lib_vars.plugin_dir)
                                             .replace('.', ''))
-        self.upper_postgresql_version = int(tools_qgis.get_plugin_metadata('majorPgVersion', '14.99', global_vars.plugin_dir)
+        self.upper_postgresql_version = int(tools_qgis.get_plugin_metadata('majorPgVersion', '14.99', lib_vars.plugin_dir)
                                             .replace('.', ''))
         self.total_sql_files = 0    # Total number of SQL files to process
         self.current_sql_file = 0   # Current number of SQL file
@@ -83,7 +83,7 @@ class GwAdminButton:
         if set_database_connection:
             connection_status, not_version, layer_source = tools_db.set_database_connection()
         else:
-            connection_status = global_vars.session_vars['logged_status']
+            connection_status = lib_vars.session_vars['logged_status']
 
         settings = QSettings()
         settings.beginGroup(f"PostgreSQL/connections/{default_connection}")
@@ -241,7 +241,7 @@ class GwAdminButton:
             global_vars.dao.rollback()
             # Reset count error variable to 0
             self.error_count = 0
-            tools_qt.show_exception_message(msg=global_vars.session_vars['last_error_msg'])
+            tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
             tools_qgis.show_info("A rollback on schema will be done.")
             if dlg:
                 tools_gw.close_dialog(dlg)
@@ -698,7 +698,7 @@ class GwAdminButton:
         """ Initialization code of the form (to be executed only once) """
 
         # Get SQL folder and check if exists
-        self.sql_dir = os.path.normpath(os.path.join(global_vars.plugin_dir, 'dbmodel'))
+        self.sql_dir = os.path.normpath(os.path.join(lib_vars.plugin_dir, 'dbmodel'))
         if not os.path.exists(self.sql_dir):
             tools_qgis.show_message(f"SQL folder not found: {self.sql_dir}")
             return
@@ -738,7 +738,7 @@ class GwAdminButton:
         tools_gw.load_settings(self.dlg_readsql)
         self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
 
-        if global_vars.user_level['level'] not in global_vars.user_level['showadminadvanced']:
+        if lib_vars.user_level['level'] not in lib_vars.user_level['showadminadvanced']:
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_schema_manager")
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_advanced")
 
@@ -1631,7 +1631,7 @@ class GwAdminButton:
 
         # Populate Table
         self.model_srid = QSqlQueryModel()
-        self.model_srid.setQuery(sql, db=global_vars.qgis_db_credentials)
+        self.model_srid.setQuery(sql, db=lib_vars.qgis_db_credentials)
         self.tbl_srid.setModel(self.model_srid)
         self.tbl_srid.show()
 
@@ -1869,12 +1869,12 @@ class GwAdminButton:
                 if status is False:
                     self.error_count = self.error_count + 1
                     tools_log.log_info(f"_read_execute_file error {filepath}")
-                    tools_log.log_info(f"Message: {global_vars.session_vars['last_error']}")
+                    tools_log.log_info(f"Message: {lib_vars.session_vars['last_error']}")
                     if self.dev_commit is False:
                         global_vars.dao.rollback()
 
                     if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
-                        self.task_create_schema.db_exception = (global_vars.session_vars['last_error'], str(f_to_read), filepath)
+                        self.task_create_schema.db_exception = (lib_vars.session_vars['last_error'], str(f_to_read), filepath)
                         self.task_create_schema.cancel()
 
                     return False
@@ -2580,7 +2580,7 @@ class GwAdminButton:
 
         # Populate table update
         qtable = self.dlg_manage_sys_fields.findChild(QTableView, "tbl_update")
-        self.model_update_table = QSqlTableModel(db=global_vars.qgis_db_credentials)
+        self.model_update_table = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
         expr_filter = f"cat_feature_id = '{form_name}'"
         self._fill_table(qtable, 've_config_sysfields', self.model_update_table, expr_filter)
@@ -2602,7 +2602,7 @@ class GwAdminButton:
 
         # Populate table update
         qtable = dialog.findChild(QTableView, "tbl_update")
-        self.model_update_table = QSqlTableModel(db=global_vars.qgis_db_credentials)
+        self.model_update_table = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         if self.chk_multi_insert:
@@ -3080,9 +3080,9 @@ class GwAdminButton:
 
         try:
             tools_gw.close_docker('admin_position')
-            global_vars.session_vars['docker_type'] = 'qgis_form_docker'
-            global_vars.session_vars['dialog_docker'] = GwDocker()
-            global_vars.session_vars['dialog_docker'].dlg_closed.connect(partial(tools_gw.close_docker, 'admin_position'))
+            lib_vars.session_vars['docker_type'] = 'qgis_form_docker'
+            lib_vars.session_vars['dialog_docker'] = GwDocker()
+            lib_vars.session_vars['dialog_docker'].dlg_closed.connect(partial(tools_gw.close_docker, 'admin_position'))
             tools_gw.manage_docker_options('admin_position')
             tools_gw.docker_dialog(self.dlg_readsql)
             self.dlg_readsql.dlg_closed.connect(partial(tools_gw.close_docker, 'admin_position'))

@@ -37,7 +37,7 @@ class GwSearch:
         self.iface = global_vars.iface
         self.project_type = global_vars.project_type
         self.canvas = global_vars.canvas
-        self.schema_name = global_vars.schema_name
+        self.schema_name = lib_vars.schema_name
         self.json_search = {}
         self.lbl_visible = False
         self.dlg_search = None
@@ -62,7 +62,7 @@ class GwSearch:
 
         self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
         self.dlg_search.lbl_msg.setVisible(False)
-        qgis_project_add_schema = global_vars.project_vars['add_schema']
+        qgis_project_add_schema = lib_vars.project_vars['add_schema']
         if qgis_project_add_schema is None:
             body = tools_gw.create_body(form=form)
         else:
@@ -188,7 +188,7 @@ class GwSearch:
     def refresh_tab(self, tab_name="tab_hydro"):
         form = f'"singleTab":"{tab_name}"'
 
-        qgis_project_add_schema = global_vars.project_vars['add_schema']
+        qgis_project_add_schema = lib_vars.project_vars['add_schema']
         if qgis_project_add_schema is None:
             body = tools_gw.create_body(form=form)
         else:
@@ -417,7 +417,7 @@ class GwSearch:
             if str(value) == '':
                 return
 
-            qgis_project_add_schema = global_vars.project_vars['add_schema']
+            qgis_project_add_schema = lib_vars.project_vars['add_schema']
             extras_search += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}, '
             extras_search += f'"addSchema":"{qgis_project_add_schema}"'
             if chk_list:
@@ -527,7 +527,7 @@ class GwSearch:
     def _open_hydrometer_dialog(self, table_name=None, feature_id=None):
 
         # get sys variale
-        qgis_project_infotype = global_vars.project_vars['info_type']
+        qgis_project_infotype = lib_vars.project_vars['info_type']
 
         feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
         extras = f'"infoType":"{qgis_project_infotype}"'
@@ -675,7 +675,7 @@ class GwSearch:
     def _restore_selectors(self, current_selectors):
         """ Restore selector_expl and selector_state to how the user had it """
 
-        qgis_project_add_schema = global_vars.project_vars['add_schema']
+        qgis_project_add_schema = lib_vars.project_vars['add_schema']
         for form_tab in current_selectors['body']['form']['formTabs']:
             if form_tab['tableName'] not in ('selector_expl', 'selector_state'):
                 continue
@@ -818,7 +818,7 @@ class GwSearch:
             table_name = self.schema_name + "." + table_name
 
         # Set model
-        model = QSqlTableModel(db=global_vars.qgis_db_credentials)
+        model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)

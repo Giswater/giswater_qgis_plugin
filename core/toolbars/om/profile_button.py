@@ -148,7 +148,7 @@ class GwProfileButton(GwAction):
 
         # Show form in docker
         tools_gw.init_docker('qgis_form_docker')
-        if global_vars.session_vars['dialog_docker']:
+        if lib_vars.session_vars['dialog_docker']:
             tools_gw.docker_dialog(self.dlg_draw_profile)
         else:
             tools_gw.open_dialog(self.dlg_draw_profile)
@@ -542,7 +542,7 @@ class GwProfileButton(GwAction):
         self.plot = plt
 
         # If file profile.png exist overwrite
-        temp_folder = f"{global_vars.user_folder_dir}{os.sep}core{os.sep}temp"
+        temp_folder = f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp"
         img_path = f"{temp_folder}{os.sep}profile.png"
         if not os.path.exists(temp_folder):
             os.makedirs(temp_folder)

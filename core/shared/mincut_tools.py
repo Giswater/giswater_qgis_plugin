@@ -31,8 +31,8 @@ class GwMincutTools:
 
         self.mincut = mincut
         self.canvas = global_vars.canvas
-        self.plugin_dir = global_vars.plugin_dir
-        self.schema_name = global_vars.schema_name
+        self.plugin_dir = lib_vars.plugin_dir
+        self.schema_name = lib_vars.schema_name
         self.settings = global_vars.giswater_settings
 
         self.rubber_band = tools_gw.create_rubberband(self.canvas, 0)

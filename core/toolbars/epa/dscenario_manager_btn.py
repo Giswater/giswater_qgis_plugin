@@ -300,7 +300,7 @@ class GwDscenarioManagerButton(GwAction):
             self.table_name = self.schema_name + "." + self.table_name
 
         # Set model
-        model = QSqlTableModel(db=global_vars.qgis_db_credentials)
+        model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         model.setTable(self.table_name)
         model.setFilter(f"dscenario_id = {self.selected_dscenario_id}")
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
@@ -433,7 +433,7 @@ class GwDscenarioManagerButton(GwAction):
             layer_list.append(tools_qgis.get_layer_source_table_name(layer))
 
         geom_layers = []
-        sql = f"SELECT f_table_name FROM geometry_columns WHERE f_table_schema = '{global_vars.schema_name}' " \
+        sql = f"SELECT f_table_name FROM geometry_columns WHERE f_table_schema = '{lib_vars.schema_name}' " \
               f"AND f_table_name LIKE 'v_edit_inp_dscenario%';"
         rows = tools_db.get_rows(sql)
         if rows:

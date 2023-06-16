@@ -41,5 +41,5 @@ class GwDocker(QDockWidget):
                 tag = f'{self.widget().objectName()}_{self.subtag}'
             else:
                 tag = str(self.widget().objectName())
-            global_vars.session_vars['last_focus'] = tag
+            lib_vars.session_vars['last_focus'] = tag
         return super().event(event)

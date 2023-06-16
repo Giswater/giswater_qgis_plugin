@@ -92,7 +92,7 @@ class GwAuxPointAddButton(GwMaptool):
 
         self.snap_to_selected_layer = False
         # Get SRID
-        self.srid = global_vars.data_epsg
+        self.srid = lib_vars.data_epsg
 
         # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
         if hasattr(self.action, "setChecked"):
