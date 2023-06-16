@@ -25,7 +25,7 @@ from ...threads.toolbox_execute import GwToolBoxTask
 from ...threads.toolbox_report import GwReportTask
 from ...ui.ui_manager import GwToolboxUi, GwToolboxManagerUi, GwToolboxReportsUi
 from ...utils import tools_gw, tools_backend_calls
-from ....lib import tools_qt, tools_qgis, tools_db
+from ....lib import lib_vars, tools_qt, tools_qgis, tools_db
 from .... import global_vars
 
 

@@ -16,7 +16,7 @@ from qgis.PyQt.QtWidgets import QAction
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
-from ...lib import tools_os
+from ...lib import lib_vars, tools_os
 
 
 class GwMaptool(QgsMapTool):

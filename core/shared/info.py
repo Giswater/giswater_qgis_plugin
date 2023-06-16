@@ -38,7 +38,7 @@ from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi
     GwInfoCrossectUi, GwInterpolate, GwInfoEpaDemandUi, GwInfoEpaOrificeUi, GwInfoEpaOutletUi, GwInfoEpaPumpUi, \
     GwInfoEpaWeirUi, GwInfoEpaDwfUi
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os
+from ...lib import lib_vars, tools_qgis, tools_qt, tools_log, tools_db, tools_os
 from ...lib.tools_qt import GwHyperLinkLineEdit
 
 global is_inserting

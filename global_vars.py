@@ -9,6 +9,8 @@ import sys
 
 from qgis.PyQt.QtCore import QSettings
 
+from lib import lib_vars
+
 
 # region system variables (values are initialized on load project without changes during session)
 iface = None                            # Instance of class QGisInterface. Provides the hook to manipulate QGIS application at runtime

@@ -14,6 +14,7 @@ from qgis.PyQt.QtGui import QKeySequence, QIcon
 from qgis.gui import QgsMessageBar
 
 from ... import global_vars
+from ...lib import lib_vars
 from ..utils import tools_gw
 
 

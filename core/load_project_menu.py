@@ -17,7 +17,7 @@ from qgis.core import QgsApplication
 from .ui.ui_manager import GwLoadMenuUi
 from .utils import tools_gw
 from .. import global_vars
-from ..lib import tools_qt, tools_qgis, tools_os, tools_db
+from ..lib import lib_vars, tools_qt, tools_qgis, tools_os, tools_db
 from .threads.project_layers_config import GwProjectLayersConfig
 
 

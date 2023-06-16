@@ -16,7 +16,7 @@ from ..maptool import GwMaptool
 from ...ui.ui_manager import GwAuxPointUi
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import tools_qgis, tools_qt, tools_db
+from ....lib import lib_vars, tools_qgis, tools_qt, tools_db
 
 
 class GwAuxPointAddButton(GwMaptool):

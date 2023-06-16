@@ -15,6 +15,7 @@ from qgis.gui import QgsMessageBar
 
 from ... import global_vars
 from ..utils import tools_gw
+from ...lib import lib_vars
 
 
 class GwDialog(QDialog):

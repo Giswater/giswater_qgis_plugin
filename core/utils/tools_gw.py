@@ -45,7 +45,7 @@ from ..utils.select_manager import GwSelectManager
 from ..utils.snap_manager import GwSnapManager
 from ..toolbars.toc import epa_world_button
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
+from ...lib import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
 from ...lib.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
 
 # These imports are for the add_{widget} functions (modules need to be imported in order to find it by its name)

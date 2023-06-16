@@ -25,7 +25,7 @@ from .visit import GwVisit
 from ..ui.ui_manager import GwInfoGenericUi, GwSearchWorkcatUi
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_db, tools_qgis, tools_qt
+from ...lib import lib_vars, tools_db, tools_qgis, tools_qt
 
 
 class GwSearch:

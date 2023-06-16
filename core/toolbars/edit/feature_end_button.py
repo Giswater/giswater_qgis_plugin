@@ -17,7 +17,7 @@ from ...toolbars.dialog import GwAction
 from ...ui.ui_manager import GwFeatureEndUi, GwInfoWorkcatUi, GwFeatureEndConnecUi
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import tools_qgis, tools_qt, tools_log, tools_db
+from ....lib import lib_vars, tools_qgis, tools_qt, tools_log, tools_db
 
 
 class GwFeatureEndButton(GwAction):

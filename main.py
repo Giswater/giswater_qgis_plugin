@@ -18,7 +18,7 @@ from .core.admin.admin_btn import GwAdminButton
 from .core.load_project import GwLoadProject
 from .core.utils import tools_gw
 from .core.utils.signal_manager import GwSignalManager
-from .lib import tools_qgis, tools_os, tools_log
+from .lib import lib_vars, tools_qgis, tools_os, tools_log
 from .core.ui.dialog import GwDialog
 from .core.ui.main_window import GwMainWindow
 
