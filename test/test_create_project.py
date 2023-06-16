@@ -11,7 +11,7 @@ from qgis.core import QgsApplication, QgsProviderRegistry
 from .test_giswater import GwTest
 from ..core.admin.gis_file_create import GwGisFileCreate
 from .. import global_vars
-from ..lib import tools_db, tools_log
+from ..lib import lib_vars, tools_db, tools_log
 
 
 # dummy instance to replace qgis.utils.iface
@@ -63,10 +63,10 @@ class GwTestQgis:
         """ Connect to a database providing a service_name set in .pg_service.conf """
 
         status = tools_db.connect_to_database_service(service_name)
-        global_vars.session_vars['logged_status'] = status
+        lib_vars.session_vars['logged_status'] = status
 
-        if self.test_giswater.global_vars.session_vars['last_error']:
-            msg = self.test_giswater.global_vars.session_vars['last_error']
+        if self.test_giswater.lib_vars.session_vars['last_error']:
+            msg = self.test_giswater.lib_vars.session_vars['last_error']
             tools_log.log_info(f"Database connection error: {msg}")
             return False
 

@@ -18,7 +18,7 @@ from .utils import tools_gw
 from .threads.project_layers_config import GwProjectLayersConfig
 from .threads.project_check import GwProjectCheckTask
 from .. import global_vars
-from ..lib import tools_qgis, tools_log, tools_db, tools_qt, tools_os
+from ..lib import lib_vars, tools_qgis, tools_log, tools_db, tools_qt, tools_os
 
 
 class GwLoadProject(QObject):
@@ -53,14 +53,14 @@ class GwLoadProject(QObject):
             return
 
         # Get SRID from table node
-        global_vars.data_epsg = tools_db.get_srid('v_edit_node', global_vars.schema_name)
+        lib_vars.data_epsg = tools_db.get_srid('v_edit_node', lib_vars.schema_name)
 
         # Manage schema name
         tools_db.get_current_user()
         layer_source = tools_qgis.get_layer_source(self.layer_node)
         schema_name = layer_source['schema']
         if schema_name:
-            global_vars.schema_name = schema_name.replace('"', '')
+            lib_vars.schema_name = schema_name.replace('"', '')
 
         # Set PostgreSQL parameter 'search_path'
         tools_db.set_search_path(layer_source['schema'])
@@ -77,8 +77,8 @@ class GwLoadProject(QObject):
         # Removes all deprecated variables defined at giswater.config
         tools_gw.remove_deprecated_config_vars()
 
-        project_role = global_vars.project_vars.get('project_role')
-        global_vars.project_vars['project_role'] = tools_gw.get_role_permissions(project_role)
+        project_role = lib_vars.project_vars.get('project_role')
+        lib_vars.project_vars['project_role'] = tools_gw.get_role_permissions(project_role)
 
         # Check if user has config files 'init' and 'session' and its parameters
         tools_gw.user_params_to_userconfig()
@@ -90,14 +90,14 @@ class GwLoadProject(QObject):
         tools_qgis.user_parameters['show_message_durations'] = value
 
         # Manage locale and corresponding 'i18n' file
-        global_vars.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', global_vars.plugin_dir)
-        tools_qt.manage_translation(global_vars.plugin_name)
+        lib_vars.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', lib_vars.plugin_dir)
+        tools_qt.manage_translation(lib_vars.plugin_name)
 
 
         # Check if schema exists
-        schema_exists = tools_db.check_schema(global_vars.schema_name)
+        schema_exists = tools_db.check_schema(lib_vars.schema_name)
         if not schema_exists:
-            tools_qgis.show_warning("Selected schema not found", parameter=global_vars.schema_name)
+            tools_qgis.show_warning("Selected schema not found", parameter=lib_vars.schema_name)
 
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
         status = self._check_layers_from_distinct_schema()
@@ -144,8 +144,8 @@ class GwLoadProject(QObject):
         if tools_os.set_boolean(force_tab_expl, False):
             self._force_tab_exploitation()
 
-        # Set global_vars.project_epsg
-        global_vars.project_epsg = tools_qgis.get_epsg()
+        # Set lib_vars.project_epsg
+        lib_vars.project_epsg = tools_qgis.get_epsg()
         tools_gw.connect_signal(QgsProject.instance().crsChanged, tools_gw.set_epsg,
                                 'load_project', 'project_read_crsChanged_set_epsg')
         global_vars.project_loaded = True
@@ -154,7 +154,7 @@ class GwLoadProject(QObject):
         self.iface.mapCanvas().snappingUtils().setIndexingStrategy(QgsSnappingUtils.IndexHybrid)
 
         # Manage versions of Giswater and PostgreSQL
-        plugin_version = tools_qgis.get_plugin_metadata('version', 0, global_vars.plugin_dir)
+        plugin_version = tools_qgis.get_plugin_metadata('version', 0, lib_vars.plugin_dir)
         project_version = tools_gw.get_project_version(schema_name)
         # Only get the x.y.zzz, not x.y.zzz.n
         try:
@@ -200,10 +200,10 @@ class GwLoadProject(QObject):
         postgresql_version = tools_db.get_pg_version()
 
         # Get version compatiblity from metadata.txt
-        minorQgisVersion = tools_qgis.get_plugin_metadata('minorQgisVersion', '3.10', global_vars.plugin_dir)
-        majorQgisVersion = tools_qgis.get_plugin_metadata('majorQgisVersion', '3.99', global_vars.plugin_dir)
-        minorPgVersion = tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', global_vars.plugin_dir).replace('.', '')
-        majorPgVersion = tools_qgis.get_plugin_metadata('majorPgVersion', '11.99', global_vars.plugin_dir).replace('.', '')
+        minorQgisVersion = tools_qgis.get_plugin_metadata('minorQgisVersion', '3.10', lib_vars.plugin_dir)
+        majorQgisVersion = tools_qgis.get_plugin_metadata('majorQgisVersion', '3.99', lib_vars.plugin_dir)
+        minorPgVersion = tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', lib_vars.plugin_dir).replace('.', '')
+        majorPgVersion = tools_qgis.get_plugin_metadata('majorPgVersion', '11.99', lib_vars.plugin_dir).replace('.', '')
 
         url_wiki = "https://github.com/Giswater/giswater_dbmodel/wiki/Version-compatibility"
         if qgis_version is not None and minorQgisVersion is not None and majorQgisVersion is not None:
@@ -219,23 +219,23 @@ class GwLoadProject(QObject):
     def _get_project_variables(self):
         """ Manage QGIS project variables """
 
-        global_vars.project_vars = {}
-        global_vars.project_vars['info_type'] = tools_qgis.get_project_variable('gwInfoType')
-        global_vars.project_vars['add_schema'] = tools_qgis.get_project_variable('gwAddSchema')
-        global_vars.project_vars['main_schema'] = tools_qgis.get_project_variable('gwMainSchema')
-        global_vars.project_vars['project_role'] = tools_qgis.get_project_variable('gwProjectRole')
-        global_vars.project_vars['project_type'] = tools_qgis.get_project_variable('gwProjectType')
+        lib_vars.project_vars = {}
+        lib_vars.project_vars['info_type'] = tools_qgis.get_project_variable('gwInfoType')
+        lib_vars.project_vars['add_schema'] = tools_qgis.get_project_variable('gwAddSchema')
+        lib_vars.project_vars['main_schema'] = tools_qgis.get_project_variable('gwMainSchema')
+        lib_vars.project_vars['project_role'] = tools_qgis.get_project_variable('gwProjectRole')
+        lib_vars.project_vars['project_type'] = tools_qgis.get_project_variable('gwProjectType')
 
 
     def _get_user_variables(self):
         """ Get config related with user variables """
 
-        global_vars.user_level['level'] = tools_gw.get_config_parser('user_level', 'level', "user", "init", False)
-        global_vars.user_level['showquestion'] = tools_gw.get_config_parser('user_level', 'showquestion', "user", "init", False)
-        global_vars.user_level['showsnapmessage'] = tools_gw.get_config_parser('user_level', 'showsnapmessage', "user", "init", False)
-        global_vars.user_level['showselectmessage'] = tools_gw.get_config_parser('user_level', 'showselectmessage', "user", "init", False)
-        global_vars.user_level['showadminadvanced'] = tools_gw.get_config_parser('user_level', 'showadminadvanced', "user", "init", False)
-        global_vars.date_format = tools_gw.get_config_parser('system', 'date_format', "user", "init", False)
+        lib_vars.user_level['level'] = tools_gw.get_config_parser('user_level', 'level', "user", "init", False)
+        lib_vars.user_level['showquestion'] = tools_gw.get_config_parser('user_level', 'showquestion', "user", "init", False)
+        lib_vars.user_level['showsnapmessage'] = tools_gw.get_config_parser('user_level', 'showsnapmessage', "user", "init", False)
+        lib_vars.user_level['showselectmessage'] = tools_gw.get_config_parser('user_level', 'showselectmessage', "user", "init", False)
+        lib_vars.user_level['showadminadvanced'] = tools_gw.get_config_parser('user_level', 'showadminadvanced', "user", "init", False)
+        lib_vars.date_format = tools_gw.get_config_parser('system', 'date_format', "user", "init", False)
 
 
     def _check_project(self, show_warning):
@@ -288,15 +288,15 @@ class GwLoadProject(QObject):
         """ Set new database connection. If force_commit=True then force commit before opening project """
 
         try:
-            if global_vars.dao and force_commit:
+            if tools_db.dao and force_commit:
                 tools_log.log_info("Force commit")
-                global_vars.dao.commit()
+                tools_db.dao.commit()
         except Exception as e:
             tools_log.log_info(str(e))
         finally:
             self.connection_status, not_version, layer_source = tools_db.set_database_connection()
             if not self.connection_status or not_version:
-                message = global_vars.session_vars['last_error']
+                message = lib_vars.session_vars['last_error']
                 if show_warning:
                     if message:
                         tools_qgis.show_warning(message, 15)
@@ -323,8 +323,8 @@ class GwLoadProject(QObject):
                 repeated_layers[layer_source['schema'].replace('"', '')] = 'v_edit_node'
 
         if len(repeated_layers) > 1:
-            if global_vars.project_vars['main_schema'] in (None, '', 'null', 'NULL') \
-                    or global_vars.project_vars['add_schema'] in (None, '', 'null', 'NULL'):
+            if lib_vars.project_vars['main_schema'] in (None, '', 'null', 'NULL') \
+                    or lib_vars.project_vars['add_schema'] in (None, '', 'null', 'NULL'):
                 msg = "QGIS project has more than one v_edit_node layer coming from different schemas. " \
                       "If you are looking to manage two schemas, it is mandatory to define which is the master and " \
                       "which isn't. To do this, you need to configure the QGIS project setting this project's " \
@@ -334,8 +334,8 @@ class GwLoadProject(QObject):
 
             # If there are layers with a different schema, the one that the user has in the project variable
             # 'gwMainSchema' is taken as the schema_name.
-            if global_vars.project_vars['main_schema'] not in (None, 'NULL', ''):
-                global_vars.schema_name = global_vars.project_vars['main_schema']
+            if lib_vars.project_vars['main_schema'] not in (None, 'NULL', ''):
+                lib_vars.schema_name = lib_vars.project_vars['main_schema']
 
         return True
 
@@ -377,7 +377,7 @@ class GwLoadProject(QObject):
             self._create_toolbar(tb)
 
         # Manage action group of every toolbar
-        icon_folder = f"{global_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}"
+        icon_folder = f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}"
         parent = self.iface.mainWindow()
         for plugin_toolbar in list(self.plugin_toolbars.values()):
             ag = QActionGroup(parent)
@@ -466,26 +466,26 @@ class GwLoadProject(QObject):
     def _check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """
 
-        if global_vars.project_vars['project_role'] == 'role_basic':
+        if lib_vars.project_vars['project_role'] == 'role_basic':
             return
 
-        elif global_vars.project_vars['project_role'] == 'role_om':
+        elif lib_vars.project_vars['project_role'] == 'role_om':
             self._enable_toolbar("om")
             return
 
-        elif global_vars.project_vars['project_role'] == 'role_edit':
+        elif lib_vars.project_vars['project_role'] == 'role_edit':
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
             self._enable_toolbar("cad")
 
-        elif global_vars.project_vars['project_role'] == 'role_epa':
+        elif lib_vars.project_vars['project_role'] == 'role_epa':
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
             self._enable_toolbar("cad")
             self._enable_toolbar("epa")
             self._hide_button("308", False)
 
-        elif global_vars.project_vars['project_role'] == 'role_master' or global_vars.project_vars['project_role'] == 'role_admin':
+        elif lib_vars.project_vars['project_role'] == 'role_master' or lib_vars.project_vars['project_role'] == 'role_admin':
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
             self._enable_toolbar("cad")
@@ -523,7 +523,7 @@ class GwLoadProject(QObject):
             except RuntimeError:
                 pass
         # Set background task 'ConfigLayerFields'
-        schema_name = global_vars.schema_name.replace('"', '')
+        schema_name = lib_vars.schema_name.replace('"', '')
         sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
                f"UNION "
                f"SELECT DISTINCT(child_layer) FROM cat_feature "
@@ -532,8 +532,8 @@ class GwLoadProject(QObject):
                f"     WHERE table_schema = '{schema_name}')")
         rows = tools_db.get_rows(sql)
         description = f"ConfigLayerFields"
-        params = {"project_type": global_vars.project_type, "schema_name": global_vars.schema_name, "db_layers": rows,
-                  "qgis_project_infotype": global_vars.project_vars['info_type']}
+        params = {"project_type": global_vars.project_type, "schema_name": lib_vars.schema_name, "db_layers": rows,
+                  "qgis_project_infotype": lib_vars.project_vars['info_type']}
         self.task_get_layers = GwProjectLayersConfig(description, params)
         QgsApplication.taskManager().addTask(self.task_get_layers)
         QgsApplication.taskManager().triggerTask(self.task_get_layers)
@@ -608,7 +608,7 @@ class GwLoadProject(QObject):
             return
 
         extras = f'"selectorType":"explfrommuni", "id":{muni_id}, "value":true, "isAlone":true, '
-        extras += f'"addSchema":"{global_vars.project_vars["add_schema"]}"'
+        extras += f'"addSchema":"{lib_vars.project_vars["add_schema"]}"'
         body = tools_gw.create_body(extras=extras)
         complet_result = tools_gw.execute_procedure('gw_fct_setselectors', body)
         if complet_result:

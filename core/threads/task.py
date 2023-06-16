@@ -10,7 +10,7 @@ from qgis.core import QgsTask
 from qgis.utils import iface
 
 from ... import global_vars
-from ...lib import tools_log, tools_db
+from ...lib import lib_vars, tools_log, tools_db
 
 
 class GwTask(QgsTask, QObject):
@@ -29,8 +29,8 @@ class GwTask(QgsTask, QObject):
 
     def run(self):
 
-        global_vars.session_vars['threads'].append(self)
-        self.aux_conn = global_vars.dao.get_aux_conn()
+        lib_vars.session_vars['threads'].append(self)
+        self.aux_conn = tools_db.dao.get_aux_conn()
         tools_log.log_info(f"Started task {self.description()}")
         iface.actionOpenProject().setEnabled(False)
         iface.actionNewProject().setEnabled(False)
@@ -40,10 +40,10 @@ class GwTask(QgsTask, QObject):
     def finished(self, result):
 
         try:
-            global_vars.session_vars['threads'].remove(self)
+            lib_vars.session_vars['threads'].remove(self)
         except ValueError:
             pass
-        global_vars.dao.delete_aux_con(self.aux_conn)
+        tools_db.dao.delete_aux_con(self.aux_conn)
         iface.actionOpenProject().setEnabled(True)
         iface.actionNewProject().setEnabled(True)
         if result:
@@ -62,6 +62,6 @@ class GwTask(QgsTask, QObject):
             result = tools_db.cancel_pid(pid)
             if result['last_error'] is not None:
                 tools_log.log_warning(result['last_error'])
-            global_vars.dao.rollback(self.aux_conn)
+            tools_db.dao.rollback(self.aux_conn)
         tools_log.log_info(f"Task '{self.description()}' was cancelled")
         super().cancel()

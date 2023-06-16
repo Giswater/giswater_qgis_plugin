@@ -26,7 +26,7 @@ from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwDialogTextUi, GwMincutComposerUi, GwMincutConnecUi, GwMincutEndUi, GwMincutHydrometerUi
 from ... import global_vars
-from ...lib import tools_qt, tools_qgis, tools_log, tools_db
+from ...lib import lib_vars, tools_qt, tools_qgis, tools_log, tools_db
 
 
 class GwMincut:
@@ -35,9 +35,9 @@ class GwMincut:
 
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
-        self.plugin_dir = global_vars.plugin_dir
+        self.plugin_dir = lib_vars.plugin_dir
         self.settings = global_vars.giswater_settings
-        self.schema_name = global_vars.schema_name
+        self.schema_name = lib_vars.schema_name
         self.timer = None
 
         # Create separate class to manage 'actionConfig'
@@ -365,7 +365,7 @@ class GwMincut:
 
         tools_qt.double_validator(self.distance, 0, 9999999, 3)
         tools_qt.double_validator(self.depth, 0, 9999999, 3)
-        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.txt_exec_user, global_vars.current_user)
+        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.txt_exec_user, tools_db.current_user)
 
         # Fill ComboBox type
         sql = ("SELECT id, descript "
@@ -491,7 +491,7 @@ class GwMincut:
     def manage_docker(self):
 
         tools_gw.init_docker('qgis_form_docker')
-        if global_vars.session_vars['dialog_docker']:
+        if lib_vars.session_vars['dialog_docker']:
             tools_gw.docker_dialog(self.dlg_mincut)
         else:
             tools_gw.open_dialog(self.dlg_mincut, dlg_name='mincut')
@@ -591,7 +591,7 @@ class GwMincut:
 
     def _set_signals(self):
 
-        if global_vars.session_vars['dialog_docker']:
+        if lib_vars.session_vars['dialog_docker']:
             self.dlg_mincut.dlg_closed.connect(partial(tools_gw.close_docker, option_name='position'))
 
         self.dlg_mincut.btn_cancel_task.clicked.connect(self._cancel_task)
@@ -691,7 +691,7 @@ class GwMincut:
 
         # Rollback transaction
         else:
-            global_vars.dao.rollback()
+            tools_db.dao.rollback()
 
         # Close dialog, save dialog position, and disconnect snapping
         tools_gw.close_dialog(self.dlg_mincut)
@@ -861,7 +861,7 @@ class GwMincut:
         received_date = received_day.toString('yyyy-MM-dd') + " " + received_time.toString('HH:mm:ss')
 
         assigned_to = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.assigned_to, 0)
-        cur_user = global_vars.current_user
+        cur_user = tools_db.current_user
         appropiate_status = tools_qt.is_checked(self.dlg_mincut, "appropiate")
 
         check_data = [str(mincut_result_state), str(anl_cause), str(received_date),
@@ -1890,7 +1890,7 @@ class GwMincut:
         event_point = self.snapper_manager.get_event_point(point=point)
 
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
-        srid = global_vars.data_epsg
+        srid = lib_vars.data_epsg
 
         sql = (f"UPDATE om_mincut"
                f" SET exec_the_geom = ST_SetSRID(ST_Point({point.x()}, {point.y()}), {srid})"
@@ -1973,7 +1973,7 @@ class GwMincut:
             sql = (f"UPDATE om_mincut"
                    f" SET mincut_class = 1, "
                    f" anl_the_geom = ST_SetSRID(ST_Point({snapped_point.x()}, "
-                   f"{snapped_point.y()}), {global_vars.data_epsg}),"
+                   f"{snapped_point.y()}), {lib_vars.data_epsg}),"
                    f" anl_user = current_user, anl_feature_type = '{elem_type.upper()}',"
                    f" anl_feature_id = '{element_id}'"
                    f" WHERE id = '{real_mincut_id}'")

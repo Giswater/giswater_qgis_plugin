@@ -15,7 +15,7 @@ from qgis.PyQt.QtCore import pyqtSignal, QObject
 from ..utils import tools_gw
 from ..ui.ui_manager import GwDocUi, GwDocManagerUi
 from ... import global_vars
-from ...lib import tools_qt, tools_db, tools_qgis, tools_os
+from ...lib import lib_vars, tools_qt, tools_db, tools_qgis, tools_os
 
 
 class GwDocument(QObject):
@@ -31,7 +31,7 @@ class GwDocument(QObject):
         self.previous_dialog = None
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
-        self.schema_name = global_vars.schema_name
+        self.schema_name = lib_vars.schema_name
         self.files_path = []
         self.project_type = tools_gw.get_project_type()
         self.doc_tables = ["doc_x_node","doc_x_arc","doc_x_connec","doc_x_gully"]
@@ -418,7 +418,7 @@ class GwDocument(QObject):
         # Check if selected file exists. Set default value if necessary
         file_path = tools_qt.get_text(dialog, widget)
         if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
-            folder_path = global_vars.plugin_dir
+            folder_path = lib_vars.plugin_dir
         else:
             folder_path = os.path.dirname(file_path)
         # Open dialog to select file

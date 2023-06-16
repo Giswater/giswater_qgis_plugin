@@ -17,7 +17,7 @@ from qgis.gui import QgsDateTimeEdit
 from ..dialog import GwAction
 from ...ui.ui_manager import GwConfigUi
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_db, tools_qgis
+from ....lib import lib_vars, tools_qt, tools_db, tools_qgis
 from .... import global_vars
 
 
@@ -196,8 +196,8 @@ class GwConfigButton(GwAction):
                         widget.setAllowNull(True)
                         widget.setCalendarPopup(True)
                         widget.setDisplayFormat('dd/MM/yyyy')
-                        if global_vars.date_format in ("dd/MM/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "yyyy-MM-dd"):
-                            widget.setDisplayFormat(global_vars.date_format)
+                        if lib_vars.date_format in ("dd/MM/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "yyyy-MM-dd"):
+                            widget.setDisplayFormat(lib_vars.date_format)
                         if field['value']:
                             field['value'] = field['value'].replace('/', '-')
                         date = QDate.fromString(field['value'], 'yyyy-MM-dd')

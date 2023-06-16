@@ -60,9 +60,9 @@ class GwCopySchemaTask(GwTask):
         # Show message
         status = (self.admin.error_count == 0)
         if status:
-            global_vars.dao.commit(aux_conn=self.aux_conn)
+            tools_db.dao.commit(aux_conn=self.aux_conn)
         else:
-            global_vars.dao.rollback(aux_conn=self.aux_conn)
+            tools_db.dao.rollback(aux_conn=self.aux_conn)
 
         # Reset count error variable to 0
         self.admin.error_count = 0

@@ -10,6 +10,7 @@ from qgis.PyQt import QtCore
 from qgis.PyQt.QtWidgets import QDockWidget
 
 from ... import global_vars
+from ...lib import lib_vars
 
 
 class GwDocker(QDockWidget):
@@ -41,5 +42,5 @@ class GwDocker(QDockWidget):
                 tag = f'{self.widget().objectName()}_{self.subtag}'
             else:
                 tag = str(self.widget().objectName())
-            global_vars.session_vars['last_focus'] = tag
+            lib_vars.session_vars['last_focus'] = tag
         return super().event(event)
