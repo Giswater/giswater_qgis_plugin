@@ -245,7 +245,7 @@ def save_current_tab(dialog, tab_widget, selector_name):
         pass
 
 
-def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_widgets=False, plugin_dir=lib_vars.plugin_dir, plugin_name=global_vars.plugin_name):
+def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_widgets=False, plugin_dir=lib_vars.plugin_dir, plugin_name=lib_vars.plugin_name):
 
     """ Open dialog """
 

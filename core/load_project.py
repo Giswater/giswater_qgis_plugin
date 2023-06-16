@@ -90,8 +90,8 @@ class GwLoadProject(QObject):
         tools_qgis.user_parameters['show_message_durations'] = value
 
         # Manage locale and corresponding 'i18n' file
-        global_vars.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', lib_vars.plugin_dir)
-        tools_qt.manage_translation(global_vars.plugin_name)
+        lib_vars.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', lib_vars.plugin_dir)
+        tools_qt.manage_translation(lib_vars.plugin_name)
 
 
         # Check if schema exists

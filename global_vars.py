@@ -9,7 +9,7 @@ import sys
 
 from qgis.PyQt.QtCore import QSettings
 
-from lib import lib_vars
+from .lib import lib_vars
 
 
 # region system variables (values are initialized on load project without changes during session)

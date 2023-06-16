@@ -64,7 +64,7 @@ class GwTest(QObject):
 
         # Set (no database connection yet)
         tools_log.set_logger(self.plugin_dir)
-        global_vars.plugin_name = self.plugin_dir
+        lib_vars.plugin_name = self.plugin_dir
         if schema_name:
             lib_vars.schema_name = schema_name
 

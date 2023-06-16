@@ -335,7 +335,7 @@ class GwAdminButton:
             # Manage Log Messages panel and open tab Giswater PY
             message_log = self.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
             message_log.setVisible(True)
-            QgsMessageLog.logMessage("", f"{global_vars.plugin_name.capitalize()} PY", 0)
+            QgsMessageLog.logMessage("", f"{lib_vars.plugin_name.capitalize()} PY", 0)
 
             # Create timer
             self.t0 = time()
