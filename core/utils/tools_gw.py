@@ -3972,9 +3972,7 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     """ Put filter widgets into layout and set headers into QTableView """
 
     complet_list = _get_list(complet_result, '', '', widgetname, 'form_feature', linkedobject)
-    print("complet_list")
-    print(complet_list)
-    tab_name = 'main'
+    tab_name = 'tab_none'
     if complet_list is False:
         return False, False
     for field in complet_list['body']['data']['fields']:
@@ -4000,7 +3998,7 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
 def _get_list(complet_result, form_name='', filter_fields='', widgetname='', formtype='',
               linkedobject=''):
 
-    form = f'"formName":"{form_name}", "tabName":"main", "widgetname":"{widgetname}", "formtype":"{formtype}"'
+    form = f'"formName":"{form_name}", "tabName":"tab_none", "widgetname":"{widgetname}", "formtype":"{formtype}"'
     feature = f'"tableName":"{linkedobject}"'
     filter_fields = ''
     body = create_body(form, feature, filter_fields)
@@ -4397,5 +4395,13 @@ def _manage_tableview(**kwargs):
     widget = set_tablemodel_config(dialog, widget, field['columnname'], 1, True)
     tools_qt.set_tableview_config(widget)
     return widget
+
+
+def _manage_tablewidget(**kwargs):
+    """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
+        widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+    """
+
+    return _manage_tableview(**kwargs)
 
 # endregion
