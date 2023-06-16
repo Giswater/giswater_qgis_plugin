@@ -14,7 +14,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import lib_vars, tools_log, tools_qt, tools_db, tools_qgis, tools_os
+from ...lib import tools_log, tools_qt, tools_db, tools_qgis, tools_os
 from .task import GwTask
 
 
@@ -176,8 +176,8 @@ class GwEpaFileManager(GwTask):
             raise self.exception
 
         # If Database exception, show dialog after task has finished
-        if lib_vars.session_vars['last_error']:
-            tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
+        if global_vars.session_vars['last_error']:
+            tools_qt.show_exception_message(msg=global_vars.session_vars['last_error_msg'])
 
 
     def cancel(self):
@@ -394,9 +394,9 @@ class GwEpaFileManager(GwTask):
         # Set file to execute
         opener = None
         if global_vars.project_type in 'ws':
-            opener = f"{lib_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}epanet{os.sep}epanet.exe"
+            opener = f"{global_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}epanet{os.sep}epanet.exe"
         elif global_vars.project_type in 'ud':
-            opener = f"{lib_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}swmm{os.sep}swmm5.exe"
+            opener = f"{global_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}swmm{os.sep}swmm5.exe"
 
         if opener is None:
             return False

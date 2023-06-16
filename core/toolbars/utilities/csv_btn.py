@@ -17,7 +17,7 @@ from ..dialog import GwAction
 from ...ui.ui_manager import GwCsvUi
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import lib_vars, tools_qt, tools_log, tools_db, tools_qgis, tools_os
+from ....lib import tools_qt, tools_log, tools_db, tools_qgis, tools_os
 
 
 class GwCSVButton(GwAction):
@@ -110,7 +110,7 @@ class GwCSVButton(GwAction):
         sql = (f"SELECT DISTINCT({field_id}), {fields}"
                f" FROM {table_name}"
                f" JOIN sys_function ON function_name =  functionname"
-               f" WHERE sys_role IN ({roles_dict[lib_vars.project_vars['project_role']]}) AND active is True ORDER BY orderby")
+               f" WHERE sys_role IN ({roles_dict[global_vars.project_vars['project_role']]}) AND active is True ORDER BY orderby")
 
         rows = tools_db.get_rows(sql)
         if not rows:
@@ -198,7 +198,7 @@ class GwCSVButton(GwAction):
         file_csv = tools_qt.get_text(self.dlg_csv, 'txt_file_csv')
         # Set default value if necessary
         if file_csv is None or file_csv == '':
-            file_csv = lib_vars.plugin_dir
+            file_csv = global_vars.plugin_dir
         # Get directory of that file
         folder_path = os.path.dirname(file_csv)
         if not os.path.exists(folder_path):

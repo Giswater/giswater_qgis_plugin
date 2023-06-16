@@ -17,7 +17,7 @@ from ...toolbars.dialog import GwAction
 from ...ui.ui_manager import GwFeatureEndUi, GwInfoWorkcatUi, GwFeatureEndConnecUi
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import lib_vars, tools_qgis, tools_qt, tools_log, tools_db
+from ....lib import tools_qgis, tools_qt, tools_log, tools_db
 
 
 class GwFeatureEndButton(GwAction):
@@ -445,7 +445,7 @@ class GwFeatureEndButton(GwAction):
         filter_ += " AND arc_state = '1' "
 
         # Set model
-        model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
+        model = QSqlTableModel(db=global_vars.qgis_db_credentials)
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.setFilter(filter_)
