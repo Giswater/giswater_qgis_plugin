@@ -227,7 +227,7 @@ class GwAdminButton:
         status = (self.error_count == 0)
         self._manage_result_message(status, parameter="Create project")
         if status:
-            global_vars.dao.commit()
+            tools_db.dao.commit()
             if is_utils is False:
                 self._close_dialog_admin(self.dlg_readsql_create_project)
             if not is_test:
@@ -238,7 +238,7 @@ class GwAdminButton:
                     tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, project_name)
                     self._set_info_project()
         else:
-            global_vars.dao.rollback()
+            tools_db.dao.rollback()
             # Reset count error variable to 0
             self.error_count = 0
             tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
@@ -377,9 +377,9 @@ class GwAdminButton:
             status = (self.error_count == 0)
             self._manage_result_message(status, parameter="Load updates")
             if status:
-                global_vars.dao.commit()
+                tools_db.dao.commit()
             else:
-                global_vars.dao.rollback()
+                tools_db.dao.rollback()
 
             # Reset count error variable to 0
             self.error_count = 0
@@ -617,7 +617,7 @@ class GwAdminButton:
 
     def load_sample_data(self, project_type):
 
-        global_vars.dao.commit()
+        tools_db.dao.commit()
         folder = os.path.join(self.folder_example, 'user', project_type)
         status = self._execute_files(folder, set_progress_bar=True)
         if not status and self.dev_commit is False:
@@ -910,7 +910,7 @@ class GwAdminButton:
 
         elif self.form_enabled:
             schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
-            if any(x in str(global_vars.dao_db_credentials['db']) for x in ('.', ',')):
+            if any(x in str(tools_db.dao_db_credentials['db']) for x in ('.', ',')):
                 message = "Database name contains special characters that are not supported"
                 self.form_enabled = False
             if schema_name == 'null':
@@ -1253,7 +1253,7 @@ class GwAdminButton:
         status = (self.error_count == 0)
         self._manage_result_message(status, parameter="Rename project")
         if status:
-            global_vars.dao.commit()
+            tools_db.dao.commit()
             # Populate schema name combo and info panel
             self._populate_data_schema_name(self.cmb_project_type)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
@@ -1261,7 +1261,7 @@ class GwAdminButton:
             if close_dlg_rename:
                 self._close_dialog_admin(self.dlg_readsql_rename)
         else:
-            global_vars.dao.rollback()
+            tools_db.dao.rollback()
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1280,9 +1280,9 @@ class GwAdminButton:
         status = (self.error_count == 0)
         self._manage_result_message(status, parameter="Load custom SQL files")
         if status:
-            global_vars.dao.commit()
+            tools_db.dao.commit()
         else:
-            global_vars.dao.rollback()
+            tools_db.dao.rollback()
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1720,9 +1720,9 @@ class GwAdminButton:
         status = (self.error_count == 0)
         self._manage_result_message(status, parameter="Reload")
         if status:
-            global_vars.dao.commit()
+            tools_db.dao.commit()
         else:
-            global_vars.dao.rollback()
+            tools_db.dao.rollback()
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1871,7 +1871,7 @@ class GwAdminButton:
                     tools_log.log_info(f"_read_execute_file error {filepath}")
                     tools_log.log_info(f"Message: {lib_vars.session_vars['last_error']}")
                     if self.dev_commit is False:
-                        global_vars.dao.rollback()
+                        tools_db.dao.rollback()
 
                     if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
                         self.task_create_schema.db_exception = (lib_vars.session_vars['last_error'], str(f_to_read), filepath)
@@ -1884,7 +1884,7 @@ class GwAdminButton:
             tools_log.log_info(f"_read_execute_file exception: {file}")
             tools_log.log_info(str(e))
             if self.dev_commit is False:
-                global_vars.dao.rollback()
+                tools_db.dao.rollback()
             if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
                 self.task_create_schema.cancel()
             status = False
@@ -2063,7 +2063,7 @@ class GwAdminButton:
                             self.dlg_import_inp.mainTab.setTabEnabled(0, True)
                             self.dlg_import_inp.mainTab.setCurrentIndex(0)  # TODO: this doesnt work for some reason...
                             return self._execute_import_inp(accepted, project_name, project_type)
-                    global_vars.dao.rollback()
+                    tools_db.dao.rollback()
                     self.error_count = 0
 
                     # Close dialog
@@ -2080,7 +2080,7 @@ class GwAdminButton:
         else:
             msg = "A rollback on schema will be done."
             tools_qt.show_info_box(msg, "Info")
-            global_vars.dao.rollback()
+            tools_db.dao.rollback()
             self.error_count = 0
             tools_gw.close_dialog(self.dlg_import_inp)
             return

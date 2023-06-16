@@ -229,8 +229,8 @@ class GwTable(object):
 
         # Execute UPSERT
         tools_log.log_info(sql, stack_level_increase=1)
-        result = global_vars.dao.execute_sql(sql, commit)
-        lib_vars.session_vars['last_error'] = global_vars.dao.last_error
+        result = tools_db.dao.execute_sql(sql, commit)
+        lib_vars.session_vars['last_error'] = tools_db.dao.last_error
         if not result:
             # Check if any error has been raised
             if lib_vars.session_vars['last_error']:

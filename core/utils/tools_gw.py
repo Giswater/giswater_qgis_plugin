@@ -544,7 +544,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     """
     style_id_epa = "-1"
     tablename_og = tablename
-    schema_name = global_vars.dao_db_credentials['schema'].replace('"', '')
+    schema_name = tools_db.dao_db_credentials['schema'].replace('"', '')
     uri = tools_db.get_uri()
     uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
     if the_geom:
@@ -560,9 +560,9 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         sub_sub_group = sub_sub_group.capitalize()
 
     if the_geom == "rast":
-        connString = f"PG: dbname={global_vars.dao_db_credentials['db']} host={global_vars.dao_db_credentials['host']} " \
-                     f"user={global_vars.dao_db_credentials['user']} password={global_vars.dao_db_credentials['password']} " \
-                     f"port={global_vars.dao_db_credentials['port']} mode=2 schema={global_vars.dao_db_credentials['schema']} " \
+        connString = f"PG: dbname={tools_db.dao_db_credentials['db']} host={tools_db.dao_db_credentials['host']} " \
+                     f"user={tools_db.dao_db_credentials['user']} password={tools_db.dao_db_credentials['password']} " \
+                     f"port={tools_db.dao_db_credentials['port']} mode=2 schema={tools_db.dao_db_credentials['schema']} " \
                      f"column={the_geom} table={tablename}"
         if alias: tablename = alias
         layer = QgsRasterLayer(connString, tablename)
@@ -3771,7 +3771,7 @@ def export_layers_to_gpkg(layers, path):
     """ This function is not used on Giswater Project at the moment. """
 
     uri = tools_db.get_uri()
-    schema_name = global_vars.dao_db_credentials['schema'].replace('"', '')
+    schema_name = tools_db.dao_db_credentials['schema'].replace('"', '')
     is_first = True
     options = QgsVectorFileWriter.SaveVectorOptions()
     options.driverName = "GPKG"
