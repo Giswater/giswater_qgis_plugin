@@ -43,7 +43,7 @@ BEGIN
   SELECT gw_fct_getformfields(
     'mincut_manager',
     'form_mincut',
-    NULL,
+    'tab_none',
     NULL,
     NULL,
     NULL,
