@@ -197,7 +197,7 @@ BEGIN
 		END IF;
 
 		-- Get Epa Type
-		if v_epatype is null then
+	    if v_epatype is null and (SELECT column_name FROM INFORMATION_SCHEMA.columns WHERE table_name = v_tablename AND column_name = 'epa_type' and table_schema = v_schemaname) is not null then
 			EXECUTE 'SELECT epa_type FROM '|| v_tablename || ' WHERE ' || v_pkeyfield || '::text = ' || v_id || '::text' INTO v_epatype;
 		end if;
 	END IF;
