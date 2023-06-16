@@ -23,7 +23,7 @@ from ..shared.element import GwElement
 from ..shared.info import GwInfo
 from ..shared.visit import GwVisit
 from ..utils import tools_gw
-from ...lib import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
+from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
 
 from ..shared.mincut_tools import filter_by_days, filter_by_dates
 
@@ -436,7 +436,7 @@ def refresh_attribute_table(**kwargs):
             continue
 
         # Get sys variale
-        qgis_project_infotype = lib_vars.project_vars['info_type']
+        qgis_project_infotype = global_vars.project_vars['info_type']
 
         feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
         extras = f'"infoType":"{qgis_project_infotype}"'

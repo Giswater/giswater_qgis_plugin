@@ -38,7 +38,7 @@ from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi
     GwInfoCrossectUi, GwInterpolate, GwInfoEpaDemandUi, GwInfoEpaOrificeUi, GwInfoEpaOutletUi, GwInfoEpaPumpUi, \
     GwInfoEpaWeirUi, GwInfoEpaDwfUi
 from ... import global_vars
-from ...lib import lib_vars, tools_qgis, tools_qt, tools_log, tools_db, tools_os
+from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os
 from ...lib.tools_qt import GwHyperLinkLineEdit
 
 global is_inserting
@@ -56,9 +56,9 @@ class GwInfo(QObject):
 
         self.iface = global_vars.iface
         self.settings = global_vars.giswater_settings
-        self.plugin_dir = lib_vars.plugin_dir
+        self.plugin_dir = global_vars.plugin_dir
         self.canvas = global_vars.canvas
-        self.schema_name = lib_vars.schema_name
+        self.schema_name = global_vars.schema_name
 
         self.new_feature_id = None
         self.layer_new_feature = None
@@ -110,9 +110,9 @@ class GwInfo(QObject):
             self.visible_tabs = []
 
             # Get project variables
-            qgis_project_add_schema = lib_vars.project_vars['add_schema']
-            qgis_project_main_schema = lib_vars.project_vars['main_schema']
-            qgis_project_role = lib_vars.project_vars['project_role']
+            qgis_project_add_schema = global_vars.project_vars['add_schema']
+            qgis_project_main_schema = global_vars.project_vars['main_schema']
+            qgis_project_role = global_vars.project_vars['project_role']
 
             self.new_feature = new_feature
 
@@ -165,7 +165,7 @@ class GwInfo(QObject):
             # Comes from QPushButtons node1 or node2 from custom form or RightButton
             elif feature_id:
                 if is_add_schema:
-                    add_schema = lib_vars.project_vars['add_schema']
+                    add_schema = global_vars.project_vars['add_schema']
                     extras = f'"addSchema":"{add_schema}"'
                 else:
                     extras = '"addSchema":""'
@@ -544,16 +544,16 @@ class GwInfo(QObject):
         title = self._set_dlg_title(complet_result)
 
         # Connect dialog signals
-        if lib_vars.session_vars['dialog_docker'] and is_docker and lib_vars.session_vars['info_docker']:
+        if global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']:
             # Delete last form from memory
-            last_info = lib_vars.session_vars['dialog_docker'].findChild(GwMainWindow, 'dlg_info_feature')
+            last_info = global_vars.session_vars['dialog_docker'].findChild(GwMainWindow, 'dlg_info_feature')
             if last_info:
                 last_info.setParent(None)
                 del last_info
 
             tools_gw.docker_dialog(dlg_cf)
-            lib_vars.session_vars['dialog_docker'].widget().dlg_closed.connect(self._manage_docker_close)
-            lib_vars.session_vars['dialog_docker'].setWindowTitle(title)
+            global_vars.session_vars['dialog_docker'].widget().dlg_closed.connect(self._manage_docker_close)
+            global_vars.session_vars['dialog_docker'].setWindowTitle(title)
             btn_cancel.clicked.connect(self._manage_docker_close)
 
         else:
@@ -997,7 +997,7 @@ class GwInfo(QObject):
 
         project_type = tools_gw.get_project_type()
         # Get PDF file
-        pdf_folder = os.path.join(lib_vars.plugin_dir, f'resources{os.sep}png')
+        pdf_folder = os.path.join(global_vars.plugin_dir, f'resources{os.sep}png')
         pdf_path = os.path.join(pdf_folder, f"{project_type}_{feature_type}_{locale}.png")
 
         # Open PDF if exists. If not open Spanish version
@@ -1515,7 +1515,7 @@ class GwInfo(QObject):
         self._roll_back()
         tools_gw.reset_rubberband(self.rubber_band)
         self._remove_layer_selection()
-        lib_vars.session_vars['dialog_docker'].widget().dlg_closed.disconnect()
+        global_vars.session_vars['dialog_docker'].widget().dlg_closed.disconnect()
         self._reset_my_json()
         tools_gw.close_docker()
 
@@ -1610,7 +1610,7 @@ class GwInfo(QObject):
             if save:
                 self._manage_accept(dialog, action_edit, new_feature, self.my_json, False, generic)
             elif self.new_feature_id is not None:
-                if lib_vars.session_vars['dialog_docker'] and lib_vars.session_vars['info_docker']:
+                if global_vars.session_vars['dialog_docker'] and global_vars.session_vars['info_docker']:
                     self._manage_docker_close()
                 else:
                     tools_gw.close_dialog(dialog)
@@ -1813,7 +1813,7 @@ class GwInfo(QObject):
                 my_json = json.dumps(_json)
                 if my_json == '' or str(my_json) == '{}':
                     if close_dlg:
-                        if lib_vars.session_vars['dialog_docker'] and dialog == lib_vars.session_vars['dialog_docker'].widget():
+                        if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
                             tools_gw.close_docker()
                             return True
                         tools_gw.close_dialog(dialog)
@@ -1872,7 +1872,7 @@ class GwInfo(QObject):
                 if thread:
                     # If param is true show question and create thread
                     msg = "You closed a valve, this will modify the current mapzones and it may take a little bit of time."
-                    if lib_vars.user_level['level'] in ('1', '2'):
+                    if global_vars.user_level['level'] in ('1', '2'):
                         msg += " Would you like to continue?"
                         answer = tools_qt.show_question(msg)
                     else:
@@ -1909,7 +1909,7 @@ class GwInfo(QObject):
         global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
 
         if close_dlg:
-            if lib_vars.session_vars['dialog_docker'] and dialog == lib_vars.session_vars['dialog_docker'].widget():
+            if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
                 self._manage_docker_close()
             else:
                 tools_gw.close_dialog(dialog)

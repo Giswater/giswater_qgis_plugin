@@ -17,7 +17,7 @@ from qgis.core import QgsApplication
 from .ui.ui_manager import GwLoadMenuUi
 from .utils import tools_gw
 from .. import global_vars
-from ..lib import lib_vars, tools_qt, tools_qgis, tools_os, tools_db
+from ..lib import tools_qt, tools_qgis, tools_os, tools_db
 from .threads.project_layers_config import GwProjectLayersConfig
 
 
@@ -40,7 +40,7 @@ class GwMenuLoad(QObject):
         self.main_menu.setObjectName("Giswater")
         tools_gw.set_config_parser("menu", "load", "true", "project", "giswater")
 
-        icon_folder = f"{lib_vars.plugin_dir}{os.sep}icons"
+        icon_folder = f"{global_vars.plugin_dir}{os.sep}icons"
         icon_path = f"{icon_folder}{os.sep}toolbars{os.sep}utilities{os.sep}99.png"
         config_icon = QIcon(icon_path)
 
@@ -96,7 +96,7 @@ class GwMenuLoad(QObject):
             # endregion
 
         # region Open plugin folder
-        if lib_vars.plugin_dir:
+        if global_vars.plugin_dir:
             icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}108.png"
             folder_icon = QIcon(icon_path)
             action_open_plugin_path = self.main_menu.addAction(f"Open plugin folder")
@@ -113,8 +113,8 @@ class GwMenuLoad(QObject):
         # endregion
 
         # region Open user folder
-        if lib_vars.user_folder_dir:
-            log_folder = f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}log"
+        if global_vars.user_folder_dir:
+            log_folder = f"{global_vars.user_folder_dir}{os.sep}core{os.sep}log"
             size = tools_os.get_folder_size(log_folder)
             log_folder_volume = f"{round(size / (1024 * 1024), 2)} MB"
             icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}102.png"
@@ -144,7 +144,7 @@ class GwMenuLoad(QObject):
     def _open_config_path(self):
         """ Opens the OS-specific Config directory """
 
-        path = os.path.realpath(lib_vars.user_folder_dir)
+        path = os.path.realpath(global_vars.user_folder_dir)
         status, message = tools_os.open_file(path)
         if status is False and message is not None:
             tools_qgis.show_warning(message, parameter=path)
@@ -153,7 +153,7 @@ class GwMenuLoad(QObject):
     def _open_plugin_path(self):
         """ Opens the OS-specific Plugin directory """
 
-        path = os.path.realpath(lib_vars.plugin_dir)
+        path = os.path.realpath(global_vars.plugin_dir)
         status, message = tools_os.open_file(path)
         if status is False and message is not None:
             tools_qgis.show_warning(message, parameter=path)
@@ -205,14 +205,14 @@ class GwMenuLoad(QObject):
         self.tree_config_files.itemDoubleClicked.connect(partial(self._double_click_event))
         self.tree_config_files.itemChanged.connect(partial(self._set_config_value))
 
-        path = f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}config"
+        path = f"{global_vars.user_folder_dir}{os.sep}core{os.sep}config"
         files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
         for file in files:
             item = QTreeWidgetItem([f"{file}"])
 
             project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater")
             parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True, strict=False)
-            parser.read(f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}config{os.sep}{file}")
+            parser.read(f"{global_vars.user_folder_dir}{os.sep}core{os.sep}config{os.sep}{file}")
 
             # For each section we create a sub-item and add all the parameters to that sub-item
             for section in parser.sections():
@@ -278,8 +278,8 @@ class GwMenuLoad(QObject):
 
     def _open_current_selections(self):
 
-        if lib_vars.session_vars['current_selections']:
-            global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, lib_vars.session_vars['current_selections'])
+        if global_vars.session_vars['current_selections']:
+            global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, global_vars.session_vars['current_selections'])
 
 
     def _reset_plugin(self):
@@ -305,7 +305,7 @@ class GwMenuLoad(QObject):
             except RuntimeError:
                 pass
 
-        schema_name = lib_vars.schema_name.replace('"', '')
+        schema_name = global_vars.schema_name.replace('"', '')
         sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
                f"UNION "
                f"SELECT DISTINCT(child_layer) FROM cat_feature "
@@ -314,8 +314,8 @@ class GwMenuLoad(QObject):
                f"     WHERE table_schema = '{schema_name}')")
         rows = tools_db.get_rows(sql)
         description = f"ConfigLayerFields"
-        params = {"project_type": global_vars.project_type, "schema_name": lib_vars.schema_name, "db_layers": rows,
-                  "qgis_project_infotype": lib_vars.project_vars['info_type']}
+        params = {"project_type": global_vars.project_type, "schema_name": global_vars.schema_name, "db_layers": rows,
+                  "qgis_project_infotype": global_vars.project_vars['info_type']}
         self.task_get_layers = GwProjectLayersConfig(description, params)
         QgsApplication.taskManager().addTask(self.task_get_layers)
         QgsApplication.taskManager().triggerTask(self.task_get_layers)

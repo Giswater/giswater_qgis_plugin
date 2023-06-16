@@ -15,7 +15,7 @@ __revision__ = '$Format:%H$'
 
 from weakref import WeakKeyDictionary
 from ... import global_vars
-from ...lib import lib_vars, tools_db, tools_log, tools_qt, tools_qgis
+from ...lib import tools_db, tools_log, tools_qt, tools_qgis
 
 
 class GwGenericDescriptor(object):
@@ -229,11 +229,11 @@ class GwTable(object):
 
         # Execute UPSERT
         tools_log.log_info(sql, stack_level_increase=1)
-        result = tools_db.dao.execute_sql(sql, commit)
-        lib_vars.session_vars['last_error'] = tools_db.dao.last_error
+        result = global_vars.dao.execute_sql(sql, commit)
+        global_vars.session_vars['last_error'] = global_vars.dao.last_error
         if not result:
             # Check if any error has been raised
-            if lib_vars.session_vars['last_error']:
-                tools_qt.manage_exception_db(lib_vars.session_vars['last_error'], sql, schema_name=lib_vars.schema_name)
+            if global_vars.session_vars['last_error']:
+                tools_qt.manage_exception_db(global_vars.session_vars['last_error'], sql, schema_name=global_vars.schema_name)
 
         return result

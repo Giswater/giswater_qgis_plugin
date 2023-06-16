@@ -16,7 +16,7 @@ from qgis.PyQt.QtWidgets import QAction
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
-from ...lib import lib_vars, tools_os
+from ...lib import tools_os
 
 
 class GwMaptool(QgsMapTool):
@@ -25,9 +25,9 @@ class GwMaptool(QgsMapTool):
 
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
-        self.schema_name = lib_vars.schema_name
+        self.schema_name = global_vars.schema_name
         self.settings = global_vars.giswater_settings
-        self.plugin_dir = lib_vars.plugin_dir
+        self.plugin_dir = global_vars.plugin_dir
         self.project_type = global_vars.project_type
         self.show_help = tools_gw.get_config_parser('system', 'show_help', "project", "giswater")
         self.layer_arc = None

@@ -22,7 +22,7 @@ from ..shared.selector import GwSelector
 from ..ui.ui_manager import GwSelectorUi, GwMincutUi
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import lib_vars, tools_qgis, tools_qt, tools_db, tools_os
+from ...lib import tools_qgis, tools_qt, tools_db, tools_os
 
 
 class GwMincutTools:
@@ -31,8 +31,8 @@ class GwMincutTools:
 
         self.mincut = mincut
         self.canvas = global_vars.canvas
-        self.plugin_dir = lib_vars.plugin_dir
-        self.schema_name = lib_vars.schema_name
+        self.plugin_dir = global_vars.plugin_dir
+        self.schema_name = global_vars.schema_name
         self.settings = global_vars.giswater_settings
 
         self.rubber_band = tools_gw.create_rubberband(self.canvas, 0)

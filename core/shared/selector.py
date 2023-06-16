@@ -15,7 +15,7 @@ from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QLineEdit, QSize
 from ..ui.ui_manager import GwSelectorUi
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import lib_vars, tools_qgis, tools_qt, tools_os, tools_db
+from ...lib import tools_qgis, tools_qt, tools_os, tools_db
 
 
 class GwSelector:
@@ -51,7 +51,7 @@ class GwSelector:
         current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
         self.get_selector(dlg_selector, selector_type, current_tab=current_tab)
 
-        if lib_vars.session_vars['dialog_docker']:
+        if global_vars.session_vars['dialog_docker']:
             tools_gw.docker_dialog(dlg_selector)
             dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_docker, option_name='position'))
 
@@ -324,7 +324,7 @@ class GwSelector:
         index = dialog.main_tab.currentIndex()
         tab_name = dialog.main_tab.widget(index).objectName()
         selector_type = dialog.main_tab.widget(index).property("selector_type")
-        qgis_project_add_schema = lib_vars.project_vars['add_schema']
+        qgis_project_add_schema = global_vars.project_vars['add_schema']
         widget_all = dialog.findChild(QCheckBox, f'chk_all_{tab_name}')
 
         if widget_all is None or (widget_all is not None and widget.objectName() != widget_all.objectName()):

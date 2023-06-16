@@ -11,7 +11,7 @@ from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QIcon
 
 from ... import global_vars
-from ...lib import lib_vars, tools_qgis
+from ...lib import tools_qgis
 
 
 class GwAction:
@@ -20,9 +20,9 @@ class GwAction:
 
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
-        self.schema_name = lib_vars.schema_name
+        self.schema_name = global_vars.schema_name
         self.settings = global_vars.giswater_settings
-        self.plugin_dir = lib_vars.plugin_dir
+        self.plugin_dir = global_vars.plugin_dir
         self.project_type = global_vars.project_type
 
         icon = None
