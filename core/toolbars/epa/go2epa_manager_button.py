@@ -64,6 +64,7 @@ class GwGo2EpaManagerButton(GwAction):
         selection_model = self.dlg_manager.tbl_rpt_cat_result.selectionModel()
         selection_model.selectionChanged.connect(partial(self._fill_txt_infolog))
         selection_model.selectionChanged.connect(partial(self._enable_btn_corporate))
+        self.dlg_manager.tbl_rpt_cat_result.doubleClicked.connect(partial(self._set_result_id, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
         self.dlg_manager.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_manager))
         self.dlg_manager.rejected.connect(partial(tools_gw.close_dialog, self.dlg_manager))
         self.dlg_manager.txt_result_id.textChanged.connect(partial(self._fill_manager_table))
@@ -320,4 +321,15 @@ class GwGo2EpaManagerButton(GwAction):
         # Refresh table
         self._fill_manager_table()
 
+    def _set_result_id(self, dialog, widget):
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=dialog)
+            return
+
+        row = selected_list[0].row()
+        table_model = widget.model()
+        result_id = table_model.data(table_model.index(row, 0))
+        tools_gw.set_config_parser('btn_go2epa_selector', 'rpt_selector_result', f'{result_id}')
     # endregion
