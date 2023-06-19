@@ -361,7 +361,7 @@ BEGIN
 
 					IF v_link.the_geom IS NULL THEN
 						-- create link geom
-						v_link.the_geom := st_setsrid(ST_makeline(v_connect.the_geom, v_point_aux), 25831);
+						v_link.the_geom := st_setsrid(ST_makeline(v_connect.the_geom, v_point_aux), SRID_VALUE);
 					
 						IF v_projecttype = 'WS' AND v_check_arcdnom_status IS TRUE THEN	
 							INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
