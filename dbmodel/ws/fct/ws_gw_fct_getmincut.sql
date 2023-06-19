@@ -346,7 +346,8 @@ BEGIN
               '"valveNot":'||v_result_valve_not_proposed||','||
               '"node":'||v_result_node||','||
               '"connec":'||v_result_connec||','||
-              '"arc":'||v_result_arc|| '
+              '"arc":'||v_result_arc||','||
+			  '"tiled":'||v_tiled|| '
           }
         }
         }';

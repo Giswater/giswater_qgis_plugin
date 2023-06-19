@@ -319,7 +319,8 @@ BEGIN
 			  '"valve":'||v_result_valve||','||
 			  '"node":'||v_result_node||','||
 			  '"connec":'||v_result_connec||','||
-			  '"arc":'||v_result_arc|| '
+			  '"arc":'||v_result_arc||','||
+			  '"tiled":'||v_tiled|| '
 	      }
 	    }
 	}');
