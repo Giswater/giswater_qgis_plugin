@@ -479,7 +479,7 @@ VALUES ('inp_lid', 'form_feature', 'main','active','boolean','check','active',fa
 
 -- search
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) 
-    VALUES('basic_search_v2_network_gully', '{"sys_display_name":"concat(gully_id, '' : '', gratecat_id)", "sys_tablename":"v_edit_gully", "sys_pk":"gully_id", "sys_fct":"gw_fct_getinfofromid", "sys_filter":""}', 'Search configuration parameteres', 'Gully:', NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    VALUES('basic_search_v2_tab_network_gully', '{"sys_display_name":"concat(gully_id, '' : '', gratecat_id)", "sys_tablename":"v_edit_gully", "sys_pk":"gully_id", "sys_fct":"gw_fct_getinfofromid", "sys_filter":""}', 'Search configuration parameteres', 'Gully:', NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 DELETE FROM config_toolbox where id IN (SELECT id FROM sys_function WHERE project_type  ='ws');
 

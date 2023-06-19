@@ -113,15 +113,15 @@ BEGIN
 	    
 		for rec_tab in SELECT * FROM config_form_tabs WHERE formname='search' order by orderby
 		loop	
-			for v_parameter, v_tab_params, v_label in select parameter, value, label from config_param_system where parameter ilike concat('basic_search_v2_', lower(rec_tab.label), '%')
+			for v_parameter, v_tab_params, v_label in select parameter, value, label from config_param_system where parameter ilike concat('basic_search_v2_', lower(rec_tab.tabname), '%')
 			loop
-				if v_parameter = 'basic_search_v2_psector' and v_tiled is true then
+				if v_parameter = 'basic_search_v2_tab_psector' and v_tiled is true then
 					continue;
 				end if;
 				
 				v_filter_list = string_to_array(v_tab_params->>'sys_display_name', ',');
 				
-				if v_parameter = 'basic_search_v2_address' then
+				if v_parameter = 'basic_search_v2_tab_address' then
 					
 					v_sql = 'SELECT count(*) as count FROM '||quote_ident(v_tab_params->>'sys_tablename_aux')||'';
 					execute 'SELECT split_part('||QUOTE_LITERAL(v_filter)||', '','', 1)' into v_filter_split;

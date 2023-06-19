@@ -1271,7 +1271,7 @@ WHERE listname = 'tbl_hydrometer_value';
 
 -- search
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) 
-    VALUES('basic_search_v2_mincut', '{"sys_display_name": "concat(id, '' - '', street_name,'', '',  postnumber, '' - '', state_name)","sys_tablename": "vu_om_mincut","sys_filter": "state = 0 OR state = 1","sys_orderby": "id","sys_pk": "id","sys_fct": "gw_fct_getmincut"}', 'Search configuration parameteres', 'Mincut:', NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    VALUES('basic_search_v2_tab_mincut', '{"sys_display_name": "concat(id, '' - '', street_name,'', '',  postnumber, '' - '', state_name)","sys_tablename": "vu_om_mincut","sys_filter": "state = 0 OR state = 1","sys_orderby": "id","sys_pk": "id","sys_fct": "gw_fct_getmincut"}', 'Search configuration parameteres', 'Mincut:', NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- 2023/05/03
 UPDATE config_form_fields 

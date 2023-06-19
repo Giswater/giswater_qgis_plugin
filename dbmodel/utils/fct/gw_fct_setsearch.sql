@@ -178,25 +178,25 @@ BEGIN
 		v_filter_value = v_value;
 		end if;
 
-		if v_section ilike 'basic_search_v2_network%' then
+		if v_section ilike 'basic_search_v2_tab_network%' then
 			EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM '||quote_ident(v_table_name)||
 			' WHERE '||quote_ident(v_filter_key)||' = ('||quote_nullable(v_filter_value)||'))row'
 			INTO v_geometry;
-		elsif v_section = 'basic_search_v2_address' and v_search_add = 'true' then
+		elsif v_section = 'basic_search_v2_tab_address' and v_search_add = 'true' then
 
 			EXECUTE 'SELECT row_to_json(row) FROM (SELECT st_x (a.the_geom) as xcoord, st_y (a.the_geom) as  ycoord, St_AsText(a.the_geom) FROM v_ext_streetaxis s join ext_municipality m using(muni_id) join v_ext_address a on s.id = a.streetaxis_id
 			 WHERE concat(s.name, '', '', m.name, '', '', a.postnumber) = ('||quote_nullable(v_filter_value)||'))row'
 			INTO v_geometry;
 
-		elsif v_section = 'basic_search_v2_address' then
+		elsif v_section = 'basic_search_v2_tab_address' then
 			EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM v_ext_streetaxis '||
 			' s WHERE '||v_filter_key||' = ('||quote_nullable(v_filter_value)||'))row'
 			INTO v_geometry;
-		elsif v_section = 'basic_search_v2_psector' then
+		elsif v_section = 'basic_search_v2_tab_psector' then
 			EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM '||quote_ident(v_table_name)||
 			' WHERE '||quote_ident(v_filter_key)||' = ('||quote_nullable(v_filter_value)||'))row'
 			INTO v_geometry;
-		elsif v_section = 'basic_search_v2_hydrometer' then
+		elsif v_section = 'basic_search_v2_tab_hydrometer' then
 			EXECUTE 'SELECT feature_id FROM '||quote_ident(v_table_name)||
 			' WHERE '||quote_ident(v_filter_key)||' = ('||quote_nullable(v_filter_value)||')'
 			INTO v_result;
@@ -204,7 +204,7 @@ BEGIN
 			EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM v_edit_connec
 			WHERE feature_id = ('||quote_nullable(v_result)||'))row'
 			INTO v_geometry;
-		elsif v_section = 'basic_search_v2_workcat' then
+		elsif v_section = 'basic_search_v2_tab_workcat' then
 
 			execute 'SELECT row_to_json(row) FROM (SELECT 
 				CASE
