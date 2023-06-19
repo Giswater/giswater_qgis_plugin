@@ -78,7 +78,7 @@ BEGIN
 
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
-  
+
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_version;
@@ -100,11 +100,11 @@ BEGIN
 			v_epa_user = (SELECT result_id FROM rpt_cat_result LIMIT 1);
 		END IF;
 	END IF;
-	
+
 	-- get om toolbox parameters
 	v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 			 SELECT config_toolbox.id, alias, function_name as functionname
-			 FROM sys_function 
+			 FROM sys_function
 			 JOIN config_toolbox USING (id)
 			 WHERE alias ILIKE ''%', v_filter ,'%'' AND sys_role =''role_om'' AND config_toolbox.active IS TRUE
 			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
@@ -142,7 +142,7 @@ BEGIN
 	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 30);
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 	EXECUTE v_querystring INTO v_epa_fields;
-	
+
 	-- get master toolbox parameters
 	v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 			 SELECT config_toolbox.id, alias, function_name as functionname
@@ -166,7 +166,7 @@ BEGIN
 			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
 			 AND (project_type=',quote_literal(v_projectype),' or project_type=''utils'')
 			 AND ',v_device,' = ANY(device)) a');
-			 
+
 	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
 	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 50);
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
@@ -178,7 +178,7 @@ BEGIN
 			 FROM config_report
 			 WHERE sys_role = ''role_basic''
 			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-			 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE ORDER BY id) a');
+			 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE AND ',v_device,' = ANT(device) ORDER BY id) a');
 
 	EXECUTE v_querystring INTO v_reports_basic;
 
@@ -187,7 +187,7 @@ BEGIN
 			 FROM config_report
 			 WHERE sys_role = ''role_om''
 			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-			 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE ORDER BY id) a');
+			 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE AND ',v_device,' = ANT(device) ORDER BY id) a');
 
 	EXECUTE v_querystring INTO v_reports_om;
 
@@ -196,7 +196,7 @@ BEGIN
 			 FROM config_report
 			 WHERE sys_role = ''role_edit''
 			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-			 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE ORDER BY id) a');
+			 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE AND ',v_device,' = ANT(device) ORDER BY id) a');
 
 	EXECUTE v_querystring INTO v_reports_edit;
 
@@ -205,7 +205,7 @@ BEGIN
 			 FROM config_report
 			 WHERE sys_role = ''role_epa''
 			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-			 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE ORDER BY id) a');
+			 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE AND ',v_device,' = ANT(device) ORDER BY id) a');
 
 	EXECUTE v_querystring INTO v_reports_epa;
 
@@ -214,7 +214,7 @@ BEGIN
 			 FROM config_report
 			 WHERE sys_role = ''role_master''
 			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-			 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE ORDER BY id) a');
+			 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE AND ',v_device,' = ANT(device) ORDER BY id) a');
 
 	EXECUTE v_querystring INTO v_reports_master;
 
@@ -223,7 +223,7 @@ BEGIN
 			 FROM config_report
 			 WHERE sys_role = ''role_admin''
 			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-			 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE ORDER BY id) a');
+			 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE AND ',v_device,' = ANT(device) ORDER BY id) a');
 
 	EXECUTE v_querystring INTO v_reports_admin;
 
@@ -235,7 +235,7 @@ BEGIN
 	'admin', v_reports_admin)) INTO v_reports;
 
 --    Control NULL's
-	SELECT json_strip_nulls(json_build_object('om', v_om_fields, 
+	SELECT json_strip_nulls(json_build_object('om', v_om_fields,
 	'edit', v_edit_fields,
 	'epa', v_epa_fields,
 	'master', v_master_fields,
@@ -251,7 +251,7 @@ BEGIN
 				', "reports":{"fields":'||v_reports||'}}}}';
 
 	RETURN v_return;
-       
+
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;

@@ -1672,3 +1672,8 @@ UPDATE sys_style SET stylevalue =
 </qgis>
 '
 WHERE id = 204;
+
+-- 19/06/23
+UPDATE ws_36.config_report
+SET device='{4}'
+WHERE id in (102,103,104);
