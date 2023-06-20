@@ -1892,7 +1892,10 @@ class GwInfo(QObject):
         # Tab EPA
         if not generic and self.my_json_epa != '' and str(self.my_json_epa) != '{}':
             feature = f'"id":"{self.feature_id}", '
-            epa_table_id = 've_epa_' + tools_qt.get_text(dialog, 'tab_data_epa_type').lower()
+            epa_type = tools_qt.get_text(dialog, 'tab_data_epa_type').lower()
+            epa_table_id = 've_epa_' + epa_type
+            if global_vars.project_type == 'ws' and self.feature_type == 'connec' and epa_type == 'junction':
+                epa_table_id = 've_epa_connec'
             my_json = json.dumps(self.my_json_epa)
             feature += f'"tableName":"{epa_table_id}", '
             feature += f' "featureType":"{self.feature_type}" '
