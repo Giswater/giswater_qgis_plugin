@@ -979,15 +979,14 @@ BEGIN
 		)a where t.arc_id = a.link_id::text AND t.node_1 = a.connec_id;
 	ELSE
 		INSERT INTO temp_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '417', l.sector_id, l.state, l.the_geom 
-		FROM v_edit_link l JOIN connec c ON feature_id = connec_id WHERE l.state = 1 and l.feature_type = 'CONNEC';
+		FROM link l JOIN connec c ON feature_id = connec_id WHERE l.state = 1 and l.feature_type = 'CONNEC';
 
 		UPDATE temp_arc t SET node_1 = connec_id, state = 9 FROM (
-		SELECT l.link_id, c.connec_id, (ST_Distance(c.the_geom, ST_startpoint(l.the_geom))) as d FROM connec c, v_edit_link l
+		SELECT l.link_id, c.connec_id, (ST_Distance(c.the_geom, ST_startpoint(l.the_geom))) as d FROM connec c, link l
 		WHERE l.state = 1 and c.state = 1 and ST_DWithin(ST_startpoint(l.the_geom), c.the_geom, 0.05) group by 1,2,3 ORDER BY 1 DESC,3 DESC
 		)a where t.arc_id = a.link_id::text AND t.node_1 = a.connec_id;
 	END IF;
 		
-
 
 	EXECUTE 'SELECT count(*) FROM temp_arc WHERE state = 1'
 	INTO v_count;
@@ -1016,10 +1015,10 @@ BEGIN
 			)a where t.arc_id = a.link_id::text AND t.node_1 = a.gully_id;
 		ELSE
 			INSERT INTO temp_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '418', l.sector_id, l.state, l.the_geom 
-			FROM v_edit_link l JOIN v_edit_gully g ON feature_id = gully_id WHERE l.state = 1 and l.feature_type = 'GULLY' ;
+			FROM link l JOIN gully g ON feature_id = gully_id WHERE l.state = 1 and l.feature_type = 'GULLY' ;
 
 			UPDATE temp_arc t SET node_1 = gully_id, state = 9 FROM (
-			SELECT l.link_id, g.gully_id, (ST_Distance(g.the_geom, ST_startpoint(l.the_geom))) as d FROM v_edit_gully g, v_edit_link l
+			SELECT l.link_id, g.gully_id, (ST_Distance(g.the_geom, ST_startpoint(l.the_geom))) as d FROM gully g, link l
 			WHERE l.state = 1 and g.state = 1 and ST_DWithin(ST_startpoint(l.the_geom), g.the_geom, 0.05) group by 1,2,3 ORDER BY 1 DESC,3 DESC
 			)a where t.arc_id = a.link_id::text AND t.node_1 = a.gully_id;
 		END IF;

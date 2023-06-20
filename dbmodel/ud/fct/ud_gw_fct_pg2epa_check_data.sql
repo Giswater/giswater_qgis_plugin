@@ -436,7 +436,7 @@ BEGIN
 	RAISE NOTICE '19 - Check flow regulator length fits on destination arc (427)';
 
 	v_querytext = 'SELECT 427, nodarc_id, ''Orifice flow regulator length do not respect the minimum length for target arc'', f.the_geom FROM selector_sector s, v_edit_inp_flwreg_orifice f
-			JOIN v_edit_node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
+			JOIN node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
 			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength||' > st_length(a.the_geom)';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -454,7 +454,7 @@ BEGIN
 	END IF;	
 
 	v_querytext = 'SELECT 427, nodarc_id, ''Weir flow regulator length do not respect the minimum length for target arc'', f.the_geom FROM selector_sector s, v_edit_inp_flwreg_weir f
-			JOIN v_edit_node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
+			JOIN node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
 			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength||' > st_length(a.the_geom)';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -472,7 +472,7 @@ BEGIN
 	END IF;	
 
 	v_querytext = 'SELECT 427, nodarc_id, ''Outlet flow regulator length do not respect the minimum length for target arc'', f.the_geom FROM selector_sector s, v_edit_inp_flwreg_pump f
-			JOIN v_edit_node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
+			JOIN node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
 			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength||' > st_length(a.the_geom)';
 
 
@@ -491,7 +491,7 @@ BEGIN
 	END IF;	
 
 	v_querytext = 'SELECT 427, nodarc_id, ''Pump flow regulator length do not respect the minimum length for target arc'', f.the_geom FROM selector_sector s, v_edit_inp_flwreg_outlet f
-			JOIN v_edit_node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
+			JOIN node n USING (node_id) JOIN arc a ON a.arc_id = to_arc 
 			WHERE n.sector_id = s.sector_id AND cur_user=current_user AND flwreg_length + '||v_minlength||' > st_length(a.the_geom)';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
