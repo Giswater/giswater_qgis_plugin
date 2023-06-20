@@ -221,19 +221,44 @@ BEGIN
 		-- FEATURE INSERT      
 		INSERT INTO element (element_id, code, elementcat_id, serial_number, "state", state_type, observ, "comment", function_type, category_type, location_type, 
 		workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, rotation, link, verified, the_geom, label_x, label_y, label_rotation, publish, 
-		inventory, undelete, expl_id, num_elements, pol_id)
+		inventory, undelete, expl_id, num_elements, pol_id, expl_id2)
 		VALUES (NEW.element_id, NEW.code, NEW.elementcat_id, NEW.serial_number, NEW."state", NEW.state_type, NEW.observ, NEW."comment", 
 		NEW.function_type, NEW.category_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, 
 		NEW.ownercat_id, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.label_x, NEW.label_y, NEW.label_rotation, NEW.publish, 
-		NEW.inventory, NEW.undelete, NEW.expl_id, NEW.num_elements, v_new_pol_id);
+		NEW.inventory, NEW.undelete, NEW.expl_id, NEW.num_elements, v_new_pol_id, NEW.expl_id2);
 
 		-- update element_x_feature table
 		IF v_tablefeature IS NOT NULL AND v_feature IS NOT NULL THEN
 			EXECUTE 'INSERT INTO element_x_'||v_tablefeature||' ('||v_tablefeature||'_id, element_id) VALUES ('||v_feature||','||NEW.element_id||') ON CONFLICT 
 			('||v_tablefeature||'_id, element_id) DO NOTHING';
 		END IF;
-			
-		RETURN NEW;			
+		
+		IF v_project_type = 'WS' THEN
+
+			--elevation from raster
+			IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE 
+			 AND (NEW.elevation IS NULL) AND
+			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_insert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
+				NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM v_ext_raster_dem WHERE id =
+					(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
+			END IF;
+
+			UPDATE element SET elevation = NEW.elevation WHERE element_id = NEW.element_id;
+		ELSIF v_project_type = 'UD' THEN
+
+				--elevation from raster
+			IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE 
+			AND (NEW.top_elev IS NULL) AND
+			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_insert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
+				NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM v_ext_raster_dem WHERE id =
+					(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
+			END IF; 
+
+			UPDATE element SET top_elevation = NEW.top_elevation WHERE element_id = NEW.element_id;
+		END IF;
+
+		RETURN NEW;	
+
 
 	-- UPDATE
 	ELSIF TG_OP = 'UPDATE' THEN
@@ -246,6 +271,36 @@ BEGIN
 		lastupdate=now(), lastupdate_user=current_user
 		WHERE element_id=OLD.element_id;
 
+		IF v_project_type = 'WS' THEN
+				-- UPDATE geom
+			IF st_equals(NEW.the_geom, OLD.the_geom) IS FALSE AND geometrytype(NEW.the_geom)='POINT'  THEN
+
+				--update elevation from raster
+				IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE 	
+				AND (NEW.elevation = OLD.elevation) AND
+				(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_update_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
+					NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM v_ext_raster_dem WHERE id =
+								(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
+				END IF;	
+			END IF;
+
+			UPDATE element SET elevation = NEW.elevation WHERE element_id = OLD.element_id;
+		ELSIF v_project_type = 'UD' THEN
+
+				-- UPDATE geom
+			IF st_equals( NEW.the_geom, OLD.the_geom) IS FALSE THEN
+
+				--update elevation from raster
+				IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE 
+				AND (NEW.top_elev = OLD.top_elev) AND
+				(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_update_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
+					NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM v_ext_raster_dem WHERE id =
+								(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
+				END IF;	
+			END IF;
+			UPDATE element SET top_elevation = NEW.top_elevation WHERE element_id = OLD.element_id;
+		END IF;
+		
 		--set rotation field
 		WITH index_query AS(
 		SELECT ST_Distance(the_geom, NEW.the_geom) as distance, the_geom FROM arc WHERE state=1 ORDER BY the_geom <-> NEW.the_geom LIMIT 10)
