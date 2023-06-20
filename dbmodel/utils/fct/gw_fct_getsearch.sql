@@ -111,7 +111,7 @@ BEGIN
 		-- profilactic control if table selector_expl is empty
 		IF (SELECT count(*) FROM selector_expl WHERE cur_user = current_user) = 0 THEN INSERT INTO selector_expl VALUES(0,current_user); END IF;
 	    
-		for rec_tab in SELECT * FROM config_form_tabs WHERE formname='search' order by orderby
+		for rec_tab in SELECT * FROM config_form_tabs WHERE formname='search' and v_device = ANY(device) order by orderby
 		loop	
 			for v_parameter, v_tab_params, v_label in select parameter, value, label from config_param_system where parameter ilike concat('basic_search_v2_', lower(rec_tab.tabname), '%')
 			loop
@@ -213,7 +213,7 @@ BEGIN
 		-- Create tabs array
 		v_form := '[';
 	
-		FOR rec_order IN (SELECT tabname FROM  config_form_tabs WHERE formname='search' order by orderby) LOOP
+		FOR rec_order IN (SELECT tabname FROM  config_form_tabs WHERE formname='search' and v_device = ANY(device) order by orderby) LOOP
 	
 		IF rec_order ='tab_network' THEN 	
 			-- Network Tab
