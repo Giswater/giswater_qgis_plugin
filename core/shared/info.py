@@ -2185,6 +2185,8 @@ class GwInfo(QObject):
             return
 
         tablename = 've_epa_' + epa_type.lower()
+        if global_vars.project_type == 'ws' and self.feature_type == 'connec' and epa_type.lower() == 'junction':
+            tablename = 've_epa_connec'
         feature = f'"tableName":"{tablename}", "id":"{self.feature_id}", "epaType": "{epa_type}"'
         body = tools_gw.create_body(feature=feature)
         function_name = 'gw_fct_getinfofromid'
