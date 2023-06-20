@@ -151,25 +151,6 @@ BEGIN
 
 	ELSIF p_formname ILIKE 've%' or p_formname ILIKE 'v_edit%' THEN
 
-        -- don't get epa widgets for v_edit% forms
-		IF p_formname ILIKE 've%' THEN
-            IF p_tgop = 'INSERT' THEN
-                v_featuretype = lower(replace(p_idname,'_id',''));
-                EXECUTE 'SELECT concat(''ve_epa_'',lower(epa_default)) 
-                FROM cat_feature cf
-                JOIN cat_feature_'||v_featuretype||' f ON cf.id = f.id
-                WHERE child_layer = '||quote_literal(p_formname)||''
-                INTO v_epa_table;
-                
-            ELSIF p_tgop='UPDATE' THEN
-                IF p_idname = 'connec_id' THEN
-                    v_epa_table='ve_epa_connec';
-                ELSE
-                    v_epa_table=concat('ve_epa_',lower(json_extract_path_text(p_values_array,'epa_type')));
-                END IF;
-            END IF;
-        END IF;
-		
 		v_orderby = 'layoutname, layoutorder';
 		IF p_device = 5 THEN 
 			v_orderby = 'web_layoutorder'; 
