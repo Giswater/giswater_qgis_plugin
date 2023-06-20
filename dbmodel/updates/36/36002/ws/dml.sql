@@ -1677,3 +1677,13 @@ WHERE id = 204;
 UPDATE config_report
 SET device='{4}'
 WHERE id in (102,103,104);
+
+
+UPDATE config_form_fields SET dv_isnullvalue = true,
+dv_querytext = 'SELECT DISTINCT (id) AS id, idval AS idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_status_pipe'' and id =''CV'''
+WHERE formname in ('v_edit_inp_shortpipe', 'v_edit_inp_dscenario_shortpipe','ve_epa_shortpipe') and columnname = 'status';
+
+UPDATE config_form_fields SET dv_isnullvalue = true,
+dv_querytext = 
+'SELECT DISTINCT (id) AS id,  idval  AS idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_status_valve'' and id = ''ACTIVE'''
+WHERE formname in ('v_edit_inp_shortpipe', 'v_edit_inp_dscenario_valve','ve_epa_valve') and columnname = 'status';
