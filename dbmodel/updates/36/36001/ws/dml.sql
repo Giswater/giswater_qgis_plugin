@@ -1689,7 +1689,7 @@ SET hidden = true
 WHERE formname = 'v_edit_inp_dscenario_pump_additional' AND columnname = 'overflow';
 
 UPDATE config_form_fields 
-SET layoutorder = (SELECT c.ordinal_position FROM information_schema.columns c WHERE c.table_schema = 'ws_36' AND c.table_name = 'v_edit_inp_pump_additional' AND c.column_name = columnname LIMIT 1)
+SET layoutorder = (SELECT c.ordinal_position FROM information_schema.columns c WHERE c.table_schema = 'SCHEMA_NAME' AND c.table_name = 'v_edit_inp_pump_additional' AND c.column_name = columnname LIMIT 1)
 WHERE formname = 'v_edit_inp_pump_additional';
 
 -- insert dscenario demand & pump tables into config_form_tableview
