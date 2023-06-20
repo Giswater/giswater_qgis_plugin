@@ -13,13 +13,13 @@ RETURNS json AS
 
 $BODY$
 /*
-
-SELECT SCHEMA_NAME.gw_fct_node_interpolate ('{"data":{"parameters":{"action":"MASSIVE-INTERPOLATE", "x":419020.041, "y":4576377.49, "node1":"77", "node2":"75"}}}')
+SELECT SCHEMA_NAME.gw_fct_node_interpolate ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+ "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"action":"INTERPOLATE""x":419161.98499003565, "y":4576782.72778585, "node1":"117", "node2":"119"}}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_node_interpolate ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"action":"EXTRAPOLATE", "x":419161.98499003565, "y":4576782.72778585, "node1":"117", "node2":"119"}}}$$);
 
-SELECT * FROM audit_check_data WHERE fid=213
+SELECT * FROM audit_check_data WHERE fid=213 
 
 --fid: 213
  
@@ -92,7 +92,15 @@ BEGIN
 	-- get system variables
 	SELECT  giswater, upper(project_type) INTO v_version, v_project FROM sys_version order by id desc limit 1;
 	SELECT value INTO v_value FROM config_param_user WHERE parameter = 'edit_node_interpolate' AND cur_user = current_user;
-	v_srid = (SELECT epsg FROM SCHEMA_NAME.sys_version limit 1);
+	v_srid = (SELECT epsg FROM sys_version limit 1);
+
+	-- get parameters
+	p_x = (((p_data ->>'data')::json->>'parameters')::json->>'x')::float;
+	p_y = (((p_data ->>'data')::json->>'parameters')::json->>'y')::float;
+	p_node1 = (((p_data ->>'data')::json->>'parameters')::json->>'node1')::text;
+	p_node2 = (((p_data ->>'data')::json->>'parameters')::json->>'node2')::text;
+	p_action = (((p_data ->>'data')::json->>'parameters')::json->>'action');
+	v_node  = (((p_data ->>'data')::json->>'parameters')::json->>'TargetNode');
 
 	IF v_project='UD' THEN
 		v_top_status := (v_value->>'topElev')::json->>'status';
@@ -108,13 +116,6 @@ BEGIN
 		v_col_top = (v_value->>'elevation')::json->>'column';
 		v_col_ymax = (v_value->>'depth')::json->>'column';
 	END IF;
-
-	-- get parameters
-	p_x = (((p_data ->>'data')::json->>'parameters')::json->>'x')::float;
-	p_y = (((p_data ->>'data')::json->>'parameters')::json->>'y')::float;
-	p_node1 = (((p_data ->>'data')::json->>'parameters')::json->>'node1')::text;
-	p_node2 = (((p_data ->>'data')::json->>'parameters')::json->>'node2')::text;
-	p_action = (((p_data ->>'data')::json->>'parameters')::json->>'action');
 	
 	IF p_action IS NULL THEN 
 		p_action = 'INTERPOLATE';
@@ -124,9 +125,16 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fid=213 AND cur_user=current_user;
 	INSERT INTO audit_check_data (fid, error_message) VALUES (213,  concat('NODE ',upper(p_action),' TOOL'));
 	INSERT INTO audit_check_data (fid, error_message) VALUES (213,  concat('--------------------------------'));
-		
-	-- Make geom point
-	v_geom0:= (SELECT ST_SetSRID(ST_MakePoint(p_x, p_y), v_srid));
+	
+	if v_node is not null and v_node !='' then 
+		v_geom0:= (select the_geom from node where node_id = v_node);
+	else 
+		-- Make geom point
+		v_geom0:= (SELECT ST_SetSRID(ST_MakePoint(p_x, p_y), v_srid));
+		--getting node_id
+		SELECT node_id INTO v_node FROM v_edit_node WHERE st_equals(the_geom, v_geom0) LIMIT 1;
+	end if;
+
 
 	-- Get node1 system values
 	v_geom1:= (SELECT the_geom FROM node WHERE node_id=p_node1);
@@ -159,9 +167,6 @@ BEGIN
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (213, 4, concat('System values of node 2 (',p_node1,') - elevation:',v_top2 , ', depth:', v_depth2));
 	END IF;
-
-	--getting node_id
-	SELECT node_id INTO v_node FROM v_edit_node WHERE st_equals(the_geom, v_geom0) LIMIT 1;
 
 	-- Calculate distances
 	v_distance01 = (SELECT ST_distance (v_geom0 , v_geom1));
