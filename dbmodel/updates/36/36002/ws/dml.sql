@@ -1674,6 +1674,6 @@ UPDATE sys_style SET stylevalue =
 WHERE id = 204;
 
 -- 19/06/23
-UPDATE ws_36.config_report
+UPDATE config_report
 SET device='{4}'
 WHERE id in (102,103,104);
