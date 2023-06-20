@@ -2204,6 +2204,10 @@ class GwInfo(QObject):
                     i += 1
             self._manage_dlg_widgets(complet_result, {}, False, reload_epa=True)
             tools_qt.enable_tab_by_tab_name(self.tab_main, 'tab_epa', True)
+            if self.action_edit.isChecked():
+                tools_gw.enable_all(dialog, complet_result['body']['data'])
+            else:
+                tools_gw.enable_widgets(dialog, complet_result['body']['data'], False)
             self._reset_my_json_epa()
             dialog.show()
 
