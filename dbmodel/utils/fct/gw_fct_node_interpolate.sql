@@ -13,8 +13,8 @@ RETURNS json AS
 
 $BODY$
 /*
-SELECT SCHEMA_NAME.gw_fct_node_interpolate ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
- "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"action":"INTERPOLATE""x":419161.98499003565, "y":4576782.72778585, "node1":"117", "node2":"119"}}}$$);
+
+SELECT SCHEMA_NAME.gw_fct_node_interpolate ('{"data":{"parameters":{"action":"MASSIVE-INTERPOLATE", "x":419020.041, "y":4576377.49, "node1":"77", "node2":"75"}}}')
 
 SELECT SCHEMA_NAME.gw_fct_node_interpolate ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"action":"EXTRAPOLATE", "x":419161.98499003565, "y":4576782.72778585, "node1":"117", "node2":"119"}}}$$);
@@ -79,6 +79,9 @@ v_ymax_status boolean;
 v_col_top text;
 v_col_ymax text;
 v_col_elev text; 
+
+v_node text;
+v_querytext text;
 
 
 BEGIN
@@ -157,6 +160,8 @@ BEGIN
 		VALUES (213, 4, concat('System values of node 2 (',p_node1,') - elevation:',v_top2 , ', depth:', v_depth2));
 	END IF;
 
+	--getting node_id
+	SELECT node_id INTO v_node FROM v_edit_node WHERE st_equals(the_geom, v_geom0) LIMIT 1;
 
 	-- Calculate distances
 	v_distance01 = (SELECT ST_distance (v_geom0 , v_geom1));
@@ -166,7 +171,7 @@ BEGIN
 	v_proportion1 = v_distance01 / v_distance012;
 	v_proportion2 = v_distance02 / v_distance012;
 
-	IF p_action =  'INTERPOLATE' THEN
+	IF p_action =  'INTERPOLATE' OR  p_action =  'MASSIVE-INTERPOLATE' THEN
 		-- Calculate interpolation values
 		v_top0 = v_top1 + (v_top2 - v_top1)* v_proportion1;
 		v_elev0 = v_elev1 + (v_elev2 - v_elev1)* v_proportion1;	
@@ -188,17 +193,33 @@ BEGIN
 		IF v_top_status THEN
 			v_top:= (SELECT to_json(v_top0::numeric(12,3)::text));
 			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Top elev:',v_top0::numeric(12,3)::text));
-		
+
+			IF p_action =  'MASSIVE-INTERPOLATE' AND v_node IS NOT NULL THEN
+				v_querytext =  'UPDATE node SET '||v_col_top||' = '||v_top0::numeric(12,3)||' WHERE node_id = '||v_node||'::text';
+				EXECUTE v_querytext;
+			END IF;
 		END IF;
+		
 		IF v_ymax_status THEN
 			v_ymax = (SELECT to_json((v_top0-v_elev0)::numeric(12,3)::text));
 			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Ymax:',(v_top0-v_elev0)::numeric(12,3)::text));
-			
+
+			IF p_action =  'MASSIVE-INTERPOLATE' AND v_node IS NOT NULL THEN
+				v_querytext =  'UPDATE node SET '||v_col_ymax||' = '||(v_top0-v_elev0)::numeric(12,3)||' WHERE node_id = '||v_node||'::text';
+				EXECUTE v_querytext;
+			END IF;
 		END IF;
+		
 		IF v_elev_status THEN
 			v_elev:= (SELECT to_json(v_elev0::numeric(12,3)::text));
 			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Elev:',v_elev0::numeric(12,3)::text));
+
+			IF p_action =  'MASSIVE-INTERPOLATE' AND v_node IS NOT NULL THEN
+				v_querytext =  'UPDATE node SET '||v_col_elev||' = '||v_elev0::numeric(12,3)||' WHERE node_id = '||v_node||'::text';
+				EXECUTE v_querytext;
+			END IF;
 		END IF;
+		
 	ELSE
 		IF v_top_status THEN
 			v_top:= (SELECT to_json(v_top0::numeric(12,3)::text));
@@ -209,6 +230,8 @@ BEGIN
 			v_ymax = (SELECT to_json((v_top0-v_elev0)::numeric(12,3)::text));
 			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Depth:',(v_top0-v_elev0)::numeric(12,3)::text));
 		END IF;
+
+		
 	END IF;
 
 	INSERT INTO audit_check_data (fid,  criticity, error_message) 
@@ -235,6 +258,8 @@ BEGIN
 	ELSE
 		v_result_fields = concat('[{"data_',v_col_top,'":',v_result_top,',"data_',v_col_ymax,'":',v_result_ymax,'}]');
 	END IF;
+
+	raise notice ' v_result_fields %', v_result_fields;
 
 	-- Control NULL's
 	v_version:=COALESCE(v_version,'{}');
