@@ -86,15 +86,17 @@ class GwGo2EpaSelectorButton(GwAction):
                "FROM v_ui_rpt_cat_result WHERE status = 'COMPLETED' ORDER BY result_id")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_go2epa_result.rpt_selector_result_id, rows)
-        tools_qt.set_combo_value(self.dlg_go2epa_result.rpt_selector_result_id,
-                                 tools_gw.get_config_parser('btn_go2epa_selector', 'rpt_selector_result', 'user',
-                                                            'session'), 0)
+        sql2 = "SELECT result_id FROM selector_rpt_main WHERE cur_user = current_user"
+        row = tools_db.get_row(sql2)
+        if row:
+            tools_qt.set_combo_value(self.dlg_go2epa_result.rpt_selector_result_id, row[0], 0)
 
         rows = tools_db.get_rows(sql, add_empty_row=True)
         tools_qt.fill_combo_values(self.dlg_go2epa_result.rpt_selector_compare_id, rows)
-        tools_qt.set_combo_value(self.dlg_go2epa_result.rpt_selector_result_id,
-                                 tools_gw.get_config_parser('btn_go2epa_selector', 'rpt_selector_compare', 'user',
-                                                            'session'), 0)
+        sql2 = "SELECT result_id FROM selector_rpt_compare WHERE cur_user = current_user"
+        row = tools_db.get_row(sql2)
+        if row:
+            tools_qt.set_combo_value(self.dlg_go2epa_result.rpt_selector_compare_id, row[0], 0)
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_go2epa_result, dlg_name='go2epa_selector')
