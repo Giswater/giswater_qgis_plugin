@@ -141,8 +141,8 @@ v_tablename_aux text;
 BEGIN
 	
 	-- Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname := 'SCHEMA_NAME';
+	SET search_path = "ws_36", public;
+	v_schemaname := 'ws_36';
 
 	-- input parameters
 	v_device := (p_data ->> 'client')::json->> 'device';
@@ -211,7 +211,7 @@ BEGIN
 		EXECUTE v_querystring;
 
 		SELECT gw_fct_infofromid(p_data) INTO v_return;
-		SET search_path = 'SCHEMA_NAME', public;
+		SET search_path = 'ws_36', public;
 		EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 		RETURN v_return;
 	END IF;
@@ -469,7 +469,7 @@ BEGIN
 		v_tablename_aux = v_tablename;
 		v_tablename = v_table_epa;
 	end if;
-
+	raise notice 'AA -> %',v_table_child;
 	-- Get tabs for form
 	IF v_isgraphdelimiter THEN
 
@@ -489,11 +489,11 @@ BEGIN
 			'SELECT "tabName", "tabLabel", "tooltip", "tabactions", orderby from(
 			SELECT formname, tabname as "tabName", label as "tabLabel", tooltip as "tooltip", json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as "tabactions", orderby, device
 			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
-			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and formname =',quote_nullable(v_table_parent),'
+			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and (formname =',quote_nullable(v_table_parent),' or formname = ',quote_nullable(v_table_child),')
 			and item_object->>''actionName'' != ''actionGetArcId''
 			and item_object->>''actionName''::text = id group by "formname","tabName", "tabLabel",  "tooltip", "orderby"
 			order by orderby
-			)b WHERE (b.formname =',quote_nullable(v_table_parent),' OR  formname =NULL) and ', v_device,' = any(device) and "tabName" not in (
+			)b WHERE (b.formname =',quote_nullable(v_table_parent),' OR b.formname =',quote_nullable(v_table_child),' OR formname =NULL) and ', v_device,' = any(device) and "tabName" not in (
 			SELECT tabname
 		  	FROM config_form_tabs
 		  	WHERE formname = ',quote_nullable(v_tablename),'))a');
@@ -520,11 +520,11 @@ BEGIN
 			'SELECT "tabName", "tabLabel", "tooltip", "tabactions", orderby from(
 			SELECT formname, tabname as "tabName", label as "tabLabel", tooltip as "tooltip", json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as "tabactions", orderby, device
 			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
-			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and formname =',quote_nullable(v_table_parent),'
+			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and (formname =',quote_nullable(v_table_parent),' or formname = ',quote_nullable(v_table_child),')
 			and item_object->>''actionName'' != ''actionMapZone'' and item_object->>''actionName'' != ''actionGetArcId''
 			and item_object->>''actionName''::text = id group by "formname","tabName", "tabLabel",  "tooltip", "orderby"
 			order by orderby
-			)b WHERE (b.formname =',quote_nullable(v_table_parent),' OR  formname =NULL) and ', v_device,' = any(device) and "tabName" not in (
+			)b WHERE (b.formname =',quote_nullable(v_table_parent),' OR b.formname =',quote_nullable(v_table_child),' OR formname =NULL) and ', v_device,' = any(device) and "tabName" not in (
 			SELECT tabname
 		  	FROM config_form_tabs
 		  	WHERE formname = ',quote_nullable(v_tablename),'))a');
@@ -551,11 +551,11 @@ BEGIN
 			'SELECT "tabName", "tabLabel", "tooltip", "tabactions", orderby from(
 			SELECT formname, tabname as "tabName", label as "tabLabel", tooltip as "tooltip", json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as "tabactions", orderby, device
 			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
-			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and formname =',quote_nullable(v_table_parent),'
+			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and (formname =',quote_nullable(v_table_parent),' or formname = ',quote_nullable(v_table_child),')
 			and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone'' and item_object->>''actionName'' != ''actionGetArcId''
 			and item_object->>''actionName''::text = id group by "formname","tabName", "tabLabel",  "tooltip", "orderby"
 			order by orderby
-			)b WHERE (b.formname =',quote_nullable(v_table_parent),' OR  formname =NULL) and ', v_device,' = any(device) and "tabName" not in (
+			)b WHERE (b.formname =',quote_nullable(v_table_parent),' OR b.formname =',quote_nullable(v_table_child),' OR formname =NULL) and ', v_device,' = any(device) and "tabName" not in (
 			SELECT tabname
 		  	FROM config_form_tabs
 		  	WHERE formname = ',quote_nullable(v_tablename),'))a');
@@ -583,11 +583,11 @@ BEGIN
 			'SELECT "tabName", "tabLabel", "tooltip", "tabactions", orderby from(
 			SELECT formname, tabname as "tabName", label as "tabLabel", tooltip as "tooltip", json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as "tabactions", orderby, device
 			FROM config_form_tabs, config_typevalue, jsonb_array_elements(tabactions::jsonb)
-			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and formname =',quote_nullable(v_table_parent),'
+			with ordinality arr(item_object, position) where typevalue =''formactions_typevalue'' and (formname =',quote_nullable(v_table_parent),' or formname = ',quote_nullable(v_table_child),')
 			and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone''
 			and item_object->>''actionName''::text = id group by "formname","tabName", "tabLabel",  "tooltip", "orderby"
 			order by orderby
-			)b WHERE (b.formname =',quote_nullable(v_table_parent),' OR  formname =NULL) and ', v_device,' = any(device) and "tabName" not in (
+			)b WHERE (b.formname =',quote_nullable(v_table_parent),' OR b.formname =',quote_nullable(v_table_child),' OR formname =NULL) and ', v_device,' = any(device) and "tabName" not in (
 			SELECT tabname
 		  	FROM config_form_tabs
 		  	WHERE formname = ',quote_nullable(v_tablename),'))a');
@@ -597,7 +597,7 @@ BEGIN
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO form_tabs;
 	END IF;
-
+raise notice 'BB -> %',v_querystring;
 	if v_tablename_aux is not null then
 		v_tablename = v_tablename_aux;
 	end if;
@@ -736,7 +736,7 @@ BEGIN
 			IF v_id IS NULL AND v_isepa IS true THEN
 			    v_id = '';
 			ELSIF v_id IS NULL AND v_islayer is not true then
-				v_id = (SELECT nextval('SCHEMA_NAME.urn_id_seq'));
+				v_id = (SELECT nextval('ws_36.urn_id_seq'));
 			END IF;
 
 			RAISE NOTICE 'User has permissions to edit table % using id %', v_tablename, v_id;
