@@ -498,32 +498,6 @@ BEGIN
 
 			IF v_isgwproject THEN -- manage pumps & valves as a reverse nod2arc. It means transforming lines into points reversing sintaxis applied on Giswater exportation
 
-				-- to_arc on pumps
-				UPDATE inp_virtualvalve SET to_arc = b.to_arc FROM
-					(select a.arc_id, n.arc_id AS to_arc from inp_virtualvalve 
-					JOIN arc a USING (arc_id) 
-					JOIN (SELECT arc_id, node_1 FROM arc)n ON a.node_2 = n.node_1
-					WHERE a.arc_id NOT IN (SELECT arc_id FROM inp_virtualvalve WHERE substring(reverse(arc_id),0,2) ~ '^\d+$')
-					AND a.arc_id != n.arc_id)b
-				WHERE  b.arc_id = inp_virtualvalve.arc_id;
-
-				-- to_arc on valves
-				UPDATE inp_virtualvalve SET to_arc = b.to_arc FROM
-					(select a.arc_id, n.arc_id AS to_arc from inp_virtualvalve 
-					JOIN arc a USING (arc_id) 
-					JOIN (SELECT arc_id, node_1 FROM arc UNION SELECT arc_id, node_2 FROM arc)n ON a.node_2 = n.node_1
-					WHERE a.arc_id NOT IN (SELECT arc_id FROM inp_virtualvalve WHERE substring(reverse(arc_id),0,2) ~ '^\d+$')
-					AND a.arc_id != n.arc_id)b
-				WHERE  b.arc_id = inp_virtualvalve.arc_id;
-
-				-- to_arc on pressurepump
-				UPDATE inp_virtualpump SET to_arc = b.to_arc FROM
-					(select a.arc_id, n.arc_id AS to_arc from inp_virtualpump 
-					JOIN arc a USING (arc_id) 
-					JOIN (SELECT arc_id, node_1 FROM arc UNION SELECT arc_id, node_2 FROM arc)n ON a.node_2 = n.node_1
-					WHERE a.arc_id NOT IN (SELECT arc_id FROM inp_virtualpump WHERE substring(reverse(arc_id),0,4) ~ '^\d+$')
-					AND a.arc_id != n.arc_id)b
-				WHERE  b.arc_id = inp_virtualpump.arc_id;
 
 				FOR v_data IN SELECT * FROM arc WHERE arc_id like '%_n2a' OR arc_id like '%_n2a_5'
 				LOOP
@@ -576,12 +550,12 @@ BEGIN
 					EXECUTE 'INSERT INTO man_'||v_mantype||' VALUES ('||quote_literal(v_node_id)||')';
 
 					IF v_epatablename = 'inp_pump' THEN
-						INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern_id, status,  energyvalue, to_arc, pump_type)
-						SELECT v_node_id, power, curve_id, speed, pattern_id, status, energyvalue, to_arc, v_pumptype FROM inp_virtualpump WHERE arc_id=v_data.arc_id;
+						INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern_id, status,  energyvalue, pump_type)
+						SELECT v_node_id, power, curve_id, speed, pattern_id, status, energyvalue, v_pumptype FROM inp_virtualpump WHERE arc_id=v_data.arc_id;
 
 					ELSIF v_epatablename = 'inp_valve' THEN
-						INSERT INTO inp_valve (node_id, valv_type, pressure, custom_dint, flow, coef_loss, curve_id, minorloss, status, to_arc)
-						SELECT v_node_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status, to_arc FROM inp_virtualvalve WHERE arc_id=v_data.arc_id;
+						INSERT INTO inp_valve (node_id, valv_type, pressure, custom_dint, flow, coef_loss, curve_id, minorloss, status)
+						SELECT v_node_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status FROM inp_virtualvalve WHERE arc_id=v_data.arc_id;
 
 					ELSE						
 						INSERT INTO inp_shortpipe (node_id, status) SELECT v_node_id, status FROM inp_pipe WHERE arc_id=v_data.arc_id;
