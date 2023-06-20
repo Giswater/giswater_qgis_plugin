@@ -346,7 +346,8 @@ BEGIN
                 -- update values when geometry is forced to reverse by geom_slp_direction_bool variable on true
                 IF geom_slp_direction_bool IS TRUE THEN
 
-                    IF ((sys_elev1_aux < sys_elev2_aux) AND (NEW.inverted_slope IS NOT TRUE)) OR ((sys_elev1_aux > sys_elev2_aux) AND (NEW.inverted_slope IS TRUE) AND (OLD.inverted_slope IS NOT TRUE)) THEN
+                    IF ((sys_elev1_aux < sys_elev2_aux) AND (NEW.inverted_slope IS NOT TRUE)) 
+                    OR ((sys_elev1_aux > sys_elev2_aux) AND (NEW.inverted_slope IS TRUE)) THEN
                         
                         -- Update conduit direction
                         -- Geometry
