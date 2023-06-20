@@ -331,5 +331,7 @@ class GwGo2EpaManagerButton(GwAction):
         row = selected_list[0].row()
         table_model = widget.model()
         result_id = table_model.data(table_model.index(row, 0))
-        tools_gw.set_config_parser('btn_go2epa_selector', 'rpt_selector_result', f'{result_id}')
+        sql = f"DELETE FROM selector_rpt_main WHERE cur_user = current_user;" \
+              f"INSERT INTO selector_rpt_main (result_id, cur_user) VALUES ('{result_id}', current_user);"
+        tools_db.execute_sql(sql)
     # endregion
