@@ -2634,8 +2634,9 @@ class GwInfo(QObject):
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
             self.tab_element_loaded = True
-        # Tab 'Relations'
+        # Tab 'EPA'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_epa' and not self.tab_epa_loaded:
+            self._reload_epa_tab(dialog)
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
             self.tab_epa_loaded = True
