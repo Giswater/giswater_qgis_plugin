@@ -65,7 +65,7 @@ BEGIN
 	FOREACH v_field IN array v_fields_array
 	LOOP	
 		EXECUTE 'SELECT column_name  FROM information_schema.columns WHERE table_name='''||v_tablename||''' and column_name='''|| replace(v_field, '"','') ||''' LIMIT 1' INTO v_exists;
-		v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'widgetname', 'data_' || replace(v_field, '"',''));
+		v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'widgetname', 'tab_data_' || replace(v_field, '"',''));
 		IF v_exists is not null THEN
 			EXECUTE 'SELECT LOWER(feature_type) FROM cat_feature WHERE child_layer = '''||v_tablename||'''' INTO v_featureType;
 			EXECUTE 'SELECT '|| replace(v_field, '"','') ||' FROM ' || v_tablename ||' WHERE '||v_featureType||'_id = '''|| v_feature_id ||'''' INTO v_result;
