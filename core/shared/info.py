@@ -1122,6 +1122,7 @@ class GwInfo(QObject):
             dlg_interpolate.rejected.connect(partial(self._manage_interpolate_rejected))
             dlg_interpolate.rb_interpolate.clicked.connect(partial(self._change_rb_type, dlg_interpolate, dlg_interpolate.rb_interpolate, complet_result, ep))
             dlg_interpolate.rb_extrapolate.clicked.connect(partial(self._change_rb_type, dlg_interpolate, dlg_interpolate.rb_extrapolate, complet_result, ep))
+            dlg_interpolate.btn_accept.setEnabled(False)
 
             tools_gw.open_dialog(dlg_interpolate, dlg_name='dialog_text')
 
@@ -1195,12 +1196,14 @@ class GwInfo(QObject):
                     self.rb_interpolate.append(rb)
                     dlg_interpolate.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
                     tools_qgis.show_message(message, message_level=0, parameter=self.node1)
+                    dlg_interpolate.btn_accept.setEnabled(False)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
                     tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10)
                     self.rb_interpolate.append(rb)
                     dlg_interpolate.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
                     tools_qgis.show_message(message, message_level=0, parameter=self.node2)
+                    dlg_interpolate.btn_accept.setEnabled(True)
 
         if self.node1 and self.node2:
 
