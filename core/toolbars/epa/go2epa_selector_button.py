@@ -11,7 +11,7 @@ from ..dialog import GwAction
 from ...ui.ui_manager import GwGo2EpaSelectorUi
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import tools_qt, tools_db, tools_qgis
+from ....lib import tools_qt, tools_db, tools_qgis, tools_os
 
 
 class GwGo2EpaSelectorButton(GwAction):
@@ -34,6 +34,10 @@ class GwGo2EpaSelectorButton(GwAction):
     def _load_result_layers(self):
         """ Adds any missing Compare layers to TOC """
 
+        # Manage user variable
+        if not tools_os.set_boolean(tools_gw.get_config_parser('btn_go2epa_selector', 'load_result_layers', "user", "init")):
+            return
+
         filtre = "(id LIKE 'v_rpt_arc%' OR id LIKE 'v_rpt_node%')"
         if global_vars.project_type == 'ud':
             filtre = "id LIKE 'v_rpt_%_sum'"
@@ -51,6 +55,10 @@ class GwGo2EpaSelectorButton(GwAction):
 
     def _load_compare_layers(self):
         """ Adds any missing Compare layers to TOC """
+
+        # Manage user variable
+        if not tools_os.set_boolean(tools_gw.get_config_parser('btn_go2epa_selector', 'load_compare_layers', "user", "init")):
+            return
 
         filtre = 'v_rpt_comp_%'
         if global_vars.project_type == 'ud':
