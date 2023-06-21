@@ -18,6 +18,7 @@ VALUES(496, 'Massive node interpolation', 'utils', NULL, 'core', true, 'Function
 ON CONFLICT (fid) DO NOTHING;
 
 -- 21/06/2023
+-- tab_elements
 UPDATE config_form_fields
 	SET widgetfunction='{
 	  "functionName": "delete_object",
@@ -27,10 +28,7 @@ UPDATE config_form_fields
 	    "sourceview": "element"
 	  }
 	}'::json
-	WHERE (formname='arc' OR formname='connec' OR formname='node')
-		AND formtype='form_feature'
-		AND columnname='delete_element'
-		AND tabname='tab_elements';
+	WHERE formtype='form_feature' AND columnname='delete_element' AND tabname='tab_elements';
 
 UPDATE config_form_fields
 	SET widgetfunction='{
@@ -41,10 +39,7 @@ UPDATE config_form_fields
 	    "sourceview": "element"
 	  }
 	}'::json
-	WHERE (formname='arc' OR formname='connec' OR formname='node')
-		AND formtype='form_feature'
-		AND columnname='insert_element'
-		AND tabname='tab_elements';
+	WHERE formtype='form_feature' AND columnname='insert_element' AND tabname='tab_elements';
 
 UPDATE config_form_fields
 	SET widgetfunction='{
@@ -56,10 +51,7 @@ UPDATE config_form_fields
 	    "sourceview": "element"
 	  }
 	}'::json
-	WHERE (formname='arc' OR formname='connec' OR formname='node')
-		AND formtype='form_feature'
-		AND columnname='new_element'
-		AND tabname='tab_elements';
+	WHERE formtype='form_feature' AND columnname='new_element' AND tabname='tab_elements';
 
 UPDATE config_form_fields
 	SET widgetfunction='{
@@ -71,8 +63,55 @@ UPDATE config_form_fields
 	    "sourceview": "element"
 	  }
 	}'::json
-	WHERE (formname='arc' OR formname='connec' OR formname='node')
-		AND formtype='form_feature'
-		AND columnname='open_element'
-		AND tabname='tab_elements';
+	WHERE formtype='form_feature' AND columnname='open_element' AND tabname='tab_elements';
 
+-- tab_documents
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "delete_object",
+  "parameters": {
+    "columnfind": "feature_id",
+    "targetwidget": "tab_documents_tbl_documents",
+    "sourceview": "doc"
+  }
+}'::json
+	WHERE formtype='form_feature' AND columnname='btn_doc_delete' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "add_object",
+  "parameters": {
+    "sourcewidget": "tab_documents_doc_id",
+    "targetwidget": "tab_documents_tbl_documents",
+    "sourceview": "doc"
+  }
+}'::json
+	WHERE formtype='form_feature' AND columnname='btn_doc_insert' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "manage_document",
+  "parameters": {
+    "sourcewidget": "tab_documents_doc_id",
+    "targetwidget": "tab_documents_tbl_documents",
+    "sourceview": "doc"
+  }
+}'::json
+	WHERE formtype='form_feature' AND columnname='btn_doc_new' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "open_selected_path",
+  "parameters": {
+    "columnfind": "path",
+    "targetwidget": "tab_documents_tbl_documents",
+    "sourceview": "doc"
+  }
+}'::json
+	WHERE formtype='form_feature' AND columnname='open_doc' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "open_selected_path",
+  "parameters": {
+    "targetwidget": "tab_documents_tbl_documents",
+    "columnfind": "path"
+  }
+}'::json
+	WHERE formtype='form_feature' AND columnname='tbl_documents' AND tabname='tab_documents';
