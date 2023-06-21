@@ -230,7 +230,13 @@ BEGIN
 			
 				JOIN cat_work AS b ON d.workcat_id = b.id WHERE b.id::text ILIKE '||quote_nullable(v_filter_value)||' LIMIT 10 )row'
 			into v_geometry;
-			
+		elsif v_section = 'basic_search_v2_tab_coordinates' then
+			v_xcoord = split_part(v_value,',',1);
+			v_ycoord = split_part(v_value,',',2);
+
+			EXECUTE 'SELECT row_to_json(row) FROM (SELECT '||v_xcoord||' as xcoord, '||v_ycoord||' as ycoord, St_AsText(ST_Point('||v_xcoord||','||v_ycoord||')))row'
+			INTO v_geometry;
+
 		end if;
 		
 		v_response = gw_fct_json_object_set_key (v_response, 'geometry', v_geometry);
