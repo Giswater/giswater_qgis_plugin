@@ -473,8 +473,6 @@ BEGIN
 				END IF;
 
 			--  Search in the workcat
-			RAISE NOTICE '1 % 2 % 3 % 4 % 5 %', v_workcat_display_field, v_workcat_layer, v_workcat_id_field, v_workcat_layer, v_filter_text;
-
 			
 			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(c))) 
 				FROM (SELECT b.'||quote_ident(v_workcat_display_field)||' as display_name, '

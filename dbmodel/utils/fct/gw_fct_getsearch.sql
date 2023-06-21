@@ -136,7 +136,6 @@ BEGIN
 				  		
 				  		v_sql = 'SELECT array_to_json(array_agg(a)) FROM (
 						'||(v_sql)::text||' LIMIT 10)a';
-						raise notice 'ASDF -> %',v_sql;
 					  	execute v_sql into v_fields;
 	
 						v_result = gw_fct_json_object_set_key (v_result, 'section', v_parameter);
