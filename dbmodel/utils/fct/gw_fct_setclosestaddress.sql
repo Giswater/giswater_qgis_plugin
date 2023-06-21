@@ -37,6 +37,8 @@ affected_rows numeric;
 v_partialquery text;
 v_partialquery2 text;
 v_partialquery3 text;
+v_expl text;
+v_state text;
 
 BEGIN
 
@@ -64,6 +66,12 @@ BEGIN
 	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (486, null, 4, concat('GET ADDRESS VALUES FROM CLOSEST STREET NUMBER'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (486, null, 4, '-------------------------------------------------------------');
+	
+	v_expl= (select string_agg(expl_id::text,',') from selector_expl where cur_user = current_user);
+	v_expl= concat(' AND a.expl_id IN (', v_expl,')');
+
+	v_state= (select string_agg(state_id::text,',') from selector_state where cur_user = current_user);
+	v_state= concat(' AND a.state IN (', v_state,')');
 
 	-- Partial query
 	IF v_project_type = 'WS' THEN
@@ -132,9 +140,9 @@ BEGIN
 	    FROM '||v_feature_type||' a
 	        JOIN ext_address ea ON ST_DWithin(a.the_geom, ea.the_geom, '||v_searchbuffer||')
 		'||v_partialquery||'
-		'||v_partialquery2||'
+		'||v_partialquery2||' '||v_expl||' '||v_state||'
 	    ORDER BY '||v_feature_type||'_id, ST_Distance(a.the_geom, ea.the_geom))q
-	    where a.'||v_feature_type||'_id=q.'||v_feature_type||'_id;';
+	    where a.'||v_feature_type||'_id=q.'||v_feature_type||'_id '||v_expl||' '||v_state||';';
 	   
 	   	GET DIAGNOSTICS affected_rows=row_count;
 	END IF;
