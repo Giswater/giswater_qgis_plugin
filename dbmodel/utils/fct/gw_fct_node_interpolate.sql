@@ -259,9 +259,9 @@ BEGIN
 	v_result_elev = COALESCE(v_elev::text,'""');
 	
 	IF v_project='UD' THEN
-		v_result_fields = concat('[{"data_',v_col_top,'":',v_result_top,',"data_',v_col_ymax,'":',v_result_ymax, ',"data_',v_col_elev,'":',v_result_elev,'}]');
+		v_result_fields = concat('[{"tab_data_',v_col_top,'":',v_result_top,',"tab_data_',v_col_ymax,'":',v_result_ymax, ',"tab_data_',v_col_elev,'":',v_result_elev,'}]');
 	ELSE
-		v_result_fields = concat('[{"data_',v_col_top,'":',v_result_top,',"data_',v_col_ymax,'":',v_result_ymax,'}]');
+		v_result_fields = concat('[{"tab_data_',v_col_top,'":',v_result_top,',"tab_data_',v_col_ymax,'":',v_result_ymax,'}]');
 	END IF;
 
 	raise notice ' v_result_fields %', v_result_fields;
