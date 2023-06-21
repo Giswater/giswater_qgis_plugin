@@ -27,7 +27,7 @@ from .document import GwDocument, global_vars
 from ..shared.psector_duplicate import GwPsectorDuplicate
 from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi, GwReplaceArc
 from ..utils import tools_gw
-from ...lib import lib_vars, tools_db, tools_qgis, tools_qt, tools_log, tools_os
+from ...libs import lib_vars, tools_db, tools_qgis, tools_qt, tools_log, tools_os
 from ..utils.snap_manager import GwSnapManager
 
 

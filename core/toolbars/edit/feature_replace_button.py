@@ -15,7 +15,7 @@ from ..maptool import GwMaptool
 from ...ui.ui_manager import GwFeatureReplaceUi, GwInfoWorkcatUi
 from ...shared.catalog import GwCatalog
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_log, tools_qgis, tools_db
+from ....libs import tools_qt, tools_log, tools_qgis, tools_db
 from .... import global_vars
 
 

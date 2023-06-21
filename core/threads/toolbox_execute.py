@@ -12,7 +12,7 @@ from qgis.gui import QgsDateTimeEdit
 from .task import GwTask
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import lib_vars, tools_log, tools_qt, tools_qgis
+from ...libs import lib_vars, tools_log, tools_qt, tools_qgis
 
 
 class GwToolBoxTask(GwTask):

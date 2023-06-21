@@ -14,7 +14,7 @@ from qgis.core import QgsVectorLayer, QgsRectangle, QgsApplication, QgsProject
 from ..maptool import GwMaptool
 from ...ui.ui_manager import GwDialogTextUi
 from ...utils import tools_gw
-from ....lib import tools_qgis, tools_qt
+from ....libs import tools_qgis, tools_qt
 from ...threads.connect_link import GwConnectLink
 from .... import global_vars
 

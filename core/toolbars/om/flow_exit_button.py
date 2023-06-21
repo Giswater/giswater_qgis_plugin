@@ -9,7 +9,7 @@ from qgis.PyQt.QtCore import Qt
 
 from ..maptool import GwMaptool
 from ...utils import tools_gw
-from ....lib import tools_qgis
+from ....libs import tools_qgis
 
 
 class GwFlowExitButton(GwMaptool):

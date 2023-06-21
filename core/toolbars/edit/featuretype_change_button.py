@@ -16,7 +16,7 @@ from ...shared.catalog import GwCatalog
 from ...shared.info import GwInfo
 from ...ui.ui_manager import GwFeatureTypeChangeUi
 from ...utils import tools_gw
-from ....lib import tools_qgis, tools_qt, tools_db
+from ....libs import tools_qgis, tools_qt, tools_db
 from .... import global_vars
 
 

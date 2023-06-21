@@ -23,7 +23,7 @@ from ..dialog import GwAction
 from ...ui.ui_manager import GwProfileUi, GwProfilesListUi
 from ...utils import tools_gw
 from ...utils.snap_manager import GwSnapManager
-from ....lib import lib_vars, tools_qt, tools_log, tools_qgis
+from ....libs import lib_vars, tools_qt, tools_log, tools_qgis
 from .... import global_vars
 
 try:

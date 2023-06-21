@@ -26,7 +26,7 @@ from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwDialogTextUi, GwMincutComposerUi, GwMincutConnecUi, GwMincutEndUi, GwMincutHydrometerUi
 from ... import global_vars
-from ...lib import lib_vars, tools_qt, tools_qgis, tools_log, tools_db
+from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db
 
 
 class GwMincut:

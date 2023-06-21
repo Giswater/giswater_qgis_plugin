@@ -10,7 +10,7 @@ from qgis.PyQt.QtCore import QSettings
 from ..maptool import GwMaptool
 from ...shared.dimensioning import GwDimensioning
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_qgis
+from ....libs import tools_qt, tools_qgis
 
 
 class GwDimensioningButton(GwMaptool):

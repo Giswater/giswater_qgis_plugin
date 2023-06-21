@@ -23,7 +23,7 @@ from ..shared.element import GwElement
 from ..shared.info import GwInfo
 from ..shared.visit import GwVisit
 from ..utils import tools_gw
-from ...lib import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
+from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
 
 from ..shared.mincut_tools import filter_by_days, filter_by_dates
 

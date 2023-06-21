@@ -10,7 +10,7 @@ from qgis.PyQt import QtCore
 from qgis.PyQt.QtWidgets import QDockWidget
 
 from ... import global_vars
-from ...lib import lib_vars
+from ...libs import lib_vars
 
 
 class GwDocker(QDockWidget):

@@ -17,7 +17,7 @@ from ..utils import tools_gw
 from ..ui.ui_manager import GwDimensioningUi
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
-from ...lib import lib_vars, tools_qgis, tools_qt
+from ...libs import lib_vars, tools_qgis, tools_qt
 
 
 class GwDimensioning:

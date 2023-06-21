@@ -14,7 +14,7 @@ from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsPointLoca
 from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint
 
 from ... import global_vars
-from ...lib import tools_qgis
+from ...libs import tools_qgis
 from . import tools_gw
 
 

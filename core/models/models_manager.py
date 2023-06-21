@@ -15,7 +15,7 @@ __revision__ = '$Format:%H$'
 
 from weakref import WeakKeyDictionary
 from ... import global_vars
-from ...lib import lib_vars, tools_db, tools_log, tools_qt, tools_qgis
+from ...libs import lib_vars, tools_db, tools_log, tools_qt, tools_qgis
 
 
 class GwGenericDescriptor(object):

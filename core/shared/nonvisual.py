@@ -23,7 +23,7 @@ from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVi
     GwNonVisualPatternWSUi, GwNonVisualRulesUi, GwNonVisualTimeseriesUi, GwNonVisualLidsUi, GwNonVisualPrint
 from ..utils.matplotlib_widget import MplCanvas
 from ..utils import tools_gw
-from ...lib import lib_vars, tools_qgis, tools_qt, tools_db, tools_log
+from ...libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_log
 from ... import global_vars
 
 

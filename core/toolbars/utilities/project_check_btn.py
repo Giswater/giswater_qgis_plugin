@@ -19,7 +19,7 @@ from ...threads.project_check import GwProjectCheckTask
 from ...ui.ui_manager import GwProjectCheckUi
 
 from ...utils import tools_gw
-from ....lib import tools_qgis
+from ....libs import tools_qgis
 
 
 class GwProjectCheckButton(GwAction):

@@ -9,7 +9,7 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal
 
 from .task import GwTask
 from ..utils import tools_gw
-from ...lib import tools_qt
+from ...libs import tools_qt
 from ... import global_vars
 
 

@@ -14,7 +14,7 @@ from qgis.core import QgsVectorLayer
 from ..dialog import GwAction
 from ...ui.ui_manager import GwFeatureDeleteUi
 from ...utils import tools_gw
-from ....lib import tools_qgis, tools_qt, tools_db
+from ....libs import tools_qgis, tools_qt, tools_db
 from .... import global_vars
 
 

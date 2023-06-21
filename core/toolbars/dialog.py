@@ -11,7 +11,7 @@ from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QIcon
 
 from ... import global_vars
-from ...lib import lib_vars, tools_qgis
+from ...libs import lib_vars, tools_qgis
 
 
 class GwAction:

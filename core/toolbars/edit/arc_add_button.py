@@ -14,7 +14,7 @@ from ..dialog import GwAction
 from ...shared.info import GwInfo
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import tools_os
+from ....libs import tools_os
 
 
 class GwArcAddButton(GwAction):

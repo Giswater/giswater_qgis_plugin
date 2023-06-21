@@ -35,7 +35,7 @@ from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, 
 from ..utils import tools_gw
 from ... import global_vars
 from .i18n_generator import GwI18NGenerator
-from ...lib import lib_vars, tools_qt, tools_qgis, tools_log, tools_db, tools_os
+from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db, tools_os
 from ..ui.docker import GwDocker
 from ..threads.project_schema_create import GwCreateSchemaTask
 from ..threads.project_schema_utils_create import GwCreateSchemaUtilsTask

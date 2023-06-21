@@ -15,7 +15,7 @@ from qgis.PyQt.QtCore import pyqtSignal, QObject
 from ..utils import tools_gw
 from ..ui.ui_manager import GwDocUi, GwDocManagerUi
 from ... import global_vars
-from ...lib import lib_vars, tools_qt, tools_db, tools_qgis, tools_os
+from ...libs import lib_vars, tools_qt, tools_db, tools_qgis, tools_os
 
 
 class GwDocument(QObject):

@@ -18,7 +18,7 @@ from .utils import tools_gw
 from .threads.project_layers_config import GwProjectLayersConfig
 from .threads.project_check import GwProjectCheckTask
 from .. import global_vars
-from ..lib import lib_vars, tools_qgis, tools_log, tools_db, tools_qt, tools_os
+from ..libs import lib_vars, tools_qgis, tools_log, tools_db, tools_qt, tools_os
 
 
 class GwLoadProject(QObject):

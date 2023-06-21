@@ -8,7 +8,7 @@ or (at your option) any later version.
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
-from ...lib import tools_qt, tools_db, tools_log
+from ...libs import tools_qt, tools_db, tools_log
 
 
 class GwCreateSchemaUtilsTask(GwTask):

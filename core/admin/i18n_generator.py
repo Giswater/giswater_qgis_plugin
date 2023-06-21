@@ -14,7 +14,7 @@ from functools import partial
 from ..ui.ui_manager import GwAdminTranslationUi
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import lib_vars, tools_qt, tools_qgis
+from ...libs import lib_vars, tools_qt, tools_qgis
 
 
 class GwI18NGenerator:
