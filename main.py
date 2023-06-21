@@ -60,14 +60,14 @@ class Giswater(QObject):
         """
 
         try:
-            # Reset values for global_vars.project_vars
-            global_vars.project_vars['info_type'] = None
-            global_vars.project_vars['add_schema'] = None
-            global_vars.project_vars['main_schema'] = None
-            global_vars.project_vars['project_role'] = None
-            global_vars.project_vars['project_type'] = None
+            # Reset values for lib_vars.project_vars
+            lib_vars.project_vars['info_type'] = None
+            lib_vars.project_vars['add_schema'] = None
+            lib_vars.project_vars['main_schema'] = None
+            lib_vars.project_vars['project_role'] = None
+            lib_vars.project_vars['project_type'] = None
         except Exception as e:
-            tools_log.log_info(f"Exception in unload when reset values for global_vars.project_vars: {e}")
+            tools_log.log_info(f"Exception in unload when reset values for lib_vars.project_vars: {e}")
 
         try:
             # Remove Giswater dockers
@@ -122,9 +122,9 @@ class Giswater(QObject):
         try:
             # Remove file handler when reloading
             if hide_gw_button:
-                global_vars.logger.close_logger()
+                lib_vars.logger.close_logger()
         except Exception as e:
-            tools_log.log_info(f"Exception in unload when global_vars.logger.close_logger(): {e}")
+            tools_log.log_info(f"Exception in unload when lib_vars.logger.close_logger(): {e}")
 
         try:
             # Remove 'Giswater menu'
@@ -174,7 +174,7 @@ class Giswater(QObject):
 
         # Initialize plugin global variables
         plugin_dir = os.path.dirname(__file__)
-        global_vars.plugin_dir = plugin_dir
+        lib_vars.plugin_dir = plugin_dir
         global_vars.iface = self.iface
         self.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', plugin_dir)
         self.icon_folder = f"{plugin_dir}{os.sep}icons{os.sep}dialogs{os.sep}24x24{os.sep}"
@@ -199,14 +199,14 @@ class Giswater(QObject):
         global_vars.init_qgis_settings(self.plugin_name)
 
         # Check if user config folder exists
-        self._manage_user_config_folder(f"{global_vars.user_folder_dir}{os.sep}core")
+        self._manage_user_config_folder(f"{lib_vars.user_folder_dir}{os.sep}core")
 
         # Initialize parsers of configuration files: init, session, giswater, user_params
         tools_gw.initialize_parsers()
 
         # Check if user has config files 'init' and 'session' and its parameters (only those without prefix)
         try:
-            tools_gw.check_old_userconfig(global_vars.user_folder_dir)
+            tools_gw.check_old_userconfig(lib_vars.user_folder_dir)
         except Exception as e:
             # This may happen if the user doesn't have permission to move/delete files
             msg = "Exception while moving/deleting old user config files"
@@ -217,7 +217,7 @@ class Giswater(QObject):
         min_log_level = tools_gw.get_config_parser('log', 'log_level', 'user', 'init', False)
         log_limit_characters = tools_gw.get_config_parser('log', 'log_limit_characters', 'user', 'init', False)
         log_db_limit_characters = tools_gw.get_config_parser('log', 'log_db_limit_characters', 'user', 'init', False)
-        global_vars.logger.set_logger_parameters(min_log_level, log_limit_characters, log_db_limit_characters)
+        lib_vars.logger.set_logger_parameters(min_log_level, log_limit_characters, log_db_limit_characters)
 
         # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
         python_enable_console = tools_gw.get_config_parser('system', 'enable_python_console', 'project', 'giswater')
@@ -364,7 +364,7 @@ class Giswater(QObject):
 
         # Add file handler
         if hide_gw_button:
-            global_vars.logger.add_file_handler()
+            lib_vars.logger.add_file_handler()
 
         # Create class to manage code that performs project configuration
         self.load_project = GwLoadProject()
@@ -416,12 +416,12 @@ class Giswater(QObject):
             self.iface.removeDockWidget(docker_info)
 
         # Remove 'current_selections' docker
-        if global_vars.session_vars['current_selections']:
-            self.iface.removeDockWidget(global_vars.session_vars['current_selections'])
-            global_vars.session_vars['current_selections'].deleteLater()
-            global_vars.session_vars['current_selections'] = None
+        if lib_vars.session_vars['current_selections']:
+            self.iface.removeDockWidget(lib_vars.session_vars['current_selections'])
+            lib_vars.session_vars['current_selections'].deleteLater()
+            lib_vars.session_vars['current_selections'] = None
 
-        # Manage 'dialog_docker' from global_vars.session_vars and remove it if exists
+        # Manage 'dialog_docker' from lib_vars.session_vars and remove it if exists
         tools_gw.close_docker()
 
         # Get 'Layers' docker form and his actions from qgis iface and remove it if exists
