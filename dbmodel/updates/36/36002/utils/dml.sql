@@ -17,4 +17,4 @@ isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytex
 FROM config_form_fields where columnname in ('expl_id2','top_elev','elevation') 
 and formname ilike 've_node';
 
-UPDATE config_form_tabs set device = '{4,5}' where forname = 'search';
+UPDATE config_form_tabs set device = '{4,5}' where formname = 'search';
