@@ -9,7 +9,7 @@ import random
 
 from qgis.core import QgsTask, QgsApplication
 
-from ..lib import tools_log
+from ..libs import tools_log
 
 
 class GwTestTask:

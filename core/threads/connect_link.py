@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from .task import GwTask
 from ..utils import tools_gw
-from ...lib import tools_log
+from ...libs import tools_log
 
 
 class GwConnectLink(GwTask):

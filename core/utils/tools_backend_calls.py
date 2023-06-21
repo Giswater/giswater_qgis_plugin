@@ -23,7 +23,7 @@ from ..shared.element import GwElement
 from ..shared.info import GwInfo
 from ..shared.visit import GwVisit
 from ..utils import tools_gw
-from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
+from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
 
 from ..shared.mincut_tools import filter_by_days, filter_by_dates
 
@@ -436,7 +436,7 @@ def refresh_attribute_table(**kwargs):
             continue
 
         # Get sys variale
-        qgis_project_infotype = global_vars.project_vars['info_type']
+        qgis_project_infotype = lib_vars.project_vars['info_type']
 
         feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
         extras = f'"infoType":"{qgis_project_infotype}"'
@@ -784,9 +784,11 @@ def _manage_document_new(doc, **kwargs):
     if doc.doc_id is None:
         return
     dialog = kwargs['dialog']
+    index_tab = dialog.tab_main.currentIndex()
+    tab_name = dialog.tab_main.widget(index_tab).objectName()
     func_params = kwargs['func_params']
 
-    tools_qt.set_widget_text(dialog,  f"{func_params['sourcewidget']}", doc.doc_id)
+    tools_qt.set_widget_text(dialog,  f"{tab_name}_{func_params['sourcewidget']}", doc.doc_id)
     add_object(**kwargs)
 
 

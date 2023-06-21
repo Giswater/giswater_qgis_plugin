@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import subprocess
-from ...lib import tools_qt
+from ...libs import tools_qt
 
 try:
     import matplotlib

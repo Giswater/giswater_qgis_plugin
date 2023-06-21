@@ -19,7 +19,7 @@ from ..dialog import GwAction
 from ...ui.ui_manager import GwPrintUi
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import tools_qgis, tools_qt
+from ....libs import tools_qgis, tools_qt
 
 
 class GwPrintButton(GwAction):

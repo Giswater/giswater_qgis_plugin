@@ -14,13 +14,13 @@ from functools import partial
 from ..ui.ui_manager import GwAdminTranslationUi
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_qt, tools_qgis
+from ...libs import lib_vars, tools_qt, tools_qgis
 
 
 class GwI18NGenerator:
 
     def __init__(self):
-        self.plugin_dir = global_vars.plugin_dir
+        self.plugin_dir = lib_vars.plugin_dir
 
 
     def init_dialog(self):

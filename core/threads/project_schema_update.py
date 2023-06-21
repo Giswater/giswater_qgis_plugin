@@ -9,7 +9,7 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal
 
 from .task import GwTask
 from ..utils import tools_gw
-from ...lib import tools_qt, tools_log, tools_db
+from ...libs import tools_qt, tools_log, tools_db
 
 
 class GwUpdateSchemaTask(GwTask):

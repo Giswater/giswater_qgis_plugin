@@ -12,7 +12,7 @@ import os
 
 from .task import GwTask
 from ..utils import tools_gw
-from ...lib import tools_qt, tools_log
+from ...libs import tools_qt, tools_log
 
 
 class GwCreateSchemaTask(GwTask):

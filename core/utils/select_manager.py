@@ -13,7 +13,7 @@ from qgis.gui import QgsMapTool
 
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_qgis
+from ...libs import tools_qgis
 from ..utils.snap_manager import GwSnapManager
 
 

@@ -15,7 +15,7 @@ from qgis.gui import QgsVertexMarker
 from ..maptool import GwMaptool
 from ...ui.ui_manager import GwAuxCircleUi
 from ...utils import tools_gw
-from ....lib import tools_qgis, tools_qt, tools_db
+from ....libs import tools_qgis, tools_qt, tools_db
 
 
 class GwAuxCircleAddButton(GwMaptool):

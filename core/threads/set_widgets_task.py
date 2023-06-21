@@ -12,7 +12,7 @@ from qgis.core import QgsTask
 from .task import GwTask
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_qt
+from ...libs import tools_qt
 
 
 class GWSetWidgetsTask(GwTask):

@@ -45,8 +45,8 @@ from ..utils.select_manager import GwSelectManager
 from ..utils.snap_manager import GwSnapManager
 from ..toolbars.toc import epa_world_button
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
-from ...lib.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
+from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
+from ...libs.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
 
 # These imports are for the add_{widget} functions (modules need to be imported in order to find it by its name)
 # noinspection PyUnresolvedReferences
@@ -122,7 +122,7 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     parser = global_vars.configs[file_name][1]
 
     if plugin != 'core':
-        path = f"{global_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config{os.sep}{file_name}.config"
+        path = f"{lib_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config{os.sep}{file_name}.config"
         parser = None
         chk_user_params = False
 
@@ -183,7 +183,7 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
     path = global_vars.configs[file_name][0]
 
     if plugin != 'core':
-        path = f"{global_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config{os.sep}{file_name}.config"
+        path = f"{lib_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config{os.sep}{file_name}.config"
         chk_user_params = False
 
     try:
@@ -245,7 +245,7 @@ def save_current_tab(dialog, tab_widget, selector_name):
         pass
 
 
-def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_widgets=False, plugin_dir=global_vars.plugin_dir, plugin_name=global_vars.plugin_name):
+def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_widgets=False, plugin_dir=lib_vars.plugin_dir, plugin_name=lib_vars.plugin_name):
 
     """ Open dialog """
 
@@ -285,7 +285,7 @@ def close_dialog(dlg, delete_dlg=True, plugin='core'):
     """ Close dialog """
 
     save_settings(dlg, plugin=plugin)
-    global_vars.session_vars['last_focus'] = None
+    lib_vars.session_vars['last_focus'] = None
     dlg.close()
     if delete_dlg:
         try:
@@ -373,14 +373,14 @@ def create_body(form='', feature='', filter_fields='', extras=None):
     """ Create and return parameters as body to functions"""
 
     info_types = {'full': 1}
-    info_type = info_types.get(global_vars.project_vars['info_type'])
+    info_type = info_types.get(lib_vars.project_vars['info_type'])
     lang = QSettings().value('locale/globalLocale', QLocale().name())
 
     client = f'$${{"client":{{"device":4, "lang":"{lang}"'
     if info_type is not None:
         client += f', "infoType":{info_type}'
-    if global_vars.project_epsg is not None:
-        client += f', "epsg":{global_vars.project_epsg}'
+    if lib_vars.project_epsg is not None:
+        client += f', "epsg":{lib_vars.project_epsg}'
     client += f'}}, '
 
     form = f'"form":{{{form}}}, '
@@ -420,7 +420,7 @@ def refresh_legend():
 def get_cursor_multiple_selection():
     """ Set cursor for multiple selection """
 
-    path_cursor = os.path.join(global_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}20x20", '201.png')
+    path_cursor = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}20x20", '201.png')
     if os.path.exists(path_cursor):
         cursor = QCursor(QPixmap(path_cursor))
     else:
@@ -544,12 +544,12 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     """
     style_id_epa = "-1"
     tablename_og = tablename
-    schema_name = global_vars.dao_db_credentials['schema'].replace('"', '')
+    schema_name = tools_db.dao_db_credentials['schema'].replace('"', '')
     uri = tools_db.get_uri()
     uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
     if the_geom:
         try:
-            uri.setSrid(f"{global_vars.data_epsg}")
+            uri.setSrid(f"{lib_vars.data_epsg}")
         except:
             pass
     create_groups = get_config_parser("system", "force_create_qgis_group_layer", "user", "init", prefix=False)
@@ -560,9 +560,9 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         sub_sub_group = sub_sub_group.capitalize()
 
     if the_geom == "rast":
-        connString = f"PG: dbname={global_vars.dao_db_credentials['db']} host={global_vars.dao_db_credentials['host']} " \
-                     f"user={global_vars.dao_db_credentials['user']} password={global_vars.dao_db_credentials['password']} " \
-                     f"port={global_vars.dao_db_credentials['port']} mode=2 schema={global_vars.dao_db_credentials['schema']} " \
+        connString = f"PG: dbname={tools_db.dao_db_credentials['db']} host={tools_db.dao_db_credentials['host']} " \
+                     f"user={tools_db.dao_db_credentials['user']} password={tools_db.dao_db_credentials['password']} " \
+                     f"port={tools_db.dao_db_credentials['port']} mode=2 schema={tools_db.dao_db_credentials['schema']} " \
                      f"column={the_geom} table={tablename}"
         if alias: tablename = alias
         layer = QgsRasterLayer(connString, tablename)
@@ -606,7 +606,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         # Set layer config
         if tablename:
             feature = '"tableName":"' + str(tablename_og) + '", "isLayer":true'
-            extras = '"infoType":"' + str(global_vars.project_vars['info_type']) + '"'
+            extras = '"infoType":"' + str(lib_vars.project_vars['info_type']) + '"'
             body = create_body(feature=feature, extras=extras)
             json_result = execute_procedure('gw_fct_getinfofromid', body)
             config_layer_attributes(json_result, layer, alias)
@@ -658,7 +658,7 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
 
     text_result = None
     temp_layers_added = []
-    srid = global_vars.data_epsg
+    srid = lib_vars.data_epsg
     i = 0
     for k, v in list(data.items()):
         if str(k) == "info":
@@ -1314,8 +1314,8 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     widget.setAllowNull(True)
                     widget.setCalendarPopup(True)
                     widget.setDisplayFormat('yyyy/MM/dd')
-                    if global_vars.date_format in ("dd/MM/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "yyyy-MM-dd"):
-                        widget.setDisplayFormat(global_vars.date_format)
+                    if lib_vars.date_format in ("dd/MM/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "yyyy-MM-dd"):
+                        widget.setDisplayFormat(lib_vars.date_format)
                     date = QDate.currentDate()
                     if field.get('value') not in ('', None, 'null'):
                         date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
@@ -2128,7 +2128,7 @@ def get_actions_from_json(json_result, sql):
             except Exception as e:
                 tools_log.log_debug(f"{type(e).__name__}: {e}")
     except Exception as e:
-        tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
+        tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, lib_vars.schema_name)
 
 
 def exec_pg_function(function_name, parameters=None, commit=True, schema_name=None, log_sql=False, rubber_band=None,
@@ -2193,8 +2193,8 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     # Manage schema_name and parameters
     if schema_name:
         sql = f"SELECT {schema_name}.{function_name}("
-    elif schema_name is None and global_vars.schema_name:
-        sql = f"SELECT {global_vars.schema_name}.{function_name}("
+    elif schema_name is None and lib_vars.schema_name:
+        sql = f"SELECT {lib_vars.schema_name}.{function_name}("
     else:
         sql = f"SELECT {function_name}("
     if parameters:
@@ -2229,7 +2229,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
         return json_result
 
     try:
-        if json_result["body"]["feature"]["geometry"] and global_vars.data_epsg != global_vars.project_epsg:
+        if json_result["body"]["feature"]["geometry"] and lib_vars.data_epsg != lib_vars.project_epsg:
             json_result = manage_json_geometry(json_result)
     except Exception:
         pass
@@ -2243,8 +2243,8 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
 def manage_json_geometry(json_result):
 
     # Set QgsCoordinateReferenceSystem
-    data_epsg = QgsCoordinateReferenceSystem(str(global_vars.data_epsg))
-    project_epsg = QgsCoordinateReferenceSystem(str(global_vars.project_epsg))
+    data_epsg = QgsCoordinateReferenceSystem(str(lib_vars.data_epsg))
+    project_epsg = QgsCoordinateReferenceSystem(str(lib_vars.project_epsg))
 
     tform = QgsCoordinateTransform(data_epsg, project_epsg, QgsProject.instance())
 
@@ -2252,11 +2252,11 @@ def manage_json_geometry(json_result):
     points = tools_qgis.get_geometry_vertex(list_coord)
 
     for point in points:
-        if str(global_vars.data_epsg) == '2052' and str(global_vars.project_epsg) == '102566':
+        if str(lib_vars.data_epsg) == '2052' and str(lib_vars.project_epsg) == '102566':
             clear_list = list_coord.group(1)
             updated_list = list_coord.group(1).replace('-', '').replace(' ', ' -')
             json_result['body']['feature']['geometry']['st_astext'] = json_result['body']['feature']['geometry']['st_astext'].replace(clear_list, updated_list)
-        elif str(global_vars.data_epsg) != str(global_vars.project_epsg):
+        elif str(lib_vars.data_epsg) != str(lib_vars.project_epsg):
             new_coords = tform.transform(point)
             json_result['body']['feature']['geometry']['st_astext'] = json_result['body']['feature']['geometry']['st_astext'].replace(str(point.x()), str(new_coords.x()))
             json_result['body']['feature']['geometry']['st_astext'] = json_result['body']['feature']['geometry']['st_astext'].replace(str(point.y()), str(new_coords.y()))
@@ -2290,7 +2290,7 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
                 msg = json_result['message']
 
             # Show exception message only if we are not in a task process
-            if len(global_vars.session_vars['threads']) == 0:
+            if len(lib_vars.session_vars['threads']) == 0:
                 tools_qgis.show_message(msg, level)
             else:
                 tools_log.log_info(msg)
@@ -2321,14 +2321,14 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
                 msg += f"SQL: {sql}\n"
             if 'MSGERR' in json_result:
                 msg += f"Message error: {json_result['MSGERR']}"
-            global_vars.session_vars['last_error_msg'] = msg
+            lib_vars.session_vars['last_error_msg'] = msg
 
             if is_thread:
                 return
 
             tools_log.log_warning(msg, stack_level_increase=2)
             # Show exception message only if we are not in a task process
-            if len(global_vars.session_vars['threads']) == 0:
+            if len(lib_vars.session_vars['threads']) == 0:
                 tools_qt.show_exception_message(title, msg)
 
     except Exception:
@@ -2348,7 +2348,7 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
     except KeyError:
         return
 
-    srid = global_vars.data_epsg
+    srid = lib_vars.data_epsg
     try:
         margin = None
         opacity = 100
@@ -2450,7 +2450,7 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
                         tools_qgis.set_margin(v_layer, margin)
 
     except Exception as e:
-        tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
+        tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, lib_vars.schema_name)
     finally:
         # Clean any broken temporal layers (left with no data)
         tools_qgis.clean_layer_group_from_toc('GW Temporal Layers')
@@ -2486,10 +2486,10 @@ def get_project_type(schemaname=None):
     """ Get project type from table 'sys_version' """
 
     project_type = None
-    if schemaname is None and global_vars.schema_name is None:
+    if schemaname is None and lib_vars.schema_name is None:
         return None
     elif schemaname in (None, 'null', ''):
-        schemaname = global_vars.schema_name
+        schemaname = lib_vars.schema_name
 
     tablename = "sys_version"
     exists = tools_db.check_table(tablename, schemaname)
@@ -2509,10 +2509,10 @@ def get_project_info(schemaname=None):
     """ Get project information from table 'sys_version' """
 
     project_info_dict = None
-    if schemaname is None and global_vars.schema_name is None:
+    if schemaname is None and lib_vars.schema_name is None:
         return None
     elif schemaname in (None, 'null', ''):
-        schemaname = global_vars.schema_name
+        schemaname = lib_vars.schema_name
 
     tablename = "sys_version"
     exists = tools_db.check_table(tablename, schemaname)
@@ -2687,7 +2687,7 @@ def manage_layer_manager(json_result, sql=None):
             del snapper_manager
 
     except Exception as e:
-        tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
+        tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, lib_vars.schema_name)
 
 
 def selection_init(class_object, dialog, table_object, query=False):
@@ -2906,11 +2906,11 @@ def docker_dialog(dialog):
     positions = {8: Qt.BottomDockWidgetArea, 4: Qt.TopDockWidgetArea,
                  2: Qt.RightDockWidgetArea, 1: Qt.LeftDockWidgetArea}
     try:
-        global_vars.session_vars['dialog_docker'].setWindowTitle(dialog.windowTitle())
-        global_vars.session_vars['dialog_docker'].setWidget(dialog)
-        global_vars.session_vars['dialog_docker'].setWindowFlags(Qt.WindowContextHelpButtonHint)
-        global_vars.iface.addDockWidget(positions[global_vars.session_vars['dialog_docker'].position],
-                                        global_vars.session_vars['dialog_docker'])
+        lib_vars.session_vars['dialog_docker'].setWindowTitle(dialog.windowTitle())
+        lib_vars.session_vars['dialog_docker'].setWidget(dialog)
+        lib_vars.session_vars['dialog_docker'].setWindowFlags(Qt.WindowContextHelpButtonHint)
+        global_vars.iface.addDockWidget(positions[lib_vars.session_vars['dialog_docker'].position],
+                                        lib_vars.session_vars['dialog_docker'])
     except RuntimeError as e:
         tools_log.log_warning(f"{type(e).__name__} --> {e}")
 
@@ -2918,34 +2918,34 @@ def docker_dialog(dialog):
 def init_docker(docker_param='qgis_info_docker'):
     """ Get user config parameter @docker_param """
 
-    global_vars.session_vars['info_docker'] = True
+    lib_vars.session_vars['info_docker'] = True
     # Show info or form in docker?
     row = get_config_value(docker_param)
     if not row:
-        global_vars.session_vars['dialog_docker'] = None
-        global_vars.session_vars['docker_type'] = None
+        lib_vars.session_vars['dialog_docker'] = None
+        lib_vars.session_vars['docker_type'] = None
         return None
     value = row[0].lower()
 
     # Check if docker has dialog of type 'form' or 'main'
     if docker_param == 'qgis_info_docker':
-        if global_vars.session_vars['dialog_docker']:
-            if global_vars.session_vars['docker_type']:
-                if global_vars.session_vars['docker_type'] != 'qgis_info_docker':
-                    global_vars.session_vars['info_docker'] = False
+        if lib_vars.session_vars['dialog_docker']:
+            if lib_vars.session_vars['docker_type']:
+                if lib_vars.session_vars['docker_type'] != 'qgis_info_docker':
+                    lib_vars.session_vars['info_docker'] = False
                     return None
 
     if value == 'true':
         close_docker()
-        global_vars.session_vars['docker_type'] = docker_param
-        global_vars.session_vars['dialog_docker'] = GwDocker()
-        global_vars.session_vars['dialog_docker'].dlg_closed.connect(partial(close_docker, option_name='position'))
+        lib_vars.session_vars['docker_type'] = docker_param
+        lib_vars.session_vars['dialog_docker'] = GwDocker()
+        lib_vars.session_vars['dialog_docker'].dlg_closed.connect(partial(close_docker, option_name='position'))
         manage_docker_options()
     else:
-        global_vars.session_vars['dialog_docker'] = None
-        global_vars.session_vars['docker_type'] = None
+        lib_vars.session_vars['dialog_docker'] = None
+        lib_vars.session_vars['docker_type'] = None
 
-    return global_vars.session_vars['dialog_docker']
+    return lib_vars.session_vars['dialog_docker']
 
 
 def close_docker(option_name='position'):
@@ -2954,21 +2954,21 @@ def close_docker(option_name='position'):
     """
 
     try:
-        if global_vars.session_vars['dialog_docker']:
-            if not global_vars.session_vars['dialog_docker'].isFloating():
-                docker_pos = global_vars.iface.mainWindow().dockWidgetArea(global_vars.session_vars['dialog_docker'])
-                widget = global_vars.session_vars['dialog_docker'].widget()
+        if lib_vars.session_vars['dialog_docker']:
+            if not lib_vars.session_vars['dialog_docker'].isFloating():
+                docker_pos = global_vars.iface.mainWindow().dockWidgetArea(lib_vars.session_vars['dialog_docker'])
+                widget = lib_vars.session_vars['dialog_docker'].widget()
                 if widget:
                     widget.close()
                     del widget
-                    global_vars.session_vars['dialog_docker'].setWidget(None)
-                    global_vars.session_vars['docker_type'] = None
+                    lib_vars.session_vars['dialog_docker'].setWidget(None)
+                    lib_vars.session_vars['docker_type'] = None
                     set_config_parser('docker', option_name, f'{docker_pos}')
-                global_vars.iface.removeDockWidget(global_vars.session_vars['dialog_docker'])
-                global_vars.session_vars['dialog_docker'] = None
+                global_vars.iface.removeDockWidget(lib_vars.session_vars['dialog_docker'])
+                lib_vars.session_vars['dialog_docker'] = None
     except AttributeError:
-        global_vars.session_vars['docker_type'] = None
-        global_vars.session_vars['dialog_docker'] = None
+        lib_vars.session_vars['docker_type'] = None
+        lib_vars.session_vars['dialog_docker'] = None
 
 
 def manage_docker_options(option_name='position'):
@@ -2978,11 +2978,11 @@ def manage_docker_options(option_name='position'):
     try:
         # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
         pos = int(get_config_parser('docker', option_name, "user", "session"))
-        global_vars.session_vars['dialog_docker'].position = 2
+        lib_vars.session_vars['dialog_docker'].position = 2
         if pos in (1, 2, 4, 8):
-            global_vars.session_vars['dialog_docker'].position = pos
+            lib_vars.session_vars['dialog_docker'].position = pos
     except Exception:
-        global_vars.session_vars['dialog_docker'].position = 2
+        lib_vars.session_vars['dialog_docker'].position = 2
 
 
 def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardItemModel=False, schema_name=None):
@@ -3042,7 +3042,7 @@ def add_icon(widget, icon, sub_folder="20x20"):
     """ Set @icon to selected @widget """
 
     # Get icons folder
-    icons_folder = os.path.join(global_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}{sub_folder}")
+    icons_folder = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}{sub_folder}")
     icon_path = os.path.join(icons_folder, str(icon) + ".png")
 
     if os.path.exists(icon_path):
@@ -3057,7 +3057,7 @@ def add_icon(widget, icon, sub_folder="20x20"):
 
 def get_icon(icon, folder="dialogs", sub_folder="20x20"):
     # Get icons folder
-    icons_folder = os.path.join(global_vars.plugin_dir, f"icons{os.sep}{folder}{os.sep}{sub_folder}")
+    icons_folder = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}{folder}{os.sep}{sub_folder}")
     icon_path = os.path.join(icons_folder, str(icon) + ".png")
 
     if os.path.exists(icon_path):
@@ -3433,7 +3433,7 @@ def reset_rubberband(rb, geometry_type=None):
 def set_epsg():
 
     epsg = tools_qgis.get_epsg()
-    global_vars.project_epsg = epsg
+    lib_vars.project_epsg = epsg
 
 
 def refresh_selectors(tab_name=None):
@@ -3464,14 +3464,14 @@ def open_dlg_help():
     """ Opens the help page for the last focused dialog """
 
     parser = configparser.ConfigParser(strict=False)
-    path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}giswater.config"
+    path = f"{lib_vars.plugin_dir}{os.sep}config{os.sep}giswater.config"
     if not os.path.exists(path):
         webbrowser.open_new_tab('https://giswater.gitbook.io/giswater-manual')
         return True
 
     parser.read(path)
     try:
-        web_tag = parser.get('web_tag', global_vars.session_vars['last_focus'])
+        web_tag = parser.get('web_tag', lib_vars.session_vars['last_focus'])
         webbrowser.open_new_tab(f'https://giswater.gitbook.io/giswater-manual/{web_tag}')
     except Exception:
         webbrowser.open_new_tab('https://giswater.gitbook.io/giswater-manual')
@@ -3505,12 +3505,12 @@ def manage_current_selections_docker(result, open=False):
             elif user_value['value']:
                 title += f"{user_value['value']} | "
 
-        if global_vars.session_vars['current_selections'] is None:
-            global_vars.session_vars['current_selections'] = QDockWidget(title[:-3])
+        if lib_vars.session_vars['current_selections'] is None:
+            lib_vars.session_vars['current_selections'] = QDockWidget(title[:-3])
         else:
-            global_vars.session_vars['current_selections'].setWindowTitle(title[:-3])
+            lib_vars.session_vars['current_selections'].setWindowTitle(title[:-3])
         if open:
-            global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, global_vars.session_vars['current_selections'])
+            global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, lib_vars.session_vars['current_selections'])
 
 
 def create_sqlite_conn(file_name):
@@ -3519,7 +3519,7 @@ def create_sqlite_conn(file_name):
     status = False
     cursor = None
     try:
-        db_path = f"{global_vars.plugin_dir}{os.sep}resources{os.sep}gis{os.sep}{file_name}.sqlite"
+        db_path = f"{lib_vars.plugin_dir}{os.sep}resources{os.sep}gis{os.sep}{file_name}.sqlite"
         tools_log.log_info(db_path)
         if os.path.exists(db_path):
             conn = sqlite3.connect(db_path)
@@ -3638,12 +3638,12 @@ def user_params_to_userconfig():
 def remove_deprecated_config_vars():
     """ Removes all deprecated variables defined at giswater.config """
 
-    if global_vars.user_folder_dir is None:
+    if lib_vars.user_folder_dir is None:
         return
 
     init_parser = configparser.ConfigParser(strict=False)
     session_parser = configparser.ConfigParser(strict=False)
-    path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
+    path_folder = os.path.join(tools_os.get_datadir(), lib_vars.user_folder_dir)
     project_types = get_config_parser('system', 'project_types', "project", "giswater").split(',')
 
     # Remove deprecated sections for init
@@ -3750,7 +3750,7 @@ def get_project_version(schemaname=None):
     """ Get project version from table 'sys_version' """
 
     if schemaname in (None, 'null', ''):
-        schemaname = global_vars.schema_name
+        schemaname = lib_vars.schema_name
 
     project_version = None
     tablename = "sys_version"
@@ -3771,7 +3771,7 @@ def export_layers_to_gpkg(layers, path):
     """ This function is not used on Giswater Project at the moment. """
 
     uri = tools_db.get_uri()
-    schema_name = global_vars.dao_db_credentials['schema'].replace('"', '')
+    schema_name = tools_db.dao_db_credentials['schema'].replace('"', '')
     is_first = True
     options = QgsVectorFileWriter.SaveVectorOptions()
     options.driverName = "GPKG"
@@ -3863,7 +3863,7 @@ def reset_position_dialog(show_message=False, plugin='core', file_name='session'
 
     try:
         parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True, strict=False)
-        config_folder = f"{global_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config"
+        config_folder = f"{lib_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config"
 
         if not os.path.exists(config_folder):
             os.makedirs(config_folder)
@@ -3944,9 +3944,9 @@ def _get_parser_from_filename(filename):
     """ Get parser of file @filename.config """
 
     if filename in ('init', 'session'):
-        folder = f"{global_vars.user_folder_dir}{os.sep}core"
+        folder = f"{lib_vars.user_folder_dir}{os.sep}core"
     elif filename in ('dev', 'giswater', 'user_params'):
-        folder = global_vars.plugin_dir
+        folder = lib_vars.plugin_dir
     else:
         return None, None
 

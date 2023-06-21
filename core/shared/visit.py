@@ -27,7 +27,7 @@ from ..ui.ui_manager import GwVisitUi, GwVisitEventUi, GwVisitEventRehabUi, GwVi
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os
+from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_db, tools_os
 
 
 class GwVisit(QObject):
@@ -40,7 +40,7 @@ class GwVisit(QObject):
 
         QObject.__init__(self)
         self.canvas = global_vars.canvas
-        self.schema_name = global_vars.schema_name
+        self.schema_name = lib_vars.schema_name
         self.iface = global_vars.iface
         self.feature_type = None
         self.layers = None
@@ -193,8 +193,8 @@ class GwVisit(QObject):
         self.dlg_add_visit.enddate.setDate(_date)
 
         # set User name get from login
-        if global_vars.current_user and self.user_name:
-            self.user_name.setText(str(global_vars.current_user))
+        if tools_db.current_user and self.user_name:
+            self.user_name.setText(str(tools_db.current_user))
 
         # set the start tab to be shown (e.g. tab_visit)
         self.current_tab_index = self._tab_index('tab_visit')
@@ -608,7 +608,7 @@ class GwVisit(QObject):
     def _update_geom(self):
         """ Update geometry field """
 
-        srid = global_vars.data_epsg
+        srid = lib_vars.data_epsg
         sql = (f"UPDATE om_visit"
                f" SET the_geom = ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
                f" WHERE id = {self.current_visit.id}")

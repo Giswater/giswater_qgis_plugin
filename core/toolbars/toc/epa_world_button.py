@@ -9,7 +9,7 @@ from qgis._core import QgsMapLayerStyle
 
 from ..dialog import GwAction
 from ...utils import tools_gw
-from ....lib import tools_qgis, tools_db, tools_os
+from ....libs import tools_qgis, tools_db, tools_os
 from .... import global_vars
 
 layers_subsetstrings = {}

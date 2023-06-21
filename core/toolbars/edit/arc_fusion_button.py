@@ -12,7 +12,7 @@ from qgis.PyQt.QtCore import Qt, QDate
 from ..maptool import GwMaptool
 from ...ui.ui_manager import GwArcFusionUi
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_db, tools_qgis, tools_os
+from ....libs import tools_qt, tools_db, tools_qgis, tools_os
 
 
 class GwArcFusionButton(GwMaptool):

@@ -16,7 +16,7 @@ from ..maptool import GwMaptool
 from ...ui.ui_manager import GwAuxPointUi
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import tools_qgis, tools_qt, tools_db
+from ....libs import lib_vars, tools_qgis, tools_qt, tools_db
 
 
 class GwAuxPointAddButton(GwMaptool):
@@ -92,7 +92,7 @@ class GwAuxPointAddButton(GwMaptool):
 
         self.snap_to_selected_layer = False
         # Get SRID
-        self.srid = global_vars.data_epsg
+        self.srid = lib_vars.data_epsg
 
         # Check action. It works if is selected from toolbar. Not working if is selected from menu or shortcut keys
         if hasattr(self.action, "setChecked"):

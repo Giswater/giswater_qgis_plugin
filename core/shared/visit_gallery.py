@@ -14,8 +14,8 @@ from qgis.PyQt.QtWidgets import QLabel, QPushButton, QLineEdit
 
 from ..ui.ui_manager import GwGalleryUi, GwGalleryZoomUi
 from ..utils import tools_gw
-from ...lib import tools_db
-from ...lib.tools_qt import GwExtendedQLabel
+from ...libs import tools_db
+from ...libs.tools_qt import GwExtendedQLabel
 
 
 class GwVisitGallery:

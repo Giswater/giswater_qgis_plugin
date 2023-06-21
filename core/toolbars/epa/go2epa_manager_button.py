@@ -16,7 +16,7 @@ from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
 from ..dialog import GwAction
 from ...ui.ui_manager import GwEpaManagerUi
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_db, tools_qgis, tools_os
+from ....libs import tools_qt, tools_db, tools_qgis, tools_os
 
 
 class GwGo2EpaManagerButton(GwAction):

@@ -38,8 +38,8 @@ from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi
     GwInfoCrossectUi, GwInterpolate, GwInfoEpaDemandUi, GwInfoEpaOrificeUi, GwInfoEpaOutletUi, GwInfoEpaPumpUi, \
     GwInfoEpaWeirUi, GwInfoEpaDwfUi
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os
-from ...lib.tools_qt import GwHyperLinkLineEdit
+from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_db, tools_os
+from ...libs.tools_qt import GwHyperLinkLineEdit
 
 global is_inserting
 is_inserting = False
@@ -56,9 +56,9 @@ class GwInfo(QObject):
 
         self.iface = global_vars.iface
         self.settings = global_vars.giswater_settings
-        self.plugin_dir = global_vars.plugin_dir
+        self.plugin_dir = lib_vars.plugin_dir
         self.canvas = global_vars.canvas
-        self.schema_name = global_vars.schema_name
+        self.schema_name = lib_vars.schema_name
 
         self.new_feature_id = None
         self.layer_new_feature = None
@@ -110,9 +110,9 @@ class GwInfo(QObject):
             self.visible_tabs = []
 
             # Get project variables
-            qgis_project_add_schema = global_vars.project_vars['add_schema']
-            qgis_project_main_schema = global_vars.project_vars['main_schema']
-            qgis_project_role = global_vars.project_vars['project_role']
+            qgis_project_add_schema = lib_vars.project_vars['add_schema']
+            qgis_project_main_schema = lib_vars.project_vars['main_schema']
+            qgis_project_role = lib_vars.project_vars['project_role']
 
             self.new_feature = new_feature
 
@@ -165,7 +165,7 @@ class GwInfo(QObject):
             # Comes from QPushButtons node1 or node2 from custom form or RightButton
             elif feature_id:
                 if is_add_schema:
-                    add_schema = global_vars.project_vars['add_schema']
+                    add_schema = lib_vars.project_vars['add_schema']
                     extras = f'"addSchema":"{add_schema}"'
                 else:
                     extras = '"addSchema":""'
@@ -544,16 +544,16 @@ class GwInfo(QObject):
         title = self._set_dlg_title(complet_result)
 
         # Connect dialog signals
-        if global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']:
+        if lib_vars.session_vars['dialog_docker'] and is_docker and lib_vars.session_vars['info_docker']:
             # Delete last form from memory
-            last_info = global_vars.session_vars['dialog_docker'].findChild(GwMainWindow, 'dlg_info_feature')
+            last_info = lib_vars.session_vars['dialog_docker'].findChild(GwMainWindow, 'dlg_info_feature')
             if last_info:
                 last_info.setParent(None)
                 del last_info
 
             tools_gw.docker_dialog(dlg_cf)
-            global_vars.session_vars['dialog_docker'].widget().dlg_closed.connect(self._manage_docker_close)
-            global_vars.session_vars['dialog_docker'].setWindowTitle(title)
+            lib_vars.session_vars['dialog_docker'].widget().dlg_closed.connect(self._manage_docker_close)
+            lib_vars.session_vars['dialog_docker'].setWindowTitle(title)
             btn_cancel.clicked.connect(self._manage_docker_close)
 
         else:
@@ -997,7 +997,7 @@ class GwInfo(QObject):
 
         project_type = tools_gw.get_project_type()
         # Get PDF file
-        pdf_folder = os.path.join(global_vars.plugin_dir, f'resources{os.sep}png')
+        pdf_folder = os.path.join(lib_vars.plugin_dir, f'resources{os.sep}png')
         pdf_path = os.path.join(pdf_folder, f"{project_type}_{feature_type}_{locale}.png")
 
         # Open PDF if exists. If not open Spanish version
@@ -1122,7 +1122,6 @@ class GwInfo(QObject):
             dlg_interpolate.rejected.connect(partial(self._manage_interpolate_rejected))
             dlg_interpolate.rb_interpolate.clicked.connect(partial(self._change_rb_type, dlg_interpolate, dlg_interpolate.rb_interpolate, complet_result, ep))
             dlg_interpolate.rb_extrapolate.clicked.connect(partial(self._change_rb_type, dlg_interpolate, dlg_interpolate.rb_extrapolate, complet_result, ep))
-            dlg_interpolate.btn_accept.setEnabled(False)
 
             tools_gw.open_dialog(dlg_interpolate, dlg_name='dialog_text')
 
@@ -1196,14 +1195,12 @@ class GwInfo(QObject):
                     self.rb_interpolate.append(rb)
                     dlg_interpolate.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
                     tools_qgis.show_message(message, message_level=0, parameter=self.node1)
-                    dlg_interpolate.btn_accept.setEnabled(False)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
                     tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10)
                     self.rb_interpolate.append(rb)
                     dlg_interpolate.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
                     tools_qgis.show_message(message, message_level=0, parameter=self.node2)
-                    dlg_interpolate.btn_accept.setEnabled(True)
 
         if self.node1 and self.node2:
 
@@ -1518,7 +1515,7 @@ class GwInfo(QObject):
         self._roll_back()
         tools_gw.reset_rubberband(self.rubber_band)
         self._remove_layer_selection()
-        global_vars.session_vars['dialog_docker'].widget().dlg_closed.disconnect()
+        lib_vars.session_vars['dialog_docker'].widget().dlg_closed.disconnect()
         self._reset_my_json()
         tools_gw.close_docker()
 
@@ -1613,7 +1610,7 @@ class GwInfo(QObject):
             if save:
                 self._manage_accept(dialog, action_edit, new_feature, self.my_json, False, generic)
             elif self.new_feature_id is not None:
-                if global_vars.session_vars['dialog_docker'] and global_vars.session_vars['info_docker']:
+                if lib_vars.session_vars['dialog_docker'] and lib_vars.session_vars['info_docker']:
                     self._manage_docker_close()
                 else:
                     tools_gw.close_dialog(dialog)
@@ -1816,7 +1813,7 @@ class GwInfo(QObject):
                 my_json = json.dumps(_json)
                 if my_json == '' or str(my_json) == '{}':
                     if close_dlg:
-                        if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
+                        if lib_vars.session_vars['dialog_docker'] and dialog == lib_vars.session_vars['dialog_docker'].widget():
                             tools_gw.close_docker()
                             return True
                         tools_gw.close_dialog(dialog)
@@ -1875,7 +1872,7 @@ class GwInfo(QObject):
                 if thread:
                     # If param is true show question and create thread
                     msg = "You closed a valve, this will modify the current mapzones and it may take a little bit of time."
-                    if global_vars.user_level['level'] in ('1', '2'):
+                    if lib_vars.user_level['level'] in ('1', '2'):
                         msg += " Would you like to continue?"
                         answer = tools_qt.show_question(msg)
                     else:
@@ -1895,10 +1892,7 @@ class GwInfo(QObject):
         # Tab EPA
         if not generic and self.my_json_epa != '' and str(self.my_json_epa) != '{}':
             feature = f'"id":"{self.feature_id}", '
-            epa_type = tools_qt.get_text(dialog, 'tab_data_epa_type').lower()
-            epa_table_id = 've_epa_' + epa_type
-            if global_vars.project_type == 'ws' and self.feature_type == 'connec' and epa_type == 'junction':
-                epa_table_id = 've_epa_connec'
+            epa_table_id = 've_epa_' + tools_qt.get_text(dialog, 'tab_data_epa_type').lower()
             my_json = json.dumps(self.my_json_epa)
             feature += f'"tableName":"{epa_table_id}", '
             feature += f' "featureType":"{self.feature_type}" '
@@ -1915,7 +1909,7 @@ class GwInfo(QObject):
         global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
 
         if close_dlg:
-            if global_vars.session_vars['dialog_docker'] and dialog == global_vars.session_vars['dialog_docker'].widget():
+            if lib_vars.session_vars['dialog_docker'] and dialog == lib_vars.session_vars['dialog_docker'].widget():
                 self._manage_docker_close()
             else:
                 tools_gw.close_dialog(dialog)
@@ -2188,8 +2182,6 @@ class GwInfo(QObject):
             return
 
         tablename = 've_epa_' + epa_type.lower()
-        if global_vars.project_type == 'ws' and self.feature_type == 'connec' and epa_type.lower() == 'junction':
-            tablename = 've_epa_connec'
         feature = f'"tableName":"{tablename}", "id":"{self.feature_id}", "epaType": "{epa_type}"'
         body = tools_gw.create_body(feature=feature)
         function_name = 'gw_fct_getinfofromid'
@@ -2207,10 +2199,6 @@ class GwInfo(QObject):
                     i += 1
             self._manage_dlg_widgets(complet_result, {}, False, reload_epa=True)
             tools_qt.enable_tab_by_tab_name(self.tab_main, 'tab_epa', True)
-            if self.action_edit.isChecked():
-                tools_gw.enable_all(dialog, complet_result['body']['data'])
-            else:
-                tools_gw.enable_widgets(dialog, complet_result['body']['data'], False)
             self._reset_my_json_epa()
             dialog.show()
 
@@ -2643,9 +2631,8 @@ class GwInfo(QObject):
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
             self.tab_element_loaded = True
-        # Tab 'EPA'
+        # Tab 'Relations'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_epa' and not self.tab_epa_loaded:
-            self._reload_epa_tab(dialog)
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
             self.tab_epa_loaded = True
@@ -3571,8 +3558,10 @@ def _manage_element_new(elem, **kwargs):
         return
 
     dialog = kwargs['dialog']
+    index_tab = dialog.tab_main.currentIndex()
+    tab_name = dialog.tab_main.widget(index_tab).objectName()
     func_params = kwargs['func_params']
-    tools_qt.set_widget_text(dialog, f"{func_params['sourcewidget']}", elem.element_id)
+    tools_qt.set_widget_text(dialog, f"{tab_name}_{func_params['sourcewidget']}", elem.element_id)
     tools_backend_calls.add_object(**kwargs)
 
 
