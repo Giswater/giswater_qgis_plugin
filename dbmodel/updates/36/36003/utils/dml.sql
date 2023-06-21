@@ -16,3 +16,63 @@ INSERT INTO sys_fprocess
 (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
 VALUES(496, 'Massive node interpolation', 'utils', NULL, 'core', true, 'Function process', NULL)
 ON CONFLICT (fid) DO NOTHING;
+
+-- 21/06/2023
+UPDATE config_form_fields
+	SET widgetfunction='{
+	  "functionName": "delete_object",
+	  "parameters": {
+	    "columnfind": "feature_id",
+	    "targetwidget": "tab_elements_tbl_elements",
+	    "sourceview": "element"
+	  }
+	}'::json
+	WHERE (formname='arc' OR formname='connec' OR formname='node')
+		AND formtype='form_feature'
+		AND columnname='delete_element'
+		AND tabname='tab_elements';
+
+UPDATE config_form_fields
+	SET widgetfunction='{
+	  "functionName": "add_object",
+	  "parameters": {
+	    "sourcewidget": "tab_elements_element_id",
+	    "targetwidget": "tab_elements_tbl_elements",
+	    "sourceview": "element"
+	  }
+	}'::json
+	WHERE (formname='arc' OR formname='connec' OR formname='node')
+		AND formtype='form_feature'
+		AND columnname='insert_element'
+		AND tabname='tab_elements';
+
+UPDATE config_form_fields
+	SET widgetfunction='{
+	  "functionName": "manage_element",
+	  "module": "info",
+	  "parameters": {
+	    "sourcewidget": "tab_elements_element_id",
+	    "targetwidget": "tab_elements_tbl_elements",
+	    "sourceview": "element"
+	  }
+	}'::json
+	WHERE (formname='arc' OR formname='connec' OR formname='node')
+		AND formtype='form_feature'
+		AND columnname='new_element'
+		AND tabname='tab_elements';
+
+UPDATE config_form_fields
+	SET widgetfunction='{
+	  "functionName": "open_selected_element",
+	  "module": "info",
+	  "parameters": {
+	    "columnfind": "element_id",
+	    "targetwidget": "tab_elements_tbl_elements",
+	    "sourceview": "element"
+	  }
+	}'::json
+	WHERE (formname='arc' OR formname='connec' OR formname='node')
+		AND formtype='form_feature'
+		AND columnname='open_element'
+		AND tabname='tab_elements';
+
