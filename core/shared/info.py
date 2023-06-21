@@ -3568,10 +3568,8 @@ def _manage_element_new(elem, **kwargs):
         return
 
     dialog = kwargs['dialog']
-    index_tab = dialog.tab_main.currentIndex()
-    tab_name = dialog.tab_main.widget(index_tab).objectName()
     func_params = kwargs['func_params']
-    tools_qt.set_widget_text(dialog, f"{tab_name}_{func_params['sourcewidget']}", elem.element_id)
+    tools_qt.set_widget_text(dialog, f"{func_params['sourcewidget']}", elem.element_id)
     tools_backend_calls.add_object(**kwargs)
 
 
