@@ -108,6 +108,7 @@ class GwInfo(QObject):
             self.my_json_epa = {}
             self.tab_type = tab_type
             self.visible_tabs = []
+            self.epa_complet_result = None
 
             # Get project variables
             qgis_project_add_schema = lib_vars.project_vars['add_schema']
@@ -1607,6 +1608,8 @@ class GwInfo(QObject):
             if str(self.my_json) == '{}' and str(self.my_json_epa) == '{}':
                 tools_qt.set_action_checked(action_edit, False)
                 tools_gw.enable_widgets(dialog, self.complet_result['body']['data'], False)
+                if self.epa_complet_result:
+                    tools_gw.enable_widgets(dialog, self.epa_complet_result['body']['data'], False)
                 self._enable_actions(dialog, False)
                 return
             save = self._ask_for_save(action_edit, fid)
@@ -1621,6 +1624,8 @@ class GwInfo(QObject):
         else:
             tools_qt.set_action_checked(action_edit, True)
             tools_gw.enable_all(dialog, self.complet_result['body']['data'])
+            if self.epa_complet_result:
+                tools_gw.enable_all(dialog, self.epa_complet_result['body']['data'])
             self._enable_actions(dialog, True)
 
 
@@ -1641,6 +1646,8 @@ class GwInfo(QObject):
         if status:  # Commit succesfull and dialog keep opened
             tools_qt.set_action_checked(action_edit, False)
             tools_gw.enable_widgets(dialog, self.complet_result['body']['data'], False)
+            if self.epa_complet_result:
+                tools_gw.enable_widgets(dialog, self.epa_complet_result['body']['data'], False)
             self._enable_actions(dialog, False)
 
 
@@ -1650,6 +1657,8 @@ class GwInfo(QObject):
             QgsProject.instance().blockSignals(True)
             tools_qt.set_action_checked(action_edit, False)
             tools_gw.enable_widgets(dialog, self.complet_result['body']['data'], False)
+            if self.epa_complet_result:
+                tools_gw.enable_widgets(dialog, self.epa_complet_result['body']['data'], False)
             self._enable_actions(dialog, False)
             QgsProject.instance().blockSignals(False)
         else:
@@ -1668,6 +1677,8 @@ class GwInfo(QObject):
         self.iface.setActiveLayer(layer)
         tools_qt.set_action_checked(action_edit, True)
         tools_gw.enable_all(dialog, self.complet_result['body']['data'])
+        if self.epa_complet_result:
+            tools_gw.enable_all(dialog, self.epa_complet_result['body']['data'])
         self._enable_actions(dialog, True)
         layer.startEditing()
         QgsProject.instance().blockSignals(False)
@@ -2194,6 +2205,7 @@ class GwInfo(QObject):
         body = tools_gw.create_body(feature=feature)
         function_name = 'gw_fct_getinfofromid'
         complet_result = tools_gw.execute_procedure(function_name, body)
+        self.epa_complet_result = complet_result
         if complet_result:
             if complet_result['body']['form'].get('visibleTabs'):
                 self.visible_tabs = complet_result['body']['form']['visibleTabs']
