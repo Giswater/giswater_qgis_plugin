@@ -2213,9 +2213,12 @@ class GwInfo(QObject):
             for lyt in dialog.findChildren(QGridLayout, QRegularExpression('lyt_epa')):
                 i = 0
                 while i < lyt.count():
-                    widget = lyt.itemAt(i).widget()
+                    item = lyt.itemAt(i)
+                    widget = item.widget()
                     if widget:
                         widget.deleteLater()
+                    else:  # for QSpacerItems
+                        lyt.removeItem(item)
                     i += 1
             self._manage_dlg_widgets(complet_result, {}, False, reload_epa=True)
             tools_qt.enable_tab_by_tab_name(self.tab_main, 'tab_epa', True)
