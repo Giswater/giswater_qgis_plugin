@@ -211,7 +211,7 @@ BEGIN
 		EXECUTE v_querystring;
 
 		SELECT gw_fct_infofromid(p_data) INTO v_return;
-		SET search_path = 'schema_name', public;
+		SET search_path = 'SCHEMA_NAME', public;
 		EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 		RETURN v_return;
 	END IF;
@@ -736,7 +736,7 @@ raise notice 'BB -> %',v_querystring;
 			IF v_id IS NULL AND v_isepa IS true THEN
 			    v_id = '';
 			ELSIF v_id IS NULL AND v_islayer is not true then
-				v_id = (SELECT nextval('schema_name.urn_id_seq'));
+				v_id = (SELECT nextval('SCHEMA_NAME.urn_id_seq'));
 			END IF;
 
 			RAISE NOTICE 'User has permissions to edit table % using id %', v_tablename, v_id;
