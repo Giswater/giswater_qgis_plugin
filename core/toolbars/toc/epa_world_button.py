@@ -100,13 +100,13 @@ def set_epa_world(_set_epa_world=None, selector_change=False, is_init=False):
         for layer in arc_layers:
             layer.setSubsetString(sql)
 
-        if nodes:
-            node_ids = "','".join(str(node) for node in nodes)
-            sql += " OR node_id IN ('{}')".format(node_ids)
-
         # node
         for layer in node_layers:
-            layer.setSubsetString(sql)
+            nodes_sql = sql
+            if nodes:
+                node_ids = "','".join(str(node) for node in nodes)
+                nodes_sql += " OR node_id IN ('{}')".format(node_ids)
+            layer.setSubsetString(nodes_sql)
 
         if global_vars.project_type == 'ws':
             # ws connec
