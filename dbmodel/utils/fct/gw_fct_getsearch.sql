@@ -151,8 +151,12 @@ BEGIN
 					
 				end if;
 			
-				--v_sys_query_text = replace(v_tab_params->>'sys_query_text', 'SELECT', concat('SELECT ', quote_literal(v_tab_params->>'sys_pk'), ' as key, ', v_tab_params->>'sys_pk', ' as value, '));
-				v_sys_query_text = 'SELECT ' || quote_literal(v_tab_params->>'sys_pk') || ' as key, ' || (v_tab_params->>'sys_pk')::text || ' as value, ' || (v_tab_params->>'sys_display_name')::text || ' as display_name FROM ' ||  (v_tab_params->>'sys_tablename')::text || ' WHERE ' || (v_tab_params->>'sys_display_name')::text || ' ILIKE ''%'||v_filter::text||'%'' ';
+				if v_tab_params->>'sys_search_name' is not null then
+					v_sys_query_text = 'SELECT ' || quote_literal(v_tab_params->>'sys_pk') || ' as key, ' || (v_tab_params->>'sys_pk')::text || ' as value, ' || (v_tab_params->>'sys_display_name')::text || ' as display_name FROM ' ||  (v_tab_params->>'sys_tablename')::text || ' WHERE ' || (v_tab_params->>'sys_search_name')::text || ' ILIKE ''%'||v_filter::text||'%'' ';
+				else
+					v_sys_query_text = 'SELECT ' || quote_literal(v_tab_params->>'sys_pk') || ' as key, ' || (v_tab_params->>'sys_pk')::text || ' as value, ' || (v_tab_params->>'sys_display_name')::text || ' as display_name FROM ' ||  (v_tab_params->>'sys_tablename')::text || ' WHERE ' || (v_tab_params->>'sys_display_name')::text || ' ILIKE ''%'||v_filter::text||'%'' ';
+				end if;
+
 				if v_tab_params->>'sys_filter' != '' then
 					v_sys_query_text := v_sys_query_text || ' AND ('||(v_tab_params->>'sys_filter')::text||')';
 				end if;
