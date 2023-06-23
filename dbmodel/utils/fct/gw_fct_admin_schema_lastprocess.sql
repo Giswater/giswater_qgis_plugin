@@ -332,11 +332,20 @@ BEGIN
 				UPDATE config_form_fields SET hidden = false where (columnname IN ('demand_max', 'demand_min', 'demand_avg') OR columnname IN ('press_max', 'press_min', 'press_avg') OR 
 				columnname IN ('om_state', 'conserv_state', 'priority', 'valve_location', 'valve_type', 'shutoff_valve', 'access_type', 'placement_type', 'crmzone_id')) 
 				AND formname ilike 've_connec%';
+                
+                UPDATE config_form_fields SET hidden=true WHERE formname = 'v_edit_arc' AND columnname='parent_id';
+                UPDATE config_form_fields SET hidden=true WHERE formname like 've_arc%' AND columnname='parent_id';
+                UPDATE config_form_fields SET hidden=true WHERE formname = 'v_edit_arc' AND columnname='observ';
+                UPDATE config_form_fields SET hidden=true WHERE formname like 've_arc%' AND columnname='observ';
 
 					
 			ELSIF v_projecttype = 'UD' THEN
 				UPDATE config_form_fields SET hidden = false where 
 				columnname IN ('step_pp', 'step_fe', 'step_replace', 'cover') AND formname ilike 've_node%';
+                
+                UPDATE config_form_fields SET layoutorder=30 WHERE formname = 'v_edit_arc' AND columnname='pavcat_id';
+                UPDATE config_form_fields SET layoutorder=30 WHERE formname like 've_arc%' AND columnname='pavcat_id';
+                
 			END IF;
 
 		ELSIF v_isnew IS FALSE THEN
