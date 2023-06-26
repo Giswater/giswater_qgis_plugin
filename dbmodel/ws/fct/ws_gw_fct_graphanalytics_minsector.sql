@@ -291,8 +291,8 @@ BEGIN
 
 			UPDATE minsector SET num_hydro = a.c FROM (
 			select minsector_id, case when count(*) is not null then count(*) else 0 end as c FROM 
-			(SELECT * FROM v_rtc_hydrometer_x_connec JOIN connec USING (connec_id) 
-			UNION SELECT * FROM v_rtc_hydrometer_x_node JOIN node USING (node_id) 
+			(SELECT hydrometer_id, minsector_id FROM v_rtc_hydrometer_x_connec JOIN connec USING (connec_id) 
+			UNION SELECT hydrometer_id, minsector_id FROM v_rtc_hydrometer_x_node JOIN node USING (node_id) 
 			)a GROUP by minsector_id)a WHERE a.minsector_id=minsector.minsector_id;
 			
  			UPDATE minsector SET num_hydro = 0 where num_hydro is null and expl_id in (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
