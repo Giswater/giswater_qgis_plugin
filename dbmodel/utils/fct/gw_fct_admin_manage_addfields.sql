@@ -375,7 +375,7 @@ BEGIN
 				label, ismandatory, isparent, iseditable, isautoupdate, layoutname, 
 				placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetcontrols,
 				dv_parent_id, dv_querytext_filterc, dv_querytext,  linkedobject, hidden)	
-				VALUES (v_viewname, v_formtype, 'data', v_param_name, v_layoutorder, v_config_datatype, v_config_widgettype,
+				VALUES (v_viewname, v_formtype, 'tab_data', v_param_name, v_layoutorder, v_config_datatype, v_config_widgettype,
 				v_label, v_ismandatory,v_isparent, v_iseditable, v_isautoupdate, v_layoutname,
 				v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_isnullvalue, v_jsonwidgetdim,
 				v_parentid, v_querytextfilterc, v_querytext,  v_linkedobject, v_hidden)
@@ -653,7 +653,7 @@ BEGIN
 			datatype, widgettype, label, ismandatory, isparent, iseditable, 
 			layoutname, placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetcontrols,
 			dv_parent_id, dv_querytext_filterc, dv_querytext,  linkedobject, hidden)
-			VALUES (v_viewname, v_formtype, 'data', v_param_name, v_layoutorder,v_config_datatype, v_config_widgettype,
+			VALUES (v_viewname, v_formtype, 'tab_data', v_param_name, v_layoutorder,v_config_datatype, v_config_widgettype,
 			v_label, v_ismandatory, v_isparent, v_iseditable, v_layoutname,
 			v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_isnullvalue, v_jsonwidgetdim,
 			v_parentid, v_querytextfilterc, v_querytext,  v_linkedobject, v_hidden)
