@@ -115,3 +115,14 @@ UPDATE config_form_fields
   }
 }'::json
 	WHERE formtype='form_feature' AND columnname='tbl_documents' AND tabname='tab_documents';
+
+UPDATE config_form_fields SET tabname = 'tab_data' WHERE tabname='data';
+UPDATE config_form_fields SET tabname = 'tab_connections' WHERE tabname='connection';
+
+INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam)
+VALUES ('tabname_typevalue', 'tab_none', 'tab_none', 'tabNone', NULL) 
+ON CONFLICT (typevalue, id) DO NOTHING;
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
+VALUES ('config_typevalue', 'tabname_typevalue','config_form_fields','tabname', null, true)
+ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
