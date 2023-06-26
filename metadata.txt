@@ -8,6 +8,8 @@ version=3.5.038
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Adrian Valenciano, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Elies Bertran, Abel García Juanes, Xavier Torret
 
 Changelog=Version 3.5.038
+    - Add user variables to auto load or not go2epa selector layers
+    - Various bug fixes
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
