@@ -41,9 +41,9 @@ BEGIN
 
 		-- FEATURE INSERT
 		INSERT INTO inp_subcatchment (subc_id, outlet_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero, routeto, rted, maxrate, minrate, decay, drytime, maxinfil, suction,
-		conduct, initdef, curveno, drytime_2, sector_id, hydrology_id, the_geom, descript) 
+		conduct, initdef, curveno, drytime_2, sector_id, hydrology_id, the_geom, descript,minelev ) 
 		VALUES (NEW.subc_id, NEW.outlet_id, NEW.rg_id, NEW.area, NEW.imperv, NEW.width, NEW.slope, NEW.clength, NEW.snow_id, NEW.nimp, NEW.nperv, NEW.simp, NEW.sperv, NEW.zero, NEW.routeto, NEW.rted, NEW.maxrate, 
-		NEW.minrate, NEW.decay, NEW.drytime, NEW.maxinfil, NEW.suction, NEW.conduct, NEW.initdef, NEW.curveno, NEW.drytime_2, NEW.sector_id, NEW.hydrology_id, NEW.the_geom, NEW.descript);
+		NEW.minrate, NEW.decay, NEW.drytime, NEW.maxinfil, NEW.suction, NEW.conduct, NEW.initdef, NEW.curveno, NEW.drytime_2, NEW.sector_id, NEW.hydrology_id, NEW.the_geom, NEW.descript, NEW.minelev);
 		
 		RETURN NEW;
 
@@ -55,7 +55,7 @@ BEGIN
 		SET subc_id=NEW.subc_id, outlet_id=NEW.outlet_id, rg_id=NEW.rg_id, area=NEW.area, imperv=NEW.imperv, width=NEW.width, slope=NEW.slope, clength=NEW.clength, snow_id=NEW.snow_id, nimp=NEW.nimp, nperv=NEW.nperv, 
 		simp=NEW.simp, sperv=NEW.sperv, zero=NEW.zero, routeto=NEW.routeto, rted=NEW.rted, maxrate=NEW.maxrate, minrate=NEW.minrate, decay=NEW.decay, drytime=NEW.drytime, maxinfil=NEW.maxinfil, suction=NEW.suction, 
 		conduct=NEW.conduct, initdef=NEW.initdef, curveno=NEW.curveno, conduct_2=NEW.conduct_2, drytime_2=NEW.drytime_2, sector_id=NEW.sector_id, hydrology_id=NEW.hydrology_id, the_geom=NEW.the_geom,
-		descript = NEW.descript
+		descript = NEW.descript, minelev=NEW.minelev
 		WHERE subc_id = OLD.subc_id AND hydrology_id = OLD.hydrology_id;
                 
 		RETURN NEW;
