@@ -1,3 +1,7 @@
 3.5.038
 *************
 - Enhance trg_config_control adding element_type to allowed values on featurecat_id field
+- Correct management of inventory field on edit_triggers
+- Enhance performance for check projects
+- Fix duplicated widgets on config_form_fields for not sample new projects
+- Various bug fix
