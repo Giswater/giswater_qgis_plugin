@@ -25,3 +25,15 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET widgetfunction='{"functionName": "filter_table", "parameters": {"columnfind": "hydrometer_customer_code", "field_id": "feature_id"}}'::json
 	WHERE formtype='form_feature' AND columnname='hydrometer_id' AND tabname='tab_hydrometer';
+	
+
+insert into sys_param_user (id,formname, descript, sys_role, idval, label, isenabled, layoutorder, project_type, "datatype", 
+widgettype, ismandatory , layoutname,iseditable, placeholder, source)
+select 'inp_report_nodes_2', formname, descript, sys_role, idval, label, isenabled, layoutorder+1, project_type, "datatype", 
+widgettype, ismandatory , layoutname, iseditable, placeholder, source from sys_param_user spu where id = 'inp_report_nodes'
+
+update sys_param_user set label = concat(label,'I-(max.40):') where id = 'inp_report_nodes';
+update sys_param_user set label = concat(label,'II-(max.40):') where id = 'inp_report_nodes_2';
+
+update sys_param_user set layoutorder = 10 where id = 'inp_report_links';
+

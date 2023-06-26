@@ -146,3 +146,10 @@ CREATE OR REPLACE VIEW v_ui_hydroval
      LEFT JOIN crm_typevalue crmstate ON ext_rtc_hydrometer_x_data.value_state = crmstate.id::integer AND crmstate.typevalue::text = 'crm_value_state'::text
   ORDER BY 1;
 
+CREATE OR REPLACE VIEW vi_report
+AS SELECT a.idval AS parameter,
+    b.value
+   FROM sys_param_user a
+     JOIN config_param_user b ON a.id = b.parameter::text
+  WHERE (a.layoutname = ANY (ARRAY['lyt_reports_1'::text, 'lyt_reports_2'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT null
+  order by 1
