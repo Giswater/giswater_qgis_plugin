@@ -642,6 +642,7 @@ BEGIN
 		--update values of related connecs;
 		IF NEW.fluid_type != OLD.fluid_type AND v_autoupdate_fluid IS TRUE THEN
 			UPDATE connec SET fluid_type = NEW.fluid_type WHERE arc_id = NEW.arc_id;
+			UPDATE link SET fluid_type = NEW.fluid_type WHERE exit_id = NEW.arc_id;
 		END IF;
 
 		RETURN NEW;
