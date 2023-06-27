@@ -86,6 +86,9 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
 
 	-- process
+	-- inserting on catalog table
+	PERFORM setval('SCHEMA_NAME.cat_dscenario_dscenario_id_seq'::regclass,(SELECT max(dscenario_id) FROM cat_dscenario) ,true);
+
 	INSERT INTO cat_dscenario (name, descript, parent_id, dscenario_type, active, expl_id,log) 
 	VALUES (v_name, v_descript, v_parent_id, v_dscenario_type, v_active, v_expl_id, concat('Created by ',current_user,' on ',substring(now()::text,0,20)))
 	ON CONFLICT (name) DO NOTHING
