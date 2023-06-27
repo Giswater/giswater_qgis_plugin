@@ -88,6 +88,7 @@ v_ignoregraphanalytics boolean;
 v_ignoreepa boolean;
 v_ignoreplan boolean;
 v_usepsector boolean;
+v_cur_expl integer[];
 
 BEGIN 
 
@@ -166,6 +167,8 @@ BEGIN
 	-- init process
 	v_isenabled:=FALSE;
 	v_count=0;
+
+	select array_agg(expl_id) INTO v_cur_expl from selector_expl where cur_user = current_user;
     
 	-- Delete and insert values from python into audit_check_project	
         DELETE FROM audit_check_project WHERE cur_user = current_user AND fid = 101;
@@ -564,6 +567,11 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, v_result_id, 2, NULL);
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, v_result_id, 1, NULL);
 
+		--reset exploitations
+		DELETE FROM selector_expl  where cur_user = current_user;
+		INSERT INTO selector_expl
+		SELECT expl_id, current_user FROM exploitation where expl_id = ANY (v_cur_expl);
+		
 		-- get results
 		-- info
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
