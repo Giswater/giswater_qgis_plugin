@@ -404,7 +404,9 @@ UPDATE config_form_fields SET label='Sector name' WHERE label='Dma name' AND col
 DELETE FROM config_param_system WHERE "parameter"='edit_connect_autoupdate_dma';
 DELETE FROM config_param_system WHERE "parameter"='edit_connect_autoupdate_fluid';
 
-ALTER TABLE arc DISABLE TRIGGER ALL;
+ALTER TABLE arc DISABLE TRIGGER gw_trg_arc_link_update;
+ALTER TABLE arc DISABLE TRIGGER gw_trg_arc_noderotation_update;
+ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
 
 UPDATE arc SET nodetype_1 = node_type FROM vu_node WHERE node_id = node_1;
 UPDATE arc SET nodetype_2 = node_type FROM vu_node WHERE node_id = node_2;
@@ -415,7 +417,9 @@ UPDATE arc SET depth2 = vu_node.depth FROM vu_node WHERE node_id = node_2;
 UPDATE arc SET staticpress1 = vu_node.staticpressure FROM vu_node WHERE node_id = node_1;
 UPDATE arc SET staticpress2 = vu_node.staticpressure FROM vu_node WHERE node_id = node_2;
 
-ALTER TABLE arc ENABLE TRIGGER ALL;
+ALTER TABLE arc ENABLE TRIGGER gw_trg_arc_link_update;
+ALTER TABLE arc ENABLE TRIGGER gw_trg_arc_noderotation_update;
+ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
 
 
 SELECT gw_fct_connect_link_refactor();
