@@ -762,7 +762,7 @@ class GwToolBoxButton(GwAction):
             self.no_clickable_items.append(f'{group} [{len(functions)}]')
             functions.sort(key=self._sort_list, reverse=False)
             for function in functions:
-                func_name = QStandardItem(str(function['listname']))
+                func_name = QStandardItem(str(function['id']))
                 label = QStandardItem(str(function['alias']))
                 vdefault = QStandardItem(str(function['addparam']))
                 font = label.font()
