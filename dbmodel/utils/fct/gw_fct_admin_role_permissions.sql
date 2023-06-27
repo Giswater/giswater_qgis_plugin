@@ -90,7 +90,8 @@ BEGIN
 	END IF;
 
 	-- Assign role admin to current user
-	IF 'role_admin' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
+	IF 'role_admin' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) and 
+	(select rolsuper from pg_roles where rolname = current_user) is true THEN
 		GRANT role_admin TO current_user;
 	END IF;
 
