@@ -1581,6 +1581,7 @@ class GwPsector:
     def set_toggle_active(self, dialog, qtbl_psm):
 
         sql = ""
+        selector_updated = False
         selected_list = qtbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -1597,12 +1598,20 @@ class GwPsector:
                 return
             if active:
                 sql += f"UPDATE plan_psector SET active = False WHERE psector_id = {psector_id};"
+                # Remove from selector
+                sql += f"DELETE FROM selector_psector WHERE psector_id = {psector_id} AND cur_user = current_user;"
+                message = f"Psector removed from selector"
+                tools_qgis.show_info(message, dialog=self.dlg_psector_mng)
+                selector_updated = True
             else:
                 sql += f"UPDATE plan_psector SET active = True WHERE psector_id = {psector_id};"
 
         tools_db.execute_sql(sql)
 
         self._filter_table(dialog, dialog.tbl_psm, dialog.txt_name, dialog.chk_active, 'v_ui_plan_psector')
+        if selector_updated:
+            tools_qgis.force_refresh_map_canvas()
+            tools_gw.refresh_selectors()
 
 
     def update_current_psector(self, dialog, qtbl_psm):
