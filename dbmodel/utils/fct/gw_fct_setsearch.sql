@@ -141,6 +141,8 @@ v_exec_func text;
 v_table_name text;
 v_search_add text;
 v_device integer;
+v_xcoord float;
+v_ycoord float;
 
 BEGIN
 
