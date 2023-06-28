@@ -18,3 +18,17 @@ UPDATE config_toolbox SET inputparams = '[{"widgetname":"insertIntoNode", "label
 {"widgetname":"nodeType", "label":"Node type:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":7, "dvQueryText":"select distinct id as id, id as idval from cat_feature_node where id is not null", "selectedId":"$userNodetype", "iseditable":false},
 {"widgetname":"nodeCat", "label":"Node catalog:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":8, "dvQueryText":"select distinct id as id, id as idval from cat_node where nodetype_id = $userNodetype  OR nodetype_id is null order by id", "selectedId":"$userNodecat"}]' 
 WHERE id = 2118;
+
+
+UPDATE config_form_fields set dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_location WHERE feature_type=''ELEMENT'' AND active IS TRUE'
+WHERE columnname='location_type' AND formname = 'v_edit_element';
+
+UPDATE config_form_fields set dv_querytext='SELECT function_type as id, function_type as idval FROM man_type_function WHERE feature_type=''ELEMENT'' AND active IS TRUE',
+dv_orderby_id=true, dv_isnullvalue=true
+WHERE columnname='function_type' AND formname = 'v_edit_element';
+
+UPDATE config_form_fields set dv_querytext='SELECT category_type as id, category_type as idval FROM man_type_category WHERE feature_type=''ELEMENT'' AND active IS TRUE'
+WHERE columnname='category_type' AND formname = 'v_edit_element';
+
+UPDATE config_form_fields set dv_querytext='SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE feature_type=''ELEMENT'' AND active IS TRUE'
+WHERE columnname='fluid_type' AND formname = 'v_edit_element';
