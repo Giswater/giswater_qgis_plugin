@@ -75,34 +75,34 @@ INSERT INTO config_visit_parameter VALUES ('defect_node', NULL, 'INSPECTION', 'N
 INSERT INTO config_visit_parameter VALUES ('incident_comment', NULL, 'INCIDENCE', 'ALL', 'text', NULL, 'incident_comment', 'event_standard', 'defaultvalue', FALSE, 'incident_comment');
 INSERT INTO config_visit_parameter VALUES ('incident_type', NULL, 'INCIDENCE', 'ALL', 'text', NULL, 'incident type', 'event_standard', 'defaultvalue', FALSE, 'incident_type');
 
-INSERT INTO config_visit_parameter VALUES ('observ', NULL, 'INSPECTION', 'ALL', 'text', NULL, 'Inspection observations', 'event_standard', 'defaultvalue', FALSE, 'observ');
+INSERT INTO config_visit_parameter VALUES ('insp_observ', NULL, 'INSPECTION', 'ALL', 'text', NULL, 'Inspection observations', 'event_standard', 'defaultvalue', FALSE, 'insp_observ');
 INSERT INTO config_visit_parameter VALUES ('photo', NULL, 'INSPECTION', 'ALL', 'boolean', NULL, 'Photography', 'event_standard', 'defaultvalue', FALSE, 'photo');
 
 
 -- config_visit_class_x_parameter
 INSERT INTO config_visit_class_x_parameter VALUES (1, 'leak_arc');
-INSERT INTO config_visit_class_x_parameter VALUES (1, 'observ');
+INSERT INTO config_visit_class_x_parameter VALUES (1, 'insp_observ');
 INSERT INTO config_visit_class_x_parameter VALUES (1, 'photo');
 INSERT INTO config_visit_class_x_parameter VALUES (2, 'leak_node');
-INSERT INTO config_visit_class_x_parameter VALUES (2, 'observ');
+INSERT INTO config_visit_class_x_parameter VALUES (2, 'insp_observ');
 INSERT INTO config_visit_class_x_parameter VALUES (2, 'photo');
 INSERT INTO config_visit_class_x_parameter VALUES (3, 'leak_connec');
-INSERT INTO config_visit_class_x_parameter VALUES (3, 'observ');
+INSERT INTO config_visit_class_x_parameter VALUES (3, 'insp_observ');
 INSERT INTO config_visit_class_x_parameter VALUES (3, 'photo');
 INSERT INTO config_visit_class_x_parameter VALUES (4, 'clean_arc');
 INSERT INTO config_visit_class_x_parameter VALUES (4, 'sediments_arc');
 INSERT INTO config_visit_class_x_parameter VALUES (4, 'defect_arc');
-INSERT INTO config_visit_class_x_parameter VALUES (4, 'observ');
+INSERT INTO config_visit_class_x_parameter VALUES (4, 'insp_observ');
 INSERT INTO config_visit_class_x_parameter VALUES (4, 'photo');
 INSERT INTO config_visit_class_x_parameter VALUES (5, 'defect_node');
 INSERT INTO config_visit_class_x_parameter VALUES (5, 'clean_node');
 INSERT INTO config_visit_class_x_parameter VALUES (5, 'sediments_node');
-INSERT INTO config_visit_class_x_parameter VALUES (5, 'observ');
+INSERT INTO config_visit_class_x_parameter VALUES (5, 'insp_observ');
 INSERT INTO config_visit_class_x_parameter VALUES (5, 'photo');
 INSERT INTO config_visit_class_x_parameter VALUES (6, 'clean_connec');
 INSERT INTO config_visit_class_x_parameter VALUES (6, 'defect_connec');
 INSERT INTO config_visit_class_x_parameter VALUES (6, 'sediments_connec');
-INSERT INTO config_visit_class_x_parameter VALUES (6, 'observ');
+INSERT INTO config_visit_class_x_parameter VALUES (6, 'insp_observ');
 INSERT INTO config_visit_class_x_parameter VALUES (6, 'photo');
 INSERT INTO config_visit_class_x_parameter VALUES (7, 'incident_type');
 INSERT INTO config_visit_class_x_parameter VALUES (7, 'incident_comment');
@@ -134,7 +134,7 @@ CREATE OR REPLACE VIEW ve_visit_arc_leak AS
     om_visit.class_id,
     om_visit.status,
     a.param_1 AS leak_arc,
-    a.param_2 AS observ,
+    a.param_2 AS insp_observ,
     a.param_3 AS photo
    FROM om_visit
      JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
@@ -148,7 +148,7 @@ CREATE OR REPLACE VIEW ve_visit_arc_leak AS
       FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
       LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
       where config_visit_class.ismultievent = TRUE and om_visit.class_id = 1 ORDER  BY 1,2'::text, 
-      ' VALUES (''leak_arc''),(''observ''),(''photo'')'::text) 
+      ' VALUES (''leak_arc''),(''insp_observ''),(''photo'')'::text) 
       ct(visit_id integer, param_1 text, param_2 text, param_3 boolean)) a ON a.visit_id = om_visit.id
   WHERE config_visit_class.ismultievent = true AND config_visit_class.id = 1;
   
@@ -176,7 +176,7 @@ CREATE OR REPLACE VIEW ve_visit_node_leak AS
     om_visit.class_id,
     om_visit.status,
     a.param_1 AS leak_node,
-    a.param_2 AS observ,
+    a.param_2 AS insp_observ,
     a.param_3 AS photo
    FROM om_visit
      JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
@@ -190,7 +190,7 @@ CREATE OR REPLACE VIEW ve_visit_node_leak AS
       FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
       LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
       where config_visit_class.ismultievent = TRUE and om_visit.class_id = 2 ORDER  BY 1,2'::text, 
-      ' VALUES (''leak_node''),(''observ''),(''photo'')'::text) 
+      ' VALUES (''leak_node''),(''insp_observ''),(''photo'')'::text) 
       ct(visit_id integer, param_1 text, param_2 text, param_3 boolean)) a ON a.visit_id = om_visit.id
   WHERE config_visit_class.ismultievent = true AND config_visit_class.id = 2;
   
@@ -218,7 +218,7 @@ CREATE OR REPLACE VIEW ve_visit_connec_leak AS
     om_visit.class_id,
     om_visit.status,
     a.param_1 AS leak_connec,
-    a.param_2 AS observ,
+    a.param_2 AS insp_observ,
     a.param_3 AS photo
    FROM om_visit
      JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
@@ -232,7 +232,7 @@ CREATE OR REPLACE VIEW ve_visit_connec_leak AS
       FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
       LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
       where config_visit_class.ismultievent = TRUE and om_visit.class_id = 3 ORDER  BY 1,2'::text, 
-      ' VALUES (''leak_connec''),(''observ''),(''photo'')'::text) 
+      ' VALUES (''leak_connec''),(''insp_observ''),(''photo'')'::text) 
       ct(visit_id integer, param_1 text, param_2 text, param_3 boolean)) a ON a.visit_id = om_visit.id
   WHERE config_visit_class.ismultievent = true AND config_visit_class.id = 3;
   
@@ -262,7 +262,7 @@ CREATE OR REPLACE VIEW ve_visit_arc_insp AS
     a.param_1 AS sediments_arc,
     a.param_2 AS defect_arc,
     a.param_3 AS clean_arc,
-    a.param_4 AS observ,
+    a.param_4 AS insp_observ,
     a.param_5 AS photo
    FROM om_visit
      JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
@@ -278,7 +278,7 @@ CREATE OR REPLACE VIEW ve_visit_arc_insp AS
       FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
       LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
       where config_visit_class.ismultievent = TRUE and om_visit.class_id = 4 ORDER  BY 1,2'::text, 
-      ' VALUES (''sediments_arc''),(''defect_arc''),(''clean_arc''),(''observ''),(''photo'')'::text) 
+      ' VALUES (''sediments_arc''),(''defect_arc''),(''clean_arc''),(''insp_observ''),(''photo'')'::text) 
       ct(visit_id integer, param_1 text, param_2 text, param_3 text, param_4 text, param_5 boolean)) a ON a.visit_id = om_visit.id
   WHERE config_visit_class.ismultievent = true AND config_visit_class.id = 4;
   
@@ -308,7 +308,7 @@ CREATE OR REPLACE VIEW ve_visit_node_insp AS
     a.param_1 AS sediments_node,
     a.param_2 AS defect_node,
     a.param_3 AS clean_node,
-    a.param_4 AS observ,
+    a.param_4 AS insp_observ,
     a.param_5 AS photo
    FROM om_visit
      JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
@@ -324,7 +324,7 @@ CREATE OR REPLACE VIEW ve_visit_node_insp AS
       FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
       LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
       where config_visit_class.ismultievent = TRUE and om_visit.class_id = 5 ORDER  BY 1,2'::text, 
-      ' VALUES (''sediments_node''),(''defect_node''),(''clean_node''),(''observ''),(''photo'')'::text) 
+      ' VALUES (''sediments_node''),(''defect_node''),(''clean_node''),(''insp_observ''),(''photo'')'::text) 
       ct(visit_id integer, param_1 text, param_2 text, param_3 text, param_4 text, param_5 boolean)) a ON a.visit_id = om_visit.id
   WHERE config_visit_class.ismultievent = true AND config_visit_class.id = 5;
   
@@ -354,7 +354,7 @@ CREATE OR REPLACE VIEW ve_visit_connec_insp AS
     a.param_1 AS sediments_connec,
     a.param_2 AS defect_connec,
     a.param_3 AS clean_connec,
-    a.param_4 AS observ,
+    a.param_4 AS insp_observ,
     a.param_5 AS photo
    FROM om_visit
      JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
@@ -370,7 +370,7 @@ CREATE OR REPLACE VIEW ve_visit_connec_insp AS
       FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
       LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
       where config_visit_class.ismultievent = TRUE and om_visit.class_id = 6 ORDER  BY 1,2'::text, 
-      ' VALUES (''sediments_connec''),(''defect_connec''),(''clean_connec''),(''observ''),(''photo'')'::text) 
+      ' VALUES (''sediments_connec''),(''defect_connec''),(''clean_connec''),(''insp_observ''),(''photo'')'::text) 
       ct(visit_id integer, param_1 text, param_2 text, param_3 text, param_4 text, param_5 boolean)) a ON a.visit_id = om_visit.id
   WHERE config_visit_class.ismultievent = true AND config_visit_class.id = 6;
   
@@ -515,7 +515,7 @@ AS SELECT ve_visit_arc_leak.visit_id,
     c.idval AS "Visit class",
     t.idval AS "Status",
     ve_visit_arc_leak.leak_arc AS "Leak",
-    ve_visit_arc_leak.observ AS "Observation",
+    ve_visit_arc_leak.insp_observ AS "Observation",
     ve_visit_arc_leak.photo AS "Photo",
     ve_visit_arc_leak.the_geom
    FROM ve_visit_arc_leak
@@ -533,7 +533,7 @@ AS SELECT ve_visit_node_leak.visit_id,
     c.idval AS "Visit class",
     t.idval AS "Status",
     ve_visit_node_leak.leak_node AS "Leak",
-    ve_visit_node_leak.observ AS "Observation",
+    ve_visit_node_leak.insp_observ AS "Observation",
     ve_visit_node_leak.photo AS "Photo",
     ve_visit_node_leak.the_geom
    FROM ve_visit_node_leak
@@ -551,7 +551,7 @@ AS SELECT ve_visit_connec_leak.visit_id,
     c.idval AS "Visit class",
     t.idval AS "Status",
     ve_visit_connec_leak.leak_connec AS "Leak",
-    ve_visit_connec_leak.observ AS "Observation",
+    ve_visit_connec_leak.insp_observ AS "Observation",
     ve_visit_connec_leak.photo AS "Photo",
     ve_visit_connec_leak.the_geom
    FROM ve_visit_connec_leak
@@ -571,7 +571,7 @@ AS SELECT ve_visit_arc_insp.visit_id,
     ve_visit_arc_insp.sediments_arc AS "Sediments",
     u.idval AS "Defects",
     y.idval AS "Cleaned",
-    ve_visit_arc_insp.observ AS "Observation",
+    ve_visit_arc_insp.insp_observ AS "Observation",
     ve_visit_arc_insp.photo AS "Photo",
     ve_visit_arc_insp.the_geom
    FROM ve_visit_arc_insp
@@ -593,7 +593,7 @@ AS SELECT ve_visit_node_insp.visit_id,
     ve_visit_node_insp.sediments_node AS "Sediments",
     u.idval AS "Defects",
     y.idval AS "Cleaned",
-    ve_visit_node_insp.observ AS "Observation",
+    ve_visit_node_insp.insp_observ AS "Observation",
     ve_visit_node_insp.photo AS "Photo",
     ve_visit_node_insp.the_geom
    FROM ve_visit_node_insp
@@ -615,7 +615,7 @@ AS SELECT ve_visit_connec_insp.visit_id,
     ve_visit_connec_insp.sediments_connec AS "Sediments",
     u.idval AS "Defects",
     y.idval AS "Cleaned",
-    ve_visit_connec_insp.observ AS "Observation",
+    ve_visit_connec_insp.insp_observ AS "Observation",
     ve_visit_connec_insp.photo AS "Photo",
     ve_visit_connec_insp.the_geom
    FROM ve_visit_connec_insp
@@ -703,7 +703,7 @@ INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutna
 VALUES('visit_arc_leak', 'form_visit', 'tab_data', 'leak_arc', 'lyt_data_1', NULL, 'string', 'text', 'Leak arc:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 5);
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
-VALUES('visit_arc_leak', 'form_visit', 'tab_data', 'observ', 'lyt_data_1', NULL, 'string', 'text', 'Observations:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 6);
+VALUES('visit_arc_leak', 'form_visit', 'tab_data', 'insp_observ', 'lyt_data_1', NULL, 'string', 'text', 'Observations:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 6);
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('visit_arc_leak', 'form_visit', 'tab_data', 'status', 'lyt_data_1', NULL, 'integer', 'combo', 'Status:', NULL, NULL, false, false, true, NULL, NULL, 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''visit_status'' and id =''4''', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 7);
@@ -751,7 +751,7 @@ INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutna
 VALUES('visit_node_leak', 'form_visit', 'tab_data', 'leak_node', 'lyt_data_1', NULL, 'string', 'text', 'Leak node:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 5);
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
-VALUES('visit_node_leak', 'form_visit', 'tab_data', 'observ', 'lyt_data_1', NULL, 'string', 'text', 'Observations:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 6);
+VALUES('visit_node_leak', 'form_visit', 'tab_data', 'insp_observ', 'lyt_data_1', NULL, 'string', 'text', 'Observations:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 6);
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('visit_node_leak', 'form_visit', 'tab_data', 'status', 'lyt_data_1', NULL, 'integer', 'combo', 'Status:', NULL, NULL, false, false, true, NULL, NULL, 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''visit_status'' and id =''4''', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 7);
@@ -799,7 +799,7 @@ INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutna
 VALUES('visit_connec_leak', 'form_visit', 'tab_data', 'leak_connec', 'lyt_data_1', NULL, 'string', 'text', 'Leak connec:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 5);
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
-VALUES('visit_connec_leak', 'form_visit', 'tab_data', 'observ', 'lyt_data_1', NULL, 'string', 'text', 'Observations:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 6);
+VALUES('visit_connec_leak', 'form_visit', 'tab_data', 'insp_observ', 'lyt_data_1', NULL, 'string', 'text', 'Observations:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 6);
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('visit_connec_leak', 'form_visit', 'tab_data', 'status', 'lyt_data_1', NULL, 'integer', 'combo', 'Status:', NULL, NULL, false, false, true, NULL, NULL, 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''visit_status'' and id =''4''', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 7);
@@ -853,7 +853,7 @@ INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutna
 VALUES('visit_arc_insp', 'form_visit', 'tab_data', 'clean_arc', 'lyt_data_1', NULL, 'integer', 'combo', 'Clean arc:', NULL, NULL, false, false, true, NULL, NULL, 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''visit_cleaned''', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 7);
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
-VALUES('visit_arc_insp', 'form_visit', 'tab_data', 'observ', 'lyt_data_1', NULL, 'string', 'text', 'Observations:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 8);
+VALUES('visit_arc_insp', 'form_visit', 'tab_data', 'insp_observ', 'lyt_data_1', NULL, 'string', 'text', 'Observations:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 8);
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('visit_arc_insp', 'form_visit', 'tab_data', 'status', 'lyt_data_1', NULL, 'integer', 'combo', 'Status:', NULL, NULL, false, false, true, NULL, NULL, 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''visit_status'' and id =''4''', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 9);
@@ -908,7 +908,7 @@ INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutna
 VALUES('visit_node_insp', 'form_visit', 'tab_data', 'clean_node', 'lyt_data_1', NULL, 'integer', 'combo', 'Clean node:', NULL, NULL, false, false, true, NULL, NULL, 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''visit_cleaned''', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 7);
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
-VALUES('visit_node_insp', 'form_visit', 'tab_data', 'observ', 'lyt_data_1', NULL, 'string', 'text', 'Observations:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 8);
+VALUES('visit_node_insp', 'form_visit', 'tab_data', 'insp_observ', 'lyt_data_1', NULL, 'string', 'text', 'Observations:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 8);
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('visit_node_insp', 'form_visit', 'tab_data', 'status', 'lyt_data_1', NULL, 'integer', 'combo', 'Status:', NULL, NULL, false, false, true, NULL, NULL, 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''visit_status'' and id =''4''', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 9);
@@ -963,7 +963,7 @@ INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutna
 VALUES('visit_connec_insp', 'form_visit', 'tab_data', 'clean_connec', 'lyt_data_1', NULL, 'integer', 'combo', 'Clean connec:', NULL, NULL, false, false, true, NULL, NULL, 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''visit_cleaned''', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 7);
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
-VALUES('visit_connec_insp', 'form_visit', 'tab_data', 'observ', 'lyt_data_1', NULL, 'string', 'text', 'Observations:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 8);
+VALUES('visit_connec_insp', 'form_visit', 'tab_data', 'insp_observ', 'lyt_data_1', NULL, 'string', 'text', 'Observations:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 8);
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('visit_connec_insp', 'form_visit', 'tab_data', 'status', 'lyt_data_1', NULL, 'integer', 'combo', 'Status:', NULL, NULL, false, false, true, NULL, NULL, 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''visit_status'' and id =''4''', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 9);
