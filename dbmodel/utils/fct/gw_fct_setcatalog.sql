@@ -240,7 +240,7 @@ BEGIN
 		INTO v_dvquery, v_columnname;
 	END IF;
 
-	EXECUTE 'SELECT json_build_object (''widgetname'', '||quote_literal(concat('data_',v_columnname))||',''comboIds'',id,''comboNames'',idval, ''selectedId'','||quote_literal(v_newid)||') as fields
+	EXECUTE 'SELECT json_build_object (''widgetname'', '||quote_literal(concat('tab_data_',v_columnname))||',''comboIds'',id,''comboNames'',idval, ''selectedId'','||quote_literal(v_newid)||') as fields
 	FROM (SELECT array_agg(id::text)as id, array_agg(idval) as idval FROM 
 	('||v_dvquery||') a ORDER BY id) b'
 	INTO v_returnfields;
