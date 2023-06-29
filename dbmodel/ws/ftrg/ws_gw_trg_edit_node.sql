@@ -1020,7 +1020,7 @@
 				JOIN cat_node ON cat_node.id=NEW.nodecat_id WHERE n.id = cat_node.nodetype_id LIMIT 1)::text;
 		         
 				IF v_man_table='man_valve' THEN
-			    	v_sql:= 'UPDATE man_valve SET closed='||(NEW.closed_valve)||', broken='||(NEW.broken_valve)||' WHERE node_id='||quote_literal(NEW.node_id)||'';
+			    	v_sql:= 'UPDATE man_valve SET closed='||coalesce(NEW.closed_valve, false)||', broken='||coalesce(NEW.broken_valve,false)||' WHERE node_id='||quote_literal(NEW.node_id)||'';
 			    	EXECUTE v_sql;
                 END IF;
 			
