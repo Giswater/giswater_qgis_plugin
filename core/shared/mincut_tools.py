@@ -63,7 +63,7 @@ class GwMincutTools:
         self._manage_dlg_widgets(self.complet_result)
         self.load_connections(self.complet_result)
 
-        self.tbl_mincut_edit = self.dlg_mincut_man.findChild(QTableView, "main_tbl_mincut_edit")
+        self.tbl_mincut_edit = self.dlg_mincut_man.findChild(QTableView, "tab_none_tbl_mincut_edit")
         tools_gw.open_dialog(self.dlg_mincut_man, dlg_name='mincut_manager_dinamic')
 
     def load_connections(self, complet_result, filter_fields=''):
@@ -179,7 +179,7 @@ def close_mincut_manager(**kwargs):
 def mincut_selector(**kwargs):
     """ Manage mincut selector """
     dialog = kwargs['dialog']
-    qtable = dialog.findChild(QTableView, "main_tbl_mincut_edit")
+    qtable = dialog.findChild(QTableView, "tab_none_tbl_mincut_edit")
     field_id = "id"
     model = qtable.model()
     selected_mincuts = []
@@ -214,7 +214,7 @@ def mincut_selector(**kwargs):
 def delete_mincut(**kwargs):
     """ Delete selected elements of the table (by id) """
     dialog = kwargs['dialog']
-    widget = dialog.findChild(QTableView, "main_tbl_mincut_edit")
+    widget = dialog.findChild(QTableView, "tab_none_tbl_mincut_edit")
     table_name = "om_mincut"
     column_id = "id"
     complet_result = kwargs['complet_result']
@@ -304,7 +304,7 @@ def _reload_table(dialog, complet_result):
 def cancel_mincut(**kwargs):
 
     dialog = kwargs['dialog']
-    table = dialog.findChild(QTableView, "main_tbl_mincut_edit")
+    table = dialog.findChild(QTableView, "tab_none_tbl_mincut_edit")
     selected_list = table.selectionModel().selectedRows()
     if len(selected_list) == 0:
         message = "Any record selected"
@@ -331,7 +331,7 @@ def cancel_mincut(**kwargs):
 
 def check_filter_days(**kwargs):
     dialog = kwargs['dialog']
-    spinbox = dialog.findChild(QSpinBox, "main_spm_next_days")
+    spinbox = dialog.findChild(QSpinBox, "tab_none_spm_next_days")
     if spinbox.isEnabled():
         spinbox.setEnabled(False)
         spinbox.valueChanged.emit(0)
@@ -345,7 +345,7 @@ def filter_by_days(dialog, widget):
     filter_sign = widgetcontrols.get('filterSign')
     filter_type = widgetcontrols.get('filterType')
 
-    spinbox = dialog.findChild(QSpinBox, "main_spm_next_days")
+    spinbox = dialog.findChild(QSpinBox, "tab_none_spm_next_days")
 
     date_from = datetime.datetime.now()
     days_added = spinbox.text()
@@ -404,9 +404,9 @@ def filter_by_dates(dialog, widget):
     widgetname = widget.objectName()
     widgetcontrols = widget.property('widgetcontrols')
     filter_sign = widgetcontrols.get('filterSign')
-    state_combo = dialog.findChild(QComboBox, "main_state")
-    date_from = dialog.findChild(QgsDateTimeEdit, "main_date_from")
-    date_to = dialog.findChild(QgsDateTimeEdit, "main_date_to")
+    state_combo = dialog.findChild(QComboBox, "tab_none_state")
+    date_from = dialog.findChild(QgsDateTimeEdit, "tab_none_date_from")
+    date_to = dialog.findChild(QgsDateTimeEdit, "tab_none_date_to")
 
     options = {
          0: {"widget_text_from":"Date from: forecast_start", "widget_text_to":"Date to: forecast_end", "column_from":"forecast_start", "column_to":"forecast_end"},
@@ -431,7 +431,7 @@ def filter_by_dates(dialog, widget):
     value = tools_qt.get_calendar_date(dialog, widget, date_format='yyyy-MM-dd')
     if int(state_id) in (0, 1, 2, 3):
         if options[int(state_id)]['column_to'] is not None:
-            if widgetname == 'main_date_from':
+            if widgetname == 'tab_none_date_from':
                 filter_fields = f'"{options[int(state_id)]["column_from"]}":{{"value":"{value}","filterSign":"{filter_sign}"}}, '
             else:
                 filter_fields = f'"{options[int(state_id)]["column_to"]}":{{"value":"{value}","filterSign":"{filter_sign}"}}, '
@@ -446,10 +446,10 @@ def filter_by_dates(dialog, widget):
 def combo_tweaks(**kwargs):
     state_combo = kwargs['widget']
     dialog = kwargs['dialog']
-    date_from = dialog.findChild(QgsDateTimeEdit, "main_date_from")
-    date_to = dialog.findChild(QgsDateTimeEdit, "main_date_to")
-    lbl_date_from = dialog.findChild(QLabel, "lbl_main_date_from")
-    lbl_date_to = dialog.findChild(QLabel, "lbl_main_date_to")
+    date_from = dialog.findChild(QgsDateTimeEdit, "tab_none_date_from")
+    date_to = dialog.findChild(QgsDateTimeEdit, "tab_none_date_to")
+    lbl_date_from = dialog.findChild(QLabel, "lbl_tab_none_date_from")
+    lbl_date_to = dialog.findChild(QLabel, "lbl_tab_none_date_to")
 
     options = {
         0: {"widget_text_from": "Date from: forecast_start", "widget_text_to": "Date to: forecast_end",
