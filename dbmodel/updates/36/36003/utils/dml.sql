@@ -126,3 +126,19 @@ ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, parameter_id, active)
 VALUES ('config_typevalue', 'tabname_typevalue','config_form_fields','tabname', null, true)
 ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;
+
+
+INSERT INTO sys_fprocess
+(fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
+VALUES(497, 'Check orphan documents', 'utils', NULL, 'core', true, 'Function process', NULL)
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess
+(fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
+VALUES(498, 'Check orphan visits', 'utils', NULL, 'core', true, 'Function process', NULL)
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess
+(fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
+VALUES(498, 'Check orphan elements', 'utils', NULL, 'core', true, 'Function process', NULL)
+ON CONFLICT (fid) DO NOTHING;

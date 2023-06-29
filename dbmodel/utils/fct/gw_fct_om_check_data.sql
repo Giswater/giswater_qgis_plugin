@@ -1390,6 +1390,78 @@ BEGIN
         VALUES (125, 1, '480', 'INFO: No connects with more than 1 link on service',v_count);
     END IF;
 
+  RAISE NOTICE '49 - Check orphan documents (497)';
+  	IF v_project_type = 'WS' THEN
+	    v_querytext = '(select id from doc where id not in (
+										select distinct  doc_id from doc_x_arc UNION
+										select distinct  doc_id from doc_x_connec UNION
+										select distinct  doc_id from doc_x_node ))a';
+	ELSIF v_project_type = 'UD' THEN
+	    v_querytext = '(select id from doc where id not in (
+										select distinct  doc_id from doc_x_arc UNION
+										select distinct  doc_id from doc_x_connec UNION
+										select distinct  doc_id from doc_x_node UNION
+										select distinct  doc_id from doc_x_gully))a';
+	END IF;
+
+	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+    IF v_count > 0 THEN
+
+        INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
+        VALUES (125, 2, '497',concat('WARNING-497: There is/are ',v_count,' documents not related to any feature.'),v_count);
+    ELSE
+        INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+        VALUES (125, 1, '497', 'INFO: All documents are related to the features.',v_count);
+    END IF;
+
+  RAISE NOTICE '50 - Check no geometry orphan visits (498)';
+  	IF v_project_type = 'WS' THEN
+	    v_querytext = '(select id from om_visit where the_geom is null and id not in (
+										select distinct visit_id from om_visit_x_arc UNION
+										select distinct visit_id from om_visit_x_connec UNION
+										select distinct visit_id from om_visit_x_node ))a';
+	ELSIF v_project_type = 'UD' THEN
+	    v_querytext = '(select id from om_visit where the_geom is null and id not in (
+										select distinct visit_id from om_visit_x_arc UNION
+										select distinct visit_id from om_visit_x_connec UNION
+										select distinct visit_id from om_visit_x_node UNION
+										select distinct visit_id from om_visit_x_gully ))a';
+	END IF;
+
+	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+    IF v_count > 0 THEN
+
+        INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
+        VALUES (125, 2, '498',concat('WARNING-498: There is/are ',v_count,' visits not related to any feature and without geometry.'),v_count);
+    ELSE
+        INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+        VALUES (125, 1, '498', 'INFO: All visits are related to the features or have geometry.',v_count);
+    END IF;
+
+  RAISE NOTICE '51 - Check no geometry orphan elements (499)';
+  	IF v_project_type = 'WS' THEN
+	    v_querytext = '(select element_id from element where the_geom is null and element_id not in (
+										select distinct element_id from element_x_arc UNION
+										select distinct element_id from element_x_connec UNION
+										select distinct element_id from element_x_node ))a';
+	ELSIF v_project_type = 'UD' THEN
+	    v_querytext = '(select element_id from element where the_geom is null and element_id not in (
+										select distinct element_id from element_x_arc UNION
+										select distinct element_id from element_x_connec UNION
+										select distinct element_id from element_x_node UNION
+										select distinct element_id from element_x_gully ))a';
+	END IF;
+
+	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+    IF v_count > 0 THEN
+
+        INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
+        VALUES (125, 2, '499',concat('WARNING-499: There is/are ',v_count,' elements not related to any feature and without geometry.'),v_count);
+    ELSE
+        INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+        VALUES (125, 1, '499', 'INFO: All elements are related to the features or have geometry.',v_count);
+    END IF;
+
 
 	-- Removing isaudit false sys_fprocess
 	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
