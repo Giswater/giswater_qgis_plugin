@@ -619,6 +619,11 @@ BEGIN
 
 			RAISE NOTICE 'Finish engine....';
 
+			UPDATE temp_anlgraph SET  water=9 WHERE 
+			trace in (select trace from temp_anlgraph where trace is not null and water=1 group by trace having count(distinct arc_id) =2 and count( arc_id) =3) 
+			and arc_id not in (select arc_id from temp_anlgraph where isheader is true);
+
+
 			-- update feature atributes
 			IF v_updatefeature THEN
 
