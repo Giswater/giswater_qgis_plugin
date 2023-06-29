@@ -234,13 +234,6 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (219, null, 4, concat('Create new class ', v_class_id,' - ',v_class_name,'.'));
 			
-			IF (SELECT visitclass_id FROM config_visit_class_x_feature WHERE visitclass_id = v_class_id AND active IS TRUE) IS NULL THEN
-				INSERT INTO config_visit_class_x_feature (visitclass_id, tablename, active) VALUES (v_class_id, concat('v_edit_',v_feature_system_id), TRUE);	
-
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (219, null, 4, concat('Insert values into config_visit_class_x_feature.'));
-			END IF;
-			
 			IF (SELECT formname FROM config_form_fields WHERE formname = v_viewname LIMIT 1) IS NULL THEN
 				
 				--capture common fields names that need to be copied for the specific visit form
@@ -452,7 +445,6 @@ raise notice 'classID,%',v_class_id;
 				RAISE NOTICE 'DELETE ALL';
 				DELETE FROM config_form_fields  WHERE formtype='visit' and formname IN (SELECT formname FROM config_visit_class WHERE id = v_class_id);
 				DELETE FROM config_visit_class_x_parameter WHERE class_id = v_class_id;
-				DELETE FROM config_visit_class_x_feature WHERE visitclass_id = v_class_id;
 				DELETE FROM config_visit_parameter WHERE id IN (SELECT parameter_id FROM config_visit_class_x_parameter WHERE class_id = v_class_id);
 				DELETE FROM config_visit_class WHERE id = v_class_id;
 				DELETE FROM sys_table WHERE id = v_viewname;			
@@ -487,9 +479,6 @@ raise notice 'classID,%',v_class_id;
 				VALUES (v_class_id, v_viewname, concat('ve_visit_',v_feature_system_id,'_singlevent'))
 				 ON CONFLICT (id) DO NOTHING;
 			END IF;
-
-			INSERT INTO config_visit_class_x_feature (visitclass_id, tablename) 
-			VALUES (v_class_id, concat('v_edit_',v_feature_system_id)) ON CONFLICT (visitclass_id, tablename) DO NOTHING;	
 		
 			IF (SELECT formname FROM config_form_fields  WHERE formname = v_viewname LIMIT 1) IS NULL THEN
 				--capture common fields names that need to be copied for the specific visit form

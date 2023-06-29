@@ -8,3 +8,5 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"audit_log_data", "column":"feature_id", "dataType":"character varying(30)"}}$$);
+
+DROP TABLE config_visit_class_x_feature; 

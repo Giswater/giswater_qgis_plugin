@@ -46,14 +46,6 @@ INSERT INTO config_visit_class VALUES(7, 'Incident arc', NULL, true, false, true
 INSERT INTO config_visit_class VALUES(8, 'Incident node', NULL, true, false, true, 'NODE', 'role_om', 2, NULL, 'incident_node', 've_visit_incid_node', 'v_ui_visit_incid_node');
 INSERT INTO config_visit_class VALUES(9, 'Incident connec', NULL, true, false, true, 'CONNEC', 'role_om', 2, NULL, 'incident_connec', 've_visit_incid_connec', 'v_ui_visit_incid_connec');
 
--- config_visit_class_x_feature
-truncate config_visit_class_x_feature;
-INSERT INTO config_visit_class_x_feature VALUES ('v_edit_arc', 1);
-INSERT INTO config_visit_class_x_feature VALUES ('v_edit_connec', 2);
-INSERT INTO config_visit_class_x_feature VALUES ('v_edit_node', 3);
-INSERT INTO config_visit_class_x_feature VALUES ('v_edit_connec', 4);
-INSERT INTO config_visit_class_x_feature VALUES ('v_edit_node', 5);
-INSERT INTO config_visit_class_x_feature VALUES ('v_edit_arc', 6);
 
 -- config_visit_parameter
 INSERT INTO config_visit_parameter VALUES ('leak_connec', NULL, 'INSPECTION', 'CONNEC', 'text', NULL, 'leak on connec', 'event_standard', 'defaultvalue',FALSE, 'con_insp_des');

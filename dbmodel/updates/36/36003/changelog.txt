@@ -1,3 +1,4 @@
 3.6.003
 *************
 - Add new function to make massive interpolation for nodes
+- Drop config_visit_class_x_feature (unused table)
