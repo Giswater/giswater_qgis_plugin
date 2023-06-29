@@ -3,6 +3,7 @@ This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
+-- The code of this have been received helpfull assistance from Enric Amat (FISERSA) and Claudia Dragoste (Aigües de Girona SA)
 
 --FUNCTION CODE: 2214
 
@@ -16,7 +17,7 @@ example:
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_downstream($${
 "client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
 "feature":{"id":["20607"]},
-"data":{}}$$)
+"data":{}}$$);
 
 
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_downstream($${
@@ -24,44 +25,51 @@ SELECT SCHEMA_NAME.gw_fct_graphanalytics_downstream($${
 "feature":{},
 "data":{ "coordinates":{"xcoord":419277.7306855297,"ycoord":4576625.674511955, "zoomRatio":3565.9967217571534}}}$$)
 
--- fid: 221,220
+--fid: 221;
 
 */
-DECLARE 
+DECLARE
 
-  v_result_json json;
-  v_result json;
-  v_result_info text;
-  v_result_point json;
-  v_result_line json;
-  v_result_polygon json;
-  v_error_context text;
-  v_version text;
-  v_status text;
-  v_level integer;
-  v_message text;
-  v_audit_result text;
-  
-  v_cur_user text;
-  v_prev_cur_user text;
-	v_count_connec integer;
-	v_count_gully integer;
-	v_count_node integer;
-	v_length_arc numeric;
-	v_device integer;
+v_affectrow numeric;
 
-	v_node text;
-	v_xcoord double precision;
-	v_ycoord double precision;
-	v_epsg integer;
-	v_client_epsg integer;
-	v_point public.geometry;
+v_result_info json;
+v_result_point json;
+v_result_line json;
+v_result_polygon json;
+v_result text;
+v_count integer;
+v_version text;
 
-	v_sensibility_f float;
-	v_sensibility float;
-	v_zoomratio float;
+v_debug boolean;
+v_error_context text;
+v_audit_result text;
+
+v_level integer;
+v_status text;
+v_message text;
+
+v_project_type text;
+v_node integer;
+v_point public.geometry;
+v_sensibility_f float;
+v_sensibility float;
+v_zoomratio float;
+v_fid integer=221;
+v_cur_user text;
+v_device integer;
+v_xcoord float;
+v_ycoord float;
+v_epsg integer;
+v_client_epsg integer;
+v_prev_cur_user text;
+
+v_count_connec integer;
+v_count_gully integer;
+v_count_node integer;
+v_length_arc numeric;
+
 BEGIN
-
+	
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 	
@@ -72,6 +80,7 @@ BEGIN
 	v_epsg := (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 	v_client_epsg := (p_data ->> 'client')::json->> 'epsg';
 	v_zoomratio := ((p_data ->> 'data')::json->> 'coordinates')::json->>'zoomRatio';
+	v_node = json_array_elements_text(json_extract_path_text(p_data,'feature','id')::json)::integer;
 
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 	
@@ -79,13 +88,15 @@ BEGIN
 	IF v_cur_user IS NOT NULL THEN
 		EXECUTE 'SET ROLE "'||v_cur_user||'"';
 	END IF;
+	
+	-- select config values
+	SELECT giswater, upper(project_type) INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- Reset values
-	DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = 221 OR fid = 220);
-	DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = 221 OR fid = 220);
+	DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
+	DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
+	TRUNCATE temp_anlgraph;
 
-	-- select version
-	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	--Look for closest node using coordinates
 	IF v_xcoord IS NOT NULL THEN 
@@ -95,31 +106,46 @@ BEGIN
 
 		-- Make point
 		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
-
+	
 		SELECT node_id INTO v_node FROM v_edit_node WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
-
+		
 		SELECT gw_fct_json_object_set_key (p_data,'feature'::text, jsonb_build_object('id',json_agg(v_node))) INTO p_data;
 	END IF;
-	
-	-- Compute the tributary area using recursive function
-	EXECUTE 'SELECT gw_fct_graphanalytics_downstream_recursive($$'||p_data||'$$);'
-	INTO v_result_json;
 
-	IF (v_result_json->>'status')::TEXT = 'Accepted' THEN
+		
+	-- fill the graph table	
+	INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
+	SELECT  arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
+	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND value_state_type.is_operative=TRUE AND v_edit_arc.state > 0;
+		
+	-- Close mapzone headers
+	EXECUTE 'UPDATE temp_anlgraph SET flag=0, water=1, trace = 1::integer  WHERE node_1::integer IN ('||v_node||')';
 
-		IF v_audit_result is null THEN
-			v_status = 'Accepted';
-			v_level = 3;
-			v_message = 'Flow exit done successfully';
-		ELSE
+	-- inundation process
+		LOOP						
+			v_count = v_count+1;
+			UPDATE temp_anlgraph n SET water=1, trace = a.trace FROM v_anl_graphanalytics_mapzones a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;	
+			GET DIAGNOSTICS v_affectrow = row_count;
+			raise notice 'v_count --> %' , v_count;
+			EXIT WHEN v_affectrow = 0;
+			EXIT WHEN v_count = 5000;
+		END LOOP;
 
-			SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
-			SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
-			SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+		RAISE NOTICE 'Finish engine....';
 
-		END IF;
+		INSERT INTO anl_arc (arc_id, fid, arccat_id, expl_id, the_geom)
+		SELECT arc_id, v_fid, arc_type, expl_id, the_geom
+		FROM schema_name.temp_anlgraph 
+		join schema_name.arc using(arc_id)
+		where water=1;
 
-		--affected network
+		INSERT INTO anl_node (node_id, nodecat_id,state, expl_id, fid, the_geom)
+		SELECT node_id, node_type, state, expl_id, v_fid, the_geom 
+		FROM v_edit_node WHERE node_id IN (SELECT  node_1 from temp_anlgraph where water=1 union SELECT  node_2 from temp_anlgraph where water=1);
+
+
+	-- info
+	--affected network
 		SELECT count(*) INTO v_count_connec FROM v_anl_flow_connec;
 		SELECT count(*) INTO v_count_gully FROM v_anl_flow_gully;
 		SELECT count(*) INTO v_count_node FROM v_anl_flow_node JOIN cat_feature_node cn ON cn.id=node_type WHERE isprofilesurface IS TRUE;
@@ -130,41 +156,41 @@ BEGIN
 		'nodesIsprofileTrue',v_count_node, 'numConnecs', v_count_connec, 'numGully', v_count_gully) )
 		INTO v_result;
 
-		v_result := COALESCE(v_result, '{}'); 
+		v_result := COALESCE(v_result, '{}');  
 		v_result_info := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
 		IF v_device = 5 THEN
 			SELECT jsonb_agg(features.feature) INTO v_result
 			FROM (
-	  	SELECT jsonb_build_object(
-	     'type',       'Feature',
-	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-	    'properties', to_jsonb(row) - 'the_geom',
-	    'crs',concat('EPSG:',ST_SRID(the_geom))
-	  	) AS feature
-	  	FROM (SELECT arc_id, arc_type, context, expl_id, st_length(the_geom) as length, the_geom
-	  	FROM  v_anl_flow_arc) row) features;
+		  	SELECT jsonb_build_object(
+		     'type',       'Feature',
+		    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+		    'properties', to_jsonb(row) - 'the_geom',
+		    'crs',concat('EPSG:',ST_SRID(the_geom))
+		  	) AS feature
+		  	FROM (SELECT arc_id, arc_type, context, expl_id, st_length(the_geom) as length, the_geom
+		  	FROM  v_anl_flow_arc) row) features;
 
-			v_result := COALESCE(v_result, '{}'); 
-			v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 	
-			
+				v_result := COALESCE(v_result, '{}'); 
+				v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 	
+				
 			SELECT jsonb_agg(features.feature) INTO v_result
 			FROM (
-	  	SELECT jsonb_build_object(
-			'type',       'Feature',
-			'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-			'properties', to_jsonb(row) - 'the_geom',
-			'crs',concat('EPSG:',ST_SRID(the_geom))
-	  	) AS feature
-	  	FROM (SELECT node_id as feature_id, node_type as feature_type, context, expl_id, the_geom
-	  	FROM  v_anl_flow_node
-	  	UNION 
-	  	SELECT connec_id,'CONNEC', context, expl_id, the_geom
-	  	FROM  v_anl_flow_connec
-	  	UNION 
-	  	SELECT gully_id,'GULLY', context, expl_id, the_geom
-	  	FROM  v_anl_flow_gully) row) features;
+		  	SELECT jsonb_build_object(
+				'type',       'Feature',
+				'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+				'properties', to_jsonb(row) - 'the_geom',
+				'crs',concat('EPSG:',ST_SRID(the_geom))
+		  	) AS feature
+		  	FROM (SELECT node_id as feature_id, node_type as feature_type, context, expl_id, the_geom
+		  	FROM  v_anl_flow_node
+		  	UNION 
+		  	SELECT connec_id,'CONNEC', context, expl_id, the_geom
+		 	FROM  v_anl_flow_connec
+		 	UNION 
+		 	SELECT gully_id,'GULLY', context, expl_id, the_geom
+			FROM  v_anl_flow_gully) row) features;
 
 			v_result := COALESCE(v_result, '{}'); 
 			v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
@@ -178,21 +204,22 @@ BEGIN
 
 		END IF;
 		
-		EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
+	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 		
-		--  Return
-		RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
-			',"body":{"form":{}'||
-				',"data":{ "info":'||v_result_info||','||
-				'"point":'||v_result_point||','||
-				'"line":'||v_result_line||','||
-				'"polygon":'||v_result_polygon||'}'||
-				'}'
-			'}')::json, 2214, null, null, null);
+	v_status = 'Accepted';
+	v_level = 3;
+	v_message = 'Flow  analysis done succesfully';
 
-	ELSE 
-		RETURN v_result_json;
-	END IF;
+	--  Return
+
+	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
+				   ',"body":{"form":{}'||
+				   ',"data":{ "info":'||v_result_info||','||
+					  '"point":'||v_result_point||','||
+					  '"line":'||v_result_line||','||
+					  '"polygon":'||v_result_polygon||'}'||
+					 '}'
+		'}')::json, 2214, null, null, null);
 
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
