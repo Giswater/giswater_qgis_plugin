@@ -69,7 +69,12 @@ DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=168;
 DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=168;
 
 --Execute the process only if admin_raster_dem is true
-IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE THEN	
+IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS FALSE THEN 
+
+	INSERT INTO audit_check_data(fid,result_id, error_message)
+	VALUES (168,'elevation from raster','It is impossible to carry out the process. Your config_param_system variable for Raster DEM is in FALSE.');
+
+ELSIF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE THEN	
 		
 	--select update field
 	SELECT json_extract_path_text(value::json,'updateField') INTO v_update_field FROM config_param_system WHERE parameter='admin_raster_dem';
@@ -162,47 +167,49 @@ IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_
 
 		END IF;
 	END IF;
-		-- get results
-		-- info
-		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=168 order by id) row;
-		v_result := COALESCE(v_result, '{}'); 
-		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+END IF;
+	
+-- get results
+-- info
+SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=168 order by id) row;
+v_result := COALESCE(v_result, '{}'); 
+v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
-		--points
-		v_result = null;
-		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, node_id AS feature_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid=168) row;
-		v_result := COALESCE(v_result, '{}'); 
-		v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
+--points
+v_result = null;
+SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+FROM (SELECT id, node_id AS feature_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid=168) row;
+v_result := COALESCE(v_result, '{}'); 
+v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
 
-		--    Control nulls
-		v_result_info := COALESCE(v_result_info, '{}'); 
-		v_result_point := COALESCE(v_result_point, '{}'); 
+--    Control nulls
+v_result_info := COALESCE(v_result_info, '{}'); 
+v_result_point := COALESCE(v_result_point, '{}'); 
 
-		IF v_audit_result is null THEN
-			v_status = 'Accepted';
-			v_level = 3;
-			v_message = 'Arc divide done successfully';
-	        
-		ELSE
+IF v_audit_result is null THEN
+	v_status = 'Accepted';
+	v_level = 3;
+	v_message = 'Process done successfully';
+	
+ELSE
 
-			SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
-			SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
-			SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+	SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+	SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
+	SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
 
-		END IF;
+END IF;
 
-		--  Return
-		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
-	             ',"body":{"form":{}'||
-			     ',"data":{ "info":'||v_result_info||','||
-					'"point":'||v_result_point||
-				'}}'||
-		    '}')::json,2760, null, null, null);
+--  Return
+RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
+		 ',"body":{"form":{}'||
+		 ',"data":{ "info":'||v_result_info||','||
+			'"point":'||v_result_point||
+		'}}'||
+	'}')::json,2760, null, null, null);
 
-	END IF;
-	RETURN null;
+
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
