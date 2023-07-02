@@ -72,6 +72,49 @@ BEGIN
 		v_expl = (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
 	END IF;
 
+	-- create temp tables
+	CREATE TEMP TABLE temp_vnode(
+	  id serial NOT NULL,
+	  l1 integer,
+	  v1 integer,
+	  l2 integer,
+	  v2 integer,
+	  CONSTRAINT temp_vnode_pkey PRIMARY KEY (id));
+  
+	CREATE TEMP TABLE temp_link(
+	  link_id integer NOT NULL,
+	  vnode_id integer,
+	  vnode_type text,
+	  feature_id character varying(16),
+	  feature_type character varying(16),
+	  exit_id character varying(16),
+	  exit_type character varying(16),
+	  state smallint,
+	  expl_id integer,
+	  sector_id integer,
+	  dma_id integer,
+	  exit_topelev double precision,
+	  exit_elev double precision,
+	  the_geom geometry(LineString,SRID_VALUE),
+	  the_geom_endpoint geometry(Point,SRID_VALUE),
+	  flag boolean,
+	  CONSTRAINT temp_link_pkey PRIMARY KEY (link_id));
+	
+	CREATE TEMP TABLE temp_link_x_arc(
+	  link_id integer NOT NULL,
+	  vnode_id integer,
+	  arc_id character varying(16),
+	  feature_type character varying(16),
+	  feature_id character varying(16),
+	  node_1 character varying(16),
+	  node_2 character varying(16),
+	  vnode_distfromnode1 numeric(12,3),
+	  vnode_distfromnode2 numeric(12,3),
+	  exit_topelev double precision,
+	  exit_ymax numeric(12,3),
+	  exit_elev numeric(12,3),
+	  CONSTRAINT temp_link_x_arc_pkey PRIMARY KEY (link_id));
+
 	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "fid":227}}}')::json;
 
 	-- get debug parameters (settings)
@@ -311,6 +354,10 @@ BEGIN
 	IF v_sector_0 = true THEN
 		INSERT INTO selector_sector VALUES (0,current_user);
 	END IF;
+	
+	DROP TABLE IF EXISTS temp_vnode;
+	DROP TABLE IF EXISTS temp_link;
+	DROP TABLE IF EXISTS temp_link_x_arc;
 	
 	RAISE NOTICE '22 - Manage return';
 	IF v_step=1 THEN

@@ -10,3 +10,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"audit_log_data", "column":"feature_id", "dataType":"character varying(30)"}}$$);
 
 DROP TABLE config_visit_class_x_feature; 
+
+DROP TABLE IF EXISTS temp_vnode;
+DROP TABLE IF EXISTS temp_link;
+DROP TABLE IF EXISTS temp_link_x_arc;
+
+DELETE FROM sys_table WHERE id IN ('config_visit_class_x_feature','temp_vnode','temp_link','temp_link_x_arc')

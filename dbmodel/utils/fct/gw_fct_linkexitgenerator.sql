@@ -38,11 +38,6 @@ BEGIN
 
 	-- select config values
 	SELECT project_type, giswater  INTO v_projecttype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-
-	-- delete info on used tables
-	DELETE FROM temp_vnode;
-	DELETE FROM temp_link;
-	DELETE FROM temp_link_x_arc;
 	
 	-- insert features temp_link
 	INSERT INTO temp_link SELECT link_id, link_id, exit_type, feature_id, feature_type, exit_id, exit_type, state, expl_id, sector_id, dma_id, exit_topelev, exit_elev, the_geom, st_endpoint(the_geom), false
