@@ -51,7 +51,6 @@ BEGIN
 	-- harmonize those links with same endpoint
 	FOR v_links IN SELECT * FROM temp_vnode order by 1
 	LOOP	
-		raise notice ' % ', v_links;
 		UPDATE temp_link a SET vnode_id = t.vnode_id, flag=true FROM temp_link t WHERE a.link_id = v_links.l1 AND t.link_id = v_links.l2 AND a.flag is false;					
 	END LOOP;
 	
@@ -63,7 +62,6 @@ BEGIN
 	-- harmonize those links with same endpoint whith node
 	FOR v_links IN SELECT l1,v1, v2 FROM temp_vnode order by 1
 	LOOP	
-		raise notice ' ----------% ', v_links;
 		UPDATE temp_link a SET vnode_id = v_links.v2, vnode_type = 'NODE' WHERE link_id = v_links.l1;
 	END LOOP;
 
