@@ -70,7 +70,6 @@ BEGIN
 	-- reset graph & audit tables
 	DELETE FROM anl_arc where cur_user=current_user AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE fid=v_fid AND cur_user=current_user;
-	TRUNCATE temp_anlgraph;	
 
 	-- reset exploitation
 	IF v_expl IS NOT NULL THEN
@@ -84,6 +83,37 @@ BEGIN
 	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('----------------------------------------------------------'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, 'INFO');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, '-------');
+
+	CREATE TEMP TABLE temp_anlgraph(
+		id serial NOT NULL,
+    arc_id character varying(20) COLLATE pg_catalog."default",
+    node_1 character varying(20) COLLATE pg_catalog."default",
+    node_2 character varying(20) COLLATE pg_catalog."default",
+    water smallint,
+    flag smallint,
+    checkf smallint,
+    cost numeric(12,4),
+    value numeric(12,4),
+    trace integer,
+    isheader boolean);
+
+CREATE OR REPLACE TEMP VIEW v_anl_graph AS 
+ SELECT anl_graph.arc_id,
+    anl_graph.node_1,
+    anl_graph.node_2,
+    anl_graph.flag,
+    a.flag AS flagi
+   FROM temp_anlgraph anl_graph
+     JOIN ( SELECT anl_graph_1.arc_id,
+            anl_graph_1.node_1,
+            anl_graph_1.node_2,
+            anl_graph_1.water,
+            anl_graph_1.flag,
+            anl_graph_1.checkf
+           FROM temp_anlgraph anl_graph_1
+          WHERE anl_graph_1.water = 1) a ON anl_graph.node_1::text = a.node_2::text
+  WHERE anl_graph.flag < 2 AND anl_graph.water = 0 AND a.flag < 2;
+  
 
 	-- fill the graph table
 	INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
@@ -176,7 +206,9 @@ BEGIN
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 
-	
+	DROP VIEW v_anl_graph;
+	DROP TABLE temp_anlgraph;
+
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}, "data":{ "info":'||v_result_info||','||

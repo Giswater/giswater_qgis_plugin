@@ -101,11 +101,49 @@ BEGIN
 	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('---------------------------------------------------'));
 	
 	-- reset tables (graph & audit_log)
-	TRUNCATE temp_anlgraph;
 	DELETE FROM audit_log_data WHERE fid=v_fid AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fid=v_fid AND cur_user=current_user;
-	DELETE FROM anl_arc WHERE fid=v_fid AND cur_user=current_user;
 	DELETE FROM audit_check_data WHERE fid=v_fid AND cur_user=current_user;
+
+	CREATE TEMP TABLE temp_anlgraph(
+	id serial NOT NULL PRIMARY KEY,
+    arc_id character varying(20) COLLATE pg_catalog."default",
+    node_1 character varying(20) COLLATE pg_catalog."default",
+    node_2 character varying(20) COLLATE pg_catalog."default",
+    water smallint,
+    flag smallint,
+    checkf smallint,
+    cost numeric(12,4),
+    value numeric(12,4),
+    trace integer,
+    isheader boolean);
+
+	CREATE TEMP TABLE temp_anl_node(
+    id serial PRIMARY KEY,
+    fid integer, 
+    nodecat_id character varying(30), 
+    node_id character varying(16), 
+    the_geom public.geometry, 
+    descript text);
+
+	CREATE OR REPLACE VIEW v_anl_graph AS 
+	 SELECT anl_graph.arc_id,
+	    anl_graph.node_1,
+	    anl_graph.node_2,
+	    anl_graph.flag,
+	    a.flag AS flagi,
+	    a.value
+	   FROM temp_anlgraph anl_graph
+	     JOIN ( SELECT anl_graph_1.arc_id,
+	            anl_graph_1.node_1,
+	            anl_graph_1.node_2,
+	            anl_graph_1.water,
+	            anl_graph_1.flag,
+	            anl_graph_1.checkf,
+	            anl_graph_1.value
+	           FROM temp_anlgraph anl_graph_1
+	          WHERE anl_graph_1.water = 1) a ON anl_graph.node_1::text = a.node_2::text
+	  WHERE anl_graph.flag < 2 AND anl_graph.water = 0 AND a.flag < 2;
+
 
 	-- reset user's state
 	DELETE FROM selector_state WHERE cur_user=current_user;
@@ -221,7 +259,7 @@ BEGIN
 			
 			IF v_header_arc IS NOT NULL THEN
 				
-				EXECUTE 'INSERT INTO anl_node (fid, nodecat_id, node_id, the_geom, descript) 
+				EXECUTE 'INSERT INTO temp_anl_node (fid, nodecat_id, node_id, the_geom, descript) 
 				SELECT DISTINCT ON (node_id) '||v_fid||', nodecat_id, '||v_end_node::text||', the_geom, 
 				concat (''{"value":"'','||v_acc_value||',''", "header":"'||v_feature.node_1||'"}'')
 				FROM v_edit_node WHERE node_id= '''||v_end_node||''';';
@@ -309,20 +347,20 @@ BEGIN
 	
 	--EXECUTE 'DELETE FROM anl_node WHERE fid = '||v_fid||' AND node_id::text IN ('||v_node_string||');';
 	
-	EXECUTE 'INSERT INTO anl_node (fid, nodecat_id, node_id, the_geom, descript) 
+	EXECUTE 'INSERT INTO temp_anl_node (fid, nodecat_id, node_id, the_geom, descript) 
 	SELECT DISTINCT ON (node_id) '||v_fid||', nodecat_id,node_id, the_geom, 
 	concat (''{"value":"0", "header":"'',node_id,''"}'')
-	FROM v_edit_node WHERE v_edit_node.node_id::text IN ('||v_node_string||') AND node_id NOT IN (select node_id FROM anl_node WHERE fid = '||v_fid||');';
+	FROM v_edit_node WHERE v_edit_node.node_id::text IN ('||v_node_string||') AND node_id NOT IN (select node_id FROM temp_anl_node WHERE fid = '||v_fid||');';
 
 	-- update fields for node layers (value and header)
 	FOR rec IN execute 'SELECT * FROM cat_feature JOIN sys_addfields on cat_feature_id=cat_feature.id 
  	WHERE param_name ='''|| v_valuefield||''''
 	LOOP
 		v_querytext =  'UPDATE '||rec.child_layer||' SET '||v_valuefield||' = a.descript::json->>''value'', '||v_headerfield||
-		' = a.descript::json->>''header'' FROM anl_node a WHERE fid='||v_fid||' AND a.node_id='||rec.child_layer||'.node_id AND cur_user=current_user';
+		' = a.descript::json->>''header'' FROM temp_anl_node a WHERE fid='||v_fid||' AND a.node_id='||rec.child_layer||'.node_id AND cur_user=current_user';
 		EXECUTE v_querytext;
 		
-		EXECUTE 'UPDATE anl_node SET result_id = '||v_fid||' WHERE fid='||v_fid||' 
+		EXECUTE 'UPDATE temp_anl_node SET result_id = '||v_fid||' WHERE fid='||v_fid||' 
 		AND node_id IN (SELECT node_id::text FROM '||rec.child_layer||')';
 
 	END LOOP;
@@ -347,8 +385,8 @@ BEGIN
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
-  	FROM (SELECT id, node_id, nodecat_id, state, node_id_aux,nodecat_id_aux, state_aux, expl_id, descript::json, fid, the_geom 
-  	FROM  anl_node WHERE cur_user="current_user"() AND fid=116 and result_id = '116') row) features;
+  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript::json, fid, the_geom 
+  	FROM  temp_anl_node WHERE cur_user="current_user"() AND fid=116 and result_id = '116') row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
    	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');  
