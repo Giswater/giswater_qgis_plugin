@@ -32,3 +32,6 @@ WHERE columnname='category_type' AND formname = 'v_edit_element';
 
 UPDATE config_form_fields set dv_querytext='SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE feature_type=''ELEMENT'' AND active IS TRUE'
 WHERE columnname='fluid_type' AND formname = 'v_edit_element';
+
+UPDATE config_typevalue SET addparam=camelstyle::json WHERE typevalue='sys_table_context';
+UPDATE config_typevalue SET camelstyle=null WHERE typevalue='sys_table_context';

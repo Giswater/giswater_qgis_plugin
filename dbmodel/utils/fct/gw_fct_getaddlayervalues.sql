@@ -48,7 +48,7 @@ BEGIN
 	left join geomtable c ON st.id =c.table_name
 	left join idtable i ON st.id =i.table_name
 	WHERE typevalue = 'sys_table_context'
-	ORDER BY  json_extract_path_text(camelstyle::json,'orderBy')::integer,orderby, alias)d into v_fields_array;
+	ORDER BY  json_extract_path_text(ct.addparam,'orderBy')::integer,orderby, alias)d into v_fields_array;
 
 	v_fields := array_to_json(v_fields_array);
 
