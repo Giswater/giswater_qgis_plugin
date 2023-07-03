@@ -62,7 +62,7 @@ v_widgetvalue json;
 v_input json;
 v_editability text;
 v_label text;     
-v_clause text='';
+v_clause text;
 v_device text;
 v_debug boolean;
 v_debug_var text;
@@ -231,7 +231,7 @@ BEGIN
 	LOOP
       		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'imageVal', COALESCE((aux_json->>'queryText'), ''));
       		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 
-      		'queryText', 'orderById', 'parentId', 'queryTextFilter');
+      		'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
 	END LOOP;
 
 	-- combo no childs
@@ -253,6 +253,10 @@ BEGIN
 			EXECUTE v_querystring INTO v_array;
 		END IF;
 
+		-- Enable null values
+		IF (aux_json->>'isNullValue')::boolean IS TRUE THEN
+			v_array = array_prepend('',v_array);
+		END IF;
 		combo_json = array_to_json(v_array);
 		v_combo_id = combo_json;
 		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));
@@ -266,6 +270,10 @@ BEGIN
 			EXECUTE v_querystring INTO v_array;
 		END IF;
 
+		-- Enable null values
+		IF (aux_json->>'isNullValue')::boolean IS TRUE THEN
+			v_array = array_prepend('',v_array);
+		END IF;
 		combo_json = array_to_json(v_array);
 		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboNames', COALESCE(combo_json, '[]'));
 
@@ -279,7 +287,7 @@ BEGIN
 		ELSE
 			--removing the not used keys
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
-			'queryText', 'orderById', 'parentId', 'queryTextFilter');
+			'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
 		END IF;
 
 	END LOOP;
@@ -298,8 +306,13 @@ BEGIN
 				v_selected_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_municipality_vdefault' AND cur_user = current_user);
 			ELSIF (aux_json->>'parentId') = 'arc_id' THEN -- specific case for arc_id as parent
 				v_selected_id = p_id;
-			ELSE
-				v_querystring = concat('SELECT value::text FROM sys_param_user JOIN config_param_user ON sys_param_user.id=parameter
+			ELSIF (aux_json->>'parentId') = 'team_id' THEN -- specific case for team_id as parent
+				v_selected_id = p_values_array->>'team_id';
+				/*IF v_selected_id IS NULL THEN
+					v_selected_id = (select team_id from om_visit_lot_x_user where user_id = current_user and endtime is null);
+				END IF;*/
+			ELSE 
+				v_querystring = concat('SELECT value::text FROM sys_param_user JOIN config_param_user ON sys_param_user.id=parameter 
 					WHERE cur_user=current_user AND feature_field_id=',quote_literal(quote_ident(aux_json->>'parentId')));
 				v_debug_vars := json_build_object('aux_json->>''parentId''', (aux_json->>'parentId'));
 				v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getformfields', 'flag', 50);
@@ -346,6 +359,10 @@ BEGIN
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'iseditable', false);
 		END IF;
 
+		-- Enable null values
+		IF (aux_json->>'dv_isnullvalue')::boolean IS TRUE THEN 
+			v_array = array_prepend('',v_array);
+		END IF;
 		combo_json = array_to_json(v_array);
 		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));
 
@@ -365,6 +382,10 @@ BEGIN
 			EXECUTE v_querystring INTO v_array;
 		END IF;
 
+		-- Enable null values
+		IF (aux_json->>'dv_isnullvalue')::boolean IS TRUE THEN 
+			v_array = array_prepend('',v_array);
+		END IF;
 		combo_json = array_to_json(v_array);
 
 		combo_json := COALESCE(combo_json, '[]');
@@ -381,7 +402,7 @@ BEGIN
 		ELSE
 			--removing the not used keys
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
-			'queryText', 'orderById', 'parentId', 'queryTextFilter');
+			'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
 		END IF;
 
 	END LOOP;
@@ -389,8 +410,8 @@ BEGIN
 	-- for the rest of widgets removing not used keys
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' NOT IN ('image', 'combo', 'typeahead')
 	LOOP
-		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
-		'queryText', 'orderById', 'parentId', 'queryTextFilter');
+		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 
+		'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
 	END LOOP;
 
 	-- Remove widgetaction when is null
