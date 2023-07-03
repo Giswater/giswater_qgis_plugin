@@ -135,11 +135,29 @@ BEGIN
 	END IF;
  
 	-- reset graph & audit_log tables
-	DELETE FROM temp_anlgraph;
 	DELETE FROM audit_log_data WHERE fid=v_fid AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fid=134 AND cur_user=current_user;
-	DELETE FROM anl_arc WHERE fid=134 AND cur_user=current_user;
 	DELETE FROM audit_check_data WHERE fid=134 AND cur_user=current_user;
+
+	CREATE TEMP TABLE temp_anl_arc(
+    id serial PRIMARY KEY,
+    fid integer, 
+    arccat_id character varying(30), 
+    arc_id character varying(16), 
+    the_geom public.geometry, 
+    descript text);
+
+	CREATE TEMP TABLE temp_anlgraph(
+	id serial NOT NULL,
+    arc_id character varying(20) COLLATE pg_catalog."default",
+    node_1 character varying(20) COLLATE pg_catalog."default",
+    node_2 character varying(20) COLLATE pg_catalog."default",
+    water smallint,
+    flag smallint,
+    checkf smallint,
+    cost numeric(12,4),
+    value numeric(12,4),
+    trace integer,
+    isheader boolean);
 
 	-- Starting process
 	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('MINSECTOR DYNAMIC SECTORITZATION'));
@@ -268,7 +286,7 @@ BEGIN
 			-- finish engine
 			----------------
 			-- insert arc results into audit table
-			INSERT INTO anl_arc (fid, arccat_id, arc_id, the_geom, descript)
+			INSERT INTO temp_anl_arc (fid, arccat_id, arc_id, the_geom, descript)
 			SELECT DISTINCT ON (arc_id) 134, arccat_id, a.arc_id, the_geom, v_arc::text
 			FROM (SELECT arc_id, max(water) as water FROM temp_anlgraph WHERE water=1 GROUP by arc_id) a JOIN arc b ON a.arc_id=b.arc_id;
 			GET DIAGNOSTICS v_affectedrow =row_count;
@@ -278,7 +296,7 @@ BEGIN
 		IF v_updatefeature THEN 
 		
 			-- due URN concept whe can update massively feature from anl_node without check if is arc/node/connec.....
-			UPDATE arc SET minsector_id = a.descript::integer FROM anl_arc a WHERE fid=134 AND a.arc_id=arc.arc_id AND cur_user=current_user;
+			UPDATE arc SET minsector_id = a.descript::integer FROM temp_anl_arc a WHERE fid=134 AND a.arc_id=arc.arc_id;
 
 			-- update graph nodes inside minsector
 			UPDATE node SET minsector_id = a.minsector_id FROM arc a WHERE node_id = node_1;
@@ -327,8 +345,7 @@ BEGIN
 			INSERT INTO audit_check_data (fid, error_message)
 			VALUES (v_fid, concat('INFO: Minsector attribute (minsector_id) on arc/node/connec features keeps same value previous function. Nothing have been updated by this process'));
 			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('INFO: To take a look on results you can do querys like this:'));
-			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('SELECT * FROM anl_arc WHERE fid = 134  AND cur_user=current_user;'));
-			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('SELECT * FROM anl_node WHERE fid = 134  AND cur_user=current_user;'));
+			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('SELECT * FROM temp_anl_arc ;'));
 		
 		END IF;
 
@@ -426,6 +443,8 @@ BEGIN
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	v_result_polygon := COALESCE(v_result_polygon, '{}');
 	
+	DROP TABLE temp_anlgraph;
+	DROP TABLE temp_anl_arc;
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
