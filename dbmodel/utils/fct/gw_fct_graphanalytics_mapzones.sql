@@ -330,12 +330,75 @@ BEGIN
 
 	IF v_audit_result IS NULL THEN
 	
-		-- reset graph & audit_log tables
-		DELETE FROM anl_arc where cur_user=current_user and fid=v_fid;
-		DELETE FROM anl_node where cur_user=current_user and fid=v_fid;
-		TRUNCATE temp_anlgraph;
+		--create temporal tables
+		CREATE TEMP TABLE temp_audit_check_data(
+	    id SERIAL NOT NULL,
+	    fid smallint,
+	    result_id character varying(30) COLLATE pg_catalog."default",
+	    table_id text COLLATE pg_catalog."default",
+	    column_id text COLLATE pg_catalog."default",
+	    criticity smallint,
+	    enabled boolean,
+	    error_message text COLLATE pg_catalog."default",
+	    tstamp timestamp without time zone DEFAULT now(),
+	    cur_user text COLLATE pg_catalog."default" DEFAULT "current_user"(),
+	    feature_type text COLLATE pg_catalog."default",
+	    feature_id text COLLATE pg_catalog."default",
+	    addparam json,
+	    fcount integer,
+	    CONSTRAINT temp_audit_check_data_pkey PRIMARY KEY (id));
 
-		DELETE FROM audit_check_data WHERE fid=v_fid AND cur_user=current_user;
+		CREATE TEMP TABLE temp_anlgraph(
+	    id serial NOT NULL,
+	    arc_id character varying(20) COLLATE pg_catalog."default",
+	    node_1 character varying(20) COLLATE pg_catalog."default",
+	    node_2 character varying(20) COLLATE pg_catalog."default",
+	    water smallint,
+	    flag smallint,
+	    checkf smallint,
+	    length numeric(12,4),
+	    cost numeric(12,4),
+	    value numeric(12,4),
+	    trace integer,
+	    isheader boolean,
+	    orderby integer,
+	    CONSTRAINT temp_anlgraph_pkey PRIMARY KEY (id),
+	    CONSTRAINT temp_anlgraph_unique UNIQUE (arc_id, node_1));
+		
+		CREATE TEMP TABLE temp_table(
+	    id serial NOT NULL PRIMARY KEY,
+	    fid integer,
+	    text_column text,
+	    cur_user text COLLATE pg_catalog."default" DEFAULT "current_user"());
+
+		CREATE TEMP TABLE temp_data(
+	    id serial NOT NULL PRIMARY KEY,
+	    fid smallint,
+	    feature_type character varying(16) COLLATE pg_catalog."default",
+	    feature_id character varying(16) COLLATE pg_catalog."default",
+	    log_message text COLLATE pg_catalog."default",
+	    cur_user text COLLATE pg_catalog."default" DEFAULT "current_user"());
+
+		CREATE OR REPLACE TEMP VIEW v_anl_graphanalytics_mapzones AS
+		 SELECT temp_anlgraph.arc_id,
+		    temp_anlgraph.node_1,
+		    temp_anlgraph.node_2,
+		    temp_anlgraph.flag,
+		    a2.flag AS flagi,
+		    a2.value,
+		    a2.trace
+		   FROM temp_anlgraph
+		     JOIN ( SELECT temp_anlgraph_1.arc_id,
+		            temp_anlgraph_1.node_1,
+		            temp_anlgraph_1.node_2,
+		            temp_anlgraph_1.water,
+		            temp_anlgraph_1.flag,
+		            temp_anlgraph_1.checkf,
+		            temp_anlgraph_1.value,
+		            temp_anlgraph_1.trace
+		           FROM temp_anlgraph temp_anlgraph_1
+		          WHERE temp_anlgraph_1.water = 1) a2 ON temp_anlgraph.node_1::text = a2.node_2::text
+		  WHERE temp_anlgraph.flag < 2 AND temp_anlgraph.water = 0 AND a2.flag = 0;
 
 		-- reset rtc_scada_x_dma or rtc_scada_x_dma
 		IF v_class = 'DMA' THEN
@@ -385,39 +448,39 @@ BEGIN
 		END IF;
 
 		-- start build log message
-		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('MAPZONES DYNAMIC SECTORITZATION - ', upper(v_class)));
+		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('MAPZONES DYNAMIC SECTORITZATION - ', upper(v_class)));
 		IF upper(v_class) ='PRESSZONE' THEN
-			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('------------------------------------------------------------------'));
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('------------------------------------------------------------------'));
 		ELSE
-			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('----------------------------------------------------------'));
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('----------------------------------------------------------'));
 		END IF;
-		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Use psectors: ', upper(v_usepsector::text)));
-		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Mapzone constructor method: ', upper(v_updatemapzgeom::text)));
-		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Update feature mapzone attributes: ', upper(v_updatefeature::text)));
-		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Previous data quality control: ', v_checkdata));
+		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Use psectors: ', upper(v_usepsector::text)));
+		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Mapzone constructor method: ', upper(v_updatemapzgeom::text)));
+		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Update feature mapzone attributes: ', upper(v_updatefeature::text)));
+		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Previous data quality control: ', v_checkdata));
 		
 		IF v_floodonlymapzone IS NOT NULL THEN
-			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('''Flood only mapzone'' have been ACTIVATED. Graphic log have been disabled. Used mapzones:',v_floodonlymapzone,'.'));
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('''Flood only mapzone'' have been ACTIVATED. Graphic log have been disabled. Used mapzones:',v_floodonlymapzone,'.'));
 		END IF;	
-		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat(''));
+		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat(''));
 
 
 		IF (SELECT (value::json->>(v_class))::boolean FROM config_param_system WHERE parameter='utils_graphanalytics_status') IS FALSE THEN
 
 			RAISE NOTICE 'Mapzone graphanalytics is not enabled to continue';
 	
-			INSERT INTO audit_check_data (fid, criticity, error_message)
+			INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 			VALUES (v_fid, 3, concat('ERROR-',v_fid,': Dynamic analysis for ',v_class,'''s is not configured on database. Please update system variable ''utils_graphanalytics_status'' to enable it '));
 		ELSE 
 			RAISE NOTICE 'Mapzone graphanalytics is in progress';
 
 			-- start build log message
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 3, 'ERRORS');
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 3, '-----------');
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, 'WARNINGS');
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, '--------------');
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, 'INFO');
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, '-------');
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 3, 'ERRORS');
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 3, '-----------');
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, 'WARNINGS');
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, '--------------');
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, 'INFO');
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, '-------');
 
 			IF v_updatefeature THEN 
 				-- reset mapzones (update to 0)
@@ -741,7 +804,7 @@ BEGIN
 	
 				IF v_updatemapzgeom > 0 THEN		
 					-- message
-					INSERT INTO audit_check_data (fid, criticity, error_message)
+					INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 					VALUES (v_fid, 1, concat('INFO: Geometry of mapzone ',v_class ,' has been modified by this process'));
 				END IF;
 
@@ -777,7 +840,7 @@ BEGIN
 							GET DIAGNOSTICS v_count = row_count;
 
 							-- log
-							INSERT INTO audit_check_data (fid,  criticity, error_message)
+							INSERT INTO temp_audit_check_data (fid,  criticity, error_message)
 							VALUES (v_fid, 2, concat('WARNING-395: There is a conflict against ',upper(v_table),'''s (',rec_conflict.mapzone,') with ',v_count1,' arc(s) and ',v_count,' connec(s) affected.'));
 									
 							-- update mapzone geometry
@@ -796,7 +859,7 @@ BEGIN
 
 					-- create log
 					IF v_project_type='UD' THEN
-						v_querytext = ' INSERT INTO audit_check_data (fid, criticity, error_message)
+						v_querytext = ' INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 						SELECT '||v_fid||', 1, concat('||v_mapzonename||','' with '', arcs, '' Arcs, '',nodes, '' Nodes, '', case when connecs is null then 0 else connecs end, '' Connecs and '',
 						 case when gullies is null then 0 else gullies end, '' Gullies'')
 						FROM (SELECT '||(v_field)||', count(*) as arcs FROM v_edit_arc WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')a
@@ -806,7 +869,7 @@ BEGIN
 						JOIN '||(v_table)||' p ON a.'||(v_field)||' = p.'||(v_field);
 						EXECUTE v_querytext;
 					ELSE 
-						v_querytext = ' INSERT INTO audit_check_data (fid, criticity, error_message)
+						v_querytext = ' INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 						SELECT '||v_fid||', 1, concat('||v_mapzonename||','' with '', arcs, '' Arcs, '',nodes, '' Nodes and '', case when connecs is null then 0 else connecs end, '' Connecs'')
 						FROM (SELECT '||(v_field)||', count(*) as arcs FROM v_edit_arc WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')a
 						LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM v_edit_node  WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')b USING ('||(v_field)||')
@@ -817,7 +880,7 @@ BEGIN
 						
 				ELSE
 					IF v_project_type='UD' THEN
-						v_querytext = ' INSERT INTO audit_check_data (fid, criticity, error_message)
+						v_querytext = ' INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 						SELECT '||v_fid||', 1, concat('||v_mapzonename||','' with '', arcs, '' Arcs, '',nodes, '' Nodes, '', case when connecs is null then 0 else connecs end, '' Connecs and '',
 						 case when gullies is null then 0 else gullies end, '' Gullies'')
 						FROM (SELECT '||(v_field)||', count(*) as arcs FROM v_edit_arc  WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')a
@@ -828,7 +891,7 @@ BEGIN
 						WHERE a.'||(v_field)||'::text = '||quote_literal(v_floodonlymapzone);
 						EXECUTE v_querytext;
 					ELSE
-						v_querytext = ' INSERT INTO audit_check_data (fid, criticity, error_message)
+						v_querytext = ' INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 						SELECT '||v_fid||', 1, concat('||v_mapzonename||','' with '', arcs, '' Arcs, '',nodes, '' Nodes and '', case when connecs is null then 0 else connecs end, '' Connecs'')
 						FROM (SELECT '||(v_field)||', count(*) as arcs FROM v_edit_arc  WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')a
 						LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM v_edit_node  WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')b USING ('||(v_field)||')
@@ -840,18 +903,18 @@ BEGIN
 				END IF;
 			ELSE
 				-- message
-				INSERT INTO audit_check_data (fid, criticity, error_message)
+				INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 				VALUES (v_fid, 1, concat('INFO: Mapzone attribute on arc/node/connec features keeps same value previous function. Nothing have been updated by this process'));
 				IF v_class = 'DRAINZONE' THEN
-					INSERT INTO audit_check_data (fid, criticity, error_message)
+					INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 					VALUES (v_fid, 1, concat('INFO: To see results you can query using this values (XX): DRAINZONE:481 '));
 				ELSE
-					INSERT INTO audit_check_data (fid, criticity, error_message)
+					INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 					VALUES (v_fid, 1, concat('INFO: To see results you can query using this values (XX): SECTOR:130, DQA:144, DMA:145, PRESSZONE:146, STATICPRESSURE:147 '));
 				END IF;
-				INSERT INTO audit_check_data (fid, criticity, error_message)
+				INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 				VALUES (v_fid, 1, concat('SELECT * FROM anl_arc WHERE fid = (XX) AND cur_user=current_user;'));
-				INSERT INTO audit_check_data (fid, criticity, error_message)
+				INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 				VALUES (v_fid, 1, concat('NOTE: This query may load more than once same arc. This will be usefull to check mapzone conflicts because it will show where could be problem'));
 			END IF;
 			
@@ -1049,10 +1112,10 @@ BEGIN
 			select count(*) INTO v_count FROM 
 			(SELECT DISTINCT arc_id FROM v_edit_arc JOIN temp_anlgraph USING (arc_id) WHERE water = 0)a;
 			IF v_count > 0 THEN
-				INSERT INTO audit_check_data (fid, criticity, error_message)
+				INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 				VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' arc''s have been disconnected'));
 			ELSE
-				INSERT INTO audit_check_data (fid, criticity, error_message)
+				INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 				VALUES (v_fid, 1, concat('INFO: 0 arc''s have been disconnected'));
 			END IF;
 		
@@ -1061,14 +1124,14 @@ BEGIN
 				select count(*) INTO v_count FROM 
 				(SELECT DISTINCT connec_id FROM v_edit_connec JOIN temp_anlgraph USING (arc_id) WHERE water = 0)a;
 				IF v_count > 0 THEN
-					INSERT INTO audit_check_data (fid, criticity, error_message)
+					INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 					VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' connec''s have been disconnected'));
 				ELSE
-					INSERT INTO audit_check_data (fid, criticity, error_message)
+					INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 					VALUES (v_fid, 1, concat('INFO: 0 connec''s have been disconnected'));
 				END IF;
 			ELSE
-				INSERT INTO audit_check_data (fid, criticity, error_message)
+				INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 				VALUES (v_fid, 1, concat('INFO: 0 connec''s have been disconnected'));
 			END IF;
 			
@@ -1078,22 +1141,22 @@ BEGIN
 					select count(*) INTO v_count FROM 
 					(SELECT DISTINCT gully_id FROM v_edit_gully JOIN temp_anlgraph USING (arc_id) WHERE water = 0)a;
 					IF v_count > 0 THEN
-						INSERT INTO audit_check_data (fid, criticity, error_message)
+						INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 						VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' gullies have been disconnected'));
 					ELSE
-						INSERT INTO audit_check_data (fid, criticity, error_message)
+						INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 						VALUES (v_fid, 1, concat('INFO: 0 gullies have been disconnected'));
 					END IF;
 				ELSE
-					INSERT INTO audit_check_data (fid, criticity, error_message)
+					INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 					VALUES (v_fid, 1, concat('INFO: 0 gullies have been disconnected'));
 				END IF;
 			END IF;
 
 			-- insert spacer for warning and info
-			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, '');
-			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  2, '');
-			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, '');
+			INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, '');
+			INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  2, '');
+			INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, '');
 		END IF;
 	END IF;
 
@@ -1114,6 +1177,12 @@ BEGIN
 		where a2.sector_id != node.sector_id ON CONFLICT (node_id, sector_id) DO NOTHING;	
 	END IF;
 
+	-- reset graph & audit_log tables
+	DELETE FROM audit_check_data WHERE fid=v_fid AND cur_user=current_user;
+
+	INSERT INTO audit_check_data (fid, result_id, table_id, column_id, criticity, enabled, error_message, tstamp, cur_user, feature_type, feature_id, addparam, fcount)
+	SELECT fid, result_id, table_id, column_id, criticity, enabled, error_message, tstamp, cur_user, feature_type, feature_id, addparam, fcount FROM temp_audit_check_data;
+	
 	RAISE NOTICE 'Getting results';
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
@@ -1247,6 +1316,12 @@ BEGIN
 	v_visible_layer := COALESCE(v_visible_layer, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
+
+	DROP VIEW v_anl_graphanalytics_mapzones;
+	DROP TABLE temp_anlgraph;
+	DROP TABLE temp_table;
+	DROP TABLE temp_data;
+	DROP TABLE temp_audit_check_data;
 
 	--  Return
 	RETURN  gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
