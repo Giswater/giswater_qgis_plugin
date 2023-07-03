@@ -1716,7 +1716,7 @@ class GwMincut:
                     f" VALUES ('{result_mincut_id}', '{element_id}');\n")
             # Get hydrometer_id of selected connec
             sql2 = (f"SELECT hydrometer_id FROM v_rtc_hydrometer"
-                    f" WHERE connec_id = '{element_id}'")
+                    f" WHERE feature_id = '{element_id}'")
             rows = tools_db.get_rows(sql2)
             if rows:
                 for row in rows:
