@@ -95,7 +95,40 @@ BEGIN
 	-- Reset values
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
-	TRUNCATE temp_anlgraph;
+
+	CREATE TEMP TABLE temp_anlgraph(
+	id serial NOT NULL PRIMARY KEY,
+    arc_id character varying(20) COLLATE pg_catalog."default",
+    node_1 character varying(20) COLLATE pg_catalog."default",
+    node_2 character varying(20) COLLATE pg_catalog."default",
+    water smallint,
+    flag smallint,
+    checkf smallint,
+    cost numeric(12,4),
+    value numeric(12,4),
+    trace integer,
+    isheader boolean);
+
+CREATE OR REPLACE TEMP VIEW v_anl_graphanalytics_downstream AS 
+ SELECT temp_anlgraph.arc_id,
+    temp_anlgraph.node_1,
+    temp_anlgraph.node_2,
+    temp_anlgraph.flag,
+    a2.flag AS flagi,
+    a2.value,
+    a2.trace
+   FROM temp_anlgraph
+     JOIN ( SELECT temp_anlgraph_1.arc_id,
+            temp_anlgraph_1.node_1,
+            temp_anlgraph_1.node_2,
+            temp_anlgraph_1.water,
+            temp_anlgraph_1.flag,
+            temp_anlgraph_1.checkf,
+            temp_anlgraph_1.value,
+            temp_anlgraph_1.trace
+           FROM temp_anlgraph temp_anlgraph_1
+          WHERE temp_anlgraph_1.water = 1) a2 ON temp_anlgraph.node_1::text = a2.node_2::text
+  WHERE temp_anlgraph.flag < 2 AND temp_anlgraph.water = 0 AND a2.flag = 0;
 
 
 	--Look for closest node using coordinates
@@ -124,7 +157,7 @@ BEGIN
 	-- inundation process
 		LOOP						
 			v_count = v_count+1;
-			UPDATE temp_anlgraph n SET water=1, trace = a.trace FROM v_anl_graphanalytics_mapzones a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;	
+			UPDATE temp_anlgraph n SET water=1, trace = a.trace FROM v_anl_graphanalytics_downstream a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;	
 			GET DIAGNOSTICS v_affectrow = row_count;
 			raise notice 'v_count --> %' , v_count;
 			EXIT WHEN v_affectrow = 0;
@@ -135,8 +168,8 @@ BEGIN
 
 		INSERT INTO anl_arc (arc_id, fid, arccat_id, expl_id, the_geom)
 		SELECT arc_id, v_fid, arc_type, expl_id, the_geom
-		FROM schema_name.temp_anlgraph 
-		join schema_name.arc using(arc_id)
+		FROM temp_anlgraph 
+		join arc using(arc_id)
 		where water=1;
 
 		INSERT INTO anl_node (node_id, nodecat_id,state, expl_id, fid, the_geom)
@@ -210,8 +243,10 @@ BEGIN
 	v_level = 3;
 	v_message = 'Flow  analysis done succesfully';
 
-	--  Return
+	DROP VIEW v_anl_graphanalytics_downstream;
+	DROP TABLE temp_anlgraph;
 
+	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
 				   ',"body":{"form":{}'||
 				   ',"data":{ "info":'||v_result_info||','||
