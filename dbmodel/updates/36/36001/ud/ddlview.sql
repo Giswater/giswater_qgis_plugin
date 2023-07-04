@@ -174,7 +174,7 @@ CREATE OR REPLACE VIEW vu_arc AS
    (CASE WHEN arc.sys_elev2 IS NULL THEN node_sys_elev_2::numeric(12,3) ELSE arc.sys_elev2 END) AS sys_elev2,
     CASE WHEN (CASE WHEN arc.custom_y2 IS NULL THEN y2::numeric(12,3) ELSE custom_y2 END) IS NULL THEN (node_sys_top_elev_2 - arc.sys_elev2)
     ELSE  (CASE WHEN arc.custom_y2 IS NULL THEN y2::numeric(12,3) ELSE custom_y2 END) END AS sys_y2,
-    node_sys_top_elev_2 - (CASE WHEN arc.sys_elev2 IS NULL THEN node_sys_elev_2::numeric(12,3) ELSE arc.sys_elev2 END) - cat_arc.geom2 AS r2,
+    node_sys_top_elev_2 - (CASE WHEN arc.sys_elev2 IS NULL THEN node_sys_elev_2::numeric(12,3) ELSE arc.sys_elev2 END) - cat_arc.geom1 AS r2,
     (CASE WHEN arc.sys_elev2 IS NULL THEN node_sys_elev_2::numeric(12,3) ELSE arc.sys_elev2 END) - node_sys_elev_2 AS z2,
     arc.sys_slope AS slope,
     arc.arc_type,
