@@ -356,7 +356,7 @@ BEGIN
 
     ELSE
     -- mincut details
-    SELECT * INTO v_mincutrec FROM om_mincut WHERE id = v_mincut;
+    SELECT * INTO v_mincutrec FROM om_mincut WHERE id::text = v_mincut::text;
     INSERT INTO audit_check_data (fid, error_message) VALUES (216, '');
     INSERT INTO audit_check_data (fid, error_message) VALUES (216, 'Mincut stats');
     INSERT INTO audit_check_data (fid, error_message) VALUES (216, '-----------------');
@@ -377,7 +377,7 @@ BEGIN
     v_result_info := COALESCE(v_result_info, '{}'); 
 
     -- return
-    RETURN ('{"status":"Accepted", "version":"'||v_version||'","body":{"form":{}'||
+    RETURN ('{"status":"Accepted", "version":'||v_version||',"body":{"form":{}'||
             ',"data":{ "info":'||v_result_info||'}'||
             '}}')::json;
     END IF;
