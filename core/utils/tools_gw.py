@@ -459,16 +459,44 @@ def draw_by_json(complet_result, rubber_band, margin=None, reset_rb=True, color=
     list_coord = re.search(r'\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
     max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
 
+    # Parse the WKT string to extract the geometry type and coordinates
+    wkt_string = complet_result['body']['feature']['geometry']['st_astext']
+
     if reset_rb:
         reset_rubberband(rubber_band)
-    if str(max_x) == str(min_x) and str(max_y) == str(min_y):
-        point = QgsPointXY(float(max_x), float(max_y))
-        tools_qgis.draw_point(point, rubber_band, color, width)
-    else:
-        points = tools_qgis.get_geometry_vertex(list_coord)
-        tools_qgis.draw_polyline(points, rubber_band, color, width)
+    draw_wkt_geometry(wkt_string, rubber_band, color, width)
+
     if margin is not None:
         tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin, change_crs=False)
+
+
+def draw_wkt_geometry(wkt_string, rubber_band, color, width):
+    match = re.match(r'^(\w+)\((.*)\)$', wkt_string)
+    if not match:
+        tools_qgis.show_warning('Invalid WKT string', parameter=f'Error in draw_by_json(), wkt={wkt_string}')
+    geometry_type = match.group(1)
+    coordinates = match.group(2)
+
+    # Draw the geometry based on its type
+    if geometry_type == 'POINT':
+        x, y = [float(c) for c in coordinates.split()]
+        point = QgsPointXY(x, y)
+        tools_qgis.draw_point(point, rubber_band, color, width, reset_rb=False)
+    elif geometry_type == 'LINESTRING':
+        points = [QgsPointXY(float(x), float(y)) for x, y in (c.split() for c in coordinates.split(','))]
+        tools_qgis.draw_polyline(points, rubber_band, color, width, reset_rb=False)
+    elif geometry_type == 'POLYGON':
+        rings = [QgsPointXY(float(x), float(y)) for x, y in (c.split() for c in coordinates.split(','))]
+        tools_qgis.draw_polygon(rings, rubber_band, color, width, reset_rb=False)
+    elif geometry_type == 'GEOMETRYCOLLECTION':
+        # Extract the individual geometries from the collection
+        # NOTE: will only work if all geometries have the same geometry type
+        geometries = re.findall(r'(\w+)\((.*?)\)', coordinates)
+        for geometry_type, geometry_coords in geometries:
+            geometry_wkt = f'{geometry_type.upper()}({geometry_coords})'
+            draw_wkt_geometry(geometry_wkt, rubber_band, color, width)
+    else:
+        tools_qgis.show_warning('Unsuported geometry type', parameter=geometry_type)
 
 
 def enable_feature_type(dialog, widget_name='tbl_relation', ids=None):
