@@ -1512,39 +1512,27 @@ def add_button(**kwargs):
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
     function_name = None
     real_name = widget.objectName()
-    if 'data_' in widget.objectName():
-        real_name = widget.objectName()[5:len(widget.objectName())]
+    if 'tab_data_' in widget.objectName():
+        real_name = widget.objectName()[9:len(widget.objectName())]
 
     if field['stylesheet'] is not None and 'icon' in field['stylesheet']:
         icon = field['stylesheet']['icon']
         size = field['stylesheet']['size'] if 'size' in field['stylesheet'] else "20x20"
         add_icon(widget, f'{icon}', size)
 
-    if 'widgetfunction' in field:
+    func_params = ""
+    if field.get('widgetfunction'):
         if 'module' in field['widgetfunction']:
             module = globals()[field['widgetfunction']['module']]
         function_name = field['widgetfunction'].get('functionName')
         if function_name is not None:
-            if function_name:
-                exist = tools_os.check_python_function(module, function_name)
-                if not exist:
-                    msg = f"widget {real_name} has associated function {function_name}, but {function_name} not exist"
-                    tools_qgis.show_message(msg, 2)
-                    return widget
-            else:
-                message = "Parameter functionName is null for button"
-                tools_qgis.show_message(message, 2, parameter=widget.objectName())
-
-    func_params = ""
-    if 'widgetfunction' in field and field['widgetfunction'] and 'functionName' in field['widgetfunction']:
-        function_name = field['widgetfunction']['functionName']
-        exist = tools_os.check_python_function(module, function_name)
-        if not exist:
-            msg = f"widget {real_name} has associated function {function_name}, but {function_name} not exist"
-            tools_qgis.show_message(msg, 2)
-            return widget
-        if 'parameters' in field['widgetfunction']:
-            func_params = field['widgetfunction']['parameters']
+            exist = tools_os.check_python_function(module, function_name)
+            if not exist:
+                msg = f"widget {real_name} has associated function {function_name}, but {function_name} not exist"
+                tools_qgis.show_message(msg, 2)
+                return widget
+            if 'parameters' in field['widgetfunction']:
+                func_params = field['widgetfunction']['parameters']
     else:
         message = "Parameter widgetfunction.functionName is null for button"
         tools_qgis.show_message(message, 2, parameter=widget.objectName())
