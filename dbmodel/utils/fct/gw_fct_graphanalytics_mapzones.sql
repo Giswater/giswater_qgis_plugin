@@ -337,22 +337,7 @@ BEGIN
 	IF v_audit_result IS NULL THEN
 	
 		--create temporal
-		CREATE TEMP TABLE temp_audit_check_data(
-	    id serial NOT NULL,
-	    fid smallint,
-	    result_id character varying(30) COLLATE pg_catalog."default",
-	    table_id text COLLATE pg_catalog."default",
-	    column_id text COLLATE pg_catalog."default",
-	    criticity smallint,
-	    enabled boolean,
-	    error_message text COLLATE pg_catalog."default",
-	    tstamp timestamp without time zone DEFAULT now(),
-	    cur_user text COLLATE pg_catalog."default" DEFAULT "current_user"(),
-	    feature_type text COLLATE pg_catalog."default",
-	    feature_id text COLLATE pg_catalog."default",
-	    addparam json,
-	    fcount integer,
-	    CONSTRAINT temp_audit_check_data_pkey PRIMARY KEY (id));
+		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 
 		CREATE TEMP TABLE temp_anlgraph(
 	    id serial NOT NULL,

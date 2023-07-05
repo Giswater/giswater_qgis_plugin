@@ -143,16 +143,10 @@ BEGIN
 	DELETE FROM audit_log_data WHERE fid=v_fid AND cur_user=current_user;
 	DELETE FROM audit_check_data WHERE fid=134 AND cur_user=current_user;
 
-	CREATE TEMP TABLE temp_anl_arc(
-    id serial PRIMARY KEY,
-    fid integer, 
-    arccat_id character varying(30), 
-    arc_id character varying(16), 
-    the_geom public.geometry, 
-    descript text);
-
+	CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
+	
 	CREATE TEMP TABLE temp_anlgraph(
-	id serial NOT NULL,
+	id serial NOT NULL PRIMARY KEY,
     arc_id character varying(20) COLLATE pg_catalog."default",
     node_1 character varying(20) COLLATE pg_catalog."default",
     node_2 character varying(20) COLLATE pg_catalog."default",
