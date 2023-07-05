@@ -665,7 +665,7 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.action_demand, "254", sub_folder="24x24")
 
 
-    def _manage_dlg_widgets(self, complet_result, result, new_feature, reload_epa=False):
+    def _manage_dlg_widgets(self, complet_result, result, new_feature, reload_epa=False, tab='tab_data'):
         """ Creates and populates all the widgets """
 
         layout_list = []
@@ -675,9 +675,9 @@ class GwInfo(QObject):
                        'check': 'checkbox', 'datetime': 'dateedit', 'hyperlink': 'hyperlink', 'spinbox': 'spinbox',
                        'doublespinbox': 'spinbox'}
         for field in complet_result['body']['data']['fields']:
-            if 'hidden' in field and field['hidden']:
+            if field.get('hidden'):
                 continue
-            if reload_epa and 'lyt_epa' not in field['layoutname']:
+            if tab != field['tabname']:
                 continue
             if field.get('widgetcontrols') and field['widgetcontrols'].get('hiddenWhenNull') \
                     and field.get('value') in (None, ''):
@@ -2655,6 +2655,7 @@ class GwInfo(QObject):
 
         # Tab 'Elements'
         if self.tab_main.widget(index_tab).objectName() == 'tab_elements' and not self.tab_element_loaded:
+            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_elements')
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
             self.tab_element_loaded = True
@@ -2666,36 +2667,43 @@ class GwInfo(QObject):
             self.tab_epa_loaded = True
         # Tab 'Relations'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_relations' and not self.tab_relations_loaded:
+            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_relations')
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
             self.tab_relations_loaded = True
         # Tab 'Connections'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_connections' and not self.tab_connections_loaded:
+            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_connections')
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
             self.tab_connections_loaded = True
         # Tab 'Hydrometer'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_hydrometer' and not self.tab_hydrometer_loaded:
+            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_hydrometer')
             filter_fields = f'"feature_id":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields, id_name="feature_id")
             self.tab_hydrometer_loaded = True
         # Tab 'Hydrometer values'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_hydrometer_val' and not self.tab_hydrometer_val_loaded:
+            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_hydrometer_val')
             filter_fields = f'"feature_id":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields, id_name="feature_id")
             self.tab_hydrometer_val_loaded = True
         # Tab 'Visit'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_visit' and not self.tab_visit_loaded:
+            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_visit')
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
             self.tab_visit_loaded = True
         # Tab 'Event'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_event' and not self.tab_event_loaded:
+            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_event')
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
             self.tab_event_loaded = True
         # Tab 'Documents'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_documents' and not self.tab_document_loaded:
+            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_documents')
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
             self.tab_document_loaded = True
