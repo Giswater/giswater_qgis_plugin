@@ -4408,7 +4408,6 @@ def _manage_tableview(**kwargs):
     widget = add_tableview(complet_result, field, dialog, module, class_self)
     widget = add_tableview_header(widget, field)
     widget = fill_tableview_rows(widget, field)
-    widget = set_tablemodel_config(dialog, widget, field['columnname'], 1, True)
     tools_qt.set_tableview_config(widget)
     return widget
 
