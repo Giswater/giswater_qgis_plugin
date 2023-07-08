@@ -35,3 +35,7 @@ WHERE columnname='fluid_type' AND formname = 'v_edit_element';
 
 UPDATE config_typevalue SET addparam=camelstyle::json WHERE typevalue='sys_table_context';
 UPDATE config_typevalue SET camelstyle=null WHERE typevalue='sys_table_context';
+
+INSERT INTO inp_typevalue VALUES ('inp_result_status', 0 , 'DEPRECATED') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue VALUES ('inp_result_status', 1 , 'PARTIAL') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue VALUES ('inp_result_status', 2 , 'COMPLETED') ON CONFLICT (typevalue, id) DO NOTHING;
