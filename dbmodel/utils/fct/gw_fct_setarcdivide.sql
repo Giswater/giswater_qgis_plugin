@@ -1008,6 +1008,12 @@ BEGIN
 
 	--last process
 	UPDATE node SET arc_id=NULL WHERE node_id=v_node_id;
+	UPDATE node SET sector_id = rec_aux1.sector_id, dma_id = rec_aux1.dma_id WHERE node_id=v_node_id;
+	
+	IF v_project_type ='WS' THEN
+		UPDATE node SET presszone_id = rec_aux1.presszone_id, dqa_id = rec_aux1.dqa_id, minsector_id = rec_aux1.minsector_id 
+		WHERE node_id=v_node_id;
+	END IF;
 
 	-- get results
 	-- info
