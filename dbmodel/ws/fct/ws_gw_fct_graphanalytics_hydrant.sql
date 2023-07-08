@@ -48,8 +48,8 @@ v_line2  public.geometry;
 rec_point  record;
 v_node_duplicated  text;
 v_node_json json;
-v_node_array text[];
-v_proposal_array text[];
+v_node_array integer[];
+v_proposal_array integer[];
 v_tablename text;
 rec_hydrant text;
 v_dist_street numeric;
@@ -59,6 +59,8 @@ v_use_propsal boolean;
 v_use_psector boolean;
 v_query text;
 v_hidrant_array text;
+v_max_hydr_id integer;
+v_max_prop_hydr_id integer;
 BEGIN
 
 -- Search path
@@ -153,7 +155,7 @@ SET search_path = "SCHEMA_NAME", public;
 			END LOOP;
 
 			IF v_use_propsal IS TRUE THEN
-				EXECUTE 'SELECT array_agg(a.node_id) from (SELECT node_id FROM anl_node where fid='||v_fid_proposal||' AND cur_user=current_user)a'
+				EXECUTE 'SELECT array_agg(a.node_id::integer) from (SELECT node_id FROM anl_node where fid='||v_fid_proposal||' AND cur_user=current_user)a'
 				into v_proposal_array;	
 
 				IF v_proposal_array IS NOT NULL THEN
@@ -226,7 +228,16 @@ SET search_path = "SCHEMA_NAME", public;
 		FROM  om_streetaxis s where id not in (select annotation from temp_arc WHERE result_id= v_fid::text))a;
 
 		--update temp tables with new temporal ids
-		UPDATE temp_node a SET node_id=b.row_id from (select row_number()over() as row_id, id from temp_node)b where a.id=b.id and node_id is null;
+		SELECT max(x) into v_max_hydr_id FROM unnest(v_node_array), unnest(v_proposal_array) as x;
+	
+		IF v_use_propsal IS TRUE THEN
+			SELECT max(x) into v_max_prop_hydr_id FROM unnest(v_proposal_array) as x;
+			IF v_max_prop_hydr_id is not null and v_max_prop_hydr_id > v_max_hydr_id THEN
+				v_max_hydr_id=v_max_prop_hydr_id;
+			END IF;
+		END IF;
+	
+		UPDATE temp_node a SET node_id=b.row_id from (select v_max_hydr_id + row_number()over() as row_id, id from temp_node)b where a.id=b.id and node_id is null;
 		UPDATE temp_arc a SET arc_id=b.row_id from (select row_number()over() as row_id, id from temp_arc where result_id=v_fid::text)b where a.id=b.id and result_id=v_fid::text;
 
 		--update temp_arc with values of node_1, node_2 from temp_node

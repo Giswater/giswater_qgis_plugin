@@ -27,9 +27,7 @@ BEGIN
 			END IF;
 		END IF;
 
-		IF NEW.node_id IS NULL THEN
-			NEW.node_id=nextval('SCHEMA_NAME.urn_id_seq'::regclass);
-		END IF;
+		NEW.node_id=nextval('SCHEMA_NAME.urn_id_seq'::regclass);
 
 		INSERT INTO anl_node (node_id, nodecat_id, expl_id, the_geom, fid)
 		VALUES (NEW.node_id, NEW.nodecat_id, NEW.expl_id, NEW.the_geom, 468);
