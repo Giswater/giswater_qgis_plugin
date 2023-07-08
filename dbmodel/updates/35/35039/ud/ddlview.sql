@@ -155,3 +155,21 @@ CREATE OR REPLACE VIEW vu_arc
      JOIN dma m USING (dma_id)
      LEFT JOIN v_ext_streetaxis c ON c.id::text = arc.streetaxis_id::text
      LEFT JOIN v_ext_streetaxis d ON d.id::text = arc.streetaxis2_id::text;
+
+
+drop view vi_outlets;
+CREATE OR REPLACE VIEW ud.vi_outlets
+AS SELECT arc_id,
+    temp_arc.node_1,
+    temp_arc.node_2,
+    case when f.offsetval is null then '*' else f.offsetval::text end as offsetval,
+    f.outlet_type,
+        CASE
+            WHEN f.curve_id IS NULL THEN f.cd1::text::character varying
+            ELSE f.curve_id
+        END AS other1,
+    f.cd2::text AS other2,
+    f.flap::character varying AS other3
+   FROM temp_arc_flowregulator f
+     JOIN temp_arc USING (arc_id)
+  WHERE f.type::text = 'OUTLET'::text;
