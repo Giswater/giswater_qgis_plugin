@@ -56,6 +56,10 @@ BEGIN
 
 	-- update rpt_cat_result
 	UPDATE rpt_cat_result SET exec_date = now(), cur_user = current_user , status = 2 WHERE result_id = v_result;
+	
+	-- delete wrong VALUES
+	UPDATE rpt_node SET time='0:00' where time ='null' and result_id = v_result;
+	UPDATE rpt_arc SET time='0:00' where time ='null' and result_id = v_result;
 
 	-- create log message
 	RETURN gw_fct_rpt2pg_log(v_result, v_import);
