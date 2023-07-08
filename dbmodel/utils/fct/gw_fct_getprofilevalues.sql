@@ -176,7 +176,6 @@ BEGIN
   	SELECT (value::json->>'node')::json->>'cat_geom1' INTO v_node_geom1 FROM config_param_system WHERE parameter = 'om_profile_vdefault';
   	SELECT (value::json->>'vnodeStatus') INTO v_vnode_status FROM config_param_system WHERE parameter = 'om_profile_vdefault';
 
-
 	-- create temp tables
 	CREATE TEMP TABLE temp_vnode(
 	  id serial NOT NULL,
@@ -220,67 +219,8 @@ BEGIN
 	  exit_elev numeric(12,3),
 	  CONSTRAINT temp_link_x_arc_pkey PRIMARY KEY (link_id));
 
-	CREATE TEMP TABLE temp_anl_arc(
-	  id serial NOT NULL,
-	  arc_id character varying(16) NOT NULL,
-	  arccat_id character varying(30),
-	  state integer,
-	  arc_id_aux character varying(16),
-	  expl_id integer,
-	  fid integer NOT NULL,
-	  cur_user character varying(30) NOT NULL DEFAULT "current_user"(),
-	  the_geom geometry(LineString,SRID_VALUE),
-	  the_geom_p geometry(Point,SRID_VALUE),
-	  descript text,
-	  result_id character varying(16),
-	  node_1 character varying(16),
-	  node_2 character varying(16),
-	  sys_type character varying(30),
-	  code character varying(30),
-	  cat_geom1 double precision,
-	  length double precision,
-	  slope double precision,
-	  total_length numeric(12,3),
-	  z1 double precision,
-	  z2 double precision,
-	  y1 double precision,
-	  y2 double precision,
-	  elev1 double precision,
-	  elev2 double precision,
-	  dma_id integer,
-	  addparam text,
-	  sector_id integer,
-	  CONSTRAINT anl_arc_pkey PRIMARY KEY (id));
-	  
-	CREATE TEMP TABLE temp_anl_node(
-	  id serial NOT NULL,
-	  node_id character varying(16) NOT NULL DEFAULT nextval('SCHEMA_NAME.urn_id_seq'::regclass),
-	  nodecat_id character varying(30),
-	  state integer,
-	  num_arcs integer,
-	  node_id_aux character varying(16),
-	  nodecat_id_aux character varying(30),
-	  state_aux integer,
-	  expl_id integer,
-	  fid integer NOT NULL,
-	  cur_user character varying(30) NOT NULL DEFAULT "current_user"(),
-	  the_geom geometry(Point,SRID_VALUE),
-	  arc_distance numeric(12,3),
-	  arc_id character varying(16),
-	  descript text,
-	  result_id character varying(16),
-	  total_distance numeric(12,3),
-	  sys_type character varying(30),
-	  code character varying(30),
-	  cat_geom1 double precision,
-	  top_elev double precision,
-	  elev double precision,
-	  ymax double precision,
-	  state_type integer,
-	  sector_id integer,
-	  addparam text,
-	  CONSTRAINT anl_node_pkey PRIMARY KEY (id));
-
+	CREATE TEMP TABLE temp_anl_arc(LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
+	CREATE TEMP TABLE temp_anl_node(LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
   	
   	-- set value to v_linksdistance if null
 	IF v_linksdistance IS NULL THEN
