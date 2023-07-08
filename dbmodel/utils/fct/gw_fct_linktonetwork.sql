@@ -542,9 +542,9 @@ BEGIN
 						WHERE psector_id = v_psector_current AND gully_id = v_connect_id AND state = 1;
 					END IF;
 				END IF;
-			END IF;
+			END IF; 
 
-			RAISE NOTICE 'LINK: %, %:, %, %:, %',v_link.link_id, v_link.feature_type, v_link.feature_id, v_link.exit_type, v_link.exit_id;
+			RAISE NOTICE 'LINK:%, %:%, %:%',v_link.link_id, v_link.feature_type, v_link.feature_id, v_link.exit_type, v_link.exit_id;
 			-- reset values
 			v_connect := null;
 			v_link := null;
