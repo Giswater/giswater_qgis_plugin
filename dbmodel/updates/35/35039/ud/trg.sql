@@ -8,4 +8,4 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME ,public;
 
 create trigger gw_trg_vi_outlets instead of insert or delete or update on vi_outlets 
-for each row execute function ud.gw_trg_vi('vi_outlets');
+for each row execute function gw_trg_vi('vi_outlets');
