@@ -158,7 +158,7 @@ CREATE OR REPLACE VIEW vu_arc
 
 
 drop view vi_outlets;
-CREATE OR REPLACE VIEW ud.vi_outlets
+CREATE OR REPLACE VIEW vi_outlets
 AS SELECT arc_id,
     temp_arc.node_1,
     temp_arc.node_2,
