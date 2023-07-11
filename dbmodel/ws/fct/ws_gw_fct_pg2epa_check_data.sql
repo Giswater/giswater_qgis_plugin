@@ -60,18 +60,13 @@ BEGIN
 		v_fid = 225;
 	END IF;
 
-	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fid IN (107, 153, 164, 165, 166, 167, 170, 171, 198, 292, 293, 294, 379, 411, 412, 432, 480)
-	AND cur_user=current_user;
-	DELETE FROM anl_arc WHERE fid IN (169, 229, 230, 295) AND cur_user=current_user;
-	DELETE FROM anl_connec WHERE fid IN (480) AND cur_user=current_user;
-
 	--create temp tables
-	CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
-	CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-	CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
-	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+	IF v_fid = 225 THEN
+		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
+		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+	END IF;
 
 	-- Header
 	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (225,  4, 'CHECK GIS DATA QUALITY ACORDING EPA ROLE');
@@ -946,16 +941,6 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (225, 2, '');
 	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (225, 1, '');
 
-	INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
-	INSERT INTO anl_node SELECT * FROM temp_anl_node;
-	INSERT INTO anl_connec SELECT * FROM temp_anl_connec;
-	INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
-
-	DROP TABLE  IF EXISTS temp_anl_arc;
-	DROP TABLE IF EXISTS temp_anl_node ;
-	DROP TABLE IF EXISTS  temp_anl_connec;
-	DROP TABLE  IF EXISTS temp_audit_check_data;
-
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
@@ -995,26 +980,23 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString",  "features":',v_result,'}'); 
 
-	--polygons
-	v_result = null;
-	SELECT jsonb_agg(features.feature) INTO v_result
-	FROM (
-	SELECT jsonb_build_object(
-	'type',       'Feature',
-	'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-	'properties', to_jsonb(row) - 'the_geom'
-	) AS feature
-	FROM (SELECT id, pol_id, pol_type, state, expl_id, descript, the_geom
-	FROM  anl_polygon WHERE cur_user="current_user"() AND fid =14) row) features;
-
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_polygon = concat ('{"geometryType":"Polygon", "features":',v_result, '}');
-
-	--    Control nulls
+	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
+
+	IF fid = 225 THEN
+		INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
+		INSERT INTO anl_node SELECT * FROM temp_anl_node;
+		INSERT INTO anl_connec SELECT * FROM temp_anl_connec;
+		INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
+
+		DROP TABLE  IF EXISTS temp_anl_arc;
+		DROP TABLE IF EXISTS temp_anl_node ;
+		DROP TABLE IF EXISTS  temp_anl_connec;
+		DROP TABLE  IF EXISTS temp_audit_check_data;
+	END IF;
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
