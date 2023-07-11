@@ -41,10 +41,10 @@ BEGIN
 	IF v_breaklegth = NULL THEN v_breaklegth = 1000; END IF;
 	
 	-- count
-	SELECT count(*) INTO v_count FROM (SELECT arc_id, v_breaklegth/(st_length(the_geom)+0.001) as partial, the_geom  FROM temp_arc)a  WHERE partial < 1;
+	SELECT count(*) INTO v_count FROM (SELECT arc_id, v_breaklegth/(st_length(the_geom)+0.001) as partial, the_geom  FROM temp_t_arc)a  WHERE partial < 1;
 
 	-- insert into vnode table with state  = 0
-	FOR rec_arc IN EXECUTE ' SELECT * FROM (SELECT arc_id, '||v_breaklegth||'/(st_length(the_geom)+0.001) as partial, the_geom  FROM temp_arc)a  WHERE partial < 1'
+	FOR rec_arc IN EXECUTE ' SELECT * FROM (SELECT arc_id, '||v_breaklegth||'/(st_length(the_geom)+0.001) as partial, the_geom  FROM temp_t_arc)a  WHERE partial < 1'
 	LOOP
 		-- counter
 		i = i+1;
@@ -54,7 +54,7 @@ BEGIN
 		LOOP
 			EXIT WHEN v_total > 1;
 
-			INSERT INTO temp_table(fid, geom_point)
+			INSERT INTO temp_t_table(fid, geom_point)
 			SELECT 150, ST_LineInterpolatePoint(rec_arc.the_geom, v_total);
 			v_total = v_total + rec_arc.partial;
 		END LOOP;
@@ -62,9 +62,9 @@ BEGIN
 	END LOOP;
 
 	-- delete those are overlaped with real vnodes
-	UPDATE temp_table a SET fid = 296 FROM temp_link WHERE st_dwithin(st_endpoint(the_geom), geom_point, v_removevnodebuffer);
-	UPDATE temp_table a SET fid = 296 FROM temp_node WHERE st_dwithin((the_geom), geom_point, v_removevnodebuffer);
-	DELETE FROM temp_table WHERE fid = 296;
+	UPDATE temp_t_table a SET fid = 296 FROM temp_link WHERE st_dwithin(st_endpoint(the_geom), geom_point, v_removevnodebuffer);
+	UPDATE temp_t_table a SET fid = 296 FROM temp_node WHERE st_dwithin((the_geom), geom_point, v_removevnodebuffer);
+	DELETE FROM temp_t_table WHERE fid = 296;
 
 RETURN 0;
 END;

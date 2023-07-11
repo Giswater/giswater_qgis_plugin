@@ -33,14 +33,14 @@ BEGIN
 	IF v_networkmode = 1 THEN -- Because shut-off valves are not exported as a shortpipe, pipes closer shut-off valves will be setted
 
 		-- shutoff valves (TCV OR SHORTPIPES)
-		UPDATE temp_arc SET status='CLOSED' 
-		FROM (SELECT temp_arc.arc_id FROM temp_arc JOIN man_valve ON node_id=node_1 where closed is true
+		UPDATE temp_t_arc SET status='CLOSED' 
+		FROM (SELECT temp_t_arc.arc_id FROM temp_t_arc JOIN man_valve ON node_id=node_1 where closed is true
 		UNION
-		SELECT temp_arc.arc_id from temp_arc join man_valve ON node_id=node_2  where closed is true) a 
-		WHERE a.arc_id=temp_arc.arc_id;
+		SELECT temp_t_arc.arc_id from temp_t_arc join man_valve ON node_id=node_2  where closed is true) a 
+		WHERE a.arc_id=temp_t_arc.arc_id;
 
 		-- mandatory nodarcs
-		UPDATE temp_arc SET status='CLOSED' 
+		UPDATE temp_t_arc SET status='CLOSED' 
 		FROM man_valve WHERE closed is true AND arc_id = concat(node_id, '_n2a');
 
 		-- cv valves: not applied
@@ -53,22 +53,22 @@ BEGIN
 		ELSE
 			v_querytext = ' AND epa_type = ''SHORTPIPE''';
 		END IF;
-		EXECUTE ' UPDATE temp_arc a SET status=''CLOSED'' FROM man_valve v WHERE a.arc_id=concat(v.node_id,''_n2a'') AND closed=true '||v_querytext;
-		EXECUTE ' UPDATE temp_arc a SET status=''OPEN'' FROM man_valve v WHERE a.arc_id=concat(v.node_id,''_n2a'') AND closed=false'||v_querytext;
+		EXECUTE ' UPDATE temp_t_arc a SET status=''CLOSED'' FROM man_valve v WHERE a.arc_id=concat(v.node_id,''_n2a'') AND closed=true '||v_querytext;
+		EXECUTE ' UPDATE temp_t_arc a SET status=''OPEN'' FROM man_valve v WHERE a.arc_id=concat(v.node_id,''_n2a'') AND closed=false'||v_querytext;
 
 		-- mandatory nodarcs
-		UPDATE temp_arc a SET status='OPEN' FROM man_valve v WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.closed is not true;
-		UPDATE temp_arc a SET status='CLOSED' FROM man_valve v WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.closed = true;
-		UPDATE temp_arc a SET status=v.status FROM inp_valve v WHERE a.arc_id=concat(v.node_id,'_n2a') AND a.status = 'OPEN';
+		UPDATE temp_t_arc a SET status='OPEN' FROM man_valve v WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.closed is not true;
+		UPDATE temp_t_arc a SET status='CLOSED' FROM man_valve v WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.closed = true;
+		UPDATE temp_t_arc a SET status=v.status FROM inp_valve v WHERE a.arc_id=concat(v.node_id,'_n2a') AND a.status = 'OPEN';
 
 		-- cv valves 
-		UPDATE temp_arc a SET status='CV' FROM inp_shortpipe v WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.status = 'CV' AND a.status = 'OPEN';
-		UPDATE temp_arc a SET status='CV' FROM inp_valve v WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.status = 'CV' AND a.status = 'OPEN';
+		UPDATE temp_t_arc a SET status='CV' FROM inp_shortpipe v WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.status = 'CV' AND a.status = 'OPEN';
+		UPDATE temp_t_arc a SET status='CV' FROM inp_valve v WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.status = 'CV' AND a.status = 'OPEN';
 
     END IF;
     
     -- all that not are closed are open
-    UPDATE temp_arc SET status='OPEN' WHERE status IS NULL;
+    UPDATE temp_t_arc SET status='OPEN' WHERE status IS NULL;
 
     RETURN 1;
 		

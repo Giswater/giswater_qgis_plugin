@@ -43,10 +43,6 @@ BEGIN
 
 	raise notice 'Delete previous values from same result';
 
-	-- Delete previous results on rpt_inp_node & arc tables
-	TRUNCATE temp_node;
-	TRUNCATE temp_arc;
-
 	--Use state_type only is operative true or not
 	IF v_isoperative THEN
 		v_statetype = ' AND value_state_type.is_operative = TRUE ';
@@ -54,14 +50,14 @@ BEGIN
 		v_statetype = ' AND (value_state_type.is_operative = TRUE OR value_state_type.is_operative = FALSE)';
 	END IF;
 
-	raise notice 'Inserting nodes on temp_node table';
+	raise notice 'Inserting nodes on temp_t_node table';
 
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
-	EXECUTE ' INSERT INTO temp_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
+	EXECUTE ' INSERT INTO temp_t_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
 		WITH b AS (SELECT ve_arc.* FROM selector_sector, ve_arc
 		JOIN value_state_type ON ve_arc.state_type = value_state_type.id
 		WHERE ve_arc.sector_id = selector_sector.sector_id AND epa_type !=''UNDEFINED'' AND selector_sector.cur_user = "current_user"()::text 
-		AND ve_arc.sector_id > 0 '
+		AND ve_arc.sector_id > 0 AND ve_arc.state > 0'
 		||v_statetype||')
 		SELECT DISTINCT ON (n.node_id)
 		n.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, a.sector_id, n.state, n.state_type, n.annotation, n.the_geom, n.expl_id, dma_id, presszone_id, dqa_id, minsector_id,
@@ -77,14 +73,14 @@ BEGIN
 
 	IF v_networkmode = 4 THEN
 	
-		EXECUTE ' INSERT INTO temp_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
+		EXECUTE ' INSERT INTO temp_t_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
 			SELECT DISTINCT ON (c.connec_id)
 			c.connec_id, elevation, elevation-depth as elev, ''CONNEC'', connecat_id, epa_type, c.sector_id, c.state, c.state_type, c.annotation, c.the_geom, c.expl_id, c.dma_id, c.presszone_id, c.dqa_id, c.minsector_id,
 			(case when c.builtdate is not null then (now()::date-c.builtdate)/30 else 0 end)
 			FROM selector_sector, v_edit_connec c
 			JOIN value_state_type ON id = state_type
 			WHERE c.sector_id = selector_sector.sector_id 
-			AND c.sector_id > 0
+			AND c.sector_id > 0 AND c.state > 0 
 			AND pjoint_id IS NOT NULL AND pjoint_type IS NOT NULL
 			AND epa_type = ''JUNCTION''
 			AND selector_sector.cur_user = "current_user"()::text '
@@ -92,100 +88,100 @@ BEGIN
 	END IF;
 
 	-- update child param for inp_reservoir
-	UPDATE temp_node SET pattern_id=inp_reservoir.pattern_id FROM inp_reservoir WHERE temp_node.node_id=inp_reservoir.node_id;
+	UPDATE temp_t_node SET pattern_id=inp_reservoir.pattern_id FROM inp_reservoir WHERE temp_t_node.node_id=inp_reservoir.node_id;
 
 	-- update head for those reservoirs head is not null
-	UPDATE temp_node SET elevation = head, elev = head FROM inp_reservoir WHERE temp_node.node_id=inp_reservoir.node_id AND head is not null;
+	UPDATE temp_t_node SET elevation = head, elev = head FROM inp_reservoir WHERE temp_t_node.node_id=inp_reservoir.node_id AND head is not null;
 	
 	-- update child param for inp_junction
-	UPDATE temp_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE temp_node.node_id=inp_junction.node_id;
+	UPDATE temp_t_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE temp_t_node.node_id=inp_junction.node_id;
 
 	-- update child param for inp_tank
-	UPDATE temp_node SET addparam=concat('{"initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
+	UPDATE temp_t_node SET addparam=concat('{"initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
 	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'", "overflow":"',overflow,'"}')
-	FROM inp_tank WHERE temp_node.node_id=inp_tank.node_id;
+	FROM inp_tank WHERE temp_t_node.node_id=inp_tank.node_id;
 	
 	-- update child param for inp_inlet
-	UPDATE temp_node SET addparam=concat('{"pattern_id":"',inp_inlet.pattern_id,'", "initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
+	UPDATE temp_t_node SET addparam=concat('{"pattern_id":"',inp_inlet.pattern_id,'", "initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
 	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'", "overflow":"',overflow,'"}')
-	FROM inp_inlet WHERE temp_node.node_id=inp_inlet.node_id;
+	FROM inp_inlet WHERE temp_t_node.node_id=inp_inlet.node_id;
 	
 	-- update child param for inp_valve
-	UPDATE temp_node SET addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "diameter":"',custom_dint,'", "flow":"',
+	UPDATE temp_t_node SET addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "diameter":"',custom_dint,'", "flow":"',
 	flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "minorloss":"',minorloss,'", "status":"',status,
 	'", "to_arc":"',to_arc,'", "add_settings":"',add_settings,'"}')
-	FROM inp_valve WHERE temp_node.node_id=inp_valve.node_id;
+	FROM inp_valve WHERE temp_t_node.node_id=inp_valve.node_id;
 
 	-- update addparam for inp_pump
-	UPDATE temp_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern_id":"',inp_pump.pattern_id,'", "status":"',status,'", "to_arc":"',to_arc,
+	UPDATE temp_t_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern_id":"',inp_pump.pattern_id,'", "status":"',status,'", "to_arc":"',to_arc,
 	'", "effic_curve_id":"', effic_curve_id,'", "energy_price":"',energy_price,'", "energy_pattern_id":"',energy_pattern_id,'", "pump_type":"',pump_type,'"}')
-	FROM inp_pump WHERE temp_node.node_id=inp_pump.node_id;
+	FROM inp_pump WHERE temp_t_node.node_id=inp_pump.node_id;
 
 	IF v_forcereservoirsoninlets THEN
 
-		UPDATE temp_node SET epa_type = 'RESERVOIR' WHERE epa_type = 'INLET';
+		UPDATE temp_t_node SET epa_type = 'RESERVOIR' WHERE epa_type = 'INLET';
 
 	ELSIF v_forcetanksoninlets THEN
 
-		UPDATE temp_node SET epa_type = 'TANK' WHERE epa_type = 'INLET';
+		UPDATE temp_t_node SET epa_type = 'TANK' WHERE epa_type = 'INLET';
 	ELSE 
 
 		-- manage inlets as reservoir (when there are as many pipes as you want but all are related to same sector)
-		UPDATE temp_node SET epa_type = 'RESERVOIR' WHERE node_id IN (
+		UPDATE temp_t_node SET epa_type = 'RESERVOIR' WHERE node_id IN (
 		SELECT node_id FROM (
-		SELECT a.sector_id, n1.node_id FROM temp_arc a JOIN temp_node n1 ON n1.node_id = node_1	WHERE n1.epa_type ='INLET'
+		SELECT a.sector_id, n1.node_id FROM temp_t_arc a JOIN temp_t_node n1 ON n1.node_id = node_1	WHERE n1.epa_type ='INLET'
 		UNION
-		SELECT a.sector_id, n2.node_id FROM temp_arc a JOIN temp_node n2 ON n2.node_id = node_2	WHERE n2.epa_type ='INLET')a
+		SELECT a.sector_id, n2.node_id FROM temp_t_arc a JOIN temp_t_node n2 ON n2.node_id = node_2	WHERE n2.epa_type ='INLET')a
 		group by node_id
 		HAVING count(sector_id)=1);
 
 		-- manage inlets as tanks  (when there are as many pipes as you want and there are at least two sectors involved)
-		UPDATE temp_node SET epa_type = 'TANK' WHERE node_id IN (
+		UPDATE temp_t_node SET epa_type = 'TANK' WHERE node_id IN (
 		SELECT node_id FROM (
-		SELECT a.sector_id, n1.node_id FROM temp_arc a JOIN temp_node n1 ON n1.node_id = node_1	WHERE n1.epa_type ='INLET'
+		SELECT a.sector_id, n1.node_id FROM temp_t_arc a JOIN temp_t_node n1 ON n1.node_id = node_1	WHERE n1.epa_type ='INLET'
 		UNION
-		SELECT a.sector_id, n2.node_id FROM temp_arc a JOIN temp_node n2 ON n2.node_id = node_2	WHERE n2.epa_type ='INLET')a
+		SELECT a.sector_id, n2.node_id FROM temp_t_arc a JOIN temp_t_node n2 ON n2.node_id = node_2	WHERE n2.epa_type ='INLET')a
 		group by node_id
 		HAVING count(sector_id)>1);
 	END IF;
 
 	-- update child param for inp_reservoir
-	UPDATE temp_node SET pattern_id=inp_reservoir.pattern_id FROM inp_reservoir WHERE temp_node.node_id=inp_reservoir.node_id;
+	UPDATE temp_t_node SET pattern_id=inp_reservoir.pattern_id FROM inp_reservoir WHERE temp_t_node.node_id=inp_reservoir.node_id;
 	
 	-- update child param for inp_junction
-	UPDATE temp_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE temp_node.node_id=inp_junction.node_id;
+	UPDATE temp_t_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE temp_t_node.node_id=inp_junction.node_id;
 
 	-- update child param for inp_tank
-	UPDATE temp_node SET addparam=concat('{"initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
+	UPDATE temp_t_node SET addparam=concat('{"initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
 	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'", "overflow":"',overflow,'"}')
-	FROM inp_tank WHERE temp_node.node_id=inp_tank.node_id;
+	FROM inp_tank WHERE temp_t_node.node_id=inp_tank.node_id;
 	
 	-- update child param for inp_inlet
-	UPDATE temp_node SET
+	UPDATE temp_t_node SET
 	addparam=concat('{"pattern_id":"',i.pattern_id,'", "initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
 	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'", "overflow":"',overflow,'"}')
-	FROM inp_inlet i WHERE temp_node.node_id=i.node_id;
+	FROM inp_inlet i WHERE temp_t_node.node_id=i.node_id;
 
 	-- update head for those inlet acting as reservoir with head not null
-	UPDATE temp_node SET elevation = head, elev = head FROM inp_inlet WHERE temp_node.node_id=inp_inlet.node_id AND head is not null AND epa_type = 'RESERVOIR';
+	UPDATE temp_t_node SET elevation = head, elev = head FROM inp_inlet WHERE temp_t_node.node_id=inp_inlet.node_id AND head is not null AND epa_type = 'RESERVOIR';
 
 	-- update head for those reservoirs with head is not null
-	UPDATE temp_node SET elevation = head, elev = head FROM inp_reservoir WHERE temp_node.node_id=inp_reservoir.node_id AND head is not null;
+	UPDATE temp_t_node SET elevation = head, elev = head FROM inp_reservoir WHERE temp_t_node.node_id=inp_reservoir.node_id AND head is not null;
 
 	-- update child param for inp_valve
-	UPDATE temp_node SET addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "diameter":"',custom_dint,'", "flow":"',
+	UPDATE temp_t_node SET addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "diameter":"',custom_dint,'", "flow":"',
 	flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "minorloss":"',minorloss,'", "status":"',status,
 	'", "to_arc":"',to_arc,'", "add_settings":"',add_settings,'"}')
-	FROM inp_valve WHERE temp_node.node_id=inp_valve.node_id;
+	FROM inp_valve WHERE temp_t_node.node_id=inp_valve.node_id;
 
 	-- update addparam for inp_pump
-	UPDATE temp_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',inp_pump.pattern_id,'", "status":"',status,'", "to_arc":"',to_arc,
+	UPDATE temp_t_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',inp_pump.pattern_id,'", "status":"',status,'", "to_arc":"',to_arc,
 	'", "energyvalue":"',energyvalue,'", "pump_type":"',pump_type,'"}')
-	FROM inp_pump WHERE temp_node.node_id=inp_pump.node_id;
+	FROM inp_pump WHERE temp_t_node.node_id=inp_pump.node_id;
 
-	raise notice 'inserting arcs on temp_arc table';
+	raise notice 'inserting arcs on temp_t_arc table';
 	
-	EXECUTE 'INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, 
+	EXECUTE 'INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, 
 		length, diameter, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
 		SELECT
 		v_arc.arc_id, node_1, node_2, v_arc.cat_arctype_id, arccat_id, epa_type, v_arc.sector_id, v_arc.state, v_arc.state_type, v_arc.annotation,
@@ -207,13 +203,13 @@ BEGIN
 			AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < cat_mat_roughness.end_age '
 			||v_statetype||' AND v_arc.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
 			AND epa_type != ''UNDEFINED''
-			AND v_arc.sector_id > 0
+			AND v_arc.sector_id > 0 AND v_arc.state > 0
 			AND st_length(v_arc.the_geom) >= '||v_minlength;
 
 	IF v_networkmode =  4 THEN
 
 		-- this need to be solved here in spite of fill_data functions because some kind of incosnstency done on this function on previous lines
-		EXECUTE 'INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, length, diameter, the_geom,
+		EXECUTE 'INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, length, diameter, the_geom,
 			expl_id, dma_id, presszone_id, dqa_id, minsector_id, status, minorloss, age)
 			SELECT concat(''CO'',connec_id), connec_id as node_1, CASE WHEN vnode_type = ''ARC'' THEN concat(''VN'',vnode_id) WHEN vnode_type = ''NODE'' THEN vnode_id::text ELSE pjoint_id end AS node_2, 
 			''LINK'', connecat_id, ''PIPE'', c.sector_id, c.state, c.state_type, annotation, 
@@ -233,44 +229,43 @@ BEGIN
 				AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < cat_mat_roughness.end_age '
 				||v_statetype||' AND c.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
 				AND epa_type = ''JUNCTION''
-				AND c.sector_id > 0
+				AND c.sector_id > 0 AND c.state > 0
 				AND pjoint_id IS NOT NULL AND pjoint_type IS NOT NULL';
 	END IF;
         
 	-- update child param for inp_pipe
-	UPDATE temp_arc SET 
+	UPDATE temp_t_arc SET 
 	minorloss = inp_pipe.minorloss,
 	status = (CASE WHEN inp_pipe.status IS NULL THEN 'OPEN' ELSE inp_pipe.status END),	
 	addparam=concat('{"reactionparam":"',inp_pipe.reactionparam, '","reactionvalue":"',inp_pipe.reactionvalue,'"}')
-	FROM inp_pipe WHERE temp_arc.arc_id=inp_pipe.arc_id;
+	FROM inp_pipe WHERE temp_t_arc.arc_id=inp_pipe.arc_id;
 
 	-- update child param for inp_virtualvalve
-	UPDATE temp_arc SET 
+	UPDATE temp_t_arc SET 
 	minorloss = inp_virtualvalve.minorloss, 
 	diameter = inp_virtualvalve.diameter, 
 	status = inp_virtualvalve.status, 
 	addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "flow":"',flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'"}')
-	FROM inp_virtualvalve WHERE temp_arc.arc_id=inp_virtualvalve.arc_id;
+	FROM inp_virtualvalve WHERE temp_t_arc.arc_id=inp_virtualvalve.arc_id;
 
 	-- update addparam for inp_virtualpump
-	UPDATE temp_arc SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern_id":"',p.pattern_id,'", "status":"',p.status,'",
+	UPDATE temp_t_arc SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern_id":"',p.pattern_id,'", "status":"',p.status,'",
 	"effic_curve_id":"', effic_curve_id,'", "energy_price":"',energy_price,'", "energy_pattern_id":"',energy_pattern_id,'", "pump_type":"FLOWPUMP"}')
-	FROM inp_virtualpump p WHERE temp_arc.arc_id=p.arc_id;
+	FROM inp_virtualpump p WHERE temp_t_arc.arc_id=p.arc_id;
 
 	-- update addparam for inp_shortpipe (step 1)
-	UPDATE temp_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"", "roughness":"',a.roughness,'"}')
+	UPDATE temp_t_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"", "roughness":"',a.roughness,'"}')
 	FROM inp_shortpipe 
-	JOIN (SELECT node_1 as node_id, diameter, roughness FROM temp_arc) a USING (node_id)
-	WHERE temp_node.node_id=inp_shortpipe.node_id;
+	JOIN (SELECT node_1 as node_id, diameter, roughness FROM temp_t_arc) a USING (node_id)
+	WHERE temp_t_node.node_id=inp_shortpipe.node_id;
  
 	-- update addparam for inp_shortpipe (step 2)
-	UPDATE temp_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"", "roughness":"',a.roughness,'"}')
+	UPDATE temp_t_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"", "roughness":"',a.roughness,'"}')
 	FROM inp_shortpipe 
-	JOIN (SELECT node_2 as node_id, diameter, roughness FROM temp_arc) a USING (node_id)
-	WHERE temp_node.node_id=inp_shortpipe.node_id;
+	JOIN (SELECT node_2 as node_id, diameter, roughness FROM temp_t_arc) a USING (node_id)
+	WHERE temp_t_node.node_id=inp_shortpipe.node_id;
 
-
-    RETURN 1;
+	RETURN 1;
 		
 END;
 $BODY$

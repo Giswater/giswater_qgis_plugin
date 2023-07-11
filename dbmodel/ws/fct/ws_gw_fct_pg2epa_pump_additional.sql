@@ -51,9 +51,9 @@ BEGIN
     RAISE NOTICE 'Starting additional pumps process.';
 	
 	--  Loop for pumping stations
-    FOR node_id_aux IN (SELECT DISTINCT a.node_id FROM inp_pump_additional a JOIN temp_arc ON concat(node_id,'_n2a')=arc_id JOIN inp_pump p ON p.node_id = a.node_id WHERE pump_type = 'FLOWPUMP')
+    FOR node_id_aux IN (SELECT DISTINCT a.node_id FROM inp_pump_additional a JOIN temp_t_arc ON concat(node_id,'_n2a')=arc_id JOIN inp_pump p ON p.node_id = a.node_id WHERE pump_type = 'FLOWPUMP')
     LOOP
-		SELECT * INTO arc_rec FROM temp_arc WHERE arc_id=concat(node_id_aux,'_n2a');
+		SELECT * INTO arc_rec FROM temp_t_arc WHERE arc_id=concat(node_id_aux,'_n2a');
 
 		-- Loop for additional pumps
 		FOR pump_rec IN SELECT * FROM inp_pump_additional WHERE node_id=node_id_aux
@@ -106,12 +106,13 @@ BEGIN
 						 pump_rec.energy_pattern_id,'","pump_type":"', arc_rec.addparam::json->>'pump_type','"}');	
 
 
-			-- Inserting into temp_arc
-			INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, epa_type, sector_id, arccat_id, state, state_type, status, the_geom, expl_id, flw_code, addparam, 
+			-- Inserting into temp_t_arc
+			INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, epa_type, sector_id, arccat_id, state, state_type, status, the_geom, expl_id, flw_code, addparam, 
 			length, diameter, roughness, dma_id, presszone_id, dqa_id, minsector_id) 
 			VALUES (record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, 'NODE2ARC', record_new_arc.epa_type, record_new_arc.sector_id, 
 			record_new_arc.arccat_id, record_new_arc.state, arc_rec.state_type, pump_rec.status, record_new_arc.the_geom, arc_rec.expl_id, v_old_arc_id, v_addparam, 
-			arc_rec.length,	arc_rec.diameter, arc_rec.roughness, record_new_arc.dma_id, record_new_arc.presszone_id, record_new_arc.dqa_id, record_new_arc.minsector_id);			
+			arc_rec.length,	arc_rec.diameter, arc_rec.roughness, record_new_arc.dma_id, record_new_arc.presszone_id, record_new_arc.dqa_id, record_new_arc.minsector_id);	
+					
 		END LOOP;
 
     END LOOP;

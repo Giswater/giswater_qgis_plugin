@@ -49,24 +49,24 @@ BEGIN
 	raise notice ' % % % %',v_nullbuffer,v_cerobuffer,v_diameter,v_statsmethod;
 
 	RAISE NOTICE 'setting roughness for null values';
-	EXECUTE 'SELECT '||v_statsmethod||'(roughness) FROM temp_arc '
+	EXECUTE 'SELECT '||v_statsmethod||'(roughness) FROM temp_t_arc '
 	INTO v_roughness;
-	UPDATE temp_arc SET roughness = v_roughness WHERE roughness IS NULL;
+	UPDATE temp_t_arc SET roughness = v_roughness WHERE roughness IS NULL;
 
 	RAISE NOTICE 'setting diameter for null values';
-	UPDATE temp_arc SET diameter = v_diameter WHERE diameter IS NULL;
+	UPDATE temp_t_arc SET diameter = v_diameter WHERE diameter IS NULL;
 
 	RAISE NOTICE 'setting null elevation values using closest points values';
-	UPDATE temp_node SET elevation = d.elevation FROM
+	UPDATE temp_t_node SET elevation = d.elevation FROM
 		(SELECT c.n1 as node_id, e2 as elevation FROM (SELECT DISTINCT ON (a.node_id) a.node_id as n1, a.elevation as e1, a.the_geom as n1_geom, b.node_id as n2, b.elevation as e2, b.the_geom as n2_geom FROM node a, node b 
 		WHERE st_dwithin (a.the_geom, b.the_geom, v_nullbuffer) AND a.node_id != b.node_id AND a.elevation IS NULL AND b.elevation IS NOT NULL) c order by st_distance (n1_geom, n2_geom))d
-		WHERE temp_node.elevation IS NULL AND d.node_id=temp_node.node_id;
+		WHERE temp_t_node.elevation IS NULL AND d.node_id=temp_t_node.node_id;
 
 	RAISE NOTICE 'setting cero elevation values using closest points values';
-	UPDATE temp_node SET elevation = d.elevation FROM
+	UPDATE temp_t_node SET elevation = d.elevation FROM
 		(SELECT c.n1 as node_id, e2 as elevation FROM (SELECT DISTINCT ON (a.node_id) a.node_id as n1, a.elevation as e1, a.the_geom as n1_geom, b.node_id as n2, b.elevation as e2, b.the_geom as n2_geom FROM node a, node b 
 		WHERE st_dwithin (a.the_geom, b.the_geom, v_cerobuffer) AND a.node_id != b.node_id AND a.elevation = 0 AND b.elevation > 0) c order by st_distance (n1_geom, n2_geom))d
-		WHERE temp_node.elevation IS NULL AND d.node_id=temp_node.node_id;
+		WHERE temp_t_node.elevation IS NULL AND d.node_id=temp_t_node.node_id;
 
     RETURN 1;
 
