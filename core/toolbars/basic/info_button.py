@@ -269,16 +269,9 @@ class GwInfoButton(GwMaptool):
         if feature['geometry'] is None:
             return
 
-        list_coord = re.search('\((.*)\)', str(feature['geometry']))
-        max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
         if reset_rb:
             tools_gw.reset_rubberband(self.rubber_band)
-        if str(max_x) == str(min_x) and str(max_y) == str(min_y):
-            point = QgsPointXY(float(max_x), float(max_y))
-            tools_qgis.draw_point(point, self.rubber_band)
-        else:
-            points = tools_qgis.get_geometry_vertex(list_coord)
-            tools_qgis.draw_polyline(points, self.rubber_band)
+        tools_gw.draw_wkt_geometry(str(feature['geometry']), self.rubber_band, QColor(255, 0, 0, 100), 3)
 
 
     def _get_info_from_selected_id(self, action, tab_type):

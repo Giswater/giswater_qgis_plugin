@@ -31,7 +31,7 @@ from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, Qg
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsDataSourceUri, \
-    QgsProviderRegistry, QgsMapLayerStyle
+    QgsProviderRegistry, QgsMapLayerStyle, QgsGeometry
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand
 
 from ..models.cat_feature import GwCatFeature
@@ -486,14 +486,21 @@ def draw_wkt_geometry(wkt_string, rubber_band, color, width):
         points = [QgsPointXY(float(x), float(y)) for x, y in (c.split() for c in coordinates.split(','))]
         tools_qgis.draw_polyline(points, rubber_band, color, width, reset_rb=False)
     elif geometry_type == 'POLYGON':
-        rings = [QgsPointXY(float(x), float(y)) for x, y in (c.split() for c in coordinates.split(','))]
-        tools_qgis.draw_polygon(rings, rubber_band, color, width, reset_rb=False)
+        # TODO: accept polygons with inner rings
+        rings = QgsGeometry.fromWkt(wkt_string).asPolygon()
+        rings = [QgsPointXY(x, y) for x, y in rings[0]]
+        tools_qgis.draw_polygon(rings, rubber_band, color, width)
     elif geometry_type == 'GEOMETRYCOLLECTION':
         # Extract the individual geometries from the collection
         # NOTE: will only work if all geometries have the same geometry type
         geometries = re.findall(r'(\w+)\((.*?)\)', coordinates)
         for geometry_type, geometry_coords in geometries:
             geometry_wkt = f'{geometry_type.upper()}({geometry_coords})'
+            draw_wkt_geometry(geometry_wkt, rubber_band, color, width)
+    elif geometry_type == 'MULTIPOLYGON':
+        geometries = re.findall(r'\(\((.*?)\)\)', coordinates)
+        for geometry_coords in geometries:
+            geometry_wkt = f'POLYGON(({geometry_coords}))'
             draw_wkt_geometry(geometry_wkt, rubber_band, color, width)
     else:
         tools_qgis.show_warning('Unsuported geometry type', parameter=geometry_type)
