@@ -13,8 +13,8 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":227}}}$$)-- when is called from go2epa_main
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data('{"parameters":{}}')-- when is called from toolbox or from checkproject
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{ "resultId":"test_bgeo_b1", "useNetworkGeom":"false"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":101}}}$$)-- when is called from checkproject
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data('{"parameters":{}}')-- when is called from toolbox
 
 -- fid: main: 225
 		other: 107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,293,294,295,371,379,433,411,412,430,432,480
@@ -69,17 +69,17 @@ BEGIN
 	END IF;
 
 	-- Header
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (225,  4, 'CHECK GIS DATA QUALITY ACORDING EPA ROLE');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (225,  4, '----------------------------------------------------------');
+	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  4, 'CHECK GIS DATA QUALITY ACORDING EPA ROLE');
+	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  4, '----------------------------------------------------------');
 
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (225,  3, 'CRITICAL ERRORS');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (225,  3, '----------------------');
+	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, 'CRITICAL ERRORS');
+	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, '----------------------');
 
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (225,  2, 'WARNINGS');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (225,  2, '--------------');
+	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  2, 'WARNINGS');
+	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  2, '--------------');
 
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (225,  1, 'INFO');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (225,  1, '-------');
+	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, 'INFO');
+	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, '-------');
 
 
 	RAISE NOTICE '1 - Check orphan nodes (fid:  107)';
@@ -933,13 +933,13 @@ BEGIN
 		DELETE FROM temp_anl_arc WHERE fid = v_record.fid AND cur_user = current_user;
 		DELETE FROM temp_anl_connec WHERE fid = v_record.fid AND cur_user = current_user;
 
-		DELETE FROM temp_audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user AND fid IN (227,225);		
+		DELETE FROM temp_audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user AND fid = v_fid;
 	END LOOP;
 		
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (225, 4, '');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (225, 3, '');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (225, 2, '');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (225, 1, '');
+	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid, 4, '');
+	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid, 3, '');
+	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid, 2, '');
+	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid, 1, '');
 
 	-- get results
 	-- info
