@@ -232,7 +232,7 @@ BEGIN
 	IF (v_state=0 OR v_state=2 OR v_state IS NULL) THEN
 
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"1070", "function":"2126","debug_msg":"State is 0 or 2"}}$$);' INTO v_audit_result;
+		"data":{"message":"1070", "function":"2126","debug_msg":"State is 0 or 2", "function_type":true}}$$);' INTO v_audit_result;
 
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;

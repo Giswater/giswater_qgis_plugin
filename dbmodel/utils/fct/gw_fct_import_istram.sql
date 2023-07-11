@@ -130,7 +130,7 @@ BEGIN
 			
 			IF v_count = 0 THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3190", "function":"3104","debug_msg":null}}$$);'INTO v_audit_result;
+				"data":{"message":"3190", "function":"3104","debug_msg":null, "function_type":true}}$$);'INTO v_audit_result;
 			ELSE
 				--insert values into catalogs
 				INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) 

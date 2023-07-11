@@ -180,7 +180,7 @@ BEGIN
 
 		-- message
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3118", "function":"2622","debug_msg":""}}$$);'INTO v_message;
+		"data":{"message":"3118", "function":"2622","debug_msg":"", "function_type":true}}$$);'INTO v_message;
 
 		RAISE NOTICE '--- INSERT NEW VISIT gw_fct_setinsert WITH MESSAGE: % ---', v_message;
 
@@ -210,7 +210,7 @@ BEGIN
 
 		-- message
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3120", "function":"2662","debug_msg":""}}$$);'INTO v_message;
+		"data":{"message":"3120", "function":"2662","debug_msg":"", "function_type":true}}$$);'INTO v_message;
 
 		RAISE NOTICE '--- UPDATE VISIT gw_fct_setfields USING v_id % WITH MESSAGE: % ---', v_id, v_message;
 
@@ -241,7 +241,7 @@ BEGIN
 
 			-- message
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3118", "function":"2622","debug_msg":""}}$$);'INTO v_message;
+			"data":{"message":"3118", "function":"2622","debug_msg":"", "function_type":true}}$$);'INTO v_message;
 
 		END LOOP;
 		v_querystring = concat('UPDATE om_visit_event SET value = ''true'' WHERE visit_id = ',quote_nullable(v_id),' AND parameter_id = ''photo''');

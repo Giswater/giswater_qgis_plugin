@@ -590,7 +590,7 @@ BEGIN
 		--check if field order will overlap the existing field	
 		IF v_orderby IN (SELECT orderby FROM sys_addfields WHERE cat_feature_id = v_cat_feature AND param_name!=v_param_name) THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3016", "function":"2690","debug_msg":null}}$$);' INTO v_audit_result;
+			"data":{"message":"3016", "function":"2690","debug_msg":null, "function_type":true}}$$);' INTO v_audit_result;
 		END IF;
 
 		-- get view definition

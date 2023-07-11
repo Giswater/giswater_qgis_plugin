@@ -54,7 +54,7 @@ BEGIN
 					v_result=concat(feature_id_aux,' has associated arcs ',v_result);				
 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"1072", "function":"2130","debug_msg":"'||v_result||'"}}$$);';
+					"data":{"message":"1072", "function":"2130","debug_msg":"'||v_result||'", "function_type":true}}$$);';
 				END IF;
 
 				SELECT count(arc.arc_id) INTO v_num_feature FROM arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state = 2;
@@ -64,7 +64,7 @@ BEGIN
 					(SELECT arc.arc_id FROM arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state = 2); 
 					
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3140", "function":"2130","debug_msg":"'||v_psector_list||'"}}$$);';
+					"data":{"message":"3140", "function":"2130","debug_msg":"'||v_psector_list||'", "function_type":true}}$$);';
 					
 				END IF;
 
@@ -72,7 +72,7 @@ BEGIN
 				SELECT count(link_id) INTO v_num_feature FROM link WHERE exit_type='NODE' AND exit_id=feature_id_aux AND link.state > 0;
 				IF v_num_feature > 0 THEN 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"1072", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
+					"data":{"message":"1072", "function":"2130","debug_msg":"'||feature_id_aux||'", "function_type":true}}$$);';
 				END IF;
 				
 			ELSIF state_aux!=v_old_state AND (v_downgrade_force IS TRUE) THEN
@@ -131,7 +131,7 @@ BEGIN
 				SELECT count(arc_id) INTO v_num_feature FROM connec WHERE arc_id=feature_id_aux AND connec.state>0;
 				IF v_num_feature > 0 THEN 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"1074", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
+					"data":{"message":"1074", "function":"2130","debug_msg":"'||feature_id_aux||'", "function_type":true}}$$);';
 				END IF;
 
 				--node's control (only WS)
@@ -139,7 +139,7 @@ BEGIN
 					SELECT count(arc_id) INTO v_num_feature FROM node WHERE arc_id=feature_id_aux AND node.state>0;
 					IF v_num_feature > 0 THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"1074", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
+						"data":{"message":"1074", "function":"2130","debug_msg":"'||feature_id_aux||'", "function_type":true}}$$);';
 					END IF;
 				
 				--gully's control (only UD)
@@ -147,7 +147,7 @@ BEGIN
 					SELECT count(arc_id) INTO v_num_feature FROM gully WHERE arc_id=feature_id_aux AND gully.state>0;
 					IF v_num_feature > 0 THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"1074", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
+						"data":{"message":"1074", "function":"2130","debug_msg":"'||feature_id_aux||'", "function_type":true}}$$);';
 					END IF;	
 				END IF;
 			END IF;	
@@ -161,7 +161,7 @@ BEGIN
 				SELECT count(link_id) INTO v_num_feature FROM link WHERE exit_type='CONNEC' AND exit_id=feature_id_aux AND link.state > 0;
 				IF v_num_feature > 0 THEN 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"1072", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
+					"data":{"message":"1072", "function":"2130","debug_msg":"'||feature_id_aux||'", "function_type":true}}$$);';
 				END IF;
 
 				-- hydrometer control
@@ -170,7 +170,7 @@ BEGIN
 				
 				IF v_num_feature > 0 THEN 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3194", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
+					"data":{"message":"3194", "function":"2130","debug_msg":"'||feature_id_aux||'", "function_type":true}}$$);';
 				END IF;
 					
 				
@@ -206,7 +206,7 @@ BEGIN
 				SELECT count(link_id) INTO v_num_feature FROM link WHERE exit_type='GULLY' AND exit_id=feature_id_aux AND link.state > 0;
 				IF v_num_feature > 0 THEN 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"1072", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
+					"data":{"message":"1072", "function":"2130","debug_msg":"'||feature_id_aux||'", "function_type":true}}$$);';
 				END IF;
 				
 			ELSIF state_aux!=v_old_state AND (v_downgrade_force IS TRUE) THEN
@@ -236,20 +236,20 @@ BEGIN
 		
 			IF ('role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"1080", "function":"2130","debug_msg":null}}$$);';
+				"data":{"message":"1080", "function":"2130","debug_msg":null, "function_type":true}}$$);';
 			END IF;
 
 			-- check at least one psector defined
 			IF (SELECT psector_id FROM plan_psector LIMIT 1) IS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"1081", "function":"2130","debug_msg":null}}$$);';
+				"data":{"message":"1081", "function":"2130","debug_msg":null, "function_type":true}}$$);';
 			END IF;
 
 			-- check user's variable
 			SELECT value INTO v_psector_vdefault FROM config_param_user WHERE parameter='plan_psector_vdefault' AND cur_user="current_user"();
 			IF v_psector_vdefault IS NULL THEN	
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"1083", "function":"2130","debug_msg":null}}$$);';
+				"data":{"message":"1083", "function":"2130","debug_msg":null, "function_type":true}}$$);';
 			END IF;
 
 			-- force visible psector vdefault
@@ -278,7 +278,7 @@ BEGIN
 			SELECT value INTO v_psector_vdefault FROM config_param_user WHERE parameter='plan_psector_vdefault' AND cur_user="current_user"();
 			IF v_psector_vdefault IS NULL THEN	
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"1083", "function":"2130","debug_msg":null}}$$);';
+				"data":{"message":"1083", "function":"2130","debug_msg":null, "function_type":true}}$$);';
 			END IF;
 
 			-- force visible psector vdefault
@@ -299,7 +299,7 @@ BEGIN
 			-- check user's role
 			IF ('role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')))  THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"1080", "function":"2130","debug_msg":null}}$$);';
+				"data":{"message":"1080", "function":"2130","debug_msg":null, "function_type":true}}$$);';
 			END IF;
 		END IF;	
 	END IF;

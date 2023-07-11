@@ -232,7 +232,7 @@ BEGIN
             IF v_projecttype  ='WS' THEN
                 IF (SELECT cat_dnom::integer FROM v_edit_arc WHERE arc_id=v_connect.arc_id) >= v_check_arcdnom AND v_check_arcdnom_status IS TRUE THEN
                     EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                    "data":{"message":"3232", "function":"3188","debug_msg":'||v_check_arcdnom||'}}$$);';
+                    "data":{"message":"3232", "function":"3188","debug_msg":'||v_check_arcdnom||', "function_type":true}}$$);';
                 END IF;
             END IF;
 		END IF;	
@@ -289,7 +289,7 @@ BEGIN
 			-- state control
 			IF v_arc.state=2 AND v_connect.state=1 AND v_isarcdivide is false THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3050", "function":"2124","debug_msg":null}}$$);' INTO v_audit_result;
+				"data":{"message":"3050", "function":"2124","debug_msg":null, "function_type":true}}$$);' INTO v_audit_result;
 			END IF;
 
 			-- get endfeature attributes

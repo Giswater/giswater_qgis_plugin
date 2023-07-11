@@ -196,7 +196,7 @@ BEGIN
 
 	-- set message
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-	"data":{"message":"3118", "function":"2616","debug_msg":""}}$$);'INTO v_message;
+	"data":{"message":"3118", "function":"2616","debug_msg":"", "function_type":true}}$$);'INTO v_message;
 
 	RAISE NOTICE '--- Returning from (gw_fct_setinsert) with this message :: % ---', v_message;
 

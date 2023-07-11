@@ -433,7 +433,7 @@ raise notice 'classID,%',v_class_id;
 
 			ELSE
 				 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-   			"data":{"message":"3024", "function":"2746","debug_msg":null}}$$);';
+   			"data":{"message":"3024", "function":"2746","debug_msg":null, "function_type":true}}$$);';
 			END IF;
 
 	ELSIF v_action = 'DELETE' AND v_action_type = 'class' THEN
@@ -453,7 +453,7 @@ raise notice 'classID,%',v_class_id;
 				UPDATE config_visit_class SET active = FALSE WHERE id = v_class_id;
 				
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-   			"data":{"message":"3026", "function":"2746","debug_msg":null}}$$);';
+   			"data":{"message":"3026", "function":"2746","debug_msg":null, "function_type":true}}$$);';
 			END IF;
 
 			EXECUTE 'DROP VIEW IF EXISTS '||v_viewname||';';

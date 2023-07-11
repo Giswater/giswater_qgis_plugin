@@ -82,7 +82,7 @@ BEGIN
 
 		IF v_shortcut IS NOT NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3196", "function":"3148","debug_msg":"'||v_shortcut||'"}}$$);'INTO v_audit_result;
+			"data":{"message":"3196", "function":"3148","debug_msg":"'||v_shortcut||'", "function_type":true}}$$);'INTO v_audit_result;
 		END IF;
 
 		--insert configuration
