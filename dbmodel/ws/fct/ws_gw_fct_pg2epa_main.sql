@@ -141,6 +141,7 @@ BEGIN
 	
 		DELETE FROM rpt_cat_result WHERE result_id=v_result;
 		INSERT INTO rpt_cat_result (result_id, inp_options, status, expl_id) VALUES (v_result, v_inpoptions, 1, v_expl);
+		DELETE FROM rpt_inp_pattern_value WHERE result_id=v_result;	
 		DELETE FROM selector_inp_result WHERE cur_user=current_user;
 		INSERT INTO selector_inp_result (result_id, cur_user) VALUES (v_result, current_user);
 
@@ -348,6 +349,12 @@ BEGIN
 
 	-- step 5: create json return
 	ELSIF v_step=5 THEN
+	
+		-- moving data from temporal tables
+		INSERT INTO temp_node SELECT * FROM temp_t_node;
+		INSERT INTO temp_arc SELECT * FROM temp_t_arc;
+		INSERT INTO temp_demand SELECT * FROM temp_t_demand;
+		INSERT INTO rpt_inp_pattern_value SELECT * FROM temp_rpt_inp_pattern_value;	
 
 		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
 		SELECT gw_fct_pg2epa_export_inp(p_data) INTO v_file;
@@ -359,25 +366,21 @@ BEGIN
 
 	-- step 6: post-proces
 	ELSIF v_step=6 THEN
-
-		-- move nodes
+	
+		-- move nodes data
 		INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
 		the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition,dma_id, presszone_id, dqa_id, minsector_id)
 		SELECT result_id, node_id, elevation, case when elev is null then elevation else elev end, node_type, nodecat_id, epa_type, sector_id, state, 
 		state_type, annotation, demand, the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition,dma_id, presszone_id, dqa_id, minsector_id
 		FROM temp_rpt_inp_node;
 		
-		-- move arcs
+		-- move arcs data
 		INSERT INTO rpt_inp_arc 
 		(result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, 
 		the_geom, expl_id, flw_code, minorloss, addparam, arcparent,dma_id, presszone_id, dqa_id, minsector_id)
 		SELECT result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, 
 		status, the_geom, expl_id, flw_code, minorloss, addparam, arcparent,dma_id, presszone_id, dqa_id, minsector_id
 		FROM temp_rpt_inp_arc;
-			
-		-- move patterns used
-		DELETE FROM rpt_inp_pattern_value WHERE result_id=v_result;	
-		INSERT INTO rpt_inp_pattern_value SELECT * FROM temp_rpt_inp_pattern_value;
 
 		-- restore hydrometer selector
 		DELETE FROM selector_hydrometer WHERE cur_user = current_user;
@@ -409,9 +412,9 @@ BEGIN
 	END IF;
 
 	-- Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$
