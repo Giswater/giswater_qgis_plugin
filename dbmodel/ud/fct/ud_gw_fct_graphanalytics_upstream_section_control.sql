@@ -127,7 +127,7 @@ BEGIN
 			VALUES (v_fid,  'There are no arcs with unconsistent sections.', v_count);
 		ELSE
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			VALUES (v_fid,  concat ('There are ',v_count,' arcs with section (geom1) bigger then the section of the following arc.'), v_count);
+			VALUES (v_fid,  concat ('There are ',v_count,' arcs with section (geom1) bigger than the section of the following arc.'), v_count);
 
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
 			SELECT v_fid,  concat ('Arc_id: ',string_agg(arc_id, ', '), '.' ), v_count 
