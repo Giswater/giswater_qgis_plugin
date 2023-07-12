@@ -129,7 +129,6 @@ v_y1 text;
 v_y2 text;
 v_papersize integer;
 v_count integer;
-v_nodevalid boolean;
 v_nodemessage text;
 v_querytext1 text;
 v_querytext2 text;
@@ -228,16 +227,14 @@ BEGIN
 	END IF;
 
 	-- Check start-end nodes
-	v_nodemessage = 'Start/End nodes is/are not valid(s). CHECK elev data AND cat_feature.isprofilesurface. Only NOT start/end nodes may have missed elev data OR may have cat_feature.isprofilesurface = false';
+	v_nodemessage = 'Start/End nodes is/are not valid(s). CHECK elev data. Only NOT start/end nodes may have missed elev data';
 	IF v_project_type = 'UD' THEN
-		SELECT isprofilesurface INTO v_nodevalid FROM v_edit_node JOIN cat_feature_node ON node_type = id 
-		WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id = v_init;
-
-		IF v_nodevalid THEN
-			SELECT isprofilesurface INTO v_nodevalid FROM v_edit_node JOIN cat_feature_node ON node_type = id 
-			WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id = v_end;
-			
-			IF v_nodevalid IS NOT TRUE THEN	
+		IF (SELECT COUNT(*) FROM v_edit_node JOIN cat_feature_node ON node_type = id 
+			WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id = v_init) > 0 
+			THEN
+			IF (SELECT COUNT(*) FROM v_edit_node JOIN cat_feature_node ON node_type = id 
+				WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id = v_end) = 0 
+				THEN
 				v_level = 2;
 				v_message = v_nodemessage;
 			END IF;
@@ -245,7 +242,7 @@ BEGIN
 			v_level = 2;
 			v_message = v_nodemessage;
 		END IF;
-	END IF;	
+	END IF;
 
 	-- Check not integer id''s 
 	FOR object_rec IN SELECT json_array_elements_text('["arc", "node"]'::json) as idval
