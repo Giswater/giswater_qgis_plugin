@@ -65,12 +65,10 @@ class GwEpaFileManager(GwTask):
         super().run()
 
         self.initialize_variables()
-        tools_log.log_info(f"Task 'Go2Epa' execute function 'def _get_steps'")
-        steps = self._get_steps()
         status = True
         if self.go2epa_export_inp or self.go2epa_execute_epa:
             tools_log.log_info(f"Task 'Go2Epa' execute function 'def _exec_function_pg2epa'")
-            status = self._exec_function_pg2epa(steps)
+            status = self._exec_function_pg2epa()
             if not status:
                 self.function_name = 'gw_fct_pg2epa_main'
                 return False
@@ -202,7 +200,7 @@ class GwEpaFileManager(GwTask):
 
     # region private functions
 
-    def _exec_function_pg2epa(self, steps):
+    def _exec_function_pg2epa(self):
 
         self.json_result = None
         status = False
@@ -212,67 +210,20 @@ class GwEpaFileManager(GwTask):
         if global_vars.project_type == 'ud':
             extras += f', "dumpSubcatch":"{self.export_subcatch}"'
 
-        if steps == 3:
-            self.body = tools_gw.create_body(extras=(extras + f', "step": 1'))
-            tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 1 with parameters: "
-                               f"'gw_fct_pg2epa_main', '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
-
-            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
-                                                     aux_conn=self.aux_conn, is_thread=True)
-            if self.isCanceled():
-                return False
-            if json_result is not None:
-                self.body = tools_gw.create_body(extras=(extras + f', "step": 2'))
-                tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 2 with parameters: "
-                                   f"'gw_fct_pg2epa_main', '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
-                json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
-                                                         aux_conn=self.aux_conn, is_thread=True)
-                if self.isCanceled():
-                    return False
-                if json_result is not None:
-                    self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
-                    tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 3 with parameters: "
-                                       f"'gw_fct_pg2epa_main', '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
-                    json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
-                                                             aux_conn=self.aux_conn, is_thread=True)
-                    if self.isCanceled():
-                        return False
-        elif steps == 2:
-            self.body = tools_gw.create_body(extras=(extras + f', "step": 1'))
-            tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 1 with parameters: "
+        # 7 steps
+        main_json_result = None
+        for step in range(0, 7):
+            self.body = tools_gw.create_body(extras=(extras + f', "step": {step}'))
+            tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step {step} with parameters: "
                                f"'gw_fct_pg2epa_main', '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
             json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
                                                      aux_conn=self.aux_conn, is_thread=True)
-            if self.isCanceled():
-                return False
-            if json_result is not None:
-                self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
-                tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 3 with parameters: "
-                                   f"'gw_fct_pg2epa_main', '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
-                json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
-                                                         aux_conn=self.aux_conn, is_thread=True)
-                if self.isCanceled():
-                    return False
-
-        elif steps == 1:
-            self.body = tools_gw.create_body(extras=(extras + f', "step": 3'))
-            tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 3 with parameters: "
-                               f"'gw_fct_pg2epa_main', '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
-            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
-                                                     aux_conn=self.aux_conn, is_thread=True)
-            if self.isCanceled():
-                return False
-        else:  # steps == 0
-            extras += f', "step": 0'
-            self.body = tools_gw.create_body(extras=extras)
-            tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step 0 with parameters: "
-                               f"'gw_fct_pg2epa_main', '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
-            json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
-                                                     aux_conn=self.aux_conn, is_thread=True)
-            if self.isCanceled():
+            if step == 5:
+                main_json_result = json_result
+            if self.isCanceled() or json_result is None:
                 return False
 
-        # Manage json result
+        json_result = main_json_result
         self.json_result = json_result
         self.complet_result = json_result
         if json_result is None or not json_result:
@@ -596,18 +547,5 @@ class GwEpaFileManager(GwTask):
         self.common_msg += "Import RPT file finished."
 
         return True
-
-
-    def _get_steps(self):
-
-        value = tools_gw.get_config_value('inp_options_debug')
-        if value:
-            value = json.loads(value[0])
-            try:
-                steps = int(value['steps'])
-            except (KeyError, ValueError):
-                steps = 0
-
-            return steps
 
     # endregion
