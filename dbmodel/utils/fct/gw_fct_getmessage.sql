@@ -14,7 +14,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_getmessage($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},
-"data":{"message":"2", "function":"1312","debug_msg":null, "variables":"value", "function_type":true}}$$)
+"data":{"message":"2", "function":"1312","debug_msg":null, "variables":"value", "is_process":true}}$$)
 */
 
 DECLARE
@@ -34,7 +34,7 @@ v_function_id integer;
 v_message text;
 v_variables text;
 v_debug Boolean;
-v_function_type boolean = false;
+v_isprocess boolean = false;
 
 BEGIN
 
@@ -48,7 +48,7 @@ BEGIN
 	v_function_id = lower(((p_data ->>'data')::json->>'function')::text);
 	v_message = lower(((p_data ->>'data')::json->>'debug_msg')::text);
 	v_variables = lower(((p_data ->>'data')::json->>'variables')::text);
-	v_function_type = lower(((p_data ->>'data')::json->>'function_type')::text);
+	v_isprocess = lower(((p_data ->>'data')::json->>'is_process')::text);
 
 	SELECT giswater, project_type INTO v_version, v_projectype FROM sys_version ORDER BY id DESC LIMIT 1;
 
@@ -56,7 +56,7 @@ BEGIN
 	SELECT * INTO rec_cat_error FROM sys_message WHERE sys_message.id=v_message_id;
 
 	-- message process
-	if v_function_type then
+	if v_isprocess then
 
 		IF rec_cat_error IS NULL THEN
 			v_return_text = 'The process has returned an error code, but this error code is not present on the sys_message table. Please contact with your system administrator in order to update your sys_message table';

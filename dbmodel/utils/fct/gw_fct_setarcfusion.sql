@@ -199,7 +199,7 @@ BEGIN
 
 				IF rec_addfield1.value_param!=rec_addfield2.value_param  THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3008", "function":"2112","debug_msg":null, "function_type":true}}$$)' INTO v_audit_result;
+					"data":{"message":"3008", "function":"2112","debug_msg":null, "is_process":true}}$$)' INTO v_audit_result;
 
 				ELSIF rec_addfield2.value_param IS NULL and rec_addfield1.value_param IS NOT NULL THEN
 					UPDATE man_addfields_value SET feature_id=v_new_record.arc_id WHERE feature_id=v_record1.arc_id AND parameter_id=rec_param.parameter_id;
@@ -377,7 +377,7 @@ BEGIN
 							-- control if state_type is null
 							IF v_state_type IS NULL THEN
 								EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-								"data":{"message":"3134", "function":"2112","debug_msg":null, "function_type":true}}$$)' INTO v_audit_result;
+								"data":{"message":"3134", "function":"2112","debug_msg":null, "is_process":true}}$$)' INTO v_audit_result;
 							END IF;
 						
 							INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Change state of node  ',v_node_id,' to obsolete.'));
@@ -527,21 +527,21 @@ BEGIN
 			-- Arcs has different types
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"2004", "function":"2112","debug_msg":null, "function_type":true}}$$)' INTO v_audit_result;
+				"data":{"message":"2004", "function":"2112","debug_msg":null, "is_process":true}}$$)' INTO v_audit_result;
 
 			END IF;
 
 		-- Node has not 2 arcs
 		ELSE
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"2006", "function":"2112","debug_msg":null, "function_type":true}}$$)' INTO v_audit_result;
+			"data":{"message":"2006", "function":"2112","debug_msg":null, "is_process":true}}$$)' INTO v_audit_result;
 		END IF;
 
 	-- Node not found
 	ELSE 
 
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"2002", "function":"2112","debug_msg":null, "function_type":true}}$$)' INTO v_audit_result;
+		"data":{"message":"2002", "function":"2112","debug_msg":null, "is_process":true}}$$)' INTO v_audit_result;
 
 	END IF;
 

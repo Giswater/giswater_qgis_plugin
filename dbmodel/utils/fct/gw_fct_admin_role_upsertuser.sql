@@ -115,7 +115,7 @@ BEGIN
 		ELSE
 			--EXECUTE 'SELECT (3040,2780, NULL)' INTO v_audit_result;
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-  			"data":{"message":"3040", "function":"2780","debug_msg":null, "function_type":true}}$$)'
+  			"data":{"message":"3040", "function":"2780","debug_msg":null, "is_process":true}}$$)'
   			INTO v_audit_result;
 		END IF;
 

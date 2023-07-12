@@ -102,7 +102,7 @@ BEGIN
 
 				IF v_psector_id IS NOT NULL THEN 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3142", "function":"3068","debug_msg":"'||v_psector_list||'", "function_type":true}}$$);' INTO v_audit_result;
+					"data":{"message":"3142", "function":"3068","debug_msg":"'||v_psector_list||'", "is_process":true}}$$);' INTO v_audit_result;
 				END IF;
 			END IF;
 
@@ -119,7 +119,7 @@ BEGIN
 				v_result=concat(rec_id,' has associated arcs ',v_result);				
 
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"1072", "function":"3068","debug_msg":"'||v_result||'", "function_type":true}}$$);' INTO v_audit_result;
+				"data":{"message":"1072", "function":"3068","debug_msg":"'||v_result||'", "is_process":true}}$$);' INTO v_audit_result;
 			END IF;
 		END LOOP;
 	END IF;

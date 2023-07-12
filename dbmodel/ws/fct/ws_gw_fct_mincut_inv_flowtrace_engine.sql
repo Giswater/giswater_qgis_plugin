@@ -42,7 +42,7 @@ BEGIN
         --Control nulls
         IF node_id_arg IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3006", "function":"2322","debug_msg":null, "function_type":true}}$$);';
+			"data":{"message":"3006", "function":"2322","debug_msg":null, "is_process":true}}$$);';
         END IF;
 
         -- Get node  public.geometry

@@ -207,7 +207,7 @@ BEGIN
 	-- control nulls
 	IF v_tablename IS NULL THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3156", "function":"2592","debug_msg":"tableName", "function_type":true}}$$);'INTO v_audit_result;
+		"data":{"message":"3156", "function":"2592","debug_msg":"tableName", "is_process":true}}$$);'INTO v_audit_result;
 	else
 		execute 'SELECT addparam FROM config_form_list where listname = $1' into v_table_params using v_tablename;
 	END IF;

@@ -66,7 +66,7 @@ BEGIN
 		IF v_count > 0 THEN
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3164", "function":"3002","debug_msg":null, "function_type":true}}$$)' INTO v_audit_result;
+			"data":{"message":"3164", "function":"3002","debug_msg":null, "is_process":true}}$$)' INTO v_audit_result;
 
 		END IF;		
 
@@ -93,7 +93,7 @@ BEGIN
 		IF v_count > 0 THEN
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3164", "function":"3002","debug_msg":null, "function_type":true}}$$)' INTO v_audit_result;
+			"data":{"message":"3164", "function":"3002","debug_msg":null, "is_process":true}}$$)' INTO v_audit_result;
 
 		END IF;		
 

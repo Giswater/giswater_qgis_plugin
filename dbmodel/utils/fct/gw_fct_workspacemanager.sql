@@ -105,7 +105,7 @@ BEGIN
 			
 			v_return_msg = 'Name already exists, please set a new one or delete existing workspace';
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3188", "function":"3078","debug_msg":null, "function_type":true}}$$);' INTO v_audit_result;
+			"data":{"message":"3188", "function":"3078","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
 
 		ELSE
 		--create configuration json for creating new workspace or saving the current settings as temporal in order to beeing able to reset them
@@ -201,10 +201,10 @@ BEGIN
 		--check if someone uses a workspace at the moment, if not, remove it 
 		IF v_workspace_id::text IN (SELECT value FROM config_param_user WHERE parameter='utils_workspace_vdefault' AND cur_user != current_user) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3186", "function":"3078","debug_msg":null, "function_type":true}}$$);'INTO v_audit_result;
+			"data":{"message":"3186", "function":"3078","debug_msg":null, "is_process":true}}$$);'INTO v_audit_result;
 		ELSIF v_iseditable IS NOT TRUE THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3200", "function":"3078","debug_msg":null, "function_type":true}}$$);'INTO v_audit_result;
+			"data":{"message":"3200", "function":"3078","debug_msg":null, "is_process":true}}$$);'INTO v_audit_result;
 		ELSE
 			IF (SELECT value FROM config_param_user WHERE parameter='utils_workspace_vdefault' AND cur_user = current_user) = v_workspace_id::text THEN
 				--remove workspace from config_param_user
@@ -229,7 +229,7 @@ BEGIN
 	ELSIF v_action = 'UPDATE' THEN
 		IF v_iseditable IS NOT TRUE THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3200", "function":"3078","debug_msg":null, "function_type":true}}$$);'INTO v_audit_result;
+			"data":{"message":"3200", "function":"3078","debug_msg":null, "is_process":true}}$$);'INTO v_audit_result;
 		ELSE
 			-- update configuration of selected workspace
 			UPDATE cat_workspace SET config = v_workspace_config WHERE id = v_workspace_id;
@@ -256,7 +256,7 @@ BEGIN
 	ELSIF v_action = 'TOGGLE' THEN	
 		IF v_iseditable IS NOT TRUE THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3200", "function":"3078","debug_msg":null, "function_type":true}}$$);'INTO v_audit_result;
+			"data":{"message":"3200", "function":"3078","debug_msg":null, "is_process":true}}$$);'INTO v_audit_result;
 		ELSE
 			UPDATE cat_workspace SET private = (NOT private) WHERE id=v_workspace_id;
 		END IF;

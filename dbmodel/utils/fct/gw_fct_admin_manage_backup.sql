@@ -69,7 +69,7 @@ BEGIN
 
 	IF v_backupname IS NULL OR length(v_backupname) < 1 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3146", "function":"2792","debug_msg":null, "function_type":true}}$$);' INTO v_audit_result;
+		"data":{"message":"3146", "function":"2792","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
 
 	ELSE
 
@@ -78,7 +78,7 @@ BEGIN
 			IF (SELECT count(*) FROM temp_table WHERE text_column::json->>'name' = v_backupname AND fid = 434) > 0 THEN
 				
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3148", "function":"2792","debug_msg":"'||v_backupname||'", "function_type":true}}$$);' INTO v_audit_result;
+				"data":{"message":"3148", "function":"2792","debug_msg":"'||v_backupname||'", "is_process":true}}$$);' INTO v_audit_result;
 			END IF;
 
 			v_querytext = 'INSERT INTO temp_table (fid, text_column, addparam) SELECT 434, ''{"name":"'||v_backupname||'", "table":"'||v_tablename||'"}'', row_to_json(row) FROM (SELECT * FROM '||v_tablename||') row';
@@ -94,14 +94,14 @@ BEGIN
 			-- check consistency on tablename
 			IF v_tablename != v_tablename_check THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3150", "function":"2792","debug_msg":"'||v_tablename||'", "function_type":true}}$$);' INTO v_audit_result;
+				"data":{"message":"3150", "function":"2792","debug_msg":"'||v_tablename||'", "is_process":true}}$$);' INTO v_audit_result;
 			END IF;
 
 			-- automatic backup creation
 			-- check if backup exists
 			IF (SELECT count(*) FROM temp_table WHERE text_column::json->>'name' = v_newbackupname AND fid=434 ) > 0 THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3148", "function":"2792","debug_msg":"'||v_newbackupname||'", "function_type":true}}$$);' INTO v_audit_result;
+				"data":{"message":"3148", "function":"2792","debug_msg":"'||v_newbackupname||'", "is_process":true}}$$);' INTO v_audit_result;
 			END IF;
 
 			v_querytext = 'INSERT INTO temp_table (fid, text_column, addparam) SELECT 434, ''{"name":"'||v_newbackupname||'", "table":"'||v_tablename||'"}'', row_to_json(row) FROM (SELECT * FROM '||v_tablename||') row';

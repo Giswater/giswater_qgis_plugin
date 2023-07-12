@@ -71,7 +71,7 @@ BEGIN
 
 		IF v_units IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"2086", "function":"2510","debug_msg":null, "function_type":true}}$$);'INTO v_audit_result;
+			"data":{"message":"2086", "function":"2510","debug_msg":null, "is_process":true}}$$);'INTO v_audit_result;
 		END IF;
 	
 		-- control of price units (csv2)
@@ -80,7 +80,7 @@ BEGIN
 
 		IF v_units IS NOT NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"2088", "function":"2510","debug_msg":"'||v_units||'", "function_type":true}}$$);'INTO v_audit_result;
+			"data":{"message":"2088", "function":"2510","debug_msg":"'||v_units||'", "is_process":true}}$$);'INTO v_audit_result;
 		END IF;
 
 		-- control of price descript (csv3)
@@ -88,7 +88,7 @@ BEGIN
 
 		IF v_units IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"2090", "function":"2510","debug_msg":null, "function_type":true}}$$);'INTO v_audit_result;
+			"data":{"message":"2090", "function":"2510","debug_msg":null, "is_process":true}}$$);'INTO v_audit_result;
 		END IF;
 
 		-- control of null prices(csv5)
@@ -96,7 +96,7 @@ BEGIN
 
 		IF v_units IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"2092", "function":"2510","debug_msg":null, "function_type":true}}$$);'INTO v_audit_result;
+			"data":{"message":"2092", "function":"2510","debug_msg":null, "is_process":true}}$$);'INTO v_audit_result;
 		END IF;
 	
 		-- Insert into plan_price_cat table
