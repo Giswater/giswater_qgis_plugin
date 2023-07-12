@@ -154,14 +154,14 @@ BEGIN
 		INSERT INTO selector_hydrometer SELECT id, current_user FROM ext_rtc_hydrometer_state
 		ON CONFLICT (state_id, cur_user) DO NOTHING;
 
-		v_return = '{"message":{"level":1, "text":"Step-0: Pre-process workflow done succesfully"}}'::json;
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Step-0: Pre-process workflow done succesfully"}}'::json;
 		RETURN v_return;
 
 	-- step 1 : autorepair epa-type
 	ELSIF v_step = 1 THEN 
 
 		PERFORM gw_fct_pg2epa_autorepair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
-		v_return = '{"message":{"level":1, "text":"Step-1: Auto-repair epa_type done succesfully"}}'::json;
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Step-1: Auto-repair epa_type done succesfully"}}'::json;
 		RETURN v_return;
 
 	-- step 2: check data
@@ -171,7 +171,7 @@ BEGIN
 		v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "fid":227}}}')::json;
 	
 		PERFORM gw_fct_pg2epa_check_data(v_input);
-		v_return = '{"message":{"level":1, "text":"Step-2: Check data done succesfully"}}'::json;
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Step-2: Check data done succesfully"}}'::json;
 		RETURN v_return;
 	
 	-- step 3 : structure data
@@ -337,14 +337,14 @@ BEGIN
 
 		PERFORM gw_fct_pg2epa_dscenario(v_result);
 
-		v_return = '{"message":{"level":1, "text":"Step-3: Structure data, scenario data and boundary conditions done succesfully"}}'::json;
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Step-3: Structure data, scenario data and boundary conditions done succesfully"}}'::json;
 		RETURN v_return;		
 		
 	-- step 4: analyze graph
 	ELSIF v_step=4 THEN
 
 		PERFORM gw_fct_pg2epa_check_network(v_input);	
-		v_return = '{"message":{"level":1, "text":"Step-4: Gragf analytics done succesfully"}}'::json;
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Step-4: Gragf analytics done succesfully"}}'::json;
 		RETURN v_return;
 
 	-- step 5: create json return
@@ -407,7 +407,7 @@ BEGIN
 		DROP TABLE IF EXISTS temp_t_go2epa;
 		DROP TABLE IF EXISTS temp_t_anlgraph;
 
-		v_return = '{"message":{"level":1, "text":"Step-6: Post-process workflow done succesfully"}}'::json;
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Step-6: Post-process workflow done succesfully"}}'::json;
 		RETURN v_return;
 	END IF;
 
