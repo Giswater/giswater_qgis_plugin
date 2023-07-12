@@ -49,11 +49,6 @@ BEGIN
 	INTO v_version;
       
 	SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
-	--set current process as users parameter
-	DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
-
-	INSERT INTO config_param_user (value, parameter, cur_user)
-	VALUES (txid_current(),'utils_cur_trans',current_user );
 
 	-- Get input parameters:
 	v_featuretype := lower((p_data ->> 'feature')::json->> 'featureType');
@@ -166,7 +161,6 @@ BEGIN
 
     END IF;
 
-    DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
 
 	v_version := COALESCE(v_version, '[]');
 	v_result_info := COALESCE(v_result_info, '[]');

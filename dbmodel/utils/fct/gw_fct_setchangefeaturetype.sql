@@ -53,12 +53,6 @@ BEGIN
 
 	SELECT upper(project_type), giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
-	--set current process as users parameter
-	DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
-
-	INSERT INTO config_param_user (value, parameter, cur_user)
-	VALUES (txid_current(),'utils_cur_trans',current_user );
-    
 	
 	-- manage log (fid: 143)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;

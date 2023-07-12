@@ -118,12 +118,6 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
 
-	--set current process as users parameter
-	DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
-	delete from temp_table where fid = 398;
-
-	INSERT INTO config_param_user (value, parameter, cur_user)
-	VALUES (txid_current(),'utils_cur_trans',current_user );
    
 	-- Get parameters from input json
 	v_array_node_id = lower(((p_data ->>'feature')::json->>'id')::text);

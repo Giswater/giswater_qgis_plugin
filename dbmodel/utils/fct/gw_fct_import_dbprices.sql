@@ -45,12 +45,7 @@ BEGIN
 	-- get system parameters
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
-    --set current process as users parameter
-    DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
 
-    INSERT INTO config_param_user (value, parameter, cur_user)
-    VALUES (txid_current(),'utils_cur_trans',current_user );
-    
    	v_label = ((p_data ->>'data')::json->>'importParam')::text;
    	
 	-- manage log (fid:  234)

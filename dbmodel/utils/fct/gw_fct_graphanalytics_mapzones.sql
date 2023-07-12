@@ -191,12 +191,6 @@ BEGIN
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 	
-	--set current process as users parameter
-	DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
-
-	INSERT INTO config_param_user (value, parameter, cur_user)
-	VALUES (txid_current(),'utils_cur_trans',current_user );
-
 	UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'edit_typevalue_fk_disable' AND cur_user = current_user;
 	
 	-- set variable to skip audit = true
