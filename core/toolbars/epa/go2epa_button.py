@@ -425,6 +425,7 @@ class GwGo2EpaButton(GwAction):
         # Set background task 'Go2Epa'
         description = f"Go2Epa"
         self.go2epa_task = GwEpaFileManager(description, self, timer=self.timer)
+        self.go2epa_task.step_completed.connect(self.step_completed)
         QgsApplication.taskManager().addTask(self.go2epa_task)
         QgsApplication.taskManager().triggerTask(self.go2epa_task)
 
@@ -433,6 +434,14 @@ class GwGo2EpaButton(GwAction):
 
         if hasattr(self, 'go2epa_task'):
             self.go2epa_task.cancel()
+
+
+    def step_completed(self, json_result):
+
+        message = json_result.get('message')
+        if message:
+            data = {"info": {"values": [{"message": message.get('text')}]}}
+            tools_gw.fill_tab_log(self.dlg_go2epa, data, reset_text=False, close=False)
 
 
     def _set_completer_result(self, widget, viewname, field_name):
