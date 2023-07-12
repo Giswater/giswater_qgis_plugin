@@ -685,10 +685,23 @@ class GwProfileButton(GwAction):
         i3y = node.top_elev - node.ymax + node.z1
 
         # Create list points
-        xinf = [s1x, i1x, i2x, i3x]
-        yinf = [s1y, i1y, i2y, i3y]
-        xsup = [s1x, s2x, s3x]
-        ysup = [s1y, s2y, s3y]
+        xinf = []
+        yinf = []
+        xsup = []
+        ysup = []
+        if node.surface_type == 'TOP':
+            xinf = [s1x, i1x, i2x, i3x]
+            yinf = [s1y, i1y, i2y, i3y]
+            xsup = [s1x, s2x, s3x]
+            ysup = [s1y, s2y, s3y]
+        else:
+            s0x = -node.geom / 2
+            s0y = node.top_elev - node.ymax + node.z1 + node.cat_geom
+            xinf = [s0x, i1x, i2x, i3x]
+            yinf = [s0y, i1y, i2y, i3y]
+            xsup = [s0x, s3x]
+            ysup = [s0y, s3y]
+
 
         # draw first node bottom line
         plt.plot(xinf, yinf, zorder=100, linestyle=self._get_stylesheet(node.data_type)[0],
@@ -886,7 +899,8 @@ class GwProfileButton(GwAction):
         # Create node list points
         xninf = [i2x, i3x, i4x, i5x]
         yninf = [i2y, i3y, i4y, i5y]
-
+        xnsup = []
+        ynsup = []
         if node.surface_type == 'TOP':
             xnsup = [s2x, s3x, s4x, s5x]
             ynsup = [s2y, s3y, s4y, s5y]
@@ -1168,8 +1182,16 @@ class GwProfileButton(GwAction):
         # Create node list points
         xninf = [i2x, i3x, i4x]
         yninf = [i2y, i3y, i4y]
-        xnsup = [s2x, s3x, s4x, i4x]
-        ynsup = [s2y, s3y, s4y, i4y]
+        xnsup = []
+        ynsup = []
+        if node.surface_type == 'TOP':
+            xnsup = [s2x, s3x, s4x, i4x]
+            ynsup = [s2y, s3y, s4y, i4y]
+        else:
+            s0x = node.start_point + node.geom / 2
+            s0y = node.top_elev - node.ymax + prev_node.z2 + prev_node.cat_geom
+            xnsup = [s2x, s0x, i4x]
+            ynsup = [s2y, s0y, i4y]
 
         # draw node bottom line
         plt.plot(xninf, yninf,
