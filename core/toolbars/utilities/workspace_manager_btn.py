@@ -12,7 +12,7 @@ from functools import partial
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
 from qgis.PyQt.QtCore import QRegExp, QItemSelectionModel
 from qgis.PyQt.QtWidgets import QTableView
-from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit, QPlainTextEdit, QCheckBox
+from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit, QPlainTextEdit, QCheckBox, QAbstractItemView
 
 from ..dialog import GwAction
 from ...ui.ui_manager import GwWorkspaceManagerUi, GwCreateWorkspaceUi
@@ -129,7 +129,7 @@ class GwWorkspaceManagerButton(GwAction):
                 self.tbl_wrkspcm = tools_gw.fill_tableview_rows(self.tbl_wrkspcm, field)
             # TODO: config_form_tableview
             # widget = tools_gw.set_tablemodel_config(self.dlg_workspace_manager, self.tbl_wrkspcm, 'tbl_wrkspcm', 1, True)
-            tools_qt.set_tableview_config(self.tbl_wrkspcm)
+            tools_qt.set_tableview_config(self.tbl_wrkspcm, selectionMode=QAbstractItemView.SingleSelection)
 
         return complet_list
 
