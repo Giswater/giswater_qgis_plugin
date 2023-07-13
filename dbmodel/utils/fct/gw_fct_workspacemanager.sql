@@ -284,30 +284,38 @@ BEGIN
 				EXECUTE 'DELETE FROM '||v_selector_name||' WHERE cur_user = current_user;';
 		
 				v_selector_value = json_extract_path_text(rec_selector,v_selector_name);
-				--insert values into selectors with more than 1 field
-				IF  v_project_type = 'UD' AND v_selector_name IN ('selector_rpt_compare_tstep', 'selector_rpt_main_tstep', 'selector_date')
-				OR v_project_type = 'WS' AND v_selector_name IN ('selector_date') THEN
-					
-					FOR rec_selectorcomp IN SELECT * FROM json_array_elements(v_selector_value) LOOP
 
-						SELECT string_agg(key,', ') as keys,  string_agg(quote_literal(value),', ') as values  INTO rec_selectorcolumn FROM (
-						SELECT * from json_each_text(rec_selectorcomp::JSON))a;
+				IF v_selector_value IS NOT NULL THEN 
+					--insert values into selectors with more than 1 field
+					IF v_project_type = 'UD' AND v_selector_name IN ('selector_rpt_compare_tstep', 'selector_rpt_main_tstep', 'selector_date')
+					OR v_project_type = 'WS' AND v_selector_name IN ('selector_date') THEN
 						
-						EXECUTE 'INSERT INTO '||v_selector_name||' ('||rec_selectorcolumn.keys||') 
-						VALUES ('||rec_selectorcolumn.values||' );';
-				
-					END LOOP;
-				ELSE 
-				--insert values into selectors with 1 field
-					IF v_selector_value IS NOT NULL THEN
-						EXECUTE 'SELECT data_type FROM information_schema.columns where table_name = '||quote_literal(v_selector_name)||'
-						AND table_schema='||quote_literal(v_schemaname)||' and column_name!=''cur_user'''
-						INTO v_datatype;
+						FOR rec_selectorcomp IN SELECT * FROM json_array_elements(v_selector_value) LOOP
 
-						EXECUTE 'INSERT INTO '||v_selector_name||'
-						SELECT value::'||v_datatype||', current_user FROM json_array_elements_text('''||v_selector_value||''')';
+							SELECT string_agg(key,', ') as keys,  string_agg(quote_literal(value),', ') as values  INTO rec_selectorcolumn FROM (
+							SELECT * from json_each_text(rec_selectorcomp::JSON))a;
+							
+							EXECUTE 'INSERT INTO '||v_selector_name||' ('||rec_selectorcolumn.keys||') 
+							VALUES ('||rec_selectorcolumn.values||' );';
+					
+						END LOOP;
+					ELSIF v_selector_name = 'selector_psector' THEN
+							EXECUTE 'INSERT INTO selector_psector
+							SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer IN (SELECT psector_id FROM plan_psector);';
+					ELSIF v_selector_name = 'selector_inp_dscenario' THEN
+							EXECUTE 'INSERT INTO selector_inp_dscenario
+							SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer IN (SELECT dscenario_id FROM cat_dscenario);';
+					ELSE 
+					--insert values into selectors with 1 field
+						IF v_selector_value IS NOT NULL THEN
+							EXECUTE 'SELECT data_type FROM information_schema.columns where table_name = '||quote_literal(v_selector_name)||'
+							AND table_schema='||quote_literal(v_schemaname)||' and column_name!=''cur_user'''
+							INTO v_datatype;
+
+							EXECUTE 'INSERT INTO '||v_selector_name||'
+							SELECT value::'||v_datatype||', current_user FROM json_array_elements_text('''||v_selector_value||''')';
+						END IF;
 					END IF;
-
 				END IF;
 			END IF;
 		END LOOP;
