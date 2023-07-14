@@ -165,8 +165,8 @@ BEGIN
 	   'properties', to_jsonb(row) - 'the_geom',
 	   'crs',concat('EPSG:',ST_SRID(the_geom))
 	  ) AS feature
-	  FROM (SELECT arc_id, arccat_id, expl_id, fid, the_geom, descript as geom1
-	  FROM anl_arc WHERE fid=v_fid) row) features;
+	  FROM (SELECT distinct arc_id, arccat_id, expl_id, fid, the_geom, descript as geom1
+	  FROM anl_arc WHERE fid=v_fid and cur_user="current_user"()) row) features;
 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 	
