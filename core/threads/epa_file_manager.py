@@ -213,14 +213,14 @@ class GwEpaFileManager(GwTask):
 
         # 7 steps
         main_json_result = None
-        for step in range(0, 7):
+        for step in range(1, 7):
             self.body = tools_gw.create_body(extras=(extras + f', "step": {step}'))
             tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step {step} with parameters: "
                                f"'gw_fct_pg2epa_main', '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
             json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
                                                      aux_conn=self.aux_conn, is_thread=True)
             self.step_completed.emit(json_result)
-            if step == 5:
+            if step == 6:
                 main_json_result = json_result
             if self.isCanceled() or json_result is None:
                 return False
