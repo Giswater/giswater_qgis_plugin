@@ -100,11 +100,10 @@ BEGIN
 		DELETE FROM anl_node where cur_user=current_user AND fid IN (233,228,139,290);
 		DELETE FROM audit_check_data where cur_user=current_user AND fid = 139;
 
-		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
-		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_node (LIKE ws36003.anl_node INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_arc (LIKE ws36003.anl_arc INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_connec (LIKE ws36003.anl_connec INCLUDING ALL);
+		CREATE TEMP TABLE temp_audit_check_data (LIKE ws36003.audit_check_data INCLUDING ALL);
 	END IF;
 	
 	-- Header
@@ -629,7 +628,6 @@ BEGIN
 		DROP TABLE temp_anl_node;
 		DROP TABLE temp_anl_arc;
 		DROP TABLE temp_anl_connec;
-		DROP TABLE temp_t_anlgraph;
 		DROP TABLE temp_audit_check_data;
 	END IF;
 
