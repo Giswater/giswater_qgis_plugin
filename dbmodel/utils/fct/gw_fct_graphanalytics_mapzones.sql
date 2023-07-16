@@ -330,54 +330,32 @@ BEGIN
 
 	IF v_audit_result IS NULL THEN
 	
-		--create temporal
+		--create temporal tables
 		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_data (LIKE SCHEMA_NAME.temp_data INCLUDING ALL);
 
-		CREATE TEMP TABLE temp_anlgraph(
-	    id serial NOT NULL,
-	    arc_id character varying(20) COLLATE pg_catalog."default",
-	    node_1 character varying(20) COLLATE pg_catalog."default",
-	    node_2 character varying(20) COLLATE pg_catalog."default",
-	    water smallint,
-	    flag smallint,
-	    checkf smallint,
-	    length numeric(12,4),
-	    cost numeric(12,4),
-	    value numeric(12,4),
-	    trace integer,
-	    isheader boolean,
-	    orderby integer,
-	    CONSTRAINT temp_anlgraph_pkey PRIMARY KEY (id),
-	    CONSTRAINT temp_anlgraph_unique UNIQUE (arc_id, node_1));
-		
-		CREATE TEMP TABLE temp_data(
-	    id serial NOT NULL PRIMARY KEY,
-	    fid smallint,
-	    feature_type character varying(16) COLLATE pg_catalog."default",
-	    feature_id character varying(16) COLLATE pg_catalog."default",
-	    log_message text COLLATE pg_catalog."default",
-	    cur_user text COLLATE pg_catalog."default" DEFAULT "current_user"());
-
-		CREATE OR REPLACE TEMP VIEW v_anl_graphanalytics_mapzones AS
-		 SELECT temp_anlgraph.arc_id,
-		    temp_anlgraph.node_1,
-		    temp_anlgraph.node_2,
-		    temp_anlgraph.flag,
+		--create temporal view
+		CREATE OR REPLACE TEMP VIEW v_temp_anlgraph AS
+		 SELECT temp_t_anlgraph.arc_id,
+		    temp_t_anlgraph.node_1,
+		    temp_t_anlgraph.node_2,
+		    temp_t_anlgraph.flag,
 		    a2.flag AS flagi,
 		    a2.value,
 		    a2.trace
-		   FROM temp_anlgraph
-		     JOIN ( SELECT temp_anlgraph_1.arc_id,
-		            temp_anlgraph_1.node_1,
-		            temp_anlgraph_1.node_2,
-		            temp_anlgraph_1.water,
-		            temp_anlgraph_1.flag,
-		            temp_anlgraph_1.checkf,
-		            temp_anlgraph_1.value,
-		            temp_anlgraph_1.trace
-		           FROM temp_anlgraph temp_anlgraph_1
-		          WHERE temp_anlgraph_1.water = 1) a2 ON temp_anlgraph.node_1::text = a2.node_2::text
-		  WHERE temp_anlgraph.flag < 2 AND temp_anlgraph.water = 0 AND a2.flag = 0;
+		   FROM temp_t_anlgraph
+		     JOIN ( SELECT temp_t_anlgraph_1.arc_id,
+		            temp_t_anlgraph_1.node_1,
+		            temp_t_anlgraph_1.node_2,
+		            temp_t_anlgraph_1.water,
+		            temp_t_anlgraph_1.flag,
+		            temp_t_anlgraph_1.checkf,
+		            temp_t_anlgraph_1.value,
+		            temp_t_anlgraph_1.trace
+		           FROM temp_t_anlgraph temp_t_anlgraph_1
+		          WHERE temp_t_anlgraph_1.water = 1) a2 ON temp_t_anlgraph.node_1::text = a2.node_2::text
+		  WHERE temp_t_anlgraph.flag < 2 AND temp_t_anlgraph.water = 0 AND a2.flag = 0;
 			
 		IF v_usepsector IS  TRUE THEN
 			v_psectors_query_arc = ' AND a.arc_id NOT IN (SELECT arc_id FROM v_plan_psector_arc WHERE plan_state = 0) OR a.arc_id IN (SELECT arc_id FROM v_plan_psector_arc WHERE plan_state = 1)';
@@ -476,11 +454,11 @@ BEGIN
 
 			-- fill the graph table
 			IF v_class = 'DRAINZONE' THEN
-				EXECUTE 'INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
+				EXECUTE 'INSERT INTO temp_t_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
 				SELECT  arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0 FROM arc a JOIN value_state_type ON state_type=id 
 				WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND value_state_type.is_operative=TRUE AND a.state = 1 and expl_id='||v_expl_id||' '||v_psectors_query_arc||';';
 			ELSE
-				EXECUTE 'INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
+				EXECUTE 'INSERT INTO temp_t_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
 				SELECT  arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0 FROM arc a JOIN value_state_type ON state_type=id 
 				WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND value_state_type.is_operative=TRUE AND a.state = 1  and expl_id='||v_expl_id||' '||v_psectors_query_arc||'
 				UNION
@@ -490,9 +468,9 @@ BEGIN
 			END IF;
 
 			-- close custom nodes acording config parameters
-			EXECUTE 'UPDATE temp_anlgraph SET flag = 1 WHERE node_1 IN (SELECT json_array_elements_text((graphconfig->>''forceClosed'')::json) FROM '
+			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_1 IN (SELECT json_array_elements_text((graphconfig->>''forceClosed'')::json) FROM '
 			||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE)';
-			EXECUTE 'UPDATE temp_anlgraph SET flag = 1 WHERE node_2 IN (SELECT json_array_elements_text((graphconfig->>''forceClosed'')::json) FROM '
+			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_2 IN (SELECT json_array_elements_text((graphconfig->>''forceClosed'')::json) FROM '
 			||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE)';
 
 			-- set header node for mapzones
@@ -501,21 +479,21 @@ BEGIN
 
 			-- close boundary conditions acording config_graph_valve (flag=1)
 			IF v_class !='DRAINZONE' THEN
-				v_querytext  = 'UPDATE temp_anlgraph SET flag=1 WHERE 
+				v_querytext  = 'UPDATE temp_t_anlgraph SET flag=1 WHERE 
 						node_1::integer IN (
 						SELECT a.node_id::integer FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.nodetype_id 
 						LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer 
-						JOIN temp_anlgraph e ON a.node_id::integer=e.node_1::integer 
+						JOIN temp_t_anlgraph e ON a.node_id::integer=e.node_1::integer 
 						JOIN config_graph_valve v ON v.id = c.id
 						WHERE closed=TRUE
 						AND v.active IS TRUE)';
 				EXECUTE v_querytext;
 
-				v_querytext  = 'UPDATE temp_anlgraph SET flag=1 WHERE 
+				v_querytext  = 'UPDATE temp_t_anlgraph SET flag=1 WHERE 
 						node_2::integer IN (
 						SELECT (a.node_id::integer) FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.nodetype_id 
 						LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer 
-						JOIN temp_anlgraph e ON a.node_id::integer=e.node_1::integer 
+						JOIN temp_t_anlgraph e ON a.node_id::integer=e.node_1::integer 
 						JOIN config_graph_valve v ON v.id = c.id
 						WHERE closed=TRUE
 						AND v.active IS TRUE)';
@@ -524,47 +502,47 @@ BEGIN
 			END IF;
 
 			-- open custom nodes acording config parameters
-			EXECUTE 'UPDATE temp_anlgraph SET flag = 0 WHERE node_1 IN (SELECT json_array_elements_text((graphconfig->>''forceOpen'')::json) FROM '
+			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 0 WHERE node_1 IN (SELECT json_array_elements_text((graphconfig->>''forceOpen'')::json) FROM '
 			||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE)';
-			EXECUTE 'UPDATE temp_anlgraph SET flag = 0 WHERE node_2 IN (SELECT json_array_elements_text((graphconfig->>''forceOpen'')::json) FROM '
+			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 0 WHERE node_2 IN (SELECT json_array_elements_text((graphconfig->>''forceOpen'')::json) FROM '
 			||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE)';
             
-            -- close customized stoppers acording on graphconfig column on mapzone table
-			EXECUTE 'UPDATE temp_anlgraph SET flag = 1 WHERE node_1 IN (SELECT (json_array_elements_text((graphconfig->>''stopper'')::json)) as node_id FROM '||quote_ident(v_table)||')';
-			EXECUTE 'UPDATE temp_anlgraph SET flag = 1 WHERE node_2 IN (SELECT (json_array_elements_text((graphconfig->>''stopper'')::json)) as node_id FROM '||quote_ident(v_table)||')';
+			-- close customized stoppers acording on graphconfig column on mapzone table
+			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_1 IN (SELECT (json_array_elements_text((graphconfig->>''stopper'')::json)) as node_id FROM '||quote_ident(v_table)||')';
+			EXECUTE 'UPDATE temp_t_anlgraph SET flag = 1 WHERE node_2 IN (SELECT (json_array_elements_text((graphconfig->>''stopper'')::json)) as node_id FROM '||quote_ident(v_table)||')';
 
 			-- close checkvalves on the opposite sense where they are working
 			IF v_class !='DRAINZONE' THEN
 
-				UPDATE temp_anlgraph SET flag=1 WHERE id IN (
-						SELECT id FROM temp_anlgraph JOIN (
+				UPDATE temp_t_anlgraph SET flag=1 WHERE id IN (
+						SELECT id FROM temp_t_anlgraph JOIN (
 						SELECT node_id, to_arc from config_graph_checkvalve order by 1,2
 						) a 
 						ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_2::integer);
 			END IF;
 
 			-- close custom nodes acording init parameters
-			UPDATE temp_anlgraph SET flag = 1 WHERE node_1 IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
-			UPDATE temp_anlgraph SET flag = 1 WHERE node_2 IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
+			UPDATE temp_t_anlgraph SET flag = 1 WHERE node_1 IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
+			UPDATE temp_t_anlgraph SET flag = 1 WHERE node_2 IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
 			
 			-- open custom nodes acording init parameters
-			UPDATE temp_anlgraph SET flag = 0 WHERE node_1 IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
-			UPDATE temp_anlgraph SET flag = 0 WHERE node_2 IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
+			UPDATE temp_t_anlgraph SET flag = 0 WHERE node_1 IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
+			UPDATE temp_t_anlgraph SET flag = 0 WHERE node_2 IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
 			
 			-- Close mapzone headers
-			v_querytext  = 'UPDATE temp_anlgraph SET flag=1 WHERE node_1::integer IN ('||v_text||')';
+			v_querytext  = 'UPDATE temp_t_anlgraph SET flag=1 WHERE node_1::integer IN ('||v_text||')';
 			EXECUTE v_querytext;
-			v_querytext  = 'UPDATE temp_anlgraph SET flag=1 WHERE node_2::integer IN ('||v_text||')';
+			v_querytext  = 'UPDATE temp_t_anlgraph SET flag=1 WHERE node_2::integer IN ('||v_text||')';
 			EXECUTE v_querytext;
 
 			--moved after Close mapzone headers
-			v_text =  concat ('SELECT * FROM (',v_text,')a JOIN temp_anlgraph e ON a.node_id::integer=e.node_1::integer');
+			v_text =  concat ('SELECT * FROM (',v_text,')a JOIN temp_t_anlgraph e ON a.node_id::integer=e.node_1::integer');
 
 			-- Open mapzone headers BUT ONLY ENABLING the right sense (to_arc)			
 			IF v_class = 'SECTOR' THEN
 				-- sector (sector.graphconfig)
-				UPDATE temp_anlgraph SET flag=0, isheader = true WHERE id IN (
-					SELECT id FROM temp_anlgraph JOIN (
+				UPDATE temp_t_anlgraph SET flag=0, isheader = true WHERE id IN (
+					SELECT id FROM temp_t_anlgraph JOIN (
 					SELECT (json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent' as node_id, 
 					json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json) 
 					as to_arc from sector 
@@ -573,8 +551,8 @@ BEGIN
 			
 			ELSIF v_class = 'DMA' THEN
 				-- dma (dma.graphconfig)
-				UPDATE temp_anlgraph SET flag=0, isheader = true WHERE id IN (
-					SELECT id FROM temp_anlgraph JOIN (
+				UPDATE temp_t_anlgraph SET flag=0, isheader = true WHERE id IN (
+					SELECT id FROM temp_t_anlgraph JOIN (
 					SELECT (json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent' as node_id, 
 					json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json) 
 					as to_arc from dma 
@@ -583,8 +561,8 @@ BEGIN
 
 			ELSIF v_class = 'DQA' THEN
 				-- dqa (dqa.graphconfig)
-				UPDATE temp_anlgraph SET flag=0, isheader = true WHERE id IN (
-				SELECT id FROM temp_anlgraph JOIN (
+				UPDATE temp_t_anlgraph SET flag=0, isheader = true WHERE id IN (
+				SELECT id FROM temp_t_anlgraph JOIN (
 					SELECT (json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent' as node_id, 
 					json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json) 
 					as to_arc from dqa  
@@ -593,8 +571,8 @@ BEGIN
 
 			ELSIF v_class = 'PRESSZONE' THEN
 				-- presszone (presszone.graphconfig)
-				UPDATE temp_anlgraph SET flag=0, isheader = true WHERE id IN (
-				SELECT id FROM temp_anlgraph JOIN (
+				UPDATE temp_t_anlgraph SET flag=0, isheader = true WHERE id IN (
+				SELECT id FROM temp_t_anlgraph JOIN (
 					SELECT (json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent' as node_id, 
 					json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json) 
 					as to_arc from presszone
@@ -606,19 +584,19 @@ BEGIN
 			
 				-- set the starting element (water)
 				IF v_floodonlymapzone IS NULL THEN
-					v_querytext = 'UPDATE temp_anlgraph SET water=1, trace = '||v_fieldmp||'::integer 
+					v_querytext = 'UPDATE temp_t_anlgraph SET water=1, trace = '||v_fieldmp||'::integer 
 					FROM '||v_table||' WHERE graphconfig is not null and active is true AND flag=0 
 					AND node_1 IN (SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id)';
 					EXECUTE v_querytext;
 				ELSE
-					v_querytext = 'UPDATE temp_anlgraph SET water=1, trace = '||v_fieldmp||'::integer 
+					v_querytext = 'UPDATE temp_t_anlgraph SET water=1, trace = '||v_fieldmp||'::integer 
 					FROM '||v_table||' WHERE graphconfig is not null and active is true AND '||v_fieldmp||'::integer IN ('||v_floodonlymapzone||') AND flag=0 
 					AND node_1 IN (SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id)';
 					EXECUTE v_querytext;
 				END IF;
 			ELSE 
 
-				v_querytext = 'UPDATE temp_anlgraph SET water=1, flag=0, trace = '||v_fieldmp||'::integer 
+				v_querytext = 'UPDATE temp_t_anlgraph SET water=1, flag=0, trace = '||v_fieldmp||'::integer 
 				FROM '||v_table||' WHERE graphconfig is not null and active is true
 				AND node_1 IN (SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id)';
 				EXECUTE v_querytext;
@@ -628,7 +606,7 @@ BEGIN
 			-- inundation process
 			LOOP						
 				v_count = v_count+1;
-				UPDATE temp_anlgraph n SET water=1, trace = a.trace FROM v_anl_graphanalytics_mapzones a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;	
+				UPDATE temp_t_anlgraph n SET water=1, trace = a.trace FROM v_temp_anlgraph a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;	
 				GET DIAGNOSTICS v_affectrow = row_count;
 				raise notice 'v_count --> %' , v_count;
 				EXIT WHEN v_affectrow = 0;
@@ -637,9 +615,9 @@ BEGIN
 
 			RAISE NOTICE 'Finish engine....';
 
-			UPDATE temp_anlgraph SET  water=9 WHERE 
-			trace in (select trace from temp_anlgraph where trace is not null and water=1 group by trace having count(distinct arc_id) =2 and count( arc_id) =3) 
-			and arc_id not in (select arc_id from temp_anlgraph where isheader is true);
+			UPDATE temp_t_anlgraph SET  water=9 WHERE 
+			trace in (select trace from temp_t_anlgraph where trace is not null and water=1 group by trace having count(distinct arc_id) =2 and count( arc_id) =3) 
+			and arc_id not in (select arc_id from temp_t_anlgraph where isheader is true);
 
 
 			-- update feature atributes
@@ -648,7 +626,7 @@ BEGIN
 				RAISE NOTICE ' Update arcs';
 
 				-- update arc table
-				v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = trace FROM temp_anlgraph t WHERE arc.arc_id = t.arc_id AND water = 1';
+				v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = trace FROM temp_t_anlgraph t WHERE arc.arc_id = t.arc_id AND water = 1';
 				EXECUTE v_querytext;
 
 				RAISE NOTICE ' Update nodes';
@@ -663,9 +641,9 @@ BEGIN
 
 				select node, count(*) c, trace FROM(
 				select id, node, arc_id, trace, flag from(
-				select id, node_1 node, arc_id, trace, flag from temp_anlgraph where trace > 0 and flag = 0
+				select id, node_1 node, arc_id, trace, flag from temp_t_anlgraph where trace > 0 and flag = 0
 				union all
-				select id, node_2, arc_id, trace, flag from temp_anlgraph where trace > 0 and flag = 0)a
+				select id, node_2, arc_id, trace, flag from temp_t_anlgraph where trace > 0 and flag = 0)a
 				order by node
 				)b group by node, trace order by 1, 2 desc
 				
@@ -691,7 +669,7 @@ BEGIN
 
 				
 				IF v_islastupdate IS TRUE THEN
-					v_querytext = 'UPDATE arc SET lastupdate = now(), lastupdate_user=current_user FROM temp_anlgraph t WHERE arc.arc_id = t.arc_id AND water = 1';
+					v_querytext = 'UPDATE arc SET lastupdate = now(), lastupdate_user=current_user FROM temp_t_anlgraph t WHERE arc.arc_id = t.arc_id AND water = 1';
 					EXECUTE v_querytext;
 
 					v_querytext = 'UPDATE node SET lastupdate = now(), lastupdate_user=current_user FROM arc a WHERE a.arc_id=node.arc_id AND a.state=1 AND a.expl_id='||v_expl_id||''||v_psectors_query_arc||' ';
@@ -702,9 +680,9 @@ BEGIN
 
 					select node, count(*) c, trace FROM(
 					select id, node, arc_id, trace, flag from(
-					select id, node_1 node, arc_id, trace, flag from temp_anlgraph where trace > 0 and flag = 0
+					select id, node_1 node, arc_id, trace, flag from temp_t_anlgraph where trace > 0 and flag = 0
 					union all
-					select id, node_2, arc_id, trace, flag from temp_anlgraph where trace > 0 and flag = 0)a
+					select id, node_2, arc_id, trace, flag from temp_t_anlgraph where trace > 0 and flag = 0)a
 					order by node
 					)b group by node, trace order by 1, 2 desc
 					
@@ -726,8 +704,7 @@ BEGIN
 
 					RAISE NOTICE ' Update staticpressure';
 
-					DELETE FROM temp_data;
-					INSERT INTO temp_data (fid, feature_type, feature_id, log_message)
+					INSERT INTO temp_t_data (fid, feature_type, feature_id, log_message)
 					SELECT 147, 'node', n.node_id, 
 					concat('{"staticpressure":',case when (pz.head - n.elevation::float + (case when n.depth is null then 0 else n.depth end)::float) is null 
 					then 0 ELSE (pz.head - n.elevation::float + (case when n.depth is null then 0 else n.depth end)) END, '}')
@@ -736,16 +713,16 @@ BEGIN
 						(SELECT distinct on(node) node as node_id, trace as presszone_id FROM(
 						select node, count(*) c, trace FROM(
 						select id, node, arc_id, trace, flag from(
-						select id, node_1 node, arc_id, trace, flag from temp_anlgraph where trace > 0 and flag = 0
+						select id, node_1 node, arc_id, trace, flag from temp_t_anlgraph where trace > 0 and flag = 0
 						union all
-						select id, node_2, arc_id, trace, flag from temp_anlgraph where trace > 0 and flag = 0)a
+						select id, node_2, arc_id, trace, flag from temp_t_anlgraph where trace > 0 and flag = 0)a
 						order by node
 						)b group by node, trace order by 1, 2 desc
 						)c order by node, c desc) t USING (node_id)
 					JOIN presszone pz ON pz.presszone_id = t.presszone_id::text;		
 
 					-- update on node table those elements connected on graph
-					UPDATE node SET staticpressure=(log_message::json->>'staticpressure')::float FROM temp_data a WHERE a.feature_id=node_id 
+					UPDATE node SET staticpressure=(log_message::json->>'staticpressure')::float FROM temp_t_data a WHERE a.feature_id=node_id 
 					AND fid=147 AND cur_user=current_user;
 					
 					-- update on node table those elements disconnected from graph
@@ -778,7 +755,7 @@ BEGIN
 									SELECT node_id, mpz FROM (SELECT node_id, mpz FROM 
 									(SELECT arc_id, node_1 as node_id, '||v_field||'::text  as mpz FROM arc a WHERE expl_id = '||v_expl_id||' and state = 1 '||v_psectors_query_arc||'
 									UNION SELECT arc_id, node_2, '||v_field||'::text FROM arc a WHERE expl_id = '||v_expl_id||' and state = 1 '||v_psectors_query_arc||') a JOIN 
-									(SELECT DISTINCT ON (arc_id) arc_id, flag, isheader FROM temp_anlgraph)b USING (arc_id) 
+									(SELECT DISTINCT ON (arc_id) arc_id, flag, isheader FROM temp_t_anlgraph)b USING (arc_id) 
 									WHERE flag = 0 and isheader is not true group by node_id, mpz
 									) a group by node_id, mpz)
 									SELECT DISTINCT ON (node_id) node_id, concat(quote_literal(a.mpz),'','', quote_literal(b.mpz)) as mapzone FROM qt a JOIN qt b USING (node_id)
@@ -810,15 +787,15 @@ BEGIN
 							EXECUTE 'UPDATE '||v_table||' SET the_geom = null WHERE '||v_fieldmp||'::text IN ('||rec_conflict.mapzone||')';
 		
 							-- setting the graph for conflict
-							EXECUTE 'UPDATE temp_anlgraph t SET water = -1 FROM arc a WHERE a.state = 1 and a.expl_id = '||v_expl_id||' and t.arc_id = a.arc_id AND a.'||v_field||'::integer = -1 '||v_psectors_query_arc||'';
+							EXECUTE 'UPDATE temp_t_anlgraph t SET water = -1 FROM arc a WHERE a.state = 1 and a.expl_id = '||v_expl_id||' and t.arc_id = a.arc_id AND a.'||v_field||'::integer = -1 '||v_psectors_query_arc||'';
 						
 						END LOOP;
 
 					END IF;
 
 					-- setting the graph for disconnected
-					UPDATE temp_anlgraph t SET water = 9 WHERE water = 0;
-					EXECUTE 'UPDATE temp_anlgraph t SET water = 0 FROM arc a WHERE a.state = 1 and a.expl_id = '||v_expl_id||' and t.arc_id = a.arc_id AND a.'||v_field||'::integer = 0';
+					UPDATE temp_t_anlgraph t SET water = 9 WHERE water = 0;
+					EXECUTE 'UPDATE temp_t_anlgraph t SET water = 0 FROM arc a WHERE a.state = 1 and a.expl_id = '||v_expl_id||' and t.arc_id = a.arc_id AND a.'||v_field||'::integer = 0';
 
 					-- create log
 					IF v_project_type='UD' THEN
@@ -917,7 +894,7 @@ BEGIN
 			--update of fields 'lastupdate' and 'lastupdate_user'
 			IF v_floodonlymapzone IS NULL THEN
 	            v_querytext = 'UPDATE '||quote_ident(v_table)||' set lastupdate=now(), lastupdate_user=current_user 
-	            where '||quote_ident(v_field)||' IN (SELECT distinct '||quote_ident(v_field)||' FROM arc JOIN temp_anlgraph USING (arc_id))';
+	            where '||quote_ident(v_field)||' IN (SELECT distinct '||quote_ident(v_field)||' FROM arc JOIN temp_t_anlgraph USING (arc_id))';
 	        ELSE
 	        	v_querytext = 'UPDATE '||quote_ident(v_table)||' set lastupdate=now(), lastupdate_user=current_user 
 	            where '||quote_ident(v_field)||'='||v_floodonlymapzone||'';
@@ -933,7 +910,7 @@ BEGIN
 				-- concave polygon
 				v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = st_multi(a.the_geom) 
 						FROM (with polygon AS (SELECT st_collect (the_geom) as g, '||quote_ident(v_field)||' FROM arc a  
-						JOIN temp_anlgraph USING (arc_id) 
+						JOIN temp_t_anlgraph USING (arc_id) 
 						WHERE state > 0  AND water = 1 and expl_id = '||v_expl_id||'   group by '||quote_ident(v_field)||') 
 						SELECT '||quote_ident(v_field)||
 						', CASE WHEN st_geometrytype(st_concavehull(g, '||v_concavehull||')) = ''ST_Polygon''::text THEN st_buffer(st_concavehull(g, '||
@@ -950,7 +927,7 @@ BEGIN
 				v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
 
 						(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from arc a 
-						JOIN temp_anlgraph USING (arc_id) 
+						JOIN temp_t_anlgraph USING (arc_id) 
 						where a.state > 0 AND water = 1 AND '||quote_ident(v_field)||'::integer > 0 and expl_id = '||v_expl_id||'  group by '||quote_ident(v_field)||')a 
 						WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);
 
@@ -969,11 +946,11 @@ BEGIN
 				v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
 							(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
 							(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from arc a
-							JOIN temp_anlgraph USING (arc_id) 
+							JOIN temp_t_anlgraph USING (arc_id) 
 							where a.state > 0 AND water = 1 AND  '||quote_ident(v_field)||'::integer > 0 and expl_id = '||v_expl_id||'   group by '||quote_ident(v_field)||'
 							UNION
 							SELECT '||quote_ident(v_field)||', st_collect(ext_plot.the_geom) as geom FROM  ext_plot, connec a
-							JOIN temp_anlgraph USING (arc_id) 
+							JOIN temp_t_anlgraph USING (arc_id) 
 							WHERE a.state > 0 and a.expl_id = '||v_expl_id||' 
 							AND '||quote_ident(v_field)||'::integer > 0  AND water = 1
 							AND st_dwithin(a.the_geom, ext_plot.the_geom, 0.001)
@@ -985,7 +962,7 @@ BEGIN
 						UPDATE arc set the_geom = geom FROM(
 							SELECT dma_id, st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
 							(SELECT dma_id, st_buffer(st_collect(the_geom), 10) as geom from v_edit_arc 
-							JOIN temp_anlgraph USING (arc_id) 
+							JOIN temp_t_anlgraph USING (arc_id) 
 							where dma_id::integer > 0 group by dma_id
 							UNION
 							SELECT dma_id, st_collect(ext_plot.the_geom) as geom FROM v_edit_connec, ext_plot
@@ -1006,12 +983,12 @@ BEGIN
 				-- use link and pipe buffer
 				v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
 						(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
-						(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from arc a JOIN temp_anlgraph USING (arc_id) 
+						(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from arc a JOIN temp_t_anlgraph USING (arc_id) 
 						where a.state > 0  AND water = 1 AND a.'||quote_ident(v_field)||'::integer > 0 and a.expl_id = '||v_expl_id||' group by '||quote_ident(v_field)||'
 						UNION
 						SELECT a.'||quote_ident(v_field)||', (st_buffer(st_collect(link.the_geom),'||v_geomparamupdate_divide||',''endcap=flat join=round'')) 
 						as geom FROM link, connec a
-						JOIN temp_anlgraph USING (arc_id) 
+						JOIN temp_t_anlgraph USING (arc_id) 
 						WHERE a.'||quote_ident(v_field)||'::integer > 0  AND water = 1
 						AND a.state > 0	AND link.feature_id = connec_id and link.feature_type = ''CONNEC'' and a.expl_id = '||v_expl_id||'
 						group by a.'||quote_ident(v_field)||'	
@@ -1047,12 +1024,12 @@ BEGIN
 				(SELECT v_field, st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
 				(SELECT v_field, st_buffer(st_collect(the_geom), v_geomparamupdate) as geom 
 				FROM v_edit_arc arc
-				JOIN temp_anlgraph USING (arc_id) 
+				JOIN temp_t_anlgraph USING (arc_id) 
 				where arc.state = 1 AND water = 1 AND v_field::INTEGER> 0 group by v_field
 				UNION
 				SELECT v_field, st_collect(z.geom) as geom FROM v_crm_zone z
 				join v_edit_node using (node_id)
-				JOIN temp_anlgraph ON  node_id = node_1
+				JOIN temp_t_anlgraph ON  node_id = node_1
 				WHERE v_edit_node.state = 1 AND water = 1 AND v_field::INTEGER> 0
 				group by v_field
 				)a group by v_field)b 
@@ -1074,7 +1051,7 @@ BEGIN
 
 			-- disconnected arcs
 			select count(*) INTO v_count FROM 
-			(SELECT DISTINCT arc_id FROM arc JOIN temp_anlgraph USING (arc_id) WHERE water = 0 )a;
+			(SELECT DISTINCT arc_id FROM arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0 )a;
 			IF v_count > 0 THEN
 				INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 				VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' arc''s have been disconnected'));
@@ -1086,7 +1063,7 @@ BEGIN
 			-- disconnected connecs
 			IF v_count > 0 THEN 
 				select count(*) INTO v_count FROM 
-				(SELECT DISTINCT connec_id FROM connec JOIN temp_anlgraph USING (arc_id) WHERE water = 0)a;
+				(SELECT DISTINCT connec_id FROM connec JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0)a;
 				IF v_count > 0 THEN
 					INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 					VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' connec''s have been disconnected'));
@@ -1103,7 +1080,7 @@ BEGIN
 				-- disconnected gullies
 				IF v_count > 0 THEN 
 					select count(*) INTO v_count FROM 
-					(SELECT DISTINCT gully_id FROM gully JOIN temp_anlgraph USING (arc_id) WHERE water = 0)a;
+					(SELECT DISTINCT gully_id FROM gully JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0)a;
 					IF v_count > 0 THEN
 						INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 						VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' gullies have been disconnected'));
@@ -1168,9 +1145,9 @@ BEGIN
 		    'properties', to_jsonb(row) - 'the_geom'
 			) AS feature
 			FROM 
-			(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Disconnected'::text as descript, the_geom FROM arc JOIN temp_anlgraph USING (arc_id) WHERE water = 0
+			(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Disconnected'::text as descript, the_geom FROM arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0
 			UNION
-			SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM arc JOIN temp_anlgraph USING (arc_id) WHERE water = -1
+			SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = -1
 			) row) features;
 
 			v_result := COALESCE(v_result, '{}'); 
@@ -1186,9 +1163,9 @@ BEGIN
 		    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		    'properties', to_jsonb(row) - 'the_geom'
 			) AS feature
-			FROM (SELECT DISTINCT ON (connec_id) connec_id, connecat_id, c.state, c.expl_id, 'Disconnected'::text as descript, c.the_geom FROM connec c JOIN temp_anlgraph USING (arc_id) WHERE water = 0
+			FROM (SELECT DISTINCT ON (connec_id) connec_id, connecat_id, c.state, c.expl_id, 'Disconnected'::text as descript, c.the_geom FROM connec c JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0
 			UNION
-			SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM connec c JOIN temp_anlgraph USING (arc_id) WHERE water = -1
+			SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM connec c JOIN temp_t_anlgraph USING (arc_id) WHERE water = -1
 			UNION			
 			SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Orphan'::text as descript, the_geom FROM connec c WHERE dma_id = 0 AND arc_id IS NULL
 			) row) features;
@@ -1203,14 +1180,14 @@ BEGIN
 		DELETE FROM anl_connec WHERE fid=v_fid AND cur_user=current_user;
 	
 		INSERT INTO anl_arc (arc_id, expl_id, fid, cur_user, the_geom, dma_id)
-		SELECT arc_id, expl_id, v_fid, current_user, the_geom, trace FROM temp_anlgraph JOIN arc USING (arc_id) WHERE water=1;
+		SELECT arc_id, expl_id, v_fid, current_user, the_geom, trace FROM temp_t_anlgraph JOIN arc USING (arc_id) WHERE water=1;
 	
 		INSERT INTO anl_connec (connec_id, expl_id, fid, cur_user, the_geom, dma_id)
-		SELECT connec_id, expl_id, v_fid, current_user, the_geom, trace FROM temp_anlgraph JOIN connec USING (arc_id) WHERE water=1;
+		SELECT connec_id, expl_id, v_fid, current_user, the_geom, trace FROM temp_t_anlgraph JOIN connec USING (arc_id) WHERE water=1;
 
 		IF v_project_type = 'UD' THEN
 			INSERT INTO anl_connec (connec_id, expl_id, fid, cur_user, the_geom, dma_id)
-			SELECT gully_id, expl_id, v_fid, current_user, the_geom, trace FROM temp_anlgraph JOIN gully USING (arc_id) WHERE water=1;
+			SELECT gully_id, expl_id, v_fid, current_user, the_geom, trace FROM temp_t_anlgraph JOIN gully USING (arc_id) WHERE water=1;
 		END IF;
 
 		-- arc elements
@@ -1264,9 +1241,9 @@ BEGIN
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 
-	DROP VIEW v_anl_graphanalytics_mapzones;
-	DROP TABLE temp_anlgraph;
-	DROP TABLE temp_data;
+	DROP VIEW v_temp_anlgraph;
+	DROP TABLE temp_t_anlgraph;
+	DROP TABLE temp_t_data;
 	DROP TABLE temp_audit_check_data;
 
 	--  Return

@@ -15,8 +15,13 @@ $BODY$
 
 /*
 --EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_network('{"data":{"parameters":{"resultId":"z1","fid":227}}}')::json; -- when is called from go2epa
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_network('{"data":{"parameters":{"resultId":"test_20201016"}}}')::json; -- when is called from toolbox
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_network('{"data":{"parameters":{"resultId":"test1","fid":227}}}')::json; -- when is called from go2epa
+
+CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
+CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
+drop table temp_t_anlgraph;
+
+select * from SCHEMA_NAME.temp_t_anlgraph
 
 --RESULTS
 SELECT node_id FROM temp_anl_node WHERE fid = 233 AND cur_user=current_user
@@ -93,19 +98,27 @@ BEGIN
 		v_boundaryelem = 'outfall';
 	END IF;
 			
-	IF v_fid is null THEN
-		v_fid = 139;
-
-		DELETE FROM anl_arc where cur_user=current_user AND fid IN (232,231,139,404,431,454);
-		DELETE FROM anl_node where cur_user=current_user AND fid IN (233,228,139,290);
-		DELETE FROM audit_check_data where cur_user=current_user AND fid = 139;
-
-		CREATE TEMP TABLE temp_anl_node (LIKE ws36003.anl_node INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_arc (LIKE ws36003.anl_arc INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_connec (LIKE ws36003.anl_connec INCLUDING ALL);
-		CREATE TEMP TABLE temp_audit_check_data (LIKE ws36003.audit_check_data INCLUDING ALL);
-	END IF;
-	
+	-- create temporal view
+	CREATE OR REPLACE TEMP VIEW v_temp_anlgraph AS
+		SELECT anl_graph.arc_id,
+		    anl_graph.node_1,
+		    anl_graph.node_2,
+		    anl_graph.flag,
+		    a.flag AS flagi,
+		    a.value
+		   FROM temp_t_anlgraph anl_graph
+		     JOIN ( SELECT anl_graph_1.arc_id,
+			    anl_graph_1.node_1,
+			    anl_graph_1.node_2,
+			    anl_graph_1.water,
+			    anl_graph_1.flag,
+			    anl_graph_1.checkf,
+			    anl_graph_1.value
+			   FROM temp_t_anlgraph anl_graph_1
+			  WHERE anl_graph_1.water = 1) a ON anl_graph.node_1::text = a.node_2::text
+		  WHERE anl_graph.flag < 2 AND anl_graph.water = 0 AND a.flag < 2;
+			
+			
 	-- Header
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 4, 'CHECK RESULT NETWORK ACORDING EPA RULES');
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 4, '---------------------------------------------------------');
@@ -213,42 +226,27 @@ BEGIN
 
 	RAISE NOTICE '5 - Check disconnected network (139)';	
 
-	IF v_fid = 227 THEN
+	-- fill the graph table
+	INSERT INTO temp_t_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
+	select  a.arc_id, case when node_1 is null then '00000' else node_1 end, case when node_2 is null then '00000' else node_2 end, 0, 0, 0
+	from temp_t_arc a
+	union all
+	select  a.arc_id, case when node_2 is null then '00000' else node_2 end, case when node_1 is null then '00000' else node_1 end, 0, 0, 0
+	from temp_t_arc a
+	ON CONFLICT (arc_id, node_1) DO NOTHING;
 	
-		-- fill the graph table
-		INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
-		select  a.arc_id, case when node_1 is null then '00000' else node_1 end, case when node_2 is null then '00000' else node_2 end, 0, 0, 0
-		from temp_t_arc a
-		union all
-		select  a.arc_id, case when node_2 is null then '00000' else node_2 end, case when node_1 is null then '00000' else node_1 end, 0, 0, 0
-		from temp_t_arc a
-		ON CONFLICT (arc_id, node_1) DO NOTHING;
-		
-	ELSIF v_fid = 139 THEN
-
-		-- fill the graph table
-		INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
-		select  a.arc_id, case when node_1 is null then '00000' else node_1 end, case when node_2 is null then '00000' else node_2 end, 0, 0, 0
-		from rpt_inp_arc a where result_id = v_result_id
-		union all
-		select  a.arc_id, case when node_2 is null then '00000' else node_2 end, case when node_1 is null then '00000' else node_1 end, 0, 0, 0
-		from rpt_inp_arc a where result_id = v_result_id
-		ON CONFLICT (arc_id, node_1) DO NOTHING;
-
-	END IF;
-
 	-- set boundary conditions of graph table
 	IF v_project_type = 'WS' THEN
-		UPDATE temp_anlgraph
+		UPDATE temp_t_anlgraph
 			SET flag=1, water=1 
 			WHERE node_1 IN (SELECT node_id FROM temp_t_node WHERE (epa_type='RESERVOIR' OR epa_type='INLET' OR epa_type='TANK'));
 
-		UPDATE temp_anlgraph
+		UPDATE temp_t_anlgraph
 			SET flag=1, water=1 
 			WHERE node_2 IN (SELECT node_id FROM temp_t_node WHERE (epa_type='RESERVOIR' OR epa_type='INLET' OR epa_type='TANK'));
 		
 	ELSIF v_project_type = 'UD' THEN
-		UPDATE temp_anlgraph
+		UPDATE temp_t_anlgraph
 			SET flag=1, water=1 
 			WHERE node_1 IN (SELECT node_id FROM temp_t_node WHERE epa_type='OUTFALL');
 	END IF;
@@ -256,32 +254,19 @@ BEGIN
 	-- inundation process
 	LOOP
 		v_cont = v_cont+1;
-		update temp_anlgraph n set water= 1, flag=n.flag+1 from v_anl_graph a where n.node_1 = a.node_1 and n.arc_id = a.arc_id;
+		update temp_t_anlgraph n set water= 1, flag=n.flag+1 from v_temp_anlgraph a where n.node_1 = a.node_1 and n.arc_id = a.arc_id;
 		GET DIAGNOSTICS v_affectedrows =row_count;
 		EXIT WHEN v_affectedrows = 0;
 		EXIT WHEN v_cont = 2000;
 	END LOOP;
 
-	-- getting arc results
-	IF v_fid = 139 THEN 
-		-- arc results
-		INSERT INTO temp_anl_arc (fid, result_id, arc_id, the_geom, descript)
-		SELECT DISTINCT ON (a.arc_id) 139, v_result, a.arc_id, the_geom, concat('Arc disconnected from any', v_boundaryelem)  
-			FROM temp_anlgraph a
-			JOIN rpt_inp_arc b ON a.arc_id=b.arc_id
-			WHERE result_id = v_result_id
-			GROUP BY a.arc_id,the_geom
-			having max(water) = 0;
-			
-	ELSIF  v_fid = 227 THEN  
-		-- arc results
-		INSERT INTO temp_anl_arc (fid, result_id, arc_id, the_geom, descript)
-		SELECT DISTINCT ON (a.arc_id) 139, v_result, a.arc_id, the_geom, concat('Disconnected arc from any ', v_boundaryelem)  
-			FROM temp_anlgraph a
-			JOIN temp_t_arc b ON a.arc_id=b.arc_id
-			GROUP BY a.arc_id,the_geom
-			having max(water) = 0;
-	END IF;
+	-- arc results
+	INSERT INTO temp_anl_arc (fid, result_id, arc_id, the_geom, descript)
+	SELECT DISTINCT ON (a.arc_id) 139, v_result, a.arc_id, the_geom, concat('Disconnected arc from any ', v_boundaryelem)  
+		FROM temp_t_anlgraph a
+		JOIN temp_t_arc b ON a.arc_id=b.arc_id
+		GROUP BY a.arc_id,the_geom
+		having max(water) = 0;
 
 	-- counting arc results
 	SELECT count(*) FROM temp_anl_arc INTO v_count WHERE fid = 139 AND cur_user=current_user;
@@ -297,125 +282,70 @@ BEGIN
 	IF v_project_type = 'WS' THEN
 
 		RAISE NOTICE '6 - Check dry network (232)';	
-		DELETE FROM temp_anlgraph;
+		DELETE FROM temp_t_anlgraph;
 		v_cont = 0;
 
-		IF v_fid = 227 THEN
-
-			-- fill the graph table
-			INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
-			select  a.arc_id, case when node_1 is null then '00000' else node_1 end, case when node_2 is null then '00000' else node_2 end, 0, 0, 0
-			from temp_t_arc a
-			union all
-			select  a.arc_id, case when node_2 is null then '00000' else node_2 end, case when node_1 is null then '00000' else node_1 end, 0, 0, 0
-			from temp_t_arc a
-			ON CONFLICT (arc_id, node_1) DO NOTHING;
+		-- fill the graph table
+		INSERT INTO temp_t_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
+		select  a.arc_id, case when node_1 is null then '00000' else node_1 end, case when node_2 is null then '00000' else node_2 end, 0, 0, 0
+		from temp_t_arc a
+		union all
+		select  a.arc_id, case when node_2 is null then '00000' else node_2 end, case when node_1 is null then '00000' else node_1 end, 0, 0, 0
+		from temp_t_arc a
+		ON CONFLICT (arc_id, node_1) DO NOTHING;
 			
-		ELSIF v_fid = 139 THEN
-
-			-- fill the graph table
-			INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
-			select  a.arc_id, case when node_1 is null then '00000' else node_1 end, case when node_2 is null then '00000' else node_2 end, 0, 0, 0
-			from rpt_inp_arc a where result_id = v_result_id
-			union all
-			select  a.arc_id, case when node_2 is null then '00000' else node_2 end, case when node_1 is null then '00000' else node_1 end, 0, 0, 0
-			from rpt_inp_arc a where result_id = v_result_id
-			ON CONFLICT (arc_id, node_1) DO NOTHING;
-
-		END IF;
 
 		-- set boundary conditions of graph table
-		UPDATE temp_anlgraph
+		UPDATE temp_t_anlgraph
 			SET flag =1 WHERE arc_id IN (SELECT arc_id FROM temp_t_arc WHERE status = 'CLOSED');
-		UPDATE temp_anlgraph
+		UPDATE temp_t_anlgraph
 			SET flag=1, water=1 
 			WHERE node_1 IN (SELECT node_id FROM temp_t_node WHERE (epa_type='RESERVOIR' OR epa_type='INLET' OR epa_type='TANK'));
-		UPDATE temp_anlgraph
+		UPDATE temp_t_anlgraph
 			SET flag=1, water=1 
 			WHERE node_2 IN (SELECT node_id FROM temp_t_node WHERE (epa_type='RESERVOIR' OR epa_type='INLET' OR epa_type='TANK'));
 
 		-- inundation process
 		LOOP
 			v_cont = v_cont+1;
-			update temp_anlgraph n set water= 1, flag=n.flag+1 from v_anl_graph a where n.node_1 = a.node_1 and n.arc_id = a.arc_id;
+			update temp_t_anlgraph n set water= 1, flag=n.flag+1 from v_temp_anlgraph a where n.node_1 = a.node_1 and n.arc_id = a.arc_id;
 			GET DIAGNOSTICS v_affectedrows =row_count;
 			EXIT WHEN v_affectedrows = 0;
 			EXIT WHEN v_cont = 2000;
 			RAISE NOTICE '% - %', v_cont, v_affectedrows;
 		END LOOP;
 
-		IF v_fid = 139 THEN 
-			-- dry arcs
-			INSERT INTO temp_anl_arc (fid, result_id, arc_id, the_geom, descript)
-			SELECT DISTINCT ON (a.arc_id) 232, v_result, a.arc_id, the_geom, concat('Dry arc')  
-				FROM temp_anlgraph a
-				JOIN rpt_inp_arc b ON a.arc_id=b.arc_id
-				WHERE result_id = v_result_id
-				GROUP BY a.arc_id,the_geom
-				having max(water) = 0;
-				
-			-- dry nodes
-			INSERT INTO temp_anl_node (fid, node_id, the_geom, descript)
-			SELECT distinct on (node_id) 232, n.node_id, n.the_geom, concat('Dry node') FROM rpt_inp_node n
-				JOIN
-				(
-				SELECT node_1 AS node_id FROM temp_anlgraph JOIN (SELECT arc_id FROM temp_anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
-				UNION
-				SELECT node_2 FROM temp_anlgraph JOIN (SELECT arc_id FROM temp_anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
-				)
-				a USING (node_id)
-				WHERE result_id = v_result_id;
+	
+		-- insert into result table arc results
+		INSERT INTO temp_anl_arc (fid, arc_id, the_geom, descript)
+		SELECT DISTINCT ON (a.arc_id) 232, a.arc_id, the_geom, concat('Dry arc')
+			FROM temp_t_anlgraph a
+			JOIN temp_t_arc b ON a.arc_id=b.arc_id
+			GROUP BY a.arc_id,the_geom
+			having max(water) = 0;
 
-			-- removed demands
-			INSERT INTO temp_anl_node (fid, node_id, the_geom, descript)
-			SELECT distinct on (node_id) 233, n.node_id, n.the_geom, concat('Dry node with demand which have been updated to 0') FROM rpt_inp_node n
-				WHERE (addparam::json->>'removedDemand')::boolean is true AND result_id = v_result_id;
-
-			-- not removed demands
-			INSERT INTO temp_anl_node (fid, node_id, the_geom, descript)
-			SELECT distinct on (node_id) 233, n.node_id, n.the_geom, concat('Dry node with demand') FROM rpt_inp_node n
-				JOIN
-				(
-				SELECT node_1 AS node_id FROM temp_anlgraph JOIN (SELECT arc_id FROM temp_anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
-				UNION
-				SELECT node_2 FROM temp_anlgraph JOIN (SELECT arc_id FROM temp_anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
-				)
-				a USING (node_id)
-				WHERE n.demand > 0 AND result_id = v_result_id;
-
-
-		ELSIF  v_fid = 227 THEN  
-			-- insert into result table arc results
-			INSERT INTO temp_anl_arc (fid, arc_id, the_geom, descript)
-			SELECT DISTINCT ON (a.arc_id) 232, a.arc_id, the_geom, concat('Dry arc')
-				FROM temp_anlgraph a
-				JOIN temp_t_arc b ON a.arc_id=b.arc_id
-				GROUP BY a.arc_id,the_geom
-				having max(water) = 0;
-
-			-- insert into result table dry nodes
-			INSERT INTO temp_anl_node (fid, node_id, the_geom, descript)
-			SELECT distinct on (node_id) 232, n.node_id, n.the_geom, concat('Dry node') FROM temp_t_node n
-				JOIN
-				(
-				SELECT node_1 AS node_id FROM temp_anlgraph JOIN (SELECT arc_id FROM temp_anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
-				UNION
-				SELECT node_2 FROM temp_anlgraph JOIN (SELECT arc_id FROM temp_anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
-				)
-				a USING (node_id);
-
+		-- insert into result table dry nodes
+		INSERT INTO temp_anl_node (fid, node_id, the_geom, descript)
+		SELECT distinct on (node_id) 232, n.node_id, n.the_geom, concat('Dry node') FROM temp_t_node n
+			JOIN
+			(
+			SELECT node_1 AS node_id FROM temp_t_anlgraph JOIN (SELECT arc_id FROM temp_anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+			UNION
+			SELECT node_2 FROM temp_t_anlgraph JOIN (SELECT arc_id FROM temp_anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+			)
+			a USING (node_id);
 			-- insert into result table dry nodes with demands (error)
-			INSERT INTO temp_anl_node (fid, node_id, the_geom, descript, demand)
-			SELECT distinct on (node_id) 233, n.node_id, n.the_geom, concat('Dry node with demand'), demand FROM temp_t_node n
-				JOIN
-				(
-				SELECT node_1 AS node_id FROM temp_anlgraph JOIN (SELECT arc_id FROM temp_anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
-				UNION
-				SELECT node_2 FROM temp_anlgraph JOIN (SELECT arc_id FROM temp_anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
-				)
-				a USING (node_id)
-				WHERE n.demand > 0;
-		END IF;
+		INSERT INTO temp_anl_node (fid, node_id, the_geom, descript, demand)
+		SELECT distinct on (node_id) 233, n.node_id, n.the_geom, concat('Dry node with demand'), demand FROM temp_t_node n
+			JOIN
+			(
+			SELECT node_1 AS node_id FROM temp_t_anlgraph JOIN (SELECT arc_id FROM temp_anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+			UNION
+			SELECT node_2 FROM temp_t_anlgraph JOIN (SELECT arc_id FROM temp_anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+			)
+			a USING (node_id)
+			WHERE n.demand > 0;
+
 
 		-- counting arcs
 		SELECT count(*) FROM (SELECT arc_id FROM temp_anl_arc INTO v_count WHERE fid = 232 AND cur_user=current_user EXCEPT SELECT arc_id FROM temp_anl_arc WHERE fid = 139 AND cur_user=current_user)a;
@@ -457,46 +387,41 @@ BEGIN
 
 
 	-- updating values on result
-	IF v_fid = 227 THEN
+	IF v_delnetwork THEN
+		DELETE FROM temp_t_arc WHERE arc_id IN (SELECT arc_id FROM temp_anl_arc WHERE fid = 139 AND cur_user=current_user);
+		GET DIAGNOSTICS v_count = row_count;
 
-		IF v_delnetwork THEN
-			DELETE FROM temp_t_arc WHERE arc_id IN (SELECT arc_id FROM temp_anl_arc WHERE fid = 139 AND cur_user=current_user);
-			GET DIAGNOSTICS v_count = row_count;
-
-			IF v_count > 0 THEN
-				INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result, 2, 
-				concat('WARNING-227: {delDisconnectNetwork} is enabled and ',v_count,' arcs have been removed.'));
-			ELSE
-				INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result, 1, 
-				concat('INFO: {delDisconnectNetwork} is enabled but nothing have been removed.'));
-			END IF;
-
-			DELETE FROM temp_t_node WHERE node_id IN (SELECT node_id FROM temp_anl_node WHERE fid = 139 AND cur_user=current_user);
-			DELETE FROM temp_audit_check_data WHERE fid = 227 AND error_message like '%topological disconnected from any%' AND cur_user = current_user;
+		IF v_count > 0 THEN
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result, 2, 
+			concat('WARNING-227: {delDisconnectNetwork} is enabled and ',v_count,' arcs have been removed.'));
+		ELSE
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result, 1, 
+			concat('INFO: {delDisconnectNetwork} is enabled but nothing have been removed.'));
 		END IF;
 
-		IF v_removedemands THEN
-			UPDATE temp_t_node n SET demand = 0, addparam = gw_fct_json_object_set_key(addparam::json, 'removedDemand'::text, true::boolean) 
-			FROM temp_anl_node a WHERE fid = 233 AND a.cur_user = current_user AND a.node_id = n.node_id;
-			GET DIAGNOSTICS v_count = row_count;
-			IF v_count > 0 THEN
-				INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result, 2, concat(
-				'WARNING-227: {removeDemandsOnDryNetwork} is enabled and demand from ',v_count,' nodes have been removed'));
-			ELSE
-				INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result, 1, concat('INFO: {removeDemandsOnDryNetwork} is enabled but no dry nodes have been found.'));
-			END IF;
-			DELETE FROM temp_audit_check_data WHERE fid = 227 AND error_message like '%Dry node(s) with demand%' AND cur_user = current_user;
-		END IF;
+		DELETE FROM temp_t_node WHERE node_id IN (SELECT node_id FROM temp_anl_node WHERE fid = 139 AND cur_user=current_user);
+		DELETE FROM temp_audit_check_data WHERE fid = 227 AND error_message like '%topological disconnected from any%' AND cur_user = current_user;
 	END IF;
 
+	IF v_removedemands THEN
+		UPDATE temp_t_node n SET demand = 0, addparam = gw_fct_json_object_set_key(addparam::json, 'removedDemand'::text, true::boolean) 
+		FROM temp_anl_node a WHERE fid = 233 AND a.cur_user = current_user AND a.node_id = n.node_id;
+		GET DIAGNOSTICS v_count = row_count;
+		IF v_count > 0 THEN
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result, 2, concat(
+			'WARNING-227: {removeDemandsOnDryNetwork} is enabled and demand from ',v_count,' nodes have been removed'));
+		ELSE
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result, 1, concat('INFO: {removeDemandsOnDryNetwork} is enabled but no dry nodes have been found.'));
+		END IF;
+		DELETE FROM temp_audit_check_data WHERE fid = 227 AND error_message like '%Dry node(s) with demand%' AND cur_user = current_user;
+	END IF;
 	
 
 	RAISE NOTICE '7 - Stats';
-
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,concat(''));
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,concat('BASIC STATS'));
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,concat('-------------------'));
@@ -567,13 +492,7 @@ BEGIN
 		'Total Length (Km)', v_sumlength);
 	END IF;
 
-	-- insert spacers on log	
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 4, '');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 3, '');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 2, '');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 1, '');
-
-
+	
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
@@ -618,18 +537,8 @@ BEGIN
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 
-	IF v_fid = 139 THEN
 
-		INSERT INTO anl_node SELECT * FROM temp_anl_node;
-		INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
-		INSERT INTO anl_connec SELECT * FROM temp_anl_connec;
-		INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
-
-		DROP TABLE temp_anl_node;
-		DROP TABLE temp_anl_arc;
-		DROP TABLE temp_anl_connec;
-		DROP TABLE temp_audit_check_data;
-	END IF;
+	DROP VIEW v_temp_anlgraph;
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||

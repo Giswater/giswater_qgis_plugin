@@ -12,7 +12,6 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"test1","fid":227}}}$$) --when is called from go2epa_main from toolbox
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"test_20201016"}}}$$) -- when is called from toolbox
 
 -- fid: 114, 159, 230, 297, 396, 400, 402, 404, 405, 413, 414, 415, 432. Number 227 is passed by input parameters
 
@@ -112,19 +111,6 @@ BEGIN
 			
 	-- init variables
 	v_count=0;
-	IF v_fid is null THEN
-		v_fid = 114;
-	
-		-- delete old values on result table
-		DELETE FROM audit_check_data WHERE fid IN (114,402) AND cur_user=current_user;
-		DELETE FROM audit_check_data WHERE id < 0;
-		DELETE FROM anl_node WHERE fid IN (297, 396, 413, 415) AND cur_user=current_user;
-		DELETE FROM anl_arc WHERE fid IN (297, 373, 396) AND cur_user=current_user;
-
-		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.temp_anl_node INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.temp_anl_arc INCLUDING ALL);
-		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.temp_audit_check_data INCLUDING ALL);
-	END IF;
 
 	-- get user parameters
 	SELECT row_to_json(row) FROM (SELECT inp_options_interval_from, inp_options_interval_to
@@ -197,11 +183,6 @@ BEGIN
 	END IF;
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Number of psectors used: ', v_psectorused));
 
-
-	UPDATE rpt_cat_result SET 
-	export_options = concat('{"Network export mode": "', v_networkmodeval,'", "Pattern method": "', v_patternmethodval, '"}')::json
-	WHERE result_id = v_result_id;
-
 	IF v_checkresult THEN
 	
 		IF v_default::boolean THEN
@@ -232,7 +213,7 @@ BEGIN
 
 		
 		RAISE NOTICE '2 - Check nod2arc length control';	
-		v_nodearc_real = (SELECT st_length (the_geom) FROM temp_arc WHERE  arc_type='NODE2ARC' AND result_id =  v_result_id LIMIT 1);
+		v_nodearc_real = (SELECT st_length (the_geom) FROM temp_t_arc WHERE  arc_type='NODE2ARC' AND result_id =  v_result_id LIMIT 1);
 		v_nodearc_user = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_nodarc_length' AND cur_user=current_user);
 
 		IF  v_nodearc_user > (v_nodearc_real+0.01) THEN 
@@ -344,7 +325,7 @@ BEGIN
 
 		RAISE NOTICE '5 - Check for UNDEFINED elements on temp table (297)';
 		INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, descript)
-		SELECT 297, node_id, nodecat_id, the_geom, 'Node with epa_type UNDEFINED' FROM temp_node WHERE  epa_type = 'UNDEFINED';
+		SELECT 297, node_id, nodecat_id, the_geom, 'Node with epa_type UNDEFINED' FROM temp_t_node WHERE  epa_type = 'UNDEFINED';
 		
 		SELECT count(*) INTO v_count FROM temp_anl_node WHERE fid = 297 AND cur_user = current_user;
 		IF  v_count > 0 THEN
@@ -356,9 +337,9 @@ BEGIN
 		END IF;
 
 		INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, the_geom, descript)
-		SELECT 297, arc_id, arccat_id, the_geom, 'Arc with epa_type UNDEFINED' FROM temp_arc WHERE  epa_type = 'UNDEFINED';
+		SELECT 297, arc_id, arccat_id, the_geom, 'Arc with epa_type UNDEFINED' FROM temp_t_arc WHERE  epa_type = 'UNDEFINED';
 		
-		SELECT count(*) INTO v_count FROM temp_arc WHERE epa_type = 'UNDEFINED';
+		SELECT count(*) INTO v_count FROM temp_t_arc WHERE epa_type = 'UNDEFINED';
 		IF  v_count > 0 THEN
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 2, concat('WARNING-297: There is/are ',v_count,' arcs with epa_type UNDEFINED on this exportation.'));
@@ -430,7 +411,7 @@ BEGIN
 	-- CONTROLS arcs
 	v_querytext = '(SELECT a.id, a.arc_id as controls, b.arc_id as templayer FROM 
 		(SELECT substring(split_part(text,''LINK '', 2) FROM ''[^ ]+''::text) arc_id, id, sector_id FROM inp_controls WHERE active is true)a
-		LEFT JOIN temp_arc b USING (arc_id)
+		LEFT JOIN temp_t_arc b USING (arc_id)
 		WHERE b.arc_id IS NULL AND a.arc_id IS NOT NULL 
 		AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
 		OR a.sector_id::text != b.sector_id::text) a';
@@ -448,7 +429,7 @@ BEGIN
 	-- CONTROLS nodes
 	v_querytext = '(SELECT a.id, a.node_id as controls, b.node_id as templayer FROM 
 		(SELECT substring(split_part(text,''NODE '', 2) FROM ''[^ ]+''::text) node_id, id, sector_id FROM inp_controls WHERE active is true)a
-		LEFT JOIN temp_node b USING (node_id)
+		LEFT JOIN temp_t_node b USING (node_id)
 		WHERE b.node_id IS NULL AND a.node_id IS NOT NULL 
 		AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
 		OR a.sector_id::text != b.sector_id::text) a';
@@ -468,7 +449,7 @@ BEGIN
 	LOOP
 		v_querytext = '(SELECT a.id, a.node_id as controls, b.node_id as templayer FROM 
 		(SELECT substring(split_part(text,'||quote_literal(object_rec.tabname)||', 2) FROM ''[^ ]+''::text) node_id, id, sector_id FROM inp_rules WHERE active is true)a
-		LEFT JOIN temp_node b USING (node_id)
+		LEFT JOIN temp_t_node b USING (node_id)
 		WHERE b.node_id IS NULL AND a.node_id IS NOT NULL 
 		AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
 		OR a.sector_id::text != b.sector_id::text) a';
@@ -493,7 +474,7 @@ BEGIN
 	LOOP
 		v_querytext = '(SELECT a.id, a.arc_id as controls, b.arc_id as templayer FROM 
 		(SELECT substring(split_part(text,'||quote_literal(object_rec.tabname)||', 2) FROM ''[^ ]+''::text) arc_id, id, sector_id FROM inp_rules WHERE active is true)a
-		LEFT JOIN temp_arc b USING (arc_id)
+		LEFT JOIN temp_t_arc b USING (arc_id)
 		WHERE b.arc_id IS NULL AND a.arc_id IS NOT NULL 
 		AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
 		OR a.sector_id::text != b.sector_id::text) a';
@@ -516,7 +497,7 @@ BEGIN
 	RAISE NOTICE '10 - EPA Outlayer values (407)';
 
 	-- elevation
-	SELECT count(*) INTO v_count FROM (SELECT case when elev is not null then elev else elevation end as elev FROM temp_node) a 
+	SELECT count(*) INTO v_count FROM (SELECT case when elev is not null then elev else elevation end as elev FROM temp_t_node) a 
 	WHERE elev < (v_outlayer_elevation->>'min')::float OR elev > (v_outlayer_elevation->>'max')::float;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -527,7 +508,7 @@ BEGIN
 	END IF;
 	
 	-- depth
-	SELECT count(*) INTO v_count FROM (SELECT elevation-elev as depth FROM temp_node) a 
+	SELECT count(*) INTO v_count FROM (SELECT elevation-elev as depth FROM temp_t_node) a 
 	WHERE depth < (v_outlayer_depth->>'min')::float OR depth > (v_outlayer_depth->>'max')::float;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -645,9 +626,9 @@ BEGIN
 		'}')::json, 2848, null, null, null);
 
 	--  Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

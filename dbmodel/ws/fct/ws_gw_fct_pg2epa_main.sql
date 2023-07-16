@@ -100,8 +100,8 @@ BEGIN
 		  dma_id integer,
 		  exit_topelev double precision,
 		  exit_elev double precision,
-		  the_geom geometry(LineString,SRID_VALUE),
-		  the_geom_endpoint geometry(Point,SRID_VALUE),
+		  the_geom geometry(LineString,SCHEMA_NAME),
+		  the_geom_endpoint geometry(Point,SCHEMA_NAME),
 		  flag boolean,
 		  CONSTRAINT temp_link_pkey PRIMARY KEY (link_id));
 		
@@ -120,19 +120,19 @@ BEGIN
 		  exit_elev numeric(12,3),
 		  CONSTRAINT temp_link_x_arc_pkey PRIMARY KEY (link_id));
 
+		CREATE TEMP TABLE temp_t_csv (LIKE temp_csv INCLUDING ALL);
 		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 		CREATE TEMP TABLE temp_audit_log_data (LIKE SCHEMA_NAME.audit_log_data INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_table (LIKE SCHEMA_NAME.temp_table INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_demand (LIKE SCHEMA_NAME.temp_demand INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
 
 		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
 		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
 		CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
 
-		CREATE TEMP TABLE temp_rpt_inp_node (LIKE SCHEMA_NAME.rpt_inp_node INCLUDING ALL);
-		CREATE TEMP TABLE temp_rpt_inp_arc (LIKE SCHEMA_NAME.rpt_inp_arc INCLUDING ALL);
 		CREATE TEMP TABLE temp_rpt_inp_pattern_value (LIKE SCHEMA_NAME.rpt_inp_pattern_value INCLUDING ALL);
 
 		CREATE TEMP TABLE temp_t_go2epa (LIKE SCHEMA_NAME.temp_go2epa INCLUDING ALL);
@@ -157,21 +157,21 @@ BEGIN
 		INSERT INTO selector_hydrometer SELECT id, current_user FROM ext_rtc_hydrometer_state
 		ON CONFLICT (state_id, cur_user) DO NOTHING;
 
-		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 1/7-Preprocess workflow...... done succesfully"}}'::json;
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 1/7 - Preprocess workflow...... done succesfully"}}'::json;
 		RETURN v_return;
 
 	-- step 1 : autorepair epa-type
 	ELSIF v_step = 2 THEN 
 
 		PERFORM gw_fct_pg2epa_autorepair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
-		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 2/7-Autorepair epa_type...... done succesfully"}}'::json;
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 2/7 - Autorepair epa_type...... done succesfully"}}'::json;
 		RETURN v_return;
 
 	-- step 2: check data
 	ELSIF v_step = 3 THEN 
 
 		PERFORM gw_fct_pg2epa_check_data(v_input);
-		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 3/7-Check data...... done succesfully"}}'::json;
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 3/7 - Check according EPA rules...... done succesfully"}}'::json;
 		RETURN v_return;
 	
 	-- step 4: structure data
@@ -238,7 +238,6 @@ BEGIN
 		UPDATE temp_t_arc SET length=0.05 WHERE length=0;
 
 		RAISE NOTICE '4.11 - Set demands & patterns';
-		TRUNCATE temp_demand;
 		IF v_setdemand THEN
 			PERFORM gw_fct_pg2epa_demand(v_result);		
 		END IF;
@@ -246,7 +245,7 @@ BEGIN
 		RAISE NOTICE '4.12 - Setting valve status';
 		PERFORM gw_fct_pg2epa_valve_status(v_result);
 
-		
+
 		RAISE NOTICE '4.13 - Profilactic last control';
 
 		-- arcs without nodes
@@ -304,22 +303,11 @@ BEGIN
 		-- remove pattern when breakPipes is enabled	
 		IF v_breakpipes THEN
 			UPDATE temp_t_node n SET pattern_id  = ';VNODE BRKPIPE' , demand = 0 FROM temp_table t WHERE n.node_id = concat('VN',t.id);				
-		END IF;
+		END IF;		
 
 		RAISE NOTICE '4.14 - Move from temp tables to rpt_inp tables';
 		UPDATE temp_t_arc SET result_id  = v_result;
 		UPDATE temp_t_node SET result_id  = v_result;
-		INSERT INTO temp_rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
-		the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition,dma_id, presszone_id, dqa_id, minsector_id)
-		SELECT result_id, node_id, elevation, case when elev is null then elevation else elev end, node_type, nodecat_id, epa_type, sector_id, state, 
-		state_type, annotation, demand, the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition,dma_id, presszone_id, dqa_id, minsector_id
-		FROM temp_t_node;
-		INSERT INTO temp_rpt_inp_arc 
-		(result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, 
-		the_geom, expl_id, flw_code, minorloss, addparam, arcparent,dma_id, presszone_id, dqa_id, minsector_id)
-		SELECT result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, 
-		status, the_geom, expl_id, flw_code, minorloss, addparam, arcparent,dma_id, presszone_id, dqa_id, minsector_id
-		FROM temp_t_arc;
 		
 		-- move patterns used
 		INSERT INTO temp_rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, 
@@ -334,34 +322,26 @@ BEGIN
 
 		PERFORM gw_fct_pg2epa_dscenario(v_result);
 
-		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 4/7-Structure data,scenario data and boundary conditions...... done succesfully"}}'::json;
-		RETURN v_return;		
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 4/7 - Structure data...... done succesfully"}}'::json;
+		RETURN v_return;
 		
 	-- step 5: analyze graph
 	ELSIF v_step=5 THEN
 
 		PERFORM gw_fct_pg2epa_check_network(v_input);	
-		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 5/7-Graph analytics...... done succesfully"}}'::json;
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 5/7 - Graph analysis...... done succesfully"}}'::json;
 		RETURN v_return;
 
 	-- step 6: create json return
 	ELSIF v_step=6 THEN
-
-		TRUNCATE temp_node;
-		TRUNCATE temp_arc;
-	
-		-- moving data from temporal tables
-		INSERT INTO temp_node SELECT * FROM temp_t_node;
-		INSERT INTO temp_arc SELECT * FROM temp_t_arc;
-		INSERT INTO temp_demand SELECT * FROM temp_t_demand;
-		INSERT INTO rpt_inp_pattern_value SELECT * FROM temp_rpt_inp_pattern_value;	
 
 		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
 		SELECT gw_fct_pg2epa_export_inp(p_data) INTO v_file;
 		v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
 		v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
 		v_return = replace(v_return::text, '"message":{"level":1, "text":"Data quality analysis done succesfully"}', 
-		'"message":{"level":1, "text":"Step export INP file 6/7-Writing the INP file...... done succesfully"}')::json;
+		'"message":{"level":1, "text":"Export INP file 6/7 - Writing the INP file...... done succesfully"}')::json;
+
 		RETURN v_return;	
 
 	-- step 7: post-proces
@@ -372,7 +352,7 @@ BEGIN
 		the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition,dma_id, presszone_id, dqa_id, minsector_id)
 		SELECT result_id, node_id, elevation, case when elev is null then elevation else elev end, node_type, nodecat_id, epa_type, sector_id, state, 
 		state_type, annotation, demand, the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition,dma_id, presszone_id, dqa_id, minsector_id
-		FROM temp_rpt_inp_node;
+		FROM temp_t_node;
 		
 		-- move arcs data
 		INSERT INTO rpt_inp_arc 
@@ -380,7 +360,10 @@ BEGIN
 		the_geom, expl_id, flw_code, minorloss, addparam, arcparent,dma_id, presszone_id, dqa_id, minsector_id)
 		SELECT result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, 
 		status, the_geom, expl_id, flw_code, minorloss, addparam, arcparent,dma_id, presszone_id, dqa_id, minsector_id
-		FROM temp_rpt_inp_arc;
+		FROM temp_t_arc;
+
+		-- move patterns data
+		INSERT INTO rpt_inp_pattern_value SELECT * FROM temp_rpt_inp_pattern_value;	
 
 		-- restore hydrometer selector
 		DELETE FROM selector_hydrometer WHERE cur_user = current_user;
@@ -401,13 +384,13 @@ BEGIN
 		DROP TABLE IF EXISTS temp_anl_arc;
 		DROP TABLE IF EXISTS temp_anl_node;
 		DROP TABLE IF EXISTS temp_anl_connec;
-		DROP TABLE IF EXISTS temp_rpt_inp_node;
-		DROP TABLE IF EXISTS temp_rpt_inp_arc;
 		DROP TABLE IF EXISTS temp_rpt_inp_pattern_value;
 		DROP TABLE IF EXISTS temp_t_go2epa;
 		DROP TABLE IF EXISTS temp_t_anlgraph;
+		DROP TABLE IF EXISTS temp_t_csv;
 
-		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 7/7-Postprocess workflow...... done succesfully"}}'::json;
+
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 7/7 - Postprocess workflow...... done succesfully"}}'::json;
 		RETURN v_return;
 	END IF;
 
