@@ -14,7 +14,7 @@ RETURNS json AS
 $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true", "step":"1"}}$$); -- PRE-PROCESS
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"1"}}$$); -- PRE-PROCESS
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"2"}}$$); -- AUTOREPAIR
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"3"}}$$); -- CHECK DATA
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"4"}}$$); -- STRUCTURE DATA
@@ -90,69 +90,14 @@ BEGIN
 		DELETE FROM selector_state WHERE cur_user=current_user;
 		INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
 		
-		-- create temp tables
-		CREATE TABLE temp_arc_flowregulator	(
-		  arc_id character varying(18) NOT NULL,
-		  type character varying(18),
-		  weir_type character varying(18),
-		  offsetval numeric(12,4),
-		  cd numeric(12,4),
-		  ec numeric(12,4),
-		  cd2 numeric(12,4),
-		  flap character varying(3),
-		  geom1 numeric(12,4),
-		  geom2 numeric(12,4) DEFAULT 0.00,
-		  geom3 numeric(12,4) DEFAULT 0.00,
-		  geom4 numeric(12,4) DEFAULT 0.00,
-		  surcharge character varying(3),
-		  road_width double precision,
-		  road_surf character varying(16),
-		  coef_curve double precision,
-		  curve_id character varying(16),
-		  status character varying(3),
-		  startup numeric(12,4),
-		  shutoff numeric(12,4),
-		  ori_type character varying(18),
-		  orate numeric(12,4),
-		  shape character varying(18),
-		  close_time integer DEFAULT 0,
-		  outlet_type character varying(16),
-		  cd1 numeric(12,4),
-		  CONSTRAINT temp_arc_flowregulator_pkey PRIMARY KEY (arc_id));
+		CREATE TEMP TABLE temp_t_arc_flowregulator (LIKE SCHEMA_NAME.temp_arc_flowregulator INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_lid_usage (LIKE SCHEMA_NAME.temp_lid_usage INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_node_other (LIKE SCHEMA_NAME.temp_node_other INCLUDING ALL);
 		
-		CREATE TABLE temp_lid_usage(
-		  subc_id character varying(16) NOT NULL,
-		  lidco_id character varying(16) NOT NULL,
-		  numelem smallint,
-		  area numeric(16,6),
-		  width numeric(12,4),
-		  initsat numeric(12,4),
-		  fromimp numeric(12,4),
-		  toperv smallint,
-		  rptfile character varying(10),
-		  CONSTRAINT temp_lid_usage_pkey PRIMARY KEY (subc_id, lidco_id));
-		
-				
-		CREATE TABLE temp_node_other(
-		  id serial NOT NULL,
-		  node_id character varying(16),
-		  type character varying(16),
-		  poll_id character varying(16),
-		  timser_id character varying(16),
-		  other character varying(30),
-		  mfactor numeric(12,4),
-		  sfactor numeric(12,4),
-		  base numeric(12,4),
-		  pattern_id character varying(16),
-		  CONSTRAINT temp_node_other_pkey PRIMARY KEY (id),
-		  CONSTRAINT temp_node_other_unique UNIQUE (node_id, type));
-		
-		
-		CREATE TEMP TABLE temp_t_csv (LIKE temp_csv INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_table (LIKE temp_table INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_csv (LIKE SCHEMA_NAME.temp_csv INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_table (LIKE SCHEMA_NAME.temp_table INCLUDING ALL);
 		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 		CREATE TEMP TABLE temp_audit_log_data (LIKE SCHEMA_NAME.audit_log_data INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_table (LIKE SCHEMA_NAME.temp_table INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_gully (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
@@ -160,7 +105,6 @@ BEGIN
 
 		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
 		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
 		CREATE TEMP TABLE temp_anl_gully (LIKE SCHEMA_NAME.anl_gully INCLUDING ALL);
 		CREATE TEMP TABLE temp_rpt_inp_raingage (LIKE SCHEMA_NAME.rpt_inp_raingage INCLUDING ALL);
 
@@ -253,14 +197,7 @@ BEGIN
 	
 	-- step 7: post-proces
 	ELSIF v_step=7 THEN
-	
-		-- move nodes data
-		INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
-		the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition,dma_id, presszone_id, dqa_id, minsector_id)
-		SELECT result_id, node_id, elevation, case when elev is null then elevation else elev end, node_type, nodecat_id, epa_type, sector_id, state, 
-		state_type, annotation, demand, the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition,dma_id, presszone_id, dqa_id, minsector_id
-		FROM temp_t_node;
-		
+			
 		-- move arcs data
 		INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, 
 		length, n, the_geom, expl_id, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage)
@@ -275,15 +212,11 @@ BEGIN
 		SELECT result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type,
 		sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node
 		FROM temp_t_node;
-	
-	
-		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 7/7 - Postprocess workflow...... done succesfully"}}'::json;
-		RETURN v_return;
 		
 		-- drop temp tables
-		DROP TABLE IF EXISTS temp_arc_flowregulator;
-		DROP TABLE IF EXISTS temp_lid_usage;
-		DROP TABLE IF EXISTS temp_node_other;
+		DROP TABLE IF EXISTS temp_t_arc_flowregulator;
+		DROP TABLE IF EXISTS temp_t_lid_usage;
+		DROP TABLE IF EXISTS temp_t_node_other;
 
 		DROP TABLE IF EXISTS temp_t_csv;	
 		DROP TABLE IF EXISTS temp_t_table;	
@@ -292,7 +225,7 @@ BEGIN
 		DROP TABLE IF EXISTS temp_t_table;
 		DROP TABLE IF EXISTS temp_t_node;
 		DROP TABLE IF EXISTS temp_t_arc;
-		DROP TABLE IF EXISTS temp_anl_gully;
+		DROP TABLE IF EXISTS temp_t_gully;
 		DROP TABLE IF EXISTS temp_t_anlgraph;
 
 		DROP TABLE IF EXISTS temp_anl_arc;
