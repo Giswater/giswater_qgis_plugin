@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION NODE: 1320
 
 
-CREATE OR REPLACE FUNCTION "ws35038".gw_trg_edit_node()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_node()
   RETURNS trigger AS
 $BODY$
 DECLARE 

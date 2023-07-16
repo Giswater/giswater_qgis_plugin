@@ -61,26 +61,25 @@ BEGIN
 	END IF;
 
 	--create temp tables
-	IF v_fid = 225 THEN
+	IF v_fid = 225 OR v_fid= 101 THEN
 		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
 		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
 		CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
 		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+
+		-- Header
+		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  4, 'CHECK GIS DATA QUALITY ACORDING EPA RULES');
+		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  4, '----------------------------------------------------------');
+
+		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, 'CRITICAL ERRORS');
+		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, '----------------------');
+
+		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  2, 'WARNINGS');
+		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  2, '--------------');
+
+		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, 'INFO');
+		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, '-------');
 	END IF;
-
-	-- Header
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  4, 'CHECK GIS DATA QUALITY ACORDING EPA ROLE');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  4, '----------------------------------------------------------');
-
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, 'CRITICAL ERRORS');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, '----------------------');
-
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  2, 'WARNINGS');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  2, '--------------');
-
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, 'INFO');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, '-------');
-
 
 	RAISE NOTICE '1 - Check orphan nodes (fid:  107)';
 	v_querytext = '(SELECT node_id, nodecat_id, the_geom, expl_id FROM 
@@ -935,17 +934,30 @@ BEGIN
 
 		DELETE FROM temp_audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user AND fid = v_fid;
 	END LOOP;
-		
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid, 4, '');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid, 3, '');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid, 2, '');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid, 1, '');
+
+	
+	IF v_fid = 225 OR v_fid = 101 THEN
+		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '');
+		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '');
+		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, '');
+		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, '');
+	
+		INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
+		INSERT INTO anl_node SELECT * FROM temp_anl_node;
+		INSERT INTO anl_connec SELECT * FROM temp_anl_connec;
+		INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
+
+		DROP TABLE IF EXISTS temp_anl_arc;
+		DROP TABLE IF EXISTS temp_anl_node ;
+		DROP TABLE IF EXISTS temp_anl_connec;
+		DROP TABLE IF EXISTS temp_audit_check_data;
+	END IF;
 
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (
-	SELECT error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by criticity desc, id asc
+	SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by criticity desc, id asc
 	) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
@@ -961,7 +973,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-	FROM  temp_anl_node WHERE cur_user="current_user"() AND fid IN (107, 164, 165, 166, 167, 170, 171, 187, 198, 292, 293, 294, 379, 411, 412, 432)) row) features;
+	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (107, 164, 165, 166, 167, 170, 171, 187, 198, 292, 293, 294, 379, 411, 412, 432)) row) features;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point",  "features":',v_result, '}'); 
 
@@ -975,7 +987,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom, fid
-	FROM  temp_anl_arc WHERE cur_user="current_user"() AND fid IN (188, 169, 229, 230, 295)) row) features;
+	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (188, 169, 229, 230, 295)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString",  "features":',v_result,'}'); 
@@ -985,18 +997,6 @@ BEGIN
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
-
-	IF fid = 225 THEN
-		INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
-		INSERT INTO anl_node SELECT * FROM temp_anl_node;
-		INSERT INTO anl_connec SELECT * FROM temp_anl_connec;
-		INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
-
-		DROP TABLE  IF EXISTS temp_anl_arc;
-		DROP TABLE IF EXISTS temp_anl_node ;
-		DROP TABLE IF EXISTS  temp_anl_connec;
-		DROP TABLE  IF EXISTS temp_audit_check_data;
-	END IF;
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||

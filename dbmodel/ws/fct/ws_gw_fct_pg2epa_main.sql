@@ -14,13 +14,16 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":SRID_VALUE}, "data":{"resultId":"test1", "step":"0"}}$$) -- PRE-PROCESS
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":SRID_VALUE}, "data":{"resultId":"test1", "step":"1"}}$$) -- AUTOREPAIR
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":SRID_VALUE}, "data":{"resultId":"test1", "step":"2"}}$$) -- CHECK DATA
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":SRID_VALUE}, "data":{"resultId":"test1", "step":"3"}}$$) -- STRUCTURE DATA
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":SRID_VALUE}, "data":{"resultId":"test1", "step":"4"}}$$) -- CHECK GRAPH
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":SRID_VALUE}, "data":{"resultId":"test1", "step":"5"}}$$) -- BUILD INP 
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":SRID_VALUE}, "data":{"resultId":"test1", "step":"6"}}$$) -- POST-PROCESS
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"1"}}$$); -- PRE-PROCESS
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"2"}}$$); -- AUTOREPAIR
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"3"}}$$); -- CHECK DATA
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"4"}}$$); -- STRUCTURE DATA
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"5"}}$$); -- CHECK GRAPH
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"6"}}$$); -- BUILD INP 
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"7"}}$$); -- POST-PROCESS
+
+select * from temp_audit_check_data order by 1 asc
+
 
 --fid: 227
 
@@ -63,9 +66,10 @@ BEGIN
 	-- get input data
 	v_result = (p_data->>'data')::json->>'resultId';
 	v_step = (p_data->>'data')::json->>'step';  -- use network previously defined
-
+	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "fid":227}}}')::json;
+		
 	-- step 0 : preprocess
-	IF v_step = 0 THEN
+	IF v_step = 1 THEN
 
 		-- check sector selector
 		SELECT count(*) INTO v_count FROM selector_sector WHERE cur_user = current_user;
@@ -116,12 +120,12 @@ BEGIN
 		  exit_elev numeric(12,3),
 		  CONSTRAINT temp_link_x_arc_pkey PRIMARY KEY (link_id));
 
-		CREATE TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
-		CREATE TABLE temp_audit_log_data (LIKE SCHEMA_NAME.audit_log_data INCLUDING ALL);
-		CREATE TABLE temp_t_table (LIKE SCHEMA_NAME.temp_table INCLUDING ALL);
-		CREATE TABLE temp_t_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
-		CREATE TABLE temp_t_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
-		CREATE TABLE temp_t_demand (LIKE SCHEMA_NAME.temp_demand INCLUDING ALL);
+		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+		CREATE TEMP TABLE temp_audit_log_data (LIKE SCHEMA_NAME.audit_log_data INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_table (LIKE SCHEMA_NAME.temp_table INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_demand (LIKE SCHEMA_NAME.temp_demand INCLUDING ALL);
 
 		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
 		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
@@ -154,28 +158,25 @@ BEGIN
 		INSERT INTO selector_hydrometer SELECT id, current_user FROM ext_rtc_hydrometer_state
 		ON CONFLICT (state_id, cur_user) DO NOTHING;
 
-		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Step-0: Pre-process workflow done succesfully"}}'::json;
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 1/7-Preprocess workflow...... done succesfully"}}'::json;
 		RETURN v_return;
 
 	-- step 1 : autorepair epa-type
-	ELSIF v_step = 1 THEN 
+	ELSIF v_step = 2 THEN 
 
 		PERFORM gw_fct_pg2epa_autorepair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
-		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Step-1: Auto-repair epa_type done succesfully"}}'::json;
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 2/7-Autorepair epa_type...... done succesfully"}}'::json;
 		RETURN v_return;
 
 	-- step 2: check data
-	ELSIF v_step = 2 THEN 
+	ELSIF v_step = 3 THEN 
 
-		-- build input
-		v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "fid":227}}}')::json;
-	
 		PERFORM gw_fct_pg2epa_check_data(v_input);
-		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Step-2: Check data done succesfully"}}'::json;
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 3/7-Check data...... done succesfully"}}'::json;
 		RETURN v_return;
 	
-	-- step 3 : structure data
-	ELSIF v_step = 3 THEN 
+	-- step 4: structure data
+	ELSIF v_step = 4 THEN 
 	
 		-- get user parameteres
 		v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
@@ -191,26 +192,23 @@ BEGIN
 		-- get debug parameters
 		v_setdemand = (SELECT value::json->>'setDemand' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 		v_breakpipes = (SELECT (value::json->>'breakPipes')::json->>'status' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
-
-		-- build input
-		v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "fid":227}}}')::json;
 		
-		RAISE NOTICE '3.1 - Fill temp tables';
+		RAISE NOTICE '4.1 - Fill temp tables';
 		PERFORM gw_fct_pg2epa_fill_data(v_result);
 
-		RAISE NOTICE '3.2 - Call gw_fct_pg2epa_nod2arc function';
+		RAISE NOTICE '4.2 - Call gw_fct_pg2epa_nod2arc function';
 		PERFORM gw_fct_pg2epa_nod2arc(v_result, v_onlymandatory_nodarc, false);
 
-		RAISE NOTICE '3.3 - Call gw_fct_pg2epa_doublenod2arc';
+		RAISE NOTICE '4.3 - Call gw_fct_pg2epa_doublenod2arc';
 		PERFORM gw_fct_pg2epa_nod2arc_double(v_result);
 				
-		RAISE NOTICE '3.4 - Call gw_fct_pg2epa_pump_additional function';
+		RAISE NOTICE '4.4 - Call gw_fct_pg2epa_pump_additional function';
 		PERFORM gw_fct_pg2epa_pump_additional(v_result);
 
-		RAISE NOTICE '3.5 - manage varcs';
+		RAISE NOTICE '4.5 - manage varcs';
 		PERFORM gw_fct_pg2epa_manage_varc(v_result);	
 
-		RAISE NOTICE '3.6 - Trim arcs';
+		RAISE NOTICE '4.6 - Trim arcs';
 		IF v_networkmode IN (3,4) THEN
 		
 			IF v_breakpipes THEN
@@ -220,7 +218,7 @@ BEGIN
 			SELECT gw_fct_pg2epa_vnodetrimarcs(v_result) INTO v_response;
 		END IF;
 
-		RAISE NOTICE '3.7 - Execute buildup model';
+		RAISE NOTICE '4.7 - Execute buildup model';
 		IF v_buildupmode = 1 THEN
 			PERFORM gw_fct_pg2epa_buildup_supply(v_result);
 			
@@ -228,29 +226,29 @@ BEGIN
 			PERFORM gw_fct_pg2epa_buildup_transport(v_result);
 		END IF;
 
-		RAISE NOTICE '3.8 - Set default values';
+		RAISE NOTICE '4.8 - Set default values';
 		IF v_vdefault THEN
 			PERFORM gw_fct_pg2epa_vdefault(v_input);
 		END IF;
 
-		RAISE NOTICE '3.9 - Set ceros';
+		RAISE NOTICE '4.9 - Set ceros';
 		UPDATE temp_t_node SET elevation = 0 WHERE elevation IS NULL;
 		UPDATE temp_t_node SET addparam = replace (addparam, '""','null');
 		
-		RAISE NOTICE '3.10 - Set length > 0.05 when length is 0';
+		RAISE NOTICE '4.10 - Set length > 0.05 when length is 0';
 		UPDATE temp_t_arc SET length=0.05 WHERE length=0;
 
-		RAISE NOTICE '3.11 - Set demands & patterns';
+		RAISE NOTICE '4.11 - Set demands & patterns';
 		TRUNCATE temp_demand;
 		IF v_setdemand THEN
 			PERFORM gw_fct_pg2epa_demand(v_result);		
 		END IF;
 
-		RAISE NOTICE '3.12 - Setting valve status';
+		RAISE NOTICE '4.12 - Setting valve status';
 		PERFORM gw_fct_pg2epa_valve_status(v_result);
 
 		
-		RAISE NOTICE '3.13 - Profilactic last control';
+		RAISE NOTICE '4.13 - Profilactic last control';
 
 		-- arcs without nodes
 		UPDATE temp_t_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM temp_t_arc a LEFT JOIN temp_t_node ON node_1=node_id WHERE temp_t_node.node_id is null) a WHERE t.id = a.id;
@@ -309,7 +307,7 @@ BEGIN
 			UPDATE temp_t_node n SET pattern_id  = ';VNODE BRKPIPE' , demand = 0 FROM temp_table t WHERE n.node_id = concat('VN',t.id);				
 		END IF;
 
-		RAISE NOTICE '3.14 - Move from temp tables to rpt_inp tables';
+		RAISE NOTICE '4.14 - Move from temp tables to rpt_inp tables';
 		UPDATE temp_t_arc SET result_id  = v_result;
 		UPDATE temp_t_node SET result_id  = v_result;
 		INSERT INTO temp_rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
@@ -337,18 +335,21 @@ BEGIN
 
 		PERFORM gw_fct_pg2epa_dscenario(v_result);
 
-		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Step-3: Structure data, scenario data and boundary conditions done succesfully"}}'::json;
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 4/7-Structure data,scenario data and boundary conditions...... done succesfully"}}'::json;
 		RETURN v_return;		
 		
-	-- step 4: analyze graph
-	ELSIF v_step=4 THEN
+	-- step 5: analyze graph
+	ELSIF v_step=5 THEN
 
 		PERFORM gw_fct_pg2epa_check_network(v_input);	
-		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Step-4: Gragf analytics done succesfully"}}'::json;
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 5/7-Graph analytics...... done succesfully"}}'::json;
 		RETURN v_return;
 
-	-- step 5: create json return
-	ELSIF v_step=5 THEN
+	-- step 6: create json return
+	ELSIF v_step=6 THEN
+
+		TRUNCATE temp_node;
+		TRUNCATE temp_arc;
 	
 		-- moving data from temporal tables
 		INSERT INTO temp_node SELECT * FROM temp_t_node;
@@ -361,11 +362,11 @@ BEGIN
 		v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
 		v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
 		v_return = replace(v_return::text, '"message":{"level":1, "text":"Data quality analysis done succesfully"}', 
-		'"message":{"level":1, "text":"Step-5: Creation of inp done succesfully"}')::json;
+		'"message":{"level":1, "text":"Step export INP file 6/7-Writing the INP file...... done succesfully"}')::json;
 		RETURN v_return;	
 
-	-- step 6: post-proces
-	ELSIF v_step=6 THEN
+	-- step 7: post-proces
+	ELSIF v_step=7 THEN
 	
 		-- move nodes data
 		INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
@@ -407,7 +408,7 @@ BEGIN
 		DROP TABLE IF EXISTS temp_t_go2epa;
 		DROP TABLE IF EXISTS temp_t_anlgraph;
 
-		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Step-6: Post-process workflow done succesfully"}}'::json;
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 7/7-Postprocess workflow...... done succesfully"}}'::json;
 		RETURN v_return;
 	END IF;
 
