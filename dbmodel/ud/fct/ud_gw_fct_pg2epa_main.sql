@@ -14,14 +14,13 @@ RETURNS json AS
 $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"0"}}$$) -- FULL PROCESS
-
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"1"}}$$) -- STRUCTURE DATA (GRAPH AND BOUNDARY)
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"2"}}$$) -- ANALYZE GRAPH
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"3"}}$$) -- CREATE JSON
-
-SELECT "SCHEMA_NAME".gw_fct_pg2epa_fill_data ('r1');
-
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true", "step":"1"}}$$); -- PRE-PROCESS
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"2"}}$$); -- AUTOREPAIR
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"3"}}$$); -- CHECK DATA
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"4"}}$$); -- STRUCTURE DATA
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"5"}}$$); -- CHECK GRAPH
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"6"}}$$); -- BUILD INP 
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"7"}}$$); -- POST-PROCESS
 
 -- fid: 227
 
@@ -56,11 +55,10 @@ BEGIN
 	-- get input data
 	v_result =  (p_data->>'data')::json->>'resultId';
 	v_dumpsubcatch =  (p_data->>'data')::json->>'dumpSubcatch';
-	v_step = (p_data->>'data')::json->>'step';
-	IF v_step IS NULL THEN v_step = 0; END IF;
-		
+	v_step = (p_data->>'data')::json->>'step';		
 	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "dumpSubcatch":"',v_dumpsubcatch,'", "fid":227}}}')::json;
 	
+		
 	-- get user parameters
 	v_advancedsettings = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_advancedsettings' AND cur_user=current_user)::boolean;
 	v_vdefault = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
@@ -69,144 +67,244 @@ BEGIN
 		v_expl = (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
 	END IF;
 	
-	IF v_step=3 THEN
 
-		PERFORM gw_fct_pg2epa_dscenario(v_result);
-		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
-		SELECT gw_fct_pg2epa_export_inp(p_data) INTO v_file;
-		v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
-		v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
-		v_return = replace(v_return::text, '"message":{"level":1, "text":"Data quality analysis done succesfully"}', 
-		'"message":{"level":1, "text":"Step-3: Creation of json for export done succesfully"}')::json;
-		RETURN v_return;
-		
-	ELSIF v_step=2 THEN
+	-- step 1: pre-process
+	IF v_step = 1 THEN
 	
-		PERFORM gw_fct_pg2epa_check_network(v_input);	
-		v_return = '{"message":{"level":1, "text":"Step-2: Gragf analytics done succesfully"}}'::json;
-		RETURN v_return;
+		-- check consistency for user options 
+		SELECT gw_fct_pg2epa_check_options(v_input) INTO v_return;
+		IF v_return->>'status' = 'Failed' THEN
+			RETURN v_return;
+		END IF;
 		
-	END IF;
+		-- force sector =0 disabled
+		DELETE FROM selector_sector  WHERE sector_id = 0 and cur_user = current_user;
+			
+		-- check sector selector
+		SELECT count(*) INTO v_count FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
+		IF v_count = 0 THEN
+			RETURN ('{"status":"Failed","message":{"level":1, "text":"There is no sector selected. Please select at least one"}}')::json;
+		END IF;
+					
+		-- force only state 1 selector
+		DELETE FROM selector_state WHERE cur_user=current_user;
+		INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
+		
+		-- create temp tables
+		CREATE TABLE temp_arc_flowregulator	(
+		  arc_id character varying(18) NOT NULL,
+		  type character varying(18),
+		  weir_type character varying(18),
+		  offsetval numeric(12,4),
+		  cd numeric(12,4),
+		  ec numeric(12,4),
+		  cd2 numeric(12,4),
+		  flap character varying(3),
+		  geom1 numeric(12,4),
+		  geom2 numeric(12,4) DEFAULT 0.00,
+		  geom3 numeric(12,4) DEFAULT 0.00,
+		  geom4 numeric(12,4) DEFAULT 0.00,
+		  surcharge character varying(3),
+		  road_width double precision,
+		  road_surf character varying(16),
+		  coef_curve double precision,
+		  curve_id character varying(16),
+		  status character varying(3),
+		  startup numeric(12,4),
+		  shutoff numeric(12,4),
+		  ori_type character varying(18),
+		  orate numeric(12,4),
+		  shape character varying(18),
+		  close_time integer DEFAULT 0,
+		  outlet_type character varying(16),
+		  cd1 numeric(12,4),
+		  CONSTRAINT temp_arc_flowregulator_pkey PRIMARY KEY (arc_id));
+		
+		CREATE TABLE temp_lid_usage(
+		  subc_id character varying(16) NOT NULL,
+		  lidco_id character varying(16) NOT NULL,
+		  numelem smallint,
+		  area numeric(16,6),
+		  width numeric(12,4),
+		  initsat numeric(12,4),
+		  fromimp numeric(12,4),
+		  toperv smallint,
+		  rptfile character varying(10),
+		  CONSTRAINT temp_lid_usage_pkey PRIMARY KEY (subc_id, lidco_id));
+		
+				
+		CREATE TABLE temp_node_other(
+		  id serial NOT NULL,
+		  node_id character varying(16),
+		  type character varying(16),
+		  poll_id character varying(16),
+		  timser_id character varying(16),
+		  other character varying(30),
+		  mfactor numeric(12,4),
+		  sfactor numeric(12,4),
+		  base numeric(12,4),
+		  pattern_id character varying(16),
+		  CONSTRAINT temp_node_other_pkey PRIMARY KEY (id),
+		  CONSTRAINT temp_node_other_unique UNIQUE (node_id, type));
+		
+		
+		CREATE TEMP TABLE temp_t_csv (LIKE temp_csv INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_table (LIKE temp_table INCLUDING ALL);
+		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+		CREATE TEMP TABLE temp_audit_log_data (LIKE SCHEMA_NAME.audit_log_data INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_table (LIKE SCHEMA_NAME.temp_table INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_gully (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
 
-	-- check sector selector
-	SELECT count(*) INTO v_count FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
-	IF v_count = 0 THEN
-		RETURN ('{"status":"Failed","message":{"level":1, "text":"There is no sector selected. Please select at least one"}}')::json;
-	END IF;
+		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_gully (LIKE SCHEMA_NAME.anl_gully INCLUDING ALL);
+		CREATE TEMP TABLE temp_rpt_inp_raingage (LIKE SCHEMA_NAME.rpt_inp_raingage INCLUDING ALL);
 
-	-- delete used tables
-	DELETE FROM audit_check_data WHERE fid = 227 AND cur_user=current_user;
-	DELETE FROM audit_log_data WHERE fid = 227 AND cur_user=current_user;
-	DELETE FROM temp_table;
-
-	-- force only state 1 selector
-	DELETE FROM selector_state WHERE cur_user=current_user;
-	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
-	
-	-- force only sector =0 disabled
-	IF (SELECT count(*) FROM selector_sector WHERE sector_id = 0 and cur_user = current_user ) = 1 THEN
-		v_sector_0 = true;
-	END IF;
-	DELETE FROM selector_sector  WHERE sector_id = 0 and cur_user = current_user;
-
-	-- setting variables
-	v_inpoptions = (SELECT (replace (replace (replace (array_to_json(array_agg(json_build_object((t.parameter),(t.value))))::text,'},{', ' , '),'[',''),']',''))::json 
+		CREATE TEMP TABLE temp_t_go2epa (LIKE SCHEMA_NAME.temp_go2epa INCLUDING ALL);
+		
+		
+		-- setting selectors
+		v_inpoptions = (SELECT (replace (replace (replace (array_to_json(array_agg(json_build_object((t.parameter),(t.value))))::text,'},{', ' , '),'[',''),']',''))::json 
 				FROM (SELECT parameter, value FROM config_param_user 
 				JOIN sys_param_user a ON a.id=parameter	WHERE cur_user=current_user AND formname='epaoptions')t);
 
-	-- check consistency for user options 
-	SELECT gw_fct_pg2epa_check_options(v_input) INTO v_return;
-	IF v_return->>'status' = 'Failed' THEN
+		-- setting selectors
+		DELETE FROM rpt_cat_result WHERE result_id=v_result;
+		INSERT INTO rpt_cat_result (result_id, inp_options, status, expl_id) VALUES (v_result, v_inpoptions, 1, v_expl);
+		DELETE FROM selector_inp_result WHERE cur_user=current_user;
+		INSERT INTO selector_inp_result (result_id, cur_user) VALUES (v_result, current_user);
+
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 1/7 - Preprocess workflow...... done succesfully"}}'::json;
 		RETURN v_return;
-	END IF;
 
-	RAISE NOTICE '1 - Upsert on rpt_cat_table and set selectors';
-	DELETE FROM rpt_cat_result WHERE result_id=v_result;
-	INSERT INTO rpt_cat_result (result_id, inp_options, status, expl_id) VALUES (v_result, v_inpoptions, 1, v_expl);
-	DELETE FROM selector_inp_result WHERE cur_user=current_user;
-	INSERT INTO selector_inp_result (result_id, cur_user) VALUES (v_result, current_user);
+	ELSIF v_step = 2 THEN 
 
-	-- repair inp tables
-	IF v_autorepair IS NOT FALSE THEN
 		PERFORM gw_fct_pg2epa_autorepair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
-	END IF;
-	
-	RAISE NOTICE '2 - check system data';
-	PERFORM gw_fct_pg2epa_check_data(v_input);
-	
-	RAISE NOTICE '3 - Fill temp tables';
-	PERFORM gw_fct_pg2epa_fill_data(v_result);
-	
-	RAISE NOTICE '4 - Manage varcs';
-	PERFORM gw_fct_pg2epa_manage_varc(v_result);
-	
-	RAISE NOTICE '5 - Call nod2arc function';
-	PERFORM gw_fct_pg2epa_nod2arc(v_result);
-	
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 2/7 - Autorepair epa_type...... done succesfully"}}'::json;
+		RETURN v_return;
 
-	RAISE NOTICE '7 - Dump subcatchments';
-	IF v_dumpsubcatch THEN
-		PERFORM gw_fct_pg2epa_dump_subcatch(p_data);
-	END IF;
-
-	RAISE NOTICE '8 - Set default values';
-	IF v_vdefault THEN
-		PERFORM gw_fct_pg2epa_vdefault(v_input);
-	END IF;
-
-	IF v_step = 0 THEN
+	-- step 3: check data
+	ELSIF v_step = 3 THEN 
+		
+		PERFORM gw_fct_pg2epa_check_data(v_input);
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 3/7 - Check according EPA rules...... done succesfully"}}'::json;
+		RETURN v_return;
+		
+	-- step 4: structure data
+	ELSIF v_step = 4 THEN 
 	
-		RAISE NOTICE '9 - dscenario';
+		RAISE NOTICE '4.1 - Fill temp tables';
+		PERFORM gw_fct_pg2epa_fill_data(v_result);
+		
+		RAISE NOTICE '4.2 - Manage varcs';
+		PERFORM gw_fct_pg2epa_manage_varc(v_result);
+		
+		RAISE NOTICE '4.3 - Call nod2arc function';
+		PERFORM gw_fct_pg2epa_nod2arc(v_result);
+		
+		RAISE NOTICE '4.4 - Dump subcatchments';
+		IF v_dumpsubcatch THEN
+			PERFORM gw_fct_pg2epa_dump_subcatch(p_data);
+		END IF;
+
+		RAISE NOTICE '4.5 - Set default values';
+		IF v_vdefault THEN
+			PERFORM gw_fct_pg2epa_vdefault(v_input);
+		END IF;
+
+		RAISE NOTICE '4.6 - dscenario';
 		PERFORM gw_fct_pg2epa_dscenario(v_result);
 		
-		RAISE NOTICE '10 - Advanced settings';
+		RAISE NOTICE '4.7 - Advanced settings';
 		IF v_advancedsettings THEN
 			PERFORM gw_fct_pg2epa_advancedsettings(v_result);
 		END IF;
 		
-		RAISE NOTICE '11 - Check result network';
-		PERFORM gw_fct_pg2epa_check_network(v_input);
-
-		RAISE NOTICE '12 - check result previous exportation';
-		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return;
+		RAISE NOTICE '4.8 - Update values for temp table';
+		UPDATE temp_t_arc SET result_id  = v_result;
+		UPDATE temp_t_node SET result_id  = v_result;
 		
-	END IF;
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 4/7 - Structure data...... done succesfully"}}'::json;
+		RETURN v_return;
+		
+		
+	-- step 5: analyze graph
+	ELSIF v_step=5 THEN
+		
+		PERFORM gw_fct_pg2epa_check_network(v_input);		
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 5/7 - Graph analysis...... done succesfully"}}'::json;
+		RETURN v_return;
 
-	RAISE NOTICE '13 - Move from temp tables to rpt_inp tables';
-	UPDATE temp_arc SET result_id  = v_result;
-	UPDATE temp_node SET result_id  = v_result;
-	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, 
-	length, n, the_geom, expl_id, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage)
-	SELECT
-	result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation,
-	length, n, the_geom, expl_id, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage 
-	FROM temp_arc;
-	
-	INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id,
-	epa_type, sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node)
-	SELECT result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type,
-	sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node
-	FROM temp_node;
-	
-	-- recover sector 0 (if exists previously)
-	IF v_sector_0 = true THEN
-		INSERT INTO selector_sector VALUES (0,current_user);
-	END IF;
-	
-	RAISE NOTICE '14 - Manage return';
-	IF v_step=1 THEN
-	
-		v_return = '{"message":{"level":1, "text":"Step-1: Structure data, graph and boundary conditions of inp created succesfully"}}'::json;
-		RETURN v_return;	
+	-- step 6: create json return
+	ELSIF v_step=6 THEN
 
-	ELSIF v_step=0 THEN
-	
+		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return;
 		SELECT gw_fct_pg2epa_export_inp(p_data) INTO v_file;
 		v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
 		v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
-		v_return = replace(v_return::text, '"message":{"level":1, "text":"Data quality analysis done succesfully"}', '"message":{"level":1, "text":"Inp export done succesfully"}')::json;
+		v_return = replace(v_return::text, '"message":{"level":1, "text":"Data quality analysis done succesfully"}', 
+		'"message":{"level":1, "text":"Export INP file 6/7 - Writing the INP file...... done succesfully"}')::json;
+
+		RETURN v_return;	
+	
+	-- step 7: post-proces
+	ELSIF v_step=7 THEN
+	
+		-- move nodes data
+		INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
+		the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition,dma_id, presszone_id, dqa_id, minsector_id)
+		SELECT result_id, node_id, elevation, case when elev is null then elevation else elev end, node_type, nodecat_id, epa_type, sector_id, state, 
+		state_type, annotation, demand, the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition,dma_id, presszone_id, dqa_id, minsector_id
+		FROM temp_t_node;
+		
+		-- move arcs data
+		INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, 
+		length, n, the_geom, expl_id, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage)
+		SELECT
+		result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation,
+		length, n, the_geom, expl_id, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage 
+		FROM temp_t_arc;
+
+		-- move nodes data
+		INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id,
+		epa_type, sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node)
+		SELECT result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type,
+		sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node
+		FROM temp_t_node;
+	
+	
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 7/7 - Postprocess workflow...... done succesfully"}}'::json;
 		RETURN v_return;
 		
+		-- drop temp tables
+		DROP TABLE IF EXISTS temp_arc_flowregulator;
+		DROP TABLE IF EXISTS temp_lid_usage;
+		DROP TABLE IF EXISTS temp_node_other;
+
+		DROP TABLE IF EXISTS temp_t_csv;	
+		DROP TABLE IF EXISTS temp_t_table;	
+		DROP TABLE IF EXISTS temp_audit_check_data;
+		DROP TABLE IF EXISTS temp_audit_log_data;
+		DROP TABLE IF EXISTS temp_t_table;
+		DROP TABLE IF EXISTS temp_t_node;
+		DROP TABLE IF EXISTS temp_t_arc;
+		DROP TABLE IF EXISTS temp_anl_gully;
+		DROP TABLE IF EXISTS temp_t_anlgraph;
+
+		DROP TABLE IF EXISTS temp_anl_arc;
+		DROP TABLE IF EXISTS temp_anl_node;		
+		DROP TABLE IF EXISTS temp_anl_gully;
+		DROP TABLE IF EXISTS temp_rpt_inp_raingage;
+		
+		DROP TABLE IF EXISTS temp_t_go2epa;
+		
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 7/7 - Postprocess workflow...... done succesfully"}}'::json;
+		RETURN v_return;
+
 	END IF;
 
 	--  Exception handling

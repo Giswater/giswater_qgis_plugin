@@ -148,3 +148,8 @@ DELETE FROM sys_table WHERE id='config_visit_class_x_feature';
 UPDATE sys_function set 
 descript = 'Massive repair function. All the arcs that are not connected with extremal node will be reconected using the parameter arc_searchnodes.
 Function works only for operative features (state=1).' where function_name = 'gw_fct_arc_repair';
+
+
+DELETE FROM config_toolbox WHERE id IN (2848); 
+
+UPDATE config_fprocess SET tablename = replace(tablename, 'vi_', 'vi_t_') WHERE fid  =141;

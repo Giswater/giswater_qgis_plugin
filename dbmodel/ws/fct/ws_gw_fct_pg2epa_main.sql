@@ -68,15 +68,23 @@ BEGIN
 	v_step = (p_data->>'data')::json->>'step';  -- use network previously defined
 	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "fid":227}}}')::json;
 		
-	-- step 0 : preprocess
+	-- step 1: preprocess
 	IF v_step = 1 THEN
+	
+		-- force sector =0 disabled
+		DELETE FROM selector_sector  WHERE sector_id = 0 and cur_user = current_user;
 
 		-- check sector selector
 		SELECT count(*) INTO v_count FROM selector_sector WHERE cur_user = current_user;
 		IF v_count = 0 THEN
 			RETURN ('{"status":"Failed","message":{"level":1, "text":"There is no sector selected. Please select at least one"}}')::json;
 		END IF;		
-
+		
+		-- force only state 1 selector
+		DELETE FROM selector_state WHERE cur_user=current_user;
+		INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
+		
+		
 		-- create temp tables
 		CREATE TEMP TABLE temp_vnode(
 		  id serial NOT NULL,
@@ -160,14 +168,14 @@ BEGIN
 		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 1/7 - Preprocess workflow...... done succesfully"}}'::json;
 		RETURN v_return;
 
-	-- step 1 : autorepair epa-type
+	-- step 2: autorepair epa-type
 	ELSIF v_step = 2 THEN 
 
 		PERFORM gw_fct_pg2epa_autorepair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
 		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 2/7 - Autorepair epa_type...... done succesfully"}}'::json;
 		RETURN v_return;
 
-	-- step 2: check data
+	-- step 3: check data
 	ELSIF v_step = 3 THEN 
 
 		PERFORM gw_fct_pg2epa_check_data(v_input);
@@ -305,7 +313,7 @@ BEGIN
 			UPDATE temp_t_node n SET pattern_id  = ';VNODE BRKPIPE' , demand = 0 FROM temp_table t WHERE n.node_id = concat('VN',t.id);				
 		END IF;		
 
-		RAISE NOTICE '4.14 - Move from temp tables to rpt_inp tables';
+		RAISE NOTICE '4.14 - Update values for temp table';
 		UPDATE temp_t_arc SET result_id  = v_result;
 		UPDATE temp_t_node SET result_id  = v_result;
 		
@@ -375,20 +383,22 @@ BEGIN
 		DROP TABLE IF EXISTS temp_vnode;
 		DROP TABLE IF EXISTS temp_link;
 		DROP TABLE IF EXISTS temp_link_x_arc;
+		
+		DROP TABLE IF EXISTS temp_t_csv;
 		DROP TABLE IF EXISTS temp_audit_check_data;
 		DROP TABLE IF EXISTS temp_audit_log_data;
 		DROP TABLE IF EXISTS temp_t_table;
 		DROP TABLE IF EXISTS temp_t_node;
 		DROP TABLE IF EXISTS temp_t_arc;
 		DROP TABLE IF EXISTS temp_t_demand;
+		DROP TABLE IF EXISTS temp_t_anlgraph;
+		
 		DROP TABLE IF EXISTS temp_anl_arc;
 		DROP TABLE IF EXISTS temp_anl_node;
 		DROP TABLE IF EXISTS temp_anl_connec;
+		
 		DROP TABLE IF EXISTS temp_rpt_inp_pattern_value;
 		DROP TABLE IF EXISTS temp_t_go2epa;
-		DROP TABLE IF EXISTS temp_t_anlgraph;
-		DROP TABLE IF EXISTS temp_t_csv;
-
 
 		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 7/7 - Postprocess workflow...... done succesfully"}}'::json;
 		RETURN v_return;

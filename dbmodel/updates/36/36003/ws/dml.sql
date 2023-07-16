@@ -23,6 +23,3 @@ UPDATE config_toolbox SET inputparams =
 "comboIds":[0,1,2,3], "comboNames":["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "PLOT & PIPE BUFFER"], "selectedId":"2"}, 
 {"widgetname":"geomParamUpdate", "label":"Update parameter:","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layoutorder":10, "isMandatory":false, "placeholder":"5-30", "value":""}]'
 WHERE id = 2706;
-
-
-UPDATE config_fprocess SET tablename = replace(tablename, 'vi_', 'vi_t_') WHERE fid  =141;
