@@ -39,3 +39,6 @@ UPDATE config_typevalue SET camelstyle=null WHERE typevalue='sys_table_context';
 INSERT INTO inp_typevalue VALUES ('inp_result_status', 0 , 'DEPRECATED') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO inp_typevalue VALUES ('inp_result_status', 1 , 'PARTIAL') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO inp_typevalue VALUES ('inp_result_status', 2 , 'COMPLETED') ON CONFLICT (typevalue, id) DO NOTHING;
+
+UPDATE config_form_fields SET widgetcontrols='{"setMultiline": false, "valueRelation":{"nullValue":true, "layer": "v_edit_inp_pattern", "activated": true, "keyColumn": "pattern_id", "valueColumn": "pattern_id", "filterExpression": null}}'
+WHERE formname='v_edit_dma' AND columnname='pattern_id';
