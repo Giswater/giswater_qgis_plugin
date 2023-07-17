@@ -108,8 +108,8 @@ BEGIN
 		  dma_id integer,
 		  exit_topelev double precision,
 		  exit_elev double precision,
-		  the_geom geometry(LineString,SCHEMA_NAME),
-		  the_geom_endpoint geometry(Point,SCHEMA_NAME),
+		  the_geom geometry(LineString,SRID_VALUE),
+		  the_geom_endpoint geometry(Point,SRID_VALUE),
 		  flag boolean,
 		  CONSTRAINT temp_link_pkey PRIMARY KEY (link_id));
 		
@@ -128,7 +128,7 @@ BEGIN
 		  exit_elev numeric(12,3),
 		  CONSTRAINT temp_link_x_arc_pkey PRIMARY KEY (link_id));
 
-		CREATE TEMP TABLE temp_t_csv (LIKE temp_csv INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_csv (LIKE SCHEMA_NAME.temp_csv INCLUDING ALL);
 		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 		CREATE TEMP TABLE temp_audit_log_data (LIKE SCHEMA_NAME.audit_log_data INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_table (LIKE SCHEMA_NAME.temp_table INCLUDING ALL);
