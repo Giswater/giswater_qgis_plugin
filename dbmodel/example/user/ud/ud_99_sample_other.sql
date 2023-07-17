@@ -232,7 +232,19 @@ SELECT sector_id, current_user FROM sector
 ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
 SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$);
+"data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true","step":"1"}}$$);
+SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
+"data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true","step":"2"}}$$);
+SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
+"data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true","step":"3"}}$$);
+SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
+"data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true","step":"4"}}$$);
+SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
+"data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true","step":"5"}}$$);
+SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
+"data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true","step":"6"}}$$);
+SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
+"data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true","step":"7"}}$$);
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'audit_project_user_control';
 
