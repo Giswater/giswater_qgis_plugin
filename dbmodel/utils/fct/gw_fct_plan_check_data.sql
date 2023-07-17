@@ -15,10 +15,10 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_plan_check_data($${}$$)
 
-SELECT * FROM anl_arc WHERE fid=115 AND cur_user=current_user;
-SELECT * FROM anl_node WHERE fid=115 AND cur_user=current_user;
+SELECT * FROM anl_arc WHERE fid=v_fid AND cur_user=current_user;
+SELECT * FROM anl_node WHERE fid=v_fid AND cur_user=current_user;
 
--- fid: 115, 252,354,355,452, 467
+-- fid: v_fid, 252,354,355,452, 467
 
 */
 
@@ -41,6 +41,7 @@ v_error_context text;
 v_query text;
 v_comment text;
 v_querytext text;
+v_fid integer;
 
 BEGIN 
 
@@ -52,13 +53,13 @@ BEGIN
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- getting input data 	
-	
-	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fid=115 AND cur_user=current_user;
-	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (252);
-	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (252,452);
-	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (252, 354, 355,467);
+	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid'::text;
 
+
+	-- init variables
+	IF v_fid is null THEN
+		v_fid = 115;
+	END IF;
 
 	--create temp tables
 	CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
@@ -67,17 +68,17 @@ BEGIN
 	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 
 	-- Starting process
-	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (115, 4, concat('DATA QUALITY ANALYSIS ACORDING PLAN-PRICE RULES'));
-	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (115, 4, '-------------------------------------------------------------');
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('DATA QUALITY ANALYSIS ACORDING PLAN-PRICE RULES'));
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '-------------------------------------------------------------');
 
-	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (115, 3, 'CRITICAL ERRORS');
-	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (115, 3, '----------------------');
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, 'CRITICAL ERRORS');
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '----------------------');
 
-	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (115, 2, 'WARNINGS');
-	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (115, 2, '--------------');
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, 'WARNINGS');
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, '--------------');
 
-	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (115, 1, 'INFO');
-	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (115, 1, '-------');
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, 'INFO');
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, '-------');
 
 	--arc catalog
 	SELECT count(*) INTO v_table_count FROM cat_arc WHERE active=TRUE;
@@ -86,43 +87,43 @@ BEGIN
 	SELECT count(*) INTO v_count FROM cat_arc WHERE active IS NULL;
 	IF v_count>0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled, error_message, fcount)
-		VALUES (115, '323', 'cat_arc', 'active', 3, FALSE, concat('ERROR-323: There are ',v_count,' row(s) without values on cat_arc.active column.'), v_count);
+		VALUES (v_fid, '323', 'cat_arc', 'active', 3, FALSE, concat('ERROR-323: There are ',v_count,' row(s) without values on cat_arc.active column.'), v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '323', 1,'INFO: There is/are no row(s) without values on cat_arc.active column.',v_count);
+		VALUES (v_fid, '323', 1,'INFO: There is/are no row(s) without values on cat_arc.active column.',v_count);
 	END IF;
 
 	--check cat_arc cost column (324)
 	SELECT count(*) INTO v_count FROM cat_arc WHERE cost IS NOT NULL and active=TRUE;
 	IF v_table_count>v_count THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '324', 'cat_arc', 'cost', 2, FALSE, concat('WARNING-324: There are ',(v_table_count-v_count),' row(s) without values on cat_arc.cost column.'), (v_table_count-v_count));
+		VALUES (v_fid, '324', 'cat_arc', 'cost', 2, FALSE, concat('WARNING-324: There are ',(v_table_count-v_count),' row(s) without values on cat_arc.cost column.'), (v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '324', 1,'INFO: There is/are no row(s) without values on cat_arc.cost column.', v_count);
+		VALUES (v_fid, '324', 1,'INFO: There is/are no row(s) without values on cat_arc.cost column.', v_count);
 	END IF;
 
 	--check cat_arc m2bottom_cost column (325)
 	SELECT count(*) INTO v_count FROM cat_arc WHERE m2bottom_cost IS NOT NULL and active=TRUE;
 	IF v_table_count>v_count THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '325', 'cat_arc', 'm2bottom_cost', 2, FALSE, concat('WARNING-325: There are ',(v_table_count-v_count),' row(s) without values on cat_arc.m2bottom_cost column.'),(v_table_count-v_count));
+		VALUES (v_fid, '325', 'cat_arc', 'm2bottom_cost', 2, FALSE, concat('WARNING-325: There are ',(v_table_count-v_count),' row(s) without values on cat_arc.m2bottom_cost column.'),(v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '325', 1,'INFO: There is/are no row(s) without values on cat_arc.m2bottom_cost column.',v_count);
+		VALUES (v_fid, '325', 1,'INFO: There is/are no row(s) without values on cat_arc.m2bottom_cost column.',v_count);
 	END IF;
 
 	--check cat_arc m3protec_cost column (326)
 	SELECT count(*) INTO v_count FROM cat_arc WHERE m3protec_cost IS NOT NULL and active=TRUE;
 	IF v_table_count>v_count THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '326', 'cat_arc', 'm3protec_cost', 2, FALSE, concat('WARNING-326: There are ',(v_table_count-v_count),' row(s) without values on cat_arc.m3protec_cost column.'), (v_table_count-v_count));
+		VALUES (v_fid, '326', 'cat_arc', 'm3protec_cost', 2, FALSE, concat('WARNING-326: There are ',(v_table_count-v_count),' row(s) without values on cat_arc.m3protec_cost column.'), (v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '326', 1,'INFO: There is/are no row(s) without values on cat_arc.m3protec_cost column.',v_count);
+		VALUES (v_fid, '326', 1,'INFO: There is/are no row(s) without values on cat_arc.m3protec_cost column.',v_count);
 	END IF;
 
 
@@ -130,11 +131,11 @@ BEGIN
 	SELECT count(*) INTO v_count FROM cat_arc WHERE estimated_depth IS NOT NULL and active=TRUE;
 	IF v_table_count>v_count THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '437', 'cat_arc', 'estimated_depth', 2, FALSE, concat('WARNING-437: There are ',(v_table_count-v_count),' row(s) without values on cat_arc.estimated_depth column.'), (v_table_count-v_count));
+		VALUES (v_fid, '437', 'cat_arc', 'estimated_depth', 2, FALSE, concat('WARNING-437: There are ',(v_table_count-v_count),' row(s) without values on cat_arc.estimated_depth column.'), (v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '437', 1,'INFO: There is/are no row(s) without values on cat_arc.estimated_depth column.',v_count);
+		VALUES (v_fid, '437', 1,'INFO: There is/are no row(s) without values on cat_arc.estimated_depth column.',v_count);
 	END IF;
 
 	
@@ -145,33 +146,33 @@ BEGIN
 	SELECT count(*) INTO v_count FROM cat_node WHERE active IS NULL;
 	IF v_count>0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '327', 'cat_node', 'active', 3, FALSE, concat('ERROR-327: There are ',v_count,' row(s) without values on cat_node.active column.'), v_count);
+		VALUES (v_fid, '327', 'cat_node', 'active', 3, FALSE, concat('ERROR-327: There are ',v_count,' row(s) without values on cat_node.active column.'), v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '327', 1,'INFO: There is/are no row(s) without values on cat_node.active column.',v_count);
+		VALUES (v_fid, '327', 1,'INFO: There is/are no row(s) without values on cat_node.active column.',v_count);
 	END IF;
 
 	--check cat_node cost column (328)
 	SELECT count(*) INTO v_count FROM cat_node WHERE cost IS NOT NULL and active=TRUE;
 	IF v_table_count>v_count THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '328', 'cat_node', 'cost', 2, FALSE, concat('WARNING-328: There are ',(v_table_count-v_count),' row(s) without values on cat_node.cost column.'), (v_table_count-v_count));
+		VALUES (v_fid, '328', 'cat_node', 'cost', 2, FALSE, concat('WARNING-328: There are ',(v_table_count-v_count),' row(s) without values on cat_node.cost column.'), (v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '328', 1,'INFO: There is/are no row(s) row(s) without values on cat_node.cost column.',v_count);
+		VALUES (v_fid, '328', 1,'INFO: There is/are no row(s) row(s) without values on cat_node.cost column.',v_count);
 	END IF;
 
 	--check cat_node cost_unit column (329)
 	SELECT count(*) INTO v_count FROM cat_node WHERE cost_unit IS NOT NULL and active=TRUE;
 	IF v_table_count>v_count THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '329', 'cat_node', 'cost_unit', 2, FALSE, concat('WARNING-329: There are ',(v_table_count-v_count),' row(s) without values on cat_node.cost_unit column.'), (v_table_count-v_count));
+		VALUES (v_fid, '329', 'cat_node', 'cost_unit', 2, FALSE, concat('WARNING-329: There are ',(v_table_count-v_count),' row(s) without values on cat_node.cost_unit column.'), (v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '329', 1,'INFO: There is/are no row(s) without values on cat_node.cost_unit column.',v_count);
+		VALUES (v_fid, '329', 1,'INFO: There is/are no row(s) without values on cat_node.cost_unit column.',v_count);
 	END IF;
 	
 	
@@ -181,11 +182,11 @@ BEGIN
 		SELECT count(*) INTO v_count FROM cat_node WHERE estimated_depth IS NOT NULL and active=TRUE;
 		IF v_table_count>v_count THEN
 			INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-			VALUES (115, '330', 'cat_node', 'estimated_depth', 2, FALSE, concat('WARNING-330: There are ',(v_table_count-v_count),' row(s) without values on cat_node.estimated_depth column.'), (v_table_count-v_count));
+			VALUES (v_fid, '330', 'cat_node', 'estimated_depth', 2, FALSE, concat('WARNING-330: There are ',(v_table_count-v_count),' row(s) without values on cat_node.estimated_depth column.'), (v_table_count-v_count));
 		ELSE
 			v_count = 0;
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (115, '330', 1,'INFO: There is/are no row(s) without values on cat_node.estimated_depth column.',v_count);
+			VALUES (v_fid, '330', 1,'INFO: There is/are no row(s) without values on cat_node.estimated_depth column.',v_count);
 		END IF;
 
 	ELSIF v_project_type='UD' THEN 
@@ -194,11 +195,11 @@ BEGIN
 		SELECT count(*) INTO v_count FROM cat_node WHERE estimated_y IS NOT NULL and active=TRUE;
 		IF v_table_count>v_count THEN
 			INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-			VALUES (115, '331', 'cat_node', 'estimated_y', 2, FALSE, concat('WARNING-331: There are ',(v_table_count-v_count),' row(s) without values on cat_node.estimated_y column.'), (v_table_count-v_count));
+			VALUES (v_fid, '331', 'cat_node', 'estimated_y', 2, FALSE, concat('WARNING-331: There are ',(v_table_count-v_count),' row(s) without values on cat_node.estimated_y column.'), (v_table_count-v_count));
 		ELSE
 			v_count = 0;
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (115, '331', 1,'INFO: There is/are no row(s) without values on cat_node.estimated_y column.',v_count);
+			VALUES (v_fid, '331', 1,'INFO: There is/are no row(s) without values on cat_node.estimated_y column.',v_count);
 		END IF;
 	END IF;
 
@@ -210,11 +211,11 @@ BEGIN
 	SELECT count(*) INTO v_count FROM cat_connec WHERE active IS NULL;
 	IF v_count>0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '332', 'cat_connec', 'active', 3, FALSE, concat('ERROR-332: There are ',v_count,' row(s) without values on cat_connec.active column.'), v_count);
+		VALUES (v_fid, '332', 'cat_connec', 'active', 3, FALSE, concat('ERROR-332: There are ',v_count,' row(s) without values on cat_connec.active column.'), v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '332', 1,'INFO: There is/are no row(s) without values on cat_connec.active column column.',v_count);
+		VALUES (v_fid, '332', 1,'INFO: There is/are no row(s) without values on cat_connec.active column column.',v_count);
 	END IF;
 
 	--pavement catalog
@@ -224,22 +225,22 @@ BEGIN
 	SELECT count(*) INTO v_count FROM cat_pavement WHERE thickness IS NOT NULL;
 	IF v_table_count>v_count THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '336', 'cat_pavement', 'thickness', 2, FALSE, concat('WARNING-336: There are ',(v_table_count-v_count),' row(s) without values on cat_pavement.thickness column.'), (v_table_count-v_count));
+		VALUES (v_fid, '336', 'cat_pavement', 'thickness', 2, FALSE, concat('WARNING-336: There are ',(v_table_count-v_count),' row(s) without values on cat_pavement.thickness column.'), (v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '336', 1,'INFO: There is/are no row(s) without values on cat_pavement.thickness column.',v_count);
+		VALUES (v_fid, '336', 1,'INFO: There is/are no row(s) without values on cat_pavement.thickness column.',v_count);
 	END IF;
 
 	--check cat_pavement m2cost column (337)
 	SELECT count(*) INTO v_count FROM cat_pavement WHERE m2_cost IS NOT NULL;
 	IF v_table_count>v_count THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '337', 'cat_pavement', 'm2_cost', 2, FALSE, concat('WARNING-337: There are ',(v_table_count-v_count),' row(s) without values on cat_pavement.m2_cost column.'), (v_table_count-v_count));
+		VALUES (v_fid, '337', 'cat_pavement', 'm2_cost', 2, FALSE, concat('WARNING-337: There are ',(v_table_count-v_count),' row(s) without values on cat_pavement.m2_cost column.'), (v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '337', 1,'INFO: There is/are no row(s) without values on cat_pavement.m2_cost column.',v_count);
+		VALUES (v_fid, '337', 1,'INFO: There is/are no row(s) without values on cat_pavement.m2_cost column.',v_count);
 	END IF;
 
 	--soil catalog
@@ -249,66 +250,66 @@ BEGIN
 	SELECT count(*) INTO v_count FROM cat_soil WHERE y_param IS NOT NULL;
 	IF v_table_count>v_count THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '338', 'cat_soil', 'y_param', 2, FALSE, concat('WARNING-338: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.y_param column.'), v_count);
+		VALUES (v_fid, '338', 'cat_soil', 'y_param', 2, FALSE, concat('WARNING-338: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.y_param column.'), v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '338', 1,'INFO: There is/are no row(s) without values on cat_soil.y_param column.',v_count);
+		VALUES (v_fid, '338', 1,'INFO: There is/are no row(s) without values on cat_soil.y_param column.',v_count);
 	END IF;
 
 	--check cat_soil b column (339)
 	SELECT count(*) INTO v_count FROM cat_soil WHERE b IS NOT NULL;
 	IF v_table_count>v_count THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '339', 'cat_soil', 'b', 2, FALSE, concat('WARNING-339: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.b column.'), v_count);
+		VALUES (v_fid, '339', 'cat_soil', 'b', 2, FALSE, concat('WARNING-339: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.b column.'), v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '339', 1,'INFO: There is/are no row(s) without values on cat_soil.b column.',v_count);
+		VALUES (v_fid, '339', 1,'INFO: There is/are no row(s) without values on cat_soil.b column.',v_count);
 	END IF;
 
 	--check cat_soil m3exc_cost column (340)
 	SELECT count(*) INTO v_count FROM cat_soil WHERE m3exc_cost IS NOT NULL;
 	IF v_table_count>v_count THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '340', 'cat_soil', 'm3exc_cost', 2, FALSE, concat('WARNING-340: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.m3exc_cost column.'), v_count);
+		VALUES (v_fid, '340', 'cat_soil', 'm3exc_cost', 2, FALSE, concat('WARNING-340: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.m3exc_cost column.'), v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '340', 1,'INFO: There is/are no row(s) without values on cat_soil.m3exc_cost column.',v_count);
+		VALUES (v_fid, '340', 1,'INFO: There is/are no row(s) without values on cat_soil.m3exc_cost column.',v_count);
 	END IF;
 
 	--check cat_soil m3fill_cost column (341)
 	SELECT count(*) INTO v_count FROM cat_soil WHERE m3fill_cost IS NOT NULL;
 	IF v_table_count>v_count THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '341', 'cat_soil', 'm3fill_cost', 2, FALSE, concat('WARNING-341: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.m3fill_cost column.'), v_count);
+		VALUES (v_fid, '341', 'cat_soil', 'm3fill_cost', 2, FALSE, concat('WARNING-341: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.m3fill_cost column.'), v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '341', 1,'INFO: There is/are no row(s) without values on cat_soil.m3fill_cost column.',v_count);
+		VALUES (v_fid, '341', 1,'INFO: There is/are no row(s) without values on cat_soil.m3fill_cost column.',v_count);
 	END IF;
 
 	--check cat_soil m3excess_cost column (342)
 	SELECT count(*) INTO v_count FROM cat_soil WHERE m3excess_cost IS NOT NULL;
 	IF v_table_count>v_count THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '342', 'cat_soil', 'm3excess_cost', 2, FALSE, concat('WARNING-342: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.m3excess_cost column.'), v_count);
+		VALUES (v_fid, '342', 'cat_soil', 'm3excess_cost', 2, FALSE, concat('WARNING-342: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.m3excess_cost column.'), v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '342', 1,'INFO: There is/are no row(s) without values on cat_soil.m3excess_cost column.',v_count);
+		VALUES (v_fid, '342', 1,'INFO: There is/are no row(s) without values on cat_soil.m3excess_cost column.',v_count);
 	END IF;
 
 	--check cat_soil m2trenchl_cost column (343)
 	SELECT count(*) INTO v_count FROM cat_soil WHERE m2trenchl_cost IS NOT NULL;
 	IF v_table_count>v_count THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '343', 'cat_soil', 'm2trenchl_cost', 2, FALSE, concat('WARNING-343: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.m2trenchl_cost column.'), v_count);
+		VALUES (v_fid, '343', 'cat_soil', 'm2trenchl_cost', 2, FALSE, concat('WARNING-343: There are ',(v_table_count-v_count),' row(s) without values on cat_soil.m2trenchl_cost column.'), v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '343', 1,'INFO: There is/are no row(s) without values on cat_soil.m2trenchl_cost column.',v_count);
+		VALUES (v_fid, '343', 1,'INFO: There is/are no row(s) without values on cat_soil.m2trenchl_cost column.',v_count);
 	END IF;
 
 	IF v_project_type='UD' THEN
@@ -320,11 +321,11 @@ BEGIN
 		SELECT count(*) INTO v_count FROM cat_grate WHERE active IS NULL;
 		IF v_count>0 THEN
 			INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-			VALUES (115, '344', 'cat_grate', 'active', 3, FALSE, concat('ERROR-344: There are ',v_count,' row(s) without values on cat_grate.active column.'), v_count);
+			VALUES (v_fid, '344', 'cat_grate', 'active', 3, FALSE, concat('ERROR-344: There are ',v_count,' row(s) without values on cat_grate.active column.'), v_count);
 		ELSE
 			v_count = 0;
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (115, '344', 1,'INFO: There is/are no row(s) without values on cat_grate.active column.',v_count);
+			VALUES (v_fid, '344', 1,'INFO: There is/are no row(s) without values on cat_grate.active column.',v_count);
 		END IF;
 	END IF;	
 
@@ -335,11 +336,11 @@ BEGIN
 	SELECT count(*) INTO v_count FROM plan_arc_x_pavement;
 	IF v_table_count>v_count THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '346', 'plan_arc_x_pavement', 'rows number', 1, FALSE, 'INFO: The number of row(s) of the plan_arc_x_pavement table is lower than the arc table.', v_count);
+		VALUES (v_fid, '346', 'plan_arc_x_pavement', 'rows number', 1, FALSE, 'INFO: The number of row(s) of the plan_arc_x_pavement table is lower than the arc table.', v_count);
 	ELSE
 		v_count = 0;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '346', 1,'INFO: The number of row(s) of the plan_arc_x_pavement table is same than the arc table.',v_count);
+		VALUES (v_fid, '346', 1,'INFO: The number of row(s) of the plan_arc_x_pavement table is same than the arc table.',v_count);
 	END IF;
 
 	--check plan_arc_x_pavemen pavcat_id column (347)
@@ -347,11 +348,11 @@ BEGIN
 	SELECT count(*) INTO v_count FROM plan_arc_x_pavement WHERE pavcat_id IS NOT NULL;
 	IF v_table_count>v_count THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-		VALUES (115, '347', 'plan_arc_x_pavement', 'pavcat_id', 2, FALSE, concat('WARNING-347: There are ',(v_table_count-v_count),' row(s) without values on plan_arc_x_pavement.pavcat_id column.'),(v_table_count-v_count));
+		VALUES (v_fid, '347', 'plan_arc_x_pavement', 'pavcat_id', 2, FALSE, concat('WARNING-347: There are ',(v_table_count-v_count),' row(s) without values on plan_arc_x_pavement.pavcat_id column.'),(v_table_count-v_count));
 	ELSE
 		v_count = 0;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '347', 1,'INFO: There is/are no row(s) without values on row(s) without values on plan_arc_x_pavement.pavcat_id column.',v_count);
+		VALUES (v_fid, '347', 1,'INFO: There is/are no row(s) without values on row(s) without values on plan_arc_x_pavement.pavcat_id column.',v_count);
 	END IF;
 
 	--check if features with state = 2 are related to any psector (252)
@@ -381,7 +382,7 @@ BEGIN
 			EXECUTE concat ('INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
 			SELECT 252, b.feature_id, b.catalog, ''Arcs state = 2 without psector'', b.the_geom, 2 FROM (', v_query,')b  WHERE feature = ''ARC''');
 			INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-			VALUES (115, '252', 3, FALSE, concat('ERROR-252 (temp_anl_arc): There are ',v_count,' planified arcs without psector.'),v_count);
+			VALUES (v_fid, '252', 3, FALSE, concat('ERROR-252 (temp_anl_arc): There are ',v_count,' planified arcs without psector.'),v_count);
 		END IF;
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')b WHERE feature = ''NODE'';'
 		INTO v_count; 
@@ -389,24 +390,24 @@ BEGIN
 			EXECUTE concat ('INSERT INTO temp_anl_node (fid, node_id, nodecat_id, descript, the_geom, state)
 			SELECT 252, b.feature_id, b.catalog, ''Nodes state = 2 without psector'', b.the_geom, 2 FROM (', v_query,')b  WHERE feature = ''NODE''');
 			INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message,fcount)
-			VALUES (115, '252', 3, FALSE, concat('ERROR-252 (temp_anl_node): There are ',v_count,' planified nodes without psector.'),v_count);		END IF;
+			VALUES (v_fid, '252', 3, FALSE, concat('ERROR-252 (temp_anl_node): There are ',v_count,' planified nodes without psector.'),v_count);		END IF;
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')b WHERE feature = ''CONNEC'';'
 		INTO v_count; 
 		IF v_count > 0 THEN
 			EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, connecat_id, descript, the_geom,state)
 			SELECT 252, b.feature_id, b.catalog, ''Connecs state = 2 without psector'', b.the_geom,2 FROM (', v_query,')b  WHERE feature = ''CONNEC''');
 			INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message,fcount)
-			VALUES (115, '252', 3, FALSE, concat('ERROR-252 (temp_anl_connec): There are ',v_count,' planified connecs without psector.'),v_count);		END IF;
+			VALUES (v_fid, '252', 3, FALSE, concat('ERROR-252 (temp_anl_connec): There are ',v_count,' planified connecs without psector.'),v_count);		END IF;
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')b WHERE feature = ''GULLY'';'
 		INTO v_count; 
 		IF v_count > 0 THEN
 			EXECUTE concat ('INSERT INTO temp_anl_connec (fid, gully_id, gullycat_id, descript, the_geom, state)
 			SELECT 252, b.feature_id, b.catalog, ''Gullies state = 2 without psector'', b.the_geom, 2 FROM (', v_query,')b  WHERE feature = ''GULLY''');
 			INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-			VALUES (115, '252', 3, FALSE, concat('ERROR-252 (temp_anl_connec): There are ',v_count,' planified gullys without psector.'),v_count);		END IF;
+			VALUES (v_fid, '252', 3, FALSE, concat('ERROR-252 (temp_anl_connec): There are ',v_count,' planified gullys without psector.'),v_count);		END IF;
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '252', 1,'INFO: There are no features with state=2 without psector.',v_count);
+		VALUES (v_fid, '252', 1,'INFO: There are no features with state=2 without psector.',v_count);
 	END IF;
 /*
 	--check if arcs with state = 2 have final nodes state = 2 in the psector (354)
@@ -434,10 +435,10 @@ BEGIN
 		EXECUTE concat ('INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
 		SELECT 354, c.arc_id, c.arccat_id, ''Arcs state = 2 without planned final nodes in psector'', c.the_geom, 2 FROM (', v_query,')c ');
 		INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-		VALUES (115, '354', 3, FALSE, concat('ERROR-354 (temp_anl_arc): There are ',v_count,' planified arcs without final planned nodes defined in psector.'),v_count);
+		VALUES (v_fid, '354', 3, FALSE, concat('ERROR-354 (temp_anl_arc): There are ',v_count,' planified arcs without final planned nodes defined in psector.'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '354', 1,'INFO: There are no arcs with state=2 with planned final nodes not defined psector.',v_count);
+		VALUES (v_fid, '354', 1,'INFO: There are no arcs with state=2 with planned final nodes not defined psector.',v_count);
 	END IF;
 	
 	SELECT pa.arc_id, pa.psector_id , node_1 as node FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
@@ -471,10 +472,10 @@ BEGIN
 		EXECUTE concat ('INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
 		SELECT 355, c.arc_id, c.arccat_id, concat(''Arcs state = 2 final nodes obsolete in psector '',c.psector_id), c.the_geom, 2 FROM (', v_query,')c ');
 		INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-		VALUES (115, '355', 3, FALSE, concat('ERROR-355 (temp_anl_arc): There are ',v_count,' planified arcs with final nodes defined as obsolete in psector.'),v_count);
+		VALUES (v_fid, '355', 3, FALSE, concat('ERROR-355 (temp_anl_arc): There are ',v_count,' planified arcs with final nodes defined as obsolete in psector.'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '355', 1,'INFO: There are no arcs with state=2 with final nodes obsolete in psector.',v_count);
+		VALUES (v_fid, '355', 1,'INFO: There are no arcs with state=2 with final nodes obsolete in psector.',v_count);
 	END IF;
 
 
@@ -488,10 +489,10 @@ BEGIN
 		EXECUTE concat ('INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id)
 			SELECT 452, arc_id, arccat_id, ''node_1 or node_2 nulls'', the_geom, expl_id FROM ', v_querytext);
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (115, 2, '452', concat('WARNING-452 (temp_anl_arc): There is/are ',v_count,' arc''s with state=1 and without node_1 or node_2.'),v_count);
+		VALUES (v_fid, 2, '452', concat('WARNING-452 (temp_anl_arc): There is/are ',v_count,' arc''s with state=1 and without node_1 or node_2.'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id,error_message, fcount)
-		VALUES (115, 1, '452','INFO: No arc''s with state=1 and without node_1 or node_2 nodes found.', v_count);
+		VALUES (v_fid, 1, '452','INFO: No arc''s with state=1 and without node_1 or node_2 nodes found.', v_count);
 	END IF;
 
 	-- Planified umps with more than two arcs (467);
@@ -514,12 +515,12 @@ BEGIN
 		SELECT count(*) FROM temp_anl_node INTO v_count WHERE fid=467 AND cur_user=current_user;
 		IF v_count > 0 THEN
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (115, '467', 3, concat(
+			VALUES (v_fid, '467', 3, concat(
 			'ERROR-467 (temp_anl_node): There is/are ',v_count,' pumps(s) with more than two arcs .Take a look on temporal table to details'),v_count);
 			v_count=0;
 		ELSE
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (115, '467' , 1,  'INFO: EPA pumps checked. No pumps with more than two arcs detected.',v_count);
+			VALUES (v_fid, '467' , 1,  'INFO: EPA pumps checked. No pumps with more than two arcs detected.',v_count);
 		END IF;		
 	END IF;
 
@@ -529,13 +530,13 @@ BEGIN
 
 	IF v_count > 700 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-		VALUES (115, '465', 3, FALSE, concat('ERROR-465: There are ',v_count,' rows on plan_price table. Revise the data and remove unnecessary rows.'),v_count);
+		VALUES (v_fid, '465', 3, FALSE, concat('ERROR-465: There are ',v_count,' rows on plan_price table. Revise the data and remove unnecessary rows.'),v_count);
 	ELSIF v_count > 300 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-		VALUES (115, '465', 2, FALSE, concat('WARNING-465: There are ',v_count,' rows on plan_price table. Revise the data and remove unnecessary rows.'),v_count);
+		VALUES (v_fid, '465', 2, FALSE, concat('WARNING-465: There are ',v_count,' rows on plan_price table. Revise the data and remove unnecessary rows.'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (115, '465', 1,'INFO: The number of rows on plan price is acceptable.',v_count);
+		VALUES (v_fid, '465', 1,'INFO: The number of rows on plan price is acceptable.',v_count);
 	END IF;
 
 
@@ -547,24 +548,40 @@ BEGIN
 		DELETE FROM temp_anl_arc WHERE fid = v_record.fid AND cur_user = current_user;
 		DELETE FROM temp_anl_connec WHERE fid = v_record.fid AND cur_user = current_user;
 
-		DELETE FROM temp_audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user AND fid = 115;		
+		DELETE FROM temp_audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user AND fid = v_fid;		
 	END LOOP;
 
-	-- insert spacers
-	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (115, 4, '');
-	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (115, 3, '');
-	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (115, 2, '');
-	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (115, 1, '');
+		-- insert spacers
+		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '');
+		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '');
+		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, '');
+		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, '');
 
-	INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
-	INSERT INTO anl_node SELECT * FROM temp_anl_node;
-	INSERT INTO anl_connec SELECT * FROM temp_anl_connec;
-	INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
+	IF v_fid = 115 THEN
 
-	DROP TABLE  IF EXISTS temp_anl_arc;
-	DROP TABLE IF EXISTS temp_anl_node ;
-	DROP TABLE IF EXISTS  temp_anl_connec;
-	DROP TABLE  IF EXISTS temp_audit_check_data;
+		-- delete old values on result table
+		DELETE FROM audit_check_data WHERE fid=115 AND cur_user=current_user;
+		DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (252);
+		DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (252,452);
+		DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (252, 354, 355,467);
+
+		INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
+		INSERT INTO anl_node SELECT * FROM temp_anl_node;
+		INSERT INTO anl_connec SELECT * FROM temp_anl_connec;
+		INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
+
+	ELSIF  v_fid = 101 THEN 
+		UPDATE temp_audit_check_data SET fid = 115;
+		UPDATE temp_anl_arc SET fid = 115;
+		UPDATE temp_anl_node SET fid = 115;
+		UPDATE temp_anl_connec SET fid = 115;
+
+		INSERT INTO project_temp_anl_arc SELECT * FROM temp_anl_arc;
+		INSERT INTO project_temp_anl_node SELECT * FROM temp_anl_node;
+		INSERT INTO project_temp_anl_connec SELECT * FROM temp_anl_connec;
+		INSERT INTO project_temp_audit_check_data SELECT * FROM temp_audit_check_data;
+	END IF;
+
 
 	-- get results
 	-- info
@@ -621,6 +638,12 @@ BEGIN
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
+
+	--drop temp tables
+	DROP TABLE  IF EXISTS temp_anl_arc;
+	DROP TABLE IF EXISTS temp_anl_node ;
+	DROP TABLE IF EXISTS  temp_anl_connec;
+	DROP TABLE  IF EXISTS temp_audit_check_data;
 
 		--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":"'||v_version||'"'||

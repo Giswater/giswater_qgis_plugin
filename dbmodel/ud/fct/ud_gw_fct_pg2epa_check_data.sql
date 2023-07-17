@@ -18,10 +18,10 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":127}}}$$)-- when is called from go2epa_main
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"parameters":{}}$$)-- when is called from toolbox or from checkproject
 
--- fid: main: 225,
+-- fid: main: 255,
 	other: 106,107,111,113,164,175,187,188,294,295,379,427,430,440,480
 
-SELECT * FROM audit_check_data WHERE fid = 225
+SELECT * FROM audit_check_data WHERE fid = v_fid
 
 */
 
@@ -61,11 +61,11 @@ BEGIN
 	-- init variables
 	v_count=0;
 	IF v_fid is null THEN
-		v_fid = 225;
+		v_fid = 255;
 	END IF;	
 
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fid=225 AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fid=255 AND cur_user=current_user;
 	DELETE FROM anl_arc WHERE fid IN (284, 295, 427) AND cur_user=current_user;
 	DELETE FROM anl_node WHERE fid IN (106, 107, 111, 113, 164, 294, 379) AND cur_user=current_user;
 
@@ -75,17 +75,17 @@ BEGIN
 	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 
 	-- Header
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, concat('DATA QUALITY ANALYSIS ACORDING EPA RULES'));
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '-----------------------------------------------------------');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('DATA QUALITY ANALYSIS ACORDING EPA RULES'));
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, '-----------------------------------------------------------');
 
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 3, 'CRITICAL ERRORS');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 3, '----------------------');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 3, 'CRITICAL ERRORS');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 3, '----------------------');
 
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 2, 'WARNINGS');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 2, '--------------');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2, 'WARNINGS');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2, '--------------');
 
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 1, 'INFO');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 1, '-------');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, 'INFO');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, '-------');
 			
 	RAISE NOTICE '1 - Check orphan nodes (fid:  107)';
 	v_querytext = '(SELECT node_id, nodecat_id, the_geom FROM (SELECT node_id FROM v_edit_node EXCEPT 
@@ -639,24 +639,43 @@ BEGIN
 	END LOOP;
 
 	-- insert spacers for log
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 3, '');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 2, '');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 1, '');
-	
-	INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
-	INSERT INTO anl_node SELECT * FROM temp_anl_node;
-	INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
+		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '');
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '');
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, '');
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, ''); 
 
-	DROP TABLE  IF EXISTS temp_anl_arc;
-	DROP TABLE IF EXISTS temp_anl_node ;
-	DROP TABLE  IF EXISTS temp_audit_check_data;
+	IF v_fid = 225 THEN
+		
+		DELETE FROM anl_arc WHERE fid =225 AND cur_user=current_user;
+		DELETE FROM anl_node WHERE fid =225 AND cur_user=current_user;
+		DELETE FROM anl_connec WHERE fid =225 AND cur_user=current_user;
+		DELETE FROM audit_check_data WHERE fid =225 AND cur_user=current_user;
+
+		INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
+		INSERT INTO anl_node SELECT * FROM temp_anl_node;
+		INSERT INTO anl_connec SELECT * FROM temp_anl_connec;
+		INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
+
+	ELSIF  v_fid = 101 THEN 
+		UPDATE temp_audit_check_data SET fid = 225;
+		UPDATE temp_anl_arc SET fid = 225;
+		UPDATE temp_anl_node SET fid = 225;
+		UPDATE temp_anl_connec SET fid = 225;
+
+		INSERT INTO project_temp_anl_arc SELECT * FROM temp_anl_arc;
+		INSERT INTO project_temp_anl_node SELECT * FROM temp_anl_node;
+		INSERT INTO project_temp_anl_connec SELECT * FROM temp_anl_connec;
+		INSERT INTO project_temp_audit_check_data SELECT * FROM temp_audit_check_data;
+
+	END IF;
+
+
 
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() 
-	AND fid=v_fid order by criticity desc, id asc) row;
+	FROM (SELECT error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() 
+	AND fid=255 order by criticity desc, id asc) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	
@@ -671,7 +690,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT DISTINCT ON (node_id) id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (106, 107, 111, 113, 164, 187, 294, 379)) row) features;
+	FROM  temp_anl_node WHERE cur_user="current_user"() AND fid IN (106, 107, 111, 113, 164, 187, 294, 379)) row) features;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point",  "features":',v_result, '}'); 
 
@@ -685,7 +704,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT DISTINCT ON (arc_id) id, arc_id, arccat_id, state, expl_id, descript, the_geom, fid
-	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (188, 284, 295, 427,430)) row) features;
+	FROM  temp_anl_arc WHERE cur_user="current_user"() AND fid IN (188, 284, 295, 427,430)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
@@ -710,6 +729,11 @@ BEGIN
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
+
+	--drop temp tables 
+	DROP TABLE  IF EXISTS temp_anl_arc;
+	DROP TABLE IF EXISTS temp_anl_node ;
+	DROP TABLE  IF EXISTS temp_audit_check_data;
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||

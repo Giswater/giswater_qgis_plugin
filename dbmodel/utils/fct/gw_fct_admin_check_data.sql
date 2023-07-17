@@ -38,6 +38,7 @@ v_feature_list text;
 v_param_list text;
 rec_fields text;
 v_field_array text[];
+v_fid integer;
 
 BEGIN
 
@@ -51,22 +52,27 @@ BEGIN
 
 	-- init variables
 	v_count=0;
+	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid'::text;
 
-	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fid=195 AND cur_user=current_user;
+	IF v_fid is null THEN
+		v_fid = 195;
+	END IF;
+
 	
+	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+
 	-- Starting process
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 4, concat('CHECK ADMIN CONFIGURATION'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 4, '-------------------------------------------------------------');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CHECK ADMIN CONFIGURATION'));
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 3, 'CRITICAL ERRORS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 3, '----------------------');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'CRITICAL ERRORS');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '----------------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 2, 'WARNINGS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 2, '--------------');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, 'WARNINGS');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '--------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 1, 'INFO');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 1, '-------');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '-------');
 
 
 	--CHECK VALUES ON OBLIGATORY CAT_FEATURE_* FIELDS (303)
@@ -77,11 +83,11 @@ BEGIN
 	IF v_count > 0 THEN
 		v_errortext=concat('ERROR-303: There is/are ',v_count,' features without value on field "active" from cat_feature. Features - ',v_feature_list::text,'.');
 
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 3, '303', v_errortext, v_count);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 3, '303', v_errortext, v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 1,'303', 'INFO: All features have value on field "active"', 0);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 1,'303', 'INFO: All features have value on field "active"', 0);
 	END IF;
 
 	--check if all features have value on field code_autofill (304)
@@ -90,11 +96,11 @@ BEGIN
 	IF v_count > 0 THEN
 		v_errortext=concat('ERROR-304: There is/are ',v_count,' features without value on field "code_autofill" from cat_feature. Features - ',v_feature_list::text,'.');
 
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 3, '304', v_errortext, v_count);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 3, '304', v_errortext, v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 1, '304', 'INFO: All features have value on field "code_autofill"', 0);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 1, '304', 'INFO: All features have value on field "code_autofill"', 0);
 	END IF;
 
 	--check if all nodes have value on field num_arcs (305)
@@ -103,11 +109,11 @@ BEGIN
 	IF v_count > 0 THEN
 		v_errortext=concat('ERROR-305: There is/are ',v_count,' nodes without value on field "num_arcs" from cat_feature_node. Features - ',v_feature_list::text,'.');
 
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 3, '305', v_errortext, v_count);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 3, '305', v_errortext, v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 1, '305', 'INFO: All nodes have value on field "num_arcs"', 0);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 1, '305', 'INFO: All nodes have value on field "num_arcs"', 0);
 	END IF;
 
 	--check if all nodes have value on field isarcdivide (306)
@@ -116,11 +122,11 @@ BEGIN
 	IF v_count > 0 THEN
 		v_errortext=concat('ERROR-306: There is/are ',v_count,' nodes without value on field "isarcdivide" from cat_feature_node. Features - ',v_feature_list::text,'.');
 
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 3, '306', v_errortext, v_count);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 3, '306', v_errortext, v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 1, '306', 'INFO: All nodes have value on field "isarcdivide"', 0);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 1, '306', 'INFO: All nodes have value on field "isarcdivide"', 0);
 	END IF;
 
 	IF v_project_type = 'WS' THEN
@@ -130,11 +136,11 @@ BEGIN
 		IF v_count > 0 THEN
 			v_errortext=concat('ERROR-307: There is/are ',v_count,' nodes without value on field "graph_delimiter" from cat_feature_node. Features - ',v_feature_list::text,'.');
 
-			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-			VALUES (195, 3, '307',v_errortext, v_count);
+			INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+			VALUES (v_fid, 3, '307',v_errortext, v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-			VALUES (195, 1, '307','INFO: All nodes have value on field "graph_delimiter"', 0);
+			INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+			VALUES (v_fid, 1, '307','INFO: All nodes have value on field "graph_delimiter"', 0);
 		END IF;
 	END IF;
 
@@ -145,11 +151,11 @@ BEGIN
 		IF v_count > 0 THEN
 			v_errortext=concat('ERROR-308: There is/are ',v_count,' nodes without value on field "isexitupperintro" from cat_feature_node. Features - ',v_feature_list::text,'.');
 
-			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-			VALUES (195, 3, '308', v_errortext, v_count);
+			INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+			VALUES (v_fid, 3, '308', v_errortext, v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-			VALUES (195, 1, '308', 'INFO: All nodes have value on field "isexitupperintro"', 0);
+			INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+			VALUES (v_fid, 1, '308', 'INFO: All nodes have value on field "isexitupperintro"', 0);
 		END IF;
 	END IF;
 	
@@ -159,11 +165,11 @@ BEGIN
 	IF v_count > 0 THEN
 		v_errortext=concat('ERROR-309: There is/are ',v_count,' nodes without value on field "choose_hemisphere" from cat_feature_node. Features - ',v_feature_list::text,'.');
 
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 3, '309', v_errortext, v_count);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 3, '309', v_errortext, v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 1, '309', 'INFO: All nodes have value on field "choose_hemisphere"', 0);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 1, '309', 'INFO: All nodes have value on field "choose_hemisphere"', 0);
 	END IF;
 
 	--check if all nodes have value on field isprofilesurface (310)
@@ -173,11 +179,11 @@ BEGIN
 		IF v_count > 0 THEN
 			v_errortext=concat('ERROR-310: There is/are ',v_count,' nodes without value on field "isprofilesurface" from cat_feature_node. Features - ',v_feature_list::text,'.');
 
-			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-			VALUES (195, 3,'310', v_errortext, v_count);
+			INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+			VALUES (v_fid, 3,'310', v_errortext, v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-			VALUES (195, 1, '310','INFO: All nodes have value on field "isprofilesurface"', 0);
+			INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+			VALUES (v_fid, 1, '310','INFO: All nodes have value on field "isprofilesurface"', 0);
 		END IF;
 	END IF;
 
@@ -198,8 +204,8 @@ BEGIN
 
 					v_errortext=concat('ERROR-311: View ',rec.child_layer,' has wrongly defined man_table');
 
-					INSERT INTO audit_check_data (fid,  criticity,result_id, error_message)
-					VALUES (195, 3, '311', v_errortext);
+					INSERT INTO temp_audit_check_data (fid,  criticity,result_id, error_message)
+					VALUES (v_fid, 3, '311', v_errortext);
 				END IF;
 			END IF;
 
@@ -214,8 +220,8 @@ BEGIN
 				IF v_count > 0 THEN
 					v_errortext=concat('WARNING-312: There is/are ',v_count,' active addfields that may not be present on the view ',rec.child_layer,'. Addfields: ',v_param_list::text,'.');
 
-					INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-					VALUES (195, 2, '312', v_errortext, v_count);
+					INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+					VALUES (v_fid, 2, '312', v_errortext, v_count);
 
 				END IF;
 		
@@ -225,8 +231,8 @@ BEGIN
 			IF rec.child_layer is not null then
 				v_errortext=concat('ERROR-313: View ',rec.child_layer,' is defined in cat_feature table but is not created in a DB');
 
-				INSERT INTO audit_check_data (fid,  criticity, result_id, error_message)
-				VALUES (195, 3, '313', v_errortext);
+				INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message)
+				VALUES (v_fid, 3, '313', v_errortext);
 			END IF;
 		END IF;
 
@@ -238,11 +244,11 @@ BEGIN
 	IF v_count > 0 THEN
 		v_errortext=concat('ERROR-314: There is/are ',v_count,' active features which views names are not present in cat_feature table. Features - ',v_feature_list::text,'.');
 
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 3, '314', v_errortext, v_count);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 3, '314', v_errortext, v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid,  criticity, result_id,error_message, fcount)
-		VALUES (195, 1,'314', 'INFO: All active features have child view name in cat_feature table', 0);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id,error_message, fcount)
+		VALUES (v_fid, 1,'314', 'INFO: All active features have child view name in cat_feature table', 0);
 	END IF;
 
 	--check if all views with active cat_feature have a definition in config_info_layer_x_type (315)
@@ -252,11 +258,11 @@ BEGIN
 	IF v_count > 0 THEN
 		v_errortext=concat('ERROR-315: There is/are ',v_count,' active features which views are not defined in config_info_layer_x_type. Undefined views: ',v_view_list::text,'.');
 
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 3, '315',  v_errortext, v_count);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 3, '315',  v_errortext, v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 1, '315', 'INFO: All active features have child view defined in config_info_layer_x_type', 0);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 1, '315', 'INFO: All active features have child view defined in config_info_layer_x_type', 0);
 	END IF;
 
 
@@ -267,11 +273,11 @@ BEGIN
 	IF v_count > 0 THEN
 		v_errortext = concat('ERRO-316: There is/are ',v_count,' active features which views are not defined in config_form_fields. Undefined views: ',v_view_list,'.');
 		
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 3, '316', v_errortext, v_count);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 3, '316', v_errortext, v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 1, '316', 'INFO: All active features have child view defined in config_form_fields',0);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 1, '316', 'INFO: All active features have child view defined in config_form_fields',0);
 	END IF;
 
 	--check if all ve_node_*,ve_arc_* etc views created in schema are related to any feature in cat_feature (317)
@@ -283,8 +289,8 @@ BEGIN
 
 		IF position(rec.table_name IN v_querytext) = 0 THEN
 			v_errortext=concat('WARNING-317: View ',rec.table_name,' is defined in a DB but is not related to any feature in cat_feature.');
-			INSERT INTO audit_check_data (fid,  criticity,result_id, error_message, fcount)
-			VALUES (195, 2, '317',v_errortext, 0);
+			INSERT INTO temp_audit_check_data (fid,  criticity,result_id, error_message, fcount)
+			VALUES (v_fid, 2, '317',v_errortext, 0);
 		END IF;
 	END LOOP;
 
@@ -295,11 +301,11 @@ BEGIN
 
 	IF v_count > 0 THEN
 		v_errortext =  concat('ERROR-318: There is/are ',v_count,' feature form fields in config_form_fields that don''t have data type. Fields: ',v_view_list,'.');
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 3,'318',v_errortext, v_count);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 3,'318',v_errortext, v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 1, '318', 'INFO: All feature form fields have defined data type.', 0);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 1, '318', 'INFO: All feature form fields have defined data type.', 0);
 	END IF;
 
 	--check if all the fields has defined widgettype (319)
@@ -307,11 +313,11 @@ BEGIN
 
 	IF v_count > 0 THEN
 		v_errortext = concat('ERROR-319: There is/are ',v_count,' feature form fields in config_form_fields that don''t have widget type. Fields: ',v_view_list,'.');
-		INSERT INTO audit_check_data (fid,  criticity, result_id,error_message, fcount)
-		VALUES (195, 3,'319', v_errortext, v_count);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id,error_message, fcount)
+		VALUES (v_fid, 3,'319', v_errortext, v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 1, '319', 'INFO: All feature form fields have defined widget type.',0);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 1, '319', 'INFO: All feature form fields have defined widget type.',0);
 	END IF;
 
 	--check if all the fields defined as combo or typeahead have dv_querytext defined (320)
@@ -320,11 +326,11 @@ BEGIN
 
 	IF v_count > 0 THEN
 		v_errortext = concat('ERROR-320: There is/are ',v_count,' feature form fields in config_form_fields that are combo or typeahead but don''t have dv_querytext defined. Fields: ',v_view_list,'.');
-		INSERT INTO audit_check_data (fid,  criticity,result_id, error_message, fcount)
-		VALUES (195, 3, '320', v_errortext, v_count);
+		INSERT INTO temp_audit_check_data (fid,  criticity,result_id, error_message, fcount)
+		VALUES (v_fid, 3, '320', v_errortext, v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 1, '320', 'INFO: All feature form fields with widget type combo or typeahead have dv_querytext defined.',0);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 1, '320', 'INFO: All feature form fields with widget type combo or typeahead have dv_querytext defined.',0);
 	END IF;
 
 	--check if all addfields are defined in config_form_fields (321)
@@ -334,11 +340,11 @@ BEGIN
 
 	IF v_count > 0 THEN
 		v_errortext=concat('ERROR-321: There is/are ',v_count,' addfields that are not defined in config_form_fields. Addfields: ',v_view_list,'.');
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 3, '321',v_errortext, v_count);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 3, '321',v_errortext, v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 1, '321','INFO: All addfields are defined in config_form_fields.', 0);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 1, '321','INFO: All addfields are defined in config_form_fields.', 0);
 	END IF;
 
 	--check if definitions has duplicated layoutorder for different layouts (322)
@@ -347,17 +353,17 @@ BEGIN
 
 	IF v_field_array IS NOT NULL THEN
 		v_errortext=concat('ERROR-322: There is/are form names with duplicated layout order defined in config_form_fields: ');
-		INSERT INTO audit_check_data (fid,  criticity, result_id,error_message, fcount)
-		VALUES (195, 3,'322', v_errortext, v_count);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id,error_message, fcount)
+		VALUES (v_fid, 3,'322', v_errortext, v_count);
 
 		FOREACH rec_fields IN ARRAY(v_field_array)
 		LOOP
-			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message)
-		VALUES (195, 3, '322', rec_fields); --replace(replace(rec_fields::text,'("',''),'")',''));
+			INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message)
+		VALUES (v_fid, 3, '322', rec_fields); --replace(replace(rec_fields::text,'("',''),'")',''));
 		END LOOP;
 	ELSE
-		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (195, 1, '322','INFO: All fields defined in config_form_fields have unduplicated order.', 0);
+		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 1, '322','INFO: All fields defined in config_form_fields have unduplicated order.', 0);
 	END IF;
 
 	--Check consistency between cat_manager and config_user_x_expl(472)
@@ -373,13 +379,13 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 
 		IF v_count > 0 THEN
-			EXECUTE 'INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-			SELECT DISTINCT  195, 3, ''472'', 
+			EXECUTE 'INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
+			SELECT DISTINCT  v_fid, 3, ''472'', 
 			concat(''ERROR-472: There is/are '','||v_count||','' inconsistent configurations on cat_manager and config_user_x_expl for user: '',string_agg(DISTINCT users,'', '')),
 			'||v_count||' FROM '||v_querytext||';';
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, result_id,error_message, fcount)
-			VALUES (195, 1, '472','INFO: Configuration of cat_manager and config_user_x_expl is consistent.', v_count);
+			INSERT INTO temp_audit_check_data (fid, criticity, result_id,error_message, fcount)
+			VALUES (v_fid, 1, '472','INFO: Configuration of cat_manager and config_user_x_expl is consistent.', v_count);
 		END IF;
 	 END IF;
 
@@ -396,29 +402,45 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 
 		IF v_count > 0 THEN
-			EXECUTE 'INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-			SELECT DISTINCT  195, 3, ''473'', 
+			EXECUTE 'INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
+			SELECT DISTINCT  v_fid, 3, ''473'', 
 			concat(''ERROR-473: There is/are '','||v_count||','' inconsistent configurations on cat_manager and config_user_x_sector for user: '',string_agg(DISTINCT users,'', '')),
 			'||v_count||' FROM '||v_querytext||';';
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, result_id,error_message, fcount)
-			VALUES (195, 1, '473','INFO: Configuration of cat_manager and config_user_x_sector is consistent.', v_count);
+			INSERT INTO temp_audit_check_data (fid, criticity, result_id,error_message, fcount)
+			VALUES (v_fid, 1, '473','INFO: Configuration of cat_manager and config_user_x_sector is consistent.', v_count);
 		END IF;
 	 END IF;
 
 
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, '');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 3, '');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2, '');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, '');
+		
+	IF v_fid = 195 THEN
+		-- delete old values on result table
+		DELETE FROM audit_check_data WHERE fid=195 AND cur_user=current_user;
+
+		INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
+
+	ELSIF  v_fid = 101 THEN 
+		UPDATE temp_audit_check_data SET fid = 195;
+
+		INSERT INTO project_temp_audit_check_data SELECT * FROM temp_audit_check_data;
+
+	END IF;
+
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=195 order by criticity desc, id asc) row;
+	FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=195 order by criticity desc, id asc) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, v_result_id, 4, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, v_result_id, 3, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, v_result_id, 2, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, v_result_id, 1, '');
-	
+
+--DROP temp tables
+	DROP TABLE IF EXISTS temp_audit_check_data;
+
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 

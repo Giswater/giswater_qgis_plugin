@@ -169,14 +169,14 @@ BEGIN
 	v_count=0;
 
 	--create temp
-  CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+  CREATE TEMP TABLE project_temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+  CREATE TEMP TABLE project_temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
+  CREATE TEMP TABLE project_temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
+  CREATE TEMP TABLE project_temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
   
 	select array_agg(expl_id) INTO v_cur_expl from selector_expl where cur_user = current_user;
     
-	-- Delete and insert values from python into audit_check_project	
-  DELETE FROM audit_check_project WHERE cur_user = current_user AND fid = 101;
-  
-
+	
 	query_text=NULL;
 	FOR field in SELECT * FROM json_array_elements(v_insert_fields) LOOP
 		select into query_text concat(query_text, 'INSERT INTO '||v_schemaname||'.audit_check_project (table_schema, table_id, table_dbname, table_host, fid, table_user) ') ;
@@ -208,44 +208,42 @@ BEGIN
 		UPDATE sys_param_user set project_type = lower(v_project_type) where project_type IS NULL;
 	END IF;
 
-	-- delete old values on result table
-	DELETE FROM temp_audit_check_data WHERE fid=101 AND cur_user=current_user;
 	
 	-- Starting process
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'AUDIT CHECK PROJECT');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '------------------------------');
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'AUDIT CHECK PROJECT');
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '------------------------------');
 
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 3, 'CRITICAL ERRORS');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 3, '----------------------');
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 3, 'CRITICAL ERRORS');
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 3, '----------------------');
 
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 2, 'WARNINGS');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 2, '--------------');
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 2, 'WARNINGS');
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 2, '--------------');
 
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 1, 'INFO');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 1, '-------');
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 1, 'INFO');
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 1, '-------');
 
 	--check plugin and db version (349)
 	IF v_qgis_version = v_version THEN
 		v_errortext=concat('Giswater version: ',v_version,'.');
-		INSERT INTO temp_audit_check_data (fid,  criticity, error_message,fcount)
+		INSERT INTO project_temp_audit_check_data (fid,  criticity, error_message,fcount)
 		VALUES (101, 4, v_errortext,0);
 	ELSE
 		v_errortext=concat('ERROR-349: Version of plugin is different than the database version. DB: ',v_version,', plugin: ',v_qgis_version,'.');
-		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		INSERT INTO project_temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
 		VALUES (101, 3, '349',v_errortext, 1);
 	END IF;
 
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('PostgreSQL version: ',(SELECT version())));
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('PostGIS version: ',(SELECT postgis_version())));
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('QGIS version: ', v_qgisversion));
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('O/S version: ', v_osversion));
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('Log volume (User folder): ', v_logfoldervolume));
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('QGIS variables: gwProjectType:',quote_nullable(v_qgis_project_type),', gwInfoType:',
+	INSERT INTO project_temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('PostgreSQL version: ',(SELECT version())));
+	INSERT INTO project_temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('PostGIS version: ',(SELECT postgis_version())));
+	INSERT INTO project_temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('QGIS version: ', v_qgisversion));
+	INSERT INTO project_temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('O/S version: ', v_osversion));
+	INSERT INTO project_temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('Log volume (User folder): ', v_logfoldervolume));
+	INSERT INTO project_temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('QGIS variables: gwProjectType:',quote_nullable(v_qgis_project_type),', gwInfoType:',
 	quote_nullable(v_infotype),', gwProjectRole:', quote_nullable(v_projectrole),', gwMainSchema:',quote_nullable(v_mainschema),', gwAddSchema:',quote_nullable(v_addschema)));
 	
 	v_errortext=concat('Logged as ', current_user,' on ', now());
 	
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+	INSERT INTO project_temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 
   
 
@@ -256,7 +254,7 @@ BEGIN
 		WHERE active=false AND concat(lower(cat_feature.id),'_vdefault') = sys_param_user.id);
 
 		v_errortext=concat('Inactive parameters have been deleted from sys_param_user.');
-		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+		INSERT INTO project_temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 		
 	END IF;
 
@@ -274,7 +272,7 @@ BEGIN
 		IF (SELECT count(*) FROM selector_state WHERE cur_user=current_user) < 1 THEN 
 			INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
 			v_errortext=concat('Set feature state = 1 for addschema and user');
-			INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+			INSERT INTO project_temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 		END IF;
 		SET search_path = 'SCHEMA_NAME';
 	END IF;
@@ -305,23 +303,23 @@ BEGIN
 			SELECT psector_id INTO v_psector_vdef FROM plan_psector WHERE status=2 LIMIT 1;
 			IF v_psector_vdef IS NULL THEN
 				v_errortext=concat('No current psector have been set. There are not psectors with status=2 on project');
-				INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+				INSERT INTO project_temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 			END IF;
 		END IF;
 
 		IF v_psector_vdef IS NOT NULL THEN
 			v_errortext=concat('Current psector: ',v_psector_vdef);
-			INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+			INSERT INTO project_temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 		END IF;
 
-		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('Use psectors on check db): ', upper(v_usepsector::text)));
+		INSERT INTO project_temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('Use psectors on check db): ', upper(v_usepsector::text)));
 	END IF;
 
 	IF v_selection_mode = 'userSelectors' THEN
 		-- Check which exploitations have been checked
 		SELECT string_agg(name, ' / ') INTO v_user_expl FROM exploitation JOIN selector_expl USING (expl_id) WHERE cur_user=current_user;
 		v_errortext=concat('Checked exploitation/s: ', v_user_expl);
-		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+		INSERT INTO project_temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 	END IF;
 
 	--If user has activated full project control, depending on user role - execute corresponding check function
@@ -330,31 +328,31 @@ BEGIN
 		IF 'role_om' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 			EXECUTE 'SELECT gw_fct_om_check_data($${
 			"client":{"device":4, "infoType":1, "lang":"ES"},
-			"feature":{},"data":{"parameters":{"selectionMode":"'||v_selection_mode||'"}}}$$)';
+			"feature":{},"data":{"parameters":{"selectionMode":"'||v_selection_mode||'","fid":101}}}$$)';
 			-- insert results 
-			UPDATE temp_audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB OM):', split_part(error_message,': ',2))
+			UPDATE project_temp_audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB OM):', split_part(error_message,': ',2))
 			WHERE fid=125 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
 
-			INSERT INTO temp_audit_check_data  (fid, criticity, result_id, error_message, fcount)
-			SELECT 101, criticity, result_id, error_message, fcount FROM temp_audit_check_data 
+			INSERT INTO project_temp_audit_check_data  (fid, criticity, result_id, error_message, fcount)
+			SELECT 101, criticity, result_id, error_message, fcount FROM project_temp_audit_check_data 
 			WHERE fid=125 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
 
 			IF v_ignoregraphanalytics IS FALSE THEN
 				IF v_project_type = 'WS' THEN
 					EXECUTE 'SELECT gw_fct_graphanalytics_check_data($${
 					"client":{"device":4, "infoType":1, "lang":"ES"},
-					"feature":{},"data":{"parameters":{"selectionMode":"'||v_selection_mode||'", "graphClass":"ALL"}}}$$)';
+					"feature":{},"data":{"parameters":{"selectionMode":"'||v_selection_mode||'", "graphClass":"ALL","fid":101}}}$$)';
 					-- insert results 
-					UPDATE temp_audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB GRAPH):', split_part(error_message,': ',2))
+					UPDATE project_temp_audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB GRAPH):', split_part(error_message,': ',2))
 					WHERE fid=211 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
 
-					INSERT INTO temp_audit_check_data  (fid, criticity, result_id, error_message, fcount)
-					SELECT 101, criticity, result_id, error_message, fcount FROM temp_audit_check_data 
+					INSERT INTO project_temp_audit_check_data  (fid, criticity, result_id, error_message, fcount)
+					SELECT 101, criticity, result_id, error_message, fcount FROM project_temp_audit_check_data 
 					WHERE fid=211 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
 				END IF;
 			ELSE
 				-- delete old values on result table
-				DELETE FROM temp_audit_check_data WHERE fid=211 AND cur_user=current_user;
+				DELETE FROM project_temp_audit_check_data WHERE fid=211 AND cur_user=current_user;
 				DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (176,180,181,182,208,209);
 			END IF;
 		END IF;		
@@ -363,13 +361,13 @@ BEGIN
 
 			IF v_ignoreepa IS FALSE THEN
 				EXECUTE 'SELECT gw_fct_pg2epa_check_data($${
-				"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{}}$$)';
+				"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"fid":101}}}$$)';
 				-- insert results 
-				UPDATE temp_audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB EPA):', split_part(error_message,': ',2))
+				UPDATE project_temp_audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB EPA):', split_part(error_message,': ',2))
 				WHERE fid=225 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
 
-				INSERT INTO temp_audit_check_data  (fid, criticity, result_id, error_message, fcount)
-				SELECT 101, criticity, result_id, error_message, fcount FROM temp_audit_check_data 
+				INSERT INTO project_temp_audit_check_data  (fid, criticity, result_id, error_message, fcount)
+				SELECT 101, criticity, result_id, error_message, fcount FROM project_temp_audit_check_data 
 				WHERE fid=225 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;	
 			END IF;
 		END IF;
@@ -378,17 +376,17 @@ BEGIN
 
 			IF v_ignoreplan IS FALSE THEN
 				EXECUTE 'SELECT gw_fct_plan_check_data($${
-				"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{}}$$)';
+				"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"fid":101}}}$$)';
 				-- insert results 
-				UPDATE temp_audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB PLAN):', split_part(error_message,': ',2))
+				UPDATE project_temp_audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB PLAN):', split_part(error_message,': ',2))
 				WHERE fid=115 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
 
-				INSERT INTO temp_audit_check_data  (fid, criticity, result_id, error_message, fcount)
-				SELECT 101, criticity, result_id, error_message, fcount FROM temp_audit_check_data 
+				INSERT INTO project_temp_audit_check_data  (fid, criticity, result_id, error_message, fcount)
+				SELECT 101, criticity, result_id, error_message, fcount FROM project_temp_audit_check_data 
 				WHERE fid=115 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
 			ELSE
 				-- delete old values on result table
-				DELETE FROM temp_audit_check_data WHERE fid=115 AND cur_user=current_user;
+				DELETE FROM project_temp_audit_check_data WHERE fid=115 AND cur_user=current_user;
 				DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (252);
 				DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (252);
 				DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (252, 354, 355);
@@ -398,13 +396,13 @@ BEGIN
 		IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 			EXECUTE 'SELECT gw_fct_admin_check_data($${"client":
 			{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-			"data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}$$)::text';
+			"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"fid":101}}}$$)::text';
 			-- insert results 
-			UPDATE temp_audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB ADMIN):', split_part(error_message,': ',2))
+			UPDATE project_temp_audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB ADMIN):', split_part(error_message,': ',2))
 			WHERE fid=195 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
 
-			INSERT INTO temp_audit_check_data  (fid, criticity, result_id, error_message, fcount)
-			SELECT 101, criticity, result_id, error_message, fcount FROM temp_audit_check_data 
+			INSERT INTO project_temp_audit_check_data  (fid, criticity, result_id, error_message, fcount)
+			SELECT 101, criticity, result_id, error_message, fcount FROM project_temp_audit_check_data 
 			WHERE fid=195 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
 			
 		END IF;
@@ -416,11 +414,11 @@ BEGIN
 		"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"checkType":"Project","isAudit":'||v_isaudit||', "selectionMode":"'||v_selection_mode||'"}}}$$)::text';
 			
 		-- insert results 
-		UPDATE temp_audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB USER):', split_part(error_message,': ',2))
+		UPDATE project_temp_audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB USER):', split_part(error_message,': ',2))
 		WHERE fid=251 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
 
-		INSERT INTO temp_audit_check_data  (fid, criticity, result_id, error_message, fcount)
-		SELECT 101, criticity, result_id, error_message, fcount FROM temp_audit_check_data 
+		INSERT INTO project_temp_audit_check_data  (fid, criticity, result_id, error_message, fcount)
+		SELECT 101, criticity, result_id, error_message, fcount FROM project_temp_audit_check_data 
 		WHERE fid=251 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') 
 		AND error_message NOT LIKE 'DATA%'
 		AND error_message NOT LIKE '---%' AND cur_user=current_user;
@@ -456,10 +454,10 @@ BEGIN
 		IF v_count>0 THEN
 			v_errortext = concat('ERROR-350 (QGIS PROJ): There is/are ',v_count,' layers that come from differen host: ',v_layer_list,'.');
 			
-			INSERT INTO temp_audit_check_data (fid,  criticity, result_id,error_message)
+			INSERT INTO project_temp_audit_check_data (fid,  criticity, result_id,error_message)
 			VALUES (101, 3,'350',v_errortext );
 		ELSE
-			INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message)
+			INSERT INTO project_temp_audit_check_data (fid,  criticity, result_id, error_message)
 			VALUES (101, 1, '350', 'INFO (QGIS PROJ): All layers come from current host');
 		END IF;
 		
@@ -470,10 +468,10 @@ BEGIN
 		IF v_count>0 THEN
 			v_errortext = concat('ERROR-351 (QGIS PROJ): There is/are ',v_count,' layers that come from different database: ',v_layer_list,'.');
 		
-			INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message)
+			INSERT INTO project_temp_audit_check_data (fid,  criticity, result_id, error_message)
 			VALUES (101, 3, '351', v_errortext );
 		ELSE
-			INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message)
+			INSERT INTO project_temp_audit_check_data (fid,  criticity, result_id, error_message)
 			VALUES (101, 1, '351', 'INFO (QGIS PROJ): All layers come from current database');
 		END IF;
 
@@ -484,10 +482,10 @@ BEGIN
 		IF v_count>0 THEN
 			v_errortext = concat('ERROR-352 (QGIS PROJ): There is/are ',v_count,' layers that come from different schema: ',v_layer_list,'.');
 		
-			INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message)
+			INSERT INTO project_temp_audit_check_data (fid,  criticity, result_id, error_message)
 			VALUES (101, 3, '352', v_errortext );
 		ELSE
-			INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message)
+			INSERT INTO project_temp_audit_check_data (fid,  criticity, result_id, error_message)
 			VALUES (101, 1, '352', 'INFO (QGIS PROJ): All layers come from current schema');
 		END IF;
 
@@ -498,24 +496,24 @@ BEGIN
 		IF v_count>0 THEN
 			v_errortext = concat('ERROR-353 (QGIS PROJ): There is/are ',v_count,' layers that have been added by different user: ',v_layer_list,'.');
 		
-			INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message)
+			INSERT INTO project_temp_audit_check_data (fid,  criticity, result_id, error_message)
 			VALUES (101, 3,'353',v_errortext );
 		ELSE
-			INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message)
+			INSERT INTO project_temp_audit_check_data (fid,  criticity, result_id, error_message)
 			VALUES (101, 1, '353','INFO (QGIS PROJ): All layers have been added by current user');
 		END IF;
 
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '-----------------------------------------------------------');
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'To check CRITICAL ERRORS or WARNINGS, execute a query FROM anl_table WHERE fid=error number AND current_user.');
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'For example:');
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'SELECT * FROM anl_arc WHERE fid=103 AND cur_user=current_user;');
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'Only the errors with anl_table next to the number can be checked this way.');
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'Using Giswater Toolbox it''s also posible to check these errors.');
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '-----------------------------------------------------------');
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
+		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
+		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '-----------------------------------------------------------');
+		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'To check CRITICAL ERRORS or WARNINGS, execute a query FROM anl_table WHERE fid=error number AND current_user.');
+		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'For example:');
+		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
+		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'SELECT * FROM anl_arc WHERE fid=103 AND cur_user=current_user;');
+		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
+		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'Only the errors with anl_table next to the number can be checked this way.');
+		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'Using Giswater Toolbox it''s also posible to check these errors.');
+		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '-----------------------------------------------------------');
+		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
 
 		-- start process
 		FOR v_rectable IN SELECT * FROM sys_table WHERE sys_role IN 
@@ -567,24 +565,21 @@ BEGIN
 		v_missing_layers = v_result_layers_criticity3::jsonb||v_result_layers_criticity2::jsonb;
 		
 
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, v_result_id, 4, NULL);
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, v_result_id, 3, NULL);
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, v_result_id, 2, NULL);
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, v_result_id, 1, NULL);
+		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, v_result_id, 4, NULL);
+		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, v_result_id, 3, NULL);
+		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, v_result_id, 2, NULL);
+		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, v_result_id, 1, NULL);
 
 		--reset exploitations
 		DELETE FROM selector_expl  where cur_user = current_user;
 		INSERT INTO selector_expl
 		SELECT expl_id, current_user FROM exploitation where expl_id = ANY (v_cur_expl);
 		
-		INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
-	
-		DROP TABLE  IF EXISTS temp_audit_check_data;
 
 		-- get results
 		-- info
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=101 order by criticity desc, id asc) row;
+		FROM (SELECT id, error_message as message FROM project_temp_audit_check_data WHERE cur_user="current_user"() AND fid=101 order by criticity desc, id asc) row;
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -599,11 +594,11 @@ BEGIN
 		    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		    'properties', to_jsonb(row) - 'the_geom'
 			) AS feature
-			FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, fid, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid IN (107,214,164,166,170,171,198) -- epa
+			FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, fid, the_geom FROM project_temp_anl_node WHERE cur_user="current_user"() AND fid IN (107,214,164,166,170,171,198) -- epa
 			UNION
-			SELECT id, node_id, nodecat_id, state, expl_id, descript, fid, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid IN (104,176,179,180,181,182,187,196,197,202,203)  -- om
+			SELECT id, node_id, nodecat_id, state, expl_id, descript, fid, the_geom FROM project_temp_anl_node WHERE cur_user="current_user"() AND fid IN (104,176,179,180,181,182,187,196,197,202,203)  -- om
 			UNION
-			SELECT id, connec_id, connecat_id, state, expl_id, descript,fid, the_geom FROM anl_connec WHERE cur_user="current_user"() AND fid IN (201,202,204,205,206) -- om
+			SELECT id, connec_id, connecat_id, state, expl_id, descript,fid, the_geom FROM project_temp_anl_connec WHERE cur_user="current_user"() AND fid IN (201,202,204,205,206) -- om
 			) row) features;
 
 			v_result := COALESCE(v_result, '{}'); 
@@ -619,15 +614,31 @@ BEGIN
 		    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		    'properties', to_jsonb(row) - 'the_geom'
 			) AS feature
-			FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid IN (103, 214, 139)  -- epa
+			FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom FROM project_temp_anl_arc WHERE cur_user="current_user"() AND fid IN (103, 214, 139)  -- epa
 			UNION
-			SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid IN (104, 188, 202) -- om
+			SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom FROM project_temp_anl_arc WHERE cur_user="current_user"() AND fid IN (104, 188, 202) -- om
 			) row) features;
 
 			v_result := COALESCE(v_result, '{}'); 
 			v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, ',"category_field":"descript"}');
 
 		END IF;
+
+			-- Delete and insert values from python into audit_check_project	
+	  DELETE FROM audit_check_data WHERE cur_user = current_user AND fid = 101;
+	  DELETE FROM anl_node WHERE cur_user = current_user AND fid = 101;
+	  DELETE FROM anl_arc WHERE cur_user = current_user AND fid = 101;
+	  DELETE FROM anl_connec WHERE cur_user = current_user AND fid = 101;
+
+		INSERT INTO anl_arc SELECT * FROM project_temp_anl_arc;
+		INSERT INTO anl_node SELECT * FROM project_temp_anl_node;
+		INSERT INTO anl_connec SELECT * FROM project_temp_anl_connec;
+		INSERT INTO audit_check_data SELECT * FROM project_temp_audit_check_data;
+
+		DROP TABLE IF EXISTS project_temp_anl_arc;
+		DROP TABLE IF EXISTS project_temp_anl_node;
+		DROP TABLE IF EXISTS project_temp_anl_connec;
+		DROP TABLE IF EXISTS project_temp_audit_check_data;
 
 		--    Control null
 		v_version:=COALESCE(v_version,'{}');
