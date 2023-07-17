@@ -934,11 +934,12 @@ BEGIN
 	END LOOP;
 
 	
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '');
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '');
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, '');
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, ''); 
+
 	IF v_fid = 225 THEN
-		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '');
-		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '');
-		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, '');
-		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, '');
 		
 		DELETE FROM anl_arc WHERE fid =225 AND cur_user=current_user;
 		DELETE FROM anl_node WHERE fid =225 AND cur_user=current_user;
