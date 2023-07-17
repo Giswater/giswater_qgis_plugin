@@ -829,10 +829,10 @@ BEGIN
 		
 					IF v_current_id='[]' THEN
 						--case when list is empty
-						EXECUTE 'SELECT  array_to_json(''{'||v_selected_id||'}''::text[])'
+						EXECUTE concat('SELECT  array_to_json(''{',v_selected_id,'}''::text[])')
 						INTO v_new_id;
 						v_fields_array[array_index] = gw_fct_json_object_set_key(v_fields_array[array_index],'comboIds',v_new_id::json);
-						EXECUTE 'SELECT  array_to_json(''{'||v_selected_idval||'}''::text[])'
+						EXECUTE concat('SELECT  array_to_json(''{',v_selected_idval,'}''::text[])')
 						INTO v_new_id;
 						v_fields_array[array_index] = gw_fct_json_object_set_key(v_fields_array[array_index],'comboNames',v_new_id::json);
 					ELSE
