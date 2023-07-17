@@ -153,3 +153,5 @@ Function works only for operative features (state=1).' where function_name = 'gw
 DELETE FROM config_toolbox WHERE id IN (2848); 
 
 UPDATE config_fprocess SET tablename = replace(tablename, 'vi_', 'vi_t_') WHERE fid  =141;
+
+DELETE FROM sys_table WHERE id IN ('v_anl_graphanalytics_mapzones', 'v_anl_graphanalytics_upstream', 'v_anl_graph');

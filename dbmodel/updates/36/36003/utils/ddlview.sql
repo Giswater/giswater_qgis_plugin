@@ -7,7 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer_state", "column":"is_operative", "dataType":"boolean"}}$$);
-
-ALTER TABLE ext_rtc_hydrometer_state ALTER COLUMN is_operative SET DEFAULT true;
-
+DROP VIEW IF EXISTS v_anl_graphanalytics_mapzones;
+DROP VIEW IF EXISTS v_anl_graphanalytics_upstream;
+DROP VIEW IF EXISTS v_anl_graph;
