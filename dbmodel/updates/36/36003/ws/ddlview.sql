@@ -78,3 +78,5 @@ CREATE OR REPLACE VIEW vi_coordinates AS
    FROM temp_node,
     selector_inp_result a
   WHERE a.result_id::text = temp_node.result_id::text AND a.cur_user = "current_user"()::text;
+
+DROP VIEW IF EXISTS vi_pjointpattern ;
