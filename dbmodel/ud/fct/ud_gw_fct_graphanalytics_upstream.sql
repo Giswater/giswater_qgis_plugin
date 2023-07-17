@@ -96,41 +96,30 @@ BEGIN
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
 
-	CREATE TEMP TABLE temp_anlgraph	(
-		id serial NOT NULL PRIMARY KEY,
-    arc_id character varying(20) COLLATE pg_catalog."default",
-    node_1 character varying(20) COLLATE pg_catalog."default",
-    node_2 character varying(20) COLLATE pg_catalog."default",
-    water smallint,
-    flag smallint,
-    checkf smallint,
-    cost numeric(12,4),
-    value numeric(12,4),
-    trace integer,
-    isheader boolean);
+	CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
 
-CREATE OR REPLACE TEMP VIEW v_anl_graphanalytics_upstream AS
- SELECT temp_anlgraph.arc_id,
-    temp_anlgraph.node_1,
-    temp_anlgraph.node_2,
-    temp_anlgraph.flag,
-    a2.flag AS flagi,
-    a2.value,
-    a2.trace,
-    v.cat_geom1
-   FROM temp_anlgraph
-     JOIN ( SELECT temp_anlgraph_1.arc_id,
-            temp_anlgraph_1.node_1,
-            temp_anlgraph_1.node_2,
-            temp_anlgraph_1.water,
-            temp_anlgraph_1.flag,
-            temp_anlgraph_1.checkf,
-            temp_anlgraph_1.value,
-            temp_anlgraph_1.trace
-           FROM temp_anlgraph temp_anlgraph_1
-          WHERE temp_anlgraph_1.water = 1) a2 ON temp_anlgraph.node_2::text = a2.node_1::text
-     JOIN v_edit_arc v ON temp_anlgraph.arc_id::text = v.arc_id::text
-  WHERE temp_anlgraph.flag < 2 AND temp_anlgraph.water = 0 AND a2.flag = 0;
+	CREATE OR REPLACE TEMP VIEW v_anl_graphanalytics_upstream AS
+	 SELECT temp_t_anlgraph.arc_id,
+	    temp_t_anlgraph.node_1,
+	    temp_t_anlgraph.node_2,
+	    temp_t_anlgraph.flag,
+	    a2.flag AS flagi,
+	    a2.value,
+	    a2.trace,
+	    v.cat_geom1
+	   FROM temp_t_anlgraph
+	     JOIN ( SELECT temp_t_anlgraph_1.arc_id,
+	            temp_t_anlgraph_1.node_1,
+	            temp_t_anlgraph_1.node_2,
+	            temp_t_anlgraph_1.water,
+	            temp_t_anlgraph_1.flag,
+	            temp_t_anlgraph_1.checkf,
+	            temp_t_anlgraph_1.value,
+	            temp_t_anlgraph_1.trace
+	           FROM temp_t_anlgraph temp_t_anlgraph_1
+	          WHERE temp_t_anlgraph_1.water = 1) a2 ON temp_t_anlgraph.node_2::text = a2.node_1::text
+	     JOIN v_edit_arc v ON temp_t_anlgraph.arc_id::text = v.arc_id::text
+	  WHERE temp_t_anlgraph.flag < 2 AND temp_t_anlgraph.water = 0 AND a2.flag = 0;
 
 
 	--Look for closest node using coordinates
@@ -149,17 +138,17 @@ CREATE OR REPLACE TEMP VIEW v_anl_graphanalytics_upstream AS
 
 		
 	-- fill the graph table
-	INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
+	INSERT INTO temp_t_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
 	SELECT  arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND value_state_type.is_operative=TRUE AND v_edit_arc.state > 0;
 		
 	-- Close mapzone headers
-	EXECUTE 'UPDATE temp_anlgraph SET flag=0, water=1, trace = 1::integer  WHERE node_2::integer IN ('||v_node||')';
+	EXECUTE 'UPDATE temp_t_anlgraph SET flag=0, water=1, trace = 1::integer  WHERE node_2::integer IN ('||v_node||')';
 
 	-- inundation process
 		LOOP						
 			v_count = v_count+1;
-			UPDATE temp_anlgraph n SET water=1, trace = a.trace FROM v_anl_graphanalytics_upstream a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;	
+			UPDATE temp_t_anlgraph n SET water=1, trace = a.trace FROM v_anl_graphanalytics_upstream a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;	
 			GET DIAGNOSTICS v_affectrow = row_count;
 			raise notice 'v_count --> %' , v_count;
 			EXIT WHEN v_affectrow = 0;
@@ -171,13 +160,13 @@ CREATE OR REPLACE TEMP VIEW v_anl_graphanalytics_upstream AS
 
 		INSERT INTO anl_arc (arc_id, fid, arccat_id, expl_id, the_geom)
 		SELECT arc_id, v_fid, arc_type, expl_id, the_geom
-		FROM temp_anlgraph 
+		FROM temp_t_anlgraph 
 		join arc using(arc_id)
 		where water=1;
 
 		INSERT INTO anl_node (node_id, nodecat_id,state, expl_id, fid, the_geom)
 		SELECT node_id, node_type, state, expl_id, v_fid, the_geom 
-		FROM v_edit_node WHERE node_id IN (SELECT  node_1 from temp_anlgraph where water=1 union SELECT  node_2 from temp_anlgraph where water=1);
+		FROM v_edit_node WHERE node_id IN (SELECT  node_1 from temp_t_anlgraph where water=1 union SELECT  node_2 from temp_t_anlgraph where water=1);
 
 
 	-- info
@@ -247,7 +236,7 @@ CREATE OR REPLACE TEMP VIEW v_anl_graphanalytics_upstream AS
 	v_message = 'Flow  analysis done succesfully';
 
 	DROP VIEW v_anl_graphanalytics_upstream;
-	DROP TABLE temp_anlgraph;
+	DROP TABLE temp_t_anlgraph;
 	--  Return
 
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||

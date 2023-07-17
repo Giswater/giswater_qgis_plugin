@@ -84,18 +84,8 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, 'INFO');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, '-------');
 
-	CREATE TEMP TABLE temp_anlgraph(
-		id serial NOT NULL,
-    arc_id character varying(20) COLLATE pg_catalog."default",
-    node_1 character varying(20) COLLATE pg_catalog."default",
-    node_2 character varying(20) COLLATE pg_catalog."default",
-    water smallint,
-    flag smallint,
-    checkf smallint,
-    cost numeric(12,4),
-    value numeric(12,4),
-    trace integer,
-    isheader boolean);
+
+	CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
 
 CREATE OR REPLACE TEMP VIEW v_anl_graph AS 
  SELECT anl_graph.arc_id,
@@ -103,20 +93,20 @@ CREATE OR REPLACE TEMP VIEW v_anl_graph AS
     anl_graph.node_2,
     anl_graph.flag,
     a.flag AS flagi
-   FROM temp_anlgraph anl_graph
+   FROM temp_t_anlgraph anl_graph
      JOIN ( SELECT anl_graph_1.arc_id,
             anl_graph_1.node_1,
             anl_graph_1.node_2,
             anl_graph_1.water,
             anl_graph_1.flag,
             anl_graph_1.checkf
-           FROM temp_anlgraph anl_graph_1
+           FROM temp_t_anlgraph anl_graph_1
           WHERE anl_graph_1.water = 1) a ON anl_graph.node_1::text = a.node_2::text
   WHERE anl_graph.flag < 2 AND anl_graph.water = 0 AND a.flag < 2;
   
 
 	-- fill the graph table
-	INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
+	INSERT INTO temp_t_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
 	SELECT  arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0 FROM v_edit_arc 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE
 	UNION
@@ -130,19 +120,19 @@ CREATE OR REPLACE TEMP VIEW v_anl_graph AS
 		v_text = 'SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id from sector WHERE graphconfig IS NOT NULL';
 
 		-- close boundary conditions setting flag=1 for all nodes that fits on graph delimiters and closed valves
-		v_querytext  = 'UPDATE temp_anlgraph SET flag=1 WHERE 
+		v_querytext  = 'UPDATE temp_t_anlgraph SET flag=1 WHERE 
 			node_1 IN('||v_text||' UNION
 			SELECT (a.node_id) FROM node a 	JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.nodetype_id 
-			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN temp_anlgraph e ON a.node_id::integer=e.node_1::integer WHERE (graph_delimiter=''MINSECTOR'' AND closed=TRUE))
+			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN temp_t_anlgraph e ON a.node_id::integer=e.node_1::integer WHERE (graph_delimiter=''MINSECTOR'' AND closed=TRUE))
 			OR node_2 IN ('||v_text||' UNION
 			SELECT (a.node_id) FROM node a 	JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.nodetype_id 
-			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN temp_anlgraph e ON a.node_id::integer=e.node_1::integer WHERE (graph_delimiter=''MINSECTOR'' AND closed=TRUE))';
+			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN temp_t_anlgraph e ON a.node_id::integer=e.node_1::integer WHERE (graph_delimiter=''MINSECTOR'' AND closed=TRUE))';
 				
 		EXECUTE v_querytext;
 
 		-- open boundary conditions set flag=0 for graph delimiters that have been setted to 1 on query before BUT ONLY ENABLING the right sense (to_arc)
-		UPDATE temp_anlgraph SET flag=0 WHERE id IN (
-			SELECT id FROM temp_anlgraph JOIN (
+		UPDATE temp_t_anlgraph SET flag=0 WHERE id IN (
+			SELECT id FROM temp_t_anlgraph JOIN (
 			SELECT (json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent' as node_id, 
 			json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json) 
 			as to_arc from sector 
@@ -151,12 +141,12 @@ CREATE OR REPLACE TEMP VIEW v_anl_graph AS
 	END IF;
 		
 	-- init inlet
-	UPDATE temp_anlgraph	SET flag=1, water=1 WHERE node_1 = v_nodeid; 
+	UPDATE temp_t_anlgraph	SET flag=1, water=1 WHERE node_1 = v_nodeid; 
 
 	-- inundation process
 	LOOP
 		v_count = v_count+1;
-                update temp_anlgraph n set water= 1, flag=n.flag+1 from v_anl_graph a where n.node_1 = a.node_1  and n.arc_id = a.arc_id;
+                update temp_t_anlgraph n set water= 1, flag=n.flag+1 from v_anl_graph a where n.node_1 = a.node_1  and n.arc_id = a.arc_id;
 
 		GET DIAGNOSTICS affected_rows =row_count;
 		exit when affected_rows = 0;
@@ -168,11 +158,11 @@ CREATE OR REPLACE TEMP VIEW v_anl_graph AS
 	
 	-- insert into result table
 	EXECUTE 'INSERT INTO anl_arc (fid, arc_id, the_geom, descript)
-		SELECT DISTINCT ON (a.arc_id) '||v_fid||', a.arc_id, the_geom, '''||v_class||'''	FROM temp_anlgraph a
+		SELECT DISTINCT ON (a.arc_id) '||v_fid||', a.arc_id, the_geom, '''||v_class||'''	FROM temp_t_anlgraph a
 		JOIN arc b ON a.arc_id=b.arc_id GROUP BY a.arc_id, the_geom HAVING max(water) '||v_sign||' 0 ';
 
 	-- count arcs
-	EXECUTE 'SELECT count(*) FROM (SELECT DISTINCT ON (arc_id) count(*) FROM temp_anlgraph GROUP BY arc_id HAVING max(water)'||v_sign||' 0 )a'
+	EXECUTE 'SELECT count(*) FROM (SELECT DISTINCT ON (arc_id) count(*) FROM temp_t_anlgraph GROUP BY arc_id HAVING max(water)'||v_sign||' 0 )a'
 		INTO v_count;
 
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, '');
@@ -207,7 +197,7 @@ CREATE OR REPLACE TEMP VIEW v_anl_graph AS
 	v_result_line := COALESCE(v_result_line, '{}'); 
 
 	DROP VIEW v_anl_graph;
-	DROP TABLE temp_anlgraph;
+	DROP TABLE temp_t_anlgraph;
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
