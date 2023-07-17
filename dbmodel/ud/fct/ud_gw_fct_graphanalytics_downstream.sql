@@ -98,7 +98,7 @@ BEGIN
 
 	CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
 
-CREATE OR REPLACE TEMP VIEW v_anl_graphanalytics_downstream AS 
+CREATE OR REPLACE TEMP VIEW v_temp_graphanalytics_downstream AS 
  SELECT temp_t_anlgraph.arc_id,
     temp_t_anlgraph.node_1,
     temp_t_anlgraph.node_2,
@@ -146,7 +146,7 @@ CREATE OR REPLACE TEMP VIEW v_anl_graphanalytics_downstream AS
 	-- inundation process
 		LOOP						
 			v_count = v_count+1;
-			UPDATE temp_t_anlgraph n SET water=1, trace = a.trace FROM v_anl_graphanalytics_downstream a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;	
+			UPDATE temp_t_anlgraph n SET water=1, trace = a.trace FROM v_temp_graphanalytics_downstream a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;	
 			GET DIAGNOSTICS v_affectrow = row_count;
 			raise notice 'v_count --> %' , v_count;
 			EXIT WHEN v_affectrow = 0;
@@ -232,7 +232,7 @@ CREATE OR REPLACE TEMP VIEW v_anl_graphanalytics_downstream AS
 	v_level = 3;
 	v_message = 'Flow  analysis done succesfully';
 
-	DROP VIEW v_anl_graphanalytics_downstream;
+	DROP VIEW v_temp_graphanalytics_downstream;
 	DROP TABLE temp_t_anlgraph;
 
 	--  Return
