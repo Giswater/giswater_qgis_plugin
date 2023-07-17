@@ -146,6 +146,26 @@ BEGIN
 	
 	CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
 
+	CREATE OR REPLACE TEMP VIEW v_temp_anlgraph
+	 AS
+	 SELECT anl_graph.arc_id,
+	    anl_graph.node_1,
+	    anl_graph.node_2,
+	    anl_graph.flag,
+	    a.flag AS flagi,
+	    a.value
+	   FROM temp_t_anlgraph anl_graph
+	     JOIN ( SELECT anl_graph_1.arc_id,
+	            anl_graph_1.node_1,
+	            anl_graph_1.node_2,
+	            anl_graph_1.water,
+	            anl_graph_1.flag,
+	            anl_graph_1.checkf,
+	            anl_graph_1.value
+	           FROM temp_t_anlgraph anl_graph_1
+	          WHERE anl_graph_1.water = 1) a ON anl_graph.node_1::text = a.node_2::text
+	  WHERE anl_graph.flag < 2 AND anl_graph.water = 0 AND a.flag < 2;
+
 	-- Starting process
 	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('MINSECTOR DYNAMIC SECTORITZATION'));
 	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('---------------------------------------------------'));
@@ -257,7 +277,7 @@ BEGIN
 				--raise notice 'v_cont1 %', v_cont1;
 
 				v_cont1 = v_cont1+1;
-				UPDATE temp_t_anlgraph n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graph a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;
+				UPDATE temp_t_anlgraph n SET water= 1, flag=n.flag+1, checkf=1 FROM v_temp_anlgraph a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;
 				GET DIAGNOSTICS v_affectedrow =row_count;
 				v_row1 = v_row1 + v_affectedrow;
 				EXIT WHEN v_affectedrow = 0;
@@ -446,6 +466,7 @@ BEGIN
 	v_result_polygon := COALESCE(v_result_polygon, '{}');
 	
 	--drop temporal layers
+	DROP VIEW v_temp_anlgraph;
 	DROP TABLE temp_t_anlgraph;
 	DROP TABLE temp_anl_arc;
 

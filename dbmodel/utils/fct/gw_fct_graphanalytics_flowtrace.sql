@@ -87,7 +87,7 @@ BEGIN
 
 	CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
 
-CREATE OR REPLACE TEMP VIEW v_anl_graph AS 
+CREATE OR REPLACE TEMP VIEW v_temp_anlgraph AS 
  SELECT anl_graph.arc_id,
     anl_graph.node_1,
     anl_graph.node_2,
@@ -146,7 +146,7 @@ CREATE OR REPLACE TEMP VIEW v_anl_graph AS
 	-- inundation process
 	LOOP
 		v_count = v_count+1;
-                update temp_t_anlgraph n set water= 1, flag=n.flag+1 from v_anl_graph a where n.node_1 = a.node_1  and n.arc_id = a.arc_id;
+                update temp_t_anlgraph n set water= 1, flag=n.flag+1 from v_temp_anlgraph a where n.node_1 = a.node_1  and n.arc_id = a.arc_id;
 
 		GET DIAGNOSTICS affected_rows =row_count;
 		exit when affected_rows = 0;
@@ -196,7 +196,7 @@ CREATE OR REPLACE TEMP VIEW v_anl_graph AS
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 
-	DROP VIEW v_anl_graph;
+	DROP VIEW v_temp_anlgraph;
 	DROP TABLE temp_t_anlgraph;
 
 	--  Return
