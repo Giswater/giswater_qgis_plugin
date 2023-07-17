@@ -301,13 +301,13 @@ SELECT sector_id, current_user FROM sector
 ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
 
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"0"}}$$); -- PRE-PROCESS
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"1"}}$$); -- AUTOREPAIR
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"2"}}$$);-- CHECK DATA
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"3"}}$$); -- STRUCTURE DATA
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"4"}}$$);-- CHECK GRAPH
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"5"}}$$); -- BUILD INP
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"6"}}$$); -- POST-PROCESS
+SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"1"}}$$); -- PRE-PROCESS
+SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"2"}}$$); -- AUTOREPAIR
+SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"3"}}$$);-- CHECK DATA
+SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"4"}}$$); -- STRUCTURE DATA
+SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"5"}}$$);-- CHECK GRAPH
+SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"6"}}$$); -- BUILD INP
+SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"7"}}$$); -- POST-PROCESS
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'audit_project_user_control';
 
