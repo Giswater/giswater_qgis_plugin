@@ -66,7 +66,8 @@ v_result_info json;
 v_uservalues json;
 v_querytext text;
 v_iseditable boolean;
-
+v_deleted_dscenario text;
+v_deleted_psector text;
 BEGIN
 
 	-- search path
@@ -300,9 +301,17 @@ BEGIN
 					
 						END LOOP;
 					ELSIF v_selector_name = 'selector_psector' THEN
+
+							EXECUTE 'SELECT string_agg(value::text, '', '')  FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer NOT IN (SELECT psector_id FROM plan_psector)'
+							INTO v_deleted_psector;
+
 							EXECUTE 'INSERT INTO selector_psector
 							SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer IN (SELECT psector_id FROM plan_psector);';
 					ELSIF v_selector_name = 'selector_inp_dscenario' THEN
+
+							EXECUTE 'SELECT string_agg(value::text, '', '') FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer NOT IN (SELECT dscenario_id FROM cat_dscenario)'
+							INTO v_deleted_dscenario;
+
 							EXECUTE 'INSERT INTO selector_inp_dscenario
 							SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer IN (SELECT dscenario_id FROM cat_dscenario);';
 					ELSE 
@@ -343,7 +352,18 @@ BEGIN
 
 		v_return_msg = 'Workspace changed successfully';
 	END IF;
-				
+	
+	IF v_deleted_psector IS NOT NULL OR v_deleted_dscenario IS NOT NULL THEN 
+		p_data = replace(p_data::text, 'CURRENT', 'UPDATE');
+		PERFORM gw_fct_workspacemanager(p_data);
+		IF v_deleted_psector IS NOT NULL THEN	
+			v_return_msg = concat(v_return_msg,'. Workspace recreated without psector:',v_deleted_psector);
+		END IF;
+		IF v_deleted_dscenario IS NOT NULL THEN	
+			v_return_msg = concat(v_return_msg,'. Workspace recreated without dscenario:',v_deleted_dscenario,'.');
+		END IF;
+	END IF;
+
 	IF v_audit_result is null THEN
 		v_return_status = 'Accepted';
 		v_return_level = 3;
