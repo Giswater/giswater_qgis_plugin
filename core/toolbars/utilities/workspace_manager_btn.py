@@ -208,6 +208,9 @@ class GwWorkspaceManagerButton(GwAction):
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
 
+        if result and result.get('message') and result['message'].get('text'):
+            tools_qgis.show_message(result["message"].get('text'), result["message"].get('level'), dialog=self.dlg_workspace_manager)
+
         if result and result['status'] == "Accepted":
             # Set labels
             self._set_labels_current_workspace(value, result=result)
