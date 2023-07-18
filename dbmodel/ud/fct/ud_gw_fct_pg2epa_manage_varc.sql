@@ -32,7 +32,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 	-- Loop for the virtual arcs
-	FOR rec_virtual IN SELECT * FROM temp_arc WHERE epa_type='VIRTUAL'
+	FOR rec_virtual IN SELECT * FROM temp_t_arc WHERE epa_type='VIRTUAL'
 	LOOP
 		RAISE NOTICE 'rec_virtual %', rec_virtual;
 
@@ -40,12 +40,12 @@ BEGIN
 		SELECT fusion_node, add_length INTO fusion_node_aux, add_length_bool FROM inp_virtual WHERE arc_id=rec_virtual.arc_id;
 
 		IF fusion_node_aux IS NULL THEN
-			fusion_node_aux:=(SELECT node_id FROM temp_node WHERE (node_id=rec_virtual.node_1 AND node_type='JUNCTION') 
+			fusion_node_aux:=(SELECT node_id FROM temp_t_node WHERE (node_id=rec_virtual.node_1 AND node_type='JUNCTION') 
 							  OR (node_id=rec_virtual.node_2 AND node_type='JUNCTION') LIMIT 1);
 		END IF;
 
 		-- Taking values from the fusion node (as node1)
-		FOR rec_arc IN SELECT * FROM temp_arc WHERE node_1=rec_virtual.node_2 AND node_1=fusion_node_aux
+		FOR rec_arc IN SELECT * FROM temp_t_arc WHERE node_1=rec_virtual.node_2 AND node_1=fusion_node_aux
 		LOOP
 
 			-- Looking for add or not the length of virtual arc to the destination arc
@@ -62,16 +62,16 @@ BEGIN
 	
 		
 			-- Deleting features 
-			DELETE FROM temp_node WHERE node_id=rec_virtual.node_2;
-			DELETE FROM temp_arc WHERE arc_id=rec_virtual.arc_id;
+			DELETE FROM temp_t_node WHERE node_id=rec_virtual.node_2;
+			DELETE FROM temp_t_arc WHERE arc_id=rec_virtual.arc_id;
 
 			-- Updating arc
-			UPDATE temp_arc SET node_1=rec_virtual.node_1, length=length+length_aux, the_geom=new_arc_geom WHERE arc_id=rec_arc.arc_id;
+			UPDATE temp_t_arc SET node_1=rec_virtual.node_1, length=length+length_aux, the_geom=new_arc_geom WHERE arc_id=rec_arc.arc_id;
 
 		END LOOP;
 		
 		-- Taking values from the fusion node (as node2)
-		FOR rec_arc IN SELECT * FROM temp_arc WHERE node_2=rec_virtual.node_1 AND node_2=fusion_node_aux
+		FOR rec_arc IN SELECT * FROM temp_t_arc WHERE node_2=rec_virtual.node_1 AND node_2=fusion_node_aux
 		LOOP
 	
 			-- Looking for add or not the length of virtual arc to the destination arc
@@ -87,11 +87,11 @@ BEGIN
 			new_arc_geom := ST_MakeLine(pointArray2);
 	
 			-- Deleting features 
-			DELETE FROM temp_node WHERE node_id=rec_virtual.node_1;
-			DELETE FROM temp_arc WHERE arc_id=rec_virtual.arc_id;
+			DELETE FROM temp_t_node WHERE node_id=rec_virtual.node_1;
+			DELETE FROM temp_t_arc WHERE arc_id=rec_virtual.arc_id;
 
 			-- Updating arc
-			UPDATE temp_arc SET node_2=rec_virtual.node_2, length=length+length_aux, the_geom=new_arc_geom WHERE arc_id=rec_arc.arc_id;
+			UPDATE temp_t_arc SET node_2=rec_virtual.node_2, length=length+length_aux, the_geom=new_arc_geom WHERE arc_id=rec_arc.arc_id;
 
 		END LOOP;
 

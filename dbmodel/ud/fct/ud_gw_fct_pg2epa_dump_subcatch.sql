@@ -37,7 +37,7 @@ BEGIN
 	-- get input parameters
 	v_client_epsg = (p_data->>'client')::json->>'epsg'; 
 
-	DELETE FROM temp_table WHERE fid = v_fid;
+	DELETE FROM temp_t_table WHERE fid = v_fid;
 
 	-- Dump node coordinates for every polygon
 	FOR row_id IN SELECT subc_id FROM v_edit_inp_subcatchment
@@ -51,7 +51,7 @@ BEGIN
 		FOR point_aux IN SELECT (ST_dumppoints(subcatchment_polygon)).geom
 		LOOP
 			-- Insert result into outfile table
-			INSERT INTO temp_table (fid, text_column) VALUES ( v_fid, format('%s       %s       %s       ', row_id, 
+			INSERT INTO temp_t_table (fid, text_column) VALUES ( v_fid, format('%s       %s       %s       ', row_id, 
 			to_char(ST_X(ST_Transform(point_aux,v_client_epsg)),'99999999.999'), 
 			to_char(ST_Y(ST_Transform(point_aux,v_client_epsg)),'99999999.999')) );
 		END LOOP;
@@ -59,7 +59,7 @@ BEGIN
 	END LOOP;
 
 	-- Return the temporal table
-	RETURN QUERY SELECT text_column::varchar FROM temp_table WHERE cur_user=current_user AND fid = 117;
+	RETURN QUERY SELECT text_column::varchar FROM temp_t_table WHERE cur_user=current_user AND fid = 117;
 
 END;$BODY$
 LANGUAGE plpgsql VOLATILE

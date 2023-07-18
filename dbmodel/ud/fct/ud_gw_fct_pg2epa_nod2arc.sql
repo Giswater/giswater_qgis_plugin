@@ -13,7 +13,7 @@ AS $BODY$
 /*
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
 
-SELECT * FROM SCHEMA_NAME.temp_arc
+SELECT * FROM SCHEMA_NAME.temp_t_arc
 
 */
 
@@ -72,29 +72,29 @@ BEGIN
 	RAISE NOTICE 'Starting process of nodarcs';
 	
 	-- setting record_new_arc
-	SELECT * INTO rec_new_arc FROM temp_arc LIMIT 1;
+	SELECT * INTO rec_new_arc FROM temp_t_arc LIMIT 1;
 
 	FOR rec_flowreg IN 
 	SELECT node_id, to_arc, flwreg_length, flw_type, order_id, epa_type FROM 
-	(SELECT temp_node.node_id, to_arc, flwreg_length, 'OR'::text as flw_type, order_id, 'ORIFICE' as epa_type FROM inp_flwreg_orifice JOIN temp_node ON temp_node.node_id=inp_flwreg_orifice.node_id 
-	JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id
+	(SELECT temp_t_node.node_id, to_arc, flwreg_length, 'OR'::text as flw_type, order_id, 'ORIFICE' as epa_type FROM inp_flwreg_orifice JOIN temp_t_node ON temp_t_node.node_id=inp_flwreg_orifice.node_id 
+	JOIN selector_sector ON selector_sector.sector_id=temp_t_node.sector_id
 		UNION 
-	SELECT temp_node.node_id, to_arc, flwreg_length, 'OT'::text as flw_type, order_id, 'OUTLET' as epa_type FROM inp_flwreg_outlet JOIN temp_node ON temp_node.node_id=inp_flwreg_outlet.node_id 
-	JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id
+	SELECT temp_t_node.node_id, to_arc, flwreg_length, 'OT'::text as flw_type, order_id, 'OUTLET' as epa_type FROM inp_flwreg_outlet JOIN temp_t_node ON temp_t_node.node_id=inp_flwreg_outlet.node_id 
+	JOIN selector_sector ON selector_sector.sector_id=temp_t_node.sector_id
 		UNION 
-	SELECT temp_node.node_id, to_arc, flwreg_length, 'PU'::text as flw_type, order_id, 'PUMP' as epa_type FROM inp_flwreg_pump JOIN temp_node ON temp_node.node_id=inp_flwreg_pump.node_id 
-	JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id
+	SELECT temp_t_node.node_id, to_arc, flwreg_length, 'PU'::text as flw_type, order_id, 'PUMP' as epa_type FROM inp_flwreg_pump JOIN temp_t_node ON temp_t_node.node_id=inp_flwreg_pump.node_id 
+	JOIN selector_sector ON selector_sector.sector_id=temp_t_node.sector_id
 		UNION 
-	SELECT temp_node.node_id, to_arc, flwreg_length, 'WE'::text as flw_type, order_id, 'WEIR' as epa_type FROM inp_flwreg_weir JOIN temp_node ON temp_node.node_id=inp_flwreg_weir.node_id 
-	JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id)a
+	SELECT temp_t_node.node_id, to_arc, flwreg_length, 'WE'::text as flw_type, order_id, 'WEIR' as epa_type FROM inp_flwreg_weir JOIN temp_t_node ON temp_t_node.node_id=inp_flwreg_weir.node_id 
+	JOIN selector_sector ON selector_sector.sector_id=temp_t_node.sector_id)a
 	ORDER BY node_id, to_arc
 					
 	LOOP
 		-- Getting data from node
-		SELECT * INTO rec_node FROM temp_node WHERE node_id = rec_flowreg.node_id;
+		SELECT * INTO rec_node FROM temp_t_node WHERE node_id = rec_flowreg.node_id;
 
 		-- Getting data from arc
-		SELECT arc_id, node_1, node_2, the_geom INTO v_arc, v_node_1, v_node_2, v_geom FROM temp_arc WHERE arc_id=rec_flowreg.to_arc;
+		SELECT arc_id, node_1, node_2, the_geom INTO v_arc, v_node_1, v_node_2, v_geom FROM temp_t_arc WHERE arc_id=rec_flowreg.to_arc;
 		IF v_arc IS NULL THEN	
 
 		ELSE
@@ -144,7 +144,7 @@ BEGIN
 				rec_new_arc.the_geom := ST_MakeLine(v_nodarc_node_1_geom, v_nodarc_node_2_geom);
       
 				-- Inserting new arc into arc table
-				INSERT INTO temp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, expl_id, the_geom)
+				INSERT INTO temp_t_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, expl_id, the_geom)
 				VALUES(result_id_var, rec_new_arc.arc_id, rec_new_arc.node_1, rec_new_arc.node_2, rec_new_arc.arc_type, rec_new_arc.arccat_id, 
 				rec_new_arc.epa_type, rec_new_arc.sector_id, rec_new_arc.state, rec_new_arc.state_type, rec_new_arc.annotation, rec_new_arc.length, rec_new_arc.expl_id, rec_new_arc.the_geom);
 	
@@ -179,7 +179,7 @@ BEGIN
 
 					--create the modified geom
 					rec_new_arc.the_geom=ST_makeline(ARRAY[ST_startpoint(nodarc_rec.the_geom), p1_geom, p2_geom, ST_endpoint(nodarc_rec.the_geom)]);
-					UPDATE temp_arc SET arccat_id='SECONDARY', the_geom=rec_new_arc.the_geom WHERE arc_id = rec_new_arc.arc_id;			
+					UPDATE temp_t_arc SET arccat_id='SECONDARY', the_geom=rec_new_arc.the_geom WHERE arc_id = rec_new_arc.arc_id;			
 				ELSE
 					-- Inserting new node into node table
 					rec_node.epa_type := 'JUNCTION';
@@ -187,12 +187,12 @@ BEGIN
 					v_node_yinit =(SELECT value::float FROM config_param_user WHERE parameter='epa_junction_y0_vdefault' AND cur_user=current_user);
 					IF v_node_yinit IS NULL THEN v_node_yinit = 0; END IF;
 
-					INSERT INTO temp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, y0, ysur, apond, expl_id, the_geom) 
+					INSERT INTO temp_t_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, y0, ysur, apond, expl_id, the_geom) 
 					VALUES (result_id_var, rec_new_arc.node_2, rec_node.top_elev, (rec_node.top_elev-rec_node.elev), rec_node.elev, rec_node.node_type, rec_node.nodecat_id, rec_node.epa_type, 
 					rec_node.sector_id, rec_node.state, rec_node.state_type, rec_node.annotation, v_node_yinit, rec_node.ysur, rec_node.apond, rec_node.expl_id, v_nodarc_node_2_geom)
 					ON CONFLICT (node_id) DO NOTHING;
 
-					SELECT * INTO nodarc_rec FROM temp_arc WHERE arc_id=concat(rec_flowreg.node_id,rec_flowreg.flw_type, rec_flowreg.order_id);
+					SELECT * INTO nodarc_rec FROM temp_t_arc WHERE arc_id=concat(rec_flowreg.node_id,rec_flowreg.flw_type, rec_flowreg.order_id);
 					
 					-- udpating the feature
 					v_counter :=1;
@@ -202,11 +202,11 @@ BEGIN
 				old_to_arc= rec_flowreg.to_arc;
 				old_node_2 = rec_new_arc.node_2;
 
-				UPDATE temp_arc SET node_1 = rec_new_arc.node_2 WHERE arc_id = rec_flowreg.to_arc;
+				UPDATE temp_t_arc SET node_1 = rec_new_arc.node_2 WHERE arc_id = rec_flowreg.to_arc;
 
 				-- update values on node_2 when flow regulator it's a pump, fixing ysur as maximum as possible
 				IF rec_flowreg.flw_type='PU' THEN
-					UPDATE temp_node SET y0=0, ysur=9999 WHERE node_id=rec_new_arc.node_2;
+					UPDATE temp_t_node SET y0=0, ysur=9999 WHERE node_id=rec_new_arc.node_2;
 				END IF;				
 			END IF;
 		END IF;

@@ -27,7 +27,7 @@ BEGIN
 	
 	-- update ysur for junctions
 	IF v_ysur IS NOT NULL THEN
-		UPDATE rpt_inp_node SET ysur = v_ysur WHERE result_id = p_result;
+		UPDATE temp_rpt_inp_node SET ysur = v_ysur WHERE result_id = p_result;
 	END IF;
 
     RETURN 1;

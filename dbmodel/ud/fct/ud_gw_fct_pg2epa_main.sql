@@ -100,13 +100,15 @@ BEGIN
 		CREATE TEMP TABLE temp_audit_log_data (LIKE SCHEMA_NAME.audit_log_data INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_gully (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_gully (LIKE SCHEMA_NAME.temp_gully INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
 
 		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
 		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
 		CREATE TEMP TABLE temp_anl_gully (LIKE SCHEMA_NAME.anl_gully INCLUDING ALL);
 		CREATE TEMP TABLE temp_rpt_inp_raingage (LIKE SCHEMA_NAME.rpt_inp_raingage INCLUDING ALL);
+		CREATE TEMP TABLE temp_rpt_inp_node (LIKE SCHEMA_NAME.rpt_inp_node INCLUDING ALL);
+		CREATE TEMP TABLE temp_rpt_inp_arc (LIKE SCHEMA_NAME.rpt_inp_arc INCLUDING ALL);
 
 		CREATE TEMP TABLE temp_t_go2epa (LIKE SCHEMA_NAME.temp_go2epa INCLUDING ALL);
 		
@@ -222,7 +224,6 @@ BEGIN
 		DROP TABLE IF EXISTS temp_t_table;	
 		DROP TABLE IF EXISTS temp_audit_check_data;
 		DROP TABLE IF EXISTS temp_audit_log_data;
-		DROP TABLE IF EXISTS temp_t_table;
 		DROP TABLE IF EXISTS temp_t_node;
 		DROP TABLE IF EXISTS temp_t_arc;
 		DROP TABLE IF EXISTS temp_t_gully;
@@ -232,6 +233,8 @@ BEGIN
 		DROP TABLE IF EXISTS temp_anl_node;		
 		DROP TABLE IF EXISTS temp_anl_gully;
 		DROP TABLE IF EXISTS temp_rpt_inp_raingage;
+		DROP TABLE IF EXISTS temp_rpt_inp_node;
+		DROP TABLE IF EXISTS temp_rpt_inp_arc;
 		
 		DROP TABLE IF EXISTS temp_t_go2epa;
 		

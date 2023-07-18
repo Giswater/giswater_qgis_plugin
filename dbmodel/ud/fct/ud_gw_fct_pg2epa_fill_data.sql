@@ -16,8 +16,8 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "la
 INSERT INTO SCHEMA_NAME.rpt_cat_result VALUES ('r1');
 SELECT "SCHEMA_NAME".gw_fct_pg2epa_fill_data ('r1');
 
-select * from temp_arc
-	select * from temp_node where epa_type = 'DIVIDER'
+select * from temp_t_arc
+	select * from temp_t_node where epa_type = 'DIVIDER'
 
 
 */ 
@@ -36,14 +36,15 @@ BEGIN
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	-- Delete previous results on temp_node & arc tables
-	TRUNCATE temp_node;
-	TRUNCATE temp_node_other;
-	TRUNCATE temp_arc;
-	TRUNCATE temp_arc_flowregulator;
-	TRUNCATE temp_gully;
+	-- Delete previous results on temp_t_node & arc tables
+	TRUNCATE temp_t_node;
+	TRUNCATE temp_t_node_other;
+	TRUNCATE temp_t_arc;
+	TRUNCATE temp_t_arc_flowregulator;
+	TRUNCATE temp_t_gully;
+	TRUNCATE temp_rpt_inp_raingage;
 	DELETE FROM rpt_inp_raingage WHERE result_id = result_id_var;
-	TRUNCATE temp_lid_usage;
+	TRUNCATE temp_t_lid_usage;
 
 	-- set all timeseries of raingage using user's value
 	v_rainfall:= (SELECT value FROM config_param_user WHERE parameter='inp_options_setallraingages' AND cur_user=current_user);
@@ -67,7 +68,7 @@ BEGIN
 
 	-- Insert on node rpt_inp table
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
-	EXECUTE 'INSERT INTO temp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom, age)
+	EXECUTE 'INSERT INTO temp_t_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom, age)
 	SELECT '||quote_literal(result_id_var)||',
 	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, node.state, 
 	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom, (now()::date-node.builtdate)/30
@@ -118,34 +119,34 @@ BEGIN
 	PERFORM gw_fct_anl_node_sink($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"tableName":"v_edit_inp_junction"},"data":{"parameters":{"saveOnDatabase":true}}}$$);
 	
 	-- update child param for divider
-	UPDATE temp_node SET addparam=concat('{"divider_type":"',divider_type,'", "arc_id":"',arc_id,'", "curve_id":"',curve_id,'", "qmin":"',
+	UPDATE temp_t_node SET addparam=concat('{"divider_type":"',divider_type,'", "arc_id":"',arc_id,'", "curve_id":"',curve_id,'", "qmin":"',
 	qmin,'", "ht":"',ht,'", "cd":"',cd,'"}')
-	FROM inp_divider WHERE temp_node.node_id=inp_divider.node_id;
+	FROM inp_divider WHERE temp_t_node.node_id=inp_divider.node_id;
 
 	-- update child param for storage
-	UPDATE temp_node SET addparam=concat('{"storage_type":"',storage_type,'", "curve_id":"',curve_id,'", "a1":"',a1,'", "a2":"',a2,'", "a0":"',a0,'", "fevap":"',fevap,'", "sh":"',sh,'", "hc":"',hc,'", 
+	UPDATE temp_t_node SET addparam=concat('{"storage_type":"',storage_type,'", "curve_id":"',curve_id,'", "a1":"',a1,'", "a2":"',a2,'", "a0":"',a0,'", "fevap":"',fevap,'", "sh":"',sh,'", "hc":"',hc,'", 
 	"imd":"',imd,'"}')
-	FROM inp_storage WHERE temp_node.node_id=inp_storage.node_id;
+	FROM inp_storage WHERE temp_t_node.node_id=inp_storage.node_id;
 
 	-- update child param for outfall
-	UPDATE temp_node SET addparam=concat('{"outfall_type":"',outfall_type,'", "state":"',state,'", "curve_id":"',curve_id,'", "timser_id":"',timser_id,'", "gate":"',gate,'"}')
-	FROM inp_outfall WHERE temp_node.node_id=inp_outfall.node_id;
+	UPDATE temp_t_node SET addparam=concat('{"outfall_type":"',outfall_type,'", "state":"',state,'", "curve_id":"',curve_id,'", "timser_id":"',timser_id,'", "gate":"',gate,'"}')
+	FROM inp_outfall WHERE temp_t_node.node_id=inp_outfall.node_id;
 
-	UPDATE temp_node SET epa_type='OUTFALL' FROM anl_node a JOIN inp_junction USING (node_id) 
+	UPDATE temp_t_node SET epa_type='OUTFALL' FROM anl_node a JOIN inp_junction USING (node_id) 
 	WHERE outfallparam IS NOT NULL AND fid = 113 AND cur_user=current_user
-	AND temp_node.node_id=a.node_id;
+	AND temp_t_node.node_id=a.node_id;
 
-	INSERT INTO temp_node_other (node_id, type, timser_id, other, mfactor, sfactor, base, pattern_id)
+	INSERT INTO temp_t_node_other (node_id, type, timser_id, other, mfactor, sfactor, base, pattern_id)
 	SELECT node_id, 'FLOW', timser_id, 'FLOW', 1, sfactor, base, pattern_id FROM v_edit_inp_inflows;
 
-	INSERT INTO temp_node_other (node_id, type, timser_id, poll_id, other, mfactor, sfactor, base, pattern_id)
+	INSERT INTO temp_t_node_other (node_id, type, timser_id, poll_id, other, mfactor, sfactor, base, pattern_id)
 	SELECT node_id, 'POLLUTANT', timser_id, poll_id, form_type, mfactor, sfactor, base, pattern_id FROM v_edit_inp_inflows_poll;
 	
-	INSERT INTO temp_node_other (node_id, type, poll_id, other)
+	INSERT INTO temp_t_node_other (node_id, type, poll_id, other)
 	SELECT node_id, 'TREATMENT', poll_id, function FROM v_edit_inp_treatment;
 
 	-- Insert on arc rpt_inp table
-	EXECUTE 'INSERT INTO temp_arc 
+	EXECUTE 'INSERT INTO temp_t_arc 
 	(result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, n, expl_id, the_geom, q0, qmax, barrels, slope,
 	culvert, kentry, kexit, kavg, flap, seepage, age)
 	SELECT '||quote_literal(result_id_var)||',
@@ -176,11 +177,11 @@ BEGIN
 
 	-- todo: UPDATE childparam for inp_weir, inp_orifice, inp_outlet, inp_pump
 
-	-- fill temp_gully in order to work with 1D/2D
+	-- fill temp_t_gully in order to work with 1D/2D
 	IF v_networkmode = 2 THEN
 
 		-- netgully
-		EXECUTE 'INSERT INTO temp_gully 
+		EXECUTE 'INSERT INTO temp_t_gully 
 		SELECT 
 		concat(''NG'',node_id), g.node_type, gratecat_id, null, g.node_id, g.sector_id, g.state, g.state_type, 
 		case when custom_top_elev is null then top_elev else custom_top_elev end, 
@@ -197,7 +198,7 @@ BEGIN
 		WHERE g.sector_id > 0 '||v_statetype||';';
 
 		-- gully
-		EXECUTE 'INSERT INTO temp_gully 
+		EXECUTE 'INSERT INTO temp_t_gully 
 		SELECT 
 		gully_id, g.gully_type, gratecat_id, g.arc_id, 
 		case when pjoint_type = ''NODE'' then pjoint_id else a.node_2 END AS node_id, 
@@ -219,34 +220,34 @@ BEGIN
 	END IF;
 
 	-- orifice
-	INSERT INTO temp_arc_flowregulator (arc_id, type, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4, close_time)
+	INSERT INTO temp_t_arc_flowregulator (arc_id, type, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4, close_time)
 	SELECT arc_id, 'ORIFICE', ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4, close_time
 	FROM v_edit_inp_orifice;
 
-	INSERT INTO temp_arc_flowregulator (arc_id, type, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4, close_time)
+	INSERT INTO temp_t_arc_flowregulator (arc_id, type, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4, close_time)
 	SELECT nodarc_id, 'ORIFICE', ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4, close_time
 	FROM v_edit_inp_flwreg_orifice;
 
 	-- outlet
-	INSERT INTO temp_arc_flowregulator (arc_id, type, outlet_type, offsetval, curve_id, cd1, cd2, flap)
+	INSERT INTO temp_t_arc_flowregulator (arc_id, type, outlet_type, offsetval, curve_id, cd1, cd2, flap)
 	SELECT arc_id, 'OUTLET', outlet_type, offsetval, curve_id, cd1, cd2, flap
 	FROM v_edit_inp_outlet;
 
-	INSERT INTO temp_arc_flowregulator (arc_id, type, outlet_type, offsetval, curve_id, cd1, cd2, flap)
+	INSERT INTO temp_t_arc_flowregulator (arc_id, type, outlet_type, offsetval, curve_id, cd1, cd2, flap)
 	SELECT nodarc_id, 'OUTLET', outlet_type, offsetval,curve_id, cd1, cd2, flap
 	FROM v_edit_inp_flwreg_outlet;
 
 	-- pump
-	INSERT INTO temp_arc_flowregulator (arc_id, type, curve_id, status, startup, shutoff)
+	INSERT INTO temp_t_arc_flowregulator (arc_id, type, curve_id, status, startup, shutoff)
 	SELECT arc_id, 'PUMP', curve_id, status, startup, shutoff
 	FROM v_edit_inp_pump;
 	
-	INSERT INTO temp_arc_flowregulator (arc_id, type, curve_id, status, startup, shutoff)
+	INSERT INTO temp_t_arc_flowregulator (arc_id, type, curve_id, status, startup, shutoff)
 	SELECT nodarc_id, 'PUMP', curve_id, status, startup, shutoff
 	FROM v_edit_inp_flwreg_pump;
 
 	-- weir
-	INSERT INTO temp_arc_flowregulator (arc_id, type, weir_type, offsetval, cd, ec, cd2, flap, shape, geom1, geom2, geom3, geom4, road_width, 
+	INSERT INTO temp_t_arc_flowregulator (arc_id, type, weir_type, offsetval, cd, ec, cd2, flap, shape, geom1, geom2, geom3, geom4, road_width, 
 	road_surf, coef_curve, surcharge)
 	SELECT arc_id, 'WEIR', weir_type, offsetval, cd, ec, cd2, flap, inp_typevalue.descript, geom1, geom2, geom3, geom4, road_width, 
 	road_surf, coef_curve, surcharge
@@ -254,7 +255,7 @@ BEGIN
 	LEFT JOIN inp_typevalue ON inp_typevalue.id::text = v_edit_inp_weir.weir_type::text
 	WHERE inp_typevalue.typevalue::text = 'inp_value_weirs';
 	
-	INSERT INTO temp_arc_flowregulator (arc_id, type, weir_type, offsetval, cd, ec, cd2, flap, shape, geom1, geom2, geom3, geom4, road_width, 
+	INSERT INTO temp_t_arc_flowregulator (arc_id, type, weir_type, offsetval, cd, ec, cd2, flap, shape, geom1, geom2, geom3, geom4, road_width, 
 	road_surf, coef_curve, surcharge)
 	SELECT nodarc_id, 'WEIR', weir_type, offsetval, cd, ec, cd2, flap, inp_typevalue.descript, geom1, geom2, geom3, geom4, road_width, 
 	road_surf, coef_curve, surcharge
@@ -263,7 +264,7 @@ BEGIN
 	WHERE inp_typevalue.typevalue::text = 'inp_value_weirs';
 
 	-- rpt_inp_raingage
-	INSERT INTO rpt_inp_raingage
+	INSERT INTO temp_rpt_inp_raingage
 	SELECT result_id_var, * FROM v_edit_raingage;
 
 	RETURN 1;	
