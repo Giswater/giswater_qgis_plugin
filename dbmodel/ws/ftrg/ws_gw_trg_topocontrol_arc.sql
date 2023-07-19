@@ -59,14 +59,14 @@ BEGIN
 	IF v_sys_statetopocontrol IS NOT TRUE OR v_user_statetopocontrol IS TRUE THEN
 
 		-- working without statetopocontrol
-		SELECT node.* INTO nodeRecord1 FROM node
+		SELECT node.*,nodetype_id INTO nodeRecord1 FROM node
 		JOIN cat_node ON cat_node.id=node.nodecat_id
 		JOIN cat_feature_node ON cat_feature_node.id = nodetype_id
 		WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) ORDER BY
 		(case when isarcdivide is true then 1 else 2 end), 
 		ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) limit 1;
 
-		SELECT node.* INTO nodeRecord2 FROM node
+		SELECT node.*,nodetype_id INTO nodeRecord2 FROM node
 		JOIN cat_node ON cat_node.id=node.nodecat_id
 		JOIN cat_feature_node ON cat_feature_node.id = nodetype_id
 		WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) ORDER BY
