@@ -948,14 +948,15 @@ def reset_model(dialog, table_object, feature_type):
 
 def get_feature_by_id(layer, id, field_id=None):
 
-    features = layer.getFeatures()
-    for feature in features:
-        if field_id is None:
-            if feature.id() == id:
-                return feature
-        else:
+    if field_id is not None:
+        expr = f"{field_id} = '{id}'"
+        features = layer.getFeatures(expr)
+        for feature in features:
             if feature[field_id] == id:
                 return feature
+    else:
+        return layer.getFeature(id)
+
     return False
 
 
