@@ -63,44 +63,44 @@ BEGIN
 	END IF;
 	raise notice 'v_distance_left,%',v_distance_left;
 	-- Check if the node is already computed
-	SELECT node_id INTO v_exists_id FROM anl_node WHERE node_id = v_node_id AND cur_user="current_user"() AND fid = v_fid;
+	SELECT node_id INTO v_exists_id FROM temp_anl_node WHERE node_id = v_node_id AND cur_user="current_user"() AND fid = v_fid;
 
 	-- Compute proceed
 	IF NOT FOUND THEN
 
 		-- Update value
-		INSERT INTO anl_node (node_id, state, fid, the_geom)
-		SELECT node_id, 1, v_fid, the_geom FROM temp_node WHERE node_id = v_node_id;
+		INSERT INTO temp_anl_node (node_id, state, fid, the_geom)
+		SELECT node_id, 1, v_fid, the_geom FROM temp_t_node WHERE node_id = v_node_id;
 	
-		v_query='SELECT flag, arc_id, node_1 as target_node, the_geom FROM '||(v_schema)||' .temp_arc WHERE node_1 = '||quote_literal(v_node_id)||' AND (flag IS false or flag IS null) and result_id='''||v_fid||''' UNION
-		SELECT flag,arc_id, node_2 as target_node, the_geom FROM '||(v_schema)||'.temp_arc WHERE node_2 = '||quote_literal(v_node_id)||' AND (flag IS false or flag IS null)  and result_id='''||v_fid||'''';
+		v_query='SELECT flag, arc_id, node_1 as target_node, the_geom FROM temp_t_arc WHERE node_1 = '||quote_literal(v_node_id)||' AND (flag IS false or flag IS null) and result_id='''||v_fid||''' UNION
+		SELECT flag,arc_id, node_2 as target_node, the_geom FROM temp_t_arc WHERE node_2 = '||quote_literal(v_node_id)||' AND (flag IS false or flag IS null)  and result_id='''||v_fid||'''';
 
 		-- Loop for all the arcs
 		FOR rec_table IN EXECUTE v_query LOOP
 
 			--check if node_id is one at the street crossing - recuperate the saved distance and remove the node if all street options where used
-			IF v_node_id in (SELECT node_id from anl_node where fid=v_fid_cross) THEN
+			IF v_node_id in (SELECT node_id from temp_anl_node where fid=v_fid_cross) THEN
 				
-				SELECT total_distance into v_distance_left from anl_node where fid=v_fid_cross AND node_id=v_node_id and cur_user="current_user"();
+				SELECT total_distance into v_distance_left from temp_anl_node where fid=v_fid_cross AND node_id=v_node_id and cur_user="current_user"();
 				
 				EXECUTE 'SELECT count(distinct arc_id) FROM (
-				SELECT arc_id, node_1 as target_node, the_geom FROM temp_arc WHERE node_1 = '||quote_literal(v_node_id)||' and result_id='''||v_fid||'''  UNION
-				SELECT arc_id, node_2 as target_node, the_geom FROM temp_arc WHERE node_1 = '||quote_literal(v_node_id)||' and result_id='''||v_fid||''')a'
+				SELECT arc_id, node_1 as target_node, the_geom FROM temp_t_arc WHERE node_1 = '||quote_literal(v_node_id)||' and result_id='''||v_fid||'''  UNION
+				SELECT arc_id, node_2 as target_node, the_geom FROM temp_t_arc WHERE node_1 = '||quote_literal(v_node_id)||' and result_id='''||v_fid||''')a'
 				INTO v_count;
 				
 				IF v_count = 1 THEN
-					DELETE FROM anl_node WHERE node_id=v_node_id AND fid=v_fid_cross and cur_user="current_user"();
+					DELETE FROM temp_anl_node WHERE node_id=v_node_id AND fid=v_fid_cross and cur_user="current_user"();
 				END IF;
 			END IF;
 			
 			--check number of arcs that leave the node to save it as a road crossing if necessary
 			EXECUTE 'SELECT count(distinct arc_id) FROM (
-				SELECT arc_id, node_1 as target_node, the_geom FROM temp_arc WHERE node_1 = '||quote_literal(v_node_id)||' and result_id='''||v_fid||'''  UNION
-				SELECT arc_id, node_2 as target_node, the_geom FROM temp_arc WHERE node_1 = '||quote_literal(v_node_id)||' and result_id='''||v_fid||''')a'
+				SELECT arc_id, node_1 as target_node, the_geom FROM temp_t_arc WHERE node_1 = '||quote_literal(v_node_id)||' and result_id='''||v_fid||'''  UNION
+				SELECT arc_id, node_2 as target_node, the_geom FROM temp_t_arc WHERE node_1 = '||quote_literal(v_node_id)||' and result_id='''||v_fid||''')a'
 			INTO v_count;
 				
 			IF v_count  > 0 THEN
-					INSERT INTO anl_node (fid, node_id, total_distance)
+					INSERT INTO temp_anl_node (fid, node_id, total_distance)
 					VALUES (v_fid_cross, v_node_id, v_distance_left);
 				END IF;
 
@@ -108,24 +108,24 @@ BEGIN
 		
 			-- Insert arc into tables
 			--IF rec_table.arc_id NOT IN  (SELECT arc_id FROM anl_arc WHERE fid=v_fid) THEN 
-					INSERT INTO anl_arc (arc_id, fid, the_geom,length, descript, expl_id, node_1) 
+					INSERT INTO temp_anl_arc (arc_id, fid, the_geom,length, descript, expl_id, node_1) 
 					SELECT rec_table.arc_id, v_fid, rec_table.the_geom, v_arclength, v_hydrant, expl_id, v_hydrant FROM exploitation
 					WHERE ST_DWithin(rec_table.the_geom, exploitation.the_geom,0.01);
 			--END IF;
 			raise notice 'rec_table.arc_id,v_distance_left,%-%',rec_table.arc_id,v_distance_left;
 			v_currentDistance=v_currentDistance+v_arclength;
 
-			UPDATE anl_node set total_distance=v_currentDistance WHERE node_id=v_node_id AND fid=v_fid and cur_user="current_user"();
+			UPDATE temp_anl_node set total_distance=v_currentDistance WHERE node_id=v_node_id AND fid=v_fid and cur_user="current_user"();
 
-			UPDATE temp_arc SET flag=true where arc_id=rec_table.arc_id;
+			UPDATE temp_t_arc SET flag=true where arc_id=rec_table.arc_id;
 	
 			IF v_distance_left > v_arclength  THEN
 				v_distance_left=v_distance_left-v_arclength;
 				
 				--look for the 
 				SELECT target_node INTO v_target_node FROM (
-				SELECT arc_id, node_1 as target_node, the_geom FROM temp_arc WHERE arc_id = rec_table.arc_id AND result_id=v_fid::text UNION
-				SELECT arc_id, node_2 as target_node, the_geom FROM temp_arc WHERE arc_id = rec_table.arc_id AND result_id=v_fid::text)a
+				SELECT arc_id, node_1 as target_node, the_geom FROM temp_t_arc WHERE arc_id = rec_table.arc_id AND result_id=v_fid::text UNION
+				SELECT arc_id, node_2 as target_node, the_geom FROM temp_t_arc WHERE arc_id = rec_table.arc_id AND result_id=v_fid::text)a
 				WHERE target_node!=rec_table.target_node;
 
 				IF v_target_node IS NOT NULL THEN
@@ -143,7 +143,7 @@ BEGIN
 	 				v_percent=1;
 	 			END IF;
 	 			--check the direction of newly created arc and reverse it if it doesnt start in the initial node
-				SELECT node_id::integer INTO v_checkstart FROM temp_node n
+				SELECT node_id::integer INTO v_checkstart FROM temp_t_node n
 				WHERE ST_DWithin(ST_startpoint(rec_table.the_geom), n.the_geom,2) AND result_id=v_fid::text
 				ORDER BY ST_Distance(n.the_geom, ST_startpoint(rec_table.the_geom)) LIMIT 1;
 
@@ -155,21 +155,21 @@ BEGIN
 				RAISE NOTICE 'v_hydrant,% - arc, %',v_hydrant,rec_table.arc_id;
 				
 				IF v_percent > 0.001 	THEN 
-					EXECUTE 'UPDATE anl_arc SET the_geom=(ST_LineSubstring('''||rec_table.the_geom::text||''',0.0,'||v_percent||')), fid='||v_fid_cross||', 
+					EXECUTE 'UPDATE temp_anl_arc SET the_geom=(ST_LineSubstring('''||rec_table.the_geom::text||''',0.0,'||v_percent||')), fid='||v_fid_cross||', 
 					length = st_length(ST_LineSubstring('''||rec_table.the_geom::text||''',0.0,'||v_percent||')) 
 					WHERE arc_id='||quote_literal(rec_table.arc_id)||' and fid='||v_fid||' and cur_user=current_user and descript='||quote_literal(v_hydrant)||';';
 				END IF;
 
 				IF v_percent < 1 THEN
-					EXECUTE 'UPDATE temp_arc SET flag=NULL WHERE arc_id='||quote_literal(rec_table.arc_id)||';';
+					EXECUTE 'UPDATE temp_t_arc SET flag=NULL WHERE arc_id='||quote_literal(rec_table.arc_id)||';';
 				END IF;
 
 				EXECUTE 'SELECT count(distinct arc_id) FROM (
-				SELECT arc_id, node_1 as target_node, the_geom FROM temp_arc WHERE node_1 = '||quote_literal(v_node_id)||' and result_id='''||v_fid||'''  UNION
-				SELECT arc_id, node_2 as target_node, the_geom FROM temp_arc WHERE node_1 = '||quote_literal(v_node_id)||' and result_id='''||v_fid||''')a'
+				SELECT arc_id, node_1 as target_node, the_geom FROM temp_t_arc WHERE node_1 = '||quote_literal(v_node_id)||' and result_id='''||v_fid||'''  UNION
+				SELECT arc_id, node_2 as target_node, the_geom FROM temp_t_arc WHERE node_1 = '||quote_literal(v_node_id)||' and result_id='''||v_fid||''')a'
 				INTO v_count;
 				IF v_count = 0 THEN
-					DELETE FROM anl_node WHERE node_id=v_node_id AND fid=v_fid_cross and cur_user="current_user"();
+					DELETE FROM temp_anl_node WHERE node_id=v_node_id AND fid=v_fid_cross and cur_user="current_user"();
 				END IF;
 
 				IF v_distance_left IS NULL THEN 

@@ -76,21 +76,22 @@ SET search_path = "SCHEMA_NAME", public;
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
-	-- Reset values
-	DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = v_fid OR fid = v_fid_result);
-	DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = v_fid OR fid = v_fid_result);
-	DELETE FROM temp_arc WHERE (result_id = v_fid::text);
-	DELETE FROM temp_node WHERE (result_id = v_fid::text);
-	DELETE FROM audit_check_data WHERE (fid = v_fid) and cur_user="current_user"();
-			
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CALCULATE THE REACH OF HYDRANTS'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
+	--create temp tables
+	CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
+	CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
+	CREATE TEMP TABLE temp_t_table (LIKE SCHEMA_NAME.temp_table INCLUDING ALL);
+	CREATE TEMP TABLE temp_t_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
+	CREATE TEMP TABLE temp_t_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
+	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+		
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CALCULATE THE REACH OF HYDRANTS'));
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
 
 	--store psector selector values
 	IF v_use_psector IS NOT TRUE THEN
 			-- save psector selector 
-			DELETE FROM temp_table WHERE fid=288 AND cur_user=current_user;
-			INSERT INTO temp_table (fid, text_column)
+			DELETE FROM temp_t_table WHERE fid=288 AND cur_user=current_user;
+			INSERT INTO temp_t_table (fid, text_column)
 			SELECT 288, (array_agg(psector_id)) FROM selector_psector WHERE cur_user=current_user;
 
 			-- set psector selector
@@ -127,12 +128,12 @@ SET search_path = "SCHEMA_NAME", public;
 					SELECT (ST_Dump(the_geom)).geom INTO v_street_geom FROM om_streetaxis WHERE id=v_closest_street;
 
 					--insert point located on the closest street to the temporal table
-					EXECUTE 'INSERT INTO temp_node(result_id, node_id, the_geom)
+					EXECUTE 'INSERT INTO temp_t_node(result_id, node_id, the_geom)
 					SELECT '||v_fid||', '||rec_hydrant||', ST_ClosestPoint(s.the_geom, n.the_geom)
 					FROM '||v_tablename||' n, om_streetaxis s WHERE n.node_id='||quote_literal(rec_hydrant)||' AND s.id='||quote_literal(v_closest_street)||';';
 
 					--divide street on which hydrant is located and insert on temp table
-					EXECUTE 'SELECT ST_LineLocatePoint('||quote_literal(v_street_geom::text)||', temp_node.the_geom) FROM temp_node WHERE node_id='||quote_literal(rec_hydrant)||' and result_id='''||v_fid||''''
+					EXECUTE 'SELECT ST_LineLocatePoint('||quote_literal(v_street_geom::text)||', temp_t_node.the_geom) FROM temp_t_node WHERE node_id='||quote_literal(rec_hydrant)||' and result_id='''||v_fid||''''
 					INTO v_intersect_loc;
 							
 					v_line1 := ST_LineSubstring(v_street_geom, 0.0, v_intersect_loc);
@@ -145,7 +146,7 @@ SET search_path = "SCHEMA_NAME", public;
 						v_line2=NULL;
 					END IF;
 
-					INSERT INTO temp_arc(result_id, arc_id,the_geom, annotation)
+					INSERT INTO temp_t_arc(result_id, arc_id,the_geom, annotation)
 					SELECT distinct v_fid,row_number()over() as row_id, the_geom, id FROM 
 					(SELECT v_line1  as the_geom,v_closest_street as id
 					UNION SELECT v_line2  as the_geom,v_closest_street as id)a;
@@ -176,13 +177,13 @@ SET search_path = "SCHEMA_NAME", public;
 						SELECT (ST_Dump(the_geom)).geom INTO v_street_geom FROM om_streetaxis WHERE id=v_closest_street;
 
 						--insert point located on the closest street to the temporal table
-						EXECUTE 'INSERT INTO temp_node(result_id, node_id, the_geom)
+						EXECUTE 'INSERT INTO temp_t_node(result_id, node_id, the_geom)
 						SELECT '||v_fid||', '||rec_hydrant||', ST_ClosestPoint(s.the_geom, n.the_geom)
 						FROM anl_node n, om_streetaxis s WHERE n.node_id='||quote_literal(rec_hydrant)||' AND s.id='||quote_literal(v_closest_street)||'
 						AND cur_user=current_user AND fid='||v_fid_proposal||';';
 
 						--divide street on which hydrant is located and insert on temp table
-						EXECUTE 'SELECT ST_LineLocatePoint('||quote_literal(v_street_geom::text)||', temp_node.the_geom) FROM temp_node WHERE node_id='||quote_literal(rec_hydrant)||' and result_id='''||v_fid||''''
+						EXECUTE 'SELECT ST_LineLocatePoint('||quote_literal(v_street_geom::text)||', temp_t_node.the_geom) FROM temp_t_node WHERE node_id='||quote_literal(rec_hydrant)||' and result_id='''||v_fid||''''
 						INTO v_intersect_loc;
 							
 						v_line1 := ST_LineSubstring(v_street_geom, 0.0, v_intersect_loc);
@@ -195,7 +196,7 @@ SET search_path = "SCHEMA_NAME", public;
 							v_line2=NULL;
 						END IF;
 						
-						INSERT INTO temp_arc(result_id, arc_id,the_geom, annotation)
+						INSERT INTO temp_t_arc(result_id, arc_id,the_geom, annotation)
 						SELECT distinct v_fid,row_number()over() as row_id, the_geom, id FROM 
 						(SELECT v_line1  as the_geom,v_closest_street as id
 						UNION SELECT v_line2  as the_geom,v_closest_street as id)a;
@@ -206,44 +207,45 @@ SET search_path = "SCHEMA_NAME", public;
 			END IF;
 		END IF;
 					
-		--insert final street points on temp_node table
+		--insert final street points on temp_t_node table
 		FOR rec_point IN (SELECT v_fid , ST_EndPoint((ST_Dump(s.the_geom)).geom) as the_geom, s.id
 		FROM om_streetaxis s WHERE s.the_geom is not null UNION
 		SELECT  v_fid , ST_StartPoint((ST_Dump(the_geom)).geom) AS geom, id
 		FROM  om_streetaxis s  WHERE the_geom is not null) LOOP
 
-			SELECT id INTO v_node_duplicated FROM temp_node WHERE ST_DWithin(rec_point.the_geom, temp_node.the_geom, 0.001) AND result_id=v_fid::text;
+			SELECT id INTO v_node_duplicated FROM temp_t_node WHERE ST_DWithin(rec_point.the_geom, temp_t_node.the_geom, 0.001) AND result_id=v_fid::text;
 
 			IF v_node_duplicated IS NULL THEN
-				INSERT INTO temp_node(result_id, the_geom, annotation)
+				INSERT INTO temp_t_node(result_id, the_geom, annotation)
 				VALUES (v_fid , rec_point.the_geom, rec_point.id);
 			END IF;
 
 		END LOOP;
 
-		--insert streets on temp_arc table
-		INSERT INTO temp_arc(result_id, arc_id,the_geom, annotation)
+		--insert streets on temp_t_arc table
+		INSERT INTO temp_t_arc(result_id, arc_id,the_geom, annotation)
 		SELECT distinct v_fid,row_number()over() as row_id, the_geom, id FROM 
 		(select (ST_Dump(the_geom)).geom as the_geom, id
-		FROM  om_streetaxis s where id not in (select annotation from temp_arc WHERE result_id= v_fid::text))a;
+		FROM  om_streetaxis s where id not in (select annotation from temp_t_arc WHERE result_id= v_fid::text))a;
 
 		--update temp tables with new temporal ids
-		SELECT max(x) into v_max_hydr_id FROM unnest(v_node_array), unnest(v_proposal_array) as x;
+		SELECT max(x) into v_max_hydr_id FROM unnest(v_node_array)as x;
 	
 		IF v_use_propsal IS TRUE THEN
 			SELECT max(x) into v_max_prop_hydr_id FROM unnest(v_proposal_array) as x;
 			IF v_max_prop_hydr_id is not null and v_max_prop_hydr_id > v_max_hydr_id THEN
 				v_max_hydr_id=v_max_prop_hydr_id;
 			END IF;
+		ELSE 
 		END IF;
 	
-		UPDATE temp_node a SET node_id=b.row_id from (select v_max_hydr_id + row_number()over() as row_id, id from temp_node)b where a.id=b.id and node_id is null;
-		UPDATE temp_arc a SET arc_id=b.row_id from (select row_number()over() as row_id, id from temp_arc where result_id=v_fid::text)b where a.id=b.id and result_id=v_fid::text;
+		UPDATE temp_t_node a SET node_id=b.row_id from (select v_max_hydr_id + row_number()over() as row_id, id from temp_t_node)b where a.id=b.id and node_id is null;
+		UPDATE temp_t_arc a SET arc_id=b.row_id from (select row_number()over() as row_id, id from temp_t_arc where result_id=v_fid::text)b where a.id=b.id and result_id=v_fid::text;
 
-		--update temp_arc with values of node_1, node_2 from temp_node
-		UPDATE temp_arc a SET node_1=node_id FROM temp_node n WHERE ST_dwithin(St_startpoint(a.the_geom),n.the_geom,0.01) AND (n.result_id=v_fid::text ) AND node_1 IS NULL;
+		--update temp_t_arc with values of node_1, node_2 from temp_t_node
+		UPDATE temp_t_arc a SET node_1=node_id FROM temp_t_node n WHERE ST_dwithin(St_startpoint(a.the_geom),n.the_geom,0.01) AND (n.result_id=v_fid::text ) AND node_1 IS NULL;
 
-		UPDATE temp_arc a SET node_2=node_id FROM temp_node n WHERE ST_dwithin(St_endpoint(a.the_geom),n.the_geom,0.01) AND (n.result_id=v_fid::text) AND node_2 IS NULL;
+		UPDATE temp_t_arc a SET node_2=node_id FROM temp_t_node n WHERE ST_dwithin(St_endpoint(a.the_geom),n.the_geom,0.01) AND (n.result_id=v_fid::text) AND node_2 IS NULL;
 
 		--duplicate distance on proposal mode
 		IF v_mode=1 THEN
@@ -260,10 +262,10 @@ SET search_path = "SCHEMA_NAME", public;
 		--execute function for each hydrant
 		FOREACH rec_hydrant IN ARRAY(v_node_array) LOOP
 
-			UPDATE temp_arc SET flag=null where result_id=v_fid::text;
-			DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = v_fid OR fid=v_fid_result);
+			UPDATE temp_t_arc SET flag=null where result_id=v_fid::text;
+			DELETE FROM temp_anl_node WHERE cur_user="current_user"() AND (fid = v_fid OR fid=v_fid_result);
 			-- log
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Process executed for hydrant: ',rec_hydrant,'.'));
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Process executed for hydrant: ',rec_hydrant,'.'));
 
 			p_data=p_data::jsonb||concat('{"nodeId":"',rec_hydrant,'","hydrantId":"',rec_hydrant,'"}')::jsonb;
 
@@ -276,9 +278,18 @@ SET search_path = "SCHEMA_NAME", public;
 	-- restore state selector (if it's needed)
 	IF v_use_psector IS NOT TRUE THEN
 		INSERT INTO selector_psector (psector_id, cur_user)
-		select unnest(text_column::integer[]), current_user from temp_table where fid=288 and cur_user=current_user
+		select unnest(text_column::integer[]), current_user from temp_t_table where fid=288 and cur_user=current_user
 		ON CONFLICT (psector_id, cur_user) DO NOTHING;
 	END IF;
+
+	-- Reset values, insert results
+	DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = v_fid OR fid = v_fid_result);
+	DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = v_fid OR fid = v_fid_result);
+	DELETE FROM audit_check_data WHERE (fid = v_fid) and cur_user="current_user"();
+	
+	INSERT INTO anl_node SELECT * FROM temp_anl_node;
+	INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
+	INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
 
 	-- get results
 	--lines
@@ -291,7 +302,7 @@ SET search_path = "SCHEMA_NAME", public;
 	  'properties', to_jsonb(row) - 'the_geom'
 	 	) AS feature
 		FROM (SELECT ST_Union(the_geom) as the_geom, node_1 as hydrant_id
-		FROM  anl_arc WHERE cur_user="current_user"() AND (fid=v_fid_result Or fid=v_fid) group by node_1) row) features;
+		FROM  temp_anl_arc WHERE cur_user="current_user"() AND (fid=v_fid_result Or fid=v_fid) group by node_1) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
@@ -321,9 +332,15 @@ SET search_path = "SCHEMA_NAME", public;
 
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
+	FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
+	--drop temp tables
+	DROP TABLE temp_anl_arc;
+	DROP TABLE temp_anl_node;
+	DROP TABLE temp_t_table;
+	DROP TABLE temp_audit_check_data;
 
 	IF (v_result_json->>'status')::TEXT = 'Accepted' THEN
 
