@@ -733,7 +733,7 @@ BEGIN
 					USING OLD
 					INTO v_old_value_param;
 
-				IF v_new_value_param IS NOT NULL THEN 
+				IF (v_new_value_param IS NOT null and v_old_value_param!=v_new_value_param) OR (v_new_value_param IS NOT null and v_old_value_param is NULL) THEN 
 
 					EXECUTE 'INSERT INTO man_addfields_value(feature_id, parameter_id, value_param) VALUES ($1, $2, $3) 
 						ON CONFLICT (feature_id, parameter_id)
