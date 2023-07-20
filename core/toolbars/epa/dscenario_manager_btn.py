@@ -544,8 +544,8 @@ class GwDscenarioManagerButton(GwAction):
                 sql += f", '{self.feature_type.upper()}'"
             sql += f");"
         else:
-        tools_db.execute_sql(sql)
             sql = f"INSERT INTO v_edit_{view} VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}');"
+        tools_db.execute_sql(sql)
 
         # Refresh tableview
         self._fill_dscenario_table()
