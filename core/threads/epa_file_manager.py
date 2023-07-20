@@ -65,6 +65,9 @@ class GwEpaFileManager(GwTask):
 
         super().run()
 
+        self.step_completed.emit({"message": {"level": 1, "text": "GO2EPA - Work in progress"}})
+        self.step_completed.emit({"message": {"level": 1, "text": "-------------------------"}})
+
         self.initialize_variables()
         status = True
         if self.go2epa_export_inp or self.go2epa_execute_epa:
@@ -329,6 +332,7 @@ class GwEpaFileManager(GwTask):
             return False
 
         tools_log.log_info(f"Execute EPA software")
+        self.step_completed.emit({"message": {"level": 1, "text": "Execute EPA software......"}})
 
         if self.file_rpt == "null":
             message = "You have to set this parameter"
@@ -360,6 +364,7 @@ class GwEpaFileManager(GwTask):
 
         subprocess.call([opener, self.file_inp, self.file_rpt], shell=False)
         self.common_msg += "EPA model finished. "
+        self.step_completed.emit({"message": {"level": 1, "text": "EPA model finished."}})
 
         return True
 
@@ -368,6 +373,7 @@ class GwEpaFileManager(GwTask):
         """ Import result file """
 
         tools_log.log_info(f"Import rpt file........: {self.file_rpt}")
+        self.step_completed.emit({"message": {"level": 1, "text": "Import rpt file......"}})
 
         self.rpt_result = None
         self.json_rpt = None
@@ -529,22 +535,23 @@ class GwEpaFileManager(GwTask):
     def _exec_import_function(self):
         """ Call function gw_fct_rpt2pg_main """
 
-        extras = f'"resultId":"{self.result_name}"'
-        if self.json_rpt:
-            extras += f', "file": {self.json_rpt}'
-        self.body = tools_gw.create_body(extras=extras)
-        self.json_result = tools_gw.execute_procedure('gw_fct_rpt2pg_main', self.body,
-                                                      aux_conn=self.aux_conn, is_thread=True)
-        self.rpt_result = self.json_result
-        if self.json_result is None or not self.json_result:
-            self.function_failed = True
-            return False
+        for step in range(1, 3):
+            extras = f'"step":"{step}", "resultId":"{self.result_name}"'
+            if step == 1 and self.json_rpt:
+                extras += f', "file": {self.json_rpt}'
+            self.body = tools_gw.create_body(extras=extras)
+            self.json_result = tools_gw.execute_procedure('gw_fct_rpt2pg_main', self.body,
+                                                          aux_conn=self.aux_conn, is_thread=True)
+            self.rpt_result = self.json_result
+            if self.json_result is None or not self.json_result:
+                self.function_failed = True
+                return False
 
-        if self.json_result.get('status') == 'Failed':
-            tools_log.log_warning(self.json_result)
-            self.function_failed = True
-            return False
-
+            if self.json_result.get('status') == 'Failed':
+                tools_log.log_warning(self.json_result)
+                self.function_failed = True
+                return False
+            self.step_completed.emit(self.json_result)
         # final message
         self.common_msg += "Import RPT file finished."
 
