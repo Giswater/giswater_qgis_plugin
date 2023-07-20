@@ -156,4 +156,6 @@ UPDATE config_fprocess SET tablename = replace(tablename, 'vi_', 'vi_t_') WHERE 
 
 DELETE FROM sys_table WHERE id IN ('v_anl_graphanalytics_mapzones', 'v_anl_graphanalytics_upstream', 'v_anl_graph');
 
-UPDATE config_form_fields SET datatype='datetime' WHERE formtype='form_visit' and widgettype='datetime'
+UPDATE config_form_fields SET datatype='datetime' WHERE formtype='form_visit' and widgettype='datetime';
+
+UPDATE sys_fprocess SET fprocess_type='Check om-data' WHERE fid=175;

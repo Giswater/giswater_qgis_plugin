@@ -216,13 +216,22 @@ BEGIN
 
 	RAISE NOTICE '07 - Check state_type nulls (arc, node) (175)';
 
-	v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE state > 0 AND state_type IS NULL 
-		        UNION SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node WHERE state > 0 AND state_type IS NULL) a';
+	v_querytext = '(SELECT arc_id FROM '||v_edit||'arc WHERE state > 0 AND state_type IS NULL 
+		        UNION SELECT node_id FROM '||v_edit||'node WHERE state > 0 AND state_type IS NULL) a';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
+	
+		v_querytext = 'INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, expl_id, state)
+		SELECT 175, node_id, nodecat_id, the_geom, expl_id, state FROM '||v_edit||'node WHERE state > 0 AND state_type IS NULL';
+		EXECUTE v_querytext;
+	
+		v_querytext = 'INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, the_geom, expl_id, state)
+		SELECT 175, arc_id, arccat_id, the_geom, expl_id, state FROM '||v_edit||'arc WHERE state > 0 AND state_type IS NULL';
+		EXECUTE v_querytext;
+	
 		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 3, '175',concat('ERROR-175: There is/are ',v_count,' topologic features (arc, node) with state_type with NULL values. Please, check your data before continue'),v_count);
+		VALUES (v_fid, 3, '175',concat('ERROR-175 (temp_anl_node/arc): There is/are ',v_count,' topologic features (arc, node) with state_type with NULL values. Please, check your data before continue'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 1, '175', 'INFO: No topologic features (arc, node) with state_type NULL values found.',v_count);
@@ -1530,7 +1539,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT node_id as id, nodecat_id as feature_catalog, state, expl_id, descript, fid, the_geom FROM temp_anl_node WHERE cur_user="current_user"()
-	AND fid IN (106,177,187,202,442,443)
+	AND fid IN (106,177,187,202,442,443,175)
 	UNION
 	SELECT connec_id, connecat_id, state, expl_id, descript, fid, the_geom FROM temp_anl_connec WHERE cur_user="current_user"()
 	AND fid IN (210,201,202,204,205,291,478,488,480)) row) features;
@@ -1553,7 +1562,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (
-  	SELECT id, arccat_id, state, expl_id, descript, fid, the_geom FROM  temp_anl_arc WHERE cur_user="current_user"() AND fid IN (103, 196, 197, 188, 223, 202, 372, 391, 417, 418, 479)
+  	SELECT id, arccat_id, state, expl_id, descript, fid, the_geom FROM  temp_anl_arc WHERE cur_user="current_user"() AND fid IN (103, 196, 197, 188, 223, 202, 372, 391, 417, 418, 479,175)
   	) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 

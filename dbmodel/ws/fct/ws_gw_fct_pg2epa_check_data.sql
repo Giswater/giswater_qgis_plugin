@@ -98,21 +98,6 @@ BEGIN
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id,  error_message, fcount)
 		VALUES (v_fid, 1, '107', 'INFO: No node(s) orphan found.',v_count);
 	END IF;
-		
-	
-	RAISE NOTICE '4 - Check state_type nulls (arc, node) (175)';
-	v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM v_edit_arc JOIN selector_sector USING (sector_id) WHERE state_type IS NULL AND cur_user = current_user
-			UNION 
-			SELECT node_id, nodecat_id, the_geom FROM v_edit_node JOIN selector_sector USING (sector_id) WHERE state_type IS NULL AND cur_user = current_user) a';
-
-	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
-	IF v_count > 0 THEN
-		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 3, '175',concat('ERROR-175: There is/are ',v_count,' topologic features (arc, node) with state_type with NULL values. Please, check your data before continue'),v_count);
-	ELSE
-		INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 1,'175', 'INFO: No topologic features (arc, node) with state_type NULL values found.',v_count);
-	END IF;
 
 	RAISE NOTICE '5 - Check for missed features on inp tables (272)';
 	v_querytext = '(SELECT arc_id, ''arc'' FROM v_edit_arc LEFT JOIN 
