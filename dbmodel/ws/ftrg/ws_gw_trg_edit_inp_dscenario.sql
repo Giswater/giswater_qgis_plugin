@@ -71,7 +71,9 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 			-- default values
 			IF NEW.minorloss IS NULL THEN NEW.minorloss = (SELECT minorloss FROM v_edit_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
-			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM v_edit_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
+			IF NEW.status IS NULL OR NEW.status='' THEN 
+				NEW.status = (SELECT CASE WHEN closed = false THEN 'CLOSED' WHEN closed = true THEN 'OPEN' END FROM man_valve WHERE node_id = NEW.node_id);
+			END IF;
 			
 			IF NEW.bulk_coeff IS NULL THEN NEW.bulk_coeff = (SELECT bulk_coeff FROM v_edit_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
 			IF NEW.wall_coeff IS NULL THEN NEW.wall_coeff = (SELECT wall_coeff FROM v_edit_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
