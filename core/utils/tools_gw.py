@@ -1973,7 +1973,7 @@ def add_frame(field, x=None):
     return widget
 
 
-def add_combo(field, dialog=None, complet_result=None):
+def add_combo(field, dialog=None, complet_result=None, ignore_function=False):
     widget = QComboBox()
     widget.setObjectName(field['widgetname'])
     if 'widgetcontrols' in field and field['widgetcontrols']:
@@ -1991,7 +1991,7 @@ def add_combo(field, dialog=None, complet_result=None):
         if not field['iseditable']:
             widget.setStyleSheet("QComboBox { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
 
-    if 'widgetfunction' in field and field['widgetfunction']:
+    if not ignore_function and 'widgetfunction' in field and field['widgetfunction']:
         widgetfunction = field['widgetfunction']
         functions = None
         if isinstance(widgetfunction, list):
@@ -2003,7 +2003,7 @@ def add_combo(field, dialog=None, complet_result=None):
         for f in functions:
             if 'isFilter' in f and f['isFilter']: continue
             columnname = field['columnname']
-            parameters = f['parameters']
+            parameters = f.get('parameters')
 
             kwargs = {"complet_result": complet_result, "dialog": dialog, "columnname": columnname, "widget": widget,
                       "func_params": parameters}

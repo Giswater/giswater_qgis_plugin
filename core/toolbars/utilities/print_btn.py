@@ -326,7 +326,7 @@ class GwPrintButton(GwAction):
             widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, my_json))
             widget.returnPressed.connect(partial(tools_gw.get_values, dialog, widget, my_json))
         elif field['widgettype'] == 'combo':
-            widget = tools_gw.add_combo(field)
+            widget = tools_gw.add_combo(field, ignore_function=True)
             widget = tools_gw.set_widget_size(widget, field)
             widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, my_json))
             if 'widgetfunction' in field:
