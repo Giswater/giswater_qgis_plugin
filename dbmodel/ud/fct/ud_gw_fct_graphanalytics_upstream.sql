@@ -242,6 +242,7 @@ BEGIN
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
 				   ',"body":{"form":{}'||
 				   ',"data":{ "info":'||v_result_info||','||
+				      '"initPoint":'||v_node||','||
 					  '"point":'||v_result_point||','||
 					  '"line":'||v_result_line||','||
 					  '"polygon":'||v_result_polygon||'}'||
