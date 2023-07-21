@@ -207,7 +207,7 @@ class Giswater(QObject):
         if not success:
             tools_gw.recreate_config_files()
             msg = "The user config files have been recreated. A backup of the broken ones have been created at"
-            tools_qgis.show_critical(msg, parameter=f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}config{os.sep}")
+            tools_qgis.show_message(msg, message_level=3, title="Parsing error fixed", parameter=f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}config{os.sep}")
         else:
             # Check if user has config files 'init' and 'session' and its parameters (only those without prefix)
             try:
