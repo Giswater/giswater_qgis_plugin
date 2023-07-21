@@ -3565,7 +3565,7 @@ def manage_user_config_folder(user_folder_dir):
     """ Check if user config folder exists. If not create empty files init.config and session.config """
 
     try:
-        config_folder = f"{user_folder_dir}{os.sep}config{os.sep}"
+        config_folder = f"{user_folder_dir}{os.sep}core{os.sep}config{os.sep}"
         if not os.path.exists(config_folder):
             tools_log.log_info(f"Creating user config folder: {config_folder}")
             os.makedirs(config_folder)
@@ -3663,7 +3663,7 @@ def user_params_to_userconfig():
                             comment = value2.split('#')[1]
                             set_config_parser(section_name, parameter, value.strip(), "user", file_name, comment, _pre, False)
     except:
-        recreate_config_files()
+        pass
 
 
 def recreate_config_files():
