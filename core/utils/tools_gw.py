@@ -19,6 +19,7 @@ if 'nt' in sys.builtin_module_names:
     import ctypes
 from collections import OrderedDict
 from functools import partial
+from datetime import datetime
 
 from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, QLocale
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon, QStandardItem, \
@@ -3400,7 +3401,12 @@ def recreate_config_files():
     for filename in filenames:
         filepath = f"{global_vars.user_folder_dir}{os.sep}core{os.sep}config{os.sep}{filename}.config"
         if os.path.exists(filepath):
-            os.rename(filepath, f"{filepath}.bak")
+            now = datetime.now()
+            now = now.strftime("%d%m%Y-%H%M%S")
+            bak_filename = f"{filepath}_{now}.bak"
+            if os.path.exists(bak_filename):
+                os.remove(bak_filename)
+            os.rename(filepath, bak_filename)
 
     manage_user_config_folder(global_vars.user_folder_dir)
     initialize_parsers()
