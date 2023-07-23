@@ -1088,7 +1088,7 @@ BEGIN
 		    s1.outlet_id,
 		    'JUNCTION'::text AS outlet_type,
 		    s1.hydrology_id,
-		    st_makeline(st_centroid(s1.the_geom), node.the_geom)::geometry(LineString,25831) AS the_geom
+		    st_makeline(st_centroid(s1.the_geom), node.the_geom)::geometry(LineString,SRID_VALUE) AS the_geom
 		   FROM v_edit_inp_subcatchment s1
 		     JOIN node ON node.node_id::text = s1.outlet_id::text
 		UNION
@@ -1096,7 +1096,7 @@ BEGIN
 		    s1.outlet_id,
 		    'SUBCATCHMENT'::text AS outlet_type,
 		    s1.hydrology_id,
-		    st_makeline(st_centroid(s1.the_geom), st_centroid(s2.the_geom))::geometry(LineString,25831) AS the_geom
+		    st_makeline(st_centroid(s1.the_geom), st_centroid(s2.the_geom))::geometry(LineString,SRID_VALUE) AS the_geom
 		   FROM v_edit_inp_subcatchment s1
 		     JOIN v_edit_inp_subcatchment s2 ON s1.outlet_id::text = s2.subc_id::text) a;
 
