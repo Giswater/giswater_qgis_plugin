@@ -76,10 +76,6 @@ BEGIN
 		UPDATE rpt_node SET time='0:00' where time ='null' and result_id = v_result;
 		UPDATE rpt_arc SET time='0:00' where time ='null' and result_id = v_result;
 
-		-- drop tables
-		DROP TABLE IF EXISTS temp_audit_check_data;
-		DROP TABLE IF EXISTS temp_t_csv;
-
 		-- create log message
 		RETURN gw_fct_rpt2pg_log(v_result, v_import);
 
