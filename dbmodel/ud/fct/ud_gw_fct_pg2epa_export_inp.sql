@@ -70,1254 +70,1249 @@ BEGIN
 
 
 
-CREATE OR REPLACE VIEW vi_t_adjustments AS
- SELECT a.adj_type AS parameter,
-    a.subc_id,
-    a.monthly_adj
-   FROM ( SELECT 1 AS "order",
-            inp_adjustments.adj_type,
-            NULL::character varying AS subc_id,
-            concat(inp_adjustments.value_1, ' ', inp_adjustments.value_2, ' ', inp_adjustments.value_3, ' ', inp_adjustments.value_4, ' ', inp_adjustments.value_5, ' ', inp_adjustments.value_6, ' ', inp_adjustments.value_7, ' ', inp_adjustments.value_8, ' ', inp_adjustments.value_9, ' ', inp_adjustments.value_10, ' ', inp_adjustments.value_11, ' ', inp_adjustments.value_12) AS monthly_adj
-           FROM inp_adjustments
-        UNION
-         SELECT 2,
-            'N-PERV'::character varying AS parameter,
-            inp_subcatchment.subc_id,
-            inp_subcatchment.nperv_pattern_id AS montly_adjunstment
-           FROM inp_subcatchment
-          WHERE inp_subcatchment.nperv_pattern_id IS NOT NULL
-        UNION
-         SELECT 2,
-            'DSTORE'::character varying,
-            inp_subcatchment.subc_id,
-            inp_subcatchment.dstore_pattern_id AS montly_adjunstment
-           FROM inp_subcatchment
-          WHERE inp_subcatchment.dstore_pattern_id IS NOT NULL
-        UNION
-         SELECT 2,
-            'INFIL'::character varying,
-            inp_subcatchment.subc_id,
-            inp_subcatchment.infil_pattern_id AS montly_adjunstment
-           FROM inp_subcatchment
-          WHERE inp_subcatchment.infil_pattern_id IS NOT NULL) a;
-
-CREATE OR REPLACE VIEW vi_t_aquifers AS
- SELECT inp_aquifer.aquif_id,
-    inp_aquifer.por,
-    inp_aquifer.wp,
-    inp_aquifer.fc,
-    inp_aquifer.k,
-    inp_aquifer.ks,
-    inp_aquifer.ps,
-    inp_aquifer.uef,
-    inp_aquifer.led,
-    inp_aquifer.gwr,
-    inp_aquifer.be,
-    inp_aquifer.wte,
-    inp_aquifer.umc,
-    inp_aquifer.pattern_id
-   FROM inp_aquifer
-  ORDER BY inp_aquifer.aquif_id;
-
-
-CREATE OR REPLACE VIEW vi_t_backdrop AS
- SELECT inp_backdrop.text
-   FROM inp_backdrop;
-
-
-CREATE OR REPLACE VIEW vi_t_buildup AS
- SELECT inp_buildup.landus_id,
-    inp_buildup.poll_id,
-    inp_typevalue.idval AS funcb_type,
-    inp_buildup.c1,
-    inp_buildup.c2,
-    inp_buildup.c3,
-    inp_buildup.perunit
-   FROM inp_buildup
-     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_buildup.funcb_type::text
-  WHERE inp_typevalue.typevalue::text = 'inp_value_buildup'::text;
-
-
-CREATE OR REPLACE VIEW vi_t_conduits AS
- SELECT arc_id,
-    t.node_1,
-    t.node_2,
-    t.length,
-    t.n,
-    t.elevmax1 AS z1,
-    t.elevmax2 AS z2,
-    t.q0::numeric(12,4) AS q0,
-    t.qmax::numeric(12,4) AS qmax,
-    concat(';', t.sector_id, ' ', t.arccat_id, ' ', t.age) AS other
-   FROM temp_t_arc t
-     JOIN inp_conduit USING (arc_id)
-UNION
- SELECT t.arc_id,
-    t.node_1,
-    t.node_2,
-    t.length,
-    t.n,
-    t.elevmax1 AS z1,
-    t.elevmax2 AS z2,
-    t.q0::numeric(12,4) AS q0,
-    t.qmax::numeric(12,4) AS qmax,
-    concat(';', t.sector_id, ' ', t.arccat_id) AS other
-   FROM temp_t_arc t
-     JOIN inp_conduit ON t.arcparent::text = inp_conduit.arc_id::text;
-
-
-CREATE OR REPLACE VIEW vi_t_controls AS
- SELECT c.text
-   FROM ( SELECT inp_controls.id,
-            inp_controls.text
-           FROM selector_sector,
-            inp_controls
-          WHERE selector_sector.sector_id = inp_controls.sector_id AND selector_sector.cur_user = "current_user"()::text AND inp_controls.active IS NOT FALSE
-        UNION
-         SELECT d.id,
-            d.text
-           FROM selector_sector s,
-            v_edit_inp_dscenario_controls d
-          WHERE s.sector_id = d.sector_id AND s.cur_user = "current_user"()::text AND d.active IS NOT FALSE
-  ORDER BY 1) c
-  ORDER BY c.id;
-
- CREATE OR REPLACE VIEW vi_t_coordinates AS
- SELECT temp_rpt_inp_node.node_id,
-    NULL::numeric(16,3) AS xcoord,
-    NULL::numeric(16,3) AS ycoord,
-    temp_rpt_inp_node.the_geom
-   FROM temp_rpt_inp_node,
-    selector_inp_result a
-  WHERE a.result_id::text = temp_rpt_inp_node.result_id::text AND a.cur_user = "current_user"()::text;
-
-
-CREATE OR REPLACE VIEW vi_t_coverages AS
- SELECT v_edit_inp_subcatchment.subc_id,
-    inp_coverage.landus_id,
-    inp_coverage.percent
-   FROM inp_coverage
-     JOIN v_edit_inp_subcatchment ON inp_coverage.subc_id::text = v_edit_inp_subcatchment.subc_id::text
-     LEFT JOIN ( SELECT DISTINCT ON (a.subc_id) a.subc_id,
-            v_node.node_id
-           FROM ( SELECT unnest(inp_subcatchment.outlet_id::text[]) AS node_array,
-                    inp_subcatchment.subc_id,
-                    inp_subcatchment.outlet_id,
-                    inp_subcatchment.rg_id,
-                    inp_subcatchment.area,
-                    inp_subcatchment.imperv,
-                    inp_subcatchment.width,
-                    inp_subcatchment.slope,
-                    inp_subcatchment.clength,
-                    inp_subcatchment.snow_id,
-                    inp_subcatchment.nimp,
-                    inp_subcatchment.nperv,
-                    inp_subcatchment.simp,
-                    inp_subcatchment.sperv,
-                    inp_subcatchment.zero,
-                    inp_subcatchment.routeto,
-                    inp_subcatchment.rted,
-                    inp_subcatchment.maxrate,
-                    inp_subcatchment.minrate,
-                    inp_subcatchment.decay,
-                    inp_subcatchment.drytime,
-                    inp_subcatchment.maxinfil,
-                    inp_subcatchment.suction,
-                    inp_subcatchment.conduct,
-                    inp_subcatchment.initdef,
-                    inp_subcatchment.curveno,
-                    inp_subcatchment.conduct_2,
-                    inp_subcatchment.drytime_2,
-                    inp_subcatchment.sector_id,
-                    inp_subcatchment.hydrology_id,
-                    inp_subcatchment.the_geom,
-                    inp_subcatchment.descript
-                   FROM inp_subcatchment
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text) a
-             JOIN v_node ON v_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text;
-
-
-
-CREATE OR REPLACE VIEW vi_t_curves AS
- SELECT a.curve_id,
-    a.curve_type,
-    a.x_value,
-    a.y_value
-   FROM ( WITH qt AS (
-                 SELECT inp_curve_value.id,
-                    inp_curve_value.curve_id,
-                        CASE
-                            WHEN inp_curve_value.id = (( SELECT min(sub.id) AS min
-                               FROM inp_curve_value sub
-                              WHERE sub.curve_id::text = inp_curve_value.curve_id::text)) THEN inp_typevalue.idval
-                            ELSE NULL::character varying
-                        END AS curve_type,
-                    inp_curve_value.x_value,
-                    inp_curve_value.y_value,
-                    c.expl_id
-                   FROM inp_curve c
-                     JOIN inp_curve_value ON c.id::text = inp_curve_value.curve_id::text
-                     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = c.curve_type::text
-                  WHERE inp_typevalue.typevalue::text = 'inp_value_curve'::text AND c.active
-                )
-         SELECT qt.id,
-            qt.curve_id,
-            qt.curve_type,
-            qt.x_value,
-            qt.y_value,
-            qt.expl_id
-           FROM qt
-             JOIN selector_expl s USING (expl_id)
-          WHERE s.cur_user = "current_user"()::text
-        UNION
-         SELECT qt.id,
-            qt.curve_id,
-            qt.curve_type,
-            qt.x_value,
-            qt.y_value,
-            qt.expl_id
-           FROM qt
-          WHERE qt.expl_id IS NULL) a
-  ORDER BY a.id;
-
- CREATE OR REPLACE VIEW vi_t_dividers AS
- SELECT temp_t_node.node_id,
-    temp_t_node.elev,
-    temp_t_node.addparam::json ->> 'arc_id'::text AS arc_id,
-    temp_t_node.addparam::json ->> 'divider_type'::text AS divider_type,
-    temp_t_node.addparam::json ->> 'qmin'::text AS other1,
-    temp_t_node.y0 AS other2,
-    temp_t_node.ysur AS other3,
-    temp_t_node.apond AS other4,
-    NULL::double precision AS other5,
-    NULL::double precision AS other6
-   FROM temp_t_node
-  WHERE temp_t_node.epa_type::text = 'DIVIDER'::text AND (temp_t_node.addparam::json ->> 'divider_type'::text) = 'CUTOFF'::text
-UNION
- SELECT temp_t_node.node_id,
-    temp_t_node.elev,
-    temp_t_node.addparam::json ->> 'arc_id'::text AS arc_id,
-    temp_t_node.addparam::json ->> 'divider_type'::text AS divider_type,
-    temp_t_node.y0::text AS other1,
-    temp_t_node.ysur AS other2,
-    temp_t_node.apond AS other3,
-    NULL::numeric AS other4,
-    NULL::double precision AS other5,
-    NULL::double precision AS other6
-   FROM temp_t_node
-  WHERE temp_t_node.epa_type::text = 'DIVIDER'::text AND (temp_t_node.addparam::json ->> 'divider_type'::text) = 'OVERFLOW'::text
-UNION
- SELECT temp_t_node.node_id,
-    temp_t_node.elev,
-    temp_t_node.addparam::json ->> 'arc_id'::text AS arc_id,
-    temp_t_node.addparam::json ->> 'divider_type'::text AS divider_type,
-    temp_t_node.addparam::json ->> 'curve_id'::text AS other1,
-    temp_t_node.y0 AS other2,
-    temp_t_node.ysur AS other3,
-    temp_t_node.apond AS other4,
-    NULL::double precision AS other5,
-    NULL::double precision AS other6
-   FROM temp_t_node
-  WHERE temp_t_node.epa_type::text = 'DIVIDER'::text AND (temp_t_node.addparam::json ->> 'divider_type'::text) = 'TABULAR'::text
-UNION
- SELECT temp_t_node.node_id,
-    temp_t_node.elev,
-    temp_t_node.addparam::json ->> 'arc_id'::text AS arc_id,
-    temp_t_node.addparam::json ->> 'divider_type'::text AS divider_type,
-    temp_t_node.addparam::json ->> 'qmin'::text AS other1,
-    (temp_t_node.addparam::json ->> 'ht'::text)::numeric AS other2,
-    (temp_t_node.addparam::json ->> 'cd'::text)::numeric AS other3,
-    temp_t_node.y0 AS other4,
-    temp_t_node.ysur AS other5,
-    temp_t_node.apond AS other6
-   FROM temp_t_node
-  WHERE temp_t_node.epa_type::text = 'DIVIDER'::text AND (temp_t_node.addparam::json ->> 'divider_type'::text) = 'WEIR'::text;
-
-
-CREATE OR REPLACE VIEW vi_t_dwf AS
- SELECT temp_rpt_inp_node.node_id,
-    'FLOW'::text AS type_dwf,
-    inp_dwf.value,
-    inp_dwf.pat1,
-    inp_dwf.pat2,
-    inp_dwf.pat3,
-    inp_dwf.pat4
-   FROM selector_inp_result,
-    temp_rpt_inp_node
-     JOIN inp_dwf ON inp_dwf.node_id::text = temp_rpt_inp_node.node_id::text
-  WHERE temp_rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND inp_dwf.dwfscenario_id = (( SELECT config_param_user.value::integer AS value
-           FROM config_param_user
-          WHERE config_param_user.parameter::text = 'inp_options_dwfscenario'::text AND config_param_user.cur_user::text = CURRENT_USER))
-UNION
- SELECT temp_rpt_inp_node.node_id,
-    inp_dwf_pol_x_node.poll_id AS type_dwf,
-    inp_dwf_pol_x_node.value,
-    inp_dwf_pol_x_node.pat1,
-    inp_dwf_pol_x_node.pat2,
-    inp_dwf_pol_x_node.pat3,
-    inp_dwf_pol_x_node.pat4
-   FROM selector_inp_result,
-    temp_rpt_inp_node
-     JOIN inp_dwf_pol_x_node ON inp_dwf_pol_x_node.node_id::text = temp_rpt_inp_node.node_id::text
-  WHERE temp_rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND inp_dwf_pol_x_node.dwfscenario_id = (( SELECT config_param_user.value::integer AS value
-           FROM config_param_user
-          WHERE config_param_user.parameter::text = 'inp_options_dwfscenario'::text AND config_param_user.cur_user::text = CURRENT_USER));
-
-
-
-CREATE OR REPLACE VIEW vi_t_evaporation AS
- SELECT inp_evaporation.evap_type,
-    inp_evaporation.value
-   FROM inp_evaporation;
-
-
-
-CREATE OR REPLACE VIEW vi_t_files AS
- SELECT inp_files.actio_type,
-    inp_files.file_type,
-    inp_files.fname
-   FROM inp_files
-  WHERE inp_files.active IS TRUE;
-
-
-CREATE OR REPLACE VIEW vi_t_groundwater AS
- SELECT inp_groundwater.subc_id,
-    inp_groundwater.aquif_id,
-    inp_groundwater.node_id,
-    inp_groundwater.surfel,
-    inp_groundwater.a1,
-    inp_groundwater.b1,
-    inp_groundwater.a2,
-    inp_groundwater.b2,
-    inp_groundwater.a3,
-    inp_groundwater.tw,
-    inp_groundwater.h
-   FROM v_edit_inp_subcatchment
-     JOIN inp_groundwater ON inp_groundwater.subc_id::text = v_edit_inp_subcatchment.subc_id::text
-     LEFT JOIN ( SELECT DISTINCT ON (a.subc_id) a.subc_id,
-            v_node.node_id
-           FROM ( SELECT unnest(inp_subcatchment.outlet_id::text[]) AS node_array,
-                    inp_subcatchment.subc_id,
-                    inp_subcatchment.outlet_id,
-                    inp_subcatchment.rg_id,
-                    inp_subcatchment.area,
-                    inp_subcatchment.imperv,
-                    inp_subcatchment.width,
-                    inp_subcatchment.slope,
-                    inp_subcatchment.clength,
-                    inp_subcatchment.snow_id,
-                    inp_subcatchment.nimp,
-                    inp_subcatchment.nperv,
-                    inp_subcatchment.simp,
-                    inp_subcatchment.sperv,
-                    inp_subcatchment.zero,
-                    inp_subcatchment.routeto,
-                    inp_subcatchment.rted,
-                    inp_subcatchment.maxrate,
-                    inp_subcatchment.minrate,
-                    inp_subcatchment.decay,
-                    inp_subcatchment.drytime,
-                    inp_subcatchment.maxinfil,
-                    inp_subcatchment.suction,
-                    inp_subcatchment.conduct,
-                    inp_subcatchment.initdef,
-                    inp_subcatchment.curveno,
-                    inp_subcatchment.conduct_2,
-                    inp_subcatchment.drytime_2,
-                    inp_subcatchment.sector_id,
-                    inp_subcatchment.hydrology_id,
-                    inp_subcatchment.the_geom,
-                    inp_subcatchment.descript
-                   FROM inp_subcatchment
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text) a
-             JOIN v_node ON v_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text;
-
-
-CREATE OR REPLACE VIEW vi_t_gully AS
- SELECT temp_t_gully.gully_id,
-    temp_t_gully.outlet_type,
-    COALESCE(temp_t_gully.node_id::text, '-9999'::text) AS node_id,
-    st_x(temp_t_gully.the_geom)::numeric(12,3) AS xcoord,
-    st_y(temp_t_gully.the_geom)::numeric(12,3) AS ycoord,
-    COALESCE(temp_t_gully.top_elev::numeric(12,3), '-9999'::integer::numeric) AS zcoord,
-    temp_t_gully.width::numeric(12,3) AS width,
-    temp_t_gully.length::numeric(12,3) AS length,
-    COALESCE(temp_t_gully.depth::numeric(12,3), '-9999'::integer::numeric) AS depth,
-    temp_t_gully.method,
-    temp_t_gully.weir_cd::numeric(12,3) AS weir_cd,
-    temp_t_gully.orifice_cd::numeric(12,3) AS orifice_cd,
-    temp_t_gully.a_param::numeric(12,3) AS a_param,
-    temp_t_gully.b_param::numeric(12,3) AS b_param,
-    temp_t_gully.efficiency
-   FROM temp_t_gully;
-
-
-CREATE OR REPLACE VIEW vi_t_gully2node AS
- SELECT a.gully_id,
-    n.node_id,
-    st_makeline(a.the_geom, n.the_geom) AS the_geom
-   FROM ( SELECT g.gully_id,
-                CASE
-                    WHEN g.pjoint_type::text = 'NODE'::text THEN g.pjoint_id
-                    ELSE a_1.node_2
-                END AS node_id,
-            a_1.expl_id,
-            g.the_geom
-           FROM v_edit_inp_gully g
-             LEFT JOIN arc a_1 USING (arc_id)) a
-     JOIN node n USING (node_id);
-
-CREATE OR REPLACE VIEW vi_t_gwf AS
- SELECT inp_groundwater.subc_id,
-    ('LATERAL'::text || ' '::text) || inp_groundwater.fl_eq_lat::text AS fl_eq_lat,
-    ('DEEP'::text || ' '::text) || inp_groundwater.fl_eq_lat::text AS fl_eq_deep
-   FROM v_edit_inp_subcatchment
-     JOIN inp_groundwater ON inp_groundwater.subc_id::text = v_edit_inp_subcatchment.subc_id::text;
-
-
-CREATE OR REPLACE VIEW vi_t_hydrographs AS
- SELECT inp_hydrograph_value.text
-   FROM inp_hydrograph_value;
-
-
-
-CREATE OR REPLACE VIEW vi_t_infiltration  AS
- SELECT v_edit_inp_subcatchment.subc_id,
-    v_edit_inp_subcatchment.curveno AS other1,
-    v_edit_inp_subcatchment.conduct_2 AS other2,
-    v_edit_inp_subcatchment.drytime_2 AS other3,
-    NULL::numeric AS other4,
-    NULL::double precision AS other5
-   FROM v_edit_inp_subcatchment
-     JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
-     JOIN ( SELECT a.subc_id,
-            a.outlet_id
-           FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                     JOIN temp_node ON inp_subcatchment.outlet_id::text = temp_node.node_id::text
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
-                UNION
-                 SELECT inp_subcatchment.outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id)
-  WHERE cat_hydrology.infiltration::text = 'CURVE_NUMBER'::text
-UNION
- SELECT v_edit_inp_subcatchment.subc_id,
-    v_edit_inp_subcatchment.suction AS other1,
-    v_edit_inp_subcatchment.conduct AS other2,
-    v_edit_inp_subcatchment.initdef AS other3,
-    NULL::integer AS other4,
-    NULL::double precision AS other5
-   FROM v_edit_inp_subcatchment
-     JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
-     JOIN ( SELECT a.subc_id,
-            a.outlet_id
-           FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                     JOIN temp_node ON inp_subcatchment.outlet_id::text = temp_node.node_id::text
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
-                UNION
-                 SELECT inp_subcatchment.outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id)
-  WHERE cat_hydrology.infiltration::text = 'GREEN_AMPT'::text
-UNION
- SELECT v_edit_inp_subcatchment.subc_id,
-    v_edit_inp_subcatchment.curveno AS other1,
-    v_edit_inp_subcatchment.conduct_2 AS other2,
-    v_edit_inp_subcatchment.drytime_2 AS other3,
-    NULL::integer AS other4,
-    NULL::double precision AS other5
-   FROM v_edit_inp_subcatchment
-     JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
-     JOIN ( SELECT a.subc_id,
-            a.outlet_id
-           FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                     JOIN temp_node ON inp_subcatchment.outlet_id::text = temp_node.node_id::text
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
-                UNION
-                 SELECT inp_subcatchment.outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id)
-  WHERE cat_hydrology.infiltration::text = ANY (ARRAY['MODIFIED_HORTON'::text, 'HORTON'::text]);
-
-
-CREATE OR REPLACE VIEW vi_t_inflows AS
- SELECT temp_t_node_other.node_id,
-    temp_t_node_other.type,
-    temp_t_node_other.timser_id,
-    'FLOW'::text AS format,
-    1::numeric(12,4) AS mfactor,
-    temp_t_node_other.sfactor,
-    temp_t_node_other.base,
-    temp_t_node_other.pattern_id
-   FROM temp_t_node_other
-  WHERE temp_t_node_other.type::text = 'FLOW'::text
-UNION
- SELECT temp_t_node_other.node_id,
-    temp_t_node_other.poll_id AS type,
-    temp_t_node_other.timser_id,
-    temp_t_node_other.other AS format,
-    temp_t_node_other.mfactor,
-    temp_t_node_other.sfactor,
-    temp_t_node_other.base,
-    temp_t_node_other.pattern_id
-   FROM temp_t_node_other
-  WHERE temp_t_node_other.type::text = 'POLLUTANT'::text
-  ORDER BY 1;
-
-
-CREATE OR REPLACE VIEW vi_t_junctions AS
- SELECT temp_t_node.node_id,
-    temp_t_node.elev,
-    temp_t_node.ymax,
-    temp_t_node.y0,
-    temp_t_node.ysur,
-    temp_t_node.apond,
-    concat(';', temp_t_node.sector_id, ' ', temp_t_node.node_type) AS other
-   FROM temp_t_node
-  WHERE temp_t_node.epa_type::text = ANY (ARRAY['JUNCTION'::text, 'NETGULLY'::text]);
-
-CREATE OR REPLACE VIEW vi_t_labels AS
- SELECT inp_label.xcoord,
-    inp_label.ycoord,
-    inp_label.label,
-    inp_label.anchor,
-    inp_label.font,
-    inp_label.size,
-    inp_label.bold,
-    inp_label.italic
-   FROM inp_label
-  ORDER BY inp_label.label;
-
-CREATE OR REPLACE VIEW vi_t_landuses AS
- SELECT inp_landuses.landus_id,
-    inp_landuses.sweepint,
-    inp_landuses.availab,
-    inp_landuses.lastsweep
-   FROM inp_landuses;
-
-
-CREATE OR REPLACE VIEW vi_t_lid_controls AS
- SELECT a.lidco_id,
-    a.lidco_type,
-    a.other1,
-    a.other2,
-    a.other3,
-    a.other4,
-    a.other5,
-    a.other6,
-    a.other7
-   FROM ( SELECT 0 AS id,
-            inp_lid.lidco_id,
-            inp_lid.lidco_type,
-            NULL::numeric AS other1,
-            NULL::numeric AS other2,
-            NULL::numeric AS other3,
-            NULL::numeric AS other4,
-            NULL::text AS other5,
-            NULL::text AS other6,
-            NULL::text AS other7
-           FROM inp_lid
-          WHERE inp_lid.active
-        UNION
-         SELECT inp_lid_value.id,
-            inp_lid_value.lidco_id,
-            inp_typevalue.idval AS lidco_type,
-            inp_lid_value.value_2 AS other1,
-            inp_lid_value.value_3 AS other2,
-            inp_lid_value.value_4 AS other3,
-            inp_lid_value.value_5 AS other4,
-            inp_lid_value.value_6 AS other5,
-            inp_lid_value.value_7 AS other6,
-            inp_lid_value.value_8 AS other7
-           FROM inp_lid_value
-             JOIN inp_lid USING (lidco_id)
-             LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_lid_value.lidlayer::text
-          WHERE inp_lid.active AND inp_typevalue.typevalue::text = 'inp_value_lidlayer'::text) a
-  ORDER BY a.lidco_id, a.id;
-
- CREATE OR REPLACE VIEW vi_t_lid_usage AS
- SELECT temp_t_lid_usage.subc_id,
-    temp_t_lid_usage.lidco_id,
-    temp_t_lid_usage.numelem::integer AS numelem,
-    temp_t_lid_usage.area,
-    temp_t_lid_usage.width,
-    temp_t_lid_usage.initsat,
-    temp_t_lid_usage.fromimp,
-    temp_t_lid_usage.toperv::integer AS toperv,
-    temp_t_lid_usage.rptfile
-   FROM v_edit_inp_subcatchment
-     JOIN temp_t_lid_usage ON temp_t_lid_usage.subc_id::text = v_edit_inp_subcatchment.subc_id::text;
-
-CREATE OR REPLACE VIEW vi_t_loadings  AS
- SELECT inp_loadings.subc_id,
-    inp_loadings.poll_id,
-    inp_loadings.ibuildup
-   FROM v_edit_inp_subcatchment
-     JOIN inp_loadings ON inp_loadings.subc_id::text = v_edit_inp_subcatchment.subc_id::text;
-
-
- CREATE OR REPLACE VIEW vi_t_losses AS
- SELECT temp_t_arc.arc_id,
-        CASE
-            WHEN temp_t_arc.kentry IS NOT NULL THEN temp_t_arc.kentry
-            ELSE 0::numeric
-        END AS kentry,
-        CASE
-            WHEN temp_t_arc.kexit IS NOT NULL THEN temp_t_arc.kexit
-            ELSE 0::numeric
-        END AS kexit,
-        CASE
-            WHEN temp_t_arc.kavg IS NOT NULL THEN temp_t_arc.kavg
-            ELSE 0::numeric
-        END AS kavg,
-        CASE
-            WHEN temp_t_arc.flap IS NOT NULL THEN temp_t_arc.flap
-            ELSE 'NO'::character varying
-        END AS flap,
-    temp_t_arc.seepage
-   FROM temp_t_arc
-  WHERE temp_t_arc.kentry > 0::numeric OR temp_t_arc.kexit > 0::numeric OR temp_t_arc.kavg > 0::numeric OR temp_t_arc.flap::text = 'YES'::text OR temp_t_arc.seepage IS NOT NULL;
-
-
-
-CREATE OR REPLACE VIEW vi_t_map  AS
- SELECT inp_mapdim.type_dim,
-    concat(inp_mapdim.x1, ' ', inp_mapdim.y1, ' ', inp_mapdim.x2, ' ', inp_mapdim.y2) AS other_val
-   FROM inp_mapdim
-UNION
- SELECT inp_typevalue.idval AS type_dim,
-    inp_mapunits.map_type AS other_val
-   FROM inp_mapunits
-     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_mapunits.type_units::text
-  WHERE inp_typevalue.typevalue::text = 'inp_value_mapunits'::text;
-
-
-CREATE OR REPLACE VIEW vi_t_options  AS
- SELECT a.parameter,
-    a.value
-   FROM ( SELECT a_1.idval AS parameter,
-            b.value,
-                CASE
-                    WHEN a_1.layoutname ~~ '%general_1%'::text THEN '1'::text
-                    WHEN a_1.layoutname ~~ '%hydraulics_1%'::text THEN '2'::text
-                    WHEN a_1.layoutname ~~ '%hydraulics_2%'::text THEN '3'::text
-                    WHEN a_1.layoutname ~~ '%date_1%'::text THEN '3'::text
-                    WHEN a_1.layoutname ~~ '%date_2%'::text THEN '4'::text
-                    WHEN a_1.layoutname ~~ '%general_2%'::text THEN '5'::text
-                    ELSE NULL::text
-                END AS layoutname,
-            a_1.layoutorder
-           FROM sys_param_user a_1
-             JOIN config_param_user b ON a_1.id = b.parameter::text
-          WHERE (a_1.layoutname = ANY (ARRAY['lyt_general_1'::text, 'lyt_general_2'::text, 'lyt_hydraulics_1'::text, 'lyt_hydraulics_2'::text, 'lyt_date_1'::text, 'lyt_date_2'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT NULL AND a_1.idval IS NOT NULL
-        UNION
-         SELECT 'INFILTRATION'::text AS parameter,
-            cat_hydrology.infiltration AS value,
-            '1'::text AS text,
-            2
-           FROM config_param_user,
-            cat_hydrology
-          WHERE config_param_user.parameter::text = 'inp_options_hydrology_scenario'::text AND config_param_user.cur_user::text = "current_user"()::text) a
-  ORDER BY a.layoutname, a.layoutorder;
-
-
-
-CREATE OR REPLACE VIEW vi_t_orifices AS
- SELECT arc_id,
-    temp_t_arc.node_1,
-    temp_t_arc.node_2,
-    f.ori_type,
-    f.offsetval,
-    f.cd,
-    f.flap,
-    f.orate,
-    f.close_time
-   FROM temp_t_arc_flowregulator f
-     JOIN temp_t_arc USING (arc_id)
-  WHERE f.type::text = 'ORIFICE'::text;
-
-
-CREATE OR REPLACE VIEW vi_t_outfalls AS
- SELECT temp_t_node.node_id,
-    temp_t_node.elev,
-    temp_t_node.addparam::json ->> 'outfall_type'::text AS outfall_type,
-    temp_t_node.addparam::json ->> 'gate'::text AS other1,
-    NULL::text AS other2
-   FROM temp_t_node
-  WHERE temp_t_node.epa_type::text = 'OUTFALL'::text AND ((temp_t_node.addparam::json ->> 'outfall_type'::text) = ANY (ARRAY['FREE'::text, 'NORMAL'::text]))
-UNION
- SELECT temp_t_node.node_id,
-    temp_t_node.elev,
-    temp_t_node.addparam::json ->> 'outfall_type'::text AS outfall_type,
-    temp_t_node.addparam::json ->> 'state'::text AS other1,
-    temp_t_node.addparam::json ->> 'gate'::text AS other2
-   FROM temp_t_node
-  WHERE temp_t_node.epa_type::text = 'OUTFALL'::text AND (temp_t_node.addparam::json ->> 'outfall_type'::text) = 'FIXED'::text
-UNION
- SELECT temp_t_node.node_id,
-    temp_t_node.elev,
-    temp_t_node.addparam::json ->> 'outfall_type'::text AS outfall_type,
-    temp_t_node.addparam::json ->> 'curve_id'::text AS other1,
-    temp_t_node.addparam::json ->> 'gate'::text AS other2
-   FROM temp_t_node
-  WHERE temp_t_node.epa_type::text = 'OUTFALL'::text AND (temp_t_node.addparam::json ->> 'outfall_type'::text) = 'TIDAL'::text
-UNION
- SELECT temp_t_node.node_id,
-    temp_t_node.elev,
-    temp_t_node.addparam::json ->> 'outfall_type'::text AS outfall_type,
-    temp_t_node.addparam::json ->> 'timser_id'::text AS other1,
-    temp_t_node.addparam::json ->> 'gate'::text AS other2
-   FROM temp_t_node
-  WHERE temp_t_node.epa_type::text = 'OUTFALL'::text AND (temp_t_node.addparam::json ->> 'outfall_type'::text) = 'TIMESERIES'::text;
-
-
- CREATE OR REPLACE VIEW vi_t_outlets AS
- SELECT arc_id,
-    temp_t_arc.node_1,
-    temp_t_arc.node_2,
-        CASE
-            WHEN f.offsetval IS NULL THEN '*'::text
-            ELSE f.offsetval::text
-        END AS offsetval,
-    f.outlet_type,
-        CASE
-            WHEN f.curve_id IS NULL THEN f.cd1::text::character varying
-            ELSE f.curve_id
-        END AS other1,
-    f.cd2::text AS other2,
-    f.flap::character varying AS other3
-   FROM temp_t_arc_flowregulator f
-     JOIN temp_t_arc USING (arc_id)
-  WHERE f.type::text = 'OUTLET'::text;
-
-
-
-CREATE OR REPLACE VIEW vi_t_parent_arc  AS
- SELECT v_arc.arc_id,
-    v_arc.code,
-    v_arc.node_1,
-    v_arc.nodetype_1,
-    v_arc.y1,
-    v_arc.custom_y1,
-    v_arc.elev1,
-    v_arc.custom_elev1,
-    v_arc.sys_elev1,
-    v_arc.sys_y1,
-    v_arc.r1,
-    v_arc.z1,
-    v_arc.node_2,
-    v_arc.nodetype_2,
-    v_arc.y2,
-    v_arc.custom_y2,
-    v_arc.elev2,
-    v_arc.custom_elev2,
-    v_arc.sys_elev2,
-    v_arc.sys_y2,
-    v_arc.r2,
-    v_arc.z2,
-    v_arc.slope,
-    v_arc.arc_type,
-    v_arc.sys_type,
-    v_arc.arccat_id,
-    v_arc.matcat_id,
-    v_arc.cat_shape,
-    v_arc.cat_geom1,
-    v_arc.cat_geom2,
-    v_arc.width,
-    v_arc.epa_type,
-    v_arc.expl_id,
-    v_arc.macroexpl_id,
-    v_arc.sector_id,
-    v_arc.macrosector_id,
-    v_arc.state,
-    v_arc.state_type,
-    v_arc.annotation,
-    v_arc.gis_length,
-    v_arc.custom_length,
-    v_arc.inverted_slope,
-    v_arc.observ,
-    v_arc.comment,
-    v_arc.dma_id,
-    v_arc.macrodma_id,
-    v_arc.soilcat_id,
-    v_arc.function_type,
-    v_arc.category_type,
-    v_arc.fluid_type,
-    v_arc.location_type,
-    v_arc.workcat_id,
-    v_arc.workcat_id_end,
-    v_arc.builtdate,
-    v_arc.enddate,
-    v_arc.buildercat_id,
-    v_arc.ownercat_id,
-    v_arc.muni_id,
-    v_arc.postcode,
-    v_arc.district_id,
-    v_arc.streetname,
-    v_arc.postnumber,
-    v_arc.postcomplement,
-    v_arc.streetname2,
-    v_arc.postnumber2,
-    v_arc.postcomplement2,
-    v_arc.descript,
-    v_arc.link,
-    v_arc.verified,
-    v_arc.undelete,
-    v_arc.label,
-    v_arc.label_x,
-    v_arc.label_y,
-    v_arc.label_rotation,
-    v_arc.publish,
-    v_arc.inventory,
-    v_arc.uncertain,
-    v_arc.num_value,
-    v_arc.tstamp,
-    v_arc.insert_user,
-    v_arc.lastupdate,
-    v_arc.lastupdate_user,
-    v_arc.the_geom
-   FROM v_arc,
-    selector_sector
-  WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
-
-
-
-CREATE OR REPLACE VIEW vi_t_patterns AS
- SELECT p.pattern_id,
-    p.pattern_type,
-    inp_pattern_value.factor_1,
-    inp_pattern_value.factor_2,
-    inp_pattern_value.factor_3,
-    inp_pattern_value.factor_4,
-    inp_pattern_value.factor_5,
-    inp_pattern_value.factor_6,
-    inp_pattern_value.factor_7,
-    inp_pattern_value.factor_8,
-    inp_pattern_value.factor_9,
-    inp_pattern_value.factor_10,
-    inp_pattern_value.factor_11,
-    inp_pattern_value.factor_12,
-    inp_pattern_value.factor_13,
-    inp_pattern_value.factor_14,
-    inp_pattern_value.factor_15,
-    inp_pattern_value.factor_16,
-    inp_pattern_value.factor_17,
-    inp_pattern_value.factor_18,
-    inp_pattern_value.factor_19,
-    inp_pattern_value.factor_20,
-    inp_pattern_value.factor_21,
-    inp_pattern_value.factor_22,
-    inp_pattern_value.factor_23,
-    inp_pattern_value.factor_24
-   FROM selector_expl s,
-    inp_pattern p
-     JOIN inp_pattern_value USING (pattern_id)
-  WHERE p.active AND p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
-  ORDER BY p.pattern_id;
-
-
-CREATE OR REPLACE VIEW vi_t_pollutants AS
- SELECT inp_pollutant.poll_id,
-    inp_pollutant.units_type,
-    inp_pollutant.crain,
-    inp_pollutant.cgw,
-    inp_pollutant.cii,
-    inp_pollutant.kd,
-    inp_pollutant.sflag,
-    inp_pollutant.copoll_id,
-    inp_pollutant.cofract,
-    inp_pollutant.cdwf,
-    inp_pollutant.cinit
-   FROM inp_pollutant
-  ORDER BY inp_pollutant.poll_id;
-
-
-CREATE OR REPLACE VIEW vi_t_polygons AS
- SELECT temp_t_table.text_column
-   FROM temp_t_table
-  WHERE temp_t_table.fid = 117;
-
-
-CREATE OR REPLACE VIEW vi_t_pumps AS
- SELECT arc_id,
-    temp_t_arc.node_1,
-    temp_t_arc.node_2,
-    temp_t_arc_flowregulator.curve_id,
-    temp_t_arc_flowregulator.status,
-    temp_t_arc_flowregulator.startup,
-    temp_t_arc_flowregulator.shutoff
-   FROM temp_t_arc_flowregulator
-     JOIN temp_t_arc USING (arc_id)
-  WHERE temp_t_arc_flowregulator.type::text = 'PUMP'::text;
-
-CREATE OR REPLACE VIEW vi_t_raingages AS
- SELECT DISTINCT r.rg_id,
-    r.form_type,
-    r.intvl,
-    r.scf,
-    inp_typevalue.idval AS raingage_type,
-    r.timser_id AS other1,
-    NULL::character varying AS other2,
-    NULL::character varying AS other3
-   FROM selector_inp_result s,
-    temp_rpt_inp_raingage r
-     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = r.rgage_type::text
-  WHERE inp_typevalue.typevalue::text = 'inp_typevalue_raingage'::text AND r.rgage_type::text = 'TIMESERIES'::text AND s.result_id::text = r.result_id::text AND s.cur_user = CURRENT_USER
-UNION
- SELECT DISTINCT r.rg_id,
-    r.form_type,
-    r.intvl,
-    r.scf,
-    inp_typevalue.idval AS raingage_type,
-    r.fname AS other1,
-    r.sta AS other2,
-    r.units AS other3
-   FROM selector_inp_result s,
-    temp_rpt_inp_raingage r
-     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = r.rgage_type::text
-  WHERE inp_typevalue.typevalue::text = 'inp_typevalue_raingage'::text AND r.rgage_type::text = 'FILE'::text AND s.result_id::text = r.result_id::text AND s.cur_user = CURRENT_USER;
-
-CREATE OR REPLACE VIEW vi_t_rdii AS
- SELECT temp_rpt_inp_node.node_id,
-    inp_rdii.hydro_id,
-    inp_rdii.sewerarea
-   FROM selector_inp_result,
-    temp_rpt_inp_node
-     JOIN inp_rdii ON inp_rdii.node_id::text = temp_rpt_inp_node.node_id::text
-  WHERE temp_rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text;
-
-
-
-CREATE OR REPLACE VIEW vi_t_report AS
- SELECT a.idval AS parameter,
-    b.value
-   FROM sys_param_user a
-     JOIN config_param_user b ON a.id = b.parameter::text
-  WHERE (a.layoutname = ANY (ARRAY['lyt_reports_1'::text, 'lyt_reports_2'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT NULL;
-
-
-CREATE OR REPLACE VIEW vi_t_snowpacks AS
- SELECT inp_snowpack_value.snow_id,
-    inp_snowpack_value.snow_type,
-    inp_snowpack_value.value_1,
-    inp_snowpack_value.value_2,
-    inp_snowpack_value.value_3,
-    inp_snowpack_value.value_4,
-    inp_snowpack_value.value_5,
-    inp_snowpack_value.value_6,
-    inp_snowpack_value.value_7
-   FROM inp_snowpack_value
-  ORDER BY inp_snowpack_value.id;
-
-
-
-CREATE OR REPLACE VIEW vi_t_storage AS
- SELECT temp_t_node.node_id,
-    temp_t_node.elev,
-    temp_t_node.ymax,
-    temp_t_node.y0,
-    temp_t_node.addparam::json ->> 'storage_type'::text AS storage_type,
-    temp_t_node.addparam::json ->> 'a1'::text AS other1,
-    temp_t_node.addparam::json ->> 'a2'::text AS other2,
-    temp_t_node.addparam::json ->> 'a0'::text AS other3,
-    temp_t_node.apond::text AS other4,
-    temp_t_node.addparam::json ->> 'fevap'::text AS other5,
-    temp_t_node.addparam::json ->> 'sh'::text AS other6,
-    temp_t_node.addparam::json ->> 'hc'::text AS other7,
-    temp_t_node.addparam::json ->> 'imd'::text AS other8
-   FROM temp_t_node
-  WHERE temp_t_node.epa_type::text = 'STORAGE'::text AND (temp_t_node.addparam::json ->> 'storage_type'::text) = 'FUNCTIONAL'::text
-UNION
- SELECT temp_t_node.node_id,
-    temp_t_node.elev,
-    temp_t_node.ymax,
-    temp_t_node.y0,
-    temp_t_node.addparam::json ->> 'storage_type'::text AS storage_type,
-    temp_t_node.addparam::json ->> 'curve_id'::text AS other1,
-    temp_t_node.apond::text AS other2,
-    temp_t_node.addparam::json ->> 'fevap'::text AS other3,
-    temp_t_node.addparam::json ->> 'sh'::text AS other4,
-    temp_t_node.addparam::json ->> 'hc'::text AS other5,
-    temp_t_node.addparam::json ->> 'imd'::text AS other6,
-    NULL::text AS other7,
-    NULL::text AS other8
-   FROM temp_t_node
-  WHERE temp_t_node.epa_type::text = 'STORAGE'::text AND (temp_t_node.addparam::json ->> 'storage_type'::text) = 'TABULAR'::text;
-
-
-
-CREATE OR REPLACE VIEW vi_t_subareas AS
- SELECT DISTINCT v_edit_inp_subcatchment.subc_id,
-    v_edit_inp_subcatchment.nimp,
-    v_edit_inp_subcatchment.nperv,
-    v_edit_inp_subcatchment.simp,
-    v_edit_inp_subcatchment.sperv,
-    v_edit_inp_subcatchment.zero,
-    v_edit_inp_subcatchment.routeto,
-    v_edit_inp_subcatchment.rted
-   FROM v_edit_inp_subcatchment
-     JOIN ( SELECT a.subc_id,
-            a.outlet_id
-           FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                     JOIN temp_node ON inp_subcatchment.outlet_id::text = temp_node.node_id::text
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
-                UNION
-                 SELECT inp_subcatchment.outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id);
-
-
-CREATE OR REPLACE VIEW vi_t_subcatch2outlet  AS
- SELECT a.subc_id,
-    a.outlet_id,
-    a.outlet_type,
-    st_length2d(a.the_geom) AS length,
-    a.hydrology_id,
-    a.the_geom
-   FROM ( SELECT s1.subc_id,
-            s1.outlet_id,
-            'JUNCTION'::text AS outlet_type,
-            s1.hydrology_id,
-            st_makeline(st_centroid(s1.the_geom), node.the_geom)::geometry(LineString,25831) AS the_geom
-           FROM v_edit_inp_subcatchment s1
-             JOIN node ON node.node_id::text = s1.outlet_id::text
-        UNION
-         SELECT s1.subc_id,
-            s1.outlet_id,
-            'SUBCATCHMENT'::text AS outlet_type,
-            s1.hydrology_id,
-            st_makeline(st_centroid(s1.the_geom), st_centroid(s2.the_geom))::geometry(LineString,25831) AS the_geom
-           FROM v_edit_inp_subcatchment s1
-             JOIN v_edit_inp_subcatchment s2 ON s1.outlet_id::text = s2.subc_id::text) a;
-
-
-CREATE OR REPLACE VIEW vi_t_subcatchcentroid  AS
- SELECT v_edit_inp_subcatchment.subc_id,
-    v_edit_inp_subcatchment.hydrology_id,
-    st_centroid(v_edit_inp_subcatchment.the_geom) AS the_geom
-   FROM v_edit_inp_subcatchment;
-
-CREATE OR REPLACE VIEW vi_t_subcatchments AS
- SELECT DISTINCT v_edit_inp_subcatchment.subc_id,
-    v_edit_inp_subcatchment.rg_id,
-    b.outlet_id,
-    v_edit_inp_subcatchment.area,
-    v_edit_inp_subcatchment.imperv,
-    v_edit_inp_subcatchment.width,
-    v_edit_inp_subcatchment.slope,
-    v_edit_inp_subcatchment.clength,
-    v_edit_inp_subcatchment.snow_id
-   FROM v_edit_inp_subcatchment
-     JOIN ( SELECT a.subc_id,
-            a.outlet_id
-           FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                     JOIN temp_node ON inp_subcatchment.outlet_id::text = temp_node.node_id::text
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
-                UNION
-                 SELECT inp_subcatchment.outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id);
-
-
-CREATE OR REPLACE VIEW vi_t_symbols  AS
- SELECT v_edit_raingage.rg_id,
-    NULL::numeric(16,3) AS xcoord,
-    NULL::numeric(16,3) AS ycoord,
-    v_edit_raingage.the_geom
-   FROM v_edit_raingage;
-
-
-CREATE OR REPLACE VIEW vi_t_temperature  AS
- SELECT inp_temperature.temp_type,
-    inp_temperature.value
-   FROM inp_temperature;
-
-
-
-CREATE OR REPLACE VIEW vi_t_timeseries AS
- SELECT b.timser_id,
-    b.other1,
-    b.other2,
-    b.other3
-   FROM ( SELECT t.id,
-            t.timser_id,
-            t.other1,
-            t.other2,
-            t.other3
-           FROM selector_expl s,
-            ( SELECT a.id,
-                    a.timser_id,
-                    a.other1,
-                    a.other2,
-                    a.other3,
-                    a.expl_id
-                   FROM ( SELECT inp_timeseries_value.id,
-                            inp_timeseries_value.timser_id,
-                            inp_timeseries_value.date AS other1,
-                            inp_timeseries_value.hour AS other2,
-                            inp_timeseries_value.value AS other3,
-                            inp_timeseries.expl_id
-                           FROM inp_timeseries_value
-                             JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
-                          WHERE inp_timeseries.times_type::text = 'ABSOLUTE'::text AND inp_timeseries.active
-                        UNION
-                         SELECT inp_timeseries_value.id,
-                            inp_timeseries_value.timser_id,
-                            concat('FILE', ' ', inp_timeseries.fname) AS other1,
-                            NULL::character varying AS other2,
-                            NULL::numeric AS other3,
-                            inp_timeseries.expl_id
-                           FROM inp_timeseries_value
-                             JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
-                          WHERE inp_timeseries.times_type::text = 'FILE'::text AND inp_timeseries.active
-                        UNION
-                         SELECT inp_timeseries_value.id,
-                            inp_timeseries_value.timser_id,
-                            NULL::text AS other1,
-                            inp_timeseries_value."time" AS other2,
-                            inp_timeseries_value.value::numeric AS other3,
-                            inp_timeseries.expl_id
-                           FROM inp_timeseries_value
-                             JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
-                          WHERE inp_timeseries.times_type::text = 'RELATIVE'::text AND inp_timeseries.active) a
-                  ORDER BY a.id) t
-          WHERE t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL) b
-  ORDER BY b.id;
-
-
-CREATE OR REPLACE VIEW vi_t_transects AS
- SELECT inp_transects_value.text
-   FROM inp_transects_value
-  ORDER BY inp_transects_value.id;
-
-
-CREATE OR REPLACE VIEW vi_t_treatment AS
- SELECT temp_t_node_other.node_id,
-    temp_t_node_other.poll_id,
-    temp_t_node_other.other AS function
-   FROM temp_t_node_other
-  WHERE temp_t_node_other.type::text = 'TREATMENT'::text;
-
-
-CREATE OR REPLACE VIEW vi_t_vertices AS
- SELECT DISTINCT ON (arc.path, arc.point) arc.arc_id,
-    NULL::numeric(16,3) AS xcoord,
-    NULL::numeric(16,3) AS ycoord,
-    arc.point AS the_geom
-   FROM ( SELECT (st_dumppoints(temp_rpt_inp_arc.the_geom)).geom AS point,
-            (st_dumppoints(temp_rpt_inp_arc.the_geom)).path AS path,
-            st_startpoint(temp_rpt_inp_arc.the_geom) AS startpoint,
-            st_endpoint(temp_rpt_inp_arc.the_geom) AS endpoint,
-            temp_rpt_inp_arc.sector_id,
-            temp_rpt_inp_arc.arc_id
-           FROM selector_inp_result,
-            temp_rpt_inp_arc
-          WHERE temp_rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text) arc
-  WHERE (arc.point < arc.startpoint OR arc.point > arc.startpoint) AND (arc.point < arc.endpoint OR arc.point > arc.endpoint)
-  ORDER BY arc.path;
-
-
-CREATE OR REPLACE VIEW vi_t_washoff  AS
- SELECT inp_washoff.landus_id,
-    inp_washoff.poll_id,
-    inp_typevalue.idval AS funcw_type,
-    inp_washoff.c1,
-    inp_washoff.c2,
-    inp_washoff.sweepeffic,
-    inp_washoff.bmpeffic
-   FROM inp_washoff
-     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_washoff.funcw_type::text
-  WHERE inp_typevalue.typevalue::text = 'inp_value_washoff'::text;
-
-
-CREATE OR REPLACE VIEW vi_t_weirs AS
- SELECT arc_id,
-    temp_t_arc.node_1,
-    temp_t_arc.node_2,
-    f.weir_type,
-    f.offsetval,
-    f.cd,
-    f.flap,
-    f.ec,
-    f.cd2,
-    f.surcharge,
-    f.road_width,
-    f.road_surf,
-    f.coef_curve
-   FROM temp_t_arc_flowregulator f
-     JOIN temp_t_arc USING (arc_id)
-  WHERE f.type::text = 'WEIR'::text;
-
-
-CREATE OR REPLACE VIEW vi_t_xsections AS
- SELECT temp_t_arc.arc_id,
-    cat_arc_shape.epa AS shape,
-    cat_arc.geom1::text AS other1,
-    cat_arc.curve_id AS other2,
-    0::text AS other3,
-    0::text AS other4,
-    temp_t_arc.barrels AS other5,
-    NULL::text AS other6
-   FROM temp_t_arc
-     JOIN cat_arc ON temp_t_arc.arccat_id::text = cat_arc.id::text
-     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
-  WHERE cat_arc_shape.epa::text = 'CUSTOM'::text AND NOT (temp_t_arc.arc_id::text IN ( SELECT temp_t_arc_flowregulator.arc_id
-           FROM temp_t_arc_flowregulator))
-UNION
- SELECT temp_t_arc.arc_id,
-    cat_arc_shape.epa AS shape,
-    cat_arc.geom1::text AS other1,
-    cat_arc.geom2::text AS other2,
-    cat_arc.geom3::text AS other3,
-    cat_arc.geom4::text AS other4,
-    temp_t_arc.barrels AS other5,
-    temp_t_arc.culvert::text AS other6
-   FROM temp_t_arc
-     JOIN cat_arc ON temp_t_arc.arccat_id::text = cat_arc.id::text
-     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
-  WHERE (cat_arc_shape.epa::text <> ALL (ARRAY['CUSTOM'::text, 'IRREGULAR'::text])) AND NOT (temp_t_arc.arc_id::text IN ( SELECT temp_t_arc_flowregulator.arc_id
-           FROM temp_t_arc_flowregulator))
-UNION
- SELECT temp_t_arc.arc_id,
-    cat_arc_shape.epa AS shape,
-    cat_arc.tsect_id AS other1,
-    0::character varying AS other2,
-    0::text AS other3,
-    0::text AS other4,
-    temp_t_arc.barrels AS other5,
-    NULL::text AS other6
-   FROM temp_t_arc
-     JOIN cat_arc ON temp_t_arc.arccat_id::text = cat_arc.id::text
-     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
-  WHERE cat_arc_shape.epa::text = 'IRREGULAR'::text AND NOT (temp_t_arc.arc_id::text IN ( SELECT temp_t_arc_flowregulator.arc_id
-           FROM temp_t_arc_flowregulator))
-UNION
- SELECT temp_t_arc_flowregulator.arc_id,
-    temp_t_arc_flowregulator.shape,
-    temp_t_arc_flowregulator.geom1::text AS other1,
-    temp_t_arc_flowregulator.geom2::text AS other2,
-    temp_t_arc_flowregulator.geom3::text AS other3,
-    temp_t_arc_flowregulator.geom4::text AS other4,
-    NULL::integer AS other5,
-    NULL::text AS other6
-   FROM temp_t_arc_flowregulator
-  WHERE temp_t_arc_flowregulator.type::text = ANY (ARRAY['ORIFICE'::character varying::text, 'WEIR'::character varying::text]);
-
+	CREATE OR REPLACE VIEW vi_t_adjustments AS
+	 SELECT a.adj_type AS parameter,
+	    a.subc_id,
+	    a.monthly_adj
+	   FROM ( SELECT 1 AS "order",
+		    inp_adjustments.adj_type,
+		    NULL::character varying AS subc_id,
+		    concat(inp_adjustments.value_1, ' ', inp_adjustments.value_2, ' ', inp_adjustments.value_3, ' ', inp_adjustments.value_4, ' ', inp_adjustments.value_5, ' ', inp_adjustments.value_6, ' ', inp_adjustments.value_7, ' ', inp_adjustments.value_8, ' ', inp_adjustments.value_9, ' ', inp_adjustments.value_10, ' ', inp_adjustments.value_11, ' ', inp_adjustments.value_12) AS monthly_adj
+		   FROM inp_adjustments
+		UNION
+		 SELECT 2,
+		    'N-PERV'::character varying AS parameter,
+		    inp_subcatchment.subc_id,
+		    inp_subcatchment.nperv_pattern_id AS montly_adjunstment
+		   FROM inp_subcatchment
+		  WHERE inp_subcatchment.nperv_pattern_id IS NOT NULL
+		UNION
+		 SELECT 2,
+		    'DSTORE'::character varying,
+		    inp_subcatchment.subc_id,
+		    inp_subcatchment.dstore_pattern_id AS montly_adjunstment
+		   FROM inp_subcatchment
+		  WHERE inp_subcatchment.dstore_pattern_id IS NOT NULL
+		UNION
+		 SELECT 2,
+		    'INFIL'::character varying,
+		    inp_subcatchment.subc_id,
+		    inp_subcatchment.infil_pattern_id AS montly_adjunstment
+		   FROM inp_subcatchment
+		  WHERE inp_subcatchment.infil_pattern_id IS NOT NULL) a;
+
+	CREATE OR REPLACE VIEW vi_t_aquifers AS
+	 SELECT inp_aquifer.aquif_id,
+	    inp_aquifer.por,
+	    inp_aquifer.wp,
+	    inp_aquifer.fc,
+	    inp_aquifer.k,
+	    inp_aquifer.ks,
+	    inp_aquifer.ps,
+	    inp_aquifer.uef,
+	    inp_aquifer.led,
+	    inp_aquifer.gwr,
+	    inp_aquifer.be,
+	    inp_aquifer.wte,
+	    inp_aquifer.umc,
+	    inp_aquifer.pattern_id
+	   FROM inp_aquifer
+	  ORDER BY inp_aquifer.aquif_id;
+
+
+	CREATE OR REPLACE VIEW vi_t_backdrop AS
+	 SELECT inp_backdrop.text
+	   FROM inp_backdrop;
+
+
+	CREATE OR REPLACE VIEW vi_t_buildup AS
+	 SELECT inp_buildup.landus_id,
+	    inp_buildup.poll_id,
+	    inp_typevalue.idval AS funcb_type,
+	    inp_buildup.c1,
+	    inp_buildup.c2,
+	    inp_buildup.c3,
+	    inp_buildup.perunit
+	   FROM inp_buildup
+	     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_buildup.funcb_type::text
+	  WHERE inp_typevalue.typevalue::text = 'inp_value_buildup'::text;
+
+
+	CREATE OR REPLACE VIEW vi_t_conduits AS
+	 SELECT arc_id,
+	    t.node_1,
+	    t.node_2,
+	    t.length,
+	    t.n,
+	    t.elevmax1 AS z1,
+	    t.elevmax2 AS z2,
+	    t.q0::numeric(12,4) AS q0,
+	    t.qmax::numeric(12,4) AS qmax,
+	    concat(';', t.sector_id, ' ', t.arccat_id, ' ', t.age) AS other
+	   FROM temp_t_arc t
+	     JOIN inp_conduit USING (arc_id)
+	UNION
+	 SELECT t.arc_id,
+	    t.node_1,
+	    t.node_2,
+	    t.length,
+	    t.n,
+	    t.elevmax1 AS z1,
+	    t.elevmax2 AS z2,
+	    t.q0::numeric(12,4) AS q0,
+	    t.qmax::numeric(12,4) AS qmax,
+	    concat(';', t.sector_id, ' ', t.arccat_id) AS other
+	   FROM temp_t_arc t
+	     JOIN inp_conduit ON t.arcparent::text = inp_conduit.arc_id::text;
+
+
+	CREATE OR REPLACE VIEW vi_t_controls AS
+	 SELECT c.text
+	   FROM ( SELECT inp_controls.id,
+		    inp_controls.text
+		   FROM selector_sector,
+		    inp_controls
+		  WHERE selector_sector.sector_id = inp_controls.sector_id AND selector_sector.cur_user = "current_user"()::text AND inp_controls.active IS NOT FALSE
+		UNION
+		 SELECT d.id,
+		    d.text
+		   FROM selector_sector s,
+		    v_edit_inp_dscenario_controls d
+		  WHERE s.sector_id = d.sector_id AND s.cur_user = "current_user"()::text AND d.active IS NOT FALSE
+	  ORDER BY 1) c
+	  ORDER BY c.id;
+
+	 CREATE OR REPLACE VIEW vi_t_coordinates AS
+	 SELECT node_id,
+	    NULL::numeric(16,3) AS xcoord,
+	    NULL::numeric(16,3) AS ycoord,
+	    the_geom
+	   FROM temp_t_node;
+
+
+	CREATE OR REPLACE VIEW vi_t_coverages AS
+	 SELECT v_edit_inp_subcatchment.subc_id,
+	    inp_coverage.landus_id,
+	    inp_coverage.percent
+	   FROM inp_coverage
+	     JOIN v_edit_inp_subcatchment ON inp_coverage.subc_id::text = v_edit_inp_subcatchment.subc_id::text
+	     LEFT JOIN ( SELECT DISTINCT ON (a.subc_id) a.subc_id,
+		    v_node.node_id
+		   FROM ( SELECT unnest(inp_subcatchment.outlet_id::text[]) AS node_array,
+			    inp_subcatchment.subc_id,
+			    inp_subcatchment.outlet_id,
+			    inp_subcatchment.rg_id,
+			    inp_subcatchment.area,
+			    inp_subcatchment.imperv,
+			    inp_subcatchment.width,
+			    inp_subcatchment.slope,
+			    inp_subcatchment.clength,
+			    inp_subcatchment.snow_id,
+			    inp_subcatchment.nimp,
+			    inp_subcatchment.nperv,
+			    inp_subcatchment.simp,
+			    inp_subcatchment.sperv,
+			    inp_subcatchment.zero,
+			    inp_subcatchment.routeto,
+			    inp_subcatchment.rted,
+			    inp_subcatchment.maxrate,
+			    inp_subcatchment.minrate,
+			    inp_subcatchment.decay,
+			    inp_subcatchment.drytime,
+			    inp_subcatchment.maxinfil,
+			    inp_subcatchment.suction,
+			    inp_subcatchment.conduct,
+			    inp_subcatchment.initdef,
+			    inp_subcatchment.curveno,
+			    inp_subcatchment.conduct_2,
+			    inp_subcatchment.drytime_2,
+			    inp_subcatchment.sector_id,
+			    inp_subcatchment.hydrology_id,
+			    inp_subcatchment.the_geom,
+			    inp_subcatchment.descript
+			   FROM inp_subcatchment
+			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text) a
+		     JOIN v_node ON v_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text;
+
+
+
+	CREATE OR REPLACE VIEW vi_t_curves AS
+	 SELECT a.curve_id,
+	    a.curve_type,
+	    a.x_value,
+	    a.y_value
+	   FROM ( WITH qt AS (
+			 SELECT inp_curve_value.id,
+			    inp_curve_value.curve_id,
+				CASE
+				    WHEN inp_curve_value.id = (( SELECT min(sub.id) AS min
+				       FROM inp_curve_value sub
+				      WHERE sub.curve_id::text = inp_curve_value.curve_id::text)) THEN inp_typevalue.idval
+				    ELSE NULL::character varying
+				END AS curve_type,
+			    inp_curve_value.x_value,
+			    inp_curve_value.y_value,
+			    c.expl_id
+			   FROM inp_curve c
+			     JOIN inp_curve_value ON c.id::text = inp_curve_value.curve_id::text
+			     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = c.curve_type::text
+			  WHERE inp_typevalue.typevalue::text = 'inp_value_curve'::text AND c.active
+			)
+		 SELECT qt.id,
+		    qt.curve_id,
+		    qt.curve_type,
+		    qt.x_value,
+		    qt.y_value,
+		    qt.expl_id
+		   FROM qt
+		     JOIN selector_expl s USING (expl_id)
+		  WHERE s.cur_user = "current_user"()::text
+		UNION
+		 SELECT qt.id,
+		    qt.curve_id,
+		    qt.curve_type,
+		    qt.x_value,
+		    qt.y_value,
+		    qt.expl_id
+		   FROM qt
+		  WHERE qt.expl_id IS NULL) a
+	  ORDER BY a.id;
+
+	 CREATE OR REPLACE VIEW vi_t_dividers AS
+	 SELECT temp_t_node.node_id,
+	    temp_t_node.elev,
+	    temp_t_node.addparam::json ->> 'arc_id'::text AS arc_id,
+	    temp_t_node.addparam::json ->> 'divider_type'::text AS divider_type,
+	    temp_t_node.addparam::json ->> 'qmin'::text AS other1,
+	    temp_t_node.y0 AS other2,
+	    temp_t_node.ysur AS other3,
+	    temp_t_node.apond AS other4,
+	    NULL::double precision AS other5,
+	    NULL::double precision AS other6
+	   FROM temp_t_node
+	  WHERE temp_t_node.epa_type::text = 'DIVIDER'::text AND (temp_t_node.addparam::json ->> 'divider_type'::text) = 'CUTOFF'::text
+	UNION
+	 SELECT temp_t_node.node_id,
+	    temp_t_node.elev,
+	    temp_t_node.addparam::json ->> 'arc_id'::text AS arc_id,
+	    temp_t_node.addparam::json ->> 'divider_type'::text AS divider_type,
+	    temp_t_node.y0::text AS other1,
+	    temp_t_node.ysur AS other2,
+	    temp_t_node.apond AS other3,
+	    NULL::numeric AS other4,
+	    NULL::double precision AS other5,
+	    NULL::double precision AS other6
+	   FROM temp_t_node
+	  WHERE temp_t_node.epa_type::text = 'DIVIDER'::text AND (temp_t_node.addparam::json ->> 'divider_type'::text) = 'OVERFLOW'::text
+	UNION
+	 SELECT temp_t_node.node_id,
+	    temp_t_node.elev,
+	    temp_t_node.addparam::json ->> 'arc_id'::text AS arc_id,
+	    temp_t_node.addparam::json ->> 'divider_type'::text AS divider_type,
+	    temp_t_node.addparam::json ->> 'curve_id'::text AS other1,
+	    temp_t_node.y0 AS other2,
+	    temp_t_node.ysur AS other3,
+	    temp_t_node.apond AS other4,
+	    NULL::double precision AS other5,
+	    NULL::double precision AS other6
+	   FROM temp_t_node
+	  WHERE temp_t_node.epa_type::text = 'DIVIDER'::text AND (temp_t_node.addparam::json ->> 'divider_type'::text) = 'TABULAR'::text
+	UNION
+	 SELECT temp_t_node.node_id,
+	    temp_t_node.elev,
+	    temp_t_node.addparam::json ->> 'arc_id'::text AS arc_id,
+	    temp_t_node.addparam::json ->> 'divider_type'::text AS divider_type,
+	    temp_t_node.addparam::json ->> 'qmin'::text AS other1,
+	    (temp_t_node.addparam::json ->> 'ht'::text)::numeric AS other2,
+	    (temp_t_node.addparam::json ->> 'cd'::text)::numeric AS other3,
+	    temp_t_node.y0 AS other4,
+	    temp_t_node.ysur AS other5,
+	    temp_t_node.apond AS other6
+	   FROM temp_t_node
+	  WHERE temp_t_node.epa_type::text = 'DIVIDER'::text AND (temp_t_node.addparam::json ->> 'divider_type'::text) = 'WEIR'::text;
+
+
+	CREATE OR REPLACE VIEW vi_t_dwf AS
+	 SELECT temp_rpt_inp_node.node_id,
+	    'FLOW'::text AS type_dwf,
+	    inp_dwf.value,
+	    inp_dwf.pat1,
+	    inp_dwf.pat2,
+	    inp_dwf.pat3,
+	    inp_dwf.pat4
+	   FROM selector_inp_result,
+	    temp_rpt_inp_node
+	     JOIN inp_dwf ON inp_dwf.node_id::text = temp_rpt_inp_node.node_id::text
+	  WHERE temp_rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND inp_dwf.dwfscenario_id = (( SELECT config_param_user.value::integer AS value
+		   FROM config_param_user
+		  WHERE config_param_user.parameter::text = 'inp_options_dwfscenario'::text AND config_param_user.cur_user::text = CURRENT_USER))
+	UNION
+	 SELECT temp_rpt_inp_node.node_id,
+	    inp_dwf_pol_x_node.poll_id AS type_dwf,
+	    inp_dwf_pol_x_node.value,
+	    inp_dwf_pol_x_node.pat1,
+	    inp_dwf_pol_x_node.pat2,
+	    inp_dwf_pol_x_node.pat3,
+	    inp_dwf_pol_x_node.pat4
+	   FROM selector_inp_result,
+	    temp_rpt_inp_node
+	     JOIN inp_dwf_pol_x_node ON inp_dwf_pol_x_node.node_id::text = temp_rpt_inp_node.node_id::text
+	  WHERE temp_rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND inp_dwf_pol_x_node.dwfscenario_id = (( SELECT config_param_user.value::integer AS value
+		   FROM config_param_user
+		  WHERE config_param_user.parameter::text = 'inp_options_dwfscenario'::text AND config_param_user.cur_user::text = CURRENT_USER));
+
+
+
+	CREATE OR REPLACE VIEW vi_t_evaporation AS
+	 SELECT inp_evaporation.evap_type,
+	    inp_evaporation.value
+	   FROM inp_evaporation;
+
+
+
+	CREATE OR REPLACE VIEW vi_t_files AS
+	 SELECT inp_files.actio_type,
+	    inp_files.file_type,
+	    inp_files.fname
+	   FROM inp_files
+	  WHERE inp_files.active IS TRUE;
+
+
+	CREATE OR REPLACE VIEW vi_t_groundwater AS
+	 SELECT inp_groundwater.subc_id,
+	    inp_groundwater.aquif_id,
+	    inp_groundwater.node_id,
+	    inp_groundwater.surfel,
+	    inp_groundwater.a1,
+	    inp_groundwater.b1,
+	    inp_groundwater.a2,
+	    inp_groundwater.b2,
+	    inp_groundwater.a3,
+	    inp_groundwater.tw,
+	    inp_groundwater.h
+	   FROM v_edit_inp_subcatchment
+	     JOIN inp_groundwater ON inp_groundwater.subc_id::text = v_edit_inp_subcatchment.subc_id::text
+	     LEFT JOIN ( SELECT DISTINCT ON (a.subc_id) a.subc_id,
+		    v_node.node_id
+		   FROM ( SELECT unnest(inp_subcatchment.outlet_id::text[]) AS node_array,
+			    inp_subcatchment.subc_id,
+			    inp_subcatchment.outlet_id,
+			    inp_subcatchment.rg_id,
+			    inp_subcatchment.area,
+			    inp_subcatchment.imperv,
+			    inp_subcatchment.width,
+			    inp_subcatchment.slope,
+			    inp_subcatchment.clength,
+			    inp_subcatchment.snow_id,
+			    inp_subcatchment.nimp,
+			    inp_subcatchment.nperv,
+			    inp_subcatchment.simp,
+			    inp_subcatchment.sperv,
+			    inp_subcatchment.zero,
+			    inp_subcatchment.routeto,
+			    inp_subcatchment.rted,
+			    inp_subcatchment.maxrate,
+			    inp_subcatchment.minrate,
+			    inp_subcatchment.decay,
+			    inp_subcatchment.drytime,
+			    inp_subcatchment.maxinfil,
+			    inp_subcatchment.suction,
+			    inp_subcatchment.conduct,
+			    inp_subcatchment.initdef,
+			    inp_subcatchment.curveno,
+			    inp_subcatchment.conduct_2,
+			    inp_subcatchment.drytime_2,
+			    inp_subcatchment.sector_id,
+			    inp_subcatchment.hydrology_id,
+			    inp_subcatchment.the_geom,
+			    inp_subcatchment.descript
+			   FROM inp_subcatchment
+			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text) a
+		     JOIN v_node ON v_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text;
+
+
+	CREATE OR REPLACE VIEW vi_t_gully AS
+	 SELECT temp_t_gully.gully_id,
+	    temp_t_gully.outlet_type,
+	    COALESCE(temp_t_gully.node_id::text, '-9999'::text) AS node_id,
+	    st_x(temp_t_gully.the_geom)::numeric(12,3) AS xcoord,
+	    st_y(temp_t_gully.the_geom)::numeric(12,3) AS ycoord,
+	    COALESCE(temp_t_gully.top_elev::numeric(12,3), '-9999'::integer::numeric) AS zcoord,
+	    temp_t_gully.width::numeric(12,3) AS width,
+	    temp_t_gully.length::numeric(12,3) AS length,
+	    COALESCE(temp_t_gully.depth::numeric(12,3), '-9999'::integer::numeric) AS depth,
+	    temp_t_gully.method,
+	    temp_t_gully.weir_cd::numeric(12,3) AS weir_cd,
+	    temp_t_gully.orifice_cd::numeric(12,3) AS orifice_cd,
+	    temp_t_gully.a_param::numeric(12,3) AS a_param,
+	    temp_t_gully.b_param::numeric(12,3) AS b_param,
+	    temp_t_gully.efficiency
+	   FROM temp_t_gully;
+
+
+	CREATE OR REPLACE VIEW vi_t_gully2node AS
+	 SELECT a.gully_id,
+	    n.node_id,
+	    st_makeline(a.the_geom, n.the_geom) AS the_geom
+	   FROM ( SELECT g.gully_id,
+			CASE
+			    WHEN g.pjoint_type::text = 'NODE'::text THEN g.pjoint_id
+			    ELSE a_1.node_2
+			END AS node_id,
+		    a_1.expl_id,
+		    g.the_geom
+		   FROM v_edit_inp_gully g
+		     LEFT JOIN arc a_1 USING (arc_id)) a
+	     JOIN node n USING (node_id);
+
+	CREATE OR REPLACE VIEW vi_t_gwf AS
+	 SELECT inp_groundwater.subc_id,
+	    ('LATERAL'::text || ' '::text) || inp_groundwater.fl_eq_lat::text AS fl_eq_lat,
+	    ('DEEP'::text || ' '::text) || inp_groundwater.fl_eq_lat::text AS fl_eq_deep
+	   FROM v_edit_inp_subcatchment
+	     JOIN inp_groundwater ON inp_groundwater.subc_id::text = v_edit_inp_subcatchment.subc_id::text;
+
+
+	CREATE OR REPLACE VIEW vi_t_hydrographs AS
+	 SELECT inp_hydrograph_value.text
+	   FROM inp_hydrograph_value;
+
+
+
+	CREATE OR REPLACE VIEW vi_t_infiltration  AS
+	 SELECT v_edit_inp_subcatchment.subc_id,
+	    v_edit_inp_subcatchment.curveno AS other1,
+	    v_edit_inp_subcatchment.conduct_2 AS other2,
+	    v_edit_inp_subcatchment.drytime_2 AS other3,
+	    NULL::numeric AS other4,
+	    NULL::double precision AS other5
+	   FROM v_edit_inp_subcatchment
+	     JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
+	     JOIN ( SELECT a.subc_id,
+		    a.outlet_id
+		   FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
+			    inp_subcatchment.subc_id
+			   FROM inp_subcatchment
+			     JOIN temp_node ON inp_subcatchment.outlet_id::text = temp_node.node_id::text
+			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
+			UNION
+			 SELECT inp_subcatchment.outlet_id,
+			    inp_subcatchment.subc_id
+			   FROM inp_subcatchment
+			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id)
+	  WHERE cat_hydrology.infiltration::text = 'CURVE_NUMBER'::text
+	UNION
+	 SELECT v_edit_inp_subcatchment.subc_id,
+	    v_edit_inp_subcatchment.suction AS other1,
+	    v_edit_inp_subcatchment.conduct AS other2,
+	    v_edit_inp_subcatchment.initdef AS other3,
+	    NULL::integer AS other4,
+	    NULL::double precision AS other5
+	   FROM v_edit_inp_subcatchment
+	     JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
+	     JOIN ( SELECT a.subc_id,
+		    a.outlet_id
+		   FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
+			    inp_subcatchment.subc_id
+			   FROM inp_subcatchment
+			     JOIN temp_node ON inp_subcatchment.outlet_id::text = temp_node.node_id::text
+			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
+			UNION
+			 SELECT inp_subcatchment.outlet_id,
+			    inp_subcatchment.subc_id
+			   FROM inp_subcatchment
+			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id)
+	  WHERE cat_hydrology.infiltration::text = 'GREEN_AMPT'::text
+	UNION
+	 SELECT v_edit_inp_subcatchment.subc_id,
+	    v_edit_inp_subcatchment.curveno AS other1,
+	    v_edit_inp_subcatchment.conduct_2 AS other2,
+	    v_edit_inp_subcatchment.drytime_2 AS other3,
+	    NULL::integer AS other4,
+	    NULL::double precision AS other5
+	   FROM v_edit_inp_subcatchment
+	     JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
+	     JOIN ( SELECT a.subc_id,
+		    a.outlet_id
+		   FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
+			    inp_subcatchment.subc_id
+			   FROM inp_subcatchment
+			     JOIN temp_node ON inp_subcatchment.outlet_id::text = temp_node.node_id::text
+			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
+			UNION
+			 SELECT inp_subcatchment.outlet_id,
+			    inp_subcatchment.subc_id
+			   FROM inp_subcatchment
+			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id)
+	  WHERE cat_hydrology.infiltration::text = ANY (ARRAY['MODIFIED_HORTON'::text, 'HORTON'::text]);
+
+
+	CREATE OR REPLACE VIEW vi_t_inflows AS
+	 SELECT temp_t_node_other.node_id,
+	    temp_t_node_other.type,
+	    temp_t_node_other.timser_id,
+	    'FLOW'::text AS format,
+	    1::numeric(12,4) AS mfactor,
+	    temp_t_node_other.sfactor,
+	    temp_t_node_other.base,
+	    temp_t_node_other.pattern_id
+	   FROM temp_t_node_other
+	  WHERE temp_t_node_other.type::text = 'FLOW'::text
+	UNION
+	 SELECT temp_t_node_other.node_id,
+	    temp_t_node_other.poll_id AS type,
+	    temp_t_node_other.timser_id,
+	    temp_t_node_other.other AS format,
+	    temp_t_node_other.mfactor,
+	    temp_t_node_other.sfactor,
+	    temp_t_node_other.base,
+	    temp_t_node_other.pattern_id
+	   FROM temp_t_node_other
+	  WHERE temp_t_node_other.type::text = 'POLLUTANT'::text
+	  ORDER BY 1;
+
+
+	CREATE OR REPLACE VIEW vi_t_junctions AS
+	 SELECT temp_t_node.node_id,
+	    temp_t_node.elev,
+	    temp_t_node.ymax,
+	    temp_t_node.y0,
+	    temp_t_node.ysur,
+	    temp_t_node.apond,
+	    concat(';', temp_t_node.sector_id, ' ', temp_t_node.node_type) AS other
+	   FROM temp_t_node
+	  WHERE temp_t_node.epa_type::text = ANY (ARRAY['JUNCTION'::text, 'NETGULLY'::text]);
+
+	CREATE OR REPLACE VIEW vi_t_labels AS
+	 SELECT inp_label.xcoord,
+	    inp_label.ycoord,
+	    inp_label.label,
+	    inp_label.anchor,
+	    inp_label.font,
+	    inp_label.size,
+	    inp_label.bold,
+	    inp_label.italic
+	   FROM inp_label
+	  ORDER BY inp_label.label;
+
+	CREATE OR REPLACE VIEW vi_t_landuses AS
+	 SELECT inp_landuses.landus_id,
+	    inp_landuses.sweepint,
+	    inp_landuses.availab,
+	    inp_landuses.lastsweep
+	   FROM inp_landuses;
+
+
+	CREATE OR REPLACE VIEW vi_t_lid_controls AS
+	 SELECT a.lidco_id,
+	    a.lidco_type,
+	    a.other1,
+	    a.other2,
+	    a.other3,
+	    a.other4,
+	    a.other5,
+	    a.other6,
+	    a.other7
+	   FROM ( SELECT 0 AS id,
+		    inp_lid.lidco_id,
+		    inp_lid.lidco_type,
+		    NULL::numeric AS other1,
+		    NULL::numeric AS other2,
+		    NULL::numeric AS other3,
+		    NULL::numeric AS other4,
+		    NULL::text AS other5,
+		    NULL::text AS other6,
+		    NULL::text AS other7
+		   FROM inp_lid
+		  WHERE inp_lid.active
+		UNION
+		 SELECT inp_lid_value.id,
+		    inp_lid_value.lidco_id,
+		    inp_typevalue.idval AS lidco_type,
+		    inp_lid_value.value_2 AS other1,
+		    inp_lid_value.value_3 AS other2,
+		    inp_lid_value.value_4 AS other3,
+		    inp_lid_value.value_5 AS other4,
+		    inp_lid_value.value_6 AS other5,
+		    inp_lid_value.value_7 AS other6,
+		    inp_lid_value.value_8 AS other7
+		   FROM inp_lid_value
+		     JOIN inp_lid USING (lidco_id)
+		     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_lid_value.lidlayer::text
+		  WHERE inp_lid.active AND inp_typevalue.typevalue::text = 'inp_value_lidlayer'::text) a
+	  ORDER BY a.lidco_id, a.id;
+
+	 CREATE OR REPLACE VIEW vi_t_lid_usage AS
+	 SELECT temp_t_lid_usage.subc_id,
+	    temp_t_lid_usage.lidco_id,
+	    temp_t_lid_usage.numelem::integer AS numelem,
+	    temp_t_lid_usage.area,
+	    temp_t_lid_usage.width,
+	    temp_t_lid_usage.initsat,
+	    temp_t_lid_usage.fromimp,
+	    temp_t_lid_usage.toperv::integer AS toperv,
+	    temp_t_lid_usage.rptfile
+	   FROM v_edit_inp_subcatchment
+	     JOIN temp_t_lid_usage ON temp_t_lid_usage.subc_id::text = v_edit_inp_subcatchment.subc_id::text;
+
+	CREATE OR REPLACE VIEW vi_t_loadings  AS
+	 SELECT inp_loadings.subc_id,
+	    inp_loadings.poll_id,
+	    inp_loadings.ibuildup
+	   FROM v_edit_inp_subcatchment
+	     JOIN inp_loadings ON inp_loadings.subc_id::text = v_edit_inp_subcatchment.subc_id::text;
+
+
+	 CREATE OR REPLACE VIEW vi_t_losses AS
+	 SELECT temp_t_arc.arc_id,
+		CASE
+		    WHEN temp_t_arc.kentry IS NOT NULL THEN temp_t_arc.kentry
+		    ELSE 0::numeric
+		END AS kentry,
+		CASE
+		    WHEN temp_t_arc.kexit IS NOT NULL THEN temp_t_arc.kexit
+		    ELSE 0::numeric
+		END AS kexit,
+		CASE
+		    WHEN temp_t_arc.kavg IS NOT NULL THEN temp_t_arc.kavg
+		    ELSE 0::numeric
+		END AS kavg,
+		CASE
+		    WHEN temp_t_arc.flap IS NOT NULL THEN temp_t_arc.flap
+		    ELSE 'NO'::character varying
+		END AS flap,
+	    temp_t_arc.seepage
+	   FROM temp_t_arc
+	  WHERE temp_t_arc.kentry > 0::numeric OR temp_t_arc.kexit > 0::numeric OR temp_t_arc.kavg > 0::numeric OR temp_t_arc.flap::text = 'YES'::text OR temp_t_arc.seepage IS NOT NULL;
+
+
+
+	CREATE OR REPLACE VIEW vi_t_map  AS
+	 SELECT inp_mapdim.type_dim,
+	    concat(inp_mapdim.x1, ' ', inp_mapdim.y1, ' ', inp_mapdim.x2, ' ', inp_mapdim.y2) AS other_val
+	   FROM inp_mapdim
+	UNION
+	 SELECT inp_typevalue.idval AS type_dim,
+	    inp_mapunits.map_type AS other_val
+	   FROM inp_mapunits
+	     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_mapunits.type_units::text
+	  WHERE inp_typevalue.typevalue::text = 'inp_value_mapunits'::text;
+
+
+	CREATE OR REPLACE VIEW vi_t_options  AS
+	 SELECT a.parameter,
+	    a.value
+	   FROM ( SELECT a_1.idval AS parameter,
+		    b.value,
+			CASE
+			    WHEN a_1.layoutname ~~ '%general_1%'::text THEN '1'::text
+			    WHEN a_1.layoutname ~~ '%hydraulics_1%'::text THEN '2'::text
+			    WHEN a_1.layoutname ~~ '%hydraulics_2%'::text THEN '3'::text
+			    WHEN a_1.layoutname ~~ '%date_1%'::text THEN '3'::text
+			    WHEN a_1.layoutname ~~ '%date_2%'::text THEN '4'::text
+			    WHEN a_1.layoutname ~~ '%general_2%'::text THEN '5'::text
+			    ELSE NULL::text
+			END AS layoutname,
+		    a_1.layoutorder
+		   FROM sys_param_user a_1
+		     JOIN config_param_user b ON a_1.id = b.parameter::text
+		  WHERE (a_1.layoutname = ANY (ARRAY['lyt_general_1'::text, 'lyt_general_2'::text, 'lyt_hydraulics_1'::text, 'lyt_hydraulics_2'::text, 'lyt_date_1'::text, 'lyt_date_2'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT NULL AND a_1.idval IS NOT NULL
+		UNION
+		 SELECT 'INFILTRATION'::text AS parameter,
+		    cat_hydrology.infiltration AS value,
+		    '1'::text AS text,
+		    2
+		   FROM config_param_user,
+		    cat_hydrology
+		  WHERE config_param_user.parameter::text = 'inp_options_hydrology_scenario'::text AND config_param_user.cur_user::text = "current_user"()::text) a
+	  ORDER BY a.layoutname, a.layoutorder;
+
+
+
+	CREATE OR REPLACE VIEW vi_t_orifices AS
+	 SELECT arc_id,
+	    temp_t_arc.node_1,
+	    temp_t_arc.node_2,
+	    f.ori_type,
+	    f.offsetval,
+	    f.cd,
+	    f.flap,
+	    f.orate,
+	    f.close_time
+	   FROM temp_t_arc_flowregulator f
+	     JOIN temp_t_arc USING (arc_id)
+	  WHERE f.type::text = 'ORIFICE'::text;
+
+
+	CREATE OR REPLACE VIEW vi_t_outfalls AS
+	 SELECT temp_t_node.node_id,
+	    temp_t_node.elev,
+	    temp_t_node.addparam::json ->> 'outfall_type'::text AS outfall_type,
+	    temp_t_node.addparam::json ->> 'gate'::text AS other1,
+	    NULL::text AS other2
+	   FROM temp_t_node
+	  WHERE temp_t_node.epa_type::text = 'OUTFALL'::text AND ((temp_t_node.addparam::json ->> 'outfall_type'::text) = ANY (ARRAY['FREE'::text, 'NORMAL'::text]))
+	UNION
+	 SELECT temp_t_node.node_id,
+	    temp_t_node.elev,
+	    temp_t_node.addparam::json ->> 'outfall_type'::text AS outfall_type,
+	    temp_t_node.addparam::json ->> 'state'::text AS other1,
+	    temp_t_node.addparam::json ->> 'gate'::text AS other2
+	   FROM temp_t_node
+	  WHERE temp_t_node.epa_type::text = 'OUTFALL'::text AND (temp_t_node.addparam::json ->> 'outfall_type'::text) = 'FIXED'::text
+	UNION
+	 SELECT temp_t_node.node_id,
+	    temp_t_node.elev,
+	    temp_t_node.addparam::json ->> 'outfall_type'::text AS outfall_type,
+	    temp_t_node.addparam::json ->> 'curve_id'::text AS other1,
+	    temp_t_node.addparam::json ->> 'gate'::text AS other2
+	   FROM temp_t_node
+	  WHERE temp_t_node.epa_type::text = 'OUTFALL'::text AND (temp_t_node.addparam::json ->> 'outfall_type'::text) = 'TIDAL'::text
+	UNION
+	 SELECT temp_t_node.node_id,
+	    temp_t_node.elev,
+	    temp_t_node.addparam::json ->> 'outfall_type'::text AS outfall_type,
+	    temp_t_node.addparam::json ->> 'timser_id'::text AS other1,
+	    temp_t_node.addparam::json ->> 'gate'::text AS other2
+	   FROM temp_t_node
+	  WHERE temp_t_node.epa_type::text = 'OUTFALL'::text AND (temp_t_node.addparam::json ->> 'outfall_type'::text) = 'TIMESERIES'::text;
+
+
+	 CREATE OR REPLACE VIEW vi_t_outlets AS
+	 SELECT arc_id,
+	    temp_t_arc.node_1,
+	    temp_t_arc.node_2,
+		CASE
+		    WHEN f.offsetval IS NULL THEN '*'::text
+		    ELSE f.offsetval::text
+		END AS offsetval,
+	    f.outlet_type,
+		CASE
+		    WHEN f.curve_id IS NULL THEN f.cd1::text::character varying
+		    ELSE f.curve_id
+		END AS other1,
+	    f.cd2::text AS other2,
+	    f.flap::character varying AS other3
+	   FROM temp_t_arc_flowregulator f
+	     JOIN temp_t_arc USING (arc_id)
+	  WHERE f.type::text = 'OUTLET'::text;
+
+
+
+	CREATE OR REPLACE VIEW vi_t_parent_arc  AS
+	 SELECT v_arc.arc_id,
+	    v_arc.code,
+	    v_arc.node_1,
+	    v_arc.nodetype_1,
+	    v_arc.y1,
+	    v_arc.custom_y1,
+	    v_arc.elev1,
+	    v_arc.custom_elev1,
+	    v_arc.sys_elev1,
+	    v_arc.sys_y1,
+	    v_arc.r1,
+	    v_arc.z1,
+	    v_arc.node_2,
+	    v_arc.nodetype_2,
+	    v_arc.y2,
+	    v_arc.custom_y2,
+	    v_arc.elev2,
+	    v_arc.custom_elev2,
+	    v_arc.sys_elev2,
+	    v_arc.sys_y2,
+	    v_arc.r2,
+	    v_arc.z2,
+	    v_arc.slope,
+	    v_arc.arc_type,
+	    v_arc.sys_type,
+	    v_arc.arccat_id,
+	    v_arc.matcat_id,
+	    v_arc.cat_shape,
+	    v_arc.cat_geom1,
+	    v_arc.cat_geom2,
+	    v_arc.width,
+	    v_arc.epa_type,
+	    v_arc.expl_id,
+	    v_arc.macroexpl_id,
+	    v_arc.sector_id,
+	    v_arc.macrosector_id,
+	    v_arc.state,
+	    v_arc.state_type,
+	    v_arc.annotation,
+	    v_arc.gis_length,
+	    v_arc.custom_length,
+	    v_arc.inverted_slope,
+	    v_arc.observ,
+	    v_arc.comment,
+	    v_arc.dma_id,
+	    v_arc.macrodma_id,
+	    v_arc.soilcat_id,
+	    v_arc.function_type,
+	    v_arc.category_type,
+	    v_arc.fluid_type,
+	    v_arc.location_type,
+	    v_arc.workcat_id,
+	    v_arc.workcat_id_end,
+	    v_arc.builtdate,
+	    v_arc.enddate,
+	    v_arc.buildercat_id,
+	    v_arc.ownercat_id,
+	    v_arc.muni_id,
+	    v_arc.postcode,
+	    v_arc.district_id,
+	    v_arc.streetname,
+	    v_arc.postnumber,
+	    v_arc.postcomplement,
+	    v_arc.streetname2,
+	    v_arc.postnumber2,
+	    v_arc.postcomplement2,
+	    v_arc.descript,
+	    v_arc.link,
+	    v_arc.verified,
+	    v_arc.undelete,
+	    v_arc.label,
+	    v_arc.label_x,
+	    v_arc.label_y,
+	    v_arc.label_rotation,
+	    v_arc.publish,
+	    v_arc.inventory,
+	    v_arc.uncertain,
+	    v_arc.num_value,
+	    v_arc.tstamp,
+	    v_arc.insert_user,
+	    v_arc.lastupdate,
+	    v_arc.lastupdate_user,
+	    v_arc.the_geom
+	   FROM v_arc,
+	    selector_sector
+	  WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+
+
+	CREATE OR REPLACE VIEW vi_t_patterns AS
+	 SELECT p.pattern_id,
+	    p.pattern_type,
+	    inp_pattern_value.factor_1,
+	    inp_pattern_value.factor_2,
+	    inp_pattern_value.factor_3,
+	    inp_pattern_value.factor_4,
+	    inp_pattern_value.factor_5,
+	    inp_pattern_value.factor_6,
+	    inp_pattern_value.factor_7,
+	    inp_pattern_value.factor_8,
+	    inp_pattern_value.factor_9,
+	    inp_pattern_value.factor_10,
+	    inp_pattern_value.factor_11,
+	    inp_pattern_value.factor_12,
+	    inp_pattern_value.factor_13,
+	    inp_pattern_value.factor_14,
+	    inp_pattern_value.factor_15,
+	    inp_pattern_value.factor_16,
+	    inp_pattern_value.factor_17,
+	    inp_pattern_value.factor_18,
+	    inp_pattern_value.factor_19,
+	    inp_pattern_value.factor_20,
+	    inp_pattern_value.factor_21,
+	    inp_pattern_value.factor_22,
+	    inp_pattern_value.factor_23,
+	    inp_pattern_value.factor_24
+	   FROM selector_expl s,
+	    inp_pattern p
+	     JOIN inp_pattern_value USING (pattern_id)
+	  WHERE p.active AND p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
+	  ORDER BY p.pattern_id;
+
+
+	CREATE OR REPLACE VIEW vi_t_pollutants AS
+	 SELECT inp_pollutant.poll_id,
+	    inp_pollutant.units_type,
+	    inp_pollutant.crain,
+	    inp_pollutant.cgw,
+	    inp_pollutant.cii,
+	    inp_pollutant.kd,
+	    inp_pollutant.sflag,
+	    inp_pollutant.copoll_id,
+	    inp_pollutant.cofract,
+	    inp_pollutant.cdwf,
+	    inp_pollutant.cinit
+	   FROM inp_pollutant
+	  ORDER BY inp_pollutant.poll_id;
+
+
+	CREATE OR REPLACE VIEW vi_t_polygons AS
+	 SELECT temp_t_table.text_column
+	   FROM temp_t_table
+	  WHERE temp_t_table.fid = 117;
+
+
+	CREATE OR REPLACE VIEW vi_t_pumps AS
+	 SELECT arc_id,
+	    temp_t_arc.node_1,
+	    temp_t_arc.node_2,
+	    temp_t_arc_flowregulator.curve_id,
+	    temp_t_arc_flowregulator.status,
+	    temp_t_arc_flowregulator.startup,
+	    temp_t_arc_flowregulator.shutoff
+	   FROM temp_t_arc_flowregulator
+	     JOIN temp_t_arc USING (arc_id)
+	  WHERE temp_t_arc_flowregulator.type::text = 'PUMP'::text;
+
+	CREATE OR REPLACE VIEW vi_t_raingages AS
+	 SELECT DISTINCT r.rg_id,
+	    r.form_type,
+	    r.intvl,
+	    r.scf,
+	    inp_typevalue.idval AS raingage_type,
+	    r.timser_id AS other1,
+	    NULL::character varying AS other2,
+	    NULL::character varying AS other3
+	   FROM selector_inp_result s,
+	    temp_rpt_inp_raingage r
+	     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = r.rgage_type::text
+	  WHERE inp_typevalue.typevalue::text = 'inp_typevalue_raingage'::text AND r.rgage_type::text = 'TIMESERIES'::text AND s.result_id::text = r.result_id::text AND s.cur_user = CURRENT_USER
+	UNION
+	 SELECT DISTINCT r.rg_id,
+	    r.form_type,
+	    r.intvl,
+	    r.scf,
+	    inp_typevalue.idval AS raingage_type,
+	    r.fname AS other1,
+	    r.sta AS other2,
+	    r.units AS other3
+	   FROM selector_inp_result s,
+	    temp_rpt_inp_raingage r
+	     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = r.rgage_type::text
+	  WHERE inp_typevalue.typevalue::text = 'inp_typevalue_raingage'::text AND r.rgage_type::text = 'FILE'::text AND s.result_id::text = r.result_id::text AND s.cur_user = CURRENT_USER;
+
+	CREATE OR REPLACE VIEW vi_t_rdii AS
+	 SELECT temp_rpt_inp_node.node_id,
+	    inp_rdii.hydro_id,
+	    inp_rdii.sewerarea
+	   FROM selector_inp_result,
+	    temp_rpt_inp_node
+	     JOIN inp_rdii ON inp_rdii.node_id::text = temp_rpt_inp_node.node_id::text
+	  WHERE temp_rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text;
+
+
+
+	CREATE OR REPLACE VIEW vi_t_report AS
+	 SELECT a.idval AS parameter,
+	    b.value
+	   FROM sys_param_user a
+	     JOIN config_param_user b ON a.id = b.parameter::text
+	  WHERE (a.layoutname = ANY (ARRAY['lyt_reports_1'::text, 'lyt_reports_2'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT NULL;
+
+
+	CREATE OR REPLACE VIEW vi_t_snowpacks AS
+	 SELECT inp_snowpack_value.snow_id,
+	    inp_snowpack_value.snow_type,
+	    inp_snowpack_value.value_1,
+	    inp_snowpack_value.value_2,
+	    inp_snowpack_value.value_3,
+	    inp_snowpack_value.value_4,
+	    inp_snowpack_value.value_5,
+	    inp_snowpack_value.value_6,
+	    inp_snowpack_value.value_7
+	   FROM inp_snowpack_value
+	  ORDER BY inp_snowpack_value.id;
+
+
+
+	CREATE OR REPLACE VIEW vi_t_storage AS
+	 SELECT temp_t_node.node_id,
+	    temp_t_node.elev,
+	    temp_t_node.ymax,
+	    temp_t_node.y0,
+	    temp_t_node.addparam::json ->> 'storage_type'::text AS storage_type,
+	    temp_t_node.addparam::json ->> 'a1'::text AS other1,
+	    temp_t_node.addparam::json ->> 'a2'::text AS other2,
+	    temp_t_node.addparam::json ->> 'a0'::text AS other3,
+	    temp_t_node.apond::text AS other4,
+	    temp_t_node.addparam::json ->> 'fevap'::text AS other5,
+	    temp_t_node.addparam::json ->> 'sh'::text AS other6,
+	    temp_t_node.addparam::json ->> 'hc'::text AS other7,
+	    temp_t_node.addparam::json ->> 'imd'::text AS other8
+	   FROM temp_t_node
+	  WHERE temp_t_node.epa_type::text = 'STORAGE'::text AND (temp_t_node.addparam::json ->> 'storage_type'::text) = 'FUNCTIONAL'::text
+	UNION
+	 SELECT temp_t_node.node_id,
+	    temp_t_node.elev,
+	    temp_t_node.ymax,
+	    temp_t_node.y0,
+	    temp_t_node.addparam::json ->> 'storage_type'::text AS storage_type,
+	    temp_t_node.addparam::json ->> 'curve_id'::text AS other1,
+	    temp_t_node.apond::text AS other2,
+	    temp_t_node.addparam::json ->> 'fevap'::text AS other3,
+	    temp_t_node.addparam::json ->> 'sh'::text AS other4,
+	    temp_t_node.addparam::json ->> 'hc'::text AS other5,
+	    temp_t_node.addparam::json ->> 'imd'::text AS other6,
+	    NULL::text AS other7,
+	    NULL::text AS other8
+	   FROM temp_t_node
+	  WHERE temp_t_node.epa_type::text = 'STORAGE'::text AND (temp_t_node.addparam::json ->> 'storage_type'::text) = 'TABULAR'::text;
+
+
+
+	CREATE OR REPLACE VIEW vi_t_subareas AS
+	 SELECT DISTINCT v_edit_inp_subcatchment.subc_id,
+	    v_edit_inp_subcatchment.nimp,
+	    v_edit_inp_subcatchment.nperv,
+	    v_edit_inp_subcatchment.simp,
+	    v_edit_inp_subcatchment.sperv,
+	    v_edit_inp_subcatchment.zero,
+	    v_edit_inp_subcatchment.routeto,
+	    v_edit_inp_subcatchment.rted
+	   FROM v_edit_inp_subcatchment
+	     JOIN ( SELECT a.subc_id,
+		    a.outlet_id
+		   FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
+			    inp_subcatchment.subc_id
+			   FROM inp_subcatchment
+			     JOIN temp_node ON inp_subcatchment.outlet_id::text = temp_node.node_id::text
+			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
+			UNION
+			 SELECT inp_subcatchment.outlet_id,
+			    inp_subcatchment.subc_id
+			   FROM inp_subcatchment
+			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id);
+
+
+	CREATE OR REPLACE VIEW vi_t_subcatch2outlet  AS
+	 SELECT a.subc_id,
+	    a.outlet_id,
+	    a.outlet_type,
+	    st_length2d(a.the_geom) AS length,
+	    a.hydrology_id,
+	    a.the_geom
+	   FROM ( SELECT s1.subc_id,
+		    s1.outlet_id,
+		    'JUNCTION'::text AS outlet_type,
+		    s1.hydrology_id,
+		    st_makeline(st_centroid(s1.the_geom), node.the_geom)::geometry(LineString,25831) AS the_geom
+		   FROM v_edit_inp_subcatchment s1
+		     JOIN node ON node.node_id::text = s1.outlet_id::text
+		UNION
+		 SELECT s1.subc_id,
+		    s1.outlet_id,
+		    'SUBCATCHMENT'::text AS outlet_type,
+		    s1.hydrology_id,
+		    st_makeline(st_centroid(s1.the_geom), st_centroid(s2.the_geom))::geometry(LineString,25831) AS the_geom
+		   FROM v_edit_inp_subcatchment s1
+		     JOIN v_edit_inp_subcatchment s2 ON s1.outlet_id::text = s2.subc_id::text) a;
+
+
+	CREATE OR REPLACE VIEW vi_t_subcatchcentroid  AS
+	 SELECT v_edit_inp_subcatchment.subc_id,
+	    v_edit_inp_subcatchment.hydrology_id,
+	    st_centroid(v_edit_inp_subcatchment.the_geom) AS the_geom
+	   FROM v_edit_inp_subcatchment;
+
+	CREATE OR REPLACE VIEW vi_t_subcatchments AS
+	 SELECT DISTINCT v_edit_inp_subcatchment.subc_id,
+	    v_edit_inp_subcatchment.rg_id,
+	    b.outlet_id,
+	    v_edit_inp_subcatchment.area,
+	    v_edit_inp_subcatchment.imperv,
+	    v_edit_inp_subcatchment.width,
+	    v_edit_inp_subcatchment.slope,
+	    v_edit_inp_subcatchment.clength,
+	    v_edit_inp_subcatchment.snow_id
+	   FROM v_edit_inp_subcatchment
+	     JOIN ( SELECT a.subc_id,
+		    a.outlet_id
+		   FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
+			    inp_subcatchment.subc_id
+			   FROM inp_subcatchment
+			     JOIN temp_node ON inp_subcatchment.outlet_id::text = temp_node.node_id::text
+			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
+			UNION
+			 SELECT inp_subcatchment.outlet_id,
+			    inp_subcatchment.subc_id
+			   FROM inp_subcatchment
+			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id);
+
+
+	CREATE OR REPLACE VIEW vi_t_symbols  AS
+	 SELECT v_edit_raingage.rg_id,
+	    NULL::numeric(16,3) AS xcoord,
+	    NULL::numeric(16,3) AS ycoord,
+	    v_edit_raingage.the_geom
+	   FROM v_edit_raingage;
+
+
+	CREATE OR REPLACE VIEW vi_t_temperature  AS
+	 SELECT inp_temperature.temp_type,
+	    inp_temperature.value
+	   FROM inp_temperature;
+
+
+
+	CREATE OR REPLACE VIEW vi_t_timeseries AS
+	 SELECT b.timser_id,
+	    b.other1,
+	    b.other2,
+	    b.other3
+	   FROM ( SELECT t.id,
+		    t.timser_id,
+		    t.other1,
+		    t.other2,
+		    t.other3
+		   FROM selector_expl s,
+		    ( SELECT a.id,
+			    a.timser_id,
+			    a.other1,
+			    a.other2,
+			    a.other3,
+			    a.expl_id
+			   FROM ( SELECT inp_timeseries_value.id,
+				    inp_timeseries_value.timser_id,
+				    inp_timeseries_value.date AS other1,
+				    inp_timeseries_value.hour AS other2,
+				    inp_timeseries_value.value AS other3,
+				    inp_timeseries.expl_id
+				   FROM inp_timeseries_value
+				     JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+				  WHERE inp_timeseries.times_type::text = 'ABSOLUTE'::text AND inp_timeseries.active
+				UNION
+				 SELECT inp_timeseries_value.id,
+				    inp_timeseries_value.timser_id,
+				    concat('FILE', ' ', inp_timeseries.fname) AS other1,
+				    NULL::character varying AS other2,
+				    NULL::numeric AS other3,
+				    inp_timeseries.expl_id
+				   FROM inp_timeseries_value
+				     JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+				  WHERE inp_timeseries.times_type::text = 'FILE'::text AND inp_timeseries.active
+				UNION
+				 SELECT inp_timeseries_value.id,
+				    inp_timeseries_value.timser_id,
+				    NULL::text AS other1,
+				    inp_timeseries_value."time" AS other2,
+				    inp_timeseries_value.value::numeric AS other3,
+				    inp_timeseries.expl_id
+				   FROM inp_timeseries_value
+				     JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+				  WHERE inp_timeseries.times_type::text = 'RELATIVE'::text AND inp_timeseries.active) a
+			  ORDER BY a.id) t
+		  WHERE t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL) b
+	  ORDER BY b.id;
+
+
+	CREATE OR REPLACE VIEW vi_t_transects AS
+	 SELECT inp_transects_value.text
+	   FROM inp_transects_value
+	  ORDER BY inp_transects_value.id;
+
+
+	CREATE OR REPLACE VIEW vi_t_treatment AS
+	 SELECT temp_t_node_other.node_id,
+	    temp_t_node_other.poll_id,
+	    temp_t_node_other.other AS function
+	   FROM temp_t_node_other
+	  WHERE temp_t_node_other.type::text = 'TREATMENT'::text;
+
+
+	CREATE OR REPLACE VIEW vi_t_vertices AS
+	 SELECT DISTINCT ON (arc.path, arc.point) arc.arc_id,
+	    NULL::numeric(16,3) AS xcoord,
+	    NULL::numeric(16,3) AS ycoord,
+	    arc.point AS the_geom
+	   FROM ( SELECT (st_dumppoints(temp_t_arc.the_geom)).geom AS point,
+		    (st_dumppoints(temp_t_arc.the_geom)).path AS path,
+		    st_startpoint(temp_t_arc.the_geom) AS startpoint,
+		    st_endpoint(temp_t_arc.the_geom) AS endpoint,
+		    temp_t_arc.sector_id,
+		    temp_t_arc.arc_id
+		   FROM temp_t_arc) arc
+	  WHERE (arc.point < arc.startpoint OR arc.point > arc.startpoint) AND (arc.point < arc.endpoint OR arc.point > arc.endpoint)
+	  ORDER BY arc.path;
+
+
+	CREATE OR REPLACE VIEW vi_t_washoff  AS
+	 SELECT inp_washoff.landus_id,
+	    inp_washoff.poll_id,
+	    inp_typevalue.idval AS funcw_type,
+	    inp_washoff.c1,
+	    inp_washoff.c2,
+	    inp_washoff.sweepeffic,
+	    inp_washoff.bmpeffic
+	   FROM inp_washoff
+	     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_washoff.funcw_type::text
+	  WHERE inp_typevalue.typevalue::text = 'inp_value_washoff'::text;
+
+
+	CREATE OR REPLACE VIEW vi_t_weirs AS
+	 SELECT arc_id,
+	    temp_t_arc.node_1,
+	    temp_t_arc.node_2,
+	    f.weir_type,
+	    f.offsetval,
+	    f.cd,
+	    f.flap,
+	    f.ec,
+	    f.cd2,
+	    f.surcharge,
+	    f.road_width,
+	    f.road_surf,
+	    f.coef_curve
+	   FROM temp_t_arc_flowregulator f
+	     JOIN temp_t_arc USING (arc_id)
+	  WHERE f.type::text = 'WEIR'::text;
+
+
+	CREATE OR REPLACE VIEW vi_t_xsections AS
+	 SELECT temp_t_arc.arc_id,
+	    cat_arc_shape.epa AS shape,
+	    cat_arc.geom1::text AS other1,
+	    cat_arc.curve_id AS other2,
+	    0::text AS other3,
+	    0::text AS other4,
+	    temp_t_arc.barrels AS other5,
+	    NULL::text AS other6
+	   FROM temp_t_arc
+	     JOIN cat_arc ON temp_t_arc.arccat_id::text = cat_arc.id::text
+	     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
+	  WHERE cat_arc_shape.epa::text = 'CUSTOM'::text AND NOT (temp_t_arc.arc_id::text IN ( SELECT temp_t_arc_flowregulator.arc_id
+		   FROM temp_t_arc_flowregulator))
+	UNION
+	 SELECT temp_t_arc.arc_id,
+	    cat_arc_shape.epa AS shape,
+	    cat_arc.geom1::text AS other1,
+	    cat_arc.geom2::text AS other2,
+	    cat_arc.geom3::text AS other3,
+	    cat_arc.geom4::text AS other4,
+	    temp_t_arc.barrels AS other5,
+	    temp_t_arc.culvert::text AS other6
+	   FROM temp_t_arc
+	     JOIN cat_arc ON temp_t_arc.arccat_id::text = cat_arc.id::text
+	     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
+	  WHERE (cat_arc_shape.epa::text <> ALL (ARRAY['CUSTOM'::text, 'IRREGULAR'::text])) AND NOT (temp_t_arc.arc_id::text IN ( SELECT temp_t_arc_flowregulator.arc_id
+		   FROM temp_t_arc_flowregulator))
+	UNION
+	 SELECT temp_t_arc.arc_id,
+	    cat_arc_shape.epa AS shape,
+	    cat_arc.tsect_id AS other1,
+	    0::character varying AS other2,
+	    0::text AS other3,
+	    0::text AS other4,
+	    temp_t_arc.barrels AS other5,
+	    NULL::text AS other6
+	   FROM temp_t_arc
+	     JOIN cat_arc ON temp_t_arc.arccat_id::text = cat_arc.id::text
+	     JOIN cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
+	  WHERE cat_arc_shape.epa::text = 'IRREGULAR'::text AND NOT (temp_t_arc.arc_id::text IN ( SELECT temp_t_arc_flowregulator.arc_id
+		   FROM temp_t_arc_flowregulator))
+	UNION
+	 SELECT temp_t_arc_flowregulator.arc_id,
+	    temp_t_arc_flowregulator.shape,
+	    temp_t_arc_flowregulator.geom1::text AS other1,
+	    temp_t_arc_flowregulator.geom2::text AS other2,
+	    temp_t_arc_flowregulator.geom3::text AS other3,
+	    temp_t_arc_flowregulator.geom4::text AS other4,
+	    NULL::integer AS other5,
+	    NULL::text AS other6
+	   FROM temp_t_arc_flowregulator
+	  WHERE temp_t_arc_flowregulator.type::text = ANY (ARRAY['ORIFICE'::character varying::text, 'WEIR'::character varying::text]);
 
 
 	--node
@@ -1336,13 +1331,13 @@ UNION
 			SELECT v_fid,rpad(concat(';;',c1),20),rpad(c2,20),rpad(c3,20),rpad(c4,20),rpad(c5,20),rpad(c6,20),rpad(c7,20),rpad(c8,20),rpad(c9,20),rpad(c10,20),rpad(c11,20),rpad(c12,20)
 			,rpad(c13,20),rpad(c14,20),rpad(c15,20),rpad(c16,20),rpad(c17,20),rpad(c18,20),rpad(c19,20),rpad(c20,20),rpad(c21,20),rpad(c22,20),rpad(c23,20),rpad(c24,20),rpad(c25,20),rpad(c26,20)
 			,rpad(c27,20),rpad(c28,20),rpad(c29,20),rpad(c30,20)
-			FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE table_schema =''SCHEMA_NAME'' and table_name='''||rec_table.tablename||'''::text') 
+			FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE table_name='''||rec_table.tablename||'''::text') 
 			AS rpt(table_name text, c1 text, c2 text, c3 text, c4 text, c5 text, c6 text, c7 text, c8 text, c9 text, c10 text, c11 text, c12 text, c13 text, c14 text, c15 text, 
 			c16 text, c17 text, c18 text, c19 text, c20 text, c21 text, c22 text, c23 text, c24 text, c25 text, c26 text, c27 text, c28 text, c29 text, c30 text);
 		
 			INSERT INTO temp_t_csv (fid) VALUES (141) RETURNING id INTO id_last;
 		
-			SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename AND table_schema='SCHEMA_NAME';
+			SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename;
 		
 			--add underlines    
 			FOR num_col_rec IN 1..num_column
@@ -1471,7 +1466,7 @@ UNION
 	DROP VIEW IF EXISTS vi_temperature;
 	DROP VIEW IF EXISTS vi_timeseries;
 	DROP VIEW IF EXISTS vi_transects;
-	
+
 	RETURN v_return;
         
 END;$BODY$
