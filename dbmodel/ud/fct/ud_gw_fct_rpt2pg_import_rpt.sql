@@ -72,95 +72,95 @@ BEGIN
 	END LOOP;
 
 	-- delete trash rows
-	DELETE FROM temp_csv WHERE source ='rpt_controls_actions_taken' and csv1='Control' and csv2='Actions';
+	DELETE FROM temp_t_csv WHERE source ='rpt_controls_actions_taken' and csv1='Control' and csv2='Actions';
 		
-	DELETE FROM temp_csv WHERE csv1='Analysis' and csv2='begun';
-	DELETE FROM temp_csv WHERE csv1='Analysis' and csv2='ended';
-	DELETE FROM temp_csv WHERE csv1='Total' and csv2='elapsed';
+	DELETE FROM temp_t_csv WHERE csv1='Analysis' and csv2='begun';
+	DELETE FROM temp_t_csv WHERE csv1='Analysis' and csv2='ended';
+	DELETE FROM temp_t_csv WHERE csv1='Total' and csv2='elapsed';
 
-	DELETE FROM temp_csv WHERE source ='rpt_node' and csv1='Analysis' and csv2='begun';
-	DELETE FROM temp_csv WHERE source ='rpt_node' and csv1='Analysis' and csv2='ended';
-	DELETE FROM temp_csv WHERE source ='rpt_node' and csv1='Total' and csv2='elapsed';
+	DELETE FROM temp_t_csv WHERE source ='rpt_node' and csv1='Analysis' and csv2='begun';
+	DELETE FROM temp_t_csv WHERE source ='rpt_node' and csv1='Analysis' and csv2='ended';
+	DELETE FROM temp_t_csv WHERE source ='rpt_node' and csv1='Total' and csv2='elapsed';
 
-	DELETE FROM temp_csv WHERE source ='rpt_subcathrunoff_sum' and csv1='Subcatchment' and csv2='Runoff';
-	DELETE FROM temp_csv WHERE source ='rpt_subcathrunoff_sum' and csv1='Total' and csv2='Total';
-	DELETE FROM temp_csv WHERE source ='rpt_subcathrunoff_sum' and csv1='Precip' and csv2='Runon';
-	DELETE FROM temp_csv WHERE source ='rpt_subcathrunoff_sum' and csv1='Subcatchment' and csv2='mm';
+	DELETE FROM temp_t_csv WHERE source ='rpt_subcathrunoff_sum' and csv1='Subcatchment' and csv2='Runoff';
+	DELETE FROM temp_t_csv WHERE source ='rpt_subcathrunoff_sum' and csv1='Total' and csv2='Total';
+	DELETE FROM temp_t_csv WHERE source ='rpt_subcathrunoff_sum' and csv1='Precip' and csv2='Runon';
+	DELETE FROM temp_t_csv WHERE source ='rpt_subcathrunoff_sum' and csv1='Subcatchment' and csv2='mm';
 
-	DELETE FROM temp_csv WHERE source ='rpt_subcatchwashoff_sum' and csv1='Subcatchment' and csv2='Washoff';
-	DELETE FROM temp_csv WHERE source ='rpt_subcatchwashoff_sum' and csv1='Subcatchment' and csv2='kg';
-	DELETE FROM temp_csv WHERE source ='rpt_subcatchwashoff_sum' and csv1=(SELECT poll_id FROM vi_pollutants LIMIT 1);
+	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchwashoff_sum' and csv1='Subcatchment' and csv2='Washoff';
+	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchwashoff_sum' and csv1='Subcatchment' and csv2='kg';
+	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchwashoff_sum' and csv1=(SELECT poll_id FROM vi_pollutants LIMIT 1);
 	
-	DELETE FROM temp_csv WHERE source ='rpt_nodedepth_sum' and csv1='Node' and csv2='Depth';
-	DELETE FROM temp_csv WHERE source ='rpt_nodedepth_sum' and csv1='Average' and csv2='Maximum';
-	DELETE FROM temp_csv WHERE source ='rpt_nodedepth_sum' and csv1='Depth' and csv2='Depth';
-	DELETE FROM temp_csv WHERE source ='rpt_nodedepth_sum' and csv1='Node' and csv2='Type';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodedepth_sum' and csv1='Node' and csv2='Depth';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodedepth_sum' and csv1='Average' and csv2='Maximum';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodedepth_sum' and csv1='Depth' and csv2='Depth';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodedepth_sum' and csv1='Node' and csv2='Type';
 	
-	DELETE FROM temp_csv WHERE source ='rpt_nodeinflow_sum' and csv1='Node' and csv2='Inflow';
-	DELETE FROM temp_csv WHERE source ='rpt_nodeinflow_sum' and csv1='Maximum' and csv2='Maximum';
-	DELETE FROM temp_csv WHERE source ='rpt_nodeinflow_sum' and csv1='Lateral' and csv2='Total';
-	DELETE FROM temp_csv WHERE source ='rpt_nodeinflow_sum' and csv1='Inflow' and csv2='Inflow';
-	DELETE FROM temp_csv WHERE source ='rpt_nodeinflow_sum' and csv1='Node' and csv2='Type';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodeinflow_sum' and csv1='Node' and csv2='Inflow';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodeinflow_sum' and csv1='Maximum' and csv2='Maximum';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodeinflow_sum' and csv1='Lateral' and csv2='Total';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodeinflow_sum' and csv1='Inflow' and csv2='Inflow';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodeinflow_sum' and csv1='Node' and csv2='Type';
 
-	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Node' and csv2='Surcharge';
-	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Surcharging' and csv2='occurs';
-	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Max.' and csv2='Height';
-	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Hours' and csv2='Above';
-	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Node' and csv2='Type';
-	DELETE FROM temp_csv WHERE source ='rpt_nodesurcharge_sum'  and csv1='nodes' or csv2='nodes';
-	DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='No' and csv2='nodes';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Node' and csv2='Surcharge';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Surcharging' and csv2='occurs';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Max.' and csv2='Height';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Hours' and csv2='Above';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodesurcharge_sum' and csv1='Node' and csv2='Type';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodesurcharge_sum'  and csv1='nodes' or csv2='nodes';
+	DELETE FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv1='No' and csv2='nodes';
 
-	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Node' and csv2='Flooding';
-	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Flooding' and csv2='refers';
-	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Maximum' and csv2='Time';
-	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Hours' and csv2='Rate';
-	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Node' and csv2='Flooded';
-	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Total' and csv2='Maximum';
-	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='nodes' or csv2='nodes';
-	DELETE FROM temp_csv WHERE source ='rpt_nodeflooding_sum' and csv1='No' and csv2='nodes';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Node' and csv2='Flooding';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Flooding' and csv2='refers';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Maximum' and csv2='Time';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Hours' and csv2='Rate';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Node' and csv2='Flooded';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodeflooding_sum' and csv1='Total' and csv2='Maximum';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodeflooding_sum' and csv1='nodes' or csv2='nodes';
+	DELETE FROM temp_t_csv WHERE source ='rpt_nodeflooding_sum' and csv1='No' and csv2='nodes';
 
-	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Storage' and csv2='Volume';
-	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Average' and csv2='Avg';
-	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Volume' and csv2='Pcnt';
-	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Storage' and csv2='Unit';
+	DELETE FROM temp_t_csv WHERE source ='rpt_storagevol_sum' and csv1='Storage' and csv2='Volume';
+	DELETE FROM temp_t_csv WHERE source ='rpt_storagevol_sum' and csv1='Average' and csv2='Avg';
+	DELETE FROM temp_t_csv WHERE source ='rpt_storagevol_sum' and csv1='Volume' and csv2='Pcnt';
+	DELETE FROM temp_t_csv WHERE source ='rpt_storagevol_sum' and csv1='Storage' and csv2='Unit';
 
-	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Storage' and csv2='Volume';
-	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Average' and csv2='Avg';
-	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Volume' and csv2='Pcnt';
-	DELETE FROM temp_csv WHERE source ='rpt_storagevol_sum' and csv1='Storage' and csv2='Unit';
+	DELETE FROM temp_t_csv WHERE source ='rpt_storagevol_sum' and csv1='Storage' and csv2='Volume';
+	DELETE FROM temp_t_csv WHERE source ='rpt_storagevol_sum' and csv1='Average' and csv2='Avg';
+	DELETE FROM temp_t_csv WHERE source ='rpt_storagevol_sum' and csv1='Volume' and csv2='Pcnt';
+	DELETE FROM temp_t_csv WHERE source ='rpt_storagevol_sum' and csv1='Storage' and csv2='Unit';
 
-	DELETE FROM temp_csv WHERE source ='rpt_outfallflow_sum' and csv1='Outfall' and csv2='Loading';
-	DELETE FROM temp_csv WHERE source ='rpt_outfallflow_sum' and csv1 like 'Flow%' and csv2 like 'Avg%';
-	DELETE FROM temp_csv WHERE source ='rpt_outfallflow_sum' and csv1 like 'Freq%' and csv2 like 'Flow%';
-	DELETE FROM temp_csv WHERE source ='rpt_outfallflow_sum' and csv1='Outfall' and csv2='Node';
+	DELETE FROM temp_t_csv WHERE source ='rpt_outfallflow_sum' and csv1='Outfall' and csv2='Loading';
+	DELETE FROM temp_t_csv WHERE source ='rpt_outfallflow_sum' and csv1 like 'Flow%' and csv2 like 'Avg%';
+	DELETE FROM temp_t_csv WHERE source ='rpt_outfallflow_sum' and csv1 like 'Freq%' and csv2 like 'Flow%';
+	DELETE FROM temp_t_csv WHERE source ='rpt_outfallflow_sum' and csv1='Outfall' and csv2='Node';
 	
-	DELETE FROM temp_csv WHERE source ='rpt_arcflow_sum' and csv1='Link' and csv2='Flow';
-	DELETE FROM temp_csv WHERE source ='rpt_arcflow_sum' and csv1='Maximum' and csv2='Occurrence';
-	DELETE FROM temp_csv WHERE source ='rpt_arcflow_sum' and csv1='|Flow|' and csv2='Occurrence';
-	DELETE FROM temp_csv WHERE source ='rpt_arcflow_sum' and csv1='Link' and csv2='Type';
-	DELETE FROM temp_csv WHERE source ='rpt_arcflow_sum' and csv1='Maximum' and csv2='Time';
+	DELETE FROM temp_t_csv WHERE source ='rpt_arcflow_sum' and csv1='Link' and csv2='Flow';
+	DELETE FROM temp_t_csv WHERE source ='rpt_arcflow_sum' and csv1='Maximum' and csv2='Occurrence';
+	DELETE FROM temp_t_csv WHERE source ='rpt_arcflow_sum' and csv1='|Flow|' and csv2='Occurrence';
+	DELETE FROM temp_t_csv WHERE source ='rpt_arcflow_sum' and csv1='Link' and csv2='Type';
+	DELETE FROM temp_t_csv WHERE source ='rpt_arcflow_sum' and csv1='Maximum' and csv2='Time';
 	
-	DELETE FROM temp_csv WHERE source ='rpt_flowclass_sum' and csv1='Flow' and csv2='Classification';
-	DELETE FROM temp_csv WHERE source ='rpt_flowclass_sum' and csv1='/Actual' and csv2='Up';
-	DELETE FROM temp_csv WHERE source ='rpt_flowclass_sum' and csv1='Conduit' and csv2='Length';
+	DELETE FROM temp_t_csv WHERE source ='rpt_flowclass_sum' and csv1='Flow' and csv2='Classification';
+	DELETE FROM temp_t_csv WHERE source ='rpt_flowclass_sum' and csv1='/Actual' and csv2='Up';
+	DELETE FROM temp_t_csv WHERE source ='rpt_flowclass_sum' and csv1='Conduit' and csv2='Length';
 
-	DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Conduit' and csv2='Surcharge';
-	DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Hours' and csv2='Hours';
-	DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Conduit' and csv2='Both';
-	DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Pollutant';
-	DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='No' and csv2='conduits';
-	DELETE FROM temp_csv WHERE id >= (SELECT id FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv2='Pollutant'and csv3='Load')
-				AND id <= (SELECT id FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Link'and csv2='kg');	
+	DELETE FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Conduit' and csv2='Surcharge';
+	DELETE FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Hours' and csv2='Hours';
+	DELETE FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Conduit' and csv2='Both';
+	DELETE FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Pollutant';
+	DELETE FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv1='No' and csv2='conduits';
+	DELETE FROM temp_t_csv WHERE id >= (SELECT id FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv2='Pollutant'and csv3='Load')
+				AND id <= (SELECT id FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Link'and csv2='kg');	
 
-	DELETE FROM temp_csv WHERE id >= (SELECT id FROM temp_csv WHERE source ='rpt_arcpollutant_sum' and csv2='Pollutant'and csv3='Load')
-				AND id <= (SELECT id FROM temp_csv WHERE source ='rpt_arcpollutant_sum' and csv1='Link'and csv2='kg');
+	DELETE FROM temp_t_csv WHERE id >= (SELECT id FROM temp_t_csv WHERE source ='rpt_arcpollutant_sum' and csv2='Pollutant'and csv3='Load')
+				AND id <= (SELECT id FROM temp_t_csv WHERE source ='rpt_arcpollutant_sum' and csv1='Link'and csv2='kg');
 
-	DELETE FROM temp_csv WHERE source ='rpt_pumping_sum' and csv1='Pumping' and csv2='Summary';
-	DELETE FROM temp_csv WHERE source ='rpt_pumping_sum' and csv1='Min' and csv2='Avg';
-	DELETE FROM temp_csv WHERE source ='rpt_pumping_sum' and csv1='Percent' and csv2='Number';
-	DELETE FROM temp_csv WHERE source ='rpt_pumping_sum' and csv1='Pump' and csv2='Utilized';
+	DELETE FROM temp_t_csv WHERE source ='rpt_pumping_sum' and csv1='Pumping' and csv2='Summary';
+	DELETE FROM temp_t_csv WHERE source ='rpt_pumping_sum' and csv1='Min' and csv2='Avg';
+	DELETE FROM temp_t_csv WHERE source ='rpt_pumping_sum' and csv1='Percent' and csv2='Number';
+	DELETE FROM temp_t_csv WHERE source ='rpt_pumping_sum' and csv1='Pump' and csv2='Utilized';
 	
-	FOR rpt_rec IN SELECT * FROM temp_csv order by id
+	FOR rpt_rec IN SELECT * FROM temp_t_csv order by id
 	LOOP
 		i = 0;
 		IF rpt_rec.csv1 = 'WARNING' THEN
@@ -536,9 +536,9 @@ BEGIN
 	    '}')::json;	
 
 	--  Exception handling
-    EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
-	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN
+	--GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
+	--RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 	  
 END;
 $BODY$
