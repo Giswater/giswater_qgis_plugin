@@ -2446,6 +2446,8 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
                         size = style_type['width'] if style_type.get('width') else 2
                         if geometry_type == 'Point':
                             v_layer.renderer().symbol().setSize(size)
+                        elif geometry_type in ('Polygon', 'Multipolygon'):
+                            pass
                         else:
                             v_layer.renderer().symbol().setWidth(size)
                         v_layer.renderer().symbol().setOpacity(opacity)
