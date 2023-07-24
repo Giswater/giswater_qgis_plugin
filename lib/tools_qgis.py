@@ -21,7 +21,7 @@ from qgis.PyQt.QtWidgets import QDockWidget, QApplication, QPushButton
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
     QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsRectangle, QgsSymbol, \
     QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsGeometry, QgsCoordinateReferenceSystem, \
-    QgsCoordinateTransform
+    QgsCoordinateTransform, QgsFillSymbol
 from qgis.core import QgsVectorLayer
 from qgis.utils import iface
 
@@ -695,6 +695,8 @@ def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=Non
         symbol = QgsSymbol.defaultSymbol(layer.geometryType())
         if type(symbol) in (QgsLineSymbol, ):
             symbol.setWidth(size)
+        elif type(symbol) in (QgsFillSymbol, ):
+            pass
         else:
             symbol.setSize(size)
 
