@@ -168,16 +168,7 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
-
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
-
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"Polygon", "features":',v_result,'}'); 
-
-	--    Control nulls
+	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
