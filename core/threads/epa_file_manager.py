@@ -22,7 +22,7 @@ class GwEpaFileManager(GwTask):
     """ This shows how to subclass QgsTask """
 
     fake_progress = pyqtSignal()
-    step_completed = pyqtSignal(dict)
+    step_completed = pyqtSignal(dict, str)
 
     def __init__(self, description, go2epa, timer=None):
 
@@ -65,8 +65,8 @@ class GwEpaFileManager(GwTask):
 
         super().run()
 
-        self.step_completed.emit({"message": {"level": 1, "text": "GO2EPA - Work in progress"}})
-        self.step_completed.emit({"message": {"level": 1, "text": "-------------------------"}})
+        self.step_completed.emit({"message": {"level": 1, "text": "GO2EPA - Work in progress"}}, "\n")
+        self.step_completed.emit({"message": {"level": 1, "text": "-------------------------"}}, "\n")
 
         self.initialize_variables()
         status = True
@@ -222,7 +222,7 @@ class GwEpaFileManager(GwTask):
                                f"'gw_fct_pg2epa_main', '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
             json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
                                                      aux_conn=self.aux_conn, is_thread=True)
-            self.step_completed.emit(json_result)
+            self.step_completed.emit(json_result, "\n")
             if step == 6:
                 main_json_result = json_result
             if self.isCanceled() or json_result is None:
@@ -332,7 +332,7 @@ class GwEpaFileManager(GwTask):
             return False
 
         tools_log.log_info(f"Execute EPA software")
-        self.step_completed.emit({"message": {"level": 1, "text": "Execute EPA software......"}})
+        self.step_completed.emit({"message": {"level": 1, "text": "Execute EPA software......"}}, "")
 
         if self.file_rpt == "null":
             message = "You have to set this parameter"
@@ -364,7 +364,7 @@ class GwEpaFileManager(GwTask):
 
         subprocess.call([opener, self.file_inp, self.file_rpt], shell=False)
         self.common_msg += "EPA model finished. "
-        self.step_completed.emit({"message": {"level": 1, "text": "EPA model finished."}})
+        self.step_completed.emit({"message": {"level": 1, "text": "EPA model finished."}}, "\n")
 
         return True
 
@@ -373,7 +373,7 @@ class GwEpaFileManager(GwTask):
         """ Import result file """
 
         tools_log.log_info(f"Import rpt file........: {self.file_rpt}")
-        self.step_completed.emit({"message": {"level": 1, "text": "Import rpt file......"}})
+        self.step_completed.emit({"message": {"level": 1, "text": "Import rpt file......"}}, "")
 
         self.rpt_result = None
         self.json_rpt = None
@@ -551,7 +551,7 @@ class GwEpaFileManager(GwTask):
                 tools_log.log_warning(self.json_result)
                 self.function_failed = True
                 return False
-            self.step_completed.emit(self.json_result)
+            self.step_completed.emit(self.json_result, "\n")
         # final message
         self.common_msg += "Import RPT file finished."
 

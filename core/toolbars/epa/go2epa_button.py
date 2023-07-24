@@ -436,12 +436,12 @@ class GwGo2EpaButton(GwAction):
             self.go2epa_task.cancel()
 
 
-    def step_completed(self, json_result):
+    def step_completed(self, json_result, end="\n"):
 
         message = json_result.get('message')
         if message:
             data = {"info": {"values": [{"message": message.get('text')}]}}
-            tools_gw.fill_tab_log(self.dlg_go2epa, data, reset_text=False, close=False)
+            tools_gw.fill_tab_log(self.dlg_go2epa, data, reset_text=False, close=False, end=end)
 
 
     def _set_completer_result(self, widget, viewname, field_name):
