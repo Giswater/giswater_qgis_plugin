@@ -886,7 +886,7 @@ def load_missing_layers(filter, group="GW Layers", sub_group=None):
                 add_layer_database(tablename, alias=alias, group=group, sub_group=sub_group)
 
 
-def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_set_tabs_enabled=True, close=True):
+def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_set_tabs_enabled=True, close=True, end="\n"):
     """
     Populate txt_infolog QTextEdit widget
         :param dialog: QDialog
@@ -908,13 +908,13 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
         for item in data['info']['values']:
             if 'message' in item:
                 if item['message'] is not None:
-                    text += str(item['message']) + "\n"
+                    text += str(item['message']) + end
                     if force_tab:
                         change_tab = True
                 else:
-                    text += "\n"
+                    text += end
 
-    tools_qt.set_widget_text(dialog, 'txt_infolog', text + "\n")
+    tools_qt.set_widget_text(dialog, 'txt_infolog', text + end)
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
     if qtabwidget is not None:
         qtabwidget.setTabEnabled(qtabwidget.count() - 1, True)
