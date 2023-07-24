@@ -43,8 +43,8 @@ BEGIN
 		"data":{"message":"3174", "function":"3026","debug_msg":"", "is_process":true}}$$)'
 		INTO v_getmessage;
 	END IF;
-	
-	v_message = json_extract_path(v_getmessage,'body','data','info','message');
+
+	v_message = json_extract_path(v_getmessage, 'message');
 	v_status = 'Accepted';
 	v_level = 3;
 	
