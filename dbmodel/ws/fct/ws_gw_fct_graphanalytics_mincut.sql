@@ -53,6 +53,25 @@ BEGIN
 	v_isrecursive = ((SELECT (p_data::json->>'data')::json->>'parameters')::json->>'isRecursive');
 
 
+	CREATE OR REPLACE TEMP VIEW v_anl_graph AS 
+	 SELECT anl_graph.arc_id,
+	    anl_graph.node_1,
+	    anl_graph.node_2,
+	    anl_graph.flag,
+	    a.flag AS flagi,
+	    a.value
+	   FROM temp_anlgraph anl_graph
+	     JOIN ( SELECT anl_graph_1.arc_id,
+	            anl_graph_1.node_1,
+	            anl_graph_1.node_2,
+	            anl_graph_1.water,
+	            anl_graph_1.flag,
+	            anl_graph_1.checkf,
+	            anl_graph_1.value
+	           FROM temp_anlgraph anl_graph_1
+	          WHERE anl_graph_1.water = 1) a ON anl_graph.node_1::text = a.node_2::text
+	  WHERE anl_graph.flag < 2 AND anl_graph.water = 0 AND a.flag < 2;
+
 	IF v_mincutstep = 1 THEN 
 
 		-- reset selectors
@@ -216,6 +235,7 @@ BEGIN
 		       WHERE a.node_id = v.node_id AND result_id = '||v_mincutid;
 	EXECUTE v_querytext;
 
+DROP VIEW IF EXISTS v_anl_graph;
 	
 RETURN 1;
 END;

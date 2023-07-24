@@ -104,28 +104,7 @@ BEGIN
 	DELETE FROM audit_log_data WHERE fid=v_fid AND cur_user=current_user;
 	DELETE FROM audit_check_data WHERE fid=v_fid AND cur_user=current_user;
 
-	CREATE TEMP TABLE temp_anlgraph(
-	id serial NOT NULL PRIMARY KEY,
-    arc_id character varying(20) COLLATE pg_catalog."default",
-    node_1 character varying(20) COLLATE pg_catalog."default",
-    node_2 character varying(20) COLLATE pg_catalog."default",
-    water smallint,
-    flag smallint,
-    checkf smallint,
-    cost numeric(12,4),
-    value numeric(12,4),
-    trace integer,
-    isheader boolean);
-
-	CREATE TEMP TABLE temp_anl_node(
-    id serial PRIMARY KEY,
-    fid integer, 
-    nodecat_id character varying(30), 
-    node_id character varying(16), 
-    the_geom public.geometry, 
-    descript text);
-
-	CREATE OR REPLACE VIEW v_anl_graph AS 
+	CREATE OR REPLACE TEMPORAL VIEW v_anl_graph AS 
 	 SELECT anl_graph.arc_id,
 	    anl_graph.node_1,
 	    anl_graph.node_2,
@@ -399,7 +378,8 @@ BEGIN
 	v_result_polygon:=COALESCE(v_result_polygon,'{}');
 	v_result_fields:=COALESCE(v_result_fields,'{}');
 
-
+	DROP VIEW IF EXISTS v_anl_graph;
+	
 	--return definition for v_audit_check_result
 	RETURN  gw_fct_json_create_return(('{"status":"Accepted", "message":{"priority":1, "text":"LRS process done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
