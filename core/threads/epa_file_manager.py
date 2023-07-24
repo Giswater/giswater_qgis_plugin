@@ -373,7 +373,6 @@ class GwEpaFileManager(GwTask):
         """ Import result file """
 
         tools_log.log_info(f"Import rpt file........: {self.file_rpt}")
-        self.step_completed.emit({"message": {"level": 1, "text": "Import rpt file......"}}, "")
 
         self.rpt_result = None
         self.json_rpt = None
