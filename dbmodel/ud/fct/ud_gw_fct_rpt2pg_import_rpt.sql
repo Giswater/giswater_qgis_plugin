@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg_import_rpt(p_data json)
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_rpt2pg_import_rpt($${"data":{"resultId":"test_xavi"}}$$)
+SELECT SCHEMA_NAME.gw_fct_rpt2pg_import_rpt($${"data":{"resultId":"test"}}$$)
 
 --fid:140
 
@@ -145,6 +145,7 @@ BEGIN
 	DELETE FROM temp_t_csv WHERE source ='rpt_flowclass_sum' and csv1='Conduit' and csv2='Length';
 
 	DELETE FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Conduit' and csv2='Surcharge';
+    DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv2='conduits';
 	DELETE FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Hours' and csv2='Hours';
 	DELETE FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Conduit' and csv2='Both';
 	DELETE FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Pollutant';
