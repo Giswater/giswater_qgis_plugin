@@ -35,7 +35,7 @@ class GwGo2EpaSelectorButton(GwAction):
         """ Adds any missing Compare layers to TOC """
 
         # Manage user variable
-        if not tools_os.set_boolean(tools_gw.get_config_parser('btn_go2epa_selector', 'load_result_layers', "user", "init")):
+        if not tools_os.set_boolean(tools_gw.get_config_parser('btn_go2epa_selector', 'load_result_layers', "user", "init"), default=False):
             return
 
         filtre = "(id LIKE 'v_rpt_arc%' OR id LIKE 'v_rpt_node%')"
@@ -57,7 +57,7 @@ class GwGo2EpaSelectorButton(GwAction):
         """ Adds any missing Compare layers to TOC """
 
         # Manage user variable
-        if not tools_os.set_boolean(tools_gw.get_config_parser('btn_go2epa_selector', 'load_compare_layers', "user", "init")):
+        if not tools_os.set_boolean(tools_gw.get_config_parser('btn_go2epa_selector', 'load_compare_layers', "user", "init"), default=False):
             return
 
         filtre = 'v_rpt_comp_%'
