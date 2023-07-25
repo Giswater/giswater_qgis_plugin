@@ -441,7 +441,7 @@ class GwGo2EpaButton(GwAction):
         message = json_result.get('message')
         if message:
             data = {"info": {"values": [{"message": message.get('text')}]}}
-            tools_gw.fill_tab_log(self.dlg_go2epa, data, reset_text=False, close=False, end=end)
+            tools_gw.fill_tab_log(self.dlg_go2epa, data, reset_text=False, close=False, end=end, call_set_tabs_enabled=False)
 
 
     def _set_completer_result(self, widget, viewname, field_name):
