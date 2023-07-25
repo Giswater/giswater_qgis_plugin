@@ -1022,25 +1022,26 @@ BEGIN
 	IF v_floodonlymapzone IS NULL THEN
 	
 		v_result = null;
+		IF v_commitchanges IS TRUE THEN
+			-- disconnected arcs
+			SELECT jsonb_agg(features.feature) INTO v_result
+			FROM (
+			SELECT jsonb_build_object(
+			     'type',       'Feature',
+			    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+			    'properties', to_jsonb(row) - 'the_geom'
+			) AS feature
+			FROM 
+			(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Disconnected'::text as descript, the_geom FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0 
+			group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
+			UNION
+			SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = -1 
+			group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
+			) row) features;
 
-		-- disconnected arcs
-		SELECT jsonb_agg(features.feature) INTO v_result
-		FROM (
-		SELECT jsonb_build_object(
-		     'type',       'Feature',
-		    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-		    'properties', to_jsonb(row) - 'the_geom'
-		) AS feature
-		FROM 
-		(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Disconnected'::text as descript, the_geom FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0 
-		group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
-		UNION
-		SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = -1 
-		group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
-		) row) features;
-
-		v_result := COALESCE(v_result, '{}'); 
-		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
+			v_result := COALESCE(v_result, '{}'); 
+			v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
+		END IF;
 
 		-- disconnected connecs
 		v_result = null;
@@ -1085,9 +1086,34 @@ BEGIN
 	------ end of multi-transactional event
 	IF v_commitchanges IS FALSE THEN  -- all features in order to make a more complex log
 	
-		-- arc elements
+		
+		-- arc elementS
+			EXECUTE 'SELECT jsonb_agg(features.feature) 
+			FROM (
+			SELECT jsonb_build_object(
+			     ''type'',       ''Feature'',
+			    ''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+			    ''properties'', to_jsonb(row) - ''the_geom''
+			) AS feature
+			FROM 
+			(SELECT * FROM 
+			(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, ''Disconnected''::text as descript, the_geom FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0 
+			group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
+			UNION
+			SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, ''Conflict''::text as descript, the_geom FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = -1 
+			group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
+			) a 
+			UNION
+			SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, '||v_field||'::text as descript, the_geom FROM temp_t_arc WHERE state=1 and dma_id >0
+			) row) features'
+			INTO v_result;
+
+			v_result := COALESCE(v_result, '{}'); 
+			v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
+
 		v_result = null;
 
+		-- polygons 
 		EXECUTE 'SELECT jsonb_agg(features.feature) 
 		FROM (
 	  	SELECT jsonb_build_object(
@@ -1105,6 +1131,7 @@ BEGIN
 		DELETE FROM anl_arc WHERE fid=v_fid AND cur_user=current_user;
 		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, cur_user, the_geom, '||v_field||') SELECT arc_id, expl_id, '||v_fid||', current_user, the_geom, '||v_field||' FROM temp_t_arc';
 
+		v_visible_layer = NULL;
 	ELSIF v_commitchanges IS TRUE THEN
 
 		-- setting variables in order to enhace performance
@@ -1187,7 +1214,7 @@ BEGIN
 		v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = c.'||quote_ident(v_field)||', lastupdate = c.lastupdate FROM temp_t_connec c WHERE c.connec_id=connec.connec_id';
 		EXECUTE v_querytext;
 		IF v_class = 'PRESSZONE' THEN
-			UPDATE connec SET staticpressure = n.staticpressure FROM temp_t_connec c WHERE c.connec_id=connec.connec_id;
+			UPDATE connec SET staticpressure = c.staticpressure FROM temp_t_connec c WHERE c.connec_id=connec.connec_id;
 		END IF;
 
 		IF v_project_type = 'WS' THEN
@@ -1211,11 +1238,9 @@ BEGIN
 	
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_visible_layer := COALESCE(v_visible_layer, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
-	v_visible_layer := COALESCE(v_visible_layer, '{}'); 
 	v_level := COALESCE(v_level, 0); 
 	v_message := COALESCE(v_message, ''); 
 	v_version := COALESCE(v_version, ''); 
@@ -1247,8 +1272,8 @@ BEGIN
 	RETURN  gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}, "data":{ "info":'||v_result_info||','||
 					  '"point":'||v_result_point||','||
-					  '"polygon":'||v_result_polygon||','||
-					  '"line":'||v_result_line||'}'||'}}')::json, 2710, null, ('{"visible": ["'||v_visible_layer||'"]}')::json, null)::json;
+					  '"line":'||v_result_line||','||
+					  '"polygon":'||v_result_polygon||'}'||'}}')::json, 2710, null, ('{"visible": ["'||v_visible_layer||'"]}')::json, null)::json;
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
