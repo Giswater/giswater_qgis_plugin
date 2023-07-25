@@ -386,7 +386,7 @@ BEGIN
 
 		IF v_project_type = 'UD' THEN
 			EXECUTE 'INSERT INTO temp_t_gully
-			SELECT  g.* FROM gully WHERE expl_id='||v_expl_id||' '||v_psectors_query_gully||';';
+			SELECT  g.* FROM gully g WHERE expl_id='||v_expl_id||' '||v_psectors_query_gully||';';
 		END IF;
 
 		IF v_class = 'SECTOR' THEN
@@ -753,11 +753,11 @@ BEGIN
 				 case when gullies is null then 0 else gullies end, '' Gullies'')
 				FROM (SELECT '||(v_field)||', count(*) as arcs FROM temp_t_arc a WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_arc||
 				' GROUP BY '||(v_field)||')e
-				LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes a FROM temp_t_node n WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_node||
+				LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM temp_t_node n WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_node||
 				' GROUP BY '||(v_field)||')b USING ('||(v_field)||')
-				LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs a FROM temp_t_connec c WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_connec||
+				LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM temp_t_connec c WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_connec||
 				' GROUP BY '||(v_field)||')c USING ('||(v_field)||')
-				LEFT JOIN (SELECT '||(v_field)||', count(*) as gullies a FROM temp_t_gully g WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_gully||
+				LEFT JOIN (SELECT '||(v_field)||', count(*) as gullies FROM temp_t_gully g WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_gully||
 				' GROUP BY '||(v_field)||')d USING ('||(v_field)||')
 				JOIN '||(v_table)||' p ON e.'||(v_field)||' = p.'||(v_field);
 				EXECUTE v_querytext;
@@ -1177,20 +1177,29 @@ BEGIN
 		END IF;
 
 		-- node
-		v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = n.'||quote_ident(v_field)||', staticpressure = n.staticpressure, lastupdate = n.lastupdate FROM temp_t_node n WHERE n.node_id=node.node_id';
+		v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = n.'||quote_ident(v_field)||', lastupdate = n.lastupdate FROM temp_t_node n WHERE n.node_id=node.node_id';
 		EXECUTE v_querytext;
+		IF v_class = 'PRESSZONE' THEN
+			UPDATE node SET staticpressure = n.staticpressure FROM temp_t_node n WHERE n.node_id=node.node_id;
+		END IF;
 
 		-- connec
-		v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = c.'||quote_ident(v_field)||', staticpressure = c.staticpressure, lastupdate = c.lastupdate FROM temp_t_connec c WHERE c.connec_id=connec.connec_id';
+		v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = c.'||quote_ident(v_field)||', lastupdate = c.lastupdate FROM temp_t_connec c WHERE c.connec_id=connec.connec_id';
 		EXECUTE v_querytext;
+		IF v_class = 'PRESSZONE' THEN
+			UPDATE connec SET staticpressure = n.staticpressure FROM temp_t_connec c WHERE c.connec_id=connec.connec_id;
+		END IF;
 
-		--link
-		v_querytext = 'UPDATE link SET '||quote_ident(v_field)||' = l.'||quote_ident(v_field)||' FROM temp_t_link l WHERE l.link_id=link.link_id';
-		EXECUTE v_querytext;
+		IF v_project_type = 'WS' THEN
 
-		-- gully
-		IF v_class = 'DRAINZONE' THEN
-			v_querytext = 'UPDATE gully SET '||quote_ident(v_field)||' = g.'||quote_ident(v_field)||', lastupdate = c.lastupdate FROM temp_t_gully g WHERE g.gully_id=gully.gully_id';
+			--link
+			v_querytext = 'UPDATE link SET '||quote_ident(v_field)||' = l.'||quote_ident(v_field)||' FROM temp_t_link l WHERE l.link_id=link.link_id';
+			EXECUTE v_querytext;
+
+		ELSIF v_project_type = 'UD' THEN
+		
+			-- gully
+			v_querytext = 'UPDATE gully SET '||quote_ident(v_field)||' = g.'||quote_ident(v_field)||', lastupdate = g.lastupdate FROM temp_t_gully g WHERE g.gully_id=gully.gully_id';
 			EXECUTE v_querytext;
 		END IF;	
 		
