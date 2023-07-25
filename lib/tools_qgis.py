@@ -676,7 +676,7 @@ def restore_user_layer(layer_name, user_current_layer=None):
             iface.setActiveLayer(layer)
 
 
-def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=None):
+def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=None, opacity=255):
     """
     :param layer: QgsVectorLayer to be categorized (QgsVectorLayer)
     :param cat_field: Field to categorize (String)
@@ -705,7 +705,7 @@ def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=Non
             color = color_values.get(str(unique_value))
             symbol.setColor(color)
         except Exception:
-            color = QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))
+            color = QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256), opacity)
             symbol.setColor(color)
 
         # create renderer object

@@ -2195,7 +2195,7 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
                             color_values[item['id']] = color
                         cat_field = str(style_type[key]['field'])
                         size = style_type[key]['width'] if style_type[key].get('width') else 2
-                        tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values)
+                        tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values, opacity=int(opacity * 255))
 
                     elif style_type[key]['style'] == 'random':
                         size = style_type['width'] if style_type.get('width') else 2
