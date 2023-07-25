@@ -37,3 +37,6 @@ update sys_param_user set label = concat(label,'II-(max.40):') where id = 'inp_r
 
 update sys_param_user set layoutorder = 10 where id = 'inp_report_links';
 
+DELETE FROM sys_param_user WHERE id = 'inp_options_rtc_period_id';
+DELETE FROM config_param_user WHERE parameter = 'inp_options_rtc_period_id';
+
