@@ -233,22 +233,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_regist
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_fountain", "column":"_pol_id_", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_tank", "column":"_pol_id_", "dataType":"integer"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"lastupdate", "dataType":"timestamp", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"lastupdate_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"tstamp", "dataType":"timestamp", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"insert_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"lastupdate", "dataType":"timestamp", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"lastupdate_user", "dataType":"varchar(15)", "isUtils":"False"}}$$);
-
-
-ALTER TABLE presszone ALTER COLUMN tstamp SET DEFAULT now();
-ALTER TABLE presszone ALTER COLUMN insert_user SET DEFAULT current_user;
-
-ALTER TABLE dqa ALTER COLUMN tstamp SET DEFAULT now();
-ALTER TABLE dqa ALTER COLUMN insert_user SET DEFAULT current_user;
 
 CREATE TABLE IF NOT EXISTS rtc_hydrometer_x_node
 (
