@@ -158,8 +158,8 @@ BEGIN
 		FROM ext_rtc_hydrometer_x_data d
 		JOIN ext_rtc_hydrometer h ON h.id::text = d.hydrometer_id::text
 		JOIN rtc_hydrometer_x_node USING (hydrometer_id) 
-		JOIN node USING (node_id)
-		WHERE cat_period_id = v_period AND node.expl_id = v_expl AND node.state > 0
+		JOIN node n USING (node_id)
+		WHERE cat_period_id = v_period AND n.expl_id = v_expl AND n.state > 0
 		order by 2;
 
 		-- real number of hydrometers
