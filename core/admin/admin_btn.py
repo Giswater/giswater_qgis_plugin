@@ -1758,6 +1758,8 @@ class GwAdminButton:
         self._change_project_type(self.cmb_create_project_type)
         self.connection_name = str(tools_qt.get_text(self.dlg_readsql, self.cmb_connection))
 
+        self._update_time_elapsed("", self.dlg_readsql_create_project)
+
         # Open dialog
         self.dlg_readsql_create_project.setWindowTitle(f"Create Project - {self.connection_name}")
         tools_gw.open_dialog(self.dlg_readsql_create_project, dlg_name='admin_dbproject')
