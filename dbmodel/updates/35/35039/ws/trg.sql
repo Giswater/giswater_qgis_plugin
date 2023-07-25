@@ -11,4 +11,4 @@ CREATE TRIGGER gw_trg_ui_rpt_cat_result INSTEAD OF INSERT OR UPDATE OR DELETE
 ON v_ui_rpt_cat_result FOR EACH ROW EXECUTE PROCEDURE gw_trg_ui_rpt_cat_result();
    
 CREATE TRIGGER gw_trg_edit_inp_dscenario_demand INSTEAD OF INSERT OR DELETE OR UPDATE 
-ON v_edit_inp_dscenario_demand FOR EACH ROW EXECUTE FUNCTION ws.gw_trg_edit_inp_dscenario_demand();
+ON v_edit_inp_dscenario_demand FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario_demand();
