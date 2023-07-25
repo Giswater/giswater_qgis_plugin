@@ -7,8 +7,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME ,public;
 
-CREATE TRIGGER gw_trg_ui_rpt_cat_result INSTEAD OF INSERT OR UPDATE OR DELETE
-ON v_ui_rpt_cat_result FOR EACH ROW EXECUTE PROCEDURE gw_trg_ui_rpt_cat_result();
-   
-CREATE TRIGGER gw_trg_edit_inp_dscenario_demand INSTEAD OF INSERT OR DELETE OR UPDATE 
-ON v_edit_inp_dscenario_demand FOR EACH ROW EXECUTE FUNCTION ws.gw_trg_edit_inp_dscenario_demand();
+
+DROP INDEX IF EXISTS ws.inp_dscenario_demand_source;
+
+CREATE INDEX IF NOT EXISTS inp_dscenario_demand_dscenario_id
+ON inp_dscenario_demand USING btree (dscenario_id) TABLESPACE pg_default;
