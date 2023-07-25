@@ -21,3 +21,5 @@ DROP RULE IF EXISTS macrodqa_del_undefined ON macrodqa;
 CREATE RULE macrodqa_del_undefined AS
 ON DELETE TO macrodqa
 WHERE (old.macrodqa_id = 0) DO INSTEAD NOTHING;
+
+ALTER TABLE om_waterbalance_dma_graph  ADD CONSTRAINT om_waterbalance_dma_graph_unique UNIQUE (dma_id, node_id);
