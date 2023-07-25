@@ -46,3 +46,7 @@ WHERE formname='v_edit_dma' AND columnname='pattern_id';
 UPDATE config_function SET style = '{"style": {"point": {"style": "categorized", "field": "mapzone", "transparency": 0.5, "width": 2.5, "values": [{"id": "Disconnected", "color": [255,124,64]}, {"id": "Conflict", "color": [14,206,253]}]},
 "line": {"style": "categorized", "field": "mapzone", "transparency": 0.5, "width": 1.5, "values": [{"id": "Disconnected", "color": [255,124,64]}, {"id": "Conflict", "color": [14,206,253]}]},
 "polygon": {"style": "categorized","field": "mapzone",  "transparency": 0.5}}}' WHERE id=2710;
+
+INSERT INTO sys_param_user(id, formname, descript, sys_role, project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, source)
+VALUES ('edit_node2arc_update_disable','hidden','Parameter that controls updating values by gw_trg_topocontrol_node', 'role_edit',
+'utils', false, false, 'boolean',null, true,false,'core');

@@ -263,66 +263,68 @@ BEGIN
 				UPDATE polygon SET the_geom=ST_translate(the_geom, xvar, yvar) WHERE pol_id=pol_id_var;
 			END IF; 
 
-			-- values of node
-			v_nodetype = (SELECT nodetype_id FROM cat_node WHERE NEW.nodecat_id = id);
-			v_staticpress = coalesce(NEW.staticpressure,0);
-			v_elevation = NEW.elevation;
-			v_depth = coalesce(NEW.depth,0);
-									
-			-- Select arcs with start-end on the updated node
-			v_querytext := 'SELECT * FROM arc WHERE arc.node_1 = ' || quote_literal(NEW.node_id) || ' OR arc.node_2 = ' || quote_literal(NEW.node_id); 
-			FOR arcrec IN EXECUTE v_querytext
-			LOOP
-				-- Initial and final node of the arc
-				SELECT * INTO nodeRecord1 FROM v_node WHERE v_node.node_id = arcrec.node_1;
-				SELECT * INTO nodeRecord2 FROM v_node WHERE v_node.node_id = arcrec.node_2;
+			IF (SELECT value::boolean FROM config_param_user WHERE cur_user=current_user AND parameter = 'edit_node2arc_update_disable') IS NOT TRUE THEN
+				-- values of node
+				v_nodetype = (SELECT nodetype_id FROM cat_node WHERE NEW.nodecat_id = id);
+				v_staticpress = coalesce(NEW.staticpressure,0);
+				v_elevation = NEW.elevation;
+				v_depth = coalesce(NEW.depth,0);
+										
+				-- Select arcs with start-end on the updated node
+				v_querytext := 'SELECT * FROM arc WHERE arc.node_1 = ' || quote_literal(NEW.node_id) || ' OR arc.node_2 = ' || quote_literal(NEW.node_id); 
+				FOR arcrec IN EXECUTE v_querytext
+				LOOP
+					-- Initial and final node of the arc
+					SELECT * INTO nodeRecord1 FROM v_node WHERE v_node.node_id = arcrec.node_1;
+					SELECT * INTO nodeRecord2 FROM v_node WHERE v_node.node_id = arcrec.node_2;
 
-				-- Control de lineas de longitud 0
-				IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
+					-- Control de lineas de longitud 0
+					IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
 
-					-- Update arc node coordinates, node_id and direction
-					IF (nodeRecord1.node_id = NEW.node_id) THEN
+						-- Update arc node coordinates, node_id and direction
+						IF (nodeRecord1.node_id = NEW.node_id) THEN
 
-						-- update arc
-						IF v_elevation IS NOT NULL THEN
-							EXECUTE 'UPDATE arc SET
-								elevation1 = '|| v_elevation ||',
-								depth1 = '|| v_depth||',
-								staticpress1 = '|| v_staticpress ||' 
-								WHERE arc_id = ' || quote_literal(arcrec."arc_id");
-						END IF;
+							-- update arc
+							IF v_elevation IS NOT NULL THEN
+								EXECUTE 'UPDATE arc SET
+									elevation1 = '|| v_elevation ||',
+									depth1 = '|| v_depth||',
+									staticpress1 = '|| v_staticpress ||' 
+									WHERE arc_id = ' || quote_literal(arcrec."arc_id");
+							END IF;
+							
+							EXECUTE 'UPDATE arc SET	nodetype_1 = '|| quote_literal(v_nodetype) ||', 
+							the_geom = ST_SetPoint($1, 0, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") 
+							USING arcrec.the_geom, NEW.the_geom; 
+
+						ELSIF (nodeRecord2.node_id = NEW.node_id) THEN
+
+							-- update arc
+							IF v_elevation IS NOT NULL THEN
+								EXECUTE 'UPDATE arc SET
+									elevation2 = '|| v_elevation ||',
+									depth2 = '|| v_depth||',
+									staticpress2 = '|| v_staticpress ||' 
+									WHERE arc_id = ' || quote_literal(arcrec."arc_id");
+							END IF;					
 						
-						EXECUTE 'UPDATE arc SET	nodetype_1 = '|| quote_literal(v_nodetype) ||', 
-						the_geom = ST_SetPoint($1, 0, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") 
-						USING arcrec.the_geom, NEW.the_geom; 
-
-					ELSIF (nodeRecord2.node_id = NEW.node_id) THEN
-
-						-- update arc
-						IF v_elevation IS NOT NULL THEN
-							EXECUTE 'UPDATE arc SET
-								elevation2 = '|| v_elevation ||',
-								depth2 = '|| v_depth||',
-								staticpress2 = '|| v_staticpress ||' 
-								WHERE arc_id = ' || quote_literal(arcrec."arc_id");
-						END IF;					
-					
-						EXECUTE 'UPDATE arc SET nodetype_2 = '|| quote_literal(v_nodetype) ||',
-						the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") 
-						USING arcrec.the_geom, NEW.the_geom; 
+							EXECUTE 'UPDATE arc SET nodetype_2 = '|| quote_literal(v_nodetype) ||',
+							the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") 
+							USING arcrec.the_geom, NEW.the_geom; 
+						END IF;
 					END IF;
-				END IF;
-			
-			--update links
-			v_querytext:= 'SELECT * FROM link WHERE link.exit_id= ' || quote_literal(NEW.node_id) || ' AND exit_type=''NODE''';
+				
+				--update links
+				v_querytext:= 'SELECT * FROM link WHERE link.exit_id= ' || quote_literal(NEW.node_id) || ' AND exit_type=''NODE''';
 
-			FOR v_linkrec IN EXECUTE v_querytext
-			LOOP
-				-- Coordinates
-				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(v_linkrec."link_id")
-				USING v_linkrec.the_geom, NEW.the_geom;
-			END LOOP;
-			END LOOP; 
+				FOR v_linkrec IN EXECUTE v_querytext
+				LOOP
+					-- Coordinates
+					EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(v_linkrec."link_id")
+					USING v_linkrec.the_geom, NEW.the_geom;
+				END LOOP;
+				END LOOP; 
+			END IF;
 		END IF;
 				
 	END IF;
