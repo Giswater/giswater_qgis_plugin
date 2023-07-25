@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2526
 
-DROP FUNCTION IF EXISTS  SCHEMA_NAME.gw_fct_utils_csv2pg_export_epanet_inp(character varying, text);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_export_epanet_inp(character varying, text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_export_inp(p_data json)
 RETURNS json AS
 $BODY$
@@ -576,7 +576,7 @@ BEGIN
 		EXECUTE 'INSERT INTO temp_t_csv(fid,csv1) VALUES ('||v_fid||','''|| rec_table.target||''');';
 
 		-- insert fieldnames
-		IF rec_table.tablename = 'vi_patterns' THEN
+		IF rec_table.tablename = 'vi_t_patterns' THEN
 			INSERT INTO temp_t_csv (fid,csv1,csv2) VALUES (141, ';ID', 'Multipliers');
 			num_column = 2;
 		ELSE 
@@ -609,19 +609,19 @@ BEGIN
 		UPDATE temp_t_csv SET csv4 = 'dscenario source' where csv4 like '%other%' and csv1 like '%feature_id%';
 
 		-- insert values
-		CASE WHEN rec_table.tablename='vi_t_options' and (SELECT value FROM vi_options WHERE parameter='hydraulics') is null THEN
+		CASE WHEN rec_table.tablename='vi_t_options' and (SELECT value FROM vi_t_options WHERE parameter='hydraulics') is null THEN
 			EXECUTE 'INSERT INTO temp_t_csv SELECT nextval(''temp_csv_id_seq''::regclass),'||v_fid||',current_user,'''||rec_table.tablename::text||''',*  FROM '||
 			rec_table.tablename||' WHERE parameter!=''hydraulics'';';
 
 		WHEN rec_table.tablename = 'vi_t_coordinates' THEN
 			-- on the fly transformation of epsg
-			INSERT INTO temp_t_csv SELECT nextval('temp_csv_id_seq'::regclass), v_fid, current_user,'vi_coordinates', 
-			node_id, ROUND(ST_x(ST_transform(the_geom, v_client_epsg))::numeric, 3), ROUND(ST_y(ST_transform(the_geom, v_client_epsg))::numeric, 3)  FROM vi_coordinates;
+			INSERT INTO temp_t_csv SELECT nextval('temp_csv_id_seq'::regclass), v_fid, current_user,'vi_t_coordinates', 
+			node_id, ROUND(ST_x(ST_transform(the_geom, v_client_epsg))::numeric, 3), ROUND(ST_y(ST_transform(the_geom, v_client_epsg))::numeric, 3)  FROM vi_t_coordinates;
 
 		WHEN rec_table.tablename = 'vi_t_vertices' THEN
 			-- on the fly transformation of epsg
-			INSERT INTO temp_t_csv SELECT nextval('temp_csv_id_seq'::regclass), v_fid, current_user,'vi_vertices', 
-			arc_id, ROUND(ST_x(ST_transform(the_geom, v_client_epsg))::numeric, 3), ROUND(ST_y(ST_transform(the_geom, v_client_epsg))::numeric, 3)  FROM vi_vertices;
+			INSERT INTO temp_t_csv SELECT nextval('temp_csv_id_seq'::regclass), v_fid, current_user,'vi_t_vertices', 
+			arc_id, ROUND(ST_x(ST_transform(the_geom, v_client_epsg))::numeric, 3), ROUND(ST_y(ST_transform(the_geom, v_client_epsg))::numeric, 3)  FROM vi_t_vertices;
 		ELSE
 			EXECUTE 'INSERT INTO temp_t_csv SELECT nextval(''temp_csv_id_seq''::regclass),'||v_fid||',current_user,'''||rec_table.tablename::text||''',*  FROM '||
 			rec_table.tablename||';';
