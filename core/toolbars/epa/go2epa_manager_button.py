@@ -135,7 +135,7 @@ class GwGo2EpaManagerButton(GwAction):
         sql = f"UPDATE v_ui_rpt_cat_result SET expl_id = {value} WHERE result_id = '{result_id}';"
         result = tools_db.execute_sql(sql)
         if result:
-            self._fill_manager_table(self.dlg_manager.txt_result_id.currentText())
+            self._fill_manager_table(tools_qt.get_text(self.dlg_manager, 'txt_result_id'))
 
 
     def _fill_txt_infolog(self, selected):
@@ -258,7 +258,7 @@ class GwGo2EpaManagerButton(GwAction):
             sql = f"DELETE FROM {table_name}"
             sql += f" WHERE {column_id} IN ({list_id})"
             tools_db.execute_sql(sql)
-            self._fill_manager_table(self.dlg_manager.txt_result_id.currentText())
+            self._fill_manager_table(tools_qt.get_text(self.dlg_manager, 'txt_result_id'))
 
 
     def _epa2data(self, widget, column_id):
