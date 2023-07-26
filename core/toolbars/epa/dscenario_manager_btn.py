@@ -731,6 +731,7 @@ class GwDscenarioManagerButton(GwAction):
 
         tools_gw.disconnect_signal('dscenario_snapping')
         tools_gw.remove_selection()
+        tools_gw.reset_rubberband(self.rubber_band)
         self.iface.actionPan().trigger()
 
     # endregion
