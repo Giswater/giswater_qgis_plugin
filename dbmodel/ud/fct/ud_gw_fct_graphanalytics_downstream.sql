@@ -216,7 +216,7 @@ BEGIN
 	v_status = 'Accepted';
 	v_level = 3;
 	v_message = 'Flow  analysis done succesfully';
-	RAISE NOTICE 'LOOP'; LOOP END LOOP;
+
 	-- Reset values
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
