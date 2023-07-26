@@ -96,7 +96,7 @@ SET search_path = "SCHEMA_NAME", public;
 
 			-- set psector selector
 			DELETE FROM selector_psector WHERE cur_user=current_user;
-		END IF;
+	END IF;
 
 	--CREATE ARRAY OF HYDRANTS
 	select array_agg(a) into v_node_array from json_array_elements_text(v_node_json) a WHERE a IN (SELECT node_id FROM man_hydrant);
@@ -275,21 +275,6 @@ SET search_path = "SCHEMA_NAME", public;
 		END LOOP;
 	END IF;
 
-	-- restore state selector (if it's needed)
-	IF v_use_psector IS NOT TRUE THEN
-		INSERT INTO selector_psector (psector_id, cur_user)
-		select unnest(text_column::integer[]), current_user from temp_t_table where fid=288 and cur_user=current_user
-		ON CONFLICT (psector_id, cur_user) DO NOTHING;
-	END IF;
-
-	-- Reset values, insert results
-	DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = v_fid OR fid = v_fid_result);
-	DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = v_fid OR fid = v_fid_result);
-	DELETE FROM audit_check_data WHERE (fid = v_fid) and cur_user="current_user"();
-	
-	INSERT INTO anl_node SELECT * FROM temp_anl_node;
-	INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
-	INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
 
 	-- get results
 	--lines
@@ -310,7 +295,7 @@ SET search_path = "SCHEMA_NAME", public;
 	IF v_use_propsal is true then
 		v_query='SELECT DISTINCT ON (node_id)  node_id, nodecat_id, expl_id,the_geom
 		 	FROM node WHERE node_id::integer =ANY(ARRAY['||v_hidrant_array||'])
-		 	UNION SELECT node_id, ''HYDRANT PROPOSAL'',expl_id, the_geom FROM anl_node WHERE fid='||v_fid_proposal||' AND cur_user=current_user';
+		 	UNION SELECT node_id, ''HYDRANT PROPOSAL'',expl_id, the_geom FROM temp_anl_node WHERE fid='||v_fid_proposal||' AND cur_user=current_user';
 	else
 		v_query='SELECT DISTINCT ON (node_id)  node_id, nodecat_id, expl_id,the_geom
 		 	FROM node WHERE node_id::integer =ANY(ARRAY['||v_hidrant_array||'])';
@@ -335,6 +320,22 @@ SET search_path = "SCHEMA_NAME", public;
 	FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
+	-- restore state selector (if it's needed)
+	IF v_use_psector IS NOT TRUE THEN
+		INSERT INTO selector_psector (psector_id, cur_user)
+		select unnest(text_column::integer[]), current_user from temp_t_table where fid=288 and cur_user=current_user
+		ON CONFLICT (psector_id, cur_user) DO NOTHING;
+	END IF;
+
+	-- Reset values, insert results
+	DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = v_fid OR fid = v_fid_result);
+	DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = v_fid OR fid = v_fid_result);
+	DELETE FROM audit_check_data WHERE (fid = v_fid) and cur_user="current_user"();
+	
+	INSERT INTO anl_node SELECT * FROM temp_anl_node;
+	INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
+	INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
 
 	--drop temp tables
 	DROP TABLE temp_anl_arc;
