@@ -520,7 +520,8 @@ class GwToolBoxButton(GwAction):
             if type(widget) in (QCheckBox, QRadioButton):
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
-                tools_qt.set_checked(dialog, widget, value)
+                if value not in (None, 'None'):
+                    tools_qt.set_checked(dialog, widget, value)
             elif type(widget) is QComboBox and widget.property('selectedId') in (None,'','NULL'):
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
