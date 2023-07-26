@@ -160,6 +160,3 @@ UPDATE config_form_fields SET datatype='datetime' WHERE formtype='form_visit' an
 
 UPDATE sys_fprocess SET fprocess_type='Check om-data' WHERE fid=175;
 
-UPDATE config_function SET style = '{"style": {"point": {"style": "categorized", "field": "descript", "transparency": 0.5, "width": 2.5, "values": [{"id": "Disconnected", "color": [255,124,64]}, {"id": "Conflict", "color": [14,206,253]}]},
-"line": {"style": "categorized", "field": "descript", "transparency": 0.5, "width": 2.5, "values": [{"id": "Disconnected", "color": [255,124,64]}, {"id": "Conflict", "color": [14,206,253]}]},
-  "polygon": {"style": "categorized","field": "descript",  "transparency": 0.5}}}' WHERE id=2710;
