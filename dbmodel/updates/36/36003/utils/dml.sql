@@ -160,3 +160,11 @@ UPDATE config_form_fields SET datatype='datetime' WHERE formtype='form_visit' an
 
 UPDATE sys_fprocess SET fprocess_type='Check om-data' WHERE fid=175;
 
+UPDATE config_toolbox SET inputparams='[
+{"widgetname":"name", "label":"Name: (*)","widgettype":"linetext","datatype":"text", "isMandatory":true, "tooltip":"Name for dscenario (mandatory)", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":1, "value":""},
+{"widgetname":"descript", "label":"Descript:","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Descript for dscenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":2, "value":""},
+{"widgetname":"parent", "label":"Parent:","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Parent for dscenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":3, "value":""},
+{"widgetname":"type", "label":"Type:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT id, idval FROM inp_typevalue WHERE typevalue = ''inp_typevalue_dscenario''", "layoutname":"grl_option_parameters","layoutorder":4, "value":""},
+{"widgetname":"active", "label":"Active:", "widgettype":"check", "datatype":"boolean", "tooltip":"If true, active" , "layoutname":"grl_option_parameters","layoutorder":5, "value":"true"},
+{"widgetname":"expl", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":6, "value":""}
+]'::json WHERE id=3134;
