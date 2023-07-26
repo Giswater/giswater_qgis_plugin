@@ -22,3 +22,6 @@ ALTER TABLE sector ALTER COLUMN insert_user SET DEFAULT current_user;
 
 ALTER TABLE dma ALTER COLUMN tstamp SET DEFAULT now();
 ALTER TABLE dma ALTER COLUMN insert_user SET DEFAULT current_user;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"sector_id", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"sector_id", "dataType":"integer", "isUtils":"False"}}$$);
