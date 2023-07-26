@@ -204,8 +204,8 @@ BEGIN
 
 		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'speed',d.speed) FROM v_edit_inp_dscenario_pump d 
 		WHERE t.arc_id = concat(d.node_id, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.speed IS NOT NULL;
-		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'pattern',d.pattern) FROM v_edit_inp_dscenario_pump d 
-		WHERE t.arc_id = concat(d.node_id, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.pattern IS NOT NULL;
+		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'pattern',d.pattern_id) FROM v_edit_inp_dscenario_pump d 
+		WHERE t.arc_id = concat(d.node_id, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.pattern_id IS NOT NULL;
 
 
 		-- updating values for pumps additional
