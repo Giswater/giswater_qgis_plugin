@@ -3462,7 +3462,7 @@ def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json):
             value = tools_qt.get_widget_value(dialog, widget_name)
             id_val += f"{value}, "
         id_val = id_val[:-2]
-    if not id_val:
+    if id_val in (None, '', 'None'):
         id_val = feature_id
 
     feature = f'"id":"{id_val}", '
