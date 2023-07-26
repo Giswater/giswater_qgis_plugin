@@ -85,9 +85,10 @@ BEGIN
 		v_edit = 'v_edit_';
 	END IF;
 	
-
-	CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+	IF v_fid = 125 OR v_fid = 101 THEN
+		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
+		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+	END IF;
 
 	-- Starting process
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('DATA QUALITY ANALYSIS ACORDING graph ANALYTICS RULES'));
@@ -406,8 +407,8 @@ BEGIN
 	LOOP
 		-- remove anl tables
 		DELETE FROM temp_anl_node WHERE fid = v_record.fid AND cur_user = current_user;
-		DELETE FROM anl_arc WHERE fid = v_record.fid AND cur_user = current_user;
-		DELETE FROM anl_connec WHERE fid = v_record.fid AND cur_user = current_user;
+		DELETE FROM temp_anl_arc WHERE fid = v_record.fid AND cur_user = current_user;
+		DELETE FROM temp_anl_connec WHERE fid = v_record.fid AND cur_user = current_user;
 
 		DELETE FROM temp_audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user AND fid = v_fid;		
 	END LOOP;
@@ -471,9 +472,11 @@ BEGIN
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
 	
-	--DROP temp tables
-	DROP TABLE IF EXISTS temp_anl_node ;
-	DROP TABLE IF EXISTS temp_audit_check_data;
+	IF v_fid = 211 OR v_fid = 101 THEN
+		--DROP temp tables
+		DROP TABLE IF EXISTS temp_anl_node ;
+		DROP TABLE IF EXISTS temp_audit_check_data;
+	END IF;
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||

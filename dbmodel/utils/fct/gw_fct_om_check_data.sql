@@ -81,12 +81,15 @@ BEGIN
 
 	
 	--create temp tables
-	CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
-	CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-	CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
-	CREATE TEMP TABLE temp_temp_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
-	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+	IF v_fid = 125 OR v_fid = 101 THEN
+		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
+		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+	END IF;
 
+	CREATE TEMP TABLE temp_t_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
+	
 	-- Starting process
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('DATA QUALITY ANALYSIS ACORDING O&M RULES'));
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
@@ -895,26 +898,26 @@ BEGIN
 
 	RAISE NOTICE '31 - Check operative arcs with wrong topology (372)';
 	
-	EXECUTE 'INSERT INTO temp_temp_arc (arc_id, node_1, node_2, result_id, sector_id,state) SELECT arc_id, node_1, node_2, ''372'', sector_id,state 
+	EXECUTE 'INSERT INTO temp_t_arc (arc_id, node_1, node_2, result_id, sector_id,state) SELECT arc_id, node_1, node_2, ''372'', sector_id,state 
 			 FROM '||v_edit||'arc WHERE state = 1';
 	-- update node_1
-	UPDATE temp_temp_arc t SET node_1 = node_id, state = 9 FROM (
+	UPDATE temp_t_arc t SET node_1 = node_id, state = 9 FROM (
 	SELECT arc.arc_id, node.node_id, min(ST_Distance(node.the_geom, ST_startpoint(arc.the_geom))) as d FROM node, arc 
 	WHERE arc.state = 1 and node.state = 1 and ST_DWithin(ST_startpoint(arc.the_geom), node.the_geom, 0.02) group by 1,2 ORDER BY 1 DESC,3 DESC
 	)a where t.arc_id = a.arc_id AND t.node_1 != a.node_id;
 	
 	--update node_2
-	UPDATE temp_temp_arc t SET node_2 = node_id, state = 9 FROM (
+	UPDATE temp_t_arc t SET node_2 = node_id, state = 9 FROM (
 	SELECT arc.arc_id, node.node_id, min(ST_Distance(node.the_geom, ST_endpoint(arc.the_geom))) as d FROM node, arc 
 	WHERE arc.state = 1 and node.state = 1 and ST_DWithin(ST_endpoint(arc.the_geom), node.the_geom, 0.02) group by 1,2 ORDER BY 1 DESC,3 DESC
 	)a where t.arc_id = a.arc_id AND t.node_2 != a.node_id;
 
-	EXECUTE 'SELECT count(*) FROM temp_temp_arc WHERE state = 9'
+	EXECUTE 'SELECT count(*) FROM temp_t_arc WHERE state = 9'
 	INTO v_count;
 	IF v_count > 0 THEN
 		EXECUTE 'INSERT INTO temp_anl_arc (fid, arc_id, node_1, node_2, descript, the_geom, expl_id)
 		SELECT 372, t.arc_id, t.node_1, t.node_2, concat(''Operative arcs with wrong topology. Proposed nodes: {node_1:'',t.node_1,'', node_2:'', t.node_2, ''}''), a.the_geom, a.expl_id 
-		FROM temp_temp_arc t JOIN arc a USING(arc_id) WHERE t.state = 9'	;
+		FROM temp_t_arc t JOIN arc a USING(arc_id) WHERE t.state = 9'	;
 		INSERT INTO temp_audit_check_data (fid, criticity,result_id,error_message, fcount)
 		VALUES (v_fid, 3, '372', concat('ERROR-372 (temp_anl_arc): There is/are ',v_count,' operative arcs with wrong topology.'),v_count);
 	ELSE
@@ -979,33 +982,33 @@ BEGIN
 	RAISE NOTICE '34 - Check operative links with wrong topology (417, 418)';
 
 	-- connec_id (417)
-	DELETE FROM temp_temp_arc;
+	DELETE FROM temp_t_arc;
 
 	IF v_edit IS NULL THEN 
-		INSERT INTO temp_temp_arc (arc_id, node_1, result_id, state, the_geom) SELECT link_id, feature_id, '417', l.state, l.the_geom 
+		INSERT INTO temp_t_arc (arc_id, node_1, result_id, state, the_geom) SELECT link_id, feature_id, '417', l.state, l.the_geom 
 		FROM link l JOIN connec c ON feature_id = connec_id WHERE l.state = 1 and l.feature_type = 'CONNEC';
 
-		UPDATE temp_temp_arc t SET node_1 = connec_id, state = 9 FROM (
+		UPDATE temp_t_arc t SET node_1 = connec_id, state = 9 FROM (
 		SELECT l.link_id, c.connec_id, (ST_Distance(c.the_geom, ST_startpoint(l.the_geom))) as d FROM connec c, link l
 		WHERE l.state = 1 and c.state = 1 and ST_DWithin(ST_startpoint(l.the_geom), c.the_geom, 0.05) group by 1,2,3 ORDER BY 1 DESC,3 DESC
 		)a where t.arc_id = a.link_id::text AND t.node_1 = a.connec_id;
 	ELSE
-		INSERT INTO temp_temp_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '417', l.sector_id, l.state, l.the_geom 
+		INSERT INTO temp_t_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '417', l.sector_id, l.state, l.the_geom 
 		FROM link l JOIN connec c ON feature_id = connec_id WHERE l.state = 1 and l.feature_type = 'CONNEC';
 
-		UPDATE temp_temp_arc t SET node_1 = connec_id, state = 9 FROM (
+		UPDATE temp_t_arc t SET node_1 = connec_id, state = 9 FROM (
 		SELECT l.link_id, c.connec_id, (ST_Distance(c.the_geom, ST_startpoint(l.the_geom))) as d FROM connec c, link l
 		WHERE l.state = 1 and c.state = 1 and ST_DWithin(ST_startpoint(l.the_geom), c.the_geom, 0.05) group by 1,2,3 ORDER BY 1 DESC,3 DESC
 		)a where t.arc_id = a.link_id::text AND t.node_1 = a.connec_id;
 	END IF;
 		
 
-	EXECUTE 'SELECT count(*) FROM temp_temp_arc WHERE state = 1'
+	EXECUTE 'SELECT count(*) FROM temp_t_arc WHERE state = 1'
 	INTO v_count;
 	IF v_count > 0 THEN
 		EXECUTE 'INSERT INTO temp_anl_arc (fid, arc_id, node_1, arccat_id, descript, the_geom, expl_id)
 		SELECT 417, t.arc_id, t.node_1, ''LINK'', concat(''Link with wrong topology. Startpoint does not fit with connec '',t.node_1), t.the_geom, a.expl_id 
-		FROM temp_temp_arc t JOIN '||v_edit||'connec a ON node_1 = connec_id WHERE t.state = 1';
+		FROM temp_t_arc t JOIN '||v_edit||'connec a ON node_1 = connec_id WHERE t.state = 1';
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 3, '417', concat('ERROR-417 (temp_anl_arc): There is/are ',v_count,' links related to connecs with wrong topology, startpoint does not fit connec'),v_count);
 	ELSE
@@ -1015,32 +1018,32 @@ BEGIN
 
 	-- gullys (418)
 	IF v_project_type = 'UD' THEN
-		DELETE FROM temp_temp_arc;
+		DELETE FROM temp_t_arc;
 
 		IF v_edit IS NULL THEN
-			INSERT INTO temp_temp_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '418', l.sector_id, l.state, l.the_geom 
+			INSERT INTO temp_t_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '418', l.sector_id, l.state, l.the_geom 
 			FROM link l JOIN gully g ON feature_id = gully_id WHERE l.state = 1 and l.feature_type = 'GULLY' ;
 
-			UPDATE temp_temp_arc t SET node_1 = gully_id, state = 9 FROM (
+			UPDATE temp_t_arc t SET node_1 = gully_id, state = 9 FROM (
 			SELECT l.link_id, g.gully_id, (ST_Distance(g.the_geom, ST_startpoint(l.the_geom))) as d FROM gully g, link l
 			WHERE l.state = 1 and g.state = 1 and ST_DWithin(ST_startpoint(l.the_geom), g.the_geom, 0.05) group by 1,2,3 ORDER BY 1 DESC,3 DESC
 			)a where t.arc_id = a.link_id::text AND t.node_1 = a.gully_id;
 		ELSE
-			INSERT INTO temp_temp_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '418', l.sector_id, l.state, l.the_geom 
+			INSERT INTO temp_t_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '418', l.sector_id, l.state, l.the_geom 
 			FROM link l JOIN gully g ON feature_id = gully_id WHERE l.state = 1 and l.feature_type = 'GULLY' ;
 
-			UPDATE temp_temp_arc t SET node_1 = gully_id, state = 9 FROM (
+			UPDATE temp_t_arc t SET node_1 = gully_id, state = 9 FROM (
 			SELECT l.link_id, g.gully_id, (ST_Distance(g.the_geom, ST_startpoint(l.the_geom))) as d FROM gully g, link l
 			WHERE l.state = 1 and g.state = 1 and ST_DWithin(ST_startpoint(l.the_geom), g.the_geom, 0.05) group by 1,2,3 ORDER BY 1 DESC,3 DESC
 			)a where t.arc_id = a.link_id::text AND t.node_1 = a.gully_id;
 		END IF;
 
-		EXECUTE 'SELECT count(*) FROM temp_temp_arc WHERE state = 1'
+		EXECUTE 'SELECT count(*) FROM temp_t_arc WHERE state = 1'
 		INTO v_count;
 		IF v_count > 0 THEN
 			EXECUTE 'INSERT INTO temp_anl_arc (fid, arc_id, node_1, arccat_id, descript, the_geom, expl_id)
 			SELECT 418, t.arc_id, t.node_1, ''LINK'', concat(''Link with wrong topology. Startpoint does not fit with gully '',t.node_1), t.the_geom, a.expl_id 
-			FROM temp_temp_arc t JOIN '||v_edit||'gully a ON node_1 = gully_id WHERE t.state = 1';
+			FROM temp_t_arc t JOIN '||v_edit||'gully a ON node_1 = gully_id WHERE t.state = 1';
 			INSERT INTO temp_audit_check_data (fid, criticity,result_id,error_message, fcount)
 			VALUES (v_fid, 3, '418', concat('ERROR-418 (temp_anl_arc): There is/are ',v_count,' links related to gully with wrong topology, startpoint does not fit gully)'),v_count);
 		ELSE
@@ -1584,12 +1587,14 @@ BEGIN
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
 	
-	--drop temporal tables
-	DROP TABLE  IF EXISTS temp_anl_arc;
-	DROP TABLE IF EXISTS temp_anl_node ;
-	DROP TABLE IF EXISTS  temp_anl_connec;
-	DROP TABLE  IF EXISTS temp_temp_arc;
-	DROP TABLE  IF EXISTS temp_audit_check_data;
+	IF v_fid = 125 OR v_fid = 101 THEN
+		--drop temporal tables
+		DROP TABLE  IF EXISTS temp_anl_arc;
+		DROP TABLE IF EXISTS temp_anl_node ;
+		DROP TABLE IF EXISTS  temp_anl_connec;
+		DROP TABLE  IF EXISTS temp_t_arc;
+		DROP TABLE  IF EXISTS temp_audit_check_data;
+	END IF;
 
 
 	-- Return
