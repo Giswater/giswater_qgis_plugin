@@ -227,6 +227,11 @@ class GwEpaFileManager(GwTask):
                 main_json_result = json_result
             if self.isCanceled() or json_result is None:
                 return False
+            if json_result.get('status') == 'Failed':
+                tools_log.log_warning(json_result)
+                self.function_failed = True
+                self.step_completed.emit({"message": {"level": 1, "text": "EXECUTION FAILED! Check logs for more information"}}, "\n")
+                return False
 
         json_result = main_json_result
         self.json_result = json_result
