@@ -1104,7 +1104,7 @@ BEGIN
 			group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
 			) a 
 			UNION
-			SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, '||v_field||'::text as descript, the_geom FROM temp_t_arc WHERE state=1 and dma_id >0
+			SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, '||v_field||'::text as descript, the_geom FROM temp_t_arc WHERE dma_id >0
 			) row) features'
 			INTO v_result;
 
