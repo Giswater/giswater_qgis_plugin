@@ -20,9 +20,8 @@ SELECT SCHEMA_NAME.gw_fct_graphanalytics_minsector('{"data":{"parameters":{"expl
 select distinct(sector_id) from SCHEMA_NAME.arc where expl_id=1
 
 select * from exploitation order by 1
-
-
- SELECT gw_fct_graphanalytics_minsector($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"exploitation":"[1]", "usePsectors":"false", "updateFeature":"false", "updateMinsectorGeom":"2", "geomParamUpdate":"10"}}}$$);
+ 
+SELECT SCHEMA_NAME.gw_fct_graphanalytics_minsector($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"exploitation":"[1]", "sector":null, "usePsectors":"false", "updateFeature":"true", "updateMapZone":"3", "geomParamUpdate":"20"}}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_minsector('{"data":{"parameters":{"arc":"2002", "checkQualityData": true, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2, "geomParamUpdate":10}}}')
 
@@ -81,7 +80,6 @@ v_usepsectors boolean;
 v_concavehull float = 0.85;
 v_error_context text;
 v_checkdata boolean;
-v_maxmsector integer = 0;
 v_returnerror boolean = false;
 v_sector json;
 v_sector_query text;
@@ -89,11 +87,12 @@ v_expl_query text;
 v_psectors_query_arc text;
 v_psectors_query_node text;
 v_psectors_query_connec text;
+v_loop record;
 
 BEGIN
 
-    -- Search path
-    SET search_path = "SCHEMA_NAME", public;
+	-- Search path
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- get variables
 	v_arcid = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'arc');
@@ -103,7 +102,6 @@ BEGIN
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 	v_usepsectors = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePsectors');
 	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
-	v_maxmsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'MaxMinsectors');
 	v_sector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'sector');
 
 	-- select config values
@@ -143,28 +141,29 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fid=134 AND cur_user=current_user;
 
 	CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
-	
-	CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
+	CREATE TEMP TABLE IF NOT EXISTS temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
 
-	CREATE OR REPLACE TEMP VIEW v_temp_anlgraph
-	 AS
-	 SELECT anl_graph.arc_id,
-	    anl_graph.node_1,
-	    anl_graph.node_2,
-	    anl_graph.flag,
-	    a.flag AS flagi,
-	    a.value
-	   FROM temp_t_anlgraph anl_graph
-	     JOIN ( SELECT anl_graph_1.arc_id,
-	            anl_graph_1.node_1,
-	            anl_graph_1.node_2,
-	            anl_graph_1.water,
-	            anl_graph_1.flag,
-	            anl_graph_1.checkf,
-	            anl_graph_1.value
-	           FROM temp_t_anlgraph anl_graph_1
-	          WHERE anl_graph_1.water = 1) a ON anl_graph.node_1::text = a.node_2::text
-	  WHERE anl_graph.flag < 2 AND anl_graph.water = 0 AND a.flag < 2;
+	-- create temporal view
+	CREATE OR REPLACE TEMP VIEW v_temp_anlgraph AS
+	 SELECT temp_t_anlgraph.arc_id,
+	    temp_t_anlgraph.node_1,
+	    temp_t_anlgraph.node_2,
+	    temp_t_anlgraph.flag,
+	    a2.flag AS flagi,
+	    a2.value,
+	    a2.trace
+	   FROM temp_t_anlgraph
+	     JOIN ( SELECT temp_t_anlgraph_1.arc_id,
+		    temp_t_anlgraph_1.node_1,
+		    temp_t_anlgraph_1.node_2,
+		    temp_t_anlgraph_1.water,
+		    temp_t_anlgraph_1.flag,
+		    temp_t_anlgraph_1.checkf,
+		    temp_t_anlgraph_1.value,
+		    temp_t_anlgraph_1.trace
+		   FROM temp_t_anlgraph temp_t_anlgraph_1
+		  WHERE temp_t_anlgraph_1.water = 1) a2 ON temp_t_anlgraph.node_1::text = a2.node_2::text
+		  WHERE temp_t_anlgraph.flag < 2 AND temp_t_anlgraph.water = 0 AND a2.flag < 2;
 
 	-- Starting process
 	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('MINSECTOR DYNAMIC SECTORITZATION'));
@@ -175,7 +174,6 @@ BEGIN
 		INSERT INTO audit_check_data (fid, criticity, error_message)
 		VALUES (v_fid, 3, concat('ERROR-',v_fid,': There are null values on cat_feature_node.graphdelimiter. Please fill it before continue'));
 	ELSE
-	
 		-- reset exploitation
 		IF v_expl IS NOT NULL THEN
 			
@@ -222,78 +220,69 @@ BEGIN
 			v_psectors_query_connec='';
 		END IF;
 			raise notice 'v_psectors_query_arc,%',v_psectors_query_arc;
+			
 		-- create graph
-		IF v_maxmsector > 0 THEN
-			EXECUTE 'INSERT INTO temp_t_anlgraph ( arc_id, node_1, node_2, water, flag, checkf )
-			SELECT  arc_id, node_1, node_2, 0, 0, 0 FROM arc a
-			WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND (minsector_id < 1 or minsector_id is null) AND state=1 AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||'
-			UNION
-			SELECT  arc_id, node_2, node_1, 0, 0, 0 FROM arc a
-			WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND (minsector_id < 1 or minsector_id is null) AND state=1 AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||';';
-		ELSE
-			EXECUTE 'INSERT INTO temp_t_anlgraph ( arc_id, node_1, node_2, water, flag, checkf )
-			SELECT  arc_id, node_1, node_2, 0, 0, 0 FROM arc a
-			WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND state=1 AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||'
-			UNION
-			SELECT  arc_id, node_2, node_1, 0, 0, 0 FROM arc a
-			WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND state=1  AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||';';
-		END IF;
+		EXECUTE 'INSERT INTO temp_t_anlgraph ( arc_id, node_1, node_2, water, flag, checkf, trace )
+		SELECT  arc_id, node_1, node_2, 0, 0, 0, 0 FROM arc a
+		WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND state=1 AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||'
+		UNION
+		SELECT  arc_id, node_2, node_1, 0, 0, 0, 0 FROM arc a
+		WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND state=1  AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||';';
+			
+		-- set the starting element
+		v_querytext = 'UPDATE temp_t_anlgraph SET flag=1, water=1, checkf=1, trace=a.arc_id::integer 
+				FROM (SELECT a.arc_id FROM arc a JOIN vu_node ON node_1 = node_id WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter =''MINSECTOR'')
+				UNION SELECT a.arc_id FROM arc a JOIN vu_node ON node_2 = node_id WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter =''MINSECTOR''))a
+					                                            WHERE temp_t_anlgraph.arc_id = a.arc_id';
+		EXECUTE v_querytext;
 
-		SELECT count(*)/2 INTO v_total FROM temp_t_anlgraph;
-		
-		-- set boundary conditions of graph table	
-		UPDATE temp_t_anlgraph SET flag=2 FROM cat_feature_node a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id 
-		WHERE c.node_id=temp_t_anlgraph.node_1 AND graph_delimiter !='NONE' ;
+		-- inundation process
+		LOOP	
+			v_cont1 = v_cont1+1;
+			UPDATE temp_t_anlgraph n SET water= 1, flag=n.flag+1, checkf=1, trace = a.trace FROM v_temp_anlgraph a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;
+			GET DIAGNOSTICS v_affectedrow =row_count;
+			v_row1 = v_row1 + v_affectedrow;
+			raise notice 'INUNDATION --> %' , v_cont1;
+			EXIT WHEN v_affectedrow = 0;
+			EXIT WHEN v_cont1 = 30;
+		END LOOP;
 
-		raise notice 'Starting process - Number of arcs: %', v_total;
+		-- fusioning parts of each minsectors in one unique minsector 
+		create temp view v_t_process as 
+		SELECT * FROM 
+		(
+		SELECT node_id FROM 
+		(SELECT node_1 AS node_id, trace FROM temp_t_anlgraph UNION SELECT node_2, trace FROM temp_t_anlgraph ORDER BY 1)a
+		JOIN vu_node USING (node_id) 
+		WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter ='NONE') group by node_id having count(*) > 1
+		ORDER BY 1
+		) a JOIN  
+		(
+		SELECT a.* FROM 
+		(SELECT node_1 AS node_id, trace FROM temp_t_anlgraph UNION SELECT node_2, trace FROM temp_t_anlgraph ORDER BY 1)a
+		JOIN vu_node USING (node_id) 
+		WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter ='NONE')
+		ORDER BY 1
+		) b USING (node_id)
+		JOIN 
+		(SELECT trace, count(*) FROM temp_t_anlgraph GROUP BY trace) c USING (trace)
+		order by 2, 3 desc;
 
 		LOOP
-			-- reset water flag
-			UPDATE temp_t_anlgraph SET water=0;
-			
-			v_cont2 = v_cont2 +1;
-
-			IF v_maxmsector > 0 THEN
-				EXIT WHEN v_cont2 = v_maxmsector + 1;
-			END IF;
-
-			------------------
-			-- starting engine
-			SELECT a.arc_id INTO v_arc FROM (SELECT arc_id, max(checkf) as checkf FROM temp_t_anlgraph GROUP by arc_id) a WHERE checkf=0 LIMIT 1;
-
-			EXIT WHEN v_arc IS NULL;
-					
-			-- set the starting element
-			v_querytext = 'UPDATE temp_t_anlgraph SET flag=1, water=1, checkf=1 WHERE arc_id='||quote_literal(v_arc)||'';
-			EXECUTE v_querytext;
-
-			-- init variable
-			v_cont1 = 0;
-
-			raise notice 'counter %', v_cont2;
-
-			-- inundation process
-			LOOP	
-				--raise notice 'v_cont1 %', v_cont1;
-
-				v_cont1 = v_cont1+1;
-				UPDATE temp_t_anlgraph n SET water= 1, flag=n.flag+1, checkf=1 FROM v_temp_anlgraph a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;
-				GET DIAGNOSTICS v_affectedrow =row_count;
-				v_row1 = v_row1 + v_affectedrow;
-				EXIT WHEN v_affectedrow = 0;
-				EXIT WHEN v_cont1 = 200;
+			EXIT WHEN (select count(*) from v_t_process) = 0;
 				
-			END LOOP;
-
-			-- finish engine
-			----------------
-			-- insert arc results into audit table
-			INSERT INTO temp_anl_arc (fid, arccat_id, arc_id, the_geom, descript)
-			SELECT DISTINCT ON (arc_id) 134, arccat_id, a.arc_id, the_geom, v_arc::text
-			FROM (SELECT arc_id, max(water) as water FROM temp_t_anlgraph WHERE water=1 GROUP by arc_id) a JOIN arc b ON a.arc_id=b.arc_id;
-			GET DIAGNOSTICS v_affectedrow =row_count;
-
+			FOR v_loop IN select a.count, node_id, b.trace as trace_new, c.trace as trace_old from 
+						(SELECT max(count) AS count, node_id FROM v_t_process GROUP BY node_id )a
+						join v_t_process b USING (count, node_id) join v_t_process c USING (node_id) where b.trace::text != c.trace::text
+			LOOP
+				UPDATE temp_t_anlgraph SET trace = v_loop.trace_new WHERE trace = v_loop.trace_old;
+			END LOOP;				
 		END LOOP;
+
+		-- insert arc results into audit table
+		INSERT INTO temp_anl_arc (fid, arccat_id, arc_id, the_geom, descript)
+		SELECT DISTINCT ON (arc_id) 134, arccat_id, a.arc_id, the_geom, trace::text
+		FROM (SELECT arc_id, max(water) as water, trace FROM temp_t_anlgraph WHERE water=1 GROUP by arc_id, trace) a JOIN arc b ON a.arc_id=b.arc_id;		
 
 		IF v_updatefeature THEN 
 		
@@ -346,7 +335,7 @@ BEGIN
 			LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
 			JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
 			JOIN man_netwjoin ON man_netwjoin.customer_code::text = ext_rtc_hydrometer.connec_id::text
-     		JOIN node a ON a.node_id::text = man_netwjoin.node_id::text
+			JOIN node a ON a.node_id::text = man_netwjoin.node_id::text
 			WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = "current_user"()::text 
 			AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_node||'
 			)a GROUP by minsector_id)a WHERE a.minsector_id=minsector.minsector_id;';
@@ -467,6 +456,7 @@ BEGIN
 	
 	--drop temporal layers
 	DROP VIEW v_temp_anlgraph;
+	DROP VIEW v_t_process;
 	DROP TABLE temp_t_anlgraph;
 	DROP TABLE temp_anl_arc;
 
