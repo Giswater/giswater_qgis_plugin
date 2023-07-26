@@ -1088,28 +1088,30 @@ BEGIN
 	
 		
 		-- arc elementS
-			EXECUTE 'SELECT jsonb_agg(features.feature) 
-			FROM (
-			SELECT jsonb_build_object(
-			     ''type'',       ''Feature'',
-			    ''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
-			    ''properties'', to_jsonb(row) - ''the_geom''
-			) AS feature
-			FROM 
-			(SELECT * FROM 
-			(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, ''Disconnected''::text as descript, the_geom FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0 
-			group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
-			UNION
-			SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, ''Conflict''::text as descript, the_geom FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = -1 
-			group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
-			) a 
-			UNION
-			SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, '||v_field||'::text as descript, the_geom FROM temp_t_arc WHERE dma_id >0
-			) row) features'
-			INTO v_result;
+		EXECUTE 'SELECT jsonb_agg(features.feature) 
+		FROM (
+		SELECT jsonb_build_object(
+		    ''type'',       ''Feature'',
+		    ''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+		    ''properties'', to_jsonb(row) - ''the_geom''
+		) AS feature
+		FROM 
+		(SELECT * FROM 
+		(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, ''0'' as mapzone_id, the_geom, ''Disconnected''::text as descript  FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0 
+		group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
+		UNION
+		SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, NULL as mapzone_id, the_geom, ''Conflict''::text as descript FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = -1 
+		group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
+		) a 
+		UNION
+		SELECT DISTINCT ON (arc_id) arc_id, arccat_id, t.state, t.expl_id, t.'||v_field||'::TEXT as mapzone_id, t.the_geom, m.name as descript FROM temp_t_arc t 
+		JOIN '||v_table||' m USING ('||v_field||') WHERE '||v_field||'::integer >0
+		) row ) features'
+		INTO v_result;
 
-			v_result := COALESCE(v_result, '{}'); 
-			v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
+
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
 
 		v_result = null;
 
@@ -1121,7 +1123,7 @@ BEGIN
 	    ''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
 	    ''properties'', to_jsonb(row) - ''the_geom''
 	  	) AS feature
-	  	FROM (SELECT '||v_field||', '||v_field||' as descript, '||v_fid||' as fid, the_geom FROM temp_'||v_table||') row) features'
+	  	FROM (SELECT  t.'||v_field||' as mapzone_id, m.name  as descript, '||v_fid||' as fid, t.the_geom FROM temp_'||v_table||' t JOIN '||v_table||' m USING ('||v_field||')) row) features'
 		INTO v_result;
 
 		v_result := COALESCE(v_result, '{}'); 
