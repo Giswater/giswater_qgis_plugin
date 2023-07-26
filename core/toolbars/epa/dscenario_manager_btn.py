@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from functools import partial
 from sip import isdeleted
+import json
 
 from qgis.core import QgsProject
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor
@@ -17,7 +18,7 @@ from qgis.PyQt.QtWidgets import QDialog, QLineEdit
 
 from ..dialog import GwAction
 from ..utilities.toolbox_btn import GwToolBoxButton
-from ...ui.ui_manager import GwDscenarioManagerUi, GwDscenarioUi
+from ...ui.ui_manager import GwDscenarioManagerUi, GwDscenarioUi, GwInfoGenericUi
 from ...utils import tools_gw
 from ...models.item_delegates import ReadOnlyDelegate, EditableDelegate
 from .... import global_vars
@@ -269,6 +270,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario.main_tab.setCurrentIndex(default_tab_idx)
 
         # Connect signals
+        self.dlg_dscenario.btn_properties.clicked.connect(partial(self._manage_properties))
         self.dlg_dscenario.btn_toc.clicked.connect(partial(self._manage_add_layers))
         self.dlg_dscenario.btn_insert.clicked.connect(partial(self._manage_insert))
         self.dlg_dscenario.btn_delete.clicked.connect(partial(self._manage_delete))
@@ -416,6 +418,69 @@ class GwDscenarioManagerButton(GwAction):
         if feature_type != 'feature_id':
             table = f"v_edit_{feature_type.split('_')[0]}"
         tools_qgis.highlight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
+
+
+    def _manage_properties(self):
+        tablename = "v_edit_cat_dscenario"
+        feature_id = self.selected_dscenario_id
+        pkey = "dscenario_id"
+
+        feature = f'"tableName":"{tablename}", "id":"{feature_id}"'
+        body = tools_gw.create_body(feature=feature)
+        json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
+        if json_result is None or json_result['status'] == 'Failed':
+            return
+        result = json_result
+
+        # Build dlg
+        self.props_dlg = GwInfoGenericUi()
+        tools_gw.load_settings(self.props_dlg)
+        self.my_json_add = {}
+        tools_gw.build_dialog_info(self.props_dlg, result, my_json=self.my_json_add)
+        # Disable widgets
+        disabled_widgets = ['dscenario_id', 'log']
+        for widget in disabled_widgets:
+            widget_name = f"tab_none_{widget}"
+            tools_qt.set_widget_enabled(self.props_dlg, widget_name, False)
+
+        # Signals
+        self.props_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.props_dlg))
+        self.props_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.props_dlg))
+        self.props_dlg.btn_accept.clicked.connect(partial(self._accept_props_dlg, self.props_dlg, tablename, pkey,
+                                                          self.selected_dscenario_id, self.my_json_add))
+
+        # Open dlg
+        tools_gw.open_dialog(self.props_dlg, dlg_name='info_generic')
+
+
+    def _accept_props_dlg(self, dialog, tablename, pkey, feature_id, my_json):
+        if not my_json:
+            return
+
+        fields = json.dumps(my_json)
+        id_val = ""
+        if pkey:
+            if not isinstance(pkey, list):
+                pkey = [pkey]
+            for pk in pkey:
+                widget_name = f"tab_none_{pk}"
+                value = tools_qt.get_widget_value(dialog, widget_name)
+                id_val += f"{value}, "
+            id_val = id_val[:-2]
+        if not id_val:
+            id_val = feature_id
+
+        feature = f'"id":"{id_val}", '
+        feature += f'"tableName":"{tablename}"'
+        extras = f'"fields":{fields}'
+        body = tools_gw.create_body(feature=feature, extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
+        if json_result and json_result.get('status') == 'Accepted':
+            tools_gw.close_dialog(dialog)
+            # Refresh tableview
+            self._fill_manager_table(self.filter_name.text())
+            return
+        tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
 
 
     def _manage_add_layers(self):
