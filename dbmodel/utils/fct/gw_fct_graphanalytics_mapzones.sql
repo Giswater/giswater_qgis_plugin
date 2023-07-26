@@ -160,64 +160,6 @@ BEGIN
 	IF v_floodonlymapzone = '' THEN v_floodonlymapzone = NULL; END IF;
 	v_floodonlymapzone = REPLACE(REPLACE (v_floodonlymapzone,'[','') ,']','');
 
-
-	/* todo transactional
-
-	-- data quality analysis
-	IF v_checkdata = 'FULL' THEN
-	
-		-- om data quality analysis
-		v_input = '{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
-		PERFORM gw_fct_om_check_data(v_input);
-		SELECT count(*) INTO v_count1 FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 AND criticity=3 AND result_id IS NOT NULL;
-
-		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 AND result_id IS NULL AND error_message ='' AND criticity=1;
-
-		-- graph quality analysis
-		v_input = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors", "graphClass":',quote_ident(v_class),'}}}')::json;
-		PERFORM gw_fct_graphanalytics_check_data(v_input);
-		SELECT count(*) INTO v_count2 FROM audit_check_data WHERE cur_user="current_user"() AND fid=211 AND criticity=3 AND result_id IS NOT NULL;
-
-		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=211 AND result_id IS NULL;
-
-	ELSIF v_checkdata = 'PARTIAL' THEN
-
-		-- graph quality analysis
-		v_input = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors", "graphClass":',quote_ident(v_class),'}}}')::json;
-		PERFORM gw_fct_graphanalytics_check_data(v_input);
-		SELECT count(*) INTO v_count2 FROM audit_check_data WHERE cur_user="current_user"() AND fid=211 AND criticity=3 AND result_id IS NOT NULL;
-
-	ELSE
-		IF v_class != 'DRAINZONE' THEN
-			IF (SELECT count(*) FROM config_graph_valve WHERE active is TRUE) < 1 THEN
-				DELETE FROM audit_check_data WHERE fid = 211 and cur_user = current_user;
-				INSERT INTO audit_check_data (error_message, fid, cur_user, criticity) VALUES ('ERROR: config_graph_valve table is not configured', 211, current_user, 3);
-				v_count1 = 1;
-			END IF;
-		END IF;
-	END IF;
-
-	v_count = coalesce(v_count1,0) + coalesce(v_count2,0);
-
-	-- check criticity of data in order to continue or not
-	IF v_count > 0 THEN
-		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND (fid=125 or fid=211) order by criticity desc, id asc) row;
-
-		v_result := COALESCE(v_result, '{}'); 
-		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-
-		-- Control nulls
-		v_result_info := COALESCE(v_result_info, '{}'); 
-		
-		--  Return
-		RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Mapzones dynamic analysis canceled. Data is not ready to work with"}, "version":"'||v_version||'"'||
-		',"body":{"form":{}, "data":{ "info":'||v_result_info||'}}}')::json;	
-
-	END IF;
-
-	*/ 
-
 	-- set fid:
 	IF v_class = 'PRESSZONE' THEN 
 		v_fid=146;
@@ -263,18 +205,76 @@ BEGIN
 		"data":{"message":"3090", "function":"2710","debug_msg":null, "is_process":true}}$$);'  INTO v_audit_result;
 	END IF;
 
+		
+	---create temp tables necessaries for quality check
+	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+	CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
+	CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
+	CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
+
+	-- data quality analysis
+	IF v_checkdata = 'FULL' THEN
+	
+		-- om data quality analysis
+		v_input = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{ "fid":',v_fid,',"parameters":{"selectionMode":"userSelectors"}}}')::json;
+		PERFORM gw_fct_om_check_data(v_input);
+		SELECT count(*) INTO v_count1 FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid AND criticity=3 AND result_id IS NOT NULL;
+
+		DELETE FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid AND error_message ='' AND criticity=1;
+
+		-- graph quality analysis
+		v_input = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{ "fid":',v_fid,',"selectionMode":"userSelectors", "graphClass":',quote_ident(v_class),'}}}')::json;
+		PERFORM gw_fct_graphanalytics_check_data(v_input);
+		SELECT count(*) INTO v_count2 FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid AND criticity=3 AND result_id IS NOT NULL;
+
+		DELETE FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid AND result_id IS NULL;
+
+	ELSIF v_checkdata = 'PARTIAL' THEN
+
+		-- graph quality analysis
+		v_input = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{ "fid":',v_fid,',"selectionMode":"userSelectors", "graphClass":',quote_ident(v_class),'}}}')::json;
+		PERFORM gw_fct_graphanalytics_check_data(v_input);
+		SELECT count(*) INTO v_count2 FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid AND criticity=3 AND result_id IS NOT NULL;
+
+	ELSE
+		IF v_class != 'DRAINZONE' THEN
+			IF (SELECT count(*) FROM config_graph_valve WHERE active is TRUE) < 1 THEN
+				DELETE FROM temp_audit_check_data WHERE fid = v_fid and cur_user = current_user;
+				INSERT INTO temp_audit_check_data (error_message, fid, cur_user, criticity) VALUES ('ERROR: config_graph_valve table is not configured', v_fid, current_user, 3);
+				v_count1 = 1;
+			END IF;
+		END IF;
+	END IF;
+
+	v_count = coalesce(v_count1,0) + coalesce(v_count2,0);
+
+	-- check criticity of data in order to continue or not
+	IF v_count > 0 THEN
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid AND criticity > 1 order by criticity desc, id asc) row;
+
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
+		-- Control nulls
+		v_result_info := COALESCE(v_result_info, '{}'); 
+		
+		--  Return
+		RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Mapzones dynamic analysis canceled. Data is not ready to work with"}, "version":"'||v_version||'"'||
+		',"body":{"form":{}, "data":{ "info":'||v_result_info||'}}}')::json;	
+
+	END IF;
+
+	
 	IF v_audit_result IS NOT NULL OR (SELECT (value::json->>(v_class))::boolean FROM config_param_system WHERE parameter='utils_graphanalytics_status') IS FALSE THEN
 			
 		INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 		VALUES (v_fid, 3, concat('ERROR-',v_fid,': Dynamic analysis for ',v_class,'''s is not configured on database. Please update system variable ''utils_graphanalytics_status'' to enable it '));
 	ELSE	
 		--create temporal tables
-		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+
 		CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_data (LIKE SCHEMA_NAME.temp_data INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_arc (LIKE SCHEMA_NAME.arc INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_node (LIKE SCHEMA_NAME.node INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_connec (LIKE SCHEMA_NAME.connec INCLUDING ALL);
