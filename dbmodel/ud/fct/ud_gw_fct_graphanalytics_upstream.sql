@@ -92,10 +92,6 @@ BEGIN
 	-- select config values
 	SELECT giswater, upper(project_type) INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
-	-- Reset values
-	DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
-	DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
-
 	CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
 
 	CREATE OR REPLACE TEMP VIEW v_temp_graphanalytics_upstream AS
@@ -136,7 +132,6 @@ BEGIN
 		SELECT gw_fct_json_object_set_key (p_data,'feature'::text, jsonb_build_object('id',json_agg(v_node))) INTO p_data;
 	END IF;
 
-		
 	-- fill the graph table
 	INSERT INTO temp_t_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
 	SELECT  arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
@@ -156,17 +151,6 @@ BEGIN
 		END LOOP;
 
 		RAISE NOTICE 'Finish engine....';
-
-
-		INSERT INTO anl_arc (arc_id, fid, arccat_id, expl_id, the_geom)
-		SELECT arc_id, v_fid, arc_type, expl_id, the_geom
-		FROM temp_t_anlgraph 
-		join arc using(arc_id)
-		where water=1;
-
-		INSERT INTO anl_node (node_id, nodecat_id,state, expl_id, fid, the_geom)
-		SELECT node_id, node_type, state, expl_id, v_fid, the_geom 
-		FROM v_edit_node WHERE node_id IN (SELECT  node_1 from temp_t_anlgraph where water=1 union SELECT  node_2 from temp_t_anlgraph where water=1);
 
 
 	-- info
@@ -234,6 +218,18 @@ BEGIN
 	v_status = 'Accepted';
 	v_level = 3;
 	v_message = 'Flow  analysis done succesfully';
+
+	-- Reset values
+	DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
+	DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
+
+	INSERT INTO anl_arc (arc_id, fid, arccat_id, expl_id, the_geom)
+	SELECT arc_id, v_fid, arc_type, expl_id, the_geom	FROM temp_t_anlgraph 
+	join arc using(arc_id) where water=1;
+
+	INSERT INTO anl_node (node_id, nodecat_id,state, expl_id, fid, the_geom)
+	SELECT node_id, node_type, state, expl_id, v_fid, the_geom 
+	FROM v_edit_node WHERE node_id IN (SELECT  node_1 from temp_t_anlgraph where water=1 union SELECT  node_2 from temp_t_anlgraph where water=1);
 
 	DROP VIEW v_temp_graphanalytics_upstream;
 	DROP TABLE temp_t_anlgraph;
