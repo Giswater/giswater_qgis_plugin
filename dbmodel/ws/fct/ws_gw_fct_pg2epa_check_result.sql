@@ -563,6 +563,8 @@ BEGIN
 		      SELECT node_id, fid, 'ERROR-415: Connec AS JUNCTION without pjoint', the_geom FROM temp_anl_node WHERE cur_user="current_user"() AND fid = 415
 			UNION
 		      SELECT node_id, fid, 'ERROR-432: Node ''T candidate'' with wrong topology', the_geom FROM temp_anl_node WHERE cur_user="current_user"() AND fid = 432
+			UNION
+		      SELECT node_id, fid, 'ERROR-166: Node2arc with more than two arcs', the_geom FROM temp_anl_node WHERE cur_user="current_user"() AND fid = 166
 		      ) row
 		      ) features;
 
@@ -591,6 +593,8 @@ BEGIN
 			WHERE cur_user="current_user"() AND fid =232
 			UNION
 			SELECT arc_id as id, fid, 'ERROR-396: Link over nodarc'::text as descript, the_geom FROM temp_anl_arc WHERE cur_user="current_user"() AND fid=396
+			UNION
+			SELECT arc_id as id, fid, 'ERROR-454: Arc with state=1 and without node_1 or node_2'::text as descript, the_geom FROM temp_anl_arc WHERE cur_user="current_user"() AND fid=454
 		     ) row) features;
 
 		v_result := COALESCE(v_result, '{}'); 
