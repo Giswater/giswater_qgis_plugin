@@ -17,7 +17,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":101}}
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data('{"parameters":{}}')-- when is called from toolbox
 
 -- fid: main: 225
-		other: 107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,293,294,295,371,379,433,411,412,430,432,480
+		other: 107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,294,295,371,379,433,411,412,430,432,480
 
 */
 
@@ -56,28 +56,29 @@ BEGIN
 
 	-- init variables
 	v_count=0;
-	IF v_fid is null THEN
-		v_fid = 225;
+	IF v_fid is null THEN v_fid = 225; END IF;
+
+	IF v_fid IN (101,225) THEN
+		--create temp tables
+		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
+		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+
+		-- Header
+		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  4, 'CHECK GIS DATA QUALITY ACORDING EPA RULES');
+		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  4, '----------------------------------------------------------');
+
+		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, 'CRITICAL ERRORS');
+		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, '----------------------');
+
+		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  2, 'WARNINGS');
+		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  2, '--------------');
+			
+		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, 'INFO');
+		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, '-------');
 	END IF;
 
-	--create temp tables
-	CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
-	CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-	CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
-	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
-
-	-- Header
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  4, 'CHECK GIS DATA QUALITY ACORDING EPA RULES');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  4, '----------------------------------------------------------');
-
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, 'CRITICAL ERRORS');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, '----------------------');
-
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  2, 'WARNINGS');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  2, '--------------');
-		
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, 'INFO');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, '-------');
 	
 	RAISE NOTICE '1 - Check orphan nodes (fid:  107)';
 	v_querytext = '(SELECT node_id, nodecat_id, the_geom, expl_id FROM 
@@ -176,30 +177,59 @@ BEGIN
 	END IF;
 	
 
-	RAISE NOTICE '9 - Mandatory node2arcs with less than two arcs (fid: 167)';
+	RAISE NOTICE '9.1 - Mandatory node2arc with less than two arcs (fid: 167)';
 	INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
 	SELECT 167, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with less than two arcs', a.expl_id FROM (
 		SELECT node_id, nodecat_id, v_edit_node.the_geom, v_edit_node.expl_id FROM v_edit_node
 		JOIN selector_sector USING (sector_id) 
 		JOIN v_edit_arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
-		AND v_edit_node.epa_type IN ('VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user)
+		AND v_edit_node.epa_type IN ('VALVE', 'PUMP') AND a1.sector_id IN 
+		(SELECT sector_id FROM selector_sector WHERE cur_user=current_user)
 		UNION ALL
 		SELECT node_id, nodecat_id, v_edit_node.the_geom, v_edit_node.expl_id FROM v_edit_node
 		JOIN selector_sector USING (sector_id) 
 		JOIN v_edit_arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
-		AND v_edit_node.epa_type IN ('VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user))a
+		AND v_edit_node.epa_type IN ('VALVE', 'PUMP') AND a1.sector_id IN 
+		(SELECT sector_id FROM selector_sector WHERE cur_user=current_user))a
 	GROUP by node_id, nodecat_id, the_geom, expl_id
 	HAVING count(*) < 2;
 
 
-	SELECT count(*) INTO v_count FROM temp_anl_node WHERE fid = 167 AND cur_user=current_user;
+	SELECT count(*) INTO v_count FROM temp_anl_node WHERE fid = 167;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '167', 2, concat('WARNING-167 (temp_anl_node): There is/are ',
-		v_count,' node2arc(s) with less than two arcs. All of them have been transformed to nodarc using only arc joined. For more info you can type: '),v_count);
+		VALUES (v_fid, '167', 3, concat('ERROR-167 (temp_anl_node): There is/are ',
+		v_count,' Mandatory node2arc(s) with less than two arcs.'),v_count);
 	ELSE 
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '167', 1 ,'INFO: No results found looking for node2arc(s) with less than two arcs.', v_count);
+		VALUES (v_fid, '167', 1 ,'INFO: No results found for mandatory node2arc(s) with less than two arcs.', v_count);
+	END IF;
+
+	RAISE NOTICE '9.2 - Non-Mandatory node2arc with less than two arcs (fid: 292)';
+	INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
+	SELECT 292, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with less than two arcs', a.expl_id FROM (
+		SELECT node_id, nodecat_id, v_edit_node.the_geom, v_edit_node.expl_id FROM v_edit_node
+		JOIN selector_sector USING (sector_id) 
+		JOIN v_edit_arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
+		AND v_edit_node.epa_type IN ('SHORTPIPE') AND a1.sector_id IN 
+		(SELECT sector_id FROM selector_sector WHERE cur_user=current_user)
+		UNION ALL
+		SELECT node_id, nodecat_id, v_edit_node.the_geom, v_edit_node.expl_id FROM v_edit_node
+		JOIN selector_sector USING (sector_id) 
+		JOIN v_edit_arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
+		AND v_edit_node.epa_type IN ('SHORTPIPE') AND a1.sector_id IN 
+		(SELECT sector_id FROM selector_sector WHERE cur_user=current_user))a
+	GROUP by node_id, nodecat_id, the_geom, expl_id
+	HAVING count(*) < 2;
+
+	SELECT count(*) INTO v_count FROM temp_anl_node WHERE fid = 292;
+	IF v_count > 0 THEN
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '292', 2, concat('WARNING-292 (temp_anl_node): There is/are ',
+		v_count,' NON-mandatory node2arc(s) with less than two arcs. It will be transformed on the fly using only one arc'),v_count);
+	ELSE 
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '292', 1 ,'INFO: No results found for NON-mandatory node2arc(s) with less than two arcs.', v_count);
 	END IF;
 
 	
@@ -591,7 +621,7 @@ BEGIN
 		VALUES (v_fid, '198' , 1, 'INFO: Tanks checked. No mandatory values missed.',v_count);
 	END IF;	
 
-	RAISE NOTICE '20.2 - Inlets with null mandatory values(fid: 153)';
+	RAISE NOTICE '21 - Inlets with null mandatory values(fid: 153)';
 	INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, descript, sector_id)
 	SELECT 153, a.node_id, nodecat_id, the_geom, 'Inlet with null mandatory values', sector_id FROM v_edit_inp_inlet a
 	WHERE (initlevel IS NULL) OR (minlevel IS NULL) OR (maxlevel IS NULL) OR (diameter IS NULL) OR (minvol IS NULL);
@@ -607,59 +637,8 @@ BEGIN
 		VALUES (v_fid, '153' , 1, 'INFO: Inlets checked. No mandatory values missed.',v_count);
 	END IF;		
 
-	RAISE NOTICE '21 - pumps with more than two arcs (292)';
-	INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
-	select 292, b.node_id, nodecat_id, the_geom, 'EPA pump with more than two arcs', expl_id
-	FROM(
-	SELECT node_id, count(*) FROM(
-	SELECT node_id FROM arc JOIN v_edit_inp_pump ON node_1 = node_id 
-	WHERE arc.state=1
-	UNION ALL
-	SELECT node_id FROM arc JOIN v_edit_inp_pump ON node_2 = node_id
-	WHERE arc.state=1) a
-	JOIN node USING (node_id)
-	GROUP BY node_id
-	HAVING count(*)>2)b
-	JOIN node USING (node_id);
 	
-	SELECT count(*) FROM temp_anl_node INTO v_count WHERE fid=292 AND cur_user=current_user;
-	IF v_count > 0 THEN
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '292', 3, concat(
-		'ERROR-292 (temp_anl_node): There is/are ',v_count,' pumps(s) with more than two arcs .Take a look on temporal table to details'),v_count);
-		v_count=0;
-	ELSE
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '292' , 1,  'INFO: EPA pumps checked. No pumps with more than two arcs detected.',v_count);
-	END IF;		
-
-
-	RAISE NOTICE '22 - valves with more than two arcs (293)';
-	INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
-	select 293, b.node_id, nodecat_id, the_geom, 'EPA valve with more than two arcs', expl_id
-	FROM(
-	SELECT node_id, count(*) FROM(
-	SELECT node_id FROM arc JOIN v_edit_inp_valve ON node_1 = node_id and arc.state = 1 
-	UNION ALL
-	SELECT node_id FROM arc JOIN v_edit_inp_valve ON node_2 = node_id and arc.state = 1) a
-	GROUP BY node_id
-	HAVING count(*)>2)b
-	JOIN node USING (node_id)
-	WHERE node.state > 0;
-	
-	SELECT count(*) FROM temp_anl_node INTO v_count WHERE fid=293 AND cur_user=current_user;
-	IF v_count > 0 THEN
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '293', 3, concat(
-		'ERROR-293 (temp_anl_node): There is/are ',v_count,' valve(s) with more than two arcs .Take a look on temporal table to details'),v_count);
-		v_count=0;
-	ELSE
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message,fcount)
-		VALUES (v_fid, '293' , 1, 'INFO: EPA valves checked. No valves with more than two arcs detected.',v_count);
-	END IF;	
-
-	
-	RAISE NOTICE '23 - Inconsistency on inp node tables (294)';
+	RAISE NOTICE '22 - Inconsistency on inp node tables (294)';
 	INSERT INTO temp_anl_node (fid, node_id, nodecat_id, descript, the_geom, sector_id)
 		SELECT 294, n.node_id, n.nodecat_id, concat(epa_type, ' using inp_junction table') AS epa_table, n.the_geom, n.sector_id FROM v_edit_inp_junction JOIN node n USING (node_id) WHERE epa_type !='JUNCTION'
 		UNION
@@ -685,7 +664,7 @@ BEGIN
 		VALUES (v_fid, '294' , 1, 'INFO: Epa type for node features checked. No inconsistencies aganints epa table found.', v_count);
 	END IF;	
 
-	RAISE NOTICE '24 - Inconsistency on inp arc tables (295)';
+	RAISE NOTICE '23 - Inconsistency on inp arc tables (295)';
 	INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id)
 		SELECT 295, a.arc_id, a.arccat_id, concat(epa_type, ' using inp_pipe table') AS epa_table, a.the_geom, a.sector_id FROM v_edit_inp_virtualvalve JOIN arc a USING (arc_id) WHERE epa_type !='VIRTUAL'
 		UNION
@@ -918,13 +897,12 @@ BEGIN
 		DELETE FROM temp_audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user AND fid = v_fid;
 	END LOOP;
 
-	
-	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '');
-	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '');
-	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, '');
-	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, ''); 
-
 	IF v_fid = 225 THEN
+
+		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '');
+		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '');
+		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, '');
+		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, ''); 
 		
 		DELETE FROM anl_arc WHERE fid =225 AND cur_user=current_user;
 		DELETE FROM anl_node WHERE fid =225 AND cur_user=current_user;
@@ -937,6 +915,7 @@ BEGIN
 		INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
 
 	ELSIF  v_fid = 101 THEN 
+	
 		UPDATE temp_audit_check_data SET fid = 225;
 		UPDATE temp_anl_arc SET fid = 225;
 		UPDATE temp_anl_node SET fid = 225;
@@ -946,7 +925,6 @@ BEGIN
 		INSERT INTO project_temp_anl_node SELECT * FROM temp_anl_node;
 		INSERT INTO project_temp_anl_connec SELECT * FROM temp_anl_connec;
 		INSERT INTO project_temp_audit_check_data SELECT * FROM temp_audit_check_data;
-
 	END IF;
 
 	-- get results
@@ -969,7 +947,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-	FROM temp_anl_node WHERE cur_user="current_user"() AND fid IN (107, 164, 165, 166, 167, 170, 171, 187, 198, 292, 293, 294, 379, 411, 412, 432)) row) features;
+	FROM temp_anl_node WHERE cur_user="current_user"() AND fid IN (107, 164, 165, 166, 167, 170, 171, 187, 198, 294, 379, 411, 412, 432)) row) features;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point",  "features":',v_result, '}'); 
 
@@ -988,17 +966,20 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString",  "features":',v_result,'}'); 
 
+	--drop temporal tables
+	IF v_fid IN (101,225) THEN
+
+		DROP TABLE IF EXISTS temp_anl_arc;
+		DROP TABLE IF EXISTS temp_anl_node ;
+		DROP TABLE IF EXISTS temp_anl_connec;
+		DROP TABLE IF EXISTS temp_audit_check_data;
+	END IF;
+
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
-
-	--drop temporal tables
-	DROP TABLE IF EXISTS temp_anl_arc;
-	DROP TABLE IF EXISTS temp_anl_node ;
-	DROP TABLE IF EXISTS temp_anl_connec;
-	DROP TABLE IF EXISTS temp_audit_check_data;
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||

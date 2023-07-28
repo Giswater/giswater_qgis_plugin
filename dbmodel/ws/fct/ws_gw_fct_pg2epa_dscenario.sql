@@ -167,15 +167,12 @@ BEGIN
 		UPDATE temp_t_arc t SET status = d.status FROM v_edit_inp_dscenario_pipe d 
 		WHERE substring (t.arc_id, 0, (case when position ('P' in t.arc_id) in (0) then 99 else position ('P' in t.arc_id) end)) = d.arc_id 		
 		AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.status IS NOT NULL;
-		
 		UPDATE temp_t_arc t SET minorloss = d.minorloss FROM v_edit_inp_dscenario_pipe d 
 		WHERE substring (t.arc_id, 0, (case when position ('P' in t.arc_id) in (0) then 99 else position ('P' in t.arc_id) end)) = d.arc_id
 		AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.minorloss IS NOT NULL;
-
 		UPDATE temp_t_arc t SET diameter = d.dint FROM v_edit_inp_dscenario_pipe d 
 		WHERE substring (t.arc_id, 0, (case when position ('P' in t.arc_id) in (0) then 99 else position ('P' in t.arc_id) end)) = d.arc_id 
 		AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.dint IS NOT NULL;
-
 		UPDATE temp_t_arc t SET roughness = d.roughness FROM v_edit_inp_dscenario_pipe d 
 		WHERE substring (t.arc_id, 0, (case when position ('P' in t.arc_id) in (0) then 99 else position ('P' in t.arc_id) end)) = d.arc_id 
 		AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.roughness IS NOT NULL;

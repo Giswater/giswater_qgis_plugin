@@ -334,7 +334,8 @@ BEGIN
 			SELECT node_2 FROM temp_t_anlgraph JOIN (SELECT arc_id FROM temp_anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
 			)
 			a USING (node_id);
-			-- insert into result table dry nodes with demands (error)
+
+		-- insert into result table dry nodes with demands (error)
 		INSERT INTO temp_anl_node (fid, node_id, the_geom, descript, demand)
 		SELECT distinct on (node_id) 233, n.node_id, n.the_geom, concat('Dry node with demand'), demand FROM temp_t_node n
 			JOIN

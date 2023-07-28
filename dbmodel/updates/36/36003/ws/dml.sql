@@ -399,3 +399,6 @@ UPDATE config_form_list
 UPDATE config_form_list
 	SET query_text='SELECT dscenario_id, arc_id, power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id FROM v_edit_inp_dscenario_virtualpump WHERE arc_id IS NOT NULL'
 	WHERE listname='tbl_inp_virtualpump';
+
+UPDATE sys_fprocess SET fprocess_name = 'Non-mandatory nodarc with less than two arcs' WHERE fid = 292;
+DELETE FROM sys_fprocess WHERE fid = 293;

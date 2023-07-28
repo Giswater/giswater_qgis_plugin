@@ -565,6 +565,9 @@ BEGIN
 		      SELECT node_id, fid, 'ERROR-432: Node ''T candidate'' with wrong topology', the_geom FROM temp_anl_node WHERE cur_user="current_user"() AND fid = 432
 			UNION
 		      SELECT node_id, fid, 'ERROR-166: Node2arc with more than two arcs', the_geom FROM temp_anl_node WHERE cur_user="current_user"() AND fid = 166
+		    UNION
+		      SELECT node_id, fid, 'ERROR-167: Mandatory Node2arc with less than two arcs', the_geom FROM temp_anl_node WHERE cur_user="current_user"() AND fid = 167
+		
 		      ) row
 		      ) features;
 

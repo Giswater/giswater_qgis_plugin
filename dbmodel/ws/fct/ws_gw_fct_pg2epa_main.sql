@@ -203,11 +203,15 @@ BEGIN
 		RAISE NOTICE '4.1 - Fill temp tables';
 		PERFORM gw_fct_pg2epa_fill_data(v_result);
 
-		RAISE NOTICE '4.2 - Call gw_fct_pg2epa_nod2arc function';
-		PERFORM gw_fct_pg2epa_nod2arc(v_result, v_onlymandatory_nodarc, false);
+		SELECT count(*) INTO v_count FROM temp_anl_node WHERE fid IN (166,167);
+		IF v_count = 0 THEN
+		
+			RAISE NOTICE '4.2 - Call gw_fct_pg2epa_nod2arc function';
+			PERFORM gw_fct_pg2epa_nod2arc(v_result, v_onlymandatory_nodarc, false);
 
-		RAISE NOTICE '4.3 - Call gw_fct_pg2epa_doublenod2arc';
-		PERFORM gw_fct_pg2epa_nod2arc_double(v_result);
+			RAISE NOTICE '4.3 - Call gw_fct_pg2epa_doublenod2arc';
+			PERFORM gw_fct_pg2epa_nod2arc_double(v_result);
+		END IF;
 				
 		RAISE NOTICE '4.4 - Call gw_fct_pg2epa_pump_additional function';
 		PERFORM gw_fct_pg2epa_pump_additional(v_result);
