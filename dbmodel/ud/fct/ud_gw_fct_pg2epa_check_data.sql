@@ -60,21 +60,14 @@ BEGIN
 
 	-- init variables
 	v_count=0;
-	IF v_fid is null THEN
-		v_fid = 255;
-	END IF;	
+	IF v_fid is null THEN v_fid = 255; END IF;	
 
-	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fid=255 AND cur_user=current_user;
-	DELETE FROM anl_arc WHERE fid IN (284, 295, 427) AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fid IN (106, 107, 111, 113, 164, 294, 379) AND cur_user=current_user;
-
-	--create temp tables
-	IF v_fid = 255 THEN
+	IF v_fid IN (101,225) THEN
+		--create temp tables
 		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
 		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
 		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
-
+		
 		-- Header
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('DATA QUALITY ANALYSIS ACORDING EPA RULES'));
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, '-----------------------------------------------------------');
@@ -87,7 +80,7 @@ BEGIN
 
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, 'INFO');
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, '-------');
-
+		
 	END IF;
 			
 	RAISE NOTICE '1 - Check orphan nodes (fid:  107)';
@@ -641,17 +634,16 @@ BEGIN
 		DELETE FROM temp_audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user;
 	END LOOP;
 
-	IF v_fid = 225 THEN
+	-- insert spacers for log
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '');
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '');
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, '');
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, ''); 
 
-		-- insert spacers for log
-		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '');
-		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '');
-		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, '');
-		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, ''); 
+	IF v_fid = 225 THEN
 			
 		DELETE FROM anl_arc WHERE fid =225 AND cur_user=current_user;
 		DELETE FROM anl_node WHERE fid =225 AND cur_user=current_user;
-		DELETE FROM anl_connec WHERE fid =225 AND cur_user=current_user;
 		DELETE FROM audit_check_data WHERE fid =225 AND cur_user=current_user;
 
 		INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
@@ -669,10 +661,7 @@ BEGIN
 		INSERT INTO project_temp_anl_node SELECT * FROM temp_anl_node;
 		INSERT INTO project_temp_anl_connec SELECT * FROM temp_anl_connec;
 		INSERT INTO project_temp_audit_check_data SELECT * FROM temp_audit_check_data;
-
 	END IF;
-
-
 
 	-- get results
 	-- info
@@ -723,7 +712,7 @@ BEGIN
 	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
 
 	--drop temp tables 
-	IF v_fid = 255 THEN
+	IF v_fid IN (101,225) THEN
 		DROP TABLE IF EXISTS temp_anl_arc;
 		DROP TABLE IF EXISTS temp_anl_node ;
 		DROP TABLE IF EXISTS temp_audit_check_data;
