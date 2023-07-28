@@ -3352,6 +3352,7 @@ def add_row_epa(tbl, tablename, pkey, **kwargs):
     tools_qt.set_widget_text(info.add_dlg, 'tab_none_feature_id', feature_id)
     layout = info.add_dlg.findChild(QGridLayout, 'lyt_main_1')
     tools_qt.set_selected_item(info.add_dlg, 'tab_none_feature_type', f"{info.feature_type.upper()}")
+    tools_qt.set_widget_enabled(info.add_dlg, 'tab_none_feature_type', False)
 
     # Get every widget in the layout
     widgets = []
