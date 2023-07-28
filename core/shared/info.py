@@ -3475,16 +3475,6 @@ def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result)
         QgsProject.instance().blockSignals(False)
         return False
 
-    sql = (f"SELECT node_id FROM  {tablename} WHERE node_id = '{feature_id}'" )
-    for filter in list_filter:
-        if filter[0] == 'order_id':
-            sql += f" AND {filter[0]} = {filter[1]}"
-    result = tools_db.get_row(sql)
-    if result is not None:
-        msg = "Record already exists for this node_id, order_id. It is not possible to repeat"
-        tools_qgis.show_warning(msg, dialog=dialog)
-        return False
-
     fields = json.dumps(my_json)
     id_val = ""
     if pkey:
@@ -3500,7 +3490,7 @@ def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result)
 
     feature = f'"id":"{id_val}", '
     feature += f'"tableName":"{tablename}"'
-    extras = f'"fields":{fields}'
+    extras = f'"fields":{fields}, "force_action":"INSERT"'
     body = tools_gw.create_body(feature=feature, extras=extras)
     json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
     if json_result and json_result.get('status') == 'Accepted':
@@ -3553,7 +3543,7 @@ def save_tbl_changes(complet_list, info, dialog):
 
         feature = f'"id":"{k}", '
         feature += f'"tableName":"{view}"'
-        extras = f'"fields":{fields}'
+        extras = f'"fields":{fields}, "force_action":"UPDATE"'
         body = tools_gw.create_body(feature=feature, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
         if json_result and json_result.get('status') == 'Accepted':
