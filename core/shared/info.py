@@ -3306,7 +3306,7 @@ def open_epa_dlg(**kwargs):
             btn_add_base = info.dlg.findChild(QPushButton, 'btn_add_base')
             if btn_add_base:
                 tools_gw.add_icon(btn_add_base, '111b', "24x24")
-                btn_add_base.clicked.connect(partial(add_row_epa, tbl, add_view, pk, info.dlg, **kwargs))
+                btn_add_base.clicked.connect(partial(add_row_epa, tbl, view, add_view, pk, info.dlg, **kwargs))
             btn_delete_base = info.dlg.findChild(QPushButton, 'btn_delete_base')
             if btn_delete_base:
                 tools_gw.add_icon(btn_delete_base, '112b', "24x24")
@@ -3315,7 +3315,7 @@ def open_epa_dlg(**kwargs):
             btn_add_dscenario = info.dlg.findChild(QPushButton, 'btn_add_dscenario')
             if btn_add_dscenario:
                 tools_gw.add_icon(btn_add_dscenario, '111b', "24x24")
-                btn_add_dscenario.clicked.connect(partial(add_row_epa, tbl, add_view, pk, info.dlg, **kwargs))
+                btn_add_dscenario.clicked.connect(partial(add_row_epa, tbl, view, add_view, pk, info.dlg, **kwargs))
             btn_delete_dscenario = info.dlg.findChild(QPushButton, 'btn_delete_dscenario')
             if btn_delete_dscenario:
                 tools_gw.add_icon(btn_delete_dscenario, '112b', "24x24")
@@ -3327,11 +3327,17 @@ def open_epa_dlg(**kwargs):
     tools_gw.open_dialog(info.dlg, dlg_name=ui_name)
 
 
-def add_row_epa(tbl, tablename, pkey, dlg, **kwargs):
+def add_row_epa(tbl, view, tablename, pkey, dlg, **kwargs):
+
     # Get variables
     complet_result = kwargs['complet_result']
     info = kwargs['class']
-
+    my_json = getattr(info, f"my_json_{view}")
+    if my_json:
+        message = "You are trying to add/remove a record from the table, with changes to the current records. If you continue, the changes will be discarded without saving. Do you want to continue?"
+        answer = tools_qt.show_question(message, "Info Message", force_action=True)
+        if not answer:
+            return
     feature_id = complet_result['body']['feature']['id']
     id_name = complet_result['body']['feature']['idName']
 
@@ -3410,10 +3416,17 @@ def refresh_epa_tbl(tblview, dlg, **kwargs):
         fill_tbl(complet_list, tbl, info, view)
 
 
-def delete_tbl_row(tbl, tablename, pkey, dlg, **kwargs):
+def delete_tbl_row(tbl, view, pkey, dlg, **kwargs):
     # Get variables
     complet_result = kwargs['complet_result']
     info = kwargs['class']
+
+    my_json = getattr(info, f"my_json_{view}")
+    if my_json:
+        message = "You are trying to add/remove a record from the table, with changes to the current records. If you continue, the changes will be discarded without saving. Do you want to continue?"
+        answer = tools_qt.show_question(message, "Info Message", force_action=True)
+        if not answer:
+            return
 
     # Get selected row
     selected_list = tbl.selectionModel().selectedRows()
@@ -3446,9 +3459,10 @@ def delete_tbl_row(tbl, tablename, pkey, dlg, **kwargs):
                 condition = f"{key} = '{val}'"
                 conditions.append(condition)
             condition_str = " AND ".join(conditions)
-            sql = f"DELETE FROM {tablename} WHERE {condition_str}"
+            sql = f"DELETE FROM {view} WHERE {condition_str}"
             tools_db.execute_sql(sql)
-
+            info.dlg.btn_accept.setEnabled(True)
+            info.inserted_feature = True
         # Refresh tableview
         refresh_epa_tbl(tbl, dlg, **kwargs)
 
