@@ -50,7 +50,7 @@ TO CHECK PROBLEMS, RUN MODE DEBUG
 ---------------------------------
 
 1) CONTEXT 
-SET search_path='SCHEMA_NAME', public;
+SET search_path='ws', public;
 UPDATE arc SET dma_id=0 where expl_id IN (1,2)
 
 
