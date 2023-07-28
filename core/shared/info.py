@@ -109,6 +109,7 @@ class GwInfo(QObject):
             self.tab_type = tab_type
             self.visible_tabs = []
             self.epa_complet_result = None
+            self.inserted_feature = False
 
             # Get project variables
             qgis_project_add_schema = lib_vars.project_vars['add_schema']
@@ -3378,7 +3379,7 @@ def add_row_epa(tbl, tablename, pkey, dlg, **kwargs):
     info.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, info.add_dlg))
     info.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, info.add_dlg))
     info.add_dlg.dlg_closed.connect(partial(refresh_epa_tbl, tbl, dlg, **kwargs))
-    info.add_dlg.btn_accept.clicked.connect(partial(accept_add_dlg, info.add_dlg, tablename, pkey, feature_id, info.my_json_add, result))
+    info.add_dlg.btn_accept.clicked.connect(partial(accept_add_dlg, info.add_dlg, tablename, pkey, feature_id, info.my_json_add, result, info))
 
     # Open dlg
     tools_gw.open_dialog(info.add_dlg, dlg_name='info_generic')
@@ -3452,7 +3453,7 @@ def delete_tbl_row(tbl, tablename, pkey, dlg, **kwargs):
         refresh_epa_tbl(tbl, dlg, **kwargs)
 
 
-def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result):
+def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result, info):
 
     if not my_json:
         return
@@ -3499,7 +3500,10 @@ def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result)
     json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
     if json_result and json_result.get('status') == 'Accepted':
         tools_gw.close_dialog(dialog)
+        info.dlg.btn_accept.setEnabled(True)
+        info.inserted_feature = True
         return
+
     tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
 
 
@@ -3539,7 +3543,11 @@ def save_tbl_changes(complet_list, info, dialog):
     my_json = getattr(info, f"my_json_{view}")
     list_rows = []
     status = True
-    if not my_json:
+    if info.inserted_feature and not my_json:
+        info.inserted_feature = False
+        tools_gw.close_dialog(dialog)
+        return
+    elif not my_json:
         return
 
     # For each edited row
