@@ -87,8 +87,9 @@ v_expl_query text;
 v_psectors_query_arc text;
 v_psectors_query_node text;
 v_psectors_query_connec text;
+v_psectors_query_link text;
 v_loop record;
-
+v_visible_layer text= 'v_edit_minsector';
 BEGIN
 
 	-- Search path
@@ -111,19 +112,21 @@ BEGIN
 	v_fid=134;
 	v_featuretype='arc';
 
+	--create temp table for quality check
+	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 
 	-- data quality analysis
 	IF v_checkdata THEN
-		v_input = '{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
+		v_input = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"fid":',v_fid,'selectionMode":"userSelectors"}}}')::json;
 		PERFORM gw_fct_om_check_data(v_input);
-		SELECT count(*) INTO v_count FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 AND criticity=3;
+		SELECT count(*) INTO v_count FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid AND criticity=3;
 	END IF;
 
 	-- check criticity of data in order to continue or not
 	IF v_count > 3 THEN
 	
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 order by criticity desc, id asc) row;
+		FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by criticity desc, id asc) row;
 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
@@ -137,8 +140,13 @@ BEGIN
 	END IF;
  
 	-- reset graph & audit_log tables
-	DELETE FROM audit_log_data WHERE fid=v_fid AND cur_user=current_user;
-	DELETE FROM audit_check_data WHERE fid=134 AND cur_user=current_user;
+	DELETE FROM temp_audit_check_data WHERE fid=134 AND cur_user=current_user;
+
+	CREATE TEMP TABLE temp_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
+	CREATE TEMP TABLE temp_t_node (LIKE SCHEMA_NAME.node INCLUDING ALL);
+	CREATE TEMP TABLE temp_t_connec (LIKE SCHEMA_NAME.connec INCLUDING ALL);
+	CREATE TEMP TABLE temp_t_link (LIKE SCHEMA_NAME.link INCLUDING ALL);
+	CREATE TEMP TABLE temp_t_arc (LIKE SCHEMA_NAME.arc INCLUDING ALL);
 
 	CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
 	CREATE TEMP TABLE IF NOT EXISTS temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
@@ -166,12 +174,12 @@ BEGIN
 		  WHERE temp_t_anlgraph.flag < 2 AND temp_t_anlgraph.water = 0 AND a2.flag < 2;
 
 	-- Starting process
-	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('MINSECTOR DYNAMIC SECTORITZATION'));
-	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('---------------------------------------------------'));
+	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('MINSECTOR DYNAMIC SECTORITZATION'));
+	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('---------------------------------------------------'));
 
 	SELECT count(*) INTO v_count FROM cat_feature_node WHERE graph_delimiter IS NULL;
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, criticity, error_message)
+		INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 		VALUES (v_fid, 3, concat('ERROR-',v_fid,': There are null values on cat_feature_node.graphdelimiter. Please fill it before continue'));
 	ELSE
 		-- reset exploitation
@@ -180,7 +188,7 @@ BEGIN
 			IF substring(v_expl::text,0,2)='[' THEN
 				v_expl_query = ' a.expl_id = ANY(ARRAY'||v_expl||')';
 			ELSE
-				INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid,
+				INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid,
 				concat('ERROR-',v_fid,': Please insert exploitation id''s as tooltip shows, using []'));
 				DELETE FROM selector_expl WHERE cur_user=current_user;  
 				v_returnerror = true;
@@ -194,7 +202,7 @@ BEGIN
 			IF substring(v_sector::text,0,2)='[' THEN
 				v_sector_query = ' AND a.sector_id = ANY(ARRAY'||v_sector||')';
 			ELSE
-				INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid,
+				INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid,
 				concat('ERROR-',v_fid,': Please insert sector id''s as tooltip shows, using []'));
 				v_returnerror = true;
 				 --dissabling all:
@@ -207,32 +215,39 @@ BEGIN
 
 		IF v_usepsectors THEN
 			SELECT count(*) INTO v_count FROM selector_psector WHERE cur_user = current_user;
-			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid,
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid,
 			concat('INFO: Plan psector strategy is enabled. The number of psectors used on this analysis is ', v_count));
 			v_psectors_query_arc = ' AND a.arc_id NOT IN (SELECT arc_id FROM v_plan_psector_arc WHERE plan_state = 0) OR a.arc_id IN (SELECT arc_id FROM v_plan_psector_arc WHERE plan_state = 1)';
 			v_psectors_query_node = 'AND a.node_id NOT IN (SELECT node_id FROM v_plan_psector_node WHERE plan_state = 0) OR a.node_id IN (SELECT node_id FROM v_plan_psector_node WHERE plan_state = 1)';
 			v_psectors_query_connec = 'AND a.connec_id NOT IN (SELECT connec_id FROM v_plan_psector_connec WHERE plan_state = 0) OR a.connec_id IN (SELECT connec_id FROM v_plan_psector_connec WHERE plan_state = 1)';
+			v_psectors_query_link = 'AND a.feature_id NOT IN (SELECT connec_id FROM v_plan_psector_connec WHERE plan_state = 0) OR a.feature_id IN (SELECT connec_id FROM v_plan_psector_connec WHERE plan_state = 1)';
 		ELSIF v_usepsectors IS FALSE AND v_returnerror IS FALSE THEN
-			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid,
+			INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid,
 			concat('INFO: All psectors have been disabled to execute this analysis'));
 			v_psectors_query_arc='';
 			v_psectors_query_node='';
 			v_psectors_query_connec='';
+			v_psectors_query_link='';
 		END IF;
 			raise notice 'v_psectors_query_arc,%',v_psectors_query_arc;
+
+		EXECUTE 'INSERT INTO temp_t_arc SELECT * FROM arc a WHERE state=1 AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||';';
+		EXECUTE 'INSERT INTO temp_t_node SELECT * FROM node a WHERE state=1 AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||';';
+		EXECUTE 'INSERT INTO temp_t_connec SELECT * FROM connec  a WHERE state=1 AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_connec||';';
+		EXECUTE 'INSERT INTO temp_t_link SELECT * FROM link a  WHERE state=1 AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_link||';';
 			
 		-- create graph
 		EXECUTE 'INSERT INTO temp_t_anlgraph ( arc_id, node_1, node_2, water, flag, checkf, trace )
-		SELECT  arc_id, node_1, node_2, 0, 0, 0, 0 FROM arc a
+		SELECT  arc_id, node_1, node_2, 0, 0, 0, 0 FROM temp_t_arc a
 		WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND state=1 AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||'
 		UNION
-		SELECT  arc_id, node_2, node_1, 0, 0, 0, 0 FROM arc a
+		SELECT  arc_id, node_2, node_1, 0, 0, 0, 0 FROM temp_t_arc a
 		WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND state=1  AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||';';
 			
 		-- set the starting element
 		v_querytext = 'UPDATE temp_t_anlgraph SET flag=1, water=1, checkf=1, trace=a.arc_id::integer 
-				FROM (SELECT a.arc_id FROM arc a JOIN vu_node ON node_1 = node_id WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter =''MINSECTOR'')
-				UNION SELECT a.arc_id FROM arc a JOIN vu_node ON node_2 = node_id WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter =''MINSECTOR''))a
+				FROM (SELECT a.arc_id FROM temp_t_arc a JOIN vu_node ON node_1 = node_id WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter =''MINSECTOR'')
+				UNION SELECT a.arc_id FROM temp_t_arc a JOIN vu_node ON node_2 = node_id WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter =''MINSECTOR''))a
 					                                            WHERE temp_t_anlgraph.arc_id = a.arc_id';
 		EXECUTE v_querytext;
 
@@ -247,7 +262,7 @@ BEGIN
 			EXIT WHEN v_cont1 = 30;
 		END LOOP;
 
-		-- fusioning parts of each minsectors in one unique minsector 
+		-- fusioning parts of each temp_minsectors in one unique temp_minsector 
 		create temp view v_t_process as 
 		SELECT * FROM 
 		(
@@ -284,105 +299,92 @@ BEGIN
 		SELECT DISTINCT ON (arc_id) 134, arccat_id, a.arc_id, the_geom, trace::text
 		FROM (SELECT arc_id, max(water) as water, trace FROM temp_t_anlgraph WHERE water=1 GROUP by arc_id, trace) a JOIN arc b ON a.arc_id=b.arc_id;		
 
-		IF v_updatefeature THEN 
 		
-			-- due URN concept whe can update massively feature from anl_node without check if is arc/node/connec.....
-			UPDATE arc SET minsector_id = a.descript::integer FROM temp_anl_arc a WHERE fid=134 AND a.arc_id=arc.arc_id;
+		-- due URN concept whe can update massively feature from anl_node without check if is arc/node/connec.....
+		UPDATE temp_t_arc SET minsector_id = a.descript::integer FROM temp_anl_arc a WHERE fid=134 AND a.arc_id=temp_t_arc.arc_id;
 
-			-- update graph nodes inside minsector
-			UPDATE node SET minsector_id = a.minsector_id FROM arc a WHERE node_id = node_1;
-			UPDATE node SET minsector_id = a.minsector_id FROM arc a WHERE node_id = node_2;
+		-- update graph nodes inside temp_minsector
+		UPDATE temp_t_node SET minsector_id = a.minsector_id FROM temp_t_arc a WHERE node_id = node_1;
+		UPDATE temp_t_node SET minsector_id = a.minsector_id FROM temp_t_arc a WHERE node_id = node_2;
 	
-			-- update graph nodes on the border of minsectors
-			EXECUTE 'UPDATE node SET minsector_id = 0 FROM node a 
-			JOIN cat_node ON a.nodecat_id = cat_node.id
-			JOIN cat_feature_node c ON c.id=nodetype_id WHERE graph_delimiter!=''NONE'' 
-			AND node.node_id = a.node_id AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_node||';';
+		-- update graph nodes on the border of temp_minsectors
+		EXECUTE 'UPDATE temp_t_node SET minsector_id = 0 FROM node a 
+		JOIN cat_node ON a.nodecat_id = cat_node.id
+		JOIN cat_feature_node c ON c.id=nodetype_id WHERE graph_delimiter!=''NONE'' 
+		AND temp_t_node.node_id = a.node_id AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_node||';';
 								
-			-- used v_edit_connec to the exploitation filter. Row before is not neeeded because on table anl_* is data filtered by the process...
-			EXECUTE 'UPDATE connec c SET minsector_id = a.minsector_id FROM arc a WHERE a.arc_id=c.arc_id AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||';';
-			EXECUTE 'UPDATE link SET minsector_id = a.minsector_id FROM connec a WHERE a.connec_id=link.feature_id AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_connec||';';
+		-- used v_edit_connec to the exploitation filter. Row before is not neeeded because on table anl_* is data filtered by the process...
+		EXECUTE 'UPDATE temp_t_connec c SET minsector_id = a.minsector_id FROM temp_t_arc a WHERE a.arc_id=c.arc_id AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||';';
+		EXECUTE 'UPDATE temp_t_link a SET minsector_id = a.minsector_id FROM temp_t_connec WHERE temp_t_connec.connec_id=a.feature_id AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_link||';';
 
-			-- insert into minsector table
-			EXECUTE 'DELETE FROM minsector a WHERE '||v_expl_query||' '||v_sector_query||';';
-			EXECUTE 'INSERT INTO minsector (minsector_id, dma_id, dqa_id, sector_id, expl_id, presszone_id)
-			SELECT distinct ON (minsector_id) minsector_id, dma_id, dqa_id, sector_id, expl_id, presszone_id FROM arc a WHERE minsector_id is not null AND state=1 
-			AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||'
-			ON CONFLICT (minsector_id) DO NOTHING;';
+		-- insert into temp_minsector table
+		EXECUTE 'DELETE FROM temp_minsector a WHERE '||v_expl_query||' '||v_sector_query||';';
+		EXECUTE 'INSERT INTO temp_minsector (minsector_id, dma_id, dqa_id, sector_id, expl_id, presszone_id)
+		SELECT distinct ON (minsector_id) minsector_id, dma_id, dqa_id, sector_id, expl_id, presszone_id FROM temp_t_arc a 
+		WHERE minsector_id is not null AND state=1 
+		AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||'
+		ON CONFLICT (minsector_id) DO NOTHING;';
 
-			-- update minsector parameters
-			EXECUTE 'UPDATE minsector SET num_border = a.num FROM 
-			(SELECT a.minsector_id,   CASE WHEN count(node_id)=1 then 2 else count(node_id) end AS num FROM node n, arc a 
-			WHERE  (a.node_1 = n.node_id OR a.node_2 = n.node_id) AND  n.minsector_id = 0 AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||'
-			GROUP BY a.minsector_id)a WHERE a.minsector_id=minsector.minsector_id;';
+		-- update temp_minsector parameters
+		EXECUTE 'UPDATE temp_minsector SET num_border = a.num FROM 
+		(SELECT a.minsector_id,   CASE WHEN count(node_id)=1 then 2 else count(node_id) end AS num FROM temp_t_node n, temp_t_arc a 
+		WHERE  (a.node_1 = n.node_id OR a.node_2 = n.node_id) AND  n.minsector_id = 0 AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||'
+		GROUP BY a.minsector_id)a WHERE a.minsector_id=temp_minsector.minsector_id;';
 
-			EXECUTE 'UPDATE minsector SET num_connec = b.c FROM (SELECT minsector_id, case when count(*) is not null then count(*) else 0 end as c
-			FROM connec a WHERE '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_connec||' GROUP by minsector_id)b WHERE b.minsector_id=minsector.minsector_id;';
+		EXECUTE 'UPDATE temp_minsector SET num_connec = b.c FROM (SELECT minsector_id, case when count(*) is not null then count(*) else 0 end as c
+		FROM temp_t_connec a WHERE '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_connec||' GROUP by minsector_id)b WHERE b.minsector_id=temp_minsector.minsector_id;';
 			
-			EXECUTE 'UPDATE minsector a SET num_connec = 0 where num_connec is null AND '||v_expl_query||' '||v_sector_query||';';
+		EXECUTE 'UPDATE temp_minsector a SET num_connec = 0 where num_connec is null AND '||v_expl_query||' '||v_sector_query||';';
 
-			EXECUTE 'UPDATE minsector SET num_hydro = a.c FROM (
-			select minsector_id, case when count(*) is not null then count(*) else 0 end as c FROM 
-			(SELECT hydrometer_id, minsector_id 
-			FROM selector_hydrometer,rtc_hydrometer
-			LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
-			JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
-			JOIN connec a ON a.customer_code::text = ext_rtc_hydrometer.connec_id::text
-			WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = "current_user"()::text 
-			AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_connec||'
-			UNION SELECT hydrometer_id, minsector_id 
-			FROM selector_hydrometer,rtc_hydrometer
-			LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
-			JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
-			JOIN man_netwjoin ON man_netwjoin.customer_code::text = ext_rtc_hydrometer.connec_id::text
-			JOIN node a ON a.node_id::text = man_netwjoin.node_id::text
-			WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = "current_user"()::text 
-			AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_node||'
-			)a GROUP by minsector_id)a WHERE a.minsector_id=minsector.minsector_id;';
+		EXECUTE 'UPDATE temp_minsector SET num_hydro = a.c FROM (
+		select minsector_id, case when count(*) is not null then count(*) else 0 end as c FROM 
+		(SELECT hydrometer_id, minsector_id 
+		FROM selector_hydrometer,rtc_hydrometer
+		LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
+		JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
+		JOIN temp_t_connec a ON a.customer_code::text = ext_rtc_hydrometer.connec_id::text
+		WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = "current_user"()::text 
+		AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_connec||'
+		UNION SELECT hydrometer_id, minsector_id 
+		FROM selector_hydrometer,rtc_hydrometer
+		LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
+		JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
+		JOIN man_netwjoin ON man_netwjoin.customer_code::text = ext_rtc_hydrometer.connec_id::text
+		JOIN temp_t_node a ON a.node_id::text = man_netwjoin.node_id::text
+		WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = "current_user"()::text 
+		AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_node||'
+		)a GROUP by minsector_id)a WHERE a.minsector_id=temp_minsector.minsector_id;';
 			
- 			EXECUTE 'UPDATE minsector a SET num_hydro = 0 WHERE num_hydro is null AND '||v_expl_query||';';
+ 		EXECUTE 'UPDATE temp_minsector a SET num_hydro = 0 WHERE num_hydro is null AND '||v_expl_query||';';
 
-			EXECUTE 'UPDATE minsector SET length = b.length FROM (SELECT minsector_id, sum(st_length2d(a.the_geom)::numeric(12,2)) as length 
-			FROM arc a WHERE '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||'
-			GROUP by minsector_id)b WHERE b.minsector_id=minsector.minsector_id;';
-
-			-- message
-			INSERT INTO audit_check_data (fid, error_message)
-			VALUES (v_fid, concat('WARNING-',v_fid,': Minsector attribute (minsector_id) on arc/node/connec features have been updated by this process'));
-			
-		ELSIF v_updatefeature IS FALSE and v_returnerror IS FALSE THEN
-			-- message
-			INSERT INTO audit_check_data (fid, error_message)
-			VALUES (v_fid, concat('INFO: Minsector attribute (minsector_id) on arc/node/connec features keeps same value previous function. Nothing have been updated by this process'));
-			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('INFO: To take a look on results you can do querys like this:'));
-			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('SELECT * FROM temp_anl_arc ;'));
-		
-		END IF;
+		EXECUTE 'UPDATE temp_minsector SET length = b.length FROM (SELECT minsector_id, sum(st_length2d(a.the_geom)::numeric(12,2)) as length 
+		FROM temp_t_arc a WHERE '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||'
+		GROUP by minsector_id)b WHERE b.minsector_id=temp_minsector.minsector_id;';
 
 		-- update geometry of mapzones
 		IF v_updatemapzgeom = 0 OR v_updatemapzgeom IS NULL THEN
 
-			EXECUTE 'UPDATE minsector m SET the_geom = null FROM arc a WHERE a.minsector_id = m.minsector_id AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||';';
+			EXECUTE 'UPDATE temp_minsector m SET the_geom = null FROM temp_t_arc a WHERE a.minsector_id = m.minsector_id AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||';';
 						
 		ELSIF  v_updatemapzgeom = 1 THEN
 			
 
 			-- concave polygon
-			v_querytext = 'UPDATE minsector set the_geom = st_multi(b.the_geom) 
+			v_querytext = 'UPDATE temp_minsector set the_geom = st_multi(b.the_geom) 
 					FROM (with polygon AS (SELECT st_collect (the_geom) as g, minsector_id FROM arc a WHERE '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||' group by minsector_id)
 					SELECT minsector_id, CASE WHEN st_geometrytype(st_concavehull(g, '||v_geomparamupdate||')) = ''ST_Polygon''::text THEN st_buffer(st_concavehull(g, '||
 					v_concavehull||'), 3)::geometry(Polygon,'||v_srid||')
 					ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon, '||v_srid||') END AS the_geom FROM polygon
-					)b WHERE b.minsector_id = minsector.minsector_id';
+					)b WHERE b.minsector_id = temp_minsector.minsector_id';
 			EXECUTE v_querytext;
 					
 		ELSIF  v_updatemapzgeom = 2 THEN
 				
 			-- pipe buffer
-			v_querytext = '	UPDATE minsector set the_geom = st_multi(geom) FROM
-					(SELECT minsector_id, (st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from arc a where minsector_id > 0 
+			v_querytext = '	UPDATE temp_minsector set the_geom = st_multi(geom) FROM
+					(SELECT minsector_id, (st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from temp_t_arc a where minsector_id > 0 
 					AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||' group by minsector_id)b 
-					WHERE b.minsector_id = minsector.minsector_id';			
+					WHERE b.minsector_id = temp_minsector.minsector_id';			
 			EXECUTE v_querytext;
 
 		ELSIF  v_updatemapzgeom = 3 THEN
@@ -391,45 +393,59 @@ BEGIN
 
 	/*
 			-- buffer pipe
-			v_querytext = '	UPDATE minsector set the_geom = geom FROM
+			v_querytext = '	UPDATE temp_minsector set the_geom = geom FROM
 					(SELECT minsector_id, st_multi(st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from arc where minsector_id::integer > 0 
 					AND arc_id NOT IN (SELECT DISTINCT arc_id FROM v_edit_connec,ext_plot WHERE st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001))
 					group by minsector_id)a 
-					WHERE a.minsector_id = minsector.minsector_id';			
+					WHERE a.minsector_id = temp_minsector.minsector_id';			
 			EXECUTE v_querytext;
 			-- plot
-			v_querytext = '	UPDATE minsector set the_geom = geom FROM
+			v_querytext = '	UPDATE temp_minsector set the_geom = geom FROM
 					(SELECT minsector_id, st_multi(st_buffer(st_collect(ext_plot.the_geom),0.01)) as geom FROM v_edit_connec, ext_plot
 					WHERE minsector_id::integer > 0 AND st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001)
 					group by minsector_id)a 
-					WHERE a.minsector_id = minsector.minsector_id';	
+					WHERE a.minsector_id = temp_minsector.minsector_id';	
 	*/
-			v_querytext = ' UPDATE minsector set the_geom = geom FROM
+			v_querytext = ' UPDATE temp_minsector set the_geom = geom FROM
 						(SELECT minsector_id, st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
-						(SELECT minsector_id, st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from arc a
+						(SELECT minsector_id, st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from temp_t_arc a
 						where minsector_id::integer > 0 AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_arc||' group by minsector_id 
 						UNION
-						SELECT minsector_id, st_collect(ext_plot.the_geom) as geom FROM connec a, ext_plot
+						SELECT minsector_id, st_collect(ext_plot.the_geom) as geom FROM temp_t_connec a, ext_plot
 						WHERE minsector_id::integer > 0 AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_connec||' AND st_dwithin(a.the_geom, ext_plot.the_geom, 0.001) 
 						group by minsector_id
 						)c group by minsector_id)b 
-					WHERE b.minsector_id=minsector.minsector_id';
+					WHERE b.minsector_id=temp_minsector.minsector_id';
 
 			EXECUTE v_querytext;
 		END IF;
 					
 		IF v_updatemapzgeom > 0 THEN
 			-- message
-			INSERT INTO audit_check_data (fid, criticity, error_message)
+			INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 			VALUES (v_fid, 2, concat('WARNING-',v_fid,': Geometry of mapzone ',v_class ,' have been modified by this process'));
 		END IF;
 
 	END IF;
 	
+	-- messageç
+	IF v_updatefeature IS TRUE THEN 
+		INSERT INTO temp_audit_check_data (fid, error_message)
+		VALUES (v_fid, concat('WARNING-',v_fid,': temp_minsector attribute (minsector_id) on arc/node/connec features have been updated by this process'));
+				
+	ELSIF v_updatefeature IS FALSE and v_returnerror IS FALSE THEN
+		-- message
+		INSERT INTO temp_audit_check_data (fid, error_message)
+		VALUES (v_fid, concat('INFO: temp_minsector attribute (minsector_id) on arc/node/connec features keeps same value previous function. Nothing have been updated by this process'));
+		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('INFO: To take a look on results you can do querys like this:'));
+		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('SELECT * FROM temp_anl_arc ;'));
+		
+	END IF;
+
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by id) row;
+	FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	
@@ -443,22 +459,64 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}');
 
-	--polygons
-	v_result = null;
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_polygon = concat ('{"geometryType":"Polygon", "features":',v_result, '}');
+	IF v_updatefeature IS FALSE THEN 
+		-- polygons 
+		EXECUTE 'SELECT jsonb_agg(features.feature) 
+		FROM ( 
+	  	SELECT jsonb_build_object(
+	    ''type'',       ''Feature'',
+	    ''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+	    ''properties'', to_jsonb(row) - ''the_geom''
+	  	) AS feature
+	  	FROM (SELECT  * FROM temp_minsector) row) features'
+		INTO v_result;
+
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_polygon = concat ('{"geometryType":"Polygon", "features":',v_result, '}');
+		v_visible_layer = NULL;
+	ELSE 
+		v_result = null;
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_polygon = concat ('{"geometryType":"Polygon", "features":',v_result, '}');
 	
+	END IF;
+
+
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	v_result_polygon := COALESCE(v_result_polygon, '{}');
-	
+
+	IF v_updatefeature IS TRUE THEN 
+		-- minsector
+		EXECUTE 'DELETE FROM minsector a WHERE '||v_expl_query||' '||v_sector_query||';';
+		INSERT INTO minsector 
+		SELECT distinct ON (minsector_id) *	FROM temp_minsector
+		ON CONFLICT (minsector_id) DO NOTHING;
+
+		-- arcs
+		UPDATE arc SET minsector_id = a.minsector_id FROM temp_t_arc a WHERE a.arc_id=arc.arc_id;
+
+		-- node
+		UPDATE node SET minsector_id = n.minsector_id  FROM temp_t_node n WHERE n.node_id=node.node_id;
+
+		-- connec
+		UPDATE connec c SET minsector_id = a.minsector_id FROM temp_t_connec a WHERE a.connec_id=c.connec_id;
+		UPDATE link l SET minsector_id = a.minsector_id FROM temp_t_connec a WHERE a.connec_id=l.feature_id;
+	END IF;
+
 	--drop temporal layers
-	DROP VIEW v_temp_anlgraph;
-	DROP VIEW v_t_process;
-	DROP TABLE temp_t_anlgraph;
-	DROP TABLE temp_anl_arc;
+	DROP VIEW IF EXISTS v_temp_anlgraph;
+	DROP VIEW IF EXISTS v_t_process;
+	DROP TABLE IF EXISTS temp_t_anlgraph;
+	DROP TABLE IF EXISTS temp_minsector;
+	DROP TABLE IF EXISTS temp_t_node;
+	DROP TABLE IF EXISTS temp_t_link;
+	DROP TABLE IF EXISTS temp_t_connec;
+	DROP TABLE IF EXISTS temp_anl_arc;
+	DROP TABLE IF EXISTS temp_audit_check_data;
+	DROP TABLE IF EXISTS temp_t_arc;
 
 	--show results on the map
 	DELETE FROM selector_expl WHERE cur_user=current_user;
@@ -475,7 +533,7 @@ BEGIN
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_polygon||'}'||
 		       '}'||
-	    '}')::json, 2706, null, null, null);
+	    '}')::json, 2706, null,  ('{"visible": ["'||v_visible_layer||'"]}')::json, null);
 
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
