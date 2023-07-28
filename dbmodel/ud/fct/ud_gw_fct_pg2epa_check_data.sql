@@ -16,7 +16,7 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":127}}}$$)-- when is called from go2epa_main
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"parameters":{}}$$)-- when is called from toolbox or from checkproject
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":101}}}$$)-- when is called from checkproject
 
 -- fid: main: 255,
 	other: 106,107,111,113,164,175,187,188,294,295,379,427,430,440,480
@@ -60,10 +60,10 @@ BEGIN
 
 	-- init variables
 	v_count=0;
-	IF v_fid is null THEN v_fid = 255; END IF;	
+	IF v_fid is null THEN v_fid = 225; END IF;	
 
 	IF v_fid IN (101,225) THEN
-		--create temp tables
+		
 		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
 		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
 		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
@@ -629,8 +629,6 @@ BEGIN
 		-- remove anl tables
 		DELETE FROM temp_anl_node WHERE fid = v_record.fid AND cur_user = current_user;
 		DELETE FROM temp_anl_arc WHERE fid = v_record.fid AND cur_user = current_user;
-		DELETE FROM anl_connec WHERE fid = v_record.fid AND cur_user = current_user;
-
 		DELETE FROM temp_audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user;
 	END LOOP;
 
@@ -648,18 +646,15 @@ BEGIN
 
 		INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
 		INSERT INTO anl_node SELECT * FROM temp_anl_node;
-		INSERT INTO anl_connec SELECT * FROM temp_anl_connec;
 		INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
 
 	ELSIF  v_fid = 101 THEN 
 		UPDATE temp_audit_check_data SET fid = 225;
 		UPDATE temp_anl_arc SET fid = 225;
 		UPDATE temp_anl_node SET fid = 225;
-		UPDATE temp_anl_connec SET fid = 225;
 
 		INSERT INTO project_temp_anl_arc SELECT * FROM temp_anl_arc;
 		INSERT INTO project_temp_anl_node SELECT * FROM temp_anl_node;
-		INSERT INTO project_temp_anl_connec SELECT * FROM temp_anl_connec;
 		INSERT INTO project_temp_audit_check_data SELECT * FROM temp_audit_check_data;
 	END IF;
 
