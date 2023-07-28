@@ -3347,9 +3347,11 @@ def add_row_epa(tbl, tablename, pkey, **kwargs):
     info.my_json_add = {}
     tools_gw.build_dialog_info(info.add_dlg, result, my_json=info.my_json_add)
 
-    # Populate node_id
+    # Populate node_id/feature_id
     tools_qt.set_widget_text(info.add_dlg, 'tab_none_node_id', feature_id)
+    tools_qt.set_widget_text(info.add_dlg, 'tab_none_feature_id', feature_id)
     layout = info.add_dlg.findChild(QGridLayout, 'lyt_main_1')
+    tools_qt.set_selected_item(info.add_dlg, 'tab_none_feature_type', f"{info.feature_type.upper()}")
 
     # Get every widget in the layout
     widgets = []
