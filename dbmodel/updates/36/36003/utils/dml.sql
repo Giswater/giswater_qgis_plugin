@@ -182,3 +182,16 @@ SET ismandatory=true WHERE formname='v_edit_inp_pump_additional' AND formtype='f
 
 UPDATE config_form_fields
 SET layoutorder=1, hidden=false WHERE formname='v_edit_inp_dscenario_demand' AND formtype='form_feature' AND columnname='feature_id' AND tabname='tab_none';
+
+-- change epa layouts
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam)
+VALUES('layout_name_typevalue', 'lyt_epa_dsc_1', 'lyt_epa_dsc_1', 'lytEpaDsc1', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam)
+VALUES('layout_name_typevalue', 'lyt_epa_dsc_2', 'lyt_epa_dsc_2', 'lytEpaDsc2', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam)
+VALUES('layout_name_typevalue', 'lyt_epa_dsc_3', 'lyt_epa_dsc_3', 'lytEpaDsc3', NULL);
+
+UPDATE config_form_fields SET layoutname = 'lyt_epa_dsc_3' WHERE layoutname = 'lyt_epa_3';
+
+DELETE FROM config_typevalue WHERE typevalue='layout_name_typevalue' AND id='lyt_epa_3';
+
