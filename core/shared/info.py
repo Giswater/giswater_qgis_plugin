@@ -3305,20 +3305,20 @@ def open_epa_dlg(**kwargs):
             btn_add_base = info.dlg.findChild(QPushButton, 'btn_add_base')
             if btn_add_base:
                 tools_gw.add_icon(btn_add_base, '111b', "24x24")
-                btn_add_base.clicked.connect(partial(add_row_epa, tbl, add_view, pk, **kwargs))
+                btn_add_base.clicked.connect(partial(add_row_epa, tbl, add_view, pk, info.dlg, **kwargs))
             btn_delete_base = info.dlg.findChild(QPushButton, 'btn_delete_base')
             if btn_delete_base:
                 tools_gw.add_icon(btn_delete_base, '112b', "24x24")
-                btn_delete_base.clicked.connect(partial(delete_tbl_row, tbl, view, pk, **kwargs))
+                btn_delete_base.clicked.connect(partial(delete_tbl_row, tbl, view, pk, info.dlg, **kwargs))
         else:
             btn_add_dscenario = info.dlg.findChild(QPushButton, 'btn_add_dscenario')
             if btn_add_dscenario:
                 tools_gw.add_icon(btn_add_dscenario, '111b', "24x24")
-                btn_add_dscenario.clicked.connect(partial(add_row_epa, tbl, add_view, pk, **kwargs))
+                btn_add_dscenario.clicked.connect(partial(add_row_epa, tbl, add_view, pk, info.dlg, **kwargs))
             btn_delete_dscenario = info.dlg.findChild(QPushButton, 'btn_delete_dscenario')
             if btn_delete_dscenario:
                 tools_gw.add_icon(btn_delete_dscenario, '112b', "24x24")
-                btn_delete_dscenario.clicked.connect(partial(delete_tbl_row, tbl, view, pk, **kwargs))
+                btn_delete_dscenario.clicked.connect(partial(delete_tbl_row, tbl, view, pk, info.dlg, **kwargs))
 
     info.dlg.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, info.dlg, True))
     info.dlg.finished.connect(partial(tools_gw.save_settings, info.dlg))
@@ -3326,7 +3326,7 @@ def open_epa_dlg(**kwargs):
     tools_gw.open_dialog(info.dlg, dlg_name=ui_name)
 
 
-def add_row_epa(tbl, tablename, pkey, **kwargs):
+def add_row_epa(tbl, tablename, pkey, dlg, **kwargs):
     # Get variables
     complet_result = kwargs['complet_result']
     info = kwargs['class']
@@ -3377,14 +3377,14 @@ def add_row_epa(tbl, tablename, pkey, **kwargs):
     # Signals
     info.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, info.add_dlg))
     info.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, info.add_dlg))
-    info.add_dlg.dlg_closed.connect(partial(refresh_epa_tbl, tbl, **kwargs))
+    info.add_dlg.dlg_closed.connect(partial(refresh_epa_tbl, tbl, dlg, **kwargs))
     info.add_dlg.btn_accept.clicked.connect(partial(accept_add_dlg, info.add_dlg, tablename, pkey, feature_id, info.my_json_add, result))
 
     # Open dlg
     tools_gw.open_dialog(info.add_dlg, dlg_name='info_generic')
 
 
-def refresh_epa_tbl(tblview, **kwargs):
+def refresh_epa_tbl(tblview, dlg, **kwargs):
     # Get variables
     complet_result = kwargs['complet_result']
     info = kwargs['class']
@@ -3397,7 +3397,7 @@ def refresh_epa_tbl(tblview, **kwargs):
     # Fill tableviews
     for tableview in tableviews:
         tbl = tableview['tbl']
-        tbl = info.dlg.findChild(QTableView, tbl)
+        tbl = dlg.findChild(QTableView, tbl)
         if not tbl:
             continue
         view = tableview['view']
@@ -3409,7 +3409,7 @@ def refresh_epa_tbl(tblview, **kwargs):
         fill_tbl(complet_list, tbl, info, view)
 
 
-def delete_tbl_row(tbl, tablename, pkey, **kwargs):
+def delete_tbl_row(tbl, tablename, pkey, dlg, **kwargs):
     # Get variables
     complet_result = kwargs['complet_result']
     info = kwargs['class']
@@ -3449,7 +3449,7 @@ def delete_tbl_row(tbl, tablename, pkey, **kwargs):
             tools_db.execute_sql(sql)
 
         # Refresh tableview
-        refresh_epa_tbl(tbl, **kwargs)
+        refresh_epa_tbl(tbl, dlg, **kwargs)
 
 
 def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result):
@@ -3560,6 +3560,24 @@ def save_tbl_changes(complet_list, info, dialog):
         tools_gw.close_dialog(dialog)
     else:
         tools_qgis.show_warning('There are some error in the records with id: ', parameter=list_rows, dialog=dialog)
+
+
+def add_to_dscenario(**kwargs):
+    func_params = kwargs['func_params']
+    dialog = kwargs['dialog']
+    tbl = tools_qt.get_widget(dialog, func_params.get('targetwidget'))
+    tablename = func_params.get('tablename')
+    pkey = func_params.get('pkey')
+    add_row_epa(tbl, tablename, pkey, dialog, **kwargs)
+
+
+def remove_from_dscenario(**kwargs):
+    func_params = kwargs['func_params']
+    dialog = kwargs['dialog']
+    tbl = tools_qt.get_widget(dialog, func_params.get('targetwidget'))
+    tablename = func_params.get('tablename')
+    pkey = func_params.get('pkey')
+    delete_tbl_row(tbl, tablename, pkey, dialog, **kwargs)
 
 # endregion
 

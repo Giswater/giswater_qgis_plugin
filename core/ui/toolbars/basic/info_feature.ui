@@ -183,8 +183,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>28</height>
+             <width>734</width>
+             <height>360</height>
             </rect>
            </property>
            <attribute name="label">
@@ -192,7 +192,13 @@
            </attribute>
            <layout class="QGridLayout" name="gridLayout_16">
             <item row="0" column="0">
-             <layout class="QGridLayout" name="lyt_epa_3"/>
+             <layout class="QGridLayout" name="lyt_epa_dsc_1"/>
+            </item>
+            <item row="2" column="0">
+             <layout class="QGridLayout" name="lyt_epa_dsc_3"/>
+            </item>
+            <item row="1" column="0">
+             <layout class="QGridLayout" name="lyt_epa_dsc_2"/>
             </item>
            </layout>
           </widget>
