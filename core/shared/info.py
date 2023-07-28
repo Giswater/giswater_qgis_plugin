@@ -3374,7 +3374,7 @@ def add_row_epa(tbl, tablename, pkey, **kwargs):
     info.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, info.add_dlg))
     info.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, info.add_dlg))
     info.add_dlg.dlg_closed.connect(partial(refresh_epa_tbl, tbl, **kwargs))
-    info.add_dlg.btn_accept.clicked.connect(partial(accept_add_dlg, info.add_dlg, tablename, pkey, feature_id, info.my_json_add))
+    info.add_dlg.btn_accept.clicked.connect(partial(accept_add_dlg, info.add_dlg, tablename, pkey, feature_id, info.my_json_add, result))
 
     # Open dlg
     tools_gw.open_dialog(info.add_dlg, dlg_name='info_generic')
@@ -3445,12 +3445,45 @@ def delete_tbl_row(tbl, tablename, pkey, **kwargs):
             tools_db.execute_sql(sql)
 
         # Refresh tableview
-        refresh_epa_tbl(tablename, **kwargs)
+        refresh_epa_tbl(tbl, **kwargs)
 
 
-def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json):
+def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result):
+
     if not my_json:
         return
+
+    list_mandatory = []
+    list_filter = []
+
+    for field in complet_result['body']['data']['fields']:
+        if field['ismandatory']:
+            widget = dialog.findChild(QWidget, field['widgetname'])
+            widget.setStyleSheet(None)
+            value = tools_qt.get_text(dialog, widget)
+            if value in ('null', None, ''):
+                widget.setStyleSheet("border: 1px solid red")
+                list_mandatory.append(field['widgetname'])
+            else:
+                elem = [field['columnname'], value]
+                list_filter.append(elem)
+
+    if list_mandatory:
+        msg = "Some mandatory values are missing. Please check the widgets marked in red."
+        tools_qgis.show_warning(msg, dialog=dialog)
+        tools_qt.set_action_checked("actionEdit", True, dialog)
+        QgsProject.instance().blockSignals(False)
+        return False
+
+    sql = (f"SELECT node_id FROM  {tablename} WHERE node_id = '{feature_id}'" )
+    for filter in list_filter:
+        if filter[0] == 'order_id':
+            sql += f" AND {filter[0]} = {filter[1]}"
+    result = tools_db.get_row(sql)
+    if result is not None:
+        msg = "Record already exists for this node_id, order_id. It is not possible to repeat"
+        tools_qgis.show_warning(msg, dialog=dialog)
+        return False
 
     fields = json.dumps(my_json)
     id_val = ""
@@ -3507,6 +3540,7 @@ def save_tbl_changes(complet_list, info, dialog):
 
     view = complet_list['body']['feature']['tableName']
     my_json = getattr(info, f"my_json_{view}")
+
     if not my_json:
         tools_gw.close_dialog(dialog)
         return
