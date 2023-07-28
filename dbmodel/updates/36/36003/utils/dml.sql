@@ -170,12 +170,15 @@ UPDATE config_toolbox SET inputparams='[
 ]'::json WHERE id=3134;
 
 -- 28/07/2023
-UPDATE SCHEMA_NAME.config_typevalue
+UPDATE config_typevalue
 SET idval='Additional Pump', camelstyle=NULL, addparam=NULL
 WHERE typevalue='formactions_typevalue' AND id='actionPump';
 
-UPDATE SCHEMA_NAME.config_form_fields
+UPDATE config_form_fields
 SET ismandatory=true WHERE formname='v_edit_inp_dscenario_pump_additional' AND formtype='form_feature' AND columnname='order_id' AND tabname='tab_none';
 
-UPDATE SCHEMA_NAME.config_form_fields
+UPDATE config_form_fields
 SET ismandatory=true WHERE formname='v_edit_inp_pump_additional' AND formtype='form_feature' AND columnname='order_id' AND tabname='tab_none';
+
+UPDATE config_form_fields
+SET layoutorder=1, hidden=false WHERE formname='v_edit_inp_dscenario_demand' AND formtype='form_feature' AND columnname='feature_id' AND tabname='tab_none';
