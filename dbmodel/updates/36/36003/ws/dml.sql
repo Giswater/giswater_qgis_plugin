@@ -23,4 +23,4 @@ UPDATE config_toolbox SET inputparams =
 {"widgetname":"geomParamUpdate", "label":"Update parameter:","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layoutorder":10, "isMandatory":false, "placeholder":"5-30", "value":""}]'
 WHERE id = 2706;
 
-UPDATE config_function set style = '{"style": {"polygon": {"style": "categorized","field": "minsector_id",  "transparency": 0.5}}}' WHERE id = 2706;
+UPDATE config_function set style = '{"style": {"polygon": {"style": "categorized","field": "minsector_id",  "transparency": 0.5}}}',layermanager=null WHERE id = 2706;
