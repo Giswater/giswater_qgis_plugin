@@ -3432,7 +3432,7 @@ def delete_tbl_row(tbl, view, pkey, dlg, **kwargs):
     selected_list = tbl.selectionModel().selectedRows()
     if len(selected_list) == 0:
         message = "Any record selected"
-        tools_qgis.show_warning(message, dialog=info.dlg)
+        tools_qgis.show_warning(message, dialog=dlg)
         return
 
     values = []
@@ -3461,8 +3461,11 @@ def delete_tbl_row(tbl, view, pkey, dlg, **kwargs):
             condition_str = " AND ".join(conditions)
             sql = f"DELETE FROM {view} WHERE {condition_str}"
             tools_db.execute_sql(sql)
-            info.dlg.btn_accept.setEnabled(True)
-            info.inserted_feature = True
+            try:
+                info.dlg.btn_accept.setEnabled(True)
+                info.inserted_feature = True
+            except AttributeError:
+                pass
         # Refresh tableview
         refresh_epa_tbl(tbl, dlg, **kwargs)
 
@@ -3551,7 +3554,10 @@ def tbl_data_changed(info, view, tbl, model, addparam, index):
         getattr(info, f"my_json_{view}")[ids][fieldname] = str(field)
 
     # Enable btn_accept
-    info.dlg.btn_accept.setEnabled(True)
+    try:
+        info.dlg.btn_accept.setEnabled(True)
+    except AttributeError:
+        pass
 
 
 def save_tbl_changes(complet_list, info, dialog):
@@ -3590,18 +3596,24 @@ def save_tbl_changes(complet_list, info, dialog):
 def add_to_dscenario(**kwargs):
     func_params = kwargs['func_params']
     dialog = kwargs['dialog']
+    info = kwargs['class']
     tbl = tools_qt.get_widget(dialog, func_params.get('targetwidget'))
     tablename = func_params.get('tablename')
     pkey = func_params.get('pkey')
-    add_row_epa(tbl, tablename, pkey, dialog, **kwargs)
+    setattr(info, f"my_json_{tablename}", {})
+
+    add_row_epa(tbl, tablename, tablename, pkey, dialog, **kwargs)
 
 
 def remove_from_dscenario(**kwargs):
     func_params = kwargs['func_params']
     dialog = kwargs['dialog']
+    info = kwargs['class']
     tbl = tools_qt.get_widget(dialog, func_params.get('targetwidget'))
     tablename = func_params.get('tablename')
     pkey = func_params.get('pkey')
+    setattr(info, f"my_json_{tablename}", {})
+
     delete_tbl_row(tbl, tablename, pkey, dialog, **kwargs)
 
 # endregion
