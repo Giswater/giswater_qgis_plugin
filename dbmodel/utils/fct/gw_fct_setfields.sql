@@ -209,19 +209,26 @@ BEGIN
 		-- query text, final step
 		v_idname_array := string_to_array(v_idname, ', ');
 		v_id_array := string_to_array(v_id, ', ');
-		IF cardinality(v_idname_array) > 1 AND cardinality(v_id_array) > 1 THEN
-			i = 1;
+
+        IF cardinality(v_idname_array) > 1 AND cardinality(v_id_array) > 1 then
+            i = 1;
 			v_querytext := v_querytext || ' WHERE ';
-			FOREACH idname IN ARRAY v_idname_array LOOP
+			FOREACH idname IN ARRAY v_idname_array loop
 				v_querytext := v_querytext || quote_ident(idname) || ' = CAST(' || quote_literal(v_id_array[i]) || ' AS ' || column_type_id_array[i] || ') AND ';
 				i=i+1;
 			END LOOP;
 			v_querytext = substring(v_querytext, 0, length(v_querytext)-4);
+		ELSIF cardinality(v_idname_array) > 1 THEN
+			i = 1;
+			v_querytext := v_querytext || ' WHERE ';
+			FOREACH idname IN ARRAY v_idname_array loop
+				v_querytext := v_querytext || quote_ident(idname) || ' = CAST(' || quote_literal(v_fields->>idname) || ' AS ' || column_type_id_array[i] || ') AND ';
+				i=i+1;
+			END LOOP;
+			v_querytext = substring(v_querytext, 0, length(v_querytext)-4);
 		ELSE
-			v_querytext := v_querytext || ' WHERE ' || quote_ident(v_idname) || ' = CAST(' || quote_literal(v_id) || ' AS ' || column_type_id || ')';	
+			v_querytext := v_querytext || ' WHERE ' || quote_ident(v_idname) || ' = CAST(' || quote_literal(v_id) || ' AS ' || column_type_id || ')';
 		END IF;
-
-		raise notice 'v_querytext %', v_querytext;
 
 		-- execute query text
 		EXECUTE v_querytext;
@@ -231,8 +238,6 @@ BEGIN
 				"form":{},
 				"feature":{"tableName":"'|| v_tablename ||'", "id":"'|| v_id ||'", "fieldsReload":"'|| v_fieldsreload ||'", "parentField":"'||json_object_keys(v_fields)||'"},
 				"data":{}}$$)' INTO v_columnfromid;
-
-			raise notice 'v_columnfromid %', v_columnfromid;
 		END IF;
 	END IF;
 

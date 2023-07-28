@@ -25,8 +25,16 @@ BEGIN
     
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        "data":{"message":"1030", "function":"1210","debug_msg":null}}$$);'; 
+
+        IF v_node_table = 'inp_pump_additional' THEN
+            INSERT INTO inp_pump_additional (node_id, order_id, power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id)
+            VALUES (NEW.node_id, NEW.order_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern_id, NEW.status, NEW.effic_curve_id, NEW.energy_price, NEW.energy_pattern_id);
+        ELSE
+            EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+            "data":{"message":"1030", "function":"1310","debug_msg":null}}$$);';
+        END IF;
+
+        RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
 

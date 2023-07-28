@@ -168,3 +168,14 @@ UPDATE config_toolbox SET inputparams='[
 {"widgetname":"active", "label":"Active:", "widgettype":"check", "datatype":"boolean", "tooltip":"If true, active" , "layoutname":"grl_option_parameters","layoutorder":5, "value":"true"},
 {"widgetname":"expl", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":6, "value":""}
 ]'::json WHERE id=3134;
+
+-- 28/07/2023
+UPDATE SCHEMA_NAME.config_typevalue
+SET idval='Additional Pump', camelstyle=NULL, addparam=NULL
+WHERE typevalue='formactions_typevalue' AND id='actionPump';
+
+UPDATE SCHEMA_NAME.config_form_fields
+SET ismandatory=true WHERE formname='v_edit_inp_dscenario_pump_additional' AND formtype='form_feature' AND columnname='order_id' AND tabname='tab_none';
+
+UPDATE SCHEMA_NAME.config_form_fields
+SET ismandatory=true WHERE formname='v_edit_inp_pump_additional' AND formtype='form_feature' AND columnname='order_id' AND tabname='tab_none';
