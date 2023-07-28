@@ -1603,6 +1603,7 @@ class GwInfo(QObject):
         # With the editing QAction we need to collect the last modified value (self.get_last_value()),
         # since the "editingFinished" signals of the widgets are not detected.
         # Therefore whenever the cursor enters a widget, it will ask if we want to save changes
+
         if not action_edit.isChecked():
             self._get_last_value(dialog, generic)
             if str(self.my_json) == '{}' and str(self.my_json_epa) == '{}':
@@ -3525,31 +3526,37 @@ def tbl_data_changed(info, view, tbl, model, addparam, index):
     else:
         getattr(info, f"my_json_{view}")[ids][fieldname] = str(field)
 
+    # Enable btn_accept
+    info.dlg.btn_accept.setEnabled(True)
+
 
 def save_tbl_changes(complet_list, info, dialog):
 
     view = complet_list['body']['feature']['tableName']
     my_json = getattr(info, f"my_json_{view}")
-
+    list_rows = []
+    status = True
     if not my_json:
-        tools_gw.close_dialog(dialog)
         return
 
     # For each edited row
     for k, v in my_json.items():
+
         fields = json.dumps(v)
         if not fields:
             continue
-
         feature = f'"id":"{k}", '
         feature += f'"tableName":"{view}"'
         extras = f'"fields":{fields}, "force_action":"UPDATE"'
         body = tools_gw.create_body(feature=feature, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
-        if json_result and json_result.get('status') == 'Accepted':
-            tools_gw.close_dialog(dialog)
-            return
-        tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
+        if json_result and json_result.get('status') != 'Accepted':
+            status = False
+            list_rows.append(k)
+    if status:
+        tools_gw.close_dialog(dialog)
+    else:
+        tools_qgis.show_warning('There are some error in the records with id: ', parameter=list_rows, dialog=dialog)
 
 # endregion
 
