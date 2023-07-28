@@ -3500,8 +3500,11 @@ def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result,
     json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
     if json_result and json_result.get('status') == 'Accepted':
         tools_gw.close_dialog(dialog)
-        info.dlg.btn_accept.setEnabled(True)
-        info.inserted_feature = True
+        try:
+            info.dlg.btn_accept.setEnabled(True)
+            info.inserted_feature = True
+        except AttributeError:
+            pass
         return
 
     tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
