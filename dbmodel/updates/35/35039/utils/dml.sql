@@ -51,3 +51,7 @@ INSERT INTO sys_param_user(id, formname, descript, sys_role, project_type, ispar
 VALUES ('edit_node2arc_update_disable','hidden','Parameter that controls updating values by gw_trg_topocontrol_node', 'role_edit',
 'utils', false, false, 'boolean',null, true,false,'core');
 
+UPDATE config_toolbox SET inputparams = b.inp FROM (SELECT json_agg(a.inputs) AS inp FROM
+(SELECT json_array_elements(inputparams)as inputs, json_extract_path_text(json_array_elements(inputparams),'widgetname') as widget
+FROM   config_toolbox 
+WHERE id=2768)a WHERE widget!='floodFromNode')b WHERE  id=2768;
