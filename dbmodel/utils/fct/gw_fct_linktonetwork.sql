@@ -247,40 +247,21 @@ BEGIN
 				v_checkeddiam = concat(' AND cat_dnom::integer<',v_check_arcdnom,' ');
 			ELSE v_checkeddiam = '';
 			END IF;
-					
-			-- check for arc_id
-			IF v_link.the_geom IS NULL AND v_connect.state = 1 THEN -- looking for closest arc from connect
+		
+			IF v_link.the_geom IS NULL THEN -- looking for closest arc from connect
 				EXECUTE 'WITH index_query AS(
 				SELECT ST_Distance(the_geom, '||quote_literal(v_connect.the_geom::text)||') as distance, arc_id 
-				FROM arc a WHERE state = 1 AND a.expl_id ='||v_connect.expl_id||' '||v_checkeddiam||' '||v_forcedarcs||' 
-				AND st_dwithin(the_geom, '||quote_literal(v_connect.the_geom::text)||',100))
+				FROM v_edit_arc WHERE state > 0 '||v_checkeddiam||''||v_forcedarcs||')
 				SELECT arc_id FROM index_query ORDER BY distance limit 1'
 				INTO v_connect.arc_id;
-				
-			ELSIF v_link.the_geom IS NOT NULL AND v_link.state = 1 THEN -- looking for closest arc from link's endpoint
+			
+			ELSIF v_link.the_geom IS NOT NULL THEN -- looking for closest arc from link's endpoint
 				EXECUTE 'WITH index_query AS(
 				SELECT ST_Distance(the_geom, st_endpoint('||quote_literal(v_link.the_geom::text)||')) as distance, arc_id 
-				FROM arc a 
-				WHERE state = 1 AND a.expl_id ='||v_connect.expl_id||' '||v_checkeddiam||' '||v_forcedarcs||' 
-				AND st_dwithin(the_geom, '||quote_literal(v_connect.the_geom::text)||',50))
+				FROM v_edit_arc WHERE state > 0 '||v_checkeddiam||''||v_forcedarcs||')
 				SELECT arc_id FROM index_query ORDER BY distance limit 1'
 				INTO v_connect.arc_id;
-					
-			ELSIF v_link.the_geom IS NULL AND v_connect.state = 2 THEN -- looking for closest arc from connect
-				EXECUTE 'WITH index_query AS(
-				SELECT ST_Distance(the_geom, '||quote_literal(v_connect.the_geom::text)||') as distance, arc_id 
-				FROM v_edit_arc a WHERE state > 0 AND a.expl_id ='||v_connect.expl_id||' '||v_checkeddiam||' '||v_forcedarcs||' 
-				AND st_dwithin(the_geom, '||quote_literal(v_connect.the_geom::text)||',100))
-				SELECT arc_id FROM index_query ORDER BY distance limit 1'
-				INTO v_connect.arc_id;
-				
-			ELSIF v_link.the_geom IS NOT NULL AND v_link.state = 2 THEN -- looking for closest arc from link's endpoint
-				EXECUTE 'WITH index_query AS(
-				SELECT ST_Distance(the_geom, st_endpoint('||quote_literal(v_link.the_geom::text)||')) as distance, arc_id 
-				FROM v_edit_arc a WHERE state > 0 AND a.expl_id ='||v_connect.expl_id||' '||v_checkeddiam||' '||v_forcedarcs||'  
-				AND st_dwithin(the_geom, '||quote_literal(v_connect.the_geom::text)||',50))
-				SELECT arc_id FROM index_query ORDER BY distance limit 1'
-				INTO v_connect.arc_id;
+
 			END IF;
 
 			-- get v_edit_arc information
