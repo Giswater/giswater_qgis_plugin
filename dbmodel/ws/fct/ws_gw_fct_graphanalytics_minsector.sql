@@ -89,7 +89,8 @@ v_psectors_query_node text;
 v_psectors_query_connec text;
 v_psectors_query_link text;
 v_loop record;
-v_visible_layer text= 'v_edit_minsector';
+v_visible_layer text;
+
 BEGIN
 
 	-- Search path
@@ -117,7 +118,7 @@ BEGIN
 
 	-- data quality analysis
 	IF v_checkdata THEN
-		v_input = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"fid":',v_fid,'selectionMode":"userSelectors"}}}')::json;
+		v_input = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"fid":',v_fid,', "selectionMode":"userSelectors"}}}')::json;
 		PERFORM gw_fct_om_check_data(v_input);
 		SELECT count(*) INTO v_count FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid AND criticity=3;
 	END IF;
@@ -473,12 +474,12 @@ BEGIN
 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_polygon = concat ('{"geometryType":"Polygon", "features":',v_result, '}');
-		v_visible_layer = NULL;
+		v_visible_layer = 'v_edit_arc';
 	ELSE 
 		v_result = null;
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_polygon = concat ('{"geometryType":"Polygon", "features":',v_result, '}');
-	
+		v_visible_layer = NULL;
 	END IF;
 
 
