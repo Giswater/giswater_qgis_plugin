@@ -3299,7 +3299,7 @@ def open_epa_dlg(**kwargs):
 
         complet_list = get_list(view, id_name, feature_id)
         fill_tbl(complet_list, tbl, info, view)
-        info.dlg.btn_accept.clicked.connect(partial(save_tbl_changes, complet_list, info, info.dlg))
+        info.dlg.btn_accept.clicked.connect(partial(save_tbl_changes, complet_list, info, info.dlg, pk))
 
         # Add & Delete buttons
         if 'dscenario' not in view:
@@ -3560,7 +3560,7 @@ def tbl_data_changed(info, view, tbl, model, addparam, index):
         pass
 
 
-def save_tbl_changes(complet_list, info, dialog):
+def save_tbl_changes(complet_list, info, dialog, pk):
 
     view = complet_list['body']['feature']['tableName']
     my_json = getattr(info, f"my_json_{view}")
@@ -3579,8 +3579,10 @@ def save_tbl_changes(complet_list, info, dialog):
         fields = json.dumps(v)
         if not fields:
             continue
-        feature = f'"id":"{k}", '
-        feature += f'"tableName":"{view}"'
+        feature = f'"id":"{k}"'
+        if pk:
+            feature += f', "idName":"{pk}"'
+        feature += f', "tableName":"{view}"'
         extras = f'"fields":{fields}, "force_action":"UPDATE"'
         body = tools_gw.create_body(feature=feature, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
