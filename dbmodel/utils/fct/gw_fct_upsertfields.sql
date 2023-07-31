@@ -96,6 +96,7 @@ BEGIN
 	v_featuretype := (p_data ->> 'feature')::json->> 'featureType';
 	v_tablename := (p_data ->> 'feature')::json->> 'tableName';
 	v_id := (p_data ->> 'feature')::json->> 'id';
+	v_idname := (p_data ->> 'feature')::json->> 'idName';
 	v_fields := ((p_data ->> 'data')::json->> 'fields')::json;
 	v_force_action := ((p_data ->> 'data')::json->> 'force_action');
 	v_fieldsreload := (p_data ->> 'data')::json->> 'reload';
@@ -104,9 +105,11 @@ BEGIN
 	select array_agg(row_to_json(a)) into v_text from json_each(v_fields)a;
 
 	--  Get id column, for tables is the key column
-	EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
-        INTO v_idname
-        USING v_tablename;
+	IF v_idname ISNULL THEN
+		EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
+	        INTO v_idname
+	        USING v_tablename;
+    END IF;
 	-- Get if view has composite primary key
 	IF v_idname ISNULL THEN
 		EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_addparam USING v_tablename;
