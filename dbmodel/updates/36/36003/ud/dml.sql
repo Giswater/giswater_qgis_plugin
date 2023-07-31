@@ -199,6 +199,7 @@ UPDATE config_form_list
 	SET query_text='SELECT dscenario_id, node_id, elev, ymax, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur, apond FROM v_edit_inp_dscenario_storage WHERE node_id IS NOT NULL'
 	WHERE listname='tbl_inp_storage';
 
+ALTER TABLE inp_dscenario_flwreg_weir DROP CONSTRAINT IF EXISTS inp_dscenario_flwreg_weir_check_type;
 ALTER TABLE inp_dscenario_flwreg_weir ADD CONSTRAINT inp_dscenario_flwreg_weir_check_type 
 CHECK (weir_type::text = ANY (ARRAY['ROADWAY', 'SIDEFLOW', 'TRANSVERSE', 'V-NOTCH', 'TRAPEZOIDAL_WEIR']));
 ALTER TABLE inp_flwreg_weir ADD CONSTRAINT inp_dscenario_flwreg_weir_check_type 
