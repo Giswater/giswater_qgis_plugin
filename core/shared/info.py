@@ -3648,7 +3648,7 @@ def save_widgets_changes(table_name, info, dialog, pk):
     if not fields:
         return
     id_ = tools_qt.get_text(dialog, pk)
-    feature = f'"id":"{id_}"'  # TODO: get id from widget
+    feature = f'"id":"{id_}"'
     if pk and type(pk) != list:
         feature += f', "idName":"{pk}"'
     feature += f', "tableName":"{table_name}"'
