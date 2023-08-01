@@ -152,4 +152,37 @@ AS SELECT a.idval AS parameter,
    FROM sys_param_user a
      JOIN config_param_user b ON a.id = b.parameter::text
   WHERE (a.layoutname = ANY (ARRAY['lyt_reports_1'::text, 'lyt_reports_2'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT null
-  order by 1
+  order by 1;
+
+
+CREATE OR REPLACE VIEW ve_epa_netgully AS
+ SELECT inp_netgully.node_id,
+    inp_netgully.y0,
+    inp_netgully.ysur,
+    inp_netgully.apond,
+    inp_netgully.outlet_type,
+    inp_netgully.custom_width,
+    inp_netgully.custom_length,
+    inp_netgully.custom_depth,
+    inp_netgully.method,
+    inp_netgully.weir_cd,
+    inp_netgully.orifice_cd,
+    inp_netgully.custom_a_param,
+    inp_netgully.custom_b_param,
+    inp_netgully.efficiency,
+    d.aver_depth AS depth_average,
+    d.max_depth AS depth_max,
+    d.time_days AS depth_max_day,
+    d.time_hour AS depth_max_hour,
+    s.hour_surch AS surcharge_hour,
+    s.max_height AS surgarge_max_height,
+    f.hour_flood AS flood_hour,
+    f.max_rate AS flood_max_rate,
+    f.time_days AS time_day,
+    f.time_hour,
+    f.tot_flood AS flood_total,
+    f.max_ponded AS flood_max_ponded
+   FROM inp_netgully
+     LEFT JOIN v_rpt_nodedepth_sum d USING (node_id)
+     LEFT JOIN v_rpt_nodesurcharge_sum s USING (node_id)
+     LEFT JOIN v_rpt_nodeflooding_sum f USING (node_id);
