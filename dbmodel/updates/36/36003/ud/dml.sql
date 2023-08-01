@@ -233,4 +233,6 @@ order by layoutorder;
 
 UPDATE config_form_fields set layoutorder=2 WHERE formname='ve_epa_gully' AND columnname='outlet_type';
 
-UPDATE config_form_fields set tabname='tab_epa' WHERE  formname ='ve_epa_netgully'
+UPDATE config_form_fields set tabname='tab_epa' WHERE  formname ='ve_epa_netgully';
+
+UPDATE config_form_fields SET iseditable = true WHERE layoutname = 'lyt_epa_dsc_1' AND widgettype = 'button';
