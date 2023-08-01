@@ -145,9 +145,9 @@ class GwToolBoxTask(GwTask):
 
         if self.isCanceled():
             return False
-        if self.json_result['status'] == 'Failed':
-            return False
         if not self.json_result or self.json_result is None:
+            return False
+        if self.json_result['status'] == 'Failed':
             return False
 
         return True
