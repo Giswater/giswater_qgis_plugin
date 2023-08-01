@@ -264,5 +264,5 @@ UPDATE config_form_fields
 	SET iseditable=true
 	WHERE formname='v_edit_inp_dscenario_inflows' AND columnname='order_id';
 
-UPDATE config_form_list set dv_querytext = 'SELECT dscenario_id, node_id, elev, ymax, y0, ysur, apond, outfallparam FROM v_edit_inp_dscenario_junction WHERE node_id IS NOT NULL'
+UPDATE config_form_list set query_text = 'SELECT dscenario_id, node_id, elev, ymax, y0, ysur, apond, outfallparam FROM v_edit_inp_dscenario_junction WHERE node_id IS NOT NULL'
 WHERE listname = 'tbl_inp_junction';
