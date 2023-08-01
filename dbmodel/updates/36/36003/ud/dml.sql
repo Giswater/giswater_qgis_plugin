@@ -236,3 +236,5 @@ UPDATE config_form_fields set layoutorder=2 WHERE formname='ve_epa_gully' AND co
 UPDATE config_form_fields set tabname='tab_epa' WHERE  formname ='ve_epa_netgully';
 
 UPDATE config_form_fields SET iseditable = true WHERE layoutname = 'lyt_epa_dsc_1' AND widgettype = 'button';
+
+DELETE FROM config_form_tabs WHERE formname = 'v_edit_connec' and tabname = 'tab_epa';
