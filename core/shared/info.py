@@ -936,8 +936,9 @@ class GwInfo(QObject):
                            "dwfscenario_id", "node_id", "value", "pat1", "pat2", "pat3", "pat4"
                        ],
                        "widgetsTablename": "inp_dwf",
+                       "widgetsTablePk": "node_id",
                        "tableviews": [
-                        {"tbl": "tbl_dscenario_inflows", "view": "v_edit_inp_dscenario_inflows"}
+                        {"tbl": "tbl_dscenario_inflows", "view": "v_edit_inp_dscenario_inflows", "pk": ["dscenario_id", "node_id"]}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg(**kwargs)
@@ -3265,6 +3266,7 @@ def open_epa_dlg(**kwargs):
     tableviews = func_params['tableviews']
     widgets = func_params.get('widgets')
     widgets_tablename = func_params.get('widgetsTablename')
+    widgets_table_pk = func_params.get('widgetsTablePk')
 
     feature_id = complet_result['body']['feature']['id']
     id_name = complet_result['body']['feature']['idName']
@@ -3279,11 +3281,15 @@ def open_epa_dlg(**kwargs):
         sql = f"SELECT {fields} FROM {widgets_tablename} WHERE {id_name} = '{feature_id}'"
         row = tools_db.get_row(sql)
         if row:
+            setattr(info, f"my_json_{widgets_tablename}", {})
             for i, widget in enumerate(widgets):
                 w = info.dlg.findChild(QLineEdit, widget)
                 if not w:
                     continue
                 tools_qt.set_widget_text(info.dlg, w, row[i])
+                w.editingFinished.connect(partial(tools_gw.get_values, info.dlg, w, getattr(info, f"my_json_{widgets_tablename}")))
+                w.editingFinished.connect(partial(_manage_accept_btn, info, widgets_tablename))
+        info.dlg.btn_accept.clicked.connect(partial(save_widgets_changes, widgets_tablename, info, info.dlg, widgets_table_pk))
     # Fill tableviews
     for tableview in tableviews:
         tbl = tableview['tbl']
@@ -3527,6 +3533,39 @@ def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result,
     tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
 
 
+def widget_data_changed(info, view, tbl, model, addparam, value):
+
+    # Get view pk
+    ids = f''
+    if addparam:
+        for pk in addparam.split(','):
+            col = tools_qt.get_col_index_by_col_name(tbl, pk.strip())
+            if col is not False:
+                ids += f"{model.index(index.row(), col).data()}, "
+        ids = ids.strip(', ')
+    else:
+        ids = f"{model.index(index.row(), 0).data()}"
+
+    if ids not in getattr(info, f"my_json_{view}"):
+        getattr(info, f"my_json_{view}")[ids] = {}
+
+    # Get edited cell
+    fieldname = model.headerData(index.column(), Qt.Horizontal)
+    field = index.data()
+
+    # Fill my_json
+    if str(field) == '' or field is None:
+        getattr(info, f"my_json_{view}")[ids][fieldname] = None
+    else:
+        getattr(info, f"my_json_{view}")[ids][fieldname] = str(field)
+
+    # Enable btn_accept
+    try:
+        info.dlg.btn_accept.setEnabled(True)
+    except AttributeError:
+        pass
+
+
 def tbl_data_changed(info, view, tbl, model, addparam, index):
 
     # Get view pk
@@ -3593,6 +3632,43 @@ def save_tbl_changes(complet_list, info, dialog, pk):
         tools_gw.close_dialog(dialog)
     else:
         tools_qgis.show_warning('There are some error in the records with id: ', parameter=list_rows, dialog=dialog)
+
+
+def save_widgets_changes(table_name, info, dialog, pk):
+    my_json = getattr(info, f"my_json_{table_name}")
+    status = True
+    if info.inserted_feature and not my_json:
+        info.inserted_feature = False
+        tools_gw.close_dialog(dialog)
+        return
+    elif not my_json:
+        return
+
+    fields = json.dumps(my_json)
+    if not fields:
+        return
+    id_ = tools_qt.get_text(dialog, pk)
+    feature = f'"id":"{id_}"'  # TODO: get id from widget
+    if pk and type(pk) != list:
+        feature += f', "idName":"{pk}"'
+    feature += f', "tableName":"{table_name}"'
+    extras = f'"fields":{fields}, "force_action":"UPDATE"'
+    body = tools_gw.create_body(feature=feature, extras=extras)
+    json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
+    if json_result and json_result.get('status') != 'Accepted':
+        status = False
+
+    if status:
+        tools_gw.close_dialog(dialog)
+    else:
+        tools_qgis.show_warning('There are some error in the records with id: ', parameter=id_, dialog=dialog)
+
+
+def _manage_accept_btn(info, tablename):
+    my_json = getattr(info, f"my_json_{tablename}")
+    if not my_json:
+        return
+    info.dlg.btn_accept.setEnabled(True)
 
 
 def add_to_dscenario(**kwargs):
