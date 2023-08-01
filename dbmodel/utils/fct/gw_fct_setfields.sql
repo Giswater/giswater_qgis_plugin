@@ -102,12 +102,6 @@ BEGIN
 
 	select array_agg(row_to_json(a)) into v_text from json_each(v_fields)a;
 
-	--  Get id column, for tables is the key column
-	IF v_idname ISNULL THEN
-		EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
-	        INTO v_idname
-	        USING v_tablename;
-    END IF;
 	-- Get if view has composite primary key
 	IF v_idname ISNULL THEN
 		EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_addparam USING v_tablename;
@@ -132,6 +126,14 @@ BEGIN
 			END LOOP;
 		END IF;
 	END IF;
+
+	--  Get id column, for tables is the key column
+	IF v_idname ISNULL THEN
+		EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
+	        INTO v_idname
+	        USING v_tablename;
+    END IF;
+
 	-- For views it suposse pk is the first column
 	IF v_idname ISNULL THEN
 		EXECUTE '

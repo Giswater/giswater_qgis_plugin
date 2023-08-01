@@ -208,3 +208,8 @@ CHECK (weir_type::text = ANY (ARRAY['ROADWAY', 'SIDEFLOW', 'TRANSVERSE', 'V-NOTC
 UPDATE config_form_fields
 	SET iseditable=true
 	WHERE formname='v_edit_inp_dscenario_inflows' AND columnname='order_id';
+
+-- configure pkey for flwreg tables
+UPDATE sys_table
+	SET addparam='{"pkey":"dscenario_id, nodarc_id"}'::json
+	WHERE id IN ('inp_dscenario_flwreg_orifice', 'inp_dscenario_flwreg_outlet', 'inp_dscenario_flwreg_pump', 'inp_dscenario_flwreg_weir');
