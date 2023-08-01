@@ -3580,7 +3580,7 @@ def save_tbl_changes(complet_list, info, dialog, pk):
         if not fields:
             continue
         feature = f'"id":"{k}"'
-        if pk:
+        if pk and type(pk) != list:
             feature += f', "idName":"{pk}"'
         feature += f', "tableName":"{view}"'
         extras = f'"fields":{fields}, "force_action":"UPDATE"'
