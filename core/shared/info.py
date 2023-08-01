@@ -3367,6 +3367,14 @@ def add_row_epa(tbl, view, tablename, pkey, dlg, **kwargs):
     tools_qt.set_selected_item(info.add_dlg, 'tab_none_feature_type', f"{info.feature_type.upper()}")
     tools_qt.set_widget_enabled(info.add_dlg, 'tab_none_feature_type', False)
 
+    cmb_nodarc_id = info.add_dlg.findChild(QComboBox, 'tab_none_nodarc_id')
+    aux_view = view.replace("dscenario_", "")
+    if cmb_nodarc_id:
+        sql = (f"SELECT nodarc_id as id, nodarc_id as idval FROM {aux_view}"
+               f" WHERE {info.feature_type}_id = '{feature_id}'")
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(cmb_nodarc_id, rows)
+
     # Get every widget in the layout
     widgets = []
     for row in range(layout.rowCount()):
