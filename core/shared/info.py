@@ -3495,6 +3495,8 @@ def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result,
     for field in complet_result['body']['data']['fields']:
         if field['ismandatory']:
             widget = dialog.findChild(QWidget, field['widgetname'])
+            if not widget:
+                continue
             widget.setStyleSheet(None)
             value = tools_qt.get_text(dialog, widget)
             if value in ('null', None, ''):
