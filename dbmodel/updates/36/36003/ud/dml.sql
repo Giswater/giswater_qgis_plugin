@@ -213,3 +213,28 @@ UPDATE config_form_fields
 UPDATE sys_table
 	SET addparam='{"pkey":"dscenario_id, nodarc_id"}'::json
 	WHERE id IN ('inp_dscenario_flwreg_orifice', 'inp_dscenario_flwreg_outlet', 'inp_dscenario_flwreg_pump', 'inp_dscenario_flwreg_weir');
+
+-- configure tab epa for gullies
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, 
+ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+SELECT 've_epa_gully', formtype, 'tab_epa', columnname, 'lyt_epa_data_1', layoutorder, datatype, widgettype, label, tooltip, placeholder, 
+ismandatory, isparent, TRUE, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
+FROM config_form_fields
+where formname ='ve_node_netgully' and columnname in ('custom_top_elev')
+order by layoutorder;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, 
+ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+SELECT 've_epa_gully', formtype, 'tab_epa', columnname, 'lyt_epa_data_1', layoutorder, datatype, widgettype, label, tooltip, placeholder, 
+ismandatory, isparent, TRUE, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
+FROM config_form_fields
+where formname ='ve_epa_netgully' and columnname in ('outlet_type', 'custom_width', 'custom_length', 'custom_depth', 'method', 'weir_cd', 'orifice_cd', 'custom_a_param', 'custom_b_param', 'efficiency')
+order by layoutorder;
+
+UPDATE config_form_fields set layoutorder=2 WHERE formname='ve_epa_gully' AND columnname='outlet_type';
+
+UPDATE config_form_fields set tabname='tab_epa' WHERE  formname ='ve_epa_netgully'
