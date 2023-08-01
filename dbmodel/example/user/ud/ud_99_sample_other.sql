@@ -580,3 +580,26 @@ UPDATE config_form_tabs SET device = '{4,5}' where formname = 've_node_water_con
 UPDATE config_form_tabs SET device = '{5}' where formname like 'visit_%';
 UPDATE config_form_tabs SET device = '{5}' where formname like 'incident_%';
 UPDATE config_form_tabs SET device = '{4}' where formname like 'v_edit_%' and tabname = 'tab_plan';
+
+-- 01/08/23
+
+UPDATE config_form_fields
+SET layoutorder = (SELECT attnum FROM pg_attribute WHERE attrelid = formname::regclass AND attname = columnname and attnum > 0 AND NOT attisdropped ORDER BY attnum LIMIT 1)
+WHERE formname IN ('v_edit_inp_flwreg_orifice', 'v_edit_inp_dscenario_flwreg_orifice', 'v_edit_inp_flwreg_outlet', 'v_edit_inp_dscenario_flwreg_outlet', 'v_edit_inp_flwreg_pump', 'v_edit_inp_dscenario_flwreg_pump', 'v_edit_inp_flwreg_weir', 'v_edit_inp_dscenario_flwreg_weir', 'v_edit_inp_dscenario_demand', 'v_edit_inp_dscenario_pump_additional', 'v_edit_inp_dscenario_pump','v_edit_inp_pump_additional', 'v_edit_inp_dscenario_virtualvalve', 'v_edit_inp_dscenario_virtualpump', 'v_edit_inp_dscenario_valve', 'v_edit_inp_dscenario_tank', 'v_edit_inp_dscenario_shortpipe', 'v_edit_inp_dscenario_rules', 'v_edit_inp_dscenario_reservoir', 'v_edit_inp_dscenario_pipe', 'v_edit_inp_dscenario_junction', 'v_edit_inp_dscenario_inlet', 'v_edit_inp_dscenario_controls', 'v_edit_inp_dscenario_connec', 'inp_dscenario_virtualvalve', 'v_edit_inp_dscenario_conduit', 'v_edit_inp_dscenario_inflows', 'v_edit_inp_dscenario_inflows_poll', 'v_edit_inp_dscenario_lid_usage', 'v_edit_inp_dscenario_outfall', 'v_edit_inp_dscenario_raingage', 'v_edit_inp_dscenario_storage', 'v_edit_inp_dscenario_treatment');
+
+-- set hiden and iseditable for dscenario arc_id/node_id/connec_id/feature_id
+UPDATE config_form_fields
+SET iseditable = false, hidden = false
+WHERE formname IN ('v_edit_inp_flwreg_orifice', 'v_edit_inp_dscenario_flwreg_orifice', 'v_edit_inp_flwreg_outlet', 'v_edit_inp_dscenario_flwreg_outlet', 'v_edit_inp_flwreg_pump', 'v_edit_inp_dscenario_flwreg_pump', 'v_edit_inp_flwreg_weir', 'v_edit_inp_dscenario_flwreg_weir', 'v_edit_inp_dscenario_demand', 'v_edit_inp_dscenario_pump_additional', 'v_edit_inp_dscenario_pump','v_edit_inp_pump_additional', 'v_edit_inp_dscenario_virtualvalve', 'v_edit_inp_dscenario_virtualpump', 'v_edit_inp_dscenario_valve', 'v_edit_inp_dscenario_tank', 'v_edit_inp_dscenario_shortpipe', 'v_edit_inp_dscenario_rules', 'v_edit_inp_dscenario_reservoir', 'v_edit_inp_dscenario_pipe', 'v_edit_inp_dscenario_junction', 'v_edit_inp_dscenario_inlet', 'v_edit_inp_dscenario_controls', 'v_edit_inp_dscenario_connec', 'inp_dscenario_virtualvalve', 'v_edit_inp_dscenario_conduit', 'v_edit_inp_dscenario_inflows', 'v_edit_inp_dscenario_inflows_poll', 'v_edit_inp_dscenario_lid_usage', 'v_edit_inp_dscenario_outfall', 'v_edit_inp_dscenario_raingage', 'v_edit_inp_dscenario_storage', 'v_edit_inp_dscenario_treatment');
+
+UPDATE config_form_fields
+SET hidden=true
+WHERE formname='v_edit_inp_dscenario_junction' AND formtype='form_feature' AND columnname='peak_factor' AND tabname='tab_none';
+
+UPDATE config_form_fields
+SET ismandatory=true
+WHERE columnname='flwreg_length' OR columnname = 'order_id' OR columnname = 'to_arc' AND (tabname='tab_none' AND formname ilike 'v_edit_inp_flwreg%');
+
+UPDATE config_form_fields
+	SET iseditable=true
+	WHERE formname='v_edit_inp_dscenario_inflows' AND columnname='order_id';
