@@ -261,6 +261,13 @@ BEGIN
 				FROM v_edit_arc WHERE state > 0 '||v_checkeddiam||''||v_forcedarcs||')
 				SELECT arc_id FROM index_query ORDER BY distance limit 1'
 				INTO v_connect.arc_id;
+				
+			IF v_connect.arc_id IS NULL and v_forcedarcs is not null THEN -- looking for closest arc from connect
+				EXECUTE 'WITH index_query AS(
+				SELECT ST_Distance(the_geom, '||quote_literal(v_connect.the_geom::text)||') as distance, arc_id FROM arc WHERE state > 0 '||v_forcedarcs||')
+				SELECT arc_id FROM index_query ORDER BY distance limit 1'
+				INTO v_connect.arc_id;
+			end if;
 
 			END IF;
 

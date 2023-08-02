@@ -44,10 +44,11 @@ v_gully_proximity json;
 v_sql text;
 v_psector_vdefault text;
 v_schemaname text;
-v_feature_list text;
-v_feature_list2 text;
-v_feature_list3 text;
-v_feature_list4 text;
+v_list_features_obsolete text;
+v_list_connec_undoable text;
+v_list_gully_undoable text;
+v_list_arc_new text;
+v_list_connec_doable text;
 v_error_context text;
 v_connecautolink text;
 v_gullyautolink text;
@@ -79,8 +80,8 @@ BEGIN
     -- save value for automatic connect2network and set true in order to automatically connect new feature
     SELECT value INTO v_connecautolink FROM config_param_user WHERE parameter='edit_connec_automatic_link' AND cur_user=current_user;
     SELECT value INTO v_gullyautolink FROM config_param_user WHERE parameter='edit_gully_automatic_link' AND cur_user=current_user;
-    UPDATE config_param_user SET value='true' WHERE parameter IN ('edit_connec_automatic_link', 'edit_gully_automatic_link') AND cur_user=current_user;
-	
+    UPDATE config_param_user SET value='false' WHERE parameter IN ('edit_connec_automatic_link', 'edit_gully_automatic_link') AND cur_user=current_user;
+
 	UPDATE  config_param_system SET value = gw_fct_json_object_set_key(v_connec_proximity::json, 'activated'::text, 'false'::text) WHERE parameter='edit_connec_proximity';
 	UPDATE  config_param_system SET value = gw_fct_json_object_set_key(v_gully_proximity::json, 'activated'::text, 'false'::text) WHERE parameter='edit_gully_proximity';
 	
@@ -112,9 +113,9 @@ BEGIN
 	VALUES (153, v_result_id, concat('Set ',v_new_psector_name,' as current psector.' ));
 
 	--copy arcs with state 0 inside plan_psector tables
-	SELECT string_agg(arc_id,',') INTO v_feature_list FROM plan_psector_x_arc  WHERE psector_id=v_old_psector_id AND state=0;
+	SELECT string_agg(arc_id,',') INTO v_list_features_obsolete FROM plan_psector_x_arc  WHERE psector_id=v_old_psector_id AND state=0;
 
-	IF v_feature_list IS NOT NULL THEN
+	IF v_list_features_obsolete IS NOT NULL THEN
 		UPDATE config_param_user SET value='false' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
 	
 		PERFORM setval('SCHEMA_NAME.plan_psector_x_arc_id_seq', (select max(id) from plan_psector_x_arc) , true);
@@ -124,76 +125,76 @@ BEGIN
 	
 		UPDATE config_param_user SET value='true' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
 
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied arcs with state 0: ', v_feature_list ));
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied arcs with state 0: ', v_list_features_obsolete ));
 	END IF;
 
 	--copy nodes with state 0 inside plan_psector tables
-	SELECT string_agg(node_id,',') INTO v_feature_list FROM plan_psector_x_node  WHERE psector_id=v_old_psector_id AND state=0;
+	SELECT string_agg(node_id,',') INTO v_list_features_obsolete FROM plan_psector_x_node  WHERE psector_id=v_old_psector_id AND state=0;
 
-	IF v_feature_list IS NOT NULL THEN
+	IF v_list_features_obsolete IS NOT NULL THEN
 		PERFORM setval('SCHEMA_NAME.plan_psector_x_node_id_seq', (select max(id) from plan_psector_x_node) , true);
 		INSERT INTO plan_psector_x_node(node_id, psector_id, state, doable, descript) 
 		SELECT node_id, v_new_psector_id, state, doable, descript FROM plan_psector_x_node 
 		WHERE psector_id=v_old_psector_id AND state=0;
 
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied nodes with state 0: ', v_feature_list ));
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied nodes with state 0: ', v_list_features_obsolete ));
 	END IF;
 
 	--copy connecs with state 0 inside plan_psector tables
-	SELECT string_agg(connec_id,',') INTO v_feature_list FROM plan_psector_x_connec WHERE psector_id=v_old_psector_id AND state=0;
+	SELECT string_agg(connec_id,',') INTO v_list_features_obsolete FROM plan_psector_x_connec WHERE psector_id=v_old_psector_id AND state=0;
 
-	IF v_feature_list IS NOT NULL THEN
+	IF v_list_features_obsolete IS NOT NULL THEN
 		PERFORM setval('SCHEMA_NAME.plan_psector_x_connec_id_seq', (select max(id) from plan_psector_x_connec) , true);
 		INSERT INTO plan_psector_x_connec(connec_id, psector_id, state, doable, descript, arc_id, link_id) 
 		SELECT DISTINCT connec_id, v_new_psector_id, 0, false, descript, arc_id, link_id FROM plan_psector_x_connec 
 		WHERE psector_id=v_old_psector_id AND state=0 ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
 
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied connecs with state 0: ', v_feature_list ));
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied connecs with state 0: ', v_list_features_obsolete ));
 	END IF;
 
 	--copy connecs with state 1 inside plan_psector tables
-	SELECT string_agg(connec_id,',') INTO v_feature_list2 FROM plan_psector_x_connec WHERE psector_id=v_old_psector_id AND state=1 AND doable=false;
+	SELECT string_agg(connec_id,',') INTO v_list_connec_undoable FROM plan_psector_x_connec WHERE psector_id=v_old_psector_id AND state=1 AND doable=false;
 
-	IF v_feature_list2 IS NOT NULL THEN
+	IF v_list_connec_undoable IS NOT NULL THEN
 		PERFORM setval('SCHEMA_NAME.plan_psector_x_connec_id_seq', (select max(id) from plan_psector_x_connec) , true);
 		INSERT INTO plan_psector_x_connec(connec_id, psector_id, state, doable, descript) 
 		SELECT DISTINCT connec_id, v_new_psector_id, 1, false, descript FROM plan_psector_x_connec 
 		WHERE psector_id=v_old_psector_id AND state=1 AND doable=false ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
 
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied connecs with state 1 (doable false): ', v_feature_list2));
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied connecs with state 1 (doable false): ', v_list_connec_undoable));
 	END IF;
 
 	IF v_project_type='UD' THEN
 		--copy gullies with state 0 inside plan_psector tables
-		SELECT string_agg(gully_id,',') INTO v_feature_list FROM plan_psector_x_gully WHERE psector_id=v_old_psector_id AND state=0;
-		IF v_feature_list IS NOT NULL THEN
+		SELECT string_agg(gully_id,',') INTO v_list_features_obsolete FROM plan_psector_x_gully WHERE psector_id=v_old_psector_id AND state=0;
+		IF v_list_features_obsolete IS NOT NULL THEN
 			PERFORM setval('SCHEMA_NAME.plan_psector_x_gully_id_seq', (select max(id) from plan_psector_x_gully) , true);
 			INSERT INTO plan_psector_x_gully(gully_id, psector_id, state, doable, descript, arc_id, link_id) 
 			SELECT DISTINCT gully_id, v_new_psector_id, state, doable, descript, arc_id, link_id FROM plan_psector_x_gully 
 			WHERE psector_id=v_old_psector_id AND state=0 ON CONFLICT (psector_id, gully_id, state) DO NOTHING;
 	
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied gullies with state 0: ', v_feature_list ));
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied gullies with state 0: ', v_list_features_obsolete ));
 		END IF;
 	
 		--copy gullies with state 1 inside plan_psector tables
-		SELECT string_agg(gully_id,',') INTO v_feature_list3 FROM plan_psector_x_gully WHERE psector_id=v_old_psector_id AND state=1 AND doable=false;
+		SELECT string_agg(gully_id,',') INTO v_list_gully_undoable FROM plan_psector_x_gully WHERE psector_id=v_old_psector_id AND state=1 AND doable=false;
 
-		IF v_feature_list2 IS NOT NULL THEN
+		IF v_list_connec_undoable IS NOT NULL THEN
 			PERFORM setval('SCHEMA_NAME.plan_psector_x_gully_id_seq', (select max(id) from plan_psector_x_gully) , true);
 			INSERT INTO plan_psector_x_gully(gully_id, psector_id, state, doable, descript) 
 			SELECT DISTINCT gully_id, v_new_psector_id, 1, false, descript FROM plan_psector_x_gully 
 			WHERE psector_id=v_old_psector_id AND state=1 AND doable=false ON CONFLICT (psector_id, gully_id, state) DO NOTHING;
 	
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied gullies with state 1: ', v_feature_list3));
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied gullies with state 1: ', v_list_gully_undoable));
 		END IF;
 	END IF;
 	--copy features inside plan_psector tables
-	SELECT string_agg(price_id,',') INTO v_feature_list FROM plan_psector_x_other WHERE psector_id=v_old_psector_id;	
-	IF v_feature_list IS NOT NULL THEN
+	SELECT string_agg(price_id,',') INTO v_list_features_obsolete FROM plan_psector_x_other WHERE psector_id=v_old_psector_id;	
+	IF v_list_features_obsolete IS NOT NULL THEN
 		INSERT INTO plan_psector_x_other(price_id, measurement, psector_id, descript)
 		SELECT  price_id, measurement, psector_id, descript FROM plan_psector_x_other WHERE psector_id=v_old_psector_id;
 		
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied other prices: ', v_feature_list ));
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied other prices: ', v_list_features_obsolete ));
 	END IF;
 
 	-- delete old psector from selector and set new
@@ -243,32 +244,42 @@ BEGIN
 		END LOOP;
 
 		EXECUTE 'SELECT string_agg('||lower(rec_type.id)||'_id,'','') FROM plan_psector_x_'||lower(rec_type.id)||' WHERE psector_id='||v_old_psector_id||' and state=1'
-		into v_feature_list;
+		into v_list_features_obsolete;
 		
-		IF v_feature_list IS NOT NULL THEN
+		IF v_list_features_obsolete IS NOT NULL THEN
 			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (153, v_result_id, concat('New ',lower(rec_type.id),' inserted with state 1: ', v_feature_list));
+			VALUES (153, v_result_id, concat('New ',lower(rec_type.id),' inserted with state 1: ', v_list_features_obsolete));
 		END IF;
 
 	END LOOP;
 
 	-- select forced arcs to connect with
-	SELECT string_agg(arc_id,',') INTO v_feature_list4 FROM plan_psector_x_arc WHERE psector_id=v_new_psector_id;	
+	SELECT string_agg(arc_id,',') INTO v_list_arc_new FROM plan_psector_x_arc WHERE psector_id=v_new_psector_id;	
 
-	IF v_feature_list2 IS NOT NULL THEN
-		-- connect to network connecs with state 1 from v_feature_list2
+	IF v_list_connec_undoable IS NOT NULL AND v_list_arc_new IS NOT NULL THEN
+		-- connect to network connecs with state 1 from v_list_connec_undoable
 		EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-		"feature":{"id":"['||v_feature_list2||']"},"data":{"feature_type":"CONNEC", "forcedArcs":['||v_feature_list4||']}}$$)';
+		"feature":{"id":"['||v_list_connec_undoable||']"},"data":{"feature_type":"CONNEC", "forcedArcs":['||v_list_arc_new||']}}$$)';
 	END IF;
 
 	IF v_project_type='UD' THEN
-		IF v_feature_list3 IS NOT NULL THEN
-			-- connect to network gullies with state 1 from v_feature_list3
+		IF v_list_gully_undoable IS NOT NULL AND v_list_arc_new IS NOT NULL THEN
+			-- connect to network gullies with state 1 from v_list_gully_undoable
 			EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-			"feature":{"id":"['||v_feature_list3||']"},"data":{"feature_type":"GULLY", "forcedArcs":['||v_feature_list4||']}}$$)';
+			"feature":{"id":"['||v_list_gully_undoable||']"},"data":{"feature_type":"GULLY", "forcedArcs":['||v_list_arc_new||']}}$$)';
 		END IF;
 	END IF;
-	
+
+	SELECT string_agg(connec_id,',') INTO v_list_connec_doable FROM plan_psector_x_connec WHERE psector_id=v_new_psector_id AND doable=true AND state=1 AND 
+	connec_id NOT IN (SELECT feature_id FROM link WHERE feature_type='CONNEC');	
+
+	IF v_list_connec_doable IS NOT NULL THEN
+		-- connect to network connecs with state 1 from v_list_connec_undoable
+		EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+		"feature":{"id":"['||v_list_connec_doable||']"},"data":{"feature_type":"CONNEC"}}$$)';
+	END IF;
+
+
 	--activate the functions an set back the values of parameters
 	UPDATE config_param_user SET value=v_connecautolink WHERE parameter='edit_connec_automatic_link' and cur_user=current_user;
 	UPDATE config_param_user SET value=v_gullyautolink WHERE parameter='edit_gully_automatic_link' and cur_user=current_user;
