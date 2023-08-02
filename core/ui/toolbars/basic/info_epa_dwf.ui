@@ -24,8 +24,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>947</width>
-        <height>379</height>
+        <width>943</width>
+        <height>368</height>
        </rect>
       </property>
       <attribute name="label">
@@ -36,6 +36,12 @@
         <layout class="QGridLayout" name="lyt_base_1">
          <item row="0" column="0">
           <widget class="QLabel" name="label">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string>DWF scenario id:</string>
            </property>
@@ -53,6 +59,12 @@
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="readOnly">
             <bool>true</bool>
            </property>
@@ -66,15 +78,32 @@
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QLineEdit" name="value"/>
+          <widget class="QLineEdit" name="value">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="dwfscenario_id"/>
+          <widget class="QLineEdit" name="dwfscenario_id">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
          </item>
          <item row="3" column="0" colspan="2">
           <spacer name="verticalSpacer">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Expanding</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -90,6 +119,12 @@
         <layout class="QGridLayout" name="lyt_base_2" rowstretch="0,0,0,0,0">
          <item row="0" column="0">
           <widget class="QLabel" name="label_2">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string>Pat 1:</string>
            </property>
@@ -104,6 +139,12 @@
          </item>
          <item row="2" column="0">
           <widget class="QLabel" name="label_6">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string>Pat 3:</string>
            </property>
@@ -124,6 +165,12 @@
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_5">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string>Pat 2:</string>
            </property>
@@ -157,8 +204,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>112</width>
-        <height>123</height>
+        <width>943</width>
+        <height>368</height>
        </rect>
       </property>
       <attribute name="label">
