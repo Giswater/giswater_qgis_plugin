@@ -2755,6 +2755,21 @@ class GwInfo(QObject):
             widget = tools_gw.fill_tableview_rows(widget, field)
             widget = tools_gw.set_tablemodel_config(dialog, widget, short_name, 1, True)
             tools_qt.set_tableview_config(widget, edit_triggers=QTableView.DoubleClicked)
+            if 'tab_epa' in widgetname:
+                model = widget.model()
+                tbl_upsert = widget.property('widgetcontrols').get('tableUpsert')
+                setattr(self, f"my_json_{tbl_upsert}", {})
+
+                # get view addparam
+                addparam = None
+                sql = f"SELECT addparam FROM sys_table WHERE id = '{tbl_upsert}'"
+                row = tools_db.get_row(sql)
+                if row:
+                    addparam = row[0]
+                    if addparam:
+                        addparam = addparam.get('pkey')
+                model.dataChanged.connect(partial(tbl_data_changed, self, tbl_upsert, widget, model, addparam))
+                dialog.btn_accept.clicked.connect(partial(save_tbl_changes, tbl_upsert, self, dialog, addparam))
 
         widget_list = []
         widget_list.extend(self.tab_main.widget(index_tab).findChildren(QComboBox, QRegularExpression(f"{tab_name}_")))
@@ -3318,7 +3333,7 @@ def open_epa_dlg(**kwargs):
 
         complet_list = get_list(view, id_name, feature_id)
         fill_tbl(complet_list, tbl, info, view)
-        info.dlg.btn_accept.clicked.connect(partial(save_tbl_changes, complet_list, info, info.dlg, pk))
+        info.dlg.btn_accept.clicked.connect(partial(save_tbl_changes, view, info, info.dlg, pk))
 
         # Add & Delete buttons
         if 'dscenario' not in view:
@@ -3622,10 +3637,9 @@ def tbl_data_changed(info, view, tbl, model, addparam, index):
         pass
 
 
-def save_tbl_changes(complet_list, info, dialog, pk):
+def save_tbl_changes(table_name, info, dialog, pk):
 
-    view = complet_list['body']['feature']['tableName']
-    my_json = getattr(info, f"my_json_{view}")
+    my_json = getattr(info, f"my_json_{table_name}")
     list_rows = []
     status = True
     if info.inserted_feature and not my_json:
@@ -3642,9 +3656,9 @@ def save_tbl_changes(complet_list, info, dialog, pk):
         if not fields:
             continue
         feature = f'"id":"{k}"'
-        if pk and type(pk) != list:
+        if pk and type(pk) != list and ',' not in pk:
             feature += f', "idName":"{pk}"'
-        feature += f', "tableName":"{view}"'
+        feature += f', "tableName":"{table_name}"'
         extras = f'"fields":{fields}, "force_action":"UPDATE"'
         body = tools_gw.create_body(feature=feature, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
