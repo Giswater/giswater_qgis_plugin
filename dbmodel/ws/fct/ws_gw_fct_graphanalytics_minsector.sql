@@ -247,8 +247,8 @@ BEGIN
 			
 		-- set the starting element
 		v_querytext = 'UPDATE temp_t_anlgraph SET flag=1, water=1, checkf=1, trace=a.arc_id::integer 
-				FROM (SELECT a.arc_id FROM temp_t_arc a JOIN vu_node ON node_1 = node_id WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter =''MINSECTOR'')
-				UNION SELECT a.arc_id FROM temp_t_arc a JOIN vu_node ON node_2 = node_id WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter =''MINSECTOR''))a
+				FROM (SELECT a.arc_id FROM temp_t_arc a JOIN vu_node ON node_1 = node_id WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter !=''NONE'')
+				UNION SELECT a.arc_id FROM temp_t_arc a JOIN vu_node ON node_2 = node_id WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter !=''NONE''))a
 					                                            WHERE temp_t_anlgraph.arc_id = a.arc_id';
 		EXECUTE v_querytext;
 
@@ -284,6 +284,8 @@ BEGIN
 		(SELECT trace, count(*) FROM temp_t_anlgraph GROUP BY trace) c USING (trace)
 		order by 2, 3 desc;
 
+		v_cont1 = 0;
+
 		LOOP
 			EXIT WHEN (select count(*) from v_t_process) = 0;
 				
@@ -292,6 +294,8 @@ BEGIN
 						join v_t_process b USING (count, node_id) join v_t_process c USING (node_id) where b.trace::text != c.trace::text
 			LOOP
 				UPDATE temp_t_anlgraph SET trace = v_loop.trace_new WHERE trace = v_loop.trace_old;
+				v_cont1 = v_cont1+1;
+				raise notice 'FIXING MINSECTORS --> %' , v_cont1;
 			END LOOP;				
 		END LOOP;
 
