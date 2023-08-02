@@ -221,9 +221,9 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF NEW.pattern_id IS NULL OR NEW.pattern_id='' THEN NEW.pattern_id = (SELECT pattern_id FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
 			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
 
-			IF NEW.effic_curve_id IS NULL OR NEW.effic_curve_id='' THEN NEW.effic_curve_id = (SELECT effic_curve_id FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
-			IF NEW.energy_price IS NULL THEN NEW.energy_price = (SELECT energy_price FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
-			IF NEW.energy_pattern_id IS NULL OR NEW.energy_pattern_id='' THEN NEW.energy_pattern_id = (SELECT energy_pattern_id FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id);END IF;
+			IF NEW.effic_curve_id IS NULL OR NEW.effic_curve_id='' THEN NEW.effic_curve_id = (SELECT effic_curve_id FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id limit 1);END IF;
+			IF NEW.energy_price IS NULL THEN NEW.energy_price = (SELECT energy_price FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id limit 1);END IF;
+			IF NEW.energy_pattern_id IS NULL OR NEW.energy_pattern_id='' THEN NEW.energy_pattern_id = (SELECT energy_pattern_id FROM v_edit_inp_pump_additional WHERE node_id = NEW.node_id limit 1);END IF;
 
 			INSERT INTO inp_dscenario_pump_additional (dscenario_id, node_id, order_id, power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id)
 			VALUES (NEW.dscenario_id, NEW.node_id, NEW.order_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern_id, NEW.status, NEW.effic_curve_id, NEW.energy_price, NEW.energy_pattern_id);
