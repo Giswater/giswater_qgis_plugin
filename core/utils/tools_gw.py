@@ -19,6 +19,7 @@ if 'nt' in sys.builtin_module_names:
     import ctypes
 from collections import OrderedDict
 from functools import partial
+from datetime import datetime
 
 from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, QLocale
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon, QStandardItem, \
@@ -98,10 +99,14 @@ def save_settings(dialog, plugin='core'):
 def initialize_parsers():
     """ Initialize parsers of configuration files: init, session, giswater, user_params """
 
+    success = True
     for config in global_vars.list_configs:
         filepath, parser = _get_parser_from_filename(config)
         global_vars.configs[config][0] = filepath
         global_vars.configs[config][1] = parser
+        if parser is None:
+            success = False
+    return success
 
 
 def get_config_parser(section: str, parameter: str, config_type, file_name, prefix=True, get_comment=False,
@@ -2190,12 +2195,14 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
                             color_values[item['id']] = color
                         cat_field = str(style_type[key]['field'])
                         size = style_type[key]['width'] if style_type[key].get('width') else 2
-                        tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values)
+                        tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values, opacity=int(opacity * 255))
 
                     elif style_type[key]['style'] == 'random':
                         size = style_type['width'] if style_type.get('width') else 2
                         if geometry_type == 'Point':
                             v_layer.renderer().symbol().setSize(size)
+                        elif geometry_type in ('Polygon', 'Multipolygon'):
+                            pass
                         else:
                             v_layer.renderer().symbol().setWidth(size)
                         v_layer.renderer().symbol().setOpacity(opacity)
@@ -3215,14 +3222,14 @@ def refresh_selectors(tab_name=None):
 def open_dlg_help():
     """ Opens the help page for the last focused dialog """
 
-    parser = configparser.ConfigParser(strict=False)
+    parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True, strict=False)
     path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}giswater.config"
     if not os.path.exists(path):
         webbrowser.open_new_tab('https://giswater.gitbook.io/giswater-manual')
         return True
 
-    parser.read(path)
     try:
+        parser.read(path)
         web_tag = parser.get('web_tag', global_vars.session_vars['last_focus'])
         webbrowser.open_new_tab(f'https://giswater.gitbook.io/giswater-manual/{web_tag}')
     except Exception:
@@ -3289,7 +3296,7 @@ def manage_user_config_folder(user_folder_dir):
     """ Check if user config folder exists. If not create empty files init.config and session.config """
 
     try:
-        config_folder = f"{user_folder_dir}{os.sep}config{os.sep}"
+        config_folder = f"{user_folder_dir}{os.sep}core{os.sep}config{os.sep}"
         if not os.path.exists(config_folder):
             tools_log.log_info(f"Creating user config folder: {config_folder}")
             os.makedirs(config_folder)
@@ -3336,55 +3343,76 @@ def user_params_to_userconfig():
     if parser is None:
         return
 
-    # Get the sections of the user params inventory
-    inv_sections = parser.sections()
+    try:
+        # Get the sections of the user params inventory
+        inv_sections = parser.sections()
 
-    # For each section (inventory)
-    for section in inv_sections:
+        # For each section (inventory)
+        for section in inv_sections:
 
-        file_name = section.split('.')[0]
-        section_name = section.split('.')[1]
-        parameters = parser.options(section)
+            file_name = section.split('.')[0]
+            section_name = section.split('.')[1]
+            parameters = parser.options(section)
 
-        # For each parameter (inventory)
-        for parameter in parameters:
+            # For each parameter (inventory)
+            for parameter in parameters:
 
-            # Manage if parameter need prefix and project_type is not defined
-            if parameter.startswith("_") and global_vars.project_type is None:
-                continue
-            if parameter.startswith("#"):
-                continue
-                
-            _pre = False
-            inv_param = parameter
-            # If it needs a prefix
-            if parameter.startswith("_"):
-                _pre = True
-                parameter = inv_param[1:]
-            # If it's just a comment line
-            if parameter.startswith("#"):
-                # tools_log.log_info(f"set_config_parser: {file_name} {section_name} {parameter}")
-                set_config_parser(section_name, parameter, None, "user", file_name, prefix=False, chk_user_params=False)
-                continue
+                # Manage if parameter need prefix and project_type is not defined
+                if parameter.startswith("_") and global_vars.project_type is None:
+                    continue
+                if parameter.startswith("#"):
+                    continue
 
-            # If it's a normal value
-            # Get value[section][parameter] of the user config file
-            value = get_config_parser(section_name, parameter, "user", file_name, _pre, True, False, True)
+                _pre = False
+                inv_param = parameter
+                # If it needs a prefix
+                if parameter.startswith("_"):
+                    _pre = True
+                    parameter = inv_param[1:]
+                # If it's just a comment line
+                if parameter.startswith("#"):
+                    # tools_log.log_info(f"set_config_parser: {file_name} {section_name} {parameter}")
+                    set_config_parser(section_name, parameter, None, "user", file_name, prefix=False, chk_user_params=False)
+                    continue
 
-            # If this value (user config file) is None (doesn't exist, isn't set, etc.)
-            if value is None:
-                # Read the default value for that parameter
-                value = get_config_parser(section, inv_param, "project", "user_params", False, True, False, True)
-                # Set value[section][parameter] in the user config file
-                set_config_parser(section_name, parameter, value, "user", file_name, None, _pre, False)
-            else:
-                value2 = get_config_parser(section, inv_param, "project", "user_params", False, True, False, True)
-                if value2 is not None:
-                    # If there's an inline comment in the inventory but there isn't one in the user config file, add it
-                    if "#" not in value and "#" in value2:
-                        # Get the comment (inventory) and set it (user config file)
-                        comment = value2.split('#')[1]
-                        set_config_parser(section_name, parameter, value.strip(), "user", file_name, comment, _pre, False)
+                # If it's a normal value
+                # Get value[section][parameter] of the user config file
+                value = get_config_parser(section_name, parameter, "user", file_name, _pre, True, False, True)
+
+                # If this value (user config file) is None (doesn't exist, isn't set, etc.)
+                if value is None:
+                    # Read the default value for that parameter
+                    value = get_config_parser(section, inv_param, "project", "user_params", False, True, False, True)
+                    # Set value[section][parameter] in the user config file
+                    set_config_parser(section_name, parameter, value, "user", file_name, None, _pre, False)
+                else:
+                    value2 = get_config_parser(section, inv_param, "project", "user_params", False, True, False, True)
+                    if value2 is not None:
+                        # If there's an inline comment in the inventory but there isn't one in the user config file, add it
+                        if "#" not in value and "#" in value2:
+                            # Get the comment (inventory) and set it (user config file)
+                            comment = value2.split('#')[1]
+                            set_config_parser(section_name, parameter, value.strip(), "user", file_name, comment, _pre, False)
+    except:
+        pass
+
+
+def recreate_config_files():
+    filenames = ['init', 'session']
+
+    for filename in filenames:
+        filepath = f"{global_vars.user_folder_dir}{os.sep}core{os.sep}config{os.sep}{filename}.config"
+        if os.path.exists(filepath):
+            now = datetime.now()
+            now = now.strftime("%d%m%Y-%H%M%S")
+            bak_filename = f"{filepath}_{now}.bak"
+            if os.path.exists(bak_filename):
+                os.remove(bak_filename)
+            os.rename(filepath, bak_filename)
+
+    manage_user_config_folder(global_vars.user_folder_dir)
+    initialize_parsers()
+    user_params_to_userconfig()
 
 
 def remove_deprecated_config_vars():
@@ -3393,8 +3421,8 @@ def remove_deprecated_config_vars():
     if global_vars.user_folder_dir is None:
         return
 
-    init_parser = configparser.ConfigParser(strict=False)
-    session_parser = configparser.ConfigParser(strict=False)
+    init_parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True, strict=False)
+    session_parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True, strict=False)
     path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
     project_types = get_config_parser('system', 'project_types', "project", "giswater").split(',')
 
@@ -3404,18 +3432,21 @@ def remove_deprecated_config_vars():
         tools_log.log_warning(f"File not found: {path}")
         return
 
-    init_parser.read(path)
-    vars = get_config_parser('system', 'deprecated_section_init', "project", "giswater")
-    if vars is not None:
-        for var in vars.split(','):
-            section = var.split('.')[0].strip()
-            if not init_parser.has_section(section):
-                continue
-            init_parser.remove_section(section)
+    try:
+        init_parser.read(path)
+        vars = get_config_parser('system', 'deprecated_section_init', "project", "giswater")
+        if vars is not None:
+            for var in vars.split(','):
+                section = var.split('.')[0].strip()
+                if not init_parser.has_section(section):
+                    continue
+                init_parser.remove_section(section)
 
-    with open(path, 'w') as configfile:
-        init_parser.write(configfile)
-        configfile.close()
+        with open(path, 'w') as configfile:
+            init_parser.write(configfile)
+            configfile.close()
+    except:
+        pass
 
     # Remove deprecated sections for session
     path = f"{path_folder}{os.sep}core{os.sep}config{os.sep}session.config"
@@ -3423,18 +3454,21 @@ def remove_deprecated_config_vars():
         tools_log.log_warning(f"File not found: {path}")
         return
 
-    session_parser.read(path)
-    vars = get_config_parser('system', 'deprecated_section_session', "project", "giswater")
-    if vars is not None:
-        for var in vars.split(','):
-            section = var.split('.')[0].strip()
-            if not session_parser.has_section(section):
-                continue
-            session_parser.remove_section(section)
+    try:
+        session_parser.read(path)
+        vars = get_config_parser('system', 'deprecated_section_session', "project", "giswater")
+        if vars is not None:
+            for var in vars.split(','):
+                section = var.split('.')[0].strip()
+                if not session_parser.has_section(section):
+                    continue
+                session_parser.remove_section(section)
 
-    with open(path, 'w') as configfile:
-        session_parser.write(configfile)
-        configfile.close()
+        with open(path, 'w') as configfile:
+            session_parser.write(configfile)
+            configfile.close()
+    except:
+        pass
 
     # Remove deprecated vars for init
     path = f"{path_folder}{os.sep}core{os.sep}config{os.sep}init.config"
@@ -3442,23 +3476,26 @@ def remove_deprecated_config_vars():
         tools_log.log_warning(f"File not found: {path}")
         return
 
-    init_parser.read(path)
-    vars = get_config_parser('system', 'deprecated_vars_init', "project", "giswater")
-    if vars is not None:
-        for var in vars.split(','):
-            section = var.split('.')[0].strip()
-            if not init_parser.has_section(section):
-                continue
-            option = var.split('.')[1].strip()
-            if option.startswith('_'):
-                for proj in project_types:
-                    init_parser.remove_option(section, f"{proj}{option}")
-            else:
-                init_parser.remove_option(section, option)
+    try:
+        init_parser.read(path)
+        vars = get_config_parser('system', 'deprecated_vars_init', "project", "giswater")
+        if vars is not None:
+            for var in vars.split(','):
+                section = var.split('.')[0].strip()
+                if not init_parser.has_section(section):
+                    continue
+                option = var.split('.')[1].strip()
+                if option.startswith('_'):
+                    for proj in project_types:
+                        init_parser.remove_option(section, f"{proj}{option}")
+                else:
+                    init_parser.remove_option(section, option)
 
-    with open(path, 'w') as configfile:
-        init_parser.write(configfile)
-        configfile.close()
+        with open(path, 'w') as configfile:
+            init_parser.write(configfile)
+            configfile.close()
+    except:
+        pass
 
     # Remove deprecated vars for session
     path = f"{path_folder}{os.sep}core{os.sep}config{os.sep}session.config"
@@ -3466,23 +3503,26 @@ def remove_deprecated_config_vars():
         tools_log.log_warning(f"File not found: {path}")
         return
 
-    session_parser.read(path)
-    vars = get_config_parser('system', 'deprecated_vars_session', "project", "giswater")
-    if vars is not None:
-        for var in vars.split(','):
-            section = var.split('.')[0].strip()
-            if not session_parser.has_section(section):
-                continue
-            option = var.split('.')[1].strip()
-            if option.startswith('_'):
-                for proj in project_types:
-                    session_parser.remove_option(section, f"{proj}{option}")
-            else:
-                session_parser.remove_option(section, option)
+    try:
+        session_parser.read(path)
+        vars = get_config_parser('system', 'deprecated_vars_session', "project", "giswater")
+        if vars is not None:
+            for var in vars.split(','):
+                section = var.split('.')[0].strip()
+                if not session_parser.has_section(section):
+                    continue
+                option = var.split('.')[1].strip()
+                if option.startswith('_'):
+                    for proj in project_types:
+                        session_parser.remove_option(section, f"{proj}{option}")
+                else:
+                    session_parser.remove_option(section, option)
 
-    with open(path, 'w') as configfile:
-        session_parser.write(configfile)
-        configfile.close()
+        with open(path, 'w') as configfile:
+            session_parser.write(configfile)
+            configfile.close()
+    except:
+        pass
 
 
 def hide_widgets_form(dialog, dlg_name):
@@ -3710,7 +3750,7 @@ def _get_parser_from_filename(filename):
 
     try:
         parser.read(filepath)
-    except (configparser.DuplicateSectionError, configparser.DuplicateOptionError) as e:
+    except (configparser.DuplicateSectionError, configparser.DuplicateOptionError, configparser.ParsingError) as e:
         tools_qgis.show_critical(f"Error parsing file: {filepath}", parameter=e)
         return filepath, None
 

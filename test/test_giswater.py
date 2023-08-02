@@ -85,7 +85,7 @@ class GwTest(QObject):
 
         value = None
         try:
-            metadata = configparser.ConfigParser()
+            metadata = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True, strict=False)
             metadata.read(metadata_file)
             value = metadata.get('general', parameter)
         except configparser.NoOptionError:

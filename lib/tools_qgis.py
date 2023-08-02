@@ -21,7 +21,7 @@ from qgis.PyQt.QtWidgets import QDockWidget, QApplication, QPushButton
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
     QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsRectangle, QgsSymbol, \
     QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsGeometry, QgsCoordinateReferenceSystem, \
-    QgsCoordinateTransform
+    QgsCoordinateTransform, QgsFillSymbol
 from qgis.core import QgsVectorLayer
 from qgis.utils import iface
 
@@ -202,7 +202,7 @@ def get_plugin_metadata(parameter, default_value, plugin_dir=None):
 
     value = None
     try:
-        metadata = configparser.ConfigParser(strict=False)
+        metadata = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True, strict=False)
         metadata.read(metadata_file)
         value = metadata.get('general', parameter)
     except configparser.NoOptionError:
@@ -224,7 +224,7 @@ def get_plugin_version():
         message = f"Metadata file not found: {metadata_file}"
         return plugin_version, message
 
-    metadata = configparser.ConfigParser(strict=False)
+    metadata = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True, strict=False)
     metadata.read(metadata_file)
     plugin_version = metadata.get('general', 'version')
     if plugin_version is None:
@@ -676,7 +676,7 @@ def restore_user_layer(layer_name, user_current_layer=None):
             iface.setActiveLayer(layer)
 
 
-def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=None):
+def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=None, opacity=255):
     """
     :param layer: QgsVectorLayer to be categorized (QgsVectorLayer)
     :param cat_field: Field to categorize (String)
@@ -695,6 +695,8 @@ def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=Non
         symbol = QgsSymbol.defaultSymbol(layer.geometryType())
         if type(symbol) in (QgsLineSymbol, ):
             symbol.setWidth(size)
+        elif type(symbol) in (QgsFillSymbol, ):
+            pass
         else:
             symbol.setSize(size)
 
@@ -703,7 +705,7 @@ def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=Non
             color = color_values.get(str(unique_value))
             symbol.setColor(color)
         except Exception:
-            color = QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))
+            color = QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256), opacity)
             symbol.setColor(color)
 
         # create renderer object
