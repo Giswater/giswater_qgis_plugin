@@ -425,3 +425,37 @@ WHERE formname='v_edit_inp_dscenario_pump_additional' AND formtype='form_feature
 UPDATE config_form_fields
 SET ismandatory=true
 WHERE columnname='speed' AND tabname='tab_none' AND formname ilike 'v_edit_inp_dscenario%';
+
+UPDATE config_form_fields
+SET  widgetcontrols='{"saveValue": false, "tableUpsert":"v_edit_inp_dscenario_pump"}'::json
+WHERE formname='ve_epa_pump' AND formtype='form_feature' AND columnname='tbl_inp_pump' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET widgetcontrols='{"saveValue": false, "tableUpsert":"v_edit_inp_dscenario_junction"}'::json
+WHERE formname='ve_epa_junction' AND formtype='form_feature' AND columnname='tbl_inp_junction' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET widgetcontrols='{"saveValue": false, "tableUpsert":"v_edit_inp_dscenario_pipe"}'::json
+WHERE formname='ve_epa_pipe' AND formtype='form_feature' AND columnname='tbl_inp_pipe' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET  widgetcontrols='{"saveValue": false, "tableUpsert":"v_edit_inp_dscenario_shortpipe"}'::json
+WHERE formname='ve_epa_shortpipe' AND formtype='form_feature' AND columnname='tbl_inp_shortpipe' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET  widgetcontrols='{"saveValue": false, "tableUpsert":"v_edit_inp_dscenario_tank"}'::json
+WHERE formname='ve_epa_tank' AND formtype='form_feature' AND columnname='tbl_inp_tank' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET  widgetcontrols='{"saveValue": false, "tableUpsert":"v_edit_inp_dscenario_reservoir"}'::json
+WHERE formname='ve_epa_reservoir' AND formtype='form_feature' AND columnname='tbl_inp_reservoir' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET widgetcontrols='{"saveValue": false, "tableUpsert":"v_edit_inp_dscenario_valve"}'::json
+WHERE formname='ve_epa_valve' AND formtype='form_feature' AND columnname='tbl_inp_valve' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET  widgetcontrols='{"saveValue": false, "tableUpsert":"v_edit_inp_dscenario_virtualvalve"}'::json
+WHERE formname='ve_epa_virtualvalve' AND formtype='form_feature' AND columnname='tbl_inp_virtualvalve' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET widgetcontrols='{"saveValue": false, "tableUpsert":"v_edit_inp_dscenario_connec"}'::json
+WHERE formname='ve_epa_connec' AND formtype='form_feature' AND columnname='tbl_inp_connec' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET  widgetcontrols='{"saveValue": false, "tableUpsert":"v_edit_inp_dscenario_pump"}'::json
+WHERE formname='ve_epa_virtualpump' AND formtype='form_feature' AND columnname='tbl_inp_pump' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET  widgetcontrols='{"saveValue": false, "tableUpsert":"v_edit_inp_dscenario_inlet"}'::json
+WHERE formname='ve_epa_inlet' AND formtype='form_feature' AND columnname='tbl_inp_inlet' AND tabname='tab_epa';
