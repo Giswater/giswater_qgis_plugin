@@ -602,3 +602,5 @@ WHERE columnname='flwreg_length' OR columnname = 'order_id' OR columnname = 'to_
 UPDATE config_form_fields
 	SET iseditable=true
 	WHERE formname='v_edit_inp_dscenario_inflows' AND columnname='order_id';
+
+UPDATE config_form_fields SET iseditable = true WHERE layoutname = 'lyt_epa_dsc_1' AND widgettype = 'button';

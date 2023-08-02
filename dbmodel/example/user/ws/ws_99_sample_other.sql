@@ -771,3 +771,5 @@ WHERE formname='v_edit_inp_dscenario_pump_additional' AND formtype='form_feature
 UPDATE config_form_fields
 SET ismandatory=true
 WHERE columnname='speed' AND tabname='tab_none' AND formname ilike 'v_edit_inp_dscenario%';
+
+UPDATE config_form_fields SET iseditable = true WHERE layoutname = 'lyt_epa_dsc_1' AND widgettype = 'button';
