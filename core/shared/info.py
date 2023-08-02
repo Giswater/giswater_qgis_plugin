@@ -3282,9 +3282,21 @@ def open_epa_dlg(**kwargs):
         row = tools_db.get_row(sql)
         if row:
             setattr(info, f"my_json_{widgets_tablename}", {})
+            sql = f"SELECT pattern_id as id, pattern_id as idval FROM inp_pattern WHERE pattern_id IS NOT NULL"
+            rows = tools_db.get_rows(sql)
             for i, widget in enumerate(widgets):
+                if 'pat' in widget:
+                    w = info.dlg.findChild(QComboBox, widget)
+                    if w is None:
+                        continue
+                    if rows:
+                        tools_qt.fill_combo_values(w, rows, add_empty=True)
+                        tools_qt.set_combo_value(w, row[i], 0)
+                        w.currentIndexChanged.connect(partial(tools_gw.get_values, info.dlg, w, getattr(info, f"my_json_{widgets_tablename}")))
+                        w.currentIndexChanged.connect(partial(_manage_accept_btn, info, widgets_tablename))
+                    continue
                 w = info.dlg.findChild(QLineEdit, widget)
-                if not w:
+                if w is None:
                     continue
                 tools_qt.set_widget_text(info.dlg, w, row[i])
                 w.editingFinished.connect(partial(tools_gw.get_values, info.dlg, w, getattr(info, f"my_json_{widgets_tablename}")))
