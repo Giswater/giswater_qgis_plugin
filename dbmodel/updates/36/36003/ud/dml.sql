@@ -266,3 +266,17 @@ UPDATE config_form_fields
 
 UPDATE config_form_list set query_text = 'SELECT dscenario_id, node_id, elev, ymax, y0, ysur, apond, outfallparam FROM v_edit_inp_dscenario_junction WHERE node_id IS NOT NULL'
 WHERE listname = 'tbl_inp_junction';
+
+-- configure tableUpsert for epa dscenario tableviews
+UPDATE config_form_fields
+	SET widgetcontrols='{"saveValue": false, "tableUpsert": "v_edit_inp_dscenario_conduit"}'::json
+	WHERE formname='ve_epa_conduit'AND columnname='tbl_inp_conduit';
+UPDATE config_form_fields
+	SET widgetcontrols='{"saveValue": false, "tableUpsert": "v_edit_inp_dscenario_junction"}'::json
+	WHERE formname='ve_epa_junction'AND columnname='tbl_inp_junction';
+UPDATE config_form_fields
+	SET widgetcontrols='{"saveValue": false, "tableUpsert": "v_edit_inp_dscenario_outfall"}'::json
+	WHERE formname='ve_epa_outfall'AND columnname='tbl_inp_outfall';
+UPDATE config_form_fields
+	SET widgetcontrols='{"saveValue": false, "tableUpsert": "v_edit_inp_dscenario_storage"}'::json
+	WHERE formname='ve_epa_storage'AND columnname='tbl_inp_storage';
