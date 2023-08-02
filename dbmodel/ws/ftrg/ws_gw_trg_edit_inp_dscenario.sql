@@ -278,13 +278,12 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 		ELSIF v_dscenario_type = 'JUNCTION' THEN
 			UPDATE inp_dscenario_junction SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, demand=NEW.demand, pattern_id=NEW.pattern_id,
-			demand_type=NEW.demand_type, peak_factor=NEW.peak_factor,
 			emitter_coeff=NEW.emitter_coeff, init_quality=NEW.init_quality, source_type=NEW.source_type, source_quality=NEW.source_quality, source_pattern_id=NEW.source_pattern_id
 			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 
 		ELSIF v_dscenario_type = 'CONNEC' THEN
 			UPDATE inp_dscenario_connec SET dscenario_id=NEW.dscenario_id, connec_id=NEW.connec_id,
-			demand=NEW.demand, pattern_id=NEW.pattern_id, demand_type=NEW.demand_type, peak_factor=NEW.peak_factor,
+			demand=NEW.demand, pattern_id=NEW.pattern_id, peak_factor=NEW.peak_factor,
 			custom_roughness=NEW.custom_roughness, custom_length=NEW.custom_length, custom_dint=NEW.custom_dint,
 			emitter_coeff=NEW.emitter_coeff, init_quality=NEW.init_quality, source_type=NEW.source_type, source_quality=NEW.source_quality, source_pattern_id=NEW.source_pattern_id
 			WHERE dscenario_id=OLD.dscenario_id AND connec_id=OLD.connec_id;
