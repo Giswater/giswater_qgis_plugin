@@ -3460,7 +3460,6 @@ def refresh_epa_tbl(tblview, dlg, **kwargs):
 
 def delete_tbl_row(tbl, view, pkey, dlg, **kwargs):
     # Get variables
-    complet_result = kwargs['complet_result']
     info = kwargs['class']
 
     my_json = getattr(info, f"my_json_{view}")
@@ -3506,7 +3505,7 @@ def delete_tbl_row(tbl, view, pkey, dlg, **kwargs):
             try:
                 info.dlg.btn_accept.setEnabled(True)
                 info.inserted_feature = True
-            except AttributeError:
+            except (AttributeError, RuntimeError):
                 pass
         # Refresh tableview
         refresh_epa_tbl(tbl, dlg, **kwargs)
@@ -3564,7 +3563,7 @@ def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result,
         try:
             info.dlg.btn_accept.setEnabled(True)
             info.inserted_feature = True
-        except AttributeError:
+        except (AttributeError, RuntimeError):
             pass
         return
 
@@ -3600,7 +3599,7 @@ def widget_data_changed(info, view, tbl, model, addparam, value):
     # Enable btn_accept
     try:
         info.dlg.btn_accept.setEnabled(True)
-    except AttributeError:
+    except (AttributeError, RuntimeError):
         pass
 
 
@@ -3633,7 +3632,7 @@ def tbl_data_changed(info, view, tbl, model, addparam, index):
     # Enable btn_accept
     try:
         info.dlg.btn_accept.setEnabled(True)
-    except AttributeError:
+    except (AttributeError, RuntimeError):
         pass
 
 
@@ -3705,7 +3704,10 @@ def _manage_accept_btn(info, tablename):
     my_json = getattr(info, f"my_json_{tablename}")
     if not my_json:
         return
-    info.dlg.btn_accept.setEnabled(True)
+    try:
+        info.dlg.btn_accept.setEnabled(True)
+    except (AttributeError, RuntimeError):
+        pass
 
 
 def add_to_dscenario(**kwargs):
