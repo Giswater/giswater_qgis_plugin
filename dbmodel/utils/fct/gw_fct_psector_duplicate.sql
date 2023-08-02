@@ -49,6 +49,7 @@ v_list_connec_undoable text;
 v_list_gully_undoable text;
 v_list_arc_new text;
 v_list_connec_doable text;
+v_list_gully_doable text;
 v_error_context text;
 v_connecautolink text;
 v_gullyautolink text;
@@ -274,10 +275,21 @@ BEGIN
 	connec_id NOT IN (SELECT feature_id FROM link WHERE feature_type='CONNEC');	
 
 	IF v_list_connec_doable IS NOT NULL THEN
-		-- connect to network connecs with state 1 from v_list_connec_undoable
+		-- connect to network connecs with state 1 from v_list_connec_doable
 		EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"id":"['||v_list_connec_doable||']"},"data":{"feature_type":"CONNEC"}}$$)';
 	END IF;
+    
+	IF v_project_type='UD' THEN
+        SELECT string_agg(gully_id,',') INTO v_list_gully_doable FROM plan_psector_x_gully WHERE psector_id=v_new_psector_id AND doable=true AND state=1 AND 
+        gully_id NOT IN (SELECT feature_id FROM link WHERE feature_type='GULLY');	
+
+        IF v_list_gully_doable IS NOT NULL THEN
+            -- connect to network gullys with state 1 from v_list_gully_doable
+            EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+            "feature":{"id":"['||v_list_gully_doable||']"},"data":{"feature_type":"GULLY"}}$$)';
+        END IF;
+    END IF;
 
 
 	--activate the functions an set back the values of parameters
