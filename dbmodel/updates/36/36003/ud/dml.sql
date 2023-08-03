@@ -381,3 +381,5 @@ WHERE formname='v_edit_inp_dscenario_raingage' AND formtype='form_feature' AND c
 
 DELETE FROM config_form_fields
 WHERE formname='v_edit_inp_dscenario_flwreg_orifice' AND formtype='form_feature' AND columnname='order_id' AND tabname='tab_none';
+
+UPDATE sys_table SET addparam='{"pkey":"dwfscenario_id, node_id"}'::json WHERE id='inp_dwf';
