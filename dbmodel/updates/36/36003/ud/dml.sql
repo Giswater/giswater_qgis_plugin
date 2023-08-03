@@ -342,3 +342,16 @@ WHERE formname='v_edit_inp_dscenario_conduit' AND formtype='form_feature' AND co
 UPDATE config_form_fields
 SET ismandatory=false
 WHERE formname='v_edit_inp_dscenario_conduit' AND formtype='form_feature' AND columnname='flap' AND tabname='tab_none';
+
+UPDATE config_form_fields
+SET ismandatory=true
+WHERE formname='inp_flwreg_orifice' AND formtype='form_feature' AND columnname='to_arc' AND tabname='tab_none';
+UPDATE config_form_fields
+SET ismandatory=true
+WHERE formname='inp_flwreg_outlet' AND formtype='form_feature' AND columnname='to_arc' AND tabname='tab_none';
+UPDATE config_form_fields
+SET ismandatory=true
+WHERE formname='inp_flwreg_pump' AND formtype='form_feature' AND columnname='to_arc' AND tabname='tab_none';
+UPDATE config_form_fields
+SET ismandatory=true
+WHERE formname='inp_flwreg_weir' AND formtype='form_feature' AND columnname='to_arc' AND tabname='tab_none';
