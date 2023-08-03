@@ -3350,6 +3350,7 @@ def open_epa_dlg(**kwargs):
 
         complet_list = get_list(view, id_name, feature_id)
         fill_tbl(complet_list, tbl, info, view)
+        tools_gw.set_tablemodel_config(info.dlg, tbl, view, schema_name=info.schema_name, isQStandardItemModel=True)
         info.dlg.btn_accept.clicked.connect(partial(save_tbl_changes, view, info, info.dlg, pk))
 
         # Add & Delete buttons
@@ -3473,6 +3474,7 @@ def refresh_epa_tbl(tblview, dlg, **kwargs):
 
         complet_list = get_list(view, id_name, feature_id)
         fill_tbl(complet_list, tbl, info, view)
+        tools_gw.set_tablemodel_config(info.dlg, tbl, view, schema_name=info.schema_name, isQStandardItemModel=True)
 
 
 def delete_tbl_row(tbl, view, pkey, dlg, **kwargs):
