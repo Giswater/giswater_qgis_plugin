@@ -3358,7 +3358,7 @@ def open_epa_dlg(**kwargs):
             btn_delete_base = info.dlg.findChild(QPushButton, 'btn_delete_base')
             if btn_delete_base:
                 tools_gw.add_icon(btn_delete_base, '112b', "24x24")
-                btn_delete_base.clicked.connect(partial(delete_tbl_row, tbl, view, pk, info.dlg, **kwargs))
+                btn_delete_base.clicked.connect(partial(delete_tbl_row, tbl, view, pk, info.dlg, tablename=tableview['tbl'], tableview=tableview['view'], id_name=id_name, feature_id=feature_id, **kwargs))
         else:
             btn_add_dscenario = info.dlg.findChild(QPushButton, 'btn_add_dscenario')
             if btn_add_dscenario:
@@ -3472,8 +3472,17 @@ def refresh_epa_tbl(tblview, dlg, **kwargs):
         fill_tbl(complet_list, tbl, info, view)
         tools_gw.set_tablemodel_config(info.dlg, tbl, view, schema_name=info.schema_name, isQStandardItemModel=True)
 
+def reload_tbl_dscenario (info, tablename, tableview, id_name, feature_id):
 
-def delete_tbl_row(tbl, view, pkey, dlg, **kwargs):
+    tbl_name = tablename.replace ("tbl", "tbl_dscenario")
+    view = tableview.replace("inp", "inp_dscenario")
+    tbl = info.dlg.findChild(QTableView, tbl_name)
+
+    complet_list = get_list(view, id_name, feature_id)
+    fill_tbl(complet_list, tbl, info, view)
+
+
+def delete_tbl_row(tbl, view, pkey, dlg, tablename=None, tableview=None, id_name=None, feature_id=None, **kwargs):
     # Get variables
     info = kwargs['class']
 
@@ -3524,6 +3533,8 @@ def delete_tbl_row(tbl, view, pkey, dlg, **kwargs):
                 pass
         # Refresh tableview
         refresh_epa_tbl(tbl, dlg, **kwargs)
+        if 'dscenario' not in view:
+            reload_tbl_dscenario(info, tablename, tableview, id_name, feature_id)
 
 
 def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result, info):
