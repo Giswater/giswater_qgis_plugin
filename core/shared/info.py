@@ -3735,8 +3735,12 @@ def add_to_dscenario(**kwargs):
     info = kwargs['class']
     tbl = tools_qt.get_widget(dialog, func_params.get('targetwidget'))
     tablename = func_params.get('tablename')
+    dlg_title = func_params.get('add_dlg_title')
     pkey = func_params.get('pkey')
-    dlg_title = f"{tablename} - Dscenario"
+    if dlg_title:
+        dlg_title = f"{dlg_title} - Dscenario"
+    else:
+        dlg_title = f"{tablename} - Dscenario"
     setattr(info, f"my_json_{tablename}", {})
 
     add_row_epa(tbl, tablename, tablename, pkey, dialog, dlg_title, **kwargs)
