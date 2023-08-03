@@ -216,8 +216,9 @@ class GwDscenarioManagerButton(GwAction):
         index = self.tbl_dscenario.selectionModel().currentIndex()
         value = index.sibling(index.row(), 0).data()
 
-        message = "Are you sure you want to delete these records?"
-        answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 1).data())
+        message = "CAUTION! Deleting a dscenario will delete data from features related to the dscenario.\n" \
+                  "Are you sure you want to delete these records?"
+        answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 1).data(), force_action=True)
         if answer:
             sql = f"DELETE FROM v_edit_cat_dscenario WHERE dscenario_id = {value}"
             tools_db.execute_sql(sql)
