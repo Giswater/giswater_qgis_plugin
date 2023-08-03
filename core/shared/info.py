@@ -3464,11 +3464,12 @@ def refresh_epa_tbl(tblview, dlg, **kwargs):
         if not tbl:
             continue
         view = tableview['view']
+        tbl_view = tableview['tbl'].replace("tab_epa_", "")
         if tbl != tblview:
             continue
         id_name = tableview.get('id_name', id_name)
 
-        complet_list = get_list(view, id_name, feature_id)
+        complet_list = get_list(tbl_view, id_name, feature_id)
         fill_tbl(complet_list, tbl, info, view)
         tools_gw.set_tablemodel_config(info.dlg_cf, tbl, view, schema_name=info.schema_name, isQStandardItemModel=True)
 
