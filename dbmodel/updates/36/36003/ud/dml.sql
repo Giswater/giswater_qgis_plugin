@@ -329,3 +329,16 @@ WHERE formname='v_edit_inp_dscenario_raingage' AND formtype='form_feature' AND c
 UPDATE config_form_fields
 SET ismandatory=false
 WHERE formname='v_edit_inp_dscenario_raingage' AND formtype='form_feature' AND columnname='timser_id' AND tabname='tab_none';
+
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_conduit' AND formtype='form_feature' AND columnname='arccat_id' AND tabname='tab_none';
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_conduit' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_none';
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_conduit' AND formtype='form_feature' AND columnname='culvert' AND tabname='tab_none';
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_conduit' AND formtype='form_feature' AND columnname='flap' AND tabname='tab_none';
