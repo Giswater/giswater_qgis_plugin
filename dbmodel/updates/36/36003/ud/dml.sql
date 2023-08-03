@@ -310,3 +310,7 @@ ON CONFLICT DO NOTHING;
 UPDATE config_form_tableview
 	SET visible=false
 	WHERE objectname like 'v_edit_inp_dscenario_%' AND columnname='the_geom';
+
+UPDATE config_form_fields
+	SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_yesno'' '
+	WHERE formname IN ('v_edit_inp_dscenario_conduit', 've_epa_conduit') AND columnname='flap';
