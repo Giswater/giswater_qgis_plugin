@@ -122,7 +122,7 @@ BEGIN
 	ELSIF v_featuretype='connec' or v_featuretype='gully' then
 			FOREACH rec_id IN ARRAY(v_id_list)
 			LOOP
-				EXECUTE 'UPDATE link state = 0 WHERE feature_id = '|| quote_literal(rec_id)||';';
+				EXECUTE 'UPDATE link SET state = 0 WHERE feature_id = '|| quote_literal(rec_id)||';';
 			END LOOP;
 	END IF;
 
