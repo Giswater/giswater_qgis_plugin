@@ -722,3 +722,10 @@ SET widgetfunction='{
   }
 }'::json, linkedobject='tbl_inp_virtualvalve', hidden=false, web_layoutorder=NULL
 WHERE formname='ve_epa_virtualvalve' AND formtype='form_feature' AND columnname='add_to_dscenario' AND tabname='tab_epa';
+
+UPDATE config_form_fields
+SET  ismandatory=false
+WHERE formname='v_edit_inp_dscenario_pump' AND formtype='form_feature' AND columnname='speed' AND tabname='tab_none';
+UPDATE config_form_fields
+SET  ismandatory=false
+WHERE formname='v_edit_inp_dscenario_pump_additional' AND formtype='form_feature' AND columnname='speed' AND tabname='tab_none';
