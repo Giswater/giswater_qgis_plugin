@@ -3470,7 +3470,7 @@ def refresh_epa_tbl(tblview, dlg, **kwargs):
 
         complet_list = get_list(view, id_name, feature_id)
         fill_tbl(complet_list, tbl, info, view)
-        tools_gw.set_tablemodel_config(info.dlg, tbl, view, schema_name=info.schema_name, isQStandardItemModel=True)
+        tools_gw.set_tablemodel_config(info.dlg_cf, tbl, view, schema_name=info.schema_name, isQStandardItemModel=True)
 
 def reload_tbl_dscenario (info, tablename, tableview, id_name, feature_id):
 
