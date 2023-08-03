@@ -280,3 +280,33 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET widgetcontrols='{"saveValue": false, "tableUpsert": "v_edit_inp_dscenario_storage"}'::json
 	WHERE formname='ve_epa_storage'AND columnname='tbl_inp_storage';
+
+-- 03/08/23
+UPDATE config_form_tableview SET columnindex = columnindex-1 WHERE objectname like '%inp%flwreg%';
+
+-- Generate INSERT statements for config_form_tableview
+WITH column_info AS (
+    SELECT 
+        'epa form' AS location_type,
+        'ud' AS project_type,
+        table_name AS objectname,
+        column_name AS columnname,
+        ordinal_position-1 AS columnindex,
+        true AS visible
+    FROM 
+        information_schema.columns
+    WHERE 
+        table_name like 'v_edit_inp_dscenario_%' AND table_schema = 'SCHEMA_NAME'
+    ORDER BY 
+        ordinal_position
+)
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible)
+SELECT
+    location_type, project_type, objectname, columnname, columnindex, visible
+FROM
+    column_info
+ON CONFLICT DO NOTHING;
+
+UPDATE config_form_tableview
+	SET visible=false
+	WHERE objectname like 'v_edit_inp_dscenario_%' AND columnname='the_geom';
