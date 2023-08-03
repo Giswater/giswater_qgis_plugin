@@ -355,3 +355,7 @@ WHERE formname='inp_flwreg_pump' AND formtype='form_feature' AND columnname='to_
 UPDATE config_form_fields
 SET ismandatory=true
 WHERE formname='inp_flwreg_weir' AND formtype='form_feature' AND columnname='to_arc' AND tabname='tab_none';
+
+UPDATE config_form_fields
+SET ismandatory=true
+WHERE formname='inp_flwreg_pump' AND formtype='form_feature' AND columnname='curve_id' AND tabname='tab_none';
