@@ -3737,6 +3737,7 @@ def _manage_accept_btn(info, tablename):
 
 
 def add_to_dscenario(**kwargs):
+
     func_params = kwargs['func_params']
     dialog = kwargs['dialog']
     info = kwargs['class']
@@ -3748,6 +3749,14 @@ def add_to_dscenario(**kwargs):
         dlg_title = f"{dlg_title} - Dscenario"
     else:
         dlg_title = f"{tablename} - Dscenario"
+
+    my_json = getattr(info, f"my_json_{tablename}")
+    if my_json:
+        message = "You are trying to add/remove a record from the table, with changes to the current records. If you continue, the changes will be discarded without saving. Do you want to continue?"
+        answer = tools_qt.show_question(message, "Info Message", force_action=True)
+        if not answer:
+            return
+
     setattr(info, f"my_json_{tablename}", {})
 
     add_row_epa(tbl, tablename, tablename, pkey, dialog, dlg_title, **kwargs)
@@ -3760,6 +3769,14 @@ def remove_from_dscenario(**kwargs):
     tbl = tools_qt.get_widget(dialog, func_params.get('targetwidget'))
     tablename = func_params.get('tablename')
     pkey = func_params.get('pkey')
+
+    my_json = getattr(info, f"my_json_{tablename}")
+    if my_json:
+        message = "You are trying to add/remove a record from the table, with changes to the current records. If you continue, the changes will be discarded without saving. Do you want to continue?"
+        answer = tools_qt.show_question(message, "Info Message", force_action=True)
+        if not answer:
+            return
+
     setattr(info, f"my_json_{tablename}", {})
 
     delete_tbl_row(tbl, tablename, pkey, dialog, **kwargs)
