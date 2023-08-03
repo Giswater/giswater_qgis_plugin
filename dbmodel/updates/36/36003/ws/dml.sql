@@ -532,3 +532,193 @@ UPDATE config_form_tableview
 SET columnindex=11, visible=false WHERE objectname='inp_pump_additional' AND columnname='energy_price';
 UPDATE config_form_tableview
 SET columnindex=12, visible=true WHERE objectname='inp_pump_additional' AND columnname='energy_pattern_id';
+
+UPDATE config_form_fields
+SET widgetfunction='{
+  "functionName": "add_to_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_pump",
+    "tablename": "v_edit_inp_dscenario_pump",
+    "pkey": [
+      "dscenario_id",
+      "node_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_pump", "view": "v_edit_inp_dscenario_pump", "add_view": "v_edit_inp_dscenario_pump", "pk": ["dscenario_id", "node_id"]}
+   ]
+ , "add_dlg_title":"Pump" }
+}'::json, linkedobject='tbl_inp_pump', hidden=false, web_layoutorder=NULL
+WHERE formname='ve_epa_pump' AND formtype='form_feature' AND columnname='add_to_dscenario' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET widgetfunction='{
+  "functionName": "add_to_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_connec",
+    "tablename": "v_edit_inp_dscenario_connec",
+    "pkey": [
+      "dscenario_id",
+      "connec_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_connec", "view": "v_edit_inp_dscenario_connec", "add_view": "v_edit_inp_dscenario_connec", "pk": ["dscenario_id", "connec_id"]}
+   ], "add_dlg_title":"Connec" 
+  }
+}'::json, linkedobject='tbl_inp_connec', hidden=false, web_layoutorder=NULL
+WHERE formname='ve_epa_connec' AND formtype='form_feature' AND columnname='add_to_dscenario' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET widgetfunction='{
+  "functionName": "add_to_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_inlet",
+    "tablename": "v_edit_inp_dscenario_inlet",
+    "pkey": [
+      "dscenario_id",
+      "node_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_inlet", "view": "v_edit_inp_dscenario_inlet", "add_view": "v_edit_inp_dscenario_inlet", "pk": ["dscenario_id", "node_id"]}
+   ], "add_dlg_title":"Inlet" 
+  }
+}'::json, linkedobject='tbl_inp_inlet', hidden=false, web_layoutorder=NULL
+WHERE formname='ve_epa_inlet' AND formtype='form_feature' AND columnname='add_to_dscenario' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET widgetfunction='{
+  "functionName": "add_to_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_junction",
+    "tablename": "v_edit_inp_dscenario_junction",
+    "pkey": [
+      "dscenario_id",
+      "node_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_junction", "view": "v_edit_inp_dscenario_junction", "add_view": "v_edit_inp_dscenario_junction", "pk": ["dscenario_id", "node_id"]}
+   ]
+ , "add_dlg_title":"Junction"  }
+}'::json, linkedobject='tbl_inp_junction', hidden=false, web_layoutorder=NULL
+WHERE formname='ve_epa_junction' AND formtype='form_feature' AND columnname='add_to_dscenario' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET widgetfunction='{
+  "functionName": "add_to_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_pipe",
+    "tablename": "v_edit_inp_dscenario_pipe",
+    "pkey": [
+      "dscenario_id",
+      "arc_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_pipe", "view": "v_edit_inp_dscenario_pipe", "add_view": "v_edit_inp_dscenario_pipe", "pk": ["dscenario_id", "arc_id"]}
+   ], "add_dlg_title":"Pipe" 
+  }
+}'::json, linkedobject='tbl_inp_pipe', hidden=false, web_layoutorder=NULL
+WHERE formname='ve_epa_pipe' AND formtype='form_feature' AND columnname='add_to_dscenario' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET widgetfunction='{
+  "functionName": "add_to_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_reservoir",
+    "tablename": "v_edit_inp_dscenario_reservoir",
+    "pkey": [
+      "dscenario_id",
+      "node_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_reservoir", "view": "v_edit_inp_dscenario_reservoir", "add_view": "v_edit_inp_dscenario_reservoir", "pk": ["dscenario_id", "node_id"]}
+   ], "add_dlg_title":"Reservoir" 
+  }
+}'::json, linkedobject='tbl_inp_reservoir', hidden=false, web_layoutorder=NULL
+WHERE formname='ve_epa_reservoir' AND formtype='form_feature' AND columnname='add_to_dscenario' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET widgetfunction='{
+  "functionName": "add_to_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_shortpipe",
+    "tablename": "v_edit_inp_dscenario_shortpipe",
+    "pkey": [
+      "dscenario_id",
+      "node_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_shortpipe", "view": "v_edit_inp_dscenario_shortpipe", "add_view": "v_edit_inp_dscenario_shortpipe", "pk": ["dscenario_id", "node_id"]}
+   ]
+, "add_dlg_title":"Shortpipe"   }
+}'::json, linkedobject='tbl_inp_shortpipe', hidden=false, web_layoutorder=NULL
+WHERE formname='ve_epa_shortpipe' AND formtype='form_feature' AND columnname='add_to_dscenario' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET widgetfunction='{
+  "functionName": "add_to_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_tank",
+    "tablename": "v_edit_inp_dscenario_tank",
+    "pkey": [
+      "dscenario_id",
+      "node_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_tank", "view": "v_edit_inp_dscenario_tank", "add_view": "v_edit_inp_dscenario_tank", "pk": ["dscenario_id", "node_id"]}
+   ], "add_dlg_title":"Tank" 
+  }
+}'::json, linkedobject='tbl_inp_tank', hidden=false, web_layoutorder=NULL
+WHERE formname='ve_epa_tank' AND formtype='form_feature' AND columnname='add_to_dscenario' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET widgetfunction='{
+  "functionName": "add_to_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_valve",
+    "tablename": "v_edit_inp_dscenario_valve",
+    "pkey": [
+      "dscenario_id",
+      "node_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_valve", "view": "v_edit_inp_dscenario_valve", "add_view": "v_edit_inp_dscenario_valve", "pk": ["dscenario_id", "node_id"]}
+   ]
+, "add_dlg_title":"Valve"   }
+}'::json, linkedobject='tbl_inp_valve', hidden=false, web_layoutorder=NULL
+WHERE formname='ve_epa_valve' AND formtype='form_feature' AND columnname='add_to_dscenario' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET widgetfunction='{
+  "functionName": "add_to_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_virtualpump",
+    "tablename": "v_edit_inp_dscenario_virtualpump",
+    "pkey": [
+      "dscenario_id",
+      "arc_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_virtualpump", "view": "v_edit_inp_dscenario_virtualpump", "add_view": "v_edit_inp_dscenario_virtualpump", "pk": ["dscenario_id", "arc_id"]}
+   ]
+, "add_dlg_title":"Virtualpump" 
+  }
+}'::json, linkedobject='tbl_inp_virtualpump', hidden=false, web_layoutorder=NULL
+WHERE formname='ve_epa_virtualpump' AND formtype='form_feature' AND columnname='add_to_dscenario' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET widgetfunction='{
+  "functionName": "add_to_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_virtualvalve",
+    "tablename": "v_edit_inp_dscenario_virtualvalve",
+    "pkey": [
+      "dscenario_id",
+      "arc_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_virtualvalve", "view": "v_edit_inp_dscenario_virtualvalve", "add_view": "v_edit_inp_dscenario_virtualvalve", "pk": ["dscenario_id", "arc_id"]}
+   ]
+, "add_dlg_title":"Virtualvalve" 
+  }
+}'::json, linkedobject='tbl_inp_virtualvalve', hidden=false, web_layoutorder=NULL
+WHERE formname='ve_epa_virtualvalve' AND formtype='form_feature' AND columnname='add_to_dscenario' AND tabname='tab_epa';
