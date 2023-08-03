@@ -748,3 +748,13 @@ SET ismandatory=false
 WHERE formname='v_edit_inp_dscenario_connec' AND formtype='form_feature' AND columnname='custom_dint' AND tabname='tab_none';
 
 UPDATE config_function set layermanager = '{"visible": ["v_edit_minsector"]}' WHERE id = 2706;
+
+-- add orderby to most tableviews
+UPDATE config_form_list
+	SET vdefault='{"orderBy":"1", "orderType": "ASC"}'::json
+  WHERE listname IN ('tbl_element_x_arc', 'tbl_element_x_node', 'tbl_element_x_connec', 'tbl_relations', 'tbl_hydrometer', 'tbl_visit_x_arc', 
+  'tbl_visit_x_node', 'tbl_visit_x_connec', 'tbl_doc_x_arc', 'tbl_doc_x_node', 'tbl_doc_x_connec', 'tbl_inp_virtualvalve', 'tbl_hydrometer_value', 
+  'tbl_inp_connec', 'tbl_inp_inlet', 'tbl_inp_junction', 'tbl_inp_pipe', 'tbl_inp_pump', 'tbl_inp_reservoir', 'tbl_inp_shortpipe', 'tbl_inp_tank', 
+  'tbl_inp_valve', 'tbl_inp_virtualpump');
+
+

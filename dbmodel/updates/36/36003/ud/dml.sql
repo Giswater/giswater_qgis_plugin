@@ -282,34 +282,6 @@ UPDATE config_form_fields
 	WHERE formname='ve_epa_storage'AND columnname='tbl_inp_storage';
 
 -- 03/08/23
-UPDATE config_form_tableview SET columnindex = columnindex-1 WHERE objectname like '%inp%flwreg%';
-
--- Generate INSERT statements for config_form_tableview
-WITH column_info AS (
-    SELECT 
-        'epa form' AS location_type,
-        'ud' AS project_type,
-        table_name AS objectname,
-        column_name AS columnname,
-        ordinal_position-1 AS columnindex,
-        true AS visible
-    FROM 
-        information_schema.columns
-    WHERE 
-        table_name like 'v_edit_inp_dscenario_%' AND table_schema = 'SCHEMA_NAME'
-    ORDER BY 
-        ordinal_position
-)
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible)
-SELECT
-    location_type, project_type, objectname, columnname, columnindex, visible
-FROM
-    column_info
-ON CONFLICT DO NOTHING;
-
-UPDATE config_form_tableview
-	SET visible=false
-	WHERE objectname like 'v_edit_inp_dscenario_%' AND columnname='the_geom';
 
 UPDATE config_form_fields
 	SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_yesno'' '
@@ -405,3 +377,11 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET layoutorder=1,ismandatory=true
 	WHERE formname='v_edit_inp_dwf' AND columnname='dwfscenario_id';
+
+-- add orderby to most tableviews
+UPDATE config_form_list
+	SET vdefault='{"orderBy":"1", "orderType": "ASC"}'::json
+  WHERE listname IN ('tbl_element_x_arc', 'tbl_element_x_node', 'tbl_element_x_connec', 'tbl_relations', 'tbl_hydrometer', 'tbl_visit_x_arc', 'tbl_visit_x_node', 
+  'tbl_visit_x_connec', 'tbl_doc_x_arc', 'tbl_doc_x_node', 'tbl_doc_x_connec', 'tbl_hydrometer_value', 'tbl_connection_upstream', 'tbl_connection_downstream', 
+  'inp_flwreg_orifice', 'inp_dscenario_flwreg_orifice', 'inp_flwreg_outlet', 'inp_dscenario_flwreg_outlet', 'inp_flwreg_pump', 'inp_dscenario_flwreg_pump', 
+  'inp_flwreg_weir', 'inp_dscenario_flwreg_weir', 'tbl_inp_conduit', 'tbl_inp_outfall', 'tbl_inp_storage', 'tbl_inp_junction')
