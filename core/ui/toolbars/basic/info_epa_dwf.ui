@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>DWF</string>
+   <string>DWF &amp; INFLOWS</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_5">
    <item row="0" column="0">
@@ -25,168 +25,48 @@
         <x>0</x>
         <y>0</y>
         <width>947</width>
-        <height>379</height>
+        <height>386</height>
        </rect>
       </property>
       <attribute name="label">
-       <string>Base</string>
+       <string>DWF</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
-        <layout class="QGridLayout" name="lyt_base_1">
+       <item row="1" column="0">
+        <layout class="QGridLayout" name="lyt_base">
          <item row="0" column="0">
-          <widget class="QLabel" name="label">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>DWF scenario id:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Value:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="node_id">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Node id:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QLineEdit" name="value">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0" colspan="2">
-          <spacer name="verticalSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Expanding</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="dwfscenario_id"/>
+          <widget class="QTableView" name="tbl_dwf"/>
          </item>
         </layout>
        </item>
-       <item row="0" column="1">
-        <layout class="QGridLayout" name="lyt_base_2" rowstretch="0,0,0,0,0">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_2">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
+       <item row="0" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QPushButton" name="btn_add_base">
            <property name="text">
-            <string>Pat 1:</string>
+            <string/>
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_7">
+         <item>
+          <widget class="QPushButton" name="btn_delete_base">
            <property name="text">
-            <string>Pat 4:</string>
+            <string/>
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_6">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Pat 3:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0" colspan="4">
-          <spacer name="verticalSpacer_2">
+         <item>
+          <spacer name="horizontalSpacer_3">
            <property name="orientation">
-            <enum>Qt::Vertical</enum>
+            <enum>Qt::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>20</width>
-             <height>40</height>
+             <width>40</width>
+             <height>20</height>
             </size>
            </property>
           </spacer>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Pat 2:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1" colspan="3">
-          <widget class="QComboBox" name="pat1">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1" colspan="3">
-          <widget class="QComboBox" name="pat4"/>
-         </item>
-         <item row="2" column="1" colspan="3">
-          <widget class="QComboBox" name="pat3"/>
-         </item>
-         <item row="1" column="1" colspan="3">
-          <widget class="QComboBox" name="pat2"/>
          </item>
         </layout>
        </item>
@@ -197,12 +77,12 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>112</width>
-        <height>123</height>
+        <width>947</width>
+        <height>386</height>
        </rect>
       </property>
       <attribute name="label">
-       <string>Dscenario</string>
+       <string>INFLOWS</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="1" column="0">

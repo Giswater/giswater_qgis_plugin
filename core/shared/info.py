@@ -932,13 +932,9 @@ class GwInfo(QObject):
     def _open_dwf_dlg(self):
         # kwargs
         func_params = {"ui": "GwInfoEpaDwfUi", "uiName": "info_epa_dwf",
-                       "widgets": [
-                           "dwfscenario_id", "node_id", "value", "pat1", "pat2", "pat3", "pat4"
-                       ],
-                       "widgetsTablename": "inp_dwf",
-                       "widgetsTablePk": "node_id",
                        "tableviews": [
-                        {"tbl": "tbl_dscenario_inflows", "view": "v_edit_inp_dscenario_inflows", "pk": ["dscenario_id", "node_id"], "add_dlg_title": "DWF - Dscenario"}
+                        {"tbl": "tbl_dwf", "view": "inp_dwf", "pk": ["node_id", "dwfscenario_id"], "add_view": "v_edit_inp_dwf", "add_dlg_title": "DWF"},
+                        {"tbl": "tbl_dscenario_inflows", "view": "inp_dscenario_inflows", "pk": ["dscenario_id", "node_id", "order_id"], "add_view": "v_edit_inp_dscenario_inflows", "add_dlg_title": "INFLOWS - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg(**kwargs)
