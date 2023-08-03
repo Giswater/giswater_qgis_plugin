@@ -117,13 +117,20 @@ BEGIN
 				"data":{"message":"1072", "function":"3068","debug_msg":"'||v_result||'", "is_process":true}}$$);' INTO v_audit_result;
 			END IF;
 		END LOOP;
+
+
+	ELSIF v_featuretype='connec' or v_featuretype='gully' then
+			FOREACH rec_id IN ARRAY(v_id_list)
+			LOOP
+				EXECUTE 'UPDATE link state = 0 WHERE feature_id = '|| quote_literal(rec_id)||';';
+			END LOOP;
 	END IF;
 
 	IF v_audit_result is null THEN
 		FOREACH rec_id IN ARRAY(v_id_list) LOOP
 
-            -- perform state control for connects
-            IF v_featuretype='connec' or v_featuretype='gully' then
+      -- perform state control for connects
+      IF v_featuretype='connec' or v_featuretype='gully' then
 				PERFORM gw_fct_state_control(upper(v_featuretype::varchar), rec_id::varchar, 0, 'UPDATE');
 			END IF;
 
