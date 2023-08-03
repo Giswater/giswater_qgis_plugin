@@ -359,3 +359,23 @@ WHERE formname='inp_flwreg_weir' AND formtype='form_feature' AND columnname='to_
 UPDATE config_form_fields
 SET ismandatory=true
 WHERE formname='inp_flwreg_pump' AND formtype='form_feature' AND columnname='curve_id' AND tabname='tab_none';
+
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_inflows' AND formtype='form_feature' AND columnname='order_id' AND tabname='tab_none';
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_junction' AND formtype='form_feature' AND columnname='ysur' AND tabname='tab_none';
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_raingage' AND formtype='form_feature' AND columnname='form_type' AND tabname='tab_none';
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_raingage' AND formtype='form_feature' AND columnname='scf' AND tabname='tab_none';
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_raingage' AND formtype='form_feature' AND columnname='rgage_type' AND tabname='tab_none';
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_raingage' AND formtype='form_feature' AND columnname='timser_id' AND tabname='tab_none';
+
