@@ -736,3 +736,13 @@ WHERE formname='v_edit_inp_dscenario_pipe' AND formtype='form_feature' AND colum
 UPDATE config_form_fields
 SET ismandatory=false
 WHERE formname='v_edit_inp_dscenario_pipe' AND formtype='form_feature' AND columnname='dint' AND tabname='tab_none';
+
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_connec' AND formtype='form_feature' AND columnname='custom_roughness' AND tabname='tab_none';
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_connec' AND formtype='form_feature' AND columnname='custom_length' AND tabname='tab_none';
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_connec' AND formtype='form_feature' AND columnname='custom_dint' AND tabname='tab_none';
