@@ -314,3 +314,18 @@ UPDATE config_form_tableview
 UPDATE config_form_fields
 	SET widgettype='combo', dv_querytext='SELECT id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_yesno'' '
 	WHERE formname IN ('v_edit_inp_dscenario_conduit', 've_epa_conduit') AND columnname='flap';
+
+-- 03/08/23
+
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_raingage' AND formtype='form_feature' AND columnname='form_type' AND tabname='tab_none';
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_raingage' AND formtype='form_feature' AND columnname='scf' AND tabname='tab_none';
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_raingage' AND formtype='form_feature' AND columnname='rgage_type' AND tabname='tab_none';
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_raingage' AND formtype='form_feature' AND columnname='timser_id' AND tabname='tab_none';
