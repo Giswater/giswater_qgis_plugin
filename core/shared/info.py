@@ -2746,7 +2746,7 @@ class GwInfo(QObject):
 
             widget = self.dlg_cf.findChild(QTableView, field['widgetname'])
             if widget is None: continue
-            short_name = field['widgetname'].replace(f"{tab_name}_", "", 1)
+            short_name = field['widgetname'].replace(f"tab_{tab_name}_", "", 1)
             widget = tools_gw.add_tableview_header(widget, field)
             widget = tools_gw.fill_tableview_rows(widget, field)
             widget = tools_gw.set_tablemodel_config(dialog, widget, short_name, 1, True)
