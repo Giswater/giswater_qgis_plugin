@@ -196,3 +196,7 @@ UPDATE config_form_fields SET layoutname = 'lyt_epa_dsc_3' WHERE layoutname = 'l
 DELETE FROM config_typevalue WHERE typevalue='layout_name_typevalue' AND id='lyt_epa_3';
 
 UPDATE config_form_fields SET iseditable = true WHERE layoutname = 'lyt_epa_dsc_1' AND widgettype = 'button';
+
+UPDATE config_form_fields
+	SET dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_typevalue_dscenario'''
+	WHERE formname='v_edit_cat_dscenario' AND columnname='dscenario_type';
