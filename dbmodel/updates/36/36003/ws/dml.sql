@@ -459,3 +459,76 @@ WHERE formname='ve_epa_virtualpump' AND formtype='form_feature' AND columnname='
 UPDATE config_form_fields
 SET  widgetcontrols='{"saveValue": false, "tableUpsert":"v_edit_inp_dscenario_inlet"}'::json
 WHERE formname='ve_epa_inlet' AND formtype='form_feature' AND columnname='tbl_inp_inlet' AND tabname='tab_epa';
+
+-- 03/08/23
+
+UPDATE config_form_tableview
+SET columnindex=0, visible=false WHERE objectname='inp_dscenario_demand' AND columnname='id';
+UPDATE config_form_tableview
+SET columnindex=1, visible=true WHERE objectname='inp_dscenario_demand' AND columnname='dscenario_id';
+UPDATE config_form_tableview
+SET columnindex=2, visible=true WHERE objectname='inp_dscenario_demand' AND columnname='feature_id';
+UPDATE config_form_tableview
+SET columnindex=3, visible=true WHERE objectname='inp_dscenario_demand' AND columnname='feature_type';
+UPDATE config_form_tableview
+SET columnindex=4, visible=true WHERE objectname='inp_dscenario_demand' AND columnname='demand';
+UPDATE config_form_tableview
+SET columnindex=5, visible=true WHERE objectname='inp_dscenario_demand' AND columnname='pattern_id';
+UPDATE config_form_tableview
+SET columnindex=6, visible=true WHERE objectname='inp_dscenario_demand' AND columnname='demand_type';
+UPDATE config_form_tableview
+SET columnindex=7, visible=true WHERE objectname='inp_dscenario_demand' AND columnname='source';
+UPDATE config_form_tableview
+SET columnindex=0, visible=false WHERE objectname='inp_dscenario_pump_additional' AND columnname='id';
+UPDATE config_form_tableview
+SET columnindex=1, visible=true WHERE objectname='inp_dscenario_pump_additional' AND columnname='dscenario_id';
+UPDATE config_form_tableview
+SET columnindex=2, visible=true WHERE objectname='inp_dscenario_pump_additional' AND columnname='node_id';
+UPDATE config_form_tableview
+SET columnindex=3, visible=true WHERE objectname='inp_dscenario_pump_additional' AND columnname='order_id';
+UPDATE config_form_tableview
+SET columnindex=4, visible=true WHERE objectname='inp_dscenario_pump_additional' AND columnname='power';
+UPDATE config_form_tableview
+SET columnindex=5, visible=true WHERE objectname='inp_dscenario_pump_additional' AND columnname='curve_id';
+UPDATE config_form_tableview
+SET columnindex=6, visible=true WHERE objectname='inp_dscenario_pump_additional' AND columnname='speed';
+UPDATE config_form_tableview
+SET columnindex=7, visible=true WHERE objectname='inp_dscenario_pump_additional' AND columnname='pattern_id';
+UPDATE config_form_tableview
+SET columnindex=8, visible=true WHERE objectname='inp_dscenario_pump_additional' AND columnname='status';
+UPDATE config_form_tableview
+SET columnindex=9, visible=true WHERE objectname='inp_dscenario_pump_additional' AND columnname='energyparam';
+UPDATE config_form_tableview
+SET columnindex=10, visible=true WHERE objectname='inp_dscenario_pump_additional' AND columnname='energyvalue';
+UPDATE config_form_tableview
+SET columnindex=11, visible=true WHERE objectname='inp_dscenario_pump_additional' AND columnname='effic_curve_id';
+UPDATE config_form_tableview
+SET columnindex=12, visible=true WHERE objectname='inp_dscenario_pump_additional' AND columnname='energy_price';
+UPDATE config_form_tableview
+SET columnindex=13, visible=true WHERE objectname='inp_dscenario_pump_additional' AND columnname='energy_pattern_id';
+UPDATE config_form_tableview
+SET columnindex=0, visible=false WHERE objectname='inp_pump_additional' AND columnname='id';
+UPDATE config_form_tableview
+SET columnindex=1, visible=true WHERE objectname='inp_pump_additional' AND columnname='node_id';
+UPDATE config_form_tableview
+SET columnindex=2, visible=true WHERE objectname='inp_pump_additional' AND columnname='order_id';
+UPDATE config_form_tableview
+SET columnindex=3, visible=true WHERE objectname='inp_pump_additional' AND columnname='power';
+UPDATE config_form_tableview
+SET columnindex=4, visible=true WHERE objectname='inp_pump_additional' AND columnname='curve_id';
+UPDATE config_form_tableview
+SET columnindex=5, visible=true WHERE objectname='inp_pump_additional' AND columnname='speed';
+UPDATE config_form_tableview
+SET columnindex=6, visible=true WHERE objectname='inp_pump_additional' AND columnname='pattern_id';
+UPDATE config_form_tableview
+SET columnindex=7, visible=true WHERE objectname='inp_pump_additional' AND columnname='status';
+UPDATE config_form_tableview
+SET columnindex=8, visible=true WHERE objectname='inp_pump_additional' AND columnname='energyparam';
+UPDATE config_form_tableview
+SET columnindex=10, visible=true WHERE objectname='inp_pump_additional' AND columnname='energyvalue';
+UPDATE config_form_tableview
+SET columnindex=10, visible=true WHERE objectname='inp_pump_additional' AND columnname='effic_curve_id';
+UPDATE config_form_tableview
+SET columnindex=11, visible=false WHERE objectname='inp_pump_additional' AND columnname='energy_price';
+UPDATE config_form_tableview
+SET columnindex=12, visible=true WHERE objectname='inp_pump_additional' AND columnname='energy_pattern_id';
