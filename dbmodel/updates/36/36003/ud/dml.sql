@@ -383,3 +383,25 @@ DELETE FROM config_form_fields
 WHERE formname='v_edit_inp_dscenario_flwreg_orifice' AND formtype='form_feature' AND columnname='order_id' AND tabname='tab_none';
 
 UPDATE sys_table SET addparam='{"pkey":"dwfscenario_id, node_id"}'::json WHERE id='inp_dwf';
+
+UPDATE config_form_fields
+	SET layoutorder=2,iseditable=false,ismandatory=true
+	WHERE formname='v_edit_inp_dwf' AND columnname='node_id';
+UPDATE config_form_fields
+	SET layoutorder=3
+	WHERE formname='v_edit_inp_dwf' AND columnname='value';
+UPDATE config_form_fields
+	SET layoutorder=4
+	WHERE formname='v_edit_inp_dwf' AND columnname='pat1';
+UPDATE config_form_fields
+	SET layoutorder=5
+	WHERE formname='v_edit_inp_dwf' AND columnname='pat2';
+UPDATE config_form_fields
+	SET layoutorder=6
+	WHERE formname='v_edit_inp_dwf' AND columnname='pat3';
+UPDATE config_form_fields
+	SET layoutorder=7
+	WHERE formname='v_edit_inp_dwf' AND columnname='pat4';
+UPDATE config_form_fields
+	SET layoutorder=1,ismandatory=true
+	WHERE formname='v_edit_inp_dwf' AND columnname='dwfscenario_id';
