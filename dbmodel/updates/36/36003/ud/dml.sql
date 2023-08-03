@@ -379,3 +379,5 @@ UPDATE config_form_fields
 SET ismandatory=false
 WHERE formname='v_edit_inp_dscenario_raingage' AND formtype='form_feature' AND columnname='timser_id' AND tabname='tab_none';
 
+DELETE FROM config_form_fields
+WHERE formname='v_edit_inp_dscenario_flwreg_orifice' AND formtype='form_feature' AND columnname='order_id' AND tabname='tab_none';
