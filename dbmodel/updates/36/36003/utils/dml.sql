@@ -200,3 +200,19 @@ UPDATE config_form_fields SET iseditable = true WHERE layoutname = 'lyt_epa_dsc_
 UPDATE config_form_fields
 	SET dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_typevalue_dscenario'''
 	WHERE formname='v_edit_cat_dscenario' AND columnname='dscenario_type';
+
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName": "open_visit_files", "module": "info", "parameters":{"targetwidget":"tab_visit_tbl_visits"}}'::json
+	WHERE formname IN ('arc', 'node', 'connec', 'gully') AND columnname='open_gallery' AND tabname='tab_visit';
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName": "open_visit_manager", "parameters":{"columnfind": "visit_id", "targetwidget": "tab_event_tbl_event_cf", "sourceview": "event"}}'::json
+	WHERE formname IN ('arc', 'node', 'connec', 'gully') AND columnname='btn_open_visit' AND tabname='tab_event';
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName": "open_gallery", "module": "info", "parameters":{"targetwidget":"tab_event_tbl_event_cf", "columnfind": ["visit_id", "event_id"], "sourceview":"visit"}}'::json
+	WHERE formname IN ('arc', 'node', 'connec', 'gully') AND columnname='btn_open_gallery' AND tabname='tab_event';
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName": "open_visit_document", "module": "info", "parameters":{"targetwidget": "tab_event_tbl_event_cf", "columnfind": "visit_id"}}'::json
+	WHERE formname IN ('arc', 'node', 'connec', 'gully') AND columnname='btn_open_visit_doc' AND tabname='tab_event';
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName": "open_visit_event", "module": "info", "parameters":{"targetwidget": "tab_event_tbl_event_cf", "columnfind":["visit_id", "event_id"]}}'::json
+	WHERE formname IN ('arc', 'node', 'connec', 'gully') AND columnname='btn_open_visit_event' AND tabname='tab_event';
