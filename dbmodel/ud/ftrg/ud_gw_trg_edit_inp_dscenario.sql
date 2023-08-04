@@ -281,8 +281,8 @@ BEGIN
 			WHERE dscenario_id = OLD.dscenario_id AND subc_id=OLD.subc_id AND lidco_id=OLD.lidco_id;
 
 		ELSIF v_dscenario_type = 'OUTFALL' THEN
-			UPDATE inp_dscenario_outfall SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, outfall_type=NEW.outfall_type, stage=NEW.stage, 
-			curve_id=NEW.curve_id, timser_id=NEW.timser_id, gate=NEW.gate, elev=NEW.elev, ymax=NEW.ymax
+			UPDATE inp_dscenario_outfall SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, elev=NEW.elev, ymax=NEW.ymax, outfall_type=NEW.outfall_type, stage=NEW.stage, 
+			curve_id=NEW.curve_id, timser_id=NEW.timser_id, gate=NEW.gate
 			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 			
 		ELSIF v_dscenario_type = 'RAINGAGE' THEN
@@ -291,7 +291,7 @@ BEGIN
 			WHERE dscenario_id=OLD.dscenario_id AND rg_id=OLD.rg_id;
 			
 		ELSIF v_dscenario_type = 'STORAGE' THEN
-			UPDATE inp_dscenario_storage SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, storage_type=NEW.storage_type, curve_id=NEW.curve_id, 
+			UPDATE inp_dscenario_storage SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, elev=NEW.elev, ymax=New.ymax, storage_type=NEW.storage_type, curve_id=NEW.curve_id, 
 			a1=NEW.a1, a2=NEW.a2, a0=NEW.a0, fevap=NEW.fevap, sh=NEW.sh, hc=NEW.hc, imd=NEW.imd, y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond
 			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 			
