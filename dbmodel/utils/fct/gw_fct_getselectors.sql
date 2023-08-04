@@ -315,7 +315,7 @@ BEGIN
 
 		ELSE 
 			v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(b))) FROM (
-					select *, row_number() OVER (',case when v_selector_type='selector_mincut' then 'ORDER BY id' else '' end,') as orderby from (
+					select *, row_number() OVER (',concat('ORDER BY ', v_orderby),') as orderby from (
 					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' ,
 					 v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
 					FROM ', v_table ,' WHERE ' , v_table_id , ' IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' UNION 
