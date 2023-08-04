@@ -747,7 +747,7 @@ def get_filter_qtableview_mincut(dialog, widget_list, func_params, filter_fields
                         if not widget.isEnabled():
                             continue
 
-                    if widget.objectName() == "main_spm_next_days":
+                    if widget.objectName() == "tab_none_spm_next_days":
                         filter_fields += filter_by_days(dialog, widget)
                     elif type(widget) is QgsDateTimeEdit:
                         filter_fields += filter_by_dates(dialog, widget)
