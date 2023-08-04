@@ -3480,8 +3480,9 @@ def reload_tbl_dscenario (info, tablename, tableview, id_name, feature_id):
     view = tableview.replace("inp", "inp_dscenario")
     tbl = info.dlg.findChild(QTableView, tbl_name)
 
-    complet_list = get_list(view, id_name, feature_id)
-    fill_tbl(complet_list, tbl, info, view)
+    if tbl is not None:
+        complet_list = get_list(view, id_name, feature_id)
+        fill_tbl(complet_list, tbl, info, view)
 
 
 def delete_tbl_row(tbl, view, pkey, dlg, tablename=None, tableview=None, id_name=None, feature_id=None, **kwargs):
