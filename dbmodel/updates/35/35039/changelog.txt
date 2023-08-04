@@ -2,3 +2,7 @@
 *************
 - Add nodeinflow for detailed rpt node on UD results 
 - Move order by to correct column on config_typevalue where sys_table_context
+- Mapzones - return polygons of created zones and disconnect elements as temporal layer if commit chages is false
+- Force arcdivide function to move mapzones values from arc to inserted node
+- Set raingage geometry column not null
+- Change querytext for *_type columns on v_edit_element form. Don't use featurecat_id

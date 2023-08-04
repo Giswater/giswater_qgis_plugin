@@ -1,0 +1,3 @@
+3.5.040
+*************
+- Enhance setclosestaddress function allowing to insersect the results with a polygon layer

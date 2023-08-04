@@ -37,8 +37,11 @@ affected_rows numeric;
 v_partialquery text;
 v_partialquery2 text;
 v_partialquery3 text;
+v_partialquery4 text;
+v_polygonlayer text;
 v_expl text;
 v_state text;
+v_geom_column text;
 
 BEGIN
 
@@ -59,6 +62,7 @@ BEGIN
 	v_updatevalues := ((p_data ->>'data')::json->>'parameters')::json->>'updateValues';
 	v_searchbuffer := ((p_data ->>'data')::json->>'parameters')::json->>'searchBuffer';
 	v_feature_type := lower(((p_data ->>'feature')::json->>'featureType'))::text;
+	v_polygonlayer := ((p_data ->>'data')::json->>'parameters')::json->>'insersectPolygonLayer';
 
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=486;
@@ -120,6 +124,17 @@ BEGIN
 		v_partialquery3=' ea.postnumber ';
 	END IF;
 
+	IF v_polygonlayer='NONE' THEN
+		v_partialquery4='';
+	ELSE
+		EXECUTE 'select column_name from INFORMATION_SCHEMA.columns 
+		where table_schema=''SCHEMA_NAME'' and udt_name=''geometry'' and table_name='||quote_literal(v_polygonlayer)||''
+		INTO v_geom_column;
+	
+		v_partialquery4='and a.'||v_feature_type||'_id in (select a.'||v_feature_type||'_id from '||v_polygonlayer||' p, '||v_feature_type||' a 
+		where ST_Contains (p.'||v_geom_column||', a.the_geom))';
+	END IF;
+
     -- get array elements if previousSelection
 	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
 
@@ -130,6 +145,7 @@ BEGIN
 	        JOIN ext_address ea ON ST_DWithin(a.the_geom, ea.the_geom, '||v_searchbuffer||')
 		'||v_partialquery||'
 		'||v_partialquery2||'
+		'||v_partialquery4||'
 	    ORDER BY '||v_feature_type||'_id, ST_Distance(a.the_geom, ea.the_geom))q
 	    where a.'||v_feature_type||'_id=q.'||v_feature_type||'_id and a.'||v_feature_type||'_id IN ('||v_array||');';
 	   
@@ -140,7 +156,7 @@ BEGIN
 	    FROM '||v_feature_type||' a
 	        JOIN ext_address ea ON ST_DWithin(a.the_geom, ea.the_geom, '||v_searchbuffer||')
 		'||v_partialquery||'
-		'||v_partialquery2||' '||v_expl||' '||v_state||'
+		'||v_partialquery2||' '||v_partialquery4||' '||v_expl||' '||v_state||'
 	    ORDER BY '||v_feature_type||'_id, ST_Distance(a.the_geom, ea.the_geom))q
 	    where a.'||v_feature_type||'_id=q.'||v_feature_type||'_id '||v_expl||' '||v_state||';';
 	   
