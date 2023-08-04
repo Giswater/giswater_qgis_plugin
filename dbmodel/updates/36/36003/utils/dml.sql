@@ -216,3 +216,10 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET widgetfunction='{"functionName": "open_visit_event", "module": "info", "parameters":{"targetwidget": "tab_event_tbl_event_cf", "columnfind":["visit_id", "event_id"]}}'::json
 	WHERE formname IN ('arc', 'node', 'connec', 'gully') AND columnname='btn_open_visit_event' AND tabname='tab_event';
+
+UPDATE config_form_fields
+	SET widgetfunction='{ "functionName": "delete_object", "parameters": {"columnfind": "element_id", "targetwidget": "tab_elements_tbl_elements", "sourceview": "element"}}'::json
+	WHERE formname IN ('arc', 'node', 'connec', 'gully') AND columnname='delete_element' AND tabname='tab_elements';
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName": "delete_object", "parameters": {"columnfind": "doc_id", "targetwidget": "tab_documents_tbl_documents", "sourceview": "doc"}}'::json
+	WHERE formname IN ('arc', 'node', 'connec', 'gully') AND columnname='btn_doc_delete' AND tabname='tab_documents';
