@@ -3411,11 +3411,17 @@ def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, **kwargs):
 
     cmb_nodarc_id = info.add_dlg.findChild(QComboBox, 'tab_none_nodarc_id')
     aux_view = view.replace("dscenario_", "")
-    if cmb_nodarc_id:
+    if cmb_nodarc_id is not None:
         sql = (f"SELECT nodarc_id as id, nodarc_id as idval FROM {aux_view}"
                f" WHERE {info.feature_type}_id = '{feature_id}'")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(cmb_nodarc_id, rows)
+    cmb_order_id = info.add_dlg.findChild(QComboBox, 'tab_none_order_id')
+    if cmb_order_id is not None:
+        sql = (f"SELECT order_id as id, order_id::text as idval FROM {aux_view}"
+               f" WHERE {info.feature_type}_id = '{feature_id}'")
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(cmb_order_id, rows, 1)
 
     # Get every widget in the layout
     widgets = []
@@ -3474,9 +3480,9 @@ def refresh_epa_tbl(tblview, dlg, **kwargs):
         fill_tbl(complet_list, tbl, info, view)
         tools_gw.set_tablemodel_config(dlg, tbl, view, schema_name=info.schema_name, isQStandardItemModel=True)
 
-def reload_tbl_dscenario (info, tablename, tableview, id_name, feature_id):
 
-    tbl_name = tablename.replace ("tbl", "tbl_dscenario")
+def reload_tbl_dscenario (info, tablename, tableview, id_name, feature_id):
+    tbl_name = tablename.replace("tbl", "tbl_dscenario")
     view = tableview.replace("inp", "inp_dscenario")
     tbl = info.dlg.findChild(QTableView, tbl_name)
 
