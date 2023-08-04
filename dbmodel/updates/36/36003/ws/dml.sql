@@ -761,3 +761,7 @@ ALTER TABLE inp_dscenario_pump_additional
   ADD CONSTRAINT inp_dscenario_pump_additional_pump_id_fkey FOREIGN KEY (node_id, order_id)
       REFERENCES inp_pump_additional (node_id, order_id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE;
+
+UPDATE config_form_fields
+	SET widgettype='combo'
+	WHERE formname='v_edit_inp_dscenario_pump_additional' AND columnname='order_id';
