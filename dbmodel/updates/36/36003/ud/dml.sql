@@ -384,7 +384,7 @@ UPDATE config_form_list
   WHERE listname IN ('tbl_element_x_arc', 'tbl_element_x_node', 'tbl_element_x_connec', 'tbl_relations', 'tbl_hydrometer', 'tbl_visit_x_arc', 'tbl_visit_x_node', 
   'tbl_visit_x_connec', 'tbl_doc_x_arc', 'tbl_doc_x_node', 'tbl_doc_x_connec', 'tbl_hydrometer_value', 'tbl_connection_upstream', 'tbl_connection_downstream', 
   'inp_flwreg_orifice', 'inp_dscenario_flwreg_orifice', 'inp_flwreg_outlet', 'inp_dscenario_flwreg_outlet', 'inp_flwreg_pump', 'inp_dscenario_flwreg_pump', 
-  'inp_flwreg_weir', 'inp_dscenario_flwreg_weir', 'tbl_inp_conduit', 'tbl_inp_outfall', 'tbl_inp_storage', 'tbl_inp_junction')
+  'inp_flwreg_weir', 'inp_dscenario_flwreg_weir', 'tbl_inp_conduit', 'tbl_inp_outfall', 'tbl_inp_storage', 'tbl_inp_junction');
 
 -- 04/08/23
 INSERT INTO config_form_list (listname,query_text,device,listtype,listclass,vdefault)
