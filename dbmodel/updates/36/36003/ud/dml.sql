@@ -385,3 +385,7 @@ UPDATE config_form_list
   'tbl_visit_x_connec', 'tbl_doc_x_arc', 'tbl_doc_x_node', 'tbl_doc_x_connec', 'tbl_hydrometer_value', 'tbl_connection_upstream', 'tbl_connection_downstream', 
   'inp_flwreg_orifice', 'inp_dscenario_flwreg_orifice', 'inp_flwreg_outlet', 'inp_dscenario_flwreg_outlet', 'inp_flwreg_pump', 'inp_dscenario_flwreg_pump', 
   'inp_flwreg_weir', 'inp_dscenario_flwreg_weir', 'tbl_inp_conduit', 'tbl_inp_outfall', 'tbl_inp_storage', 'tbl_inp_junction')
+
+-- 04/08/23
+INSERT INTO config_form_list (listname,query_text,device,listtype,listclass,vdefault)
+	VALUES ('inp_dwf','SELECT dwfscenario_id, node_id, value, pat1, pat2, pat3, pat4 FROM inp_dwf WHERE dwfscenario_id IS NOT NULL',4,'tab','list','{"orderBy":"1", "orderType": "ASC"}'::json);
