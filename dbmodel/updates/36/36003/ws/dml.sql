@@ -757,4 +757,7 @@ UPDATE config_form_list
   'tbl_inp_connec', 'tbl_inp_inlet', 'tbl_inp_junction', 'tbl_inp_pipe', 'tbl_inp_pump', 'tbl_inp_reservoir', 'tbl_inp_shortpipe', 'tbl_inp_tank', 
   'tbl_inp_valve', 'tbl_inp_virtualpump');
 
-
+ALTER TABLE inp_dscenario_pump_additional
+  ADD CONSTRAINT inp_dscenario_pump_additional_pump_id_fkey FOREIGN KEY (node_id, order_id)
+      REFERENCES inp_pump_additional (node_id, order_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE;
