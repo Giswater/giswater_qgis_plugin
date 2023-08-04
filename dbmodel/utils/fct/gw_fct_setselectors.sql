@@ -15,7 +15,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"None", "tabName":"tab_exploitation", "forceParent":"True", "checkAll":"True", "addSchema":"None"}}$$);
 SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"explfrommuni", "id":32, "value":true, "isAlone":true, "addSchema":"SCHEMA_NAME"}}$$)::text
 
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_psector", "id":"1", "isAlone":"True", "value":"True", "addSchema":"None", "useAtlas":true}}$$);
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_psector", "id":"1", "ids":"[1,2]", "isAlone":"True", "value":"True", "addSchema":"None", "useAtlas":true}}$$);
 
 fid: 397
 
@@ -30,6 +30,7 @@ v_tabname text;
 v_tablename text;
 v_columnname text;
 v_id integer;
+v_ids text;
 v_value text;
 v_muni integer;
 v_isalone boolean;
@@ -65,6 +66,13 @@ v_cur_user text;
 v_prev_cur_user text;
 v_device integer;
 v_expand float=0;
+v_tiled boolean;
+v_result json;
+v_result_init json;
+v_result_valve json;
+v_result_node json;
+v_result_connec json;
+v_result_arc json;
 
 
 BEGIN
@@ -81,6 +89,7 @@ BEGIN
 	v_tabname := (p_data ->> 'data')::json->> 'tabName';
 	v_selectortype := (p_data ->> 'data')::json->> 'selectorType';
 	v_id := (p_data ->> 'data')::json->> 'id';
+	v_ids := (p_data ->> 'data')::json->> 'ids';
 	v_value := (p_data ->> 'data')::json->> 'value';
 	v_isalone := (p_data ->> 'data')::json->> 'isAlone';
 	v_checkall := (p_data ->> 'data')::json->> 'checkAll';
@@ -91,6 +100,7 @@ BEGIN
 	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
 	v_device := (p_data ->> 'client')::json->> 'device';
 
+	v_tiled := ((p_data ->>'client')::json->>'tiled')::boolean;
 	v_prev_cur_user = current_user;
 	IF v_cur_user IS NOT NULL THEN
 		EXECUTE 'SET ROLE "'||v_cur_user||'"';
@@ -190,8 +200,9 @@ BEGIN
 					EXECUTE 'INSERT INTO '||v_addschema||'.'|| v_tablename || ' ('|| v_columnname ||', cur_user) 
 					SELECT '|| v_columnname ||', current_user FROM '||v_addschema||'.'||v_zonetable||' ON CONFLICT ('|| v_columnname ||', cur_user) DO NOTHING';
 				ELSE
-					EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||' 
-					ON CONFLICT ('|| v_columnname ||', cur_user) DO NOTHING';
+					EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
+					',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,')') end),'
+					ON CONFLICT (',v_columnname,', cur_user) DO NOTHING;');		
 				END IF;		
 			END IF;
 			
@@ -404,7 +415,7 @@ BEGIN
 	-- Return
 	v_return = concat('{"client":',(p_data ->> 'client'),', "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, "feature":{}, 
 	"data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":',v_action,', 
-	"selectorType":"',v_selectortype,'", "addSchema":"', v_addschema,'",
+	"selectorType":"',v_selectortype,'", "addSchema":"', v_addschema,'", "tiled":"', v_tiled,'", "id":"', v_id,'", "ids":"', v_ids,'",
 	"layers":',COALESCE(((p_data ->> 'data')::json->> 'layers'), '{}'),'}}');
 	RETURN gw_fct_getselectors(v_return);
 
