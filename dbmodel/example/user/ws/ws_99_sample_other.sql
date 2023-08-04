@@ -773,3 +773,27 @@ SET ismandatory=true
 WHERE columnname='speed' AND tabname='tab_none' AND formname ilike 'v_edit_inp_dscenario%';
 
 UPDATE config_form_fields SET iseditable = true WHERE layoutname = 'lyt_epa_dsc_1' AND widgettype = 'button';
+
+UPDATE config_form_fields
+SET  ismandatory=false
+WHERE formname='v_edit_inp_dscenario_pump' AND formtype='form_feature' AND columnname='speed' AND tabname='tab_none';
+UPDATE config_form_fields
+SET  ismandatory=false
+WHERE formname='v_edit_inp_dscenario_pump_additional' AND formtype='form_feature' AND columnname='speed' AND tabname='tab_none';
+
+UPDATE config_form_fields
+SET  ismandatory=false
+WHERE formname='v_edit_inp_dscenario_pipe' AND formtype='form_feature' AND columnname='roughness' AND tabname='tab_none';
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_pipe' AND formtype='form_feature' AND columnname='dint' AND tabname='tab_none';
+
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_connec' AND formtype='form_feature' AND columnname='custom_roughness' AND tabname='tab_none';
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_connec' AND formtype='form_feature' AND columnname='custom_length' AND tabname='tab_none';
+UPDATE config_form_fields
+SET ismandatory=false
+WHERE formname='v_edit_inp_dscenario_connec' AND formtype='form_feature' AND columnname='custom_dint' AND tabname='tab_none';
