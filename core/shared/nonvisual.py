@@ -332,18 +332,30 @@ class GwNonVisual:
             sql = f"select ic.id as curve_id, ca.id as arccat_id, geom1, geom2 from {self.schema_name}.v_edit_inp_curve ic join {self.schema_name}.cat_arc ca on ca.curve_id = ic.id " \
                   f"WHERE ic.curve_type = 'SHAPE' and ca.shape = 'CUSTOM' and ic.id ILIKE '%{filter}%'"
             curve_results = tools_db.get_rows(sql)
-            for curve in curve_results:
-                geom1 = curve[2]
-                geom2 = curve[3]
-                name = f"{curve[0]} - {curve[1]}"
-                self.get_print_curves(curve[0], path, name, geom1, geom2)
+            if curve_results is None:
+                msg = "There is no valid shape curve in the list"
+                tools_qgis.show_info(msg, dialog=self.manager_dlg)
+            else:
+                for curve in curve_results:
+                    geom1 = curve[2]
+                    geom2 = curve[3]
+                    name = f"{curve[0]} - {curve[1]}"
+                    self.get_print_curves(curve[0], path, name, geom1, geom2)
+                msg = "Export done succesfully"
+                tools_qgis.show_info(msg, dialog=self.manager_dlg)
         else:
             sql = f"select id as curve_id from {self.schema_name}.v_edit_inp_curve ic " \
                   f"WHERE ic.curve_type = 'SHAPE' and ic.id ILIKE '%{filter}%'"
             curve_results = tools_db.get_rows(sql)
-            for curve in curve_results:
-                name = f"{curve[0]}"
-                self.get_print_curves(curve[0], path, name)
+            if curve_results is None:
+                msg = "There is no valid shape curve in the list"
+                tools_qgis.show_info(msg, dialog=self.manager_dlg)
+            else:
+                for curve in curve_results:
+                    name = f"{curve[0]}"
+                    self.get_print_curves(curve[0], path, name)
+                msg = "Export done succesfully"
+                tools_qgis.show_info(msg, dialog=self.manager_dlg)
 
         tools_gw.close_dialog(self.dlg_print)
 
@@ -691,7 +703,9 @@ class GwNonVisual:
             plot_widget.axes.plot(aux_y_list, aux_x_list, color="grey", alpha=0.5, linestyle="dashed")
 
             if file_name:
-                fig_title = f"{file_name} (S: {round(area*100, 2)} dm2 - {round(geom1, 2)} x {round(geom2, 2)})"
+                fig_title = f"{file_name}"
+                if area and geom1 and geom2:
+                    fig_title = f"{fig_title} (S: {round(area*100, 2)} dm2 - {round(geom1, 2)} x {round(geom2, 2)})"
                 plot_widget.axes.text(min(y_list_inverted)*1.1, max(x_list)*1.07, f"{fig_title}", fontsize=8)
         else:
             plot_widget.axes.plot(x_list, y_list, color='indianred')
