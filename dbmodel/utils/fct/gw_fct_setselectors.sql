@@ -112,7 +112,7 @@ BEGIN
 
 	-- profilactic control
 	IF lower(v_selectortype) = 'none' OR v_selectortype = '' OR lower(v_selectortype) ='null' THEN v_selectortype = 'selector_basic'; END IF;
-	IF v_useatlas IS null then v_useatlas = true; END IF;
+	IF v_useatlas IS null then v_useatlas = false; END IF;
 
 	-- profilactic control of schema name
 	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null' OR v_addschema is null OR v_addschema='NULL'
