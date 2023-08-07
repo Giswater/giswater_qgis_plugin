@@ -68,126 +68,128 @@ BEGIN
 	v_pricecat = (SELECT id FROM plan_price_cat LIMIT 1);
 	
 	IF v_step = 1 THEN
-
-		-- inserting result on table plan_result_cat
-		INSERT INTO plan_result_cat (name, result_type, coefficient, tstamp, cur_user, descript, pricecat_id) VALUES
-		(v_result_name, 1, v_coeff, now(), current_user, v_descript, v_pricecat) RETURNING result_id INTO v_result_id;
-
-		-- start build log message
+			-- start build log message
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('CALCULATE COST OF RECONSTRUCTION'));
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('----------------------------------------------------------'));
 
+		IF v_result_name IN (SELECT name FROM plan_result_cat) THEN 
+			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('1ST. STEP Result with this name is already defined on plan_result tables.'));
+		ELSE
+			-- inserting result on table plan_result_cat
+			INSERT INTO plan_result_cat (name, result_type, coefficient, tstamp, cur_user, descript, pricecat_id) VALUES
+			(v_result_name, 1, v_coeff, now(), current_user, v_descript, v_pricecat) RETURNING result_id INTO v_result_id;
 
-		-- starting process
-		INSERT INTO plan_rec_result_node (result_id, node_id, nodecat_id, node_type, top_elev, elev, epa_type, sector_id, state, annotation,
-		the_geom, cost_unit, descript, measurement, cost, budget, expl_id, builtdate, age, acoeff)
+		
+			-- starting process
+			INSERT INTO plan_rec_result_node (result_id, node_id, nodecat_id, node_type, top_elev, elev, epa_type, sector_id, state, annotation,
+			the_geom, cost_unit, descript, measurement, cost, budget, expl_id, builtdate, age, acoeff)
 
-		SELECT
-		v_result_id,
-		v.node_id,
-		v.nodecat_id,
-		v.node_type,
-		v.top_elev,
-		v.elev,
-		v.epa_type,
-		v.sector_id,
-		v.state,
-		v.annotation,
-		v.the_geom,
-		v.cost_unit,
-		v.descript,
-		measurement,
-		v.cost*v_coeff,
-		v.budget*v_coeff,
-		v.expl_id,
-		builtdate,
-		((date_part('days',(now()-node.builtdate)::interval))/365)::numeric(12,2) as age,
-		acoeff
-		FROM v_plan_node v
-		JOIN node USING (node_id)
-		JOIN cat_node ON id = node.nodecat_id
-		WHERE v.state=1
-		ON CONFLICT (result_id, node_id) DO NOTHING;
+			SELECT
+			v_result_id,
+			v.node_id,
+			v.nodecat_id,
+			v.node_type,
+			v.top_elev,
+			v.elev,
+			v.epa_type,
+			v.sector_id,
+			v.state,
+			v.annotation,
+			v.the_geom,
+			v.cost_unit,
+			v.descript,
+			measurement,
+			v.cost*v_coeff,
+			v.budget*v_coeff,
+			v.expl_id,
+			builtdate,
+			((date_part('days',(now()-node.builtdate)::interval))/365)::numeric(12,2) as age,
+			acoeff
+			FROM v_plan_node v
+			JOIN node USING (node_id)
+			JOIN cat_node ON id = node.nodecat_id
+			WHERE v.state=1
+			ON CONFLICT (result_id, node_id) DO NOTHING;
 
 
-		-- insert into arc table
-		INSERT INTO plan_rec_result_arc
-		SELECT
-		v_result_id,
-		v.arc_id,
-		v.node_1,
-		v.node_2,
-		v.arc_type,
-		v.arccat_id,
-		v.epa_type,
-		v.sector_id,
-		v.state,
-		v.annotation,
-		v.soilcat_id,
-		v.y1,
-		v.y2,
-		v.mean_y,
-		v.z1,
-		v.z2,
-		v.thickness,
-		v.width,
-		v.b,
-		v.bulk,
-		v.geom1,
-		v.area,
-		v.y_param,
-		v.total_y,
-		v.rec_y,
-		v.geom1_ext,
-		v.calculed_y,
-		v.m3mlexc,
-		v.m2mltrenchl,
-		v.m2mlbottom,
-		v.m2mlpav,
-		v.m3mlprotec,
-		v.m3mlfill,
-		v.m3mlexcess,
-		v.m3exc_cost,
-		v.m2trenchl_cost*v_coeff,
-		v.m2bottom_cost*v_coeff,
-		v.m2pav_cost*v_coeff,
-		v.m3protec_cost*v_coeff,
-		v.m3fill_cost*v_coeff,
-		v.m3excess_cost*v_coeff,
-		v.cost_unit,
-		v.pav_cost*v_coeff,
-		v.exc_cost*v_coeff,
-		v.trenchl_cost*v_coeff,
-		v.base_cost*v_coeff,
-		v.protec_cost*v_coeff,
-		v.fill_cost*v_coeff,
-		v.excess_cost*v_coeff,
-		v.arc_cost*v_coeff,
-		v.cost*v_coeff,
-		v.length,
-		v.budget*v_coeff,
-		v.other_budget*v_coeff,
-		v.total_budget*v_coeff,
-		v.the_geom,
-		v.expl_id,
-		null,
-		builtdate,
-		((date_part('days',(now()-a.builtdate)::interval))/365)::numeric(12,2) as age,
-		acoeff
-		FROM v_plan_arc v
-		JOIN arc a USING (arc_id)
-		JOIN cat_arc c ON c.id = a.arccat_id
-		WHERE a.state=1
-		ON CONFLICT (result_id, arc_id) DO NOTHING;
+			-- insert into arc table
+			INSERT INTO plan_rec_result_arc
+			SELECT
+			v_result_id,
+			v.arc_id,
+			v.node_1,
+			v.node_2,
+			v.arc_type,
+			v.arccat_id,
+			v.epa_type,
+			v.sector_id,
+			v.state,
+			v.annotation,
+			v.soilcat_id,
+			v.y1,
+			v.y2,
+			v.mean_y,
+			v.z1,
+			v.z2,
+			v.thickness,
+			v.width,
+			v.b,
+			v.bulk,
+			v.geom1,
+			v.area,
+			v.y_param,
+			v.total_y,
+			v.rec_y,
+			v.geom1_ext,
+			v.calculed_y,
+			v.m3mlexc,
+			v.m2mltrenchl,
+			v.m2mlbottom,
+			v.m2mlpav,
+			v.m3mlprotec,
+			v.m3mlfill,
+			v.m3mlexcess,
+			v.m3exc_cost,
+			v.m2trenchl_cost*v_coeff,
+			v.m2bottom_cost*v_coeff,
+			v.m2pav_cost*v_coeff,
+			v.m3protec_cost*v_coeff,
+			v.m3fill_cost*v_coeff,
+			v.m3excess_cost*v_coeff,
+			v.cost_unit,
+			v.pav_cost*v_coeff,
+			v.exc_cost*v_coeff,
+			v.trenchl_cost*v_coeff,
+			v.base_cost*v_coeff,
+			v.protec_cost*v_coeff,
+			v.fill_cost*v_coeff,
+			v.excess_cost*v_coeff,
+			v.arc_cost*v_coeff,
+			v.cost*v_coeff,
+			v.length,
+			v.budget*v_coeff,
+			v.other_budget*v_coeff,
+			v.total_budget*v_coeff,
+			v.the_geom,
+			v.expl_id,
+			null,
+			builtdate,
+			((date_part('days',(now()-a.builtdate)::interval))/365)::numeric(12,2) as age,
+			acoeff
+			FROM v_plan_arc v
+			JOIN arc a USING (arc_id)
+			JOIN cat_arc c ON c.id = a.arccat_id
+			WHERE a.state=1
+			ON CONFLICT (result_id, arc_id) DO NOTHING;
 
-		-- force selector
-		INSERT INTO selector_plan_result (cur_user, result_id) VALUES (current_user, v_result_id) ON CONFLICT (cur_user, result_id) DO NOTHING;
+			-- force selector
+			INSERT INTO selector_plan_result (cur_user, result_id) VALUES (current_user, v_result_id) ON CONFLICT (cur_user, result_id) DO NOTHING;
 
-		-- inserting log
-		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, '1ST. STEP executed');
-		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, 'Snapshot of values form v_plan_arc and v_plan_node have been inserted on plan_result_arc and plan_result_node tables');
-		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, 'This proces enables to execute STEP 2 in order to calculate amortized values using age,cost and acoeff (amortized rate per year)');
-	
+			-- inserting log
+			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, '1ST. STEP executed');
+			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, 'Snapshot of values form v_plan_arc and v_plan_node have been inserted on plan_result_arc and plan_result_node tables');
+			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, 'This proces enables to execute STEP 2 in order to calculate amortized values using age,cost and acoeff (amortized rate per year)');
+		END IF;
 	ELSIF v_step = 2 THEN
 		
 		-- update result on node table
