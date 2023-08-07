@@ -14,8 +14,13 @@ $BODY$
 
 /*example
 
-SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic" ,"filterText":"1"}}$$);
-SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{"currentTab":"tab_psector"}, "feature":{}, "data":{"selectorType":"selector_basic", "useAtlas":true}}$$);
+SELECT SCHEMA_NAME.gw_fct_getselectors($${"client":{"lang":"en_US", "infoType":1, "epsg":25831}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic" ,"filterText":"1"}}$$);
+
+SELECT SCHEMA_NAME.gw_fct_getselectors($${"client":{"lang":"en_US", "infoType":1, "epsg":25831}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "filterText":""}}$$);
+
+SELECT SCHEMA_NAME.gw_fct_getselectors($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "filterText":""}}$$);
+
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_exploitation", "id":"1", "isAlone":"True", "disableParent":"False", "value":"True", "addSchema":"NULL"}}$$)
 
 */
 
@@ -86,12 +91,12 @@ v_loadProject boolean=false;
 v_addschema text;
 v_tiled boolean;
 v_result json;
-v_result_init json;
-v_result_valve_proposed json;
-v_result_valve_not_proposed json;
-v_result_node json;
-v_result_connec json;
-v_result_arc json;
+v_mincut_init json;
+v_mincut_valve_proposed json;
+v_mincut_valve_not_proposed json;
+v_mincut_node json;
+v_mincut_connec json;
+v_mincut_arc json;
 BEGIN
 
 	-- Set search path to local schema
@@ -113,6 +118,8 @@ BEGIN
 	v_device := (p_data ->> 'client')::json->> 'device';
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
 	v_tiled := ((p_data ->>'client')::json->>'tiled')::boolean;
+
+	IF v_device is null then v_device = 4; END IF;
 
 	v_prev_cur_user = current_user;
 	IF v_cur_user IS NOT NULL THEN
@@ -315,12 +322,12 @@ BEGIN
 
 		ELSE 
 			v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(b))) FROM (
-					select *, row_number() OVER (',concat('ORDER BY ', v_orderby),') as orderby from (
-					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' ,
-					 v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
+					select *, row_number() OVER (ORDER BY orderby) as orderby from (
+					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ' , 
+					v_orderby, ' as orderby , ''', v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
 					FROM ', v_table ,' WHERE ' , v_table_id , ' IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' UNION 
-					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , 
-					v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
+					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ' , 
+					v_orderby, ' , ''',v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
 					FROM ', v_table ,' WHERE ' , v_table_id , ' NOT IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ',
 					 v_fullfilter ,') a)b');
 
@@ -372,6 +379,7 @@ BEGIN
 
 	-- Manage QWC
 	IF v_device = 5 THEN
+	
 		-- Get active exploitations geometry (to zoom on them)
 		IF v_loadProject IS TRUE AND v_geometry IS NULL THEN
 			SELECT row_to_json (a) 
@@ -379,6 +387,7 @@ BEGIN
 			FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
 			FROM (SELECT st_expand(st_collect(the_geom), 50.0) as the_geom FROM exploitation where expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) b) a;
 		END IF;
+		
 		if v_tiled is true and v_selector_type='selector_mincut' then
 			-- GET GEOJSON
 			--v_om_mincut
@@ -394,7 +403,7 @@ BEGIN
 		  	FROM  v_om_mincut) row) features;
 			raise notice 'v_om_mincut -> %', v_result;
 			v_result := COALESCE(v_result, '{}');
-			v_result_init = concat('{"geometryType":"Point", "features":',v_result, '}');
+			v_mincut_init = concat('{"geometryType":"Point", "features":',v_result, '}');
 			
 			--v_om_mincut_valve proposed true
             SELECT jsonb_agg(features.feature) INTO v_result
@@ -409,7 +418,7 @@ BEGIN
             FROM  v_om_mincut_valve WHERE proposed = true) row) features;
 
             v_result := COALESCE(v_result, '{}');
-            v_result_valve_proposed = concat('{"geometryType":"Point", "features":',v_result, '}');
+            v_mincut_valve_proposed = concat('{"geometryType":"Point", "features":',v_result, '}');
             
             --v_om_mincut_valve proposed false
             SELECT jsonb_agg(features.feature) INTO v_result
@@ -424,7 +433,7 @@ BEGIN
             FROM  v_om_mincut_valve WHERE proposed = false) row) features;
 
             v_result := COALESCE(v_result, '{}');
-            v_result_valve_not_proposed = concat('{"geometryType":"Point", "features":',v_result, '}');
+            v_mincut_valve_not_proposed = concat('{"geometryType":"Point", "features":',v_result, '}');
 	
 			--v_om_mincut_node
 			SELECT jsonb_agg(features.feature) INTO v_result
@@ -439,7 +448,7 @@ BEGIN
 		  	FROM  v_om_mincut_node) row) features;
 	
 			v_result := COALESCE(v_result, '{}');
-			v_result_node = concat('{"geometryType":"Point", "features":',v_result, '}');
+			v_mincut_node = concat('{"geometryType":"Point", "features":',v_result, '}');
 	
 			--v_om_mincut_connec
 			SELECT jsonb_agg(features.feature) INTO v_result
@@ -454,7 +463,7 @@ BEGIN
 		  	FROM  v_om_mincut_connec) row) features;
 	
 			v_result := COALESCE(v_result, '{}');
-			v_result_connec = concat('{"geometryType":"Point", "features":',v_result, '}');
+			v_mincut_connec = concat('{"geometryType":"Point", "features":',v_result, '}');
 	
 			--v_om_mincut_arc
 			SELECT jsonb_agg(features.feature) INTO v_result
@@ -469,7 +478,7 @@ BEGIN
 		  	FROM  v_om_mincut_arc) row) features;
 	
 			v_result := COALESCE(v_result, '{}');
-			v_result_arc = concat('{"geometryType":"LineString", "features":',v_result, '}');
+			v_mincut_arc = concat('{"geometryType":"LineString", "features":',v_result, '}');
 		end if;
 	END IF;
 
@@ -484,12 +493,12 @@ BEGIN
 	v_geometry = COALESCE(v_geometry, '{}');
 	v_stylesheet := COALESCE(v_stylesheet, '{}');
 	v_layerColumns = COALESCE(v_layerColumns, '{}');
-	v_result_init = COALESCE(v_result_init, '[]');
-	v_result_valve_proposed = COALESCE(v_result_valve_proposed, '[]');
-	v_result_valve_not_proposed = COALESCE(v_result_valve_not_proposed, '[]');
-	v_result_node = COALESCE(v_result_node, '[]');
-	v_result_connec = COALESCE(v_result_connec, '[]');
-	v_result_arc = COALESCE(v_result_arc, '[]');
+	v_mincut_init = COALESCE(v_mincut_init, '[]');
+	v_mincut_valve_proposed = COALESCE(v_mincut_valve_proposed, '[]');
+	v_mincut_valve_not_proposed = COALESCE(v_mincut_valve_not_proposed, '[]');
+	v_mincut_node = COALESCE(v_mincut_node, '[]');
+	v_mincut_connec = COALESCE(v_mincut_connec, '[]');
+	v_mincut_arc = COALESCE(v_mincut_arc, '[]');
 	
 	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 	
@@ -517,14 +526,14 @@ BEGIN
 				"userValues":'||v_uservalues||',
 				"geometry":'||v_geometry||',
 				"layerColumns":'||v_layerColumns||
-				(case when v_tiled is true then ',
-				"tiled":'||v_tiled||',
-				"init":'||v_result_init||',
-				"valveClose":'||v_result_valve_proposed||',
-				"valveNot":'||v_result_valve_not_proposed||',
-				"node":'||v_result_node||',
-				"connec":'||v_result_connec||',
-				"arc":'||v_result_arc else '' end ) ||
+				(case when v_tiled is true and v_selector_type = 'selector_mincut' then ',
+					"tiled":'||v_tiled||',
+					"mincutInit":'||v_mincut_init||',
+					"mincutProposedValve":'||v_mincut_valve_proposed||',
+					"mincutNotProposedValve":'||v_mincut_valve_not_proposed||',
+					"mincutNode":'||v_mincut_node||',
+					"mincutConnec":'||v_mincut_connec||',
+					"mincutArc":'||v_mincut_arc else '' end ) ||	
 				'}'||
 			'}'||
 		    '}')::json,2796, null, null, v_action::json);
