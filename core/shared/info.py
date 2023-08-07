@@ -3293,35 +3293,7 @@ def open_epa_dlg(**kwargs):
         row = tools_db.get_row(sql)
         if row:
             setattr(info, f"my_json_{widgets_tablename}", {})
-            dwfscenario_sql = f"SELECT id, idval FROM cat_dwf_scenario WHERE id IS NOT NULL"
-            dwfscenario_rows = tools_db.get_rows(dwfscenario_sql)
-            pattern_sql = f"SELECT pattern_id as id, pattern_id as idval FROM inp_pattern WHERE pattern_id IS NOT NULL"
-            pattern_rows = tools_db.get_rows(pattern_sql)
             for i, widget in enumerate(widgets):
-                # dwfscenario_id
-                if widget == 'dwfscenario_id':
-                    w = info.dlg.findChild(QComboBox, widget)
-                    if w is None:
-                        continue
-                    if dwfscenario_rows:
-                        tools_qt.fill_combo_values(w, dwfscenario_rows, 1, add_empty=True)
-                        tools_qt.set_combo_value(w, str(row[i]), 0)
-                        w.currentIndexChanged.connect(partial(tools_gw.get_values, info.dlg, w, getattr(info, f"my_json_{widgets_tablename}")))
-                        w.currentIndexChanged.connect(partial(_manage_accept_btn, info, widgets_tablename))
-                    continue
-
-                # patX
-                if 'pat' in widget:
-                    w = info.dlg.findChild(QComboBox, widget)
-                    if w is None:
-                        continue
-                    if pattern_rows:
-                        tools_qt.fill_combo_values(w, pattern_rows, add_empty=True)
-                        tools_qt.set_combo_value(w, row[i], 0)
-                        w.currentIndexChanged.connect(partial(tools_gw.get_values, info.dlg, w, getattr(info, f"my_json_{widgets_tablename}")))
-                        w.currentIndexChanged.connect(partial(_manage_accept_btn, info, widgets_tablename))
-                    continue
-
                 # lineedits
                 w = info.dlg.findChild(QLineEdit, widget)
                 if w is None:
