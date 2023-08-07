@@ -1,3 +1,4 @@
 3.5.040
 *************
 - Enhance setclosestaddress function allowing to insersect the results with a polygon layer
+- New function gw_fct_import_valve_status for importing data related to shortpipes from csv file.
