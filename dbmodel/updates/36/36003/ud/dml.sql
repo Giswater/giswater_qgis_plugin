@@ -389,3 +389,77 @@ UPDATE config_form_list
 -- 04/08/23
 INSERT INTO config_form_list (listname,query_text,device,listtype,listclass,vdefault)
 	VALUES ('inp_dwf','SELECT dwfscenario_id, node_id, value, pat1, pat2, pat3, pat4 FROM inp_dwf WHERE dwfscenario_id IS NOT NULL',4,'tab','list','{"orderBy":"1", "orderType": "ASC"}'::json);
+
+-- 07/08/2023
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "add_to_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_conduit",
+    "tablename": "v_edit_inp_dscenario_conduit",
+    "pkey": [
+      "dscenario_id",
+      "arc_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_conduit", "view": "v_edit_inp_dscenario_conduit", "add_view": "v_edit_inp_dscenario_conduit", "pk": ["dscenario_id", "arc_id"]}
+   ],
+   "add_dlg_title":"Conduit"
+  }
+}'::json
+	WHERE formname='ve_epa_conduit' AND columnname='add_to_dscenario';
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "add_to_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_junction",
+    "tablename": "v_edit_inp_dscenario_junction",
+    "pkey": [
+      "dscenario_id",
+      "node_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_junction", "view": "v_edit_inp_dscenario_junction", "add_view": "v_edit_inp_dscenario_junction", "pk": ["dscenario_id", "node_id"]}
+   ],
+   "add_dlg_title":"Junction"
+  }
+}'::json
+	WHERE formname='ve_epa_junction' AND columnname='add_to_dscenario';
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "add_to_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_outfall",
+    "tablename": "v_edit_inp_dscenario_outfall",
+    "pkey": [
+      "dscenario_id",
+      "node_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_outfall", "view": "v_edit_inp_dscenario_outfall", "add_view": "v_edit_inp_dscenario_outfall", "pk": ["dscenario_id", "node_id"]}
+   ],
+   "add_dlg_title":"Outfall"
+  }
+}'::json
+	WHERE formname='ve_epa_outfall' AND columnname='add_to_dscenario';
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "add_to_dscenario",
+  "module": "info",
+  "parameters": {
+    "targetwidget": "tab_epa_tbl_inp_storage",
+    "tablename": "v_edit_inp_dscenario_storage",
+    "pkey": [
+      "dscenario_id",
+      "node_id"
+    ],
+    "tableviews": [
+		{"tbl": "tab_epa_tbl_inp_storage", "view": "v_edit_inp_dscenario_storage", "add_view": "v_edit_inp_dscenario_storage", "pk": ["dscenario_id", "node_id"]}
+   ],
+   "add_dlg_title":"Storage"
+  }
+}'::json
+	WHERE formname='ve_epa_storage' AND columnname='add_to_dscenario';
