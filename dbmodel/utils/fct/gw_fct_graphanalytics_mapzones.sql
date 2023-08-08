@@ -133,6 +133,11 @@ v_psectors_query_arc text;
 v_psectors_query_node text;
 v_psectors_query_connec text;
 v_psectors_query_gully text;
+v_query_arc text;
+v_query_node text;
+v_query_connec text;
+v_query_gully text;
+v_query_link text;
 
 BEGIN
 	-- Search path
@@ -372,22 +377,38 @@ BEGIN
 		END IF;
 
 		-- fill temporal tables
-		EXECUTE 'INSERT INTO temp_t_arc
-		SELECT  a.* FROM arc a WHERE expl_id='||v_expl_id||' '||v_psectors_query_arc||';';
+        IF v_usepsector IS  TRUE THEN
+			v_query_arc = 'SELECT a.* FROM arc a JOIN v_edit_arc USING (arc_id) WHERE a.expl_id='||v_expl_id;
+			v_query_node = 'SELECT n.* FROM node n JOIN v_edit_node USING (node_id) WHERE n.expl_id='||v_expl_id;
+			v_query_connec = 'SELECT c.* FROM connec c JOIN v_edit_connec USING (connec_id) WHERE c.expl_id='||v_expl_id;
+			v_query_link = 'SELECT l.* FROM link l JOIN v_edit_link USING (link_id) WHERE l.expl_id='||v_expl_id;
+			IF v_project_type='UD' THEN
+				v_query_gully = 'SELECT g.* FROM gully g JOIN v_edit_gully USING (gully_id) WHERE g.expl_id='||v_expl_id;
+			END IF;
+		ELSE
+			v_query_arc = 'SELECT * FROM arc WHERE state=1 AND expl_id='||v_expl_id;
+			v_query_node = 'SELECT * FROM node WHERE state=1 AND expl_id='||v_expl_id;
+			v_query_connec = 'SELECT * FROM connec WHERE state=1 AND expl_id='||v_expl_id;
+			v_query_link = 'SELECT * FROM link WHERE state=1 AND expl_id='||v_expl_id;
+			IF v_project_type='UD' THEN
+				v_query_gully = 'SELECT * FROM gully WHERE expl_id='||v_expl_id;
+			END IF;
+		END IF;
+        
+		EXECUTE 'INSERT INTO temp_t_arc '||v_query_arc;
 
-		EXECUTE 'INSERT INTO temp_t_node
-		SELECT  n.* FROM node n WHERE expl_id='||v_expl_id||' '||v_psectors_query_node||';';
+		EXECUTE 'INSERT INTO temp_t_node '||v_query_node;
 
-		EXECUTE 'INSERT INTO temp_t_connec
-		SELECT  c.* FROM connec c WHERE expl_id='||v_expl_id||' '||v_psectors_query_connec||';';			
+		EXECUTE 'INSERT INTO temp_t_connec '||v_query_connec;
 
-		EXECUTE 'INSERT INTO temp_t_link
-		SELECT  l.* FROM link l WHERE expl_id='||v_expl_id;			
+		EXECUTE 'INSERT INTO temp_t_link '||v_query_link;
 
 		IF v_project_type = 'UD' THEN
-			EXECUTE 'INSERT INTO temp_t_gully
-			SELECT  g.* FROM gully g WHERE expl_id='||v_expl_id||' '||v_psectors_query_gully||';';
+			EXECUTE 'INSERT INTO temp_t_gully '||v_query_gully;
 		END IF;
+	
+		-- update temp_t_connec in order to get correct arc_id (for planified features, arc_id from parent layer is NULL)
+		UPDATE temp_t_connec t SET arc_id=c.arc_id FROM v_edit_connec c WHERE t.connec_id=c.connec_id;
 
 		IF v_class = 'SECTOR' THEN
 			EXECUTE 'INSERT INTO temp_'||v_table||' SELECT * FROM '||v_table||' WHERE active is true AND sector_id IN (SELECT distinct '||v_field||' FROM temp_t_arc)';
