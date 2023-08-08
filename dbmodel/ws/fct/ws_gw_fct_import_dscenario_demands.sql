@@ -7,12 +7,12 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE:3254
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_dscenario_demandas(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_dscenario_demands(p_data json)
 RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_import_dscenario_demandas($${
+SELECT SCHEMA_NAME.gw_fct_import_dscenario_demands($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{}}$$)
 
