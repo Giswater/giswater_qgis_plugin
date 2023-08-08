@@ -9,6 +9,12 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 
 Changelog=Version 3.6.003
+    - Change layers style when activating/deactivating epa world
+    - Reduced the time it takes to open the info form
+    - Fix highlight for polygons
+    - Go2Epa multistep approach
+    - Add properties button in dscenario dialog
+    - Improvements & fixes to flowregulator & demand actions
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
