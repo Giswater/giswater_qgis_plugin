@@ -11,3 +11,15 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hyd
 
 ALTER TABLE ext_rtc_hydrometer_state ALTER COLUMN is_operative SET DEFAULT true;
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD",
+"table":"audit_psector_gully_traceability", "column":"adate", "dataType":"text"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD",
+"table":"audit_psector_gully_traceability", "column":"adescript", "dataType":"text"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD",
+"table":"audit_psector_gully_traceability", "column":"siphon_type", "dataType":"text"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD",
+"table":"audit_psector_gully_traceability", "column":"odorflap", "dataType":"text"}}$$);
+

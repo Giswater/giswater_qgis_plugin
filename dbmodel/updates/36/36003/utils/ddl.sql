@@ -15,4 +15,22 @@ DROP TABLE IF EXISTS temp_vnode;
 DROP TABLE IF EXISTS temp_link;
 DROP TABLE IF EXISTS temp_link_x_arc;
 
-DELETE FROM sys_table WHERE id IN ('config_visit_class_x_feature','temp_vnode','temp_link','temp_link_x_arc')
+DELETE FROM sys_table WHERE id IN ('config_visit_class_x_feature','temp_vnode','temp_link','temp_link_x_arc');
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD",
+"table":"audit_psector_arc_traceability", "column":"adate", "dataType":"text"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD",
+"table":"audit_psector_arc_traceability", "column":"adescript", "dataType":"text"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD",
+"table":"audit_psector_node_traceability", "column":"adate", "dataType":"text"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD",
+"table":"audit_psector_node_traceability", "column":"adescript", "dataType":"text"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD",
+"table":"audit_psector_connec_traceability", "column":"adate", "dataType":"text"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD",
+"table":"audit_psector_connec_traceability", "column":"adescript", "dataType":"text"}}$$);
