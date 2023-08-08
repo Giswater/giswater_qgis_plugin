@@ -283,8 +283,6 @@ class Giswater(QObject):
                                     'main', 'newProjectCreated')
             tools_gw.connect_signal(self.iface.actionSaveProject().triggered, self._save_toolbars_position,
                                     'main', 'actionSaveProject_save_toolbars_position')
-            tools_gw.connect_signal(self.iface.actionSaveProject().triggered, self.save_project,
-                                    'main', 'actionSaveProject_save_project')
         except AttributeError:
             pass
 
@@ -301,7 +299,7 @@ class Giswater(QObject):
         except TypeError:
             pass
         try:
-            self.iface.actionSaveProject().triggered.disconnect()
+            tools_gw.disconnect_signal('main', 'actionSaveProject_save_toolbars_position')
         except TypeError:
             pass
 
