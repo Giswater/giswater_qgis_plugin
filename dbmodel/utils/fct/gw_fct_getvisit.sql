@@ -23,6 +23,7 @@ DECLARE
 v_version json;
 v_device integer;
 v_feature_type text;
+column_type text;
 v_feature_id integer;
 v_visit_id integer;
 v_message json;
@@ -55,6 +56,7 @@ form_tabs json[];
 form_tabs_json json;
 v_forminfo json;
 v_tablename text;
+v_sourcetable character varying;
 v_xcoord double precision;
 v_ycoord double precision;
 v_client_epsg integer;
@@ -79,6 +81,7 @@ v_featuretype text;
 v_fields json;
 
 v_errcontext text;
+v_geometry json;
 
 
 BEGIN
@@ -215,6 +218,19 @@ BEGIN
 		v_featuretype := (SELECT feature_type FROM config_visit_class WHERE id=v_visitclass);
 	end if;
 
+	-- getting source table in order to enhance performance
+	IF v_tablename LIKE 'v_edit_cad%' THEN v_sourcetable = v_tablename;
+	ELSIF v_tablename LIKE '%link_connec%' OR v_tablename LIKE '%link_gully%' THEN v_sourcetable = 'link';
+	ELSIF v_tablename LIKE 'v_%edit_%' THEN v_sourcetable = replace (v_tablename, 'v_edit_', '');
+	ELSIF v_tablename LIKE 've_%node_%' THEN v_sourcetable = 'node';
+	ELSIF v_tablename LIKE 've_%arc_%' THEN v_sourcetable = 'arc';
+	ELSIF v_tablename LIKE 've_%connec_%' THEN v_sourcetable = 'connec';
+	ELSIF v_tablename LIKE 've_%gully_%' THEN v_sourcetable = 'gully';
+	ELSIF v_tablename LIKE '%hydrometer%' THEN v_sourcetable = 'v_rtc_hydrometer';
+	ELSIF v_tablename LIKE '%element%' THEN v_sourcetable = 'element';
+	ELSE v_sourcetable = v_tablename;
+	END IF;
+
 	-- Manage fields
 	if v_visit_id is not null and v_tablename is not null and v_fields is null then
 		v_querystring = concat('SELECT row_to_json(a) FROM (SELECT * FROM ',quote_ident(v_tablename),' WHERE visit_id=',quote_nullable(v_visit_id),')a');
@@ -341,6 +357,42 @@ BEGIN
 
   v_fieldsjson := to_json(v_fields_array);
 
+	-- Get id column type
+	EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+		JOIN pg_class t on a.attrelid = t.oid
+		JOIN pg_namespace s on t.relnamespace = s.oid
+		WHERE a.attnum > 0
+		AND NOT a.attisdropped
+		AND a.attname = $3
+		AND t.relname = $2
+		AND s.nspname = $1
+		ORDER BY a.attnum'
+			USING v_schemaname, v_sourcetable, v_idname
+			INTO column_type;
+
+	-- Get geometry (to feature response)
+	IF v_the_geom IS NOT NULL AND v_id IS NOT NULL THEN
+		EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS x, ST_y(ST_centroid(ST_envelope(the_geom))) AS y, St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_sourcetable)||
+		' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||(column_type)||'))row'
+		INTO v_geometry;
+	END IF;
+	-- Get geometry for elements without geometry
+	IF v_the_geom is not null AND v_sourcetable = 'element' THEN
+		IF v_geometry ISNULL THEN
+			IF v_project_type = 'WS' THEN
+				select  row_to_json(c) INTO v_geometry from (SELECT st_x(st_centroid(st_envelope(the_geom))) as x, st_y(st_centroid(st_envelope(the_geom))) as y , St_AsText(the_geom) from
+				(select st_union(array_agg(the_geom))  as the_geom from (SELECT the_geom, element_id FROM arc JOIN element_x_arc USING (arc_id)
+						UNION SELECT the_geom, element_id FROM node JOIN element_x_node USING (node_id)
+						UNION SELECT the_geom, element_id FROM connec JOIN element_x_connec USING (connec_id))a WHERE element_id = v_id)b)c;
+			ELSIF v_project_type = 'UD' THEN
+				select  row_to_json(c) INTO v_geometry from (SELECT st_x(st_centroid(st_envelope(the_geom))) as x, st_y(st_centroid(st_envelope(the_geom))) as y , St_AsText(the_geom) from
+				(select st_union(array_agg(the_geom))  as the_geom from (SELECT the_geom, element_id FROM arc JOIN element_x_arc USING (arc_id)
+						UNION SELECT the_geom, element_id FROM node JOIN element_x_node USING (node_id)
+						UNION SELECT the_geom, element_id FROM gully JOIN element_x_gully USING (gully_id)
+						UNION SELECT the_geom, element_id FROM connec JOIN element_x_connec USING (connec_id))a WHERE element_id = v_id)b)c;
+			END IF;
+		END IF;
+	END IF;
 
 	--  Control NULL's
 	v_message := COALESCE(v_message, '{}');
@@ -360,7 +412,8 @@ BEGIN
 	      },
 	  "feature": {
 		"idName": "",
-		"visitId": "'||v_visit_id||'"
+		"visitId": "'||v_visit_id||'",
+		"geometry": '||v_geometry||'
 	      }
 	    }
 	  }')::JSON;
