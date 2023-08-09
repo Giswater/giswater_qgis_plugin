@@ -138,6 +138,7 @@ v_query_node text;
 v_query_connec text;
 v_query_gully text;
 v_query_link text;
+v_dscenario_valve text;
 
 BEGIN
 	-- Search path
@@ -160,8 +161,10 @@ BEGIN
 	v_parameters = (SELECT ((p_data::json->>'data')::json->>'parameters'));
 	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges');
 	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
+	v_dscenario_valve = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'dscenario_valve');
 
 	-- profilactic controls
+	IF v_dscenario_valve = '' THEN v_dscenario_valve = NULL; END IF;
 	IF v_floodonlymapzone = '' THEN v_floodonlymapzone = NULL; END IF;
 	v_floodonlymapzone = REPLACE(REPLACE (v_floodonlymapzone,'[','') ,']','');
 
@@ -490,6 +493,47 @@ BEGIN
 				WHERE closed=TRUE
 				AND v.active IS TRUE)';
 			EXECUTE v_querytext;
+
+			IF v_dscenario_valve IS NOT NULL THEN
+			--close valve
+			raise notice 'v_dd';
+				v_querytext  = 'UPDATE temp_t_anlgraph SET flag=1 WHERE 
+				node_1::integer IN (
+				SELECT a.node_id::integer 
+				FROM temp_t_node a 
+				JOIN inp_dscenario_shortpipe s ON a.node_id = s.node_id
+				WHERE status=''CLOSED''
+				AND dscenario_id = '||v_dscenario_valve||'::integer)';
+			EXECUTE v_querytext;
+
+			v_querytext  = 'UPDATE temp_t_anlgraph SET flag=1 WHERE 
+				node_2::integer IN (
+				SELECT a.node_id::integer 
+				FROM temp_t_node a 
+				JOIN inp_dscenario_shortpipe s ON a.node_id = s.node_id
+				WHERE status=''CLOSED''
+				AND dscenario_id = '||v_dscenario_valve||'::integer)';
+			EXECUTE v_querytext;
+			
+			--òpen valve
+			v_querytext  = 'UPDATE temp_t_anlgraph SET flag=0 WHERE 
+				node_1::integer IN (
+				SELECT a.node_id::integer 
+				FROM temp_t_node a 
+				JOIN inp_dscenario_shortpipe s ON a.node_id = s.node_id
+				WHERE status=''OPEN''
+				AND dscenario_id = '||v_dscenario_valve||'::integer)';
+			EXECUTE v_querytext;
+
+			v_querytext  = 'UPDATE temp_t_anlgraph SET flag=0 WHERE 
+				node_2::integer IN (
+				SELECT a.node_id::integer 
+				FROM temp_t_node a 
+				JOIN inp_dscenario_shortpipe s ON a.node_id = s.node_id
+				WHERE status=''OPEN''
+				AND dscenario_id = '||v_dscenario_valve||'::integer)';
+			EXECUTE v_querytext;
+			END IF;
 		END IF;
 
 		-- open custom nodes acording config parameters
