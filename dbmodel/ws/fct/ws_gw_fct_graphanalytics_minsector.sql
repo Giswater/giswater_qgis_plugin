@@ -178,10 +178,10 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('MINSECTOR DYNAMIC SECTORITZATION'));
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('---------------------------------------------------'));
 
-	SELECT count(*) INTO v_count FROM cat_feature_node WHERE graph_delimiter IS NULL;
-	IF v_count > 0 THEN
+	SELECT count(*) INTO v_count FROM config_graph_valve WHERE active IS true;
+	IF v_count < 1 THEN
 		INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-		VALUES (v_fid, 3, concat('ERROR-',v_fid,': There are null values on cat_feature_node.graphdelimiter. Please fill it before continue'));
+		VALUES (v_fid, 3, concat('ERROR-',v_fid,': There are no active values on config_graph_valve. Please fill it in before continue'));
 	ELSE
 		-- reset exploitation
 		IF v_expl IS NOT NULL THEN
@@ -247,8 +247,8 @@ BEGIN
 			
 		-- set the starting element
 		v_querytext = 'UPDATE temp_t_anlgraph SET flag=1, water=1, checkf=1, trace=a.arc_id::integer 
-				FROM (SELECT a.arc_id FROM temp_t_arc a JOIN vu_node ON node_1 = node_id WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter !=''NONE'')
-				UNION SELECT a.arc_id FROM temp_t_arc a JOIN vu_node ON node_2 = node_id WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter !=''NONE''))a
+				FROM (SELECT a.arc_id FROM temp_t_arc a JOIN vu_node ON node_1 = node_id WHERE node_type IN (SELECT id FROM config_graph_valve WHERE active IS TRUE)
+				UNION SELECT a.arc_id FROM temp_t_arc a JOIN vu_node ON node_2 = node_id WHERE node_type IN (SELECT id FROM config_graph_valve WHERE active IS TRUE))a
 					                                            WHERE temp_t_anlgraph.arc_id = a.arc_id';
 		EXECUTE v_querytext;
 
@@ -259,6 +259,8 @@ BEGIN
 			GET DIAGNOSTICS v_affectedrow =row_count;
 			v_row1 = v_row1 + v_affectedrow;
 			raise notice 'INUNDATION --> %' , v_cont1;
+			execute 'drop table if exists SCHEMA_NAME.aaaa_temp_t_anlgraph_'||v_cont1||';';
+			execute'create table SCHEMA_NAME.aaaa_temp_t_anlgraph_'||v_cont1||' as select temp_t_anlgraph.*, arc.the_geom from temp_t_anlgraph JOIN SCHEMA_NAME.arc USING(arc_id) ;';
 			EXIT WHEN v_affectedrow = 0;
 			EXIT WHEN v_cont1 = 30;
 		END LOOP;
@@ -270,14 +272,14 @@ BEGIN
 		SELECT node_id FROM 
 		(SELECT node_1 AS node_id, trace FROM temp_t_anlgraph UNION SELECT node_2, trace FROM temp_t_anlgraph ORDER BY 1)a
 		JOIN vu_node USING (node_id) 
-		WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter ='NONE') group by node_id having count(*) > 1
+		WHERE node_type IN (SELECT id FROM config_graph_valve WHERE active IS TRUE) group by node_id having count(*) > 1
 		ORDER BY 1
 		) a JOIN  
 		(
 		SELECT a.* FROM 
 		(SELECT node_1 AS node_id, trace FROM temp_t_anlgraph UNION SELECT node_2, trace FROM temp_t_anlgraph ORDER BY 1)a
 		JOIN vu_node USING (node_id) 
-		WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter ='NONE')
+		WHERE node_type IN (SELECT id FROM config_graph_valve WHERE active IS TRUE)
 		ORDER BY 1
 		) b USING (node_id)
 		JOIN 
@@ -315,7 +317,7 @@ BEGIN
 		-- update graph nodes on the border of temp_minsectors
 		EXECUTE 'UPDATE temp_t_node SET minsector_id = 0 FROM node a 
 		JOIN cat_node ON a.nodecat_id = cat_node.id
-		JOIN cat_feature_node c ON c.id=nodetype_id WHERE graph_delimiter!=''NONE'' 
+		JOIN config_graph_valve c ON c.id=nodetype_id WHERE c.active IS TRUE
 		AND temp_t_node.node_id = a.node_id AND '||v_expl_query||' '||v_sector_query||' '||v_psectors_query_node||';';
 								
 		-- used v_edit_connec to the exploitation filter. Row before is not neeeded because on table anl_* is data filtered by the process...
