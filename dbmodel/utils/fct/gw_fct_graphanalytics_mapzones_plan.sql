@@ -4,21 +4,21 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2768
+--FUNCTION CODE: 3256
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_mapzones_advanced(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_mapzones_advanced(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_mapzones_plan(p_data json)
 RETURNS json AS
 $BODY$
 
 /*
-SELECT gw_fct_graphanalytics_mapzones_advanced('{"data":{"parameters":{"graphClass":"SECTOR", "exploitation": "15", 
+SELECT gw_fct_graphanalytics_mapzones_plan('{"data":{"parameters":{"graphClass":"SECTOR", "exploitation": "15", 
 "updateFeature":"TRUE", "updateMapZone":1, "debug":"FALSE"}}}');
 
-SELECT gw_fct_graphanalytics_mapzones_advanced('{"data":{"parameters":{"graphClass":"DMA", "exploitation": "1", 
+SELECT gw_fct_graphanalytics_mapzones_plan('{"data":{"parameters":{"graphClass":"DMA", "exploitation": "1", 
 "updateFeature":"TRUE", "updateMapZone":3}}}');
 
-SELECT gw_fct_graphanalytics_mapzones_advanced('{"data":{"parameters":{"graphClass":"DQA", "exploitation": "2", 
+SELECT gw_fct_graphanalytics_mapzones_plan('{"data":{"parameters":{"graphClass":"DQA", "exploitation": "2", 
 "updateFeature":"TRUE", "updateMapZone":0}}}');
 
 */
@@ -37,6 +37,8 @@ v_usepsector text;
 v_valuefordisconnected integer;
 v_floodonlymapzone text;
 v_commitchanges text;
+v_dscenario_valve text;
+v_dscenario_mapzone text;
 
 BEGIN
 
@@ -47,13 +49,13 @@ BEGIN
 	v_updatemapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_paramupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
-	v_floodfromnode = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'floodFromNode');
 	v_forceclosed = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'forceClosed');
 	v_forceopen = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'forceOpen');
 	v_usepsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePlanPsector');
-	v_valuefordisconnected = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'valueForDisconnected');
 	v_floodonlymapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'floodOnlyMapzone');
 	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges');
+	v_dscenario_valve = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'dscenario_valve');
+	v_dscenario_mapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'dscenario_mapzone');
 
 
 	-- control of null values
@@ -65,12 +67,13 @@ BEGIN
 	IF v_updatemapzone IS NULL THEN v_updatemapzone = 1; END IF;
 	IF v_valuefordisconnected IS NULL THEN v_valuefordisconnected = 0; END IF;
 	IF v_floodonlymapzone IS NULL THEN v_floodonlymapzone = ''; END IF;
-	IF v_commitchanges IS NULL THEN v_commitchanges = FALSE ; END IF;
-
+	IF v_commitchanges IS NULL THEN v_commitchanges = TRUE ; END IF;
+	IF v_dscenario_valve IS NULL THEN v_dscenario_valve = '' ; END IF;
+	IF v_dscenario_mapzone IS NULL THEN v_dscenario_mapzone = '' ; END IF;
 	
 	v_data = concat ('{"data":{"parameters":{"graphClass":"',v_class,'", "exploitation": [',v_expl,'], "updateFeature":"TRUE",
-	"updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate, ',"floodFromNode":"',v_floodfromnode,'", "forceOpen": [',v_forceopen,'], "forceClosed":[',v_forceclosed,'], "usePlanPsector": ',v_usepsector,', "debug":"FALSE", 
-	"valueForDisconnected":',v_valuefordisconnected,', "floodOnlyMapzone":"',v_floodonlymapzone,'", "commitChanges":',v_commitchanges,'}}}');
+	"updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate, ', "forceOpen": [',v_forceopen,'], "forceClosed":[',v_forceclosed,'], "usePlanPsector": ',v_usepsector,', "debug":"FALSE", 
+	"valueForDisconnected":',v_valuefordisconnected,', "floodOnlyMapzone":"',v_floodonlymapzone,'", "commitChanges":',v_commitchanges,', "dscenario_valve":"',v_dscenario_valve,'", "dscenario_mapzone":"',v_dscenario_mapzone,'"}}}');
 
 	RETURN gw_fct_graphanalytics_mapzones(v_data);
 

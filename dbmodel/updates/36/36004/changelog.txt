@@ -1,2 +1,4 @@
 3.6.004
 *************
+- New function gw_fct_graphanalytics_mapzones_plan for creating mapzones for dscenario.
+- New table inp_dscenario_mapzone for storing data related to mapzone dscenario.

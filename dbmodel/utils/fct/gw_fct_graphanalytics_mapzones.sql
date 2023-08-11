@@ -139,6 +139,7 @@ v_query_connec text;
 v_query_gully text;
 v_query_link text;
 v_dscenario_valve text;
+v_dscenario_mapzone text;
 
 BEGIN
 	-- Search path
@@ -162,9 +163,11 @@ BEGIN
 	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges');
 	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
 	v_dscenario_valve = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'dscenario_valve');
+	v_dscenario_mapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'dscenario_mapzone');
 
 	-- profilactic controls
 	IF v_dscenario_valve = '' THEN v_dscenario_valve = NULL; END IF;
+	IF v_dscenario_mapzone = '' THEN v_dscenario_mapzone = NULL; END IF;
 	IF v_floodonlymapzone = '' THEN v_floodonlymapzone = NULL; END IF;
 	v_floodonlymapzone = REPLACE(REPLACE (v_floodonlymapzone,'[','') ,']','');
 
@@ -496,7 +499,6 @@ BEGIN
 
 			IF v_dscenario_valve IS NOT NULL THEN
 			--close valve
-			raise notice 'v_dd';
 				v_querytext  = 'UPDATE temp_t_anlgraph SET flag=1 WHERE 
 				node_1::integer IN (
 				SELECT a.node_id::integer 
@@ -1199,7 +1201,7 @@ BEGIN
 		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, cur_user, the_geom, '||v_field||') SELECT arc_id, expl_id, '||v_fid||', current_user, the_geom, '||v_field||' FROM temp_t_arc';
 
 		v_visible_layer = NULL;
-	ELSIF v_commitchanges IS TRUE THEN
+	ELSIF v_commitchanges IS TRUE and v_dscenario_mapzone is null THEN
 
 		-- setting variables in order to enhace performance
 		UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'edit_typevalue_fk_disable' AND cur_user = current_user;
@@ -1301,6 +1303,20 @@ BEGIN
 		UPDATE config_param_user SET value = 'FALSE' WHERE parameter = 'edit_typevalue_fk_disable' AND cur_user = current_user;
 		UPDATE config_param_user SET value = 'FALSE' WHERE parameter = 'edit_node2arc_update_disable' AND cur_user = current_user;
 		UPDATE config_param_system SET value = 'FALSE' WHERE parameter = 'admin_skip_audit';
+
+	ELSIF v_dscenario_mapzone IS NOT NULL THEN
+
+		EXECUTE 'DELETE FROM inp_dscenario_mapzone WHERE dscenario_id = '||v_dscenario_mapzone||' AND mapzone_type = '||quote_literal(v_class)||';';
+
+		EXECUTE 'INSERT INTO inp_dscenario_mapzone (dscenario_id, mapzone_type, mapzone_id, the_geom)
+		SELECT '||v_dscenario_mapzone||'::integer, upper('||quote_literal(v_class) ||'), '||v_field||', the_geom FROM temp_'||v_table||';';
+
+		EXECUTE 'UPDATE inp_dscenario_mapzone SET arcs = a.arcs from (select array_agg(arc_id::integer)as arcs,'|| v_field||' 
+		FROM temp_t_arc group by '|| v_field||') a WHERE dscenario_id ='||v_dscenario_mapzone||'	AND mapzone_id = '|| v_field||'::text AND mapzone_type = '||quote_literal(v_class)||';';
+		EXECUTE 'UPDATE inp_dscenario_mapzone SET nodes = a.nodes from (select array_agg(node_id::integer)as nodes,'|| v_field||' 
+		FROM temp_t_node group by '|| v_field||') a WHERE dscenario_id ='||v_dscenario_mapzone||'	AND mapzone_id = '|| v_field||'::text AND mapzone_type = '||quote_literal(v_class)||';';
+		EXECUTE 'UPDATE inp_dscenario_mapzone SET connecs = a.connecs from (select array_agg(connec_id::integer)as connecs,'|| v_field||' 
+		FROM temp_t_connec group by '|| v_field||') a WHERE dscenario_id ='||v_dscenario_mapzone||'	AND mapzone_id = '|| v_field||'::text AND mapzone_type = '||quote_literal(v_class)||';';
 	END IF;
 	
 	-- Control nulls
