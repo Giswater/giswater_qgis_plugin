@@ -319,6 +319,10 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		ELSIF v_dscenario_type = 'CONTROLS' THEN
 			UPDATE inp_dscenario_controls SET dscenario_id = NEW.dscenario_id, sector_id= NEW.sector_id, text= NEW.text, active=NEW.active
 			WHERE id=OLD.id;
+
+		ELSIF v_dscenario_type = 'MAPZONE' THEN
+			UPDATE inp_dscenario_mapzone SET pattern_id = NEW.pattern_id
+			WHERE dscenario_id=OLD.dscenario_id AND mapzone_id=OLD.mapzone_id AND mapzone_type=OLD.mapzone_type;
 		END IF;
 
 		RETURN NEW;
@@ -362,6 +366,9 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 		ELSIF v_dscenario_type = 'CONTROLS' THEN
 			DELETE FROM inp_dscenario_controls WHERE id=OLD.id;
+
+		ELSIF v_dscenario_type = 'MAPZONE' THEN
+			DELETE FROM inp_dscenario_mapzone WHERE dscenario_id=OLD.dscenario_id AND mapzone_id=OLD.mapzone_id AND mapzone_type=OLD.mapzone_type;
 
 		END IF;
 
