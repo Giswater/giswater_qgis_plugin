@@ -28,7 +28,7 @@ This function could be automatic triggered by valve status (open or closed) by c
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_toolbox 
-VALUES (3256, 'Mapzone dscenario planification','{"featureType":[]}',
+VALUES (3256, 'Mapzone Dscenario Planification','{"featureType":[]}',
 '[{"widgetname":"graphClass", "label":"Graph class:", "widgettype":"combo","datatype":"text","tooltip": "Graphanalytics method used", "layoutname":"grl_option_parameters","layoutorder":1,"comboIds":["PRESSZONE","DQA","DMA","SECTOR"],
 "comboNames":["Pressure Zonification (PRESSZONE)", "District Quality Areas (DQA) ", "District Metering Areas (DMA)", "Inlet Sectorization (SECTOR-HIGH / SECTOR-LOW)"], "selectedId":""}, 
 {"widgetname":"exploitation", "label":"Exploitation:","widgettype":"combo","datatype":"text","tooltip": "Choose exploitation to work with", "layoutname":"grl_option_parameters","layoutorder":2, 
@@ -50,7 +50,7 @@ VALUES (3258, 'gw_fct_mapzones_dscenario_pattern', 'ws', 'function', 'json', 'js
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_toolbox 
-VALUES (3258, 'Mapzone Dscenario Planification','{"featureType":[]}',
+VALUES (3258, 'Manage Mapzone Dscenario Demand','{"featureType":[]}',
 '[{"widgetname":"dscenario_mapzone", "label":"Source dscenario mapzone:","widgettype":"combo","datatype":"text","tooltip": "Select mapzone dscenario from where data will be copied to demand dscenario", "layoutname":"grl_option_parameters","layoutorder":1,"dvQueryText":"select dscenario_id as id, name as idval from cat_dscenario where dscenario_type =''MAPZONE'' order by name","isNullValue":"true", "selectedId":""},
 {"widgetname":"graphClass", "label":"Graph class:", "widgettype":"combo","datatype":"text","tooltip": "Graphanalytics method used", "layoutname":"grl_option_parameters","layoutorder":2,"comboIds":["PRESSZONE","DQA","DMA","SECTOR"],
 "comboNames":["Pressure Zonification (PRESSZONE)", "District Quality Areas (DQA) ", "District Metering Areas (DMA)", "Inlet Sectorization (SECTOR-HIGH / SECTOR-LOW)"], "selectedId":""}, 
