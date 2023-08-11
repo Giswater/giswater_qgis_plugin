@@ -2,3 +2,4 @@
 *************
 - New function gw_fct_graphanalytics_mapzones_plan for creating mapzones for dscenario.
 - New table inp_dscenario_mapzone for storing data related to mapzone dscenario.
+- New function gw_fct_mapzones_dscenario_pattern for inserting features and it's patterns into dscenario demanda based on values assigned to each dscenario mapzone.

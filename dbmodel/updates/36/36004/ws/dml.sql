@@ -18,7 +18,7 @@ VALUES ('inp_dscenario_mapzone' , 'Table to manage mapzones defined for a specif
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, source)
-VALUES (3256, 'gw_fct_graphanalytics_mapzones_plan', 'utils', 'function', 'json', 'json', 'Function to analyze network as a graph. Multiple analysis is avaliable (SECTOR, DQA, PRESSZONE & DMA). Before start you need to configure:
+VALUES (3256, 'gw_fct_graphanalytics_mapzones_plan', 'ws', 'function', 'json', 'json', 'Function to analyze network as a graph. Multiple analysis is avaliable (SECTOR, DQA, PRESSZONE & DMA). Before start you need to configure:
 - Field graph_delimiter on [cat_feature_node] table. 
 - Field graphconfig on [dma, sector, cat_presszone and dqa] tables.
 - Enable status for variable utils_graphanalytics_status on [config_param_system] table.
@@ -45,16 +45,16 @@ VALUES (3256, 'Mapzone dscenario planification','{"featureType":[]}',
 null, true, '{4}');
 
 INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, source)
-VALUES (3258, 'gw_fct_mapzones_dscenario_pattern', 'utils', 'function', 'json', 'json', 
+VALUES (3258, 'gw_fct_mapzones_dscenario_pattern', 'ws', 'function', 'json', 'json', 
 'Function that allows to configure demand dscenario for connecs and nodes, depending on their mapzones, defined on table inp_dscenario_mapzones and using pattern_id assigned to each of the zones', 'role_epa', 'core')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_toolbox 
 VALUES (3258, 'Mapzone Dscenario Planification','{"featureType":[]}',
-'[{"widgetname":"dscenario_mapzone", "label":"Source dscenario mapzone:","widgettype":"combo","datatype":"text","tooltip": "Select mapzone dscenario from where data will be copied to demand dscenario", "layoutname":"grl_option_parameters","layoutorder":9,"dvQueryText":"select dscenario_id as id, name as idval from cat_dscenario where dscenario_type =''MAPZONE'' order by name","isNullValue":"true", "selectedId":""},
+'[{"widgetname":"dscenario_mapzone", "label":"Source dscenario mapzone:","widgettype":"combo","datatype":"text","tooltip": "Select mapzone dscenario from where data will be copied to demand dscenario", "layoutname":"grl_option_parameters","layoutorder":1,"dvQueryText":"select dscenario_id as id, name as idval from cat_dscenario where dscenario_type =''MAPZONE'' order by name","isNullValue":"true", "selectedId":""},
 {"widgetname":"graphClass", "label":"Graph class:", "widgettype":"combo","datatype":"text","tooltip": "Graphanalytics method used", "layoutname":"grl_option_parameters","layoutorder":2,"comboIds":["PRESSZONE","DQA","DMA","SECTOR"],
 "comboNames":["Pressure Zonification (PRESSZONE)", "District Quality Areas (DQA) ", "District Metering Areas (DMA)", "Inlet Sectorization (SECTOR-HIGH / SECTOR-LOW)"], "selectedId":""}, 
-{"widgetname":"dscenario_demand", "label":"Target dscenario demand:","widgettype":"combo","datatype":"text","tooltip": "Select demand dscenario where data will be inserted", "layoutname":"grl_option_parameters","layoutorder":9,
+{"widgetname":"dscenario_demand", "label":"Target dscenario demand:","widgettype":"combo","datatype":"text","tooltip": "Select demand dscenario where data will be inserted", "layoutname":"grl_option_parameters","layoutorder":3,
 "dvQueryText":"select dscenario_id as id, name as idval from cat_dscenario where dscenario_type =''DEMAND'' order by name","isNullValue":"true", "selectedId":""}]',
 null, true, '{4}');
 
@@ -70,7 +70,7 @@ FROM config_form_fields WHERE formname ='v_edit_cat_dscenario' AND
 columnname in ('dscenario_id', 'name') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING; 
 
 INSERT INTO config_form_fields 
-SELECT 'v_edit_inp_dscenario_mapzone', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, 'energy_pattern_id', tooltip, placeholder, ismandatory, 
+SELECT 'v_edit_inp_dscenario_mapzone', formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, 'pattern_id', tooltip, placeholder, ismandatory, 
 isparent, true, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, 
 widgetcontrols, widgetfunction, linkedobject, hidden 
 FROM config_form_fields WHERE formname ='v_edit_inp_dscenario_demand' AND 
@@ -90,3 +90,7 @@ INSERT INTO config_form_fields
 VALUES ('v_edit_inp_dscenario_mapzone', 'form_feature', 'tab_none', 'connecs', null, null, 'string', 'text', 'connecs', null, null, false, 
 false, false, false, false, null, null, null, null, null, null, 
 null, null, null, false);
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (502, 'Mapzone dscenario demand', 'ws', null, 'core', true, 'Function process', null) ON CONFLICT (fid) DO NOTHING;
+	
