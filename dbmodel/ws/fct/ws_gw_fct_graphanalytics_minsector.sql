@@ -259,8 +259,7 @@ BEGIN
 			GET DIAGNOSTICS v_affectedrow =row_count;
 			v_row1 = v_row1 + v_affectedrow;
 			raise notice 'INUNDATION --> %' , v_cont1;
-			execute 'drop table if exists SCHEMA_NAME.aaaa_temp_t_anlgraph_'||v_cont1||';';
-			execute'create table SCHEMA_NAME.aaaa_temp_t_anlgraph_'||v_cont1||' as select temp_t_anlgraph.*, arc.the_geom from temp_t_anlgraph JOIN SCHEMA_NAME.arc USING(arc_id) ;';
+	
 			EXIT WHEN v_affectedrow = 0;
 			EXIT WHEN v_cont1 = 30;
 		END LOOP;
