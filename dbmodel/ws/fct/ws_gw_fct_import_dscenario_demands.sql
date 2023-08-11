@@ -23,7 +23,7 @@ SELECT SCHEMA_NAME.gw_fct_import_dscenario_demands($${
 DECLARE
 
 
-v_result_id text= 'import cat feature';
+v_result_id text= 'import dscenario demand';
 v_result json;
 v_result_info json;
 v_project_type text;
@@ -46,14 +46,7 @@ BEGIN
 	-- get system parameters
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
-    --set current process as users parameter
-    DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
-
-    INSERT INTO config_param_user (value, parameter, cur_user)
-    VALUES (txid_current(),'utils_cur_trans',current_user );
-    
   v_fid = ((p_data ->>'data')::json->>'fid')::text;
-   	
   
 	-- manage log (fid:  v_fid)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
@@ -79,11 +72,11 @@ BEGIN
 
 			INSERT INTO inp_dscenario_demand(
 			dscenario_id, feature_id, feature_type, demand, demand_type, source)
-			SELECT v_dscenario_id, csv2, 'CONNEC',csv3::float, null, csv3 FROM temp_csv JOIN connec ON csv2 = connec_id WHERE cur_user=current_user AND fid = v_fid;
+			SELECT v_dscenario_id, csv2, 'CONNEC',csv4::float, substring(csv5,1,18), csv6 FROM temp_csv JOIN connec ON csv2 = connec_id WHERE cur_user=current_user AND fid = v_fid;
 
 			INSERT INTO inp_dscenario_demand(
 			dscenario_id, feature_id, feature_type, demand, demand_type, source)
-			SELECT v_dscenario_id, csv2, 'NODE',csv3::float, null, csv3 FROM temp_csv JOIN man_netwjoin ON csv2 = node_id WHERE cur_user=current_user AND fid = v_fid;
+			SELECT v_dscenario_id, csv2, 'NODE',csv4::float, substring(csv5,1,18), csv6 FROM temp_csv JOIN man_netwjoin ON csv2 = node_id WHERE cur_user=current_user AND fid = v_fid;
 
 			-- manage log (fid: v_fid)
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Reading values from temp_csv table -> Done'));
