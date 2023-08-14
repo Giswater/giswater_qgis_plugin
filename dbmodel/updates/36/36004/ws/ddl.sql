@@ -18,3 +18,5 @@ connecs integer[],
 the_geom geometry(MultiPolygon,SRID_VALUE),
 CONSTRAINT inp_dscenario_zone_pkey PRIMARY KEY (dscenario_id, mapzone_type, mapzone_id)
 );
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"staticpressure", "dataType":"numeric(12,3)"}}$$);

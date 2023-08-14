@@ -672,20 +672,21 @@ BEGIN
 		WHERE node = node_id';
 		
 		RAISE NOTICE ' Update temporal tables of connecs, links and gullies';
+		
 		-- used connec using v_edit_arc because the exploitation filter (same before)
 		v_querytext = 'UPDATE temp_t_connec SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||' FROM temp_t_arc a WHERE a.arc_id=temp_t_connec.arc_id';
 		EXECUTE v_querytext;
 
-		v_querytext = 'UPDATE temp_t_connec a SET '||quote_ident(v_field)||' = 0 WHERE connec_id IN (SELECT connec_id FROM v_plan_psector_connec WHERE plan_state = 0)';
-		EXECUTE v_querytext;
-
-		IF v_project_type='WS' THEN
-			v_querytext = 'UPDATE temp_t_link SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||' FROM temp_t_connec a WHERE a.connec_id=temp_t_link.feature_id';
-			EXECUTE v_querytext;
-
-		ELSIF v_project_type='UD' THEN
+		-- update link table
+		EXECUTE 'UPDATE temp_t_link SET '||quote_ident(v_field)||' = c.'||quote_ident(v_field)||' FROM temp_t_connec c WHERE c.connec_id=feature_id';
+		
+		IF v_project_type='UD' THEN
+			
 			v_querytext = 'UPDATE temp_t_gully SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||' FROM temp_t_arc a WHERE a.arc_id=temp_t_gully.arc_id';
 			EXECUTE v_querytext;
+
+			-- update link table
+			EXECUTE 'UPDATE temp_t_link SET '||quote_ident(v_field)||' = g.'||quote_ident(v_field)||' FROM temp_t_gully g  WHERE c.gullyid=feature_id';		
 		END IF;	
 
 		IF v_islastupdate IS TRUE THEN
@@ -712,6 +713,9 @@ BEGIN
 
 			v_querytext = 'UPDATE temp_t_connec SET lastupdate = now(), lastupdate_user=current_user FROM temp_t_arc a WHERE a.arc_id=temp_t_connec.arc_id';
 			EXECUTE v_querytext;
+
+			-- update link table
+			EXECUTE 'UPDATE temp_t_link SET lastupdate = lastupdate = now(), lastupdate_user=current_user;';
 
 			IF v_project_type='UD' THEN
 				v_querytext = 'UPDATE temp_t_gully SET lastupdate = now(), lastupdate_user=current_user FROM temp_t_arc a WHERE a.arc_id=temp_t_gully.arc_id';
@@ -751,12 +755,20 @@ BEGIN
 				WHERE st_dwithin(temp_t_arc.the_geom, n.the_geom, 0.05::double precision) AND temp_t_arc.state = 1 AND n.state = 1 
 				and n.arc_id IS NOT NULL AND temp_t_node.node_id=n.node_id and n.expl_id='||v_expl_id||' '||v_psectors_query_node||';';
 				
-			-- updat connec table
+			-- update connec table
 			EXECUTE 'UPDATE temp_t_connec SET staticpressure =(b.head - b.elevation + (case when b.depth is null then 0 else b.depth end)::float) FROM 
-				(SELECT connec_id, head, elevation, depth FROM temp_t_connec c
-				JOIN presszone USING (presszone_id)
-				WHERE state = 1 AND c.expl_id='||v_expl_id||' '||v_psectors_query_connec||') b
+				(SELECT connec_id, head, elevation, depth FROM temp_t_connec c JOIN temp_t_link ON feature_id = connec_id
+				JOIN presszone p ON c.presszone_id = p.presszone_id
+				WHERE temp_t_link.state = 1 AND c.expl_id='||v_expl_id||' '||v_psectors_query_connec||') b
 				WHERE temp_t_connec.connec_id=b.connec_id;';
+
+			-- update link table
+			EXECUTE 'UPDATE temp_t_link SET staticpressure =(b.head - b.elevation + (case when b.depth is null then 0 else b.depth end)::float) FROM 
+				(SELECT link_id, head, elevation, depth FROM temp_t_connec c JOIN temp_t_link ON feature_id = connec_id
+				JOIN presszone p ON c.presszone_id = p.presszone_id
+				WHERE c.expl_id='||v_expl_id||' '||v_psectors_query_connec||') b
+				WHERE temp_t_link.link_id=b.link_id;';
+
 		END IF;
 
 		IF v_updatemapzgeom > 0 THEN		
@@ -1264,7 +1276,8 @@ BEGIN
 		EXECUTE v_querytext;
 
 		-- arcs
-		v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||', lastupdate = a.lastupdate FROM temp_t_arc a WHERE a.arc_id=arc.arc_id';
+		v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||', lastupdate_user = a.lastupdate_user, lastupdate = a.lastupdate 
+		FROM temp_t_arc a WHERE a.arc_id=arc.arc_id';
 		EXECUTE v_querytext;
 		IF v_class = 'PRESSZONE' THEN
 			-- static pressure for arcs
@@ -1273,29 +1286,35 @@ BEGIN
 		END IF;
 
 		-- node
-		v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = n.'||quote_ident(v_field)||', lastupdate = n.lastupdate FROM temp_t_node n WHERE n.node_id=node.node_id';
+		v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = n.'||quote_ident(v_field)||', lastupdate_user = n.lastupdate_user, lastupdate = n.lastupdate 
+		FROM temp_t_node n WHERE n.node_id=node.node_id';
 		EXECUTE v_querytext;
 		IF v_class = 'PRESSZONE' THEN
 			UPDATE node SET staticpressure = n.staticpressure FROM temp_t_node n WHERE n.node_id=node.node_id;
 		END IF;
 
-		-- connec
-		v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = c.'||quote_ident(v_field)||', lastupdate = c.lastupdate FROM temp_t_connec c WHERE c.connec_id=connec.connec_id';
+		-- connec state = 1
+		v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = c.'||quote_ident(v_field)||', lastupdate_user = c.lastupdate_user, lastupdate = c.lastupdate 
+		FROM temp_t_connec c WHERE c.connec_id=connec.connec_id';
 		EXECUTE v_querytext;
 		IF v_class = 'PRESSZONE' THEN
 			UPDATE connec SET staticpressure = c.staticpressure FROM temp_t_connec c WHERE c.connec_id=connec.connec_id;
 		END IF;
 
-		IF v_project_type = 'WS' THEN
+		--link
+		IF v_class = 'PRESSZONE' THEN
+			UPDATE link SET staticpressure = l.staticpressure FROM temp_t_link l WHERE l.link_id=link.link_id;
+		END IF;
+		
+		v_querytext = 'UPDATE link SET '||quote_ident(v_field)||' = l.'||quote_ident(v_field)||', lastupdate_user = l.lastupdate_user, lastupdate = l.lastupdate 
+		FROM temp_t_link l WHERE link.link_id = l.link_id';
+		EXECUTE v_querytext;
 
-			--link
-			v_querytext = 'UPDATE link SET '||quote_ident(v_field)||' = l.'||quote_ident(v_field)||' FROM temp_t_link l WHERE l.link_id=link.link_id';
-			EXECUTE v_querytext;
-
-		ELSIF v_project_type = 'UD' THEN
+		IF v_project_type = 'UD' THEN
 		
 			-- gully
-			v_querytext = 'UPDATE gully SET '||quote_ident(v_field)||' = g.'||quote_ident(v_field)||', lastupdate = g.lastupdate FROM temp_t_gully g WHERE g.gully_id=gully.gully_id';
+			v_querytext = 'UPDATE gully SET '||quote_ident(v_field)||' = g.'||quote_ident(v_field)||', lastupdate_user = g.lastupdate_user, lastupdate = g.lastupdate 
+			FROM temp_t_gully g WHERE g.gully_id=gully.gully_id';
 			EXECUTE v_querytext;
 		END IF;	
 		
