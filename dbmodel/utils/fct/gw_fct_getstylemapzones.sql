@@ -22,10 +22,10 @@ v_sector json;
 v_dma json;
 v_presszone json;
 v_dqa json;
-v_statussector text;
-v_statuspresszone text;
-v_statusdma text;
-v_statusdqa text;
+v_statussector text = 'Random';
+v_statuspresszone text = 'Random';
+v_statusdma text = 'Random';
+v_statusdqa text = 'Random';
 v_project_type text;
 v_colsector text;
 v_colpresszone text;
@@ -36,7 +36,7 @@ v_trapresszone text;
 v_tradma text;
 v_tradqa text;
 v_drainzone json;
-v_statusdrainzone text;
+v_statusdrainzone text = 'Random';
 v_coldrainzone text;
 v_tradrainzone text;
 
@@ -108,7 +108,6 @@ BEGIN
 	v_tradma := COALESCE(v_tradma, '0.5');
 	v_tradqa := COALESCE(v_tradqa, '0.5');
 	v_tradrainzone := COALESCE(v_tradrainzone, '0.5');
-	
 
 	--    Return
 	RETURN ('{"status":"Accepted", "version":'||v_version||
