@@ -74,36 +74,33 @@ BEGIN
         SELECT arc_id INTO v_arc_id FROM arc WHERE node_1 =  v_feature_id;
     END IF;
 
-    IF v_graphdelim = 'CHECKVALVE' THEN
+    IF  v_graphdelim = 'CHECKVALVE' THEN
 
+        IF v_epatype = 'SHORTPIPE' THEN
 		UPDATE inp_shortpipe SET to_arc = v_arc_id, status ='CV' WHERE node_id = v_feature_id;
+
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, 
 		concat('Set to_arc for check-valve, ', v_feature_id, ' with value ',v_arc_id, '. and EPANET status with value ''CV'', '));
+	END IF;
 
-		INSERT INTO config_graph_checkvalve (node_id, to_arc, active) 
-		VALUES (v_feature_id, v_arc_id,TRUE) ON CONFLICT (node_id) DO UPDATE SET to_arc = v_arc_id;
+	INSERT INTO config_graph_checkvalve (node_id, to_arc, active) 
+	VALUES (v_feature_id, v_arc_id,TRUE) ON CONFLICT (node_id) DO UPDATE SET to_arc = v_arc_id;
 
-		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, 
-		concat('and set to_arc of config_graph_checkvalve for node ', v_feature_id, ' with value ',v_arc_id, '.'));
-
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, 
+	concat('and set to_arc of config_graph_checkvalve for node ', v_feature_id, ' with value ',v_arc_id, '.'));
     
-    ELSIF v_epatype IN ('PUMP', 'VALVE', 'SHORTPIPE') OR v_graphdelim != 'NONE' THEN
+    ELSIF v_epatype IN ('PUMP', 'VALVE') OR v_graphdelim IN ('SECTOR','PRESSZONE','DMA', 'DQA') THEN
     
         --update to_arc on go2epa tables
         IF v_epatype = 'PUMP' THEN
             UPDATE inp_pump SET to_arc = v_arc_id WHERE node_id = v_feature_id;
-            
+
             INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, concat('Set to_arc of pump ', v_feature_id, ' with value ',v_arc_id, '.'));
 
         ELSIF v_epatype = 'VALVE' THEN
             UPDATE inp_valve SET to_arc = v_arc_id WHERE node_id = v_feature_id;
 
             INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, concat('Set to_arc of valve ', v_feature_id, ' with value ',v_arc_id, '.'));
-
-        ELSIF v_epatype = 'SHORTPIPE' THEN
-            UPDATE inp_shortpipe SET to_arc = v_arc_id WHERE node_id = v_feature_id;
-
-            INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, concat('Set to_arc of shortpipe ', v_feature_id, ' with value ',v_arc_id, '.'));
         END IF;
 
         --define list of mapzones to be set 

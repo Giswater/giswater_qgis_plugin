@@ -105,7 +105,7 @@ BEGIN
 		
 		IF v_catname IS NULL THEN
 			EXECUTE 'SELECT lower(graph_delimiter) FROM cat_feature JOIN cat_feature_node USING (id)
-			WHERE child_layer = '||quote_literal(v_feature_table)||';'
+			WHERE graph_delimiter NOT IN (''MINSECTOR'', ''NONE'', ''CHECKVALVE'') AND child_layer = '||quote_literal(v_feature_table)||';'
 			INTO v_catname;
 		END IF;
 		--get addmapzone config

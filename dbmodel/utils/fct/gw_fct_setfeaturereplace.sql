@@ -602,11 +602,11 @@ BEGIN
 			IF v_feature_type = 'node' THEN
 
 				-- check if old / new nodes they are graphdelimiters
-				EXECUTE 'SELECT CASE WHEN lower(graph_delimiter) = ''none'' or lower(graph_delimiter) = ''minsector'' THEN NULL ELSE lower(graph_delimiter) END AS graph 
+				EXECUTE 'SELECT CASE WHEN graph_delimiter IN (''NONE'', ''MINSECTOR'',''CHECKVALVE'') THEN NULL ELSE lower(graph_delimiter) END AS graph 
 				FROM '||v_feature_type_table||' c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id='''||v_old_featuretype||''';'
 				INTO v_mapzone_old;
 
-				EXECUTE 'SELECT CASE WHEN lower(graph_delimiter) = ''none'' or lower(graph_delimiter) = ''minsector''  THEN NULL ELSE lower(graph_delimiter) END AS graph 
+				EXECUTE 'SELECT CASE WHEN graph_delimiter IN (''NONE'', ''MINSECTOR'',''CHECKVALVE'') THEN NULL ELSE lower(graph_delimiter) END AS graph 
 				FROM '||v_feature_type_table||' c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id='''||v_feature_type_new||''';'
 				INTO v_mapzone_new;
 
@@ -641,13 +641,13 @@ BEGIN
 			ELSIF v_feature_type = 'arc' THEN
 
 					--check if final nodes of arc are graph delimiters
-					EXECUTE 'SELECT CASE WHEN lower(graph_delimiter) = ''none'' or lower(graph_delimiter) = ''minsector'' THEN NULL ELSE lower(graph_delimiter) END AS graph, node_1 FROM v_edit_arc a 
+					EXECUTE 'SELECT CASE WHEN graph_delimiter IN (''NONE'', ''MINSECTOR'',''CHECKVALVE'') THEN NULL ELSE lower(graph_delimiter) END AS graph, node_1 FROM v_edit_arc a 
 					JOIN v_edit_node n1 ON n1.node_id=node_1
 					JOIN cat_feature_node cf1 ON n1.node_type = cf1.id 
 					WHERE a.arc_id='''||v_id||''';'
 					INTO v_node1_graph, v_node_1;
 
-					EXECUTE 'SELECT CASE WHEN lower(graph_delimiter) = ''none'' or lower(graph_delimiter) = ''minsector'' THEN NULL ELSE lower(graph_delimiter) END AS graph,node_2 FROM v_edit_arc a 
+					EXECUTE 'SELECT CASE WHEN graph_delimiter IN (''NONE'', ''MINSECTOR'',''CHECKVALVE'') THEN NULL ELSE lower(graph_delimiter) END AS graph,node_2 FROM v_edit_arc a 
 					JOIN v_edit_node n2 ON n2.node_id=node_2
 					JOIN cat_feature_node cf2 ON n2.node_type = cf2.id 
 					WHERE a.arc_id='''||v_id||''';'

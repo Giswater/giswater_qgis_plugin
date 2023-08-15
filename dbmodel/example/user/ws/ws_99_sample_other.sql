@@ -84,6 +84,7 @@ UPDATE cat_feature_node SET graph_delimiter='PRESSZONE' WHERE id IN('PR_BREAK_VA
 UPDATE cat_feature_node SET graph_delimiter='DQA' WHERE id IN('CLORINATHOR');
 UPDATE cat_feature_node SET graph_delimiter='DMA' WHERE id IN('FLOWMETER');
 UPDATE cat_feature_node SET graph_delimiter='SECTOR' WHERE id IN('SOURCE','TANK','WATERWELL','WTP');
+UPDATE cat_feature_node SET graph_delimiter='CHECKVALVE' WHERE id IN('CHECK_VALVE');
 
 update ext_rtc_hydrometer SET state_id=1;
 
