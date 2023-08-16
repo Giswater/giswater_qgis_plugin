@@ -20,3 +20,16 @@ CONSTRAINT inp_dscenario_zone_pkey PRIMARY KEY (dscenario_id, mapzone_type, mapz
 );
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"staticpressure", "dataType":"numeric(12,3)"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_scada_x_data", "column":"scada_id", "dataType":"text"}}$$);
+
+UPDATE ext_rtc_scada_x_data SET scada_id = s.scada_id FROM ext_rtc_scada s WHERE s.node_id = ext_rtc_scada_x_data.node_id;
+UPDATE  ext_rtc_scada_x_data SET scada_id = node_id WHERE scada_id is null;
+ALTER TABLE ext_rtc_scada_x_data DROP CONSTRAINT ext_rtc_scada_x_data_pkey;
+ALTER TABLE ext_rtc_scada_x_data ADD CONSTRAINT ext_rtc_scada_x_data_pkey PRIMARY KEY(scada_id, value_date);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_data", "column":"date_value", "dataType":"timestamp"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_data", "column":"text_value", "dataType":"text"}}$$);
+
+
+
