@@ -12,10 +12,11 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_import_scada_values($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"fid":502}}$$)
+SELECT SCHEMA_NAME.gw_fct_import_scada_values($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{}}$$)
 
 -- fid 469 for generic import scada values 
        502 for specific flowmeter_daily_values wich has an own fid but uses this function to work with.
+  
 */
 
 
@@ -37,11 +38,12 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	v_fid = (p_data ->>'data')::json->>'fid';
-
+	if v_fid is null then v_fid = (SELECT fid FROM temp_csv where cur_user = current_user order by id desc limit 1); end if;
 
 	-- get system parameters
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-   
+
+
 	-- manage log (fid: v_fid)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
 	IF v_fid = 469 THEN
@@ -59,21 +61,21 @@ BEGIN
 		(v_addfields.csv1, v_addfields.csv2, v_addfields.csv3::date, v_addfields.csv4::float, v_addfields.csv5::integer, v_addfields.csv6::integer, v_addfields.csv7);			
 	END LOOP;
 
-	SELECT DISTINCT csv1 INTO v_count FROM temp_csv WHERE cur_user=current_user AND fid = v_fid;
+	SELECT count(*) INTO v_count FROM (SELECT DISTINCT csv1 FROM temp_csv WHERE cur_user=current_user AND fid = v_fid)a;
 
 	-- manage log (fid: v_fid)
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Reading values from temp_csv table -> Done'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Inserting values on ext_rtc_scada_x_data table -> Done'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Deleting values from temp_csv -> Done'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Process finished with ',i, ' rows inserted.'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Data for ',v_count, ' tags from scada has been imported.'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Data from ',v_count, ' scada tags have been imported.'));
 
 	-- get log (fid: v_fid)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-			
+		
 	-- Control nulls
 	v_version := COALESCE(v_version, '{}'); 
 	v_result_info := COALESCE(v_result_info, '{}'); 

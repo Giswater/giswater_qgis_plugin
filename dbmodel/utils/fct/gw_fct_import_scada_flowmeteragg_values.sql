@@ -48,12 +48,9 @@ BEGIN
    
 	-- manage log (fid: v_fid)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
-	DELETE FROM ext_rtc_scada_x_data;-- ------------------------------------------------------------------------------------------------------------------>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	DELETE FROM temp_data;
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('IMPORT FLOWMETER AGGREGATED VALUES FILE'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('------------------------------------------'));
-
-	--CREATE TEMP TABLE temp_t_data (LIKE SCHEMA_NAME.temp_data INCLUDING ALL); 
 
 	-- refactoring data on temp csv
 	FOR v_addfields IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = v_fid
@@ -89,15 +86,18 @@ BEGIN
 	-- mapping values on table
 	INSERT INTO ext_rtc_scada_x_data SELECT feature_id, date_value::date, float_value, int_value, fid, text_value, log_message FROM temp_data;
 	
-
+	-- couting
 	SELECT count(*) INTO v_count FROM (SELECT DISTINCT csv1 FROM temp_csv WHERE cur_user=current_user AND fid = v_fid)a;
+	SELECT count(*) INTO i FROM (SELECT feature_id FROM temp_data)a;
+
 
 	-- manage log (fid: v_fid)
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Reading values from temp_csv table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Inserting values on ext_rtc_scada_x_data table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Deleting values from temp_csv -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Reading values from temp_csv table -> Done!'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Inserting values on ext_rtc_scada_x_data table -> Done!'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Deleting values from temp_csv -> Done!'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Refactorize value to one value per day -> Done!'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Process finished with ',i, ' rows inserted.'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Data for ',v_count, ' tags from scada has been imported and refactorized to one value per day.'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Data from ',v_count, ' scada tags have been imported.'));
 
 	-- get log (fid: v_fid)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 

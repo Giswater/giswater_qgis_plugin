@@ -101,7 +101,7 @@ INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, i
 VALUES (506, 'Import flowmeter agg values', 'ws', null, 'core', true, 'Function process', null) ON CONFLICT (fid) DO NOTHING;
 	
 INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, source)
-VALUES (3260, 'gw_fct_import_flowmeteragg_values', 'ws', 'function', 'json', 'json', 
+VALUES (3260, 'gw_fct_import_scada_flowmeteragg_values', 'ws', 'function', 'json', 'json', 
 'Function to import flowmeter aggregated values with random interval in order to transform to daily values', 'role_om', 'core')
 ON CONFLICT (id) DO NOTHING;
 
@@ -110,6 +110,6 @@ INSERT INTO config_csv VALUES (504, 'Import flowmeter daily values', 'Import dai
 INSERT INTO config_csv VALUES (506, 'Import flowmeter agg values', 'Import aggregated flowmeter values into table ext_rtc_scada_x_data according example file ext_rtc_flowmeter_agg_values.csv', 'gw_fct_import_scada_flowmeteragg_values', true, 22);
 
 UPDATE sys_function SET function_name = 'gw_fct_import_scada_values' WHERE id = 3166;
-UPDATE sys_fprocess SET fprocess_name = 'Import scada values' WHERE id = 469;
+UPDATE sys_fprocess SET fprocess_name = 'Import scada values' WHERE fid = 469;
 UPDATE config_csv SET alias = 'Import scada values', descript = 'Import scada values into table ext_rtc_scada_x_data according example file ext_rtc_flowmeter_daily_values.csv', 
 functionname = 'gw_fct_import_scada_values' WHERE fid = 469;
