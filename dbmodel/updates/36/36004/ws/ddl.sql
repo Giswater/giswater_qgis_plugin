@@ -95,4 +95,17 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_data",
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_data", "column":"text_value", "dataType":"text"}}$$);
 
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector_graph", "column":"expl_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector_graph", "column":"sector_id", "dataType":"integer"}}$$);
 
+
+CREATE TABLE config_graph_minsector(
+  minsector_id integer NOT NULL,
+  expl_id integer,
+  parameters json,
+  active boolean DEFAULT true,
+  CONSTRAINT config_graph_minsector_pkey PRIMARY KEY (minsector_id),
+  CONSTRAINT config_graph_minsector_expl_id_fkey FOREIGN KEY (expl_id)
+      REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT config_graph_minsector_minsector_id_fkey FOREIGN KEY (minsector_id)
+      REFERENCES minsector (minsector_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE);
