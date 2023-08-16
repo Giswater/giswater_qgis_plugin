@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3256
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_mapzones_advanced(json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_mapzones_plan(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_mapzones_plan(p_data json)
 RETURNS json AS
 $BODY$
@@ -38,16 +38,14 @@ v_valuefordisconnected integer;
 v_floodonlymapzone text;
 v_commitchanges text;
 v_dscenario_valve text;
-v_dscenario_mapzone text;
+v_netscenario text;
 
 BEGIN
 
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 	
-	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'graphClass');
 	v_updatemapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
-	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_paramupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 	v_forceclosed = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'forceClosed');
 	v_forceopen = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'forceOpen');
@@ -55,7 +53,7 @@ BEGIN
 	v_floodonlymapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'floodOnlyMapzone');
 	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges');
 	v_dscenario_valve = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'dscenario_valve');
-	v_dscenario_mapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'dscenario_mapzone');
+	v_netscenario = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'netscenario');
 
 
 	-- control of null values
@@ -69,11 +67,12 @@ BEGIN
 	IF v_floodonlymapzone IS NULL THEN v_floodonlymapzone = ''; END IF;
 	IF v_commitchanges IS NULL THEN v_commitchanges = TRUE ; END IF;
 	IF v_dscenario_valve IS NULL THEN v_dscenario_valve = '' ; END IF;
-	IF v_dscenario_mapzone IS NULL THEN v_dscenario_mapzone = '' ; END IF;
-	
+	IF v_netscenario IS NULL THEN v_netscenario = '' ; END IF;
+	SELECT netscenario_type, expl_id INTO v_class, v_expl FROM plan_netscenario WHERE netscenario_id::text = v_netscenario::TEXT;
+
 	v_data = concat ('{"data":{"parameters":{"graphClass":"',v_class,'", "exploitation": [',v_expl,'], "updateFeature":"TRUE",
 	"updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate, ', "forceOpen": [',v_forceopen,'], "forceClosed":[',v_forceclosed,'], "usePlanPsector": ',v_usepsector,', "debug":"FALSE", 
-	"valueForDisconnected":',v_valuefordisconnected,', "floodOnlyMapzone":"',v_floodonlymapzone,'", "commitChanges":',v_commitchanges,', "dscenario_valve":"',v_dscenario_valve,'", "dscenario_mapzone":"',v_dscenario_mapzone,'"}}}');
+	"valueForDisconnected":',v_valuefordisconnected,', "floodOnlyMapzone":"',v_floodonlymapzone,'", "commitChanges":',v_commitchanges,', "dscenario_valve":"',v_dscenario_valve,'", "netscenario":"',v_netscenario,'"}}}');
 
 	RETURN gw_fct_graphanalytics_mapzones(v_data);
 

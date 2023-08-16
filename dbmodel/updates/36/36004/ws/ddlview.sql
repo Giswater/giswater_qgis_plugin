@@ -7,21 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME ,public;
 
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_mapzone AS
- SELECT d.dscenario_id,
-    d.name, 
-	mapzone_type, 
-	mapzone_id, 
-	pattern_id, 
-	arcs, 
-	nodes, 
-	connecs, 
-	the_geom
-   FROM selector_inp_dscenario,
-    inp_dscenario_mapzone mapzone
-   JOIN cat_dscenario d USING (dscenario_id)
-  WHERE active IS TRUE AND mapzone.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
-
 CREATE OR REPLACE VIEW vu_link AS 
  SELECT l.link_id,
     l.feature_type,
@@ -329,3 +314,60 @@ CREATE OR REPLACE VIEW v_connec AS
             v_link_connec.staticpressure
            FROM v_link_connec
           WHERE v_link_connec.state = 2) a ON a.feature_id::text = vu_connec.connec_id::text;
+
+
+CREATE OR REPLACE VIEW v_plan_netscenario_presszone  AS
+SELECT n.netscenario_id, 
+presszone_id, 
+head, 
+the_geom
+FROM selector_netscenario,
+plan_netscenario_presszone n
+WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_plan_netscenario_dma  AS
+SELECT n.netscenario_id, 
+dma_id, 
+pattern_id, 
+the_geom
+FROM selector_netscenario,
+plan_netscenario_dma n
+WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_plan_netscenario_arc  AS
+SELECT n.netscenario_id, 
+arc_id, 
+presszone_id, 
+dma_id,
+the_geom
+FROM selector_netscenario,
+plan_netscenario_arc n
+WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_plan_netscenario_node  AS
+SELECT n.netscenario_id, 
+node_id, 
+presszone_id, 
+staticpressure,
+dma_id,
+pattern_id,
+the_geom
+FROM selector_netscenario,
+plan_netscenario_node n
+WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_plan_netscenario_connec  AS
+SELECT n.netscenario_id, 
+connec_id, 
+presszone_id, 
+staticpressure,
+dma_id,
+pattern_id,
+the_geom
+FROM selector_netscenario,
+plan_netscenario_connec n
+WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;

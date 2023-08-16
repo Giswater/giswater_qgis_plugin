@@ -7,12 +7,12 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE:3258
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mapzones_dscenario_pattern(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_set_netscenario_pattern(p_data json)
 RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_mapzones_dscenario_pattern($${
+SELECT SCHEMA_NAME.gw_fct_set_netscenario_pattern($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{}}$$)
 
@@ -23,12 +23,10 @@ SELECT SCHEMA_NAME.gw_fct_mapzones_dscenario_pattern($${
 DECLARE
 
 v_fid integer =502;
-v_dscenario_mapzone integer;
+v_netscenario_mapzone integer;
 v_dscenario_demand integer;
-v_class text;
 
-
-v_result_id text= 'Insert demands for mapzones';
+v_result_id text= 'Set patterns using netscenarios';
 v_result json;
 v_result_info json;
 v_project_type text;
@@ -51,10 +49,7 @@ BEGIN
 	-- get system parameters
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
-
-
-  v_dscenario_mapzone = (((p_data ->>'data')::json->>'parameters')::json->>'dscenario_mapzone')::text;
-  v_class = (((p_data ->>'data')::json->>'parameters')::json->>'graphClass')::text;
+  v_netscenario_mapzone = (((p_data ->>'data')::json->>'parameters')::json->>'dscenario_mapzone')::text;
   v_dscenario_demand = (((p_data ->>'data')::json->>'parameters')::json->>'dscenario_demand')::integer;
   
 	-- manage log (fid:  v_fid)
@@ -64,15 +59,15 @@ BEGIN
 
 	--check if all mapzones have assigned pattern_id
 
-	EXECUTE 'SELECT count(*) FROM inp_dscenario_mapzone WHERE mapzone_type = '||quote_literal(v_class)||' AND dscenario_id = '||quote_literal(v_dscenario_mapzone)||'
+	EXECUTE 'SELECT count(*) FROM plan_netscenario WHERE netscenario_type = ''DMA'' AND netscenario_id = '||quote_literal(v_netscenario_mapzone)||'
 	and pattern_id IS NULL;'
 	INTO v_count;
 
 	IF v_count = 0 THEN
 		
-		EXECUTE 'INSERT INTO inp_dscenario_demand( dscenario_id, feature_id, feature_type, pattern_id)
-		SELECT '||v_dscenario_demand||', unnest(connecs), ''CONNEC'', pattern_id FROM inp_dscenario_mapzone
-		WHERE mapzone_type = '||quote_literal(v_class)||' AND dscenario_id = '||quote_literal(v_dscenario_mapzone)||';';
+		EXECUTE 'INSERT INTO inp_dscenario_demand(dscenario_id, feature_id, feature_type, pattern_id)
+		SELECT '||v_dscenario_demand||', connec_id, ''CONNEC'', pattern_id FROM plan_netscenario_connec
+		WHERE netdscenario_id = '||quote_literal(v_netscenario_mapzone)||';';
 
 		EXECUTE 'SELECT count(*) from inp_dscenario_demand
 		WHERE dscenario_id =  '||v_dscenario_demand||' AND feature_type = ''CONNEC'''
@@ -81,8 +76,8 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count,' connecs  were inserted into demand table.'));
 
 		EXECUTE 'INSERT INTO inp_dscenario_demand( dscenario_id, feature_id, feature_type, pattern_id)
-		SELECT '||v_dscenario_demand||', unnest(nodes), ''NODE'', pattern_id FROM inp_dscenario_mapzone
-		WHERE mapzone_type = '||quote_literal(v_class)||' AND dscenario_id = '||quote_literal(v_dscenario_mapzone)||';';
+		SELECT '||v_dscenario_demand||', node_id, ''NODE'', pattern_id FROM plan_netscenario_node
+		WHERE  netscenario_id = '||quote_literal(v_netscenario_mapzone)||';';
 
 		EXECUTE 'SELECT count(*) from inp_dscenario_demand
 		WHERE dscenario_id =  '||v_dscenario_demand||' AND feature_type = ''NODE'''
