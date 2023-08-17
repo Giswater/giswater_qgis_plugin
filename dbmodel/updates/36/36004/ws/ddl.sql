@@ -78,34 +78,49 @@ CREATE TABLE IF NOT EXISTS selector_netscenario(
     CONSTRAINT selector_netscenario_pkey PRIMARY KEY (netscenario_id, cur_user),
     CONSTRAINT selector_netscenario_netscenario_id_fkey FOREIGN KEY (netscenario_id)
         REFERENCES plan_netscenario (netscenario_id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE);
+        ON UPDATE CASCADE ON DELETE CASCADE);
 
+-- 2023/8/17
+ALTER TABLE ext_rtc_scada_x_data DROP CONSTRAINT ext_rtc_scada_x_data_pkey;
+ALTER TABLE ext_rtc_scada_x_data RENAME TO _ext_rtc_scada_x_data_;
+
+CREATE TABLE IF NOT EXISTS ext_rtc_scada_x_data(
+  scada_id text NOT NULL,
+  node_id character varying(16) NOT NULL,
+  value_date timestamp without time zone NOT NULL,
+  value double precision,
+  value_status integer,
+  annotation text,
+  CONSTRAINT ext_rtc_scada_x_data_pkey PRIMARY KEY (scada_id, value_date),
+  CONSTRAINT ext_rtc_scada_x_data_node_id_fkey FOREIGN KEY (node_id)
+  REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_scada", "column":"tagname", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_scada", "column":"units", "dataType":"text"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"staticpressure", "dataType":"numeric(12,3)"}}$$);
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_scada_x_data", "column":"scada_id", "dataType":"text"}}$$);
-
-UPDATE ext_rtc_scada_x_data SET scada_id = s.scada_id FROM ext_rtc_scada s WHERE s.node_id = ext_rtc_scada_x_data.node_id;
-UPDATE  ext_rtc_scada_x_data SET scada_id = node_id WHERE scada_id is null;
-ALTER TABLE ext_rtc_scada_x_data DROP CONSTRAINT ext_rtc_scada_x_data_pkey;
-ALTER TABLE ext_rtc_scada_x_data ADD CONSTRAINT ext_rtc_scada_x_data_pkey PRIMARY KEY(scada_id, value_date);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_data", "column":"date_value", "dataType":"timestamp"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_data", "column":"text_value", "dataType":"text"}}$$);
 
-
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector_graph", "column":"expl_id", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector_graph", "column":"sector_id", "dataType":"integer"}}$$);
 
-
-CREATE TABLE config_graph_minsector(
+CREATE TABLE IF NOT EXISTS minsector_graph_inlet(
   minsector_id integer NOT NULL,
   expl_id integer,
   parameters json,
   active boolean DEFAULT true,
-  CONSTRAINT config_graph_minsector_pkey PRIMARY KEY (minsector_id),
-  CONSTRAINT config_graph_minsector_expl_id_fkey FOREIGN KEY (expl_id)
+  CONSTRAINT minsector_graph_inlet_pkey PRIMARY KEY (minsector_id),
+  CONSTRAINT cminsector_graph_inlet_expl_id_fkey FOREIGN KEY (expl_id)
       REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT config_graph_minsector_minsector_id_fkey FOREIGN KEY (minsector_id)
+  CONSTRAINT minsector_graph_inlet_minsector_id_fkey FOREIGN KEY (minsector_id)
       REFERENCES minsector (minsector_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE);
+
+CREATE TABLE IF NOT EXISTS minsector_graph_checkvalve(
+  node_id character varying(16) NOT NULL,
+  to_minsector character varying(16) NOT NULL,
+  active boolean DEFAULT true,
+  CONSTRAINT minsector_graph_checkvalve_node_id_fkey PRIMARY KEY (node_id));
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut", "column":"minsector_id", "dataType":"integer"}}$$);

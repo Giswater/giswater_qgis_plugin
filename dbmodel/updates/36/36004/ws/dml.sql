@@ -175,3 +175,6 @@ UPDATE sys_function SET function_name = 'gw_fct_import_scada_values' WHERE id = 
 UPDATE sys_fprocess SET fprocess_name = 'Import scada values' WHERE fid = 469;
 UPDATE config_csv SET alias = 'Import scada values', descript = 'Import scada values into table ext_rtc_scada_x_data according example file scada_values.csv', 
 functionname = 'gw_fct_import_scada_values' WHERE fid = 469;
+
+INSERT INTO scada_id, node_id, value_date, value, value_status
+SELECT node_id, node_id, value_date, value, value_status FROM _ext_rtc_scada_x_data_;

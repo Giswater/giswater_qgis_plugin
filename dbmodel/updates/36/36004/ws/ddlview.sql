@@ -371,3 +371,8 @@ the_geom
 FROM selector_netscenario,
 plan_netscenario_connec n
 WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
+
+
+CREATE VIEW v_minsector_graph AS
+SELECT m.* FROM minsector_graph m, selector_expl s 
+WHERE cur_user = current_user AND s.expl_id = m.expl_id;
