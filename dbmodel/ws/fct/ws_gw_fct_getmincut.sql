@@ -116,7 +116,7 @@ BEGIN
                 USING v_point_geom;
         END IF;
 
-        --	Get municipality
+        -- Get municipality
         EXECUTE 'SELECT array_agg(row.muni_id) FROM (SELECT DISTINCT ext_municipality.muni_id FROM ext_address JOIN ext_municipality USING (muni_id) WHERE id = ANY($1)) row'
             INTO aux_muni_id
             USING address_array;
@@ -124,13 +124,12 @@ BEGIN
             INTO aux_muni_name
             USING address_array;
 
-        --	Get postcode
+        -- Get postcode
         EXECUTE 'SELECT array_agg(row.postcode) FROM (SELECT DISTINCT postcode FROM ext_address WHERE id = ANY($1)) row'
             INTO aux_cp
             USING address_array;
 
-
-        --	Get street
+        -- Get street
         EXECUTE 'SELECT array_agg(row.streetaxis_id) FROM (SELECT DISTINCT streetaxis_id, ext_streetaxis.name 
             FROM ext_address JOIN ext_streetaxis ON (streetaxis_id = ext_streetaxis.id) WHERE ext_address.id = ANY($1) order by name) row'
             INTO aux_street_id
