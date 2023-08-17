@@ -39,6 +39,8 @@ v_drainzone json;
 v_statusdrainzone text = 'Random';
 v_coldrainzone text;
 v_tradrainzone text;
+v_netscenario_dma json;
+v_netscenario_presszone json;
 
 BEGIN
 
@@ -76,7 +78,10 @@ BEGIN
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id, stylesheet::json FROM v_edit_presszone WHERE presszone_id NOT IN (''0'', ''-1'') and active IS TRUE) row' INTO v_presszone ;
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, stylesheet::json FROM v_edit_dma WHERE dma_id > 0 and active IS TRUE) row' INTO v_dma ;
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldqa||' as id, stylesheet::json FROM v_edit_dqa WHERE dqa_id > 0 and active IS TRUE) row' INTO v_dqa ;
-	
+		
+		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, null as stylesheet FROM v_plan_netscenario_dma WHERE dma_id > 0 ) row' INTO v_netscenario_dma ;
+		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id, null as stylesheet FROM v_plan_netscenario_presszone WHERE presszone_id NOT IN (''0'', ''-1'') ) row' INTO v_netscenario_presszone ;
+
 	ELSIF v_project_type = 'UD' THEN
 	
 		-- get mode	
@@ -98,6 +103,8 @@ BEGIN
 	v_presszone := COALESCE(v_presszone, '{}');
 	v_dqa  := COALESCE(v_dqa, '{}');
 	v_drainzone  := COALESCE(v_drainzone, '{}');
+	v_netscenario_dma  := COALESCE(v_netscenario_dma, '{}');
+	v_netscenario_presszone  := COALESCE(v_netscenario_presszone, '{}');
 	v_colsector  := COALESCE(v_colsector, '{}');
 	v_colpresszone  := COALESCE(v_colpresszone, '{}');
 	v_coldma  := COALESCE(v_coldma, '{}');
@@ -117,6 +124,8 @@ BEGIN
 				',{"name":"presszone", "status": "'||v_statuspresszone||'", "idname":"'||v_colpresszone||'",  "layer":"v_edit_presszone", "transparency":'||v_trapresszone||',  "values":' || v_presszone ||'}'||
 				',{"name":"dma",  "status": "'||v_statusdma||'", "idname": "'||v_coldma||'", "layer":"v_edit_dma", "transparency":'||v_tradma||', "values":' || v_dma ||'}'||
 				',{"name":"dqa",  "status": "'||v_statusdqa||'", "idname": "'||v_coldqa||'", "layer":"v_edit_dqa", "transparency":'||v_tradqa||', "values":' || v_dqa ||'}'||
+				',{"name":"netscenario_dma",  "status": "'||v_statusdma||'", "idname": "'||v_coldma||'", "layer":"v_plan_netscenario_dma", "transparency":'||v_tradma||', "values":' || v_netscenario_dma ||'}'||
+				',{"name":"netscenario_presszone",  "status": "'||v_statuspresszone||'", "idname": "'||v_colpresszone||'", "layer":"v_plan_netscenario_presszone", "transparency":'||v_trapresszone||', "values":' || v_netscenario_presszone ||'}'||
 				',{"name":"drainzone",  "status": "'||v_statusdrainzone||'", "idname": "'||v_coldrainzone||'", "layer":"v_edit_drainzone", "transparency":'||v_tradrainzone||', "values":' || v_drainzone ||'}'||
 				']}}'||
 	    '}')::json;

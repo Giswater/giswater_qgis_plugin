@@ -1341,7 +1341,15 @@ BEGIN
 		EXECUTE 'INSERT INTO plan_netscenario_connec(netscenario_id, connec_id, '||quote_ident(v_field)||', the_geom)
 		SELECT '|| v_netscenario||', connec_id, '||quote_ident(v_field)||', the_geom FROM temp_t_connec';
 
+		IF v_class = 'PRESSZONE' THEN
+			v_visible_layer ='v_plan_netscenario_presszone';
+		ELSIF v_class = 'DMA' THEN
+			v_visible_layer ='v_plan_netscenario_dma';
+		END IF;
 
+		DELETE FROM selector_netscenario  WHERE cur_user=current_user;
+		INSERT INTO selector_netscenario (netscenario_id) VALUES (v_netscenario::integer);
+		
 	END IF;
 	
 	-- Control nulls
