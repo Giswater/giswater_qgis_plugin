@@ -117,7 +117,7 @@ VALUES (3260, 'Create empty Netscenario','{"featureType":[]}',
 {"widgetname":"type", "label":"Type:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"netscenario type", "dvQueryText":"SELECT id, idval FROM plan_typevalue WHERE typevalue = ''netscenario_type''", "layoutname":"grl_option_parameters","layoutorder":4, "value":""},
 {"widgetname":"active", "label":"Active:", "widgettype":"check", "datatype":"boolean", "tooltip":"If true, active" , "layoutname":"grl_option_parameters","layoutorder":5, "value":"true"},
 {"widgetname":"expl", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"netscenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":6, "value":""}]',
-null, true, '{4}');
+null, true, '{4}') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, source)
 VALUES (3262, 'gw_fct_create_netscenario_from_toc', 'ws', 'function', 'json', 'json', 
@@ -131,7 +131,7 @@ VALUES (3262, 'Create Netscenario from ToC','{"featureType":[]}',
 {"widgetname":"type", "label":"Type:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"netscenario type", "dvQueryText":"SELECT id, idval FROM plan_typevalue WHERE typevalue = ''netscenario_type''", "layoutname":"grl_option_parameters","layoutorder":4, "value":""},
 {"widgetname":"active", "label":"Active:", "widgettype":"check", "datatype":"boolean", "tooltip":"If true, active" , "layoutname":"grl_option_parameters","layoutorder":5, "value":"true"},
 {"widgetname":"expl", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"netscenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":6, "value":""}]',
-null, true, '{4}');
+null, true, '{4}') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, source)
 VALUES (3264, 'gw_fct_duplicate_netscenario', 'ws', 'function', 'json', 'json', 
@@ -145,7 +145,7 @@ VALUES (3264, 'Duplicate Netscenario','{"featureType":[]}',
 {"widgetname":"descript", "label":"Descript:","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Descript for netscenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":2, "value":""},
 {"widgetname":"parent", "label":"Parent:","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Parent for netscenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":3, "value":""},
 {"widgetname":"active", "label":"Active:", "widgettype":"check", "datatype":"boolean", "tooltip":"If true, active" , "layoutname":"grl_option_parameters","layoutorder":5, "value":"true"}]',
-null, true, '{4}');
+null, true, '{4}') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
 VALUES (508, 'Create new Netscenario', 'ws', null, 'core', true, 'Function process', null) ON CONFLICT (fid) DO NOTHING;
@@ -178,3 +178,15 @@ functionname = 'gw_fct_import_scada_values' WHERE fid = 469;
 
 INSERT INTO scada_id, node_id, value_date, value, value_status
 SELECT node_id, node_id, value_date, value, value_status FROM _ext_rtc_scada_x_data_;
+
+INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam)
+VALUES ('tabname_typevalue', 'tab_netscenario', 'tab_netscenario', 'tabNetscenario', NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+	
+INSERT INTO config_form_tabs(formname, tabname, label, tooltip, sys_role, tabfunction, tabactions, orderby, device)
+VALUES ('selector_netscenario', 'tab_netscenario', 'Netscenario', 'Netscenario Selector', 'role_basic', null, null, 1,'{4,5}') ON CONFLICT (formname, tabname) DO NOTHING;
+
+INSERT INTO config_param_system(
+parameter, value, descript, label, 
+dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type,  datatype)
+VALUES ('basic_selector_tab_netscenario', '{"table":"plan_netscenario","table_id":"netscenario_id","selector":"selector_netscenario","selector_id":"netscenario_id","label":"netscenario_id, ''-'', name ","query_filter":" AND id > 0 ","manageAll":true}', 'Variable to configura all options related to search for the specificic tab','Selector variables', 
+null, null, true, null, 'ws', 'json') ON CONFLICT (parameter) DO NOTHING;
