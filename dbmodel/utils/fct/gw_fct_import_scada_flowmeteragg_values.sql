@@ -77,14 +77,15 @@ BEGIN
 		IF v_loop_numdays IS NOT NULL THEN  -- excluding by this way last row wich from temp_csv
 			FOR n IN i..v_loop_numdays
 			LOOP
-				INSERT INTO temp_data (feature_id, date_value, float_value, int_value, fid, text_value, log_message) 
-				VALUES (v_addfields.csv2, v_currentdate + n, ((v_nextvol -v_currentvol)/(v_volume_numdays))::numeric(12,4), v_addfields.csv5::integer, v_addfields.csv6::integer, v_addfields.csv7::text, v_addfields.csv1);
+				INSERT INTO temp_data (feature_id, date_value, float_value, int_value, text_value, log_message) 
+				VALUES (v_addfields.csv2, v_currentdate + n, ((v_nextvol -v_currentvol)/(v_volume_numdays))::numeric(12,4), 
+				v_addfields.csv5::integer, v_addfields.csv6::text, v_addfields.csv1);
 			END LOOP;	
 		END IF;
 	END LOOP;
 
 	-- mapping values on table
-	INSERT INTO ext_rtc_scada_x_data SELECT feature_id, date_value::date, float_value, int_value, fid, text_value, log_message FROM temp_data;
+	INSERT INTO ext_rtc_scada_x_data SELECT log_message, feature_id, date_value::date, float_value, int_value, text_value  FROM temp_data;
 	
 	-- couting
 	SELECT count(*) INTO v_count FROM (SELECT DISTINCT csv1 FROM temp_csv WHERE cur_user=current_user AND fid = v_fid)a;
