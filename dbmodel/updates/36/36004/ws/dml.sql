@@ -107,21 +107,54 @@ VALUES ('netscenario_type', 'PRESSZONE', 'PRESSZONE',NULL, NULL);
 
 INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, source)
 VALUES (3260, 'gw_fct_create_netscenario_empty', 'ws', 'function', 'json', 'json', 
-'Function that allows to create new configuration of netscenario and copy mapzones configuration for selected exploitation', 'role_master', 'core')
+'Function that allows to create new empty netscenario', 'role_master', 'core')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_toolbox 
 VALUES (3260, 'Create empty Netscenario','{"featureType":[]}',
 '[{"widgetname":"name", "label":"Name: (*)","widgettype":"linetext","datatype":"text", "isMandatory":true, "tooltip":"Name for netscenario (mandatory)", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":1, "value":""},
 {"widgetname":"descript", "label":"Descript:","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Descript for netscenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":2, "value":""},
-{"widgetname":"parent", "label":"Parent:","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Parent for netscenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":3, "value":""},
 {"widgetname":"type", "label":"Type:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"netscenario type", "dvQueryText":"SELECT id, idval FROM plan_typevalue WHERE typevalue = ''netscenario_type''", "layoutname":"grl_option_parameters","layoutorder":4, "value":""},
 {"widgetname":"active", "label":"Active:", "widgettype":"check", "datatype":"boolean", "tooltip":"If true, active" , "layoutname":"grl_option_parameters","layoutorder":5, "value":"true"},
 {"widgetname":"expl", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"netscenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":6, "value":""}]',
 null, true, '{4}');
 
+INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, source)
+VALUES (3262, 'gw_fct_create_netscenario_from_toc', 'ws', 'function', 'json', 'json', 
+'Function that allows to create new configuration of netscenario and copy mapzones configuration for selected exploitation', 'role_master', 'core')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_toolbox 
+VALUES (3262, 'Create Netscenario from ToC','{"featureType":[]}',
+'[{"widgetname":"name", "label":"Name: (*)","widgettype":"linetext","datatype":"text", "isMandatory":true, "tooltip":"Name for netscenario (mandatory)", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":1, "value":""},
+{"widgetname":"descript", "label":"Descript:","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Descript for netscenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":2, "value":""},
+{"widgetname":"type", "label":"Type:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"netscenario type", "dvQueryText":"SELECT id, idval FROM plan_typevalue WHERE typevalue = ''netscenario_type''", "layoutname":"grl_option_parameters","layoutorder":4, "value":""},
+{"widgetname":"active", "label":"Active:", "widgettype":"check", "datatype":"boolean", "tooltip":"If true, active" , "layoutname":"grl_option_parameters","layoutorder":5, "value":"true"},
+{"widgetname":"expl", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"netscenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":6, "value":""}]',
+null, true, '{4}');
+
+INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, source)
+VALUES (3264, 'gw_fct_duplicate_netscenario', 'ws', 'function', 'json', 'json', 
+'Function that allows to create new configuration of netscenario and copy mapzones configuration from already created netscenario', 'role_master', 'core')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_toolbox 
+VALUES (3264, 'Duplicate Netscenario','{"featureType":[]}',
+'[{"widgetname":"copyFrom", "label":"Copy from:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT netscenario_id as id, name as idval FROM plan_netscenario WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":0, "selectedId":""},
+{"widgetname":"name", "label":"Name: (*)","widgettype":"linetext","datatype":"text", "isMandatory":true, "tooltip":"Name for netscenario (mandatory)", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":1, "value":""},
+{"widgetname":"descript", "label":"Descript:","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Descript for netscenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":2, "value":""},
+{"widgetname":"parent", "label":"Parent:","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Parent for netscenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":3, "value":""},
+{"widgetname":"active", "label":"Active:", "widgettype":"check", "datatype":"boolean", "tooltip":"If true, active" , "layoutname":"grl_option_parameters","layoutorder":5, "value":"true"}]',
+null, true, '{4}');
+
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
 VALUES (508, 'Create new Netscenario', 'ws', null, 'core', true, 'Function process', null) ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (510, 'Duplicate Netscenario', 'ws', null, 'core', true, 'Function process', null) ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (512, 'Create Netscenario from ToC', 'ws', null, 'core', true, 'Function process', null) ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
 VALUES (504, 'Import flowmeter daily values', 'ws', null, 'core', true, 'Function process', null) ON CONFLICT (fid) DO NOTHING;

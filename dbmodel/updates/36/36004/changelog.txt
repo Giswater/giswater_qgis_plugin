@@ -1,5 +1,6 @@
 3.6.004
 *************
-- New function gw_fct_graphanalytics_mapzones_plan for creating mapzones for dscenario.
-- New table inp_dscenario_mapzone for storing data related to mapzone dscenario.
-- New function gw_fct_mapzones_dscenario_pattern for inserting features and it's patterns into dscenario demanda based on values assigned to each dscenario mapzone.
+- New tables: plan_netscenario, plan_netscenario_dma, plan_netscenario_presszone, plan_netscenario_arc, plan_netscenario_node, plan_netscenario_connec for storing data related to mapzone netscenario.
+- New function gw_fct_graphanalytics_mapzones_plan for creating mapzones for netscenario.
+- New function gw_fct_mapzones_dscenario_pattern for inserting features and it's patterns into dscenario demanda based on values assigned to each netscenario mapzone.
+- New functions: gw_fct_create_netscenario_empty, gw_fct_create_netscenario_from_toc, gw_fct_duplicate_netscenario for creating new netscenarios.

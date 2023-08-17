@@ -4,16 +4,16 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 3260
+--FUNCTION CODE: 3262
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_create_netscenario_empty(p_data json) 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_create_netscenario_from_toc(p_data json) 
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_create_netscenario_empty($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"target":"1", "copyFrom":"2", "action":"DELETE-COPY"}}}$$)
+SELECT SCHEMA_NAME.gw_fct_create_netscenario_from_toc($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"target":"1", "copyFrom":"2", "action":"DELETE-COPY"}}}$$)
 
--- fid: 508
+-- fid: 512
 
 */
 
@@ -29,7 +29,7 @@ v_copyfrom integer;
 v_target integer;
 v_error_context text;
 v_projecttype text;
-v_fid integer = 508;
+v_fid integer = 512;
 
 v_name text;
 v_descript text;
@@ -94,12 +94,12 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'The new netscenario have been created sucessfully');
 
 		IF v_netscenario_type = 'DMA' THEN
-			INSERT INTO plan_netscenario_dma (netscenario_id, dma_id, pattern_id, graphconfig) 
-			SELECT v_scenarioid, dma_id, pattern_id, graphconfig FROM dma WHERE expl_id = v_expl_id
+			INSERT INTO plan_netscenario_dma (netscenario_id, dma_id, pattern_id, graphconfig, the_geom) 
+			SELECT v_scenarioid, dma_id, pattern_id, graphconfig, the_geom FROM dma WHERE expl_id = v_expl_id
 			ON CONFLICT (netscenario_id, dma_id) DO NOTHING;
 		ELSIF v_netscenario_type = 'PRESSZONE' THEN
-			INSERT INTO plan_netscenario_presszone (netscenario_id, presszone_id, head, graphconfig) 
-			SELECT v_scenarioid, presszone_id, head, graphconfig FROM presszone WHERE expl_id = v_expl_id
+			INSERT INTO plan_netscenario_presszone (netscenario_id, presszone_id, head, graphconfig, the_geom) 
+			SELECT v_scenarioid, presszone_id, head, graphconfig, the_geom FROM presszone WHERE expl_id = v_expl_id
 			ON CONFLICT (netscenario_id, presszone_id) DO NOTHING;
 		END IF;
 
@@ -125,7 +125,7 @@ BEGIN
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||
 			'}}'||
-	    '}')::json, 3260, null, null, null); 
+	    '}')::json, 3262, null, null, null); 
 
 	-- manage exceptions
 	EXCEPTION WHEN OTHERS THEN
