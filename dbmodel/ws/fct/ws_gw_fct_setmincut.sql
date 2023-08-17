@@ -72,6 +72,7 @@ v_result_valve json;
 v_result_node json;
 v_result_connec json;
 v_result_arc json;
+v_mincut_version integer;
 
 BEGIN
 
@@ -90,6 +91,7 @@ BEGIN
 	v_node := ((p_data ->>'data')::json->>'nodeId')::integer;
 	v_arc := ((p_data ->>'data')::json->>'arcId')::integer;
 	v_usepsectors := ((p_data ->>'data')::json->>'usePsectors')::boolean;
+	v_mincut_version := (SELECT value::json->>'version' FROM config_param_system WHERE parameter = 'om_mincut_config');
 
 	v_xcoord := ((p_data ->> 'data')::json->> 'coordinates')::json->>'xcoord';
 	v_ycoord := ((p_data ->> 'data')::json->> 'coordinates')::json->>'ycoord';
@@ -99,9 +101,6 @@ BEGIN
 
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 	IF v_cur_user IS NULL THEN v_cur_user = current_user; END IF;
-
-	-- delete previous
-	DELETE FROM audit_check_data WHERE fid = 216 and cur_user=v_cur_user;
 
 	-- get arc_id from click
 	IF v_xcoord IS NOT NULL THEN 
@@ -132,10 +131,20 @@ BEGIN
 			end if;
 		END IF;
 
-        IF v_device = 4 THEN
-            RETURN gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut, v_usepsectors);
+		IF v_device = 4 THEN
+			IF v_mincut_version = 5 THEN
+				RETURN gw_fct_mincut_minsector(v_arc::text, v_mincut, v_usepsectors);
+			ELSE 
+				RETURN gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut, v_usepsectors);
+			END IF;
+            
 		ELSIF v_device = 5 THEN
-			SELECT gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut, v_usepsectors) INTO v_response;
+			IF v_mincut_version = 5 THEN
+				SELECT gw_fct_mincut_minsector(v_arc::text, v_mincut, v_usepsectors)INTO v_response;
+			ELSE 
+				SELECT gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut, v_usepsectors) INTO v_response;
+			END IF;
+		
 			p_data = jsonb_set(p_data::jsonb, '{data,mincutId}', to_jsonb(v_mincut))::json;
 			v_mincut_class = 1;
 			v_querytext = concat('UPDATE om_mincut SET mincut_class = ', v_mincut_class, ', ', 
@@ -143,9 +152,7 @@ BEGIN
 							'anl_user = ''', v_cur_user, ''', ', 
 							'anl_feature_type = ''ARC'', ', 
 							'anl_feature_id = ', v_arc, ' ',
-							'WHERE id = ', v_mincut
-						);
-
+							'WHERE id = ', v_mincut);
 			EXECUTE v_querytext;
 			RETURN gw_fct_getmincut(p_data);
 		END IF;
@@ -167,7 +174,11 @@ BEGIN
 					end if;
 				END IF;
 
-				RETURN gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut, v_usepsectors);
+				IF v_mincut_version = 5 THEN
+					RETURN gw_fct_mincut_minsector(v_arc::text, v_mincut, v_usepsectors);
+				ELSE 
+					RETURN gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut, v_usepsectors);
+				END IF;
 			ELSE
 				RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Start mincut"}, "version":"'||v_version||'","body":{"form":{},"data":{ "info":null,"geometry":null, "mincutDetails":null}}}}')::json;
 			END IF;
@@ -302,7 +313,6 @@ BEGIN
 		v_result_arc = concat('{"geometryType":"LineString", "features":',v_result, '}');
 
 	END IF;
-
 
 	v_message = COALESCE(v_message, '{}');
 

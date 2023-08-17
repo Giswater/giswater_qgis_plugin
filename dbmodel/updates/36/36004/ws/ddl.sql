@@ -106,24 +106,9 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_data",
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_data", "column":"text_value", "dataType":"text"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector_graph", "column":"expl_id", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector_graph", "column":"sector_id", "dataType":"integer"}}$$);
 
-CREATE TABLE IF NOT EXISTS minsector_graph_inlet(
-  minsector_id integer NOT NULL,
-  expl_id integer NOT NULL,
-  parameters json,
-  active boolean DEFAULT true,
-  CONSTRAINT minsector_graph_inlet_pkey PRIMARY KEY (minsector_id),
-  CONSTRAINT cminsector_graph_inlet_expl_id_fkey FOREIGN KEY (expl_id)
-      REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT minsector_graph_inlet_minsector_id_fkey FOREIGN KEY (minsector_id)
-      REFERENCES minsector (minsector_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE);
-
-CREATE TABLE minsector_graph_checkvalve(
-  node_id character varying(16) NOT NULL,
-  expl_id integer NOT NULL,
-  to_minsector character varying(16) NOT NULL,
-  active boolean DEFAULT true,
-  CONSTRAINT minsector_graph_checkvalve_node_id_fkey PRIMARY KEY (node_id)); 
-  
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut", "column":"minsector_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut_arc", "column":"minsector_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut_node", "column":"minsector_id", "dataType":"integer"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut_valve", "column":"flag", "dataType":"boolean"}}$$);
