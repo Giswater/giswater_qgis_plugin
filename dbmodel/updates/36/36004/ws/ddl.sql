@@ -110,7 +110,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector_g
 
 CREATE TABLE IF NOT EXISTS minsector_graph_inlet(
   minsector_id integer NOT NULL,
-  expl_id integer,
+  expl_id integer NOT NULL,
   parameters json,
   active boolean DEFAULT true,
   CONSTRAINT minsector_graph_inlet_pkey PRIMARY KEY (minsector_id),
@@ -119,10 +119,11 @@ CREATE TABLE IF NOT EXISTS minsector_graph_inlet(
   CONSTRAINT minsector_graph_inlet_minsector_id_fkey FOREIGN KEY (minsector_id)
       REFERENCES minsector (minsector_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE);
 
-CREATE TABLE IF NOT EXISTS minsector_graph_checkvalve(
+CREATE TABLE minsector_graph_checkvalve(
   node_id character varying(16) NOT NULL,
+  expl_id integer NOT NULL,
   to_minsector character varying(16) NOT NULL,
   active boolean DEFAULT true,
-  CONSTRAINT minsector_graph_checkvalve_node_id_fkey PRIMARY KEY (node_id));
-
+  CONSTRAINT minsector_graph_checkvalve_node_id_fkey PRIMARY KEY (node_id)); 
+  
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_mincut", "column":"minsector_id", "dataType":"integer"}}$$);
