@@ -176,8 +176,8 @@ UPDATE sys_fprocess SET fprocess_name = 'Import scada values' WHERE fid = 469;
 UPDATE config_csv SET alias = 'Import scada values', descript = 'Import scada values into table ext_rtc_scada_x_data according example file scada_values.csv', 
 functionname = 'gw_fct_import_scada_values' WHERE fid = 469;
 
-INSERT INTO scada_id, node_id, value_date, value, value_status
-SELECT node_id, node_id, value_date, value, value_status FROM _ext_rtc_scada_x_data_;
+INSERT INTO ext_rtc_scada_x_data (scada_id, node_id, value_date, value, value_status)
+SELECT node_id, node_id, value_date, value, value_status FROM _ext_rtc_scada_x_data36_;
 
 INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam)
 VALUES ('tabname_typevalue', 'tab_netscenario', 'tab_netscenario', 'tabNetscenario', NULL) ON CONFLICT (typevalue, id) DO NOTHING;

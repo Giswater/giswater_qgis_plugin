@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS selector_netscenario(
 
 -- 2023/8/17
 ALTER TABLE ext_rtc_scada_x_data DROP CONSTRAINT ext_rtc_scada_x_data_pkey;
-ALTER TABLE ext_rtc_scada_x_data RENAME TO _ext_rtc_scada_x_data_;
+ALTER TABLE ext_rtc_scada_x_data RENAME TO _ext_rtc_scada_x_data36_;
 
 CREATE TABLE IF NOT EXISTS ext_rtc_scada_x_data(
   scada_id text NOT NULL,
