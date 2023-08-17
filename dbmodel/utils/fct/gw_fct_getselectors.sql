@@ -223,7 +223,9 @@ BEGIN
 		-- Manage filters from ids (only mincut)
 		IF v_selector = 'selector_mincut_result' THEN
 			v_selector_list = replace(replace(v_selector_list, '[', '('), ']', ')');
-			v_filterfromids = ' AND ' || v_table_id || ' IN '|| v_selector_list || ' ';
+			IF v_selector_list != '' THEN
+				v_filterfromids = ' AND ' || v_table_id || ' IN '|| v_selector_list || ' ';
+			END IF;
 		END IF;
 
 
