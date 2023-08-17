@@ -30,6 +30,7 @@ CONSTRAINT plan_netscenario_expl_id_fkey FOREIGN KEY (expl_id)
 CREATE TABLE plan_netscenario_presszone(
 netscenario_id integer, 
 presszone_id character varying(30), 
+presszone_name character varying(30),
 head numeric(12,2), 
 graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json, 
 the_geom geometry(MultiPolygon, SRID_VALUE),
@@ -38,6 +39,7 @@ CONSTRAINT plan_netscenario_presszone_pkey PRIMARY KEY (netscenario_id, presszon
 CREATE TABLE plan_netscenario_dma (
 netscenario_id integer, 
 dma_id integer, 
+dma_name character varying(30),
 pattern_id character varying(16), 
 graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json, 
 the_geom geometry(MultiPolygon, SRID_VALUE),

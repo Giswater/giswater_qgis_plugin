@@ -135,7 +135,8 @@ CREATE OR REPLACE VIEW v_edit_link AS
     l.macrodqa_id,
     l.expl_id2,
     l.epa_type,
-    l.is_operative
+    l.is_operative,
+    l.staticpressure
    FROM v_link l;
 
 
@@ -319,6 +320,7 @@ CREATE OR REPLACE VIEW v_connec AS
 CREATE OR REPLACE VIEW v_plan_netscenario_presszone  AS
 SELECT n.netscenario_id, 
 presszone_id, 
+presszone_name AS name,
 head, 
 the_geom
 FROM selector_netscenario,
@@ -329,6 +331,7 @@ WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netsce
 CREATE OR REPLACE VIEW v_plan_netscenario_dma  AS
 SELECT n.netscenario_id, 
 dma_id, 
+dma_name AS name,
 pattern_id, 
 the_geom
 FROM selector_netscenario,
