@@ -296,3 +296,5 @@ CREATE TABLE inp_dscenario_virtualpump(
       REFERENCES inp_curve (id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE
 );
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"staticpressure", "dataType":"numeric(12,3)"}}$$);

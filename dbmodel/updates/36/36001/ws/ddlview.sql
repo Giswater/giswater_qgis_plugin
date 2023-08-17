@@ -1149,7 +1149,8 @@ CREATE OR REPLACE VIEW vu_link AS
     q.macrodqa_id,
     l.expl_id2,
     l.epa_type,
-    l.is_operative
+    l.is_operative,
+    l.staticpressure
    FROM link l
      LEFT JOIN sector s USING (sector_id)
      LEFT JOIN presszone p USING (presszone_id)

@@ -104,7 +104,7 @@ BEGIN
 	DELETE FROM audit_log_data WHERE fid=v_fid AND cur_user=current_user;
 	DELETE FROM audit_check_data WHERE fid=v_fid AND cur_user=current_user;
 
-	CREATE OR REPLACE TEMPORAL VIEW v_anl_graph AS 
+	CREATE OR REPLACE TEMP VIEW v_anl_graph AS 
 	 SELECT anl_graph.arc_id,
 	    anl_graph.node_1,
 	    anl_graph.node_2,
