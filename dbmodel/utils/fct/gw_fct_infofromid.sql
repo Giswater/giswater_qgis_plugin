@@ -180,7 +180,7 @@ BEGIN
 
 		EXECUTE 'SELECT feature_id, featurecat_id  FROM '||v_tablename||' WHERE pol_id = '||quote_literal(v_id)||''
 		INTO v_id, v_tablename;
-		v_tablename = (SELECT concat('v_edit_',lower(feature_type)) FROM cat_feature WHERE system_id = v_tablename LIMIT 1);
+		v_tablename = (SELECT concat('v_edit_',lower(feature_type)) FROM cat_feature WHERE id = v_tablename LIMIT 1);
 		IF v_tablename IS NULL THEN v_tablename = 'v_edit_element'; END IF;
 		v_editable = true;
 	END IF;
