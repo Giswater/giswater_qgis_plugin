@@ -190,3 +190,8 @@ parameter, value, descript, label,
 dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type,  datatype)
 VALUES ('basic_selector_tab_netscenario', '{"table":"plan_netscenario","table_id":"netscenario_id","selector":"selector_netscenario","selector_id":"netscenario_id","label":"netscenario_id, ''-'', name ","query_filter":" AND id > 0 ","manageAll":true}', 'Variable to configura all options related to search for the specificic tab','Selector variables', 
 null, null, true, null, 'ws', 'json') ON CONFLICT (parameter) DO NOTHING;
+
+UPDATE config_toolbox SET inputparams = b.inp FROM (SELECT json_agg(a.inputs) AS inp FROM
+(SELECT json_array_elements(inputparams)as inputs, json_extract_path_text(json_array_elements(inputparams),'widgetname') as widget
+FROM   config_toolbox 
+WHERE id=2706)a WHERE widget!='sector')b WHERE  id=2706;
