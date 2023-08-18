@@ -379,3 +379,23 @@ WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netsce
 CREATE VIEW v_minsector_graph AS
 SELECT m.* FROM minsector_graph m, selector_expl s 
 WHERE cur_user = current_user AND s.expl_id = m.expl_id;
+
+DROP VIEW v_edit_minsector;
+CREATE OR REPLACE VIEW v_edit_minsector AS
+ SELECT m.minsector_id,
+    m.code,
+    m.dma_id,
+    m.dqa_id,
+    m.presszone_id,
+    m.expl_id,
+    m.num_border,
+    m.num_connec,
+    m.num_hydro,
+    m.length,
+    m.descript,
+    m.addparam,
+    m.the_geom
+   FROM selector_expl,  minsector m
+  WHERE m.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"minsector", "column":"sector_id"}}$$);

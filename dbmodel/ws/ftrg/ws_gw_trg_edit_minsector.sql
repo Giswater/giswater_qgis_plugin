@@ -31,8 +31,8 @@ BEGIN
 		END IF;
 
 			
-		INSERT INTO minsector (code, dma_id, dqa_id, presszone_id, sector_id, expl_id, num_border, num_connec, num_hydro, length, descript, addparam, the_geom)
-		VALUES ( NEW.code, NEW.dma_id, NEW.dqa_id, NEW.presszone_id, NEW.sector_id, NEW.expl_id, NEW.num_border, NEW.num_connec, NEW.num_hydro, NEW.length, NEW.descript, 
+		INSERT INTO minsector (code, dma_id, dqa_id, presszone_id, expl_id, num_border, num_connec, num_hydro, length, descript, addparam, the_geom)
+		VALUES ( NEW.code, NEW.dma_id, NEW.dqa_id, NEW.presszone_id, NEW.expl_id, NEW.num_border, NEW.num_connec, NEW.num_hydro, NEW.length, NEW.descript, 
 			NEW.addparam, NEW.the_geom);
 
 		RETURN NEW;
@@ -40,7 +40,7 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
    	
 		UPDATE minsector 
-		SET minsector_id =NEW.minsector_id, code = NEW.code, dma_id = NEW.dma_id, dqa_id = NEW.dqa_id, presszone_id= NEW.presszone_id, sector_id=NEW.sector_id, expl_id=NEW.expl_id, 
+		SET minsector_id =NEW.minsector_id, code = NEW.code, dma_id = NEW.dma_id, dqa_id = NEW.dqa_id, presszone_id= NEW.presszone_id, expl_id=NEW.expl_id, 
 		num_border=NEW.num_border, num_connec=NEW.num_connec, num_hydro=NEW.num_hydro, length=NEW.length, descript=NEW.descript, addparam=NEW.addparam, the_geom=NEW.the_geom
 		WHERE minsector_id=OLD.minsector_id;
 		
