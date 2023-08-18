@@ -78,7 +78,6 @@ v_concavehull float = 0.85;
 v_error_context text;
 v_checkdata boolean;
 v_returnerror boolean = false;
-v_sector json;
 v_expl_query text;
 v_psectors_query_arc text;
 v_psectors_query_node text;
@@ -100,7 +99,6 @@ BEGIN
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 	v_usepsectors = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePsectors');
 	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
-	v_sector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'sector');
 
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -132,8 +130,32 @@ BEGIN
 		v_result_info := COALESCE(v_result_info, '{}'); 
 		
 		--  Return
-		RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Mapzones dynamic analysis canceled. Data is not ready to work with"}, "version":"'||v_version||'"'||
-		',"body":{"form":{}, "data":{ "info":'||v_result_info||'}}}')::json;	
+		RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Mapzones dynamic analysis canceled. Data is not ready to work with"}, "version":"'||v_version||'"
+		,"body":{"form":{}, "data":{"info":'||v_result_info||'}}}')::json;	
+	END IF;
+
+	-- check expl_id <>0
+	IF v_usepsectors IS false THEN
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		FROM (SELECT node_id FROM node n JOIN cat_node cn ON n.nodecat_id=cn.id JOIN cat_feature cf ON cf.id=cn.nodetype_id 
+		WHERE state = 1 AND expl_id = 0 AND cf.system_id='VALVE') row;
+	ELSE
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		FROM (SELECT node_id FROM node n JOIN cat_node cn ON n.nodecat_id=cn.id JOIN cat_feature cf ON cf.id=cn.nodetype_id 
+		WHERE state IN (1,2) AND expl_id = 0 AND cf.system_id='VALVE') row;
+	END IF;
+
+	IF v_result IS NOT NULL THEN	
+	
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_info = concat ('{"values":',v_result, '}');
+
+		-- Control nulls
+		v_result_info := COALESCE(v_result_info, '{}'); 
+	
+		-- Return
+		RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Mapzones dynamic analysis canceled. There is/are valves with expl_id=0. It is not possible to proceed"},
+		 "version":"'||v_version||'","body":{"form":{}, "data":{"info":'||v_result_info||'}}}')::json;	
 	END IF;
  
 	-- reset graph & audit_log tables
