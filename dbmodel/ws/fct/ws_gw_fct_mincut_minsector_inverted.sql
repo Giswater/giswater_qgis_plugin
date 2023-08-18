@@ -36,24 +36,25 @@ BEGIN
 		SELECT * INTO rec_mincut FROM temp_om_mincut;
 		SELECT macroexpl_id INTO v_macroexpl FROM exploitation WHERE expl_id=rec_mincut.expl_id;
 
+		-- this make sense when some of the proposed valves are not operative. Then inundation for that valve is needed in order to find next one
 		IF (SELECT count(*) FROM temp_om_mincut_valve WHERE (broken or unaccess) and proposed) > 0 THEN
-
+	
 			-- create the graph
 			INSERT INTO temp_t_anlgraph (arc_id, node_1, node_2, water, flag, checkf )
 			SELECT node_id, minsector_1, minsector_2, 0, 0, 0 FROM minsector_graph WHERE expl_id = rec_mincut.expl_id
 			UNION
 			SELECT node_id, minsector_2, minsector_1, 0, 0, 0 FROM minsector_graph WHERE expl_id = rec_mincut.expl_id;
 
-			-- setup the new boundary conditions
+			-- setup valves enabled to participate
 			UPDATE temp_t_anlgraph SET flag = 1 WHERE arc_id IN (SELECT node_id FROM temp_om_mincut_valve WHERE broken IS FALSE AND unaccess IS FALSE AND proposed IS not true);
 
-			-- setup the new boundary conditions broken
+			-- setup valves not enabled to participate
 			UPDATE temp_t_anlgraph SET flag = 0 WHERE arc_id IN (SELECT node_id FROM temp_om_mincut_valve WHERE broken IS TRUE AND closed IS FALSE);
 
-			-- set the closed valve
+			-- set bonudary conditions with closed valves
 			UPDATE temp_t_anlgraph SET flag = 1 WHERE arc_id IN (SELECT node_id FROM temp_om_mincut_valve WHERE closed is true);
 
-			-- open the starting elements on the right sense
+			-- seting the starting elements to the right sense
 			UPDATE temp_t_anlgraph SET water=1, trace = node_1::integer WHERE arc_id IN (SELECT node_id FROM temp_om_mincut_valve WHERE (broken or unaccess) and proposed)
 			AND node_1::integer = rec_mincut.minsector_id; 
 
@@ -267,8 +268,7 @@ BEGIN
 				END IF;
 			END LOOP;
 			
-			IF v_inletpath IS FALSE THEN
-								
+			IF v_inletpath IS FALSE THEN				
 				--Valve has no exit. Update proposed value
 				UPDATE om_mincut_valve SET proposed=FALSE, flag=TRUE WHERE node_id=rec_valve.node_id AND result_id = p_result;
 			END IF;
@@ -282,8 +282,8 @@ BEGIN
 			-- create temporal tables
 			CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
 			CREATE OR REPLACE TEMP VIEW v_t_anl_graph AS 
-			 SELECT t.arc_id,t.node_1,t.node_2,t.trace,t.flag,t.water
-			   FROM temp_t_anlgraph t
+			SELECT t.arc_id,t.node_1,t.node_2,t.trace,t.flag,t.water
+			FROM temp_t_anlgraph t
 			     JOIN ( SELECT arc_id, node_1, node_2, water, flag FROM temp_t_anlgraph WHERE water = 1) a ON t.node_1::text = a.node_2::text
 			     WHERE t.flag < 2 AND t.water = 0 AND a.flag = 0;
 
