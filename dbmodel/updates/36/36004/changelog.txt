@@ -4,3 +4,5 @@
 - New function gw_fct_graphanalytics_mapzones_plan for creating mapzones for netscenario.
 - New function gw_fct_mapzones_dscenario_pattern for inserting features and it's patterns into dscenario demanda based on values assigned to each netscenario mapzone.
 - New functions: gw_fct_create_netscenario_empty, gw_fct_create_netscenario_from_toc, gw_fct_duplicate_netscenario for creating new netscenarios.
+- Enhance views (vi_t_) to export timeseries, patterns and curves from project to inp file only when they are used
+

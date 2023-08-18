@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2528
 
-DROP FUNCTION IF EXISTS  SCHEMA_NAME.gw_fct_utils_csv2pg_export_swmm_inp(character varying);
-DROP FUNCTION IF EXISTS  SCHEMA_NAME.gw_fct_utils_csv2pg_export_swmm_inp(character varying, text);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_export_swmm_inp(character varying);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_export_swmm_inp(character varying, text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_export_inp(p_data json)
 RETURNS json AS
 $BODY$
@@ -70,7 +70,7 @@ BEGIN
 
 
 
-	CREATE OR REPLACE VIEW vi_t_adjustments AS
+	CREATE OR REPLACE TEMP VIEW vi_t_adjustments AS
 	 SELECT a.adj_type AS parameter,
 	    a.subc_id,
 	    a.monthly_adj
@@ -101,7 +101,7 @@ BEGIN
 		   FROM inp_subcatchment
 		  WHERE inp_subcatchment.infil_pattern_id IS NOT NULL) a;
 
-	CREATE OR REPLACE VIEW vi_t_aquifers AS
+	CREATE OR REPLACE TEMP VIEW vi_t_aquifers AS
 	 SELECT inp_aquifer.aquif_id,
 	    inp_aquifer.por,
 	    inp_aquifer.wp,
@@ -120,12 +120,12 @@ BEGIN
 	  ORDER BY inp_aquifer.aquif_id;
 
 
-	CREATE OR REPLACE VIEW vi_t_backdrop AS
+	CREATE OR REPLACE TEMP VIEW vi_t_backdrop AS
 	 SELECT inp_backdrop.text
 	   FROM inp_backdrop;
 
 
-	CREATE OR REPLACE VIEW vi_t_buildup AS
+	CREATE OR REPLACE TEMP VIEW vi_t_buildup AS
 	 SELECT inp_buildup.landus_id,
 	    inp_buildup.poll_id,
 	    inp_typevalue.idval AS funcb_type,
@@ -138,7 +138,7 @@ BEGIN
 	  WHERE inp_typevalue.typevalue::text = 'inp_value_buildup'::text;
 
 
-	CREATE OR REPLACE VIEW vi_t_conduits AS
+	CREATE OR REPLACE TEMP VIEW vi_t_conduits AS
 	 SELECT arc_id,
 	    t.node_1,
 	    t.node_2,
@@ -166,7 +166,7 @@ BEGIN
 	     JOIN inp_conduit ON t.arcparent::text = inp_conduit.arc_id::text;
 
 
-	CREATE OR REPLACE VIEW vi_t_controls AS
+	CREATE OR REPLACE TEMP VIEW vi_t_controls AS
 	 SELECT c.text
 	   FROM ( SELECT inp_controls.id,
 		    inp_controls.text
@@ -182,7 +182,7 @@ BEGIN
 	  ORDER BY 1) c
 	  ORDER BY c.id;
 
-	 CREATE OR REPLACE VIEW vi_t_coordinates AS
+	 CREATE OR REPLACE TEMP VIEW vi_t_coordinates AS
 	 SELECT node_id,
 	    NULL::numeric(16,3) AS xcoord,
 	    NULL::numeric(16,3) AS ycoord,
@@ -190,7 +190,7 @@ BEGIN
 	   FROM temp_t_node;
 
 
-	CREATE OR REPLACE VIEW vi_t_coverages AS
+	CREATE OR REPLACE TEMP VIEW vi_t_coverages AS
 	 SELECT v_edit_inp_subcatchment.subc_id,
 	    inp_coverage.landus_id,
 	    inp_coverage.percent
@@ -235,50 +235,7 @@ BEGIN
 		     JOIN v_node ON v_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text;
 
 
-
-	CREATE OR REPLACE VIEW vi_t_curves AS
-	 SELECT a.curve_id,
-	    a.curve_type,
-	    a.x_value,
-	    a.y_value
-	   FROM ( WITH qt AS (
-			 SELECT inp_curve_value.id,
-			    inp_curve_value.curve_id,
-				CASE
-				    WHEN inp_curve_value.id = (( SELECT min(sub.id) AS min
-				       FROM inp_curve_value sub
-				      WHERE sub.curve_id::text = inp_curve_value.curve_id::text)) THEN inp_typevalue.idval
-				    ELSE NULL::character varying
-				END AS curve_type,
-			    inp_curve_value.x_value,
-			    inp_curve_value.y_value,
-			    c.expl_id
-			   FROM inp_curve c
-			     JOIN inp_curve_value ON c.id::text = inp_curve_value.curve_id::text
-			     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = c.curve_type::text
-			  WHERE inp_typevalue.typevalue::text = 'inp_value_curve'::text AND c.active
-			)
-		 SELECT qt.id,
-		    qt.curve_id,
-		    qt.curve_type,
-		    qt.x_value,
-		    qt.y_value,
-		    qt.expl_id
-		   FROM qt
-		     JOIN selector_expl s USING (expl_id)
-		  WHERE s.cur_user = "current_user"()::text
-		UNION
-		 SELECT qt.id,
-		    qt.curve_id,
-		    qt.curve_type,
-		    qt.x_value,
-		    qt.y_value,
-		    qt.expl_id
-		   FROM qt
-		  WHERE qt.expl_id IS NULL) a
-	  ORDER BY a.id;
-
-	 CREATE OR REPLACE VIEW vi_t_dividers AS
+	 CREATE OR REPLACE TEMP VIEW vi_t_dividers AS
 	 SELECT temp_t_node.node_id,
 	    temp_t_node.elev,
 	    temp_t_node.addparam::json ->> 'arc_id'::text AS arc_id,
@@ -332,7 +289,7 @@ BEGIN
 	  WHERE temp_t_node.epa_type::text = 'DIVIDER'::text AND (temp_t_node.addparam::json ->> 'divider_type'::text) = 'WEIR'::text;
 
 
-	CREATE OR REPLACE VIEW vi_t_dwf AS
+	CREATE OR REPLACE TEMP VIEW vi_t_dwf AS
 	 SELECT temp_rpt_inp_node.node_id,
 	    'FLOW'::text AS type_dwf,
 	    inp_dwf.value,
@@ -363,14 +320,14 @@ BEGIN
 
 
 
-	CREATE OR REPLACE VIEW vi_t_evaporation AS
+	CREATE OR REPLACE TEMP VIEW vi_t_evaporation AS
 	 SELECT inp_evaporation.evap_type,
 	    inp_evaporation.value
 	   FROM inp_evaporation;
 
 
 
-	CREATE OR REPLACE VIEW vi_t_files AS
+	CREATE OR REPLACE TEMP VIEW vi_t_files AS
 	 SELECT inp_files.actio_type,
 	    inp_files.file_type,
 	    inp_files.fname
@@ -378,7 +335,7 @@ BEGIN
 	  WHERE inp_files.active IS TRUE;
 
 
-	CREATE OR REPLACE VIEW vi_t_groundwater AS
+	CREATE OR REPLACE TEMP VIEW vi_t_groundwater AS
 	 SELECT inp_groundwater.subc_id,
 	    inp_groundwater.aquif_id,
 	    inp_groundwater.node_id,
@@ -431,7 +388,7 @@ BEGIN
 		     JOIN v_node ON v_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text;
 
 
-	CREATE OR REPLACE VIEW vi_t_gully AS
+	CREATE OR REPLACE TEMP VIEW vi_t_gully AS
 	 SELECT temp_t_gully.gully_id,
 	    temp_t_gully.outlet_type,
 	    COALESCE(temp_t_gully.node_id::text, '-9999'::text) AS node_id,
@@ -450,7 +407,7 @@ BEGIN
 	   FROM temp_t_gully;
 
 
-	CREATE OR REPLACE VIEW vi_t_gully2node AS
+	CREATE OR REPLACE TEMP VIEW vi_t_gully2node AS
 	 SELECT a.gully_id,
 	    n.node_id,
 	    st_makeline(a.the_geom, n.the_geom) AS the_geom
@@ -465,7 +422,7 @@ BEGIN
 		     LEFT JOIN arc a_1 USING (arc_id)) a
 	     JOIN node n USING (node_id);
 
-	CREATE OR REPLACE VIEW vi_t_gwf AS
+	CREATE OR REPLACE TEMP VIEW vi_t_gwf AS
 	 SELECT inp_groundwater.subc_id,
 	    ('LATERAL'::text || ' '::text) || inp_groundwater.fl_eq_lat::text AS fl_eq_lat,
 	    ('DEEP'::text || ' '::text) || inp_groundwater.fl_eq_lat::text AS fl_eq_deep
@@ -473,13 +430,13 @@ BEGIN
 	     JOIN inp_groundwater ON inp_groundwater.subc_id::text = v_edit_inp_subcatchment.subc_id::text;
 
 
-	CREATE OR REPLACE VIEW vi_t_hydrographs AS
+	CREATE OR REPLACE TEMP VIEW vi_t_hydrographs AS
 	 SELECT inp_hydrograph_value.text
 	   FROM inp_hydrograph_value;
 
 
 
-	CREATE OR REPLACE VIEW vi_t_infiltration  AS
+	CREATE OR REPLACE TEMP VIEW vi_t_infiltration  AS
 	 SELECT v_edit_inp_subcatchment.subc_id,
 	    v_edit_inp_subcatchment.curveno AS other1,
 	    v_edit_inp_subcatchment.conduct_2 AS other2,
@@ -547,7 +504,7 @@ BEGIN
 	  WHERE cat_hydrology.infiltration::text = ANY (ARRAY['MODIFIED_HORTON'::text, 'HORTON'::text]);
 
 
-	CREATE OR REPLACE VIEW vi_t_inflows AS
+	CREATE OR REPLACE TEMP VIEW vi_t_inflows AS
 	 SELECT temp_t_node_other.node_id,
 	    temp_t_node_other.type,
 	    temp_t_node_other.timser_id,
@@ -572,7 +529,7 @@ BEGIN
 	  ORDER BY 1;
 
 
-	CREATE OR REPLACE VIEW vi_t_junctions AS
+	CREATE OR REPLACE TEMP VIEW vi_t_junctions AS
 	 SELECT temp_t_node.node_id,
 	    temp_t_node.elev,
 	    temp_t_node.ymax,
@@ -583,7 +540,7 @@ BEGIN
 	   FROM temp_t_node
 	  WHERE temp_t_node.epa_type::text = ANY (ARRAY['JUNCTION'::text, 'NETGULLY'::text]);
 
-	CREATE OR REPLACE VIEW vi_t_labels AS
+	CREATE OR REPLACE TEMP VIEW vi_t_labels AS
 	 SELECT inp_label.xcoord,
 	    inp_label.ycoord,
 	    inp_label.label,
@@ -595,7 +552,7 @@ BEGIN
 	   FROM inp_label
 	  ORDER BY inp_label.label;
 
-	CREATE OR REPLACE VIEW vi_t_landuses AS
+	CREATE OR REPLACE TEMP VIEW vi_t_landuses AS
 	 SELECT inp_landuses.landus_id,
 	    inp_landuses.sweepint,
 	    inp_landuses.availab,
@@ -603,7 +560,7 @@ BEGIN
 	   FROM inp_landuses;
 
 
-	CREATE OR REPLACE VIEW vi_t_lid_controls AS
+	CREATE OR REPLACE TEMP VIEW vi_t_lid_controls AS
 	 SELECT a.lidco_id,
 	    a.lidco_type,
 	    a.other1,
@@ -642,7 +599,7 @@ BEGIN
 		  WHERE inp_lid.active AND inp_typevalue.typevalue::text = 'inp_value_lidlayer'::text) a
 	  ORDER BY a.lidco_id, a.id;
 
-	 CREATE OR REPLACE VIEW vi_t_lid_usage AS
+	 CREATE OR REPLACE TEMP VIEW vi_t_lid_usage AS
 	 SELECT temp_t_lid_usage.subc_id,
 	    temp_t_lid_usage.lidco_id,
 	    temp_t_lid_usage.numelem::integer AS numelem,
@@ -655,7 +612,7 @@ BEGIN
 	   FROM v_edit_inp_subcatchment
 	     JOIN temp_t_lid_usage ON temp_t_lid_usage.subc_id::text = v_edit_inp_subcatchment.subc_id::text;
 
-	CREATE OR REPLACE VIEW vi_t_loadings  AS
+	CREATE OR REPLACE TEMP VIEW vi_t_loadings  AS
 	 SELECT inp_loadings.subc_id,
 	    inp_loadings.poll_id,
 	    inp_loadings.ibuildup
@@ -663,7 +620,7 @@ BEGIN
 	     JOIN inp_loadings ON inp_loadings.subc_id::text = v_edit_inp_subcatchment.subc_id::text;
 
 
-	 CREATE OR REPLACE VIEW vi_t_losses AS
+	 CREATE OR REPLACE TEMP VIEW vi_t_losses AS
 	 SELECT temp_t_arc.arc_id,
 		CASE
 		    WHEN temp_t_arc.kentry IS NOT NULL THEN temp_t_arc.kentry
@@ -687,7 +644,7 @@ BEGIN
 
 
 
-	CREATE OR REPLACE VIEW vi_t_map  AS
+	CREATE OR REPLACE TEMP VIEW vi_t_map  AS
 	 SELECT inp_mapdim.type_dim,
 	    concat(inp_mapdim.x1, ' ', inp_mapdim.y1, ' ', inp_mapdim.x2, ' ', inp_mapdim.y2) AS other_val
 	   FROM inp_mapdim
@@ -699,7 +656,7 @@ BEGIN
 	  WHERE inp_typevalue.typevalue::text = 'inp_value_mapunits'::text;
 
 
-	CREATE OR REPLACE VIEW vi_t_options  AS
+	CREATE OR REPLACE TEMP VIEW vi_t_options  AS
 	 SELECT a.parameter,
 	    a.value
 	   FROM ( SELECT a_1.idval AS parameter,
@@ -729,7 +686,7 @@ BEGIN
 
 
 
-	CREATE OR REPLACE VIEW vi_t_orifices AS
+	CREATE OR REPLACE TEMP VIEW vi_t_orifices AS
 	 SELECT arc_id,
 	    temp_t_arc.node_1,
 	    temp_t_arc.node_2,
@@ -744,7 +701,7 @@ BEGIN
 	  WHERE f.type::text = 'ORIFICE'::text;
 
 
-	CREATE OR REPLACE VIEW vi_t_outfalls AS
+	CREATE OR REPLACE TEMP VIEW vi_t_outfalls AS
 	 SELECT temp_t_node.node_id,
 	    temp_t_node.elev,
 	    temp_t_node.addparam::json ->> 'outfall_type'::text AS outfall_type,
@@ -778,7 +735,7 @@ BEGIN
 	  WHERE temp_t_node.epa_type::text = 'OUTFALL'::text AND (temp_t_node.addparam::json ->> 'outfall_type'::text) = 'TIMESERIES'::text;
 
 
-	 CREATE OR REPLACE VIEW vi_t_outlets AS
+	 CREATE OR REPLACE TEMP VIEW vi_t_outlets AS
 	 SELECT arc_id,
 	    temp_t_arc.node_1,
 	    temp_t_arc.node_2,
@@ -798,132 +755,7 @@ BEGIN
 	  WHERE f.type::text = 'OUTLET'::text;
 
 
-
-	CREATE OR REPLACE VIEW vi_t_parent_arc  AS
-	 SELECT v_arc.arc_id,
-	    v_arc.code,
-	    v_arc.node_1,
-	    v_arc.nodetype_1,
-	    v_arc.y1,
-	    v_arc.custom_y1,
-	    v_arc.elev1,
-	    v_arc.custom_elev1,
-	    v_arc.sys_elev1,
-	    v_arc.sys_y1,
-	    v_arc.r1,
-	    v_arc.z1,
-	    v_arc.node_2,
-	    v_arc.nodetype_2,
-	    v_arc.y2,
-	    v_arc.custom_y2,
-	    v_arc.elev2,
-	    v_arc.custom_elev2,
-	    v_arc.sys_elev2,
-	    v_arc.sys_y2,
-	    v_arc.r2,
-	    v_arc.z2,
-	    v_arc.slope,
-	    v_arc.arc_type,
-	    v_arc.sys_type,
-	    v_arc.arccat_id,
-	    v_arc.matcat_id,
-	    v_arc.cat_shape,
-	    v_arc.cat_geom1,
-	    v_arc.cat_geom2,
-	    v_arc.width,
-	    v_arc.epa_type,
-	    v_arc.expl_id,
-	    v_arc.macroexpl_id,
-	    v_arc.sector_id,
-	    v_arc.macrosector_id,
-	    v_arc.state,
-	    v_arc.state_type,
-	    v_arc.annotation,
-	    v_arc.gis_length,
-	    v_arc.custom_length,
-	    v_arc.inverted_slope,
-	    v_arc.observ,
-	    v_arc.comment,
-	    v_arc.dma_id,
-	    v_arc.macrodma_id,
-	    v_arc.soilcat_id,
-	    v_arc.function_type,
-	    v_arc.category_type,
-	    v_arc.fluid_type,
-	    v_arc.location_type,
-	    v_arc.workcat_id,
-	    v_arc.workcat_id_end,
-	    v_arc.builtdate,
-	    v_arc.enddate,
-	    v_arc.buildercat_id,
-	    v_arc.ownercat_id,
-	    v_arc.muni_id,
-	    v_arc.postcode,
-	    v_arc.district_id,
-	    v_arc.streetname,
-	    v_arc.postnumber,
-	    v_arc.postcomplement,
-	    v_arc.streetname2,
-	    v_arc.postnumber2,
-	    v_arc.postcomplement2,
-	    v_arc.descript,
-	    v_arc.link,
-	    v_arc.verified,
-	    v_arc.undelete,
-	    v_arc.label,
-	    v_arc.label_x,
-	    v_arc.label_y,
-	    v_arc.label_rotation,
-	    v_arc.publish,
-	    v_arc.inventory,
-	    v_arc.uncertain,
-	    v_arc.num_value,
-	    v_arc.tstamp,
-	    v_arc.insert_user,
-	    v_arc.lastupdate,
-	    v_arc.lastupdate_user,
-	    v_arc.the_geom
-	   FROM v_arc,
-	    selector_sector
-	  WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
-
-
-
-	CREATE OR REPLACE VIEW vi_t_patterns AS
-	 SELECT p.pattern_id,
-	    p.pattern_type,
-	    inp_pattern_value.factor_1,
-	    inp_pattern_value.factor_2,
-	    inp_pattern_value.factor_3,
-	    inp_pattern_value.factor_4,
-	    inp_pattern_value.factor_5,
-	    inp_pattern_value.factor_6,
-	    inp_pattern_value.factor_7,
-	    inp_pattern_value.factor_8,
-	    inp_pattern_value.factor_9,
-	    inp_pattern_value.factor_10,
-	    inp_pattern_value.factor_11,
-	    inp_pattern_value.factor_12,
-	    inp_pattern_value.factor_13,
-	    inp_pattern_value.factor_14,
-	    inp_pattern_value.factor_15,
-	    inp_pattern_value.factor_16,
-	    inp_pattern_value.factor_17,
-	    inp_pattern_value.factor_18,
-	    inp_pattern_value.factor_19,
-	    inp_pattern_value.factor_20,
-	    inp_pattern_value.factor_21,
-	    inp_pattern_value.factor_22,
-	    inp_pattern_value.factor_23,
-	    inp_pattern_value.factor_24
-	   FROM selector_expl s,
-	    inp_pattern p
-	     JOIN inp_pattern_value USING (pattern_id)
-	  WHERE p.active AND p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
-	  ORDER BY p.pattern_id;
-
-
-	CREATE OR REPLACE VIEW vi_t_pollutants AS
+	CREATE OR REPLACE TEMP VIEW vi_t_pollutants AS
 	 SELECT inp_pollutant.poll_id,
 	    inp_pollutant.units_type,
 	    inp_pollutant.crain,
@@ -939,13 +771,13 @@ BEGIN
 	  ORDER BY inp_pollutant.poll_id;
 
 
-	CREATE OR REPLACE VIEW vi_t_polygons AS
+	CREATE OR REPLACE TEMP VIEW vi_t_polygons AS
 	 SELECT temp_t_table.text_column
 	   FROM temp_t_table
 	  WHERE temp_t_table.fid = 117;
 
 
-	CREATE OR REPLACE VIEW vi_t_pumps AS
+	CREATE OR REPLACE TEMP VIEW vi_t_pumps AS
 	 SELECT arc_id,
 	    temp_t_arc.node_1,
 	    temp_t_arc.node_2,
@@ -957,7 +789,7 @@ BEGIN
 	     JOIN temp_t_arc USING (arc_id)
 	  WHERE temp_t_arc_flowregulator.type::text = 'PUMP'::text;
 
-	CREATE OR REPLACE VIEW vi_t_raingages AS
+	CREATE OR REPLACE TEMP VIEW vi_t_raingages AS
 	 SELECT DISTINCT r.rg_id,
 	    r.form_type,
 	    r.intvl,
@@ -984,7 +816,7 @@ BEGIN
 	     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = r.rgage_type::text
 	  WHERE inp_typevalue.typevalue::text = 'inp_typevalue_raingage'::text AND r.rgage_type::text = 'FILE'::text AND s.result_id::text = r.result_id::text AND s.cur_user = CURRENT_USER;
 
-	CREATE OR REPLACE VIEW vi_t_rdii AS
+	CREATE OR REPLACE TEMP VIEW vi_t_rdii AS
 	 SELECT temp_rpt_inp_node.node_id,
 	    inp_rdii.hydro_id,
 	    inp_rdii.sewerarea
@@ -995,7 +827,7 @@ BEGIN
 
 
 
-	CREATE OR REPLACE VIEW vi_t_report AS
+	CREATE OR REPLACE TEMP VIEW vi_t_report AS
 	 SELECT a.idval AS parameter,
 	    b.value
 	   FROM sys_param_user a
@@ -1003,7 +835,7 @@ BEGIN
 	  WHERE (a.layoutname = ANY (ARRAY['lyt_reports_1'::text, 'lyt_reports_2'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT NULL;
 
 
-	CREATE OR REPLACE VIEW vi_t_snowpacks AS
+	CREATE OR REPLACE TEMP VIEW vi_t_snowpacks AS
 	 SELECT inp_snowpack_value.snow_id,
 	    inp_snowpack_value.snow_type,
 	    inp_snowpack_value.value_1,
@@ -1018,7 +850,7 @@ BEGIN
 
 
 
-	CREATE OR REPLACE VIEW vi_t_storage AS
+	CREATE OR REPLACE TEMP VIEW vi_t_storage AS
 	 SELECT temp_t_node.node_id,
 	    temp_t_node.elev,
 	    temp_t_node.ymax,
@@ -1053,7 +885,7 @@ BEGIN
 
 
 
-	CREATE OR REPLACE VIEW vi_t_subareas AS
+	CREATE OR REPLACE TEMP VIEW vi_t_subareas AS
 	 SELECT DISTINCT v_edit_inp_subcatchment.subc_id,
 	    v_edit_inp_subcatchment.nimp,
 	    v_edit_inp_subcatchment.nperv,
@@ -1075,39 +907,9 @@ BEGIN
 			    inp_subcatchment.subc_id
 			   FROM inp_subcatchment
 			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id);
+			  
 
-
-	CREATE OR REPLACE VIEW vi_t_subcatch2outlet  AS
-	 SELECT a.subc_id,
-	    a.outlet_id,
-	    a.outlet_type,
-	    st_length2d(a.the_geom) AS length,
-	    a.hydrology_id,
-	    a.the_geom
-	   FROM ( SELECT s1.subc_id,
-		    s1.outlet_id,
-		    'JUNCTION'::text AS outlet_type,
-		    s1.hydrology_id,
-		    st_makeline(st_centroid(s1.the_geom), node.the_geom)::geometry(LineString,SRID_VALUE) AS the_geom
-		   FROM v_edit_inp_subcatchment s1
-		     JOIN node ON node.node_id::text = s1.outlet_id::text
-		UNION
-		 SELECT s1.subc_id,
-		    s1.outlet_id,
-		    'SUBCATCHMENT'::text AS outlet_type,
-		    s1.hydrology_id,
-		    st_makeline(st_centroid(s1.the_geom), st_centroid(s2.the_geom))::geometry(LineString,SRID_VALUE) AS the_geom
-		   FROM v_edit_inp_subcatchment s1
-		     JOIN v_edit_inp_subcatchment s2 ON s1.outlet_id::text = s2.subc_id::text) a;
-
-
-	CREATE OR REPLACE VIEW vi_t_subcatchcentroid  AS
-	 SELECT v_edit_inp_subcatchment.subc_id,
-	    v_edit_inp_subcatchment.hydrology_id,
-	    st_centroid(v_edit_inp_subcatchment.the_geom) AS the_geom
-	   FROM v_edit_inp_subcatchment;
-
-	CREATE OR REPLACE VIEW vi_t_subcatchments AS
+	CREATE OR REPLACE TEMP VIEW vi_t_subcatchments AS
 	 SELECT DISTINCT v_edit_inp_subcatchment.subc_id,
 	    v_edit_inp_subcatchment.rg_id,
 	    b.outlet_id,
@@ -1132,7 +934,7 @@ BEGIN
 			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id);
 
 
-	CREATE OR REPLACE VIEW vi_t_symbols  AS
+	CREATE OR REPLACE TEMP VIEW vi_t_symbols  AS
 	 SELECT v_edit_raingage.rg_id,
 	    NULL::numeric(16,3) AS xcoord,
 	    NULL::numeric(16,3) AS ycoord,
@@ -1140,71 +942,19 @@ BEGIN
 	   FROM v_edit_raingage;
 
 
-	CREATE OR REPLACE VIEW vi_t_temperature  AS
+	CREATE OR REPLACE TEMP VIEW vi_t_temperature  AS
 	 SELECT inp_temperature.temp_type,
 	    inp_temperature.value
 	   FROM inp_temperature;
 
 
-
-	CREATE OR REPLACE VIEW vi_t_timeseries AS
-	 SELECT b.timser_id,
-	    b.other1,
-	    b.other2,
-	    b.other3
-	   FROM ( SELECT t.id,
-		    t.timser_id,
-		    t.other1,
-		    t.other2,
-		    t.other3
-		   FROM selector_expl s,
-		    ( SELECT a.id,
-			    a.timser_id,
-			    a.other1,
-			    a.other2,
-			    a.other3,
-			    a.expl_id
-			   FROM ( SELECT inp_timeseries_value.id,
-				    inp_timeseries_value.timser_id,
-				    inp_timeseries_value.date AS other1,
-				    inp_timeseries_value.hour AS other2,
-				    inp_timeseries_value.value AS other3,
-				    inp_timeseries.expl_id
-				   FROM inp_timeseries_value
-				     JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
-				  WHERE inp_timeseries.times_type::text = 'ABSOLUTE'::text AND inp_timeseries.active
-				UNION
-				 SELECT inp_timeseries_value.id,
-				    inp_timeseries_value.timser_id,
-				    concat('FILE', ' ', inp_timeseries.fname) AS other1,
-				    NULL::character varying AS other2,
-				    NULL::numeric AS other3,
-				    inp_timeseries.expl_id
-				   FROM inp_timeseries_value
-				     JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
-				  WHERE inp_timeseries.times_type::text = 'FILE'::text AND inp_timeseries.active
-				UNION
-				 SELECT inp_timeseries_value.id,
-				    inp_timeseries_value.timser_id,
-				    NULL::text AS other1,
-				    inp_timeseries_value."time" AS other2,
-				    inp_timeseries_value.value::numeric AS other3,
-				    inp_timeseries.expl_id
-				   FROM inp_timeseries_value
-				     JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
-				  WHERE inp_timeseries.times_type::text = 'RELATIVE'::text AND inp_timeseries.active) a
-			  ORDER BY a.id) t
-		  WHERE t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL) b
-	  ORDER BY b.id;
-
-
-	CREATE OR REPLACE VIEW vi_t_transects AS
+	CREATE OR REPLACE TEMP VIEW vi_t_transects AS
 	 SELECT inp_transects_value.text
 	   FROM inp_transects_value
 	  ORDER BY inp_transects_value.id;
 
 
-	CREATE OR REPLACE VIEW vi_t_treatment AS
+	CREATE OR REPLACE TEMP VIEW vi_t_treatment AS
 	 SELECT temp_t_node_other.node_id,
 	    temp_t_node_other.poll_id,
 	    temp_t_node_other.other AS function
@@ -1212,7 +962,7 @@ BEGIN
 	  WHERE temp_t_node_other.type::text = 'TREATMENT'::text;
 
 
-	CREATE OR REPLACE VIEW vi_t_vertices AS
+	CREATE OR REPLACE TEMP VIEW vi_t_vertices AS
 	 SELECT DISTINCT ON (arc.path, arc.point) arc.arc_id,
 	    NULL::numeric(16,3) AS xcoord,
 	    NULL::numeric(16,3) AS ycoord,
@@ -1228,7 +978,7 @@ BEGIN
 	  ORDER BY arc.path;
 
 
-	CREATE OR REPLACE VIEW vi_t_washoff  AS
+	CREATE OR REPLACE TEMP VIEW vi_t_washoff  AS
 	 SELECT inp_washoff.landus_id,
 	    inp_washoff.poll_id,
 	    inp_typevalue.idval AS funcw_type,
@@ -1241,7 +991,7 @@ BEGIN
 	  WHERE inp_typevalue.typevalue::text = 'inp_value_washoff'::text;
 
 
-	CREATE OR REPLACE VIEW vi_t_weirs AS
+	CREATE OR REPLACE TEMP VIEW vi_t_weirs AS
 	 SELECT arc_id,
 	    temp_t_arc.node_1,
 	    temp_t_arc.node_2,
@@ -1260,7 +1010,7 @@ BEGIN
 	  WHERE f.type::text = 'WEIR'::text;
 
 
-	CREATE OR REPLACE VIEW vi_t_xsections AS
+	CREATE OR REPLACE TEMP VIEW vi_t_xsections AS
 	 SELECT temp_t_arc.arc_id,
 	    cat_arc_shape.epa AS shape,
 	    cat_arc.geom1::text AS other1,
@@ -1314,6 +1064,140 @@ BEGIN
 	   FROM temp_t_arc_flowregulator
 	  WHERE temp_t_arc_flowregulator.type::text = ANY (ARRAY['ORIFICE'::character varying::text, 'WEIR'::character varying::text]);
 
+
+
+	-- temporal views related to other temporal views (last to create first to drop below)
+
+	CREATE OR REPLACE TEMP VIEW vi_t_patterns AS
+	 SELECT p.pattern_id,
+	    p.pattern_type,
+	    inp_pattern_value.factor_1,
+	    inp_pattern_value.factor_2,
+	    inp_pattern_value.factor_3,
+	    inp_pattern_value.factor_4,
+	    inp_pattern_value.factor_5,
+	    inp_pattern_value.factor_6,
+	    inp_pattern_value.factor_7,
+	    inp_pattern_value.factor_8,
+	    inp_pattern_value.factor_9,
+	    inp_pattern_value.factor_10,
+	    inp_pattern_value.factor_11,
+	    inp_pattern_value.factor_12,
+	    inp_pattern_value.factor_13,
+	    inp_pattern_value.factor_14,
+	    inp_pattern_value.factor_15,
+	    inp_pattern_value.factor_16,
+	    inp_pattern_value.factor_17,
+	    inp_pattern_value.factor_18,
+	    inp_pattern_value.factor_19,
+	    inp_pattern_value.factor_20,
+	    inp_pattern_value.factor_21,
+	    inp_pattern_value.factor_22,
+	    inp_pattern_value.factor_23,
+	    inp_pattern_value.factor_24
+	   FROM selector_expl s,
+	    inp_pattern p
+	     JOIN inp_pattern_value USING (pattern_id)
+	     JOIN (select pattern_id FROM vi_t_aquifers UNION select monthly_adj FROM vi_t_adjustments UNION select pattern_id FROM vi_t_inflows UNION 
+		  select pat1 FROM vi_t_dwf UNION select pat2 FROM vi_t_dwf UNION select pat3 FROM vi_t_dwf UNION select pat4 FROM vi_t_dwf) a USING (pattern_id)  
+	     WHERE p.active AND p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
+	     ORDER BY p.pattern_id;
+
+
+	CREATE OR REPLACE TEMP VIEW vi_t_timeseries AS
+	 SELECT b.timser_id,
+	    b.other1,
+	    b.other2,
+	    b.other3
+	   FROM ( SELECT t.id,
+		    t.timser_id,
+		    t.other1,
+		    t.other2,
+		    t.other3
+		   FROM selector_expl s,
+		    ( SELECT a.id,
+			    a.timser_id,
+			    a.other1,
+			    a.other2,
+			    a.other3,
+			    a.expl_id
+			   FROM ( SELECT inp_timeseries_value.id,
+				    inp_timeseries_value.timser_id,
+				    inp_timeseries_value.date AS other1,
+				    inp_timeseries_value.hour AS other2,
+				    inp_timeseries_value.value AS other3,
+				    inp_timeseries.expl_id
+				   FROM inp_timeseries_value
+				     JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+				  WHERE inp_timeseries.times_type::text = 'ABSOLUTE'::text AND inp_timeseries.active
+				UNION
+				 SELECT inp_timeseries_value.id,
+				    inp_timeseries_value.timser_id,
+				    concat('FILE', ' ', inp_timeseries.fname) AS other1,
+				    NULL::character varying AS other2,
+				    NULL::numeric AS other3,
+				    inp_timeseries.expl_id
+				   FROM inp_timeseries_value
+				     JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+				  WHERE inp_timeseries.times_type::text = 'FILE'::text AND inp_timeseries.active
+				UNION
+				 SELECT inp_timeseries_value.id,
+				    inp_timeseries_value.timser_id,
+				    NULL::text AS other1,
+				    inp_timeseries_value."time" AS other2,
+				    inp_timeseries_value.value::numeric AS other3,
+				    inp_timeseries.expl_id
+				   FROM inp_timeseries_value
+				     JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+				  WHERE inp_timeseries.times_type::text = 'RELATIVE'::text AND inp_timeseries.active) a
+			  ORDER BY a.id) t
+		JOIN (SELECT other1 as timser_id FROM vi_t_raingages UNION SELECT other1 FROM vi_t_outfalls UNION  SELECT timser_id FROM vi_t_inflows) a USING (timser_id)
+		WHERE t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL) b
+	  ORDER BY b.id;
+
+	CREATE OR REPLACE TEMP VIEW vi_t_curves AS
+	 SELECT a.curve_id,
+	    a.curve_type,
+	    a.x_value,
+	    a.y_value
+	   FROM ( WITH qt AS (
+			 SELECT inp_curve_value.id,
+			    inp_curve_value.curve_id,
+				CASE
+				    WHEN inp_curve_value.id = (( SELECT min(sub.id) AS min
+				       FROM inp_curve_value sub
+				      WHERE sub.curve_id::text = inp_curve_value.curve_id::text)) THEN inp_typevalue.idval
+				    ELSE NULL::character varying
+				END AS curve_type,
+			    inp_curve_value.x_value,
+			    inp_curve_value.y_value,
+			    c.expl_id
+			   FROM inp_curve c
+			     JOIN inp_curve_value ON c.id::text = inp_curve_value.curve_id::text
+			     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = c.curve_type::text
+			  WHERE inp_typevalue.typevalue::text = 'inp_value_curve'::text AND c.active
+			)
+		 SELECT qt.id,
+		    qt.curve_id,
+		    qt.curve_type,
+		    qt.x_value,
+		    qt.y_value,
+		    qt.expl_id
+		   FROM qt
+		     JOIN selector_expl s USING (expl_id)
+		  WHERE s.cur_user = "current_user"()::text
+		UNION
+		 SELECT qt.id,
+		    qt.curve_id,
+		    qt.curve_type,
+		    qt.x_value,
+		    qt.y_value,
+		    qt.expl_id
+		   FROM qt
+		  WHERE qt.expl_id IS NULL) a
+		  JOIN (SELECT curve_id FROM vi_t_pumps UNION SELECT other1 FROM vi_t_dividers UNION SELECT other1 FROM vi_t_outfalls UNION
+			SELECT other1 FROM vi_t_outlets UNION SELECT other1 FROM vi_t_storage UNION SELECT other2 FROM vi_t_xsections) b USING (curve_id)
+	  ORDER BY a.id;
 
 	--node
 	FOR rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid order by orderby
@@ -1415,7 +1299,11 @@ BEGIN
 		order by id
 		)a )row;
 
-	--drop temporal views
+	--drop TEMP views
+	DROP VIEW IF EXISTS vi_t_timeseries;
+	DROP VIEW IF EXISTS vi_t_curves;
+	DROP VIEW IF EXISTS vi_t_patterns;
+	
 	DROP VIEW IF EXISTS vi_t_adjustments;
 	DROP VIEW IF EXISTS vi_t_aquifers;
 	DROP VIEW IF EXISTS vi_t_backdrop;
@@ -1424,13 +1312,14 @@ BEGIN
 	DROP VIEW IF EXISTS vi_t_controls;
 	DROP VIEW IF EXISTS vi_t_coordinates;
 	DROP VIEW IF EXISTS vi_t_coverages;
-	DROP VIEW IF EXISTS vi_t_curves;
 	DROP VIEW IF EXISTS vi_t_dividers;
 	DROP VIEW IF EXISTS vi_t_dwf;
 	DROP VIEW IF EXISTS vi_t_evaporation;
 	DROP VIEW IF EXISTS vi_t_files;
 	DROP VIEW IF EXISTS vi_t_groundwater;
 	DROP VIEW IF EXISTS vi_t_gully;
+	DROP VIEW IF EXISTS vi_t_gully2node;
+	DROP VIEW IF EXISTS vi_t_gwf;
 	DROP VIEW IF EXISTS vi_t_hydrographs;
 	DROP VIEW IF EXISTS vi_t_infiltration;
 	DROP VIEW IF EXISTS vi_t_inflows;
@@ -1446,7 +1335,6 @@ BEGIN
 	DROP VIEW IF EXISTS vi_t_orifices;
 	DROP VIEW IF EXISTS vi_t_outfalls;
 	DROP VIEW IF EXISTS vi_t_outlets;
-	DROP VIEW IF EXISTS vi_t_patterns;
 	DROP VIEW IF EXISTS vi_t_pollutants;
 	DROP VIEW IF EXISTS vi_t_polygons;
 	DROP VIEW IF EXISTS vi_t_pumps;
@@ -1463,9 +1351,8 @@ BEGIN
 	DROP VIEW IF EXISTS vi_t_washoff;
 	DROP VIEW IF EXISTS vi_t_weirs;
 	DROP VIEW IF EXISTS vi_t_xsections;
-	DROP VIEW IF EXISTS vi_temperature;
-	DROP VIEW IF EXISTS vi_timeseries;
-	DROP VIEW IF EXISTS vi_transects;
+	DROP VIEW IF EXISTS vi_t_temperature;
+	DROP VIEW IF EXISTS vi_t_transects;
 
 	RETURN v_return;
         
