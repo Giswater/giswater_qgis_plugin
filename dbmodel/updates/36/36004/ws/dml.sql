@@ -201,7 +201,22 @@ VALUES (508, 'Set rpt results as archived', 'ws', null, 'core', true, 'Function 
 
 INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, source)
 VALUES (3266, 'gw_fct_set_rpt_archived', 'ws', 'function', 'json', 'json', 
-'Function that moves data related to selected result_id from rpt and rpt_inp tables to archived tables', 'role_edit', 'core') ON CONFLICT (fid) DO NOTHING;
+'Function that moves data related to selected result_id from rpt and rpt_inp tables to archived tables', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO inp_typevalue
 VALUES('inp_result_status', 3, 'ARCHIVED',NULL, NULL);
+
+INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, source)
+VALUES (3268, 'gw_fct_pg2epa_setinitvalues', 'ws', 'function', 'json', 'json', 
+'Function that updates initlevel of inlets and tanks using values from selected simulation', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (510, 'Set initlevel of inlets and tanks', 'ws', null, 'core', true, 'Function process', null) ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO config_toolbox(id, alias, functionparams, inputparams, observ, active, device)
+VALUES (3268, 'Set initlevel values from executed simulation', '{"featureType":[]}', 
+'[{"widgetname":"resultId", "label":"Copy from:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT result_id as id, result_id as idval FROM rpt_cat_result WHERE status !=3", "layoutname":"grl_option_parameters","layoutorder":0, "selectedId":""}]',
+null, true, '{4}') ON CONFLICT (id) DO NOTHING;
+
+
+

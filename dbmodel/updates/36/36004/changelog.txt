@@ -6,3 +6,4 @@
 - New functions: gw_fct_create_netscenario_empty, gw_fct_create_netscenario_from_toc, gw_fct_duplicate_netscenario for creating new netscenarios.
 - Enhance views (vi_t_) to export timeseries, patterns and curves from project to inp file only when they are used
 - New function (3266) gw_fct_set_rpt_archived that moves data related to selected result_id from rpt and rpt_inp tables to archived tables
+- New function (3268) gw_fct_pg2epa_setinitvalues that updates initlevel of inlets and tanks using values from selected simulation
