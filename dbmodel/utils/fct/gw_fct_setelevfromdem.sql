@@ -47,6 +47,7 @@ v_level integer;
 v_status text;
 v_message text;
 v_audit_result json;
+v_count integer;
 BEGIN
 	
 -- search path
@@ -168,11 +169,17 @@ ELSIF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM conf
 		END IF;
 	END IF;
 END IF;
+
+--count updated elements
+select count(*) from audit_check_data where fid = 168 and error_message like 'ELEVATION UPDATED%' and tstamp = now() into v_count;
+insert into audit_check_data (fid, error_message) values (168, '--------------------------------------------------------------');
+insert into audit_check_data (fid, error_message) values (168, concat(v_count, ' ', upper(v_feature_type), 'S have been updated, which are the following:'));
+insert into audit_check_data (fid, error_message) values (168, '--------------------------------------------------------------');
 	
 -- get results
 -- info
 SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=168 order by id) row;
+FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=168 order by id desc) row;
 v_result := COALESCE(v_result, '{}'); 
 v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
