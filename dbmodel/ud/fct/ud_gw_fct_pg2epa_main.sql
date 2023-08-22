@@ -41,7 +41,6 @@ v_error_context text;
 v_count integer;
 v_message text;
 v_step integer=0;
-v_autorepair boolean;
 v_expl integer = null;
 v_sector_0 boolean = false;
 
@@ -62,7 +61,7 @@ BEGIN
 	-- get user parameters
 	v_advancedsettings = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_advancedsettings' AND cur_user=current_user)::boolean;
 	v_vdefault = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
-	v_autorepair = (SELECT (value::json->>'autoRepair') FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+
 	IF (SELECT count(expl_id) FROM selector_expl WHERE cur_user = current_user) = 1 THEN
 		v_expl = (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
 	END IF;

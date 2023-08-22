@@ -7,5 +7,9 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-INSERT INTO inp_typevalue
-VALUES('inp_result_status', 3, 'ARCHIVED',NULL, NULL);
+
+UPDATE config_param_user SET value = value::jsonb - 'autoRepair'
+WHERE  parameter = 'inp_options_debug';
+
+UPDATE config_param_user SET value = value::jsonb - 'steps'
+WHERE  parameter = 'inp_options_debug';

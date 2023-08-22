@@ -202,3 +202,6 @@ VALUES (508, 'Set rpt results as archived', 'ws', null, 'core', true, 'Function 
 INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, source)
 VALUES (3266, 'gw_fct_set_rpt_archived', 'ws', 'function', 'json', 'json', 
 'Function that moves data related to selected result_id from rpt and rpt_inp tables to archived tables', 'role_edit', 'core') ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO inp_typevalue
+VALUES('inp_result_status', 3, 'ARCHIVED',NULL, NULL);
