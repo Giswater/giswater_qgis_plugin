@@ -195,3 +195,10 @@ UPDATE config_toolbox SET inputparams = b.inp FROM (SELECT json_agg(a.inputs) AS
 (SELECT json_array_elements(inputparams)as inputs, json_extract_path_text(json_array_elements(inputparams),'widgetname') as widget
 FROM   config_toolbox 
 WHERE id=2706)a WHERE widget!='sector')b WHERE  id=2706;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (508, 'Set rpt results as archived', 'ws', null, 'core', true, 'Function process', null) ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, source)
+VALUES (3266, 'gw_fct_set_rpt_archived', 'ws', 'function', 'json', 'json', 
+'Function that moves data related to selected result_id from rpt and rpt_inp tables to archived tables', 'role_edit', 'core') ON CONFLICT (fid) DO NOTHING;
