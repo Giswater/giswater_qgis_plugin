@@ -18,32 +18,14 @@ SELECT SCHEMA_NAME.gw_fct_set_rpt_archived($${"client":{"device":4, "lang":"es_E
 
 DECLARE
 
-object_rec record;
-
 v_version text;
 v_result json;
 v_result_info json;
-v_copyfrom integer;
-v_target integer;
 v_error_context text;
-v_count integer;
-v_count2 integer;
 v_projecttype text;
 v_fid integer = 508;
-v_action text;
-v_querytext text;
-v_result_id text = null;
-v_name text;
-v_descript text;
-v_id text;
-v_selectionmode text;
-v_scenarioid integer;
-v_tablename text;
-v_featuretype text;
-v_table text;
-v_columns text;
-v_queryfilter text;
-v_expl integer;
+v_result_id text;
+
 
 BEGIN
 
@@ -164,8 +146,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-
-  
-SELECT SCHEMA_NAME.gw_fct_set_rpt_archived($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, 
-"form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "result_id":"v2connec"}}$$);
