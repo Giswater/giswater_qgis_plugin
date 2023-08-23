@@ -35,6 +35,8 @@ v_macroexpl integer;
 v_mincutrec record;
 v_result json;
 v_result_info json;
+v_connec_id text;
+v_geom geometry;
 
 
 BEGIN
@@ -59,6 +61,15 @@ BEGIN
 	ELSIF v_mincut_class=2 THEN
 		UPDATE om_mincut_connec m SET the_geom=c.the_geom, customer_code=c.customer_code FROM connec c 
 		WHERE c.connec_id=m.connec_id AND result_id = v_mincut;
+	END IF;
+    
+	-- fill anl_feature_type, anl_the_geom and anl_feature_id (even for multiple connec mincut, get one random connec_id and geom)
+	IF v_mincut_class=2 THEN
+		SELECT connec_id, c.the_geom INTO v_connec_id, v_geom FROM connec c JOIN om_mincut_connec USING (connec_id) 
+		WHERE result_id=v_mincut LIMIT 1;
+	
+		UPDATE om_mincut SET anl_feature_type='CONNEC', anl_feature_id=v_connec_id, anl_the_geom=v_geom 
+		WHERE om_mincut.id=v_mincut;
 	END IF;
 
 	-- update om_mincut table
