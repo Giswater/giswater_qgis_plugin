@@ -188,7 +188,7 @@ VALUES ('selector_netscenario', 'tab_netscenario', 'Netscenario', 'Netscenario S
 INSERT INTO config_param_system(
 parameter, value, descript, label, 
 dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type,  datatype)
-VALUES ('basic_selector_tab_netscenario', '{"table":"plan_netscenario","table_id":"netscenario_id","selector":"selector_netscenario","selector_id":"netscenario_id","label":"netscenario_id, ''-'', name ","query_filter":" AND id > 0 ","manageAll":true}', 'Variable to configura all options related to search for the specificic tab','Selector variables', 
+VALUES ('basic_selector_tab_netscenario', '{"table":"plan_netscenario","table_id":"netscenario_id","selector":"selector_netscenario","selector_id":"netscenario_id","label":"netscenario_id, ''-'', name ","query_filter":" ","manageAll":true}', 'Variable to configura all options related to search for the specificic tab','Selector variables', 
 null, null, true, null, 'ws', 'json') ON CONFLICT (parameter) DO NOTHING;
 
 UPDATE config_toolbox SET inputparams = b.inp FROM (SELECT json_agg(a.inputs) AS inp FROM
