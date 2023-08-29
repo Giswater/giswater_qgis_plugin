@@ -60,6 +60,7 @@ from .utilities.csv_btn import GwCSVButton
 from .utilities.print_btn import GwPrintButton
 from .utilities.project_check_btn import GwProjectCheckButton
 from .utilities.workspace_manager_btn import GwWorkspaceManagerButton
+from .utilities.utils_manager_btn import GwUtilsManagerButton
 
 # ToC
 from .toc.add_child_layer_button import GwAddChildLayerButton

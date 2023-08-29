@@ -300,6 +300,14 @@ class GwWorkspaceManagerUi(GwDialog, FORM_CLASS):
 FORM_CLASS = _get_ui_class('workspace_create.ui', 'utilities')
 class GwCreateWorkspaceUi(GwDialog, FORM_CLASS):
     pass
+
+FORM_CLASS = _get_ui_class('mapzone_manager.ui', 'utilities')
+class GwMapzoneManagerUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = _get_ui_class('mapzone_config.ui', 'utilities')
+class GwMapzoneConfigUi(GwDialog, FORM_CLASS):
+    pass
 # endregion
 
 # region TOC
