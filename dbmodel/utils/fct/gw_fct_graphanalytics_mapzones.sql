@@ -281,6 +281,20 @@ BEGIN
 			
 		INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 		VALUES (v_fid, 3, concat('ERROR-',v_fid,': Dynamic analysis for ',v_class,'''s is not configured on database. Please update system variable ''utils_graphanalytics_status'' to enable it '));
+
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid AND criticity > 1 order by criticity desc, id asc) row;
+
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
+		-- Control nulls
+		v_result_info := COALESCE(v_result_info, '{}'); 
+		
+		--  Return
+		RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Mapzones dynamic analysis canceled. Configuration is not set corerctly to start the process"}, "version":"'||v_version||'"'||
+		',"body":{"form":{}, "data":{ "info":'||v_result_info||'}}}')::json;	
+
 	ELSE	
 		--create temporal tables
 
@@ -1361,27 +1375,27 @@ BEGIN
 	v_message := COALESCE(v_message, ''); 
 	v_version := COALESCE(v_version, ''); 
 
-	DROP VIEW v_temp_anlgraph;
-	DROP TABLE temp_t_anlgraph;
-	DROP TABLE temp_t_data;
-	DROP TABLE temp_audit_check_data;
-	DROP TABLE temp_anl_arc;
-	DROP TABLE temp_anl_node;
-	DROP TABLE temp_anl_connec;
-	DROP TABLE temp_t_arc;
-	DROP TABLE temp_t_node;
-	DROP TABLE temp_t_connec;
-	DROP TABLE temp_t_link;
+	DROP VIEW IF EXISTS v_temp_anlgraph;
+	DROP TABLE IF EXISTS temp_t_anlgraph;
+	DROP TABLE IF EXISTS temp_t_data;
+	DROP TABLE IF EXISTS temp_audit_check_data;
+	DROP TABLE IF EXISTS temp_anl_arc;
+	DROP TABLE IF EXISTS temp_anl_node;
+	DROP TABLE IF EXISTS temp_anl_connec;
+	DROP TABLE IF EXISTS temp_t_arc;
+	DROP TABLE IF EXISTS temp_t_node;
+	DROP TABLE IF EXISTS temp_t_connec;
+	DROP TABLE IF EXISTS temp_t_link;
 
 	IF v_project_type = 'UD' THEN
-		DROP TABLE temp_t_gully;
-		DROP TABLE temp_drainzone;
+		DROP TABLE IF EXISTS temp_t_gully;
+		DROP TABLE IF EXISTS temp_drainzone;
 	ELSE
-		DROP TABLE temp_om_waterbalance_dma_graph;
-		DROP TABLE temp_sector;
-		DROP TABLE temp_presszone;
-		DROP TABLE temp_dma;
-		DROP TABLE temp_dqa;
+		DROP TABLE IF EXISTS temp_om_waterbalance_dma_graph;
+		DROP TABLE IF EXISTS temp_sector;
+		DROP TABLE IF EXISTS temp_presszone;
+		DROP TABLE IF EXISTS temp_dma;
+		DROP TABLE IF EXISTS temp_dqa;
 	END IF;
 	
 	--  Return
