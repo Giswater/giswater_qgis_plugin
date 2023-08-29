@@ -155,7 +155,10 @@ BEGIN
 				UNION
 				select jsonb_build_object('selector_date', json_agg(a.selector_value::json)) as selector_conf FROM (
 				select json_build_object('from_date', from_date, 'to_date', to_date,'context', context)::text as selector_value
-				FROM selector_date where cur_user=current_user)a )s;
+				FROM selector_date where cur_user=current_user)a 
+				UNION
+				select jsonb_build_object('selector_netscenario',array_agg(netscenario_id)) as selector_conf 
+				FROM selector_netscenario where cur_user=current_user )s;
 		ELSIF v_project_type = 'UD' THEN
 			SELECT json_agg(s.selector_conf) INTO v_selectors_configcompound  FROM (
 				select jsonb_build_object('selector_rpt_main_tstep', json_agg(a.selector_value::json))as selector_conf FROM (
