@@ -218,5 +218,30 @@ VALUES (3268, 'Set initlevel values from executed simulation', '{"featureType":[
 '[{"widgetname":"resultId", "label":"Copy from:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT result_id as id, result_id as idval FROM rpt_cat_result WHERE status !=3", "layoutname":"grl_option_parameters","layoutorder":0, "selectedId":""}]',
 null, true, '{4}') ON CONFLICT (id) DO NOTHING;
 
+UPDATE config_form_fields SET layoutname = 'lyt_data_1' where formname = 'v_edit_sector';
 
+UPDATE config_form_fields SET layoutorder = attnum 
+FROM   pg_attribute
+WHERE  attrelid = 'SCHEMA_NAME.v_edit_sector'::regclass AND formname = 'v_edit_sector'
+and columnname = attname;
 
+UPDATE config_form_fields SET layoutname = 'lyt_data_1' where formname = 'v_edit_dma';
+
+UPDATE config_form_fields SET layoutorder = attnum 
+FROM   pg_attribute
+WHERE  attrelid = 'SCHEMA_NAME.v_edit_dma'::regclass AND formname = 'v_edit_dma'
+and columnname = attname;
+
+UPDATE config_form_fields SET layoutname = 'lyt_data_1' where formname = 'v_edit_presszone';
+
+UPDATE config_form_fields SET layoutorder = attnum 
+FROM   pg_attribute
+WHERE  attrelid = 'SCHEMA_NAME.v_edit_presszone'::regclass AND formname = 'v_edit_presszone'
+and columnname = attname;
+
+UPDATE config_form_fields SET layoutname = 'lyt_data_1' where formname = 'v_edit_dqa';
+
+UPDATE config_form_fields SET layoutorder = attnum 
+FROM   pg_attribute
+WHERE  attrelid = 'SCHEMA_NAME.v_edit_dqa'::regclass AND formname = 'v_edit_dqa'
+and columnname = attname;
