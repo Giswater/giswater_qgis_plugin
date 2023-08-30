@@ -10,7 +10,7 @@ import json
 from functools import partial
 from sip import isdeleted
 
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QPoint
 from qgis.PyQt.QtGui import QKeySequence
 from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -24,7 +24,7 @@ from ...shared.info import GwInfo
 from ...shared.psector import GwPsector
 from ...utils import tools_gw
 from .... import global_vars
-from ....libs import tools_qgis, tools_qt, lib_vars
+from ....libs import tools_qgis, tools_qt, lib_vars, tools_db, tools_os
 
 
 class GwUtilsManagerButton(GwAction):
@@ -56,13 +56,12 @@ class GwUtilsManagerButton(GwAction):
 
     def clicked_event(self):
 
-        if self.menu.property('last_selection') is not None:
-            self.info_feature.add_feature(self.menu.property('last_selection'), action=self)
+        button = self.action.associatedWidgets()[1]
+        menu_point = button.mapToGlobal(QPoint(0, button.height()))
+        self.menu.popup(menu_point)
 
 
     # region private functions
-
-    # region menu main functions
 
     def _fill_utils_menu(self):
         """ Fill add arc menu """
@@ -94,12 +93,14 @@ class GwUtilsManagerButton(GwAction):
             # obj_action.triggered.connect(partial(self._save_last_selection, self.menu, feature_cat))
 
 
-    def _save_last_selection(self, menu, feature_cat):
-        menu.setProperty("last_selection", feature_cat)
+    def _prices_manager(self):
+        self.psector = GwPsector()
+        self.psector.manage_prices()
 
+    # region mapzone manager functions
 
     def _mapzones_manager(self):
-        print(f"mapzones manager")
+
         # Create dialog
         self.mapzone_mng_dlg = GwMapzoneManagerUi()
         tools_gw.load_settings(self.mapzone_mng_dlg)
@@ -127,31 +128,17 @@ class GwUtilsManagerButton(GwAction):
 
         # Connect signals
         self.mapzone_mng_dlg.btn_config.clicked.connect(partial(self._manage_config))
-        # self.mapzone_mng_dlg.btn_toc.clicked.connect(partial(self._manage_add_layers))
-        # self.mapzone_mng_dlg.btn_insert.clicked.connect(partial(self._manage_insert))
-        # self.mapzone_mng_dlg.btn_delete.clicked.connect(partial(self._manage_delete))
-        # self.mapzone_mng_dlg.btn_snapping.clicked.connect(partial(self._manage_select))
+        self.mapzone_mng_dlg.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active))
+        self.mapzone_mng_dlg.btn_create.clicked.connect(partial(self._manage_create))
+        self.mapzone_mng_dlg.btn_update.clicked.connect(partial(self._manage_update))
+        self.mapzone_mng_dlg.btn_delete.clicked.connect(partial(self._manage_delete))
         self.mapzone_mng_dlg.main_tab.currentChanged.connect(partial(self._manage_current_changed))
-        # self.mapzone_mng_dlg.finished.connect(self._selection_end)
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.close_dialog, self.mapzone_mng_dlg, True))
 
         self._manage_current_changed()
 
-        # sql = f"SELECT name FROM v_edit_cat_dscenario WHERE dscenario_id = {self.selected_dscenario_id}"
-        # row = tools_db.get_row(sql)
-        # dscenario_name = row[0]
-        # title = f"Dscenario {self.selected_dscenario_id} - {dscenario_name}"
         tools_gw.open_dialog(self.mapzone_mng_dlg, 'mapzone_manager')
 
-
-    def _prices_manager(self):
-        self.psector = GwPsector()
-        self.psector.manage_prices()
-
-
-    # endregion
-
-    # region mapzone manager functions
 
     def _manage_current_changed(self):
         """ Manages tab changes """
@@ -242,6 +229,7 @@ class GwUtilsManagerButton(GwAction):
         # Sort the table by feature id
         model.sort(1, 0)
 
+    # region config button
 
     def _manage_config(self):
         """ Dialog from config button """
@@ -576,6 +564,88 @@ class GwUtilsManagerButton(GwAction):
         dialog.blockSignals(False)
         action.setChecked(False)
         # self.signal_activate.emit()
+
+    # endregion
+
+    def _manage_toggle_active(self):
+        # Get selected row
+        tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
+        view = tableview.objectName().replace('tbl_', '')
+        selected_list = tableview.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.mapzone_mng_dlg)
+            return
+
+        # Get selected mapzone data
+        index = tableview.selectionModel().currentIndex()
+        mapzone_id = index.sibling(index.row(), 0).data()
+        active = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(tableview, 'active')).data()
+        active = tools_os.set_boolean(active)
+        field_id = tableview.model().headerData(0, Qt.Horizontal)
+
+        sql = f"UPDATE {view} SET active = {str(not active).lower()} WHERE {field_id} = {mapzone_id}"
+        tools_db.execute_sql(sql)
+
+        # Refresh tableview
+        self._manage_current_changed()
+
+
+    def _manage_create(self):
+        # Get selected row
+        tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
+        view = tableview.objectName().replace('tbl_', '')
+        selected_list = tableview.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.mapzone_mng_dlg)
+            return
+
+        # Get selected mapzone data
+        index = tableview.selectionModel().currentIndex()
+        mapzone_id = index.sibling(index.row(), 0).data()
+        field_id = tableview.model().headerData(0, Qt.Horizontal)
+
+
+    def _manage_update(self):
+        # Get selected row
+        tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
+        view = tableview.objectName().replace('tbl_', '')
+        selected_list = tableview.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.mapzone_mng_dlg)
+            return
+
+        # Get selected mapzone data
+        index = tableview.selectionModel().currentIndex()
+        mapzone_id = index.sibling(index.row(), 0).data()
+        field_id = tableview.model().headerData(0, Qt.Horizontal)
+
+
+    def _manage_delete(self):
+        # Get selected row
+        tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
+        view = tableview.objectName().replace('tbl_', '')
+        selected_list = tableview.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.mapzone_mng_dlg)
+            return
+
+        # Get selected mapzone data
+        index = tableview.selectionModel().currentIndex()
+        mapzone_id = index.sibling(index.row(), 0).data()
+        field_id = tableview.model().headerData(0, Qt.Horizontal)
+
+        message = "Are you sure you want to delete these records?"
+        answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 1).data(), force_action=True)
+        if answer:
+            sql = f"DELETE FROM {view} WHERE {field_id} = {mapzone_id}"
+            tools_db.execute_sql(sql)
+
+            # Refresh tableview
+            self._manage_current_changed()
 
     # endregion
 
