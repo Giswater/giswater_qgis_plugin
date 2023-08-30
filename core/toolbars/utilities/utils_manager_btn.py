@@ -297,6 +297,7 @@ class GwUtilsManagerButton(GwAction):
         # Preview
         self.config_dlg.btn_clear_preview.clicked.connect(partial(self._clear_preview, self.config_dlg))
         # Dialog buttons
+        self.config_dlg.btn_accept.clicked.connect(partial(self._accept_config, self.config_dlg))
         self.config_dlg.btn_cancel.clicked.connect(self.config_dlg.reject)
         self.config_dlg.finished.connect(partial(tools_gw.close_dialog, self.config_dlg, True))
 
@@ -539,6 +540,33 @@ class GwUtilsManagerButton(GwAction):
         """ Set preview textbox to '' """
 
         tools_qt.set_widget_text(dialog, 'txt_preview', '')
+
+
+    def _accept_config(self, dialog):
+        """ Accept button for config dialog """
+
+        preview = tools_qt.get_text(dialog, 'txt_preview')
+
+        if not preview:
+            return
+        parameters = f'"action": "UPDATE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
+                     f'"config": {preview}'
+        extras = f'"parameters": {{{parameters}}}'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
+        if json_result is None:
+            return
+
+        if 'status' in json_result and json_result['status'] == 'Accepted':
+            if json_result['message']:
+                level = 1
+                if 'level' in json_result['message']:
+                    level = int(json_result['message']['level'])
+                tools_qgis.show_message(json_result['message']['text'], level)
+
+            self._reset_config_vars(0)
+            tools_gw.close_dialog(dialog)
+            self._manage_current_changed()
 
 
     def _cancel_snapping_tool(self, dialog, action):
