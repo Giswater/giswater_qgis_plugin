@@ -11,17 +11,18 @@ from functools import partial
 from sip import isdeleted
 
 from qgis.PyQt.QtCore import Qt, QPoint
-from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView
+from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel
 from qgis.PyQt.QtSql import QSqlTableModel
 
 from qgis.gui import QgsMapToolEmitPoint
 
-from ...ui.ui_manager import GwMapzoneManagerUi, GwMapzoneConfigUi
+from ...ui.ui_manager import GwMapzoneManagerUi, GwMapzoneConfigUi, GwInfoGenericUi
 from ...utils.snap_manager import GwSnapManager
 from ...shared.info import GwInfo
 from ...utils import tools_gw
 from .... import global_vars
 from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_os
+
 
 class GwMapzoneManager:
 
@@ -167,7 +168,7 @@ class GwMapzoneManager:
         # Sort the table by feature id
         model.sort(1, 0)
 
-        # region config button
+    # region config button
 
     def _manage_config(self):
         """ Dialog from config button """
@@ -494,7 +495,7 @@ class GwMapzoneManager:
         action.setChecked(False)
         # self.signal_activate.emit()
 
-        # endregion
+    # endregion
 
     def _manage_toggle_active(self):
         # Get selected row
@@ -520,19 +521,76 @@ class GwMapzoneManager:
         self._manage_current_changed()
 
     def _manage_create(self):
-        # Get selected row
-        tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
-        view = tableview.objectName().replace('tbl_', '')
-        selected_list = tableview.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.mapzone_mng_dlg)
-            return
 
-        # Get selected mapzone data
-        index = tableview.selectionModel().currentIndex()
-        mapzone_id = index.sibling(index.row(), 0).data()
-        field_id = tableview.model().headerData(0, Qt.Horizontal)
+        tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
+        tablename = tableview.objectName().replace('tbl_', '')
+
+        # Execute getinfofromid
+        feature = f'"tableName":"{tablename}"'
+        body = tools_gw.create_body(feature=feature)
+        json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
+        if json_result is None or json_result['status'] == 'Failed':
+            return
+        result = json_result
+
+        # Build dlg
+        self.add_dlg = GwInfoGenericUi()
+        tools_gw.load_settings(self.add_dlg)
+        self.my_json_add = {}
+        tools_gw.build_dialog_info(self.add_dlg, result, my_json=self.my_json_add)
+
+        # # Populate node_id/feature_id
+        # tools_qt.set_widget_text(self.add_dlg, f'tab_none_{info.feature_type}_id', feature_id)
+        # tools_qt.set_widget_text(self.add_dlg, 'tab_none_feature_id', feature_id)
+        layout = self.add_dlg.findChild(QGridLayout, 'lyt_main_1')
+        # tools_qt.set_selected_item(self.add_dlg, 'tab_none_feature_type', f"{info.feature_type.upper()}")
+        # tools_qt.set_widget_enabled(self.add_dlg, 'tab_none_feature_type', False)
+
+        # cmb_nodarc_id = self.add_dlg.findChild(QComboBox, 'tab_none_nodarc_id')
+        # aux_view = view.replace("dscenario_", "")
+        # if cmb_nodarc_id is not None:
+        #     sql = (f"SELECT nodarc_id as id, nodarc_id as idval FROM {aux_view}"
+        #            f" WHERE {info.feature_type}_id = '{feature_id}'")
+        #     rows = tools_db.get_rows(sql)
+        #     tools_qt.fill_combo_values(cmb_nodarc_id, rows)
+        # cmb_order_id = self.add_dlg.findChild(QComboBox, 'tab_none_order_id')
+        # if cmb_order_id is not None:
+        #     sql = (f"SELECT order_id as id, order_id::text as idval FROM {aux_view}"
+        #            f" WHERE {info.feature_type}_id = '{feature_id}'")
+        #     rows = tools_db.get_rows(sql)
+        #     tools_qt.fill_combo_values(cmb_order_id, rows, 1)
+
+        # Get every widget in the layout
+        widgets = []
+        for row in range(layout.rowCount()):
+            for column in range(layout.columnCount()):
+                item = layout.itemAtPosition(row, column)
+                if item is not None:
+                    widget = item.widget()
+                    if widget is not None and type(widget) != QLabel:
+                        widgets.append(widget)
+        # Get all widget's values
+        for widget in widgets:
+            tools_gw.get_values(self.add_dlg, widget, self.my_json_add, ignore_editability=True)
+        # Remove Nones from self.my_json_add
+        keys_to_remove = []
+        for key, value in self.my_json_add.items():
+            if value is None:
+                keys_to_remove.append(key)
+        for key in keys_to_remove:
+            del self.my_json_add[key]
+
+        # Signals
+        self.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.add_dlg))
+        self.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.add_dlg))
+        # self.add_dlg.dlg_closed.connect(partial(refresh_epa_tbl, tbl, dlg, **kwargs))
+        # self.add_dlg.btn_accept.clicked.connect(
+        #     partial(accept_add_dlg, self.add_dlg, tablename, pkey, feature_id, self.my_json_add, result, info))
+
+        # Open dlg
+        dlg_title = f"New mapzone - {tablename}"
+        tools_gw.open_dialog(self.add_dlg, dlg_name='info_generic', title=dlg_title)
+
 
     def _manage_update(self):
         # Get selected row
@@ -573,5 +631,3 @@ class GwMapzoneManager:
 
             # Refresh tableview
             self._manage_current_changed()
-
-    # endregion
