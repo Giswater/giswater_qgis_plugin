@@ -13,3 +13,6 @@ WHERE  parameter = 'inp_options_debug';
 
 UPDATE config_param_user SET value = value::jsonb - 'steps'
 WHERE  parameter = 'inp_options_debug';
+
+UPDATE sys_table SET context='{"level_1":"OM","level_2":"VISIT"}', orderby=3, alias='Visit Catalog' WHERE id='om_visit_cat';
+UPDATE sys_table SET context='{"level_1":"OM","level_2":"VISIT"}', orderby=4, alias='Parameter Catalog' WHERE id='config_visit_parameter';

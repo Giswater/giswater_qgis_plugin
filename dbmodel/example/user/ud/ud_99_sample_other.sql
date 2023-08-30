@@ -601,3 +601,5 @@ UPDATE config_form_fields
 	WHERE formname='v_edit_inp_dscenario_inflows' AND columnname='order_id';
 
 UPDATE config_form_fields SET iseditable = true WHERE layoutname = 'lyt_epa_dsc_1' AND widgettype = 'button';
+
+UPDATE sys_table SET alias = 'Gully child' WHERE id='ve_gully_gully';
