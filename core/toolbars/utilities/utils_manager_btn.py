@@ -313,7 +313,7 @@ class GwUtilsManagerButton(GwAction):
         if mode in (0, 1):
             self.node_parent = None
             tools_qt.set_widget_text(self.config_dlg, 'txt_nodeParent', '')
-            self.to_arc_list = []
+            self.to_arc_list = set()
             tools_qt.set_widget_text(self.config_dlg, 'txt_toArc', '')
             tools_qt.set_widget_enabled(self.config_dlg, 'btn_snapping_toArc', False)
             tools_qt.set_widget_enabled(self.config_dlg, 'btn_add_nodeParent', False)
@@ -440,7 +440,7 @@ class GwUtilsManagerButton(GwAction):
         """
 
         # Set variable, set widget text and enable add button
-        self.to_arc_list.append(feat_id)
+        self.to_arc_list.add(int(feat_id))
 
         tools_qt.set_widget_text(self.config_dlg, 'txt_toArc', f"{self.to_arc_list}")
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_nodeParent, True)
@@ -465,7 +465,7 @@ class GwUtilsManagerButton(GwAction):
         """ ADD button for nodeParent """
 
         node_parent_feat, node_parent_id = self.node_parent
-        to_arc_list = json.dumps(self.to_arc_list)
+        to_arc_list = json.dumps(list(self.to_arc_list))
         preview = tools_qt.get_text(dialog, 'txt_preview')
 
         parameters = f'"action": "PREVIEW", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
