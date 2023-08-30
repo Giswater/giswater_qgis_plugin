@@ -270,9 +270,7 @@ class GwUtilsManagerButton(GwAction):
         tools_gw.add_icon(self.config_dlg.btn_snapping_forceClosed, "137")
 
         # Set variables
-        self.node_parent = None  # (snapped feature of nodeParent selection, node_id)
-        self.to_arc_list = []  # list of arc_ids
-        self.force_closed_list = []  # list of node_ids
+        self._reset_config_vars()
 
         # Fill preview
         if graphconfig:
@@ -314,6 +312,27 @@ class GwUtilsManagerButton(GwAction):
 
         # Open dialog
         tools_gw.open_dialog(self.config_dlg, 'mapzone_config')
+
+
+    def _reset_config_vars(self, mode=0):
+        """
+        Reset config variables
+
+            :param mode: which variables to reset {0: all, 1: nodeParent & toArc, 2: only forceClosed}
+        """
+
+        if mode in (0, 1):
+            self.node_parent = None
+            tools_qt.set_widget_text(self.config_dlg, 'txt_nodeParent', '')
+            self.to_arc_list = []
+            tools_qt.set_widget_text(self.config_dlg, 'txt_toArc', '')
+            tools_qt.set_widget_enabled(self.config_dlg, 'btn_snapping_toArc', False)
+            tools_qt.set_widget_enabled(self.config_dlg, 'btn_add_nodeParent', False)
+        if mode in (0, 2):
+            self.force_closed_list = []
+            tools_qt.set_widget_text(self.config_dlg, 'txt_forceClosed', '')
+            tools_qt.set_widget_enabled(self.config_dlg, 'btn_add_forceClosed', False)
+
 
 
     def get_snapped_feature_id(self, dialog, action, layer_name, option, widget_name, child_type):
@@ -481,6 +500,9 @@ class GwUtilsManagerButton(GwAction):
             if preview:
                 tools_qt.set_widget_text(dialog, 'txt_preview', json.dumps(preview))
 
+            self._cancel_snapping_tool(dialog, dialog.btn_add_nodeParent)
+            self._reset_config_vars(1)
+
 
     def _add_force_closed(self, dialog):
         """ ADD button for forceClosed """
@@ -508,6 +530,9 @@ class GwUtilsManagerButton(GwAction):
             preview = json_result['body']['data'].get('preview')
             if preview:
                 tools_qt.set_widget_text(dialog, 'txt_preview', json.dumps(preview))
+
+            self._cancel_snapping_tool(dialog, dialog.btn_add_forceClosed)
+            self._reset_config_vars(2)
 
 
     def _clear_preview(self, dialog):
