@@ -5,6 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import json
+
 from functools import partial
 from sip import isdeleted
 
@@ -244,6 +246,20 @@ class GwUtilsManagerButton(GwAction):
     def _manage_config(self):
         """ Dialog from config button """
 
+        # Get selected row
+        tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
+        selected_list = tableview.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.mapzone_mng_dlg)
+            return
+
+        # Get selected mapzone data
+        index = tableview.selectionModel().currentIndex()
+        self.mapzone_id = index.sibling(index.row(), 0).data()
+        self.mapzone_type = tableview.objectName().split('_')[-1].lower()
+        graphconfig = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(tableview, 'graphconfig')).data()
+
         # Build dialog
         self.config_dlg = GwMapzoneConfigUi()
         tools_gw.load_settings(self.config_dlg)
@@ -255,7 +271,12 @@ class GwUtilsManagerButton(GwAction):
 
         # Set variables
         self.node_parent = None  # (snapped feature of nodeParent selection, node_id)
-        self.to_arc = None  # (snapped feature of toArc selection, arc_id)
+        self.to_arc_list = []  # list of arc_ids
+        self.force_closed_list = []  # list of node_ids
+
+        # Fill preview
+        if graphconfig:
+            tools_qt.set_widget_text(self.config_dlg, 'txt_preview', graphconfig)
 
         # Connect signals
         self.child_type = None
@@ -265,6 +286,19 @@ class GwUtilsManagerButton(GwAction):
         self.config_dlg.btn_snapping_toArc.clicked.connect(
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_toArc, 'v_edit_arc', 'toArc', None,
                     self.child_type))
+        self.config_dlg.btn_add_nodeParent.clicked.connect(
+            partial(self._add_node_parent, self.config_dlg)
+        )
+        # Force closed
+        self.config_dlg.btn_snapping_forceClosed.clicked.connect(
+            partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_forceClosed, 'v_edit_node', 'forceClosed', None,
+                    self.child_type))
+        self.config_dlg.btn_add_forceClosed.clicked.connect(
+            partial(self._add_force_closed, self.config_dlg)
+        )
+        # Preview
+        self.config_dlg.btn_clear_preview.clicked.connect(partial(self._clear_preview, self.config_dlg))
+        # Dialog buttons
         self.config_dlg.btn_cancel.clicked.connect(self.config_dlg.reject)
         self.config_dlg.finished.connect(partial(tools_gw.close_dialog, self.config_dlg, True))
 
@@ -294,7 +328,7 @@ class GwUtilsManagerButton(GwAction):
         #     if widget is None:
         #         action.setChecked(False)
         #         return
-        # Block the signals of de dialog so that the key ESC does not close it
+        # Block the signals of the dialog so that the key ESC does not close it
         dialog.blockSignals(True)
 
         self.vertex_marker = self.snapper_manager.vertex_marker
@@ -371,7 +405,8 @@ class GwUtilsManagerButton(GwAction):
             tools_qgis.show_warning(f"Exception in info (def _get_id)", parameter=e)
         finally:
             self.snapper_manager.recover_snapping_options()
-            self._cancel_snapping_tool(dialog, action)
+            if option == 'nodeParent':
+                self._cancel_snapping_tool(dialog, action)
 
 
     def _set_node_parent(self, snapped_feat, feat_id, child_type):
@@ -396,20 +431,42 @@ class GwUtilsManagerButton(GwAction):
             :param feat_id: Id of the snapped feature
         """
 
-        node_parent, node_parent_id = self.node_parent
-        dma_id = node_parent.attribute("dma_id")
-        presszone_id = node_parent.attribute("presszone_id")
-        sector_id = node_parent.attribute("sector_id")
-        dqa_id = node_parent.attribute("dqa_id")
-        if dqa_id == -1:
-            dqa_id = "null"
-        child_type = node_parent.attribute("node_type")
+        # Set variable, set widget text and enable add button
+        self.to_arc_list.append(feat_id)
 
-        feature = f'"featureType":"{child_type}", "id":"{node_parent_id}"'
-        extras = (f'"arcId":"{feat_id}", "dmaId":"{dma_id}", "presszoneId":"{presszone_id}", "sectorId":"{sector_id}", '
-                  f'"dqaId":"{dqa_id}"')
-        body = tools_gw.create_body(feature=feature, extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_settoarc', body)
+        tools_qt.set_widget_text(self.config_dlg, 'txt_toArc', f"{self.to_arc_list}")
+        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_nodeParent, True)
+
+
+    def _set_force_closed(self, snapped_feat, feat_id, child_type):
+        """
+        Function called in def _get_id(self, dialog, action, option, point, event):
+            getattr(self, options[option][1])(feat_id, child_type)
+
+            :param feat_id: Id of the snapped feature
+        """
+
+        # Set variable, set widget text and enable add button
+        self.force_closed_list.append(feat_id)
+
+        tools_qt.set_widget_text(self.config_dlg, 'txt_forceClosed', f"{self.force_closed_list}")
+        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_forceClosed, True)
+
+
+    def _add_node_parent(self, dialog):
+        """ ADD button for nodeParent """
+
+        node_parent_feat, node_parent_id = self.node_parent
+        to_arc_list = json.dumps(self.to_arc_list)
+        preview = tools_qt.get_text(dialog, 'txt_preview')
+
+        parameters = f'"action": "PREVIEW", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
+                     f'"nodeParent": "{node_parent_id}", "toArc": {to_arc_list}'
+        if preview:
+            parameters += f', "config": {preview}'
+        extras = f'"parameters": {{{parameters}}}'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
         if json_result is None:
             return
 
@@ -418,12 +475,45 @@ class GwUtilsManagerButton(GwAction):
                 level = 1
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
-                tools_qgis.show_message(json_result['message']['text'], level)
+                tools_qgis.show_message(json_result['message']['text'], level, dialog=dialog)
 
-            # Set variable, set widget text and enable add button
-            self.to_arc = (snapped_feat, feat_id)
-            tools_qt.set_widget_text(self.config_dlg, 'txt_toArc', f"{feat_id}")
-            tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_nodeParent, True)
+            preview = json_result['body']['data'].get('preview')
+            if preview:
+                tools_qt.set_widget_text(dialog, 'txt_preview', json.dumps(preview))
+
+
+    def _add_force_closed(self, dialog):
+        """ ADD button for forceClosed """
+
+        force_closed_list = json.dumps(self.force_closed_list)
+        preview = tools_qt.get_text(dialog, 'txt_preview')
+
+        parameters = f'"action": "PREVIEW", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
+                     f'"forceClosed": {force_closed_list}'
+        if preview:
+            parameters += f', "config": {preview}'
+        extras = f'"parameters": {{{parameters}}}'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
+        if json_result is None:
+            return
+
+        if 'status' in json_result and json_result['status'] == 'Accepted':
+            if json_result['message']:
+                level = 1
+                if 'level' in json_result['message']:
+                    level = int(json_result['message']['level'])
+                tools_qgis.show_message(json_result['message']['text'], level, dialog=dialog)
+
+            preview = json_result['body']['data'].get('preview')
+            if preview:
+                tools_qt.set_widget_text(dialog, 'txt_preview', json.dumps(preview))
+
+
+    def _clear_preview(self, dialog):
+        """ Set preview textbox to '' """
+
+        tools_qt.set_widget_text(dialog, 'txt_preview', '')
 
 
     def _cancel_snapping_tool(self, dialog, action):
