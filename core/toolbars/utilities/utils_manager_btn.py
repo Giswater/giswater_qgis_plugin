@@ -318,7 +318,7 @@ class GwUtilsManagerButton(GwAction):
             tools_qt.set_widget_enabled(self.config_dlg, 'btn_snapping_toArc', False)
             tools_qt.set_widget_enabled(self.config_dlg, 'btn_add_nodeParent', False)
         if mode in (0, 2):
-            self.force_closed_list = []
+            self.force_closed_list = set()
             tools_qt.set_widget_text(self.config_dlg, 'txt_forceClosed', '')
             tools_qt.set_widget_enabled(self.config_dlg, 'btn_add_forceClosed', False)
 
@@ -455,7 +455,7 @@ class GwUtilsManagerButton(GwAction):
         """
 
         # Set variable, set widget text and enable add button
-        self.force_closed_list.append(feat_id)
+        self.force_closed_list.add(feat_id)
 
         tools_qt.set_widget_text(self.config_dlg, 'txt_forceClosed', f"{self.force_closed_list}")
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_forceClosed, True)
@@ -496,7 +496,7 @@ class GwUtilsManagerButton(GwAction):
     def _add_force_closed(self, dialog):
         """ ADD button for forceClosed """
 
-        force_closed_list = json.dumps(self.force_closed_list)
+        force_closed_list = json.dumps(list(self.force_closed_list))
         preview = tools_qt.get_text(dialog, 'txt_preview')
 
         parameters = f'"action": "PREVIEW", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
