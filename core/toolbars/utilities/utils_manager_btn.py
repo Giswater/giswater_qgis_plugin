@@ -8,12 +8,16 @@ or (at your option) any later version.
 from functools import partial
 from sip import isdeleted
 
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QKeySequence
 from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView
 from qgis.PyQt.QtSql import QSqlTableModel
 
+from qgis.gui import QgsMapToolEmitPoint
+
 from ..dialog import GwAction
 from ...ui.ui_manager import GwMapzoneManagerUi, GwMapzoneConfigUi
+from ...utils.snap_manager import GwSnapManager
 from ...shared.info import GwInfo
 from ...shared.psector import GwPsector
 from ...utils import tools_gw
@@ -44,6 +48,9 @@ class GwUtilsManagerButton(GwAction):
             self.action.setMenu(self.menu)
             toolbar.addAction(self.action)
 
+        self.snapper_manager = GwSnapManager(self.iface)
+        self.snapper_manager.set_snapping_layers()
+
 
     def clicked_event(self):
 
@@ -53,6 +60,7 @@ class GwUtilsManagerButton(GwAction):
 
     # region private functions
 
+    # region menu main functions
 
     def _fill_utils_menu(self):
         """ Fill add arc menu """
@@ -134,6 +142,15 @@ class GwUtilsManagerButton(GwAction):
         tools_gw.open_dialog(self.mapzone_mng_dlg, 'mapzone_manager')
 
 
+    def _prices_manager(self):
+        self.psector = GwPsector()
+        self.psector.manage_prices()
+
+
+    # endregion
+
+    # region mapzone manager functions
+
     def _manage_current_changed(self):
         """ Manages tab changes """
 
@@ -168,7 +185,7 @@ class GwUtilsManagerButton(GwAction):
 
 
     def _fill_mapzone_table(self, set_edit_triggers=QTableView.DoubleClicked, expr=None):
-        """ Fill dscenario table with data from its corresponding table """
+        """ Fill mapzone table with data from its corresponding table """
 
         # Manage exception if dialog is closed
         if isdeleted(self.mapzone_mng_dlg):
@@ -225,14 +242,198 @@ class GwUtilsManagerButton(GwAction):
 
 
     def _manage_config(self):
+        """ Dialog from config button """
+
+        # Build dialog
         self.config_dlg = GwMapzoneConfigUi()
         tools_gw.load_settings(self.config_dlg)
 
+        # Button icons
+        tools_gw.add_icon(self.config_dlg.btn_snapping_nodeParent, "137")
+        tools_gw.add_icon(self.config_dlg.btn_snapping_toArc, "137")
+        tools_gw.add_icon(self.config_dlg.btn_snapping_forceClosed, "137")
+
+        # Set variables
+        self.node_parent = None  # (snapped feature of nodeParent selection, node_id)
+        self.to_arc = None  # (snapped feature of toArc selection, arc_id)
+
+        # Connect signals
+        self.child_type = None
+        self.config_dlg.btn_snapping_nodeParent.clicked.connect(
+            partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_nodeParent, 'v_edit_node', 'nodeParent', None,
+                    self.child_type))
+        self.config_dlg.btn_snapping_toArc.clicked.connect(
+            partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_toArc, 'v_edit_arc', 'toArc', None,
+                    self.child_type))
+        self.config_dlg.btn_cancel.clicked.connect(self.config_dlg.reject)
+        self.config_dlg.finished.connect(partial(tools_gw.close_dialog, self.config_dlg, True))
+
+        # Enable/disable certain widgets
+        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_snapping_nodeParent, True)
+        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_snapping_toArc, False)
+        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_nodeParent, False)
+
+        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_snapping_forceClosed, True)
+        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_forceClosed, False)
+
+        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_clear_preview, True)
+
+        # Open dialog
         tools_gw.open_dialog(self.config_dlg, 'mapzone_config')
 
 
-    def _prices_manager(self):
-        self.psector = GwPsector()
-        self.psector.manage_prices()
+    def get_snapped_feature_id(self, dialog, action, layer_name, option, widget_name, child_type):
+        """ Snap feature and set a value into dialog """
+
+        layer = tools_qgis.get_layer_by_tablename(layer_name)
+        if not layer:
+            action.setChecked(False)
+            return
+        # if widget_name is not None:
+        #     widget = dialog.findChild(QWidget, widget_name)
+        #     if widget is None:
+        #         action.setChecked(False)
+        #         return
+        # Block the signals of de dialog so that the key ESC does not close it
+        dialog.blockSignals(True)
+
+        self.vertex_marker = self.snapper_manager.vertex_marker
+
+        # Store user snapping configuration
+        self.snapper_manager.store_snapping_options()
+
+        # Disable snapping
+        self.snapper_manager.set_snapping_status()
+
+        # if we are doing info over connec or over node
+        if option in ('arc', 'set_to_arc'):
+            self.snapper_manager.config_snap_to_arc()
+        elif option == 'node':
+            self.snapper_manager.config_snap_to_node()
+        # Set signals
+        tools_gw.disconnect_signal('mapzone_manager_snapping', 'get_snapped_feature_id_xyCoordinates_mouse_moved')
+        tools_gw.connect_signal(self.canvas.xyCoordinates, partial(self._mouse_moved, layer),
+                                'mapzone_manager_snapping', 'get_snapped_feature_id_xyCoordinates_mouse_moved')
+
+        tools_gw.disconnect_signal('mapzone_manager_snapping', 'get_snapped_feature_id_ep_canvasClicked_get_id')
+        emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(emit_point)
+        tools_gw.connect_signal(emit_point.canvasClicked, partial(self._get_id, dialog, action, option, emit_point, child_type),
+                                'mapzone_manager_snapping', 'get_snapped_feature_id_ep_canvasClicked_get_id')
+
+
+    def _mouse_moved(self, layer, point):
+        """ Mouse motion detection """
+
+        # Set active layer
+        self.iface.setActiveLayer(layer)
+        layer_name = tools_qgis.get_layer_source_table_name(layer)
+
+        # Get clicked point
+        self.vertex_marker.hide()
+        event_point = self.snapper_manager.get_event_point(point=point)
+
+        # Snapping
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if result.isValid():
+            layer = self.snapper_manager.get_snapped_layer(result)
+            # Check feature
+            viewname = tools_qgis.get_layer_source_table_name(layer)
+            if viewname == layer_name:
+                self.snapper_manager.add_marker(result, self.vertex_marker)
+
+
+    def _get_id(self, dialog, action, option, emit_point, child_type, point, event):
+        """ Get selected attribute from snapped feature """
+
+        # @options{'key':['att to get from snapped feature', 'function to call']}
+        options = {'nodeParent': ['node_id', '_set_node_parent'], 'toArc': ['arc_id', '_set_to_arc'],
+                   'forceClosed': ['node_id', '_set_force_closed']}
+
+        if event == Qt.RightButton:
+            self._cancel_snapping_tool(dialog, action)
+            return
+
+        try:
+            # Refresh all layers to avoid selecting old deleted features
+            global_vars.canvas.refreshAllLayers()
+            # Get coordinates
+            event_point = self.snapper_manager.get_event_point(point=point)
+            # Snapping
+            result = self.snapper_manager.snap_to_current_layer(event_point)
+            if not result.isValid():
+                return
+            # Get the point. Leave selection
+            snapped_feat = self.snapper_manager.get_snapped_feature(result)
+            feat_id = snapped_feat.attribute(f'{options[option][0]}')
+            getattr(self, options[option][1])(snapped_feat, feat_id, child_type)
+        except Exception as e:
+            tools_qgis.show_warning(f"Exception in info (def _get_id)", parameter=e)
+        finally:
+            self.snapper_manager.recover_snapping_options()
+            self._cancel_snapping_tool(dialog, action)
+
+
+    def _set_node_parent(self, snapped_feat, feat_id, child_type):
+        """
+        Function called in def _get_id(self, dialog, action, option, point, event):
+            getattr(self, options[option][1])(feat_id, child_type)
+
+            :param feat_id: Id of the snapped feature
+        """
+
+        self.node_parent = (snapped_feat, feat_id)
+
+        tools_qt.set_widget_text(self.config_dlg, 'txt_nodeParent', f"{feat_id}")
+        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_snapping_toArc, True)
+
+
+    def _set_to_arc(self, snapped_feat, feat_id, child_type):
+        """
+        Function called in def _get_id(self, dialog, action, option, point, event):
+            getattr(self, options[option][1])(feat_id, child_type)
+
+            :param feat_id: Id of the snapped feature
+        """
+
+        node_parent, node_parent_id = self.node_parent
+        dma_id = node_parent.attribute("dma_id")
+        presszone_id = node_parent.attribute("presszone_id")
+        sector_id = node_parent.attribute("sector_id")
+        dqa_id = node_parent.attribute("dqa_id")
+        if dqa_id == -1:
+            dqa_id = "null"
+        child_type = node_parent.attribute("node_type")
+
+        feature = f'"featureType":"{child_type}", "id":"{node_parent_id}"'
+        extras = (f'"arcId":"{feat_id}", "dmaId":"{dma_id}", "presszoneId":"{presszone_id}", "sectorId":"{sector_id}", '
+                  f'"dqaId":"{dqa_id}"')
+        body = tools_gw.create_body(feature=feature, extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_settoarc', body)
+        if json_result is None:
+            return
+
+        if 'status' in json_result and json_result['status'] == 'Accepted':
+            if json_result['message']:
+                level = 1
+                if 'level' in json_result['message']:
+                    level = int(json_result['message']['level'])
+                tools_qgis.show_message(json_result['message']['text'], level)
+
+            # Set variable, set widget text and enable add button
+            self.to_arc = (snapped_feat, feat_id)
+            tools_qt.set_widget_text(self.config_dlg, 'txt_toArc', f"{feat_id}")
+            tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_nodeParent, True)
+
+
+    def _cancel_snapping_tool(self, dialog, action):
+
+        tools_qgis.disconnect_snapping(False, None, self.vertex_marker)
+        tools_gw.disconnect_signal('mapzone_manager_snapping')
+        dialog.blockSignals(False)
+        action.setChecked(False)
+        # self.signal_activate.emit()
+
+    # endregion
 
     # endregion

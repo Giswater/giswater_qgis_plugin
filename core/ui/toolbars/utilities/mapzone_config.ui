@@ -30,14 +30,14 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_7">
+      <widget class="QPushButton" name="btn_accept">
        <property name="text">
         <string>OK</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_8">
+      <widget class="QPushButton" name="btn_cancel">
        <property name="text">
         <string>Cancel</string>
        </property>
@@ -55,10 +55,10 @@
       </widget>
      </item>
      <item row="3" column="2" colspan="2">
-      <widget class="QLineEdit" name="lineEdit_3"/>
+      <widget class="QLineEdit" name="txt_forceClosed"/>
      </item>
      <item row="1" column="1">
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="btn_snapping_toArc">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -71,10 +71,10 @@
       </widget>
      </item>
      <item row="0" column="2" colspan="2">
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="txt_nodeParent"/>
      </item>
      <item row="1" column="2" colspan="2">
-      <widget class="QLineEdit" name="lineEdit_2"/>
+      <widget class="QLineEdit" name="txt_toArc"/>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_2">
@@ -84,7 +84,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="btn_snapping_nodeParent">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -104,14 +104,14 @@
       </widget>
      </item>
      <item row="2" column="3">
-      <widget class="QPushButton" name="pushButton_4">
+      <widget class="QPushButton" name="btn_add_nodeParent">
        <property name="text">
         <string>ADD</string>
        </property>
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QPushButton" name="pushButton_3">
+      <widget class="QPushButton" name="btn_snapping_forceClosed">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -124,7 +124,7 @@
       </widget>
      </item>
      <item row="4" column="3">
-      <widget class="QPushButton" name="pushButton_5">
+      <widget class="QPushButton" name="btn_add_forceClosed">
        <property name="text">
         <string>ADD</string>
        </property>
@@ -157,7 +157,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_6">
+        <widget class="QPushButton" name="btn_clear_preview">
          <property name="text">
           <string>Clear Preview</string>
          </property>
@@ -166,12 +166,12 @@
       </layout>
      </item>
      <item row="1" column="0">
-      <widget class="QTextEdit" name="textEdit"/>
+      <widget class="QTextEdit" name="txt_preview"/>
      </item>
     </layout>
    </item>
    <item row="0" column="3" rowspan="9">
-    <widget class="QTextEdit" name="textEdit_2">
+    <widget class="QTextEdit" name="txt_infolog">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
        <horstretch>0</horstretch>
