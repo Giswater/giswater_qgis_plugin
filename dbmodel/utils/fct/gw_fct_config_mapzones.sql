@@ -7,12 +7,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3270
 
-CREATE OR REPLACE FUNCTION ws_sample36.gw_fct_config_mapzones(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_config_mapzones(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
- SELECT ws_sample36,gw_fct_config_mapzones($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, 
+ SELECT SCHEMA_NAME,gw_fct_config_mapzones($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, 
  "parameters":{"configZone":"EXPL", "action":"PREVIEW", "nodeParent":, "toArc":}}}$$);
 */
 DECLARE 
@@ -39,7 +39,7 @@ v_status text;
 v_message text;
 BEGIN
 
-  SET search_path = "ws_sample36", public;
+  SET search_path = "SCHEMA_NAME", public;
 
   -- select version
   SELECT giswater, project_type INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
