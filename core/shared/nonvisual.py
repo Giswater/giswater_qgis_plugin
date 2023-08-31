@@ -125,7 +125,10 @@ class GwNonVisual:
         chk_active_visible, btn_print_visible = visibility_settings.get(tab_name, default_visibility)
 
         self.manager_dlg.chk_active.setVisible(chk_active_visible)
-        self.manager_dlg.btn_print.setVisible(btn_print_visible)
+        if btn_print_visible and global_vars.project_type == 'ud':
+            self.manager_dlg.btn_print.setVisible(btn_print_visible)
+        else:
+            self.manager_dlg.btn_print.setVisible(False)
 
 
     def _get_nonvisual_object(self, tbl_view, function_name):
