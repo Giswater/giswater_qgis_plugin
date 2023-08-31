@@ -37,6 +37,7 @@ class GwMapzoneManager:
 
         self.snapper_manager = GwSnapManager(self.iface)
         self.snapper_manager.set_snapping_layers()
+        self.vertex_marker = self.snapper_manager.vertex_marker
 
         self.mapzone_mng_dlg = None
 
@@ -233,7 +234,7 @@ class GwMapzoneManager:
         # Dialog buttons
         self.config_dlg.btn_accept.clicked.connect(partial(self._accept_config, self.config_dlg))
         self.config_dlg.btn_cancel.clicked.connect(self.config_dlg.reject)
-        self.config_dlg.finished.connect(partial(tools_gw.close_dialog, self.config_dlg, True))
+        self.config_dlg.finished.connect(partial(self._config_dlg_finished, self.config_dlg))
 
         # Enable/disable certain widgets
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_snapping_nodeParent, True)
@@ -248,21 +249,30 @@ class GwMapzoneManager:
         # Open dialog
         tools_gw.open_dialog(self.config_dlg, 'mapzone_config')
 
+
+    def _config_dlg_finished(self, dialog):
+
+        self._cancel_snapping_tool(dialog, None)
+        self.iface.actionPan().trigger()
+        tools_gw.close_dialog(dialog)
+
+
     def _reset_config_vars(self, mode=0):
         """
         Reset config variables
 
-            :param mode: which variables to reset {0: all, 1: nodeParent & toArc, 2: only forceClosed}
+            :param mode: which variables to reset {0: all, 1: nodeParent (& toArc), 2: toArc, 3: forceClosed}
         """
 
         if mode in (0, 1):
             self.node_parent = None
             tools_qt.set_widget_text(self.config_dlg, 'txt_nodeParent', '')
-            self.to_arc_list = set()
-            tools_qt.set_widget_text(self.config_dlg, 'txt_toArc', '')
             tools_qt.set_widget_enabled(self.config_dlg, 'btn_snapping_toArc', False)
             tools_qt.set_widget_enabled(self.config_dlg, 'btn_add_nodeParent', False)
-        if mode in (0, 2):
+        if mode in (0, 1, 2):
+            self.to_arc_list = set()
+            tools_qt.set_widget_text(self.config_dlg, 'txt_toArc', '')
+        if mode in (0, 3):
             self.force_closed_list = set()
             tools_qt.set_widget_text(self.config_dlg, 'txt_forceClosed', '')
             tools_qt.set_widget_enabled(self.config_dlg, 'btn_add_forceClosed', False)
@@ -274,13 +284,6 @@ class GwMapzoneManager:
         if not layer:
             action.setChecked(False)
             return
-        # if widget_name is not None:
-        #     widget = dialog.findChild(QWidget, widget_name)
-        #     if widget is None:
-        #         action.setChecked(False)
-        #         return
-        # Block the signals of the dialog so that the key ESC does not close it
-        dialog.blockSignals(True)
 
         self.vertex_marker = self.snapper_manager.vertex_marker
 
@@ -371,6 +374,8 @@ class GwMapzoneManager:
         tools_qt.set_widget_text(self.config_dlg, 'txt_nodeParent', f"{feat_id}")
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_snapping_toArc, True)
 
+        self._reset_config_vars(2)
+
     def _set_to_arc(self, snapped_feat, feat_id, child_type):
         """
         Function called in def _get_id(self, dialog, action, option, point, event):
@@ -458,7 +463,7 @@ class GwMapzoneManager:
                 tools_qt.set_widget_text(dialog, 'txt_preview', json.dumps(preview))
 
             self._cancel_snapping_tool(dialog, dialog.btn_add_forceClosed)
-            self._reset_config_vars(2)
+            self._reset_config_vars(3)
 
     def _clear_preview(self, dialog):
         """ Set preview textbox to '' """
@@ -496,7 +501,8 @@ class GwMapzoneManager:
         tools_qgis.disconnect_snapping(False, None, self.vertex_marker)
         tools_gw.disconnect_signal('mapzone_manager_snapping')
         dialog.blockSignals(False)
-        action.setChecked(False)
+        if action:
+            action.setChecked(False)
         # self.signal_activate.emit()
 
     # endregion
