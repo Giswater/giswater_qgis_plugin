@@ -32,3 +32,6 @@ VALUES(3242, 'It''s not possible to configure this node as mapzone header, cause
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source")
 VALUES(3244, 'It''s not possible to use selected arcs. They are not connected to node parent', 'Select different arcs.', 2, true, 'utils', 'core');
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source") 
+VALUES(3246, 'The inserted streetname value doesn''t exist on ext_streetaxis table', 'Please insert an existing one', 2, true, 'utils', 'core') ON CONFLICT (id) DO NOTHING;
