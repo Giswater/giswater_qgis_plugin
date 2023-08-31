@@ -77,6 +77,7 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.btn_update.clicked.connect(partial(self._manage_update))
         self.mapzone_mng_dlg.btn_delete.clicked.connect(partial(self._manage_delete))
         self.mapzone_mng_dlg.main_tab.currentChanged.connect(partial(self._manage_current_changed))
+        self.mapzone_mng_dlg.btn_cancel.clicked.connect(self.mapzone_mng_dlg.reject)
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.close_dialog, self.mapzone_mng_dlg, True))
 
         self._manage_current_changed()
