@@ -210,10 +210,13 @@ class GwMapzoneManager:
 
         # Connect signals
         self.child_type = None
+        # nodeParent
         self.config_dlg.btn_snapping_nodeParent.clicked.connect(
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_nodeParent,
                     'v_edit_node', 'nodeParent', None,
                     self.child_type))
+        self.config_dlg.txt_nodeParent.textEdited.connect(partial(self._txt_node_parent_finished))
+        # toArc
         self.config_dlg.btn_snapping_toArc.clicked.connect(
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_toArc, 'v_edit_arc',
                     'toArc', None,
@@ -353,7 +356,7 @@ class GwMapzoneManager:
             # Get the point. Leave selection
             snapped_feat = self.snapper_manager.get_snapped_feature(result)
             feat_id = snapped_feat.attribute(f'{options[option][0]}')
-            getattr(self, options[option][1])(snapped_feat, feat_id, child_type)
+            getattr(self, options[option][1])(feat_id)
         except Exception as e:
             tools_qgis.show_warning(f"Exception in info (def _get_id)", parameter=e)
         finally:
@@ -361,25 +364,31 @@ class GwMapzoneManager:
             if option == 'nodeParent':
                 self._cancel_snapping_tool(dialog, action)
 
-    def _set_node_parent(self, snapped_feat, feat_id, child_type):
+
+    def _txt_node_parent_finished(self, text):
+        self._set_node_parent(text, False)
+
+
+    def _set_node_parent(self, feat_id, set_text=True):
         """
         Function called in def _get_id(self, dialog, action, option, point, event):
-            getattr(self, options[option][1])(feat_id, child_type)
+            getattr(self, options[option][1])(feat_id)
 
             :param feat_id: Id of the snapped feature
         """
 
-        self.node_parent = (snapped_feat, feat_id)
+        self.node_parent = feat_id
 
-        tools_qt.set_widget_text(self.config_dlg, 'txt_nodeParent', f"{feat_id}")
-        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_snapping_toArc, True)
+        if set_text:
+            tools_qt.set_widget_text(self.config_dlg, 'txt_nodeParent', f"{feat_id}")
+        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_snapping_toArc, bool(feat_id))
 
-        self._reset_config_vars(2)
+        self._reset_config_vars(2 if bool(feat_id) else 1)
 
-    def _set_to_arc(self, snapped_feat, feat_id, child_type):
+    def _set_to_arc(self, feat_id):
         """
         Function called in def _get_id(self, dialog, action, option, point, event):
-            getattr(self, options[option][1])(feat_id, child_type)
+            getattr(self, options[option][1])(feat_id)
 
             :param feat_id: Id of the snapped feature
         """
@@ -390,10 +399,10 @@ class GwMapzoneManager:
         tools_qt.set_widget_text(self.config_dlg, 'txt_toArc', f"{self.to_arc_list}")
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_nodeParent, True)
 
-    def _set_force_closed(self, snapped_feat, feat_id, child_type):
+    def _set_force_closed(self, feat_id):
         """
         Function called in def _get_id(self, dialog, action, option, point, event):
-            getattr(self, options[option][1])(feat_id, child_type)
+            getattr(self, options[option][1])(feat_id)
 
             :param feat_id: Id of the snapped feature
         """
@@ -407,7 +416,7 @@ class GwMapzoneManager:
     def _add_node_parent(self, dialog):
         """ ADD button for nodeParent """
 
-        node_parent_feat, node_parent_id = self.node_parent
+        node_parent_id = self.node_parent
         to_arc_list = json.dumps(list(self.to_arc_list))
         preview = tools_qt.get_text(dialog, 'txt_preview')
 
