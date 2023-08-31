@@ -219,29 +219,68 @@ VALUES (3268, 'Set initlevel values from executed simulation', '{"featureType":[
 null, true, '{4}') ON CONFLICT (id) DO NOTHING;
 
 UPDATE config_form_fields SET layoutname = 'lyt_data_1' where formname = 'v_edit_sector';
+UPDATE config_form_fields SET layoutorder =1 WHERE  formname = 'v_edit_sector' AND columnname = 'sector_id';
+UPDATE config_form_fields SET layoutorder =2 WHERE  formname = 'v_edit_sector' AND columnname = 'name';
+UPDATE config_form_fields SET layoutorder =3 WHERE  formname = 'v_edit_sector' AND columnname = 'macrosector_id';
+UPDATE config_form_fields SET layoutorder =4 WHERE  formname = 'v_edit_sector' AND columnname = 'descript';
+UPDATE config_form_fields SET layoutorder =5 WHERE  formname = 'v_edit_sector' AND columnname = 'undelete';
+UPDATE config_form_fields SET layoutorder =6 WHERE  formname = 'v_edit_sector' AND columnname = 'graphconfig';
+UPDATE config_form_fields SET layoutorder =7 WHERE  formname = 'v_edit_sector' AND columnname = 'stylesheet';
+UPDATE config_form_fields SET layoutorder =8 WHERE  formname = 'v_edit_sector' AND columnname = 'active';
+UPDATE config_form_fields SET layoutorder =9 WHERE  formname = 'v_edit_sector' AND columnname = 'parent_id';
+UPDATE config_form_fields SET layoutorder =10 WHERE  formname = 'v_edit_sector' AND columnname = 'pattern_id';
 
-UPDATE config_form_fields SET layoutorder = attnum 
-FROM   pg_attribute
-WHERE  attrelid = 'SCHEMA_NAME.v_edit_sector'::regclass AND formname = 'v_edit_sector'
-and columnname = attname;
-
+INSERT INTO config_form_fields(
+formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, 
+	ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+	dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+SELECT 'v_edit_presszone', formtype, tabname, columnname, layoutname, 2, datatype, widgettype, label, tooltip, placeholder, 
+	ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+	dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
+	from config_form_fields 
+	where formname ='v_edit_dma' and columnname = 'name';
 UPDATE config_form_fields SET layoutname = 'lyt_data_1' where formname = 'v_edit_dma';
 
-UPDATE config_form_fields SET layoutorder = attnum 
-FROM   pg_attribute
-WHERE  attrelid = 'SCHEMA_NAME.v_edit_dma'::regclass AND formname = 'v_edit_dma'
-and columnname = attname;
+UPDATE config_form_fields SET layoutorder =1 WHERE  formname = 'v_edit_dma' AND columnname = 'dma_id';
+UPDATE config_form_fields SET layoutorder =2 WHERE  formname = 'v_edit_dma' AND columnname = 'name';
+UPDATE config_form_fields SET layoutorder =3 WHERE  formname = 'v_edit_dma' AND columnname = 'macrodma_id';
+UPDATE config_form_fields SET layoutorder =4 WHERE  formname = 'v_edit_dma' AND columnname = 'descript';
+UPDATE config_form_fields SET layoutorder =5 WHERE  formname = 'v_edit_dma' AND columnname = 'undelete';
+UPDATE config_form_fields SET layoutorder =6 WHERE  formname = 'v_edit_dma' AND columnname = 'expl_id';
+UPDATE config_form_fields SET layoutorder =7 WHERE  formname = 'v_edit_dma' AND columnname = 'pattern_id';
+UPDATE config_form_fields SET layoutorder =8 WHERE  formname = 'v_edit_dma' AND columnname = 'link';
+UPDATE config_form_fields SET layoutorder =9 WHERE  formname = 'v_edit_dma' AND columnname = 'minc';
+UPDATE config_form_fields SET layoutorder =10 WHERE  formname = 'v_edit_dma' AND columnname = 'maxc';
+UPDATE config_form_fields SET layoutorder =12 WHERE  formname = 'v_edit_dma' AND columnname = 'effc';
+UPDATE config_form_fields SET layoutorder =13 WHERE  formname = 'v_edit_dma' AND columnname = 'graphconfig';
+UPDATE config_form_fields SET layoutorder =14 WHERE  formname = 'v_edit_dma' AND columnname = 'stylesheet';
+UPDATE config_form_fields SET layoutorder =15 WHERE  formname = 'v_edit_dma' AND columnname = 'active';
+UPDATE config_form_fields SET layoutorder =16 WHERE  formname = 'v_edit_dma' AND columnname = 'avg_press';
 
 UPDATE config_form_fields SET layoutname = 'lyt_data_1' where formname = 'v_edit_presszone';
+UPDATE config_form_fields SET layoutorder =1 WHERE  formname = 'v_edit_presszone' AND columnname = 'presszone_id';
+UPDATE config_form_fields SET layoutorder =2 WHERE  formname = 'v_edit_presszone' AND columnname = 'name';
+UPDATE config_form_fields SET layoutorder =3 WHERE  formname = 'v_edit_presszone' AND columnname = 'expl_id';
+UPDATE config_form_fields SET layoutorder =4 WHERE  formname = 'v_edit_presszone' AND columnname = 'graphconfig';
+UPDATE config_form_fields SET layoutorder =5 WHERE  formname = 'v_edit_presszone' AND columnname = 'head';
+UPDATE config_form_fields SET layoutorder =6 WHERE  formname = 'v_edit_presszone' AND columnname = 'stylesheet';
+UPDATE config_form_fields SET layoutorder =7 WHERE  formname = 'v_edit_presszone' AND columnname = 'active';
+UPDATE config_form_fields SET layoutorder =8 WHERE  formname = 'v_edit_presszone' AND columnname = 'descript';
 
-UPDATE config_form_fields SET layoutorder = attnum 
-FROM   pg_attribute
-WHERE  attrelid = 'SCHEMA_NAME.v_edit_presszone'::regclass AND formname = 'v_edit_presszone'
-and columnname = attname;
 
 UPDATE config_form_fields SET layoutname = 'lyt_data_1' where formname = 'v_edit_dqa';
+UPDATE config_form_fields SET layoutorder =1 WHERE  formname = 'v_edit_dqa' AND columnname = 'dqa_id';
+UPDATE config_form_fields SET layoutorder =2 WHERE  formname = 'v_edit_dqa' AND columnname = 'name';
+UPDATE config_form_fields SET layoutorder =3 WHERE  formname = 'v_edit_dqa' AND columnname = 'expl_id';
+UPDATE config_form_fields SET layoutorder =4 WHERE  formname = 'v_edit_dqa' AND columnname = 'macrodqa_id';
+UPDATE config_form_fields SET layoutorder =5 WHERE  formname = 'v_edit_dqa' AND columnname = 'descript';
+UPDATE config_form_fields SET layoutorder =6 WHERE  formname = 'v_edit_dqa' AND columnname = 'undelete';
+UPDATE config_form_fields SET layoutorder =7 WHERE  formname = 'v_edit_dqa' AND columnname = 'pattern_id';
+UPDATE config_form_fields SET layoutorder =8 WHERE  formname = 'v_edit_dqa' AND columnname = 'dqa_type';
+UPDATE config_form_fields SET layoutorder =9 WHERE  formname = 'v_edit_dqa' AND columnname = 'link';
+UPDATE config_form_fields SET layoutorder =10 WHERE  formname = 'v_edit_dqa' AND columnname = 'graphconfig';
+UPDATE config_form_fields SET layoutorder =11 WHERE  formname = 'v_edit_dqa' AND columnname = 'stylesheet';
+UPDATE config_form_fields SET layoutorder =12 WHERE  formname = 'v_edit_dqa' AND columnname = 'active';
 
-UPDATE config_form_fields SET layoutorder = attnum 
-FROM   pg_attribute
-WHERE  attrelid = 'SCHEMA_NAME.v_edit_dqa'::regclass AND formname = 'v_edit_dqa'
-and columnname = attname;
+INSERT INTO sys_table(id, descript, sys_role, source)
+VALUES ('v_ui_plan_netscenario', 'Table to show netscenario in qgis ui', 'role_master', 'core');

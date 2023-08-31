@@ -399,3 +399,17 @@ CREATE OR REPLACE VIEW v_edit_minsector AS
   WHERE m.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"minsector", "column":"sector_id"}}$$);
+
+
+CREATE OR REPLACE VIEW v_ui_plan_netscenario AS
+ SELECT DISTINCT ON (c.netscenario_id) c.netscenario_id,
+    c.name,
+    c.descript,
+    c.netscenario_type,
+    c.parent_id,
+    c.expl_id,
+    c.active,
+    c.log
+   FROM plan_netscenario c,
+    selector_expl s
+  WHERE s.expl_id = c.expl_id AND s.cur_user = CURRENT_USER::text OR c.expl_id IS NULL;
