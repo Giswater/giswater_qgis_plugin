@@ -568,7 +568,6 @@ class GwToolBoxButton(GwAction):
             except RuntimeError:
                 pass
 
-        self.dlg_functions.btn_run.setEnabled(False)
         self.dlg_functions.btn_cancel.show()
         self.dlg_functions.btn_close.hide()
         dialog.progressBar.setRange(0, 0)
