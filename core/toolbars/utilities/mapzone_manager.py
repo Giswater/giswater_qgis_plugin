@@ -11,10 +11,11 @@ from functools import partial
 from sip import isdeleted
 
 from qgis.PyQt.QtCore import Qt, QPoint
-from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel
+from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget
 from qgis.PyQt.QtSql import QSqlTableModel
 
 from qgis.gui import QgsMapToolEmitPoint
+from qgis.core import QgsProject
 
 from ...ui.ui_manager import GwMapzoneManagerUi, GwMapzoneConfigUi, GwInfoGenericUi
 from ...utils.snap_manager import GwSnapManager
@@ -54,6 +55,8 @@ class GwMapzoneManager:
 
         default_tab_idx = 0
         tabs = ['sector', 'dma', 'presszone', 'dqa']
+        if global_vars.project_type == 'ud':
+            tabs = ['drainzone']
         for tab in tabs:
             view = f'v_edit_{tab}'
             qtableview = QTableView()
@@ -520,10 +523,12 @@ class GwMapzoneManager:
         # Refresh tableview
         self._manage_current_changed()
 
+
     def _manage_create(self):
 
         tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
         tablename = tableview.objectName().replace('tbl_', '')
+        field_id = tableview.model().headerData(0, Qt.Horizontal)
 
         # Execute getinfofromid
         feature = f'"tableName":"{tablename}"'
@@ -533,69 +538,15 @@ class GwMapzoneManager:
             return
         result = json_result
 
-        # Build dlg
-        self.add_dlg = GwInfoGenericUi()
-        tools_gw.load_settings(self.add_dlg)
-        self.my_json_add = {}
-        tools_gw.build_dialog_info(self.add_dlg, result, my_json=self.my_json_add)
+        dlg_title = f"New {tablename.split('_')[-1].capitalize()}"
 
-        # # Populate node_id/feature_id
-        # tools_qt.set_widget_text(self.add_dlg, f'tab_none_{info.feature_type}_id', feature_id)
-        # tools_qt.set_widget_text(self.add_dlg, 'tab_none_feature_id', feature_id)
-        layout = self.add_dlg.findChild(QGridLayout, 'lyt_main_1')
-        # tools_qt.set_selected_item(self.add_dlg, 'tab_none_feature_type', f"{info.feature_type.upper()}")
-        # tools_qt.set_widget_enabled(self.add_dlg, 'tab_none_feature_type', False)
-
-        # cmb_nodarc_id = self.add_dlg.findChild(QComboBox, 'tab_none_nodarc_id')
-        # aux_view = view.replace("dscenario_", "")
-        # if cmb_nodarc_id is not None:
-        #     sql = (f"SELECT nodarc_id as id, nodarc_id as idval FROM {aux_view}"
-        #            f" WHERE {info.feature_type}_id = '{feature_id}'")
-        #     rows = tools_db.get_rows(sql)
-        #     tools_qt.fill_combo_values(cmb_nodarc_id, rows)
-        # cmb_order_id = self.add_dlg.findChild(QComboBox, 'tab_none_order_id')
-        # if cmb_order_id is not None:
-        #     sql = (f"SELECT order_id as id, order_id::text as idval FROM {aux_view}"
-        #            f" WHERE {info.feature_type}_id = '{feature_id}'")
-        #     rows = tools_db.get_rows(sql)
-        #     tools_qt.fill_combo_values(cmb_order_id, rows, 1)
-
-        # Get every widget in the layout
-        widgets = []
-        for row in range(layout.rowCount()):
-            for column in range(layout.columnCount()):
-                item = layout.itemAtPosition(row, column)
-                if item is not None:
-                    widget = item.widget()
-                    if widget is not None and type(widget) != QLabel:
-                        widgets.append(widget)
-        # Get all widget's values
-        for widget in widgets:
-            tools_gw.get_values(self.add_dlg, widget, self.my_json_add, ignore_editability=True)
-        # Remove Nones from self.my_json_add
-        keys_to_remove = []
-        for key, value in self.my_json_add.items():
-            if value is None:
-                keys_to_remove.append(key)
-        for key in keys_to_remove:
-            del self.my_json_add[key]
-
-        # Signals
-        self.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.add_dlg))
-        self.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.add_dlg))
-        # self.add_dlg.dlg_closed.connect(partial(refresh_epa_tbl, tbl, dlg, **kwargs))
-        # self.add_dlg.btn_accept.clicked.connect(
-        #     partial(accept_add_dlg, self.add_dlg, tablename, pkey, feature_id, self.my_json_add, result, info))
-
-        # Open dlg
-        dlg_title = f"New mapzone - {tablename}"
-        tools_gw.open_dialog(self.add_dlg, dlg_name='info_generic', title=dlg_title)
+        self._build_generic_info(dlg_title, result, tablename, field_id, force_action="INSERT")
 
 
     def _manage_update(self):
         # Get selected row
         tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
-        view = tableview.objectName().replace('tbl_', '')
+        tablename = tableview.objectName().replace('tbl_', '')
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -606,6 +557,19 @@ class GwMapzoneManager:
         index = tableview.selectionModel().currentIndex()
         mapzone_id = index.sibling(index.row(), 0).data()
         field_id = tableview.model().headerData(0, Qt.Horizontal)
+
+        # Execute getinfofromid
+        feature = f'"tableName":"{tablename}", "id": "{mapzone_id}"'
+        body = tools_gw.create_body(feature=feature)
+        json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
+        if json_result is None or json_result['status'] == 'Failed':
+            return
+        result = json_result
+
+        dlg_title = f"Update {tablename.split('_')[-1].capitalize()} ({mapzone_id})"
+
+        self._build_generic_info(dlg_title, result, tablename, field_id, force_action="UPDATE")
+
 
     def _manage_delete(self):
         # Get selected row
@@ -631,3 +595,115 @@ class GwMapzoneManager:
 
             # Refresh tableview
             self._manage_current_changed()
+
+
+    def _build_generic_info(self, dlg_title, result, tablename, field_id, force_action=None):
+        # Build dlg
+        self.add_dlg = GwInfoGenericUi()
+        tools_gw.load_settings(self.add_dlg)
+        self.my_json_add = {}
+        tools_gw.build_dialog_info(self.add_dlg, result, my_json=self.my_json_add)
+        # # Populate node_id/feature_id
+        # tools_qt.set_widget_text(self.add_dlg, f'tab_none_{info.feature_type}_id', feature_id)
+        # tools_qt.set_widget_text(self.add_dlg, 'tab_none_feature_id', feature_id)
+        layout = self.add_dlg.findChild(QGridLayout, 'lyt_main_1')
+        # Disable widgets if updating
+        if force_action == "UPDATE":
+            tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_{field_id}', False)  # sector_id/dma_id/...
+        # tools_qt.set_selected_item(self.add_dlg, 'tab_none_feature_type', f"{info.feature_type.upper()}")
+        # tools_qt.set_widget_enabled(self.add_dlg, 'tab_none_feature_type', False)
+        # cmb_nodarc_id = self.add_dlg.findChild(QComboBox, 'tab_none_nodarc_id')
+        # aux_view = view.replace("dscenario_", "")
+        # if cmb_nodarc_id is not None:
+        #     sql = (f"SELECT nodarc_id as id, nodarc_id as idval FROM {aux_view}"
+        #            f" WHERE {info.feature_type}_id = '{feature_id}'")
+        #     rows = tools_db.get_rows(sql)
+        #     tools_qt.fill_combo_values(cmb_nodarc_id, rows)
+        # cmb_order_id = self.add_dlg.findChild(QComboBox, 'tab_none_order_id')
+        # if cmb_order_id is not None:
+        #     sql = (f"SELECT order_id as id, order_id::text as idval FROM {aux_view}"
+        #            f" WHERE {info.feature_type}_id = '{feature_id}'")
+        #     rows = tools_db.get_rows(sql)
+        #     tools_qt.fill_combo_values(cmb_order_id, rows, 1)
+        # Get every widget in the layout
+        widgets = []
+        for row in range(layout.rowCount()):
+            for column in range(layout.columnCount()):
+                item = layout.itemAtPosition(row, column)
+                if item is not None:
+                    widget = item.widget()
+                    if widget is not None and type(widget) != QLabel:
+                        widgets.append(widget)
+        # Get all widget's values
+        for widget in widgets:
+            tools_gw.get_values(self.add_dlg, widget, self.my_json_add, ignore_editability=True)
+        # Remove Nones from self.my_json_add
+        keys_to_remove = []
+        for key, value in self.my_json_add.items():
+            if value is None:
+                keys_to_remove.append(key)
+        for key in keys_to_remove:
+            del self.my_json_add[key]
+        # Signals
+        self.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.add_dlg))
+        self.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.add_dlg))
+        self.add_dlg.dlg_closed.connect(self._manage_current_changed)
+        self.add_dlg.btn_accept.clicked.connect(
+            partial(self._accept_add_dlg, self.add_dlg, tablename, field_id, None, self.my_json_add, result, force_action))
+        # Open dlg
+        tools_gw.open_dialog(self.add_dlg, dlg_name='info_generic', title=dlg_title)
+
+
+    def _accept_add_dlg(self, dialog, tablename, pkey, feature_id, my_json, complet_result, force_action):
+        if not my_json:
+            return
+
+        list_mandatory = []
+        list_filter = []
+
+        for field in complet_result['body']['data']['fields']:
+            if field['ismandatory']:
+                widget = dialog.findChild(QWidget, field['widgetname'])
+                if not widget:
+                    continue
+                widget.setStyleSheet(None)
+                value = tools_qt.get_text(dialog, widget)
+                if value in ('null', None, ''):
+                    widget.setStyleSheet("border: 1px solid red")
+                    list_mandatory.append(field['widgetname'])
+                else:
+                    elem = [field['columnname'], value]
+                    list_filter.append(elem)
+
+        if list_mandatory:
+            msg = "Some mandatory values are missing. Please check the widgets marked in red."
+            tools_qgis.show_warning(msg, dialog=dialog)
+            tools_qt.set_action_checked("actionEdit", True, dialog)
+            QgsProject.instance().blockSignals(False)
+            return False
+
+        fields = json.dumps(my_json)
+        id_val = ""
+        if pkey:
+            if not isinstance(pkey, list):
+                pkey = [pkey]
+            for pk in pkey:
+                widget_name = f"tab_none_{pk}"
+                value = tools_qt.get_widget_value(dialog, widget_name)
+                id_val += f"{value}, "
+            id_val = id_val[:-2]
+        # if id_val in (None, '', 'None'):
+        #     id_val = feature_id
+
+        feature = f'"id":"{id_val}", '
+        feature += f'"tableName":"{tablename}"'
+        extras = f'"fields":{fields}'
+        if force_action:
+            extras += f', "force_action":"{force_action}"'
+        body = tools_gw.create_body(feature=feature, extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
+        if json_result and json_result.get('status') == 'Accepted':
+            tools_gw.close_dialog(dialog)
+            return
+
+        tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)

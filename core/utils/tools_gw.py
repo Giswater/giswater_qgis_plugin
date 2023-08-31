@@ -1655,7 +1655,7 @@ def add_checkbox(**kwargs):
     if connect_signal is not None and connect_signal is False:
         return widget
 
-    if 'widgetfunction' in field:
+    if field.get('widgetfunction'):
         if 'module' in field['widgetfunction']:
             module = globals()[field['widgetfunction']['module']]
         function_name = field['widgetfunction'].get('functionName')
