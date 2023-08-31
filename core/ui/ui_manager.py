@@ -273,6 +273,15 @@ FORM_CLASS = _get_ui_class('replace_arc.ui', 'plan')
 class GwReplaceArc(GwDialog, FORM_CLASS):
     pass
 
+FORM_CLASS = _get_ui_class('netscenario_manager.ui', 'plan')
+class GwNetscenarioManagerUi(GwDialog, FORM_CLASS):
+    pass
+    pass
+
+FORM_CLASS = _get_ui_class('netscenario.ui', 'plan')
+class GwNetscenarioUi(GwDialog, FORM_CLASS):
+    pass
+
 # endregion
 
 
