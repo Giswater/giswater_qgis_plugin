@@ -795,3 +795,59 @@ WHERE formname='v_edit_inp_dscenario_connec' AND formtype='form_feature' AND col
 UPDATE config_form_fields
 SET ismandatory=false
 WHERE formname='v_edit_inp_dscenario_connec' AND formtype='form_feature' AND columnname='custom_dint' AND tabname='tab_none';
+
+
+
+UPDATE config_form_fields SET layoutname = 'lyt_data_1' where formname = 'v_edit_sector';
+UPDATE config_form_fields SET layoutorder =1 WHERE  formname = 'v_edit_sector' AND columnname = 'sector_id';
+UPDATE config_form_fields SET layoutorder =2 WHERE  formname = 'v_edit_sector' AND columnname = 'name';
+UPDATE config_form_fields SET layoutorder =3 WHERE  formname = 'v_edit_sector' AND columnname = 'macrosector_id';
+UPDATE config_form_fields SET layoutorder =4 WHERE  formname = 'v_edit_sector' AND columnname = 'descript';
+UPDATE config_form_fields SET layoutorder =5 WHERE  formname = 'v_edit_sector' AND columnname = 'undelete';
+UPDATE config_form_fields SET layoutorder =6 WHERE  formname = 'v_edit_sector' AND columnname = 'graphconfig';
+UPDATE config_form_fields SET layoutorder =7 WHERE  formname = 'v_edit_sector' AND columnname = 'stylesheet';
+UPDATE config_form_fields SET layoutorder =8 WHERE  formname = 'v_edit_sector' AND columnname = 'active';
+UPDATE config_form_fields SET layoutorder =9 WHERE  formname = 'v_edit_sector' AND columnname = 'parent_id';
+UPDATE config_form_fields SET layoutorder =10 WHERE  formname = 'v_edit_sector' AND columnname = 'pattern_id';
+
+UPDATE config_form_fields SET layoutname = 'lyt_data_1' where formname = 'v_edit_dma';
+UPDATE config_form_fields SET layoutorder =1 WHERE  formname = 'v_edit_dma' AND columnname = 'dma_id';
+UPDATE config_form_fields SET layoutorder =2 WHERE  formname = 'v_edit_dma' AND columnname = 'name';
+UPDATE config_form_fields SET layoutorder =3 WHERE  formname = 'v_edit_dma' AND columnname = 'macrodma_id';
+UPDATE config_form_fields SET layoutorder =4 WHERE  formname = 'v_edit_dma' AND columnname = 'descript';
+UPDATE config_form_fields SET layoutorder =5 WHERE  formname = 'v_edit_dma' AND columnname = 'undelete';
+UPDATE config_form_fields SET layoutorder =6 WHERE  formname = 'v_edit_dma' AND columnname = 'expl_id';
+UPDATE config_form_fields SET layoutorder =7 WHERE  formname = 'v_edit_dma' AND columnname = 'pattern_id';
+UPDATE config_form_fields SET layoutorder =8 WHERE  formname = 'v_edit_dma' AND columnname = 'link';
+UPDATE config_form_fields SET layoutorder =9 WHERE  formname = 'v_edit_dma' AND columnname = 'minc';
+UPDATE config_form_fields SET layoutorder =10 WHERE  formname = 'v_edit_dma' AND columnname = 'maxc';
+UPDATE config_form_fields SET layoutorder =12 WHERE  formname = 'v_edit_dma' AND columnname = 'effc';
+UPDATE config_form_fields SET layoutorder =13 WHERE  formname = 'v_edit_dma' AND columnname = 'graphconfig';
+UPDATE config_form_fields SET layoutorder =14 WHERE  formname = 'v_edit_dma' AND columnname = 'stylesheet';
+UPDATE config_form_fields SET layoutorder =15 WHERE  formname = 'v_edit_dma' AND columnname = 'active';
+UPDATE config_form_fields SET layoutorder =16 WHERE  formname = 'v_edit_dma' AND columnname = 'avg_press';
+
+UPDATE config_form_fields SET layoutname = 'lyt_data_1' where formname = 'v_edit_presszone';
+UPDATE config_form_fields SET layoutorder =1 WHERE  formname = 'v_edit_presszone' AND columnname = 'presszone_id';
+UPDATE config_form_fields SET layoutorder =2 WHERE  formname = 'v_edit_presszone' AND columnname = 'name';
+UPDATE config_form_fields SET layoutorder =3 WHERE  formname = 'v_edit_presszone' AND columnname = 'expl_id';
+UPDATE config_form_fields SET layoutorder =4 WHERE  formname = 'v_edit_presszone' AND columnname = 'graphconfig';
+UPDATE config_form_fields SET layoutorder =5 WHERE  formname = 'v_edit_presszone' AND columnname = 'head';
+UPDATE config_form_fields SET layoutorder =6 WHERE  formname = 'v_edit_presszone' AND columnname = 'stylesheet';
+UPDATE config_form_fields SET layoutorder =7 WHERE  formname = 'v_edit_presszone' AND columnname = 'active';
+UPDATE config_form_fields SET layoutorder =8 WHERE  formname = 'v_edit_presszone' AND columnname = 'descript';
+
+
+UPDATE config_form_fields SET layoutname = 'lyt_data_1' where formname = 'v_edit_dqa';
+UPDATE config_form_fields SET layoutorder =1 WHERE  formname = 'v_edit_dqa' AND columnname = 'dqa_id';
+UPDATE config_form_fields SET layoutorder =2 WHERE  formname = 'v_edit_dqa' AND columnname = 'name';
+UPDATE config_form_fields SET layoutorder =3 WHERE  formname = 'v_edit_dqa' AND columnname = 'expl_id';
+UPDATE config_form_fields SET layoutorder =4 WHERE  formname = 'v_edit_dqa' AND columnname = 'macrodqa_id';
+UPDATE config_form_fields SET layoutorder =5 WHERE  formname = 'v_edit_dqa' AND columnname = 'descript';
+UPDATE config_form_fields SET layoutorder =6 WHERE  formname = 'v_edit_dqa' AND columnname = 'undelete';
+UPDATE config_form_fields SET layoutorder =7 WHERE  formname = 'v_edit_dqa' AND columnname = 'pattern_id';
+UPDATE config_form_fields SET layoutorder =8 WHERE  formname = 'v_edit_dqa' AND columnname = 'dqa_type';
+UPDATE config_form_fields SET layoutorder =9 WHERE  formname = 'v_edit_dqa' AND columnname = 'link';
+UPDATE config_form_fields SET layoutorder =10 WHERE  formname = 'v_edit_dqa' AND columnname = 'graphconfig';
+UPDATE config_form_fields SET layoutorder =11 WHERE  formname = 'v_edit_dqa' AND columnname = 'stylesheet';
+UPDATE config_form_fields SET layoutorder =12 WHERE  formname = 'v_edit_dqa' AND columnname = 'active';
