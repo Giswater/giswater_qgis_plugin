@@ -37,6 +37,7 @@ v_audit_result text;
 v_level integer;
 v_status text;
 v_message text;
+v_use_node json;
 BEGIN
 
   SET search_path = "SCHEMA_NAME", public;
@@ -61,7 +62,7 @@ BEGIN
   INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
   INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '');
 
-  IF v_action = 'PREVIEW' THEN 
+  IF v_action = 'ADD' THEN 
   	IF v_nodeparent IS NOT NULL THEN 
   		
 	  	IF v_nodeparent IN (SELECT node_id FROM node WHERE state > 0) THEN
@@ -104,10 +105,34 @@ BEGIN
 	  END IF;
 
 	 	IF v_forceclosed IS NOT NULL THEN
-	  	v_preview = jsonb_set( v_preview::jsonb, '{forceClosed}',(v_preview::jsonb -> 'forceClosed') ||v_forceclosed::jsonb);
+	 			EXECUTE 'SELECT json_agg(a::integer) FROM json_array_elements_text('''||v_forceclosed||'''::json) a WHERE a IN (SELECT node_id FROM node WHERE state > 0)'
+		   	into v_forceclosed;
+
+		   	IF v_forceclosed IS NOT NULL THEN
+		   		v_preview = jsonb_set( v_preview::jsonb, '{forceClosed}',(v_preview::jsonb -> 'forceClosed') || v_forceclosed::jsonb);
+		   	END IF;
 		END IF; 
 	  
-  	
+  ELSIF v_action = 'REMOVE' THEN
+  	IF v_nodeparent IS NOT NULL THEN
+	  	EXECUTE 'SELECT json_agg(a.data::json) FROM 
+			(SELECT json_array_elements_text(
+			json_extract_path('''||v_config||'''::json,''use'')) data)a
+			WHERE  json_extract_path_text(data ::json,''nodeParent'') != '||quote_literal(v_nodeparent)||''
+			into v_use_node;
+
+			v_preview = jsonb_set( v_config::jsonb, '{use}',(v_config::jsonb -> 'use') || v_use_node::jsonb);
+		END IF;
+
+		IF v_forceclosed IS NOT NULL THEN
+			EXECUTE 'SELECT json_agg(a.data::integer) FROM 
+			(SELECT json_array_elements_text(json_extract_path('''||v_config||'''::json,''forceClosed'')) data)a
+			WHERE  a.data != '''||v_forceclosed||''';'
+			into v_forceclosed;
+
+		  v_preview = jsonb_set( v_preview::jsonb, '{forceClosed}',(v_preview::jsonb -> 'forceClosed') || v_forceclosed::jsonb);
+		END IF; 
+		
   ELSIF v_action = 'UPDATE' AND v_config IS NOT NULL THEN
 	  IF v_zone = 'DMA' THEN 
 	  	v_id = 'dma_id';
