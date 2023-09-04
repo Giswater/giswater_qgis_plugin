@@ -691,6 +691,9 @@ BEGIN
 		v_querytext = 'UPDATE temp_t_connec SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||' FROM temp_t_arc a WHERE a.arc_id=temp_t_connec.arc_id';
 		EXECUTE v_querytext;
 
+		v_querytext = 'UPDATE temp_t_connec SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||' FROM temp_t_node a WHERE temp_t_connec.arc_id IS NULL AND a.node_id=temp_t_connec.pjoint_id';
+		EXECUTE v_querytext;
+
 		-- update link table
 		EXECUTE 'UPDATE temp_t_link SET '||quote_ident(v_field)||' = c.'||quote_ident(v_field)||' FROM temp_t_connec c WHERE c.connec_id=feature_id';
 		
