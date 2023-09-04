@@ -142,6 +142,20 @@
        </property>
       </widget>
      </item>
+     <item row="2" column="2">
+      <widget class="QPushButton" name="btn_remove_nodeParent">
+       <property name="text">
+        <string>REMOVE</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="2">
+      <widget class="QPushButton" name="btn_remove_forceClosed">
+       <property name="text">
+        <string>REMOVE</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item row="3" column="0" colspan="3">

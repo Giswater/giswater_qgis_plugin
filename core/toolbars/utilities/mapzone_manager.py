@@ -224,6 +224,9 @@ class GwMapzoneManager:
         self.config_dlg.btn_add_nodeParent.clicked.connect(
             partial(self._add_node_parent, self.config_dlg)
         )
+        self.config_dlg.btn_remove_nodeParent.clicked.connect(
+            partial(self._remove_node_parent, self.config_dlg)
+        )
         # Force closed
         self.config_dlg.btn_snapping_forceClosed.clicked.connect(
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_forceClosed,
@@ -231,6 +234,9 @@ class GwMapzoneManager:
                     self.child_type))
         self.config_dlg.btn_add_forceClosed.clicked.connect(
             partial(self._add_force_closed, self.config_dlg)
+        )
+        self.config_dlg.btn_remove_forceClosed.clicked.connect(
+            partial(self._remove_force_closed, self.config_dlg)
         )
         # Preview
         self.config_dlg.btn_clear_preview.clicked.connect(partial(self._clear_preview, self.config_dlg))
@@ -243,9 +249,11 @@ class GwMapzoneManager:
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_snapping_nodeParent, True)
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_snapping_toArc, False)
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_nodeParent, False)
+        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_nodeParent, False)
 
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_snapping_forceClosed, True)
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_forceClosed, False)
+        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_forceClosed, False)
 
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_clear_preview, True)
 
@@ -272,6 +280,7 @@ class GwMapzoneManager:
             tools_qt.set_widget_text(self.config_dlg, 'txt_nodeParent', '')
             tools_qt.set_widget_enabled(self.config_dlg, 'btn_snapping_toArc', False)
             tools_qt.set_widget_enabled(self.config_dlg, 'btn_add_nodeParent', False)
+            tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_nodeParent, False)
         if mode in (0, 1, 2):
             self.to_arc_list = set()
             tools_qt.set_widget_text(self.config_dlg, 'txt_toArc', '')
@@ -279,6 +288,7 @@ class GwMapzoneManager:
             self.force_closed_list = set()
             tools_qt.set_widget_text(self.config_dlg, 'txt_forceClosed', '')
             tools_qt.set_widget_enabled(self.config_dlg, 'btn_add_forceClosed', False)
+            tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_forceClosed, False)
 
     def get_snapped_feature_id(self, dialog, action, layer_name, option, widget_name, child_type):
         """ Snap feature and set a value into dialog """
@@ -382,6 +392,7 @@ class GwMapzoneManager:
         if set_text:
             tools_qt.set_widget_text(self.config_dlg, 'txt_nodeParent', f"{feat_id}")
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_snapping_toArc, bool(feat_id))
+        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_nodeParent, bool(feat_id))
 
         self._reset_config_vars(2 if bool(feat_id) else 1)
 
@@ -398,6 +409,7 @@ class GwMapzoneManager:
 
         tools_qt.set_widget_text(self.config_dlg, 'txt_toArc', f"{self.to_arc_list}")
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_nodeParent, True)
+        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_nodeParent, True)
 
     def _set_force_closed(self, feat_id):
         """
@@ -412,6 +424,7 @@ class GwMapzoneManager:
 
         tools_qt.set_widget_text(self.config_dlg, 'txt_forceClosed', f"{self.force_closed_list}")
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_forceClosed, True)
+        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_forceClosed, True)
 
     def _add_node_parent(self, dialog):
         """ ADD button for nodeParent """
@@ -420,7 +433,7 @@ class GwMapzoneManager:
         to_arc_list = json.dumps(list(self.to_arc_list))
         preview = tools_qt.get_text(dialog, 'txt_preview')
 
-        parameters = f'"action": "PREVIEW", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
+        parameters = f'"action": "ADD", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
                      f'"nodeParent": "{node_parent_id}", "toArc": {to_arc_list}'
         if preview:
             parameters += f', "config": {preview}'
@@ -444,13 +457,73 @@ class GwMapzoneManager:
             self._cancel_snapping_tool(dialog, dialog.btn_add_nodeParent)
             self._reset_config_vars(1)
 
+    def _remove_node_parent(self, dialog):
+        """ REMOVE button for nodeParent """
+
+        node_parent_id = self.node_parent
+        preview = tools_qt.get_text(dialog, 'txt_preview')
+
+        parameters = f'"action": "REMOVE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
+                     f'"nodeParent": "{node_parent_id}"'
+        if preview:
+            parameters += f', "config": {preview}'
+        extras = f'"parameters": {{{parameters}}}'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
+        if json_result is None:
+            return
+
+        if 'status' in json_result and json_result['status'] == 'Accepted':
+            if json_result['message']:
+                level = 1
+                if 'level' in json_result['message']:
+                    level = int(json_result['message']['level'])
+                tools_qgis.show_message(json_result['message']['text'], level, dialog=dialog)
+
+            preview = json_result['body']['data'].get('preview')
+            if preview:
+                tools_qt.set_widget_text(dialog, 'txt_preview', json.dumps(preview))
+
+            self._cancel_snapping_tool(dialog, dialog.btn_remove_nodeParent)
+            self._reset_config_vars(1)
+
     def _add_force_closed(self, dialog):
         """ ADD button for forceClosed """
 
         force_closed_list = json.dumps(list(self.force_closed_list))
         preview = tools_qt.get_text(dialog, 'txt_preview')
 
-        parameters = f'"action": "PREVIEW", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
+        parameters = f'"action": "ADD", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
+                     f'"forceClosed": {force_closed_list}'
+        if preview:
+            parameters += f', "config": {preview}'
+        extras = f'"parameters": {{{parameters}}}'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
+        if json_result is None:
+            return
+
+        if 'status' in json_result and json_result['status'] == 'Accepted':
+            if json_result['message']:
+                level = 1
+                if 'level' in json_result['message']:
+                    level = int(json_result['message']['level'])
+                tools_qgis.show_message(json_result['message']['text'], level, dialog=dialog)
+
+            preview = json_result['body']['data'].get('preview')
+            if preview:
+                tools_qt.set_widget_text(dialog, 'txt_preview', json.dumps(preview))
+
+            self._cancel_snapping_tool(dialog, dialog.btn_add_forceClosed)
+            self._reset_config_vars(3)
+
+    def _remove_force_closed(self, dialog):
+        """ ADD button for forceClosed """
+
+        force_closed_list = json.dumps(list(self.force_closed_list))
+        preview = tools_qt.get_text(dialog, 'txt_preview')
+
+        parameters = f'"action": "REMOVE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
                      f'"forceClosed": {force_closed_list}'
         if preview:
             parameters += f', "config": {preview}'
