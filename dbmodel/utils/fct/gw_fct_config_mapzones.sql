@@ -83,11 +83,13 @@ BEGIN
 				AND (node_1 ='||quote_literal(v_nodeparent)||' OR node_2 = '||quote_literal(v_nodeparent)||'))'
 		   	into v_toarc;
 				
-				IF v_toarc IS NULL THEN 
+				IF v_toarc IS NULL AND v_project_type = 'WS' THEN 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3244", "function":"3270","debug_msg": "'||v_nodeparent||'"}}$$);'  INTO v_audit_result;
-				ELSE
+				ELSIF v_project_type = 'WS' THEN
 					v_preview = concat('{"nodeParent":"',v_nodeparent,'", "toArc":',v_toarc,'}');
+				ELSIF v_project_type = 'UD' THEN 
+					v_preview = concat('{"nodeParent":"',v_nodeparent,'"}');
 				END IF;
 				
 				IF v_config is null then
@@ -106,8 +108,10 @@ BEGIN
 	  END IF;
 
 	 	IF v_forceclosed IS NOT NULL THEN
-	 			EXECUTE 'SELECT json_agg(a::integer) FROM json_array_elements_text('''||v_forceclosed||'''::json) a WHERE a IN (SELECT node_id FROM node WHERE state > 0)'
+	 			EXECUTE 'SELECT json_agg(a::integer) FROM json_array_elements_text('''||v_forceclosed||'''::json) a WHERE a IN (SELECT node_id FROM node WHERE state > 0) AND a NOT IN
+	 			(select json_array_elements_text('''||v_preview||'''::json -> ''forceClosed''))'
 		   	into v_forceclosed;
+
 
 		   	IF v_forceclosed IS NOT NULL THEN
 		   		v_preview = jsonb_set( v_preview::jsonb, '{forceClosed}',(v_preview::jsonb -> 'forceClosed') || v_forceclosed::jsonb);
