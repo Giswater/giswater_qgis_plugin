@@ -38,6 +38,7 @@ v_level integer;
 v_status text;
 v_message text;
 v_use_node json;
+v_use_forceclosed json;
 BEGIN
 
   SET search_path = "SCHEMA_NAME", public;
@@ -121,16 +122,22 @@ BEGIN
 			WHERE  json_extract_path_text(data ::json,''nodeParent'') != '||quote_literal(v_nodeparent)||''
 			into v_use_node;
 
-			v_preview = jsonb_set( v_config::jsonb, '{use}',(v_config::jsonb -> 'use') || v_use_node::jsonb);
+			v_preview = jsonb_set( v_config::jsonb, '{use}', v_use_node::jsonb);
+		
 		END IF;
 
 		IF v_forceclosed IS NOT NULL THEN
+		
+			select string_agg(quote_literal(a.elem)::text,', ') into v_forceclosed
+			from (SELECT json_array_elements_text( v_forceclosed::json)  as elem)a ;
+					
 			EXECUTE 'SELECT json_agg(a.data::integer) FROM 
 			(SELECT json_array_elements_text(json_extract_path('''||v_config||'''::json,''forceClosed'')) data)a
-			WHERE  a.data != '''||v_forceclosed||''';'
-			into v_forceclosed;
+			WHERE  a.data not in ('||v_forceclosed||')'
+			into v_use_forceclosed;
 
-		  v_preview = jsonb_set( v_preview::jsonb, '{forceClosed}',(v_preview::jsonb -> 'forceClosed') || v_forceclosed::jsonb);
+			v_preview = jsonb_set( v_config::jsonb, '{forceClosed}',v_use_forceclosed::jsonb);
+
 		END IF; 
 		
   ELSIF v_action = 'UPDATE' AND v_config IS NOT NULL THEN
