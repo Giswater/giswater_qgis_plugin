@@ -257,6 +257,12 @@ class GwMapzoneManager:
 
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_clear_preview, True)
 
+        # Hide widgets for UD projects
+        if global_vars.project_type == 'ud':
+            tools_qt.set_widget_visible(self.config_dlg, self.config_dlg.lbl_toArc, False)
+            tools_qt.set_widget_visible(self.config_dlg, self.config_dlg.btn_snapping_toArc, False)
+            tools_qt.set_widget_visible(self.config_dlg, self.config_dlg.txt_toArc, False)
+
         # Open dialog
         tools_gw.open_dialog(self.config_dlg, 'mapzone_config')
 
@@ -393,6 +399,8 @@ class GwMapzoneManager:
             tools_qt.set_widget_text(self.config_dlg, 'txt_nodeParent', f"{feat_id}")
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_snapping_toArc, bool(feat_id))
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_nodeParent, bool(feat_id))
+        if global_vars.project_type == 'ud':
+            tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_nodeParent, bool(feat_id))
 
         self._reset_config_vars(2 if bool(feat_id) else 1)
 

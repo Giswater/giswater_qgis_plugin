@@ -48,7 +48,7 @@
    <item row="0" column="0" colspan="3">
     <layout class="QGridLayout" name="gridLayout_2">
      <item row="0" column="0">
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="lbl_nodeParent">
        <property name="text">
         <string>nodeParent:</string>
        </property>
@@ -89,7 +89,7 @@
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="lbl_toArc">
        <property name="text">
         <string>toArc:</string>
        </property>
@@ -109,7 +109,7 @@
       </widget>
      </item>
      <item row="3" column="0">
-      <widget class="QLabel" name="label_3">
+      <widget class="QLabel" name="lbl_forceClosed">
        <property name="text">
         <string>forceClosed:</string>
        </property>
@@ -161,7 +161,7 @@
    <item row="3" column="0" colspan="3">
     <layout class="QGridLayout" name="gridLayout_3">
      <item row="0" column="0">
-      <widget class="QLabel" name="label_4">
+      <widget class="QLabel" name="lbl_preview">
        <property name="text">
         <string>Preview:</string>
        </property>
