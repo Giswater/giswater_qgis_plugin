@@ -132,14 +132,9 @@ BEGIN
 			END IF;
 			
 			IF v_customfeature IS NOT NULL THEN		
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat(v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);			
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat(v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);
 			ELSE
 				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_nodecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-
-				-- get first value (last chance)
-				IF (NEW.nodecat_id IS NULL) THEN
-					NEW.nodecat_id := (SELECT id FROM cat_node WHERE active IS TRUE LIMIT 1);
-				END IF;
 			END IF;
 			
 			IF (NEW.nodecat_id IS NULL) THEN

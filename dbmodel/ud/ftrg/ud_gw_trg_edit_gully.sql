@@ -161,9 +161,6 @@ BEGIN
 		-- grate Catalog ID
 		IF (NEW.gratecat_id IS NULL OR NEW.gratecat_id = '') THEN
 				NEW.gratecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_gratecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			IF (NEW.gratecat_id IS NULL) THEN
-				NEW.gratecat_id:=(SELECT id FROM cat_grate WHERE active IS TRUE LIMIT 1);
-			END IF;
 		END IF;
 
 		-- Arc Catalog ID

@@ -116,10 +116,7 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1022", "function":"1204","debug_msg":null}}$$);';
 			END IF;
-				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_connecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			IF (NEW.connecat_id IS NULL) THEN
-				NEW.connecat_id:=(SELECT id FROM cat_connec WHERE active IS TRUE LIMIT 1);
-			END IF;
+			NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_connecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 		
 		-- Exploitation

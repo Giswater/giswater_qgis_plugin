@@ -121,9 +121,6 @@ BEGIN
 			IF (NEW.arccat_id IS NULL) THEN
 				NEW.arccat_id := (SELECT arccat_id from arc WHERE ST_DWithin(NEW.the_geom, arc.the_geom,0.001) LIMIT 1);
 			END IF;
-			IF (NEW.arccat_id IS NULL) THEN
-					NEW.arccat_id := (SELECT id FROM cat_arc WHERE active IS TRUE LIMIT 1);
-			END IF;       
 		END IF;
 		
 		
