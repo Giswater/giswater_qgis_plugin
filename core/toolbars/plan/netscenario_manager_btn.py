@@ -18,7 +18,8 @@ from qgis.PyQt.QtWidgets import QDialog, QLineEdit
 
 from ..dialog import GwAction
 from ..utilities.toolbox_btn import GwToolBoxButton
-from ...ui.ui_manager import GwNetscenarioManagerUi, GwNetscenarioUi, GwInfoGenericUi
+from ...shared.selector import GwSelector
+from ...ui.ui_manager import GwNetscenarioManagerUi, GwNetscenarioUi, GwInfoGenericUi, GwSelectorUi
 from ...utils import tools_gw
 from ...models.item_delegates import ReadOnlyDelegate, EditableDelegate
 from .... import global_vars
@@ -57,6 +58,7 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Manage btn create
         self._manage_btn_create()
+        tools_gw.add_icon(self.dlg_netscenario_manager.btn_selector, "142", folder='toolbars', sub_folder='basic')
 
         # Apply filter validator
         self.filter_name = self.dlg_netscenario_manager.findChild(QLineEdit, 'txt_name')
@@ -69,8 +71,10 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Connect main dialog signals
         self.dlg_netscenario_manager.txt_name.textChanged.connect(partial(self._fill_manager_table))
+        self.dlg_netscenario_manager.btn_selector.clicked.connect(partial(self._netscenario_selector))
         self.dlg_netscenario_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_netscenario))
-        self.dlg_netscenario_manager.btn_update.clicked.connect(partial(self._open_toolbox_function, 3256))
+        self.dlg_netscenario_manager.btn_update.clicked.connect(partial(self._manage_properties))
+        self.dlg_netscenario_manager.btn_execute.clicked.connect(partial(self._open_toolbox_function, 3256))
         self.dlg_netscenario_manager.btn_delete.clicked.connect(partial(self._delete_selected_netscenario))
         self.dlg_netscenario_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
         self.tbl_netscenario.doubleClicked.connect(self._open_netscenario)
@@ -81,6 +85,41 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_netscenario_manager, 'netscenario_manager')
+
+
+    def _netscenario_selector(self):
+        """ Manage mincut selector """
+        dialog = self.dlg_netscenario_manager
+        qtable = self.tbl_netscenario
+        field_id = "netscenario_id"
+        model = qtable.model()
+        selected_netscenarios = []
+        column_id = tools_qt.get_col_index_by_col_name(qtable, field_id)
+
+        for x in range(0, model.rowCount()):
+            index = model.index(x, column_id)
+            value = model.data(index)
+            selected_netscenarios.append(int(value))
+
+        if len(selected_netscenarios) == 0:
+            msg = "There are no visible netscenarios in the table. Try a different filter or make one"
+            tools_qgis.show_message(msg, dialog=dialog)
+            return
+        selector_values = f"selector_netscenario"
+        aux_params = f'"ids":{json.dumps(selected_netscenarios)}'
+        min_selector = GwSelector()
+
+        dlg_selector = GwSelectorUi()
+        tools_gw.load_settings(dlg_selector)
+        current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_netscenario", "user", "session")
+        dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
+        dlg_selector.rejected.connect(partial(tools_gw.save_settings, dlg_selector))
+        dlg_selector.rejected.connect(
+            partial(tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'netscenario'))
+
+        min_selector.get_selector(dlg_selector, selector_values, current_tab=current_tab, aux_params=aux_params)
+
+        tools_gw.open_dialog(dlg_selector, dlg_name='netscenario')
 
 
 
@@ -254,7 +293,6 @@ class GwNetscenarioManagerButton(GwAction):
         self.dlg_netscenario.main_tab.setCurrentIndex(default_tab_idx)
 
         # Connect signals
-        self.dlg_netscenario.btn_properties.clicked.connect(partial(self._manage_properties))
         self.dlg_netscenario.btn_toc.clicked.connect(partial(self._manage_add_layers))
         self.dlg_netscenario.btn_insert.clicked.connect(partial(self._manage_insert))
         self.dlg_netscenario.btn_delete.clicked.connect(partial(self._manage_delete))
@@ -405,11 +443,22 @@ class GwNetscenarioManagerButton(GwAction):
 
 
     def _manage_properties(self):
-        tablename = "plan_netscenario"
-        feature_id = self.selected_netscenario_id
+
+        # Get selected row
+        selected_list = self.tbl_netscenario.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.dlg_netscenario_manager)
+            return
+
+        # Get selected netscenario id
+        index = self.tbl_netscenario.selectionModel().currentIndex()
+        selected_netscenario_id = index.sibling(index.row(), 0).data()
+        selected_netscenario_type = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(self.tbl_netscenario, 'netscenario_type')).data()
+        tablename = f"v_edit_plan_netscenario_{selected_netscenario_type.lower()}"
         pkey = "netscenario_id"
 
-        feature = f'"tableName":"{tablename}", "id":"{feature_id}"'
+        feature = f'"tableName":"{tablename}", "id":"{selected_netscenario_id}"'
         body = tools_gw.create_body(feature=feature)
         json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
         if json_result is None or json_result['status'] == 'Failed':
@@ -431,7 +480,7 @@ class GwNetscenarioManagerButton(GwAction):
         self.props_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.props_dlg))
         self.props_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.props_dlg))
         self.props_dlg.btn_accept.clicked.connect(partial(self._accept_props_dlg, self.props_dlg, tablename, pkey,
-                                                          self.selected_netscenario_id, self.my_json_add))
+                                                          selected_netscenario_id, self.my_json_add))
 
         # Open dlg
         tools_gw.open_dialog(self.props_dlg, dlg_name='info_generic')
@@ -489,7 +538,7 @@ class GwNetscenarioManagerButton(GwAction):
             geom_layers = [row[0] for row in rows]
 
         # Get layers to add
-        lyr_filter = "plan_netscenario_%"
+        lyr_filter = "%plan_netscenario_%"
         sql = f"SELECT id, alias, style_id, addparam FROM sys_table WHERE id LIKE '{lyr_filter}' AND alias IS NOT NULL"
         rows = tools_db.get_rows(sql)
         if rows:
