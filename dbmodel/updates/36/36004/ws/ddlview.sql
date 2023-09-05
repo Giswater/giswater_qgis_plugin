@@ -316,26 +316,32 @@ CREATE OR REPLACE VIEW v_connec AS
            FROM v_link_connec
           WHERE v_link_connec.state = 2) a ON a.feature_id::text = vu_connec.connec_id::text;
 
-
-CREATE OR REPLACE VIEW v_plan_netscenario_presszone  AS
-SELECT n.netscenario_id, 
+ 
+CREATE OR REPLACE VIEW v_edit_plan_netscenario_presszone  AS
+SELECT n.netscenario_id,
+name AS netscenario_name, 
 presszone_id, 
-presszone_name AS name,
-head, 
+presszone_name,
+head,
+graphconfig,
 the_geom
 FROM selector_netscenario,
 plan_netscenario_presszone n
+JOIN plan_netscenario p USING (netscenario_id)
 WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
 
 
-CREATE OR REPLACE VIEW v_plan_netscenario_dma  AS
+CREATE OR REPLACE VIEW v_edit_plan_netscenario_dma  AS
 SELECT n.netscenario_id, 
+name AS netscenario_name, 
 dma_id, 
-dma_name AS name,
+dma_name,
 pattern_id, 
+graphconfig,
 the_geom
 FROM selector_netscenario,
 plan_netscenario_dma n
+JOIN plan_netscenario p USING (netscenario_id)
 WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
 
 
