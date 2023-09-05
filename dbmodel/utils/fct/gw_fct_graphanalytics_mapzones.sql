@@ -821,11 +821,11 @@ BEGIN
 					GET DIAGNOSTICS v_count1 = row_count;
 					
 					-- node
-					EXECUTE 'UPDATE temp_t_node t SET '||v_field||' = -1 FROM temp_t_node a WHERE  a.state = 1 and a.expl_id = '||v_expl_id||' and t.node_id = a.node_id AND t.'||v_field||'::text IN ('||
+					EXECUTE 'UPDATE temp_t_node t SET '||v_field||' = -1 FROM temp_t_node n WHERE  n.state = 1 and n.expl_id = '||v_expl_id||' and t.node_id = n.node_id AND t.'||v_field||'::text IN ('||
 					rec_conflict.mapzone||') '||v_psectors_query_node||';';
 
 					-- connec
-					EXECUTE 'UPDATE temp_t_connec t SET '||v_field||'  = -1 FROM temp_t_connec a WHERE a.state = 1 and a.expl_id = '||v_expl_id||' and t.connec_id = a.connec_id AND t.'||v_field||'::text IN ('||
+					EXECUTE 'UPDATE temp_t_connec t SET '||v_field||'  = -1 FROM temp_t_connec c WHERE c.state = 1 and c.expl_id = '||v_expl_id||' and t.connec_id = c.connec_id AND t.'||v_field||'::text IN ('||
 					rec_conflict.mapzone||') '||v_psectors_query_connec||';';
 					GET DIAGNOSTICS v_count = row_count;
 
