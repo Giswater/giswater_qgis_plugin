@@ -34,7 +34,7 @@ BEGIN
 		END IF;
 			
 		INSERT INTO dma (dma_id, name, descript, macrodma_id, the_geom, undelete, expl_id, pattern_id, link, minc, maxc, effc, active)
-		VALUES (NEW.dma_id, NEW.name, NEW.macrodma_id, NEW.descript, NEW.the_geom, NEW.undelete, NEW.expl_id, NEW.pattern_id, NEW.link, NEW.minc, 
+		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.macrodma_id, NEW.the_geom, NEW.undelete, NEW.expl_id, NEW.pattern_id, NEW.link, NEW.minc, 
 		NEW.maxc, NEW.effc, NEW.active);
 
 		RETURN NEW;
