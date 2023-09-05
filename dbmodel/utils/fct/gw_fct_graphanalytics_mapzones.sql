@@ -1048,9 +1048,16 @@ BEGIN
 			as geom FROM temp_t_link, temp_t_connec a
 			JOIN temp_t_anlgraph USING (arc_id) 
 			WHERE a.'||quote_ident(v_field)||'::integer > 0  AND water = 1
-			AND a.state > 0	AND temp_t_link.feature_id = connec_id and temp_t_link.feature_type = ''CONNEC'' and a.expl_id = '||v_expl_id||'
-			group by a.'||quote_ident(v_field)||'	
-			)c group by '||quote_ident(v_field)||')b 
+			AND a.state > 0 AND temp_t_link.feature_id = connec_id and temp_t_link.feature_type = ''CONNEC'' and a.expl_id = '||v_expl_id||'
+			group by a.'||quote_ident(v_field)||'
+			UNION
+			SELECT a.'||quote_ident(v_field)||', (st_buffer(st_collect(temp_t_link.the_geom),'||v_geomparamupdate_divide||',''endcap=flat join=round'')) 
+			as geom FROM temp_t_link, temp_t_connec a
+			JOIN temp_t_node n ON a.arc_id IS NULL AND n.node_id=a.pjoint_id
+			WHERE a.'||quote_ident(v_field)||'::integer > 0
+			AND a.state > 0 AND temp_t_link.feature_id = connec_id and temp_t_link.feature_type = ''CONNEC'' and a.expl_id = '||v_expl_id||'
+			group by a.'||quote_ident(v_field)||'
+			)c group by '||quote_ident(v_field)||')b
 			WHERE b.'||quote_ident(v_field)||'= temp_'||(v_table)||'.'||quote_ident(v_fieldmp);
 			raise notice 'v_querytext,%',v_querytext;
 
@@ -1154,8 +1161,12 @@ BEGIN
 		UNION
 		SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM temp_t_connec c JOIN temp_t_anlgraph USING (arc_id) WHERE water = -1
 		group by (arc_id, connec_id, connecat_id, state, expl_id, the_geom) having count(arc_id)=2
-		UNION			
-		SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Orphan'::text as descript, the_geom FROM temp_t_connec c WHERE arc_id IS NULL
+		UNION
+		(SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Orphan'::text as descript, the_geom FROM temp_t_connec c WHERE arc_id IS NULL
+		EXCEPT
+		SELECT DISTINCT ON (connec_id) connec_id, connecat_id, c.state, c.expl_id, 'Orphan'::text as descript, c.the_geom FROM temp_t_connec c 
+		JOIN temp_t_node a ON a.node_id=c.pjoint_id
+		WHERE c.pjoint_type = 'NODE')
 		) row) features;
 
 		v_result := COALESCE(v_result, '{}'); 
