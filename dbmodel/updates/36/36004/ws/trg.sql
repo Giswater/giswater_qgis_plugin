@@ -15,14 +15,14 @@ CREATE TRIGGER gw_trg_edit_minsector
 
 CREATE TRIGGER gw_trg_edit_plan_netscenario
     INSTEAD OF INSERT OR DELETE OR UPDATE 
-    ON ws_sample36.v_edit_plan_netscenario_dma
+    ON SCHEMA_NAME.v_edit_plan_netscenario_dma
     FOR EACH ROW
-    EXECUTE FUNCTION ws_sample36.gw_trg_edit_plan_netscenario('DMA');
+    EXECUTE FUNCTION SCHEMA_NAME.gw_trg_edit_plan_netscenario('DMA');
 
 
 CREATE TRIGGER gw_trg_edit_plan_netscenario
     INSTEAD OF INSERT OR DELETE OR UPDATE 
-    ON ws_sample36.v_edit_plan_netscenario_presszone
+    ON SCHEMA_NAME.v_edit_plan_netscenario_presszone
     FOR EACH ROW
-    EXECUTE FUNCTION ws_sample36.gw_trg_edit_plan_netscenario('PRESSZONE');
+    EXECUTE FUNCTION SCHEMA_NAME.gw_trg_edit_plan_netscenario('PRESSZONE');
 
