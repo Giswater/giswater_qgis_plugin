@@ -98,3 +98,26 @@ AS SELECT e.pol_id,
     polygon.trace_featuregeom
    FROM v_edit_element e
      JOIN polygon USING (pol_id);
+     
+
+CREATE OR REPLACE VIEW v_ui_element_x_gully
+AS SELECT element_x_gully.id,
+    element_x_gully.gully_id,
+    element_x_gully.element_id,
+    v_edit_element.elementcat_id,
+    cat_element.descript,
+    v_edit_element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    v_edit_element.observ,
+    v_edit_element.comment,
+    v_edit_element.location_type,
+    v_edit_element.builtdate,
+    v_edit_element.enddate
+   FROM element_x_gully
+     JOIN v_edit_element ON v_edit_element.element_id::text = element_x_gully.element_id::text
+     JOIN value_state ON v_edit_element.state = value_state.id
+     LEFT JOIN value_state_type ON v_edit_element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = v_edit_element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = v_edit_element.elementcat_id::text;
+     

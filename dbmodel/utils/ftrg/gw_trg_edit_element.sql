@@ -255,7 +255,7 @@ BEGIN
 					(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
 			END IF;
 
-			UPDATE element SET top_elevation = NEW.top_elevation WHERE element_id = NEW.element_id;
+			UPDATE element SET top_elev = NEW.top_elev WHERE element_id = NEW.element_id;
 		END IF;
 
 		RETURN NEW;
