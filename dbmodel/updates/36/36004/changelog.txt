@@ -10,3 +10,4 @@
 - Add config_visit_parameter and om_visit_cat tables to Giswater Load Layers button
 - New function (3270) gw_fct_config_mapzones for configurating mapzones using manager
 - Modify edit triggers to check that inserted streetname exists on ext_streetaxis
+- New field is_waterbal on ext_rtc_hydrometer to mark hydrometers which values enter into water balance calculations

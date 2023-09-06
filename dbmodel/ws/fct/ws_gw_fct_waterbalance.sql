@@ -225,11 +225,11 @@ BEGIN
 
 			--update data
 			UPDATE om_waterbalance n SET n_connec = count_connecs, link_length = length::numeric(12,3)
-			FROM (SELECT c.dma_id, p.id as cat_period_id, count(connec_id) as count_connecs, sum(st_length(l.the_geom)) /1000 as length
+			FROM (SELECT c.dma_id, p.id as cat_period_id, count(c.connec_id) as count_connecs, sum(st_length(l.the_geom)) /1000 as length
 			FROM ext_cat_period p, rtc_hydrometer_x_connec d
 			JOIN connec c USING (connec_id) 
 			JOIN ext_rtc_hydrometer h ON c.customer_code = h.connec_id
-			left join link l on connec_id = feature_id
+			left join link l on c.connec_id = feature_id
 			where c.state=1 and p.id = v_period AND is_waterbal IS TRUE
 			GROUP BY c.dma_id, p.id)a
 			WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id AND expl_id = v_expl;
