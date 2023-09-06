@@ -542,6 +542,8 @@ class GwElement:
                 f" WHERE element_id = '{element_id}';")
         sql += (f"\nDELETE FROM element_x_connec"
                 f" WHERE element_id = '{element_id}';")
+        sql += (f"\nDELETE FROM element_x_gully"
+                f" WHERE element_id = '{element_id}';")
 
         if self.list_ids['arc']:
             for feature_id in self.list_ids['arc']:
@@ -554,6 +556,10 @@ class GwElement:
         if self.list_ids['connec']:
             for feature_id in self.list_ids['connec']:
                 sql += (f"\nINSERT INTO element_x_connec (element_id, connec_id)"
+                        f" VALUES ('{element_id}', '{feature_id}');")
+        if self.list_ids['gully']:
+            for feature_id in self.list_ids['gully']:
+                sql += (f"\nINSERT INTO element_x_gully (element_id, gully_id)"
                         f" VALUES ('{element_id}', '{feature_id}');")
         status = tools_db.execute_sql(sql)
         if status:
