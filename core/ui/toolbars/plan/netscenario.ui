@@ -50,6 +50,27 @@
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="btn_config">
+       <property name="text">
+        <string>Config</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_create">
+       <property name="text">
+        <string>Create</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_update">
+       <property name="text">
+        <string>Update</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="btn_toc">
        <property name="text">
         <string/>

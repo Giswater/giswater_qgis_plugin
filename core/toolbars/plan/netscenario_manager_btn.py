@@ -18,6 +18,7 @@ from qgis.PyQt.QtWidgets import QDialog, QLineEdit
 
 from ..dialog import GwAction
 from ..utilities.toolbox_btn import GwToolBoxButton
+from ..utilities.mapzone_manager import GwMapzoneManager
 from ...shared.selector import GwSelector
 from ...ui.ui_manager import GwNetscenarioManagerUi, GwNetscenarioUi, GwInfoGenericUi, GwSelectorUi
 from ...utils import tools_gw
@@ -275,8 +276,8 @@ class GwNetscenarioManagerButton(GwAction):
         default_tab_idx = 0
         # Select all netscenario views
         sql = f"SELECT table_name FROM INFORMATION_SCHEMA.tables WHERE table_schema = '{lib_vars.schema_name}' " \
-              f"AND table_name LIKE 'plan_netscenario_%'" \
-              f"ORDER BY array_position(ARRAY['plan_netscenario_arc', 'plan_netscenario_node', 'plan_netscenario_connec', 'plan_netscenario_dma', 'plan_netscenario_presszone'], table_name::text);"
+              f"AND table_name IN ('plan_netscenario_arc', 'plan_netscenario_node', 'plan_netscenario_connec', 'v_edit_plan_netscenario_{self.selected_netscenario_type.lower()}') " \
+              f"ORDER BY array_position(ARRAY['plan_netscenario_arc', 'plan_netscenario_node', 'plan_netscenario_connec'], table_name::text);"
         rows = tools_db.get_rows(sql)
         if rows:
             views = [x[0] for x in rows]
@@ -293,6 +294,9 @@ class GwNetscenarioManagerButton(GwAction):
         self.dlg_netscenario.main_tab.setCurrentIndex(default_tab_idx)
 
         # Connect signals
+        self.dlg_netscenario.btn_config.clicked.connect(partial(self._manage_config))
+        self.dlg_netscenario.btn_create.clicked.connect(partial(self._manage_create))
+        self.dlg_netscenario.btn_update.clicked.connect(partial(self._manage_update))
         self.dlg_netscenario.btn_toc.clicked.connect(partial(self._manage_add_layers))
         self.dlg_netscenario.btn_insert.clicked.connect(partial(self._manage_insert))
         self.dlg_netscenario.btn_delete.clicked.connect(partial(self._manage_delete))
@@ -386,7 +390,7 @@ class GwNetscenarioManagerButton(GwAction):
         # Populate typeahead
         if enable:
             self._manage_feature_type()
-            table_name = f"v_edit_{tab_name.replace('plan_netscenario_', '')}"
+            table_name = f"v_edit_{tab_name.replace('plan_netscenario_', '').replace('v_edit_', '')}"
             feature_type = self.feature_type
             if self.filter_dict.get(tab_name):
                 table_name = self.filter_dict[tab_name]['filter_table']
@@ -440,6 +444,33 @@ class GwNetscenarioManagerButton(GwAction):
         if feature_type != 'feature_id':
             table = f"v_edit_{feature_type.split('_')[0]}"
         tools_qgis.highlight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
+
+
+    def _manage_config(self):
+        self.mapzone_manager = GwMapzoneManager()
+        self.mapzone_manager.manage_config(self.dlg_netscenario)
+        try:
+            self.mapzone_manager.config_dlg.finished.connect(partial(self._manage_current_changed))
+        except:
+            pass
+
+
+    def _manage_create(self):
+        self.mapzone_manager = GwMapzoneManager()
+        self.mapzone_manager.manage_create(self.dlg_netscenario)
+        try:
+            self.mapzone_manager.add_dlg.dlg_closed.connect(partial(self._manage_current_changed))
+        except:
+            pass
+
+
+    def _manage_update(self):
+        self.mapzone_manager = GwMapzoneManager()
+        self.mapzone_manager.manage_update(self.dlg_netscenario)
+        try:
+            self.mapzone_manager.add_dlg.dlg_closed.connect(partial(self._manage_current_changed))
+        except:
+            pass
 
 
     def _manage_properties(self):
@@ -532,7 +563,7 @@ class GwNetscenarioManagerButton(GwAction):
 
         geom_layers = []
         sql = f"SELECT f_table_name FROM geometry_columns WHERE f_table_schema = '{lib_vars.schema_name}' " \
-              f"AND f_table_name LIKE 'plan_netscenario%';"
+              f"AND f_table_name LIKE '%plan_netscenario%';"
         rows = tools_db.get_rows(sql)
         if rows:
             geom_layers = [row[0] for row in rows]

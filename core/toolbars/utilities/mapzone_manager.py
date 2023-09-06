@@ -72,10 +72,10 @@ class GwMapzoneManager:
         # self.dlg_dscenario.main_tab.setCurrentIndex(default_tab_idx)
 
         # Connect signals
-        self.mapzone_mng_dlg.btn_config.clicked.connect(partial(self._manage_config))
+        self.mapzone_mng_dlg.btn_config.clicked.connect(partial(self.manage_config, self.mapzone_mng_dlg, None))
         self.mapzone_mng_dlg.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active))
-        self.mapzone_mng_dlg.btn_create.clicked.connect(partial(self._manage_create))
-        self.mapzone_mng_dlg.btn_update.clicked.connect(partial(self._manage_update))
+        self.mapzone_mng_dlg.btn_create.clicked.connect(partial(self.manage_create, self.mapzone_mng_dlg, None))
+        self.mapzone_mng_dlg.btn_update.clicked.connect(partial(self.manage_update, self.mapzone_mng_dlg, None))
         self.mapzone_mng_dlg.btn_delete.clicked.connect(partial(self._manage_delete))
         self.mapzone_mng_dlg.main_tab.currentChanged.connect(partial(self._manage_current_changed))
         self.mapzone_mng_dlg.btn_cancel.clicked.connect(self.mapzone_mng_dlg.reject)
@@ -121,7 +121,7 @@ class GwMapzoneManager:
         """ Fill mapzone table with data from its corresponding table """
 
         # Manage exception if dialog is closed
-        if isdeleted(self.mapzone_mng_dlg):
+        if self.mapzone_mng_dlg is None or isdeleted(self.mapzone_mng_dlg):
             return
 
         self.table_name = f"{self.mapzone_mng_dlg.main_tab.currentWidget().objectName()}"
@@ -175,15 +175,16 @@ class GwMapzoneManager:
 
     # region config button
 
-    def _manage_config(self):
+    def manage_config(self, dialog, tableview=None):
         """ Dialog from config button """
 
         # Get selected row
-        tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
+        if tableview is None:
+            tableview = dialog.main_tab.currentWidget()
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.mapzone_mng_dlg)
+            tools_qgis.show_warning(message, dialog=dialog)
             return
 
         # Get selected mapzone data
@@ -621,9 +622,10 @@ class GwMapzoneManager:
         self._manage_current_changed()
 
 
-    def _manage_create(self):
+    def manage_create(self, dialog, tableview=None):
 
-        tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
+        if tableview is None:
+            tableview = dialog.main_tab.currentWidget()
         tablename = tableview.objectName().replace('tbl_', '')
         field_id = tableview.model().headerData(0, Qt.Horizontal)
 
@@ -640,14 +642,15 @@ class GwMapzoneManager:
         self._build_generic_info(dlg_title, result, tablename, field_id, force_action="INSERT")
 
 
-    def _manage_update(self):
+    def manage_update(self, dialog, tableview=None):
         # Get selected row
-        tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
+        if tableview is None:
+            tableview = dialog.main_tab.currentWidget()
         tablename = tableview.objectName().replace('tbl_', '')
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.mapzone_mng_dlg)
+            tools_qgis.show_warning(message, dialog=dialog)
             return
 
         # Get selected mapzone data
