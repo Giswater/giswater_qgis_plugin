@@ -13,7 +13,7 @@ from qgis.core import QgsProject
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt, QRegExp, QPoint
-from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox
+from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QCompleter
 from qgis.PyQt.QtWidgets import QDialog, QLineEdit
 
 from ..dialog import GwAction
@@ -35,11 +35,11 @@ class GwNetscenarioManagerButton(GwAction):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.feature_type = 'node'
         self.feature_types = ['node_id', 'arc_id', 'feature_id', 'connec_id', 'dma_id', 'presszone_id']
-        self.filter_dict = {"plan_netscenario_arc": {"filter_table": "v_edit_arc", "feature_type": "sector"},
-                            "plan_netscenario_node": {"filter_table": "v_edit_node", "feature_type": "sector"},
+        self.filter_dict = {"plan_netscenario_arc": {"filter_table": "v_edit_arc", "feature_type": "arc"},
+                            "plan_netscenario_node": {"filter_table": "v_edit_node", "feature_type": "node"},
                             "plan_netscenario_connec": {"filter_table": "v_edit_inp_connec", "feature_type": "connec"},
-                            "plan_netscenario_dma": {"filter_table": "v_edit_dma", "feature_type": "dma"},
-                            "plan_netscenario_presszone": {"filter_table": "v_edit_presszone", "feature_type": "presszone"},
+                            "v_edit_plan_netscenario_dma": {"filter_table": "v_edit_dma", "feature_type": "dma"},
+                            "v_edit_plan_netscenario_presszone": {"filter_table": "v_edit_presszone", "feature_type": "presszone"},
                             }
         self.filter_disabled = []
         self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
@@ -378,8 +378,7 @@ class GwNetscenarioManagerButton(GwAction):
         self._fill_netscenario_table()
 
         # Refresh txt_feature_id
-        tools_qt.set_widget_text(self.dlg_netscenario, self.dlg_netscenario.txt_feature_id, '')
-        self.dlg_netscenario.txt_feature_id.setStyleSheet(None)
+        tools_qt.set_combo_value(self.dlg_netscenario.cmb_feature_id, '', 0, False)
 
         # Manage insert typeahead
         # Get index of selected tab
@@ -395,7 +394,12 @@ class GwNetscenarioManagerButton(GwAction):
             if self.filter_dict.get(tab_name):
                 table_name = self.filter_dict[tab_name]['filter_table']
                 feature_type = self.filter_dict[tab_name]['feature_type']
-            tools_gw.set_completer_widget(table_name, self.dlg_netscenario.txt_feature_id, feature_type, add_id=True)
+            sql = f"SELECT DISTINCT({feature_type}_id::text) as id, {feature_type}_id::text as idval" \
+                  f" FROM {table_name}" \
+                  f" WHERE {feature_type}_id::text NOT IN ('-1', '0')" \
+                  f" ORDER BY id"
+            rows = tools_db.get_rows(sql)
+            tools_qt.fill_combo_values(self.dlg_netscenario.cmb_feature_id, rows, add_empty=True)
 
         # Deactivate btn_snapping functionality
         self._selection_end()
