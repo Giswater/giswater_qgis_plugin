@@ -317,9 +317,65 @@ dv_orderby_id=a.dv_orderby_id,dv_isnullvalue=a.dv_isnullvalue
 from (select datatype, widgettype, ismandatory,  dv_querytext, dv_orderby_id, dv_isnullvalue
 from config_form_fields where formname = 'v_edit_dma' and columnname in ('pattern_id'))a
 where formname = 'v_edit_plan_netscenario_dma' and columnname in ('pattern_id');
+INSERT INTO config_form_fields(
+formname, formtype, tabname, columnname, layoutname, layoutorder, 
+label,isparent, iseditable, isautoupdate, isfilter, hidden)
+SELECT 'v_edit_plan_netscenario_dma', 'form_feature', 'tab_none', attname, 'lyt_data_1', attnum,
+attname, false, true, false, false, false FROM   pg_attribute
+WHERE  attrelid = 'SCHEMA_NAME.v_edit_plan_netscenario_dma'::regclass 
+and attname!='the_geom';
+	
+INSERT INTO config_form_fields(
+formname, formtype, tabname, columnname, layoutname, layoutorder, 
+label,isparent, iseditable, isautoupdate, isfilter, hidden)
+SELECT 'v_edit_plan_netscenario_presszone', 'form_feature', 'tab_none', attname, 'lyt_data_1', attnum,
+attname, false, true, false, false, false FROM   pg_attribute
+WHERE  attrelid = 'SCHEMA_NAME.v_edit_plan_netscenario_presszone'::regclass 
+and attname!='the_geom';
+	
+UPDATE config_form_fields set datatype='string', widgettype='text'
+where (formname = 'v_edit_plan_netscenario_dma' or formname = 'v_edit_plan_netscenario_presszone') 
+and columnname in ('presszone_id','presszone_name','dma_name','graphconfig', 'netscenario_name');
+
+UPDATE config_form_fields set datatype='integer', widgettype='text', ismandatory = true
+where (formname = 'v_edit_plan_netscenario_dma' or formname = 'v_edit_plan_netscenario_presszone')  and columnname in ('netscenario_id', 'dma_id');
+
+
+UPDATE config_form_fields set datatype='numeric', widgettype='text', ismandatory = false
+where formname = 'v_edit_plan_netscenario_presszone' and columnname in ('head');
+
+UPDATE config_form_fields set datatype=a.datatype, widgettype=a.widgettype, ismandatory = a.ismandatory, dv_querytext=a.dv_querytext,
+dv_orderby_id=a.dv_orderby_id,dv_isnullvalue=a.dv_isnullvalue
+from (select datatype, widgettype, ismandatory,  dv_querytext, dv_orderby_id, dv_isnullvalue
+from config_form_fields where formname = 'v_edit_dma' and columnname in ('pattern_id'))a
+where formname = 'v_edit_plan_netscenario_dma' and columnname in ('pattern_id');
 
 INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, source)
 VALUES (3274, 'gw_trg_edit_plan_netscenario', 'ws', 'function trigger', null, null, 'Function trigger that allows editing views of netscenario dma and presszone', 'role_edit', 'core')
 ON CONFLICT (id) DO NOTHING;
 
 UPDATE ext_rtc_hydrometer SET is_waterbal = true;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+SELECT 'plan_netscenario_dma',formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
+FROM config_form_fields WHERE formname = 'v_edit_plan_netscenario_dma' AND columnname in ('netscenario_id', 'dma_id', 'dma_name','pattern_id','graphconfig');
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+SELECT 'plan_netscenario_dma',formtype, tabname, 'dma_name', layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
+FROM config_form_fields WHERE formname = 'v_edit_plan_netscenario_dma' AND columnname in ('name');
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+SELECT 'plan_netscenario_presszone',formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
+FROM config_form_fields WHERE formname = 'v_edit_plan_netscenario_presszone' AND columnname in ('netscenario_id', 'presszone_id', 'presszone_name','head','graphconfig');
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+SELECT 'plan_netscenario_presszone',formtype, tabname, 'presszone_name', layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
+FROM config_form_fields WHERE formname = 'v_edit_plan_netscenario_presszone' AND columnname in ('name');
