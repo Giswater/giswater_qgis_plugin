@@ -170,8 +170,8 @@ class GwMapzoneManager:
         if geom_col_idx not in (None, False):
             widget.setColumnHidden(geom_col_idx, True)
 
-        # Sort the table by feature id
-        model.sort(1, 0)
+        # Sort the table
+        model.sort(0, 0)
 
     # region config button
 
