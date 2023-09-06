@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE:3260
+--FUNCTION CODE:3272
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_scada_flowmeteragg_values(p_data json)
 RETURNS json AS

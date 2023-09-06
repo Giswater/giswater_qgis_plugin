@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 3274
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_plan_netscenario()  RETURNS trigger AS
 $BODY$
@@ -30,7 +30,7 @@ BEGIN
 			END IF;
 
 			INSERT INTO plan_netscenario_dma (netscenario_id, dma_id, dma_name, pattern_id, graphconfig, the_geom)
-			VALUES (NEW.netscenario_id, NEW.dma_id, NEW.dma_name, NEW.pattern_id, NEW.graphconfig, NEW.the_geom) ON CONFLICT (netscenario_id, dma_id) DO NOTHING;
+			VALUES (NEW.netscenario_id, NEW.dma_id, NEW.name, NEW.pattern_id, NEW.graphconfig, NEW.the_geom) ON CONFLICT (netscenario_id, dma_id) DO NOTHING;
 
 		ELSIF v_mapzone = 'PRESSZONE' THEN
 
@@ -40,7 +40,7 @@ BEGIN
 			END IF;
 
 			INSERT INTO plan_netscenario_presszone (netscenario_id, presszone_id, presszone_name, head, graphconfig, the_geom)
-			VALUES (NEW.netscenario_id, NEW.presszone_id, NEW.presszone_name, NEW.head, NEW.graphconfig, NEW.the_geom) ON CONFLICT (netscenario_id, presszone_id) DO NOTHING;
+			VALUES (NEW.netscenario_id, NEW.presszone_id, NEW.name, NEW.head, NEW.graphconfig, NEW.the_geom) ON CONFLICT (netscenario_id, presszone_id) DO NOTHING;
 
 		END IF;
 		RETURN NEW;
@@ -48,12 +48,12 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
    	IF v_mapzone = 'DMA' THEN
 			UPDATE plan_netscenario_dma 
-			SET dma_id=NEW.dma_id, dma_name=NEW.dma_name,  the_geom=NEW.the_geom, pattern_id=NEW.pattern_id, graphconfig=NEW.graphconfig::json
+			SET dma_id=NEW.dma_id, dma_name=NEW.name,  the_geom=NEW.the_geom, pattern_id=NEW.pattern_id, graphconfig=NEW.graphconfig::json
 			WHERE dma_id=OLD.dma_id AND netscenario_id=NEW.netscenario_id;
 		
 		ELSIF v_mapzone = 'PRESSZONE' THEN
 			UPDATE plan_netscenario_presszone 
-			SET presszone_id=NEW.presszone_id, presszone_name=NEW.presszone_name,  the_geom=NEW.the_geom, head=NEW.head, graphconfig=NEW.graphconfig::json
+			SET presszone_id=NEW.presszone_id, presszone_name=NEW.name,  the_geom=NEW.the_geom, head=NEW.head, graphconfig=NEW.graphconfig::json
 			WHERE presszone_id=OLD.presszone_id AND netscenario_id=NEW.netscenario_id;
 		END IF;
 
