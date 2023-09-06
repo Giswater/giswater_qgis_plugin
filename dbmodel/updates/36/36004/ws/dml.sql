@@ -321,3 +321,5 @@ where formname = 'v_edit_plan_netscenario_dma' and columnname in ('pattern_id');
 INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, source)
 VALUES (3274, 'gw_trg_edit_plan_netscenario', 'ws', 'function trigger', null, null, 'Function trigger that allows editing views of netscenario dma and presszone', 'role_edit', 'core')
 ON CONFLICT (id) DO NOTHING;
+
+UPDATE ext_rtc_hydrometer SET is_waterbal = true;

@@ -158,8 +158,8 @@ BEGIN
 			-- total_inyected
 			UPDATE om_waterbalance n SET total_sys_input =  value FROM (
 			SELECT dma_id, p.id, (sum(coalesce(value,0)*flow_sign))::numeric(12,2) as value 
-			FROM ext_cat_period p, ext_rtc_scada_x_data JOIN om_waterbalance_dma_graph  USING (node_id)
-			WHERE value_date >= start_date AND value_date <= end_date 
+			FROM ext_cat_period p, ext_rtc_scada_x_data d JOIN om_waterbalance_dma_graph  USING (node_id)
+			WHERE value_date >= start_date AND value_date <= end_date
 			GROUP BY p.id, dma_id order by 1,2)a
 			WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.id;
 
@@ -173,7 +173,10 @@ BEGIN
 			UPDATE om_waterbalance n SET auth_bill_met_hydro = value::numeric(12,2) FROM (SELECT dma_id, cat_period_id, (sum(sum))::numeric(12,2) as value
 			FROM ext_rtc_hydrometer_x_data d
 			JOIN rtc_hydrometer_x_connec USING (hydrometer_id)
-			JOIN connec c USING (connec_id) GROUP BY dma_id, cat_period_id)a
+			JOIN connec c USING (connec_id) 
+			JOIN ext_rtc_hydrometer h ON h.id = d.hydrometer_id 
+			where is_waterbal IS TRUE
+			GROUP BY dma_id, cat_period_id)a
 			WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id;
 
 			UPDATE om_waterbalance SET auth_bill_met_hydro = 0 WHERE auth_bill_met_hydro is null AND cat_period_id = v_period;
@@ -184,10 +187,12 @@ BEGIN
 			LOOP
 			v_count = v_count + 1;
 			
-			v_total_hydro = (SELECT sum(sum) FROM ext_rtc_hydrometer_x_data JOIN rtc_hydrometer_x_connec USING (hydrometer_id) JOIN connec USING (connec_id) where cat_period_id = v_period AND dma_id = v_dma AND expl_id = v_expl);
+			v_total_hydro = (SELECT sum(sum) FROM ext_rtc_hydrometer_x_data d JOIN rtc_hydrometer_x_connec USING (hydrometer_id) JOIN connec USING (connec_id) 
+				JOIN ext_rtc_hydrometer h ON h.id = d.hydrometer_id where cat_period_id = v_period AND dma_id = v_dma AND expl_id = v_expl AND is_waterbal IS TRUE);
 
-			v_centroidday = (SELECT (sum(sum*extract(epoch from value_date)/(24*3600)))/v_total_hydro FROM ext_rtc_hydrometer_x_data 
-					JOIN rtc_hydrometer_x_connec USING (hydrometer_id) JOIN connec USING (connec_id) where cat_period_id = v_period AND dma_id = v_dma);
+			v_centroidday = (SELECT (sum(sum*extract(epoch from value_date)/(24*3600)))/v_total_hydro FROM ext_rtc_hydrometer_x_data d
+					JOIN rtc_hydrometer_x_connec USING (hydrometer_id) JOIN connec USING (connec_id) 
+					JOIN ext_rtc_hydrometer h ON h.id = d.hydrometer_id where cat_period_id = v_period AND dma_id = v_dma AND is_waterbal IS TRUE);
 			IF v_centroidday IS NULL THEN 
 				v_centroidday = extract(epoch from((end_date - start_date) + start_date))/(24*3600);
 			END IF;
@@ -223,8 +228,9 @@ BEGIN
 			FROM (SELECT c.dma_id, p.id as cat_period_id, count(connec_id) as count_connecs, sum(st_length(l.the_geom)) /1000 as length
 			FROM ext_cat_period p, rtc_hydrometer_x_connec d
 			JOIN connec c USING (connec_id) 
+			JOIN ext_rtc_hydrometer h ON c.customer_code = h.connec_id
 			left join link l on connec_id = feature_id
-			where c.state=1 and p.id = v_period
+			where c.state=1 and p.id = v_period AND is_waterbal IS TRUE
 			GROUP BY c.dma_id, p.id)a
 			WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id AND expl_id = v_expl;
 			
@@ -233,7 +239,7 @@ BEGIN
 			FROM ext_cat_period p, rtc_hydrometer_x_connec d
 			JOIN connec c USING (connec_id) 
 			JOIN ext_rtc_hydrometer h ON c.customer_code = h.connec_id
-			where state=1  and p.id = v_period
+			where state=1  and p.id = v_period AND is_waterbal IS TRUE
 			GROUP BY dma_id, p.id)a
 			WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id AND expl_id = v_expl;
 

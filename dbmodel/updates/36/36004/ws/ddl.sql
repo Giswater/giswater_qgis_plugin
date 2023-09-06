@@ -233,3 +233,8 @@ CREATE TABLE IF NOT EXISTS archived_rpt_inp_pattern_value(
     factor_18 numeric(12,4),
     user_name text
 );
+
+ 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer", "column":"is_waterbal", "dataType":"boolean"}}$$);
+
+ALTER TABLE ext_rtc_hydrometer ALTER COLUMN is_waterbal SET DEFAULT True;
