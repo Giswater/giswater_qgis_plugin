@@ -93,8 +93,8 @@ class GwToolBoxButton(GwAction):
                 self.dlg_functions.finished.connect(signal)
 
         # Open form and set title
-        self.dlg_functions.setWindowTitle(f"{self.function_selected}")
         tools_gw.open_dialog(self.dlg_functions, dlg_name='toolbox')
+        self.dlg_functions.setWindowTitle(f"{self.function_selected}")
         return self.dlg_functions
 
     def remove_layers(self):
@@ -259,8 +259,8 @@ class GwToolBoxButton(GwAction):
             QgsApplication.taskManager().addTask(self.report_thread)
             QgsApplication.taskManager().triggerTask(self.report_thread)
 
-            self.dlg_reports.setWindowTitle(f"{function_name}")
             tools_gw.open_dialog(self.dlg_reports, dlg_name='reports')
+            self.dlg_reports.setWindowTitle(f"{function_name}")
 
         elif 'processes' in index.parent().parent().data().lower():
 
@@ -302,8 +302,8 @@ class GwToolBoxButton(GwAction):
             self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
 
             # Open form and set title
-            self.dlg_functions.setWindowTitle(f"{self.function_selected}")
             tools_gw.open_dialog(self.dlg_functions, dlg_name='toolbox')
+            self.dlg_functions.setWindowTitle(f"{self.function_selected}")
 
 
     def _report_finished(self, status, json_result):
