@@ -321,7 +321,7 @@ CREATE OR REPLACE VIEW v_edit_plan_netscenario_presszone  AS
 SELECT n.netscenario_id,
 name AS netscenario_name, 
 presszone_id, 
-presszone_name,
+presszone_name as name,
 head,
 graphconfig,
 the_geom
@@ -335,7 +335,7 @@ CREATE OR REPLACE VIEW v_edit_plan_netscenario_dma  AS
 SELECT n.netscenario_id, 
 name AS netscenario_name, 
 dma_id, 
-dma_name,
+dma_name  as name,
 pattern_id, 
 graphconfig,
 the_geom
