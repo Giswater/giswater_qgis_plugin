@@ -31,8 +31,8 @@ BEGIN
 		END IF;
 
 		-- Insert into polygon table
-		INSERT INTO polygon (sys_type, the_geom, feature_id, featurecat_id) 
-		SELECT sys_type, NEW.the_geom, NEW.feature_id, gully_type
+		INSERT INTO polygon (sys_type, the_geom, feature_id, featurecat_id, trace_featuregeom) 
+		SELECT sys_type, NEW.the_geom, NEW.feature_id, gully_type, NEW.trace_featuregeom
 		FROM v_edit_gully WHERE gully_id=NEW.feature_id
 		ON CONFLICT (feature_id) DO UPDATE SET the_geom=NEW.the_geom;
 		
@@ -43,7 +43,7 @@ BEGIN
 	-- UPDATE
 	ELSIF TG_OP = 'UPDATE' THEN
 	
-		UPDATE polygon SET pol_id=NEW.pol_id, the_geom=NEW.the_geom WHERE pol_id=OLD.pol_id;
+		UPDATE polygon SET pol_id=NEW.pol_id, the_geom=NEW.the_geom, trace_featuregeom=NEW.trace_featuregeom WHERE pol_id=OLD.pol_id;
 		
 		IF (NEW.feature_id != OLD.feature_id) THEN
 			IF (SELECT gully_id FROM gully WHERE gully_id=NEW.feature_id) IS NULL THEN

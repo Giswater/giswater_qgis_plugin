@@ -21,12 +21,11 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	-- Updating polygon geometry in case of exists it
-	IF (OLD.pol_id IS NOT NULL) THEN   
-		xvar= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
-		yvar= (st_y(NEW.the_geom)-st_y(OLD.the_geom));		
-		UPDATE polygon SET the_geom=ST_translate(the_geom, xvar, yvar) WHERE pol_id=OLD.pol_id;
-	END IF;  
-			
+    IF (OLD.pol_id IS NOT NULL) THEN   
+        xvar= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
+        yvar= (st_y(NEW.the_geom)-st_y(OLD.the_geom));        
+        UPDATE polygon SET the_geom=ST_translate(the_geom, xvar, yvar) WHERE pol_id=OLD.pol_id;
+    END IF;  
 			
 --  Select links with start-end on the updated node
 	querystring := 'SELECT * FROM link WHERE (link.feature_id = ' || quote_literal(NEW.gully_id) || ' 

@@ -177,3 +177,7 @@ VALUES('tbl_element_x_gully', 'SELECT id as sys_id, * FROM v_ui_element_x_gully 
 INSERT INTO config_form_list
 (listname, query_text, device, listtype, listclass, vdefault, addparam)
 VALUES('tbl_visit_x_gully', 'SELECT * FROM v_ui_event_x_gully WHERE event_id IS NOT NULL', 4, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, NULL);
+
+DELETE FROM sys_param_user WHERE id='edit_gully_autoupdate_polgeom';
+DELETE FROM config_param_user WHERE parameter='edit_gully_autoupdate_polgeom';
+

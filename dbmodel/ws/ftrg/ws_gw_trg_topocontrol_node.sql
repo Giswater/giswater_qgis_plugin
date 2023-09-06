@@ -49,6 +49,7 @@ v_staticpress double precision;
 v_elevation double precision;
 v_depth double precision;
 v_elev  double precision;
+v_trace_featuregeom boolean;
 
 BEGIN
 
@@ -257,7 +258,8 @@ BEGIN
 				
 			-- Updating polygon geometry in case of exists it
 			pol_id_var:= (SELECT pol_id FROM polygon WHERE feature_id=OLD.node_id);
-			IF (pol_id_var IS NOT NULL) THEN   
+			v_trace_featuregeom:= (SELECT trace_featuregeom FROM polygon WHERE feature_id=OLD.node_id);
+			IF (pol_id_var IS NOT NULL) AND (v_trace_featuregeom IS TRUE) THEN   
 				xvar= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
 				yvar= (st_y(NEW.the_geom)-st_y(OLD.the_geom));		
 				UPDATE polygon SET the_geom=ST_translate(the_geom, xvar, yvar) WHERE pol_id=pol_id_var;

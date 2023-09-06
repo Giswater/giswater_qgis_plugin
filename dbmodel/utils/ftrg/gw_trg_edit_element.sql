@@ -36,13 +36,14 @@ dx float;
 dy float;
 v_x float;
 v_y float;
-v_new_pol_id varchar(16);
+v_pol_id varchar(16);
 v_srid integer;
 v_project_type text;
 
 v_feature text;
 v_tablefeature text;
 v_elementtype_id text;
+v_trace_featuregeom boolean;
 
 BEGIN
 
@@ -173,9 +174,9 @@ BEGIN
 			ELSIF v_length IS NOT NULL AND (v_width IS NULL OR v_width = 0) THEN
 
 				-- get element dimensions to generate CIRCULARE geometry
-				v_new_pol_id:= (SELECT nextval('urn_id_seq'));
+				v_pol_id:= (SELECT nextval('urn_id_seq'));
 				INSERT INTO polygon(sys_type, the_geom, pol_id, featurecat_id, feature_id) 
-				VALUES ('ELEMENT', St_Multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)),v_new_pol_id, v_elementtype_id, NEW.element_id);
+				VALUES ('ELEMENT', St_Multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)),v_pol_id, v_elementtype_id, NEW.element_id);
 
 			ELSIF v_length*v_width != 0 THEN
  
@@ -211,21 +212,21 @@ BEGIN
 					p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
 					INTO v_the_geom_pol;
 				
-				v_new_pol_id:= (SELECT nextval('urn_id_seq'));
+				v_pol_id:= (SELECT nextval('urn_id_seq'));
 
 				INSERT INTO polygon(sys_type, the_geom, pol_id, featurecat_id, feature_id) 
-				VALUES ('ELEMENT', v_the_geom_pol, v_new_pol_id, v_elementtype_id, NEW.element_id);
+				VALUES ('ELEMENT', v_the_geom_pol, v_pol_id, v_elementtype_id, NEW.element_id);
 			END IF;
 		END IF;
 		
 		-- FEATURE INSERT      
 		INSERT INTO element (element_id, code, elementcat_id, serial_number, "state", state_type, observ, "comment", function_type, category_type, location_type, 
 		workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, rotation, link, verified, the_geom, label_x, label_y, label_rotation, publish, 
-		inventory, undelete, expl_id, num_elements, pol_id, expl_id2)
+		inventory, undelete, expl_id, num_elements, pol_id, expl_id2, trace_featuregeom)
 		VALUES (NEW.element_id, NEW.code, NEW.elementcat_id, NEW.serial_number, NEW."state", NEW.state_type, NEW.observ, NEW."comment", 
 		NEW.function_type, NEW.category_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, 
 		NEW.ownercat_id, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.label_x, NEW.label_y, NEW.label_rotation, NEW.publish, 
-		NEW.inventory, NEW.undelete, NEW.expl_id, NEW.num_elements, v_new_pol_id, NEW.expl_id2);
+		NEW.inventory, NEW.undelete, NEW.expl_id, NEW.num_elements, v_pol_id, NEW.expl_id2, NEW.trace_featuregeom);
 
 		-- update element_x_feature table
 		IF v_tablefeature IS NOT NULL AND v_feature IS NOT NULL THEN
@@ -252,12 +253,12 @@ BEGIN
 			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_insert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
 				NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM v_ext_raster_dem WHERE id =
 					(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
-			END IF; 
+			END IF;
 
 			UPDATE element SET top_elevation = NEW.top_elevation WHERE element_id = NEW.element_id;
 		END IF;
 
-		RETURN NEW;	
+		RETURN NEW;
 
 
 	-- UPDATE
@@ -268,7 +269,7 @@ BEGIN
 		function_type=NEW.function_type, category_type=NEW.category_type,  location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, 
 		buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, 
 		the_geom=NEW.the_geom, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, undelete=NEW.undelete,expl_id=NEW.expl_id, num_elements=NEW.num_elements,
-		lastupdate=now(), lastupdate_user=current_user
+		lastupdate=now(), lastupdate_user=current_user, trace_featuregeom=NEW.trace_featuregeom
 		WHERE element_id=OLD.element_id;
 
 		IF v_project_type = 'WS' THEN
@@ -281,7 +282,7 @@ BEGIN
 				(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_update_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
 					NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM v_ext_raster_dem WHERE id =
 								(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
-				END IF;	
+				END IF;
 			END IF;
 
 			UPDATE element SET elevation = NEW.elevation WHERE element_id = OLD.element_id;
@@ -296,9 +297,9 @@ BEGIN
 				(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_update_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
 					NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM v_ext_raster_dem WHERE id =
 								(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
-				END IF;	
+				END IF;
 			END IF;
-			UPDATE element SET top_elevation = NEW.top_elevation WHERE element_id = OLD.element_id;
+			UPDATE element SET top_elev = NEW.top_elev WHERE element_id = OLD.element_id;
 		END IF;
 		
 		--set rotation field
@@ -332,14 +333,14 @@ BEGIN
 
 			ELSIF v_length IS NOT NULL AND (v_width IS NULL OR v_width = 0) THEN
 
-				v_new_pol_id:= (SELECT nextval('urn_id_seq'));
+				v_pol_id:= (SELECT nextval('urn_id_seq'));
 
 				-- get element dimensions to generate CIRCULARE geometry
 				IF (SELECT pol_id FROM element WHERE element_id = NEW.element_id) IS NULL THEN
 					INSERT INTO polygon(sys_type, the_geom, pol_id, featurecat_id, feature_id)
-					VALUES ('ELEMENT', St_multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)),v_new_pol_id, v_elementtype_id, NEW.element_id);
-					UPDATE element SET pol_id=v_new_pol_id WHERE element_id = NEW.element_id;
-				ELSE									
+					VALUES ('ELEMENT', St_multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)),v_pol_id, v_elementtype_id, NEW.element_id);
+					UPDATE element SET pol_id=v_pol_id WHERE element_id = NEW.element_id;
+				ELSE
 					UPDATE polygon SET the_geom = St_multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)) 
 					WHERE pol_id = (SELECT pol_id FROM element WHERE element_id = NEW.element_id);
 				END IF;
@@ -377,20 +378,30 @@ BEGIN
 					p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
 					INTO v_the_geom_pol;
 
-				v_new_pol_id:= (SELECT nextval('urn_id_seq'));
+				v_pol_id:= (SELECT nextval('urn_id_seq'));
 
 				IF (SELECT pol_id FROM element WHERE element_id = NEW.element_id) IS NULL THEN
 					INSERT INTO polygon(sys_type, the_geom, pol_id, featurecat_id, feature_id) 
-					VALUES ('ELEMENT', v_the_geom_pol, v_new_pol_id, v_elementtype_id, NEW.element_id);
-					UPDATE element SET pol_id=v_new_pol_id WHERE element_id = NEW.element_id;
+					VALUES ('ELEMENT', v_the_geom_pol, v_pol_id, v_elementtype_id, NEW.element_id);
+					UPDATE element SET pol_id=v_pol_id WHERE element_id = NEW.element_id;
 
 				ELSE
 					UPDATE polygon SET the_geom = v_the_geom_pol WHERE pol_id = (SELECT pol_id FROM element WHERE element_id = NEW.element_id);
 				END IF;
 				
 			END IF;
-		END IF;		
-
+		END IF;
+	
+		-- Updating polygon geometry in case of exists it
+		SELECT pol_id, trace_featuregeom INTO v_pol_id, v_trace_featuregeom FROM polygon WHERE feature_id=OLD.element_id;
+		IF v_pol_id IS NOT NULL AND (NEW.the_geom::text <> OLD.the_geom::text) THEN
+			IF v_trace_featuregeom IS TRUE THEN   
+				v_x= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
+				v_y= (st_y(NEW.the_geom)-st_y(OLD.the_geom));
+				UPDATE polygon SET the_geom=ST_translate(the_geom, v_x, v_y) WHERE pol_id=v_pol_id;
+			END IF;
+		END IF;
+		
 		RETURN NEW;
     
 	-- DELETE

@@ -36,6 +36,7 @@ v_connect2network boolean;
 v_auto_streetvalues_status boolean;
 v_auto_streetvalues_buffer integer;
 v_auto_streetvalues_field text;
+v_trace_featuregeom boolean;
 
 BEGIN
 
@@ -543,9 +544,14 @@ BEGIN
 							(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
 			END IF;	
 			
-			--update associated geometry of element (if exists)
-			UPDATE element SET the_geom = NEW.the_geom WHERE St_dwithin(OLD.the_geom, the_geom, 0.001) 
-			AND element_id IN (SELECT element_id FROM element_x_connec WHERE connec_id = NEW.connec_id);	
+			--update associated geometry of element (if exists) and trace_featuregeom is true
+			v_trace_featuregeom:= (SELECT trace_featuregeom FROM element JOIN element_x_connec using (element_id) 
+                WHERE connec_id=NEW.connec_id AND the_geom IS NOT NULL LIMIT 1);
+			-- if trace_featuregeom is false, do nothing
+			IF v_trace_featuregeom IS TRUE THEN
+				UPDATE v_edit_element SET the_geom = NEW.the_geom WHERE St_dwithin(OLD.the_geom, the_geom, 0.001) 
+				AND element_id IN (SELECT element_id FROM element_x_connec WHERE connec_id=NEW.connec_id);
+			END IF;
 			
 		END IF;
 

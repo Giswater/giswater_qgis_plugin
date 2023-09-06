@@ -39,6 +39,7 @@ v_gully_id varchar;
 v_connec_id varchar;
 v_linkrec record;
 v_message text;
+v_trace_featuregeom boolean;
 
 v_sys_elev1 double precision;
 v_sys_elev2 double precision;
@@ -284,7 +285,8 @@ BEGIN
 					
 			-- Updating polygon geometry in case of exists it
 			v_pol:= (SELECT pol_id FROM polygon WHERE feature_id=OLD.node_id);
-			IF (v_pol IS NOT NULL) THEN   
+			v_trace_featuregeom:= (SELECT trace_featuregeom FROM polygon WHERE feature_id=OLD.node_id);
+			IF (v_pol IS NOT NULL) AND (v_trace_featuregeom IS TRUE) THEN   
 				v_x= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
 				v_y= (st_y(NEW.the_geom)-st_y(OLD.the_geom));		
 				UPDATE polygon SET the_geom=ST_translate(the_geom, v_x, v_y) WHERE pol_id=v_pol;
