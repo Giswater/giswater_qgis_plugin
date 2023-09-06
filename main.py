@@ -148,7 +148,7 @@ class Giswater(QObject):
             if self.load_project:
                 if self.load_project.plugin_toolbars:
                     for plugin_toolbar in list(self.load_project.plugin_toolbars.values()):
-                        if plugin_toolbar.enabled:
+                        if plugin_toolbar.enabled and plugin_toolbar.toolbar.objectName() != 'toolbar_toc_name':
                             plugin_toolbar.toolbar.setVisible(False)
                             del plugin_toolbar.toolbar
         except Exception as e:
