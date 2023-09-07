@@ -501,3 +501,100 @@ AS SELECT e.pol_id,
    FROM v_edit_element e
      JOIN polygon USING (pol_id);
 
+
+-- 07/09/2023
+DROP VIEW IF EXISTS v_ui_sector;
+CREATE OR REPLACE VIEW v_ui_sector AS
+ SELECT s.sector_id,
+    s.name,
+    ms.name AS "macrosector",
+    s.descript,
+    s.undelete,
+    s.sector_type,
+    s.active,
+    s.parent_id,
+    s.pattern_id,
+    s.tstamp,
+    s.insert_user,
+    s.lastupdate,
+    s.lastupdate_user,
+    s.graphconfig,
+    s.stylesheet
+   FROM sector s
+     LEFT JOIN macrosector ms ON ms.macrosector_id = s.macrosector_id
+  WHERE s.sector_id > 0
+  ORDER BY s.sector_id;
+
+
+DROP VIEW IF EXISTS v_ui_dma;
+CREATE OR REPLACE VIEW v_ui_dma AS
+ SELECT d.dma_id,
+	d.name,
+	d.descript,
+	d.expl_id,
+	md.name AS "macrodma",
+	d.active,
+	d.undelete,
+	d.minc,
+	d.maxc,
+	d.effc,
+	d.avg_press,
+	d.pattern_id,
+	d.link,
+	d.graphconfig,
+	d.stylesheet,
+	d.tstamp,
+	d.insert_user,
+	d.lastupdate,
+	d.lastupdate_user
+   FROM dma d
+     LEFT JOIN macrodma md ON md.macrodma_id = d.macrodma_id
+  WHERE d.dma_id > 0
+  ORDER BY d.dma_id;
+
+
+DROP VIEW IF EXISTS v_ui_presszone;
+CREATE OR REPLACE VIEW v_ui_presszone AS
+ SELECT p.presszone_id,
+ 	p.name,
+ 	p.descript,
+ 	p.expl_id,
+ 	p.link,
+ 	p.head,
+ 	p.active,
+ 	p.graphconfig,
+ 	p.stylesheet,
+ 	p.tstamp,
+ 	p.insert_user,
+ 	p.lastupdate,
+ 	p.lastupdate_user 
+   FROM presszone p
+  WHERE p.presszone_id NOT IN ('0', '-1')
+  ORDER BY p.presszone_id;
+
+
+DROP VIEW IF EXISTS v_ui_dqa;
+CREATE OR REPLACE VIEW v_ui_dqa AS
+ SELECT d.dqa_id,
+	d."name",
+	d.descript,
+	d.expl_id,
+	md.name as "macrodma",
+	d.active,
+	d.undelete,
+	d.the_geom,
+	d.pattern_id,
+	d.dqa_type,
+	d.link,
+	d.graphconfig,
+	d.stylesheet,
+	d.tstamp,
+	d.insert_user,
+	d.lastupdate,
+	d.lastupdate_user
+   FROM dqa d
+     LEFT JOIN macrodqa md ON md.macrodqa_id = d.macrodqa_id
+  WHERE d.dqa_id > 0
+  ORDER BY d.dqa_id;
+
+
