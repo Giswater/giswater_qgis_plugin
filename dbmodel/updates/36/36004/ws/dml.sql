@@ -59,7 +59,7 @@ VALUES (3256, 'Mapzone Netscenario Planification','{"featureType":[]}',
 {"widgetname":"updateMapZone", "label":"Mapzone constructor method:","widgettype":"combo","datatype":"integer","layoutname":"grl_option_parameters","layoutorder":9,
 "comboIds":[0,1,2,3,4], "comboNames":["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "PLOT & PIPE BUFFER", "LINK & PIPE BUFFER"], "selectedId":""}, 
 {"widgetname":"geomParamUpdate", "label":"Pipe buffer","widgettype":"text","datatype":"float","tooltip":"Buffer from arcs to create mapzone geometry using [PIPE BUFFER] options. Normal values maybe between 3-20 mts.", "layoutname":"grl_option_parameters","layoutorder":10, "isMandatory":false, "placeholder":"5-30", "value":""}]',
-null, true, '{4}');
+null, true, '{4}') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, source)
 VALUES (3258, 'gw_fct_set_netscenario_pattern', 'ws', 'function', 'json', 'json', 
@@ -71,10 +71,10 @@ VALUES (3258, 'Set pattern values on demand dscenario','{"featureType":[]}',
 '[{"widgetname":"netscenario", "label":"Source netscenario:","widgettype":"combo","datatype":"text","tooltip": "Select mapzone dscenario from where data will be copied to demand dscenario", "layoutname":"grl_option_parameters","layoutorder":1,"dvQueryText":"select dscenario_id as id, name as idval from plan_netscenario where netscenario_type =''DMA'' order by name","isNullValue":"true", "selectedId":""},
 {"widgetname":"dscenario_demand", "label":"Target dscenario demand:","widgettype":"combo","datatype":"text","tooltip": "Select demand dscenario where data will be inserted", "layoutname":"grl_option_parameters","layoutorder":3,
 "dvQueryText":"select dscenario_id as id, name as idval from cat_dscenario where dscenario_type =''DEMAND'' order by name","isNullValue":"true", "selectedId":""}]',
-null, true, '{4}');
+null, true, '{4}') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_typevalue(typevalue, id, addparam)
-VALUES ('sys_table_context', '{"level_1":"MASTERPLAN","level_2":"NETSCENARIO"}', '{"orderBy":24}');
+VALUES ('sys_table_context', '{"level_1":"MASTERPLAN","level_2":"NETSCENARIO"}', '{"orderBy":24}') ON CONFLICT (typevalue, id) DO NOTHING;
 
 INSERT INTO sys_table(id, descript, sys_role,  source, context, orderby, alias, addparam)
 VALUES ('v_edit_plan_netscenario_dma' , 'Editable view to visualize dma related to selected netscenario', 'role_master', 'core','{"level_1":"MASTERPLAN","level_2":"NETSCENARIO"}', 1, 'Netscenario DMA', '{"pkey":"netscenario_id, dma_id"}')
@@ -100,10 +100,10 @@ INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, i
 VALUES (502, 'Set dscenario demand using netscenario', 'ws', null, 'core', true, 'Function process', null) ON CONFLICT (fid) DO NOTHING;
 	
 INSERT INTO plan_typevalue
-VALUES ('netscenario_type', 'DMA', 'DMA',NULL, NULL);
+VALUES ('netscenario_type', 'DMA', 'DMA',NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
 INSERT INTO plan_typevalue
-VALUES ('netscenario_type', 'PRESSZONE', 'PRESSZONE',NULL, NULL);
+VALUES ('netscenario_type', 'PRESSZONE', 'PRESSZONE',NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
 INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, source)
 VALUES (3260, 'gw_fct_create_netscenario_empty', 'ws', 'function', 'json', 'json', 
@@ -167,9 +167,11 @@ VALUES (3272, 'gw_fct_import_scada_flowmeteragg_values', 'ws', 'function', 'json
 'Function to import flowmeter aggregated values with random interval in order to transform to daily values', 'role_om', 'core')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO config_csv VALUES (504, 'Import flowmeter daily values', 'Import daily flowmeter values into table ext_rtc_scada_x_data according example file scada_flowmeter_daily_values.csv', 'gw_fct_import_scada_values', true, 21);
+INSERT INTO config_csv VALUES (504, 'Import flowmeter daily values', 'Import daily flowmeter values into table ext_rtc_scada_x_data according example file scada_flowmeter_daily_values.csv', 'gw_fct_import_scada_values', true, 21)
+ ON CONFLICT (fid) DO NOTHING;
 
-INSERT INTO config_csv VALUES (506, 'Import flowmeter agg values', 'Import aggregated flowmeter values into table ext_rtc_scada_x_data according example file scada_flowmeter_agg_values.csv', 'gw_fct_import_scada_flowmeteragg_values', true, 22);
+INSERT INTO config_csv VALUES (506, 'Import flowmeter agg values', 'Import aggregated flowmeter values into table ext_rtc_scada_x_data according example file scada_flowmeter_agg_values.csv', 'gw_fct_import_scada_flowmeteragg_values', true, 22)
+ ON CONFLICT (fid) DO NOTHING;
 
 UPDATE sys_function SET function_name = 'gw_fct_import_scada_values' WHERE id = 3166;
 UPDATE sys_fprocess SET fprocess_name = 'Import scada values' WHERE fid = 469;
@@ -204,7 +206,7 @@ VALUES (3266, 'gw_fct_set_rpt_archived', 'ws', 'function', 'json', 'json',
 'Function that moves data related to selected result_id from rpt and rpt_inp tables to archived tables', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO inp_typevalue
-VALUES('inp_result_status', 3, 'ARCHIVED',NULL, NULL);
+VALUES('inp_result_status', 3, 'ARCHIVED',NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
 INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, source)
 VALUES (3268, 'gw_fct_pg2epa_setinitvalues', 'ws', 'function', 'json', 'json', 
@@ -238,7 +240,8 @@ SELECT 'v_edit_presszone', formtype, tabname, columnname, layoutname, 2, datatyp
 	ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
 	dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
 	from config_form_fields 
-	where formname ='v_edit_dma' and columnname = 'name';
+	where formname ='v_edit_dma' and columnname = 'name' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
 UPDATE config_form_fields SET layoutname = 'lyt_data_1' where formname = 'v_edit_dma';
 
 UPDATE config_form_fields SET layoutorder =1 WHERE  formname = 'v_edit_dma' AND columnname = 'dma_id';
@@ -283,7 +286,7 @@ UPDATE config_form_fields SET layoutorder =11 WHERE  formname = 'v_edit_dqa' AND
 UPDATE config_form_fields SET layoutorder =12 WHERE  formname = 'v_edit_dqa' AND columnname = 'active';
 
 INSERT INTO sys_table(id, descript, sys_role, source)
-VALUES ('v_ui_plan_netscenario', 'Table to show netscenario in qgis ui', 'role_master', 'core');
+VALUES ('v_ui_plan_netscenario', 'Table to show netscenario in qgis ui', 'role_master', 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_form_fields(
 formname, formtype, tabname, columnname, layoutname, layoutorder, 
@@ -291,7 +294,7 @@ label,isparent, iseditable, isautoupdate, isfilter, hidden)
 SELECT 'v_edit_plan_netscenario_dma', 'form_feature', 'tab_none', attname, 'lyt_data_1', attnum,
 attname, false, true, false, false, false FROM   pg_attribute
 WHERE  attrelid = 'SCHEMA_NAME.v_edit_plan_netscenario_dma'::regclass 
-and attname!='the_geom';
+and attname!='the_geom' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 	
 INSERT INTO config_form_fields(
 formname, formtype, tabname, columnname, layoutname, layoutorder, 
@@ -299,7 +302,7 @@ label,isparent, iseditable, isautoupdate, isfilter, hidden)
 SELECT 'v_edit_plan_netscenario_presszone', 'form_feature', 'tab_none', attname, 'lyt_data_1', attnum,
 attname, false, true, false, false, false FROM   pg_attribute
 WHERE  attrelid = 'SCHEMA_NAME.v_edit_plan_netscenario_presszone'::regclass 
-and attname!='the_geom';
+and attname!='the_geom' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 	
 UPDATE config_form_fields set datatype='string', widgettype='text'
 where (formname = 'v_edit_plan_netscenario_dma' or formname = 'v_edit_plan_netscenario_presszone') 
@@ -317,13 +320,14 @@ dv_orderby_id=a.dv_orderby_id,dv_isnullvalue=a.dv_isnullvalue
 from (select datatype, widgettype, ismandatory,  dv_querytext, dv_orderby_id, dv_isnullvalue
 from config_form_fields where formname = 'v_edit_dma' and columnname in ('pattern_id'))a
 where formname = 'v_edit_plan_netscenario_dma' and columnname in ('pattern_id');
+
 INSERT INTO config_form_fields(
 formname, formtype, tabname, columnname, layoutname, layoutorder, 
 label,isparent, iseditable, isautoupdate, isfilter, hidden)
 SELECT 'v_edit_plan_netscenario_dma', 'form_feature', 'tab_none', attname, 'lyt_data_1', attnum,
 attname, false, true, false, false, false FROM   pg_attribute
 WHERE  attrelid = 'SCHEMA_NAME.v_edit_plan_netscenario_dma'::regclass 
-and attname!='the_geom';
+and attname!='the_geom' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 	
 INSERT INTO config_form_fields(
 formname, formtype, tabname, columnname, layoutname, layoutorder, 
@@ -331,7 +335,7 @@ label,isparent, iseditable, isautoupdate, isfilter, hidden)
 SELECT 'v_edit_plan_netscenario_presszone', 'form_feature', 'tab_none', attname, 'lyt_data_1', attnum,
 attname, false, true, false, false, false FROM   pg_attribute
 WHERE  attrelid = 'SCHEMA_NAME.v_edit_plan_netscenario_presszone'::regclass 
-and attname!='the_geom';
+and attname!='the_geom' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 	
 UPDATE config_form_fields set datatype='string', widgettype='text'
 where (formname = 'v_edit_plan_netscenario_dma' or formname = 'v_edit_plan_netscenario_presszone') 
@@ -360,22 +364,24 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 SELECT 'plan_netscenario_dma',formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
-FROM config_form_fields WHERE formname = 'v_edit_plan_netscenario_dma' AND columnname in ('netscenario_id', 'dma_id', 'dma_name','pattern_id','graphconfig');
+FROM config_form_fields WHERE formname = 'v_edit_plan_netscenario_dma' AND columnname in ('netscenario_id', 'dma_id', 'dma_name','pattern_id','graphconfig') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 SELECT 'plan_netscenario_dma',formtype, tabname, 'dma_name', layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
-FROM config_form_fields WHERE formname = 'v_edit_plan_netscenario_dma' AND columnname in ('name');
+FROM config_form_fields WHERE formname = 'v_edit_plan_netscenario_dma' AND columnname in ('name') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 SELECT 'plan_netscenario_presszone',formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
-FROM config_form_fields WHERE formname = 'v_edit_plan_netscenario_presszone' AND columnname in ('netscenario_id', 'presszone_id', 'presszone_name','head','graphconfig');
+FROM config_form_fields WHERE formname = 'v_edit_plan_netscenario_presszone' AND columnname in ('netscenario_id', 'presszone_id', 'presszone_name','head','graphconfig') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 SELECT 'plan_netscenario_presszone',formtype, tabname, 'presszone_name', layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
-FROM config_form_fields WHERE formname = 'v_edit_plan_netscenario_presszone' AND columnname in ('name');
+FROM config_form_fields WHERE formname = 'v_edit_plan_netscenario_presszone' AND columnname in ('name') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
