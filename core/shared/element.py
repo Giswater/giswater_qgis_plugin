@@ -542,8 +542,9 @@ class GwElement:
                 f" WHERE element_id = '{element_id}';")
         sql += (f"\nDELETE FROM element_x_connec"
                 f" WHERE element_id = '{element_id}';")
-        sql += (f"\nDELETE FROM element_x_gully"
-                f" WHERE element_id = '{element_id}';")
+        if global_vars.project_type == 'ud':
+            sql += (f"\nDELETE FROM element_x_gully"
+                    f" WHERE element_id = '{element_id}';")
 
         if self.list_ids['arc']:
             for feature_id in self.list_ids['arc']:
