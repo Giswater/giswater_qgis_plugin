@@ -59,7 +59,7 @@ class GwMapzoneManager:
         if global_vars.project_type == 'ud':
             tabs = ['drainzone']
         for tab in tabs:
-            view = f'v_edit_{tab}'
+            view = f'v_ui_{tab}'
             qtableview = QTableView()
             qtableview.setObjectName(f"tbl_{view}")
             # qtableview.clicked.connect(partial(self._manage_highlight, qtableview, view))
@@ -601,7 +601,7 @@ class GwMapzoneManager:
     def _manage_toggle_active(self):
         # Get selected row
         tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
-        view = tableview.objectName().replace('tbl_', '')
+        view = tableview.objectName().replace('tbl_', '').replace('v_ui_', 'v_edit_')
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -626,7 +626,7 @@ class GwMapzoneManager:
 
         if tableview is None:
             tableview = dialog.main_tab.currentWidget()
-        tablename = tableview.objectName().replace('tbl_', '')
+        tablename = tableview.objectName().replace('tbl_', '').replace('v_ui_', 'v_edit_')
         field_id = tableview.model().headerData(0, Qt.Horizontal)
 
         # Execute getinfofromid
@@ -646,7 +646,7 @@ class GwMapzoneManager:
         # Get selected row
         if tableview is None:
             tableview = dialog.main_tab.currentWidget()
-        tablename = tableview.objectName().replace('tbl_', '')
+        tablename = tableview.objectName().replace('tbl_', '').replace('v_ui_', 'v_edit_')
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -674,7 +674,7 @@ class GwMapzoneManager:
     def _manage_delete(self):
         # Get selected row
         tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
-        view = tableview.objectName().replace('tbl_', '')
+        view = tableview.objectName().replace('tbl_', '').replace('v_ui_', 'v_edit_')
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
