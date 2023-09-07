@@ -297,7 +297,7 @@ class GwNetscenarioManagerButton(GwAction):
         default_tab_idx = 0
         # Select all netscenario views
         sql = f"SELECT table_name FROM INFORMATION_SCHEMA.tables WHERE table_schema = '{lib_vars.schema_name}' " \
-              f"AND table_name IN ('plan_netscenario_arc', 'plan_netscenario_node', 'plan_netscenario_connec', 'v_edit_plan_netscenario_{self.selected_netscenario_type.lower()}') " \
+              f"AND table_name IN ('plan_netscenario_arc', 'plan_netscenario_node', 'plan_netscenario_connec', 'plan_netscenario_{self.selected_netscenario_type.lower()}') " \
               f"ORDER BY array_position(ARRAY['plan_netscenario_arc', 'plan_netscenario_node', 'plan_netscenario_connec'], table_name::text);"
         rows = tools_db.get_rows(sql)
         if rows:
@@ -473,6 +473,7 @@ class GwNetscenarioManagerButton(GwAction):
 
     def _manage_config(self):
         self.mapzone_manager = GwMapzoneManager()
+        self.mapzone_manager.netscenario_id = self.selected_netscenario_id
         self.mapzone_manager.manage_config(self.dlg_netscenario)
         try:
             self.mapzone_manager.config_dlg.finished.connect(partial(self._manage_current_changed))
@@ -482,6 +483,7 @@ class GwNetscenarioManagerButton(GwAction):
 
     def _manage_create(self):
         self.mapzone_manager = GwMapzoneManager()
+        self.mapzone_manager.netscenario_id = self.selected_netscenario_id
         self.mapzone_manager.manage_create(self.dlg_netscenario)
         try:
             self.mapzone_manager.add_dlg.dlg_closed.connect(partial(self._manage_current_changed))
@@ -491,6 +493,7 @@ class GwNetscenarioManagerButton(GwAction):
 
     def _manage_update(self):
         self.mapzone_manager = GwMapzoneManager()
+        self.mapzone_manager.netscenario_id = self.selected_netscenario_id
         self.mapzone_manager.manage_update(self.dlg_netscenario)
         try:
             self.mapzone_manager.add_dlg.dlg_closed.connect(partial(self._manage_current_changed))

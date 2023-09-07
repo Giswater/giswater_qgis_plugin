@@ -40,6 +40,7 @@ class GwMapzoneManager:
         self.vertex_marker = self.snapper_manager.vertex_marker
 
         self.mapzone_mng_dlg = None
+        self.netscenario_id = None
 
 
     def manage_mapzones(self):
@@ -570,6 +571,8 @@ class GwMapzoneManager:
             return
         parameters = f'"action": "UPDATE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
                      f'"config": {preview}'
+        if self.netscenario_id is not None:
+            parameters += f', "netscenarioId": {self.netscenario_id}'
         extras = f'"parameters": {{{parameters}}}'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
