@@ -1270,7 +1270,7 @@ def build_dialog_info(dialog, result, my_json=None):
             kwargs = {"dialog": dialog, "field": field}
             widget = add_button(**kwargs)
 
-        if 'ismandatory' in field:
+        if 'ismandatory' in field and widget is not None:
             widget.setProperty('ismandatory', field['ismandatory'])
 
         if 'layoutorder' in field and field['layoutorder'] is not None:
