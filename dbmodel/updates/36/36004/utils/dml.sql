@@ -35,3 +35,5 @@ VALUES(3244, 'It''s not possible to use selected arcs. They are not connected to
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source") 
 VALUES(3246, 'The inserted streetname value doesn''t exist on ext_streetaxis table', 'Please insert an existing one', 2, true, 'utils', 'core') ON CONFLICT (id) DO NOTHING;
+
+UPDATE sys_table SET context='{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"POLYGON"}', orderby=4, alias='Element polygon'  WHERE id='ve_pol_element';
