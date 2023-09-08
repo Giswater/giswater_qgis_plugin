@@ -1929,8 +1929,10 @@ class GwInfo(QObject):
                 self._manage_docker_close()
             else:
                 tools_gw.close_dialog(dialog)
+            QgsProject.instance().blockSignals(False)
             return None
 
+        QgsProject.instance().blockSignals(False)
         return True
 
 
