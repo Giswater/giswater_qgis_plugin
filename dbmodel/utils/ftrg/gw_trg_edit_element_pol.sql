@@ -33,8 +33,8 @@ BEGIN
 		END IF;
 					
 		-- Insert into polygon table
-		INSERT INTO polygon (pol_id, sys_type, the_geom, featurecat_id, feature_id, trace_featuregeom)
-		SELECT NEW.pol_id, 'ELEMENT', NEW.the_geom, elementtype_id, NEW.element_id, NEW.trace_featuregeom
+		INSERT INTO polygon (pol_id, sys_type, the_geom, featurecat_id, feature_id)
+		SELECT NEW.pol_id, 'ELEMENT', NEW.the_geom, elementtype_id, NEW.element_id
 		FROM v_edit_element WHERE element_id=NEW.element_id 
 		ON CONFLICT (feature_id) DO UPDATE SET the_geom=NEW.the_geom;
 

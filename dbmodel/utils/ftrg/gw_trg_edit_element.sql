@@ -222,11 +222,11 @@ BEGIN
 		-- FEATURE INSERT      
 		INSERT INTO element (element_id, code, elementcat_id, serial_number, "state", state_type, observ, "comment", function_type, category_type, location_type, 
 		workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, rotation, link, verified, the_geom, label_x, label_y, label_rotation, publish, 
-		inventory, undelete, expl_id, num_elements, pol_id, expl_id2, trace_featuregeom)
+		inventory, undelete, expl_id, num_elements, pol_id, expl_id2)
 		VALUES (NEW.element_id, NEW.code, NEW.elementcat_id, NEW.serial_number, NEW."state", NEW.state_type, NEW.observ, NEW."comment", 
 		NEW.function_type, NEW.category_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, 
 		NEW.ownercat_id, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.label_x, NEW.label_y, NEW.label_rotation, NEW.publish, 
-		NEW.inventory, NEW.undelete, NEW.expl_id, NEW.num_elements, v_pol_id, NEW.expl_id2, NEW.trace_featuregeom);
+		NEW.inventory, NEW.undelete, NEW.expl_id, NEW.num_elements, v_pol_id, NEW.expl_id2);
 
 		-- update element_x_feature table
 		IF v_tablefeature IS NOT NULL AND v_feature IS NOT NULL THEN
