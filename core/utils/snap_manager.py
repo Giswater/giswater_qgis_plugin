@@ -30,10 +30,11 @@ class GwSnapManager(object):
 
         # Snapper
         self.snapping_config = self.get_snapping_options()
-        self.snapping_config.setEnabled(True)
         self.snapper = self.get_snapper()
-        proj = QgsProject.instance()
-        proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
+        if global_vars.use_gw_snapping is True:
+            self.snapping_config.setEnabled(True)
+            proj = QgsProject.instance()
+            proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
 
         # Set default vertex marker
         color = QColor(255, 100, 255)
