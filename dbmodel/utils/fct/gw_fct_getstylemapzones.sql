@@ -124,8 +124,8 @@ BEGIN
 				',{"name":"presszone", "status": "'||v_statuspresszone||'", "idname":"'||v_colpresszone||'",  "layer":"v_edit_presszone", "transparency":'||v_trapresszone||',  "values":' || v_presszone ||'}'||
 				',{"name":"dma",  "status": "'||v_statusdma||'", "idname": "'||v_coldma||'", "layer":"v_edit_dma", "transparency":'||v_tradma||', "values":' || v_dma ||'}'||
 				',{"name":"dqa",  "status": "'||v_statusdqa||'", "idname": "'||v_coldqa||'", "layer":"v_edit_dqa", "transparency":'||v_tradqa||', "values":' || v_dqa ||'}'||
-				',{"name":"netscenario_dma",  "status": "'||v_statusdma||'", "idname": "'||v_coldma||'", "layer":"v_plan_netscenario_dma", "transparency":'||v_tradma||', "values":' || v_netscenario_dma ||'}'||
-				',{"name":"netscenario_presszone",  "status": "'||v_statuspresszone||'", "idname": "'||v_colpresszone||'", "layer":"v_plan_netscenario_presszone", "transparency":'||v_trapresszone||', "values":' || v_netscenario_presszone ||'}'||
+				',{"name":"netscenario_dma",  "status": "'||v_statusdma||'", "idname": "'||v_coldma||'", "layer":"v_edit_plan_netscenario_dma", "transparency":'||v_tradma||', "values":' || v_netscenario_dma ||'}'||
+				',{"name":"netscenario_presszone",  "status": "'||v_statuspresszone||'", "idname": "'||v_colpresszone||'", "layer":"v_edit_plan_netscenario_presszone", "transparency":'||v_trapresszone||', "values":' || v_netscenario_presszone ||'}'||
 				',{"name":"drainzone",  "status": "'||v_statusdrainzone||'", "idname": "'||v_coldrainzone||'", "layer":"v_edit_drainzone", "transparency":'||v_tradrainzone||', "values":' || v_drainzone ||'}'||
 				']}}'||
 	    '}')::json;
