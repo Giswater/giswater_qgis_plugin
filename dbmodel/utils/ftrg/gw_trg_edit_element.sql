@@ -321,7 +321,8 @@ BEGIN
 		v_doublegeometry = (SELECT isdoublegeom FROM cat_element WHERE id = NEW.elementcat_id);
 
 		-- double geometry catalog update
-		IF v_insert_double_geom AND v_doublegeometry AND (NEW.elementcat_id != OLD.elementcat_id OR NEW.the_geom::text <> OLD.the_geom::text) THEN
+		IF v_insert_double_geom AND v_doublegeometry AND 
+		(NEW.elementcat_id != OLD.elementcat_id OR NEW.the_geom::text <> OLD.the_geom::text) THEN
 
 			v_length = (SELECT geom1 FROM cat_element WHERE id=NEW.elementcat_id);
 			v_width = (SELECT geom2 FROM cat_element WHERE id=NEW.elementcat_id);
@@ -341,8 +342,11 @@ BEGIN
 					VALUES ('ELEMENT', St_multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)),v_pol_id, v_elementtype_id, NEW.element_id);
 					UPDATE element SET pol_id=v_pol_id WHERE element_id = NEW.element_id;
 				ELSE
-					UPDATE polygon SET the_geom = St_multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)) 
-					WHERE pol_id = (SELECT pol_id FROM element WHERE element_id = NEW.element_id);
+					SELECT trace_featuregeom INTO v_trace_featuregeom FROM polygon WHERE feature_id=OLD.element_id;
+					IF v_trace_featuregeom IS TRUE THEN   
+						UPDATE polygon SET the_geom = St_multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)) 
+						WHERE pol_id = (SELECT pol_id FROM element WHERE element_id = NEW.element_id);
+					END IF;
 				END IF;
 
 			ELSIF v_length*v_width != 0 THEN
@@ -386,19 +390,21 @@ BEGIN
 					UPDATE element SET pol_id=v_pol_id WHERE element_id = NEW.element_id;
 
 				ELSE
-					UPDATE polygon SET the_geom = v_the_geom_pol WHERE pol_id = (SELECT pol_id FROM element WHERE element_id = NEW.element_id);
+					SELECT trace_featuregeom INTO v_trace_featuregeom FROM polygon WHERE feature_id=OLD.element_id;
+					IF v_trace_featuregeom IS TRUE THEN   
+						UPDATE polygon SET the_geom = v_the_geom_pol WHERE pol_id = (SELECT pol_id FROM element WHERE element_id = NEW.element_id);
+					END IF;
 				END IF;
-				
 			END IF;
-		END IF;
-	
-		-- Updating polygon geometry in case of exists it
-		SELECT pol_id, trace_featuregeom INTO v_pol_id, v_trace_featuregeom FROM polygon WHERE feature_id=OLD.element_id;
-		IF v_pol_id IS NOT NULL AND (NEW.the_geom::text <> OLD.the_geom::text) THEN
-			IF v_trace_featuregeom IS TRUE THEN   
-				v_x= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
-				v_y= (st_y(NEW.the_geom)-st_y(OLD.the_geom));
-				UPDATE polygon SET the_geom=ST_translate(the_geom, v_x, v_y) WHERE pol_id=v_pol_id;
+		ELSE
+			-- Updating polygon geometry in case of exists it
+			SELECT pol_id, trace_featuregeom INTO v_pol_id, v_trace_featuregeom FROM polygon WHERE feature_id=OLD.element_id;
+			IF v_pol_id IS NOT NULL AND (NEW.the_geom::text <> OLD.the_geom::text) THEN
+				IF v_trace_featuregeom IS TRUE THEN   
+					v_x= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
+					v_y= (st_y(NEW.the_geom)-st_y(OLD.the_geom));
+					UPDATE polygon SET the_geom=ST_translate(the_geom, v_x, v_y) WHERE pol_id=v_pol_id;
+				END IF;
 			END IF;
 		END IF;
 		
