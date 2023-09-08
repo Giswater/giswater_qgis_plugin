@@ -121,3 +121,22 @@ AS SELECT element_x_gully.id,
      LEFT JOIN man_type_location ON man_type_location.location_type::text = v_edit_element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
      LEFT JOIN cat_element ON cat_element.id::text = v_edit_element.elementcat_id::text;
      
+
+DROP VIEW IF EXISTS v_ui_drainzone;
+CREATE OR REPLACE VIEW v_ui_drainzone AS
+ SELECT d.drainzone_id,
+    d.name,
+    d.expl_id,
+    d.descript,
+    d.active,
+    d.undelete,
+    d.link,
+    d.graphconfig,
+    d.stylesheet,
+    d.tstamp,
+    d.insert_user,
+    d.lastupdate,
+    d.lastupdate_user
+   FROM drainzone d
+  WHERE d.drainzone_id > 0
+  ORDER BY d.drainzone_id;
