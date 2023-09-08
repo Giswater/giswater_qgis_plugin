@@ -591,7 +591,7 @@ BEGIN
 			array_index := array_index + 1;
 
 			IF p_tg_op='INSERT' THEN 
-
+				field_value = NULL;
 				CASE (aux_json->>'columnname')
 				
 				-- special values
