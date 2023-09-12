@@ -57,6 +57,8 @@ class GwNetscenarioManagerButton(GwAction):
         self.dlg_netscenario_manager = GwNetscenarioManagerUi()
         tools_gw.load_settings(self.dlg_netscenario_manager)
 
+        tools_gw.add_icon(self.dlg_netscenario_manager.btn_toc, "306", sub_folder="24x24")
+
         # Manage btn create
         self._manage_btn_create()
         tools_gw.add_icon(self.dlg_netscenario_manager.btn_selector, "142", folder='toolbars', sub_folder='basic')
@@ -72,6 +74,7 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Connect main dialog signals
         self.dlg_netscenario_manager.txt_name.textChanged.connect(partial(self._fill_manager_table))
+        self.dlg_netscenario_manager.btn_toc.clicked.connect(partial(self._manage_add_layers))
         self.dlg_netscenario_manager.btn_selector.clicked.connect(partial(self._netscenario_selector))
         self.dlg_netscenario_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_netscenario))
         self.dlg_netscenario_manager.btn_update.clicked.connect(partial(self._manage_properties))
@@ -289,7 +292,6 @@ class GwNetscenarioManagerButton(GwAction):
         tools_gw.load_settings(self.dlg_netscenario)
 
         # Add icons
-        tools_gw.add_icon(self.dlg_netscenario.btn_toc, "306", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_netscenario.btn_insert, "111", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_netscenario.btn_delete, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_netscenario.btn_snapping, "137")
@@ -318,7 +320,6 @@ class GwNetscenarioManagerButton(GwAction):
         self.dlg_netscenario.btn_config.clicked.connect(partial(self._manage_config))
         self.dlg_netscenario.btn_create.clicked.connect(partial(self._manage_create))
         self.dlg_netscenario.btn_update.clicked.connect(partial(self._manage_update))
-        self.dlg_netscenario.btn_toc.clicked.connect(partial(self._manage_add_layers))
         self.dlg_netscenario.btn_insert.clicked.connect(partial(self._manage_insert))
         self.dlg_netscenario.btn_delete.clicked.connect(partial(self._manage_delete))
         self.dlg_netscenario.btn_snapping.clicked.connect(partial(self._manage_select))
