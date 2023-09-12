@@ -514,7 +514,7 @@ class GwNetscenarioManagerButton(GwAction):
         index = self.tbl_netscenario.selectionModel().currentIndex()
         selected_netscenario_id = index.sibling(index.row(), 0).data()
         selected_netscenario_type = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(self.tbl_netscenario, 'netscenario_type')).data()
-        tablename = f"v_edit_plan_netscenario_{selected_netscenario_type.lower()}"
+        tablename = f"plan_netscenario"
         pkey = "netscenario_id"
 
         feature = f'"tableName":"{tablename}", "id":"{selected_netscenario_id}"'
