@@ -165,7 +165,7 @@ BEGIN
 		v_elev2:= (SELECT elevation - depth FROM v_edit_node WHERE node_id=p_node2);
 		v_depth2:= (SELECT depth FROM v_edit_node WHERE node_id=p_node2);
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (213, 4, concat('System values of node 2 (',p_node1,') - elevation:',v_top2 , ', depth:', v_depth2));
+		VALUES (213, 4, concat('System values of node 2 (',p_node2,') - elevation:',v_top2 , ', depth:', v_depth2));
 	END IF;
 
 	-- Calculate distances
