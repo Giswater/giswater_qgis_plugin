@@ -399,7 +399,7 @@ class GwNetscenarioManagerButton(GwAction):
         # Fill current table
         self._fill_netscenario_table()
 
-        # Refresh txt_feature_id
+        # Refresh cmb_feature_id
         tools_qt.set_combo_value(self.dlg_netscenario.cmb_feature_id, '', 0, False)
 
         # Manage insert typeahead
@@ -433,10 +433,20 @@ class GwNetscenarioManagerButton(GwAction):
     def _enable_widgets(self, enable):
         """  """
 
-        tools_qt.set_widget_enabled(self.dlg_netscenario, 'txt_feature_id', enable)
+        # Get index of selected tab
+        index_tab = self.dlg_netscenario.main_tab.currentIndex()
+        tab_name = self.dlg_netscenario.main_tab.widget(index_tab).objectName()
+
+        tools_qt.set_widget_enabled(self.dlg_netscenario, 'cmb_feature_id', enable)
         tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_insert', enable)
         tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_delete', enable)
         tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_snapping', enable)
+
+        if tab_name in ('plan_netscenario_arc', 'plan_netscenario_node', 'plan_netscenario_connec'):
+            enable = False
+        tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_config', enable)
+        tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_create', enable)
+        tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_update', enable)
 
 
     def _manage_feature_type(self):
@@ -675,12 +685,12 @@ class GwNetscenarioManagerButton(GwAction):
     def _manage_insert(self):
         """ Insert feature to netscenario via the button """
 
-        if self.dlg_netscenario.txt_feature_id.text() == '':
+        if self.dlg_netscenario.cmb_feature_id.text() == '':
             message = "Feature_id is mandatory."
-            self.dlg_netscenario.txt_feature_id.setStyleSheet("border: 1px solid red")
+            self.dlg_netscenario.cmb_feature_id.setStyleSheet("border: 1px solid red")
             tools_qgis.show_warning(message, dialog=self.dlg_netscenario)
             return
-        self.dlg_netscenario.txt_feature_id.setStyleSheet(None)
+        self.dlg_netscenario.cmb_feature_id.setStyleSheet(None)
         tableview = self.dlg_netscenario.main_tab.currentWidget()
         view = tableview.objectName()
 
@@ -695,14 +705,14 @@ class GwNetscenarioManagerButton(GwAction):
             elif view == "plan_netscenario_demand":
                 sql += f", feature_type"
             # VALUES
-            sql += f")VALUES ({self.selected_netscenario_id}, '{self.dlg_netscenario.txt_feature_id.text()}'"
+            sql += f")VALUES ({self.selected_netscenario_id}, '{self.dlg_netscenario.cmb_feature_id.text()}'"
             if view in ("plan_netscenario_controls", "plan_netscenario_rules"):
                 sql += f", ''"
             elif view == "plan_netscenario_demand":
                 sql += f", '{self.feature_type.upper()}'"
             sql += f");"
         else:
-            sql = f"INSERT INTO {view} VALUES ({self.selected_netscenario_id}, '{self.dlg_netscenario.txt_feature_id.text()}');"
+            sql = f"INSERT INTO {view} VALUES ({self.selected_netscenario_id}, '{self.dlg_netscenario.cmb_feature_id.text()}');"
         tools_db.execute_sql(sql)
 
         # Refresh tableview
