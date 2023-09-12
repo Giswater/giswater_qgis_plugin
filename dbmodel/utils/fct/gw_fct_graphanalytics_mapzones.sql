@@ -766,11 +766,13 @@ BEGIN
 			UPDATE temp_t_node SET staticpressure=(log_message::json->>'staticpressure')::float FROM temp_t_data a WHERE a.feature_id=node_id 
 			AND fid=147 AND cur_user=current_user;
 			
+			/* due performance issues is better to keep frozen till solve it
 			-- update on node table those elements disconnected from graph
 			EXECUTE 'UPDATE temp_t_node SET staticpressure=(staticpress1-(staticpress1-staticpress2)*st_linelocatepoint(temp_t_arc.the_geom, n.the_geom))::numeric(12,3)
 				FROM temp_t_arc, temp_t_node n
 				WHERE st_dwithin(temp_t_arc.the_geom, n.the_geom, 0.05::double precision) AND temp_t_arc.state = 1 AND n.state = 1 
 				and n.arc_id IS NOT NULL AND temp_t_node.node_id=n.node_id and n.expl_id='||v_expl_id||' '||v_psectors_query_node||';';
+			*/
 				
 			-- update connec table
 			EXECUTE 'UPDATE temp_t_connec SET staticpressure =(b.head - b.elevation + (case when b.depth is null then 0 else b.depth end)::float) FROM 
