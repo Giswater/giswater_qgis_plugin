@@ -385,3 +385,5 @@ iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue,
 SELECT 'plan_netscenario_presszone',formtype, tabname, 'presszone_name', layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
 iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
 FROM config_form_fields WHERE formname = 'v_edit_plan_netscenario_presszone' AND columnname in ('name') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+UPDATE config_form_fields SET widgettype = 'text', datatype = 'string' where formname ilike '%netscenario%' and columnname ilike '%name';
