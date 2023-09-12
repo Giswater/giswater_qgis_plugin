@@ -151,7 +151,12 @@ BEGIN
 
 		END IF;
 		
-	ELSIF v_action = 'UPDATE' AND v_config IS NOT NULL THEN
+	ELSIF v_action = 'UPDATE' THEN
+		IF v_config IS NULL THEN
+				v_config = '{"use":[], "ignore":[], "forceClosed":[]}';
+		END IF;
+
+
 		IF v_zone = 'DMA' THEN 
 			v_id = 'dma_id';
 		ELSIF v_zone = 'SECTOR' THEN 
