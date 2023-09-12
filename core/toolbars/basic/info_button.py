@@ -194,6 +194,8 @@ class GwInfoButton(GwMaptool):
             action_valve.hovered.connect(partial(self._reset_rubber_bands))
             main_menu.addAction(action_valve)
             main_menu.addSeparator()
+
+        main_menu.aboutToHide.connect(self._reset_rubber_bands)
         main_menu.exec_(click_point)
 
 
