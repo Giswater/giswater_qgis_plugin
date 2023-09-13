@@ -706,28 +706,15 @@ class GwMapzoneManager:
         tools_gw.load_settings(self.add_dlg)
         self.my_json_add = {}
         tools_gw.build_dialog_info(self.add_dlg, result, my_json=self.my_json_add)
-        # # Populate node_id/feature_id
-        # tools_qt.set_widget_text(self.add_dlg, f'tab_none_{info.feature_type}_id', feature_id)
-        # tools_qt.set_widget_text(self.add_dlg, 'tab_none_feature_id', feature_id)
         layout = self.add_dlg.findChild(QGridLayout, 'lyt_main_1')
         # Disable widgets if updating
         if force_action == "UPDATE":
-            tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_{field_id}', False)  # sector_id/dma_id/...
-        # tools_qt.set_selected_item(self.add_dlg, 'tab_none_feature_type', f"{info.feature_type.upper()}")
-        # tools_qt.set_widget_enabled(self.add_dlg, 'tab_none_feature_type', False)
-        # cmb_nodarc_id = self.add_dlg.findChild(QComboBox, 'tab_none_nodarc_id')
-        # aux_view = view.replace("dscenario_", "")
-        # if cmb_nodarc_id is not None:
-        #     sql = (f"SELECT nodarc_id as id, nodarc_id as idval FROM {aux_view}"
-        #            f" WHERE {info.feature_type}_id = '{feature_id}'")
-        #     rows = tools_db.get_rows(sql)
-        #     tools_qt.fill_combo_values(cmb_nodarc_id, rows)
-        # cmb_order_id = self.add_dlg.findChild(QComboBox, 'tab_none_order_id')
-        # if cmb_order_id is not None:
-        #     sql = (f"SELECT order_id as id, order_id::text as idval FROM {aux_view}"
-        #            f" WHERE {info.feature_type}_id = '{feature_id}'")
-        #     rows = tools_db.get_rows(sql)
-        #     tools_qt.fill_combo_values(cmb_order_id, rows, 1)
+            tools_qt.set_widget_enabled(self.add_dlg, f'tab_data_{field_id}', False)  # sector_id/dma_id/...
+        # Populate netscenario_id
+        if self.netscenario_id is not None:
+            tools_qt.set_widget_text(self.add_dlg, f'tab_data_netscenario_id', self.netscenario_id)
+            tools_qt.set_widget_enabled(self.add_dlg, f'tab_data_netscenario_id', False)
+
         # Get every widget in the layout
         widgets = []
         for row in range(layout.rowCount()):
