@@ -201,3 +201,32 @@ VALUES('tbl_visit_x_gully', 'SELECT * FROM v_ui_event_x_gully WHERE event_id IS 
 DELETE FROM sys_param_user WHERE id='edit_gully_autoupdate_polgeom';
 DELETE FROM config_param_user WHERE parameter='edit_gully_autoupdate_polgeom';
 
+
+-- 13/09/23
+-- element
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
+	VALUES('gully form', 'utils', 'tbl_element_x_gully', 'sys_id', 0, true, NULL, NULL, NULL, NULL)
+ON CONFLICT (objectname, columnname) DO NOTHING;
+UPDATE config_form_tableview SET objectname = 'tbl_element_x_gully', columnindex = columnindex+1
+WHERE objectname = 'v_ui_element_x_gully';
+
+-- document
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
+	VALUES('gully form', 'utils', 'tbl_doc_x_gully', 'sys_id', 0, true, NULL, NULL, NULL, NULL)
+ON CONFLICT (objectname, columnname) DO NOTHING;
+UPDATE config_form_tableview SET objectname = 'tbl_doc_x_gully', columnindex = columnindex+1
+WHERE objectname = 'v_ui_doc_x_gully';
+
+-- visit
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
+	VALUES('gully form', 'utils', 'tbl_visit_x_gully', 'sys_id', 0, true, NULL, NULL, NULL, NULL)
+ON CONFLICT (objectname, columnname) DO NOTHING;
+UPDATE config_form_tableview SET objectname = 'tbl_visit_x_gully', columnindex = columnindex+1
+WHERE objectname = 'v_ui_event_x_gully';
+
+-- connection
+UPDATE config_form_tableview SET objectname = 'tbl_connection_downstream', columnindex = columnindex+1
+WHERE objectname = 'v_ui_node_x_connection_downstream';
+
+UPDATE config_form_tableview SET objectname = 'tbl_connection_upstream', columnindex = columnindex+1
+WHERE objectname = 'v_ui_node_x_connection_upstream';

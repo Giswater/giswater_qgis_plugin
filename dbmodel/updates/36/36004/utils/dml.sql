@@ -37,3 +37,77 @@ INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, p
 VALUES(3246, 'The inserted streetname value doesn''t exist on ext_streetaxis table', 'Please insert an existing one', 2, true, 'utils', 'core') ON CONFLICT (id) DO NOTHING;
 
 UPDATE sys_table SET context='{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"POLYGON"}', orderby=4, alias='Element polygon'  WHERE id='ve_pol_element';
+
+
+-- 13/09/23
+-- element
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
+	VALUES('arc form', 'utils', 'tbl_element_x_arc', 'sys_id', 0, true, NULL, NULL, NULL, NULL)
+ON CONFLICT (objectname, columnname) DO NOTHING;
+UPDATE config_form_tableview SET objectname = 'tbl_element_x_arc', columnindex = columnindex+1
+WHERE objectname = 'v_ui_element_x_arc';
+
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
+	VALUES('node form', 'utils', 'tbl_element_x_node', 'sys_id', 0, true, NULL, NULL, NULL, NULL)
+ON CONFLICT (objectname, columnname) DO NOTHING;
+UPDATE config_form_tableview SET objectname = 'tbl_element_x_node', columnindex = columnindex+1
+WHERE objectname = 'v_ui_element_x_node';
+
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
+	VALUES('connec form', 'utils', 'tbl_element_x_connec', 'sys_id', 0, true, NULL, NULL, NULL, NULL)
+ON CONFLICT (objectname, columnname) DO NOTHING;
+UPDATE config_form_tableview SET objectname = 'tbl_element_x_connec', columnindex = columnindex+1
+WHERE objectname = 'v_ui_element_x_connec';
+
+-- document
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
+	VALUES('arc form', 'utils', 'tbl_doc_x_arc', 'sys_id', 0, true, NULL, NULL, NULL, NULL)
+ON CONFLICT (objectname, columnname) DO NOTHING;
+UPDATE config_form_tableview SET objectname = 'tbl_doc_x_arc', columnindex = columnindex+1
+WHERE objectname = 'v_ui_doc_x_arc';
+
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
+	VALUES('node form', 'utils', 'tbl_doc_x_node', 'sys_id', 0, true, NULL, NULL, NULL, NULL)
+ON CONFLICT (objectname, columnname) DO NOTHING;
+UPDATE config_form_tableview SET objectname = 'tbl_doc_x_node', columnindex = columnindex+1
+WHERE objectname = 'v_ui_doc_x_node';
+
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
+	VALUES('connec form', 'utils', 'tbl_doc_x_connec', 'sys_id', 0, true, NULL, NULL, NULL, NULL)
+ON CONFLICT (objectname, columnname) DO NOTHING;
+UPDATE config_form_tableview SET objectname = 'tbl_doc_x_connec', columnindex = columnindex+1
+WHERE objectname = 'v_ui_doc_x_connec';
+
+-- visit
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
+	VALUES('arc form', 'utils', 'tbl_visit_x_arc', 'sys_id', 0, true, NULL, NULL, NULL, NULL)
+ON CONFLICT (objectname, columnname) DO NOTHING;
+UPDATE config_form_tableview SET objectname = 'tbl_visit_x_arc', columnindex = columnindex+1
+WHERE objectname = 'v_ui_event_x_arc';
+
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
+	VALUES('node form', 'utils', 'tbl_visit_x_node', 'sys_id', 0, true, NULL, NULL, NULL, NULL)
+ON CONFLICT (objectname, columnname) DO NOTHING;
+UPDATE config_form_tableview SET objectname = 'tbl_visit_x_node', columnindex = columnindex+1
+WHERE objectname = 'v_ui_event_x_node';
+
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
+	VALUES('connec form', 'utils', 'tbl_visit_x_connec', 'sys_id', 0, true, NULL, NULL, NULL, NULL)
+ON CONFLICT (objectname, columnname) DO NOTHING;
+UPDATE config_form_tableview SET objectname = 'tbl_visit_x_connec', columnindex = columnindex+1
+WHERE objectname = 'v_ui_event_x_connec';
+
+-- hydrometer
+UPDATE config_form_tableview SET objectname = 'tbl_hydrometer', columnindex = columnindex+1
+WHERE objectname = 'v_ui_hydrometer';
+
+-- hydrometer value
+UPDATE config_form_tableview SET objectname = 'tbl_hydrometer_value', columnindex = columnindex+1
+WHERE objectname = 'v_ui_hydroval';
+
+-- relations
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
+	VALUES('arc form', 'utils', 'v_ui_arc_x_relations', 'sys_id', 0, true, NULL, NULL, NULL, NULL)
+ON CONFLICT (objectname, columnname) DO NOTHING;
+UPDATE config_form_tableview SET objectname = 'tbl_relations', columnindex = columnindex+1
+WHERE objectname = 'v_ui_arc_x_relations';
