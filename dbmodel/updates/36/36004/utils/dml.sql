@@ -25,13 +25,10 @@ INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, i
 VALUES (512, 'Modify mapzone configuration', 'utils', null, 'core', true, 'Function process', null) ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source")
-VALUES(3240, 'It''s not possible to configure thid node as mapzone header, cause this type of node that can''t be a header of', 'Select different parent node.', 2, true, 'utils', 'core') ON CONFLICT (id) DO NOTHING;
+VALUES(3242, 'It''s not possible to configure this node as mapzone header, because it''s not an operative nor planified node', 'Select different parent node.', 2, true, 'utils', 'core')  ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source")
-VALUES(3242, 'It''s not possible to configure this node as mapzone header, cause it''s not an operative nor planified node', 'Select different parent node.', 2, true, 'utils', 'core')  ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source")
-VALUES(3244, 'It''s not possible to use selected arcs. They are not connected to node parent', 'Select different arcs.', 2, true, 'utils', 'core')  ON CONFLICT (id) DO NOTHING;
+VALUES(3244, 'It''s not possible to use selected arcs. They are not connected to node parent', 'Select different arc.', 2, true, 'utils', 'core')  ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source") 
 VALUES(3246, 'The inserted streetname value doesn''t exist on ext_streetaxis table', 'Please insert an existing one', 2, true, 'utils', 'core') ON CONFLICT (id) DO NOTHING;
