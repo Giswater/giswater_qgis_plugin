@@ -73,6 +73,7 @@ class GwMapzoneManager:
         # self.dlg_dscenario.main_tab.setCurrentIndex(default_tab_idx)
 
         # Connect signals
+        self.mapzone_mng_dlg.txt_name.textChanged.connect(partial(self._txt_name_changed))
         self.mapzone_mng_dlg.btn_config.clicked.connect(partial(self.manage_config, self.mapzone_mng_dlg, None))
         self.mapzone_mng_dlg.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active))
         self.mapzone_mng_dlg.btn_create.clicked.connect(partial(self.manage_create, self.mapzone_mng_dlg, None))
@@ -86,37 +87,18 @@ class GwMapzoneManager:
 
         tools_gw.open_dialog(self.mapzone_mng_dlg, 'mapzone_manager')
 
+    def _txt_name_changed(self, text):
+        expr = f"name ilike '%{text}%'" if text else None
+        self._fill_mapzone_table(expr=expr)
+
     def _manage_current_changed(self):
         """ Manages tab changes """
 
+        # Refresh txt_feature_id
+        tools_qt.set_widget_text(self.mapzone_mng_dlg, self.mapzone_mng_dlg.txt_name, '')
+
         # Fill current table
         self._fill_mapzone_table()
-
-        # # Refresh txt_feature_id
-        # tools_qt.set_widget_text(self.dlg_dscenario, self.dlg_dscenario.txt_feature_id, '')
-        # self.dlg_dscenario.txt_feature_id.setStyleSheet(None)
-        #
-        # # Manage insert typeahead
-        # # Get index of selected tab
-        # index_tab = self.dlg_dscenario.main_tab.currentIndex()
-        # tab_name = self.dlg_dscenario.main_tab.widget(index_tab).objectName()
-        # enable = tab_name not in self.filter_disabled
-        #
-        # # Populate typeahead
-        # if enable:
-        #     self._manage_feature_type()
-        #     table_name = f"v_edit_{tab_name.replace('dscenario_', '')}"
-        #     feature_type = self.feature_type
-        #     if self.filter_dict.get(tab_name):
-        #         table_name = self.filter_dict[tab_name]['filter_table']
-        #         feature_type = self.filter_dict[tab_name]['feature_type']
-        #     tools_gw.set_completer_widget(table_name, self.dlg_dscenario.txt_feature_id, feature_type, add_id=True)
-        #
-        # # Deactivate btn_snapping functionality
-        # self._selection_end()
-        #
-        # # Enable/disable filter & buttons
-        # self._enable_widgets(enable)
 
     def _fill_mapzone_table(self, set_edit_triggers=QTableView.DoubleClicked, expr=None):
         """ Fill mapzone table with data from its corresponding table """
