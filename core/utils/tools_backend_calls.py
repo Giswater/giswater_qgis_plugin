@@ -283,7 +283,7 @@ def filter_table(**kwargs):
             model.clear()
             tools_gw.add_tableview_header(qtable, field)
             tools_gw.fill_tableview_rows(qtable, field)
-            tools_gw.set_tablemodel_config(dialog, qtable, field['widgetname'], 1, True)
+            tools_gw.set_tablemodel_config(dialog, qtable, linkedobject, 1, True)
             tools_qt.set_tableview_config(qtable)
 
     return complet_list

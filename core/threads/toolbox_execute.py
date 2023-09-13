@@ -183,6 +183,7 @@ class GwToolBoxTask(GwTask):
             tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
         elif result:
             tools_gw.fill_tab_log(self.dialog, self.json_result['body']['data'], True, True, 1, False, False)
+            self.dialog.btn_run.setEnabled(False)
         # If sql function return null
         elif result is False:
             msg = f"Database returned null. Check postgres function 'gw_fct_getinfofromid'"

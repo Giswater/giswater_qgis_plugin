@@ -542,6 +542,9 @@ class GwElement:
                 f" WHERE element_id = '{element_id}';")
         sql += (f"\nDELETE FROM element_x_connec"
                 f" WHERE element_id = '{element_id}';")
+        if global_vars.project_type == 'ud':
+            sql += (f"\nDELETE FROM element_x_gully"
+                    f" WHERE element_id = '{element_id}';")
 
         if self.list_ids['arc']:
             for feature_id in self.list_ids['arc']:
@@ -555,10 +558,16 @@ class GwElement:
             for feature_id in self.list_ids['connec']:
                 sql += (f"\nINSERT INTO element_x_connec (element_id, connec_id)"
                         f" VALUES ('{element_id}', '{feature_id}');")
+        if self.list_ids['gully']:
+            for feature_id in self.list_ids['gully']:
+                sql += (f"\nINSERT INTO element_x_gully (element_id, gully_id)"
+                        f" VALUES ('{element_id}', '{feature_id}');")
         status = tools_db.execute_sql(sql)
         if status:
             self.element_id = element_id
             self.layers = tools_gw.manage_close(self.dlg_add_element, table_object, layers=self.layers)
+            # Refresh canvas
+            tools_qgis.refresh_map_canvas()
 
 
     def _filter_elementcat_id(self):

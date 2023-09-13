@@ -273,6 +273,15 @@ FORM_CLASS = _get_ui_class('replace_arc.ui', 'plan')
 class GwReplaceArc(GwDialog, FORM_CLASS):
     pass
 
+FORM_CLASS = _get_ui_class('netscenario_manager.ui', 'plan')
+class GwNetscenarioManagerUi(GwDialog, FORM_CLASS):
+    pass
+    pass
+
+FORM_CLASS = _get_ui_class('netscenario.ui', 'plan')
+class GwNetscenarioUi(GwDialog, FORM_CLASS):
+    pass
+
 # endregion
 
 
@@ -299,6 +308,14 @@ class GwWorkspaceManagerUi(GwDialog, FORM_CLASS):
 
 FORM_CLASS = _get_ui_class('workspace_create.ui', 'utilities')
 class GwCreateWorkspaceUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = _get_ui_class('mapzone_manager.ui', 'utilities')
+class GwMapzoneManagerUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = _get_ui_class('mapzone_config.ui', 'utilities')
+class GwMapzoneConfigUi(GwDialog, FORM_CLASS):
     pass
 # endregion
 

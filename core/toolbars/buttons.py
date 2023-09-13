@@ -52,6 +52,7 @@ from .epa.nonvisual_manager_button import GwNonVisualManagerButton
 from .plan.psector_button import GwPsectorButton
 from .plan.psector_manager_button import GwPsectorManagerButton
 from .plan.price_manager_button import GwPriceManagerButton
+from .plan.netscenario_manager_btn import GwNetscenarioManagerButton
 
 # Utilities
 from .utilities.toolbox_btn import GwToolBoxButton
@@ -60,6 +61,7 @@ from .utilities.csv_btn import GwCSVButton
 from .utilities.print_btn import GwPrintButton
 from .utilities.project_check_btn import GwProjectCheckButton
 from .utilities.workspace_manager_btn import GwWorkspaceManagerButton
+from .utilities.utils_manager_btn import GwUtilsManagerButton
 
 # ToC
 from .toc.add_child_layer_button import GwAddChildLayerButton

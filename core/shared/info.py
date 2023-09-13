@@ -227,6 +227,7 @@ class GwInfo(QObject):
                     else:
                         sub_tag = 'node'
                 feature_id = self.complet_result['body']['feature']['id']
+
                 result, dialog = self._open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker,
                     new_feature=new_feature)
                 if feature_cat is not None:
@@ -504,12 +505,15 @@ class GwInfo(QObject):
                 pass
 
         self.visible_tabs = complet_result['body']['form'].get('visibleTabs', [])
+
         for tab in self.visible_tabs:
             tabs_to_show.append(tab['tabName'])
 
         for x in range(self.tab_main.count() - 1, 0, -1):
             if self.tab_main.widget(x).objectName() not in tabs_to_show:
                 tools_qt.remove_tab(self.tab_main, self.tab_main.widget(x).objectName())
+            elif new_feature and self.tab_main.widget(x).objectName() != 'tab_data':
+                tools_qt.enable_tab_by_tab_name(self.tab_main, self.tab_main.widget(x).objectName(), False)
 
         # Actions
         self._get_actions()
@@ -1619,6 +1623,10 @@ class GwInfo(QObject):
                     self._manage_docker_close()
                 else:
                     tools_gw.close_dialog(dialog)
+            if new_feature:
+                for tab in self.visible_tabs:
+                    tools_qt.enable_tab_by_tab_name(self.tab_main, tab['tabName'], True)
+            self._reload_epa_tab(dialog)
             self._reset_my_json()
         else:
             tools_qt.set_action_checked(action_edit, True)
@@ -1929,8 +1937,10 @@ class GwInfo(QObject):
                 self._manage_docker_close()
             else:
                 tools_gw.close_dialog(dialog)
+            QgsProject.instance().blockSignals(False)
             return None
 
+        QgsProject.instance().blockSignals(False)
         return True
 
 
@@ -2749,8 +2759,8 @@ class GwInfo(QObject):
             short_name = field['widgetname'].replace(f"tab_{tab_name}_", "", 1)
             widget = tools_gw.add_tableview_header(widget, field)
             widget = tools_gw.fill_tableview_rows(widget, field)
-            widget = tools_gw.set_tablemodel_config(dialog, widget, short_name, 1, True)
-            tools_qt.set_tableview_config(widget, edit_triggers=QTableView.DoubleClicked)
+            tools_qt.set_tableview_config(widget, edit_triggers=QTableView.DoubleClicked, sectionResizeMode=0)
+            widget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, 1, True)
             if 'tab_epa' in widgetname:
                 model = widget.model()
                 tbl_upsert = widget.property('widgetcontrols').get('tableUpsert')

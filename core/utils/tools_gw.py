@@ -1270,7 +1270,7 @@ def build_dialog_info(dialog, result, my_json=None):
             kwargs = {"dialog": dialog, "field": field}
             widget = add_button(**kwargs)
 
-        if 'ismandatory' in field:
+        if 'ismandatory' in field and widget is not None:
             widget.setProperty('ismandatory', field['ismandatory'])
 
         if 'layoutorder' in field and field['layoutorder'] is not None:
@@ -1655,7 +1655,7 @@ def add_checkbox(**kwargs):
     if connect_signal is not None and connect_signal is False:
         return widget
 
-    if 'widgetfunction' in field:
+    if field.get('widgetfunction'):
         if 'module' in field['widgetfunction']:
             module = globals()[field['widgetfunction']['module']]
         function_name = field['widgetfunction'].get('functionName')
@@ -3068,11 +3068,11 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
     return widget
 
 
-def add_icon(widget, icon, sub_folder="20x20"):
+def add_icon(widget, icon, sub_folder="20x20", folder="dialogs"):
     """ Set @icon to selected @widget """
 
     # Get icons folder
-    icons_folder = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}{sub_folder}")
+    icons_folder = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}{folder}{os.sep}{sub_folder}")
     icon_path = os.path.join(icons_folder, str(icon) + ".png")
 
     if os.path.exists(icon_path):

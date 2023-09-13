@@ -1737,6 +1737,11 @@ class GwPsector:
         if tools_os.set_boolean(keep_open_form, False) is not True:
             tools_gw.close_dialog(self.dlg_psector_mng)
 
+        # put psector on selector_psector
+        sql = f"DELETE FROM selector_psector WHERE psector_id = {psector_id} AND cur_user = current_user;" \
+              f"INSERT INTO selector_psector (psector_id, cur_user) VALUES ({psector_id}, current_user);"
+        tools_db.execute_sql(sql)
+
         # Open form
         self.master_new_psector(psector_id)
         
