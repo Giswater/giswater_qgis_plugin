@@ -9,6 +9,12 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 
 Changelog=Version 3.6.004
+    - New button: Utils manager (mapzones manager & prices manager)
+    - New button: Netscenario manager
+    - Epa results manager: add "Archive" button
+    - Put psector on selector_psector when opening it
+    - Manage tabs editability on insert new feature
+    - Bug fix: toolbox dialogs' titles now show function name
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
