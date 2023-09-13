@@ -291,35 +291,10 @@ VALUES ('v_ui_plan_netscenario', 'Table to show netscenario in qgis ui', 'role_m
 INSERT INTO config_form_fields(
 formname, formtype, tabname, columnname, layoutname, layoutorder, 
 label,isparent, iseditable, isautoupdate, isfilter, hidden)
-SELECT 'v_edit_plan_netscenario_dma', 'form_feature', 'tab_none', attname, 'lyt_data_1', attnum,
+SELECT 'plan_netscenario', 'form_feature', 'tab_none', attname, 'lyt_data_1', attnum,
 attname, false, true, false, false, false FROM   pg_attribute
-WHERE  attrelid = 'SCHEMA_NAME.v_edit_plan_netscenario_dma'::regclass 
-and attname!='the_geom' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
-	
-INSERT INTO config_form_fields(
-formname, formtype, tabname, columnname, layoutname, layoutorder, 
-label,isparent, iseditable, isautoupdate, isfilter, hidden)
-SELECT 'v_edit_plan_netscenario_presszone', 'form_feature', 'tab_none', attname, 'lyt_data_1', attnum,
-attname, false, true, false, false, false FROM   pg_attribute
-WHERE  attrelid = 'SCHEMA_NAME.v_edit_plan_netscenario_presszone'::regclass 
-and attname!='the_geom' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
-	
-UPDATE config_form_fields set datatype='string', widgettype='text'
-where (formname = 'v_edit_plan_netscenario_dma' or formname = 'v_edit_plan_netscenario_presszone') 
-and columnname in ('presszone_id','presszone_name','dma_name','graphconfig', 'netscenario_name');
-
-UPDATE config_form_fields set datatype='integer', widgettype='text', ismandatory = true
-where (formname = 'v_edit_plan_netscenario_dma' or formname = 'v_edit_plan_netscenario_presszone')  and columnname in ('netscenario_id', 'dma_id');
-
-
-UPDATE config_form_fields set datatype='numeric', widgettype='text', ismandatory = false
-where formname = 'v_edit_plan_netscenario_presszone' and columnname in ('head');
-
-UPDATE config_form_fields set datatype=a.datatype, widgettype=a.widgettype, ismandatory = a.ismandatory, dv_querytext=a.dv_querytext,
-dv_orderby_id=a.dv_orderby_id,dv_isnullvalue=a.dv_isnullvalue
-from (select datatype, widgettype, ismandatory,  dv_querytext, dv_orderby_id, dv_isnullvalue
-from config_form_fields where formname = 'v_edit_dma' and columnname in ('pattern_id'))a
-where formname = 'v_edit_plan_netscenario_dma' and columnname in ('pattern_id');
+WHERE  attrelid = 'SCHEMA_NAME.plan_netscenario'::regclass and attnum >0
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields(
 formname, formtype, tabname, columnname, layoutname, layoutorder, 
@@ -353,6 +328,61 @@ dv_orderby_id=a.dv_orderby_id,dv_isnullvalue=a.dv_isnullvalue
 from (select datatype, widgettype, ismandatory,  dv_querytext, dv_orderby_id, dv_isnullvalue
 from config_form_fields where formname = 'v_edit_dma' and columnname in ('pattern_id'))a
 where formname = 'v_edit_plan_netscenario_dma' and columnname in ('pattern_id');
+
+INSERT INTO config_form_fields(
+formname, formtype, tabname, columnname, layoutname, layoutorder, 
+label,isparent, iseditable, isautoupdate, isfilter, hidden)
+SELECT 'v_edit_plan_netscenario_dma', 'form_feature', 'tab_none', attname, 'lyt_data_1', attnum,
+attname, false, true, false, false, false FROM   pg_attribute
+WHERE  attrelid = 'SCHEMA_NAME.v_edit_plan_netscenario_dma'::regclass 
+and attname!='the_geom' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+	
+INSERT INTO config_form_fields(
+formname, formtype, tabname, columnname, layoutname, layoutorder, 
+label,isparent, iseditable, isautoupdate, isfilter, hidden)
+SELECT 'v_edit_plan_netscenario_presszone', 'form_feature', 'tab_none', attname, 'lyt_data_1', attnum,
+attname, false, true, false, false, false FROM   pg_attribute
+WHERE  attrelid = 'SCHEMA_NAME.v_edit_plan_netscenario_presszone'::regclass 
+and attname!='the_geom' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+UPDATE config_form_fields set datatype='string', widgettype='text'
+where formname in ('v_edit_plan_netscenario_dma','v_edit_plan_netscenario_presszone','plan_netscenario') 
+and columnname in ('presszone_id','presszone_name','dma_name','graphconfig', 'netscenario_name', 'name', 'descript', 'log');
+
+UPDATE config_form_fields set datatype='integer', widgettype='text', ismandatory = true
+where formname in ('v_edit_plan_netscenario_dma','v_edit_plan_netscenario_presszone','plan_netscenario') 
+and columnname in ('netscenario_id', 'dma_id');
+
+UPDATE config_form_fields set datatype='numeric', widgettype='text', ismandatory = false
+where formname = 'v_edit_plan_netscenario_presszone' and columnname in ('head');
+
+UPDATE config_form_fields set datatype=a.datatype, widgettype=a.widgettype, ismandatory = a.ismandatory, dv_querytext=a.dv_querytext,
+dv_orderby_id=a.dv_orderby_id,dv_isnullvalue=a.dv_isnullvalue
+from (select datatype, widgettype, ismandatory,  dv_querytext, dv_orderby_id, dv_isnullvalue
+from config_form_fields where formname = 'v_edit_dma' and columnname in ('pattern_id'))a
+where formname = 'v_edit_plan_netscenario_dma' and columnname in ('pattern_id');
+
+UPDATE config_form_fields set datatype=a.datatype, widgettype=a.widgettype, ismandatory = a.ismandatory, dv_querytext=a.dv_querytext,
+dv_orderby_id=a.dv_orderby_id,dv_isnullvalue=a.dv_isnullvalue
+from (select datatype, widgettype, ismandatory,  dv_querytext, dv_orderby_id, dv_isnullvalue
+from config_form_fields where formname = 'v_edit_dma' and columnname in ('expl_id'))a
+where formname = 'plan_netscenario' and columnname in ('expl_id');
+
+UPDATE config_form_fields set datatype=a.datatype, widgettype=a.widgettype, ismandatory = a.ismandatory, dv_querytext=a.dv_querytext,
+dv_orderby_id=a.dv_orderby_id,dv_isnullvalue=a.dv_isnullvalue
+from (select datatype, widgettype, ismandatory,  dv_querytext, dv_orderby_id, dv_isnullvalue
+from config_form_fields where formname = 'v_edit_dma' and columnname in ('active'))a
+where formname = 'plan_netscenario' and columnname in ('active');
+
+UPDATE config_form_fields set datatype='string', widgettype='combo', ismandatory = false, 
+dv_querytext='SELECT netscenario_id as id,name as idval FROM plan_netscenario WHERE active IS TRUE ',
+dv_orderby_id=true, dv_isnullvalue=true
+where formname = 'plan_netscenario' and columnname in ('parent_id');
+
+UPDATE config_form_fields set datatype='string', widgettype='combo', ismandatory = true, 
+dv_querytext='SELECT id, idval FROM plan_typevalue WHERE typevalue = ''netscenario_type''',
+dv_orderby_id=true, dv_isnullvalue=true
+where formname = 'plan_netscenario' and columnname in ('netscenario_type');
 
 INSERT INTO sys_function( id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, source)
 VALUES (3274, 'gw_trg_edit_plan_netscenario', 'ws', 'function trigger', null, null, 'Function trigger that allows editing views of netscenario dma and presszone', 'role_edit', 'core')
