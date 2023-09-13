@@ -2759,8 +2759,8 @@ class GwInfo(QObject):
             short_name = field['widgetname'].replace(f"tab_{tab_name}_", "", 1)
             widget = tools_gw.add_tableview_header(widget, field)
             widget = tools_gw.fill_tableview_rows(widget, field)
-            widget = tools_gw.set_tablemodel_config(dialog, widget, short_name, 1, True)
-            tools_qt.set_tableview_config(widget, edit_triggers=QTableView.DoubleClicked)
+            tools_qt.set_tableview_config(widget, edit_triggers=QTableView.DoubleClicked, sectionResizeMode=0)
+            widget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, 1, True)
             if 'tab_epa' in widgetname:
                 model = widget.model()
                 tbl_upsert = widget.property('widgetcontrols').get('tableUpsert')
