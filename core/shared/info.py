@@ -67,6 +67,7 @@ class GwInfo(QObject):
         self.suppres_form = None
         self.prev_action = None
         self.previous_map_tool = None
+        self.vertex_marker = None
 
 
     def get_info_from_coordinates(self, point, tab_type):
