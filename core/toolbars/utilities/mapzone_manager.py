@@ -94,6 +94,8 @@ class GwMapzoneManager:
     def _manage_current_changed(self):
         """ Manages tab changes """
 
+        if self.mapzone_mng_dlg is None or isdeleted(self.mapzone_mng_dlg):
+            return
         # Refresh txt_feature_id
         tools_qt.set_widget_text(self.mapzone_mng_dlg, self.mapzone_mng_dlg.txt_name, '')
 
