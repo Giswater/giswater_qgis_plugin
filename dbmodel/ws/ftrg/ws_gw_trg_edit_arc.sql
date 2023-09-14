@@ -49,7 +49,7 @@ BEGIN
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 		-- check if streetname exists
-		IF (NEW.streetname NOT IN (SELECT DISTINCT descript FROM v_ext_streetaxis)) OR (NEW.streetname2 NOT IN (SELECT DISTINCT descript FROM v_ext_streetaxis)) THEN
+		IF NEW.streetname IS NOT NULL AND ((NEW.streetname NOT IN (SELECT DISTINCT descript FROM v_ext_streetaxis)) OR (NEW.streetname2 NOT IN (SELECT DISTINCT descript FROM v_ext_streetaxis))) THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3246", "function":"1302","debug_msg":null}}$$);';
 		END IF;
