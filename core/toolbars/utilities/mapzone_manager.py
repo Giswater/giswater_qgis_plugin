@@ -177,6 +177,10 @@ class GwMapzoneManager:
         self.mapzone_type = tableview.objectName().split('_')[-1].lower()
         col_idx = tools_qt.get_col_index_by_col_name(tableview, f'{self.mapzone_type}_id')
         self.mapzone_id = index.sibling(index.row(), col_idx).data()
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, f'name')
+        if col_idx is None:
+            col_idx = tools_qt.get_col_index_by_col_name(tableview, f'{self.mapzone_type}_name')
+        mapzone_name = index.sibling(index.row(), col_idx).data()
         col_idx = tools_qt.get_col_index_by_col_name(tableview, 'graphconfig')
         graphconfig = index.sibling(index.row(), col_idx).data()
 
@@ -252,7 +256,10 @@ class GwMapzoneManager:
             tools_qt.set_widget_visible(self.config_dlg, self.config_dlg.txt_toArc, False)
 
         # Open dialog
-        tools_gw.open_dialog(self.config_dlg, 'mapzone_config')
+        dlg_title = f"Mapzone config - {mapzone_name}"
+        if self.netscenario_id is not None:
+            dlg_title += f" (Netscenario {self.netscenario_id})"
+        tools_gw.open_dialog(self.config_dlg, 'mapzone_config', title=dlg_title)
 
 
     def _config_dlg_finished(self, dialog):
