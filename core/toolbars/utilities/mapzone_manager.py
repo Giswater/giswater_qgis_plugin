@@ -174,9 +174,11 @@ class GwMapzoneManager:
 
         # Get selected mapzone data
         index = tableview.selectionModel().currentIndex()
-        self.mapzone_id = index.sibling(index.row(), 0).data()
         self.mapzone_type = tableview.objectName().split('_')[-1].lower()
-        graphconfig = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(tableview, 'graphconfig')).data()
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, f'{self.mapzone_type}_id')
+        self.mapzone_id = index.sibling(index.row(), col_idx).data()
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, 'graphconfig')
+        graphconfig = index.sibling(index.row(), col_idx).data()
 
         # Build dialog
         self.config_dlg = GwMapzoneConfigUi()
@@ -761,7 +763,6 @@ class GwMapzoneManager:
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             tools_qgis.show_warning(msg, dialog=dialog)
             tools_qt.set_action_checked("actionEdit", True, dialog)
-            QgsProject.instance().blockSignals(False)
             return False
 
         fields = json.dumps(my_json)
