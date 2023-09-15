@@ -197,7 +197,7 @@ class GwSelector:
                 if tools_qt.get_widget(dialog, f"chk_all_{tab_name}") is None:
                     widget = QCheckBox()
                     widget.setObjectName('chk_all_' + str(tab_name))
-                    widget.stateChanged.connect(partial(self._manage_all, dialog, widget))
+                    widget.toggled.connect(partial(self._manage_all, dialog, widget))
                     widget.setLayoutDirection(Qt.LeftToRight)
                     chk_all_tooltip = "Shift+Click to uncheck all"
                     widget.setToolTip(chk_all_tooltip)
