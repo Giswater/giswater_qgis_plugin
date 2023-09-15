@@ -188,7 +188,7 @@ BEGIN
 			v_count = v_count + 1;
 			
 			v_total_hydro = (SELECT sum(sum) FROM ext_rtc_hydrometer_x_data d JOIN rtc_hydrometer_x_connec USING (hydrometer_id) JOIN connec USING (connec_id) 
-				JOIN ext_rtc_hydrometer h ON h.id = d.hydrometer_id where cat_period_id = v_period AND dma_id = v_dma AND expl_id = v_expl AND is_waterbal IS TRUE);
+				JOIN ext_rtc_hydrometer h ON h.id = d.hydrometer_id where cat_period_id = v_period AND dma_id = v_dma AND connec.expl_id = v_expl AND is_waterbal IS TRUE);
 
 			v_centroidday = (SELECT (sum(sum*extract(epoch from value_date)/(24*3600)))/v_total_hydro FROM ext_rtc_hydrometer_x_data d
 					JOIN rtc_hydrometer_x_connec USING (hydrometer_id) JOIN connec USING (connec_id) 
