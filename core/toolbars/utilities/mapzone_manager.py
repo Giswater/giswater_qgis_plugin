@@ -429,6 +429,8 @@ class GwMapzoneManager:
 
         parameters = f'"action": "ADD", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
                      f'"nodeParent": "{node_parent_id}", "toArc": {to_arc_list}'
+        if self.netscenario_id is not None:
+            parameters += f', "netscenarioId": {self.netscenario_id}'
         if preview:
             parameters += f', "config": {preview}'
         extras = f'"parameters": {{{parameters}}}'
@@ -459,6 +461,8 @@ class GwMapzoneManager:
 
         parameters = f'"action": "REMOVE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
                      f'"nodeParent": "{node_parent_id}"'
+        if self.netscenario_id is not None:
+            parameters += f', "netscenarioId": {self.netscenario_id}'
         if preview:
             parameters += f', "config": {preview}'
         extras = f'"parameters": {{{parameters}}}'
@@ -489,6 +493,8 @@ class GwMapzoneManager:
 
         parameters = f'"action": "ADD", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
                      f'"forceClosed": {force_closed_list}'
+        if self.netscenario_id is not None:
+            parameters += f', "netscenarioId": {self.netscenario_id}'
         if preview:
             parameters += f', "config": {preview}'
         extras = f'"parameters": {{{parameters}}}'
@@ -519,6 +525,8 @@ class GwMapzoneManager:
 
         parameters = f'"action": "REMOVE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
                      f'"forceClosed": {force_closed_list}'
+        if self.netscenario_id is not None:
+            parameters += f', "netscenarioId": {self.netscenario_id}'
         if preview:
             parameters += f', "config": {preview}'
         extras = f'"parameters": {{{parameters}}}'
