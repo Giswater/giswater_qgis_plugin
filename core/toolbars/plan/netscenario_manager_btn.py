@@ -685,7 +685,7 @@ class GwNetscenarioManagerButton(GwAction):
     def _manage_insert(self):
         """ Insert feature to netscenario via the button """
 
-        if self.dlg_netscenario.cmb_feature_id.text() == '':
+        if self.dlg_netscenario.cmb_feature_id.lineEdit().text() == '':
             message = "Feature_id is mandatory."
             self.dlg_netscenario.cmb_feature_id.setStyleSheet("border: 1px solid red")
             tools_qgis.show_warning(message, dialog=self.dlg_netscenario)
@@ -705,14 +705,14 @@ class GwNetscenarioManagerButton(GwAction):
             elif view == "plan_netscenario_demand":
                 sql += f", feature_type"
             # VALUES
-            sql += f")VALUES ({self.selected_netscenario_id}, '{self.dlg_netscenario.cmb_feature_id.text()}'"
+            sql += f")VALUES ({self.selected_netscenario_id}, '{self.dlg_netscenario.cmb_feature_id.lineEdit().text()}'"
             if view in ("plan_netscenario_controls", "plan_netscenario_rules"):
                 sql += f", ''"
             elif view == "plan_netscenario_demand":
                 sql += f", '{self.feature_type.upper()}'"
             sql += f");"
         else:
-            sql = f"INSERT INTO {view} VALUES ({self.selected_netscenario_id}, '{self.dlg_netscenario.cmb_feature_id.text()}');"
+            sql = f"INSERT INTO {view} VALUES ({self.selected_netscenario_id}, '{self.dlg_netscenario.cmb_feature_id.lineEdit().text()}');"
         tools_db.execute_sql(sql)
 
         # Refresh tableview
