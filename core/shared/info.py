@@ -1762,7 +1762,8 @@ class GwInfo(QObject):
         :return: (boolean)
         """
 
-        QgsProject.instance().blockSignals(True)
+        # QgsProject.instance().blockSignals(True)
+        # It's not necessary to block signals because the code isn't changing snapping configuration anymore.
 
         # Check if C++ object has been deleted
         if isdeleted(dialog):
@@ -1797,13 +1798,11 @@ class GwInfo(QObject):
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             tools_qgis.show_warning(msg, dialog=dialog)
             tools_qt.set_action_checked("actionEdit", True, dialog)
-            QgsProject.instance().blockSignals(False)
             return False
 
         if _json != '' and str(_json) != '{}':
             if not generic and self._has_elev_and_y_json(_json):
                 tools_qt.set_action_checked("actionEdit", True, dialog)
-                QgsProject.instance().blockSignals(False)
                 return False
 
             # If we create a new feature
@@ -1823,7 +1822,6 @@ class GwInfo(QObject):
                 if status is False:
                     error = self.layer_new_feature.commitErrors()
                     tools_log.log_warning(f"{error}")
-                    QgsProject.instance().blockSignals(False)
                     return False
 
                 self.new_feature_id = None
@@ -1870,7 +1868,6 @@ class GwInfo(QObject):
 
             json_result = tools_gw.execute_procedure('gw_fct_setfields', body)
             if not json_result:
-                QgsProject.instance().blockSignals(False)
                 return False
 
             if clear_json:
@@ -1907,7 +1904,6 @@ class GwInfo(QObject):
                         QgsApplication.taskManager().triggerTask(self.valve_thread)
             elif "Failed" in json_result['status']:
                 # If json_result['status'] is Failed message from database is showed user by get_json->manage_json_exception
-                QgsProject.instance().blockSignals(False)
                 return False
 
         # Tab EPA
@@ -1925,7 +1921,6 @@ class GwInfo(QObject):
             json_result = tools_gw.execute_procedure('gw_fct_setfields', body)
             self._reset_my_json_epa()
             if not json_result or "Failed" in json_result['status']:
-                QgsProject.instance().blockSignals(False)
                 return False
 
         # Force a map refresh
@@ -1937,10 +1932,8 @@ class GwInfo(QObject):
                 self._manage_docker_close()
             else:
                 tools_gw.close_dialog(dialog)
-            QgsProject.instance().blockSignals(False)
             return None
 
-        QgsProject.instance().blockSignals(False)
         return True
 
 
@@ -3554,7 +3547,6 @@ def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result,
         msg = "Some mandatory values are missing. Please check the widgets marked in red."
         tools_qgis.show_warning(msg, dialog=dialog)
         tools_qt.set_action_checked("actionEdit", True, dialog)
-        QgsProject.instance().blockSignals(False)
         return False
 
     fields = json.dumps(my_json)
