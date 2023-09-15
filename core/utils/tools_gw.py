@@ -585,6 +585,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     style_id_epa = "-1"
     tablename_og = tablename
     schema_name = tools_db.dao_db_credentials['schema'].replace('"', '')
+    field_id = field_id.replace(" ", "")
     uri = tools_db.get_uri()
     uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
     if the_geom:
@@ -2693,28 +2694,6 @@ def manage_layer_manager(json_result, sql=None):
                 tools_qgis.set_margin(layer, margin)
                 if prev_layer:
                     global_vars.iface.setActiveLayer(prev_layer)
-
-        # Set snnaping options
-        if 'snnaping' in layermanager:
-            snapper_manager = GwSnapManager(global_vars.iface)
-            for layer_name in layermanager['snnaping']:
-                layer = tools_qgis.get_layer_by_tablename(layer_name)
-                if layer:
-                    QgsProject.instance().blockSignals(True)
-                    segment_flag = get_vertex_flag(2)
-                    layer_settings = snapper_manager.config_snap_to_layer(layer, QgsPointLocator.All, True)
-                    if layer_settings:
-                        layer_settings.setTypeFlag(segment_flag)
-                        layer_settings.setTolerance(15)
-                        layer_settings.setEnabled(True)
-                    else:
-                        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, segment_flag, 15, 1)
-                    snapping_config = snapper_manager.get_snapping_options()
-                    snapping_config.setIndividualLayerSettings(layer, layer_settings)
-                    QgsProject.instance().blockSignals(False)
-                    QgsProject.instance().snappingConfigChanged.emit(snapping_config)
-            snapper_manager.set_snap_mode()
-            del snapper_manager
 
     except Exception as e:
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, lib_vars.schema_name)
