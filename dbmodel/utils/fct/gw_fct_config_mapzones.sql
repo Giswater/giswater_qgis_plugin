@@ -40,7 +40,7 @@ v_message text;
 v_use_node json;
 v_use_forceclosed json;
 v_netscenario_id integer;
-
+v_check_value text;
 BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
@@ -55,8 +55,7 @@ BEGIN
 	v_toarc=json_extract_path_text(p_data, 'data','parameters','toArc')::TEXT;
 	v_forceclosed=json_extract_path_text(p_data, 'data','parameters','forceClosed')::TEXT;
 	v_config=json_extract_path_text(p_data, 'data','parameters','config')::TEXT;
-	v_netscenario_id=json_extract_path_text(p_data, 'data','parameters','netscenario_id')::integer;
-
+	v_netscenario_id=json_extract_path_text(p_data, 'data','parameters','netscenarioId')::integer;
 
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
@@ -68,7 +67,7 @@ BEGIN
 
 	IF v_action = 'ADD' THEN 
 		IF v_nodeparent IS NOT NULL THEN 
-			IF v_netscenario_id IS NULL and v_nodeparent NOT IN (SELECT node_id FROM node WHERE state = 1)  OR v_netscenario_id IS NOT NULL and v_nodeparent NOT IN (SELECT node_id FROM node WHERE state > 0) THEN
+			IF (v_netscenario_id IS NULL and v_nodeparent NOT IN (SELECT node_id FROM node WHERE state = 1)) OR (v_netscenario_id IS NOT NULL and v_nodeparent NOT IN (SELECT node_id FROM node WHERE state > 0)) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3242", "function":"3270","debug_msg": "'||v_zone||'"}}$$);'  INTO v_audit_result;
 			ELSE
@@ -97,8 +96,15 @@ BEGIN
 				IF v_config is null then
 						v_config = '{"use":[], "ignore":[], "forceClosed":[]}';
 				END IF;
-
+				
+				EXECUTE 'SELECT json_extract_path_text(json_extract_path('''||v_config||'''::json,''use'')->0,''nodeParent'')'
+				INTO v_check_value;
+				
+				IF v_check_value ='' THEN 
+					v_preview = concat('{"use":[',v_preview,'], "ignore":[], "forceClosed":[]}');
+				ELSE
 					v_preview = jsonb_set( v_config::jsonb, '{use}',(v_config::jsonb -> 'use') ||v_preview::jsonb);
+				END IF;
 			END IF;
 
 		ELSE 
@@ -160,9 +166,9 @@ BEGIN
 		END IF;
 		
 		IF v_netscenario_id IS NULL THEN
-			EXECUTE 'UPDATE '||lower(v_zone)||' set graphconfig = '''||v_config::JSON||''' WHERE '||v_id||' = '||v_mapzone_id||';';
+			EXECUTE 'UPDATE '||lower(v_zone)||' set graphconfig = '''||v_config::JSON||''' WHERE '||v_id||'::text = '||v_mapzone_id||'::text;';
 		ELSE
-			EXECUTE 'UPDATE plan_netscenario_'||lower(v_zone)||' set graphconfig = '''||v_config::JSON||''' WHERE '||v_id||' = '||v_mapzone_id||' AND netscenario_id='||v_netscenario_id||';';
+			EXECUTE 'UPDATE plan_netscenario_'||lower(v_zone)||' set graphconfig = '''||v_config::JSON||''' WHERE '||v_id||'::text = '||v_mapzone_id||'::text AND netscenario_id='||v_netscenario_id||';';
 		END IF;
 	END IF;
 		
