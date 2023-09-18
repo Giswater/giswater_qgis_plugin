@@ -2551,7 +2551,7 @@ def get_project_info(schemaname=None):
         tools_qgis.show_warning(f"Table not found: '{tablename}'")
         return None
 
-    sql = (f"SELECT lower(project_type), epsg, giswater, language "
+    sql = (f"SELECT lower(project_type), epsg, giswater, language, date "
            f"FROM {schemaname}.{tablename} "
            f"ORDER BY id DESC LIMIT 1")
     row = tools_db.get_row(sql)
@@ -2560,6 +2560,7 @@ def get_project_info(schemaname=None):
                              'project_epsg': row[1],
                              'project_version': row[2],
                              'project_language': row[3],
+                             'project_date': row[4]
                              }
 
     return project_info_dict
