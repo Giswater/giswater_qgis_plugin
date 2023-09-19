@@ -393,11 +393,8 @@ BEGIN
 	END IF;
 
 	--  Control NULL's
-	v_version := COALESCE(v_version, '');
+	v_message := COALESCE(v_message, '{}');
 	v_forminfo := COALESCE(v_forminfo, '{}');
-	v_fieldsjson := COALESCE(v_fieldsjson, '{}');
-	v_visit_id := COALESCE(v_visit_id, '');
-	v_geometry := COALESCE(v_geometry, '{}');
 
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo,'headerText',v_header_text);
 
