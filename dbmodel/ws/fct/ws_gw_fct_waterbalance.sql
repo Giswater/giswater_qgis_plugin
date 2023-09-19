@@ -149,7 +149,7 @@ BEGIN
 
 			-- total inlet
 			UPDATE om_waterbalance n SET total_in =  value FROM (
-			SELECT dma_id, p.id, (sum(coalesce(value,0)*flow_sign))::numeric(12,2) as value 
+			SELECT dma_id, p.id, (sum(coalesce(value,0)*flow_sign))::numeric as value 
 			FROM ext_cat_period p, ext_rtc_scada_x_data JOIN om_waterbalance_dma_graph  USING (node_id)
 			WHERE value_date >= start_date AND value_date <= end_date and flow_sign = 1
 			GROUP BY p.id, dma_id order by 1,2)a
@@ -157,7 +157,7 @@ BEGIN
 
 			-- total_inyected
 			UPDATE om_waterbalance n SET total_sys_input =  value FROM (
-			SELECT dma_id, p.id, (sum(coalesce(value,0)*flow_sign))::numeric(12,2) as value 
+			SELECT dma_id, p.id, (sum(coalesce(value,0)*flow_sign))::numeric as value 
 			FROM ext_cat_period p, ext_rtc_scada_x_data d JOIN om_waterbalance_dma_graph  USING (node_id)
 			WHERE value_date >= start_date AND value_date <= end_date
 			GROUP BY p.id, dma_id order by 1,2)a
@@ -170,7 +170,7 @@ BEGIN
 	 			SELECT count(*) INTO v_count FROM om_waterbalance WHERE cat_period_id = v_period AND expl_id = v_expl;
 
 			-- auth_bill_met_hydro
-			UPDATE om_waterbalance n SET auth_bill_met_hydro = value::numeric(12,2) FROM (SELECT dma_id, cat_period_id, (sum(sum))::numeric(12,2) as value
+			UPDATE om_waterbalance n SET auth_bill_met_hydro = value::numeric FROM (SELECT dma_id, cat_period_id, (sum(sum))::numeric as value
 			FROM ext_rtc_hydrometer_x_data d
 			JOIN rtc_hydrometer_x_connec USING (hydrometer_id)
 			JOIN connec c USING (connec_id) 
@@ -209,16 +209,16 @@ BEGIN
 
 			--raise notice ' % % % % % %',v_centroidday::integer , v_period, v_prevperiod, v_dma, v_startdate, v_enddate;
 
-			v_total_input = (SELECT (sum(coalesce(value,0)*flow_sign))::numeric(12,2)
+			v_total_input = (SELECT (sum(coalesce(value,0)*flow_sign))::numeric
 					FROM ext_rtc_scada_x_data JOIN om_waterbalance_dma_graph USING (node_id) WHERE dma_id = v_dma AND value_date >= v_startdate AND value_date <= v_enddate);
 
-			v_total_inlet = (SELECT (sum(coalesce(value,0)*flow_sign))::numeric(12,2)
+			v_total_inlet = (SELECT (sum(coalesce(value,0)*flow_sign))::numeric
 					FROM ext_rtc_scada_x_data JOIN om_waterbalance_dma_graph USING (node_id) WHERE flow_sign = 1 AND dma_id = v_dma AND value_date >= v_startdate AND value_date <= v_enddate);
 
 			v_total_out = v_total_inlet - v_total_input;
 
 			UPDATE om_waterbalance SET total_sys_input = v_total_input, total_in = v_total_inlet, total_out = v_total_out,
-					auth_bill_met_hydro = v_total_hydro::numeric(12,2), startdate = v_startdate, enddate = v_enddate WHERE cat_period_id = v_period AND dma_id = v_dma;
+					auth_bill_met_hydro = v_total_hydro::numeric, startdate = v_startdate, enddate = v_enddate WHERE cat_period_id = v_period AND dma_id = v_dma;
 			END LOOP;
 			
 			END IF;
@@ -267,7 +267,7 @@ BEGIN
 	 		auth_unbill = (COALESCE(auth_unbill_met, 0::double precision) + 
 	 		COALESCE(auth_unbill_unmet, 0::double precision)),
 			loss_app = (COALESCE(loss_app_unath, 0::double precision) + (COALESCE(loss_app_met_error, 0::double precision) + 
-			COALESCE(loss_app_data_error, 0::double precision))::numeric(12,2)::double precision),
+			COALESCE(loss_app_data_error, 0::double precision))::numeric::double precision),
     	loss_real = (COALESCE(loss_real_leak_main, 0::double precision) + COALESCE(loss_real_leak_service, 0::double precision) + 
     	COALESCE(loss_real_storage, 0::double precision)),
     	total_in = COALESCE(total_in::double precision, 0::double precision),
@@ -275,9 +275,9 @@ BEGIN
     	total = COALESCE(total_sys_input, 0::double precision) WHERE cat_period_id = v_period AND expl_id = v_expl;
 
     	UPDATE om_waterbalance SET auth =  (auth_bill + auth_unbill),
-    	nrw = (total::double precision - auth_bill::double precision)::numeric(12,2),
-    	nrw_eff = CASE WHEN total::double precision > 0::double precision THEN ((100::numeric * auth_bill)::double precision / total::double precision)::numeric(12,2)
-      ELSE 0::numeric(12,2) end,
+    	nrw = (total::double precision - auth_bill::double precision)::numeric,
+    	nrw_eff = CASE WHEN total::double precision > 0::double precision THEN ((100::numeric * auth_bill)::double precision / total::double precision)::numeric
+      ELSE 0::numeric end,
       loss = (total::double precision - auth_bill::double precision - auth_unbill::double precision)
       WHERE cat_period_id = v_period AND expl_id = v_expl;
 	 		
@@ -314,9 +314,9 @@ BEGIN
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Process done succesfully for period: ',v_period));
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Number of DMA processed: ', v_count));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Total System Input: ', rec_nrw.tsi::numeric(12,2), ' CMP'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Billed metered consumtion: ', rec_nrw.bmc::numeric(12,2), ' CMP'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Non-revenue water: ', rec_nrw.nrw::numeric(12,2), ' CMP'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Total System Input: ', rec_nrw.tsi::numeric, ' CMP'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Billed metered consumtion: ', rec_nrw.bmc::numeric, ' CMP'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Non-revenue water: ', rec_nrw.nrw::numeric, ' CMP'));
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
 
 
