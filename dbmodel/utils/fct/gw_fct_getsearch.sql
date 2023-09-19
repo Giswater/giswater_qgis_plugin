@@ -160,6 +160,9 @@ BEGIN
 				if v_tab_params->>'sys_filter' != '' then
 					v_sys_query_text := v_sys_query_text || ' AND ('||(v_tab_params->>'sys_filter')::text||')';
 				end if;
+
+				v_sys_query_text := v_sys_query_text || ' ORDER BY regexp_replace(' || (v_tab_params->>'sys_display_name')::text || ',''[^0-9]+'','''',''g'')::numeric';
+
 				v_sql = 'SELECT array_to_json(array_agg(a)) FROM (
 						'||(v_sys_query_text)::text||' ';
 	  			
