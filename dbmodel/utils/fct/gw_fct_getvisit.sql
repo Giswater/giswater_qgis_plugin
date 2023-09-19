@@ -393,7 +393,6 @@ BEGIN
 	END IF;
 
 	--  Control NULL's
-	v_message := COALESCE(v_message, '{}');
 	v_forminfo := COALESCE(v_forminfo, '{}');
 
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo,'headerText',v_header_text);
