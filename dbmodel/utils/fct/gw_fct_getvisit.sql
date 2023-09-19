@@ -26,8 +26,6 @@ v_feature_type text;
 column_type text;
 v_feature_id integer;
 v_visit_id integer;
-v_message json;
-
 aux_json json;
 array_index integer DEFAULT 0;
 field_value character varying;
@@ -222,10 +220,10 @@ BEGIN
 	IF v_tablename LIKE 'v_edit_cad%' THEN v_sourcetable = v_tablename;
 	ELSIF v_tablename LIKE '%link_connec%' OR v_tablename LIKE '%link_gully%' THEN v_sourcetable = 'link';
 	ELSIF v_tablename LIKE 'v_%edit_%' THEN v_sourcetable = replace (v_tablename, 'v_edit_', '');
-	ELSIF v_tablename LIKE 've_%node_%' THEN v_sourcetable = 'node';
-	ELSIF v_tablename LIKE 've_%arc_%' THEN v_sourcetable = 'arc';
-	ELSIF v_tablename LIKE 've_%connec_%' THEN v_sourcetable = 'connec';
-	ELSIF v_tablename LIKE 've_%gully_%' THEN v_sourcetable = 'gully';
+	ELSIF v_tablename LIKE 've_%node%' THEN v_sourcetable = 'node';
+	ELSIF v_tablename LIKE 've_%arc%' THEN v_sourcetable = 'arc';
+	ELSIF v_tablename LIKE 've_%connec%' THEN v_sourcetable = 'connec';
+	ELSIF v_tablename LIKE 've_%gully%' THEN v_sourcetable = 'gully';
 	ELSIF v_tablename LIKE '%hydrometer%' THEN v_sourcetable = 'v_rtc_hydrometer';
 	ELSIF v_tablename LIKE '%element%' THEN v_sourcetable = 'element';
 	ELSE v_sourcetable = v_tablename;
@@ -395,11 +393,13 @@ BEGIN
 	END IF;
 
 	--  Control NULL's
-	v_message := COALESCE(v_message, '{}');
+	v_version := COALESCE(v_version, '');
 	v_forminfo := COALESCE(v_forminfo, '{}');
+	v_fieldsjson := COALESCE(v_fieldsjson, '{}');
+	v_visit_id := COALESCE(v_visit_id, '');
+	v_geometry := COALESCE(v_geometry, '{}');
 
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo,'headerText',v_header_text);
-
 
 	-- Return
 	return ('{
