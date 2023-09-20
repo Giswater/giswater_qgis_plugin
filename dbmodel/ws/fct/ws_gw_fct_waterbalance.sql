@@ -174,7 +174,7 @@ BEGIN
 			FROM ext_rtc_hydrometer_x_data d
 			JOIN rtc_hydrometer_x_connec USING (hydrometer_id)
 			JOIN connec c USING (connec_id) 
-			JOIN ext_rtc_hydrometer h ON h.id = d.hydrometer_id 
+			JOIN ext_rtc_hydrometer h ON h.id::text = d.hydrometer_id::text
 			where is_waterbal IS TRUE
 			GROUP BY dma_id, cat_period_id)a
 			WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id;
