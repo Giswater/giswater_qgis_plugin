@@ -447,3 +447,5 @@ sum(auth) as "Authorized", sum(loss) as "Losses",
 (case when sum(n.total) > 0 THEN (sum(auth)/sum(n.total))::numeric(20,2) else 0.00 end) as "Losses Efficiency",
 (avg(n.ili))::numeric(20,2) as "ILI"
 FROM v_om_waterbalance n WHERE n.dma IS NOT NULL' where id = 104;
+
+DELETE FROM sys_function WHERE id = 3106;
