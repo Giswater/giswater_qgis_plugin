@@ -10,3 +10,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 DROP VIEW IF EXISTS v_ui_element_x_gully;
 ALTER TABLE element_x_gully ALTER COLUMN id TYPE integer USING id::integer;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_transects", "column":"sector_id", "dataType":"integer"}}$$);

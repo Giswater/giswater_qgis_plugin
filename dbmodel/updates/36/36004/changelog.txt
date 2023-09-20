@@ -12,3 +12,5 @@
 - Modify edit triggers to check that inserted streetname exists on ext_streetaxis
 - New field is_waterbal on ext_rtc_hydrometer to mark hydrometers which values enter into water balance calculations
 - New field trace_featuregeom on element and polygon to enable or disable their movement according to the movement of its node/connec/gully/element
+- New field sector_id on inp_transects (UD).
+- New view v_edit_inp_transects with trigger.
