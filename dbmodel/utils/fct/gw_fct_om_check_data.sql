@@ -471,9 +471,13 @@ BEGIN
 
 	RAISE NOTICE '17 - Check for orphan polygons on polygon table (255)';
 	IF v_project_type ='UD' THEN
-
-		v_querytext = '(SELECT pol_id FROM polygon WHERE feature_id IS NULL OR feature_id NOT IN (SELECT gully_id FROM gully UNION
-		SELECT node_id FROM node UNION SELECT connec_id FROM connec)) b';
+		IF v_edit IS NULL THEN 
+			v_querytext = '(SELECT pol_id FROM polygon WHERE feature_id IS NULL OR feature_id NOT IN (SELECT gully_id FROM gully UNION
+			SELECT node_id FROM node UNION SELECT connec_id FROM connec)) b';
+		ELSE
+			v_querytext = '(SELECT * FROM (SELECT pol_id, feature_id FROM ve_pol_node UNION SELECT pol_id, feature_id FROM ve_pol_connec UNION SELECT pol_id, feature_id FROM ve_pol_gully) a 
+			WHERE feature_id IS NULL OR feature_id NOT IN (SELECT gully_id FROM gully UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec)) b';
+		END IF; 
 
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		
@@ -485,8 +489,12 @@ BEGIN
 			VALUES (v_fid, 1, '255','INFO: No polygons without parent feature found.',v_count);
 		END IF;
 	ELSIF v_project_type='WS' THEN
-		v_querytext = '(SELECT pol_id FROM polygon WHERE feature_id IS NULL OR feature_id NOT IN (SELECT node_id FROM node UNION SELECT connec_id FROM connec)) a';
-
+		IF v_edit IS NULL THEN 
+			v_querytext = '(SELECT pol_id FROM polygon WHERE feature_id IS NULL OR feature_id NOT IN (SELECT node_id FROM node UNION SELECT connec_id FROM connec)) a';
+		ELSE
+			v_querytext = '(SELECT * FROM (SELECT * FROM ve_pol_node UNION SELECT * FROM ve_pol_connec)b 
+			WHERE feature_id IS NULL OR feature_id NOT IN (SELECT node_id FROM node UNION SELECT connec_id FROM connec))a';
+		END IF;
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		
 		IF v_count > 0 THEN
@@ -994,10 +1002,10 @@ BEGIN
 		)a where t.arc_id = a.link_id::text AND t.node_1 = a.connec_id;
 	ELSE
 		INSERT INTO temp_t_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '417', l.sector_id, l.state, l.the_geom 
-		FROM link l JOIN connec c ON feature_id = connec_id WHERE l.state = 1 and l.feature_type = 'CONNEC';
+		FROM v_edit_link l JOIN v_edit_connec c ON feature_id = connec_id WHERE l.state = 1 and l.feature_type = 'CONNEC';
 
 		UPDATE temp_t_arc t SET node_1 = connec_id, state = 9 FROM (
-		SELECT l.link_id, c.connec_id, (ST_Distance(c.the_geom, ST_startpoint(l.the_geom))) as d FROM connec c, link l
+		SELECT l.link_id, c.connec_id, (ST_Distance(c.the_geom, ST_startpoint(l.the_geom))) as d FROM v_edit_connec c, link l
 		WHERE l.state = 1 and c.state = 1 and ST_DWithin(ST_startpoint(l.the_geom), c.the_geom, 0.05) group by 1,2,3 ORDER BY 1 DESC,3 DESC
 		)a where t.arc_id = a.link_id::text AND t.node_1 = a.connec_id;
 	END IF;
