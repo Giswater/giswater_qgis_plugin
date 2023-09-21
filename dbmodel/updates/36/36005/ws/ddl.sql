@@ -5,11 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog;
+SET search_path = SCHEMA_NAME ,public;
 
 
-CREATE TRIGGER gw_trg_ui_element INSTEAD OF
-INSERT OR DELETE OR UPDATE
-ON v_ui_element_x_gully 
-FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_element('element_x_gully');
-
+DROP FUNCTION IF EXISTS gw_fct_pg2epa_check_nodarc;

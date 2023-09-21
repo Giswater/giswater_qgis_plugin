@@ -238,5 +238,3 @@ CREATE TABLE IF NOT EXISTS archived_rpt_inp_pattern_value(
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer", "column":"is_waterbal", "dataType":"boolean"}}$$);
 
 ALTER TABLE ext_rtc_hydrometer ALTER COLUMN is_waterbal SET DEFAULT True;
-
-DROP FUNCTION IF EXISTS gw_fct_pg2epa_check_nodarc;

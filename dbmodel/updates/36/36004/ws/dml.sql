@@ -417,35 +417,3 @@ iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue,
 FROM config_form_fields WHERE formname = 'v_edit_plan_netscenario_presszone' AND columnname in ('name') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 UPDATE config_form_fields SET widgettype = 'text', datatype = 'string' where formname ilike '%netscenario%' and columnname ilike '%name';
-
-UPDATE config_report SET query_text = 
-'SELECT w.exploitation as "Exploitation", w.dma as "Dma", period as "Period", 
-total_in::numeric(20,2) as "Total inlet",
-total_out::numeric(20,2) as "Total outlet",
-total::numeric(20,2) as "Total injected",
-auth_bill as "Auth. Bill", auth_unbill as "Auth. Unbill", auth as "Authorized", 
-loss_app as "Losses App", loss_real as "Losses Real",loss as "Losses", 
-(case when total > 0 then (auth/total)::numeric(20,2) else 0 end) as "Losses Efficiency" ,
-rw as "Revenue", nrw as "Non Revenue", 
-(case when total > 0 then (rw/total)::numeric(20,2) else 0.00 end) as "Revenue Efficiency",
-w.ili::numeric(20,2) as "ILI"
-FROM v_om_waterbalance w' where id = 102;
-
-UPDATE config_report SET query_text = 
-'SELECT n.exploitation as "Exploitation",
-(sum(n.total))::numeric(20,2) as "Total input", sum(rw) as "Revenue", sum(nrw) as "Non Revenue", 
-(case when sum(n.total) > 0 THEN (sum(rw)/sum(n.total))::numeric(20,2) else 0.00 end) as "Revenue Efficiency",
-sum(auth) as "Authorized", sum(loss) as "Losses", 
-(case when sum(n.total) > 0 THEN (sum(auth)/sum(n.total))::numeric(20,2) else 0.00 end) as "Losses Efficiency"
-FROM v_om_waterbalance n  WHERE n.dma IS NOT NULL' where id = 103;
-
-UPDATE config_report SET query_text = 
-'SELECT n.exploitation as "Exploitation", n.dma as "Dma", 
-(sum(n.total))::numeric(20,2) as "Total input", sum(rw) as "Revenue", sum(nrw) as "Non Revenue", 
-(case when sum(n.total) > 0 THEN (sum(rw)/sum(n.total))::numeric(20,2) else 0.00 end) as "Revenue Efficiency",
-sum(auth) as "Authorized", sum(loss) as "Losses", 
-(case when sum(n.total) > 0 THEN (sum(auth)/sum(n.total))::numeric(20,2) else 0.00 end) as "Losses Efficiency",
-(avg(n.ili))::numeric(20,2) as "ILI"
-FROM v_om_waterbalance n WHERE n.dma IS NOT NULL' where id = 104;
-
-DELETE FROM sys_function WHERE id = 3106;

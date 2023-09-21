@@ -7,9 +7,4 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
-CREATE TRIGGER gw_trg_ui_element INSTEAD OF
-INSERT OR DELETE OR UPDATE
-ON v_ui_element_x_gully 
-FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_element('element_x_gully');
-
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_transects", "column":"sector_id", "dataType":"integer"}}$$);
