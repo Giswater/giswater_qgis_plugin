@@ -38,6 +38,8 @@ v_status text;
 v_level integer;
 v_message text;
 v_result text;
+v_count integer;
+v_elem record;
 
 BEGIN
 
@@ -131,6 +133,19 @@ BEGIN
 
       -- perform state control for connects
       IF v_featuretype='connec' or v_featuretype='gully' then
+			/* (TO DO: Refactor Add tab 'log' to control if there are more than 1 related features for elements)
+			SELECT element_id FROM element_x_node WHERE node_id=rec_id
+			UNION 
+			SELECT element_id FROM element_x_arc WHERE arc_id=rec_id
+			union
+			SELECT element_id FROM element_x_connec WHERE connec_id=rec_id
+			INTO v_elem;
+			EXECUTE 'with mec as (select element_id, arc_id as feature_id from element_x_arc 
+					union select element_id, node_id as feature_id from element_x_node 
+					union select element_id, connec_id as feature_id from element_x_connec),
+			elem as (select element_id, state as element_state from element)
+			select count(*) from mec join elem using (element_id) where element_id'|| quote_literal(rec_id)||'
+			and element_state = 1' into v_count;*/		
 				PERFORM gw_fct_state_control(upper(v_featuretype::varchar), rec_id::varchar, 0, 'UPDATE');
 			END IF;
 
@@ -152,6 +167,10 @@ BEGIN
 				EXECUTE 'UPDATE element e SET state = 0, state_type='||v_state_type||', 
 				enddate = '||quote_literal(v_enddate)||' FROM element_x_'||v_featuretype||' f WHERE f.element_id=e.element_id AND '||v_featuretype||'_id ='||quote_literal(rec_id)||'';
 			END IF;
+			/* (TO DO: Refactor Add tab 'log' to control if there are more than 1 related features for elements)
+			if v_count > 1 then
+				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (xxx, v_result_id, 'This element was related to more than 1 feature. All of them have been affected by this action.');
+			end if;*/
 		END LOOP;
 	END IF;
 
