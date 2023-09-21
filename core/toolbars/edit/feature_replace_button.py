@@ -483,7 +483,8 @@ class GwFeatureReplaceButton(GwMaptool):
             tools_qt.set_widget_enabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
             sql = (f"SELECT DISTINCT(id) "
                    f"FROM {self.cat_table} "
-                   f"WHERE {self.feature_type_cat} = '{feature_type_new}' AND (active IS TRUE OR active IS NULL)")
+                   f"WHERE {self.feature_type_cat} = '{feature_type_new}' AND (active IS TRUE OR active IS NULL)"
+                   f"ORDER BY id")
 
         elif self.project_type == 'ud':
             sql = (f"SELECT DISTINCT(id) "
