@@ -38,7 +38,9 @@ class GwMapzoneManager:
         self.snapper_manager = GwSnapManager(self.iface)
         self.snapper_manager.set_snapping_layers()
         self.vertex_marker = self.snapper_manager.vertex_marker
+        self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
 
+        self.feature_types = ['sector_id', 'dma_id', 'presszone_id', 'dqa_id']
         self.mapzone_mng_dlg = None
         self.netscenario_id = None
 
@@ -63,7 +65,7 @@ class GwMapzoneManager:
             view = f'v_ui_{tab}'
             qtableview = QTableView()
             qtableview.setObjectName(f"tbl_{view}")
-            # qtableview.clicked.connect(partial(self._manage_highlight, qtableview, view))
+            qtableview.clicked.connect(partial(self._manage_highlight, qtableview, view))
             tab_idx = self.mapzone_mng_dlg.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
             self.mapzone_mng_dlg.main_tab.widget(tab_idx).setObjectName(view)
 
@@ -81,11 +83,28 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.btn_delete.clicked.connect(partial(self._manage_delete))
         self.mapzone_mng_dlg.main_tab.currentChanged.connect(partial(self._manage_current_changed))
         self.mapzone_mng_dlg.btn_cancel.clicked.connect(self.mapzone_mng_dlg.reject)
+        self.mapzone_mng_dlg.finished.connect(partial(tools_gw.reset_rubberband, self.rubber_band, None))
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.close_dialog, self.mapzone_mng_dlg, True))
 
         self._manage_current_changed()
 
         tools_gw.open_dialog(self.mapzone_mng_dlg, 'mapzone_manager')
+
+    def _manage_highlight(self, qtableview, view, index):
+        """ Creates rubberband to indicate which feature is selected """
+
+        tools_gw.reset_rubberband(self.rubber_band)
+        table = view.replace("v_ui", "v_edit")
+        feature_type = 'feature_id'
+
+        for x in self.feature_types:
+            col_idx = tools_qt.get_col_index_by_col_name(qtableview, x)
+            if col_idx is not None and col_idx is not False:
+                feature_type = x
+                break
+        if feature_type != 'feature_id':
+            table = f"v_edit_{feature_type.split('_')[0]}"
+        tools_qgis.highlight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
 
     def _txt_name_changed(self, text):
         expr = f"name ilike '%{text}%'" if text else None
@@ -98,6 +117,9 @@ class GwMapzoneManager:
             return
         # Refresh txt_feature_id
         tools_qt.set_widget_text(self.mapzone_mng_dlg, self.mapzone_mng_dlg.txt_name, '')
+
+        # Reset rubberband
+        tools_gw.reset_rubberband(self.rubber_band)
 
         # Fill current table
         self._fill_mapzone_table()
