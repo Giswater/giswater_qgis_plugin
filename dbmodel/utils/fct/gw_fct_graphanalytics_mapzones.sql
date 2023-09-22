@@ -728,8 +728,6 @@ BEGIN
 			EXECUTE v_querytext;
 
 		END IF;	
-		DROP TABLE IF EXISTS aaa_temp_t_anlgraph;
-		CREATE TABLE aaa_temp_t_anlgraph AS SELECT * FROM temp_t_anlgraph;
 
 		-- inundation process
 		LOOP						
@@ -1462,8 +1460,6 @@ BEGIN
 
 	ELSIF v_netscenario IS NOT NULL THEN
 
-		DROP TABLE IF EXISTS aaa_temp_dma;
-		CREATE TABLE aaa_temp_dma AS SELECT * FROM temp_dma;
 		v_querytext = 'UPDATE plan_netscenario_'||v_table||' SET the_geom = t.the_geom FROM temp_'||v_table||' t WHERE t.'||v_field||' = plan_netscenario_'||v_table||'.'||v_field||' 
 		AND plan_netscenario_'||v_table||'.netscenario_id = '||v_netscenario||'';
 		EXECUTE v_querytext;
