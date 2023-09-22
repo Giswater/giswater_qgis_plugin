@@ -43,3 +43,41 @@ CREATE OR REPLACE VIEW v_om_waterbalance
      JOIN exploitation e USING (expl_id)
      JOIN dma d USING (dma_id)
      JOIN ext_cat_period p ON p.id::text = om_waterbalance.cat_period_id::text;
+
+
+
+CREATE OR REPLACE VIEW v_edit_plan_netscenario_dma
+ AS
+ SELECT n.netscenario_id,
+    p.name AS netscenario_name,
+    n.dma_id,
+    n.dma_name AS name,
+    n.pattern_id,
+    n.graphconfig,
+    n.the_geom,
+    n.active,
+    n.lastupdate,
+    n.lastupdate_user 
+   FROM selector_netscenario,
+    plan_netscenario_dma n
+     JOIN plan_netscenario p USING (netscenario_id)
+  WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
+
+
+
+CREATE OR REPLACE VIEW v_edit_plan_netscenario_presszone
+ AS
+ SELECT n.netscenario_id,
+    p.name AS netscenario_name,
+    n.presszone_id,
+    n.presszone_name AS name,
+    n.head,
+    n.graphconfig,
+    n.the_geom,
+    n.active,
+    n.lastupdate,
+    n.lastupdate_user 
+   FROM selector_netscenario,
+    plan_netscenario_presszone n
+     JOIN plan_netscenario p USING (netscenario_id)
+  WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;

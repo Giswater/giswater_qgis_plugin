@@ -94,6 +94,17 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'The new netscenario have been created sucessfully');
 	END IF;
 
+	IF v_netscenario_type = 'DMA' THEN
+			INSERT INTO plan_netscenario_dma (netscenario_id, dma_id,dma_name, pattern_id, graphconfig, the_geom, active) 
+			SELECT v_scenarioid, dma_id, name, pattern_id, graphconfig, the_geom, TRUE FROM dma WHERE dma_id = 0 OR dma_id = -1
+			ON CONFLICT (netscenario_id, dma_id) DO NOTHING;
+		ELSIF v_netscenario_type = 'PRESSZONE' THEN
+			INSERT INTO plan_netscenario_presszone (netscenario_id, presszone_id,presszone_name, head, graphconfig, the_geom, active) 
+			SELECT v_scenarioid, presszone_id, name, head, graphconfig, the_geom, TRUE FROM presszone WHERE presszone_id= '0' OR presszone_id= '-1'
+			ON CONFLICT (netscenario_id, presszone_id) DO NOTHING;
+		END IF;
+
+
 	-- insert spacers
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, concat(''));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, concat(''));

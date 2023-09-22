@@ -48,12 +48,12 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
    	IF v_mapzone = 'DMA' THEN
 			UPDATE plan_netscenario_dma 
-			SET dma_id=NEW.dma_id, dma_name=NEW.name,  the_geom=NEW.the_geom, pattern_id=NEW.pattern_id, graphconfig=NEW.graphconfig::json
+			SET dma_id=NEW.dma_id, dma_name=NEW.name,  the_geom=NEW.the_geom, pattern_id=NEW.pattern_id, graphconfig=NEW.graphconfig::json, active=NEW.active
 			WHERE dma_id=OLD.dma_id AND netscenario_id=NEW.netscenario_id;
 		
 		ELSIF v_mapzone = 'PRESSZONE' THEN
 			UPDATE plan_netscenario_presszone 
-			SET presszone_id=NEW.presszone_id, presszone_name=NEW.name,  the_geom=NEW.the_geom, head=NEW.head, graphconfig=NEW.graphconfig::json
+			SET presszone_id=NEW.presszone_id, presszone_name=NEW.name,  the_geom=NEW.the_geom, head=NEW.head, graphconfig=NEW.graphconfig::json, active=NEW.active
 			WHERE presszone_id=OLD.presszone_id AND netscenario_id=NEW.netscenario_id;
 		END IF;
 

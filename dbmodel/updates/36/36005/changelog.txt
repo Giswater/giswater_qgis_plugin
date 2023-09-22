@@ -2,3 +2,4 @@
 *************
 - New field sector_id on inp_transects (UD).
 - New view v_edit_inp_transects with trigger.
+- New fields on plan_netscenario_dma and plan_netscenario_presszone: active, lastupdate, lastupdate_user

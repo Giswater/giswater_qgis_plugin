@@ -9,3 +9,15 @@ SET search_path = SCHEMA_NAME ,public;
 
 
 DROP FUNCTION IF EXISTS gw_fct_pg2epa_check_nodarc;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_dma", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+ALTER TABLE plan_netscenario_dma ALTER COLUMN active SET DEFAULT TRUE;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_presszone", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+ALTER TABLE plan_netscenario_presszone ALTER COLUMN active SET DEFAULT TRUE;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_presszone", "column":"lastupdate", "dataType":"timestamp", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_presszone", "column":"lastupdate_user", "dataType":"character varying(30)", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_dma", "column":"lastupdate", "dataType":"timestamp", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_dma", "column":"lastupdate_user", "dataType":"character varying(30)", "isUtils":"False"}}$$);
