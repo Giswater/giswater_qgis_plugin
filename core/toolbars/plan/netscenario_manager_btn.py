@@ -472,7 +472,6 @@ class GwNetscenarioManagerButton(GwAction):
     def _manage_highlight(self, qtableview, view, index):
         """ Creates rubberband to indicate which feature is selected """
 
-        table = view.replace("_netscenario", "")
         feature_type = 'feature_id'
 
         for x in self.feature_types:
@@ -480,8 +479,8 @@ class GwNetscenarioManagerButton(GwAction):
             if col_idx not in (None, False):
                 feature_type = x
                 break
-        if feature_type != 'feature_id':
-            table = f"v_edit_{feature_type.split('_')[0]}"
+
+        table = f"v_edit_{view}"
         tools_qgis.highlight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
 
 
