@@ -1460,7 +1460,7 @@ BEGIN
 
 	ELSIF v_netscenario IS NOT NULL THEN
 
-		v_querytext = 'UPDATE plan_netscenario_'||v_table||' SET the_geom = t.the_geom FROM temp_'||v_table||' t WHERE t.'||v_field||' = plan_netscenario_'||v_table||'.'||v_field||' 
+		v_querytext = 'UPDATE plan_netscenario_'||v_table||' SET the_geom = t.the_geom, lastupdate = lastupdate = now(), lastupdate_user=current_user FROM temp_'||v_table||' t WHERE t.'||v_field||' = plan_netscenario_'||v_table||'.'||v_field||' 
 		AND plan_netscenario_'||v_table||'.netscenario_id = '||v_netscenario||'';
 		EXECUTE v_querytext;
 

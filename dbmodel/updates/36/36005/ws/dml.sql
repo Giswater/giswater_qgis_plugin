@@ -38,3 +38,44 @@ sum(auth) as "Authorized", sum(loss) as "Losses",
 FROM v_om_waterbalance n WHERE n.dma IS NOT NULL' where id = 104;
 
 DELETE FROM sys_function WHERE id = 3106;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, isfilter, hidden)
+VALUES ('plan_netscenario_dma','form_feature', 'tab_none', 'active', 'lyt_data_1', 7, 'boolean', 'check', 'active', null, null, false, false, 
+true, false, false, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, isfilter, hidden)
+VALUES ('v_edit_plan_netscenario_dma','form_feature', 'tab_none', 'active', 'lyt_data_1', 7, 'boolean', 'check', 'active', null, null, false, false, 
+true, false, false, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, isfilter, hidden)
+VALUES ('plan_netscenario_presszone','form_feature', 'tab_none', 'active', 'lyt_data_1', 7, 'boolean', 'check', 'active', null, null, false, false, 
+true, false, false, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, isfilter, hidden)
+VALUES ('v_edit_plan_netscenario_presszone','form_feature', 'tab_none', 'active', 'lyt_data_1', 7, 'boolean', 'check', 'active', null, null, false, false, 
+true, false, false, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, isfilter, hidden)
+VALUES ('plan_netscenario_dma','form_feature', 'tab_none', 'lastupdate', 'lyt_data_1', 7, 'string', 'text', 'lastupdate', null, null, false, false, 
+false, false, false, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, isfilter, hidden)
+VALUES ('plan_netscenario_dma','form_feature', 'tab_none', 'lastupdate_user', 'lyt_data_1', 7, 'string', 'text', 'lastupdate_user', null, null, false, false, 
+false, false, false, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, isfilter, hidden)
+VALUES ('plan_netscenario_presszone','form_feature', 'tab_none', 'lastupdate', 'lyt_data_1', 7, 'string', 'text', 'lastupdate', null, null, false, false, 
+false, false, false, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, isfilter, hidden)
+VALUES ('plan_netscenario_presszone','form_feature', 'tab_none', 'lastupdate_user', 'lyt_data_1', 7, 'string', 'text', 'lastupdate_user', null, null, false, false, 
+false, false, false, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;

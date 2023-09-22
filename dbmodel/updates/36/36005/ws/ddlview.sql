@@ -55,9 +55,7 @@ CREATE OR REPLACE VIEW v_edit_plan_netscenario_dma
     n.pattern_id,
     n.graphconfig,
     n.the_geom,
-    n.active,
-    n.lastupdate,
-    n.lastupdate_user 
+    n.active
    FROM selector_netscenario,
     plan_netscenario_dma n
      JOIN plan_netscenario p USING (netscenario_id)
@@ -74,9 +72,7 @@ CREATE OR REPLACE VIEW v_edit_plan_netscenario_presszone
     n.head,
     n.graphconfig,
     n.the_geom,
-    n.active,
-    n.lastupdate,
-    n.lastupdate_user 
+    n.active
    FROM selector_netscenario,
     plan_netscenario_presszone n
      JOIN plan_netscenario p USING (netscenario_id)
