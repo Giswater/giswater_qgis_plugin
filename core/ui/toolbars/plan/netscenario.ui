@@ -67,6 +67,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="btn_toggle_active">
+       <property name="text">
+        <string>Toggle active</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="btn_create">
        <property name="text">
         <string>Create</string>

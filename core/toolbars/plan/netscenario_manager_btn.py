@@ -24,7 +24,7 @@ from ...ui.ui_manager import GwNetscenarioManagerUi, GwNetscenarioUi, GwInfoGene
 from ...utils import tools_gw
 from ...models.item_delegates import ReadOnlyDelegate, EditableDelegate
 from .... import global_vars
-from ....libs import lib_vars, tools_qgis, tools_qt, tools_db
+from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_os
 
 
 class GwNetscenarioManagerButton(GwAction):
@@ -318,6 +318,7 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Connect signals
         self.dlg_netscenario.btn_config.clicked.connect(partial(self._manage_config))
+        self.dlg_netscenario.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active))
         self.dlg_netscenario.btn_create.clicked.connect(partial(self._manage_create))
         self.dlg_netscenario.btn_update.clicked.connect(partial(self._manage_update))
         self.dlg_netscenario.btn_insert.clicked.connect(partial(self._manage_insert))
@@ -448,6 +449,7 @@ class GwNetscenarioManagerButton(GwAction):
         tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_config', enable)
         tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_create', enable)
         tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_update', enable)
+        tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_toggle_active', enable)
 
 
     def _manage_feature_type(self):
@@ -511,6 +513,30 @@ class GwNetscenarioManagerButton(GwAction):
             self.mapzone_manager.add_dlg.dlg_closed.connect(partial(self._manage_current_changed))
         except:
             pass
+
+
+    def _manage_toggle_active(self):
+        # Get selected row
+        tableview = self.dlg_netscenario.main_tab.currentWidget()
+        view = tableview.objectName().replace('tbl_', '')
+        selected_list = tableview.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.dlg_netscenario)
+            return
+
+        # Get selected mapzone data
+        index = tableview.selectionModel().currentIndex()
+        mapzone_id = index.sibling(index.row(), 0).data()
+        active = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(tableview, 'active')).data()
+        active = tools_os.set_boolean(active)
+        field_id = tableview.model().headerData(0, Qt.Horizontal)
+
+        sql = f"UPDATE {view} SET active = {str(not active).lower()} WHERE {field_id} = {mapzone_id}"
+        tools_db.execute_sql(sql, log_sql=True)
+
+        # Refresh tableview
+        self._manage_current_changed()
 
 
     def _manage_properties(self):
