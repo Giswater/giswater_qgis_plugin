@@ -345,6 +345,7 @@ class GwNetscenarioManagerButton(GwAction):
 
         self.table_name = f"{self.dlg_netscenario.main_tab.currentWidget().objectName()}"
         widget = self.dlg_netscenario.main_tab.currentWidget()
+        netscenario_type = self.selected_netscenario_type.lower()
 
         if self.schema_name not in self.table_name:
             self.table_name = self.schema_name + "." + self.table_name
@@ -352,7 +353,7 @@ class GwNetscenarioManagerButton(GwAction):
         # Set model
         model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         model.setTable(self.table_name)
-        model.setFilter(f"netscenario_id = {self.selected_netscenario_id}")
+        model.setFilter(f"netscenario_id = {self.selected_netscenario_id} AND {netscenario_type}_id::text NOT IN ('-1', '0')")
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)
         model.select()
