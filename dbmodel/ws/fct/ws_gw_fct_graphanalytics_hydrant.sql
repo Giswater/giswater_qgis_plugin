@@ -16,7 +16,7 @@ example:
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_hydrant($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
 "form":{}, "feature":{"tableName":"ve_node_hydrant", "featureType":"NODE", "id":["1054"]}, 
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection","parameters":{"distance":"50"}}}$$);
-
+
 -- fid: 463, 464
 
 */
@@ -341,6 +341,8 @@ SET search_path = "SCHEMA_NAME", public;
 	DROP TABLE temp_anl_arc;
 	DROP TABLE temp_anl_node;
 	DROP TABLE temp_t_table;
+	DROP TABLE temp_t_arc;
+	DROP TABLE temp_t_node;
 	DROP TABLE temp_audit_check_data;
 
 	IF (v_result_json->>'status')::TEXT = 'Accepted' THEN
