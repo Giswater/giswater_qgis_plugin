@@ -240,12 +240,14 @@ BEGIN
 		IF v_topocontrol IS TRUE AND v_catfeature.feature_type IS NOT NULL THEN 
 	
 			IF upper(v_catfeature.feature_type) ='NODE' THEN
-			
+				
+				/* commented because it is creating some kind of incosistences on normal operation and does not make sense
 				v_numnodes := (SELECT COUNT(*) FROM node WHERE ST_DWithin(p_reduced_geometry, node.the_geom, v_node_proximity) AND node.node_id != p_id AND node.state!=0);		
 				IF (v_numnodes >1) AND (v_node_proximity_control IS TRUE) THEN
 					v_message = (SELECT concat('Error[1096]:',error_message, p_id,'. ',hint_message) FROM sys_message WHERE id=1096);
 					v_status = false;
 				END IF;
+				*/
 				
 			ELSIF upper(v_catfeature.feature_type) ='ARC' THEN
 			
