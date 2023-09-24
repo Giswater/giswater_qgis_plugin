@@ -398,6 +398,9 @@ BEGIN
 					END IF;
 				
 				ELSIF v_psector_id IS NOT NULL THEN
+
+					-- profilactic control for state_type
+					if v_state_type is null then v_state_type = v_record1.state_type; end if;
 				
 					UPDATE arc SET state = 2, state_type = v_state_type WHERE arc_id = v_new_record.arc_id;
                     
