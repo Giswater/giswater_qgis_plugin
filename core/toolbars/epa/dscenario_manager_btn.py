@@ -443,6 +443,7 @@ class GwDscenarioManagerButton(GwAction):
         for widget in disabled_widgets:
             widget_name = f"tab_none_{widget}"
             tools_qt.set_widget_enabled(self.props_dlg, widget_name, False)
+        self.props_dlg.actionEdit.setVisible(False)
 
         # Signals
         self.props_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.props_dlg))

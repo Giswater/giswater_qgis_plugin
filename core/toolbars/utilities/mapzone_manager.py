@@ -730,6 +730,7 @@ class GwMapzoneManager:
         self.my_json_add = {}
         tools_gw.build_dialog_info(self.add_dlg, result, my_json=self.my_json_add)
         layout = self.add_dlg.findChild(QGridLayout, 'lyt_main_1')
+        self.add_dlg.actionEdit.setVisible(False)
         # Disable widgets if updating
         if force_action == "UPDATE":
             tools_qt.set_widget_enabled(self.add_dlg, f'tab_data_{field_id}', False)  # sector_id/dma_id/...
