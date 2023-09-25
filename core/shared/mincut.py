@@ -1340,7 +1340,7 @@ class GwMincut:
         # Get 'hydrometers' related with this 'connec'
         sql = (f"SELECT DISTINCT({self.col2})"
                f" FROM v_rtc_hydrometer"
-               f" WHERE connec_id = '{connec_id}'")
+               f" WHERE feature_id = '{connec_id}'")
         rows = tools_db.get_rows(sql)
         values = []
         if rows:
