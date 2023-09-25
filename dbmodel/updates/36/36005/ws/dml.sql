@@ -79,3 +79,12 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 iseditable, isautoupdate, isfilter, hidden)
 VALUES ('plan_netscenario_presszone','form_feature', 'tab_none', 'lastupdate_user', 'lyt_data_1', 7, 'string', 'text', 'lastupdate_user', null, null, false, false, 
 false, false, false, false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+UPDATE config_form_fields SET iseditable=false where formname='plan_netscenario' and columnname='netscenario_id';
+UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=3 where formname='plan_netscenario' and columnname='descript';
+UPDATE config_form_fields SET layoutorder=4 where formname='plan_netscenario' and columnname='netscenario_type';
+UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=5 where formname='plan_netscenario' and columnname='expl_id';
+UPDATE config_form_fields SET layoutorder=6 where formname='plan_netscenario' and columnname='parent_id';
+UPDATE config_form_fields SET layoutorder=7 where formname='plan_netscenario' and columnname='active';
+UPDATE config_form_fields SET iseditable=false and layoutorder=8 where formname='plan_netscenario' and columnname='log';
