@@ -140,11 +140,11 @@ BEGIN
 			union
 			SELECT element_id FROM element_x_connec WHERE connec_id=rec_id
 			INTO v_elem;
-			EXECUTE 'with mec as (select element_id, arc_id as feature_id from element_x_arc 
+			EXECUTE 'with a as (select element_id, arc_id as feature_id from element_x_arc 
 					union select element_id, node_id as feature_id from element_x_node 
 					union select element_id, connec_id as feature_id from element_x_connec),
 			elem as (select element_id, state as element_state from element)
-			select count(*) from mec join elem using (element_id) where element_id'|| quote_literal(rec_id)||'
+			select count(*) from a join elem using (element_id) where element_id'|| quote_literal(rec_id)||'
 			and element_state = 1' into v_count;*/		
 				PERFORM gw_fct_state_control(upper(v_featuretype::varchar), rec_id::varchar, 0, 'UPDATE');
 			END IF;
