@@ -1800,7 +1800,9 @@ class GwAdminButton:
         if not os.path.exists(filedir):
             tools_log.log_info(f"Folder not found: {filedir}")
             return True
-
+        # Skipping metadata folders for Mac OS
+        if '.DS_Store' in filedir:
+            return True
         tools_log.log_info(f"Processing folder: {filedir}")
         filelist = sorted(os.listdir(filedir))
         status = True
