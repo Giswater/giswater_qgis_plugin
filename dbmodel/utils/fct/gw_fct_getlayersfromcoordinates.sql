@@ -66,6 +66,14 @@ v_valve_id text;
 v_valve_text text;
 v_valve_tablename text;
 v_closed_valve bool;
+v_dscenario_valve bool=false;
+v_valve_id_dscenario text;
+v_valve_text_dscenario text;
+v_valve_tablename_dscenario text;
+v_closed_valve_dscenario text;
+v_dscenario_id int;
+v_valve_value_dscenario text;
+v_valve_epa_type text;
 
   
 BEGIN
@@ -123,6 +131,13 @@ BEGIN
 
 	--   Make point
 	SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
+
+	FOREACH v_layer IN ARRAY v_visibleLayers::text[]
+	LOOP
+		IF v_layer = 'v_edit_inp_dscenario_valve' THEN v_dscenario_valve = true; END IF;
+		
+	END LOOP;
+	
 
 	v_sql := 'SELECT layer_id, 0 as orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id= '''' UNION 
               SELECT layer_id, orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id = any('||quote_literal(v_visibleLayers)||'::text[]) ORDER BY orderby';
@@ -215,6 +230,25 @@ BEGIN
                                 ELSE
                                     v_valve_text := 'Close valve ('||v_id||')';
                                 END IF;
+                               	EXECUTE 'SELECT epa_type FROM '||v_layer||' WHERE '||v_idname||' = '''||v_id||'''' INTO v_valve_epa_type;
+
+                                IF v_dscenario_valve IS TRUE AND v_valve_epa_type = 'VALVE' THEN
+                                	EXECUTE 'SELECT dscenario_id FROM selector_inp_dscenario WHERE cur_user = current_user LIMIT 1' INTO v_dscenario_id;
+                                	IF (SELECT count(dscenario_id) FROM selector_inp_dscenario WHERE cur_user = current_user) != 1 THEN
+                                		v_valve_text_dscenario := 'To change valve status in dsenario you must have only one dscenario active';
+                                	ELSE
+	                                	v_valve_tablename_dscenario := 'v_edit_inp_dscenario_valve';
+	                                	v_valve_id_dscenario := v_id;
+	                                	EXECUTE 'SELECT status FROM '||quote_ident(v_valve_tablename_dscenario)||' WHERE dscenario_id = '||v_dscenario_id||' AND '||v_idname||' = '''||v_id||'''' INTO v_closed_valve_dscenario;
+
+		                                IF v_closed_valve_dscenario = 'CLOSED' OR v_closed_valve IS TRUE THEN
+		                                    v_valve_text_dscenario := 'Open valve in dscenario '||v_dscenario_id||' ('||v_id||')';
+		                                ELSE
+		                                    v_valve_text_dscenario := 'Close valve in dscenario '||v_dscenario_id||' ('||v_id||')';
+		                                END IF;
+		                            END IF;
+                                	
+                                END IF;
                             END IF;
                         END LOOP;
                     END IF;
@@ -242,17 +276,35 @@ BEGIN
 		v_valve_text := ', "valve": {"id": "'||v_valve_id||'", "text": "'||v_valve_text||
 						'", "tableName":"'||v_valve_tablename||'", "value": "'||(NOT v_closed_valve)||'"}';
 	END IF;
+
+	IF v_valve_text_dscenario IS NOT NULL THEN
+		v_valve_id_dscenario := COALESCE(v_valve_id_dscenario, '');
+		v_dscenario_id := COALESCE(v_dscenario_id, -1);
+		v_valve_tablename_dscenario := COALESCE(v_valve_tablename_dscenario, '');
+		v_valve_value_dscenario := COALESCE(v_valve_value_dscenario, '');
+		v_valve_value_dscenario := coalesce(v_valve_value_dscenario, v_closed_valve_dscenario);
+	
+		IF v_closed_valve_dscenario = 'OPEN' OR (v_closed_valve_dscenario IS NULL AND v_closed_valve IS FALSE) THEN
+			v_valve_value_dscenario := 'CLOSED';
+		ELSIF v_closed_valve_dscenario = 'CLOSED' OR (v_closed_valve_dscenario IS NULL AND v_closed_valve IS TRUE) THEN
+			v_valve_value_dscenario := 'OPEN';
+		END IF;
+
+		v_valve_text_dscenario := ', "valve_dscenario": {"id": "'||v_valve_id_dscenario||'", "dscenario_id": "'||v_dscenario_id||'", "text": "'||v_valve_text_dscenario||
+						'", "tableName":"'||v_valve_tablename_dscenario||'", "value": "'||v_valve_value_dscenario||'"}';
+	END IF;
     
 	fields := array_to_json(fields_array);
 	fields := COALESCE(fields, '[]');    
 	v_valve_text := COALESCE(v_valve_text, '');
+	v_valve_text_dscenario := COALESCE(v_valve_text_dscenario, '');
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{"level":1, "text":"Process done successfully"}'||
 			',"form":{}'||
 			',"feature":{}'||
-			',"data":{"layersNames":' || fields ||''|| v_valve_text ||'}}'||
+			',"data":{"layersNames":' || fields ||''|| v_valve_text ||''|| v_valve_text_dscenario ||'}}'||
 	    '}')::json, 2590, null, null, null);
 
 	-- Exception handling
