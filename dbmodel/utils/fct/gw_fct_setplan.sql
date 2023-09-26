@@ -42,16 +42,20 @@ BEGIN
 	v_psector := json_extract_path_text (p_data,'data','psectorId')::integer;
 	v_state_obsolete_planified:= (SELECT value::json ->> 'obsolete_planified' FROM config_param_system WHERE parameter='plan_psector_status_action');
 
-
-	--control psector topology: find arc, that on psector is defined as operative, but its final nodes are defined as obsolete
+	
 	IF v_psector IS NOT NULL THEN
-		v_query = 'SELECT pa.arc_id, pa.psector_id , node_1 as node FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
-		JOIN plan_psector_x_node pn1 ON pn1.node_id = arc.node_1
-		WHERE pa.psector_id = pn1.psector_id AND pa.state = 1 AND pn1.state = 0 AND pa.psector_id = '|| v_psector ||' AND arc.state_type<>'|| v_state_obsolete_planified ||'
-		UNION
-		SELECT pa.arc_id, pa.psector_id, node_2 FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
-		JOIN plan_psector_x_node pn2 ON pn2.node_id = arc.node_2
-		WHERE pa.psector_id = pn2.psector_id AND pa.state = 1 AND pn2.state = 0  AND pa.psector_id = '|| v_psector ||' AND arc.state_type<>'|| v_state_obsolete_planified ||'';
+
+		--control psector topology: find arc, that on psector is defined as operative, on psector there are no nodes
+		v_query = '
+		select a.arc_id, node_id, ''Arc operative without node_1 in this psector'',  a.the_geom FROM arc a
+		join (select node_id from plan_psector_x_node where psector_id = '|| v_psector ||' and state = 0)n on node_1= node_id
+		left join (select * from plan_psector_x_arc where psector_id = '|| v_psector ||') p ON p.arc_id = a.arc_id
+		where p.arc_id is null and a.state=1
+		union
+		select a.arc_id, node_id, ''Arc operative without node_2 in this psector'', a.the_geom FROM arc a
+		join (select node_id from plan_psector_x_node where psector_id = '|| v_psector ||' and state = 0 )n on node_2 = node_id
+		left join (select * from plan_psector_x_arc where psector_id = '|| v_psector ||') p ON p.arc_id = a.arc_id
+		where p.arc_id is null and a.state=1';
 
 
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')c'
@@ -64,22 +68,17 @@ BEGIN
 
 		END IF;		
 
-		--control psector topology: find arc, that on inventory is defined as planified, but on psector it's final nodes are set as obsolete
-		v_query = 'SELECT * FROM
-		(SELECT pa.arc_id, pa.psector_id , node_1 as node FROM plan_psector_x_arc pa JOIN arc a USING (arc_id)
-			JOIN node n ON node_id = node_1 where n.state = 2 AND a.state=2 AND pa.psector_id = '|| v_psector ||'
-		EXCEPT
-		SELECT pa.arc_id, pa.psector_id , node_1 as node FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
-			JOIN plan_psector_x_node pn1 ON pn1.node_id = arc.node_1
-			WHERE pa.psector_id = pn1.psector_id and pa.state = 1 AND pn1.state = 1 AND pa.psector_id = '|| v_psector ||')a
-		UNION
-		SELECT * FROM
-		(SELECT pa.arc_id, pa.psector_id , node_2 as node FROM plan_psector_x_arc pa JOIN arc a USING (arc_id)
-			JOIN node n ON node_id = node_2 where n.state = 2 AND a.state=2 AND pa.psector_id = '|| v_psector ||'
-		EXCEPT
-		SELECT pa.arc_id, pa.psector_id , node_2 as node FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
-			JOIN plan_psector_x_node pn2 ON pn2.node_id = arc.node_2
-			WHERE pa.psector_id = pn2.psector_id AND pa.state = 1 AND pn2.state = 1 AND pa.psector_id = '|| v_psector ||')b';
+		--control psector topology: find arc, that on inventory is defined as planified, but on psector there are no nodes
+		v_query = '
+		select a.arc_id, node_id, ''Arc planned without node_1 in this psector'' as descript,  a.the_geom FROM arc a
+		join (select node_id from plan_psector_x_node where psector_id = '|| v_psector ||' and state = 0)n on node_1= node_id
+		left join (select * from plan_psector_x_arc where psector_id = '|| v_psector ||') p ON p.arc_id = a.arc_id
+		where p.arc_id is not null and a.state=2
+		union
+		select a.arc_id, node_id, ''Arc planned without node_2 in this psector'', a.the_geom FROM arc a
+		join (select node_id from plan_psector_x_node where psector_id = '|| v_psector ||' and state = 0 )n on node_2 = node_id
+		left join (select * from plan_psector_x_arc where psector_id = '|| v_psector ||') p ON p.arc_id = a.arc_id
+		where p.arc_id is not null and a.state=2';
 
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')c'
 		INTO v_count; 
@@ -88,7 +87,6 @@ BEGIN
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3164", "function":"3002","debug_msg":null, "is_process":true}}$$)' INTO v_audit_result;
-
 		END IF;		
 
 	END IF;
@@ -105,7 +103,7 @@ BEGIN
 
     END IF;
 
-  -- get uservalues
+	-- get uservalues
 	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
 	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault')
 	AND cur_user = current_user ORDER BY parameter)a);
