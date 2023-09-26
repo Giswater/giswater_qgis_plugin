@@ -1182,7 +1182,7 @@ class GwVisit(QObject):
         sql = ("SELECT 'ALL' as id "
                "UNION SELECT id "
                "FROM sys_feature_type "
-               "WHERE classlevel = 1 OR classlevel = 2"
+               "WHERE classlevel = 1 OR classlevel = 2 "
                "ORDER BY id")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_visit.feature_type, rows)
