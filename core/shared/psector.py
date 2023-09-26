@@ -42,10 +42,12 @@ class GwPsector:
         self.rubber_band_point = tools_gw.create_rubberband(self.canvas)
         self.rubber_band_line = tools_gw.create_rubberband(self.canvas)
         self.rubber_band_rectangle = tools_gw.create_rubberband(self.canvas)
+        self.rubber_band_op = tools_gw.create_rubberband(self.canvas)
         self.emit_point = None
         self.vertex_marker = None
         self.dict_to_update = {}
         self.my_json = {}
+        self.feature_geoms = {}
         self.tablename_psector_x_arc = "plan_psector_x_arc"
         self.tablename_psector_x_node = "plan_psector_x_node"
         self.tablename_psector_x_connec = "v_edit_plan_psector_x_connec"
@@ -219,33 +221,42 @@ class GwPsector:
 
         # tbl_psector_x_arc
         self.fill_table(self.dlg_plan_psector, self.qtbl_arc, self.tablename_psector_x_arc,
-                        set_edit_triggers=QTableView.DoubleClicked, expr=expr)
+                        set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="arc", field_id="arc_id")
         tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_arc, self.tablename_psector_x_arc)
         self.qtbl_arc.setProperty('tablename', self.tablename_psector_x_arc)
 
         self.qtbl_arc.selectionModel().selectionChanged.connect(partial(
-            tools_qgis.highlight_features_by_id, self.qtbl_arc, "v_edit_arc", "arc_id", self.rubber_band_point, 5
+            tools_qgis.highlight_features_by_id, self.qtbl_arc, "v_edit_arc", "arc_id", self.rubber_band_line, 5
+        ))
+        self.qtbl_arc.selectionModel().selectionChanged.connect(partial(
+            self._highlight_features_by_id, self.qtbl_arc, "arc", "arc_id", self.rubber_band_op, 5
         ))
 
         # tbl_psector_x_node
         self.fill_table(self.dlg_plan_psector, self.qtbl_node, self.tablename_psector_x_node,
-                        set_edit_triggers=QTableView.DoubleClicked, expr=expr)
+                        set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="node", field_id="node_id")
         tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_node, self.tablename_psector_x_node)
         self.qtbl_node.setProperty('tablename', self.tablename_psector_x_node)
 
         self.qtbl_node.selectionModel().selectionChanged.connect(partial(
             tools_qgis.highlight_features_by_id, self.qtbl_node, "v_edit_node", "node_id", self.rubber_band_point, 10
         ))
+        self.qtbl_node.selectionModel().selectionChanged.connect(partial(
+            self._highlight_features_by_id, self.qtbl_node, "node", "node_id", self.rubber_band_op, 5
+        ))
 
         # tbl_psector_x_connec
         self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec,
-                        set_edit_triggers=QTableView.DoubleClicked, expr=expr)
+                        set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="connec", field_id="connec_id")
         tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec)
         self.qtbl_connec.setProperty('tablename', self.tablename_psector_x_connec)
 
         self.qtbl_connec.selectionModel().selectionChanged.connect(partial(
             tools_qgis.highlight_features_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band_point,
             10
+        ))
+        self.qtbl_connec.selectionModel().selectionChanged.connect(partial(
+            self._highlight_features_by_id, self.qtbl_connec, "connec", "connec_id", self.rubber_band_op, 5
         ))
         self.qtbl_connec.selectionModel().selectionChanged.connect(partial(
             self._manage_tab_feature_buttons
@@ -255,13 +266,16 @@ class GwPsector:
         # tbl_psector_x_gully
         if self.project_type.upper() == 'UD':
             self.fill_table(self.dlg_plan_psector, self.qtbl_gully, self.tablename_psector_x_gully,
-                            set_edit_triggers=QTableView.DoubleClicked, expr=expr)
+                            set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="gully", field_id="gully_id")
             tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_gully, self.tablename_psector_x_gully)
             self.qtbl_gully.setProperty('tablename', self.tablename_psector_x_gully)
 
             self.qtbl_gully.selectionModel().selectionChanged.connect(partial(
                 tools_qgis.highlight_features_by_id, self.qtbl_gully, "v_edit_gully", "gully_id",
                 self.rubber_band_point, 10
+            ))
+            self.qtbl_gully.selectionModel().selectionChanged.connect(partial(
+                self._highlight_features_by_id, self.qtbl_gully, "gully", "gully_id", self.rubber_band_op, 5
             ))
             self.qtbl_gully.selectionModel().selectionChanged.connect(partial(
                 self._manage_tab_feature_buttons
@@ -965,6 +979,7 @@ class GwPsector:
         try:
             tools_gw.reset_rubberband(self.rubber_band_point)
             tools_gw.reset_rubberband(self.rubber_band_line)
+            tools_gw.reset_rubberband(self.rubber_band_op)
             self._clear_my_json()
             self.reload_states_selector()
             if cur_active_layer:
@@ -1365,7 +1380,8 @@ class GwPsector:
             tools_qgis.show_warning(model.lastError().text())
 
 
-    def fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
+    def fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers,
+                   expr=None, feature_type=None, field_id=None):
         """ Set a model with selected filter.
             Attach that model to selected table
             @setEditStrategy:
@@ -1405,6 +1421,8 @@ class GwPsector:
 
         if hidde:
             self.refresh_table(dialog, widget)
+        if feature_type is not None and field_id is not None:
+            self._manage_features_geom(widget, feature_type, field_id)
 
 
     def refresh_table(self, dialog, widget):
@@ -2292,6 +2310,7 @@ class GwPsector:
         self.dlg_replace_arc.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_replace_arc))
         self.dlg_replace_arc.rejected.connect(partial(tools_gw.reset_rubberband, self.rubber_band_point))
         self.dlg_replace_arc.rejected.connect(partial(tools_gw.reset_rubberband, self.rubber_band_line))
+        self.dlg_replace_arc.rejected.connect(partial(tools_gw.reset_rubberband, self.rubber_band_op))
         self.dlg_replace_arc.rejected.connect(self._reset_snapping)
 
         # Open form
@@ -2325,6 +2344,7 @@ class GwPsector:
             self.dlg_replace_arc.close()
             tools_gw.reset_rubberband(self.rubber_band_point)
             tools_gw.reset_rubberband(self.rubber_band_line)
+            tools_gw.reset_rubberband(self.rubber_band_op)
             self.iface.actionPan().trigger()
 
         # Activate again if variable is True
@@ -2542,6 +2562,56 @@ class GwPsector:
         tools_db.execute_sql(sql)
         tools_gw.load_tableview_psector(dialog, feature_type)
         tools_gw.set_model_signals(self)
+
+
+    def _manage_features_geom(self, qtable, feature_type, field_id):
+        tools_gw.reset_rubberband(self.rubber_band_op)
+        ids = []
+        table_model = qtable.model()
+        for row_index in range(table_model.rowCount()):
+            column_index = tools_qt.get_col_index_by_col_name(qtable, "state")
+            if table_model.record(row_index).value(column_index) != 0:
+                continue
+            column_index = tools_qt.get_col_index_by_col_name(qtable, field_id)
+            _id = table_model.record(row_index).value(column_index)
+            ids.append(_id)
+
+        if not ids:
+            return
+        ids_str = json.dumps(ids).replace('"', '')
+        extras = f'"feature_type": "{feature_type}", "ids": "{ids_str}"'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_getfeaturegeom', body)
+        if not json_result or json_result.get("status") != "Accepted":
+            return
+
+        self.feature_geoms[feature_type] = json_result['body']['data']
+
+
+    def _highlight_features_by_id(self, qtable, feature_type, field_id, rubber_band, width, selected, deselected):
+
+        tools_gw.reset_rubberband(self.rubber_band_op)
+        geoms = self.feature_geoms.get(feature_type)
+        if not geoms:
+            return
+
+        ids = []
+        for idx, index in enumerate(qtable.selectionModel().selectedRows()):
+            row = index.row()
+            column_index = tools_qt.get_col_index_by_col_name(qtable, "state")
+            if index.sibling(row, column_index).data() != 0:
+                continue
+            column_index = tools_qt.get_col_index_by_col_name(qtable, field_id)
+            _id = index.sibling(row, column_index).data()
+            ids.append(_id)
+
+        if not ids:
+            return
+
+        for _id in ids:
+            geom = geoms[_id]['st_astext']
+            color = QColor(0, 90, 255, 125)
+            tools_qgis.draw_polyline(geom, rubber_band, color, width)
 
 
     # endregion
