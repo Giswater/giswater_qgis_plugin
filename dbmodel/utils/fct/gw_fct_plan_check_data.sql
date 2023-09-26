@@ -382,7 +382,7 @@ BEGIN
 			EXECUTE concat ('INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
 			SELECT 252, b.feature_id, b.catalog, ''Arcs state = 2 without psector'', b.the_geom, 2 FROM (', v_query,')b  WHERE feature = ''ARC''');
 			INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-			VALUES (v_fid, '252', 3, FALSE, concat('ERROR-252 (temp_anl_arc): There are ',v_count,' planified arcs without psector.'),v_count);
+			VALUES (v_fid, '252', 3, FALSE, concat('ERROR-252 (temp_arc): There are ',v_count,' planified arcs without psector.'),v_count);
 		END IF;
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')b WHERE feature = ''NODE'';'
 		INTO v_count; 
@@ -435,7 +435,7 @@ BEGIN
 		EXECUTE concat ('INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
 		SELECT 354, c.arc_id, c.arccat_id, ''Arcs state = 2 without planned final nodes in psector'', c.the_geom, 2 FROM (', v_query,')c ');
 		INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-		VALUES (v_fid, '354', 3, FALSE, concat('ERROR-354 (temp_anl_arc): There are ',v_count,' planified arcs without final planned nodes defined in psector.'),v_count);
+		VALUES (v_fid, '354', 3, FALSE, concat('ERROR-354 (temp_arc): There are ',v_count,' planified arcs without final planned nodes defined in psector.'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '354', 1,'INFO: There are no arcs with state=2 with planned final nodes not defined psector.',v_count);
@@ -472,7 +472,7 @@ BEGIN
 		EXECUTE concat ('INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
 		SELECT 355, c.arc_id, c.arccat_id, concat(''Arcs state = 2 final nodes obsolete in psector '',c.psector_id), c.the_geom, 2 FROM (', v_query,')c ');
 		INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-		VALUES (v_fid, '355', 3, FALSE, concat('ERROR-355 (temp_anl_arc): There are ',v_count,' planified arcs with final nodes defined as obsolete in psector.'),v_count);
+		VALUES (v_fid, '355', 3, FALSE, concat('ERROR-355 (temp_arc): There are ',v_count,' planified arcs with final nodes defined as obsolete in psector.'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '355', 1,'INFO: There are no arcs with state=2 with final nodes obsolete in psector.',v_count);
@@ -489,13 +489,13 @@ BEGIN
 		EXECUTE concat ('INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id)
 			SELECT 452, arc_id, arccat_id, ''node_1 or node_2 nulls'', the_geom, expl_id FROM ', v_querytext);
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 2, '452', concat('WARNING-452 (temp_anl_arc): There is/are ',v_count,' arc''s with state=1 and without node_1 or node_2.'),v_count);
+		VALUES (v_fid, 2, '452', concat('WARNING-452 (temp_arc): There is/are ',v_count,' arc''s with state=1 and without node_1 or node_2.'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id,error_message, fcount)
 		VALUES (v_fid, 1, '452','INFO: No arc''s with state=1 and without node_1 or node_2 nodes found.', v_count);
 	END IF;
 
-	-- Planified umps with more than two arcs (467);
+	-- Planified pumps with more than two arcs (467);
 	IF v_project_type='WS' THEN 
 		INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
 		select 467, b.node_id, nodecat_id, the_geom, 'Planified EPA pump with more than two arcs', expl_id
@@ -516,7 +516,7 @@ BEGIN
 		IF v_count > 0 THEN
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 			VALUES (v_fid, '467', 3, concat(
-			'ERROR-467 (temp_anl_node): There is/are ',v_count,' pumps(s) with more than two arcs .Take a look on temporal table to details'),v_count);
+			'ERROR-467 (temp_node): There is/are ',v_count,' pumps(s) with more than two arcs .Take a look on temporal table to details'),v_count);
 			v_count=0;
 		ELSE
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
