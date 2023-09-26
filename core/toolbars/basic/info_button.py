@@ -195,6 +195,21 @@ class GwInfoButton(GwMaptool):
             main_menu.addAction(action_valve)
             main_menu.addSeparator()
 
+        # Open/close valve in dscenario
+        valve_dscenario = json_result['body']['data'].get('valve_dscenario')
+        if valve_dscenario:
+            valve_dscenario_id = valve_dscenario['id']
+            dscenario_id = valve_dscenario['dscenario_id']
+            valve_dscenario_text = valve_dscenario['text']
+            valve_dscenario_table = valve_dscenario['tableName']
+            valve_dscenario_value = valve_dscenario['value']
+            action_valve_dscenario = QAction(f"{valve_dscenario_text}", None)
+            if valve_dscenario_id:
+                action_valve_dscenario.triggered.connect(partial(self._toggle_valve_state_dscenario, dscenario_id, valve_dscenario_id, valve_dscenario_table, valve_dscenario_value))
+            action_valve_dscenario.hovered.connect(partial(self._reset_rubber_bands))
+            main_menu.addAction(action_valve_dscenario)
+            main_menu.addSeparator()
+
         main_menu.aboutToHide.connect(self._reset_rubber_bands)
         main_menu.exec_(click_point)
 
@@ -261,6 +276,20 @@ class GwInfoButton(GwMaptool):
             self.valve_thread = GwToggleValveTask("Update mapzones", params)
             QgsApplication.taskManager().addTask(self.valve_thread)
             QgsApplication.taskManager().triggerTask(self.valve_thread)
+
+
+    def _toggle_valve_state_dscenario(self, dscenario_id, valve_id, table_name, value):
+        """ Open or closes a valve in a dscenario """
+
+        # Build function body
+        feature = f'"id":"{dscenario_id}, {valve_id}", '
+        feature += f'"tableName":"{table_name}" '
+        # feature += f' "featureType":"node" '
+        extras = f'"fields":{{"dscenario_id": "{dscenario_id}", "node_id": "{valve_id}","status": "{value}"}}'
+        body = tools_gw.create_body(feature=feature, extras=extras)
+
+        tools_gw.execute_procedure('gw_fct_upsertfields', body)
+        tools_qgis.refresh_map_canvas()
 
 
     def _draw_by_action(self, feature, rb_list, reset_rb=True):
