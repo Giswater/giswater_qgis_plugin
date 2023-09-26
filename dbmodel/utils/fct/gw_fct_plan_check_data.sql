@@ -7,13 +7,13 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2436
 
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_audit_check_data(integer);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_check_data(p_data json)  
+DROP FUNCTION IF EXISTS ws36004.gw_fct_plan_audit_check_data(integer);
+CREATE OR REPLACE FUNCTION ws36004.gw_fct_plan_check_data(p_data json)  
 RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_plan_check_data($${}$$)
+SELECT ws36004.gw_fct_plan_check_data($${}$$)
 
 SELECT * FROM anl_arc WHERE fid=v_fid AND cur_user=current_user;
 SELECT * FROM anl_node WHERE fid=v_fid AND cur_user=current_user;
@@ -46,7 +46,7 @@ v_fid integer;
 BEGIN 
 
 	-- init function
-	SET search_path="SCHEMA_NAME", public;
+	SET search_path="ws36004", public;
 	v_return:=0;
 	v_global_count:=0;
 
@@ -62,10 +62,10 @@ BEGIN
 	END IF;
 
 	--create temp tables
-	CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
-	CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-	CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
-	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+	CREATE TEMP TABLE temp_anl_arc (LIKE ws36004.anl_arc INCLUDING ALL);
+	CREATE TEMP TABLE temp_anl_node (LIKE ws36004.anl_node INCLUDING ALL);
+	CREATE TEMP TABLE temp_anl_connec (LIKE ws36004.anl_connec INCLUDING ALL);
+	CREATE TEMP TABLE temp_audit_check_data (LIKE ws36004.audit_check_data INCLUDING ALL);
 
 	-- Starting process
 	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('DATA QUALITY ANALYSIS ACORDING PLAN-PRICE RULES'));
@@ -409,23 +409,19 @@ BEGIN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '252', 1,'INFO: There are no features with state=2 without psector.',v_count);
 	END IF;
-/*
-	--check if arcs with state = 2 have final nodes state = 2 in the psector (354)
-	v_query =  'SELECT * FROM
-	(SELECT pa.arc_id, a.arccat_id, pa.psector_id , node_1 as node, a.the_geom FROM plan_psector_x_arc pa JOIN v_edit_arc a USING (arc_id)
-		JOIN v_edit_node n ON node_id = node_1 where n.state = 2 AND a.state=2
-	EXCEPT
-	SELECT pa.arc_id, a.arccat_id, pa.psector_id , node_1 as node, a.the_geom FROM plan_psector_x_arc pa JOIN v_edit_arc a USING (arc_id)
+
+	--check if arcs with state = 1 have final nodes downgraded in psector (354)
+	v_query =  'SELECT DISTINCT ON (arc_id) * FROM (
+		SELECT a.arc_id, a.arccat_id, pa.psector_id , node_1 as node, a.the_geom FROM v_edit_arc a
 		JOIN plan_psector_x_node pn1 ON pn1.node_id = a.node_1
-		WHERE pa.psector_id = pn1.psector_id and pa.state = 1 AND pn1.state = 1)a
-	UNION
-	SELECT * FROM
-	(SELECT pa.arc_id, a.arccat_id, pa.psector_id , node_2 as node,  a.the_geom FROM plan_psector_x_arc pa JOIN v_edit_arc a USING (arc_id)
-		JOIN v_edit_node n ON node_id = node_2 where n.state = 2 AND a.state=2
-	EXCEPT
-	SELECT pa.arc_id, a.arccat_id, pa.psector_id , node_2 as node,  a.the_geom FROM plan_psector_x_arc pa JOIN v_edit_arc USING (arc_id)
-		JOIN plan_psector_x_node pn2 ON pn2.node_id = arc.node_2
-		WHERE pa.psector_id = pn2.psector_id AND pa.state = 1 AND pn2.state = 1)b';
+		left JOIN plan_psector_x_arc pa using (arc_id)
+		WHERE a.state = 1 AND pn1.state = 0 and pa.psector_id is null
+		UNION
+		SELECT a.arc_id, a.arccat_id, pa.psector_id, node_2, a.the_geom FROM v_edit_arc a
+		JOIN plan_psector_x_node pn2 ON pn2.node_id = a.node_2
+		left JOIN plan_psector_x_arc pa using (arc_id)
+		WHERE a.state = 1 AND pn2.state = 0 and pa.psector_id is null
+		) b';
 
 	EXECUTE 'SELECT count(*) FROM ('||v_query||')c'
 	INTO v_count; 
@@ -433,25 +429,14 @@ BEGIN
 	IF v_count > 0 THEN
 
 		EXECUTE concat ('INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
-		SELECT 354, c.arc_id, c.arccat_id, ''Arcs state = 2 without planned final nodes in psector'', c.the_geom, 2 FROM (', v_query,')c ');
+		SELECT 354, c.arc_id, c.arccat_id, concat(''Arcs state = 1 final nodes obsolete in psector '',c.psector_id), c.the_geom, 2 FROM (', v_query,')c ');
 		INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-		VALUES (v_fid, '354', 3, FALSE, concat('ERROR-354 (temp_arc): There are ',v_count,' planified arcs without final planned nodes defined in psector.'),v_count);
+		VALUES (v_fid, '354', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' operative arcs without final nodes in some psector.'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '354', 1,'INFO: There are no arcs with state=2 with planned final nodes not defined psector.',v_count);
+		VALUES (v_fid, '354', 1,'INFO: There are no arcs with state=1 with final nodes obsolete in psector.',v_count);
 	END IF;
-	
-	SELECT pa.arc_id, pa.psector_id , node_1 as node FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
-		JOIN plan_psector_x_node pn1 ON pn1.node_id = arc.node_1
-		WHERE pa.psector_id = pn1.psector_id AND pa.state = 1 AND pn1.state = 0 AND pa.psector_id 
-		in (select psector_id from selector_psector where cur_user = 'jdelgado') AND arc.state_type<> 24
-		UNION
-		SELECT pa.arc_id, pa.psector_id, node_2 FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
-		JOIN plan_psector_x_node pn2 ON pn2.node_id = arc.node_2
-		WHERE pa.psector_id = pn2.psector_id AND pa.state = 1 AND pn2.state = 0 AND pa.psector_id 
-		in (select psector_id from selector_psector where cur_user = 'jdelgado')   AND arc.state_type<> 24
-		
-		*/
+
 
 	--check if arcs with state = 2 have final nodes state = 1 or 2 enabled in psector (355)
 	v_query =  'SELECT * FROM (
@@ -472,28 +457,12 @@ BEGIN
 		EXECUTE concat ('INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
 		SELECT 355, c.arc_id, c.arccat_id, concat(''Arcs state = 2 final nodes obsolete in psector '',c.psector_id), c.the_geom, 2 FROM (', v_query,')c ');
 		INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-		VALUES (v_fid, '355', 3, FALSE, concat('ERROR-355 (temp_arc): There are ',v_count,' planified arcs with final nodes defined as obsolete in psector.'),v_count);
+		VALUES (v_fid, '355', 3, FALSE, concat('ERROR-355 (anl_arc): There are ',v_count,' planified arcs without final in some psector.'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '355', 1,'INFO: There are no arcs with state=2 with final nodes obsolete in psector.',v_count);
 	END IF;
 
-
-	-- Check node_1 or node_2 nulls for planified features (452)
-	v_querytext = '(SELECT arc_id,arccat_id,the_geom, expl_id FROM v_edit_arc WHERE state = 2 AND node_1 IS NULL 
-	               UNION
- 				   SELECT arc_id, arccat_id, the_geom, expl_id FROM v_edit_arc WHERE state = 2 AND node_2 IS NULL) a';
-
-	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
-	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id)
-			SELECT 452, arc_id, arccat_id, ''node_1 or node_2 nulls'', the_geom, expl_id FROM ', v_querytext);
-		INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 2, '452', concat('WARNING-452 (temp_arc): There is/are ',v_count,' arc''s with state=1 and without node_1 or node_2.'),v_count);
-	ELSE
-		INSERT INTO temp_audit_check_data (fid, criticity, result_id,error_message, fcount)
-		VALUES (v_fid, 1, '452','INFO: No arc''s with state=1 and without node_1 or node_2 nodes found.', v_count);
-	END IF;
 
 	-- Planified pumps with more than two arcs (467);
 	IF v_project_type='WS' THEN 
