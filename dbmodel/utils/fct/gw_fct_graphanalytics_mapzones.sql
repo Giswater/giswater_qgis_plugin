@@ -177,7 +177,7 @@ BEGIN
 		v_table  = 'presszone';
 		v_field = 'presszone_id';
 		v_fieldmp = 'presszone_id';
-		v_visible_layer ='v_edit_presszone';
+		v_visible_layer ='"v_edit_presszone"';
 		IF v_netscenario is not null then
 			v_mapzonename = 'presszone_name';
 		else
@@ -189,7 +189,7 @@ BEGIN
 		v_table = 'dma';
 		v_field = 'dma_id';
 		v_fieldmp = 'dma_id';
-		v_visible_layer ='v_edit_dma';
+		v_visible_layer ='"v_edit_dma"';
 		IF v_netscenario is not null then
 			v_mapzonename = 'dma_name';
 		else
@@ -201,7 +201,7 @@ BEGIN
 		v_table = 'dqa';
 		v_field = 'dqa_id';
 		v_fieldmp = 'dqa_id';
-		v_visible_layer ='v_edit_dqa';
+		v_visible_layer ='"v_edit_dqa"';
 		v_mapzonename = 'name';
 			
 	ELSIF v_class = 'SECTOR' THEN 
@@ -209,7 +209,7 @@ BEGIN
 		v_table = 'sector';
 		v_field = 'sector_id';
 		v_fieldmp = 'sector_id';
-		v_visible_layer ='v_edit_sector';
+		v_visible_layer ='"v_edit_sector"';
 		v_mapzonename = 'name';
 		
 	ELSIF v_class = 'DRAINZONE' THEN 
@@ -217,7 +217,7 @@ BEGIN
 		v_table = 'drainzone';
 		v_field = 'drainzone_id';
 		v_fieldmp = 'drainzone_id';
-		v_visible_layer ='v_edit_drainzone';
+		v_visible_layer ='"v_edit_drainzone"';
 		v_mapzonename = 'name';	
 	ELSE	
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -1478,9 +1478,17 @@ BEGIN
 		SELECT '|| v_netscenario||', connec_id, '||quote_ident(v_field)||', the_geom FROM temp_t_connec';
 
 		IF v_class = 'PRESSZONE' THEN
-			v_visible_layer ='v_edit_plan_netscenario_presszone';
+			v_visible_layer ='"v_edit_plan_netscenario_presszone"';
 		ELSIF v_class = 'DMA' THEN
-			v_visible_layer ='v_edit_plan_netscenario_dma';
+			v_visible_layer ='"v_edit_plan_netscenario_dma"';
+		END IF;
+
+		DELETE FROM selector_inp_dscenario WHERE cur_user = current_user;
+		
+		IF v_dscenario_valve IS NOT NULL THEN
+			v_visible_layer = concat(v_visible_layer, ', ', '"v_edit_inp_dscenario_shortpipe"');
+			
+			INSERT INTO selector_inp_dscenario (dscenario_id) VALUES (v_dscenario_valve::integer);
 		END IF;
 
 		DELETE FROM selector_netscenario  WHERE cur_user=current_user;
@@ -1525,7 +1533,7 @@ BEGIN
              ',"body":{"form":{}, "data":{ "info":'||v_result_info||','||
 					  '"point":'||v_result_point||','||
 					  '"line":'||v_result_line||','||
-					  '"polygon":'||v_result_polygon||'}'||'}}')::json, 2710, null, ('{"visible": ["'||v_visible_layer||'"]}')::json, null)::json;
+					  '"polygon":'||v_result_polygon||'}'||'}}')::json, 2710, null, ('{"visible": ['||v_visible_layer||']}')::json, null)::json;
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
