@@ -88,3 +88,12 @@ UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=5 where formn
 UPDATE config_form_fields SET layoutorder=6 where formname='plan_netscenario' and columnname='parent_id';
 UPDATE config_form_fields SET layoutorder=7 where formname='plan_netscenario' and columnname='active';
 UPDATE config_form_fields SET iseditable=false and layoutorder=8 where formname='plan_netscenario' and columnname='log';
+
+
+UPDATE config_form_fields SET dv_querytext = 
+'SELECT DISTINCT (id) AS id,  idval  AS idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_status_valve'' '
+WHERE formname in ('v_edit_inp_dscenario_valve', 've_epa_valve', 've_epa_shortpipe') and columnname = 'status';
+
+UPDATE config_form_fields SET dv_querytext = 
+'SELECT DISTINCT (id) AS id,  idval  AS idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_status_pipe'' '
+WHERE formname in ('ve_epa_shortpipe', 'v_edit_inp_shortpipe', 'v_edit_inp_dscenario_shortpipe') and columnname = 'status';
