@@ -530,9 +530,9 @@ BEGIN
 
 		-- delete old values on result table
 		DELETE FROM audit_check_data WHERE fid=115 AND cur_user=current_user;
-		DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (252);
-		DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (252,452);
-		DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (252, 354, 355,467);
+		DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (252, 354, 355);
+		DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (252, 452, 354, 355);
+		DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (252, 354, 355, 467);
 
 		INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
 		INSERT INTO anl_node SELECT * FROM temp_anl_node;
@@ -540,6 +540,7 @@ BEGIN
 		INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
 
 	ELSIF  v_fid = 101 THEN 
+	
 		UPDATE temp_audit_check_data SET fid = 115;
 		UPDATE temp_anl_arc SET fid = 115;
 		UPDATE temp_anl_node SET fid = 115;

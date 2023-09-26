@@ -387,9 +387,9 @@ BEGIN
 			ELSE
 				-- delete old values on result table
 				DELETE FROM project_temp_audit_check_data WHERE fid=115 AND cur_user=current_user;
-				DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (252);
-				DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (252);
-				DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (252, 354, 355);
+				DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (252, 354, 355);
+				DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (252, 354, 355);
+				DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (252, 354, 355, 467);
 			END IF;
 		END IF;
 
