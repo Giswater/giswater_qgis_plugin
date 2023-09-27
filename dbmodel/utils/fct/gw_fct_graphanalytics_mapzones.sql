@@ -540,43 +540,33 @@ BEGIN
 				AND v.active IS TRUE)';
 			EXECUTE v_querytext;
 
-			IF v_dscenario_valve IS NOT NULL THEN
+			IF v_netscenario IS NOT NULL THEN
 			--close valve
 				v_querytext  = 'UPDATE temp_t_anlgraph SET flag=1 WHERE 
 				node_1::integer IN (
 				SELECT a.node_id::integer 
-				FROM temp_t_node a 
-				JOIN inp_dscenario_shortpipe s ON a.node_id = s.node_id
-				WHERE status=''CLOSED''
-				AND dscenario_id = '||v_dscenario_valve||'::integer)';
-			EXECUTE v_querytext;
-
-			v_querytext  = 'UPDATE temp_t_anlgraph SET flag=1 WHERE 
-				node_2::integer IN (
+				FROM plan_netscenario_valve a 
+				WHERE closed IS TRUE
+				AND netscenario_id = '||v_netscenario||'::integer) 
+				OR node_2::integer IN (
 				SELECT a.node_id::integer 
-				FROM temp_t_node a 
-				JOIN inp_dscenario_shortpipe s ON a.node_id = s.node_id
-				WHERE status=''CLOSED''
-				AND dscenario_id = '||v_dscenario_valve||'::integer)';
+				FROM plan_netscenario_valve a 
+				WHERE closed IS TRUE
+				AND netscenario_id = '||v_netscenario||'::integer)';
 			EXECUTE v_querytext;
 			
 			--òpen valve
 			v_querytext  = 'UPDATE temp_t_anlgraph SET flag=0 WHERE 
 				node_1::integer IN (
 				SELECT a.node_id::integer 
-				FROM temp_t_node a 
-				JOIN inp_dscenario_shortpipe s ON a.node_id = s.node_id
-				WHERE status=''OPEN''
-				AND dscenario_id = '||v_dscenario_valve||'::integer)';
-			EXECUTE v_querytext;
-
-			v_querytext  = 'UPDATE temp_t_anlgraph SET flag=0 WHERE 
-				node_2::integer IN (
+				FROM plan_netscenario_valve a 
+				WHERE closed IS FALSE
+				AND netscenario_id = '||v_netscenario||'::integer) 
+				OR node_2::integer IN (
 				SELECT a.node_id::integer 
-				FROM temp_t_node a 
-				JOIN inp_dscenario_shortpipe s ON a.node_id = s.node_id
-				WHERE status=''OPEN''
-				AND dscenario_id = '||v_dscenario_valve||'::integer)';
+				FROM plan_netscenario_valve a 
+				WHERE closed IS FALSE
+				AND netscenario_id = '||v_netscenario||'::integer)';
 			EXECUTE v_querytext;
 			END IF;
 		END IF;
