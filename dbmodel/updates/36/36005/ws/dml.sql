@@ -118,3 +118,14 @@ netscenario_id, node_id, closed', 'gw_fct_import_netscenario_valve_closed', true
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
 VALUES (3278, 'gw_fct_import_netscenario_valve_closed', 'ws', 'function', 'json', 'json', 'Function to import closed valve into netscenario', 'role_epa', null, 'core') ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_toolbox SET inputparams = b.inp FROM (SELECT json_agg(a.inputs) AS inp FROM
+(SELECT json_array_elements(inputparams)as inputs, json_extract_path_text(json_array_elements(inputparams),'widgetname') as widget
+FROM   config_toolbox 
+WHERE id=2768)a WHERE widget!='usePlanPsector')b WHERE  id=2768;
+
+UPDATE config_toolbox SET inputparams = b.inp FROM (SELECT json_agg(a.inputs) AS inp FROM
+(SELECT json_array_elements(inputparams)as inputs, json_extract_path_text(json_array_elements(inputparams),'widgetname') as widget
+FROM   config_toolbox 
+WHERE id=3256)a WHERE widget!='dscenario_valve')b WHERE  id=3256;
+
