@@ -77,3 +77,16 @@ CREATE OR REPLACE VIEW v_edit_plan_netscenario_presszone
     plan_netscenario_presszone n
      JOIN plan_netscenario p USING (netscenario_id)
   WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_edit_plan_netscenario_valve AS
+ SELECT v.netscenario_id,
+    v.node_id,
+    v.closed,
+    node.the_geom
+   FROM selector_netscenario,
+    plan_netscenario_valve v
+    JOIN node USING (node_id)
+  WHERE v.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
+
+

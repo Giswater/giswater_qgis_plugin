@@ -54,3 +54,6 @@ ALTER TABLE IF EXISTS plan_netscenario_connec
     REFERENCES plan_netscenario_presszone (netscenario_id, presszone_id) MATCH SIMPLE
     ON UPDATE CASCADE
     ON DELETE CASCADE;
+
+ALTER TABLE IF EXISTS plan_netscenario_valve ADD CONSTRAINT plan_netscenario_valve_netscenario_id_node_id_fkey FOREIGN KEY (netscenario_id, node_id)
+REFERENCES plan_netscenario_node(netscenario_id,node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;

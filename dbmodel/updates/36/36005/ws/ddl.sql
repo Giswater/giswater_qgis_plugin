@@ -21,3 +21,10 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netsce
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_dma", "column":"lastupdate", "dataType":"timestamp", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_dma", "column":"lastupdate_user", "dataType":"character varying(30)", "isUtils":"False"}}$$);
+
+CREATE TABLE plan_netscenario_valve (
+netscenario_id integer, 
+node_id character varying(16),
+closed boolean  DEFAULT false,
+CONSTRAINT plan_netscenario_valve_pkey PRIMARY KEY (netscenario_id, node_id)); 
+

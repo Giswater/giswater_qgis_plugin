@@ -13,16 +13,16 @@ DECLARE
 v_newpattern json;
 v_status boolean;
 v_value text;
-v_mapzone text;
+v_table text;
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
-	v_mapzone = TG_ARGV[0];
+	v_table = TG_ARGV[0];
 
 	IF TG_OP = 'INSERT' THEN
 		
-		IF v_mapzone = 'DMA' THEN
+		IF v_table = 'DMA' THEN
 
 			-- dma_id
 			IF NEW.dma_id is null THEN
@@ -32,7 +32,7 @@ BEGIN
 			INSERT INTO plan_netscenario_dma (netscenario_id, dma_id, dma_name, pattern_id, graphconfig, the_geom)
 			VALUES (NEW.netscenario_id, NEW.dma_id, NEW.name, NEW.pattern_id, NEW.graphconfig, NEW.the_geom) ON CONFLICT (netscenario_id, dma_id) DO NOTHING;
 
-		ELSIF v_mapzone = 'PRESSZONE' THEN
+		ELSIF v_table = 'PRESSZONE' THEN
 
 			-- presszone_id
 			IF NEW.presszone_id is null THEN
@@ -42,29 +42,41 @@ BEGIN
 			INSERT INTO plan_netscenario_presszone (netscenario_id, presszone_id, presszone_name, head, graphconfig, the_geom)
 			VALUES (NEW.netscenario_id, NEW.presszone_id, NEW.name, NEW.head, NEW.graphconfig, NEW.the_geom) ON CONFLICT (netscenario_id, presszone_id) DO NOTHING;
 
+		ELSIF v_table = 'VALVE' THEN
+
+			INSERT INTO plan_netscenario_valve (netscenario_id, node_id, closed)
+			VALUES (NEW.netscenario_id, NEW.node_id, NEW.closed) ON CONFLICT (netscenario_id, node_id) DO NOTHING;
+
 		END IF;
 		RETURN NEW;
 		
 	ELSIF TG_OP = 'UPDATE' THEN
-   	IF v_mapzone = 'DMA' THEN
+   	IF v_table = 'DMA' THEN
 			UPDATE plan_netscenario_dma 
 			SET dma_id=NEW.dma_id, dma_name=NEW.name,  the_geom=NEW.the_geom, pattern_id=NEW.pattern_id, graphconfig=NEW.graphconfig::json, active=NEW.active
 			WHERE dma_id=OLD.dma_id AND netscenario_id=NEW.netscenario_id;
 		
-		ELSIF v_mapzone = 'PRESSZONE' THEN
+		ELSIF v_table = 'PRESSZONE' THEN
 			UPDATE plan_netscenario_presszone 
 			SET presszone_id=NEW.presszone_id, presszone_name=NEW.name,  the_geom=NEW.the_geom, head=NEW.head, graphconfig=NEW.graphconfig::json, active=NEW.active
 			WHERE presszone_id=OLD.presszone_id AND netscenario_id=NEW.netscenario_id;
+		
+		ELSIF v_table = 'VALVE' THEN
+
+			UPDATE plan_netscenario_valve SET closed=NEW.closed WHERE netscenario_id = NEW.netscenario_id AND node_id=NEW.node_id;	
+
 		END IF;
 
 		RETURN NEW;
 		
 	ELSIF TG_OP = 'DELETE' THEN  
 	 
-	 	IF v_mapzone = 'DMA' THEN
+	 	IF v_table = 'DMA' THEN
 			DELETE FROM plan_netscenario_dma WHERE dma_id = OLD.dma_id;
-		ELSIF v_mapzone = 'PRESSZONE' THEN
+		ELSIF v_table = 'PRESSZONE' THEN
 			DELETE FROM plan_netscenario_presszone WHERE presszone_id = OLD.presszone_id;
+		ELSIF v_table = 'VALVE' THEN
+			DELETE FROM plan_netscenario_valve WHERE netscenario_id = OLD.netscenario_id AND node_id=OLD.node_id;	
 		END IF;
 
 		RETURN NULL;

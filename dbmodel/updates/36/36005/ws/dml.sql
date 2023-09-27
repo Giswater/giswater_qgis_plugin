@@ -101,3 +101,10 @@ WHERE formname in ('ve_epa_shortpipe', 'v_edit_inp_shortpipe', 'v_edit_inp_dscen
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source") 
 VALUES(3248, 'There is no street data available', 'Please draw tramified streets on om_streetaxis table', 2, false, 'ws', 'core') ON CONFLICT (id) DO NOTHING;
 
+INSERT INTO sys_table(id, descript, sys_role,  source, context, orderby, alias, addparam)
+VALUES ('v_edit_plan_netscenario_valve' , 'Editable view to visualize valve related to selected netscenario', 'role_master', 'core','{"level_1":"MASTERPLAN","level_2":"NETSCENARIO"}', 6, 'Netscenario valve', '{"pkey":"netscenario_id, node_id"}')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role,  source, addparam)
+VALUES ('plan_netscenario_valve' , 'Table of valve related to selected netscenario', 'role_master', 'core', '{"pkey":"netscenario_id, node_id"}')
+ON CONFLICT (id) DO NOTHING;
