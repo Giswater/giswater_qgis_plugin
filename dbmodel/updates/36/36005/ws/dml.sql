@@ -108,3 +108,13 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_table(id, descript, sys_role,  source, addparam)
 VALUES ('plan_netscenario_valve' , 'Table of valve related to selected netscenario', 'role_master', 'core', '{"pkey":"netscenario_id, node_id"}')
 ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (514, 'Import valve closed into netscenario', 'ws', null, 'core', true, 'Function process', null) ON CONFLICT (fid) DO NOTHING;
+	
+INSERT INTO config_csv(fid, alias, descript, functionname, active, orderby, addparam)
+VALUES (514, 'Import netscenario closed valves ','The csv file must have the folloWing fields:
+netscenario_id, node_id, closed', 'gw_fct_import_netscenario_valve_closed', true, null,null) ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3278, 'gw_fct_import_netscenario_valve_closed', 'ws', 'function', 'json', 'json', 'Function to import closed valve into netscenario', 'role_epa', null, 'core') ON CONFLICT (id) DO NOTHING;

@@ -4,3 +4,4 @@
 - New view v_edit_inp_transects with trigger.
 - New fields on plan_netscenario_dma and plan_netscenario_presszone: active, lastupdate, lastupdate_user
 - New table plan_netscenario_valve and editabl view v_edit_plan_netscenario_valve
+- New function (3278) gw_fct_import_netscenario_valve_closed to import closed valves into netscenario configuration.
