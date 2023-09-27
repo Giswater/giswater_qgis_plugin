@@ -293,7 +293,7 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Add icons
         tools_gw.add_icon(self.dlg_netscenario.btn_insert, "111", sub_folder="24x24")
-        tools_gw.add_icon(self.dlg_netscenario.btn_delete, "112", sub_folder="24x24")
+        # tools_gw.add_icon(self.dlg_netscenario.btn_delete, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_netscenario.btn_snapping, "137")
 
         default_tab_idx = 0
