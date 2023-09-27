@@ -316,6 +316,8 @@ class GwNetscenarioManagerButton(GwAction):
 
         self.dlg_netscenario.main_tab.setCurrentIndex(default_tab_idx)
 
+        self.dlg_netscenario.lbl_mapzone_id.setText(f'{self.selected_netscenario_type.capitalize()} id:')
+
         # Connect signals
         self.dlg_netscenario.btn_config.clicked.connect(partial(self._manage_config))
         self.dlg_netscenario.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active))
@@ -446,6 +448,10 @@ class GwNetscenarioManagerButton(GwAction):
 
         if tab_name in ('plan_netscenario_arc', 'plan_netscenario_node', 'plan_netscenario_connec'):
             enable = False
+        tools_qt.set_widget_enabled(self.dlg_netscenario, 'cmb_feature_id', enable)
+        tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_insert', enable)
+        tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_delete', enable)
+        tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_snapping', enable)
         tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_config', enable)
         tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_create', enable)
         tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_update', enable)

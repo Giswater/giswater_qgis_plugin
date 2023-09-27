@@ -34,6 +34,13 @@
    <item row="0" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
+      <widget class="QLabel" name="lbl_mapzone_id">
+       <property name="text">
+        <string>Mapzone id:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QComboBox" name="cmb_feature_id">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -43,6 +50,27 @@
        </property>
        <property name="editable">
         <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_insert">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_delete">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_snapping">
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>
@@ -84,27 +112,6 @@
       <widget class="QPushButton" name="btn_update">
        <property name="text">
         <string>Update</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btn_insert">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btn_delete">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btn_snapping">
-       <property name="text">
-        <string/>
        </property>
       </widget>
      </item>
