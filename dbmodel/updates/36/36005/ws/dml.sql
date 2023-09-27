@@ -98,5 +98,6 @@ UPDATE config_form_fields SET dv_querytext =
 'SELECT DISTINCT (id) AS id,  idval  AS idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_status_pipe'' '
 WHERE formname in ('ve_epa_shortpipe', 'v_edit_inp_shortpipe', 'v_edit_inp_dscenario_shortpipe') and columnname = 'status';
 
-INSERT INTO ws_sample36.sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source") 
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source") 
 VALUES(3248, 'There is no street data available', 'Please draw tramified streets on om_streetaxis table', 2, false, 'ws', 'core') ON CONFLICT (id) DO NOTHING;
+
