@@ -116,6 +116,13 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="btn_toggle_closed">
+          <property name="text">
+           <string>Toggle closed</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="btn_config">
           <property name="text">
            <string>Config</string>

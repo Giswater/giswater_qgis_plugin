@@ -40,6 +40,7 @@ class GwNetscenarioManagerButton(GwAction):
                             "plan_netscenario_connec": {"filter_table": "v_edit_inp_connec", "feature_type": "connec"},
                             "v_edit_plan_netscenario_dma": {"filter_table": "v_edit_dma", "feature_type": "dma"},
                             "v_edit_plan_netscenario_presszone": {"filter_table": "v_edit_presszone", "feature_type": "presszone"},
+                            "plan_netscenario_valve": {"filter_table": "v_edit_node", "feature_type": "node"},
                             }
         self.filter_disabled = []
         self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
@@ -299,7 +300,7 @@ class GwNetscenarioManagerButton(GwAction):
         default_tab_idx = 0
         # Select all netscenario views
         sql = f"SELECT table_name FROM INFORMATION_SCHEMA.tables WHERE table_schema = '{lib_vars.schema_name}' " \
-              f"AND table_name IN ('plan_netscenario_arc', 'plan_netscenario_node', 'plan_netscenario_connec', 'plan_netscenario_{self.selected_netscenario_type.lower()}') " \
+              f"AND table_name IN ('plan_netscenario_arc', 'plan_netscenario_node', 'plan_netscenario_connec', 'plan_netscenario_{self.selected_netscenario_type.lower()}', 'plan_netscenario_valve') " \
               f"ORDER BY array_position(ARRAY['plan_netscenario_arc', 'plan_netscenario_node', 'plan_netscenario_connec'], table_name::text);"
         rows = tools_db.get_rows(sql)
         if rows:
@@ -321,6 +322,7 @@ class GwNetscenarioManagerButton(GwAction):
         # Connect signals
         self.dlg_netscenario.btn_config.clicked.connect(partial(self._manage_config))
         self.dlg_netscenario.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active))
+        self.dlg_netscenario.btn_toggle_closed.clicked.connect(partial(self._manage_toggle_closed))
         self.dlg_netscenario.btn_create.clicked.connect(partial(self._manage_create))
         self.dlg_netscenario.btn_update.clicked.connect(partial(self._manage_update))
         self.dlg_netscenario.btn_insert.clicked.connect(partial(self._manage_insert))
@@ -356,7 +358,10 @@ class GwNetscenarioManagerButton(GwAction):
         # Set model
         model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         model.setTable(self.table_name)
-        model.setFilter(f"netscenario_id = {self.selected_netscenario_id} AND {netscenario_type}_id::text NOT IN ('-1', '0')")
+        filter_str = f"netscenario_id = {self.selected_netscenario_id}"
+        if 'valve' not in self.table_name:
+            filter_str += f" AND {netscenario_type}_id::text NOT IN ('-1', '0')"
+        model.setFilter(filter_str)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)
         model.select()
@@ -441,21 +446,27 @@ class GwNetscenarioManagerButton(GwAction):
         index_tab = self.dlg_netscenario.main_tab.currentIndex()
         tab_name = self.dlg_netscenario.main_tab.widget(index_tab).objectName()
 
-        tools_qt.set_widget_enabled(self.dlg_netscenario, 'cmb_feature_id', enable)
-        tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_insert', enable)
-        tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_delete', enable)
-        tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_snapping', enable)
+        widget_names = ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active']
 
-        if tab_name in ('plan_netscenario_arc', 'plan_netscenario_node', 'plan_netscenario_connec'):
-            enable = False
-        tools_qt.set_widget_enabled(self.dlg_netscenario, 'cmb_feature_id', enable)
-        tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_insert', enable)
-        tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_delete', enable)
-        tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_snapping', enable)
-        tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_config', enable)
-        tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_create', enable)
-        tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_update', enable)
-        tools_qt.set_widget_enabled(self.dlg_netscenario, 'btn_toggle_active', enable)
+        for name in widget_names:
+            tools_qt.set_widget_enabled(self.dlg_netscenario, name, enable)
+
+        disabled_widgets = {
+            'plan_netscenario_arc': ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active'],
+            'plan_netscenario_node': ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active'],
+            'plan_netscenario_connec': ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active'],
+            'plan_netscenario_valve': ['cmb_feature_id', 'btn_insert', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active']
+        }
+        if tab_name in disabled_widgets:
+            for name in disabled_widgets[tab_name]:
+                tools_qt.set_widget_enabled(self.dlg_netscenario, name, False)
+
+        if tab_name == 'plan_netscenario_valve':
+            tools_qt.set_widget_visible(self.dlg_netscenario, 'btn_toggle_active', False)
+            tools_qt.set_widget_visible(self.dlg_netscenario, 'btn_toggle_closed', True)
+        else:
+            tools_qt.set_widget_visible(self.dlg_netscenario, 'btn_toggle_active', True)
+            tools_qt.set_widget_visible(self.dlg_netscenario, 'btn_toggle_closed', False)
 
 
     def _manage_feature_type(self):
@@ -541,6 +552,32 @@ class GwNetscenarioManagerButton(GwAction):
         field_id = tableview.model().headerData(col_idx, Qt.Horizontal)
 
         sql = f"UPDATE {view} SET active = {str(not active).lower()} WHERE netscenario_id = {netscenario_id} AND {field_id} = {mapzone_id}"
+        tools_db.execute_sql(sql, log_sql=True)
+
+        # Refresh tableview
+        self._manage_current_changed()
+
+
+    def _manage_toggle_closed(self):
+        # Get selected row
+        tableview = self.dlg_netscenario.main_tab.currentWidget()
+        view = tableview.objectName().replace('tbl_', '')
+        selected_list = tableview.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.dlg_netscenario)
+            return
+
+        # Get selected mapzone data
+        index = tableview.selectionModel().currentIndex()
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, 'netscenario_id')
+        netscenario_id = index.sibling(index.row(), col_idx).data()
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, f'node_id')
+        node_id = index.sibling(index.row(), col_idx).data()
+        closed = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(tableview, 'closed')).data()
+        closed = tools_os.set_boolean(closed)
+
+        sql = f"UPDATE {view} SET closed = {str(not closed).lower()} WHERE netscenario_id = {netscenario_id} AND node_id = '{node_id}'"
         tools_db.execute_sql(sql, log_sql=True)
 
         # Refresh tableview
