@@ -61,6 +61,8 @@ v_query text;
 v_hidrant_array text;
 v_max_hydr_id integer;
 v_max_prop_hydr_id integer;
+v_expl_array text;
+v_count integer;
 BEGIN
 
 -- Search path
@@ -107,6 +109,16 @@ SET search_path = "SCHEMA_NAME", public;
 		into v_node_array;
 		EXECUTE 'SELECT string_agg(a.node_id,'', '') from (SELECT n.node_id FROM '||v_tablename||' n join man_hydrant using (node_id))a'
 		into v_hidrant_array;
+	END IF;
+
+
+	EXECUTE 'SELECT DISTINCT string_agg(expl_id::text,'', '') FROM node WHERE node_id::integer IN ('||v_hidrant_array||')'
+	INTO v_expl_array;
+	EXECUTE 'SELECT count(*) FROM om_streetaxis WHERE expl_id IN ('||v_expl_array||')' INTO v_count;
+
+	IF v_count = 0 THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"3248", "function":"3160","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
 	END IF;
 
 	IF v_node_array IS NOT NULL THEN
