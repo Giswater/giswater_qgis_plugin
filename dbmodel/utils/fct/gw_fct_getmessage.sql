@@ -132,9 +132,17 @@ BEGIN
 			FROM sys_function WHERE sys_function.id=v_function_id;
 
 			IF v_message IS NOT NULL THEN
-				RAISE EXCEPTION 'Function: [%] - %. HINT: % - % ', rec_function.function_name, concat(upper(rec_cat_error.error_message), ' ',v_message), upper(rec_cat_error.hint_message), v_variables ;
+				IF v_variables IS NOT NULL and v_variables != '<NULL>' THEN
+					RAISE EXCEPTION 'Function: [%] - %. HINT: % - % ', rec_function.function_name, concat(upper(rec_cat_error.error_message), ' ',v_message), upper(rec_cat_error.hint_message), v_variables ;
+				ELSE
+					RAISE EXCEPTION 'Function: [%] - %. HINT: %', rec_function.function_name, concat(upper(rec_cat_error.error_message), ' ',v_message), upper(rec_cat_error.hint_message);
+				END IF;
 			ELSE
-				RAISE EXCEPTION 'Function: [%] - %. HINT: % - %', rec_function.function_name, upper(rec_cat_error.error_message), upper(rec_cat_error.hint_message), v_variables ;
+				IF v_variables IS NOT NULL and v_variables != '<NULL>'THEN
+					RAISE EXCEPTION 'Function: [%] - %. HINT: % - %', rec_function.function_name, upper(rec_cat_error.error_message), upper(rec_cat_error.hint_message), v_variables ;
+				ELSE
+					RAISE EXCEPTION 'Function: [%] - %. HINT: %', rec_function.function_name, upper(rec_cat_error.error_message), upper(rec_cat_error.hint_message) ;
+				END IF;
 			END IF;
 		ELSIF rec_cat_error.log_level = 3 THEN
 
