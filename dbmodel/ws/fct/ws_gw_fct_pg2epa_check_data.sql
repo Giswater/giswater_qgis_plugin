@@ -94,7 +94,7 @@ BEGIN
 		the_geom, expl_id FROM ', v_querytext);
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 2, '107', 
-		concat('WARNING-107 (temp_anl_node): There is/are ',v_count,' node''s orphans ready-to-export (epa_type & state_type). If they are actually orphan, you could change the epa_type to fix it'),v_count);
+		concat('WARNING-107 (anl_node): There is/are ',v_count,' node''s orphans ready-to-export (epa_type & state_type). If they are actually orphan, you could change the epa_type to fix it'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id,  error_message, fcount)
 		VALUES (v_fid, 1, '107', 'INFO: No node(s) orphan found.',v_count);
@@ -131,7 +131,7 @@ BEGIN
 		INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, expl_id)
 		SELECT 164, node_id, nodecat_id, the_geom, expl_id FROM v_edit_node WHERE elevation IS NULL;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '164', 3, concat('ERROR-164 (temp_anl_node): There is/are ',v_count,' node(s) without elevation. Take a look on temporal table for details.'),v_count);
+		VALUES (v_fid, '164', 3, concat('ERROR-164 (anl_node): There is/are ',v_count,' node(s) without elevation. Take a look on temporal table for details.'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '164', 1, 'INFO: No nodes with null values on field elevation have been found.',v_count);
@@ -145,7 +145,7 @@ BEGIN
 		INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
 		SELECT 165, node_id, nodecat_id, the_geom, 'Elevation with zero', expl_id FROM v_edit_node WHERE elevation=0;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '165', 2, concat('WARNING-165 (temp_anl_node): There is/are ',v_count,' node(s) with elevation=0.'),v_count);
+		VALUES (v_fid, '165', 2, concat('WARNING-165 (anl_node): There is/are ',v_count,' node(s) with elevation=0.'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '165', 1, 'INFO: No nodes with ''0'' on field elevation have been found.',v_count);
@@ -170,7 +170,7 @@ BEGIN
 	SELECT count(*) INTO v_count FROM temp_anl_node WHERE fid = 166 AND cur_user=current_user;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '166', 3, concat('ERROR-166 (temp_anl_node): There is/are ',v_count,' node2arcs with more than two arcs. It''s impossible to continue'),v_count);
+		VALUES (v_fid, '166', 3, concat('ERROR-166 (anl_node): There is/are ',v_count,' node2arcs with more than two arcs. It''s impossible to continue'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '166', 1, 'INFO: No results found looking for node2arc(s) with more than two arcs.',v_count);
@@ -198,7 +198,7 @@ BEGIN
 	SELECT count(*) INTO v_count FROM temp_anl_node WHERE fid = 167;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '167', 3, concat('ERROR-167 (temp_anl_node): There is/are ',
+		VALUES (v_fid, '167', 3, concat('ERROR-167 (anl_node): There is/are ',
 		v_count,' Mandatory node2arc(s) with less than two arcs.'),v_count);
 	ELSE 
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -225,7 +225,7 @@ BEGIN
 	SELECT count(*) INTO v_count FROM temp_anl_node WHERE fid = 292;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '292', 2, concat('WARNING-292 (temp_anl_node): There is/are ',
+		VALUES (v_fid, '292', 2, concat('WARNING-292 (anl_node): There is/are ',
 		v_count,' NON-mandatory node2arc(s) with less than two arcs. It will be transformed on the fly using only one arc'),v_count);
 	ELSE 
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -240,7 +240,7 @@ BEGIN
 	SELECT count(*) INTO v_count FROM temp_anl_arc WHERE fid = 169 AND cur_user=current_user;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '169', 2, concat('WARNING-169 (temp_anl_arc): There is/are ',
+		VALUES (v_fid, '169', 2, concat('WARNING-169 (anl_arc): There is/are ',
 		v_count,' CV pipes. Be carefull with the sense of pipe and check that node_1 and node_2 are on the right direction to prevent reverse flow.'),v_count);
 	ELSE 
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -288,7 +288,7 @@ BEGIN
 	SELECT count(*) INTO v_count FROM temp_anl_node WHERE fid = 170 AND cur_user=current_user;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '170', 3, concat('ERROR-170 (temp_anl_node): There is/are ', v_count,' valve(s) with wrong to_arc value according with the two closest arcs.'),v_count);
+		VALUES (v_fid, '170', 3, concat('ERROR-170 (anl_node): There is/are ', v_count,' valve(s) with wrong to_arc value according with the two closest arcs.'),v_count);
 	ELSE 
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '170', 1,
@@ -459,7 +459,7 @@ BEGIN
 	SELECT count(*) INTO v_count FROM temp_anl_node WHERE fid = 171 AND cur_user=current_user;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '171', 3, concat('ERROR-171 (temp_anl_node): There is/are ', v_count,' pump(s) with wrong to_arc value according with closest arcs.'),v_count);
+		VALUES (v_fid, '171', 3, concat('ERROR-171 (anl_node): There is/are ', v_count,' pump(s) with wrong to_arc value according with closest arcs.'),v_count);
 
 	ELSE 
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -537,7 +537,7 @@ BEGIN
 		WHERE st_length(the_geom) < v_nodeproximity;
 		
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '229', 2, concat('WARNING-229 (temp_anl_arc): There is/are ',v_count,' pipe(s) with length less than node proximity distance (',v_nodeproximity,') configured.'),v_count);
+		VALUES (v_fid, '229', 2, concat('WARNING-229 (anl_arc): There is/are ',v_count,' pipe(s) with length less than node proximity distance (',v_nodeproximity,') configured.'),v_count);
 		v_count=0;
 		
 	ELSE
@@ -553,7 +553,7 @@ BEGIN
 		SELECT 230, arc_id, arccat_id , the_geom, concat('Length less than minimum distance: ', (st_length(the_geom))::numeric (12,3)), sector_id FROM v_edit_inp_pipe where st_length(the_geom) < v_minlength;
 
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '230', 3, concat('ERROR-230 (temp_anl_arc): There is/are ',v_count,' pipe(s) with length less than configured minimum length (',v_minlength,') which are not exported.'),v_count);
+		VALUES (v_fid, '230', 3, concat('ERROR-230 (anl_arc): There is/are ',v_count,' pipe(s) with length less than configured minimum length (',v_minlength,') which are not exported.'),v_count);
 		v_count=0;
 		
 	ELSE
@@ -614,7 +614,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '198', 3, concat(
-		'ERROR-198 (temp_anl_node): There is/are ',v_count,' tank(s) with null values at least on mandatory columns for tank (initlevel, minlevel, maxlevel, diameter, minvol).Take a look on temporal table to details'),v_count);
+		'ERROR-198 (anl_node): There is/are ',v_count,' tank(s) with null values at least on mandatory columns for tank (initlevel, minlevel, maxlevel, diameter, minvol).Take a look on temporal table to details'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -630,7 +630,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '153', 3, concat(
-		'ERROR-153 (temp_anl_node): There is/are ',v_count,' inlets(s) with null values at least on mandatory columns for inlets (initlevel, minlevel, maxlevel, diameter, minvol).Take a look on temporal table to details'),v_count);
+		'ERROR-153 (anl_node): There is/are ',v_count,' inlets(s) with null values at least on mandatory columns for inlets (initlevel, minlevel, maxlevel, diameter, minvol).Take a look on temporal table to details'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -657,7 +657,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '294', 3, concat(
-		'ERROR-294 (temp_anl_node): There is/are ',v_count,' node features with epa_type not according with epa table. Check your data before continue'),v_count);
+		'ERROR-294 (anl_node): There is/are ',v_count,' node features with epa_type not according with epa table. Check your data before continue'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -675,7 +675,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '295', 3, concat(
-		'ERROR-295 (temp_anl_arc): There is/are ',v_count,' arc features with epa_type not according with epa table. Check your data before continue'), v_count);
+		'ERROR-295 (anl_arc): There is/are ',v_count,' arc features with epa_type not according with epa table. Check your data before continue'), v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -723,7 +723,7 @@ BEGIN
 		EXECUTE concat ('INSERT INTO temp_anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id) SELECT 379, node_id, nodecat_id, 
 		''Topological node with epa_type UNDEFINED'', the_geom, expl_id FROM (', v_querytext,')a');
 		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 2, '379' ,concat('WARNING-379 (temp_anl_node): There is/are ',v_count,' node(s) with epa_type UNDEFINED acting as node_1 or node_2 of arcs. Please, check your data before continue.'),v_count);
+		VALUES (v_fid, 2, '379' ,concat('WARNING-379 (anl_node): There is/are ',v_count,' node(s) with epa_type UNDEFINED acting as node_1 or node_2 of arcs. Please, check your data before continue.'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 	VALUES (v_fid, 1, '379','INFO: No nodes with epa_type UNDEFINED acting as node_1 or node_2 of arcs found.',v_count);
@@ -758,7 +758,7 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 3, '411' ,concat('ERROR-411 (temp_anl_node): There is/are ',v_count,' mandatory nodarcs (VALVE & PUMP) over other EPA nodes.'),v_count);
+		VALUES (v_fid, 3, '411' ,concat('ERROR-411 (anl_node): There is/are ',v_count,' mandatory nodarcs (VALVE & PUMP) over other EPA nodes.'),v_count);
 
 		EXECUTE 'INSERT INTO temp_anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, the_geom, arc_distance, descript, sector_id) SELECT * FROM ('||v_querytext||') a';
 	ELSE
@@ -782,7 +782,7 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 2, '412' ,concat('WARNING-412 (temp_anl_node): There is/are ',v_count,' Shortpipe nodarc(s) over other EPA nodes.'),v_count);
+		VALUES (v_fid, 2, '412' ,concat('WARNING-412 (anl_node): There is/are ',v_count,' Shortpipe nodarc(s) over other EPA nodes.'),v_count);
 
 		EXECUTE 'INSERT INTO temp_anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, the_geom, arc_distance, descript) SELECT * FROM ('||v_querytext||') a';
 
@@ -831,7 +831,7 @@ BEGIN
 	
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '429', 3, concat('ERROR-432 (temp_anl_node): There is/are ',v_count,' Node(s) ''T candidate'' with wrong topology'),v_count);
+		VALUES (v_fid, '429', 3, concat('ERROR-432 (anl_node): There is/are ',v_count,' Node(s) ''T candidate'' with wrong topology'),v_count);
 
 		EXECUTE 'INSERT INTO temp_anl_node (node_id, sector_id, fid, descript, nodecat_id, the_geom) '||v_querytext;
 	ELSE
@@ -863,7 +863,7 @@ BEGIN
 		
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '480', 2, concat(
-		'WARNING-480 (temp_anl_connec): There is/are ',v_count,' connecs more than once because related psectors are visible.'),v_count);
+		'WARNING-480 (anl_connec): There is/are ',v_count,' connecs more than once because related psectors are visible.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -892,7 +892,7 @@ BEGIN
 		-- remove anl tables
 		DELETE FROM temp_anl_node WHERE fid = v_record.fid AND cur_user = current_user;
 		DELETE FROM temp_anl_arc WHERE fid = v_record.fid AND cur_user = current_user;
-		DELETE FROM temp_anl_connec WHERE fid = v_record.fid AND cur_user = current_user;
+		DELETE FROM (anl_node): WHERE fid = v_record.fid AND cur_user = current_user;
 
 		DELETE FROM temp_audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user AND fid = v_fid;
 	END LOOP;

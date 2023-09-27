@@ -95,7 +95,7 @@ BEGIN
 		EXECUTE concat ('INSERT INTO temp_anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 107, node_id, nodecat_id, ''Orphan node'',
 		the_geom FROM ', v_querytext);
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '107',concat('ERROR-107 (temp_anl_node): There is/are ',v_count,' node''s orphan. If they are JUNCTIONS, on the exportation will be removed.'),v_count);
+		VALUES (v_fid, v_result_id, 3, '107',concat('ERROR-107 (anl_node): There is/are ',v_count,' node''s orphan. If they are JUNCTIONS, on the exportation will be removed.'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1,'107', 'INFO: No node(s) orphan found.',v_count);
@@ -154,7 +154,7 @@ BEGIN
 	
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 2, '113', concat('WARNING-113 (temp_anl_node): There is/are ',v_count,
+		VALUES (v_fid, v_result_id, 2, '113', concat('WARNING-113 (anl_node): There is/are ',v_count,
 		' junction(s) type sink which means that junction only have entry arcs without any exit arc (FORCE_MAIN is not valid).'),v_count);
 
 		-- check nodes sink automaticly swiched to outfall (fuction gw_fct_temp_anl_node_sink have been called on pg2epa_fill_data function)
@@ -163,7 +163,7 @@ BEGIN
 		
 		IF v_count_2 > 0 THEN
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-			VALUES (v_fid, v_result_id, 2, '113', concat('WARNING-113 (temp_anl_node):  ',v_count_2,' from ',v_count,
+			VALUES (v_fid, v_result_id, 2, '113', concat('WARNING-113 (anl_node):  ',v_count_2,' from ',v_count,
 			' junction(s) type sink has/have outfallparam field defined and has/have been switched to OUTFALL using defined parameters.'),v_count);
 		END IF;
 		v_count=0;
@@ -186,7 +186,7 @@ BEGIN
 	
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 2, '111', concat('WARNING-111 (temp_anl_node): There is/are ',v_count,' junction(s) with exits upper intro'),v_count);
+		VALUES (v_fid, v_result_id, 2, '111', concat('WARNING-111 (anl_node): There is/are ',v_count,' junction(s) with exits upper intro'),v_count);
 	ELSE 
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '111', concat('INFO: Any junction have been detected with exits upper intro.'),v_count);
@@ -202,7 +202,7 @@ BEGIN
 		SELECT 164, node_id, nodecat_id, the_geom FROM v_edit_node JOIN selector_sector USING (sector_id) 
 		WHERE epa_type !='UNDEFINED' AND sys_elev IS NULL AND cur_user = current_user;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '164', concat('ERROR-164 (temp_anl_node): There is/are ',v_count,' EPA node(s) without sys_elevation values.'),v_count);
+		VALUES (v_fid, v_result_id, 3, '164', concat('ERROR-164 (anl_node): There is/are ',v_count,' EPA node(s) without sys_elevation values.'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '164', 'INFO: No nodes with null values on field elevation have been found.',v_count);
@@ -213,7 +213,7 @@ BEGIN
 		INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, the_geom)
 		SELECT 284, arc_id, arccat_id, the_geom FROM v_edit_arc JOIN selector_sector USING (sector_id) WHERE cur_user = current_user AND sys_elev1 = NULL OR sys_elev2 = NULL;
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '284', concat('ERROR-284 (temp_anl_arc): There is/are ',v_count,' arc(s) without values on sys_elev1 or sys_elev2.'),v_count);
+		VALUES (v_fid, v_result_id, 3, '284', concat('ERROR-284 (anl_arc): There is/are ',v_count,' arc(s) without values on sys_elev1 or sys_elev2.'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '284', 'INFO: No arcs with null values on field elevation (sys_elev1 or sys_elev2) have been found.',v_count);
@@ -267,7 +267,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '294',concat(
-		'ERROR-294 (temp_anl_node): There is/are ',v_count,' node features with epa_type not according with epa table. Check your data before continue'), v_count);
+		'ERROR-294 (anl_node): There is/are ',v_count,' node features with epa_type not according with epa table. Check your data before continue'), v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -293,7 +293,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '295',concat(
-		'ERROR-295 (temp_anl_arc): There is/are ',v_count,' arc features with epa_type not according with epa table. Check your data before continue'), v_count);
+		'ERROR-295 (anl_arc): There is/are ',v_count,' arc features with epa_type not according with epa table. Check your data before continue'), v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -313,7 +313,7 @@ BEGIN
 		EXECUTE concat ('INSERT INTO temp_anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id) SELECT 379, node_id, nodecat_id, 
 		''Topological node with epa_type UNDEFINED'', the_geom, expl_id FROM (', v_querytext,')a');
 		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 2, '379' ,concat('WARNING-379 (temp_anl_node): There is/are ',v_count,' node(s) with epa_type UNDEFINED acting as node_1 or node_2 of arcs. Please, check your data before continue.'),v_count);
+		VALUES (v_fid, 2, '379' ,concat('WARNING-379 (anl_node): There is/are ',v_count,' node(s) with epa_type UNDEFINED acting as node_1 or node_2 of arcs. Please, check your data before continue.'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 	VALUES (v_fid, 1, '379','INFO: No nodes with epa_type UNDEFINED acting as node_1 or node_2 of arcs found.',v_count);
@@ -373,7 +373,7 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '106' ,concat('WARNING-106 (temp_anl_node): There is/are ',v_count,' nodes with less proximity than minimum configured (',v_nodetolerance,').'),v_count);
+		VALUES (v_fid, v_result_id, 3, '106' ,concat('WARNING-106 (anl_node): There is/are ',v_count,' nodes with less proximity than minimum configured (',v_nodetolerance,').'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '106','INFO: All nodes has the minimum distance among them acording with the configured value ',v_count);
@@ -447,7 +447,7 @@ BEGIN
 	
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '427',concat(
-		'ERROR-427 (temp_anl_arc): There is/are ',v_count,' orifice flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
+		'ERROR-427 (anl_arc): There is/are ',v_count,' orifice flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -465,7 +465,7 @@ BEGIN
 	
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '427',concat(
-		'ERROR-427 (temp_anl_arc): There is/are ',v_count,' weir flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
+		'ERROR-427 (anl_arc): There is/are ',v_count,' weir flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -484,7 +484,7 @@ BEGIN
 	
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '427',concat(
-		'ERROR-427 (temp_anl_arc): There is/are ',v_count,' outlet flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
+		'ERROR-427 (anl_arc): There is/are ',v_count,' outlet flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -502,7 +502,7 @@ BEGIN
 	
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '427',concat(
-		'ERROR-427 (temp_anl_arc): There is/are ',v_count,' pump flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
+		'ERROR-427 (anl_arc): There is/are ',v_count,' pump flow regulator(s) wich his length do not respect the minimum length for target arc.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -572,7 +572,7 @@ BEGIN
 			
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '427',concat(
-		'ERROR-440 (temp_anl_node): There is/are ',v_count,' outlets defined on subcatchments view, that are not present on junction, outfall, storage, divider or subcatchment view.'),v_count);
+		'ERROR-440 (anl_node): There is/are ',v_count,' outlets defined on subcatchments view, that are not present on junction, outfall, storage, divider or subcatchment view.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)

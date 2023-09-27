@@ -161,7 +161,7 @@ BEGIN
 		EXECUTE concat ('INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, descript, the_geom, expl_id)
 			SELECT 454, arc_id, arccat_id, ''node_1 or node_2 nulls'', the_geom, expl_id FROM ', v_querytext);
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 3, '454', concat('ERROR-454 (temp_anl_arc): There is/are ',v_count,' arc''s with state=1 and without node_1 or node_2.'),v_count);
+		VALUES (v_fid, 3, '454', concat('ERROR-454 (anl_arc): There is/are ',v_count,' arc''s with state=1 and without node_1 or node_2.'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id,error_message, fcount)
 		VALUES (v_fid, 1, '454','INFO: No arcs with without node_1 or node_2 nodes found.', v_count);
@@ -379,7 +379,7 @@ BEGIN
 			SELECT 431, arc_id, the_geom, concat('Arc with less length than minimum configured (',v_minlength,')') FROM temp_t_arc WHERE st_length(the_geom) < v_minlength AND epa_type = 'CONDUIT';
 		
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (v_fid, v_result_id, 2, concat('WARNING-431 (temp_anl_arc): There is/are ',v_count,' arcs with length with length less than ',v_minlength,' meters (minimum length configured).'), v_count);
+			VALUES (v_fid, v_result_id, 2, concat('WARNING-431 (anl_arc): There is/are ',v_count,' arcs with length with length less than ',v_minlength,' meters (minimum length configured).'), v_count);
 		ELSE
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: No arcs with length less than ',v_minlength,' meters (minimum length configured).'), v_count);

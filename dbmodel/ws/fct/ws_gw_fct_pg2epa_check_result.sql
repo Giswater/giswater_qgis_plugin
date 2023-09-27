@@ -365,7 +365,7 @@ BEGIN
 
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 2, 
-			concat('WARNING-373 (temp_anl_arc): There is/are ', v_count, ' arc on v_edit_arc with sector_id = 0 that didn''t take part in the simulation. Topological nodes will be exported if they are associated with some other exported arc.'));
+			concat('WARNING-373 (anl_arc): There is/are ', v_count, ' arc on v_edit_arc with sector_id = 0 that didn''t take part in the simulation. Topological nodes will be exported if they are associated with some other exported arc.'));
 		ELSE
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: All arcs on v_edit_arc have sector_id different than 0.'));			

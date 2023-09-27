@@ -382,7 +382,7 @@ BEGIN
 			EXECUTE concat ('INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
 			SELECT 252, b.feature_id, b.catalog, ''Arcs state = 2 without psector'', b.the_geom, 2 FROM (', v_query,')b  WHERE feature = ''ARC''');
 			INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-			VALUES (v_fid, '252', 3, FALSE, concat('ERROR-252 (temp_arc): There are ',v_count,' planified arcs without psector.'),v_count);
+			VALUES (v_fid, '252', 3, FALSE, concat('ERROR-252 (anl_arc): There are ',v_count,' planified arcs without psector.'),v_count);
 		END IF;
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')b WHERE feature = ''NODE'';'
 		INTO v_count; 
@@ -390,21 +390,21 @@ BEGIN
 			EXECUTE concat ('INSERT INTO temp_anl_node (fid, node_id, nodecat_id, descript, the_geom, state)
 			SELECT 252, b.feature_id, b.catalog, ''Nodes state = 2 without psector'', b.the_geom, 2 FROM (', v_query,')b  WHERE feature = ''NODE''');
 			INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message,fcount)
-			VALUES (v_fid, '252', 3, FALSE, concat('ERROR-252 (temp_anl_node): There are ',v_count,' planified nodes without psector.'),v_count);		END IF;
+			VALUES (v_fid, '252', 3, FALSE, concat('ERROR-252 (anl_node): There are ',v_count,' planified nodes without psector.'),v_count);		END IF;
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')b WHERE feature = ''CONNEC'';'
 		INTO v_count; 
 		IF v_count > 0 THEN
 			EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, connecat_id, descript, the_geom,state)
 			SELECT 252, b.feature_id, b.catalog, ''Connecs state = 2 without psector'', b.the_geom,2 FROM (', v_query,')b  WHERE feature = ''CONNEC''');
 			INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message,fcount)
-			VALUES (v_fid, '252', 3, FALSE, concat('ERROR-252 (temp_anl_connec): There are ',v_count,' planified connecs without psector.'),v_count);		END IF;
+			VALUES (v_fid, '252', 3, FALSE, concat('ERROR-252 (anl_connec): There are ',v_count,' planified connecs without psector.'),v_count);		END IF;
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')b WHERE feature = ''GULLY'';'
 		INTO v_count; 
 		IF v_count > 0 THEN
 			EXECUTE concat ('INSERT INTO temp_anl_connec (fid, gully_id, gullycat_id, descript, the_geom, state)
 			SELECT 252, b.feature_id, b.catalog, ''Gullies state = 2 without psector'', b.the_geom, 2 FROM (', v_query,')b  WHERE feature = ''GULLY''');
 			INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-			VALUES (v_fid, '252', 3, FALSE, concat('ERROR-252 (temp_anl_connec): There are ',v_count,' planified gullys without psector.'),v_count);		END IF;
+			VALUES (v_fid, '252', 3, FALSE, concat('ERROR-252 (anl_connec): There are ',v_count,' planified gullys without psector.'),v_count);		END IF;
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '252', 1,'INFO: There are no features with state=2 without psector.',v_count);
@@ -485,7 +485,7 @@ BEGIN
 		IF v_count > 0 THEN
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 			VALUES (v_fid, '467', 3, concat(
-			'ERROR-467 (temp_node): There is/are ',v_count,' pumps(s) with more than two arcs .Take a look on temporal table to details'),v_count);
+			'ERROR-467 (anl_node): There is/are ',v_count,' pumps(s) with more than two arcs .Take a look on temporal table to details'),v_count);
 			v_count=0;
 		ELSE
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
