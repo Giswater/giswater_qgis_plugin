@@ -526,12 +526,15 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Get selected mapzone data
         index = tableview.selectionModel().currentIndex()
-        mapzone_id = index.sibling(index.row(), 0).data()
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, 'netscenario_id')
+        netscenario_id = index.sibling(index.row(), col_idx).data()
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, f'{self.selected_netscenario_type.lower()}_id')
+        mapzone_id = index.sibling(index.row(), col_idx).data()
         active = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(tableview, 'active')).data()
         active = tools_os.set_boolean(active)
-        field_id = tableview.model().headerData(0, Qt.Horizontal)
+        field_id = tableview.model().headerData(col_idx, Qt.Horizontal)
 
-        sql = f"UPDATE {view} SET active = {str(not active).lower()} WHERE {field_id} = {mapzone_id}"
+        sql = f"UPDATE {view} SET active = {str(not active).lower()} WHERE netscenario_id = {netscenario_id} AND {field_id} = {mapzone_id}"
         tools_db.execute_sql(sql, log_sql=True)
 
         # Refresh tableview
