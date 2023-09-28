@@ -323,7 +323,7 @@ class GwNetscenarioManagerButton(GwAction):
         self.dlg_netscenario.btn_toggle_closed.clicked.connect(partial(self._manage_toggle_closed))
         self.dlg_netscenario.btn_create.clicked.connect(partial(self._manage_create))
         self.dlg_netscenario.btn_update.clicked.connect(partial(self._manage_update))
-        self.dlg_netscenario.btn_insert.clicked.connect(partial(self._manage_insert))
+        self.dlg_netscenario.btn_insert.clicked.connect(partial(self._manage_insert, None))
         self.dlg_netscenario.btn_delete.clicked.connect(partial(self._manage_delete))
         self.dlg_netscenario.btn_snapping.clicked.connect(partial(self._manage_select))
         self.dlg_netscenario.main_tab.currentChanged.connect(partial(self._manage_current_changed))
@@ -759,10 +759,11 @@ class GwNetscenarioManagerButton(GwAction):
                     child.defaultWidget().setChecked(True)
 
 
-    def _manage_insert(self):
+    def _manage_insert(self, p_feature_id=None):
         """ Insert feature to netscenario via the button """
 
-        if self.dlg_netscenario.cmb_feature_id.lineEdit().text() == '':
+        feature_id = p_feature_id if p_feature_id is not None else self.dlg_netscenario.cmb_feature_id.lineEdit().text()
+        if feature_id == '':
             message = "Feature_id is mandatory."
             self.dlg_netscenario.cmb_feature_id.setStyleSheet("border: 1px solid red")
             tools_qgis.show_warning(message, dialog=self.dlg_netscenario)
@@ -771,29 +772,47 @@ class GwNetscenarioManagerButton(GwAction):
         tableview = self.dlg_netscenario.main_tab.currentWidget()
         view = tableview.objectName()
 
-        sql = f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{self.table_name[len(f'{self.schema_name}.'):]}';"
-        rows = tools_db.get_rows(sql)
-
-        if rows[0][0] == 'id':
-            # FIELDS
-            sql = f"INSERT INTO {view} ({rows[1][0]}, {rows[2][0]}"
-            if view in ("plan_netscenario_controls", "plan_netscenario_rules"):
-                sql += f", {rows[3][0]}"
-            elif view == "plan_netscenario_demand":
-                sql += f", feature_type"
-            # VALUES
-            sql += f")VALUES ({self.selected_netscenario_id}, '{self.dlg_netscenario.cmb_feature_id.lineEdit().text()}'"
-            if view in ("plan_netscenario_controls", "plan_netscenario_rules"):
-                sql += f", ''"
-            elif view == "plan_netscenario_demand":
-                sql += f", '{self.feature_type.upper()}'"
-            sql += f");"
+        if view == 'plan_netscenario_dma':
+            sql = f"SELECT name, pattern_id, graphconfig, the_geom, active FROM dma WHERE dma_id = '{feature_id}';"
+            row = tools_db.get_row(sql)
+            if not row:
+                message = f"This dma doesn't exist"
+                self.dlg_netscenario.cmb_feature_id.setStyleSheet("border: 1px solid red")
+                tools_qgis.show_warning(message, parameter=feature_id, dialog=self.dlg_netscenario)
+                return
+            dma_name = row[0]
+            pattern_id = row[1]
+            graphconfig = json.dumps(row[2])
+            the_geom = row[3]
+            active = str(row[4]).lower()
+            sql = f"INSERT INTO v_edit_{view} (netscenario_id, dma_id, name, pattern_id, graphconfig, the_geom, active) " \
+                  f"VALUES ({self.selected_netscenario_id}, '{feature_id}', '{dma_name}', '{pattern_id}', $${graphconfig}$$, $${the_geom}$$, {active});"
+            result = tools_db.execute_sql(sql)
+        elif view == 'plan_netscenario_presszone':
+            sql = f"SELECT name, head, graphconfig, the_geom, active FROM presszone WHERE presszone_id = '{feature_id}';"
+            row = tools_db.get_row(sql)
+            if not row:
+                message = f"This presszone doesn't exist"
+                self.dlg_netscenario.cmb_feature_id.setStyleSheet("border: 1px solid red")
+                tools_qgis.show_warning(message, parameter=feature_id, dialog=self.dlg_netscenario)
+                return
+            presszone_name = row[0]
+            head = row[1]
+            graphconfig = json.dumps(row[2])
+            the_geom = row[3]
+            active = str(row[4]).lower()
+            sql = f"INSERT INTO v_edit_{view} (netscenario_id, presszone_id, name, head, graphconfig, the_geom, active) " \
+                  f"VALUES ({self.selected_netscenario_id}, '{feature_id}', '{presszone_name}', '{head}', $${graphconfig}$$, $${the_geom}$$, {active});"
+            result = tools_db.execute_sql(sql)
         else:
-            sql = f"INSERT INTO {view} VALUES ({self.selected_netscenario_id}, '{self.dlg_netscenario.cmb_feature_id.lineEdit().text()}');"
-        tools_db.execute_sql(sql)
+            sql = f"INSERT INTO {view} VALUES ({self.selected_netscenario_id}, '{feature_id}');"
+            result = tools_db.execute_sql(sql)
 
-        # Refresh tableview
-        self._fill_netscenario_table()
+
+        if p_feature_id is None:
+            # Refresh tableview
+            self._fill_netscenario_table()
+        return result
 
 
     def _manage_delete(self):
@@ -893,15 +912,13 @@ class GwNetscenarioManagerButton(GwAction):
 
             if selected_ids:
                 inserted = {f'{self.feature_type}': []}
-                tableview = self.dlg_netscenario.main_tab.currentWidget()
-                view = tableview.objectName()
                 for f in selected_ids:
-                    sql = f"INSERT INTO {view} VALUES ({self.selected_netscenario_id}, '{f}');"
-                    result = tools_db.execute_sql(sql, log_sql=False, log_error=False, show_exception=False)
+                    result = self._manage_insert(f)
                     if result:
                         inserted[f'{self.feature_type}'].append(f)
                 self._fill_netscenario_table()
 
+                self._selection_end()
                 # Just select the inserted features
                 tools_gw.get_expression_filter(self.feature_type, inserted, {f"{self.feature_type}": [layer]})
 
