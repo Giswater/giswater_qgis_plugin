@@ -553,7 +553,11 @@ class GwNetscenarioManagerButton(GwAction):
         active = tools_os.set_boolean(active)
         field_id = tableview.model().headerData(col_idx, Qt.Horizontal)
 
-        sql = f"UPDATE {view} SET active = {str(not active).lower()} WHERE netscenario_id = {netscenario_id} AND {field_id} = {mapzone_id}"
+        sql = f"UPDATE {view} SET active = {str(not active).lower()} WHERE netscenario_id = {netscenario_id} AND {field_id} = "
+        if field_id == 'presszone_id':
+            sql += f"'{mapzone_id}'"
+        else:
+            sql += f"{mapzone_id}"
         tools_db.execute_sql(sql, log_sql=True)
 
         # Refresh tableview
