@@ -638,17 +638,7 @@ class GwNetscenarioManagerButton(GwAction):
             return
 
         fields = json.dumps(my_json)
-        id_val = ""
-        if pkey:
-            if not isinstance(pkey, list):
-                pkey = [pkey]
-            for pk in pkey:
-                widget_name = f"tab_none_{pk}"
-                value = tools_qt.get_widget_value(dialog, widget_name)
-                id_val += f"{value}, "
-            id_val = id_val[:-2]
-        if not id_val:
-            id_val = feature_id
+        id_val = feature_id
 
         feature = f'"id":"{id_val}", '
         feature += f'"tableName":"{tablename}"'
