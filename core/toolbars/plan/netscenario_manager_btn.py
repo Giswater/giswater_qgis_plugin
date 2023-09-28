@@ -40,7 +40,7 @@ class GwNetscenarioManagerButton(GwAction):
                             "plan_netscenario_connec": {"filter_table": "v_edit_inp_connec", "feature_type": "connec"},
                             "v_edit_plan_netscenario_dma": {"filter_table": "v_edit_dma", "feature_type": "dma"},
                             "v_edit_plan_netscenario_presszone": {"filter_table": "v_edit_presszone", "feature_type": "presszone"},
-                            "plan_netscenario_valve": {"filter_table": "v_edit_node", "feature_type": "node"},
+                            "plan_netscenario_valve": {"filter_table": "man_valve", "feature_type": "node"},
                             }
         self.filter_disabled = []
         self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
@@ -317,8 +317,6 @@ class GwNetscenarioManagerButton(GwAction):
 
         self.dlg_netscenario.main_tab.setCurrentIndex(default_tab_idx)
 
-        self.dlg_netscenario.lbl_mapzone_id.setText(f'{self.selected_netscenario_type.capitalize()} id:')
-
         # Connect signals
         self.dlg_netscenario.btn_config.clicked.connect(partial(self._manage_config))
         self.dlg_netscenario.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active))
@@ -455,7 +453,7 @@ class GwNetscenarioManagerButton(GwAction):
             'plan_netscenario_arc': ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active'],
             'plan_netscenario_node': ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active'],
             'plan_netscenario_connec': ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active'],
-            'plan_netscenario_valve': ['cmb_feature_id', 'btn_insert', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active']
+            'plan_netscenario_valve': ['btn_config', 'btn_create', 'btn_update', 'btn_toggle_active']
         }
         if tab_name in disabled_widgets:
             for name in disabled_widgets[tab_name]:
@@ -464,9 +462,13 @@ class GwNetscenarioManagerButton(GwAction):
         if tab_name == 'plan_netscenario_valve':
             tools_qt.set_widget_visible(self.dlg_netscenario, 'btn_toggle_active', False)
             tools_qt.set_widget_visible(self.dlg_netscenario, 'btn_toggle_closed', True)
+            tools_qt.set_widget_text(self.dlg_netscenario, 'lbl_mapzone_id', 'Node id:')
+            self.dlg_netscenario.grb_copy.setTitle(f'Insert valve')
         else:
             tools_qt.set_widget_visible(self.dlg_netscenario, 'btn_toggle_active', True)
             tools_qt.set_widget_visible(self.dlg_netscenario, 'btn_toggle_closed', False)
+            tools_qt.set_widget_text(self.dlg_netscenario, 'lbl_mapzone_id', f'{self.selected_netscenario_type.capitalize()} id:')
+            self.dlg_netscenario.grb_copy.setTitle(f'Copy from existing {self.selected_netscenario_type}')
 
 
     def _manage_feature_type(self):
