@@ -30,6 +30,9 @@ v_level integer;
 v_status text;
 v_message text;
 v_error_context text;
+v_result json;
+v_result_info json;
+v_result_line json;
 
 BEGIN
 
@@ -42,21 +45,26 @@ BEGIN
 	v_psector := json_extract_path_text (p_data,'data','psectorId')::integer;
 	v_state_obsolete_planified:= (SELECT value::json ->> 'obsolete_planified' FROM config_param_system WHERE parameter='plan_psector_status_action');
 
+	-- delete previous logs
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid = 354;
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid = 355;
+	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid = 354;
+	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid = 355;
 	
 	IF v_psector IS NOT NULL THEN
 
 		--control psector topology: find arc, that on psector is defined as operative, on psector there are no nodes
 		v_query = '
-		select a.arc_id, node_id, concat(''Arc on service '',a.arc_id, '' has not node_1 ('', node_id, '') in this psector'') as descript,  a.the_geom FROM arc a
+		select a.arc_id, a.arccat_id, node_id, '|| v_psector ||' as psector_id, concat(''Arc on service '',a.arc_id, '' has not node_1 ('', node_id, '') in this psector'') as descript,  a.the_geom FROM arc a
 		join (select node_id from plan_psector_x_node where psector_id = '|| v_psector ||' and state = 0)n on node_1= node_id
 		left join (select * from plan_psector_x_arc where psector_id = '|| v_psector ||') p ON p.arc_id = a.arc_id
 		where p.arc_id is null and a.state=1
 		union
-		select a.arc_id, node_id, concat(''Arc on service '',a.arc_id, '' has not node_2 ('', node_id, '') in this psector'') as descript, a.the_geom FROM arc a
+		select a.arc_id, a.arccat_id, node_id, '|| v_psector ||' as psector_id, concat(''Arc on service '',a.arc_id, '' has not node_2 ('', node_id, '') in this psector'') as descript, a.the_geom FROM arc a
 		join (select node_id from plan_psector_x_node where psector_id = '|| v_psector ||' and state = 0 )n on node_2 = node_id
 		left join (select * from plan_psector_x_arc where psector_id = '|| v_psector ||') p ON p.arc_id = a.arc_id
 		where p.arc_id is null and a.state=1';
-
+		raise notice 'v_query :>> %', v_query;
 
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')c'
 		INTO v_count; 
@@ -64,16 +72,14 @@ BEGIN
 		IF v_count > 0 THEN
 
 			-- return el json. There are some topological inconsistences on this psector. Would you like to see the log (YES)  (LATER)
-			/*
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (354, 4, concat('TOPOLOGICAL INCONSISTENCES'));
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (354, 4, '-------------------------------------------------------------');
 
 			EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
-			SELECT 355, c.arc_id, c.arccat_id, concat(''Operative arc '', arc_id ,'' without final nodes in this psector '',c.psector_id), c.the_geom, 2 FROM (', v_query,')c ');
+			SELECT 354, c.arc_id, c.arccat_id, concat(''Operative arc '', arc_id ,'' without final nodes in this psector '',c.psector_id), c.the_geom, 1 FROM (', v_query,')c ');
 			
-			INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-			VALUES (v_fid, '354', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' operative arcs without final nodes in this psector.'),v_count);
-			*/
+			INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
+			VALUES (354, '354', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' operative arcs without final nodes in this psector.'),v_count);
 		
 		END IF;		
 
@@ -89,22 +95,22 @@ BEGIN
 		left join (select * from plan_psector_x_arc where psector_id = '|| v_psector ||') p ON p.arc_id = a.arc_id
 		where p.arc_id is not null and a.state=2';
 
+	raise notice 'v_query :>> %', v_query;
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')c'
 		INTO v_count; 
+	raise notice 'v_count :>> %', v_count;
 
 		IF v_count > 0 THEN
 
 			-- return el json. There are some topological inconsistences on this psector. Would you like to see the log (YES)  (LATER)
-			/*
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (355, 4, concat('TOPOLOGICAL INCONSISTENCES'));
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (355, 4, '-------------------------------------------------------------');
 
 			EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
 			SELECT 355, c.arc_id, c.arccat_id, concat(''Planned arc  '', arc_id ,'' without final nodes in this psector''), c.the_geom, 2 FROM (', v_query,')c ');
 			
-			INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-			VALUES (v_fid, '355', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' planned arcs without final nodes in this psector.'),v_count);
-			*/								 
+			INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
+			VALUES (355, '355', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' planned arcs without final nodes in this psector.'),v_count);
 
 		END IF;		
 
@@ -127,12 +133,38 @@ BEGIN
 	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault')
 	AND cur_user = current_user ORDER BY parameter)a);
 
+
+	-- get results
+	--lines
+	v_result = null;
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+	  	SELECT jsonb_build_object(
+	     'type',       'Feature',
+	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+	    'properties', to_jsonb(row) - 'the_geom'
+	  	) AS feature
+	  	FROM (SELECT id, arc_id, arccat_id, state, descript, node_1, node_2, expl_id, fid, st_length(the_geom) as length, the_geom
+	  	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (354,355)) row) features;
+
+	v_result := COALESCE(v_result, '{}');
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}');
+
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid IN (354, 355) order by criticity desc, id asc) row;
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
+	-- Control nulls
+	v_result_info := COALESCE(v_result_info, '{}'); 
+
 	--control nulls
 	v_uservalues := COALESCE(v_uservalues, '{}');
 		--  Return
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
-		     ',"data":{"userValues":'||v_uservalues||', "info":{}'||
+		     ',"data":{"userValues":'||v_uservalues||', "info":'||v_result_info||', "line":'||v_result_line||
 			'}}'||
 	    '}')::json, 3002, null, null, null);
 
