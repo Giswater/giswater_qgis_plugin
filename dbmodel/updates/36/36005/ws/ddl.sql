@@ -28,3 +28,8 @@ node_id character varying(16),
 closed boolean  DEFAULT false,
 CONSTRAINT plan_netscenario_valve_pkey PRIMARY KEY (netscenario_id, node_id)); 
 
+ALTER TABLE plan_netscenario_dma ALTER COLUMN lastupdate SET DEFAULT now();
+ALTER TABLE plan_netscenario_presszone ALTER COLUMN lastupdate SET DEFAULT now();
+
+ALTER TABLE plan_netscenario_dma ALTER COLUMN lastupdate_user SET DEFAULT current_user;
+ALTER TABLE plan_netscenario_presszone ALTER COLUMN lastupdate_user SET DEFAULT current_user;
