@@ -195,19 +195,19 @@ class GwInfoButton(GwMaptool):
             main_menu.addAction(action_valve)
             main_menu.addSeparator()
 
-        # Open/close valve in dscenario
-        valve_dscenario = json_result['body']['data'].get('valve_dscenario')
-        if valve_dscenario:
-            valve_dscenario_id = valve_dscenario['id']
-            dscenario_id = valve_dscenario['dscenario_id']
-            valve_dscenario_text = valve_dscenario['text']
-            valve_dscenario_table = valve_dscenario['tableName']
-            valve_dscenario_value = valve_dscenario['value']
-            action_valve_dscenario = QAction(f"{valve_dscenario_text}", None)
-            if valve_dscenario_id:
-                action_valve_dscenario.triggered.connect(partial(self._toggle_valve_state_dscenario, dscenario_id, valve_dscenario_id, valve_dscenario_table, valve_dscenario_value))
-            action_valve_dscenario.hovered.connect(partial(self._reset_rubber_bands))
-            main_menu.addAction(action_valve_dscenario)
+        # Open/close valve in netscenario
+        valve_netscenario = json_result['body']['data'].get('valve_netscenario')
+        if valve_netscenario:
+            valve_netscenario_id = valve_netscenario['id']
+            netscenario_id = valve_netscenario['netscenario_id']
+            valve_netscenario_text = valve_netscenario['text']
+            valve_netscenario_table = valve_netscenario['tableName']
+            valve_netscenario_value = valve_netscenario['value']
+            action_valve_netscenario = QAction(f"{valve_netscenario_text}", None)
+            if valve_netscenario_id:
+                action_valve_netscenario.triggered.connect(partial(self._toggle_valve_state_netscenario, netscenario_id, valve_netscenario_id, valve_netscenario_table, valve_netscenario_value))
+            action_valve_netscenario.hovered.connect(partial(self._reset_rubber_bands))
+            main_menu.addAction(action_valve_netscenario)
             main_menu.addSeparator()
 
         main_menu.aboutToHide.connect(self._reset_rubber_bands)
@@ -278,14 +278,14 @@ class GwInfoButton(GwMaptool):
             QgsApplication.taskManager().triggerTask(self.valve_thread)
 
 
-    def _toggle_valve_state_dscenario(self, dscenario_id, valve_id, table_name, value):
-        """ Open or closes a valve in a dscenario """
+    def _toggle_valve_state_netscenario(self, netscenario_id, valve_id, table_name, value):
+        """ Open or closes a valve in a netscenario """
 
         # Build function body
-        feature = f'"id":"{dscenario_id}, {valve_id}", '
+        feature = f'"id":"{netscenario_id}, {valve_id}", '
         feature += f'"tableName":"{table_name}" '
         # feature += f' "featureType":"node" '
-        extras = f'"fields":{{"dscenario_id": "{dscenario_id}", "node_id": "{valve_id}","status": "{value}"}}'
+        extras = f'"fields":{{"netscenario_id": "{netscenario_id}", "node_id": "{valve_id}","closed": "{value}"}}'
         body = tools_gw.create_body(feature=feature, extras=extras)
 
         tools_gw.execute_procedure('gw_fct_upsertfields', body)
