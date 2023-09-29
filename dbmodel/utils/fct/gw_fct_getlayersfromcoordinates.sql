@@ -66,13 +66,13 @@ v_valve_id text;
 v_valve_text text;
 v_valve_tablename text;
 v_closed_valve bool;
-v_dscenario_valve bool=false;
-v_valve_id_dscenario text;
-v_valve_text_dscenario text;
-v_valve_tablename_dscenario text;
-v_closed_valve_dscenario text;
-v_dscenario_id int;
-v_valve_value_dscenario text;
+v_netscenario_valve bool=false;
+v_valve_id_netscenario text;
+v_valve_text_netscenario text;
+v_valve_tablename_netscenario text;
+v_closed_valve_netscenario bool;
+v_netscenario_id int;
+v_valve_value_netscenario bool;
 v_valve_epa_type text;
 
   
@@ -134,7 +134,7 @@ BEGIN
 
 	FOREACH v_layer IN ARRAY v_visibleLayers::text[]
 	LOOP
-		IF v_layer = 'v_edit_inp_dscenario_valve' THEN v_dscenario_valve = true; END IF;
+		IF v_layer = 'v_edit_plan_netscenario_valve' THEN v_netscenario_valve = true; END IF;
 		
 	END LOOP;
 	
@@ -230,24 +230,23 @@ BEGIN
                                 ELSE
                                     v_valve_text := 'Close valve ('||v_id||')';
                                 END IF;
-                               	EXECUTE 'SELECT epa_type FROM '||v_layer||' WHERE '||v_idname||' = '''||v_id||'''' INTO v_valve_epa_type;
 
-                                IF v_dscenario_valve IS TRUE AND v_valve_epa_type = 'VALVE' THEN
-                                	EXECUTE 'SELECT dscenario_id FROM selector_inp_dscenario WHERE cur_user = current_user LIMIT 1' INTO v_dscenario_id;
-                                	IF (SELECT count(dscenario_id) FROM selector_inp_dscenario WHERE cur_user = current_user) != 1 THEN
-                                		v_valve_text_dscenario := 'To change valve status in dsenario you must have only one dscenario active';
+                                IF v_netscenario_valve IS TRUE THEN
+                                	EXECUTE 'SELECT netscenario_id FROM selector_netscenario WHERE cur_user = current_user LIMIT 1' INTO v_netscenario_id;
+                                	IF (SELECT count(netscenario_id) FROM selector_netscenario WHERE cur_user = current_user) != 1 THEN
+                                		v_valve_text_netscenario := 'To change valve status in netsenario you must have only one netscenario active';
                                 	ELSE
-	                                	v_valve_tablename_dscenario := 'v_edit_inp_dscenario_valve';
-	                                	v_valve_id_dscenario := v_id;
-	                                	EXECUTE 'SELECT status FROM '||quote_ident(v_valve_tablename_dscenario)||' WHERE dscenario_id = '||v_dscenario_id||' AND '||v_idname||' = '''||v_id||'''' INTO v_closed_valve_dscenario;
+	                                	v_valve_tablename_netscenario := 'v_edit_plan_netscenario_valve';
+	                                	v_valve_id_netscenario := v_id;
+	                                	EXECUTE 'SELECT closed FROM '||quote_ident(v_valve_tablename_netscenario)||' WHERE netscenario_id = '||v_netscenario_id||' AND '||v_idname||' = '''||v_id||'''' INTO v_closed_valve_netscenario;
 
-		                                IF v_closed_valve_dscenario = 'CLOSED' OR v_closed_valve IS TRUE THEN
-		                                    v_valve_text_dscenario := 'Open valve in dscenario '||v_dscenario_id||' ('||v_id||')';
+		                                IF v_closed_valve_netscenario IS True OR (v_closed_valve_netscenario ISNULL AND v_closed_valve IS TRUE) THEN
+		                                    v_valve_text_netscenario := 'Open valve in netscenario '||v_netscenario_id||' ('||v_id||')';
 		                                ELSE
-		                                    v_valve_text_dscenario := 'Close valve in dscenario '||v_dscenario_id||' ('||v_id||')';
+		                                    v_valve_text_netscenario := 'Close valve in netscenario '||v_netscenario_id||' ('||v_id||')';
 		                                END IF;
 		                            END IF;
-                                	
+
                                 END IF;
                             END IF;
                         END LOOP;
@@ -277,34 +276,31 @@ BEGIN
 						'", "tableName":"'||v_valve_tablename||'", "value": "'||(NOT v_closed_valve)||'"}';
 	END IF;
 
-	IF v_valve_text_dscenario IS NOT NULL THEN
-		v_valve_id_dscenario := COALESCE(v_valve_id_dscenario, '');
-		v_dscenario_id := COALESCE(v_dscenario_id, -1);
-		v_valve_tablename_dscenario := COALESCE(v_valve_tablename_dscenario, '');
-		v_valve_value_dscenario := COALESCE(v_valve_value_dscenario, '');
-		v_valve_value_dscenario := coalesce(v_valve_value_dscenario, v_closed_valve_dscenario);
+	IF v_valve_text_netscenario IS NOT NULL THEN
+		v_valve_id_netscenario := COALESCE(v_valve_id_netscenario, '');
+		v_netscenario_id := COALESCE(v_netscenario_id, -1);
+		v_valve_tablename_netscenario := COALESCE(v_valve_tablename_netscenario, '');
 	
-		IF v_closed_valve_dscenario = 'OPEN' OR (v_closed_valve_dscenario IS NULL AND v_closed_valve IS FALSE) THEN
-			v_valve_value_dscenario := 'CLOSED';
-		ELSIF v_closed_valve_dscenario = 'CLOSED' OR (v_closed_valve_dscenario IS NULL AND v_closed_valve IS TRUE) THEN
-			v_valve_value_dscenario := 'OPEN';
+		IF v_closed_valve_netscenario IS NULL THEN
+			v_closed_valve_netscenario := v_closed_valve;
 		END IF;
 
-		v_valve_text_dscenario := ', "valve_dscenario": {"id": "'||v_valve_id_dscenario||'", "dscenario_id": "'||v_dscenario_id||'", "text": "'||v_valve_text_dscenario||
-						'", "tableName":"'||v_valve_tablename_dscenario||'", "value": "'||v_valve_value_dscenario||'"}';
+		v_valve_text_netscenario := ', "valve_netscenario": {"id": "'||v_valve_id_netscenario||'", "netscenario_id": "'||v_netscenario_id||'", "text": "'||v_valve_text_netscenario||
+						'", "tableName":"'||v_valve_tablename_netscenario||'", "value": "'||(NOT v_closed_valve_netscenario)||'"}';
+
 	END IF;
     
 	fields := array_to_json(fields_array);
 	fields := COALESCE(fields, '[]');    
 	v_valve_text := COALESCE(v_valve_text, '');
-	v_valve_text_dscenario := COALESCE(v_valve_text_dscenario, '');
+	v_valve_text_netscenario := COALESCE(v_valve_text_netscenario, '');
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{"level":1, "text":"Process done successfully"}'||
 			',"form":{}'||
 			',"feature":{}'||
-			',"data":{"layersNames":' || fields ||''|| v_valve_text ||''|| v_valve_text_dscenario ||'}}'||
+			',"data":{"layersNames":' || fields ||''|| v_valve_text ||''|| v_valve_text_netscenario ||'}}'||
 	    '}')::json, 2590, null, null, null);
 
 	-- Exception handling
