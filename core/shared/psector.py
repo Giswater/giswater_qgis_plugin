@@ -25,7 +25,7 @@ from qgis.gui import QgsMapToolEmitPoint
 
 from .document import GwDocument, global_vars
 from ..shared.psector_duplicate import GwPsectorDuplicate
-from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi, GwReplaceArc
+from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi, GwReplaceArc, GwDialogTextUi
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_db, tools_qgis, tools_qt, tools_log, tools_os
 from ..utils.snap_manager import GwSnapManager
@@ -1124,12 +1124,36 @@ class GwPsector:
 
     def set_plan(self):
 
-        # TODO: Check this
         extras = f'"psectorId":"{tools_qt.get_text(self.dlg_plan_psector, self.psector_id)}"'
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_setplan', body)
+        json_result = tools_gw.execute_procedure('gw_fct_setplan', body, is_thread=True)  # is_thread=True because we don't want to call manage_json_response yet
         tools_gw.manage_current_selections_docker(json_result)
+        if not json_result or 'body' not in json_result or 'data' not in json_result['body']:
+            return
+
+        if json_result['body']['data']['info']['values']:
+            text = "There are some topological inconsistences on this psector. Would you like to see the log?"
+            function = partial(self.show_psector_topoerror_log, json_result)
+            tools_qgis.show_message_function(text, function, message_level=1, duration=0)
+
         return json_result
+
+
+    def show_psector_topoerror_log(self, json_result):
+
+        # Remove message
+        self.iface.messageBar().popWidget()
+
+        # Create log dialog
+        self.dlg_infolog = GwDialogTextUi()
+        tools_qt.set_widget_visible(self.dlg_infolog, 'btn_accept', False)
+        self.dlg_infolog.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_infolog, True))
+
+        text, _ = tools_gw.fill_tab_log(self.dlg_infolog, json_result['body']['data'], close=False)
+        tools_gw.open_dialog(self.dlg_infolog)
+
+        # Draw log features on map
+        tools_gw.manage_json_response(json_result)
 
 
     def price_selector(self, dialog, tableleft, tableright):
