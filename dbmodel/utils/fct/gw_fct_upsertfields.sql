@@ -89,7 +89,7 @@ BEGIN
 	p_data = REPLACE (p_data::text, '"null"', 'null');
 	p_data = REPLACE (p_data::text, '""', 'null');
 	p_data = REPLACE (p_data::text, '''''', 'null');
-      
+
 	-- Get input parameters:
 	v_device := (p_data ->> 'client')::json->> 'device';
 	v_infotype := (p_data ->> 'client')::json->> 'infoType';
@@ -109,24 +109,6 @@ BEGIN
 		EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_addparam USING v_tablename;
 		v_idname = v_addparam ->> 'pkey';
 		v_idname_array := string_to_array(v_idname, ', ');
-
-		IF v_idname IS NOT NULL THEN
-			FOREACH idname IN ARRAY v_idname_array LOOP
-				EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
-				    JOIN pg_class t on a.attrelid = t.oid
-				    JOIN pg_namespace s on t.relnamespace = s.oid
-				    WHERE a.attnum > 0 
-				    AND NOT a.attisdropped
-				    AND a.attname = $3
-				    AND t.relname = $2 
-				    AND s.nspname = $1
-				    ORDER BY a.attnum'
-			    USING v_schemaname, v_tablename, idname
-			    INTO column_type_id;
-				column_type_id_array[i] := column_type_id;
-				i=i+1;
-			END LOOP;
-		END IF;
 	END IF;
 
 	--  Get id column, for tables is the key column
@@ -137,28 +119,47 @@ BEGIN
     END IF;
 
 	-- For views it suposse pk is the first column
-	IF v_idname ISNULL THEN
+	IF v_idname is NULL THEN
 		EXECUTE '
 		SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
-		AND t.relname = $1 
+		AND t.relname = $1
 		AND s.nspname = $2
 		ORDER BY a.attnum LIMIT 1'
 		INTO v_idname
 		USING v_tablename, v_schemaname;
 	END IF;
- 
-	--   Get id column type
-	EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
-	    JOIN pg_class t on a.attrelid = t.oid
-	    JOIN pg_namespace s on t.relnamespace = s.oid
-	    WHERE a.attnum > 0 
-	    AND NOT a.attisdropped
-	    AND a.attname = $3
-	    AND t.relname = $2 
-	    AND s.nspname = $1
-	    ORDER BY a.attnum'
+
+	if v_idname_array is not null then
+		FOREACH idname IN ARRAY v_idname_array LOOP
+			EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+			    JOIN pg_class t on a.attrelid = t.oid
+			    JOIN pg_namespace s on t.relnamespace = s.oid
+			    WHERE a.attnum > 0
+			    AND NOT a.attisdropped
+			    AND a.attname = $3
+			    AND t.relname = $2
+			    AND s.nspname = $1
+			    ORDER BY a.attnum'
+		    USING v_schemaname, v_tablename, idname
+		    INTO column_type_id;
+			column_type_id_array[i] := column_type_id;
+			i=i+1;
+		END LOOP;
+	else
+
+		--   Get id column type
+		EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+		    JOIN pg_class t on a.attrelid = t.oid
+		    JOIN pg_namespace s on t.relnamespace = s.oid
+		    WHERE a.attnum > 0
+		    AND NOT a.attisdropped
+		    AND a.attname = $3
+		    AND t.relname = $2
+		    AND s.nspname = $1
+		    ORDER BY a.attnum'
             USING v_schemaname, v_tablename, v_idname
             INTO column_type_id;
+	end if;
 
     IF v_force_action IS NULL THEN
 

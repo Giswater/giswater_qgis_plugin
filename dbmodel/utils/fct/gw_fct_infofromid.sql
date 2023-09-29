@@ -138,9 +138,19 @@ v_table_epa text;
 v_epatype text;
 v_tablename_aux text;
 v_zone text;
+v_id_array text[];
+v_idname_array text[];
+column_type_id_array text[];
+column_type_id character varying;
+i integer=1;
+v_querytext text;
+idname text;
+v_addparam json;
+
+
 
 BEGIN
-	
+
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname := 'SCHEMA_NAME';
@@ -188,18 +198,71 @@ BEGIN
 
 	-- Check if feature exist
 	IF v_id is not null or v_id != '' then
-		EXECUTE 'SELECT gw_fct_getpkeyfield('''||v_tablename||''');' INTO v_pkeyfield;
-		EXECUTE 'SELECT ' || v_pkeyfield || ' FROM '|| v_tablename || ' WHERE ' || v_pkeyfield || '::text = ' || v_id || '::text' INTO v_idname;
-		IF v_idname IS NULL THEN
+
+		-- Manage primary key
+		EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_addparam USING v_tablename;
+		v_idname = v_addparam ->> 'pkey';
+		v_idname_array := string_to_array(v_idname, ', ');
+
+		if v_idname_array is null THEN
+			EXECUTE 'SELECT gw_fct_getpkeyfield('''||v_tablename||''');' INTO v_pkeyfield;
+			v_idname_array := string_to_array(v_pkeyfield, ', ');
+		end if;
+
+		v_id_array := string_to_array(v_id, ', ');
+
+		IF v_idname_array IS NULL THEN
 			EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 			RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "version":'|| v_version
 			||', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
 
 		END IF;
 
+
+		if v_idname_array is not null then
+			FOREACH idname IN ARRAY v_idname_array LOOP
+				EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+				    JOIN pg_class t on a.attrelid = t.oid
+				    JOIN pg_namespace s on t.relnamespace = s.oid
+				    WHERE a.attnum > 0
+				    AND NOT a.attisdropped
+				    AND a.attname = $3
+				    AND t.relname = $2
+				    AND s.nspname = $1
+				    ORDER BY a.attnum'
+			    USING v_schemaname, v_tablename, idname
+			    INTO column_type_id;
+				column_type_id_array[i] := column_type_id;
+				i=i+1;
+			END LOOP;
+		else
+			--   Get id column type
+			EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+			    JOIN pg_class t on a.attrelid = t.oid
+			    JOIN pg_namespace s on t.relnamespace = s.oid
+			    WHERE a.attnum > 0
+			    AND NOT a.attisdropped
+			    AND a.attname = $3
+			    AND t.relname = $2
+			    AND s.nspname = $1
+			    ORDER BY a.attnum'
+	            USING v_schemaname, v_tablename, v_idname
+	            INTO column_type_id;
+		end if;
+
 		-- Get Epa Type
 	    if v_epatype is null and (SELECT column_name FROM INFORMATION_SCHEMA.columns WHERE table_name = v_tablename AND column_name = 'epa_type' and table_schema = v_schemaname) is not null then
-			EXECUTE 'SELECT epa_type FROM '|| v_tablename || ' WHERE ' || v_pkeyfield || '::text = ' || v_id || '::text' INTO v_epatype;
+
+	    	v_querytext = 'SELECT epa_type FROM '|| v_tablename || ' ';
+
+			i = 1;
+			v_querytext := v_querytext || ' WHERE ';
+			FOREACH idname IN ARRAY v_idname_array loop
+				v_querytext := v_querytext || quote_ident(idname) || ' = CAST(' || quote_literal(v_id_array[i]) || ' AS ' || column_type_id_array[i] || ') AND ';
+				i=i+1;
+			END LOOP;
+			v_querytext = substring(v_querytext, 0, length(v_querytext)-4);
+			EXECUTE v_querytext INTO v_epatype;
 		end if;
 	END IF;
 
@@ -366,54 +429,70 @@ BEGIN
 	ELSE v_sourcetable = v_tablename;
 	END IF;
 
+	--if v_idname_array is null
+
 	-- Get id column
-	EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
-		INTO v_idname
-		USING v_sourcetable;
+	if v_id is null then
 
-	-- For views it suposse pk is the first column
-	IF v_idname ISNULL THEN
-		EXECUTE '
-		SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
-		AND t.relname = $1
-		AND s.nspname = $2
-		ORDER BY a.attnum LIMIT 1'
-		INTO v_idname
-		USING v_sourcetable, v_schemaname;
-	END IF;
+		-- Manage primary key
+		EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_addparam USING v_tablename;
+		v_idname = v_addparam ->> 'pkey';
+		v_idname_array := string_to_array(v_idname, ', ');
 
-	-- Get id column type
-	EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
-		JOIN pg_class t on a.attrelid = t.oid
-		JOIN pg_namespace s on t.relnamespace = s.oid
-		WHERE a.attnum > 0
-		AND NOT a.attisdropped
-		AND a.attname = $3
-		AND t.relname = $2
-		AND s.nspname = $1
-		ORDER BY a.attnum'
-			USING v_schemaname, v_sourcetable, v_idname
-			INTO column_type;
+		if v_idname_array is null then
 
-	-- Get geometry_column
-	EXECUTE 'SELECT attname FROM pg_attribute a
-	    JOIN pg_class t on a.attrelid = t.oid
-	    JOIN pg_namespace s on t.relnamespace = s.oid
-	    WHERE a.attnum > 0
-	    AND NOT a.attisdropped
-	    AND t.relname = $1
-	    AND s.nspname = $2
-	    AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
-	    ORDER BY a.attnum
-		LIMIT 1'
-		INTO v_the_geom
-		USING v_sourcetable, v_schemaname;
+			EXECUTE 'SELECT gw_fct_getpkeyfield('''||v_tablename||''');' INTO v_pkeyfield;
+			v_idname_array := string_to_array(v_pkeyfield, ', ');
+
+			if v_idname_array is not null then
+				FOREACH idname IN ARRAY v_idname_array LOOP
+					EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+					    JOIN pg_class t on a.attrelid = t.oid
+					    JOIN pg_namespace s on t.relnamespace = s.oid
+					    WHERE a.attnum > 0
+					    AND NOT a.attisdropped
+					    AND a.attname = $3
+					    AND t.relname = $2
+					    AND s.nspname = $1
+					    ORDER BY a.attnum'
+				    USING v_schemaname, v_tablename, idname
+				    INTO column_type_id;
+					column_type_id_array[i] := column_type_id;
+					i=i+1;
+				END LOOP;
+			else
+				--   Get id column type
+				EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+				    JOIN pg_class t on a.attrelid = t.oid
+				    JOIN pg_namespace s on t.relnamespace = s.oid
+				    WHERE a.attnum > 0
+				    AND NOT a.attisdropped
+				    AND a.attname = $3
+				    AND t.relname = $2
+				    AND s.nspname = $1
+				    ORDER BY a.attnum'
+		            USING v_schemaname, v_tablename, v_idname
+		            INTO column_type_id;
+			end if;
+
+		end if;
+
+	end if;
 
 	-- Get geometry (to feature response)
 	IF v_the_geom IS NOT NULL AND v_id IS NOT NULL THEN
-		EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS x, ST_y(ST_centroid(ST_envelope(the_geom))) AS y, St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_sourcetable)||
-		' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||(column_type)||'))row'
-		INTO v_geometry;
+
+		v_querytext = 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS x, ST_y(ST_centroid(ST_envelope(the_geom))) AS y, St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_sourcetable);
+
+		i = 1;
+		v_querytext := v_querytext || ' WHERE ';
+		FOREACH idname IN ARRAY v_idname_array loop
+			v_querytext := v_querytext || quote_ident(idname) || ' = CAST(' || quote_literal(v_id_array[i]) || ' AS ' || column_type_id_array[i] || ') AND ';
+			i=i+1;
+		END LOOP;
+		v_querytext = substring(v_querytext, 0, length(v_querytext)-4);
+		v_querytext := v_querytext || ')row';
+		EXECUTE v_querytext INTO v_geometry;
 	END IF;
 
 	-- Get geometry for elements without geometry
@@ -436,41 +515,41 @@ BEGIN
 
 	IF v_tablename != v_sourcetable THEN
 
-		-- Get id column for tablename
-		EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
-			INTO v_idname
-			USING v_tablename;
+		-- get id column for tablename
+		execute 'select a.attname from pg_index i join pg_attribute a on a.attrelid = i.indrelid and a.attnum = any(i.indkey) where  i.indrelid = $1::regclass and i.indisprimary'
+			into v_idname
+			using v_tablename;
 
-		-- For views it suposse pk is the first column
-		IF v_idname ISNULL THEN
-			EXECUTE '
-			SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
-			AND t.relname = $1
-			AND s.nspname = $2
-			ORDER BY a.attnum LIMIT 1'
-			INTO v_idname
-			USING v_tablename, v_schemaname;
-		END IF;
+		-- for views it suposse pk is the first column
+		if v_idname isnull then
+			execute '
+			select a.attname from pg_attribute a   join pg_class t on a.attrelid = t.oid  join pg_namespace s on t.relnamespace = s.oid where a.attnum > 0   and not a.attisdropped
+			and t.relname = $1
+			and s.nspname = $2
+			order by a.attnum limit 1'
+			into v_idname
+			using v_tablename, v_schemaname;
+		end if;
 
-		-- Get id column type
-		EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
-			JOIN pg_class t on a.attrelid = t.oid
-			JOIN pg_namespace s on t.relnamespace = s.oid
-			WHERE a.attnum > 0
-			AND NOT a.attisdropped
-			AND a.attname = $3
-			AND t.relname = $2
-			AND s.nspname = $1
-			ORDER BY a.attnum'
-				USING v_schemaname, v_tablename, v_idname
-				INTO column_type;
+		-- get id column type
+		execute 'select pg_catalog.format_type(a.atttypid, a.atttypmod) from pg_attribute a
+			join pg_class t on a.attrelid = t.oid
+			join pg_namespace s on t.relnamespace = s.oid
+			where a.attnum > 0
+			and not a.attisdropped
+			and a.attname = $3
+			and t.relname = $2
+			and s.nspname = $1
+			order by a.attnum'
+				using v_schemaname, v_tablename, v_idname
+				into column_type;
 	END IF;
 
 	if v_table_epa is not null then
 		v_tablename_aux = v_tablename;
 		v_tablename = v_table_epa;
 	end if;
-	raise notice 'AA -> %',v_table_child;
+
 	-- Get tabs for form
 	IF v_isgraphdelimiter THEN
 
@@ -598,7 +677,7 @@ BEGIN
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO form_tabs;
 	END IF;
-raise notice 'BB -> %',v_querystring;
+
 	if v_tablename_aux is not null then
 		v_tablename = v_tablename_aux;
 	end if;
@@ -754,7 +833,6 @@ raise notice 'BB -> %',v_querystring;
 							  'v_configtabledefined', v_configtabledefined, 'v_idname', v_idname, 'column_type', column_type);
 			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 340);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-
 			EXECUTE v_querystring INTO v_fields;
 
 		ELSIF v_editable = FALSE THEN
