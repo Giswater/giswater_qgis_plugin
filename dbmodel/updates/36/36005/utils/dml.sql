@@ -20,3 +20,21 @@ CREATE RULE macroexploitation_undefined AS
   CREATE RULE macroexploitation_del_undefined AS
     ON DELETE TO macroexploitation
    WHERE (old.macroexpl_id = 0) DO INSTEAD NOTHING;
+   
+ 
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3280, 'gw_fct_setnoderotation', 'utils', 'function', 'json', 'json', 'Function to update massively the column rotation for nodes. Function works with the selection of user (exploitation and psectors)', 'role_edit', null, 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (516, 'Node rotation update', 'utils', null, 'core', true, 'Function process', null) ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO config_toolbox 
+VALUES (3280, 'Massive node rotation update','{"featureType":[]}', '{}', null, true, '{4}') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_param_user (id, formname, descript, sys_role, project_type, ismandatory, source) 
+VALUES ('edit_disable_arctopocontrol', 'dynamic', 'If true, topocontrol is disabled', 'role_edit', 'utils', true, 'core');
+
+INSERT INTO sys_param_user (id, formname, descript, sys_role, project_type, ismandatory, source) 
+VALUES ('edit_disable_update_nodevalues', 'dynamic', 'If true, topocontrol is disabled', 'role_edit', 'utils', true, 'core');
+
+

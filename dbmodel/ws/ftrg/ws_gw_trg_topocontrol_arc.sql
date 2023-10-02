@@ -28,6 +28,7 @@ v_message text;
 v_msg boolean = false;
 v_check_conflictmapzones boolean = false;
 v_zone text;
+v_edit_disable_arctopocontrol boolean;
 	
 BEGIN 
 
@@ -43,7 +44,9 @@ BEGIN
 
 	-- get user variables
 	SELECT value::boolean INTO v_user_statetopocontrol FROM config_param_user WHERE parameter='edit_disable_statetopocontrol' AND cur_user = current_user;
+	SELECT value::boolean INTO v_edit_disable_arctopocontrol FROM config_param_user WHERE parameter='edit_disable_arctopocontrol' AND cur_user = current_user;
 	SELECT value::boolean INTO v_nodeinsert_arcendpoint FROM config_param_user WHERE parameter='edit_arc_insert_automatic_endpoint' AND cur_user = current_user;
+
 
 	--Check if user has migration mode enabled
 	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
@@ -52,7 +55,7 @@ BEGIN
 	END IF;
 
 	-- disable trigger
-	IF v_arc_searchnodes_control IS FALSE THEN
+	IF v_arc_searchnodes_control IS FALSE OR v_edit_disable_arctopocontrol THEN
 		RETURN NEW;
 	END IF;
 

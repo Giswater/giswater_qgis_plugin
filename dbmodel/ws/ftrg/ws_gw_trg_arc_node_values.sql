@@ -16,14 +16,18 @@ v_message text;
 BEGIN 
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	
+	IF (SELECT value::boolean FROM config_param_user WHERE parameter = 'edit_disable_update_nodevalues' and cur_user = current_user) IS NOT FALSE THEN
     
-	UPDATE arc a SET nodetype_1 = nodetype_id ,elevation1 = n.elevation, depth1 = n.depth, staticpress1 = n.staticpressure 
-	FROM vu_node n
-	WHERE a.arc_id = NEW.arc_id AND node_id = node_1;
+		UPDATE arc a SET nodetype_1 = nodetype_id ,elevation1 = n.elevation, depth1 = n.depth, staticpress1 = n.staticpressure 
+		FROM vu_node n
+		WHERE a.arc_id = NEW.arc_id AND node_id = node_1;
 
-	UPDATE arc a SET nodetype_2 = nodetype_id ,elevation2 = n.elevation, depth2 = n.depth, staticpress2 = n.staticpressure 
-	FROM vu_node n
-	WHERE a.arc_id = NEW.arc_id AND node_id = node_2;
+		UPDATE arc a SET nodetype_2 = nodetype_id ,elevation2 = n.elevation, depth2 = n.depth, staticpress2 = n.staticpressure 
+		FROM vu_node n
+		WHERE a.arc_id = NEW.arc_id AND node_id = node_2;
+		
+	END IF;
 
 RETURN NEW;
 		
