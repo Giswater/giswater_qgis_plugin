@@ -129,3 +129,7 @@ UPDATE config_toolbox SET inputparams = b.inp FROM (SELECT json_agg(a.inputs) AS
 FROM   config_toolbox 
 WHERE id=3256)a WHERE widget!='dscenario_valve')b WHERE  id=3256;
 
+UPDATE sys_function SET descript='Function to calculate water balance according stardards of IWA.
+Before that: 
+1) tables ext_cat_period, ext_rtc_hydrometer_x_data, ext_rtc_scada_x_data need to be filled.
+2) DMA graph need to be executed.' WHERE id=3142;
