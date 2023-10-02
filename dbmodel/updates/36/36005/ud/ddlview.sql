@@ -26,3 +26,17 @@ CREATE OR REPLACE VIEW v_edit_inp_transects AS
     inp_transects c
 JOIN inp_transects_value t on t.tsect_id = c.id
   WHERE c.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+  
+  
+  CREATE OR REPLACE VIEW ve_pol_node
+AS SELECT polygon.pol_id,
+    polygon.feature_id,
+    polygon.featurecat_id,
+    polygon.state,
+    polygon.sys_type,
+    polygon.the_geom,
+    polygon.trace_featuregeom
+   FROM node
+     JOIN v_state_node USING (node_id)
+     JOIN v_expl_node USING (node_id)
+     JOIN polygon ON polygon.feature_id::text = node.node_id::text;

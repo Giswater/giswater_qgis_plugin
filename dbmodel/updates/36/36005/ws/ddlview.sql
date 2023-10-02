@@ -88,5 +88,20 @@ CREATE OR REPLACE VIEW v_edit_plan_netscenario_valve AS
     plan_netscenario_valve v
     JOIN node USING (node_id)
   WHERE v.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
+  
+  
+    CREATE OR REPLACE VIEW ve_pol_node
+AS SELECT polygon.pol_id,
+    polygon.feature_id,
+    polygon.featurecat_id,
+    polygon.state,
+    polygon.sys_type,
+    polygon.the_geom,
+    polygon.trace_featuregeom
+   FROM node
+     JOIN v_state_node USING (node_id)
+     JOIN v_expl_node USING (node_id)
+     JOIN polygon ON polygon.feature_id::text = node.node_id::text;
+
 
 
