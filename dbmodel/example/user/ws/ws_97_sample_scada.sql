@@ -7,6 +7,13 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+INSERT INTO ext_rtc_scada VALUES('113766-T1', 'REMOTE CONTROL', NULL, '113766');
+INSERT INTO ext_rtc_scada VALUES('1080-T1', 'REMOTE CONTROL', NULL, '1080');
+INSERT INTO ext_rtc_scada VALUES('113952-T1', 'REMOTE CONTROL', NULL, '113952');
+INSERT INTO ext_rtc_scada VALUES('1101-T1', 'REMOTE CONTROL', NULL, '1101');
+INSERT INTO ext_rtc_scada VALUES('111111-T1', 'REMOTE CONTROL', NULL, '111111');
+INSERT INTO ext_rtc_scada VALUES('1097-T1', 'REMOTE CONTROL', NULL, '1097');
+
 INSERT INTO ext_rtc_scada_x_data  VALUES ('1080-T1','1080','02/05/2015 00:00:00',300.98);
 INSERT INTO ext_rtc_scada_x_data  VALUES ('1080-T1','1080','03/05/2015 00:00:00',300.98);
 INSERT INTO ext_rtc_scada_x_data  VALUES ('1080-T1','1080','04/05/2015 00:00:00',300.98);
