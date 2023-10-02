@@ -470,6 +470,9 @@ class GwNetscenarioManagerButton(GwAction):
             tools_qt.set_widget_text(self.dlg_netscenario, 'lbl_mapzone_id', f'{self.selected_netscenario_type.capitalize()} id:')
             self.dlg_netscenario.grb_copy.setTitle(f'Copy from existing {self.selected_netscenario_type}')
 
+        # TODO: enable again when getinfofromid accepts multiple pkeys
+        tools_qt.set_widget_visible(self.dlg_netscenario, 'btn_update', False)
+
 
     def _manage_feature_type(self):
         """ Manages current tableview feature type (node, arc, nodarc, etc.) """
