@@ -364,7 +364,7 @@ BEGIN
 					EXECUTE v_query_string_select INTO v_value;	
 				END IF;
 				
-				v_query_string_update= 'UPDATE '||v_man_table||' set '||v_column||'='||quote_literal(v_value)||' where node_id='||quote_literal(v_id)||';';
+				v_query_string_update= 'UPDATE '||v_man_table||' set '||v_column||'='||quote_literal(v_value)||' where '||v_feature_type||'_id='||quote_literal(v_id)||';';
 				IF v_query_string_update IS NOT NULL THEN
 					EXECUTE v_query_string_update; 
 
@@ -468,7 +468,7 @@ BEGIN
 
 			UPDATE connec SET arc_id = v_id WHERE arc_id = v_old_feature_id;
 			GET DIAGNOSTICS v_count = row_count;
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' operative connec(s) have been reconnected'));		
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' operative connec(s) have been reconnected'));
 			
 			UPDATE plan_psector_x_connec SET arc_id = v_id WHERE arc_id = v_old_feature_id;
 			GET DIAGNOSTICS v_count = row_count;
