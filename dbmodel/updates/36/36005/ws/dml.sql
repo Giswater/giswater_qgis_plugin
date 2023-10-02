@@ -113,7 +113,7 @@ INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, i
 VALUES (514, 'Import valve closed into netscenario', 'ws', null, 'core', true, 'Function process', null) ON CONFLICT (fid) DO NOTHING;
 	
 INSERT INTO config_csv(fid, alias, descript, functionname, active, orderby, addparam)
-VALUES (514, 'Import netscenario closed valves ','The csv file must have the folloWing fields:
+VALUES (514, 'Import netscenario closed valves ','The csv file must have the following fields:
 netscenario_id, node_id, closed', 'gw_fct_import_netscenario_valve_closed', true, 23,null) ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)

@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-UPDATE config_csv set descript = 'The csv file must have the folloWing fields:
+UPDATE config_csv set descript = 'The csv file must have the following fields:
 dscenario_name, feature_id, feature_type, value, demand_type, source', active = TRUE WHERE fid=501;
 
 INSERT INTO sys_table(id, descript, sys_role,  source)
