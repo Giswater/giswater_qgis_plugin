@@ -681,11 +681,12 @@ class GwMapzoneManager:
 
         # Get selected mapzone data
         index = tableview.selectionModel().currentIndex()
-        mapzone_id = index.sibling(index.row(), 0).data()
-        field_id = tableview.model().headerData(0, Qt.Horizontal)
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, f"{tablename.split('_')[-1].lower()}_id")
+        mapzone_id = index.sibling(index.row(), col_idx).data()
+        field_id = tableview.model().headerData(col_idx, Qt.Horizontal)
 
         # Execute getinfofromid
-        feature = f'"tableName":"{tablename}", "id": "{mapzone_id}"'
+        feature = f'"tableName":"{tablename}", "id": "{self.netscenario_id}, {mapzone_id}"'
         body = tools_gw.create_body(feature=feature)
         json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
         if json_result is None or json_result['status'] == 'Failed':
