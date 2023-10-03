@@ -133,3 +133,17 @@ UPDATE sys_function SET descript='Function to calculate water balance according 
 Before that: 
 1) tables ext_cat_period, ext_rtc_hydrometer_x_data, ext_rtc_scada_x_data need to be filled.
 2) DMA graph need to be executed.' WHERE id=3142;
+
+
+-- 3/10/2023
+update config_toolbox set device = '{4}' WHERE id in (2768,2110);
+
+INSERT INTO config_report (id, alias, query_text, addparam, filterparam, sys_role, active, device) VALUES
+(105, 'Nodes by exploitation and type', 'SELECT name as "Exploitation", node_type as "Node type", count(*) as "Units" FROM v_edit_node JOIN exploitation USING (expl_id) GROUP BY node_type, name',
+ '{"orderBy":"1", "orderType": "DESC"}',
+ '[{"columnname":"Exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
+"dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER BY name","isNullValue":"true"},
+{"columnname":"Node type", "label":"Node type:", "widgettype":"combo","datatype":"text","layoutorder":2,
+"dvquerytext":"Select id as id, id as idval FROM cat_feature_node join cat_feature USING (id) WHERE id IS NOT NULL AND active ORDER BY id","isNullValue":"true"}]',
+'role_basic', true, '{4,5}')
+ON CONFLICT id DO NOTHING;
