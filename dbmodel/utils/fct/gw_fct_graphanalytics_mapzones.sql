@@ -771,7 +771,7 @@ BEGIN
 			EXECUTE v_querytext;
 
 			-- update link table
-			EXECUTE 'UPDATE temp_t_link SET '||quote_ident(v_field)||' = g.'||quote_ident(v_field)||' FROM temp_t_gully g WHERE c.gully_id=feature_id';		
+			EXECUTE 'UPDATE temp_t_link SET '||quote_ident(v_field)||' = g.'||quote_ident(v_field)||' FROM temp_t_gully g WHERE g.gully_id=feature_id';		
 		END IF;	
 
 		IF v_islastupdate IS TRUE THEN
