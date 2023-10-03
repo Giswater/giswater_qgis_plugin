@@ -56,12 +56,13 @@ BEGIN
 	schemas_array := current_schemas(FALSE);
 	
 	-- getting values from feature
-	v_querystring = concat('SELECT (row_to_json(a)) FROM (SELECT * FROM ',quote_ident(p_table_id),' WHERE ',quote_ident(p_idname),' = CAST(',quote_nullable(p_id),' AS ',(p_columntype),'))a');
-	v_debug_vars := json_build_object('p_table_id', p_table_id, 'p_idname', p_idname, 'p_id', p_id, 'p_columntype', p_columntype);
-	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureinfo', 'flag', 10);
-	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-	EXECUTE v_querystring INTO v_values_array;
-
+	if p_id is not null then
+        v_querystring = concat('SELECT (row_to_json(a)) FROM (SELECT * FROM ',quote_ident(p_table_id),' WHERE ',quote_ident(p_idname),' = CAST(',quote_nullable(p_id),' AS ',(p_columntype),'))a');
+        v_debug_vars := json_build_object('p_table_id', p_table_id, 'p_idname', p_idname, 'p_id', p_id, 'p_columntype', p_columntype);
+        v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureinfo', 'flag', 10);
+        SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+        EXECUTE v_querystring INTO v_values_array;
+    end if;
 	IF  p_configtable THEN 
 
 		raise notice 'Configuration fields are defined on config_info_layer_field, calling gw_fct_getformfields with formname: % tablename: % id %', p_table_id, p_table_id, p_id;
