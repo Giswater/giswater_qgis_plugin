@@ -163,7 +163,8 @@ BEGIN
 
 	FOR v_tab IN EXECUTE v_query
 ​
-	LOOP		
+	LOOP
+		continue when v_tab.tabname not in ('tab_exploitation', 'tab_mincut') and v_tiled = true;		
 		-- get variables form input
 		v_selector_list := (p_data ->> 'data')::json->> 'ids';
 		v_filterfrominput := (p_data ->> 'data')::json->> 'filterText';
