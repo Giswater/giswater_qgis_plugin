@@ -679,11 +679,13 @@ BEGIN
 				WHEN 'gis_length' THEN
 					field_value = v_gislength;
 				WHEN 'epa_type' THEN
-					v_querystring = concat('SELECT epa_default FROM cat_feature_',(v_catfeature.feature_type),' WHERE id = ', quote_nullable(v_catfeature.id));
-					v_debug_vars := json_build_object('v_catfeature.feature_type', v_catfeature.feature_type, 'v_catfeature.id', v_catfeature.id);
-					v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 80);
-					SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-					EXECUTE v_querystring INTO field_value;
+				    if v_catfeature.feature_type != 'LINK' then
+                        v_querystring = concat('SELECT epa_default FROM cat_feature_',(v_catfeature.feature_type),' WHERE id = ', quote_nullable(v_catfeature.id));
+                        v_debug_vars := json_build_object('v_catfeature.feature_type', v_catfeature.feature_type, 'v_catfeature.id', v_catfeature.id);
+                        v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 80);
+                        SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+                        EXECUTE v_querystring INTO field_value;
+                       end if;
 				WHEN 'fire_code' THEN
 					IF v_use_fire_code_seq THEN
 						field_value = nextval ('man_hydrant_fire_code_seq'::regclass);
