@@ -479,6 +479,20 @@ BEGIN
 
 	end if;
 
+    -- Get geometry_column
+	EXECUTE 'SELECT attname FROM pg_attribute a
+	    JOIN pg_class t on a.attrelid = t.oid
+	    JOIN pg_namespace s on t.relnamespace = s.oid
+	    WHERE a.attnum > 0
+	    AND NOT a.attisdropped
+	    AND t.relname = $1
+	    AND s.nspname = $2
+	    AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
+	    ORDER BY a.attnum
+		LIMIT 1'
+		INTO v_the_geom
+		USING v_sourcetable, v_schemaname;
+
 	-- Get geometry (to feature response)
 	IF v_the_geom IS NOT NULL AND v_id IS NOT NULL THEN
 
