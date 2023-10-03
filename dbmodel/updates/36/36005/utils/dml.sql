@@ -38,3 +38,14 @@ INSERT INTO sys_param_user (id, formname, descript, sys_role, project_type, isma
 VALUES ('edit_disable_update_nodevalues', 'dynamic', 'If true, topocontrol is disabled', 'role_edit', 'utils', true, 'core');
 
 
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+SELECT 'v_edit_link', formtype, 'tab_none', columnname, 'lyt_data_1', layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
+iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder
+FROM config_form_fields WHERE formname = 'v_edit_connec' AND columnname in ('connecat_id', 'workcat_id', 'workcat_id_end','builtdate','enddate', 'drainzone_id') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+UPDATE config_form_fields SET ismandatory = false, dv_orderby_id = true, dv_parent_id = NULL, dv_querytext_filterc = NULL WHERE  columnname = 'connecat_id' AND formname = 'v_edit_link';
+
+UPDATE config_form_fields SET iseditable = true, placeholder=null WHERE  columnname in ('workcat_id', 'workcat_id_end', 'builtdate', 'enddate') AND formname = 'v_edit_link';
+
+UPDATE config_form_fields SET iseditable = false, placeholder=null WHERE  columnname in ('connecat_id', 'drainzone_id') AND formname = 'v_edit_link';

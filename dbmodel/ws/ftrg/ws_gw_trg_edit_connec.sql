@@ -773,7 +773,10 @@ BEGIN
 			UPDATE connec SET state=NEW.state WHERE connec_id = NEW.connec_id;
 			
 		END IF;
-		
+		IF (NEW.connecat_id != OLD.connecat_id) AND NEW.state > 0 THEN   
+			UPDATE link SET connecat_id=NEW.connecat_id WHERE feature_id = NEW.connec_id AND state>0;
+		END IF;		
+
 		-- State_type
 		IF NEW.state=0 AND OLD.state=1 THEN
 			IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN

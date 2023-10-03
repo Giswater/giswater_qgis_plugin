@@ -6,3 +6,4 @@
 - New table plan_netscenario_valve and editabl view v_edit_plan_netscenario_valve
 - New function (3278) gw_fct_import_netscenario_valve_closed to import closed valves into netscenario configuration.
 - Add a Default macroexploitation even for Empty new projects
+- New fields on link: connecat_id, drainzone_id, workcat_id, workcat_id_end, startdate, enddate.
