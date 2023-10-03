@@ -61,7 +61,7 @@ BEGIN
 
         ELSIF v_epatype = 'netgully' THEN
             UPDATE inp_netgully
-            SET y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond, close_time=NEW.outlet_type, custom_width=NEW.custom_width, custom_length=NEW.custom_length, custom_depth=NEW.custom_depth,
+            SET y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond, outlet_type=NEW.outlet_type, custom_width=NEW.custom_width, custom_length=NEW.custom_length, custom_depth=NEW.custom_depth,
             method=NEW.method, weir_cd=NEW.weir_cd, orifice_cd=NEW.orifice_cd, custom_a_param=NEW.custom_a_param, custom_b_param=NEW.custom_b_param, efficiency=NEW.efficiency
             WHERE node_id=OLD.node_id;
 
