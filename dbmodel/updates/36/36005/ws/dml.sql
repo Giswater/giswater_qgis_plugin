@@ -146,4 +146,4 @@ INSERT INTO config_report (id, alias, query_text, addparam, filterparam, sys_rol
 {"columnname":"Node type", "label":"Node type:", "widgettype":"combo","datatype":"text","layoutorder":2,
 "dvquerytext":"Select id as id, id as idval FROM cat_feature_node join cat_feature USING (id) WHERE id IS NOT NULL AND active ORDER BY id","isNullValue":"true"}]',
 'role_basic', true, '{4,5}')
-ON CONFLICT id DO NOTHING;
+ON CONFLICT (id) DO NOTHING;
