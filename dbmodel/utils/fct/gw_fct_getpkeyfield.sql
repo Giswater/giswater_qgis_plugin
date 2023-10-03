@@ -40,6 +40,17 @@ BEGIN
 		INTO v_geom_field
 		USING p_layer_name;
 	end if;
+
+	-- Get pkey from sys_table
+	IF v_geom_field ISNULL THEN
+		EXECUTE '
+		SELECT (addparam->>''pkey'') FROM sys_table 
+		WHERE id = $1 
+		ORDER BY id LIMIT 1'
+		INTO v_geom_field
+		USING p_layer_name;
+	END IF;
+
 	-- For views it suposse pk is the first column
 	IF v_geom_field ISNULL THEN
 		EXECUTE '
