@@ -2391,7 +2391,7 @@ class GwInfo(QObject):
                             action.setToolTip(act['actionTooltip'])
                             action.setVisible(True)
 
-        self._enable_actions(dialog, self.layer.isEditable())
+        self._enable_actions(dialog, self.action_edit.isChecked())
 
 
     def _check_elev_y(self):
