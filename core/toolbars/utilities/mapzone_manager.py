@@ -686,7 +686,10 @@ class GwMapzoneManager:
         field_id = tableview.model().headerData(col_idx, Qt.Horizontal)
 
         # Execute getinfofromid
-        feature = f'"tableName":"{tablename}", "id": "{self.netscenario_id}, {mapzone_id}"'
+        _id = f"{mapzone_id}"
+        if self.netscenario_id is not None:
+            _id = f"{self.netscenario_id}, {mapzone_id}"
+        feature = f'"tableName":"{tablename}", "id": "{_id}"'
         body = tools_gw.create_body(feature=feature)
         json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
         if json_result is None or json_result['status'] == 'Failed':
