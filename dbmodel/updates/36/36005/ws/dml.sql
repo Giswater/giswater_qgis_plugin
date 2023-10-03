@@ -147,3 +147,13 @@ INSERT INTO config_report (id, alias, query_text, addparam, filterparam, sys_rol
 "dvquerytext":"Select id as id, id as idval FROM cat_feature_node join cat_feature USING (id) WHERE id IS NOT NULL AND active ORDER BY id","isNullValue":"true"}]',
 'role_basic', true, '{4,5}')
 ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_form_fields set columnname ='bulk_coeff' where columnname ='buk_coeff';
+
+UPDATE config_form_fields set columnname ='init_quality' where columnname ='initial_quality';
+
+UPDATE config_form_fields SET dv_querytext = 'SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_value_status_pipe''', 
+dv_orderby_id=true, dv_isnullvalue = true, widgettype='combo' WHERE  columnname 
+ilike 'status' and formname = 've_epa_connec';
+
+UPDATE config_form_fields set columnname ='energy_pattern_id' where columnname ='price_pattern' and formname = 've_epa_pump';
