@@ -642,14 +642,13 @@ BEGIN
 		ELSIF NEW.state = 1 AND st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
 
 			-- update link
-			UPDATE link SET exit_id = NEW.exit_id , exit_type = NEW.exit_type, the_geom=NEW.the_geom, expl_id = v_expl, sector_id = v_sector, dma_id = v_dma,
-			connecat_id = NEW.connecat_id
+			UPDATE link SET exit_id = NEW.exit_id , exit_type = NEW.exit_type, the_geom=NEW.the_geom, expl_id = v_expl, sector_id = v_sector, dma_id = v_dma
 			WHERE link_id=NEW.link_id;
 		
 			-- force reconnection on coonecs
 			IF NEW.feature_type = 'CONNEC' THEN
 				UPDATE connec SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id, dma_id = v_dma WHERE connec_id = NEW.feature_id;
-				UPDATE link SET connecat_id = c.connecat_id FROM connec c WHERE connec_id = NEW.feature_id;
+				UPDATE link SET connecat_id = c.connecat_id FROM connec c WHERE connec_id = NEW.feature_id AND link.state > 0;
 
 			ELSIF NEW.feature_type = 'GULLY' THEN
 				UPDATE gully SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id, dma_id = v_dma WHERE  gully_id = NEW.feature_id;
@@ -665,7 +664,7 @@ BEGIN
 			-- update values on plan_psector tables
 			IF NEW.feature_type='CONNEC' THEN
 				UPDATE plan_psector_x_connec SET arc_id = v_arc_id WHERE plan_psector_x_connec.link_id=NEW.link_id;
-				UPDATE link SET connecat_id = c.connecat_id FROM connec c WHERE connec_id = NEW.feature_id;
+				UPDATE link SET connecat_id = c.connecat_id FROM connec c WHERE connec_id = NEW.feature_id AND link.state > 0;
 
 			ELSIF NEW.feature_type='GULLY' THEN
 				UPDATE plan_psector_x_gully SET arc_id = v_arc_id WHERE plan_psector_x_gully.link_id=NEW.link_id;
