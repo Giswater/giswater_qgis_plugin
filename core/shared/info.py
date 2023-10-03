@@ -107,7 +107,7 @@ class GwInfo(QObject):
             self.my_json = {}
             self.my_json_epa = {}
             self.tab_type = tab_type
-            self.visible_tabs = []
+            self.visible_tabs = {}
             self.epa_complet_result = None
             self.inserted_feature = False
 
@@ -504,10 +504,11 @@ class GwInfo(QObject):
             except:
                 pass
 
-        self.visible_tabs = complet_result['body']['form'].get('visibleTabs', [])
+        for tab in complet_result['body']['form']['visibleTabs']:
+            self.visible_tabs[tab['tabName']] = tab
 
         for tab in self.visible_tabs:
-            tabs_to_show.append(tab['tabName'])
+            tabs_to_show.append(self.visible_tabs[tab]['tabName'])
 
         for x in range(self.tab_main.count() - 1, 0, -1):
             if self.tab_main.widget(x).objectName() not in tabs_to_show:
@@ -2210,7 +2211,9 @@ class GwInfo(QObject):
         self.epa_complet_result = complet_result
         if complet_result:
             if complet_result['body']['form'].get('visibleTabs'):
-                self.visible_tabs = complet_result['body']['form']['visibleTabs']
+                for tab in complet_result['body']['form']['visibleTabs']:
+                    if tab['tabName'] == 'tab_epa':
+                        self.visible_tabs[tab['tabName']] = tab
                 self._show_actions(self.dlg_cf, self.tab_main.currentWidget().objectName())
             for lyt in dialog.findChildren(QGridLayout, QRegularExpression('lyt_epa')):
                 i = 0
@@ -2383,9 +2386,9 @@ class GwInfo(QObject):
             return
 
         for tab in self.visible_tabs:
-            if tab['tabName'] == tab_name:
-                if tab['tabactions'] is not None:
-                    for act in tab['tabactions']:
+            if self.visible_tabs[tab]['tabName'] == tab_name:
+                if self.visible_tabs[tab]['tabactions'] is not None:
+                    for act in self.visible_tabs[tab]['tabactions']:
                         action = dialog.findChild(QAction, act['actionName'])
                         if action is not None:
                             action.setToolTip(act['actionTooltip'])
