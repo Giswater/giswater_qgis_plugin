@@ -105,3 +105,47 @@ AS SELECT polygon.pol_id,
 
 
 
+DROP VIEW IF EXISTS v_ui_mincut;
+
+CREATE OR REPLACE VIEW v_ui_mincut
+AS SELECT om_mincut.id,
+    om_mincut.work_order,
+    a.idval AS state,
+    b.idval AS class,
+    om_mincut.mincut_type,
+    om_mincut.received_date,
+    exploitation.name AS exploitation,
+    ext_municipality.name AS municipality,
+    om_mincut.postcode,
+    ext_streetaxis.name AS streetaxis,
+    om_mincut.postnumber,
+    c.idval AS anl_cause,
+    om_mincut.anl_tstamp,
+    om_mincut.anl_user,
+    om_mincut.anl_descript,
+    om_mincut.anl_feature_id,
+    om_mincut.anl_feature_type,
+    om_mincut.forecast_start,
+    om_mincut.forecast_end,
+    cat_users.name AS assigned_to,
+    om_mincut.exec_start,
+    om_mincut.exec_end,
+    om_mincut.exec_user,
+    om_mincut.exec_descript,
+    om_mincut.exec_from_plot,
+    om_mincut.exec_depth,
+    om_mincut.exec_appropiate,
+    om_mincut.chlorine,
+    om_mincut.turbidity,
+    om_mincut.notified,
+    om_mincut.output
+   FROM om_mincut
+     LEFT JOIN om_typevalue a ON a.id::integer = om_mincut.mincut_state AND a.typevalue = 'mincut_state'::text
+     LEFT JOIN om_typevalue b ON b.id::integer = om_mincut.mincut_class AND b.typevalue = 'mincut_class'::text
+     LEFT JOIN om_typevalue c ON c.id::integer = om_mincut.anl_cause::integer AND c.typevalue = 'mincut_cause'::text
+     LEFT JOIN exploitation ON exploitation.expl_id = om_mincut.expl_id
+     LEFT JOIN macroexploitation ON macroexploitation.macroexpl_id = om_mincut.macroexpl_id
+     LEFT JOIN ext_municipality ON ext_municipality.muni_id = om_mincut.muni_id
+     LEFT JOIN ext_streetaxis ON ext_streetaxis.id::text = om_mincut.streetaxis_id::text
+     LEFT JOIN cat_users ON cat_users.id::text = om_mincut.assigned_to::text
+  WHERE om_mincut.id > 0;
