@@ -374,7 +374,7 @@ class GwInfo(QObject):
                 continue
             if 'layoutname' in field and field['layoutname'] == 'lyt_none':
                 continue
-            if field.get('tabname') != 'tab_data':
+            if field.get('tabname') not in ('tab_data', 'tab_none'):
                 continue
             if 'spacer' in field['widgettype']:
                 continue
@@ -1808,6 +1808,8 @@ class GwInfo(QObject):
 
             # If we create a new feature
             if self.new_feature_id is not None:
+                if new_feature is False:
+                    new_feature = tools_qt.get_feature_by_id(self.layer, self.new_feature_id)
                 new_feature.setAttribute(id_name, newfeature_id)
                 after_insert = True
                 for k, v in list(_json.items()):
