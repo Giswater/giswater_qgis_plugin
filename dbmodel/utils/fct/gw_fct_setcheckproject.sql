@@ -153,7 +153,7 @@ BEGIN
 
 	-- profilactic null control
 	IF v_qgis_init_guide_map IS NULL THEN v_qgis_init_guide_map = FALSE; END IF;
-	IF v_qgis_layers_setpropierties IS NULL THEN v_qgis_layers_setpropierties = FALSE; END IF;
+	IF v_qgis_layers_setpropierties IS NULL THEN v_qgis_layers_setpropierties = TRUE; END IF;
 	IF v_ignoregraphanalytics IS NULL THEN v_ignoregraphanalytics = FALSE; END IF;
 	IF v_ignoreepa IS NULL THEN v_ignoreepa = FALSE; END IF;
 	IF v_ignoreplan IS NULL THEN v_ignoreplan = FALSE; END IF;
