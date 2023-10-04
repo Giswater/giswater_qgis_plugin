@@ -140,7 +140,8 @@ v_result_line json;
 v_result_point json;
 v_result_polygon json;
 v_device integer;
-
+v_nonpriority_statetype integer;
+v_cost_string text;
 BEGIN
 
 	--  Search path
@@ -226,6 +227,14 @@ BEGIN
 		v_linksdistance = 0;
 	END IF;
 
+	SELECT value::integer INTO v_nonpriority_statetype FROM config_param_system WHERE parameter = 'om_profile_nonpriority_statetype';
+
+	IF v_nonpriority_statetype IS NULL THEN
+		 v_cost_string = 'gis_length::float as cost';
+	ELSE
+		v_cost_string = concat('case when state_type = ',v_nonpriority_statetype,' THEN gis_length::float + 0.1 ELSE gis_length::float END as cost'); 
+	END IF;
+
 	-- Check start-end nodes
 	v_nodemessage = 'Start/End nodes is/are not valid(s). CHECK elev data. Only NOT start/end nodes may have missed elev data';
 	IF v_project_type = 'UD' THEN
@@ -303,7 +312,7 @@ BEGIN
 			v_y2 = 'case when node_1=node_id then depth2 else depth1 end';
 		END IF;
 
-		v_query_dijkstra := 'SELECT edge::text AS arc_id, node::text AS node_id, agg_cost as total_length FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, 
+		v_query_dijkstra := 'SELECT edge::text AS arc_id, node::text AS node_id, agg_cost as total_length FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, '||v_cost_string||',
 					gis_length::float as reverse_cost FROM v_edit_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init||','||v_end||')';
 
 		IF v_mid IS NOT NULL THEN
@@ -316,8 +325,8 @@ BEGIN
 
 				-- DIJKSTRA v_init_aux -> v_end_aux
 				v_query_dijkstra = 'SELECT edge::text AS arc_id, node::text AS node_id, (select coalesce(max(total_distance), 0) from temp_anl_node where fid = ''222'' and cur_user = current_user) + agg_cost as total_length 
-				FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, 
-					gis_length::float as reverse_cost FROM v_edit_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init_aux||','||v_end_aux||')';
+				FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, '||v_cost_string||', 
+				gis_length::float as reverse_cost FROM v_edit_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init_aux||','||v_end_aux||')';
 				
 				-- We need to insert values each dijkstra for the total_length to keep accumulating
 				-- insert edge values on temp_anl_arc table
@@ -341,9 +350,8 @@ BEGIN
 			END LOOP;
 			-- Last DIJKSTRA
 			v_query_dijkstra = concat('SELECT edge::text AS arc_id, node::text AS node_id, (select coalesce(max(total_distance), 0) from temp_anl_node) + agg_cost as total_length 
-			FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, 
+			FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, '||v_cost_string||', 
 			gis_length::float as reverse_cost FROM v_edit_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init_aux||','||v_end||')');
-		END IF;
 
 		-- insert edge values on temp_anl_arc table
 		EXECUTE 'INSERT INTO temp_anl_arc (fid, arc_id, code, node_1, node_2, sys_type, arccat_id, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2, expl_id, the_geom)
