@@ -1626,7 +1626,7 @@ class GwInfo(QObject):
                     tools_gw.close_dialog(dialog)
             if new_feature:
                 for tab in self.visible_tabs:
-                    tools_qt.enable_tab_by_tab_name(self.tab_main, tab['tabName'], True)
+                    tools_qt.enable_tab_by_tab_name(self.tab_main, self.visible_tabs[tab]['tabName'], True)
             self._reload_epa_tab(dialog)
             self._reset_my_json()
         else:
