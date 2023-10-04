@@ -26,16 +26,16 @@ INSERT INTO sys_function (id, function_name, project_type, function_type, input_
 VALUES (3280, 'gw_fct_setnoderotation', 'utils', 'function', 'json', 'json', 'Function to update massively the column rotation for nodes. Function works with the selection of user (exploitation and psectors)', 'role_edit', null, 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
-VALUES (516, 'Node rotation update', 'utils', null, 'core', true, 'Function process', null) ON CONFLICT (fid) DO NOTHING;
+VALUES (516, 'Node rotation update', 'utils', null, 'core', true, 'Function process', null) ON CONFLICT (fid) DO NOTHING ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO config_toolbox 
-VALUES (3280, 'Massive node rotation update','{"featureType":[]}', '{}', null, true, '{4}') ON CONFLICT (id) DO NOTHING;
+VALUES (3280, 'Massive node rotation update','{"featureType":[]}', '{}', null, true, '{4}') ON CONFLICT (id) DO NOTHING ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_param_user (id, formname, descript, sys_role, project_type, ismandatory, source) 
-VALUES ('edit_disable_arctopocontrol', 'dynamic', 'If true, topocontrol is disabled', 'role_edit', 'utils', true, 'core');
+VALUES ('edit_disable_arctopocontrol', 'dynamic', 'If true, topocontrol is disabled', 'role_edit', 'utils', true, 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_param_user (id, formname, descript, sys_role, project_type, ismandatory, source) 
-VALUES ('edit_disable_update_nodevalues', 'dynamic', 'If true, topocontrol is disabled', 'role_edit', 'utils', true, 'core');
+VALUES ('edit_disable_update_nodevalues', 'dynamic', 'If true, topocontrol is disabled', 'role_edit', 'utils', true, 'core') ON CONFLICT (id) DO NOTHING;
 
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent, 
@@ -53,4 +53,4 @@ UPDATE config_form_fields SET iseditable = false, placeholder=null WHERE  column
 UPDATE config_form_fields SET dv_querytext = 'SELECT id as id, name as idval from drainzone WHERE id IS NOT NULL ' WHERE  columnname in ('drainzone_id') AND formname = 'v_edit_link';
 
 INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam)
-VALUES ('tabname_typevalue', 'tab_exploitation_add', 'tab_exploitation_add', 'ExploitationAdd', null);
+VALUES ('tabname_typevalue', 'tab_exploitation_add', 'tab_exploitation_add', 'ExploitationAdd', null) ON CONFLICT (typevalue, id) DO NOTHING;
