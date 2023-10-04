@@ -1969,9 +1969,9 @@ class GwInfo(QObject):
             if 'visibleTabs' not in self.complet_result['body']['form']:
                 return
             for tab in self.visible_tabs:
-                if tab['tabName'] == tab_name:
-                    if tab['tabactions'] is not None:
-                        for act in tab['tabactions']:
+                if self.visible_tabs[tab]['tabName'] == tab_name:
+                    if self.visible_tabs[tab]['tabactions'] is not None:
+                        for act in self.visible_tabs[tab]['tabactions']:
                             action = dialog.findChild(QAction, act['actionName'])
                             if action is not None and action.objectName() not in static_actions:
                                 action.setEnabled(not act['disabled'])
