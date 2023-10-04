@@ -55,3 +55,7 @@ INSERT INTO config_report (id, alias, query_text, addparam, filterparam, sys_rol
 "dvquerytext":"Select id as id, id as idval FROM cat_feature_node join cat_feature USING (id) WHERE id IS NOT NULL AND active ORDER BY id","isNullValue":"true"}]',
 'role_basic', true, '{4,5}')
 ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_param_system(parameter, value, descript, label, isenabled,  project_type,  datatype, widgettype, ismandatory)
+VALUES ('om_profile_nonpriority_statetype', 6, 'Features with defined state type won''t be prioritised to be choosen on a profile in case of overlaying conduiuts', 
+'Profile non priority state type', false, 'ud', 'integer', 'linetext', false ) ON CONFLICT (parameter) DO NOTHING;
