@@ -204,8 +204,14 @@ BEGIN
 			INTO v_result;
 
 			EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM v_edit_connec
-			WHERE feature_id = ('||quote_nullable(v_result)||'))row'
+			WHERE connec_id = ('||quote_nullable(v_result)||'))row'
 			INTO v_geometry;
+
+			if v_geometry is null then
+				EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM v_edit_node
+				WHERE node_id = ('||quote_nullable(v_result)||'))row'
+				INTO v_geometry;
+			end if;
 		elsif v_section = 'basic_search_v2_tab_workcat' then
 
 			execute 'SELECT row_to_json(row) FROM (SELECT 
