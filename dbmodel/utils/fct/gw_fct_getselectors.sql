@@ -325,8 +325,21 @@ BEGIN
 						WHERE ',v_table_id ,' NOT IN (' , v_ids, ') ',
 						 v_fullfilter ,' ORDER BY orderby asc) a');
 				END IF;
-
+		ELSIF v_tab.tabname ='tab_exploitation_add' and v_addschema IS NOT NULL THEN
+			v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , 
+						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
+						FROM ',v_addschema,'.' , v_table , ' m 
+						WHERE ',v_table_id ,' NOT IN (SELECT ',v_table_id ,' FROM  SCHEMA_NAME.', v_table , ') AND ' , 
+						v_table_id , ' IN (SELECT ' , v_selector_id , ' FROM ',v_addschema,'.' , v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' UNION 
+						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , 
+						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
+						FROM ',v_addschema,'.', v_table , ' m
+						WHERE ',v_table_id ,' NOT IN (SELECT ',v_table_id ,' FROM  SCHEMA_NAME.', v_table , ') AND ' , 
+						v_table_id , ' NOT IN (SELECT ' , v_selector_id , ' FROM ',v_addschema,'.' , v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' ORDER BY orderby asc) a');
+			
 		ELSE 
+		
 			v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(b))) FROM (
 					select *, row_number() OVER (ORDER BY orderby) as orderby from (
 					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ' , 

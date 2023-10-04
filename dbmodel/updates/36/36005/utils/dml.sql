@@ -49,3 +49,8 @@ UPDATE config_form_fields SET ismandatory = false, dv_orderby_id = true, dv_pare
 UPDATE config_form_fields SET iseditable = true, placeholder=null WHERE  columnname in ('workcat_id', 'workcat_id_end', 'builtdate', 'enddate') AND formname = 'v_edit_link';
 
 UPDATE config_form_fields SET iseditable = false, placeholder=null WHERE  columnname in ('connecat_id', 'drainzone_id') AND formname = 'v_edit_link';
+
+UPDATE config_form_fields SET dv_querytext = 'SELECT id as id, name as idval from drainzone WHERE id IS NOT NULL ' WHERE  columnname in ('drainzone_id') AND formname = 'v_edit_link';
+
+INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam)
+VALUES ('tabname_typevalue', 'tab_exploitation_add', 'tab_exploitation_add', 'ExploitationAdd', null);
