@@ -57,5 +57,5 @@ INSERT INTO config_report (id, alias, query_text, addparam, filterparam, sys_rol
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_param_system(parameter, value, descript, label, isenabled,  project_type,  datatype, widgettype, ismandatory)
-VALUES ('om_profile_nonpriority_statetype', 6, 'Features with defined state type won''t be prioritised to be choosen on a profile in case of overlaying conduiuts', 
+VALUES ('om_profile_nonpriority_statetype', null, 'Features with defined state type won''t be prioritised to be choosen on a profile in case of overlaying conduiuts', 
 'Profile non priority state type', false, 'ud', 'integer', 'linetext', false ) ON CONFLICT (parameter) DO NOTHING;
