@@ -57,5 +57,5 @@ VALUES ('tabname_typevalue', 'tab_exploitation_add', 'tab_exploitation_add', 'Ex
 
 
 --05/10/23
-update ws.config_form_fields set dv_querytext='select id, id as idval from cat_arc where id=''1''' where formname ='print' and columnname='composer'; 
-update ws.config_form_fields set widgettype='text' where formname ='v_edit_inp_dscenario_pump_additional' and columnname='order_id'; 
+update config_form_fields set dv_querytext='select id, id as idval from cat_arc where id=''1''' where formname ='print' and columnname='composer'; 
+update config_form_fields set widgettype='text' where formname ='v_edit_inp_dscenario_pump_additional' and columnname='order_id'; 
