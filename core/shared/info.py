@@ -329,6 +329,7 @@ class GwInfo(QObject):
             widget = dialog.findChild(QWidget, widget_name)
             if widget is None:
                 action.setChecked(False)
+                tools_qgis.show_message(f"Widget: {widget_name} not in form.", dialog=dialog)
                 return
         # Block the signals of de dialog so that the key ESC does not close it
         dialog.blockSignals(True)
