@@ -54,3 +54,8 @@ UPDATE config_form_fields SET dv_querytext = 'SELECT id as id, name as idval fro
 
 INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam)
 VALUES ('tabname_typevalue', 'tab_exploitation_add', 'tab_exploitation_add', 'ExploitationAdd', null) ON CONFLICT (typevalue, id) DO NOTHING;
+
+
+--05/10/23
+update ws.config_form_fields set dv_querytext='select id, id as idval from cat_arc where id=''1''' where formname ='print' and columnname='composer'; 
+update ws.config_form_fields set widgettype='text' where formname ='v_edit_inp_dscenario_pump_additional' and columnname='order_id'; 
