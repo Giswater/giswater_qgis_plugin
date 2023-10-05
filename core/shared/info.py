@@ -2364,11 +2364,11 @@ class GwInfo(QObject):
 
         # Check feature_type
         if self.feature_type == 'connec':
-            widget = f'{tab_type}_{self.feature_type}at_id'
+            widget = f'tab_{tab_type}_{self.feature_type}at_id'
         elif self.feature_type == 'gully':
-            widget = f'{tab_type}_gratecat_id'
+            widget = f'tab_{tab_type}_gratecat_id'
         else:
-            widget = f'{tab_type}_{self.feature_type}cat_id'
+            widget = f'tab_{tab_type}_{self.feature_type}cat_id'
         self.catalog.open_catalog(self.dlg_cf, widget, feature_type, child_type)
 
 
