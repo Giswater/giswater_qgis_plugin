@@ -140,7 +140,8 @@ v_result_line json;
 v_result_point json;
 v_result_polygon json;
 v_device integer;
-v_nonpriority_statetype integer;
+v_nonpriority_statetype text;
+v_extra_cost numeric=0;
 v_cost_string text;
 BEGIN
 
@@ -227,12 +228,13 @@ BEGIN
 		v_linksdistance = 0;
 	END IF;
 
-	SELECT value::integer INTO v_nonpriority_statetype FROM config_param_system WHERE parameter = 'om_profile_nonpriority_statetype';
+	SELECT json_extract_path_text(value::json,'state_type'),json_extract_path_text(value::json,'extra_cost')::numeric INTO v_nonpriority_statetype, v_extra_cost
+	FROM config_param_system WHERE parameter = 'om_profile_nonpriority_statetype';
 
-	IF v_nonpriority_statetype IS NULL THEN
+	IF v_nonpriority_statetype IS NULL or v_nonpriority_statetype='' THEN
 		 v_cost_string = 'gis_length::float as cost';
 	ELSE
-		v_cost_string = concat('case when state_type = ',v_nonpriority_statetype,' THEN gis_length::float + 0.1 ELSE gis_length::float END as cost'); 
+		v_cost_string = concat('case when state_type = ',v_nonpriority_statetype::integer,' THEN gis_length::float + '||v_extra_cost||' ELSE gis_length::float END as cost'); 
 	END IF;
 
 	-- Check start-end nodes
