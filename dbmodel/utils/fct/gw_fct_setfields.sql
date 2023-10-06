@@ -69,6 +69,7 @@ v_idname_array text[];
 v_id_array text[];
 column_type_id_array text[];
 idname text;
+v_pkeyfield text;
 
 BEGIN
 
@@ -104,23 +105,31 @@ BEGIN
 
 	-- Get if view has composite primary key
 	IF v_idname ISNULL THEN
-		EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_addparam USING v_tablename;
-		v_idname = v_addparam ->> 'pkey';
-		v_idname_array := string_to_array(v_idname, ', ');
 
-		IF v_idname IS NOT NULL THEN
+		-- Manage primary key
+		EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_addparam USING v_tablename;
+		v_idname_array := string_to_array(v_idname, ', ');
+		if v_idname_array is null THEN
+			EXECUTE 'SELECT gw_fct_getpkeyfield('''||v_tablename||''');' INTO v_idname;
+			v_idname_array := string_to_array(v_idname, ', ');
+		end if;
+
+		v_id_array := string_to_array(v_id, ', ');
+		IF v_idname IS NOT NULL then
+
 			FOREACH idname IN ARRAY v_idname_array LOOP
 				EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
 				    JOIN pg_class t on a.attrelid = t.oid
 				    JOIN pg_namespace s on t.relnamespace = s.oid
-				    WHERE a.attnum > 0 
+				    WHERE a.attnum > 0
 				    AND NOT a.attisdropped
 				    AND a.attname = $3
-				    AND t.relname = $2 
+				    AND t.relname = $2
 				    AND s.nspname = $1
 				    ORDER BY a.attnum'
 			    USING v_schemaname, v_tablename, idname
 			    INTO column_type_id;
+
 				column_type_id_array[i] := column_type_id;
 				i=i+1;
 			END LOOP;
@@ -138,21 +147,21 @@ BEGIN
 	IF v_idname ISNULL THEN
 		EXECUTE '
 		SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
-		AND t.relname = $1 
+		AND t.relname = $1
 		AND s.nspname = $2
 		ORDER BY a.attnum LIMIT 1'
 		INTO v_idname
 		USING v_tablename, v_schemaname;
 	END IF;
- 
+
 	--   Get id column type
 	EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
 	    JOIN pg_class t on a.attrelid = t.oid
 	    JOIN pg_namespace s on t.relnamespace = s.oid
-	    WHERE a.attnum > 0 
+	    WHERE a.attnum > 0
 	    AND NOT a.attisdropped
 	    AND a.attname = $3
-	    AND t.relname = $2 
+	    AND t.relname = $2
 	    AND s.nspname = $1
 	    ORDER BY a.attnum'
             USING v_schemaname, v_tablename, v_idname
@@ -162,9 +171,9 @@ BEGIN
 		i = 1;
 		-- query text, step1
 		v_querytext := 'UPDATE ' || quote_ident(v_tablename) ||' SET ';
-	
+
 		-- query text, step2
-		FOREACH text IN ARRAY v_text 
+		FOREACH text IN ARRAY v_text
 		LOOP
 			SELECT v_text [i] into v_jsonfield;
 			v_field:= (SELECT (v_jsonfield ->> 'key')) ;
@@ -174,7 +183,7 @@ BEGIN
 			IF v_field = 'closed' THEN
 				v_closedstatus = v_value;
 			END IF;
-			
+
 			-- Get column type
 			EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(v_tablename) || ' AND column_name = $2'
 				USING v_schemaname, v_field
@@ -184,36 +193,38 @@ BEGIN
 			IF v_columntype IS NULL THEN
 				v_columntype='text';
 			END IF;
-				
+
 			-- control geometry fields
-			IF v_field ='the_geom' OR v_field ='geom' THEN 
+			IF v_field ='the_geom' OR v_field ='geom' THEN
 				v_columntype='geometry';
 			END IF;
-			--IF v_value !='null' OR v_value !='NULL' THEN 
-		
+			--IF v_value !='null' OR v_value !='NULL' THEN
+
 				IF v_field='state' THEN
 					PERFORM gw_fct_state_control(v_featuretype, v_id, v_value::integer, 'UPDATE');
 				END IF;
-				
-				IF v_field in ('geom', 'the_geom') THEN			
-					v_value := (SELECT ST_SetSRID((v_value)::geometry, SRID_VALUE));				
+
+				IF v_field in ('geom', 'the_geom') THEN
+					v_value := (SELECT ST_SetSRID((v_value)::geometry, 25831));
 				END IF;
-				
+
 				--building the query text
 				IF n=1 THEN
 					v_querytext := concat (v_querytext, quote_ident(v_field) , ' = CAST(' , quote_nullable(v_value) , ' AS ' , v_columntype , ')');
 				ELSIF i>1 THEN
 					v_querytext := concat (v_querytext, ' , ',  quote_ident(v_field) , ' = CAST(' , quote_nullable(v_value) , ' AS ' , v_columntype , ')');
 				END IF;
-				n=n+1;			
+				n=n+1;
 			--END IF;
 			i=i+1;
 
 		END LOOP;
 
 		-- query text, final step
-		v_idname_array := string_to_array(v_idname, ', ');
-		v_id_array := string_to_array(v_id, ', ');
+		if v_idname_array is null then
+			v_idname_array := string_to_array(v_idname, ', ');
+			v_id_array := string_to_array(v_id, ', ');
+		end if;
 
         IF cardinality(v_idname_array) > 1 AND cardinality(v_id_array) > 1 then
             i = 1;
@@ -230,6 +241,7 @@ BEGIN
 				v_querytext := v_querytext || quote_ident(idname) || ' = CAST(' || quote_literal(v_fields->>idname) || ' AS ' || column_type_id_array[i] || ') AND ';
 				i=i+1;
 			END LOOP;
+
 			v_querytext = substring(v_querytext, 0, length(v_querytext)-4);
 		ELSE
 			v_querytext := v_querytext || ' WHERE ' || quote_ident(v_idname) || ' = CAST(' || quote_literal(v_id) || ' AS ' || column_type_id || ')';

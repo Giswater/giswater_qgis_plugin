@@ -70,6 +70,7 @@ column_type_id_array text[];
 idname text;
 v_result record;
 v_force_action text;
+v_pkeyfield text;
 
 BEGIN
 
@@ -104,30 +105,15 @@ BEGIN
 
 	select array_agg(row_to_json(a)) into v_text from json_each(v_fields)a;
 
-	-- Get if view has composite primary key
-	IF v_idname ISNULL THEN
-		EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_addparam USING v_tablename;
-		v_idname = v_addparam ->> 'pkey';
-		v_idname_array := string_to_array(v_idname, ', ');
-	END IF;
+	-- Manage primary key
+	EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_addparam USING v_tablename;
+	v_idname_array := string_to_array(v_idname, ', ');
+	if v_idname_array is null THEN
+		EXECUTE 'SELECT gw_fct_getpkeyfield('''||v_tablename||''');' INTO v_pkeyfield;
+		v_idname_array := string_to_array(v_pkeyfield, ', ');
+	end if;
 
-	--  Get id column, for tables is the key column
-	IF v_idname ISNULL THEN
-		EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
-	        INTO v_idname
-	        USING v_tablename;
-    END IF;
-
-	-- For views it suposse pk is the first column
-	IF v_idname is NULL THEN
-		EXECUTE '
-		SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
-		AND t.relname = $1
-		AND s.nspname = $2
-		ORDER BY a.attnum LIMIT 1'
-		INTO v_idname
-		USING v_tablename, v_schemaname;
-	END IF;
+	v_id_array := string_to_array(v_id, ', ');
 
 	if v_idname_array is not null then
 		FOREACH idname IN ARRAY v_idname_array LOOP
