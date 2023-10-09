@@ -339,15 +339,16 @@ BEGIN
 		UPDATE temp_t_node t SET pattern_id = d.pattern_id FROM v_edit_inp_dscenario_connec d 
 		WHERE t.node_id = d.connec_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.pattern_id IS NOT NULL;
 		UPDATE temp_t_arc t SET status = d.status FROM v_edit_inp_dscenario_connec d 
-		WHERE t.arc_id = d.connec_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.status IS NOT NULL;
+		WHERE t.arc_id = concat('CO',d.connec_id) AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.status IS NOT NULL;
 		UPDATE temp_t_arc t SET minorloss = d.minorloss FROM v_edit_inp_dscenario_connec d 
-		WHERE t.arc_id = d.connec_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.minorloss IS NOT NULL;
+		WHERE t.arc_id = concat('CO',d.connec_id) AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.minorloss IS NOT NULL;
 		UPDATE temp_t_arc t SET diameter = d.custom_dint FROM v_edit_inp_dscenario_connec d 
-		WHERE t.arc_id = d.connec_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.custom_dint IS NOT NULL;
+		WHERE t.arc_id = concat('CO',d.connec_id) AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.custom_dint IS NOT NULL;
 		UPDATE temp_t_arc t SET length = d.custom_length FROM v_edit_inp_dscenario_connec d 
-		WHERE t.arc_id = d.connec_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.custom_length IS NOT NULL;
+		WHERE t.arc_id = concat('CO',d.connec_id) AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.custom_length IS NOT NULL;
 		UPDATE temp_t_arc t SET roughness = d.custom_roughness FROM v_edit_inp_dscenario_connec d 
-		WHERE t.arc_id = d.connec_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.custom_roughness IS NOT NULL;
+		WHERE t.arc_id = concat('CO',d.connec_id) AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.custom_roughness IS NOT NULL;
+
 		
 		-- updating values for virtualvalve
 		UPDATE temp_t_arc t SET status = d.status FROM v_edit_inp_dscenario_virtualvalve d 
