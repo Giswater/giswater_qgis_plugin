@@ -742,6 +742,7 @@ class GwMapzoneManager:
         if self.netscenario_id is not None:
             tools_qt.set_widget_text(self.add_dlg, f'tab_data_netscenario_id', self.netscenario_id)
             tools_qt.set_widget_enabled(self.add_dlg, f'tab_data_netscenario_id', False)
+            field_id = ['netscenario_id', field_id]
 
         # Get every widget in the layout
         widgets = []
@@ -805,13 +806,14 @@ class GwMapzoneManager:
             if not isinstance(pkey, list):
                 pkey = [pkey]
             for pk in pkey:
-                widget_name = f"tab_none_{pk}"
-                value = tools_qt.get_widget_value(dialog, widget_name)
-                id_val += f"{value}, "
+                results = pk.split(',')
+                for result in results:
+                    widget_name = f"tab_none_{result}"
+                    value = tools_qt.get_widget_value(dialog, widget_name)
+                    id_val += f"{value}, "
             id_val = id_val[:-2]
         # if id_val in (None, '', 'None'):
         #     id_val = feature_id
-
         feature = f'"id":"{id_val}", '
         feature += f'"tableName":"{tablename}"'
         extras = f'"fields":{fields}'
