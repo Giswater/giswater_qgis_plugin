@@ -57,4 +57,8 @@ VALUES ('tabname_typevalue', 'tab_exploitation_add', 'tab_exploitation_add', 'Ex
 
 
 --05/10/23
-update config_form_fields set widgettype='text' where formname ='v_edit_inp_dscenario_pump_additional' and columnname='order_id'; 
+update config_form_fields set widgettype='text' where formname ='v_edit_inp_dscenario_pump_additional' and columnname='order_id';
+
+-- 09/10/23
+DELETE FROM config_param_system
+WHERE "parameter"='utils_use_gw_snapping';
