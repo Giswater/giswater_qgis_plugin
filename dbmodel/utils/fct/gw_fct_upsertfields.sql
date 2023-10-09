@@ -150,8 +150,11 @@ BEGIN
     IF v_force_action IS NULL THEN
 
         v_querytext := 'SELECT * FROM ' || quote_ident(v_tablename);
-        v_idname_array := string_to_array(v_idname, ', ');
-        v_id_array := string_to_array(v_id, ', ');
+
+        if v_idname_array is null then
+        	v_idname_array := string_to_array(v_idname, ', ');
+        	v_id_array := string_to_array(v_id, ', ');
+        end if;
 
         IF cardinality(v_idname_array) > 1 AND cardinality(v_id_array) > 1 then
             i = 1;
