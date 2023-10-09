@@ -155,20 +155,39 @@ BEGIN
 			v_orderby = 'web_layoutorder'; 
 		END IF;
 
-		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (
-			
+		if replace(p_idname,'_id','') in ('arc', 'node', 'connec', 'gully') then
+			v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (
+
 			WITH typevalue AS (SELECT * FROM config_typevalue)
-		
+
 			SELECT ',v_label,', columnname, columnname as column_id, concat(tabname,''_'',columnname) AS widgetname, widgettype,
 			widgetfunction, widgetfunction as  widgetAction, widgetfunction as updateAction, widgetfunction as changeAction,
 			',v_device,' hidden, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY '', v_orderby ,'') AS orderby, tabname,
 			layoutname, layoutorder, dv_parent_id AS "parentId", isparent, ismandatory, linkedobject, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
 
 			dv_orderby_id AS "orderById", dv_isnullvalue AS "isNullValue", stylesheet, widgetcontrols, isfilter, web_layoutorder
-			FROM config_form_fields 
+			FROM config_form_fields
 			LEFT JOIN config_typevalue a ON a.id = widgetfunction::json->>''functionName'' AND a.typevalue = ''widgetfunction_typevalue''
 			LEFT JOIN config_typevalue b ON b.id = widgettype AND b.typevalue = ''widgettype_typevalue''
 			WHERE (formname = ',quote_nullable(p_formname),' OR formname = ''',replace(p_idname, '_id', ''),''') AND formtype= ',quote_nullable(p_formtype),' ',v_clause,' ',v_filter_widgets,' ORDER BY orderby) a');
+
+		else
+			v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (
+
+			WITH typevalue AS (SELECT * FROM config_typevalue)
+
+			SELECT ',v_label,', columnname, columnname as column_id, concat(tabname,''_'',columnname) AS widgetname, widgettype,
+			widgetfunction, widgetfunction as  widgetAction, widgetfunction as updateAction, widgetfunction as changeAction,
+			',v_device,' hidden, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY '', v_orderby ,'') AS orderby, tabname,
+			layoutname, layoutorder, dv_parent_id AS "parentId", isparent, ismandatory, linkedobject, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
+
+			dv_orderby_id AS "orderById", dv_isnullvalue AS "isNullValue", stylesheet, widgetcontrols, isfilter, web_layoutorder
+			FROM config_form_fields
+			LEFT JOIN config_typevalue a ON a.id = widgetfunction::json->>''functionName'' AND a.typevalue = ''widgetfunction_typevalue''
+			LEFT JOIN config_typevalue b ON b.id = widgettype AND b.typevalue = ''widgettype_typevalue''
+			WHERE formname = ',quote_nullable(p_formname),' AND formtype= ',quote_nullable(p_formtype),' ',v_clause,' ',v_filter_widgets,' ORDER BY orderby) a');
+
+		end if;
 
 		v_debug_vars := json_build_object('v_label', v_label, 'p_tabname', p_tabname, 'v_device', v_device, 'p_formname', p_formname, 'p_formtype', p_formtype, 'v_clause', v_clause);
 		v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getformfields', 'flag', 10);
