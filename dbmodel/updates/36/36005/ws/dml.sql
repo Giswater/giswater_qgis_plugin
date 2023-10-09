@@ -161,3 +161,8 @@ UPDATE config_form_fields set columnname ='energy_pattern_id' where columnname =
 UPDATE config_form_list SET query_text = replace(query_text, 'name,','') where listname ='tbl_mincut_manager';
 
 UPDATE config_param_system SET value = '{"activated":false}' WHERE parameter ='edit_arc_check_conflictmapzones';
+
+-- 09/10/23
+UPDATE config_param_system
+SET value='{"table":"plan_netscenario","table_id":"netscenario_id","selector":"selector_netscenario","selector_id":"netscenario_id","label":"netscenario_id, ''-'', name ","query_filter":" ", "selectionMode":"removePrevious"}'
+WHERE "parameter"='basic_selector_tab_netscenario';
