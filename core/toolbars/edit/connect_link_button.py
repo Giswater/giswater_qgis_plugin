@@ -46,13 +46,6 @@ class GwConnectLinkButton(GwMaptool):
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
-        # Clear snapping
-        self.snapper_manager.set_snapping_status()
-
-        # Set snapping to 'connec' and 'gully'
-        self.snapper_manager.config_snap_to_connec()
-        self.snapper_manager.config_snap_to_gully()
-
         # Change cursor
         cursor = tools_gw.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)

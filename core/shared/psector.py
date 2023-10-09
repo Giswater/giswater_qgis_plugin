@@ -2322,7 +2322,6 @@ class GwPsector:
         self.dlg_replace_arc.txt_current_arccat.setText(self.arc_cat_id)
 
         # Disconnect Snapping
-        self.snapper_manager.recover_snapping_options()
         tools_qgis.disconnect_snapping(False, None, self.vertex_marker)
         tools_gw.disconnect_signal('psector')
 

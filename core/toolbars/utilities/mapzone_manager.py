@@ -323,17 +323,6 @@ class GwMapzoneManager:
 
         self.vertex_marker = self.snapper_manager.vertex_marker
 
-        # Store user snapping configuration
-        self.snapper_manager.store_snapping_options()
-
-        # Disable snapping
-        self.snapper_manager.set_snapping_status()
-
-        # if we are doing info over connec or over node
-        if option in ('arc', 'set_to_arc'):
-            self.snapper_manager.config_snap_to_arc()
-        elif option == 'node':
-            self.snapper_manager.config_snap_to_node()
         # Set signals
         tools_gw.disconnect_signal('mapzone_manager_snapping', 'get_snapped_feature_id_xyCoordinates_mouse_moved')
         tools_gw.connect_signal(self.canvas.xyCoordinates, partial(self._mouse_moved, layer),
@@ -393,7 +382,6 @@ class GwMapzoneManager:
         except Exception as e:
             tools_qgis.show_warning(f"Exception in info (def _get_id)", parameter=e)
         finally:
-            self.snapper_manager.recover_snapping_options()
             if option == 'nodeParent':
                 self._cancel_snapping_tool(dialog, action)
 

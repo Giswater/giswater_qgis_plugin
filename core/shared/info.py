@@ -277,15 +277,7 @@ class GwInfo(QObject):
         keep_active = tools_os.set_boolean(keep_active, False)
         if not keep_active:
             self.prev_action = None
-        # Store user snapping configuration
-        self.snapper_manager.store_snapping_options()
 
-        # Set snapping to 'node', 'connec' and 'gully'
-        self.snapper_manager.config_snap_to_arc()
-        self.snapper_manager.config_snap_to_node()
-        self.snapper_manager.config_snap_to_connec()
-        self.snapper_manager.config_snap_to_gully()
-        self.snapper_manager.set_snap_mode()
         tools_gw.connect_signal(self.iface.actionAddFeature().toggled, self._action_is_checked,
                                 'info', 'add_feature_actionAddFeature_toggled_action_is_checked')
 
@@ -336,17 +328,6 @@ class GwInfo(QObject):
 
         self.vertex_marker = self.snapper_manager.vertex_marker
 
-        # Store user snapping configuration
-        self.snapper_manager.store_snapping_options()
-
-        # Disable snapping
-        self.snapper_manager.set_snapping_status()
-
-        # if we are doing info over connec or over node
-        if option in ('arc', 'set_to_arc'):
-            self.snapper_manager.config_snap_to_arc()
-        elif option == 'node':
-            self.snapper_manager.config_snap_to_node()
         # Set signals
         tools_gw.disconnect_signal('info_snapping', 'get_snapped_feature_id_xyCoordinates_mouse_moved')
         tools_gw.connect_signal(self.canvas.xyCoordinates, partial(self._mouse_moved, layer),
@@ -1383,12 +1364,8 @@ class GwInfo(QObject):
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
-        # Clear snapping
-        self.snapper_manager.set_snapping_status()
-
         # Set snapping
         layer = global_vars.iface.activeLayer()
-        self.snapper_manager.config_snap_to_layer(layer)
 
         # Set marker
         self.vertex_marker = self.snapper_manager.vertex_marker
@@ -1510,7 +1487,6 @@ class GwInfo(QObject):
             action_widget.setChecked(False)
 
         try:
-            self.snapper_manager.restore_snap_options(self.previous_snapping)
             self.vertex_marker.hide()
             tools_gw.disconnect_signal('info_snapping', 'manage_action_copy_paste_xyCoordinates_mouse_move')
             tools_gw.disconnect_signal('info_snapping', 'manage_action_copy_paste_ep_canvasClicked')
@@ -3062,7 +3038,6 @@ class GwInfo(QObject):
         except Exception as e:
             tools_qgis.show_warning(f"Exception in info (def _get_id)", parameter=e)
         finally:
-            self.snapper_manager.recover_snapping_options()
             self._cancel_snapping_tool(dialog, action)
 
 
@@ -3120,7 +3095,6 @@ class GwInfo(QObject):
         """ Recover snapping options when action add feature is un-checked """
 
         if not self.iface.actionAddFeature().isChecked():
-            self.snapper_manager.recover_snapping_options()
             tools_gw.disconnect_signal('info', 'add_feature_actionAddFeature_toggled_action_is_checked')
 
 
@@ -3130,7 +3104,6 @@ class GwInfo(QObject):
         :return:
         """
 
-        self.snapper_manager.recover_snapping_options()
         self.info_layer.featureAdded.disconnect(self._open_new_feature)
         feature = tools_qt.get_feature_by_id(self.info_layer, feature_id)
         geom = feature.geometry()
