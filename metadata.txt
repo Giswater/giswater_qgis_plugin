@@ -9,6 +9,14 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 
 Changelog=Version 3.6.005
+    - Fix snapping when inserting features
+    - Enhancement: highlight features with state 0 in psector
+    - Add new button to info right-click menu to open/close valves in netscenario
+    - New button "toggle active" in netscenario
+    - New button to delete items from curve (non-visual objects)
+    - Add date of creation in schema properties
+    - Bug fixes in netscenario
+    - Bug fixes in mapzone config
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
