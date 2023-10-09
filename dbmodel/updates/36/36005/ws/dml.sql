@@ -159,3 +159,5 @@ ilike 'status' and formname = 've_epa_connec';
 UPDATE config_form_fields set columnname ='energy_pattern_id' where columnname ='price_pattern' and formname = 've_epa_pump';
 
 UPDATE config_form_list SET query_text = replace(query_text, 'name,','') where listname ='tbl_mincut_manager';
+
+UPDATE config_param_system SET value = '{"activated":false}' WHERE parameter ='edit_arc_check_conflictmapzones';
