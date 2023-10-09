@@ -870,7 +870,7 @@ BEGIN
 				--check if selected id is on combo list
 				IF field_value::text not in  (select a from json_array_elements_text(json_extract_path(v_fields_array[array_index],'comboIds'))a) AND field_value IS NOT NULL then
 					--find dvquerytext for combo
-					v_querystring = concat('SELECT dv_querystring FROM config_form_fields WHERE
+					v_querystring = concat('SELECT dv_querytext FROM config_form_fields WHERE
 					columnname::text = (',quote_literal(v_fields_array[array_index]),'::json->>''columnname'')::text
 					and formname = ',quote_literal(p_table_id),';');
 					v_debug_vars := json_build_object('v_fields_array[array_index]', v_fields_array[array_index], 'p_table_id', p_table_id);
