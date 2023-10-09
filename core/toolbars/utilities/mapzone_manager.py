@@ -124,7 +124,7 @@ class GwMapzoneManager:
         # Fill current table
         self._fill_mapzone_table()
 
-    def _fill_mapzone_table(self, set_edit_triggers=QTableView.DoubleClicked, expr=None):
+    def _fill_mapzone_table(self, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
         """ Fill mapzone table with data from its corresponding table """
 
         # Manage exception if dialog is closed
