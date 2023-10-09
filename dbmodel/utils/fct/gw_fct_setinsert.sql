@@ -68,6 +68,12 @@ v_feature json;
 v_message json;
 v_first boolean;
 v_error_context text;
+v_addparam json;
+v_idname_array text[];
+v_id_array text[];
+column_type_id_array text[];
+idname text;
+column_type_id character varying;
 
 BEGIN
 
@@ -97,6 +103,70 @@ BEGIN
 	v_fields := ((p_data ->> 'data')::json->> 'fields')::json;
 
 	select array_agg(row_to_json(a)) into v_text from json_each(v_fields)a;
+
+	-- Get if view has composite primary key
+	IF v_idname ISNULL THEN
+
+		-- Manage primary key
+		EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_addparam USING v_tablename;
+		v_idname_array := string_to_array(v_idname, ', ');
+		if v_idname_array is null THEN
+			EXECUTE 'SELECT gw_fct_getpkeyfield('''||v_tablename||''');' INTO v_idname;
+			v_idname_array := string_to_array(v_idname, ', ');
+		end if;
+
+		v_id_array := string_to_array(v_id, ', ');
+		IF v_idname IS NOT NULL then
+
+			FOREACH idname IN ARRAY v_idname_array LOOP
+				EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+				    JOIN pg_class t on a.attrelid = t.oid
+				    JOIN pg_namespace s on t.relnamespace = s.oid
+				    WHERE a.attnum > 0
+				    AND NOT a.attisdropped
+				    AND a.attname = $3
+				    AND t.relname = $2
+				    AND s.nspname = $1
+				    ORDER BY a.attnum'
+			    USING v_schemaname, v_tablename, idname
+			    INTO column_type_id;
+
+				column_type_id_array[i] := column_type_id;
+				i=i+1;
+			END LOOP;
+		END IF;
+	END IF;
+
+	--  Get id column, for tables is the key column
+	IF v_idname ISNULL THEN
+		EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
+	        INTO v_idname
+	        USING v_tablename;
+    END IF;
+
+	-- For views it suposse pk is the first column
+	IF v_idname ISNULL THEN
+		EXECUTE '
+		SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
+		AND t.relname = $1
+		AND s.nspname = $2
+		ORDER BY a.attnum LIMIT 1'
+		INTO v_idname
+		USING v_tablename, v_schemaname;
+	END IF;
+
+	--   Get id column type
+	EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+	    JOIN pg_class t on a.attrelid = t.oid
+	    JOIN pg_namespace s on t.relnamespace = s.oid
+	    WHERE a.attnum > 0
+	    AND NOT a.attisdropped
+	    AND a.attname = $3
+	    AND t.relname = $2
+	    AND s.nspname = $1
+	    ORDER BY a.attnum'
+            USING v_schemaname, v_tablename, v_idname
+            INTO column_type_id;
 
 	-- query text, step1
 	v_querytext := 'INSERT INTO ' || quote_ident(v_tablename) ||' (';
