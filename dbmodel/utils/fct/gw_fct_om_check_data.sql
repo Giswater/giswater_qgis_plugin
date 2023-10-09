@@ -600,7 +600,7 @@ BEGIN
 		FROM node n, link l
 		JOIN '||v_edit||'connec c ON l.feature_id = c.connec_id 
 		WHERE st_dwithin(n.the_geom, st_endpoint(l.the_geom), 0.01)
-		AND exit_type = ''NODE'' 
+		AND exit_type IN (''NODE'', ''ARC'')
 		AND l.feature_type = ''CONNEC'' AND n.state=1 and c.state = 1 and l.state=1
 		ORDER BY feature_type, link_id';
 
@@ -630,7 +630,7 @@ BEGIN
 				FROM node n, link l
 				JOIN '||v_edit||'gully c ON l.feature_id = c.gully_id 
 				WHERE st_dwithin(n.the_geom, st_endpoint(l.the_geom), 0.01)
-				AND exit_type = ''NODE'' 
+				AND exit_type IN (''NODE'', ''ARC'')
 				AND l.feature_type = ''GULLY'' AND n.state=1 and c.state = 1 and l.state=1
 				ORDER BY feature_type, link_id';
 
@@ -795,7 +795,7 @@ BEGIN
 		VALUES (v_fid, 1, '264','INFO: No features with end date earlier than built date',v_count);
 	END IF;
 
-	RAISE NOTICE '27 - Automatic links with more than 100 mts (longitude out-of-range) (265)';
+	RAISE NOTICE '27 - Automatic links with more than 100 mts (length out-of-range) (265)';
 
 	EXECUTE 'SELECT count(*) FROM '||v_edit||'link where st_length(the_geom) > 100'
 	INTO v_count;
