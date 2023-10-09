@@ -800,7 +800,7 @@ class GwNetscenarioManagerButton(GwAction):
             result = tools_db.execute_sql(sql)
         else:
             sql = f"INSERT INTO {view} VALUES ({self.selected_netscenario_id}, '{feature_id}');"
-            result = tools_db.execute_sql(sql)
+            result = tools_db.execute_sql(sql, show_exception=False)
 
 
         if p_feature_id is None:
