@@ -279,7 +279,7 @@ class GwEpaFileManager(GwTask):
         tools_log.log_info(f"Write inp file........: {folder_path}")
 
         # Generate generic INP file
-        file_inp = open(folder_path, "w")
+        file_inp = open(folder_path, "w", errors='replace')
         read = True
         for row in all_rows:
             # Use regexp to check which targets to read (everyone except GULLY)
@@ -300,7 +300,7 @@ class GwEpaFileManager(GwTask):
 
             # Replace extension .inp
             aditional_path = folder_path.replace('.inp', f'.dat')
-            aditional_file = open(aditional_path, "w")
+            aditional_file = open(aditional_path, "w", errors='replace')
             read = True
             save_file = False
             for row in all_rows:
@@ -403,10 +403,10 @@ class GwEpaFileManager(GwTask):
             # Replace the velocities
             try:
                 # Read the contents of the file
-                with open(file_path, "r+") as file:
+                with open(file_path, "r+", errors='replace') as file:
                     contents = file.read()
                 # Save a backup of the file
-                with open(f"{file_path}.old", 'w', encoding='utf-8') as file:
+                with open(f"{file_path}.old", 'w', encoding='utf-8', errors='replace') as file:
                     file.write(contents)
                 # Replace the words
                 old_contents = contents
@@ -414,14 +414,14 @@ class GwEpaFileManager(GwTask):
                 if contents != old_contents:
                     self.replaced_velocities = True
                 # Write the file with new contents
-                with open(file_path, "r+") as file:
+                with open(file_path, "r+", errors='replace') as file:
                     file.write(contents)
-                with open(f"{file_path}", 'w', encoding='utf-8') as file:
+                with open(f"{file_path}", 'w', encoding='utf-8', errors='replace') as file:
                     file.write(contents)
             except Exception as e:
                 tools_log.log_error(f"Exception when replacing rpt velocities: {e}")
 
-        self.file_rpt = open(file_path, "r+")
+        self.file_rpt = open(file_path, "r+", errors='replace')
         full_file = self.file_rpt.readlines()
         progress = 0
 

@@ -79,7 +79,7 @@ def set_epa_world(_set_epa_world=None, selector_change=False, is_init=False):
                 if style_manager.setCurrentStyle("GwEpaStyle"):
                     pass
                 else:
-                    style_id = epa_style[f"{layer.name()}"]
+                    style_id = epa_style.get(f"{layer.name()}", 204)
                     tools_gw.set_layer_style(style_id, layer, True)
 
         sectors = _get_sectors()

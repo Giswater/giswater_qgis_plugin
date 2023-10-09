@@ -2298,6 +2298,46 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 	<context>
 		<name>admin_addfields</name>
 		<message>
+			<source>btn_accept</source>
+			<translation>Aceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Aceptar</translation>
+		</message>
+		<message>
+			<source>lbl_field_name</source>
+			<translation>Nombre del campo:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_field_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>lbl_widgetcontrols</source>
+			<translation>Controles del widget:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_widgetcontrols</source>
+			<translation>Ejemplo de la configuración {"widgetdim": 150,"setMultiline":true,"vdefault": "01-01-2014", "filterSign": ">}</translation>
+		</message>
+		<message>
+			<source>lbl_widget_type</source>
+			<translation>Tipo de widget:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_widget_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>tab_update</source>
 			<translation>Actualizar</translation>
 		</message>
@@ -2306,11 +2346,27 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_widget_function</source>
+			<translation>Función del widget:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_widget_function</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_column_id</source>
 			<translation>Nombre columna:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_column_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_editability</source>
+			<translation>Editabilidad:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_editability</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -2327,14 +2383,6 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>tooltip_grb_additional</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_null_value</source>
-			<translation>Valor nulo:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_null_value</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -2362,211 +2410,19 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_widget_type</source>
-			<translation>Tipo de widget:</translation>
+			<source>lbl_auto_update</source>
+			<translation>Auto actualizable:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_widget_type</source>
+			<source>tooltip_lbl_auto_update</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_delete</source>
-			<translation>Borrar</translation>
+			<source>lbl_null_value</source>
+			<translation>Valor nulo:</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_typeahead</source>
-			<translation>Mecanografiar:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_typeahead</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_tooltip</source>
-			<translation>Tooltip:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_tooltip</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_stylesheet</source>
-			<translation>Hoja de estilo:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_stylesheet</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_placeholder</source>
-			<translation>Marcador de posición</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_placeholder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_linkedobject</source>
-			<translation>Objeto vinculado:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_linkedobject</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_field_name</source>
-			<translation>Nombre del campo:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_field_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_action_function</source>
-			<translation>Función de acción:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_action_function</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_main_addfields</source>
-			<translation>Diálogo</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_main_addfields</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_data_type</source>
-			<translation>Tipo dato:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_data_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_form_type</source>
-			<translation>Tipo formulario:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_form_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_parent_id</source>
-			<translation>Id del padre:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_parent_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>lbl_parent</source>
-			<translation>Es padre:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_parent</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_widgetcontrols</source>
-			<translation>Controles del widget:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_widgetcontrols</source>
-			<translation>Ejemplo de la configuración {"widgetdim": 150,"setMultiline":true,"vdefault": "01-01-2014", "filterSign": ">}</translation>
-		</message>
-		<message>
-			<source>lbl_query_text</source>
-			<translation>Texto de consulta:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_query_text</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_create</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_query_filter</source>
-			<translation>Filtro texto consulta:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_query_filter</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_reload_field</source>
-			<translation>Recargar campo:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_reload_field</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_num_dec</source>
-			<translation>Número decimales:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_num_dec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_not_update</source>
-			<translation>No actualizado:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_not_update</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_mandatory</source>
-			<translation>Obligatorio:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_mandatory</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_enabled</source>
-			<translation>Habilitado:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_enabled</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Aceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Aceptar</translation>
-		</message>
-		<message>
-			<source>grb_mandatory</source>
-			<translation>Configuración obligatoria de campos añadidos</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_mandatory</source>
+			<source>tooltip_lbl_null_value</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -2578,27 +2434,171 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_auto_update</source>
-			<translation>Auto actualizable:</translation>
+			<source>grb_mandatory</source>
+			<translation>Configuración obligatoria de campos añadidos</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_auto_update</source>
+			<source>tooltip_grb_mandatory</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_widget_function</source>
-			<translation>Función del widget:</translation>
+			<source>lbl_enabled</source>
+			<translation>Habilitado:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_widget_function</source>
+			<source>tooltip_lbl_enabled</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_editability</source>
-			<translation>Editabilidad:</translation>
+			<source>lbl_mandatory</source>
+			<translation>Obligatorio:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_editability</source>
+			<source>tooltip_lbl_mandatory</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_not_update</source>
+			<translation>No actualizado:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_not_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_num_dec</source>
+			<translation>Número decimales:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_num_dec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_reload_field</source>
+			<translation>Recargar campo:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_reload_field</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_query_filter</source>
+			<translation>Filtro texto consulta:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_query_filter</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_create</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_query_text</source>
+			<translation>Texto de consulta:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_query_text</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_parent</source>
+			<translation>Es padre:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_parent</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_parent_id</source>
+			<translation>Id del padre:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_parent_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_form_type</source>
+			<translation>Tipo formulario:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_form_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_data_type</source>
+			<translation>Tipo dato:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_data_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_main_addfields</source>
+			<translation>Diálogo</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_main_addfields</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_action_function</source>
+			<translation>Función de acción:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_action_function</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_linkedobject</source>
+			<translation>Objeto vinculado:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_linkedobject</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_placeholder</source>
+			<translation>Marcador de posición</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_placeholder</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_stylesheet</source>
+			<translation>Hoja de estilo:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_stylesheet</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_tooltip</source>
+			<translation>Tooltip:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_tooltip</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_typeahead</source>
+			<translation>Mecanografiar:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_typeahead</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_delete</source>
+			<translation>Borrar</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_delete</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -2613,19 +2613,19 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Aceptar</translation>
 		</message>
 		<message>
+			<source>lbl_connec</source>
+			<translation>Conexión:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>dlg_main_credentials</source>
 			<translation>Diálogo</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_credentials</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_user_name</source>
-			<translation>Nombre de usuario:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_user_name</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -2637,6 +2637,14 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_user_name</source>
+			<translation>Nombre de usuario:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_user_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_connection_message</source>
 			<translation>No se pudieron recuperar los parámetros de conexión para:</translation>
 		</message>
@@ -2644,23 +2652,47 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<source>tooltip_lbl_connection_message</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>lbl_connec</source>
-			<translation>Conexión:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_connec</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>admin_dbproject</name>
+		<message>
+			<source>lbl_project_name</source>
+			<translation>Nombre proyecto:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_project_name</source>
+			<translation>Nombre de un esquema nuevo. El nombre debe escribirse en minúsculas, utilizando solo letras del alfabeto inglés y sin espacios ni guiones</translation>
+		</message>
 		<message>
 			<source>dlg_main_dbproject</source>
 			<translation>Crear proyecto</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_dbproject</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Cerrar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Cerrar</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Aceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Aceptar</translation>
+		</message>
+		<message>
+			<source>btn_push_file</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_push_file</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -2672,6 +2704,33 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Identificador de la referencia espacial. Solo se permiten los valores que se muestran en la tabla</translation>
 		</message>
 		<message>
+			<source>grb_projectschema</source>
+			<translation>Configuracion del esquema de proyecto</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_projectschema</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_locale</source>
+			<translation>Idioma:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_locale</source>
+			<translation>Idioma del esquema</translation>
+		</message>
+	</context>
+	<context>
+		<name>admin_gisproject</name>
+		<message>
+			<source>btn_gis_folder</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_gis_folder</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_close</source>
 			<translation>Cerrar</translation>
 		</message>
@@ -2688,54 +2747,19 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Aceptar</translation>
 		</message>
 		<message>
-			<source>lbl_locale</source>
-			<translation>Idioma:</translation>
+			<source>lbl_export_user_pass</source>
+			<translation>Exportar contraseña usuario:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_locale</source>
-			<translation>Idioma del esquema</translation>
-		</message>
-		<message>
-			<source>btn_push_file</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_push_file</source>
+			<source>tooltip_lbl_export_user_pass</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>grb_projectschema</source>
-			<translation>Configuracion del esquema de proyecto</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_projectschema</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_project_name</source>
-			<translation>Nombre proyecto:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_project_name</source>
-			<translation>Nombre de un esquema nuevo. El nombre debe escribirse en minúsculas, utilizando solo letras del alfabeto inglés y sin espacios ni guiones</translation>
-		</message>
-	</context>
-	<context>
-		<name>admin_gisproject</name>
 		<message>
 			<source>lbl_gis_folder</source>
 			<translation>Carpeta:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_gis_folder</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_gis_folder</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_gis_folder</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -2747,6 +2771,14 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>dlg_main_gisproject</source>
+			<translation>Crear proyecto QGIS</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_main_gisproject</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_gis_file</source>
 			<translation>Nombre archivo QGIS:</translation>
 		</message>
@@ -2754,14 +2786,9 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<source>tooltip_lbl_gis_file</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Aceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Aceptar</translation>
-		</message>
+	</context>
+	<context>
+		<name>admin_importinp</name>
 		<message>
 			<source>btn_close</source>
 			<translation>Cerrar</translation>
@@ -2771,30 +2798,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Cerrar</translation>
 		</message>
 		<message>
-			<source>dlg_main_gisproject</source>
-			<translation>Crear proyecto QGIS</translation>
+			<source>tab_config</source>
+			<translation>Configuración</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_main_gisproject</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_export_user_pass</source>
-			<translation>Exportar contraseña usuario:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_export_user_pass</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>admin_importinp</name>
-		<message>
-			<source>btn_run</source>
-			<translation>Ejecutar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_run</source>
+			<source>tooltip_tab_config</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -2806,11 +2814,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_config</source>
-			<translation>Configuración</translation>
+			<source>btn_run</source>
+			<translation>Ejecutar</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_config</source>
+			<source>tooltip_btn_run</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -2821,23 +2829,15 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<source>tooltip_dlg_main_importinp</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Cerrar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Cerrar</translation>
-		</message>
 	</context>
 	<context>
 		<name>admin_projectinfo</name>
 		<message>
-			<source>dlg_main_projectinfo</source>
-			<translation>Actualizar SQL</translation>
+			<source>lbl_info</source>
+			<translation>Información sobre nuevas actualizaciones</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_main_projectinfo</source>
+			<source>tooltip_lbl_info</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -2849,11 +2849,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_info</source>
-			<translation>Información sobre nuevas actualizaciones</translation>
+			<source>dlg_main_projectinfo</source>
+			<translation>Actualizar SQL</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_info</source>
+			<source>tooltip_dlg_main_projectinfo</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -2868,11 +2868,27 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 	<context>
 		<name>admin_qtdialog</name>
 		<message>
-			<source>btn_path</source>
-			<translation>...</translation>
+			<source>btn_accept</source>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_path</source>
+			<source>tooltip_btn_accept</source>
+			<translation>Aceptar</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>lbl_path</source>
+			<translation>Ruta UI</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_path</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -2884,35 +2900,19 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_path</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_formname</source>
 			<translation>Nombre formulario:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_formname</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Aceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Aceptar</translation>
-		</message>
-		<message>
-			<source>lbl_path</source>
-			<translation>Ruta UI</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_path</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -2962,22 +2962,6 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>grb_basic_conf</source>
-			<translation>Configuracíon básica</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_basic_conf</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_additional_conf</source>
-			<translation>Configuracíon adicional</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_additional_conf</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_hidden</source>
 			<translation>Oculto:</translation>
 		</message>
@@ -2994,70 +2978,6 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_stylesheet</source>
-			<translation>Hoja de estilo:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_stylesheet</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_enabled</source>
-			<translation>Habilitado:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_enabled</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_editable</source>
-			<translation>Editable:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_editable</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_editability</source>
-			<translation>Editabilidad:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_editability</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_column_id</source>
-			<translation>Id columna:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_column_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_update</source>
-			<translation>Actualizar</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_update</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Aceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Aceptar</translation>
-		</message>
-		<message>
-			<source>btn_open</source>
-			<translation>Abrir</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_layout_name</source>
 			<translation>Nombre de diseño:</translation>
 		</message>
@@ -3066,19 +2986,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Cancelar</translation>
+			<source>grb_additional_conf</source>
+			<translation>Configuracíon adicional</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>tab_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_create</source>
+			<source>tooltip_grb_additional_conf</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3090,12 +3002,76 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Ejemplo de configuration keys {"widgetdim": 150,"setMultiline":true,"vdefault": "01-01-2014", "filterSign": ">}</translation>
 		</message>
 		<message>
+			<source>lbl_stylesheet</source>
+			<translation>Hoja de estilo:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_stylesheet</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>dlg_main_sysfields</source>
 			<translation>Diálogo</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_sysfields</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_create</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_open</source>
+			<translation>Abrir</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_column_id</source>
+			<translation>Id columna:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_column_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_editability</source>
+			<translation>Editabilidad:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_editability</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_editable</source>
+			<translation>Editable:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_editable</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_enabled</source>
+			<translation>Habilitado:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_enabled</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>lbl_layout_order</source>
@@ -3129,39 +3105,39 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<source>tooltip_lbl_tooltip</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Aceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Aceptar</translation>
+		</message>
+		<message>
+			<source>tab_update</source>
+			<translation>Actualizar</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_basic_conf</source>
+			<translation>Configuracíon básica</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_basic_conf</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>admin_translation</name>
-		<message>
-			<source>chk_db_msg</source>
-			<translation>Traducir mensajes base de datos</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_db_msg</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_py_msg</source>
-			<translation>Traducir formularios y mensajes python</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_py_msg</source>
-			<translation>None</translation>
-		</message>
 		<message>
 			<source>grb_translate_files</source>
 			<translation>Traducir archivos</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_translate_files</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_database</source>
-			<translation>Base de datos:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_database</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3181,11 +3157,35 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_host</source>
+			<translation>Anfitrión:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_host</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_py_msg</source>
+			<translation>Traducir formularios y mensajes python</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_py_msg</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_language</source>
 			<translation>Idioma:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_language</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_database</source>
+			<translation>Base de datos:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_database</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3197,14 +3197,6 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_host</source>
-			<translation>Anfitrión:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_host</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_user</source>
 			<translation>Usuario:</translation>
 		</message>
@@ -3213,11 +3205,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_scode</source>
-			<translation>Código fuente:</translation>
+			<source>chk_db_msg</source>
+			<translation>Traducir mensajes base de datos</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_scode</source>
+			<source>tooltip_chk_db_msg</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3226,6 +3218,14 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>tooltip_btn_connection</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_scode</source>
+			<translation>Código fuente:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_scode</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -3344,6 +3344,14 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>grb_conection</source>
+			<translation>Conexión</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_conection</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>grb_visit</source>
 			<translation>Visita</translation>
 		</message>
@@ -3373,14 +3381,6 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>tooltip_grb_files_generator</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_conection</source>
-			<translation>Conección</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_conection</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3667,11 +3667,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 	<context>
 		<name>admin_visitclass</name>
 		<message>
-			<source>btn_class_cancel</source>
-			<translation>Cancelar</translation>
+			<source>btn_class_ok</source>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_class_cancel</source>
+			<source>tooltip_btn_class_ok</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3683,11 +3683,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_viewname</source>
-			<translation>Ver nombre:</translation>
+			<source>btn_param_create</source>
+			<translation>Crear</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_viewname</source>
+			<source>tooltip_btn_param_create</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3699,75 +3699,19 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_param_create</source>
-			<translation>Crear</translation>
+			<source>lbl_class_name</source>
+			<translation>Nombre clase:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_param_create</source>
+			<source>tooltip_lbl_class_name</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_multi_feat</source>
-			<translation>Elemento múltiple:</translation>
+			<source>lbl_viewname</source>
+			<translation>Ver nombre:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_multi_feat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_param_update</source>
-			<translation>Actualizar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_param_update</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>lbl_active</source>
-			<translation>Activo:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_active</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_param_opt</source>
-			<translation>Opciones parámetro:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_param_opt</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_param_delete</source>
-			<translation>Borrar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_param_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_main_visitclass</source>
-			<translation>Gestionar clase de visita</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_main_visitclass</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_class_ok</source>
-			<translation>Aceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_class_ok</source>
+			<source>tooltip_lbl_viewname</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3779,11 +3723,43 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_class_name</source>
-			<translation>Nombre clase:</translation>
+			<source>btn_class_cancel</source>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_class_name</source>
+			<source>tooltip_btn_class_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_param_opt</source>
+			<translation>Opciones parámetro:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_param_opt</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>lbl_multi_feat</source>
+			<translation>Elemento múltiple:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_multi_feat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_main_visitclass</source>
+			<translation>Gestionar clase de visita</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_main_visitclass</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3795,11 +3771,35 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_param_update</source>
+			<translation>Actualizar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_param_update</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_param_delete</source>
+			<translation>Borrar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_param_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_feat_type</source>
 			<translation>Tipo de elemento:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_feat_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_active</source>
+			<translation>Activo:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_active</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3814,38 +3814,6 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 	<context>
 		<name>admin_visitparam</name>
 		<message>
-			<source>lbl_default_value</source>
-			<translation>Valor por defecto:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_default_value</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_main_visitparam</source>
-			<translation>Gestionar parámetro de visita</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_main_visitparam</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_query_text</source>
-			<translation>Texto de consulta:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_query_text</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_mandatory</source>
-			<translation>Obligatorio:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_mandatory</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_enabled</source>
 			<translation>Habilitado:</translation>
 		</message>
@@ -3854,27 +3822,35 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_short_descript</source>
-			<translation>Descripción corta:</translation>
+			<source>lbl_data_type</source>
+			<translation>Tipo dato:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_short_descript</source>
+			<source>tooltip_lbl_data_type</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_editable</source>
-			<translation>Editable:</translation>
+			<source>grb_params</source>
+			<translation>Parametros</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_editable</source>
+			<source>tooltip_grb_params</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_descript</source>
-			<translation>Descripción:</translation>
+			<source>lbl_parameter_name</source>
+			<translation>Nombre parámetro:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_descript</source>
+			<source>tooltip_lbl_parameter_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_main_visitparam</source>
+			<translation>Gestionar parámetro de visita</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_main_visitparam</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3894,27 +3870,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Cancelar</translation>
 		</message>
 		<message>
-			<source>grb_params</source>
-			<translation>Parametros</translation>
+			<source>btn_ok</source>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
-			<source>tooltip_grb_params</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_form_type</source>
-			<translation>Tipo formulario:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_form_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_data_type</source>
-			<translation>Tipo dato:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_data_type</source>
+			<source>tooltip_btn_ok</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3926,6 +3886,22 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_mandatory</source>
+			<translation>Obligatorio:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_mandatory</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_query_text</source>
+			<translation>Texto de consulta:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_query_text</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_code</source>
 			<translation>Código:</translation>
 		</message>
@@ -3934,19 +3910,43 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_ok</source>
-			<translation>Aceptar</translation>
+			<source>lbl_descript</source>
+			<translation>Descripción:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_ok</source>
+			<source>tooltip_lbl_descript</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_parameter_name</source>
-			<translation>Nombre parámetro:</translation>
+			<source>lbl_editable</source>
+			<translation>Editable:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_parameter_name</source>
+			<source>tooltip_lbl_editable</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_default_value</source>
+			<translation>Valor por defecto:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_default_value</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_short_descript</source>
+			<translation>Descripción corta:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_short_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_form_type</source>
+			<translation>Tipo formulario:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_form_type</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -3957,6 +3957,22 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Fusionar arco</translation>
 		</message>
 		<message>
+			<source>tab_loginfo</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_loginfo</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Aceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Aceptar</translation>
+		</message>
+		<message>
 			<source>btn_cancel</source>
 			<translation>Cancelar</translation>
 		</message>
@@ -3965,11 +3981,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Cancelar</translation>
 		</message>
 		<message>
-			<source>lbl_enddate</source>
-			<translation>Fecha de finalización:</translation>
+			<source>lbl_workcat_id_end</source>
+			<translation>Expdte baja:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_enddate</source>
+			<source>tooltip_lbl_workcat_id_end</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3981,36 +3997,20 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_enddate</source>
+			<translation>Fecha de finalización:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_enddate</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>dlg_arc_fusion</source>
 			<translation>Fusionar arco</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_arc_fusion</source>
 			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_loginfo</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_loginfo</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workcat_id_end</source>
-			<translation>Expdte baja:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workcat_id_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Aceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Aceptar</translation>
 		</message>
 	</context>
 	<context>
@@ -4021,91 +4021,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>tab_infolog</source>
-			<translation>Fugas</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_pipes</source>
-			<translation>Tuberías</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_pipes</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_buffer</source>
-			<translation>Distancia de buffer (m):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_buffer</source>
-			<translation>Distancia desde una fuga a la que se seleccionan las tuberías a las que se asigna esa fuga.</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
 			<translation>Info Log</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_infolog</source>
 			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_diameter</source>
-			<translation>Filtrar por diámetro:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_diameter</source>
-			<translation>Utiliza sólo tuberías que coincidan con el rango de diámetros del inicial.</translation>
-		</message>
-		<message>
-			<source>chk_all_leaks</source>
-			<translation>Utilizar todas las fugas</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_all_leaks</source>
-			<translation>Calcula las fugas por kilómetro y año utilizando todos los datos disponibles, independientemente del parámetro 'años a calcular'.</translation>
-		</message>
-		<message>
-			<source>lbl_diameter_range</source>
-			<translation>Rango de diámetro:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_diameter_range</source>
-			<translation>Rango de diámetros basado en factores de la tubería inicial.</translation>
-		</message>
-		<message>
-			<source>lbl_cluster_length</source>
-			<translation>Longitud del cluster (m):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cluster_length</source>
-			<translation>Suma máxima de longitudes de tubería dentro de un cluster, en metros.</translation>
-		</message>
-		<message>
-			<source>lbl_years</source>
-			<translation>Años a calcular:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_years</source>
-			<translation>Número de años de datos de fugas a tener en cuenta, en función de la antigüedad.</translation>
-		</message>
-		<message>
-			<source>lbl_builtdate_range</source>
-			<translation>Rango de fechas de construcción (años):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_builtdate_range</source>
-			<translation>Intervalo de fechas de construcción, en años anteriores y posteriores a la tubería inicial.</translation>
-		</message>
-		<message>
-			<source>lbl_builtdate</source>
-			<translation>Filtrar por fecha de instalación:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_builtdate</source>
-			<translation>Utiliza sólo las tuberías que coinciden con el intervalo de fechas de instalación de la inicial.</translation>
 		</message>
 		<message>
 			<source>dlg_assignation</source>
@@ -4124,12 +4044,76 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_diameter_range</source>
+			<translation>Rango de diámetro:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_diameter_range</source>
+			<translation>Rango de diámetros basado en factores de la tubería inicial.</translation>
+		</message>
+		<message>
+			<source>lbl_max_distance</source>
+			<translation>Distancia máxima (m):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_max_distance</source>
+			<translation>Distancia máxima, en metros, entre la tubería inicial y otras tuberías incluidas en el cluster.</translation>
+		</message>
+		<message>
+			<source>lbl_years</source>
+			<translation>Años a calcular:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_years</source>
+			<translation>Número de años de datos de fugas a tener en cuenta, en función de la antigüedad.</translation>
+		</message>
+		<message>
+			<source>lbl_builtdate_range</source>
+			<translation>Rango de fechas de construcción (años):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_builtdate_range</source>
+			<translation>Intervalo de fechas de construcción, en años anteriores y posteriores a la tubería inicial.</translation>
+		</message>
+		<message>
 			<source>lbl_material</source>
 			<translation>Filtrar por material:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_material</source>
 			<translation>Utiliza sólo tuberías del mismo material que el inicial.</translation>
+		</message>
+		<message>
+			<source>lbl_cluster_length</source>
+			<translation>Longitud del cluster (m):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cluster_length</source>
+			<translation>Suma máxima de longitudes de tubería dentro de un cluster, en metros.</translation>
+		</message>
+		<message>
+			<source>chk_all_leaks</source>
+			<translation>Utilizar todas las fugas</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_all_leaks</source>
+			<translation>Calcula las fugas por kilómetro y año utilizando todos los datos disponibles, independientemente del parámetro 'años a calcular'.</translation>
+		</message>
+		<message>
+			<source>lbl_pipes</source>
+			<translation>Tuberías</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_pipes</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_buffer</source>
+			<translation>Distancia de buffer (m):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_buffer</source>
+			<translation>Distancia desde una fuga a la que se seleccionan las tuberías a las que se asigna esa fuga.</translation>
 		</message>
 		<message>
 			<source>lbl_leaks</source>
@@ -4140,12 +4124,28 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_max_distance</source>
-			<translation>Distancia máxima (m):</translation>
+			<source>lbl_builtdate</source>
+			<translation>Filtrar por fecha de instalación:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_max_distance</source>
-			<translation>Distancia máxima, en metros, entre la tubería inicial y otras tuberías incluidas en el cluster.</translation>
+			<source>tooltip_lbl_builtdate</source>
+			<translation>Utiliza sólo las tuberías que coinciden con el intervalo de fechas de instalación de la inicial.</translation>
+		</message>
+		<message>
+			<source>lbl_diameter</source>
+			<translation>Filtrar por diámetro:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_diameter</source>
+			<translation>Utiliza sólo tuberías que coincidan con el rango de diámetros del inicial.</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Fugas</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
 		</message>
 	</context>
 	<context>
@@ -4161,6 +4161,14 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<message>
 			<source>tooltip_lbl_ins_radius</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>chk_deleete_prev</source>
@@ -4186,14 +4194,6 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<source>tooltip_dlg_auxcircle</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
 	</context>
 	<context>
 		<name>auxpoint</name>
@@ -4210,12 +4210,12 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_disty</source>
-			<translation>Distancia Y:</translation>
+			<source>btn_cancel</source>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_disty</source>
-			<translation>None</translation>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -4226,19 +4226,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Aceptar</translation>
 		</message>
 		<message>
-			<source>rb_right</source>
-			<translation>Punto final</translation>
+			<source>rb_left</source>
+			<translation>Punto inicial</translation>
 		</message>
 		<message>
-			<source>tooltip_rb_right</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_delete_prev</source>
-			<translation>Eliminar puntos anteriores</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_delete_prev</source>
+			<source>tooltip_rb_left</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4250,11 +4242,42 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>rb_left</source>
-			<translation>Punto inicial</translation>
+			<source>chk_delete_prev</source>
+			<translation>Eliminar puntos anteriores</translation>
 		</message>
 		<message>
-			<source>tooltip_rb_left</source>
+			<source>tooltip_chk_delete_prev</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>rb_right</source>
+			<translation>Punto final</translation>
+		</message>
+		<message>
+			<source>tooltip_rb_right</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_disty</source>
+			<translation>Distancia Y:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_disty</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>config</name>
+		<message>
+			<source>title</source>
+			<translation>Configuración</translation>
+		</message>
+		<message>
+			<source>tab_admin</source>
+			<translation>Admin</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_admin</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4265,12 +4288,21 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<source>tooltip_btn_cancel</source>
 			<translation>Cancelar</translation>
 		</message>
-	</context>
-	<context>
-		<name>config</name>
 		<message>
-			<source>title</source>
-			<translation>Configuración</translation>
+			<source>tab_featurecat</source>
+			<translation>Elemento de catálogo</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_featurecat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_basic</source>
+			<translation>Básico</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_basic</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>tab_addfields</source>
@@ -4278,6 +4310,14 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>tooltip_tab_addfields</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_config</source>
+			<translation>Configuración</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_config</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4296,46 +4336,6 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<source>tooltip_btn_accept</source>
 			<translation>Aceptar</translation>
 		</message>
-		<message>
-			<source>tab_admin</source>
-			<translation>Admin</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_admin</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_featurecat</source>
-			<translation>Elemento de catálogo</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_featurecat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_config</source>
-			<translation>Configuración</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_basic</source>
-			<translation>Básico</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_basic</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
 	</context>
 	<context>
 		<name>crm_trace</name>
@@ -4350,14 +4350,6 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 	</context>
 	<context>
 		<name>csv</name>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
 		<message>
 			<source>tab_preview</source>
 			<translation>Previsualizar</translation>
@@ -4391,6 +4383,30 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_file_csv</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_file_csv</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_set_of_charac</source>
+			<translation>Conjunto de caracteres</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_set_of_charac</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_info</source>
+			<translation>Información:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_delimiter</source>
 			<translation>Delimitador:</translation>
 		</message>
@@ -4407,30 +4423,6 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_set_of_charac</source>
-			<translation>Conjunto de caracteres</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_set_of_charac</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_info</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_file_csv</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_file_csv</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_accept</source>
 			<translation>Aceptar</translation>
 		</message>
@@ -4439,27 +4431,12 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Aceptar</translation>
 		</message>
 		<message>
-			<source>lbl_info</source>
-			<translation>Información:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>dlg_csv2pg</source>
 			<translation>Importar CSV</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_csv2pg</source>
 			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>dialog_table</name>
-		<message>
-			<source>title</source>
-			<translation>Diálogo</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -4470,12 +4447,19 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Cancelar</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Aceptar</translation>
+			<source>tab_info</source>
+			<translation>Info log</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Aceptar</translation>
+			<source>tooltip_tab_info</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>dialog_table</name>
+		<message>
+			<source>title</source>
+			<translation>Diálogo</translation>
 		</message>
 		<message>
 			<source>dlg_dialog_table</source>
@@ -4493,12 +4477,13 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<source>tooltip_btn_add_row</source>
 			<translation>None</translation>
 		</message>
-	</context>
-	<context>
-		<name>dialog_text</name>
 		<message>
-			<source>title</source>
-			<translation>Diálogo</translation>
+			<source>btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -4507,6 +4492,13 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<message>
 			<source>tooltip_btn_accept</source>
 			<translation>Aceptar</translation>
+		</message>
+	</context>
+	<context>
+		<name>dialog_text</name>
+		<message>
+			<source>title</source>
+			<translation>Diálogo</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -4517,6 +4509,14 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Cancelar</translation>
 		</message>
 		<message>
+			<source>dlg_dialog_text</source>
+			<translation>Diálogo</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_dialog_text</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_close</source>
 			<translation>Cerrar</translation>
 		</message>
@@ -4525,12 +4525,12 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_dialog_text</source>
-			<translation>Diálogo</translation>
+			<source>btn_accept</source>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_dialog_text</source>
-			<translation>None</translation>
+			<source>tooltip_btn_accept</source>
+			<translation>Aceptar</translation>
 		</message>
 	</context>
 	<context>
@@ -4540,11 +4540,19 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Dimensionamiento</translation>
 		</message>
 		<message>
-			<source>dlg_dimensioning</source>
-			<translation>Dimensionamiento</translation>
+			<source>btn_cancel</source>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_dimensioning</source>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>grb_other</source>
+			<translation>Otros</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_other</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4572,20 +4580,12 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>grb_other</source>
-			<translation>Otros</translation>
+			<source>dlg_dimensioning</source>
+			<translation>Dimensionamiento</translation>
 		</message>
 		<message>
-			<source>tooltip_grb_other</source>
+			<source>tooltip_dlg_dimensioning</source>
 			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
 		</message>
 	</context>
 	<context>
@@ -4593,22 +4593,6 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<message>
 			<source>title</source>
 			<translation>Documento</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>lbl_observ</source>
-			<translation>Observaciones:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_observ</source>
-			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_path_doc</source>
@@ -4619,12 +4603,20 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Ruta</translation>
 		</message>
 		<message>
-			<source>btn_snapping</source>
+			<source>dlg_doc</source>
+			<translation>Documento</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_doc</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_snapping</source>
-			<translation>Snapping</translation>
+			<source>btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>path</source>
@@ -4635,20 +4627,12 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Completar con alguna ruta de carpeta accesible o ruta web</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Aceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Aceptar</translation>
-		</message>
-		<message>
-			<source>tab_doc</source>
-			<translation>Documento</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_doc</source>
+			<source>btn_snapping</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>Snapping</translation>
 		</message>
 		<message>
 			<source>tab_arc</source>
@@ -4659,59 +4643,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Arco</translation>
 		</message>
 		<message>
-			<source>tab_node</source>
-			<translation>Nodo</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>Nodo</translation>
-		</message>
-		<message>
-			<source>btn_path_url</source>
-			<translation>Web</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_path_url</source>
-			<translation>Abra el explorador para permitir la selección de la ruta web. También es posible simplemente pegar la ruta en el cuadro de enlace de texto </translation>
-		</message>
-		<message>
-			<source>_dlg_doc</source>
+			<source>tab_doc</source>
 			<translation>Documento</translation>
 		</message>
 		<message>
-			<source>tooltip__dlg_doc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Sumidero</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>Sumidero</translation>
-		</message>
-		<message>
-			<source>lbl_link</source>
-			<translation>Enlace:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_link</source>
-			<translation>Enlace</translation>
-		</message>
-		<message>
-			<source>lbl_doc_type</source>
-			<translation>Tipo doc:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_doc_type</source>
-			<translation>Tipo documento</translation>
-		</message>
-		<message>
-			<source>dlg_doc</source>
-			<translation>Documento</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_doc</source>
+			<source>tooltip_tab_doc</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4731,12 +4667,36 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_delete</source>
+			<source>btn_accept</source>
+			<translation>Aceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Aceptar</translation>
+		</message>
+		<message>
+			<source>lbl_observ</source>
+			<translation>Observaciones:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_observ</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Eliminar</translation>
+			<source>btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>tab_gully</source>
+			<translation>Sumidero</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_gully</source>
+			<translation>Sumidero</translation>
 		</message>
 		<message>
 			<source>lbl_doc_id</source>
@@ -4754,20 +4714,52 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<source>tooltip_btn_insert</source>
 			<translation>Insertar</translation>
 		</message>
+		<message>
+			<source>lbl_link</source>
+			<translation>Enlace:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_link</source>
+			<translation>Enlace</translation>
+		</message>
+		<message>
+			<source>lbl_doc_type</source>
+			<translation>Tipo doc:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_doc_type</source>
+			<translation>Tipo documento</translation>
+		</message>
+		<message>
+			<source>btn_path_url</source>
+			<translation>Web</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_path_url</source>
+			<translation>Abra el explorador para permitir la selección de la ruta web. También es posible simplemente pegar la ruta en el cuadro de enlace de texto </translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Nodo</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>Nodo</translation>
+		</message>
+		<message>
+			<source>_dlg_doc</source>
+			<translation>Documento</translation>
+		</message>
+		<message>
+			<source>tooltip__dlg_doc</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>doc_manager</name>
 		<message>
 			<source>title</source>
 			<translation>Gestor de documentos</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cerrar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
@@ -4778,6 +4770,14 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Eliminar</translation>
 		</message>
 		<message>
+			<source>dlg_doc_manager</source>
+			<translation>Gestor de documentos</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_doc_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_doc_id</source>
 			<translation>Filtrar por: Id doc</translation>
 		</message>
@@ -4786,30 +4786,30 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_doc_manager</source>
-			<translation>Gestor de documentos</translation>
+			<source>btn_cancel</source>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_doc_manager</source>
-			<translation>None</translation>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
 		</message>
 	</context>
 	<context>
 		<name>dscenario_manager</name>
+		<message>
+			<source>btn_delete</source>
+			<translation>Borrar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>None</translation>
+		</message>
 		<message>
 			<source>btn_duplicate</source>
 			<translation>Duplicar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_duplicate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_create</source>
-			<translation>Crear</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4821,19 +4821,19 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_update</source>
 			<translation>Actualizar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Borrar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -4844,20 +4844,60 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Elemento</translation>
 		</message>
 		<message>
-			<source>lbl_link</source>
-			<translation>Enlace:</translation>
+			<source>lbl_element_id</source>
+			<translation>Id elemento:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_link</source>
-			<translation>Enlace</translation>
-		</message>
-		<message>
-			<source>btn_snapping</source>
+			<source>tooltip_lbl_element_id</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_snapping</source>
-			<translation>Snapping</translation>
+			<source>lbl_verified</source>
+			<translation>Verificado:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_verified</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_elementcad_id</source>
+			<translation>Id elemento catálogo:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_elementcad_id</source>
+			<translation>Catálogo</translation>
+		</message>
+		<message>
+			<source>btn_add_geom</source>
+			<translation>Añadir geometría</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_geom</source>
+			<translation>Añadir geometría</translation>
+		</message>
+		<message>
+			<source>lbl_num_element</source>
+			<translation>Número de elemento:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_num_element</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_element</source>
+			<translation>Elemento</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_element</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>lbl_workcat_id</source>
@@ -4866,6 +4906,14 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<message>
 			<source>tooltip_lbl_workcat_id</source>
 			<translation>Expediente alta</translation>
+		</message>
+		<message>
+			<source>lbl_builtdate</source>
+			<translation>Fecha construcción:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_builtdate</source>
+			<translation>Fecha alta</translation>
 		</message>
 		<message>
 			<source>tab_connec</source>
@@ -4924,60 +4972,12 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Arco</translation>
 		</message>
 		<message>
-			<source>lbl_buildercat_id</source>
-			<translation>Constructor:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_buildercat_id</source>
-			<translation>Constructor</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>tab_element</source>
-			<translation>Elemento</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_element</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_accept</source>
 			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
 			<translation>Aceptar</translation>
-		</message>
-		<message>
-			<source>lbl_num_element</source>
-			<translation>Número de elemento:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_num_element</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_element_id</source>
-			<translation>Id elemento:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_element_id</source>
-			<translation>None</translation>
 		</message>
 		<message>
 			<source>tab_gully</source>
@@ -4988,36 +4988,12 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Sumidero</translation>
 		</message>
 		<message>
-			<source>btn_add_geom</source>
-			<translation>Añadir geometría</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_geom</source>
-			<translation>Añadir geometría</translation>
-		</message>
-		<message>
-			<source>lbl_element_type</source>
-			<translation>Tipo elemento:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_element_type</source>
-			<translation>Tipo elemento</translation>
-		</message>
-		<message>
 			<source>lbl_state_type</source>
 			<translation>Tipo estado:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_state_type</source>
 			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_elementcad_id</source>
-			<translation>Id elemento catálogo:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_elementcad_id</source>
-			<translation>Catálogo</translation>
 		</message>
 		<message>
 			<source>lbl_state</source>
@@ -5036,28 +5012,12 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_verified</source>
-			<translation>Verificado:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_verified</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_code</source>
 			<translation>Código:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_code</source>
 			<translation>Código</translation>
-		</message>
-		<message>
-			<source>lbl_location_type</source>
-			<translation>Tipo ubicación:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_location_type</source>
-			<translation>Ubicación</translation>
 		</message>
 		<message>
 			<source>lbl_rotation</source>
@@ -5076,6 +5036,46 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Relaciones</translation>
 		</message>
 		<message>
+			<source>lbl_link</source>
+			<translation>Enlace:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_link</source>
+			<translation>Enlace</translation>
+		</message>
+		<message>
+			<source>lbl_location_type</source>
+			<translation>Tipo ubicación:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_location_type</source>
+			<translation>Ubicación</translation>
+		</message>
+		<message>
+			<source>lbl_element_type</source>
+			<translation>Tipo elemento:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_element_type</source>
+			<translation>Tipo elemento</translation>
+		</message>
+		<message>
+			<source>lbl_buildercat_id</source>
+			<translation>Constructor:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_buildercat_id</source>
+			<translation>Constructor</translation>
+		</message>
+		<message>
+			<source>btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>Snapping</translation>
+		</message>
+		<message>
 			<source>btn_insert</source>
 			<translation>None</translation>
 		</message>
@@ -5092,12 +5092,12 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_builtdate</source>
-			<translation>Fecha construcción:</translation>
+			<source>btn_cancel</source>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_builtdate</source>
-			<translation>Fecha alta</translation>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
 		</message>
 	</context>
 	<context>
@@ -5115,19 +5115,19 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Eliminar</translation>
 		</message>
 		<message>
-			<source>lbl_element_id</source>
-			<translation>Filtrar por: Id elemento</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_element_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>dlg_element_manager</source>
 			<translation>Gestor de elementos</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_element_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_element_id</source>
+			<translation>Filtrar por: Id elemento</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_element_id</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5142,11 +5142,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 	<context>
 		<name>epa_compare</name>
 		<message>
-			<source>lbl_result_name_to_show</source>
-			<translation>Nombre del resultado (para mostrar):</translation>
+			<source>lbl_time_to_compare</source>
+			<translation>Hora (para comparar):</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_result_name_to_show</source>
+			<source>tooltip_lbl_time_to_compare</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5158,11 +5158,27 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_selector_date</source>
-			<translation>Selector de fecha:</translation>
+			<source>lbl_result_name_to_compare</source>
+			<translation>Nombre del resultado (para comparar):</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_selector_date</source>
+			<source>tooltip_lbl_result_name_to_compare</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_time_to_show</source>
+			<translation>Hora (para mostrar):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_time_to_show</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_compare_time</source>
+			<translation>Comparar hora:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_compare_time</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5182,51 +5198,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Aceptar</translation>
 		</message>
 		<message>
-			<source>lbl_compare_time</source>
-			<translation>Comparar hora:</translation>
+			<source>tab_result</source>
+			<translation>Resultado</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_compare_time</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_selector</source>
-			<translation>Selector</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_selector</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_name_to_compare</source>
-			<translation>Nombre del resultado (para comparar):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_name_to_compare</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>tab_time</source>
-			<translation>Hora:</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_time</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_time_to_compare</source>
-			<translation>Hora (para comparar):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_time_to_compare</source>
+			<source>tooltip_tab_result</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5238,19 +5214,43 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_result</source>
-			<translation>Resultado</translation>
+			<source>lbl_selector_date</source>
+			<translation>Selector de fecha:</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_result</source>
+			<source>tooltip_lbl_selector_date</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_time_to_show</source>
-			<translation>Hora (para mostrar):</translation>
+			<source>tab_time</source>
+			<translation>Hora:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_time_to_show</source>
+			<source>tooltip_tab_time</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>dlg_selector</source>
+			<translation>Selector</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_selector</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_name_to_show</source>
+			<translation>Nombre del resultado (para mostrar):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_name_to_show</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -5258,15 +5258,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<name>fastprint</name>
 		<message>
 			<source>title</source>
-			<translation>Diálogo</translation>
-		</message>
-		<message>
-			<source>grb_map_options</source>
-			<translation>Opciones de mapa:</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_map_options</source>
-			<translation>None</translation>
+			<translation>Impresión rápida</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -5277,19 +5269,27 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Cerrar</translation>
 		</message>
 		<message>
-			<source>dlg_fastprint</source>
-			<translation>Diálogo</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_fastprint</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_preview</source>
 			<translation>Vista previa</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_preview</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_print</source>
+			<translation>Imprimir</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_print</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_map_options</source>
+			<translation>Opciones de mapa:</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_map_options</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5301,11 +5301,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_print</source>
-			<translation>Imprimir</translation>
+			<source>dlg_fastprint</source>
+			<translation>Impresión rápida</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_print</source>
+			<source>tooltip_dlg_fastprint</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -5316,11 +5316,35 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Borrar elemento</translation>
 		</message>
 		<message>
-			<source>tab_info_log</source>
-			<translation>Info log</translation>
+			<source>btn_cancel</source>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_info_log</source>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>lbl_feature_id</source>
+			<translation>Id elemento</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_feature_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_feature_type</source>
+			<translation>Tipo de elemento:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_feature_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_relations</source>
+			<translation>Mostrar relaciones del elemento</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_relations</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5332,12 +5356,28 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Cancelar</translation>
+			<source>btn_delete</source>
+			<translation>Borrar elemento seleccionado</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
+			<source>tooltip_btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>tab_info_log</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_info_log</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>Snapping</translation>
 		</message>
 		<message>
 			<source>tab_del_feature</source>
@@ -5355,13 +5395,12 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<source>tooltip_dlg_feature_delete</source>
 			<translation>None</translation>
 		</message>
+	</context>
+	<context>
+		<name>feature_end</name>
 		<message>
-			<source>lbl_feature_type</source>
-			<translation>Tipo de elemento:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_feature_type</source>
-			<translation>None</translation>
+			<source>title</source>
+			<translation>Dar de baja</translation>
 		</message>
 		<message>
 			<source>btn_snapping</source>
@@ -5372,131 +5411,12 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Snapping</translation>
 		</message>
 		<message>
-			<source>btn_relations</source>
-			<translation>Mostrar relaciones del elemento</translation>
+			<source>lbl_description</source>
+			<translation>Descripción:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_relations</source>
+			<source>tooltip_lbl_description</source>
 			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Borrar elemento seleccionado</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>lbl_feature_id</source>
-			<translation>Id elemento</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_feature_id</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>feature_end</name>
-		<message>
-			<source>title</source>
-			<translation>Dar de baja</translation>
-		</message>
-		<message>
-			<source>btn_new_workcat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_new_workcat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workcat_id_end</source>
-			<translation>Expdte baja:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workcat_id_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_arc</source>
-			<translation>Arco</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_arc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Aceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Aceptar</translation>
-		</message>
-		<message>
-			<source>tab_elem</source>
-			<translation>Elemento</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_elem</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_connec</source>
-			<translation>Acometida</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_insert</source>
-			<translation>Insertar</translation>
-		</message>
-		<message>
-			<source>tab_node</source>
-			<translation>Nodo</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_node</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_gully</source>
-			<translation>Sumidero</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_gully</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_workcat</source>
-			<translation>Expediente</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_workcat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>tab_relations</source>
@@ -5507,19 +5427,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Relaciones</translation>
 		</message>
 		<message>
-			<source>lbl_description</source>
-			<translation>Descripción:</translation>
+			<source>tab_gully</source>
+			<translation>Sumidero</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_description</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workcat_date</source>
-			<translation>Fecha expdte:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workcat_date</source>
+			<source>tooltip_tab_gully</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5531,19 +5443,51 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_snapping</source>
+			<source>tab_elem</source>
+			<translation>Elemento</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_elem</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_snapping</source>
-			<translation>Snapping</translation>
+			<source>tab_workcat</source>
+			<translation>Expediente</translation>
 		</message>
 		<message>
-			<source>lbl_enddate</source>
-			<translation>Fecha de finalización:</translation>
+			<source>tooltip_tab_workcat</source>
+			<translation>None</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_enddate</source>
+			<source>tab_connec</source>
+			<translation>Acometida</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_arc</source>
+			<translation>Arco</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_arc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_workcat_id_end</source>
+			<translation>Expdte baja:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workcat_id_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_new_workcat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_new_workcat</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5554,20 +5498,68 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<source>tooltip_dlg_feature_end</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>lbl_enddate</source>
+			<translation>Fecha de finalización:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_enddate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_workcat_date</source>
+			<translation>Fecha expdte:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workcat_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Aceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Aceptar</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>tab_node</source>
+			<translation>Nodo</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_node</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_insert</source>
+			<translation>Insertar</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
+		</message>
 	</context>
 	<context>
 		<name>feature_end_connec</name>
 		<message>
 			<source>title</source>
 			<translation>Elementos desconectados de tramo</translation>
-		</message>
-		<message>
-			<source>lbl_info</source>
-			<translation>Lista de elementos que quedarán desconectados cuando los tramos seleccionados sean dados de baja:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_info</source>
-			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_filter_by</source>
@@ -5578,11 +5570,27 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_accept</source>
+			<translation>Aceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Aceptar</translation>
+		</message>
+		<message>
 			<source>dlg_feature_end_connec</source>
 			<translation>Elementos desconectados de tramo</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_feature_end_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_info</source>
+			<translation>Lista de elementos que quedarán desconectados cuando los tramos seleccionados sean dados de baja:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_info</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5593,14 +5601,6 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<source>tooltip_btn_cancel</source>
 			<translation>Cancelar</translation>
 		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Aceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Aceptar</translation>
-		</message>
 	</context>
 	<context>
 		<name>go2epa</name>
@@ -5609,60 +5609,12 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Ir a Epa</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Aceptar</translation>
+			<source>btn_cancel</source>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Aceptar</translation>
-		</message>
-		<message>
-			<source>lbl_result_name</source>
-			<translation>Nombre resultado:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_only_check</source>
-			<translation>Usar la geometría de red resultante</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_only_check</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_export</source>
-			<translation>Exportar INP</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_export</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_process_options</source>
-			<translation>Opciones de proceso</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_process_options</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_file_manager</source>
-			<translation>Administrador de archivos</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_file_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_loginfo</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_loginfo</source>
-			<translation>None</translation>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>chk_exec</source>
@@ -5671,6 +5623,22 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<message>
 			<source>tooltip_chk_exec</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_import_result</source>
+			<translation>Importar resultado</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_import_result</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Aceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>lbl_counter</source>
@@ -5689,43 +5657,19 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Cancelar</translation>
+			<source>grb_file_manager</source>
+			<translation>Administrador de archivos</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>btn_options</source>
-			<translation>Opciones</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_options</source>
+			<source>tooltip_grb_file_manager</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_hs_ds</source>
-			<translation>Selector</translation>
+			<source>chk_export</source>
+			<translation>Exportar INP</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_hs_ds</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_file_inp</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_file_inp</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_import_result</source>
-			<translation>Importar resultado</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_import_result</source>
+			<source>tooltip_chk_export</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5737,11 +5681,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>chk_recurrent</source>
-			<translation>Usar llamadas iterativas</translation>
+			<source>lbl_inp_file</source>
+			<translation>Archivo INP:</translation>
 		</message>
 		<message>
-			<source>tooltip_chk_recurrent</source>
+			<source>tooltip_lbl_inp_file</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5753,6 +5697,54 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>chk_only_check</source>
+			<translation>Usar la geometría de red resultante</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_only_check</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_loginfo</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_loginfo</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_hs_ds</source>
+			<translation>Selector</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_hs_ds</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_options</source>
+			<translation>Opciones</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_options</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>chk_recurrent</source>
+			<translation>Usar llamadas iterativas</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_recurrent</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_file_inp</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_file_inp</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_file_rpt</source>
 			<translation>...</translation>
 		</message>
@@ -5761,11 +5753,19 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_inp_file</source>
-			<translation>Archivo INP:</translation>
+			<source>grb_process_options</source>
+			<translation>Opciones de proceso</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_inp_file</source>
+			<source>tooltip_grb_process_options</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_name</source>
+			<translation>Nombre resultado:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_name</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -5776,20 +5776,20 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Gestor de resultados Epa</translation>
 		</message>
 		<message>
-			<source>btn_delete</source>
-			<translation>Borrar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
 			<source>btn_set_corporate</source>
 			<translation>Alternar corporativo</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_set_corporate</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Cerrar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>dlg_go2epa_manager</source>
@@ -5808,12 +5808,12 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_close</source>
-			<translation>Cerrar</translation>
+			<source>btn_delete</source>
+			<translation>Borrar</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Cerrar</translation>
+			<source>tooltip_btn_delete</source>
+			<translation>Eliminar</translation>
 		</message>
 	</context>
 	<context>
@@ -5823,12 +5823,12 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Go2Epa - opciones</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Aceptar</translation>
+			<source>tab_inp</source>
+			<translation>Inp</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Aceptar</translation>
+			<source>tooltip_tab_inp</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>dlg_go2epa_options</source>
@@ -5839,12 +5839,12 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_inp</source>
-			<translation>Inp</translation>
+			<source>btn_accept</source>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_inp</source>
-			<translation>None</translation>
+			<source>tooltip_btn_accept</source>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -5878,12 +5878,27 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Cancelar</translation>
 		</message>
 		<message>
+			<source>btn_accept</source>
+			<translation>Aceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Aceptar</translation>
+		</message>
+		<message>
 			<source>dlg_info_catalog</source>
 			<translation>Catálogo</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_info_catalog</source>
 			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>info_crmvalue</name>
+		<message>
+			<source>title</source>
+			<translation>Hidrómetro</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -5892,13 +5907,6 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<message>
 			<source>tooltip_btn_accept</source>
 			<translation>Aceptar</translation>
-		</message>
-	</context>
-	<context>
-		<name>info_crmvalue</name>
-		<message>
-			<source>title</source>
-			<translation>Hidrómetro</translation>
 		</message>
 		<message>
 			<source>lbl_hydrometer_id</source>
@@ -5909,12 +5917,12 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Aceptar</translation>
+			<source>btn_close</source>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Aceptar</translation>
+			<source>tooltip_btn_close</source>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>dlg_info_crmvalue</source>
@@ -5924,14 +5932,6 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<source>tooltip_dlg_info_crmvalue</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Cerrar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Cerrar</translation>
-		</message>
 	</context>
 	<context>
 		<name>info_crossect</name>
@@ -5940,83 +5940,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Sección</translation>
 		</message>
 		<message>
-			<source>lbl_cost_fill</source>
-			<translation>lbl_cost_fill</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_fill</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cost_exc</source>
-			<translation>lbl_cost_exc</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_exc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cost_area</source>
-			<translation>lbl_cost_area</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_area</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_cost_width</source>
 			<translation>lbl_cost_width</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_cost_width</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cost_trench</source>
-			<translation>lbl_cost_trench</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_trench</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cost_b_left</source>
-			<translation>lbl_cost_b_left</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_b_left</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_section_image</source>
-			<translation>lbl_section_image</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_section_image</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cost_excav</source>
-			<translation>lbl_cost_excav</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_excav</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cost_y_param</source>
-			<translation>lbl_cost_y_param</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_y_param</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cost_bulk</source>
-			<translation>lbl_cost_bulk</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_bulk</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6028,6 +5956,46 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_cost_b_right</source>
+			<translation>lbl_cost_b_right</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_b_right</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cost_exc</source>
+			<translation>lbl_cost_exc</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_exc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_section_image</source>
+			<translation>lbl_section_image</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_section_image</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cost_b_left</source>
+			<translation>lbl_cost_b_left</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_b_left</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cost_y_param</source>
+			<translation>lbl_cost_y_param</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_y_param</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_close</source>
 			<translation>Cerrar</translation>
 		</message>
@@ -6036,11 +6004,43 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Cerrar</translation>
 		</message>
 		<message>
-			<source>lbl_cost_b_right</source>
-			<translation>lbl_cost_b_right</translation>
+			<source>lbl_cost_bulk</source>
+			<translation>lbl_cost_bulk</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_cost_b_right</source>
+			<source>tooltip_lbl_cost_bulk</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cost_area</source>
+			<translation>lbl_cost_area</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_area</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cost_fill</source>
+			<translation>lbl_cost_fill</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_fill</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cost_trench</source>
+			<translation>lbl_cost_trench</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_trench</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cost_excav</source>
+			<translation>lbl_cost_excav</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_excav</source>
 			<translation>None</translation>
 		</message>
 	</context>

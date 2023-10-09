@@ -38,7 +38,9 @@ class GwMapzoneManager:
         self.snapper_manager = GwSnapManager(self.iface)
         self.snapper_manager.set_snapping_layers()
         self.vertex_marker = self.snapper_manager.vertex_marker
+        self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
 
+        self.feature_types = ['sector_id', 'dma_id', 'presszone_id', 'dqa_id']
         self.mapzone_mng_dlg = None
         self.netscenario_id = None
 
@@ -63,7 +65,7 @@ class GwMapzoneManager:
             view = f'v_ui_{tab}'
             qtableview = QTableView()
             qtableview.setObjectName(f"tbl_{view}")
-            # qtableview.clicked.connect(partial(self._manage_highlight, qtableview, view))
+            qtableview.clicked.connect(partial(self._manage_highlight, qtableview, view))
             tab_idx = self.mapzone_mng_dlg.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
             self.mapzone_mng_dlg.main_tab.widget(tab_idx).setObjectName(view)
 
@@ -81,11 +83,28 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.btn_delete.clicked.connect(partial(self._manage_delete))
         self.mapzone_mng_dlg.main_tab.currentChanged.connect(partial(self._manage_current_changed))
         self.mapzone_mng_dlg.btn_cancel.clicked.connect(self.mapzone_mng_dlg.reject)
+        self.mapzone_mng_dlg.finished.connect(partial(tools_gw.reset_rubberband, self.rubber_band, None))
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.close_dialog, self.mapzone_mng_dlg, True))
 
         self._manage_current_changed()
 
         tools_gw.open_dialog(self.mapzone_mng_dlg, 'mapzone_manager')
+
+    def _manage_highlight(self, qtableview, view, index):
+        """ Creates rubberband to indicate which feature is selected """
+
+        tools_gw.reset_rubberband(self.rubber_band)
+        table = view.replace("v_ui", "v_edit")
+        feature_type = 'feature_id'
+
+        for x in self.feature_types:
+            col_idx = tools_qt.get_col_index_by_col_name(qtableview, x)
+            if col_idx is not None and col_idx is not False:
+                feature_type = x
+                break
+        if feature_type != 'feature_id':
+            table = f"v_edit_{feature_type.split('_')[0]}"
+        tools_qgis.highlight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
 
     def _txt_name_changed(self, text):
         expr = f"name ilike '%{text}%'" if text else None
@@ -94,13 +113,18 @@ class GwMapzoneManager:
     def _manage_current_changed(self):
         """ Manages tab changes """
 
+        if self.mapzone_mng_dlg is None or isdeleted(self.mapzone_mng_dlg):
+            return
         # Refresh txt_feature_id
         tools_qt.set_widget_text(self.mapzone_mng_dlg, self.mapzone_mng_dlg.txt_name, '')
+
+        # Reset rubberband
+        tools_gw.reset_rubberband(self.rubber_band)
 
         # Fill current table
         self._fill_mapzone_table()
 
-    def _fill_mapzone_table(self, set_edit_triggers=QTableView.DoubleClicked, expr=None):
+    def _fill_mapzone_table(self, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
         """ Fill mapzone table with data from its corresponding table """
 
         # Manage exception if dialog is closed
@@ -172,9 +196,15 @@ class GwMapzoneManager:
 
         # Get selected mapzone data
         index = tableview.selectionModel().currentIndex()
-        self.mapzone_id = index.sibling(index.row(), 0).data()
         self.mapzone_type = tableview.objectName().split('_')[-1].lower()
-        graphconfig = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(tableview, 'graphconfig')).data()
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, f'{self.mapzone_type}_id')
+        self.mapzone_id = index.sibling(index.row(), col_idx).data()
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, f'name')
+        if col_idx is None:
+            col_idx = tools_qt.get_col_index_by_col_name(tableview, f'{self.mapzone_type}_name')
+        mapzone_name = index.sibling(index.row(), col_idx).data()
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, 'graphconfig')
+        graphconfig = index.sibling(index.row(), col_idx).data()
 
         # Build dialog
         self.config_dlg = GwMapzoneConfigUi()
@@ -248,7 +278,10 @@ class GwMapzoneManager:
             tools_qt.set_widget_visible(self.config_dlg, self.config_dlg.txt_toArc, False)
 
         # Open dialog
-        tools_gw.open_dialog(self.config_dlg, 'mapzone_config')
+        dlg_title = f"Mapzone config - {mapzone_name}"
+        if self.netscenario_id is not None:
+            dlg_title += f" (Netscenario {self.netscenario_id})"
+        tools_gw.open_dialog(self.config_dlg, 'mapzone_config', title=dlg_title)
 
 
     def _config_dlg_finished(self, dialog):
@@ -290,17 +323,6 @@ class GwMapzoneManager:
 
         self.vertex_marker = self.snapper_manager.vertex_marker
 
-        # Store user snapping configuration
-        self.snapper_manager.store_snapping_options()
-
-        # Disable snapping
-        self.snapper_manager.set_snapping_status()
-
-        # if we are doing info over connec or over node
-        if option in ('arc', 'set_to_arc'):
-            self.snapper_manager.config_snap_to_arc()
-        elif option == 'node':
-            self.snapper_manager.config_snap_to_node()
         # Set signals
         tools_gw.disconnect_signal('mapzone_manager_snapping', 'get_snapped_feature_id_xyCoordinates_mouse_moved')
         tools_gw.connect_signal(self.canvas.xyCoordinates, partial(self._mouse_moved, layer),
@@ -360,7 +382,6 @@ class GwMapzoneManager:
         except Exception as e:
             tools_qgis.show_warning(f"Exception in info (def _get_id)", parameter=e)
         finally:
-            self.snapper_manager.recover_snapping_options()
             if option == 'nodeParent':
                 self._cancel_snapping_tool(dialog, action)
 
@@ -427,6 +448,8 @@ class GwMapzoneManager:
 
         parameters = f'"action": "ADD", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
                      f'"nodeParent": "{node_parent_id}", "toArc": {to_arc_list}'
+        if self.netscenario_id is not None:
+            parameters += f', "netscenarioId": {self.netscenario_id}'
         if preview:
             parameters += f', "config": {preview}'
         extras = f'"parameters": {{{parameters}}}'
@@ -457,6 +480,8 @@ class GwMapzoneManager:
 
         parameters = f'"action": "REMOVE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
                      f'"nodeParent": "{node_parent_id}"'
+        if self.netscenario_id is not None:
+            parameters += f', "netscenarioId": {self.netscenario_id}'
         if preview:
             parameters += f', "config": {preview}'
         extras = f'"parameters": {{{parameters}}}'
@@ -487,6 +512,8 @@ class GwMapzoneManager:
 
         parameters = f'"action": "ADD", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
                      f'"forceClosed": {force_closed_list}'
+        if self.netscenario_id is not None:
+            parameters += f', "netscenarioId": {self.netscenario_id}'
         if preview:
             parameters += f', "config": {preview}'
         extras = f'"parameters": {{{parameters}}}'
@@ -517,6 +544,8 @@ class GwMapzoneManager:
 
         parameters = f'"action": "REMOVE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
                      f'"forceClosed": {force_closed_list}'
+        if self.netscenario_id is not None:
+            parameters += f', "netscenarioId": {self.netscenario_id}'
         if preview:
             parameters += f', "config": {preview}'
         extras = f'"parameters": {{{parameters}}}'
@@ -640,11 +669,15 @@ class GwMapzoneManager:
 
         # Get selected mapzone data
         index = tableview.selectionModel().currentIndex()
-        mapzone_id = index.sibling(index.row(), 0).data()
-        field_id = tableview.model().headerData(0, Qt.Horizontal)
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, f"{tablename.split('_')[-1].lower()}_id")
+        mapzone_id = index.sibling(index.row(), col_idx).data()
+        field_id = tableview.model().headerData(col_idx, Qt.Horizontal)
 
         # Execute getinfofromid
-        feature = f'"tableName":"{tablename}", "id": "{mapzone_id}"'
+        _id = f"{mapzone_id}"
+        if self.netscenario_id is not None:
+            _id = f"{self.netscenario_id}, {mapzone_id}"
+        feature = f'"tableName":"{tablename}", "id": "{_id}"'
         body = tools_gw.create_body(feature=feature)
         json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
         if json_result is None or json_result['status'] == 'Failed':
@@ -675,7 +708,7 @@ class GwMapzoneManager:
         answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 1).data(),
                                         force_action=True)
         if answer:
-            sql = f"DELETE FROM {view} WHERE {field_id} = {mapzone_id}"
+            sql = f"DELETE FROM {view} WHERE {field_id}::text = '{mapzone_id}'"
             tools_db.execute_sql(sql)
 
             # Refresh tableview
@@ -689,6 +722,7 @@ class GwMapzoneManager:
         self.my_json_add = {}
         tools_gw.build_dialog_info(self.add_dlg, result, my_json=self.my_json_add)
         layout = self.add_dlg.findChild(QGridLayout, 'lyt_main_1')
+        self.add_dlg.actionEdit.setVisible(False)
         # Disable widgets if updating
         if force_action == "UPDATE":
             tools_qt.set_widget_enabled(self.add_dlg, f'tab_data_{field_id}', False)  # sector_id/dma_id/...
@@ -696,6 +730,7 @@ class GwMapzoneManager:
         if self.netscenario_id is not None:
             tools_qt.set_widget_text(self.add_dlg, f'tab_data_netscenario_id', self.netscenario_id)
             tools_qt.set_widget_enabled(self.add_dlg, f'tab_data_netscenario_id', False)
+            field_id = ['netscenario_id', field_id]
 
         # Get every widget in the layout
         widgets = []
@@ -751,7 +786,6 @@ class GwMapzoneManager:
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             tools_qgis.show_warning(msg, dialog=dialog)
             tools_qt.set_action_checked("actionEdit", True, dialog)
-            QgsProject.instance().blockSignals(False)
             return False
 
         fields = json.dumps(my_json)
@@ -760,13 +794,14 @@ class GwMapzoneManager:
             if not isinstance(pkey, list):
                 pkey = [pkey]
             for pk in pkey:
-                widget_name = f"tab_none_{pk}"
-                value = tools_qt.get_widget_value(dialog, widget_name)
-                id_val += f"{value}, "
+                results = pk.split(',')
+                for result in results:
+                    widget_name = f"tab_none_{result}"
+                    value = tools_qt.get_widget_value(dialog, widget_name)
+                    id_val += f"{value}, "
             id_val = id_val[:-2]
         # if id_val in (None, '', 'None'):
         #     id_val = feature_id
-
         feature = f'"id":"{id_val}", '
         feature += f'"tableName":"{tablename}"'
         extras = f'"fields":{fields}'

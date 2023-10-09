@@ -44,9 +44,16 @@ class GwUtilsManagerButton(GwAction):
 
     def clicked_event(self):
 
+        if self.menu.property('last_selection') is not None:
+            getattr(self, self.menu.property('last_selection'))()
+            return
         button = self.action.associatedWidgets()[1]
         menu_point = button.mapToGlobal(QPoint(0, button.height()))
         self.menu.popup(menu_point)
+
+
+    def _save_last_selection(self, menu, button_function):
+        menu.setProperty("last_selection", button_function)
 
 
     # region private functions
@@ -78,7 +85,7 @@ class GwUtilsManagerButton(GwAction):
             #     pass
             self.menu.addAction(obj_action)
             obj_action.triggered.connect(partial(getattr(self, button_function)))
-            # obj_action.triggered.connect(partial(self._save_last_selection, self.menu, feature_cat))
+            obj_action.triggered.connect(partial(self._save_last_selection, self.menu, button_function))
 
 
     def _prices_manager(self):

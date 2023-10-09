@@ -96,12 +96,6 @@ class GwMaptool(QgsMapTool):
         if hasattr(self.action, "setChecked"):  # If the maptool is activated through the giswater menu, it breaks
             self.action.setChecked(False)
 
-        # Restore previous snapping
-        self.snapper_manager.restore_snap_options(self.previous_snapping)
-
-        # Enable snapping
-        self.snapper_manager.set_snapping_status(True)
-
         # Recover cursor
         self.canvas.setCursor(self.std_cursor)
 

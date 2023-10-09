@@ -66,16 +66,8 @@ class GwFeatureReplaceButton(GwMaptool):
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
-        # Disable snapping
-        self.snapper_manager.set_snapping_status()
-
         # Set snapping to 'node', 'connec' and 'gully'
         self.snapper_manager.set_snapping_layers()
-        self.snapper_manager.config_snap_to_node()
-        self.snapper_manager.config_snap_to_connec()
-        self.snapper_manager.config_snap_to_gully()
-        self.snapper_manager.config_snap_to_arc()
-        self.snapper_manager.set_snap_mode()
 
         # Manage last feature type selected
         last_feature_type = tools_gw.get_config_parser("btn_feature_replace", "last_feature_type", "user", "session")
@@ -483,7 +475,8 @@ class GwFeatureReplaceButton(GwMaptool):
             tools_qt.set_widget_enabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
             sql = (f"SELECT DISTINCT(id) "
                    f"FROM {self.cat_table} "
-                   f"WHERE {self.feature_type_cat} = '{feature_type_new}' AND (active IS TRUE OR active IS NULL)")
+                   f"WHERE {self.feature_type_cat} = '{feature_type_new}' AND (active IS TRUE OR active IS NULL)"
+                   f"ORDER BY id")
 
         elif self.project_type == 'ud':
             sql = (f"SELECT DISTINCT(id) "

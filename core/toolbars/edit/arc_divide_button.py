@@ -62,9 +62,6 @@ class GwArcDivideButton(GwMaptool):
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
-        # Clear snapping
-        self.snapper_manager.set_snapping_status()
-
         # Get active layer
         self.active_layer = self.iface.activeLayer()
 

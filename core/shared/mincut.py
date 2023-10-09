@@ -1340,7 +1340,7 @@ class GwMincut:
         # Get 'hydrometers' related with this 'connec'
         sql = (f"SELECT DISTINCT({self.col2})"
                f" FROM v_rtc_hydrometer"
-               f" WHERE connec_id = '{connec_id}'")
+               f" WHERE feature_id = '{connec_id}'")
         rows = tools_db.get_rows(sql)
         values = []
         if rows:
@@ -1759,7 +1759,6 @@ class GwMincut:
             tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
             tools_gw.disconnect_signal('mincut')
             # Recover snapping options, refresh canvas & set visible layers
-            self.snapper_manager.recover_snapping_options()
             return
 
         self.mincut_class = 1
@@ -2103,8 +2102,6 @@ class GwMincut:
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
         tools_gw.disconnect_signal('mincut')
         self.set_visible_mincut_layers()
-        if self.snapper_manager:
-            self.snapper_manager.restore_snap_options(self.previous_snapping)
         self._remove_selection()
 
 
@@ -2122,15 +2119,11 @@ class GwMincut:
             tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
             tools_gw.disconnect_signal('mincut')
             # Recover snapping options, refresh canvas & set visible layers
-            self.snapper_manager.recover_snapping_options()
             return
 
         # Disconnect other snapping and signals in case wrong user clicks
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
         tools_gw.disconnect_signal('mincut')
-
-        # Store user snapping configuration
-        self.snapper_manager.store_snapping_options()
 
         # Set vertex marker propierties
         self.vertex_marker = self.snapper_manager.vertex_marker
@@ -2180,7 +2173,6 @@ class GwMincut:
                 self._custom_mincut_execute(element_id)
             elif action.objectName() == "actionChangeValveStatus":
                 self._change_valve_status_execute(element_id)
-            self.snapper_manager.recover_snapping_options()
             tools_qgis.refresh_map_canvas(True)
             self.set_visible_mincut_layers()
             self._remove_selection()
@@ -2503,7 +2495,6 @@ class GwMincut:
             tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
             tools_gw.disconnect_signal('mincut')
             # Recover snapping options, refresh canvas & set visible layers
-            self.snapper_manager.recover_snapping_options()
             return
 
         # Declare snapper_manager and emit_point
@@ -2511,9 +2502,6 @@ class GwMincut:
         self.canvas.setMapTool(self.emit_point)
         self.snapper_manager = GwSnapManager(self.iface)
         self.snapper = self.snapper_manager.get_snapper()
-
-        # Store user snapping configuration
-        self.snapper_manager.store_snapping_options()
 
         # Set vertex marker properties
         self.vertex_marker = self.snapper_manager.vertex_marker

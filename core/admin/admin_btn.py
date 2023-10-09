@@ -1661,13 +1661,15 @@ class GwAdminButton:
             self.project_epsg = dict_info['project_epsg']
             self.project_version = dict_info['project_version']
             self.project_language = dict_info['project_language']
+            project_date = dict_info['project_date'].strftime('%d-%m-%Y %H:%M:%S')
 
             msg = (f'Database version: {self.postgresql_version}\n'
                    f'PostGis version: {self.postgis_version}\n \n'
                    f'Schema name: {schema_name}\n'
                    f'Version: {self.project_version}\n'
                    f'EPSG: {self.project_epsg}\n'
-                   f'Language: {self.project_language}\n')
+                   f'Language: {self.project_language}\n'
+                   f'Date of creation: {project_date}\n')
 
             self.software_version_info.setText(msg)
 
@@ -1798,7 +1800,9 @@ class GwAdminButton:
         if not os.path.exists(filedir):
             tools_log.log_info(f"Folder not found: {filedir}")
             return True
-
+        # Skipping metadata folders for Mac OS
+        if '.DS_Store' in filedir:
+            return True
         tools_log.log_info(f"Processing folder: {filedir}")
         filelist = sorted(os.listdir(filedir))
         status = True

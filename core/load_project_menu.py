@@ -325,8 +325,6 @@ class GwMenuLoad(QObject):
         """ Deactivates all snapping managers """
 
         for i in range(0, len(global_vars.snappers)):
-            global_vars.snappers[i].restore_snap_options(global_vars.snappers[i].recover_snapping_options())
-            global_vars.snappers[i].set_snapping_status(False)
             global_vars.snappers[i].vertex_marker.hide()
 
 

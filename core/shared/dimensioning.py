@@ -262,13 +262,7 @@ class GwDimensioning:
 
         self.snapper_manager.remove_marker(self.vertex_marker)
         self.previous_snapping = self.snapper_manager.get_snapping_options()
-        self.snapper_manager.set_snapping_status()
         self.snapper_manager.set_snapping_layers()
-
-        self.snapper_manager.config_snap_to_node()
-        self.snapper_manager.config_snap_to_connec()
-        self.snapper_manager.config_snap_to_gully()
-        self.snapper_manager.set_snap_mode()
 
         self.dlg_dim.actionOrientation.setChecked(False)
         self.iface.setActiveLayer(self.layer_node)
@@ -354,7 +348,6 @@ class GwDimensioning:
             tools_qt.set_widget_text(self.dlg_dim, "feature_id", element_id)
             tools_qt.set_widget_text(self.dlg_dim, "feature_type", feat_type.upper())
 
-            self.snapper_manager.restore_snap_options(self.previous_snapping)
             tools_gw.disconnect_signal('dimensioning', 'snapping_ep_canvasClicked_click_button_snapping')
             tools_gw.disconnect_signal('dimensioning', 'snapping_xyCoordinates_mouse_move')
             self._deactivate_signals(action, emit_point)
@@ -372,13 +365,7 @@ class GwDimensioning:
 
         self.snapper_manager.remove_marker(self.vertex_marker)
         self.previous_snapping = self.snapper_manager.get_snapping_options()
-        self.snapper_manager.set_snapping_status()
         self.snapper_manager.set_snapping_layers()
-
-        self.snapper_manager.config_snap_to_node()
-        self.snapper_manager.config_snap_to_connec()
-        self.snapper_manager.config_snap_to_gully()
-        self.snapper_manager.set_snap_mode()
 
         self.dlg_dim.actionSnapping.setChecked(False)
         tools_gw.connect_signal(self.canvas.xyCoordinates, self._canvas_move_event,
@@ -414,7 +401,6 @@ class GwDimensioning:
         self.y_symbol = self.dlg_dim.findChild(QLineEdit, "y_symbol")
         self.y_symbol.setText(str(int(point.y())))
 
-        self.snapper_manager.restore_snap_options(self.previous_snapping)
         tools_gw.disconnect_signal('dimensioning', 'orientation_ep_canvasClicked_click_button_orientation')
         tools_gw.disconnect_signal('dimensioning', 'orientation_xyCoordinates_canvas_move_event')
         self._deactivate_signals(action, emit_point)
