@@ -708,7 +708,7 @@ class GwMapzoneManager:
         answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 1).data(),
                                         force_action=True)
         if answer:
-            sql = f"DELETE FROM {view} WHERE {field_id} = {mapzone_id}"
+            sql = f"DELETE FROM {view} WHERE {field_id}::text = '{mapzone_id}'"
             tools_db.execute_sql(sql)
 
             # Refresh tableview
