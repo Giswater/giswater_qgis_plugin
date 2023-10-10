@@ -62,3 +62,8 @@ update config_form_fields set widgettype='text' where formname ='v_edit_inp_dsce
 -- 09/10/23
 DELETE FROM config_param_system
 WHERE "parameter"='utils_use_gw_snapping';
+
+--10/10/23
+UPDATE sys_table
+SET addparam='{"valueRelation":[{"keyColumn":"macroexpl_id", "valueColumn":"name", "targerLayer":"v_edit_exploitation", "targetColumn":"macroexpl_id", "nullValue":false, "filterExpression": null}]} '::json
+WHERE id='macroexploitation';
