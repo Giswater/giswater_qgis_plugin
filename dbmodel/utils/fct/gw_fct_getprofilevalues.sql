@@ -141,8 +141,8 @@ v_result_point json;
 v_result_polygon json;
 v_device integer;
 v_nonpriority_statetype text;
-v_extra_cost numeric=0;
 v_cost_string text;
+
 BEGIN
 
 	--  Search path
@@ -228,13 +228,13 @@ BEGIN
 		v_linksdistance = 0;
 	END IF;
 
-	SELECT json_extract_path_text(value::json,'state_type'),json_extract_path_text(value::json,'extra_cost')::numeric INTO v_nonpriority_statetype, v_extra_cost
+	SELECT json_extract_path_text(value::json,'state_type') INTO v_nonpriority_statetype 
 	FROM config_param_system WHERE parameter = 'om_profile_nonpriority_statetype';
 
 	IF v_nonpriority_statetype IS NULL or v_nonpriority_statetype='' THEN
-		 v_cost_string = 'gis_length::float as cost';
+		 v_cost_string = 'gis_length::float ';
 	ELSE
-		v_cost_string = concat('case when state_type = ',v_nonpriority_statetype::integer,' THEN gis_length::float + '||v_extra_cost||' ELSE gis_length::float END as cost'); 
+		v_cost_string = concat('case when state_type = ',v_nonpriority_statetype::integer,' THEN -1 ELSE gis_length::float END '); 
 	END IF;
 
 	-- Check start-end nodes
@@ -314,8 +314,9 @@ BEGIN
 			v_y2 = 'case when node_1=node_id then depth2 else depth1 end';
 		END IF;
 
-		v_query_dijkstra := 'SELECT edge::text AS arc_id, node::text AS node_id, agg_cost as total_length FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, '||v_cost_string||',
-					gis_length::float as reverse_cost FROM v_edit_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init||','||v_end||')';
+
+		v_query_dijkstra := 'SELECT edge::text AS arc_id, node::text AS node_id, agg_cost as total_length FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, 
+					'||v_cost_string||' as cost, '||v_cost_string||' as reverse_cost FROM v_edit_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init||','||v_end||')';
 
 		IF v_mid IS NOT NULL THEN
 			v_query_dijkstra = '';
@@ -326,9 +327,9 @@ BEGIN
 				v_end_aux = v_i;
 
 				-- DIJKSTRA v_init_aux -> v_end_aux
-				v_query_dijkstra = 'SELECT edge::text AS arc_id, node::text AS node_id, (select coalesce(max(total_distance), 0) from temp_anl_node where fid = ''222'' and cur_user = current_user) + agg_cost as total_length 
-				FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, '||v_cost_string||', 
-				gis_length::float as reverse_cost FROM v_edit_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init_aux||','||v_end_aux||')';
+				v_query_dijkstra = 'SELECT edge::text AS arc_id, node::text AS node_id, (select coalesce(max(total_distance), 0) from anl_node where fid = ''222'' and cur_user = current_user) + agg_cost as total_length 
+				FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, '||v_cost_string||' as cost, 
+					'||v_cost_string||' as reverse_cost FROM v_edit_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init_aux||','||v_end_aux||')';
 				
 				-- We need to insert values each dijkstra for the total_length to keep accumulating
 				-- insert edge values on temp_anl_arc table
@@ -352,10 +353,14 @@ BEGIN
 			END LOOP;
 			
 			-- Last DIJKSTRA
-			v_query_dijkstra = concat('SELECT edge::text AS arc_id, node::text AS node_id, (select coalesce(max(total_distance), 0) from temp_anl_node) + agg_cost as total_length 
-			FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, '||v_cost_string||', 
-			gis_length::float as reverse_cost FROM v_edit_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init_aux||','||v_end||')');
-        END IF;
+
+			v_query_dijkstra = concat('SELECT edge::text AS arc_id, node::text AS node_id, (select coalesce(max(total_distance), 0) from anl_node where fid = ''222'' and cur_user = current_user) + agg_cost as total_length 
+			FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, 
+			 '||v_cost_string||' as cost, '||v_cost_string||' as reverse_cost 
+			FROM v_edit_arc WHERE node_1 is not null AND node_2 is not null'', '||v_init_aux||','||v_end||')');
+
+		END IF;
+				
 		-- insert edge values on temp_anl_arc table
 		EXECUTE 'INSERT INTO temp_anl_arc (fid, arc_id, code, node_1, node_2, sys_type, arccat_id, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2, expl_id, the_geom)
 			SELECT  222, arc_id, code, node_id, case when node_1=node_id then node_2 else node_1 end as node_2, sys_type, arccat_id, '||v_fcatgeom||', gis_length, 
@@ -744,6 +749,11 @@ BEGIN
 
 	END IF;
 
+	IF v_arc IS NULL THEN
+		v_message = 'Unable to create a Profile. Check your path continuity before continue!';
+		v_level = 2;
+	END IF;
+	
 	-- control null values
 	IF v_guitarlegend IS NULL THEN v_guitarlegend='{}'; END IF;
 	IF v_stylesheet IS NULL THEN v_stylesheet='{}'; END IF;
