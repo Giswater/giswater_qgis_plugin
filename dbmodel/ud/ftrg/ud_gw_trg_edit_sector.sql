@@ -20,11 +20,7 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
 	IF TG_OP = 'INSERT' THEN
-
-		IF NEW.sector_id IS NULL THEN
-			NEW.sector_id=(SELECT nextval('SCHEMA_NAME.sector_sector_id_seq'::regclass));
-		END IF;
-		
+	
 		NEW.active = TRUE;
 		
 		INSERT INTO sector (sector_id, name, descript, macrosector_id, the_geom, undelete, active, parent_id)
