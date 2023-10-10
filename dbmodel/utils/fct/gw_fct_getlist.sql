@@ -485,6 +485,7 @@ BEGIN
 		  FROM unnest(v_table_headers) AS t(columnname)
 		  LEFT JOIN config_form_tableview AS cftv
 		  ON t.columnname = cftv.columnname AND cftv.objectname = v_tablename
+		  ORDER BY cftv.columnindex ASC
 		) AS merged_cols
 		where merged_cols.visible is not false ;
 	IF v_headers_list IS NOT NULL THEN
