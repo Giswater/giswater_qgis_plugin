@@ -125,7 +125,10 @@ class GwNonVisual:
         chk_active_visible, btn_print_visible = visibility_settings.get(tab_name, default_visibility)
 
         self.manager_dlg.chk_active.setVisible(chk_active_visible)
-        self.manager_dlg.btn_print.setVisible(btn_print_visible)
+        if btn_print_visible and global_vars.project_type == 'ud':
+            self.manager_dlg.btn_print.setVisible(btn_print_visible)
+        else:
+            self.manager_dlg.btn_print.setVisible(False)
 
 
     def _get_nonvisual_object(self, tbl_view, function_name):
@@ -373,6 +376,9 @@ class GwNonVisual:
         # Create plot widget
         plot_widget = self._create_plot_widget(self.dialog)
 
+        # Icons
+        tools_gw.add_icon(self.dialog.btn_delete_item, "112", sub_folder="24x24")
+
         # Define variables
         tbl_curve_value = self.dialog.tbl_curve_value
         cmb_expl_id = self.dialog.cmb_expl_id
@@ -402,6 +408,7 @@ class GwNonVisual:
         tbl_curve_value.cellChanged.connect(partial(self._onCellChanged, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._manage_curve_value, self.dialog, tbl_curve_value))
         tbl_curve_value.cellChanged.connect(partial(self._manage_curve_plot, self.dialog, tbl_curve_value, plot_widget))
+        self.dialog.btn_delete_item.clicked.connect(partial(self._manage_delete_btn, tbl_curve_value, plot_widget))
         self.dialog.btn_accept.clicked.connect(partial(self._accept_curves, self.dialog, is_new))
         self._connect_dialog_signals()
 
@@ -712,6 +719,11 @@ class GwNonVisual:
 
         # Draw plot
         plot_widget.draw()
+
+
+    def _manage_delete_btn(self, table, plot_widget):
+        table.removeRow(table.currentRow())
+        self._manage_curve_plot(self.dialog, table, plot_widget, None, None)
 
 
     def _accept_curves(self, dialog, is_new):

@@ -194,6 +194,23 @@ class GwInfoButton(GwMaptool):
             action_valve.hovered.connect(partial(self._reset_rubber_bands))
             main_menu.addAction(action_valve)
             main_menu.addSeparator()
+
+        # Open/close valve in netscenario
+        valve_netscenario = json_result['body']['data'].get('valve_netscenario')
+        if valve_netscenario:
+            valve_netscenario_id = valve_netscenario['id']
+            netscenario_id = valve_netscenario['netscenario_id']
+            valve_netscenario_text = valve_netscenario['text']
+            valve_netscenario_table = valve_netscenario['tableName']
+            valve_netscenario_value = valve_netscenario['value']
+            action_valve_netscenario = QAction(f"{valve_netscenario_text}", None)
+            if valve_netscenario_id:
+                action_valve_netscenario.triggered.connect(partial(self._toggle_valve_state_netscenario, netscenario_id, valve_netscenario_id, valve_netscenario_table, valve_netscenario_value))
+            action_valve_netscenario.hovered.connect(partial(self._reset_rubber_bands))
+            main_menu.addAction(action_valve_netscenario)
+            main_menu.addSeparator()
+
+        main_menu.aboutToHide.connect(self._reset_rubber_bands)
         main_menu.exec_(click_point)
 
 
@@ -259,6 +276,20 @@ class GwInfoButton(GwMaptool):
             self.valve_thread = GwToggleValveTask("Update mapzones", params)
             QgsApplication.taskManager().addTask(self.valve_thread)
             QgsApplication.taskManager().triggerTask(self.valve_thread)
+
+
+    def _toggle_valve_state_netscenario(self, netscenario_id, valve_id, table_name, value):
+        """ Open or closes a valve in a netscenario """
+
+        # Build function body
+        feature = f'"id":"{netscenario_id}, {valve_id}", '
+        feature += f'"tableName":"{table_name}" '
+        # feature += f' "featureType":"node" '
+        extras = f'"fields":{{"netscenario_id": "{netscenario_id}", "node_id": "{valve_id}","closed": "{value}"}}'
+        body = tools_gw.create_body(feature=feature, extras=extras)
+
+        tools_gw.execute_procedure('gw_fct_upsertfields', body)
+        tools_qgis.refresh_map_canvas()
 
 
     def _draw_by_action(self, feature, rb_list, reset_rb=True):

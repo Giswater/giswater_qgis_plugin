@@ -107,7 +107,7 @@ class GwInfo(QObject):
             self.my_json = {}
             self.my_json_epa = {}
             self.tab_type = tab_type
-            self.visible_tabs = []
+            self.visible_tabs = {}
             self.epa_complet_result = None
             self.inserted_feature = False
 
@@ -227,6 +227,7 @@ class GwInfo(QObject):
                     else:
                         sub_tag = 'node'
                 feature_id = self.complet_result['body']['feature']['id']
+
                 result, dialog = self._open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker,
                     new_feature=new_feature)
                 if feature_cat is not None:
@@ -276,15 +277,7 @@ class GwInfo(QObject):
         keep_active = tools_os.set_boolean(keep_active, False)
         if not keep_active:
             self.prev_action = None
-        # Store user snapping configuration
-        self.snapper_manager.store_snapping_options()
 
-        # Set snapping to 'node', 'connec' and 'gully'
-        self.snapper_manager.config_snap_to_arc()
-        self.snapper_manager.config_snap_to_node()
-        self.snapper_manager.config_snap_to_connec()
-        self.snapper_manager.config_snap_to_gully()
-        self.snapper_manager.set_snap_mode()
         tools_gw.connect_signal(self.iface.actionAddFeature().toggled, self._action_is_checked,
                                 'info', 'add_feature_actionAddFeature_toggled_action_is_checked')
 
@@ -328,23 +321,13 @@ class GwInfo(QObject):
             widget = dialog.findChild(QWidget, widget_name)
             if widget is None:
                 action.setChecked(False)
+                tools_qgis.show_message(f"Widget: {widget_name} not in form.", dialog=dialog)
                 return
         # Block the signals of de dialog so that the key ESC does not close it
         dialog.blockSignals(True)
 
         self.vertex_marker = self.snapper_manager.vertex_marker
 
-        # Store user snapping configuration
-        self.snapper_manager.store_snapping_options()
-
-        # Disable snapping
-        self.snapper_manager.set_snapping_status()
-
-        # if we are doing info over connec or over node
-        if option in ('arc', 'set_to_arc'):
-            self.snapper_manager.config_snap_to_arc()
-        elif option == 'node':
-            self.snapper_manager.config_snap_to_node()
         # Set signals
         tools_gw.disconnect_signal('info_snapping', 'get_snapped_feature_id_xyCoordinates_mouse_moved')
         tools_gw.connect_signal(self.canvas.xyCoordinates, partial(self._mouse_moved, layer),
@@ -373,7 +356,7 @@ class GwInfo(QObject):
                 continue
             if 'layoutname' in field and field['layoutname'] == 'lyt_none':
                 continue
-            if field.get('tabname') != 'tab_data':
+            if field.get('tabname') not in ('tab_data', 'tab_none'):
                 continue
             if 'spacer' in field['widgettype']:
                 continue
@@ -503,13 +486,17 @@ class GwInfo(QObject):
             except:
                 pass
 
-        self.visible_tabs = complet_result['body']['form'].get('visibleTabs', [])
+        for tab in complet_result['body']['form']['visibleTabs']:
+            self.visible_tabs[tab['tabName']] = tab
+
         for tab in self.visible_tabs:
-            tabs_to_show.append(tab['tabName'])
+            tabs_to_show.append(self.visible_tabs[tab]['tabName'])
 
         for x in range(self.tab_main.count() - 1, 0, -1):
             if self.tab_main.widget(x).objectName() not in tabs_to_show:
                 tools_qt.remove_tab(self.tab_main, self.tab_main.widget(x).objectName())
+            elif new_feature and self.tab_main.widget(x).objectName() != 'tab_data':
+                tools_qt.enable_tab_by_tab_name(self.tab_main, self.tab_main.widget(x).objectName(), False)
 
         # Actions
         self._get_actions()
@@ -1377,12 +1364,8 @@ class GwInfo(QObject):
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
-        # Clear snapping
-        self.snapper_manager.set_snapping_status()
-
         # Set snapping
         layer = global_vars.iface.activeLayer()
-        self.snapper_manager.config_snap_to_layer(layer)
 
         # Set marker
         self.vertex_marker = self.snapper_manager.vertex_marker
@@ -1504,7 +1487,6 @@ class GwInfo(QObject):
             action_widget.setChecked(False)
 
         try:
-            self.snapper_manager.restore_snap_options(self.previous_snapping)
             self.vertex_marker.hide()
             tools_gw.disconnect_signal('info_snapping', 'manage_action_copy_paste_xyCoordinates_mouse_move')
             tools_gw.disconnect_signal('info_snapping', 'manage_action_copy_paste_ep_canvasClicked')
@@ -1619,6 +1601,10 @@ class GwInfo(QObject):
                     self._manage_docker_close()
                 else:
                     tools_gw.close_dialog(dialog)
+            if new_feature:
+                for tab in self.visible_tabs:
+                    tools_qt.enable_tab_by_tab_name(self.tab_main, self.visible_tabs[tab]['tabName'], True)
+            self._reload_epa_tab(dialog)
             self._reset_my_json()
         else:
             tools_qt.set_action_checked(action_edit, True)
@@ -1754,7 +1740,8 @@ class GwInfo(QObject):
         :return: (boolean)
         """
 
-        QgsProject.instance().blockSignals(True)
+        # QgsProject.instance().blockSignals(True)
+        # It's not necessary to block signals because the code isn't changing snapping configuration anymore.
 
         # Check if C++ object has been deleted
         if isdeleted(dialog):
@@ -1789,17 +1776,17 @@ class GwInfo(QObject):
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             tools_qgis.show_warning(msg, dialog=dialog)
             tools_qt.set_action_checked("actionEdit", True, dialog)
-            QgsProject.instance().blockSignals(False)
             return False
 
         if _json != '' and str(_json) != '{}':
             if not generic and self._has_elev_and_y_json(_json):
                 tools_qt.set_action_checked("actionEdit", True, dialog)
-                QgsProject.instance().blockSignals(False)
                 return False
 
             # If we create a new feature
             if self.new_feature_id is not None:
+                if new_feature is False:
+                    new_feature = tools_qt.get_feature_by_id(self.layer, self.new_feature_id)
                 new_feature.setAttribute(id_name, newfeature_id)
                 after_insert = True
                 for k, v in list(_json.items()):
@@ -1815,7 +1802,6 @@ class GwInfo(QObject):
                 if status is False:
                     error = self.layer_new_feature.commitErrors()
                     tools_log.log_warning(f"{error}")
-                    QgsProject.instance().blockSignals(False)
                     return False
 
                 self.new_feature_id = None
@@ -1862,7 +1848,6 @@ class GwInfo(QObject):
 
             json_result = tools_gw.execute_procedure('gw_fct_setfields', body)
             if not json_result:
-                QgsProject.instance().blockSignals(False)
                 return False
 
             if clear_json:
@@ -1899,7 +1884,6 @@ class GwInfo(QObject):
                         QgsApplication.taskManager().triggerTask(self.valve_thread)
             elif "Failed" in json_result['status']:
                 # If json_result['status'] is Failed message from database is showed user by get_json->manage_json_exception
-                QgsProject.instance().blockSignals(False)
                 return False
 
         # Tab EPA
@@ -1917,7 +1901,6 @@ class GwInfo(QObject):
             json_result = tools_gw.execute_procedure('gw_fct_setfields', body)
             self._reset_my_json_epa()
             if not json_result or "Failed" in json_result['status']:
-                QgsProject.instance().blockSignals(False)
                 return False
 
         # Force a map refresh
@@ -1965,9 +1948,9 @@ class GwInfo(QObject):
             if 'visibleTabs' not in self.complet_result['body']['form']:
                 return
             for tab in self.visible_tabs:
-                if tab['tabName'] == tab_name:
-                    if tab['tabactions'] is not None:
-                        for act in tab['tabactions']:
+                if self.visible_tabs[tab]['tabName'] == tab_name:
+                    if self.visible_tabs[tab]['tabactions'] is not None:
+                        for act in self.visible_tabs[tab]['tabactions']:
                             action = dialog.findChild(QAction, act['actionName'])
                             if action is not None and action.objectName() not in static_actions:
                                 action.setEnabled(not act['disabled'])
@@ -2207,7 +2190,9 @@ class GwInfo(QObject):
         self.epa_complet_result = complet_result
         if complet_result:
             if complet_result['body']['form'].get('visibleTabs'):
-                self.visible_tabs = complet_result['body']['form']['visibleTabs']
+                for tab in complet_result['body']['form']['visibleTabs']:
+                    if tab['tabName'] == 'tab_epa':
+                        self.visible_tabs[tab['tabName']] = tab
                 self._show_actions(self.dlg_cf, self.tab_main.currentWidget().objectName())
             for lyt in dialog.findChildren(QGridLayout, QRegularExpression('lyt_epa')):
                 i = 0
@@ -2356,11 +2341,11 @@ class GwInfo(QObject):
 
         # Check feature_type
         if self.feature_type == 'connec':
-            widget = f'{tab_type}_{self.feature_type}at_id'
+            widget = f'tab_{tab_type}_{self.feature_type}at_id'
         elif self.feature_type == 'gully':
-            widget = f'{tab_type}_gratecat_id'
+            widget = f'tab_{tab_type}_gratecat_id'
         else:
-            widget = f'{tab_type}_{self.feature_type}cat_id'
+            widget = f'tab_{tab_type}_{self.feature_type}cat_id'
         self.catalog.open_catalog(self.dlg_cf, widget, feature_type, child_type)
 
 
@@ -2380,15 +2365,15 @@ class GwInfo(QObject):
             return
 
         for tab in self.visible_tabs:
-            if tab['tabName'] == tab_name:
-                if tab['tabactions'] is not None:
-                    for act in tab['tabactions']:
+            if self.visible_tabs[tab]['tabName'] == tab_name:
+                if self.visible_tabs[tab]['tabactions'] is not None:
+                    for act in self.visible_tabs[tab]['tabactions']:
                         action = dialog.findChild(QAction, act['actionName'])
                         if action is not None:
                             action.setToolTip(act['actionTooltip'])
                             action.setVisible(True)
 
-        self._enable_actions(dialog, self.layer.isEditable())
+        self._enable_actions(dialog, self.action_edit.isChecked())
 
 
     def _check_elev_y(self):
@@ -2749,8 +2734,8 @@ class GwInfo(QObject):
             short_name = field['widgetname'].replace(f"tab_{tab_name}_", "", 1)
             widget = tools_gw.add_tableview_header(widget, field)
             widget = tools_gw.fill_tableview_rows(widget, field)
-            widget = tools_gw.set_tablemodel_config(dialog, widget, short_name, 1, True)
-            tools_qt.set_tableview_config(widget, edit_triggers=QTableView.DoubleClicked)
+            tools_qt.set_tableview_config(widget, edit_triggers=QTableView.DoubleClicked, sectionResizeMode=0)
+            widget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, 1, True)
             if 'tab_epa' in widgetname:
                 model = widget.model()
                 tbl_upsert = widget.property('widgetcontrols').get('tableUpsert')
@@ -3053,7 +3038,6 @@ class GwInfo(QObject):
         except Exception as e:
             tools_qgis.show_warning(f"Exception in info (def _get_id)", parameter=e)
         finally:
-            self.snapper_manager.recover_snapping_options()
             self._cancel_snapping_tool(dialog, action)
 
 
@@ -3111,7 +3095,6 @@ class GwInfo(QObject):
         """ Recover snapping options when action add feature is un-checked """
 
         if not self.iface.actionAddFeature().isChecked():
-            self.snapper_manager.recover_snapping_options()
             tools_gw.disconnect_signal('info', 'add_feature_actionAddFeature_toggled_action_is_checked')
 
 
@@ -3121,7 +3104,6 @@ class GwInfo(QObject):
         :return:
         """
 
-        self.snapper_manager.recover_snapping_options()
         self.info_layer.featureAdded.disconnect(self._open_new_feature)
         feature = tools_qt.get_feature_by_id(self.info_layer, feature_id)
         geom = feature.geometry()
@@ -3544,7 +3526,6 @@ def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result,
         msg = "Some mandatory values are missing. Please check the widgets marked in red."
         tools_qgis.show_warning(msg, dialog=dialog)
         tools_qt.set_action_checked("actionEdit", True, dialog)
-        QgsProject.instance().blockSignals(False)
         return False
 
     fields = json.dumps(my_json)

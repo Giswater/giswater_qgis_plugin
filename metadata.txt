@@ -1,20 +1,22 @@
 [general]
 name=giswater
-qgisMinimumVersion=3.10
-qgisMaximumVersion=3.99
-description=Plugin to manage water networks (water supply, sewerage and urban drainage) using QGIS and PostGIS-PostgreSQL(from 9.5 to 15.x)
+qgisMinimumVersion=3.22
+qgisMaximumVersion=3.28
+description=Plugin to manage water networks (water supply, sewerage and urban drainage) using QGIS and PostGIS-PostgreSQL
 about=Disclaimer: This plugin is released using the open source GNU-GPL3 license. Although a reasonable effort has been made to assure that the results obtained are correct,  some of the capabilities provided by Giswater are experimental, therefore the development team and the Giswater Association are not responsible and assume no liability whatsoever for any results or any use made of the results obtained from the program, nor for any damages or litigation that result from the use of these programs for any purpose.
-version=3.6.003
+version=3.6.005
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Elies Bertran, Abel García Juanes, Xavier Torret
 
 
-Changelog=Version 3.6.003
-    - Change layers style when activating/deactivating epa world
-    - Reduced the time it takes to open the info form
-    - Fix highlight for polygons
-    - Go2Epa multistep approach
-    - Add properties button in dscenario dialog
-    - Improvements & fixes to flowregulator & demand actions
+Changelog=Version 3.6.006
+    - Fix snapping when inserting features
+    - Enhancement: highlight features with state 0 in psector
+    - Add new button to info right-click menu to open/close valves in netscenario
+    - New button "toggle active" in netscenario
+    - New button to delete items from curve (non-visual objects)
+    - Add date of creation in schema properties
+    - Bug fixes in netscenario
+    - Bug fixes in mapzone config
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
@@ -26,7 +28,7 @@ icon=icons/dialogs/20x20/giswater.png
 experimental=False
 
 # Compatibility versions
-minorQgisVersion=3.16
-majorQgisVersion=3.99
-minorPgVersion=9.05.00
+minorQgisVersion=3.22
+majorQgisVersion=3.28
+minorPgVersion=9.5.00
 majorPgVersion=15.00.99

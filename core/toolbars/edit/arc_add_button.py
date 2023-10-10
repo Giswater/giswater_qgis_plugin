@@ -43,6 +43,9 @@ class GwArcAddButton(GwAction):
 
     def clicked_event(self):
 
+        # Refresh cat feature list
+        self._fill_arc_menu()
+
         if self.menu.property('last_selection') is not None:
             self.info_feature.add_feature(self.menu.property('last_selection'), action=self)
 

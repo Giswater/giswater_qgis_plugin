@@ -106,8 +106,6 @@ class GwAuxPointAddButton(GwMaptool):
             message = "Click on 2 places on the map, creating a line, then set the location of a point"
             tools_qgis.show_info(message)
 
-        # Store user snapping configuration
-        self.snapper_manager.store_snapping_options()
 
         # Get current layer
         self.current_layer = self.iface.activeLayer()
@@ -137,7 +135,6 @@ class GwAuxPointAddButton(GwMaptool):
 
         self.point_1 = None
         self.point_2 = None
-        self.snapper_manager.recover_snapping_options()
 
         # Call parent method
         super().deactivate()
@@ -259,7 +256,6 @@ class GwAuxPointAddButton(GwMaptool):
                 self.point_2 = None
 
         elif event.button() == Qt.RightButton:
-            self.snapper_manager.recover_snapping_options()
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
 

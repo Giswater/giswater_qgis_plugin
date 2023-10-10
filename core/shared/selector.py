@@ -120,6 +120,7 @@ class GwSelector:
         if aux_params:
             tools_gw.set_config_parser("selector_mincut", f"aux_params", f"{aux_params}", "user", "session")
             extras = f"{extras}, {aux_params}"
+        extras += f', "addSchema":"{lib_vars.project_vars["add_schema"]}"'
         body = tools_gw.create_body(form=form, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
 
@@ -196,7 +197,7 @@ class GwSelector:
                 if tools_qt.get_widget(dialog, f"chk_all_{tab_name}") is None:
                     widget = QCheckBox()
                     widget.setObjectName('chk_all_' + str(tab_name))
-                    widget.stateChanged.connect(partial(self._manage_all, dialog, widget))
+                    widget.toggled.connect(partial(self._manage_all, dialog, widget))
                     widget.setLayoutDirection(Qt.LeftToRight)
                     chk_all_tooltip = "Shift+Click to uncheck all"
                     widget.setToolTip(chk_all_tooltip)

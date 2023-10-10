@@ -585,6 +585,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     style_id_epa = "-1"
     tablename_og = tablename
     schema_name = tools_db.dao_db_credentials['schema'].replace('"', '')
+    field_id = field_id.replace(" ", "")
     uri = tools_db.get_uri()
     uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
     if the_geom:
@@ -642,14 +643,41 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         if style_id_epa not in (None, "-1"):
             set_layer_style(style_id_epa, layer, True)
 
-
-        # Set layer config
         if tablename:
+            # Set layer config
             feature = '"tableName":"' + str(tablename_og) + '", "isLayer":true'
             extras = '"infoType":"' + str(lib_vars.project_vars['info_type']) + '"'
             body = create_body(feature=feature, extras=extras)
             json_result = execute_procedure('gw_fct_getinfofromid', body)
             config_layer_attributes(json_result, layer, alias)
+
+            # Manage valueRelation
+            valueRelation = None
+            sql = f"SELECT addparam FROM sys_table WHERE id = '{tablename_og}'"
+            row = tools_db.get_row(sql)
+            if row:
+                valueRelation = row[0]
+                if valueRelation:
+                    valueRelation = valueRelation.get('valueRelation')
+            if valueRelation:
+                for vr in valueRelation:
+                    vr_layer = tools_qgis.get_layer_by_tablename(vr['targerLayer'])  # Get 'Layer'
+                    field_index = vr_layer.fields().indexFromName(vr['targetColumn'])   # Get 'Column' index
+                    vr_key_column = vr['keyColumn']  # Get 'Key'
+                    vr_value_column = vr['valueColumn']  # Get 'Value'
+                    vr_allow_nullvalue = vr['nullValue']  # Get null values
+                    vr_filter_expression = vr['filterExpression']  # Get 'FilterExpression'
+                    if vr_filter_expression is None:
+                        vr_filter_expression = ''
+
+                    # Create and apply ValueRelation config
+                    editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{layer.id()}',
+                                                                                 'Key': f'{vr_key_column}',
+                                                                                 'Value': f'{vr_value_column}',
+                                                                                 'AllowNull': f'{vr_allow_nullvalue}',
+                                                                                 'FilterExpression': f'{vr_filter_expression}'
+                                                                                 })
+                    vr_layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
     global_vars.iface.mapCanvas().refresh()
 
@@ -1270,7 +1298,7 @@ def build_dialog_info(dialog, result, my_json=None):
             kwargs = {"dialog": dialog, "field": field}
             widget = add_button(**kwargs)
 
-        if 'ismandatory' in field:
+        if 'ismandatory' in field and widget is not None:
             widget.setProperty('ismandatory', field['ismandatory'])
 
         if 'layoutorder' in field and field['layoutorder'] is not None:
@@ -1655,7 +1683,7 @@ def add_checkbox(**kwargs):
     if connect_signal is not None and connect_signal is False:
         return widget
 
-    if 'widgetfunction' in field:
+    if field.get('widgetfunction'):
         if 'module' in field['widgetfunction']:
             module = globals()[field['widgetfunction']['module']]
         function_name = field['widgetfunction'].get('functionName')
@@ -2550,7 +2578,7 @@ def get_project_info(schemaname=None):
         tools_qgis.show_warning(f"Table not found: '{tablename}'")
         return None
 
-    sql = (f"SELECT lower(project_type), epsg, giswater, language "
+    sql = (f"SELECT lower(project_type), epsg, giswater, language, date "
            f"FROM {schemaname}.{tablename} "
            f"ORDER BY id DESC LIMIT 1")
     row = tools_db.get_row(sql)
@@ -2559,6 +2587,7 @@ def get_project_info(schemaname=None):
                              'project_epsg': row[1],
                              'project_version': row[2],
                              'project_language': row[3],
+                             'project_date': row[4]
                              }
 
     return project_info_dict
@@ -2693,28 +2722,6 @@ def manage_layer_manager(json_result, sql=None):
                 tools_qgis.set_margin(layer, margin)
                 if prev_layer:
                     global_vars.iface.setActiveLayer(prev_layer)
-
-        # Set snnaping options
-        if 'snnaping' in layermanager:
-            snapper_manager = GwSnapManager(global_vars.iface)
-            for layer_name in layermanager['snnaping']:
-                layer = tools_qgis.get_layer_by_tablename(layer_name)
-                if layer:
-                    QgsProject.instance().blockSignals(True)
-                    segment_flag = get_vertex_flag(2)
-                    layer_settings = snapper_manager.config_snap_to_layer(layer, QgsPointLocator.All, True)
-                    if layer_settings:
-                        layer_settings.setTypeFlag(segment_flag)
-                        layer_settings.setTolerance(15)
-                        layer_settings.setEnabled(True)
-                    else:
-                        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, segment_flag, 15, 1)
-                    snapping_config = snapper_manager.get_snapping_options()
-                    snapping_config.setIndividualLayerSettings(layer, layer_settings)
-                    QgsProject.instance().blockSignals(False)
-                    QgsProject.instance().snappingConfigChanged.emit(snapping_config)
-            snapper_manager.set_snap_mode()
-            del snapper_manager
 
     except Exception as e:
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, lib_vars.schema_name)
@@ -3068,11 +3075,11 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
     return widget
 
 
-def add_icon(widget, icon, sub_folder="20x20"):
+def add_icon(widget, icon, sub_folder="20x20", folder="dialogs"):
     """ Set @icon to selected @widget """
 
     # Get icons folder
-    icons_folder = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}{sub_folder}")
+    icons_folder = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}{folder}{os.sep}{sub_folder}")
     icon_path = os.path.join(icons_folder, str(icon) + ".png")
 
     if os.path.exists(icon_path):

@@ -95,9 +95,6 @@ class GwAuxCircleAddButton(GwMaptool):
             message = "Click on feature or any place on the map and set radius of a circle"
             tools_qgis.show_info(message)
 
-        # Store user snapping configuration
-        self.snapper_manager.store_snapping_options()
-
         # Get current layer
         self.current_layer = self.iface.activeLayer()
 
@@ -127,7 +124,6 @@ class GwAuxCircleAddButton(GwMaptool):
 
     def deactivate(self):
 
-        self.snapper_manager.recover_snapping_options()
         # Call parent method
         super().deactivate()
         self.iface.setActiveLayer(self.current_layer)
@@ -224,7 +220,6 @@ class GwAuxCircleAddButton(GwMaptool):
             self._init_create_circle_form(point)
 
         elif event.button() == Qt.RightButton:
-            self.snapper_manager.recover_snapping_options()
             self.iface.actionPan().trigger()
             self.cancel_circle = True
             self.cancel_map_tool()

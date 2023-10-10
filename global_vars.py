@@ -33,7 +33,6 @@ project_type = None                     # Project type get from table "sys_versi
 signal_manager = None                   # Instance of class GwSignalManager. Found in "/core/utils/signal_manager.py"
 giswater_settings = None                # Instance of class QSettings. QGIS settings related to Giswater variables such as toolbars and checkable actions
 exec_procedure_max_retries = None       # Maximum number of execution retries of a PostgreSQL function
-use_gw_snapping = True                  # Parameter from config_param_system, if false Giswater will not manage snapping configuration
 load_project_menu = None
 # endregion
 

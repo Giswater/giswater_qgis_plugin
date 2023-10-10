@@ -395,6 +395,7 @@ def open_mincut(**kwargs):
     mincut.set_dialog(dlg_mincut)
     mincut.init_mincut_form()
     mincut.load_mincut(result_mincut_id)
+    tools_qt.manage_translation('mincut', dlg_mincut)
     mincut.manage_docker()
     mincut.set_visible_mincut_layers(True)
 
