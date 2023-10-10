@@ -643,14 +643,41 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         if style_id_epa not in (None, "-1"):
             set_layer_style(style_id_epa, layer, True)
 
-
-        # Set layer config
         if tablename:
+            # Set layer config
             feature = '"tableName":"' + str(tablename_og) + '", "isLayer":true'
             extras = '"infoType":"' + str(lib_vars.project_vars['info_type']) + '"'
             body = create_body(feature=feature, extras=extras)
             json_result = execute_procedure('gw_fct_getinfofromid', body)
             config_layer_attributes(json_result, layer, alias)
+
+            # Manage valueRelation
+            valueRelation = None
+            sql = f"SELECT addparam FROM sys_table WHERE id = '{tablename_og}'"
+            row = tools_db.get_row(sql)
+            if row:
+                valueRelation = row[0]
+                if valueRelation:
+                    valueRelation = valueRelation.get('valueRelation')
+            if valueRelation:
+                for vr in valueRelation:
+                    vr_layer = tools_qgis.get_layer_by_tablename(vr['targerLayer'])  # Get 'Layer'
+                    field_index = vr_layer.fields().indexFromName(vr['targetColumn'])   # Get 'Column' index
+                    vr_key_column = vr['keyColumn']  # Get 'Key'
+                    vr_value_column = vr['valueColumn']  # Get 'Value'
+                    vr_allow_nullvalue = vr['nullValue']  # Get null values
+                    vr_filter_expression = vr['filterExpression']  # Get 'FilterExpression'
+                    if vr_filter_expression is None:
+                        vr_filter_expression = ''
+
+                    # Create and apply ValueRelation config
+                    editor_widget_setup = QgsEditorWidgetSetup('ValueRelation', {'Layer': f'{layer.id()}',
+                                                                                 'Key': f'{vr_key_column}',
+                                                                                 'Value': f'{vr_value_column}',
+                                                                                 'AllowNull': f'{vr_allow_nullvalue}',
+                                                                                 'FilterExpression': f'{vr_filter_expression}'
+                                                                                 })
+                    vr_layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
     global_vars.iface.mapCanvas().refresh()
 
