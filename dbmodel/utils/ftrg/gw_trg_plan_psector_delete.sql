@@ -24,22 +24,22 @@ BEGIN
 	-- counting if psector is last psector for that feature
 	IF v_parent = 'arc' THEN
 		SELECT count(psector_id) INTO v_count FROM plan_psector_x_arc JOIN arc USING (arc_id) WHERE arc.state = 2 AND arc_id = OLD.arc_id;
-		v_state:= (SELECT state FROM arc WHERE arc_id = OLD.arc_id);
+		v_state:= (SELECT state FROM arc WHERE arc_id = NEW.arc_id);
 		v_feature = OLD.arc_id;
 		
 	ELSIF v_parent = 'node' THEN
 		SELECT count(psector_id) INTO v_count FROM plan_psector_x_node JOIN node USING (node_id) WHERE node.state = 2 AND node_id = OLD.node_id;
-		v_state:= (SELECT state FROM node WHERE node_id = OLD.node_id);
+		v_state:= (SELECT state FROM node WHERE node_id = NEW.node_id);
 		v_feature = OLD.node_id;
 		
 	ELSIF v_parent = 'connec' THEN
 		SELECT count(psector_id) INTO v_count FROM plan_psector_x_connec JOIN connec USING (connec_id) WHERE connec.state = 2 AND connec_id = OLD.connec_id;
-		v_state:= (SELECT state FROM connec WHERE connec_id = OLD.connec_id);
+		v_state:= (SELECT state FROM connec WHERE connec_id = NEW.connec_id);
 		v_feature = OLD.connec_id;
 		
 	ELSIF v_parent = 'gully' THEN
 		SELECT count(psector_id) INTO v_count FROM plan_psector_x_gully JOIN gully USING (gully_id) WHERE gully.state = 2 AND gully_id = OLD.gully_id;
-		v_state:= (SELECT state FROM gully WHERE gully_id = OLD.gully_id);
+		v_state:= (SELECT state FROM gully WHERE gully_id = NEW.gully_id);
 		v_feature = OLD.gully_id;
 	END IF;
 
