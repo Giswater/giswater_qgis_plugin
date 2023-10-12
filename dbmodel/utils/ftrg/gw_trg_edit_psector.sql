@@ -131,7 +131,7 @@ BEGIN
 				postcode,streetaxis_id,postnumber,postcomplement,streetaxis2_id,postnumber2,postcomplement2,a.descript,link,verified,the_geom,undelete,
 				label_x,label_y,label_rotation,publish,inventory,uncertain,expl_id,num_value,feature_type,tstamp,lastupdate,lastupdate_user,a.insert_user,
 				district_id,workcat_id_plan,asset_id,pavcat_id,drainzone_id,nodetype_1,node_sys_top_elev_1,node_sys_elev_1,nodetype_2,node_sys_top_elev_2,
-				node_sys_elev_2,parent_id,expl_id2			
+				node_sys_elev_2,parent_id,expl_id2, adate, adescript	
 				FROM plan_psector_x_arc pa JOIN arc a USING (arc_id) 
 				WHERE psector_id=NEW.psector_id;
 			
