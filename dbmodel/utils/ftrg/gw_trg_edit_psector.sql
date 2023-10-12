@@ -140,7 +140,7 @@ BEGIN
 				comment,dma_id,soilcat_id,function_type,category_type,fluid_type,location_type,workcat_id,workcat_id_end,buildercat_id,builtdate,enddate,ownercat_id,
 				muni_id,postcode,streetaxis_id,postnumber,postcomplement,streetaxis2_id,postnumber2,postcomplement2,n.descript,rotation,link,verified,the_geom,undelete,
 				label_x,label_y,label_rotation,publish,inventory,xyz_date,uncertain,unconnected,expl_id,num_value,feature_type,tstamp,arc_id,lastupdate,lastupdate_user,
-				n.insert_user,matcat_id,district_id,workcat_id_plan,asset_id,drainzone_id,parent_id,expl_id2
+				n.insert_user,matcat_id,district_id,workcat_id_plan,asset_id,drainzone_id,parent_id,expl_id2, adate, adescript
 				FROM plan_psector_x_node pn JOIN node n USING (node_id) 
 				WHERE psector_id=NEW.psector_id;
 			
