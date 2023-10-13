@@ -530,7 +530,7 @@ class GwNonVisual:
     def _manage_curve_type(self, dialog, curve_type_headers, table, index):
         """ Manage curve values table headers """
 
-        curve_type = tools_qt.get_text(dialog, 'cmb_curve_type')
+        curve_type = tools_qt.get_text(dialog, 'cmb_curve_type', return_string_null=False)
         if curve_type:
             headers = curve_type_headers.get(curve_type)
             table.setHorizontalHeaderLabels(headers)
