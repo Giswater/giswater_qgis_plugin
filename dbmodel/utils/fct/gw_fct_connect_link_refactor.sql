@@ -91,8 +91,10 @@ BEGIN
 			UPDATE plan_psector_x_gully SET link_id=v_new_link_id WHERE gully_id=rec.gully_id;
 			
 			INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, link_id, active)
-			SELECT rec.gully_id, exit_id, rec.psector_id, 0, link_id, true
-			FROM link WHERE feature_id=rec.gully_id AND link.state=1;
+			SELECT rec.gully_id, gully.arc_id, rec.psector_id, 0, link_id, true
+			FROM link 
+			JOIN gully ON link.feature_id = gully.gully_id
+			WHERE feature_id=rec.gully_id AND link.state=1;
 		END LOOP;
 	END IF;
 
