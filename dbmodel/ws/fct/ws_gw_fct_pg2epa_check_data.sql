@@ -892,7 +892,7 @@ BEGIN
 		-- remove anl tables
 		DELETE FROM temp_anl_node WHERE fid = v_record.fid AND cur_user = current_user;
 		DELETE FROM temp_anl_arc WHERE fid = v_record.fid AND cur_user = current_user;
-		DELETE FROM (anl_node): WHERE fid = v_record.fid AND cur_user = current_user;
+		DELETE FROM anl_node WHERE fid = v_record.fid AND cur_user = current_user;
 
 		DELETE FROM temp_audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user AND fid = v_fid;
 	END LOOP;
