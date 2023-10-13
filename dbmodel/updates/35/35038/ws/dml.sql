@@ -25,4 +25,7 @@ UPDATE link SET exit_type=NULL where link_id in (select link_id from link l
 left join connec c on connec_id=feature_id 
 where exit_type='VNODE' and l.feature_type = 'CONNEC' and connec_id is null);
 
+UPDATE link SET exit_type=NULL where exit_type='VNODE'; 
+UPDATE link SET feature_type=NULL where feature_type='VNODE';
+
 DELETE FROM sys_feature_type WHERE id='VNODE';
