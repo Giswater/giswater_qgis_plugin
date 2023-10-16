@@ -234,7 +234,7 @@ BEGIN
 		IF v_value !='null' OR v_value !='NULL' THEN
 
 			IF v_field in ('geom', 'the_geom') THEN
-				v_value := (SELECT ST_SetSRID((v_value)::geometry, 25831));
+				v_value := (SELECT ST_SetSRID((v_value)::geometry, v_epsg));
 			END IF;
 			--building the query text
 			IF i=1 OR v_first IS FALSE THEN

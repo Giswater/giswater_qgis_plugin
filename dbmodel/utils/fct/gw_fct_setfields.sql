@@ -205,7 +205,7 @@ BEGIN
 				END IF;
 
 				IF v_field in ('geom', 'the_geom') THEN
-					v_value := (SELECT ST_SetSRID((v_value)::geometry, 25831));
+					v_value := (SELECT ST_SetSRID((v_value)::geometry, SRID_VALUE));
 				END IF;
 
 				--building the query text
