@@ -6,14 +6,21 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3068
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_setendfeature(json);
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setendfeature(p_data json)
-  RETURNS json AS
-$BODY$
+ RETURNS json
+ LANGUAGE plpgsql
+AS $function$
 
 /* example
+fid = 518
+
+
 	SELECT SCHEMA_NAME.gw_fct_setendfeature($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
-	"form":{}, "feature":{"featureType":"arc", "featureId":["113935", "2076", "2215"]}, 
+	"form":{}, "feature":{["featureType":"arc", "featureId":["113935", "2076", "2215"]],
+			      ["featureType":"node", "featureId":["113935", "2076", "2215"]], 
+			      ["featureType":"connec", "featureId":["113935", "2076", "2215"]],
+			      ["featureType":"gully", "featureId":["113935", "2076", "2215"]]}, 
 	"data":{"filterFields":{}, "pageInfo":{}, "state_type":"1", "workcat_id_end":"work1", 
 	"enddate":"2020/12/04", "workcat_date":"2017/12/06", "description":"Description work1"}}$$);
 */
@@ -38,11 +45,11 @@ v_status text;
 v_level integer;
 v_message text;
 v_result text;
-v_count integer;
-v_elem record;
+v_count integer = 0;
+v_querytext text;
+v_fid integer = 518;
 
 BEGIN
-
 	--  Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 	
@@ -51,6 +58,11 @@ BEGIN
 	INTO v_version;
       
 	SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
+	--set current process as users parameter
+	DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
+
+	INSERT INTO config_param_user (value, parameter, cur_user)
+	VALUES (txid_current(),'utils_cur_trans',current_user );
 
 	-- Get input parameters:
 	v_featuretype := lower((p_data ->> 'feature')::json->> 'featureType');
@@ -61,135 +73,253 @@ BEGIN
 
 	select array_agg(a) into v_id_list from json_array_elements_text(v_id::json) a;
 
-	IF v_featuretype = 'arc' THEN 
-	
-		FOREACH rec_id IN ARRAY(v_id_list)
-		LOOP
-			--remove links related to arc
-			EXECUTE 'DELETE FROM link 
-			WHERE link_id IN (SELECT link_id FROM link l JOIN connec c ON c.connec_id = l.feature_id WHERE c.arc_id = '|| quote_literal(rec_id)||');';
-			
-			EXECUTE 'UPDATE connec SET arc_id = NULL WHERE arc_id = '|| quote_literal(rec_id)||';';
+	-- manage log
+	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
 
-			IF v_projecttype = 'UD' THEN
-				--remove links related to arc
-				EXECUTE 'DELETE FROM link 
-				WHERE link_id IN (SELECT link_id FROM link l JOIN gully g ON g.gully_id = l.feature_id WHERE g.arc_id = '|| quote_literal(rec_id)||');';
-				
-				EXECUTE 'UPDATE gully SET arc_id = NULL WHERE arc_id = '|| quote_literal(rec_id)||';';
-			END IF;
-			
-		END LOOP;
+
+	-- build log
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('END FEATURE'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '------------------------------');
+
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, 'WARNINGS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '--------------');
+
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '-------');
+	
+
+	--LOOP v_featuretype	
+
+		IF v_featuretype = 'arc' THEN 
 		
-	
-	ELSIF v_featuretype = 'node' THEN
-	
-		FOREACH rec_id IN ARRAY(v_id_list)
-		LOOP
-			--check if node is involved into psector because of arc
-			EXECUTE 'SELECT count(arc.arc_id)  FROM arc WHERE (node_1='|| quote_literal(rec_id)||' OR node_2='|| quote_literal(rec_id)||') AND arc.state = 2;'
-			INTO v_num_feature;
-
-			IF v_num_feature > 0 THEN
-				
-				EXECUTE 'SELECT string_agg(name::text, '', ''), string_agg(psector_id::text, '', '')
-				FROM plan_psector_x_arc JOIN plan_psector USING (psector_id) where arc_id IN 
-				(SELECT arc.arc_id FROM arc WHERE (node_1='||quote_literal(rec_id)||' OR node_2='|| quote_literal(rec_id)||') AND arc.state = 2);'
-				INTO v_psector_list, v_psector_id;
-
-				IF v_psector_id IS NOT NULL THEN 
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3142", "function":"3068","debug_msg":"'||v_psector_list||'", "is_process":true}}$$);' INTO v_audit_result;
-				END IF;
-			END IF;
-
-			--check if node is related to on service arcs
-			EXECUTE 'SELECT count(arc.arc_id)  FROM arc WHERE (node_1='|| quote_literal(rec_id)||' OR node_2='|| quote_literal(rec_id)||') AND arc.state = 1;'
-			INTO v_num_feature;		
-	
-			IF v_num_feature > 0 THEN
-			
-				v_result = 'SELECT array_agg(arc_id) FROM arc WHERE (node_1='|| quote_literal(rec_id)||' OR node_2='|| quote_literal(rec_id)||') AND arc.state = 1;';
-
-				EXECUTE v_result INTO v_result;
-
-				v_result=concat(rec_id,' has associated arcs ',v_result);				
-
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"1072", "function":"3068","debug_msg":"'||v_result||'", "is_process":true}}$$);' INTO v_audit_result;
-			END IF;
-		END LOOP;
-
-
-	ELSIF v_featuretype='connec' or v_featuretype='gully' then
 			FOREACH rec_id IN ARRAY(v_id_list)
 			LOOP
-				EXECUTE 'UPDATE link SET state = 0 WHERE feature_id = '|| quote_literal(rec_id)||';';
-			END LOOP;
-	END IF;
+				v_count = v_count + 1;
+				
+				--remove links related to arc
+				EXECUTE 'DELETE FROM link 
+				WHERE link_id IN (SELECT link_id FROM link l JOIN connec c ON c.connec_id = l.feature_id WHERE c.arc_id = '|| quote_literal(rec_id)||');';
+				
+				EXECUTE 'UPDATE connec SET arc_id = NULL WHERE arc_id = '|| quote_literal(rec_id)||';';
 
-	IF v_audit_result is null THEN
-		FOREACH rec_id IN ARRAY(v_id_list) LOOP
+				IF v_projecttype = 'UD' THEN
+					--remove links related to arc
+					EXECUTE 'DELETE FROM link 
+					WHERE link_id IN (SELECT link_id FROM link l JOIN gully g ON g.gully_id = l.feature_id WHERE g.arc_id = '|| quote_literal(rec_id)||');';
+					
+					EXECUTE 'UPDATE gully SET arc_id = NULL WHERE arc_id = '|| quote_literal(rec_id)||';';
+				END IF;			
 
-      -- perform state control for connects
-      IF v_featuretype='connec' or v_featuretype='gully' then
-			/* (TO DO: Refactor Add tab 'log' to control if there are more than 1 related features for elements)
-			SELECT element_id FROM element_x_node WHERE node_id=rec_id
-			UNION 
-			SELECT element_id FROM element_x_arc WHERE arc_id=rec_id
-			union
-			SELECT element_id FROM element_x_connec WHERE connec_id=rec_id
-			INTO v_elem;
-			EXECUTE 'with a as (select element_id, arc_id as feature_id from element_x_arc 
-					union select element_id, node_id as feature_id from element_x_node 
-					union select element_id, connec_id as feature_id from element_x_connec),
-			elem as (select element_id, state as element_state from element)
-			select count(*) from a join elem using (element_id) where element_id'|| quote_literal(rec_id)||'
-			and element_state = 1' into v_count;*/		
-				PERFORM gw_fct_state_control(upper(v_featuretype::varchar), rec_id::varchar, 0, 'UPDATE');
-			END IF;
-
-			IF v_workcat_id_end IS NOT NULL THEN 
-				EXECUTE 'UPDATE '||v_featuretype||' SET state = 0, state_type='||v_state_type||', 
-				workcat_id_end = '||quote_literal(v_workcat_id_end)||',
-				enddate = '||quote_literal(v_enddate)||' WHERE '||v_featuretype||'_id ='||quote_literal(rec_id)||'';
+				-- specific log for arcs which have elements associated to other features
+				if projecttype = 'UD' then
+					v_querytext = 'With b as (select element_id, arc_id as feature_id from element_x_arc 
+						union select element_id, node_id as feature_id from element_x_node 
+						union select element_id, connec_id as feature_id from element_x_connec
+						union select element_id, gully_id as feature_id from element_x_gully),
+						c as (select element_id from element_x_'||v_featuretype||' where '||v_featuretype||'_id= '||quote_literal(rec_id)||')
+						select count(*)-1, element_id from b join c using(element_id) group by b.element_id, arc_id having count(*)>1;';
+				elsif projecttype = 'WS' then
+					v_querytext = 'With b as (select element_id, arc_id as feature_id from element_x_arc 
+						union select element_id, node_id as feature_id from element_x_node 
+						union select element_id, connec_id as feature_id from element_x_connec),
+						c as (select element_id from element_x_'||v_featuretype||' where '||v_featuretype||'_id= '||quote_literal(rec_id)||')
+						select count(*)-1, element_id from b join c using(element_id) group by b.element_id, arc_id having count(*)>1;';
+				end if;
 			
-				-- related elements to obsolete
-				EXECUTE 'UPDATE element e SET state = 0, state_type='||v_state_type||', 
-				workcat_id_end = '||quote_literal(v_workcat_id_end)||',
-				enddate = '||quote_literal(v_enddate)||' FROM element_x_'||v_featuretype||' f WHERE f.element_id=e.element_id AND '||v_featuretype||'_id ='||quote_literal(rec_id)||'';
+				EXECUTE ' SELECT count(*) FROM ('||v_querytext||' ) a' INTO v_count;
 				
-			ELSE 
-				EXECUTE 'UPDATE '||v_featuretype||' SET state = 0, state_type='||v_state_type||', 
-				enddate = '||quote_literal(v_enddate)||' WHERE '||v_featuretype||'_id ='||quote_literal(rec_id)||'';
-				
-				-- related elements to obsolete
-				EXECUTE 'UPDATE element e SET state = 0, state_type='||v_state_type||', 
-				enddate = '||quote_literal(v_enddate)||' FROM element_x_'||v_featuretype||' f WHERE f.element_id=e.element_id AND '||v_featuretype||'_id ='||quote_literal(rec_id)||'';
-			END IF;
-			/* (TO DO: Refactor Add tab 'log' to control if there are more than 1 related features for elements)
-			if v_count > 1 then
-				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (xxx, v_result_id, 'This element was related to more than 1 feature. All of them have been affected by this action.');
-			end if;*/
-		END LOOP;
-	END IF;
+				IF v_count > 0 THEN
+					-- header built dinamyc on python
+					INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, concat(v_count , ' elements related to arc (',rec_id,') have been also downgraded with this feature'));
+				END IF;
+			END LOOP;
 
+			-- generic log for arcs
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, concat(v_count, ' arc(s) have been downgraded')); 
+			END IF;
+		
+		
+		ELSIF v_featuretype = 'node' THEN
+		
+			FOREACH rec_id IN ARRAY(v_id_list)
+			LOOP
+				--check if node is involved into psector because of arc
+				EXECUTE 'SELECT count(arc.arc_id)  FROM arc WHERE (node_1='|| quote_literal(rec_id)||' OR node_2='|| quote_literal(rec_id)||') AND arc.state = 2;'
+				INTO v_num_feature;
+
+				IF v_num_feature > 0 THEN
+					
+					EXECUTE 'SELECT string_agg(name::text, '', ''), string_agg(psector_id::text, '', '')
+					FROM plan_psector_x_arc JOIN plan_psector USING (psector_id) where arc_id IN 
+					(SELECT arc.arc_id FROM arc WHERE (node_1='||quote_literal(rec_id)||' OR node_2='|| quote_literal(rec_id)||') AND arc.state = 2);'
+					INTO v_psector_list, v_psector_id;
+
+					IF v_psector_id IS NOT NULL THEN 
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3142", "function":"3068","debug_msg":"'||v_psector_list||'"}}$$);' INTO v_audit_result;
+					END IF;
+				END IF;
+
+				--check if node is related to on service arcs
+				EXECUTE 'SELECT count(arc.arc_id)  FROM arc WHERE (node_1='|| quote_literal(rec_id)||' OR node_2='|| quote_literal(rec_id)||') AND arc.state = 1;'
+				INTO v_num_feature;		
+		
+				IF v_num_feature > 0 THEN
+				
+					v_result = 'SELECT array_agg(arc_id) FROM arc WHERE (node_1='|| quote_literal(rec_id)||' OR node_2='|| quote_literal(rec_id)||') AND arc.state = 1;';
+
+					EXECUTE v_result INTO v_result;
+
+					v_result=concat(rec_id,' has associated arcs ',v_result);				
+
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"1072", "function":"3068","debug_msg":"'||v_result||'"}}$$);' INTO v_audit_result;
+				END IF;
+			
+				-- log specific, en cas que un node la lii amb un elements related a més objectes
+				if projecttype = 'UD' then
+					v_querytext = 'With b as (select element_id, arc_id as feature_id from element_x_arc 
+						union select element_id, node_id as feature_id from element_x_node 
+						union select element_id, connec_id as feature_id from element_x_connec
+						union select element_id, gully_id as feature_id from element_x_gully),
+						c as (select element_id from element_x_'||v_featuretype||' where '||v_featuretype||'_id= '||quote_literal(rec_id)||')
+						select count(*)-1, element_id from b join c using(element_id) group by b.element_id, node_id having count(*)>1;';
+				elsif projecttype = 'WS' then
+					v_querytext = 'With b as (select element_id, arc_id as feature_id from element_x_arc 
+						union select element_id, node_id as feature_id from element_x_node 
+						union select element_id, connec_id as feature_id from element_x_connec),
+						c as (select element_id from element_x_'||v_featuretype||' where '||v_featuretype||'_id= '||quote_literal(rec_id)||')
+						select count(*)-1, element_id from b join c using(element_id) group by b.element_id, node_id having count(*)>1;';
+				end if;
+			
+				EXECUTE ' SELECT count(*) FROM ('||v_querytext||' ) a' INTO v_count;
+				
+				IF v_count > 0 THEN
+					-- header built dinamyc on python
+					INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, concat(v_count , ' elements related to arc (',rec_id,') have been also downgraded with this feature'));
+				END IF;
+			END LOOP;
+			
+			-- generic log for nodes
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, concat(v_count, ' node(s) have been downgraded')); 
+			END IF;
+				
+		ELSIF v_featuretype = 'connec' THEN
+			FOREACH rec_id IN ARRAY(v_id_list)
+			LOOP
+				-- log specific, en cas que un connec la lii amb un elements related a més objectes
+				if projecttype = 'UD' then
+					v_querytext = 'With b as (select element_id, arc_id as feature_id from element_x_arc 
+						union select element_id, node_id as feature_id from element_x_node 
+						union select element_id, connec_id as feature_id from element_x_connec
+						union select element_id, gully_id as feature_id from element_x_gully),
+						c as (select element_id from element_x_'||v_featuretype||' where '||v_featuretype||'_id= '||quote_literal(rec_id)||')
+						select count(*)-1, element_id from b join c using(element_id) group by b.element_id, connec_id having count(*)>1;';
+				elsif projecttype = 'WS' then
+					v_querytext = 'With b as (select element_id, arc_id as feature_id from element_x_arc 
+						union select element_id, node_id as feature_id from element_x_node 
+						union select element_id, connec_id as feature_id from element_x_connec),
+						c as (select element_id from element_x_'||v_featuretype||' where '||v_featuretype||'_id= '||quote_literal(rec_id)||')
+						select count(*)-1, element_id from b join c using(element_id) group by b.element_id, connec_id having count(*)>1;';
+				end if;
+			
+				EXECUTE ' SELECT count(*) FROM ('||v_querytext||' ) a' INTO v_count;
+				
+				IF v_count > 0 THEN
+					-- header built dinamyc on python
+					INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, concat(v_count , ' elements related to arc (',rec_id,') have been also downgraded with this feature'));
+				END IF;
+			END LOOP;
+
+			-- generic log for connecs
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, concat(v_count, ' connec(s) have been downgraded')); 
+			END IF;
+		
+		ELSIF v_featuretype = 'gully' THEN
+			FOREACH rec_id IN ARRAY(v_id_list)
+			LOOP
+				-- log specific, en cas que un gully la lii amb un elements related a més objectes
+				v_querytext = 'with b as (select element_id, arc_id as feature_id from element_x_arc 
+						union select element_id, node_id as feature_id from element_x_node 
+						union select element_id, connec_id as feature_id from element_x_connec
+						union select element_id, gully_id as feature_id from element_x_gully),
+						c as (select element_id from element_x_'||v_featuretype||' where '||v_featuretype||'_id= '||quote_literal(rec_id)||')
+						select count(*)-1, element_id from b join c using(element_id) group by b.element_id, gully_id having count(*)>1;';
+		
+				EXECUTE ' SELECT count(*) FROM ('||v_querytext||' ) a' INTO v_count;
+					
+				IF v_count > 0 THEN
+					-- header built dinamyc on python
+					INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, concat(v_count , ' elements related to gully (',rec_id,') have been also downgraded with this feature'));
+				END IF;
+			end loop;
+			
+			-- generic log for connecs
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, concat(v_count, ' gully(s) have been downgraded')); 
+			END IF;
+		END IF;
+
+		IF v_audit_result is null THEN
+
+			FOREACH rec_id IN ARRAY(v_id_list) LOOP
+
+			-- perform state control for connects
+			IF v_featuretype='connec' or v_featuretype='gully' then
+					PERFORM gw_fct_state_control(upper(v_featuretype::varchar), rec_id::varchar, 0, 'UPDATE');
+				END IF;
+
+				IF v_workcat_id_end IS NOT NULL THEN 
+					EXECUTE 'UPDATE '||v_featuretype||' SET state = 0, state_type='||v_state_type||', 
+					workcat_id_end = '||quote_literal(v_workcat_id_end)||',
+					enddate = '||quote_literal(v_enddate)||' WHERE '||v_featuretype||'_id ='||quote_literal(rec_id)||'';
+				
+					-- related elements to obsolete
+					EXECUTE 'UPDATE element e SET state = 0, state_type='||v_state_type||', 
+					workcat_id_end = '||quote_literal(v_workcat_id_end)||',
+					enddate = '||quote_literal(v_enddate)||' FROM element_x_'||v_featuretype||' f WHERE f.element_id=e.element_id AND '||v_featuretype||'_id ='||quote_literal(rec_id)||'';
+					
+				ELSE 
+					EXECUTE 'UPDATE '||v_featuretype||' SET state = 0, state_type='||v_state_type||', 
+					enddate = '||quote_literal(v_enddate)||' WHERE '||v_featuretype||'_id ='||quote_literal(rec_id)||'';
+					
+					-- related elements to obsolete
+					EXECUTE 'UPDATE element e SET state = 0, state_type='||v_state_type||', 
+					enddate = '||quote_literal(v_enddate)||' FROM element_x_'||v_featuretype||' f WHERE f.element_id=e.element_id AND '||v_featuretype||'_id ='||quote_literal(rec_id)||'';
+				END IF;
+			END LOOP;
+		END IF;
+	--END LOOP;
 
 	IF v_audit_result is null THEN
-        v_status = 'Accepted';
-        v_level = 3;
-        v_message = 'Process done successfully';
-    ELSE
+		v_status = 'Accepted';
+		v_level = 3;
+		v_message = 'Process done successfully';
+	ELSE
 
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+	
+	END IF;
 
-    END IF;
+	DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
 
+	-- build log
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '');
 
-	v_version := COALESCE(v_version, '[]');
-	v_result_info := COALESCE(v_result_info, '[]');
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND 
+	fid = v_fid order by criticity desc, id asc) row;
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":"'||v_level||'", "text":"'||v_message||'"}, "version":"'||v_version||'"'||
@@ -203,7 +333,5 @@ BEGIN
 	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
-
+$function$
+;
