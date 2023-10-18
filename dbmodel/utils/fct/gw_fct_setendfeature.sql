@@ -122,13 +122,13 @@ BEGIN
 						union select element_id, connec_id as feature_id from element_x_connec
 						union select element_id, gully_id as feature_id from element_x_gully),
 						c as (select element_id from element_x_'||v_feature_type||' where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
-						select count(*)-1, element_id from b join c using(element_id) group by b.element_id, feature_id having count(*)>1';
+						select count(*)-1, element_id from b join c using(element_id) group by b.element_id having count(*)>1';
 				elsif v_projecttype = 'WS' then
 					v_querytext = 'With b as (select element_id, arc_id as feature_id from element_x_arc
 						union select element_id, node_id as feature_id from element_x_node
 						union select element_id, connec_id as feature_id from element_x_connec),
 						c as (select element_id from element_x_'||v_feature_type||' where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
-						select count(*)-1, element_id from b join c using(element_id) group by b.element_id, feature_id having count(*)>1';
+						select count(*)-1, element_id from b join c using(element_id) group by b.element_id having count(*)>1';
 				end if;
 
 				EXECUTE ' SELECT count(*) FROM ('||v_querytext||' ) a' INTO v_count;
@@ -182,20 +182,20 @@ BEGIN
 					"data":{"message":"1072", "function":"3068","debug_msg":"'||v_result||'"}}$$);' INTO v_audit_result;
 				END IF;
 
-				-- log specific, en cas que un node la lii amb un elements related a més objectes
+				-- specific log when a node is related to more than 1 node/arc/connec/gully
 				if v_projecttype = 'UD' then
 					v_querytext = 'With b as (select element_id, arc_id as feature_id from element_x_arc
 						union select element_id, node_id as feature_id from element_x_node
 						union select element_id, connec_id as feature_id from element_x_connec
 						union select element_id, gully_id as feature_id from element_x_gully),
 						c as (select element_id from element_x_'||v_feature_type||' where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
-						select count(*)-1, element_id from b join c using(element_id) group by b.element_id, feature_id having count(*)>1';
+						select count(*)-1, element_id from b join c using(element_id) group by b.element_id having count(*)>1';
 				elsif v_projecttype = 'WS' then
 					v_querytext = 'With b as (select element_id, arc_id as feature_id from element_x_arc
 						union select element_id, node_id as feature_id from element_x_node
 						union select element_id, connec_id as feature_id from element_x_connec),
 						c as (select element_id from element_x_'||v_feature_type||' where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
-						select count(*)-1, element_id from b join c using(element_id) group by b.element_id, feature_id having count(*)>1';
+						select count(*)-1, element_id from b join c using(element_id) group by b.element_id having count(*)>1';
 				end if;
 
 				EXECUTE ' SELECT count(*) FROM ('||v_querytext||' ) a' INTO v_count;
@@ -215,20 +215,20 @@ BEGIN
 			FOR v_feature_id_value IN SELECT value FROM jsonb_array_elements_text((v_feature_element->>'featureId')::jsonb)
     		loop
 	    		v_count_feature = v_count_feature + 1;
-				-- log specific, en cas que un connec la lii amb un elements related a més objectes
+				-- specific log when a connec is related to more than 1 node/arc/connec/gully
 				if v_projecttype = 'UD' then
 					v_querytext = 'With b as (select element_id, arc_id as feature_id from element_x_arc
 						union select element_id, node_id as feature_id from element_x_node
 						union select element_id, connec_id as feature_id from element_x_connec
 						union select element_id, gully_id as feature_id from element_x_gully),
 						c as (select element_id from element_x_'||v_feature_type||' where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
-						select count(*)-1, element_id from b join c using(element_id) group by b.element_id, feature_id having count(*)>1';
+						select count(*)-1, element_id from b join c using(element_id) group by b.element_id having count(*)>1';
 				elsif v_projecttype = 'WS' then
 					v_querytext = 'With b as (select element_id, arc_id as feature_id from element_x_arc
 						union select element_id, node_id as feature_id from element_x_node
 						union select element_id, connec_id as feature_id from element_x_connec),
 						c as (select element_id from element_x_'||v_feature_type||' where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
-						select count(*)-1, element_id from b join c using(element_id) group by b.element_id, feature_id having count(*)>1';
+						select count(*)-1, element_id from b join c using(element_id) group by b.element_id having count(*)>1';
 				end if;
 
 				EXECUTE ' SELECT count(*) FROM ('||v_querytext||' ) a' INTO v_count;
@@ -247,13 +247,13 @@ BEGIN
 			FOR v_feature_id_value IN SELECT value FROM jsonb_array_elements_text((v_feature_element->>'featureId')::jsonb)
     		loop
 	    		v_count_feature = v_count_feature + 1;
-				-- log specific, en cas que un gully la lii amb un elements related a més objectes
+				-- specific log when a gully is related to more than 1 node/arc/connec/gully
 				v_querytext = 'with b as (select element_id, arc_id as feature_id from element_x_arc
 						union select element_id, node_id as feature_id from element_x_node
 						union select element_id, connec_id as feature_id from element_x_connec
 						union select element_id, gully_id as feature_id from element_x_gully),
 						c as (select element_id from element_x_'||v_feature_type||' where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
-						select count(*)-1, element_id from b join c using(element_id) group by b.element_id, feature_id having count(*)>1';
+						select count(*)-1, element_id from b join c using(element_id) group by b.element_id having count(*)>1';
 
 				EXECUTE ' SELECT count(*) FROM ('||v_querytext||' ) a' INTO v_count;
 
