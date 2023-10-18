@@ -156,7 +156,8 @@ BEGIN
         	v_id_array := string_to_array(v_id, ', ');
         end if;
 
-        IF cardinality(v_idname_array) > 1 AND cardinality(v_id_array) > 1 then
+        IF cardinality(v_idname_array) > 0 AND cardinality(v_id_array) > 0 then
+
             i = 1;
             v_querytext := v_querytext || ' WHERE ';
             FOREACH idname IN ARRAY v_idname_array loop
@@ -164,7 +165,8 @@ BEGIN
                 i=i+1;
             END LOOP;
             v_querytext = substring(v_querytext, 0, length(v_querytext)-4);
-        ELSIF cardinality(v_idname_array) > 1 THEN
+        ELSIF cardinality(v_idname_array) > 0 then
+
             i = 1;
             v_querytext := v_querytext || ' WHERE ';
             FOREACH idname IN ARRAY v_idname_array loop
