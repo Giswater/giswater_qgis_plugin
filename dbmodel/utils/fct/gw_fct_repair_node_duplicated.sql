@@ -94,7 +94,7 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Transfer topology to node ',v_targetnode,' -> Done'));
 
 
-		ELSIF v_action = 'DONWGRADE' THEN
+		ELSIF v_action = 'DOWNGRADE' THEN
 
 			-- transfer topology
 			UPDATE arc SET node_1 = v_targetnode WHERE node_1 = v_node;
