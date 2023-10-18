@@ -828,7 +828,7 @@ BEGIN
 				order by node
 				)b group by node, trace order by 1, 2 desc
 				)c order by node, c desc) t USING (node_id)
-			JOIN presszone pz ON pz.presszone_id = t.presszone_id::text;		
+			JOIN temp_presszone pz ON pz.presszone_id = t.presszone_id::text;		
 
 			-- update on node table those elements connected on graph
 			UPDATE temp_t_node SET staticpressure=(log_message::json->>'staticpressure')::float FROM temp_t_data a WHERE a.feature_id=node_id 
@@ -1471,8 +1471,12 @@ BEGIN
 
 		IF v_class = 'PRESSZONE' THEN
 			v_visible_layer ='"v_edit_plan_netscenario_presszone"';
+			UPDATE plan_netscenario_node SET staticpressure = t.staticpressure FROM temp_t_node t WHERE plan_netscenario_node.node_id=t.node_id;
+			UPDATE plan_netscenario_connec SET staticpressure = t.staticpressure FROM temp_t_connec t WHERE plan_netscenario_connec.connec_id=t.connec_id;
 		ELSIF v_class = 'DMA' THEN
 			v_visible_layer ='"v_edit_plan_netscenario_dma"';
+			UPDATE plan_netscenario_node SET pattern_id = t.pattern_id FROM temp_dma t WHERE plan_netscenario_node.dma_id=t.dma_id;
+			UPDATE plan_netscenario_connec SET pattern_id = t.pattern_id FROM temp_dma t WHERE plan_netscenario_connec.dma_id=t.dma_id;
 		END IF;
 
 		DELETE FROM selector_inp_dscenario WHERE cur_user = current_user;
