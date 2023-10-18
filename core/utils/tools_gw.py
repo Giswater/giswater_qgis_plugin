@@ -374,7 +374,7 @@ def reconnect_signal(section, signal_name):
     return False
 
 
-def create_body(form='', feature='', filter_fields='', extras=None):
+def create_body(form='', feature='', filter_fields='', extras=None, list_feature=None):
     """ Create and return parameters as body to functions"""
 
     info_types = {'full': 1}
@@ -389,7 +389,10 @@ def create_body(form='', feature='', filter_fields='', extras=None):
     client += f'}}, '
 
     form = f'"form":{{{form}}}, '
-    feature = f'"feature":{{{feature}}}, '
+    if list_feature:
+        feature = f'"feature":{feature}, '
+    else:
+        feature = f'"feature":{{{feature}}}, '
     filter_fields = f'"filterFields":{{{filter_fields}}}'
     page_info = f'"pageInfo":{{}}'
     data = f'"data":{{{filter_fields}, {page_info}'
