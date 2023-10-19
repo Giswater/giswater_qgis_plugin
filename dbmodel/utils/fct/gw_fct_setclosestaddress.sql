@@ -86,7 +86,7 @@ BEGIN
 		END IF;
 	ELSIF v_project_type = 'UD' THEN
 		IF v_feature_type='node' THEN
-			v_partialquery=' JOIN cat_node cn on cn.id=a.nodecat_id JOIN cat_feature cf on cf.id=cn.node_type ';
+			v_partialquery=' JOIN cat_node cn on cn.id=a.nodecat_id JOIN cat_feature cf on cf.id=a.node_type ';
 		ELSE
 			v_partialquery=' ';
 		END IF;
@@ -124,7 +124,7 @@ BEGIN
 		v_partialquery3=' ea.postnumber ';
 	END IF;
 
-	IF v_polygonlayer='NONE' THEN
+	IF v_polygonlayer='NONE' OR v_polygonlayer IS NULL THEN
 		v_partialquery4='';
 	ELSE
 		EXECUTE 'select column_name from INFORMATION_SCHEMA.columns 
