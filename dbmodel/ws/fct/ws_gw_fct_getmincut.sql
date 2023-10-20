@@ -54,6 +54,7 @@ DECLARE
     v_result_arc json;
     v_tiled boolean=false;
     v_point_geom public.geometry;
+    v_bbox json;
     address_array text[];
     aux_combo text[];
     aux_street_id text[];
@@ -325,6 +326,18 @@ BEGIN
 
         END IF;
 
+        -- get v_bbox for geometry
+      	SELECT 
+		    jsonb_build_object(
+		      'x1', ST_XMin(the_geom),
+		      'y1', ST_YMin(the_geom),
+		      'x2', ST_XMax(the_geom),
+		      'y2', ST_YMax(the_geom)
+		    )
+		FROM v_om_mincut_arc
+		limit 1
+		into v_bbox;
+
         v_result_init = COALESCE(v_result_init, '{}');
         v_result_valve_proposed = COALESCE(v_result_valve_proposed, '{}');
         v_result_valve_not_proposed = COALESCE(v_result_valve_not_proposed, '{}');
@@ -340,13 +353,14 @@ BEGIN
           "data": {
             "mincutId": '|| v_mincutid ||',
             "fields": '|| v_fieldsjson ||','||
-              '"init":'||v_result_init||','||
-              '"valveClose":'||v_result_valve_proposed||','||
-              '"valveNot":'||v_result_valve_not_proposed||','||
-              '"node":'||v_result_node||','||
-              '"connec":'||v_result_connec||','||
-              '"arc":'||v_result_arc||','||
-			  '"tiled":'||v_tiled|| '
+              '"mincutInit":'||v_result_init||','||
+              '"mincutProposedValve":'||v_result_valve_proposed||','||
+              '"mincutNotProposedValve":'||v_result_valve_not_proposed||','||
+              '"mincutNode":'||v_result_node||','||
+              '"mincutConnec":'||v_result_connec||','||
+              '"mincutArc":'||v_result_arc||','||
+			  '"tiled":'||v_tiled||','||
+			  '"geometry":' ||v_bbox::text||'
           }
         }
         }';

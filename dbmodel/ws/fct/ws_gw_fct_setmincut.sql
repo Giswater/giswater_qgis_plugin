@@ -325,11 +325,11 @@ BEGIN
 	      "feature": {},
 	      "data": {
 	        "mincutId": ' || v_mincut ||','||
-			  '"init":'||v_result_init||','||
+			  '"mincutInit":'||v_result_init||','||
 			  '"valve":'||v_result_valve||','||
-			  '"node":'||v_result_node||','||
-			  '"connec":'||v_result_connec||','||
-			  '"arc":'||v_result_arc||','||
+			  '"mincutNode":'||v_result_node||','||
+			  '"mincutConnec":'||v_result_connec||','||
+			  '"mincutArc":'||v_result_arc||','||
 			  '"tiled":'||v_tiled|| '
 	      }
 	    }
