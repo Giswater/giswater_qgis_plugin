@@ -61,3 +61,55 @@ JOIN v_state_link USING (link_id);
 
 CREATE OR REPLACE VIEW v_edit_link AS SELECT *
 FROM v_link l;
+
+
+--22/10/23
+drop view if exists v_ui_arc_x_relations;
+CREATE OR REPLACE VIEW v_ui_arc_x_relations as
+  WITH links_node AS (
+         SELECT n.node_id,
+            l.feature_id,
+            l.exit_type AS proceed_from,
+            l.exit_id AS proceed_from_id,
+            l.state AS l_state,
+            n.state AS n_state
+           FROM node n
+             JOIN link l ON n.node_id::text = l.exit_id::text
+             where l.state = 1
+        )
+ SELECT row_number() OVER () + 1000000 AS rid,  
+    v_connec.arc_id,
+    v_connec.connec_type AS featurecat_id,
+    v_connec.connecat_id AS catalog,
+    v_connec.connec_id AS feature_id,
+    v_connec.code AS feature_code,
+    v_connec.sys_type,
+    a.state as arc_state,
+    v_connec.state AS feature_state,
+    st_x(v_connec.the_geom) AS x,
+    st_y(v_connec.the_geom) AS y,
+    l.exit_type AS proceed_from,
+    l.exit_id AS proceed_from_id,
+    'v_edit_connec'::text AS sys_table_id
+   FROM v_connec
+     JOIN link l ON v_connec.connec_id::text = l.feature_id::text
+     JOIN arc a ON a.arc_id = v_connec.arc_id
+  WHERE v_connec.arc_id IS NOT NULL AND l.exit_type::text <> 'NODE'::text AND l.state = 1 AND l.state = 1 and a.state = 1
+UNION
+ SELECT DISTINCT ON (c.connec_id) row_number() OVER () + 2000000 AS rid,
+    a.arc_id,
+    c.connec_type AS featurecat_id,
+    c.connecat_id AS catalog,
+    c.connec_id AS feature_id,
+    c.code AS feature_code,
+    c.sys_type,
+    a.state as arc_state,
+    c.state AS feature_state,
+    st_x(c.the_geom) AS x,
+    st_y(c.the_geom) AS y,
+    n.proceed_from,
+    n.proceed_from_id,
+    'v_edit_connec'::text AS sys_table_id
+   FROM arc a
+     JOIN links_node n ON a.node_1::text = n.node_id::text
+     JOIN v_connec c ON c.connec_id::text = n.feature_id::text

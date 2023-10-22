@@ -68,8 +68,8 @@ CREATE OR REPLACE VIEW v_ui_arc_x_relations as
             l.exit_id AS proceed_from_id,
             l.state AS l_state,
             n.state AS n_state
-           FROM SCHEMA_NAME.node n
-             JOIN SCHEMA_NAME.link l ON n.node_id::text = l.exit_id::text
+           FROM node n
+             JOIN link l ON n.node_id::text = l.exit_id::text
              where l.state = 1
         )
  SELECT row_number() OVER () + 1000000 AS rid,  
@@ -86,9 +86,9 @@ CREATE OR REPLACE VIEW v_ui_arc_x_relations as
     l.exit_type AS proceed_from,
     l.exit_id AS proceed_from_id,
     'v_edit_connec'::text AS sys_table_id
-   FROM SCHEMA_NAME.v_connec
-     JOIN SCHEMA_NAME.link l ON v_connec.connec_id::text = l.feature_id::text
-     JOIN SCHEMA_NAME.arc a ON a.arc_id = v_connec.arc_id
+   FROM v_connec
+     JOIN link l ON v_connec.connec_id::text = l.feature_id::text
+     JOIN arc a ON a.arc_id = v_connec.arc_id
   WHERE v_connec.arc_id IS NOT NULL AND l.exit_type::text <> 'NODE'::text AND l.state = 1 AND l.state = 1 and a.state = 1
 UNION
  SELECT DISTINCT ON (c.connec_id) row_number() OVER () + 2000000 AS rid,
@@ -105,9 +105,9 @@ UNION
     n.proceed_from,
     n.proceed_from_id,
     'v_edit_connec'::text AS sys_table_id
-   FROM SCHEMA_NAME.arc a
+   FROM arc a
      JOIN links_node n ON a.node_1::text = n.node_id::text
-     JOIN SCHEMA_NAME.v_connec c ON c.connec_id::text = n.feature_id::text
+     JOIN v_connec c ON c.connec_id::text = n.feature_id::text
 UNION
  SELECT row_number() OVER () + 3000000 AS rid, 
     v_gully.arc_id,
@@ -123,9 +123,9 @@ UNION
     l.exit_type AS proceed_from,
     l.exit_id AS proceed_from_id,
     'v_edit_gully'::text AS sys_table_id
-   FROM SCHEMA_NAME.v_gully
-     JOIN SCHEMA_NAME.link l ON v_gully.gully_id::text = l.feature_id::text
-     JOIN SCHEMA_NAME.arc a ON a.arc_id = v_gully.arc_id
+   FROM v_gully
+     JOIN link l ON v_gully.gully_id::text = l.feature_id::text
+     JOIN arc a ON a.arc_id = v_gully.arc_id
   WHERE v_gully.arc_id IS NOT NULL AND l.exit_type::text <> 'NODE'::text AND l.state = 1 and a.state =  1
 UNION
  SELECT DISTINCT ON (g.gully_id) row_number() OVER () + 4000000 AS rid, 
@@ -142,6 +142,6 @@ UNION
     n.proceed_from,
     n.proceed_from_id,
     'v_edit_gully'::text AS sys_table_id
-   FROM SCHEMA_NAME.arc a
+   FROM arc a
      JOIN links_node n ON a.node_1::text = n.node_id::text
-     JOIN SCHEMA_NAME.v_gully g ON g.gully_id::text = n.feature_id::text;
+     JOIN v_gully g ON g.gully_id::text = n.feature_id::text;
