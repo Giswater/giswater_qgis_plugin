@@ -19,3 +19,6 @@ UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"VALUE DOMAIN"}
 UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"VALUE DOMAIN"}' , alias = 'Fluid type' WHERE id = 'man_type_fluid';
 UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"VALUE DOMAIN"}' , alias = 'Location type' WHERE id = 'man_type_location';
 UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"VALUE DOMAIN"}' , alias = 'Function type' WHERE id = 'man_type_function';
+
+-- 24/10/23
+UPDATE sys_param_user SET ismandatory = True WHERE id = 'plan_psector_vdefault';
