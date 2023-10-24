@@ -665,41 +665,49 @@ class GwMincut:
 
     def _mincut_close(self):
 
-        tools_qgis.restore_user_layer('v_edit_node', self.user_current_layer)
-        self._remove_selection()
-        tools_qgis.reset_rubber_band(self.search.rubber_band)
-
-        # If client don't touch nothing just rejected dialog or press cancel
-        if not self.dlg_mincut.closeMainWin and self.dlg_mincut.mincutCanceled:
-            tools_gw.close_dialog(self.dlg_mincut)
-            return
-
-        self.dlg_mincut.closeMainWin = True
-        self.dlg_mincut.mincutCanceled = True
-
-        # If id exists in database on btn_cancel delete
-        if self.action == "get_mincut":
-            result_mincut_id = self.dlg_mincut.result_mincut_id.text()
-            sql = (f"SELECT id FROM om_mincut"
-                   f" WHERE id = {result_mincut_id}")
-            row = tools_db.get_row(sql)
-            if row:
-                sql = (f"DELETE FROM om_mincut"
-                       f" WHERE id = {result_mincut_id}")
-                tools_db.execute_sql(sql)
-                tools_qgis.show_info("Mincut canceled!")
-
-        # Rollback transaction
+        if lib_vars.session_vars['dialog_docker'] and lib_vars.session_vars['dialog_docker'].isFloating():
+            widget = lib_vars.session_vars['dialog_docker'].widget()
+            if widget:
+                widget.close()
+                del widget
+                global_vars.iface.removeDockWidget(lib_vars.session_vars['dialog_docker'])
+                lib_vars.session_vars['docker_type'] = None
         else:
-            tools_db.dao.rollback()
+            tools_qgis.restore_user_layer('v_edit_node', self.user_current_layer)
+            self._remove_selection()
+            tools_qgis.reset_rubber_band(self.search.rubber_band)
 
-        # Close dialog, save dialog position, and disconnect snapping
-        tools_gw.close_dialog(self.dlg_mincut)
+            # If client don't touch nothing just rejected dialog or press cancel
+            if not self.dlg_mincut.closeMainWin and self.dlg_mincut.mincutCanceled:
+                tools_gw.close_dialog(self.dlg_mincut)
+                return
 
-        tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal('mincut')
-        self._remove_selection()
-        tools_qgis.refresh_map_canvas()
+            self.dlg_mincut.closeMainWin = True
+            self.dlg_mincut.mincutCanceled = True
+
+            # If id exists in database on btn_cancel delete
+            if self.action == "get_mincut":
+                result_mincut_id = self.dlg_mincut.result_mincut_id.text()
+                sql = (f"SELECT id FROM om_mincut"
+                       f" WHERE id = {result_mincut_id}")
+                row = tools_db.get_row(sql)
+                if row:
+                    sql = (f"DELETE FROM om_mincut"
+                           f" WHERE id = {result_mincut_id}")
+                    tools_db.execute_sql(sql)
+                    tools_qgis.show_info("Mincut canceled!")
+
+            # Rollback transaction
+            else:
+                tools_db.dao.rollback()
+
+            # Close dialog, save dialog position, and disconnect snapping
+            tools_gw.close_dialog(self.dlg_mincut)
+
+            tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
+            tools_gw.disconnect_signal('mincut')
+            self._remove_selection()
+            tools_qgis.refresh_map_canvas()
 
 
     def _real_start(self):
