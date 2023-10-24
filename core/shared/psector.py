@@ -2177,10 +2177,17 @@ class GwPsector:
                " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
                " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
         row = tools_db.get_row(sql)
-        current_psector = row[0]
+
         selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
 
-        if str(current_psector) != str(selected_psector):
+        if row is None:
+            message = "Current user does not have 'plan_psector_vdefault'. Value of current psector will be inserted."
+            tools_qt.show_info_box(message)
+
+            sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_psector_vdefault', '{selected_psector}', current_user)")
+            tools_db.execute_sql(sql)
+
+        elif str(row[0]) != str(selected_psector):
             message = "This psector does not match the current one. Value of current psector will be updated."
             tools_qt.show_info_box(message)
 
