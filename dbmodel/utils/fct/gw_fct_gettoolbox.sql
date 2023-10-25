@@ -219,7 +219,7 @@ BEGIN
 	EXECUTE v_querystring INTO v_reports_master;
 
 	v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-			 SELECT id, alias
+			 SELECT id, alias, addparam
 			 FROM config_report
 			 WHERE sys_role = ''role_admin''
 			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
