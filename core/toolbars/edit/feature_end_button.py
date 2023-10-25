@@ -473,7 +473,10 @@ class GwFeatureEndButton(GwAction):
 
         # Check for errors
         if model.lastError().isValid():
-            tools_qgis.show_warning(model.lastError().text(), dialog=self.dlg_work)
+            if 'Unable to find table' in model.lastError().text():
+                tools_db.reset_qsqldatabase_connection(self.dlg_work)
+            else:
+                tools_qgis.show_warning(model.lastError().text(), dialog=self.dlg_work)
 
         # Attach model to table view
         widget.setModel(model)

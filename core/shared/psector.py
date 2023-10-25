@@ -17,7 +17,7 @@ from sip import isdeleted
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor
-from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
+from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel, QSqlError
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
     QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu
 from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry, QgsMapToPixel
@@ -1401,7 +1401,10 @@ class GwPsector:
 
         # Check for errors
         if model.lastError().isValid():
-            tools_qgis.show_warning(model.lastError().text())
+            if 'Unable to find table' in model.lastError().text():
+                tools_db.reset_qsqldatabase_connection()
+            else:
+                tools_qgis.show_warning(model.lastError().text())
 
 
     def fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers,
@@ -1435,7 +1438,10 @@ class GwPsector:
 
         # Check for errors
         if model.lastError().isValid():
-            tools_qgis.show_warning(model.lastError().text(), dialog=dialog)
+            if 'Unable to find table' in model.lastError().text():
+                tools_db.reset_qsqldatabase_connection(dialog)
+            else:
+                tools_qgis.show_warning(model.lastError().text(), dialog=dialog)
         # Attach model to table view
         if expr:
             widget.setModel(model)

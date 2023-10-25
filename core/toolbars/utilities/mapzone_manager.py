@@ -154,7 +154,10 @@ class GwMapzoneManager:
 
         # Check for errors
         if model.lastError().isValid():
-            tools_qgis.show_warning(model.lastError().text(), dialog=self.mapzone_mng_dlg)
+            if 'Unable to find table' in model.lastError().text():
+                tools_db.reset_qsqldatabase_connection(self.mapzone_mng_dlg)
+            else:
+                tools_qgis.show_warning(model.lastError().text(), dialog=self.mapzone_mng_dlg)
         # Attach model to table view
         if expr:
             widget.setModel(model)
