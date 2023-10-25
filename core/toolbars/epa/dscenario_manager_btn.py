@@ -367,7 +367,10 @@ class GwDscenarioManagerButton(GwAction):
 
         # Check for errors
         if model.lastError().isValid():
-            tools_qgis.show_warning(model.lastError().text(), dialog=self.dlg_dscenario)
+            if 'Unable to find table' in model.lastError().text():
+                tools_db.reset_qsqldatabase_connection(self.dlg_dscenario)
+            else:
+                tools_qgis.show_warning(model.lastError().text(), dialog=self.dlg_dscenario)
         # Attach model to table view
         if expr:
             widget.setModel(model)
