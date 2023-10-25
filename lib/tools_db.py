@@ -302,6 +302,7 @@ def create_qsqldatabase_connection(host, port, db, user, pwd):
         details = global_vars.qgis_db_credentials.lastError().databaseText()
         tools_log.log_warning(str(details))
         return False
+    return status
 
 
 def reset_qsqldatabase_connection(dialog=iface):
