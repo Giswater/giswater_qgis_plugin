@@ -21,6 +21,16 @@ v_result_id integer;
 v_error_context text;
 v_usepsectors boolean;
 
+v_xcoord double precision;
+v_ycoord double precision;
+v_epsg integer;
+v_client_epsg integer;
+v_point public.geometry;
+
+v_sensibility_f float;
+v_sensibility float;
+v_zoomratio float;
+
 BEGIN 
 	-- set search_path
     SET search_path= 'SCHEMA_NAME','public';
@@ -29,6 +39,26 @@ BEGIN
 	v_node_id := (p_data ->>'data')::json->>'nodeId';
 	v_result_id := ((p_data ->>'data')::json->>'mincutId')::integer;
 	v_usepsectors := ((p_data ->>'data')::json->>'usePsectors')::boolean;
+
+	v_xcoord := ((p_data ->> 'data')::json->> 'coordinates')::json->>'xcoord';
+	v_ycoord := ((p_data ->> 'data')::json->> 'coordinates')::json->>'ycoord';
+	v_epsg := (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
+	v_client_epsg := (p_data ->> 'client')::json->> 'epsg';
+	v_zoomratio := ((p_data ->> 'data')::json->> 'coordinates')::json->>'zoomRatio';
+
+	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
+
+	-- get node_id from coordinates
+	IF v_node_id IS NULL AND v_xcoord IS NOT NULL THEN 
+		EXECUTE 'SELECT (value::json->>''web'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
+		INTO v_sensibility_f;
+		v_sensibility = (v_zoomratio / 500 * v_sensibility_f);
+
+		-- Make point
+		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
+	
+		SELECT node_id INTO v_node_id FROM v_edit_node WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
+	END IF;
 
 	SELECT anl_feature_id INTO feature_id_aux FROM om_mincut WHERE id=v_result_id;
 	SELECT anl_feature_type INTO feature_type_aux FROM om_mincut WHERE id=v_result_id;
