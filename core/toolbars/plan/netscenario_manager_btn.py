@@ -14,15 +14,13 @@ from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt, QRegExp, QPoint
 from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QCompleter
-from qgis.PyQt.QtWidgets import QDialog, QLineEdit
+from qgis.PyQt.QtWidgets import QDialog, QLineEdit, QDateEdit
 
 from ..dialog import GwAction
 from ..utilities.toolbox_btn import GwToolBoxButton
 from ..utilities.mapzone_manager import GwMapzoneManager
-from ...shared.selector import GwSelector
-from ...ui.ui_manager import GwNetscenarioManagerUi, GwNetscenarioUi, GwInfoGenericUi, GwSelectorUi
+from ...ui.ui_manager import GwNetscenarioManagerUi, GwNetscenarioUi, GwInfoGenericUi
 from ...utils import tools_gw
-from ...models.item_delegates import ReadOnlyDelegate, EditableDelegate
 from .... import global_vars
 from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_os
 
@@ -62,7 +60,6 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Manage btn create
         self._manage_btn_create()
-        tools_gw.add_icon(self.dlg_netscenario_manager.btn_selector, "142", folder='toolbars', sub_folder='basic')
 
         # Apply filter validator
         self.filter_name = self.dlg_netscenario_manager.findChild(QLineEdit, 'txt_name')
@@ -76,56 +73,105 @@ class GwNetscenarioManagerButton(GwAction):
         # Connect main dialog signals
         self.dlg_netscenario_manager.txt_name.textChanged.connect(partial(self._fill_manager_table))
         self.dlg_netscenario_manager.btn_toc.clicked.connect(partial(self._manage_add_layers))
-        self.dlg_netscenario_manager.btn_selector.clicked.connect(partial(self._netscenario_selector))
         self.dlg_netscenario_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_netscenario))
         self.dlg_netscenario_manager.btn_update.clicked.connect(partial(self._manage_properties))
         self.dlg_netscenario_manager.btn_execute.clicked.connect(partial(self._execute_selected_netscenario))
         self.dlg_netscenario_manager.btn_delete.clicked.connect(partial(self._delete_selected_netscenario))
         self.dlg_netscenario_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
         self.tbl_netscenario.doubleClicked.connect(self._open_netscenario)
+        self.dlg_netscenario_manager.btn_update_netscenario.clicked.connect(
+            partial(self._update_current_netscenario, self.dlg_netscenario_manager, self.tbl_netscenario))
 
         self.dlg_netscenario_manager.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_netscenario_manager))
         self.dlg_netscenario_manager.finished.connect(partial(tools_gw.save_settings, self.dlg_netscenario_manager))
         self.dlg_netscenario_manager.finished.connect(partial(self.save_user_values))
 
+        self.dlg_netscenario_manager.chk_active.stateChanged.connect(partial(self._fill_manager_table))
+        self.dlg_netscenario_manager.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active,
+            self.tbl_netscenario, 'plan_netscenario', is_manager=True))
+
+        self._set_label_current_netscenario(self.dlg_netscenario_manager)
+
         # Open dialog
         tools_gw.open_dialog(self.dlg_netscenario_manager, 'netscenario_manager')
 
 
-    def _netscenario_selector(self):
-        """ Manage mincut selector """
-        dialog = self.dlg_netscenario_manager
-        qtable = self.tbl_netscenario
-        field_id = "netscenario_id"
-        model = qtable.model()
-        selected_netscenarios = []
-        column_id = tools_qt.get_col_index_by_col_name(qtable, field_id)
+    def _filter_table(self, dialog, table, widget_txt, widget_chk, tablename):
 
-        for x in range(0, model.rowCount()):
-            index = model.index(x, column_id)
-            value = model.data(index)
-            selected_netscenarios.append(int(value))
+        result_select = tools_qt.get_text(dialog, widget_txt)
+        inactive_select = widget_chk.isChecked()
 
-        if len(selected_netscenarios) == 0:
-            msg = "There are no visible netscenarios in the table. Try a different filter or make one"
-            tools_qgis.show_message(msg, dialog=dialog)
+        expr = ""
+
+        if not inactive_select:
+            expr += f" active is true"
+
+        if result_select != 'null':
+            if expr != "":
+                expr += f" AND "
+            expr += f" name ILIKE '%{result_select}%'"
+        if expr != "":
+            # Refresh model with selected filter
+            table.model().setFilter(expr)
+            table.model().select()
+        else:
+            self.fill_table(dialog, table, tablename)
+
+    def _update_current_netscenario(self, dialog, qtbl_nsm):
+
+        selected_list = qtbl_nsm.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=dialog)
             return
-        selector_values = f"selector_netscenario"
-        aux_params = f'"ids":{json.dumps(selected_netscenarios)}'
-        min_selector = GwSelector()
 
-        dlg_selector = GwSelectorUi()
-        tools_gw.load_settings(dlg_selector)
-        current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_netscenario", "user", "session")
-        dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
-        dlg_selector.rejected.connect(partial(tools_gw.save_settings, dlg_selector))
-        dlg_selector.rejected.connect(
-            partial(tools_gw.save_current_tab, dlg_selector, dlg_selector.main_tab, 'netscenario'))
+        index = selected_list[0]
 
-        min_selector.get_selector(dlg_selector, selector_values, current_tab=current_tab, aux_params=aux_params)
+        # Get selected netscenario_id and active
+        col_ind = tools_qt.get_col_index_by_col_name(qtbl_nsm, 'netscenario_id')
+        netscenario_id = index.sibling(index.row(), col_ind).data()
+        col_ind = tools_qt.get_col_index_by_col_name(qtbl_nsm, 'active')
+        active = index.sibling(index.row(), col_ind).data()
 
-        tools_gw.open_dialog(dlg_selector, dlg_name='netscenario')
+        if active in (False, "False"):
+            message = f"Cannot set the current psector of an inactive psector. You must activate it before."
+            tools_qgis.show_warning(message, dialog=self.dlg_netscenario_manager)
+            return
 
+        self._set_selector(netscenario_id)
+
+        message = "Values has been updated"
+        tools_qgis.show_info(message, dialog=dialog)
+
+        self._set_label_current_netscenario(dialog)
+
+
+    def _set_selector(self, netscenario_id):
+        """ Insert or update values in tables with current_user control """
+
+        extras = f'"selectorType":"None", "tabName":"tab_netscenario", "checkAll":null, "addSchema":"None", "id":"{netscenario_id}", "value":"True", "isAlone":"True"'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_setselectors', body)
+        if json_result is None or json_result['status'] == 'Failed':
+            return
+        level = json_result['body']['message']['level']
+        if level == 0:
+            message = json_result['body']['message']['text']
+            tools_qgis.show_message(message, level)
+
+
+    def _set_label_current_netscenario(self, dialog):
+
+        sql = ("SELECT t1.netscenario_id, t1.name FROM plan_netscenario AS t1 "
+               " INNER JOIN selector_netscenario AS t2 ON t1.netscenario_id = t2.netscenario_id "
+               " WHERE t2.cur_user = current_user")
+        row = tools_db.get_row(sql)
+        self.current_netscenario_id = row
+
+        if not row:
+            return
+
+        tools_qt.set_widget_text(dialog, 'lbl_vdefault_netscenario', self.current_netscenario_id[1])
 
 
     # region netscenario manager
@@ -135,13 +181,16 @@ class GwNetscenarioManagerButton(GwAction):
         pass
 
 
-    def _get_list(self, table_name='v_ui_plan_netscenario', filter_name="", filter_id=None):
+    def _get_list(self, table_name='v_ui_plan_netscenario', filter_name="", filter_id=None, chk_active=False):
         """ Mount and execute the query for gw_fct_getlist """
 
         feature = f'"tableName":"{table_name}"'
         filter_fields = f'"limit": -1, "name": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'
         if filter_id is not None:
             filter_fields += f', "netscenario_id": {{"filterSign":"=", "value":"{filter_id}"}}'
+        if chk_active is False:
+            filter_fields += f', "active": {{"filterSign":"=", "value":true}}'
+
         body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
         json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
         if json_result is None or json_result['status'] == 'Failed':
@@ -153,10 +202,13 @@ class GwNetscenarioManagerButton(GwAction):
         return complet_list
 
 
-    def _fill_manager_table(self, filter_name=""):
+    def _fill_manager_table(self):
         """ Fill netscenario manager table with data from v_ui_plan_netscenario """
 
-        complet_list = self._get_list("v_ui_plan_netscenario", filter_name)
+        filter_name = self.filter_name.text()
+        chk_active = self.dlg_netscenario_manager.chk_active.isChecked()
+
+        complet_list = self._get_list("v_ui_plan_netscenario", filter_name, chk_active=chk_active)
 
         if complet_list is False:
             return False, False
@@ -200,7 +252,7 @@ class GwNetscenarioManagerButton(GwAction):
 
         toolbox_btn = GwToolBoxButton(None, None, None, None, None)
         if connect is None:
-            connect = [partial(self._fill_manager_table, self.filter_name.text()), partial(tools_gw.refresh_selectors)]
+            connect = [partial(self._fill_manager_table), partial(tools_gw.refresh_selectors)]
         else:
             if type(connect) != list:
                 connect = [connect]
@@ -272,7 +324,7 @@ class GwNetscenarioManagerButton(GwAction):
             tools_db.execute_sql(sql)
 
             # Refresh tableview
-            self._fill_manager_table(self.filter_name.text())
+            self._fill_manager_table()
 
     # endregion
 
@@ -319,7 +371,7 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Connect signals
         self.dlg_netscenario.btn_config.clicked.connect(partial(self._manage_config))
-        self.dlg_netscenario.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active))
+        self.dlg_netscenario.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active, None, None, False))
         self.dlg_netscenario.btn_toggle_closed.clicked.connect(partial(self._manage_toggle_closed))
         self.dlg_netscenario.btn_create.clicked.connect(partial(self._manage_create))
         self.dlg_netscenario.btn_update.clicked.connect(partial(self._manage_update))
@@ -339,7 +391,7 @@ class GwNetscenarioManagerButton(GwAction):
         tools_gw.open_dialog(self.dlg_netscenario, 'netscenario', title=f"{title}")
 
 
-    def _fill_netscenario_table(self, set_edit_triggers=QTableView.DoubleClicked, expr=None):
+    def _fill_netscenario_table(self, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
         """ Fill netscenario table with data from its corresponding table """
 
         # Manage exception if dialog is closed
@@ -363,14 +415,6 @@ class GwNetscenarioManagerButton(GwAction):
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)
         model.select()
-        # Set item delegates
-        readonly_delegate = ReadOnlyDelegate(widget)
-        widget.setItemDelegateForColumn(0, readonly_delegate)
-        widget.setItemDelegateForColumn(1, readonly_delegate)
-        editable_delegate = EditableDelegate(widget)
-        for x in range(2, model.columnCount()):
-            widget.setItemDelegateForColumn(x, editable_delegate)
-
 
         # Check for errors
         if model.lastError().isValid():
@@ -466,12 +510,10 @@ class GwNetscenarioManagerButton(GwAction):
             tools_qt.set_widget_visible(self.dlg_netscenario, 'btn_toggle_active', False)
             tools_qt.set_widget_visible(self.dlg_netscenario, 'btn_toggle_closed', True)
             tools_qt.set_widget_text(self.dlg_netscenario, 'lbl_mapzone_id', 'Node id:')
-            self.dlg_netscenario.grb_copy.setTitle(f'Insert valve')
         else:
             tools_qt.set_widget_visible(self.dlg_netscenario, 'btn_toggle_active', True)
             tools_qt.set_widget_visible(self.dlg_netscenario, 'btn_toggle_closed', False)
             tools_qt.set_widget_text(self.dlg_netscenario, 'lbl_mapzone_id', f'{self.selected_netscenario_type.capitalize()} id:')
-            self.dlg_netscenario.grb_copy.setTitle(f'Copy from existing {self.selected_netscenario_type}')
 
 
     def _manage_feature_type(self):
@@ -536,35 +578,46 @@ class GwNetscenarioManagerButton(GwAction):
             pass
 
 
-    def _manage_toggle_active(self):
+    def _manage_toggle_active(self, tableview, view, is_manager):
+
         # Get selected row
-        tableview = self.dlg_netscenario.main_tab.currentWidget()
-        view = tableview.objectName().replace('tbl_', '')
+        if tableview is None and view is None:
+            tableview = self.dlg_netscenario.main_tab.currentWidget()
+            view = tableview.objectName().replace('tbl_', '')
+
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
             tools_qgis.show_warning(message, dialog=self.dlg_netscenario)
             return
 
-        # Get selected mapzone data
-        index = tableview.selectionModel().currentIndex()
-        col_idx = tools_qt.get_col_index_by_col_name(tableview, 'netscenario_id')
-        netscenario_id = index.sibling(index.row(), col_idx).data()
-        col_idx = tools_qt.get_col_index_by_col_name(tableview, f'{self.selected_netscenario_type.lower()}_id')
-        mapzone_id = index.sibling(index.row(), col_idx).data()
-        active = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(tableview, 'active')).data()
-        active = tools_os.set_boolean(active)
-        field_id = tableview.model().headerData(col_idx, Qt.Horizontal)
+        for index in selected_list:
 
-        sql = f"UPDATE {view} SET active = {str(not active).lower()} WHERE netscenario_id = {netscenario_id} AND {field_id} = "
-        if field_id == 'presszone_id':
-            sql += f"'{mapzone_id}'"
-        else:
-            sql += f"{mapzone_id}"
-        tools_db.execute_sql(sql, log_sql=True)
+            col_idx = tools_qt.get_col_index_by_col_name(tableview, 'netscenario_id')
+            netscenario_id = index.sibling(index.row(), col_idx).data()
+            active = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(tableview, 'active')).data()
+            active = tools_os.set_boolean(active)
+
+            sql = f"UPDATE {view} SET active = {str(not active).lower()} WHERE netscenario_id = {netscenario_id}"
+
+            if not is_manager:
+                # Get selected mapzone data
+                col_idx = tools_qt.get_col_index_by_col_name(tableview, f'{self.selected_netscenario_type.lower()}_id')
+                field_id = tableview.model().headerData(col_idx, Qt.Horizontal)
+                mapzone_id = index.sibling(index.row(), col_idx).data()
+
+                if field_id == 'presszone_id':
+                    sql += f" AND {field_id} = '{mapzone_id}'"
+                else:
+                    sql += f" AND {field_id} = {mapzone_id}"
+
+            tools_db.execute_sql(sql, log_sql=True)
 
         # Refresh tableview
-        self._manage_current_changed()
+        if is_manager:
+            self._fill_manager_table()
+        else:
+            self._manage_current_changed()
 
 
     def _manage_toggle_closed(self):
@@ -655,7 +708,7 @@ class GwNetscenarioManagerButton(GwAction):
         if json_result and json_result.get('status') == 'Accepted':
             tools_gw.close_dialog(dialog)
             # Refresh tableview
-            self._fill_manager_table(self.filter_name.text())
+            self._fill_manager_table()
             return
         tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
 

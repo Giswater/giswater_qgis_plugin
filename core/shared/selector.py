@@ -15,7 +15,7 @@ from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QLineEdit, QSize
 from ..ui.ui_manager import GwSelectorUi
 from ..utils import tools_gw
 from ... import global_vars
-from ...libs import lib_vars, tools_qgis, tools_qt, tools_os, tools_db
+from ...libs import lib_vars, tools_qgis, tools_qt, tools_os
 
 
 class GwSelector:
