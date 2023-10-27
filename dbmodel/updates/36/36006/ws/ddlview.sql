@@ -112,4 +112,23 @@ UNION
     'v_edit_connec'::text AS sys_table_id
    FROM arc a
      JOIN links_node n ON a.node_1::text = n.node_id::text
-     JOIN v_connec c ON c.connec_id::text = n.feature_id::text
+     JOIN v_connec c ON c.connec_id::text = n.feature_id::text;
+
+
+27/10/2023
+CREATE OR REPLACE VIEW v_edit_plan_psector_x_connec AS 
+ SELECT plan_psector_x_connec.id,
+    plan_psector_x_connec.connec_id,
+    plan_psector_x_connec.arc_id,
+    plan_psector_x_connec.psector_id,
+    plan_psector_x_connec.state,
+    plan_psector_x_connec.doable,
+    plan_psector_x_connec.descript,
+    plan_psector_x_connec.link_id,
+    plan_psector_x_connec.active,
+    plan_psector_x_connec.insert_tstamp,
+    plan_psector_x_connec.insert_user,
+    exit_type
+   FROM plan_psector_x_connec
+   JOIN v_edit_link USING (link_id);
+

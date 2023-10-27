@@ -22,3 +22,8 @@ UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"VALUE DOMAIN"}
 
 -- 24/10/23
 UPDATE sys_param_user SET ismandatory = True WHERE id = 'plan_psector_vdefault';
+
+-- 27/10/23
+UPDATE sys_message SET error_message = 'IT iS IMPOSSIBLE TO UPDATE ARC_ID FROM PSECTOR DIALOG BECAUSE THIS PLANNED LINK HAS NOT ARC AS EXIT-TYPE',
+hint_message = 'TO UPDATE IT USE ARC_ID CONNECT(CONNEC or GULLY) DIALOG OR EDIT THE ENDPOINT OF LINK''S GEOMETRY ON CANVAS'
+where id = 3212;
