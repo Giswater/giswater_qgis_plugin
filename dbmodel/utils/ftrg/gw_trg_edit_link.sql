@@ -548,16 +548,17 @@ BEGIN
 		IF v_projectype = 'WS' THEN
 		
 			INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id,
-			 fluid_type, dma_id, dqa_id, presszone_id, minsector_id, connecat_id, workcat_id, workcat_id_end, builtdate, enddate)
+			 fluid_type, dma_id, dqa_id, presszone_id, minsector_id, connecat_id, workcat_id, workcat_id_end, builtdate, enddate, exit_elev, exit_topelev)
 			VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector, 
-			v_fluidtype, v_dma, v_dqa, v_presszone, v_minsector, NEW.connecat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate);
+			v_fluidtype, v_dma, v_dqa, v_presszone, v_minsector, NEW.connecat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate,
+			NEW.exit_elev, NEW.exit_topelev);
 			
 		ELSIF  v_projectype = 'UD' THEN
 		
 			INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id, 
-				connecat_id, workcat_id, workcat_id_end, builtdate, enddate)
+				connecat_id, workcat_id, workcat_id_end, builtdate, enddate, exit_elev, exit_topelev)
 			VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector, v_fluidtype, v_dma, 
-				NEW.connecat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate);
+				NEW.connecat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.exit_elev, NEW.exit_topelev);
 		END IF;
 
 		-- update feature
@@ -682,7 +683,8 @@ BEGIN
 		END IF;
 
 		-- update link state
-		UPDATE link SET state = NEW.state, the_geom = NEW.the_geom, workcat_id = NEW.workcat_id, workcat_id_end = NEW.workcat_id_end, builtdate = NEW.builtdate, enddate = NEW.enddate 
+		UPDATE link SET state = NEW.state, the_geom = NEW.the_geom, workcat_id = NEW.workcat_id, workcat_id_end = NEW.workcat_id_end, builtdate = NEW.builtdate, 
+		enddate = NEW.enddate, exit_elev = NEW.exit_elev, exit_topelev = NEW.exit_topelev
 		WHERE link_id=NEW.link_id;
 	
 		-- Update state_type if edit_connect_update_statetype is TRUE
