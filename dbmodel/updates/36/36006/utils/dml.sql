@@ -27,3 +27,8 @@ UPDATE sys_param_user SET ismandatory = True WHERE id = 'plan_psector_vdefault';
 UPDATE sys_message SET error_message = 'IT iS IMPOSSIBLE TO UPDATE ARC_ID FROM PSECTOR DIALOG BECAUSE THIS PLANNED LINK HAS NOT ARC AS EXIT-TYPE',
 hint_message = 'TO UPDATE IT USE ARC_ID CONNECT(CONNEC or GULLY) DIALOG OR EDIT THE ENDPOINT OF LINK''S GEOMETRY ON CANVAS'
 where id = 3212;
+
+UPDATE config_form_fields SET tooltip='arc_id - Identificador del arco. No es necesario introducirlo, es un serial automático' WHERE formname='v_edit_arc' AND formtype='form_feature' AND columnname='arc_id' AND tabname='tab_data';
+UPDATE config_form_fields SET tooltip='arc_id - Identificador del arco. No es necesario introducirlo, es un serial automático' WHERE formname='ve_arc_pipe' AND formtype='form_feature' AND columnname='arc_id' AND tabname='tab_data';
+UPDATE config_form_fields SET tooltip='arc_id - Identificador del arco. No es necesario introducirlo, es un serial automático' WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='arc_id' AND tabname='tab_data';
+UPDATE config_form_fields SET tooltip='arc_id - Identificador del arco. No es necesario introducirlo, es un serial automático' WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='arc_id' AND tabname='tab_data';
