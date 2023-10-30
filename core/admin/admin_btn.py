@@ -156,7 +156,7 @@ class GwAdminButton:
 
         tools_log.log_info(f"Create schema of type '{project_type}': '{project_name_schema}'")
 
-        if self.rdb_import_data.isChecked():
+        if self.rdb_inp.isChecked():
             self.file_inp = tools_qt.get_text(self.dlg_readsql_create_project, 'data_file')
             if self.file_inp == 'null':
                 msg = "The 'Path' field is required for Import INP data."
@@ -177,9 +177,7 @@ class GwAdminButton:
                 if msg:
                     tools_qt.show_info_box(msg, "Warning")
                     return
-
-        elif self.rdb_sample.isChecked():
-
+        elif self.rdb_sample_full.isChecked() or self.rdb_sample_inv.isChecked():
             if self.locale != 'en_US' or str(self.project_epsg) != '25831':
                 msg = ("This functionality is only allowed with the locality 'en_US' and SRID 25831."
                        "\nDo you want change it and continue?")
@@ -397,9 +395,10 @@ class GwAdminButton:
         # Find Widgets in form
         self.project_name = self.dlg_readsql_create_project.findChild(QLineEdit, 'project_name')
         self.project_descript = self.dlg_readsql_create_project.findChild(QLineEdit, 'project_descript')
-        self.rdb_sample = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample')
-        self.rdb_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_data')
-        self.rdb_import_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_import_data')
+        self.rdb_sample_inv = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample_inv')
+        self.rdb_sample_full = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample_full')
+        self.rdb_empty = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_empty')
+        self.rdb_inp = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_inp')
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
 
         # Load user values
@@ -411,7 +410,8 @@ class GwAdminButton:
                                                         force_reload=True)
         if create_schema_type:
             chk_widget = self.dlg_readsql_create_project.findChild(QWidget, create_schema_type)
-            chk_widget.setChecked(True)
+            if chk_widget:
+                chk_widget.setChecked(True)
         inp_file_path = tools_gw.get_config_parser('btn_admin', 'inp_file_path', "user", "session", False, force_reload=True)
         if inp_file_path not in ('null', None):
             self.data_file.setText(inp_file_path)
@@ -619,6 +619,16 @@ class GwAdminButton:
 
         tools_db.dao.commit()
         folder = os.path.join(self.folder_example, 'user', project_type)
+        status = self._execute_files(folder, set_progress_bar=True)
+        if not status and self.dev_commit is False:
+            return False
+
+        return True
+
+
+    def load_inv_data(self, project_type):
+        tools_db.dao.commit()
+        folder = os.path.join(self.folder_example, 'inv', project_type)
         status = self._execute_files(folder, set_progress_bar=True)
         if not status and self.dev_commit is False:
             return False
@@ -1557,7 +1567,7 @@ class GwAdminButton:
     def _enable_datafile(self):
         """"""
 
-        if self.rdb_import_data.isChecked() is True:
+        if self.rdb_inp.isChecked() is True:
             self.data_file.setEnabled(True)
             self.btn_push_file.setEnabled(True)
         else:
@@ -1744,7 +1754,7 @@ class GwAdminButton:
         self.cmb_create_project_type.currentIndexChanged.connect(
             partial(self._change_project_type, self.cmb_create_project_type))
         self.cmb_locale.currentIndexChanged.connect(partial(self._update_locale))
-        self.rdb_import_data.toggled.connect(partial(self._enable_datafile))
+        self.rdb_inp.toggled.connect(partial(self._enable_datafile))
         self.filter_srid.textChanged.connect(partial(self._filter_srid_changed))
 
 
