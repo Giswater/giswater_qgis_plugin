@@ -66,6 +66,7 @@ v_version text; -- To store version of system
 v_psector_current integer; -- Current psector related to user
 
 -- process variables
+v_i integer = 0;
 v_connect record; -- Record to store the value for the used connect
 v_link record; -- Record to store the value for the used link
 v_link_point public.geometry;
@@ -178,6 +179,10 @@ BEGIN
 
 	    FOREACH v_connect_id IN ARRAY v_feature_array
 	    LOOP
+	
+		v_i = v_i+1;
+
+		RAISE NOTICE '% - %', v_i, v_connect_id;
 
 	    IF v_isforcedarcs IS FALSE THEN
 	    	v_forcedarcs= '';
