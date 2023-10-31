@@ -24,6 +24,7 @@ from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, Q
 from qgis.gui import QgsMapToolEmitPoint
 
 from .document import GwDocument, global_vars
+from ..toolbars.utilities.toolbox_btn import GwToolBoxButton
 from ..shared.psector_duplicate import GwPsectorDuplicate
 from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi, GwReplaceArc, GwDialogTextUi
 from ..utils import tools_gw
@@ -1609,6 +1610,7 @@ class GwPsector:
         self.dlg_psector_mng.btn_update_psector.clicked.connect(
             partial(self.update_current_psector, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.btn_duplicate.clicked.connect(self.psector_duplicate)
+        self.dlg_psector_mng.btn_merge.clicked.connect(self.psector_merge)
         self.dlg_psector_mng.txt_name.textChanged.connect(partial(
            self._filter_table, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name,
            self.dlg_psector_mng.chk_active, table_name))
@@ -1922,6 +1924,32 @@ class GwPsector:
         """ Filter rows from 'manage_prices' dialog from selected tab """
 
         self._filter_table(dialog, dialog.tbl_om_result_cat, dialog.txt_name, dialog.chk_active, tablename)
+
+
+    def psector_merge(self):
+        """ Merges the selected psectors """
+
+        # Get selected row
+        selected_list = self.qtbl_psm.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            return
+
+        # Get selected dscenario id
+        value = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            # Id to delete
+            id_feature = self.qtbl_psm.model().record(row).value("psector_id")
+            value += str(id_feature) + ", "
+        value = value[:-2]
+
+        # Execute toolbox function
+        dlg_functions = self._open_toolbox_function(3284)
+        # Set psector ids in txt psector_ids
+        tools_qt.set_widget_text(dlg_functions, 'psector_ids', f"{value}")
+        tools_qt.set_widget_enabled(dlg_functions, 'psector_ids', False)
 
 
     def psector_duplicate(self):
@@ -2649,5 +2677,18 @@ class GwPsector:
             color = QColor(0, 90, 255, 125)
             tools_qgis.draw_polyline(geom, rubber_band, color, width)
 
+
+    def _open_toolbox_function(self, function, signal=None, connect=None):
+        """ Execute currently selected function from combobox """
+
+        toolbox_btn = GwToolBoxButton(None, None, None, None, None)
+        if connect is None:
+            connect = [partial(self.fill_table, self.dlg_psector_mng, self.qtbl_psm, 'v_ui_plan_psector'),
+                       partial(tools_gw.refresh_selectors)]
+        else:
+            if type(connect) != list:
+                connect = [connect]
+        dlg_functions = toolbox_btn.open_function_by_id(function, connect_signal=connect)
+        return dlg_functions
 
     # endregion
