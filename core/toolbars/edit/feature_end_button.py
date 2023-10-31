@@ -60,6 +60,8 @@ class GwFeatureEndButton(GwAction):
 
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
 
+        self.selected_list = []
+
         # Create the dialog and signals
         self.dlg_work_end = GwFeatureEndUi()
         tools_gw.load_settings(self.dlg_work_end)
@@ -225,10 +227,10 @@ class GwFeatureEndButton(GwAction):
 
     def _set_list_selected_id(self, qtable):
 
-        selected_list = qtable.model()
         self.selected_list = []
+        selected_list = qtable.model()
+
         if selected_list is None:
-            self._manage_close(self.dlg_work_end)
             return
 
         for x in range(0, selected_list.rowCount()):
@@ -237,7 +239,7 @@ class GwFeatureEndButton(GwAction):
             self.selected_list.append(id_)
 
 
-    def _end_feature(self):
+    def _end_feature(self, force_downgrade=False):
         """ Get elements from all the tables and update his data """
 
         # Setting values
@@ -260,12 +262,12 @@ class GwFeatureEndButton(GwAction):
                    f"WHERE arc_id IN {ids} AND arc_state = '1'")
             row = tools_db.get_row(sql)
 
-        if row:
+        if row and force_downgrade is False:
             self.dlg_work = GwFeatureEndConnecUi()
             tools_gw.load_settings(self.dlg_work)
 
             self.dlg_work.btn_cancel.clicked.connect(partial(self._close_dialog_workcat_list, self.dlg_work))
-            self.dlg_work.btn_accept.clicked.connect(self._exec_downgrade)
+            self.dlg_work.btn_accept.clicked.connect(self._check_downgrade)
             self._set_completer()
 
             table_relations = "v_ui_arc_x_relations"
@@ -296,46 +298,70 @@ class GwFeatureEndButton(GwAction):
 
         else:
             # Update tablename of every feature_type
+            feature_body_list = ""
+
+            # Manage element
             self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_element)
-            self._update_feature_type("element")
+            feature_body = self._manage_feature_body("element")
+            if feature_body:
+                feature_body_list += f"{feature_body}, "
+
+            # Manage connec
             self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_connec)
-            self._update_feature_type("connec")
+            feature_body = self._manage_feature_body("connec")
+            if feature_body:
+                feature_body_list += f"{feature_body}, "
+
+            # Manage arc
+            self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
+            feature_body = self._manage_feature_body("arc")
+            if feature_body:
+                feature_body_list += f"{feature_body}, "
+
+            # Manage node
+            self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_node)
+            feature_body = self._manage_feature_body("node")
+            if feature_body:
+                feature_body_list += f"{feature_body}, "
+
+            # Manage gully
             if str(self.project_type) == 'ud':
                 self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_gully)
-                self._update_feature_type("gully")
-            self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
-            self._update_feature_type("arc")
-            self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_node)
-            self._update_feature_type("node")
+                feature_body = self._manage_feature_body("gully")
+                if feature_body:
+                    feature_body_list += f"{feature_body}, "
+
+            feature_body_list = "[" + feature_body_list[:-2] + "]"
+
+            self._update_feature_type(feature_body_list)
 
 
-            self._manage_close(self.dlg_work_end, True)
-
-            # Remove selection for all layers in TOC
-            for layer in self.iface.mapCanvas().layers():
-                if layer.type() == layer.VectorLayer:
-                    layer.removeSelection()
-            self.iface.mapCanvas().refresh()
-
-
-    def _update_feature_type(self, feature_type):
-        """ Get elements from @feature_type and update his corresponding table """
+    def _manage_feature_body(self, feature_type):
 
         if len(self.selected_list) == 0:
-            return
+            return False
 
         id_list = ""
         for id_ in self.selected_list:
             id_list += f'"{id_}", '
         id_list = "[" + id_list[:-2] + "]"
 
-        feature = f'"featureType":"{feature_type}", "featureId":{id_list}'
+        feature_body = f'{{"featureType":"{feature_type}", "featureId":{id_list}}}'
+
+        return feature_body
+
+    def _update_feature_type(self, feature, list_feature=True):
+        """ Get elements from @feature_type and update his corresponding table """
+
         extras = f'"state_type":"{self.statetype_id_end}", '
         extras += f'"enddate":"{self.enddate}", "workcat_date":"{self.workcatdate}"'
         if self.workcat_id_end not in (None, 'null', ''):
             extras += f', "workcat_id_end":"{self.workcat_id_end}"'
-        body = tools_gw.create_body(feature=feature, extras=extras)
-        tools_gw.execute_procedure('gw_fct_setendfeature', body)
+        body = tools_gw.create_body(feature=feature, extras=extras, list_feature=list_feature)
+
+        result = tools_gw.execute_procedure('gw_fct_setendfeature', body)
+        if result:
+            tools_gw.fill_tab_log(self.dlg_work_end, result['body']['data'], tab_idx=2)
 
 
     def _open_selected_object(self, widget):
@@ -391,7 +417,7 @@ class GwFeatureEndButton(GwAction):
             canvas.zoomIn()
 
 
-    def _exec_downgrade(self):
+    def _check_downgrade(self):
 
         message = "Are you sure you want to disconnect this elements?"
         title = "Disconnect elements"
@@ -399,13 +425,8 @@ class GwFeatureEndButton(GwAction):
         if not answer:
             return
 
-        # Update tablename of every feature_type
-        self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
-        self._update_feature_type("arc")
-
-        self.canvas.refresh()
         self.dlg_work.close()
-        self._end_feature()
+        self._end_feature(force_downgrade=True)
 
 
     def _set_completer(self):
@@ -453,7 +474,10 @@ class GwFeatureEndButton(GwAction):
 
         # Check for errors
         if model.lastError().isValid():
-            tools_qgis.show_warning(model.lastError().text(), dialog=self.dlg_work)
+            if 'Unable to find table' in model.lastError().text():
+                tools_db.reset_qsqldatabase_connection(self.dlg_work)
+            else:
+                tools_qgis.show_warning(model.lastError().text(), dialog=self.dlg_work)
 
         # Attach model to table view
         widget.setModel(model)

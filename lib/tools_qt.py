@@ -28,7 +28,7 @@ from qgis.core import QgsExpression, QgsProject, QgsLayerTreeLayer
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import iface
 
-from . import tools_log, tools_os, tools_qgis
+from . import tools_log, tools_os, tools_qgis, tools_db
 from .. import global_vars
 from .ui.ui_manager import DialogTextUi
 
@@ -668,7 +668,10 @@ def fill_table(qtable, table_name, expr_filter=None, edit_strategy=QSqlTableMode
 
     # Check for errors
     if model.lastError().isValid():
-        tools_log.log_warning(f"fill_table: {model.lastError().text()}")
+        if 'Unable to find table' in model.lastError().text():
+            tools_db.reset_qsqldatabase_connection()
+        else:
+            tools_log.log_warning(f"fill_table: {model.lastError().text()}")
 
     # Attach model to tableview
     qtable.setModel(model)
@@ -1282,7 +1285,10 @@ def set_table_model(dialog, table_object, table_name, expr_filter):
     model.setEditStrategy(QSqlTableModel.OnManualSubmit)
     model.select()
     if model.lastError().isValid():
-        tools_qgis.show_warning(model.lastError().text())
+        if 'Unable to find table' in model.lastError().text():
+            tools_db.reset_qsqldatabase_connection()
+        else:
+            tools_qgis.show_warning(model.lastError().text())
         return expr
 
     # Attach model to selected widget

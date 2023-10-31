@@ -557,6 +557,8 @@ class GwElement:
         if status:
             self.element_id = element_id
             self.layers = tools_gw.manage_close(self.dlg_add_element, table_object, layers=self.layers)
+            # Refresh canvas
+            tools_qgis.refresh_map_canvas()
 
 
     def _filter_elementcat_id(self):

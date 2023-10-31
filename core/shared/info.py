@@ -67,6 +67,7 @@ class GwInfo(QObject):
         self.suppres_form = None
         self.prev_action = None
         self.previous_map_tool = None
+        self.vertex_marker = None
 
 
     def get_info_from_coordinates(self, point, tab_type):
@@ -3331,26 +3332,26 @@ class GwInfo(QObject):
                     if rows:
                             btn_visit_intervals.setEnabled(True)
 
-            #gallery
-            if type(table_name) is dict:
-                table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
+        #gallery
+        if type(table_name) is dict:
+            table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
 
-            sql = (f"SELECT column_name FROM information_schema.columns "
-                   f"WHERE table_name = '{table_name}' AND column_name='photo'")
-            column_exist = tools_db.get_row(sql)
+        sql = (f"SELECT column_name FROM information_schema.columns "
+               f"WHERE table_name = '{table_name}' AND column_name='photo'")
+        column_exist = tools_db.get_row(sql)
 
-            if column_exist:
-                sql = f"SELECT photo FROM {table_name} WHERE photo IS TRUE AND visit_id = '{self.visit_id}'"
-                row = tools_db.get_row(sql)
-            else:
-                row = None
+        if column_exist:
+            sql = f"SELECT photo FROM {table_name} WHERE photo IS TRUE AND visit_id = '{self.visit_id}'"
+            row = tools_db.get_row(sql)
+        else:
+            row = None
 
-            if not row:
-                return
+        if not row:
+            return
 
-            # If gallery 'True' or 'False'
-            if str(row[0]) == 'True':
-                btn_open_gallery.setEnabled(True)
+        # If gallery 'True' or 'False'
+        if str(row[0]) == 'True':
+            btn_open_gallery.setEnabled(True)
 
 
     def _open_visit_files(self):

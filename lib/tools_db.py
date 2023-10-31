@@ -9,6 +9,8 @@ from qgis.PyQt.QtSql import QSqlDatabase
 from qgis.core import QgsCredentials, QgsDataSourceUri
 from qgis.PyQt.QtCore import QSettings
 
+from qgis.utils import iface
+
 from .. import global_vars
 from . import tools_log, tools_qt, tools_qgis, tools_pgdao, tools_os
 
@@ -265,19 +267,8 @@ def connect_to_database(host, port, db, user, pwd, sslmode):
     global_vars.current_user = user
 
     # QSqlDatabase connection for Table Views
-    global_vars.qgis_db_credentials = QSqlDatabase.addDatabase("QPSQL", global_vars.plugin_name)
-    global_vars.qgis_db_credentials.setHostName(host)
-    if port != '':
-        global_vars.qgis_db_credentials.setPort(int(port))
-    global_vars.qgis_db_credentials.setDatabaseName(db)
-    global_vars.qgis_db_credentials.setUserName(user)
-    global_vars.qgis_db_credentials.setPassword(pwd)
-    status = global_vars.qgis_db_credentials.open()
+    status = create_qsqldatabase_connection(host, port, db, user, pwd)
     if not status:
-        msg = "Database connection error (QSqlDatabase). Please open plugin log file to get more details"
-        global_vars.session_vars['last_error'] = tools_qt.tr(msg)
-        details = global_vars.qgis_db_credentials.lastError().databaseText()
-        tools_log.log_warning(str(details))
         return False
 
     # psycopg2 connection
@@ -292,6 +283,41 @@ def connect_to_database(host, port, db, user, pwd, sslmode):
         return False
 
     return status
+
+
+def create_qsqldatabase_connection(host, port, db, user, pwd):
+
+    global_vars.last_db_credentials = {'host': host, 'port': port, 'db': db, 'user': user, 'pwd': pwd}
+    global_vars.qgis_db_credentials = QSqlDatabase.addDatabase("QPSQL", global_vars.plugin_name)
+    global_vars.qgis_db_credentials.setHostName(host)
+    if port != '':
+        global_vars.qgis_db_credentials.setPort(int(port))
+    global_vars.qgis_db_credentials.setDatabaseName(db)
+    global_vars.qgis_db_credentials.setUserName(user)
+    global_vars.qgis_db_credentials.setPassword(pwd)
+    status = global_vars.qgis_db_credentials.open()
+    if not status:
+        msg = "Database connection error (QSqlDatabase). Please open plugin log file to get more details"
+        global_vars.session_vars['last_error'] = tools_qt.tr(msg)
+        details = global_vars.qgis_db_credentials.lastError().databaseText()
+        tools_log.log_warning(str(details))
+        return False
+    return status
+
+
+def reset_qsqldatabase_connection(dialog=iface):
+    if not global_vars.last_db_credentials:
+        return False
+
+    host = global_vars.last_db_credentials['host']
+    port = global_vars.last_db_credentials['port']
+    db = global_vars.last_db_credentials['db']
+    user = global_vars.last_db_credentials['user']
+    pwd = global_vars.last_db_credentials['pwd']
+    QSqlDatabase.removeDatabase(global_vars.plugin_name)
+    create_qsqldatabase_connection(host, port, db, user, pwd)
+    tools_qgis.show_warning("Database connection reset, please try again", dialog=dialog)
+
 
 
 def connect_to_database_service(service, sslmode=None):

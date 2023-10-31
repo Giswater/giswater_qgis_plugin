@@ -689,7 +689,10 @@ class GwAdminButton:
 
         # Check for errors
         if model.lastError().isValid():
-            tools_qgis.show_warning(model.lastError().text())
+            if 'Unable to find table' in model.lastError().text():
+                tools_db.reset_qsqldatabase_connection()
+            else:
+                tools_qgis.show_warning(model.lastError().text())
         # Attach model to table view
         qtable.setModel(model)
 
@@ -1814,7 +1817,9 @@ class GwAdminButton:
         if not os.path.exists(filedir):
             tools_log.log_info(f"Folder not found: {filedir}")
             return True
-
+        # Skipping metadata folders for Mac OS
+        if '.DS_Store' in filedir:
+            return True
         tools_log.log_info(f"Processing folder: {filedir}")
         filelist = sorted(os.listdir(filedir))
         status = True

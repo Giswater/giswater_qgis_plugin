@@ -343,7 +343,10 @@ class GwVisit(QObject):
 
         # Check for errors
         if model.lastError().isValid():
-            tools_qgis.show_warning(model.lastError().text())
+            if 'Unable to find table' in model.lastError().text():
+                tools_db.reset_qsqldatabase_connection()
+            else:
+                tools_qgis.show_warning(model.lastError().text())
 
             # Attach model to table view
         if widget:
@@ -1179,7 +1182,7 @@ class GwVisit(QObject):
         sql = ("SELECT 'ALL' as id "
                "UNION SELECT id "
                "FROM sys_feature_type "
-               "WHERE classlevel = 1 OR classlevel = 2"
+               "WHERE classlevel = 1 OR classlevel = 2 "
                "ORDER BY id")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_visit.feature_type, rows)

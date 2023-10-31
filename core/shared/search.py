@@ -827,7 +827,10 @@ class GwSearch:
         widget.setEditTriggers(set_edit_triggers)
         # Check for errors
         if model.lastError().isValid():
-            tools_qgis.show_warning(model.lastError().text(), dialog=self.items_dialog)
+            if 'Unable to find table' in model.lastError().text():
+                tools_db.reset_qsqldatabase_connection(self.items_dialog)
+            else:
+                tools_qgis.show_warning(model.lastError().text(), dialog=self.items_dialog)
         # Attach model to table view
         if expr:
             widget.setModel(model)
