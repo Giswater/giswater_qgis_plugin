@@ -17,3 +17,12 @@ INSERT INTO config_form_tableview (location_type, project_type, objectname, colu
 UPDATE cat_feature_node SET epa_default='UNDEFINED', isarcdivide=false WHERE id='AIR_VALVE';
 UPDATE config_form_fields SET hidden=false, iseditable=true, label = 'Exit elevation' where formname = 'v_edit_link' and columnname = 'exit_topelev';
 
+-- 30/10/23
+INSERT INTO config_form_fields values ('ve_epa_pump', 'form_feature', 'tab_epa', 'effic_curve_id', 'lyt_epa_data_1', 11, 'string', 'combo', 'Eff. curve', 'Eff. curve', null, false, false, true, false, false, 'SELECT id as id, id as idval FROM v_edit_inp_curve WHERE curve_type = ''EFFICIENCY''', true, true, null, null, null, null, null, null, false);
+
+UPDATE config_form_fields set widgettype = 'combo', dv_querytext = 'SELECT pattern_id as id, pattern_id as idval FROM v_edit_inp_pattern WHERE pattern_id is not null' 
+where formname like 've_epa_pump' and columnname ='energy_pattern_id';
+
+UPDATE config_form_fields set iseditable = false  where formname = 've_epa_pump' and columnname = 'avg_effic';
+
+
