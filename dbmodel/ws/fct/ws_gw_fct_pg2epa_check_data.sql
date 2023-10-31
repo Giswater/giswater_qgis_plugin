@@ -712,10 +712,10 @@ BEGIN
 
 
 	RAISE NOTICE '26 - Topological nodes with epa_type UNDEFINED (379)';
-	v_querytext = 'SELECT n.node_id, nodecat_id, the_geom, n.expl_id FROM (SELECT node_1 node_id, sector_id FROM v_edit_arc WHERE epa_type !=''UNDEFINED'' UNION 
-			   SELECT node_2, sector_id FROM v_edit_arc WHERE epa_type !=''UNDEFINED'' )a 
-		       LEFT JOIN  (SELECT node_id, nodecat_id, the_geom, expl_id FROM v_edit_node WHERE epa_type = ''UNDEFINED'') n USING (node_id) 
-		       JOIN selector_sector USING (sector_id) 
+	v_querytext = 'SELECT n.node_id, nodecat_id, the_geom, n.expl_id FROM (SELECT node_1 node_id, sector_id FROM v_edit_arc WHERE epa_type !=''UNDEFINED'' UNION
+			   SELECT node_2, sector_id FROM arc WHERE epa_type !=''UNDEFINED'' )a
+		       JOIN  (SELECT node_id, nodecat_id, the_geom, expl_id FROM v_edit_node WHERE epa_type = ''UNDEFINED'') n USING (node_id)
+		       JOIN selector_sector USING (sector_id)
 		       WHERE n.node_id IS NOT NULL AND cur_user = current_user';
 	
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -821,7 +821,7 @@ BEGIN
 	
 	RAISE NOTICE '32 - Check nodes ''T candidate'' with wrong topology (fid: 432)';
 
-	v_querytext = 'SELECT b.* FROM (SELECT n1.node_id, n1.sector_id, 432, ''Node ''''T candidate'''' with wrong topology'', n1.nodecat_id, n1.the_geom FROM v_edit_arc a, node n1 
+	v_querytext = 'SELECT b.* FROM (SELECT n1.node_id, n1.sector_id, 432, ''Node ''''T candidate'''' with wrong topology'', n1.nodecat_id, n1.the_geom FROM arc a, node n1
 					JOIN v_state_node USING (node_id) JOIN v_expl_node USING (node_id)
 		      JOIN (SELECT node_1 node_id FROM arc WHERE state = 1 UNION SELECT node_2 FROM arc WHERE state = 1) b USING (node_id)
 		      WHERE st_dwithin(a.the_geom, n1.the_geom,0.01) AND n1.node_id NOT IN (node_1, node_2))b, selector_sector s WHERE s.sector_id = b.sector_id AND cur_user=current_user';
