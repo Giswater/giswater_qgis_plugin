@@ -36,3 +36,13 @@ UPDATE config_form_fields SET tooltip='arc_id - Identificador del arco. No es ne
 -- 29/10/2023
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
 VALUES (3282, 'gw_fct_getfeatureboundary', 'utils', 'function', 'json', 'json', 'Function to return boundary feature in function of different input parameters', 'role_edit', null, 'core') ON CONFLICT (id) DO NOTHING;
+
+-- 31/10/2023
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3284, 'gw_fct_psector_merge', 'utils', 'function', 'json', 'json', 'Function to merge two or more psectors into one', 'role_master', null, 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) 
+VALUES (518, 'Psector merge', 'utils', NULL, 'core', true, 'Function process', NULL);
+
+INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device) 
+VALUES(3284, 'Merge two or more psectors into one', '{"featureType":[]}'::json, '[{"widgetname":"psector_ids", "label":"Psector ids: (*)", "widgettype":"text", "datatype":"text", "layoutname":"grl_option_parameters","layoutorder":0, "isMandatory":true}, {"widgetname":"new_psector_name", "label":"New psector name: (*)", "widgettype":"text", "datatype":"text", "layoutname":"grl_option_parameters","layoutorder":1, "isMandatory":true}]'::json, NULL, true, '{4}');
