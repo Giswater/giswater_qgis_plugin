@@ -25,4 +25,6 @@ where formname like 've_epa_pump' and columnname ='energy_pattern_id';
 
 UPDATE config_form_fields set iseditable = false  where formname = 've_epa_pump' and columnname = 'avg_effic';
 
+-- 31/10/23
+UPDATE sys_param_user SET "label"='Hydraulic timestep' WHERE id='inp_times_hydraulic_timestep';
 

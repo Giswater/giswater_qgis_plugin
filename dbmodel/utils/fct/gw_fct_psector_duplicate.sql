@@ -111,7 +111,10 @@ BEGIN
 	END IF;
 	
 	INSERT INTO audit_check_data (fid, result_id, error_message)
-	VALUES (153, v_result_id, concat('Set ',v_new_psector_name,' as current psector.' ));
+	VALUES (153, v_result_id, concat('Set source psector (',v_old_psector_id,') as current psector.' ));
+
+	-- set old psector in selector
+	INSERT INTO selector_psector (psector_id, cur_user) VALUES (v_old_psector_id, current_user) ON CONFLICT DO NOTHING;
 
 	--copy arcs with state 0 inside plan_psector tables
 	SELECT string_agg(arc_id,',') INTO v_list_features_obsolete FROM plan_psector_x_arc  WHERE psector_id=v_old_psector_id AND state=0;
@@ -198,10 +201,6 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied other prices: ', v_list_features_obsolete ));
 	END IF;
 
-	-- delete old psector from selector and set new
-	DELETE FROM selector_psector WHERE psector_id=v_old_psector_id AND cur_user=current_user;
-	INSERT INTO selector_psector VALUES (v_new_psector_id, current_user) ON CONFLICT (psector_id, cur_user) DO NOTHING;
-
 	--insert copy of the planified feature in the corresponding v_edit_* view and insert it into plan_psector_x_* table
 	FOR rec_type IN (SELECT * FROM sys_feature_type WHERE classlevel=1 OR classlevel = 2 ORDER BY CASE
 		WHEN id='NODE' THEN 1 
@@ -253,6 +252,13 @@ BEGIN
 		END IF;
 
 	END LOOP;
+
+	-- delete old psector from selector and set new
+	DELETE FROM selector_psector WHERE psector_id=v_old_psector_id AND cur_user=current_user;
+	INSERT INTO selector_psector VALUES (v_new_psector_id, current_user) ON CONFLICT (psector_id, cur_user) DO NOTHING;
+	
+	INSERT INTO audit_check_data (fid, result_id, error_message)
+	VALUES (153, v_result_id, concat('Set ',v_new_psector_name,' as current psector.' ));
 
 	-- select forced arcs to connect with
 	SELECT string_agg(arc_id,',') INTO v_list_arc_new FROM plan_psector_x_arc WHERE psector_id=v_new_psector_id;	
