@@ -7,4 +7,4 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-RENAME table arc_border_expl TO _arc_border_expl_;
+ALTER TABLE arc_border_expl RENAME TO _arc_border_expl_;

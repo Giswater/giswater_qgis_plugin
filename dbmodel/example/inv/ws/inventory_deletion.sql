@@ -40,3 +40,5 @@ DELETE FROM cat_dscenario;
 DELETE FROM plan_psector;
 
 UPDATE cat_mat_roughness SET roughness = null;
+
+DELETE FROM rpt_result_cat;

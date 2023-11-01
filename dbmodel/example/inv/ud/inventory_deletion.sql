@@ -30,6 +30,7 @@ DELETE FROM inp_flwreg_pump;
 DELETE FROM inp_flwreg_orifice;
 DELETE FROM inp_flwreg_outlet;
 
+update cat_mat_arc SET n = null;
 
 DELETE FROM inp_pattern;
 DELETE FROM inp_curve;
@@ -38,4 +39,6 @@ DELETE FROM cat_hydrology;
 DELETE FROM cat_dwf_scenario;
 DELETE FROM cat_dscenario;
 DELETE FROM plan_psector;
+
+DELETE FROM rpt_cat_result;
 
