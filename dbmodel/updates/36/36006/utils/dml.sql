@@ -12,7 +12,7 @@ VALUES (518, 'Set end feature', 'utils', null, 'core', true, 'Function process',
 ON CONFLICT (fid) DO NOTHING;
 
 -- 21/10/2023
-INSERT INTO config_typevalue (typevalue, id, addparam) VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"VALUE DOMAIN"}', '{"orderBy":99}');
+INSERT INTO config_typevalue (typevalue, id, addparam) VALUES ('sys_table_context','{"level_1":"INVENTORY","level_2":"VALUE DOMAIN"}', '{"orderBy":99}')
 ON CONFLICT (typevalue, id) DO NOTHING;
 
 UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"VALUE DOMAIN"}' , alias = 'Category type' WHERE id = 'man_type_category';
@@ -42,7 +42,8 @@ INSERT INTO sys_function (id, function_name, project_type, function_type, input_
 VALUES (3284, 'gw_fct_psector_merge', 'utils', 'function', 'json', 'json', 'Function to merge two or more psectors into one', 'role_master', null, 'core') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) 
-VALUES (518, 'Psector merge', 'utils', NULL, 'core', true, 'Function process', NULL);
+VALUES (520, 'Psector merge', 'utils', NULL, 'core', true, 'Function process', NULL)
+ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device) 
 VALUES(3284, 'Merge two or more psectors into one', '{"featureType":[]}'::json, '[{"widgetname":"psector_ids", "label":"Psector ids: (*)", "widgettype":"text", "datatype":"text", "layoutname":"grl_option_parameters","layoutorder":0, "isMandatory":true}, {"widgetname":"new_psector_name", "label":"New psector name: (*)", "widgettype":"text", "datatype":"text", "layoutname":"grl_option_parameters","layoutorder":1, "isMandatory":true}]'::json, NULL, true, '{4}');

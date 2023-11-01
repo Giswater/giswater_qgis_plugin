@@ -539,10 +539,10 @@ ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
 
 INSERT INTO sys_fprocess
 (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
-VALUES(495, 'Set optimum outlet', 'ud', NULL, 'core', true, 'Function process', NULL);
+VALUES(495, 'Set optimum outlet', 'ud', NULL, 'core', true, 'Function process', NULL) ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_function (id, function_name, project_type, function_type) 
-VALUES (3242, 'gw_fct_epa_setoptimumoutlet', 'ud', 'function')ON CONFLICT (id) DO NOTHING;
+VALUES (3242, 'gw_fct_epa_setoptimumoutlet', 'ud', 'function') ON CONFLICT (id) DO NOTHING;
 
 -- 2023/06/07
 -- FLWREG LISTS

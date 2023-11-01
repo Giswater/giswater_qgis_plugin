@@ -12,4 +12,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 CREATE INDEX IF NOT EXISTS node_arc_id ON node USING btree (arc_id);
 
 -- 30/10/2023
-CREATE INDEX plan_psector_expl_id ON ud.plan_psector USING btree (expl_id);
+CREATE INDEX IF NOT EXISTS plan_psector_expl_id ON plan_psector USING btree (expl_id);
