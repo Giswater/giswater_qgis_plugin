@@ -2,3 +2,6 @@
 *************
 - Minor bug fix
 - New function to merge psectors (gw_fct_psector_merge)
+- Adjustent of fk for catalogs on inp tables (moving from on delete cascade to restrict)
+- Creation of example data for inventory
+- Simplify reports for water balance

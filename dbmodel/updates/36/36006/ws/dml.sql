@@ -28,3 +28,36 @@ UPDATE config_form_fields set iseditable = false  where formname = 've_epa_pump'
 -- 31/10/23
 UPDATE sys_param_user SET "label"='Hydraulic timestep' WHERE id='inp_times_hydraulic_timestep';
 
+
+UPDATE config_report SET query_text = '
+SELECT w.exploitation as "Exploitation", w.dma as "Dma", period as "Period", 
+total_in::numeric(20,2) as "Total inlet",
+total_out::numeric(20,2) as "Total outlet",
+total::numeric(20,2) as "Total injected",
+auth as "Authorized Vol.", 
+loss as "Losses Vol.", 
+(case when total > 0 then 100*(1-auth/total)::numeric(20,2) else 0.00 end) as "NRW"
+FROM v_om_waterbalance w'
+WHERE id = 102;
+
+UPDATE config_report SET query_text = 
+'SELECT n.exploitation as "Exploitation",
+(sum(n.total))::numeric(20,2) as "Total injected", 
+sum(auth) as "Authorized Vol.", 
+sum(loss) as "Losses Vol.", 
+(case when sum(n.total) > 0 THEN 100*(1-sum(auth)/sum(total))::numeric(20,2) else 0.00 end) as "NRW"
+FROM v_om_waterbalance n  WHERE n.dma IS NOT NULL'
+WHERE id = 103;
+
+
+UPDATE config_report SET query_text = 
+'SELECT n.exploitation as "Exploitation", n.dma as "Dma", 
+(sum(n.total))::numeric(20,2) as "Total injected", 
+sum(auth) as "Authorized Vol.", 
+sum(loss) as "Losses Vol.", 
+(case when sum(n.total) > 0 THEN 100*(1-sum(auth)/sum(total))::numeric(20,2) else 0.00 end) as "NRW"
+FROM v_om_waterbalance n  WHERE n.dma IS NOT NULL
+group by exploitation, dma'
+WHERE id = 104;
+
+

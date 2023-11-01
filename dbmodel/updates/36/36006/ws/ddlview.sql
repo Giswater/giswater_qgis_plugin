@@ -115,7 +115,7 @@ UNION
      JOIN v_connec c ON c.connec_id::text = n.feature_id::text;
 
 
-27/10/2023
+--27/10/2023
 CREATE OR REPLACE VIEW v_edit_plan_psector_x_connec AS 
  SELECT plan_psector_x_connec.id,
     plan_psector_x_connec.connec_id,
@@ -133,7 +133,7 @@ CREATE OR REPLACE VIEW v_edit_plan_psector_x_connec AS
    JOIN v_edit_link USING (link_id);
   
   
-30/10/2023
+--30/10/2023
 CREATE OR REPLACE VIEW v_connec AS 
  SELECT vu_connec.connec_id,
     vu_connec.code,
