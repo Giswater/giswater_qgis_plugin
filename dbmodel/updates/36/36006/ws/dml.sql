@@ -46,7 +46,7 @@ UPDATE config_report SET query_text =
 sum(auth) as "Authorized Vol.", 
 sum(loss) as "Losses Vol.", 
 (case when sum(n.total) > 0 THEN 100*(1-sum(auth)/sum(total))::numeric(20,2) else 0.00 end) as "NRW"
-FROM v_om_waterbalance n  WHERE n.dma IS NOT NULL'
+FROM v_om_waterbalance n  WHERE n.dma IS NOT NULL '
 WHERE id = 103;
 
 
@@ -56,8 +56,7 @@ UPDATE config_report SET query_text =
 sum(auth) as "Authorized Vol.", 
 sum(loss) as "Losses Vol.", 
 (case when sum(n.total) > 0 THEN 100*(1-sum(auth)/sum(total))::numeric(20,2) else 0.00 end) as "NRW"
-FROM v_om_waterbalance n  WHERE n.dma IS NOT NULL
-group by exploitation, dma'
+FROM v_om_waterbalance n  WHERE n.dma IS NOT NULL '
 WHERE id = 104;
 
 
