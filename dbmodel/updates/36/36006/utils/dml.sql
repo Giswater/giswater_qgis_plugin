@@ -46,3 +46,7 @@ VALUES (518, 'Psector merge', 'utils', NULL, 'core', true, 'Function process', N
 
 INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device) 
 VALUES(3284, 'Merge two or more psectors into one', '{"featureType":[]}'::json, '[{"widgetname":"psector_ids", "label":"Psector ids: (*)", "widgettype":"text", "datatype":"text", "layoutname":"grl_option_parameters","layoutorder":0, "isMandatory":true}, {"widgetname":"new_psector_name", "label":"New psector name: (*)", "widgettype":"text", "datatype":"text", "layoutname":"grl_option_parameters","layoutorder":1, "isMandatory":true}]'::json, NULL, true, '{4}');
+
+-- 31/10/2023
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3286, 'gw_trg_refresh_state_expl_matviews', 'utils', 'Trigger function', null, null, 'Trigger function to refresh matviews in order to enhance performe', 'role_basic', null, 'core') ON CONFLICT (id) DO NOTHING;

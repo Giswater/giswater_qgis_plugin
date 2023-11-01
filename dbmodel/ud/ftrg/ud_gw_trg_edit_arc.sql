@@ -346,7 +346,6 @@ BEGIN
 			END IF;
 		END IF;
 
-		
 		--Copy id to code field
 		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature WHERE id=NEW.arc_type;
 		
