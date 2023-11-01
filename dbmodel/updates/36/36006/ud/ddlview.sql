@@ -152,9 +152,9 @@ CREATE MATERIALIZED VIEW v_state_link_gully AS
   WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_gully.state = 1 
   AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER::text AND plan_psector_x_gully.active IS TRUE;
 
-ALTER TABLE v_state_link OWNER TO role_admin;
-ALTER TABLE v_state_link_connec OWNER TO role_admin;
-ALTER TABLE v_state_link_gully OWNER TO role_admin;
+ALTER TABLE v_state_link OWNER TO role_basic;
+ALTER TABLE v_state_link_connec OWNER TO role_basic;
+ALTER TABLE v_state_link_gully OWNER TO role_basic;
 
 create or replace view v_link_connec as 
 select distinct on (link_id) * from vu_link_connec

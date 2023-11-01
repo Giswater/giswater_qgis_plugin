@@ -326,7 +326,7 @@ BEGIN
 			WHERE psector_id=NEW.psector_id;
 		
 			INSERT INTO audit_psector_node_traceability			
-				SELECT nextval('SCHEMA_NAME.audit_psector_node_traceability_id_seq'), psector_id, pn.state, doable, addparam, now(), current_user, v_action 
+				SELECT nextval('SCHEMA_NAME.audit_psector_node_traceability_id_seq'), psector_id, pn.state, doable, addparam, now(), current_user, v_action,
 				n.node_id,code,top_elev,ymax,elev,custom_top_elev,custom_ymax,custom_elev,node_type,nodecat_id,epa_type,sector_id,n.state,state_type,annotation,observ,
 				comment,dma_id,soilcat_id,function_type,category_type,fluid_type,location_type,workcat_id,workcat_id_end,buildercat_id,builtdate,enddate,ownercat_id,
 				muni_id,postcode,streetaxis_id,postnumber,postcomplement,streetaxis2_id,postnumber2,postcomplement2,n.descript,rotation,link,verified,the_geom,undelete,
