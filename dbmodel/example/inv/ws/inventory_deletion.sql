@@ -23,6 +23,7 @@ UPDATE sector s SET the_geom = e.the_geom FROM exploitation e WHERE s.sector_id 
 
 UPDATE inp_valve SET valv_type =NULL, custom_dint=null, status= null, pressure=null, flow=null, to_arc=null;
 UPDATE inp_pump SET curve_id = null, status= null, to_arc = null, pump_type = null;
+UPDATE inp_pump_additional SET curve_id = null, status= null;
 UPDATE inp_reservoir SET head = null, pattern_id = null;
 UPDATE inp_inlet SET head = null, pattern_id = null, initlevel=null, minlevel=null, maxlevel=null, diameter=null, curve_id=null, overflow=null;
 UPDATE inp_junction SET demand=null, pattern_id = null;
@@ -42,4 +43,4 @@ DELETE FROM plan_psector;
 
 UPDATE cat_mat_roughness SET roughness = null;
 
-DELETE FROM rpt_result_cat;
+DELETE FROM rpt_cat_result;
