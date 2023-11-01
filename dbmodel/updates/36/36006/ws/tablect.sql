@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = ws36006, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 1/11/2023
 ALTER TABLE inp_connec DROP CONSTRAINT inp_connec_pattern_id_fkey;

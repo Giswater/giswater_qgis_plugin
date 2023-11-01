@@ -33,10 +33,11 @@ UPDATE ext_rtc_dma_period SET pattern_id = null;
 UPDATE dma SET pattern_id = null;
 UPDATE sector SET pattern_id = null;
 
+DELETE FROM cat_dscenario;
+
 DELETE FROM inp_pattern;
 DELETE FROM inp_curve;
 
-DELETE FROM cat_dscenario;
 DELETE FROM plan_psector;
 
 UPDATE cat_mat_roughness SET roughness = null;
