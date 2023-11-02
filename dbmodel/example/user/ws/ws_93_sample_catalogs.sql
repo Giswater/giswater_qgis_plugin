@@ -68,7 +68,7 @@ UPDATE cat_feature SET active = false WHERE id = 'VCONNEC';
 
 INSERT INTO cat_connec VALUES ('PVC25-PN16-DOM', 'WJOIN', 'PVC', '16', '25', NULL, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true);
 INSERT INTO cat_connec VALUES ('PVC32-PN16-DOM', 'WJOIN', 'PVC', '16', '32', NULL, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true);
-INSERT INTO cat_connec VALUES ('PVC32-PN16-TRA', 'WJOIN', 'PVC', '16', '32', NULL, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true);
+INSERT INTO cat_connec VALUES ('PVC32-PN16-IND', 'WJOIN', 'PVC', '16', '32', NULL, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true);
 INSERT INTO cat_connec VALUES ('PVC50-PN16-IND', 'WJOIN', 'PVC', '16', '50', NULL, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true);
 INSERT INTO cat_connec VALUES ('PVC63-PN16-FOU', 'FOUNTAIN', 'PVC', '16', '63', NULL, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true);
 INSERT INTO cat_connec VALUES ('PVC25-PN16-TAP', 'TAP', 'PVC', '16', '25', NULL, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true);
