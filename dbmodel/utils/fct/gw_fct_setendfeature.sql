@@ -52,6 +52,7 @@ v_fid integer = 518;
 v_feature json;
 v_feature_element json;
 v_feature_type text;
+v_element_id text;
 
 BEGIN
 	--  Set search path to local schema
@@ -121,20 +122,21 @@ BEGIN
 						union select element_id, node_id as feature_id from element_x_node
 						union select element_id, connec_id as feature_id from element_x_connec
 						union select element_id, gully_id as feature_id from element_x_gully),
-						c as (select element_id from element_x_'||v_feature_type||' where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
-						select count(*)-1, element_id from b join c using(element_id) group by b.element_id having count(*)>1';
+						c as (select element_id, state from element_x_'||v_feature_type||' join element using (element_id) where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
+						select count(*)-1, element_id from b join c using(element_id) where state=1 group by b.element_id having count(*)>1';
 				elsif v_projecttype = 'WS' then
 					v_querytext = 'With b as (select element_id, arc_id as feature_id from element_x_arc
 						union select element_id, node_id as feature_id from element_x_node
 						union select element_id, connec_id as feature_id from element_x_connec),
-						c as (select element_id from element_x_'||v_feature_type||' where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
-						select count(*)-1, element_id from b join c using(element_id) group by b.element_id having count(*)>1';
+						c as (select element_id, state from element_x_'||v_feature_type||' join element using (element_id) where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
+						select count(*)-1, element_id from b join c using(element_id) where state=1 group by b.element_id having count(*)>1';
 				end if;
 
 				EXECUTE ' SELECT count(*) FROM ('||v_querytext||' ) a' INTO v_count;
+				EXECUTE ' SELECT string_agg(element_id,'', '') FROM ('||v_querytext||' ) a' INTO v_element_id;
 
 				IF v_count > 0 THEN
-					INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, concat(v_count , ' elements related to arc (',v_feature_id_value,') have been also downgraded with this feature'));
+					INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, concat(v_count , ' additional element(s) related to the downgraded arc (',v_feature_id_value,') was/were also related to another operative feature(s) (element_id:',v_element_id,')'));
 				END IF;
 			END LOOP;
 
@@ -188,20 +190,21 @@ BEGIN
 						union select element_id, node_id as feature_id from element_x_node
 						union select element_id, connec_id as feature_id from element_x_connec
 						union select element_id, gully_id as feature_id from element_x_gully),
-						c as (select element_id from element_x_'||v_feature_type||' where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
-						select count(*)-1, element_id from b join c using(element_id) group by b.element_id having count(*)>1';
+						c as (select element_id, state from element_x_'||v_feature_type||' join element using (element_id) where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
+						select count(*)-1, element_id from b join c using(element_id) where state=1 group by b.element_id having count(*)>1';
 				elsif v_projecttype = 'WS' then
 					v_querytext = 'With b as (select element_id, arc_id as feature_id from element_x_arc
 						union select element_id, node_id as feature_id from element_x_node
 						union select element_id, connec_id as feature_id from element_x_connec),
-						c as (select element_id from element_x_'||v_feature_type||' where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
-						select count(*)-1, element_id from b join c using(element_id) group by b.element_id having count(*)>1';
+						c as (select element_id, state from element_x_'||v_feature_type||' join element using (element_id) where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
+						select count(*)-1, element_id from b join c using(element_id) where state=1 group by b.element_id having count(*)>1';
 				end if;
 
 				EXECUTE ' SELECT count(*) FROM ('||v_querytext||' ) a' INTO v_count;
+				EXECUTE ' SELECT string_agg(element_id,'', '') FROM ('||v_querytext||' ) a' INTO v_element_id;
 
 				IF v_count > 0 THEN
-					INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, concat(v_count , ' elements related to node (',v_feature_id_value,') have been also downgraded with this feature'));
+					INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, concat(v_count , ' additional element(s) related to the downgraded node (',v_feature_id_value,') was/were also related to another operative feature(s) (element_id:',v_element_id,')'));
 				END IF;
 			END LOOP;
 
@@ -221,20 +224,21 @@ BEGIN
 						union select element_id, node_id as feature_id from element_x_node
 						union select element_id, connec_id as feature_id from element_x_connec
 						union select element_id, gully_id as feature_id from element_x_gully),
-						c as (select element_id from element_x_'||v_feature_type||' where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
-						select count(*)-1, element_id from b join c using(element_id) group by b.element_id having count(*)>1';
+						c as (select element_id, state from element_x_'||v_feature_type||' join element using (element_id) where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
+						select count(*)-1, element_id from b join c using(element_id) where state=1 group by b.element_id having count(*)>1';
 				elsif v_projecttype = 'WS' then
 					v_querytext = 'With b as (select element_id, arc_id as feature_id from element_x_arc
 						union select element_id, node_id as feature_id from element_x_node
 						union select element_id, connec_id as feature_id from element_x_connec),
-						c as (select element_id from element_x_'||v_feature_type||' where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
-						select count(*)-1, element_id from b join c using(element_id) group by b.element_id having count(*)>1';
+						c as (select element_id, state from element_x_'||v_feature_type||' join element using (element_id) where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
+						select count(*)-1, element_id from b join c using(element_id) where state=1 group by b.element_id having count(*)>1';
 				end if;
 
 				EXECUTE ' SELECT count(*) FROM ('||v_querytext||' ) a' INTO v_count;
+				EXECUTE ' SELECT string_agg(element_id,'', '') FROM ('||v_querytext||' ) a' INTO v_element_id;
 
 				IF v_count > 0 THEN
-					INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, concat(v_count , ' elements related to connec (',v_feature_id_value,') have been also downgraded with this feature'));
+					INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, concat(v_count , ' additional element(s) related to the downgraded connec (',v_feature_id_value,') was/were also related to another operative feature(s) (element_id:',v_element_id,')'));
 				END IF;
 			END LOOP;
 
@@ -252,13 +256,14 @@ BEGIN
 						union select element_id, node_id as feature_id from element_x_node
 						union select element_id, connec_id as feature_id from element_x_connec
 						union select element_id, gully_id as feature_id from element_x_gully),
-						c as (select element_id from element_x_'||v_feature_type||' where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
-						select count(*)-1, element_id from b join c using(element_id) group by b.element_id having count(*)>1';
+						c as (select element_id, state from element_x_'||v_feature_type||' join element using (element_id) where '||v_feature_type||'_id= '||quote_literal(v_feature_id_value)||')
+						select count(*)-1, element_id from b join c using(element_id) where state=1 group by b.element_id having count(*)>1';
 
 				EXECUTE ' SELECT count(*) FROM ('||v_querytext||' ) a' INTO v_count;
+				EXECUTE ' SELECT string_agg(element_id,'', '') FROM ('||v_querytext||' ) a' INTO v_element_id;
 
 				IF v_count > 0 THEN
-					INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, concat(v_count , ' elements related to gully (',v_feature_id_value,') have been also downgraded with this feature'));
+					INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, concat(v_count , ' additional element(s) related to the downgraded gully (',v_feature_id_value,') was/were also related to another operative feature(s) (element_id:',v_element_id,')'));
 				END IF;
 			end loop;
 
