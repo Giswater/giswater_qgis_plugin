@@ -53,3 +53,5 @@ INSERT INTO sys_function (id, function_name, project_type, function_type, input_
 VALUES (3286, 'gw_trg_refresh_state_expl_matviews', 'utils', 'Trigger function', null, null, 'Trigger function to refresh matviews in order to enhance performe', 'role_basic', null, 'core') ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM sys_table WHERE id = 'arc_border_expl';
+
+UPDATE config_form_tabs SET orderby=4 WHERE tabname='tab_event' AND orderby IS NULL;

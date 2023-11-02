@@ -18,3 +18,5 @@ UPDATE config_form_tabs SET tabactions='[{"actionName":"actionEdit", "disabled":
 {"actionName":"actionGetParentId", "disabled":false},
 {"actionName":"actionLink",  "disabled":false},
 {"actionName": "actionHelp", "disabled": false}]'::json WHERE formname='v_edit_arc' AND tabname='tab_data';
+
+UPDATE sys_param_user SET layoutorder=26 WHERE id='edit_node_ymax_vdefault';
