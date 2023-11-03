@@ -1105,55 +1105,100 @@ BEGIN
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_timeseries AS
-	 SELECT b.timser_id,
-	    b.other1,
-	    b.other2,
-	    b.other3
-	   FROM ( SELECT t.id,
-		    t.timser_id,
-		    t.other1,
-		    t.other2,
-		    t.other3
-		   FROM selector_expl s,
-		    ( SELECT a.id,
-			    a.timser_id,
-			    a.other1,
-			    a.other2,
-			    a.other3,
-			    a.expl_id
-			   FROM ( SELECT inp_timeseries_value.id,
-				    inp_timeseries_value.timser_id,
-				    inp_timeseries_value.date AS other1,
-				    inp_timeseries_value.hour AS other2,
-				    inp_timeseries_value.value AS other3,
-				    inp_timeseries.expl_id
-				   FROM inp_timeseries_value
-				     JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
-				  WHERE inp_timeseries.times_type::text = 'ABSOLUTE'::text AND inp_timeseries.active
-				UNION
-				 SELECT inp_timeseries_value.id,
-				    inp_timeseries_value.timser_id,
-				    concat('FILE', ' ', inp_timeseries.fname) AS other1,
-				    NULL::character varying AS other2,
-				    NULL::numeric AS other3,
-				    inp_timeseries.expl_id
-				   FROM inp_timeseries_value
-				     JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
-				  WHERE inp_timeseries.times_type::text = 'FILE'::text AND inp_timeseries.active
-				UNION
-				 SELECT inp_timeseries_value.id,
-				    inp_timeseries_value.timser_id,
-				    NULL::text AS other1,
-				    inp_timeseries_value."time" AS other2,
-				    inp_timeseries_value.value::numeric AS other3,
-				    inp_timeseries.expl_id
-				   FROM inp_timeseries_value
-				     JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
-				  WHERE inp_timeseries.times_type::text = 'RELATIVE'::text AND inp_timeseries.active) a
-			  ORDER BY a.id) t
-		JOIN (SELECT other1 as timser_id FROM vi_t_raingages UNION SELECT other1 FROM vi_t_outfalls UNION  SELECT timser_id FROM vi_t_inflows) a USING (timser_id)
-		WHERE t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL) b
-	  ORDER BY b.id;
+	SELECT 
+	b.timser_id,
+	b.other1,
+	b.other2,
+	b.other3
+    FROM ( SELECT t.id,
+			t.timser_id,
+			t.other1,
+			t.other2,
+			t.other3
+		   FROM ud.selector_expl s,
+			( SELECT a.id,
+					a.timser_id,
+					a.other1,
+					a.other2,
+					a.other3,
+					a.expl_id
+				   FROM ( SELECT inp_timeseries_value.id,
+							inp_timeseries_value.timser_id,
+							inp_timeseries_value.date AS other1,
+							inp_timeseries_value.hour AS other2,
+							inp_timeseries_value.value AS other3,
+							inp_timeseries.expl_id
+						   FROM ud.inp_timeseries_value
+							 JOIN ud.inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+						  WHERE inp_timeseries.times_type::text = 'ABSOLUTE'::text AND inp_timeseries.active
+						UNION
+						 SELECT inp_timeseries_value.id,
+							inp_timeseries_value.timser_id,
+							concat('FILE', ' ', inp_timeseries.fname) AS other1,
+							NULL::character varying AS other2,
+							NULL::numeric AS other3,
+							inp_timeseries.expl_id
+						   FROM ud.inp_timeseries_value
+							 JOIN ud.inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+						  WHERE inp_timeseries.times_type::text = 'FILE'::text AND inp_timeseries.active
+						UNION
+						 SELECT inp_timeseries_value.id,
+							inp_timeseries_value.timser_id,
+							NULL::text AS other1,
+							inp_timeseries_value."time" AS other2,
+							inp_timeseries_value.value::numeric AS other3,
+							inp_timeseries.expl_id
+						   FROM ud.inp_timeseries_value
+							 JOIN ud.inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+						  WHERE inp_timeseries.times_type::text = 'RELATIVE'::text AND inp_timeseries.active) a
+				  ORDER BY a.id) t
+		  WHERE (t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text)
+		  union 
+		  SELECT t.id,
+			t.timser_id,
+			t.other1,
+			t.other2,
+			t.other3
+		   FROM 
+			( SELECT a.id,
+					a.timser_id,
+					a.other1,
+					a.other2,
+					a.other3,
+					a.expl_id
+				   FROM ( SELECT inp_timeseries_value.id,
+							inp_timeseries_value.timser_id,
+							inp_timeseries_value.date AS other1,
+							inp_timeseries_value.hour AS other2,
+							inp_timeseries_value.value AS other3,
+							inp_timeseries.expl_id
+						   FROM ud.inp_timeseries_value
+							 JOIN ud.inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+						  WHERE inp_timeseries.times_type::text = 'ABSOLUTE'::text AND inp_timeseries.active
+						UNION
+						 SELECT inp_timeseries_value.id,
+							inp_timeseries_value.timser_id,
+							concat('FILE', ' ', inp_timeseries.fname) AS other1,
+							NULL::character varying AS other2,
+							NULL::numeric AS other3,
+							inp_timeseries.expl_id
+						   FROM ud.inp_timeseries_value
+							 JOIN ud.inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+						  WHERE inp_timeseries.times_type::text = 'FILE'::text AND inp_timeseries.active
+						UNION
+						 SELECT inp_timeseries_value.id,
+							inp_timeseries_value.timser_id,
+							NULL::text AS other1,
+							inp_timeseries_value."time" AS other2,
+							inp_timeseries_value.value::numeric AS other3,
+							inp_timeseries.expl_id
+						   FROM ud.inp_timeseries_value
+							 JOIN ud.inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+						  WHERE inp_timeseries.times_type::text = 'RELATIVE'::text AND inp_timeseries.active) a
+				  ORDER BY a.id) t
+		  WHERE t.expl_id is NULL) b
+  	ORDER BY b.id;
+
 
 	CREATE OR REPLACE TEMP VIEW vi_t_curves AS
 	 SELECT a.curve_id,
