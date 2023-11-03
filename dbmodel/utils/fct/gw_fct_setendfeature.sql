@@ -303,6 +303,11 @@ BEGIN
 					EXECUTE 'UPDATE element e SET state = 0, state_type='||v_state_type||',
 					enddate = '||quote_literal(v_enddate)||' FROM element_x_'||v_feature_type||' f WHERE f.element_id=e.element_id AND '||v_feature_type||'_id ='||quote_literal(v_feature_id_value)||'';
 				END IF;
+			
+				-- related link to obsolete
+				IF v_feature_type='connec' or v_feature_type='gully' then
+					EXECUTE 'UPDATE link SET state = 0 WHERE feature_id = '|| quote_literal(v_feature_id_value)||';';
+				END IF;
 
 			END LOOP;
 		END IF;
