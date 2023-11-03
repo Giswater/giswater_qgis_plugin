@@ -20,6 +20,7 @@ v_old_state integer;
 v_psector_vdefault integer;
 v_num_feature integer;
 v_downgrade_force boolean;
+v_connec_downgrade_force boolean;
 v_state_type integer;
 v_psector_list text;
 v_schemaname text;
@@ -35,6 +36,7 @@ BEGIN
 
 	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 	v_downgrade_force:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_arc_downgrade_force' AND cur_user=current_user)::boolean;
+	v_connec_downgrade_force:= (SELECT "value" FROM config_param_system WHERE "parameter"='edit_connec_downgrade_force')::boolean;
 	
 	-- control for downgrade features to state(0)
 	IF tg_op_aux = 'UPDATE' THEN
@@ -155,7 +157,7 @@ BEGIN
 		ELSIF feature_type_aux='CONNEC' and state_aux=0 THEN
 			SELECT state INTO v_old_state FROM connec WHERE connec_id=feature_id_aux;
 			
-			IF state_aux!=v_old_state AND (v_downgrade_force IS NOT TRUE) THEN
+			IF state_aux!=v_old_state AND (v_connec_downgrade_force IS NOT TRUE) THEN
 
 				--link feature control
 				SELECT count(link_id) INTO v_num_feature FROM link WHERE exit_type='CONNEC' AND exit_id=feature_id_aux AND link.state > 0;
@@ -174,7 +176,7 @@ BEGIN
 				END IF;
 					
 				
-			ELSIF state_aux!=v_old_state AND (v_downgrade_force IS TRUE) THEN
+			ELSIF state_aux!=v_old_state AND (v_connec_downgrade_force IS TRUE) THEN
 			
 				--link feature control
 				SELECT count(link_id) INTO v_num_feature FROM link WHERE exit_type='CONNEC' AND exit_id=feature_id_aux AND link.state > 0;
@@ -200,7 +202,7 @@ BEGIN
 		ELSIF feature_type_aux='GULLY' and state_aux=0 THEN
 			SELECT state INTO v_old_state FROM gully WHERE gully_id=feature_id_aux;
 
-			IF state_aux!=v_old_state AND (v_downgrade_force IS NOT TRUE) THEN
+			IF state_aux!=v_old_state AND (v_connec_downgrade_force IS NOT TRUE) THEN
 
 				--link feature control
 				SELECT count(link_id) INTO v_num_feature FROM link WHERE exit_type='GULLY' AND exit_id=feature_id_aux AND link.state > 0;
@@ -209,7 +211,7 @@ BEGIN
 					"data":{"message":"1072", "function":"2130","debug_msg":"'||feature_id_aux||'", "is_process":true}}$$);';
 				END IF;
 				
-			ELSIF state_aux!=v_old_state AND (v_downgrade_force IS TRUE) THEN
+			ELSIF state_aux!=v_old_state AND (v_connec_downgrade_force IS TRUE) THEN
 			
 				--link feature control
 				SELECT count(link_id) INTO v_num_feature FROM link WHERE exit_type='GULLY' AND exit_id=feature_id_aux AND link.state > 0;
