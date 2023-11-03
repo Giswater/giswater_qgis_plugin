@@ -1115,7 +1115,7 @@ BEGIN
 			t.other1,
 			t.other2,
 			t.other3
-		   FROM ud.selector_expl s,
+		   FROM selector_expl s,
 			( SELECT a.id,
 					a.timser_id,
 					a.other1,
@@ -1128,8 +1128,8 @@ BEGIN
 							inp_timeseries_value.hour AS other2,
 							inp_timeseries_value.value AS other3,
 							inp_timeseries.expl_id
-						   FROM ud.inp_timeseries_value
-							 JOIN ud.inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+						   FROM inp_timeseries_value
+							 JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
 						  WHERE inp_timeseries.times_type::text = 'ABSOLUTE'::text AND inp_timeseries.active
 						UNION
 						 SELECT inp_timeseries_value.id,
@@ -1138,8 +1138,8 @@ BEGIN
 							NULL::character varying AS other2,
 							NULL::numeric AS other3,
 							inp_timeseries.expl_id
-						   FROM ud.inp_timeseries_value
-							 JOIN ud.inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+						   FROM inp_timeseries_value
+							 JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
 						  WHERE inp_timeseries.times_type::text = 'FILE'::text AND inp_timeseries.active
 						UNION
 						 SELECT inp_timeseries_value.id,
@@ -1148,8 +1148,8 @@ BEGIN
 							inp_timeseries_value."time" AS other2,
 							inp_timeseries_value.value::numeric AS other3,
 							inp_timeseries.expl_id
-						   FROM ud.inp_timeseries_value
-							 JOIN ud.inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+						   FROM inp_timeseries_value
+							 JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
 						  WHERE inp_timeseries.times_type::text = 'RELATIVE'::text AND inp_timeseries.active) a
 				  ORDER BY a.id) t
 		  WHERE (t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text)
@@ -1172,8 +1172,8 @@ BEGIN
 							inp_timeseries_value.hour AS other2,
 							inp_timeseries_value.value AS other3,
 							inp_timeseries.expl_id
-						   FROM ud.inp_timeseries_value
-							 JOIN ud.inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+						   FROM inp_timeseries_value
+							 JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
 						  WHERE inp_timeseries.times_type::text = 'ABSOLUTE'::text AND inp_timeseries.active
 						UNION
 						 SELECT inp_timeseries_value.id,
@@ -1182,8 +1182,8 @@ BEGIN
 							NULL::character varying AS other2,
 							NULL::numeric AS other3,
 							inp_timeseries.expl_id
-						   FROM ud.inp_timeseries_value
-							 JOIN ud.inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+						   FROM inp_timeseries_value
+							 JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
 						  WHERE inp_timeseries.times_type::text = 'FILE'::text AND inp_timeseries.active
 						UNION
 						 SELECT inp_timeseries_value.id,
@@ -1192,8 +1192,8 @@ BEGIN
 							inp_timeseries_value."time" AS other2,
 							inp_timeseries_value.value::numeric AS other3,
 							inp_timeseries.expl_id
-						   FROM ud.inp_timeseries_value
-							 JOIN ud.inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
+						   FROM inp_timeseries_value
+							 JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
 						  WHERE inp_timeseries.times_type::text = 'RELATIVE'::text AND inp_timeseries.active) a
 				  ORDER BY a.id) t
 		  WHERE t.expl_id is NULL) b
