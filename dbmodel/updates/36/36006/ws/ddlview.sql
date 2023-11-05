@@ -130,7 +130,7 @@ CREATE OR REPLACE VIEW v_edit_plan_psector_x_connec AS
     plan_psector_x_connec.insert_user,
     exit_type
    FROM plan_psector_x_connec
-   JOIN v_edit_link USING (link_id);
+   LEFT JOIN link USING (link_id);
   
   
 --30/10/2023

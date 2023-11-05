@@ -160,7 +160,7 @@ SELECT plan_psector_x_connec.id,
     plan_psector_x_connec.insert_user,
     exit_type
    FROM plan_psector_x_connec
-   JOIN v_edit_link USING (link_id);
+   LEFT JOIN link USING (link_id);
 
 
 CREATE OR REPLACE VIEW v_edit_plan_psector_x_gully AS 
@@ -177,8 +177,7 @@ SELECT plan_psector_x_gully.id,
     plan_psector_x_gully.insert_user,
     exit_type
    FROM plan_psector_x_gully
-   JOIN v_edit_link USING (link_id);
-
+   LEFT JOIN link USING (link_id);
 
 
 -- 30/10/2023
@@ -209,7 +208,7 @@ CREATE OR REPLACE VIEW v_connec AS
     vu_connec.state_type,
     vu_connec.connec_depth,
     vu_connec.connec_length,
-    vu_connec.arc_id,
+    v_state_connec.arc_id,
     vu_connec.annotation,
     vu_connec.observ,
     vu_connec.comment,
@@ -320,7 +319,7 @@ CREATE OR REPLACE VIEW v_gully AS
     vu_gully.connec_arccat_id,
     vu_gully.connec_length,
     vu_gully.connec_depth,
-    vu_gully.arc_id,
+    v_state_gully.arc_id,
     vu_gully.expl_id,
     vu_gully.macroexpl_id,
          CASE
