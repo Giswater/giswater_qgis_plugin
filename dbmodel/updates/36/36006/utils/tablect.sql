@@ -13,3 +13,6 @@ CREATE INDEX IF NOT EXISTS node_arc_id ON node USING btree (arc_id);
 
 -- 30/10/2023
 CREATE INDEX IF NOT EXISTS plan_psector_expl_id ON plan_psector USING btree (expl_id);
+
+-- 3/11/2023
+DROP TRIGGER IF EXISTS gw_trg_node_border ON node;
