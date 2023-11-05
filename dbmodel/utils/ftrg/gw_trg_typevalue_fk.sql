@@ -31,10 +31,13 @@ BEGIN
 		RETURN NULL;
 	ELSE
 
-		IF NEW.expl_id = 0 THEN 
-			RAISE EXCEPTION 'Value 0 for exploitation it is not enabled on network objects. It is only used to relate undefined mapzones';
+		-- Do no allow to insert or update value '0' for exploitation
+		IF v_table IN ('arc', 'node', 'connec', 'gully', 'element', 'link') AND TG_OP IN ('INSERT', 'UPDATE') THEN
+			IF NEW.expl_id = 0 THEN 
+				RAISE EXCEPTION 'Value 0 for exploitation it is not enabled on network objects. It is only used to relate undefined mapzones';
+			END IF;
 		END IF;
-		
+				
 		--select typevalue for the table
 		v_typevalue_fk = 'SELECT * FROM sys_foreignkey WHERE target_table='''||v_table||''' AND active IS TRUE';
 		
