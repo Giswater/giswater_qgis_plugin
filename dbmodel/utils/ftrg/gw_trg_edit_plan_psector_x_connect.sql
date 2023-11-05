@@ -16,12 +16,15 @@ v_link_id integer;
 v_link_new integer;
 v_exit_type text;
 v_rec record;
+v_project_type text;
 
 
 BEGIN 
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	v_table:= TG_ARGV[0];
+
+	v_project_type = (SELECT project_type FROM sys_version LIMIT 1);
 
 	IF TG_OP = 'INSERT' THEN
 
@@ -37,11 +40,22 @@ BEGIN
 			IF v_rec.state =  1 THEN
 
 				-- inserting new link on psector
-				INSERT INTO link (feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, 
-				exit_topelev, sector_id, dma_id, fluid_type, exit_elev, expl_id2, epa_type, is_operative, connecat_id, workcat_id, workcat_id_end, builtdate, enddate)
-				SELECT feature_id, feature_type, exit_id, exit_type, userdefined_geom, 2, expl_id, the_geom, exit_topelev, sector_id, dma_id, fluid_type, exit_elev,
-				expl_id2, epa_type, is_operative, connecat_id, workcat_id, workcat_id_end, builtdate, enddate FROM link WHERE state=1 AND feature_id = v_rec.connec_id
-				RETURNING link_id INTO v_link_new;
+				IF v_project_type = 'WS' THEN
+					INSERT INTO link (feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, 
+					exit_topelev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id, exit_elev, expl_id2, epa_type, is_operative, connecat_id, workcat_id, workcat_id_end, builtdate, enddate)
+					SELECT feature_id, feature_type, exit_id, exit_type, userdefined_geom, 2, expl_id, the_geom, exit_topelev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id,  exit_elev,
+					expl_id2, epa_type, is_operative, connecat_id, workcat_id, workcat_id_end, builtdate, enddate FROM link WHERE state=1 AND feature_id = v_rec.connec_id
+					RETURNING link_id INTO v_link_new;
+
+				ELSIF v_project_type = 'UD' THEN
+					INSERT INTO link (feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, 
+					exit_topelev, sector_id, dma_id, fluid_type, exit_elev, expl_id2, epa_type, is_operative, connecat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id)
+					SELECT feature_id, feature_type, exit_id, exit_type, userdefined_geom, 2, expl_id, the_geom, exit_topelev, sector_id, dma_id, fluid_type, exit_elev,
+					expl_id2, epa_type, is_operative, connecat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id FROM link WHERE state=1 AND feature_id = v_rec.connec_id
+					RETURNING link_id INTO v_link_new;
+
+				END IF;
+
 				UPDATE link SET state = 2 where link_id = v_link_new;
 			
 				INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, link_id, arc_id) values (NEW.connec_id,  NEW.psector_id, 0, v_link_id, v_rec.arc_id) 
@@ -66,9 +80,9 @@ BEGIN
 
 				-- inserting new link on psector
 				INSERT INTO link (feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, 
-				exit_topelev, sector_id, dma_id, fluid_type, exit_elev, expl_id2, epa_type, is_operative, connecat_id, workcat_id, workcat_id_end, builtdate, enddate)
+				exit_topelev, sector_id, dma_id, fluid_type, exit_elev, expl_id2, epa_type, is_operative, connecat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id)
 				SELECT feature_id, feature_type, exit_id, exit_type, userdefined_geom, 2, expl_id, the_geom, exit_topelev, sector_id, dma_id, fluid_type, exit_elev,
-				expl_id2, epa_type, is_operative, connecat_id, workcat_id, workcat_id_end, builtdate, enddate FROM link WHERE state=1 AND feature_id = v_rec.gully_id
+				expl_id2, epa_type, is_operative, connecat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id FROM link WHERE state=1 AND feature_id = v_rec.gully_id
 				RETURNING link_id INTO v_link_new;
 				UPDATE link SET state = 2 where link_id = v_link_new;
 
