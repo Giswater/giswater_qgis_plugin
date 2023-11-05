@@ -30,6 +30,11 @@ BEGIN
 	IF v_disable THEN 
 		RETURN NULL;
 	ELSE
+
+		IF NEW.expl_id = 0 THEN 
+			RAISE EXCEPTION 'Value 0 for exploitation it is not enabled on network objects. It is only used to relate undefined mapzones';
+		END IF;
+		
 		--select typevalue for the table
 		v_typevalue_fk = 'SELECT * FROM sys_foreignkey WHERE target_table='''||v_table||''' AND active IS TRUE';
 		
