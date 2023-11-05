@@ -28,7 +28,7 @@ BEGIN
 			EXECUTE 'SELECT state, arc_id FROM connec where connec_id = '''||new.connec_id||''''
 			INTO v_rec;
 
-			v_link_id = (select link_id from link where feature_id = new.connec_id and feature_type = 'CONNEC' AND exit_id = v_rec.arc_id LIMIT 1);
+			v_link_id = (select link_id from link where feature_id = new.connec_id and feature_type = 'CONNEC' and link.state = 1 LIMIT 1);
 
 			--inserting on tables
 			IF v_rec.state =  1 THEN
@@ -47,7 +47,7 @@ BEGIN
 			EXECUTE 'SELECT state, arc_id FROM gully where gully_id = '''||new.gully_id||''''
 			INTO v_rec;
 			
-			v_link_id = (select link_id from link where feature_id = new.gully_id and feature_type = 'GULLY' AND exit_id = v_rec.arc_id LIMIT 1);
+			v_link_id = (select link_id from link where feature_id = new.gully_id and feature_type = 'GULLY'  and link.state = 1 LIMIT 1);
 
 			--inserting on tables
 			IF v_rec.state =  1 THEN
