@@ -74,3 +74,5 @@ INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp
 
 ALTER TABLE inp_shortpipe DROP CONSTRAINT inp_shortpipe_status_check;
 ALTER TABLE inp_shortpipe ADD CONSTRAINT inp_shortpipe_status_check CHECK (((status)::text = ANY ((ARRAY[''::character varying, 'CV'::character varying, 'OPEN'::character varying, 'CLOSED'::character varying])::text[])));
+
+UPDATE sys_message SET hint_message='Unlink hydrometers first or set edit_connec_downgrade_force on config_param_system to true' WHERE id=3194;
