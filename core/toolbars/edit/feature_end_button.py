@@ -107,8 +107,8 @@ class GwFeatureEndButton(GwAction):
         self.dlg_work_end.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_work_end.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
         self.dlg_work_end.btn_accept.clicked.connect(partial(self._end_feature))
-        self.dlg_work_end.btn_cancel.clicked.connect(partial(self._manage_close, self.dlg_work_end, True, False))
-        self.dlg_work_end.rejected.connect(partial(self._manage_close, self.dlg_work_end, True, True))
+        self.dlg_work_end.btn_cancel.clicked.connect(partial(self._manage_close, self.dlg_work_end))
+        self.dlg_work_end.rejected.connect(partial(self._manage_close, self.dlg_work_end))
         self.dlg_work_end.workcat_id_end.editTextChanged.connect(partial(self._fill_workids))
         self.dlg_work_end.btn_new_workcat.clicked.connect(partial(self._new_workcat))
 
@@ -491,34 +491,12 @@ class GwFeatureEndButton(GwAction):
         tools_gw.open_dialog(self.dlg_work_end)
 
 
-    def _manage_close(self, dialog, force_downgrade=False, show_warning=False):
+    def _manage_close(self, dialog):
         """ Close dialog and disconnect snapping """
 
         tools_gw.close_dialog(dialog)
         tools_qgis.disconnect_snapping()
         tools_qgis.disconnect_signal_selection_changed()
-        if force_downgrade:
-            sql = ("SELECT feature_type, feature_id, log_message "
-                   "FROM audit_log_data "
-                   "WHERE fid = 128 AND cur_user = current_user")
-            rows = tools_db.get_rows(sql)
-            ids_ = ""
-            if rows:
-                for row in rows:
-                    ids_ += str(row[1]) + ", "
-                    state_statetype = str(row['log_message']).split(',')
-                    sql = (f"UPDATE {row[0].lower()} "
-                           f"SET state = '{state_statetype[0]}', state_type = '{state_statetype[1]}' "
-                           f"WHERE {row[0]}_id = '{row[1]}';")
-                    tools_db.execute_sql(sql)
-
-                ids_ = ids_[:-2]
-                if show_warning and len(ids_) != 0:
-                    msg = 'These items could not be downgrade to state 0'
-                    tools_qt.show_info_box(msg, title="Warning", inf_text=str(ids_))
-                sql = ("DELETE FROM audit_log_data "
-                       "WHERE fid = 128 AND cur_user = current_user")
-                tools_db.execute_sql(sql)
         self._set_edit_arc_downgrade_force('False')
         tools_gw.remove_selection(True, layers=self.layers)
         self.canvas.refresh()
