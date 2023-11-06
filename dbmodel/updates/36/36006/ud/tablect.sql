@@ -139,3 +139,7 @@ REFERENCES inp_landuses (landus_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RES
 ALTER TABLE inp_washoff DROP CONSTRAINT inp_washoff_land_x_pol_poll_id_fkey;
 ALTER TABLE inp_washoff ADD CONSTRAINT inp_washoff_land_x_pol_poll_id_fkey FOREIGN KEY (poll_id)
 REFERENCES inp_pollutant (poll_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE inp_coverage DROP CONSTRAINT inp_coverage_land_x_subc_subc_id_fkey;
+ALTER TABLE inp_coverage ADD CONSTRAINT inp_coverage_land_x_subc_subc_id_fkey FOREIGN KEY (subc_id, hydrology_id)
+REFERENCES inp_subcatchment (subc_id, hydrology_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
