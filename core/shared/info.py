@@ -3308,7 +3308,11 @@ def open_epa_dlg(**kwargs):
             btn_add_base = info.dlg.findChild(QPushButton, 'btn_add_base')
             if btn_add_base:
                 tools_gw.add_icon(btn_add_base, '111b', "24x24")
-                btn_add_base.clicked.connect(partial(add_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, **kwargs))
+                btn_add_base.clicked.connect(partial(add_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, "INSERT", **kwargs))
+            btn_edit_base = info.dlg.findChild(QPushButton, 'btn_edit_base')
+            if btn_edit_base:
+                tools_gw.add_icon(btn_edit_base, '101')
+                btn_edit_base.clicked.connect(partial(edit_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, **kwargs))
             btn_delete_base = info.dlg.findChild(QPushButton, 'btn_delete_base')
             if btn_delete_base:
                 tools_gw.add_icon(btn_delete_base, '112b', "24x24")
@@ -3317,11 +3321,15 @@ def open_epa_dlg(**kwargs):
             btn_add_dscenario = info.dlg.findChild(QPushButton, 'btn_add_dscenario')
             if btn_add_dscenario:
                 tools_gw.add_icon(btn_add_dscenario, '111b', "24x24")
-                btn_add_dscenario.clicked.connect(partial(add_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, **kwargs))
+                btn_add_dscenario.clicked.connect(partial(add_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, "INSERT", **kwargs))
             btn_delete_dscenario = info.dlg.findChild(QPushButton, 'btn_delete_dscenario')
             if btn_delete_dscenario:
                 tools_gw.add_icon(btn_delete_dscenario, '112b', "24x24")
                 btn_delete_dscenario.clicked.connect(partial(delete_tbl_row, tbl, view, pk, info.dlg, **kwargs))
+            btn_edit_dscenario = info.dlg.findChild(QPushButton, 'btn_edit_dscenario')
+            if btn_edit_dscenario:
+                tools_gw.add_icon(btn_edit_dscenario, '101')
+                btn_edit_dscenario.clicked.connect(partial(edit_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, **kwargs))
 
     info.dlg.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, info.dlg, True))
     info.dlg.finished.connect(partial(tools_gw.save_settings, info.dlg))
@@ -3329,7 +3337,35 @@ def open_epa_dlg(**kwargs):
     tools_gw.open_dialog(info.dlg, dlg_name=ui_name)
 
 
-def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, **kwargs):
+
+def edit_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, **kwargs):
+    # Get selected row
+    selected_list = tbl.selectionModel().selectedRows()
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        tools_qgis.show_warning(message, dialog=dlg)
+        return
+
+    values = []
+    if pkey:
+        if not isinstance(pkey, list):
+            pkey = [pkey]
+        values = []
+        for index in selected_list:
+            value = {}
+            for pk in pkey:
+                col_idx = tools_qt.get_col_index_by_col_name(tbl, pk)
+                if col_idx is None:
+                    col_idx = 0
+                value[pk] = index.sibling(index.row(), col_idx).data()
+            if value:
+                values.append(value)
+
+    kwargs['values'] = values
+    add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, "UPDATE", **kwargs)
+
+
+def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, force_action, **kwargs):
 
     # Get variables
     complet_result = kwargs['complet_result']
@@ -3344,6 +3380,10 @@ def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, **kwargs):
     id_name = complet_result['body']['feature']['idName']
 
     feature = f'"tableName":"{tablename}", "isEpa": true'
+    if force_action == "UPDATE":
+        values = kwargs['values']
+        id_str = ', '.join([str(value) for value in values[0].values()])
+        feature += f', "id": "{id_str}"'
     body = tools_gw.create_body(feature=feature)
     json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
     if json_result is None or json_result['status'] == 'Failed':
@@ -3401,7 +3441,7 @@ def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, **kwargs):
     info.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, info.add_dlg))
     info.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, info.add_dlg))
     info.add_dlg.dlg_closed.connect(partial(refresh_epa_tbl, tbl, dlg, **kwargs))
-    info.add_dlg.btn_accept.clicked.connect(partial(accept_add_dlg, info.add_dlg, tablename, pkey, feature_id, info.my_json_add, result, info))
+    info.add_dlg.btn_accept.clicked.connect(partial(accept_add_dlg, info.add_dlg, tablename, pkey, feature_id, info.my_json_add, result, info, force_action))
 
     # Open dlg
     tools_gw.open_dialog(info.add_dlg, dlg_name='info_generic', title=dlg_title)
@@ -3500,7 +3540,7 @@ def delete_tbl_row(tbl, view, pkey, dlg, tablename=None, tableview=None, id_name
             reload_tbl_dscenario(info, tablename, tableview, id_name, feature_id)
 
 
-def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result, info):
+def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result, info, force_action):
 
     if not my_json:
         return
@@ -3543,7 +3583,7 @@ def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result,
 
     feature = f'"id":"{id_val}", '
     feature += f'"tableName":"{tablename}"'
-    extras = f'"fields":{fields}, "force_action":"INSERT"'
+    extras = f'"fields":{fields}, "force_action":"{force_action}"'
     body = tools_gw.create_body(feature=feature, extras=extras)
     json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
     if json_result and json_result.get('status') == 'Accepted':
@@ -3721,7 +3761,7 @@ def add_to_dscenario(**kwargs):
 
     setattr(info, f"my_json_{tablename}", {})
 
-    add_row_epa(tbl, tablename, tablename, pkey, dialog, dlg_title, **kwargs)
+    add_row_epa(tbl, tablename, tablename, pkey, dialog, dlg_title, "INSERT", **kwargs)
 
 
 def remove_from_dscenario(**kwargs):

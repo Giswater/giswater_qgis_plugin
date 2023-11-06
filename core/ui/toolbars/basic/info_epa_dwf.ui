@@ -25,7 +25,7 @@
         <x>0</x>
         <y>0</y>
         <width>947</width>
-        <height>386</height>
+        <height>379</height>
        </rect>
       </property>
       <attribute name="label">
@@ -56,6 +56,13 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="btn_edit_base">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer name="horizontalSpacer_3">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -78,7 +85,7 @@
         <x>0</x>
         <y>0</y>
         <width>947</width>
-        <height>386</height>
+        <height>379</height>
        </rect>
       </property>
       <attribute name="label">
@@ -103,6 +110,13 @@
          </item>
          <item>
           <widget class="QPushButton" name="btn_delete_dscenario">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_edit_dscenario">
            <property name="text">
             <string/>
            </property>
