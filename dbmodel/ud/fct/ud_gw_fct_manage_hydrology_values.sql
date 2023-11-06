@@ -41,6 +41,8 @@ v_sector integer;
 v_sector_name text;
 v_sector_list text[];
 rec text;
+v_flag integer = 0;
+
 BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
@@ -122,11 +124,22 @@ BEGIN
 			"subc_id,  aquif_id, node_id, surfel, a1, b1, a2, b2, a3, tw, h, fl_eq_lat, fl_eq_deep",
 			"subc_id, landus_id, t.percent"]'::json) as column
 				
-			LOOP
+			loop
+				
+			
 				IF v_action = 'DELETE-COPY' THEN
 
-					raise notice ' % %', object_rec.table, v_target;
-					EXECUTE 'DELETE FROM inp_'||object_rec.table||' WHERE hydrology_id = '||v_target;
+					if v_sectors = -999 then 
+
+						if v_flag = 0 then 
+							raise notice ' % %', object_rec.table, v_target;
+							EXECUTE 'DELETE FROM inp_'||object_rec.table||' WHERE hydrology_id = '||v_target;
+							v_flag = 1;
+						end if;
+					else
+						raise notice ' % %', object_rec.table, v_target;
+						EXECUTE 'DELETE FROM inp_'||object_rec.table||' WHERE hydrology_id = '||v_target;
+					end if;
 
 					-- get message
 					GET DIAGNOSTICS v_count = row_count;
@@ -135,6 +148,7 @@ BEGIN
 						VALUES (v_fid, v_sector, 2, concat('WARNING: ',v_count,' row(s) have been removed from inp_',object_rec.table,' table.'));
 					END IF;
 				END IF;
+			
 						
 				IF v_action = 'KEEP-COPY' OR  v_action = 'DELETE-COPY' THEN
 
