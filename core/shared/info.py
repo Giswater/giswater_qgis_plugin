@@ -3973,8 +3973,9 @@ def new_visit(**kwargs):
     """ Call button 64: om_add_visit """
 
     dlg_cf = kwargs['dialog']
-    feature_type = kwargs['complet_result']['body']['feature']['childType']
+    feature_type = kwargs['complet_result']['body']['feature']['featureType']
     feature_id = kwargs['complet_result']['body']['feature']['id']
+
     # Get expl_id to save it on om_visit and show the geometry of visit
     expl_id = tools_qt.get_combo_value(dlg_cf, 'tab_data_expl_id', 0)
     if expl_id == -1:
@@ -3982,8 +3983,9 @@ def new_visit(**kwargs):
         tools_qgis.show_warning(msg)
         return
 
-    date_event_from = dlg_cf.findChild(QDateEdit, "date_event_from")
-    date_event_to = dlg_cf.findChild(QDateEdit, "date_event_to")
+    date_event_from = dlg_cf.tab_event.findChild(QgsDateTimeEdit, "date_event_from")
+    date_event_to = dlg_cf.tab_event.findChild(QgsDateTimeEdit, "date_event_to")
+
     tbl_event_cf = dlg_cf.findChild(QTableView, "tbl_event_cf")
     manage_visit = GwVisit()
     manage_visit.visit_added.connect(partial(_update_visit_table, feature_type, date_event_from, date_event_to, tbl_event_cf))
