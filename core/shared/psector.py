@@ -2186,17 +2186,14 @@ class GwPsector:
         # Check if there is a connec/gully selected
         tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
         selected_rows = []
-        selected_qtbl = None
         if tab_idx == 2:
             selected_rows = self.qtbl_connec.selectionModel().selectedRows()
-            selected_qtbl = self.qtbl_connec
             if len(selected_rows) == 0:
                 message = "Any record selected"
                 tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
                 return
         elif tab_idx == 3:
             selected_rows = self.qtbl_gully.selectionModel().selectedRows()
-            selected_qtbl = self.qtbl_gully
             if len(selected_rows) == 0:
                 message = "Any record selected"
                 tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
@@ -2277,7 +2274,7 @@ class GwPsector:
         tools_qgis.force_refresh_map_canvas()
 
         # Manage signals
-        tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
+        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
         tools_gw.set_model_signals(self)
 
 
