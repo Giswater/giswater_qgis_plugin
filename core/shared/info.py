@@ -430,6 +430,8 @@ class GwInfo(QObject):
         self.dlg_generic.btn_accept.setEnabled(can_edit)
 
         self.dlg_generic.dlg_closed.connect(self.rubber_band.reset)
+        self.dlg_generic.dlg_closed.connect(self._roll_back)
+        self.dlg_generic.dlg_closed.connect(self._disconnect_signals)
         tools_gw.open_dialog(self.dlg_generic, dlg_name='info_generic')
 
         return result, self.dlg_generic
