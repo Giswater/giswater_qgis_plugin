@@ -4476,11 +4476,11 @@
 			<translation>Go2Epa - opccions</translation>
 		</message>
 		<message>
-			<source>tab_rpt</source>
-			<translation>Rpt</translation>
+			<source>tab_other</source>
+			<translation>Altres</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_rpt</source>
+			<source>tooltip_tab_other</source>
 			<translation>None</translation>
 		</message>
 		<message>

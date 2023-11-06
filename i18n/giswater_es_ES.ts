@@ -4477,11 +4477,11 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Go2Epa - opciones</translation>
 		</message>
 		<message>
-			<source>tab_rpt</source>
-			<translation>Rpt</translation>
+			<source>tab_other</source>
+			<translation>Otros</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_rpt</source>
+			<source>tooltip_tab_other</source>
 			<translation>None</translation>
 		</message>
 		<message>
