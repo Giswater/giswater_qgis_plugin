@@ -59,4 +59,7 @@ sum(loss) as "Losses Vol.",
 FROM v_om_waterbalance n  WHERE n.dma IS NOT NULL '
 WHERE id = 104;
 
+UPDATE config_toolbox SET alias ='Mapzones Netscenario analysis'
+where id = 3256;
+
 
