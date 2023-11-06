@@ -63,3 +63,14 @@ UPDATE config_toolbox SET alias ='Mapzones Netscenario analysis'
 where id = 3256;
 
 
+
+--06/07/2023. Manage null values on shortpipe status
+
+UPDATE config_form_fields set dv_querytext = 'SELECT DISTINCT (id) AS id, idval AS idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_status_shortpipe''' WHERE formname in ('ve_epa_shortpipe', 'v_edit_inp_shortpipe', 'v_edit_inp_dscenario_shortpipe') and columnname ='status';
+UPDATE config_form_fields set dv_isnullvalue =True  WHERE formname in ('ve_epa_shortpipe', 'v_edit_inp_shortpipe', 'v_edit_inp_dscenario_shortpipe') and columnname ='status';
+
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_value_status_shortpipe', 'CV', 'CV', NULL, NULL);
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_value_status_shortpipe', ' ', ' ', NULL, NULL);
+
+ALTER TABLE inp_shortpipe DROP CONSTRAINT inp_shortpipe_status_check;
+ALTER TABLE inp_shortpipe ADD CONSTRAINT inp_shortpipe_status_check CHECK (((status)::text = ANY ((ARRAY[''::character varying, 'CV'::character varying, 'OPEN'::character varying, 'CLOSED'::character varying])::text[])));
