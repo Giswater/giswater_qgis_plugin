@@ -55,6 +55,7 @@ class GwGo2EpaSelectorButton(GwAction):
 
     def _load_compare_layers(self):
         """ Adds any missing Compare layers to TOC """
+        """ This function is no longer used after reversing the change to load compare layers. """
 
         # Manage user variable
         if not tools_os.set_boolean(tools_gw.get_config_parser('btn_go2epa_selector', 'load_compare_layers', "user", "init"), default=False):
@@ -115,7 +116,6 @@ class GwGo2EpaSelectorButton(GwAction):
         current_tab_object_name = current_tab_widget.objectName()
 
         if current_tab_object_name == "tab_time":
-            print("TAB TIME")
             # Realizar la consulta y llenar los combo box correspondientes
             sql = "SELECT DISTINCT time, time FROM rpt_arc WHERE result_id ILIKE '%%' ORDER BY time"
             rows = tools_db.get_rows(sql, add_empty_row=True)
@@ -130,7 +130,6 @@ class GwGo2EpaSelectorButton(GwAction):
                                                                 'session', prefix=False), 0)
 
         elif current_tab_object_name == "tab_datetime":
-            print("TAB DATEIME")
             # Realizar la consulta y llenar los combo box correspondientes
             result_id = tools_qt.get_combo_value(self.dlg_go2epa_result.rpt_selector_result_id, 0)
             sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
@@ -138,7 +137,6 @@ class GwGo2EpaSelectorButton(GwAction):
                    f"ORDER BY resultdate")
             rows = tools_db.get_rows(sql)
             if rows is not None:
-                print("Rows not none")
                 tools_qt.fill_combo_values(self.dlg_go2epa_result.cmb_sel_date, rows)
                 selector_date = tools_qt.get_combo_value(self.dlg_go2epa_result.cmb_sel_date, 0)
                 sql = (f"SELECT DISTINCT(resulttime), resulttime FROM rpt_arc "
@@ -231,12 +229,7 @@ class GwGo2EpaSelectorButton(GwAction):
             tools_gw.set_config_parser('btn_go2epa_selector', 'rpt_selector_result', f'{rpt_selector_result_id}')
 
         if rpt_selector_compare_id not in (None, -1, ''):
-            tools_qgis.set_cursor_wait()
-            try:
-                self._load_compare_layers()
-            except Exception:
-                pass
-            tools_qgis.restore_cursor()
+
             sql = (f"INSERT INTO selector_rpt_compare (result_id, cur_user)"
                    f" VALUES ('{rpt_selector_compare_id}', '{user}');\n")
             tools_db.execute_sql(sql)
