@@ -469,4 +469,16 @@ CREATE OR REPLACE VIEW ve_pol_node AS
      JOIN polygon ON polygon.feature_id::text = v_node.node_id::text;
 
 
+CREATE OR REPLACE VIEW v_anl_flow_gully AS 
+ SELECT gully_id,
+        CASE
+            WHEN anl_arc.fid = 220 THEN 'Flow trace'::text
+            WHEN anl_arc.fid = 221 THEN 'Flow exit'::text
+            ELSE NULL::text
+        END AS context,
+    anl_arc.expl_id,
+    gully.the_geom
+   FROM anl_arc
+     JOIN gully ON anl_arc.arc_id::text = gully.arc_id::text
+     JOIN selector_expl ON anl_arc.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text AND anl_arc.cur_user::name = "current_user"() AND (anl_arc.fid = 220 OR anl_arc.fid = 221);
 
