@@ -31,6 +31,9 @@
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <widget class="QTabWidget" name="mainTab">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="currentIndex">
          <number>0</number>
         </property>
@@ -333,13 +336,20 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tab_log">
+        <widget class="QWidget" name="tab_info_log">
          <attribute name="title">
           <string>Info Log</string>
          </attribute>
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="0" column="0">
-           <widget class="QTextEdit" name="txt_infolog"/>
+           <widget class="QTextEdit" name="txt_infolog">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

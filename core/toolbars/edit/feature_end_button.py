@@ -133,6 +133,8 @@ class GwFeatureEndButton(GwAction):
         self.dlg_work_end.tbl_cat_work_x_element.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                          self.dlg_work_end.tbl_cat_work_x_element, "v_edit_element", "element_id", self.rubber_band, 10))
 
+        tools_gw.disable_tab_log(self.dlg_work_end)
+
         # Set values
         self._fill_fields()
 
