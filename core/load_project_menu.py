@@ -72,7 +72,7 @@ class GwMenuLoad(QObject):
                     button_def = global_vars.giswater_settings.value(f"buttons_def/{index_action}")
                     text = ""
                     if button_def:
-                        text = self._translate(f'{index_action}_text')
+                        text = self._translate(f'{button_def}')
                     parent = self.iface.mainWindow()
                     ag = QActionGroup(parent)
                     ag.setProperty('gw_name', 'gw_QActionGroup')
