@@ -309,3 +309,20 @@ CREATE OR REPLACE VIEW v_connec AS
            FROM vu_link
            JOIN selector_expl USING (expl_id) WHERE cur_user =current_user AND vu_link.state = 2) 
            a ON a.feature_id::text = vu_connec.connec_id::text;
+
+-- 7/11/2023
+CREATE OR REPLACE VIEW v_rpt_arc AS
+SELECT r.* FROM rpt_arc_stats r, selector_rpt_main s
+WHERE r.result_id::text = s.result_id::text AND s.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_rpt_node AS
+SELECT r.* FROM rpt_node_stats r, selector_rpt_main s
+WHERE r.result_id::text = s.result_id::text AND s.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_rpt_compare_arc AS
+SELECT r.* FROM rpt_arc_stats r, selector_rpt_compare s
+WHERE r.result_id::text = s.result_id::text AND s.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_rpt_compare_node AS
+SELECT r.* FROM rpt_node_stats r, selector_rpt_compare s
+JOIN selector_rpt_compare USING (result_id);

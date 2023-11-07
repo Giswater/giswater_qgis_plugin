@@ -59,6 +59,7 @@ BEGIN
 
 	EXECUTE 'DELETE FROM rpt_inp_arc WHERE result_id = '||quote_literal(v_result_id)||';';
 	EXECUTE 'DELETE FROM rpt_arc WHERE result_id = '||quote_literal(v_result_id)||';';
+	EXECUTE 'DELETE FROM rpt_arc_stats WHERE result_id = '||quote_literal(v_result_id)||';';
 
 	EXECUTE 'INSERT INTO archived_rpt_node(
 	result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, the_geom, 
@@ -72,6 +73,7 @@ BEGIN
 
 	EXECUTE 'DELETE FROM rpt_inp_node WHERE result_id = '||quote_literal(v_result_id)||';';
 	EXECUTE 'DELETE FROM rpt_node WHERE result_id = '||quote_literal(v_result_id)||';';
+	EXECUTE 'DELETE FROM rpt_node_stats WHERE result_id = '||quote_literal(v_result_id)||';';
 
 
 	EXECUTE 'INSERT INTO archived_rpt_energy_usage(

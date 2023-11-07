@@ -86,3 +86,6 @@ ALTER TABLE inp_shortpipe DROP CONSTRAINT inp_shortpipe_status_check;
 ALTER TABLE inp_shortpipe ADD CONSTRAINT inp_shortpipe_status_check CHECK (((status)::text = ANY ((ARRAY[''::character varying, 'CV'::character varying, 'OPEN'::character varying, 'CLOSED'::character varying])::text[])));
 
 UPDATE sys_message SET hint_message='Unlink hydrometers first or set edit_connec_downgrade_force on config_param_system to true' WHERE id=3194;
+
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('rpt_arc_stats', 'Table to store result stats in order to gain performance showing results', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('rpt_node_stats', 'Table to store result stats in order to gain performance showing results', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
