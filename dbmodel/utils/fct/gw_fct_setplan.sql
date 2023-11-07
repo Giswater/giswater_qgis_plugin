@@ -11,10 +11,8 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setplan(p_data json)
 RETURNS json AS
 $BODY$
 
-/*+
-
-SELECT gw_fct_setplan($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
-"form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},"psectorId":"1"}}$$);
+/*
+SELECT SCHEMA_NAME.gw_fct_setplan($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},"psectorId":"1"}}$$);
 */
 
 DECLARE
@@ -33,6 +31,7 @@ v_error_context text;
 v_result json;
 v_result_info json;
 v_result_line json;
+v_project_type text;
 
 BEGIN
 
@@ -41,6 +40,8 @@ BEGIN
 
 	-- select config values
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
+
 
 	v_psector := json_extract_path_text (p_data,'data','psectorId')::integer;
 	v_state_obsolete_planified:= (SELECT value::json ->> 'obsolete_planified' FROM config_param_system WHERE parameter='plan_psector_status_action');
@@ -57,6 +58,21 @@ BEGIN
 
 	
 	IF v_psector IS NOT NULL THEN
+	
+		-- find links for connects state 0 and link null
+		SELECT count(*) INTO v_count FROM plan_psector_x_connec WHERE state = 0 AND link_id IS NULL AND psector_id = v_psector;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
+			VALUES (354, '354', 3, FALSE, concat('ERROR-354: There are ',v_count,' downgraded connecs without link_id informed in this psector.'),v_count);
+		END IF;		
+		
+		IF v_project_type = 'UD' THEN
+			SELECT  count(*) INTO v_count FROM plan_psector_x_gully WHERE state = 0 AND link_id IS NULL AND psector_id = v_psector;
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
+				VALUES (354, '354', 3, FALSE, concat('ERROR-354: There are ',v_count,' downgraded gullies without link_id informed in this psector.'),v_count);
+			END IF;				
+		END IF;
 
 		-- control psector topology: find operative/planned arcs without operative nodes in this psector
 		v_query = '

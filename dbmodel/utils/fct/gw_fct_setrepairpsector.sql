@@ -15,7 +15,7 @@ descrption
 This function:
 - fill link_id for connects with state 0 where link_id is null
 - find and repair operative/planned arcs without operative nodes in this psector
-- find planned arcs without planned nodes in this psector
+- find and repair planned arcs without planned nodes in this psector
 
 example
 SELECT gw_fct_setrepairpsector($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},"psectorId":"1"}}$$);
