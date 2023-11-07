@@ -428,7 +428,7 @@ BEGIN
 
 
 			-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
-			FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid AND tablename NOT IN ('vi_pipes', 'vi_junctions', 'v_valves', 'vi_status', 'vi_controls', 'vi_rules', 'vi_coordinates') order by orderby
+			FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid AND tablename NOT IN ('vi_pipes', 'vi_junctions', 'vi_valves', 'vi_status', 'vi_controls', 'vi_rules', 'vi_coordinates') order by orderby
 			LOOP
 				--identifing the number of fields of the editable view
 				FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns 
@@ -660,7 +660,7 @@ BEGIN
 			IF v_isgwproject THEN -- Reconnect those arcs connected to dissapeared nodarcs to the new node
 
 				-- reconnect presspumps
-				FOR v_node_id, v_newnode, v_oldarc IN SELECT  node_id, replace (node_id, '_n2a_2', ''), replace (node_id, '_n2a_2', '_n2a_4') FROM node where substring(reverse(node_id),1,2) = '2_'
+				FOR v_node_id, v_newnode, v_oldarc IN SELECT  node_id, replace (node_id, '_n2a_2', ''), replace (node_id, '_n2a_2', '_n2a_4') FROM node where substring(reverse(node_id),1,2) = '3_'
 				LOOP
 					UPDATE arc SET node_1=v_newnode WHERE node_1=v_node_id;
 					UPDATE arc SET node_2=v_newnode WHERE node_2=v_node_id;

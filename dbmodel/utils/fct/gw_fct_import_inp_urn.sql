@@ -96,7 +96,7 @@ SELECT project_type, giswater INTO project_type_aux, v_version FROM sys_version 
 					END IF;
 				END LOOP;
 
-				v_tables ='{inp_energy, inp_reactions}';
+				v_tables ='{inp_energy}';
 
 				FOREACH rec_inp IN ARRAY(v_tables) LOOP
 					EXECUTE 'SELECT count(*) FROM '||rec_inp||' WHERE position('||quote_literal(rec.feature_id)||' in descript) > 0' INTO v_count;
