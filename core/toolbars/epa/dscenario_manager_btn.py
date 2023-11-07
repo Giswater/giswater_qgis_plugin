@@ -84,7 +84,8 @@ class GwDscenarioManagerButton(GwAction):
         # Connect main dialog signals
         self.dlg_dscenario_manager.txt_name.textChanged.connect(partial(self._fill_manager_table))
         self.dlg_dscenario_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario))
-        self.dlg_dscenario_manager.btn_update.clicked.connect(partial(self._open_toolbox_function, 3042))
+        self.dlg_dscenario_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3042))
+        self.dlg_dscenario_manager.btn_update.clicked.connect(partial(self._manage_properties, True))
         self.dlg_dscenario_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario))
         self.dlg_dscenario_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
         self.tbl_dscenario.doubleClicked.connect(self._open_dscenario)
@@ -425,10 +426,22 @@ class GwDscenarioManagerButton(GwAction):
         tools_qgis.highlight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
 
 
-    def _manage_properties(self):
+    def _manage_properties(self, feature_id=None):
+
         tablename = "v_edit_cat_dscenario"
-        feature_id = self.selected_dscenario_id
         pkey = "dscenario_id"
+
+        if feature_id is None:
+            feature_id = self.selected_dscenario_id
+        else:
+            # Get selected netscenario id
+            index = self.tbl_dscenario.selectionModel().currentIndex()
+            feature_id = index.sibling(index.row(), 0).data()
+            self.selected_dscenario_id = feature_id
+            if feature_id is None:
+                message = "Any record selected"
+                tools_qgis.show_warning(message, dialog=self.dlg_dscenario_manager)
+                return
 
         feature = f'"tableName":"{tablename}", "id":"{feature_id}"'
         body = tools_gw.create_body(feature=feature)
