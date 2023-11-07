@@ -78,7 +78,6 @@ INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp
 INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_value_status_shortpipe', ' ', ' ', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
 INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_value_status_shortpipe_dscen', 'CV', 'CV', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_value_status_shortpipe_dscen', ' ', ' ', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_value_status_shortpipe_dscen', 'OPEN', 'OPEN', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_value_status_shortpipe_dscen', 'CLOSED', 'CLOSED', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
