@@ -2632,7 +2632,7 @@ class GwPsector:
                     sql += f"UPDATE {list_tables[feature_type]} SET doable = True WHERE {feature_type}_id = '{feature_id}' AND psector_id = {selected_psector} AND state = '{state}';"
         else:
             return
-        print(f"SQL -> {sql}")
+
         tools_db.execute_sql(sql)
         tools_gw.load_tableview_psector(dialog, feature_type)
         tools_gw.set_model_signals(self)
