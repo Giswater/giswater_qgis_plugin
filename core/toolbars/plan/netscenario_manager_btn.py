@@ -78,6 +78,8 @@ class GwNetscenarioManagerButton(GwAction):
         self.dlg_netscenario_manager.btn_execute.clicked.connect(partial(self._execute_selected_netscenario))
         self.dlg_netscenario_manager.btn_delete.clicked.connect(partial(self._delete_selected_netscenario))
         self.dlg_netscenario_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
+        self.tbl_netscenario.doubleClicked.connect(partial(self._update_current_netscenario,
+                                                           self.dlg_netscenario_manager, self.tbl_netscenario))
         self.tbl_netscenario.doubleClicked.connect(self._open_netscenario)
         self.dlg_netscenario_manager.btn_update_netscenario.clicked.connect(
             partial(self._update_current_netscenario, self.dlg_netscenario_manager, self.tbl_netscenario))
