@@ -410,8 +410,10 @@ class GwAdminButton:
                                                         force_reload=True)
         if create_schema_type:
             chk_widget = self.dlg_readsql_create_project.findChild(QWidget, create_schema_type)
-            if chk_widget:
+            try:
                 chk_widget.setChecked(True)
+            except:
+                pass
         inp_file_path = tools_gw.get_config_parser('btn_admin', 'inp_file_path', "user", "session", False, force_reload=True)
         if inp_file_path not in ('null', None):
             self.data_file.setText(inp_file_path)
