@@ -5,3 +5,5 @@
 - Adjustent of fk for catalogs on inp tables (moving from on delete cascade to restrict)
 - Creation of example data for inventory
 - Simplify reports for water balance
+- Hug enhancement of performance by creating rpt_arc & rpt_node stats table with materialized results
+- New function setreapirpsector to be used to repair psectors when they has wrong topology

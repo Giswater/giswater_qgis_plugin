@@ -51,9 +51,14 @@ BEGIN
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid = 354;
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid = 355;
 	
+	-- return el json. There are some topological inconsistences on this psector. Would you like to see the log (YES)  (LATER)
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (355, 4, concat('TOPOLOGICAL INCONSISTENCES'));
+	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (355, 4, '-------------------------------------------------------------');
+
+	
 	IF v_psector IS NOT NULL THEN
 
-		--control psector topology: find arc, that on psector is defined as operative, on psector there are no nodes
+		-- control psector topology: find operative/planned arcs without operative nodes in this psector
 		v_query = '
 		select a.arc_id, a.arccat_id, node_id, '|| v_psector ||' as psector_id, concat(''Arc on service '',a.arc_id, '' has not node_1 ('', node_id, '') in this psector'') as descript,  a.the_geom FROM arc a
 		join (select node_id from plan_psector_x_node where psector_id = '|| v_psector ||' and state = 0)n on node_1= node_id
@@ -64,53 +69,44 @@ BEGIN
 		join (select node_id from plan_psector_x_node where psector_id = '|| v_psector ||' and state = 0 )n on node_2 = node_id
 		left join (select * from plan_psector_x_arc where psector_id = '|| v_psector ||') p ON p.arc_id = a.arc_id
 		where p.arc_id is null and a.state=1';
-		raise notice 'v_query :>> %', v_query;
 
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')c'
 		INTO v_count; 
 
 		IF v_count > 0 THEN
 
-			-- return el json. There are some topological inconsistences on this psector. Would you like to see the log (YES)  (LATER)
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (354, 4, concat('TOPOLOGICAL INCONSISTENCES'));
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (354, 4, '-------------------------------------------------------------');
-
 			EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
-			SELECT 354, c.arc_id, c.arccat_id, concat(''Operative arc '', arc_id ,'' without final nodes in this psector '',c.psector_id), c.the_geom, 1 FROM (', v_query,')c ');
+			SELECT 354, c.arc_id, c.arccat_id, concat(''Arc '', arc_id ,'' without some init/end operative nodes in this psector '',c.psector_id), c.the_geom, 1 FROM (', v_query,')c ');
 			
 			INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-			VALUES (354, '354', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' operative arcs without final nodes in this psector.'),v_count);
+			VALUES (354, '354', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' arcs without final nodes in this psector.'),v_count);
 		
 		END IF;		
 
-		--control psector topology: find arc, that on inventory is defined as planified, but on psector there are no nodes
+		-- control psector topology: find planned arcs without planned nodes in this psector
 		v_query = '
-		select a.arc_id, node_id, concat(''Arc planned '',a.arc_id, '' has not node_1 ('', node_id, '') in this psector'') as descript,  a.the_geom FROM arc a
-		join (select node_id from plan_psector_x_node where psector_id = '|| v_psector ||' and state = 0)n on node_1= node_id
-		left join (select * from plan_psector_x_arc where psector_id = '|| v_psector ||') p ON p.arc_id = a.arc_id
-		where p.arc_id is not null and a.state=2
+		select a.arc_id, arccat_id, a.the_geom FROM arc a
+		join (select * from plan_psector_x_arc where psector_id = '|| v_psector ||') pa ON pa.arc_id = a.arc_id
+		join node ON node_id = a.node_1
+		left join (select * from plan_psector_x_node where psector_id = '|| v_psector ||' and state = 1) pn ON pn.node_id = a.node_1
+		where pn.node_id is null and a.state=2 and node.state = 2
 		union
-		select a.arc_id, node_id, concat(''Arc planned '',a.arc_id, '' has not node_2 ('', node_id, '') in this psector'') as descript, a.the_geom FROM arc a
-		join (select node_id from plan_psector_x_node where psector_id = '|| v_psector ||' and state = 0 )n on node_2 = node_id
-		left join (select * from plan_psector_x_arc where psector_id = '|| v_psector ||') p ON p.arc_id = a.arc_id
-		where p.arc_id is not null and a.state=2';
+		select a.arc_id, arccat_id, a.the_geom FROM arc a
+		join (select * from plan_psector_x_arc where psector_id = '|| v_psector ||') pa ON pa.arc_id = a.arc_id
+		join node ON node_id = a.node_2
+		left join (select * from plan_psector_x_node where psector_id = '|| v_psector ||' and state = 1) pn ON pn.node_id = a.node_2
+		where pn.node_id is null and a.state=2  and node.state = 2';
 
-	raise notice 'v_query :>> %', v_query;
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')c'
 		INTO v_count; 
-	raise notice 'v_count :>> %', v_count;
 
 		IF v_count > 0 THEN
 
-			-- return el json. There are some topological inconsistences on this psector. Would you like to see the log (YES)  (LATER)
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (355, 4, concat('TOPOLOGICAL INCONSISTENCES'));
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (355, 4, '-------------------------------------------------------------');
-
 			EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
-			SELECT 355, c.arc_id, c.arccat_id, concat(''Planned arc  '', arc_id ,'' without final nodes in this psector''), c.the_geom, 2 FROM (', v_query,')c ');
+			SELECT 355, c.arc_id, c.arccat_id, concat(''Planned arc  '', arc_id ,'' without some init/end planned nodes in this psector''), c.the_geom, 2 FROM (', v_query,')c ');
 			
 			INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-			VALUES (355, '355', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' planned arcs without final nodes in this psector.'),v_count);
+			VALUES (355, '355', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' planned arcs without some init/end planed nodes in this psector.'),v_count);
 
 		END IF;		
 

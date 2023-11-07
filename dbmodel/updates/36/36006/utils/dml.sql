@@ -55,3 +55,11 @@ VALUES (3286, 'gw_trg_refresh_state_expl_matviews', 'utils', 'Trigger function',
 DELETE FROM sys_table WHERE id = 'arc_border_expl';
 
 UPDATE config_form_tabs SET orderby=4 WHERE tabname='tab_event' AND orderby IS NULL;
+
+-- 7/11/2023
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, source)
+VALUES (3288, 'gw_fct_setrepairpsector', 'utils', 'function', null, null, 'Function to fix possible errors on psector', 'role_master', null, 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (521, 'Set repair psector', 'utils', null, 'core', true, 'Function process', null) 
+ON CONFLICT (fid) DO NOTHING;
