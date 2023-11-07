@@ -24,9 +24,9 @@ v_state_obsolete_planified integer;
 v_uservalues json;
 
 v_audit_result text;
-v_level integer;
-v_status text;
-v_message text;
+v_level integer = 3;
+v_status text = 'Accepted';
+v_message text = 'Process done successfully';
 v_error_context text;
 v_result json;
 v_result_info json;
@@ -60,17 +60,21 @@ BEGIN
 	IF v_psector IS NOT NULL THEN
 	
 		-- find links for connects state 0 and link null
-		SELECT count(*) INTO v_count FROM plan_psector_x_connec WHERE state = 0 AND link_id IS NULL AND psector_id = v_psector;
+		SELECT count(*) INTO v_count FROM plan_psector_x_connec p JOIN link l ON feature_id = connec_id WHERE p.state = 0 AND p.link_id IS NULL AND l.state = 1 AND psector_id = v_psector;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
 			VALUES (354, '354', 3, FALSE, concat('ERROR-354: There are ',v_count,' downgraded connecs without link_id informed in this psector.'),v_count);
+			v_level = 1;
+			
 		END IF;		
 		
 		IF v_project_type = 'UD' THEN
-			SELECT  count(*) INTO v_count FROM plan_psector_x_gully WHERE state = 0 AND link_id IS NULL AND psector_id = v_psector;
+			SELECT count(*) INTO v_count FROM plan_psector_x_gully p JOIN link l ON feature_id = gully_id WHERE p.state = 0 AND p.link_id IS NULL AND l.state = 1 AND psector_id = v_psector;
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
 				VALUES (354, '354', 3, FALSE, concat('ERROR-354: There are ',v_count,' downgraded gullies without link_id informed in this psector.'),v_count);
+				v_level = 1;	
+				
 			END IF;				
 		END IF;
 
@@ -95,7 +99,8 @@ BEGIN
 			SELECT 354, c.arc_id, c.arccat_id, concat(''Arc '', arc_id ,'' without some init/end operative nodes in this psector '',c.psector_id), c.the_geom, 1 FROM (', v_query,')c ');
 			
 			INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
-			VALUES (354, '354', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' arcs without final nodes in this psector.'),v_count);
+			VALUES (354, '354', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' arcs without some init/end operative nodes in this psector.'),v_count);
+			v_level = 1;
 		
 		END IF;		
 
@@ -123,28 +128,20 @@ BEGIN
 			
 			INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
 			VALUES (355, '355', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' planned arcs without some init/end planed nodes in this psector.'),v_count);
+			v_level = 1;
 
 		END IF;		
 
 	END IF;
 
-	 IF v_audit_result is null THEN
-        v_status = 'Accepted';
-        v_level = 3;
-        v_message = 'Process done successfully';
-    ELSE
-
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
-
-    END IF;
-
 	-- get uservalues
 	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
 	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault')
 	AND cur_user = current_user ORDER BY parameter)a);
-
+	
+	IF v_level = 1 THEN
+		v_message = 'Proces done successfully but with some incosistency';
+	END IF;
 
 	-- get results
 	--lines
@@ -170,10 +167,9 @@ BEGIN
 
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
-
-	--control nulls
 	v_uservalues := COALESCE(v_uservalues, '{}');
-		--  Return
+	
+	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{"userValues":'||v_uservalues||', "info":'||v_result_info||', "line":'||v_result_line||

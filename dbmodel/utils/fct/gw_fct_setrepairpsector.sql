@@ -176,7 +176,7 @@ BEGIN
 	v_message := 'Process done succesfully';
 
 	--  Return
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"'||v_message||'"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":3, "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{"info":'||v_result_info||', "line":'||v_result_line||
 			'}}'||
