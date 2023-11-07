@@ -728,11 +728,11 @@ class GwMapzoneManager:
         self.add_dlg.actionEdit.setVisible(False)
         # Disable widgets if updating
         if force_action == "UPDATE":
-            tools_qt.set_widget_enabled(self.add_dlg, f'tab_data_{field_id}', False)  # sector_id/dma_id/...
+            tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_{field_id}', False)  # sector_id/dma_id/...
         # Populate netscenario_id
         if self.netscenario_id is not None:
-            tools_qt.set_widget_text(self.add_dlg, f'tab_data_netscenario_id', self.netscenario_id)
-            tools_qt.set_widget_enabled(self.add_dlg, f'tab_data_netscenario_id', False)
+            tools_qt.set_widget_text(self.add_dlg, f'tab_none_netscenario_id', self.netscenario_id)
+            tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_netscenario_id', False)
             field_id = ['netscenario_id', field_id]
 
         # Get every widget in the layout
