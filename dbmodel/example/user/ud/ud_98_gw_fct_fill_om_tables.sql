@@ -86,8 +86,8 @@ BEGIN
   FOR rec_gully IN SELECT *from gully WHERE state=1 
   LOOP
 	  --visit class 4. insp gullys
-	  INSERT INTO ve_visit_gully_insp (gully_id, visitcat_id, startdate, enddate, user_name, expl_id, the_geom, class_id, status, sediments_gully, defect_gully, clean_gully, insp_observ, photo) 
-		VALUES(rec_gully.gully_id, 1, now(), now(), 'postgres', rec_gully.expl_id, rec_gully.the_geom, 4, 1, 'Medium amount', 'Cleaned', 'No defects', 'No other problems', False);
+	  INSERT INTO ve_visit_gully_insp (gully_id, visitcat_id, startdate, enddate, user_name, expl_id, the_geom, class_id, status, sediments_gully, defect_gully, clean_gully, smells_gully, insp_observ, photo) 
+		VALUES(rec_gully.gully_id, 1, now(), now(), 'postgres', rec_gully.expl_id, rec_gully.the_geom, 4, 1, 'Medium amount', 'Cleaned', 'No defects', False, 'No other problems', False);
 
 		--visit class 8. incident gullys
 		INSERT INTO ve_visit_incid_gully (gully_id, visitcat_id, startdate, enddate, user_name, expl_id, the_geom, class_id, status, incident_type, incident_comment, photo) 

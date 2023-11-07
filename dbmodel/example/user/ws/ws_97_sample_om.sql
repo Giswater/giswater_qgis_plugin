@@ -108,8 +108,8 @@ CREATE OR REPLACE VIEW ve_visit_arc_leak AS
             ct.param_2,
             ct.param_3
            FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
-      FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
-      LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
+      FROM SCHEMA_NAME.om_visit JOIN SCHEMA_NAME.om_visit_event ON om_visit.id= om_visit_event.visit_id 
+      LEFT JOIN SCHEMA_NAME.config_visit_class on config_visit_class.id=om_visit.class_id
       where config_visit_class.ismultievent = TRUE and om_visit.class_id = 1 ORDER  BY 1,2'::text, 
       ' VALUES (''leak_arc''),(''insp_observ''),(''photo'')'::text) 
       ct(visit_id integer, param_1 text, param_2 text, param_3 boolean)) a ON a.visit_id = om_visit.id
@@ -149,8 +149,8 @@ CREATE OR REPLACE VIEW ve_visit_connec_leak AS
             ct.param_2,
             ct.param_3
            FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
-      FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
-      LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
+      FROM SCHEMA_NAME.om_visit JOIN SCHEMA_NAME.om_visit_event ON om_visit.id= om_visit_event.visit_id 
+      LEFT JOIN SCHEMA_NAME.config_visit_class on config_visit_class.id=om_visit.class_id
       where config_visit_class.ismultievent = TRUE and om_visit.class_id = 2 ORDER  BY 1,2'::text, 
       ' VALUES (''leak_connec''),(''insp_observ''),(''photo'')'::text) 
       ct(visit_id integer, param_1 text, param_2 text, param_3 boolean)) a ON a.visit_id = om_visit.id
@@ -194,8 +194,8 @@ CREATE OR REPLACE VIEW ve_visit_node_insp AS
             ct.param_4,
             ct.param_5
            FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
-      FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
-      LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
+      FROM SCHEMA_NAME.om_visit JOIN SCHEMA_NAME.om_visit_event ON om_visit.id= om_visit_event.visit_id 
+      LEFT JOIN SCHEMA_NAME.config_visit_class on config_visit_class.id=om_visit.class_id
       where config_visit_class.ismultievent = TRUE and om_visit.class_id = 3 ORDER  BY 1,2'::text, 
       ' VALUES (''sediments_node''),(''defect_node''),(''clean_node''),(''insp_observ''),(''photo'')'::text) 
       ct(visit_id integer, param_1 text, param_2 text, param_3 text, param_4 text, param_5 boolean)) a ON a.visit_id = om_visit.id
@@ -235,8 +235,8 @@ CREATE OR REPLACE VIEW ve_visit_incid_node AS
             ct.param_2,
             ct.param_3
            FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
-      FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
-      LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
+      FROM SCHEMA_NAME.om_visit JOIN SCHEMA_NAME.om_visit_event ON om_visit.id= om_visit_event.visit_id 
+      LEFT JOIN SCHEMA_NAME.config_visit_class on config_visit_class.id=om_visit.class_id
       where config_visit_class.ismultievent = TRUE and om_visit.class_id = 4 ORDER  BY 1,2'::text, 
       ' VALUES (''incident_type''), (''incident_comment''), (''photo'')'::text) 
       ct(visit_id integer, param_1 text, param_2 text, param_3 boolean)) a ON a.visit_id = om_visit.id
