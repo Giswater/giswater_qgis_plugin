@@ -469,7 +469,8 @@ class GwDscenarioManagerButton(GwAction):
                                                           self.selected_dscenario_id, self.my_json_add))
 
         # Open dlg
-        tools_gw.open_dialog(self.props_dlg, dlg_name='info_generic')
+        title = f"Prperties for Dscenario: {self.selected_dscenario_id}"
+        tools_gw.open_dialog(self.props_dlg, dlg_name='info_generic', title=title)
 
 
     def _accept_props_dlg(self, dialog, tablename, pkey, feature_id, my_json):
