@@ -43,31 +43,31 @@ BEGIN
     FOR rec_arc IN SELECT * FROM arc WHERE state=1
     LOOP
         --visit class 1. leak_arc
-        INSERT INTO ve_visit_arc_leak (visit_id, arc_id, visitcat_id, startdate, enddate, user_name, expl_id, class_id, status, leak_arc, insp_observ, photo) 
-        VALUES(nextval('SCHEMA_NAME.om_visit_id_seq'), rec_arc.arc_id, 1, now(), now(), 'postgres', rec_arc.expl_id, 1, 1, 'Minor leak', 'No other problems', False);
+        INSERT INTO ve_visit_arc_leak (arc_id, visitcat_id, startdate, enddate, user_name, expl_id, class_id, status, leak_arc, insp_observ, photo) 
+        VALUES(rec_arc.arc_id, 1, now(), now(), 'postgres', rec_arc.expl_id, 1, 1, 'Minor leak', 'No other problems', False);
     END LOOP;
    
    --CONNECS
     FOR rec_connec IN SELECT * from connec WHERE state=1
     LOOP
         --visit class 2. leak connec
-        INSERT INTO ve_visit_connec_leak (visit_id, connec_id, visitcat_id, startdate, enddate, user_name, expl_id, class_id, status, leak_connec, insp_observ, photo) 
-        VALUES(nextval('SCHEMA_NAME.om_visit_id_seq'), rec_connec.connec_id, 1, now(), now(), 'postgres', rec_connec.expl_id, 2, 1, 'Minor leak', 'No other problems', False);
+        INSERT INTO ve_visit_connec_leak (connec_id, visitcat_id, startdate, enddate, user_name, expl_id, class_id, status, leak_connec, insp_observ, photo) 
+        VALUES(rec_connec.connec_id, 1, now(), now(), 'postgres', rec_connec.expl_id, 2, 1, 'Minor leak', 'No other problems', False);
     END LOOP;       
 
     --NODES
     FOR rec_node IN SELECT * FROM node WHERE state=1
     LOOP    
         --visit class 3. inspection node
-        INSERT INTO ve_visit_node_insp (visit_id, node_id, visitcat_id, startdate, enddate, user_name, expl_id, class_id, status, sediments_node, defect_node, clean_node, insp_observ, photo) 
-        VALUES(nextval('SCHEMA_NAME.om_visit_id_seq'), rec_node.node_id, 1, now(), now(), 'postgres', rec_node.expl_id, 3, 1, 'No sediments', 'No defects', 'Cleaning done', 'No other problems', False);
+        INSERT INTO ve_visit_node_insp (node_id, visitcat_id, startdate, enddate, user_name, expl_id, class_id, status, sediments_node, defect_node, clean_node, insp_observ, photo) 
+        VALUES(rec_node.node_id, 1, now(), now(), 'postgres', rec_node.expl_id, 3, 1, 'No sediments', 'No defects', 'Cleaning done', 'No other problems', False);
     END LOOP;
     
     --visit class 4 (incident nodes)
     FOR rec_node IN SELECT * FROM node WHERE state=1 order by random() limit 20
     LOOP
-        INSERT INTO ve_visit_incid_node (visit_id, node_id, visitcat_id, startdate, enddate, user_name, expl_id, class_id, status, incident_type, incident_comment, photo) 
-        VALUES(nextval('SCHEMA_NAME.om_visit_id_seq'), rec_node.node_id, 1, now(), now(), 'postgres', rec_node.expl_id, 4, 1, 'Missing cover', 'Minor loss of water', False);
+        INSERT INTO ve_visit_incid_node (node_id, visitcat_id, startdate, enddate, user_name, expl_id, class_id, status, incident_type, incident_comment, photo) 
+        VALUES(rec_node.node_id, 1, now(), now(), 'postgres', rec_node.expl_id, 4, 1, 'Missing cover', 'Minor loss of water', False);
     END LOOP;    
     
    
