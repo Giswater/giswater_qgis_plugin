@@ -2624,14 +2624,15 @@ class GwPsector:
             for i in range(0, len(selected_list)):
                 row = selected_list[i].row()
                 feature_id = qtbl_feature.model().record(row).value(f"{feature_type}_id")
+                state = qtbl_feature.model().record(row).value(f"state")
                 doable = qtbl_feature.model().record(row).value("doable")
                 if doable:
-                    sql += f"UPDATE {list_tables[feature_type]} SET doable = False WHERE {feature_type}_id = '{feature_id}' AND psector_id = {selected_psector};"
+                    sql += f"UPDATE {list_tables[feature_type]} SET doable = False WHERE {feature_type}_id = '{feature_id}' AND psector_id = {selected_psector} AND state = '{state}';"
                 else:
-                    sql += f"UPDATE {list_tables[feature_type]} SET doable = True WHERE {feature_type}_id = '{feature_id}' AND psector_id = {selected_psector};"
+                    sql += f"UPDATE {list_tables[feature_type]} SET doable = True WHERE {feature_type}_id = '{feature_id}' AND psector_id = {selected_psector} AND state = '{state}';"
         else:
             return
-
+        print(f"SQL -> {sql}")
         tools_db.execute_sql(sql)
         tools_gw.load_tableview_psector(dialog, feature_type)
         tools_gw.set_model_signals(self)
