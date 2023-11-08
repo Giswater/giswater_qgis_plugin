@@ -362,7 +362,7 @@ BEGIN
 	ELSIF v_tabname IN ('tab_hydro_state', 'tab_psector', 'tab_network_state', 'tab_dscenario') THEN
 		v_geometry = NULL;
 
-	ELSIF v_count > 0 IS NOT NULL or (v_checkall IS False and v_id is null) THEN
+	ELSIF v_count_2 > 0 IS NOT NULL or (v_checkall IS False and v_id is null) THEN
 		SELECT row_to_json (a) 
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
