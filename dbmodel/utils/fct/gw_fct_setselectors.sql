@@ -51,6 +51,7 @@ v_querytext text;
 v_message text = '{"level":1, "text":"Process done successfully"}';
 v_count integer = 0;
 v_count_aux integer = 0;
+v_count_2 integer = 0;
 v_name text;
 v_disableparent boolean;
 v_fid integer = 397;
@@ -340,6 +341,8 @@ BEGIN
 		END IF;
 	END IF;
 	
+	SELECT count(the_geom) INTO v_count_2 FROM v_edit_arc LIMIT 1;
+
 	-- get envelope over arcs or over exploitation if arcs dont exist
 	IF v_tabname='tab_sector' THEN
 		SELECT row_to_json (a) 
@@ -359,7 +362,7 @@ BEGIN
 	ELSIF v_tabname IN ('tab_hydro_state', 'tab_psector', 'tab_network_state', 'tab_dscenario') THEN
 		v_geometry = NULL;
 
-	ELSIF (SELECT the_geom FROM v_edit_arc LIMIT 1) IS NOT NULL or (v_checkall IS False and v_id is null) THEN
+	ELSIF v_count > 0 IS NOT NULL or (v_checkall IS False and v_id is null) THEN
 		SELECT row_to_json (a) 
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
