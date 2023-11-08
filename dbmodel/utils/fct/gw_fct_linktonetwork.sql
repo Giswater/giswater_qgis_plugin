@@ -80,6 +80,7 @@ v_pjointtype text; -- Type for the destination feature (ARC, NODE, CONNEC, GULLY
 v_pjointid text; -- Id for the destination feature
 
 v_count integer; -- Counter
+v_count2 integer; -- Counter
 
 v_isoperative_psector boolean = false; -- It shows when the worflow comes from psector but for those existing connects which they are involved on psector
 v_existing_link integer; -- link_id: In case of psector for operative links, we collect the value of the operative link
@@ -235,7 +236,7 @@ BEGIN
 			v_forcedarcs = concat (' AND arc_id::integer = ',v_connect.arc_id,' ');
 			-- check if forced arc diameter is smaller than configured
             IF v_projecttype  ='WS' THEN
-                IF (SELECT cat_dnom::integer FROM v_edit_arc WHERE arc_id=v_connect.arc_id) >= v_check_arcdnom AND v_check_arcdnom_status IS TRUE THEN
+                IF (SELECT cat_dnom::integer FROM vu_arc WHERE arc_id=v_connect.arc_id) >= v_check_arcdnom AND v_check_arcdnom_status IS TRUE THEN
                     EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                     "data":{"message":"3232", "function":"3188","debug_msg":'||v_check_arcdnom||', "is_process":true}}$$);';
                 END IF;
@@ -293,7 +294,8 @@ BEGIN
 				v_link.exit_id = v_pjointid;
 
 				-- case when planned node over existing node
-				IF (SELECT node_id FROM v_edit_node WHERE node_id = v_link.exit_id) IS NULL AND v_ispsector IS TRUE THEN
+				SELECT count(*) INTO v_count2 FROM v_edit_node WHERE node_id = v_link.exit_id;
+				IF v_count2 = 0 AND v_ispsector IS TRUE THEN
 					SELECT node_id INTO v_link.exit_id FROM node WHERE state = 2 AND st_dwithin(the_geom,v_link.the_geom,0.01) ORDER BY tstamp DESC LIMIT 1;
 				END IF;
 
