@@ -3192,7 +3192,7 @@ def get_list(table_name, id_name=None, filter=None):
     return complet_list
 
 
-def fill_tbl(complet_list, tbl, info, view):
+def fill_tbl(complet_list, tbl, info, view, dlg):
     if complet_list is False:
         return False, False
 
@@ -3233,10 +3233,19 @@ def fill_tbl(complet_list, tbl, info, view):
         if field['value']:
             tbl = tools_gw.add_tableview_header(tbl, field)
             tbl = tools_gw.fill_tableview_rows(tbl, field)
-        tools_qt.set_tableview_config(tbl, edit_triggers=QTableView.DoubleClicked)
+        tools_qt.set_tableview_config(tbl)
         model.dataChanged.connect(partial(tbl_data_changed, info, view, tbl, model, addparam))
+    tbl.doubleClicked.connect(partial(epa_tbl_doubleClicked, tbl, dlg))
     # editability
     tbl.model().flags = lambda index: epa_tbl_flags(index, model, non_editable_columns)
+
+
+def epa_tbl_doubleClicked(tbl, dlg):
+
+    if 'dscenario' in tbl.objectName():
+        dlg.findChild(QPushButton, 'btn_edit_dscenario').click()
+    else:
+        dlg.findChild(QPushButton, 'btn_edit_base').click()
 
 
 def epa_tbl_flags(index, model, non_editable_columns=None):
@@ -3301,7 +3310,7 @@ def open_epa_dlg(**kwargs):
         id_name = tableview.get('id_name', id_name)
 
         complet_list = get_list(view, id_name, feature_id)
-        fill_tbl(complet_list, tbl, info, view)
+        fill_tbl(complet_list, tbl, info, view, info.dlg)
         tools_gw.set_tablemodel_config(info.dlg, tbl, view, schema_name=info.schema_name, isQStandardItemModel=True)
         info.dlg.btn_accept.clicked.connect(partial(save_tbl_changes, view, info, info.dlg, pk))
 
@@ -3473,7 +3482,7 @@ def refresh_epa_tbl(tblview, dlg, **kwargs):
         else:
             view = tableview['view']
         complet_list = get_list(view, id_name, feature_id)
-        fill_tbl(complet_list, tbl, info, view)
+        fill_tbl(complet_list, tbl, info, view, dlg)
         tools_gw.set_tablemodel_config(dlg, tbl, view, schema_name=info.schema_name, isQStandardItemModel=True)
 
 
@@ -3484,7 +3493,7 @@ def reload_tbl_dscenario (info, tablename, tableview, id_name, feature_id):
 
     if tbl is not None:
         complet_list = get_list(view, id_name, feature_id)
-        fill_tbl(complet_list, tbl, info, view)
+        fill_tbl(complet_list, tbl, info, view, info.dlg)
 
 
 def delete_tbl_row(tbl, view, pkey, dlg, tablename=None, tableview=None, id_name=None, feature_id=None, **kwargs):
