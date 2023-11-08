@@ -26,7 +26,7 @@ from qgis.gui import QgsMapToolEmitPoint
 from .document import GwDocument, global_vars
 from ..toolbars.utilities.toolbox_btn import GwToolBoxButton
 from ..shared.psector_duplicate import GwPsectorDuplicate
-from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi, GwReplaceArc, GwDialogTextUi
+from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi, GwReplaceArc, GwPsectorRepairUi
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_db, tools_qgis, tools_qt, tools_log, tools_os
 from ..utils.snap_manager import GwSnapManager
@@ -997,6 +997,10 @@ class GwPsector:
             tools_gw.disconnect_signal('psector')
             tools_qgis.disconnect_signal_selection_changed()
 
+            json_result = self.set_plan()
+            if json_result.get('status') == 'Accepted':
+                self.reload_states_selector()
+
             # Apply filters on tableview
             if hasattr(self, 'dlg_psector_mng'):
                 self._filter_table(self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name, self.dlg_psector_mng.chk_active, 'v_ui_plan_psector')
@@ -1112,42 +1116,39 @@ class GwPsector:
 
         self.dlg_plan_psector.tabWidget.setTabEnabled(1, True)
 
-        if close_dlg:
-            json_result = self.set_plan()
-            if json_result.get('status') == 'Accepted':
-                self.reload_states_selector()
-                tools_gw.close_dialog(self.dlg_plan_psector)
-
         # Refresh selectors UI if it is open and and the form will close
         if close_dlg:
+            tools_gw.close_dialog(self.dlg_plan_psector)
             tools_gw.refresh_selectors()
 
 
     def set_plan(self):
 
-        extras = f'"psectorId":"{tools_qt.get_text(self.dlg_plan_psector, self.psector_id)}"'
+        psector_id = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
+        psector_name = tools_qt.get_text(self.dlg_plan_psector, "name", return_string_null=False)
+        extras = f'"psectorId":"{psector_id}"'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_setplan', body, is_thread=True)  # is_thread=True because we don't want to call manage_json_response yet
         tools_gw.manage_current_selections_docker(json_result)
         if not json_result or 'body' not in json_result or 'data' not in json_result['body']:
             return
 
-        if json_result['body']['data']['info']['values']:
-            text = "There are some topological inconsistences on this psector. Would you like to see the log?"
-            function = partial(self.show_psector_topoerror_log, json_result)
+        if json_result['message']['level'] == 1:
+            text = f"There are some topological inconsistences on psector '{psector_name}'. Would you like to see the log?"
+            function = partial(self.show_psector_topoerror_log, json_result, psector_id)
             tools_qgis.show_message_function(text, function, message_level=1, duration=0)
 
         return json_result
 
 
-    def show_psector_topoerror_log(self, json_result):
+    def show_psector_topoerror_log(self, json_result, psector_id):
 
         # Remove message
         self.iface.messageBar().popWidget()
 
         # Create log dialog
-        self.dlg_infolog = GwDialogTextUi()
-        tools_qt.set_widget_visible(self.dlg_infolog, 'btn_accept', False)
+        self.dlg_infolog = GwPsectorRepairUi()
+        self.dlg_infolog.btn_repair.clicked.connect(partial(self.repair_psector, psector_id))
         self.dlg_infolog.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_infolog, True))
 
         text, _ = tools_gw.fill_tab_log(self.dlg_infolog, json_result['body']['data'], close=False)
@@ -1155,6 +1156,28 @@ class GwPsector:
 
         # Draw log features on map
         tools_gw.manage_json_response(json_result)
+
+
+    def repair_psector(self, psector_id):
+
+        extras = f'"psectorId":"{psector_id}"'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_setrepairpsector', body, is_thread=True)
+
+        if not json_result or 'body' not in json_result or 'data' not in json_result['body']:
+            return
+
+        text, _ = tools_gw.fill_tab_log(self.dlg_infolog, json_result['body']['data'], close=False)
+
+        tools_qt.set_widget_enabled(self.dlg_infolog, 'btn_repair', False)
+        # Remove temporal layers
+        tools_qgis.remove_layer_from_toc("line", "GW Temporal Layers")
+        tools_qgis.remove_layer_from_toc("point", "GW Temporal Layers")
+        tools_qgis.remove_layer_from_toc("polygon", "GW Temporal Layers")
+        tools_qgis.clean_layer_group_from_toc("GW Temporal Layers")
+
+        # Refresh canvas
+        tools_qgis.refresh_map_canvas()
 
 
     def price_selector(self, dialog, tableleft, tableright):
