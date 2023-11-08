@@ -2706,6 +2706,8 @@ class GwPsector:
             return
 
         for _id in ids:
+            if _id not in geoms:
+                continue
             geom = geoms[_id]['st_astext']
             color = QColor(0, 90, 255, 125)
             tools_qgis.draw_polyline(geom, rubber_band, color, width)
