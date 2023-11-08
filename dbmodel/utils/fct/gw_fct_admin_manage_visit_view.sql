@@ -60,7 +60,7 @@ BEGIN
 	raise notice 'v_new_parameters - ct,%',v_new_parameters.ct_param;
 	raise notice 'v_old_ct_param,%',v_old_ct_param;
 
-	IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS FALSE THEN
+	IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS FALSE THEN
 		-- create a new view if doesn't exist
 	EXECUTE 'SELECT DISTINCT string_agg(concat(''om_visit_x_'||v_feature_system_id||'.'',column_name)::text,'', '')
 		FROM information_schema.columns where table_name=''om_visit_x_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
