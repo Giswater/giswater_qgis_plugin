@@ -881,7 +881,7 @@ BEGIN
 						p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
 						INTO v_the_geom_pol;
 
-					IF (SELECT pol_id FROM gully WHERE gully_id = NEW.gully_id) IS NULL THEN
+					IF (SELECT pol_id FROM polygon WHERE feature_id = NEW.gully_id) IS NULL THEN
 						INSERT INTO polygon(sys_type, the_geom, featurecat_id,feature_id ) 
 						VALUES ('GULLY', v_the_geom_pol, NEW.gully_type, NEW.gully_id);
 					ELSE
