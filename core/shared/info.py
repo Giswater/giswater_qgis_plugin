@@ -3235,6 +3235,10 @@ def fill_tbl(complet_list, tbl, info, view, dlg):
             tbl = tools_gw.fill_tableview_rows(tbl, field)
         tools_qt.set_tableview_config(tbl)
         model.dataChanged.connect(partial(tbl_data_changed, info, view, tbl, model, addparam))
+    try:
+        tbl.doubleClicked.disconnect()
+    except Exception:
+        pass
     tbl.doubleClicked.connect(partial(epa_tbl_doubleClicked, tbl, dlg))
     # editability
     tbl.model().flags = lambda index: epa_tbl_flags(index, model, non_editable_columns)
