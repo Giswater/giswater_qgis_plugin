@@ -160,6 +160,8 @@ v_addparam json;
 v_pkeyfield text;
 v_schemaname text;
 
+p_idname_aux text;
+
 BEGIN
 
 	-- get basic parameters
@@ -225,37 +227,22 @@ BEGIN
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
 	EXECUTE v_active_feature INTO v_catfeature;
-	if p_idname is null then
-		-- Manage primary key
-		EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_addparam USING v_tablename;
-		p_idname = v_addparam ->> 'pkey';
-		v_idname_array := string_to_array(p_idname, ', ');
-		if v_idname_array is null THEN
-			EXECUTE 'SELECT gw_fct_getpkeyfield('''||v_tablename||''');' INTO v_pkeyfield;
-			v_idname_array := string_to_array(v_pkeyfield, ', ');
-		end if;
 
-		v_id_array := string_to_array(p_id, ', ');
+	-- Manage primary key
+	EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_addparam USING v_tablename;
+	p_idname_aux = v_addparam ->> 'pkey';
+	v_idname_array := string_to_array(p_idname_aux, ', ');
+	if v_idname_array is null THEN
+		EXECUTE 'SELECT gw_fct_getpkeyfield('''||v_tablename||''');' INTO v_pkeyfield;
+		v_idname_array := string_to_array(v_pkeyfield, ', ');
+	end if;
+
+	v_id_array := string_to_array(p_id, ', ');
 
 
-		if v_idname_array is not null then
-			FOREACH idname IN ARRAY v_idname_array LOOP
-				EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
-				    JOIN pg_class t on a.attrelid = t.oid
-				    JOIN pg_namespace s on t.relnamespace = s.oid
-				    WHERE a.attnum > 0
-				    AND NOT a.attisdropped
-				    AND a.attname = $3
-				    AND t.relname = $2
-				    AND s.nspname = $1
-				    ORDER BY a.attnum'
-			    USING v_schemaname, v_tablename, idname
-			    INTO column_type_id;
-				column_type_id_array[i] := column_type_id;
-				i=i+1;
-			END LOOP;
-		else
-			--   Get id column type
+	if v_idname_array is not null then
+		p_idname = p_idname_aux;
+		FOREACH idname IN ARRAY v_idname_array LOOP
 			EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
 			    JOIN pg_class t on a.attrelid = t.oid
 			    JOIN pg_namespace s on t.relnamespace = s.oid
@@ -265,9 +252,25 @@ BEGIN
 			    AND t.relname = $2
 			    AND s.nspname = $1
 			    ORDER BY a.attnum'
-	            USING v_schemaname, v_tablename, p_idname
-	            INTO column_type_id;
-		end if;
+                USING v_schemaname, v_tablename, idname
+                INTO column_type_id;
+                column_type_id_array[i] := column_type_id;
+                i=i+1;
+        END LOOP;
+
+	else
+		--   Get id column type
+		EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+		    JOIN pg_class t on a.attrelid = t.oid
+		    JOIN pg_namespace s on t.relnamespace = s.oid
+		    WHERE a.attnum > 0
+		    AND NOT a.attisdropped
+		    AND a.attname = $3
+		    AND t.relname = $2
+		    AND s.nspname = $1
+		    ORDER BY a.attnum'
+            USING v_schemaname, v_tablename, p_idname
+            INTO column_type_id;
 	end if;
 
 	--  Starting control process
@@ -510,13 +513,15 @@ BEGIN
 
 		END IF;
 
-		IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = 'SCHEMA_NAME' AND table_name = concat('ve_epa_',lower(v_epa)))) IS TRUE THEN
+		IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = 'SCHEMA_NAME' AND table_name = concat('ve_epa_',lower(v_epa)))) IS TRUE then
+
 			v_querystring = concat('SELECT (row_to_json(a)) FROM
 				(SELECT * FROM ',p_table_id,' a LEFT JOIN ve_epa_',lower(v_epa),' b ON a.',quote_ident(p_idname),'=b.',quote_ident(p_idname),' WHERE a.',quote_ident(p_idname),' = CAST(',quote_literal(p_id),' AS ',(p_columntype),'))a');
 			v_debug_vars := json_build_object('p_table_id', p_table_id, 'p_idname', p_idname, 'p_id', p_id, 'p_columntype', p_columntype);
 			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 20);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		elsif v_idname_array is not null then
+
 			v_querystring = 'SELECT (row_to_json(a)) FROM (SELECT * FROM '|| p_table_id || ' ';
 
 			i = 1;
@@ -893,7 +898,7 @@ BEGIN
 					end if;
 
 					v_current_id =json_extract_path_text(v_fields_array[array_index],'comboIds');
-		
+
 					IF v_current_id='[]' THEN
 						--case when list is empty
 						EXECUTE concat('SELECT  array_to_json(''{',v_selected_id,'}''::text[])')
@@ -926,27 +931,28 @@ BEGIN
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'selectedId', COALESCE(field_value, ''));
 			ELSIF (aux_json->>'widgettype')='button' and json_extract_path_text(aux_json,'widgetcontrols','text') IS NOT NULL THEN
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'value', json_extract_path_text(aux_json,'widgetcontrols','text'));
-			ELSE 
+			ELSE
+
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'value', COALESCE(field_value, ''));
 
 				IF (aux_json->>'widgettype')='button' and ((aux_json->>'columnname') = 'node_1' OR (aux_json->>'columnname') = 'node_2') and
-					(SELECT value::boolean FROM config_param_system WHERE parameter='admin_node_code_on_arc' ) is true THEN 
+					(SELECT value::boolean FROM config_param_system WHERE parameter='admin_node_code_on_arc' ) is true THEN
 					SELECT code into label_value FROM node WHERE node_id = field_value;
-					label_value := COALESCE(label_value, ''); 
+					label_value := COALESCE(label_value, '');
 					v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'valueLabel', label_value);
 				END IF;
-			END IF;		
-			
+			END IF;
+
 			-- setting widgetcontrols
-			IF (aux_json->>'datatype')='double' OR (aux_json->>'datatype')='integer' OR (aux_json->>'datatype')='numeric' THEN 
+			IF (aux_json->>'datatype')='double' OR (aux_json->>'datatype')='integer' OR (aux_json->>'datatype')='numeric' THEN
 				IF v_widgetvalues IS NOT NULL THEN
 					v_widgetcontrols = gw_fct_json_object_set_key ((aux_json->>'widgetcontrols')::json, 'maxMinValues' ,(v_widgetvalues->>(aux_json->>'columnname'))::json);
 					v_fields_array[array_index] := gw_fct_json_object_set_key (v_fields_array[array_index], 'widgetcontrols', v_widgetcontrols);
 				END IF;
 			END IF;
-		END LOOP;  
+		END LOOP;
 	END IF;
-	
+
 	--Check if user has migration mode enabled
 	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
 	  	v_status = TRUE;
@@ -957,13 +963,13 @@ BEGIN
 
 	-- Control NULL's
 	v_version := COALESCE(v_version, '[]');
-	v_fields := COALESCE(v_fields, '[]');    
-	v_message := COALESCE(v_message, '[]');    
-    
+	v_fields := COALESCE(v_fields, '[]');
+	v_message := COALESCE(v_message, '[]');
+
 	-- Return
 	IF v_status IS TRUE THEN
 		RETURN v_fields;
-	ELSE 
+	ELSE
 		RETURN ('{"status":"Failed" '||
 			',"message":{"level":2, "text":"'||v_message||'"}'||
 			',"version":'||v_version||
@@ -974,8 +980,7 @@ BEGIN
 				'}'||
 			'}')::json;
 	END IF;
-		
-END;
-$BODY$
+
+END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
