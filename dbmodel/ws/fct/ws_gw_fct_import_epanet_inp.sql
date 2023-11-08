@@ -78,7 +78,7 @@ BEGIN
 	-- get input data
 	v_debugmode := ((p_data ->>'data')::json->>'parameters')::json->>'debugMode'::text;
 	
-	IF (select count(*) from SCHEMA_NAME.temp_csv where CSV1 = ';Created by Giswater') = 1 THEN
+	IF (select count(*) from temp_csv where CSV1 = ';Created by Giswater') = 1 THEN
 		v_isgwproject := TRUE;
 	END IF;
 
