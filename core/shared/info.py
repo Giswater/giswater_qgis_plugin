@@ -890,8 +890,8 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaPumpUi", "uiName": "info_epa_pump",
                        "tableviews": [
-                        {"tbl": "tbl_pump", "view": "inp_pump_additional", "add_view": "v_edit_inp_pump_additional", "pk": "id", "add_dlg_title": "Pump Additional - Base"},
-                        {"tbl": "tbl_dscenario_pump", "view": "inp_dscenario_pump_additional", "add_view": "v_edit_inp_dscenario_pump_additional", "pk": "id", "add_dlg_title": "Pump Additional - Dscenario"}
+                        {"tbl": "tbl_pump", "view": "inp_pump_additional", "add_view": "v_edit_inp_pump_additional", "pk": ["node_id", "order_id"], "add_dlg_title": "Pump Additional - Base"},
+                        {"tbl": "tbl_dscenario_pump", "view": "inp_dscenario_pump_additional", "add_view": "v_edit_inp_dscenario_pump_additional", "pk": ["dscenario_id", "node_id", "order_id"], "add_dlg_title": "Pump Additional - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg(**kwargs)
