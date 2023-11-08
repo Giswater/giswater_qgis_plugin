@@ -24,7 +24,7 @@ BEGIN
 	-- counting if psector is last psector for that feature
 	IF v_parent = 'arc' THEN
 		SELECT count(psector_id) INTO v_count FROM plan_psector_x_arc JOIN arc USING (arc_id) WHERE arc.state = 2 AND arc_id = OLD.arc_id;
-		v_state:= (SELECT state FROM arc WHERE arc_id = NEW.arc_id);
+		v_state:= (SELECT state FROM arc WHERE arc_id = OLD.arc_id);
 		v_feature = OLD.arc_id;
 		
 	ELSIF v_parent = 'node' THEN

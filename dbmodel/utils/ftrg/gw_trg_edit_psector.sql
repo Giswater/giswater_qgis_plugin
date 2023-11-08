@@ -25,6 +25,7 @@ v_state_obsolete_planified integer;
 v_affectrow integer;
 v_psector_geom geometry;
 v_action text;
+v_plan_psector_force_delete text;
 
 BEGIN
 
@@ -349,8 +350,12 @@ BEGIN
 				WHERE psector_id=NEW.psector_id;
 			END IF;
 		
+			-- get v_plan_psector_force_delete and set to true in order to also delete from arc/node/connec when delete from plan_psector_x_*
+			SELECT value INTO v_plan_psector_force_delete FROM config_param_user WHERE parameter='plan_psector_force_delete' AND cur_user=current_user;
+			UPDATE config_param_user SET value='true' WHERE parameter='plan_psector_force_delete' AND cur_user=current_user;
+		
 			-- delete from plan_psector_x_* tables
-			FOR rec_type IN (SELECT * FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2 ORDER BY id asc) LOOP
+			FOR rec_type IN (SELECT * FROM sys_feature_type WHERE classlevel IN (1,2) ORDER BY id asc) LOOP
 				-- delete from psector_x_*
 				EXECUTE 'DELETE FROM plan_psector_x_'||lower(rec_type.id)||' 
 				WHERE psector_id = '||OLD.psector_id||';';
@@ -358,6 +363,9 @@ BEGIN
 			
 			-- reset psector geometry
 			UPDATE plan_psector SET the_geom=v_psector_geom WHERE psector_id=NEW.psector_id;
+		
+			-- reset plan_psector_force_delete
+			UPDATE config_param_user SET value=v_plan_psector_force_delete WHERE parameter='plan_psector_force_delete' AND cur_user=current_user;
 		
 		END IF;
 	END IF;
