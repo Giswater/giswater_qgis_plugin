@@ -57,11 +57,11 @@ v_element_id text;
 BEGIN
 	--  Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
-	
+
 	--  get api version
 	EXECUTE 'SELECT value FROM config_param_system WHERE parameter=''admin_version'''
 	INTO v_version;
-      
+
 	SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 	--set current process as users parameter
 	DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
@@ -282,28 +282,19 @@ BEGIN
 				IF v_feature_type='connec' or v_feature_type='gully' then
 					PERFORM gw_fct_state_control(upper(v_feature_type::varchar), v_feature_id_value::varchar, 0, 'UPDATE');
 				END IF;
+				v_querytext = 'UPDATE '||v_feature_type||' SET state = 0, enddate = '||quote_literal(v_enddate)||' ';
+				IF v_workcat_id_end IS NOT NULL then
+					v_querytext := v_querytext || ' , workcat_id_end = '||quote_literal(v_workcat_id_end)||' ';
+				end if;
 
-				IF v_workcat_id_end IS NOT NULL THEN
+				IF v_feature_type != 'link' then
+					v_querytext := v_querytext || ' , state_type = '||v_state_type||' ';
+				end if;
 
-					EXECUTE 'UPDATE '||v_feature_type||' SET state = 0, state_type='||v_state_type||',
-					workcat_id_end = '||quote_literal(v_workcat_id_end)||',
-					enddate = '||quote_literal(v_enddate)||' WHERE '||v_feature_type||'_id ='||quote_literal(v_feature_id_value)||'';
+				v_querytext := v_querytext || ' WHERE '||v_feature_type||'_id ='||quote_literal(v_feature_id_value)||'';
 
-					-- related elements to obsolete
-					EXECUTE 'UPDATE element e SET state = 0, state_type='||v_state_type||',
-					workcat_id_end = '||quote_literal(v_workcat_id_end)||',
-					enddate = '||quote_literal(v_enddate)||' FROM element_x_'||v_feature_type||' f WHERE f.element_id=e.element_id AND '||v_feature_type||'_id ='||quote_literal(v_feature_id_value)||'';
+				execute v_querytext;
 
-				ELSE
-
-					EXECUTE 'UPDATE '||v_feature_type||' SET state = 0, state_type='||v_state_type||',
-					enddate = '||quote_literal(v_enddate)||' WHERE '||v_feature_type||'_id ='||quote_literal(v_feature_id_value)||'';
-
-					-- related elements to obsolete
-					EXECUTE 'UPDATE element e SET state = 0, state_type='||v_state_type||',
-					enddate = '||quote_literal(v_enddate)||' FROM element_x_'||v_feature_type||' f WHERE f.element_id=e.element_id AND '||v_feature_type||'_id ='||quote_literal(v_feature_id_value)||'';
-				END IF;
-			
 				-- related link to obsolete
 				IF v_feature_type='connec' or v_feature_type='gully' then
 					EXECUTE 'UPDATE link SET state = 0 WHERE feature_id = '|| quote_literal(v_feature_id_value)||';';
@@ -319,10 +310,10 @@ BEGIN
 		v_message = 'Process done successfully';
 	ELSE
 
-		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status;
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
-	
+
 	END IF;
 
 	DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
@@ -337,13 +328,13 @@ BEGIN
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND
 	fid = v_fid order by criticity desc, id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":"'||v_level||'", "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
-		     ',"data":{ "info":'||v_result_info||				
+		     ',"data":{ "info":'||v_result_info||
 			'}}'||
 	    '}')::json, 3068, null, null, null);
 
