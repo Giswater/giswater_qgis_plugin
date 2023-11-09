@@ -41,6 +41,7 @@ class GwFeatureEndButton(GwAction):
         self.list_ids['connec'] = []
         self.list_ids['gully'] = []
         self.list_ids['element'] = []
+        self.list_ids['link'] = []
 
         # Setting layers
         self.layers = {}
@@ -49,11 +50,13 @@ class GwFeatureEndButton(GwAction):
         self.layers['connec'] = []
         self.layers['gully'] = []
         self.layers['element'] = []
+        self.layers['link'] = []
 
         self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
         self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
         self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
         self.layers['element'] = [tools_qgis.get_layer_by_tablename('v_edit_element')]
+        self.layers['link'] = [tools_qgis.get_layer_by_tablename('v_edit_link')]
 
         self.layers = tools_gw.remove_selection(True, layers=self.layers)
 
@@ -74,7 +77,7 @@ class GwFeatureEndButton(GwAction):
             tools_qt.set_tableview_config(widget)
 
         # Remove tabs
-        params = ['arc', 'node', 'connec', 'gully', 'element']
+        params = ['arc', 'node', 'connec', 'gully', 'element', 'link']
         if self.list_tabs:
             for i in params:
                 if i not in self.list_tabs:
@@ -99,8 +102,7 @@ class GwFeatureEndButton(GwAction):
         tools_gw.set_completer_object(self.dlg_work_end, self.table_object)
 
         # Set signals
-        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
-                           "v_edit_element"]
+        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully", "v_edit_link"]
         self.excluded_layers = excluded_layers
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_work_end.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
@@ -132,6 +134,8 @@ class GwFeatureEndButton(GwAction):
                                                                        self.dlg_work_end.tbl_cat_work_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
         self.dlg_work_end.tbl_cat_work_x_element.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                          self.dlg_work_end.tbl_cat_work_x_element, "v_edit_element", "element_id", self.rubber_band, 10))
+        self.dlg_work_end.tbl_cat_work_x_link.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                         self.dlg_work_end.tbl_cat_work_x_link, "v_edit_link", "link_id", self.rubber_band, 10))
 
         tools_gw.disable_tab_log(self.dlg_work_end)
 
@@ -300,6 +304,12 @@ class GwFeatureEndButton(GwAction):
         else:
             # Update tablename of every feature_type
             feature_body_list = ""
+
+            # Manage link
+            self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_link)
+            feature_body = self._manage_feature_body("link")
+            if feature_body:
+                feature_body_list += f"{feature_body}, "
 
             # Manage element
             self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_element)

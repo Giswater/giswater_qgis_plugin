@@ -441,7 +441,7 @@ def hide_parent_layers(excluded_layers=[]):
     """ Hide generic layers """
 
     layers_changed = {}
-    list_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element"]
+    list_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_link"]
     if global_vars.project_type == 'ud':
         list_layers.append("v_edit_gully")
 
@@ -529,7 +529,7 @@ def reset_feature_list():
     """ Reset list of selected records """
 
     ids = []
-    list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
+    list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': [], 'link': []}
 
     return ids, list_ids
 
@@ -539,7 +539,7 @@ def get_signal_change_tab(dialog, excluded_layers=[]):
 
     tab_idx = dialog.tab_feature.currentIndex()
     tab_name = {'tab_arc': 'arc', 'tab_node': 'node', 'tab_connec': 'connec', 'tab_gully': 'gully',
-                'tab_elem': 'element'}
+                'tab_elem': 'element', 'tab_link': 'link'}
 
     feature_type = tab_name.get(dialog.tab_feature.widget(tab_idx).objectName(), 'arc')
     hide_parent_layers(excluded_layers=excluded_layers)
@@ -2924,7 +2924,7 @@ def insert_feature(class_object, dialog, table_object, query=False, remove_ids=T
 def remove_selection(remove_groups=True, layers=None):
     """ Remove all previous selections """
 
-    list_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element"]
+    list_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_link"]
     if global_vars.project_type == 'ud':
         list_layers.append("v_edit_gully")
 
@@ -3326,7 +3326,7 @@ def manage_close(dialog, table_object, cur_active_layer=None, single_tool_mode=N
     else:
         layers = remove_selection(True, layers=layers)
 
-    list_feature_type = ['arc', 'node', 'connec', 'element']
+    list_feature_type = ['arc', 'node', 'connec', 'element', 'link']
     if global_vars.project_type == 'ud':
         list_feature_type.append('gully')
     for feature_type in list_feature_type:
@@ -3443,7 +3443,7 @@ def get_parent_layers_visibility():
     """
 
     layers_visibility = {}
-    for layer_name in ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully"]:
+    for layer_name in ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully", "v_edit_link"]:
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         if layer:
             layers_visibility[layer] = tools_qgis.is_layer_visible(layer)
