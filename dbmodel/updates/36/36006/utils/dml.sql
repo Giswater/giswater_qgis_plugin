@@ -63,3 +63,12 @@ VALUES (3288, 'gw_fct_setrepairpsector', 'utils', 'function', null, null, 'Funct
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
 VALUES (521, 'Set repair psector', 'utils', null, 'core', true, 'Function process', null) 
 ON CONFLICT (fid) DO NOTHING;
+
+UPDATE config_csv SET alias = 'Import scada values', descript = 'Import scada values into table ext_rtc_scada_x_data according example file scada_values.csv', 
+functionname = 'gw_fct_import_scada_values' WHERE fid = 469;
+
+UPDATE config_csv SET descript='The csv file must have the following fields:
+hydrometer_id, cat_period_id, sum, value_date (optional), value_type (optional), value_status (optional), value_state (optional)' WHERE fid=470 AND alias='Import hydrometer_x_data';
+
+UPDATE config_csv SET descript='The csv file must have the following fields:
+id, start_date, end_date, period_seconds (optional), code' WHERE fid=471 AND alias='Import crm period values';
