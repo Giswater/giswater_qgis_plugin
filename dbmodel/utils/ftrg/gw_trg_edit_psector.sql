@@ -266,6 +266,14 @@ BEGIN
 						AND p.state = 1 AND p.psector_id='||OLD.psector_id||' AND n.'||lower(rec_type.id)||'_id = '''||rec.id||'''
 						AND n.pjoint_type=''NODE'';';
 					
+						-- set pjoint_id when pjoint_type=ARC getting it from exit_id on planified link
+						EXECUTE 'UPDATE '||lower(rec_type.id)||' n SET pjoint_id = link.exit_id
+						FROM plan_psector_x_'||lower(rec_type.id)||' p 
+						JOIN link USING (link_id)
+						WHERE n.'||lower(rec_type.id)||'_id = p.'||lower(rec_type.id)||'_id 
+						AND p.state = 1 AND p.psector_id='||OLD.psector_id||' AND n.'||lower(rec_type.id)||'_id = '''||rec.id||'''
+						AND n.pjoint_type=''ARC'';';
+					
 						-- set links to state 0 when its connec is 0 on psector
 						EXECUTE 'UPDATE link SET state=0
 						FROM plan_psector_x_'||lower(rec_type.id)||' p WHERE link.link_id = p.link_id 
@@ -294,8 +302,8 @@ BEGIN
 				DELETE FROM config_param_user WHERE parameter='edit_connect_downgrade_link' AND cur_user=current_user;
 			END IF;
 		
-			-- reset psector geometry
-			UPDATE plan_psector SET the_geom=v_psector_geom WHERE psector_id=NEW.psector_id;
+			-- reset psector geometry and set inactive
+			UPDATE plan_psector SET the_geom=v_psector_geom, active=false WHERE psector_id=NEW.psector_id;
 
 			--reset topology control
 			UPDATE config_param_user SET value = 'false' WHERE parameter='edit_disable_statetopocontrol' AND cur_user=current_user;
@@ -361,8 +369,8 @@ BEGIN
 				WHERE psector_id = '||OLD.psector_id||';';
 			END LOOP;
 			
-			-- reset psector geometry
-			UPDATE plan_psector SET the_geom=v_psector_geom WHERE psector_id=NEW.psector_id;
+			-- reset psector geometry and set inactive
+			UPDATE plan_psector SET the_geom=v_psector_geom, active=false WHERE psector_id=NEW.psector_id;
 		
 			-- reset plan_psector_force_delete
 			UPDATE config_param_user SET value=v_plan_psector_force_delete WHERE parameter='plan_psector_force_delete' AND cur_user=current_user;
