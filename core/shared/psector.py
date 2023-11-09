@@ -1805,7 +1805,6 @@ class GwPsector:
             message = f"To open psector {psector_name}, it must be activated before."
             tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
             return
-
         psector_id = qtbl_psm.model().record(row).value("psector_id")
         keep_open_form = tools_gw.get_config_parser('dialogs_actions', 'psector_manager_keep_open', "user", "init", prefix=True)
         if tools_os.set_boolean(keep_open_form, False) is not True:
@@ -1815,17 +1814,6 @@ class GwPsector:
         sql = f"DELETE FROM selector_psector WHERE psector_id = {psector_id} AND cur_user = current_user;" \
               f"INSERT INTO selector_psector (psector_id, cur_user) VALUES ({psector_id}, current_user);"
         tools_db.execute_sql(sql)
-
-        # Set current psector
-
-        aux_widget = QLineEdit()
-        aux_widget.setText(str(psector_id))
-        self.upsert_config_param_user(self.dlg_psector_mng, aux_widget, "plan_psector_vdefault")
-
-        message = "Values has been updated"
-        tools_qgis.show_info(message, dialog=self.dlg_psector_mng)
-
-        self.set_label_current_psector(self.dlg_psector_mng)
 
         # Open form
         self.master_new_psector(psector_id)
