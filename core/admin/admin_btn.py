@@ -1038,8 +1038,10 @@ class GwAdminButton:
         export_passwd = tools_qt.is_checked(self.dlg_create_gis_project, 'chk_export_passwd')
 
         if export_passwd and not self.is_service:
-            msg = "Credentials will be stored in GIS project file"
-            tools_qt.show_info_box(msg, "Warning")
+            msg = "Credentials will be stored in GIS project file. Do you want to continue?"
+            answer = tools_qt.show_question(msg, "Warning")
+            if not answer:
+                return
 
         # Generate QGIS project
         self._generate_qgis_project(gis_folder, gis_file, project_type, schema_name, export_passwd, roletype)
