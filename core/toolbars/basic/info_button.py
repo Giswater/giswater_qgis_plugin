@@ -22,6 +22,7 @@ from ...threads.toggle_valve_state import GwToggleValveTask
 from ...utils import tools_gw
 from .... import global_vars
 from ....libs import lib_vars, tools_qgis, tools_os, tools_qt
+# from qgis.core import QgsWkbTypes
 
 
 class GwInfoButton(GwMaptool):

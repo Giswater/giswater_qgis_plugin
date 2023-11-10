@@ -34,6 +34,7 @@ from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, Qg
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsDataSourceUri, \
     QgsProviderRegistry, QgsMapLayerStyle, QgsGeometry
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand
+from qgis.core import QgsWkbTypes
 
 from ..models.cat_feature import GwCatFeature
 from ..ui.dialog import GwDialog
@@ -3448,9 +3449,10 @@ def restore_parent_layers_visibility(layers):
         tools_qgis.set_layer_visible(layer, False, visibility)
 
 
-def create_rubberband(canvas, geometry_type=1):
+def create_rubberband(canvas, geometry_type= 1):
     """ Creates a rubberband and adds it to the global list """
-
+    geometry_type = QgsWkbTypes.LineGeometry
+    geometry_type = QgsWkbTypes.PointGeometry
     rb = QgsRubberBand(canvas, geometry_type)
     global_vars.active_rubberbands.append(rb)
     return rb

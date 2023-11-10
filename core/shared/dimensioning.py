@@ -55,7 +55,7 @@ class GwDimensioning:
 
         # qgis_feature = self.get_feature_by_id(self.layer_dimensions, fid, 'id')
 
-        # when funcion is called from new feature
+        # when function is called from new feature
         if db_return is None:
             rubber_band = tools_gw.create_rubberband(self.canvas, 0)
             extras = f'"coordinates":{{{self.points}}}'

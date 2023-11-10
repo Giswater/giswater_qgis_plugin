@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
 
+
 from .task import GwTask
 from ..utils import tools_gw
 from ...libs import tools_log, tools_qgis, tools_qt, tools_db
