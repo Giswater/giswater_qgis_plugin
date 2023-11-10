@@ -11,6 +11,7 @@ import re
 import urllib.parse as parse
 import webbrowser
 from functools import partial
+from qgis.core import QgsEditFormConfig
 
 from sip import isdeleted
 
@@ -295,7 +296,7 @@ class GwInfo(QObject):
             QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
             config = self.info_layer.editFormConfig()
             self.conf_supp = config.suppress()
-            config.setSuppress(0)
+            config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.Default)
             self.info_layer.setEditFormConfig(config)
             self.iface.setActiveLayer(self.info_layer)
             self.info_layer.startEditing()

@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QSettings
+from qgis.core import QgsEditFormConfig
 
 from ..maptool import GwMaptool
 from ...shared.dimensioning import GwDimensioning
@@ -38,7 +39,7 @@ class GwDimensioningButton(GwMaptool):
             QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
             config = self.layer.editFormConfig()
             self.conf_supp = config.suppress()
-            config.setSuppress(0)
+            config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.Default)
             self.layer.setEditFormConfig(config)
 
             self.iface.setActiveLayer(self.layer)
