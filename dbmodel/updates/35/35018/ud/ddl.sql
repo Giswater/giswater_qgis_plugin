@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/11/09
-DROP VIEW v_vnode;
+DROP VIEW IF EXISTS v_vnode;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"vnode", "column":"top_elev", "dataType":"text", "isUtils":"False"}}$$);
 
