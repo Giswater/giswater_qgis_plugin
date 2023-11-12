@@ -87,13 +87,13 @@ BEGIN
 					UPDATE link SET state = 2 where link_id = v_link_new;
 
 					IF v_record.feature_type = 'CONNEC' THEN
-						INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, link_id, arc_id) values (v_record.feature_id,  NEW.psector_id, 0, v_link_id, v_rec.arc_id) 
+						INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, link_id, arc_id) values (v_record.feature_id,  NEW.psector_id, 0, v_record.link_id, v_rec.arc_id) 
 						on conflict do nothing;
 						INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, link_id, arc_id) values (v_record.feature_id,  NEW.psector_id, 1, v_link_new, v_rec.arc_id) 
 						on conflict do nothing;
 						
 					ELSIF v_record.feature_type = 'GULLY' THEN
-						INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, link_id, arc_id) values (v_record.feature_id,  NEW.psector_id, 0, v_link_id, v_rec.arc_id) 
+						INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, link_id, arc_id) values (v_record.feature_id,  NEW.psector_id, 0, v_record.link_id, v_rec.arc_id) 
 						on conflict do nothing;
 						INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, link_id, arc_id) values (v_record.feature_id,  NEW.psector_id, 1, v_link_new, v_rec.arc_id) 
 						on conflict do nothing;
@@ -121,13 +121,13 @@ BEGIN
 						UPDATE link SET state = 2 where link_id = v_link_new;
 					
 						IF v_record_2.feature_type = 'CONNEC' THEN
-							INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, link_id, arc_id) values (v_record_2.feature_id,  NEW.psector_id, 0, v_link_id, v_rec.arc_id) 
+							INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, link_id, arc_id) values (v_record_2.feature_id,  NEW.psector_id, 0, v_record_2.link_id, v_rec.arc_id) 
 							on conflict do nothing;
 							INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, link_id, arc_id) values (v_record_2.feature_id,  NEW.psector_id, 1, v_link_new, v_rec.arc_id) 
 							on conflict do nothing;
 							
 						ELSIF v_record_2.feature_type = 'GULLY' THEN
-							INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, link_id, arc_id) values (v_record_2.feature_id,  NEW.psector_id, 0, v_link_id, v_rec.arc_id) 
+							INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, link_id, arc_id) values (v_record_2.feature_id,  NEW.psector_id, 0, v_record_2.link_id, v_rec.arc_id) 
 							on conflict do nothing;
 							INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, link_id, arc_id) values (v_record_2.feature_id,  NEW.psector_id, 1, v_link_new, v_rec.arc_id) 
 							on conflict do nothing;
