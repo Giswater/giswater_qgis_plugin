@@ -119,17 +119,17 @@ BEGIN
 
 
 	--Look for closest node using coordinates
-	IF v_xcoord IS NOT NULL THEN 
+	IF v_node IS NULL THEN 
 		EXECUTE 'SELECT (value::json->>''web'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
 		INTO v_sensibility_f;
 		v_sensibility = (v_zoomratio / 500 * v_sensibility_f);
 
 		-- Make point
 		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
-	
 		SELECT node_id INTO v_node FROM v_edit_node WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
-		
-		SELECT gw_fct_json_object_set_key (p_data,'feature'::text, jsonb_build_object('id',json_agg(v_node))) INTO p_data;
+		IF v_node IS NULL THEN
+			SELECT node_2 INTO v_node FROM v_edit_arc WHERE ST_DWithin(the_geom, v_point,100)  order by st_distance (the_geom, v_point) LIMIT 1;
+		END IF;
 	END IF;
 
 	-- fill the graph table

@@ -7,8 +7,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2214
 
-DROP FUNCTION IF EXISTS  SCHEMA_NAME.gw_fct_flow_exit (character varying);
-DROP FUNCTION IF EXISTS  SCHEMA_NAME.gw_fct_flow_exit (json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_flow_exit (character varying);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_flow_exit (json);
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_graphanalytics_downstream(p_data json)  
 RETURNS json AS $BODY$
 
@@ -115,19 +115,18 @@ BEGIN
           WHERE temp_t_anlgraph_1.water = 1) a2 ON temp_t_anlgraph.node_1::text = a2.node_2::text
   WHERE temp_t_anlgraph.flag < 2 AND temp_t_anlgraph.water = 0 AND a2.flag = 0;
 
-
 	--Look for closest node using coordinates
-	IF v_xcoord IS NOT NULL THEN 
+	IF v_node IS NULL THEN 
 		EXECUTE 'SELECT (value::json->>''web'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
 		INTO v_sensibility_f;
 		v_sensibility = (v_zoomratio / 500 * v_sensibility_f);
 
 		-- Make point
 		SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
-	
 		SELECT node_id INTO v_node FROM v_edit_node WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
-		
-		SELECT gw_fct_json_object_set_key (p_data,'feature'::text, jsonb_build_object('id',json_agg(v_node))) INTO p_data;
+		IF v_node IS NULL THEN
+			SELECT node_1 INTO v_node FROM v_edit_arc WHERE ST_DWithin(the_geom, v_point,100)  order by st_distance (the_geom, v_point) LIMIT 1;
+		END IF;
 	END IF;
 
 		
