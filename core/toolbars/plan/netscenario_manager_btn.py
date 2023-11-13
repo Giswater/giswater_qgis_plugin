@@ -365,7 +365,7 @@ class GwNetscenarioManagerButton(GwAction):
                 qtableview.clicked.connect(partial(self._manage_highlight, qtableview, view))
                 tab_idx = self.dlg_netscenario.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
                 self.dlg_netscenario.main_tab.widget(tab_idx).setObjectName(view)
-
+                qtableview.doubleClicked.connect(partial(self._manage_update))
                 if view.split('_')[-1].upper() == self.selected_netscenario_type:
                     default_tab_idx = tab_idx
 
