@@ -1432,7 +1432,7 @@ class GwPsector:
 
 
     def fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers,
-                   expr=None, feature_type=None, field_id=None):
+                   expr=None, feature_type=None, field_id=None, refresh_table=True):
         """ Set a model with selected filter.
             Attach that model to selected table
             @setEditStrategy:
@@ -1477,6 +1477,15 @@ class GwPsector:
             self.refresh_table(dialog, widget)
         if feature_type is not None and field_id is not None:
             self._manage_features_geom(widget, feature_type, field_id)
+
+        if self.tablename_psector_x_connec in table_name and refresh_table:
+            self.fill_table(self.dlg_plan_psector, self.qtbl_gully, self.tablename_psector_x_gully,
+                            set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="gully",
+                            field_id="gully_id", refresh_table=False)
+        elif self.tablename_psector_x_gully in table_name and refresh_table:
+            self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec,
+                            set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="connec",
+                            field_id="connec_id", refresh_table=False)
 
 
     def refresh_table(self, dialog, widget):
