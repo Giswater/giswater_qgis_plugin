@@ -71,7 +71,7 @@ BEGIN
 	END IF;
 
 	-- for all nodes 
-	IF v_rotation_disable IS FALSE THEN 
+	IF v_rotation_disable IS TRUE THEN 
     		UPDATE node SET rotation=NEW.hemisphere WHERE node_id=NEW.node_id;
 	END IF;
 
