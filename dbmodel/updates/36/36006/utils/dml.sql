@@ -72,3 +72,5 @@ hydrometer_id, cat_period_id, sum, value_date (optional), value_type (optional),
 
 UPDATE config_csv SET descript='The csv file must have the following fields:
 id, start_date, end_date, period_seconds (optional), code' WHERE fid=471 AND alias='Import crm period values';
+INSERT INTO sys_message (id, error_message, log_level, show_user, project_type, "source")
+VALUES(3250, 'Value 0 for exploitation it is not enabled on network objects. It is only used to relate undefined mapzones', 2, true, 'utils', 'core');
