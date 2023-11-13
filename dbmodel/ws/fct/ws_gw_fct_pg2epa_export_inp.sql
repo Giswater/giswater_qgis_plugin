@@ -114,6 +114,7 @@ BEGIN
 		concat(';', temp_t_demand.dscenario_id, ' ', temp_t_demand.source, ' ', temp_t_demand.demand_type) AS other
 		FROM temp_t_demand
 		JOIN temp_t_node ON temp_t_demand.feature_id::text = temp_t_node.node_id::text
+		where temp_t_demand.demand is not null
 		ORDER BY temp_t_demand.feature_id, (concat(';', temp_t_demand.dscenario_id, ' ', temp_t_demand.source, ' ', temp_t_demand.demand_type));
 
 
