@@ -19,7 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":127}}
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":101}}}$$)-- when is called from checkproject
 
 -- fid: main: 255,
-	other: 106,107,111,113,164,175,187,188,294,295,379,427,430,440,480
+	other: 106,107,111,113,164,175,187,188,294,295,379,427,430,440,480, 522
 
 SELECT * FROM audit_check_data WHERE fid = v_fid
 
@@ -622,6 +622,24 @@ BEGIN
 		VALUES (v_fid, '482', 1, 'INFO: No rows on arc catalog without values on geom1 column.', v_count);
 	END IF;
 	v_count=0;
+
+	RAISE NOTICE '27 - Check if outfalls have more than 1 connected arc';
+	with n as (select node_id from node, arc where node.epa_type='OUTFALL' and st_dwithin(node.the_geom, arc.the_geom, 0.01) group by node_id having count(node_id)>1)
+	select count(*) from n into v_count;
+	
+	IF v_count>0 then
+		INSERT INTO temp_audit_check_data (result_id, criticity, error_message, fcount)
+		VALUES ('522', 3, concat('ERROR-522: There is/are ',v_count,' outfalls with more than 1 arc connected.'),v_count);
+		
+		EXECUTE 'INSERT INTO temp_anl_node (fid, node_id, descript, the_geom, expl_id, nodecat_id) 
+		select 522, node.node_id, ''Outfall with more than 1 arc'', node.the_geom, node.expl_id, node.nodecat_id 
+		from node, arc where node.epa_type=''OUTFALL'' and st_dwithin(node.the_geom, arc.the_geom, 0.01) 
+		group by node.node_id having count(node.node_id)>1';
+	END IF;
+	v_count=0;
+
+
+
 	
 	-- Removing isaudit false sys_fprocess
 	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
@@ -691,7 +709,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT DISTINCT ON (arc_id) id, arc_id, arccat_id, state, expl_id, descript, the_geom, fid
-	FROM  temp_anl_arc WHERE cur_user="current_user"() AND fid IN (188, 284, 295, 427,430)) row) features;
+	FROM  temp_anl_arc WHERE cur_user="current_user"() AND fid IN (188, 284, 295, 427,430, 522)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
