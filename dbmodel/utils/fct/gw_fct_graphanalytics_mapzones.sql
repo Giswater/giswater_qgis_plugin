@@ -353,9 +353,7 @@ BEGIN
 			INSERT INTO temp_om_waterbalance_dma_graph SELECT * FROM om_waterbalance_dma_graph;
 			EXECUTE 'DELETE FROM temp_om_waterbalance_dma_graph
 			WHERE node_id IN 
-			(SELECT node_id FROM temp_om_waterbalance_dma_graph
-			JOIN node n USING (node_id)
-			WHERE n.expl_id = '||v_expl_id||' '||v_psectors_query_node||');';
+			(SELECT node_id FROM temp_om_waterbalance_dma_graph JOIN temp_t_node n USING (node_id))';
 		END IF;
 
 		-- start build log message
@@ -826,15 +824,13 @@ BEGIN
 			-- update connec table
 			EXECUTE 'UPDATE temp_t_connec SET staticpressure =(b.head - b.elevation + (case when b.depth is null then 0 else b.depth end)::float) FROM 
 				(SELECT connec_id, head, elevation, depth FROM temp_t_connec c JOIN temp_t_link ON feature_id = connec_id
-				JOIN presszone p ON c.presszone_id = p.presszone_id
-				WHERE temp_t_link.state = 1 AND c.expl_id='||v_expl_id||' '||v_psectors_query_connec||') b
+				JOIN temp_presszone p ON c.presszone_id = p.presszone_id) b
 				WHERE temp_t_connec.connec_id=b.connec_id;';
 
 			-- update link table
 			EXECUTE 'UPDATE temp_t_link SET staticpressure =(b.head - b.elevation + (case when b.depth is null then 0 else b.depth end)::float) FROM 
 				(SELECT link_id, head, elevation, depth FROM temp_t_connec c JOIN temp_t_link ON feature_id = connec_id
-				JOIN presszone p ON c.presszone_id = p.presszone_id
-				WHERE c.expl_id='||v_expl_id||' '||v_psectors_query_connec||') b
+				JOIN temp_presszone p ON c.presszone_id = p.presszone_id) b
 				WHERE temp_t_link.link_id=b.link_id;';
 
 		END IF;
@@ -1341,9 +1337,7 @@ BEGIN
 
 			EXECUTE 'DELETE FROM om_waterbalance_dma_graph
 			WHERE node_id IN 
-			(SELECT node_id FROM om_waterbalance_dma_graph
-			JOIN node n USING (node_id)
-			WHERE n.expl_id = '||v_expl_id||' '||v_psectors_query_node||');';
+			(SELECT node_id FROM om_waterbalance_dma_graph JOIN temp_t_node n USING (node_id))';
 
 			INSERT INTO om_waterbalance_dma_graph SELECT * FROM temp_om_waterbalance_dma_graph ON CONFLICT (dma_id, node_id) DO NOTHING;
 			
