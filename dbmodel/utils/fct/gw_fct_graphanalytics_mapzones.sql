@@ -129,10 +129,6 @@ v_floodonlymapzone text;
 v_islastupdate boolean;
 v_commitchanges boolean;
 v_project_type text;
-v_psectors_query_arc text;
-v_psectors_query_node text;
-v_psectors_query_connec text;
-v_psectors_query_gully text;
 v_query_arc text;
 v_query_node text;
 v_query_connec text;
@@ -350,20 +346,6 @@ BEGIN
 			   FROM temp_t_anlgraph temp_t_anlgraph_1
 			  WHERE temp_t_anlgraph_1.water = 1) a2 ON temp_t_anlgraph.node_1::text = a2.node_2::text
 			  WHERE temp_t_anlgraph.flag < 2 AND temp_t_anlgraph.water = 0 AND a2.flag = 0;
-			
-		IF v_usepsector IS  TRUE THEN
-			v_psectors_query_arc = ' AND a.arc_id NOT IN (SELECT arc_id FROM v_plan_psector_arc WHERE plan_state = 0) OR a.arc_id IN (SELECT arc_id FROM v_plan_psector_arc WHERE plan_state = 1)';
-			v_psectors_query_node = 'AND n.node_id NOT IN (SELECT node_id FROM v_plan_psector_node WHERE plan_state = 0) OR n.node_id IN (SELECT node_id FROM v_plan_psector_node WHERE plan_state = 1)';
-			v_psectors_query_connec = 'AND c.connec_id NOT IN (SELECT connec_id FROM v_plan_psector_connec WHERE plan_state = 0) OR c.connec_id IN (SELECT connec_id FROM v_plan_psector_connec WHERE plan_state = 1)';
-			IF v_project_type='UD' THEN
-				v_psectors_query_gully = 'AND g.gully_id NOT IN (SELECT gully_id FROM v_plan_psector_gully WHERE plan_state = 0) OR g.gully_id IN (SELECT gully_id FROM v_plan_psector_gully WHERE plan_state = 1)';
-			END IF;
-		ELSE
-			v_psectors_query_arc='';
-			v_psectors_query_node='';
-			v_psectors_query_connec='';
-			v_psectors_query_gully='';
-		END IF;
 
 		-- reset rtc_scada_x_dma or rtc_scada_x_dma
 		IF v_class = 'DMA' THEN
@@ -410,7 +392,7 @@ BEGIN
 		END IF;
 
 		-- fill temporal tables
-        IF v_usepsector IS  TRUE THEN
+		IF v_usepsector IS  TRUE THEN
 			v_query_arc = 'SELECT a.* FROM arc a JOIN v_edit_arc USING (arc_id) WHERE a.expl_id='||v_expl_id;
 			v_query_node = 'SELECT n.* FROM node n JOIN v_edit_node USING (node_id) WHERE n.expl_id='||v_expl_id;
 			v_query_connec = 'SELECT c.* FROM connec c JOIN v_edit_connec USING (connec_id) WHERE c.expl_id='||v_expl_id;
@@ -429,11 +411,8 @@ BEGIN
 		END IF;
         
 		EXECUTE 'INSERT INTO temp_t_arc '||v_query_arc;
-
 		EXECUTE 'INSERT INTO temp_t_node '||v_query_node;
-
 		EXECUTE 'INSERT INTO temp_t_connec '||v_query_connec;
-
 		EXECUTE 'INSERT INTO temp_t_link '||v_query_link;
 
 		IF v_project_type = 'UD' THEN
@@ -481,19 +460,19 @@ BEGIN
 				EXECUTE v_querytext;
 			END IF;		
 		END IF;
-
+		
 		-- fill the graph table
 		IF v_class = 'DRAINZONE' THEN
 			EXECUTE 'INSERT INTO temp_t_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
 			SELECT  arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0 FROM temp_t_arc a JOIN value_state_type ON state_type=id 
-			WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND value_state_type.is_operative=TRUE AND a.state = 1 and expl_id='||v_expl_id||' '||v_psectors_query_arc||';';
+			WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND value_state_type.is_operative=TRUE';
 		ELSE
 			EXECUTE 'INSERT INTO temp_t_anlgraph (arc_id, node_1, node_2, water, flag, checkf)
 			SELECT  arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0 FROM temp_t_arc a JOIN value_state_type ON state_type=id 
-			WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND value_state_type.is_operative=TRUE AND a.state = 1  and expl_id='||v_expl_id||' '||v_psectors_query_arc||'
+			WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND value_state_type.is_operative=TRUE
 			UNION
 			SELECT  arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0 FROM temp_t_arc a JOIN value_state_type ON state_type=id 
-			WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND value_state_type.is_operative=TRUE AND a.state = 1  and expl_id='||v_expl_id||' '||v_psectors_query_arc||';';
+			WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND value_state_type.is_operative=TRUE';
 		END IF;
 
 		IF v_netscenario IS NOT NULL THEN
@@ -874,46 +853,46 @@ BEGIN
 
 				-- manage conflicts (nodes no headers and no stoppers with different mapzones)
 				FOR rec_conflict IN EXECUTE 'SELECT DISTINCT mapzone FROM (WITH qt AS (
-					SELECT node_id, mpz FROM (SELECT node_id, mpz FROM 
-					(SELECT arc_id, node_1 as node_id, '||v_field||'::text  as mpz FROM temp_t_arc a WHERE expl_id = '||v_expl_id||' and state = 1 '||v_psectors_query_arc||'
-					UNION SELECT arc_id, node_2, '||v_field||'::text FROM temp_t_arc a WHERE expl_id = '||v_expl_id||' and state = 1 '||v_psectors_query_arc||') a JOIN 
-					(SELECT DISTINCT ON (arc_id) arc_id, flag, isheader FROM temp_t_anlgraph)b USING (arc_id) 
-					WHERE flag = 0 and isheader is not true group by node_id, mpz
-					) a group by node_id, mpz)
-					SELECT DISTINCT ON (node_id) node_id, concat(quote_literal(a.mpz),'','', quote_literal(b.mpz)) as mapzone FROM qt a JOIN qt b USING (node_id)
-					WHERE a.mpz::text != b.mpz::text AND a.mpz::text !=''0'' AND b.mpz::text !=''0'') a'
+						SELECT node_id, mpz FROM (SELECT node_id, mpz FROM 
+						(SELECT arc_id, node_1 as node_id, '||v_field||'::text  as mpz FROM temp_t_arc UNION SELECT arc_id, node_2, '||v_field||'::text FROM temp_t_arc) a JOIN 
+						(SELECT DISTINCT ON (arc_id) arc_id, flag, isheader FROM temp_t_anlgraph)b USING (arc_id) 
+						WHERE flag = 0 and isheader is not true group by node_id, mpz
+						) a group by node_id, mpz)
+						SELECT DISTINCT ON (node_id) node_id, concat(quote_literal(a.mpz),'','', quote_literal(b.mpz)) as mapzone FROM qt a JOIN qt b USING (node_id)
+						WHERE a.mpz::text != b.mpz::text AND a.mpz::text !=''0'' AND b.mpz::text !=''0'') a'
 
 				LOOP
 					RAISE NOTICE 'Managing conflicts -> %', rec_conflict;
 			
 					-- update & count features
 					--arc
-					EXECUTE 'UPDATE temp_t_arc t SET '||v_field||' = -1 FROM temp_t_arc a WHERE a.state = 1 and a.expl_id = '||v_expl_id||' and t.arc_id =a.arc_id AND t.'||v_field||'::text IN ('||
-					rec_conflict.mapzone||') '||v_psectors_query_arc||';';
+					EXECUTE 'UPDATE temp_t_arc t SET '||v_field||' = -1  WHERE '||v_field||'::text IN ('||rec_conflict.mapzone||')';
 					GET DIAGNOSTICS v_count1 = row_count;
+					raise notice 'Updated % conflict rows on arc', v_count1; 
 					
 					-- node
-					EXECUTE 'UPDATE temp_t_node t SET '||v_field||' = -1 FROM temp_t_node n WHERE  n.state = 1 and n.expl_id = '||v_expl_id||' and t.node_id = n.node_id AND t.'||v_field||'::text IN ('||
-					rec_conflict.mapzone||') '||v_psectors_query_node||';';
-
+					EXECUTE 'UPDATE temp_t_node t SET '||v_field||' = -1  WHERE '||v_field||'::text IN ('||rec_conflict.mapzone||')';
+					GET DIAGNOSTICS v_count1 = row_count;
+					raise notice 'Updated % conflict rows on node', v_count1; 
+				
 					-- connec
-					EXECUTE 'UPDATE temp_t_connec t SET '||v_field||'  = -1 FROM temp_t_connec c WHERE c.state = 1 and c.expl_id = '||v_expl_id||' and t.connec_id = c.connec_id AND t.'||v_field||'::text IN ('||
-					rec_conflict.mapzone||') '||v_psectors_query_connec||';';
+					EXECUTE 'UPDATE temp_t_connec t SET '||v_field||' = -1  WHERE '||v_field||'::text IN ('||rec_conflict.mapzone||')';
 					GET DIAGNOSTICS v_count = row_count;
+					raise notice 'Updated % conflict rows on connec', v_count; 
 
 					-- log
 					INSERT INTO temp_audit_check_data (fid,  criticity, error_message)
 					VALUES (v_fid, 2, concat('WARNING-395: There is a conflict against ',upper(v_table),'''s (',rec_conflict.mapzone,') with ',v_count1,' arc(s) and ',v_count,' connec(s) affected.'));
-							
+								
 					-- update mapzone geometry
 					IF v_netscenario IS NOT NULL THEN
 						EXECUTE 'UPDATE plan_netscenario_'||v_table||' SET the_geom = null WHERE '||v_fieldmp||'::text IN ('||rec_conflict.mapzone||') AND netscenario_id = '||v_netscenario||';';
 					ELSE 
 						EXECUTE 'UPDATE '||v_table||' SET the_geom = null WHERE '||v_fieldmp||'::text IN ('||rec_conflict.mapzone||')';
 					END IF;
+	
 					-- setting the graph for conflict
-					EXECUTE 'UPDATE temp_t_anlgraph t SET water = -1 FROM temp_t_arc a WHERE a.state = 1 and a.expl_id = '||v_expl_id||' and t.arc_id = a.arc_id AND a.'||v_field||'::integer = -1 '||
-					v_psectors_query_arc||'';
+					EXECUTE 'UPDATE temp_t_anlgraph t SET water = -1 FROM temp_t_arc v WHERE t.arc_id = v.arc_id AND v.'||v_field||'::integer = -1';
 				END LOOP;
 			END IF;
 
@@ -922,13 +901,13 @@ BEGIN
 				v_querytext = ' INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 				SELECT '||v_fid||', 0, concat('||v_mapzonename||','' with '', arcs, '' Arcs, '',nodes, '' Nodes, '', case when connecs is null then 0 else connecs end, '' Connecs and '',
 				 case when gullies is null then 0 else gullies end, '' Gullies'')
-				FROM (SELECT '||(v_field)||', count(*) as arcs FROM temp_t_arc a WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_arc||
+				FROM (SELECT '||(v_field)||', count(*) as arcs FROM temp_t_arc a WHERE '||(v_field)||'::integer > 0 '
 				' GROUP BY '||(v_field)||')e
-				LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM temp_t_node n WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_node||
+				LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM temp_t_node n WHERE '||(v_field)||'::integer > 0 '
 				' GROUP BY '||(v_field)||')b USING ('||(v_field)||')
-				LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM temp_t_connec c WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_connec||
+				LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM temp_t_connec c WHERE '||(v_field)||'::integer > 0 '
 				' GROUP BY '||(v_field)||')c USING ('||(v_field)||')
-				LEFT JOIN (SELECT '||(v_field)||', count(*) as gullies FROM temp_t_gully g WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_gully||
+				LEFT JOIN (SELECT '||(v_field)||', count(*) as gullies FROM temp_t_gully g WHERE  and '||(v_field)||'::integer > 0 '
 				' GROUP BY '||(v_field)||')d USING ('||(v_field)||')
 				JOIN '||(v_table)||' p ON e.'||(v_field)||' = p.'||(v_field);
 				EXECUTE v_querytext;
@@ -936,20 +915,16 @@ BEGIN
 				IF v_netscenario IS NOT NULL THEN
 					v_querytext = ' INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 					SELECT '||v_fid||', 0, concat('||v_mapzonename||','' with '', arcs, '' Arcs, '',nodes, '' Nodes and '', case when connecs is null then 0 else connecs end, '' Connecs'')
-					FROM (SELECT '||(v_field)||', count(*) as arcs FROM temp_t_arc a WHERE state = 1 and expl_id = '||v_expl_id||' and  '||(v_field)||'::integer > 0 '||v_psectors_query_arc||' GROUP BY '||(v_field)||')e
-					LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM temp_t_node n WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_node||
-					' GROUP BY '||(v_field)||')b USING ('||(v_field)||')
-					LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM temp_t_connec c WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_connec||
-					' GROUP BY '||(v_field)||')c USING ('||(v_field)||')
+					FROM (SELECT '||(v_field)||', count(*) as arcs FROM temp_t_arc a WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')e
+					LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM temp_t_node n WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')b USING ('||(v_field)||')
+					LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM temp_t_connec c WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')c USING ('||(v_field)||')
 					JOIN plan_netscenario_'||(v_table)||' p ON e.'||(v_field)||' = p.'||(v_field);
 				ELSE
 					v_querytext = ' INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 					SELECT '||v_fid||', 0, concat('||v_mapzonename||','' with '', arcs, '' Arcs, '',nodes, '' Nodes and '', case when connecs is null then 0 else connecs end, '' Connecs'')
-					FROM (SELECT '||(v_field)||', count(*) as arcs FROM temp_t_arc a WHERE state = 1 and expl_id = '||v_expl_id||' and  '||(v_field)||'::integer > 0 '||v_psectors_query_arc||' GROUP BY '||(v_field)||')e
-					LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM temp_t_node n WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_node||
-					' GROUP BY '||(v_field)||')b USING ('||(v_field)||')
-					LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM temp_t_connec c WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_connec||
-					' GROUP BY '||(v_field)||')c USING ('||(v_field)||')
+					FROM (SELECT '||(v_field)||', count(*) as arcs FROM temp_t_arc a WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')e
+					LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM temp_t_node n WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')b USING ('||(v_field)||')
+					LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM temp_t_connec c WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')c USING ('||(v_field)||')
 					JOIN '||(v_table)||' p ON e.'||(v_field)||' = p.'||(v_field);
 				END IF;
 
@@ -961,13 +936,10 @@ BEGIN
 				v_querytext = ' INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 				SELECT '||v_fid||', 0, concat('||v_mapzonename||','' with '', arcs, '' Arcs, '',nodes, '' Nodes, '', case when connecs is null then 0 else connecs end, '' Connecs and '',
 				 case when gullies is null then 0 else gullies end, '' Gullies'')
-				FROM (SELECT '||(v_field)||', count(*) as arcs FROM temp_t_arc a  WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_arc||' GROUP BY '||(v_field)||')e
-				LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM temp_t_node n WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_node||
-				' GROUP BY '||(v_field)||')b USING ('||(v_field)||')
-				LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM temp_t_connec c WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_connec||
-				' GROUP BY '||(v_field)||')c USING ('||(v_field)||')
-				LEFT JOIN (SELECT '||(v_field)||', count(*) as gullies FROM temp_t_gully g WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_gully||
-				' GROUP BY '||(v_field)||')d USING ('||(v_field)||')
+				FROM (SELECT '||(v_field)||', count(*) as arcs FROM temp_t_arc a  WHERE '||(v_field)||'::integer > 0  GROUP BY '||(v_field)||')e
+				LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM temp_t_node n WHERE '||(v_field)||'::integer > 0  GROUP BY '||(v_field)||')b USING ('||(v_field)||')
+				LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM temp_t_connec c WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')c USING ('||(v_field)||')
+				LEFT JOIN (SELECT '||(v_field)||', count(*) as gullies FROM temp_t_gully g WHERE '||(v_field)||'::integer > 0  GROUP BY '||(v_field)||')d USING ('||(v_field)||')
 				JOIN '||(v_table)||' p ON e.'||(v_field)||' = p.'||(v_field)||'
 				WHERE a.'||(v_field)||'::text = '||quote_literal(v_floodonlymapzone);
 				EXECUTE v_querytext;
@@ -975,23 +947,17 @@ BEGIN
 				IF v_netscenario IS NOT NULL THEN
 					v_querytext = ' INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 					SELECT '||v_fid||', 0, concat('||v_mapzonename||','' with '', arcs, '' Arcs, '',nodes, '' Nodes and '', case when connecs is null then 0 else connecs end, '' Connecs'')
-					FROM (SELECT '||(v_field)||', count(*) as arcs FROM temp_t_arc a WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_arc||
-					' GROUP BY '||(v_field)||')e
-					LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM temp_t_node n WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_node||
-					' GROUP BY '||(v_field)||')b USING ('||(v_field)||')
-					LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM temp_t_connec c WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_connec||
-					' GROUP BY '||(v_field)||')c USING ('||(v_field)||')
+					FROM (SELECT '||(v_field)||', count(*) as arcs FROM temp_t_arc a WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')e
+					LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM temp_t_node n WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')b USING ('||(v_field)||')
+					LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM temp_t_connec c WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')c USING ('||(v_field)||')
 					JOIN plan_netscenario_'||(v_table)||' p ON e.'||(v_field)||' = p.'||(v_field)||'
 					WHERE p.'||(v_field)||'::text = '||quote_literal(v_floodonlymapzone)||'::text';
 				ELSE
 					v_querytext = ' INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 					SELECT '||v_fid||', 0, concat('||v_mapzonename||','' with '', arcs, '' Arcs, '',nodes, '' Nodes and '', case when connecs is null then 0 else connecs end, '' Connecs'')
-					FROM (SELECT '||(v_field)||', count(*) as arcs FROM temp_t_arc a WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_arc||
-					' GROUP BY '||(v_field)||')e
-					LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM temp_t_node n WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_node||
-					' GROUP BY '||(v_field)||')b USING ('||(v_field)||')
-					LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM temp_t_connec c WHERE state = 1 and expl_id = '||v_expl_id||' and '||(v_field)||'::integer > 0 '||v_psectors_query_connec||
-					' GROUP BY '||(v_field)||')c USING ('||(v_field)||')
+					FROM (SELECT '||(v_field)||', count(*) as arcs FROM temp_t_arc a WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')e
+					LEFT JOIN (SELECT '||(v_field)||', count(*) as nodes FROM temp_t_node n WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')b USING ('||(v_field)||')
+					LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM temp_t_connec c WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')c USING ('||(v_field)||')
 					JOIN '||(v_table)||' p ON e.'||(v_field)||' = p.'||(v_field)||'
 					WHERE p.'||(v_field)||'::text = '||quote_literal(v_floodonlymapzone)||'::text';
 				END IF;
