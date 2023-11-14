@@ -262,6 +262,12 @@ BEGIN
 	FROM v_edit_inp_flwreg_weir
 	LEFT JOIN inp_typevalue ON inp_typevalue.id::text = v_edit_inp_flwreg_weir.weir_type::text
 	WHERE inp_typevalue.typevalue::text = 'inp_value_weirs';
+	
+	-- filling empty values
+	UPDATE temp_t_node SET y0=0 where y0 IS NULL;
+	UPDATE temp_t_node SET ysur=0 where ysur IS NULL;
+
+	UPDATE temp_t_arc SET q0=0 where q0 IS NULL;
 
 	-- rpt_inp_raingage
 	INSERT INTO temp_rpt_inp_raingage
