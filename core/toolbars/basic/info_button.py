@@ -95,19 +95,6 @@ class GwInfoButton(GwMaptool):
 
     # region private functions
 
-    def _create_point(self, event):
-
-        x = event.pos().x()
-        y = event.pos().y()
-        try:
-            point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
-        except(TypeError, KeyError):
-            self.iface.actionPan().trigger()
-            return False
-
-        return point
-
-
     def _reactivate_map_tool(self):
         """ Reactivate tool """
 
@@ -336,7 +323,7 @@ class GwInfoButton(GwMaptool):
 
         if event.button() == Qt.LeftButton:
 
-            point = self._create_point(event)
+            point = tools_qgis.create_point(self.canvas, self.iface, event)
             if point is False:
                 return
             tools_gw.init_docker()
@@ -349,7 +336,7 @@ class GwInfoButton(GwMaptool):
             self.previous_info_feature = info_feature
 
         elif event.button() == Qt.RightButton:
-            point = self._create_point(event)
+            point = tools_qgis.create_point(self.canvas, self.iface, event)
             if point is False:
                 return
 

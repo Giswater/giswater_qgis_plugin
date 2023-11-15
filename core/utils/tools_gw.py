@@ -32,9 +32,8 @@ from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, Qg
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsDataSourceUri, \
-    QgsProviderRegistry, QgsMapLayerStyle, QgsGeometry
+    QgsProviderRegistry, QgsMapLayerStyle, QgsGeometry, QgsWkbTypes
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand
-from qgis.core import QgsWkbTypes
 
 from ..models.cat_feature import GwCatFeature
 from ..ui.dialog import GwDialog

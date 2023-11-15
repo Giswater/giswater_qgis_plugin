@@ -35,6 +35,8 @@ class GwFlowTraceButton(GwMaptool):
             self.snapper_manager.add_marker(result, self.vertex_marker)
             # Data for function
             self.snapped_feat = self.snapper_manager.get_snapped_feature(result)
+        else:
+            self.snapped_feat = None
 
 
     def canvasReleaseEvent(self, event):
@@ -82,9 +84,15 @@ class GwFlowTraceButton(GwMaptool):
         if event.button() == Qt.LeftButton and self.current_layer:
 
             # Execute SQL function
-            elem_id = self.snapped_feat.attribute('node_id')
-            feature_id = f'"id":["{elem_id}"]'
-            body = tools_gw.create_body(feature=feature_id)
+            if self.snapped_feat is None:
+                elem_id = 'null'
+            else:
+                elem_id = f"""{self.snapped_feat.attribute('node_id')}"""
+            feature_id = f'"id":[{elem_id}]'
+            point = tools_qgis.create_point(self.canvas, self.iface, event)
+            scale_zoom = self.iface.mapCanvas().scale()
+            extras = f' "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
+            body = tools_gw.create_body(feature=feature_id, extras=extras)
             result = tools_gw.execute_procedure('gw_fct_graphanalytics_upstream', body)
             if not result or result['status'] == 'Failed':
                 return
