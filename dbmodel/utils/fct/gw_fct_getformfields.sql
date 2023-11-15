@@ -115,7 +115,7 @@ BEGIN
 		
 
 	IF p_filterfield IS NOT NULL AND p_filterfield!='' THEN
-		v_filter_widgets = ' AND columnname NOT IN('||quote_literal(p_filterfield)||') ';
+		v_filter_widgets = ' AND columnname NOT IN('||(p_filterfield)||') ';
 
 	END IF;
 
