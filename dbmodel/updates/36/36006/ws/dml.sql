@@ -29,15 +29,21 @@ UPDATE config_form_fields set iseditable = false  where formname = 've_epa_pump'
 UPDATE sys_param_user SET "label"='Hydraulic timestep' WHERE id='inp_times_hydraulic_timestep';
 
 
-UPDATE config_report SET query_text = '
-SELECT w.exploitation as "Exploitation", w.dma as "Dma", period as "Period", 
+UPDATE config_report SET query_text = 
+'SELECT w.exploitation as "Exploitation", w.dma as "Dma", period as "Period", 
 total_in::numeric(20,2) as "Total inlet",
 total_out::numeric(20,2) as "Total outlet",
 total::numeric(20,2) as "Total injected",
 auth as "Authorized Vol.", 
 loss as "Losses Vol.", 
 (case when total > 0 then 100*(1-auth/total)::numeric(20,2) else 0.00 end) as "NRW"
-FROM v_om_waterbalance w'
+FROM v_om_waterbalance w', 
+filterparam = '[{"columnname":"Exploitation", "label":"Exploitation:", "widgettype":"combo","datatype":"text","layoutorder":1,
+"dvquerytext":"Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER by name","isNullValue":"true"},
+{"columnname":"Dma", "label":"Dma:", "widgettype":"combo","datatype":"text","layoutorder":2,
+"dvquerytext":"Select name as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0 ORDER BY name","isNullValue":"true"},
+{"columnname":"Period", "label":"Period:", "widgettype":"combo","datatype":"text","layoutorder":1,
+"dvquerytext":"Select code as id, code as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY end_date DESC","isNullValue":"true"}]'
 WHERE id = 102;
 
 UPDATE config_report SET query_text = 
@@ -95,3 +101,9 @@ UPDATE cat_arc SET shape='CIRCULAR' WHERE shape IS NULL;
 ALTER TABLE cat_arc ALTER COLUMN shape SET NOT NULL;
 
 UPDATE config_fprocess SET orderby=4 WHERE fid=239 AND tablename='vi_curves';
+
+UPDATE config_toolbox SET inputparams='[{"widgetname":"executeGraphDma", "label":"Execute Graph for DMA:", "widgettype":"check","datatype":"boolean","tooltip":"If true, graphaanalytics mapzones will be triggered for DMA and expl selected" , "layoutname":"grl_option_parameters","layoutorder":1,"value":""},
+{"widgetname":"exploitation", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":2, "value":""},
+{"widgetname":"period", "label":"Period:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT id, code as idval FROM ext_cat_period ORDER BY end_date DESC", "layoutname":"grl_option_parameters","layoutorder":3, "value":""},
+{"widgetname":"method", "label":"Method:","widgettype":"combo","datatype":"text","isMandatory":true,"tooltip":"Water balance method", "dvQueryText":"SELECT id, idval FROM om_typevalue WHERE typevalue = ''waterbalance_method''", "layoutname":"grl_option_parameters","layoutorder":4, "value":""}
+]'::json WHERE id=3142;
