@@ -79,3 +79,6 @@ VALUES(522, 'Check outfalls with more than 1 arc', 'utils', NULL, 'core', true, 
 
 INSERT INTO sys_message (id, error_message, log_level, show_user, project_type, "source")
 VALUES(3250, 'Value 0 for exploitation it is not enabled on network objects. It is only used to relate undefined mapzones', 2, true, 'utils', 'core');
+
+-- 15/11/23
+ALTER TABLE cat_arc ALTER COLUMN shape SET NOT NULL;
