@@ -35,14 +35,8 @@ BEGIN
     --nullif function returns null instead of cast value error in case when there is no value in the inp data
     
    IF TG_OP = 'INSERT' THEN
-
-	  IF v_view='vi_reservoirs' THEN
-	    INSERT INTO node (node_id, elevation, nodecat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
-	    VALUES (NEW.node_id, NEW.head,'RESERVOIR','RESERVOIR',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1)) ;
-	    INSERT INTO inp_reservoir (node_id, pattern_id) VALUES (NEW.node_id, NEW.pattern_id);
-	    INSERT INTO man_source(node_id) VALUES (NEW.node_id); 
 	    
-	  ELSIF v_view='vi_tanks' THEN
+	  IF v_view='vi_tanks' THEN
 	    INSERT INTO node (node_id, elevation, nodecat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
 	    VALUES (NEW.node_id, NEW.elevation,'TANK','TANK',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1));
 	    INSERT INTO inp_tank (node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow) 

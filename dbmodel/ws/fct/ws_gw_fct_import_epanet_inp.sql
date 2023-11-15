@@ -407,6 +407,12 @@ BEGIN
 			-- insert rules
 			INSERT INTO inp_rules (sector_id, text, active)
 			select 1, csv1, true FROM temp_csv where source='[RULES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';-%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
+		
+			-- insert reservoirs
+			INSERT INTO node (node_id, elevation, nodecat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
+			select csv1, csv2::numeric(12,3), 'RESERVOIR','RESERVOIR',1,1,1,1,2 FROM temp_csv where source='[RESERVOIRS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
+			INSERT INTO inp_reservoir (node_id, pattern_id) select csv1, csv3 FROM temp_csv where source='[RESERVOIRS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
+			INSERT INTO man_source(node_id) select csv1 FROM temp_csv where source='[RESERVOIRS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
 
 
 			-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
