@@ -230,11 +230,13 @@ BEGIN
 
 	-- Manage primary key
 	EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_addparam USING v_tablename;
-	p_idname_aux = v_addparam ->> 'pkey';
 	v_idname_array := string_to_array(p_idname_aux, ', ');
 	if v_idname_array is null THEN
 		EXECUTE 'SELECT gw_fct_getpkeyfield('''||v_tablename||''');' INTO v_pkeyfield;
+		p_idname_aux = v_pkeyfield;
 		v_idname_array := string_to_array(v_pkeyfield, ', ');
+	else
+		p_idname_aux = v_addparam ->> 'pkey';
 	end if;
 
 	v_id_array := string_to_array(p_id, ', ');

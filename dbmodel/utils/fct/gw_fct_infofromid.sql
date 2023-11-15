@@ -141,7 +141,6 @@ v_zone text;
 v_id_array text[];
 v_idname_array text[];
 column_type_id_array text[];
-column_type_id character varying;
 i integer=1;
 v_querytext text;
 idname text;
@@ -231,8 +230,8 @@ BEGIN
 				    AND s.nspname = $1
 				    ORDER BY a.attnum'
 			    USING v_schemaname, v_tablename, idname
-			    INTO column_type_id;
-				column_type_id_array[i] := column_type_id;
+			    INTO column_type;
+				column_type_id_array[i] := column_type;
 				i=i+1;
 			END LOOP;
 		else
@@ -247,7 +246,7 @@ BEGIN
 			    AND s.nspname = $1
 			    ORDER BY a.attnum'
 	            USING v_schemaname, v_tablename, v_idname
-	            INTO column_type_id;
+	            INTO column_type;
 		end if;
 
 		-- Get Epa Type
@@ -456,8 +455,8 @@ BEGIN
 					    AND s.nspname = $1
 					    ORDER BY a.attnum'
 				    USING v_schemaname, v_tablename, idname
-				    INTO column_type_id;
-					column_type_id_array[i] := column_type_id;
+				    INTO column_type;
+					column_type_id_array[i] := column_type;
 					i=i+1;
 				END LOOP;
 			else
@@ -472,7 +471,7 @@ BEGIN
 				    AND s.nspname = $1
 				    ORDER BY a.attnum'
 		            USING v_schemaname, v_tablename, v_idname
-		            INTO column_type_id;
+		            INTO column_type;
 			end if;
 
 		end if;
