@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
-from qgis.core import QgsEditFormConfig
+from qgis.core import Qgis, QgsEditFormConfig
 
 from .task import GwTask
 from ..utils import tools_gw
@@ -106,7 +106,10 @@ class GwProjectLayersConfig(GwTask):
             if layer is None:
                 continue
             config = layer.editFormConfig()
-            config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.Default)
+            if Qgis.QGIS_VERSION_INT >= 33200:
+                config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.Default)
+            else:
+                config.setSuppress(0)
             layer.setEditFormConfig(config)
 
 

@@ -21,7 +21,7 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox
-from qgis.core import QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY, QgsProject
+from qgis.core import Qgis, QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY, QgsProject
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
 
 from .catalog import GwCatalog
@@ -296,7 +296,10 @@ class GwInfo(QObject):
             QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
             config = self.info_layer.editFormConfig()
             self.conf_supp = config.suppress()
-            config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.Default)
+            if Qgis.QGIS_VERSION_INT >= 33200:
+                config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.Default)
+            else:
+                config.setSuppress(0)
             self.info_layer.setEditFormConfig(config)
             self.iface.setActiveLayer(self.info_layer)
             self.info_layer.startEditing()
