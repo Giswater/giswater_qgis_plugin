@@ -89,3 +89,7 @@ UPDATE sys_message SET hint_message='Unlink hydrometers first or set edit_connec
 
 INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('rpt_arc_stats', 'Table to store result stats in order to gain performance showing results', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('rpt_node_stats', 'Table to store result stats in order to gain performance showing results', 'role_epa', 'core') ON CONFLICT (id) DO NOTHING;
+
+-- 15/11/23
+UPDATE cat_arc SET shape='CIRCULAR' WHERE shape IS NULL;
+ALTER TABLE cat_arc ALTER COLUMN shape SET NOT NULL;
