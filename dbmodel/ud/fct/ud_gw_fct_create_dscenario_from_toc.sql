@@ -118,7 +118,7 @@ BEGIN
 	ELSE 
 		-- getting columns
 		IF v_targettable = 'inp_dscenario_conduit' THEN
-			v_columns = v_scenarioid||', arc_id, arccat_id, matcat_id, custom_n, barrels, culvert, kentry, kexit,kavg, flap, q0, qmax, seepage, elev1, elev2';
+			v_columns = v_scenarioid||', arc_id, arccat_id, matcat_id, custom_n, barrels, culvert, kentry, kexit,kavg, flap, q0, qmax, seepage';
 			
 		ELSIF v_targettable = 'inp_dscenario_divider' THEN
 			v_columns = v_scenarioid||', node_id, elev, ymax, divider_type, arc_id, curve_id, qmin, ht, cd, y0, ysur, apond';
@@ -144,7 +144,7 @@ BEGIN
 			v_columns = v_scenarioid||', poll_id,  node_id, timser_id, form_type, mfactor, factor, base, pattern_id';
 						
 	 	ELSIF v_targettable = 'inp_dscenario_junction' THEN
-			v_columns = v_scenarioid||', node_id, y0, ysur, apond, outfallparam::json, elev, ymax';
+			v_columns = v_scenarioid||', node_id, y0, ysur, apond, outfallparam::json';
 
 		ELSIF v_targettable = 'inp_dscenario_lid_usage' THEN
 			v_columns = v_scenarioid||', subc_id, '||quote_literal(v_lidco)||', null, area, width, null, null, null, null, descript';
