@@ -7,6 +7,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+UPDATE config_param_user SET value = true where parameter = 'plan_psector_force_delete';
+
 UPDATE arc SET sector_id = expl_id;
 UPDATE node SET sector_id = expl_id;
 UPDATE connec SET sector_id = expl_id;
@@ -42,3 +44,4 @@ DELETE FROM plan_psector;
 
 DELETE FROM rpt_cat_result;
 
+UPDATE config_param_user SET value = false where parameter = 'plan_psector_force_delete';
