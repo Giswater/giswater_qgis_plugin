@@ -93,3 +93,5 @@ INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('rpt_node_stats', 
 -- 15/11/23
 UPDATE cat_arc SET shape='CIRCULAR' WHERE shape IS NULL;
 ALTER TABLE cat_arc ALTER COLUMN shape SET NOT NULL;
+
+UPDATE config_fprocess SET orderby=4 WHERE fid=239 AND tablename='vi_curves';
