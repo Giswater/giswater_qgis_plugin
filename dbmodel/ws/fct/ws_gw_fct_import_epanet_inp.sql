@@ -413,10 +413,21 @@ BEGIN
 			select csv1, csv2::numeric(12,3), 'RESERVOIR','RESERVOIR',1,1,1,1,2 FROM temp_csv where source='[RESERVOIRS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
 			INSERT INTO inp_reservoir (node_id, pattern_id) select csv1, csv3 FROM temp_csv where source='[RESERVOIRS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
 			INSERT INTO man_source(node_id) select csv1 FROM temp_csv where source='[RESERVOIRS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
+		
+			-- insert tanks
+			INSERT INTO node (node_id, elevation, nodecat_id, epa_type,sector_id, dma_id, expl_id, state, state_type) 
+			select csv1, csv2::numeric(12,3), 'TANK','TANK',1,1,1,1,2 FROM temp_csv where source='[TANKS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
+			
+			INSERT INTO inp_tank (node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow) 
+			SELECT csv1, csv3::numeric(12,3), csv4::numeric(12,3), csv5::numeric(12,3), csv6::numeric(12,3), csv7::numeric(12,3), NULL, NULL FROM temp_csv where source='[TANKS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
+			
+			INSERT INTO man_tank (node_id) 
+			select csv1 FROM temp_csv where source='[TANKS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
 
 
 			-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
-			FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid AND tablename NOT IN ('vi_pipes', 'vi_junctions', 'vi_valves', 'vi_status', 'vi_controls', 'vi_rules', 'vi_coordinates') order by orderby
+			FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid AND tablename 
+			NOT IN ('vi_tanks', 'vi_reservoirs', 'vi_pipes', 'vi_junctions', 'vi_valves', 'vi_status', 'vi_controls', 'vi_rules', 'vi_coordinates') order by orderby
 			LOOP
 				--identifing the number of fields of the editable view
 				FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns 
