@@ -71,7 +71,7 @@ UPDATE config_csv SET descript='The csv file must have the following fields:
 hydrometer_id, cat_period_id, sum, value_date (optional), value_type (optional), value_status (optional), value_state (optional)' WHERE fid=470 AND alias='Import hydrometer_x_data';
 
 UPDATE config_csv SET descript='The csv file must have the following fields:
-id, start_date, end_date, period_seconds (optional), code' WHERE fid=471 AND alias='Import crm period values';
+id, start_date, end_date, period_seconds (optional), code', active = true WHERE fid=471 AND alias='Import crm period values';
 
 --11/11/2023
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) 
