@@ -16,3 +16,6 @@ CREATE INDEX IF NOT EXISTS plan_psector_expl_id ON plan_psector USING btree (exp
 
 -- 3/11/2023
 DROP TRIGGER IF EXISTS gw_trg_node_border ON node;
+
+-- 20/11/2023
+CREATE INDEX temp_csv_source ON temp_csv USING btree (source COLLATE pg_catalog."default");
