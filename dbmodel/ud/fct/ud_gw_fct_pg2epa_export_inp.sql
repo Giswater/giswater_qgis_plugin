@@ -9,8 +9,9 @@ This version of Giswater is provided by Giswater Association
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_export_swmm_inp(character varying);
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_export_swmm_inp(character varying, text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_export_inp(p_data json)
-RETURNS json AS
-$BODY$
+ RETURNS json
+ LANGUAGE plpgsql
+AS $function$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
@@ -290,7 +291,7 @@ BEGIN
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_dwf AS
-	 SELECT temp_rpt_inp_node.node_id,
+	 SELECT temp_t_node.node_id,
 	    'FLOW'::text AS type_dwf,
 	    inp_dwf.value,
 	    inp_dwf.pat1,
@@ -298,13 +299,13 @@ BEGIN
 	    inp_dwf.pat3,
 	    inp_dwf.pat4
 	   FROM selector_inp_result,
-	    temp_rpt_inp_node
-	     JOIN inp_dwf ON inp_dwf.node_id::text = temp_rpt_inp_node.node_id::text
-	  WHERE temp_rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND inp_dwf.dwfscenario_id = (( SELECT config_param_user.value::integer AS value
+	    temp_t_node
+	     JOIN inp_dwf ON inp_dwf.node_id::text = temp_t_node.node_id::text
+	  WHERE temp_t_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND inp_dwf.dwfscenario_id = (( SELECT config_param_user.value::integer AS value
 		   FROM config_param_user
 		  WHERE config_param_user.parameter::text = 'inp_options_dwfscenario'::text AND config_param_user.cur_user::text = CURRENT_USER))
 	UNION
-	 SELECT temp_rpt_inp_node.node_id,
+	 SELECT temp_t_node.node_id,
 	    inp_dwf_pol_x_node.poll_id AS type_dwf,
 	    inp_dwf_pol_x_node.value,
 	    inp_dwf_pol_x_node.pat1,
@@ -312,9 +313,9 @@ BEGIN
 	    inp_dwf_pol_x_node.pat3,
 	    inp_dwf_pol_x_node.pat4
 	   FROM selector_inp_result,
-	    temp_rpt_inp_node
-	     JOIN inp_dwf_pol_x_node ON inp_dwf_pol_x_node.node_id::text = temp_rpt_inp_node.node_id::text
-	  WHERE temp_rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND inp_dwf_pol_x_node.dwfscenario_id = (( SELECT config_param_user.value::integer AS value
+	    temp_t_node
+	     JOIN inp_dwf_pol_x_node ON inp_dwf_pol_x_node.node_id::text = temp_t_node.node_id::text
+	  WHERE temp_t_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND inp_dwf_pol_x_node.dwfscenario_id = (( SELECT config_param_user.value::integer AS value
 		   FROM config_param_user
 		  WHERE config_param_user.parameter::text = 'inp_options_dwfscenario'::text AND config_param_user.cur_user::text = CURRENT_USER));
 
@@ -817,13 +818,13 @@ BEGIN
 	  WHERE inp_typevalue.typevalue::text = 'inp_typevalue_raingage'::text AND r.rgage_type::text = 'FILE'::text AND s.result_id::text = r.result_id::text AND s.cur_user = CURRENT_USER;
 
 	CREATE OR REPLACE TEMP VIEW vi_t_rdii AS
-	 SELECT temp_rpt_inp_node.node_id,
+	 SELECT temp_t_node.node_id,
 	    inp_rdii.hydro_id,
 	    inp_rdii.sewerarea
 	   FROM selector_inp_result,
-	    temp_rpt_inp_node
-	     JOIN inp_rdii ON inp_rdii.node_id::text = temp_rpt_inp_node.node_id::text
-	  WHERE temp_rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text;
+	    temp_t_node
+	     JOIN inp_rdii ON inp_rdii.node_id::text = temp_t_node.node_id::text
+	  WHERE temp_t_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text;
 
 
 
@@ -1100,9 +1101,42 @@ BEGIN
 	     JOIN inp_pattern_value USING (pattern_id)
 	     JOIN (select pattern_id FROM vi_t_aquifers UNION select monthly_adj FROM vi_t_adjustments UNION select pattern_id FROM vi_t_inflows UNION 
 		  select pat1 FROM vi_t_dwf UNION select pat2 FROM vi_t_dwf UNION select pat3 FROM vi_t_dwf UNION select pat4 FROM vi_t_dwf) a USING (pattern_id)  
-	     WHERE p.active AND p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
-	     ORDER BY p.pattern_id;
-
+	     WHERE p.active AND p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text 
+		 WHERE p.active AND p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text 
+	     union 
+	      SELECT p.pattern_id,
+	    p.pattern_type,
+	    inp_pattern_value.factor_1,
+	    inp_pattern_value.factor_2,
+	    inp_pattern_value.factor_3,
+	    inp_pattern_value.factor_4,
+	    inp_pattern_value.factor_5,
+	    inp_pattern_value.factor_6,
+	    inp_pattern_value.factor_7,
+	    inp_pattern_value.factor_8,
+	    inp_pattern_value.factor_9,
+	    inp_pattern_value.factor_10,
+	    inp_pattern_value.factor_11,
+	    inp_pattern_value.factor_12,
+	    inp_pattern_value.factor_13,
+	    inp_pattern_value.factor_14,
+	    inp_pattern_value.factor_15,
+	    inp_pattern_value.factor_16,
+	    inp_pattern_value.factor_17,
+	    inp_pattern_value.factor_18,
+	    inp_pattern_value.factor_19,
+	    inp_pattern_value.factor_20,
+	    inp_pattern_value.factor_21,
+	    inp_pattern_value.factor_22,
+	    inp_pattern_value.factor_23,
+	    inp_pattern_value.factor_24
+	   FROM selector_expl s,
+	    inp_pattern p
+	     JOIN inp_pattern_value USING (pattern_id)
+	     JOIN (select pattern_id FROM vi_t_aquifers UNION select monthly_adj FROM vi_t_adjustments UNION select pattern_id FROM vi_t_inflows UNION 
+		  select pat1 FROM vi_t_dwf UNION select pat2 FROM vi_t_dwf UNION select pat3 FROM vi_t_dwf UNION select pat4 FROM vi_t_dwf) a USING (pattern_id)  
+	     WHERE p.active AND p.expl_id is null
+	     ORDER BY pattern_id;
 
 	CREATE OR REPLACE TEMP VIEW vi_t_timeseries AS
 	SELECT 
@@ -1401,6 +1435,4 @@ BEGIN
 
 	RETURN v_return;
         
-END;$BODY$
-LANGUAGE plpgsql VOLATILE
-COST 100;
+END;$function$;

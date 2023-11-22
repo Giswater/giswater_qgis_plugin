@@ -26,3 +26,6 @@ UPDATE inp_curve SET active = true where active is null;
 UPDATE inp_typevalue SET descript = 'RECT_OPEN' WHERE typevalue = 'inp_value_weirs' AND id = 'ROADWAY';
 
 ALTER TABLE cat_arc ALTER COLUMN shape SET NOT NULL;
+
+--22/11/2023
+UPDATE inp_timeseries SET active = true where active is null;
