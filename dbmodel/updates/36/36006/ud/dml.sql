@@ -29,3 +29,4 @@ ALTER TABLE cat_arc ALTER COLUMN shape SET NOT NULL;
 
 --22/11/2023
 UPDATE inp_timeseries SET active = true where active is null;
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'CONTROLS', 'CONTROLS');
