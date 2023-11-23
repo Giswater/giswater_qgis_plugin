@@ -672,7 +672,11 @@ class GwMapzoneManager:
 
         # Get selected mapzone data
         index = tableview.selectionModel().currentIndex()
-        col_idx = tools_qt.get_col_index_by_col_name(tableview, f"{tablename.split('_')[-1].lower()}_id")
+        col_name = f"{tablename.split('_')[-1].lower()}_id"
+        if col_name == 'valve_id':
+            col_name = 'node_id'
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, col_name)
+
         mapzone_id = index.sibling(index.row(), col_idx).data()
         field_id = tableview.model().headerData(col_idx, Qt.Horizontal)
 
