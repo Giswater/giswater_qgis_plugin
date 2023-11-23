@@ -446,7 +446,7 @@ class GwPsector:
             partial(self._replace_arc))
         self.dlg_plan_psector.btn_arc_fusion.clicked.connect(
             partial(self._arc_fusion))
-        self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
+        self.dlg_plan_psector.btn_reports.clicked.connect(partial(self.open_dlg_reports))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_plan_psector, excluded_layers))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
@@ -511,7 +511,7 @@ class GwPsector:
         self.dlg_plan_psector.tab_feature.setCurrentIndex(0)
         tools_gw.get_signal_change_tab(self.dlg_plan_psector, excluded_layers)
 
-        widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
+        widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_reports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
         self.set_restriction_by_role(self.dlg_plan_psector, widget_to_ignore, restriction)
 
@@ -562,7 +562,7 @@ class GwPsector:
         tools_qt.set_widget_text(dialog, 'lbl_total_count', f'{"{:.2f}".format(total_result)} {symbol}')
 
 
-    def open_dlg_rapports(self):
+    def open_dlg_reports(self):
 
         default_file_name = tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.name)
 
@@ -574,7 +574,7 @@ class GwPsector:
         tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_csv_path', default_file_name + ".csv")
 
         self.dlg_psector_rapport.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_psector_rapport))
-        self.dlg_psector_rapport.btn_ok.clicked.connect(partial(self.generate_rapports))
+        self.dlg_psector_rapport.btn_ok.clicked.connect(partial(self.generate_reports))
         self.dlg_psector_rapport.btn_path.clicked.connect(
             partial(tools_qt.get_folder_path, self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path))
 
@@ -632,7 +632,7 @@ class GwPsector:
             tools_qt.set_combo_value(self.dlg_psector_rapport.cmb_templates, row[0], 1)
 
 
-    def generate_rapports(self):
+    def generate_reports(self):
 
         txt_path = f"{tools_qt.get_text(self.dlg_psector_rapport, 'txt_path')}"
         tools_gw.set_config_parser('btn_psector', 'psector_rapport_path', txt_path)
@@ -867,7 +867,7 @@ class GwPsector:
         self.dlg_plan_psector.btn_insert.setEnabled(enabled)
         self.dlg_plan_psector.btn_delete.setEnabled(enabled)
         self.dlg_plan_psector.btn_snapping.setEnabled(enabled)
-        widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
+        widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_reports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
         self.set_restriction_by_role(self.dlg_plan_psector, widget_to_ignore, restriction)
 
@@ -912,7 +912,7 @@ class GwPsector:
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, row[1])
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.vat, row[2])
 
-        widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
+        widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_reports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
         self.set_restriction_by_role(self.dlg_plan_psector, widget_to_ignore, restriction)
 

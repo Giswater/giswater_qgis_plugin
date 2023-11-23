@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>960</width>
-    <height>633</height>
+    <height>743</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -1004,8 +1004,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>916</width>
-            <height>246</height>
+            <width>908</width>
+            <height>289</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
@@ -1646,7 +1646,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="btn_rapports">
+          <widget class="QPushButton" name="btn_reports">
            <property name="minimumSize">
             <size>
              <width>150</width>
@@ -1657,7 +1657,7 @@
             <enum>Qt::TabFocus</enum>
            </property>
            <property name="text">
-            <string>Generate rapports</string>
+            <string>Generate report</string>
            </property>
           </widget>
          </item>
