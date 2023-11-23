@@ -379,6 +379,7 @@ class GwNetscenarioManagerButton(GwAction):
         self.dlg_netscenario.btn_update.clicked.connect(partial(self._manage_update))
         self.dlg_netscenario.btn_insert.clicked.connect(partial(self._manage_insert, None))
         self.dlg_netscenario.btn_delete.clicked.connect(partial(self._manage_delete))
+        self.dlg_netscenario.btn_mapzone_analysis.clicked.connect(partial(self._open_toolbox_function, 3256))
         self.dlg_netscenario.btn_snapping.clicked.connect(partial(self._manage_select))
         self.dlg_netscenario.main_tab.currentChanged.connect(partial(self._manage_current_changed))
         self.dlg_netscenario.finished.connect(self._selection_end)
@@ -493,16 +494,16 @@ class GwNetscenarioManagerButton(GwAction):
         index_tab = self.dlg_netscenario.main_tab.currentIndex()
         tab_name = self.dlg_netscenario.main_tab.widget(index_tab).objectName()
 
-        widget_names = ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active']
+        widget_names = ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active', 'btn_mapzone_analysis']
 
         for name in widget_names:
             tools_qt.set_widget_enabled(self.dlg_netscenario, name, enable)
 
         disabled_widgets = {
-            'plan_netscenario_arc': ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active'],
-            'plan_netscenario_node': ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active'],
-            'plan_netscenario_connec': ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active'],
-            'plan_netscenario_valve': ['btn_config', 'btn_create', 'btn_update', 'btn_toggle_active']
+            'plan_netscenario_arc': ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active', 'btn_mapzone_analysis'],
+            'plan_netscenario_node': ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active', 'btn_mapzone_analysis'],
+            'plan_netscenario_connec': ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active', 'btn_mapzone_analysis'],
+            'plan_netscenario_valve': ['btn_config', 'btn_create', 'btn_update', 'btn_toggle_active', 'btn_mapzone_analysis']
         }
         if tab_name in disabled_widgets:
             for name in disabled_widgets[tab_name]:
