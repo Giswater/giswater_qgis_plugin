@@ -54,6 +54,8 @@ class GwPsector:
         self.tablename_psector_x_connec = "v_edit_plan_psector_x_connec"
         self.tablename_psector_x_gully = "v_edit_plan_psector_x_gully"
 
+        self.project_type = tools_gw.get_project_type()
+
 
     def get_psector(self, psector_id=None, list_coord=None):
         """ Buttons 45 and 81: New psector """
@@ -76,7 +78,6 @@ class GwPsector:
         widget_list = self.dlg_plan_psector.findChildren(QTableView)
         for widget in widget_list:
             tools_qt.set_tableview_config(widget)
-        self.project_type = tools_gw.get_project_type()
 
         # Get layers of every feature_type
         self.list_elemets = {}
