@@ -1479,13 +1479,13 @@ class GwPsector:
             self._manage_features_geom(widget, feature_type, field_id)
 
         if self.tablename_psector_x_connec in table_name and refresh_table:
-            self.fill_table(self.dlg_plan_psector, self.qtbl_gully, self.tablename_psector_x_gully,
-                            set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="gully",
-                            field_id="gully_id", refresh_table=False)
-        elif self.tablename_psector_x_gully in table_name and refresh_table:
             self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec,
                             set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="connec",
                             field_id="connec_id", refresh_table=False)
+        elif self.project_type == 'ud' and self.tablename_psector_x_gully in table_name and refresh_table:
+            self.fill_table(self.dlg_plan_psector, self.qtbl_gully, self.tablename_psector_x_gully,
+                            set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="gully",
+                            field_id="gully_id", refresh_table=False)
 
 
     def refresh_table(self, dialog, widget):
