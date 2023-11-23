@@ -135,7 +135,7 @@ BEGIN
 
 		-- calculation process
 		INSERT INTO om_waterbalance (expl_id, dma_id, cat_period_id)
-		SELECT v_expl, dma_id, v_period FROM dma WHERE expl_id = v_expl AND dma_id > 0
+		SELECT v_expl, dma_id, v_period FROM dma WHERE expl_id = v_expl AND dma_id > 0 AND active IS TRUE
 		ON CONFLICT (cat_period_id, dma_id) do nothing;
 
 		-- getting dates for period
