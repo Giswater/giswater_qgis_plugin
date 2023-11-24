@@ -1191,6 +1191,7 @@ class GwPsector:
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.fill_table(dialog, tbl_all_rows, tableleft)
         tools_gw.set_tablemodel_config(dialog, tbl_all_rows, tableleft)
+        tbl_all_rows.horizontalHeader().setStretchLastSection(False)
 
         if not self.price_loaded:
             self.price_loaded = True
