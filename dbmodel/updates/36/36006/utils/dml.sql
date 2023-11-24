@@ -79,3 +79,13 @@ VALUES(522, 'Check outfalls with more than 1 arc', 'utils', NULL, 'core', true, 
 
 INSERT INTO sys_message (id, error_message, log_level, show_user, project_type, "source")
 VALUES(3250, 'Value 0 for exploitation it is not enabled on network objects. It is only used to relate undefined mapzones', 2, true, 'utils', 'core');
+
+--24/11/2023
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
+VALUES('psector form', 'utils', 'v_price_compost', 'id', 0, true, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
+VALUES('psector form', 'utils', 'v_price_compost', 'unit', 1, true, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
+VALUES('psector form', 'utils', 'v_price_compost', 'descript', 2, true, NULL, NULL, '{"stretch": true}'::json, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
+VALUES('psector form', 'utils', 'v_price_compost', 'price', 3, true, NULL, NULL, NULL, NULL);
