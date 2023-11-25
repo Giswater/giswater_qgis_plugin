@@ -482,3 +482,24 @@ CREATE OR REPLACE VIEW v_anl_flow_gully AS
      JOIN gully ON anl_arc.arc_id::text = gully.arc_id::text
      JOIN selector_expl ON anl_arc.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text AND anl_arc.cur_user::name = "current_user"() AND (anl_arc.fid = 220 OR anl_arc.fid = 221);
 
+
+CREATE OR REPLACE VIEW v_rpt_comp_storagevol_sum
+AS SELECT rpt_storagevol_sum.id,
+    rpt_storagevol_sum.result_id,
+    rpt_storagevol_sum.node_id,
+    node.node_type,
+    node.nodecat_id,
+    rpt_storagevol_sum.aver_vol,
+    rpt_storagevol_sum.avg_full,
+    rpt_storagevol_sum.ei_loss,
+    rpt_storagevol_sum.max_vol,
+    rpt_storagevol_sum.max_full,
+    rpt_storagevol_sum.time_days,
+    rpt_storagevol_sum.time_hour,
+    rpt_storagevol_sum.max_out,
+    node.sector_id,
+    node.the_geom
+   FROM selector_rpt_compare, rpt_inp_node node
+     JOIN rpt_storagevol_sum ON rpt_storagevol_sum.node_id::text = node.node_id::text
+  WHERE rpt_storagevol_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text
+  AND node.result_id::text = selector_rpt_compare.result_id::text;
