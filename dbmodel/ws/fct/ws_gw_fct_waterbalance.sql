@@ -181,18 +181,18 @@ BEGIN
 
 			UPDATE om_waterbalance SET auth_bill_met_hydro = 0 WHERE auth_bill_met_hydro is null AND cat_period_id = v_period;
 	 			
-	 		ELSIF  v_method = 'DCW' THEN -- dynamic period acording centroid for dates x vol of dma
+	 	ELSIF  v_method = 'DCW' THEN -- dynamic period acording centroid for dates x vol of dma
 
 			FOR v_dma IN SELECT DISTINCT dma_id FROM connec WHERE state = 1 AND expl_id = v_expl
 			LOOP
 			v_count = v_count + 1;
 			
 			v_total_hydro = (SELECT sum(sum) FROM ext_rtc_hydrometer_x_data d JOIN rtc_hydrometer_x_connec USING (hydrometer_id) JOIN connec USING (connec_id) 
-				JOIN ext_rtc_hydrometer h ON h.id = d.hydrometer_id where cat_period_id = v_period AND dma_id = v_dma AND connec.expl_id = v_expl AND is_waterbal IS TRUE);
+				JOIN ext_rtc_hydrometer h ON h.id::text = d.hydrometer_id::text where cat_period_id = v_period AND dma_id = v_dma AND connec.expl_id = v_expl AND is_waterbal IS TRUE);
 
 			v_centroidday = (SELECT (sum(sum*extract(epoch from value_date)/(24*3600)))/v_total_hydro FROM ext_rtc_hydrometer_x_data d
 					JOIN rtc_hydrometer_x_connec USING (hydrometer_id) JOIN connec USING (connec_id) 
-					JOIN ext_rtc_hydrometer h ON h.id = d.hydrometer_id where cat_period_id = v_period AND dma_id = v_dma AND is_waterbal IS TRUE);
+					JOIN ext_rtc_hydrometer h ON h.id::text = d.hydrometer_id::text where cat_period_id = v_period AND dma_id = v_dma AND is_waterbal IS TRUE);
 			IF v_centroidday IS NULL THEN 
 				v_centroidday = extract(epoch from((end_date - start_date) + start_date))/(24*3600);
 			END IF;
@@ -228,7 +228,7 @@ BEGIN
 			FROM (SELECT c.dma_id, p.id as cat_period_id, count(c.connec_id) as count_connecs, sum(st_length(l.the_geom)) /1000 as length
 			FROM ext_cat_period p, rtc_hydrometer_x_connec d
 			JOIN connec c USING (connec_id) 
-			JOIN ext_rtc_hydrometer h ON c.customer_code = h.connec_id
+			JOIN ext_rtc_hydrometer h ON c.customer_code::text = h.connec_id::text
 			left join link l on c.connec_id = feature_id
 			where c.state=1 and p.id = v_period AND is_waterbal IS TRUE
 			GROUP BY c.dma_id, p.id)a
