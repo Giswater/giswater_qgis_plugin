@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>939</width>
-    <height>786</height>
+    <width>943</width>
+    <height>795</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,6 +20,20 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="verticalLayout_3">
+      <item row="4" column="0">
+       <widget class="QLabel" name="lbl_dscenario_name">
+        <property name="text">
+         <string>Filter by: Dscenario name</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="12">
+       <widget class="QPushButton" name="btn_cancel">
+        <property name="text">
+         <string>Close</string>
+        </property>
+       </widget>
+      </item>
       <item row="5" column="0" colspan="2">
        <widget class="QLineEdit" name="txt_name">
         <property name="sizePolicy">
@@ -30,20 +44,6 @@
         </property>
         <property name="text">
          <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0" colspan="12">
-       <widget class="QTableView" name="tbl_dscenario">
-        <property name="selectionMode">
-         <enum>QAbstractItemView::SingleSelection</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="lbl_dscenario_name">
-        <property name="text">
-         <string>Filter by: Dscenario name</string>
         </property>
        </widget>
       </item>
@@ -60,48 +60,21 @@
         </property>
        </spacer>
       </item>
-      <item row="7" column="11">
-       <widget class="QPushButton" name="btn_cancel">
-        <property name="text">
-         <string>Close</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="11">
-       <widget class="QPushButton" name="btn_delete">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Delete</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="10">
-       <widget class="QPushButton" name="btn_toolbox">
-        <property name="text">
-         <string>Actions</string>
-        </property>
-       </widget>
-      </item>
       <item row="5" column="9">
-       <widget class="QPushButton" name="btn_update">
-        <property name="text">
-         <string>Update</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="8">
        <widget class="QPushButton" name="btn_duplicate">
         <property name="text">
          <string>Duplicate</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="7">
+      <item row="5" column="11">
+       <widget class="QPushButton" name="btn_toolbox">
+        <property name="text">
+         <string>Actions</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="8">
        <widget class="QToolButton" name="btn_create">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -126,6 +99,33 @@
         </property>
        </widget>
       </item>
+      <item row="6" column="0" colspan="13">
+       <widget class="QTableView" name="tbl_dscenario">
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="12">
+       <widget class="QPushButton" name="btn_delete">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Delete</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="10">
+       <widget class="QPushButton" name="btn_update">
+        <property name="text">
+         <string>Update</string>
+        </property>
+       </widget>
+      </item>
       <item row="5" column="2" colspan="5">
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
@@ -138,6 +138,13 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="5" column="7">
+       <widget class="QPushButton" name="btn_toggle_active">
+        <property name="text">
+         <string>Toggle active</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
