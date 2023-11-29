@@ -65,3 +65,11 @@ UPDATE config_toolbox SET inputparams='[
   {"widgetname":"action", "label":"Action:", "widgettype":"combo", "datatype":"text", "comboIds":["INSERT-ONLY", "DELETE-COPY", "KEEP-COPY", "DELETE-ONLY"], "comboNames":["INSERT ONLY", "DELETE & COPY", "KEEP & COPY", "DELETE ONLY"], "layoutname":"grl_option_parameters","layoutorder":3, "selectedId":"INSERT-ONLY"},
   {"widgetname":"copyFrom", "label":"Copy from:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT id, idval FROM cat_dwf_scenario c WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":4, "selectedId":""}
   ]'::json WHERE id=3102;
+  
+  
+insert into config_toolbox (id,alias,functionparams, inputparams, observ, active, device)
+values (3242, 'Set optimum outlet for subcatchments', '{"featureType":[]}', 
+'[{"widgetname":"sector", "label":"Sector:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT sector_id AS id, name as idval FROM sector JOIN selector_sector USING (sector_id) WHERE cur_user = current_user UNION SELECT -999,''ALL VISIBLE SECTORS'' ORDER BY 1 DESC ", "layoutname":"grl_option_parameters","layoutorder":1, "selectedId":"$userSector"}]',
+null, true, '{4}');
+
+update sys_function set descript = 'Function to set optimum outlet for subcatchments according the closest node of network with less elevation that minimum elevation (minelev) of subcatchment' WHERE id = 3242;
