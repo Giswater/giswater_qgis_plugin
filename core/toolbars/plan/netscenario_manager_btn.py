@@ -57,6 +57,7 @@ class GwNetscenarioManagerButton(GwAction):
         tools_gw.load_settings(self.dlg_netscenario_manager)
 
         tools_gw.add_icon(self.dlg_netscenario_manager.btn_toc, "306", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_netscenario_manager.btn_execute, "311", sub_folder="24x24")
 
         # Manage btn create
         self._manage_btn_create()
@@ -75,7 +76,7 @@ class GwNetscenarioManagerButton(GwAction):
         self.dlg_netscenario_manager.btn_toc.clicked.connect(partial(self._manage_add_layers))
         self.dlg_netscenario_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_netscenario))
         self.dlg_netscenario_manager.btn_update.clicked.connect(partial(self._manage_properties))
-        self.dlg_netscenario_manager.btn_execute.clicked.connect(partial(self._execute_selected_netscenario))
+        self.dlg_netscenario_manager.btn_execute.clicked.connect(partial(self._execute_current_netscenario))
         self.dlg_netscenario_manager.btn_delete.clicked.connect(partial(self._delete_selected_netscenario))
         self.dlg_netscenario_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
         self.tbl_netscenario.doubleClicked.connect(partial(self._update_current_netscenario,
@@ -283,24 +284,13 @@ class GwNetscenarioManagerButton(GwAction):
         tools_qt.set_widget_enabled(dlg_functions, 'copyFrom', False)
 
 
-    def _execute_selected_netscenario(self):
-        """ Executes the selected netscenario """
-
-        # Get selected row
-        selected_list = self.tbl_netscenario.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_netscenario_manager)
-            return
-
-        # Get selected netscenario id
-        index = self.tbl_netscenario.selectionModel().currentIndex()
-        value = index.sibling(index.row(), 0).data()
+    def _execute_current_netscenario(self):
+        """ Executes the current netscenario """
 
         # Execute toolbox function
         dlg_functions = self._open_toolbox_function(3256)
         # Set netscenario_id in combo copyFrom
-        tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'netscenario'), f"{value}", 0)
+        tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'netscenario'), f"{self.current_netscenario_id[0]}", 0)
         tools_qt.set_widget_enabled(dlg_functions, 'netscenario', False)
 
 
