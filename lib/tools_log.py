@@ -64,19 +64,19 @@ class GwLogger(object):
 
         try:
             min_log_level = int(min_log_level)
-        except ValueError:
+        except (ValueError, TypeError):
             pass
         if isinstance(min_log_level, int):
             self.min_log_level = min_log_level
         try:
             log_limit_characters = int(log_limit_characters)
-        except ValueError:
+        except (ValueError, TypeError):
             pass
         if isinstance(log_limit_characters, int):
             self.log_limit_characters = log_limit_characters
         try:
             log_db_limit_characters = int(log_db_limit_characters)
-        except ValueError:
+        except (ValueError, TypeError):
             pass
         if isinstance(log_db_limit_characters, int):
             self.log_db_limit_characters = log_db_limit_characters
