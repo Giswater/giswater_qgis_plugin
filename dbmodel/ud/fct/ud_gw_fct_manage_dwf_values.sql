@@ -41,8 +41,10 @@ v_target_name text;
 v_action text;
 v_querytext text;
 v_sector integer;
-v_result_id text = null;
 v_sector_name text;
+v_sector_list text[];
+v_result_id text = null;
+rec text;
 
 BEGIN
 
@@ -50,22 +52,28 @@ BEGIN
 
 	-- select version
 	SELECT giswater, project_type INTO v_version, v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
-	
-	-- getting input data 	
+
+	-- getting input data
 	v_copyfrom :=  ((p_data ->>'data')::json->>'parameters')::json->>'copyFrom';
 	v_target :=  ((p_data ->>'data')::json->>'parameters')::json->>'target';
 	v_sector :=  ((p_data ->>'data')::json->>'parameters')::json->>'sector';
 	v_action :=  ((p_data ->>'data')::json->>'parameters')::json->>'action';
-	
+
 	-- getting scenario name
 	v_source_name := (SELECT idval FROM cat_dwf_scenario WHERE id = v_copyfrom);
 	v_target_name := (SELECT idval FROM cat_dwf_scenario WHERE id = v_target);
 	v_sector_name := (SELECT name FROM sector WHERE sector_id = v_sector);
-	
+
+	IF v_sector = -999 THEN
+		SELECT array_agg(sector_id) INTO v_sector_list FROM  sector JOIN selector_sector USING (sector_id) WHERE cur_user = current_user;
+	ELSE
+		SELECT array_agg(sector_id) INTO v_sector_list FROM  sector WHERE sector_id = v_sector;
+	END IF;
+
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;	
-	
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('MANAGE DWF VALUES'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '--------------------------------------------------');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Target scenario: ',v_target_name));
@@ -76,84 +84,90 @@ BEGIN
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'ERRORS');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '--------');
-	
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, 'WARNINGS');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '---------');
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
-    
+
 	IF v_copyfrom = v_target AND v_action NOT IN ('INSERT-ONLY','DELETE-ONLY') THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 3, concat('PROCESS HAS FAILED......'));	
+		VALUES (v_fid, v_result_id, 3, concat('PROCESS HAS FAILED......'));
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 3, concat('ERROR-403: Target and source are the same.'));	
-	ELSE
-		FOR object_rec IN SELECT json_array_elements_text('["dwf"]'::json) as table,
-					json_array_elements_text('["node_id"]'::json) as pk,
-					json_array_elements_text('["node_id, value, pat1, pat2, pat3, pat4"]'::json) as column
-		
-		LOOP
-			IF v_action = 'DELETE-COPY' THEN
+		VALUES (v_fid, v_result_id, 3, concat('ERROR-403: Target and source are the same.'));
+	else
 
-				EXECUTE 'DELETE FROM inp_'||object_rec.table||' WHERE dwfscenario_id = '||v_target;
+		FOREACH rec IN ARRAY(v_sector_list) LOOP
 
-				-- get message
-				GET DIAGNOSTICS v_count = row_count;
-				IF v_count > 0 THEN
-					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 2, concat('WARNING: ',v_count,' row(s) have been removed from inp_',object_rec.table,' table.'));
-				END IF;
-			END IF;
-				
-			IF v_action = 'KEEP-COPY' OR  v_action = 'DELETE-COPY' THEN
+			v_sector = rec;
+			v_sector_name := (SELECT name FROM sector WHERE sector_id = v_sector);
 
-				-- get message
-				EXECUTE 'SELECT count(*) FROM inp_'||object_rec.table||' WHERE dwfscenario_id = '||v_target INTO v_count;
-				IF v_count > 0 THEN
-					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been keep from inp_',object_rec.table,' table.'));
-				END IF;	
+			FOR object_rec IN SELECT json_array_elements_text('["dwf"]'::json) as table,
+						json_array_elements_text('["node_id"]'::json) as pk,
+						json_array_elements_text('["node_id, value, pat1, pat2, pat3, pat4"]'::json) as column
 
-				v_querytext = 'INSERT INTO inp_'||object_rec.table||' SELECT '||object_rec.column||', '||v_target||' FROM inp_'||object_rec.table||' t JOIN node USING (node_id)
-				WHERE dwfscenario_id = '||v_copyfrom||' AND sector_id = '||v_sector||
-				' ON CONFLICT (dwfscenario_id, '||object_rec.pk||') DO NOTHING';
-				RAISE NOTICE 'v_querytext %', v_querytext;
-				EXECUTE v_querytext;	
-							
-				-- get message
-				GET DIAGNOSTICS v_count2 = row_count;
-				IF v_count > 0 AND v_count2 = 0 THEN
-					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 1, concat('INFO: No rows have been inserted on inp_',object_rec.table,' table.'));
-				ELSIF v_count2 > 0 THEN
-					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count2,' row(s) have been inserted on inp_',object_rec.table,' table.'));
-				END IF;		
-				
-			ELSIF v_action = 'DELETE-ONLY' THEN
+			LOOP
+				IF v_action = 'DELETE-COPY' THEN
 
-				EXECUTE 'DELETE FROM inp_'||object_rec.table||' WHERE dwfscenario_id = '||v_target;
+					EXECUTE 'DELETE FROM inp_'||object_rec.table||' WHERE dwfscenario_id = '||v_target;
 
-				-- get message
-				GET DIAGNOSTICS v_count = row_count;
-				IF v_count > 0 THEN
-					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been removed from inp_',object_rec.table,' table.'));
+					-- get message
+					GET DIAGNOSTICS v_count = row_count;
+					IF v_count > 0 THEN
+						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+						VALUES (v_fid, v_result_id, 2, concat('WARNING: ',v_count,' row(s) have been removed from inp_',object_rec.table,' table.'));
+					END IF;
 				END IF;
 
-			ELSIF v_action = 'INSERT-ONLY' THEN
+				IF v_action = 'KEEP-COPY' OR  v_action = 'DELETE-COPY' THEN
 
-				INSERT INTO inp_dwf (node_id, dwfscenario_id) SELECT node_id, v_target FROM v_edit_inp_junction
-				ON CONFLICT (node_id, dwfscenario_id) DO NOTHING;
+					-- get message
+					EXECUTE 'SELECT count(*) FROM inp_'||object_rec.table||' WHERE dwfscenario_id = '||v_target INTO v_count;
+					IF v_count > 0 THEN
+						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been keep from inp_',object_rec.table,' table.'));
+					END IF;
 
-				-- get message
-				GET DIAGNOSTICS v_count = row_count;
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been inserted into inp_dwf table from v_edit_inp_junction table.'));
-			END IF;
-		END LOOP;		
+					v_querytext = 'INSERT INTO inp_'||object_rec.table||' SELECT '||object_rec.column||', '||v_target||' FROM inp_'||object_rec.table||' t JOIN node USING (node_id)
+					WHERE dwfscenario_id = '||v_copyfrom||' AND sector_id = '||v_sector||
+					' ON CONFLICT (dwfscenario_id, '||object_rec.pk||') DO NOTHING';
+					RAISE NOTICE 'v_querytext %', v_querytext;
+					EXECUTE v_querytext;
 
+					-- get message
+					GET DIAGNOSTICS v_count2 = row_count;
+					IF v_count > 0 AND v_count2 = 0 THEN
+						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+						VALUES (v_fid, v_result_id, 1, concat('INFO: No rows have been inserted on inp_',object_rec.table,' table.'));
+					ELSIF v_count2 > 0 THEN
+						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count2,' row(s) have been inserted on inp_',object_rec.table,' table.'));
+					END IF;
+
+				ELSIF v_action = 'DELETE-ONLY' THEN
+
+					EXECUTE 'DELETE FROM inp_'||object_rec.table||' WHERE dwfscenario_id = '||v_target;
+
+					-- get message
+					GET DIAGNOSTICS v_count = row_count;
+					IF v_count > 0 THEN
+						INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been removed from inp_',object_rec.table,' table.'));
+					END IF;
+
+				ELSIF v_action = 'INSERT-ONLY' THEN
+
+					INSERT INTO inp_dwf (node_id, dwfscenario_id) SELECT node_id, v_target FROM v_edit_inp_junction
+					ON CONFLICT (node_id, dwfscenario_id) DO NOTHING;
+
+					-- get message
+					GET DIAGNOSTICS v_count = row_count;
+					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+					VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been inserted into inp_dwf table from v_edit_inp_junction table.'));
+				END IF;
+			END LOOP;
+		end loop;
 		-- set selector
 		UPDATE config_param_user SET value = v_target WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user;
 
