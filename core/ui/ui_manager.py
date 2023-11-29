@@ -234,6 +234,10 @@ FROM_CLASS = _get_ui_class('nonvisual_print.ui', 'epa')
 class GwNonVisualPrint(GwDialog, FROM_CLASS):
     pass
 
+FROM_CLASS = _get_ui_class('nonvisual_roughness.ui', 'epa')
+class GwNonVisualRoughnessUi(GwDialog, FROM_CLASS):
+    pass
+
 FROM_CLASS = _get_ui_class('nonvisual_rules.ui', 'epa')
 class GwNonVisualRulesUi(GwDialog, FROM_CLASS):
     pass

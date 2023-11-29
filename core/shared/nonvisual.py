@@ -20,7 +20,8 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTa
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.core import Qgis
 from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
-    GwNonVisualPatternWSUi, GwNonVisualRulesUi, GwNonVisualTimeseriesUi, GwNonVisualLidsUi, GwNonVisualPrint
+    GwNonVisualPatternWSUi, GwNonVisualRulesUi, GwNonVisualTimeseriesUi, GwNonVisualLidsUi, GwNonVisualPrint, \
+    GwNonVisualRoughnessUi
 from ..utils.matplotlib_widget import MplCanvas
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_log
@@ -38,12 +39,12 @@ class GwNonVisual:
         self.canvas = global_vars.canvas
         self.dialog = None
         self.manager_dlg = None
-        self.dict_views = {'ws': {'v_edit_inp_curve': 'curves', 'v_edit_inp_pattern': 'patterns',
+        self.dict_views = {'ws': {'cat_mat_roughness': 'roughness', 'v_edit_inp_curve': 'curves', 'v_edit_inp_pattern': 'patterns',
                                   'v_edit_inp_controls': 'controls', 'v_edit_inp_rules': 'rules'},
                            'ud': {'v_edit_inp_curve': 'curves', 'v_edit_inp_pattern': 'patterns',
                                   'v_edit_inp_timeseries': 'timeseries', 'v_edit_inp_controls': 'controls',
                                   'inp_lid': 'lids'}}
-        self.dict_ids = {'v_edit_inp_curve': 'id', 'v_edit_inp_curve_value': 'curve_id',
+        self.dict_ids = {'cat_mat_roughness': 'id', 'v_edit_inp_curve': 'id', 'v_edit_inp_curve_value': 'curve_id',
                          'v_edit_inp_pattern': 'pattern_id', 'v_edit_inp_pattern_value': 'pattern_id',
                          'v_edit_inp_controls': 'id',
                          'v_edit_inp_rules': 'id',
@@ -365,6 +366,187 @@ class GwNonVisual:
 
         tools_gw.close_dialog(self.dlg_print)
 
+
+    # endregion
+
+    # region roughness
+    def get_roughness(self, roughness_id=None, duplicate=False):
+        """ Opens dialog for roughness """
+
+        # Get dialog
+        self.dialog = GwNonVisualRoughnessUi()
+        tools_gw.load_settings(self.dialog)
+
+        # Populate sector id combobox
+        self._populate_cmb_matcat_id(self.dialog.cmb_matcat_id)
+
+        if roughness_id is not None:
+            self._populate_roughness_widgets(roughness_id)
+        else:
+            self._load_roughness_widgets(self.dialog)
+
+        # Connect dialog signals
+        is_new = (roughness_id is None) or duplicate
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_roughness, self.dialog, is_new, roughness_id))
+        self._connect_dialog_signals()
+
+        # Open dialog
+        tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_roughness')
+
+
+    def _populate_cmb_matcat_id(self, combobox):
+
+        sql = f"SELECT id, matcat_id as idval FROM cat_mat_roughness"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            tools_qt.fill_combo_values(combobox, rows, index_to_show=1)
+
+
+    def _populate_roughness_widgets(self, roughness_id):
+        """ Fills in all the values for roughness dialog """
+
+        # Variables
+        cmb_matcat_id = self.dialog.cmb_matcat_id
+        chk_active = self.dialog.chk_active
+        txt_period_id = self.dialog.txt_period_id
+        txt_init_age = self.dialog.txt_init_age
+        txt_end_age = self.dialog.txt_end_age
+        txt_roughness = self.dialog.txt_roughness
+        txt_descript = self.dialog.txt_descript
+
+        sql = f"SELECT * FROM cat_mat_roughness WHERE id = '{roughness_id}'"
+        row = tools_db.get_row(sql)
+        if not row:
+            return
+
+        # Populate text & combobox widgets
+        tools_qt.set_combo_value(cmb_matcat_id, str(row['matcat_id']), 1)
+        tools_qt.set_checked(self.dialog, chk_active, row['active'])
+        tools_qt.set_widget_text(self.dialog, txt_period_id, row['period_id'])
+        tools_qt.set_widget_text(self.dialog, txt_init_age, row['init_age'])
+        tools_qt.set_widget_text(self.dialog, txt_end_age, row['end_age'])
+        tools_qt.set_widget_text(self.dialog, txt_roughness, row['roughness'])
+        tools_qt.set_widget_text(self.dialog, txt_descript, row['descript'])
+
+    def _load_roughness_widgets(self, dialog):
+        """ Load values from session.config """
+
+        # Variables
+        cmb_matcat_id = dialog.cmb_matcat_id
+        chk_active = dialog.chk_active
+        txt_period_id = dialog.txt_period_id
+        txt_init_age = dialog.txt_init_age
+        txt_end_age = dialog.txt_end_age
+        txt_roughness = dialog.txt_roughness
+        txt_descript = dialog.txt_descript
+
+        # Get values
+        matcat_id = tools_gw.get_config_parser('nonvisual_roughness', 'cmb_matcat_id', "user", "session")
+        active = tools_gw.get_config_parser('nonvisual_roughness', 'chk_active', "user", "session")
+        period_id = tools_gw.get_config_parser('nonvisual_roughness', 'txt_period_id', "user", "session")
+        init_age = tools_gw.get_config_parser('nonvisual_roughness', 'txt_init_age', "user", "session")
+        end_age = tools_gw.get_config_parser('nonvisual_roughness', 'txt_end_age', "user", "session")
+        roughness = tools_gw.get_config_parser('nonvisual_roughness', 'txt_roughness', "user", "session")
+        descript = tools_gw.get_config_parser('nonvisual_roughness', 'txt_descript', "user", "session")
+
+        # Populate widgets
+        tools_qt.set_combo_value(cmb_matcat_id, str(matcat_id), 0)
+        tools_qt.set_checked(dialog, chk_active, active)
+        tools_qt.set_widget_text(dialog, txt_period_id, period_id)
+        tools_qt.set_widget_text(dialog, txt_init_age, init_age)
+        tools_qt.set_widget_text(dialog, txt_end_age, end_age)
+        tools_qt.set_widget_text(dialog, txt_roughness, roughness)
+        tools_qt.set_widget_text(dialog, txt_descript, descript)
+
+
+    def _save_roughness_widgets(self, dialog):
+        """ Save values from session.config """
+
+        # Variables
+        cmb_matcat_id = dialog.cmb_matcat_id
+        chk_active = dialog.chk_active
+        txt_period_id = dialog.txt_period_id
+        txt_init_age = dialog.txt_init_age
+        txt_end_age = dialog.txt_end_age
+        txt_roughness = dialog.txt_roughness
+        txt_descript = dialog.txt_descript
+
+        # Get values
+        matcat_id = tools_qt.get_combo_value(dialog, cmb_matcat_id)
+        active = tools_qt.is_checked(dialog, chk_active)
+        period_id = tools_qt.get_text(dialog, txt_period_id)
+        init_age = tools_qt.get_text(dialog, txt_init_age)
+        end_age = tools_qt.get_text(dialog, txt_end_age)
+        roughness = tools_qt.get_text(dialog, txt_roughness)
+        descript = tools_qt.get_text(dialog, txt_descript)
+
+        # Populate widgets
+        tools_gw.set_config_parser('nonvisual_roughness', 'cmb_matcat_id', matcat_id)
+        tools_gw.set_config_parser('nonvisual_roughness', 'chk_active', active)
+        tools_gw.set_config_parser('nonvisual_roughness', 'txt_period_id', period_id)
+        tools_gw.set_config_parser('nonvisual_roughness', 'txt_init_age', init_age)
+        tools_gw.set_config_parser('nonvisual_roughness', 'txt_end_age', end_age)
+        tools_gw.set_config_parser('nonvisual_roughness', 'txt_roughness', roughness)
+        tools_gw.set_config_parser('nonvisual_roughness', 'txt_descript', descript)
+
+    def _accept_roughness(self, dialog, is_new, roughness_id):
+        """ Manage accept button (insert & update) """
+
+        # Variables
+        cmb_matcat_id = dialog.cmb_matcat_id
+        chk_active = dialog.chk_active
+        txt_period_id = dialog.txt_period_id
+        txt_init_age = dialog.txt_init_age
+        txt_end_age = dialog.txt_end_age
+        txt_roughness = dialog.txt_roughness
+        txt_descript = dialog.txt_descript
+
+        # Get widget values
+        matcat_id = tools_qt.get_combo_value(dialog, cmb_matcat_id, index=1)
+        active = tools_qt.is_checked(dialog, chk_active)
+        period_id = tools_qt.get_text(dialog, txt_period_id)
+        init_age = tools_qt.get_text(dialog, txt_init_age)
+        end_age = tools_qt.get_text(dialog, txt_end_age)
+        roughness = tools_qt.get_text(dialog, txt_roughness)
+        descript = tools_qt.get_text(dialog, txt_descript)
+
+        if is_new:
+            # Check that there are no empty fields
+            if not roughness or roughness == 'null':
+                tools_qt.set_stylesheet(roughness)
+                return
+
+            # Insert cat_mat_roughness
+            sql = f"INSERT INTO cat_mat_roughness (matcat_id, period_id, init_age, end_age, roughness, descript, active)" \
+                  f"VALUES('{matcat_id}', '{period_id}', '{init_age}', '{end_age}', '{roughness}', '{descript}', '{active}')"
+            result = tools_db.execute_sql(sql, commit=False)
+            if not result:
+                msg = "There was an error inserting control."
+                tools_qgis.show_warning(msg, dialog=dialog)
+                tools_db.dao.rollback()
+                return
+
+            # Commit
+            tools_db.dao.commit()
+            # Reload manager table
+            self._reload_manager_table()
+        elif roughness_id is not None:
+            table_name = 'cat_mat_roughness'
+
+            descript = descript.strip("'")
+            descript = descript.replace("\n", "\\n")
+            fields = f"""{{"matcat_id": "{matcat_id}", "period_id": "{period_id}", "init_age": "{init_age}", 
+            "end_age": "{end_age}", "roughness": "{roughness}", "descript": "{descript}", "active": "{active}"}}"""
+            result = self._setfields(roughness_id, table_name, fields)
+            if not result:
+                return
+            # Commit
+            tools_db.dao.commit()
+            # Reload manager table
+            self._reload_manager_table()
+
+        self._save_roughness_widgets(dialog)
+        tools_gw.close_dialog(dialog)
 
     # endregion
 
