@@ -89,3 +89,8 @@ INSERT INTO config_form_tableview (location_type, project_type, objectname, colu
 VALUES('psector form', 'utils', 'v_price_compost', 'descript', 2, true, NULL, NULL, '{"stretch": true}'::json, NULL);
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
 VALUES('psector form', 'utils', 'v_price_compost', 'price', 3, true, NULL, NULL, NULL, NULL);
+
+-- 30/11/2023
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_cat", "column":"feature_type", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_cat", "column":"alias", "dataType":"text"}}$$);
