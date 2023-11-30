@@ -999,8 +999,9 @@ class GwPsector:
             tools_qgis.disconnect_signal_selection_changed()
 
             json_result = self.set_plan()
-            if json_result.get('status') == 'Accepted':
-                self.reload_states_selector()
+            if json_result:
+                if json_result.get('status') == 'Accepted':
+                    self.reload_states_selector()
 
             # Apply filters on tableview
             if hasattr(self, 'dlg_psector_mng'):
@@ -1126,13 +1127,15 @@ class GwPsector:
     def set_plan(self):
 
         psector_id = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
+        if psector_id is None:
+            return False
         psector_name = tools_qt.get_text(self.dlg_plan_psector, "name", return_string_null=False)
         extras = f'"psectorId":"{psector_id}"'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_setplan', body, is_thread=True)  # is_thread=True because we don't want to call manage_json_response yet
         tools_gw.manage_current_selections_docker(json_result)
         if not json_result or 'body' not in json_result or 'data' not in json_result['body']:
-            return
+            return False
 
         if json_result['message']['level'] == 1:
             text = f"There are some topological inconsistences on psector '{psector_name}'. Would you like to see the log?"
