@@ -61,7 +61,7 @@ class GwWorkspaceManagerButton(GwAction):
         self.dlg_workspace_manager.btn_create.clicked.connect(partial(self._open_create_workspace_dlg))
         self.dlg_workspace_manager.btn_current.clicked.connect(partial(self._set_current_workspace))
         self.dlg_workspace_manager.btn_toggle_privacy.clicked.connect(partial(self._toggle_privacy_workspace))
-        self.dlg_workspace_manager.btn_update.clicked.connect(partial(self._update_workspace))
+        self.dlg_workspace_manager.btn_update.clicked.connect(partial(self._open_update_workspace_dlg))
         selection_model = self.dlg_workspace_manager.tbl_wrkspcm.selectionModel()
         selection_model.selectionChanged.connect(partial(self._fill_info))
         self.dlg_workspace_manager.btn_delete.clicked.connect(partial(self._delete_workspace))
@@ -71,6 +71,43 @@ class GwWorkspaceManagerButton(GwAction):
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_workspace_manager, 'workspace_manager')
+
+
+    def _open_update_workspace_dlg(self):
+
+        # Create workspace dialog
+        self.dlg_create_workspace = GwCreateWorkspaceUi()
+        self.new_workspace_name = self.dlg_create_workspace.findChild(QLineEdit, 'txt_workspace_name')
+        self.new_workspace_descript = self.dlg_create_workspace.findChild(QPlainTextEdit, 'txt_workspace_descript')
+        self.new_workspace_chk = self.dlg_create_workspace.findChild(QCheckBox, 'chk_workspace_private')
+
+        # Disable tab log
+        tools_gw.disable_tab_log(self.dlg_create_workspace)
+
+        # Connect create workspace dialog signals
+        self.dlg_create_workspace.btn_accept.clicked.connect(partial(self._update_workspace))
+        self.dlg_create_workspace.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_create_workspace))
+
+        # Get selected row
+        selected_list = self.tbl_wrkspcm.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.dlg_workspace_manager)
+            return
+
+        # Get selected workspace id
+        index = self.tbl_wrkspcm.selectionModel().currentIndex()
+        value = index.sibling(index.row(), 0).data()
+
+        sql = (f"SELECT name, descript, private FROM cat_workspace WHERE id = {value}")
+        row = tools_db.get_row(sql)
+
+        tools_qt.set_widget_text(self.dlg_create_workspace, self.new_workspace_name, row['name'])
+        tools_qt.set_widget_text(self.dlg_create_workspace, self.new_workspace_descript, row['descript'])
+        tools_qt.set_checked(self.dlg_create_workspace, self.new_workspace_chk, row['private'])
+
+        # Open the dialog
+        tools_gw.open_dialog(self.dlg_create_workspace, 'workspace_create', stay_on_top=True)
 
 
     def _open_create_workspace_dlg(self):
@@ -273,10 +310,22 @@ class GwWorkspaceManagerButton(GwAction):
         index = self.tbl_wrkspcm.selectionModel().currentIndex()
         value = index.sibling(index.row(), 0).data()
 
+        name = self.new_workspace_name.text()
+        descript = self.new_workspace_descript.toPlainText()
+        if descript == '':
+            descript = 'null'
+        else:
+            descript = f'"{descript}"'
+            descript = descript.replace("\n", "\\n")
+        if len(name) == 0:
+            tools_qt.set_stylesheet(self.new_workspace_name)
+            return
+        private = self.new_workspace_chk.isChecked()
+
         message = "Are you sure you want to override the configuration of this workspace?"
         answer = tools_qt.show_question(message, "Update configuration", index.sibling(index.row(), 1).data())
         if answer:
-            extras = f'"action":"{action}", "id": "{value}"'
+            extras = f'"action":"{action}", "name":"{name}", "descript":{descript}, "private":"{private}", "id": "{value}"'
             body = tools_gw.create_body(extras=extras)
             result = tools_gw.execute_procedure('gw_fct_workspacemanager', body)
 
@@ -284,7 +333,10 @@ class GwWorkspaceManagerButton(GwAction):
                 message = result.get('message')
                 if message:
                     tools_qgis.show_message(message['text'], message['level'], dialog=self.dlg_workspace_manager)
+
+                tools_gw.fill_tab_log(self.dlg_create_workspace, result['body']['data'])
                 self._fill_tbl(self.filter_name.text())
+                self._set_labels_current_workspace(name=name, result=result)
 
 
     def _delete_workspace(self):
