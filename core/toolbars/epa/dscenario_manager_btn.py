@@ -67,6 +67,8 @@ class GwDscenarioManagerButton(GwAction):
             if toolbar is not None:
                 self.action.setMenu(self.menu)
                 toolbar.addAction(self.action)
+        else:
+            self.views_dict = {'v_edit_cat_dscenario': 'dscenario_id'}
 
 
     def clicked_event(self):
@@ -462,7 +464,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario.main_tab.setCurrentIndex(default_tab_idx)
 
         # Connect signals
-        self.dlg_dscenario.btn_properties.clicked.connect(partial(self._manage_properties))
+        self.dlg_dscenario.btn_properties.clicked.connect(partial(self._manage_properties, self.dlg_dscenario_manager, 'v_edit_cat_dscenario'))
         self.dlg_dscenario.btn_toc.clicked.connect(partial(self._manage_add_layers))
         self.dlg_dscenario.btn_insert.clicked.connect(partial(self._manage_insert))
         self.dlg_dscenario.btn_delete.clicked.connect(partial(self._manage_delete))
