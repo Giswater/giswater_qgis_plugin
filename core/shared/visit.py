@@ -1001,6 +1001,8 @@ class GwVisit(QObject):
         # Fill combo parameter_id depending feature_type
         self._fill_combo_parameter_id()
 
+        self._fill_visitcat(self.visit_id.text())
+
         if self.event_parameter_id:
             tools_qt.set_combo_value(self.dlg_add_visit.parameter_id, self.event_parameter_id, 0)
 
@@ -1102,16 +1104,17 @@ class GwVisit(QObject):
         widget_table.model().select()
 
 
-    def _fill_combos(self, visit_id=None):
-        """ Fill combo boxes of the form """
+    def _fill_visitcat(self, visit_id=None):
 
-        # Visit tab
-        # Fill ComboBox visitcat_id
         # save result in self.visitcat_ids to get id depending on selected combo
-        sql = ("SELECT id, name"
-               " FROM om_visit_cat"
-               " WHERE active is true"
-               " ORDER BY name")
+        sql = f"SELECT id, alias"\
+              " FROM om_visit_cat"\
+              " WHERE active is true"
+
+        if self.feature_type not in ('all', None):
+            sql = f"{sql} AND (upper(feature_type) = '{self.feature_type.upper()}' OR feature_type IS NULL) "
+        sql = f"{sql} ORDER BY name"
+
         self.visitcat_ids = tools_db.get_rows(sql)
 
         if self.visitcat_ids:
@@ -1135,12 +1138,22 @@ class GwVisit(QObject):
                        f" FROM om_visit"
                        f" WHERE id = '{visit_id}' ")
                 id_visitcat = tools_db.get_row(sql)
-                sql = (f"SELECT id, name"
-                       f" FROM om_visit_cat"
-                       f" WHERE active is true AND id = '{id_visitcat[0]}' "
-                       f" ORDER BY name")
-                row = tools_db.get_row(sql)
-                tools_qt.set_combo_value(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
+                if id_visitcat is not None:
+
+                    sql = (f"SELECT id, name"
+                           f" FROM om_visit_cat"
+                           f" WHERE active is true AND id = '{id_visitcat[0]}' "
+                           f" ORDER BY name")
+                    row = tools_db.get_row(sql)
+                    tools_qt.set_combo_value(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
+
+
+    def _fill_combos(self, visit_id=None):
+        """ Fill combo boxes of the form """
+
+        # Visit tab
+        # Fill ComboBox visitcat_id
+        self._fill_visitcat(visit_id)
 
         # Fill ComboBox status
         rows = self._get_values_from_catalog('om_typevalue', 'visit_status')
