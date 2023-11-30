@@ -43,7 +43,7 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		IF v_table = 'inp_curve' THEN
-			UPDATE inp_curve SET id=NEW.id, curve_type=NEW.curve_type, descript=NEW.descript, expl_id=NEW.expl_id, active=NEW.active
+			UPDATE inp_curve SET id=NEW.id, curve_type=NEW.curve_type, descript=NEW.descript, expl_id=NEW.expl_id
 			WHERE id=OLD.id;
 
 			IF (SELECT project_type FROM sys_version LIMIT 1) = 'UD' THEN
