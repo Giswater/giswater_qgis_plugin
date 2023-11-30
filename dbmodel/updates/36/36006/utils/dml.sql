@@ -94,3 +94,4 @@ VALUES('psector form', 'utils', 'v_price_compost', 'price', 3, true, NULL, NULL,
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_cat", "column":"feature_type", "dataType":"text"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_cat", "column":"alias", "dataType":"text"}}$$);
+UPDATE om_visit_cat set alias = name;
