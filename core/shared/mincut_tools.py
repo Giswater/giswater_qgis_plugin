@@ -10,13 +10,13 @@ import json
 from functools import partial
 
 from qgis.PyQt.QtCore import QStringListModel, QSize, QDateTime, QDate, Qt, QRegExp
-from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QDateTimeEdit
 from qgis.gui import QgsDateTimeEdit
+from qgis.core import QgsWkbTypes
 
-from ..utils import tools_gw, tools_backend_calls
+from ..utils import tools_backend_calls
 
 from ..shared.selector import GwSelector
 from ..ui.ui_manager import GwSelectorUi, GwMincutUi
@@ -35,7 +35,7 @@ class GwMincutTools:
         self.schema_name = lib_vars.schema_name
         self.settings = global_vars.giswater_settings
 
-        self.rubber_band = tools_gw.create_rubberband(self.canvas, 0)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.PointGeometry)
 
     def set_dialog(self, dialog):
         self.dlg_mincut_man = dialog

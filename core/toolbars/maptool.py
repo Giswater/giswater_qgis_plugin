@@ -155,6 +155,8 @@ class GwMaptool(QgsMapTool):
             geom_type = QgsWkbTypes.PolygonGeometry
         elif geom_type == "line":
             geom_type = QgsWkbTypes.LineGeometry
+        else:
+            geom_type = QgsWkbTypes.PointGeometry
         self.rubber_band.reset(geom_type)
 
 

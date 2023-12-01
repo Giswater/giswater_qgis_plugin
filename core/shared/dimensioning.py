@@ -10,7 +10,7 @@ from functools import partial
 from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, \
     QSizePolicy, QSpacerItem
-from qgis.core import QgsPointXY
+from qgis.core import QgsPointXY, QgsWkbTypes
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsVertexMarker
 
 from ..utils import tools_gw
@@ -57,7 +57,7 @@ class GwDimensioning:
 
         # when function is called from new feature
         if db_return is None:
-            rubber_band = tools_gw.create_rubberband(self.canvas, 0)
+            rubber_band = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.PointGeometry)
             extras = f'"coordinates":{{{self.points}}}'
             body = tools_gw.create_body(extras=extras)
             json_result = tools_gw.execute_procedure('gw_fct_getdimensioning', body)

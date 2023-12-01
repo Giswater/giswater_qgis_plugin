@@ -3461,10 +3461,8 @@ def restore_parent_layers_visibility(layers):
         tools_qgis.set_layer_visible(layer, False, visibility)
 
 
-def create_rubberband(canvas, geometry_type= QgsWkbTypes.GeometryType):
+def create_rubberband(canvas, geometry_type=QgsWkbTypes.LineGeometry):
     """ Creates a rubberband and adds it to the global list """
-    geometry_type = QgsWkbTypes.LineGeometry
-    geometry_type = QgsWkbTypes.PointGeometry
     rb = QgsRubberBand(canvas, geometry_type)
     global_vars.active_rubberbands.append(rb)
     return rb
