@@ -82,10 +82,10 @@ BEGIN
 	DELETE FROM temp_t_csv WHERE source ='rpt_node' and csv1='Analysis' and csv2='ended';
 	DELETE FROM temp_t_csv WHERE source ='rpt_node' and csv1='Total' and csv2='elapsed';
 
-	DELETE FROM temp_t_csv WHERE source ='rpt_subcathrunoff_sum' and csv1='Subcatchment' and csv2='Runoff';
-	DELETE FROM temp_t_csv WHERE source ='rpt_subcathrunoff_sum' and csv1='Total' and csv2='Total';
-	DELETE FROM temp_t_csv WHERE source ='rpt_subcathrunoff_sum' and csv1='Precip' and csv2='Runon';
-	DELETE FROM temp_t_csv WHERE source ='rpt_subcathrunoff_sum' and csv1='Subcatchment' and csv2='mm';
+	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchrunoff_sum' and csv1='Subcatchment' and csv2='Runoff';
+	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchrunoff_sum' and csv1='Total' and csv2='Total';
+	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchrunoff_sum' and csv1='Precip' and csv2='Runon';
+	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchrunoff_sum' and csv1='Subcatchment' and csv2='mm';
 
 	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchwashoff_sum' and csv1='Subcatchment' and csv2='Washoff';
 	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchwashoff_sum' and csv1='Subcatchment' and csv2='kg';
@@ -274,16 +274,16 @@ BEGIN
 			VALUES (v_result_id,CONCAT(rpt_rec.csv1,' ',rpt_rec.csv2,' ',rpt_rec.csv3,' ',rpt_rec.csv4,' ',rpt_rec.csv5,' ',
 			rpt_rec.csv6,' ',rpt_rec.csv7));
 
-		ELSIF type_aux='rpt_subcathrunoff_sum' then 
+		ELSIF type_aux='rpt_subcatchrunoff_sum' then 
 
 			IF v_epaversion = '5.1' then
 
-				INSERT INTO rpt_subcathrunoff_sum(result_id, subc_id, tot_precip, tot_runon, tot_evap, tot_infil, tot_runoff, tot_runofl, peak_runof, runoff_coe, vxmax, vymax, depth, vel, vhmax) 
+				INSERT INTO rpt_subcatchrunoff_sum(result_id, subc_id, tot_precip, tot_runon, tot_evap, tot_infil, tot_runoff, tot_runofl, peak_runof, runoff_coe, vxmax, vymax, depth, vel, vhmax) 
 				VALUES (v_result_id, rpt_rec.csv1, rpt_rec.csv2::numeric, rpt_rec.csv3::numeric, rpt_rec.csv4::numeric, rpt_rec.csv5::numeric, rpt_rec.csv8::numeric,
 				rpt_rec.csv9::numeric,rpt_rec.csv10::numeric,rpt_rec.csv11::numeric,rpt_rec.csv12::numeric,rpt_rec.csv13::numeric,rpt_rec.csv14::numeric,
 				rpt_rec.csv15::numeric,rpt_rec.csv16::numeric);
 			ELSE
-				INSERT INTO rpt_subcathrunoff_sum(result_id, subc_id, tot_precip, tot_runon, tot_evap, tot_infil,tot_runoff, tot_runofl, peak_runof, runoff_coe, vxmax, vymax, depth, vel, vhmax) 
+				INSERT INTO rpt_subcatchrunoff_sum(result_id, subc_id, tot_precip, tot_runon, tot_evap, tot_infil,tot_runoff, tot_runofl, peak_runof, runoff_coe, vxmax, vymax, depth, vel, vhmax) 
 				VALUES (v_result_id,rpt_rec.csv1,rpt_rec.csv2::numeric,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric,rpt_rec.csv6::numeric,
 				rpt_rec.csv7::numeric,rpt_rec.csv8::numeric,rpt_rec.csv9::numeric,rpt_rec.csv10::numeric,rpt_rec.csv11::numeric,rpt_rec.csv12::numeric,
 				rpt_rec.csv13::numeric,rpt_rec.csv14::numeric);

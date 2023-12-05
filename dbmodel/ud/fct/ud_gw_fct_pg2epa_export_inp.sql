@@ -1102,7 +1102,6 @@ BEGIN
 	     JOIN (select pattern_id FROM vi_t_aquifers UNION select monthly_adj FROM vi_t_adjustments UNION select pattern_id FROM vi_t_inflows UNION 
 		  select pat1 FROM vi_t_dwf UNION select pat2 FROM vi_t_dwf UNION select pat3 FROM vi_t_dwf UNION select pat4 FROM vi_t_dwf) a USING (pattern_id)  
 	     WHERE p.active AND p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text 
-		 WHERE p.active AND p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text 
 	     union 
 	      SELECT p.pattern_id,
 	    p.pattern_type,
