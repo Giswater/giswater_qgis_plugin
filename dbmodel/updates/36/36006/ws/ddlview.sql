@@ -329,6 +329,7 @@ JOIN selector_rpt_compare USING (result_id);
 
 
 
+drop view if exists v_ui_arc_x_relations;
 CREATE OR REPLACE VIEW v_ui_arc_x_relations AS 
  SELECT row_number() OVER (ORDER BY v_node.node_id) + 1000000 AS rid,
     v_node.arc_id,
