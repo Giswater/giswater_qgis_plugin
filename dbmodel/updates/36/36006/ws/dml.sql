@@ -81,7 +81,6 @@ WHERE formname in ('v_edit_inp_dscenario_shortpipe') and columnname ='status';
 UPDATE config_form_fields set dv_isnullvalue =True  WHERE formname in ('ve_epa_shortpipe', 'v_edit_inp_shortpipe') and columnname ='status';
 
 INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_value_status_shortpipe', 'CV', 'CV', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_value_status_shortpipe', ' ', ' ', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
 INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_value_status_shortpipe_dscen', 'CV', 'CV', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_value_status_shortpipe_dscen', 'OPEN', 'OPEN', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
