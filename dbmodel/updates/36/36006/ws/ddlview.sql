@@ -326,39 +326,3 @@ WHERE r.result_id::text = s.result_id::text AND s.cur_user = "current_user"()::t
 CREATE OR REPLACE VIEW v_rpt_compare_node AS
 SELECT r.* FROM rpt_node_stats r, selector_rpt_compare s
 JOIN selector_rpt_compare USING (result_id);
-
-
-
-drop view if exists v_ui_arc_x_relations;
-CREATE OR REPLACE VIEW v_ui_arc_x_relations AS 
- SELECT row_number() OVER (ORDER BY v_node.node_id) + 1000000 AS rid,
-    v_node.arc_id,
-    v_node.nodetype_id AS featurecat_id,
-    v_node.nodecat_id AS catalog,
-    v_node.node_id AS feature_id,
-    v_node.code AS feature_code,
-    v_node.sys_type,
-    v_arc.state AS arc_state,
-    v_node.state AS feature_state,
-    st_x(v_node.the_geom) AS x,
-    st_y(v_node.the_geom) AS y,
-    'v_edit_node'::text AS sys_table_id
-   FROM v_node
-     JOIN arc v_arc ON v_arc.arc_id::text = v_node.arc_id::text
-  WHERE v_node.arc_id IS NOT NULL
-UNION
- SELECT row_number() OVER () + 2000000 AS rid,
-    v_arc.arc_id,
-    v_connec.connectype_id AS featurecat_id,
-    v_connec.connecat_id AS catalog,
-    v_connec.connec_id AS feature_id,
-    v_connec.code AS feature_code,
-    v_connec.sys_type,
-    v_arc.state AS arc_state,
-    v_connec.state AS feature_state,
-    st_x(v_connec.the_geom) AS x,
-    st_y(v_connec.the_geom) AS y,
-    'v_edit_connec'::text AS sys_table_id
-   FROM v_connec
-     JOIN arc v_arc ON v_arc.arc_id::text = v_connec.arc_id::text
-  WHERE v_connec.arc_id IS NOT NULL;
