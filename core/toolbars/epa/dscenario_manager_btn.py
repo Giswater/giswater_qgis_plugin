@@ -241,7 +241,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario_manager.finished.connect(partial(self.save_user_values))
 
         # Open dialog
-        self.dlg_dwf_manager.setWindowTitle(f'Dscenario manager')
+        self.dlg_dscenario_manager.setWindowTitle(f'Dscenario manager')
         tools_gw.open_dialog(self.dlg_dscenario_manager, 'dscenario_manager')
 
 
