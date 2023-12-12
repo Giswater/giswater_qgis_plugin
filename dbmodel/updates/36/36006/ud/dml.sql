@@ -73,3 +73,10 @@ values (3242, 'Set optimum outlet for subcatchments', '{"featureType":[]}',
 null, true, '{4}');
 
 update sys_function set descript = 'Function to set optimum outlet for subcatchments according the closest node of network with less elevation that minimum elevation (minelev) of subcatchment' WHERE id = 3242;
+
+-- 12/12/2023
+UPDATE config_form_fields SET layoutname='lyt_data_1' WHERE formname='ve_gully_gully' AND formtype='form_feature' AND columnname='connec_y1' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutname='lyt_data_1' WHERE formname='ve_gully_pgully' AND formtype='form_feature' AND columnname='connec_y2' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutname='lyt_data_1' WHERE formname='ve_gully_pgully' AND formtype='form_feature' AND columnname='connec_y1' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutname='lyt_data_1' WHERE formname='ve_gully_vgully' AND formtype='form_feature' AND columnname='connec_y1' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutname='lyt_data_1' WHERE formname='ve_gully_vgully' AND formtype='form_feature' AND columnname='connec_y2' AND tabname='tab_data';
