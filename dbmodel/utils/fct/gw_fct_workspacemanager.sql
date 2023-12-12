@@ -230,7 +230,7 @@ BEGIN
 			"data":{"message":"3200", "function":"3078","debug_msg":null, "is_process":true}}$$);'INTO v_audit_result;
 		ELSE
 			-- update configuration of selected workspace
-			UPDATE cat_workspace SET config = v_workspace_config WHERE id = v_workspace_id;
+			UPDATE cat_workspace SET name = v_workspace_name, descript = v_workspace_descript, config = v_workspace_config, private = v_workspace_private WHERE id = v_workspace_id;
 		END IF;
 		
 	ELSIF v_action = 'CURRENT' THEN
