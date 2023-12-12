@@ -143,8 +143,7 @@ v_staticpressure float;
 label_value text;
 
 v_streetname varchar;
-v_postnumber integer;
-v_postcomplement varchar;
+v_postnumber varchar;
 
 v_auto_streetvalues_status boolean;
 v_auto_streetvalues_field varchar;
@@ -486,10 +485,6 @@ BEGIN
 
 		--Postnumber/postcomplement
 		v_postnumber := (select ext_address.postnumber from ext_address
-						where ST_DWithin(p_reduced_geometry, ext_address.the_geom, v_auto_streetvalues_buffer)
-						order by ST_Distance(p_reduced_geometry, ext_address.the_geom) LIMIT 1);
-
-		v_postcomplement := (select ext_address.postnumber from ext_address
 						where ST_DWithin(p_reduced_geometry, ext_address.the_geom, v_auto_streetvalues_buffer)
 						order by ST_Distance(p_reduced_geometry, ext_address.the_geom) LIMIT 1);
 
