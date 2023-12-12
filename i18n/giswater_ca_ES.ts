@@ -7212,12 +7212,12 @@
 	<context>
 		<name>netscenario_manager</name>
 		<message>
-			<source>btn_duplicate</source>
-			<translation></translation>
+			<source>btn_delete</source>
+			<translation>Esborrar</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_duplicate</source>
-			<translation>Duplicate</translation>
+			<source>tooltip_btn_delete</source>
+			<translation>Esborrar</translation>
 		</message>
 		<message>
 			<source>btn_update_netscenario</source>
@@ -7260,44 +7260,44 @@
 			<translation>Filter by: Netscenario name</translation>
 		</message>
 		<message>
+			<source>btn_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>btn_update</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update</source>
+			<translation>Actualitzar</translation>
+		</message>
+		<message>
 			<source>btn_toc</source>
 			<translation></translation>
 		</message>
 		<message>
 			<source>tooltip_btn_toc</source>
-			<translation>Load Giswater layer</translation>
+			<translation>Carregar capes Giswater</translation>
+		</message>
+		<message>
+			<source>btn_duplicate</source>
+			<translation>Duplicar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_duplicate</source>
+			<translation>Duplicar</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation></translation>
+			<translation>Tancar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Close</translation>
-		</message>
-		<message>
-			<source>btn_create</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create</source>
-			<translation>Create</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Delete</translation>
-		</message>
-		<message>
-			<source>btn_update</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update</source>
-			<translation>Update</translation>
+			<translation>Tancar</translation>
 		</message>
 	</context>
 	<context>

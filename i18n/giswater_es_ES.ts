@@ -7213,12 +7213,12 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 	<context>
 		<name>netscenario_manager</name>
 		<message>
-			<source>btn_duplicate</source>
-			<translation>Duplicate</translation>
+			<source>btn_delete</source>
+			<translation>Borrar</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_duplicate</source>
-			<translation>Duplicate</translation>
+			<source>tooltip_btn_delete</source>
+			<translation>Borrar</translation>
 		</message>
 		<message>
 			<source>btn_update_netscenario</source>
@@ -7261,6 +7261,22 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Filter by: Netscenario name</translation>
 		</message>
 		<message>
+			<source>btn_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>btn_update</source>
+			<translation>Actualizar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update</source>
+			<translation>Actualizar</translation>
+		</message>
+		<message>
 			<source>btn_toc</source>
 			<translation></translation>
 		</message>
@@ -7269,36 +7285,20 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Cargar capa Giswater</translation>
 		</message>
 		<message>
+			<source>btn_duplicate</source>
+			<translation>Duplicar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_duplicate</source>
+			<translation>Duplicar</translation>
+		</message>
+		<message>
 			<source>btn_cancel</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Close</translation>
-		</message>
-		<message>
-			<source>btn_create</source>
-			<translation>     Create     </translation>
-		</message>
-		<message>
-			<source>tooltip_btn_create</source>
-			<translation>Create</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Delete</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Delete</translation>
-		</message>
-		<message>
-			<source>btn_update</source>
-			<translation>Update</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update</source>
-			<translation>Update</translation>
+			<translation>Cerrar</translation>
 		</message>
 	</context>
 	<context>

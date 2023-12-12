@@ -7213,12 +7213,12 @@
 	<context>
 		<name>netscenario_manager</name>
 		<message>
-			<source>btn_duplicate</source>
-			<translation>Duplicate</translation>
+			<source>btn_delete</source>
+			<translation>Delete</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_duplicate</source>
-			<translation>Duplicate</translation>
+			<source>tooltip_btn_delete</source>
+			<translation>Delete</translation>
 		</message>
 		<message>
 			<source>btn_update_netscenario</source>
@@ -7261,22 +7261,6 @@
 			<translation>Filter by: Netscenario name</translation>
 		</message>
 		<message>
-			<source>btn_toc</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_btn_toc</source>
-			<translation>Load Giswater layer</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Close</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Close</translation>
-		</message>
-		<message>
 			<source>btn_create</source>
 			<translation>     Create     </translation>
 		</message>
@@ -7285,20 +7269,36 @@
 			<translation>Create</translation>
 		</message>
 		<message>
-			<source>btn_delete</source>
-			<translation>Delete</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>Delete</translation>
-		</message>
-		<message>
 			<source>btn_update</source>
 			<translation>Update</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update</source>
 			<translation>Update</translation>
+		</message>
+		<message>
+			<source>btn_toc</source>
+			<translation></translation>
+		</message>
+		<message>
+			<source>tooltip_btn_toc</source>
+			<translation>Load Giswater layer</translation>
+		</message>
+		<message>
+			<source>btn_duplicate</source>
+			<translation>Duplicate</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_duplicate</source>
+			<translation>Duplicate</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Close</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Close</translation>
 		</message>
 	</context>
 	<context>
