@@ -154,6 +154,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_hydrology_manager.finished.connect(partial(self.save_user_values))
 
         # Open dialog
+        self.dlg_hydrology_manager.setWindowTitle(f'Hydrology scenario manager')
         tools_gw.open_dialog(self.dlg_hydrology_manager, 'dscenario_manager')
 
 
@@ -197,6 +198,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dwf_manager.finished.connect(partial(self.save_user_values))
 
         # Open dialog
+        self.dlg_dwf_manager.setWindowTitle(f'DWF scenario manager')
         tools_gw.open_dialog(self.dlg_dwf_manager, 'dscenario_manager')
 
 
@@ -239,6 +241,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario_manager.finished.connect(partial(self.save_user_values))
 
         # Open dialog
+        self.dlg_dwf_manager.setWindowTitle(f'Dscenario manager')
         tools_gw.open_dialog(self.dlg_dscenario_manager, 'dscenario_manager')
 
 
