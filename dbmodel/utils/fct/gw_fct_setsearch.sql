@@ -440,7 +440,7 @@ BEGIN
 				concat ('||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_1)||','' - '',
 				'||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_2)||','' - '',
 				'||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_3)||')
-				 AS display_name, '||quote_literal(v_hydro_layer)||' AS sys_table_id, '||quote_literal(v_hydro_id_field)||' AS sys_idname
+				 AS display_name, '||quote_literal(v_hydro_layer)||' AS sys_table_id, '||quote_literal(v_hydro_id_field)||' AS sys_idname, '||quote_ident(v_hydro_feature_field)||' AS sys_connec_id
 				FROM '||quote_ident(v_hydro_layer)||'
 				JOIN connec ON (connec.connec_id = '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_feature_field)||')
 				WHERE '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_exploitation_display_field)||' = '||quote_literal(v_name)||'
