@@ -137,7 +137,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_hydrology_manager.txt_name.textChanged.connect(partial(self._fill_manager_table,
                                                                         'v_edit_cat_hydrology'))
         self.dlg_hydrology_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
-                                                self.dlg_hydrology_manager, 'v_edit_cat_hydrology'))
+                                                self.dlg_hydrology_manager, 'v_edit_cat_hydrology', 3294))
         self.dlg_hydrology_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3100,
                                                                        'v_edit_cat_hydrology'))
         self.dlg_hydrology_manager.btn_update.clicked.connect(partial(self._manage_properties,
@@ -179,7 +179,7 @@ class GwDscenarioManagerButton(GwAction):
         # Connect main dialog signals
         self.dlg_dwf_manager.txt_name.textChanged.connect(partial(self._fill_manager_table, 'v_edit_cat_dwf_scenario'))
         self.dlg_dwf_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
-                                                self.dlg_dwf_manager, 'v_edit_cat_dwf_scenario'))
+                                                self.dlg_dwf_manager, 'v_edit_cat_dwf_scenario', 3296))
         self.dlg_dwf_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3102,
                                                                  'v_edit_cat_dwf_scenario'))
         self.dlg_dwf_manager.btn_update.clicked.connect(partial(self._manage_properties,
@@ -224,7 +224,7 @@ class GwDscenarioManagerButton(GwAction):
         # Connect main dialog signals
         self.dlg_dscenario_manager.txt_name.textChanged.connect(partial(self._fill_manager_table, 'v_edit_cat_dscenario'))
         self.dlg_dscenario_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
-                                                self.dlg_dscenario_manager, 'v_edit_cat_dscenario'))
+                                                self.dlg_dscenario_manager, 'v_edit_cat_dscenario', 3156))
         self.dlg_dscenario_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3042,
                                                                        'v_edit_cat_dscenario'))
         self.dlg_dscenario_manager.btn_update.clicked.connect(partial(self._manage_properties,
@@ -377,7 +377,7 @@ class GwDscenarioManagerButton(GwAction):
         return dlg_functions
 
 
-    def _duplicate_selected_dscenario(self, dialog, view):
+    def _duplicate_selected_dscenario(self, dialog, view, fct_id):
         """ Duplicates the selected dscenario """
 
         # Get selected row
@@ -392,7 +392,7 @@ class GwDscenarioManagerButton(GwAction):
         value = index.sibling(index.row(), 0).data()
 
         # Execute toolbox function
-        dlg_functions = self._open_toolbox_function(3156, view)
+        dlg_functions = self._open_toolbox_function(fct_id, view)
         # Set dscenario_id in combo copyFrom
         tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'copyFrom'), f"{value}", 0)
         tools_qt.set_widget_enabled(dlg_functions, 'copyFrom', False)
