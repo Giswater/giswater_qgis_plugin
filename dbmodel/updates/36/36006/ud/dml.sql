@@ -89,3 +89,31 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('gully', 'form_feature', 'tab_visit', 'open_gallery', 'lyt_visit_2', 2, NULL, 'button', NULL, 'Open gallery', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{"icon":"136b", "size":"24x24"}'::json, '{"saveValue":false, "filterSign":"="}'::json, '{"functionName": "open_visit_files", "module": "info", "parameters":{"targetwidget":"tab_visit_tbl_visits"}}'::json, 'tbl_visit_x_gully', false, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('gully', 'form_feature', 'tab_visit', 'tbl_visits', 'lyt_visit_3', 1, NULL, 'tableview', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue": false}'::json, '{"functionName": "open_selected_path", "parameters":{"columnfind":"path"}}'::json, 'tbl_visit_x_gully', false, 4);
 
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES(3294, 'gw_fct_duplicate_hydrology_scenario', 'ud', 'function', NULL, NULL, 'Function to duplicate hydrology scenario', 'role_epa', NULL, 'core');
+INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device)
+VALUES(3294, 'Duplicate Hydrology scenario', '{"featureType":[]}'::json, '[
+{"widgetname":"copyFrom", "label":"Copy from:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT hydrology_id as id, name as idval FROM cat_hydrology WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":1, "selectedId":"$userDscenario"},
+{"widgetname":"name", "label":"Name: (*)","widgettype":"linetext","datatype":"text", "isMandatory":true, "tooltip":"Name for hydrology scenario (mandatory)", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":2, "value":""},
+{"widgetname":"infiltration", "label":"Infiltration:","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Infiltration", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":3, "value":""},
+{"widgetname":"text", "label":"Text:","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Text of hydrology scenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":4, "value":""},
+{"widgetname":"expl", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"hydrology scenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":5, "value":""},
+{"widgetname":"active", "label":"Active:", "widgettype":"check", "datatype":"boolean", "tooltip":"If true, active" , "layoutname":"grl_option_parameters","layoutorder":6, "value":"true"}
+]'::json, NULL, true, '{4}');
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
+VALUES(525, 'Duplicate hydrology scenario', 'ud', NULL, 'core', NULL, 'Function process', NULL);
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES(3296, 'gw_fct_duplicate_dwf_scenario', 'ud', 'function', NULL, NULL, 'Function to duplicate dwf scenario', 'role_epa', NULL, 'core');
+INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device)
+VALUES(3296, 'Duplicate DWF scenario', '{"featureType":[]}'::json, '[
+{"widgetname":"copyFrom", "label":"Copy from:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT id, idval FROM cat_dwf_scenario WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":1, "selectedId":"$userDscenario"},
+{"widgetname":"idval", "label":"Name: (*)","widgettype":"linetext","datatype":"text", "isMandatory":true, "tooltip":"Name for dwf scenario (mandatory)", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":2, "value":""},
+{"widgetname":"startdate", "label":"Start date:","widgettype":"datetime","datatype":"date", "isMandatory":false, "tooltip":"Start date for dwf scenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":3, "value":""},
+{"widgetname":"enddate", "label":"Parent:","widgettype":"datetime","datatype":"date", "isMandatory":false, "tooltip":"", "placeholder":"End date for dwf scenario", "layoutname":"grl_option_parameters","layoutorder":4, "value":""},
+{"widgetname":"observ", "label":"Observ:","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Observations of dwf scenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":5, "value":""},
+{"widgetname":"expl", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"dwf scenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":6, "value":""},
+{"widgetname":"active", "label":"Active:", "widgettype":"check", "datatype":"boolean", "tooltip":"If true, active" , "layoutname":"grl_option_parameters","layoutorder":7, "value":"true"}
+]'::json, NULL, true, '{4}');
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
+VALUES(526, 'Duplicate dwf scenario', 'ud', NULL, 'core', NULL, 'Function process', NULL);
