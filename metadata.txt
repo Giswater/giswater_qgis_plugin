@@ -20,6 +20,7 @@ Changelog=Version 3.6.005
     - Manage Hydrology scenarios and dwf scenarios (ud)
     - Add Roughness catalog on Non-visual
     - Enhance button execute netscenario on netscenario_manager
+    - Add variable "basic_search_hydrometer_show_connec" to manage open hydrometer form from search
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
