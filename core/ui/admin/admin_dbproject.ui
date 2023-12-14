@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>481</width>
+    <width>676</width>
     <height>796</height>
    </rect>
   </property>
@@ -90,7 +90,7 @@
        <item row="8" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QRadioButton" name="rdb_data">
+          <widget class="QRadioButton" name="rdb_empty">
            <property name="text">
             <string>Empty data</string>
            </property>
@@ -100,14 +100,21 @@
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="rdb_sample">
+          <widget class="QRadioButton" name="rdb_sample_inv">
            <property name="text">
-            <string>Example data</string>
+            <string>Inventory Example</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="rdb_import_data">
+          <widget class="QRadioButton" name="rdb_sample_full">
+           <property name="text">
+            <string>Full Example</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rdb_inp">
            <property name="enabled">
             <bool>true</bool>
            </property>
@@ -196,6 +203,19 @@
          </attribute>
         </widget>
        </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="lbl_source">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Data source:</string>
+         </property>
+        </widget>
+       </item>
       </layout>
       <zorder>tbl_srid</zorder>
       <zorder>project_name</zorder>
@@ -208,6 +228,7 @@
       <zorder>lbl_filter</zorder>
       <zorder>lbl_project_type</zorder>
       <zorder>cmb_create_project_type</zorder>
+      <zorder>lbl_source</zorder>
      </widget>
     </item>
     <item row="4" column="0" colspan="5">
@@ -276,9 +297,9 @@
   <tabstop>project_descript</tabstop>
   <tabstop>srid_id</tabstop>
   <tabstop>tbl_srid</tabstop>
-  <tabstop>rdb_data</tabstop>
-  <tabstop>rdb_sample</tabstop>
-  <tabstop>rdb_import_data</tabstop>
+  <tabstop>rdb_empty</tabstop>
+  <tabstop>rdb_sample_full</tabstop>
+  <tabstop>rdb_inp</tabstop>
   <tabstop>data_file</tabstop>
   <tabstop>btn_push_file</tabstop>
  </tabstops>

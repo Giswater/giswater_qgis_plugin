@@ -154,7 +154,10 @@ class GwMapzoneManager:
 
         # Check for errors
         if model.lastError().isValid():
-            tools_qgis.show_warning(model.lastError().text(), dialog=self.mapzone_mng_dlg)
+            if 'Unable to find table' in model.lastError().text():
+                tools_db.reset_qsqldatabase_connection(self.mapzone_mng_dlg)
+            else:
+                tools_qgis.show_warning(model.lastError().text(), dialog=self.mapzone_mng_dlg)
         # Attach model to table view
         if expr:
             widget.setModel(model)
@@ -669,7 +672,11 @@ class GwMapzoneManager:
 
         # Get selected mapzone data
         index = tableview.selectionModel().currentIndex()
-        col_idx = tools_qt.get_col_index_by_col_name(tableview, f"{tablename.split('_')[-1].lower()}_id")
+        col_name = f"{tablename.split('_')[-1].lower()}_id"
+        if col_name == 'valve_id':
+            col_name = 'node_id'
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, col_name)
+
         mapzone_id = index.sibling(index.row(), col_idx).data()
         field_id = tableview.model().headerData(col_idx, Qt.Horizontal)
 
@@ -725,11 +732,12 @@ class GwMapzoneManager:
         self.add_dlg.actionEdit.setVisible(False)
         # Disable widgets if updating
         if force_action == "UPDATE":
-            tools_qt.set_widget_enabled(self.add_dlg, f'tab_data_{field_id}', False)  # sector_id/dma_id/...
+            tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_{field_id}', False)  # sector_id/dma_id/...
         # Populate netscenario_id
         if self.netscenario_id is not None:
-            tools_qt.set_widget_text(self.add_dlg, f'tab_data_netscenario_id', self.netscenario_id)
-            tools_qt.set_widget_enabled(self.add_dlg, f'tab_data_netscenario_id', False)
+            tools_qt.set_widget_text(self.add_dlg, f'tab_none_netscenario_id', self.netscenario_id)
+            tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_netscenario_id', False)
+            tools_qt.set_checked(self.add_dlg, 'tab_none_active', True)
             field_id = ['netscenario_id', field_id]
 
         # Get every widget in the layout

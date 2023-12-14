@@ -234,6 +234,10 @@ FROM_CLASS = _get_ui_class('nonvisual_print.ui', 'epa')
 class GwNonVisualPrint(GwDialog, FROM_CLASS):
     pass
 
+FROM_CLASS = _get_ui_class('nonvisual_roughness.ui', 'epa')
+class GwNonVisualRoughnessUi(GwDialog, FROM_CLASS):
+    pass
+
 FROM_CLASS = _get_ui_class('nonvisual_rules.ui', 'epa')
 class GwNonVisualRulesUi(GwDialog, FROM_CLASS):
     pass
@@ -267,6 +271,10 @@ class GwPsectorManagerUi(GwDialog, FORM_CLASS):
 
 FORM_CLASS = _get_ui_class('psector_rapport.ui', 'plan')
 class GwPsectorRapportUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = _get_ui_class('psector_repair.ui', 'plan')
+class GwPsectorRepairUi(GwDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = _get_ui_class('replace_arc.ui', 'plan')

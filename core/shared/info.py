@@ -11,6 +11,7 @@ import re
 import urllib.parse as parse
 import webbrowser
 from functools import partial
+from qgis.core import QgsEditFormConfig
 
 from sip import isdeleted
 
@@ -20,7 +21,8 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox
-from qgis.core import QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY, QgsProject
+from qgis.core import Qgis, QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, \
+    QgsPointXY, QgsProject, QgsWkbTypes
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
 
 from .catalog import GwCatalog
@@ -64,7 +66,7 @@ class GwInfo(QObject):
         self.layer_new_feature = None
         self.tab_type = tab_type
         self.connected = False
-        self.rubber_band = tools_gw.create_rubberband(self.canvas, 0)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.PointGeometry)
         self.snapper_manager = GwSnapManager(self.iface)
         self.snapper_manager.set_snapping_layers()
         self.suppres_form = None
@@ -295,7 +297,10 @@ class GwInfo(QObject):
             QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
             config = self.info_layer.editFormConfig()
             self.conf_supp = config.suppress()
-            config.setSuppress(0)
+            if Qgis.QGIS_VERSION_INT >= 33200:
+                config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.Default)
+            else:
+                config.setSuppress(0)
             self.info_layer.setEditFormConfig(config)
             self.iface.setActiveLayer(self.info_layer)
             self.info_layer.startEditing()
@@ -430,6 +435,8 @@ class GwInfo(QObject):
         self.dlg_generic.btn_accept.setEnabled(can_edit)
 
         self.dlg_generic.dlg_closed.connect(self.rubber_band.reset)
+        self.dlg_generic.dlg_closed.connect(self._roll_back)
+        self.dlg_generic.dlg_closed.connect(self._disconnect_signals)
         tools_gw.open_dialog(self.dlg_generic, dlg_name='info_generic')
 
         return result, self.dlg_generic
@@ -571,24 +578,6 @@ class GwInfo(QObject):
 
         self.tab_main = self.dlg_cf.findChild(QTabWidget, "tab_main")
         self.tab_main.currentChanged.connect(partial(self._tab_activation, self.dlg_cf))
-        # self.tbl_element = self.dlg_cf.findChild(QTableView, "tbl_element")
-        # tools_qt.set_tableview_config(self.tbl_element)
-        # self.tbl_relations = self.dlg_cf.findChild(QTableView, "tbl_relations")
-        # tools_qt.set_tableview_config(self.tbl_relations)
-        # self.tbl_upstream = self.dlg_cf.findChild(QTableView, "tbl_upstream")
-        # tools_qt.set_tableview_config(self.tbl_upstream)
-        # self.tbl_downstream = self.dlg_cf.findChild(QTableView, "tbl_downstream")
-        # tools_qt.set_tableview_config(self.tbl_downstream)
-        # self.tbl_hydrometer = self.dlg_cf.findChild(QTableView, "tbl_hydrometer")
-        # tools_qt.set_tableview_config(self.tbl_hydrometer)
-        # self.tbl_hydrometer_value = self.dlg_cf.findChild(QTableView, "tbl_hydrometer_value")
-        # tools_qt.set_tableview_config(self.tbl_hydrometer_value, QAbstractItemView.SelectItems,
-        #                               QTableView.CurrentChanged)
-        # self.tbl_visit_cf = self.dlg_cf.findChild(QTableView, "tbl_visit_cf")
-        # self.tbl_event_cf = self.dlg_cf.findChild(QTableView, "tbl_event_cf")
-        # tools_qt.set_tableview_config(self.tbl_event_cf)
-        # self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
-        # tools_qt.set_tableview_config(self.tbl_document)
 
 
     def _get_features(self, complet_result):
@@ -888,8 +877,8 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaPumpUi", "uiName": "info_epa_pump",
                        "tableviews": [
-                        {"tbl": "tbl_pump", "view": "inp_pump_additional", "add_view": "v_edit_inp_pump_additional", "pk": "id", "add_dlg_title": "Pump Additional - Base"},
-                        {"tbl": "tbl_dscenario_pump", "view": "inp_dscenario_pump_additional", "add_view": "v_edit_inp_dscenario_pump_additional", "pk": "id", "add_dlg_title": "Pump Additional - Dscenario"}
+                        {"tbl": "tbl_pump", "view": "inp_pump_additional", "add_view": "v_edit_inp_pump_additional", "pk": ["node_id", "order_id"], "add_dlg_title": "Pump Additional - Base"},
+                        {"tbl": "tbl_dscenario_pump", "view": "inp_dscenario_pump_additional", "add_view": "v_edit_inp_dscenario_pump_additional", "pk": ["dscenario_id", "node_id", "order_id"], "add_dlg_title": "Pump Additional - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg(**kwargs)
@@ -1175,7 +1164,7 @@ class GwInfo(QObject):
                 snapped_feat = self.snapper_manager.get_snapped_feature(result)
                 element_id = snapped_feat.attribute('node_id')
                 message = "Selected node"
-                rb = tools_gw.create_rubberband(global_vars.canvas, 0)
+                rb = tools_gw.create_rubberband(global_vars.canvas, QgsWkbTypes.PointGeometry)
                 if self.node1 is None:
                     self.node1 = str(element_id)
                     tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10)
@@ -3190,7 +3179,7 @@ def get_list(table_name, id_name=None, filter=None):
     return complet_list
 
 
-def fill_tbl(complet_list, tbl, info, view):
+def fill_tbl(complet_list, tbl, info, view, dlg):
     if complet_list is False:
         return False, False
 
@@ -3231,10 +3220,23 @@ def fill_tbl(complet_list, tbl, info, view):
         if field['value']:
             tbl = tools_gw.add_tableview_header(tbl, field)
             tbl = tools_gw.fill_tableview_rows(tbl, field)
-        tools_qt.set_tableview_config(tbl, edit_triggers=QTableView.DoubleClicked)
+        tools_qt.set_tableview_config(tbl)
         model.dataChanged.connect(partial(tbl_data_changed, info, view, tbl, model, addparam))
+    try:
+        tbl.doubleClicked.disconnect()
+    except Exception:
+        pass
+    tbl.doubleClicked.connect(partial(epa_tbl_doubleClicked, tbl, dlg))
     # editability
     tbl.model().flags = lambda index: epa_tbl_flags(index, model, non_editable_columns)
+
+
+def epa_tbl_doubleClicked(tbl, dlg):
+
+    if 'dscenario' in tbl.objectName():
+        dlg.findChild(QPushButton, 'btn_edit_dscenario').click()
+    else:
+        dlg.findChild(QPushButton, 'btn_edit_base').click()
 
 
 def epa_tbl_flags(index, model, non_editable_columns=None):
@@ -3299,7 +3301,7 @@ def open_epa_dlg(**kwargs):
         id_name = tableview.get('id_name', id_name)
 
         complet_list = get_list(view, id_name, feature_id)
-        fill_tbl(complet_list, tbl, info, view)
+        fill_tbl(complet_list, tbl, info, view, info.dlg)
         tools_gw.set_tablemodel_config(info.dlg, tbl, view, schema_name=info.schema_name, isQStandardItemModel=True)
         info.dlg.btn_accept.clicked.connect(partial(save_tbl_changes, view, info, info.dlg, pk))
 
@@ -3308,7 +3310,11 @@ def open_epa_dlg(**kwargs):
             btn_add_base = info.dlg.findChild(QPushButton, 'btn_add_base')
             if btn_add_base:
                 tools_gw.add_icon(btn_add_base, '111b', "24x24")
-                btn_add_base.clicked.connect(partial(add_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, **kwargs))
+                btn_add_base.clicked.connect(partial(add_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, "INSERT", **kwargs))
+            btn_edit_base = info.dlg.findChild(QPushButton, 'btn_edit_base')
+            if btn_edit_base:
+                tools_gw.add_icon(btn_edit_base, '101')
+                btn_edit_base.clicked.connect(partial(edit_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, **kwargs))
             btn_delete_base = info.dlg.findChild(QPushButton, 'btn_delete_base')
             if btn_delete_base:
                 tools_gw.add_icon(btn_delete_base, '112b', "24x24")
@@ -3317,11 +3323,15 @@ def open_epa_dlg(**kwargs):
             btn_add_dscenario = info.dlg.findChild(QPushButton, 'btn_add_dscenario')
             if btn_add_dscenario:
                 tools_gw.add_icon(btn_add_dscenario, '111b', "24x24")
-                btn_add_dscenario.clicked.connect(partial(add_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, **kwargs))
+                btn_add_dscenario.clicked.connect(partial(add_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, "INSERT", **kwargs))
             btn_delete_dscenario = info.dlg.findChild(QPushButton, 'btn_delete_dscenario')
             if btn_delete_dscenario:
                 tools_gw.add_icon(btn_delete_dscenario, '112b', "24x24")
                 btn_delete_dscenario.clicked.connect(partial(delete_tbl_row, tbl, view, pk, info.dlg, **kwargs))
+            btn_edit_dscenario = info.dlg.findChild(QPushButton, 'btn_edit_dscenario')
+            if btn_edit_dscenario:
+                tools_gw.add_icon(btn_edit_dscenario, '101')
+                btn_edit_dscenario.clicked.connect(partial(edit_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, **kwargs))
 
     info.dlg.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, info.dlg, True))
     info.dlg.finished.connect(partial(tools_gw.save_settings, info.dlg))
@@ -3329,7 +3339,35 @@ def open_epa_dlg(**kwargs):
     tools_gw.open_dialog(info.dlg, dlg_name=ui_name)
 
 
-def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, **kwargs):
+
+def edit_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, **kwargs):
+    # Get selected row
+    selected_list = tbl.selectionModel().selectedRows()
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        tools_qgis.show_warning(message, dialog=dlg)
+        return
+
+    values = []
+    if pkey:
+        if not isinstance(pkey, list):
+            pkey = [pkey]
+        values = []
+        for index in selected_list:
+            value = {}
+            for pk in pkey:
+                col_idx = tools_qt.get_col_index_by_col_name(tbl, pk)
+                if col_idx is None:
+                    col_idx = 0
+                value[pk] = index.sibling(index.row(), col_idx).data()
+            if value:
+                values.append(value)
+
+    kwargs['values'] = values
+    add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, "UPDATE", **kwargs)
+
+
+def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, force_action, **kwargs):
 
     # Get variables
     complet_result = kwargs['complet_result']
@@ -3344,6 +3382,10 @@ def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, **kwargs):
     id_name = complet_result['body']['feature']['idName']
 
     feature = f'"tableName":"{tablename}", "isEpa": true'
+    if force_action == "UPDATE":
+        values = kwargs['values']
+        id_str = ', '.join([str(value) for value in values[0].values()])
+        feature += f', "id": "{id_str}"'
     body = tools_gw.create_body(feature=feature)
     json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
     if json_result is None or json_result['status'] == 'Failed':
@@ -3401,7 +3443,7 @@ def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, **kwargs):
     info.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, info.add_dlg))
     info.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, info.add_dlg))
     info.add_dlg.dlg_closed.connect(partial(refresh_epa_tbl, tbl, dlg, **kwargs))
-    info.add_dlg.btn_accept.clicked.connect(partial(accept_add_dlg, info.add_dlg, tablename, pkey, feature_id, info.my_json_add, result, info))
+    info.add_dlg.btn_accept.clicked.connect(partial(accept_add_dlg, info.add_dlg, tablename, pkey, feature_id, info.my_json_add, result, info, force_action))
 
     # Open dlg
     tools_gw.open_dialog(info.add_dlg, dlg_name='info_generic', title=dlg_title)
@@ -3431,7 +3473,7 @@ def refresh_epa_tbl(tblview, dlg, **kwargs):
         else:
             view = tableview['view']
         complet_list = get_list(view, id_name, feature_id)
-        fill_tbl(complet_list, tbl, info, view)
+        fill_tbl(complet_list, tbl, info, view, dlg)
         tools_gw.set_tablemodel_config(dlg, tbl, view, schema_name=info.schema_name, isQStandardItemModel=True)
 
 
@@ -3442,7 +3484,7 @@ def reload_tbl_dscenario (info, tablename, tableview, id_name, feature_id):
 
     if tbl is not None:
         complet_list = get_list(view, id_name, feature_id)
-        fill_tbl(complet_list, tbl, info, view)
+        fill_tbl(complet_list, tbl, info, view, info.dlg)
 
 
 def delete_tbl_row(tbl, view, pkey, dlg, tablename=None, tableview=None, id_name=None, feature_id=None, **kwargs):
@@ -3500,7 +3542,7 @@ def delete_tbl_row(tbl, view, pkey, dlg, tablename=None, tableview=None, id_name
             reload_tbl_dscenario(info, tablename, tableview, id_name, feature_id)
 
 
-def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result, info):
+def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result, info, force_action):
 
     if not my_json:
         return
@@ -3543,7 +3585,7 @@ def accept_add_dlg(dialog, tablename, pkey, feature_id, my_json, complet_result,
 
     feature = f'"id":"{id_val}", '
     feature += f'"tableName":"{tablename}"'
-    extras = f'"fields":{fields}, "force_action":"INSERT"'
+    extras = f'"fields":{fields}, "force_action":"{force_action}"'
     body = tools_gw.create_body(feature=feature, extras=extras)
     json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
     if json_result and json_result.get('status') == 'Accepted':
@@ -3721,7 +3763,7 @@ def add_to_dscenario(**kwargs):
 
     setattr(info, f"my_json_{tablename}", {})
 
-    add_row_epa(tbl, tablename, tablename, pkey, dialog, dlg_title, **kwargs)
+    add_row_epa(tbl, tablename, tablename, pkey, dialog, dlg_title, "INSERT", **kwargs)
 
 
 def remove_from_dscenario(**kwargs):
@@ -3973,8 +4015,9 @@ def new_visit(**kwargs):
     """ Call button 64: om_add_visit """
 
     dlg_cf = kwargs['dialog']
-    feature_type = kwargs['complet_result']['body']['feature']['childType']
+    feature_type = kwargs['complet_result']['body']['feature']['featureType']
     feature_id = kwargs['complet_result']['body']['feature']['id']
+
     # Get expl_id to save it on om_visit and show the geometry of visit
     expl_id = tools_qt.get_combo_value(dlg_cf, 'tab_data_expl_id', 0)
     if expl_id == -1:
@@ -3982,8 +4025,9 @@ def new_visit(**kwargs):
         tools_qgis.show_warning(msg)
         return
 
-    date_event_from = dlg_cf.findChild(QDateEdit, "date_event_from")
-    date_event_to = dlg_cf.findChild(QDateEdit, "date_event_to")
+    date_event_from = dlg_cf.tab_event.findChild(QgsDateTimeEdit, "date_event_from")
+    date_event_to = dlg_cf.tab_event.findChild(QgsDateTimeEdit, "date_event_to")
+
     tbl_event_cf = dlg_cf.findChild(QTableView, "tbl_event_cf")
     manage_visit = GwVisit()
     manage_visit.visit_added.connect(partial(_update_visit_table, feature_type, date_event_from, date_event_to, tbl_event_cf))

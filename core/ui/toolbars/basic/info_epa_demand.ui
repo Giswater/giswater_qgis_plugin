@@ -24,8 +24,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>943</width>
-        <height>394</height>
+        <width>947</width>
+        <height>404</height>
        </rect>
       </property>
       <attribute name="label">
@@ -50,6 +50,13 @@
          </item>
          <item>
           <widget class="QPushButton" name="btn_delete_dscenario">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_edit_dscenario">
            <property name="text">
             <string/>
            </property>

@@ -49,7 +49,7 @@ class GwToolBoxButton(GwAction):
         self._open_toolbox()
 
 
-    def open_function_by_id(self, func_id, connect_signal=None):
+    def open_function_by_id(self, func_id, connect_signal=None, aux_params="null"):
 
         self.dlg_functions = GwToolboxManagerUi()
         tools_gw.load_settings(self.dlg_functions)
@@ -84,7 +84,7 @@ class GwToolBoxButton(GwAction):
         self.dlg_functions.mainTab.currentChanged.connect(partial(self._manage_btn_run))
         self.dlg_functions.btn_run.clicked.connect(partial(self._execute_function, self.function_selected,
                                                            self.dlg_functions, self.dlg_functions.cmb_layers,
-                                                           json_result['body']['data']))
+                                                           json_result['body']['data'], aux_params=aux_params))
         self.dlg_functions.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))
         self.dlg_functions.rejected.connect(partial(tools_gw.close_dialog, self.dlg_functions))
         self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
@@ -556,7 +556,7 @@ class GwToolBoxButton(GwAction):
             tools_qt.set_checked(dialog, 'rbt_layer', True)
 
 
-    def _execute_function(self, description, dialog, combo, result):
+    def _execute_function(self, description, dialog, combo, result, aux_params="null"):
 
         # Manage if task is already running
         if hasattr(self, 'toolbox_task') and self.toolbox_task is not None:
@@ -582,7 +582,7 @@ class GwToolBoxButton(GwAction):
 
         self.timer.start(1000)
         # Set background task 'GwToolBoxTask'
-        self.toolbox_task = GwToolBoxTask(self, description, dialog, combo, result, timer=self.timer)
+        self.toolbox_task = GwToolBoxTask(self, description, dialog, combo, result, timer=self.timer, aux_params=aux_params)
         QgsApplication.taskManager().addTask(self.toolbox_task)
         QgsApplication.taskManager().triggerTask(self.toolbox_task)
 

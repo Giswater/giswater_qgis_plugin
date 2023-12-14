@@ -20,7 +20,7 @@ class GwToolBoxTask(GwTask):
 
     fake_progress = pyqtSignal()
 
-    def __init__(self, toolbox, description, dialog, combo, result, timer=None):
+    def __init__(self, toolbox, description, dialog, combo, result, timer=None, aux_params="null"):
 
         super().__init__(description)
         self.toolbox = toolbox
@@ -32,6 +32,7 @@ class GwToolBoxTask(GwTask):
         self.exception = None
         self.function_name = None
         self.timer = timer
+        self.aux_params = aux_params
 
 
     def run(self):
@@ -138,6 +139,9 @@ class GwToolBoxTask(GwTask):
         if len(widget_list) > 0:
             extras = extras[:-2]
         extras += '}'
+        if self.aux_params is False:
+            self.aux_params = "null"
+        extras += f', "aux_params":{self.aux_params}'
         self.body = tools_gw.create_body(feature=feature_field, extras=extras)
         tools_log.log_info(f"Task 'Toolbox execute' execute procedure '{self.function_name}' with parameters: '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
         self.json_result = tools_gw.execute_procedure(self.function_name, self.body,

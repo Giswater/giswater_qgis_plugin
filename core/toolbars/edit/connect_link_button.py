@@ -9,7 +9,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QRect, Qt
 from qgis.PyQt.QtWidgets import QApplication
-from qgis.core import QgsVectorLayer, QgsRectangle, QgsApplication, QgsProject
+from qgis.core import QgsVectorLayer, QgsRectangle, QgsApplication, QgsProject, QgsWkbTypes
 
 from ..maptool import GwMaptool
 from ...ui.ui_manager import GwDialogTextUi
@@ -72,7 +72,7 @@ class GwConnectLinkButton(GwMaptool):
     def canvasPressEvent(self, event):
 
         self.select_rect.setRect(0, 0, 0, 0)
-        tools_gw.reset_rubberband(self.rubber_band, 2)
+        tools_gw.reset_rubberband(self.rubber_band, QgsWkbTypes.PolygonGeometry)
 
 
     def canvasReleaseEvent(self, event):
@@ -242,7 +242,7 @@ class GwConnectLinkButton(GwMaptool):
         ur = transform.toMapCoordinates(self.select_rect.right(), self.select_rect.top())
 
         # Rubber band
-        tools_gw.reset_rubberband(self.rubber_band, 2)
+        tools_gw.reset_rubberband(self.rubber_band, QgsWkbTypes.PolygonGeometry)
         self.rubber_band.addPoint(ll, False)
         self.rubber_band.addPoint(lr, False)
         self.rubber_band.addPoint(ur, False)

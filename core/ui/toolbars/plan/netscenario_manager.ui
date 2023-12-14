@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>872</width>
-    <height>786</height>
+    <width>1135</width>
+    <height>392</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,34 +20,28 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="verticalLayout_3">
-      <item row="7" column="10">
-       <widget class="QPushButton" name="btn_cancel">
+      <item row="5" column="10">
+       <widget class="QPushButton" name="btn_toggle_active">
         <property name="text">
-         <string>Close</string>
+         <string>Toggle active</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="2" colspan="2">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>5000</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="lbl_netscenario_name">
+      <item row="5" column="14">
+       <widget class="QPushButton" name="btn_duplicate">
         <property name="text">
-         <string>Filter by: Netscenario name</string>
+         <string>Duplicate</string>
         </property>
        </widget>
       </item>
-      <item row="7" column="0" colspan="5">
+      <item row="5" column="12">
+       <widget class="QPushButton" name="btn_toc">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0" colspan="13">
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -60,54 +54,34 @@
         </property>
        </spacer>
       </item>
-      <item row="5" column="10">
-       <widget class="QPushButton" name="btn_delete">
+      <item row="5" column="2">
+       <widget class="QCheckBox" name="chk_active">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Delete</string>
+         <string>Show inactive</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="0" colspan="2">
-       <widget class="QLineEdit" name="txt_name">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+      <item row="5" column="9">
+       <widget class="QPushButton" name="btn_update_netscenario">
         <property name="text">
-         <string/>
+         <string>Current netscenario</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="0" colspan="11">
-       <widget class="QTableView" name="tbl_netscenario">
-        <property name="selectionMode">
-         <enum>QAbstractItemView::SingleSelection</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="8">
+      <item row="5" column="15">
        <widget class="QPushButton" name="btn_update">
         <property name="text">
          <string>Update</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="7">
-       <widget class="QPushButton" name="btn_duplicate">
-        <property name="text">
-         <string>Duplicate</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="6">
+      <item row="5" column="13">
        <widget class="QToolButton" name="btn_create">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -132,22 +106,78 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="9">
-       <widget class="QPushButton" name="btn_execute">
-        <property name="text">
-         <string>Execute</string>
+      <item row="5" column="0" colspan="2">
+       <widget class="QLineEdit" name="txt_name">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-       </widget>
-      </item>
-      <item row="5" column="5">
-       <widget class="QPushButton" name="btn_selector">
         <property name="text">
          <string/>
         </property>
        </widget>
       </item>
-      <item row="5" column="4">
-       <widget class="QPushButton" name="btn_toc">
+      <item row="5" column="6">
+       <widget class="QLabel" name="lbl_vdefault_netscenario">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="16">
+       <widget class="QPushButton" name="btn_delete">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Delete</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="16">
+       <widget class="QPushButton" name="btn_cancel">
+        <property name="text">
+         <string>Close</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0" colspan="17">
+       <widget class="QTableView" name="tbl_netscenario">
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="lbl_netscenario_name">
+        <property name="text">
+         <string>Filter by: Netscenario name</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="4" colspan="2">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>5000</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="5" column="11">
+       <widget class="QPushButton" name="btn_execute">
+        <property name="toolTip">
+         <string/>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -160,9 +190,7 @@
  </widget>
  <tabstops>
   <tabstop>txt_name</tabstop>
-  <tabstop>btn_delete</tabstop>
   <tabstop>tbl_netscenario</tabstop>
-  <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>

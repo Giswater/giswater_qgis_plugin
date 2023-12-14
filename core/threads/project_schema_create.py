@@ -99,7 +99,7 @@ class GwCreateSchemaTask(GwTask):
             self.timer.stop()
 
         if self.finish_execution['import_data']:
-            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_import_data', prefix=False)
+            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_inp', prefix=False)
             msg = ("The base schema have been correctly executed."
                    "\nNow will start the import process. It is experimental and it may crash."
                    "\nIf this happens, please notify it by send a e-mail to info@giswater.org.")
@@ -178,13 +178,17 @@ class GwCreateSchemaTask(GwTask):
         self.admin.total_sql_files = 100
         self.admin.progress_ratio = 1.0
 
-        if self.admin.rdb_import_data.isChecked():
+        if self.admin.rdb_inp.isChecked():
             self.finish_execution['import_data'] = True
-        elif self.admin.rdb_sample.isChecked() and example_data:
-            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample', prefix=False)
+        elif self.admin.rdb_sample_inv.isChecked() and example_data:
+            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample_full', prefix=False)
             self.admin.load_sample_data(project_type=project_type)
-        elif self.admin.rdb_data.isChecked():
-            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_data', prefix=False)
+            self.admin.load_inv_data(project_type=project_type)
+        elif self.admin.rdb_sample_full.isChecked() and example_data:
+            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample_full', prefix=False)
+            self.admin.load_sample_data(project_type=project_type)
+        elif self.admin.rdb_empty.isChecked():
+            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_empty', prefix=False)
 
 
     def calculate_number_of_files(self):

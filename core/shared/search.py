@@ -18,6 +18,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileD
     QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget, QDockWidget, QCheckBox
 from qgis.core import QgsPointXY, QgsGeometry
 
+from libs import tools_os
 from .document import GwDocument
 from .info import GwInfo
 from .psector import GwPsector
@@ -112,7 +113,7 @@ class GwSearch:
                     elif field['widgettype'] == 'combo':
                         widget = self._add_combobox(field)
                     elif field['widgettype'] == 'check':
-                        kwargs = {"dialog": self.dlg_search,  "field": field}
+                        kwargs = {"dialog": self.dlg_search, "field": field}
                         widget = tools_gw.add_checkbox(**kwargs)
                     gridlayout.addWidget(label, x, 0)
                     gridlayout.addWidget(widget, x, 1)
@@ -336,7 +337,7 @@ class GwSearch:
             point = QgsPointXY(float(x1), float(y1))
             tools_qgis.draw_point(point, self.rubber_band)
             tools_qgis.zoom_to_rectangle(x1, y1, x1, y1, margin=100)
-            self._open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'])
+            self._open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'], connec_id=item['sys_connec_id'])
 
         # Tab 'workcat'
         elif tab_selected == 'workcat':
@@ -523,29 +524,43 @@ class GwSearch:
                 list_items.append(elem)
         return list_items
 
+    def _open_hydrometer_dialog(self, table_name=None, feature_id=None, connec_id=None):
 
-    def _open_hydrometer_dialog(self, table_name=None, feature_id=None):
 
-        # get sys variale
-        qgis_project_infotype = lib_vars.project_vars['info_type']
+        # Get basic_search_hydrometer_show_connec param
+        row = tools_gw.get_config_value("basic_search_hydrometer_show_connec", table='config_param_system')
 
-        feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
-        extras = f'"infoType":"{qgis_project_infotype}"'
-        body = tools_gw.create_body(feature=feature, extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
-        if json_result is None or json_result['status'] == 'Failed':
-            return
-        result = json_result
+        if tools_os.set_boolean(row['value']):
+            self.customForm = GwInfo(tab_type='data')
+            # v_edit_connec is the exact view to see the details of connec
+            complet_result, dialog = self.customForm.get_info_from_id(
+                "v_edit_connec", tab_type='data', feature_id=connec_id, is_add_schema=False)
 
-        self.hydro_info_dlg = GwInfoGenericUi()
-        tools_gw.load_settings(self.hydro_info_dlg)
+            if not complet_result:
+                return
+            tab_main = dialog.findChild(QTabWidget, "tab_main")
+            tab_main.setCurrentIndex(3)
 
-        self.hydro_info_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
-        self.hydro_info_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
-        self.hydro_info_dlg.dlg_closed.connect(self._reset_rubber_band)
-        tools_gw.build_dialog_info(self.hydro_info_dlg, result)
-        tools_gw.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
+        else:
+            qgis_project_infotype = lib_vars.project_vars['info_type']
 
+            feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
+            extras = f'"infoType":"{qgis_project_infotype}"'
+            body = tools_gw.create_body(feature=feature, extras=extras)
+            json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
+
+            if json_result is None or json_result['status'] == 'Failed':
+                return
+            result = json_result
+
+            self.hydro_info_dlg = GwInfoGenericUi()
+            tools_gw.load_settings(self.hydro_info_dlg)
+
+            self.hydro_info_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
+            self.hydro_info_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
+            self.hydro_info_dlg.dlg_closed.connect(self._reset_rubber_band)
+            tools_gw.build_dialog_info(self.hydro_info_dlg, result)
+            tools_gw.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
 
     def _workcat_open_table_items(self, item):
         """ Create the view and open the dialog with his content """
@@ -827,7 +842,10 @@ class GwSearch:
         widget.setEditTriggers(set_edit_triggers)
         # Check for errors
         if model.lastError().isValid():
-            tools_qgis.show_warning(model.lastError().text(), dialog=self.items_dialog)
+            if 'Unable to find table' in model.lastError().text():
+                tools_db.reset_qsqldatabase_connection(self.items_dialog)
+            else:
+                tools_qgis.show_warning(model.lastError().text(), dialog=self.items_dialog)
         # Attach model to table view
         if expr:
             widget.setModel(model)

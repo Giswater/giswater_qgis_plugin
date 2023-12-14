@@ -32,7 +32,7 @@ from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, Qg
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsDataSourceUri, \
-    QgsProviderRegistry, QgsMapLayerStyle, QgsGeometry
+    QgsProviderRegistry, QgsMapLayerStyle, QgsGeometry, QgsWkbTypes
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand
 
 from ..models.cat_feature import GwCatFeature
@@ -374,7 +374,7 @@ def reconnect_signal(section, signal_name):
     return False
 
 
-def create_body(form='', feature='', filter_fields='', extras=None):
+def create_body(form='', feature='', filter_fields='', extras=None, list_feature=None):
     """ Create and return parameters as body to functions"""
 
     info_types = {'full': 1}
@@ -389,7 +389,10 @@ def create_body(form='', feature='', filter_fields='', extras=None):
     client += f'}}, '
 
     form = f'"form":{{{form}}}, '
-    feature = f'"feature":{{{feature}}}, '
+    if list_feature:
+        feature = f'"feature":{feature}, '
+    else:
+        feature = f'"feature":{{{feature}}}, '
     filter_fields = f'"filterFields":{{{filter_fields}}}'
     page_info = f'"pageInfo":{{}}'
     data = f'"data":{{{filter_fields}, {page_info}'
@@ -438,7 +441,7 @@ def hide_parent_layers(excluded_layers=[]):
     """ Hide generic layers """
 
     layers_changed = {}
-    list_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element"]
+    list_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_link"]
     if global_vars.project_type == 'ud':
         list_layers.append("v_edit_gully")
 
@@ -526,7 +529,7 @@ def reset_feature_list():
     """ Reset list of selected records """
 
     ids = []
-    list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
+    list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': [], 'link': []}
 
     return ids, list_ids
 
@@ -536,7 +539,7 @@ def get_signal_change_tab(dialog, excluded_layers=[]):
 
     tab_idx = dialog.tab_feature.currentIndex()
     tab_name = {'tab_arc': 'arc', 'tab_node': 'node', 'tab_connec': 'connec', 'tab_gully': 'gully',
-                'tab_elem': 'element'}
+                'tab_elem': 'element', 'tab_link': 'link'}
 
     feature_type = tab_name.get(dialog.tab_feature.widget(tab_idx).objectName(), 'arc')
     hide_parent_layers(excluded_layers=excluded_layers)
@@ -954,7 +957,7 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
         try:
             dialog.btn_accept.disconnect()
             dialog.btn_accept.hide()
-        except AttributeError:
+        except Exception as e:
             pass
 
         try:
@@ -1166,52 +1169,51 @@ def set_style_mapzones():
         lyr = tools_qgis.get_layer_by_tablename(mapzone['layer'])
         categories = []
         status = mapzone['status']
-        if status == 'Disable':
+        if status == 'Disable' or lyr is None:
             continue
 
-        if lyr:
-            # Loop for each id returned on json
-            for id in mapzone['values']:
-                # initialize the default symbol for this geometry type
-                symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
+        # Loop for each id returned on json
+        for id in mapzone['values']:
+            # initialize the default symbol for this geometry type
+            symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
+            try:
+                symbol.setOpacity(float(mapzone['transparency']))
+            except KeyError:  # backwards compatibility for database < 3.5.030
+                symbol.setOpacity(float(mapzone['opacity']))
+
+            # Setting simp
+            R = random.randint(0, 255)
+            G = random.randint(0, 255)
+            B = random.randint(0, 255)
+            if status == 'Stylesheet':
                 try:
-                    symbol.setOpacity(float(mapzone['transparency']))
-                except KeyError:  # backwards compatibility for database < 3.5.030
-                    symbol.setOpacity(float(mapzone['opacity']))
-
-                # Setting simp
-                R = random.randint(0, 255)
-                G = random.randint(0, 255)
-                B = random.randint(0, 255)
-                if status == 'Stylesheet':
-                    try:
-                        R = id['stylesheet']['color'][0]
-                        G = id['stylesheet']['color'][1]
-                        B = id['stylesheet']['color'][2]
-                    except (TypeError, KeyError):
-                        R = random.randint(0, 255)
-                        G = random.randint(0, 255)
-                        B = random.randint(0, 255)
-
-                elif status == 'Random':
+                    R = id['stylesheet']['color'][0]
+                    G = id['stylesheet']['color'][1]
+                    B = id['stylesheet']['color'][2]
+                except (TypeError, KeyError):
                     R = random.randint(0, 255)
                     G = random.randint(0, 255)
                     B = random.randint(0, 255)
 
-                # Setting sytle
-                layer_style = {'color': '{}, {}, {}'.format(int(R), int(G), int(B))}
-                symbol_layer = QgsSimpleFillSymbolLayer.create(layer_style)
+            elif status == 'Random':
+                R = random.randint(0, 255)
+                G = random.randint(0, 255)
+                B = random.randint(0, 255)
 
-                if symbol_layer is not None:
-                    symbol.changeSymbolLayer(0, symbol_layer)
-                category = QgsRendererCategory(id['id'], symbol, str(id['id']))
-                categories.append(category)
+            # Setting sytle
+            layer_style = {'color': '{}, {}, {}'.format(int(R), int(G), int(B))}
+            symbol_layer = QgsSimpleFillSymbolLayer.create(layer_style)
 
-                # apply symbol to layer renderer
-                lyr.setRenderer(QgsCategorizedSymbolRenderer(mapzone['idname'], categories))
+            if symbol_layer is not None:
+                symbol.changeSymbolLayer(0, symbol_layer)
+            category = QgsRendererCategory(id['id'], symbol, str(id['id']))
+            categories.append(category)
 
-                # repaint layer
-                lyr.triggerRepaint()
+        # apply symbol to layer renderer
+        lyr.setRenderer(QgsCategorizedSymbolRenderer(mapzone['idname'], categories))
+
+        # repaint layer
+        lyr.triggerRepaint()
 
 
 def manage_feature_cat():
@@ -2804,17 +2806,28 @@ def set_model_signals(class_object):
 
     filter_ = "psector_id = '" + str(class_object.psector_id.text()) + "'"
     class_object.fill_table(class_object.dlg_plan_psector, class_object.qtbl_connec, class_object.tablename_psector_x_connec,
-                    set_edit_triggers=QTableView.DoubleClicked, expr=filter_)
+                    set_edit_triggers=QTableView.DoubleClicked, expr=filter_, feature_type="connec", field_id="connec_id")
 
     # Set selectionModel signals
     class_object.qtbl_arc.selectionModel().selectionChanged.connect(partial(
         tools_qgis.highlight_features_by_id, class_object.qtbl_arc, "v_edit_arc", "arc_id", class_object.rubber_band_point, 5
     ))
+    class_object.qtbl_arc.selectionModel().selectionChanged.connect(partial(
+        class_object._highlight_features_by_id, class_object.qtbl_arc, "arc", "arc_id", class_object.rubber_band_op, 5
+    ))
+
     class_object.qtbl_node.selectionModel().selectionChanged.connect(partial(
         tools_qgis.highlight_features_by_id, class_object.qtbl_node, "v_edit_node", "node_id", class_object.rubber_band_point, 10
     ))
+    class_object.qtbl_node.selectionModel().selectionChanged.connect(partial(
+        class_object._highlight_features_by_id, class_object.qtbl_node, "node", "node_id", class_object.rubber_band_op, 5
+    ))
+
     class_object.qtbl_connec.selectionModel().selectionChanged.connect(partial(
         tools_qgis.highlight_features_by_id, class_object.qtbl_connec, "v_edit_connec", "connec_id", class_object.rubber_band_point, 10
+    ))
+    class_object.qtbl_connec.selectionModel().selectionChanged.connect(partial(
+        class_object._highlight_features_by_id, class_object.qtbl_connec, "connec", "connec_id", class_object.rubber_band_op, 5
     ))
     class_object.qtbl_connec.selectionModel().selectionChanged.connect(partial(
         class_object._manage_tab_feature_buttons
@@ -2823,6 +2836,9 @@ def set_model_signals(class_object):
     if class_object.project_type.upper() == 'UD':
         class_object.qtbl_gully.selectionModel().selectionChanged.connect(partial(
             tools_qgis.highlight_features_by_id, class_object.qtbl_gully, "v_edit_gully", "gully_id", class_object.rubber_band_point, 10
+        ))
+        class_object.qtbl_gully.selectionModel().selectionChanged.connect(partial(
+            class_object._highlight_features_by_id, class_object.qtbl_gully, "gully", "gully_id", class_object.rubber_band_op, 5
         ))
         class_object.qtbl_gully.selectionModel().selectionChanged.connect(partial(
             class_object._manage_tab_feature_buttons
@@ -2908,7 +2924,7 @@ def insert_feature(class_object, dialog, table_object, query=False, remove_ids=T
 def remove_selection(remove_groups=True, layers=None):
     """ Remove all previous selections """
 
-    list_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element"]
+    list_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_link"]
     if global_vars.project_type == 'ud':
         list_layers.append("v_edit_gully")
 
@@ -3310,7 +3326,7 @@ def manage_close(dialog, table_object, cur_active_layer=None, single_tool_mode=N
     else:
         layers = remove_selection(True, layers=layers)
 
-    list_feature_type = ['arc', 'node', 'connec', 'element']
+    list_feature_type = ['arc', 'node', 'connec', 'element', 'link']
     if global_vars.project_type == 'ud':
         list_feature_type.append('gully')
     for feature_type in list_feature_type:
@@ -3427,7 +3443,7 @@ def get_parent_layers_visibility():
     """
 
     layers_visibility = {}
-    for layer_name in ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully"]:
+    for layer_name in ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully", "v_edit_link"]:
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         if layer:
             layers_visibility[layer] = tools_qgis.is_layer_visible(layer)
@@ -3445,9 +3461,8 @@ def restore_parent_layers_visibility(layers):
         tools_qgis.set_layer_visible(layer, False, visibility)
 
 
-def create_rubberband(canvas, geometry_type=1):
+def create_rubberband(canvas, geometry_type=QgsWkbTypes.LineGeometry):
     """ Creates a rubberband and adds it to the global list """
-
     rb = QgsRubberBand(canvas, geometry_type)
     global_vars.active_rubberbands.append(rb)
     return rb

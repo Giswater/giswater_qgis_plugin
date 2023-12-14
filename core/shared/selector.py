@@ -15,7 +15,7 @@ from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QLineEdit, QSize
 from ..ui.ui_manager import GwSelectorUi
 from ..utils import tools_gw
 from ... import global_vars
-from ...libs import lib_vars, tools_qgis, tools_qt, tools_os, tools_db
+from ...libs import lib_vars, tools_qgis, tools_qt, tools_os
 
 
 class GwSelector:
@@ -59,13 +59,14 @@ class GwSelector:
             dlg_selector.key_escape.connect(partial(tools_gw.close_docker))
 
         else:
-            dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
             dlg_selector.rejected.connect(partial(tools_gw.save_settings, dlg_selector))
             tools_gw.open_dialog(dlg_selector, dlg_name='selector')
 
             # Set shortcut keys
             dlg_selector.key_escape.connect(partial(tools_gw.close_dialog, dlg_selector))
 
+        dlg_selector.btn_close.clicked.connect(partial(self._selector_close, dlg_selector))
+        
         # Manage tab focus
         dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(self._set_focus, dlg_selector))
         # Save the name of current tab used by the user
@@ -74,6 +75,19 @@ class GwSelector:
 
         # Set typeahead focus if configured
         self._set_focus(dlg_selector)
+
+
+    def _selector_close(self, dialog):
+
+        if lib_vars.session_vars['dialog_docker'] and lib_vars.session_vars['dialog_docker'].isFloating():
+            widget = lib_vars.session_vars['dialog_docker'].widget()
+            if widget:
+                widget.close()
+                del widget
+                global_vars.iface.removeDockWidget(lib_vars.session_vars['dialog_docker'])
+                lib_vars.session_vars['docker_type'] = None
+        else:
+            tools_gw.close_dialog(dialog)
 
 
     def _set_focus(self, dialog):

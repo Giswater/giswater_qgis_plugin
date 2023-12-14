@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>385</width>
+    <width>656</width>
     <height>431</height>
    </rect>
   </property>
@@ -30,7 +30,10 @@
     <widget class="QWidget" name="centralwidget" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QTabWidget" name="tabWidget">
+       <widget class="QTabWidget" name="mainTab">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="currentIndex">
          <number>0</number>
         </property>
@@ -329,6 +332,37 @@
               </item>
              </layout>
             </widget>
+            <widget class="QWidget" name="tab_link">
+             <attribute name="title">
+              <string>Link</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_5">
+              <item row="0" column="0">
+               <widget class="QTableView" name="tbl_cat_work_x_link">
+                <property name="sortingEnabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_info_log">
+         <attribute name="title">
+          <string>Info Log</string>
+         </attribute>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="0" column="0">
+           <widget class="QTextEdit" name="txt_infolog">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
          </layout>
@@ -384,7 +418,7 @@
   <tabstop>tbl_cat_work_x_node</tabstop>
   <tabstop>tbl_cat_work_x_gully</tabstop>
   <tabstop>tbl_cat_work_x_arc</tabstop>
-  <tabstop>tabWidget</tabstop>
+  <tabstop>mainTab</tabstop>
  </tabstops>
  <resources/>
  <connections/>

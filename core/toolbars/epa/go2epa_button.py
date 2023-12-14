@@ -501,7 +501,13 @@ class GwGo2EpaButton(GwAction):
         self.dlg_go2epa_options.btn_accept.clicked.connect(partial(self._update_values, self.epa_options_list))
         self.dlg_go2epa_options.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_go2epa_options))
         self.dlg_go2epa_options.rejected.connect(partial(tools_gw.close_dialog, self.dlg_go2epa_options))
+        self.dlg_go2epa_options.findChild(QTabWidget, 'tabWidget').currentChanged.connect(partial(
+            tools_gw.save_current_tab, self.dlg_go2epa_options, self.dlg_go2epa_options.tabWidget, 'main'))
 
+        current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_go2epa_options_main", "user", "session")
+        if current_tab:
+            tab = self.dlg_go2epa_options.tabWidget.findChild(QWidget, current_tab)
+            self.dlg_go2epa_options.tabWidget.setCurrentWidget(tab)
         tools_gw.open_dialog(self.dlg_go2epa_options, dlg_name='go2epa_options')
 
 
