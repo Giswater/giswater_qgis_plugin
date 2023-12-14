@@ -8,7 +8,7 @@ version=3.6.006
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Elies Bertran, Abel García Juanes, Xavier Torret
 
 
-Changelog=Version 3.6.005
+Changelog=Version 3.6.006
     - Fix snapping when inserting features
     - Enhancement: highlight features with state 0 in psector
     - Add new button to info right-click menu to open/close valves in netscenario
