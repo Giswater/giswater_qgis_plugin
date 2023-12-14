@@ -34,4 +34,4 @@ experimental=False
 minorQgisVersion=3.22
 majorQgisVersion=3.36
 minorPgVersion=9.5.00
-majorPgVersion=15.00.99
+majorPgVersion=16.1.00
