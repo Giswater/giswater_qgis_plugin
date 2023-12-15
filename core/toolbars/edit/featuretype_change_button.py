@@ -259,7 +259,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
                    f"WHERE active IS TRUE OR active IS NULL "
                    f"ORDER BY id")
             rows = tools_db.get_rows(sql, log_sql=True)
-            tools_qt.fill_combo_values(self.dlg_change.featurecat_id, rows, 1)
+            tools_qt.fill_combo_values(self.dlg_change.featurecat_id, rows)
 
             # Set default value
             featurecat_id = tools_gw.get_config_parser("btn_featuretype_change", "featurecat_id", "user", "session")
@@ -307,7 +307,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
                f"WHERE {self.feature_type}type_id = '{feature_type_new}' AND (active IS TRUE OR active IS NULL) "
                f"ORDER BY id")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_change.featurecat_id, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_change.featurecat_id, rows)
         featurecat_id = tools_gw.get_config_parser("btn_featuretype_change", "featurecat_id", "user", "session")
         if featurecat_id not in (None, "None"):
             tools_qt.set_combo_value(self.dlg_change.featurecat_id, featurecat_id, 1, add_new=False)

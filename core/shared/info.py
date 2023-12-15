@@ -3417,7 +3417,7 @@ def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, force_action, **kwar
         sql = (f"SELECT order_id as id, order_id::text as idval FROM {aux_view}"
                f" WHERE {info.feature_type}_id = '{feature_id}'")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(cmb_order_id, rows, 1)
+        tools_qt.fill_combo_values(cmb_order_id, rows)
 
     # Get every widget in the layout
     widgets = []

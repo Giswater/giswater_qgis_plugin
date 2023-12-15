@@ -166,11 +166,11 @@ class GwElement:
         # Fill combo boxes
         sql = "SELECT DISTINCT(elementtype_id), elementtype_id FROM cat_element ORDER BY elementtype_id"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.element_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_element.element_type, rows)
 
         sql = "SELECT expl_id, name FROM exploitation WHERE expl_id != '0' ORDER BY name"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.expl_id, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_element.expl_id, rows)
 
         # Set explotation vdefault for combo expl_id
         sql = "SELECT value FROM config_param_user WHERE parameter='edit_exploitation_vdefault' AND cur_user=current_user"
@@ -180,7 +180,7 @@ class GwElement:
 
         sql = "SELECT DISTINCT(id), name FROM value_state"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.state, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_element.state, rows)
 
         self._filter_state_type()
 
@@ -188,31 +188,31 @@ class GwElement:
                " WHERE feature_type = 'ELEMENT' "
                " ORDER BY location_type")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.location_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_element.location_type, rows)
         if rows:
             tools_qt.set_combo_value(self.dlg_add_element.location_type, rows[0][0], 0)
 
         sql = "SELECT DISTINCT(id), id FROM cat_owner"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.ownercat_id, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_add_element.ownercat_id, rows, add_empty=True)
 
         sql = "SELECT DISTINCT(id), id FROM cat_builder"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.buildercat_id, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_add_element.buildercat_id, rows, add_empty=True)
 
         sql = "SELECT DISTINCT(id), id FROM cat_work"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.workcat_id, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_add_element.workcat_id, rows, add_empty=True)
         self.dlg_add_element.workcat_id.currentIndexChanged.connect(partial(
             tools_qt.set_stylesheet, self.dlg_add_element.workcat_id, None))
 
         sql = "SELECT DISTINCT(id), id FROM cat_work"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.workcat_id_end, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_add_element.workcat_id_end, rows, add_empty=True)
 
         sql = "SELECT id, idval FROM edit_typevalue WHERE typevalue = 'value_verified'"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.verified, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_add_element.verified, rows, add_empty=True)
         self._filter_elementcat_id()
 
         if self.new_element_id:
@@ -348,7 +348,7 @@ class GwElement:
         sql = (f"SELECT DISTINCT(id), name FROM value_state_type "
                f"WHERE state = {state}")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.state_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_element.state_type, rows)
 
 
     def _fill_tbl_new_element(self, dialog, feature_type, feature_id):
@@ -578,7 +578,7 @@ class GwElement:
                f" WHERE elementtype_id = '{element_type}'"
                f" ORDER BY id")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.elementcat_id, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_element.elementcat_id, rows)
 
 
     def _open_selected_object_element(self, dialog, widget, table_object):

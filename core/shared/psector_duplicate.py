@@ -33,7 +33,7 @@ class GwPsectorDuplicate(QObject):
         # Populate combo duplicate psector
         sql = "SELECT psector_id, name FROM plan_psector"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_duplicate_psector.duplicate_psector, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_duplicate_psector.duplicate_psector, rows)
 
         # Set QComboBox with selected psector
         tools_qt.set_combo_value(self.dlg_duplicate_psector.duplicate_psector, str(psector_id), 0)

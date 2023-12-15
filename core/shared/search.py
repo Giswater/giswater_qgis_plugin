@@ -204,7 +204,7 @@ class GwSearch:
                     if field['widgettype'] == 'combo':
                         widget = main_tab.findChild(QComboBox, field['widgetname'])
                         list_items = self._get_list_items(widget, field)
-                        tools_qt.fill_combo_values(widget, list_items, 1)
+                        tools_qt.fill_combo_values(widget, list_items)
                 except Exception:
                     msg = f"key 'comboIds' or/and comboNames not found WHERE columname='{field['columnname']}' AND " \
                           f"widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
@@ -490,7 +490,7 @@ class GwSearch:
         widget.setObjectName(field['widgetname'])
         widget.setProperty('columnname', field['columnname'])
         list_items = self._get_list_items(widget, field)
-        tools_qt.fill_combo_values(widget, list_items, 1)
+        tools_qt.fill_combo_values(widget, list_items)
         tools_qt.set_combo_value(widget, field.get('selectedId'), 0)
         # noinspection PyUnresolvedReferences
         widget.currentIndexChanged.connect(partial(self._clear_lineedits))

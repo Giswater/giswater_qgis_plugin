@@ -45,7 +45,7 @@ class GwFeatureDeleteButton(GwAction):
         # Populate combo feature type
         sql = f"SELECT DISTINCT(feature_type) AS id, feature_type AS idval FROM cat_feature WHERE feature_type in {self.list_feature_type}"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_feature_delete.feature_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_feature_delete.feature_type, rows)
 
         # Set active layer
         layer_name = 'v_edit_' + tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()

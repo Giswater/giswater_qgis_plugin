@@ -399,7 +399,7 @@ class GwNonVisual:
         sql = f"SELECT id, matcat_id as idval FROM cat_mat_roughness"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(combobox, rows, index_to_show=1)
+            tools_qt.fill_combo_values(combobox, rows)
 
 
     def _populate_roughness_widgets(self, roughness_id):
@@ -573,7 +573,7 @@ class GwNonVisual:
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1, add_empty=True)
+            tools_qt.fill_combo_values(cmb_expl_id, rows, add_empty=True)
 
         # Create & fill cmb_curve_type
         curve_type_headers, curve_type_list = self._create_curve_type_lists()
@@ -1072,7 +1072,7 @@ class GwNonVisual:
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1, add_empty=True)
+            tools_qt.fill_combo_values(cmb_expl_id, rows, add_empty=True)
 
         if pattern_id:
             self._populate_ws_patterns_widgets(pattern_id, duplicate=duplicate)
@@ -1334,7 +1334,7 @@ class GwNonVisual:
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1, add_empty=True)
+            tools_qt.fill_combo_values(cmb_expl_id, rows, add_empty=True)
 
         sql = "SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_typevalue_pattern'"
         rows = tools_db.get_rows(sql)
@@ -1930,15 +1930,15 @@ class GwNonVisual:
         sql = "SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_value_timserid'"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(cmb_timeser_type, rows, index_to_show=1)
+            tools_qt.fill_combo_values(cmb_timeser_type, rows)
         sql = "SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_typevalue_timeseries'"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(cmb_times_type, rows, index_to_show=1)
+            tools_qt.fill_combo_values(cmb_times_type, rows)
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1, add_empty=True)
+            tools_qt.fill_combo_values(cmb_expl_id, rows, add_empty=True)
 
 
     def _populate_timeser_widgets(self, timser_id, duplicate=False):
@@ -2235,7 +2235,7 @@ class GwNonVisual:
         sql = f"SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' ORDER BY idval"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(self.dialog.cmb_lidtype, rows, 1)
+            tools_qt.fill_combo_values(self.dialog.cmb_lidtype, rows)
 
         # Populate Control Curve combo
         sql = f"SELECT id FROM v_edit_inp_curve; "
@@ -2668,7 +2668,7 @@ class GwNonVisual:
         sql = f"SELECT sector_id as id, name as idval FROM v_edit_sector WHERE sector_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(combobox, rows, index_to_show=1)
+            tools_qt.fill_combo_values(combobox, rows)
 
 
     def _create_plot_widget(self, dialog):

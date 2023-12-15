@@ -873,7 +873,7 @@ class GwVisit(QObject):
         sql += f"ORDER BY id"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(dialog.parameter_id, rows, 1)
+            tools_qt.fill_combo_values(dialog.parameter_id, rows)
 
         # Set user devault parameter
         parameter_id = tools_gw.get_config_value('om_visit_parameter_vdefault')
@@ -1123,7 +1123,7 @@ class GwVisit(QObject):
         self.visitcat_ids = tools_db.get_rows(sql)
 
         if self.visitcat_ids:
-            tools_qt.fill_combo_values(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
+            tools_qt.fill_combo_values(self.dlg_add_visit.visitcat_id, self.visitcat_ids)
             # now get default value to be show in visitcat_id
             row = tools_gw.get_config_value('om_visit_cat_vdefault')
             if row:
@@ -1163,7 +1163,7 @@ class GwVisit(QObject):
         # Fill ComboBox status
         rows = self._get_values_from_catalog('om_typevalue', 'visit_status')
         if rows:
-            tools_qt.fill_combo_values(self.dlg_add_visit.status, rows, 1, sort_combo=True)
+            tools_qt.fill_combo_values(self.dlg_add_visit.status, rows, sort_combo=True)
             status = tools_gw.get_config_value('om_visit_status_vdefault')
             if status:
                 tools_qt.set_combo_value(self.dlg_add_visit.status, str(status[0]), 0)
@@ -1180,7 +1180,7 @@ class GwVisit(QObject):
               "WHERE cur_user=current_user"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(self.exploitation, rows, 1, sort_by=0)
+            tools_qt.fill_combo_values(self.exploitation, rows, sort_by=0)
             if visit_id is None:
                 if self.expl_id is not None:
                     tools_qt.set_combo_value(self.exploitation, self.expl_id, 0, add_new=False)
@@ -1209,7 +1209,7 @@ class GwVisit(QObject):
         # Fill ComboBox parameter_type_id
         sql = "SELECT id, idval FROM om_typevalue WHERE typevalue = 'visit_param_type' ORDER by idval"
         parameter_type_ids = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_visit.parameter_type_id, parameter_type_ids, 1)
+        tools_qt.fill_combo_values(self.dlg_add_visit.parameter_type_id, parameter_type_ids)
 
         # now get default value to be show in parameter_type_id
         row = tools_gw.get_config_value('om_param_type_vdefault', log_info=False)
@@ -1235,7 +1235,7 @@ class GwVisit(QObject):
         sql += where
         sql += f"ORDER BY id"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_visit.parameter_id, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_visit.parameter_id, rows)
 
 
     def _set_completers(self):
@@ -1793,7 +1793,7 @@ class GwVisit(QObject):
 
         node_list.append([node_1, f"node 1: {node_1}"])
         node_list.append([node_2, f"node 2: {node_2}"])
-        tools_qt.fill_combo_values(self.dlg_event.position_id, node_list, 1, True, False)
+        tools_qt.fill_combo_values(self.dlg_event.position_id, node_list, True, False)
 
 
     def _visit_tab_feature_changed(self, dialog, table_object='visit', excluded_layers=[]):

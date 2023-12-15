@@ -442,7 +442,7 @@ class GwAdminButton:
         # Populate combo with all locales
         status, sqlite_cur = tools_gw.create_sqlite_conn("config")
         list_locale = self._select_active_locales(sqlite_cur)
-        tools_qt.fill_combo_values(self.cmb_locale, list_locale, 1)
+        tools_qt.fill_combo_values(self.cmb_locale, list_locale)
         locale = tools_gw.get_config_parser('btn_admin', 'project_locale', 'user', 'session', False, force_reload=True)
         tools_qt.set_combo_value(self.cmb_locale, locale, 0)
 
@@ -862,7 +862,7 @@ class GwAdminButton:
         self._populate_combo_connections()
 
         if str(self.list_connections) != '[]':
-            tools_qt.fill_combo_values(self.cmb_connection, self.list_connections, 1)
+            tools_qt.fill_combo_values(self.cmb_connection, self.list_connections)
 
         # Set last connection for default
         tools_qt.set_combo_value(self.cmb_connection, str(last_connection), 1)
@@ -1494,11 +1494,11 @@ class GwAdminButton:
         # Manage widgets
         sql = "SELECT id, id as idval FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_manage_visit_class.feature_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_visit_class.feature_type, rows)
 
         sql = "SELECT id, idval FROM om_typevalue WHERE typevalue = 'visit_type'"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_manage_visit_class.visit_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_visit_class.visit_type, rows)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_manage_visit_class, dlg_name='admin_visitclass')
@@ -1610,7 +1610,7 @@ class GwAdminButton:
             self.dlg_readsql.project_schema_name.clear()
             return
 
-        tools_qt.fill_combo_values(self.dlg_readsql.project_schema_name, result_list, 1)
+        tools_qt.fill_combo_values(self.dlg_readsql.project_schema_name, result_list)
 
 
     def _manage_srid(self):
@@ -2363,9 +2363,9 @@ class GwAdminButton:
                    f" ORDER BY id")
             rows = tools_db.get_rows(sql)
 
-            tools_qt.fill_combo_values(self.dlg_readsql.cmb_formname_fields, rows, 1)
-            tools_qt.fill_combo_values(self.dlg_readsql.cmb_feature_name_view, rows, 1)
-            tools_qt.fill_combo_values(self.dlg_readsql.cmb_feature_sys_fields, rows, 1)
+            tools_qt.fill_combo_values(self.dlg_readsql.cmb_formname_fields, rows)
+            tools_qt.fill_combo_values(self.dlg_readsql.cmb_feature_name_view, rows)
+            tools_qt.fill_combo_values(self.dlg_readsql.cmb_feature_sys_fields, rows)
 
 
     def _create_child_view(self):
@@ -2577,19 +2577,19 @@ class GwAdminButton:
         sql = (f"SELECT DISTINCT(id), idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'widgettype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_manage_fields.widgettype, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_fields.widgettype, rows)
 
         # Populate datatype combo
         sql = (f"SELECT id, idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'datatype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_manage_fields.datatype, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_fields.datatype, rows)
 
         # Populate layoutname combo
         sql = (f"SELECT id, idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'layout_name_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_manage_fields.layoutname, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_fields.layoutname, rows)
 
         # Set default value for formtype widget
         tools_qt.set_widget_text(self.dlg_manage_fields, self.dlg_manage_fields.formtype, 'feature')
@@ -2658,7 +2658,7 @@ class GwAdminButton:
                    f"WHERE cat_feature_id = '{form_name}'")
 
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_manage_fields.cmb_fields, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_fields.cmb_fields, rows)
 
 
     def _manage_close_dlg(self, dlg_to_close):
@@ -3049,7 +3049,7 @@ class GwAdminButton:
         self.dlg_credentials = GwCredentialsUi()
         tools_gw.load_settings(self.dlg_credentials)
         if str(self.list_connections) != '[]':
-            tools_qt.fill_combo_values(self.dlg_credentials.cmb_connection, self.list_connections, 1)
+            tools_qt.fill_combo_values(self.dlg_credentials.cmb_connection, self.list_connections)
         else:
             msg = "You don't have any connection to PostGIS database configurated. " \
                   "Check your QGIS data source manager and create at least one"
@@ -3143,12 +3143,12 @@ class GwAdminButton:
         if not ws_result_list:
             self.dlg_readsql.cmb_utils_ws.clear()
         else:
-            tools_qt.fill_combo_values(self.dlg_readsql.cmb_utils_ws, ws_result_list, 1)
+            tools_qt.fill_combo_values(self.dlg_readsql.cmb_utils_ws, ws_result_list)
 
         if not ud_result_list:
             self.dlg_readsql.cmb_utils_ud.clear()
         else:
-            tools_qt.fill_combo_values(self.dlg_readsql.cmb_utils_ud, ud_result_list, 1)
+            tools_qt.fill_combo_values(self.dlg_readsql.cmb_utils_ud, ud_result_list)
 
 
     def _create_utils(self):

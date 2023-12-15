@@ -178,7 +178,7 @@ class GwFeatureEndButton(GwAction):
 
         sql = 'SELECT id as id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0'
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_work_end.cmb_statetype_end, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_work_end.cmb_statetype_end, rows)
         row = tools_gw.get_config_value('edit_statetype_0_vdefault')
         if row:
             tools_qt.set_combo_value(self.dlg_work_end.cmb_statetype_end, row[0], 0)
