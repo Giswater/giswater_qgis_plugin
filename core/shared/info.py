@@ -2069,8 +2069,8 @@ class GwInfo(QObject):
             widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, self.my_json_epa))
             # TODO: Make autoupdate widgets work
         widget.textChanged.connect(partial(self._enabled_accept, dialog))
-        widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
         widget.textChanged.connect(partial(self._check_min_max_value, dialog, widget, dialog.btn_accept))
+        widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
 
         return widget
 
@@ -2096,8 +2096,8 @@ class GwInfo(QObject):
             widget.textChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json_epa))
             # TODO: Make autoupdate widgets work
         widget.textChanged.connect(partial(self._enabled_accept, dialog))
-        widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
         widget.textChanged.connect(partial(self._check_min_max_value, dialog, widget, dialog.btn_accept))
+        widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
 
         return widget
 
