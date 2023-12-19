@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2602
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_gettypeahead(p_data json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_gettypeahead(p_data json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_gettypeahead(p_data json)
   RETURNS json AS
 $BODY$

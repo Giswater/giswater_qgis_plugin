@@ -17,6 +17,7 @@ ext_utils_schema_aux varchar;
 query_aux text;
 ws_current_schema_aux text;
 ud_current_schema_aux text;
+v_error_context text;
 
 BEGIN
 
@@ -431,6 +432,7 @@ BEGIN
 	END IF;
 
 	return;
+
 
 END;$BODY$
   LANGUAGE plpgsql VOLATILE

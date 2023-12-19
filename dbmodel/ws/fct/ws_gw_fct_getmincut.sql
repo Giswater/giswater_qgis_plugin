@@ -62,7 +62,7 @@ DECLARE
     aux_muni_id text[];
     aux_muni_name text[];
     aux_cp text[];
-
+    v_error_context text;
 
 BEGIN
     -- Set search path to local schema
@@ -394,6 +394,12 @@ BEGIN
             ',"data":{ "info":'||v_result_info||'}'||
             '}}')::json;
     END IF;
+
+    -- Exception handling
+    EXCEPTION WHEN OTHERS THEN
+    GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+    RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

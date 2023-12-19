@@ -26,7 +26,7 @@ v_idname text;
 v_geometry json;
 fields_array json[];
 v_count integer = 0;
-
+v_error_context text;
 
 BEGIN
 	
@@ -83,7 +83,12 @@ BEGIN
 		     ',"data":'||fields_array[0]||''||
 		     ',"styles":'||v_return||''||
 	    '}}')::json;
-	    
+
+	-- Exception handling
+    EXCEPTION WHEN OTHERS THEN
+    GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+    RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

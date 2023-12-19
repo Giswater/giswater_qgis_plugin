@@ -246,11 +246,6 @@ BEGIN
 		      ',"feature":'||(p_data->>'feature')::json||
 		      ',"data":{"fields":' || fields ||'}}'||		     
 	       '}')::json;
-		   
-	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
 
 END;
 $BODY$

@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2576
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getgo2epa(p_data json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getgo2epa(p_data json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getgo2epa(p_data json)
   RETURNS json AS
 $BODY$
@@ -55,11 +55,6 @@ BEGIN
 				'}'||
 			'}'||
 	    '}')::json;
-       
-	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-
 
 END;
 $BODY$

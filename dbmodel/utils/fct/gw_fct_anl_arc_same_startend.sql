@@ -116,12 +116,7 @@ BEGIN
 		     ',"data":{ "info":'||v_result_info||','||
 				'"line":'||v_result_line||
 		       '}}'||
-	    '}')::json, 2104, null, null, null); 
-
-	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-
+	    '}')::json, 2104, null, null, null);
 
 END;
 $BODY$

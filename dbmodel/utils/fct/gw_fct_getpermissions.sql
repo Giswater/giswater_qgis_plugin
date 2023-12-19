@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2596
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getpermissions(json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getpermissions(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getpermissions(p_data json)
   RETURNS json AS
 $BODY$
@@ -66,10 +66,6 @@ BEGIN
 		', "isEditable":' || v_iseditable ||
 		', "permissions":'|| v_permissions||
 		'}')::json;
-
-	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

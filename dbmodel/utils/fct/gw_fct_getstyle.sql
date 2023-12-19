@@ -21,7 +21,7 @@ v_return json;
 v_style_id text;
 v_style text;
 v_version json;
-
+v_error_context text;
 
 
 
@@ -44,7 +44,12 @@ BEGIN
 		     ',"data":{}'||
 		     ',"styles":'||v_return||''||
 	    '}}')::json;
-	    
+
+	-- Exception handling
+    EXCEPTION WHEN OTHERS THEN
+    GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+    RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

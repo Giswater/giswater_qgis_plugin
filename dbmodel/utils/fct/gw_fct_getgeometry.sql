@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2630
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getgeometry(json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getgeometry(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getgeometry(p_data json)
   RETURNS json AS
 $BODY$

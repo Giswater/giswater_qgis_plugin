@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2600
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getsearch(p_data json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getsearch(p_data json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getsearch(p_data json)
   RETURNS json AS
 $BODY$
@@ -675,10 +675,10 @@ BEGIN
 
 
 	-- Exception handling
-	/*EXCEPTION WHEN OTHERS THEN
+	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
 	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
-*/
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

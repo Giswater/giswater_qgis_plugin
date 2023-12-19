@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2866
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_combochilds(character varying, character varying, character varying, character varying, character varying, character varying);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getcombochilds(character varying, character varying, character varying, character varying, character varying, character varying);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getcombochilds(
     p_table_id character varying,
     p_id character varying,
@@ -169,7 +169,7 @@ BEGIN
         '}')::json;
 
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
+	EXCEPTION WHEN OTHERS THEN
 	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;

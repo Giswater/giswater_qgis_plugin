@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2578
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getinfocrossection(json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getinfocrossection(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfocrossection(p_data json)
   RETURNS json AS
 $BODY$

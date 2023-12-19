@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2628
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_gettoolbarbuttons(json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_gettoolbarbuttons(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_gettoolbarbuttons(p_data json)
   RETURNS json AS
 $BODY$
@@ -24,7 +24,7 @@ v_role text;
 v_projectype text;
 v_clientbuttons text;
 v_buttons json;
-		
+
 BEGIN
 
 	-- Set search path to local schema
@@ -62,10 +62,7 @@ BEGIN
 		     ',"data":{"buttons":' || v_buttons ||
 				'}}'||
 	    '}')::json;
-       
-	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+
 
 END;
 $BODY$

@@ -79,10 +79,6 @@ BEGIN
    
 	--  Return
 	RETURN v_return;
-       
-	-- xception handling
-	EXCEPTION WHEN OTHERS THEN 
-    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

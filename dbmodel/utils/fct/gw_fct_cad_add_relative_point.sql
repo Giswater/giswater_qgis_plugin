@@ -28,6 +28,7 @@ rec record;
 v_angle0 float;
 v_x0coord float;
 v_y0coord float;
+v_error_context text;
 
 BEGIN
 
@@ -100,6 +101,12 @@ BEGIN
     INSERT INTO temp_table (fid, geom_point)  VALUES (127, v_point_result);
 
 	RETURN v_point_result;
-        
+
+    -- Exception handling
+    EXCEPTION WHEN OTHERS THEN
+    GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+    RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
+
 END;$BODY$
   LANGUAGE plpgsql VOLATILE

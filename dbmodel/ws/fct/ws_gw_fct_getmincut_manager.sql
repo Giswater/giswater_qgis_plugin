@@ -31,6 +31,7 @@ DECLARE
   v_fieldsjson jsonb := '[]';
   v_version json;
   v_response json;
+  v_error_context text;
 
 BEGIN
   -- Set search path to local schema
@@ -144,7 +145,12 @@ BEGIN
     }
   }';
   RETURN v_response;
-  -- RETURN v_fields_array;
+
+  -- Exception handling
+    EXCEPTION WHEN OTHERS THEN
+    GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+    RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 
 END;
 $BODY$

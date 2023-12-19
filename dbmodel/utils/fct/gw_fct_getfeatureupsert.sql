@@ -7,8 +7,8 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2560
 
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_featureupsert(character varying, character varying, public.geometry, integer, integer, character varying, boolean);
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_featureupsert(character varying, character varying, public.geometry, integer, integer, character varying, boolean, text, text);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getfeatureupsert(character varying, character varying, public.geometry, integer, integer, character varying, boolean);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getfeatureupsert(character varying, character varying, public.geometry, integer, integer, character varying, boolean, text, text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getfeatureupsert(
     p_table_id character varying,
     p_id character varying,

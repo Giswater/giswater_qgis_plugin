@@ -350,11 +350,6 @@ BEGIN
 	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'|| v_version ||',
 	"body": {"feature":{"id":"'||v_id||'"}, "data":{"geometry":'|| return_event_manager_aux ||'}}}')::json;
 
-	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
-
 END;
 $function$
 ;

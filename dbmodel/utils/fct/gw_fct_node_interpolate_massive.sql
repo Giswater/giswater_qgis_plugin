@@ -132,11 +132,6 @@ BEGIN
 					'"point":'||v_result_point||'}'||
 			      '}}');
 
-	--  Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
-	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-	  
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

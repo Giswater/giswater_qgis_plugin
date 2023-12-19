@@ -28,6 +28,7 @@ v_featuretype text;
 v_tablename text;
 v_id text;
 v_querytext text;
+v_error_context text;
 
 -- variables only used on the automatic trigger mapzone
 v_closedstatus boolean;
@@ -163,6 +164,13 @@ BEGIN
 
 	-- Return
 	RETURN (v_message::json);
+
+	-- Exception handling
+    EXCEPTION WHEN OTHERS THEN
+    GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+    RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

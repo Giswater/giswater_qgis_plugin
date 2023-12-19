@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2570
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getconfig(json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getconfig(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getconfig(p_data json)
   RETURNS json AS
 $BODY$

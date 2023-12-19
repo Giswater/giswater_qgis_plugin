@@ -339,11 +339,6 @@ BEGIN
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":'||v_version||
             ',"message":{"level":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json, 2734, null, null, null);
 
-	-- manage exceptions
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

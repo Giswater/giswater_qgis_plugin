@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2584
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getinfofromlist(json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getinfofromlist(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfofromlist(p_data json)
   RETURNS json AS
 $BODY$
@@ -103,10 +103,6 @@ BEGIN
 	END IF;
 
 	RETURN gw_fct_json_create_return(v_rectgeometry, 2584, null, null, null);
-	
-	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

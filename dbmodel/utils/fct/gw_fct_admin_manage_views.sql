@@ -293,12 +293,6 @@ BEGIN
 			   '}'||
 		'}')::json, 3076, null, null, null);
 
-	EXCEPTION WHEN OTHERS THEN
-		GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (133, 2, concat ('Process of creation, or restoring child views have been crashed on sql files', v_gwversion));	
-		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (133, 2, concat ('SQL error: ',SQLERRM,'Context: ',v_error_context));	
-		RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

@@ -75,12 +75,6 @@ BEGIN
 				'"polygon":{"geometryType":"", "values":[]}'||
 			   '}}'||
 		'}')::json, 3130, null, null, null);
-
-	
-	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-
 	
 END;
 $BODY$

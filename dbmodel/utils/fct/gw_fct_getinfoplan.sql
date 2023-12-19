@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2586
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getinfoplan(p_data json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getinfoplan(p_data json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfoplan(p_data json)
   RETURNS json AS
 $BODY$

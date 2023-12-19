@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2868
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getinsertformdisabled(varchar, varchar, varchar);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getinsertformdisabled(varchar, varchar, varchar);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinsertformdisabled(table_id character varying,lang character varying, id character varying)
   RETURNS json AS
 $BODY$

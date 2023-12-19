@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2874
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getcolumnsfrom_id(json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getcolumnsfromid(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getcolumnsfromid(p_data json)
   RETURNS json AS
 $BODY$
@@ -92,11 +92,6 @@ BEGIN
 	    
 	-- Return
 	RETURN v_fields::json;
-
-	--Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-
 
 END;
 $BODY$

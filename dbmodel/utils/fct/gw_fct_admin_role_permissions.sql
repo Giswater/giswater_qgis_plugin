@@ -28,7 +28,7 @@ v_apiservice boolean;
 v_rolepermissions boolean;
 v_publishuser varchar;
 v_vpn_dbuser boolean;
-
+v_error_context text;
 rec_user record;
 
 BEGIN

@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2558
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_featureinfo(character varying, character varying, integer, integer, boolean);
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_featureinfo(character varying, character varying, integer, integer, boolean, text, text, text);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getfeatureinfo(character varying, character varying, integer, integer, boolean);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getfeatureinfo(character varying, character varying, integer, integer, boolean, text, text, text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getfeatureinfo(
     p_table_id character varying,
     p_id character varying,

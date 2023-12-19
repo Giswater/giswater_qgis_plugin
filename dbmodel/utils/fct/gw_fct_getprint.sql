@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 -- FUNCTION CODE: 2682
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getprint(p_data json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getprint(p_data json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getprint(p_data json)
   RETURNS json AS
 $BODY$

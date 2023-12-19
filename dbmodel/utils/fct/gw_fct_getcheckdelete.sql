@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2120
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_check_delete(text, text);
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_check_delete(json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getcheckdelete(text, text);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getcheckdelete(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getcheckdelete(p_data json)
   RETURNS json AS
 $BODY$
@@ -44,6 +44,7 @@ v_level integer;
 v_status text;
 v_message text;
 v_version text;
+v_error_context text;
 
 BEGIN
 

@@ -58,6 +58,7 @@ v_max_seq_id integer;
 v_querytext text;
 v_definition text;
 rec_viewname text;
+
 BEGIN 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
@@ -526,6 +527,11 @@ BEGIN
 		',"body":{"form":{}'||
 			',"data":{ "info":'||v_result_info||
 			'}}}');
+
+    -- Exception handling
+    EXCEPTION WHEN OTHERS THEN
+    GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+    RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

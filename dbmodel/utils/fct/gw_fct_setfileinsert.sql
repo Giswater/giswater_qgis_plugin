@@ -93,10 +93,6 @@ BEGIN
 	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'|| v_version ||
 		', "body": {"feature":{"id":"'||v_id||'"}}}')::json;    
 
-	--  Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-
 END;
 $BODY$
 LANGUAGE 'plpgsql' VOLATILE COST 100;

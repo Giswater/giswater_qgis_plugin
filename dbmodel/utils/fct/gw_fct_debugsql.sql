@@ -55,12 +55,6 @@ BEGIN
 	END IF;
 	-- Return
 	RETURN ('{"status":"Accepted", "MSGERR":"" }')::json;
-	
-       
-	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM)  ||',"version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$
