@@ -332,12 +332,16 @@ class GwSearch:
 
         # Tab 'hydro'
         elif tab_selected == 'hydro':
-            x1 = item['sys_x']
-            y1 = item['sys_y']
-            point = QgsPointXY(float(x1), float(y1))
-            tools_qgis.draw_point(point, self.rubber_band)
-            tools_qgis.zoom_to_rectangle(x1, y1, x1, y1, margin=100)
-            self._open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'], connec_id=item['sys_connec_id'])
+            # Get basic_search_hydrometer_show_connec param
+            row = tools_gw.get_config_value("basic_search_hydrometer_show_connec", table='config_param_system')
+            basic_search_hydrometer = tools_os.set_boolean(row['value'])
+            if not basic_search_hydrometer:
+                x1 = item['sys_x']
+                y1 = item['sys_y']
+                point = QgsPointXY(float(x1), float(y1))
+                tools_qgis.draw_point(point, self.rubber_band)
+                tools_qgis.zoom_to_rectangle(x1, y1, x1, y1, margin=100)
+            self._open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'], connec_id=item['sys_connec_id'], basic_search_hydrometer=basic_search_hydrometer)
 
         # Tab 'workcat'
         elif tab_selected == 'workcat':
@@ -524,13 +528,9 @@ class GwSearch:
                 list_items.append(elem)
         return list_items
 
-    def _open_hydrometer_dialog(self, table_name=None, feature_id=None, connec_id=None):
+    def _open_hydrometer_dialog(self, table_name=None, feature_id=None, connec_id=None, basic_search_hydrometer=False):
 
-
-        # Get basic_search_hydrometer_show_connec param
-        row = tools_gw.get_config_value("basic_search_hydrometer_show_connec", table='config_param_system')
-
-        if tools_os.set_boolean(row['value']):
+        if basic_search_hydrometer:
             self.customForm = GwInfo(tab_type='data')
             # v_edit_connec is the exact view to see the details of connec
             complet_result, dialog = self.customForm.get_info_from_id(
@@ -540,7 +540,7 @@ class GwSearch:
                 return
             tab_main = dialog.findChild(QTabWidget, "tab_main")
             tab_main.setCurrentIndex(3)
-
+            self._select_row_by_feature_id(tab_main, feature_id)
         else:
             qgis_project_infotype = lib_vars.project_vars['info_type']
 
@@ -562,6 +562,26 @@ class GwSearch:
             tools_gw.build_dialog_info(self.hydro_info_dlg, result)
             tools_gw.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
 
+    def _select_row_by_feature_id(self, tab_main, feature_id, column_index=0):
+        # Get the index of the current tab
+        current_tab_index = tab_main.currentIndex()
+        current_tab = tab_main.widget(current_tab_index)
+
+        # Find the first QTableView within the current tab
+        tbl_hydro = current_tab.findChild(QTableView, "tab_hydrometer_tbl_hydrometer")
+
+        if tbl_hydro:
+            model = tbl_hydro.model()
+
+            # Find items in the "hydrometer_customer_code" column that match the feature_id
+            # Adjust according to the specific column
+            matching_items = model.findItems(feature_id, Qt.MatchExactly, column_index)
+
+            if matching_items:
+                # Select the found row
+                row = matching_items[0].row()
+                tbl_hydro.selectRow(row)
+
     def _workcat_open_table_items(self, item):
         """ Create the view and open the dialog with his content """
 
@@ -576,7 +596,7 @@ class GwSearch:
         self._force_expl(workcat_id)
 
         self.items_dialog = GwSearchWorkcatUi()
-        
+
         tools_gw.add_icon(self.items_dialog.btn_doc_insert, "111", sub_folder="24x24")
         tools_gw.add_icon(self.items_dialog.btn_doc_delete, "112", sub_folder="24x24")
         tools_gw.add_icon(self.items_dialog.btn_doc_new, "34", sub_folder="24x24")
