@@ -1009,12 +1009,10 @@ BEGIN
 			END IF;
 		END IF;
 
-		--update of fields 'lastupdate' and 'lastupdate_user'
-        IF v_project_type = 'WS' THEN
-            v_querytext = 'UPDATE temp_'||quote_ident(v_table)||' set lastupdate=now(), lastupdate_user=current_user
-            where '||quote_ident(v_field)||' IN (SELECT distinct '||quote_ident(v_field)||' FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id))';
-            EXECUTE v_querytext;
-        END IF;
+		--update of fields 'lastupdate' and 'lastupdate_user'	
+		v_querytext = 'UPDATE temp_'||quote_ident(v_table)||' set lastupdate=now(), lastupdate_user=current_user 
+		where '||quote_ident(v_field)||' IN (SELECT distinct '||quote_ident(v_field)||' FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id))';
+		EXECUTE v_querytext;
 
 		-- insert spacer for warning and info
 		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, '');
