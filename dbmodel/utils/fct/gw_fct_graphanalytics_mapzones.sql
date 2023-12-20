@@ -748,8 +748,8 @@ BEGIN
 			EXECUTE v_querytext;
 
 			-- update link table
-			EXECUTE 'UPDATE temp_t_link SET '||quote_ident(v_field)||' = g.'||quote_ident(v_field)||' FROM temp_t_gully g WHERE g.gully_id=feature_id';		
-		END IF;	
+			EXECUTE 'UPDATE temp_t_link SET '||quote_ident(v_field)||' = g.'||quote_ident(v_field)||' FROM temp_t_gully g WHERE g.gully_id=feature_id';
+		END IF;
 
 		IF v_islastupdate IS TRUE THEN
 		
@@ -903,7 +903,7 @@ BEGIN
 				' GROUP BY '||(v_field)||')b USING ('||(v_field)||')
 				LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM temp_t_connec c WHERE '||(v_field)||'::integer > 0 '
 				' GROUP BY '||(v_field)||')c USING ('||(v_field)||')
-				LEFT JOIN (SELECT '||(v_field)||', count(*) as gullies FROM temp_t_gully g WHERE  and '||(v_field)||'::integer > 0 '
+				LEFT JOIN (SELECT '||(v_field)||', count(*) as gullies FROM temp_t_gully g WHERE '||(v_field)||'::integer > 0 '
 				' GROUP BY '||(v_field)||')d USING ('||(v_field)||')
 				JOIN '||(v_table)||' p ON e.'||(v_field)||' = p.'||(v_field);
 				EXECUTE v_querytext;
@@ -937,7 +937,7 @@ BEGIN
 				LEFT JOIN (SELECT '||(v_field)||', count(*) as connecs FROM temp_t_connec c WHERE '||(v_field)||'::integer > 0 GROUP BY '||(v_field)||')c USING ('||(v_field)||')
 				LEFT JOIN (SELECT '||(v_field)||', count(*) as gullies FROM temp_t_gully g WHERE '||(v_field)||'::integer > 0  GROUP BY '||(v_field)||')d USING ('||(v_field)||')
 				JOIN '||(v_table)||' p ON e.'||(v_field)||' = p.'||(v_field)||'
-				WHERE a.'||(v_field)||'::text = '||quote_literal(v_floodonlymapzone);
+				WHERE e.'||(v_field)||'::text = '||quote_literal(v_floodonlymapzone);
 				EXECUTE v_querytext;
 			ELSE
 				IF v_netscenario IS NOT NULL THEN
@@ -1009,10 +1009,12 @@ BEGIN
 			END IF;
 		END IF;
 
-		--update of fields 'lastupdate' and 'lastupdate_user'	
-		v_querytext = 'UPDATE temp_'||quote_ident(v_table)||' set lastupdate=now(), lastupdate_user=current_user 
-		where '||quote_ident(v_field)||' IN (SELECT distinct '||quote_ident(v_field)||' FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id))';
-		EXECUTE v_querytext;
+		--update of fields 'lastupdate' and 'lastupdate_user'
+        IF v_project_type = 'WS' THEN
+            v_querytext = 'UPDATE temp_'||quote_ident(v_table)||' set lastupdate=now(), lastupdate_user=current_user
+            where '||quote_ident(v_field)||' IN (SELECT distinct '||quote_ident(v_field)||' FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id))';
+            EXECUTE v_querytext;
+        END IF;
 
 		-- insert spacer for warning and info
 		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, '');
