@@ -28,7 +28,7 @@ CREATE TABLE rpt_arc_stats (
   reaction_min numeric,
   ffactor_max numeric,
   ffactor_min numeric,
-  the_geom geometry(LINESTRING, 25831),
+  the_geom geometry(LINESTRING, SRID_VALUE),
   CONSTRAINT rpt_arc_stats_pkey PRIMARY KEY (arc_id, result_id),
   CONSTRAINT rpt_arc_stats_result_id_fkey FOREIGN KEY (result_id)
       REFERENCES rpt_cat_result (result_id) MATCH SIMPLE
@@ -53,7 +53,7 @@ CREATE TABLE rpt_node_stats (
   quality_max numeric,
   quality_min numeric,
   quality_avg numeric(12,2),
-  the_geom geometry(POINT, 25831),
+  the_geom geometry(POINT, SRID_VALUE),
   CONSTRAINT rpt_node_stats_pkey PRIMARY KEY (node_id, result_id),
   CONSTRAINT rpt_node_stats_result_id_fkey FOREIGN KEY (result_id)
       REFERENCES rpt_cat_result (result_id) MATCH SIMPLE
