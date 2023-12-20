@@ -64,3 +64,6 @@ UPDATE config_form_fields SET linkedobject='tbl_inp_dscenario_tank' WHERE formna
 UPDATE config_form_fields SET linkedobject='tbl_inp_dscenario_valve' WHERE formname='ve_epa_valve' AND formtype='form_feature' AND columnname='add_to_dscenario' AND tabname='tab_epa';
 UPDATE config_form_fields SET linkedobject='tbl_inp_dscenario_virtualpump' WHERE formname='ve_epa_virtualpump' AND formtype='form_feature' AND columnname='add_to_dscenario' AND tabname='tab_epa';
 UPDATE config_form_fields SET linkedobject='tbl_inp_dscenario_virtualvalve' WHERE formname='ve_epa_virtualvalve' AND formtype='form_feature' AND columnname='add_to_dscenario' AND tabname='tab_epa';
+
+-- 20/12/2023
+UPDATE om_visit_cat set alias = name;
