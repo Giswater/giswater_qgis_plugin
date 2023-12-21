@@ -11,7 +11,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QDate, QStringListModel
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QSizePolicy, QGridLayout, QLabel, \
-    QTextEdit, QLineEdit, QCompleter
+    QTextEdit, QLineEdit, QCompleter, QTabWidget, QWidget, QGroupBox
 from qgis.gui import QgsDateTimeEdit
 
 from ..dialog import GwAction
@@ -37,6 +37,13 @@ class GwConfigButton(GwAction):
     # region private functions
 
     def _open_config(self):
+        # Manage tab signal
+        self.tab_basic_loaded = False
+        self.tab_featurecat_loaded = False
+        self.tab_mantype_loaded = False
+        self.tab_addfields_loaded = False
+        self.tab_admin_loaded = False
+        self.json_result = None
 
         # Get user
         cur_user = tools_db.get_current_user()
@@ -46,25 +53,31 @@ class GwConfigButton(GwAction):
         # Get visible layers name from TOC
         result = self._get_layers_name()
 
+        # Get dialog
         self.dlg_config = GwConfigUi()
         tools_gw.load_settings(self.dlg_config)
 
         # Call function gw_fct_getconfig and get json_result
         body = tools_gw.create_body(form='"formName":"config"', extras=result)
-        json_result = tools_gw.execute_procedure('gw_fct_getconfig', body)
-        if not json_result or json_result['status'] == 'Failed':
+        self.json_result = tools_gw.execute_procedure('gw_fct_getconfig', body)
+        if not self.json_result or self.json_result['status'] == 'Failed':
             return False
 
-        # Construct form for config and admin
-        # User
-        self._build_dialog_options(json_result['body']['form']['formTabs'][0], 'user')
-        # System
-        self._build_dialog_options(json_result['body']['form']['formTabs'][1], 'system')
+        # Get widget controls
+        self._get_widget_controls()
 
         # Event on change from combo parent
-        self._get_event_combo_parent(json_result['body']['form']['formTabs'])
+        self._get_event_combo_parent(self.json_result['body']['form']['formTabs'])
 
-        tools_qt.hide_void_groupbox(self.dlg_config)
+        # Load first tab
+        initial_index = 0
+        grbox_list = self.tab_main.widget(initial_index).findChildren(QGroupBox)
+        layoutname_list = []
+        layout_list = self.tab_main.widget(initial_index).findChildren(QGridLayout)
+        for layout in layout_list:
+            layoutname_list.append(layout.objectName())
+        self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
+        self._hide_void_tab_groupbox(grbox_list)
 
         # Check user/role and remove tabs
         role_admin = tools_db.check_role_user("role_admin", cur_user)
@@ -80,6 +93,59 @@ class GwConfigButton(GwAction):
         # Open form
         tools_gw.open_dialog(self.dlg_config, dlg_name='config')
 
+    def _get_widget_controls(self):
+        """ Control the current tab, to load widgets """
+
+        self.tab_main = self.dlg_config.findChild(QTabWidget, "tab_main")
+        self.tab_main.currentChanged.connect(partial(self._tab_activation))
+
+    def _tab_activation(self):
+        """ Call functions depend on tab selection """
+
+        # Get index of selected tab
+        index_tab = self.tab_main.currentIndex()
+        grbox_list = self.tab_main.widget(index_tab).findChildren(QGroupBox)
+        layoutname_list = []
+        layout_list = self.tab_main.widget(index_tab).findChildren(QGridLayout)
+        for layout in layout_list:
+            layoutname_list.append(layout.objectName())
+
+        # Tab 'Basic'
+        if self.tab_main.widget(index_tab).objectName() == 'tab_basic' and not self.tab_basic_loaded:
+            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
+            self._hide_void_tab_groupbox(grbox_list)
+            self.tab_basic_loaded = True
+        # Tab 'Featurecat'
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_featurecat' and not self.tab_featurecat_loaded:
+            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
+            self._hide_void_tab_groupbox(grbox_list)
+            self.tab_featurecat_loaded = True
+        # Tab 'Man Type'
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_mantype' and not self.tab_mantype_loaded:
+            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
+            self._hide_void_tab_groupbox(grbox_list)
+            self.tab_mantype_loaded = True
+        # Tab 'Additional Fields'
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_addfields' and not self.tab_addfields_loaded:
+            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
+            self._hide_void_tab_groupbox(grbox_list)
+            self.tab_addfields_loaded = True
+        # Tab 'Admin'
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_admin' and not self.tab_admin_loaded:
+            self._build_dialog_options(self.json_result['body']['form']['formTabs'][1], 'system', layoutname_list)
+            self._hide_void_tab_groupbox(grbox_list)
+            self.tab_admin_loaded = True
+
+    def _hide_void_tab_groupbox(self, grbox_list):
+        """ Rceives a list, searches it all the QGroupBox, looks 1 to 1 if the grb have widgets, if it does not have
+         (if it is empty), hides the QGroupBox
+        :param grbox_list: list of QGroupBox
+        """
+
+        for grbox in grbox_list:
+            widget_list = grbox.findChildren(QWidget)
+            if len(widget_list) == 0:
+                grbox.setVisible(False)
 
     def _get_layers_name(self):
         """ Returns the name of all the layers visible in the TOC, then populate the cad_combo_layers """
@@ -127,15 +193,14 @@ class GwConfigButton(GwAction):
         tools_gw.close_dialog(self.dlg_config)
 
 
-    def _build_dialog_options(self, row, tab):
+    def _build_dialog_options(self, row, tab, list):
 
         self.tab = tab
-
         for field in row['fields']:
             try:
                 widget = None
                 self.chk = None
-                if field['label']:
+                if field['label'] and field['layoutname'] in list:
                     lbl = QLabel()
                     lbl.setObjectName('lbl' + field['widgetname'])
                     lbl.setText(field['label'])
