@@ -25,8 +25,6 @@ UPDATE sys_param_user SET layoutorder=26 WHERE id='edit_node_ymax_vdefault';
 UPDATE inp_curve SET active = true where active is null;
 UPDATE inp_typevalue SET descript = 'RECT_OPEN' WHERE typevalue = 'inp_value_weirs' AND id = 'ROADWAY';
 
-ALTER TABLE cat_arc ALTER COLUMN shape SET NOT NULL;
-
 --22/11/2023
 UPDATE inp_timeseries SET active = true where active is null;
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'CONTROLS', 'CONTROLS');
