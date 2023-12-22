@@ -14,6 +14,7 @@ import re
 import sys
 import sqlite3
 import webbrowser
+import xml.etree.ElementTree as ET
 
 if 'nt' in sys.builtin_module_names:
     import ctypes
@@ -684,6 +685,14 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
 
     global_vars.iface.mapCanvas().refresh()
 
+def validate_qml(qml_content):
+    qml_content_no_spaces = qml_content.replace("\n", "").replace("\t", "")
+    try:
+        root = ET.fromstring(qml_content_no_spaces)
+        return True, None
+    except ET.ParseError as e:
+        return False, str(e)
+
 
 def set_layer_style(style_id, layer, is_epa=False):
     body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
@@ -694,21 +703,24 @@ def set_layer_style(style_id, layer, is_epa=False):
         if 'style' in style['body']['styles']:
             qml = style['body']['styles']['style']
 
-            style_manager = layer.styleManager()
+            valid_qml, error_message = validate_qml(qml)
+            if not valid_qml:
+                tools_qgis.show_warning(f"El QML tiene errores: {error_message}")
+            else:
+                style_manager = layer.styleManager()
 
-            # read valid style from layer
-            style = QgsMapLayerStyle()
-            style.readFromLayer(layer)
+                # read valid style from layer
+                style = QgsMapLayerStyle()
+                style.readFromLayer(layer)
 
-            style_name = "GwEpaStyle" if is_epa else "GwStyle"
-            # add style with new name
-            style_manager.addStyle(style_name, style)
-            # set new style as current
-            style_manager.setCurrentStyle(style_name)
+                style_name = "GwEpaStyle" if is_epa else "GwStyle"
+                # add style with new name
+                style_manager.addStyle(style_name, style)
+                # set new style as current
+                style_manager.setCurrentStyle(style_name)
 
-            tools_qgis.create_qml(layer, qml)
-            style_manager.setCurrentStyle("GwStyle")
-
+                tools_qgis.create_qml(layer, qml)
+                style_manager.setCurrentStyle("GwStyle")
 
 def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
                    group='GW Temporal Layers', call_set_tabs_enabled=True, close=True):
