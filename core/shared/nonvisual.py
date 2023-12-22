@@ -612,7 +612,6 @@ class GwNonVisual:
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_curve')
 
     def _paste_curves_values(self, tbl_curve_value):
-        print("activao")
         selected = tbl_curve_value.selectedRanges()
         if not selected:
             return
