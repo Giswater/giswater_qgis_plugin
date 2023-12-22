@@ -2064,8 +2064,8 @@ def add_combo(field, dialog=None, complet_result=None, ignore_function=False):
 
 def fill_combo(widget, field, index_to_show=1):
     # check if index_to_show is in widgetcontrols, then assign new value
-    if field['widgetcontrols'] and 'index_to_show' in field['widgetcontrols']:
-        index_to_show = field['widgetcontrols']['index_to_show']
+    if field.get('widgetcontrols') and 'index_to_show' in field.get('widgetcontrols'):
+        index_to_show = field.get('widgetcontrols')['index_to_show']
 
     # Generate list of items to add into combo
     widget.blockSignals(True)
