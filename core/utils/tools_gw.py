@@ -705,7 +705,8 @@ def set_layer_style(style_id, layer, is_epa=False):
 
             valid_qml, error_message = validate_qml(qml)
             if not valid_qml:
-                tools_qgis.show_warning(f"El QML tiene errores: {error_message}")
+                msg = "The QML file is invalid."
+                tools_qgis.show_warning(msg, parameter=error_message)
             else:
                 style_manager = layer.styleManager()
 
