@@ -1113,6 +1113,7 @@ class GwNonVisual:
         is_new = (pattern_id is None) or duplicate
         self.dialog.btn_accept.clicked.connect(partial(self._accept_pattern_ws, self.dialog, is_new))
 
+
     def _paste_pattern_values(self, tbl_patter_value):
         selected = tbl_patter_value.selectedRanges()
         if not selected:
@@ -1474,7 +1475,6 @@ class GwNonVisual:
 
 
     def _manage_patterns_tableviews(self, dialog, cmb_pattern_type, plot_widget):
-
         # Variables
         tbl_monthly = dialog.tbl_monthly
         tbl_daily = dialog.tbl_daily
@@ -1491,6 +1491,11 @@ class GwNonVisual:
         pattern_type = tools_qt.get_combo_value(dialog, cmb_pattern_type)
         cur_table = dialog.findChild(QTableWidget, f"tbl_{pattern_type.lower()}")
         cur_table.setVisible(True)
+
+        # Copy values from clipboard
+        paste_shortcut = QShortcut(QKeySequence.Paste, cur_table)
+        paste_shortcut.activated.connect(partial(self._paste_pattern_values, cur_table))
+
         try:
             cur_table.cellChanged.disconnect()
         except TypeError:
