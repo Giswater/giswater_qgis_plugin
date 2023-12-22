@@ -16,7 +16,8 @@ try:
 except ImportError:
     scipy_imported = False
 
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QWidget
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QWidget, QShortcut,QApplication
+from qgis.PyQt.QtGui import QKeySequence
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.core import Qgis
 from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
@@ -569,6 +570,10 @@ class GwNonVisual:
         cmb_expl_id = self.dialog.cmb_expl_id
         cmb_curve_type = self.dialog.cmb_curve_type
 
+        # Copy values from clipboard
+        paste_shortcut = QShortcut(QKeySequence.Paste, tbl_curve_value)
+        paste_shortcut.activated.connect(partial(self._paste_curves_values, tbl_curve_value))
+
         # Populate combobox
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id > 0"
         rows = tools_db.get_rows(sql)
@@ -605,6 +610,23 @@ class GwNonVisual:
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_curve')
+
+    def _paste_curves_values(self, tbl_curve_value):
+        print("activao")
+        selected = tbl_curve_value.selectedRanges()
+        if not selected:
+            return
+
+        text = QApplication.clipboard().text()
+        rows = text.split("\n")
+
+        for r, row in enumerate(rows):
+            columns = row.split("\t")
+            for c, value in enumerate(columns):
+                item = QTableWidgetItem(value)
+                row_pos = selected[0].topRow() + r
+                col_pos = selected[0].leftColumn() + c
+                tbl_curve_value.setItem(row_pos, col_pos, item)
 
     def get_print_curves(self, curve_id, path, file_name, geom1=None, geom2=None):
         """ Opens dialog for curve """
@@ -1061,6 +1083,10 @@ class GwNonVisual:
         tbl_pattern_value = self.dialog.tbl_pattern_value
         cmb_expl_id = self.dialog.cmb_expl_id
 
+        # Copy values from clipboard
+        paste_shortcut = QShortcut(QKeySequence.Paste, tbl_pattern_value)
+        paste_shortcut.activated.connect(partial(self._paste_pattern_values, tbl_pattern_value))
+
         # Set scale-to-fit for tableview
         tbl_pattern_value.horizontalHeader().setSectionResizeMode(1)
         tbl_pattern_value.horizontalHeader().setMinimumSectionSize(50)
@@ -1087,6 +1113,22 @@ class GwNonVisual:
         # Connect OK button to insert all inp_pattern and inp_pattern_value data to database
         is_new = (pattern_id is None) or duplicate
         self.dialog.btn_accept.clicked.connect(partial(self._accept_pattern_ws, self.dialog, is_new))
+
+    def _paste_pattern_values(self, tbl_patter_value):
+        selected = tbl_patter_value.selectedRanges()
+        if not selected:
+            return
+
+        text = QApplication.clipboard().text()
+        rows = text.split("\n")
+
+        for r, row in enumerate(rows):
+            columns = row.split("\t")
+            for c, value in enumerate(columns):
+                item = QTableWidgetItem(value)
+                row_pos = selected[0].topRow() + r
+                col_pos = selected[0].leftColumn() + c
+                tbl_patter_value.setItem(row_pos, col_pos, item)
 
 
     def _populate_ws_patterns_widgets(self, pattern_id, duplicate=False):
@@ -1899,6 +1941,10 @@ class GwNonVisual:
         cmb_expl_id = self.dialog.cmb_expl_id
         tbl_timeseries_value = self.dialog.tbl_timeseries_value
 
+        # Copy values from clipboard
+        paste_shortcut = QShortcut(QKeySequence.Paste, tbl_timeseries_value)
+        paste_shortcut.activated.connect(partial(self._paste_timeseries_values, tbl_timeseries_value))
+
         # Populate combobox
         self._populate_timeser_combos(cmb_expl_id, cmb_times_type, cmb_timeser_type)
 
@@ -1923,6 +1969,24 @@ class GwNonVisual:
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_timeseries')
 
+    def _paste_timeseries_values(self, tbl_timeseries_value):
+        selected = tbl_timeseries_value.selectedRanges()
+        if not selected:
+            return
+
+        text = QApplication.clipboard().text()
+        rows = text.split("\n")
+
+        times_type = tools_qt.get_combo_value(self.dialog, self.dialog.cmb_times_type)
+        for r, row in enumerate(rows):
+            columns = row.split("\t")
+            for c, value in enumerate(columns):
+                item = QTableWidgetItem(value)
+                row_pos = selected[0].topRow() + r
+                col_pos = selected[0].leftColumn() + c
+                if times_type == 'RELATIVE':
+                    col_pos += 1
+                tbl_timeseries_value.setItem(row_pos, col_pos, item)
 
     def _populate_timeser_combos(self, cmb_expl_id, cmb_times_type, cmb_timeser_type):
         """ Populates timeseries dialog combos """
