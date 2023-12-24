@@ -689,11 +689,18 @@ BEGIN
 				END IF;
 			END IF;
 		ELSE 
-			v_querytext = 'UPDATE temp_t_anlgraph SET water=1, flag=0, trace = '||v_fieldmp||'::integer 
-			FROM '||v_table||' WHERE graphconfig is not null and active is true
-			AND node_1 IN (SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id)';
-			EXECUTE v_querytext;
-
+			
+			IF v_floodonlymapzone IS NULL THEN
+				v_querytext = 'UPDATE temp_t_anlgraph SET water=1, flag=0, trace = '||v_fieldmp||'::integer 
+				FROM '||v_table||' WHERE graphconfig is not null and active is true
+				AND node_1 IN (SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id)';
+				EXECUTE v_querytext;
+			ELSE
+				v_querytext = 'UPDATE temp_t_anlgraph SET water=1, flag=0, trace = '||v_fieldmp||'::integer 
+				FROM '||v_table||' WHERE graphconfig is not null and active is true AND '||v_fieldmp||'::integer IN ('||v_floodonlymapzone||')
+				AND node_1 IN (SELECT (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id)';
+				EXECUTE v_querytext;
+			END IF;
 		END IF;	
 
 		-- inundation process
