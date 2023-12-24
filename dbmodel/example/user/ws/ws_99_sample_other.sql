@@ -851,3 +851,5 @@ UPDATE config_form_fields SET layoutorder =9 WHERE  formname = 'v_edit_dqa' AND 
 UPDATE config_form_fields SET layoutorder =10 WHERE  formname = 'v_edit_dqa' AND columnname = 'graphconfig';
 UPDATE config_form_fields SET layoutorder =11 WHERE  formname = 'v_edit_dqa' AND columnname = 'stylesheet';
 UPDATE config_form_fields SET layoutorder =12 WHERE  formname = 'v_edit_dqa' AND columnname = 'active';
+
+UPDATE presszone SET head = 52.27 WHERE presszone_id = '4';
