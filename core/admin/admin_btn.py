@@ -335,6 +335,15 @@ class GwAdminButton:
             message_log.setVisible(True)
             QgsMessageLog.logMessage("", f"{lib_vars.plugin_name.capitalize()} PY", 0)
 
+            # Manage Log Messages in tab log
+            main_tab = self.dlg_readsql_show_info.findChild(QTabWidget, 'mainTab')
+            main_tab.setCurrentWidget(main_tab.findChild(QWidget, "tab_loginfo"))
+            main_tab.setTabEnabled(main_tab.currentIndex(), True)
+            self.infolog_updates = self.dlg_readsql_show_info.findChild(QTextEdit, 'txt_infolog')
+            self.infolog_updates.setReadOnly(True)
+            self.message_infolog = ''
+            self.infolog_updates.setText(self.message_infolog)
+
             # Create timer
             self.t0 = time()
             self.timer = QTimer()
@@ -1893,6 +1902,7 @@ class GwAdminButton:
                     self.error_count = self.error_count + 1
                     tools_log.log_info(f"_read_execute_file error {filepath}")
                     tools_log.log_info(f"Message: {lib_vars.session_vars['last_error']}")
+                    self.message_infolog = f"_read_execute_file error {filepath}\nMessage: {lib_vars.session_vars['last_error']}"
                     if self.dev_commit is False:
                         tools_db.dao.rollback()
 
@@ -1906,6 +1916,7 @@ class GwAdminButton:
             self.error_count = self.error_count + 1
             tools_log.log_info(f"_read_execute_file exception: {file}")
             tools_log.log_info(str(e))
+            self.message_infolog = f"_read_execute_file exception: {file}\n {str(e)}"
             if self.dev_commit is False:
                 tools_db.dao.rollback()
             if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):

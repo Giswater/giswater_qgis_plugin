@@ -62,6 +62,8 @@ class GwUpdateSchemaTask(GwTask):
         # Enable red 'X' from dlg_readsql_show_info
         self.admin.dlg_readsql_show_info.setWindowFlag(Qt.WindowCloseButtonHint, True)
         self.admin.dlg_readsql_show_info.show()
+        # Show Message Info in tab log
+        self.admin.infolog_updates.setText(self.admin.message_infolog)
 
         if self.timer:
             self.timer.stop()
