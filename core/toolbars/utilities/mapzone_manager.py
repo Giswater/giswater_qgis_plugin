@@ -66,6 +66,7 @@ class GwMapzoneManager:
             qtableview = QTableView()
             qtableview.setObjectName(f"tbl_{view}")
             qtableview.clicked.connect(partial(self._manage_highlight, qtableview, view))
+            qtableview.doubleClicked.connect(partial(self.manage_update, self.mapzone_mng_dlg, None))
             tab_idx = self.mapzone_mng_dlg.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
             self.mapzone_mng_dlg.main_tab.widget(tab_idx).setObjectName(view)
 
