@@ -501,14 +501,6 @@ class GwInfo(QObject):
             except:
                 pass
 
-        if self.feature_type != 'PIPE':
-            coordinates = json.loads(f'{{{list_points}}}')
-            x1 = coordinates["x1"]
-            y1 = coordinates["y1"]
-            global_vars.canvas.setCenter(QgsPointXY(x1, y1))
-            global_vars.canvas.refresh()
-
-
         for tab in complet_result['body']['form']['visibleTabs']:
             self.visible_tabs[tab['tabName']] = tab
 
