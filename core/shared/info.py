@@ -228,6 +228,14 @@ class GwInfo(QObject):
                         sub_tag = 'arc'
                     else:
                         sub_tag = 'node'
+
+                # Comes from QPushButtons node1 or node2
+                if feature_id:
+                    x1 = self.complet_result['body']['feature']['geometry']['x']
+                    y1 = self.complet_result['body']['feature']['geometry']['y']
+                    global_vars.canvas.setCenter(QgsPointXY(x1, y1))
+                    global_vars.canvas.refresh()
+
                 feature_id = self.complet_result['body']['feature']['id']
 
                 result, dialog = self._open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker,
