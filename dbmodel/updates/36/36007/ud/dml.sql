@@ -16,3 +16,6 @@ ALTER TABLE cat_arc_shape ADD CONSTRAINT cat_arc_shape_check CHECK (epa::text = 
 
 UPDATE cat_arc SET shape = 'UNKNOWN' WHERE shape is null;
 ALTER TABLE cat_arc ALTER COLUMN shape SET NOT NULL;
+
+INSERT INTO inp_typevalue VALUES ('inp_options_networkmode_', '3', '1D/2D SWMM-IBER WET');
+

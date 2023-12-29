@@ -547,7 +547,7 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, concat('INFO: All CONTROLS has correct arc id values.'));
 	END IF;
 
-	IF v_networkmode = 2 THEN
+	IF v_networkmode = 2 or v_networkmode = 3 THEN
 	
 		RAISE NOTICE '6 - Check arc_id null for gully (455)';
 		SELECT count(*) INTO v_count FROM (SELECT * FROM v_edit_gully g,  selector_sector s 

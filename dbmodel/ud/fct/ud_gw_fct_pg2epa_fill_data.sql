@@ -178,7 +178,7 @@ BEGIN
 	-- todo: UPDATE childparam for inp_weir, inp_orifice, inp_outlet, inp_pump
 
 	-- fill temp_t_gully in order to work with 1D/2D
-	IF v_networkmode = 2 THEN
+	IF v_networkmode = 2 or v_networkmode = 3 THEN
 
 		-- netgully
 		EXECUTE 'INSERT INTO temp_t_gully 

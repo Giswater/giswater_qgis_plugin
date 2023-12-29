@@ -408,21 +408,6 @@ BEGIN
 	   FROM temp_t_gully;
 
 
-	CREATE OR REPLACE TEMP VIEW vi_t_gully2node AS
-	 SELECT a.gully_id,
-	    n.node_id,
-	    st_makeline(a.the_geom, n.the_geom) AS the_geom
-	   FROM ( SELECT g.gully_id,
-			CASE
-			    WHEN g.pjoint_type::text = 'NODE'::text THEN g.pjoint_id
-			    ELSE a_1.node_2
-			END AS node_id,
-		    a_1.expl_id,
-		    g.the_geom
-		   FROM v_edit_inp_gully g
-		     LEFT JOIN arc a_1 USING (arc_id)) a
-	     JOIN node n USING (node_id);
-
 	CREATE OR REPLACE TEMP VIEW vi_t_gwf AS
 	 SELECT inp_groundwater.subc_id,
 	    ('LATERAL'::text || ' '::text) || inp_groundwater.fl_eq_lat::text AS fl_eq_lat,
@@ -1281,7 +1266,11 @@ BEGIN
 	FOR rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid order by orderby
 	LOOP
 		-- insert header
-		IF rec_table.tablename IN ('vi_t_gully','vi_t_grate','vi_t_link','vi_t_lxsections') AND v_exportmode = 1 THEN
+		IF rec_table.tablename IN ('vi_t_gully') AND v_exportmode = 1 THEN
+			-- nothing because this targets does not to be exported
+
+		ELSIF rec_table.tablename IN ('vi_t_subareas', 'vi_t_subcatchments', 'vi_t_infiltration', 'vi_t_raingages', 'vi_t_landuses', 'vi_t_coverages', 'vi_t_buildup', 'vi_t_washoff', 
+		'vi_t_lid_controls', 'vi_t_lid_usage', 'vi_t_snowpacks') AND v_exportmode = 2 THEN
 			-- nothing because this targets does not to be exported
 
 		ELSE
@@ -1396,7 +1385,6 @@ BEGIN
 	DROP VIEW IF EXISTS vi_t_files;
 	DROP VIEW IF EXISTS vi_t_groundwater;
 	DROP VIEW IF EXISTS vi_t_gully;
-	DROP VIEW IF EXISTS vi_t_gully2node;
 	DROP VIEW IF EXISTS vi_t_gwf;
 	DROP VIEW IF EXISTS vi_t_hydrographs;
 	DROP VIEW IF EXISTS vi_t_infiltration;
