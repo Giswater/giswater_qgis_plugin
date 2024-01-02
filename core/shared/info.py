@@ -233,8 +233,14 @@ class GwInfo(QObject):
                 if feature_id:
                     x1 = self.complet_result['body']['feature']['geometry']['x']
                     y1 = self.complet_result['body']['feature']['geometry']['y']
-                    global_vars.canvas.setCenter(QgsPointXY(x1, y1))
-                    global_vars.canvas.refresh()
+
+                    current_extent = global_vars.canvas.extent()
+
+                    feature_point = QgsPointXY(x1, y1)
+
+                    if not current_extent.contains(feature_point):
+                        global_vars.canvas.setCenter(feature_point)
+                        global_vars.canvas.refresh()
 
                 feature_id = self.complet_result['body']['feature']['id']
 
