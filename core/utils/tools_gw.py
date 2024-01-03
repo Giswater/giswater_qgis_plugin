@@ -1181,8 +1181,8 @@ def set_style_mapzones():
         # Loop for each mapzone returned on json
         lyr = tools_qgis.get_layer_by_tablename(mapzone['layer'])
         categories = []
-        status = mapzone['status']
-        if status == 'Disable' or lyr is None:
+        mode = mapzone['mode']
+        if mode == 'Disable' or lyr is None:
             continue
 
         # Loop for each id returned on json
@@ -1198,7 +1198,7 @@ def set_style_mapzones():
             R = random.randint(0, 255)
             G = random.randint(0, 255)
             B = random.randint(0, 255)
-            if status == 'Stylesheet':
+            if mode == 'Stylesheet':
                 try:
                     R = id['stylesheet']['color'][0]
                     G = id['stylesheet']['color'][1]
@@ -1208,7 +1208,7 @@ def set_style_mapzones():
                     G = random.randint(0, 255)
                     B = random.randint(0, 255)
 
-            elif status == 'Random':
+            elif mode == 'Random':
                 R = random.randint(0, 255)
                 G = random.randint(0, 255)
                 B = random.randint(0, 255)
