@@ -235,6 +235,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario_manager.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active,
                                                 self.dlg_dscenario_manager, self.tbl_dscenario, 'v_edit_cat_dscenario'))
         self.tbl_dscenario.doubleClicked.connect(self._open_dscenario)
+        self.dlg_dscenario_manager.chk_active.stateChanged.connect(partial(self._filter_active, self.dlg_dscenario_manager))
 
         self.dlg_dscenario_manager.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dscenario_manager))
         self.dlg_dscenario_manager.finished.connect(partial(tools_gw.save_settings, self.dlg_dscenario_manager))
@@ -322,6 +323,27 @@ class GwDscenarioManagerButton(GwAction):
         tools_qt.set_tableview_config(self.tbl_dscenario)
 
         return complet_list
+
+
+    def _filter_active(self, dialog, active):
+        """ Filters manager table by active """
+        tableview = dialog.findChild(QTableView)
+
+        show_only_active = active == Qt.Checked
+
+        model = tableview.model()
+        if model is None:
+            return
+
+        for row in range(model.rowCount()):
+            index = model.index(row, tools_qt.get_col_index_by_col_name(tableview, 'active'))
+            value = model.data(index)
+
+            if show_only_active != json.loads(value.lower()):
+                tableview.setRowHidden(row, True)
+                tableview.viewport().update()
+            else:
+                self._fill_manager_table('v_edit_cat_dscenario', self.filter_name.text())
 
 
     def _manage_btn_create(self, dialog, view):
