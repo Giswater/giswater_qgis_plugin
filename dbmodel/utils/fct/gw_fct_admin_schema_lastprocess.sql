@@ -132,6 +132,10 @@ BEGIN
 				EXECUTE 'DROP TABLE IF EXISTS '||v_tablename.table_name||' CASCADE';
 			END LOOP;
 			
+			-- set mapzones symbology
+			UPDATE config_function SET style = (replace(style::text, 'Random', 'Disable'))::json WHERE id = 2928;
+			UPDATE config_function SET style = (replace(style::text, 'Stylesheet', 'Disable'))::json WHERE id = 2928;
+
 			-- drop deprecated views
 			IF v_projecttype = 'WS' THEN 
 				DROP VIEW IF EXISTS v_edit_man_varc;
