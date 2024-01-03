@@ -86,8 +86,11 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.btn_cancel.clicked.connect(self.mapzone_mng_dlg.reject)
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.reset_rubberband, self.rubber_band, None))
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.close_dialog, self.mapzone_mng_dlg, True))
+        self.mapzone_mng_dlg.chk_active.stateChanged.connect(partial(self._filter_active, self.mapzone_mng_dlg))
+
 
         self._manage_current_changed()
+        self.mapzone_mng_dlg.main_tab.currentChanged.connect(partial(self._filter_active, self.mapzone_mng_dlg, None))
 
         tools_gw.open_dialog(self.mapzone_mng_dlg, 'mapzone_manager')
 
@@ -183,6 +186,24 @@ class GwMapzoneManager:
 
         # Sort the table
         model.sort(0, 0)
+
+
+    def _filter_active(self, dialog, active):
+        """ Filters manager table by active """
+
+        widget_table = dialog.main_tab.currentWidget()
+        id_field = 'active'
+        if active is None:
+            active = dialog.chk_active.checkState()
+        active = 'true' if active == 2 else None
+
+        expr = ""
+        if active is not None:
+            expr = f"{id_field} = {active}"
+
+        # Refresh model with selected filter
+        widget_table.model().setFilter(expr)
+        widget_table.model().select()
 
     # region config button
 
