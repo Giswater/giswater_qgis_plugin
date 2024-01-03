@@ -29,7 +29,7 @@
       <item row="1" column="1">
        <widget class="QCheckBox" name="chk_active">
         <property name="text">
-         <string>Show inactive</string>
+         <string>Show only active</string>
         </property>
        </widget>
       </item>

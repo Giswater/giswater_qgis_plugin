@@ -1473,6 +1473,7 @@ class GwPsector:
                 tools_qgis.show_warning(model.lastError().text(), dialog=dialog)
         # Attach model to table view
         if expr:
+            expr = ""
             widget.setModel(model)
             widget.model().setFilter(expr)
         else:
@@ -1780,7 +1781,7 @@ class GwPsector:
 
         expr = ""
 
-        if not inactive_select:
+        if inactive_select:
             expr += f" active is true"
 
         if result_select != 'null':
