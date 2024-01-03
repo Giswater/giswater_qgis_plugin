@@ -63,7 +63,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Show inactive</string>
+         <string>Show only active </string>
         </property>
        </widget>
       </item>
