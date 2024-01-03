@@ -1181,7 +1181,11 @@ def set_style_mapzones():
         # Loop for each mapzone returned on json
         lyr = tools_qgis.get_layer_by_tablename(mapzone['layer'])
         categories = []
-        mode = mapzone['mode']
+        try:
+            mode = mapzone['mode']
+        except KeyError:  # backwards compatibility for database < 3.6.007
+            mode = mapzone['status']
+			
         if mode == 'Disable' or lyr is None:
             continue
 
