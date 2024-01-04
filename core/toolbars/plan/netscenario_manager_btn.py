@@ -209,7 +209,7 @@ class GwNetscenarioManagerButton(GwAction):
         """ Fill netscenario manager table with data from v_ui_plan_netscenario """
 
         filter_name = self.filter_name.text()
-        chk_active = not self.dlg_netscenario_manager.chk_active.isChecked()
+        chk_active = self.dlg_netscenario_manager.chk_active.isChecked()
 
         complet_list = self._get_list("v_ui_plan_netscenario", filter_name, chk_active=chk_active)
 
