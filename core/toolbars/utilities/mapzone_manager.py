@@ -126,7 +126,7 @@ class GwMapzoneManager:
         tools_gw.reset_rubberband(self.rubber_band)
 
         # Fill current table
-        self._fill_mapzone_table()
+        self._fill_mapzone_table(expr='active is true')
 
     def _fill_mapzone_table(self, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
         """ Fill mapzone table with data from its corresponding table """
@@ -187,19 +187,17 @@ class GwMapzoneManager:
         # Sort the table
         model.sort(0, 0)
 
-
     def _filter_active(self, dialog, active):
         """ Filters manager table by active """
 
         widget_table = dialog.main_tab.currentWidget()
-        id_field = 'active'
+
         if active is None:
             active = dialog.chk_active.checkState()
-        active = 'true' if active == 2 else None
 
         expr = ""
-        if active is not None:
-            expr = f"{id_field} = {active}"
+        if not active:
+            expr = f"active is true"
 
         # Refresh model with selected filter
         widget_table.model().setFilter(expr)
