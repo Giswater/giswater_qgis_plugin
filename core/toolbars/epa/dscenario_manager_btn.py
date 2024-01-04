@@ -129,13 +129,16 @@ class GwDscenarioManagerButton(GwAction):
         reg_exp = QRegExp('([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
         self.filter_name.setValidator(QRegExpValidator(reg_exp))
 
+        # Checkbox show inactive
+        self.chk_active = self.dlg_hydrology_manager.chk_active
+
         # Fill table
         self.tbl_dscenario = self.dlg_hydrology_manager.findChild(QTableView, 'tbl_dscenario')
         self._fill_manager_table('v_edit_cat_hydrology')
 
         # Connect main dialog signals
         self.dlg_hydrology_manager.txt_name.textChanged.connect(partial(self._fill_manager_table,
-                                                                        'v_edit_cat_hydrology'))
+                                                                        'v_edit_cat_hydrology', None))
         self.dlg_hydrology_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
                                                 self.dlg_hydrology_manager, 'v_edit_cat_hydrology', 3294))
         self.dlg_hydrology_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3100,
@@ -147,6 +150,8 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_hydrology_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
         self.dlg_hydrology_manager.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active,
                                                 self.dlg_hydrology_manager, self.tbl_dscenario, 'v_edit_cat_hydrology'))
+        self.dlg_hydrology_manager.chk_active.stateChanged.connect(
+            partial(self._fill_manager_table, 'v_edit_cat_hydrology'))
 
         self.dlg_hydrology_manager.btn_cancel.clicked.connect(
             partial(tools_gw.close_dialog, self.dlg_hydrology_manager))
@@ -172,12 +177,16 @@ class GwDscenarioManagerButton(GwAction):
         reg_exp = QRegExp('([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
         self.filter_name.setValidator(QRegExpValidator(reg_exp))
 
+        # Checkbox show inactive
+        self.chk_active = self.dlg_dwf_manager.chk_active
+
         # Fill table
         self.tbl_dscenario = self.dlg_dwf_manager.findChild(QTableView, 'tbl_dscenario')
         self._fill_manager_table('v_edit_cat_dwf_scenario')
 
         # Connect main dialog signals
-        self.dlg_dwf_manager.txt_name.textChanged.connect(partial(self._fill_manager_table, 'v_edit_cat_dwf_scenario'))
+        self.dlg_dwf_manager.txt_name.textChanged.connect(partial(self._fill_manager_table,
+                                                                  'v_edit_cat_dwf_scenario', None))
         self.dlg_dwf_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
                                                 self.dlg_dwf_manager, 'v_edit_cat_dwf_scenario', 3296))
         self.dlg_dwf_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3102,
@@ -189,6 +198,8 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dwf_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
         self.dlg_dwf_manager.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active,
                                                 self.dlg_dwf_manager, self.tbl_dscenario, 'v_edit_cat_dwf_scenario'))
+        self.dlg_dwf_manager.chk_active.stateChanged.connect(
+            partial(self._fill_manager_table, 'v_edit_cat_dwf_scenario'))
 
         #self.tbl_dscenario.doubleClicked.connect(self._open_dscenario)
 
@@ -217,12 +228,19 @@ class GwDscenarioManagerButton(GwAction):
         reg_exp = QRegExp('([^"\'\\\\])*')  # Don't allow " or ' or \ because it breaks the query
         self.filter_name.setValidator(QRegExpValidator(reg_exp))
 
+        # Checkbox show inactive
+        self.chk_active = self.dlg_dscenario_manager.chk_active
+
         # Fill table
         self.tbl_dscenario = self.dlg_dscenario_manager.findChild(QTableView, 'tbl_dscenario')
         self._fill_manager_table('v_edit_cat_dscenario')
 
+        # CheckBox filter
+        self.filter_active = self.dlg_dscenario_manager.findChild(QCheckBox, 'chk_active')
+
         # Connect main dialog signals
-        self.dlg_dscenario_manager.txt_name.textChanged.connect(partial(self._fill_manager_table, 'v_edit_cat_dscenario'))
+        self.dlg_dscenario_manager.txt_name.textChanged.connect(partial(self._fill_manager_table,
+                                                                        'v_edit_cat_dscenario', None))
         self.dlg_dscenario_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
                                                 self.dlg_dscenario_manager, 'v_edit_cat_dscenario', 3156))
         self.dlg_dscenario_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3042,
@@ -235,7 +253,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario_manager.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active,
                                                 self.dlg_dscenario_manager, self.tbl_dscenario, 'v_edit_cat_dscenario'))
         self.tbl_dscenario.doubleClicked.connect(self._open_dscenario)
-        self.dlg_dscenario_manager.chk_active.stateChanged.connect(partial(self._filter_active, self.dlg_dscenario_manager))
+        self.dlg_dscenario_manager.chk_active.stateChanged.connect(partial(self._fill_manager_table, 'v_edit_cat_dscenario'))
 
         self.dlg_dscenario_manager.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dscenario_manager))
         self.dlg_dscenario_manager.finished.connect(partial(tools_gw.save_settings, self.dlg_dscenario_manager))
@@ -275,20 +293,22 @@ class GwDscenarioManagerButton(GwAction):
             tools_db.execute_sql(sql, log_sql=True)
 
         # Refresh tableview
-        self._fill_manager_table(view, self.filter_name.text())
+        self._fill_manager_table(view)
 
 
     def save_user_values(self):
         pass
 
 
-    def _get_list(self, table_name='v_edit_cat_dscenario', filter_name="", filter_id=None):
+    def _get_list(self, table_name='v_edit_cat_dscenario', filter_name="", filter_id=None, filter_active=None):
         """ Mount and execute the query for gw_fct_getlist """
 
         feature = f'"tableName":"{table_name}"'
         filter_fields = f'"limit": -1, "name": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'
         if filter_id is not None:
             filter_fields += f', "dscenario_id": {{"filterSign":"=", "value":"{filter_id}"}}'
+        if not filter_active:
+            filter_fields += f', "active": {{"filterSign":"=", "value":"true"}}'
         body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
         json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
         if json_result is None or json_result['status'] == 'Failed':
@@ -300,10 +320,12 @@ class GwDscenarioManagerButton(GwAction):
         return complet_list
 
 
-    def _fill_manager_table(self, view, filter_name=""):
+    def _fill_manager_table(self, view, filter_active=None, filter_name=""):
         """ Fill dscenario manager table """
-
-        complet_list = self._get_list(view, filter_name)
+        filter_active = 'true' if filter_active == 2 else self.chk_active.isChecked()
+        if filter_name == "":
+            filter_name = self.filter_name.text()
+        complet_list = self._get_list(view, filter_name, filter_active=filter_active)
 
         if complet_list is False:
             return False, False
@@ -323,27 +345,6 @@ class GwDscenarioManagerButton(GwAction):
         tools_qt.set_tableview_config(self.tbl_dscenario)
 
         return complet_list
-
-
-    def _filter_active(self, dialog, active):
-        """ Filters manager table by active """
-        tableview = dialog.findChild(QTableView)
-
-        show_only_active = active == Qt.Checked
-
-        model = tableview.model()
-        if model is None:
-            return
-
-        for row in range(model.rowCount()):
-            index = model.index(row, tools_qt.get_col_index_by_col_name(tableview, 'active'))
-            value = model.data(index)
-
-            if show_only_active != json.loads(value.lower()):
-                tableview.setRowHidden(row, True)
-                tableview.viewport().update()
-            else:
-                self._fill_manager_table('v_edit_cat_dscenario', self.filter_name.text())
 
 
     def _manage_btn_create(self, dialog, view):
@@ -391,7 +392,7 @@ class GwDscenarioManagerButton(GwAction):
 
         toolbox_btn = GwToolBoxButton(None, None, None, None, None)
         if connect is None:
-            connect = [partial(self._fill_manager_table, view, self.filter_name.text()), partial(tools_gw.refresh_selectors)]
+            connect = [partial(self._fill_manager_table, view), partial(tools_gw.refresh_selectors)]
         else:
             if type(connect) != list:
                 connect = [connect]
@@ -442,7 +443,7 @@ class GwDscenarioManagerButton(GwAction):
             tools_db.execute_sql(sql)
 
             # Refresh tableview
-            self._fill_manager_table(view, filter_name=self.filter_name.text())
+            self._fill_manager_table(view)
 
     # endregion
 
@@ -715,7 +716,7 @@ class GwDscenarioManagerButton(GwAction):
         if json_result and json_result.get('status') == 'Accepted':
             tools_gw.close_dialog(dialog)
             # Refresh tableview
-            self._fill_manager_table(tablename,  filter_name=self.filter_name.text())
+            self._fill_manager_table(tablename)
             return
         tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
 
