@@ -1226,6 +1226,19 @@ def set_style_mapzones():
             category = QgsRendererCategory(id['id'], symbol, str(id['id']))
             categories.append(category)
 
+        # Add a category for any other value not categorized
+        symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
+        try:
+            symbol.setOpacity(float(mapzone['transparency']))
+        except KeyError:  # backwards compatibility for database < 3.5.030
+            symbol.setOpacity(float(mapzone['opacity']))
+        layer_style = {'color': '{}, {}, {}'.format(int(random.randint(0, 255)), int(random.randint(0, 255)), int(random.randint(0, 255)))}
+        symbol_layer = QgsSimpleFillSymbolLayer.create(layer_style)
+        if symbol_layer is not None:
+            symbol.changeSymbolLayer(0, symbol_layer)
+        category = QgsRendererCategory('', symbol, '')
+        categories.append(category)
+
         # apply symbol to layer renderer
         lyr.setRenderer(QgsCategorizedSymbolRenderer(mapzone['idname'], categories))
 
