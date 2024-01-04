@@ -111,26 +111,33 @@ class GwMapzoneManager:
         tools_qgis.highlight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
 
     def _txt_name_changed(self, text):
-        expr = f"name ilike '%{text}%'" if text else None
+        show_inactive = self.mapzone_mng_dlg.chk_active.isChecked()
+        expr = f"name ilike '%{text}%'"
+        if not show_inactive:
+            expr += " and active is true"
         self._fill_mapzone_table(expr=expr)
 
     def _manage_current_changed(self):
         """ Manages tab changes """
-
         if self.mapzone_mng_dlg is None or isdeleted(self.mapzone_mng_dlg):
             return
+        # Get the state of the "show inactive" checkbox
+        show_inactive = self.mapzone_mng_dlg.chk_active.isChecked()
+
         # Refresh txt_feature_id
         tools_qt.set_widget_text(self.mapzone_mng_dlg, self.mapzone_mng_dlg.txt_name, '')
 
         # Reset rubberband
         tools_gw.reset_rubberband(self.rubber_band)
 
+        # Build the filter expression based on the state of the "show inactive" checkbox
+        expr = "" if show_inactive else "active is true"
+
         # Fill current table
-        self._fill_mapzone_table(expr='active is true')
+        self._fill_mapzone_table(expr=expr)
 
     def _fill_mapzone_table(self, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
         """ Fill mapzone table with data from its corresponding table """
-
         # Manage exception if dialog is closed
         if self.mapzone_mng_dlg is None or isdeleted(self.mapzone_mng_dlg):
             return
@@ -195,10 +202,15 @@ class GwMapzoneManager:
         if active is None:
             active = dialog.chk_active.checkState()
 
+        search_text = dialog.txt_name.text()
         expr = ""
         if not active:
             expr = f"active is true"
 
+        if search_text:
+            if expr:
+                expr += " and "
+            expr += f"name ilike '%{search_text}%'"
         # Refresh model with selected filter
         widget_table.model().setFilter(expr)
         widget_table.model().select()
