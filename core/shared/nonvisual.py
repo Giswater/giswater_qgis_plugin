@@ -108,7 +108,7 @@ class GwNonVisual:
             function_name = f"get_{dict_views_project[key]}"
             _id = 0
 
-            self._fill_manager_table(qtableview, key)
+            self._fill_manager_table(qtableview, key, expr='active is true')
 
             qtableview.doubleClicked.connect(partial(self._get_nonvisual_object, qtableview, function_name))
 
@@ -197,14 +197,12 @@ class GwNonVisual:
         """ Filters manager table by active """
 
         widget_table = dialog.main_tab.currentWidget()
-        id_field = 'active'
         if active is None:
             active = dialog.chk_active.checkState()
-        active = 'true' if active == 2 else None
 
         expr = ""
-        if active is not None:
-            expr = f"{id_field} = {active}"
+        if not active:
+            expr = f"active is true"
 
         # Refresh model with selected filter
         widget_table.model().setFilter(expr)
