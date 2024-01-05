@@ -52,6 +52,7 @@ class GwDscenarioManagerButton(GwAction):
                                 "inp_dscenario_flwreg_pump", "inp_dscenario_flwreg_weir", "inp_dscenario_flwreg_orifice",
                                 "inp_dscenario_flwreg_outlet", "inp_dscenario_inflows_poll", "inp_dscenario_pump_additional"
                                 ]
+        self.dict_ids = {'v_edit_cat_hydrology': 'name', 'v_edit_cat_dwf_scenario': 'idval', 'v_edit_cat_dscenario': 'name'}
         self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
 
         if self.project_type == 'ud':
@@ -303,8 +304,9 @@ class GwDscenarioManagerButton(GwAction):
     def _get_list(self, table_name='v_edit_cat_dscenario', filter_name="", filter_id=None, filter_active=None):
         """ Mount and execute the query for gw_fct_getlist """
 
+        id_field = self.dict_ids.get(table_name)
         feature = f'"tableName":"{table_name}"'
-        filter_fields = f'"limit": -1, "name": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'
+        filter_fields = f'"limit": -1, "{id_field}": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'
         if filter_id is not None:
             filter_fields += f', "dscenario_id": {{"filterSign":"=", "value":"{filter_id}"}}'
         if not filter_active:
