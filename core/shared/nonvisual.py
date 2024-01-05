@@ -183,11 +183,14 @@ class GwNonVisual:
         widget_table = dialog.main_tab.currentWidget()
         tablename = widget_table.objectName()
         id_field = self.dict_ids.get(tablename)
+        show_inactive = dialog.chk_active.isChecked()
 
         if text is None:
             text = tools_qt.get_text(dialog, dialog.txt_filter, return_string_null=False)
-
         expr = f"{id_field}::text ILIKE '%{text}%'"
+        if not show_inactive:
+            expr += " and active is true"
+
         # Refresh model with selected filter
         widget_table.model().setFilter(expr)
         widget_table.model().select()
@@ -197,13 +200,19 @@ class GwNonVisual:
         """ Filters manager table by active """
 
         widget_table = dialog.main_tab.currentWidget()
+        tablename = widget_table.objectName()
+        id_field = self.dict_ids.get(tablename)
         if active is None:
             active = dialog.chk_active.checkState()
 
+        text = tools_qt.get_text(dialog, dialog.txt_filter, return_string_null=False)
         expr = ""
         if not active:
             expr = f"active is true"
-
+        if text:
+            if expr:
+                expr += " and "
+            expr += f"{id_field}::text ILIKE '%{text}%'"
         # Refresh model with selected filter
         widget_table.model().setFilter(expr)
         widget_table.model().select()
