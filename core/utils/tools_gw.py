@@ -2437,7 +2437,25 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
     try:
         return_manager = json_result['body']['returnManager']
     except KeyError:
-        return
+        return_manager = {
+            "style": {
+                "point": {
+                    "style": "unique", "values": {
+                        "width": 3, "color": [255, 1, 1], "transparency": 0.5
+                    }
+                },
+                "line": {
+                    "style": "unique", "values": {
+                        "width": 3, "color": [255, 1, 1], "transparency": 0.5
+                    }
+                },
+                "polygon": {
+                    "style": "unique", "values": {
+                        "width": 3, "color": [255, 1, 1], "transparency": 0.5
+                    }
+                }
+            }
+        }
 
     srid = lib_vars.data_epsg
     try:
