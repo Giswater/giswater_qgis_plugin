@@ -13,6 +13,7 @@ from .libs import lib_vars
 
 
 # region system variables (values are initialized on load project without changes during session)
+gw_dev_mode = False
 iface = None                            # Instance of class QGisInterface. Provides the hook to manipulate QGIS application at runtime
 canvas = None                           # Instance of class QgsMapCanvas. Contains "canvas", "mapTool", "xyCoordinates", "Cursor", "Extent"
 list_configs = [                        # List of configuration files
