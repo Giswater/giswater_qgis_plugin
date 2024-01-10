@@ -279,7 +279,7 @@ class Giswater(QObject):
 
             if not global_vars.gw_dev_mode:
                 # Copy user_params file to user config folder
-                src = f"{lib_vars.plugin_dir}{os.sep}config{os.sep}user_params.config"
+                src = f"{global_vars.plugin_dir}{os.sep}config{os.sep}user_params.config"
                 dst = f"{config_folder}{os.sep}user_params.config"
                 shutil.copyfile(src, dst)
 
