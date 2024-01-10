@@ -6,9 +6,10 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
+import shutil
 
 from functools import partial
-from qgis.core import QgsProject
+from qgis.core import QgsProject, QgsSettings
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QDockWidget, QToolBar, QToolButton, QMenu, QApplication
@@ -180,6 +181,11 @@ class Giswater(QObject):
         user_folder_dir = f'{tools_os.get_datadir()}{os.sep}{self.plugin_name.capitalize()}{os.sep}{major_version}'
         global_vars.init_global(self.iface, self.iface.mapCanvas(), plugin_dir, self.plugin_name, user_folder_dir)
 
+        # Get gw_dev_mode variable
+        gw_dev_mode = QgsSettings().value('variables/gw_dev_mode')
+        gw_dev_mode = tools_os.set_boolean(gw_dev_mode, False)
+        global_vars.gw_dev_mode = gw_dev_mode
+
         # Create log file
         min_log_level = 20
         tools_log.set_logger(self.plugin_name, min_log_level)
@@ -228,7 +234,11 @@ class Giswater(QObject):
             tools_qgis.enable_python_console()
 
         # Set init parameter 'exec_procedure_max_retries'
-        global_vars.exec_procedure_max_retries = int(tools_gw.get_config_parser('system', 'exec_procedure_max_retries', 'user', 'init', False))
+        try:
+            global_vars.exec_procedure_max_retries = int(tools_gw.get_config_parser('system', 'exec_procedure_max_retries', 'user', 'init', False))
+        except (ValueError, TypeError):
+            global_vars.exec_procedure_max_retries = 3
+            tools_gw.set_config_parser('system', 'exec_procedure_max_retries', global_vars.exec_procedure_max_retries, 'user', 'init', prefix=False)
 
         # Create the GwSignalManager
         self._create_signal_manager()
@@ -266,6 +276,12 @@ class Giswater(QObject):
             filepath = f"{config_folder}{os.sep}session.config"
             if not os.path.exists(filepath):
                 open(filepath, 'a').close()
+
+            if not global_vars.gw_dev_mode:
+                # Copy user_params file to user config folder
+                src = f"{lib_vars.plugin_dir}{os.sep}config{os.sep}user_params.config"
+                dst = f"{config_folder}{os.sep}user_params.config"
+                shutil.copyfile(src, dst)
 
         except Exception as e:
             tools_log.log_warning(f"manage_user_config_folder: {e}")

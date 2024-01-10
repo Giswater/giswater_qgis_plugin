@@ -3740,8 +3740,10 @@ def _get_parser_from_filename(filename):
 
     if filename in ('init', 'session'):
         folder = f"{global_vars.user_folder_dir}{os.sep}core"
-    elif filename in ('dev', 'giswater', 'user_params'):
+    elif filename in ('dev', 'giswater'):
         folder = global_vars.plugin_dir
+    elif filename == 'user_params':
+        folder = global_vars.plugin_dir if global_vars.gw_dev_mode else f"{global_vars.user_folder_dir}{os.sep}core"
     else:
         return None, None
 
