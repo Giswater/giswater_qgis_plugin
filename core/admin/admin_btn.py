@@ -748,9 +748,8 @@ class GwAdminButton:
         self.folder_updates = os.path.join(self.sql_dir, 'updates')
         self.folder_example = os.path.join(self.sql_dir, 'example')
 
-        # Check if user have commit permissions
-        self.dev_commit = tools_gw.get_config_parser('system', 'dev_commit', "project", "dev", False, force_reload=True)
-        self.dev_commit = tools_os.set_boolean(self.dev_commit)
+        # Variable to commit changes even if schema creation fails
+        self.dev_commit = global_vars.gw_dev_mode
 
         # Create dialog object
         self.dlg_readsql = GwAdminUi()
