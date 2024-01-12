@@ -1197,8 +1197,8 @@ class GwVisit(QObject):
 
         # Relations tab
         # fill feature_type
-        sql = ("SELECT 'ALL' as id "
-               "UNION SELECT id "
+        sql = ("SELECT 'ALL' as id, 'ALL' as idval "
+               "UNION SELECT id, id as idval "
                "FROM sys_feature_type "
                "WHERE classlevel = 1 OR classlevel = 2 "
                "ORDER BY id")
