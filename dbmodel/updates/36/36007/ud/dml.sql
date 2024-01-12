@@ -19,3 +19,5 @@ ALTER TABLE cat_arc ALTER COLUMN shape SET NOT NULL;
 
 INSERT INTO inp_typevalue VALUES ('inp_options_networkmode_', '3', '1D/2D SWMM-IBER WET');
 
+UPDATE config_toolbox set inputparams = (replace(inputparams::text, '"$userExploitation"', '""'))::json where id = 2768;
+

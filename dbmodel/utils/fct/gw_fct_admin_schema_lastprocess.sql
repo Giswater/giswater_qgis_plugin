@@ -294,6 +294,13 @@ BEGIN
 
 				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc' 
 				WHERE columnname='matcat_id' AND formname LIKE 've_arc%';
+				
+				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_node' 
+				WHERE columnname='matcat_id' AND formname IN ('v_edit_node');
+				
+				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc' 
+				WHERE columnname='matcat_id' AND formname IN ('v_edit_arc', 'v_edit_connec');
+				
 			END IF;
 
 			-- forcing user variables in order to enhance usability for new projects
@@ -342,7 +349,6 @@ BEGIN
 				UPDATE config_form_fields SET hidden=true WHERE formname like 've_arc%' AND columnname='observ';
 
 				-- setting mapzone graph analytics without value in terms of mapzone constructor and graphclass
-
 				UPDATE config_toolbox SET inputparams = '[
 					{"widgetname":"graphClass", "label":"Graph class:", "widgettype":"combo","datatype":"text","tooltip": "Graphanalytics method used", "layoutname":"grl_option_parameters","layoutorder":1,"comboIds":["PRESSZONE","DQA","DMA","SECTOR"],
 					"comboNames":["Pressure Zonification (PRESSZONE)", "District Quality Areas (DQA) ", "District Metering Areas (DMA)", "Inlet Sectorization (SECTOR-HIGH / SECTOR-LOW)"], "selectedId":""}, 
