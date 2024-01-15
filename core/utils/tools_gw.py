@@ -2479,7 +2479,9 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
             draw_by_json(json_result, rubber_band, margin, color=color, width=width)
 
         else:
-            if type(json_result['body']['data']) is list:
+            if not json_result or not json_result.get('body'):
+                return
+            if type(json_result['body'].get('data')) is list:
                 return
             for key, value in list(json_result['body']['data'].items()):
                 if key.lower() in ('point', 'line', 'polygon'):
