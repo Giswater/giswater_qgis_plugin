@@ -21,3 +21,10 @@ INSERT INTO inp_typevalue VALUES ('inp_options_networkmode_', '3', '1D/2D SWMM-I
 
 UPDATE config_toolbox set inputparams = (replace(inputparams::text, '"$userExploitation"', '""'))::json where id = 2768;
 
+-- 15/01/2024
+update config_form_fields set tabname = 'tab_epa' where formname like 've_epa%' and tabname = 'tab_none';
+update config_form_fields set dv_isnullvalue = true where tabname = 'tab_epa' and formname = 've_epa_orifice' and columnname in ('ori_type', 'shape', 'flap');
+update config_form_fields set dv_isnullvalue = true where tabname = 'tab_epa' and formname = 've_epa_weir' and columnname in ('weir_type', 'flap');
+update config_form_fields set dv_isnullvalue = true where tabname = 'tab_epa' and formname = 've_epa_pump' and columnname in ('curve_id', 'status');
+update config_form_fields set dv_isnullvalue = true where tabname = 'tab_epa' and formname = 've_epa_outlet' and columnname in ('outlet_type', 'curve_id', 'flap');
+
