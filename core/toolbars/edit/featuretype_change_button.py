@@ -254,7 +254,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
         if project_type == 'ws':
             self.dlg_change.feature_type_new.currentIndexChanged.connect(partial(self._filter_catalog))
         elif project_type == 'ud':
-            sql = (f"SELECT DISTINCT(id), id "
+            sql = (f"SELECT DISTINCT(id), id as idval "
                    f"FROM {self.cat_table} "
                    f"WHERE active IS TRUE OR active IS NULL "
                    f"ORDER BY id")
@@ -272,7 +272,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
         self.dlg_change.feature_type.setText(feature_type)
 
         # Fill 1st combo boxes-new system feature type
-        sql = (f"SELECT DISTINCT(id) "
+        sql = (f"SELECT DISTINCT(id), id as idval "
                f"FROM cat_feature "
                f"WHERE lower(feature_type) = '{self.feature_type}' AND active is True "
                f"ORDER BY id")
@@ -302,7 +302,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
             return
 
         # Populate catalog_id
-        sql = (f"SELECT DISTINCT(id), id "
+        sql = (f"SELECT DISTINCT(id), id as idval "
                f"FROM {self.cat_table} "
                f"WHERE {self.feature_type}type_id = '{feature_type_new}' AND (active IS TRUE OR active IS NULL) "
                f"ORDER BY id")

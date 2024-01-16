@@ -245,7 +245,7 @@ class GwFeatureReplaceButton(GwMaptool):
             if feature_type_new:
                 sql = None
                 if self.feature_type in ('node', 'connec', 'gully'):
-                    sql = (f"SELECT DISTINCT(id) "
+                    sql = (f"SELECT DISTINCT(id), id as idval "
                            f"FROM {self.cat_table} "
                            f"WHERE {self.feature_type}_type = '{feature_type_new}' or {self.feature_type}_type IS NULL "
                            f"ORDER BY id")
@@ -473,13 +473,13 @@ class GwFeatureReplaceButton(GwMaptool):
         if self.project_type == 'ws':
             # Fill 3rd combo_box-catalog_id
             tools_qt.set_widget_enabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
-            sql = (f"SELECT DISTINCT(id) "
+            sql = (f"SELECT DISTINCT(id), id as idval "
                    f"FROM {self.cat_table} "
                    f"WHERE {self.feature_type_cat} = '{feature_type_new}' AND (active IS TRUE OR active IS NULL)"
                    f"ORDER BY id")
 
         elif self.project_type == 'ud':
-            sql = (f"SELECT DISTINCT(id) "
+            sql = (f"SELECT DISTINCT(id), id as idval "
                    f"FROM {self.cat_table} "
                    f"WHERE {self.feature_type}_type = '{feature_type_new}' or {self.feature_type}_type IS NULL "
                    f"AND (active IS TRUE OR active IS NULL) "
