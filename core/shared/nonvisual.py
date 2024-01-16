@@ -202,8 +202,16 @@ class GwNonVisual:
         widget_table = dialog.main_tab.currentWidget()
         tablename = widget_table.objectName()
         id_field = self.dict_ids.get(tablename)
-        if active is None:
-            active = dialog.chk_active.checkState()
+        # Get the chk_active checkbox directly from the dialog
+        chk_active_widget = dialog.chk_active
+        # Check the visual state of chk_active
+        chk_active_is_visible = chk_active_widget.isVisible()
+
+        if chk_active_is_visible:
+            if active is None:
+                active = chk_active_widget.checkState()
+        else:
+            active = True
 
         text = tools_qt.get_text(dialog, dialog.txt_filter, return_string_null=False)
         expr = ""
