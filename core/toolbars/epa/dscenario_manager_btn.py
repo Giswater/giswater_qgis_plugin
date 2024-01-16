@@ -10,10 +10,10 @@ from sip import isdeleted
 import json
 
 from qgis.core import QgsProject
-from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor
+from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor, QKeySequence
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt, QRegExp, QPoint
-from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QAction
+from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QAction, QShortcut, QApplication, QTableWidgetItem
 from qgis.PyQt.QtWidgets import QDialog, QLineEdit
 
 from ..dialog import GwAction
@@ -510,6 +510,62 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.open_dialog(self.dlg_dscenario, 'dscenario', title=f"{title}")
 
 
+    def _paste_dscenario_demand_values(self, tableview):
+        view = tableview.objectName()
+        if view == "inp_dscenario_demand" and self.project_type == 'ws':
+            text = QApplication.clipboard().text()
+            rows = text.split("\n")
+            model = tableview.model()
+
+            for row in rows:
+                if not row:
+                    continue
+
+                values = row.split("\t")
+
+                # Check if the number of values matches the number of columns
+                if len(values) != model.columnCount() - 2:
+                    continue
+
+                feature_id = values[0]  # Assuming feature_id is the first column
+                values = values[1:]  # Exclude feature_id from the values
+
+                # Insert a new feature using _manage_paste_dscenario_demand_values
+                self._manage_paste_dscenario_demand_values(feature_id, values)
+
+            model.submitAll()
+            model.select()
+            tableview.update()
+
+    def _manage_paste_dscenario_demand_values(self, feature_id, values):
+        """ Insert feature to dscenario via copy paste """
+
+        if feature_id == '':
+            message = "Feature_id is mandatory."
+            tools_qgis.show_warning(message, dialog=self.dlg_dscenario)
+            return
+        self.dlg_dscenario.txt_feature_id.setStyleSheet(None)
+        tableview = self.dlg_dscenario.main_tab.currentWidget()
+        view = tableview.objectName()
+
+        sql = f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{self.table_name[len(f'{self.schema_name}.'):]}';"
+        rows = tools_db.get_rows(sql)
+
+        # FIELDS
+        columns = [row[0] for row in rows]
+        columns_str = ', '.join(columns[1:])  # Excluding 'id'
+
+        # VALUES
+        values_str = ', '.join(
+            [f"'{self.selected_dscenario_id}'", f"'{feature_id}'"] + [f"'{value}'" for value in values])
+
+        sql = f"INSERT INTO v_edit_{view} ({columns_str}) VALUES ({values_str}) ON CONFLICT (dscenario_id, feature_id) DO NOTHING;"
+        tools_db.execute_sql(sql)
+
+        # Refresh tableview
+        self._fill_dscenario_table()
+
+
     def _fill_dscenario_table(self, set_edit_triggers=QTableView.DoubleClicked, expr=None):
         """ Fill dscenario table with data from its corresponding table """
 
@@ -596,6 +652,12 @@ class GwDscenarioManagerButton(GwAction):
                 table_name = self.filter_dict[tab_name]['filter_table']
                 feature_type = self.filter_dict[tab_name]['feature_type']
             tools_gw.set_completer_widget(table_name, self.dlg_dscenario.txt_feature_id, feature_type, add_id=True)
+
+        tableview = self.dlg_dscenario.main_tab.currentWidget()
+
+        # Copy values from clipboard only in dscenario demand in ws projects
+        paste_shortcut = QShortcut(QKeySequence.Paste, self.dlg_dscenario.main_tab)
+        paste_shortcut.activated.connect(partial(self._paste_dscenario_demand_values, tableview))
 
         # Deactivate btn_snapping functionality
         self._selection_end()
