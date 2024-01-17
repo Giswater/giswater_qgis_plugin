@@ -434,17 +434,20 @@ class GwDscenarioManagerButton(GwAction):
             return
 
         # Get selected dscenario id
-        index = self.tbl_dscenario.selectionModel().currentIndex()
-        value = index.sibling(index.row(), 0).data()
+        values = [index.sibling(index.row(), 0).data() for index in selected_list]
 
         message = "CAUTION! Deleting a dscenario will delete data from features related to the dscenario.\n" \
                   "Are you sure you want to delete these records?"
-        answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 1).data(), force_action=True)
+        answer = tools_qt.show_question(message, "Delete records", values, force_action=True)
         if answer:
-            sql = f"DELETE FROM {view} WHERE {self.views_dict[view]} = {value}"
+            # Build WHERE IN clause for SQL
+            where_clause = f"{self.views_dict[view]} IN ({', '.join(map(str, values))})"
+
+            # Construct SQL DELETE statement
+            sql = f"DELETE FROM {view} WHERE {where_clause}"
             tools_db.execute_sql(sql)
 
-            # Refresh tableview
+            # Refresh the table
             self._fill_manager_table(view)
 
     # endregion
