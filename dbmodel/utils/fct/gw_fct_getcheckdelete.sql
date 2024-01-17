@@ -44,7 +44,6 @@ v_level integer;
 v_status text;
 v_message text;
 v_version text;
-v_error_context text;
 
 BEGIN
 
