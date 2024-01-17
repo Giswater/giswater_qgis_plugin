@@ -304,18 +304,21 @@ class GwNetscenarioManagerButton(GwAction):
             tools_qgis.show_warning(message, dialog=self.dlg_netscenario_manager)
             return
 
-        # Get selected netscenario id
-        index = self.tbl_netscenario.selectionModel().currentIndex()
-        value = index.sibling(index.row(), 0).data()
+        # Get selected netscenario ids
+        values = [index.sibling(index.row(), 0).data() for index in selected_list]
 
         message = "CAUTION! Deleting a netscenario will delete data from features related to the netscenario.\n" \
                   "Are you sure you want to delete these records?"
-        answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 1).data(), force_action=True)
+        answer = tools_qt.show_question(message, "Delete records", values, force_action=True)
         if answer:
-            sql = f"DELETE FROM plan_netscenario WHERE netscenario_id = {value}"
+            # Build WHERE IN clause for SQL
+            where_clause = f"netscenario_id IN ({', '.join(map(str, values))})"
+
+            # Construct SQL DELETE statement
+            sql = f"DELETE FROM plan_netscenario WHERE {where_clause}"
             tools_db.execute_sql(sql)
 
-            # Refresh tableview
+            # Refresh the tableview
             self._fill_manager_table()
 
     # endregion
