@@ -76,7 +76,7 @@ class GwConfigButton(GwAction):
         layout_list = self.tab_main.widget(initial_index).findChildren(QGridLayout)
         for layout in layout_list:
             layoutname_list.append(layout.objectName())
-        self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
+        self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', 'tab_basic', layoutname_list)
         self._hide_void_tab_groupbox(grbox_list)
 
         # Check user/role and remove tabs
@@ -112,27 +112,27 @@ class GwConfigButton(GwAction):
 
         # Tab 'Basic'
         if self.tab_main.widget(index_tab).objectName() == 'tab_basic' and not self.tab_basic_loaded:
-            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
+            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', 'tab_basic', layoutname_list)
             self._hide_void_tab_groupbox(grbox_list)
             self.tab_basic_loaded = True
         # Tab 'Featurecat'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_featurecat' and not self.tab_featurecat_loaded:
-            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
+            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', 'tab_featurecat', layoutname_list)
             self._hide_void_tab_groupbox(grbox_list)
             self.tab_featurecat_loaded = True
         # Tab 'Man Type'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_mantype' and not self.tab_mantype_loaded:
-            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
+            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', 'tab_mantype', layoutname_list)
             self._hide_void_tab_groupbox(grbox_list)
             self.tab_mantype_loaded = True
         # Tab 'Additional Fields'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_addfields' and not self.tab_addfields_loaded:
-            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
+            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', 'tab_addfields', layoutname_list)
             self._hide_void_tab_groupbox(grbox_list)
             self.tab_addfields_loaded = True
         # Tab 'Admin'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_admin' and not self.tab_admin_loaded:
-            self._build_dialog_options(self.json_result['body']['form']['formTabs'][1], 'system', layoutname_list)
+            self._build_dialog_options(self.json_result['body']['form']['formTabs'][1], 'system', 'tab_admin', layoutname_list)
             self._hide_void_tab_groupbox(grbox_list)
             self.tab_admin_loaded = True
 
@@ -193,14 +193,18 @@ class GwConfigButton(GwAction):
         tools_gw.close_dialog(self.dlg_config)
 
 
-    def _build_dialog_options(self, row, tab, list):
+    def _build_dialog_options(self, row, tab, tab_name, list):
 
         self.tab = tab
+
+        self.hide_tab = True
+
         for field in row['fields']:
             try:
                 widget = None
                 self.chk = None
                 if field['label'] and field['layoutname'] in list:
+                    self.hide_tab = False
                     lbl = QLabel()
                     lbl.setObjectName('lbl' + field['widgetname'])
                     lbl.setText(field['label'])
@@ -297,6 +301,9 @@ class GwConfigButton(GwAction):
             except Exception as e:
                 msg = f"{type(e).__name__} {e}. widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
                 tools_qgis.show_message(msg, 2, dialog=self.dlg_config)
+
+        if self.hide_tab:
+            tools_qt.remove_tab(self.tab_main, tab_name)
 
 
     def populate_typeahead(self, completer, model, field, dialog, widget):
