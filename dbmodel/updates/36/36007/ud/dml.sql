@@ -28,3 +28,9 @@ update config_form_fields set dv_isnullvalue = true where tabname = 'tab_epa' an
 update config_form_fields set dv_isnullvalue = true where tabname = 'tab_epa' and formname = 've_epa_pump' and columnname in ('curve_id', 'status');
 update config_form_fields set dv_isnullvalue = true where tabname = 'tab_epa' and formname = 've_epa_outlet' and columnname in ('outlet_type', 'curve_id', 'flap');
 
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) 
+VALUES(530, 'Import dwf values', 'ud', NULL, 'core' , NULL, 'Function process', NULL);
+
+INSERT INTO sys_function
+
+INSERT INTO config_csv

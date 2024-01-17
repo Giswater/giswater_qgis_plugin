@@ -18,8 +18,8 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":127}}}$$)-- when is called from go2epa_main
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":101}}}$$)-- when is called from checkproject
 
--- fid: main: 255,
-	other: 106,107,111,113,164,175,187,188,294,295,379,427,430,440,480, 522
+-- fid: main: 225,
+	other: 106,107,111,113,164,175,187,188,294,295,379,427,430,440,480,522
 
 SELECT * FROM audit_check_data WHERE fid = v_fid
 
@@ -680,7 +680,7 @@ BEGIN
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() 
-	AND fid=255 order by criticity desc, id asc) row;
+	AND fid=225 order by criticity desc, id asc) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	
