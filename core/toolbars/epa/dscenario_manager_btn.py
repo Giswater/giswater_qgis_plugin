@@ -548,7 +548,7 @@ class GwDscenarioManagerButton(GwAction):
         tableview = self.dlg_dscenario.main_tab.currentWidget()
         view = tableview.objectName()
 
-        sql = f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{self.table_name[len(f'{self.schema_name}.'):]}';"
+        sql = f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{self.table_name[len(f'{self.schema_name}.'):]}' ORDER BY ordinal_position;"
         rows = tools_db.get_rows(sql)
 
         # FIELDS
@@ -559,7 +559,7 @@ class GwDscenarioManagerButton(GwAction):
         values_str = ', '.join(
             [f"'{self.selected_dscenario_id}'", f"'{feature_id}'"] + [f"'{value}'" for value in values])
 
-        sql = f"INSERT INTO v_edit_{view} ({columns_str}) VALUES ({values_str}) ON CONFLICT (dscenario_id, feature_id) DO NOTHING;"
+        sql = f"INSERT INTO v_edit_{view} ({columns_str}) VALUES ({values_str});"
         tools_db.execute_sql(sql)
 
         # Refresh tableview
@@ -893,7 +893,7 @@ class GwDscenarioManagerButton(GwAction):
         tableview = self.dlg_dscenario.main_tab.currentWidget()
         view = tableview.objectName()
 
-        sql = f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{self.table_name[len(f'{self.schema_name}.'):]}';"
+        sql = f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{self.table_name[len(f'{self.schema_name}.'):]}' ORDER BY ordinal_position;"
         rows = tools_db.get_rows(sql)
 
         if rows[0][0] == 'id':
