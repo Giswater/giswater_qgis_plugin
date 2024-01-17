@@ -28,9 +28,12 @@ update config_form_fields set dv_isnullvalue = true where tabname = 'tab_epa' an
 update config_form_fields set dv_isnullvalue = true where tabname = 'tab_epa' and formname = 've_epa_pump' and columnname in ('curve_id', 'status');
 update config_form_fields set dv_isnullvalue = true where tabname = 'tab_epa' and formname = 've_epa_outlet' and columnname in ('outlet_type', 'curve_id', 'flap');
 
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") 
+VALUES(3298, 'gw_fct_import_inp_dwf', 'ud', 'function', 'json', 'json', 'Function to import DWF values. ', 'role_epa', NULL, 'core');
+
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) 
-VALUES(530, 'Import dwf values', 'ud', NULL, 'core' , NULL, 'Function process', NULL);
+VALUES(527, 'Import dwf values', 'ud', NULL, 'core' , NULL, 'Function process', NULL);
 
-INSERT INTO sys_function
-
-INSERT INTO config_csv
+INSERT INTO config_csv (fid, alias, descript, functionname, active, orderby, addparam) 
+VALUES(472, 'Import DWF', 'Function to import DWF values. The CSV file must contain the following columns in the exact same order:   dwfscenario_id, node_id, value, pat1, pat2, pat3, pat4', 'gw_fct_import_inp_dwf', true, 21, NULL);
