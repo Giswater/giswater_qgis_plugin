@@ -204,7 +204,7 @@ def open_selected_path(**kwargs):
         at lines:   widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
     """
     func_params = kwargs['func_params']
-    qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(kwargs['dialog'], f"{func_params['targetwidget']}")
+    qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(kwargs['dialog'], f"tab_{func_params['targetwidget']}")
 
     # Get selected rows
     selected_list = qtable.selectionModel().selectedRows()
