@@ -739,15 +739,17 @@ class GwMapzoneManager:
             return
 
         # Get selected mapzone data
-        index = tableview.selectionModel().currentIndex()
-        mapzone_id = index.sibling(index.row(), 0).data()
         field_id = tableview.model().headerData(0, Qt.Horizontal)
+        mapzone_ids = [index.sibling(index.row(), 0).data() for index in selected_list]
 
         message = "Are you sure you want to delete these records?"
-        answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 1).data(),
-                                        force_action=True)
+        answer = tools_qt.show_question(message, "Delete records", [index.sibling(index.row(), 1).data() for index in selected_list], force_action=True)
         if answer:
-            sql = f"DELETE FROM {view} WHERE {field_id}::text = '{mapzone_id}'"
+            # Build WHERE IN clause for SQL
+            where_clause = f"{field_id} IN ({', '.join(map(str, mapzone_ids))})"
+
+            # Construct SQL DELETE statement
+            sql = f"DELETE FROM {view} WHERE {where_clause}"
             tools_db.execute_sql(sql)
 
             # Refresh tableview
