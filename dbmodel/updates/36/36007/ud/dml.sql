@@ -36,4 +36,4 @@ INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source"
 VALUES(527, 'Import dwf values', 'ud', NULL, 'core' , NULL, 'Function process', NULL);
 
 INSERT INTO config_csv (fid, alias, descript, functionname, active, orderby, addparam) 
-VALUES(472, 'Import DWF', 'Function to import DWF values. The CSV file must contain the following columns in the exact same order:   dwfscenario_id, node_id, value, pat1, pat2, pat3, pat4', 'gw_fct_import_inp_dwf', true, 21, NULL);
+VALUES(527, 'Import DWF', 'Function to import DWF values. The CSV file must contain the following columns in the exact same order:   dwfscenario_id, node_id, value, pat1, pat2, pat3, pat4', 'gw_fct_import_inp_dwf', true, 21, NULL);
