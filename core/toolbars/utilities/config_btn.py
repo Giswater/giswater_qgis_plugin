@@ -76,7 +76,7 @@ class GwConfigButton(GwAction):
         layout_list = self.tab_main.widget(initial_index).findChildren(QGridLayout)
         for layout in layout_list:
             layoutname_list.append(layout.objectName())
-        self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', 'tab_basic', layoutname_list)
+        self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
         self._hide_void_tab_groupbox(grbox_list)
 
         # Check user/role and remove tabs
@@ -97,6 +97,9 @@ class GwConfigButton(GwAction):
         """ Control the current tab, to load widgets """
 
         self.tab_main = self.dlg_config.findChild(QTabWidget, "tab_main")
+
+        self._hide_void_tab(self.json_result['body']['form']['formTabs'][0], 'tab_addfields', 'lyt_addfields')
+
         self.tab_main.currentChanged.connect(partial(self._tab_activation))
 
     def _tab_activation(self):
@@ -112,32 +115,32 @@ class GwConfigButton(GwAction):
 
         # Tab 'Basic'
         if self.tab_main.widget(index_tab).objectName() == 'tab_basic' and not self.tab_basic_loaded:
-            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', 'tab_basic', layoutname_list)
+            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
             self._hide_void_tab_groupbox(grbox_list)
             self.tab_basic_loaded = True
         # Tab 'Featurecat'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_featurecat' and not self.tab_featurecat_loaded:
-            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', 'tab_featurecat', layoutname_list)
+            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
             self._hide_void_tab_groupbox(grbox_list)
             self.tab_featurecat_loaded = True
         # Tab 'Man Type'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_mantype' and not self.tab_mantype_loaded:
-            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', 'tab_mantype', layoutname_list)
+            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
             self._hide_void_tab_groupbox(grbox_list)
             self.tab_mantype_loaded = True
         # Tab 'Additional Fields'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_addfields' and not self.tab_addfields_loaded:
-            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', 'tab_addfields', layoutname_list)
+            self._build_dialog_options(self.json_result['body']['form']['formTabs'][0], 'user', layoutname_list)
             self._hide_void_tab_groupbox(grbox_list)
             self.tab_addfields_loaded = True
         # Tab 'Admin'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_admin' and not self.tab_admin_loaded:
-            self._build_dialog_options(self.json_result['body']['form']['formTabs'][1], 'system', 'tab_admin', layoutname_list)
+            self._build_dialog_options(self.json_result['body']['form']['formTabs'][1], 'system', layoutname_list)
             self._hide_void_tab_groupbox(grbox_list)
             self.tab_admin_loaded = True
 
     def _hide_void_tab_groupbox(self, grbox_list):
-        """ Rceives a list, searches it all the QGroupBox, looks 1 to 1 if the grb have widgets, if it does not have
+        """ Recives a list, searches it all the QGroupBox, looks 1 to 1 if the grb have widgets, if it does not have
          (if it is empty), hides the QGroupBox
         :param grbox_list: list of QGroupBox
         """
@@ -146,6 +149,14 @@ class GwConfigButton(GwAction):
             widget_list = grbox.findChildren(QWidget)
             if len(widget_list) == 0:
                 grbox.setVisible(False)
+
+
+    def _hide_void_tab(self, row, tab_name, lyt_name):
+
+        self.hide_tab = any(field['layoutname'] in lyt_name for field in row['fields'])
+
+        if not self.hide_tab:
+            tools_qt.remove_tab(self.tab_main, tab_name)
 
     def _get_layers_name(self):
         """ Returns the name of all the layers visible in the TOC, then populate the cad_combo_layers """
@@ -193,18 +204,15 @@ class GwConfigButton(GwAction):
         tools_gw.close_dialog(self.dlg_config)
 
 
-    def _build_dialog_options(self, row, tab, tab_name, list):
+    def _build_dialog_options(self, row, tab, list):
 
         self.tab = tab
-
-        self.hide_tab = True
 
         for field in row['fields']:
             try:
                 widget = None
                 self.chk = None
                 if field['label'] and field['layoutname'] in list:
-                    self.hide_tab = False
                     lbl = QLabel()
                     lbl.setObjectName('lbl' + field['widgetname'])
                     lbl.setText(field['label'])
@@ -301,9 +309,6 @@ class GwConfigButton(GwAction):
             except Exception as e:
                 msg = f"{type(e).__name__} {e}. widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
                 tools_qgis.show_message(msg, 2, dialog=self.dlg_config)
-
-        if self.hide_tab:
-            tools_qt.remove_tab(self.tab_main, tab_name)
 
 
     def populate_typeahead(self, completer, model, field, dialog, widget):
