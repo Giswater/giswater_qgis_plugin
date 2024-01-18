@@ -604,4 +604,4 @@ UPDATE config_form_fields SET iseditable = true WHERE layoutname = 'lyt_epa_dsc_
 
 UPDATE sys_table SET alias = 'Gully child' WHERE id='ve_gully_gully';
 
-UPDATE config_function SET style = (replace(style::text, 'Random', 'Disable'))::json WHERE id = 2928;
+UPDATE config_param_system SET value = (replace(value, 'Disable', 'Random')) WHERE parameter='utils_graphanalytics_style';

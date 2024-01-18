@@ -133,8 +133,8 @@ BEGIN
 			END LOOP;
 			
 			-- set mapzones symbology
-			UPDATE config_function SET style = (replace(style::text, 'Random', 'Disable'))::json WHERE id = 2928;
-			UPDATE config_function SET style = (replace(style::text, 'Stylesheet', 'Disable'))::json WHERE id = 2928;
+            UPDATE config_param_system SET value = (replace(value, 'Random', 'Disable')) WHERE parameter='utils_graphanalytics_style';
+            UPDATE config_param_system SET value = (replace(value, 'Stylesheet', 'Disable')) WHERE parameter='utils_graphanalytics_style';
 
 			-- drop deprecated views
 			IF v_projecttype = 'WS' THEN 

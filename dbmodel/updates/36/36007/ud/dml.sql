@@ -38,6 +38,15 @@ VALUES(527, 'Import dwf values', 'ud', NULL, 'core' , NULL, 'Function process', 
 INSERT INTO config_csv (fid, alias, descript, functionname, active, orderby, addparam) 
 VALUES(527, 'Import DWF', 'Function to import DWF values. The CSV file must contain the following columns in the exact same order:   dwfscenario_id, node_id, value, pat1, pat2, pat3, pat4', 'gw_fct_import_inp_dwf', true, 21, NULL);
 
-UPDATE config_function SET style = '{"DRAINZONE":{"mode":"Disable", "column":"name"},"SECTOR":{"mode":"Disable", "column":"name"},"DMA":{"mode":"Disable", "column":"name"}}'
-WHERE id = 2928;
+INSERT INTO config_param_system SELECT 'utils_graphanalytics_style', style::text, 'There are 3 "mode" to symbolize mapzones when the project is loaded or mapzones are recalculated: 
+- Disabled: do nothing with the style
+- Random: use "column" data to categorize and set random colors to every mapzone
+- Stylesheet: use "column" data to categorize and set the configured color to every mapzone from mapzone table stylesheet column',
+'Mapzones style config:', NULL, NULL, true, 13, 'utils', null, null, 'json', 'linetext', true, true, null, null, null, null, null, null, 'lyt_admin_om'
+FROM config_function WHERE id=2928;
+
+UPDATE config_param_system SET value = '{"DRAINZONE":{"mode":"Disable", "column":"name"},"SECTOR":{"mode":"Disable", "column":"name"},"DMA":{"mode":"Disable", "column":"name"}}'
+WHERE parameter='utils_graphanalytics_style';
+
+DELETE FROM config_function WHERE id=2928;
 
