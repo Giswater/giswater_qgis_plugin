@@ -33,9 +33,9 @@ BEGIN
 			NEW.active = TRUE;
 		END IF;
 			
-		INSERT INTO dma (dma_id, name, descript, macrodma_id, the_geom, undelete, expl_id, pattern_id, link, minc, maxc, effc, active)
+		INSERT INTO dma (dma_id, name, descript, macrodma_id, the_geom, undelete, expl_id, pattern_id, link, minc, maxc, effc, active, stylesheet)
 		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.macrodma_id, NEW.the_geom, NEW.undelete, NEW.expl_id, NEW.pattern_id, NEW.link, NEW.minc, 
-		NEW.maxc, NEW.effc, NEW.active);
+		NEW.maxc, NEW.effc, NEW.active, NEW.stylesheet);
 
 		RETURN NEW;
 		
@@ -43,7 +43,7 @@ BEGIN
    	
 		UPDATE dma 
 		SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete, expl_id=NEW.expl_id, pattern_id=NEW.pattern_id, link=NEW.link,
-        minc=NEW.minc, maxc=NEW.maxc, effc=NEW.effc, active=NEW.active, lastupdate=now(), lastupdate_user = current_user, macrodma_id = NEW.macrodma_id
+        minc=NEW.minc, maxc=NEW.maxc, effc=NEW.effc, active=NEW.active, lastupdate=now(), lastupdate_user = current_user, macrodma_id = NEW.macrodma_id, stylesheet=NEW.stylesheet
 		WHERE dma_id=OLD.dma_id;
 		
 		RETURN NEW;

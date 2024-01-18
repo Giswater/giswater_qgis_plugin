@@ -51,47 +51,50 @@ BEGIN
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-  INTO v_version;
+    INTO v_version;
 
-  IF v_project_type = 'WS' THEN
+	-- get mode	
+	v_modesector := (SELECT (value::json->>'SECTOR')::json->>'mode' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
+	v_modedma := (SELECT (value::json->>'DMA')::json->>'mode' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
 
-		-- get mode	
-		v_modesector := (SELECT (style::json->>'SECTOR')::json->>'mode' FROM config_function WHERE id=2928);
-		v_modepresszone := (SELECT (style::json->>'PRESSZONE')::json->>'mode' FROM config_function WHERE id=2928);
-		v_modedma := (SELECT (style::json->>'DMA')::json->>'mode' FROM config_function WHERE id=2928);
-		v_modedqa := (SELECT (style::json->>'DQA')::json->>'mode' FROM config_function WHERE id=2928);
+	-- get column to simbolize
+	v_colsector := (SELECT (value::json->>'SECTOR')::json->>'column' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
+	v_coldma := (SELECT (value::json->>'DMA')::json->>'column' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
 
-		-- get column to simbolize
-		v_colsector := (SELECT (style::json->>'SECTOR')::json->>'column' FROM config_function WHERE id=2928);
-		v_colpresszone := (SELECT (style::json->>'PRESSZONE')::json->>'column' FROM config_function WHERE id=2928);
-		v_coldma := (SELECT (style::json->>'DMA')::json->>'column' FROM config_function WHERE id=2928);
-		v_coldqa := (SELECT (style::json->>'DQA')::json->>'column' FROM config_function WHERE id=2928);
+	-- get transparency
+	v_trasector := (SELECT (value::json->>'SECTOR')::json->>'transparency' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
+	v_tradma := (SELECT (value::json->>'DMA')::json->>'transparency' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
+	
+	-- get mapzone values
+	EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_colsector||' as id, stylesheet::json FROM v_edit_sector WHERE sector_id > 0 and active IS TRUE) row' INTO v_sector;
+	EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, stylesheet::json FROM v_edit_dma WHERE dma_id > 0 and active IS TRUE) row' INTO v_dma;
 
-		-- get transparency
-		v_trasector := (SELECT (style::json->>'SECTOR')::json->>'transparency' FROM config_function WHERE id=2928);
-		v_trapresszone := (SELECT (style::json->>'PRESSZONE')::json->>'transparency' FROM config_function WHERE id=2928);
-		v_tradma := (SELECT (style::json->>'DMA')::json->>'transparency' FROM config_function WHERE id=2928);
-		v_tradqa := (SELECT (style::json->>'DQA')::json->>'transparency' FROM config_function WHERE id=2928);
+  	IF v_project_type = 'WS' THEN
 
-		-- get mapzone values
-		EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_colsector||' as id, stylesheet::json FROM v_edit_sector WHERE sector_id > 0 and active IS TRUE) row' INTO v_sector ;
-		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id, stylesheet::json FROM v_edit_presszone WHERE presszone_id NOT IN (''0'', ''-1'') and active IS TRUE) row' INTO v_presszone ;
-		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, stylesheet::json FROM v_edit_dma WHERE dma_id > 0 and active IS TRUE) row' INTO v_dma ;
-		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldqa||' as id, stylesheet::json FROM v_edit_dqa WHERE dqa_id > 0 and active IS TRUE) row' INTO v_dqa ;
+		v_modepresszone := (SELECT (value::json->>'PRESSZONE')::json->>'mode' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
+		v_modedqa := (SELECT (value::json->>'DQA')::json->>'mode' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
+
+		v_colpresszone := (SELECT (value::json->>'PRESSZONE')::json->>'column' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
+		v_coldqa := (SELECT (value::json->>'DQA')::json->>'column' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
 		
-		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, null as stylesheet FROM v_edit_plan_netscenario_dma WHERE dma_id > 0 ) row' INTO v_netscenario_dma ;
+		v_trapresszone := (SELECT (value::json->>'PRESSZONE')::json->>'transparency' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
+		v_tradqa := (SELECT (value::json->>'DQA')::json->>'transparency' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
+
+		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id, stylesheet::json FROM v_edit_presszone WHERE presszone_id NOT IN (''0'', ''-1'') and active IS TRUE) row' INTO v_presszone ;
+		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldqa||' as id, stylesheet::json FROM v_edit_dqa WHERE dqa_id > 0 and active IS TRUE) row' INTO v_dqa ;
+		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, null as stylesheet FROM v_edit_plan_netscenario_dma WHERE dma_id > 0 ) row' INTO v_netscenario_dma;
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id, null as stylesheet FROM v_edit_plan_netscenario_presszone WHERE presszone_id NOT IN (''0'', ''-1'') ) row' INTO v_netscenario_presszone ;
 
 	ELSIF v_project_type = 'UD' THEN
 	
 		-- get mode	
-		v_modedrainzone := (SELECT (style::json->>'DRAINZONE')::json->>'mode' FROM config_function WHERE id=2928);
+		v_modedrainzone := (SELECT (value::json->>'DRAINZONE')::json->>'mode' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
 	
 		-- get column to simbolize
-		v_coldrainzone := (SELECT (style::json->>'DRAINZONE')::json->>'column' FROM config_function WHERE id=2928);
+		v_coldrainzone := (SELECT (value::json->>'DRAINZONE')::json->>'column' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
 	
 		-- get transparency
-		v_tradrainzone := (SELECT (style::json->>'DRAINZONE')::json->>'transparency' FROM config_function WHERE id=2928);
+		v_tradrainzone := (SELECT (value::json->>'DRAINZONE')::json->>'transparency' FROM config_param_system WHERE parameter='utils_graphanalytics_style');
 	
 		-- get mapzone values
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_coldrainzone||' as id, stylesheet::json FROM v_edit_drainzone WHERE drainzone_id > 0 and active IS TRUE) row' INTO v_drainzone;
