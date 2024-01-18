@@ -853,3 +853,5 @@ UPDATE config_form_fields SET layoutorder =11 WHERE  formname = 'v_edit_dqa' AND
 UPDATE config_form_fields SET layoutorder =12 WHERE  formname = 'v_edit_dqa' AND columnname = 'active';
 
 UPDATE presszone SET head = 52.27 WHERE presszone_id = '4';
+
+UPDATE config_function SET style = (replace(style::text, 'Disable', 'Random'))::json WHERE id = 2928;

@@ -21,3 +21,8 @@ VALUES(528, 'Hydro without census', 'ws', NULL, 'ddss plugin', NULL, 'Function p
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) 
 VALUES(529, 'Census whitout hydro', 'ws', NULL, 'ddss plugin' , NULL, 'Function process', NULL);
 */
+
+UPDATE config_function SET style = (replace(style::text, 'minsector_id', 'name'))::json WHERE id = 2928;
+UPDATE config_function SET style = (replace(style::text, 'presszone_id', 'name'))::json WHERE id = 2928;
+UPDATE config_function SET style = (replace(style::text, 'dqa_id', 'name'))::json WHERE id = 2928;
+UPDATE config_function SET style = (replace(style::text, 'sector_id', 'name'))::json WHERE id = 2928;

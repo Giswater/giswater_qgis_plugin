@@ -603,3 +603,5 @@ UPDATE config_form_fields
 UPDATE config_form_fields SET iseditable = true WHERE layoutname = 'lyt_epa_dsc_1' AND widgettype = 'button';
 
 UPDATE sys_table SET alias = 'Gully child' WHERE id='ve_gully_gully';
+
+UPDATE config_function SET style = (replace(style::text, 'Random', 'Disable'))::json WHERE id = 2928;
