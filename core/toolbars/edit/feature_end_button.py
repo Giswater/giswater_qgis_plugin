@@ -287,6 +287,7 @@ class GwFeatureEndButton(GwAction):
                 filter_ += f"arc_id = '{row}' OR "
             filter_ = filter_[:-3] + ""
             filter_ += " AND arc_state = '1' "
+            filter_ += " AND feature_state = 1 "
 
             tools_qt.fill_table(self.tbl_arc_x_relations, table_relations, filter_)
             self.tbl_arc_x_relations.doubleClicked.connect(
