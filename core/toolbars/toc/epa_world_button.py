@@ -38,6 +38,10 @@ def _get_layers():
     return arc_layers, node_layers, connec_layers, gully_layers, link_layers
 
 
+def is_epa_world_active(default=False):
+    return tools_os.set_boolean(tools_gw.get_config_parser("epa_world", "epa_world_active", 'user', 'session'), default)
+
+
 def set_epa_world(_set_epa_world=None, selector_change=False, is_init=False):
 
     # Style
@@ -48,8 +52,7 @@ def set_epa_world(_set_epa_world=None, selector_change=False, is_init=False):
 
     # Get set_epa_world from config
     if _set_epa_world is None:
-        _set_epa_world = tools_os.set_boolean(
-            tools_gw.get_config_parser("epa_world", "epa_world_active", 'user', 'session'), False)
+        _set_epa_world = is_epa_world_active(False)
     # Deactivate EPA
     if not _set_epa_world:
         tools_gw.set_config_parser("epa_world", "epa_world_active", str(_set_epa_world), 'user', 'session')
@@ -163,8 +166,7 @@ class GwEpaWorldButton(GwAction):
     def _switch_epa_world(self):
 
         # Check world type
-        epa_world_active = tools_os.set_boolean(
-            tools_gw.get_config_parser("epa_world", "epa_world_active", 'user', 'session'))
+        epa_world_active = is_epa_world_active()
 
         # Apply filters
         _set_epa_world = not epa_world_active
