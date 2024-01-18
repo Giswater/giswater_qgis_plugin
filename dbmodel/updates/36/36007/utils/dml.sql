@@ -67,3 +67,6 @@ UPDATE config_form_fields SET linkedobject='tbl_inp_dscenario_virtualvalve' WHER
 
 -- 20/12/2023
 UPDATE om_visit_cat set alias = name;
+
+UPDATE config_toolbox SET inputparams=NULL WHERE id=3280;
+
