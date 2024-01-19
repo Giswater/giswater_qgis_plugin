@@ -214,20 +214,11 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},"data":{"viewName":["v_edit_man_tank"],
 "fieldName":"pol_id","alias":"_pol_id_ AS pol_id","action":"DELETE-FIELD","hasChilds":"False"}}$$);
 
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_man_tank"], "action":"RESTORE-VIEW","hasChilds":"False"}}$$);
-
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},"data":{"viewName":["v_edit_man_fountain"],
 "fieldName":"pol_id","alias":"_pol_id_ AS pol_id","action":"DELETE-FIELD","hasChilds":"False"}}$$);
 
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_man_fountain"], "action":"RESTORE-VIEW","hasChilds":"False"}}$$);
-
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},"data":{"viewName":["v_edit_man_register"],
 "fieldName":"pol_id","alias":"_pol_id_ AS pol_id","action":"DELETE-FIELD","hasChilds":"False"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_man_register"], "action":"RESTORE-VIEW","hasChilds":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_register", "column":"_pol_id_", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_fountain", "column":"_pol_id_", "dataType":"integer"}}$$);
