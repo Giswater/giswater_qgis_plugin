@@ -76,10 +76,10 @@ class GwDocument(QObject):
             for i in params:
                 if i not in list_tabs:
                     tools_qt.remove_tab(self.dlg_add_doc.tab_feature, f'tab_{i}')
-        else:
-            # Remove 'gully' if not 'UD'
-            if self.project_type != 'ud':
-                tools_qt.remove_tab(self.dlg_add_doc.tab_feature, 'tab_gully')
+
+        # Remove 'gully' if not 'UD'
+        if self.project_type != 'ud':
+            tools_qt.remove_tab(self.dlg_add_doc.tab_feature, 'tab_gully')
 
         if doc_tables:
             self.doc_tables = doc_tables

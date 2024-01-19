@@ -79,13 +79,13 @@ class GwElement:
             for i in params:
                 if i not in list_tabs:
                     tools_qt.remove_tab(self.dlg_add_element.tab_feature, f'tab_{i}')
+
+        # Remove 'gully' if not 'UD'
+        self.project_type = tools_gw.get_project_type()
+        if self.project_type != 'ud':
+            tools_qt.remove_tab(self.dlg_add_element.tab_feature, 'tab_gully')
         else:
-            # Remove 'gully' if not 'UD'
-            self.project_type = tools_gw.get_project_type()
-            if self.project_type != 'ud':
-                tools_qt.remove_tab(self.dlg_add_element.tab_feature, 'tab_gully')
-            else:
-                self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
 
         # Set icons
         tools_gw.add_icon(self.dlg_add_element.btn_add_geom, "133")
