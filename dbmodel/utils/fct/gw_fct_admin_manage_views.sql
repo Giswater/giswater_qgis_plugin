@@ -121,69 +121,31 @@ BEGIN
 	END IF;
 
 	IF v_action='DELETE-FIELD' THEN
+	
+		-- this delete tool works with any column in exception of last one
+		
 		FOREACH rec_view IN ARRAY(v_viewlist) LOOP
 			
 			EXECUTE 'INSERT INTO temp_csv (fid, source, csv1 )
 			SELECT ''380'', '||quote_literal(rec_view)||',  definition FROM pg_views 
 			WHERE schemaname='||quote_literal(v_schemaname)||' and viewname = '||quote_literal(rec_view)||';';
-			
-			--find the location of a replaced field
-			EXECUTE 'SELECT max(ordinal_position) FROM information_schema.columns 
-			WHERE table_schema='||quote_literal(v_schemaname)||' and table_name = '||quote_literal(rec_view)||';'
-			INTO v_maxposition;
-			EXECUTE 'SELECT ordinal_position FROM information_schema.columns 
-			WHERE table_schema='||quote_literal(v_schemaname)||' and table_name = '||quote_literal(rec_view)||' 
-			AND column_name = '||quote_literal(v_fieldname)||''
-			INTO v_fieldposition;
+						
+			UPDATE  temp_csv set csv2 = csv1 WHERE fid=380 AND source= rec_view; 
 
-			--replace text in a view definition, depending on whether the field is last or not
-			IF v_maxposition = v_fieldposition THEN
-
-				FOR rec IN (select * from information_schema.view_table_usage WHERE table_schema=v_schemaname and view_name = rec_view AND table_name not ilike 'selector%') LOOP
-					if v_alias is null then
-						EXECUTE 'select replace(csv1,concat('||quote_literal(rec.table_name)||',''.'','||quote_literal(v_fieldname)||'),'''') 
-						from temp_csv WHERE fid=380 AND source='||quote_literal(rec_view)||''
-						into v_viewdefinition;
-					else
-						EXECUTE 'select replace(csv1,'||quote_literal(v_alias)||','''') 
-						from temp_csv WHERE fid=380 AND source='||quote_literal(rec_view)||''
-						into v_viewdefinition;
-					end if;
-					
-					--find penultiate field and remove , before FROM
-					EXECUTE 'SELECT column_name FROM information_schema.columns 
-					WHERE table_schema='||quote_literal(v_schemaname)||' and table_name = '||quote_literal(rec_view)||' AND 
-					ordinal_position = '||v_maxposition||' -1 ;'
-					INTO v_penultimate_field;
-					v_viewdefinition = replace(v_viewdefinition,concat(v_penultimate_field,','),v_penultimate_field);
-			
-					IF  position(v_fieldname in v_viewdefinition) = 0 then --v_fieldposition = 0 THEN
-						EXECUTE 'UPDATE temp_csv set csv2 = '||quote_literal(v_viewdefinition)||' WHERE fid=380 AND source='||quote_literal(rec_view)||';';
-					END IF;
-					
+			if v_alias is null then
+				-- delete specific column when definition has prefix
+				FOR rec IN (select * from information_schema.view_table_usage WHERE table_schema=v_schemaname and view_name = rec_view 
+				AND table_name not ilike 'selector%') LOOP
+					UPDATE temp_csv set csv2 = replace (csv2, concat(rec.table_name,'.',v_fieldname,',') ,'')  WHERE fid=380 AND source= rec_view; 
 				END LOOP;
-			ELSE
-				FOR rec IN (select * from information_schema.view_table_usage WHERE table_schema=v_schemaname and view_name = rec_view AND table_name not ilike 'selector%') LOOP
-		
-					IF v_alias is null THEN
-						EXECUTE 'select replace(csv1,concat('||quote_literal(rec.table_name)||',''.'','||quote_literal(v_fieldname)||','',''),'''') 
-						from temp_csv WHERE fid=380 AND source='||quote_literal(rec_view)||''
-						into v_viewdefinition;
-					ELSE
-						EXECUTE 'select replace(csv1,concat('||quote_literal(v_alias)||','',''),'''')
-						from temp_csv WHERE fid=380 AND source='||quote_literal(rec_view)||''
-						into v_viewdefinition;
-					END IF;
-					
-					IF  position(v_fieldname in v_viewdefinition) = 0 then 
-						EXECUTE 'UPDATE temp_csv set csv2 = '||quote_literal(v_viewdefinition)||' 
-						WHERE fid=380 AND source='||quote_literal(rec_view)||';';
-					END IF;
-					
-				END LOOP;
-			END IF;
-			
 
+				-- delete specific column when definition does not have prefix
+				UPDATE temp_csv set csv2 = replace (csv2, concat(v_fieldname, ',') ,'')  WHERE fid=380 AND source= rec_view;
+			else
+				-- delete specific column when definition has alias
+				UPDATE temp_csv set csv2 = replace (csv2, concat(v_alias, ',') ,'')  WHERE fid=380 AND source= rec_view; 
+			end if;		
+					
 		END LOOP;
 
 	ELSIF v_action='SAVE-VIEW' THEN
