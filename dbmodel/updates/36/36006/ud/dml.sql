@@ -72,13 +72,6 @@ null, true, '{4}');
 
 update sys_function set descript = 'Function to set optimum outlet for subcatchments according the closest node of network with less elevation that minimum elevation (minelev) of subcatchment' WHERE id = 3242;
 
--- 12/12/2023
-UPDATE config_form_fields SET layoutname='lyt_data_1' WHERE formname='ve_gully_gully' AND formtype='form_feature' AND columnname='connec_y1' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutname='lyt_data_1' WHERE formname='ve_gully_pgully' AND formtype='form_feature' AND columnname='connec_y2' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutname='lyt_data_1' WHERE formname='ve_gully_pgully' AND formtype='form_feature' AND columnname='connec_y1' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutname='lyt_data_1' WHERE formname='ve_gully_vgully' AND formtype='form_feature' AND columnname='connec_y1' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutname='lyt_data_1' WHERE formname='ve_gully_vgully' AND formtype='form_feature' AND columnname='connec_y2' AND tabname='tab_data';
-
 -- gully
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('gully', 'form_feature', 'tab_visit', 'date_visit_from', 'lyt_visit_1', 1, 'date', 'datetime', 'From:', NULL, NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"labelPosition": "top", "filterSign":">="}'::json, '{"functionName": "filter_table", "parameters":{}}'::json, 'tbl_doc_x_gully', false, 1);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('gully', 'form_feature', 'tab_visit', 'date_visit_to', 'lyt_visit_1', 2, 'date', 'datetime', 'To:', NULL, NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"labelPosition": "top", "filterSign":"<="}'::json, '{"functionName": "filter_table", "parameters":{}}'::json, 'tbl_doc_x_gully', false, 2);

@@ -50,3 +50,4 @@ WHERE parameter='utils_graphanalytics_style';
 
 DELETE FROM config_function WHERE id=2928;
 
+UPDATE config_form_fields SET layoutname='lyt_data_1', tabname='tab_data' WHERE formname LIKE 've_gully%' AND columnname LIKE 'connec_y%' AND tabname='tab_none';
