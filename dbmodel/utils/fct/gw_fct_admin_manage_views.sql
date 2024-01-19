@@ -136,12 +136,20 @@ BEGIN
 				-- delete specific column when definition has prefix
 				FOR rec IN (select * from information_schema.view_table_usage WHERE table_schema=v_schemaname and view_name = rec_view 
 				AND table_name not ilike 'selector%') LOOP
-					UPDATE temp_csv set csv2 = replace (csv2, concat(rec.table_name,'.',v_fieldname,',') ,'')  WHERE fid=380 AND source= rec_view; 
+					UPDATE temp_csv set csv2 = replace (csv2, concat(rec.table_name,'.',v_fieldname,',') ,'')  WHERE fid=380 
+					AND source= rec_view; 
 				END LOOP;
 
 				-- delete specific column when definition does not have prefix
 				UPDATE temp_csv set csv2 = replace (csv2, concat(v_fieldname, ',') ,'')  WHERE fid=380 AND source= rec_view;
 			else
+				-- delete specific column when definition has prefix
+				FOR rec IN (select * from information_schema.view_table_usage WHERE table_schema=v_schemaname and view_name = rec_view 
+				AND table_name not ilike 'selector%') LOOP
+					UPDATE temp_csv set csv2 = replace (csv2, concat(rec.table_name,'.',v_alias,',') ,'')  WHERE fid=380 
+					AND source= rec_view; 
+				END LOOP;		
+			
 				-- delete specific column when definition has alias
 				UPDATE temp_csv set csv2 = replace (csv2, concat(v_alias, ',') ,'')  WHERE fid=380 AND source= rec_view; 
 			end if;		
