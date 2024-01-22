@@ -51,3 +51,6 @@ WHERE parameter='utils_graphanalytics_style';
 DELETE FROM config_function WHERE id=2928;
 
 UPDATE config_form_fields SET layoutname='lyt_data_1', tabname='tab_data' WHERE formname LIKE 've_gully%' AND columnname LIKE 'connec_y%' AND tabname='tab_none';
+
+-- 22/01/2024
+UPDATE config_form_fields SET layoutname='lyt_hydrometer_1', layoutorder=11, "datatype"=NULL, widgettype='button', "label"=NULL, tooltip='Open link', placeholder=NULL, ismandatory=false, isparent=false, iseditable=true, isautoupdate=false, isfilter=false, dv_querytext=NULL, dv_orderby_id=NULL, dv_isnullvalue=NULL, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet='{"icon":"70", "size":"24x24"}'::json, widgetcontrols='{"saveValue":false, "filterSign":"="}'::json, widgetfunction='{"functionName": "open_selected_path", "parameters":{"targetwidget":"tab_hydrometer_tbl_hydrometer", "columnfind": "hydrometer_link"}}'::json, linkedobject='v_ui_hydrometer', hidden=false, web_layoutorder=NULL WHERE formname='connec' AND formtype='form_feature' AND columnname='btn_link' AND tabname='tab_hydrometer';
