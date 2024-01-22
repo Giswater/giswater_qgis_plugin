@@ -750,8 +750,26 @@ class GwElement:
             dialog.undelete.setChecked(True)
 
         # Check related @feature_type
+        x1, y1, x2, y2 = None, None, None, None
         for feature_type in list_feature_type:
             tools_gw.get_rows_by_feature_type(self, dialog, table_object, feature_type)
+            try:
+                layer = self.layers[feature_type][0]
+            except:
+                continue
+            extent = layer.boundingBoxOfSelected()
+            if extent.xMinimum() == 0 and extent.xMaximum() == 0:
+                continue
+            # If this is the first iteration, set the initial extent
+            if x1 is None:
+                x1, y1, x2, y2 = extent.xMinimum(), extent.yMinimum(), extent.xMaximum(), extent.yMaximum()
+            else:
+                # Update the extent to include the bounding box of the current layer
+                x1 = min(x1, extent.xMinimum())
+                y1 = min(y1, extent.yMinimum())
+                x2 = max(x2, extent.xMaximum())
+                y2 = max(y2, extent.yMaximum())
+        tools_qgis.zoom_to_rectangle(x1, y1, x2, y2)
 
 
     def _set_combo_from_param_user(self, dialog, widget, table_name, parameter, field_id='id', field_name='id'):
