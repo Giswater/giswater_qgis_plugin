@@ -287,6 +287,11 @@ class GwNetscenarioManagerButton(GwAction):
     def _execute_current_netscenario(self):
         """ Executes the current netscenario """
 
+        if self.current_netscenario_id is None:
+            message = "No current netscenario"
+            tools_qgis.show_warning(message, dialog=self.dlg_netscenario_manager)
+            return
+
         # Execute toolbox function
         dlg_functions = self._open_toolbox_function(3256)
         # Set netscenario_id in combo copyFrom
