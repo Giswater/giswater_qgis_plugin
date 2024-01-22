@@ -737,7 +737,7 @@ BEGIN
 		)c order by node, c desc)a
 		WHERE node = node_id';
 		
-		RAISE NOTICE ' Update temporal tables of connecs, links and gullies';
+		RAISE NOTICE ' Update temporal tables of connects and links';
 		
 		-- used connec using v_edit_arc because the exploitation filter (same before)
 		v_querytext = 'UPDATE temp_t_connec SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||' FROM temp_t_arc a WHERE a.arc_id=temp_t_connec.arc_id';
@@ -997,8 +997,10 @@ BEGIN
 				VALUES (v_fid, 1, concat('INFO: 0 connec''s have been disconnected'));
 			END IF;
 			
-			RAISE NOTICE 'Disconnected gullies';
 			IF v_project_type='UD' THEN
+			
+				RAISE NOTICE 'Disconnected gullies';
+
 				IF v_count > 0 THEN 
 					select count(*) INTO v_count FROM 
 					(SELECT DISTINCT gully_id FROM temp_t_gully JOIN temp_t_arc USING (arc_id) WHERE water = 0 group by (arc_id, gully_id) having count(arc_id)=2 )a;
@@ -1027,6 +1029,8 @@ BEGIN
 		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, '');
 		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  0, '');
 	END IF;
+
+	RAISE NOTICE 'Creating geometry of mapzones';
 
 	-- update geometry of mapzones
 	IF v_updatemapzgeom = 0 THEN
