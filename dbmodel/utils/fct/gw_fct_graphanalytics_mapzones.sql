@@ -1423,7 +1423,8 @@ BEGIN
 
 	ELSIF v_netscenario IS NOT NULL THEN
 
-		v_querytext = 'UPDATE plan_netscenario_'||v_table||' SET the_geom = t.the_geom, lastupdate = now(), lastupdate_user=current_user FROM temp_'||v_table||' t WHERE t.'||v_field||' = plan_netscenario_'||v_table||'.'||v_field||' 
+		v_querytext = 'UPDATE plan_netscenario_'||v_table||' SET the_geom = t.the_geom, lastupdate = now(), lastupdate_user=current_user FROM temp_'||v_table||
+		' t WHERE t.'||v_field||' = plan_netscenario_'||v_table||'.'||v_field||' 
 		AND plan_netscenario_'||v_table||'.netscenario_id = '||v_netscenario||'';
 		EXECUTE v_querytext;
 
@@ -1432,13 +1433,17 @@ BEGIN
 		DELETE FROM plan_netscenario_connec WHERE netscenario_id = v_netscenario::integer;
 
 		EXECUTE 'INSERT INTO plan_netscenario_arc(netscenario_id, arc_id, '||quote_ident(v_field)||', the_geom)
-		SELECT '|| v_netscenario||', arc_id, '||quote_ident(v_field)||', the_geom FROM temp_t_arc ON CONFLICT (netscenario_id, arc_id) DO NOTHING';
-
+		SELECT '|| v_netscenario||', arc_id, '||quote_ident(v_field)||', a.the_geom FROM temp_t_arc a
+		JOIN plan_netscenario_'||v_table||' USING (dma_id) WHERE netscenario_id =  '|| v_netscenario||'';
+	
 		EXECUTE 'INSERT INTO plan_netscenario_node(netscenario_id, node_id, '||quote_ident(v_field)||', the_geom)
-		SELECT '|| v_netscenario||', node_id, '||quote_ident(v_field)||', the_geom FROM temp_t_node ON CONFLICT (netscenario_id, node_id) DO NOTHING';
+		SELECT '|| v_netscenario||', node_id, '||quote_ident(v_field)||', n.the_geom FROM temp_t_node n
+		JOIN plan_netscenario_'||v_table||' USING (dma_id) WHERE netscenario_id =  '|| v_netscenario||'';
 
 		EXECUTE 'INSERT INTO plan_netscenario_connec(netscenario_id, connec_id, '||quote_ident(v_field)||', the_geom)
-		SELECT '|| v_netscenario||', connec_id, '||quote_ident(v_field)||', the_geom FROM temp_t_connec ON CONFLICT (netscenario_id, connec_id) DO NOTHING';
+		SELECT '|| v_netscenario||', connec_id, '||quote_ident(v_field)||', c.the_geom FROM temp_t_connec c
+		JOIN plan_netscenario_'||v_table||' USING (dma_id) WHERE netscenario_id =  '|| v_netscenario||'';
+
 
 		IF v_class = 'PRESSZONE' THEN
 			v_visible_layer ='"v_edit_plan_netscenario_presszone"';
