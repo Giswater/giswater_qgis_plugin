@@ -70,3 +70,11 @@ UPDATE om_visit_cat set alias = name;
 
 UPDATE config_toolbox SET inputparams=NULL WHERE id=3280;
 
+--22/01/24
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_connec', 'form_feature', 'tab_data', 'plot_code', 'lyt_data_3', 20, 'string', 'text', 'Plot code', 'plot_code', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, NULL) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('v_edit_connec', 'form_feature', 'tab_data', 'plot_code', 'lyt_data_3', 20, 'string', 'text', 'Plot code', 'plot_code', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, NULL) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
