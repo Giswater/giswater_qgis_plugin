@@ -1428,13 +1428,13 @@ BEGIN
 		DELETE FROM plan_netscenario_connec WHERE netscenario_id = v_netscenario::integer;
 
 		EXECUTE 'INSERT INTO plan_netscenario_arc(netscenario_id, arc_id, '||quote_ident(v_field)||', the_geom)
-		SELECT '|| v_netscenario||', arc_id, '||quote_ident(v_field)||', the_geom FROM temp_t_arc';
+		SELECT '|| v_netscenario||', arc_id, '||quote_ident(v_field)||', the_geom FROM temp_t_arc ON CONFLICT (netscenario_id, arc_id) DO NOTHING';
 
 		EXECUTE 'INSERT INTO plan_netscenario_node(netscenario_id, node_id, '||quote_ident(v_field)||', the_geom)
-		SELECT '|| v_netscenario||', node_id, '||quote_ident(v_field)||', the_geom FROM temp_t_node';
+		SELECT '|| v_netscenario||', node_id, '||quote_ident(v_field)||', the_geom FROM temp_t_node ON CONFLICT (netscenario_id, node_id) DO NOTHING';
 
 		EXECUTE 'INSERT INTO plan_netscenario_connec(netscenario_id, connec_id, '||quote_ident(v_field)||', the_geom)
-		SELECT '|| v_netscenario||', connec_id, '||quote_ident(v_field)||', the_geom FROM temp_t_connec';
+		SELECT '|| v_netscenario||', connec_id, '||quote_ident(v_field)||', the_geom FROM temp_t_connec ON CONFLICT (netscenario_id, connec_id) DO NOTHING';
 
 		IF v_class = 'PRESSZONE' THEN
 			v_visible_layer ='"v_edit_plan_netscenario_presszone"';
