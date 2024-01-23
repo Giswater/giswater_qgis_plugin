@@ -2179,7 +2179,7 @@ class GwInfo(QObject):
     def _reload_epa_tab(self, dialog):
         epa_type = tools_qt.get_text(dialog, 'tab_data_epa_type')
         # call getinfofromid
-        if epa_type.lower() == 'undefined':
+        if not epa_type or epa_type.lower() in ('undefined', 'null'):
             tools_qt.enable_tab_by_tab_name(self.tab_main, 'tab_epa', False)
             return
 
