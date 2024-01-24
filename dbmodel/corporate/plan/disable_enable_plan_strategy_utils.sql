@@ -9,6 +9,8 @@ set search_path  = SCHEMA_NAME;
 
 --DISABLE PLAN STRATEGY-- 
 ------------------------
+UPDATE config_form_tabs SET formname = 'selector_basic_' where tabname = 'tab_psector' and formname = 'selector_basic';
+
 CREATE OR REPLACE VIEW v_state_arc AS 
   SELECT arc.arc_id FROM selector_state, arc
   WHERE arc.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text;
@@ -42,6 +44,7 @@ CREATE OR REPLACE VIEW v_state_node AS
 
 --ENABLE PLAN STRATEGY-- 
 ------------------------
+UPDATE config_form_tabs SET formname = 'selector_basic' where tabname = 'tab_psector' and formname = 'selector_basic_';
 
 
 CREATE OR REPLACE VIEW v_sector_node AS 
