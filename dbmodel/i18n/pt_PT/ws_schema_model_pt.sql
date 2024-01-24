@@ -517,6 +517,13 @@ INSERT INTO cat_feature_node VALUES ('ETA', 'WTP', 'RESERVOIR', 2, true, true, '
 
 
 --
+-- Data for Name: config_graph_valve; Type: TABLE DATA; Schema: ; Owner: -
+--
+
+INSERT INTO config_graph_valve VALUES ('VALVULA_PARADA', true);
+
+
+--
 -- Data for Name: element_type; Type: TABLE DATA; Schema: ; Owner: -
 --
 

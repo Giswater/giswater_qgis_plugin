@@ -519,6 +519,13 @@ INSERT INTO cat_feature_node VALUES ('USINE_RETRAITEMENT', 'WTP', 'RESERVOIR', 2
 
 
 --
+-- Data for Name: config_graph_valve; Type: TABLE DATA; Schema: ; Owner: -
+--
+
+INSERT INTO config_graph_valve VALUES ('VANNE_FERMETURE', true);
+
+
+--
 -- Data for Name: element_type; Type: TABLE DATA; Schema: ; Owner: -
 --
 
