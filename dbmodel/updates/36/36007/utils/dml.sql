@@ -78,3 +78,14 @@ VALUES('ve_connec', 'form_feature', 'tab_data', 'plot_code', 'lyt_data_3', 20, '
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('v_edit_connec', 'form_feature', 'tab_data', 'plot_code', 'lyt_data_3', 20, 'string', 'text', 'Plot code', 'plot_code', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, NULL) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+-- 24/01/24
+insert into config_typevalue VALUES ('tabname_typevalue','tab_period','tab_period','tab_period') ON CONFLICT (typevalue, id) DO NOTHING;
+
+insert into config_form_tabs (formname, tabname, label, tooltip, sys_role, orderby, device)  
+VALUES ('selector_basic_','tab_period','Period','Period','role_basic',9,'{4,5}')  ON CONFLICT (formname, tabname) DO NOTHING;
+
+insert into config_param_system (parameter, value, descript, project_type, isenabled) VALUES  
+('basic_selector_tab_period', '{"table":"ext_cat_period","selector":"selector_period","table_id":"id","selector_id":"period_id","label":"period_id, '' - '', code","orderBy":"id","manageAll":true,"typeaheadFilter":"", "query_filter":"","typeaheadForced":false}',
+'Tab for period', 'utils', true) on conflict (parameter) DO NOTHING;
