@@ -522,6 +522,7 @@ class GwAdminButton:
         return True
 
 
+    # TODO ("Add new parameter dict_update_folders)
     def update_35to39(self, new_project=False, project_type=False, no_ct=False):
         """"""
 
