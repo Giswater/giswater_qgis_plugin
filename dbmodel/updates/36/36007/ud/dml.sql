@@ -60,3 +60,13 @@ UPDATE sys_table SET id='v_edit_inp_subc2outlet' where id='vi_subcatch2outlet';
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") VALUES(3300, 'gw_trg_edit_inp_subc2outlet', 'ud', 'trigger function', NULL, NULL, NULL, 'role_master', NULL, 'core');
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") VALUES(3252, 'There is no subcatchment or outlet_id nearby', 'Place the line inside a subcatchment or use the snapping tool to set an outlet_id for the subcatchment.', 2, true, 'utils', 'core');
+
+UPDATE sys_function SET descript ='Function to analyze graph of network. Dynamic analisys to sectorize network using the flow traceability function. 
+Before working with this funcion, it is mandatory to configurate graphconfig on drainzone table'
+WHERE function_name='gw_fct_graphanalytics_mapzones';
+
+UPDATE sys_function SET descript='Function to analyze network as a graph. Analysis is only avaliable for DRAINZONE. Before starting, you need to configurate:
+- Field graphconfig on drainzone table.
+- Enable status for variable utils_graphanalytics_status on [config_param_system] table.
+Stop your mouse over labels for more information about input parameters.'
+WHERE function_name='gw_fct_graphanalytics_mapzones_advanced';
