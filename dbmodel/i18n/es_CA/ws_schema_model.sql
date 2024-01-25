@@ -1,6 +1,14 @@
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 --
--- Data for Name: value_state; Type: TABLE DATA; Schema: ud_dev_35041_ca; Owner: -
+-- Data for Name: value_state; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO value_state VALUES (0, 'OBSOLET', NULL);
@@ -9,7 +17,7 @@ INSERT INTO value_state VALUES (1, 'OPERATIU', NULL);
 
 
 --
--- Data for Name: value_state_type; Type: TABLE DATA; Schema: ud_dev_35041_ca; Owner: -
+-- Data for Name: value_state_type; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO value_state_type VALUES (3, 2, 'PLANIFICAT', true, true);
@@ -21,7 +29,7 @@ INSERT INTO value_state_type VALUES (2, 1, 'OPERATIU', true, true);
 
 
 --
--- Data for Name: edit_typevalue; Type: TABLE DATA; Schema: ud_dev_35041_ca; Owner: -
+-- Data for Name: edit_typevalue; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO edit_typevalue VALUES ('nullvalue', '0', NULL, NULL, NULL);
@@ -30,8 +38,17 @@ INSERT INTO edit_typevalue VALUES ('man_addfields_cat_datatype', 'text', 'text',
 INSERT INTO edit_typevalue VALUES ('man_addfields_cat_datatype', 'date', 'date', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('man_addfields_cat_datatype', 'boolean', 'boolean', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('man_addfields_cat_datatype', 'numeric', 'numeric', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('sector_type', 'distribution', 'distribution', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('sector_type', 'undefined', 'undefined', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('sector_type', 'source', 'source', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('dqa_type', 'chlorine', 'chlorine', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('dqa_type', 'undefined', 'undefined', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('dqa_type', 'other', 'other', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('raster_type', 'DEM', 'DEM', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('raster_type', 'Slope', 'Slope', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('valve_ordinarystatus', '0', 'closed', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('valve_ordinarystatus', '1', 'opened', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('valve_ordinarystatus', '2', 'maybe', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('value_verified', 'PER REVISAR', 'PER REVISAR', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('value_verified', 'VERIFICAT', 'VERIFICAT', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('value_review_status', '0', 'Sense canvis', 'No hi ha canvis per sobre o sota dels llindars de tolerancia', NULL);
@@ -45,8 +62,6 @@ INSERT INTO edit_typevalue VALUES ('value_boolean', '0', 'FALSE', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('value_boolean', '1', 'MAYBE', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('value_boolean', '2', 'TRUE', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('value_boolean', '3', 'UNKNOWN', NULL, NULL);
-INSERT INTO edit_typevalue VALUES ('gully_units_placement', 'WIDTH-SIDE', 'WIDTH-SIDE', NULL, NULL);
-INSERT INTO edit_typevalue VALUES ('gully_units_placement', 'LENGTH-SIDE', 'LENGTH-SIDE', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('graphdelimiter_type', 'DMA', 'DMA', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('graphdelimiter_type', 'DQA', 'DQA', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('graphdelimiter_type', 'MINSECTOR', 'MINSECTOR', NULL, NULL);
@@ -57,13 +72,22 @@ INSERT INTO edit_typevalue VALUES ('value_review_status', '4', 'Only review obse
 
 
 --
--- Data for Name: om_typevalue; Type: TABLE DATA; Schema: ud_dev_35041_ca; Owner: -
+-- Data for Name: om_typevalue; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO om_typevalue VALUES ('visit_parameter_criticity', '1', 'Urgent', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_parameter_criticity', '2', 'High', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_parameter_criticity', '3', 'Normal', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_parameter_criticity', '4', 'Minor', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('mincut_cause', '1', 'Accidental', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('mincut_cause', '2', 'Planificat', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('mincut_class', '1', 'Tancament de xarxa', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('mincut_class', '2', 'Tancament d''escomeses', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('mincut_class', '3', 'Tancament d''abonats', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('mincut_state', '1', 'En procés', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('mincut_state', '2', 'Finalitzat', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('mincut_state', '0', 'Planificat', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('mincut_state', '3', 'Cancel.lat', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_type', '1', 'planned', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_type', '2', 'unexpected', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_status', '1', 'Iniciada', NULL, NULL);
@@ -82,14 +106,17 @@ INSERT INTO om_typevalue VALUES ('profile_papersize', '2', 'DIN A4 - 297x210', N
 INSERT INTO om_typevalue VALUES ('profile_papersize', '3', 'DIN A3 - 420x297', NULL, '{"xdim":420, "ydim":297}');
 INSERT INTO om_typevalue VALUES ('profile_papersize', '4', 'DIN A2 - 594x420', NULL, '{"xdim":594, "ydim":420}');
 INSERT INTO om_typevalue VALUES ('profile_papersize', '5', 'DIN A1 - 840x594', NULL, '{"xdim":840, "ydim":594}');
+INSERT INTO om_typevalue VALUES ('mincut_state', '4', 'On planning', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_param_type', 'INSPECCIO', 'INSPECCIO', NULL, '{"go2plan":false}');
 INSERT INTO om_typevalue VALUES ('visit_param_type', 'DESPERFECTES', 'DESPERFECTES', NULL, '{"go2plan":false}');
 INSERT INTO om_typevalue VALUES ('visit_param_type', 'RECONSTRUIR', 'RECONSTRUIR', NULL, '{"go2plan":false}');
 INSERT INTO om_typevalue VALUES ('visit_param_type', 'ALTRES', 'ALTRES', NULL, '{"go2plan":false}');
+INSERT INTO om_typevalue VALUES ('waterbalance_method', 'CPW', 'CRM PERIOD WINDOW', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('waterbalance_method', 'DCW', 'DMA CENTROID WINDOW', NULL, NULL);
 
 
 --
--- Data for Name: doc_type; Type: TABLE DATA; Schema: ud_dev_35041_ca; Owner: -
+-- Data for Name: doc_type; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO doc_type VALUES ('AS_BUILT', NULL);
@@ -100,7 +127,7 @@ INSERT INTO doc_type VALUES ('FOTO', NULL);
 
 
 --
--- Data for Name: plan_typevalue; Type: TABLE DATA; Schema: ud_dev_35041_ca; Owner: -
+-- Data for Name: plan_typevalue; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO plan_typevalue VALUES ('psector_status', '2', 'PLANIFICAT', 'Psector planificat', NULL);
@@ -124,10 +151,9 @@ INSERT INTO plan_typevalue VALUES ('psector_status', '4', 'EXECUTED (Set OPERATI
 
 
 --
--- Data for Name: config_csv; Type: TABLE DATA; Schema: ud_dev_35041_ca; Owner: -
+-- Data for Name: config_csv; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO config_csv VALUES (408, 'Import istram nodes', NULL, 'gw_fct_import_istram', false, 10, '{"query": "SELECT node_id, top_elev, sys_elev FROM v_edit_node ", "layerName":"Nodes", "group": "ISTRAM"}');
 INSERT INTO config_csv VALUES (234, 'Importar preus a la base de dades', 'El fitxer csv ha de tenir aquestes columnes per ordre: id, unit, descript, text, price.
 - La columna price ha de ser tipus numero amb dos decimals.
 - Pots triar un cataleg per els preus importats assignant-lo a Import label.
@@ -148,36 +174,33 @@ The csv file must containts next columns on same position:
 pattern_id, pattern_type, factor1,.......,factorn. 
 For WS use up factor18, repeating rows if you like. 
 For UD use up factor24. More than one row for pattern is not allowed', 'gw_fct_import_inp_pattern', true, 9, NULL);
-INSERT INTO config_csv VALUES (385, 'Import inp timeseries', 'Function to assist the import of timeseries for inp models.
-The csv file must containts next columns on same position: 
-timeseries, type, mode, date, hour, time, value (fill date/hour for ABSOLUTE or time for RELATIVE)', 'gw_fct_import_inp_timeseries', true, 9, NULL);
-INSERT INTO config_csv VALUES (409, 'Import istram arcs', NULL, 'gw_fct_import_istram', false, 11, '{"query": "SELECT arc_id, sys_elev1, sys_elev2, cat_shape, matcat_id, cat_geom1, cat_geom2 FROM v_edit_arc ", "layerName":"Arcs", "group": "ISTRAM"}');
 INSERT INTO config_csv VALUES (444, 'Import cat_feature_arc', 'The csv file must contain the following columns in the exact same order: 
 id, system_id, epa_default, code_autofill, shortcut_key, link_path, descript, active', 'gw_fct_import_cat_feature', true, 12, NULL);
 INSERT INTO config_csv VALUES (445, 'Import cat_feature_node', 'The csv file must contain the following columns in the exact same order: 
-id, system_id, epa_default, isarcdivide, isprofilesurface, code_autofill, choose_hemisphere, double_geom, num_arcs, isexitupperintro, shortcut_key, link_path, descript, active', 'gw_fct_import_cat_feature', true, 13, NULL);
+id, system_id, epa_default, isarcdivide, isprofilesurface, choose_hemisphere, code_autofill, double_geom, num_arcs, graph_delimiter, shortcut_key, link_path, descript, active', 'gw_fct_import_cat_feature', true, 13, NULL);
 INSERT INTO config_csv VALUES (446, 'Import cat_feature_connec', 'The csv file must contain the following columns in the exact same order: 
-id, system_id, code_autofill, double_geom, shortcut_key, link_path, descript, active', 'gw_fct_import_cat_feature', true, 14, NULL);
-INSERT INTO config_csv VALUES (447, 'Import cat_feature_gully', 'The csv file must contain the following columns in the exact same order: 
-id, system_id, epa_default, code_autofill, double_geom, shortcut_key, link_path, descript, active', 'gw_fct_import_cat_feature', true, 15, '{"table": "cat_feature_gully"}');
+id, system_id, epa_default, code_autofill, shortcut_key, link_path, descript, active', 'gw_fct_import_cat_feature', true, 14, NULL);
 INSERT INTO config_csv VALUES (448, 'Import cat_node', 'The csv file must contain the following columns in the exact same order: 
-id, matcat_id, shape, geom1, geom2, geom3, descript, link, brand, model, svg, estimated_y, cost_unit, cost, active, label, node_type, acoeff', 'gw_fct_import_catalog', true, 16, NULL);
+id, nodetype_id, matcat_id, pnom, dnom, dint, dext, shape, descript, link, brand, model, svg, estimated_depth, cost_unit, cost, active, label, ischange, acoeff', 'gw_fct_import_catalog', true, 16, NULL);
 INSERT INTO config_csv VALUES (449, 'Import cat_connec', 'The csv file must contain the following columns in the exact same order: 
-id, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript, link, brand, model, svg, active, label, connec_type', 'gw_fct_import_catalog', true, 17, NULL);
+id, connectype_id, matcat_id, pnom, dnom, dint, dext, descript, link, brand, model, svg, active, label', 'gw_fct_import_catalog', true, 17, NULL);
 INSERT INTO config_csv VALUES (450, 'Import cat_arc', 'The csv file must contain the following columns in the exact same order: 
-id, matcat_id, shape, geom1, geom2, geom3, geom4, geom5, geom6,geom7, geom8, geom_r, descript, link, brand, model, svg, z1, z2, width, area, estimated_depth, bulk, cost_unit, cost, m2bottom_cost, m3protec_cost, active, label, tsect_id, curve_id, arc_type, acoeff, connect_cost', 'gw_fct_import_catalog', true, 15, NULL);
-INSERT INTO config_csv VALUES (451, 'Import cat_grate', 'The csv file must contain the following columns in the exact same order: 
-id, matcat_id, length, width, total_area, effective_area, n_barr_l, n_barr_w, n_barr_diag, a_param, b_param, descript, link, brand, model, svg, active, label, gully_type', 'gw_fct_import_catalog', true, 18, NULL);
+id, arctype_id, matcat_id, pnom, dnom, dint, dext, descript, link, brand, model, svg, z1, z2, width, area, estimated_depth, bulk, cost_unit, cost, m2bottom_cost, m3protec_cost, active, label, shape, acoeff, connect_cost', 'gw_fct_import_catalog', true, 15, NULL);
 INSERT INTO config_csv VALUES (469, 'Import scada_x_data', 'Import scada_x_data', 'gw_fct_import_scada_x_data', false, 18, NULL);
 INSERT INTO config_csv VALUES (470, 'Import hydrometer_x_data', 'Import hdyrometer_x_data', 'gw_fct_import_hydrometer_x_data', false, 19, NULL);
 INSERT INTO config_csv VALUES (471, 'Import crm period values', 'Import crm period values', 'gw_fct_import_cat_period', false, 20, NULL);
+INSERT INTO config_csv VALUES (500, 'Import valve status', 'The csv file must have the folloWing fields:
+dscenario_name, node_id, status', 'gw_fct_import_valve_status', false, NULL, NULL);
+INSERT INTO config_csv VALUES (501, 'Import dscenario demands', 'The csv file must have the folloWing fields:
+dscenario_name, feature_id, feature_type, demand_type, value, source', 'gw_fct_import_dscenario_demands', false, NULL, NULL);
 
 
 --
--- Data for Name: sys_message; Type: TABLE DATA; Schema: ud_dev_35041_ca; Owner: -
+-- Data for Name: sys_message; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO sys_message VALUES (2080, 'El valor de x es massa garn. La longitud total de la línea és', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1018, 'No hi ha tipus d''arc defnits en el model', 'Definir com a mínim un', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3150, 'Backup has no data related to table', 'Please check it before continue', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3134, 'There''s no default value for Obsolete state_type', 'You need to define one default value for Obsolete state_type', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3136, 'There''s no default value for On Service state_type', 'You need to define one default value for On Service state_type', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3138, 'Before use connec on planified mode you need to create a related link', NULL, 2, true, 'utils', 'core');
@@ -194,7 +217,6 @@ INSERT INTO sys_message VALUES (3182, 'It is not allowed to downgrade (state=0) 
 INSERT INTO sys_message VALUES (3140, 'Node is connected to arc which is involved in psector', 'Try replacing node with feature replace tool or disconnect it using end feature tool', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3146, 'Backup name is missing', 'Insert value in key backupName', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3148, 'Backup name already exists', 'Try with other name or delete the existing one before', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3150, 'Backup has no data related to table', 'Please check it before continue', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3152, 'Null values on geom1 or geom2 fields on element catalog', 'Please check it before continue', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3154, 'It is not possible to add this connec to psector because it is related to node', 'Move endpoint of link closer than 0.01m to relate it to parent arc', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3156, 'Input parameter has null value', 'Please check it before continue', 2, true, 'utils', 'core');
@@ -213,6 +235,7 @@ INSERT INTO sys_message VALUES (1083, 'Si us plau configuri la seva propia varia
 INSERT INTO sys_message VALUES (1008, 'No hi ha sectors definits en el model', 'Definir com a mínim un', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (2042, 'Dma no està en la explotació definida. Si su plau revisi les seves dades', 'L''element ha d''estar dintre del dma que està relacionat amb l''explotació definida', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3018, 'El còdig de client està duplicat per a escomeses amb estat=1', 'Revisi les seves dades.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1106, 'Eliminar no està permès. Hi ha hidrometer_id a ...', 'None', 2, true, 'ws', 'core');
 INSERT INTO sys_message VALUES (1096, 'Node amb estat 2 a sobre d''un altre node amb estat=2 en la mateixa alternativa no està permès. El node és :', 'Revisi les dades del seu projecte. No és possible tenir més d''un node amb el mateix estat en la mateixa posició', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3022, 'El valor instertat no està permès en el catàlag. Catalog, field:', 'Agréguuili a la taula typevalue correcpondent per a poder utilitzar-la.', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (1044, 'Existeixen una o més conexions més properes que la distancia mínima configurada, conneec_id:', 'Verifiqui el seu projecte o modifiqui les propietats de configuració', 2, true, 'utils', 'core');
@@ -289,7 +312,8 @@ INSERT INTO sys_message VALUES (3024, 'No es pot eliminar el paràmetre. Hi ha a
 INSERT INTO sys_message VALUES (3040, 'L''usuari amnb aquest nom ja existeix', 'None', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3064, 'Hi ha un patró amb el mateix nom en la taula inp_pattern', 'Si us plau verifiqui abans de continuar.', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3038, 'El valor insertat té caràcters no acceptats:', 'No utuilitzi accents, punts o guions en la idetificació i el nom de la vista child', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1018, 'No hi ha tipus d''arc defnits en el model', 'Definir com a mínim un', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3014, 'la identificació de la posició no és node_1 o node_2 de l''arc seleccionat.', 'Si us plau revisi les seves dades', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3012, 'El valor de posició és major que la longitud total de l''arc.', 'Si us plau revisi les seves dades', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3110, 'There is no municipality defined in the model', 'None', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (2006, 'És impossible utilitzar el node per a fusionar dos arcs', 'El node no té 2 arcs', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3112, 'No class visit', 'None', 2, true, 'utils', 'core');
@@ -306,7 +330,6 @@ INSERT INTO sys_message VALUES (3124, 'Visit manager have been initialized', 'No
 INSERT INTO sys_message VALUES (3126, 'Visit manager have been finished', 'None', 0, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (1102, 'Inserir no estar permès. No hi ha hidrometer_id en...', 'None', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (1032, 'Eliminar nodes d''aquesta taula no està permès', 'Per eliminar un nou node, utilitzi la capa node en INVENTARI', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1106, 'Eliminar no està permès. Hi ha hidrometer_id a ...', 'None', 2, true, 'ws', 'core');
 INSERT INTO sys_message VALUES (1084, 'Inexistent node_id:', 'None', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (1082, 'Inexistent arc_id:', 'None', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (2034, 'El seu catàlag és diferent al tipus de node', 'Les seves dades també han d''estar en e catàlag de nodes', 2, true, 'utils', 'core');
@@ -327,6 +350,7 @@ INSERT INTO sys_message VALUES (2026, 'Hi ha conflictes contra un altre mincut p
 INSERT INTO sys_message VALUES (3130, 'Lot succesfully deleted', 'None', 0, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3132, 'Schema defined does not exists. Check your qgis project variable gwAddSchema', 'None', 1, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (2092, 'Hi ha valors nuls en la columne [price] de csv', 'Si us plau revisi abans de continuar', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2080, 'El valor de x es massa garn. La longitud total de la línea és', 'None', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (2040, 'La geometria reduida no és una cadena lineal, (arc_id, geomtype)=', 'None', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (2086, 'Hi ha valors nuls en la columne [id] de csv. Revise''l', 'None', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (2082, 'La extensió no existeix. Extension =', 'None', 2, true, 'utils', 'core');
@@ -377,7 +401,7 @@ INSERT INTO sys_message VALUES (3186, 'Workspace is being used by some user and 
 INSERT INTO sys_message VALUES (3188, 'Workspace name already exists', 'Please set a new one or delete existing workspace', 1, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3190, 'There are no nodes defined as arcs finals', 'First insert csv file with nodes definition', 2, true, 'ud', 'core');
 INSERT INTO sys_message VALUES (3192, 'It is not possible to connect on service arc with a planified node', 'Reconnect arc with node state 1', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3194, 'The value can not be inserted', 'It is not present on a table', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3194, 'It is not possible to downgrade connec because has operative hydrometer associated', 'Unlink hydrometers first', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3196, 'Shortcut key is already defined for another feature', 'Change it before uploading configuration', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3090, 'Si us plau ingressi una graphClass vàlida', 'None', 2, true, 'ws', 'core');
 INSERT INTO sys_message VALUES (3198, 'Field defined as target for DEM data is not related to elevation', 'Configure correctly parameter admin_raster_dem on config_param_system table or using configuration button', 2, true, 'utils', 'core');
@@ -387,6 +411,7 @@ INSERT INTO sys_message VALUES (3202, 'It''s not possible to break planned arcs 
 INSERT INTO sys_message VALUES (3204, 'This connec has an associated link', 'Remove the associated link and arc_id field will be set to null', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3208, 'This connec has an associated link', 'Remove the associated link and arc_id field will be set to null', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3210, 'It''s impossible to downgrade the state of a planned connec', 'To unlink,  remove from psector dialog or delete it', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3212, 'It''s impossible to update arc_id from psector dialog because this planned link has not arc as exit-type', 'Use connec dialog to update it', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3218, 'It''s impossible to attach operative link to planned feature', 'Set link''s state to planned to continue', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3220, 'It''s impossible to change link''s state to operative, because it''s related to a planned feature', NULL, 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3222, 'It''s impossible to upgrade link', 'In order to work with planned link, create new one by drawing it on link layer, using link2network button or feature/psector dialogs (setting arc_id)', 2, true, 'utils', 'core');
@@ -394,113 +419,142 @@ INSERT INTO sys_message VALUES (3224, 'It''s impossible to create a planned link
 INSERT INTO sys_message VALUES (3226, 'It''s impossible to downgrade link', 'If you want to remove it from psector, delete it', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3076, 'No és possible crear l''enllaç. En el mode d''inventari, només s''habilita un enllaç per a cada escomesa. Cennec_id:', 'In order to relate link with psector use psector dialog or link2network button. you can''t draw in on link layer', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3082, 'No és possible relacionar escomesa amb una altre escomesa o node mentres es treballa amb alternatives en el mode de planificació. Només els arcs estan disponibles', 'You can''t have two links related to the same feature (connec/gully) in one psector', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3206, 'This gully has an associated link', 'Remove the associated link and arc_id field will be set to null', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (3214, 'It''s impossible to downgrade the state of a planned gully', 'To unlink it from psector remove row or delete gully', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (3216, 'It''s impossible to update arc_id from psector dialog because this planned link has not arc as exit-type', 'Use gully dialog to update it', 2, true, 'ud', 'core');
 INSERT INTO sys_message VALUES (3228, 'It is not possible to insert arc into psector because has operative connects associated', 'You need to previously insert related connects into psector', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3164, 'Arc have incorrectly defined final nodes in this plan alternative', 'Make sure that arcs finales are on service or check by using toolbox function Check plan data (fid= 355)', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3212, 'IT iS IMPOSSIBLE TO UPDATE ARC_ID FROM PSECTOR DIALOG BECAUSE THIS PLANNED LINK HAS NOT ARC AS EXIT-TYPE', 'USE CONNECT(CONNEC-GULLY) DIALOG OR EDIT THE GEOMETRY OF THE LINK ON CANVAS TO UPDATE IT', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3238, 'Dscenario with this name doesn''t exist', 'Create an empty dscenario with the same name as indicated in csv file in order to continue the import of data', 2, true, 'ws', 'core');
 
 
 --
--- Data for Name: cat_feature; Type: TABLE DATA; Schema: ud_dev_35041_ca; Owner: -
+-- Data for Name: cat_feature; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO cat_feature VALUES ('ESCOMESA', 'CONNEC', 'CONNEC', NULL, 'v_edit_connec', 've_connec_escomesa', NULL, NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('ESCOMESA_FICTICIA', 'CONNEC', 'CONNEC', NULL, 'v_edit_connec', 've_connec_escomesa_ficticia', NULL, NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('CONDUCTE', 'CONDUIT', 'ARC', NULL, 'v_edit_arc', 've_arc_conducte', NULL, NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('IMPULSIO', 'CONDUIT', 'ARC', NULL, 'v_edit_arc', 've_arc_impulsio', NULL, NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('PUNT_ALT', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_punt_alt', NULL, NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('REGISTRE', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_registre', NULL, NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('CANVI_SECCIO', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_canvi_seccio', NULL, NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('NODE_FICTICI', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_node_fictici', NULL, NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('DESGUAS', 'OUTFALL', 'NODE', NULL, 'v_edit_node', 've_node_desguas', NULL, NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('UNIO', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_unio', NULL, NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('PRESA', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_presa', NULL, NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('EMBORNAL', 'GULLY', 'GULLY', NULL, 'v_edit_gully', 've_gully_embornal', NULL, NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('REIXA', 'GULLY', 'GULLY', NULL, 'v_edit_gully', 've_gully_reixa', NULL, NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('EMBORNAL_FICTICI', 'GULLY', 'GULLY', NULL, 'v_edit_gully', 've_gully_embornal_fictici', NULL, NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('SIFO', 'SIPHON', 'ARC', NULL, 'v_edit_arc', 've_arc_sifo', NULL, NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('RAPID', 'WACCEL', 'ARC', NULL, 'v_edit_arc', 've_arc_rapid', NULL, NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('FICTICI', 'VARC', 'ARC', NULL, 'v_edit_arc', 've_arc_fictici', NULL, NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('POU_CIRCULAR', 'MANHOLE', 'NODE', NULL, 'v_edit_node', 've_node_pou_circular', NULL, NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('SALT', 'WJUMP', 'NODE', NULL, 'v_edit_node', 've_node_salt', NULL, NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('POU_RECTANGULAR', 'MANHOLE', 'NODE', NULL, 'v_edit_node', 've_node_pou_rectangular', NULL, NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('ARQUETA_SORRERA', 'MANHOLE', 'NODE', NULL, 'v_edit_node', 've_node_arqueta_sorrera', NULL, NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('EDAR', 'WWTP', 'NODE', NULL, 'v_edit_node', 've_node_edar', NULL, NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('VALVULA', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula', NULL, NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('EMBORNAL_TOPO', 'NETGULLY', 'NODE', NULL, 'v_edit_node', 've_node_embornal_topo', NULL, NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('ELEMENT_TOPO', 'NETELEMENT', 'NODE', NULL, 'v_edit_node', 've_node_element_topo', NULL, NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('INICI', 'NETINIT', 'NODE', NULL, 'v_edit_node', 've_node_inici', NULL, NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('CAMBRA', 'CHAMBER', 'NODE', NULL, 'v_edit_node', 've_node_cambra', NULL, NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('DIPOSIT', 'STORAGE', 'NODE', NULL, 'v_edit_node', 've_node_diposit', NULL, NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('DIPOSIT_DESBORDAMENT', 'STORAGE', 'NODE', NULL, 'v_edit_node', 've_node_diposit_desbordament', NULL, NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('ESTACIO_BOMBAMENT', 'CHAMBER', 'NODE', NULL, 'v_edit_node', 've_node_estacio_bombament', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('ESCOMESA', 'WJOIN', 'CONNEC', NULL, 'v_edit_connec', 've_connec_escomesa', 'Escomesa', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('ESCOMESA_FICTICIA', 'WJOIN', 'CONNEC', NULL, 'v_edit_connec', 've_connec_escomesa_ficticia', 'Connec fictici', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('TUBERIA', 'PIPE', 'ARC', NULL, 'v_edit_arc', 've_arc_tuberia', 'Tuberia de distribució d''aigua', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVULA_CONTROL', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_control', 'Vàlvula de control', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVULA_REDUCTORA', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_reductora', 'Vàlvula reductora', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('GREEN_VALVE', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_green_valve', 'Green valve', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('CORBA', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_corba', 'Corba', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('FINAL_LINEA', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_final_linea', 'Final de línia', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVULA_CONTROL_FL', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_control_fl', 'Vàlvula controladora de fluxe', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVULA', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula', 'Vàlvula genèrica', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVULA_TRENCA_PRESSIO', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_trenca_pressio', 'Vàlvula trencadora de pressió', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVULA_DESGUAS', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_desguas', 'Vàlvula de desguàs', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('UNIO', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_unio', 'Unió', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVULA_SOST_PRESSIO', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_sost_pressio', 'Vàlvula sostenidora de pressió', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVULA_SHUTOFF', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_shutoff', 'Vàlvula shutoff', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('DIPOSIT', 'TANK', 'NODE', NULL, 'v_edit_node', 've_node_diposit', 'Dipòsit', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVULA_ACCEL', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_accel', 'Vàlvula d''acceleració', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('T', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_t', 'Unió on 3 conductes convergeixen', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('X', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_x', 'Unió on 4 conductes convergeixen', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVULA_VENTOSA', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_ventosa', 'Vàlvula ventosa', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('ADAPTACIO', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_adaptacio', 'Adaptació', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('BOCA_REG', 'GREENTAP', 'CONNEC', NULL, 'v_edit_connec', 've_connec_boca_reg', 'Boca de reg', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('FONT_ORNAMENTAL', 'FOUNTAIN', 'CONNEC', NULL, 'v_edit_connec', 've_connec_font_ornamental', 'Font ornamental', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('FONT', 'TAP', 'CONNEC', NULL, 'v_edit_connec', 've_connec_font', 'Font pública', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('VARC', 'VARC', 'ARC', 'A', 'v_edit_arc', 've_arc_varc', 'Secció virtual d''una tuberia de la xarxa. Utilitzada per connectar arcs i nodes quan tenen polígons', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('POU', 'WATERWELL', 'NODE', NULL, 'v_edit_node', 've_node_pou', 'Pou', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('PUNT_MOSTREIG', 'NETSAMPLEPOINT', 'NODE', NULL, 'v_edit_node', 've_node_punt_mostreig', 'Punt de mostreig', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('ESTACIO_TRACTAMENT', 'WTP', 'NODE', NULL, 'v_edit_node', 've_node_estacio_tractament', 'Estació de tractament', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('FILTRE', 'FILTER', 'NODE', NULL, 'v_edit_node', 've_node_filtre', 'Filtre', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('HIDRANT', 'HYDRANT', 'NODE', NULL, 'v_edit_node', 've_node_hidrant', 'Hidrant', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('REDUCCIO', 'REDUCTION', 'NODE', NULL, 'v_edit_node', 've_node_reduccio', 'Reducció', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('BOMBA', 'PUMP', 'NODE', NULL, 'v_edit_node', 've_node_bomba', 'Bomba', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('CAPTACIO', 'SOURCE', 'NODE', NULL, 'v_edit_node', 've_node_captacio', 'Captació', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('POU_ACCES', 'MANHOLE', 'NODE', NULL, 'v_edit_node', 've_node_pou_acces', 'Pou accés', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('REGISTRE', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_registre', 'Registre', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('REGISTRE_CONTROL', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_registre_control', 'Registre de control', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('REGISTRE_BYPASS', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_registre_bypass', 'Registre de bypass', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('VALVULA_REGISTRE', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_valvula_registre', 'Registre de vàlvula', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('ESCOMESA_TOPO', 'NETWJOIN', 'NODE', NULL, 'v_edit_node', 've_node_escomesa_topo', 'Escomesa topològica', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('DILATADOR', 'FLEXUNION', 'NODE', NULL, 'v_edit_node', 've_node_dilatador', 'Dilatador', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('MEDIDOR_FLUID', 'METER', 'NODE', NULL, 'v_edit_node', 've_node_medidor_fluid', 'Medidor de fluid', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('TANC_EXPANSIO', 'EXPANSIONTANK', 'NODE', NULL, 'v_edit_node', 've_node_tanc_expansio', 'Tanc d''expansió', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('MEDIDOR_PRESSIO', 'METER', 'NODE', NULL, 'v_edit_node', 've_node_medidor_pressio', 'Medidor de pressió', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('NETELEMENT', 'NETELEMENT', 'NODE', 'Alt+E', 'v_edit_node', 've_node_netelement', 'Element topològic', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('RECLORADOR', 'NETELEMENT', 'NODE', NULL, 'v_edit_node', 've_node_reclorador', 'Element to reclorate water', NULL, true, false, NULL);
 INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_edit_link', 'Link', NULL, true, false, NULL);
 
 
 --
--- Data for Name: cat_feature_arc; Type: TABLE DATA; Schema: ud_dev_35041_ca; Owner: -
+-- Data for Name: cat_feature_arc; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO cat_feature_arc VALUES ('CONDUCTE', 'CONDUIT', 'CONDUIT');
-INSERT INTO cat_feature_arc VALUES ('IMPULSIO', 'CONDUIT', 'CONDUIT');
-INSERT INTO cat_feature_arc VALUES ('SIFO', 'SIPHON', 'CONDUIT');
-INSERT INTO cat_feature_arc VALUES ('RAPID', 'WACCEL', 'CONDUIT');
-INSERT INTO cat_feature_arc VALUES ('FICTICI', 'VARC', 'OUTLET');
+INSERT INTO cat_feature_arc VALUES ('TUBERIA', 'PIPE', 'PIPE');
+INSERT INTO cat_feature_arc VALUES ('VARC', 'VARC', 'PIPE');
 
 
 --
--- Data for Name: cat_feature_connec; Type: TABLE DATA; Schema: ud_dev_35041_ca; Owner: -
+-- Data for Name: cat_feature_connec; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO cat_feature_connec VALUES ('ESCOMESA', 'CONNEC', '{"activated":false,"value":1}');
-INSERT INTO cat_feature_connec VALUES ('ESCOMESA_FICTICIA', 'CONNEC', '{"activated":false,"value":1}');
-
-
---
--- Data for Name: cat_feature_gully; Type: TABLE DATA; Schema: ud_dev_35041_ca; Owner: -
---
-
-INSERT INTO cat_feature_gully VALUES ('EMBORNAL', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
-INSERT INTO cat_feature_gully VALUES ('REIXA', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
-INSERT INTO cat_feature_gully VALUES ('EMBORNAL_FICTICI', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
+INSERT INTO cat_feature_connec VALUES ('ESCOMESA', 'WJOIN', '{"activated":false,"value":1}', 'JUNCTION');
+INSERT INTO cat_feature_connec VALUES ('BOCA_REG', 'GREENTAP', '{"activated":false,"value":1}', 'JUNCTION');
+INSERT INTO cat_feature_connec VALUES ('FONT_ORNAMENTAL', 'FOUNTAIN', '{"activated":false,"value":1}', 'JUNCTION');
+INSERT INTO cat_feature_connec VALUES ('FONT', 'TAP', '{"activated":false,"value":1}', 'JUNCTION');
+INSERT INTO cat_feature_connec VALUES ('ESCOMESA_FICTICIA', 'WJOIN', '{"activated":false,"value":1}', 'JUNCTION');
 
 
 --
--- Data for Name: cat_feature_node; Type: TABLE DATA; Schema: ud_dev_35041_ca; Owner: -
+-- Data for Name: cat_feature_node; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO cat_feature_node VALUES ('POU_CIRCULAR', 'MANHOLE', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('PUNT_ALT', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('REGISTRE', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('CANVI_SECCIO', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('NODE_FICTICI', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('SALT', 'WJUMP', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('POU_RECTANGULAR', 'MANHOLE', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('ARQUETA_SORRERA', 'MANHOLE', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('EDAR', 'WWTP', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VALVULA', 'VALVE', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('DESGUAS', 'OUTFALL', 'OUTFALL', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('EMBORNAL_TOPO', 'NETGULLY', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('UNIO', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('ELEMENT_TOPO', 'NETELEMENT', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('INICI', 'NETINIT', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('CAMBRA', 'CHAMBER', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('PRESA', 'CHAMBER', 'JUNCTION', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('DIPOSIT', 'STORAGE', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('DIPOSIT_DESBORDAMENT', 'STORAGE', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('ESTACIO_BOMBAMENT', 'CHAMBER', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('RECLORADOR', 'NETELEMENT', 'SHORTPIPE', 2, true, true, 'DQA', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('ADAPTACIO', 'JUNCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('CORBA', 'JUNCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('FINAL_LINEA', 'JUNCTION', 'JUNCTION', 1, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('UNIO', 'JUNCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('T', 'JUNCTION', 'JUNCTION', 3, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('X', 'JUNCTION', 'JUNCTION', 4, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_REDUCTORA', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_CONTROL_FL', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_TRENCA_PRESSIO', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_SOST_PRESSIO', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_ACCEL', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_VENTOSA', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('GREEN_VALVE', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_DESGUAS', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_CONTROL', 'VALVE', 'SHORTPIPE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_SHUTOFF', 'VALVE', 'SHORTPIPE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('REGISTRE', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('REGISTRE_CONTROL', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('REGISTRE_BYPASS', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_REGISTRE', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('NETELEMENT', 'NETELEMENT', 'JUNCTION', 2, true, true, 'DQA', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('TANC_EXPANSIO', 'EXPANSIONTANK', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('FILTRE', 'FILTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('DILATADOR', 'FLEXUNION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('MEDIDOR_FLUID', 'METER', 'JUNCTION', 2, true, true, 'DMA', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('MEDIDOR_PRESSIO', 'METER', 'JUNCTION', 2, true, true, 'DMA', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('HIDRANT', 'HYDRANT', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('POU_ACCES', 'MANHOLE', 'RESERVOIR', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('PUNT_MOSTREIG', 'NETSAMPLEPOINT', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('BOMBA', 'PUMP', 'PUMP', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('REDUCCIO', 'REDUCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('CAPTACIO', 'SOURCE', 'RESERVOIR', 2, true, true, 'SECTOR', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('DIPOSIT', 'TANK', 'TANK', 9, true, true, 'SECTOR', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('ESCOMESA_TOPO', 'NETWJOIN', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('POU', 'WATERWELL', 'JUNCTION', 2, true, true, 'SECTOR', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('ESTACIO_TRACTAMENT', 'WTP', 'RESERVOIR', 2, true, true, 'SECTOR', false, '{"activated":false,"value":1}');
 
 
 --
--- Data for Name: element_type; Type: TABLE DATA; Schema: ud_dev_35041_ca; Owner: -
+-- Data for Name: element_type; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO element_type VALUES ('TAPA', true, true, NULL, NULL);
-INSERT INTO element_type VALUES ('COMPORTA', true, true, NULL, NULL);
-INSERT INTO element_type VALUES ('SENSOR_IOT', true, true, NULL, NULL);
-INSERT INTO element_type VALUES ('BOMBA', true, true, NULL, NULL);
-INSERT INTO element_type VALUES ('PATE', true, true, NULL, NULL);
-INSERT INTO element_type VALUES ('PROTECTOR', true, true, NULL, NULL);
+INSERT INTO element_type VALUES ('REGISTRE', true, true, 'REGISTRE', NULL);
+INSERT INTO element_type VALUES ('POU', true, true, 'POU', NULL);
+INSERT INTO element_type VALUES ('TAPA', true, true, 'TAPA', NULL);
+INSERT INTO element_type VALUES ('PATE', true, true, 'PATE', NULL);
+INSERT INTO element_type VALUES ('BANDA_PROTECCIO', true, true, 'BANDA_PROTECCIO', NULL);
+INSERT INTO element_type VALUES ('PLACA_HIDRANT', true, true, 'PLACA_HIDRANT', NULL);
+
+
+--
+-- Data for Name: config_graph_valve; Type: TABLE DATA; Schema: ; Owner: -
+--
+
+INSERT INTO config_graph_valve VALUES ('VALVULA_SHUTOFF', true);
+
 

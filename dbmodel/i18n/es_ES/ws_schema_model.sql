@@ -7,7 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
 --
 -- Data for Name: value_state; Type: TABLE DATA; Schema: ; Owner: -
 --
@@ -392,6 +391,7 @@ INSERT INTO sys_message VALUES (3186, 'Workspace is being used by some user and 
 INSERT INTO sys_message VALUES (3188, 'Workspace name already exists', 'Please set a new one or delete existing workspace', 1, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3190, 'There are no nodes defined as arcs finals', 'First insert csv file with nodes definition', 2, true, 'ud', 'core');
 INSERT INTO sys_message VALUES (3192, 'It is not possible to connect on service arc with a planified node', 'Reconnect arc with node state 1', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3194, 'It is not possible to downgrade connec because has operative hydrometer associated', 'Unlink hydrometers first', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3196, 'Shortcut key is already defined for another feature', 'Change it before uploading configuration', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3090, 'Please enter a valid graphClass', NULL, 2, true, 'ws', 'core');
 INSERT INTO sys_message VALUES (3198, 'Field defined as target for DEM data is not related to elevation', 'Configure correctly parameter admin_raster_dem on config_param_system table or using configuration button', 2, true, 'utils', 'core');
@@ -401,6 +401,7 @@ INSERT INTO sys_message VALUES (3202, 'It''s not possible to break planned arcs 
 INSERT INTO sys_message VALUES (3204, 'This connec has an associated link', 'Remove the associated link and arc_id field will be set to null', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3208, 'This connec has an associated link', 'Remove the associated link and arc_id field will be set to null', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3210, 'It''s impossible to downgrade the state of a planned connec', 'To unlink,  remove from psector dialog or delete it', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3212, 'It''s impossible to update arc_id from psector dialog because this planned link has not arc as exit-type', 'Use connec dialog to update it', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3218, 'It''s impossible to attach operative link to planned feature', 'Set link''s state to planned to continue', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3220, 'It''s impossible to change link''s state to operative, because it''s related to a planned feature', NULL, 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3222, 'It''s impossible to upgrade link', 'In order to work with planned link, create new one by drawing it on link layer, using link2network button or feature/psector dialogs (setting arc_id)', 2, true, 'utils', 'core');
@@ -411,8 +412,6 @@ INSERT INTO sys_message VALUES (3082, 'The psector strategy is limited to only o
 INSERT INTO sys_message VALUES (3228, 'It is not possible to insert arc into psector because has operative connects associated', 'You need to previously insert related connects into psector', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3164, 'Arc have incorrectly defined final nodes in this plan alternative', 'Make sure that arcs finales are on service or check by using toolbox function Check plan data (fid= 355)', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3238, 'Dscenario with this name doesn''t exist', 'Create an empty dscenario with the same name as indicated in csv file in order to continue the import of data', 2, true, 'ws', 'core');
-INSERT INTO sys_message VALUES (3212, 'IT iS IMPOSSIBLE TO UPDATE ARC_ID FROM PSECTOR DIALOG BECAUSE THIS PLANNED LINK HAS NOT ARC AS EXIT-TYPE', 'USE CONNECT(CONNEC-GULLY) DIALOG OR EDIT THE GEOMETRY OF THE LINK ON CANVAS TO UPDATE IT', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3194, 'It is not possible to downgrade connec because has operative hydrometer associated', 'Unlink hydrometers first or set edit_connec_downgrade_force on config_param_system to true', 2, true, 'utils', 'core');
 
 
 --

@@ -1,7 +1,14 @@
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
 
+
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 --
--- Data for Name: value_state; Type: TABLE DATA; Schema: ud_dev_35041_en; Owner: -
+-- Data for Name: value_state; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO value_state VALUES (0, 'OBSOLETE', NULL);
@@ -9,9 +16,8 @@ INSERT INTO value_state VALUES (2, 'PLANIFIED', NULL);
 INSERT INTO value_state VALUES (1, 'OPERATIVE', NULL);
 
 
-
 --
--- Data for Name: value_state_type; Type: TABLE DATA; Schema: ud_dev_35041_en; Owner: -
+-- Data for Name: value_state_type; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO value_state_type VALUES (3, 2, 'PLANIFIED', true, true);
@@ -23,7 +29,7 @@ INSERT INTO value_state_type VALUES (2, 1, 'OPERATIVE', true, true);
 
 
 --
--- Data for Name: edit_typevalue; Type: TABLE DATA; Schema: ud_dev_35041_en; Owner: -
+-- Data for Name: edit_typevalue; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO edit_typevalue VALUES ('nullvalue', '0', NULL, NULL, NULL);
@@ -59,7 +65,7 @@ INSERT INTO edit_typevalue VALUES ('value_review_status', '4', 'Only review obse
 
 
 --
--- Data for Name: om_typevalue; Type: TABLE DATA; Schema: ud_dev_35041_en; Owner: -
+-- Data for Name: om_typevalue; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO om_typevalue VALUES ('visit_parameter_criticity', '1', 'Urgent', NULL, NULL);
@@ -91,7 +97,7 @@ INSERT INTO om_typevalue VALUES ('visit_param_type', 'REHABIT', 'REHABIT', NULL,
 
 
 --
--- Data for Name: doc_type; Type: TABLE DATA; Schema: ud_dev_35041_en; Owner: -
+-- Data for Name: doc_type; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO doc_type VALUES ('AS_BUILT', NULL);
@@ -102,7 +108,7 @@ INSERT INTO doc_type VALUES ('PICTURE', NULL);
 
 
 --
--- Data for Name: plan_typevalue; Type: TABLE DATA; Schema: ud_dev_35041_en; Owner: -
+-- Data for Name: plan_typevalue; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO plan_typevalue VALUES ('psector_status', '2', 'PLANNED', 'Psector planned', NULL);
@@ -126,7 +132,7 @@ INSERT INTO plan_typevalue VALUES ('psector_status', '4', 'EXECUTED (Set OPERATI
 
 
 --
--- Data for Name: config_csv; Type: TABLE DATA; Schema: ud_dev_35041_en; Owner: -
+-- Data for Name: config_csv; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO config_csv VALUES (234, 'Import db prices', 'The csv file must contains next columns on same position: id, unit, descript, text, price. 
@@ -176,7 +182,7 @@ INSERT INTO config_csv VALUES (471, 'Import crm period values', 'Import crm peri
 
 
 --
--- Data for Name: sys_message; Type: TABLE DATA; Schema: ud_dev_35041_en; Owner: -
+-- Data for Name: sys_message; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO sys_message VALUES (-1, 'Uncatched error', 'Open PotgreSQL log file to get more details', 2, true, 'generic', 'core');
@@ -393,6 +399,7 @@ INSERT INTO sys_message VALUES (3202, 'It''s not possible to break planned arcs 
 INSERT INTO sys_message VALUES (3204, 'This connec has an associated link', 'Remove the associated link and arc_id field will be set to null', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3208, 'This connec has an associated link', 'Remove the associated link and arc_id field will be set to null', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3210, 'It''s impossible to downgrade the state of a planned connec', 'To unlink,  remove from psector dialog or delete it', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3212, 'It''s impossible to update arc_id from psector dialog because this planned link has not arc as exit-type', 'Use connec dialog to update it', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3218, 'It''s impossible to attach operative link to planned feature', 'Set link''s state to planned to continue', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3220, 'It''s impossible to change link''s state to operative, because it''s related to a planned feature', NULL, 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3222, 'It''s impossible to upgrade link', 'In order to work with planned link, create new one by drawing it on link layer, using link2network button or feature/psector dialogs (setting arc_id)', 2, true, 'utils', 'core');
@@ -404,11 +411,10 @@ INSERT INTO sys_message VALUES (3206, 'This gully has an associated link', 'Remo
 INSERT INTO sys_message VALUES (3214, 'It''s impossible to downgrade the state of a planned gully', 'To unlink it from psector remove row or delete gully', 2, true, 'ud', 'core');
 INSERT INTO sys_message VALUES (3216, 'It''s impossible to update arc_id from psector dialog because this planned link has not arc as exit-type', 'Use gully dialog to update it', 2, true, 'ud', 'core');
 INSERT INTO sys_message VALUES (3228, 'It is not possible to insert arc into psector because has operative connects associated', 'You need to previously insert related connects into psector', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3212, 'IT iS IMPOSSIBLE TO UPDATE ARC_ID FROM PSECTOR DIALOG BECAUSE THIS PLANNED LINK HAS NOT ARC AS EXIT-TYPE', 'USE CONNECT(CONNEC-GULLY) DIALOG OR EDIT THE GEOMETRY OF THE LINK ON CANVAS TO UPDATE IT', 2, true, 'utils', 'core');
 
 
 --
--- Data for Name: cat_feature; Type: TABLE DATA; Schema: ud_dev_35041_en; Owner: -
+-- Data for Name: cat_feature; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO cat_feature VALUES ('CONNEC', 'CONNEC', 'CONNEC', 'Ctrl+C', 'v_edit_connec', 've_connec_connec', NULL, NULL, true, true, NULL);
@@ -444,9 +450,8 @@ INSERT INTO cat_feature VALUES ('PUMP_STATION', 'CHAMBER', 'NODE', NULL, 'v_edit
 INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_edit_link', 'Link', NULL, true, false, NULL);
 
 
-
 --
--- Data for Name: cat_feature_arc; Type: TABLE DATA; Schema: ud_dev_35041_en; Owner: -
+-- Data for Name: cat_feature_arc; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO cat_feature_arc VALUES ('CONDUIT', 'CONDUIT', 'CONDUIT');
@@ -457,7 +462,7 @@ INSERT INTO cat_feature_arc VALUES ('PUMP_PIPE', 'CONDUIT', 'CONDUIT');
 
 
 --
--- Data for Name: cat_feature_connec; Type: TABLE DATA; Schema: ud_dev_35041_en; Owner: -
+-- Data for Name: cat_feature_connec; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO cat_feature_connec VALUES ('CONNEC', 'CONNEC', '{"activated":false,"value":1}');
@@ -465,7 +470,7 @@ INSERT INTO cat_feature_connec VALUES ('VCONNEC', 'CONNEC', '{"activated":false,
 
 
 --
--- Data for Name: cat_feature_gully; Type: TABLE DATA; Schema: ud_dev_35041_en; Owner: -
+-- Data for Name: cat_feature_gully; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO cat_feature_gully VALUES ('GULLY', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
@@ -474,7 +479,7 @@ INSERT INTO cat_feature_gully VALUES ('VGULLY', 'GULLY', '{"activated":false,"va
 
 
 --
--- Data for Name: cat_feature_node; Type: TABLE DATA; Schema: ud_dev_35041_en; Owner: -
+-- Data for Name: cat_feature_node; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO cat_feature_node VALUES ('CIRC_MANHOLE', 'MANHOLE', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
@@ -500,7 +505,7 @@ INSERT INTO cat_feature_node VALUES ('PUMP_STATION', 'CHAMBER', 'STORAGE', 2, tr
 
 
 --
--- Data for Name: element_type; Type: TABLE DATA; Schema: ud_dev_35041_en; Owner: -
+-- Data for Name: element_type; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO element_type VALUES ('COVER', true, true, NULL, NULL);
@@ -509,4 +514,5 @@ INSERT INTO element_type VALUES ('IOT SENSOR', true, true, NULL, NULL);
 INSERT INTO element_type VALUES ('PUMP', true, true, NULL, NULL);
 INSERT INTO element_type VALUES ('STEP', true, true, NULL, NULL);
 INSERT INTO element_type VALUES ('PROTECTOR', true, true, NULL, NULL);
+
 
