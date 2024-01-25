@@ -54,3 +54,9 @@ UPDATE config_form_fields SET layoutname='lyt_data_1', tabname='tab_data' WHERE 
 
 -- 22/01/2024
 UPDATE config_form_fields SET widgetfunction='{"functionName": "open_selected_path", "parameters":{"targetwidget":"tab_hydrometer_tbl_hydrometer", "columnfind": "hydrometer_link"}}'::json WHERE columnname='btn_link' AND tabname='tab_hydrometer';
+
+--25/01/24
+UPDATE sys_table SET id='v_edit_inp_subc2outlet' where id='vi_subcatch2outlet'; 
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") VALUES(3300, 'gw_trg_edit_inp_subc2outlet', 'ud', 'trigger function', NULL, NULL, NULL, 'role_master', NULL, 'core');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") VALUES(3252, 'There is no subcatchment or outlet_id nearby', 'Place the line inside a subcatchment or use the snapping tool to set an outlet_id for the subcatchment.', 2, true, 'utils', 'core');

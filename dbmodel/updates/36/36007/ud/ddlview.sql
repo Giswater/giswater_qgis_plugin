@@ -436,3 +436,31 @@ AS SELECT v_connec.connec_id,
   
 SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"featureType":"CONNEC"},
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"plot_code" }}$$);
+
+
+
+--25/01/24
+drop view if exists vi_subcatch2outlet;
+
+CREATE OR REPLACE VIEW v_edit_inp_subc2outlet
+AS SELECT a.subc_id,
+    a.outlet_id,
+    a.outlet_type,
+    st_length2d(a.the_geom) AS length,
+    a.hydrology_id,
+    a.the_geom
+   FROM ( SELECT s1.subc_id,
+            s1.outlet_id,
+            'JUNCTION'::text AS outlet_type,
+            s1.hydrology_id,
+            st_makeline(st_centroid(s1.the_geom), node.the_geom)::geometry(LineString, SRID_VALUE) AS the_geom
+           FROM v_edit_inp_subcatchment s1
+             JOIN node ON node.node_id::text = s1.outlet_id::text
+        UNION
+         SELECT s1.subc_id,
+            s1.outlet_id,
+            'SUBCATCHMENT'::text AS outlet_type,
+            s1.hydrology_id,
+            st_makeline(st_centroid(s1.the_geom), st_centroid(s2.the_geom))::geometry(LineString, SRID_VALUE) AS the_geom
+           FROM v_edit_inp_subcatchment s1
+             JOIN v_edit_inp_subcatchment s2 ON s1.outlet_id::text = s2.subc_id::text) a;
