@@ -484,26 +484,26 @@ INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_
 -- Data for Name: cat_feature_arc; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO cat_feature_arc VALUES ('PIPE', 'PIPE', 'PIPE');
-INSERT INTO cat_feature_arc VALUES ('VARC', 'VARC', 'PIPE');
+--INSERT INTO cat_feature_arc VALUES ('PIPE', 'PIPE', 'PIPE');
+--INSERT INTO cat_feature_arc VALUES ('VARC', 'VARC', 'PIPE');
 
 
 --
 -- Data for Name: cat_feature_connec; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO cat_feature_connec VALUES ('WJOIN', 'WJOIN', '{"activated":false,"value":1}', 'JUNCTION');
+/* INSERT INTO cat_feature_connec VALUES ('WJOIN', 'WJOIN', '{"activated":false,"value":1}', 'JUNCTION');
 INSERT INTO cat_feature_connec VALUES ('FOUNTAIN', 'FOUNTAIN', '{"activated":false,"value":1}', 'JUNCTION');
 INSERT INTO cat_feature_connec VALUES ('TAP', 'TAP', '{"activated":false,"value":1}', 'JUNCTION');
 INSERT INTO cat_feature_connec VALUES ('GREENTAP', 'GREENTAP', '{"activated":false,"value":1}', 'JUNCTION');
-INSERT INTO cat_feature_connec VALUES ('VCONNEC', 'WJOIN', '{"activated":false,"value":1}', 'JUNCTION');
+INSERT INTO cat_feature_connec VALUES ('VCONNEC', 'WJOIN', '{"activated":false,"value":1}', 'JUNCTION'); */
 
 
 --
 -- Data for Name: cat_feature_node; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO cat_feature_node VALUES ('JUNCTION', 'JUNCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+/* INSERT INTO cat_feature_node VALUES ('JUNCTION', 'JUNCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('CLORINATHOR', 'NETELEMENT', 'SHORTPIPE', 2, true, true, 'DQA', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('T', 'JUNCTION', 'JUNCTION', 3, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('X', 'JUNCTION', 'JUNCTION', 4, true, true, 'NONE', false, '{"activated":false,"value":1}');
@@ -540,14 +540,14 @@ INSERT INTO cat_feature_node VALUES ('TANK', 'TANK', 'TANK', 9, true, true, 'SEC
 INSERT INTO cat_feature_node VALUES ('WATER_CONNECTION', 'NETWJOIN', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('WATERWELL', 'WATERWELL', 'RESERVOIR', 2, true, true, 'SECTOR', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('WTP', 'WTP', 'RESERVOIR', 2, true, true, 'SECTOR', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('AIR_VALVE', 'VALVE', 'UNDEFINED', 2, true, false, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('AIR_VALVE', 'VALVE', 'UNDEFINED', 2, true, false, 'NONE', false, '{"activated":false,"value":1}'); */
 
 
 --
 -- Data for Name: config_graph_valve; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO config_graph_valve VALUES ('SHUTOFF_VALVE', true);
+--INSERT INTO config_graph_valve VALUES ('SHUTOFF_VALVE', true);
 
 
 --
