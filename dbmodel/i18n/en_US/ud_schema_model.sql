@@ -451,57 +451,12 @@ INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_
 
 
 --
--- Data for Name: cat_feature_arc; Type: TABLE DATA; Schema: ; Owner: -
---
-
-INSERT INTO cat_feature_arc VALUES ('CONDUIT', 'CONDUIT', 'CONDUIT');
-INSERT INTO cat_feature_arc VALUES ('SIPHON', 'SIPHON', 'CONDUIT');
-INSERT INTO cat_feature_arc VALUES ('WACCEL', 'WACCEL', 'CONDUIT');
-INSERT INTO cat_feature_arc VALUES ('VARC', 'VARC', 'VIRTUAL');
-INSERT INTO cat_feature_arc VALUES ('PUMP_PIPE', 'CONDUIT', 'CONDUIT');
-
-
---
--- Data for Name: cat_feature_connec; Type: TABLE DATA; Schema: ; Owner: -
---
-
-INSERT INTO cat_feature_connec VALUES ('CONNEC', 'CONNEC', '{"activated":false,"value":1}');
-INSERT INTO cat_feature_connec VALUES ('VCONNEC', 'CONNEC', '{"activated":false,"value":1}');
-
-
---
 -- Data for Name: cat_feature_gully; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO cat_feature_gully VALUES ('GULLY', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
 INSERT INTO cat_feature_gully VALUES ('PGULLY', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
 INSERT INTO cat_feature_gully VALUES ('VGULLY', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
-
-
---
--- Data for Name: cat_feature_node; Type: TABLE DATA; Schema: ; Owner: -
---
-
-INSERT INTO cat_feature_node VALUES ('CIRC_MANHOLE', 'MANHOLE', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('HIGHPOINT', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('REGISTER', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('CHANGE', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VIRTUAL_NODE', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('JUMP', 'WJUMP', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('RECT_MANHOLE', 'MANHOLE', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('SANDBOX', 'MANHOLE', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('WWTP', 'WWTP', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VALVE', 'VALVE', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('OUTFALL', 'OUTFALL', 'OUTFALL', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('NETGULLY', 'NETGULLY', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('JUNCTION', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('NETELEMENT', 'NETELEMENT', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('NETINIT', 'NETINIT', 'JUNCTION', 1, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('CHAMBER', 'CHAMBER', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('WEIR', 'CHAMBER', 'JUNCTION', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('SEWER_STORAGE', 'STORAGE', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('OWERFLOW_STORAGE', 'STORAGE', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('PUMP_STATION', 'CHAMBER', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
 
 
 --

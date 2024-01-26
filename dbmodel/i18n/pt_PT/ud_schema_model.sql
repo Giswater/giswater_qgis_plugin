@@ -428,56 +428,11 @@ INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_
 
 
 --
--- Data for Name: cat_feature_arc; Type: TABLE DATA; Schema: ; Owner: -
---
-
-INSERT INTO cat_feature_arc VALUES ('TUBULACAO', 'CONDUIT', 'CONDUIT');
-INSERT INTO cat_feature_arc VALUES ('SIFAO', 'SIPHON', 'CONDUIT');
-INSERT INTO cat_feature_arc VALUES ('TUBO_QUEDA', 'WACCEL', 'CONDUIT');
-INSERT INTO cat_feature_arc VALUES ('TUBULACAO_VIRTUAL', 'VARC', 'VIRTUAL');
-INSERT INTO cat_feature_arc VALUES ('TUBULACAO_RECALQUE', 'CONDUIT', 'CONDUIT');
-
-
---
--- Data for Name: cat_feature_connec; Type: TABLE DATA; Schema: ; Owner: -
---
-
-INSERT INTO cat_feature_connec VALUES ('LIGACAO', 'CONNEC', '{"activated":false,"value":1}');
-
-
---
 -- Data for Name: cat_feature_gully; Type: TABLE DATA; Schema: ; Owner: -
 --
 
 INSERT INTO cat_feature_gully VALUES ('BOCA_LOBO', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
 INSERT INTO cat_feature_gully VALUES ('BOCA_LOBO_MAYOR', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
-
-
---
--- Data for Name: cat_feature_node; Type: TABLE DATA; Schema: ; Owner: -
---
-
-INSERT INTO cat_feature_node VALUES ('POCO_VISITA', 'MANHOLE', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('PONTO_ALTO', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('REGISTRO', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('CAIXA_PASSAGEM', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('NO_VIRTUAL', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('RESSALTO_HIDRAULICO', 'WJUMP', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('POCO_VISITA_RETANGULAR', 'MANHOLE', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('DESARENADOR', 'MANHOLE', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('ETE', 'WWTP', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VALVULA', 'VALVE', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('EXULTORIO', 'OUTFALL', 'OUTFALL', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('BOCA_LOBO_TOPO', 'NETGULLY', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('CAIXA_LIGACAO', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('ELEMENT_GERAL_REDE', 'NETELEMENT', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('PONTO_INICIO_REDE', 'NETINIT', 'JUNCTION', 1, true, true, NULL, 0, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('CAIXA_INSPECAO', 'CHAMBER', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VERTEDOURO', 'CHAMBER', 'JUNCTION', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('RESERVATORIO_PULMAO', 'STORAGE', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('RESERVATORIO_CONTENCAO', 'STORAGE', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('BOMBEAMENTO', 'CHAMBER', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
-
 
 
 --
