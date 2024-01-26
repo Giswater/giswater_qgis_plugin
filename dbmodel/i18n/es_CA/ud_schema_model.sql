@@ -448,6 +448,60 @@ INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_
 
 
 --
+-- Data for Name: cat_feature_arc; Type: TABLE DATA; Schema: ; Owner: -
+--
+
+INSERT INTO cat_feature_arc VALUES ('CONDUCTE', 'CONDUIT', 'CONDUIT');
+INSERT INTO cat_feature_arc VALUES ('IMPULSIO', 'CONDUIT', 'CONDUIT');
+INSERT INTO cat_feature_arc VALUES ('SIFO', 'SIPHON', 'CONDUIT');
+INSERT INTO cat_feature_arc VALUES ('RAPID', 'WACCEL', 'CONDUIT');
+INSERT INTO cat_feature_arc VALUES ('FICTICI', 'VARC', 'OUTLET');
+
+
+--
+-- Data for Name: cat_feature_connec; Type: TABLE DATA; Schema: ; Owner: -
+--
+
+INSERT INTO cat_feature_connec VALUES ('ESCOMESA', 'CONNEC', '{"activated":false,"value":1}');
+INSERT INTO cat_feature_connec VALUES ('ESCOMESA_FICTICIA', 'CONNEC', '{"activated":false,"value":1}');
+
+
+--
+-- Data for Name: cat_feature_gully; Type: TABLE DATA; Schema: ; Owner: -
+--
+
+INSERT INTO cat_feature_gully VALUES ('EMBORNAL', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
+INSERT INTO cat_feature_gully VALUES ('REIXA', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
+INSERT INTO cat_feature_gully VALUES ('EMBORNAL_FICTICI', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
+
+
+--
+-- Data for Name: cat_feature_node; Type: TABLE DATA; Schema: ; Owner: -
+--
+
+INSERT INTO cat_feature_node VALUES ('POU_CIRCULAR', 'MANHOLE', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('PUNT_ALT', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('REGISTRE', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('CANVI_SECCIO', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('NODE_FICTICI', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('SALT', 'WJUMP', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('POU_RECTANGULAR', 'MANHOLE', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('ARQUETA_SORRERA', 'MANHOLE', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('EDAR', 'WWTP', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA', 'VALVE', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('DESGUAS', 'OUTFALL', 'OUTFALL', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('EMBORNAL_TOPO', 'NETGULLY', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('UNIO', 'JUNCTION', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('ELEMENT_TOPO', 'NETELEMENT', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('INICI', 'NETINIT', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('CAMBRA', 'CHAMBER', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('PRESA', 'CHAMBER', 'JUNCTION', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('DIPOSIT', 'STORAGE', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('DIPOSIT_DESBORDAMENT', 'STORAGE', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('ESTACIO_BOMBAMENT', 'CHAMBER', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
+
+
+--
 -- Data for Name: element_type; Type: TABLE DATA; Schema: ; Owner: -
 --
 
