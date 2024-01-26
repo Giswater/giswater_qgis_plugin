@@ -437,6 +437,14 @@ INSERT INTO cat_feature VALUES ('ESTACION_BOMBEO', 'CHAMBER', 'NODE', NULL, 'v_e
 INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_edit_link', 'Link', NULL, true, false, NULL);
 
 
+--
+-- Data for Name: cat_feature_gully; Type: TABLE DATA; Schema: ; Owner: -
+--
+
+INSERT INTO cat_feature_gully VALUES ('SUMIDERO', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
+INSERT INTO cat_feature_gully VALUES ('REJA', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
+INSERT INTO cat_feature_gully VALUES ('SUMIDERO_FICTICIO', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
+
 
 --
 -- Data for Name: element_type; Type: TABLE DATA; Schema: ; Owner: -

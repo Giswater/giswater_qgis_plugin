@@ -427,6 +427,13 @@ INSERT INTO cat_feature VALUES ('BOMBEAMENTO', 'CHAMBER', 'NODE', NULL, 'v_edit_
 INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_edit_link', 'Link', NULL, true, false, NULL);
 
 
+--
+-- Data for Name: cat_feature_gully; Type: TABLE DATA; Schema: ; Owner: -
+--
+
+INSERT INTO cat_feature_gully VALUES ('BOCA_LOBO', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
+INSERT INTO cat_feature_gully VALUES ('BOCA_LOBO_MAYOR', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
+
 
 --
 -- Data for Name: element_type; Type: TABLE DATA; Schema: ; Owner: -
