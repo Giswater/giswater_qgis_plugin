@@ -7,6 +7,16 @@ This version of Giswater is provided by Giswater Association
 set search_path  = SCHEMA_NAME;
 
 
+/*
+Other strategies not implemented yet
+
+- When disabled, use the layers plan_psector_x_* to show planned infraestructure (not allowed to show deprecated objects (0 state) on psector)
+- Add hydbrid strategy by using:
+	- ve_* layers for inventory
+	- v_edit_* layers for plan
+*/
+
+
 --DISABLE PLAN STRATEGY-- 
 ------------------------
 UPDATE config_form_tabs SET formname = 'selector_basic_' where tabname = 'tab_psector' and formname = 'selector_basic';
