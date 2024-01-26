@@ -522,8 +522,7 @@ class GwAdminButton:
         return True
 
 
-    # TODO ("Add new parameter dict_update_folders)
-    def update_35to39(self, new_project=False, project_type=False, no_ct=False):
+    def update_35to39(self, new_project=False, project_type=False, no_ct=False, dict_update_folders=None):
         """"""
 
         if not os.path.exists(self.folder_updates):
@@ -531,9 +530,8 @@ class GwAdminButton:
             self.error_count = self.error_count + 1
             return
 
-        folders = sorted(os.listdir(self.folder_updates + ''))
-        for folder in folders:
-            sub_folders = sorted(os.listdir(os.path.join(self.folder_updates, folder)))
+        for folder in dict_update_folders.keys():
+            sub_folders = sorted(os.listdir(folder))
             for sub_folder in sub_folders:
                 folder_update = os.path.join(self.folder_updates, folder, sub_folder)
                 if new_project:
