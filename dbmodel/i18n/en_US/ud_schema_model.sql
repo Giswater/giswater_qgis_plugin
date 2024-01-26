@@ -451,15 +451,6 @@ INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_
 
 
 --
--- Data for Name: cat_feature_gully; Type: TABLE DATA; Schema: ; Owner: -
---
-
-INSERT INTO cat_feature_gully VALUES ('GULLY', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
-INSERT INTO cat_feature_gully VALUES ('PGULLY', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
-INSERT INTO cat_feature_gully VALUES ('VGULLY', 'GULLY', '{"activated":false,"value":1}', 'GULLY');
-
-
---
 -- Data for Name: element_type; Type: TABLE DATA; Schema: ; Owner: -
 --
 
