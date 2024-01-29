@@ -70,3 +70,7 @@ UPDATE sys_function SET descript='Function to analyze network as a graph. Analys
 - Enable status for variable utils_graphanalytics_status on [config_param_system] table.
 Stop your mouse over labels for more information about input parameters.'
 WHERE function_name='gw_fct_graphanalytics_mapzones_advanced';
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) VALUES(528, 'Check outlet_id existance in inp_subcatchment and inp_junction', 'ud', NULL, 'core', true, 'Check epa-data', NULL);
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) VALUES(529, 'Check missing data in Inp Weir', 'ud', NULL, 'core', true, 'Check epa-data', NULL);
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) VALUES(530, 'Check missing data in Inp Orifice', 'ud', NULL, 'core', true, 'Check epa-data', NULL);
