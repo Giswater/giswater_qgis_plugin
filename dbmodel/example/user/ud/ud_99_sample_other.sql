@@ -6,6 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
+
 INSERT INTO inp_gully (gully_id, outlet_type, method, weir_cd, orifice_cd, efficiency)
 SELECT gully_id, 'To_network', 'W_O', 1.6, 0.7, 90 FROM gully;
 
@@ -605,3 +607,5 @@ UPDATE config_form_fields SET iseditable = true WHERE layoutname = 'lyt_epa_dsc_
 UPDATE sys_table SET alias = 'Gully child' WHERE id='ve_gully_gully';
 
 UPDATE config_param_system SET value = (replace(value, 'Disable', 'Random')) WHERE parameter='utils_graphanalytics_style';
+
+ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
