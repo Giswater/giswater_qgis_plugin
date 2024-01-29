@@ -139,7 +139,7 @@ class GwCreateSchemaTask(GwTask):
         if (not status and self.admin.dev_commit is False) or self.isCanceled():
             return False
 
-        status = self.admin.update_35to39(True, project_type, dict_update_folders=self.dict_folders_process['update_35to39'])
+        status = self.admin.update_dict_folders(True, project_type, dict_update_folders=self.dict_folders_process['update_35to39'])
         if (not status and self.admin.dev_commit is False) or self.isCanceled():
             return False
 

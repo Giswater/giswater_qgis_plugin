@@ -357,7 +357,7 @@ class GwAdminButton:
             QgsApplication.taskManager().triggerTask(self.task_update_schema)
 
 
-    def load_updates(self, project_type=None, update_changelog=False, schema_name=None):
+    def load_updates(self, project_type=None, update_changelog=False, schema_name=None, dict_update_folders=None):
         """"""
 
         # Get current schema selected
@@ -374,7 +374,7 @@ class GwAdminButton:
         self.task1.setProgress(20)
         self.task1.setProgress(40)
         if status:
-            status = self.update_31to39(project_type=project_type)
+            status = self.update_dict_folders(False, project_type=project_type, dict_update_folders=dict_update_folders)
         self.task1.setProgress(60)
         if status:
             status = self.execute_last_process(schema_name=schema_name, locale=True)
@@ -495,7 +495,7 @@ class GwAdminButton:
         return True
 
 
-    def update_minor35to39(self, folder_update, new_project, project_type, no_ct):
+    def update_minor_dict_folders(self, folder_update, new_project, project_type, no_ct):
 
         folder_utils = os.path.join(folder_update, 'utils')
         if self._process_folder(folder_utils) is True:
@@ -522,7 +522,7 @@ class GwAdminButton:
         return True
 
 
-    def update_35to39(self, new_project=False, project_type=False, no_ct=False, dict_update_folders=None):
+    def update_dict_folders(self, new_project=False, project_type=False, no_ct=False, dict_update_folders=None):
         """"""
 
         if not os.path.exists(self.folder_updates):
@@ -537,23 +537,23 @@ class GwAdminButton:
                 if new_project:
                     if self.dev_commit is True:
                         if str(sub_folder) > '31100':
-                            status = self.update_minor35to39(folder_update, new_project, project_type, no_ct)
+                            status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
                             if status is False:
                                 return False
                     else:
                         if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
-                            status = self.update_minor35to39(folder_update, new_project, project_type, no_ct)
+                            status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
                             if status is False:
                                 return False
                 else:
                     if self.dev_commit is True:
                         if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
-                            status = self.update_minor35to39(folder_update, new_project, project_type, no_ct)
+                            status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
                             if status is False:
                                 return False
                     else:
                         if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
-                            status = self.update_minor35to39(folder_update, new_project, project_type, no_ct)
+                            status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
                             if status is False:
                                 return False
         return True
