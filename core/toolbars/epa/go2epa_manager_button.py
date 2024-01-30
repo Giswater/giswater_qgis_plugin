@@ -152,6 +152,7 @@ class GwGo2EpaManagerButton(GwAction):
         # Get id of selected row
         row = selected.indexes()
         if not row:
+            tools_qt.set_widget_text(self.dlg_manager, 'txt_infolog', '')
             return
 
         msg = ""
@@ -196,13 +197,16 @@ class GwGo2EpaManagerButton(GwAction):
 
     def _enable_btn_corporate(self, selected):
         valid = True
-        for idx, index in enumerate(self.dlg_manager.tbl_rpt_cat_result.selectionModel().selectedRows()):
+        selected_rows = self.dlg_manager.tbl_rpt_cat_result.selectionModel().selectedRows()
+        for idx, index in enumerate(selected_rows):
             col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'rpt_stats')
             row = index.row()
             status = index.sibling(row, col_idx).data()
             if not status:
                 valid = False
 
+        if not selected_rows:
+            valid = False
         self.dlg_manager.btn_set_corporate.setEnabled(valid)
 
 
