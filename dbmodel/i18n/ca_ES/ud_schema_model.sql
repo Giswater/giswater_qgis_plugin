@@ -444,7 +444,7 @@ INSERT INTO cat_feature VALUES ('CAMBRA', 'CHAMBER', 'NODE', NULL, 'v_edit_node'
 INSERT INTO cat_feature VALUES ('DIPOSIT', 'STORAGE', 'NODE', NULL, 'v_edit_node', 've_node_diposit', NULL, NULL, true, false, NULL);
 INSERT INTO cat_feature VALUES ('DIPOSIT_DESBORDAMENT', 'STORAGE', 'NODE', NULL, 'v_edit_node', 've_node_diposit_desbordament', NULL, NULL, true, false, NULL);
 INSERT INTO cat_feature VALUES ('ESTACIO_BOMBAMENT', 'CHAMBER', 'NODE', NULL, 'v_edit_node', 've_node_estacio_bombament', NULL, NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_edit_link', 'Link', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_edit_link', NULL, NULL, true, false, NULL);
 
 
 

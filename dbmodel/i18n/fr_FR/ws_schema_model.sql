@@ -434,26 +434,26 @@ INSERT INTO cat_feature VALUES ('FONTAINE', 'FOUNTAIN', 'CONNEC', NULL, 'v_edit_
 INSERT INTO cat_feature VALUES ('TAP', 'TAP', 'CONNEC', 'Ctrl+T', 'v_edit_connec', 've_connec_tap', 'Water source', NULL, true, false, NULL);
 INSERT INTO cat_feature VALUES ('GREENTAP', 'GREENTAP', 'CONNEC', 'Ctrl+G', 'v_edit_connec', 've_connec_greentap', 'Greentap', NULL, true, false, NULL);
 INSERT INTO cat_feature VALUES ('ARC_VIRTUEL', 'VARC', 'ARC', NULL, 'v_edit_arc', 've_arc_arc_virtuel', 'Virtual section of the pipe network. Used to connect arcs and nodes when polygons exists', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('PUIT', 'WATERWELL', 'NODE', NULL, 'v_edit_node', 've_node_puit', 'Waterwell', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('ELEMENT_RESEAU', 'NETELEMENT', 'NODE', NULL, 'v_edit_node', 've_node_element_reseau', 'Netelement', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('USINE_RETRAITEMENT', 'WTP', 'NODE', NULL, 'v_edit_node', 've_node_usine_retraitement', 'Water treatment point', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('FILTRE', 'FILTER', 'NODE', NULL, 'v_edit_node', 've_node_filtre', 'Filter', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('BORNE_INCENDIE', 'HYDRANT', 'NODE', NULL, 'v_edit_node', 've_node_borne_incendie', 'Hydrant', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('POMPE', 'PUMP', 'NODE', NULL, 'v_edit_node', 've_node_pompe', 'Pump', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('REGARD', 'MANHOLE', 'NODE', NULL, 'v_edit_node', 've_node_regard', 'Inspection chamber', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('COMPTEUR', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_compteur', 'Register', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('CONTROLE_COMPTEUR', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_controle_compteur', 'Control register', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('CONTOURNEMENT_COMPTEUR', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_contournement_compteur', 'Bypass-register', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('VALVE_COMPTEUR', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_valve_compteur', 'Valve register', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('CONNEXION_EAU_TOPO', 'NETWJOIN', 'NODE', NULL, 'v_edit_node', 've_node_connexion_eau_topo', 'Water connection', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('CAPTEUR_DEBIT', 'METER', 'NODE', NULL, 'v_edit_node', 've_node_capteur_debit', 'Flow meter', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('VASE_EXPANSION', 'EXPANSIONTANK', 'NODE', NULL, 'v_edit_node', 've_node_vase_expansion', 'Expansiontank', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('CAPTEUR_PRESSION', 'METER', 'NODE', NULL, 'v_edit_node', 've_node_capteur_pression', 'Pressure meter', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('FLEXUNION', 'FLEXUNION', 'NODE', 'Alt+U', 'v_edit_node', 've_node_flexunion', 'Flex union', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('NETSAMPLEPOINT', 'NETSAMPLEPOINT', 'NODE', 'Alt+B', 'v_edit_node', 've_node_netsamplepoint', 'Netsamplepoint', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('REDUCTION', 'REDUCTION', 'NODE', 'Alt+R', 'v_edit_node', 've_node_reduction', 'Reduction', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('SOURCE', 'SOURCE', 'NODE', 'Alt+S', 'v_edit_node', 've_node_source', 'Source', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_edit_link', 'Link', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('PUIT', 'WATERWELL', 'NODE', NULL, 'v_edit_node', 've_node_puit', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('ELEMENT_RESEAU', 'NETELEMENT', 'NODE', NULL, 'v_edit_node', 've_node_element_reseau', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('USINE_RETRAITEMENT', 'WTP', 'NODE', NULL, 'v_edit_node', 've_node_usine_retraitement', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('FILTRE', 'FILTER', 'NODE', NULL, 'v_edit_node', 've_node_filtre', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('BORNE_INCENDIE', 'HYDRANT', 'NODE', NULL, 'v_edit_node', 've_node_borne_incendie', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('POMPE', 'PUMP', 'NODE', NULL, 'v_edit_node', 've_node_pompe', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('REGARD', 'MANHOLE', 'NODE', NULL, 'v_edit_node', 've_node_regard', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('COMPTEUR', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_compteur', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('CONTROLE_COMPTEUR', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_controle_compteur', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('CONTOURNEMENT_COMPTEUR', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_contournement_compteur', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('VALVE_COMPTEUR', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_valve_compteur', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('CONNEXION_EAU_TOPO', 'NETWJOIN', 'NODE', NULL, 'v_edit_node', 've_node_connexion_eau_topo', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('CAPTEUR_DEBIT', 'METER', 'NODE', NULL, 'v_edit_node', 've_node_capteur_debit', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('VASE_EXPANSION', 'EXPANSIONTANK', 'NODE', NULL, 'v_edit_node', 've_node_vase_expansion', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('CAPTEUR_PRESSION', 'METER', 'NODE', NULL, 'v_edit_node', 've_node_capteur_pression', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('FLEXUNION', 'FLEXUNION', 'NODE', 'Alt+U', 'v_edit_node', 've_node_flexunion', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('NETSAMPLEPOINT', 'NETSAMPLEPOINT', 'NODE', 'Alt+B', 'v_edit_node', 've_node_netsamplepoint', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('REDUCTION', 'REDUCTION', 'NODE', 'Alt+R', 'v_edit_node', 've_node_reduction', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('SOURCE', 'SOURCE', 'NODE', 'Alt+S', 'v_edit_node', 've_node_source', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_edit_link', NULL, NULL, true, false, NULL);
 
 
 --

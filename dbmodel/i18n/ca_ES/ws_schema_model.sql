@@ -472,7 +472,7 @@ INSERT INTO cat_feature VALUES ('MEDIDOR_FLUID', 'METER', 'NODE', NULL, 'v_edit_
 INSERT INTO cat_feature VALUES ('TANC_EXPANSIO', 'EXPANSIONTANK', 'NODE', NULL, 'v_edit_node', 've_node_tanc_expansio', 'Tanc d''expansió', NULL, true, false, NULL);
 INSERT INTO cat_feature VALUES ('MEDIDOR_PRESSIO', 'METER', 'NODE', NULL, 'v_edit_node', 've_node_medidor_pressio', 'Medidor de pressió', NULL, true, false, NULL);
 INSERT INTO cat_feature VALUES ('NETELEMENT', 'NETELEMENT', 'NODE', 'Alt+E', 'v_edit_node', 've_node_netelement', 'Element topològic', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('RECLORADOR', 'NETELEMENT', 'NODE', NULL, 'v_edit_node', 've_node_reclorador', 'Element to reclorate water', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('RECLORADOR', 'NETELEMENT', 'NODE', NULL, 'v_edit_node', 've_node_reclorador', 'Element reclorador', NULL, true, false, NULL);
 INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_edit_link', 'Link', NULL, true, false, NULL);
 
 

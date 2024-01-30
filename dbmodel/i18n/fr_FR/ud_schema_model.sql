@@ -424,7 +424,7 @@ INSERT INTO cat_feature VALUES ('SEUIL', 'CHAMBER', 'NODE', NULL, 'v_edit_node',
 INSERT INTO cat_feature VALUES ('BASSIN_RETENTION', 'STORAGE', 'NODE', NULL, 'v_edit_node', 've_node_bassin_retention', NULL, NULL, true, false, NULL);
 INSERT INTO cat_feature VALUES ('BASSIN_DEBORDEMENT', 'STORAGE', 'NODE', NULL, 'v_edit_node', 've_node_bassin_debordement', NULL, NULL, true, false, NULL);
 INSERT INTO cat_feature VALUES ('STATION_POMPAGE', 'CHAMBER', 'NODE', NULL, 'v_edit_node', 've_node_station_pompage', NULL, NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_edit_link', 'Link', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_edit_link', NULL, NULL, true, false, NULL);
 
 
 
