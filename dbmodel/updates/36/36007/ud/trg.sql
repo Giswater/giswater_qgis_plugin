@@ -5,11 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-create or replace trigger gw_trg_edit_inp_subc2outlet instead of
-insert
-    or
-delete
-    or
-update
-    on
-    v_edit_inp_subc2outlet for each row execute function gw_trg_edit_inp_subc2outlet();
+SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+CREATE TRIGGER gw_trg_edit_inp_subc2outlet instead of insert or delete or Update 
+on v_edit_inp_subc2outlet for each row execute function gw_trg_edit_inp_subc2outlet();

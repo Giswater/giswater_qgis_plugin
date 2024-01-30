@@ -63,7 +63,8 @@ BEGIN
 	ELSIF TG_OP = 'DELETE' then
 		--only remove outlet_id value from subcatchment
 		update v_edit_inp_subcatchment set outlet_id=NULL where subc_id=OLD.subc_id;
-	RETURN NULL;
+	
+		RETURN NULL;
 	
 	END IF;
 	
