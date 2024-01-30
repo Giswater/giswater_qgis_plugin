@@ -860,3 +860,6 @@ UPDATE presszone SET head = 52.27 WHERE presszone_id = '4';
 UPDATE config_param_system SET value = (replace(value, 'Disable', 'Random')) WHERE parameter='utils_graphanalytics_style';
 
 ALTER TABLE connec ALTER COLUMN epa_type SET NOT NULL;
+
+UPDATE presszone SET head = head+3.5 where presszone_id in('3', '6');
+
