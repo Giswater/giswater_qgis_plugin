@@ -596,7 +596,10 @@ DELETE FROM selector_inp_dscenario; -- delete selectors because of trigger on ca
 DELETE FROM connec WHERE connec_id = '3175';
 
 -- fill missed data for connecs
-UPDATE connec SET epa_type = 'JUNCTION';
+UPDATE v_edit_connec SET epa_type = 'JUNCTION';
+UPDATE connec SET epa_type = 'UNDEFINED' where epa_type is null;
+ALTER TABLE connec ALTER COLUMN epa_type SET NOT NULL;
+
 UPDATE connec SET sector_id = a.sector_id FROM arc a WHERE a.arc_id = connec.arc_id;
 UPDATE connec SET sector_id=3 WHERE connec_id IN ('114461', '114462', '114463');
 

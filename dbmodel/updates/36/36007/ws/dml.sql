@@ -35,3 +35,7 @@ UPDATE config_param_system SET value = (replace(value, 'dqa_id', 'name'))::json 
 UPDATE config_param_system SET value = (replace(value, 'sector_id', 'name'))::json WHERE parameter='utils_graphanalytics_style';
 
 DELETE FROM config_function WHERE id=2928;
+
+UPDATE connec SET epa_type='UNDEFINED' where epa_type is null;
+
+ALTER TABLE connec ALTER COLUMN epa_type SET NOT NULL;

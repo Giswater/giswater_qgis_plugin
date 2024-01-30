@@ -530,6 +530,7 @@ UPDATE arc SET depth2 = vu_node.depth FROM vu_node WHERE node_id = node_2;
 UPDATE arc SET staticpress1 = vu_node.staticpressure FROM vu_node WHERE node_id = node_1;
 UPDATE arc SET staticpress2 = vu_node.staticpressure FROM vu_node WHERE node_id = node_2;
 
+ALTER TABLE connec ALTER COLUMN epa_type DROP NOT NULL;
 
 
 INSERT INTO connec VALUES ('3300', '3300', 34.9400, NULL, 'PVC63-PN16-FOU', 0, 'cc3300', 1, 2, '2071', NULL, NULL, NULL, NULL, 2, '3', 'soil1', 'St. Function', 'St. Category', 'St. Fluid', 'St. Location', 'work1', NULL, 'builder1', '2017-12-06', NULL, 'owner1', 1, '08830', '1-10000C', NULL, NULL, NULL, NULL, NULL, NULL, 'https://www.giswater.org', 'TO REVIEW', NULL, '0101000020E764000039D52C5121971941B9185F5065755141', NULL, NULL, NULL, NULL, true, true, 1, NULL, 'CONNEC', '2021-03-28 17:06:35.170994', 'ARC', '470', NULL, NULL, 'postgres', 2034, 1, NULL, 1, NULL, NULL, NULL, NULL);
