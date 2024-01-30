@@ -39,3 +39,5 @@ DELETE FROM config_function WHERE id=2928;
 UPDATE connec SET epa_type='UNDEFINED' where epa_type is null;
 
 ALTER TABLE connec ALTER COLUMN epa_type SET NOT NULL;
+
+DELETE FROM sys_foreignkey WHERE target_table='inp_dscenario_demand' AND active IS TRUE;
