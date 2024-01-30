@@ -190,7 +190,7 @@ class GwCreateSchemaTask(GwTask):
             #tools_log.log_info(f"Task 'Create schema' execute function 'def get_number_of_files_process' with parameters: '{process_name}'")
             dict_folders, total = self.get_number_of_files_process(process_name)
             total_sql_files += total
-            #tools_log.log_info(f"Number of SQL files '{process_name}': {total}")
+            tools_log.log_info(f"Number of SQL files '{process_name}': {total}")
             dict_process[process_name] = total
             self.dict_folders_process[process_name] = dict_folders
 
@@ -206,7 +206,7 @@ class GwCreateSchemaTask(GwTask):
             tools_log.log_info(f"Folder {folder_update_major}: {total_folder_update_major}")
             total_folder_update += total_folder_update_major
 
-        #tools_log.log_info(f"Number of SQL files '{process_name}': {total_folder_update}")
+        tools_log.log_info(f"Number of SQL files '{process_name}': {total_folder_update}")
         dict_process[process_name] = total_folder_update
 
         total_sql_files += total_folder_update
