@@ -363,10 +363,10 @@ class GwDscenarioManagerButton(GwAction):
         if global_vars.project_type == 'ud':
             if view == 'v_edit_cat_hydrology':
                 values.append([3290, "Create empty hydrology scenario"])
-                values.append([3290, "Create hydrology scenario values"])
+                # values.append([3290, "Create hydrology scenario values"])
             elif view == 'v_edit_cat_dwf_scenario':
                 values.append([3292, "Create empty dwf scenario"])
-                values.append([3292, "Create dwf scenario values"])
+                # values.append([3292, "Create dwf scenario values"])
             elif view == 'v_edit_cat_dscenario':
                 values.append([3134, "Create empty dscenario"])
                 values.append([3118, "Create from ToC"])
