@@ -13,3 +13,12 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_ca
 
 --22/01/23
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"plot_code", "dataType":"varchar"}}$$);
+
+--24/01/23
+CREATE TABLE selector_period(
+  period_id text NOT NULL,
+  cur_user text NOT NULL DEFAULT CURRENT_USER,
+  CONSTRAINT selector_period_pkey PRIMARY KEY (period_id, cur_user),
+  CONSTRAINT selector_period_id_fkey FOREIGN KEY (period_id)
+      REFERENCES ext_cat_period (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE);

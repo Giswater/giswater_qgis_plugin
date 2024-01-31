@@ -54,3 +54,35 @@ UPDATE config_form_fields SET layoutname='lyt_data_1', tabname='tab_data' WHERE 
 
 -- 22/01/2024
 UPDATE config_form_fields SET widgetfunction='{"functionName": "open_selected_path", "parameters":{"targetwidget":"tab_hydrometer_tbl_hydrometer", "columnfind": "hydrometer_link"}}'::json WHERE columnname='btn_link' AND tabname='tab_hydrometer';
+
+--25/01/24
+UPDATE sys_table SET id='v_edit_inp_subc2outlet' where id='vi_subcatch2outlet'; 
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") VALUES(3300, 'gw_trg_edit_inp_subc2outlet', 'ud', 'trigger function', NULL, NULL, NULL, 'role_master', NULL, 'core');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") VALUES(3252, 'There is no subcatchment or outlet_id nearby', 'Place the line inside a subcatchment or use the snapping tool to set an outlet_id for the subcatchment.', 2, true, 'utils', 'core');
+
+UPDATE sys_function SET descript ='Function to analyze graph of network. Dynamic analisys to sectorize network using the flow traceability function. 
+Before working with this funcion, it is mandatory to configurate graphconfig on drainzone table'
+WHERE function_name='gw_fct_graphanalytics_mapzones';
+
+UPDATE sys_function SET descript='Function to analyze network as a graph. Analysis is only avaliable for DRAINZONE. Before starting, you need to configurate:
+- Field graphconfig on drainzone table.
+- Enable status for variable utils_graphanalytics_status on [config_param_system] table.
+Stop your mouse over labels for more information about input parameters.'
+WHERE function_name='gw_fct_graphanalytics_mapzones_advanced';
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) VALUES(528, 'Check outlet_id existance in inp_subcatchment and inp_junction', 'ud', NULL, 'core', true, 'Check epa-data', NULL);
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) VALUES(529, 'Check missing data in Inp Weir', 'ud', NULL, 'core', true, 'Check epa-data', NULL);
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) VALUES(530, 'Check missing data in Inp Orifice', 'ud', NULL, 'core', true, 'Check epa-data', NULL);
+
+
+UPDATE config_toolbox SET inputparams =
+'[
+{"widgetname":"name", "label":"Name: (*)","widgettype":"linetext","datatype":"text", "isMandatory":true, "tooltip":"Name for hydrology scenario (mandatory)", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":1, "value":""},
+{"widgetname":"infiltration", "label":"Infiltration:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Infiltration", "dvQueryText":"SELECT id, idval FROM inp_typevalue WHERE typevalue =''inp_value_options_in''", "layoutname":"grl_option_parameters","layoutorder":2, "value":""},
+{"widgetname":"text", "label":"Text:","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Text of hydrology scenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":3, "value":""},
+{"widgetname":"expl", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"hydrology scenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":4, "value":""},
+{"widgetname":"active", "label":"Active:", "widgettype":"check", "datatype":"boolean", "tooltip":"If true, active" , "layoutname":"grl_option_parameters","layoutorder":5, "value":"true"}
+]'
+where id = 3290;
+

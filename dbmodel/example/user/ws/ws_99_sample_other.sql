@@ -597,6 +597,9 @@ DELETE FROM connec WHERE connec_id = '3175';
 
 -- fill missed data for connecs
 UPDATE v_edit_connec SET epa_type = 'JUNCTION';
+UPDATE connec SET epa_type = 'UNDEFINED' where epa_type is null;
+ALTER TABLE connec ALTER COLUMN epa_type SET NOT NULL;
+
 UPDATE connec SET sector_id = a.sector_id FROM arc a WHERE a.arc_id = connec.arc_id;
 UPDATE connec SET sector_id=3 WHERE connec_id IN ('114461', '114462', '114463');
 
@@ -855,3 +858,8 @@ UPDATE config_form_fields SET layoutorder =12 WHERE  formname = 'v_edit_dqa' AND
 UPDATE presszone SET head = 52.27 WHERE presszone_id = '4';
 
 UPDATE config_param_system SET value = (replace(value, 'Disable', 'Random')) WHERE parameter='utils_graphanalytics_style';
+
+ALTER TABLE connec ALTER COLUMN epa_type SET NOT NULL;
+
+UPDATE presszone SET head = head+3.5 where presszone_id in('3', '6');
+

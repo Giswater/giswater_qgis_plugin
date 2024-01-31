@@ -637,8 +637,68 @@ BEGIN
 		group by node.node_id having count(node.node_id)>1';
 	END IF;
 	v_count=0;
+	
+RAISE NOTICE '528 - Check if outlet_id exists in v_edit_junction (if outlet_id is a node) or in v_edit_inp_subcatchment (if outlet_id is a subcathment)';
+	
+	v_querytext = '(select outlet_id from v_edit_inp_subc2outlet where outlet_type = ''JUNCTION'' AND outlet_id not in (select node_id from v_edit_inp_junction) union
+	select outlet_id from v_edit_inp_subc2outlet where outlet_type = ''SUBCATCHMENT'' AND outlet_id not in (select subc_id from v_edit_inp_subcatchment))';
+	
+	EXECUTE concat('SELECT count(*) FROM ',v_querytext, 'a') INTO v_count;
+	
+	IF v_count>0 then
+		EXECUTE concat ('INSERT INTO temp_anl_node (fid, node_id, descript, the_geom) 
+		SELECT 528, subc_id, ''Non-existing outlet_id related to subcatchment'', st_startpoint(the_geom) from v_edit_inp_subc2outlet where outlet_id in ', v_querytext);
+		
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '528', 3, concat('ERROR-528 (anl_node): There is/are ',v_count,' non-existing node_id or subc_id as an outlet_id.'),v_count);
+	ELSE
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '528', 1, 'INFO: All subcatchments have an existing outlet_id',v_count);
+	END IF;
+	v_count=0;
 
+	
+	RAISE NOTICE '529 - Check null values on inp_weir';
+	v_querytext='(select arc_id, weir_type, cd, geom1, geom2, offsetval from v_edit_inp_weir 
+	where weir_type is null or cd is null or geom1 is null or geom2 is null or offsetval is null)';
 
+	execute concat('select count(*) from ', v_querytext, 'a') into v_count;
+	
+	IF v_count>0 then 
+		EXECUTE 'INSERT INTO temp_anl_arc (fid, arc_id, descript, the_geom) 
+		SELECT 529, arc_id, ''Missing values on some data of Inp Weir (weir_type, cd, geom1, geom2, offsetval)'', the_geom from v_edit_inp_weir 
+		where weir_type is null or cd is null or geom1 is null or geom2 is null or offsetval is null';
+		
+	
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '529', 3, concat('ERROR-529: There is/are ',v_count,' null values on table Inp Weir (weir_type, cd, geom1, geom2, offsetval)'), v_count);
+	ELSE
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '529', 1, 'INFO: No missing data on Inp Weir.', v_count);
+	END IF;
+	v_count=0;
+	
+	
+	RAISE NOTICE '530 - Check null values on inp_orifice';
+	v_querytext='(select ori_type, geom1, offsetval from v_edit_inp_orifice
+	where ori_type is null or geom1 is null or offsetval is null)';
+
+	execute concat('select count(*) from ', v_querytext, 'a') into v_count;
+	
+	IF v_count>0 then 
+	
+		EXECUTE 'INSERT INTO temp_anl_arc (fid, arc_id, descript, the_geom) 
+		SELECT 530, arc_id, ''Missing values on some data of Inp Orifice (ori_type, geom1, offsetval)'', the_geom from v_edit_inp_orifice
+		where ori_type is null or geom1 is null or offsetval is null';
+	
+	
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '530', 3, concat('ERROR-530: There is/are ',v_count,' null values on table Inp Orifice (ori_type, geom1, offsetval)'), v_count);
+	ELSE
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '530', 1, 'INFO: No missing data on Inp Orifice.', v_count);
+	END IF;
+	v_count=0;
 
 	
 	-- Removing isaudit false sys_fprocess

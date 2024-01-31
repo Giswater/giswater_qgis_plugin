@@ -54,15 +54,15 @@ BEGIN
 
 		-- pattern
 		IF v_patternmethod = 11 THEN -- DEFAULT PATTERN
-			UPDATE temp_t_node SET pattern_id=v_deafultpattern WHERE pattern_id IS NULL;
+			UPDATE temp_t_node SET pattern_id=v_deafultpattern WHERE pattern_id IS NULL AND epa_type ='JUNCTION';
 		
 		ELSIF v_patternmethod = 12 THEN -- SECTOR PATTERN (NODE)
 			UPDATE temp_t_node SET pattern_id=sector.pattern_id FROM node JOIN sector ON sector.sector_id=node.sector_id 
-			WHERE temp_t_node.node_id=node.node_id AND temp_t_node.pattern_id IS NULL;
+			WHERE temp_t_node.node_id=node.node_id AND temp_t_node.pattern_id IS NULL AND temp_t_node.epa_type ='JUNCTION';
 		
 		ELSIF v_patternmethod = 13 THEN -- DMA PATTERN (NODE)
 			UPDATE temp_t_node SET pattern_id=dma.pattern_id FROM node JOIN dma ON dma.dma_id=node.dma_id 
-			WHERE temp_t_node.node_id=node.node_id AND temp_t_node.pattern_id IS NULL;
+			WHERE temp_t_node.node_id=node.node_id AND temp_t_node.pattern_id IS NULL AND temp_t_node.epa_type ='JUNCTION';
 		
 		ELSIF v_patternmethod = 14 THEN -- FEATURE PATTERN (NODE)
 			-- do nothing
@@ -75,40 +75,40 @@ BEGIN
 	ELSIF v_networkmode = 4 THEN 
 
 		-- update patterns for connecs with associated link
-		UPDATE temp_t_node SET pattern_id=c.pattern_id FROM v_edit_inp_connec c WHERE connec_id = node_id;
+		UPDATE temp_t_node SET pattern_id=c.pattern_id FROM v_edit_inp_connec c WHERE connec_id = node_id  AND temp_t_node.epa_type ='JUNCTION';
 
 		-- update patterns for pattern on connecs over arc
-		UPDATE temp_t_node SET pattern_id=c.pattern_id FROM v_edit_inp_connec c WHERE concat('VC',connec_id) = node_id;
+		UPDATE temp_t_node SET pattern_id=c.pattern_id FROM v_edit_inp_connec c WHERE concat('VC',connec_id) = node_id  AND temp_t_node.epa_type ='JUNCTION';
 
 		-- demand on connecs with associated link
-		UPDATE temp_t_node SET demand=v.demand FROM v_edit_inp_connec v WHERE connec_id = node_id;
+		UPDATE temp_t_node SET demand=v.demand FROM v_edit_inp_connec v WHERE connec_id = node_id  AND temp_t_node.epa_type ='JUNCTION';
 		
 		-- demand on connecs over arc
-		UPDATE temp_t_node SET demand=v.demand FROM v_edit_inp_connec v WHERE concat('VC',connec_id) = node_id;
+		UPDATE temp_t_node SET demand=v.demand FROM v_edit_inp_connec v WHERE concat('VC',connec_id) = node_id  AND temp_t_node.epa_type ='JUNCTION';
 
 		-- pattern
 		IF v_patternmethod = 11 THEN -- DEFAULT PATTERN
-			UPDATE temp_t_node SET pattern_id=v_deafultpattern WHERE temp_t_node.pattern_id IS NULL ;
+			UPDATE temp_t_node SET pattern_id=v_deafultpattern WHERE temp_t_node.pattern_id IS NULL AND temp_t_node.epa_type ='JUNCTION';
 				
 		ELSIF v_patternmethod  = 12 THEN -- SECTOR PATTERN (CONNEC)
 
 			-- pattern on connecs with associated link
 			UPDATE temp_t_node SET pattern_id=sector.pattern_id 
-			FROM v_edit_inp_connec JOIN sector USING (sector_id) WHERE connec_id = node_id  AND temp_t_node.pattern_id IS NULL ;
+			FROM v_edit_inp_connec JOIN sector USING (sector_id) WHERE connec_id = node_id  AND temp_t_node.pattern_id IS NULL AND temp_t_node.epa_type ='JUNCTION';
 
 			-- pattern on connecs over arc
 			UPDATE temp_t_node SET pattern_id=sector.pattern_id 
-			FROM v_edit_inp_connec JOIN sector USING (sector_id) WHERE concat('VC',connec_id) = node_id  AND temp_t_node.pattern_id IS NULL ;
+			FROM v_edit_inp_connec JOIN sector USING (sector_id) WHERE concat('VC',connec_id) = node_id  AND temp_t_node.pattern_id IS NULL AND temp_t_node.epa_type ='JUNCTION';
 
 		ELSIF v_patternmethod  = 13 THEN -- DMA PATTERN (CONNEC)
 
 			-- pattern on connecs with associated link
 			UPDATE temp_t_node SET pattern_id=dma.pattern_id 
-			FROM v_edit_inp_connec JOIN dma USING (dma_id) WHERE connec_id = node_id  AND temp_t_node.pattern_id IS NULL ;
+			FROM v_edit_inp_connec JOIN dma USING (dma_id) WHERE connec_id = node_id  AND temp_t_node.pattern_id IS NULL AND temp_t_node.epa_type ='JUNCTION';
 			
 			-- pattern on connecs over arc
 			UPDATE temp_t_node SET pattern_id=dma.pattern_id 
-			FROM v_edit_inp_connec JOIN dma USING (dma_id) WHERE concat('VC',connec_id) = node_id AND temp_t_node.pattern_id IS NULL ;
+			FROM v_edit_inp_connec JOIN dma USING (dma_id) WHERE concat('VC',connec_id) = node_id AND temp_t_node.pattern_id IS NULL AND temp_t_node.epa_type ='JUNCTION';
 
 		ELSIF v_patternmethod = 14 THEN -- FEATURE PATTERN (CONNEC)
 

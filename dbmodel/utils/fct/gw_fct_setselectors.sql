@@ -29,7 +29,7 @@ v_version json;
 v_tabname text;
 v_tablename text;
 v_columnname text;
-v_id integer;
+v_id text;
 v_ids text;
 v_value text;
 v_muni integer;
@@ -277,10 +277,14 @@ BEGIN
 				END IF;
 			
 				-- manage value
-				IF v_value THEN
-					EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
+				IF v_value then
+					IF v_tabname='tab_period' THEN
+						EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('''|| v_id ||''', '''|| current_user ||''')ON CONFLICT DO NOTHING';
+					ELSE
+						EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
+					END IF;
 				ELSE
-					EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE ' || v_columnname || ' = '|| v_id ||' AND cur_user = current_user';
+					EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE ' || v_columnname || '::text = '''|| v_id ||''' AND cur_user = current_user';
 				END IF;
 			END IF;
 
@@ -312,16 +316,16 @@ BEGIN
 				-- insert into trace tables
 				INSERT INTO anl_arc (fid, arc_id, descript, the_geom) SELECT 
 				v_fid, arc_id, 'Arc forced to be visible because parent-child relation on psectors', the_geom FROM plan_psector_x_arc p
-				JOIN arc USING (arc_id) WHERE psector_id = v_id AND  p.state = 1;
+				JOIN arc USING (arc_id) WHERE psector_id = v_id::int AND  p.state = 1;
 
 				INSERT INTO anl_node (fid, node_id, descript, the_geom) SELECT 
 				v_fid, node_id, 'Node forced to be visible because parent-child relation on psectors', the_geom FROM plan_psector_x_node p
-				JOIN node USING (node_id) WHERE psector_id = v_id AND p.state = 1;
+				JOIN node USING (node_id) WHERE psector_id = v_id::int AND p.state = 1;
 				
 			END IF;
 		ELSE
 			-- getting childs for parent_id for selected row	
-			v_querytext = 'SELECT '||v_tableid||' FROM '||v_table||' WHERE active IS TRUE AND parent_id = '||v_id;
+			v_querytext = 'SELECT '||v_tableid||' FROM '||v_table||' WHERE active IS TRUE AND parent_id = '|| v_id;
 
 			FOR v_id IN EXECUTE v_querytext
 			LOOP
@@ -372,7 +376,7 @@ BEGIN
 		SELECT row_to_json (a) 
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
-		FROM (SELECT st_expand(the_geom, v_expand) as the_geom FROM exploitation where expl_id=v_id) b) a;
+		FROM (SELECT st_expand(the_geom, v_expand) as the_geom FROM exploitation where expl_id=v_id::int) b) a;
 	END IF;
 
 	/*set expl as vdefault if only one value on selector. In spite expl_vdefault is a hidden value, user can enable this variable if he needs it when working on more than
@@ -399,28 +403,28 @@ BEGIN
 	-- manage cross-reference tables
 	IF v_tabname IN('tab_exploitation', 'tab_macroexploitation', 'tab_sector') THEN
 
-		IF v_sectorfromexpl AND v_id > 0 THEN
+		IF v_sectorfromexpl AND v_id::int > 0 THEN
 
 			-- checking actually sector id exists with same id than expl_id
-			IF (SELECT count(*) FROM sector WHERE sector_id = v_id) = 1 THEN
+			IF (SELECT count(*) FROM sector WHERE sector_id = v_id::int) = 1 THEN
 				DELETE FROM selector_sector WHERE cur_user = current_user;
-				INSERT INTO selector_sector VALUES (v_id, current_user);
+				INSERT INTO selector_sector VALUES (v_id::int, current_user);
 			END IF;
 		END IF;
 
-		IF v_sectorfrommacroexpl AND v_id > 0  THEN
+		IF v_sectorfrommacroexpl AND v_id::int > 0  THEN
 			-- checking actually sector id exists with same id than expl_id
-			IF (SELECT count(*) FROM sector WHERE sector_id = v_id) = 1 THEN
+			IF (SELECT count(*) FROM sector WHERE sector_id = v_id::int) = 1 THEN
 				DELETE FROM selector_sector WHERE cur_user = current_user;
-				INSERT INTO selector_sector VALUES (v_id, current_user);
+				INSERT INTO selector_sector VALUES (v_id::int, current_user);
 			END IF;
 		END IF;	
 		
-		IF v_explfromsector AND v_id > 0 THEN
+		IF v_explfromsector AND v_id::int > 0 THEN
 			-- checking actually expl id exists with same id than sector_id
-			IF (SELECT count(*) FROM exploitation WHERE expl_id = v_id) = 1 THEN
+			IF (SELECT count(*) FROM exploitation WHERE expl_id = v_id::int) = 1 THEN
 				DELETE FROM selector_expl WHERE cur_user = current_user;
-				INSERT INTO selector_expl VALUES (v_id, current_user);
+				INSERT INTO selector_expl VALUES (v_id::int, current_user);
 			END IF;
 		END IF;	
 		
