@@ -7,6 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
 delete from config_form_fields where columnname in (
 select columnname from config_form_fields group by formname, columnname having count(*)>1
 ) and tabname='data';
@@ -752,4 +753,3 @@ INSERT INTO config_typevalue (typevalue,id,idval)
 INSERT INTO config_form_list
 (listname, query_text, device, listtype, listclass, vdefault, addparam)
 VALUES('om_visit_event_photo', 'SELECT  value as url FROM om_visit_event_photo WHERE id IS NOT NULL', 5, 'tab', 'iconList', '{"orderBy":"1", "orderType": "DESC"}'::json, NULL);
-

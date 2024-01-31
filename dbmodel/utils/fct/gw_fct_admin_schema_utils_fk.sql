@@ -296,7 +296,16 @@ BEGIN
 		ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_id_fkey"; 
 		ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis2_id_fkey"; 
 		ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_muni_id_fkey"; 
-		ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_district_id_fkey"; 
+		ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_district_id_fkey";
+
+		IF project_type_aux='UD' THEN
+			ALTER TABLE gully DROP CONSTRAINT IF EXISTS "gully_muni_id_fkey";
+			ALTER TABLE gully DROP CONSTRAINT IF EXISTS "gully_streetaxis_id_fkey";
+			ALTER TABLE gully DROP CONSTRAINT IF EXISTS "gully_streetaxis2_id_fkey";
+			ALTER TABLE gully DROP CONSTRAINT IF EXISTS "gully_district_id_fkey";
+		ELSIF project_type_aux='WS' THEN
+			ALTER TABLE om_streetaxis DROP CONSTRAINT IF EXISTS "om_streetaxis_muni_id_fkey";
+		END IF;
 
 		ALTER TABLE "ext_streetaxis" DROP CONSTRAINT IF EXISTS "ext_streetaxis_unique";
 		ALTER TABLE "ext_streetaxis" DROP CONSTRAINT IF EXISTS "ext_streetaxis_exploitation_id_fkey";
@@ -369,11 +378,6 @@ BEGIN
 		REFERENCES "ext_district" ("district_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 		IF project_type_aux='UD' THEN
-			ALTER TABLE gully DROP CONSTRAINT IF EXISTS "gully_muni_id_fkey"; 
-			ALTER TABLE gully DROP CONSTRAINT IF EXISTS "gully_streetaxis_id_fkey"; 
-			ALTER TABLE gully DROP CONSTRAINT IF EXISTS "gully_streetaxis2_id_fkey"; 
-			ALTER TABLE gully DROP CONSTRAINT IF EXISTS "gully_district_id_fkey"; 
-
 			ALTER TABLE "gully" ADD CONSTRAINT "gully_muni_id_fkey" FOREIGN KEY ("muni_id") 
 			REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 			ALTER TABLE "gully" ADD CONSTRAINT "gully_streetaxis_id_fkey" FOREIGN KEY ("muni_id","streetaxis_id") 
@@ -383,7 +387,6 @@ BEGIN
 			ALTER TABLE "gully" ADD CONSTRAINT "gully_district_id_fkey" FOREIGN KEY ("district_id") 
 			REFERENCES "ext_district" ("district_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 		ELSIF project_type_aux='WS' THEN
-			ALTER TABLE om_streetaxis DROP CONSTRAINT IF EXISTS "om_streetaxis_muni_id_fkey"; 
 			ALTER TABLE "om_streetaxis" ADD CONSTRAINT "om_streetaxis_muni_id_fkey" FOREIGN KEY ("muni_id") 
 			REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 		END IF;

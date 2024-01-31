@@ -1,6 +1,6 @@
 3.6.007
 *************
-- Refactor of the creation of projects (empty, inventory, full and mport inp)
-- add selector period strategy on selector
+- Refactor of the creation of projects (empty, inventory, full and import inp)
+- Add selector period strategy on selector
 - Drop not null for dma's (ud and ws)
 - Enhance the simbology of mapzones
