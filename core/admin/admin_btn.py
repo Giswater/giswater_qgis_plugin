@@ -357,7 +357,7 @@ class GwAdminButton:
             QgsApplication.taskManager().triggerTask(self.task_update_schema)
 
 
-    def load_updates(self, project_type=None, update_changelog=False, schema_name=None):
+    def load_updates(self, project_type=None, update_changelog=False, schema_name=None, dict_update_folders=None):
         """"""
 
         # Get current schema selected
@@ -374,7 +374,7 @@ class GwAdminButton:
         self.task1.setProgress(20)
         self.task1.setProgress(40)
         if status:
-            status = self.update_31to39(project_type=project_type)
+            status = self.update_dict_folders(False, project_type=project_type, dict_update_folders=dict_update_folders)
         self.task1.setProgress(60)
         if status:
             status = self.execute_last_process(schema_name=schema_name, locale=True)
@@ -469,7 +469,6 @@ class GwAdminButton:
 
     def load_base(self, dict_folders):
         """"""
-
         for folder in dict_folders.keys():
             status = self._execute_files(folder, set_progress_bar=True)
             if not status and self.dev_commit is False:
@@ -496,7 +495,7 @@ class GwAdminButton:
         return True
 
 
-    def update_minor31to39(self, folder_update, new_project, project_type, no_ct):
+    def update_minor_dict_folders(self, folder_update, new_project, project_type, no_ct):
 
         folder_utils = os.path.join(folder_update, 'utils')
         if self._process_folder(folder_utils) is True:
@@ -523,7 +522,7 @@ class GwAdminButton:
         return True
 
 
-    def update_31to39(self, new_project=False, project_type=False, no_ct=False):
+    def update_dict_folders(self, new_project=False, project_type=False, no_ct=False, dict_update_folders=None):
         """"""
 
         if not os.path.exists(self.folder_updates):
@@ -531,100 +530,33 @@ class GwAdminButton:
             self.error_count = self.error_count + 1
             return
 
-        folders = sorted(os.listdir(self.folder_updates + ''))
-        for folder in folders:
-            sub_folders = sorted(os.listdir(os.path.join(self.folder_updates, folder)))
+        for folder in dict_update_folders.keys():
+            sub_folders = sorted(os.listdir(folder))
             for sub_folder in sub_folders:
                 folder_update = os.path.join(self.folder_updates, folder, sub_folder)
                 if new_project:
                     if self.dev_commit is True:
                         if str(sub_folder) > '31100':
-                            status = self.update_minor31to39(folder_update, new_project, project_type, no_ct)
+                            status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
                             if status is False:
                                 return False
                     else:
                         if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
-                            status = self.update_minor31to39(folder_update, new_project, project_type, no_ct)
+                            status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
                             if status is False:
                                 return False
                 else:
                     if self.dev_commit is True:
                         if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
-                            status = self.update_minor31to39(folder_update, new_project, project_type, no_ct)
+                            status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
                             if status is False:
                                 return False
                     else:
                         if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
-                            status = self.update_minor31to39(folder_update, new_project, project_type, no_ct)
+                            status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
                             if status is False:
                                 return False
         return True
-
-
-    def load_views(self):
-        """"""
-
-        list_folders = []
-        list_folders.append(os.path.join(self.folder_software, self.file_pattern_ddlview))
-        list_folders.append(os.path.join(self.folder_utils, self.file_pattern_ddlview))
-        for folder in list_folders:
-            status = self._execute_files(folder, set_progress_bar=True)
-            if not status and self.dev_commit is False:
-                return False
-
-        return True
-
-
-    def update_30to31(self, new_project=False, project_type=False, set_progress_bar=True):
-        """"""
-
-        if not os.path.exists(self.folder_updates):
-            tools_qgis.show_message("The update folder was not found in sql folder")
-            self.error_count = self.error_count + 1
-            return True
-
-        # Process only subfolders of folder '31'
-        folder = os.path.join(self.folder_updates, '31')
-        sub_folders = sorted(os.listdir(os.path.join(self.folder_updates, folder)))
-        for sub_folder in sub_folders:
-            if new_project:
-                if str(sub_folder) <= '31100':
-                    folderpath = os.path.join(self.folder_updates, folder, sub_folder, 'utils')
-                    if self._process_folder(folderpath) is True:
-                        status = self._load_sql(folderpath, set_progress_bar=set_progress_bar)
-                        if status is False:
-                            return False
-                    folderpath = os.path.join(self.folder_updates, folder, sub_folder, project_type)
-                    if self._process_folder(folderpath) is True:
-                        status = self._load_sql(folderpath, set_progress_bar=set_progress_bar)
-                        if status is False:
-                            return False
-                    folderpath = os.path.join(self.folder_updates, folder, sub_folder, 'i18n', self.locale)
-                    if self._process_folder(folderpath) is True:
-                        status = self._execute_files(folderpath, True, set_progress_bar=set_progress_bar)
-                        if status is False:
-                            return False
-
-            else:
-                if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= '31100':
-                    folderpath = os.path.join(self.folder_updates, folder, sub_folder, 'utils')
-                    if self._process_folder(folderpath) is True:
-                        status = self._load_sql(folderpath)
-                        if status is False:
-                            return False
-                    folderpath = os.path.join(self.folder_updates, folder, sub_folder, self.project_type_selected)
-                    if self._process_folder(folderpath) is True:
-                        status = self._load_sql(folderpath)
-                        if status is False:
-                            return False
-                    folderpath = os.path.join(self.folder_updates, folder, sub_folder, 'i18n', self.locale)
-                    if self._process_folder(folderpath) is True:
-                        status = self._execute_files(folderpath, True)
-                        if status is False:
-                            return False
-
-        return True
-
 
     def load_sample_data(self, project_type):
 
@@ -657,20 +589,6 @@ class GwAdminButton:
 
         return True
 
-
-    def load_trg(self):
-        """"""
-
-        list_folders = []
-        list_folders.append(os.path.join(self.folder_utils, self.file_pattern_trg))
-        list_folders.append(os.path.join(self.folder_software, self.file_pattern_trg))
-
-        for folder in list_folders:
-            status = self._execute_files(folder, set_progress_bar=True)
-            if not status and self.dev_commit is False:
-                return False
-
-        return True
 
     # endregion
 
@@ -733,14 +651,10 @@ class GwAdminButton:
         self.locale = tools_qgis.get_locale()
 
         # Declare all file variables
-        self.file_pattern_tablect = "tablect"
         self.file_pattern_ddl = "ddl"
-        self.file_pattern_dml = "dml"
         self.file_pattern_fct = "fct"
-        self.file_pattern_trg = "trg"
         self.file_pattern_ftrg = "ftrg"
-        self.file_pattern_ddlview = "ddlview"
-        self.file_pattern_ddlrule = "ddlrule"
+        self.file_pattern_schema_model = "schema_model"
 
         # Declare all folders
         if self.schema_name is not None and self.project_type is not None:
@@ -1850,8 +1764,7 @@ class GwAdminButton:
             manage_i18n = True
 
         if manage_i18n:
-            files_to_execute = [f"{self.project_type_selected}.sql", "utils.sql", "ddl.sql", "ddlview.sql", "dml.sql",
-                                "tablect.sql", "trg.sql"]
+            files_to_execute = [f"{self.project_type_selected}_schema_model.sql"]
             for file in filelist:
                 status = True
                 if file in files_to_execute:
