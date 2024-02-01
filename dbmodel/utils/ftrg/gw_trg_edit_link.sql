@@ -260,7 +260,7 @@ BEGIN
 			v_arc_id = v_arc.arc_id;
 			v_sector = v_arc.sector_id; 
             
-            -- control of dma and fluidtype automatic values
+			-- control of dma and fluidtype automatic values
 			IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma = v_arc.dma_id; ELSE v_dma = NEW.dma_id; END IF;
 			IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN v_fluidtype = v_arc.fluid_type; ELSE v_fluidtype = NEW.fluid_type; END IF;
 
@@ -294,7 +294,7 @@ BEGIN
 			v_expl = v_node.expl_id;
 			v_sector = v_node.sector_id; 
             
-            -- control of dma and fluidtype automatic values
+			-- control of dma and fluidtype automatic values
 			IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma = v_node.dma_id; ELSE v_dma = NEW.dma_id; END IF;
 			IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN v_fluidtype = v_node.fluid_type; ELSE v_fluidtype = NEW.fluid_type; END IF;
 			
@@ -309,9 +309,13 @@ BEGIN
 
 			-- getting v_arc
 			v_arc_id = (SELECT arc_id FROM arc WHERE state > 0 AND node_1 = v_node.node_id LIMIT 1);
+			IF v_arc_id IS NULL THEN
+				v_arc_id = (SELECT arc_id FROM arc WHERE state > 0 AND node_2 = v_node.node_id LIMIT 1);
+			END IF;
 			
 			IF v_arc_id IS NULL AND NEW.state=0 THEN
 				v_arc_id = (SELECT arc_id FROM arc WHERE state = 0 AND node_1 = v_node.node_id LIMIT 1);
+
 			END IF;
 			
 		ELSIF v_connec2.connec_id IS NOT NULL THEN

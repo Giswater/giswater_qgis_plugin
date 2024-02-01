@@ -211,7 +211,8 @@ BEGIN
 		-- this need to be solved here in spite of fill_data functions because some kind of incosnstency done on this function on previous lines
 		EXECUTE 'INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, length, diameter, the_geom,
 			expl_id, dma_id, presszone_id, dqa_id, minsector_id, status, minorloss, age)
-			SELECT concat(''CO'',connec_id), connec_id as node_1, CASE WHEN vnode_type = ''ARC'' THEN concat(''VN'',vnode_id) WHEN vnode_type = ''NODE'' THEN vnode_id::text ELSE pjoint_id end AS node_2, 
+			SELECT concat(''CO'',connec_id), connec_id as node_1, 
+			CASE WHEN exit_type = ''ARC'' THEN concat(''VN'',vnode_id) WHEN exit_type = ''NODE'' THEN exit_id::text ELSE pjoint_id end AS node_2, 
 			''LINK'', connecat_id, ''PIPE'', c.sector_id, c.state, c.state_type, annotation, 
 			(CASE WHEN custom_roughness IS NOT NULL THEN custom_roughness ELSE roughness END) AS roughness,
 			(CASE WHEN custom_length IS NOT NULL THEN custom_length ELSE st_length(l.the_geom) END), 
