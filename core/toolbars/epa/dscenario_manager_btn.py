@@ -811,7 +811,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Get layers to add
         lyr_filter = "v_edit_inp_dscenario_%"
-        sql = f"SELECT id, alias, style_id, addparam FROM sys_table WHERE id LIKE '{lyr_filter}' AND alias IS NOT NULL"
+        sql = f"SELECT id, alias, style_id, addparam FROM sys_table WHERE id LIKE '{lyr_filter}' AND alias IS NOT NULL ORDER BY alias ASC"
         rows = tools_db.get_rows(sql)
         if rows:
             # LOAD ALL
