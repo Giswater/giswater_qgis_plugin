@@ -409,7 +409,7 @@ BEGIN
 			FROM (SELECT st_expand(st_collect(the_geom), 50.0) as the_geom FROM exploitation where expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) b) a;
 		END IF;
 		
-		if v_tiled is true and v_selector_type='selector_mincut' then
+		if v_selector_type='selector_mincut' then
 			-- GET GEOJSON
 			--v_om_mincut
 			SELECT jsonb_agg(features.feature) INTO v_result
@@ -547,7 +547,7 @@ BEGIN
 				"userValues":'||v_uservalues||',
 				"geometry":'||v_geometry||',
 				"layerColumns":'||v_layerColumns||
-				(case when v_tiled is true and v_selector_type = 'selector_mincut' then ',
+				(case when v_selector_type = 'selector_mincut' then ',
 					"tiled":'||v_tiled||',
 					"mincutInit":'||v_mincut_init||',
 					"mincutProposedValve":'||v_mincut_valve_proposed||',
