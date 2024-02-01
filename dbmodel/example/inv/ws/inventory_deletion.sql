@@ -48,3 +48,5 @@ UPDATE cat_mat_roughness SET roughness = null;
 DELETE FROM rpt_cat_result;
 
 UPDATE config_param_user SET value = false where parameter = 'plan_psector_force_delete';
+
+DELETE FROM inp_pump_additional;
