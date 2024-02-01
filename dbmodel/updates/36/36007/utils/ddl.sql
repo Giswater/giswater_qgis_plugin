@@ -22,3 +22,5 @@ CREATE TABLE selector_period(
   CONSTRAINT selector_period_id_fkey FOREIGN KEY (period_id)
       REFERENCES ext_cat_period (id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE);
+      
+ALTER TABLE anl_node ALTER COLUMN node_id DROP DEFAULT;
