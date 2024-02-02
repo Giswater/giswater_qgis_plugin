@@ -13,6 +13,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_ca
 
 --22/01/23
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"plot_code", "dataType":"varchar"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_connec_traceability", "column":"plot_code", "dataType":"varchar"}}$$);
 
 --24/01/23
 CREATE TABLE selector_period(
