@@ -89,3 +89,5 @@ VALUES ('selector_basic_','tab_period','Period','Period','role_basic',9,'{4,5}')
 insert into config_param_system (parameter, value, descript, project_type, isenabled) VALUES  
 ('basic_selector_tab_period', '{"table":"ext_cat_period","selector":"selector_period","table_id":"id","selector_id":"period_id","label":"id, '' - '', code","orderBy":"id","manageAll":true,"typeaheadFilter":"", "query_filter":"","typeaheadForced":false}',
 'Tab for period', 'utils', true) on conflict (parameter) DO NOTHING;
+
+DELETE FROM sys_function WHERE function_name = 'gw_trg_notify';

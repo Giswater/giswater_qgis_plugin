@@ -785,20 +785,6 @@ CREATE TRIGGER gw_trg_node_statecontrol BEFORE INSERT OR UPDATE OF state ON node
 
 
 --
--- Name: cat_feature gw_trg_notify; Type: TRIGGER; Schema: Schema; Owner: -
---
-
-CREATE TRIGGER gw_trg_notify AFTER INSERT OR DELETE OR UPDATE OF id ON cat_feature FOR EACH ROW EXECUTE FUNCTION gw_trg_notify('cat_feature');
-
-
---
--- Name: cat_work gw_trg_notify; Type: TRIGGER; Schema: Schema; Owner: -
---
-
-CREATE TRIGGER gw_trg_notify AFTER INSERT OR DELETE OR UPDATE OF id ON cat_work FOR EACH ROW EXECUTE FUNCTION gw_trg_notify('cat_work');
-
-
---
 -- Name: om_visit gw_trg_om_visit; Type: TRIGGER; Schema: Schema; Owner: -
 --
 
