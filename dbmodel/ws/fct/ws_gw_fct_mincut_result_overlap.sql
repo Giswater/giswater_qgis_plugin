@@ -152,15 +152,18 @@ BEGIN
 
 							-- create temp result for joined analysis
 							INSERT INTO om_mincut (id, work_order, mincut_state, mincut_class, expl_id, macroexpl_id) 
-							VALUES (-2, 'Conflict Mincut (system)', 2, 1, v_mincutrec.expl_id, v_mincutrec.macroexpl_id);
+							VALUES (-2, 'Conflict Mincut (system)', 2, 1, v_mincutrec.expl_id, v_mincutrec.macroexpl_id)
+							ON conflict (id) DO NOTHING;
 
 							-- copying proposed valves and afected arcs from original mincut result to temp result into om_mincut_valve 
 							INSERT INTO om_mincut_valve (result_id, node_id,  closed,  broken, unaccess, proposed, the_geom)
 							SELECT -2, node_id,  true,  broken, unaccess, proposed, the_geom 
-							FROM om_mincut_valve WHERE result_id= v_mincutid AND proposed=TRUE;
+							FROM om_mincut_valve WHERE result_id= v_mincutid AND proposed=TRUE
+							ON conflict (result_id, node_id) DO NOTHING; 
 							
 							INSERT INTO om_mincut_arc ( result_id, arc_id, the_geom)
-							SELECT -2, arc_id, the_geom FROM om_mincut_arc WHERE result_id=v_mincutid;
+							SELECT -2, arc_id, the_geom FROM om_mincut_arc WHERE result_id=v_mincutid
+							ON conflict (result_id, arc_id) DO NOTHING;
 
 							--identifing overlap
 							v_overlaps:= TRUE;
