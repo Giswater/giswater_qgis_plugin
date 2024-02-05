@@ -468,6 +468,76 @@ INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_
 
 
 --
+-- Data for Name: cat_feature_arc; Type: TABLE DATA; Schema: ; Owner: -
+--
+
+INSERT INTO cat_feature_arc VALUES ('TUBERIA', 'PIPE', 'PIPE');
+INSERT INTO cat_feature_arc VALUES ('VARC', 'VARC', 'PIPE');
+
+
+--
+-- Data for Name: cat_feature_connec; Type: TABLE DATA; Schema: ; Owner: -
+--
+
+INSERT INTO cat_feature_connec VALUES ('ACOMETIDA', 'WJOIN', '{"activated":false,"value":1}', 'JUNCTION');
+INSERT INTO cat_feature_connec VALUES ('FUENTE_ORNAMENTAL', 'FOUNTAIN', '{"activated":false,"value":1}', 'JUNCTION');
+INSERT INTO cat_feature_connec VALUES ('FUENTE', 'TAP', '{"activated":false,"value":1}', 'JUNCTION');
+INSERT INTO cat_feature_connec VALUES ('BOCA_RIEGO', 'GREENTAP', '{"activated":false,"value":1}', 'JUNCTION');
+INSERT INTO cat_feature_connec VALUES ('ACOMETIDA_FICTICIA', 'WJOIN', '{"activated":false,"value":1}', 'JUNCTION');
+
+
+--
+-- Data for Name: cat_feature_node; Type: TABLE DATA; Schema: ; Owner: -
+--
+
+INSERT INTO cat_feature_node VALUES ('RECLORADOR', 'NETELEMENT', 'SHORTPIPE', 2, true, true, 'DQA', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('ADAPTACION', 'JUNCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('CURVA', 'JUNCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('FINAL_LINEA', 'JUNCTION', 'JUNCTION', 1, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('UNION', 'JUNCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('T', 'JUNCTION', 'JUNCTION', 3, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('X', 'JUNCTION', 'JUNCTION', 4, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_REDUC_PR', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_CONTROL_FL', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_ROTURA_PR', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_SOST_PR', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_ACCEL', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_AIRE', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_VERDE', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_DESAGUE', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_CONTROL', 'VALVE', 'SHORTPIPE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_CIERRE', 'VALVE', 'SHORTPIPE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('REGISTRO', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('REGISTRO_CONTROL', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('REGISTRO_BYPASS', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('REGISTRO_VALVULA', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('ELEMENTO_RED', 'NETELEMENT', 'JUNCTION', 2, true, true, 'DQA', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('CALDERIN_EXPANSION', 'EXPANSIONTANK', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('FILTRO', 'FILTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('DILATADOR', 'FLEXUNION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('MEDIDOR', 'METER', 'JUNCTION', 2, true, true, 'DMA', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('MEDIDOR_PRESION', 'METER', 'JUNCTION', 2, true, true, 'DMA', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('HIDRANTE', 'HYDRANT', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('POZO_ACCESO', 'MANHOLE', 'RESERVOIR', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('PUNTO_MOSTREO', 'NETSAMPLEPOINT', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('BOMBEO', 'PUMP', 'PUMP', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('REDUCCION', 'REDUCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('CAPTACION', 'SOURCE', 'RESERVOIR', 2, true, true, 'SECTOR', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('DEPOSITO', 'TANK', 'TANK', 9, true, true, 'SECTOR', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('ACOMETIDA_TOPO', 'NETWJOIN', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('POZO_CAPTACION', 'WATERWELL', 'JUNCTION', 2, true, true, 'SECTOR', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('ESTACION_TRATAMIENTO', 'WTP', 'RESERVOIR', 2, true, true, 'SECTOR', false, '{"activated":false,"value":1}');
+
+
+--
+-- Data for Name: config_graph_valve; Type: TABLE DATA; Schema: ; Owner: -
+--
+
+INSERT INTO config_graph_valve VALUES ('VALVULA_CIERRE', true);
+
+
+--
 -- Data for Name: element_type; Type: TABLE DATA; Schema: ; Owner: -
 --
 
