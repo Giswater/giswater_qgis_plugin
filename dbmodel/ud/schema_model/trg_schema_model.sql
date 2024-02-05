@@ -2126,3 +2126,7 @@ CREATE TRIGGER gw_trg_visit_event_update_xy AFTER INSERT OR UPDATE OF position_i
 --
 
 CREATE TRIGGER gw_trg_visit_expl BEFORE INSERT OR UPDATE OF the_geom ON om_visit FOR EACH ROW EXECUTE FUNCTION gw_trg_visit_expl();
+
+
+ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
+ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_typevalue_fk;

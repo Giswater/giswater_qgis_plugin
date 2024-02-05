@@ -132,6 +132,10 @@ BEGIN
 				EXECUTE 'DROP TABLE IF EXISTS '||v_tablename.table_name||' CASCADE';
 			END LOOP;
 			
+			-- enable triggers
+			ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
+			ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_typevalue_fk;
+			
 			-- set mapzones symbology
             UPDATE config_param_system SET value = (replace(value, 'Random', 'Disable')) WHERE parameter='utils_graphanalytics_style';
             UPDATE config_param_system SET value = (replace(value, 'Stylesheet', 'Disable')) WHERE parameter='utils_graphanalytics_style';
