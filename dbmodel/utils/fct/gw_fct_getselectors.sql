@@ -332,12 +332,12 @@ BEGIN
 						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , 
 						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
 						FROM ',v_addschema,'.' , v_table , ' m 
-						WHERE ',v_table_id ,' NOT IN (SELECT ',v_table_id ,' FROM  SCHEMA_NAME.', v_table , ') AND ' , 
+						WHERE ',v_table_id ,' NOT IN (SELECT ',v_table_id ,' FROM  ws36007.', v_table , ') AND ' , 
 						v_table_id , ' IN (SELECT ' , v_selector_id , ' FROM ',v_addschema,'.' , v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' UNION 
 						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , 
 						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
 						FROM ',v_addschema,'.', v_table , ' m
-						WHERE ',v_table_id ,' NOT IN (SELECT ',v_table_id ,' FROM  SCHEMA_NAME.', v_table , ') AND ' , 
+						WHERE ',v_table_id ,' NOT IN (SELECT ',v_table_id ,' FROM  ws36007.', v_table , ') AND ' , 
 						v_table_id , ' NOT IN (SELECT ' , v_selector_id , ' FROM ',v_addschema,'.' , v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' ORDER BY orderby asc) a');
 			
 		ELSE 
@@ -520,6 +520,8 @@ BEGIN
 	v_mincut_node = COALESCE(v_mincut_node, '[]');
 	v_mincut_connec = COALESCE(v_mincut_connec, '[]');
 	v_mincut_arc = COALESCE(v_mincut_arc, '[]');
+	v_uservalues = COALESCE(v_uservalues, '{}');
+	v_tiled = COALESCE(v_tiled, FALSE);	
 	
 	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 	
