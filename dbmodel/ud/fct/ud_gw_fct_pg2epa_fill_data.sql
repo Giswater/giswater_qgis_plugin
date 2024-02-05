@@ -115,8 +115,8 @@ BEGIN
 		v_statetype ||' UNION SELECT node_2 FROM vi_parent_arc JOIN value_state_type ON id=state_type WHERE sector_id > 0 AND epa_type !=''UNDEFINED'' '||v_statetype ||')a ON node.node_id=a.node_id';
 		
 
-	-- node onfly transformation of junctions to outfalls (when outfallparam is fill and junction is node sink)
-	PERFORM gw_fct_anl_node_sink($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"tableName":"v_edit_inp_junction"},"data":{"parameters":{"saveOnDatabase":true}}}$$);
+	-- node on the fly transformation of junctions to outfalls (when outfallparam is fill and junction is node sink)
+	-- PERFORM gw_fct_anl_node_sink($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"tableName":"v_edit_node"},"data":{"parameters":{"saveOnDatabase":true}}}$$);
 	
 	-- update child param for divider
 	UPDATE temp_t_node SET addparam=concat('{"divider_type":"',divider_type,'", "arc_id":"',arc_id,'", "curve_id":"',curve_id,'", "qmin":"',
