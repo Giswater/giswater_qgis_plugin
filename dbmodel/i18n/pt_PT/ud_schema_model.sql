@@ -391,7 +391,7 @@ INSERT INTO sys_message VALUES (3216, 'It''s impossible to update arc_id from ps
 INSERT INTO sys_message VALUES (3228, 'It is not possible to insert arc into psector because has operative connects associated', 'You need to previously insert related connects into psector', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3164, 'Arc have incorrectly defined final nodes in this plan alternative', 'Make sure that arcs finales are on service or check by using toolbox function Check plan data (fid= 355)', 2, true, 'utils', 'core');
 
-
+ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature_after;
 --
 -- Data for Name: cat_feature; Type: TABLE DATA; Schema: ; Owner: -
 --
@@ -478,6 +478,7 @@ INSERT INTO cat_feature_node VALUES ('RESERVATORIO_PULMAO', 'STORAGE', 'STORAGE'
 INSERT INTO cat_feature_node VALUES ('RESERVATORIO_CONTENCAO', 'STORAGE', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('BOMBEAMENTO', 'CHAMBER', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
 
+ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature_after;
 
 
 --

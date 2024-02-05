@@ -413,7 +413,7 @@ INSERT INTO sys_message VALUES (3228, 'It is not possible to insert arc into pse
 INSERT INTO sys_message VALUES (3164, 'Arc have incorrectly defined final nodes in this plan alternative', 'Make sure that arcs finales are on service or check by using toolbox function Check plan data (fid= 355)', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3238, 'Dscenario with this name doesn''t exist', 'Create an empty dscenario with the same name as indicated in csv file in order to continue the import of data', 2, true, 'ws', 'core');
 
-
+ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature_after;
 --
 -- Data for Name: cat_feature; Type: TABLE DATA; Schema: ; Owner: -
 --
@@ -536,6 +536,7 @@ INSERT INTO cat_feature_node VALUES ('ESTACION_TRATAMIENTO', 'WTP', 'RESERVOIR',
 
 INSERT INTO config_graph_valve VALUES ('VALVULA_CIERRE', true);
 
+ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature_after;
 
 --
 -- Data for Name: element_type; Type: TABLE DATA; Schema: ; Owner: -

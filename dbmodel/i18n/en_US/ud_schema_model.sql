@@ -412,7 +412,7 @@ INSERT INTO sys_message VALUES (3214, 'It''s impossible to downgrade the state o
 INSERT INTO sys_message VALUES (3216, 'It''s impossible to update arc_id from psector dialog because this planned link has not arc as exit-type', 'Use gully dialog to update it', 2, true, 'ud', 'core');
 INSERT INTO sys_message VALUES (3228, 'It is not possible to insert arc into psector because has operative connects associated', 'You need to previously insert related connects into psector', 2, true, 'utils', 'core');
 
-
+ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature_after;
 --
 -- Data for Name: cat_feature; Type: TABLE DATA; Schema: ; Owner: -
 --
@@ -503,6 +503,7 @@ INSERT INTO cat_feature_node VALUES ('SEWER_STORAGE', 'STORAGE', 'STORAGE', 2, t
 INSERT INTO cat_feature_node VALUES ('OWERFLOW_STORAGE', 'STORAGE', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('PUMP_STATION', 'CHAMBER', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
 
+ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature_after;
 
 --
 -- Data for Name: element_type; Type: TABLE DATA; Schema: ; Owner: -
