@@ -2481,7 +2481,7 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
         else:
             if not json_result or not json_result.get('body'):
                 return
-            if type(json_result['body'].get('data')) is list:
+            if not json_result['body'].get('data') or type(json_result['body'].get('data')) is list:
                 return
             for key, value in list(json_result['body']['data'].items()):
                 if key.lower() in ('point', 'line', 'polygon'):
