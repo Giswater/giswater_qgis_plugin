@@ -174,6 +174,9 @@ class GwProjectCheckTask(GwTask):
 
         # Populate info_log and missing layers
         critical_level = 0
+        if result.get('status') == 'Failed':
+            tools_gw.manage_json_exception(result)
+            return False
         text_result = tools_gw.add_layer_temp(self.dlg_audit_project, result['body']['data'],
                                               'gw_fct_setcheckproject_result', True, False, 0, True,
                                               call_set_tabs_enabled=False)
