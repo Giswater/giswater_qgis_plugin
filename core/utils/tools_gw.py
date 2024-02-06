@@ -14,6 +14,7 @@ import re
 import sys
 import sqlite3
 import webbrowser
+import xml.etree.ElementTree as ET
 
 if 'nt' in sys.builtin_module_names:
     import ctypes
@@ -684,6 +685,14 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
 
     global_vars.iface.mapCanvas().refresh()
 
+def validate_qml(qml_content):
+    qml_content_no_spaces = qml_content.replace("\n", "").replace("\t", "")
+    try:
+        root = ET.fromstring(qml_content_no_spaces)
+        return True, None
+    except ET.ParseError as e:
+        return False, str(e)
+
 
 def set_layer_style(style_id, layer, is_epa=False):
     body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
@@ -694,21 +703,25 @@ def set_layer_style(style_id, layer, is_epa=False):
         if 'style' in style['body']['styles']:
             qml = style['body']['styles']['style']
 
-            style_manager = layer.styleManager()
+            valid_qml, error_message = validate_qml(qml)
+            if not valid_qml:
+                msg = "The QML file is invalid."
+                tools_qgis.show_warning(msg, parameter=error_message)
+            else:
+                style_manager = layer.styleManager()
 
-            # read valid style from layer
-            style = QgsMapLayerStyle()
-            style.readFromLayer(layer)
+                # read valid style from layer
+                style = QgsMapLayerStyle()
+                style.readFromLayer(layer)
 
-            style_name = "GwEpaStyle" if is_epa else "GwStyle"
-            # add style with new name
-            style_manager.addStyle(style_name, style)
-            # set new style as current
-            style_manager.setCurrentStyle(style_name)
+                style_name = "GwEpaStyle" if is_epa else "GwStyle"
+                # add style with new name
+                style_manager.addStyle(style_name, style)
+                # set new style as current
+                style_manager.setCurrentStyle(style_name)
 
-            tools_qgis.create_qml(layer, qml)
-            style_manager.setCurrentStyle("GwStyle")
-
+                tools_qgis.create_qml(layer, qml)
+                style_manager.setCurrentStyle("GwStyle")
 
 def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
                    group='GW Temporal Layers', call_set_tabs_enabled=True, close=True):
@@ -1168,8 +1181,12 @@ def set_style_mapzones():
         # Loop for each mapzone returned on json
         lyr = tools_qgis.get_layer_by_tablename(mapzone['layer'])
         categories = []
-        status = mapzone['status']
-        if status == 'Disable' or lyr is None:
+        try:
+            mode = mapzone['mode']
+        except KeyError:  # backwards compatibility for database < 3.6.007
+            mode = mapzone['status']
+			
+        if mode == 'Disable' or lyr is None:
             continue
 
         # Loop for each id returned on json
@@ -1185,7 +1202,7 @@ def set_style_mapzones():
             R = random.randint(0, 255)
             G = random.randint(0, 255)
             B = random.randint(0, 255)
-            if status == 'Stylesheet':
+            if mode == 'Stylesheet':
                 try:
                     R = id['stylesheet']['color'][0]
                     G = id['stylesheet']['color'][1]
@@ -1195,7 +1212,7 @@ def set_style_mapzones():
                     G = random.randint(0, 255)
                     B = random.randint(0, 255)
 
-            elif status == 'Random':
+            elif mode == 'Random':
                 R = random.randint(0, 255)
                 G = random.randint(0, 255)
                 B = random.randint(0, 255)
@@ -1208,6 +1225,19 @@ def set_style_mapzones():
                 symbol.changeSymbolLayer(0, symbol_layer)
             category = QgsRendererCategory(id['id'], symbol, str(id['id']))
             categories.append(category)
+
+        # Add a category for any other value not categorized
+        symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
+        try:
+            symbol.setOpacity(float(mapzone['transparency']))
+        except KeyError:  # backwards compatibility for database < 3.5.030
+            symbol.setOpacity(float(mapzone['opacity']))
+        layer_style = {'color': '{}, {}, {}'.format(int(random.randint(0, 255)), int(random.randint(0, 255)), int(random.randint(0, 255)))}
+        symbol_layer = QgsSimpleFillSymbolLayer.create(layer_style)
+        if symbol_layer is not None:
+            symbol.changeSymbolLayer(0, symbol_layer)
+        category = QgsRendererCategory('', symbol, '')
+        categories.append(category)
 
         # apply symbol to layer renderer
         lyr.setRenderer(QgsCategorizedSymbolRenderer(mapzone['idname'], categories))
@@ -2062,9 +2092,12 @@ def add_combo(field, dialog=None, complet_result=None, ignore_function=False):
     return widget
 
 
-def fill_combo(widget, field):
-    # Generate list of items to add into combo
+def fill_combo(widget, field, index_to_show=1):
+    # check if index_to_show is in widgetcontrols, then assign new value
+    if field.get('widgetcontrols') and 'index_to_show' in field.get('widgetcontrols'):
+        index_to_show = field.get('widgetcontrols')['index_to_show']
 
+    # Generate list of items to add into combo
     widget.blockSignals(True)
     widget.clear()
     widget.blockSignals(False)
@@ -2083,7 +2116,7 @@ def fill_combo(widget, field):
         tools_qgis.show_message(msg, 2)
     # Populate combo
     for record in combolist:
-        widget.addItem(record[1], record)
+        widget.addItem(record[index_to_show], record)
 
     return widget
 
@@ -2404,7 +2437,25 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
     try:
         return_manager = json_result['body']['returnManager']
     except KeyError:
-        return
+        return_manager = {
+            "style": {
+                "point": {
+                    "style": "unique", "values": {
+                        "width": 3, "color": [255, 1, 1], "transparency": 0.5
+                    }
+                },
+                "line": {
+                    "style": "unique", "values": {
+                        "width": 3, "color": [255, 1, 1], "transparency": 0.5
+                    }
+                },
+                "polygon": {
+                    "style": "unique", "values": {
+                        "width": 3, "color": [255, 1, 1], "transparency": 0.5
+                    }
+                }
+            }
+        }
 
     srid = lib_vars.data_epsg
     try:
@@ -2428,7 +2479,10 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
             draw_by_json(json_result, rubber_band, margin, color=color, width=width)
 
         else:
-
+            if not json_result or not json_result.get('body'):
+                return
+            if not json_result['body'].get('data') or type(json_result['body'].get('data')) is list:
+                return
             for key, value in list(json_result['body']['data'].items()):
                 if key.lower() in ('point', 'line', 'polygon'):
                     if key not in json_result['body']['data']:
@@ -4030,8 +4084,10 @@ def _get_parser_from_filename(filename):
 
     if filename in ('init', 'session'):
         folder = f"{lib_vars.user_folder_dir}{os.sep}core"
-    elif filename in ('dev', 'giswater', 'user_params'):
+    elif filename in ('dev', 'giswater'):
         folder = lib_vars.plugin_dir
+    elif filename == 'user_params':
+        folder = lib_vars.plugin_dir if global_vars.gw_dev_mode else f"{lib_vars.user_folder_dir}{os.sep}core"
     else:
         return None, None
 

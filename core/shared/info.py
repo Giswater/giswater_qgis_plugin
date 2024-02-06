@@ -228,6 +228,20 @@ class GwInfo(QObject):
                         sub_tag = 'arc'
                     else:
                         sub_tag = 'node'
+
+                # Comes from QPushButtons node1 or node2
+                if feature_id:
+                    x1 = self.complet_result['body']['feature']['geometry']['x']
+                    y1 = self.complet_result['body']['feature']['geometry']['y']
+
+                    current_extent = global_vars.canvas.extent()
+
+                    feature_point = QgsPointXY(x1, y1)
+
+                    if not current_extent.contains(feature_point):
+                        global_vars.canvas.setCenter(feature_point)
+                        global_vars.canvas.refresh()
+
                 feature_id = self.complet_result['body']['feature']['id']
 
                 result, dialog = self._open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker,
@@ -2069,8 +2083,8 @@ class GwInfo(QObject):
             widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, self.my_json_epa))
             # TODO: Make autoupdate widgets work
         widget.textChanged.connect(partial(self._enabled_accept, dialog))
-        widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
         widget.textChanged.connect(partial(self._check_min_max_value, dialog, widget, dialog.btn_accept))
+        widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
 
         return widget
 
@@ -2096,8 +2110,8 @@ class GwInfo(QObject):
             widget.textChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json_epa))
             # TODO: Make autoupdate widgets work
         widget.textChanged.connect(partial(self._enabled_accept, dialog))
-        widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
         widget.textChanged.connect(partial(self._check_min_max_value, dialog, widget, dialog.btn_accept))
+        widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
 
         return widget
 
@@ -2165,7 +2179,7 @@ class GwInfo(QObject):
     def _reload_epa_tab(self, dialog):
         epa_type = tools_qt.get_text(dialog, 'tab_data_epa_type')
         # call getinfofromid
-        if epa_type.lower() == 'undefined':
+        if not epa_type or epa_type.lower() in ('undefined', 'null'):
             tools_qt.enable_tab_by_tab_name(self.tab_main, 'tab_epa', False)
             return
 
@@ -3417,7 +3431,7 @@ def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, force_action, **kwar
         sql = (f"SELECT order_id as id, order_id::text as idval FROM {aux_view}"
                f" WHERE {info.feature_type}_id = '{feature_id}'")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(cmb_order_id, rows, 1)
+        tools_qt.fill_combo_values(cmb_order_id, rows)
 
     # Get every widget in the layout
     widgets = []

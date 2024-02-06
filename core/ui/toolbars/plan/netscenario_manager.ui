@@ -63,7 +63,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Show inactive</string>
+         <string>Show inactive </string>
         </property>
        </widget>
       </item>
@@ -153,13 +153,6 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="lbl_netscenario_name">
-        <property name="text">
-         <string>Filter by: Netscenario name</string>
-        </property>
-       </widget>
-      </item>
       <item row="5" column="4" colspan="2">
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
@@ -180,6 +173,13 @@
         </property>
         <property name="text">
          <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="lbl_netscenario_name">
+        <property name="text">
+         <string>Filter by: Netscenario name</string>
         </property>
        </widget>
       </item>

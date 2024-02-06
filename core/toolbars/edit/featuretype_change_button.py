@@ -254,12 +254,12 @@ class GwFeatureTypeChangeButton(GwMaptool):
         if project_type == 'ws':
             self.dlg_change.feature_type_new.currentIndexChanged.connect(partial(self._filter_catalog))
         elif project_type == 'ud':
-            sql = (f"SELECT DISTINCT(id), id "
+            sql = (f"SELECT DISTINCT(id), id as idval "
                    f"FROM {self.cat_table} "
                    f"WHERE active IS TRUE OR active IS NULL "
                    f"ORDER BY id")
             rows = tools_db.get_rows(sql, log_sql=True)
-            tools_qt.fill_combo_values(self.dlg_change.featurecat_id, rows, 1)
+            tools_qt.fill_combo_values(self.dlg_change.featurecat_id, rows)
 
             # Set default value
             featurecat_id = tools_gw.get_config_parser("btn_featuretype_change", "featurecat_id", "user", "session")
@@ -272,7 +272,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
         self.dlg_change.feature_type.setText(feature_type)
 
         # Fill 1st combo boxes-new system feature type
-        sql = (f"SELECT DISTINCT(id) "
+        sql = (f"SELECT DISTINCT(id), id as idval "
                f"FROM cat_feature "
                f"WHERE lower(feature_type) = '{self.feature_type}' AND active is True "
                f"ORDER BY id")
@@ -302,12 +302,12 @@ class GwFeatureTypeChangeButton(GwMaptool):
             return
 
         # Populate catalog_id
-        sql = (f"SELECT DISTINCT(id), id "
+        sql = (f"SELECT DISTINCT(id), id as idval "
                f"FROM {self.cat_table} "
                f"WHERE {self.feature_type}type_id = '{feature_type_new}' AND (active IS TRUE OR active IS NULL) "
                f"ORDER BY id")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_change.featurecat_id, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_change.featurecat_id, rows)
         featurecat_id = tools_gw.get_config_parser("btn_featuretype_change", "featurecat_id", "user", "session")
         if featurecat_id not in (None, "None"):
             tools_qt.set_combo_value(self.dlg_change.featurecat_id, featurecat_id, 1, add_new=False)

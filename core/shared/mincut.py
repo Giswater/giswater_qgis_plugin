@@ -137,7 +137,7 @@ class GwMincut:
                    f"ORDER BY name")
 
             rows = tools_db.get_rows(sql)
-            tools_qt.fill_combo_values(self.dlg_mincut.assigned_to, rows, 1, combo_clear=False)
+            tools_qt.fill_combo_values(self.dlg_mincut.assigned_to, rows, combo_clear=False)
 
         tools_qt.set_widget_text(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
 
@@ -372,21 +372,21 @@ class GwMincut:
                "FROM om_mincut_cat_type "
                "ORDER BY id")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_mincut.type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_mincut.type, rows)
 
         # Fill ComboBox cause
         sql = ("SELECT id, idval "
                "FROM om_typevalue WHERE typevalue = 'mincut_cause' "
                "ORDER BY id")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_mincut.cause, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_mincut.cause, rows)
 
         # Fill ComboBox assigned_to
         sql = ("SELECT id, name "
                "FROM cat_users WHERE active is not False "
                "ORDER BY name")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_mincut.assigned_to, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_mincut.assigned_to, rows)
 
         # Toolbar actions
         action = self.dlg_mincut.findChild(QAction, "actionMincut")

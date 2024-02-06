@@ -676,7 +676,7 @@ class GwToolBoxButton(GwAction):
             feat_types.append(elem)
         if feat_types and len(feat_types) <= 1:
             self.dlg_functions.cmb_feature_type.setVisible(False)
-        tools_qt.fill_combo_values(self.dlg_functions.cmb_feature_type, feat_types, 1)
+        tools_qt.fill_combo_values(self.dlg_functions.cmb_feature_type, feat_types)
 
 
     def _get_all_group_layers(self, feature_type):

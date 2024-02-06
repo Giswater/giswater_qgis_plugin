@@ -136,7 +136,7 @@ class GwArcFusionButton(GwMaptool):
 
         # Fill ComboBox cmb_nodeaction
         rows = [[0, 'KEEP OPERATIVE'], [1, 'DOWNGRADE NODE'], [2, 'REMOVE NODE']]
-        tools_qt.fill_combo_values(self.dlg_fusion.cmb_nodeaction, rows, 1, sort_by=0)
+        tools_qt.fill_combo_values(self.dlg_fusion.cmb_nodeaction, rows, sort_by=0)
         node_action = tools_gw.get_config_parser("btn_arc_fusion", "cmb_nodeaction", "user", "session")
         if node_action not in (None, 'None', ''):
             tools_qt.set_widget_text(self.dlg_fusion, "cmb_nodeaction", node_action)
@@ -149,7 +149,7 @@ class GwArcFusionButton(GwMaptool):
         # Fill ComboBox cmb_statetype
         sql = "SELECT id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_fusion.cmb_statetype, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_fusion.cmb_statetype, rows, add_empty=True)
         state_type = tools_gw.get_config_parser("btn_arc_fusion", "cmb_statetype", "user", "session")
         if state_type not in (None, 'None', ''):
             tools_qt.set_widget_text(self.dlg_fusion, "cmb_statetype", state_type)

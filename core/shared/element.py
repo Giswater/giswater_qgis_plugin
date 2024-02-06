@@ -79,13 +79,13 @@ class GwElement:
             for i in params:
                 if i not in list_tabs:
                     tools_qt.remove_tab(self.dlg_add_element.tab_feature, f'tab_{i}')
+
+        # Remove 'gully' if not 'UD'
+        self.project_type = tools_gw.get_project_type()
+        if self.project_type != 'ud':
+            tools_qt.remove_tab(self.dlg_add_element.tab_feature, 'tab_gully')
         else:
-            # Remove 'gully' if not 'UD'
-            self.project_type = tools_gw.get_project_type()
-            if self.project_type != 'ud':
-                tools_qt.remove_tab(self.dlg_add_element.tab_feature, 'tab_gully')
-            else:
-                self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
 
         # Set icons
         tools_gw.add_icon(self.dlg_add_element.btn_add_geom, "133")
@@ -166,11 +166,11 @@ class GwElement:
         # Fill combo boxes
         sql = "SELECT DISTINCT(elementtype_id), elementtype_id FROM cat_element ORDER BY elementtype_id"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.element_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_element.element_type, rows)
 
         sql = "SELECT expl_id, name FROM exploitation WHERE expl_id != '0' ORDER BY name"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.expl_id, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_element.expl_id, rows)
 
         # Set explotation vdefault for combo expl_id
         sql = "SELECT value FROM config_param_user WHERE parameter='edit_exploitation_vdefault' AND cur_user=current_user"
@@ -180,7 +180,7 @@ class GwElement:
 
         sql = "SELECT DISTINCT(id), name FROM value_state"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.state, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_element.state, rows)
 
         self._filter_state_type()
 
@@ -188,31 +188,31 @@ class GwElement:
                " WHERE feature_type = 'ELEMENT' "
                " ORDER BY location_type")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.location_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_element.location_type, rows)
         if rows:
             tools_qt.set_combo_value(self.dlg_add_element.location_type, rows[0][0], 0)
 
         sql = "SELECT DISTINCT(id), id FROM cat_owner"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.ownercat_id, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_add_element.ownercat_id, rows, add_empty=True)
 
         sql = "SELECT DISTINCT(id), id FROM cat_builder"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.buildercat_id, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_add_element.buildercat_id, rows, add_empty=True)
 
         sql = "SELECT DISTINCT(id), id FROM cat_work"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.workcat_id, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_add_element.workcat_id, rows, add_empty=True)
         self.dlg_add_element.workcat_id.currentIndexChanged.connect(partial(
             tools_qt.set_stylesheet, self.dlg_add_element.workcat_id, None))
 
         sql = "SELECT DISTINCT(id), id FROM cat_work"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.workcat_id_end, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_add_element.workcat_id_end, rows, add_empty=True)
 
         sql = "SELECT id, idval FROM edit_typevalue WHERE typevalue = 'value_verified'"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.verified, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_add_element.verified, rows, add_empty=True)
         self._filter_elementcat_id()
 
         if self.new_element_id:
@@ -348,7 +348,7 @@ class GwElement:
         sql = (f"SELECT DISTINCT(id), name FROM value_state_type "
                f"WHERE state = {state}")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.state_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_element.state_type, rows)
 
 
     def _fill_tbl_new_element(self, dialog, feature_type, feature_id):
@@ -578,7 +578,7 @@ class GwElement:
                f" WHERE elementtype_id = '{element_type}'"
                f" ORDER BY id")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.elementcat_id, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_element.elementcat_id, rows)
 
 
     def _open_selected_object_element(self, dialog, widget, table_object):
@@ -750,8 +750,26 @@ class GwElement:
             dialog.undelete.setChecked(True)
 
         # Check related @feature_type
+        x1, y1, x2, y2 = None, None, None, None
         for feature_type in list_feature_type:
             tools_gw.get_rows_by_feature_type(self, dialog, table_object, feature_type)
+            try:
+                layer = self.layers[feature_type][0]
+            except:
+                continue
+            extent = layer.boundingBoxOfSelected()
+            if extent.xMinimum() == 0 and extent.xMaximum() == 0:
+                continue
+            # If this is the first iteration, set the initial extent
+            if x1 is None:
+                x1, y1, x2, y2 = extent.xMinimum(), extent.yMinimum(), extent.xMaximum(), extent.yMaximum()
+            else:
+                # Update the extent to include the bounding box of the current layer
+                x1 = min(x1, extent.xMinimum())
+                y1 = min(y1, extent.yMinimum())
+                x2 = max(x2, extent.xMaximum())
+                y2 = max(y2, extent.yMaximum())
+        tools_qgis.zoom_to_rectangle(x1, y1, x2, y2)
 
 
     def _set_combo_from_param_user(self, dialog, widget, table_name, parameter, field_id='id', field_name='id'):

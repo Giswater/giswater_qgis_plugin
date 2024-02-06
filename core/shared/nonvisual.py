@@ -16,7 +16,8 @@ try:
 except ImportError:
     scipy_imported = False
 
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QWidget
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QWidget, QShortcut,QApplication
+from qgis.PyQt.QtGui import QKeySequence
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.core import Qgis
 from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
@@ -107,7 +108,7 @@ class GwNonVisual:
             function_name = f"get_{dict_views_project[key]}"
             _id = 0
 
-            self._fill_manager_table(qtableview, key)
+            self._fill_manager_table(qtableview, key, expr='active is true')
 
             qtableview.doubleClicked.connect(partial(self._get_nonvisual_object, qtableview, function_name))
 
@@ -182,11 +183,14 @@ class GwNonVisual:
         widget_table = dialog.main_tab.currentWidget()
         tablename = widget_table.objectName()
         id_field = self.dict_ids.get(tablename)
+        show_inactive = dialog.chk_active.isChecked()
 
         if text is None:
             text = tools_qt.get_text(dialog, dialog.txt_filter, return_string_null=False)
-
         expr = f"{id_field}::text ILIKE '%{text}%'"
+        if not show_inactive:
+            expr += " and active is true"
+
         # Refresh model with selected filter
         widget_table.model().setFilter(expr)
         widget_table.model().select()
@@ -196,15 +200,27 @@ class GwNonVisual:
         """ Filters manager table by active """
 
         widget_table = dialog.main_tab.currentWidget()
-        id_field = 'active'
-        if active is None:
-            active = dialog.chk_active.checkState()
-        active = 'true' if active == 2 else None
+        tablename = widget_table.objectName()
+        id_field = self.dict_ids.get(tablename)
+        # Get the chk_active checkbox directly from the dialog
+        chk_active_widget = dialog.chk_active
+        # Check the visual state of chk_active
+        chk_active_is_visible = chk_active_widget.isVisible()
 
+        if chk_active_is_visible:
+            if active is None:
+                active = chk_active_widget.checkState()
+        else:
+            active = True
+
+        text = tools_qt.get_text(dialog, dialog.txt_filter, return_string_null=False)
         expr = ""
-        if active is not None:
-            expr = f"{id_field} = {active}"
-
+        if not active:
+            expr = f"active is true"
+        if text:
+            if expr:
+                expr += " and "
+            expr += f"{id_field}::text ILIKE '%{text}%'"
         # Refresh model with selected filter
         widget_table.model().setFilter(expr)
         widget_table.model().select()
@@ -399,7 +415,7 @@ class GwNonVisual:
         sql = f"SELECT id, matcat_id as idval FROM cat_mat_roughness"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(combobox, rows, index_to_show=1)
+            tools_qt.fill_combo_values(combobox, rows)
 
 
     def _populate_roughness_widgets(self, roughness_id):
@@ -569,11 +585,15 @@ class GwNonVisual:
         cmb_expl_id = self.dialog.cmb_expl_id
         cmb_curve_type = self.dialog.cmb_curve_type
 
+        # Copy values from clipboard
+        paste_shortcut = QShortcut(QKeySequence.Paste, tbl_curve_value)
+        paste_shortcut.activated.connect(partial(self._paste_curves_values, tbl_curve_value))
+
         # Populate combobox
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1, add_empty=True)
+            tools_qt.fill_combo_values(cmb_expl_id, rows, add_empty=True)
 
         # Create & fill cmb_curve_type
         curve_type_headers, curve_type_list = self._create_curve_type_lists()
@@ -605,6 +625,22 @@ class GwNonVisual:
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_curve')
+
+    def _paste_curves_values(self, tbl_curve_value):
+        selected = tbl_curve_value.selectedRanges()
+        if not selected:
+            return
+
+        text = QApplication.clipboard().text()
+        rows = text.split("\n")
+
+        for r, row in enumerate(rows):
+            columns = row.split("\t")
+            for c, value in enumerate(columns):
+                item = QTableWidgetItem(value)
+                row_pos = selected[0].topRow() + r
+                col_pos = selected[0].leftColumn() + c
+                tbl_curve_value.setItem(row_pos, col_pos, item)
 
     def get_print_curves(self, curve_id, path, file_name, geom1=None, geom2=None):
         """ Opens dialog for curve """
@@ -1061,6 +1097,10 @@ class GwNonVisual:
         tbl_pattern_value = self.dialog.tbl_pattern_value
         cmb_expl_id = self.dialog.cmb_expl_id
 
+        # Copy values from clipboard
+        paste_shortcut = QShortcut(QKeySequence.Paste, tbl_pattern_value)
+        paste_shortcut.activated.connect(partial(self._paste_pattern_values, tbl_pattern_value))
+
         # Set scale-to-fit for tableview
         tbl_pattern_value.horizontalHeader().setSectionResizeMode(1)
         tbl_pattern_value.horizontalHeader().setMinimumSectionSize(50)
@@ -1072,7 +1112,7 @@ class GwNonVisual:
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1, add_empty=True)
+            tools_qt.fill_combo_values(cmb_expl_id, rows, add_empty=True)
 
         if pattern_id:
             self._populate_ws_patterns_widgets(pattern_id, duplicate=duplicate)
@@ -1087,6 +1127,23 @@ class GwNonVisual:
         # Connect OK button to insert all inp_pattern and inp_pattern_value data to database
         is_new = (pattern_id is None) or duplicate
         self.dialog.btn_accept.clicked.connect(partial(self._accept_pattern_ws, self.dialog, is_new))
+
+
+    def _paste_pattern_values(self, tbl_patter_value):
+        selected = tbl_patter_value.selectedRanges()
+        if not selected:
+            return
+
+        text = QApplication.clipboard().text()
+        rows = text.split("\n")
+
+        for r, row in enumerate(rows):
+            columns = row.split("\t")
+            for c, value in enumerate(columns):
+                item = QTableWidgetItem(value)
+                row_pos = selected[0].topRow() + r
+                col_pos = selected[0].leftColumn() + c
+                tbl_patter_value.setItem(row_pos, col_pos, item)
 
 
     def _populate_ws_patterns_widgets(self, pattern_id, duplicate=False):
@@ -1334,7 +1391,7 @@ class GwNonVisual:
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1, add_empty=True)
+            tools_qt.fill_combo_values(cmb_expl_id, rows, add_empty=True)
 
         sql = "SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_typevalue_pattern'"
         rows = tools_db.get_rows(sql)
@@ -1433,7 +1490,6 @@ class GwNonVisual:
 
 
     def _manage_patterns_tableviews(self, dialog, cmb_pattern_type, plot_widget):
-
         # Variables
         tbl_monthly = dialog.tbl_monthly
         tbl_daily = dialog.tbl_daily
@@ -1450,6 +1506,11 @@ class GwNonVisual:
         pattern_type = tools_qt.get_combo_value(dialog, cmb_pattern_type)
         cur_table = dialog.findChild(QTableWidget, f"tbl_{pattern_type.lower()}")
         cur_table.setVisible(True)
+
+        # Copy values from clipboard
+        paste_shortcut = QShortcut(QKeySequence.Paste, cur_table)
+        paste_shortcut.activated.connect(partial(self._paste_pattern_values, cur_table))
+
         try:
             cur_table.cellChanged.disconnect()
         except TypeError:
@@ -1899,6 +1960,10 @@ class GwNonVisual:
         cmb_expl_id = self.dialog.cmb_expl_id
         tbl_timeseries_value = self.dialog.tbl_timeseries_value
 
+        # Copy values from clipboard
+        paste_shortcut = QShortcut(QKeySequence.Paste, tbl_timeseries_value)
+        paste_shortcut.activated.connect(partial(self._paste_timeseries_values, tbl_timeseries_value))
+
         # Populate combobox
         self._populate_timeser_combos(cmb_expl_id, cmb_times_type, cmb_timeser_type)
 
@@ -1923,6 +1988,24 @@ class GwNonVisual:
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_timeseries')
 
+    def _paste_timeseries_values(self, tbl_timeseries_value):
+        selected = tbl_timeseries_value.selectedRanges()
+        if not selected:
+            return
+
+        text = QApplication.clipboard().text()
+        rows = text.split("\n")
+
+        times_type = tools_qt.get_combo_value(self.dialog, self.dialog.cmb_times_type)
+        for r, row in enumerate(rows):
+            columns = row.split("\t")
+            for c, value in enumerate(columns):
+                item = QTableWidgetItem(value)
+                row_pos = selected[0].topRow() + r
+                col_pos = selected[0].leftColumn() + c
+                if times_type == 'RELATIVE':
+                    col_pos += 1
+                tbl_timeseries_value.setItem(row_pos, col_pos, item)
 
     def _populate_timeser_combos(self, cmb_expl_id, cmb_times_type, cmb_timeser_type):
         """ Populates timeseries dialog combos """
@@ -1930,15 +2013,15 @@ class GwNonVisual:
         sql = "SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_value_timserid'"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(cmb_timeser_type, rows, index_to_show=1)
+            tools_qt.fill_combo_values(cmb_timeser_type, rows)
         sql = "SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_typevalue_timeseries'"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(cmb_times_type, rows, index_to_show=1)
+            tools_qt.fill_combo_values(cmb_times_type, rows)
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(cmb_expl_id, rows, index_to_show=1, add_empty=True)
+            tools_qt.fill_combo_values(cmb_expl_id, rows, add_empty=True)
 
 
     def _populate_timeser_widgets(self, timser_id, duplicate=False):
@@ -2235,7 +2318,7 @@ class GwNonVisual:
         sql = f"SELECT id, idval FROM inp_typevalue WHERE typevalue = 'inp_value_lidtype' ORDER BY idval"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(self.dialog.cmb_lidtype, rows, 1)
+            tools_qt.fill_combo_values(self.dialog.cmb_lidtype, rows)
 
         # Populate Control Curve combo
         sql = f"SELECT id FROM v_edit_inp_curve; "
@@ -2668,7 +2751,7 @@ class GwNonVisual:
         sql = f"SELECT sector_id as id, name as idval FROM v_edit_sector WHERE sector_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fill_combo_values(combobox, rows, index_to_show=1)
+            tools_qt.fill_combo_values(combobox, rows)
 
 
     def _create_plot_widget(self, dialog):

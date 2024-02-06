@@ -66,6 +66,7 @@ class GwMapzoneManager:
             qtableview = QTableView()
             qtableview.setObjectName(f"tbl_{view}")
             qtableview.clicked.connect(partial(self._manage_highlight, qtableview, view))
+            qtableview.doubleClicked.connect(partial(self.manage_update, self.mapzone_mng_dlg, None))
             tab_idx = self.mapzone_mng_dlg.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
             self.mapzone_mng_dlg.main_tab.widget(tab_idx).setObjectName(view)
 
@@ -85,8 +86,11 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.btn_cancel.clicked.connect(self.mapzone_mng_dlg.reject)
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.reset_rubberband, self.rubber_band, None))
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.close_dialog, self.mapzone_mng_dlg, True))
+        self.mapzone_mng_dlg.chk_active.stateChanged.connect(partial(self._filter_active, self.mapzone_mng_dlg))
+
 
         self._manage_current_changed()
+        self.mapzone_mng_dlg.main_tab.currentChanged.connect(partial(self._filter_active, self.mapzone_mng_dlg, None))
 
         tools_gw.open_dialog(self.mapzone_mng_dlg, 'mapzone_manager')
 
@@ -107,26 +111,33 @@ class GwMapzoneManager:
         tools_qgis.highlight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
 
     def _txt_name_changed(self, text):
-        expr = f"name ilike '%{text}%'" if text else None
+        show_inactive = self.mapzone_mng_dlg.chk_active.isChecked()
+        expr = f"name ilike '%{text}%'"
+        if not show_inactive:
+            expr += " and active is true"
         self._fill_mapzone_table(expr=expr)
 
     def _manage_current_changed(self):
         """ Manages tab changes """
-
         if self.mapzone_mng_dlg is None or isdeleted(self.mapzone_mng_dlg):
             return
+        # Get the state of the "show inactive" checkbox
+        show_inactive = self.mapzone_mng_dlg.chk_active.isChecked()
+
         # Refresh txt_feature_id
         tools_qt.set_widget_text(self.mapzone_mng_dlg, self.mapzone_mng_dlg.txt_name, '')
 
         # Reset rubberband
         tools_gw.reset_rubberband(self.rubber_band)
 
+        # Build the filter expression based on the state of the "show inactive" checkbox
+        expr = "" if show_inactive else "active is true"
+
         # Fill current table
-        self._fill_mapzone_table()
+        self._fill_mapzone_table(expr=expr)
 
     def _fill_mapzone_table(self, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
         """ Fill mapzone table with data from its corresponding table """
-
         # Manage exception if dialog is closed
         if self.mapzone_mng_dlg is None or isdeleted(self.mapzone_mng_dlg):
             return
@@ -182,6 +193,27 @@ class GwMapzoneManager:
 
         # Sort the table
         model.sort(0, 0)
+
+    def _filter_active(self, dialog, active):
+        """ Filters manager table by active """
+
+        widget_table = dialog.main_tab.currentWidget()
+
+        if active is None:
+            active = dialog.chk_active.checkState()
+
+        search_text = dialog.txt_name.text()
+        expr = ""
+        if not active:
+            expr = f"active is true"
+
+        if search_text:
+            if expr:
+                expr += " and "
+            expr += f"name ilike '%{search_text}%'"
+        # Refresh model with selected filter
+        widget_table.model().setFilter(expr)
+        widget_table.model().select()
 
     # region config button
 
@@ -632,7 +664,7 @@ class GwMapzoneManager:
         active = tools_os.set_boolean(active)
         field_id = tableview.model().headerData(0, Qt.Horizontal)
 
-        sql = f"UPDATE {view} SET active = {str(not active).lower()} WHERE {field_id} = {mapzone_id}"
+        sql = f"UPDATE {view} SET active = {str(not active).lower()} WHERE {field_id}::text = '{mapzone_id}'"
         tools_db.execute_sql(sql)
 
         # Refresh tableview
@@ -707,15 +739,17 @@ class GwMapzoneManager:
             return
 
         # Get selected mapzone data
-        index = tableview.selectionModel().currentIndex()
-        mapzone_id = index.sibling(index.row(), 0).data()
         field_id = tableview.model().headerData(0, Qt.Horizontal)
+        mapzone_ids = [index.sibling(index.row(), 0).data() for index in selected_list]
 
         message = "Are you sure you want to delete these records?"
-        answer = tools_qt.show_question(message, "Delete records", index.sibling(index.row(), 1).data(),
-                                        force_action=True)
+        answer = tools_qt.show_question(message, "Delete records", [index.sibling(index.row(), 1).data() for index in selected_list], force_action=True)
         if answer:
-            sql = f"DELETE FROM {view} WHERE {field_id}::text = '{mapzone_id}'"
+            # Build WHERE IN clause for SQL
+            where_clause = f"{field_id} IN ({', '.join(map(str, mapzone_ids))})"
+
+            # Construct SQL DELETE statement
+            sql = f"DELETE FROM {view} WHERE {where_clause}"
             tools_db.execute_sql(sql)
 
             # Refresh tableview

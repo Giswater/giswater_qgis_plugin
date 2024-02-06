@@ -76,10 +76,10 @@ class GwDocument(QObject):
             for i in params:
                 if i not in list_tabs:
                     tools_qt.remove_tab(self.dlg_add_doc.tab_feature, f'tab_{i}')
-        else:
-            # Remove 'gully' if not 'UD'
-            if self.project_type != 'ud':
-                tools_qt.remove_tab(self.dlg_add_doc.tab_feature, 'tab_gully')
+
+        # Remove 'gully' if not 'UD'
+        if self.project_type != 'ud':
+            tools_qt.remove_tab(self.dlg_add_doc.tab_feature, 'tab_gully')
 
         if doc_tables:
             self.doc_tables = doc_tables
@@ -216,7 +216,7 @@ class GwDocument(QObject):
                f" FROM doc_type"
                f" ORDER BY id;")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(widget, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(widget, rows, add_empty=True)
         doctype_vdefault = tools_gw.get_config_value('edit_doctype_vdefault')
         if doctype_vdefault:
             tools_qt.set_combo_value(widget, doctype_vdefault[0], 0)

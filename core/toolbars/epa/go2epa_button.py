@@ -22,6 +22,7 @@ from qgis.core import QgsApplication
 
 from ...shared.selector import GwSelector
 from ...threads.epa_file_manager import GwEpaFileManager
+from ..toc.epa_world_button import set_epa_world, is_epa_world_active
 from ...utils import tools_gw
 from ...ui.ui_manager import GwGo2EpaUI, GwSelectorUi, GwGo2EpaOptionsUi
 from .... import global_vars
@@ -522,6 +523,9 @@ class GwGo2EpaButton(GwAction):
             return False
 
         tools_gw.manage_current_selections_docker(json_result)
+        # Refresh epa world view if is active and it has changed
+        if is_epa_world_active() and any(widget['widget'] == 'inp_options_networkmode' for widget in _json):
+            set_epa_world(True)
 
         message = "Values has been updated"
         tools_qgis.show_info(message)

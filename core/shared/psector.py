@@ -161,14 +161,14 @@ class GwPsector:
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'value_priority'"
         rows = tools_db.get_rows(sql)
 
-        tools_qt.fill_combo_values(self.dlg_plan_psector.priority, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_plan_psector.priority, rows)
 
         # Populate combo expl_id
         sql = ("SELECT expl_id, name from exploitation "
                " JOIN selector_expl USING (expl_id) "
                " WHERE exploitation.expl_id != 0 and cur_user = current_user")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.cmb_expl_id, rows, 1)
+        tools_qt.fill_combo_values(self.cmb_expl_id, rows)
 
         # Populate combo workcat_id
         sql = "SELECT id as id, id as idval FROM cat_work"
@@ -178,7 +178,7 @@ class GwPsector:
         # Populate combo status
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status'"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.cmb_status, rows, 1)
+        tools_qt.fill_combo_values(self.cmb_status, rows)
 
         # tab Bugdet
         gexpenses = self.dlg_plan_psector.findChild(QLineEdit, "gexpenses")
@@ -625,11 +625,11 @@ class GwPsector:
             self.dlg_psector_rapport.cmb_templates.setEnabled(True)
             self.dlg_psector_rapport.txt_composer_path.setEnabled(True)
             self.dlg_psector_rapport.lbl_composer_disabled.setText('')
-            tools_qt.fill_combo_values(self.dlg_psector_rapport.cmb_templates, records, 1)
+            tools_qt.fill_combo_values(self.dlg_psector_rapport.cmb_templates, records)
 
         row = tools_gw.get_config_value(f'composer_plan_vdefault')
         if row:
-            tools_qt.set_combo_value(self.dlg_psector_rapport.cmb_templates, row[0], 1)
+            tools_qt.set_combo_value(self.dlg_psector_rapport.cmb_templates, row[0])
 
 
     def generate_reports(self):
@@ -2391,7 +2391,7 @@ class GwPsector:
         # Populate combo arccat
         sql = "SELECT cat_arc.id AS id, cat_arc.id as idval FROM cat_arc WHERE id IS NOT NULL AND active IS TRUE "
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_replace_arc.cmb_newarccat, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_replace_arc.cmb_newarccat, rows)
 
         # Set text current arccat
         self.dlg_replace_arc.txt_current_arccat.setText(self.arc_cat_id)

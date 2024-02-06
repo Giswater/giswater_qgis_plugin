@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import os
 from qgis.PyQt.QtCore import Qt, pyqtSignal
 
 from .task import GwTask
@@ -62,6 +63,8 @@ class GwUpdateSchemaTask(GwTask):
         # Enable red 'X' from dlg_readsql_show_info
         self.admin.dlg_readsql_show_info.setWindowFlag(Qt.WindowCloseButtonHint, True)
         self.admin.dlg_readsql_show_info.show()
+        # Show Message Info in tab log
+        self.admin.infolog_updates.setText(self.admin.message_infolog)
 
         if self.timer:
             self.timer.stop()
@@ -103,5 +106,26 @@ class GwUpdateSchemaTask(GwTask):
         schema_name = self.admin._get_schema_name()
         sql = f"DELETE FROM {schema_name}.audit_check_data WHERE fid = 133 AND cur_user = current_user;"
         tools_db.execute_sql(sql)
-        self.status = self.admin.load_updates(self.params['project_type'], update_changelog=True, schema_name=schema_name)
+        # Get all updates folders, to update
+        self.dict_folders_process['updates'] = self.get_updates_dict_folders()
+        self.status = self.admin.load_updates(self.params['project_type'], update_changelog=True, schema_name=schema_name, dict_update_folders=self.dict_folders_process['updates'])
         return True
+
+
+    def get_updates_dict_folders(self):
+        """ Get list of all updates folders """
+
+        dict_folders = {}
+
+        dict_folders[os.path.join(self.admin.folder_updates, '31', '31100')] = 0
+        dict_folders[os.path.join(self.admin.folder_updates, '31', '31103')] = 0
+        dict_folders[os.path.join(self.admin.folder_updates, '31', '31105')] = 0
+        dict_folders[os.path.join(self.admin.folder_updates, '31', '31109')] = 0
+        dict_folders[os.path.join(self.admin.folder_updates, '31', '31110')] = 0
+        dict_folders[os.path.join(self.admin.folder_updates, '32')] = 0
+        dict_folders[os.path.join(self.admin.folder_updates, '33')] = 0
+        dict_folders[os.path.join(self.admin.folder_updates, '34')] = 0
+        dict_folders[os.path.join(self.admin.folder_updates, '35')] = 0
+        dict_folders[os.path.join(self.admin.folder_updates, '36')] = 0
+
+        return dict_folders

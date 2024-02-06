@@ -129,7 +129,7 @@ class GwCSVButton(GwAction):
             self.dlg_csv.tbl_csv.setEnabled(False)
             self.dlg_csv.btn_accept.setEnabled(False)
         else:
-            tools_qt.fill_combo_values(combo, rows, 1, True, True, 1)
+            tools_qt.fill_combo_values(combo, rows, True, True, 1)
             self._update_info(self.dlg_csv)
 
 

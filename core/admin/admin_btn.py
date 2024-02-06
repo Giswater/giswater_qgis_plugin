@@ -335,6 +335,15 @@ class GwAdminButton:
             message_log.setVisible(True)
             QgsMessageLog.logMessage("", f"{lib_vars.plugin_name.capitalize()} PY", 0)
 
+            # Manage Log Messages in tab log
+            main_tab = self.dlg_readsql_show_info.findChild(QTabWidget, 'mainTab')
+            main_tab.setCurrentWidget(main_tab.findChild(QWidget, "tab_loginfo"))
+            main_tab.setTabEnabled(main_tab.currentIndex(), True)
+            self.infolog_updates = self.dlg_readsql_show_info.findChild(QTextEdit, 'txt_infolog')
+            self.infolog_updates.setReadOnly(True)
+            self.message_infolog = ''
+            self.infolog_updates.setText(self.message_infolog)
+
             # Create timer
             self.t0 = time()
             self.timer = QTimer()
@@ -348,7 +357,7 @@ class GwAdminButton:
             QgsApplication.taskManager().triggerTask(self.task_update_schema)
 
 
-    def load_updates(self, project_type=None, update_changelog=False, schema_name=None):
+    def load_updates(self, project_type=None, update_changelog=False, schema_name=None, dict_update_folders=None):
         """"""
 
         # Get current schema selected
@@ -365,7 +374,7 @@ class GwAdminButton:
         self.task1.setProgress(20)
         self.task1.setProgress(40)
         if status:
-            status = self.update_31to39(project_type=project_type)
+            status = self.update_dict_folders(False, project_type=project_type, dict_update_folders=dict_update_folders)
         self.task1.setProgress(60)
         if status:
             status = self.execute_last_process(schema_name=schema_name, locale=True)
@@ -442,7 +451,7 @@ class GwAdminButton:
         # Populate combo with all locales
         status, sqlite_cur = tools_gw.create_sqlite_conn("config")
         list_locale = self._select_active_locales(sqlite_cur)
-        tools_qt.fill_combo_values(self.cmb_locale, list_locale, 1)
+        tools_qt.fill_combo_values(self.cmb_locale, list_locale)
         locale = tools_gw.get_config_parser('btn_admin', 'project_locale', 'user', 'session', False, force_reload=True)
         tools_qt.set_combo_value(self.cmb_locale, locale, 0)
 
@@ -460,7 +469,6 @@ class GwAdminButton:
 
     def load_base(self, dict_folders):
         """"""
-
         for folder in dict_folders.keys():
             status = self._execute_files(folder, set_progress_bar=True)
             if not status and self.dev_commit is False:
@@ -487,7 +495,7 @@ class GwAdminButton:
         return True
 
 
-    def update_minor31to39(self, folder_update, new_project, project_type, no_ct):
+    def update_minor_dict_folders(self, folder_update, new_project, project_type, no_ct):
 
         folder_utils = os.path.join(folder_update, 'utils')
         if self._process_folder(folder_utils) is True:
@@ -514,7 +522,7 @@ class GwAdminButton:
         return True
 
 
-    def update_31to39(self, new_project=False, project_type=False, no_ct=False):
+    def update_dict_folders(self, new_project=False, project_type=False, no_ct=False, dict_update_folders=None):
         """"""
 
         if not os.path.exists(self.folder_updates):
@@ -522,100 +530,33 @@ class GwAdminButton:
             self.error_count = self.error_count + 1
             return
 
-        folders = sorted(os.listdir(self.folder_updates + ''))
-        for folder in folders:
-            sub_folders = sorted(os.listdir(os.path.join(self.folder_updates, folder)))
+        for folder in dict_update_folders.keys():
+            sub_folders = sorted(os.listdir(folder))
             for sub_folder in sub_folders:
                 folder_update = os.path.join(self.folder_updates, folder, sub_folder)
                 if new_project:
                     if self.dev_commit is True:
                         if str(sub_folder) > '31100':
-                            status = self.update_minor31to39(folder_update, new_project, project_type, no_ct)
+                            status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
                             if status is False:
                                 return False
                     else:
                         if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
-                            status = self.update_minor31to39(folder_update, new_project, project_type, no_ct)
+                            status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
                             if status is False:
                                 return False
                 else:
                     if self.dev_commit is True:
                         if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
-                            status = self.update_minor31to39(folder_update, new_project, project_type, no_ct)
+                            status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
                             if status is False:
                                 return False
                     else:
                         if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
-                            status = self.update_minor31to39(folder_update, new_project, project_type, no_ct)
+                            status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
                             if status is False:
                                 return False
         return True
-
-
-    def load_views(self):
-        """"""
-
-        list_folders = []
-        list_folders.append(os.path.join(self.folder_software, self.file_pattern_ddlview))
-        list_folders.append(os.path.join(self.folder_utils, self.file_pattern_ddlview))
-        for folder in list_folders:
-            status = self._execute_files(folder, set_progress_bar=True)
-            if not status and self.dev_commit is False:
-                return False
-
-        return True
-
-
-    def update_30to31(self, new_project=False, project_type=False, set_progress_bar=True):
-        """"""
-
-        if not os.path.exists(self.folder_updates):
-            tools_qgis.show_message("The update folder was not found in sql folder")
-            self.error_count = self.error_count + 1
-            return True
-
-        # Process only subfolders of folder '31'
-        folder = os.path.join(self.folder_updates, '31')
-        sub_folders = sorted(os.listdir(os.path.join(self.folder_updates, folder)))
-        for sub_folder in sub_folders:
-            if new_project:
-                if str(sub_folder) <= '31100':
-                    folderpath = os.path.join(self.folder_updates, folder, sub_folder, 'utils')
-                    if self._process_folder(folderpath) is True:
-                        status = self._load_sql(folderpath, set_progress_bar=set_progress_bar)
-                        if status is False:
-                            return False
-                    folderpath = os.path.join(self.folder_updates, folder, sub_folder, project_type)
-                    if self._process_folder(folderpath) is True:
-                        status = self._load_sql(folderpath, set_progress_bar=set_progress_bar)
-                        if status is False:
-                            return False
-                    folderpath = os.path.join(self.folder_updates, folder, sub_folder, 'i18n', self.locale)
-                    if self._process_folder(folderpath) is True:
-                        status = self._execute_files(folderpath, True, set_progress_bar=set_progress_bar)
-                        if status is False:
-                            return False
-
-            else:
-                if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= '31100':
-                    folderpath = os.path.join(self.folder_updates, folder, sub_folder, 'utils')
-                    if self._process_folder(folderpath) is True:
-                        status = self._load_sql(folderpath)
-                        if status is False:
-                            return False
-                    folderpath = os.path.join(self.folder_updates, folder, sub_folder, self.project_type_selected)
-                    if self._process_folder(folderpath) is True:
-                        status = self._load_sql(folderpath)
-                        if status is False:
-                            return False
-                    folderpath = os.path.join(self.folder_updates, folder, sub_folder, 'i18n', self.locale)
-                    if self._process_folder(folderpath) is True:
-                        status = self._execute_files(folderpath, True)
-                        if status is False:
-                            return False
-
-        return True
-
 
     def load_sample_data(self, project_type):
 
@@ -648,20 +589,6 @@ class GwAdminButton:
 
         return True
 
-
-    def load_trg(self):
-        """"""
-
-        list_folders = []
-        list_folders.append(os.path.join(self.folder_utils, self.file_pattern_trg))
-        list_folders.append(os.path.join(self.folder_software, self.file_pattern_trg))
-
-        for folder in list_folders:
-            status = self._execute_files(folder, set_progress_bar=True)
-            if not status and self.dev_commit is False:
-                return False
-
-        return True
 
     # endregion
 
@@ -724,14 +651,10 @@ class GwAdminButton:
         self.locale = tools_qgis.get_locale()
 
         # Declare all file variables
-        self.file_pattern_tablect = "tablect"
         self.file_pattern_ddl = "ddl"
-        self.file_pattern_dml = "dml"
         self.file_pattern_fct = "fct"
-        self.file_pattern_trg = "trg"
         self.file_pattern_ftrg = "ftrg"
-        self.file_pattern_ddlview = "ddlview"
-        self.file_pattern_ddlrule = "ddlrule"
+        self.file_pattern_schema_model = "schema_model"
 
         # Declare all folders
         if self.schema_name is not None and self.project_type is not None:
@@ -744,9 +667,8 @@ class GwAdminButton:
         self.folder_updates = os.path.join(self.sql_dir, 'updates')
         self.folder_example = os.path.join(self.sql_dir, 'example')
 
-        # Check if user have commit permissions
-        self.dev_commit = tools_gw.get_config_parser('system', 'dev_commit', "project", "dev", False, force_reload=True)
-        self.dev_commit = tools_os.set_boolean(self.dev_commit)
+        # Variable to commit changes even if schema creation fails
+        self.dev_commit = global_vars.gw_dev_mode
 
         # Create dialog object
         self.dlg_readsql = GwAdminUi()
@@ -862,7 +784,7 @@ class GwAdminButton:
         self._populate_combo_connections()
 
         if str(self.list_connections) != '[]':
-            tools_qt.fill_combo_values(self.cmb_connection, self.list_connections, 1)
+            tools_qt.fill_combo_values(self.cmb_connection, self.list_connections)
 
         # Set last connection for default
         tools_qt.set_combo_value(self.cmb_connection, str(last_connection), 1)
@@ -1494,11 +1416,11 @@ class GwAdminButton:
         # Manage widgets
         sql = "SELECT id, id as idval FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_manage_visit_class.feature_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_visit_class.feature_type, rows)
 
         sql = "SELECT id, idval FROM om_typevalue WHERE typevalue = 'visit_type'"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_manage_visit_class.visit_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_visit_class.visit_type, rows)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_manage_visit_class, dlg_name='admin_visitclass')
@@ -1610,7 +1532,7 @@ class GwAdminButton:
             self.dlg_readsql.project_schema_name.clear()
             return
 
-        tools_qt.fill_combo_values(self.dlg_readsql.project_schema_name, result_list, 1)
+        tools_qt.fill_combo_values(self.dlg_readsql.project_schema_name, result_list)
 
 
     def _manage_srid(self):
@@ -1842,8 +1764,7 @@ class GwAdminButton:
             manage_i18n = True
 
         if manage_i18n:
-            files_to_execute = [f"{self.project_type_selected}.sql", "utils.sql", "ddl.sql", "ddlview.sql", "dml.sql",
-                                "tablect.sql", "trg.sql"]
+            files_to_execute = [f"{self.project_type_selected}_schema_model.sql"]
             for file in filelist:
                 status = True
                 if file in files_to_execute:
@@ -1893,6 +1814,7 @@ class GwAdminButton:
                     self.error_count = self.error_count + 1
                     tools_log.log_info(f"_read_execute_file error {filepath}")
                     tools_log.log_info(f"Message: {lib_vars.session_vars['last_error']}")
+                    self.message_infolog = f"_read_execute_file error {filepath}\nMessage: {lib_vars.session_vars['last_error']}"
                     if self.dev_commit is False:
                         tools_db.dao.rollback()
 
@@ -1906,6 +1828,7 @@ class GwAdminButton:
             self.error_count = self.error_count + 1
             tools_log.log_info(f"_read_execute_file exception: {file}")
             tools_log.log_info(str(e))
+            self.message_infolog = f"_read_execute_file exception: {file}\n {str(e)}"
             if self.dev_commit is False:
                 tools_db.dao.rollback()
             if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
@@ -2363,9 +2286,9 @@ class GwAdminButton:
                    f" ORDER BY id")
             rows = tools_db.get_rows(sql)
 
-            tools_qt.fill_combo_values(self.dlg_readsql.cmb_formname_fields, rows, 1)
-            tools_qt.fill_combo_values(self.dlg_readsql.cmb_feature_name_view, rows, 1)
-            tools_qt.fill_combo_values(self.dlg_readsql.cmb_feature_sys_fields, rows, 1)
+            tools_qt.fill_combo_values(self.dlg_readsql.cmb_formname_fields, rows)
+            tools_qt.fill_combo_values(self.dlg_readsql.cmb_feature_name_view, rows)
+            tools_qt.fill_combo_values(self.dlg_readsql.cmb_feature_sys_fields, rows)
 
 
     def _create_child_view(self):
@@ -2577,19 +2500,19 @@ class GwAdminButton:
         sql = (f"SELECT DISTINCT(id), idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'widgettype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_manage_fields.widgettype, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_fields.widgettype, rows)
 
         # Populate datatype combo
         sql = (f"SELECT id, idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'datatype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_manage_fields.datatype, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_fields.datatype, rows)
 
         # Populate layoutname combo
         sql = (f"SELECT id, idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'layout_name_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_manage_fields.layoutname, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_fields.layoutname, rows)
 
         # Set default value for formtype widget
         tools_qt.set_widget_text(self.dlg_manage_fields, self.dlg_manage_fields.formtype, 'feature')
@@ -2658,7 +2581,7 @@ class GwAdminButton:
                    f"WHERE cat_feature_id = '{form_name}'")
 
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_manage_fields.cmb_fields, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_fields.cmb_fields, rows)
 
 
     def _manage_close_dlg(self, dlg_to_close):
@@ -3049,7 +2972,7 @@ class GwAdminButton:
         self.dlg_credentials = GwCredentialsUi()
         tools_gw.load_settings(self.dlg_credentials)
         if str(self.list_connections) != '[]':
-            tools_qt.fill_combo_values(self.dlg_credentials.cmb_connection, self.list_connections, 1)
+            tools_qt.fill_combo_values(self.dlg_credentials.cmb_connection, self.list_connections)
         else:
             msg = "You don't have any connection to PostGIS database configurated. " \
                   "Check your QGIS data source manager and create at least one"
@@ -3143,12 +3066,12 @@ class GwAdminButton:
         if not ws_result_list:
             self.dlg_readsql.cmb_utils_ws.clear()
         else:
-            tools_qt.fill_combo_values(self.dlg_readsql.cmb_utils_ws, ws_result_list, 1)
+            tools_qt.fill_combo_values(self.dlg_readsql.cmb_utils_ws, ws_result_list)
 
         if not ud_result_list:
             self.dlg_readsql.cmb_utils_ud.clear()
         else:
-            tools_qt.fill_combo_values(self.dlg_readsql.cmb_utils_ud, ud_result_list, 1)
+            tools_qt.fill_combo_values(self.dlg_readsql.cmb_utils_ud, ud_result_list)
 
 
     def _create_utils(self):
