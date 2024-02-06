@@ -4,3 +4,8 @@
 - Add selector period strategy on selector
 - Drop not null for dma's (ud and ws)
 - Enhance the simbology of mapzones
+- New checks on EPA data consistency
+- Set epa_type not null in connecs
+- Enable setting the outlet_id of subcatchments by editing the view v_edit_inp_subc2outlet
+- Add new field 'plot_code' to connecs
+- Add Import DWF to Import CSV
