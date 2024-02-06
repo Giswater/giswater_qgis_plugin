@@ -9,9 +9,13 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 Changelog=Version 3.6.007
 	- Use copy-paste on non-visual objects and dscenario demand dialogs
-	- Add checkbox for show all on all managers
+	- Add 'Show inactive' checkbox on managers
 	- Refactor of the creation of projects (empty, inventory, full and mport inp)
 	- Enable the possibility to delete all selected rows in managers
+	- Refresh epa world view if networkmode changed
+	- Fix datatype validator on info widgets
+	- Improve speed of config dialog
+	- Add QGIS variable 'gw_dev_mode' to manage various developer options
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
