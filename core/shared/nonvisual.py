@@ -2321,7 +2321,7 @@ class GwNonVisual:
             tools_qt.fill_combo_values(self.dialog.cmb_lidtype, rows)
 
         # Populate Control Curve combo
-        sql = f"SELECT id FROM v_edit_inp_curve; "
+        sql = f"SELECT id, id as idval FROM v_edit_inp_curve; "
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(self.dialog.txt_7_cmb_control_curve, rows)
