@@ -30,13 +30,16 @@ update config_form_fields set dv_isnullvalue = true where tabname = 'tab_epa' an
 
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") 
-VALUES(3298, 'gw_fct_import_inp_dwf', 'ud', 'function', 'json', 'json', 'Function to import DWF values. ', 'role_epa', NULL, 'core');
+VALUES(3298, 'gw_fct_import_inp_dwf', 'ud', 'function', 'json', 'json', 'Function to import DWF values. ', 'role_epa', NULL, 'core')
+ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) 
-VALUES(527, 'Import dwf values', 'ud', NULL, 'core' , NULL, 'Function process', NULL);
+VALUES(527, 'Import dwf values', 'ud', NULL, 'core' , NULL, 'Function process', NULL)
+ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO config_csv (fid, alias, descript, functionname, active, orderby, addparam) 
-VALUES(527, 'Import DWF', 'Function to import DWF values. The CSV file must contain the following columns in the exact same order:   dwfscenario_id, node_id, value, pat1, pat2, pat3, pat4', 'gw_fct_import_inp_dwf', true, 21, NULL);
+VALUES(527, 'Import DWF', 'Function to import DWF values. The CSV file must contain the following columns in the exact same order:   dwfscenario_id, node_id, value, pat1, pat2, pat3, pat4', 'gw_fct_import_inp_dwf', true, 21, NULL)
+ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO config_param_system SELECT 'utils_graphanalytics_style', style::text, 'There are 3 "mode" to symbolize mapzones when the project is loaded or mapzones are recalculated: 
 - Disabled: do nothing with the style
@@ -58,8 +61,13 @@ UPDATE config_form_fields SET widgetfunction='{"functionName": "open_selected_pa
 --25/01/24
 UPDATE sys_table SET id='v_edit_inp_subc2outlet' where id='vi_subcatch2outlet'; 
 
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") VALUES(3300, 'gw_trg_edit_inp_subc2outlet', 'ud', 'trigger function', NULL, NULL, NULL, 'role_master', NULL, 'core');
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") VALUES(3252, 'There is no subcatchment or outlet_id nearby', 'Place the line inside a subcatchment or use the snapping tool to set an outlet_id for the subcatchment.', 2, true, 'utils', 'core');
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") 
+VALUES(3300, 'gw_trg_edit_inp_subc2outlet', 'ud', 'trigger function', NULL, NULL, NULL, 'role_master', NULL, 'core')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") 
+VALUES(3252, 'There is no subcatchment or outlet_id nearby', 'Place the line inside a subcatchment or use the snapping tool to set an outlet_id for the subcatchment.', 2, true, 'utils', 'core')
+ON CONFLICT (id) DO NOTHING;
 
 UPDATE sys_function SET descript ='Function to analyze graph of network. Dynamic analisys to sectorize network using the flow traceability function. 
 Before working with this funcion, it is mandatory to configurate graphconfig on drainzone table'
@@ -71,9 +79,17 @@ UPDATE sys_function SET descript='Function to analyze network as a graph. Analys
 Stop your mouse over labels for more information about input parameters.'
 WHERE function_name='gw_fct_graphanalytics_mapzones_advanced';
 
-INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) VALUES(528, 'Check outlet_id existance in inp_subcatchment and inp_junction', 'ud', NULL, 'core', true, 'Check epa-data', NULL);
-INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) VALUES(529, 'Check missing data in Inp Weir', 'ud', NULL, 'core', true, 'Check epa-data', NULL);
-INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) VALUES(530, 'Check missing data in Inp Orifice', 'ud', NULL, 'core', true, 'Check epa-data', NULL);
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam)
+VALUES(528, 'Check outlet_id existance in inp_subcatchment and inp_junction', 'ud', NULL, 'core', true, 'Check epa-data', NULL)
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) 
+VALUES(529, 'Check missing data in Inp Weir', 'ud', NULL, 'core', true, 'Check epa-data', NULL)
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) 
+VALUES(530, 'Check missing data in Inp Orifice', 'ud', NULL, 'core', true, 'Check epa-data', NULL)
+ON CONFLICT (fid) DO NOTHING;
 
 
 UPDATE config_toolbox SET inputparams =
