@@ -628,13 +628,16 @@ BEGIN
 	select count(*) from n into v_count;
 	
 	IF v_count>0 then
-		INSERT INTO temp_audit_check_data (result_id, criticity, error_message, fcount)
-		VALUES ('522', 3, concat('ERROR-522: There is/are ',v_count,' outfalls with more than 1 arc connected.'),v_count);
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '522', 3, concat('ERROR-522: There is/are ',v_count,' outfalls with more than 1 arc connected.'),v_count);
 		
 		EXECUTE 'INSERT INTO temp_anl_node (fid, node_id, descript, the_geom, expl_id, nodecat_id) 
 		select 522, node.node_id, ''Outfall with more than 1 arc'', node.the_geom, node.expl_id, node.nodecat_id 
 		from node, arc where node.epa_type=''OUTFALL'' and st_dwithin(node.the_geom, arc.the_geom, 0.01) 
 		group by node.node_id having count(node.node_id)>1';
+	ELSE
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '522', 1, 'INFO: All outlets have a valid number of connected arcs.',v_count);
 	END IF;
 	v_count=0;
 	
