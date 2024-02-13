@@ -85,7 +85,7 @@ BEGIN
 		v_edit = 'v_edit_';
 	END IF;
 	
-	IF v_fid = 125 OR v_fid = 101 THEN
+	IF v_fid = 211 OR v_fid = 101 THEN
 		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
 		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 	END IF;
@@ -429,6 +429,8 @@ BEGIN
 	ELSIF  v_fid = 101 THEN 
 		UPDATE temp_audit_check_data SET fid = 211;
 		UPDATE temp_anl_node SET fid = 211;
+		INSERT INTO project_temp_audit_check_data SELECT * FROM temp_audit_check_data;
+		INSERT INTO project_temp_anl_node SELECT * FROM temp_anl_node;
 
 	END IF;
 
