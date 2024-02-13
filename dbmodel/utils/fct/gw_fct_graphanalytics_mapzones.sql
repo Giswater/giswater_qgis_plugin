@@ -901,6 +901,7 @@ BEGIN
 
 			-- create log
 			IF v_project_type='UD' THEN
+			
 				v_querytext = ' INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 				SELECT '||v_fid||', 0, concat('||v_mapzonename||','' with '', arcs, '' Arcs, '',nodes, '' Nodes, '', case when connecs is null then 0 else connecs end, '' Connecs and '',
 				 case when gullies is null then 0 else gullies end, '' Gullies'')
@@ -1434,15 +1435,15 @@ BEGIN
 
 		EXECUTE 'INSERT INTO plan_netscenario_arc(netscenario_id, arc_id, '||quote_ident(v_field)||', the_geom)
 		SELECT '|| v_netscenario||', arc_id, '||quote_ident(v_field)||', a.the_geom FROM temp_t_arc a
-		JOIN plan_netscenario_'||v_table||' USING (dma_id) WHERE netscenario_id =  '|| v_netscenario||'';
+		JOIN plan_netscenario_'||v_table||' USING ('||quote_ident(v_field)||') WHERE netscenario_id =  '|| v_netscenario||'';
 	
 		EXECUTE 'INSERT INTO plan_netscenario_node(netscenario_id, node_id, '||quote_ident(v_field)||', the_geom)
 		SELECT '|| v_netscenario||', node_id, '||quote_ident(v_field)||', n.the_geom FROM temp_t_node n
-		JOIN plan_netscenario_'||v_table||' USING (dma_id) WHERE netscenario_id =  '|| v_netscenario||'';
+		JOIN plan_netscenario_'||v_table||' USING ('||quote_ident(v_field)||') WHERE netscenario_id =  '|| v_netscenario||'';
 
 		EXECUTE 'INSERT INTO plan_netscenario_connec(netscenario_id, connec_id, '||quote_ident(v_field)||', the_geom)
 		SELECT '|| v_netscenario||', connec_id, '||quote_ident(v_field)||', c.the_geom FROM temp_t_connec c
-		JOIN plan_netscenario_'||v_table||' USING (dma_id) WHERE netscenario_id =  '|| v_netscenario||'';
+		JOIN plan_netscenario_'||v_table||' USING ('||quote_ident(v_field)||') WHERE netscenario_id =  '|| v_netscenario||'';
 
 
 		IF v_class = 'PRESSZONE' THEN
