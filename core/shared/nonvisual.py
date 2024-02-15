@@ -9,6 +9,7 @@ import os
 import webbrowser
 from functools import partial
 
+
 try:
     from scipy.interpolate import CubicSpline
     import numpy as np
@@ -16,9 +17,10 @@ try:
 except ImportError:
     scipy_imported = False
 
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QWidget, QShortcut,QApplication
-from qgis.PyQt.QtGui import QKeySequence
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QWidget, QShortcut,QApplication, QMenu, QAction
+from qgis.PyQt.QtGui import QKeySequence, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.PyQt.QtCore import Qt
 from qgis.core import Qgis
 from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
     GwNonVisualPatternWSUi, GwNonVisualRulesUi, GwNonVisualTimeseriesUi, GwNonVisualLidsUi, GwNonVisualPrint, \
@@ -585,6 +587,10 @@ class GwNonVisual:
         cmb_expl_id = self.dialog.cmb_expl_id
         cmb_curve_type = self.dialog.cmb_curve_type
 
+        # Populate custom context menu
+        tbl_curve_value.setContextMenuPolicy(Qt.CustomContextMenu)
+        tbl_curve_value.customContextMenuRequested.connect(partial(self._paste_curves_custom_menu, tbl_curve_value))
+
         # Copy values from clipboard
         paste_shortcut = QShortcut(QKeySequence.Paste, tbl_curve_value)
         paste_shortcut.activated.connect(partial(self._paste_curves_values, tbl_curve_value))
@@ -625,6 +631,15 @@ class GwNonVisual:
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_curve')
+
+    def _paste_curves_custom_menu(self, tbl):
+        menu = QMenu(tbl)
+        action_paste = QAction("Paste")
+        action_paste.triggered.connect(partial(self._paste_curves_values, tbl))
+
+        menu.addAction(action_paste)
+
+        menu.exec(QCursor.pos())
 
     def _paste_curves_values(self, tbl_curve_value):
         selected = tbl_curve_value.selectedRanges()
@@ -1097,9 +1112,13 @@ class GwNonVisual:
         tbl_pattern_value = self.dialog.tbl_pattern_value
         cmb_expl_id = self.dialog.cmb_expl_id
 
+        # Populate custom context menu
+        tbl_pattern_value.setContextMenuPolicy(Qt.CustomContextMenu)
+        tbl_pattern_value.customContextMenuRequested.connect(partial(self._paste_patterns_custom_menu, tbl_pattern_value))
+
         # Copy values from clipboard
         paste_shortcut = QShortcut(QKeySequence.Paste, tbl_pattern_value)
-        paste_shortcut.activated.connect(partial(self._paste_pattern_values, tbl_pattern_value))
+        paste_shortcut.activated.connect(partial(self._paste_patterns_values, tbl_pattern_value))
 
         # Set scale-to-fit for tableview
         tbl_pattern_value.horizontalHeader().setSectionResizeMode(1)
@@ -1129,7 +1148,17 @@ class GwNonVisual:
         self.dialog.btn_accept.clicked.connect(partial(self._accept_pattern_ws, self.dialog, is_new))
 
 
-    def _paste_pattern_values(self, tbl_patter_value):
+    def _paste_patterns_custom_menu(self, tbl):
+        menu = QMenu(tbl)
+        action_paste = QAction("Paste")
+        action_paste.triggered.connect(partial(self._paste_patterns_values, tbl))
+
+        menu.addAction(action_paste)
+
+        menu.exec(QCursor.pos())
+
+
+    def _paste_patterns_values(self, tbl_patter_value):
         selected = tbl_patter_value.selectedRanges()
         if not selected:
             return
@@ -1960,6 +1989,10 @@ class GwNonVisual:
         cmb_expl_id = self.dialog.cmb_expl_id
         tbl_timeseries_value = self.dialog.tbl_timeseries_value
 
+        # Populate custom context menu
+        tbl_timeseries_value.setContextMenuPolicy(Qt.CustomContextMenu)
+        tbl_timeseries_value.customContextMenuRequested.connect(partial(self._paste_timeseries_custom_menu, tbl_timeseries_value))
+
         # Copy values from clipboard
         paste_shortcut = QShortcut(QKeySequence.Paste, tbl_timeseries_value)
         paste_shortcut.activated.connect(partial(self._paste_timeseries_values, tbl_timeseries_value))
@@ -1987,6 +2020,17 @@ class GwNonVisual:
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_timeseries')
+
+
+    def _paste_timeseries_custom_menu(self, tbl):
+        menu = QMenu(tbl)
+        action_paste = QAction("Paste")
+        action_paste.triggered.connect(partial(self._paste_timeseries_values, tbl))
+
+        menu.addAction(action_paste)
+
+        menu.exec(QCursor.pos())
+
 
     def _paste_timeseries_values(self, tbl_timeseries_value):
         selected = tbl_timeseries_value.selectedRanges()
