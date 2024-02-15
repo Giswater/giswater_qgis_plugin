@@ -49,7 +49,7 @@ BEGIN
       );
    END LOOP;
    v_querytext = left(v_querytext, length(v_querytext) - 6);
-   v_querytext = CONCAT('SELECT ST_AsGeoJSON(COALESCE(ST_Union(ST_Buffer(the_geom, 2)), ST_GeomFromText(''POINT EMPTY'')))
+   v_querytext = CONCAT('SELECT ST_AsGeoJSON(COALESCE(ST_Collect(ST_Buffer(the_geom, 2)), ST_GeomFromText(''POINT EMPTY'')))
    FROM (', v_querytext, ') AS combined_geometries');
   
   ELSIF v_type = 'area' THEN
