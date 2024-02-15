@@ -513,32 +513,40 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.open_dialog(self.dlg_dscenario, 'dscenario', title=f"{title}")
 
 
+    def _paste_dscenario_demand_custom_menu(self, tbl):
+        menu = QMenu(tbl)
+        action_paste = QAction("Paste")
+        action_paste.triggered.connect(partial(self._paste_dscenario_demand_values, tbl))
+
+        menu.addAction(action_paste)
+
+        menu.exec(QCursor.pos())
+
     def _paste_dscenario_demand_values(self, tableview):
-        view = tableview.objectName()
-        if view == "inp_dscenario_demand" and self.project_type == 'ws':
-            text = QApplication.clipboard().text()
-            rows = text.split("\n")
-            model = tableview.model()
+        text = QApplication.clipboard().text()
+        rows = text.split("\n")
+        model = tableview.model()
 
-            for row in rows:
-                if not row:
-                    continue
+        for row in rows:
+            if not row:
+                continue
 
-                values = row.split("\t")
+            values = row.split("\t")
 
-                # Check if the number of values matches the number of columns
-                if len(values) != model.columnCount() - 2:
-                    continue
+            # Check if the number of values matches the number of columns
+            if len(values) != model.columnCount() - 2:
+                continue
 
-                feature_id = values[0]  # Assuming feature_id is the first column
-                values = values[1:]  # Exclude feature_id from the values
+            feature_id = values[0]  # Assuming feature_id is the first column
+            values = values[1:]  # Exclude feature_id from the values
 
-                # Insert a new feature using _manage_paste_dscenario_demand_values
-                self._manage_paste_dscenario_demand_values(feature_id, values)
+            # Insert a new feature using _manage_paste_dscenario_demand_values
+            self._manage_paste_dscenario_demand_values(feature_id, values)
 
-            model.submitAll()
-            model.select()
-            tableview.update()
+        model.submitAll()
+        model.select()
+        tableview.update()
+
 
     def _manage_paste_dscenario_demand_values(self, feature_id, values):
         """ Insert feature to dscenario via copy paste """
@@ -551,7 +559,7 @@ class GwDscenarioManagerButton(GwAction):
         tableview = self.dlg_dscenario.main_tab.currentWidget()
         view = tableview.objectName()
 
-        sql = f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{self.table_name[len(f'{self.schema_name}.'):]}' ORDER BY ordinal_position;"
+        sql = f"SELECT DISTINCT column_name, ordinal_position FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{self.table_name[len(f'{self.schema_name}.'):]}' ORDER BY ordinal_position;"
         rows = tools_db.get_rows(sql)
 
         # FIELDS
@@ -658,9 +666,14 @@ class GwDscenarioManagerButton(GwAction):
 
         tableview = self.dlg_dscenario.main_tab.currentWidget()
 
-        # Copy values from clipboard only in dscenario demand in ws projects
-        paste_shortcut = QShortcut(QKeySequence.Paste, self.dlg_dscenario.main_tab)
-        paste_shortcut.activated.connect(partial(self._paste_dscenario_demand_values, tableview))
+        if tableview.objectName() == "inp_dscenario_demand" and self.project_type == 'ws':
+            # Populate custom context menu
+            tableview.setContextMenuPolicy(Qt.CustomContextMenu)
+            tableview.customContextMenuRequested.connect(partial(self._paste_dscenario_demand_custom_menu, tableview))
+
+            # Copy values from clipboard only in dscenario demand in ws projects
+            paste_shortcut = QShortcut(QKeySequence.Paste, self.dlg_dscenario.main_tab)
+            paste_shortcut.activated.connect(partial(self._paste_dscenario_demand_values, tableview))
 
         # Deactivate btn_snapping functionality
         self._selection_end()
