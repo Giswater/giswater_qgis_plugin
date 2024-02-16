@@ -273,20 +273,7 @@ BEGIN
 			DELETE FROM config_param_system WHERE parameter = 'om_mincut_enable_alerts';
 
 			-- fk for ext tables or utils schema
-			PERFORM gw_fct_admin_schema_utils_fk();  
-			
-			-- generate child views 
-			UPDATE config_param_system SET value='FALSE' WHERE parameter='admin_config_control_trigger';
-			
-			-- delete previous definition (in order to prevent failures on delta files
-			PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-			"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE"}}$$)::text;
-			
-			-- recreate views
-			PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-			"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE"}}$$)::text;
-
-			UPDATE config_param_system SET value='TRUE' WHERE parameter='admin_config_control_trigger';
+			PERFORM gw_fct_admin_schema_utils_fk();
 			
 			--change widgettype for matcat_id when new empty data project (UD)
 			IF v_projecttype = 'UD' THEN 
@@ -443,75 +430,6 @@ BEGIN
 			SELECT * INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 			INSERT INTO sys_version (giswater, project_type, postgres, postgis, language, epsg)
 			VALUES (v_gwversion, v_version.project_type, (select version()), (select postgis_version()), v_version.language, v_version.epsg);
-			
-			-- create child views for users from 3.2 to 3.3 updates
-			IF v_oldversion < '3.3.000' AND v_gwversion > '3.3.000' THEN
-				PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
-				"feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE"}}$$)::text;
-			END IF;
-			
-			-- recreate child views adding workcat_id_plan on parent tables
-			IF v_oldversion < '3.4.032' AND v_gwversion > '3.4.030' THEN
-				PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-				"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"workcat_id_plan" }}$$);
-			END IF;
-
-			-- recreate child views adding workcat_id_plan on parent tables
-			IF v_oldversion < '3.5.031'  THEN
-			
-				FOR rec_viewname IN (SELECT child_layer FROM cat_feature WHERE feature_type = 'NODE') LOOP
-					IF (SELECT EXISTS ( SELECT 1 FROM  information_schema.tables WHERE  table_schema = v_schemaname AND table_name = rec_viewname)) 
-					IS TRUE THEN
-						EXECUTE 'SELECT pg_get_viewdef('''||v_schemaname||'.'||rec_viewname||''', true);'
-						INTO v_definition;
-
-						v_definition = replace(v_definition,concat('JOIN ',v_schemaname,'.v_state_node ON node_id = feature_id'), 
-						concat('JOIN ',v_schemaname,'.v_expl_node e ON e.node_id = feature_id'));
-
-						EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||rec_viewname||' AS '||v_definition||'';
-					END IF;
-				END LOOP;
-				
-				FOR rec_viewname IN (SELECT child_layer FROM cat_feature WHERE feature_type = 'ARC') LOOP
-					IF (SELECT EXISTS ( SELECT 1 FROM  information_schema.tables WHERE  table_schema = v_schemaname AND table_name = rec_viewname)) 
-					IS TRUE THEN
-						EXECUTE 'SELECT pg_get_viewdef('''||v_schemaname||'.'||rec_viewname||''', true);'
-						INTO v_definition;
-
-						v_definition = replace(v_definition,concat('JOIN ',v_schemaname,'.v_state_arc ON arc_id = feature_id'), 
-						concat('JOIN ',v_schemaname,'.v_expl_arc e ON e.arc_id = feature_id'));
-
-						EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||rec_viewname||' AS '||v_definition||'';
-					END IF;
-				END LOOP;
-				
-				FOR rec_viewname IN (SELECT child_layer FROM cat_feature WHERE feature_type = 'CONNEC') LOOP
-					IF (SELECT EXISTS ( SELECT 1 FROM  information_schema.tables WHERE  table_schema = v_schemaname AND table_name = rec_viewname)) 
-					IS TRUE THEN
-						EXECUTE 'SELECT pg_get_viewdef('''||v_schemaname||'.'||rec_viewname||''', true);'
-						INTO v_definition;
-
-						v_definition = replace(v_definition,concat('JOIN ',v_schemaname,'.v_state_connec ON connec_id = feature_id'), 
-						concat('JOIN ',v_schemaname,'.v_expl_connec e ON e.connec_id = feature_id'));
-
-						EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||rec_viewname||' AS '||v_definition||'';
-					END IF;
-				END LOOP;
-				
-				FOR rec_viewname IN (SELECT child_layer FROM cat_feature WHERE feature_type = 'GULLY') LOOP
-					IF (SELECT EXISTS ( SELECT 1 FROM  information_schema.tables WHERE  table_schema = v_schemaname AND table_name = rec_viewname)) 
-					IS TRUE THEN
-						EXECUTE 'SELECT pg_get_viewdef('''||v_schemaname||'.'||rec_viewname||''', true);'
-						INTO v_definition;
-
-						v_definition = replace(v_definition,concat('JOIN ',v_schemaname,'.v_state_gully ON gully_id = feature_id'), 
-						concat('JOIN ',v_schemaname,'.v_expl_gully e ON e.gully_id = feature_id'));
-
-						EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||rec_viewname||' AS '||v_definition||'';
-					END IF;
-				END LOOP;
-			
-			END IF;
 
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('Project have been sucessfully updated from ',v_oldversion,' version to ',v_gwversion, ' version'));
 			v_message='Project sucessfully updated';
