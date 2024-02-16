@@ -119,6 +119,10 @@ BEGIN
 			IF v_filtersign  IS NULL THEN
 				v_filtersign='=';
 			END IF;
+            
+			IF v_filtervalue = 'None' THEN
+				v_filtervalue = '';
+			END IF;
 			
 			IF v_filtername != '' AND v_filtervalue != '' THEN
 			
