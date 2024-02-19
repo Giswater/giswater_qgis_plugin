@@ -67,6 +67,13 @@ BEGIN
 	v_log_project = json_extract_path_text(p_data,'data','parameters','checkType');
 	v_isaudit = json_extract_path_text(p_data,'data','parameters','isAudit')::boolean;
 	v_selection_mode = json_extract_path_text(p_data,'data','parameters','selectionMode')::text;
+    
+    
+	--create temp
+    CREATE TEMP TABLE IF NOT EXISTS project_temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+    CREATE TEMP TABLE IF NOT EXISTS project_temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
+    CREATE TEMP TABLE IF NOT EXISTS project_temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
+    CREATE TEMP TABLE IF NOT EXISTS project_temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
 
 	--if in schema audit doesnt exist or doesnt have table audit_fid_log - switch off audit option
 	IF v_isaudit IS TRUE and 
@@ -85,20 +92,20 @@ BEGIN
 	v_count=0;
 
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fid=251 AND cur_user=current_user;
+	DELETE FROM project_temp_audit_check_data WHERE fid=251 AND cur_user=current_user;
 	
 	-- Starting process
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 4, concat('CHECK USER DATA'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 4, '-------------------------------------------------------------');
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 4, concat('CHECK USER DATA'));
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 4, '-------------------------------------------------------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 3, 'CRITICAL ERRORS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 3, '----------------------');
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 3, 'CRITICAL ERRORS');
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 3, '----------------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 2, 'WARNINGS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 2, '--------------');
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 2, 'WARNINGS');
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 2, '--------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 1, 'INFO');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 1, '-------');
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 1, 'INFO');
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, null, 1, '-------');
 
 		-- save state & expl selector
 	IF v_selection_mode !='userSelectors' THEN
@@ -170,7 +177,7 @@ BEGIN
 				INSERT INTO audit.audit_fid_log (fid, fcount, criticity, source)
 				VALUES (rec.fid,  v_count::integer, v_criticity, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl));
 			END IF;
-			INSERT INTO audit_check_data(fid, result_id, criticity, error_message,  fcount)
+			INSERT INTO project_temp_audit_check_data(fid, result_id, criticity, error_message,  fcount)
 			SELECT 251,rec.fid, v_criticity, concat(v_infotext,sys_fprocess.fprocess_name, ': ',v_count), v_count::integer
 			FROM sys_fprocess WHERE sys_fprocess.fid = rec.fid;
 
@@ -182,7 +189,7 @@ BEGIN
 					VALUES (rec.fid,  (rec_result::json ->> 'fcount')::integer, v_criticity, (rec_result::json ->>'groupBy'), jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl));
 				END IF;
 
-				INSERT INTO audit_check_data(fid, result_id, criticity, error_message, fcount)
+				INSERT INTO project_temp_audit_check_data(fid, result_id, criticity, error_message, fcount)
 				SELECT 251,rec.fid, v_criticity, concat(v_infotext,sys_fprocess.fprocess_name,' - ',(rec_result::json ->>'groupBy'),': ',(rec_result::json ->> 'fcount')), (rec_result::json ->> 'fcount')::integer
 				FROM sys_fprocess WHERE sys_fprocess.fid = rec.fid;
 			END LOOP;
@@ -210,7 +217,7 @@ BEGIN
 		
 		INSERT INTO audit.audit_fid_log (fid, fcount, criticity, source)
 		SELECT result_id::integer, fcount, criticity, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',v_cur_expl)
-		FROM audit_check_data a
+		FROM project_temp_audit_check_data a
 		JOIN sys_fprocess f ON f.fid=result_id::integer 
 		WHERE a.fid=101 AND cur_user = current_user 
 		AND ((criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%'))
@@ -223,7 +230,7 @@ BEGIN
 		SELECT arc_id, arccat_id, state, arc_id_aux, expl_id, fid, cur_user, 
 		the_geom, the_geom_p, descript, result_id, node_1, node_2, sys_type, 
 		code, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',expl_id)
-		FROM anl_arc WHERE fid::text IN (SELECT DISTINCT result_id FROM audit_check_data WHERE fid=101 AND cur_user = current_user 
+		FROM project_temp_anl_arc WHERE fid::text IN (SELECT DISTINCT result_id FROM project_temp_audit_check_data WHERE fid=101 AND cur_user = current_user 
 		AND criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%')) AND cur_user=current_user;
 
 		INSERT INTO audit.anl_node (node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, 
@@ -232,7 +239,7 @@ BEGIN
 		SELECT node_id, nodecat_id, state, num_arcs, node_id_aux, nodecat_id_aux, 
 		state_aux, expl_id, fid, cur_user, the_geom, arc_distance, arc_id, 
 		descript, result_id, sys_type, code, jsonb_build_object('schema','SCHEMA_NAME', 'expl_id',expl_id)
-		FROM anl_node WHERE fid::text IN (SELECT DISTINCT result_id FROM audit_check_data WHERE fid=101 AND cur_user = current_user 
+		FROM project_temp_anl_node WHERE fid::text IN (SELECT DISTINCT result_id FROM project_temp_audit_check_data WHERE fid=101 AND cur_user = current_user 
 		AND criticity IN (2,3) AND (error_message ILIKE 'ERROR-%' OR error_message ILIKE 'WARNING-%')) AND cur_user=current_user;
 
 	END IF;
@@ -240,14 +247,15 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=251 order by criticity desc, id asc) row;
+	FROM (SELECT id, error_message as message FROM project_temp_audit_check_data WHERE cur_user="current_user"() AND fid=251 order by criticity desc, id asc) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, v_result_id, 4, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, v_result_id, 3, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, v_result_id, 2, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (251, v_result_id, 1, '');
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, v_result_id, 4, '');
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, v_result_id, 3, '');
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, v_result_id, 2, '');
+	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (251, v_result_id, 1, '');
+
 	
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 

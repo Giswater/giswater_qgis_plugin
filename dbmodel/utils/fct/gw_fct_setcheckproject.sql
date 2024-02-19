@@ -169,10 +169,10 @@ BEGIN
 	v_count=0;
 
 	--create temp
-  CREATE TEMP TABLE project_temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
-  CREATE TEMP TABLE project_temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-  CREATE TEMP TABLE project_temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
-  CREATE TEMP TABLE project_temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
+  CREATE TEMP TABLE IF NOT EXISTS project_temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+  CREATE TEMP TABLE IF NOT EXISTS project_temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
+  CREATE TEMP TABLE IF NOT EXISTS project_temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
+  CREATE TEMP TABLE IF NOT EXISTS project_temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
   
 	select array_agg(expl_id) INTO v_cur_expl from selector_expl where cur_user = current_user;
     
@@ -624,22 +624,6 @@ BEGIN
 
 		END IF;
 
-			-- Delete and insert values from python into audit_check_project	
-	  DELETE FROM audit_check_data WHERE cur_user = current_user AND fid = 101;
-	  DELETE FROM anl_node WHERE cur_user = current_user AND fid = 101;
-	  DELETE FROM anl_arc WHERE cur_user = current_user AND fid = 101;
-	  DELETE FROM anl_connec WHERE cur_user = current_user AND fid = 101;
-
-		INSERT INTO anl_arc SELECT * FROM project_temp_anl_arc;
-		INSERT INTO anl_node SELECT * FROM project_temp_anl_node;
-		INSERT INTO anl_connec SELECT * FROM project_temp_anl_connec;
-		INSERT INTO audit_check_data SELECT * FROM project_temp_audit_check_data;
-
-		DROP TABLE IF EXISTS project_temp_anl_arc;
-		DROP TABLE IF EXISTS project_temp_anl_node;
-		DROP TABLE IF EXISTS project_temp_anl_connec;
-		DROP TABLE IF EXISTS project_temp_audit_check_data;
-
 		--    Control null
 		v_version:=COALESCE(v_version,'{}');
 		v_result_info:=COALESCE(v_result_info,'{}');
@@ -674,6 +658,22 @@ BEGIN
 				', "variables":{"hideForm":true, "setQgisLayers":' || v_qgis_layers_setpropierties||', "useGuideMap":'||v_qgis_init_guide_map||'}}}')::json;
 				-- setQgisLayers: not used variable on python 3.4 because threath is operative to refresh_attribute of whole layers
 	END IF;
+
+	-- Delete and insert values from python into audit_check_project	
+	DELETE FROM audit_check_data WHERE cur_user = current_user AND fid = 101;
+	DELETE FROM anl_node WHERE cur_user = current_user AND fid = 101;
+	DELETE FROM anl_arc WHERE cur_user = current_user AND fid = 101;
+	DELETE FROM anl_connec WHERE cur_user = current_user AND fid = 101;
+	
+	INSERT INTO anl_arc SELECT * FROM project_temp_anl_arc;
+	INSERT INTO anl_node SELECT * FROM project_temp_anl_node;
+	INSERT INTO anl_connec SELECT * FROM project_temp_anl_connec;
+	INSERT INTO audit_check_data SELECT * FROM project_temp_audit_check_data;
+	
+	DROP TABLE IF EXISTS project_temp_anl_arc;
+	DROP TABLE IF EXISTS project_temp_anl_node;
+	DROP TABLE IF EXISTS project_temp_anl_connec;
+	DROP TABLE IF EXISTS project_temp_audit_check_data;
 		
 	--  Return	   
 	RETURN v_return;
