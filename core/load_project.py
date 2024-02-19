@@ -33,7 +33,7 @@ class GwLoadProject(QObject):
         self.buttons = {}
 
 
-    def project_read(self, show_warning=True):
+    def project_read(self, show_warning=True, main=None):
         """ Function executed when a user opens a QGIS project (*.qgs) """
 
         global_vars.project_loaded = False
@@ -111,6 +111,15 @@ class GwLoadProject(QObject):
         #     self.gw_search = GwSearch()
         #     self.gw_search.open_search(self.dlg_search, load_project=True)
 
+        # Connect project save / new project
+        try:
+            tools_gw.connect_signal(self.iface.newProjectCreated, main._project_new,
+                                    'main', 'newProjectCreated')
+            tools_gw.connect_signal(self.iface.actionSaveProject().triggered, self._save_toolbars_position,
+                                    'main', 'actionSaveProject_save_toolbars_position')
+        except AttributeError:
+            pass
+
         # Get feature cat
         global_vars.feature_cat = tools_gw.manage_feature_cat()
 
@@ -182,6 +191,28 @@ class GwLoadProject(QObject):
         self._config_layers()
 
     # region private functions
+
+    def _save_toolbars_position(self):
+        # Get all QToolBar from qgis iface
+        widget_list = self.iface.mainWindow().findChildren(QToolBar)
+        own_toolbars = []
+
+        # Get list with own QToolBars
+        for w in widget_list:
+            if w.property('gw_name'):
+                own_toolbars.append(w)
+
+        # Order list of toolbar in function of X position
+        own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
+        if len(own_toolbars) == 0 or (len(own_toolbars) == 1 and own_toolbars[0].property('gw_name') == 'toc') or \
+                global_vars.project_type is None:
+            return
+
+        # Set 'toolbars_order' parameter on 'toolbars_position' section on init.config user file (found in user path)
+        sorted_toolbar_ids = [tb.property('gw_name') for tb in own_toolbars]
+        sorted_toolbar_ids = ",".join(sorted_toolbar_ids)
+        tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids), "user", "init")
+
 
     def _check_version_compatibility(self):
 
