@@ -11,21 +11,21 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Data for Name: value_state; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO value_state VALUES (0, 'OBSOLET', NULL);
-INSERT INTO value_state VALUES (2, 'PLANIFICAT', NULL);
-INSERT INTO value_state VALUES (1, 'OPERATIU', NULL);
+INSERT INTO value_state VALUES (0, 'OBSOLETE', NULL);
+INSERT INTO value_state VALUES (1, 'EN_SERVICE', NULL);
+INSERT INTO value_state VALUES (2, 'PLANIFIE', NULL);
 
 
 --
 -- Data for Name: value_state_type; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO value_state_type VALUES (3, 2, 'PLANIFICAT', true, true);
-INSERT INTO value_state_type VALUES (4, 2, 'RECONSTRUIR', true, false);
-INSERT INTO value_state_type VALUES (5, 1, 'PROVISIONAL', false, true);
+INSERT INTO value_state_type VALUES (2, 1, 'EN_SERVICE', true, true);
+INSERT INTO value_state_type VALUES (3, 2, 'PLANIFIÉ', true, true);
+INSERT INTO value_state_type VALUES (4, 2, 'RECONSTRUIT', true, false);
+INSERT INTO value_state_type VALUES (5, 1, 'PREVISIONNEL', false, true);
 INSERT INTO value_state_type VALUES (99, 2, 'FICTICIUS', true, false);
-INSERT INTO value_state_type VALUES (1, 0, 'OBSOLET', false, false);
-INSERT INTO value_state_type VALUES (2, 1, 'OPERATIU', true, true);
+INSERT INTO value_state_type VALUES (1, 0, 'OBSOLETE', false, false);
 
 
 --
@@ -49,15 +49,15 @@ INSERT INTO edit_typevalue VALUES ('raster_type', 'Slope', 'Slope', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('valve_ordinarystatus', '0', 'closed', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('valve_ordinarystatus', '1', 'opened', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('valve_ordinarystatus', '2', 'maybe', NULL, NULL);
-INSERT INTO edit_typevalue VALUES ('value_verified', 'PER REVISAR', 'PER REVISAR', NULL, NULL);
-INSERT INTO edit_typevalue VALUES ('value_verified', 'VERIFICAT', 'VERIFICAT', NULL, NULL);
-INSERT INTO edit_typevalue VALUES ('value_review_status', '0', 'Sense canvis', 'No hi ha canvis per sobre o sota dels llindars de tolerancia', NULL);
-INSERT INTO edit_typevalue VALUES ('value_review_status', '1', 'Nou element', 'Nou element introduit per revisar', NULL);
-INSERT INTO edit_typevalue VALUES ('value_review_status', '2', 'Geometria modificada', 'Geometria modificada en la revisió. Altre dates es poden haber modificat', NULL);
-INSERT INTO edit_typevalue VALUES ('value_review_status', '3', 'Dades modificades', 'Cavis en les dades, no en la geometria', NULL);
-INSERT INTO edit_typevalue VALUES ('value_review_validation', '0', 'Rebutjat', NULL, NULL);
-INSERT INTO edit_typevalue VALUES ('value_review_validation', '1', 'Aceptat', NULL, NULL);
-INSERT INTO edit_typevalue VALUES ('value_review_validation', '2', 'A revisar', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('value_verified', 'A VERIFIE', 'A VERIFIE', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('value_verified', 'VERIFIE', 'VERIFIE', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('value_review_status', '0', 'Aucun changement', 'Aucun changement au-dessus ou au-dessous des valeurs de tolérance', NULL);
+INSERT INTO edit_typevalue VALUES ('value_review_status', '1', 'nouveau element', 'Nouveau élément inséré à la vérification', NULL);
+INSERT INTO edit_typevalue VALUES ('value_review_status', '2', 'Géometrie modifié', 'Géometrie modifié lors de la vérification. D autres éléments peuvent avoir été modifié ', NULL);
+INSERT INTO edit_typevalue VALUES ('value_review_status', '3', 'Donnée modifiée', 'Changement dans les données, exception faite de la geometrie', NULL);
+INSERT INTO edit_typevalue VALUES ('value_review_validation', '0', 'Rejeté', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('value_review_validation', '1', 'Accepté', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('value_review_validation', '2', 'A vérifier', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('value_boolean', '0', 'FALSE', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('value_boolean', '1', 'MAYBE', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('value_boolean', '2', 'TRUE', NULL, NULL);
@@ -79,21 +79,17 @@ INSERT INTO om_typevalue VALUES ('visit_parameter_criticity', '1', 'Urgent', NUL
 INSERT INTO om_typevalue VALUES ('visit_parameter_criticity', '2', 'High', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_parameter_criticity', '3', 'Normal', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_parameter_criticity', '4', 'Minor', NULL, NULL);
-INSERT INTO om_typevalue VALUES ('mincut_cause', '1', 'Accidental', NULL, NULL);
-INSERT INTO om_typevalue VALUES ('mincut_cause', '2', 'Planificat', NULL, NULL);
-INSERT INTO om_typevalue VALUES ('mincut_class', '1', 'Tancament de xarxa', NULL, NULL);
-INSERT INTO om_typevalue VALUES ('mincut_class', '2', 'Tancament d''escomeses', NULL, NULL);
-INSERT INTO om_typevalue VALUES ('mincut_class', '3', 'Tancament d''abonats', NULL, NULL);
-INSERT INTO om_typevalue VALUES ('mincut_state', '1', 'En procés', NULL, NULL);
-INSERT INTO om_typevalue VALUES ('mincut_state', '2', 'Finalitzat', NULL, NULL);
-INSERT INTO om_typevalue VALUES ('mincut_state', '0', 'Planificat', NULL, NULL);
-INSERT INTO om_typevalue VALUES ('mincut_state', '3', 'Cancel.lat', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('mincut_cause', '1', 'Accidentel', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('mincut_cause', '2', 'Planifié', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('mincut_class', '1', 'Reseau coupe minimum', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('mincut_class', '2', 'Connexion coupe minimum', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('mincut_class', '3', 'Hydromètre coupeminimum', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('mincut_state', '1', 'En progression', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('mincut_state', '2', 'Réalisé', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('mincut_state', '0', 'Planifié', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('mincut_state', '3', 'Canceled', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_type', '1', 'planned', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_type', '2', 'unexpected', NULL, NULL);
-INSERT INTO om_typevalue VALUES ('visit_status', '1', 'Iniciada', NULL, NULL);
-INSERT INTO om_typevalue VALUES ('visit_status', '2', 'Stand-by', NULL, NULL);
-INSERT INTO om_typevalue VALUES ('visit_status', '3', 'Cancelada', NULL, NULL);
-INSERT INTO om_typevalue VALUES ('visit_status', '4', 'Finalitzada', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_param_action', '1', 'Complementary events', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_param_action', '2', 'Incompatible events', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_param_action', '3', 'Redundant events', NULL, NULL);
@@ -107,10 +103,10 @@ INSERT INTO om_typevalue VALUES ('profile_papersize', '3', 'DIN A3 - 420x297', N
 INSERT INTO om_typevalue VALUES ('profile_papersize', '4', 'DIN A2 - 594x420', NULL, '{"xdim":594, "ydim":420}');
 INSERT INTO om_typevalue VALUES ('profile_papersize', '5', 'DIN A1 - 840x594', NULL, '{"xdim":840, "ydim":594}');
 INSERT INTO om_typevalue VALUES ('mincut_state', '4', 'On planning', NULL, NULL);
-INSERT INTO om_typevalue VALUES ('visit_param_type', 'INSPECCIO', 'INSPECCIO', NULL, '{"go2plan":false}');
-INSERT INTO om_typevalue VALUES ('visit_param_type', 'DESPERFECTES', 'DESPERFECTES', NULL, '{"go2plan":false}');
-INSERT INTO om_typevalue VALUES ('visit_param_type', 'RECONSTRUIR', 'RECONSTRUIR', NULL, '{"go2plan":false}');
-INSERT INTO om_typevalue VALUES ('visit_param_type', 'ALTRES', 'ALTRES', NULL, '{"go2plan":false}');
+INSERT INTO om_typevalue VALUES ('visit_param_type', 'INSPECTION', 'INSPECTION', NULL, '{"go2plan":false}');
+INSERT INTO om_typevalue VALUES ('visit_param_type', 'RECONST', 'RECONST', NULL, '{"go2plan":false}');
+INSERT INTO om_typevalue VALUES ('visit_param_type', 'AUTRE', 'AUTRE', NULL, '{"go2plan":false}');
+INSERT INTO om_typevalue VALUES ('visit_param_type', 'REHABIT', 'REHABIT', NULL, '{"go2plan":true}');
 INSERT INTO om_typevalue VALUES ('waterbalance_method', 'CPW', 'CRM PERIOD WINDOW', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('waterbalance_method', 'DCW', 'DMA CENTROID WINDOW', NULL, NULL);
 
@@ -121,22 +117,21 @@ INSERT INTO om_typevalue VALUES ('waterbalance_method', 'DCW', 'DMA CENTROID WIN
 
 INSERT INTO doc_type VALUES ('AS_BUILT', NULL);
 INSERT INTO doc_type VALUES ('INCIDENT', NULL);
-INSERT INTO doc_type VALUES ('RELACIO DE TREBALL', NULL);
-INSERT INTO doc_type VALUES ('ALTRES', NULL);
-INSERT INTO doc_type VALUES ('FOTO', NULL);
+INSERT INTO doc_type VALUES ('RAPPORT TRAVAIL', NULL);
+INSERT INTO doc_type VALUES ('AUTRE', NULL);
+INSERT INTO doc_type VALUES ('PHOTO', NULL);
 
 
 --
 -- Data for Name: plan_typevalue; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO plan_typevalue VALUES ('psector_status', '2', 'PLANIFICAT', 'Psector planificat', NULL);
-INSERT INTO plan_typevalue VALUES ('value_priority', '1', 'PRIORITAT ALTA', NULL, NULL);
-INSERT INTO plan_typevalue VALUES ('value_priority', '2', 'PRIORITAT NORMAL', NULL, NULL);
-INSERT INTO plan_typevalue VALUES ('value_priority', '3', 'PRIORITAT BAIXA', NULL, NULL);
-INSERT INTO plan_typevalue VALUES ('psector_type', '1', 'Planificat', NULL, NULL);
-INSERT INTO plan_typevalue VALUES ('result_type', '1', 'Reconstrucció', NULL, NULL);
-INSERT INTO plan_typevalue VALUES ('result_type', '2', 'Rehabilitació', NULL, NULL);
+INSERT INTO plan_typevalue VALUES ('value_priority', '1', 'PRIORITE_MAX', NULL, NULL);
+INSERT INTO plan_typevalue VALUES ('value_priority', '2', 'PRIORITE_NORMALE', NULL, NULL);
+INSERT INTO plan_typevalue VALUES ('value_priority', '3', 'PRIORITE_BASSE', NULL, NULL);
+INSERT INTO plan_typevalue VALUES ('psector_type', '1', 'Planifié', NULL, NULL);
+INSERT INTO plan_typevalue VALUES ('result_type', '1', 'Reconstruction', NULL, NULL);
+INSERT INTO plan_typevalue VALUES ('result_type', '2', 'Réhabilitation', NULL, NULL);
 INSERT INTO plan_typevalue VALUES ('price_units', 'm3', 'm3', NULL, NULL);
 INSERT INTO plan_typevalue VALUES ('price_units', 'm2', 'm2', NULL, NULL);
 INSERT INTO plan_typevalue VALUES ('price_units', 'm', 'm', NULL, NULL);
@@ -144,9 +139,6 @@ INSERT INTO plan_typevalue VALUES ('price_units', 'pa', 'pa', NULL, NULL);
 INSERT INTO plan_typevalue VALUES ('price_units', 'u', 'u', NULL, NULL);
 INSERT INTO plan_typevalue VALUES ('price_units', 'kg', 'kg', NULL, NULL);
 INSERT INTO plan_typevalue VALUES ('price_units', 't', 't', NULL, NULL);
-INSERT INTO plan_typevalue VALUES ('psector_status', '0', 'EXECUTED (Save Trace)', 'Psector executed. Its elements are copied to traceability tables', NULL);
-INSERT INTO plan_typevalue VALUES ('psector_status', '1', 'ONGOING (Keep Plan)', 'Psector en curs', NULL);
-INSERT INTO plan_typevalue VALUES ('psector_status', '3', 'CANCELED (Save Trace)', 'Psector canceled. Its elements are copied to traceability tables', NULL);
 INSERT INTO plan_typevalue VALUES ('psector_status', '4', 'EXECUTED (Set OPERATIVE and Save Trace)', 'Psector executed. Its elements are set to On Service and also copied to traceability tables', NULL);
 
 
@@ -154,15 +146,15 @@ INSERT INTO plan_typevalue VALUES ('psector_status', '4', 'EXECUTED (Set OPERATI
 -- Data for Name: config_csv; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO config_csv VALUES (234, 'Importar preus a la base de dades', 'El fitxer csv ha de tenir aquestes columnes per ordre: id, unit, descript, text, price.
-- La columna price ha de ser tipus numero amb dos decimals.
-- Pots triar un cataleg per els preus importats assignant-lo a Import label.
-- Atencio: el fitxer csv ha de tenir una fila inicial amb els noms de columna', 'gw_fct_import_dbprices', true, 1, NULL);
+INSERT INTO config_csv VALUES (234, 'Import prix BD', 'Le fichier csv doit contenir les colonnes suivantes aux mêmes positions : id, unit, descript, text, price. 
+- La colonne de prix doit être un numérique avec deux décimales. 
+- Vous pouvez choisir un nom de catalogue pour ces prix en définissant une étiquette d importation. 
+- Attention, le fichier csv nécessite une ligne d en-tête', 'gw_fct_import_dbprices', true, 1, NULL);
 INSERT INTO config_csv VALUES (238, 'Import om visit', 'To use this import csv function parameter you need to configure before execute it the system parameter ''utils_csv2pg_om_visit_parameters''. 
 Also whe recommend to read before the annotations inside the function to work as well as posible with', 'gw_fct_import_omvisit', true, 5, NULL);
-INSERT INTO config_csv VALUES (236, 'Importar camps addicionals', 'The csv file must containts next columns on same position: 
+INSERT INTO config_csv VALUES (236, 'Import addfields', 'The csv file must containts next columns on same position: 
 feature_id (can be arc, node or connec), parameter_id (choose from sys_addfields), value_param. ', 'gw_fct_import_addfields', true, 3, NULL);
-INSERT INTO config_csv VALUES (235, 'Importar elements', 'The csv file must containts next columns on same position:
+INSERT INTO config_csv VALUES (235, 'Import elements', 'The csv file must containts next columns on same position:
 Id (arc_id, node_id, connec_id), code, elementcat_id, observ, comment, num_elements, state type (id), workcat_id, verified (choose from edit_typevalue>value_verified).
 - Observations and comments fields are optional
 - ATTENTION! Import label has to be filled with the type of element (node, arc, connec)', 'gw_fct_import_elements', true, 2, NULL);
@@ -199,8 +191,8 @@ dscenario_name, feature_id, feature_type, demand_type, value, source', 'gw_fct_i
 -- Data for Name: sys_message; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO sys_message VALUES (1018, 'No hi ha tipus d''arc defnits en el model', 'Definir com a mínim un', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3150, 'Backup has no data related to table', 'Please check it before continue', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3102, 'If dv_querytext_filterc is not null dv_parent_id is mandatory', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2038, 'The exit arc must be reversed. Arc =', 'None', 2, true, 'ud', 'core');
 INSERT INTO sys_message VALUES (3134, 'There''s no default value for Obsolete state_type', 'You need to define one default value for Obsolete state_type', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3136, 'There''s no default value for On Service state_type', 'You need to define one default value for On Service state_type', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3138, 'Before use connec on planified mode you need to create a related link', NULL, 2, true, 'utils', 'core');
@@ -217,185 +209,175 @@ INSERT INTO sys_message VALUES (3182, 'It is not allowed to downgrade (state=0) 
 INSERT INTO sys_message VALUES (3140, 'Node is connected to arc which is involved in psector', 'Try replacing node with feature replace tool or disconnect it using end feature tool', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3146, 'Backup name is missing', 'Insert value in key backupName', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3148, 'Backup name already exists', 'Try with other name or delete the existing one before', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3150, 'Backup has no data related to table', 'Please check it before continue', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3152, 'Null values on geom1 or geom2 fields on element catalog', 'Please check it before continue', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3154, 'It is not possible to add this connec to psector because it is related to node', 'Move endpoint of link closer than 0.01m to relate it to parent arc', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3156, 'Input parameter has null value', 'Please check it before continue', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3158, 'Value of the function variable is null', 'Please check it before continue', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3174, 'No valve has been choosen', 'You can continue by clicking on more valves or finish the process by clicking again on Change Valve Status', 0, true, 'ws', 'core');
-INSERT INTO sys_message VALUES (3176, 'Change valve status done successfully', 'You can continue by clicking on more valves or finish the process by executing Refresh Mincut', 0, true, 'ws', 'core');
-INSERT INTO sys_message VALUES (1014, 'La funció està fora de dma, feature_id:', 'Miri el mapa i utilitzi l''aproximació dma', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1060, 'Hi ha al menys un document adjunt a la funció eliminada. (num. document,feature_id) =', 'Revisi les seves dades. L''element  de xarxa eliminat no pot tenir cap document adjunt.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1110, 'No hi ha explotacions definidas en el model', 'Defineix el menys un', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3042, 'L''arc amb l''estat 2 no pot ser dividid pel node amb l''estat 1.', 'Per a dividr en arc, l''estat del node ha de ser el mateix', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1056, 'Hi ha al menys un arc adjunt a la funció eliminada. (num. arc,feature_id) =', 'Revisi les seves dades. L''element  de xarxa eliminat no pot tenir cap arc adjunt.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1058, 'Hi ha al menys un element adjunt a la funció eliminada. (num. element,feature_id) =', 'Revisi les seves dades. L''element  de xarxa eliminat no pot tenir cap element  adjunt.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2015, 'No hi ha una funció de estat-1 com punt final de conecció. És impossible crear-lo', 'Intenti conectar l''enllaç a un arc / node / escomesa / embornal o vnode amb estat=1', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2032, 'Completi el valor del catàlag de nodes o configúral amb el paràmetre predeterminat del valor', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1083, 'Si us plau configuri la seva propia variable psector vdefault', 'Per a treballa amb element planificats és obligatori tenir sempre definit el psector de treball utilitzant la variable psector', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1008, 'No hi ha sectors definits en el model', 'Definir com a mínim un', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2042, 'Dma no està en la explotació definida. Si su plau revisi les seves dades', 'L''element ha d''estar dintre del dma que està relacionat amb l''explotació definida', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3018, 'El còdig de client està duplicat per a escomeses amb estat=1', 'Revisi les seves dades.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1106, 'Eliminar no està permès. Hi ha hidrometer_id a ...', 'None', 2, true, 'ws', 'core');
-INSERT INTO sys_message VALUES (1096, 'Node amb estat 2 a sobre d''un altre node amb estat=2 en la mateixa alternativa no està permès. El node és :', 'Revisi les dades del seu projecte. No és possible tenir més d''un node amb el mateix estat en la mateixa posició', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3022, 'El valor instertat no està permès en el catàlag. Catalog, field:', 'Agréguuili a la taula typevalue correcpondent per a poder utilitzar-la.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1044, 'Existeixen una o més conexions més properes que la distancia mínima configurada, conneec_id:', 'Verifiqui el seu projecte o modifiqui les propietats de configuració', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3036, 'El tipus d''estat seleccionat no es pot correspondre amb l''estat', 'Modifiqui el valor d''estat o tipus d''estat.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3048, 'La longitud del fluxe es major que la longitud de l''arc de sortida de l''element de xarxa', '¡Si us plau revisi el seu projecte!', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (1098, 'No està permès tenir un node amb l''estat (1) o (2) a sobred''un altre amb estat (2). El node és:', 'Utilitzi el botó reemplaçar node. No és possible tenir més d''un node definit en el mateixa posició', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3034, 'S''ha actualitzat l''estat de l''inventari i el tipus d''estat dels elements de xarxa planificats', 'None', 1, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3066, 'El dma i el periode encara no existeixen en la taula dma-period (ext_rct_scada_dma_period). Significa que no hi ha valors per a aquell dma o  per a aquell periode de CRM en el SIG', 'Si us plau verifiqi abans de continuar.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3046, 'el tipus de node seleccionat no divideix l''arc. Tipus de node:', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1097, 'No està permès insertar / actualitzar un node amb l''estat (1) sobre un altre amb l''estat (1) també. El node és:', 'Si us plau comprovi-ho', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3070, 'L''enllaç necessita un element de xarxa per escomesa/embornal com unpunt de partida. S''ha comprovat que la geometria i no hi ha cap element de xarxa de escomesa/embornal com un punt inicial/final', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3050, 'No es possible relacionar a escomeses amb estat=1 amb arcs amb estat=2', '¡Si us plau revisi el seu mapa!', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1012, 'No hi ha dma definit en el model', 'Definir com a mínim un', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1064, 'Hi ha al menys un link adjunt a la funció eliminada. (num. link,feature_id) =', 'Revisi les seves dades. L''element  de xarxa eliminat no pot tenir cap enllaç adjunt.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1016, 'És impossible canviar el catàlag de nodes', 'El nou catàlag de nodes no pertany a l''antic catàlag de nodes (node_type.type)', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1104, 'La actualització no està permesa', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1080, 'No tens permisos per a administrar amb psector', 'Si us plau comprovi si el seu perfil té role_master per a poder gestionar els problemes de plan', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2068, 'El node_id proporcionat no existeix com ''WWTP''  (tipus de sistema)', 'Si us plau, busqui un altre node', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (2028, 'La caractarística no té un valor d''estat(1) per a ser reemplaçada, estat =', 'La característica ha de tenir l''estat 1 per a ser reemplaçada', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1100, 'No està permès insetar /actualitzar un node amb estat (2) a sobre d''un altre amb estat (2). El node és :', 'Revisi les seves dades. No és possible tenir més d''un node amb el mateix estat en la mateixa posició.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3068, 'El dma/period definit en la taula dma-period (ext_rct_scada_dma_period) tenen un patern_id definit', 'Si us plau verifiqui abans de continuar.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3032, 'No es pot aplicar la clau forana', 'Ja hi ha valors ensertats que no estan presents', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1081, 'No hi ha psectors definits en el projecte', 'Necessita almenys un psector creat per a afegir elements planificats', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3062, 'El grillat_id seleccionat té una amplda o llargada NULL. Gratecat_id:', 'Verifiqui el catàlag de reixes o els seus valors de configuració personalitzats abans de continuar', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (2094, 'Si us plau, assigni un connec per a relacionar aquest polígon geomètric', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2098, 'El connec_id facilitat no existetix com ''FOUNTAIN'' (tipus de sisitema)', 'Busqui una altre escomesa', 2, true, 'ws', 'core');
-INSERT INTO sys_message VALUES (3084, 'No està habilitat per a insertar vnode. Si està  busccand unir enllaços, el pot unir utilitzant vconnec per a unir-los', 'Pot crear l''element de xarxa vconnec i simbolitzar-la com vnodes. Al utilitzar vconnec com vnodes, tindrà tots els elements de xarxa en terminis de programació d''arc_id', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2016, 'No està habilitat per a modificar el punt inici/final de l''enllaç', 'Si vol tornar a conectar les funcions, elimini aquest enllaç i dibuixi un nou', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1010, 'La funció està fora del sector, feature_id:', 'Miri el mapa i utilitzi l''aproximació dels sectors', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1068, 'Hi ha al menys un gully adjunt a la funció eliminada. (num. gully,feature_id) =', 'Revisi les seves dades. L''element  de xarxa eliminat no pot tenir cap embornal adjunt.', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (1028, 'Eliminar arcs d''aquesta taula no està permès', 'Per eliminar un nou arc, utilitzi la capa arc en INVENTARI', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3052, 'L''eina Connect2network no està habilitada per a escomeses amb estat=2. Connec_id:', 'Per a les escomeses planificades, s''ha de crear l''enllaç manualment (un enllaç per a cada alternativa i una escomese) utilitzant el formulari psector i relacionant l''escomesa utilitzant el cap arc_id. Després d''aixó, podràs personalitzar la geometria de l''enllaç', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3058, 'És impossible vailidar l''escomesa sense assignar el valor de conncat_id . Connec_id:', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3026, 'No es pot eliminar la classe. Hi ha al menys una visita relacionada.', 'La classe s''establirà com a inactiva.', 1, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1022, 'Noi hi ha valors de catàlag de conexió definits en el model', 'Definir com a mínim un', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1054, 'És impossible dividir un arc amb estat=(1) utilitzant un node amb estat=(2)', 'Per a dividir un arc, l''estat del node utilitzat ha de ser 1', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3078, 'No és possible crear l''enllaç. En el mode inventari, només s''habilita un enllaç per a cada escomesa. Gully_id:', 'En el node de planificació és impossible crear més d''un enllaç, un per a cada alternativa, però és obligatori utilitzar el formulari psector i relacionar l''escomesa utilitzant el camp arc_id. Després d''això, podrà personalitzar la geometria de l''enllaç.', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (1050, 'És impossible dividir un arc amb estat=(0)', 'Per a dividir un arc, l''estat ha de ser 1', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2002, 'Node no trobat', 'Si us plau verifiqui la taula del node', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1066, 'Hi ha al menys un connec adjunt a la funció eliminada. (num. connec,feature_id) =', 'Revisi les seves dades. L''element  de xarxa eliminat no pot tenir cap escomesa adjunta.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3072, 'NBo és possible conectar l''enllaç a menys de 0,25 metres dels elements de xarxa nod2arc per a evitar conflictes si aquest node és un nod2arc ', 'Si us plau verifiqui abans de continuar.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2024, 'La funció està fora de qualsevol municipi, feature_id', 'Si us plau revisi les seves dades', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1078, 'Abans de degradar el gully a l''estat 0, desconecti les funcions associades, gully_id:', 'None', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (1070, 'Les caractarístiques no es poden reemplaçar, perquè el seu estat és diferent a 1. Estat =', 'Per a reemplaçar una caractarística, ha de tenir un estat = 1', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2048, 'Polígon no relacionat amb cap gully', 'Insereixi gully_id per a assignar la geometyria del polígon a l''entitat', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (1002, 'Prova de trigger', 'Prova de trigger', 0, true, 'ws_trg', 'core');
-INSERT INTO sys_message VALUES (1076, 'Abans de degradar la conecció a l''estat 0, desconecti les característiques associades, connec_id:', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (-1, 'Error no capturat', 'Obri l''arxiu de registre PostgreSQL per obtenbir més detalls', 2, true, 'generic', 'core');
-INSERT INTO sys_message VALUES (2096, 'No és possible relacionar aquesat geometría amb cap connec', 'L''escomesa ha de ser del tipus ''FOUNTAIN'' (tipus de sistema)', 2, true, 'ws', 'core');
-INSERT INTO sys_message VALUES (1052, 'És impossible dividir un arc utilitzant un node que té un estat=(0)', 'Per dividir u arc, l''estat del node ha de ser 1', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2050, 'El gully_id proporcionat no existeix', 'Busqui un altre gully_id', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (1024, 'No hi ha valors de catàlag de reixeta definits en el model', 'Definir com a mínim un', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (1004, 'No hi ha tipus de nodes definits en el model', 'Definir com a mínim un', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1014, 'Feature is out of dma, feature_id:', 'Take a look on your map and use the approach of the dma', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1060, 'There is at least one document attached to the deleted feature. (num. document,feature_id) =', 'Review your data. The deleted feature can''t have any documents attached.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1110, 'There are no exploitations defined in the model', 'Define at least one', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3042, 'Arc with state 2 cant be divided by node with state 1.', 'To divide an arc, the state of the node has to be the same', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1056, 'There is at least one arc attached to the deleted feature. (num. arc,feature_id) =', 'Review your data. The deleted feature can''t have any arcs attached.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1058, 'There is at least one element attached to the deleted feature. (num. element,feature_id) =', 'Review your data. The deleted feature can''t have any elements attached.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2015, 'There is no state-1 feature as endpoint of link. It is impossible to create it', 'Try to connect the link to one arc / node / connec / gully or vnode with state=1', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2032, 'Please, fill the node catalog value or configure it with the value default parameter', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1083, 'Please configure your own psector vdefault variable', 'To work with planified elements it is mandatory to have always defined the work psector using the psector vdefault variable', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1008, 'There are no sectors defined in the model', 'Define at least one', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2042, 'Dma is not into the defined exploitation. Please review your data', 'The element must be inside the dma which is related to the defined exploitation', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3018, 'Customer code is duplicated for connecs with state=1', 'Review your data.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1096, 'Node with state 2 over another node with state=2 on same alternative it is not allowed. The node is:', 'Review your project data.It''s not possible to have more than one nodes with the same state at the same position.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3022, 'The inserted value is not present in a catalog. Catalog, field:', 'Add it to the corresponding typevalue table in order to use it.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1044, 'Exists one o more connecs closer than configured minimum distance, connec_id:', 'Check your project or modify the configuration properties (config.connec_proximity).', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3036, 'Selected state type doesn''t correspond with state', 'Modify the value of state or state type.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3048, 'Flow length is longer than length of exit arc feature', 'Please review your project!', 2, true, 'ud', 'core');
+INSERT INTO sys_message VALUES (1098, 'It''s not allowe to have node with state(1) or(2) over one existing node with state(1).', 'Use the button replace node. It''s not possible to have more than one nodes with the same state at the same position', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3034, 'Inventory state and state type of planified features has been updated', 'None', 1, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3066, 'The dma and period don''t exists yet on dma-period table (ext_rtc_scada_dma_period). It means there are no values for that dma or for that CRM period into GIS', 'Please check it before continue.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3046, 'Selected node type doesn''t divide arc. Node type: ', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1097, 'It is not allowed to insert/update one node with state(1) over another one with state (1) also. The node is:', 'Please ckeck it', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3070, 'Link needs one connec/gully feature as start point. Geometry have been checked and there is no connec/gully feature as start/end point', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3050, 'It is not possible to relate connects with state=1 to arcs with state=2', 'Please check your map', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1012, 'There is no dma defined in the model', 'Define at least one', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1064, 'There is at least one link attached to the deleted feature. (num. link,feature_id) =', 'Review your data. The deleted feature can''t have any links attached.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1016, 'It''s impossible to change node catalog', 'The new node catalog doesn''t belong to the same type as the old node catalog (node_type.type) ', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1104, 'Update is not allowed ...', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1080, 'You don''t have permissions to manage with psector', 'Please check if your profile has role_master in order to manage with plan issues', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2068, 'The provided node_id don''t exists as a ''WWTP'' (system type)', 'Please look for another node', 2, true, 'ud', 'core');
+INSERT INTO sys_message VALUES (2028, 'The feature does not have state(1) value to be replaced, state = ', 'The feature must have state 1 to be replaced', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1100, 'It is not allowed to insert/update one node with state (2) over another one with state (2). The node is:', 'Review your data. It''s not possible to have more than one node with the same state at the same position.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3068, 'The dma/period defined on the dma-period table (ext_rtc_scada_dma_period) has a pattern_id defined', 'Please check it before continue.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3032, 'Can''t apply the foreign key', 'there are values already inserted that are not present in the catalog', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1081, 'There are not psectors defined on the project', 'You need to have at least one psector created to add planified elements', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3062, 'Selected gratecat_id has NULL width or length. Gratecat_id:', 'Check grate catalog or your custom config values before continue', 2, true, 'ud', 'core');
+INSERT INTO sys_message VALUES (2094, 'Please, assign one connec to relate this polygon geometry', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2098, 'The provided connec_id doesn''t exist as a ''FOUNTAIN'' (system type)', 'Look for another connec', 2, true, 'ws', 'core');
+INSERT INTO sys_message VALUES (3084, 'It is not enabled to insert vnodes. if you are looking to join links you can use vconnec to join it', 'You can create vconnec feature and simbolyze it as vnodes. By using vconnec as vnodes you will have all features in terms of propagation of arc_id', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2016, 'It''s not enabled to modify the start/end point of link', 'If you want to reconnect the features, delete this link and draw a new one', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1010, 'Feature is out of sector, feature_id:', 'Take a look on your map and use the approach of the sectors!', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1068, 'There is at least one gully attached to the deleted feature. (num. gully,feature_id)=', 'Review your data. The deleted feature can''t have any gullies attached.', 2, true, 'ud', 'core');
+INSERT INTO sys_message VALUES (1028, 'Delete arcs from this table is not allowed', 'To delete arcs, use layer arc in INVENTORY', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3052, 'Connect2network tool is not enabled for connec''s with state=2. Connec_id:', 'For planned connec''s you must create the link manually (one link for each alternative and one connec) by using the psector form and relate the connec using the arc_id field. After that you will be able to customize the link''s geometry.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3058, 'It is impossible to validate the connec without assigning value of connecat_id. Connec_id:', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3026, 'Can''t delete the class. There is at least one visit related to it', 'The class will be set to unactive.', 1, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1022, 'There are no connec catalog values defined in the model', 'Define at least one', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1054, 'It''is impossible to divide an arc with state=(1) using a node with state=(2)', 'To divide an arc, the state of the used node has to be 1', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1074, 'Before downgrading the arc to state 0, disconnect the associated features, arc_id: ', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3078, 'It is not possible to create the link. On inventory mode only one link is enabled for each gully. Gully_id:', 'On planning mode it is possible to create more than one link, one for each alternative, but it is mandatory to use the psector form and relate gully using arc_id field. After that you will be able to customize the link''s geometry.', 2, true, 'ud', 'core');
+INSERT INTO sys_message VALUES (1050, 'It''s impossible to divide an arc with state=(0)', 'To divide an arc, the state has to be 1', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2002, 'Node not found', 'Please check table node', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1066, 'There is at least one connec attached to the deleted feature. (num. connec,feature_id) =', 'Review your data. The deleted feature can''t have any connecs attached.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3072, 'It is not possible to connect link closer than 0.25 meters from nod2arc features in order to prevent conflits if this node may be a nod2arc', 'Please check it before continue', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2024, 'Feature is out of any municipality,feature_id:', 'Please review your data', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1078, 'Before downgrading the gully to state 0, disconnect the associated features, gully_id: ', 'None', 2, true, 'ud', 'core');
+INSERT INTO sys_message VALUES (1070, 'The feature can''t be replaced, because it''s state is different than 1. State = ', 'To replace a feature, it must have state = 1', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2048, 'Polygon not related with any gully', 'Insert gully_id in order to assign the polygon geometry to the feature', 2, true, 'ud', 'core');
+INSERT INTO sys_message VALUES (1002, 'Test trigger', 'Trigger test', 0, true, 'ws_trg', 'core');
+INSERT INTO sys_message VALUES (1076, 'Before downgrading the connec to state 0, disconnect the associated features, connec_id: ', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (-1, 'Uncatched error', 'Open PotgreSQL log file to get more details', 2, true, 'generic', 'core');
+INSERT INTO sys_message VALUES (2096, 'It is not possible to relate this geometry to any connec.', 'The connec must be type ''FOUNTAIN'' (system type).', 2, true, 'ws', 'core');
+INSERT INTO sys_message VALUES (1052, 'It''s impossible to divide an arc using node that has state=(0)', 'To divide an arc, the state of the node has to be 1', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2050, 'The provided gully_id doesn''t exist.', 'Look for another gully_id', 2, true, 'ud', 'core');
+INSERT INTO sys_message VALUES (1024, 'There are no grate catalog values defined in the model', 'Define at least one', 2, true, 'ud', 'core');
+INSERT INTO sys_message VALUES (1004, 'There are no node types defined in the model', 'Define at least one', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3094, 'One of new arcs has no length', 'The selected node may be its final.', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3096, 'If widgettype=typeahead, isautoupdate must be FALSE', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1026, 'Insertar un nou arc en aquesta taula no està permès', 'Per insertar un nou arc, utilitzi la capa arc en INVENTARI', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1026, 'Insert new arc in this table is not allowed', 'To insert new arc, use layer arc in INVENTORY', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3098, 'If widgettype=typeahead and dv_querytext_filterc is not null dv_parent_id must be combo', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1042, 'Un o més arcs no es van insertar/actualitzar perquè no tenen un node inicial/final. Arc_id:', 'Verifiqui el seu projecte o modifiqui les propietats de configuració', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2066, 'El node_id proporcionat no existeix com ''CHAMBER'' (tipo de sistema)', 'Si us plau, busqui un altre node', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (1090, 'Ha de triar un valor de catàlag de nodes per a aquesta característica', 'Nodecat_id és obligatori. Ompli la taula cat_node o utilitzi un valor predeterminat', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2010, 'No hi ha valors en la taula cat_element', 'Es requereix qeu elementcat_id insereixi valors a la taula cat_elemt o utilitzi un valor predeterminat', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1042, 'One or more arcs was not inserted/updated because it has not start/end node. Arc_id:', 'Check your project or modify the configuration properties.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2066, 'The provided node_id don''t exists as a ''CHAMBER'' (system type)', 'Please look for another node', 2, true, 'ud', 'core');
+INSERT INTO sys_message VALUES (1090, 'You must choose a node catalog value for this feature', 'Nodecat_id is required. Fill the table cat_node or use a default value', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2010, 'There are no values on the cat_element table.', 'Elementcat_id is required. Insert values into cat_element table or use a default value', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3100, 'If widgettype=typeahead, id and idval for dv_querytext expression must be the same field', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2088, 'Hi ha [unitats] vlaros nuls o no definits en la taula price_value_unit =', 'Si us plau ompli abans de continuar', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3102, 'If dv_querytext_filterc is not null dv_parent_id is mandatory', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2088, 'There are [units] values nulls or not defined on price_value_unit table  =', 'Please fill it before to continue', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3104, 'When dv_querytext_filterc, dv_parent_id must be a valid column for this form. Please check form because there is not column_id with this name', 'None', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3106, 'There is no presszone defined in the model', 'None', 2, true, 'ws', 'core');
 INSERT INTO sys_message VALUES (3108, 'Feature is out of any presszone, feature_id:', 'None', 2, true, 'ws', 'core');
-INSERT INTO sys_message VALUES (3028, 'No es pot modificar typevalue:', 'És impossible canviar els valors del sistema.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2004, 'És impossible utilitzar el node per a fusionar dos arcs', 'Les canonades tenen diferents tipus.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3016, 'El nou camp es sobreposa al existent', 'Modifiqui el valor de la comanda.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3044, 'No es pot detectar cap arc per a dividir.', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3030, 'No es pot eliminar typevalue:', 'S''està utilitzant en una taula.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3024, 'No es pot eliminar el paràmetre. Hi ha al menys un event relacionat amb ell.', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3040, 'L''usuari amnb aquest nom ja existeix', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3064, 'Hi ha un patró amb el mateix nom en la taula inp_pattern', 'Si us plau verifiqui abans de continuar.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3038, 'El valor insertat té caràcters no acceptats:', 'No utuilitzi accents, punts o guions en la idetificació i el nom de la vista child', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3014, 'la identificació de la posició no és node_1 o node_2 de l''arc seleccionat.', 'Si us plau revisi les seves dades', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3012, 'El valor de posició és major que la longitud total de l''arc.', 'Si us plau revisi les seves dades', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3028, 'Can''t modify typevalue:', 'It''s impossible to change system values.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2004, 'It is impossible to use the node to fusion two arcs', 'Pipes have different types', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3016, 'New field overlaps the existing one', 'Modify the order value.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3044, 'Can''t detect any arc to divide.', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3030, 'Can''t delete typevalue:', 'It''s being used in a table.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3024, 'Can''t delete the parameter. There is at least one event related to it', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3040, 'User with this name already exists', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3064, 'There is a pattern with same name on inp_pattern table', 'Please check before continue.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3038, 'Inserted value has unaccepted characters:', 'Don''t use accents, dots or dashes in the id and child view name', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3014, 'The position id is not node_1 or node_2 of selected arc.', 'Please review your data.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1018, 'There are no arc types defined in the model', 'Define at least one', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3012, 'The position value is bigger than the full length of the arc. ', 'Please review your data.', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3110, 'There is no municipality defined in the model', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2006, 'És impossible utilitzar el node per a fusionar dos arcs', 'El node no té 2 arcs', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3112, 'No class visit', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3114, 'sucessfully deleted', 'None', 0, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3056, 'És impossible vailidar l''arc sense assignar el valor d''arccat _id . Arc_id:', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3060, 'És impossible vailidar lel node sense assignar el valor de nodecat_id . Node_id:', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3116, 'does not exists, impossible to delete it', 'None', 1, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1034, 'Insertar una nova vàlvula en aquesta taula no està permès', 'Per insertar una nova vàlvula, utilitzi la capa node en INVENTARI', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2008, 'Arc no trobat', 'Si us plau verifiqui la taula del node', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3118, 'sucessfully inserted', 'None', 0, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3120, 'sucessfully updated', 'None', 0, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3122, 'Visit class have been changed. Previous data have been deleted', 'None', 1, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3124, 'Visit manager have been initialized', 'None', 0, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3126, 'Visit manager have been finished', 'None', 0, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1102, 'Inserir no estar permès. No hi ha hidrometer_id en...', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1032, 'Eliminar nodes d''aquesta taula no està permès', 'Per eliminar un nou node, utilitzi la capa node en INVENTARI', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1084, 'Inexistent node_id:', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1082, 'Inexistent arc_id:', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2034, 'El seu catàlag és diferent al tipus de node', 'Les seves dades també han d''estar en e catàlag de nodes', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1072, 'Abans de degradar el node a l''estat 0, desconecti les característiques associades, node_id:', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1038, 'Eliminar vàlvules d''aquesta taula no està permès', 'Para eliminar vàlvules, utilitzi la capa node INVENTARI', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2038, 'L''arc de sortida ha de ser revertit. Arc =', 'None', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (2022, '(arc_id, geom type) = ', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1074, 'Abans de degardar l''arc a l''estat 0, desconecti les característiques associades, arc_id:', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2100, 'No és possible relacionar aquesat geometría amb cap node', 'El node ha de ser del tipus ''REGISTER'' (tipus de sistema)', 2, true, 'ws', 'core');
-INSERT INTO sys_message VALUES (2104, 'El node_id facilitat no existeix com '' REGISTER''  (tipus de sistema)', 'Busqui un altre node', 2, true, 'ws', 'core');
-INSERT INTO sys_message VALUES (2012, 'La caractarística està fora d''explotació, feature_id', 'Miri el mapa i utilitzi l''approximació de les explotacions', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2102, 'No és possible relacionar aquesat geometría amb cap node', 'El node ha de ser del tipus ''TANK'' (tipus de sistema)', 2, true, 'ws', 'core');
-INSERT INTO sys_message VALUES (2014, 'Necessita conectar l''enllaç  a un connec/gully', 'Els enllaços han d''estar conectats a altres elements', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1094, 'El seu catàlag és diferent al tipus de node', 'Ha d''usar un tipus de node definit en els catàlags de nodes', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1048, 'Elev no és una columna actualitzable', 'Utilitzi top_elev o ymax per a modificar aquest valor', 2, true, 'ws', 'core');
-INSERT INTO sys_message VALUES (3128, 'Lot succesfully saved', 'None', 0, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2026, 'Hi ha conflictes contra un altre mincut planejat.', 'Si us plau revisi les seves dades', 2, true, 'ws', 'core');
-INSERT INTO sys_message VALUES (3130, 'Lot succesfully deleted', 'None', 0, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2006, 'It is impossible to use the node to fusion two arcs', 'Node doesn''t have 2 arcs', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3056, 'It is impossible to validate the arc without assigning value of arccat_id. Arc_id:', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3060, 'It is impossible to validate the node without assigning value of nodecat_id. Node_id:', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1034, 'Insert a new valve in this table is not allowed', 'To insert a new valve, use layer ndoe in INVENTORY', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2008, 'Arc not found', 'Please check table arc', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1102, 'Insert is not allowed. There is no hydrometer_id on ...', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1032, 'Delete nodes from this table is not allowed', 'To delete nodes, use layer node in INVENTORY', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1106, 'Delete is not allowed. There is hydrometer_id on ...', 'None', 2, true, 'ws', 'core');
+INSERT INTO sys_message VALUES (1084, 'Nonexistent node_id:', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1082, 'Nonexistent arc_id:', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2034, 'Your catalog is different than node type', 'Your data must be in the node catalog too', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1072, 'Before downgrading the node to state 0, disconnect the associated features, node_id: ', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1038, 'Delete valves from this table is not allowed', 'To delete valves, use layer node in INVENTORY', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2022, '(arc_id, geom type) =', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2100, 'It is not possible to relate this geometry to any node.', 'The node must be type ''REGISTER'' (system type).', 2, true, 'ws', 'core');
+INSERT INTO sys_message VALUES (2104, 'The provided node_id doesn''t exist as a ''REGISTER'' (system type)', 'Look for another node', 2, true, 'ws', 'core');
+INSERT INTO sys_message VALUES (2012, 'Feature is out of exploitation, feature_id:', 'Take a look on your map and use the approach of the exploitations!', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2102, 'It is not possible to relate this geometry to any node.', 'The node must be type ''TANK'' (system type).', 2, true, 'ws', 'core');
+INSERT INTO sys_message VALUES (2014, 'You need to connec the link to one connec/gully', 'Links must be connected to ohter elements', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1094, 'Your catalog is different than node type', 'You must use a node type defined in node catalogs', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1048, 'Elev is not an updatable column', 'Please use top_elev or ymax to modify this value', 2, true, 'ws', 'core');
+INSERT INTO sys_message VALUES (2026, 'There are conflicts against another planified mincut.', 'Please review your data', 2, true, 'ws', 'core');
 INSERT INTO sys_message VALUES (3132, 'Schema defined does not exists. Check your qgis project variable gwAddSchema', 'None', 1, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2092, 'Hi ha valors nuls en la columne [price] de csv', 'Si us plau revisi abans de continuar', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2080, 'El valor de x es massa garn. La longitud total de la línea és', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2040, 'La geometria reduida no és una cadena lineal, (arc_id, geomtype)=', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2086, 'Hi ha valors nuls en la columne [id] de csv. Revise''l', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2082, 'La extensió no existeix. Extension =', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2106, 'El node_id proporcionat no existeix com ''TANK'' (tipus de sistema)', 'Busqui un altre node', 2, true, 'ws', 'core');
-INSERT INTO sys_message VALUES (2076, 'La longitud del fluxe és major que la longitud de la caractarística de l''arc de sortida', 'Si us plau, revisi el seu projecte ', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (2084, 'El mòdul no existeix. Mòdul =', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2078, 'Text de la consulta =', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2074, 'Ha de definir la longitud del regulador de fluxe', 'None', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (3080, 'No és possible relacionar escomesa amb estat=2 a sobre l''element de xarxa amb estat=1. Conne_id:', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2120, 'Hi ha una inconsistencia entre els estats d''arc i node', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2108, 'Hi ha al menys un node adjunt a la funció eliminada. (num. node,feature_id) =', 'Revisi les seves dades. L''element  de xarxa eliminat no pot tenir cap node adjunt.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2110, 'defineix al menys un valor de state_type con state=0', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2122, 'Arc no trobat en el proces de inserció', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3074, 'És obligatori connectar com punt d''inici una escomesa  o embornal amb enllaç', 'None', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (3088, 'No està habilitat per a actualitzar vnodes', 'Vnode s''eliinarà automàticament quan l?enllaç conectat a vnode desapareixi', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2036, 'És impossible validar l''arc sense assignar el valor de arccat_id, arc_id:', 'Assigni un valor arccat_id', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2070, 'Ha d''establir un valor de la columne to_arc abans de continuar', 'None', 2, true, 'ws', 'core');
-INSERT INTO sys_message VALUES (2064, 'El node_id proporcionat no existeix com ''STORAGE'' (tipus de sistema)', 'Busqui un altre node', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (2060, 'No és possible relacionar la geometria amb cap node', 'El node ha de ser de tipus ''WWTP'' (tipus de sistema)', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (3092, 'Només l''arc està disponible com ha element de xarxa de entrada per a executar el polígon de tall', 'None', 2, true, 'ws', 'core');
-INSERT INTO sys_message VALUES (2054, 'No és possible relacionar la geometria amb cap node', 'El node ha de ser de tipus ''NETGULLY'' (tipus de sistema)', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (1020, 'No hi ha valors de catàlag d''arc definits en el model', 'Definir com a mínim un', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2052, 'Polígon no relacionat amb cap node', 'Insereixi node_id per a assignar la geometyria del polígon a l''entitat', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1006, 'No hi ha valors del catàlag de nodes definits en el model ', 'Definir com a mínim un', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2072, 'Ha d''establir els valors to_arc/node_id amb coherencia topològica', 'Node _id ha de ser el node-1 de la funció d''arc de sortida', 2, true, 'ws', 'core');
-INSERT INTO sys_message VALUES (1046, 'Existeixen un o més nodes més aprop que la distancia configurada, node_id:', 'Verifiqui el seu projecte o modifiqui les propietats de configuració', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2046, 'El tipus d''estat no és un valor de l''estat definit. Si us plau revisis les seves dades', 'El tipus d''estat ha d''estat relacionat amb els estats', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3086, 'No està habilitat per a actualitzar vnodes', 'Si està buscant actualitzar el punt final dels enllaços, utilizi la capa de l''enllaç per a fer-ho', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2062, 'El node_id proporcionat no existeix com ''NETGULLY'' (tipus de sistema)', 'Busqui un altre node', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (2058, 'No és possible relacionar la geometria amb cap node', 'El node ha de ser de tipus ''CHAMBER'' (tipus de sistema)', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (2020, 'Un o més vnodes està més aprop que la distancia mínima configurada', 'Verifiqui el seu projecte o modifiqui les propietats de configuració (config.node_proximity)', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2030, 'Les característiques no tene un valor d''estat (2) per a ser reemplaçat, estat =', 'La caractarística ha de tenir l''estat 2 per a ser reemplaçat', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1092, 'El seu catàlag de valors predeterminats no està habilitat utilitzant el tipus de node seleccionat', 'Ha d''utilitzar un tipus de node definit en els catàlags de nodes', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2056, 'No és possible relacionar la geometria amb cap node', 'El node ha de ser de tipus ''STORAGE'' (tipus de sistema)', 2, true, 'ud', 'core');
-INSERT INTO sys_message VALUES (1036, 'Hi ha columnes en aquesta taula que no es poden editar', 'Intenti actualitzar open, accesibility, broken, mincut_anl o hydraulic_anl', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1086, 'Ha de triar un valor de catàlag de conexió per a aquesta funció', ' Es requereix que Connecat_id ompli la taula cat_connec o utilitzi un valor predeterminat', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1040, 'Un o més arcs tenen el mateix node que Node1 i Node2. Node_id', 'Verifiqui el seu projecte o modifiqui les propietats de configuració', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1088, 'El catàlag Connec és diferent al tipus de conecció', 'Utilizi un tipus de conecció definida en els catàlags de conecció', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2018, 'Al menys un dels nodes extrems de l''arc no està present en l''alternativa actualitzada. La red planificada ha  perdut la topologia.', 'None', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1030, 'Insertar un nou node en aquesta taula no està permès', 'Per insertar un nou node, utilitzi la capa node en INVENTARI', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (2044, 'Presszone no està en l''explotació definida. Si us plau revisi les seves dades', 'L''element ha d''esatr dintre de la zona de pressió relacionada amb l''explotació definida', 2, true, 'ws', 'core');
-INSERT INTO sys_message VALUES (2090, 'Hi ha valors [descriptius] nuls en csv importat', 'Si us plau, completi''l abans per a continuar', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (1062, 'Hi ha al menys un visit adjunt a la funció eliminada. (num. visit,feature_id) =', 'Revisi les seves dades. L''element  de xarxa eliminat no pot tenir cap visita adjunta.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3010, 'La longitud d''arc mínima d''aquesat exportació és:', 'Aquesta longitud és menor que el paràmetre nod2arc. Ha d''actualiotzar-se el paràmetre config.node2arc per a que tingui un valor menor.', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3054, 'L''eina Connect2network no està habilitada per a embornals amb estat=2. Gully_id:', 'Per als embornals planificatd, s''ha de crear l''enllaç manualment (un enllaç per a cada alternativa i un embornal) utilitzant el formulari psector i relacionant l''escomesa utilitzant el cap arc_id. Després d''aixó, podràs personalitzar la geometria de l''enllaç', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2092, 'There are null values on the [price] column of csv', 'Please check it before continue', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2080, 'The x value is too large. The total length of the line is ', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2040, 'Reduced geometry is not a Linestring, (arc_id,geom type)=', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2086, 'There are null values on the [id] column of csv. Check it', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2082, 'The extension does not exists. Extension =', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2106, 'The provided node_id doesn''t exist as a ''TANK'' (system type)', 'Look for another node', 2, true, 'ws', 'core');
+INSERT INTO sys_message VALUES (2076, 'Flow length is longer than length of exit arc feature', 'Please review your project', 2, true, 'ud', 'core');
+INSERT INTO sys_message VALUES (2084, 'The module does not exists. Module =', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2078, 'Query text =', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2074, 'You must define the length of the flow regulator', 'None', 2, true, 'ud', 'core');
+INSERT INTO sys_message VALUES (3080, 'It''s not possible to relate connec with state=2 over feature with state=1. Connec_id:', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2120, 'There is an inconsistency between node and arc state', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2108, 'There is at least one node attached to the deleted feature. (num. node,feature_id)=', 'Review your data. The deleted feature can''t have any nodes attached.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2110, 'Define at least one value of state_type with state=0', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2122, 'Arc not found on insertion process', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3074, 'It is mandatory to connect as init point one connec or gully with link', 'None', 2, true, 'ud', 'core');
+INSERT INTO sys_message VALUES (3088, 'It is not enabled to delete vnodes', 'Vnode will be automaticly deleted when link connected to vnode disappears', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2036, 'It is impossible to validate the arc without assigning value of arccat_id, arc_id:', 'Please assign an arccat_id value', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2070, 'You need to set a value of to_arc column before continue', 'None', 2, true, 'ws', 'core');
+INSERT INTO sys_message VALUES (2064, 'The provided node_id doesn''t exist as a ''STORAGE'' (system type)', 'Look for another node', 2, true, 'ud', 'core');
+INSERT INTO sys_message VALUES (2060, 'It is not possible to relate this geometry to any node.', 'The node must be type ''WWTP'' (system type).', 2, true, 'ud', 'core');
+INSERT INTO sys_message VALUES (3092, 'Only arc is available as input feature to execute mincut', 'None', 2, true, 'ws', 'core');
+INSERT INTO sys_message VALUES (2054, 'It is not possible to relate this geometry to any node.', 'The node must be type ''NETGULLY'' (system type).', 2, true, 'ud', 'core');
+INSERT INTO sys_message VALUES (1020, 'There are no arc catalog values defined in the model', 'Define at least one', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2052, 'Polygon not related with any node', 'Insert node_id in order to assign the polygon geometry to the feature', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1006, 'There are no node catalog values defined in the model', 'Define at least one', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2072, 'You need to set to_arc/node_id values with topologic coherency', 'Node_id must be the node_1 of the exit arc feature', 2, true, 'ws', 'core');
+INSERT INTO sys_message VALUES (1046, 'Exists one o more nodes closer than configured minimum distance, node_id: ', 'Check your project or modify the configuration properties (config.node_proximity).', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2046, 'State type is not a value of the defined state. Please review your data', 'State type must be related to states', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3086, 'It is not enabled to update vnodes', 'If you are looking to update endpoint of links use the link''s layer to do it', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2062, 'The provided node_id doesn''t exist as a ''NETGULLY'' (system type)', 'Look for another node', 2, true, 'ud', 'core');
+INSERT INTO sys_message VALUES (2058, 'It is not possible to relate this geometry to any node.', 'The node must be type ''CHAMBER'' (system type).', 2, true, 'ud', 'core');
+INSERT INTO sys_message VALUES (2020, 'One or more vnodes are closer than configured minimum distance', 'Check your project or modify the configuration properties (config.node_proximity).', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2030, 'The feature not have state(2) value to be replaced, state = ', 'The feature must have state 2 to be replaced', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1092, 'Your default value catalog is not enabled using the node type choosed', 'You must use a node type defined in node catalogs', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2056, 'It is not possible to relate this geometry to any node.', 'The node must be type ''STORAGE'' (system type).', 2, true, 'ud', 'core');
+INSERT INTO sys_message VALUES (1036, 'There are columns in this table not allowed to edit', 'Try to update open, accesibility, broken, mincut_anl or hydraulic_anl', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1086, 'You must choose a connec catalog value for this feature', 'Connecat_id is required. Fill the table cat_connec or use a default value', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1040, 'One or more arcs has the same node as Node1 and Node2. Node_id:', 'Check your project or modify the configuration properties', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1088, 'Connec catalog is different than connec type', 'Use a connec type defined in connec catalogs', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2018, 'At least one of the extremal nodes of the arc is not present on the alternative updated. The planified network has losed the topology', 'None', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1030, 'Insert a new node in this table is not allowed', 'To insert new node, use layer node INVENTORY', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (2044, 'Presszone is not into the defined exploitation. Please review your data', 'The element must be inside the press zone which is related to the defined exploitation', 2, true, 'ws', 'core');
+INSERT INTO sys_message VALUES (2090, 'There are null [descript] values on the imported csv', 'Please complete it before to continue', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (1062, 'There is at least one visit attached to the deleted feature. (num. visit,feature_id) =', 'Review your data. The deleted feature can''t have any visits attached.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3010, 'The minimum arc length of this exportation is: ', 'This length is less than nod2arc parameter. You need to update config.node2arc parameter to value less than it.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3054, 'Connect2network tool is not enabled for gullies with state=2. Gully_id:', 'For planned gullies you must create the link manually (one link for each alternative and one gully) by using the psector form and relate the gully using the arc_id field. After that you will be able to customize the link''s geometry.', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3174, 'No valve has been choosen', 'You can continue by clicking on more valves or finish the process by clicking again on Change Valve Status', 0, true, 'ws', 'core');
+INSERT INTO sys_message VALUES (3176, 'Change valve status done successfully', 'You can continue by clicking on more valves or finish the process by executing Refresh Mincut', 0, true, 'ws', 'core');
 INSERT INTO sys_message VALUES (3184, 'There is at least one hydrometer related to the feature', 'Connec with state=0 can''t have any hydrometers state=1 attached.', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3186, 'Workspace is being used by some user and can not be deleted', NULL, 1, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3188, 'Workspace name already exists', 'Please set a new one or delete existing workspace', 1, true, 'utils', 'core');
@@ -403,7 +385,7 @@ INSERT INTO sys_message VALUES (3190, 'There are no nodes defined as arcs finals
 INSERT INTO sys_message VALUES (3192, 'It is not possible to connect on service arc with a planified node', 'Reconnect arc with node state 1', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3194, 'It is not possible to downgrade connec because has operative hydrometer associated', 'Unlink hydrometers first', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3196, 'Shortcut key is already defined for another feature', 'Change it before uploading configuration', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3090, 'Si us plau ingressi una graphClass vàlida', 'None', 2, true, 'ws', 'core');
+INSERT INTO sys_message VALUES (3090, 'Please enter a valid graphClass', 'None', 2, true, 'ws', 'core');
 INSERT INTO sys_message VALUES (3198, 'Field defined as target for DEM data is not related to elevation', 'Configure correctly parameter admin_raster_dem on config_param_system table or using configuration button', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3200, 'Workspace is not editable you can''t modify it nor delete it', NULL, 2, true, 'utils', NULL);
 INSERT INTO sys_message VALUES (3142, 'Node is involved in psector', 'It''s used as init or final node on planified arcs', 2, true, 'utils', 'core');
@@ -417,8 +399,8 @@ INSERT INTO sys_message VALUES (3220, 'It''s impossible to change link''s state 
 INSERT INTO sys_message VALUES (3222, 'It''s impossible to upgrade link', 'In order to work with planned link, create new one by drawing it on link layer, using link2network button or feature/psector dialogs (setting arc_id)', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3224, 'It''s impossible to create a planned link for operative feature (connec/gully)', 'If you are working on psector, use link2network button or feature/psector dialogs(setting arc_id) and then modify it', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3226, 'It''s impossible to downgrade link', 'If you want to remove it from psector, delete it', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3076, 'No és possible crear l''enllaç. En el mode d''inventari, només s''habilita un enllaç per a cada escomesa. Cennec_id:', 'In order to relate link with psector use psector dialog or link2network button. you can''t draw in on link layer', 2, true, 'utils', 'core');
-INSERT INTO sys_message VALUES (3082, 'No és possible relacionar escomesa amb una altre escomesa o node mentres es treballa amb alternatives en el mode de planificació. Només els arcs estan disponibles', 'You can''t have two links related to the same feature (connec/gully) in one psector', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3076, 'It is not possible to create the link. On inventory mode only one link is enabled for each connec. Connec_id:', 'In order to relate link with psector use psector dialog or link2network button. you can''t draw in on link layer', 2, true, 'utils', 'core');
+INSERT INTO sys_message VALUES (3082, 'It''s not possible to relate connec over other connec or node while working with alternatives on planning mode. Only arcs are avaliable', 'You can''t have two links related to the same feature (connec/gully) in one psector', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3228, 'It is not possible to insert arc into psector because has operative connects associated', 'You need to previously insert related connects into psector', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3164, 'Arc have incorrectly defined final nodes in this plan alternative', 'Make sure that arcs finales are on service or check by using toolbox function Check plan data (fid= 355)', 2, true, 'utils', 'core');
 INSERT INTO sys_message VALUES (3238, 'Dscenario with this name doesn''t exist', 'Create an empty dscenario with the same name as indicated in csv file in order to continue the import of data', 2, true, 'ws', 'core');
@@ -428,137 +410,131 @@ ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature_after;
 -- Data for Name: cat_feature; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO cat_feature VALUES ('ESCOMESA', 'WJOIN', 'CONNEC', NULL, 'v_edit_connec', 've_connec_escomesa', 'Escomesa', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('ESCOMESA_FICTICIA', 'WJOIN', 'CONNEC', NULL, 'v_edit_connec', 've_connec_escomesa_ficticia', 'Connec fictici', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('TUBERIA', 'PIPE', 'ARC', NULL, 'v_edit_arc', 've_arc_tuberia', 'Tuberia de distribució d''aigua', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('VALVULA_CONTROL', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_control', 'Vàlvula de control', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('VALVULA_REDUCTORA', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_reductora', 'Vàlvula reductora', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('GREEN_VALVE', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_green_valve', 'Green valve', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('CORBA', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_corba', 'Corba', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('FINAL_LINEA', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_final_linea', 'Final de línia', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('VALVULA_CONTROL_FL', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_control_fl', 'Vàlvula controladora de fluxe', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('VALVULA', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula', 'Vàlvula genèrica', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('VALVULA_TRENCA_PRESSIO', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_trenca_pressio', 'Vàlvula trencadora de pressió', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('VALVULA_DESGUAS', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_desguas', 'Vàlvula de desguàs', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('UNIO', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_unio', 'Unió', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('VALVULA_SOST_PRESSIO', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_sost_pressio', 'Vàlvula sostenidora de pressió', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('VALVULA_SHUTOFF', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_shutoff', 'Vàlvula shutoff', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('DIPOSIT', 'TANK', 'NODE', NULL, 'v_edit_node', 've_node_diposit', 'Dipòsit', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('VALVULA_ACCEL', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_accel', 'Vàlvula d''acceleració', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('T', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_t', 'Unió on 3 conductes convergeixen', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('X', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_x', 'Unió on 4 conductes convergeixen', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('VALVULA_VENTOSA', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_ventosa', 'Vàlvula ventosa', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('ADAPTACIO', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_adaptacio', 'Adaptació', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('BOCA_REG', 'GREENTAP', 'CONNEC', NULL, 'v_edit_connec', 've_connec_boca_reg', 'Boca de reg', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('FONT_ORNAMENTAL', 'FOUNTAIN', 'CONNEC', NULL, 'v_edit_connec', 've_connec_font_ornamental', 'Font ornamental', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('FONT', 'TAP', 'CONNEC', NULL, 'v_edit_connec', 've_connec_font', 'Font pública', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('VARC', 'VARC', 'ARC', 'A', 'v_edit_arc', 've_arc_varc', 'Secció virtual d''una tuberia de la xarxa. Utilitzada per connectar arcs i nodes quan tenen polígons', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('POU', 'WATERWELL', 'NODE', NULL, 'v_edit_node', 've_node_pou', 'Pou', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('PUNT_MOSTREIG', 'NETSAMPLEPOINT', 'NODE', NULL, 'v_edit_node', 've_node_punt_mostreig', 'Punt de mostreig', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('ESTACIO_TRACTAMENT', 'WTP', 'NODE', NULL, 'v_edit_node', 've_node_estacio_tractament', 'Estació de tractament', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('FILTRE', 'FILTER', 'NODE', NULL, 'v_edit_node', 've_node_filtre', 'Filtre', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('HIDRANT', 'HYDRANT', 'NODE', NULL, 'v_edit_node', 've_node_hidrant', 'Hidrant', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('REDUCCIO', 'REDUCTION', 'NODE', NULL, 'v_edit_node', 've_node_reduccio', 'Reducció', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('BOMBA', 'PUMP', 'NODE', NULL, 'v_edit_node', 've_node_bomba', 'Bomba', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('CAPTACIO', 'SOURCE', 'NODE', NULL, 'v_edit_node', 've_node_captacio', 'Captació', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('POU_ACCES', 'MANHOLE', 'NODE', NULL, 'v_edit_node', 've_node_pou_acces', 'Pou accés', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('REGISTRE', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_registre', 'Registre', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('REGISTRE_CONTROL', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_registre_control', 'Registre de control', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('REGISTRE_BYPASS', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_registre_bypass', 'Registre de bypass', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('VALVULA_REGISTRE', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_valvula_registre', 'Registre de vàlvula', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('ESCOMESA_TOPO', 'NETWJOIN', 'NODE', NULL, 'v_edit_node', 've_node_escomesa_topo', 'Escomesa topològica', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('DILATADOR', 'FLEXUNION', 'NODE', NULL, 'v_edit_node', 've_node_dilatador', 'Dilatador', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('MEDIDOR_FLUID', 'METER', 'NODE', NULL, 'v_edit_node', 've_node_medidor_fluid', 'Medidor de fluid', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('TANC_EXPANSIO', 'EXPANSIONTANK', 'NODE', NULL, 'v_edit_node', 've_node_tanc_expansio', 'Tanc d''expansió', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('MEDIDOR_PRESSIO', 'METER', 'NODE', NULL, 'v_edit_node', 've_node_medidor_pressio', 'Medidor de pressió', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('NETELEMENT', 'NETELEMENT', 'NODE', 'Alt+E', 'v_edit_node', 've_node_netelement', 'Element topològic', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('RECLORADOR', 'NETELEMENT', 'NODE', NULL, 'v_edit_node', 've_node_reclorador', 'Element reclorador', NULL, true, false, NULL);
-INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_edit_link', 'Link', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('CONNEXION_EAU', 'WJOIN', 'CONNEC', NULL, 'v_edit_connec', 've_connec_connexion_eau', 'Wjoin', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('CONDUIT', 'PIPE', 'ARC', NULL, 'v_edit_arc', 've_arc_conduit', 'Water distribution pipe', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVE_VERIF', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valve_verif', 'Check valve', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVE_REDUC_PRESSION', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valve_reduc_pression', 'Pressure reduction valve', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVE_VERTE', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valve_verte', 'Green valve', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('COURBE', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_courbe', 'Curve', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('FIN_LIGNE', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_fin_ligne', 'End of the line', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VANNE_CONTROLE_DEBIT', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_vanne_controle_debit', 'Flow control valve', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVE_USAGE_GENERALE', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valve_usage_generale', 'General purpose valve', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVE_COUPURE_PRESSION', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valve_coupure_pression', 'Pressure break valve', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVE_CHUTE', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valve_chute', 'Outfall valve', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('JONCTION', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_jonction', 'Junction', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVE_MAINTIEN_PRESSION', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valve_maintien_pression', 'Pressure sustainer valve', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VANNE_FERMETURE', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_vanne_fermeture', 'Shutoff valve', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('RESERVOIR', 'TANK', 'NODE', NULL, 'v_edit_node', 've_node_reservoir', 'Tank', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('BOITIER_PAPILLON', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_boitier_papillon', 'Throttle-valve', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('T', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_t', 'Junction where 3 pipes converge', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('X', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_x', 'Junction where 4 pipes converge', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVE_AIR', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valve_air', 'Air valve', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('ADAPTATION', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_adaptation', 'Adaptation junction', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('FONTAINE', 'FOUNTAIN', 'CONNEC', NULL, 'v_edit_connec', 've_connec_fontaine', 'Ornamental fountain', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('TAP', 'TAP', 'CONNEC', 'Ctrl+T', 'v_edit_connec', 've_connec_tap', 'Water source', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('GREENTAP', 'GREENTAP', 'CONNEC', 'Ctrl+G', 'v_edit_connec', 've_connec_greentap', 'Greentap', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('ARC_VIRTUEL', 'VARC', 'ARC', NULL, 'v_edit_arc', 've_arc_arc_virtuel', 'Virtual section of the pipe network. Used to connect arcs and nodes when polygons exists', NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('PUIT', 'WATERWELL', 'NODE', NULL, 'v_edit_node', 've_node_puit', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('ELEMENT_RESEAU', 'NETELEMENT', 'NODE', NULL, 'v_edit_node', 've_node_element_reseau', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('USINE_RETRAITEMENT', 'WTP', 'NODE', NULL, 'v_edit_node', 've_node_usine_retraitement', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('FILTRE', 'FILTER', 'NODE', NULL, 'v_edit_node', 've_node_filtre', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('BORNE_INCENDIE', 'HYDRANT', 'NODE', NULL, 'v_edit_node', 've_node_borne_incendie', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('POMPE', 'PUMP', 'NODE', NULL, 'v_edit_node', 've_node_pompe', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('REGARD', 'MANHOLE', 'NODE', NULL, 'v_edit_node', 've_node_regard', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('COMPTEUR', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_compteur', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('CONTROLE_COMPTEUR', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_controle_compteur', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('CONTOURNEMENT_COMPTEUR', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_contournement_compteur', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('VALVE_COMPTEUR', 'REGISTER', 'NODE', NULL, 'v_edit_node', 've_node_valve_compteur', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('CONNEXION_EAU_TOPO', 'NETWJOIN', 'NODE', NULL, 'v_edit_node', 've_node_connexion_eau_topo', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('CAPTEUR_DEBIT', 'METER', 'NODE', NULL, 'v_edit_node', 've_node_capteur_debit', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('VASE_EXPANSION', 'EXPANSIONTANK', 'NODE', NULL, 'v_edit_node', 've_node_vase_expansion', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('CAPTEUR_PRESSION', 'METER', 'NODE', NULL, 'v_edit_node', 've_node_capteur_pression', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('FLEXUNION', 'FLEXUNION', 'NODE', 'Alt+U', 'v_edit_node', 've_node_flexunion', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('NETSAMPLEPOINT', 'NETSAMPLEPOINT', 'NODE', 'Alt+B', 'v_edit_node', 've_node_netsamplepoint', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('REDUCTION', 'REDUCTION', 'NODE', 'Alt+R', 'v_edit_node', 've_node_reduction', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('SOURCE', 'SOURCE', 'NODE', 'Alt+S', 'v_edit_node', 've_node_source', NULL, NULL, true, false, NULL);
+INSERT INTO cat_feature VALUES ('LINK', 'LINK', 'LINK', NULL, 'v_edit_link', 'v_edit_link', NULL, NULL, true, false, NULL);
 
 
 --
 -- Data for Name: cat_feature_arc; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO cat_feature_arc VALUES ('TUBERIA', 'PIPE', 'PIPE');
-INSERT INTO cat_feature_arc VALUES ('VARC', 'VARC', 'PIPE');
+INSERT INTO cat_feature_arc VALUES ('CONDUIT', 'PIPE', 'PIPE');
+INSERT INTO cat_feature_arc VALUES ('ARC_VIRTUEL', 'VARC', 'PIPE');
 
 
 --
 -- Data for Name: cat_feature_connec; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO cat_feature_connec VALUES ('ESCOMESA', 'WJOIN', '{"activated":false,"value":1}', 'JUNCTION');
-INSERT INTO cat_feature_connec VALUES ('BOCA_REG', 'GREENTAP', '{"activated":false,"value":1}', 'JUNCTION');
-INSERT INTO cat_feature_connec VALUES ('FONT_ORNAMENTAL', 'FOUNTAIN', '{"activated":false,"value":1}', 'JUNCTION');
-INSERT INTO cat_feature_connec VALUES ('FONT', 'TAP', '{"activated":false,"value":1}', 'JUNCTION');
-INSERT INTO cat_feature_connec VALUES ('ESCOMESA_FICTICIA', 'WJOIN', '{"activated":false,"value":1}', 'JUNCTION');
+INSERT INTO cat_feature_connec VALUES ('CONNEXION_EAU', 'WJOIN', '{"activated":false,"value":1}', 'JUNCTION');
+INSERT INTO cat_feature_connec VALUES ('FONTAINE', 'FOUNTAIN', '{"activated":false,"value":1}', 'JUNCTION');
+INSERT INTO cat_feature_connec VALUES ('TAP', 'TAP', '{"activated":false,"value":1}', 'JUNCTION');
+INSERT INTO cat_feature_connec VALUES ('GREENTAP', 'GREENTAP', '{"activated":false,"value":1}', 'JUNCTION');
 
 
 --
 -- Data for Name: cat_feature_node; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO cat_feature_node VALUES ('RECLORADOR', 'NETELEMENT', 'SHORTPIPE', 2, true, true, 'DQA', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('ADAPTACIO', 'JUNCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('CORBA', 'JUNCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('FINAL_LINEA', 'JUNCTION', 'JUNCTION', 1, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('UNIO', 'JUNCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('T', 'JUNCTION', 'JUNCTION', 3, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('JONCTION', 'JUNCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('X', 'JUNCTION', 'JUNCTION', 4, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VALVULA_REDUCTORA', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VALVULA_CONTROL_FL', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VALVULA', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VALVULA_TRENCA_PRESSIO', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VALVULA_SOST_PRESSIO', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VALVULA_ACCEL', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VALVULA_VENTOSA', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('GREEN_VALVE', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VALVULA_DESGUAS', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VALVULA_CONTROL', 'VALVE', 'SHORTPIPE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VALVULA_SHUTOFF', 'VALVE', 'SHORTPIPE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('REGISTRE', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('REGISTRE_CONTROL', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('REGISTRE_BYPASS', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VALVULA_REGISTRE', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('NETELEMENT', 'NETELEMENT', 'JUNCTION', 2, true, true, 'DQA', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('TANC_EXPANSIO', 'EXPANSIONTANK', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('ADAPTATION', 'JUNCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('COURBE', 'JUNCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('FIN_LIGNE', 'JUNCTION', 'JUNCTION', 1, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VANNE_CONTROLE_DEBIT', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVE_USAGE_GENERALE', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVE_MAINTIEN_PRESSION', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVE_REDUC_PRESSION', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVE_COUPURE_PRESSION', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('BOITIER_PAPILLON', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVE_VERTE', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVE_CHUTE', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVE_AIR', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VANNE_FERMETURE', 'VALVE', 'SHORTPIPE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVE_VERIF', 'VALVE', 'SHORTPIPE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('COMPTEUR', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVE_COMPTEUR', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('CONTOURNEMENT_COMPTEUR', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('CONTROLE_COMPTEUR', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('ELEMENT_RESEAU', 'NETELEMENT', 'JUNCTION', 2, true, true, 'DQA', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VASE_EXPANSION', 'EXPANSIONTANK', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('FILTRE', 'FILTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('DILATADOR', 'FLEXUNION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('MEDIDOR_FLUID', 'METER', 'JUNCTION', 2, true, true, 'DMA', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('MEDIDOR_PRESSIO', 'METER', 'JUNCTION', 2, true, true, 'DMA', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('HIDRANT', 'HYDRANT', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('POU_ACCES', 'MANHOLE', 'RESERVOIR', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('PUNT_MOSTREIG', 'NETSAMPLEPOINT', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('BOMBA', 'PUMP', 'PUMP', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('REDUCCIO', 'REDUCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('CAPTACIO', 'SOURCE', 'RESERVOIR', 2, true, true, 'SECTOR', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('DIPOSIT', 'TANK', 'TANK', 9, true, true, 'SECTOR', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('ESCOMESA_TOPO', 'NETWJOIN', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('POU', 'WATERWELL', 'JUNCTION', 2, true, true, 'SECTOR', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('ESTACIO_TRACTAMENT', 'WTP', 'RESERVOIR', 2, true, true, 'SECTOR', false, '{"activated":false,"value":1}');
-
-
---
--- Data for Name: element_type; Type: TABLE DATA; Schema: ; Owner: -
---
-
-INSERT INTO element_type VALUES ('REGISTRE', true, true, 'REGISTRE', NULL);
-INSERT INTO element_type VALUES ('POU', true, true, 'POU', NULL);
-INSERT INTO element_type VALUES ('TAPA', true, true, 'TAPA', NULL);
-INSERT INTO element_type VALUES ('PATE', true, true, 'PATE', NULL);
-INSERT INTO element_type VALUES ('BANDA_PROTECCIO', true, true, 'BANDA_PROTECCIO', NULL);
-INSERT INTO element_type VALUES ('PLACA_HIDRANT', true, true, 'PLACA_HIDRANT', NULL);
+INSERT INTO cat_feature_node VALUES ('FLEXUNION', 'FLEXUNION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('CAPTEUR_PRESSION', 'METER', 'JUNCTION', 2, true, true, 'DMA', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('CAPTEUR_DEBIT', 'METER', 'JUNCTION', 2, true, true, 'DMA', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('BORNE_INCENDIE', 'HYDRANT', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('REGARD', 'MANHOLE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('NETSAMPLEPOINT', 'NETSAMPLEPOINT', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('POMPE', 'PUMP', 'PUMP', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('REDUCTION', 'REDUCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('SOURCE', 'SOURCE', 'RESERVOIR', 2, true, true, 'SECTOR', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('RESERVOIR', 'TANK', 'TANK', 9, true, true, 'SECTOR', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('CONNEXION_EAU_TOPO', 'NETWJOIN', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('PUIT', 'WATERWELL', 'RESERVOIR', 2, true, true, 'SECTOR', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('USINE_RETRAITEMENT', 'WTP', 'RESERVOIR', 2, true, true, 'SECTOR', false, '{"activated":false,"value":1}');
 
 
 --
 -- Data for Name: config_graph_valve; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO config_graph_valve VALUES ('VALVULA_SHUTOFF', true);
+INSERT INTO config_graph_valve VALUES ('VANNE_FERMETURE', true);
 
 ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature_after;
 
+--
+-- Data for Name: element_type; Type: TABLE DATA; Schema: ; Owner: -
+--
+
+INSERT INTO element_type VALUES ('COMPTEUR', true, true, 'REGISTER', NULL);
+INSERT INTO element_type VALUES ('REGARD', true, true, 'MANHOLE', NULL);
+INSERT INTO element_type VALUES ('COVER', true, true, 'COVER', NULL);
+INSERT INTO element_type VALUES ('ETAPE', true, true, 'STEP', NULL);
+INSERT INTO element_type VALUES ('BANDE_PROTECTION', true, true, 'PROTECT BAND', NULL);
+INSERT INTO element_type VALUES ('PLAQUE_INCENDIE', true, true, 'HYDRANT_PLATE', NULL);
 
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,placeholder,ismandatory,isparent,iseditable,isautoupdate,isfilter,dv_querytext,dv_orderby_id,dv_isnullvalue,dv_parent_id,dv_querytext_filterc,stylesheet,widgetcontrols,widgetfunction,linkedobject,hidden,web_layoutorder) VALUES
 	 ('cat_feature','form_feature','main','active',NULL,NULL,'boolean','check','active','active',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
@@ -7829,3 +7805,4 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	 ('ve_arc','form_feature','data','observ','lyt_data_2',13,'string','text','observ','observ',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,43),
 	 ('ve_arc_pipe','form_feature','data','observ','lyt_data_2',13,'string','text','observ','observ',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,43),
 	 ('ve_arc_varc','form_feature','data','observ','lyt_data_2',13,'string','text','observ','observ',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,43);
+
