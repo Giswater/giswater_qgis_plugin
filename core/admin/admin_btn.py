@@ -129,6 +129,7 @@ class GwAdminButton:
         self.project_epsg = project_srid
         self.locale = project_locale
         self.folder_locale = os.path.join(self.sql_dir, 'i18n', self.locale)
+        self.folder_childviews = os.path.join(self.sql_dir, 'childviews', self.locale)
 
         # Save in settings
         tools_gw.set_config_parser('btn_admin', 'project_name_schema', f'{project_name_schema}', prefix=False)
@@ -556,6 +557,22 @@ class GwAdminButton:
                             status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
                             if status is False:
                                 return False
+        return True
+
+    def load_childviews(self):
+        if self._process_folder(self.folder_childviews) is False:
+            folder_childviews = os.path.join(self.sql_dir, 'childviews', 'en_US')
+            if self._process_folder(folder_childviews) is False:
+                return False
+            else:
+                status = self._execute_files(folder_childviews, True, set_progress_bar=True)
+                if status is False and self.dev_commit is False:
+                    return False
+        else:
+            status = self._execute_files(self.folder_childviews, True, set_progress_bar=True)
+            if status is False and self.dev_commit is False:
+                return False
+
         return True
 
     def load_sample_data(self, project_type):
