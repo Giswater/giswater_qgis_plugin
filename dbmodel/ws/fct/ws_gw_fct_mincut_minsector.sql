@@ -107,9 +107,6 @@ BEGIN
 	INSERT INTO temp_om_mincut SELECT * FROM om_mincut WHERE id=p_mincut_id;
 	UPDATE temp_om_mincut SET mincut_state=4, muni_id=v_muni, expl_id=v_expl, macroexpl_id=v_macroexpl, minsector_id = v_minsector WHERE id=p_mincut_id;
 
-	-- Identify valve unaccess
-	UPDATE temp_om_mincut_valve SET unaccess=true, proposed = false WHERE node_id IN (SELECT node_id FROM om_mincut_valve_unaccess WHERE result_id=p_mincut_id);
-
 	-- Getting arc id in case of exists
 	IF p_arc_id IS NULL THEN SELECT anl_feature_id INTO p_arc_id FROM om_mincut WHERE id = p_mincut_id;END IF;
 

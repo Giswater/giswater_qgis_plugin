@@ -30,6 +30,7 @@ v_point public.geometry;
 v_sensibility_f float;
 v_sensibility float;
 v_zoomratio float;
+v_mincut_version integer;
 
 BEGIN 
 	-- set search_path
@@ -45,6 +46,7 @@ BEGIN
 	v_epsg := (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 	v_client_epsg := (p_data ->> 'client')::json->> 'epsg';
 	v_zoomratio := ((p_data ->> 'data')::json->> 'coordinates')::json->>'zoomRatio';
+	v_mincut_version := (SELECT value::json->>'version' FROM config_param_system WHERE parameter = 'om_mincut_config');
 
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 
@@ -81,7 +83,11 @@ BEGIN
 	RAISE NOTICE 'TEST 10';
 	
 	-- Recalculate the mincut
-	PERFORM gw_fct_mincut(feature_id_aux, feature_type_aux, v_result_id, v_usepsectors);
+	IF v_mincut_version = 5 THEN
+		PERFORM gw_fct_mincut_minsector(feature_id_aux, v_result_id, v_usepsectors);
+	ELSE 
+		PERFORM gw_fct_mincut(feature_id_aux, 'arc'::text, v_result_id, v_usepsectors);
+	END IF;
 	
 	-- In case of variable valveStatusUnaccess on TRUE and valve closed status on TRUE)
 	IF v_flag IS TRUE THEN
