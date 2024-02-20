@@ -15,7 +15,7 @@ from collections import OrderedDict
 from functools import partial
 from sip import isdeleted
 
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QLocale
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel, QSqlError
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
@@ -183,12 +183,13 @@ class GwPsector:
         tools_qt.fill_combo_values(self.cmb_status, rows)
 
         # tab Bugdet
+        locale = QLocale("en_US")
         gexpenses = self.dlg_plan_psector.findChild(QLineEdit, "gexpenses")
-        tools_qt.double_validator(gexpenses)
+        tools_qt.double_validator(gexpenses, locale=locale)
         vat = self.dlg_plan_psector.findChild(QLineEdit, "vat")
-        tools_qt.double_validator(vat)
+        tools_qt.double_validator(vat, locale=locale)
         other = self.dlg_plan_psector.findChild(QLineEdit, "other")
-        tools_qt.double_validator(other)
+        tools_qt.double_validator(other, locale=locale)
 
         self.set_tabs_enabled(False)
         self.enable_buttons(False)
@@ -461,9 +462,9 @@ class GwPsector:
             partial(self.query_like_widget_text, self.dlg_plan_psector, self.dlg_plan_psector.txt_name,
                     self.dlg_plan_psector.all_rows, 'v_price_compost', viewname, "id"))
 
-        self.dlg_plan_psector.gexpenses.returnPressed.connect(partial(self.calculate_percents, 'plan_psector', 'gexpenses'))
-        self.dlg_plan_psector.vat.returnPressed.connect(partial(self.calculate_percents, 'plan_psector', 'vat'))
-        self.dlg_plan_psector.other.returnPressed.connect(partial(self.calculate_percents, 'plan_psector', 'other'))
+        self.dlg_plan_psector.gexpenses.editingFinished.connect(partial(self.calculate_percents, 'plan_psector', 'gexpenses'))
+        self.dlg_plan_psector.vat.editingFinished.connect(partial(self.calculate_percents, 'plan_psector', 'vat'))
+        self.dlg_plan_psector.other.editingFinished.connect(partial(self.calculate_percents, 'plan_psector', 'other'))
 
         self.dlg_plan_psector.btn_doc_insert.clicked.connect(self.document_insert)
         self.dlg_plan_psector.btn_doc_delete.clicked.connect(partial(tools_qt.delete_rows_tableview, self.tbl_document))
