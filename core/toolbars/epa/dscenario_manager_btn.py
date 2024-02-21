@@ -399,6 +399,16 @@ class GwDscenarioManagerButton(GwAction):
             if type(connect) != list:
                 connect = [connect]
         dlg_functions = toolbox_btn.open_function_by_id(function, connect_signal=connect, aux_params=aux_params)
+
+        if function in (3100, 3102):  # hydrology & dwf scenarios
+            selected_list = self.tbl_dscenario.selectionModel().selectedRows()
+            if len(selected_list) == 0:
+                return
+
+            # Get selected scenario id
+            index = self.tbl_dscenario.selectionModel().currentIndex()
+            value = index.sibling(index.row(), 0).data()
+            tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'target'), f"{value}", 0)
         return dlg_functions
 
 
