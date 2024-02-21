@@ -6295,3 +6295,4 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	 ('ve_arc_siphon','form_feature','data','pavcat_id','lyt_data_2',30,'string','combo','pavcat_id','pavcat_id',NULL,false,false,true,false,NULL,'SELECT id, id as idval FROM cat_pavement',true,true,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
 	 ('ve_arc_waccel','form_feature','data','pavcat_id','lyt_data_2',30,'string','combo','pavcat_id','pavcat_id',NULL,false,false,true,false,NULL,'SELECT id, id as idval FROM cat_pavement',true,true,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
 	 ('ve_arc_varc','form_feature','data','pavcat_id','lyt_data_2',30,'string','combo','pavcat_id','pavcat_id',NULL,false,false,true,false,NULL,'SELECT id, id as idval FROM cat_pavement',true,true,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL);
+
