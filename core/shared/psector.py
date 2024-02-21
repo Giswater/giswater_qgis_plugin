@@ -15,7 +15,7 @@ from collections import OrderedDict
 from functools import partial
 from sip import isdeleted
 
-from qgis.PyQt.QtCore import Qt, QLocale
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel, QSqlError
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
@@ -183,13 +183,12 @@ class GwPsector:
         tools_qt.fill_combo_values(self.cmb_status, rows)
 
         # tab Bugdet
-        locale = QLocale("en_US")
         gexpenses = self.dlg_plan_psector.findChild(QLineEdit, "gexpenses")
-        tools_qt.double_validator(gexpenses, locale=locale)
+        tools_qt.double_validator(gexpenses)
         vat = self.dlg_plan_psector.findChild(QLineEdit, "vat")
-        tools_qt.double_validator(vat, locale=locale)
+        tools_qt.double_validator(vat)
         other = self.dlg_plan_psector.findChild(QLineEdit, "other")
-        tools_qt.double_validator(other, locale=locale)
+        tools_qt.double_validator(other)
 
         self.set_tabs_enabled(False)
         self.enable_buttons(False)
