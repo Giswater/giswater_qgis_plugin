@@ -895,18 +895,22 @@ class GwNonVisual:
             # Draw curve with points (0, 1.33y), (x, y), (2x, 0)
             x = x_list[0]
             y = y_list[0]
-            x_array = np.array([0, x, 2*x])
-            y_array = np.array([1.33*y, y, 0])
+            if x != 0:
+                x_array = np.array([0, x, 2*x])
+                y_array = np.array([1.33*y, y, 0])
 
-            # Define x_array as 100 equally spaced values between the min and max of original x_array
-            xnew = np.linspace(x_array.min(), x_array.max(), 100)
+                # Define x_array as 100 equally spaced values between the min and max of original x_array
+                xnew = np.linspace(x_array.min(), x_array.max(), 100)
 
-            # Define spline
-            spl = CubicSpline(x_array, y_array)
-            y_smooth = spl(xnew)
+                # Define spline
+                spl = CubicSpline(x_array, y_array)
+                y_smooth = spl(xnew)
 
-            x_list = xnew
-            y_list = y_smooth
+                x_list = xnew
+                y_list = y_smooth
+            else:
+                msg = f"Can't create curve with only one value if flow is 0. Add more values or change the flow value."
+                tools_qgis.show_warning(msg, dialog=dialog)
 
         # Manage inverted plot and mirror plot for SHAPE type
         if curve_type == 'SHAPE':
