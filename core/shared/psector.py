@@ -184,11 +184,11 @@ class GwPsector:
 
         # tab Bugdet
         gexpenses = self.dlg_plan_psector.findChild(QLineEdit, "gexpenses")
-        tools_qt.double_validator(gexpenses)
+        tools_qt.double_validator(gexpenses, min_=0)
         vat = self.dlg_plan_psector.findChild(QLineEdit, "vat")
-        tools_qt.double_validator(vat)
+        tools_qt.double_validator(vat, min_=0)
         other = self.dlg_plan_psector.findChild(QLineEdit, "other")
-        tools_qt.double_validator(other)
+        tools_qt.double_validator(other, min_=0)
 
         self.set_tabs_enabled(False)
         self.enable_buttons(False)
