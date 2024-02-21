@@ -80,6 +80,7 @@ class GwGisFileCreate:
         content = self._replace_spatial_parameters(self.layer_source['srid'], content)
         content = self._replace_extent_parameters(schema, content)
         content = self._replace_connection_parameters(content, export_passwd)
+        content = self._set_project_vars(content, export_passwd)
         content = content.replace("SCHEMA_NAME", schema)
 
         # Write contents and show message
@@ -178,6 +179,13 @@ class GwGisFileCreate:
 
         content = content.replace("__SSLMODE__", self.layer_source['sslmode'])
         content = content.replace("__DATASOURCE__", datasource)
+
+        return content
+
+
+    def _set_project_vars(self, content, export_passwd):
+
+        content = content.replace("__STORECREDENTIALS__", f"{export_passwd}")
 
         return content
 

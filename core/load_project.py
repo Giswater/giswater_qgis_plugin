@@ -246,6 +246,7 @@ class GwLoadProject(QObject):
         lib_vars.project_vars['main_schema'] = tools_qgis.get_project_variable('gwMainSchema')
         lib_vars.project_vars['project_role'] = tools_qgis.get_project_variable('gwProjectRole')
         lib_vars.project_vars['project_type'] = tools_qgis.get_project_variable('gwProjectType')
+        lib_vars.project_vars['store_credentials'] = tools_qgis.get_project_variable('gwStoreCredentials')
 
 
     def _get_user_variables(self):
