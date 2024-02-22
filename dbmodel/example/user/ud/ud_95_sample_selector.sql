@@ -7,7 +7,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO selector_expl VALUES (1, current_user);
-INSERT INTO selector_expl VALUES (2, current_user);
+INSERT INTO selector_expl VALUES (1, 'postgres');
+INSERT INTO selector_expl VALUES (2, 'postgres');
+INSERT INTO selector_expl VALUES (0, 'postgres');
 
-INSERT INTO selector_state VALUES (1, current_user);
+INSERT INTO selector_state VALUES (1, 'postgres');
