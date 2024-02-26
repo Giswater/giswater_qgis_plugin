@@ -17,3 +17,8 @@ ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
 
 -- 24/2/2024;
 DELETE FROM config_form_fields WHERE formname = 've_epa_virtualpump' and columnname = 'price_pattern';
+
+-- 26/02/2024
+UPDATE config_form_fields
+	SET widgetcontrols='{"saveValue": false, "tableUpsert": "v_edit_inp_dscenario_virtualpump"}'::json, linkedobject='tbl_inp_dscenario_virtualpump', columnname='tbl_inp_virtualpump'
+	WHERE formname='ve_epa_virtualpump' AND columnname='tbl_inp_pump';
