@@ -3483,7 +3483,7 @@ def refresh_epa_tbl(tblview, dlg, **kwargs):
             continue
         id_name = tableview.get('id_name', id_name)
         if dlg == info.dlg_cf:
-            view = tableview['tbl'].replace("tab_epa_", "")
+            view = tbl.property('linkedobject')
         else:
             view = tableview['view']
         complet_list = get_list(view, id_name, feature_id)
@@ -3491,7 +3491,7 @@ def refresh_epa_tbl(tblview, dlg, **kwargs):
         tools_gw.set_tablemodel_config(dlg, tbl, view, schema_name=info.schema_name, isQStandardItemModel=True)
 
 
-def reload_tbl_dscenario (info, tablename, tableview, id_name, feature_id):
+def reload_tbl_dscenario(info, tablename, tableview, id_name, feature_id):
     tbl_name = tablename.replace("tbl", "tbl_dscenario")
     view = tableview.replace("inp", "inp_dscenario")
     tbl = info.dlg.findChild(QTableView, tbl_name)
