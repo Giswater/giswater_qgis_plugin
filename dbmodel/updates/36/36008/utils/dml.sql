@@ -9,5 +9,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") VALUES(3256, 'It is not possible to upgrade the arc to state planified because it has operative gullies associated', NULL, 2, true, 'utils', 'core');
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") VALUES(3254, 'It is not possible to upgrade the arc to state planified because it has operative connecs associated', NULL, 2, true, 'utils', 'core');
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") VALUES(3252, 'It is not possible to upgrade the arc to state planified because node has operative arcs associated', NULL, 2, true, 'utils', 'core');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") VALUES(3252, 'It is not possible to upgrade the node to state planified because node has operative arcs associated', NULL, 2, true, 'utils', 'core');
 
