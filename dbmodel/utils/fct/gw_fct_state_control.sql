@@ -298,7 +298,8 @@ BEGIN
 				-- look for operative arcs related to node
 				SELECT count(*) INTO v_num_feature FROM (SELECT * FROM arc WHERE state = 1 AND node_1 = feature_id_aux UNION SELECT * FROM arc WHERE state = 1 AND node_2 = feature_id_aux)a;
 				IF v_num_feature > 0 THEN 
-					RAISE EXCEPTION 'It is not possible to upgrade to state planified because node has operative arcs associated';
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3252", "function":"2130","debug_msg":null, "is_process":true}}$$);';
 				END IF;
 			
 			ELSIF feature_type_aux='ARC' AND v_old_state = 1 THEN
@@ -306,7 +307,8 @@ BEGIN
 				-- look for operative connecs related arc
 				SELECT count(*) INTO v_num_feature FROM connec WHERE state = 1 AND arc_id = feature_id_aux;
 				IF v_num_feature> 0 THEN 
-					RAISE EXCEPTION 'It is not possible to upgrade the arc to state planified because has operative connecs associated';
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3254", "function":"2130","debug_msg":null, "is_process":true}}$$);';
 				END IF;
 
 				-- look for operative gullies related arc
@@ -314,7 +316,8 @@ BEGIN
 				
 					SELECT count(*) INTO v_num_feature FROM gully WHERE state = 1 AND arc_id = feature_id_aux;
 					IF v_num_feature > 0 THEN 
-						RAISE EXCEPTION 'It is not possible to upgrade the arc to state planified because has operative gullies associated';
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3256", "function":"2130","debug_msg":null, "is_process":true}}$$);';
 					END IF;
 				END IF;
 			END IF;
