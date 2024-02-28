@@ -2373,7 +2373,8 @@ class GwInfo(QObject):
                     for act in self.visible_tabs[tab]['tabactions']:
                         action = dialog.findChild(QAction, act['actionName'])
                         if action is not None:
-                            action.setToolTip(act['actionTooltip'])
+                            if 'actionTooltip' in act:
+                                action.setToolTip(act['actionTooltip'])
                             action.setVisible(True)
 
         self._enable_actions(dialog, self.action_edit.isChecked())
