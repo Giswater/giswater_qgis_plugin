@@ -15,12 +15,10 @@ from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, Q
 from qgis.PyQt.QtSql import QSqlTableModel
 
 from qgis.gui import QgsMapToolEmitPoint
-from qgis.core import QgsProject
 
 from .toolbox_btn import GwToolBoxButton
 from ...ui.ui_manager import GwMapzoneManagerUi, GwMapzoneConfigUi, GwInfoGenericUi
 from ...utils.snap_manager import GwSnapManager
-from ...shared.info import GwInfo
 from ...utils import tools_gw
 from .... import global_vars
 from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_os

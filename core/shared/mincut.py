@@ -9,7 +9,6 @@ import json
 import os
 import sys
 import csv
-from datetime import datetime
 from sip import isdeleted
 from time import time
 from datetime import datetime, timedelta

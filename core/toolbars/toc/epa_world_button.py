@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis._core import QgsMapLayerStyle
 
 from ..dialog import GwAction
 from ...utils import tools_gw

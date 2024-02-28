@@ -15,7 +15,6 @@ from qgis.gui import QgsVertexMarker
 from ..maptool import GwMaptool
 from ...ui.ui_manager import GwAuxPointUi
 from ...utils import tools_gw
-from .... import global_vars
 from ....libs import lib_vars, tools_qgis, tools_qt, tools_db
 
 

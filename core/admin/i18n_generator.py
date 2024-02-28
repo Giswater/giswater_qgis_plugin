@@ -13,7 +13,6 @@ from functools import partial
 
 from ..ui.ui_manager import GwAdminTranslationUi
 from ..utils import tools_gw
-from ... import global_vars
 from ...libs import lib_vars, tools_qt, tools_qgis
 
 

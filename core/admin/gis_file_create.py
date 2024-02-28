@@ -8,7 +8,6 @@ or (at your option) any later version.
 import os
 import shutil
 
-from ..utils import tools_gw
 from ...libs import tools_log, tools_qt, tools_db, tools_qgis
 
 
