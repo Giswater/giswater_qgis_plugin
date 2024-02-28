@@ -159,7 +159,7 @@ v_addparam json;
 v_pkeyfield text;
 v_schemaname text;
 
-p_idname_aux text;
+v_idname_aux text;
 
 BEGIN
 
@@ -229,20 +229,20 @@ BEGIN
 
 	-- Manage primary key
 	EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_addparam USING v_tablename;
-	v_idname_array := string_to_array(p_idname_aux, ', ');
+	v_idname_array := string_to_array(v_addparam ->> 'pkey', ', ');
 	if v_idname_array is null THEN
 		EXECUTE 'SELECT gw_fct_getpkeyfield('''||v_tablename||''');' INTO v_pkeyfield;
-		p_idname_aux = v_pkeyfield;
+		v_idname_aux = v_pkeyfield;
 		v_idname_array := string_to_array(v_pkeyfield, ', ');
 	else
-		p_idname_aux = v_addparam ->> 'pkey';
+		v_idname_aux = v_idname_array;
 	end if;
 
 	v_id_array := string_to_array(p_id, ', ');
 
 
 	if v_idname_array is not null then
-		p_idname = p_idname_aux;
+		p_idname = v_idname_aux;
 		FOREACH idname IN ARRAY v_idname_array LOOP
 			EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
 			    JOIN pg_class t on a.attrelid = t.oid
