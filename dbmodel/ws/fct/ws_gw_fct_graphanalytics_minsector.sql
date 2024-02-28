@@ -51,7 +51,7 @@ v_total numeric default 0;
 v_cont2 integer default 0;
 v_class text = 'MINSECTOR';
 v_feature record;
-v_expl json;
+v_expl text;
 v_data json;
 v_fid integer;
 v_addparam record;
@@ -85,6 +85,7 @@ v_psectors_query_connec text;
 v_psectors_query_link text;
 v_loop record;
 v_visible_layer text;
+v_ignorebrokenvalves boolean;
 
 BEGIN
 
@@ -99,7 +100,8 @@ BEGIN
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 	v_usepsectors = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePsectors');
 	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
-
+	v_ignorebrokenvalves = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'ignoreBrokenValves');
+	
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
 
@@ -204,11 +206,11 @@ BEGIN
 		-- reset exploitation
 		IF v_expl IS NOT NULL THEN
 			
-			IF substring(v_expl::text,0,2)='[' THEN
-				v_expl_query = ' a.expl_id = ANY(ARRAY'||v_expl||')';
+			IF substring(v_expl::text,0,2)!='[' THEN
+				v_expl_query = ' a.expl_id IN ('||v_expl||')';
 			ELSE
 				INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid,
-				concat('ERROR-',v_fid,': Please insert exploitation id''s as tooltip shows, using []'));
+				concat('ERROR-',v_fid,': Please insert exploitation id''s as a list of expl_id'));
 				DELETE FROM selector_expl WHERE cur_user=current_user;  
 				v_returnerror = true;
 				 --dissabling all:
@@ -249,13 +251,38 @@ BEGIN
 		WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND state=1  AND '||v_expl_query||'  '||v_psectors_query_arc||';';
 			
 		-- set the starting element
-		v_querytext = 'UPDATE temp_t_anlgraph SET flag=1, water=1, checkf=1, trace=a.arc_id::integer 
-				FROM (SELECT a.arc_id FROM temp_t_arc a JOIN vu_node ON node_1 = node_id WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN (''MINSECTOR''))
-				UNION SELECT a.arc_id FROM temp_t_arc a JOIN vu_node ON node_2 = node_id WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN (''MINSECTOR'')))a
-					                                            WHERE temp_t_anlgraph.arc_id = a.arc_id';
+		if v_ignorebrokenvalves is false then     
+			v_querytext = 'UPDATE temp_t_anlgraph SET flag=1, water=1, checkf=1, trace=a.arc_id::integer 
+					FROM (
+						SELECT a.arc_id FROM temp_t_arc a 
+							JOIN vu_node ON node_1 = node_id 
+							JOIN man_valve mv using (node_id)
+						WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN (''MINSECTOR'')) and mv.broken is false
+						UNION 
+						SELECT a.arc_id FROM temp_t_arc a 
+							JOIN vu_node ON node_2 = node_id 
+							JOIN man_valve mv using (node_id)
+						WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN (''MINSECTOR'')) and mv.broken is false)a
+			WHERE temp_t_anlgraph.arc_id = a.arc_id';
+		
+		elsif v_ignorebrokenvalves is true then
+			v_querytext = 'UPDATE temp_t_anlgraph SET flag=1, water=1, checkf=1, trace=a.arc_id::integer 
+						FROM (
+							SELECT a.arc_id FROM temp_t_arc a 
+								JOIN vu_node ON node_1 = node_id 
+								JOIN man_valve mv using (node_id)
+							WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN (''MINSECTOR''))
+							UNION 
+							SELECT a.arc_id FROM temp_t_arc a 
+								JOIN vu_node ON node_2 = node_id 
+								JOIN man_valve mv using (node_id)
+							WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN (''MINSECTOR'')))a
+				WHERE temp_t_anlgraph.arc_id = a.arc_id';
+		end if;
+					                                           
 		EXECUTE v_querytext;
-
-		-- inundation process
+	
+	-- inundation process
 		LOOP	
 			v_cont1 = v_cont1+1;
 			UPDATE temp_t_anlgraph n SET water= 1, flag=n.flag+1, checkf=1, trace = a.trace FROM v_temp_anlgraph a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;
@@ -546,7 +573,7 @@ BEGIN
 
 	--show results on the map
 	DELETE FROM selector_expl WHERE cur_user=current_user;
-	INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, current_user FROM exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl_id)a USING (expl_id);
+	INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, current_user FROM exploitation JOIN (SELECT unnest(string_to_array(v_expl, ','))::integer AS expl_id)a USING (expl_id);
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
 
