@@ -41,8 +41,8 @@ UPDATE sys_table
 	SET criticity=2, context='{"level_1":"OM","level_2":"MINCUT"}', orderby=1, alias='Mincut init point', addparam='{"geom": "anl_the_geom"}'::json 
 	WHERE id='v_om_mincut_initpoint';
 -- Set style for v_om_mincut_initpoint
-INSERT INTO sys_style (idval,styletype,stylevalue,active)
-	VALUES ('v_om_mincut_initpoint','qml','<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
+INSERT INTO sys_style (id, idval,styletype,stylevalue,active)
+	VALUES (170, 'v_om_mincut_initpoint','qml','<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis simplifyMaxScale="1" maxScale="0" simplifyDrawingHints="0" version="3.22.3-Białowieża" symbologyReferenceScale="-1" simplifyLocal="1" styleCategories="Symbology|Labeling|Rendering" minScale="100000000" labelsEnabled="0" simplifyAlgorithm="0" simplifyDrawingTol="1" hasScaleBasedVisibilityFlag="0">
   <renderer-v2 forceraster="0" symbollevels="0" referencescale="-1" enableorderby="0" type="singleSymbol">
     <symbols>
