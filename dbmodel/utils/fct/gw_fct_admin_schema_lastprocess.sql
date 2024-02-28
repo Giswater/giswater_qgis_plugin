@@ -79,18 +79,32 @@ BEGIN
 
 	--reset sequences for a new project or for a sample
 	IF  v_issample IS TRUE THEN
-		FOR v_rectable IN 
-		(SELECT table_name, column_name, sequence_name FROM information_schema.columns,   information_schema.sequences
-		WHERE table_schema ='SCHEMA_NAME' and sequence_schema ='SCHEMA_NAME' and  column_default ILIKE '%' || sequence_name || '%'
-		AND sequence_name!='urn_id_seq' AND sequence_name!='doc_seq' AND sequence_name!='raingage_rg_id_seq')
-		LOOP 
+		FOR v_rectable IN (
+		    SELECT c.table_name as table_name, c.column_name as column_name, s.sequence_name as sequence_name FROM information_schema.columns c
+            JOIN ( SELECT table_schema, table_name, column_name, substring(column_default from '''(.*)''') AS sequence_name
+                   FROM information_schema.columns
+                   WHERE table_schema = 'SCHEMA_NAME' AND column_default ILIKE 'nextval%'
+            ) AS s ON c.table_schema = s.table_schema
+                    AND c.table_name = s.table_name
+                    AND c.column_name = s.column_name
+            WHERE
+                c.table_schema = 'SCHEMA_NAME'
+                AND s.sequence_name IS NOT NULL
+                AND s.sequence_name != 'urn_id_seq'
+                AND s.sequence_name != 'doc_seq'
+                AND s.sequence_name != 'raingage_rg_id_seq'
+            ORDER BY
+                s.sequence_name
+        )
+		LOOP
 		    v_querytext:= 'SELECT max('||v_rectable.column_name||') FROM '||v_rectable.table_name||';' ;
-		    EXECUTE v_querytext INTO v_max_seq_id;	
-		    
-		    IF v_max_seq_id IS NOT NULL AND v_max_seq_id > 0 THEN 
-			EXECUTE 'SELECT setval(''SCHEMA_NAME.'||v_rectable.sequence_name||' '','||v_max_seq_id||', true)';			
+		    EXECUTE v_querytext INTO v_max_seq_id;
+
+		    IF v_max_seq_id IS NOT NULL AND v_max_seq_id > 0 THEN
+			EXECUTE 'SELECT setval(''SCHEMA_NAME.'||v_rectable.sequence_name||' '','||v_max_seq_id||', true)';
 		    END IF;
 		END LOOP;
+
 		v_message='Sequeneces set correctly';
 	ELSE
 		-- enable triggers on typevalue tables
