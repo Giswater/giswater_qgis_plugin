@@ -7,13 +7,17 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import json
 import os
+import sys
+import csv
+from datetime import datetime
 from sip import isdeleted
 from time import time
 from datetime import datetime, timedelta
 from functools import partial
 
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime, QDateTime, QTimer
-from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit, QLabel
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit, \
+    QLabel, QFileDialog
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsApplication, QgsFeatureRequest, QgsPrintLayout, QgsProject, QgsReadWriteContext, \
     QgsVectorLayer
@@ -302,6 +306,7 @@ class GwMincut:
 
         # Common Actions
         self.action_mincut_composer.setDisabled(False)
+        self.action_export_hydro_csv.setDisabled(False)
 
         return row
 
@@ -423,6 +428,11 @@ class GwMincut:
         action.triggered.connect(self._mincut_composer)
         tools_gw.add_icon(action, "181", sub_folder="24x24")
         self.action_mincut_composer = action
+
+        action = self.dlg_mincut.findChild(QAction, "actionExportHydroCsv")
+        action.triggered.connect(self._export_hydro_csv)
+        tools_gw.add_icon(action, "83", sub_folder="24x24")
+        self.action_export_hydro_csv = action
 
         # Set shortcut keys
         self.dlg_mincut.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_mincut))
@@ -1055,6 +1065,7 @@ class GwMincut:
         self.action_refresh_mincut.setEnabled(False)
         self.action_custom_mincut.setEnabled(False)
         self.action_change_valve_status.setEnabled(False)
+        self.action_export_hydro_csv.setEnabled(True)
 
 
     def _update_result_selector(self, result_mincut_id, commit=True):
@@ -1303,7 +1314,6 @@ class GwMincut:
         tools_gw.load_settings(self.dlg_hydro)
         self.dlg_hydro.setWindowTitle("Hydrometer management")
         self.dlg_hydro.tbl_hydro.setSelectionBehavior(QAbstractItemView.SelectRows)
-        # self.dlg_hydro.btn_snapping.setEnabled(False)
 
         # Set icons
         tools_gw.add_icon(self.dlg_hydro.btn_insert, "111", sub_folder="24x24")
@@ -1794,6 +1804,62 @@ class GwMincut:
                                 'auto_mincut_xyCoordinates_mouse_move_node_arc')
         tools_gw.connect_signal(self.emit_point.canvasClicked, self._auto_mincut_snapping,
                                 'mincut', 'auto_mincut_ep_canvasClicked_auto_mincut_snapping')
+
+
+    def _export_hydro_csv(self):
+        """ : Export Hydro Csv """
+
+        result_mincut_id = tools_qt.get_text(self.dlg_mincut, "result_mincut_id")
+
+        # Select export path
+        if 'nt' in sys.builtin_module_names:
+            folder_path = os.path.expanduser("~/Documents")
+        else:
+            folder_path = os.path.expanduser("~")
+
+        # Open dialog to select folder
+        os.chdir(folder_path)
+        file_dialog = QFileDialog()
+        file_dialog.setFileMode(QFileDialog.Directory)
+
+        msg = "Save as"
+        folder_path, filter_ = file_dialog.getSaveFileName(None, tools_qt.tr(msg), os.path.join(folder_path, f'{result_mincut_id}_{datetime.now().strftime("%d%m%Y")}'), '*.csv')
+
+        if not folder_path:
+            return
+        # Export to csv
+        if folder_path.find('.csv') == -1:
+            folder_path += '.csv'
+
+        if self.dlg_mincut.tbl_hydro:
+            model = self.dlg_mincut.tbl_hydro.model()
+        else:
+            return
+
+        # Convert qtable values into list
+        all_rows = []
+        headers = []
+        for i in range(0, model.columnCount()):
+            headers.append(str(model.headerData(i, Qt.Horizontal)))
+        all_rows.append(headers)
+        for rows in range(0, model.rowCount()):
+            row = []
+            for col in range(0, model.columnCount()):
+                row.append(str(model.data(model.index(rows, col))))
+            all_rows.append(row)
+
+        # Write list into csv file
+        try:
+            with open(folder_path, "w") as output:
+                writer = csv.writer(output, lineterminator='\n')
+                writer.writerows(all_rows)
+            tools_gw.set_config_parser('btn_search', 'search_csv_path', f"{tools_qt.get_text(self.dlg_mincut, 'txt_path')}")
+            message = "The csv file has been successfully exported"
+            tools_qgis.show_info(message, dialog=self.dlg_mincut)
+
+        except Exception:
+            msg = "File path doesn't exist or you dont have permission or file is opened"
+            tools_qgis.show_warning(msg, dialog=self.dlg_mincut)
 
 
     def _mouse_move_node_arc(self, point):

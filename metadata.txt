@@ -10,7 +10,7 @@ author=David Erill, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fust�
 Changelog=Version 3.6.008
     - Allow setting geometry to psector other prices
     - Add info form to edit dscenario items
-
+    - Add action "mincut_export_hydro_csv" on mincut form
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
 homepage=https://www.giswater.org
