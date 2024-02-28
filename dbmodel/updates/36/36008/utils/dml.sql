@@ -26,3 +26,7 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET layoutorder=3
 	WHERE formname in ('inp_dscenario_controls', 'inp_dscenario_rules') AND columnname='sector_id';
+
+UPDATE sys_function SET descript='NO input parameters needed.
+The function allows the possibility to find errors and data inconsistency for prices checking catalog elements.' WHERE id=2436 and function_name='gw_fct_plan_check_data';
+
