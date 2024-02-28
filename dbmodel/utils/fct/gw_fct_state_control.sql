@@ -299,7 +299,7 @@ BEGIN
 				SELECT count(*) INTO v_num_feature FROM (SELECT * FROM arc WHERE state = 1 AND node_1 = feature_id_aux UNION SELECT * FROM arc WHERE state = 1 AND node_2 = feature_id_aux)a;
 				IF v_num_feature > 0 THEN 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3252", "function":"2130","debug_msg":null, "is_process":true}}$$);';
+					"data":{"message":"3258", "function":"2130","debug_msg":null, "is_process":true}}$$);';
 				END IF;
 			
 			ELSIF feature_type_aux='ARC' AND v_old_state = 1 THEN
