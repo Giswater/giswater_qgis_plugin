@@ -13,7 +13,8 @@ from qgis.core import QgsProject
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor, QKeySequence
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt, QRegExp, QPoint
-from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QAction, QShortcut, QApplication, QTableWidgetItem
+from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QAction, \
+    QShortcut, QApplication, QTableWidgetItem, QWidget, QLabel, QGridLayout
 from qgis.PyQt.QtWidgets import QDialog, QLineEdit
 
 from ..dialog import GwAction
@@ -498,7 +499,8 @@ class GwDscenarioManagerButton(GwAction):
                 qtableview.clicked.connect(partial(self._manage_highlight, qtableview, view))
                 tab_idx = self.dlg_dscenario.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
                 self.dlg_dscenario.main_tab.widget(tab_idx).setObjectName(view)
-
+                # Manage editability
+                qtableview.doubleClicked.connect(partial(self._manage_update, self.dlg_dscenario, qtableview))
                 if view.split('_')[-1].upper() == self.selected_dscenario_type:
                     default_tab_idx = tab_idx
 
@@ -587,7 +589,7 @@ class GwDscenarioManagerButton(GwAction):
         self._fill_dscenario_table()
 
 
-    def _fill_dscenario_table(self, set_edit_triggers=QTableView.DoubleClicked, expr=None):
+    def _fill_dscenario_table(self, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
         """ Fill dscenario table with data from its corresponding table """
 
         # Manage exception if dialog is closed
@@ -732,6 +734,50 @@ class GwDscenarioManagerButton(GwAction):
         if feature_type != 'feature_id':
             table = f"v_edit_{feature_type.split('_')[0]}"
         tools_qgis.highlight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
+
+
+    def _manage_update(self, dialog, tableview):
+        # Get selected row
+        if tableview is None:
+            tableview = dialog.main_tab.currentWidget()
+        tablename = tableview.objectName().replace('tbl_', '')
+        # if 'v_edit_' not in tablename:
+        #     tablename = f'v_edit_{tablename}'
+        selected_list = tableview.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=dialog)
+            return
+
+        # Get selected mapzone data
+        index = tableview.selectionModel().currentIndex()
+        col_name = 'feature_id'
+        col_idx = None
+
+        for x in self.feature_types:
+            col_idx = tools_qt.get_col_index_by_col_name(tableview, x)
+            if col_idx not in (None, False):
+                col_name = x
+                break
+        print(f"{col_name=}, {col_idx=}")
+
+        feature_id = index.sibling(index.row(), col_idx).data()
+        field_id = tableview.model().headerData(col_idx, Qt.Horizontal)
+
+        # Execute getinfofromid
+        _id = f"{feature_id}"
+        if self.selected_dscenario_id is not None:
+            _id = f"{self.selected_dscenario_id}, {feature_id}"
+        feature = f'"tableName":"{tablename}", "id": "{_id}"'
+        body = tools_gw.create_body(feature=feature)
+        json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
+        if json_result is None or json_result['status'] == 'Failed':
+            return
+        result = json_result
+
+        dlg_title = f"Update {tablename.split('_')[-1].capitalize()} ({feature_id})"
+
+        self._build_generic_info(dlg_title, result, tablename, field_id, force_action="UPDATE")
 
 
     def _manage_properties(self, dialog, view, feature_id=None):
@@ -1061,5 +1107,107 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.remove_selection()
         tools_gw.reset_rubberband(self.rubber_band)
         self.iface.actionPan().trigger()
+
+
+    def _build_generic_info(self, dlg_title, result, tablename, field_id, force_action=None):
+        # Build dlg
+        self.add_dlg = GwInfoGenericUi()
+        tools_gw.load_settings(self.add_dlg)
+        self.my_json_add = {}
+        tools_gw.build_dialog_info(self.add_dlg, result, my_json=self.my_json_add)
+        layout = self.add_dlg.findChild(QGridLayout, 'lyt_main_1')
+        self.add_dlg.actionEdit.setVisible(False)
+        # Disable widgets if updating
+        if force_action == "UPDATE":
+            tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_{field_id}', False)  # sector_id/dma_id/...
+        # Populate netscenario_id
+        if self.selected_dscenario_id is not None:
+            tools_qt.set_widget_text(self.add_dlg, f'tab_none_dscenario_id', self.selected_dscenario_id)
+            tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_dscenario_id', False)
+            # tools_qt.set_checked(self.add_dlg, 'tab_none_active', True)
+            field_id = ['dscenario_id', field_id]
+
+        # Get every widget in the layout
+        widgets = []
+        for row in range(layout.rowCount()):
+            for column in range(layout.columnCount()):
+                item = layout.itemAtPosition(row, column)
+                if item is not None:
+                    widget = item.widget()
+                    if widget is not None and type(widget) != QLabel:
+                        widgets.append(widget)
+        # Get all widget's values
+        for widget in widgets:
+            tools_gw.get_values(self.add_dlg, widget, self.my_json_add, ignore_editability=True)
+        # Remove Nones from self.my_json_add
+        keys_to_remove = []
+        for key, value in self.my_json_add.items():
+            if value is None:
+                keys_to_remove.append(key)
+        for key in keys_to_remove:
+            del self.my_json_add[key]
+        # Signals
+        self.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.add_dlg))
+        self.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.add_dlg))
+        self.add_dlg.dlg_closed.connect(self._manage_current_changed)
+        self.add_dlg.btn_accept.clicked.connect(
+            partial(self._accept_add_dlg, self.add_dlg, tablename, field_id, None, self.my_json_add, result, force_action))
+        # Open dlg
+        tools_gw.open_dialog(self.add_dlg, dlg_name='info_generic', title=dlg_title)
+
+
+    def _accept_add_dlg(self, dialog, tablename, pkey, feature_id, my_json, complet_result, force_action):
+        if not my_json:
+            return
+
+        list_mandatory = []
+        list_filter = []
+
+        for field in complet_result['body']['data']['fields']:
+            if field['ismandatory']:
+                widget = dialog.findChild(QWidget, field['widgetname'])
+                if not widget:
+                    continue
+                widget.setStyleSheet(None)
+                value = tools_qt.get_text(dialog, widget)
+                if value in ('null', None, ''):
+                    widget.setStyleSheet("border: 1px solid red")
+                    list_mandatory.append(field['widgetname'])
+                else:
+                    elem = [field['columnname'], value]
+                    list_filter.append(elem)
+
+        if list_mandatory:
+            msg = "Some mandatory values are missing. Please check the widgets marked in red."
+            tools_qgis.show_warning(msg, dialog=dialog)
+            tools_qt.set_action_checked("actionEdit", True, dialog)
+            return False
+
+        fields = json.dumps(my_json)
+        id_val = ""
+        if pkey:
+            if not isinstance(pkey, list):
+                pkey = [pkey]
+            for pk in pkey:
+                results = pk.split(',')
+                for result in results:
+                    widget_name = f"tab_none_{result}"
+                    value = tools_qt.get_widget_value(dialog, widget_name)
+                    id_val += f"{value}, "
+            id_val = id_val[:-2]
+        # if id_val in (None, '', 'None'):
+        #     id_val = feature_id
+        feature = f'"id":"{id_val}", '
+        feature += f'"tableName":"{tablename}"'
+        extras = f'"fields":{fields}'
+        if force_action:
+            extras += f', "force_action":"{force_action}"'
+        body = tools_gw.create_body(feature=feature, extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
+        if json_result and json_result.get('status') == 'Accepted':
+            tools_gw.close_dialog(dialog)
+            return
+
+        tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
 
     # endregion
