@@ -7,7 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-DROP TRIGGER IF EXISTS gw_trg_notify ON cat_work;
-DROP TRIGGER IF EXISTS gw_trg_notify ON cat_feature;
 
-DROP FUNCTION IF EXISTS gw_trg_notify();
+
+DROP FUNCTION IF EXISTS gw_trg_notify() cascade;
