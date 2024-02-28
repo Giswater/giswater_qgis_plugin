@@ -754,19 +754,22 @@ class GwDscenarioManagerButton(GwAction):
         col_name = 'feature_id'
         col_idx = None
 
-        for x in self.feature_types:
-            col_idx = tools_qt.get_col_index_by_col_name(tableview, x)
-            if col_idx not in (None, False):
-                col_name = x
-                break
-        print(f"{col_name=}, {col_idx=}")
+        if tablename in ('inp_dscenario_controls', 'inp_dscenario_rules'):
+            col_name = 'id'
+            col_idx = tools_qt.get_col_index_by_col_name(tableview, col_name)
+        else:
+            for x in self.feature_types:
+                col_idx = tools_qt.get_col_index_by_col_name(tableview, x)
+                if col_idx not in (None, False):
+                    col_name = x
+                    break
 
         feature_id = index.sibling(index.row(), col_idx).data()
         field_id = tableview.model().headerData(col_idx, Qt.Horizontal)
 
         # Execute getinfofromid
         _id = f"{feature_id}"
-        if self.selected_dscenario_id is not None:
+        if self.selected_dscenario_id is not None and tablename not in ('inp_dscenario_controls', 'inp_dscenario_rules'):
             _id = f"{self.selected_dscenario_id}, {feature_id}"
         feature = f'"tableName":"{tablename}", "id": "{_id}"'
         body = tools_gw.create_body(feature=feature)
@@ -965,7 +968,9 @@ class GwDscenarioManagerButton(GwAction):
         tableview = self.dlg_dscenario.main_tab.currentWidget()
         view = tableview.objectName()
 
-        sql = f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{self.table_name[len(f'{self.schema_name}.'):]}' ORDER BY ordinal_position;"
+        sql = f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS " \
+              f"WHERE TABLE_SCHEMA = '{lib_vars.schema_name}' AND TABLE_NAME = '{self.table_name[len(f'{self.schema_name}.'):]}' " \
+              f"ORDER BY ordinal_position;"
         rows = tools_db.get_rows(sql)
 
         if rows[0][0] == 'id':
@@ -1126,6 +1131,8 @@ class GwDscenarioManagerButton(GwAction):
             tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_dscenario_id', False)
             # tools_qt.set_checked(self.add_dlg, 'tab_none_active', True)
             field_id = ['dscenario_id', field_id]
+        if tablename in ('inp_dscenario_controls', 'inp_dscenario_rules'):
+            field_id = 'id'
 
         # Get every widget in the layout
         widgets = []
