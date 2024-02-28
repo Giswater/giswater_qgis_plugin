@@ -44,7 +44,6 @@ from ..ui.ui_manager import GwSelectorUi
 from . import tools_backend_calls
 from ..load_project_menu import GwMenuLoad
 from ..utils.select_manager import GwSelectManager
-from ..utils.snap_manager import GwSnapManager
 from ..toolbars.toc import epa_world_button
 from ... import global_vars
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
