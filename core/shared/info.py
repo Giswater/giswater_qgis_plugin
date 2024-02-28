@@ -3082,6 +3082,11 @@ class GwInfo(QObject):
                     level = int(json_result['message']['level'])
                 tools_qgis.show_message(json_result['message']['text'], level)
 
+            # Refresh tab epa
+            epa_type = tools_qt.get_text(self.dlg_cf, 'tab_data_epa_type')
+            if epa_type and epa_type.lower() in ('valve', 'shortpipe', 'pump'):
+                self._reload_epa_tab(self.dlg_cf)
+
 
     def _cancel_snapping_tool(self, dialog, action):
 
