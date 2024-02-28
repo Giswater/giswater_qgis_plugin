@@ -16,3 +16,13 @@ SELECT SUBSTRING(formname FROM 8) AS formname, formtype, tabname, columnname, la
 FROM config_form_fields
 WHERE formname like 'v_edit_inp_dscenario_%' and formname not like 'v_edit_inp_dscenario_flwreg_%'
 ON CONFLICT DO NOTHING;
+
+UPDATE config_form_fields
+	SET layoutorder=1
+	WHERE formname in ('inp_dscenario_controls', 'inp_dscenario_rules') AND columnname='id';
+UPDATE config_form_fields
+	SET layoutorder=2
+	WHERE formname in ('inp_dscenario_controls', 'inp_dscenario_rules') AND columnname='dscenario_id';
+UPDATE config_form_fields
+	SET layoutorder=3
+	WHERE formname in ('inp_dscenario_controls', 'inp_dscenario_rules') AND columnname='sector_id';
