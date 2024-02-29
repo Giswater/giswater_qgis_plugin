@@ -2740,6 +2740,7 @@ class GwInfo(QObject):
             tools_qt.set_tableview_config(widget, edit_triggers=QTableView.DoubleClicked, sectionResizeMode=0)
             widget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, 1, True)
             if 'tab_epa' in widgetname:
+                widget.doubleClicked.connect(partial(epa_tbl_doubleClicked, widget, self.dlg_cf))
                 model = widget.model()
                 tbl_upsert = widget.property('widgetcontrols').get('tableUpsert')
                 setattr(self, f"my_json_{tbl_upsert}", {})
@@ -3252,7 +3253,9 @@ def fill_tbl(complet_list, tbl, info, view, dlg):
 
 def epa_tbl_doubleClicked(tbl, dlg):
 
-    if 'dscenario' in tbl.objectName():
+    if 'tab_epa' in tbl.objectName():
+        dlg.findChild(QPushButton, 'tab_epa_edit_dscenario').click()
+    elif 'dscenario' in tbl.objectName():
         dlg.findChild(QPushButton, 'btn_edit_dscenario').click()
     else:
         dlg.findChild(QPushButton, 'btn_edit_base').click()
@@ -3803,6 +3806,28 @@ def remove_from_dscenario(**kwargs):
     setattr(info, f"my_json_{tablename}", {})
 
     delete_tbl_row(tbl, tablename, pkey, dialog, **kwargs)
+
+
+def edit_dscenario(**kwargs):
+    func_params = kwargs['func_params']
+    dialog = kwargs['dialog']
+    info = kwargs['class']
+    tbl = tools_qt.get_widget(dialog, func_params.get('targetwidget'))
+    tablename = func_params.get('tablename')
+    view = tablename
+    pkey = func_params.get('pkey')
+    dlg_title = f"Edit {tablename}"
+
+    my_json = getattr(info, f"my_json_{tablename}")
+    if my_json:
+        message = "You are trying to add/remove a record from the table, with changes to the current records. If you continue, the changes will be discarded without saving. Do you want to continue?"
+        answer = tools_qt.show_question(message, "Info Message", force_action=True)
+        if not answer:
+            return
+
+    setattr(info, f"my_json_{tablename}", {})
+
+    edit_row_epa(tbl, view, tablename, pkey, dialog, dlg_title, **kwargs)
 
 # endregion
 
