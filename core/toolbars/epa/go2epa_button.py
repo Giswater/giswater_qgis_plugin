@@ -15,7 +15,6 @@ from time import time
 from datetime import timedelta
 
 from qgis.PyQt.QtCore import QStringListModel, Qt, QTimer
-from qgis.PyQt.QtSql import QSqlQueryModel
 from qgis.PyQt.QtWidgets import QWidget, QComboBox, QCompleter, QFileDialog, QTableView, QAbstractItemView, \
     QGroupBox, QSpacerItem, QSizePolicy, QGridLayout, QLabel, QTabWidget
 from qgis.core import QgsApplication
@@ -26,7 +25,7 @@ from ..toc.epa_world_button import set_epa_world, is_epa_world_active
 from ...utils import tools_gw
 from ...ui.ui_manager import GwGo2EpaUI, GwSelectorUi, GwGo2EpaOptionsUi
 from .... import global_vars
-from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_os
+from ....libs import lib_vars, tools_qgis, tools_qt, tools_db
 from ..dialog import GwAction
 
 

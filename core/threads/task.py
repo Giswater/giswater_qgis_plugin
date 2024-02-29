@@ -9,7 +9,6 @@ from qgis.PyQt.QtCore import pyqtSignal, QObject
 from qgis.core import QgsTask
 from qgis.utils import iface
 
-from ... import global_vars
 from ...libs import lib_vars, tools_log, tools_db
 
 

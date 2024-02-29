@@ -83,13 +83,12 @@ class Giswater(QObject):
             tools_log.log_info(f"Exception in unload when self._close_open_dialogs(): {e}")
             raise e
 
-        if hide_gw_button is None:
-            try:
-                # Manage unset signals
-                self._unset_signals()
-            except Exception as e:
-                tools_log.log_info(f"Exception in unload when unset signals: {e}")
-                raise e
+        try:
+            # Manage unset signals
+            self._unset_signals(hide_gw_button)
+        except Exception as e:
+            tools_log.log_info(f"Exception in unload when unset signals: {e}")
+            raise e
 
         try:
             # Force action pan
@@ -294,21 +293,18 @@ class Giswater(QObject):
         try:
             tools_gw.connect_signal(self.iface.projectRead, self._project_read,
                                     'main', 'projectRead')
-            tools_gw.connect_signal(self.iface.newProjectCreated, self._project_new,
-                                    'main', 'newProjectCreated')
-            tools_gw.connect_signal(self.iface.actionSaveProject().triggered, self._save_toolbars_position,
-                                    'main', 'actionSaveProject_save_toolbars_position')
         except AttributeError:
             pass
 
 
-    def _unset_signals(self):
+    def _unset_signals(self, hide_gw_button):
         """ Disconnect iface event signals on Project Read / New Project / Save Project """
 
-        try:
-            tools_gw.disconnect_signal('main', 'projectRead')
-        except TypeError:
-            pass
+        if hide_gw_button is None:
+            try:
+                tools_gw.disconnect_signal('main', 'projectRead')
+            except TypeError:
+                pass
         try:
             tools_gw.disconnect_signal('main', 'newProjectCreated')
         except TypeError:
@@ -388,30 +384,7 @@ class Giswater(QObject):
 
         # Create class to manage code that performs project configuration
         self.load_project = GwLoadProject()
-        self.load_project.project_read(show_warning)
-
-
-    def _save_toolbars_position(self):
-
-        # Get all QToolBar from qgis iface
-        widget_list = self.iface.mainWindow().findChildren(QToolBar)
-        own_toolbars = []
-
-        # Get list with own QToolBars
-        for w in widget_list:
-            if w.property('gw_name'):
-                own_toolbars.append(w)
-
-        # Order list of toolbar in function of X position
-        own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
-        if len(own_toolbars) == 0 or (len(own_toolbars) == 1 and own_toolbars[0].property('gw_name') == 'toc') or \
-                global_vars.project_type is None:
-            return
-
-        # Set 'toolbars_order' parameter on 'toolbars_position' section on init.config user file (found in user path)
-        sorted_toolbar_ids = [tb.property('gw_name') for tb in own_toolbars]
-        sorted_toolbar_ids = ",".join(sorted_toolbar_ids)
-        tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids), "user", "init")
+        self.load_project.project_read(show_warning, self)
 
 
     def save_project(self):

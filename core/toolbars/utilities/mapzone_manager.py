@@ -11,15 +11,14 @@ from functools import partial
 from sip import isdeleted
 
 from qgis.PyQt.QtCore import Qt, QPoint
-from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget
+from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget, QComboBox
 from qgis.PyQt.QtSql import QSqlTableModel
 
 from qgis.gui import QgsMapToolEmitPoint
-from qgis.core import QgsProject
 
+from .toolbox_btn import GwToolBoxButton
 from ...ui.ui_manager import GwMapzoneManagerUi, GwMapzoneConfigUi, GwInfoGenericUi
 from ...utils.snap_manager import GwSnapManager
-from ...shared.info import GwInfo
 from ...utils import tools_gw
 from .... import global_vars
 from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_os
@@ -52,10 +51,7 @@ class GwMapzoneManager:
         tools_gw.load_settings(self.mapzone_mng_dlg)
 
         # Add icons
-        # tools_gw.add_icon(self.dlg_dscenario.btn_toc, "306", sub_folder="24x24")
-        # tools_gw.add_icon(self.dlg_dscenario.btn_insert, "111", sub_folder="24x24")
-        # tools_gw.add_icon(self.dlg_dscenario.btn_delete, "112", sub_folder="24x24")
-        # tools_gw.add_icon(self.dlg_dscenario.btn_snapping, "137")
+        tools_gw.add_icon(self.mapzone_mng_dlg.btn_execute, "311", sub_folder="24x24")
 
         default_tab_idx = 0
         tabs = ['sector', 'dma', 'presszone', 'dqa']
@@ -77,6 +73,7 @@ class GwMapzoneManager:
 
         # Connect signals
         self.mapzone_mng_dlg.txt_name.textChanged.connect(partial(self._txt_name_changed))
+        self.mapzone_mng_dlg.btn_execute.clicked.connect(partial(self._open_mapzones_analysis))
         self.mapzone_mng_dlg.btn_config.clicked.connect(partial(self.manage_config, self.mapzone_mng_dlg, None))
         self.mapzone_mng_dlg.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active))
         self.mapzone_mng_dlg.btn_create.clicked.connect(partial(self.manage_create, self.mapzone_mng_dlg, None))
@@ -214,6 +211,17 @@ class GwMapzoneManager:
         # Refresh model with selected filter
         widget_table.model().setFilter(expr)
         widget_table.model().select()
+
+    def _open_mapzones_analysis(self):
+        """ Opens the toolbox 'mapzones_analysis' with the current type of mapzone set """
+
+        # Execute toolbox function
+        toolbox_btn = GwToolBoxButton(None, None, None, None, None)
+        dlg_functions = toolbox_btn.open_function_by_id(2768)
+
+        # Set mapzone type in combo graphClass
+        mapzone_type = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex())
+        tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'graphClass'), f"{mapzone_type.upper()}", 0)
 
     # region config button
 

@@ -54,6 +54,8 @@ class GwPsector:
         self.tablename_psector_x_connec = "v_edit_plan_psector_x_connec"
         self.tablename_psector_x_gully = "v_edit_plan_psector_x_gully"
 
+        self.previous_map_tool = self.canvas.mapTool()
+
         self.project_type = tools_gw.get_project_type()
 
 
@@ -182,11 +184,11 @@ class GwPsector:
 
         # tab Bugdet
         gexpenses = self.dlg_plan_psector.findChild(QLineEdit, "gexpenses")
-        tools_qt.double_validator(gexpenses)
+        tools_qt.double_validator(gexpenses, min_=0)
         vat = self.dlg_plan_psector.findChild(QLineEdit, "vat")
-        tools_qt.double_validator(vat)
+        tools_qt.double_validator(vat, min_=0)
         other = self.dlg_plan_psector.findChild(QLineEdit, "other")
-        tools_qt.double_validator(other)
+        tools_qt.double_validator(other, min_=0)
 
         self.set_tabs_enabled(False)
         self.enable_buttons(False)
@@ -459,9 +461,9 @@ class GwPsector:
             partial(self.query_like_widget_text, self.dlg_plan_psector, self.dlg_plan_psector.txt_name,
                     self.dlg_plan_psector.all_rows, 'v_price_compost', viewname, "id"))
 
-        self.dlg_plan_psector.gexpenses.returnPressed.connect(partial(self.calculate_percents, 'plan_psector', 'gexpenses'))
-        self.dlg_plan_psector.vat.returnPressed.connect(partial(self.calculate_percents, 'plan_psector', 'vat'))
-        self.dlg_plan_psector.other.returnPressed.connect(partial(self.calculate_percents, 'plan_psector', 'other'))
+        self.dlg_plan_psector.gexpenses.editingFinished.connect(partial(self.calculate_percents, 'plan_psector', 'gexpenses'))
+        self.dlg_plan_psector.vat.editingFinished.connect(partial(self.calculate_percents, 'plan_psector', 'vat'))
+        self.dlg_plan_psector.other.editingFinished.connect(partial(self.calculate_percents, 'plan_psector', 'other'))
 
         self.dlg_plan_psector.btn_doc_insert.clicked.connect(self.document_insert)
         self.dlg_plan_psector.btn_doc_delete.clicked.connect(partial(tools_qt.delete_rows_tableview, self.tbl_document))
@@ -1211,6 +1213,7 @@ class GwPsector:
         # Button unselect
         dialog.btn_remove.clicked.connect(
             partial(self.rows_unselector, dialog, tableright))
+        dialog.btn_set_geom.clicked.connect(partial(self._manage_price_geom, dialog, tableright))
 
 
     def create_label(self, dialog, tbl_all_rows, id_ori, tableright, id_des):
@@ -1278,6 +1281,7 @@ class GwPsector:
                 layout.itemAt(i).widget().deleteLater()
         self._add_price_widgets(dialog, tableright, psector_id, print_all_rows=print_all_rows, print_headers=print_headers)
         self.update_total(dialog)
+        self._manage_buttons_price(dialog)
 
 
     def _add_price_widgets(self, dialog, tableright, psector_id, expl_id=[], editable_widgets=['measurement','observ']
@@ -1314,6 +1318,7 @@ class GwPsector:
                 # Create check
                 check = QCheckBox()
                 check.setObjectName(f"{field['id']}")
+                check.stateChanged.connect(partial(self._manage_buttons_price, dialog))
 
                 layout = dialog.findChild(QGridLayout, 'lyt_price')
                 layout.addWidget(check, self.count, pos)
@@ -1395,13 +1400,67 @@ class GwPsector:
             sql = f"{query}'{selected_ids[i]}' AND psector_id = '{psector_id}'"
             tools_db.execute_sql(sql)
 
-        layout = dialog.findChild(QGridLayout, 'lyt_price')
+        self._manage_widgets_price(dialog, tableright, psector_id, print_all_rows=True, print_headers=True)
 
-        for i in reversed(range(layout.count())):
-            if layout.itemAt(i).widget():
-                layout.itemAt(i).widget().deleteLater()
-        self._add_price_widgets(dialog, tableright, psector_id, print_all_rows=True, print_headers=True)
-        self.update_total(dialog)
+
+    def _manage_buttons_price(self, dialog):
+        """ Get selected prices to enable/disable buttons """
+
+        select_widgets = self.dlg_plan_psector.tab_other_prices.findChildren(QCheckBox)
+        selected_ids = []
+        count = 0
+        for check in select_widgets:
+            if check.isChecked():
+                selected_ids.append(check.objectName())
+            else:
+                count = count + 1
+
+        tools_qt.set_widget_enabled(self.dlg_plan_psector, 'btn_set_geom', False)
+        tools_qt.set_widget_enabled(self.dlg_plan_psector, 'btn_remove', False)
+        if len(selected_ids) == 1:
+            tools_qt.set_widget_enabled(self.dlg_plan_psector, 'btn_set_geom', True)
+        if len(selected_ids) >= 1:
+            tools_qt.set_widget_enabled(self.dlg_plan_psector, 'btn_remove', True)
+
+    def _manage_price_geom(self, dialog, tableright):
+
+        if hasattr(self, 'emit_point') and self.emit_point is not None:
+            tools_gw.disconnect_signal('psector', 'price_geom_ep_canvasClicked_set_price_geom')
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+
+        # Set signals
+        tools_gw.connect_signal(self.emit_point.canvasClicked, partial(self._set_price_geom, dialog, tableright), 'psector',
+                                'price_geom_ep_canvasClicked_set_price_geom')
+
+
+    def _set_price_geom(self, dialog, tableright, point, button):
+        """ Add clicked geom to the_geom column for selected prices """
+
+        if button == Qt.RightButton or point is None:
+            global_vars.canvas.setMapTool(self.previous_map_tool)
+            return
+        # Add clicked geom to the_geom column for selected prices
+        # Get selected price
+        select_widgets = dialog.tab_other_prices.findChildren(QCheckBox)
+        selected_ids = []
+        count = 0
+        for check in select_widgets:
+            if check.isChecked():
+                selected_ids.append(check.objectName())
+            else:
+                count = count + 1
+        if len(selected_ids) != 1:
+            return
+        # Set the_geom
+        the_geom = point.asWkt()
+        sql = f"UPDATE {tableright} SET the_geom = $${the_geom}$$ WHERE id = {selected_ids[0]};"
+        status = tools_db.execute_sql(sql)
+        if status:
+            global_vars.canvas.setMapTool(self.previous_map_tool)
+            msg = "Geometry set correctly."
+            tools_qgis.show_info(msg, dialog=dialog)
+
 
     def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id):
         """ Populate the QTableView by filtering through the QLineEdit """

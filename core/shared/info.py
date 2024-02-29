@@ -37,8 +37,7 @@ from ..threads.toggle_valve_state import GwToggleValveTask
 
 from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, \
-    GwInfoCrossectUi, GwInterpolate, GwInfoEpaDemandUi, GwInfoEpaOrificeUi, GwInfoEpaOutletUi, GwInfoEpaPumpUi, \
-    GwInfoEpaWeirUi, GwInfoEpaDwfUi
+    GwInfoCrossectUi, GwInterpolate
 from ... import global_vars
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_db, tools_os
 from ...libs.tools_qt import GwHyperLinkLineEdit
@@ -2373,7 +2372,8 @@ class GwInfo(QObject):
                     for act in self.visible_tabs[tab]['tabactions']:
                         action = dialog.findChild(QAction, act['actionName'])
                         if action is not None:
-                            action.setToolTip(act['actionTooltip'])
+                            if 'actionTooltip' in act:
+                                action.setToolTip(act['actionTooltip'])
                             action.setVisible(True)
 
         self._enable_actions(dialog, self.action_edit.isChecked())
@@ -3081,6 +3081,11 @@ class GwInfo(QObject):
                     level = int(json_result['message']['level'])
                 tools_qgis.show_message(json_result['message']['text'], level)
 
+            # Refresh tab epa
+            epa_type = tools_qt.get_text(self.dlg_cf, 'tab_data_epa_type')
+            if epa_type and epa_type.lower() in ('valve', 'shortpipe', 'pump'):
+                self._reload_epa_tab(self.dlg_cf)
+
 
     def _cancel_snapping_tool(self, dialog, action):
 
@@ -3483,7 +3488,7 @@ def refresh_epa_tbl(tblview, dlg, **kwargs):
             continue
         id_name = tableview.get('id_name', id_name)
         if dlg == info.dlg_cf:
-            view = tableview['tbl'].replace("tab_epa_", "")
+            view = tbl.property('linkedobject')
         else:
             view = tableview['view']
         complet_list = get_list(view, id_name, feature_id)
@@ -3491,7 +3496,7 @@ def refresh_epa_tbl(tblview, dlg, **kwargs):
         tools_gw.set_tablemodel_config(dlg, tbl, view, schema_name=info.schema_name, isQStandardItemModel=True)
 
 
-def reload_tbl_dscenario (info, tablename, tableview, id_name, feature_id):
+def reload_tbl_dscenario(info, tablename, tableview, id_name, feature_id):
     tbl_name = tablename.replace("tbl", "tbl_dscenario")
     view = tableview.replace("inp", "inp_dscenario")
     tbl = info.dlg.findChild(QTableView, tbl_name)

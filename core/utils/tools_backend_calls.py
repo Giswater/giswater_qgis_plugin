@@ -19,7 +19,6 @@ from qgis.PyQt.QtWidgets import QComboBox
 
 from ... import global_vars
 from ..shared.document import GwDocument
-from ..shared.element import GwElement
 from ..shared.info import GwInfo
 from ..shared.visit import GwVisit
 from ..utils import tools_gw

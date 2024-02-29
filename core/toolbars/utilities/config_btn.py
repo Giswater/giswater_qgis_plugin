@@ -18,7 +18,6 @@ from ..dialog import GwAction
 from ...ui.ui_manager import GwConfigUi
 from ...utils import tools_gw
 from ....libs import lib_vars, tools_qt, tools_db, tools_qgis
-from .... import global_vars
 
 
 class GwConfigButton(GwAction):
