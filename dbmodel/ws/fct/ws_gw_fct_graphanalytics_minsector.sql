@@ -257,12 +257,12 @@ BEGIN
 						SELECT a.arc_id FROM temp_t_arc a 
 							JOIN vu_node ON node_1 = node_id 
 							JOIN man_valve mv using (node_id)
-						WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN (''MINSECTOR'')) and mv.broken is false
+						WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN (''MINSECTOR''))
 						UNION 
 						SELECT a.arc_id FROM temp_t_arc a 
 							JOIN vu_node ON node_2 = node_id 
 							JOIN man_valve mv using (node_id)
-						WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN (''MINSECTOR'')) and mv.broken is false)a
+						WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN (''MINSECTOR'')))a
 			WHERE temp_t_anlgraph.arc_id = a.arc_id';
 		
 		elsif v_ignorebrokenvalves is true then
@@ -271,12 +271,14 @@ BEGIN
 							SELECT a.arc_id FROM temp_t_arc a 
 								JOIN vu_node ON node_1 = node_id 
 								JOIN man_valve mv using (node_id)
-							WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN (''MINSECTOR''))
+							WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN (''MINSECTOR''))  
+								AND ((mv.broken is false and mv.closed is false) or (mv.broken is true and mv.closed is true) OR (mv.broken is false and mv.closed is true))
 							UNION 
 							SELECT a.arc_id FROM temp_t_arc a 
 								JOIN vu_node ON node_2 = node_id 
 								JOIN man_valve mv using (node_id)
-							WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN (''MINSECTOR'')))a
+							WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN (''MINSECTOR''))  
+								AND ((mv.broken is false and mv.closed is false) or (mv.broken is true and mv.closed is true) OR (mv.broken is false and mv.closed is true)))a
 				WHERE temp_t_anlgraph.arc_id = a.arc_id';
 		end if;
 					                                           
@@ -294,26 +296,53 @@ BEGIN
 		END LOOP;
 
 		-- fusioning parts of each temp_minsectors in one unique temp_minsector 
-		create temp view v_t_process as 
-		SELECT * FROM 
-		(
-		SELECT node_id FROM 
-		(SELECT node_1 AS node_id, trace FROM temp_t_anlgraph UNION SELECT node_2, trace FROM temp_t_anlgraph ORDER BY 1)a
-		JOIN vu_node USING (node_id) 
-		WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter !='MINSECTOR') group by node_id having count(*) > 1
-		ORDER BY 1
-		) a JOIN  
-		(
-		SELECT a.* FROM 
-		(SELECT node_1 AS node_id, trace FROM temp_t_anlgraph UNION SELECT node_2, trace FROM temp_t_anlgraph ORDER BY 1)a
-		JOIN vu_node USING (node_id) 
-		WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter !='MINSECTOR')
-		ORDER BY 1
-		) b USING (node_id)
-		JOIN 
-		(SELECT trace, count(*) FROM temp_t_anlgraph GROUP BY trace) c USING (trace)
-		order by 2, 3 desc;
+		IF v_ignorebrokenvalves IS FALSE THEN 
+			create temp view v_t_process as 
+			SELECT * FROM 
+			(
+			SELECT node_id FROM 
+			(SELECT node_1 AS node_id, trace FROM temp_t_anlgraph UNION SELECT node_2, trace FROM temp_t_anlgraph ORDER BY 1)a
+			JOIN vu_node USING (node_id) 
+			WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter !='MINSECTOR') group by node_id having count(*) > 1
+			ORDER BY 1
+			) a JOIN  
+			(
+			SELECT a.* FROM 
+			(SELECT node_1 AS node_id, trace FROM temp_t_anlgraph UNION SELECT node_2, trace FROM temp_t_anlgraph ORDER BY 1)a
+			JOIN vu_node USING (node_id) 
+			WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter !='MINSECTOR')
+			ORDER BY 1
+			) b USING (node_id)
+			JOIN 
+			(SELECT trace, count(*) FROM temp_t_anlgraph GROUP BY trace) c USING (trace)
+			order by 2, 3 desc;
+			
+		ELSE
+			create temp view v_t_process as 
+			SELECT * FROM 
+			(
+			SELECT node_id FROM 
+			(SELECT node_1 AS node_id, trace FROM temp_t_anlgraph UNION SELECT node_2, trace FROM temp_t_anlgraph ORDER BY 1)a
+			JOIN vu_node USING (node_id) 
+			left join man_valve mv using (node_id)
+			WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter !='MINSECTOR' OR (mv.broken IS TRUE AND mv.closed IS FALSE 
+			AND graph_delimiter ='MINSECTOR')) group by node_id having count(*) > 1
+			ORDER BY 1
+			) a JOIN  
+			(
+			SELECT a.* FROM 
+			(SELECT node_1 AS node_id, trace FROM temp_t_anlgraph UNION SELECT node_2, trace FROM temp_t_anlgraph ORDER BY 1)a
+			JOIN vu_node USING (node_id) 
+			LEFT JOIN man_valve mv using (node_id)
+			WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter !='MINSECTOR' OR (mv.broken IS TRUE AND mv.closed IS FALSE 
+			and graph_delimiter ='MINSECTOR'))
+			ORDER BY 1
+			) b USING (node_id)
+			JOIN 
+			(SELECT trace, count(*) FROM temp_t_anlgraph GROUP BY trace) c USING (trace)
+			order by 2, 3 desc;
 
+		END IF;
 		v_cont1 = 0;
 
 		LOOP
