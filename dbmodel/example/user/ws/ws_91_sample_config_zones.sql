@@ -44,10 +44,10 @@ INSERT INTO config_param_user VALUES ('utils_checkproject_database', 'false', cu
 INSERT INTO config_param_user VALUES ('edit_arc_insert_automatic_endpoint', 'false', current_user);
 INSERT INTO config_param_user VALUES ('qgis_form_initproject_hidden', 'true', current_user);
 INSERT INTO config_param_user VALUES ('inp_options_buildup_supply', '{"reservoir":{"switch2Junction":["ETAP", "POU", "CAPTACIO"]},
-"tank":{"distVirtualReservoir":0.01}, 
-"pressGroup":{"status":"ACTIVE", "forceStatus":"ACTIVE", "defaultCurve":"GP30"}, 
-"pumpStation":{"status":"CLOSED", "forceStatus":"CLOSED", "defaultCurve":"IM00"}, 
-"PRV":{"status":"ACTIVE", "forceStatus":"ACTIVE", "pressure":"30"}, 
+"tank":{"distVirtualReservoir":0.01},
+"pressGroup":{"status":"ACTIVE", "forceStatus":"ACTIVE", "defaultCurve":"GP30"},
+"pumpStation":{"status":"CLOSED", "forceStatus":"CLOSED", "defaultCurve":"IM00"},
+"PRV":{"status":"ACTIVE", "forceStatus":"ACTIVE", "pressure":"30"},
 "PSV":{"status":"ACTIVE", "forceStatus":"ACTIVE", "pressure":"30"}
 }', current_user);
 INSERT INTO config_param_user VALUES ('inp_options_advancedsettings', '{"status":false, "parameters":{"junction":{"baseDemand":0},  "reservoir":{"addElevation":1},  "tank":{"addElevation":1}, "valve":{"length":"0.3", "diameter":"100", "minorloss":0.2, "roughness":{"H-W":100, "D-W":0.5, "C-M":0.011}},"pump":{"length":0.3, "diameter":100, "roughness":{"H-W":100, "D-W":0.5, "C-M":0.011}}}}', current_user);
@@ -56,8 +56,8 @@ INSERT INTO config_param_user VALUES ('utils_formlabel_show_columname', 'false',
 INSERT INTO config_param_user VALUES ('qgis_init_guide_map', 'false', current_user);
 INSERT INTO config_param_user VALUES ('qgis_form_log_hidden', 'false', current_user);
 INSERT INTO config_param_user VALUES ('om_profile_stylesheet', '{"title":{"text":{"color":"black", "weight":"bold", "size":10}},
-"terrain":{"color":"gray", "width":1.5, "style":"dashdot"}, 
-"infra":{"real":{"color":"black", "width":1, "style":"solid"}, 
+"terrain":{"color":"gray", "width":1.5, "style":"dashdot"},
+"infra":{"real":{"color":"black", "width":1, "style":"solid"},
 "interpolated":{"color":"black", "width":1.5,"style":"dashed"}},
 "grid":{"boundary":{"color":"gray","style":"solid", "width":1}, "lines":{"color":"lightgray","style":"solid", "width":1},"text":{"color":"black", "weight":"normal"}},
 "guitar":{"lines":{"color":"black", "style":"solid", "width":1}, "auxiliarlines":{"color":"gray","style":"solid", "width":1}, "text":{"color":"black", "weight":"normal"}}}', current_user);
