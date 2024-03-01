@@ -251,7 +251,7 @@ BEGIN
 		WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND state=1  AND '||v_expl_query||'  '||v_psectors_query_arc||';';
 			
 		-- set the starting element
-		if v_ignorebrokenvalves is false then     
+		if v_ignorebrokenvalves is true then     
 			v_querytext = 'UPDATE temp_t_anlgraph SET flag=1, water=1, checkf=1, trace=a.arc_id::integer 
 					FROM (
 						SELECT a.arc_id FROM temp_t_arc a 
@@ -265,7 +265,7 @@ BEGIN
 						WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN (''MINSECTOR'')))a
 			WHERE temp_t_anlgraph.arc_id = a.arc_id';
 		
-		elsif v_ignorebrokenvalves is true then
+		elsif v_ignorebrokenvalves is false then
 			v_querytext = 'UPDATE temp_t_anlgraph SET flag=1, water=1, checkf=1, trace=a.arc_id::integer 
 						FROM (
 							SELECT a.arc_id FROM temp_t_arc a 
@@ -296,7 +296,7 @@ BEGIN
 		END LOOP;
 
 		-- fusioning parts of each temp_minsectors in one unique temp_minsector 
-		IF v_ignorebrokenvalves IS FALSE THEN 
+		IF v_ignorebrokenvalves IS TRUE THEN 
 			create temp view v_t_process as 
 			SELECT * FROM 
 			(
@@ -317,7 +317,7 @@ BEGIN
 			(SELECT trace, count(*) FROM temp_t_anlgraph GROUP BY trace) c USING (trace)
 			order by 2, 3 desc;
 			
-		ELSE
+		ELSIF v_ignorebrokenvalves IS FALSE THEN 
 			create temp view v_t_process as 
 			SELECT * FROM 
 			(
