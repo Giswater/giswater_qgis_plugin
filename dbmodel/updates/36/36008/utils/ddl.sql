@@ -7,6 +7,4 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
-
-DROP FUNCTION IF EXISTS gw_trg_notify() cascade;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_other", "column":"the_geom", "dataType":"geometry(POINT, SRID_VALUE)"}}$$);

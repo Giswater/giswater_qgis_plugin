@@ -174,6 +174,7 @@ BEGIN
 
 			-- set the closed valve
 			UPDATE temp_t_anlgraph SET flag = 1 WHERE arc_id IN (SELECT node_id FROM temp_om_mincut_valve WHERE closed is true);
+			UPDATE temp_t_anlgraph SET flag = 1 WHERE arc_id IN (SELECT node_id FROM temp_om_mincut_valve WHERE proposed is true); 
 
 			-- close the starting elements on the opossite sense
 			UPDATE temp_t_anlgraph SET flag = 1 WHERE arc_id IN (SELECT node_id FROM temp_om_mincut_valve WHERE flag)

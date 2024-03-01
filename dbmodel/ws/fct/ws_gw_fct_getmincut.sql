@@ -369,7 +369,8 @@ BEGIN
 
     ELSE
     -- mincut details
-    SELECT * INTO v_mincutrec FROM om_mincut WHERE id::text = v_mincut::text;
+    SELECT * INTO v_mincutrec FROM om_mincut WHERE id::text = v_mincutid::text;
+    DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=216;
     INSERT INTO audit_check_data (fid, error_message) VALUES (216, '');
     INSERT INTO audit_check_data (fid, error_message) VALUES (216, 'Mincut stats');
     INSERT INTO audit_check_data (fid, error_message) VALUES (216, '-----------------');

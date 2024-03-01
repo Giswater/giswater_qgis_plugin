@@ -377,7 +377,7 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 		IF v_count > 0 THEN
 			EXECUTE 'INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
-			SELECT v_fid, 2, 367, concat(''WARNING-367: There is/are '','||v_count||',
+			SELECT '||v_fid||', 2, 367, concat(''WARNING-367: There is/are '','||v_count||',
 			'' arc(s) that are configured as toArc for '','''||rec||''','' but is not operative on arc table. Arc_id - '',
 			string_agg(concat('''||rec||':'',zone_id,''-'',a.arc_id),'', ''),''.''), '||v_count||' FROM('|| v_querytext||')a';
 		ELSE
@@ -392,7 +392,7 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 		IF v_count > 0 THEN
 			EXECUTE 'INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
-			SELECT v_fid, 2, 367, concat(''WARNING-367: There is/are '','||v_count||',
+			SELECT '||v_fid||', 2, 367, concat(''WARNING-367: There is/are '','||v_count||',
 			'' node(s) that are configured as nodeParent for '','''||rec||''','' but is not operative on node table. Node_id - '',
 			string_agg(concat('''||rec||':'',zone_id,''-'',a.node_id::text),'', ''),''.''), '||v_count||' FROM('|| v_querytext||')a';
 		ELSE

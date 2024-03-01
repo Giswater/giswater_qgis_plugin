@@ -42,7 +42,7 @@ BEGIN
 	
 		IF psector_type_aux='plan' THEN
 			UPDATE plan_psector_x_other
-			SET measurement=NEW.measurement, observ=NEW.observ
+			SET measurement=NEW.measurement, observ=NEW.observ, the_geom=NEW.the_geom
 			WHERE id=OLD.id;
 			
 		ELSIF psector_type_aux='om' THEN

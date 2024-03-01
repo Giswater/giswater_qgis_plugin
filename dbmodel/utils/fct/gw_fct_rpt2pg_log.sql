@@ -29,7 +29,7 @@ v_project_type text;
 v_version text;
 v_stats json;
 v_error_context text;
-v_status text;
+v_status text = 'Accepted';
 
 BEGIN
 
@@ -46,27 +46,21 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 4, concat('Imported by: ', current_user, ', on ', to_char(now(),'YYYY-MM-DD HH:MM:SS')));
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 4, '');
 
-	v_status  = p_return ->>'status';
-
 	IF v_project_type = 'WS' THEN
 
 		IF (SELECT count(*) FROM rpt_arc WHERE result_id = p_result) < 1 THEN
 
 			-- errors
-			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, 'CRITICAL ERRORS');
-			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, '----------------------');
-			IF v_status = 'Failed' THEN
-				INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) 
-				VALUES (114, p_result, 3, 'The import function have been failed. This is because some data of rpt file has not values according standard format. PLEASE REVIEW your rpt file and your options data!!!');
-			ELSE 
-			
-				INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
-				SELECT 114, p_result, 3, concat(csv1, ' ', csv2,' ', csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12, ' ',csv13, ' ',
-				csv14, ' ',csv15, ' ',csv16, ' ',csv17, ' ',csv18, ' ',csv19, ' ',csv20)
-				FROM temp_csv WHERE fid=140 and csv1 !='*';
-			END IF;
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 4, '------------------------------------------------------------------');
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) 
+			VALUES (114, p_result, 3, UPPER('CRITICAL ERROR: The import file have been failed.'));
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, '');
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) 
+			VALUES (114, p_result, 3, 'HINT: Take a look on the RPT file OR Export INP file again without ''Execute EPA software'' & ''Import Results'' in order to check and fix errors.');
 
-		ELSE		
+			v_status = 'Failed';
+		ELSE	
+					
 			-- basic statistics
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, 'BASIC STATISTICS');
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '-----------------------');
@@ -90,6 +84,7 @@ BEGIN
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 			SELECT 114, p_result, 2, concat (time, ' ', text) FROM rpt_hydraulic_status WHERE result_id = p_result AND time = 'WARNING:';
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 2, '');
+	
 		END IF;
 
 	ELSIF v_project_type = 'UD' THEN
@@ -97,13 +92,15 @@ BEGIN
 		IF (SELECT count(*) FROM rpt_arcflow_sum WHERE result_id = p_result) < 1 THEN
 		
 			-- errors
-			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, 'CRITICAL ERRORS');
-			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, '----------------------');
-			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
-			SELECT 114, p_result, 3, concat(csv1, ' ', csv2,' ', csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12, ' ',csv13, ' ',
-			csv14, ' ',csv15, ' ',csv16, ' ',csv17, ' ',csv18, ' ',csv19, ' ',csv20)
-			FROM temp_csv WHERE fid=140 and csv1 !='*';
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 4, '------------------------------------------------------------------');
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) 
+			VALUES (114, p_result, 3, UPPER('CRITICAL ERROR: The import file have been failed.'));
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, '');
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) 
+			VALUES (114, p_result, 3, 'HINT: Take a look on the RPT file OR Export INP file again without ''Execute EPA software'' & ''Import Results'' in order to check and fix errors.');
 
+			v_status = 'Failed';
+			
 		ELSE
 			-- basic statistics
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, 'BASIC STATISTICS');
@@ -144,22 +141,26 @@ BEGIN
 		END IF;
 	END IF;
 
-	v_stats = (SELECT array_to_json(array_agg(error_message)) FROM temp_audit_check_data WHERE result_id='stats' AND fid=114 AND cur_user=current_user);
+	IF v_status = 'Accepted' THEN
 
-	UPDATE rpt_cat_result SET rpt_stats = v_stats WHERE result_id=p_result;
+		v_stats = (SELECT array_to_json(array_agg(error_message)) FROM temp_audit_check_data WHERE result_id='stats' AND fid=114 AND cur_user=current_user);
 
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
-	SELECT 114, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv
-	where fid = 11 and source='rpt_cat_result' and cur_user=current_user;
+		UPDATE rpt_cat_result SET rpt_stats = v_stats WHERE result_id=p_result;
+
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
+		SELECT 114, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv
+		where fid = 11 and source='rpt_cat_result' and cur_user=current_user;
 
 
-	-- detalied user inp options
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, 'DETAILED USER INPUT OPTIONS');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '----------------------------------------');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
-	SELECT 114, p_result, 1, concat (label, ' : ', value) FROM config_param_user 
-	JOIN sys_param_user a ON a.id=parameter WHERE cur_user=current_user AND formname='epaoptions' AND value is not null;
+		-- detalied user inp options
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '');
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, 'DETAILED USER INPUT OPTIONS');
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '----------------------------------------');
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
+		SELECT 114, p_result, 1, concat (label, ' : ', value) FROM config_param_user 
+		JOIN sys_param_user a ON a.id=parameter WHERE cur_user=current_user AND formname='epaoptions' AND value is not null;
+
+	END IF;
 	
 	-- get results
 	-- info

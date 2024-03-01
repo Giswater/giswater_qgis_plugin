@@ -108,14 +108,17 @@ BEGIN
 
 		-- Manage primary key
 		EXECUTE 'SELECT addparam FROM sys_table WHERE id = $1' INTO v_addparam USING v_tablename;
-		v_idname_array := string_to_array(v_idname, ', ');
+		IF v_addparam IS NOT NULL THEN
+			v_idname_array := string_to_array((v_addparam::json->> 'pkey'), ', ');
+		END IF;
+
 		if v_idname_array is null THEN
 			EXECUTE 'SELECT gw_fct_getpkeyfield('''||v_tablename||''');' INTO v_idname;
 			v_idname_array := string_to_array(v_idname, ', ');
 		end if;
 
 		v_id_array := string_to_array(v_id, ', ');
-		IF v_idname IS NOT NULL then
+		IF v_idname_array IS NOT NULL then
 
 			FOREACH idname IN ARRAY v_idname_array LOOP
 				EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a

@@ -7,6 +7,5 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
-
-DROP FUNCTION IF EXISTS gw_trg_notify() cascade;
+CREATE TRIGGER gw_trg_edit_ve_epa_virtualpump INSTEAD OF INSERT OR DELETE OR UPDATE 
+ON ve_epa_virtualpump FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('virtualpump');

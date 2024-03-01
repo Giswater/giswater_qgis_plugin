@@ -51,6 +51,7 @@ v_builtdate date;
 v_nodecat_id text;
 v_arclist json;
 v_count integer;
+v_node_id text;
 
 BEGIN
 
@@ -96,10 +97,11 @@ BEGIN
 		IF numNodes = 0 THEN
 			IF v_insertnode THEN
 				INSERT INTO v_edit_node (expl_id, workcat_id, state, state_type, builtdate, node_type, the_geom, nodecat_id) 
-				VALUES (v_expl, v_workcat, v_state, v_state_type, v_builtdate, v_nodetype_id, rec_table.geom_point, v_nodecat_id);
+				VALUES (v_expl, v_workcat, v_state, v_state_type, v_builtdate, v_nodetype_id, rec_table.geom_point, v_nodecat_id)
+				RETURNING node_id INTO v_node_id;
 
-				INSERT INTO anl_node (the_geom, state, fid, expl_id, nodecat_id) 
-				VALUES (rec_table.geom_point, v_state, 116, v_expl, v_nodecat_id);
+				INSERT INTO anl_node (node_id, the_geom, state, fid, expl_id, nodecat_id) 
+				VALUES (v_node_id, rec_table.geom_point, v_state, 116, v_expl, v_nodecat_id);
 
 			ELSE 
 				INSERT INTO anl_node (the_geom, state, fid, expl_id, nodecat_id) 

@@ -8,5 +8,4 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-
-DROP FUNCTION IF EXISTS gw_trg_notify() cascade;
+ALTER TABLE anl_node ALTER COLUMN node_id DROP NOT NULL;

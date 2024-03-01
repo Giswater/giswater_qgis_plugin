@@ -7,6 +7,5 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
-
-DROP FUNCTION IF EXISTS gw_trg_notify() cascade;
+CREATE TRIGGER gw_trg_plan_psector_x_other_geom AFTER INSERT OR UPDATE OR DELETE  ON plan_psector_x_other
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_geom('plan');

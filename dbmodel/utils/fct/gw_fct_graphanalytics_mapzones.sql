@@ -1371,7 +1371,12 @@ BEGIN
 		END IF;
 
 		-- mapzone
-		v_querytext = 'UPDATE '||v_table||' SET the_geom = t.the_geom FROM temp_'||v_table||' t WHERE t.'||v_field||' = '||v_table||'.'||v_field;
+		IF v_floodonlymapzone IS NULL THEN
+			v_querytext = 'UPDATE '||v_table||' SET the_geom = t.the_geom FROM temp_'||v_table||' t WHERE t.'||v_field||' = '||v_table||'.'||v_field;
+		ELSE
+			v_querytext = 'UPDATE '||v_table||' m SET the_geom = t.the_geom FROM temp_'||v_table||' t WHERE t.'||v_field||' = m.'||v_field||' AND m.'||quote_ident(v_field)||'::integer IN ('||v_floodonlymapzone||')';
+		END IF;
+
 		EXECUTE v_querytext;
 
 		-- arcs
