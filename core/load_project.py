@@ -143,6 +143,9 @@ class GwLoadProject(QObject):
         if tools_os.set_boolean(force_tab_expl, False):
             self._force_tab_exploitation()
 
+        # Manage epa POV
+        tools_gw.set_epa_world(False, is_init=True)
+
         # Set lib_vars.project_epsg
         lib_vars.project_epsg = tools_qgis.get_epsg()
         tools_gw.connect_signal(QgsProject.instance().crsChanged, tools_gw.set_epsg,
