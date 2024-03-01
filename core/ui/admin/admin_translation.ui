@@ -168,6 +168,13 @@
         </property>
        </widget>
       </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="chk_refresh_i18n">
+        <property name="text">
+         <string>Refresh i18n translations</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

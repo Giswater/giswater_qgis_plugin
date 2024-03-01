@@ -82,6 +82,8 @@ class GwI18NGenerator:
 
         py_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_msg)
         db_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_db_msg)
+        refresh_i18n = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_refresh_i18n)
+
         self.dlg_qm.lbl_info.clear()
         msg = ''
         self.language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
@@ -103,6 +105,15 @@ class GwI18NGenerator:
                 msg += "Database translation failed\n"
             elif status_cfg_msg is None:
                 msg += "Database translation canceled\n"
+
+        if refresh_i18n:
+            status_i18n_msg = self._create_i18n_files()
+            if status_i18n_msg is True:
+                msg += "Database i18n translation successful\n"
+            elif status_i18n_msg is False:
+                msg += "Database i18n translation failed\n"
+            elif status_i18n_msg is None:
+                msg += "Database i18n translation canceled\n"
 
         if msg != '':
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
@@ -281,6 +292,38 @@ class GwI18NGenerator:
 
         return True
 
+    def _create_i18n_files(self):
+        """ Read the values of the database and update the i18n files """
+
+        major_version = tools_qgis.get_major_version(plugin_dir=self.plugin_dir).replace(".", "")
+        ver_build = tools_qgis.get_build_version(plugin_dir=self.plugin_dir)
+
+        cfg_path = f"{self.plugin_dir}{os.sep}dbmodel{os.sep}i18n{os.sep}{self.language}{os.sep}"
+        file_name = f'dml.sql'
+
+        # Check if file exist
+        if os.path.exists(cfg_path + file_name):
+            msg = "Are you sure you want to overwrite this file?"
+            answer = tools_qt.show_question(msg, "Overwrite", parameter=f"\n\n{cfg_path}{file_name}")
+            if not answer:
+                return None
+        else:
+            os.makedirs(cfg_path, exist_ok=True)
+
+        self._write_header(cfg_path + file_name)
+
+        rows = self._get_dbdialog_values_i18n()
+        if not rows:
+            return False
+        self._write_dbdialog_values_i18n(rows, cfg_path + file_name)
+
+        rows = self._get_dbmessages_values_i18n()
+        if not rows:
+            return False
+        self._write_dbmessages_values_i18n(rows, cfg_path + file_name)
+
+        return True
+
 
     def _get_dbdialog_values(self):
         """ Get db dialog values """
@@ -305,6 +348,125 @@ class GwI18NGenerator:
         if not rows:
             return False
         return rows
+
+
+    def _get_dbdialog_values_i18n(self):
+        """ Get db dialog values """
+
+        sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_us, lb_{self.lower_lang}, tt_en_us, "
+               f"tt_{self.lower_lang} "
+               f"FROM i18n.dbdialog "
+               f"ORDER BY context, formname;")
+        rows = self._get_rows(sql)
+        if not rows:
+            return False
+        return rows
+    def _get_dbmessages_values_i18n(self):
+        """ Get db messages values """
+
+        sql = (f"SELECT source, project_type, context, ms_en_us, ms_{self.lower_lang}, ht_en_us, ht_{self.lower_lang}, log_level"
+               f" FROM i18n.dbmessage "
+               f" ORDER BY context;")
+        rows = self._get_rows(sql)
+        if not rows:
+            return False
+        return rows
+
+    def _write_dbdialog_values_i18n(self, rows, path):
+        """
+        Generate a string and write into file
+            :param rows: List of values ([List][List])
+            :param path: Full destination path (String)
+            :return: (Boolean)
+        """
+
+        file = open(path, "a")
+
+        for row in rows:
+            # Get values
+            table = row['context'] if row['context'] is not None else ""
+            form_name = row['formname']if row['formname'] is not None else ""
+            form_type = row['formtype']if row['formtype'] is not None else ""
+            source = row['source']if row['source'] is not None else ""
+            lbl_value = row[f'lb_{self.lower_lang}'] if row[f'lb_{self.lower_lang}'] is not None else row['lb_en_us']
+            lbl_value = lbl_value if lbl_value is not None else ""
+            if row[f'tt_{self.lower_lang}'] is not None:
+                tt_value = row[f'tt_{self.lower_lang}']
+            elif row[f'tt_en_us'] is not None:
+                tt_value = row[f'tt_en_us']
+            else:
+                tt_value = row['lb_en_us']
+            tt_value = tt_value if tt_value is not None else ""
+
+            # Check invalid characters
+            lbl_value = lbl_value.replace("'", "''") if lbl_value is not None else lbl_value
+            tt_value = tt_value.replace("'", "''") if tt_value is not None else tt_value
+            if lbl_value is not None and "\n" in lbl_value:
+                lbl_value = self._replace_invalid_characters(lbl_value)
+            if tt_value is not None and "\n" in tt_value:
+                tt_value = self._replace_invalid_characters(tt_value)
+
+            line = f'UPDATE {table} '
+            if row['context'] in ('config_param_system', 'sys_param_user'):
+                line += f'SET label = \'{lbl_value}\', tooltip = \'{tt_value}\' '
+            elif row['context'] in 'config_typevalue':
+                line += f'SET idval = \'{tt_value}\' '
+            elif row['context'] not in ('config_param_system', 'sys_param_user'):
+                line += f'SET label = \'{lbl_value}\', tooltip = \'{tt_value}\' '
+
+            # Clause WHERE for each context
+            if row['context'] == 'config_form_fields':
+                line += f'WHERE formname = \'{form_name}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\' '
+            elif row['context'] == 'config_form_tabs':
+                line += f'WHERE formname = \'{form_name}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\' '
+            elif row['context'] == 'config_form_groupbox':
+                line += f'WHERE formname = \'{form_name}\' AND layout_if = \'{source}\' '
+            elif row['context'] == 'config_typevalue':
+                line += f'WHERE formname = \'{form_name}\' AND id = \'{source}\' '
+            elif row['context'] == 'config_param_system':
+                line += f'WHERE parameter = \'{source}\' '
+            elif row['context'] == 'sys_param_user':
+                line += f'WHERE id = \'{source}\' '
+
+            line += f';\n'
+            file.write(line)
+        file.close()
+        del file
+
+    def _write_dbmessages_values_i18n(self, rows, path):
+        """
+        Generate a string and write into file
+            :param rows: List of values ([List][List])
+            :param path: Full destination path (String)
+            :return: (Boolean)
+        """
+
+        file = open(path, "a")
+
+        for row in rows:
+            # Get values
+            table = row['context'] if row['context'] is not None else ""
+            source = row['source'] if row['source'] is not None else ""
+            project_type = row['project_type'] if row['project_type'] is not None else ""
+            log_level = row['log_level'] if row['log_level'] is not None else 2
+            ms_value = row[f'ms_{self.lower_lang}'] if row[f'ms_{self.lower_lang}'] is not None else row['ms_en_us']
+            ht_value = row[f'ht_{self.lower_lang}'] if row[f'ht_{self.lower_lang}'] is not None else row['ht_en_us']
+
+            # Check invalid characters
+            ms_value = ms_value.replace("'", "''") if ms_value is not None else ms_value
+            ht_value = ht_value.replace("'", "''") if ht_value is not None else ht_value
+            if ms_value is not None and "\n" in ms_value:
+                ms_value = self._replace_invalid_characters(ms_value)
+            if ht_value is not None and "\n" in ht_value:
+                ht_value = self._replace_invalid_characters(ht_value)
+
+
+            line = f'INSERT INTO {table} (id, error_message, hint_message, log_level, show_user, project_type, source) ' \
+                   f'VALUES ({source}, \'{ms_value}\', \'{ht_value}\', {log_level}, true, \'{project_type}\', \'core\');\n'
+
+            file.write(line)
+        file.close()
+        del file
 
 
     def _write_header(self, path):
