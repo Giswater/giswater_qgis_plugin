@@ -10,7 +10,9 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_node_rotation_update()
   RETURNS trigger AS
 $BODY$
 DECLARE 
-    rec_arc Record; 
+	v_version text;
+	v_project_type text;
+    rec_arc Record;
     v_hemisphere boolean;
     hemisphere_rotation_aux float;
     v_rotation float;
@@ -20,9 +22,9 @@ DECLARE
     intersect_loc	 double precision;
     v_rotation_disable boolean;
     v_numarcs integer;
-    
-        
-BEGIN 
+
+
+BEGIN
 
 -- The goal of this function are two:
 --1) to update automatic rotation node values using the hemisphere values when the variable edit_noderotation_disable_update is TRUE
@@ -30,9 +32,17 @@ BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
+	-- select config values
+	SELECT giswater, upper(project_type) INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
+
 	-- get parameters;
-	SELECT choose_hemisphere INTO v_hemisphere FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id limit 1;
-	SELECT num_arcs INTO v_numarcs FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id limit 1;
+	IF v_project_type = 'WS' THEN
+		SELECT choose_hemisphere INTO v_hemisphere FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id limit 1;
+		SELECT num_arcs INTO v_numarcs FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id limit 1;
+	ELSIF v_project_type = 'UD' then
+		SELECT choose_hemisphere INTO v_hemisphere FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.nodetype WHERE cat_node.id=NEW.nodecat_id limit 1;
+		SELECT num_arcs INTO v_numarcs FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat limit 1;
+	END IF;
 	SELECT value::boolean INTO v_rotation_disable FROM config_param_user WHERE parameter='edit_noderotation_update_dsbl' AND cur_user=current_user;
 
 	-- for disconnected nodes
