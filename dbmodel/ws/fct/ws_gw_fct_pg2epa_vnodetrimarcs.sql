@@ -62,14 +62,14 @@ BEGIN
 			AND c.epa_type = 'JUNCTION' AND l.vnode_type = 'ARC'
 		UNION	
 			-- ficticius vnode coming from temp_table (using values created by gw_fct_pg2epa_breakpipes function)
-			SELECT distinct on (temp_table.id) concat('VN',temp_table.id) as vnode_id, 
+			SELECT distinct on (temp_t_table.id) concat('VN',temp_t_table.id) as vnode_id, 
 			arc_id, 
 			case 	
 				when st_linelocatepoint (temp_t_arc.the_geom , geom_point) > 0.9999 then 0.9999
 				when st_linelocatepoint (temp_t_arc.the_geom , geom_point) < 0.0001 then 0.0001
 				else (st_linelocatepoint (temp_t_arc.the_geom , geom_point))::numeric(12,4) end as locate,
 			null::numeric as elevation
-			FROM temp_t_arc , temp_table
+			FROM temp_t_arc , temp_t_table
 			WHERE st_dwithin ( temp_t_arc.the_geom, geom_point, 0.01) 
 			AND temp_t_arc.arc_type NOT IN ('NODE2ARC', 'LINK') AND temp_t_arc.state > 0
 		UNION 
