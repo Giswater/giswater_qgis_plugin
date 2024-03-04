@@ -68,6 +68,9 @@ v_querytext text;
 v_iseditable boolean;
 v_deleted_dscenario text;
 v_deleted_psector text;
+v_deleted_sector text;
+v_deleted_result text;
+
 BEGIN
 
 	-- search path
@@ -210,7 +213,7 @@ BEGIN
 			END IF;
 			DELETE FROM cat_workspace WHERE id=v_workspace_id;
 			v_return_msg = 'Workspace successfully deleted';
-
+			v_return_level = 3;
 		END IF;
 		
 	ELSIF v_action = 'CREATE' AND v_audit_result is null THEN
@@ -223,6 +226,7 @@ BEGIN
 		ON CONFLICT (parameter, cur_user) DO UPDATE SET value=v_workspace_id;
 
 		v_return_msg = 'Workspace successfully created';
+		v_return_level = 3;
 
 	ELSIF v_action = 'UPDATE' THEN
 		IF v_iseditable IS NOT TRUE THEN
@@ -232,6 +236,9 @@ BEGIN
 			-- update configuration of selected workspace
 			UPDATE cat_workspace SET name = v_workspace_name, descript = v_workspace_descript, config = v_workspace_config, private = v_workspace_private WHERE id = v_workspace_id;
 		END IF;
+
+		v_return_msg = 'Workspace successfully updated';
+		v_return_level = 3;
 		
 	ELSIF v_action = 'CURRENT' THEN
 		
@@ -290,6 +297,7 @@ BEGIN
 				v_selector_value = json_extract_path_text(rec_selector,v_selector_name);
 
 				IF v_selector_value IS NOT NULL THEN 
+				
 					--insert values into selectors with more than 1 field
 					IF v_project_type = 'UD' AND v_selector_name IN ('selector_rpt_compare_tstep', 'selector_rpt_main_tstep', 'selector_date')
 					OR v_project_type = 'WS' AND v_selector_name IN ('selector_date') THEN
@@ -303,6 +311,16 @@ BEGIN
 							VALUES ('||rec_selectorcolumn.values||' );';
 					
 						END LOOP;
+						
+					--insert values into selectors with 1 field
+					ELSIF v_selector_name = 'selector_sector' THEN
+
+							EXECUTE 'SELECT string_agg(value::text, '', '')  FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer NOT IN (SELECT sector_id FROM sector)'
+							INTO v_deleted_sector;
+
+							EXECUTE 'INSERT INTO selector_sector
+							SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer IN (SELECT sector_id FROM sector);';
+
 					ELSIF v_selector_name = 'selector_psector' THEN
 
 							EXECUTE 'SELECT string_agg(value::text, '', '')  FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer NOT IN (SELECT psector_id FROM plan_psector)'
@@ -310,6 +328,7 @@ BEGIN
 
 							EXECUTE 'INSERT INTO selector_psector
 							SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer IN (SELECT psector_id FROM plan_psector);';
+					
 					ELSIF v_selector_name = 'selector_inp_dscenario' THEN
 
 							EXECUTE 'SELECT string_agg(value::text, '', '') FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer NOT IN (SELECT dscenario_id FROM cat_dscenario)'
@@ -317,8 +336,18 @@ BEGIN
 
 							EXECUTE 'INSERT INTO selector_inp_dscenario
 							SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer IN (SELECT dscenario_id FROM cat_dscenario);';
+					
+					ELSIF v_selector_name in ('selector_rpt_main', 'selector_rpt_compare') THEN
+
+							EXECUTE 'SELECT string_agg(value::text, '', '') FROM json_array_elements_text('''||v_selector_value||''') WHERE value::text 
+							NOT IN (SELECT result_id FROM rpt_cat_result)' 
+							INTO v_deleted_result;
+
+							EXECUTE 'INSERT INTO '||v_selector_name||
+							' SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::text IN 
+							(SELECT result_id FROM rpt_cat_result);';
 					ELSE 
-					--insert values into selectors with 1 field
+					
 						IF v_selector_value IS NOT NULL THEN
 							EXECUTE 'SELECT data_type FROM information_schema.columns where table_name = '||quote_literal(v_selector_name)||'
 							AND table_schema='||quote_literal(v_schemaname)||' and column_name!=''cur_user'''
@@ -353,27 +382,37 @@ BEGIN
 			END IF;
 		END LOOP;
 
-		v_return_msg = 'Workspace changed successfully';
+		v_return_msg = 'Workspace successfully changed';
+		v_return_level = 3;
 	END IF;
+
+	IF v_deleted_psector IS NOT NULL OR v_deleted_dscenario IS NOT NULL OR v_deleted_sector IS NOT NULL OR v_deleted_result IS NOT NULL THEN 
 	
-	IF v_deleted_psector IS NOT NULL OR v_deleted_dscenario IS NOT NULL THEN 
 		p_data = replace(p_data::text, 'CURRENT', 'UPDATE');
 		PERFORM gw_fct_workspacemanager(p_data);
+		
 		IF v_deleted_psector IS NOT NULL THEN	
-			v_return_msg = concat(v_return_msg,'. Workspace recreated without psector:',v_deleted_psector);
+			v_return_msg = concat(v_return_msg,'. Workspace recreated without psectors:',v_deleted_psector);
 		END IF;
 		IF v_deleted_dscenario IS NOT NULL THEN	
-			v_return_msg = concat(v_return_msg,'. Workspace recreated without dscenario:',v_deleted_dscenario,'.');
+			v_return_msg = concat(v_return_msg,'. Workspace recreated without dscenarios:',v_deleted_dscenario,'.');
 		END IF;
+		IF v_deleted_sector IS NOT NULL THEN	
+			v_return_msg = concat(v_return_msg,'. Workspace recreated without sectors:',v_deleted_sector,'.');
+		END IF;
+		IF v_deleted_result IS NOT NULL THEN	
+			v_return_msg = concat(v_return_msg,'. Workspace recreated without result:',v_deleted_result,'.');
+		END IF;
+		v_return_level = 1;	
 	END IF;
 
 	IF v_audit_result is null THEN
 		v_return_status = 'Accepted';
-		v_return_level = 3;
 		IF v_return_msg IS NULL THEN
 			v_return_msg='Process executed successfully';
+			v_return_level = 3;
 		END IF;
-    ELSE
+	ELSE
 
         SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_return_status; 
         SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_return_level;
@@ -409,10 +448,8 @@ BEGIN
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-   
 
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
