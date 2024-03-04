@@ -1781,7 +1781,7 @@ class GwAdminButton:
             manage_i18n = True
 
         if manage_i18n:
-            files_to_execute = [f"{self.project_type_selected}_schema_model.sql, dml.sql"]
+            files_to_execute = [f"{self.project_type_selected}_schema_model.sql", f"dml.sql"]
             for file in filelist:
                 status = True
                 if file in files_to_execute:
