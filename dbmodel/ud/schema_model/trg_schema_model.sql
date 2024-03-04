@@ -981,13 +981,6 @@ CREATE TRIGGER gw_trg_node_arc_divide AFTER INSERT ON node FOR EACH ROW EXECUTE 
 
 
 --
--- Name: node gw_trg_node_rotation_update; Type: TRIGGER; Schema: Schema; Owner: -
---
-
-CREATE TRIGGER gw_trg_node_rotation_update AFTER INSERT OR UPDATE OF hemisphere, the_geom ON node FOR EACH ROW EXECUTE FUNCTION gw_trg_node_rotation_update();
-
-
---
 -- Name: node gw_trg_node_statecontrol; Type: TRIGGER; Schema: Schema; Owner: -
 --
 
