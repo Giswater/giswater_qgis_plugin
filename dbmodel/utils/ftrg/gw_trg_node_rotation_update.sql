@@ -40,8 +40,8 @@ BEGIN
 		SELECT choose_hemisphere INTO v_hemisphere FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id limit 1;
 		SELECT num_arcs INTO v_numarcs FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id limit 1;
 	ELSIF v_project_type = 'UD' then
-		SELECT choose_hemisphere INTO v_hemisphere FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.nodetype WHERE cat_node.id=NEW.nodecat_id limit 1;
-		SELECT num_arcs INTO v_numarcs FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat limit 1;
+		SELECT choose_hemisphere INTO v_hemisphere FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.node_type WHERE cat_node.id=NEW.nodecat_id limit 1;
+		SELECT num_arcs INTO v_numarcs FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.node_type WHERE cat_node.id=NEW.nodecat_id limit 1;
 	END IF;
 	SELECT value::boolean INTO v_rotation_disable FROM config_param_user WHERE parameter='edit_noderotation_update_dsbl' AND cur_user=current_user;
 
