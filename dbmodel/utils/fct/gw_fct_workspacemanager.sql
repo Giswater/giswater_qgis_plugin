@@ -403,7 +403,7 @@ BEGIN
 		IF v_deleted_result IS NOT NULL THEN	
 			v_return_msg = concat(v_return_msg,'. Workspace recreated without result:',v_deleted_result,'.');
 		END IF;
-		v_return_level = 1;	
+		v_return_level = 3;	
 	END IF;
 
 	IF v_audit_result is null THEN
