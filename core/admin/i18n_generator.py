@@ -13,7 +13,7 @@ from functools import partial
 
 from ..ui.ui_manager import GwAdminTranslationUi
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_qt, tools_qgis
+from ...libs import lib_vars, tools_qt, tools_qgis, tools_db
 
 
 class GwI18NGenerator:
@@ -82,10 +82,15 @@ class GwI18NGenerator:
 
         py_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_msg)
         db_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_db_msg)
+        refresh_i18n = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_refresh_i18n)
+        check_missing_dbmessage = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_missing_dbmessage)
         self.dlg_qm.lbl_info.clear()
         msg = ''
         self.language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         self.lower_lang = self.language.lower()
+        if check_missing_dbmessage:
+            self._check_missing_dbmessage_values()
+
         if py_msg:
             status_py_msg = self._create_py_files()
             if status_py_msg is True:
@@ -280,6 +285,68 @@ class GwI18NGenerator:
         self._write_dbmessages_values(rows, cfg_path + file_name)
 
         return True
+
+    def _create_i18n_files(self):
+        """ Read the values of the database and update the i18n files """
+
+        major_version = tools_qgis.get_major_version(plugin_dir=self.plugin_dir).replace(".", "")
+        ver_build = tools_qgis.get_build_version(plugin_dir=self.plugin_dir)
+
+        cfg_path = f"{self.plugin_dir}{os.sep}dbmodel{os.sep}i18n{os.sep}{self.language}{os.sep}"
+        file_name = f'dml.sql'
+
+        # Check if file exist
+        if os.path.exists(cfg_path + file_name):
+            msg = "Are you sure you want to overwrite this file?"
+            answer = tools_qt.show_question(msg, "Overwrite", parameter=f"\n\n{cfg_path}{file_name}")
+            if not answer:
+                return None
+        else:
+            os.makedirs(cfg_path, exist_ok=True)
+
+        self._write_header(cfg_path + file_name)
+
+        rows = self._get_dbdialog_values_i18n()
+        if not rows:
+            return False
+        self._write_dbdialog_values_i18n(rows, cfg_path + file_name)
+
+        rows = self._get_dbmessages_values_i18n()
+        if not rows:
+            return False
+        self._write_dbmessages_values_i18n(rows, cfg_path + file_name)
+
+        return True
+
+
+    def _check_missing_dbmessage_values(self):
+        """ Get db message values from schema_name """
+
+        sql_main = (f"SELECT id, project_type, error_message, hint_message, log_level "
+               f"FROM {self.schema_name}.sys_message "
+               f"WHERE project_type = \'{self.project_type}\' or project_type = 'utils'")
+        rows_main = tools_db.get_rows(sql_main)
+
+        if rows_main:
+            for row in rows_main:
+                # Get values
+                source = row['id'] if row['id'] is not None else ""
+                project_type = row['project_type'] if row['project_type'] is not None else ""
+                ms_msg = row['error_message'] if row['error_message'] is not None else ""
+                ht_msg = row['hint_message'] if row['hint_message'] is not None else ""
+                log_level = row['log_level'] if row['log_level'] is not None else 2
+
+                sql_i18n = (
+                    f" SELECT source, project_type, context, ms_{self.project_language.lower()}, ht_{self.project_language.lower()}"
+                    f" FROM i18n.dbmessage "
+                    f" WHERE source = \'{source}\'")
+                rows_i18n = self._get_rows(sql_i18n)
+
+                if not rows_i18n:
+                    sql_insert = (f"INSERT INTO i18n.dbmessage "
+                                  f"(source, project_type, context, ms_{self.project_language.lower()}, ht_{self.project_language.lower()}, source_code, log_level) "
+                                  f"VALUES ('{source}', '{project_type}', 'sys_message', $${ms_msg}$$, $${ht_msg}$$, 'giswater', {log_level});")
+                    self._get_rows(sql_insert)
 
 
     def _get_dbdialog_values(self):
