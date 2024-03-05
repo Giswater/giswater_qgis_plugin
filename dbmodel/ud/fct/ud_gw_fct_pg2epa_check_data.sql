@@ -647,11 +647,15 @@ BEGIN
 		VALUES (v_fid, '522', 1, 'INFO: All outlets have a valid number of connected arcs.',v_count);
 	END IF;
 	v_count=0;
+
+	RAISE NOTICE '528 - Check if outlet_id exists in v_edit_junction (if outlet_id is a node) or in v_edit_inp_subcatchment (if outlet_id is a subcathment)';
 	
-RAISE NOTICE '528 - Check if outlet_id exists in v_edit_junction (if outlet_id is a node) or in v_edit_inp_subcatchment (if outlet_id is a subcathment)';
-	
-	v_querytext = '(select outlet_id from v_edit_inp_subc2outlet where outlet_type = ''JUNCTION'' AND outlet_id not in (select node_id from v_edit_inp_junction) union
-	select outlet_id from v_edit_inp_subc2outlet where outlet_type = ''SUBCATCHMENT'' AND outlet_id not in (select subc_id from v_edit_inp_subcatchment))';
+	v_querytext = '(select outlet_id from v_edit_inp_subc2outlet
+			LEFT JOIN (select node_id from v_edit_inp_junction UNION select node_id from v_edit_inp_storage UNION select node_id from v_edit_inp_netgully) a on outlet_id = node_id
+			where outlet_type in (''JUNCTION'') and node_id is null
+			union
+			select a.outlet_id from v_edit_inp_subc2outlet a LEFT JOIN v_edit_inp_subcatchment s on a.outlet_id = s.subc_id
+			where outlet_type = ''SUBCATCHMENT'' and s.subc_id is null)';
 	
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext, 'a') INTO v_count;
 	
@@ -666,7 +670,6 @@ RAISE NOTICE '528 - Check if outlet_id exists in v_edit_junction (if outlet_id i
 		VALUES (v_fid, '528', 1, 'INFO: All subcatchments have an existing outlet_id',v_count);
 	END IF;
 	v_count=0;
-
 	
 	RAISE NOTICE '529 - Check null values on inp_weir';
 	v_querytext='(select arc_id, weir_type, cd, geom1, geom2, offsetval from v_edit_inp_weir 
@@ -745,6 +748,7 @@ RAISE NOTICE '528 - Check if outlet_id exists in v_edit_junction (if outlet_id i
 		INSERT INTO project_temp_anl_node SELECT * FROM temp_anl_node;
 		INSERT INTO project_temp_audit_check_data SELECT * FROM temp_audit_check_data;
 	END IF;
+
 
 	-- get results
 	-- info
