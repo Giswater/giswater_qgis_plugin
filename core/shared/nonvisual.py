@@ -1728,7 +1728,7 @@ class GwNonVisual:
         tools_gw.load_settings(self.dialog)
 
         # Populate sector id combobox
-        self._populate_cmb_sector_id(self.dialog.cmb_sector_id)
+        self._populate_cmb_sector_id(self.dialog, self.dialog.cmb_sector_id)
 
         if control_id is not None:
             self._populate_controls_widgets(control_id)
@@ -1858,7 +1858,7 @@ class GwNonVisual:
         tools_gw.load_settings(self.dialog)
 
         # Populate sector id combobox
-        self._populate_cmb_sector_id(self.dialog.cmb_sector_id)
+        self._populate_cmb_sector_id(self.dialog, self.dialog.cmb_sector_id)
 
         if rule_id is not None:
             self._populate_rules_widgets(rule_id)
@@ -2794,12 +2794,14 @@ class GwNonVisual:
         return values
 
 
-    def _populate_cmb_sector_id(self, combobox):
+    def _populate_cmb_sector_id(self, dialog, combobox):
 
         sql = f"SELECT sector_id as id, name as idval FROM v_edit_sector WHERE sector_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(combobox, rows)
+        else:
+            dialog.setEnabled(False)
 
 
     def _create_plot_widget(self, dialog):
