@@ -213,6 +213,24 @@ BEGIN
 		SELECT result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type,
 		sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node
 		FROM temp_t_node;
+
+		-- move log data
+		DELETE FROM anl_arc WHERE cur_user = current_user AND fid IN (106,107,111,113,164,175,187,188,294,295,379,427,430,440,480,522,528,529,530,		  		-- CHECK DATA
+									       369,370,396,401,402,455,456,457,458,									-- CHECK RESULT
+									       228,454,290,404,231,139,232,233,431);									-- CHECK NETWORK
+
+		DELETE FROM anl_node WHERE cur_user = current_user AND fid IN (106,107,111,113,164,175,187,188,294,295,379,427,430,440,480,522,528,529,530,		  		-- CHECK DATA
+									       369,370,396,401,402,455,456,457,458,									-- CHECK RESULT
+									       228,454,290,404,231,139,232,233,431);									-- CHECK NETWORK
+		
+		DELETE FROM anl_gully WHERE cur_user = current_user AND fid IN (106,107,111,113,164,175,187,188,294,295,379,427,430,440,480,522,528,529,530,		  		-- CHECK DATA
+									       369,370,396,401,402,455,456,457,458,									-- CHECK RESULT
+									       228,454,290,404,231,139,232,233,431);									-- CHECK NETWORK
+
+		
+		INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
+		INSERT INTO anl_node SELECT * FROM temp_anl_node;
+		INSERT INTO anl_gully SELECT * FROM temp_anl_gully;
 		
 		-- drop temp tables
 		DROP TABLE IF EXISTS temp_t_arc_flowregulator;

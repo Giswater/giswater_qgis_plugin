@@ -19,7 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":127}}
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":101}}}$$)-- when is called from checkproject
 
 -- fid: main: 225,
-	other: 106,107,111,113,164,175,187,188,294,295,379,427,430,440,480,522
+	other: 106,107,111,113,164,175,187,188,294,295,379,427,430,440,480,522,528,529,530
 
 SELECT * FROM audit_check_data WHERE fid = v_fid
 
@@ -602,12 +602,6 @@ BEGIN
 	END IF;
 	v_count=0;
 
-	IF v_result_id IS NULL THEN
-		UPDATE temp_audit_check_data SET result_id = table_id WHERE cur_user="current_user"() AND fid=v_fid AND result_id IS NULL;
-		UPDATE temp_audit_check_data SET table_id = NULL WHERE cur_user="current_user"() AND fid=v_fid; 
-	END IF;
-	
-
 	RAISE NOTICE '25 - Check shape with null values on arc catalog';
 	SELECT count(*) INTO v_count FROM cat_arc WHERE shape is null;
 	IF v_count > 0 THEN
@@ -713,6 +707,10 @@ BEGIN
 	END IF;
 	v_count=0;
 
+	IF v_result_id IS NULL THEN
+		UPDATE temp_audit_check_data SET result_id = table_id WHERE cur_user="current_user"() AND fid=v_fid AND result_id IS NULL;
+		UPDATE temp_audit_check_data SET table_id = NULL WHERE cur_user="current_user"() AND fid=v_fid; 
+	END IF;
 	
 	-- Removing isaudit false sys_fprocess
 	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
@@ -729,6 +727,10 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, '');
 	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, ''); 
 
+	-- 101 - checkproject
+	-- 127 - go2epa main
+	-- 225 - triggered alone
+	
 	IF v_fid = 225 THEN
 			
 		DELETE FROM anl_arc WHERE fid =225 AND cur_user=current_user;
@@ -741,14 +743,11 @@ BEGIN
 
 	ELSIF  v_fid = 101 THEN 
 		UPDATE temp_audit_check_data SET fid = 225;
-		UPDATE temp_anl_arc SET fid = 225;
-		UPDATE temp_anl_node SET fid = 225;
 
 		INSERT INTO project_temp_anl_arc SELECT * FROM temp_anl_arc;
 		INSERT INTO project_temp_anl_node SELECT * FROM temp_anl_node;
 		INSERT INTO project_temp_audit_check_data SELECT * FROM temp_audit_check_data;
 	END IF;
-
 
 	-- get results
 	-- info

@@ -169,10 +169,10 @@ BEGIN
 	v_count=0;
 
 	--create temp
-  CREATE TEMP TABLE IF NOT EXISTS project_temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
-  CREATE TEMP TABLE IF NOT EXISTS project_temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-  CREATE TEMP TABLE IF NOT EXISTS project_temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
-  CREATE TEMP TABLE IF NOT EXISTS project_temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
+	CREATE TEMP TABLE IF NOT EXISTS project_temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+	CREATE TEMP TABLE IF NOT EXISTS project_temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
+	CREATE TEMP TABLE IF NOT EXISTS project_temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
+	CREATE TEMP TABLE IF NOT EXISTS project_temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
   
 	select array_agg(expl_id) INTO v_cur_expl from selector_expl where cur_user = current_user;
     
@@ -362,6 +362,7 @@ BEGIN
 			IF v_ignoreepa IS FALSE THEN
 				EXECUTE 'SELECT gw_fct_pg2epa_check_data($${
 				"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"fid":101}}}$$)';
+				
 				-- insert results 
 				UPDATE project_temp_audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB EPA):', split_part(error_message,': ',2))
 				WHERE fid=225 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
@@ -659,11 +660,28 @@ BEGIN
 				-- setQgisLayers: not used variable on python 3.4 because threath is operative to refresh_attribute of whole layers
 	END IF;
 
-	-- Delete and insert values from python into audit_check_project	
 	DELETE FROM audit_check_data WHERE cur_user = current_user AND fid = 101;
-	DELETE FROM anl_node WHERE cur_user = current_user AND fid = 101;
-	DELETE FROM anl_arc WHERE cur_user = current_user AND fid = 101;
-	DELETE FROM anl_connec WHERE cur_user = current_user AND fid = 101;
+
+	DELETE FROM anl_node 
+	WHERE cur_user = current_user AND fid IN (103.104,106,187,188,196,197,201,202,203,204,205,257,372,417,418,419,421,422,423,424,442,443,461,478,479,488,480,497,498,499,	-- OM
+								       176,180,181,192,208,209,367,								   																		-- GRAPH
+								       106,107,111,113,164,175,187,188,294,295,379,427,430,440,480,522,528,529,530,		  												-- EPA UD
+								       107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,294,295,371,379,433,411,412,430,432,480,								-- EPA WS
+								       252,354,355,452,467);									   																		-- PLAN
+
+	DELETE FROM anl_arc 
+	WHERE cur_user = current_user AND fid IN (103.104,106,187,188,196,197,201,202,203,204,205,257,372,417,418,419,421,422,423,424,442,443,461,478,479,488,480,497,498,499,	-- OM
+								       176,180,181,192,208,209,367,								   																		-- GRAPH
+								       106,107,111,113,164,175,187,188,294,295,379,427,430,440,480,522,528,529,530,		  												-- EPA UD
+								       107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,294,295,371,379,433,411,412,430,432,480,482							-- EPA WS
+								       252,354,355,452,467);									   																		-- PLAN
+
+	DELETE FROM anl_connec 
+	WHERE cur_user = current_user AND fid IN (103.104,106,187,188,196,197,201,202,203,204,205,257,372,417,418,419,421,422,423,424,442,443,461,478,479,488,480,497,498,499,	-- OM
+								       176,180,181,192,208,209,367,								   																		-- GRAPH
+								       106,107,111,113,164,175,187,188,294,295,379,427,430,440,480,522,528,529,530,		  												-- EPA UD
+								       107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,294,295,371,379,433,411,412,430,432,480,482							-- EPA WS
+								       252,354,355,452,467);									   																		-- PLAN
 	
 	INSERT INTO anl_arc SELECT * FROM project_temp_anl_arc;
 	INSERT INTO anl_node SELECT * FROM project_temp_anl_node;

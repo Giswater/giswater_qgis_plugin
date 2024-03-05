@@ -24,7 +24,7 @@ SELECT * FROM SCHEMA_NAME.audit_check_data where fid::text  = 227::text
 	DELETE FROM anl_node WHERE fid IN (159) AND cur_user=current_user;
 	DELETE FROM anl_arc WHERE fid IN (103) AND cur_user=current_user;
 
--- fid: 114,227,416
+-- fid: 369,370,396,401,402,455,456,457,458
 
 */
 

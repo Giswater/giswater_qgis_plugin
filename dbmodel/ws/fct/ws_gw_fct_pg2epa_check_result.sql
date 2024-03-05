@@ -13,7 +13,7 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"test1","fid":227}}}$$) --when is called from go2epa_main from toolbox
 
--- fid: 114, 159, 230, 297, 396, 400, 402, 404, 405, 413, 414, 415, 432. Number 227 is passed by input parameters
+-- fid: 172,375,377,413,414,415,400,297,373,396,402,407 Number 227 is passed by input parameters
 
 */
 

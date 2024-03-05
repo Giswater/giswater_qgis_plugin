@@ -24,8 +24,7 @@ SELECT SCHEMA_NAME.gw_fct_om_check_data($${
 SELECT * FROM audit_check_data WHERE fid = v_fid
 
 --fid:  main: v_fid
-	other: 104,106,187,188,196,197,201,202,203,204,205,257,372,417,418,419,421,422,423,424,442,443,461
-
+	other: 103,104,106,187,188,196,197,201,202,203,204,205,257,372,417,418,419,421,422,423,424,442,443,461,478,479,488,480,497,498,499  
 */
 
 DECLARE
@@ -1367,7 +1366,6 @@ BEGIN
 	END IF;
     
     RAISE NOTICE '47 - Check connecs related to arcs with diameter bigger than defined value (488) (WS)';
-    
     IF v_project_type = 'WS' THEN
         IF (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'edit_link_check_arcdnom')::boolean IS TRUE THEN
             v_check_arcdnom:= (SELECT value::json->>'diameter' FROM config_param_system WHERE parameter = 'edit_link_check_arcdnom');
@@ -1521,9 +1519,6 @@ BEGIN
 	ELSIF  v_fid = 101 THEN 
 	
 		UPDATE temp_audit_check_data SET fid = 125;
-		UPDATE temp_anl_arc SET fid = 125;
-		UPDATE temp_anl_node SET fid = 125;
-		UPDATE temp_anl_connec SET fid = 125;
 
 		INSERT INTO project_temp_anl_arc SELECT * FROM temp_anl_arc;
 		INSERT INTO project_temp_anl_node SELECT * FROM temp_anl_node;

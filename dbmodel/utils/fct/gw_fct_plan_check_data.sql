@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_plan_check_data($${}$$)
 SELECT * FROM anl_arc WHERE fid=v_fid AND cur_user=current_user;
 SELECT * FROM anl_node WHERE fid=v_fid AND cur_user=current_user;
 
--- fid: v_fid, 252,354,355,452, 467
+-- fid: v_fid, 252,354,355,452,467
 
 */
 
@@ -542,9 +542,6 @@ BEGIN
 	ELSIF  v_fid = 101 THEN 
 	
 		UPDATE temp_audit_check_data SET fid = 115;
-		UPDATE temp_anl_arc SET fid = 115;
-		UPDATE temp_anl_node SET fid = 115;
-		UPDATE temp_anl_connec SET fid = 115;
 
 		INSERT INTO project_temp_anl_arc SELECT * FROM temp_anl_arc;
 		INSERT INTO project_temp_anl_node SELECT * FROM temp_anl_node;

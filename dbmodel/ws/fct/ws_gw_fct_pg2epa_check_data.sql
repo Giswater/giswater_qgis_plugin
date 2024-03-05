@@ -17,7 +17,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":101}}
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data('{"parameters":{}}')-- when is called from toolbox
 
 -- fid: main: 225
-		other: 107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,294,295,371,379,433,411,412,430,432,480
+		other: 107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,294,295,371,379,433,411,412,430,432,480,482
 
 */
 
@@ -903,7 +903,11 @@ BEGIN
 
 		DELETE FROM temp_audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user AND fid = v_fid;
 	END LOOP;
-
+	
+	-- 101 - checkproject
+	-- 127 - go2epa main
+	-- 225 - triggered alone
+	
 	IF v_fid = 225 THEN
 
 		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '');
@@ -924,9 +928,6 @@ BEGIN
 	ELSIF  v_fid = 101 THEN 
 	
 		UPDATE temp_audit_check_data SET fid = 225;
-		UPDATE temp_anl_arc SET fid = 225;
-		UPDATE temp_anl_node SET fid = 225;
-		UPDATE temp_anl_connec SET fid = 225;
 
 		INSERT INTO project_temp_anl_arc SELECT * FROM temp_anl_arc;
 		INSERT INTO project_temp_anl_node SELECT * FROM temp_anl_node;

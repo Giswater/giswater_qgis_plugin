@@ -370,6 +370,20 @@ BEGIN
 		status, the_geom, expl_id, flw_code, minorloss, addparam, arcparent,dma_id, presszone_id, dqa_id, minsector_id
 		FROM temp_t_arc;
 
+		-- move log data
+		DELETE FROM anl_arc WHERE cur_user = current_user AND fid IN (107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,294,295,371,379,433,411,412,430,432,480,	-- CHECK DATA
+									       172,375,377,413,414,415,400,297,373,396,402,407,								-- CHECK RESULT
+									       228,454,290,404,231,139,232,233,431);									-- CHECK NETWORK
+
+		DELETE FROM anl_node WHERE cur_user = current_user AND fid IN (107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,294,295,371,379,433,411,412,430,432,480,	-- CHECK DATA
+									       172,375,377,413,414,415,400,297,373,396,402,407,								-- CHECK RESULT
+									       228,454,290,404,231,139,232,233,431);									-- CHECK NETWORK
+		
+		DELETE FROM anl_connec WHERE cur_user = current_user AND fid IN (107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,294,295,371,379,433,411,412,430,432,480,	-- CHECK DATA
+									       172,375,377,413,414,415,400,297,373,396,402,407,								-- CHECK RESULT
+									       228,454,290,404,231,139,232,233,431);									-- CHECK NETWORK
+
+
 		-- move patterns data
 		INSERT INTO rpt_inp_pattern_value SELECT * FROM temp_rpt_inp_pattern_value;	
 

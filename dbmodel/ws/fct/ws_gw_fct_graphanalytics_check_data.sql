@@ -428,7 +428,7 @@ BEGIN
 
 	ELSIF  v_fid = 101 THEN 
 		UPDATE temp_audit_check_data SET fid = 211;
-		UPDATE temp_anl_node SET fid = 211;
+
 		INSERT INTO project_temp_audit_check_data SELECT * FROM temp_audit_check_data;
 		INSERT INTO project_temp_anl_node SELECT * FROM temp_anl_node;
 
