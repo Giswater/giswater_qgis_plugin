@@ -5446,3 +5446,55 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_connec_tap', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_connec_vconnec', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_connec_wjoin', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
+
+-- triggers
+CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_arc FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('parent');
+CREATE TRIGGER gw_trg_edit_arc_pipe INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_pipe FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('PIPE');
+CREATE TRIGGER gw_trg_edit_arc_varc INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_varc FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('VARC');
+
+CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_connec FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
+CREATE TRIGGER gw_trg_edit_connec_fountain INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec_fountain FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('FOUNTAIN');
+CREATE TRIGGER gw_trg_edit_connec_greentap INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec_greentap FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('GREENTAP');
+CREATE TRIGGER gw_trg_edit_connec_tap INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec_tap FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('TAP');
+CREATE TRIGGER gw_trg_edit_connec_vconnec INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec_vconnec FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('VCONNEC');
+CREATE TRIGGER gw_trg_edit_connec_wjoin INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec_wjoin FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('WJOIN');
+
+CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_node FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('parent');
+CREATE TRIGGER gw_trg_edit_node_adaptation INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_adaptation FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('ADAPTATION');
+CREATE TRIGGER gw_trg_edit_node_air_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_air_valve FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('AIR_VALVE');
+CREATE TRIGGER gw_trg_edit_node_bypass_register INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_bypass_register FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('BYPASS_REGISTER');
+CREATE TRIGGER gw_trg_edit_node_check_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_check_valve FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('CHECK_VALVE');
+CREATE TRIGGER gw_trg_edit_node_clorinathor INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_clorinathor FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('CLORINATHOR');
+CREATE TRIGGER gw_trg_edit_node_control_register INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_control_register FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('CONTROL_REGISTER');
+CREATE TRIGGER gw_trg_edit_node_curve INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_curve FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('CURVE');
+CREATE TRIGGER gw_trg_edit_node_endline INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_endline FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('ENDLINE');
+CREATE TRIGGER gw_trg_edit_node_expantank INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_expantank FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('EXPANTANK');
+CREATE TRIGGER gw_trg_edit_node_filter INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_filter FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('FILTER');
+CREATE TRIGGER gw_trg_edit_node_fl_contr_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_fl_contr_valve FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('FL_CONTR_VALVE');
+CREATE TRIGGER gw_trg_edit_node_flexunion INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_flexunion FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('FLEXUNION');
+CREATE TRIGGER gw_trg_edit_node_flowmeter INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_flowmeter FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('FLOWMETER');
+CREATE TRIGGER gw_trg_edit_node_gen_purp_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_gen_purp_valve FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('GEN_PURP_VALVE');
+CREATE TRIGGER gw_trg_edit_node_green_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_green_valve FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('GREEN_VALVE');
+CREATE TRIGGER gw_trg_edit_node_hydrant INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_hydrant FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('HYDRANT');
+CREATE TRIGGER gw_trg_edit_node_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_junction FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('JUNCTION');
+CREATE TRIGGER gw_trg_edit_node_manhole INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_manhole FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('MANHOLE');
+CREATE TRIGGER gw_trg_edit_node_netelement INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_netelement FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('NETELEMENT');
+CREATE TRIGGER gw_trg_edit_node_netsamplepoint INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_netsamplepoint FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('NETSAMPLEPOINT');
+CREATE TRIGGER gw_trg_edit_node_outfall_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_outfall_valve FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('OUTFALL_VALVE');
+CREATE TRIGGER gw_trg_edit_node_pr_break_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_pr_break_valve FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('PR_BREAK_VALVE');
+CREATE TRIGGER gw_trg_edit_node_pr_reduc_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_pr_reduc_valve FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('PR_REDUC_VALVE');
+CREATE TRIGGER gw_trg_edit_node_pr_susta_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_pr_susta_valve FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('PR_SUSTA_VALVE');
+CREATE TRIGGER gw_trg_edit_node_pressure_meter INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_pressure_meter FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('PRESSURE_METER');
+CREATE TRIGGER gw_trg_edit_node_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_pump FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('PUMP');
+CREATE TRIGGER gw_trg_edit_node_reduction INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_reduction FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('REDUCTION');
+CREATE TRIGGER gw_trg_edit_node_register INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_register FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('REGISTER');
+CREATE TRIGGER gw_trg_edit_node_shutoff_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_shutoff_valve FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('SHUTOFF_VALVE');
+CREATE TRIGGER gw_trg_edit_node_source INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_source FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('SOURCE');
+CREATE TRIGGER gw_trg_edit_node_t INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_t FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('T');
+CREATE TRIGGER gw_trg_edit_node_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_tank FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('TANK');
+CREATE TRIGGER gw_trg_edit_node_throttle_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_throttle_valve FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('THROTTLE_VALVE');
+CREATE TRIGGER gw_trg_edit_node_valve_register INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valve_register FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVE_REGISTER');
+CREATE TRIGGER gw_trg_edit_node_water_connection INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_water_connection FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('WATER_CONNECTION');
+CREATE TRIGGER gw_trg_edit_node_waterwell INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_waterwell FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('WATERWELL');
+CREATE TRIGGER gw_trg_edit_node_wtp INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_wtp FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('WTP');
+CREATE TRIGGER gw_trg_edit_node_x INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_x FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('X');

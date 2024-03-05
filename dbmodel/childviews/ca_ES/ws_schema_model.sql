@@ -5447,3 +5447,55 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_ventosa', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_arc_varc', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 10, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_x', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
+
+-- triggers
+CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_arc FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('parent');
+CREATE TRIGGER gw_trg_edit_arc_tuberia INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_tuberia FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('TUBERIA');
+CREATE TRIGGER gw_trg_edit_arc_varc INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_varc FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('VARC');
+
+CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_connec FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
+CREATE TRIGGER gw_trg_edit_connec_boca_reg INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec_boca_reg FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('BOCA_REG');
+CREATE TRIGGER gw_trg_edit_connec_escomesa INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec_escomesa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('ESCOMESA');
+CREATE TRIGGER gw_trg_edit_connec_escomesa_ficticia INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec_escomesa_ficticia FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('ESCOMESA_FICTICIA');
+CREATE TRIGGER gw_trg_edit_connec_font INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec_font FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('FONT');
+CREATE TRIGGER gw_trg_edit_connec_font_ornamental INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec_font_ornamental FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('FONT_ORNAMENTAL');
+
+CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_node FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('parent');
+CREATE TRIGGER gw_trg_edit_node_adaptacio INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_adaptacio FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('ADAPTACIO');
+CREATE TRIGGER gw_trg_edit_node_bomba INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_bomba FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('BOMBA');
+CREATE TRIGGER gw_trg_edit_node_captacio INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_captacio FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('CAPTACIO');
+CREATE TRIGGER gw_trg_edit_node_corba INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_corba FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('CORBA');
+CREATE TRIGGER gw_trg_edit_node_dilatador INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_dilatador FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('DILATADOR');
+CREATE TRIGGER gw_trg_edit_node_diposit INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_diposit FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('DIPOSIT');
+CREATE TRIGGER gw_trg_edit_node_escomesa_topo INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_escomesa_topo FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('ESCOMESA_TOPO');
+CREATE TRIGGER gw_trg_edit_node_estacio_tractament INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_estacio_tractament FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('ESTACIO_TRACTAMENT');
+CREATE TRIGGER gw_trg_edit_node_filtre INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_filtre FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('FILTRE');
+CREATE TRIGGER gw_trg_edit_node_final_linea INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_final_linea FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('FINAL_LINEA');
+CREATE TRIGGER gw_trg_edit_node_green_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_green_valve FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('GREEN_VALVE');
+CREATE TRIGGER gw_trg_edit_node_hidrant INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_hidrant FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('HIDRANT');
+CREATE TRIGGER gw_trg_edit_node_medidor_fluid INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_medidor_fluid FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('MEDIDOR_FLUID');
+CREATE TRIGGER gw_trg_edit_node_medidor_pressio INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_medidor_pressio FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('MEDIDOR_PRESSIO');
+CREATE TRIGGER gw_trg_edit_node_netelement INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_netelement FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('NETELEMENT');
+CREATE TRIGGER gw_trg_edit_node_pou INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_pou FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('POU');
+CREATE TRIGGER gw_trg_edit_node_pou_acces INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_pou_acces FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('POU_ACCES');
+CREATE TRIGGER gw_trg_edit_node_punt_mostreig INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_punt_mostreig FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('PUNT_MOSTREIG');
+CREATE TRIGGER gw_trg_edit_node_reclorador INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_reclorador FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('RECLORADOR');
+CREATE TRIGGER gw_trg_edit_node_reduccio INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_reduccio FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('REDUCCIO');
+CREATE TRIGGER gw_trg_edit_node_registre INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_registre FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('REGISTRE');
+CREATE TRIGGER gw_trg_edit_node_registre_bypass INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_registre_bypass FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('REGISTRE_BYPASS');
+CREATE TRIGGER gw_trg_edit_node_registre_control INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_registre_control FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('REGISTRE_CONTROL');
+CREATE TRIGGER gw_trg_edit_node_t INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_t FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('T');
+CREATE TRIGGER gw_trg_edit_node_tanc_expansio INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_tanc_expansio FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('TANC_EXPANSIO');
+CREATE TRIGGER gw_trg_edit_node_unio INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_unio FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('UNIO');
+CREATE TRIGGER gw_trg_edit_node_valvula INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valvula FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVULA');
+CREATE TRIGGER gw_trg_edit_node_valvula_accel INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valvula_accel FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVULA_ACCEL');
+CREATE TRIGGER gw_trg_edit_node_valvula_control INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valvula_control FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVULA_CONTROL');
+CREATE TRIGGER gw_trg_edit_node_valvula_control_fl INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valvula_control_fl FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVULA_CONTROL_FL');
+CREATE TRIGGER gw_trg_edit_node_valvula_desguas INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valvula_desguas FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVULA_DESGUAS');
+CREATE TRIGGER gw_trg_edit_node_valvula_reductora INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valvula_reductora FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVULA_REDUCTORA');
+CREATE TRIGGER gw_trg_edit_node_valvula_registre INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valvula_registre FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVULA_REGISTRE');
+CREATE TRIGGER gw_trg_edit_node_valvula_shutoff INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valvula_shutoff FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVULA_SHUTOFF');
+CREATE TRIGGER gw_trg_edit_node_valvula_sost_pressio INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valvula_sost_pressio FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVULA_SOST_PRESSIO');
+CREATE TRIGGER gw_trg_edit_node_valvula_trenca_pressio INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valvula_trenca_pressio FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVULA_TRENCA_PRESSIO');
+CREATE TRIGGER gw_trg_edit_node_valvula_ventosa INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valvula_ventosa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVULA_VENTOSA');
+CREATE TRIGGER gw_trg_edit_node_x INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_x FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('X');
