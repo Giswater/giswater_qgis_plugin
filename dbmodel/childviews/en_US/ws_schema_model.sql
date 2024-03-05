@@ -5546,3 +5546,5 @@ DROP TRIGGER IF EXISTS gw_trg_edit_node_wtp ON ve_node_wtp;
 CREATE TRIGGER gw_trg_edit_node_wtp INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_wtp FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('WTP');
 DROP TRIGGER IF EXISTS gw_trg_edit_node_x ON ve_node_x;
 CREATE TRIGGER gw_trg_edit_node_x INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_x FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('X');
+DROP TRIGGER IF EXISTS gw_trg_edit_node_junction ON ve_node_junction;
+CREATE TRIGGER gw_trg_edit_node_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_junction FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('JUNCTION');
