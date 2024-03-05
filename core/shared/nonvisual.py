@@ -1542,7 +1542,7 @@ class GwNonVisual:
 
         # Copy values from clipboard
         paste_shortcut = QShortcut(QKeySequence.Paste, cur_table)
-        paste_shortcut.activated.connect(partial(self._paste_pattern_values, cur_table))
+        paste_shortcut.activated.connect(partial(self._paste_patterns_values, cur_table))
 
         try:
             cur_table.cellChanged.disconnect()

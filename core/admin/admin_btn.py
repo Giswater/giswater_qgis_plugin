@@ -129,6 +129,7 @@ class GwAdminButton:
         self.project_epsg = project_srid
         self.locale = project_locale
         self.folder_locale = os.path.join(self.sql_dir, 'i18n', self.locale)
+        self.folder_childviews = os.path.join(self.sql_dir, 'childviews', self.locale)
 
         # Save in settings
         tools_gw.set_config_parser('btn_admin', 'project_name_schema', f'{project_name_schema}', prefix=False)
@@ -558,6 +559,22 @@ class GwAdminButton:
                                 return False
         return True
 
+    def load_childviews(self):
+        if self._process_folder(self.folder_childviews) is False:
+            folder_childviews = os.path.join(self.sql_dir, 'childviews', 'en_US')
+            if self._process_folder(folder_childviews) is False:
+                return False
+            else:
+                status = self._execute_files(folder_childviews, True, set_progress_bar=True)
+                if status is False and self.dev_commit is False:
+                    return False
+        else:
+            status = self._execute_files(self.folder_childviews, True, set_progress_bar=True)
+            if status is False and self.dev_commit is False:
+                return False
+
+        return True
+
     def load_sample_data(self, project_type):
 
         tools_db.dao.commit()
@@ -760,6 +777,8 @@ class GwAdminButton:
 
         qm_gen = GwI18NGenerator()
         qm_gen.init_dialog()
+        dict_info = tools_gw.get_project_info(self._get_schema_name())
+        qm_gen.pass_schema_info(dict_info, self._get_schema_name())
 
 
     def _info_show_database(self, connection_status=True, username=None, show_dialog=False):
@@ -1596,6 +1615,7 @@ class GwAdminButton:
 
         else:
             dict_info = tools_gw.get_project_info(schema_name)
+
             self.project_type = dict_info['project_type']
             self.project_epsg = dict_info['project_epsg']
             self.project_version = dict_info['project_version']
@@ -1764,7 +1784,7 @@ class GwAdminButton:
             manage_i18n = True
 
         if manage_i18n:
-            files_to_execute = [f"{self.project_type_selected}_schema_model.sql"]
+            files_to_execute = [f"{self.project_type_selected}_schema_model.sql", f"dml.sql"]
             for file in filelist:
                 status = True
                 if file in files_to_execute:
