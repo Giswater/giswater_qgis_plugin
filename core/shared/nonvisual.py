@@ -2796,12 +2796,16 @@ class GwNonVisual:
 
     def _populate_cmb_sector_id(self, dialog, combobox):
 
+        tooltip = "Active sectors for user selection (check selector sector)"
+        combobox.setToolTip(tooltip)
         sql = f"SELECT sector_id as id, name as idval FROM v_edit_sector WHERE sector_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(combobox, rows)
         else:
-            dialog.setEnabled(False)
+            tools_qt.set_widget_enabled(dialog, 'chk_active', False)
+            tools_qt.set_widget_enabled(dialog, 'txt_text', False)
+            tools_qt.set_widget_enabled(dialog, 'btn_accept', False)
 
 
     def _create_plot_widget(self, dialog):
