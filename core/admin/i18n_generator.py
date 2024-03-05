@@ -20,6 +20,7 @@ class GwI18NGenerator:
 
     def __init__(self):
         self.plugin_dir = lib_vars.plugin_dir
+        self.schema_name = lib_vars.schema_name
 
 
     def init_dialog(self):
@@ -39,6 +40,12 @@ class GwI18NGenerator:
         self.dlg_qm.cmb_language.currentIndexChanged.connect(partial(self._set_editability_dbmessage))
         tools_gw.open_dialog(self.dlg_qm, dlg_name='admin_translation')
 
+    def pass_schema_info(self, schema_info, schema_name):
+        self.project_type = schema_info['project_type']
+        self.project_epsg = schema_info['project_epsg']
+        self.project_version = schema_info['project_version']
+        self.project_language = schema_info['project_language']
+        self.schema_name = schema_name
 
     # region private functions
 
@@ -323,6 +330,40 @@ class GwI18NGenerator:
         self._write_dbmessages_values_i18n(rows, cfg_path + file_name)
 
         return True
+
+
+    def _check_missing_dbmessage_values(self):
+        """ Get db message values from schema_name """
+
+        sql_main = (f"SELECT id, project_type, error_message, hint_message, log_level"
+               f"FROM {self.schema_name}.sys_message"
+               f"WHERE project_type = \'{self.project_type}\'")
+        rows_main = self._get_rows(sql_main)
+
+        # source == id
+        # error_message == ms_
+        # hint_message == ht_
+
+        if rows_main:
+            for row in rows_main:
+                # Get values
+                source = row['id'] if row['id'] is not None else ""
+                ms_msg = row['error_message'] if row['error_message'] is not None else ""
+                ht_msg = row['hint_message'] if row['hint_message'] is not None else ""
+                log_level = row['log_level'] if row['log_level'] is not None else 2
+
+                sql_i18n = (
+                    f" SELECT source, project_type, context, ms_{self.project_language.lower()}, ht_{self.project_language.lower()}"
+                    f" FROM i18n.dbmessage "
+                    f" WHERE source = \'{source}\'")
+                rows_i18n = self._get_rows(sql_i18n)
+
+                if not rows_i18n:
+                    table = rows_i18n['context'] if rows_i18n['context'] is not None else ""
+                    sql_insert = (f"INSERT INTO i18n.dbmessage "
+                                  f"(source, project_type, context, ms_{self.project_language.lower()}, ht_{self.project_language.lower()}, source_code, log_level) "
+                                  f"VALUES ('{source}', '{self.project_type}', 'sys_message', '{ms_msg}', '{ht_msg}', 'giswater', {log_level});")
+                    self._get_rows(sql_insert)
 
 
     def _get_dbdialog_values(self):

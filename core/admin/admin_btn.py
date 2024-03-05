@@ -777,6 +777,8 @@ class GwAdminButton:
 
         qm_gen = GwI18NGenerator()
         qm_gen.init_dialog()
+        dict_info = tools_gw.get_project_info(self._get_schema_name())
+        qm_gen.pass_schema_info(dict_info, self._get_schema_name())
 
 
     def _info_show_database(self, connection_status=True, username=None, show_dialog=False):
@@ -1613,6 +1615,7 @@ class GwAdminButton:
 
         else:
             dict_info = tools_gw.get_project_info(schema_name)
+
             self.project_type = dict_info['project_type']
             self.project_epsg = dict_info['project_epsg']
             self.project_version = dict_info['project_version']
