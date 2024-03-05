@@ -7829,7 +7829,3 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	 ('ve_arc','form_feature','data','observ','lyt_data_2',13,'string','text','observ','observ',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,43),
 	 ('ve_arc_pipe','form_feature','data','observ','lyt_data_2',13,'string','text','observ','observ',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,43),
 	 ('ve_arc_varc','form_feature','data','observ','lyt_data_2',13,'string','text','observ','observ',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,43);
-
-
-
-

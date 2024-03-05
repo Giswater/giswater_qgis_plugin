@@ -6,7 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO plan_price_cat VALUES ('PRICES DB-2018');
 
 INSERT INTO plan_price VALUES ('S_EXC', 'm3', 'Excavation of trench up to 2 m in width and up to 4 m in depth', 'Excavation of trench up to 2 m in width and up to 4 m in depth, in compact terrain, with excavator shovel and load mechanics of excavated material', 9.0324, NULL);
 INSERT INTO plan_price VALUES ('S_NULL', 'm3', 'Filling pipe material', 'Filling pipe material', 0.0000, NULL);
@@ -100,10 +99,12 @@ INSERT INTO plan_price VALUES ('A_PELD110_PN10', 'm', 'Polyethylene pipe, with n
 INSERT INTO plan_price VALUES ('A_PVC90_PN16', 'm', 'PVC sewer pipe with nominal exterior diameter of 90mm, nominal pressure of 16 bar', 'PVC sewer pipe with nominal exterior diameter of 90mm, nominal pressure of 16 bar, with elastic join and elastomeric ring, according to the UNE-EN 1452-2; placed on the bottom trench.', 16.9000, NULL);
 INSERT INTO plan_price VALUES ('N_CUR30_PVC110', 'u', 'Connection of DN 110mm, on the 30° angle', 'Connection of DN 110mm, on the 30° angle,  with 2 bell unions with with an elastomeric ring for water and counter flange,placed on the trench bottom.', 103.0900, NULL);
 INSERT INTO plan_price VALUES ('N_CUR45_PVC110', 'u', 'Connection of DN 110mm, on the 45° angle', 'Connection of DN 110mm, on the 45° angle,  with 2 bell unions with with an elastomeric ring for water and counter flange,placed on the trench bottom.', 103.0900, NULL);
-INSERT INTO plan_price VALUES ('VIRTUAL_U', 'u', 'Null price for unitary virtual elements', 'Null price for unitary virtual elements', 0, NULL);
-INSERT INTO plan_price VALUES ('VIRTUAL_M', 'm', 'Null price for  m virtual elements', 'Null price for m virtual elements', 0, NULL);
-INSERT INTO plan_price VALUES ('VIRTUAL_M2', 'm2', 'Null price for m2 virtual elements', 'Null price for m2 virtual elements', 0, NULL);
-INSERT INTO plan_price VALUES ('VIRTUAL_M3', 'm3', 'Null price for m3 virtual elements', 'Null price for m3 virtual elements', 0, NULL);
+INSERT INTO plan_price VALUES ('VIRTUAL_U', 'u', 'Null price for unitary virtual elements', 'Null price for unitary virtual elements', 0.0000, NULL);
+INSERT INTO plan_price VALUES ('VIRTUAL_M', 'm', 'Null price for  m virtual elements', 'Null price for m virtual elements', 0.0000, NULL);
+INSERT INTO plan_price VALUES ('VIRTUAL_M2', 'm2', 'Null price for m2 virtual elements', 'Null price for m2 virtual elements', 0.0000, NULL);
+INSERT INTO plan_price VALUES ('VIRTUAL_M3', 'm3', 'Null price for m3 virtual elements', 'Null price for m3 virtual elements', 0.0000, NULL);
+
+INSERT INTO plan_price_cat VALUES ('PRICES DB-2018');
 
 
 INSERT INTO plan_price_compost VALUES (1, 'P_CONCRETE-20', 'F931201F', 0.2000);
@@ -115,5 +116,3 @@ INSERT INTO plan_price_compost VALUES (6, 'P_ASPHALT-10', 'F9J12X40', 1.0000);
 INSERT INTO plan_price_compost VALUES (7, 'P_ASPHALT-10', 'F9J13Y40', 1.0000);
 INSERT INTO plan_price_compost VALUES (8, 'P_SLAB-4P', 'F9E1311N', 1.0000);
 INSERT INTO plan_price_compost VALUES (9, 'P_SLAB-4P', 'F9265C51', 0.3000);
-
-

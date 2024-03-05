@@ -434,8 +434,8 @@ AS SELECT v_connec.connec_id,
    FROM v_connec;  
          
   
-SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"featureType":"CONNEC"},
- "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"plot_code" }}$$);
+--SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"featureType":"CONNEC"},
+-- "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"plot_code" }}$$);
 
 
 
