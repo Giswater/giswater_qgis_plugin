@@ -3000,3 +3000,106 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_sumidero_topo', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 10, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_union', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 10, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 10, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
+
+-- triggers
+DROP TRIGGER IF EXISTS gw_trg_edit_arc ON v_edit_arc;
+CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_arc FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('parent');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_arc_conducto ON ve_arc_conducto;
+CREATE TRIGGER gw_trg_edit_arc_conducto INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_conducto FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('CONDUCTO');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_arc_ficticio ON ve_arc_ficticio;
+CREATE TRIGGER gw_trg_edit_arc_ficticio INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_ficticio FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('FICTICIO');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_arc_impulsion ON ve_arc_impulsion;
+CREATE TRIGGER gw_trg_edit_arc_impulsion INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_impulsion FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('IMPULSION');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_arc_rapido ON ve_arc_rapido;
+CREATE TRIGGER gw_trg_edit_arc_rapido INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_rapido FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('RAPIDO');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_arc_sifon ON ve_arc_sifon;
+CREATE TRIGGER gw_trg_edit_arc_sifon INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_sifon FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('SIFON');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_connec ON v_edit_connec;
+CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_connec FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_connec_acometida ON ve_connec_acometida;
+CREATE TRIGGER gw_trg_edit_connec_acometida INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec_acometida FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('ACOMETIDA');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_connec_acometida_ficticia ON ve_connec_acometida_ficticia;
+CREATE TRIGGER gw_trg_edit_connec_acometida_ficticia INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec_acometida_ficticia FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('ACOMETIDA_FICTICIA');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_gully ON v_edit_gully;
+CREATE TRIGGER gw_trg_edit_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_gully FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_gully('parent');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_gully_reja ON ve_gully_reja;
+CREATE TRIGGER gw_trg_edit_gully_reja INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_gully_reja FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_gully('REJA');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_gully_sumidero ON ve_gully_sumidero;
+CREATE TRIGGER gw_trg_edit_gully_sumidero INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_gully_sumidero FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_gully('SUMIDERO');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_gully_sumidero_ficticio ON ve_gully_sumidero_ficticio;
+CREATE TRIGGER gw_trg_edit_gully_sumidero_ficticio INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_gully_sumidero_ficticio FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_gully('SUMIDERO_FICTICIO');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node ON v_edit_node;
+CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_node FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('parent');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_arqueta_arenal ON ve_node_arqueta_arenal;
+CREATE TRIGGER gw_trg_edit_node_arqueta_arenal INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_arqueta_arenal FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('ARQUETA_ARENAL');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_cambio_seccion ON ve_node_cambio_seccion;
+CREATE TRIGGER gw_trg_edit_node_cambio_seccion INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_cambio_seccion FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('CAMBIO_SECCION');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_camera ON ve_node_camera;
+CREATE TRIGGER gw_trg_edit_node_camera INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_camera FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('CAMERA');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_deposito ON ve_node_deposito;
+CREATE TRIGGER gw_trg_edit_node_deposito INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_deposito FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('DEPOSITO');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_deposito_desbordamiento ON ve_node_deposito_desbordamiento;
+CREATE TRIGGER gw_trg_edit_node_deposito_desbordamiento INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_deposito_desbordamiento FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('DEPOSITO_DESBORDAMIENTO');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_desague ON ve_node_desague;
+CREATE TRIGGER gw_trg_edit_node_desague INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_desague FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('DESAGUE');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_edar ON ve_node_edar;
+CREATE TRIGGER gw_trg_edit_node_edar INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_edar FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('EDAR');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_elemento_topo ON ve_node_elemento_topo;
+CREATE TRIGGER gw_trg_edit_node_elemento_topo INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_elemento_topo FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('ELEMENTO_TOPO');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_estacion_bombeo ON ve_node_estacion_bombeo;
+CREATE TRIGGER gw_trg_edit_node_estacion_bombeo INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_estacion_bombeo FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('ESTACION_BOMBEO');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_inicio ON ve_node_inicio;
+CREATE TRIGGER gw_trg_edit_node_inicio INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_inicio FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('INICIO');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_nodo_ficticio ON ve_node_nodo_ficticio;
+CREATE TRIGGER gw_trg_edit_node_nodo_ficticio INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_nodo_ficticio FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('NODO_FICTICIO');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_pozo_circular ON ve_node_pozo_circular;
+CREATE TRIGGER gw_trg_edit_node_pozo_circular INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_pozo_circular FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('POZO_CIRCULAR');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_pozo_rectangular ON ve_node_pozo_rectangular;
+CREATE TRIGGER gw_trg_edit_node_pozo_rectangular INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_pozo_rectangular FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('POZO_RECTANGULAR');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_presa ON ve_node_presa;
+CREATE TRIGGER gw_trg_edit_node_presa INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_presa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('PRESA');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_punto_alto ON ve_node_punto_alto;
+CREATE TRIGGER gw_trg_edit_node_punto_alto INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_punto_alto FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('PUNTO_ALTO');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_registro ON ve_node_registro;
+CREATE TRIGGER gw_trg_edit_node_registro INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_registro FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('REGISTRO');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_salto ON ve_node_salto;
+CREATE TRIGGER gw_trg_edit_node_salto INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_salto FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('SALTO');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_sumidero_topo ON ve_node_sumidero_topo;
+CREATE TRIGGER gw_trg_edit_node_sumidero_topo INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_sumidero_topo FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('SUMIDERO_TOPO');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_union ON ve_node_union;
+CREATE TRIGGER gw_trg_edit_node_union INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_union FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('UNION');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_valvula ON ve_node_valvula;
+CREATE TRIGGER gw_trg_edit_node_valvula INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valvula FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVULA');

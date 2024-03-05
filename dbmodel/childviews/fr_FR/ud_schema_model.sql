@@ -2822,3 +2822,100 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_station_pompage', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 10, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_usine_retraitement', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 10, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valve', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 10, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
+
+-- triggers
+DROP TRIGGER IF EXISTS gw_trg_edit_arc ON v_edit_arc;
+CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_arc FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('parent');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_arc_accelerateur_eau ON ve_arc_accelerateur_eau;
+CREATE TRIGGER gw_trg_edit_arc_accelerateur_eau INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_accelerateur_eau FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('ACCELERATEUR_EAU');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_arc_arc_virtuel ON ve_arc_arc_virtuel;
+CREATE TRIGGER gw_trg_edit_arc_arc_virtuel INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_arc_virtuel FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('ARC_VIRTUEL');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_arc_conduit ON ve_arc_conduit;
+CREATE TRIGGER gw_trg_edit_arc_conduit INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_conduit FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('CONDUIT');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_arc_pompe_tuyau ON ve_arc_pompe_tuyau;
+CREATE TRIGGER gw_trg_edit_arc_pompe_tuyau INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_pompe_tuyau FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('POMPE_TUYAU');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_arc_siphon ON ve_arc_siphon;
+CREATE TRIGGER gw_trg_edit_arc_siphon INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc_siphon FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('SIPHON');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_connec ON v_edit_connec;
+CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_connec FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_connec_connexion ON ve_connec_connexion;
+CREATE TRIGGER gw_trg_edit_connec_connexion INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec_connexion FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('CONNEXION');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_gully ON v_edit_gully;
+CREATE TRIGGER gw_trg_edit_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_gully FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_gully('parent');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_gully_deversoir ON ve_gully_deversoir;
+CREATE TRIGGER gw_trg_edit_gully_deversoir INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_gully_deversoir FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_gully('DEVERSOIR');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_gully_polygon_caniveau ON ve_gully_polygon_caniveau;
+CREATE TRIGGER gw_trg_edit_gully_polygon_caniveau INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_gully_polygon_caniveau FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_gully('POLYGON_CANIVEAU');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node ON v_edit_node;
+CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_node FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('parent');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_bassin_debordement ON ve_node_bassin_debordement;
+CREATE TRIGGER gw_trg_edit_node_bassin_debordement INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_bassin_debordement FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('BASSIN_DEBORDEMENT');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_bassin_retention ON ve_node_bassin_retention;
+CREATE TRIGGER gw_trg_edit_node_bassin_retention INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_bassin_retention FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('BASSIN_RETENTION');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_caniveau_topo ON ve_node_caniveau_topo;
+CREATE TRIGGER gw_trg_edit_node_caniveau_topo INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_caniveau_topo FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('CANIVEAU_TOPO');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_chambre ON ve_node_chambre;
+CREATE TRIGGER gw_trg_edit_node_chambre INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_chambre FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('CHAMBRE');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_change ON ve_node_change;
+CREATE TRIGGER gw_trg_edit_node_change INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_change FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('CHANGE');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_chute ON ve_node_chute;
+CREATE TRIGGER gw_trg_edit_node_chute INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_chute FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('CHUTE');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_compteur ON ve_node_compteur;
+CREATE TRIGGER gw_trg_edit_node_compteur INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_compteur FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('COMPTEUR');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_element_reseau ON ve_node_element_reseau;
+CREATE TRIGGER gw_trg_edit_node_element_reseau INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_element_reseau FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('ELEMENT_RESEAU');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_init_reseau ON ve_node_init_reseau;
+CREATE TRIGGER gw_trg_edit_node_init_reseau INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_init_reseau FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('INIT_RESEAU');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_jonction ON ve_node_jonction;
+CREATE TRIGGER gw_trg_edit_node_jonction INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_jonction FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('JONCTION');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_noeud_virtuel ON ve_node_noeud_virtuel;
+CREATE TRIGGER gw_trg_edit_node_noeud_virtuel INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_noeud_virtuel FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('NOEUD_VIRTUEL');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_pointhaut ON ve_node_pointhaut;
+CREATE TRIGGER gw_trg_edit_node_pointhaut INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_pointhaut FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('POINTHAUT');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_regard_circ ON ve_node_regard_circ;
+CREATE TRIGGER gw_trg_edit_node_regard_circ INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_regard_circ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('REGARD_CIRC');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_regard_rect ON ve_node_regard_rect;
+CREATE TRIGGER gw_trg_edit_node_regard_rect INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_regard_rect FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('REGARD_RECT');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_sandbox ON ve_node_sandbox;
+CREATE TRIGGER gw_trg_edit_node_sandbox INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_sandbox FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('SANDBOX');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_saut ON ve_node_saut;
+CREATE TRIGGER gw_trg_edit_node_saut INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_saut FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('SAUT');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_seuil ON ve_node_seuil;
+CREATE TRIGGER gw_trg_edit_node_seuil INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_seuil FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('SEUIL');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_station_pompage ON ve_node_station_pompage;
+CREATE TRIGGER gw_trg_edit_node_station_pompage INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_station_pompage FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('STATION_POMPAGE');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_usine_retraitement ON ve_node_usine_retraitement;
+CREATE TRIGGER gw_trg_edit_node_usine_retraitement INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_usine_retraitement FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('USINE_RETRAITEMENT');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_node_valve ON ve_node_valve;
+CREATE TRIGGER gw_trg_edit_node_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valve FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVE');
