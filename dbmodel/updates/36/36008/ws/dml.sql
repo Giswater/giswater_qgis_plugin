@@ -641,3 +641,6 @@ VALUES('ve_epa_virtualvalve', 'form_feature', 'tab_epa', 'edit_dscenario', 'lyt_
 }'::json, 'tbl_inp_dscenario_virtualvalve', false, NULL) ON CONFLICT DO NOTHING;
 
 UPDATE config_form_fields SET layoutorder = 4 WHERE columnname = 'hspacer_epa_1';
+
+UPDATE config_form_fields SET hidden=false WHERE formname='inp_dscenario_demand' AND columnname='feature_id';
+
