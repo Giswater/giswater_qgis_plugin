@@ -149,7 +149,7 @@ BEGIN
 			FOR object_rec IN SELECT json_array_elements_text('["demand", "shortpipe", "tank", "reservoir", "pipe", "pump", "valve"]'::json) as table,
 						json_array_elements_text('["", "node_id", "node_id", "node_id", "arc_id", "node_id", "node_id"]'::json) as pk,
 						json_array_elements_text('["", "node_id, minorloss, status", "node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id", 
-						 "node_id, pattern_id, head", "arc_id, minorloss, status, roughness, dint", "node_id, power, curve_id, speed, pattern, status", 
+						 "node_id, pattern_id, head", "arc_id, minorloss, status, roughness, dint", "node_id, power, curve_id, speed, pattern_id, status", 
 						 "node_id, valv_type, pressure, flow, coef_loss, curve_id, minorloss, status, add_settings"]'::json) as column
 			LOOP
 				IF v_action = 'DELETE-COPY' THEN
@@ -180,7 +180,7 @@ BEGIN
 					ELSE
 						v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' 
 						FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||
-						'ON CONFLICT (dscenario_id, '||object_rec.pk||') DO NOTHING';
+						' ON CONFLICT (dscenario_id, '||object_rec.pk||') DO NOTHING';
 						RAISE NOTICE 'v_querytext %', v_querytext;
 						EXECUTE v_querytext;	
 					END IF;			
