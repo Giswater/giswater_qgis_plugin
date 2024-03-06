@@ -643,4 +643,4 @@ VALUES('ve_epa_virtualvalve', 'form_feature', 'tab_epa', 'edit_dscenario', 'lyt_
 UPDATE config_form_fields SET layoutorder = 4 WHERE columnname = 'hspacer_epa_1';
 
 UPDATE config_form_fields SET hidden=false WHERE formname='inp_dscenario_demand' AND columnname='feature_id';
-
+UPDATE config_form_fields SET layoutorder=3 WHERE columnname='id' AND formname IN ('inp_dscenario_controls', 'inp_dscenario_rules');
