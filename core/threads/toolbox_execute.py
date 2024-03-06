@@ -43,7 +43,6 @@ class GwToolBoxTask(GwTask):
         self.function_name = self.result.get("functionname")
 
         if self.function_name is not None:
-            print("FUNCTION", self.result.get("functionname"))
             self.toolbox.save_settings_values(self.dialog, self.function_name)
             self.toolbox.save_parametric_values(self.dialog, self.function_name)
         else:
