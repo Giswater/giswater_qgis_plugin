@@ -1693,6 +1693,8 @@ class GwInfo(QObject):
             self.layer_new_feature.rollBack()
         except AttributeError:
             pass
+        except RuntimeError:
+            pass
 
         try:
             self.layer.rollBack()
