@@ -133,25 +133,6 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 1, '-------');
 	
 
-	RAISE NOTICE '1 - Check result orphan nodes on rpt tables (fid:  228)';
-	v_querytext = '(SELECT node_id, nodecat_id, the_geom FROM (
-			SELECT node_id FROM temp_t_node where sector_id > 0 EXCEPT 
-			(SELECT node_1 as node_id FROM temp_t_arc  UNION
-			SELECT node_2 FROM temp_t_arc ))a
-			JOIN temp_t_node USING (node_id)) b';
-	
-	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
-	IF v_count > 0  THEN
-		EXECUTE concat ('INSERT INTO temp_anl_node (fid, node_id, nodecat_id, descript, the_geom)
-		SELECT 228, node_id, nodecat_id, ''Orphan node'', the_geom FROM ', v_querytext);
-		INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 3, v_result_id, concat('ERROR-228: There is/are ',v_count,
-		' orphan node''s on this result. This could be because closests arcs maybe UNDEFINED among others.'),v_count);
-	ELSE
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity,  error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, 'INFO: No orphan node(s) found on this result. ', v_count);
-	END IF;
-
 	RAISE NOTICE '2 - Check node_1 or node_2 nulls on on temp_table (454)';
 	v_querytext = '(SELECT arc_id, arccat_id, the_geom, expl_id FROM temp_t_arc WHERE node_1 IS NULL UNION SELECT arc_id, 
 	arccat_id, the_geom, expl_id FROM temp_t_arc WHERE node_2 IS NULL) a';
