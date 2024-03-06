@@ -1125,9 +1125,10 @@ class GwDscenarioManagerButton(GwAction):
         # Disable widgets if updating
         if force_action == "UPDATE":
             tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_{field_id}', False)  # sector_id/dma_id/...
-        # Populate netscenario_id
+        # Populate dscenario_id
         if self.selected_dscenario_id is not None:
-            tools_qt.set_widget_text(self.add_dlg, f'tab_none_dscenario_id', self.selected_dscenario_id)
+            cmb_dscenario_id = self.add_dlg.findChild(QComboBox, 'tab_none_dscenario_id')
+            tools_qt.set_combo_value(cmb_dscenario_id, self.selected_dscenario_id, 0)
             tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_dscenario_id', False)
             # tools_qt.set_checked(self.add_dlg, 'tab_none_active', True)
             field_id = ['dscenario_id', field_id]
