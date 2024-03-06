@@ -644,3 +644,6 @@ UPDATE config_form_fields SET layoutorder = 4 WHERE columnname = 'hspacer_epa_1'
 
 UPDATE config_form_fields SET hidden=false WHERE formname='inp_dscenario_demand' AND columnname='feature_id';
 UPDATE config_form_fields SET layoutorder=3 WHERE columnname='id' AND formname IN ('inp_dscenario_controls', 'inp_dscenario_rules');
+
+INSERT INTO sys_table VALUES('inp_virtualpump', 'Used to store virtual pump values', 'role_epa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL, NULL) ON CONFLICT (id) DO NOTHING;
+
