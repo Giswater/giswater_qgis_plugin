@@ -9,3 +9,5 @@ SET search_path = 'SCHEMA_NAME', public, pg_catalog;
 
 INSERT INTO selector_sector SELECT sector_id, current_user from sector where sector_id > 0 ON CONFLICT (sector_id, cur_user) DO NOTHING;
 DELETE FROM selector_psector;
+
+UPDATE cat_arc SET active=TRUE WHERE arctype_id='VARC' AND id='VIRTUAL';
