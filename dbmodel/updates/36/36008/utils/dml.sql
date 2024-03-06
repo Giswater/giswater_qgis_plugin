@@ -30,3 +30,4 @@ UPDATE config_form_fields
 UPDATE sys_function SET descript='NO input parameters needed.
 The function allows the possibility to find errors and data inconsistency for prices checking catalog elements.' WHERE id=2436 and function_name='gw_fct_plan_check_data';
 
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('graphdelimiter_type', 'CHECKVALVE', 'CHECKVALVE', NULL, NULL);
