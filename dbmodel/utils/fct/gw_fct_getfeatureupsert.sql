@@ -896,7 +896,7 @@ BEGIN
 
 					v_current_id =json_extract_path_text(v_fields_array[array_index],'comboIds');
 
-					IF v_current_id='[]' THEN
+					IF v_current_id='[]' and v_selected_id is not null then
 						--case when list is empty
 						EXECUTE concat('SELECT  array_to_json(''{',v_selected_id,'}''::text[])')
 						INTO v_new_id;
