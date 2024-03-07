@@ -647,3 +647,26 @@ UPDATE config_form_fields SET layoutorder=3 WHERE columnname='id' AND formname I
 
 INSERT INTO sys_table VALUES('inp_virtualpump', 'Used to store virtual pump values', 'role_epa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL, NULL) ON CONFLICT (id) DO NOTHING;
 
+-- 07/03/2024
+
+UPDATE config_function SET layermanager='{
+  "visible": [
+    "v_om_mincut_arc",
+    "v_om_mincut_node",
+    "v_om_mincut_connec",
+    "v_om_mincut_initpoint"
+  ]
+}'::json, actions=NULL WHERE id=2244;
+
+UPDATE config_function SET layermanager='{
+  "visible": [
+    "v_om_mincut_arc",
+    "v_om_mincut_connec",
+    "v_om_mincut_initpoint",
+    "v_om_mincut_node"
+  ],
+  "zoom": {
+    "layer": "v_om_mincut_arc",
+    "margin": 20
+  }
+}'::json, actions=NULL WHERE id=2980;
