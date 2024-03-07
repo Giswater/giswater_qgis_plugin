@@ -769,6 +769,8 @@ class GwElement:
                 y1 = min(y1, extent.yMinimum())
                 x2 = max(x2, extent.xMaximum())
                 y2 = max(y2, extent.yMaximum())
+        if None in (x1, y1, x2, y2):
+            return
         tools_qgis.zoom_to_rectangle(x1, y1, x2, y2)
 
 

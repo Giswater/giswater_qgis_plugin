@@ -924,7 +924,7 @@
        <string>Other prices</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_9">
-       <item row="1" column="1">
+       <item row="1" column="2">
         <widget class="QPushButton" name="btn_remove">
          <property name="text">
           <string>Remove</string>
@@ -944,7 +944,7 @@
          </property>
         </spacer>
        </item>
-       <item row="3" column="0" colspan="2">
+       <item row="3" column="0" colspan="3">
         <layout class="QGridLayout" name="gridLayout_4">
          <item row="0" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_11">
@@ -994,7 +994,7 @@
          </item>
         </layout>
        </item>
-       <item row="0" column="0" colspan="2">
+       <item row="0" column="0" colspan="3">
         <widget class="QScrollArea" name="scrollArea">
          <property name="widgetResizable">
           <bool>true</bool>
@@ -1004,8 +1004,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>908</width>
-            <height>289</height>
+            <width>916</width>
+            <height>301</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
@@ -1072,10 +1072,17 @@
          </widget>
         </widget>
        </item>
-       <item row="2" column="0" colspan="2">
+       <item row="2" column="0" colspan="3">
         <widget class="Line" name="line_5">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QPushButton" name="btn_set_geom">
+         <property name="text">
+          <string>Set geometry</string>
          </property>
         </widget>
        </item>

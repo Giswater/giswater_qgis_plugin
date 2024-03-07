@@ -5,11 +5,12 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis._core import QgsMapLayerStyle
+
+from qgis.PyQt.QtCore import QObject
 
 from ..dialog import GwAction
 from ...utils import tools_gw
-from ....libs import tools_qgis, tools_db, tools_os
+from ....libs import tools_qgis, tools_db, tools_os, tools_qt
 from .... import global_vars
 
 layers_subsetstrings = {}
@@ -56,10 +57,15 @@ def set_epa_world(_set_epa_world=None, selector_change=False, is_init=False):
     # Deactivate EPA
     if not _set_epa_world:
         tools_gw.set_config_parser("epa_world", "epa_world_active", str(_set_epa_world), 'user', 'session')
-        # Disable current toofilters and set previous layer filters
+        # Disable current filters and set previous layer filters
         for layer in arc_layers + node_layers + connec_layers + gully_layers + link_layers:
             if is_init:
-                layer.setSubsetString(layer.dataProvider().subsetString())
+                # Manage style & filter
+                style_manager = layer.styleManager()
+                if style_manager.currentStyle() == "GwEpaStyle":
+                    layer.setSubsetString(None)
+                    if not style_manager.setCurrentStyle("GwStyle"):
+                        style_manager.setCurrentStyle(tools_qt.tr('default', context_name='QgsMapLayerStyleManager'))
             else:
                 layer.setSubsetString(layers_subsetstrings.get(layer.name()))
 

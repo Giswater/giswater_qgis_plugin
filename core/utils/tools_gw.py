@@ -44,7 +44,6 @@ from ..ui.ui_manager import GwSelectorUi
 from . import tools_backend_calls
 from ..load_project_menu import GwMenuLoad
 from ..utils.select_manager import GwSelectManager
-from ..utils.snap_manager import GwSnapManager
 from ..toolbars.toc import epa_world_button
 from ... import global_vars
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
@@ -921,13 +920,18 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
 def load_missing_layers(filter, group="GW Layers", sub_group=None):
     """ Adds any missing Mincut layers to TOC """
 
-    sql = f"SELECT id, alias FROM sys_table WHERE id LIKE '{filter}' AND alias IS NOT NULL"
+    sql = f"SELECT id, alias, addparam FROM sys_table " \
+          f"WHERE id LIKE '{filter}' AND alias IS NOT NULL " \
+          f"ORDER BY orderby DESC"
     rows = tools_db.get_rows(sql)
     if rows:
-        for tablename, alias in rows:
+        for tablename, alias, addparam in rows:
             lyr = tools_qgis.get_layer_by_tablename(tablename)
             if not lyr:
-                add_layer_database(tablename, alias=alias, group=group, sub_group=sub_group)
+                the_geom = 'the_geom'
+                if addparam and addparam.get('geom'):
+                    the_geom = addparam.get('geom')
+                add_layer_database(tablename, the_geom=the_geom, alias=alias, group=group, sub_group=sub_group)
 
 
 def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_set_tabs_enabled=True, close=True, end="\n"):
@@ -3560,10 +3564,10 @@ def refresh_selectors(tab_name=None):
             pass
 
 
-def set_epa_world(_set_epa_world=None, selector_change=None):
+def set_epa_world(_set_epa_world=None, selector_change=False, is_init=False):
     """ Activate or deactivate EPA world. If @_set_epa_world is None it will just refresh the filters """
 
-    epa_world_button.set_epa_world(_set_epa_world, selector_change)
+    epa_world_button.set_epa_world(_set_epa_world, selector_change, is_init)
 
 
 def open_dlg_help():

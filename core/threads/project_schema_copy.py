@@ -10,7 +10,6 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal
 from .task import GwTask
 from ..utils import tools_gw
 from ...libs import tools_qt, tools_db
-from ... import global_vars
 
 
 class GwCopySchemaTask(GwTask):

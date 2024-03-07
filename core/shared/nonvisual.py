@@ -9,6 +9,7 @@ import os
 import webbrowser
 from functools import partial
 
+
 try:
     from scipy.interpolate import CubicSpline
     import numpy as np
@@ -16,9 +17,10 @@ try:
 except ImportError:
     scipy_imported = False
 
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QWidget, QShortcut,QApplication
-from qgis.PyQt.QtGui import QKeySequence
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QWidget, QShortcut,QApplication, QMenu, QAction
+from qgis.PyQt.QtGui import QKeySequence, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.PyQt.QtCore import Qt
 from qgis.core import Qgis
 from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
     GwNonVisualPatternWSUi, GwNonVisualRulesUi, GwNonVisualTimeseriesUi, GwNonVisualLidsUi, GwNonVisualPrint, \
@@ -585,6 +587,10 @@ class GwNonVisual:
         cmb_expl_id = self.dialog.cmb_expl_id
         cmb_curve_type = self.dialog.cmb_curve_type
 
+        # Populate custom context menu
+        tbl_curve_value.setContextMenuPolicy(Qt.CustomContextMenu)
+        tbl_curve_value.customContextMenuRequested.connect(partial(self._paste_curves_custom_menu, tbl_curve_value))
+
         # Copy values from clipboard
         paste_shortcut = QShortcut(QKeySequence.Paste, tbl_curve_value)
         paste_shortcut.activated.connect(partial(self._paste_curves_values, tbl_curve_value))
@@ -625,6 +631,15 @@ class GwNonVisual:
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_curve')
+
+    def _paste_curves_custom_menu(self, tbl):
+        menu = QMenu(tbl)
+        action_paste = QAction("Paste")
+        action_paste.triggered.connect(partial(self._paste_curves_values, tbl))
+
+        menu.addAction(action_paste)
+
+        menu.exec(QCursor.pos())
 
     def _paste_curves_values(self, tbl_curve_value):
         selected = tbl_curve_value.selectedRanges()
@@ -880,18 +895,22 @@ class GwNonVisual:
             # Draw curve with points (0, 1.33y), (x, y), (2x, 0)
             x = x_list[0]
             y = y_list[0]
-            x_array = np.array([0, x, 2*x])
-            y_array = np.array([1.33*y, y, 0])
+            if x != 0:
+                x_array = np.array([0, x, 2*x])
+                y_array = np.array([1.33*y, y, 0])
 
-            # Define x_array as 100 equally spaced values between the min and max of original x_array
-            xnew = np.linspace(x_array.min(), x_array.max(), 100)
+                # Define x_array as 100 equally spaced values between the min and max of original x_array
+                xnew = np.linspace(x_array.min(), x_array.max(), 100)
 
-            # Define spline
-            spl = CubicSpline(x_array, y_array)
-            y_smooth = spl(xnew)
+                # Define spline
+                spl = CubicSpline(x_array, y_array)
+                y_smooth = spl(xnew)
 
-            x_list = xnew
-            y_list = y_smooth
+                x_list = xnew
+                y_list = y_smooth
+            else:
+                msg = f"Can't create curve with only one value if flow is 0. Add more values or change the flow value."
+                tools_qgis.show_warning(msg, dialog=dialog)
 
         # Manage inverted plot and mirror plot for SHAPE type
         if curve_type == 'SHAPE':
@@ -1097,9 +1116,13 @@ class GwNonVisual:
         tbl_pattern_value = self.dialog.tbl_pattern_value
         cmb_expl_id = self.dialog.cmb_expl_id
 
+        # Populate custom context menu
+        tbl_pattern_value.setContextMenuPolicy(Qt.CustomContextMenu)
+        tbl_pattern_value.customContextMenuRequested.connect(partial(self._paste_patterns_custom_menu, tbl_pattern_value))
+
         # Copy values from clipboard
         paste_shortcut = QShortcut(QKeySequence.Paste, tbl_pattern_value)
-        paste_shortcut.activated.connect(partial(self._paste_pattern_values, tbl_pattern_value))
+        paste_shortcut.activated.connect(partial(self._paste_patterns_values, tbl_pattern_value))
 
         # Set scale-to-fit for tableview
         tbl_pattern_value.horizontalHeader().setSectionResizeMode(1)
@@ -1129,7 +1152,17 @@ class GwNonVisual:
         self.dialog.btn_accept.clicked.connect(partial(self._accept_pattern_ws, self.dialog, is_new))
 
 
-    def _paste_pattern_values(self, tbl_patter_value):
+    def _paste_patterns_custom_menu(self, tbl):
+        menu = QMenu(tbl)
+        action_paste = QAction("Paste")
+        action_paste.triggered.connect(partial(self._paste_patterns_values, tbl))
+
+        menu.addAction(action_paste)
+
+        menu.exec(QCursor.pos())
+
+
+    def _paste_patterns_values(self, tbl_patter_value):
         selected = tbl_patter_value.selectedRanges()
         if not selected:
             return
@@ -1509,7 +1542,7 @@ class GwNonVisual:
 
         # Copy values from clipboard
         paste_shortcut = QShortcut(QKeySequence.Paste, cur_table)
-        paste_shortcut.activated.connect(partial(self._paste_pattern_values, cur_table))
+        paste_shortcut.activated.connect(partial(self._paste_patterns_values, cur_table))
 
         try:
             cur_table.cellChanged.disconnect()
@@ -1695,7 +1728,7 @@ class GwNonVisual:
         tools_gw.load_settings(self.dialog)
 
         # Populate sector id combobox
-        self._populate_cmb_sector_id(self.dialog.cmb_sector_id)
+        self._populate_cmb_sector_id(self.dialog, self.dialog.cmb_sector_id)
 
         if control_id is not None:
             self._populate_controls_widgets(control_id)
@@ -1825,7 +1858,7 @@ class GwNonVisual:
         tools_gw.load_settings(self.dialog)
 
         # Populate sector id combobox
-        self._populate_cmb_sector_id(self.dialog.cmb_sector_id)
+        self._populate_cmb_sector_id(self.dialog, self.dialog.cmb_sector_id)
 
         if rule_id is not None:
             self._populate_rules_widgets(rule_id)
@@ -1960,6 +1993,10 @@ class GwNonVisual:
         cmb_expl_id = self.dialog.cmb_expl_id
         tbl_timeseries_value = self.dialog.tbl_timeseries_value
 
+        # Populate custom context menu
+        tbl_timeseries_value.setContextMenuPolicy(Qt.CustomContextMenu)
+        tbl_timeseries_value.customContextMenuRequested.connect(partial(self._paste_timeseries_custom_menu, tbl_timeseries_value))
+
         # Copy values from clipboard
         paste_shortcut = QShortcut(QKeySequence.Paste, tbl_timeseries_value)
         paste_shortcut.activated.connect(partial(self._paste_timeseries_values, tbl_timeseries_value))
@@ -1987,6 +2024,17 @@ class GwNonVisual:
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_timeseries')
+
+
+    def _paste_timeseries_custom_menu(self, tbl):
+        menu = QMenu(tbl)
+        action_paste = QAction("Paste")
+        action_paste.triggered.connect(partial(self._paste_timeseries_values, tbl))
+
+        menu.addAction(action_paste)
+
+        menu.exec(QCursor.pos())
+
 
     def _paste_timeseries_values(self, tbl_timeseries_value):
         selected = tbl_timeseries_value.selectedRanges()
@@ -2321,7 +2369,7 @@ class GwNonVisual:
             tools_qt.fill_combo_values(self.dialog.cmb_lidtype, rows)
 
         # Populate Control Curve combo
-        sql = f"SELECT id FROM v_edit_inp_curve; "
+        sql = f"SELECT id, id as idval FROM v_edit_inp_curve; "
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(self.dialog.txt_7_cmb_control_curve, rows)
@@ -2746,12 +2794,18 @@ class GwNonVisual:
         return values
 
 
-    def _populate_cmb_sector_id(self, combobox):
+    def _populate_cmb_sector_id(self, dialog, combobox):
 
+        tooltip = "Active sectors for user selection (check selector sector)"
+        combobox.setToolTip(tooltip)
         sql = f"SELECT sector_id as id, name as idval FROM v_edit_sector WHERE sector_id > 0"
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(combobox, rows)
+        else:
+            tools_qt.set_widget_enabled(dialog, 'chk_active', False)
+            tools_qt.set_widget_enabled(dialog, 'txt_text', False)
+            tools_qt.set_widget_enabled(dialog, 'btn_accept', False)
 
 
     def _create_plot_widget(self, dialog):

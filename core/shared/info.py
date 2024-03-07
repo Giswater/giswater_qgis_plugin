@@ -37,8 +37,7 @@ from ..threads.toggle_valve_state import GwToggleValveTask
 
 from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, \
-    GwInfoCrossectUi, GwInterpolate, GwInfoEpaDemandUi, GwInfoEpaOrificeUi, GwInfoEpaOutletUi, GwInfoEpaPumpUi, \
-    GwInfoEpaWeirUi, GwInfoEpaDwfUi
+    GwInfoCrossectUi, GwInterpolate
 from ... import global_vars
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_db, tools_os
 from ...libs.tools_qt import GwHyperLinkLineEdit
@@ -691,7 +690,7 @@ class GwInfo(QObject):
                     widget_offset = 0
                     prev_layout = layout.objectName()
                 # Take the QGridLayout with the intention of adding a QSpacerItem later
-                if layout not in layout_list and layout.objectName() in ('lyt_data_1', 'lyt_data_2',
+                if layout not in layout_list and layout.objectName() in ('lyt_data_1', 'lyt_data_2', 'lyt_data_3',
                                                                          'lyt_epa_data_1', 'lyt_epa_data_2'):
                     layout_list.append(layout)
 
@@ -1694,6 +1693,8 @@ class GwInfo(QObject):
             self.layer_new_feature.rollBack()
         except AttributeError:
             pass
+        except RuntimeError:
+            pass
 
         try:
             self.layer.rollBack()
@@ -2373,7 +2374,8 @@ class GwInfo(QObject):
                     for act in self.visible_tabs[tab]['tabactions']:
                         action = dialog.findChild(QAction, act['actionName'])
                         if action is not None:
-                            action.setToolTip(act['actionTooltip'])
+                            if 'actionTooltip' in act:
+                                action.setToolTip(act['actionTooltip'])
                             action.setVisible(True)
 
         self._enable_actions(dialog, self.action_edit.isChecked())
@@ -2740,6 +2742,7 @@ class GwInfo(QObject):
             tools_qt.set_tableview_config(widget, edit_triggers=QTableView.DoubleClicked, sectionResizeMode=0)
             widget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, 1, True)
             if 'tab_epa' in widgetname:
+                widget.doubleClicked.connect(partial(epa_tbl_doubleClicked, widget, self.dlg_cf))
                 model = widget.model()
                 tbl_upsert = widget.property('widgetcontrols').get('tableUpsert')
                 setattr(self, f"my_json_{tbl_upsert}", {})
@@ -3081,6 +3084,11 @@ class GwInfo(QObject):
                     level = int(json_result['message']['level'])
                 tools_qgis.show_message(json_result['message']['text'], level)
 
+            # Refresh tab epa
+            epa_type = tools_qt.get_text(self.dlg_cf, 'tab_data_epa_type')
+            if epa_type and epa_type.lower() in ('valve', 'shortpipe', 'pump'):
+                self._reload_epa_tab(self.dlg_cf)
+
 
     def _cancel_snapping_tool(self, dialog, action):
 
@@ -3247,7 +3255,9 @@ def fill_tbl(complet_list, tbl, info, view, dlg):
 
 def epa_tbl_doubleClicked(tbl, dlg):
 
-    if 'dscenario' in tbl.objectName():
+    if 'tab_epa' in tbl.objectName():
+        dlg.findChild(QPushButton, 'tab_epa_edit_dscenario').click()
+    elif 'dscenario' in tbl.objectName():
         dlg.findChild(QPushButton, 'btn_edit_dscenario').click()
     else:
         dlg.findChild(QPushButton, 'btn_edit_base').click()
@@ -3483,7 +3493,7 @@ def refresh_epa_tbl(tblview, dlg, **kwargs):
             continue
         id_name = tableview.get('id_name', id_name)
         if dlg == info.dlg_cf:
-            view = tableview['tbl'].replace("tab_epa_", "")
+            view = tbl.property('linkedobject')
         else:
             view = tableview['view']
         complet_list = get_list(view, id_name, feature_id)
@@ -3491,7 +3501,7 @@ def refresh_epa_tbl(tblview, dlg, **kwargs):
         tools_gw.set_tablemodel_config(dlg, tbl, view, schema_name=info.schema_name, isQStandardItemModel=True)
 
 
-def reload_tbl_dscenario (info, tablename, tableview, id_name, feature_id):
+def reload_tbl_dscenario(info, tablename, tableview, id_name, feature_id):
     tbl_name = tablename.replace("tbl", "tbl_dscenario")
     view = tableview.replace("inp", "inp_dscenario")
     tbl = info.dlg.findChild(QTableView, tbl_name)
@@ -3798,6 +3808,28 @@ def remove_from_dscenario(**kwargs):
     setattr(info, f"my_json_{tablename}", {})
 
     delete_tbl_row(tbl, tablename, pkey, dialog, **kwargs)
+
+
+def edit_dscenario(**kwargs):
+    func_params = kwargs['func_params']
+    dialog = kwargs['dialog']
+    info = kwargs['class']
+    tbl = tools_qt.get_widget(dialog, func_params.get('targetwidget'))
+    tablename = func_params.get('tablename')
+    view = tablename
+    pkey = func_params.get('pkey')
+    dlg_title = f"Edit {tablename}"
+
+    my_json = getattr(info, f"my_json_{tablename}")
+    if my_json:
+        message = "You are trying to add/remove a record from the table, with changes to the current records. If you continue, the changes will be discarded without saving. Do you want to continue?"
+        answer = tools_qt.show_question(message, "Info Message", force_action=True)
+        if not answer:
+            return
+
+    setattr(info, f"my_json_{tablename}", {})
+
+    edit_row_epa(tbl, view, tablename, pkey, dialog, dlg_title, **kwargs)
 
 # endregion
 

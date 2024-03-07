@@ -9,7 +9,6 @@ or (at your option) any later version.
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtWidgets import QDockWidget
 
-from ... import global_vars
 from ...libs import lib_vars
 
 

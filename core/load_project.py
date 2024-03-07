@@ -33,7 +33,7 @@ class GwLoadProject(QObject):
         self.buttons = {}
 
 
-    def project_read(self, show_warning=True):
+    def project_read(self, show_warning=True, main=None):
         """ Function executed when a user opens a QGIS project (*.qgs) """
 
         global_vars.project_loaded = False
@@ -111,6 +111,15 @@ class GwLoadProject(QObject):
         #     self.gw_search = GwSearch()
         #     self.gw_search.open_search(self.dlg_search, load_project=True)
 
+        # Connect project save / new project
+        try:
+            tools_gw.connect_signal(self.iface.newProjectCreated, main._project_new,
+                                    'main', 'newProjectCreated')
+            tools_gw.connect_signal(self.iface.actionSaveProject().triggered, self._save_toolbars_position,
+                                    'main', 'actionSaveProject_save_toolbars_position')
+        except AttributeError:
+            pass
+
         # Get feature cat
         global_vars.feature_cat = tools_gw.manage_feature_cat()
 
@@ -133,6 +142,9 @@ class GwLoadProject(QObject):
         force_tab_expl = tools_gw.get_config_parser('system', 'force_tab_expl', 'user', 'init', prefix=False)
         if tools_os.set_boolean(force_tab_expl, False):
             self._force_tab_exploitation()
+
+        # Manage epa POV
+        tools_gw.set_epa_world(False, is_init=True)
 
         # Set lib_vars.project_epsg
         lib_vars.project_epsg = tools_qgis.get_epsg()
@@ -183,6 +195,28 @@ class GwLoadProject(QObject):
 
     # region private functions
 
+    def _save_toolbars_position(self):
+        # Get all QToolBar from qgis iface
+        widget_list = self.iface.mainWindow().findChildren(QToolBar)
+        own_toolbars = []
+
+        # Get list with own QToolBars
+        for w in widget_list:
+            if w.property('gw_name'):
+                own_toolbars.append(w)
+
+        # Order list of toolbar in function of X position
+        own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
+        if len(own_toolbars) == 0 or (len(own_toolbars) == 1 and own_toolbars[0].property('gw_name') == 'toc') or \
+                global_vars.project_type is None:
+            return
+
+        # Set 'toolbars_order' parameter on 'toolbars_position' section on init.config user file (found in user path)
+        sorted_toolbar_ids = [tb.property('gw_name') for tb in own_toolbars]
+        sorted_toolbar_ids = ",".join(sorted_toolbar_ids)
+        tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids), "user", "init")
+
+
     def _check_version_compatibility(self):
 
         # Get current QGIS and PostgreSQL versions
@@ -215,6 +249,7 @@ class GwLoadProject(QObject):
         lib_vars.project_vars['main_schema'] = tools_qgis.get_project_variable('gwMainSchema')
         lib_vars.project_vars['project_role'] = tools_qgis.get_project_variable('gwProjectRole')
         lib_vars.project_vars['project_type'] = tools_qgis.get_project_variable('gwProjectType')
+        lib_vars.project_vars['store_credentials'] = tools_qgis.get_project_variable('gwStoreCredentials')
 
 
     def _get_user_variables(self):
