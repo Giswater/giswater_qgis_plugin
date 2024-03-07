@@ -660,7 +660,7 @@ BEGIN
 				-- setQgisLayers: not used variable on python 3.4 because threath is operative to refresh_attribute of whole layers
 	END IF;
 
-	DELETE FROM audit_check_data WHERE cur_user = current_user AND fid = 101;
+	DELETE FROM audit_check_data WHERE cur_user = current_user AND fid in (101, 251, 115, 125, 195, 225);
 
 	DELETE FROM anl_node 
 	WHERE cur_user = current_user AND fid IN (103,104,106,187,188,196,197,201,202,203,204,205,257,372,417,418,419,421,422,423,424,442,443,461,478,479,488,480,497,498,499,	-- OM
