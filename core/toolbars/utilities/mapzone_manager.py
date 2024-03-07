@@ -39,7 +39,7 @@ class GwMapzoneManager:
         self.vertex_marker = self.snapper_manager.vertex_marker
         self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
 
-        self.feature_types = ['sector_id', 'dma_id', 'presszone_id', 'dqa_id']
+        self.feature_types = ['sector_id', 'dma_id', 'presszone_id', 'dqa_id', 'drainzone_id']
         self.mapzone_mng_dlg = None
         self.netscenario_id = None
 
