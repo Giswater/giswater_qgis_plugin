@@ -589,7 +589,7 @@ class GwNetscenarioManagerButton(GwAction):
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_netscenario)
+            tools_qgis.show_warning(message, dialog=self.dlg_netscenario_manager)
             return
 
         for index in selected_list:
