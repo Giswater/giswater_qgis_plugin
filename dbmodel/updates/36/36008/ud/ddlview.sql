@@ -23,3 +23,12 @@ AS SELECT drainzone.drainzone_id,
    FROM selector_expl,
     drainzone
   WHERE drainzone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+create trigger gw_trg_edit_drainzone instead of
+insert
+    or
+delete
+    or
+update
+    on
+    v_edit_drainzone for each row execute function gw_trg_edit_drainzone();
