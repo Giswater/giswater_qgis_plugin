@@ -784,7 +784,7 @@ BEGIN
 			EXECUTE v_querytext;
 
 			-- update link table
-			EXECUTE 'UPDATE temp_t_link SET lastupdate = lastupdate = now(), lastupdate_user=current_user;';
+			EXECUTE 'UPDATE temp_t_link SET lastupdate = now(), lastupdate_user=current_user;';
 
 			IF v_project_type='UD' THEN
 				v_querytext = 'UPDATE temp_t_gully SET lastupdate = now(), lastupdate_user=current_user FROM temp_t_arc a WHERE a.arc_id=temp_t_gully.arc_id';
