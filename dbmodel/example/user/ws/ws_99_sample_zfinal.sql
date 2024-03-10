@@ -11,3 +11,6 @@ INSERT INTO selector_sector SELECT sector_id, current_user from sector where sec
 DELETE FROM selector_psector;
 
 UPDATE cat_arc SET active=TRUE WHERE arctype_id='VARC' AND id='VIRTUAL';
+
+UPDATE om_visit SET startdate = startdate -  random() * (startdate - timestamp '2022-01-01 10:00:00');
+UPDATE om_visit SET enddate = enddate -  random() * (enddate - timestamp '2022-01-01 10:00:00');
