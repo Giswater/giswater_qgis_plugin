@@ -13,3 +13,4 @@ build/
 .idea/
 test/log/
 __pycache__
+config/dev.config
