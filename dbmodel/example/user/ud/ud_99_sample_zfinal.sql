@@ -19,3 +19,11 @@ INSERT INTO cat_grate (id, matcat_id, length, width, total_area, effective_area,
 
 UPDATE om_visit SET startdate = startdate -  random() * (startdate - timestamp '2022-01-01 10:00:00');
 UPDATE om_visit SET enddate = enddate -  random() * (enddate - timestamp '2022-01-01 10:00:00');
+
+UPDATE arc SET builtdate = now() -  random() * (now() - timestamp '1990-01-01 00:00:00');
+UPDATE node SET builtdate = now() -  random() * (now() - timestamp '1990-01-01 00:00:00');
+UPDATE connec SET builtdate = now() -  random() * (now() - timestamp '1990-01-01 00:00:00');
+UPDATE gully SET builtdate = now() -  random() * (now() - timestamp '1990-01-01 00:00:00');
+UPDATE link SET builtdate = c.builtdate FROM connec c WHERE feature_id = connec_id;
+UPDATE link SET builtdate = g.builtdate FROM gully g WHERE feature_id = gully_id;
+UPDATE element SET builtdate = now() -  random() * (now() - timestamp '1990-01-01 00:00:00');

@@ -14,3 +14,9 @@ UPDATE cat_arc SET active=TRUE WHERE arctype_id='VARC' AND id='VIRTUAL';
 
 UPDATE om_visit SET startdate = startdate -  random() * (startdate - timestamp '2022-01-01 10:00:00');
 UPDATE om_visit SET enddate = enddate -  random() * (enddate - timestamp '2022-01-01 10:00:00');
+
+UPDATE arc SET builtdate = now() -  random() * (now() - timestamp '1990-01-01 00:00:00');
+UPDATE node SET builtdate = now() -  random() * (now() - timestamp '1990-01-01 00:00:00');
+UPDATE connec SET builtdate = now() -  random() * (now() - timestamp '1990-01-01 00:00:00');
+UPDATE link SET builtdate = c.builtdate FROM connec c WHERE feature_id = connec_id;
+UPDATE element SET builtdate = now() -  random() * (now() - timestamp '1990-01-01 00:00:00');
