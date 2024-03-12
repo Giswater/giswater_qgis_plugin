@@ -481,7 +481,9 @@ UPDATE config_function SET id=3228 WHERE function_name='gw_fct_anl_node_proximit
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source")
 VALUES(3234, 'The inserted feature has a diferent exploitation than the psector',
-'Only features with the same exploitation as the psector are allowed', 2, true, 'utils', 'core');
+'Only features with the same exploitation as the psector are allowed', 2, true, 'utils', 'core')
+on conflict (id) do nothing;
+
 
 -- code reservation for gw_fct_setepacorporate_val
 --INSERT INTO sys_function(id) VALUES (3240);

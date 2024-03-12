@@ -1271,7 +1271,7 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"placement_type", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"valve_type", "action":"ADD-FIELD","hasChilds":"True"}}$$);
+"data":{"viewName":["v_edit_node"], "systemId":"VALVE", "fieldName":"valve_type", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "systemId":"HYDRANT","fieldName":"hydrant_type", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 

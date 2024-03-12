@@ -164,3 +164,8 @@ VALUES (3200, 'Workspace is not editable you can''t modify it nor delete it', NU
 UPDATE cat_workspace SET iseditable=TRUE WHERE iseditable IS NULL;
 
 UPDATE sys_message SET log_level=2 WHERE id=3142;
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source")
+VALUES(3234, 'The inserted feature has a diferent exploitation than the psector',
+'Only features with the same exploitation as the psector are allowed', 2, true, 'utils', 'core')
+on conflict (id) do nothing;
