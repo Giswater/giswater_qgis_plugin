@@ -2514,54 +2514,57 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
 
                     # Get values for set layer style
                     opacity = 100
-                    style_type = json_result['body']['returnManager']['style']
 
-                    if 'style' in return_manager and 'values' in return_manager['style'][key]:
-                        if 'transparency' in return_manager['style'][key]['values']:
-                            opacity = return_manager['style'][key]['values']['transparency']
-                    if style_type[key]['style'] == 'categorized':
-                        if 'transparency' in return_manager['style'][key]:
-                            opacity = return_manager['style'][key]['transparency']
-                        color_values = {}
-                        for item in json_result['body']['returnManager']['style'][key].get('values', []):
-                            color = QColor(item['color'][0], item['color'][1], item['color'][2], int(opacity * 255))
-                            color_values[item['id']] = color
-                        cat_field = str(style_type[key]['field'])
-                        size = style_type[key]['width'] if style_type[key].get('width') else 2
-                        tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values, opacity=int(opacity * 255))
+                    if json_result['body'].get('returnManager'):
 
-                    elif style_type[key]['style'] == 'random':
-                        size = style_type['width'] if style_type.get('width') else 2
-                        if geometry_type == 'Point':
-                            v_layer.renderer().symbol().setSize(size)
-                        elif geometry_type in ('Polygon', 'Multipolygon'):
-                            pass
-                        else:
-                            v_layer.renderer().symbol().setWidth(size)
-                        v_layer.renderer().symbol().setOpacity(opacity)
+                        style_type = json_result['body']['returnManager']['style']
 
-                    elif style_type[key]['style'] == 'qml':
-                        style_id = style_type[key]['id']
-                        extras = f'"style_id":"{style_id}"'
-                        body = create_body(extras=extras)
-                        style = execute_procedure('gw_fct_getstyle', body)
-                        if style is None or style.get('status') == 'Failed':
-                            return
-                        if 'styles' in style['body']:
-                            if 'style' in style['body']['styles']:
-                                qml = style['body']['styles']['style']
-                                tools_qgis.create_qml(v_layer, qml)
+                        if 'style' in return_manager and 'values' in return_manager['style'][key]:
+                            if 'transparency' in return_manager['style'][key]['values']:
+                                opacity = return_manager['style'][key]['values']['transparency']
+                        if style_type[key]['style'] == 'categorized':
+                            if 'transparency' in return_manager['style'][key]:
+                                opacity = return_manager['style'][key]['transparency']
+                            color_values = {}
+                            for item in json_result['body']['returnManager']['style'][key].get('values', []):
+                                color = QColor(item['color'][0], item['color'][1], item['color'][2], int(opacity * 255))
+                                color_values[item['id']] = color
+                            cat_field = str(style_type[key]['field'])
+                            size = style_type[key]['width'] if style_type[key].get('width') else 2
+                            tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values, opacity=int(opacity * 255))
 
-                    elif style_type[key]['style'] == 'unique':
-                        color = style_type[key]['values']['color']
-                        size = style_type['width'] if style_type.get('width') else 2
-                        color = QColor(color[0], color[1], color[2])
-                        if key == 'point':
-                            v_layer.renderer().symbol().setSize(size)
-                        elif key in ('line', 'polygon'):
-                            v_layer.renderer().symbol().setWidth(size)
-                        v_layer.renderer().symbol().setColor(color)
-                        v_layer.renderer().symbol().setOpacity(opacity)
+                        elif style_type[key]['style'] == 'random':
+                            size = style_type['width'] if style_type.get('width') else 2
+                            if geometry_type == 'Point':
+                                v_layer.renderer().symbol().setSize(size)
+                            elif geometry_type in ('Polygon', 'Multipolygon'):
+                                pass
+                            else:
+                                v_layer.renderer().symbol().setWidth(size)
+                            v_layer.renderer().symbol().setOpacity(opacity)
+
+                        elif style_type[key]['style'] == 'qml':
+                            style_id = style_type[key]['id']
+                            extras = f'"style_id":"{style_id}"'
+                            body = create_body(extras=extras)
+                            style = execute_procedure('gw_fct_getstyle', body)
+                            if style is None or style.get('status') == 'Failed':
+                                return
+                            if 'styles' in style['body']:
+                                if 'style' in style['body']['styles']:
+                                    qml = style['body']['styles']['style']
+                                    tools_qgis.create_qml(v_layer, qml)
+
+                        elif style_type[key]['style'] == 'unique':
+                            color = style_type[key]['values']['color']
+                            size = style_type['width'] if style_type.get('width') else 2
+                            color = QColor(color[0], color[1], color[2])
+                            if key == 'point':
+                                v_layer.renderer().symbol().setSize(size)
+                            elif key in ('line', 'polygon'):
+                                v_layer.renderer().symbol().setWidth(size)
+                            v_layer.renderer().symbol().setColor(color)
+                            v_layer.renderer().symbol().setOpacity(opacity)
 
                     global_vars.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
                     if margin:
