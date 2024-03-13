@@ -159,7 +159,7 @@ BEGIN
 		EXIT WHEN affected_rows = 0;
 	END LOOP;
 
-	-- 2) remove results (arc twin as closest choosed arc connected with valve if click on user takes it)
+	-- 2) remove results (arc twin as closest chosen arc connected with valve if click on user takes it)
 	IF v_mincutstep = 1 THEN 
 
 		UPDATE temp_anlgraph SET water=0 WHERE arc_id IN (

@@ -128,7 +128,7 @@ BEGIN
 		ELSE 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '');
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
-			VALUES (v_fid, null, 3, concat('ERROR: The table choosed does not fit with any epa dscenario. Please try another one.'));
+			VALUES (v_fid, null, 3, concat('ERROR: The table chosen does not fit with any epa dscenario. Please try another one.'));
 			v_finish = true;
 		END IF;
 

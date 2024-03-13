@@ -129,7 +129,7 @@ BEGIN
 	v_hydroscenarioval = (SELECT name FROM config_param_user JOIN cat_hydrology c ON value = hydrology_id::text WHERE parameter = 'inp_options_hydrology_scenario' AND cur_user = current_user);
 	v_dwfscenarioval = (SELECT idval FROM config_param_user JOIN cat_dwf_scenario c ON value = c.id::text WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user);
 	IF v_dwfscenarioval IS NULL THEN
-		v_dwfscenarioval = 'No dwf scenario choosed';
+		v_dwfscenarioval = 'No dwf scenario chosen';
 	END IF;
 
 	-- get settings values
