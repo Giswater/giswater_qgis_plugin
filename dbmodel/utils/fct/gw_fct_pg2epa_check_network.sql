@@ -61,6 +61,7 @@ v_delnetwork boolean;
 v_removedemands boolean;
 v_minlength float;
 v_demand numeric (12,4);
+v_networkmode integer;
 
 BEGIN
 	-- Search path
@@ -77,6 +78,7 @@ BEGIN
 	-- get options data
 	SELECT value INTO v_linkoffsets FROM config_param_user WHERE parameter = 'inp_options_link_offsets' AND cur_user = current_user;
 	SELECT value INTO v_minlength FROM config_param_user WHERE parameter = 'inp_options_minlength' AND cur_user = current_user;
+	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
 
 
 	-- get user variables
@@ -168,17 +170,20 @@ BEGIN
 
 	RAISE NOTICE '3 - Check links over nodarcs (404)';
 
-	SELECT count(*) INTO v_count FROM v_edit_link l, temp_t_arc a WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND a.epa_type NOT IN ('CONDUIT', 'PIPE', 'VIRTUALVALVE');
-	
-	IF v_count > 0 THEN
-		EXECUTE 'INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, state, expl_id, the_geom, descript)
-			SELECT 404, link_id, ''LINK'', l.state, l.expl_id, l.the_geom, ''Link over nodarc'' FROM v_edit_link l, temp_t_arc a 
-			WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND a.epa_type NOT IN (''CONDUIT'', ''PIPE'', ''VIRTUALVALVE'')';
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, concat('ERROR-404: There is/are ',v_count,' link(s) with endpoint over nodarcs.'),v_count);
-	ELSE
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1,'INFO: No endpoint links checked over nodarcs on this result.',v_count);
+	IF v_networkmode > 2 THEN
+
+		SELECT count(*) INTO v_count FROM v_edit_link l, temp_t_arc a WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND a.epa_type NOT IN ('CONDUIT', 'PIPE', 'VIRTUALVALVE');
+		
+		IF v_count > 0 THEN
+			EXECUTE 'INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, state, expl_id, the_geom, descript)
+				SELECT 404, link_id, ''LINK'', l.state, l.expl_id, l.the_geom, ''Link over nodarc'' FROM v_edit_link l, temp_t_arc a 
+				WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND a.epa_type NOT IN (''CONDUIT'', ''PIPE'', ''VIRTUALVALVE'')';
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-404: There is/are ',v_count,' link(s) with endpoint over nodarcs.'),v_count);
+		ELSE
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
+			VALUES (v_fid, v_result_id, 1,'INFO: No endpoint links checked over nodarcs on this result.',v_count);
+		END IF;
 	END IF;
 	
 	
