@@ -39,6 +39,7 @@ from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, \
     GwInfoCrossectUi, GwInterpolate
 # WARNING: DO NOT REMOVE THESE IMPORTS, THEY ARE USED BY EPA ACTIONS
+# noinspection PyUnresolvedReferences
 from ..ui.ui_manager import GwInfoEpaDemandUi, GwInfoEpaOrificeUi, GwInfoEpaOutletUi, GwInfoEpaPumpUi, \
     GwInfoEpaWeirUi, GwInfoEpaDwfUi
 from ... import global_vars
