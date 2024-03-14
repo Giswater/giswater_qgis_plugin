@@ -32,6 +32,7 @@ v_version text;
 v_epsg integer;
 v_message text;
 v_return json;
+v_addschema text;
 
 BEGIN
 
