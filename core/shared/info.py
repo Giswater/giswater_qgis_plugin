@@ -1599,8 +1599,9 @@ class GwInfo(QObject):
                 self._enable_actions(dialog, False)
                 return
             save = self._ask_for_save(action_edit, fid)
+            accepted = False
             if save:
-                self._manage_accept(dialog, action_edit, new_feature, self.my_json, False, generic)
+                accepted = self._manage_accept(dialog, action_edit, new_feature, self.my_json, False, generic)
             elif self.new_feature_id is not None:
                 if lib_vars.session_vars['dialog_docker'] and lib_vars.session_vars['info_docker']:
                     self._manage_docker_close()
@@ -1609,8 +1610,9 @@ class GwInfo(QObject):
             if new_feature:
                 for tab in self.visible_tabs:
                     tools_qt.enable_tab_by_tab_name(self.tab_main, self.visible_tabs[tab]['tabName'], True)
-            self._reload_epa_tab(dialog)
-            self._reset_my_json()
+            if save and accepted:
+                self._reload_epa_tab(dialog)
+                self._reset_my_json()
         else:
             tools_qt.set_action_checked(action_edit, True)
             tools_gw.enable_all(dialog, self.complet_result['body']['data'])
@@ -1625,8 +1627,9 @@ class GwInfo(QObject):
             tools_gw.close_dialog(dialog)
             return
 
-        self._manage_accept(dialog, action_edit, new_feature, my_json, True, generic)
-        self._reset_my_json()
+        status = self._manage_accept(dialog, action_edit, new_feature, my_json, True, generic)
+        if status:
+            self._reset_my_json()
 
 
     def _manage_accept(self, dialog, action_edit, new_feature, my_json, close_dlg, generic=False):
@@ -1639,6 +1642,7 @@ class GwInfo(QObject):
             if self.epa_complet_result:
                 tools_gw.enable_widgets(dialog, self.epa_complet_result['body']['data'], False)
             self._enable_actions(dialog, False)
+        return status
 
 
     def _stop_editing(self, dialog, action_edit, layer, fid, my_json, new_feature=None):
@@ -1655,8 +1659,9 @@ class GwInfo(QObject):
             save = self._ask_for_save(action_edit, fid)
             if save:
                 self._reset_my_json()
-                self._manage_accept(dialog, action_edit, new_feature, my_json, False)
-            self._reset_my_json()
+                accepted = self._manage_accept(dialog, action_edit, new_feature, my_json, False)
+                if accepted:
+                    self._reset_my_json()
 
             return save
 
