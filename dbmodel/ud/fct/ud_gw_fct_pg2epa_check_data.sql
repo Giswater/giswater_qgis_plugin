@@ -557,9 +557,9 @@ BEGIN
 	SELECT q1.* FROM query q1 
 	LEFT JOIN 
 	(SELECT * FROM (
-	SELECT subc_id, outlet_id, the_geom from v_edit_inp_subcatchment where left(outlet_id::text, 1) != ''{''::text 
+	SELECT 440, subc_id, outlet_id, the_geom from v_edit_inp_subcatchment where left(outlet_id::text, 1) != ''{''::text 
 	UNION
-	SELECT subc_id, unnest(outlet_id::text[]), the_geom AS outlet_id from v_edit_inp_subcatchment where left(outlet_id::text, 1) = ''{''::text)a)b
+	SELECT 440, subc_id, unnest(outlet_id::text[]), the_geom AS outlet_id from v_edit_inp_subcatchment where left(outlet_id::text, 1) = ''{''::text)a)b
 	USING (outlet_id)
 	WHERE b.subc_id IS NULL';
 
