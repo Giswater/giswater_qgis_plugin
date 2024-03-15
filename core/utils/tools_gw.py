@@ -109,7 +109,7 @@ def initialize_parsers():
         filepath, parser = _get_parser_from_filename(config)
         global_vars.configs[config][0] = filepath
         global_vars.configs[config][1] = parser
-        if parser is None:
+        if parser is None and config != 'dev':  # dev.config file might or might not exist
             success = False
     return success
 
