@@ -2846,6 +2846,12 @@ class GwAdminButton:
                         aux = list_aux[x].split(" ")
                         str_aux = ""
                         for i in range(len(aux)):
+                            # If the text starts with `;` it means it's the annotation for that line, so we put all
+                            # the annotation text in a single string to then insert it to csv39
+                            if str(aux[i]).startswith(';'):
+                                final_col = ' '.join(aux[i:])
+                                dirty_list.append(final_col)
+                                break
                             # If text is between double-quotes, insert it without the quotes
                             #     This includes "xxxx" and ""
                             if str(aux[i]).startswith('"') and str(aux[i]).endswith('"'):
@@ -2881,12 +2887,15 @@ class GwAdminButton:
                 sql += "INSERT INTO temp_csv (fid, source, "
                 values = "VALUES(239, $$" + target + "$$, "
                 for x in range(0, len(sp_n)):
+                    csv_col = str(x + 1)
                     if sp_n[x] != "''":
-                        sql += "csv" + str(x + 1) + ", "
+                        if sp_n[x].strip().replace("\n", "").startswith(';') and x == len(sp_n)-1:
+                            csv_col = "39"
+                        sql += "csv" + csv_col + ", "
                         value = "$$" + sp_n[x].strip().replace("\n", "") + "$$, "
                         values += value.replace("$$$$", "null")
                     else:
-                        sql += "csv" + str(x + 1) + ", "
+                        sql += "csv" + csv_col + ", "
                         values = "VALUES(null, "
                 sql = sql[:-2] + ") "
                 values = values[:-2] + ");\n"
