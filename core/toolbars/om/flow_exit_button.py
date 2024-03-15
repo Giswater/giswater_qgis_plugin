@@ -68,7 +68,7 @@ class GwFlowExitButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Click on node to computed its downstream network"
+            message = "Click on node to compute its downstream network"
             tools_qgis.show_info(message)
 
         # Control current layer (due to QGIS bug in snapping system)
