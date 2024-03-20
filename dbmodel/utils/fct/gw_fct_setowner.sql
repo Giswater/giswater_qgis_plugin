@@ -12,8 +12,7 @@ $BODY$
 
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_setowner($${"client":{"lang":"ES"}, 
-"data":{"owner":"role_admin"}}$$);
+SELECT SCHEMA_NAME.gw_fct_setowner($${"client":{"lang":"ES"}, "data":{"owner":"role_admin"}}$$);
 */
 
 
@@ -52,19 +51,18 @@ BEGIN
 		EXECUTE 'ALTER TABLE '|| v_schema ||'."'|| rec ||'" OWNER TO '|| v_owner ||';';
 	END LOOP;
 
-FOR rec IN
+	FOR rec IN
 		EXECUTE 'SELECT sequence_name FROM information_schema.SEQUENCES WHERE sequence_schema = '|| quote_literal(v_schema)||''
 	LOOP
 
 		EXECUTE 'ALTER SEQUENCE '|| v_schema ||'."'|| rec ||'" OWNER TO '|| v_owner ||';';
 	END LOOP;
 
-FOR rec IN
-	EXECUTE 'SELECT concat(routine_name,''('',string_agg(parameters.data_type,'', '' order by parameters.ordinal_position),'')'')
+	FOR rec IN
+		EXECUTE 'SELECT concat(routine_name,''('',string_agg(parameters.data_type,'', '' order by parameters.ordinal_position),'')'')
 		FROM information_schema.routines
-	   LEFT JOIN information_schema.parameters ON routines.specific_name=parameters.specific_name
-		WHERE routines.specific_schema='|| quote_literal(v_schema)||' and routine_name not in (
-		''gw_fct_cad_add_relative_point'') and routine_name not ilike ''%trg%''group by routines.specific_name,routine_name'
+		LEFT JOIN information_schema.parameters ON routines.specific_name=parameters.specific_name
+		WHERE routines.specific_schema='|| quote_literal(v_schema)||' and routine_name not ilike ''%trg%''group by routines.specific_name,routine_name'
 	LOOP
 		IF rec ilike '%ARRAY%' THEN
 			rec = replace(rec, 'ARRAY','text[]');
@@ -78,7 +76,7 @@ FOR rec IN
 	FOR rec IN
 	EXECUTE 'SELECT concat(routine_name,''('',string_agg(parameters.data_type,'', ''),'')'') 
 		FROM information_schema.routines
-	   LEFT JOIN information_schema.parameters ON routines.specific_name=parameters.specific_name
+		LEFT JOIN information_schema.parameters ON routines.specific_name=parameters.specific_name
 		WHERE routines.specific_schema='|| quote_literal(v_schema)||' and routine_name  ilike ''%trg%'' group by routine_name'
 	LOOP
 		EXECUTE 'ALTER FUNCTION '|| v_schema ||'.'|| rec ||' OWNER TO '|| v_owner ||';';
