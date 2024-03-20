@@ -7,17 +7,11 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-DROP TRIGGER gw_trg_link_data ON connec;
-CREATE TRIGGER gw_trg_link_data
-AFTER UPDATE OF epa_type, state_type, expl_id2, connecat_id
-ON connec FOR EACH ROW  EXECUTE PROCEDURE gw_trg_link_data('connec');
-
 
 DROP TRIGGER gw_trg_link_data ON connec;
 CREATE TRIGGER gw_trg_link_data
 AFTER UPDATE OF state_type, expl_id2, connecat_id
 ON connec FOR EACH ROW  EXECUTE PROCEDURE gw_trg_link_data('connec');
-
 
 DROP TRIGGER gw_trg_link_data ON gully;
 CREATE TRIGGER gw_trg_link_data
