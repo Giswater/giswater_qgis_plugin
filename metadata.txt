@@ -8,6 +8,12 @@ version=3.6.009
 author=David Erill, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Elies Bertran, Abel García Juanes, Maria Guzmán, Jordi Blanch, Xavier Torret
 
 Changelog=Version 3.6.009
+    - Bug fix: manage info accept so widget values are not lost
+    - Bug fix: changing epa network mode with epa point of view active
+    - Epa world: only apply to parent layers
+    - Improve automatic extension creation & version management
+    - Enhancement: insert INP annotations on column csv39
+    - Don't show backup files on advanced options menu
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
 homepage=https://www.giswater.org
