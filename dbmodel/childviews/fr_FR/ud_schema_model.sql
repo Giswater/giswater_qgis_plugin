@@ -2922,7 +2922,7 @@ CREATE TRIGGER gw_trg_edit_node_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON v
 
 
 -- sys_table
-INSERT INTO sys_table VALUES ('ve_connec_connexion', 'Custom editable view for CONNEXION', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_connec_connexion', 'Custom editable view for CONNEXION', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"CONNEC"}', NULL, 'Connexion', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_arc_accelerateur_eau', 'Custom editable view for ACCELERATEUR_EAU', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"ARC"}', NULL, 'Accelerateur_Eau', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_arc_arc_virtuel', 'Custom editable view for ARC_VIRTUEL', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"ARC"}', NULL, 'Arc_Virtuel', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_bassin_debordement', 'Custom editable view for BASSIN_DEBORDEMENT', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Bassin_Debordement', NULL, NULL, NULL, NULL, NULL, NULL);

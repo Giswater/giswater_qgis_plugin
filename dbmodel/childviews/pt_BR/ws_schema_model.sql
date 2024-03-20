@@ -5173,10 +5173,10 @@ CREATE TRIGGER gw_trg_edit_node_x INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_no
 
 
 -- sys_table
-INSERT INTO sys_table VALUES ('ve_connec_ligacao', 'Custom editable view for LIGACAO', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO sys_table VALUES ('ve_connec_fonte_ornamental', 'Custom editable view for FONTE_ORNAMENTAL', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO sys_table VALUES ('ve_connec_torneria', 'Custom editable view for TORNERIA', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO sys_table VALUES ('ve_connec_ponto_irrigacao', 'Custom editable view for PONTO_IRRIGACAO', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_connec_ligacao', 'Custom editable view for LIGACAO', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"CONNEC"}', NULL, 'Ligacao', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_connec_fonte_ornamental', 'Custom editable view for FONTE_ORNAMENTAL', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"CONNEC"}', NULL, 'Fonte_Ornamental', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_connec_torneria', 'Custom editable view for TORNERIA', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"CONNEC"}', NULL, 'Torneria', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_connec_ponto_irrigacao', 'Custom editable view for PONTO_IRRIGACAO', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"CONNEC"}', NULL, 'Ponto_Irrigacao', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_adaptador', 'Custom editable view for ADAPTADOR', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Adaptador', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_bomba', 'Custom editable view for BOMBA', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Bomba', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_bypass', 'Custom editable view for BYPASS', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Bypass', NULL, NULL, NULL, NULL, NULL, NULL);

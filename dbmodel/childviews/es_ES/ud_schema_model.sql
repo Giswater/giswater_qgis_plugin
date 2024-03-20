@@ -3106,8 +3106,8 @@ CREATE TRIGGER gw_trg_edit_node_valvula INSTEAD OF INSERT OR DELETE OR UPDATE ON
 
 
 -- sys_table
-INSERT INTO sys_table VALUES ('ve_connec_acometida', 'Custom editable view for ACOMETIDA', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO sys_table VALUES ('ve_connec_acometida_ficticia', 'Custom editable view for ACOMETIDA_FICTICIA', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_connec_acometida', 'Custom editable view for ACOMETIDA', 'role_edit',0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"CONNEC"}', NULL, 'Acometida', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_connec_acometida_ficticia', 'Custom editable view for ACOMETIDA_FICTICIA', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"CONNEC"}', NULL, 'Acometida_Ficticia', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_arqueta_arenal', 'Custom editable view for ARQUETA_ARENAL', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Arqueta_Arenal', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_cambio_seccion', 'Custom editable view for CAMBIO_SECCION', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Cambio_Seccion', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_camera', 'Custom editable view for CAMERA', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Camera', NULL, NULL, NULL, NULL, NULL, NULL);

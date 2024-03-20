@@ -2916,7 +2916,7 @@ CREATE TRIGGER gw_trg_edit_node_vertedouro INSTEAD OF INSERT OR DELETE OR UPDATE
 
 
 -- sys_table
-INSERT INTO sys_table VALUES ('ve_connec_ligacao', 'Custom editable view for LIGACAO', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_connec_ligacao', 'Custom editable view for LIGACAO', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"CONNEC"}', NULL, 'Ligacao', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_gully_boca_lobo', 'Custom editable view for BOCA_LOBO', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"GULLY"}', NULL, 'Boca_Lobo', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_gully_boca_lobo_mayor', 'Custom editable view for BOCA_LOBO_MAYOR', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"GULLY"}', NULL, 'Boca_Lobo_Mayor', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_boca_lobo_topo', 'Custom editable view for BOCA_LOBO_TOPO', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Boca_Lobo_Topo', NULL, NULL, NULL, NULL, NULL, NULL);
