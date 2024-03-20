@@ -58,6 +58,7 @@ v_max_seq_id integer;
 v_querytext text;
 v_definition text;
 rec_viewname text;
+rec_feature record;
 
 BEGIN 
 	-- search path
@@ -448,6 +449,17 @@ BEGIN
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('Project have been sucessfully updated from ',v_oldversion,' version to ',v_gwversion, ' version'));
 			v_message='Project sucessfully updated';
 
+			IF v_oldversion IN ('3.6.007', '3.6.008', '3.6.008.1', '3.6.008.2') THEN
+
+				FOR rec_feature IN SELECT * FROM cat_feature 
+				LOOP
+					INSERT INTO sys_table (id, descript, sys_role, criticity, context, alias) 
+					VALUES (rec_feature.child_layer, concat('Custom edit view for ', rec_feature.child_layer), 'role_edit', 0, concat('{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"', 
+					upper(rec_feature.feature_type),'"}'), rec_feature.id)
+					ON CONFLICT (id) 
+					DO update set context = concat('{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"', upper(rec_feature.feature_type),'"}');
+				END LOOP;
+			END IF;
 		END IF;
 
 		--reset sequences and id of anl, temp and audit tables
