@@ -194,12 +194,6 @@ class GwAdminButton:
                 else:
                     return
 
-        # Check postGis version
-        major_version = self.postgis_version.split(".")
-        if int(major_version[0]) >= 3:
-            sql = f"CREATE EXTENSION IF NOT EXISTS postgis_raster;"
-            tools_db.execute_sql(sql)
-
         self.error_count = 0
         # We retrieve the desired name of the schema, since in case there had been a schema with the same name, we had
         # changed the value of self.schema in the function _rename_project_data_schema or _execute_last_process
@@ -893,6 +887,12 @@ class GwAdminButton:
         if postgis_extension and self.form_enabled:
             sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
             tools_db.execute_sql(sql)
+            self.postgis_version = tools_db.get_postgis_version()
+            # Check postGis version
+            major_version = self.postgis_version.split(".")
+            if int(major_version[0]) >= 3:
+                sql = f"CREATE EXTENSION IF NOT EXISTS postgis_raster;"
+                tools_db.execute_sql(sql)
         elif self.form_enabled:
             self.form_enabled = False
             message = "Unable to create Postgis extension. Packages must be installed, consult your administrator."
