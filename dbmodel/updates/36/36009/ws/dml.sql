@@ -23,3 +23,5 @@ UPDATE config_toolbox SET inputparams='[
 {"widgetname":"period", "label":"Period:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT id, code as idval FROM ext_cat_period ORDER BY end_date DESC", "layoutname":"grl_option_parameters","layoutorder":3, "value":""},
 {"widgetname":"method", "label":"Method:","widgettype":"combo","datatype":"text","isMandatory":true,"tooltip":"Water balance method", "dvQueryText":"SELECT id, idval FROM om_typevalue WHERE typevalue = 'waterbalance_method'", "layoutname":"grl_option_parameters","layoutorder":4, "value":""}
 ]'::json WHERE id=3142;
+
+UPDATE sys_param_user SET vdefault = 2 WHERE id = 'inp_options_networkmode';
