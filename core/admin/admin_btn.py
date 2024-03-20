@@ -859,6 +859,25 @@ class GwAdminButton:
             self.form_enabled = False
 
         elif self.form_enabled:
+            plugin_version = self.plugin_version
+            project_version = self.project_version
+            # Only get the x.y.zzz, not x.y.zzz.n
+            try:
+                plugin_version_l = str(self.plugin_version).split('.')
+                if len(plugin_version_l) >= 4:
+                    plugin_version = f'{plugin_version_l[0]}'
+                    for i in range(1, 3):
+                        plugin_version = f"{plugin_version}.{plugin_version_l[i]}"
+            except Exception:
+                pass
+            try:
+                project_version_l = str(self.project_version).split('.')
+                if len(project_version_l) >= 4:
+                    project_version = f'{project_version_l[0]}'
+                    for i in range(1, 3):
+                        project_version = f"{project_version}.{project_version_l[i]}"
+            except Exception:
+                pass
             schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
             if any(x in str(tools_db.dao_db_credentials['db']) for x in ('.', ',')):
                 message = "Database name contains special characters that are not supported"
@@ -866,12 +885,12 @@ class GwAdminButton:
             if schema_name == 'null':
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
-            elif str(self.plugin_version) > str(self.project_version):
+            elif str(plugin_version) > str(project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                                          '(Schema version is lower than plugin version, please update schema)')
                 self.dlg_readsql.btn_info.setEnabled(True)
-            elif str(self.plugin_version) < str(self.project_version):
+            elif str(plugin_version) < str(project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                                          '(Schema version is higher than plugin version, please update plugin)')
@@ -1333,15 +1352,34 @@ class GwAdminButton:
             self._close_dialog_admin(self.dlg_readsql)
             self._create_credentials_form(set_connection=connection_name)
         else:
+            plugin_version = self.plugin_version
+            project_version = self.project_version
+            # Only get the x.y.zzz, not x.y.zzz.n
+            try:
+                plugin_version_l = str(self.plugin_version).split('.')
+                if len(plugin_version_l) >= 4:
+                    plugin_version = f'{plugin_version_l[0]}'
+                    for i in range(1, 3):
+                        plugin_version = f"{plugin_version}.{plugin_version_l[i]}"
+            except Exception:
+                pass
+            try:
+                project_version_l = str(self.project_version).split('.')
+                if len(project_version_l) >= 4:
+                    project_version = f'{project_version_l[0]}'
+                    for i in range(1, 3):
+                        project_version = f"{project_version}.{project_version_l[i]}"
+            except Exception:
+                pass
             if any(x in str(credentials['db']) for x in ('.', ',')):
                 message = 'Database name contains special characters that are not supported'
                 self.form_enabled = False
-            elif str(self.plugin_version) > str(self.project_version):
+            elif str(plugin_version) > str(project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                 '(Schema version is lower than plugin version, please update schema)')
                 self.dlg_readsql.btn_info.setEnabled(True)
-            elif str(self.plugin_version) < str(self.project_version):
+            elif str(plugin_version) < str(project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                 '(Schema version is higher than plugin version, please update plugin)')
@@ -1639,15 +1677,35 @@ class GwAdminButton:
         window_title = f'Giswater ({self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
+        plugin_version = self.plugin_version
+        project_version = self.project_version
+        # Only get the x.y.zzz, not x.y.zzz.n
+        try:
+            plugin_version_l = str(self.plugin_version).split('.')
+            if len(plugin_version_l) >= 4:
+                plugin_version = f'{plugin_version_l[0]}'
+                for i in range(1, 3):
+                    plugin_version = f"{plugin_version}.{plugin_version_l[i]}"
+        except Exception:
+            pass
+        try:
+            project_version_l = str(self.project_version).split('.')
+            if len(project_version_l) >= 4:
+                project_version = f'{project_version_l[0]}'
+                for i in range(1, 3):
+                    project_version = f"{project_version}.{project_version_l[i]}"
+        except Exception:
+            pass
+
         if schema_name == 'null' and self.form_enabled:
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
-        elif str(self.plugin_version) > str(self.project_version) and self.form_enabled:
+        elif str(plugin_version) > str(project_version) and self.form_enabled:
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                                      '(Schema version is lower than plugin version, please update schema)')
             self.dlg_readsql.btn_info.setEnabled(True)
-        elif str(self.plugin_version) < str(self.project_version) and self.form_enabled:
+        elif str(plugin_version) < str(project_version) and self.form_enabled:
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                                      '(Schema version is higher than plugin version, please update plugin)')
