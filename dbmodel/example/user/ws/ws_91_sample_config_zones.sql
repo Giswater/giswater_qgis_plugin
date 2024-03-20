@@ -102,7 +102,7 @@ INSERT INTO config_param_user VALUES ('inp_options_checkfreq', '2.00', current_u
 INSERT INTO config_param_user VALUES ('inp_options_diffusivity', '1', current_user);
 INSERT INTO config_param_user VALUES ('inp_options_required_pressure', '10', current_user);
 INSERT INTO config_param_user VALUES ('inp_options_units', 'LPS', current_user);
-INSERT INTO config_param_user VALUES ('inp_options_networkmode', '1', current_user);
+INSERT INTO config_param_user VALUES ('inp_options_networkmode', '2', current_user);
 INSERT INTO config_param_user VALUES ('inp_options_demand_multiplier', '1.00', current_user);
 INSERT INTO config_param_user VALUES ('inp_options_headloss', 'D-W', current_user);
 INSERT INTO config_param_user VALUES ('inp_options_dscenario_priority', '1', current_user);
