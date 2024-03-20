@@ -31,3 +31,15 @@ UPDATE config_form_fields SET widgetcontrols = (replace(widgetcontrols::text,'"f
 where formname = 'cat_connec' and columnname = 'connec_type';
 UPDATE config_form_fields SET widgetcontrols = (replace(widgetcontrols::text,'"filterExpression": null', '"filterExpression":"active=true"'))::json 
 where formname = 'cat_grate' and columnname = 'gully_type';
+
+
+UPDATE config_toolbox set inputparams = 
+'[
+{"widgetname":"idval", "label":"Name: (*)","widgettype":"linetext","datatype":"text", "isMandatory":true, "tooltip":"Name for dwf scenario (mandatory)", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":1, "value":""},
+{"widgetname":"startdate", "label":"Startdate:","widgettype":"datetime","datatype":"date", "isMandatory":false, "tooltip":"Start date for dwf scenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":2, "value":""},
+{"widgetname":"enddate", "label":"Enddate:","widgettype":"datetime","datatype":"date", "isMandatory":false, "tooltip":"End date", "placeholder":"End date for dwf scenario", "layoutname":"grl_option_parameters","layoutorder":3, "value":""},
+{"widgetname":"observ", "label":"Observ:","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Observations of dwf scenario", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":4, "value":""},
+{"widgetname":"expl", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"dwf scenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":5, "value":""},
+{"widgetname":"active", "label":"Active:", "widgettype":"check", "datatype":"boolean", "tooltip":"If true, active" , "layoutname":"grl_option_parameters","layoutorder":6, "value":"true"}
+]'
+where id = 3292;
