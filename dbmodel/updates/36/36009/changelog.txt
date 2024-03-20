@@ -1,3 +1,11 @@
 3.6.009
 *************
-- Minor bug fix on sample: register child views & add graph config for dma
+- Minor bug fix for ud & ws projects.
+- Minor fix spelling.
+- Update builtdate on sample (ws/ud).
+- Set graphconfig and stylesheet as text on v_edit_drainzone (ud).
+- Removing now() and fixing date with value '2001-01-01' on time column for views v_rpt_arc_all and v_rpt_node_all.
+- Check links over nodarcs only when export mode > 2 for ws projects.
+- Minor bug fix on sample: register child views & add graph config for dma.
+- Remove check execute graphanalitycs on water balance function dialog.
+
