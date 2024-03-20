@@ -400,11 +400,25 @@ BEGIN
 			UPDATE config_param_system SET value =
 			'{"sys_table_id":"v_edit_gully","sys_id_field":"gully_id","sys_search_field":"gully_id","alias":"Gullies","cat_field":"gratecat_id","orderby":"3","search_type":"gully"}'
 			WHERE  parameter = 'basic_search_network_gully';
+			
+			-- fix i18n
+			IF v_gwversion = '3.6.009' THEN
+				PERFORM gw_fct_admin_manage_fix_i18n_36008();
+			END IF;
+			
+			DROP FUNCTION IF EXISTS gw_fct_admin_manage_fix_i18n_36008();
 
 		ELSIF v_isnew IS FALSE THEN
 		
+			-- fix i18n
+			IF v_gwversion = '3.6.009' AND v_oldversion IN ('3.6.008', '3.6.008.1', '3.6.008.2') THEN
+				PERFORM gw_fct_admin_manage_fix_i18n_36008();
+			END IF;
+			
+			DROP FUNCTION IF EXISTS gw_fct_admin_manage_fix_i18n_36008();
+			
+				
 			SELECT project_type INTO v_projecttype FROM sys_version ORDER BY 1 DESC LIMIT 1;
-		
 		
 			-- profilactic delete to avoid conflicts with sequences and to clean gdb
 			DELETE FROM audit_check_project;
