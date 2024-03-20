@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
--- 15/03/24
+-- 15/03/2024
 UPDATE config_toolbox SET inputparams='[
 {"widgetname":"exploitation", "label":"Exploitation id''s:","widgettype":"text","datatype":"json","layoutname":"grl_option_parameters","layoutorder":1, "placeholder":"1,2", "value":""}, 
 {"widgetname":"usePsectors", "label":"Use masterplan psectors:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":6, "value":"FALSE"}, 
@@ -17,7 +17,7 @@ UPDATE config_toolbox SET inputparams='[
 {"widgetname":"ignoreBrokenValves", "label":"Ignore Broken Valves (only when open):","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":11, "isMandatory":false, "placeholder":"", "value":""}
 ]'::json WHERE id=2706;
 
--- 20/03/24
+-- 20/03/2024
 UPDATE config_toolbox SET inputparams='[
 {"widgetname":"exploitation", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":2, "value":""},
 {"widgetname":"period", "label":"Period:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT id, code as idval FROM ext_cat_period ORDER BY end_date DESC", "layoutname":"grl_option_parameters","layoutorder":3, "value":""},
@@ -25,3 +25,10 @@ UPDATE config_toolbox SET inputparams='[
 ]'::json WHERE id=3142;
 
 UPDATE sys_param_user SET vdefault = 2 WHERE id = 'inp_options_networkmode';
+
+UPDATE config_form_fields SET widgetcontrols = (replace(widgetcontrols::text,'"filterExpression": null', '"filterExpression":"active=true"'))::json 
+where formname = 'cat_node' and columnname = 'nodetype_id';
+UPDATE config_form_fields SET widgetcontrols = (replace(widgetcontrols::text,'"filterExpression": null', '"filterExpression":"active=true"'))::json 
+where formname = 'cat_arc' and columnname = 'arctype_id';
+UPDATE config_form_fields SET widgetcontrols = (replace(widgetcontrols::text,'"filterExpression": null', '"filterExpression":"active=true"'))::json 
+where formname = 'cat_connec' and columnname = 'connectype_id';
