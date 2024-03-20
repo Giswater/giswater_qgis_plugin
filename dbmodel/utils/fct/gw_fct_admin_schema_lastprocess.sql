@@ -455,8 +455,8 @@ BEGIN
 		
 		-- last process
 		UPDATE config_param_system SET value = v_gwversion WHERE parameter = 'admin_version';
-		PERFORM gw_fct_setowner($${"client":{"lang":"ES"},"data":{"owner":"role_admin"}}$$);
 		PERFORM gw_fct_admin_role_permissions();
+		PERFORM gw_fct_setowner($${"client":{"lang":"ES"},"data":{"owner":"role_admin"}}$$);
 		
 		--build return with log table
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result

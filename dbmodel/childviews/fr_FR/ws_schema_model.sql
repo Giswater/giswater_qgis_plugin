@@ -5304,10 +5304,10 @@ CREATE TRIGGER gw_trg_edit_node_x INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_no
 
 
 -- sys_table
-INSERT INTO sys_table VALUES ('ve_connec_connexion_eau', 'Custom editable view for CONNEXION_EAU', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO sys_table VALUES ('ve_connec_fontaine', 'Custom editable view for FONTAINE', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO sys_table VALUES ('ve_connec_tap', 'Custom editable view for TAP', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO sys_table VALUES ('ve_connec_greentap', 'Custom editable view for GREENTAP', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_connec_connexion_eau', 'Custom editable view for CONNEXION_EAU', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"CONNEC"}', NULL, 'Connexion_Eau', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_connec_fontaine', 'Custom editable view for FONTAINE', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"CONNEC"}', NULL, 'Fontaine', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_connec_tap', 'Custom editable view for TAP', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"CONNEC"}', NULL, 'Tap', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_connec_greentap', 'Custom editable view for GREENTAP', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"CONNEC"}', NULL, 'Greentap', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_adaptation', 'Custom editable view for ADAPTATION', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Adaptation', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_arc_arc_virtuel', 'Custom editable view for ARC_VIRTUEL', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"ARC"}', NULL, 'Arc_Virtuel', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_boitier_papillon', 'Custom editable view for BOITIER_PAPILLON', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Boitier_Papillon', NULL, NULL, NULL, NULL, NULL, NULL);

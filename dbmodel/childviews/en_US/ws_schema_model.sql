@@ -5551,11 +5551,11 @@ CREATE TRIGGER gw_trg_edit_node_junction INSTEAD OF INSERT OR DELETE OR UPDATE O
 
 
 -- sys_table
-INSERT INTO sys_table VALUES ('ve_connec_wjoin', 'Custom editable view for WJOIN', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO sys_table VALUES ('ve_connec_vconnec', 'Custom editable view for VCONNEC', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO sys_table VALUES ('ve_connec_fountain', 'Custom editable view for FOUNTAIN', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO sys_table VALUES ('ve_connec_tap', 'Custom editable view for TAP', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO sys_table VALUES ('ve_connec_greentap', 'Custom editable view for GREENTAP', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_connec_wjoin', 'Custom editable view for WJOIN', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"CONNEC"}', NULL, 'Wjoin', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_connec_vconnec', 'Custom editable view for VCONNEC', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"CONNEC"}', NULL, 'Vconnec', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_connec_fountain', 'Custom editable view for FOUNTAIN', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"CONNEC"}', NULL, 'Fountain', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_connec_tap', 'Custom editable view for TAP', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"CONNEC"}', NULL, 'Tap', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_connec_greentap', 'Custom editable view for GREENTAP', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"CONNEC"}', NULL, 'Greentap', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_adaptation', 'Custom editable view for ADAPTATION', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Adaptation', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_air_valve', 'Custom editable view for AIR_VALVE', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Air_Valve', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_bypass_register', 'Custom editable view for BYPASS_REGISTER', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Bypass_Register', NULL, NULL, NULL, NULL, NULL, NULL);
