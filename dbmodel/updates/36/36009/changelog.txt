@@ -1,0 +1,3 @@
+3.6.009
+*************
+- Minor bug fix on sample: register child views & add graph config for dma

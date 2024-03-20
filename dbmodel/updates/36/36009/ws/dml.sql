@@ -16,3 +16,10 @@ UPDATE config_toolbox SET inputparams='[
 {"widgetname":"geomParamUpdate", "label":"Update parameter:","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layoutorder":10, "isMandatory":false, "placeholder":"5-30", "value":""},
 {"widgetname":"ignoreBrokenValves", "label":"Ignore Broken Valves (only when open):","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":11, "isMandatory":false, "placeholder":"", "value":""}
 ]'::json WHERE id=2706;
+
+-- 20/03/24
+UPDATE config_toolbox SET inputparams='[
+{"widgetname":"exploitation", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":2, "value":""},
+{"widgetname":"period", "label":"Period:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Dscenario type", "dvQueryText":"SELECT id, code as idval FROM ext_cat_period ORDER BY end_date DESC", "layoutname":"grl_option_parameters","layoutorder":3, "value":""},
+{"widgetname":"method", "label":"Method:","widgettype":"combo","datatype":"text","isMandatory":true,"tooltip":"Water balance method", "dvQueryText":"SELECT id, idval FROM om_typevalue WHERE typevalue = 'waterbalance_method'", "layoutname":"grl_option_parameters","layoutorder":4, "value":""}
+]'::json WHERE id=3142;
