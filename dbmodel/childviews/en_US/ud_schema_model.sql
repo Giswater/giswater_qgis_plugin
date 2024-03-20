@@ -3111,3 +3111,36 @@ CREATE TRIGGER gw_trg_edit_node_weir INSTEAD OF INSERT OR DELETE OR UPDATE ON ve
 
 DROP TRIGGER IF EXISTS gw_trg_edit_node_wwtp ON ve_node_wwtp;
 CREATE TRIGGER gw_trg_edit_node_wwtp INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_wwtp FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('WWTP');
+
+
+-- sys_table
+INSERT INTO sys_table VALUES ('ve_connec_connec', 'Custom editable view for CONNEC', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_connec_vconnec', 'Custom editable view for VCONNEC', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_chamber', 'Custom editable view for CHAMBER', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Chamber', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_change', 'Custom editable view for CHANGE', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Change', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_circ_manhole', 'Custom editable view for CIRC_MANHOLE', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Circ_Manhole', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_arc_conduit', 'Custom editable view for CONDUIT', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"ARC"}', NULL, 'Conduit', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_gully_gully', 'Custom editable view for GULLY', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"GULLY"}', NULL, 'Gully child', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_highpoint', 'Custom editable view for HIGHPOINT', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Highpoint', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_jump', 'Custom editable view for JUMP', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Jump', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_junction', 'Custom editable view for JUNCTION', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Junction', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_netelement', 'Custom editable view for NETELEMENT', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Netelement', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_netgully', 'Custom editable view for NETGULLY', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Netgully', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_netinit', 'Custom editable view for NETINIT', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Netinit', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_outfall', 'Custom editable view for OUTFALL', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Outfall', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_owerflow_storage', 'Custom editable view for OWERFLOW_STORAGE', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Owerflow_Storage', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_gully_pgully', 'Custom editable view for PGULLY', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"GULLY"}', NULL, 'Pgully', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_arc_pump_pipe', 'Custom editable view for PUMP_PIPE', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"ARC"}', NULL, 'Pump_Pipe', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_pump_station', 'Custom editable view for PUMP_STATION', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Pump_Station', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_rect_manhole', 'Custom editable view for RECT_MANHOLE', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Rect_Manhole', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_register', 'Custom editable view for REGISTER', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Register', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_sandbox', 'Custom editable view for SANDBOX', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Sandbox', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_sewer_storage', 'Custom editable view for SEWER_STORAGE', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Sewer_Storage', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_arc_siphon', 'Custom editable view for SIPHON', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"ARC"}', NULL, 'Siphon', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_valve', 'Custom editable view for VALVE', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Valve', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_arc_varc', 'Custom editable view for VARC', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"ARC"}', NULL, 'Varc', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_gully_vgully', 'Custom editable view for VGULLY', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"GULLY"}', NULL, 'Vgully', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_virtual_node', 'Custom editable view for VIRTUAL_NODE', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Virtual_Node', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_arc_waccel', 'Custom editable view for WACCEL', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"ARC"}', NULL, 'Waccel', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_weir', 'Custom editable view for WEIR', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Weir', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_wwtp', 'Custom editable view for WWTP', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Wwtp', NULL, NULL, NULL, NULL, NULL, NULL);
