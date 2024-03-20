@@ -3566,6 +3566,10 @@ def refresh_selectors(tab_name=None):
             pass
 
 
+def is_epa_world_active(default=False):
+    return epa_world_button.is_epa_world_active(default)
+
+
 def set_epa_world(_set_epa_world=None, selector_change=False, is_init=False):
     """ Activate or deactivate EPA world. If @_set_epa_world is None it will just refresh the filters """
 
