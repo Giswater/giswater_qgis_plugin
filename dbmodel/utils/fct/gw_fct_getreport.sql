@@ -32,7 +32,7 @@ SELECT SCHEMA_NAME.gw_fct_getreport($${"client":{"device":4, "lang":"en_US", "in
 
 SELECT SCHEMA_NAME.gw_fct_getreport($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "filter":[{"filterName": "code", "filterValue": "6"}, {"filterName": "dma_id", "filterValue": "5"}], "listId":"102"}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_getreport($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":5367}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "filter":[{"filterName": "init", "filterValue": null}], "listId":"902"}}$$);
+SELECT SCHEMA_NAME.gw_fct_getreport($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "filter":[{"filterName": "init", "filterValue": null}], "listId":"902"}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_getreport($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "filter":[{"filterName": "Exploitation", "filterValue": "expl_01", "filterSign": "=", "filterWithMissedColumn": null}, {"filterName": "Dma", "filterValue": "", "filterSign": "=", "filterWithMissedColumn": null}, {"filterName": "Period", "filterValue": "", "filterSign": "=", "filterWithMissedColumn": null}], "listId":"102"}}$$);
 

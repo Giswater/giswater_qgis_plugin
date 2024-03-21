@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setinitproject (p_data json)
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_setinitproject($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":5367}, "form":{}, "feature":{}, "data":{}}$$);
+SELECT SCHEMA_NAME.gw_fct_setinitproject($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{}}$$);
 
 -- fid:
 

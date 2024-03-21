@@ -13,7 +13,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setcheckproject (p_data json)
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_setcheckproject($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":5367}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, 
+SELECT SCHEMA_NAME.gw_fct_setcheckproject($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},
 "version":"3.5.021.1", "fid":101, "initProject":false, "addSchema":"NULL", "mainSchema":"NULL", "projecRole":"role_admin", "infoType":"full", "logFolderVolume":"139.56 MB", 
 "projectType":"ws", "qgisVersion":"3.16.6-Hannover", "osVersion":"Windows 10"}}$$);
 
@@ -291,7 +291,7 @@ BEGIN
 	
 
 	-- get uservalues
-	PERFORM gw_fct_setinitproject($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":5367}, "form":{}, "feature":{}, "data":{}}$$);
+	PERFORM gw_fct_setinitproject($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{}}$$);
 	
 
 	-- Force psector vdefault visible to current_user (only to => role_master)
