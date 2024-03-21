@@ -39,12 +39,14 @@ As Giswater is as server-client software you need to install it into two separat
 
 ### Backend environment:
 Works as well on Windows, MaC or Linux O/S.<br>
-Install PostgreSQL (from 9.5 to 14).<br>
-Install Postgis, pgrouting, tablefunc and unaccent extensions for PostgreSQL.<br>
+Install PostgreSQL (from 9.5 to 16).<br>
+Install Postgis, pgrouting and other extensions for PostgreSQL.<br>
 	`create extension postgis;`<br>
 	`create extension pgrouting;`<br>
 	`create extension tablefunc;`<br>
 	`create extension unaccent;`<br>
+	`create extension postgis_raster;`<br>
+	`create extension fuzzystrmatch;`<br>
 
 ### Frontend environment:
 Works as well on Windows, MaC or Linux O/S, but only on Windows to enjoy EPA models.<br>
@@ -117,10 +119,10 @@ There is no time-period defined for major releases.<br>
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. See LICENSE file for more information.
 
 
-## THANKS TO
+## THANKS TO THE FOUNDING CONTRIBUTORS
 GITS-BarcelonaTech University<br>
 Aigües de Mataró<br>
-Aigües de Girona<br>
+Cicle de l'Aigua del Ter S.A<br>
 Aigües de Blanes<br>
 Aigües del Prat<br>
 Aigües de Vic<br>
@@ -130,4 +132,4 @@ Figueres de Serveis, S.A<br>
 Prodaisa<br>
 Sabemsa<br>
 Consorci Aigües de Tarragona<br>
-
+BGEO OPEN GIS S.L.<br>

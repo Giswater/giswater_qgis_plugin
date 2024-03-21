@@ -206,7 +206,8 @@ class GwMenuLoad(QObject):
         self.tree_config_files.itemChanged.connect(partial(self._set_config_value))
 
         path = f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}config"
-        files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f != 'user_params.config']
+        files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f != 'user_params.config'
+                 and '.bak' not in f]
         for file in files:
             item = QTreeWidgetItem([f"{file}"])
 

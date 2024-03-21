@@ -109,7 +109,7 @@ def initialize_parsers():
         filepath, parser = _get_parser_from_filename(config)
         global_vars.configs[config][0] = filepath
         global_vars.configs[config][1] = parser
-        if parser is None:
+        if parser is None and config != 'dev':  # dev.config file might or might not exist
             success = False
     return success
 
@@ -2514,7 +2514,9 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
 
                     # Get values for set layer style
                     opacity = 100
-                    style_type = json_result['body']['returnManager']['style']
+
+
+                    style_type = return_manager['style']
 
                     if 'style' in return_manager and 'values' in return_manager['style'][key]:
                         if 'transparency' in return_manager['style'][key]['values']:
@@ -2523,7 +2525,7 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
                         if 'transparency' in return_manager['style'][key]:
                             opacity = return_manager['style'][key]['transparency']
                         color_values = {}
-                        for item in json_result['body']['returnManager']['style'][key].get('values', []):
+                        for item in return_manager['style'][key].get('values', []):
                             color = QColor(item['color'][0], item['color'][1], item['color'][2], int(opacity * 255))
                             color_values[item['id']] = color
                         cat_field = str(style_type[key]['field'])

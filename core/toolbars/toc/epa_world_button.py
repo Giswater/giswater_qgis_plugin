@@ -30,11 +30,11 @@ def _get_sectors():
 
 
 def _get_layers():
-    arc_layers = [tools_qgis.get_layer_by_tablename('v_edit_arc')]
-    node_layers = [tools_qgis.get_layer_by_tablename('v_edit_node')]
-    connec_layers = [tools_qgis.get_layer_by_tablename('v_edit_connec')]
-    gully_layers = [tools_qgis.get_layer_by_tablename('v_edit_gully')]
-    link_layers = [tools_qgis.get_layer_by_tablename('v_edit_link')]
+    arc_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_arc')] if lyr is not None]
+    node_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_node')] if lyr is not None]
+    connec_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_connec')] if lyr is not None]
+    gully_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_gully')] if lyr is not None]
+    link_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_link')] if lyr is not None]
 
     return arc_layers, node_layers, connec_layers, gully_layers, link_layers
 
