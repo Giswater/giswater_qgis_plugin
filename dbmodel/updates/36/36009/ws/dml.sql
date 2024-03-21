@@ -59,3 +59,5 @@ UPDATE config_toolbox SET inputparams='[
     "selectedId": ""
   }
 ]'::json WHERE alias='Set pattern values on demand dscenario' AND id=3258;
+
+UPDATE config_form_fields SET dv_isnullvalue=true WHERE formname in ('v_edit_inp_dscenario_pump', 'inp_dscenario_pump') AND columnname='pattern_id';
