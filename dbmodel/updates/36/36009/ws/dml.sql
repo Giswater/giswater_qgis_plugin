@@ -32,3 +32,30 @@ UPDATE config_form_fields SET widgetcontrols = (replace(widgetcontrols::text,'"f
 where formname = 'cat_arc' and columnname = 'arctype_id';
 UPDATE config_form_fields SET widgetcontrols = (replace(widgetcontrols::text,'"filterExpression": null', '"filterExpression":"active=true"'))::json 
 where formname = 'cat_connec' and columnname = 'connectype_id';
+
+UPDATE config_toolbox SET inputparams='[
+  {
+    "widgetname": "netscenario",
+    "label": "Source netscenario:",
+    "widgettype": "combo",
+    "datatype": "text",
+    "tooltip": "Select mapzone dscenario from where data will be copied to demand dscenario",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 1,
+    "dvQueryText": "select netscenario_id as id, name as idval from plan_netscenario where netscenario_type =''DMA'' order by name",
+    "isNullValue": "true",
+    "selectedId": ""
+  },
+  {
+    "widgetname": "dscenario_demand",
+    "label": "Target dscenario demand:",
+    "widgettype": "combo",
+    "datatype": "text",
+    "tooltip": "Select demand dscenario where data will be inserted",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 3,
+    "dvQueryText": "select dscenario_id as id, name as idval from cat_dscenario where dscenario_type =''DEMAND'' order by name",
+    "isNullValue": "true",
+    "selectedId": ""
+  }
+]'::json WHERE alias='Set pattern values on demand dscenario' AND id=3258;
