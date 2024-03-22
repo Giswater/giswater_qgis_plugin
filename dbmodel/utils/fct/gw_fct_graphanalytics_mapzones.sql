@@ -84,8 +84,7 @@ v_affectrow numeric;
 v_cont1 integer default 0;
 v_class text;
 v_feature record;
-v_expl_json json;
-v_expl_id integer;
+v_expl_id text;
 v_macroexpl json;
 v_data json;
 v_fid integer;
@@ -147,8 +146,8 @@ BEGIN
 
 	-- get dialog variables
 	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'graphClass');
-	v_expl_json = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
-	v_expl_id = json_array_elements_text(v_expl_json);
+	v_expl_id = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
+	--v_expl_id = json_array_elements_text(v_expl_json);
 	v_macroexpl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'macroExploitation');
 	v_floodonlymapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'floodOnlyMapzone');
 	v_valuefordisconnected = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'valueForDisconnected');
@@ -399,12 +398,12 @@ BEGIN
 				v_query_gully = 'SELECT g.* FROM gully g JOIN v_edit_gully USING (gully_id) WHERE g.expl_id='||v_expl_id;
 			END IF;
 		ELSE
-			v_query_arc = 'SELECT * FROM arc WHERE state=1 AND expl_id='||v_expl_id;
-			v_query_node = 'SELECT * FROM node WHERE state=1 AND expl_id='||v_expl_id;
-			v_query_connec = 'SELECT * FROM connec WHERE state=1 AND expl_id='||v_expl_id;
-			v_query_link = 'SELECT * FROM link WHERE state=1 AND expl_id='||v_expl_id;
+			v_query_arc = 'SELECT * FROM arc WHERE state=1 AND expl_id IN('||v_expl_id||')';
+			v_query_node = 'SELECT * FROM node WHERE state=1 AND expl_id IN('||v_expl_id||')';
+			v_query_connec = 'SELECT * FROM connec WHERE state=1 AND expl_id IN('||v_expl_id||')';
+			v_query_link = 'SELECT * FROM link WHERE state=1 AND expl_id IN('||v_expl_id||')';
 			IF v_project_type='UD' THEN
-				v_query_gully = 'SELECT * FROM gully WHERE expl_id='||v_expl_id;
+				v_query_gully = 'SELECT * FROM gully WHERE expl_id IN('||v_expl_id||')';
 			END IF;
 		END IF;
         
@@ -426,7 +425,7 @@ BEGIN
 			IF v_netscenario IS NOT NULL THEN
 				EXECUTE 'INSERT INTO temp_'||v_table||' SELECT * FROM plan_netscenario_'||v_table||' WHERE active is true AND netscenario_id = '||v_netscenario;
 			ELSE
-				EXECUTE 'INSERT INTO temp_'||v_table||' SELECT * FROM '||v_table||' WHERE active is true AND expl_id = '||v_expl_id;
+				EXECUTE 'INSERT INTO temp_'||v_table||' SELECT * FROM '||v_table||' WHERE active is true AND expl_id IN('||v_expl_id||')';
 			END IF;
 		END IF;
 
@@ -434,15 +433,15 @@ BEGIN
 			
 		-- reset elements to 0
 		IF v_floodonlymapzone IS NULL THEN
-			v_querytext = 'UPDATE temp_t_arc a SET '||quote_ident(v_field)||' = 0 WHERE a.expl_id = '||v_expl_id||'';
+			v_querytext = 'UPDATE temp_t_arc a SET '||quote_ident(v_field)||' = 0 WHERE a.expl_id IN('||v_expl_id||')';
 			EXECUTE v_querytext;
-			v_querytext = 'UPDATE temp_t_node a SET '||quote_ident(v_field)||' = 0 WHERE a.expl_id = '||v_expl_id||'';
+			v_querytext = 'UPDATE temp_t_node a SET '||quote_ident(v_field)||' = 0 WHERE a.expl_id IN('||v_expl_id||')';
 			EXECUTE v_querytext;
-			v_querytext = 'UPDATE temp_t_connec a SET '||quote_ident(v_field)||' = 0 WHERE a.expl_id = '||v_expl_id||'';
+			v_querytext = 'UPDATE temp_t_connec a SET '||quote_ident(v_field)||' = 0 WHERE a.expl_id IN('||v_expl_id||')';
 			EXECUTE v_querytext;
 
 			IF v_project_type='UD' THEN
-				v_querytext = 'UPDATE temp_t_gully a SET '||quote_ident(v_field)||' = 0 WHERE a.expl_id = '||v_expl_id||'';
+				v_querytext = 'UPDATE temp_t_gully a SET '||quote_ident(v_field)||' = 0 WHERE a.expl_id IN('||v_expl_id||')';
 				EXECUTE v_querytext;
 			END IF;	
 		ELSE
@@ -1043,7 +1042,7 @@ BEGIN
 		v_querytext = '	UPDATE temp_'||(v_table)||' set the_geom = st_multi(a.the_geom) 
 			FROM (with polygon AS (SELECT st_collect (the_geom) as g, '||quote_ident(v_field)||' FROM temp_t_arc a  
 			JOIN temp_t_anlgraph USING (arc_id) 
-			WHERE state > 0  AND water = 1 and expl_id = '||v_expl_id||'   group by '||quote_ident(v_field)||') 
+			WHERE state > 0  AND water = 1 and expl_id IN('||v_expl_id||')   group by '||quote_ident(v_field)||') 
 			SELECT '||quote_ident(v_field)||
 			', CASE WHEN st_geometrytype(st_concavehull(g, '||v_concavehull||')) = ''ST_Polygon''::text THEN st_buffer(st_concavehull(g, '||
 			v_concavehull||'), 2)::geometry(Polygon,'||(v_srid)||')
@@ -1059,7 +1058,7 @@ BEGIN
 		v_querytext = '	UPDATE temp_'||(v_table)||' set the_geom = geom FROM
 			(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from temp_t_arc a 
 			JOIN temp_t_anlgraph USING (arc_id) 
-			where a.state > 0 AND water = 1 AND '||quote_ident(v_field)||'::integer > 0 and expl_id = '||v_expl_id||'  group by '||quote_ident(v_field)||')a 
+			where a.state > 0 AND water = 1 AND '||quote_ident(v_field)||'::integer > 0 and expl_id IN('||v_expl_id||')  group by '||quote_ident(v_field)||')a 
 			WHERE a.'||quote_ident(v_field)||'= temp_'||(v_table)||'.'||quote_ident(v_fieldmp);
 
 			/*
@@ -1078,11 +1077,11 @@ BEGIN
 			(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
 			(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from temp_t_arc a
 			JOIN temp_t_anlgraph USING (arc_id) 
-			where a.state > 0 AND water = 1 AND  '||quote_ident(v_field)||'::integer > 0 and expl_id = '||v_expl_id||' group by '||quote_ident(v_field)||'
+			where a.state > 0 AND water = 1 AND  '||quote_ident(v_field)||'::integer > 0 and expl_id IN('||v_expl_id||') group by '||quote_ident(v_field)||'
 			UNION
 			SELECT '||quote_ident(v_field)||', st_collect(ext_plot.the_geom) as geom FROM  ext_plot, temp_t_connec a
 			JOIN temp_t_anlgraph USING (arc_id) 
-			WHERE a.state > 0 and a.expl_id = '||v_expl_id||' 
+			WHERE a.state > 0 and a.expl_id IN('||v_expl_id||')
 			AND '||quote_ident(v_field)||'::integer > 0  AND water = 1
 			AND st_dwithin(a.the_geom, ext_plot.the_geom, 0.001)
 			group by '||quote_ident(v_field)||'	
@@ -1116,20 +1115,20 @@ BEGIN
 		v_querytext = '	UPDATE temp_'||(v_table)||' set the_geom = geom FROM
 			(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
 			(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from temp_t_arc a JOIN temp_t_anlgraph USING (arc_id) 
-			where a.state > 0  AND water = 1 AND a.'||quote_ident(v_field)||'::integer > 0 and a.expl_id = '||v_expl_id||' group by '||quote_ident(v_field)||'
+			where a.state > 0  AND water = 1 AND a.'||quote_ident(v_field)||'::integer > 0 and a.expl_id IN('||v_expl_id||') group by '||quote_ident(v_field)||'
 			UNION
 			SELECT a.'||quote_ident(v_field)||', (st_buffer(st_collect(temp_t_link.the_geom),'||v_geomparamupdate_divide||',''endcap=flat join=round'')) 
 			as geom FROM temp_t_link, temp_t_connec a
 			JOIN temp_t_anlgraph USING (arc_id) 
 			WHERE a.'||quote_ident(v_field)||'::integer > 0  AND water = 1
-			AND a.state > 0 AND temp_t_link.feature_id = connec_id and temp_t_link.feature_type = ''CONNEC'' and a.expl_id = '||v_expl_id||'
+			AND a.state > 0 AND temp_t_link.feature_id = connec_id and temp_t_link.feature_type = ''CONNEC'' and a.expl_id IN('||v_expl_id||')
 			group by a.'||quote_ident(v_field)||'
 			UNION
 			SELECT a.'||quote_ident(v_field)||', (st_buffer(st_collect(temp_t_link.the_geom),'||v_geomparamupdate_divide||',''endcap=flat join=round'')) 
 			as geom FROM temp_t_link, temp_t_connec a
 			JOIN temp_t_node n ON a.arc_id IS NULL AND n.node_id=a.pjoint_id
 			WHERE a.'||quote_ident(v_field)||'::integer > 0
-			AND a.state > 0 AND temp_t_link.feature_id = connec_id and temp_t_link.feature_type = ''CONNEC'' and a.expl_id = '||v_expl_id||'
+			AND a.state > 0 AND temp_t_link.feature_id = connec_id and temp_t_link.feature_type = ''CONNEC'' and a.expl_id IN('||v_expl_id||')
 			group by a.'||quote_ident(v_field)||'
 			)c group by '||quote_ident(v_field)||')b
 			WHERE b.'||quote_ident(v_field)||'= temp_'||(v_table)||'.'||quote_ident(v_fieldmp);
@@ -1355,19 +1354,19 @@ BEGIN
 			
 		ELSIF v_class = 'SECTOR' THEN
 
-			DELETE FROM node_border_sector WHERE node_id IN (SELECT node_id FROM temp_t_node WHERE expl_id=v_expl_id AND state=1);
+			DELETE FROM node_border_sector WHERE node_id IN (SELECT node_id FROM temp_t_node WHERE expl_id IN (v_expl_id) AND state=1);
 
 			INSERT INTO node_border_sector
 			WITH arcs AS (SELECT arc_id, node_1, node_2, sector_id FROM temp_t_arc WHERE state>0)
 			SELECT node_id, a1.sector_id
 			FROM  temp_t_node 
 			JOIN arcs a1 ON node_id=node_1 
-			where a1.sector_id != temp_t_node.sector_id AND expl_id=v_expl_id 
+			where a1.sector_id != temp_t_node.sector_id AND expl_id IN (v_expl_id)
 			UNION 
 			SELECT node_id, a2.sector_id
 			FROM  temp_t_node 
 			JOIN arcs a2 ON node_id=node_2 
-			where a2.sector_id != temp_t_node.sector_id AND expl_id=v_expl_id  ON CONFLICT (node_id, sector_id) DO NOTHING;		
+			where a2.sector_id != temp_t_node.sector_id AND expl_id IN (v_expl_id)  ON CONFLICT (node_id, sector_id) DO NOTHING;		
 		END IF;
 
 		-- mapzone
