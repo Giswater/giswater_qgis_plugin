@@ -368,7 +368,7 @@ BEGIN
 
 	--Check if defined nodes and arcs exist in a database (fid 367)
 
-	FOR rec IN SELECT 'sector' UNION SELECT 'dma' UNION SELECT 'dqa' UNION SELECT 'presszone' LOOP
+	FOR rec IN SELECT unnest(ARRAY['sector', 'dma', 'dqa', 'presszone']) LOOP
 	
 		v_querytext = 'SELECT b.arc_id, b.'||rec||'_id as zone_id FROM (
 		SELECT '||rec||'_id, json_array_elements_text(((json_array_elements_text((graphconfig::json->>''use'')::json))::json->>''toArc'')::json) as arc_id FROM '||v_edit||rec||')b 
@@ -386,7 +386,7 @@ BEGIN
 		END IF;
 
 		v_querytext = 'SELECT b.node_id, b.'||rec||'_id as zone_id FROM (
-		SELECT '||rec||'_id, ((json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'')::json as node_id FROM '||rec||')b 
+		SELECT '||rec||'_id, (graphconfig->''use''->0->>''nodeParent'')::text as node_id FROM '||rec||')b 
 		WHERE node_id::text not in (select node_id FROM node WHERE state=1)';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
