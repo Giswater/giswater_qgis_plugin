@@ -260,6 +260,15 @@ BEGIN
 		END IF;
 	END IF;
 
+
+	IF v_expl_id = '' THEN 
+
+		v_expl_id = -1;
+		
+		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, concat('ERROR: No exploitations have been selected. Please, select at least 1 exploitation in Selector'));
+	
+	END IF;
+
 	v_count = coalesce(v_count1,0) + coalesce(v_count2,0);
 
 	-- check criticity of data in order to continue or not
@@ -375,6 +384,7 @@ BEGIN
 		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat(''));
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 3, 'ERRORS');
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 3, '-----------');
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, '');
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, 'WARNINGS');
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, '--------------');
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, 'INFO');
