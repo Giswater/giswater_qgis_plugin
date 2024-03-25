@@ -345,7 +345,7 @@ BEGIN
 							INTO v_deleted_result;
 
 							EXECUTE 'INSERT INTO '||v_selector_name||
-							' SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::text IN 
+							' SELECT value::text, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::text IN 
 							(SELECT result_id FROM rpt_cat_result);';
 					ELSE 
 					
