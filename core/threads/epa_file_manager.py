@@ -117,9 +117,7 @@ class GwEpaFileManager(GwTask):
                 if self.complet_result.get('status') == "Accepted":
                     if 'body' in self.complet_result:
                         if 'data' in self.complet_result['body']:
-                            tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py' "
-                                               f"with parameters: '{self.dlg_go2epa}', '{self.complet_result['body']['data']}', "
-                                               f"'None', 'True', 'True', '1', close=False, call_set_tabs_enabled=False")
+                            tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py'")
                             tools_gw.add_layer_temp(self.dlg_go2epa, self.complet_result['body']['data'],
                                                     None, True, True, 1, True, close=False,
                                                     call_set_tabs_enabled=False)
@@ -128,9 +126,7 @@ class GwEpaFileManager(GwTask):
                 if self.rpt_result.get('status') == "Accepted":
                     if 'body' in self.rpt_result:
                         if 'data' in self.rpt_result['body']:
-                            tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py' "
-                                f"with parameters: '{self.dlg_go2epa}', '{self.rpt_result['body']['data']}', "
-                                               f"'None', 'True', 'True', '1', close=False, call_set_tabs_enabled=False")
+                            tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py'")
 
                             tools_gw.add_layer_temp(self.dlg_go2epa, self.rpt_result['body']['data'],
                                                     None, True, True, 1, True, close=False,
@@ -140,7 +136,7 @@ class GwEpaFileManager(GwTask):
             if self.body:
                 sql += f"{self.body}"
             sql += f");"
-            tools_log.log_info(f"Task 'Go2Epa' manage json response with parameters: '{self.complet_result}', '{sql}', 'None'")
+            tools_log.log_info(f"Task 'Go2Epa' manage json response")
             tools_gw.manage_json_response(self.complet_result, sql, None)
 
             replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init",
@@ -218,8 +214,7 @@ class GwEpaFileManager(GwTask):
         main_json_result = None
         for step in range(1, 8):
             self.body = tools_gw.create_body(extras=(extras + f', "step": {step}'))
-            tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step {step} with parameters: "
-                               f"'gw_fct_pg2epa_main', '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+            tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step {step}")
             json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
                                                      aux_conn=self.aux_conn, is_thread=True)
             self.step_completed.emit(json_result, "\n")
@@ -266,7 +261,7 @@ class GwEpaFileManager(GwTask):
             self.error_msg = f"{message}: INP file"
             return False
 
-        tools_log.log_info(f"Task 'Go2Epa' execute function 'def _fill_inp_file' with parameters: '{self.file_inp}', '{self.complet_result['body']['file']}'")
+        tools_log.log_info(f"Task 'Go2Epa' execute function 'def _fill_inp_file'")
         self._fill_inp_file(self.file_inp, self.complet_result['body']['file'])
         self.message = self.complet_result['message']['text']
         self.common_msg += "Export INP finished. "
@@ -384,7 +379,7 @@ class GwEpaFileManager(GwTask):
         status = False
         try:
             # Call import function
-            tools_log.log_info(f"Task 'Go2Epa' execute function 'def _read_rpt_file' with parameters: '{self.file_rpt}'")
+            tools_log.log_info(f"Task 'Go2Epa' execute function 'def _read_rpt_file'")
             status = self._read_rpt_file(self.file_rpt)
             if not status:
                 return False
