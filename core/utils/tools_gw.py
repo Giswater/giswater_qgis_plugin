@@ -877,6 +877,8 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
                         thread.message = f"ValueRelation for {thread.vr_errors} switched to ValueMap because " \
                                          f"layers {thread.vr_missing} are not present on QGIS project"
                     use_vr = False
+            else:
+                use_vr = False
 
         if not use_vr:
             # Manage new values in ValueMap
