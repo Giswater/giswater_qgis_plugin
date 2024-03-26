@@ -127,7 +127,7 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     parser = global_vars.configs[file_name][1]
 
     if plugin != 'core':
-        path = f"{lib_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config{os.sep}{file_name}.config"
+        path = f"{lib_vars.user_folder_dir}{os.sep}{plugin}{os.sep}core{os.sep}config{os.sep}{file_name}.config"
         parser = None
         chk_user_params = False
 
@@ -188,7 +188,7 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
     path = global_vars.configs[file_name][0]
 
     if plugin != 'core':
-        path = f"{lib_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config{os.sep}{file_name}.config"
+        path = f"{lib_vars.user_folder_dir}{os.sep}{plugin}{os.sep}core{os.sep}config{os.sep}{file_name}.config"
         chk_user_params = False
 
     try:
