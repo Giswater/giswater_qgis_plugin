@@ -2304,7 +2304,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
         log_sql = tools_os.set_boolean(dev_log_sql)
 
     # Execute database function
-    row = tools_db.get_row(sql, commit=commit, log_sql=log_sql, aux_conn=aux_conn)
+    row = tools_db.get_row(sql, commit=commit, log_sql=log_sql, aux_conn=aux_conn, is_thread=is_thread)
     if not row or not row[0]:
         tools_log.log_warning(f"Function error: {function_name}")
         tools_log.log_warning(sql)
@@ -2317,7 +2317,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
 
     # All functions called from python should return 'status', if not, something has probably failed in postrgres
     if 'status' not in json_result:
-        manage_json_exception(json_result, sql)
+        manage_json_exception(json_result, sql, is_thread=is_thread)
         return False
 
     # If failed, manage exception
