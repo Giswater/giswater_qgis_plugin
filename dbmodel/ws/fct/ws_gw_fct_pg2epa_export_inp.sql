@@ -585,7 +585,7 @@ BEGIN
 			SELECT v_fid,rpad(concat(';',c1),22),rpad(c2,22),rpad(c3,22),rpad(c4,22),rpad(c5,22),rpad(c6,22),rpad(c7,22),rpad(c8,22),rpad(c9,22),rpad(c10,22),
 			rpad(c11,22),rpad(c12,22),rpad(c13,22)
 			FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE column_name!=''the_geom'' and table_name='''||
-			rec_table.tablename||'''::text') 
+			rec_table.tablename||'''::text order by ordinal_position')
 			AS rpt(table_name text, c1 text, c2 text, c3 text, c4 text, c5 text, c6 text, c7 text, c8 text, c9 text, c10 text, c11 text, c12 text, c13 text);
 
 			SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename AND column_name!='the_geom';
