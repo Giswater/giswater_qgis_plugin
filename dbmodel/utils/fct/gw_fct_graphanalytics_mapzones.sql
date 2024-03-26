@@ -146,8 +146,7 @@ BEGIN
 
 	-- get dialog variables
 	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'graphClass');
-	v_expl_id = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
-	--v_expl_id = json_array_elements_text(v_expl_json);
+    v_expl_id = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_macroexpl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'macroExploitation');
 	v_floodonlymapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'floodOnlyMapzone');
 	v_valuefordisconnected = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'valueForDisconnected');

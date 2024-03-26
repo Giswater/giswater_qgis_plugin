@@ -45,7 +45,7 @@ BEGIN
 	
 	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'graphClass');
 	v_updatemapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
-	v_expl = (select replace(replace((array_agg(expl_id))::text,'{',''),'}','') from selector_expl where cur_user = current_user);
+	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_paramupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 	v_floodfromnode = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'floodFromNode');
 	v_forceclosed = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'forceClosed');
@@ -66,7 +66,12 @@ BEGIN
 	IF v_valuefordisconnected IS NULL THEN v_valuefordisconnected = 0; END IF;
 	IF v_floodonlymapzone IS NULL THEN v_floodonlymapzone = ''; END IF;
 	IF v_commitchanges IS NULL THEN v_commitchanges = FALSE ; END IF;
-
+	
+	IF v_expl ='-999' THEN 
+		v_expl = (select replace(replace((array_agg(expl_id))::text,'{',''),'}','') from selector_expl where cur_user = current_user);
+	ELSE 
+		v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
+	END IF;
 	
 	v_data = concat ('{"data":{"parameters":{"graphClass":"',v_class,'", "exploitation": "',v_expl,'", "updateFeature":"TRUE",
 	"updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate, ',"floodFromNode":"',v_floodfromnode,'", "forceOpen": [',v_forceopen,'], "forceClosed":[',v_forceclosed,'], "usePlanPsector": ',v_usepsector,', "debug":"FALSE", 

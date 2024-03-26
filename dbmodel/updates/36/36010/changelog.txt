@@ -1,3 +1,4 @@
 3.6.010
 *************
 - Minor adjusment for null values in combos for dscenario (ud & ws)
+- Allow using the selected exploitations on mapzones analysis
