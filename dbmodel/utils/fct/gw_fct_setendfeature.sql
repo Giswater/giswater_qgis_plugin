@@ -113,7 +113,7 @@ BEGIN
 					EXECUTE 'DELETE FROM link
 					WHERE link_id IN (SELECT link_id FROM link l JOIN gully g ON g.gully_id = l.feature_id WHERE g.state = 1 AND g.arc_id = '|| quote_literal(v_feature_id_value)||')';
 
-					EXECUTE 'UPDATE gully SET arc_id = NULL WHERE g.state = 1 arc_id = '|| quote_literal(v_feature_id_value)||'';
+					EXECUTE 'UPDATE gully SET arc_id = NULL WHERE state = 1 AND arc_id = '|| quote_literal(v_feature_id_value)||'';
 				END IF;
 
 				-- specific log for arcs which have elements associated to other features
