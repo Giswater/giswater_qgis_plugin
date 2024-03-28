@@ -13,7 +13,7 @@ $BODY$
 /* example
 
 -- execute
-SELECT SCHEMA_NAME.gw_fct_pg2epa_repair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
+SELECT SCHEMA_NAME.gw_fct_pg2epa_autorepair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
 
 
 ALTER TABLE SCHEMA_NAME.cat_feature_node DROP CONSTRAINT node_type_epa_table_check;
