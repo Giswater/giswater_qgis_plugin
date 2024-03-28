@@ -73,7 +73,7 @@ INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source"
 VALUES(522, 'Check outfalls with more than 1 arc', 'utils', NULL, 'core', true, 'Function process', NULL);
 
 INSERT INTO sys_message (id, error_message, log_level, show_user, project_type, "source")
-VALUES(3250, 'Value 0 for exploitation it is not enabled on network objects. It is only used to relate undefined mapzones', 2, true, 'utils', 'core');
+VALUES(3250, 'Value 0 for exploitation it is not enabled on network objects. It is only used to relate undefined mapzones', 2, true, 'utils', 'core') ON CONFLICT DO NOTHING;
 
 --24/11/2023
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 

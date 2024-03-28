@@ -1348,7 +1348,7 @@ INSERT INTO config_param_system (parameter, value, descript, "label", dv_queryte
 
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type, "source")
-VALUES(3236, 'It''s not possible to upsert the arc because node_1 and node_2 belong to different mapzones.', 'check it before continue', 2, true, 'utils', 'core');
+VALUES(3236, 'It''s not possible to upsert the arc because node_1 and node_2 belong to different mapzones.', 'check it before continue', 2, true, 'utils', 'core') ON CONFLICT DO NOTHING;
 
 
 UPDATE config_form_list set query_text = replace(query_text, 'v_ui_hydroval_x_connec', 'v_ui_hydroval') where listname = 'tbl_hydrometer_value';
