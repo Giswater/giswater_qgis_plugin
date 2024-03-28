@@ -161,13 +161,6 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="chk_refresh_i18n">
-        <property name="text">
-         <string>Refresh i18n translations</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0">
        <widget class="QCheckBox" name="chk_py_msg">
         <property name="text">
@@ -175,10 +168,24 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QCheckBox" name="chk_missing_dbmessage">
+      <item row="4" column="0">
+       <widget class="QCheckBox" name="chk_missing_translations">
         <property name="text">
-         <string>Check missing dbmessage</string>
+         <string>Check missing translations </string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="chk_refresh_i18n">
+        <property name="text">
+         <string>Refresh i18n translations</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="chk_update_messages">
+        <property name="text">
+         <string>Update dbmessages</string>
         </property>
        </widget>
       </item>

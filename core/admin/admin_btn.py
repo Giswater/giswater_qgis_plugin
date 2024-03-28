@@ -1843,9 +1843,9 @@ class GwAdminButton:
 
         if manage_i18n:
             files_to_execute = [f"{self.project_type_selected}_schema_model.sql", f"dml.sql"]
-            for file in filelist:
+            for file in files_to_execute:
                 status = True
-                if file in files_to_execute:
+                if file in filelist:
                     tools_log.log_info(os.path.join(filedir, file))
                     self.current_sql_file += 1
                     status = self._read_execute_file(filedir, file, schema_name, self.project_epsg, set_progress_bar)

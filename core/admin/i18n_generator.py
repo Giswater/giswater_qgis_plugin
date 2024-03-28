@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
+import re
 import psycopg2
 import psycopg2.extras
 import subprocess
@@ -90,13 +91,13 @@ class GwI18NGenerator:
         py_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_msg)
         db_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_db_msg)
         refresh_i18n = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_refresh_i18n)
-        check_missing_dbmessage = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_missing_dbmessage)
+        missing_translations = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_missing_translations)
 
         self.dlg_qm.lbl_info.clear()
         msg = ''
         self.language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         self.lower_lang = self.language.lower()
-        if check_missing_dbmessage:
+        if missing_translations:
             self._check_missing_dbmessage_values()
 
         if py_msg:
@@ -394,10 +395,11 @@ class GwI18NGenerator:
     def _get_dbdialog_values_i18n(self):
         """ Get db dialog values """
 
-        sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_us, lb_{self.lower_lang}, tt_en_us, "
-               f"tt_{self.lower_lang} "
-               f"FROM i18n.dbdialog "
-               f"ORDER BY context, formname;")
+        sql = (f"SELECT d.source, d.project_type, d.context, d.formname, f.formname_{self.lower_lang},"
+               f" d.formtype, d.lb_en_us, d.lb_{self.lower_lang}, d.tt_en_us, d.tt_{self.lower_lang}"
+               f" FROM i18n.dbdialog d"
+               f" LEFT JOIN i18n.dbfeature f ON f.formname = d.formname"
+               f" ORDER BY d.context, d.formname;")
         rows = self._get_rows(sql)
         if not rows:
             return False
@@ -426,9 +428,11 @@ class GwI18NGenerator:
         for row in rows:
             # Get values
             table = row['context'] if row['context'] is not None else ""
-            form_name = row['formname']if row['formname'] is not None else ""
-            form_type = row['formtype']if row['formtype'] is not None else ""
-            source = row['source']if row['source'] is not None else ""
+            form_name = row['formname'] if row['formname'] is not None else ""
+            form_name_lan = row[f'formname_{self.lower_lang}'] if row[f'formname_{self.lower_lang}'] is not None else ""
+            formname = form_name_lan if form_name_lan is not "" else form_name
+            form_type = row['formtype'] if row['formtype'] is not None else ""
+            source = row['source'] if row['source'] is not None else ""
             lbl_value = row[f'lb_{self.lower_lang}'] if row[f'lb_{self.lower_lang}'] is not None else row['lb_en_us']
             lbl_value = lbl_value if lbl_value is not None else ""
             if row[f'tt_{self.lower_lang}'] is not None:
@@ -440,16 +444,20 @@ class GwI18NGenerator:
             tt_value = tt_value if tt_value is not None else ""
 
             # Check invalid characters
-            lbl_value = lbl_value.replace("'", "''") if lbl_value is not None else lbl_value
-            tt_value = tt_value.replace("'", "''") if tt_value is not None else tt_value
-            if lbl_value is not None and "\n" in lbl_value:
-                lbl_value = self._replace_invalid_characters(lbl_value)
-            if tt_value is not None and "\n" in tt_value:
-                tt_value = self._replace_invalid_characters(tt_value)
+            if lbl_value is not None:
+                lbl_value = self._replace_invalid_quotation_marks(lbl_value)
+                if "\n" in lbl_value:
+                    lbl_value = self._replace_invalid_characters(lbl_value)
+            if tt_value is not None:
+                tt_value = self._replace_invalid_quotation_marks(tt_value)
+                if "\n" in tt_value:
+                    tt_value = self._replace_invalid_characters(tt_value)
 
             line = f'UPDATE {table} '
-            if row['context'] in ('config_param_system', 'sys_param_user'):
+            if row['context'] in 'config_param_system':
                 line += f'SET label = \'{lbl_value}\', tooltip = \'{tt_value}\' '
+            elif row['context'] in 'sys_param_user':
+                line += f'SET label = \'{lbl_value}\', descript = \'{tt_value}\' '
             elif row['context'] in 'config_typevalue':
                 line += f'SET idval = \'{tt_value}\' '
             elif row['context'] not in ('config_param_system', 'sys_param_user'):
@@ -457,13 +465,13 @@ class GwI18NGenerator:
 
             # Clause WHERE for each context
             if row['context'] == 'config_form_fields':
-                line += f'WHERE formname = \'{form_name}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\' '
+                line += f'WHERE formname = \'{formname}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\' '
             elif row['context'] == 'config_form_tabs':
-                line += f'WHERE formname = \'{form_name}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\' '
+                line += f'WHERE formname = \'{formname}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\' '
             elif row['context'] == 'config_form_groupbox':
-                line += f'WHERE formname = \'{form_name}\' AND layout_if = \'{source}\' '
+                line += f'WHERE formname = \'{formname}\' AND layout_if = \'{source}\' '
             elif row['context'] == 'config_typevalue':
-                line += f'WHERE formname = \'{form_name}\' AND id = \'{source}\' '
+                line += f'WHERE id = \'{source}\' '
             elif row['context'] == 'config_param_system':
                 line += f'WHERE parameter = \'{source}\' '
             elif row['context'] == 'sys_param_user':
@@ -490,16 +498,19 @@ class GwI18NGenerator:
             source = row['source'] if row['source'] is not None else ""
             project_type = row['project_type'] if row['project_type'] is not None else ""
             log_level = row['log_level'] if row['log_level'] is not None else 2
-            ms_value = row[f'ms_{self.lower_lang}'] if row[f'ms_{self.lower_lang}'] is not None else row['ms_en_us']
+            ms_value = row[f'ms_{self.lower_lang}'] if row[f'ms_{self.lower_lang}'] is not None else row['ms_en_us']            
             ht_value = row[f'ht_{self.lower_lang}'] if row[f'ht_{self.lower_lang}'] is not None else row['ht_en_us']
+            ht_value = ht_value if ht_value is not None else ""
 
             # Check invalid characters
-            ms_value = ms_value.replace("'", "''") if ms_value is not None else ms_value
-            ht_value = ht_value.replace("'", "''") if ht_value is not None else ht_value
-            if ms_value is not None and "\n" in ms_value:
-                ms_value = self._replace_invalid_characters(ms_value)
-            if ht_value is not None and "\n" in ht_value:
-                ht_value = self._replace_invalid_characters(ht_value)
+            if ms_value is not None:
+                ms_value = self._replace_invalid_quotation_marks(ms_value)
+                if "\n" in ms_value:
+                    ms_value = self._replace_invalid_characters(ms_value)
+            if ht_value is not None:
+                ht_value = self._replace_invalid_quotation_marks(ht_value)
+                if "\n" in ht_value:
+                    ht_value = self._replace_invalid_characters(ht_value)
 
 
             line = f'INSERT INTO {table} (id, error_message, hint_message, log_level, show_user, project_type, source) ' \
@@ -543,9 +554,11 @@ class GwI18NGenerator:
         for row in rows:
             # Get values
             table = row['context'] if row['context'] is not None else ""
-            form_name = row['formname']if row['formname'] is not None else ""
-            form_type = row['formtype']if row['formtype'] is not None else ""
-            source = row['source']if row['source'] is not None else ""
+            form_name = row['formname'] if row['formname'] is not None else ""
+            form_name_lan = row[f'formname_{self.lower_lang}'] if row[f'formname_{self.lower_lang}'] is not None else ""
+            formname = form_name_lan if form_name_lan is not None else form_name
+            form_type = row['formtype'] if row['formtype'] is not None else ""
+            source = row['source'] if row['source'] is not None else ""
             lbl_value = row[f'lb_{self.lower_lang}'] if row[f'lb_{self.lower_lang}'] is not None else row['lb_en_us']
             lbl_value = lbl_value if lbl_value is not None else ""
             if row[f'tt_{self.lower_lang}'] is not None:
@@ -751,9 +764,18 @@ class GwI18NGenerator:
          (", new line, etc.)
             :param param: The text to fix (String)
         """
-        param = param.replace("\"", "'")
+        param = param.replace("\"", "''")
         param = param.replace("\r", "")
         param = param.replace("\n", " ")
+
+        return param
+    def _replace_invalid_quotation_marks(self, param):
+        """
+        This function replaces the characters that break JSON messages
+         (')
+            :param param: The text to fix (String)
+        """
+        param = re.sub(r"(?<!')'(?!')", "''", param)
 
         return param
 
