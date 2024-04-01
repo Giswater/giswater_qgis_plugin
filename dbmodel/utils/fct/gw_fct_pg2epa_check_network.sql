@@ -57,7 +57,8 @@ v_version text;
 v_networkstats json;
 v_sumlength numeric (12,2);
 v_linkoffsets text;
-v_delnetwork boolean;
+v_deldisconnetwork boolean;
+v_deldrynetwork boolean;
 v_removedemands boolean;
 v_minlength float;
 v_demand numeric (12,4);
@@ -82,7 +83,8 @@ BEGIN
 
 
 	-- get user variables
-	v_delnetwork = (SELECT value::json->>'delDisconnNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+	v_deldisconnetwork = (SELECT value::json->>'delDisconnNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+	v_deldrynetwork = (SELECT value::json->>'delDryNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_removedemands = (SELECT value::json->>'removeDemandOnDryNodes' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	
 	-- manage no found results
@@ -374,7 +376,7 @@ BEGIN
 
 
 	-- updating values on result
-	IF v_delnetwork THEN
+	IF v_deldisconnetwork THEN
 		DELETE FROM temp_t_arc WHERE arc_id IN (SELECT arc_id FROM temp_anl_arc WHERE fid = 139 AND cur_user=current_user);
 		GET DIAGNOSTICS v_count = row_count;
 
@@ -389,13 +391,32 @@ BEGIN
 		END IF;
 
 		DELETE FROM temp_t_node WHERE node_id IN (SELECT node_id FROM temp_anl_node WHERE fid = 139 AND cur_user=current_user);
-		DELETE FROM temp_audit_check_data WHERE fid = 227 AND error_message like '%topological disconnected from any%' AND cur_user = current_user;
 	END IF;
 
+	-- updating values on result
+	IF v_deldrynetwork THEN
+		DELETE FROM temp_t_arc WHERE arc_id IN (SELECT arc_id FROM temp_anl_arc WHERE fid = 232 AND cur_user=current_user);
+		GET DIAGNOSTICS v_count = row_count;
+
+		IF v_count > 0 THEN
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result, 2, 
+			concat('WARNING-227: {delDryNetwork} is enabled and ',v_count,' arcs have been removed.'));
+		ELSE
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result, 1, 
+			concat('INFO: {delDryNetwork} is enabled but nothing have been removed.'));
+		END IF;
+
+		DELETE FROM temp_t_node WHERE node_id IN (SELECT node_id FROM temp_anl_node WHERE fid = 232 AND cur_user=current_user);
+	END IF;
+
+
 	IF v_removedemands THEN
-		UPDATE temp_t_node n SET demand = 0, addparam = gw_fct_json_object_set_key(addparam::json, 'removedDemand'::text, true::boolean) 
+		UPDATE temp_t_node n SET demand = 0, addparam = gw_fct_json_object_set_key(a.addparam::json, 'removedDemand'::text, true::boolean) 
 		FROM temp_anl_node a WHERE fid = 233 AND a.cur_user = current_user AND a.node_id = n.node_id;
 		GET DIAGNOSTICS v_count = row_count;
+		
 		IF v_count > 0 THEN
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result, 2, concat(

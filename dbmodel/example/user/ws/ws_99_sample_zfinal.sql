@@ -28,3 +28,8 @@ INSERT INTO om_waterbalance_dma_graph VALUES ('1101',4,1);
 INSERT INTO om_waterbalance_dma_graph VALUES ('113766',1,1);
 INSERT INTO om_waterbalance_dma_graph VALUES ('113766',4,-1);
 
+
+UPDATE config_param_user SET value = replace(value, '"removeDemandOnDryNodes":false', '"delDryNetwork":false, "removeDemandOnDryNodes":true') 
+WHERE parameter = 'inp_options_debug';
+
+
