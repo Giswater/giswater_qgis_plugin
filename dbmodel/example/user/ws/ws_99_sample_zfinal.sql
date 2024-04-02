@@ -32,4 +32,5 @@ INSERT INTO om_waterbalance_dma_graph VALUES ('113766',4,-1);
 UPDATE config_param_user SET value = replace(value, '"removeDemandOnDryNodes":false', '"delDryNetwork":false, "removeDemandOnDryNodes":true') 
 WHERE parameter = 'inp_options_debug';
 
+UPDATE inp_shortpipe SET to_arc = '2037', status = 'CV' where node_id = '1092';
 

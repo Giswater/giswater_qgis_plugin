@@ -17,3 +17,5 @@ update config_form_fields set widgetcontrols = (replace(widgetcontrols::text, '"
 where columnname in ('arccat_id','curve_id','expl_id','flap','form_type','gate','lidco_id','matcat_id','ori_type','outfall_type','pattern_id','poll_id','rgage_type' ,'timser_id', 'weir_type') 
 and formname like '%dscenario%';
 
+update sys_param_user SET dv_isnullvalue = true where id = 'inp_options_setallraingages';
+	
