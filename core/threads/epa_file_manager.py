@@ -440,6 +440,8 @@ class GwEpaFileManager(GwTask):
         for line_number, row in enumerate(full_file):
 
             if self.isCanceled():
+                self._close_file()
+                del full_file
                 return False
 
             progress += 1
@@ -478,6 +480,8 @@ class GwEpaFileManager(GwTask):
                                        f"Please ckeck and fix it before continue. \n"
                                        f"{error_near}")
                             self.error_msg = message
+                            self._close_file()
+                            del full_file
                             return False
                     elif bool(re.search('>50', str(dirty_list[x]))):
                         error_near = f"Error near line {line_number+1} -> {dirty_list}"
@@ -485,8 +489,11 @@ class GwEpaFileManager(GwTask):
                         message = (f"The rpt file is not valid to import. "
                                    f"Because velocity has not numeric value (>50), it seems you need to improve your simulation. "
                                    f"Please ckeck and fix it before continue. \n"
+                                   f"Note: You can force the import by activating the variable 'force_import_velocity_higher_50ms' on the init.config file. \n"
                                    f"{error_near}")
                         self.error_msg = message
+                        self._close_file()
+                        del full_file
                         return False
                     else:
                         sp_n.append(dirty_list[x])
@@ -527,6 +534,7 @@ class GwEpaFileManager(GwTask):
         self.json_rpt = json_rpt
 
         self._close_file()
+        del full_file
 
         return True
 
