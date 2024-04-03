@@ -373,7 +373,7 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '106' ,concat('WARNING-106 (anl_node): There is/are ',v_count,' nodes with less proximity than minimum configured (',v_nodetolerance,').'),v_count);
+		VALUES (v_fid, v_result_id, 2, '106' ,concat('WARNING-106 (anl_node): There is/are ',v_count,' nodes with less proximity than minimum configured (',v_nodetolerance,').'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '106','INFO: All nodes has the minimum distance among them acording with the configured value ',v_count);
