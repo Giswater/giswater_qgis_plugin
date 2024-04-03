@@ -391,30 +391,10 @@ class GwEpaFileManager(GwTask):
             return status
 
 
-    def _read_rpt_file(self, file_path=None):
+    def _read_rpt_file(self, file_path:str = None):
 
         replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init", prefix=False)
-        if tools_os.set_boolean(replace, default=False) and global_vars.project_type == 'ud':
-            # Replace the velocities
-            try:
-                # Read the contents of the file
-                with open(file_path, "r+", errors='replace') as file:
-                    contents = file.read()
-                # Save a backup of the file
-                with open(f"{file_path}.old", 'w', encoding='utf-8', errors='replace') as file:
-                    file.write(contents)
-                # Replace the words
-                old_contents = contents
-                contents = tools_os.ireplace('>50', '50', contents)
-                if contents != old_contents:
-                    self.replaced_velocities = True
-                # Write the file with new contents
-                with open(file_path, "r+", errors='replace') as file:
-                    file.write(contents)
-                with open(f"{file_path}", 'w', encoding='utf-8', errors='replace') as file:
-                    file.write(contents)
-            except Exception as e:
-                tools_log.log_error(f"Exception when replacing rpt velocities: {e}")
+        replace = tools_os.set_boolean(replace, default=False)
 
         self.file_rpt = open(file_path, "r+", errors='replace')
         full_file = self.file_rpt.readlines()
@@ -447,6 +427,9 @@ class GwEpaFileManager(GwTask):
             progress += 1
             if '**' in row or '--' in row:
                 continue
+
+            if replace and '>50' in row:
+                row = row.replace('>50', '50')
 
             row = row.rstrip()
             dirty_list = row.split(' ')
