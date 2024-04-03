@@ -625,8 +625,8 @@ BEGIN
 	v_count=0;
 
 	RAISE NOTICE '27 - Check if outfalls have more than 1 connected arc';
-	with n as (select node_id from node, arc where node.epa_type='OUTFALL' and st_dwithin(node.the_geom, arc.the_geom, 0.01) group by node_id having count(node_id)>1)
-	select count(*) from n into v_count;
+	select count(*) into v_count 
+	from (select node_2 from v_edit_inp_conduit a join v_edit_inp_outfall n on node_2 = node_id group by node_2 having count(*) > 1)a;   
 	
 	IF v_count>0 then
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -645,7 +645,12 @@ BEGIN
 	RAISE NOTICE '528 - Check if outlet_id exists in v_edit_junction (if outlet_id is a node) or in v_edit_inp_subcatchment (if outlet_id is a subcathment)';
 	
 	v_querytext = '(select outlet_id from v_edit_inp_subc2outlet
-			LEFT JOIN (select node_id from v_edit_inp_junction UNION select node_id from v_edit_inp_storage UNION select node_id from v_edit_inp_netgully) a on outlet_id = node_id
+			LEFT JOIN (
+			select node_id from v_edit_inp_junction 
+			UNION select node_id from v_edit_inp_outfall
+			UNION select node_id from v_edit_inp_storage 
+			UNION select node_id from v_edit_inp_netgully
+			) a on outlet_id = node_id
 			where outlet_type in (''JUNCTION'') and node_id is null
 			union
 			select a.outlet_id from v_edit_inp_subc2outlet a LEFT JOIN v_edit_inp_subcatchment s on a.outlet_id = s.subc_id
