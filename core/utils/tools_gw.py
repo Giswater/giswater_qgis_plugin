@@ -1700,21 +1700,20 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
 def add_checkbox(**kwargs):
     dialog = kwargs.get('dialog')
     field = kwargs.get('field')
-    is_tristate = kwargs.get('is_tristate')
     class_info = kwargs.get('class')
     connect_signal = kwargs.get('connectsignal')
 
     widget = QCheckBox()
     widget.setObjectName(field['widgetname'])
-    if 'widgetcontrols' in field and field['widgetcontrols']:
-        widget.setProperty('widgetcontrols', field['widgetcontrols'])
-    widget.setProperty('columnname', field['columnname'])
     if field.get('value') in ("t", "true", True):
         widget.setChecked(True)
-    if is_tristate:
-        widget.setTristate(is_tristate)
-        if field.get('value') == "":
-            widget.setCheckState(1)
+    if 'widgetcontrols' in field and field['widgetcontrols']:
+        widget.setProperty('widgetcontrols', field['widgetcontrols'])
+        if field['widgetcontrols'].get('tristate') in ("t", "true", True):
+            widget.setTristate(field['widgetcontrols'].get('tristate'))
+            if field.get('value') == "":
+                widget.setCheckState(1)
+    widget.setProperty('columnname', field['columnname'])
     if 'iseditable' in field:
         widget.setEnabled(field['iseditable'])
 
@@ -4427,7 +4426,7 @@ def _manage_combo(**kwargs):
 def _manage_check(**kwargs):
     """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
+    """
 
     dialog = kwargs['dialog']
     field = kwargs['field']
