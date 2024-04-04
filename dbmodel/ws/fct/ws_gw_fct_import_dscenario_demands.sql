@@ -50,7 +50,7 @@ BEGIN
   
 	-- manage log (fid:  v_fid)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('IMPORT VALVE STATUS'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('IMPORT DSCENARIO DEMAND'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('------------------------------'));
 
 	
@@ -80,8 +80,7 @@ BEGIN
 
 			-- manage log (fid: v_fid)
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Reading values from temp_csv table -> Done'));
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Inserting values on cat_dscenario table -> Done'));
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Inserting values on inp_dscenario_shortpipe table -> Done'));
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Inserting values on inp_dscenario_demand table -> Done'));
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Process finished'));
 		END IF;
 	END IF;
