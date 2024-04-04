@@ -817,6 +817,21 @@ BEGIN
 					IF (SELECT value::boolean FROM config_param_system WHERE parameter='edit_feature_auto_builtdate') IS TRUE AND field_value IS NULL  THEN
 						EXECUTE 'SELECT date(now())' INTO field_value;
 					END IF;
+					
+				WHEN 'inventory' THEN
+					IF (SELECT value::boolean FROM config_param_system WHERE parameter='edit_inventory_sysvdefault') IS TRUE THEN
+						field_value = (SELECT value::boolean FROM config_param_system WHERE parameter='edit_inventory_sysvdefault');
+					END IF;
+
+				WHEN 'publish' THEN
+					IF (SELECT value::boolean FROM config_param_system WHERE parameter='edit_publish_sysvdefault') IS TRUE THEN
+						field_value = (SELECT value::boolean FROM config_param_system WHERE parameter='edit_publish_sysvdefault');
+					END IF;
+
+				WHEN 'uncertain' THEN
+					IF (SELECT value::boolean FROM config_param_system WHERE parameter='edit_uncertain_sysvdefault') IS TRUE THEN
+						field_value = (SELECT value::boolean FROM config_param_system WHERE parameter='edit_uncertain_sysvdefault');
+					END IF;
 
 				WHEN 'streetname' THEN
 					IF (v_auto_streetvalues_status is true) then
