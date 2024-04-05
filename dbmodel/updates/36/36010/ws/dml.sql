@@ -43,4 +43,15 @@ update config_form_fields set widgetcontrols = (replace(widgetcontrols::text, '"
 where columnname in ('status','source_type','source_pattern_id','pattern_id','curve_id','mixing_model','energy_pattern_id','effic_curve_id','pump_type','valv_type', 'expl_id') 
 and formname like '%dscenario%';
 
-UPDATE sys_param_user SET vdefault = replace(vdefault, '"removeDemandOnDryNodes":false', '"delDryNetwork":false, "removeDemandOnDryNodes":true') WHERE id = 'inp_options_debug';
+UPDATE sys_param_user SET vdefault = replace(vdefault, '"removeDemandOnDryNodes":false', '"delDryNetwork":false, "removeDemandOnDryNodes":true') 
+WHERE id = 'inp_options_debug';
+
+UPDATE config_toolbox SET inputparams =
+'[{"widgetname":"exploitation", "label":"Exploitation id:","widgettype":"text","datatype":"json","layoutname":"grl_option_parameters","layoutorder":1, "placeholder":"1,2", "value":""}, 
+{"widgetname":"usePsectors", "label":"Use masterplan psectors:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":6, "value":""}, 
+{"widgetname":"commitChanges", "label":"Commit changes:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":7, "value":""}, 
+{"widgetname":"updateMapZone", "label":"Update mapzone geometry method:","widgettype":"combo","datatype":"integer","layoutname":"grl_option_parameters","layoutorder":8,"comboIds":[0,1,2,3], "comboNames":["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "PLOT & PIPE BUFFER"], "selectedId":""}, 
+{"widgetname":"geomParamUpdate", "label":"Geometry parameter:","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layoutorder":10, "isMandatory":false, "placeholder":"5-30", "value":""},
+{"widgetname":"useBrokenValves", "label":"Ignore Broken Valves (open):","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":11, "isMandatory":false, "placeholder":"", "value":""}
+]'
+WHERE id = 2706;

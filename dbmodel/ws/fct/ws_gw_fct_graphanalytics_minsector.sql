@@ -60,7 +60,7 @@ v_arcid text;
 v_featuretype text;
 v_featureid integer;
 v_querytext text;
-v_updatefeature boolean;
+v_commitchanges boolean;
 v_arc text;
 v_result_info json;
 v_result_point json;
@@ -94,7 +94,7 @@ BEGIN
 
 	-- get variables
 	v_arcid = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'arc');
-	v_updatefeature = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateFeature');
+	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
@@ -251,7 +251,7 @@ BEGIN
 		WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND state=1  AND '||v_expl_query||'  '||v_psectors_query_arc||';';
 			
 		-- set the starting element
-		if v_ignorebrokenvalves is true then     
+		if v_ignorebrokenvalves is false then     
 			v_querytext = 'UPDATE temp_t_anlgraph SET flag=1, water=1, checkf=1, trace=a.arc_id::integer 
 					FROM (
 						SELECT a.arc_id FROM temp_t_arc a 
@@ -265,7 +265,7 @@ BEGIN
 						WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN (''MINSECTOR'')))a
 			WHERE temp_t_anlgraph.arc_id = a.arc_id';
 		
-		elsif v_ignorebrokenvalves is false then
+		elsif v_ignorebrokenvalves is true then
 			v_querytext = 'UPDATE temp_t_anlgraph SET flag=1, water=1, checkf=1, trace=a.arc_id::integer 
 						FROM (
 							SELECT a.arc_id FROM temp_t_arc a 
@@ -284,7 +284,7 @@ BEGIN
 					                                           
 		EXECUTE v_querytext;
 	
-	-- inundation process
+		-- inundation process
 		LOOP	
 			v_cont1 = v_cont1+1;
 			UPDATE temp_t_anlgraph n SET water= 1, flag=n.flag+1, checkf=1, trace = a.trace FROM v_temp_anlgraph a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;
@@ -296,7 +296,7 @@ BEGIN
 		END LOOP;
 
 		-- fusioning parts of each temp_minsectors in one unique temp_minsector 
-		IF v_ignorebrokenvalves IS TRUE THEN 
+		IF v_ignorebrokenvalves IS FALSE THEN 
 			create temp view v_t_process as 
 			SELECT * FROM 
 			(
@@ -317,7 +317,7 @@ BEGIN
 			(SELECT trace, count(*) FROM temp_t_anlgraph GROUP BY trace) c USING (trace)
 			order by 2, 3 desc;
 			
-		ELSIF v_ignorebrokenvalves IS FALSE THEN 
+		ELSIF v_ignorebrokenvalves IS TRUE THEN 
 			create temp view v_t_process as 
 			SELECT * FROM 
 			(
@@ -493,11 +493,11 @@ BEGIN
 	END IF;
 	
 	-- message
-	IF v_updatefeature IS TRUE THEN 
+	IF v_commitchanges IS TRUE THEN 
 		INSERT INTO temp_audit_check_data (fid, error_message)
 		VALUES (v_fid, concat('WARNING-',v_fid,': temp_minsector attribute (minsector_id) on arc/node/connec features have been updated by this process'));
 				
-	ELSIF v_updatefeature IS FALSE and v_returnerror IS FALSE THEN
+	ELSIF v_commitchanges IS FALSE and v_returnerror IS FALSE THEN
 		-- message
 		INSERT INTO temp_audit_check_data (fid, error_message)
 		VALUES (v_fid, concat('INFO: temp_minsector attribute (minsector_id) on arc/node/connec features keeps same value previous function. Nothing have been updated by this process'));
@@ -523,7 +523,7 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}');
 
-	IF v_updatefeature IS FALSE THEN 
+	IF v_commitchanges IS FALSE THEN 
 		-- polygons 
 		EXECUTE 'SELECT jsonb_agg(features.feature) 
 		FROM ( 
@@ -552,7 +552,7 @@ BEGIN
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	v_result_polygon := COALESCE(v_result_polygon, '{}');
 
-	IF v_updatefeature IS TRUE THEN 
+	IF v_commitchanges IS TRUE THEN 
 	
 		-- minsector
 		EXECUTE 'DELETE FROM minsector a WHERE '||v_expl_query||' ;';

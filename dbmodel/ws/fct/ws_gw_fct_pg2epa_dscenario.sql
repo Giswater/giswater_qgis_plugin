@@ -69,15 +69,18 @@ BEGIN
 		v_userscenario = (SELECT array_agg(dscenario_id) FROM selector_inp_dscenario where cur_user=current_user);
 		v_deafultpattern = Coalesce((SELECT value FROM config_param_user WHERE parameter='inp_options_pattern' AND cur_user=current_user),''); 
 
-		-- base demand management	
-		IF v_demandpriority = 0 THEN -- Remove whole base demand
+		
+		-- Remove whole base demand
+		IF v_demandpriority = 0 THEN 
 		
 			UPDATE temp_t_node SET demand = 0, pattern_id = null;
-
-		ELSIF	v_demandpriority = 1 THEN -- keep base demand and overwrites it when dscenario demand exists
-			-- EPANET standard 
 			
-		ELSIF v_demandpriority = 2 THEN -- Dscenario and base demand are joined,  moving to temp_t_demand in order to do not lose base demand (because EPANET does)
+		-- EPANET standard: keep base demand and overwrites it when dscenario demand exists
+		ELSIF	v_demandpriority = 1 THEN 
+			
+			
+		-- Dscenario and base demand are joined,  moving to temp_t_demand in order to do not lose base demand (because EPANET does)
+		ELSIF v_demandpriority = 2 THEN 
 
 			-- moving node demands to temp_t_demand
 			INSERT INTO temp_t_demand (dscenario_id, feature_id, demand, pattern_id)
