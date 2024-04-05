@@ -426,16 +426,6 @@ UPDATE config_form_fields SET placeholder = 'Top floor of the building (ex: 3)' 
 UPDATE config_form_fields SET placeholder = 'Optional: Arc_id of related arc' where columnname = 'arc_id' AND formname like '%ve_node%';
 UPDATE config_form_fields SET placeholder = 'Optional: Node_id of the parent node' where columnname = 'parent_id' AND formname like '%ve_node%';
 
-INSERT INTO ext_node (fid, node_id, val, tstamp) VALUES (364,'1069',35.4,'2020-01-01 03:05:00');
-INSERT INTO ext_node (fid, node_id, val, tstamp) VALUES (364,'1069',34.4,'2020-01-01 03:10:00');
-INSERT INTO ext_node (fid, node_id, val, tstamp) VALUES (364,'1067',45.4,'2020-01-01 03:05:00');
-INSERT INTO ext_node (fid, node_id, val, tstamp) VALUES (364,'1067',44.4,'2020-01-01 03:10:00');
-
-INSERT INTO ext_arc (fid, arc_id, val, tstamp) VALUES (363,'2078',1.1,'2020-01-01 03:05:00');
-INSERT INTO ext_arc (fid, arc_id, val, tstamp) VALUES (363,'2078',0.9,'2020-01-01 03:10:00');
-INSERT INTO ext_arc (fid, arc_id, val, tstamp) VALUES (365,'2078',0.02,'2020-01-01 03:05:00');
-INSERT INTO ext_arc (fid, arc_id, val, tstamp) VALUES (365,'2078',0.03,'2020-01-01 03:10:00');
-
 
 -- 2020/12/07
 UPDATE sys_param_user SET vdefault ='{"reservoir":{"switch2Junction":["WTP", "WATERWELL", "SOURCE"]},

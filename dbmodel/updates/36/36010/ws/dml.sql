@@ -44,3 +44,9 @@ where columnname in ('status','source_type','source_pattern_id','pattern_id','cu
 and formname like '%dscenario%';
 
 UPDATE sys_param_user SET vdefault = replace(vdefault, '"removeDemandOnDryNodes":false', '"delDryNetwork":false, "removeDemandOnDryNodes":true') WHERE id = 'inp_options_debug';
+
+drop table ext_node;
+delete from sys_table where id = 'ext_node';
+
+drop table ext_arc;
+delete from sys_table where id = 'ext_arc';
