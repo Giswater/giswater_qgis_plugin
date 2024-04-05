@@ -55,3 +55,13 @@ UPDATE config_toolbox SET inputparams =
 {"widgetname":"useBrokenValves", "label":"Ignore Broken Valves (open):","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":11, "isMandatory":false, "placeholder":"", "value":""}
 ]'
 WHERE id = 2706;
+
+
+drop table if exists ext_node;
+delete from sys_table where id = 'ext_node';
+
+drop table if exists  ext_arc;
+delete from sys_table where id = 'ext_arc';
+
+DROP TABLE if exists inp_value_yesnofull;
+DELETE FROM sys_table where id = 'inp_value_yesnofull';
