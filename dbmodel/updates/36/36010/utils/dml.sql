@@ -58,6 +58,6 @@ delete from sys_function where function_name = 'gw_fct_getvisit_main';
 
 update sys_message set source = 'core' where source is null;
 
-
+DELETE FROM inp_typevalue WHERE typevalue = 'inp_typevalue_dscenario' AND id = 'UNDEFINED';
 
 
