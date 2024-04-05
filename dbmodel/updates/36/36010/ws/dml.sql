@@ -45,8 +45,11 @@ and formname like '%dscenario%';
 
 UPDATE sys_param_user SET vdefault = replace(vdefault, '"removeDemandOnDryNodes":false', '"delDryNetwork":false, "removeDemandOnDryNodes":true') WHERE id = 'inp_options_debug';
 
-drop table ext_node;
+drop table if exists ext_node;
 delete from sys_table where id = 'ext_node';
 
-drop table ext_arc;
+drop table if exists  ext_arc;
 delete from sys_table where id = 'ext_arc';
+
+DROP TABLE if exists inp_value_yesnofull;
+DELETE FROM sys_table where id = 'inp_value_yesnofull';
