@@ -802,8 +802,6 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id,error_message, fcount)
 		VALUES (v_fid, 2, '265', concat('WARNING-265: There is/are ',v_count,' automatic links with longitude out-of-range found.'),v_count);
-		INSERT INTO temp_audit_check_data (fid, criticity, error_message, fcount)
-		VALUES (v_fid, 2, concat('HINT: Links with this longitudes doesn''t make sense.'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id,error_message, fcount)
 		VALUES (v_fid, 1,'265', 'INFO: No automatic links with out-of-range Longitude found.',v_count);
