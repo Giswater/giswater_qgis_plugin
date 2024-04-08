@@ -543,7 +543,8 @@ class GwInfo(QObject):
         # Build and populate all the widgets
         self._manage_dlg_widgets(complet_result, result, new_feature)
         # Disable tab EPA if epa_type is undefined
-        if tools_qt.get_text(self.dlg_cf, 'tab_data_epa_type').lower() == 'undefined':
+        self.epa_type = tools_qt.get_text(self.dlg_cf, 'tab_data_epa_type')
+        if tools_qt.get_text(self.dlg_cf, self.epa_type).lower() == 'undefined':
             tools_qt.enable_tab_by_tab_name(self.tab_main, 'tab_epa', False)
         # Check elev data consistency
         if global_vars.project_type == 'ud':
@@ -2085,8 +2086,7 @@ class GwInfo(QObject):
                 _json = {}
                 widget.editingFinished.connect(partial(self._clean_my_json, widget))
                 widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, _json))
-                widget.editingFinished.connect(
-                    partial(self._accept, dialog, self.complet_result, _json, widget, True, False, new_feature=new_feature))
+                widget.editingFinished.connect(partial(self._accept_auto_update, dialog, self.complet_result, _json, widget, True, False, new_feature=new_feature))
             else:
                 widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
         else:  # Other tabs
@@ -2097,6 +2097,37 @@ class GwInfo(QObject):
         widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
 
         return widget
+
+
+    def _accept_auto_update(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True, new_feature=None, generic=False):
+            
+        """
+        :param dialog:
+        :param complet_result:
+        :param _json:
+        :param p_widget:
+        :param clear_json:
+        :param close_dlg:
+        :return: (boolean)
+        """
+
+        # Manage change epa_type message
+        if _json.get('epa_type'):
+
+            widget_epatype = dialog.findChild(QComboBox, 'tab_data_epa_type')        
+            message = "You are going to change the epa_type. With this operation you will lose information about " \
+                        "current epa_type values of this object. Would you like to continue?"
+            title = "Change epa_type"
+            answer = tools_qt.show_question(message, title)
+            if not answer:
+                widget_epatype.blockSignals(True)
+                tools_qt.set_combo_value(widget_epatype, self.epa_type, 1)
+                widget_epatype.blockSignals(False)
+                return
+            self.epa_type = _json.get('epa_type')
+
+        # Call accept fct
+        self._accept(dialog, complet_result, _json, p_widget, clear_json, close_dlg, new_feature, generic)
 
 
     def _set_auto_update_textarea(self, field, dialog, widget, new_feature):
@@ -2112,8 +2143,7 @@ class GwInfo(QObject):
                 _json = {}
                 widget.textChanged.connect(partial(self._clean_my_json, widget))
                 widget.textChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
-                widget.textChanged.connect(
-                    partial(self._accept, dialog, self.complet_result, _json, widget, True, False, new_feature))
+                widget.textChanged.connect(partial(self._accept_auto_update, dialog, self.complet_result, _json, widget, True, False, new_feature))
             else:
                 widget.textChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
         else:  # Other tabs
@@ -2238,8 +2268,7 @@ class GwInfo(QObject):
                 _json = {}
                 widget.currentIndexChanged.connect(partial(self._clean_my_json, widget))
                 widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
-                widget.currentIndexChanged.connect(partial(
-                    self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
+                widget.currentIndexChanged.connect(partial(self._accept_auto_update, dialog, self.complet_result, _json, widget, True, False, new_feature=new_feature))
             else:
                 widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
         else:  # Other tabs
