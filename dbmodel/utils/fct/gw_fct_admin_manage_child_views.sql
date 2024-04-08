@@ -48,14 +48,15 @@ v_viewname text;
 v_definition text;
 v_feature_type text;
 v_feature_system_id text;
+v_feature_childtable_name text;
 v_man_fields text;
+v_feature_childtable_fields text;
 v_parent_layer text;
 
 rec record;
 rec_orderby record;
 
 v_multi_create boolean;
-v_created_addfields record;
 v_project_type text;
 v_querytext text;
 v_orderby integer;
@@ -203,6 +204,7 @@ BEGIN
 			v_feature_type = lower(rec.feature_type);
 			v_feature_system_id  = lower(rec.system_id);
 			v_cat_feature = rec.id;
+			v_feature_childtable_name := 'man_' || v_feature_type || '_' || lower(v_cat_feature);
 			
 			--create a child view name if doesnt exist
 			IF (SELECT child_layer FROM cat_feature WHERE id=rec.id) IS NULL THEN
@@ -230,9 +232,18 @@ BEGIN
 			EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_system_id||'.'',column_name)::text,'', '')
 			FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
 			and column_name!='''||v_feature_type||'_id'''
-			INTO v_man_fields;	
+			INTO v_man_fields;
 
-			raise notice '4/addfields=1,v_man_fields,%',v_man_fields;
+			RAISE NOTICE '4/addfields=1,v_man_fields,%',v_man_fields;
+
+			--select columns from v_feature_childtable_name.* table without repeating the identifiers
+			EXECUTE 'SELECT DISTINCT string_agg(concat('''||v_feature_childtable_name||'.'',column_name)::text,'', '')
+			FROM information_schema.columns where table_name='''||v_feature_childtable_name||''' and table_schema='''||v_schemaname||'''
+			and column_name!=''id'' and column_name!='''||v_feature_type||'_id'''
+			INTO v_feature_childtable_fields;
+
+			RAISE NOTICE 'v_feature_childtable_fields,%',v_feature_childtable_fields;
+
 			
 			--check and select the addfields if are already created
 			IF (SELECT count(id) FROM sys_addfields WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) and active is true ) != 0 THEN
@@ -253,15 +264,6 @@ BEGIN
 					END LOOP;
 				END IF;
 
-
-				SELECT string_agg(concat('a.',param_name),',' order by orderby) as a_param,
-				string_agg(concat('ct.',param_name),',' order by orderby) as ct_param,
-				string_agg(concat('(''''',id,''''')'),',' order by orderby) as id_param,
-				string_agg(concat(param_name,' ', datatype_id),', ' order by orderby) as datatype
-				INTO v_created_addfields
-				FROM sys_addfields WHERE  (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE;		
-				
-
 				--create views with fields from parent table,man table and addfields 	
 				IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
 					( v_feature_type='arc' OR v_feature_type='node')) THEN
@@ -277,13 +279,23 @@ BEGIN
 					v_view_type = 6;
 					
 				END IF;
-				
-				v_man_fields := COALESCE(v_man_fields, 'null');
 
-				v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
-				"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||rec.id||'", "view_type":"'||v_view_type||'",
-				"man_fields":"'||v_man_fields||'","a_param":"'||v_created_addfields.a_param||'","ct_param":"'||v_created_addfields.ct_param||'",
-				"id_param":"'||v_created_addfields.id_param||'","datatype":"'||v_created_addfields.datatype||'"}}';
+				v_man_fields := COALESCE(v_man_fields, 'null');
+				v_feature_childtable_fields := COALESCE(v_feature_childtable_fields, 'null');
+
+				v_data_view = '{
+				"schema":"'||v_schemaname ||'",
+				"body":{"viewname":"'||v_viewname||'",
+					"feature_type":"'||v_feature_type||'",
+					"feature_system_id":"'||v_feature_system_id||'",
+					"feature_cat":"'||v_cat_feature||'",
+					"feature_childtable_name":"'||v_feature_childtable_name||'",
+					"feature_childtable_fields":"'||v_feature_childtable_fields||'",
+					"man_fields":"'||v_man_fields||'",
+					"view_type":"'||v_view_type||'"
+					}
+				}';
+
 				PERFORM gw_fct_admin_manage_child_views_view(v_data_view);		
 				
 			ELSE
@@ -304,10 +316,20 @@ BEGIN
 				END IF;
 
 				v_man_fields := COALESCE(v_man_fields, 'null');
+				v_feature_childtable_fields := COALESCE(v_feature_childtable_fields, 'null');
 
-				v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
-				"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||rec.id||'", "view_type":"'||v_view_type||'",
-				"man_fields":"'||v_man_fields||'","a_param":null,"ct_param":null,"id_param":null,"datatype":null}}';
+				v_data_view = '{
+				"schema":"'||v_schemaname ||'",
+				"body":{"viewname":"'||v_viewname||'",
+					"feature_type":"'||v_feature_type||'",
+					"feature_system_id":"'||v_feature_system_id||'",
+					"feature_cat":"'||v_cat_feature||'",
+					"feature_childtable_name":"'||v_feature_childtable_name||'",
+					"feature_childtable_fields":"'||v_feature_childtable_fields||'",
+					"man_fields":"'||v_man_fields||'",
+					"view_type":"'||v_view_type||'"
+					}
+				}';
 					
 				PERFORM gw_fct_admin_manage_child_views_view(v_data_view);			
 					
@@ -335,6 +357,7 @@ BEGIN
 		--get the system type and system_id of the feature and view name
 		v_feature_type = (SELECT lower(feature_type) FROM cat_feature where id=v_cat_feature);
 		v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
+		v_feature_childtable_name := 'man_' || v_feature_type || '_' || lower(v_cat_feature);
 
 		--create a child view name if doesnt exist
 		IF (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature) IS NULL THEN
@@ -362,9 +385,17 @@ BEGIN
 		EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_system_id||'.'',column_name)::text,'', '')
 		FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
 		and column_name!='''||v_feature_type||'_id'''
-		INTO v_man_fields;	
-
+		INTO v_man_fields;
+		
 		RAISE NOTICE 'v_man_fields,%',v_man_fields;
+
+		--select columns from v_feature_childtable_name.* table without repeating the identifiers
+		EXECUTE 'SELECT DISTINCT string_agg(concat('''||v_feature_childtable_name||'.'',column_name)::text,'', '')
+		FROM information_schema.columns where table_name='''||v_feature_childtable_name||''' and table_schema='''||v_schemaname||'''
+		and column_name!=''id'' and column_name!='''||v_feature_type||'_id'''
+		INTO v_feature_childtable_fields;
+
+		RAISE NOTICE 'v_feature_childtable_fields,%',v_feature_childtable_fields;
 		
 		--check and select the addfields if are already created
 		IF (SELECT count(id) FROM sys_addfields WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) and active is true ) != 0 THEN
@@ -386,13 +417,6 @@ BEGIN
 				END LOOP;
 				raise notice 'v_orderby,%',v_orderby;
 			END IF;
-
-			SELECT string_agg(concat('a.',param_name),','order by orderby) as a_param,
-			string_agg(concat('ct.',param_name),',' order by orderby) as ct_param,
-			string_agg(concat('(''''',id,''''')'),',' order by orderby) as id_param,
-			string_agg(concat(param_name,' ', datatype_id),', ' order by orderby) as datatype
-			INTO v_created_addfields
-			FROM sys_addfields WHERE  (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;	
 			
 			--create views with fields from parent table,man table and addfields 	
 			IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
@@ -413,11 +437,20 @@ BEGIN
 			RAISE NOTICE 'SIMPLE - VIEW TYPE  ,%', v_view_type;
 
 			v_man_fields := COALESCE(v_man_fields, 'null');
+			v_feature_childtable_fields := COALESCE(v_feature_childtable_fields, 'null');
 
-			v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
-			"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||v_cat_feature||'","view_type":"'||v_view_type||'",
-			"man_fields":"'||v_man_fields||'","a_param":"'||v_created_addfields.a_param||'","ct_param":"'||v_created_addfields.ct_param||'",
-			"id_param":"'||v_created_addfields.id_param||'","datatype":"'||v_created_addfields.datatype||'"}}';
+			v_data_view = '{
+			"schema":"'||v_schemaname ||'",
+			"body":{"viewname":"'||v_viewname||'",
+				"feature_type":"'||v_feature_type||'",
+				"feature_system_id":"'||v_feature_system_id||'",
+				"feature_cat":"'||v_cat_feature||'",
+				"feature_childtable_name":"'||v_feature_childtable_name||'",
+				"feature_childtable_fields":"'||v_feature_childtable_fields||'",
+				"man_fields":"'||v_man_fields||'",
+				"view_type":"'||v_view_type||'"
+				}
+			}';
 
 			PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
 
@@ -442,12 +475,23 @@ BEGIN
 			RAISE NOTICE 'SIMPLE - VIEW TYPE  ,%', v_view_type;
 
 			v_man_fields := COALESCE(v_man_fields, 'null');
+			v_feature_childtable_fields := COALESCE(v_feature_childtable_fields, 'null');
 
-			v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
-			"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||v_cat_feature||'","view_type":"'||v_view_type||'",
-			"man_fields":"'||v_man_fields||'","a_param":"null","ct_param":"null","id_param":"null","datatype":"null"}}';
+			v_data_view = '{
+			"schema":"'||v_schemaname ||'",
+			"body":{"viewname":"'||v_viewname||'",
+				"feature_type":"'||v_feature_type||'",
+				"feature_system_id":"'||v_feature_system_id||'",
+				"feature_cat":"'||v_cat_feature||'",
+				"feature_childtable_name":"'||v_feature_childtable_name||'",
+				"feature_childtable_fields":"'||v_feature_childtable_fields||'",
+				"man_fields":"'||v_man_fields||'",
+				"view_type":"'||v_view_type||'"
+				}
+			}';
 
 			PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
+
 			v_return_status = 'Accepted';
 			v_return_msg = 'Process finished successfully';
 			END IF;

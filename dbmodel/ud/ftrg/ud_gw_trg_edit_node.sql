@@ -685,21 +685,21 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_calculate_sander($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":"'||NEW.node_id||'"}}$$)';
 		END IF;
 
-		-- man addfields insert
+		-- childtable insert
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM sys_addfields
 			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
 			LOOP
-				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+				EXECUTE 'SELECT $1."' ||v_addfields.param_name||'"'
 					USING NEW
 					INTO v_new_value_param;
 
 				IF v_new_value_param IS NOT NULL THEN
-					EXECUTE 'INSERT INTO man_addfields_value (feature_id, parameter_id, value_param) VALUES ($1, $2, $3)'
-						USING NEW.node_id, v_addfields.id, v_new_value_param;
-				END IF;	
+					EXECUTE 'INSERT INTO man_node_'||lower(v_addfields.cat_feature_id)||' (node_id, '||v_addfields.param_name||') VALUES ($1, $2)'
+						USING NEW.node_id, v_new_value_param;
+				END IF;
 			END LOOP;
-		END IF;			
+		END IF;
 
 		-- epa type
 		IF (NEW.epa_type = 'JUNCTION') THEN
@@ -954,31 +954,28 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_calculate_sander($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":"'||NEW.node_id||'"}}$$)';
 		END IF;
 
-		-- man addfields update
+		-- childtable update
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM sys_addfields
 			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
 			LOOP
-
-				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+				EXECUTE 'SELECT $1."' || v_addfields.param_name ||'"'
 					USING NEW
 					INTO v_new_value_param;
-	 
-				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+
+				EXECUTE 'SELECT $1."' || v_addfields.param_name ||'"'
 					USING OLD
 					INTO v_old_value_param;
 
-				IF (v_new_value_param IS NOT null and v_old_value_param!=v_new_value_param) OR (v_new_value_param IS NOT null and v_old_value_param is NULL) THEN 
-
-					EXECUTE 'INSERT INTO man_addfields_value(feature_id, parameter_id, value_param) VALUES ($1, $2, $3) 
-						ON CONFLICT (feature_id, parameter_id)
-						DO UPDATE SET value_param=$3 WHERE man_addfields_value.feature_id=$1 AND man_addfields_value.parameter_id=$2'
-						USING NEW.node_id , v_addfields.id, v_new_value_param;	
+				IF (v_new_value_param IS NOT NULL AND v_old_value_param!=v_new_value_param) OR (v_new_value_param IS NOT NULL AND v_old_value_param IS NULL) THEN
+					EXECUTE 'INSERT INTO man_node_'||lower(v_addfields.cat_feature_id)||' (node_id, '||v_addfields.param_name||') VALUES ($1, $2)
+					    ON CONFLICT (node_id)
+					    DO UPDATE SET '||v_addfields.param_name||'=$2 WHERE AND man_node_'||lower(v_addfields.cat_feature_id)||'.node_id=$1'
+						USING NEW.node_id, v_new_value_param;
 
 				ELSIF v_new_value_param IS NULL AND v_old_value_param IS NOT NULL THEN
-
-					EXECUTE 'DELETE FROM man_addfields_value WHERE feature_id=$1 AND parameter_id=$2'
-						USING NEW.node_id , v_addfields.id;
+					EXECUTE 'UPDATE man_node_'||lower(v_addfields.cat_feature_id)||' SET '||v_addfields.param_name||' = null WHERE man_node_'||lower(v_addfields.cat_feature_id)||'.node_id=$1'
+					    USING NEW.node_id;
 				END IF;
 			END LOOP;
 		END IF;
@@ -1006,8 +1003,12 @@ BEGIN
 		-- restore plan_psector_force_delete
 		UPDATE config_param_user SET value = v_force_delete WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
 
-		--Delete addfields (after or before deletion of node, doesn't matter)
-		DELETE FROM man_addfields_value WHERE feature_id = OLD.node_id;
+		-- Delete childtable addfields (after or before deletion of node, doesn't matter)
+        FOR v_addfields IN SELECT * FROM sys_addfields
+        WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
+        LOOP
+		    EXECUTE 'DELETE FROM man_node_'||lower(v_addfields.cat_feature_id)||' WHERE node_id = OLD.node_id';
+        END LOOP;
 		
 		RETURN NULL;	
 	END IF;

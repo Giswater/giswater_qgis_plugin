@@ -3,3 +3,7 @@
 - Minor adjusment for null values in combos for dscenario (ud & ws)
 - Allow using the selected exploitations on mapzones analysis
 - Refactor of gw_trg_link_connecrotation_update. Drop not necessary code and make it useful for QGIS latest versions (quadrant has change to position priority)
+- Refactored database structure:
+    - Removed man_addfields_value table.
+    - Created new tables from addfields.
+    - Improved database organization and efficiency.
