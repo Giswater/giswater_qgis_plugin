@@ -461,9 +461,10 @@ class GwMapzoneManager:
         """
 
         # Set variable, set widget text and enable add button
-        self.to_arc_list.add(int(feat_id))
 
-        tools_qt.set_widget_text(self.config_dlg, 'txt_toArc', f"{self.to_arc_list}")
+        self.to_arc_list.add(feat_id)
+        to_arc_list_aux = [int(to_arc) for to_arc in self.to_arc_list]
+        tools_qt.set_widget_text(self.config_dlg, 'txt_toArc', f"{to_arc_list_aux}")
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_nodeParent, True)
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_nodeParent, True)
 
@@ -476,9 +477,10 @@ class GwMapzoneManager:
         """
 
         # Set variable, set widget text and enable add button
+        
         self.force_closed_list.add(feat_id)
-
-        tools_qt.set_widget_text(self.config_dlg, 'txt_forceClosed', f"{self.force_closed_list}")
+        force_closed_list_aux = [int(force_closed) for force_closed in self.force_closed_list]
+        tools_qt.set_widget_text(self.config_dlg, 'txt_forceClosed', f"{force_closed_list_aux}")
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_forceClosed, True)
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_forceClosed, True)
 
