@@ -722,7 +722,7 @@ class GwToolBoxButton(GwAction):
             elem = [f"There is no layer related to {feature_type}.", None, None]
             layers.append(elem)
 
-        tools_qt.fill_combo_values(self.dlg_functions.cmb_layers, layers, sort_combo=False)
+        tools_qt.fill_combo_values(self.dlg_functions.cmb_layers, layers, sort_combo=False, index_to_show=0)
 
 
     def _populate_trv(self, trv_widget, result, expand=False):
