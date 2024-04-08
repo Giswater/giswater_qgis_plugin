@@ -78,7 +78,7 @@ class GwNonVisual:
         self._manage_tabs_manager()
 
         # Connect dialog signals
-        self.manager_dlg.txt_filter.textChanged.connect(partial(self._filter_table, self.manager_dlg))
+        self.manager_dlg.txt_filter.textChanged.connect(partial(self._filter_table, self.manager_dlg, None))
         self.manager_dlg.main_tab.currentChanged.connect(partial(self._filter_table, self.manager_dlg, None))
         self.manager_dlg.btn_duplicate.clicked.connect(partial(self._duplicate_object, self.manager_dlg))
         self.manager_dlg.btn_create.clicked.connect(partial(self._create_object, self.manager_dlg))
@@ -86,10 +86,10 @@ class GwNonVisual:
         self.manager_dlg.btn_cancel.clicked.connect(self.manager_dlg.reject)
         self.manager_dlg.finished.connect(partial(tools_gw.close_dialog, self.manager_dlg))
         self.manager_dlg.btn_print.clicked.connect(partial(self._print_object))
-        self.manager_dlg.chk_active.stateChanged.connect(partial(self._filter_active, self.manager_dlg))
+        self.manager_dlg.chk_active.stateChanged.connect(partial(self._filter_table, self.manager_dlg))
 
         self.manager_dlg.main_tab.currentChanged.connect(partial(self._manage_tabs_changed))
-        self.manager_dlg.main_tab.currentChanged.connect(partial(self._filter_active, self.manager_dlg, None))
+        self.manager_dlg.main_tab.currentChanged.connect(partial(self._filter_table, self.manager_dlg, None))
         self._manage_tabs_changed()
 
         # Open dialog
@@ -179,26 +179,7 @@ class GwNonVisual:
         model.sort(1, 0)
 
 
-    def _filter_table(self, dialog, text):
-        """ Filters manager table by id """
-
-        widget_table = dialog.main_tab.currentWidget()
-        tablename = widget_table.objectName()
-        id_field = self.dict_ids.get(tablename)
-        show_inactive = dialog.chk_active.isChecked()
-
-        if text is None:
-            text = tools_qt.get_text(dialog, dialog.txt_filter, return_string_null=False)
-        expr = f"{id_field}::text ILIKE '%{text}%'"
-        if not show_inactive:
-            expr += " and active is true"
-
-        # Refresh model with selected filter
-        widget_table.model().setFilter(expr)
-        widget_table.model().select()
-
-
-    def _filter_active(self, dialog, active):
+    def _filter_table(self, dialog, active):
         """ Filters manager table by active """
 
         widget_table = dialog.main_tab.currentWidget()
@@ -553,7 +534,7 @@ class GwNonVisual:
 
             descript = descript.strip("'")
             descript = descript.replace("\n", "\\n")
-            fields = f"""{{"matcat_id": "{matcat_id}", "period_id": "{period_id}", "init_age": "{init_age}", 
+            fields = f"""{{"matcat_id": "{matcat_id}", "period_id": "{period_id}", "init_age": "{init_age}",
             "end_age": "{end_age}", "roughness": "{roughness}", "descript": "{descript}", "active": "{active}"}}"""
             result = self._setfields(roughness_id, table_name, fields)
             if not result:
@@ -929,7 +910,7 @@ class GwNonVisual:
 
             # Calcule el área
             area = np.trapz(y_list, x_list) * 2
-            
+
             # Create inverted plot
             plot_widget.axes.plot(y_list, x_list, color="blue")
 
@@ -2528,7 +2509,7 @@ class GwNonVisual:
         # Show tabs
         for i in range(tab_lidlayers.count()):
             tab_name = tab_lidlayers.widget(i).objectName().upper()
-            
+
             # Set the first non-hidden tab selected
             if tab_name == lidtabs[0]:
                 tab_lidlayers.setCurrentIndex(i)
