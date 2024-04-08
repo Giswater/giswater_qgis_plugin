@@ -1311,7 +1311,7 @@ BEGIN
 	    ''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
 	    ''properties'', to_jsonb(row) - ''the_geom''
 	  	) AS feature
-	  	FROM (SELECT  t.'||v_field||' as mapzone_id, m.name  as descript, '||v_fid||' as fid, t.the_geom FROM temp_'||v_table||' t JOIN '||v_table||' m USING ('||v_field||')) row) features'
+	  	FROM (SELECT  t.'||v_field||' as mapzone_id, m.name  as descript, '||v_fid||' as fid, t.expl_id, t.the_geom FROM temp_'||v_table||' t JOIN '||v_table||' m USING ('||v_field||')) row) features'
 		INTO v_result;
 
 		v_result := COALESCE(v_result, '{}'); 
