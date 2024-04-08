@@ -2515,8 +2515,8 @@ class GwMincut:
             self.action_refresh_mincut.setDisabled(True)
             self.action_custom_mincut.setDisabled(True)
             self.action_change_valve_status.setDisabled(True)
-            self.action_add_connec.setDisabled(False)
-            self.action_add_hydrometer.setDisabled(False)
+            self.action_add_connec.setDisabled(True)
+            self.action_add_hydrometer.setDisabled(True)
 
         # Finished
         elif state == '2':
