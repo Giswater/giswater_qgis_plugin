@@ -824,7 +824,10 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
                 layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintUnique,
                                          QgsFieldConstraints.ConstraintStrengthHard)
 
-        if field.get('ismandatory') is False:
+        if field.get('ismandatory') is True:
+            layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintNotNull,
+                                     QgsFieldConstraints.ConstraintStrengthHard)
+        else:
             layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintNotNull,
                                      QgsFieldConstraints.ConstraintStrengthSoft)
 
@@ -1191,7 +1194,7 @@ def set_style_mapzones():
             mode = mapzone['mode']
         except KeyError:  # backwards compatibility for database < 3.6.007
             mode = mapzone['status']
-			
+
         if mode == 'Disable' or lyr is None:
             continue
 
