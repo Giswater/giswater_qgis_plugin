@@ -76,9 +76,13 @@ class GwNonVisual:
 
         # Make and populate tabs
         self._manage_tabs_manager()
+        self._populate_filter_combos()
 
         # Connect dialog signals
         self.manager_dlg.txt_filter.textChanged.connect(partial(self._filter_table, self.manager_dlg, None))
+        self.manager_dlg.cmb_curve_type.currentIndexChanged.connect(partial(self._filter_table, self.manager_dlg, None))
+        self.manager_dlg.cmb_pattern_type.currentIndexChanged.connect(partial(self._filter_table, self.manager_dlg, None))
+        self.manager_dlg.cmb_timser_type.currentIndexChanged.connect(partial(self._filter_table, self.manager_dlg, None))
         self.manager_dlg.main_tab.currentChanged.connect(partial(self._filter_table, self.manager_dlg, None))
         self.manager_dlg.btn_duplicate.clicked.connect(partial(self._duplicate_object, self.manager_dlg))
         self.manager_dlg.btn_create.clicked.connect(partial(self._create_object, self.manager_dlg))
@@ -115,24 +119,52 @@ class GwNonVisual:
             qtableview.doubleClicked.connect(partial(self._get_nonvisual_object, qtableview, function_name))
 
 
+    def _populate_filter_combos(self):
+        """ cmb_curve_type, cmb_pattern_type, cmb_timser_type """
+
+        sql = f"SELECT DISTINCT curve_type AS id, curve_type AS idval FROM v_edit_inp_curve"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            tools_qt.fill_combo_values(self.manager_dlg.cmb_curve_type, rows, add_empty=True)
+
+        sql = f"SELECT DISTINCT pattern_type AS id, pattern_type AS idval FROM v_edit_inp_pattern"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            tools_qt.fill_combo_values(self.manager_dlg.cmb_pattern_type, rows, add_empty=True)
+
+        sql = f"SELECT DISTINCT timser_type AS id, timser_type AS idval FROM v_edit_inp_timeseries"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            tools_qt.fill_combo_values(self.manager_dlg.cmb_timser_type, rows, add_empty=True)
+
+
     def _manage_tabs_changed(self):
 
         tab_name = self.manager_dlg.main_tab.currentWidget().objectName()
 
-        visibility_settings = {  # tab_name: (chk_active, btn_print)
-            'v_edit_inp_curve': (False, True),
-            'v_edit_inp_pattern': (False, False),
-            'inp_lid': (False, False),
+        visibility_settings = {  # tab_name: (chk_active, btn_print, cmb_curve_type, cmb_pattern_type, cmb_timser_type)
+            'v_edit_inp_curve': (False, True, True, False, False),
+            'v_edit_inp_pattern': (False, False, False, True, False),
+            'v_edit_inp_timeseries': (True, False, False, False, True),
+            'inp_lid': (False, False, False, False, False),
         }
-        default_visibility = (True, False)
+        default_visibility = (True, False, False, False, False)
 
-        chk_active_visible, btn_print_visible = visibility_settings.get(tab_name, default_visibility)
+        chk_active_visible, btn_print_visible, cmb_curve_type, cmb_pattern_type, cmb_timser_type = visibility_settings.get(tab_name, default_visibility)
 
         self.manager_dlg.chk_active.setVisible(chk_active_visible)
         if btn_print_visible and global_vars.project_type == 'ud':
             self.manager_dlg.btn_print.setVisible(btn_print_visible)
         else:
             self.manager_dlg.btn_print.setVisible(False)
+
+        if global_vars.project_type == 'ud':
+            self.manager_dlg.lbl_curve_type.setVisible(cmb_curve_type)
+            self.manager_dlg.cmb_curve_type.setVisible(cmb_curve_type)
+            self.manager_dlg.lbl_pattern_type.setVisible(cmb_pattern_type)
+            self.manager_dlg.cmb_pattern_type.setVisible(cmb_pattern_type)
+            self.manager_dlg.lbl_timser_type.setVisible(cmb_timser_type)
+            self.manager_dlg.cmb_timser_type.setVisible(cmb_timser_type)
 
 
     def _get_nonvisual_object(self, tbl_view, function_name):
@@ -185,10 +217,16 @@ class GwNonVisual:
         widget_table = dialog.main_tab.currentWidget()
         tablename = widget_table.objectName()
         id_field = self.dict_ids.get(tablename)
-        # Get the chk_active checkbox directly from the dialog
+        # Get the widgets from the dialog
         chk_active_widget = dialog.chk_active
-        # Check the visual state of chk_active
+        cmb_curve_type = dialog.cmb_curve_type
+        cmb_pattern_type = dialog.cmb_pattern_type
+        cmb_timser_type = dialog.cmb_timser_type
+        # Check the visual state of the widgets
         chk_active_is_visible = chk_active_widget.isVisible()
+        cmb_curve_type_is_visible = cmb_curve_type.isVisible()
+        cmb_pattern_type_is_visible = cmb_pattern_type.isVisible()
+        cmb_timser_type_is_visible = cmb_timser_type.isVisible()
 
         if chk_active_is_visible:
             if active is None:
@@ -196,10 +234,32 @@ class GwNonVisual:
         else:
             active = True
 
+        curve_type = None
+        pattern_type = None
+        timser_type = None
+        if cmb_curve_type_is_visible:
+            curve_type = tools_qt.get_combo_value(dialog, cmb_curve_type)
+        if cmb_pattern_type_is_visible:
+            pattern_type = tools_qt.get_combo_value(dialog, cmb_pattern_type)
+        if cmb_timser_type_is_visible:
+            timser_type = tools_qt.get_combo_value(dialog, cmb_timser_type)
+
         text = tools_qt.get_text(dialog, dialog.txt_filter, return_string_null=False)
         expr = ""
         if not active:
             expr = f"active is true"
+        if curve_type is not None:
+            if expr:
+                expr += " and "
+            expr += f"curve_type::text ILIKE '%{curve_type}%'"
+        if pattern_type is not None:
+            if expr:
+                expr += " and "
+            expr += f"pattern_type::text ILIKE '%{pattern_type}%'"
+        if timser_type is not None:
+            if expr:
+                expr += " and "
+            expr += f"timser_type::text ILIKE '%{timser_type}%'"
         if text:
             if expr:
                 expr += " and "
