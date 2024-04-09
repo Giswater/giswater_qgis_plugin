@@ -624,12 +624,9 @@ INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('chamber_param_1','2','c
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('chamber_param_1','3','combo3');
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('chamber_param_1','4','combo4');
 
-INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, parameter_id)
-SELECT 'edit_typevalue','sewstorage_param_1','man_addfields_value','value_param',id FROM sys_addfields WHERE param_name='sewstorage_param_1';
-INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, parameter_id)
-SELECT 'edit_typevalue','grate_param_1','man_addfields_value','value_param',id FROM sys_addfields WHERE param_name='grate_param_1';
-INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, parameter_id)
-SELECT 'edit_typevalue','chamber_param_1','man_addfields_value','value_param',id FROM sys_addfields WHERE param_name='chamber_param_1';
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field) VALUES ('edit_typevalue','sewstorage_param_1','man_node_sewer_storage','sewstorage_param_1');
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field) VALUES ('edit_typevalue','grate_param_1','man_gully_pgully','grate_param_1');
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field) VALUES ('edit_typevalue','chamber_param_1','man_node_chamber','chamber_param_1');
 
 SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
 "data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true","step":"1"}}$$);
