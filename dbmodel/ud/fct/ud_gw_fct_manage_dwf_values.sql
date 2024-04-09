@@ -64,7 +64,7 @@ BEGIN
 	v_target_name := (SELECT idval FROM cat_dwf_scenario WHERE id = v_target);
 	v_sector_name := (SELECT name FROM sector WHERE sector_id = v_sector);
 
-	IF v_sector = -999 THEN
+	IF v_sector = -999 or v_sector is null THEN
 		SELECT array_agg(sector_id) INTO v_sector_list FROM  sector JOIN selector_sector USING (sector_id) WHERE cur_user = current_user;
 	ELSE
 		SELECT array_agg(sector_id) INTO v_sector_list FROM  sector WHERE sector_id = v_sector;
