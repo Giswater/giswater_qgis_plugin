@@ -11,11 +11,10 @@ from functools import partial
 
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
 from qgis.PyQt.QtCore import QRegExp, QItemSelectionModel
-from qgis.PyQt.QtWidgets import QTableView
-from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit, QPlainTextEdit, QCheckBox, QAbstractItemView
+from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit, QPlainTextEdit, QCheckBox, QAbstractItemView, QTableView, QApplication
 
 from ..dialog import GwAction
-from ...ui.ui_manager import GwWorkspaceManagerUi, GwCreateWorkspaceUi
+from ...ui.ui_manager import GwWorkspaceManagerUi, GwCreateWorkspaceUi, GwGo2EpaOptionsUi
 from ...utils import tools_gw
 from .... import global_vars
 from ....libs import tools_qgis, tools_qt, tools_db
@@ -265,6 +264,24 @@ class GwWorkspaceManagerButton(GwAction):
 
             # Refresh selector docker if open
             tools_gw.refresh_selectors()
+
+            # Refresh go2epa options
+            self._check_goe2pa_options()
+
+
+    def _check_goe2pa_options(self, tab_name=None):
+        """ Refreshes the selectors' UI if it's open """
+
+        # Get the selector UI if it's open
+        windows = [x for x in QApplication.allWidgets() if getattr(x, "isVisible", False)
+                and (issubclass(type(x), GwGo2EpaOptionsUi))]
+        if windows:
+            try:
+                dialog = windows[0]
+                go2epa = dialog.property('GwGo2EpaButton')
+                go2epa._refresh_go2epa_options(go2epa.dlg_go2epa_options)
+            except Exception:
+                pass
 
 
     def _toggle_privacy_workspace(self):
