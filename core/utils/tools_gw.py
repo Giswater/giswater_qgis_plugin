@@ -3563,7 +3563,7 @@ def refresh_selectors(tab_name=None):
             selector = dialog.property('GwSelector')
             if tab_name is None:
                 tab_name = dialog.main_tab.widget(dialog.main_tab.currentIndex()).objectName()
-            selector.get_selector(dialog, '"selector_basic"', filter=True, current_tab=tab_name)
+            selector.open_selector(reload_dlg = dialog)
         except Exception:
             pass
 
