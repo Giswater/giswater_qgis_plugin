@@ -30,8 +30,7 @@ from qgis.utils import reloadPlugin
 from .gis_file_create import GwGisFileCreate
 from ..threads.task import GwTask
 from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
-    GwAdminGisProjectUi, GwAdminImportUi, GwAdminFieldsUi, GwAdminVisitClassUi, GwAdminSysFieldsUi, GwCredentialsUi, \
-    GwReplaceInFileUi
+    GwAdminGisProjectUi, GwAdminImportUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi
 from ..utils import tools_gw
 from ... import global_vars
 from .i18n_generator import GwI18NGenerator
@@ -352,43 +351,6 @@ class GwAdminButton:
             QgsApplication.taskManager().triggerTask(self.task_update_schema)
 
 
-    def load_updates(self, project_type=None, update_changelog=False, schema_name=None, dict_update_folders=None):
-        """"""
-
-        # Get current schema selected
-        if schema_name is None:
-            schema_name = self._get_schema_name()
-
-        self.schema = schema_name
-        self.locale = self.project_language
-
-        self.task1 = GwTask('Manage schema')
-        QgsApplication.taskManager().addTask(self.task1)
-        self.task1.setProgress(0)
-        status = self._load_fct_ftrg()
-        self.task1.setProgress(20)
-        self.task1.setProgress(40)
-        if status:
-            status = self.update_dict_folders(False, project_type=project_type, dict_update_folders=dict_update_folders)
-        self.task1.setProgress(60)
-        if status:
-            status = self.execute_last_process(schema_name=schema_name, locale=True)
-        self.task1.setProgress(100)
-
-        if update_changelog is False:
-            status = (self.error_count == 0)
-            self._manage_result_message(status, parameter="Load updates")
-            if status:
-                tools_db.dao.commit()
-            else:
-                tools_db.dao.rollback()
-
-            # Reset count error variable to 0
-            self.error_count = 0
-
-        return status
-
-
     def init_dialog_create_project(self, project_type=None):
         """ Initialize dialog (only once) """
 
@@ -687,8 +649,9 @@ class GwAdminButton:
         self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
 
         if lib_vars.user_level['level'] not in lib_vars.user_level['showadminadvanced']:
-            tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_schema_manager")
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_advanced")
+        if global_vars.gw_dev_mode is not True:
+            tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_dev")
 
         self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater", False,
                                                         force_reload=True)
@@ -701,13 +664,10 @@ class GwAdminButton:
 
         # Get widgets form
         self.cmb_connection = self.dlg_readsql.findChild(QComboBox, 'cmb_connection')
-        self.btn_update_schema = self.dlg_readsql.findChild(QPushButton, 'btn_update_schema')
         self.lbl_schema_name = self.dlg_readsql.findChild(QLabel, 'lbl_schema_name')
-        self.btn_constrains = self.dlg_readsql.findChild(QPushButton, 'btn_constrains')
 
         # Checkbox SCHEMA
         self.chk_schema_view = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_view')
-        self.chk_schema_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_funcion')
         self.software_version_info = self.dlg_readsql.findChild(QTextEdit, 'software_version_info')
 
         self._manage_utils()
@@ -732,8 +692,7 @@ class GwAdminButton:
         self.dlg_readsql.btn_schema_create.clicked.connect(partial(self._open_create_project))
         self.dlg_readsql.btn_custom_load_file.clicked.connect(
             partial(self._load_custom_sql_files, self.dlg_readsql, "custom_path_folder"))
-        self.dlg_readsql.btn_update_schema.clicked.connect(partial(self.load_updates, None))
-        self.dlg_readsql.btn_schema_file_to_db.clicked.connect(partial(self._schema_file_to_db))
+        self.dlg_readsql.btn_reload_fct_ftrg.clicked.connect(partial(self._reload_fct_ftrg))
         self.dlg_readsql.btn_info.clicked.connect(partial(self._open_update_info))
         self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self._set_info_project))
         self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self._update_manage_ui))
@@ -748,7 +707,6 @@ class GwAdminButton:
         self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self._open_rename))
         self.dlg_readsql.btn_delete.clicked.connect(partial(self._delete_schema))
         self.dlg_readsql.btn_copy.clicked.connect(partial(self._copy_schema))
-        self.dlg_readsql.btn_constrains.clicked.connect(partial(self._btn_constrains_changed, self.btn_constrains, True))
         self.dlg_readsql.btn_create_qgis_template.clicked.connect(partial(self._create_qgis_template))
         self.dlg_readsql.btn_translation.clicked.connect(partial(self._manage_translations))
         self.dlg_readsql.btn_gis_create.clicked.connect(partial(self._open_form_create_gis_project))
@@ -762,8 +720,6 @@ class GwAdminButton:
         self.dlg_readsql.btn_create_field.clicked.connect(partial(self._open_manage_field, 'create'))
         self.dlg_readsql.btn_update_field.clicked.connect(partial(self._open_manage_field, 'update'))
         self.dlg_readsql.btn_delete_field.clicked.connect(partial(self._open_manage_field, 'delete'))
-        self.dlg_readsql.btn_create_view.clicked.connect(partial(self._create_child_view))
-        self.dlg_readsql.btn_update_sys_field.clicked.connect(partial(self._update_sys_fields))
 
 
     def _manage_translations(self):
@@ -1081,28 +1037,6 @@ class GwAdminButton:
 
         # Open MainWindow
         tools_gw.open_dialog(self.dlg_create_gis_project, dlg_name='admin_gisproject')
-
-
-    def _btn_constrains_changed(self, button, call_function=False):
-        """"""
-
-        lbl_constrains_info = self.dlg_readsql.findChild(QLabel, 'lbl_constrains_info')
-
-        if button.text() == 'OFF':
-            button.setText("ON")
-            lbl_constrains_info.setText('(Constrains enabled)  ')
-            if call_function:
-                # Enable constrains
-                sql = 'SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)'
-                tools_db.execute_sql(sql)
-
-        elif button.text() == 'ON':
-            button.setText("OFF")
-            lbl_constrains_info.setText('(Constrains dissabled)')
-            if call_function:
-                # Disable constrains
-                sql = 'SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$)'
-                tools_db.execute_sql(sql)
 
 
     def _load_sql(self, path_folder, no_ct=False, utils_schema_name=None, set_progress_bar=False):
@@ -1463,27 +1397,6 @@ class GwAdminButton:
         return connection_username
 
 
-    def _create_visit_class(self):
-        """"""
-
-        # Create the dialog and signals
-        self.dlg_manage_visit_class = GwAdminVisitClassUi()
-        tools_gw.load_settings(self.dlg_manage_visit_class)
-
-        # Manage widgets
-        sql = "SELECT id, id as idval FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2"
-        rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_manage_visit_class.feature_type, rows)
-
-        sql = "SELECT id, idval FROM om_typevalue WHERE typevalue = 'visit_type'"
-        rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_manage_visit_class.visit_type, rows)
-
-        # Open dialog
-        tools_gw.open_dialog(self.dlg_manage_visit_class, dlg_name='admin_visitclass')
-        return
-
-
     def _open_update_info(self):
         """"""
 
@@ -1730,15 +1643,14 @@ class GwAdminButton:
             return False
 
 
-    def _schema_file_to_db(self):
+    def _reload_fct_ftrg(self):
         """"""
 
-        if self.chk_schema_funcion.isChecked():
-            self.task1 = GwTask('Manage schema')
-            QgsApplication.taskManager().addTask(self.task1)
-            self.task1.setProgress(50)
-            self._reload_fct_ftrg()
-            self.task1.setProgress(100)
+        self.task1 = GwTask('Manage schema')
+        QgsApplication.taskManager().addTask(self.task1)
+        self.task1.setProgress(50)
+        self._reload_fct_ftrg()
+        self.task1.setProgress(100)
 
         status = (self.error_count == 0)
         self._manage_result_message(status, parameter="Reload")
@@ -2346,18 +2258,11 @@ class GwAdminButton:
         # Control if schema_version is updated to 3.2
         if str(self.project_version).replace('.', '') < str(self.plugin_version).replace('.', ''):
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(False)
-            tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(False)
-            tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(False)
-
-            self.dlg_readsql.cmb_feature_name_view.clear()
             self.dlg_readsql.cmb_formname_fields.clear()
-            self.dlg_readsql.cmb_feature_sys_fields.clear()
             return
 
         else:
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(True)
-            tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(True)
-            tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(True)
 
             if not tools_db.check_table('cat_feature', schema_name):
                 tools_log.log_warning(f"Table not found: 'cat_feature'")
@@ -2369,62 +2274,6 @@ class GwAdminButton:
             rows = tools_db.get_rows(sql)
 
             tools_qt.fill_combo_values(self.dlg_readsql.cmb_formname_fields, rows)
-            tools_qt.fill_combo_values(self.dlg_readsql.cmb_feature_name_view, rows)
-            tools_qt.fill_combo_values(self.dlg_readsql.cmb_feature_sys_fields, rows)
-
-
-    def _create_child_view(self):
-        """ Create child view """
-
-        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
-        form_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_feature_name_view)
-
-        # Create body
-        feature = '"catFeature":"' + form_name + '"'
-        if tools_qt.is_checked(self.dlg_readsql, self.dlg_readsql.chk_multi_create):
-            extras = '"action":"MULTI-CREATE"'
-        else:
-            extras = '"action":"SINGLE-CREATE"'
-        body = tools_gw.create_body(feature=feature, extras=extras)
-        body = body.replace('""', 'null')
-
-        # Execute query
-        json_result = tools_gw.execute_procedure('gw_fct_admin_manage_child_views', body, schema_name)
-        self._manage_json_message(json_result, title="Create child view")
-
-
-    def _update_sys_fields(self):
-        """"""
-
-        # Create the dialog and signals
-        self.dlg_manage_sys_fields = GwAdminSysFieldsUi()
-        tools_gw.load_settings(self.dlg_manage_sys_fields)
-        self.model_update_table = None
-        self.chk_multi_insert = None
-
-        # Remove unused tabs
-        form_name_fields = None
-        for x in range(self.dlg_manage_sys_fields.tab_sys_add_fields.count() - 1, -1, -1):
-            if str(self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()) != 'tab_update':
-                tab_name = self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()
-                tools_qt.remove_tab(self.dlg_manage_sys_fields.tab_sys_add_fields, tab_name)
-            form_name_fields = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_feature_sys_fields)
-
-        self._manage_update_field(self.dlg_manage_sys_fields, form_name_fields, tableview='ve_config_sysfields')
-
-        # Set listeners
-        self.dlg_manage_sys_fields.btn_cancel.clicked.connect(partial(self._close_dialog_admin, self.dlg_manage_sys_fields))
-        self.dlg_manage_sys_fields.btn_accept.clicked.connect(partial(self._close_dialog_admin, self.dlg_manage_sys_fields))
-        self.dlg_manage_sys_fields.tbl_update.doubleClicked.connect(
-            partial(self._update_selected_sys_fild, self.dlg_manage_sys_fields.tbl_update))
-        self.dlg_manage_sys_fields.btn_open.clicked.connect(
-            partial(self._update_selected_sys_fild, self.dlg_manage_sys_fields.tbl_update))
-
-        window_title = 'Update field on "' + str(form_name_fields) + '"'
-        self.dlg_manage_sys_fields.setWindowTitle(window_title)
-        self._manage_update_sys_field(form_name_fields)
-
-        tools_gw.open_dialog(self.dlg_manage_sys_fields)
 
 
     def _open_manage_field(self, action):
@@ -2466,60 +2315,6 @@ class GwAdminButton:
 
         tools_gw.open_dialog(self.dlg_manage_fields, dlg_name='admin_addfields')
         self.dlg_manage_fields.setWindowTitle(window_title)
-
-
-    # TODO:: Enhance this function and use parametric parameters
-
-    def _update_selected_sys_fild(self, widget):
-        """"""
-
-        selected_list = widget.selectionModel().selectedRows()
-
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
-            return
-
-        # Create the dialog and signals
-        self._close_dialog_admin(self.dlg_manage_sys_fields)
-        self.dlg_manage_sys_fields = GwAdminSysFieldsUi()
-        tools_gw.load_settings(self.dlg_manage_sys_fields)
-        self.model_update_table = None
-
-        form_name_fields = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_feature_sys_fields)
-
-        # Set listeners
-        self.dlg_manage_sys_fields.btn_accept.clicked.connect(
-            partial(self._manage_sys_update, form_name_fields))
-        self.dlg_manage_sys_fields.btn_cancel.clicked.connect(
-            partial(self._manage_close_dlg, self.dlg_manage_sys_fields))
-
-        # Remove unused tabs
-        for x in range(self.dlg_manage_sys_fields.tab_sys_add_fields.count() - 1, -1, -1):
-            if str(self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()) != str('tab_create'):
-                tools_qt.remove_tab(self.dlg_manage_sys_fields.tab_sys_add_fields,
-                                               self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName())
-
-        window_title = 'Update field on "' + str(form_name_fields) + '"'
-        self.dlg_manage_sys_fields.setWindowTitle(window_title)
-        row = selected_list[0].row()
-
-        for column in range(widget.model().columnCount()):
-            index = widget.model().index(row, column)
-
-            result = tools_qt.get_widget(self.dlg_manage_sys_fields,
-                                        str(widget.model().headerData(column, Qt.Horizontal)))
-
-            if result is None:
-                continue
-
-            value = str(widget.model().data(index))
-
-            if value == 'NULL':
-                value = None
-            tools_qt.set_widget_text(self.dlg_manage_sys_fields, result, value)
-
-        tools_gw.open_dialog(self.dlg_manage_sys_fields)
 
 
     def _update_selected_addfild(self, widget):
@@ -2600,21 +2395,6 @@ class GwAdminButton:
         tools_qt.set_widget_text(self.dlg_manage_fields, self.dlg_manage_fields.formtype, 'feature')
 
 
-    def _manage_update_sys_field(self, form_name):
-        """"""
-        # TODO:: Enhance this function and use parametric parameters
-
-        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
-
-        # Populate table update
-        qtable = self.dlg_manage_sys_fields.findChild(QTableView, "tbl_update")
-        self.model_update_table = QSqlTableModel(db=lib_vars.qgis_db_credentials)
-        qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
-        expr_filter = f"cat_feature_id = '{form_name}'"
-        self._fill_table(qtable, 've_config_sysfields', self.model_update_table, expr_filter)
-        tools_gw.set_tablemodel_config(self.dlg_manage_sys_fields, qtable, 've_config_sysfields', schema_name=schema_name)
-
-
     def _manage_update_field(self, dialog, form_name, tableview):
         """"""
 
@@ -2670,49 +2450,8 @@ class GwAdminButton:
         """"""
 
         self._close_dialog_admin(dlg_to_close)
-        if dlg_to_close.objectName() == 'dlg_man_sys_fields':
-            self._update_sys_fields()
-        elif dlg_to_close.objectName() == 'dlg_man_addfields':
+        if dlg_to_close.objectName() == 'dlg_man_addfields':
             self._open_manage_field('update')
-
-
-    def _manage_sys_update(self, form_name):
-        """"""
-
-        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
-        list_widgets = self.dlg_manage_sys_fields.tab_create.findChildren(QWidget)
-        column_id = tools_qt.get_text(self.dlg_manage_sys_fields, self.dlg_manage_sys_fields.columnname)
-        sql = f"UPDATE {schema_name}.ve_config_sysfields SET "
-        for widget in list_widgets:
-            if type(widget) not in (
-                    QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView,
-                    QGroupBox, QTableView) and widget.objectName() not in ('qt_spinbox_lineedit', 'chk_multi_insert'):
-
-                value = None
-                if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
-                    value = tools_qt.get_text(self.dlg_manage_sys_fields, widget, return_string_null=False)
-                elif type(widget) is QComboBox:
-                    value = tools_qt.get_combo_value(self.dlg_manage_sys_fields, widget, 0)
-                elif type(widget) is QCheckBox:
-                    value = tools_qt.is_checked(self.dlg_manage_sys_fields, widget)
-                elif type(widget) is QgsDateTimeEdit:
-                    value = tools_qt.get_calendar_date(self.dlg_manage_sys_fields, widget)
-                elif type(widget) is QPlainTextEdit:
-                    value = widget.document().toPlainText()
-
-                if value in ('null', None, ""):
-                    value = "null"
-                elif type(widget) is not QCheckBox:
-                    value = "'" + value + "'"
-                sql += f" {widget.objectName()} = {value},"
-
-        sql = sql[:-1]
-        sql += f" WHERE cat_feature_id = '{form_name}' and columnname = '{column_id}'"
-        tools_db.execute_sql(sql)
-
-        # Close dialog
-        self._close_dialog_admin(self.dlg_manage_sys_fields)
-        self._update_sys_fields()
 
 
     def _manage_accept(self, action, form_name):
