@@ -1652,21 +1652,25 @@ class GwAdminButton:
             self.software_version_info.setText(msg)
 
         else:
-            dict_info = tools_gw.get_project_info(schema_name)
+            first_dict_info = tools_gw.get_project_info(schema_name, order_direction="ASC")
+            last_dict_info = tools_gw.get_project_info(schema_name)
 
-            self.project_type = dict_info['project_type']
-            self.project_epsg = dict_info['project_epsg']
-            self.project_version = dict_info['project_version']
-            self.project_language = dict_info['project_language']
-            project_date = dict_info['project_date'].strftime('%d-%m-%Y %H:%M:%S')
-
+            self.project_type = last_dict_info['project_type']
+            self.project_epsg = last_dict_info['project_epsg']
+            self.project_version = last_dict_info['project_version']
+            self.project_language = last_dict_info['project_language']
+            project_date_create = first_dict_info['project_date'].strftime('%d-%m-%Y %H:%M:%S')
+            project_date_update = last_dict_info['project_date'].strftime('%d-%m-%Y %H:%M:%S')
+            if project_date_create == project_date_update: 
+                project_date_update = ''
             msg = (f'Database version: {self.postgresql_version}\n'
                    f'PostGis version: {self.postgis_version}\n \n'
                    f'Schema name: {schema_name}\n'
                    f'Version: {self.project_version}\n'
                    f'EPSG: {self.project_epsg}\n'
                    f'Language: {self.project_language}\n'
-                   f'Date of creation: {project_date}\n')
+                   f'Date of creation: {project_date_create}\n'
+                   f'Date of last update: {project_date_update}\n')
 
             self.software_version_info.setText(msg)
 

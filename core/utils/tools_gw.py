@@ -2627,7 +2627,7 @@ def get_project_type(schemaname=None):
     return project_type
 
 
-def get_project_info(schemaname=None):
+def get_project_info(schemaname=None, order_direction="DESC"):
     """ Get project information from table 'sys_version' """
 
     project_info_dict = None
@@ -2644,7 +2644,7 @@ def get_project_info(schemaname=None):
 
     sql = (f"SELECT lower(project_type), epsg, giswater, language, date "
            f"FROM {schemaname}.{tablename} "
-           f"ORDER BY id DESC LIMIT 1")
+           f"ORDER BY id {order_direction} LIMIT 1")
     row = tools_db.get_row(sql)
     if row:
         project_info_dict = {'project_type': row[0],
