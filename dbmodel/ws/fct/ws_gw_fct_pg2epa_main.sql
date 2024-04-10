@@ -291,7 +291,7 @@ BEGIN
 
 		-- remove pattern when breakPipes is enabled	
 		IF v_breakpipes THEN
-			UPDATE temp_t_node n SET pattern_id  = ';VNODE BRKPIPE' , demand = 0 FROM temp_table t WHERE n.node_id = concat('VN',t.id);				
+			UPDATE temp_t_node n SET pattern_id  = null , demand = 0 FROM temp_table t WHERE n.node_id = concat('VN',t.id);				
 		END IF;		
 
 		RAISE NOTICE '4.14 - Update values for temp table';
