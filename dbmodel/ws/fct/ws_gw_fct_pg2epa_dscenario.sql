@@ -74,22 +74,9 @@ BEGIN
 		IF v_demandpriority = 0 THEN 
 		
 			UPDATE temp_t_node SET demand = 0, pattern_id = null;
-			
-		-- EPANET standard: keep base demand and overwrites it when dscenario demand exists
-		ELSIF	v_demandpriority = 1 THEN 
-			
-			
-		-- Dscenario and base demand are joined,  moving to temp_t_demand in order to do not lose base demand (because EPANET does)
-		ELSIF v_demandpriority = 2 THEN 
 
-			-- moving node demands to temp_t_demand
-			INSERT INTO temp_t_demand (dscenario_id, feature_id, demand, pattern_id)
-			SELECT DISTINCT ON (node_id) 0, node_id, n.demand, n.pattern_id 
-			FROM temp_t_node n
-			JOIN temp_t_demand ON node_id = feature_id
-			WHERE n.demand IS NOT NULL AND n.demand <> 0;
 		END IF;
-
+		
 		-- insert node demands from dscenario into temp_t_demand
 		INSERT INTO temp_t_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
 		SELECT dscenario_id, feature_id, d.demand, d.pattern_id, d.demand_type, d.source
@@ -112,12 +99,16 @@ BEGIN
 			SELECT dscenario_id, pjoint_id, d.demand as demand, d.pattern_id, demand_type, source  FROM v_edit_inp_connec 
 			JOIN inp_dscenario_demand d ON feature_id = connec_id 
 			WHERE pjoint_type = 'NODE'
-			AND dscenario_id IN (SELECT unnest(v_userscenario));
+			AND dscenario_id IN (SELECT unnest(v_userscenario));	
 
-			
-		ELSIF v_networkmode = 3 THEN
-
-			-- removed due refactor of 2022/6/12
+			IF v_demandpriority = 2 THEN 
+				-- moving node demands to temp_t_demand (to skip EPANET behaviour)
+				INSERT INTO temp_t_demand (dscenario_id, feature_id, demand, pattern_id)
+				SELECT DISTINCT ON (node_id) 0, node_id, n.demand, n.pattern_id 
+				FROM temp_t_node n
+				JOIN temp_t_demand ON node_id = feature_id
+				WHERE n.demand IS NOT NULL AND n.demand <> 0;				
+			END IF;	
 			
 		END IF;
 
@@ -131,7 +122,7 @@ BEGIN
 		JOIN connec c ON concat('VC',c.pjoint_id) =  n.node_id
 		WHERE c.connec_id = d.feature_id AND d.demand IS NOT NULL AND d.demand <> 0  
 		AND dscenario_id IN (SELECT unnest(v_userscenario));
-		
+			
 		-- pattern
 		IF v_patternmethod = 11 THEN -- DEFAULT PATTERN
 			UPDATE temp_t_demand SET pattern_id=v_deafultpattern WHERE pattern_id IS NULL;

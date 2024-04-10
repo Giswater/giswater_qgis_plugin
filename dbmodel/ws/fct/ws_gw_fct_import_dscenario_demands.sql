@@ -46,7 +46,7 @@ BEGIN
 	-- get system parameters
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
-  v_fid = ((p_data ->>'data')::json->>'fid')::text;
+	v_fid = ((p_data ->>'data')::json->>'fid')::text;
   
 	-- manage log (fid:  v_fid)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
