@@ -34,6 +34,7 @@ WHERE parameter = 'inp_options_debug';
 
 UPDATE inp_shortpipe SET to_arc = '2037', status = 'CV' where node_id = '1092';
 
-UPDATE cat_feature_node SET graph_delimiter ='MINSECTOR' WHERE id = 'SHUTOFF_VALVE'
+UPDATE cat_feature_node SET graph_delimiter ='MINSECTOR' WHERE id = 'SHUTOFF_VALVE';
+UPDATE cat_feature_node SET graph_delimiter ='CHECKVALVE' WHERE id = 'CHECK_VALVE';
 
 
