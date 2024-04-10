@@ -204,3 +204,5 @@ UPDATE config_toolbox SET inputparams='[
 -- 26/03/2024
 SELECT gw_fct_admin_transfer_addfields_values();
 
+-- 10/04/2024
+UPDATE config_param_system SET project_type='utils' WHERE "parameter"='edit_mapzones_set_lastupdate';
