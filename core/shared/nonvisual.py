@@ -127,15 +127,16 @@ class GwNonVisual:
         if rows:
             tools_qt.fill_combo_values(self.manager_dlg.cmb_curve_type, rows, add_empty=True)
 
-        sql = f"SELECT DISTINCT pattern_type AS id, pattern_type AS idval FROM v_edit_inp_pattern"
-        rows = tools_db.get_rows(sql)
-        if rows:
-            tools_qt.fill_combo_values(self.manager_dlg.cmb_pattern_type, rows, add_empty=True)
+        if global_vars.project_type == 'ud':
+            sql = f"SELECT DISTINCT pattern_type AS id, pattern_type AS idval FROM v_edit_inp_pattern"
+            rows = tools_db.get_rows(sql)
+            if rows:
+                tools_qt.fill_combo_values(self.manager_dlg.cmb_pattern_type, rows, add_empty=True)
 
-        sql = f"SELECT DISTINCT timser_type AS id, timser_type AS idval FROM v_edit_inp_timeseries"
-        rows = tools_db.get_rows(sql)
-        if rows:
-            tools_qt.fill_combo_values(self.manager_dlg.cmb_timser_type, rows, add_empty=True)
+            sql = f"SELECT DISTINCT timser_type AS id, timser_type AS idval FROM v_edit_inp_timeseries"
+            rows = tools_db.get_rows(sql)
+            if rows:
+                tools_qt.fill_combo_values(self.manager_dlg.cmb_timser_type, rows, add_empty=True)
 
 
     def _manage_tabs_changed(self):
@@ -158,13 +159,18 @@ class GwNonVisual:
         else:
             self.manager_dlg.btn_print.setVisible(False)
 
+        self.manager_dlg.lbl_curve_type.setVisible(cmb_curve_type)
+        self.manager_dlg.cmb_curve_type.setVisible(cmb_curve_type)
         if global_vars.project_type == 'ud':
-            self.manager_dlg.lbl_curve_type.setVisible(cmb_curve_type)
-            self.manager_dlg.cmb_curve_type.setVisible(cmb_curve_type)
             self.manager_dlg.lbl_pattern_type.setVisible(cmb_pattern_type)
             self.manager_dlg.cmb_pattern_type.setVisible(cmb_pattern_type)
             self.manager_dlg.lbl_timser_type.setVisible(cmb_timser_type)
             self.manager_dlg.cmb_timser_type.setVisible(cmb_timser_type)
+        else:
+            self.manager_dlg.lbl_pattern_type.setVisible(False)
+            self.manager_dlg.cmb_pattern_type.setVisible(False)
+            self.manager_dlg.lbl_timser_type.setVisible(False)
+            self.manager_dlg.cmb_timser_type.setVisible(False)
 
 
     def _get_nonvisual_object(self, tbl_view, function_name):
