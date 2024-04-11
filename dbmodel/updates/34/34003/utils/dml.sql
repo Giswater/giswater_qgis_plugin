@@ -33,10 +33,6 @@ VALUES ('i18n_update_mode', '1', 'system', 'Manage updates of i18n labels and to
 'Update label & tooltips mode:', TRUE, 'utils', 'integer', 'linetext', true, false, '0') 
 ON CONFLICT (parameter) DO NOTHING;
 
-INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
-isdeprecated, istoolbox, alias, isparametric)
-VALUES (2810, 'gw_fct_admin_schema_i18n', 'utils', 'function', null, null, null,'Function to manage how the updates of tooltips and labels must be executed (overwrting old values, only when null or never', 'role_admin',
-false, false, null, false) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
 isdeprecated, istoolbox, alias, isparametric)

@@ -3852,7 +3852,6 @@ INSERT INTO sys_function VALUES (2792, 'gw_fct_admin_manage_backup', 'utils', 'f
 INSERT INTO sys_function VALUES (2734, 'gw_fct_psector_duplicate', 'utils', 'function', 'json', 'json', 'Create a copy of existing psector', 'role_master', NULL, 'core');
 INSERT INTO sys_function VALUES (2800, 'gw_fct_pg2epa_buildup_transport', 'ws', 'function', 'text ', 'integer', 'Function to generate supply models oriented to manage olumes of water and water quality', 'role_epa', NULL, 'core');
 INSERT INTO sys_function VALUES (2806, 'gw_fct_admin_test_ci', 'utils', 'function', 'void', 'json', 'Function used in continous integration to test database processes', 'role_admin', NULL, 'core');
-INSERT INTO sys_function VALUES (2810, 'gw_fct_admin_schema_i18n', 'utils', 'function', 'json', 'json', 'Function to manage how the updates of tooltips and labels must be executed (overwrting old values, only when null or never', 'role_admin', NULL, 'core');
 INSERT INTO sys_function VALUES (2818, 'gw_fct_admin_manage_triggers', 'utils', 'function', 'text, text ', 'void', 'Function to activate custom foreign keys of bbdd', 'role_admin', NULL, 'core');
 INSERT INTO sys_function VALUES (2822, 'gw_fct_admin_manage_roles', 'utils', 'function', 'json', 'json', 'Function to system roles of giswater: role_basic, role_om, role_edit, role_epa, role_master, role_admin', 'role_admin', NULL, 'core');
 INSERT INTO sys_function VALUES (2824, 'gw_fct_getdimensioning', 'utils', 'function', 'json', 'json', 'Function to show dimensioning form of api', 'role_basic', NULL, 'core');
