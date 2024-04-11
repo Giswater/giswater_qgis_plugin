@@ -8,8 +8,8 @@ or (at your option) any later version.
 from functools import partial
 
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QDoubleValidator
-from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel
+from qgis.PyQt.QtGui import QDoubleValidator, QColor
+from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel, QgsWkbTypes
 from qgis.gui import QgsVertexMarker
 
 from ..maptool import GwMaptool
@@ -28,6 +28,9 @@ class GwAuxCircleAddButton(GwMaptool):
         self.cancel_circle = False
         self.layer_circle = None
         self.snap_to_selected_layer = False
+        self.rb_circle = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.LineGeometry)
+        self.rb_circle.setLineStyle(Qt.DashLine)
+        self.rb_circle.setColor(QColor(255, 0, 0, 150))
 
 
     def cancel(self):
@@ -157,11 +160,23 @@ class GwAuxCircleAddButton(GwMaptool):
         validator.setNotation(QDoubleValidator().StandardNotation)
         self.dlg_create_circle.radius.setValidator(validator)
 
+        self.dlg_create_circle.radius.textChanged.connect(partial(self._preview_circle, point))
         self.dlg_create_circle.btn_accept.clicked.connect(partial(self._get_radius, point))
         self.dlg_create_circle.btn_cancel.clicked.connect(self.cancel)
 
         tools_gw.open_dialog(self.dlg_create_circle, dlg_name='auxcircle')
         self.dlg_create_circle.radius.setFocus()
+
+
+    def _preview_circle(self, point, text):
+        self.rb_circle.reset(QgsWkbTypes.LineGeometry)
+        try:
+            radius = float(text)
+        except ValueError:
+            radius = 0.0
+        geom = QgsGeometry.fromPointXY(point).buffer(radius, 100)
+        self.rb_circle.addGeometry(geom)
+
 
 
     def _get_radius(self, point):
