@@ -33,17 +33,20 @@ class GwAuxPointAddButton(GwMaptool):
         # RUBBERBANDS TO PREVIEW RESULT
         # Background points & line
         self.rb_bg_point = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.PointGeometry)
+        self.rb_bg_point.setColor(QColor(0, 0, 0, 150))
         self.rb_bg_line = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.LineGeometry)
         self.rb_bg_line.setLineStyle(Qt.DashLine)
+        self.rb_bg_line.setColor(QColor(0, 0, 0, 150))
         # Start point from where it will calculate final point
         self.rb_start_point = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.PointGeometry)
         self.rb_start_point.setColor(QColor(0, 0, 255, 100))
-        self.rb_start_point.setWidth(3)
-        self.rb_start_point.setIcon(QgsRubberBand.ICON_X)
+        self.rb_start_point.setWidth(5)
         # Final point calculated
         self.rb_final_point = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.PointGeometry)
-        self.rb_final_point.setColor(QColor(255, 0, 0, 100))
-        self.rb_final_point.setWidth(2)
+        self.rb_final_point.setColor(QColor(255, 0, 0, 150))
+        self.rb_final_point.setWidth(3)
+        self.rb_final_point.setIcon(QgsRubberBand.ICON_X)
+        self.rb_final_point.setIconSize(10)
 
 
     def cancel(self):
