@@ -99,7 +99,7 @@ BEGIN
 		VALUES (v_fid, null, 1, concat('INFO: Hydrology scenario named "',v_name,'" created with values from hydrology scenario ( ',v_copyfrom,' )'));
 
 	-- Copy values from hydrology scenario to copy from
-	EXECUTE 'SELECT gw_fct_manage_hydrology_values($${"client": '||(p_data ->>'client')::json||', "data": {"parameters": {"target": '||v_scenarioid||', "copyFrom": '||v_copyfrom||', "action": '||quote_ident(v_action)||'}}}$$);';
+	EXECUTE 'SELECT gw_fct_manage_hydrology_values($${"client": '||(p_data ->>'client')::json||', "data": {"parameters": {"target": '||v_scenarioid||', "copyFrom": '||v_copyfrom||', "action": '||quote_ident(v_action)||', "sector":-998}}}$$);';
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, null, 1, concat('INFO: Copied values from hydrology scenario ( ',v_copyfrom,' ) to new hydrology scenario ( ',v_scenarioid,' )'));
 

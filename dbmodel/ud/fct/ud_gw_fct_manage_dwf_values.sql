@@ -66,6 +66,8 @@ BEGIN
 
 	IF v_sector = -999 THEN
 		SELECT array_agg(sector_id) INTO v_sector_list FROM  sector JOIN selector_sector USING (sector_id) WHERE cur_user = current_user;
+	ELSIF v_sector = -998 THEN
+		SELECT array_agg(sector_id) INTO v_sector_list from sector;
 	ELSE
 		SELECT array_agg(sector_id) INTO v_sector_list FROM  sector WHERE sector_id = v_sector;
 	END IF;
