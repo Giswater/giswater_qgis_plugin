@@ -497,7 +497,7 @@ BEGIN
 			if v_addparam is not null and (select (v_addparam ->> 'header')) is null then
 				v_addparam := gw_fct_json_object_set_key(v_addparam, 'header', v_columnname);
 			end if;
-			v_headers_params := v_headers_params || coalesce(v_addparam, json_build_object('accessorKey', v_columnname, 'header', v_columnname, 'enableColumnActions', false, 'enableColumnFilter', false, 'columnFilterModeOptions', false));
+			v_headers_params := v_headers_params || coalesce(v_addparam, json_build_object('accessorKey', v_columnname, 'header', v_columnname, 'enableColumnActions', false, 'enableColumnFilter', false, 'columnFilterModeOptions', false, 'size', 0));
 			
 			i = i + 1;
 		end loop;
