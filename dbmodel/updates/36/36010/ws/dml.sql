@@ -83,6 +83,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
   "enablePagination": true,
   "enableExporting": true,
   "enableTopToolbar": false,
+  "exportButtonColor": "#e9e9e9",
   "muiTablePaginationProps": {
     "rowsPerPageOptions": [
       5,
