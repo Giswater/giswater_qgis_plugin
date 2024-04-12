@@ -373,8 +373,8 @@ BEGIN
 		END IF;
 			
 		-- updating values on table epa_table from values of old feature
-		IF (v_feature_type='node' or v_feature_type='arc' or (v_feature_type='connec' AND v_project_type='WS')) and v_epa_table_new is not null AND 
-		v_epa_type_new = v_old_epa_type THEN
+		IF (v_feature_type='node' or v_feature_type='arc' or v_feature_type='gully' or (v_feature_type='connec' AND v_project_type='WS')) 
+		and v_epa_table_new is not null AND v_epa_type_new = v_old_epa_type THEN
 			v_sql:='select column_name  FROM information_schema.columns 
 								where (table_schema=''SCHEMA_NAME'' and udt_name <> ''inet'' and 
 								table_name='''||v_epa_table_new||''') and column_name!='''||v_id_column||''';';
