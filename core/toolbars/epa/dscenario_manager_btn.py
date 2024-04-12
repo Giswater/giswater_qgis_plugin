@@ -978,14 +978,10 @@ class GwDscenarioManagerButton(GwAction):
             sql = f"INSERT INTO v_edit_{view} ({rows[1][0]}, {rows[2][0]}"
             if view in ("inp_dscenario_controls", "inp_dscenario_rules"):
                 sql += f", {rows[3][0]}"
-            elif view == "inp_dscenario_demand":
-                sql += f", feature_type"
             # VALUES
             sql += f")VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}'"
             if view in ("inp_dscenario_controls", "inp_dscenario_rules"):
                 sql += f", ''"
-            elif view == "inp_dscenario_demand":
-                sql += f", '{self.feature_type.upper()}'"
             sql += f");"
         else:
             sql = f"INSERT INTO v_edit_{view} VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}');"
@@ -1095,7 +1091,10 @@ class GwDscenarioManagerButton(GwAction):
                 tableview = self.dlg_dscenario.main_tab.currentWidget()
                 view = tableview.objectName()
                 for f in selected_ids:
-                    sql = f"INSERT INTO v_edit_{view} (dscenario_id, feature_id) VALUES ({self.selected_dscenario_id}, '{f}');"
+                    sql = f"INSERT INTO v_edit_{view}"
+                    if view == 'inp_dscenario_demand':
+                        sql += f" (dscenario_id, feature_id)"
+                    sql += f" VALUES ({self.selected_dscenario_id}, '{f}');"
                     result = tools_db.execute_sql(sql, log_sql=False, log_error=False, show_exception=False)
                     if result:
                         inserted[f'{self.feature_type}'].append(f)
