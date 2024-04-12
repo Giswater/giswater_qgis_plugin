@@ -1095,11 +1095,13 @@ class GwDscenarioManagerButton(GwAction):
                 tableview = self.dlg_dscenario.main_tab.currentWidget()
                 view = tableview.objectName()
                 for f in selected_ids:
-                    sql = f"INSERT INTO v_edit_{view} VALUES ({self.selected_dscenario_id}, '{f}');"
+                    sql = f"INSERT INTO v_edit_{view} (dscenario_id, feature_id) VALUES ({self.selected_dscenario_id}, '{f}');"
                     result = tools_db.execute_sql(sql, log_sql=False, log_error=False, show_exception=False)
                     if result:
                         inserted[f'{self.feature_type}'].append(f)
                 self._fill_dscenario_table()
+
+                self._selection_end()
 
                 # Just select the inserted features
                 tools_gw.get_expression_filter(self.feature_type, inserted, {f"{self.feature_type}": [layer]})
