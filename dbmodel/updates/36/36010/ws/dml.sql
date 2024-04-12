@@ -65,3 +65,93 @@ delete from sys_table where id = 'ext_arc';
 
 DROP TABLE if exists inp_value_yesnofull;
 DELETE FROM sys_table where id = 'inp_value_yesnofull';
+
+-- 12/04/2024
+
+update config_from_fields set widgettype='tablewidget', linkedobject='tbl_mincut_hydro' where formname='mincut' and columname='tbl_hydro';
+
+
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('tbl_mincut_hydro', 'SELECT hydrometer_id, hydrometer_customer_code, connec_id, connec_code from v_om_mincut_hydrometer ', 5, 'tab', 'list', NULL, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": true,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": false,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": true,
+  "enableTopToolbar": false,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": false,
+  "multipleRowSelection": false,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 10,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [],
+    "sorting": [
+      {
+        "id": "hydrometer_id",
+        "desc": true
+      }
+    ]
+  },
+  "modifyTopToolBar": false,
+  "renderTopToolbarCustomActions": [],
+  "enableRowActions": false,
+  "renderRowActionMenuItems": []
+}'::json);
+
+
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('mincut_form', 'ws', 'tbl_mincut_hydro', 'hydrometer_id', 0, true, 100, NULL, NULL, '{
+  "accessorKey": "hydrometer_id",
+  "header": "hydrometer_id",
+  "enableSorting": false,
+  "enableColumnOrdering": false,
+  "enableColumnFilter": false,
+  "enableClickToCopy": false,
+  "size": 0
+}'::json);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('mincut_form', 'ws', 'tbl_mincut_hydro', 'hydrometer_customer_code', 1, true, 170, NULL, NULL, '{
+  "accessorKey": "hydrometer_customer_code",
+  "header": "customer code",
+  "enableSorting": false,
+  "enableColumnOrdering": false,
+  "enableColumnFilter": false,
+  "enableClickToCopy": false,
+  "size": 0
+}'::json);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('mincut_form', 'ws', 'tbl_mincut_hydro', 'connec_id', 2, true, 100, NULL, NULL, '{
+  "accessorKey": "connec_id",
+  "header": "connec_id",
+  "enableSorting": false,
+  "enableColumnOrdering": false,
+  "enableColumnFilter": false,
+  "enableClickToCopy": false,
+  "size": 0
+}'::json);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('mincut_form', 'ws', 'tbl_mincut_hydro', 'connec_code', 3, true, 100, NULL, NULL, '{
+  "accessorKey": "connec_code",
+  "header": "connec_code",
+  "enableSorting": false,
+  "enableColumnOrdering": false,
+  "enableColumnFilter": false,
+  "enableClickToCopy": false,
+  "size": 0
+}'::json);
