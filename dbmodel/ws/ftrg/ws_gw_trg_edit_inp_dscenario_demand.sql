@@ -7,34 +7,39 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 1308
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_inp_dscenario_demand() RETURNS trigger LANGUAGE plpgsql AS $$
-DECLARE 
+DECLARE
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-   
+
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
 
 		-- overwrite id values (in case of user fill something)
 		PERFORM setval('SCHEMA_NAME.inp_dscenario_demand_id_seq',(SELECT max(id) FROM inp_dscenario_demand), true);
-	
-		INSERT INTO inp_dscenario_demand (feature_id, demand, pattern_id, demand_type, dscenario_id, feature_type, source) 
+		IF NEW.feature_type IS NULL THEN
+			IF (SELECT count(node_id) FROM node WHERE node_id=NEW.feature_id) > 0 THEN
+				NEW.feature_type = 'NODE';
+			ELSIF (SELECT count(connec_id) FROM connec WHERE connec_id=NEW.feature_id) > 0 THEN
+				NEW.feature_type = 'CONNEC';
+			END IF;
+		END IF;
+		INSERT INTO inp_dscenario_demand (feature_id, demand, pattern_id, demand_type, dscenario_id, feature_type, source)
 		VALUES (NEW.feature_id, NEW.demand, NEW.pattern_id, NEW.demand_type, NEW.dscenario_id, NEW.feature_type, NEW.source);
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE inp_dscenario_demand SET feature_id=NEW.feature_id, demand=NEW.demand, pattern_id=NEW.pattern_id, 
+		UPDATE inp_dscenario_demand SET feature_id=NEW.feature_id, demand=NEW.demand, pattern_id=NEW.pattern_id,
 		demand_type=NEW.demand_type, dscenario_id=NEW.dscenario_id,  feature_type=NEW.feature_type, source = NEW.source
 		WHERE id=OLD.id;
 		RETURN NEW;
-        
+
 	ELSIF TG_OP = 'DELETE' THEN
 		DELETE FROM inp_dscenario_demand WHERE id=OLD.id;
 		RETURN OLD;
-   
+
 	END IF;
-       
+
 END;
 $$;
-  
