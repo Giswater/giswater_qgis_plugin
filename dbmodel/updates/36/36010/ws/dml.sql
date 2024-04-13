@@ -156,3 +156,5 @@ INSERT INTO config_form_tableview (location_type, project_type, objectname, colu
   "enableClickToCopy": false,
   "size": 0
 }'::json);
+
+UPDATE inp_typevalue SET idval = 'JOIN DEM&PATT (BASIC NETWORK)' WHERE id = '2' AND typevalue = 'inp_options_dscenario_priority';
