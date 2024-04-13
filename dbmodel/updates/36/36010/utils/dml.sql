@@ -206,3 +206,10 @@ SELECT gw_fct_admin_transfer_addfields_values();
 
 -- 10/04/2024
 UPDATE config_param_system SET project_type='utils' WHERE "parameter"='edit_mapzones_set_lastupdate';
+
+
+UPDATE config_form_tabs SET sys_role = 'role_basic' WHERE formname ='selector_basic' and tabname = 'tab_macroexploitation';
+UPDATE config_form_tabs SET orderby = 2 WHERE formname ='selector_basic' and tabname = 'tab_macrosector';
+UPDATE config_form_tabs SET orderby = 3 WHERE formname ='selector_basic' and tabname = 'tab_sector';
+UPDATE config_form_tabs SET orderby = 4 WHERE formname ='selector_basic' and tabname = 'tab_network_state';
+UPDATE config_form_tabs SET orderby = 5 WHERE formname ='selector_basic' and tabname = 'tab_hydro_state';
