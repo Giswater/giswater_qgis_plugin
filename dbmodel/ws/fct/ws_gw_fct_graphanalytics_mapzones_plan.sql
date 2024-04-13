@@ -67,7 +67,7 @@ BEGIN
 	IF v_netscenario IS NULL THEN v_netscenario = '' ; END IF;
 	SELECT netscenario_type, expl_id INTO v_class, v_expl FROM plan_netscenario WHERE netscenario_id::text = v_netscenario::TEXT;
 
-	v_data = concat ('{"data":{"parameters":{"graphClass":"',v_class,'", "exploitation": [',v_expl,'], "updateFeature":"TRUE",
+	v_data = concat ('{"data":{"parameters":{"graphClass":"',v_class,'", "exploitation":"',v_expl,'", "updateFeature":"TRUE",
 	"updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate, ', "forceOpen": [',v_forceopen,'], "forceClosed":[',v_forceclosed,'], "usePlanPsector": ',v_usepsector,', "debug":"FALSE", 
 	"valueForDisconnected":',v_valuefordisconnected,', "floodOnlyMapzone":"',v_floodonlymapzone,'", "commitChanges":',v_commitchanges,', "netscenario":"',v_netscenario,'"}}}');
 

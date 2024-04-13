@@ -70,7 +70,7 @@ BEGIN
 	IF v_expl ='-999' THEN 
 		v_expl = (select replace(replace((array_agg(expl_id))::text,'{',''),'}','') from selector_expl where cur_user = current_user);
 	ELSE 
-		v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
+		v_expl = (select replace(replace(v_expl,'{',''),'}',''));
 	END IF;
 	
 	v_data = concat ('{"data":{"parameters":{"graphClass":"',v_class,'", "exploitation": "',v_expl,'", "updateFeature":"TRUE",
