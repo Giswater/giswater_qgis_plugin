@@ -27,6 +27,7 @@ v_feature_type text;
 v_childlayer text;
 v_project_type text;
 v_id text;
+v_presszone text;
 
 BEGIN
 
@@ -79,20 +80,22 @@ BEGIN
 		-- getting values for querytext if exist
 		SELECT v into v_record FROM (
 		SELECT json_array_elements_text((value::json->>'values')::json) v, (json_array_elements_text((value::json->>'values')::json)::json)->>'sourceTable' t
-		FROM config_param_system WHERE parameter = 'epa_automatic_inp2man_values' )a
+		FROM config_param_system WHERE parameter = 'epa_automatic_man2graph_values' )a
 		WHERE t = v_childlayer;
 
 	END IF;
 	
 	IF v_record IS NOT NULL THEN
 
+		v_presszone = (SELECT presszone_id from node where node_id = v_id);
+
 		-- building querytext
 		v_querytext := (v_record::json->>'query');
-		v_querytext := v_querytext ||' WHERE t.'||v_feature_type ||'_id = '||v_id||'::text
-		AND s.'||v_feature_type ||'_id = '||v_id||'::text';
+		v_querytext := v_querytext ||' WHERE t.presszone_id = '||v_presszone||'::text';
 
 		EXECUTE v_querytext;		
 	END IF;
+ 
 
 	RETURN;
 
