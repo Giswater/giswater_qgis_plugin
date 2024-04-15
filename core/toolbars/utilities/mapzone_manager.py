@@ -647,9 +647,20 @@ class GwMapzoneManager:
                     level = int(json_result['message']['level'])
                 tools_qgis.show_message(json_result['message']['text'], level)
 
+            self._get_graph_config()
             self._reset_config_vars(0)
             tools_gw.close_dialog(dialog)
             self._manage_current_changed()
+
+    def _get_graph_config(self):
+        context = "OPERATIVE" if self.netscenario_id is None else "NETSCENARIO"
+        extras = f'"context":"{context}", "mapzone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}"'
+        if self.netscenario_id is not None:
+            extras += f', "netscenarioId": {self.netscenario_id}'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_getgraphconfig', body)
+        if json_result is None:
+            return
 
     def _cancel_snapping_tool(self, dialog, action):
 
