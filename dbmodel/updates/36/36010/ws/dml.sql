@@ -68,7 +68,7 @@ DELETE FROM sys_table where id = 'inp_value_yesnofull';
 
 -- 12/04/2024
 
-update config_from_fields set widgettype='tablewidget', linkedobject='tbl_mincut_hydro' where formname='mincut' and columname='tbl_hydro';
+UPDATE config_form_fields SET widgettype = 'tablewidget', linkedobject = 'tbl_mincut_hydro' WHERE formname = 'mincut' AND columnname = 'tbl_hydro';
 
 
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) 
