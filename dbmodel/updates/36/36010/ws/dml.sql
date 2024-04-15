@@ -1789,7 +1789,9 @@ def my_form_open(dialog, layer, feature):
   <layerGeometryType>0</layerGeometryType>
 </qgis>');
 
-
+-- 15/04/2024
+INSERT INTO config_function (id,function_name,"style")
+	VALUES (3302,'gw_fct_getgraphconfig','{"style": {"point": {"style": "qml", "id": "205"}}}'::json);
 
 
 

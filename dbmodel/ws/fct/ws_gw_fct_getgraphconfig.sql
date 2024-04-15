@@ -35,7 +35,7 @@ v_querytext_end text = ' ORDER BY 2 ASC';
 v_result text;
 v_result_point json;
 
-  
+
 BEGIN
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
@@ -51,14 +51,14 @@ BEGIN
 	IF v_context = 'OPERATIVE' THEN
 		v_mapzone_id = concat(v_mapzone, '_id');
 		v_mapzone = concat('v_edit_',v_mapzone);
-		
+
 	ELSIF v_context = 'NETSCENARIO' THEN
 		v_mapzone_id = concat(v_mapzone, '_id');
 		v_mapzone = concat('v_edit_plan_netscenario_',v_mapzone);
 
 	END IF;
 
-	v_querytext = concat ('WITH mapzone_query as (select * from ',v_mapzone,') 
+	v_querytext = concat ('WITH mapzone_query as (select * from ',v_mapzone,')
 			SELECT n.node_id AS feature_id, ''nodeParent''::text AS graph_type, a.',v_mapzone_id,'::integer, a.name, NULL::float  AS rotation, n.the_geom
 			FROM ( SELECT json_array_elements_text((graphconfig::json ->> ''use''::text)::json)::json ->>''nodeParent''::text AS node_id, ',v_mapzone_id,'::integer, ',v_mapzone_name,' FROM mapzone_query) a
 			JOIN node n USING (node_id)
@@ -67,7 +67,7 @@ BEGIN
 			FROM ( SELECT json_array_elements_text((graphconfig::json ->> ''forceClosed''::text)::json) AS node_id, ',v_mapzone_id,'::integer, ',v_mapzone_name,' FROM mapzone_query) a
 			JOIN node n USING (node_id)
 		UNION
-			SELECT n.node_id AS feature_id,''forceOpen''::text AS graph_type, a.',v_mapzone_id,'::integer, a.name, NULL AS rotation, n.the_geom 
+			SELECT n.node_id AS feature_id,''forceOpen''::text AS graph_type, a.',v_mapzone_id,'::integer, a.name, NULL AS rotation, n.the_geom
 			FROM ( SELECT json_array_elements_text((graphconfig::json ->> ''forceOpen''::text)::json) AS node_id, ',v_mapzone_id,'::integer, ',v_mapzone_name,' FROM mapzone_query) a
 			JOIN node n USING (node_id)
 		UNION
@@ -83,19 +83,19 @@ BEGIN
 			end as rotation,
 
 			CASE WHEN node_1 IN (SELECT json_array_elements_text((mp.graphconfig::json ->> ''use''::text)::json)::json ->> ''nodeParent''::text AS node_id) THEN
-				st_lineinterpolatepoint(a.the_geom, 0.01::double precision) 
+				st_lineinterpolatepoint(a.the_geom, 0.01::double precision)
 			else
-				st_lineinterpolatepoint(a.the_geom, 0.99::double precision) 
+				st_lineinterpolatepoint(a.the_geom, 0.99::double precision)
 			end as the_geom
-			FROM 
-			(SELECT json_array_elements_text((json_array_elements_text((mapzone_query.graphconfig::json ->> ''use''::text)::json)::json ->> ''toArc''::text)::json) AS arc_id, ',v_mapzone_id,'::integer, ',v_mapzone_name,', graphconfig 
+			FROM
+			(SELECT json_array_elements_text((json_array_elements_text((mapzone_query.graphconfig::json ->> ''use''::text)::json)::json ->> ''toArc''::text)::json) AS arc_id, ',v_mapzone_id,'::integer, ',v_mapzone_name,', graphconfig
 			FROM mapzone_query) mp
 			JOIN arc a USING (arc_id)');
 
 	IF v_context = 'NETSCENARIO' THEN
 
-		v_querytext_add = concat (' 
-					UNION 
+		v_querytext_add = concat ('
+					UNION
 						SELECT concat (''NS-'',v.node_id),''netscenOpenedValve''::text AS graph_type, nd.',v_mapzone_id,'::integer, nd.name, NULL AS rotation, v.the_geom
 						FROM v_edit_plan_netscenario_valve v
 						left JOIN arc ON node_1 = node_id
@@ -103,9 +103,9 @@ BEGIN
 						left JOIN ',v_mapzone,' nd ON nd.',v_mapzone_id,' = na.',v_mapzone_id,' WHERE v.closed IS FALSE
 					UNION
 						SELECT concat (''NS-'',v.node_id) ,''netscenClosedValve'' AS graph_type, 0, ''UNDEFINED'', NULL AS rotation, v.the_geom
-						FROM v_edit_plan_netscenario_valve v  WHERE v.closed IS TRUE ');	
+						FROM v_edit_plan_netscenario_valve v  WHERE v.closed IS TRUE ');
 	END IF;
-  
+
 	v_querytext = concat (v_querytext, v_querytext_add, v_querytext_end);
 
 	v_querytext = concat('SELECT jsonb_agg(features.feature)
@@ -120,20 +120,20 @@ BEGIN
 	EXECUTE v_querytext INTO v_result;
 
 	-- profilactic nulls;
-	v_result := COALESCE(v_result, '{}'); 
-	IF v_result = '{}' THEN 
+	v_result := COALESCE(v_result, '{}');
+	IF v_result = '{}' THEN
 		v_result_point = '{"geometryType":"", "features":[]}';
-	ELSE 
+	ELSE
 		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
-	END IF;	
+	END IF;
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
 	     ',"body":{"form":{}'||
-		     ',"data":{ "info":"",'||
+		     ',"data":{ "info":{},'||
 				'"point":'||v_result_point||','||
-				'"line":"",'||
-				'"polygon":""}'||
+				'"line":{},'||
+				'"polygon":{}}'||
 	    '}}')::json, 3302, null, null, null);
 
 	-- Exception handling
