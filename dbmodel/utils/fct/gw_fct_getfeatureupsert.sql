@@ -933,7 +933,7 @@ BEGIN
                             select string_agg(quote_ident(a),',') into v_new_id from json_array_elements_text(v_current_id::json) a ;
                             --remove current combo names from return json
                             v_fields_array[array_index] = v_fields_array[array_index]::jsonb - 'comboNames'::text;
-                            EXECUTE 'SELECT  array_to_json(''{'||v_selected_idval||'}''::text[])'
+                            EXECUTE 'SELECT  array_to_json(ARRAY['||quote_literal(v_selected_idval)||'])::text'
                             INTO v_new_id;
                             --add new combo names to return json
                             v_fields_array[array_index] = gw_fct_json_object_set_key(v_fields_array[array_index],'comboNames',v_new_id::json);
