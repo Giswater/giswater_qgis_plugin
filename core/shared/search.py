@@ -781,9 +781,9 @@ class GwSearch:
         """ Get folder dialog """
 
         widget.setStyleSheet(None)
-        if 'nt' in sys.builtin_module_names:
-            folder_path = os.path.expanduser("~/Documents")
-        else:
+        try:
+            folder_path = os.path.expanduser("~/Documents" if os.name == 'nt' else "~")
+        except Exception:
             folder_path = os.path.expanduser("~")
 
         # Open dialog to select folder
