@@ -78,9 +78,15 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btn_snapping">
+      <widget class="QToolButton" name="btn_snapping">
        <property name="text">
         <string/>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="popupMode">
+        <enum>QToolButton::MenuButtonPopup</enum>
        </property>
       </widget>
      </item>

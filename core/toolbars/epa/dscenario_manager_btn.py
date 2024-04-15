@@ -14,7 +14,7 @@ from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor, QKeyS
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt, QRegExp, QPoint
 from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QAction, \
-    QShortcut, QApplication, QTableWidgetItem, QWidget, QLabel, QGridLayout
+    QShortcut, QApplication, QTableWidgetItem, QWidget, QLabel, QGridLayout, QToolButton
 from qgis.PyQt.QtWidgets import QDialog, QLineEdit
 
 from ..dialog import GwAction
@@ -511,7 +511,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario.btn_toc.clicked.connect(partial(self._manage_add_layers))
         self.dlg_dscenario.btn_insert.clicked.connect(partial(self._manage_insert))
         self.dlg_dscenario.btn_delete.clicked.connect(partial(self._manage_delete))
-        self.dlg_dscenario.btn_snapping.clicked.connect(partial(self._manage_select))
+        self.dlg_dscenario.btn_snapping.toggled.connect(partial(self._manage_btn_snapping))
         self.dlg_dscenario.main_tab.currentChanged.connect(partial(self._manage_current_changed))
         self.dlg_dscenario.finished.connect(self._selection_end)
         self.dlg_dscenario.finished.connect(partial(tools_gw.close_dialog, self.dlg_dscenario, True))
@@ -678,7 +678,19 @@ class GwDscenarioManagerButton(GwAction):
 
         tableview = self.dlg_dscenario.main_tab.currentWidget()
 
+        self.dlg_dscenario.btn_snapping.setMenu(None)
+        self.dlg_dscenario.btn_snapping.setPopupMode(QToolButton.DelayedPopup)
         if tableview.objectName() == "inp_dscenario_demand" and self.project_type == 'ws':
+            # Create main menu and get cursor click position
+            btn_menu = QMenu()
+
+            action_node = btn_menu.addAction("NODE")
+            action_node.triggered.connect(partial(self._set_active_layer, action_node, 'v_edit_node'))
+            action_connec = btn_menu.addAction("CONNEC")
+            action_connec.triggered.connect(partial(self._set_active_layer, action_connec, 'v_edit_connec'))
+            self.dlg_dscenario.btn_snapping.setMenu(btn_menu)
+            self.dlg_dscenario.btn_snapping.setPopupMode(QToolButton.MenuButtonPopup)
+
             # Populate custom context menu
             tableview.setContextMenuPolicy(Qt.CustomContextMenu)
             tableview.customContextMenuRequested.connect(partial(self._paste_dscenario_demand_custom_menu, tableview))
@@ -1028,6 +1040,14 @@ class GwDscenarioManagerButton(GwAction):
             self._fill_dscenario_table()
 
 
+    def _manage_btn_snapping(self, checked: bool):
+
+        if checked:
+            self._manage_select()
+        else:
+            self._selection_end()
+
+
     def _manage_select(self):
         """ Button snapping """
 
@@ -1043,17 +1063,22 @@ class GwDscenarioManagerButton(GwAction):
         # Set active layer
         view_name = self.dlg_dscenario.main_tab.currentWidget().objectName()
         layer_name = 'v_edit_' + self.feature_type
-        if self.feature_type == 'nodarc':
-            layer_name = view_name.replace("dscenario_", "")
+        if view_name != 'inp_dscenario_demand':
+            if self.feature_type == 'nodarc':
+                layer_name = view_name.replace("dscenario_", "")
+            layer = tools_qgis.get_layer_by_tablename(layer_name)
+            self.iface.setActiveLayer(layer)
+            tools_qgis.set_layer_visible(layer)
+
+        self._selection_init()
+
+
+    def _set_active_layer(self, action: QAction, layer_name: str):
+        self.dlg_dscenario.btn_snapping.setChecked(False)
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         tools_qgis.set_layer_visible(layer)
-
-        # Clear feature id field
-        #
-
-        self._selection_init()
-        # tools_gw.selection_init(self, self.dlg_dscenario, tableview)
+        self.dlg_dscenario.btn_snapping.setChecked(True)
 
 
     def _selection_init(self):
@@ -1075,7 +1100,10 @@ class GwDscenarioManagerButton(GwAction):
 
         # Get feature_type and feature_id
         layer = self.iface.activeLayer()
-        field_id = self.feature_type + "_id"
+        feature_type = self.feature_type
+        field_id = feature_type + "_id"
+        tableview = self.dlg_dscenario.main_tab.currentWidget()
+        view = tableview.objectName()
 
         # Iterate over layer
         if layer.selectedFeatureCount() > 0:
@@ -1084,12 +1112,17 @@ class GwDscenarioManagerButton(GwAction):
             features = layer.selectedFeatures()
             for feature in features:
                 # Append 'feature_id' into the list
-                selected_ids.append(feature.attribute(field_id))
+                if view == 'inp_dscenario_demand':
+                    try:
+                        selected_ids.append(feature.attribute(field_id))
+                    except KeyError:
+                        selected_ids.append(feature.attribute('connec_id'))
+                        feature_type = 'connec'
+                else:
+                    selected_ids.append(feature.attribute(field_id))
 
             if selected_ids:
-                inserted = {f'{self.feature_type}': []}
-                tableview = self.dlg_dscenario.main_tab.currentWidget()
-                view = tableview.objectName()
+                inserted = {f'{feature_type}': []}
                 for f in selected_ids:
                     sql = f"INSERT INTO v_edit_{view}"
                     if view == 'inp_dscenario_demand':
@@ -1097,13 +1130,13 @@ class GwDscenarioManagerButton(GwAction):
                     sql += f" VALUES ({self.selected_dscenario_id}, '{f}');"
                     result = tools_db.execute_sql(sql, log_sql=False, log_error=False, show_exception=False)
                     if result:
-                        inserted[f'{self.feature_type}'].append(f)
+                        inserted[f'{feature_type}'].append(f)
                 self._fill_dscenario_table()
 
-                self._selection_end()
+                self.dlg_dscenario.btn_snapping.setChecked(False)
 
                 # Just select the inserted features
-                tools_gw.get_expression_filter(self.feature_type, inserted, {f"{self.feature_type}": [layer]})
+                tools_gw.get_expression_filter(feature_type, inserted, {f"{feature_type}": [layer]})
 
 
     def _selection_end(self):
