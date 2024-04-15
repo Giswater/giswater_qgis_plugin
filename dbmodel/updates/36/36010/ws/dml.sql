@@ -1793,7 +1793,12 @@ def my_form_open(dialog, layer, feature):
 INSERT INTO config_function (id,function_name,"style")
 	VALUES (3302,'gw_fct_getgraphconfig','{"style": {"point": {"style": "qml", "id": "205"}}}'::json);
 
-
+INSERT INTO config_param_system VALUES ('epa_automatic_man2graph_values','{"status":true, "values":[
+{"status":false, "values":[
+{"sourceTable":"ve_node_pr_reduc_valve", "query":"UPDATE presszone t SET head=elevation + pression_exit FROM ve_node_pr_reduc_valve s "}]}]}',
+'Before insert - update of any mapzone, automatic update of columns on mapzone from columns on man_table',
+'GRAPH auto update mapzone tables:','','',TRUE, 14,'utils',null,null,'json','text',null,TRUE,null,null,null,null,null,
+'{"status":false}','lyt_admin_other');
 
 
 

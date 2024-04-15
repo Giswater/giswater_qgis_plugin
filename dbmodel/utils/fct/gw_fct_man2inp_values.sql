@@ -18,6 +18,7 @@ DECLARE
 
 v_automatic_man2inp_values json;
 v_automatic_inp2man_values json;
+v_automatic_man2graph_values json;
 v_record json;
 v_sourcetable text;
 v_querytext text;   
@@ -42,6 +43,8 @@ BEGIN
 	-- get config values
 	v_automatic_man2inp_values = (SELECT value FROM config_param_system WHERE parameter = 'epa_automatic_man2inp_values');
 	v_automatic_inp2man_values = (SELECT value FROM config_param_system WHERE parameter = 'epa_automatic_inp2man_values');
+	v_automatic_man2graph_values = (SELECT value FROM config_param_system WHERE parameter = 'epa_automatic_man2graph_values');
+
 
 	IF (v_automatic_man2inp_values->>'status')::boolean = true THEN
 
@@ -59,8 +62,29 @@ BEGIN
 		FROM config_param_system WHERE parameter = 'epa_automatic_inp2man_values' )a
 		WHERE t = v_childlayer;
 	END IF;
-  
-  IF v_record IS NOT NULL THEN
+	
+	IF v_record IS NOT NULL THEN
+
+		-- building querytext
+		v_querytext := (v_record::json->>'query');
+		v_querytext := v_querytext ||' WHERE t.'||v_feature_type ||'_id = '||v_id||'::text
+		AND s.'||v_feature_type ||'_id = '||v_id||'::text';
+
+		EXECUTE v_querytext;		
+	END IF;
+	
+	v_record = null;
+	
+	IF (v_automatic_man2graph_values->>'status')::boolean = true THEN
+		-- getting values for querytext if exist
+		SELECT v into v_record FROM (
+		SELECT json_array_elements_text((value::json->>'values')::json) v, (json_array_elements_text((value::json->>'values')::json)::json)->>'sourceTable' t
+		FROM config_param_system WHERE parameter = 'epa_automatic_inp2man_values' )a
+		WHERE t = v_childlayer;
+
+	END IF;
+	
+	IF v_record IS NOT NULL THEN
 
 		-- building querytext
 		v_querytext := (v_record::json->>'query');
