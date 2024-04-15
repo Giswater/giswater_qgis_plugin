@@ -73,6 +73,7 @@ class GwMapzoneManager:
 
         # Connect signals
         self.mapzone_mng_dlg.txt_name.textChanged.connect(partial(self._txt_name_changed))
+        self.mapzone_mng_dlg.chk_show_all.toggled.connect(partial(self._manage_current_changed))
         self.mapzone_mng_dlg.btn_execute.clicked.connect(partial(self._open_mapzones_analysis))
         self.mapzone_mng_dlg.btn_config.clicked.connect(partial(self.manage_config, self.mapzone_mng_dlg, None))
         self.mapzone_mng_dlg.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active))
@@ -145,9 +146,13 @@ class GwMapzoneManager:
         if self.schema_name not in self.table_name:
             self.table_name = self.schema_name + "." + self.table_name
 
+        show_all = tools_qt.is_checked(self.mapzone_mng_dlg, 'chk_show_all')
         # Set model
         model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
-        model.setTable(self.table_name)
+        table_name = self.table_name
+        if show_all:
+            table_name = table_name.replace('v_ui_', '')
+        model.setTable(table_name)
         # model.setFilter(f"dscenario_id = {self.selected_dscenario_id}")
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)
@@ -477,7 +482,7 @@ class GwMapzoneManager:
         """
 
         # Set variable, set widget text and enable add button
-        
+
         self.force_closed_list.add(feat_id)
         force_closed_list_aux = [int(force_closed) for force_closed in self.force_closed_list]
         tools_qt.set_widget_text(self.config_dlg, 'txt_forceClosed', f"{force_closed_list_aux}")
