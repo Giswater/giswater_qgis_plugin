@@ -213,3 +213,53 @@ UPDATE config_form_tabs SET orderby = 2 WHERE formname ='selector_basic' and tab
 UPDATE config_form_tabs SET orderby = 3 WHERE formname ='selector_basic' and tabname = 'tab_sector';
 UPDATE config_form_tabs SET orderby = 4 WHERE formname ='selector_basic' and tabname = 'tab_network_state';
 UPDATE config_form_tabs SET orderby = 5 WHERE formname ='selector_basic' and tabname = 'tab_hydro_state';
+
+-- 15/04/2024
+UPDATE sys_table SET id = '_man_addfields_value_' WHERE id='man_addfields_value';
+
+UPDATE sys_table SET id = 'archived_rpt_arc' WHERE id = 'rpt_arc';
+UPDATE sys_table SET id = 'archived_rpt_energy_usage' WHERE id = 'rpt_energy_usage';
+UPDATE sys_table SET id = 'archived_rpt_hydraulic_status' WHERE id = 'rpt_hydraulic_status';
+UPDATE sys_table SET id = 'archived_rpt_node' WHERE id = 'rpt_node';
+
+INSERT INTO sys_table VALUES('archived_rpt_inp_pattern_value', 'id', 'role_epa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL, NULL);
+
+UPDATE sys_function SET input_params='character varying, boolean, boolean' WHERE function_name = 'gw_fct_pg2epa_nod2arc' and project_type = 'ws';
+UPDATE sys_function SET input_params='character varying' WHERE function_name = 'gw_fct_pg2epa_nod2arc' and project_type = 'ud';
+update sys_function set input_params = null where function_name = 'gw_fct_setvalurn';
+update sys_function set input_params = null where function_name = 'gw_fct_admin_schema_utils_fk';
+update sys_function set input_params = null where function_name = 'gw_fct_admin_role_permissions';
+update sys_function set input_params = null where function_name = 'gw_fct_refresh_mat_view';
+update sys_function set input_params = null where function_name IN ('gw_fct_fill_om_tables', 'gw_fct_fill_doc_tables');
+update sys_function set input_params = null where function_name = 'gw_fct_admin_test_ci';
+update sys_function set input_params = null where function_name = 'gw_fct_vnode_repair';
+update sys_function set input_params = null where function_name = 'gw_fct_arc_repair';
+update sys_function set input_params = null where function_name = 'gw_trg_edit_anl_hydrant';
+update sys_function set input_params = 'text, json' where function_name = 'gw_fct_rpt2pg_log';
+UPDATE sys_function SET input_params = 'in json, variadic _text' where function_name='gw_fct_json_object_delete_keys';
+update sys_function set input_params = 'varchar' where function_name = 'gw_fct_pg2epa_breakpipes';
+update sys_function set input_params = 'json' where function_name = 'gw_fct_pg2epa_autorepair_epatype';
+update sys_function set input_params = 'json, int4, json, json, json' where function_name = 'gw_fct_json_create_return';
+update sys_function set input_params = 'json' where function_name = 'gw_fct_linkexitgenerator';
+update sys_function set input_params = 'json' where function_name = 'gw_fct_getprofile';
+update sys_function set input_params = 'json' where function_name = 'gw_fct_linktonetwork';
+update sys_function set input_params = 'json' where function_name = 'gw_fct_infofromid';
+update sys_function set input_params = 'json' where function_name = 'gw_fct_getdmabalance';
+update sys_function set input_params = 'json' where function_name = 'gw_fct_setclosestaddress';
+update sys_function set input_params = 'json' where function_name = 'gw_fct_setinitproject';
+update sys_function set input_params = 'json' where function_name = 'gw_fct_getvisit_manager';
+update sys_function set input_params = 'json' where function_name = 'gw_fct_waterbalance';
+update sys_function set input_params = 'json' where function_name = 'gw_fct_setprofile';
+update sys_function set input_params = 'character varying, character varying, integer, bool' where function_name = 'gw_fct_mincut';
+update sys_function set input_params = 'int4, int8, int8' where function_name = 'gw_fct_link_repair';
+update sys_function set input_params = 'int4' where function_name = 'gw_fct_linkexitgenerator';
+update sys_function set input_params = 'int4' where function_name = 'gw_fct_mincut_inverted_flowtrace';
+update sys_function set project_type = 'ud' where function_name = 'gw_fct_anl_node_elev';
+update sys_function set project_type = 'ud' where function_name = 'gw_fct_anl_arc_elev';
+DELETE FROM sys_function WHERE id=2900; -- function_name = 'gw_fct_getprojectvisitforms';
+update sys_function set input_params = 'json' where function_name = 'gw_fct_create_dwf_scenario_empty';
+update sys_function set input_params = 'json' where function_name = 'gw_fct_create_dwf_scenario_empty';
+update sys_function set input_params = 'json' where function_name = 'gw_fct_epa_setoptimumoutlet';
+update sys_function set input_params = 'json' where function_name = 'gw_fct_duplicate_hydrology_scenario';
+update sys_function set input_params = 'json' where function_name = 'gw_fct_duplicate_dwf_scenario';
+update sys_function set input_params = 'json' where function_name = 'gw_fct_create_hydrology_scenario_empty';
