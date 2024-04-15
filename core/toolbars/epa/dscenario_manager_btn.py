@@ -222,6 +222,8 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario_manager = GwDscenarioManagerUi()
         tools_gw.load_settings(self.dlg_dscenario_manager)
 
+        tools_gw.add_icon(self.dlg_dscenario_manager.btn_toc, "306", sub_folder="24x24")
+
         # Manage btn create
         self._manage_btn_create(self.dlg_dscenario_manager, 'v_edit_cat_dscenario')
 
@@ -243,6 +245,7 @@ class GwDscenarioManagerButton(GwAction):
         # Connect main dialog signals
         self.dlg_dscenario_manager.txt_name.textChanged.connect(partial(self._fill_manager_table,
                                                                         'v_edit_cat_dscenario', None))
+        self.dlg_dscenario_manager.btn_toc.clicked.connect(partial(self._manage_add_layers))
         self.dlg_dscenario_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
                                                 self.dlg_dscenario_manager, 'v_edit_cat_dscenario', 3156))
         self.dlg_dscenario_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3042,
