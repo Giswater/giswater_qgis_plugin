@@ -207,7 +207,6 @@ SELECT gw_fct_admin_transfer_addfields_values();
 -- 10/04/2024
 UPDATE config_param_system SET project_type='utils' WHERE "parameter"='edit_mapzones_set_lastupdate';
 
-
 UPDATE config_form_tabs SET sys_role = 'role_basic' WHERE formname ='selector_basic' and tabname = 'tab_macroexploitation';
 UPDATE config_form_tabs SET orderby = 2 WHERE formname ='selector_basic' and tabname = 'tab_macrosector';
 UPDATE config_form_tabs SET orderby = 3 WHERE formname ='selector_basic' and tabname = 'tab_sector';
@@ -263,3 +262,154 @@ update sys_function set input_params = 'json' where function_name = 'gw_fct_epa_
 update sys_function set input_params = 'json' where function_name = 'gw_fct_duplicate_hydrology_scenario';
 update sys_function set input_params = 'json' where function_name = 'gw_fct_duplicate_dwf_scenario';
 update sys_function set input_params = 'json' where function_name = 'gw_fct_create_hydrology_scenario_empty';
+
+-- 16/04/2024
+drop view if exists v_ui_event_x_arc;
+
+CREATE OR REPLACE VIEW v_ui_event_x_arc
+AS SELECT om_visit_event.id AS event_id,
+    om_visit.id AS visit_id,
+    om_visit.ext_code AS code,
+    om_visit.visitcat_id,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    om_visit.class_id as visit_class,
+    date_trunc('second'::text, om_visit_event.tstamp) AS tstamp,
+    om_visit_x_arc.arc_id,
+    om_visit_event.parameter_id,
+    config_visit_parameter.parameter_type,
+    config_visit_parameter.feature_type,
+    config_visit_parameter.form_type,
+    config_visit_parameter.descript,
+    om_visit_event.value,
+    om_visit_event.xcoord,
+    om_visit_event.ycoord,
+    om_visit_event.compass,
+    om_visit_event.event_code,
+        CASE
+            WHEN a.event_id IS NULL THEN false
+            ELSE true
+        END AS gallery,
+        CASE
+            WHEN b.visit_id IS NULL THEN false
+            ELSE true
+        END AS document
+   FROM om_visit
+     JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+     JOIN om_visit_x_arc ON om_visit_x_arc.visit_id = om_visit.id
+     LEFT JOIN config_visit_parameter ON config_visit_parameter.id::text = om_visit_event.parameter_id::text
+     JOIN arc ON arc.arc_id::text = om_visit_x_arc.arc_id::text
+     LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
+           FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
+     LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
+           FROM doc_x_visit) b ON b.visit_id = om_visit.id
+  ORDER BY om_visit_x_arc.arc_id;
+
+drop view if exists v_ui_event_x_node;
+
+CREATE OR REPLACE VIEW v_ui_event_x_node
+AS SELECT om_visit_event.id AS event_id,
+    om_visit.id AS visit_id,
+    om_visit.ext_code AS code,
+    om_visit.visitcat_id,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    om_visit.class_id AS visit_class,
+    date_trunc('second'::text, om_visit_event.tstamp) AS tstamp,
+    om_visit_x_node.node_id,
+    om_visit_event.parameter_id,
+    config_visit_parameter.parameter_type,
+    config_visit_parameter.feature_type,
+    config_visit_parameter.form_type,
+    config_visit_parameter.descript,
+    om_visit_event.value,
+    om_visit_event.xcoord,
+    om_visit_event.ycoord,
+    om_visit_event.compass,
+    om_visit_event.event_code,
+        CASE
+            WHEN a.event_id IS NULL THEN false
+            ELSE true
+        END AS gallery,
+        CASE
+            WHEN b.visit_id IS NULL THEN false
+            ELSE true
+        END AS document
+   FROM om_visit
+     JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+     JOIN om_visit_x_node ON om_visit_x_node.visit_id = om_visit.id
+     LEFT JOIN config_visit_parameter ON config_visit_parameter.id::text = om_visit_event.parameter_id::text
+     LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
+           FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
+     LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
+           FROM doc_x_visit) b ON b.visit_id = om_visit.id
+  ORDER BY om_visit_x_node.node_id;
+
+drop view if exists v_ui_event_x_connec;
+
+CREATE OR REPLACE VIEW v_ui_event_x_connec
+AS SELECT om_visit_event.id AS event_id,
+    om_visit.id AS visit_id,
+    om_visit.ext_code AS code,
+    om_visit.visitcat_id,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    om_visit.class_id AS visit_class,
+    date_trunc('second'::text, om_visit_event.tstamp) AS tstamp,
+    om_visit_x_connec.connec_id,
+    om_visit_event.parameter_id,
+    config_visit_parameter.parameter_type,
+    config_visit_parameter.feature_type,
+    config_visit_parameter.form_type,
+    config_visit_parameter.descript,
+    om_visit_event.value,
+    om_visit_event.xcoord,
+    om_visit_event.ycoord,
+    om_visit_event.compass,
+    om_visit_event.event_code,
+        CASE
+            WHEN a.event_id IS NULL THEN false
+            ELSE true
+        END AS gallery,
+        CASE
+            WHEN b.visit_id IS NULL THEN false
+            ELSE true
+        END AS document
+   FROM om_visit
+     JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+     JOIN om_visit_x_connec ON om_visit_x_connec.visit_id = om_visit.id
+     JOIN config_visit_parameter ON config_visit_parameter.id::text = om_visit_event.parameter_id::text
+     LEFT JOIN connec ON connec.connec_id::text = om_visit_x_connec.connec_id::text
+     LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
+           FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
+     LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
+           FROM doc_x_visit) b ON b.visit_id = om_visit.id
+  ORDER BY om_visit_x_connec.connec_id;
+
+UPDATE config_form_list SET listname='tbl_event_x_arc' WHERE listname='tbl_visit_x_arc' AND device=4;
+UPDATE config_form_list SET listname='tbl_event_x_node' WHERE listname='tbl_visit_x_node' AND device=4;
+UPDATE config_form_list SET listname='tbl_event_x_connec' WHERE listname='tbl_visit_x_connec' AND device=4;
+
+UPDATE config_form_fields SET linkedobject='tbl_event_x_arc' WHERE formname='arc' AND formtype='form_feature' AND tabname='tab_event' AND linkedobject = 'tbl_visit_x_arc';
+UPDATE config_form_fields SET linkedobject='tbl_event_x_connec' WHERE formname='connec' AND formtype='form_feature' AND tabname='tab_event' AND linkedobject = 'tbl_visit_x_connec';
+UPDATE config_form_fields SET linkedobject='tbl_event_x_node' WHERE formname='node' AND formtype='form_feature' AND tabname='tab_event' AND linkedobject = 'tbl_visit_x_node';
+
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('v_ui_visit_arc_leak', 'SELECT * FROM v_ui_visit_arc_leak WHERE visit_id IS NOT NULL', 4, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, NULL);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('v_ui_visit_connec_leak', 'SELECT * FROM v_ui_visit_connec_leak WHERE visit_id IS NOT NULL', 4, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, NULL);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('v_ui_visit_node_insp', 'SELECT * FROM v_ui_visit_node_insp WHERE visit_id IS NOT NULL', 4, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, NULL);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('v_ui_visit_incid_node', 'SELECT * FROM v_ui_visit_incid_node WHERE visit_id IS NOT NULL', 4, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, NULL);
+
+UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM config_visit_class WHERE feature_type IN (''ARC'',''ALL'') ', isfilter=false, dv_isnullvalue=false, widgetfunction='{"functionName": "manage_visit_class","parameters": {}}'::json WHERE formname='arc' AND formtype='form_feature' AND columnname='visit_class' AND tabname='tab_visit';
+UPDATE config_form_fields SET linkedobject=NULL WHERE formname='arc' AND formtype='form_feature' AND columnname='tbl_visits' AND tabname='tab_visit';
+
+UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM config_visit_class WHERE feature_type IN (''CONNEC'',''ALL'')  ', isfilter=false, dv_isnullvalue=false, widgetfunction='{"functionName": "manage_visit_class","parameters": {}}'::json WHERE formname='connec' AND formtype='form_feature' AND columnname='visit_class' AND tabname='tab_visit';
+UPDATE config_form_fields SET linkedobject=NULL WHERE formname='connec' AND formtype='form_feature' AND columnname='tbl_visits' AND tabname='tab_visit';
+
+UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM config_visit_class WHERE feature_type IN (''NODE'',''ALL'') ', isfilter=false, dv_isnullvalue=false, widgetfunction='{"functionName": "manage_visit_class","parameters": {}}'::json WHERE formname='node' AND formtype='form_feature' AND columnname='visit_class' AND tabname='tab_visit';
+UPDATE config_form_fields SET linkedobject=NULL WHERE formname='node' AND formtype='form_feature' AND columnname='tbl_visits' AND tabname='tab_visit';
