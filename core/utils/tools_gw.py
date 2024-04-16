@@ -4150,6 +4150,8 @@ def _get_list(complet_result, form_name='', filter_fields='', widgetname='', for
               linkedobject=''):
 
     form = f'"formName":"{form_name}", "tabName":"tab_none", "widgetname":"{widgetname}", "formtype":"{formtype}"'
+    if linkedobject is None:
+        return
     feature = f'"tableName":"{linkedobject}"'
     filter_fields = ''
     body = create_body(form, feature, filter_fields)

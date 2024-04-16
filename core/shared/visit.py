@@ -983,10 +983,11 @@ class GwVisit(QObject):
             return
 
         # configure model visibility
-        tools_gw.set_tablemodel_config(dialog, "tbl_visit_x_arc", "v_edit_arc")
-        tools_gw.set_tablemodel_config(dialog, "tbl_visit_x_node", "v_edit_node")
-        tools_gw.set_tablemodel_config(dialog, "tbl_visit_x_connec", "v_edit_connec")
-        tools_gw.set_tablemodel_config(dialog, "tbl_visit_x_gully", "v_edit_gully")
+        if self.current_tab_index == self._tab_index('tab_event'):
+            tools_gw.set_tablemodel_config(dialog, "tbl_event_x_arc", "v_edit_arc")
+            tools_gw.set_tablemodel_config(dialog, "tbl_event_x_node", "v_edit_node")
+            tools_gw.set_tablemodel_config(dialog, "tbl_event_x_connec", "v_edit_connec")
+            tools_gw.set_tablemodel_config(dialog, "tbl_event_x_gully", "v_edit_gully")
 
 
     def _event_feature_type_selected(self, dialog, feature_type=None):

@@ -12,6 +12,7 @@ import webbrowser
 
 from functools import partial
 from qgis.PyQt.QtCore import QDate, QRegExp, Qt
+from qgis.PyQt.QtGui import QStandardItemModel
 from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QLineEdit, QMessageBox, QTableView, QWidget, QDoubleSpinBox, QSpinBox
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer, QgsVectorLayer, QgsDataSourceUri
 from qgis.gui import QgsDateTimeEdit
@@ -195,6 +196,67 @@ def manage_document(doc_id, **kwargs):
     # If we are creating a new element
     else:
         doc.dlg_add_doc.btn_accept.clicked.connect(partial(_manage_document_new, doc, **kwargs))
+
+
+def manage_visit_class(**kwargs):
+    """ 
+    """
+    complet_result = kwargs['complet_result']
+    dialog = kwargs['dialog']
+    columnname = kwargs['columnname']
+    widget = kwargs['widget']
+    feature_id = complet_result['body']['feature']['id']
+    field_id = str(complet_result['body']['feature']['idName'])
+
+    current_visit_class = tools_gw.get_values(dialog, widget)
+    print(F"current_visit_class -> {current_visit_class[columnname]}")
+    if current_visit_class[columnname] is None:
+        return
+    sql = (f"SELECT ui_tablename FROM config_visit_class where id = {current_visit_class[columnname]}")
+    ui_tablename = tools_db.get_row(sql)
+    table_view = dialog.findChildren(QTableView)
+    if table_view in (None, []):
+        return
+    table_view = table_view[0]
+    feature = f'"tableName":"{ui_tablename[0]}"'
+    filter_fields = f'"{field_id}": {{"filterSign":"=", "value":"{feature_id}"}}'
+    body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
+    json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
+    if json_result is None or json_result['status'] == 'Failed':
+        return False
+    complet_list = json_result
+    if not complet_list:
+        return False
+    if complet_list is False:
+        return False, False
+    # headers
+    headers = complet_list['body']['form'].get('headers')
+    non_editable_columns = []
+    if headers:
+        model = table_view.model()
+        if model is None:
+            model = QStandardItemModel()
+
+        # Related by Qtable
+        model.clear()
+        table_view.setModel(model)
+        table_view.horizontalHeader().setStretchLastSection(True)
+        # Non-editable columns
+        non_editable_columns = [item['header'] for item in headers if item.get('editable') is False]
+
+    # values
+    for field in complet_list['body']['data']['fields']:
+        if 'hidden' in field and field['hidden']: continue
+        model = table_view.model()
+        if model is None:
+            model = QStandardItemModel()
+            table_view.setModel(model)
+        model.removeRows(0, model.rowCount())
+
+        if field['value']:
+            table_view = tools_gw.add_tableview_header(table_view, field)
+            table_view = tools_gw.fill_tableview_rows(table_view, field)
+        tools_qt.set_tableview_config(table_view)   
 
 
 def open_selected_path(**kwargs):

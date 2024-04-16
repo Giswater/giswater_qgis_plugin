@@ -2721,6 +2721,9 @@ class GwInfo(QObject):
             self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_visit')
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
+            cmb_visit_class = self.dlg_cf.findChild(QComboBox, 'tab_visit_visit_class')
+            current_index = cmb_visit_class.currentIndex()
+            cmb_visit_class.currentIndexChanged.emit(current_index)
             self.tab_visit_loaded = True
         # Tab 'Event'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_event' and not self.tab_event_loaded:
@@ -2753,6 +2756,8 @@ class GwInfo(QObject):
                 tools_qgis.show_info(msg, 3)
                 continue
             linkedobject = table.property('linkedobject')
+            if linkedobject is None:
+                return
             complet_list, widget_list = self._fill_tbl(complet_result, self.dlg_cf, widgetname, linkedobject, filter_fields, id_name)
             if complet_list is False:
                 return False
