@@ -23,27 +23,3 @@ CREATE OR REPLACE VIEW v_node AS
  JOIN v_state_arc USING (arc_id)
  WHERE (a.expl_id = s.expl_id OR a.expl_id2 = s.expl_id);
  
-
- CREATE OR REPLACE VIEW v_state_connec AS 
- SELECT DISTINCT ON (a.connec_id) a.connec_id,
-    a.arc_id
-   FROM (( SELECT connec.connec_id,
-                    connec.arc_id,
-                    1 AS flag
-                   FROM selector_state,  connec
-                  WHERE connec.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
-                EXCEPT
-                 SELECT plan_psector_x_connec.connec_id,
-                    plan_psector_x_connec.arc_id,
-                    1 AS flag
-                   FROM selector_psector,  plan_psector_x_connec
-                     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
-                  WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 0 
-        ) UNION
-         SELECT plan_psector_x_connec.connec_id,
-            plan_psector_x_connec.arc_id,
-            2 AS flag
-           FROM selector_psector, plan_psector_x_connec
-             JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
-          WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 1
-  ORDER BY 1, 3 DESC) a;
