@@ -71,7 +71,7 @@ BEGIN
 	FOR rec IN
 		EXECUTE 'SELECT sequence_name FROM information_schema.SEQUENCES WHERE sequence_schema = '|| quote_literal(v_schema)||''
 	LOOP
-		EXECUTE 'ALTER SEQUENCE '|| v_schema ||'."'|| rec ||'" OWNER TO '|| v_owner ||';';
+		EXECUTE 'GRANT ALL ON SEQUENCE '|| v_schema ||'."'|| rec ||'" TO '|| v_owner ||';';
 	END LOOP;
 
 	FOR rec IN
