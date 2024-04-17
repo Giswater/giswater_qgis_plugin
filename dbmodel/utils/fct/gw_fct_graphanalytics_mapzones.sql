@@ -1275,27 +1275,50 @@ BEGIN
 	------ end of multi-transactional event
 	IF v_commitchanges IS FALSE THEN  -- all features in order to make a more complex log
 		
-		-- arc elementS
-		EXECUTE 'SELECT jsonb_agg(features.feature) 
-		FROM (
-		SELECT jsonb_build_object(
-		    ''type'',       ''Feature'',
-		    ''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
-		    ''properties'', to_jsonb(row) - ''the_geom''
-		) AS feature
-		FROM 
-		(SELECT * FROM 
-		(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, ''0'' as mapzone_id, the_geom, ''Disconnected''::text as descript  FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0 
-		group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
-		UNION
-		SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, NULL as mapzone_id, the_geom, ''Conflict''::text as descript FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = -1 
-		group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
-		) a 
-		UNION
-		SELECT DISTINCT ON (arc_id) arc_id, arccat_id, t.state, t.expl_id, t.'||v_field||'::TEXT as mapzone_id, t.the_geom, m.name as descript FROM temp_t_arc t 
-		JOIN '||v_table||' m USING ('||v_field||') WHERE '||v_field||'::integer >0
-		) row ) features'
-		INTO v_result;
+		-- arc elements
+		IF v_floodonlymapzone IS NULL THEN
+			EXECUTE 'SELECT jsonb_agg(features.feature) 
+			FROM (
+			SELECT jsonb_build_object(
+			    ''type'',       ''Feature'',
+			    ''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+			    ''properties'', to_jsonb(row) - ''the_geom''
+			) AS feature
+			FROM 
+			(SELECT * FROM 
+			(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, ''0'' as mapzone_id, the_geom, ''Disconnected''::text as descript  FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0 
+			group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
+			UNION
+			SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, NULL as mapzone_id, the_geom, ''Conflict''::text as descript FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = -1 
+			group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
+			) a 
+			UNION
+			SELECT DISTINCT ON (arc_id) arc_id, arccat_id, t.state, t.expl_id, t.'||v_field||'::TEXT as mapzone_id, t.the_geom, m.name as descript FROM temp_t_arc t 
+			JOIN '||v_table||' m USING ('||v_field||') WHERE '||v_field||'::integer >0
+			) row ) features'
+			INTO v_result;
+		ELSE
+			EXECUTE 'SELECT jsonb_agg(features.feature) 
+			FROM (
+			SELECT jsonb_build_object(
+			    ''type'',       ''Feature'',
+			    ''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+			    ''properties'', to_jsonb(row) - ''the_geom''
+			) AS feature
+			FROM 
+			(SELECT * FROM 
+			(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, ''0'' as mapzone_id, the_geom, ''Disconnected''::text as descript  FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0 
+			group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
+			UNION
+			SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, NULL as mapzone_id, the_geom, ''Conflict''::text as descript FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = -1 
+			group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
+			) a 
+			UNION
+			SELECT DISTINCT ON (arc_id) arc_id, arccat_id, t.state, t.expl_id, t.'||v_field||'::TEXT as mapzone_id, t.the_geom, m.name as descript FROM temp_t_arc t 
+			JOIN '||v_table||' m USING ('||v_field||') WHERE '||v_field||'::integer IN ('||v_floodonlymapzone||')
+			) row ) features'
+			INTO v_result;
+		END IF;
 
 
 		v_result := COALESCE(v_result, '{}'); 
