@@ -103,6 +103,8 @@ v_dqa_id integer;
 v_minsector_id integer;
 v_drainzone_id integer;
 v_presszone_id text;
+v_feature_childtable_name_old text;
+v_feature_childtable_name_new text;
 
 BEGIN
 
@@ -392,22 +394,40 @@ BEGIN
 				END IF;
 			END LOOP;
 		END IF;
-		
-		-- taking values from old feature (from man_addfields table)
-		INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
-		SELECT 
-		v_id,
-		parameter_id,
-		value_param
-		FROM man_addfields_value WHERE feature_id=v_old_feature_id;
 
-		IF (SELECT count(parameter_id) FROM man_addfields_value WHERE feature_id = v_id::text) > 0 THEN
-			FOR rec_addfields IN (SELECT parameter_id, value_param FROM man_addfields_value WHERE feature_id = v_id::text)
-			LOOP
+
+		v_feature_childtable_name_old := 'man_' || v_feature_type || '_' || lower(v_old_featuretype);
+		v_feature_childtable_name_new := 'man_' || v_feature_type || '_' || lower(v_feature_type_new);
+
+		EXECUTE 'INSERT INTO '||v_feature_childtable_name_new||' ('||v_feature_type||'_id) VALUES ('||v_id||');';
+
+		v_sql := 'SELECT column_name FROM information_schema.columns 
+				WHERE table_schema = ''SCHEMA_NAME'' 
+				AND table_name = '''||v_feature_childtable_name_old||''' 
+				AND column_name !=''id'' AND column_name != '''||v_feature_type||'_id'' 
+				AND column_name IN (SELECT column_name
+									FROM information_schema.columns
+									WHERE table_name = '''||v_feature_childtable_name_new||'''
+									AND column_name !=''id'' AND column_name != '''||v_feature_type||'_id'');';
+
+		-- taking values from old feature (from man_{feature_type}_{feature_childtype}) if the column is equal.
+		FOR rec_addfields IN EXECUTE v_sql
+		LOOP
+
+			v_query_string_update = 'UPDATE '||v_feature_childtable_name_new||' SET '||rec_addfields.column_name||'='||v_feature_childtable_name_old||'.'||rec_addfields.column_name||'
+									FROM '||v_feature_childtable_name_old||'
+									WHERE '||v_feature_childtable_name_new||'.'||v_id_column||'='||quote_literal(v_id)||'
+									AND '||v_feature_childtable_name_old||'.'||v_id_column||'='||quote_literal(v_old_feature_id)||';';
+			IF v_query_string_update IS NOT NULL THEN
+				EXECUTE v_query_string_update; 
 				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (v_fid, v_result_id, concat('Copy value of addfield ',rec_addfields.parameter_id,' old feature into new one: ',rec_addfields.value_param,'.'));
-			END LOOP;
-		END IF;
+				VALUES (v_fid, v_result_id, concat('Assign old data from ',rec_addfields.column_name,' addfield to the new feature.'));
+			END IF;
+
+		END LOOP;
+
+		EXECUTE 'DELETE FROM '||v_feature_childtable_name_old||' WHERE '||v_id_column||'='||quote_literal(v_old_feature_id)||';'; 
+
 
 		--Moving elements from old feature to new feature
 		IF v_keep_elements IS TRUE THEN
