@@ -62,7 +62,7 @@ DELETE FROM inp_typevalue WHERE typevalue = 'inp_typevalue_dscenario' AND id = '
 
 UPDATE config_function SET "style"='{"style": {"point": {"style": "categorized", "field": "mapzone_id", "transparency": 0.5, "width": 2.5, "values": [{"id": "Disconnected", "color": [255,124,64]}, {"id": "Conflict", "color": [14,206,253]}]},
 "line": {"style": "categorized", "field": "mapzone_id", "transparency": 0.5, "width": 2.5, "values": [{"id": "Disconnected", "color": [255,124,64]}, {"id": "Conflict", "color": [14,206,253]}]},
-  "polygon": {"style": "categorized","field": "mapzone_id",  "transparency": 0.5}}}'::json WHERE function_name='gw_fct_graphanalytics_mapzones';
+  "polygon": {"style": "categorized","field": "mapzone_id",  "transparency": 0.5}}}'::json, actions='[{"funcName": "set_style_mapzones", "params": {}}, {"funcName": "get_graph_config", "params": {}}]'::json WHERE function_name='gw_fct_graphanalytics_mapzones';
 
 
 UPDATE config_toolbox SET inputparams='[
