@@ -2220,6 +2220,7 @@ def get_actions_from_json(json_result, sql):
             try:
                 function_name = action['funcName']
                 params = action['params']
+                params['json_result'] = json_result
                 getattr(tools_backend_calls, f"{function_name}")(**params)
             except AttributeError as e:
                 # If function_name not exist as python function

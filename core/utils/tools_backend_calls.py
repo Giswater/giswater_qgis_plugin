@@ -256,7 +256,7 @@ def manage_visit_class(**kwargs):
         if field['value']:
             table_view = tools_gw.add_tableview_header(table_view, field)
             table_view = tools_gw.fill_tableview_rows(table_view, field)
-        tools_qt.set_tableview_config(table_view)   
+        tools_qt.set_tableview_config(table_view)
 
 
 def open_selected_path(**kwargs):
@@ -456,6 +456,36 @@ def set_style_mapzones(**kwargs):
     """ Function called in def get_actions_from_json(...) --> getattr(tools_backend_calls, f"{function_name}")(**params) """
 
     tools_gw.set_style_mapzones()
+
+
+def get_graph_config(**kwargs):
+    """ A function to call gw_fct_getgraphconfig """
+    """ Function called in def get_actions_from_json(...) --> getattr(tools_backend_calls, f"{function_name}")(**params) """
+
+    json_result = kwargs.get('json_result')
+    if not json_result or json_result.get('status') != "Accepted":
+        msg = "Function get_graph_config error: json_result from last function is invalid"
+        tools_log.log_warning(msg)
+        return
+
+    has_conflicts = json_result['body']['data'].get('hasConflicts')
+    if not has_conflicts:
+        return
+
+    netscenario_id = json_result['body']['data'].get('netscenarioId')
+    context = "NETSCENARIO" if netscenario_id else "OPERATIVE"
+    mapzone_type = json_result['body']['data'].get('graphClass')
+    if not mapzone_type:
+        msg = "Function get_graph_config error: missing key 'graphClass'"
+        tools_log.log_warning(msg)
+        return
+    extras = f'"context":"{context}", "mapzone": "{mapzone_type}"'
+    body = tools_gw.create_body(extras=extras)
+    json_result = tools_gw.execute_procedure('gw_fct_getgraphconfig', body)
+    if json_result is None:
+        msg = "Function get_graph_config error: gw_fct_getgraphconfig returned null"
+        tools_log.log_warning(msg)
+        return
 
 
 def add_query_layer(**kwargs):
