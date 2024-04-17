@@ -122,9 +122,9 @@ BEGIN
 	-- profilactic nulls;
 	v_result := COALESCE(v_result, '{}');
 	IF v_result = '{}' THEN
-		v_result_point = '{"geometryType":"", "features":[]}';
+		v_result_point = '{"layerName": "Graphconfig", "geometryType":"", "features":[]}';
 	ELSE
-		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
+		v_result_point = concat ('{"layerName": "Graphconfig", "geometryType":"Point", "features":',v_result, '}');
 	END IF;
 
 	-- Return
