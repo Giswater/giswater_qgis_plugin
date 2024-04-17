@@ -135,6 +135,7 @@ v_query_gully text;
 v_query_link text;
 v_dscenario_valve text;
 v_netscenario text;
+v_has_conflicts boolean = false;
 
 BEGIN
 	-- Search path
@@ -1224,6 +1225,19 @@ BEGIN
 			group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
 			) row) features;
 
+			-- Execute the query and check if it returns any rows
+			SELECT EXISTS (
+				SELECT 1
+				FROM (
+					SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Conflict'::text as descript, the_geom
+					FROM temp_t_arc
+					JOIN temp_t_anlgraph USING (arc_id)
+					WHERE water = -1
+					GROUP BY (arc_id, arccat_id, state, expl_id, the_geom)
+					HAVING COUNT(arc_id) = 2
+				) sub_query
+			) INTO v_has_conflicts;
+
 			v_result := COALESCE(v_result, '{}');
 			v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
 		END IF;
@@ -1540,7 +1554,7 @@ BEGIN
 
 	--  Return
 	RETURN  gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
-             ',"body":{"form":{}, "data":{"graphClass": "'||v_class||'", "netscenarioId": "'||v_netscenario||'", "info":'||v_result_info||','||
+             ',"body":{"form":{}, "data":{"graphClass": "'||v_class||'", "netscenarioId": "'||v_netscenario||'", "hasConflicts": '||v_has_conflicts||', "info":'||v_result_info||','||
 					  '"point":'||v_result_point||','||
 					  '"line":'||v_result_line||','||
 					  '"polygon":'||v_result_polygon||'}'||'}}')::json, 2710, null, ('{"visible": ['||v_visible_layer||']}')::json, null)::json;
