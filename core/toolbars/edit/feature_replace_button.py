@@ -417,10 +417,10 @@ class GwFeatureReplaceButton(GwMaptool):
             return
 
         # Ask question before executing
-        message = "Are you sure you want to replace selected feature with a new one?"
+        message = f"Are you sure you want to replace selected feature with a new one?\n " \
+                  f"If you have different addfields in your feature, they will be deleted."
         answer = tools_qt.show_question(message, "Replace feature")
         if answer:
-
             # Get function input parameters
             feature = f'"type":"{self.feature_type}"'
             extras = f'"old_feature_id":"{self.feature_id}"'
