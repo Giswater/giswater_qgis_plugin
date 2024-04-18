@@ -49,6 +49,7 @@ v_man_table text;
 v_error_context text;
 v_count integer;
 v_related_id text;
+v_feature_childtable_name text;
 
 BEGIN
 
@@ -279,9 +280,11 @@ BEGIN
 	END IF;
 
  	--delete addfields values
- 	EXECUTE 'DELETE FROM man_addfields_value WHERE feature_id ='''||v_feature_id||'''and parameter_id in (SELECT id FROM sys_addfields
- 	WHERE cat_feature_id IS NULL OR cat_feature_id = '''||v_featurecat||''' )';
+	v_feature_childtable_name := 'man_' || v_feature_type || '_' || lower(v_featurecat);
 
+	EXECUTE 'DELETE FROM '||v_feature_childtable_name||' WHERE '||concat(v_feature_type,'_id')||'='||quote_literal(v_feature_id)||';'; 
+
+	
  	UPDATE config_param_user SET value = 'FALSE' WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user;
 
  	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 

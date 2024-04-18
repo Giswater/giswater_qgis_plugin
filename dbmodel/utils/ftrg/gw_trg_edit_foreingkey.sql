@@ -17,7 +17,7 @@ v_featurenew varchar;
 v_featureold varchar;
 v_projecttype text;
 v_count integer;
-    
+
 BEGIN
     
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -48,45 +48,40 @@ BEGIN
 
 	  ELSE
 
-			-- get project type
-			SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
+		-- get project type
+		SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 			
-		  IF TG_OP ='UPDATE' THEN
+		IF TG_OP ='UPDATE' THEN
+
+			IF v_featurefield='node_id' THEN
+				v_featurenew:= NEW.node_id;
+				v_featureold:= OLD.node_id;	
+			ELSIF v_featurefield='arc_id' THEN
+				v_featurenew:= NEW.arc_id;
+				v_featureold:= OLD.arc_id;
+			ELSIF v_featurefield='connec_id' THEN
+				v_featurenew:= NEW.connec_id;
+				v_featureold:= OLD.connec_id;
+			ELSIF v_featurefield='gully_id' THEN
+				v_featurenew:= NEW.gully_id;
+				v_featureold:= OLD.gully_id;
+			END IF;
 			
-				IF v_featurefield='node_id' THEN
-					v_featurenew:= NEW.node_id;
-					v_featureold:= OLD.node_id;	
-				ELSIF v_featurefield='arc_id' THEN
-					v_featurenew:= NEW.arc_id;
-					v_featureold:= OLD.arc_id;
-				ELSIF v_featurefield='connec_id' THEN
-					v_featurenew:= NEW.connec_id;
-					v_featureold:= OLD.connec_id;
-				ELSIF v_featurefield='gully_id' THEN
-					v_featurenew:= NEW.gully_id;
-					v_featureold:= OLD.gully_id;
-				END IF;
-				
 
-				-- man_addfields_value
-		    UPDATE man_addfields_value SET feature_id=v_featurenew  WHERE feature_id=v_featureold;
+		ELSIF TG_OP ='DELETE' THEN
 
-				
-		  ELSIF TG_OP ='DELETE' THEN
+			IF v_featurefield='NODE' THEN
+				v_featureold:= OLD.node_id;	
+			ELSIF v_featurefield='ARC' THEN
+				v_featureold:= OLD.arc_id;
+			ELSIF v_featurefield='CONNEC' THEN
+				v_featureold:= OLD.connec_id;
+			ELSIF v_featurefield='GULLY' THEN
+				v_featureold:= OLD.gully_id;
+			END IF;
 
-		    IF v_featurefield='NODE' THEN
-					v_featureold:= OLD.node_id;	
-				ELSIF v_featurefield='ARC' THEN
-					v_featureold:= OLD.arc_id;
-				ELSIF v_featurefield='CONNEC' THEN
-					v_featureold:= OLD.connec_id;
-				ELSIF v_featurefield='GULLY' THEN
-					v_featureold:= OLD.gully_id;
-				END IF;
-		    
-				DELETE FROM man_addfields_value WHERE feature_id=v_featureold;			
 
-		  END IF;
+		END IF;
 
 	
 	  END IF;
