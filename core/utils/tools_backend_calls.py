@@ -209,10 +209,9 @@ def manage_visit_class(**kwargs):
     field_id = str(complet_result['body']['feature']['idName'])
 
     current_visit_class = tools_gw.get_values(dialog, widget)
-    print(F"current_visit_class -> {current_visit_class[columnname]}")
     if current_visit_class[columnname] is None:
         return
-    sql = (f"SELECT ui_tablename FROM config_visit_class where id = {current_visit_class[columnname]}")
+    sql = f"SELECT ui_tablename FROM config_visit_class where id = {current_visit_class[columnname]}"
     ui_tablename = tools_db.get_row(sql)
     table_view = dialog.findChildren(QTableView)
     if table_view in (None, []):
