@@ -602,9 +602,13 @@ def get_uri():
             global_vars.dao_db_credentials['db'], global_vars.dao_db_credentials['user'],
             global_vars.dao_db_credentials['password'])
     else:
-        uri.setConnection(global_vars.dao_db_credentials['host'], global_vars.dao_db_credentials['port'],
-            global_vars.dao_db_credentials['db'], global_vars.dao_db_credentials['user'],
-            global_vars.dao_db_credentials['password'])
+        if tools_os.set_boolean(global_vars.project_vars['store_credentials'], default=True):
+            uri.setConnection(global_vars.dao_db_credentials['host'], global_vars.dao_db_credentials['port'],
+                global_vars.dao_db_credentials['db'], global_vars.dao_db_credentials['user'],
+                global_vars.dao_db_credentials['password'])
+        else:
+            uri.setConnection(global_vars.dao_db_credentials['host'], global_vars.dao_db_credentials['port'],
+                              global_vars.dao_db_credentials['db'], '', '')
 
     return uri
 

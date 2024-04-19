@@ -47220,6 +47220,7 @@ LEFT JOIN sample_epanet.connec ON (((connec.connec_id)::text = (link.connec_id):
         <value>gwProjectRole</value>
         <value>gwProjectType</value>
         <value>svg_path</value>
+        <value>gwStoreCredentials</value>
       </variableNames>
       <variableValues type="QStringList">
         <value></value>
@@ -47228,6 +47229,7 @@ LEFT JOIN sample_epanet.connec ON (((connec.connec_id)::text = (link.connec_id):
         <value>role_admin</value>
         <value>ws</value>
         <value>C:/Users/usuario/AppData/Roaming/QGIS/QGIS3\profiles\default/python/plugins\giswater\svg</value>
+        <value>__STORECREDENTIALS__</value>
       </variableValues>
     </Variables>
     <WCSLayers type="QStringList"/>

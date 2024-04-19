@@ -51,6 +51,7 @@ project_vars['add_schema'] = None       # gwAddSchema
 project_vars['main_schema'] = None      # gwMainSchema
 project_vars['project_role'] = None     # gwProjectRole
 project_vars['project_type'] = None     # gwProjectType
+project_vars['store_credentials'] = None  # gwStoreCredentials
 use_gw_snapping = True                  # Parameter from config_param_system, if false Giswater will not manage snapping configuration
 load_project_menu = None
 # endregion

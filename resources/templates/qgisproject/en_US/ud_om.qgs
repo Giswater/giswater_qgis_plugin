@@ -23323,6 +23323,7 @@ def my_form_open(dialog, layer, feature):
         <value>gwMainSchema</value>
         <value>gwProjectRole</value>
         <value>gwProjectType</value>
+        <value>gwStoreCredentials</value>
       </variableNames>
       <variableValues type="QStringList">
         <value></value>
@@ -23330,6 +23331,7 @@ def my_form_open(dialog, layer, feature):
         <value></value>
         <value>role_admin</value>
         <value>ud</value>
+        <value>__STORECREDENTIALS__</value>
       </variableValues>
     </Variables>
     <WCSLayers type="QStringList"/>
