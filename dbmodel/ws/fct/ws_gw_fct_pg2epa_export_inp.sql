@@ -687,8 +687,8 @@ BEGIN
 			' ',rpad(coalesce(csv6,''),20),' ', rpad(coalesce(csv7,''),20),' ',rpad(coalesce(csv8,''),20),' ',rpad(coalesce(csv9,''),500))
 			from temp_t_csv where fid  = 141 and cur_user = current_user and source in ('vi_t_pipes')
 		union
-			select id, concat(rpad(csv1,21),rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),20),' ',rpad(coalesce(csv5,''),20),
-			' ',rpad(coalesce(csv6,''),20),' ', rpad(coalesce(csv7,''),20),' ',rpad(coalesce(csv8,''),500))
+			select id, concat(rpad(csv1,21),rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),22),' ',rpad(coalesce(csv5,''),22),
+			' ',rpad(coalesce(csv6,''),22),' ', rpad(coalesce(csv7,''),22),' ',rpad(coalesce(csv8,''),500))
 			from temp_t_csv where fid  = 141 and cur_user = current_user and source in ('vi_t_pumps')
 		union
 			select id, concat(rpad(csv1,21),rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),20),' ',rpad(coalesce(csv5,''),20),
