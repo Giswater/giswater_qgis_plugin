@@ -87,7 +87,7 @@ class GwAdminButton:
         settings = QSettings()
         settings.beginGroup(f"PostgreSQL/connections/{default_connection}")
         self.is_service = settings.value('service')
-        if not connection_status and not self.is_service:
+        if not connection_status:
             self._create_credentials_form(set_connection=default_connection)
             return
 
@@ -1574,7 +1574,7 @@ class GwAdminButton:
             self.project_language = last_dict_info['project_language']
             project_date_create = first_dict_info['project_date'].strftime('%d-%m-%Y %H:%M:%S')
             project_date_update = last_dict_info['project_date'].strftime('%d-%m-%Y %H:%M:%S')
-            if project_date_create == project_date_update: 
+            if project_date_create == project_date_update:
                 project_date_update = ''
             msg = (f'Database version: {self.postgresql_version}\n'
                    f'PostGis version: {self.postgis_version}\n \n'
