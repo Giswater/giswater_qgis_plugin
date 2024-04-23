@@ -1434,7 +1434,7 @@ class GwPsector:
                                 'price_geom_ep_canvasClicked_set_price_geom')
 
 
-    def _set_price_geom(self, dialog, tableright, point, button):
+    def _set_price_geom(self, dialog, tableright, point: QgsPointXY, button):
         """ Add clicked geom to the_geom column for selected prices """
 
         if button == Qt.RightButton or point is None:
@@ -1453,8 +1453,8 @@ class GwPsector:
         if len(selected_ids) != 1:
             return
         # Set the_geom
-        the_geom = point.asWkt()
-        sql = f"UPDATE {tableright} SET the_geom = $${the_geom}$$ WHERE id = {selected_ids[0]};"
+        the_geom = f"ST_SetSRID(ST_Point({point.x()},{point.y()}), {lib_vars.project_epsg})"
+        sql = f"UPDATE {tableright} SET the_geom = {the_geom} WHERE id = {selected_ids[0]};"
         status = tools_db.execute_sql(sql)
         if status:
             global_vars.canvas.setMapTool(self.previous_map_tool)
@@ -1890,7 +1890,7 @@ class GwPsector:
 
         # Open form
         self.master_new_psector(psector_id)
-        
+
         # Refresh canvas
         tools_qgis.refresh_map_canvas()
 
