@@ -3567,6 +3567,24 @@ def refresh_selectors(tab_name=None):
             pass
 
 
+def execute_class_function(dlg_class, func_name: str, kwargs: dict = None):
+    """ Executes a class' function (if the corresponding dialog is open) """
+
+    # Get the dialog if it's open
+    windows = [x for x in QApplication.allWidgets() if getattr(x, "isVisible", False)
+               and (issubclass(type(x), dlg_class))]
+
+    if windows:
+        try:
+            if kwargs is None:
+                kwargs = {}
+            dialog = windows[0]
+            class_obj = dialog.property('class_obj')
+            getattr(class_obj, func_name)(**kwargs)
+        except Exception as e:
+            tools_log.log_debug(f"Exception in tools_gw.execute_class_function (executing {func_name} from {dlg_class.__name__}): {e}")
+
+
 def is_epa_world_active(default=False):
     return epa_world_button.is_epa_world_active(default)
 
