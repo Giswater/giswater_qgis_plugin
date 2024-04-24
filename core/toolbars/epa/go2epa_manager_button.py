@@ -45,6 +45,7 @@ class GwGo2EpaManagerButton(GwAction):
         self.dlg_manager.txt_result_id.setValidator(QRegExpValidator(reg_exp))
         self.dlg_manager.txt_infolog.setReadOnly(True)
         self.dlg_manager.btn_set_corporate.setEnabled(False)
+        self.dlg_manager.btn_archive.setEnabled(False)
         if self.project_type != 'ws':
             self.dlg_manager.btn_set_corporate.setVisible(False)
             self.dlg_manager.btn_archive.setVisible(False)
@@ -66,7 +67,7 @@ class GwGo2EpaManagerButton(GwAction):
                                                             'v_ui_rpt_cat_result', 'result_id'))
         selection_model = self.dlg_manager.tbl_rpt_cat_result.selectionModel()
         selection_model.selectionChanged.connect(partial(self._fill_txt_infolog))
-        selection_model.selectionChanged.connect(partial(self._enable_btn_corporate))
+        selection_model.selectionChanged.connect(partial(self._enable_buttons))
         self.dlg_manager.tbl_rpt_cat_result.doubleClicked.connect(partial(self._set_result_id, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
         self.dlg_manager.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_manager))
         self.dlg_manager.rejected.connect(partial(tools_gw.close_dialog, self.dlg_manager))
@@ -195,19 +196,24 @@ class GwGo2EpaManagerButton(GwAction):
         tools_qt.set_widget_text(self.dlg_manager, 'txt_infolog', msg)
 
 
-    def _enable_btn_corporate(self, selected):
-        valid = True
+    def _enable_buttons(self, selected):
+        set_corporate_enabled, archive_enabled = True, True
         selected_rows = self.dlg_manager.tbl_rpt_cat_result.selectionModel().selectedRows()
         for idx, index in enumerate(selected_rows):
             col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'rpt_stats')
             row = index.row()
             status = index.sibling(row, col_idx).data()
             if not status:
-                valid = False
+                set_corporate_enabled = False
+            col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'status')
+            status = index.sibling(row, col_idx).data()
+            if status != 'COMPLETED':
+                archive_enabled = False
 
         if not selected_rows:
-            valid = False
-        self.dlg_manager.btn_set_corporate.setEnabled(valid)
+            set_corporate_enabled, archive_enabled = False, False
+        self.dlg_manager.btn_set_corporate.setEnabled(set_corporate_enabled)
+        self.dlg_manager.btn_archive.setEnabled(archive_enabled)
 
 
     def _fill_combo_result_id(self):
