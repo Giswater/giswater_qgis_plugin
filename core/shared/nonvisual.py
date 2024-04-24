@@ -648,6 +648,8 @@ class GwNonVisual:
         if rows:
             tools_qt.fill_combo_values(cmb_expl_id, rows, add_empty=True)
 
+        self.dialog.txt_curve_id.setMaxLength(16)
+
         # Create & fill cmb_curve_type
         curve_type_headers, curve_type_list = self._create_curve_type_lists()
         tools_qt.fill_combo_values(cmb_curve_type, curve_type_list)
