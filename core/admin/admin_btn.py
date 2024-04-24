@@ -87,7 +87,7 @@ class GwAdminButton:
         settings = QSettings()
         settings.beginGroup(f"PostgreSQL/connections/{default_connection}")
         self.is_service = settings.value('service')
-        if not connection_status:
+        if not connection_status and not self.is_service:
             self._create_credentials_form(set_connection=default_connection)
             return
 
