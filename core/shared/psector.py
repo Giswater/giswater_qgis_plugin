@@ -68,6 +68,7 @@ class GwPsector:
 
         # Create the dialog and signals
         self.dlg_plan_psector = GwPsectorUi()
+        self.dlg_plan_psector.setProperty('class_obj', self)
         tools_gw.load_settings(self.dlg_plan_psector)
 
         # Manage btn toggle

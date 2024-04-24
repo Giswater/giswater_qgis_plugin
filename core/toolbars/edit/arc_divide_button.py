@@ -13,7 +13,7 @@ from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 
 from ..maptool import GwMaptool
-from ...ui.ui_manager import GwDialogTextUi
+from ...ui.ui_manager import GwDialogTextUi, GwPsectorUi
 from ...utils import tools_gw
 from ....libs import lib_vars, tools_qt, tools_qgis, tools_db, tools_os
 
@@ -321,6 +321,9 @@ class GwArcDivideButton(GwMaptool):
             tools_qgis.set_layer_index('v_edit_connec')
             tools_qgis.set_layer_index('v_edit_gully')
             tools_qgis.set_layer_index('v_edit_node')
+
+            # Refresh psector's relations tables
+            tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')
 
         return True, answer
 

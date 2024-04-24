@@ -10,7 +10,7 @@ from functools import partial
 from qgis.PyQt.QtCore import Qt, QDate
 
 from ..maptool import GwMaptool
-from ...ui.ui_manager import GwArcFusionUi
+from ...ui.ui_manager import GwArcFusionUi, GwPsectorUi
 from ...utils import tools_gw
 from ....libs import tools_qt, tools_db, tools_qgis, tools_os
 
@@ -96,6 +96,9 @@ class GwArcFusionButton(GwMaptool):
             self.dlg_fusion.close()
 
         self.refresh_map_canvas()
+
+        # Refresh psector's relations tables
+        tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')
 
         # Check in init config file if user wants to keep map tool active or not
         self.manage_active_maptool()

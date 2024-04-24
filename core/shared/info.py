@@ -37,7 +37,7 @@ from ..threads.toggle_valve_state import GwToggleValveTask
 
 from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, \
-    GwInfoCrossectUi, GwInterpolate
+    GwInfoCrossectUi, GwInterpolate, GwPsectorUi
 # WARNING: DO NOT REMOVE THESE IMPORTS, THEY ARE USED BY EPA ACTIONS
 # noinspection PyUnresolvedReferences
 from ..ui.ui_manager import GwInfoEpaDemandUi, GwInfoEpaOrificeUi, GwInfoEpaOutletUi, GwInfoEpaPumpUi, \
@@ -936,7 +936,7 @@ class GwInfo(QObject):
 
     def action_open_link(self):
         """ Manage def open_file from action 'Open Link' """
-        
+
         try:
             widget_list = self.dlg_cf.findChildren(tools_qt.GwHyperLinkLabel)
             for widget in widget_list:
@@ -1088,7 +1088,7 @@ class GwInfo(QObject):
             tools_gw.load_settings(dlg_interpolate)
         else:
             dlg_interpolate = refresh_dialog
-        
+
         self.ep = ep
 
         # Manage QRadioButton interpolate/extrapolate
@@ -1825,6 +1825,8 @@ class GwInfo(QObject):
                 is_inserting = False
                 my_json = json.dumps(_json)
                 if my_json == '' or str(my_json) == '{}':
+                    # Refresh psector's relations tables
+                    tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')
                     if close_dlg:
                         if lib_vars.session_vars['dialog_docker'] and dialog == lib_vars.session_vars['dialog_docker'].widget():
                             tools_gw.close_docker()
@@ -1920,6 +1922,8 @@ class GwInfo(QObject):
         # Force a map refresh
         tools_qgis.refresh_map_canvas()  # First refresh all the layers
         global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
+        # Refresh psector's relations tables
+        tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')
 
         if close_dlg:
             if lib_vars.session_vars['dialog_docker'] and dialog == lib_vars.session_vars['dialog_docker'].widget():
@@ -2100,7 +2104,7 @@ class GwInfo(QObject):
 
 
     def _accept_auto_update(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True, new_feature=None, generic=False):
-            
+
         """
         :param dialog:
         :param complet_result:
@@ -2114,7 +2118,7 @@ class GwInfo(QObject):
         # Manage change epa_type message
         if _json.get('epa_type'):
 
-            widget_epatype = dialog.findChild(QComboBox, 'tab_data_epa_type')        
+            widget_epatype = dialog.findChild(QComboBox, 'tab_data_epa_type')
             message = "You are going to change the epa_type. With this operation you will lose information about " \
                         "current epa_type values of this object. Would you like to continue?"
             title = "Change epa_type"
@@ -3531,7 +3535,7 @@ def refresh_epa_tbl(tblview, dlg, **kwargs):
         tbl = tableview['tbl']
         tbl = dlg.findChild(QTableView, tbl)
         if not tbl:
-            continue    
+            continue
         if tbl != tblview:
             continue
         id_name = tableview.get('id_name', id_name)
