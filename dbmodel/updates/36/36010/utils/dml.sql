@@ -413,3 +413,8 @@ UPDATE config_form_fields SET linkedobject=NULL WHERE formname='connec' AND form
 
 UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM config_visit_class WHERE feature_type IN (''NODE'',''ALL'') ', isfilter=false, dv_isnullvalue=false, widgetfunction='{"functionName": "manage_visit_class","parameters": {}}'::json WHERE formname='node' AND formtype='form_feature' AND columnname='visit_class' AND tabname='tab_visit';
 UPDATE config_form_fields SET linkedobject=NULL WHERE formname='node' AND formtype='form_feature' AND columnname='tbl_visits' AND tabname='tab_visit';
+
+
+-- 25/04/2024
+DELETE FROM sys_foreignkey WHERE id = 75;
+DELETE FROM sys_foreignkey WHERE id = 78;
