@@ -694,9 +694,6 @@ UPDATE config_form_fields SET layoutname = 'lyt_data_2',  layoutorder = 40 where
 UPDATE config_form_fields SET layoutname = 'lyt_data_2' , layoutorder = 40 where columnname ='workcat_id_end' AND formname LIKE '%_gully_%';
 UPDATE config_form_fields SET layoutname = 'lyt_data_2' , layoutorder = 40 where columnname ='workcat_id_end' AND formname LIKE '%_arc_%';
 
-UPDATE config_form_fields SET  hidden = true where columnname = 'z1';
-UPDATE config_form_fields SET  hidden = true where columnname = 'z2';
-UPDATE config_form_fields SET  hidden = true where columnname = 'cat_geom2' AND formname LIKE '%_arc_%';
 UPDATE config_form_fields SET  hidden = true where columnname = 'cat_shape' AND formname LIKE '%_arc_%';
 UPDATE config_form_fields SET  hidden = true where columnname = 'soilcat_id' AND formname LIKE '%_arc_%';
 
