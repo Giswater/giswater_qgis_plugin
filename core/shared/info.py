@@ -72,7 +72,7 @@ class GwInfo(QObject):
         self.rubber_band = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.PointGeometry)
         self.snapper_manager = GwSnapManager(self.iface)
         self.snapper_manager.set_snapping_layers()
-        self.suppres_form = None
+        self.conf_supp = None
         self.prev_action = None
 
 
@@ -310,12 +310,10 @@ class GwInfo(QObject):
             # be inserted. This disconnect signal avoids it
             tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
 
-            self.suppres_form = QSettings().value("/Qgis/digitizing/disable_enter_attribute_values_dialog")
-            QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
             config = self.info_layer.editFormConfig()
             self.conf_supp = config.suppress()
             if Qgis.QGIS_VERSION_INT >= 33200:
-                config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.Default)
+                config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.SuppressOn)
             else:
                 config.setSuppress(0)
             self.info_layer.setEditFormConfig(config)
@@ -3189,7 +3187,6 @@ class GwInfo(QObject):
                                                                layer_new_feature=self.info_layer, tab_type='data')
 
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
-        QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
         config = self.info_layer.editFormConfig()
         config.setSuppress(self.conf_supp)
         self.info_layer.setEditFormConfig(config)
