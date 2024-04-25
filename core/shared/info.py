@@ -315,7 +315,7 @@ class GwInfo(QObject):
             if Qgis.QGIS_VERSION_INT >= 33200:
                 config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.SuppressOn)
             else:
-                config.setSuppress(0)
+                config.setSuppress(1)
             self.info_layer.setEditFormConfig(config)
             self.iface.setActiveLayer(self.info_layer)
             self.info_layer.startEditing()
