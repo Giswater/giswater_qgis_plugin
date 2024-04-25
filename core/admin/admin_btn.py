@@ -351,6 +351,43 @@ class GwAdminButton:
             QgsApplication.taskManager().triggerTask(self.task_update_schema)
 
 
+    def load_updates(self, project_type=None, update_changelog=False, schema_name=None, dict_update_folders=None):
+        """"""
+
+        # Get current schema selected
+        if schema_name is None:
+            schema_name = self._get_schema_name()
+
+        self.schema = schema_name
+        self.locale = self.project_language
+
+        self.task1 = GwTask('Manage schema')
+        QgsApplication.taskManager().addTask(self.task1)
+        self.task1.setProgress(0)
+        status = self._load_fct_ftrg()
+        self.task1.setProgress(20)
+        self.task1.setProgress(40)
+        if status:
+            status = self.update_dict_folders(False, project_type=project_type, dict_update_folders=dict_update_folders)
+        self.task1.setProgress(60)
+        if status:
+            status = self.execute_last_process(schema_name=schema_name, locale=True)
+        self.task1.setProgress(100)
+
+        if update_changelog is False:
+            status = (self.error_count == 0)
+            self._manage_result_message(status, parameter="Load updates")
+            if status:
+                tools_db.dao.commit()
+            else:
+                tools_db.dao.rollback()
+
+            # Reset count error variable to 0
+            self.error_count = 0
+
+        return status
+
+
     def init_dialog_create_project(self, project_type=None):
         """ Initialize dialog (only once) """
 
@@ -1203,11 +1240,6 @@ class GwAdminButton:
         """"""
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         return schema_name
-
-
-    def _reload_fct_ftrg(self):
-        """"""
-        self._load_fct_ftrg()
 
 
     def _load_fct_ftrg(self):
