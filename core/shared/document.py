@@ -63,7 +63,7 @@ class GwDocument(QObject):
 
         # Setting layers
         self.layers = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
-        
+
         self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
         self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
         self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
@@ -175,6 +175,7 @@ class GwDocument(QObject):
 
         # Create the dialog
         self.dlg_man = GwDocManagerUi()
+        self.dlg_man.setProperty('class_obj', self)
         tools_gw.load_settings(self.dlg_man)
         self.dlg_man.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
         tools_qt.set_tableview_config(self.dlg_man.tbl_document)
@@ -208,6 +209,15 @@ class GwDocument(QObject):
 
     def open_document_dialog(self):
         self.get_document()
+
+
+    def _refresh_manager_table(self):
+        try:
+            if getattr(self, 'dlg_man') and self.dlg_man:
+                self.dlg_man.tbl_document.model().select()
+        except:
+            pass
+
 
     def _fill_combo_doc_type(self, widget):
         """ Executes query and fill combo box """
@@ -313,6 +323,9 @@ class GwDocument(QObject):
                         else:
                             sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file)
                             self._update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
+
+        # Refresh manager table
+        tools_gw.execute_class_function(GwDocManagerUi, '_refresh_manager_table')
 
 
     def _insert_doc_sql(self, doc_type, observ, date, path):
