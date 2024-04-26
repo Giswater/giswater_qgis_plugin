@@ -1180,6 +1180,8 @@ class GwNonVisual:
         # Create plot widget
         plot_widget = self._create_plot_widget(self.dialog)
 
+        self.dialog.txt_pattern_id.setMaxLength(16)
+
         # Populate combobox
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id > 0"
         rows = tools_db.get_rows(sql)
@@ -1468,6 +1470,8 @@ class GwNonVisual:
 
         # Create plot widget
         plot_widget = self._create_plot_widget(self.dialog)
+
+        self.dialog.txt_pattern_id.setMaxLength(16)
 
         # Populate combobox
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id > 0"
@@ -2049,6 +2053,8 @@ class GwNonVisual:
         # Copy values from clipboard
         paste_shortcut = QShortcut(QKeySequence.Paste, tbl_timeseries_value)
         paste_shortcut.activated.connect(partial(self._paste_timeseries_values, tbl_timeseries_value))
+
+        self.dialog.txt_id.setMaxLength(16)
 
         # Populate combobox
         self._populate_timeser_combos(cmb_expl_id, cmb_times_type, cmb_timeser_type)
