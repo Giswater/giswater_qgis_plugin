@@ -71,7 +71,7 @@ BEGIN
                     id BIGSERIAL PRIMARY KEY,
                     '|| lower(rec_sa.feature_type) || '_id varchar(16),
                     ' || rec_sa.param_name || ' text,
-                    CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.feature_type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.feature_type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.feature_type) || '('|| lower(rec_sa.feature_type) || '_id),
+                    CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.feature_type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.feature_type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.feature_type) || '('|| lower(rec_sa.feature_type) || '_id) ON DELETE CASCADE ,
                     CONSTRAINT ' || v_feature_childtable_name || '_unique UNIQUE ('|| lower(rec_sa.feature_type) ||'_id)
                 )';
 
