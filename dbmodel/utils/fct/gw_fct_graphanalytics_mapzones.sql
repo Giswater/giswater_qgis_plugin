@@ -1321,16 +1321,9 @@ BEGIN
 			) AS feature
 			FROM 
 			(SELECT * FROM 
-			(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, ''0'' as mapzone_id, the_geom, ''Disconnected''::text as descript  FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0 
-			group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
-			UNION
-			SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, NULL as mapzone_id, the_geom, ''Conflict''::text as descript FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id) WHERE water = -1 
-			group by (arc_id, arccat_id, state, expl_id, the_geom) having count(arc_id)=2
-			) a 
-			UNION
-			SELECT DISTINCT ON (arc_id) arc_id, arccat_id, t.state, t.expl_id, t.'||v_field||'::TEXT as mapzone_id, t.the_geom, m.name as descript FROM temp_t_arc t 
+			(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, t.state, t.expl_id, t.'||v_field||'::TEXT as mapzone_id, t.the_geom, m.name as descript FROM temp_t_arc t 
 			JOIN '||v_table||' m USING ('||v_field||') WHERE '||v_field||'::integer IN ('||v_floodonlymapzone||')
-			) row ) features'
+			)) row ) features'
 			INTO v_result;
 		END IF;
 
