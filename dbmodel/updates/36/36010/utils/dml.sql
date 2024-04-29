@@ -974,3 +974,8 @@ UPDATE config_function
 UPDATE config_function
 	SET "style"='{"style":{"point":{"style":"qml","id":"211"},"line":{"style":"qml","id":"210"}}}'::json, layermanager=NULL
 	WHERE id=2218;
+    
+INSERT INTO sys_message
+(id, error_message, hint_message, log_level, show_user, project_type, "source")
+VALUES(3260, 'No arc exists with a smaller diameter than the maximum configuered on edit_link_check_arcdnom:',
+'Please check the configured value', 2, true, 'utils', 'core');

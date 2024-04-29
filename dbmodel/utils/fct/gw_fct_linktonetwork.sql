@@ -140,6 +140,14 @@ BEGIN
 	--profilactic values
 	IF v_forceendpoint IS NULL THEN v_forceendpoint = FALSE; END IF;
 
+	--control v_check_arcdnom status and value
+	IF v_projecttype = 'WS' AND v_check_arcdnom_status IS TRUE THEN	
+		IF v_check_arcdnom <= (SELECT min(cat_dnom::integer) FROM vu_arc) THEN
+	        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	        "data":{"message":"3260", "function":"3188","debug_msg":'||v_check_arcdnom||', "is_process":true}}$$);';
+		END IF;
+	END IF;
+
 	-- create query text for forced arcs
 	IF v_forcedarcs IS NULL THEN
 		v_forcedarcs= '';
