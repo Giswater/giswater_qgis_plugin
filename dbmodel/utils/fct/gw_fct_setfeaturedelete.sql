@@ -50,10 +50,12 @@ v_error_context text;
 v_count integer;
 v_related_id text;
 v_feature_childtable_name text;
+v_schemaname text;
 
 BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname = 'SCHEMA_NAME';
 
 	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 	
@@ -282,8 +284,9 @@ BEGIN
  	--delete addfields values
 	v_feature_childtable_name := 'man_' || v_feature_type || '_' || lower(v_featurecat);
 
-	EXECUTE 'DELETE FROM '||v_feature_childtable_name||' WHERE '||concat(v_feature_type,'_id')||'='||quote_literal(v_feature_id)||';'; 
-
+	IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = '"SCHEMA_NAME"' AND table_name = v_feature_childtable_name)) IS TRUE THEN
+        EXECUTE 'DELETE FROM '||v_feature_childtable_name||' WHERE '||concat(v_feature_type,'_id')||'='||quote_literal(v_feature_id)||';'; 
+    END IF; 
 	
  	UPDATE config_param_user SET value = 'FALSE' WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user;
 
