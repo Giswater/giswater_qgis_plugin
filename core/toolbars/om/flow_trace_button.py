@@ -89,9 +89,9 @@ class GwFlowTraceButton(GwMaptool):
     def deactivate(self):
 
         # Remove temporal layers
-        tools_qgis.remove_layer_from_toc("Flowtrace node", "GW Temporal Layers")
-        tools_qgis.remove_layer_from_toc("Flowtrace arc", "GW Temporal Layers")
-        tools_qgis.clean_layer_group_from_toc("GW Temporal Layers")
+        # tools_qgis.remove_layer_from_toc("Flowtrace node", "GW Temporal Layers")
+        # tools_qgis.remove_layer_from_toc("Flowtrace arc", "GW Temporal Layers")
+        # tools_qgis.clean_layer_group_from_toc("GW Temporal Layers")
 
         super().deactivate()
 
