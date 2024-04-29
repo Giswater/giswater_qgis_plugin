@@ -105,6 +105,11 @@ BEGIN
 			v_matfromcat = true;
 		END IF;
 		
+		-- managing gully_type
+		IF NEW.gully_type IS NULL THEN
+			RAISE EXCEPTION 'The column gully_type is mandatory. Please check your cat_feature_gully and choose one';
+		END IF;
+		
 		--check if feature is double geom	
 		EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
 		FROM cat_feature_gully WHERE id='||quote_literal(NEW.gully_type)||''
