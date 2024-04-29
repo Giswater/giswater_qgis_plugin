@@ -1800,5 +1800,6 @@ INSERT INTO config_param_system VALUES ('epa_automatic_man2graph_values','{"stat
 'GRAPH auto update mapzone tables:','','',TRUE, 14,'utils',null,null,'json','text',null,TRUE,null,null,null,null,null,
 '{"status":false}','lyt_admin_other');
 
-
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_value_status_shortpipe', 'OPEN', 'OPEN', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_value_status_shortpipe', 'CLOSED', 'CLOSED', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
