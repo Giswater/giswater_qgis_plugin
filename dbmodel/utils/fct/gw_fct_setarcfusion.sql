@@ -75,12 +75,14 @@ rec_addfield1 record;
 rec_addfield2 record;
 v_fid integer = 214;
 v_result_id text= 'arc fusion';
+v_schemaname text;
 
 
 BEGIN
 
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname = 'SCHEMA_NAME';
 
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
@@ -167,9 +169,17 @@ BEGIN
 				v_arc_geom := ST_MakeLine(v_point_array2);
 
 				SELECT * INTO v_new_record FROM arc WHERE arc_id = v_record1.arc_id;
-				v_sql := 'SELECT arctype_id FROM cat_arc WHERE id = '''||v_new_record.arccat_id||''';';
-				EXECUTE v_sql
-				INTO v_arc_type;
+
+				-- Get arctype
+				IF v_project_type = 'UD' THEN
+				    v_sql := 'SELECT arc_type FROM cat_arc WHERE id = '''||v_new_record.arccat_id||''';';
+					EXECUTE v_sql
+					INTO v_arc_type;
+				ELSIF v_project_type = 'WS' THEN
+                	v_sql := 'SELECT arctype_id FROM cat_arc WHERE id = '''||v_new_record.arccat_id||''';';
+					EXECUTE v_sql
+					INTO v_arc_type;
+				END IF;
 
 
 				-- Create a new arc values
@@ -207,70 +217,72 @@ BEGIN
 
 				v_arc_childtable_name := 'man_arc_' || lower(v_arc_type);
 
-				EXECUTE 'INSERT INTO '||v_arc_childtable_name||' (arc_id) VALUES ('''||v_new_record.arc_id||''');';
+				IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = v_schemaname AND table_name = v_arc_childtable_name)) IS TRUE THEN
+					EXECUTE 'INSERT INTO '||v_arc_childtable_name||' (arc_id) VALUES ('''||v_new_record.arc_id||''');';
 
-				v_sql := 'SELECT column_name FROM information_schema.columns 
-						WHERE table_schema = ''SCHEMA_NAME'' 
-						AND table_name = '''||v_arc_childtable_name||''' 
-						AND column_name !=''id'' AND column_name != ''arc_id'' ;';
+					v_sql := 'SELECT column_name FROM information_schema.columns 
+							WHERE table_schema = ''SCHEMA_NAME'' 
+							AND table_name = '''||v_arc_childtable_name||''' 
+							AND column_name !=''id'' AND column_name != ''arc_id'' ;';
 
-				FOR rec_addfields IN EXECUTE v_sql
-				LOOP
+					FOR rec_addfields IN EXECUTE v_sql
+					LOOP
 
-					--Compare addfields and assign them to new arc
-					EXECUTE 'SELECT ' || rec_addfields.column_name || ' FROM '||v_arc_childtable_name||' WHERE arc_id = '''||v_record1.arc_id||''' ;'
-					INTO rec_addfield1;
+						--Compare addfields and assign them to new arc
+						EXECUTE 'SELECT ' || rec_addfields.column_name || ' FROM '||v_arc_childtable_name||' WHERE arc_id = '''||v_record1.arc_id||''' ;'
+						INTO rec_addfield1;
 
-					EXECUTE 'SELECT ' || rec_addfields.column_name || ' FROM '||v_arc_childtable_name||' WHERE arc_id = ''' ||v_record2.arc_id||''' ;'
-					INTO rec_addfield2;
+						EXECUTE 'SELECT ' || rec_addfields.column_name || ' FROM '||v_arc_childtable_name||' WHERE arc_id = ''' ||v_record2.arc_id||''' ;'
+						INTO rec_addfield2;
 
 
-					IF rec_addfield1 != rec_addfield2 THEN
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"3008", "function":"2112","debug_msg":null, "is_process":true}}$$)' INTO v_audit_result;
+						IF rec_addfield1 != rec_addfield2 THEN
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+							"data":{"message":"3008", "function":"2112","debug_msg":null, "is_process":true}}$$)' INTO v_audit_result;
 
-					ELSIF rec_addfield2 IS NULL and rec_addfield1 IS NOT NULL THEN
+						ELSIF rec_addfield2 IS NULL and rec_addfield1 IS NOT NULL THEN
 
-						v_query_string_update = 'UPDATE '||v_arc_childtable_name||' SET '||rec_addfields.column_name|| ' = '
-												'( SELECT '||rec_addfields.column_name||' FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_record1.arc_id)||' ) '
-												'WHERE '||v_arc_childtable_name||'.arc_id = '||quote_literal(v_new_record.arc_id)||';';
+							v_query_string_update = 'UPDATE '||v_arc_childtable_name||' SET '||rec_addfields.column_name|| ' = '
+													'( SELECT '||rec_addfields.column_name||' FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_record1.arc_id)||' ) '
+													'WHERE '||v_arc_childtable_name||'.arc_id = '||quote_literal(v_new_record.arc_id)||';';
 
-						IF v_query_string_update IS NOT NULL THEN
-							EXECUTE v_query_string_update;
-							INSERT INTO audit_check_data (fid, result_id, error_message)
-							VALUES (v_fid, v_result_id, concat('Copy values for addfield ',rec_addfields.column_name,' to the new arc.'));
+							IF v_query_string_update IS NOT NULL THEN
+								EXECUTE v_query_string_update;
+								INSERT INTO audit_check_data (fid, result_id, error_message)
+								VALUES (v_fid, v_result_id, concat('Copy values for addfield ',rec_addfields.column_name,' to the new arc.'));
+							END IF;
+
+						ELSIF rec_addfield1 IS NULL and rec_addfield2 IS NOT NULL THEN
+
+							v_query_string_update = 'UPDATE '||v_arc_childtable_name||' SET '||rec_addfields.column_name|| ' = 
+													( SELECT '||rec_addfields.column_name||' FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_record2.arc_id)||' ) 
+													WHERE '||v_arc_childtable_name||'.arc_id = '||quote_literal(v_new_record.arc_id)||';';
+
+
+							IF v_query_string_update IS NOT NULL THEN
+								EXECUTE v_query_string_update;
+								INSERT INTO audit_check_data (fid, result_id, error_message)
+								VALUES (v_fid, v_result_id, concat('Copy values for addfield ',rec_addfields.column_name,' to the new arc.'));
+							END IF;
+
+						ELSE
+							v_query_string_update = 'UPDATE '||v_arc_childtable_name||' SET '||rec_addfields.column_name|| ' = 
+													( SELECT '||rec_addfields.column_name||' FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_record1.arc_id)||' ) 
+													WHERE '||v_arc_childtable_name||'.arc_id = '||quote_literal(v_new_record.arc_id)||';';
+
+							IF v_query_string_update IS NOT NULL THEN
+								EXECUTE v_query_string_update;
+								INSERT INTO audit_check_data (fid, result_id, error_message)
+								VALUES (v_fid, v_result_id, concat('Copy values for addfield ',rec_addfields.column_name,' to the new arc.'));
+							END IF;
 						END IF;
 
-					ELSIF rec_addfield1 IS NULL and rec_addfield2 IS NOT NULL THEN
+					END LOOP;
 
-						v_query_string_update = 'UPDATE '||v_arc_childtable_name||' SET '||rec_addfields.column_name|| ' = 
-												( SELECT '||rec_addfields.column_name||' FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_record2.arc_id)||' ) 
-												WHERE '||v_arc_childtable_name||'.arc_id = '||quote_literal(v_new_record.arc_id)||';';
-
-
-						IF v_query_string_update IS NOT NULL THEN
-							EXECUTE v_query_string_update;
-							INSERT INTO audit_check_data (fid, result_id, error_message)
-							VALUES (v_fid, v_result_id, concat('Copy values for addfield ',rec_addfields.column_name,' to the new arc.'));
-						END IF;
-
-					ELSE
-						v_query_string_update = 'UPDATE '||v_arc_childtable_name||' SET '||rec_addfields.column_name|| ' = 
-												( SELECT '||rec_addfields.column_name||' FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_record1.arc_id)||' ) 
-												WHERE '||v_arc_childtable_name||'.arc_id = '||quote_literal(v_new_record.arc_id)||';';
-
-						IF v_query_string_update IS NOT NULL THEN
-							EXECUTE v_query_string_update;
-							INSERT INTO audit_check_data (fid, result_id, error_message)
-							VALUES (v_fid, v_result_id, concat('Copy values for addfield ',rec_addfields.column_name,' to the new arc.'));
-						END IF;
-					END IF;
-
-				END LOOP;
-
-				-- delete rows for old arcs
-				EXECUTE 'DELETE FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_record1.arc_id)||';';
-				EXECUTE 'DELETE FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_record2.arc_id)||';';
+					-- delete rows for old arcs
+					EXECUTE 'DELETE FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_record1.arc_id)||';';
+					EXECUTE 'DELETE FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_record2.arc_id)||';';
+				END IF;
 
 				-- update link only with enabled variable
 				IF (SELECT (value::json->>'fid')::boolean FROM config_param_system WHERE parameter='edit_custom_link') IS TRUE THEN

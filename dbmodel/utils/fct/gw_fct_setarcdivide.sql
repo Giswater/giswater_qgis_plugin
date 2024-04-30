@@ -200,9 +200,16 @@ BEGIN
 				VALUES (212, 1, concat('Divide arc ', v_arc_id,'.'));
 
 				-- Get arctype
-				v_sql := 'SELECT arctype_id FROM cat_arc WHERE id = (SELECT arccat_id FROM arc WHERE arc_id = '||v_arc_id||'::text);';
-				EXECUTE v_sql
-				INTO v_arc_type;
+				IF v_project_type = 'UD' THEN
+					v_sql := 'SELECT arc_type FROM cat_arc WHERE id = (SELECT arccat_id FROM arc WHERE arc_id = '||v_arc_id||'::text);';
+					EXECUTE v_sql
+					INTO v_arc_type;
+				ELSIF v_project_type = 'WS' THEN
+					v_sql := 'SELECT arctype_id FROM cat_arc WHERE id = (SELECT arccat_id FROM arc WHERE arc_id = '||v_arc_id||'::text);';
+					EXECUTE v_sql
+					INTO v_arc_type;
+				END IF;
+
 
 				--  Locate position of the nearest point
 				v_intersect_loc := ST_LineLocatePoint(v_arc_geom, v_node_geom);
@@ -351,38 +358,40 @@ BEGIN
 
 						v_arc_childtable_name := 'man_arc_' || lower(v_arc_type);
 
-						EXECUTE 'INSERT INTO '||v_arc_childtable_name||' (arc_id) VALUES ('''||rec_aux1.arc_id||''');';
-						EXECUTE 'INSERT INTO '||v_arc_childtable_name||' (arc_id) VALUES ('''||rec_aux2.arc_id||''');';
+						IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = v_schemaname AND table_name = v_arc_childtable_name)) IS TRUE THEN
+							EXECUTE 'INSERT INTO '||v_arc_childtable_name||' (arc_id) VALUES ('''||rec_aux1.arc_id||''');';
+							EXECUTE 'INSERT INTO '||v_arc_childtable_name||' (arc_id) VALUES ('''||rec_aux2.arc_id||''');';
 
 
-						v_sql := 'SELECT column_name FROM information_schema.columns 
-								WHERE table_schema = ''SCHEMA_NAME'' 
-								AND table_name = '''||v_arc_childtable_name||''' 
-								AND column_name !=''id'' AND column_name != ''arc_id'' ;';
+							v_sql := 'SELECT column_name FROM information_schema.columns 
+									WHERE table_schema = ''SCHEMA_NAME'' 
+									AND table_name = '''||v_arc_childtable_name||''' 
+									AND column_name !=''id'' AND column_name != ''arc_id'' ;';
 
-						FOR rec_addfields IN EXECUTE v_sql
-						LOOP
+							FOR rec_addfields IN EXECUTE v_sql
+							LOOP
 
-							v_query_string_update = 'UPDATE '||v_arc_childtable_name||' SET '||rec_addfields.column_name|| ' = '
-													'( SELECT '||rec_addfields.column_name||' FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_arc_id)||' ) '
-													'WHERE '||v_arc_childtable_name||'.arc_id = '||quote_literal(rec_aux1.arc_id)||';';
+								v_query_string_update = 'UPDATE '||v_arc_childtable_name||' SET '||rec_addfields.column_name|| ' = '
+														'( SELECT '||rec_addfields.column_name||' FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_arc_id)||' ) '
+														'WHERE '||v_arc_childtable_name||'.arc_id = '||quote_literal(rec_aux1.arc_id)||';';
 
-							IF v_query_string_update IS NOT NULL THEN
-								EXECUTE v_query_string_update;
-							END IF;
+								IF v_query_string_update IS NOT NULL THEN
+									EXECUTE v_query_string_update;
+								END IF;
 
-							v_query_string_update = 'UPDATE '||v_arc_childtable_name||' SET '||rec_addfields.column_name|| ' = '
-													'( SELECT '||rec_addfields.column_name||' FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_arc_id)||' ) '
-													'WHERE '||v_arc_childtable_name||'.arc_id = '||quote_literal(rec_aux2.arc_id)||';';
+								v_query_string_update = 'UPDATE '||v_arc_childtable_name||' SET '||rec_addfields.column_name|| ' = '
+														'( SELECT '||rec_addfields.column_name||' FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_arc_id)||' ) '
+														'WHERE '||v_arc_childtable_name||'.arc_id = '||quote_literal(rec_aux2.arc_id)||';';
 
-							IF v_query_string_update IS NOT NULL THEN
-								EXECUTE v_query_string_update;
-							END IF;
+								IF v_query_string_update IS NOT NULL THEN
+									EXECUTE v_query_string_update;
+								END IF;
 
-						END LOOP;
+							END LOOP;
 
-						INSERT INTO audit_check_data (fid, result_id, error_message)
-						VALUES (v_fid, v_result_id, concat('Copy values from old arc: ',v_arc_id,' to the new arcs: (',rec_aux1.arc_id,', ',rec_aux2.arc_id,').'));
+							INSERT INTO audit_check_data (fid, result_id, error_message)
+							VALUES (v_fid, v_result_id, concat('Copy values from old arc: ',v_arc_id,' to the new arcs: (',rec_aux1.arc_id,', ',rec_aux2.arc_id,').'));
+						END IF;
 
 						-- update arc_id of disconnected nodes linked to old arc
 						FOR rec_node IN SELECT node_id, the_geom FROM node WHERE arc_id=v_arc_id AND node_id!=v_node_id
@@ -731,38 +740,42 @@ BEGIN
 
 						v_arc_childtable_name := 'man_arc_' || lower(v_arc_type);
 
-						EXECUTE 'INSERT INTO '||v_arc_childtable_name||' (arc_id) VALUES ('''||rec_aux1.arc_id||''');';
-						EXECUTE 'INSERT INTO '||v_arc_childtable_name||' (arc_id) VALUES ('''||rec_aux2.arc_id||''');';
+						IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = v_schemaname AND table_name = v_arc_childtable_name)) IS TRUE THEN
+							EXECUTE 'INSERT INTO '||v_arc_childtable_name||' (arc_id) VALUES ('''||rec_aux1.arc_id||''');';
+							EXECUTE 'INSERT INTO '||v_arc_childtable_name||' (arc_id) VALUES ('''||rec_aux2.arc_id||''');';
 
 
-						v_sql := 'SELECT column_name FROM information_schema.columns 
-								WHERE table_schema = ''SCHEMA_NAME'' 
-								AND table_name = '''||v_arc_childtable_name||''' 
-								AND column_name !=''id'' AND column_name != ''arc_id'' ;';
+							v_sql := 'SELECT column_name FROM information_schema.columns 
+									WHERE table_schema = ''SCHEMA_NAME'' 
+									AND table_name = '''||v_arc_childtable_name||''' 
+									AND column_name !=''id'' AND column_name != ''arc_id'' ;';
 
-						FOR rec_addfields IN EXECUTE v_sql
-						LOOP
+							FOR rec_addfields IN EXECUTE v_sql
+							LOOP
 
-							v_query_string_update = 'UPDATE '||v_arc_childtable_name||' SET '||rec_addfields.column_name|| ' = '
-													'( SELECT '||rec_addfields.column_name||' FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_arc_id)||' ) '
-													'WHERE '||v_arc_childtable_name||'.arc_id = '||quote_literal(rec_aux1.arc_id)||';';
+								v_query_string_update = 'UPDATE '||v_arc_childtable_name||' SET '||rec_addfields.column_name|| ' = '
+														'( SELECT '||rec_addfields.column_name||' FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_arc_id)||' ) '
+														'WHERE '||v_arc_childtable_name||'.arc_id = '||quote_literal(rec_aux1.arc_id)||';';
 
-							IF v_query_string_update IS NOT NULL THEN
-								EXECUTE v_query_string_update;
-							END IF;
+								IF v_query_string_update IS NOT NULL THEN
+									EXECUTE v_query_string_update;
+								END IF;
 
-							v_query_string_update = 'UPDATE '||v_arc_childtable_name||' SET '||rec_addfields.column_name|| ' = '
-													'( SELECT '||rec_addfields.column_name||' FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_arc_id)||' ) '
-													'WHERE '||v_arc_childtable_name||'.arc_id = '||quote_literal(rec_aux2.arc_id)||';';
+								v_query_string_update = 'UPDATE '||v_arc_childtable_name||' SET '||rec_addfields.column_name|| ' = '
+														'( SELECT '||rec_addfields.column_name||' FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_arc_id)||' ) '
+														'WHERE '||v_arc_childtable_name||'.arc_id = '||quote_literal(rec_aux2.arc_id)||';';
 
-							IF v_query_string_update IS NOT NULL THEN
-								EXECUTE v_query_string_update;
-							END IF;
+								IF v_query_string_update IS NOT NULL THEN
+									EXECUTE v_query_string_update;
+								END IF;
 
-						END LOOP;
+							END LOOP;
 
-						INSERT INTO audit_check_data (fid, result_id, error_message)
-						VALUES (v_fid, v_result_id, concat('Copy values from old arc: ',v_arc_id,' to the new arcs: (',rec_aux1.arc_id,', ',rec_aux2.arc_id,').'));
+							INSERT INTO audit_check_data (fid, result_id, error_message)
+							VALUES (v_fid, v_result_id, concat('Copy values from old arc: ',v_arc_id,' to the new arcs: (',rec_aux1.arc_id,', ',rec_aux2.arc_id,').'));
+
+						END IF;
+
 
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (212, 1,'Copy elements is not avaliable from old arc to new arc when node.state = 2');

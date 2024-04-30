@@ -105,11 +105,13 @@ v_drainzone_id integer;
 v_presszone_id text;
 v_feature_childtable_name_old text;
 v_feature_childtable_name_new text;
+v_schemaname text;
 
 BEGIN
 
 	-- Search path
 	SET search_path = 'SCHEMA_NAME', public;
+	v_schemaname = 'SCHEMA_NAME';
 
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
@@ -399,33 +401,40 @@ BEGIN
 		v_feature_childtable_name_old := 'man_' || v_feature_type || '_' || lower(v_old_featuretype);
 		v_feature_childtable_name_new := 'man_' || v_feature_type || '_' || lower(v_feature_type_new);
 
-		EXECUTE 'INSERT INTO '||v_feature_childtable_name_new||' ('||v_feature_type||'_id) VALUES ('||v_id||');';
+		IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = v_schemaname AND table_name = v_feature_childtable_name_old)) IS TRUE AND
+			(SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = v_schemaname AND table_name = v_feature_childtable_name_new)) IS TRUE
+		THEN
 
-		v_sql := 'SELECT column_name FROM information_schema.columns 
-				WHERE table_schema = ''SCHEMA_NAME'' 
-				AND table_name = '''||v_feature_childtable_name_old||''' 
-				AND column_name !=''id'' AND column_name != '''||v_feature_type||'_id'' 
-				AND column_name IN (SELECT column_name
-									FROM information_schema.columns
-									WHERE table_name = '''||v_feature_childtable_name_new||'''
-									AND column_name !=''id'' AND column_name != '''||v_feature_type||'_id'');';
+			EXECUTE 'INSERT INTO '||v_feature_childtable_name_new||' ('||v_feature_type||'_id) VALUES ('||v_id||');';
 
-		-- taking values from old feature (from man_{feature_type}_{feature_childtype}) if the column is equal.
-		FOR rec_addfields IN EXECUTE v_sql
-		LOOP
+			v_sql := 'SELECT column_name FROM information_schema.columns 
+					WHERE table_schema = ''SCHEMA_NAME'' 
+					AND table_name = '''||v_feature_childtable_name_old||''' 
+					AND column_name !=''id'' AND column_name != '''||v_feature_type||'_id'' 
+					AND column_name IN (SELECT column_name
+										FROM information_schema.columns
+										WHERE table_name = '''||v_feature_childtable_name_new||'''
+										AND column_name !=''id'' AND column_name != '''||v_feature_type||'_id'');';
 
-			v_query_string_update = 'UPDATE '||v_feature_childtable_name_new||' SET '||rec_addfields.column_name||' = '
-									'(SELECT '||rec_addfields.column_name||' FROM '||v_feature_childtable_name_old||' WHERE '||v_id_column||' = '||quote_literal(v_id)||' ) '
-									'WHERE '||v_feature_childtable_name_old||'.'||v_id_column||' = '||quote_literal(v_old_feature_id)||';';
-			IF v_query_string_update IS NOT NULL THEN
-				EXECUTE v_query_string_update; 
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (v_fid, v_result_id, concat('Assign old data from ',rec_addfields.column_name,' addfield to the new feature.'));
-			END IF;
+			-- taking values from old feature (from man_{feature_type}_{feature_childtype}) if the column is equal.
+			FOR rec_addfields IN EXECUTE v_sql
+			LOOP
 
-		END LOOP;
+				v_query_string_update = 'UPDATE '||v_feature_childtable_name_new||' SET '||rec_addfields.column_name||' = '
+										'(SELECT '||rec_addfields.column_name||' FROM '||v_feature_childtable_name_old||' WHERE '||v_id_column||' = '||quote_literal(v_id)||' ) '
+										'WHERE '||v_feature_childtable_name_old||'.'||v_id_column||' = '||quote_literal(v_old_feature_id)||';';
+				IF v_query_string_update IS NOT NULL THEN
+					EXECUTE v_query_string_update; 
+					INSERT INTO audit_check_data (fid, result_id, error_message)
+					VALUES (v_fid, v_result_id, concat('Assign old data from ',rec_addfields.column_name,' addfield to the new feature.'));
+				END IF;
 
-		EXECUTE 'DELETE FROM '||v_feature_childtable_name_old||' WHERE '||v_id_column||'='||quote_literal(v_old_feature_id)||';'; 
+			END LOOP;
+
+			EXECUTE 'DELETE FROM '||v_feature_childtable_name_old||' WHERE '||v_id_column||'='||quote_literal(v_old_feature_id)||';'; 
+		END IF;
+
+		
 
 
 		--Moving elements from old feature to new feature

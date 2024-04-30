@@ -284,7 +284,7 @@ BEGIN
  	--delete addfields values
 	v_feature_childtable_name := 'man_' || v_feature_type || '_' || lower(v_featurecat);
 
-	IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = '"SCHEMA_NAME"' AND table_name = v_feature_childtable_name)) IS TRUE THEN
+	IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = v_schemaname AND table_name = v_feature_childtable_name)) IS TRUE THEN
         EXECUTE 'DELETE FROM '||v_feature_childtable_name||' WHERE '||concat(v_feature_type,'_id')||'='||quote_literal(v_feature_id)||';'; 
     END IF; 
 	
