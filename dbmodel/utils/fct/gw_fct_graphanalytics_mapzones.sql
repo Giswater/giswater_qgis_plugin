@@ -260,7 +260,6 @@ BEGIN
 		END IF;
 	END IF;
 
-
 	IF v_expl_id = '' THEN
 
 		v_expl_id = -1;
@@ -400,20 +399,20 @@ BEGIN
 
 		-- fill temporal tables
 		IF v_usepsector IS  TRUE THEN
-			v_query_arc = 'SELECT a.* FROM arc a JOIN v_edit_arc USING (arc_id) WHERE a.expl_id='||v_expl_id;
-			v_query_node = 'SELECT n.* FROM node n JOIN v_edit_node USING (node_id) WHERE n.expl_id='||v_expl_id;
-			v_query_connec = 'SELECT c.* FROM connec c JOIN v_edit_connec USING (connec_id) WHERE c.expl_id='||v_expl_id;
-			v_query_link = 'SELECT l.* FROM link l JOIN v_edit_link USING (link_id) WHERE l.expl_id='||v_expl_id;
+			v_query_arc = 'SELECT a.* FROM arc a JOIN v_edit_arc USING (arc_id) WHERE a.expl_id IN ('||v_expl_id||')';
+			v_query_node = 'SELECT n.* FROM node n JOIN v_edit_node USING (node_id) WHERE n.expl_id IN ('||v_expl_id||')';
+			v_query_connec = 'SELECT c.* FROM connec c JOIN v_edit_connec USING (connec_id) WHERE c.expl_id IN ('||v_expl_id||')';
+			v_query_link = 'SELECT l.* FROM link l JOIN v_edit_link USING (link_id) WHERE l.expl_id IN ('||v_expl_id||')';
 			IF v_project_type='UD' THEN
-				v_query_gully = 'SELECT g.* FROM gully g JOIN v_edit_gully USING (gully_id) WHERE g.expl_id='||v_expl_id;
+				v_query_gully = 'SELECT g.* FROM gully g JOIN v_edit_gully USING (gully_id) WHERE g.expl_id IN ('||v_expl_id||')';
 			END IF;
 		ELSE
-			v_query_arc = 'SELECT * FROM arc WHERE state=1 AND expl_id IN('||v_expl_id||')';
-			v_query_node = 'SELECT * FROM node WHERE state=1 AND expl_id IN('||v_expl_id||')';
-			v_query_connec = 'SELECT * FROM connec WHERE state=1 AND expl_id IN('||v_expl_id||')';
-			v_query_link = 'SELECT * FROM link WHERE state=1 AND expl_id IN('||v_expl_id||')';
+			v_query_arc = 'SELECT * FROM arc WHERE state=1 AND expl_id IN ('||v_expl_id||')';
+			v_query_node = 'SELECT * FROM node WHERE state=1 AND expl_id IN ('||v_expl_id||')';
+			v_query_connec = 'SELECT * FROM connec WHERE state=1 AND expl_id IN ('||v_expl_id||')';
+			v_query_link = 'SELECT * FROM link WHERE state=1 AND expl_id IN ('||v_expl_id||')';
 			IF v_project_type='UD' THEN
-				v_query_gully = 'SELECT * FROM gully WHERE expl_id IN('||v_expl_id||')';
+				v_query_gully = 'SELECT * FROM gully WHERE expl_id IN ('||v_expl_id||')';
 			END IF;
 		END IF;
 
@@ -1393,19 +1392,19 @@ BEGIN
 
 		ELSIF v_class = 'SECTOR' THEN
 
-			DELETE FROM node_border_sector WHERE node_id IN (SELECT node_id FROM temp_t_node WHERE expl_id IN (v_expl_id) AND state=1);
+			EXECUTE 'DELETE FROM node_border_sector WHERE node_id IN (SELECT node_id FROM temp_t_node WHERE expl_id IN ('||v_expl_id||') AND state=1)';
 
-			INSERT INTO node_border_sector
+			EXECUTE 'INSERT INTO node_border_sector
 			WITH arcs AS (SELECT arc_id, node_1, node_2, sector_id FROM temp_t_arc WHERE state>0)
 			SELECT node_id, a1.sector_id
 			FROM  temp_t_node
 			JOIN arcs a1 ON node_id=node_1
-			where a1.sector_id != temp_t_node.sector_id AND expl_id IN (v_expl_id)
+			where a1.sector_id != temp_t_node.sector_id AND expl_id IN ('||v_expl_id||')
 			UNION
 			SELECT node_id, a2.sector_id
 			FROM  temp_t_node
 			JOIN arcs a2 ON node_id=node_2
-			where a2.sector_id != temp_t_node.sector_id AND expl_id IN (v_expl_id)  ON CONFLICT (node_id, sector_id) DO NOTHING;
+			where a2.sector_id != temp_t_node.sector_id AND expl_id IN ('||v_expl_id||')  ON CONFLICT (node_id, sector_id) DO NOTHING';
 		END IF;
 
 		-- mapzone

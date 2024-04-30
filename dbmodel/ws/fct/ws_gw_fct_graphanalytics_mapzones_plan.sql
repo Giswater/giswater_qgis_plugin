@@ -16,7 +16,7 @@ SELECT gw_fct_graphanalytics_mapzones_plan('{"data":{"parameters":{"graphClass":
 "updateFeature":"TRUE", "updateMapZone":1, "debug":"FALSE"}}}');
 
 SELECT gw_fct_graphanalytics_mapzones_plan('{"data":{"parameters":{"graphClass":"DMA", "exploitation": "1", 
-"updateFeature":"TRUE", "updateMapZone":3}}}');
+"updateFeature":"TRUE", "updateMapZone":3}}}'); 
 
 SELECT gw_fct_graphanalytics_mapzones_plan('{"data":{"parameters":{"graphClass":"DQA", "exploitation": "2", 
 "updateFeature":"TRUE", "updateMapZone":0}}}');
@@ -26,7 +26,7 @@ SELECT gw_fct_graphanalytics_mapzones_plan('{"data":{"parameters":{"graphClass":
 DECLARE
 
 v_class text;
-v_expl integer;
+v_expl text;
 v_updatemapzone integer;
 v_data json;
 v_paramupdate float;
@@ -43,7 +43,8 @@ BEGIN
 
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
-	
+
+	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_updatemapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_paramupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 	v_forceclosed = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'forceClosed');
@@ -65,7 +66,15 @@ BEGIN
 	IF v_floodonlymapzone IS NULL THEN v_floodonlymapzone = ''; END IF;
 	IF v_commitchanges IS NULL THEN v_commitchanges = TRUE ; END IF;
 	IF v_netscenario IS NULL THEN v_netscenario = '' ; END IF;
-	SELECT netscenario_type, expl_id INTO v_class, v_expl FROM plan_netscenario WHERE netscenario_id::text = v_netscenario::TEXT;
+	SELECT netscenario_type INTO v_class FROM plan_netscenario WHERE netscenario_id::text = v_netscenario::TEXT;
+
+
+	IF v_expl ='-999' THEN 
+		v_expl = (select replace(replace((array_agg(expl_id))::text,'{',''),'}','') from selector_expl where cur_user = current_user);
+	ELSE 
+		v_expl = (SELECT expl_id FROM plan_netscenario WHERE netscenario_id::text = v_netscenario);
+	END IF;
+
 
 	v_data = concat ('{"data":{"parameters":{"graphClass":"',v_class,'", "exploitation":"',v_expl,'", "updateFeature":"TRUE",
 	"updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate, ', "forceOpen": [',v_forceopen,'], "forceClosed":[',v_forceclosed,'], "usePlanPsector": ',v_usepsector,', "debug":"FALSE", 
