@@ -224,7 +224,7 @@ BEGIN
 	CREATE TEMP TABLE temp_anl_node(LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
   	
   	-- set value to v_linksdistance if null
-	IF v_linksdistance IS NULL THEN
+	IF v_linksdistance IS NULL OR v_linksdistance = '' OR  v_linksdistance =' ' THEN
 		v_linksdistance = 0;
 	END IF;
 
@@ -353,7 +353,6 @@ BEGIN
 			END LOOP;
 			
 			-- Last DIJKSTRA
-
 			v_query_dijkstra = concat('SELECT edge::text AS arc_id, node::text AS node_id, (select coalesce(max(total_distance), 0) from temp_anl_node where fid = ''222'' and cur_user = current_user) + agg_cost as total_length 
 			FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, 
 			 '||v_cost_string||' as cost, '||v_cost_string||' as reverse_cost 
