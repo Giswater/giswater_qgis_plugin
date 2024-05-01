@@ -93,12 +93,7 @@ BEGIN
 		UPDATE temp_anlgraph SET flag = 1
 		FROM om_mincut_valve WHERE result_id=v_mincutid AND ((unaccess = FALSE AND broken = FALSE))
 		AND (temp_anlgraph.node_1 = om_mincut_valve.node_id OR temp_anlgraph.node_2 = om_mincut_valve.node_id);
-		
-		-- setup graph closing check-valves
-		UPDATE temp_anlgraph SET flag = 1 
-		FROM config_graph_checkvalve c 
-		WHERE (temp_anlgraph.node_1 = c.node_id OR temp_anlgraph.node_2 = c.node_id);
-		
+			
 		-- setup graph closing closed valves
 		UPDATE temp_anlgraph SET flag = 1 
 		FROM om_mincut_valve WHERE result_id=v_mincutid AND closed=TRUE 
@@ -127,11 +122,6 @@ BEGIN
 		UPDATE temp_anlgraph SET flag = 1
 		FROM om_mincut_valve WHERE result_id=v_mincutid AND proposed = TRUE
 		AND (temp_anlgraph.node_1 = om_mincut_valve.node_id OR temp_anlgraph.node_2 = om_mincut_valve.node_id);
-
-		-- setup graph closing check-valves
-		UPDATE temp_anlgraph SET flag = 1 
-		FROM config_graph_checkvalve c 
-		WHERE (temp_anlgraph.node_1 = c.node_id OR temp_anlgraph.node_2 = c.node_id);
 
 		-- setup graph closing closed valves
 		UPDATE temp_anlgraph SET flag = 1
