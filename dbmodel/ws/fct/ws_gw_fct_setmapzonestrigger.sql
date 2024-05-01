@@ -29,6 +29,7 @@ v_tablename text;
 v_id text;
 v_querytext text;
 v_error_context text;
+v_fid integer = 512;
 
 -- variables only used on the automatic trigger mapzone
 v_closedstatus boolean;
@@ -47,7 +48,8 @@ v_useplanpsector boolean;
 v_updatemapzone float;
 v_value integer;
 v_geometry text;
-v_exploitation integer;
+v_exploitation text;
+v_mapzones text;
 
 BEGIN
 
@@ -56,7 +58,7 @@ BEGIN
 	
 	-- get project type
 	SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
-	
+
 	-- Get input parameters:
 	v_featuretype := (p_data ->> 'feature')::json->> 'featureType';
 	v_tablename := (p_data ->> 'feature')::json->> 'tableName';
@@ -67,12 +69,19 @@ BEGIN
 	AND graph_delimiter IS NOT NULL;
 	
 	-- getting exploitation
-	v_exploitation = (SELECT expl_id FROM node WHERE node_id = v_id);
+	v_exploitation = (SELECT array_agg(expl_id) FROM selector_expl where cur_user = current_user);
+	v_exploitation = replace(replace (v_exploitation,'{',''), '}','');
 
 	v_count = (SELECT COUNT(*) FROM (SELECT node_1 FROM v_edit_arc WHERE node_1 = v_id UNION ALL SELECT node_2 FROM v_edit_arc WHERE node_2 = v_id)a);
 	
 	IF v_type = 'VALVE' AND v_closedstatus IS NOT NULL AND v_count = 2 THEN
-		
+
+		-- create the log
+		DROP TABLE IF EXISTS temp_audit_check_data_duplicate;
+		CREATE TEMP TABLE temp_audit_check_data_duplicate (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+		INSERT INTO temp_audit_check_data_duplicate (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 0, 'DETAILS');
+		INSERT INTO temp_audit_check_data_duplicate (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 0, '----------');
+	
 		-- getting system variable
 		v_automaticmapzonetrigger = (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'utils_graphanalytics_automatic_trigger');		
 		
@@ -83,6 +92,7 @@ BEGIN
 			v_useplanpsector = (SELECT (value::json->>'parameters')::json->>'usePlanPsector' FROM config_param_system WHERE parameter = 'utils_graphanalytics_automatic_trigger'); 
 			v_updatemapzone = (SELECT (value::json->>'parameters')::json->>'updateMapZone' FROM config_param_system WHERE parameter = 'utils_graphanalytics_automatic_trigger'); 
 			v_mapzone_array = (SELECT (value::json->>'mapzone') FROM config_param_system WHERE parameter = 'utils_graphanalytics_automatic_trigger'); 
+			v_mapzones = replace((SELECT (value::json->>'mapzone') FROM config_param_system WHERE parameter = 'utils_graphanalytics_automatic_trigger'), '"','');
 			
 			-- FOR v_mapzone
 			FOR v_mapzone IN SELECT json_array_elements_text(v_mapzone_array)
@@ -118,58 +128,73 @@ BEGIN
 
 						RAISE NOTICE 'mapzones %', v_mapzone_id;
 
-						v_querytext = '{"data":{"parameters":{"graphClass":"'||v_mapzone||'", "floodOnlyMapzone":"'||v_mapzone_id||'", "checkData":false, "updateFeature":"true", 
+						v_querytext = '{"data":{"parameters":{"graphClass":"'||v_mapzone||'", "exploitation":"'||v_exploitation||'", "floodOnlyMapzone":"'||v_mapzone_id||'", "checkData":false, "commitChanges":"true", 
 						"updateMapZone":'||v_updatemapzone||', "geomParamUpdate":'||v_geomparamupdate||',"debug":false, "usePlanPsector":'||v_useplanpsector||', "forceOpen":[], "forceClosed":[]}}}';
 					ELSE
-						v_querytext = '{"data":{"parameters":{"graphClass":"'||v_mapzone||'", "exploitation":['||v_exploitation||'], "checkData":false, "updateFeature":"true", 
+						v_querytext = '{"data":{"parameters":{"graphClass":"'||v_mapzone||'", "exploitation":"'||v_exploitation||'", "checkData":false, "commitChanges":"true", 
 						"updateMapZone":'||v_updatemapzone||', "geomParamUpdate":'||v_geomparamupdate||',"debug":false, "usePlanPsector":'||v_useplanpsector||', "forceOpen":[], "forceClosed":[]}}}';					
 					END IF;
 
 					PERFORM gw_fct_graphanalytics_mapzones(v_querytext::json);
-
-					-- return message 
-					IF v_closedstatus IS TRUE THEN
-
-						v_message = '{"status": "Accepted", "level": 1, "text": "DYNAMIC MAPZONES: Valve have been succesfully closed. Maybe this operation have been affected mapzones scenario. Take a look on canvas"}';	
-					
-					ELSIF v_closedstatus IS FALSE THEN
+						
+					IF v_closedstatus IS FALSE THEN
 
 						IF v_count= 1 THEN
-							v_message = '{"status": "Accepted", "level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. Nothing happens because both sides of valve has same mapzone"}';
-
+							INSERT INTO temp_audit_check_data_duplicate (fid, criticity, error_message) 
+							VALUES (v_fid, 0, concat(v_mapzone, ' Any ',v_mapzone,' have been updated. Both sides of valve have the same ',v_mapzone));
+										
 						ELSIF v_count =  2 THEN
 						
 							IF v_count_2 = 2 THEN			
-								v_message = concat('{"status": "Accepted", "level": 2, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened but THERE IS A CONFLICT. Check your valve status before continue!!!"}');			
+								INSERT INTO temp_audit_check_data_duplicate (fid, criticity, error_message) 
+								VALUES (v_fid, 2, concat (' There is a CONFLICT against two ', v_mapzone, 'S. Check your valve status!'));
+								
 							ELSIF  v_count_2 = 1 THEN
-								v_message = '{"status": "Accepted", "level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. Disconnected network have been atached to current mapzone"}';
+								INSERT INTO temp_audit_check_data_duplicate (fid, criticity, error_message) 
+								VALUES (v_fid, 1, concat (' Disconnected features have been atached to current ',v_mapzone));
+
 							END IF;
 						ELSE 
 							-- return message 
-							v_message = '{"status": "Accepted", "level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened and nothing have been updated"}';
+							INSERT INTO temp_audit_check_data_duplicate (fid, criticity, error_message) 
+							VALUES (v_fid, 0, concat(v_mapzone, ' Any ',v_mapzone,' have been updated. Both sides of valve has not ',v_mapzone));
 						END IF;
 					END IF;
 				ELSE
-					v_message = '{"status": "Accepted", "level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully updated but no mapzones have been modified"}';			
+					INSERT INTO temp_audit_check_data_duplicate (fid, criticity, error_message) 
+					VALUES (v_fid, 0, concat (v_mapzone, '''S: Any mapzone have been updated.\n'));
 				END IF;
-				
 			END LOOP;
+
+			-- check for message
+			IF v_closedstatus IS TRUE THEN
+				v_message = '{"status": "Accepted", "level": 1, "text": "Valve status have been succesfully closed, automatic trigger for mapzones is enabled and therefore some MAPZONES MAY HAVE CHANGED"}';			
+				
+			ELSIF (SELECT count(*) FROM temp_audit_check_data_duplicate WHERE criticity > 0) > 0 THEN
+			
+				-- detailed log need to be created
+				v_message = concat('{"status": "Accepted", "level": 1, "text": "Valve status have been succesfully updated, automatic trigger for mapzones is enabled and some MAPZONES HAVE CHANGED: ',
+						replace(replace(replace(replace((SELECT (array_agg(error_message))::text FROM temp_audit_check_data_duplicate WHERE criticity > 0),'{',''),'}',''),'"',''),',',''), '"}');
+				
+			ELSE
+				v_message = '{"status": "Accepted", "level": 0, "text": "Valve status have been succesfully updated, automatic trigger for mapzones is enabled, but any mapzone have been changed"}';			
+
+			END IF;		
 		ELSE 
 			-- return message 
-			v_message = '{"status": "Accepted", "level": 0, "text": "Feature succesfully updated. Valve status have been succesfully updated. Automatic trigger is not enabled to recalculate DYNAMIC MAPZONES"}';			
+			v_message = '{"status": "Accepted", "level": 0, "text": "Valve status have been succesfully updated. Nothing to do because automatic trigger is not enabled to recalculate DYNAMIC MAPZONES"}';			
 		END IF;
 	ELSE
-		v_message = '{"status": "Accepted", "level": 0, "text": "No changes on mapzones"}';
+		v_message = '{"status": "Accepted", "level": 0, "text": "Nothing to do because it is not a valve"}';
 	END IF;
 
 	-- Return
 	RETURN (v_message::json);
 
 	-- Exception handling
-    EXCEPTION WHEN OTHERS THEN
-    GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-    RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

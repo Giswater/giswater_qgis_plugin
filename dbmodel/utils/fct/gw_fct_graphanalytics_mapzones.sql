@@ -147,7 +147,7 @@ BEGIN
 
 	-- get dialog variables
 	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'graphClass');
-    v_expl_id = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
+	v_expl_id = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_macroexpl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'macroExploitation');
 	v_floodonlymapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'floodOnlyMapzone');
 	v_valuefordisconnected = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'valueForDisconnected');
@@ -261,11 +261,8 @@ BEGIN
 	END IF;
 
 	IF v_expl_id = '' THEN
-
 		v_expl_id = -1;
-
 		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, concat('ERROR: No exploitations have been selected. Please, select at least 1 exploitation in Selector'));
-
 	END IF;
 
 	v_count = coalesce(v_count1,0) + coalesce(v_count2,0);
