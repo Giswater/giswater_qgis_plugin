@@ -985,4 +985,5 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, '
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'explFromSector','true'::text) WHERE parameter = 'basic_selector_tab_sector';
 UPDATE config_param_system SET value = gw_fct_json_object_delete_keys (value::json,'explFromMacrosector') WHERE parameter = 'basic_selector_tab_macrosector';
 
+DELETE FROM config_form_fields WHERE columnname = '_pol_id_';
 DELETE FROM sys_message where id = 2024;
