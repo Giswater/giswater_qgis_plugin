@@ -34,3 +34,7 @@ UPDATE config_form_fields SET linkedobject='tbl_event_x_gully' WHERE formname='n
 
 UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM config_visit_class WHERE feature_type IN (''GULLY'',''ALL'') ', isfilter=false, dv_isnullvalue=false, widgetfunction='{"functionName": "manage_visit_class","parameters": {}}'::json WHERE formname='gully' AND formtype='form_feature' AND columnname='visit_class' AND tabname='tab_visit';
 UPDATE config_form_fields SET linkedobject=NULL WHERE formname='gully' AND formtype='form_feature' AND columnname='tbl_visits' AND tabname='tab_visit';
+
+-- 01/05/2024
+UPDATE config_param_system set isenabled = false where parameter in ('basic_search_hydrometer', 'basic_search_v2_tab_hydrometer');
+UPDATE config_form_tabs set device = '{}' WHERE formname = 'search' AND tabname  ='tab_hydro';
