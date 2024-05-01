@@ -979,3 +979,9 @@ INSERT INTO sys_message
 (id, error_message, hint_message, log_level, show_user, project_type, "source")
 VALUES(3260, 'No arc exists with a smaller diameter than the maximum configuered on edit_link_check_arcdnom:',
 'Please check the configured value', 2, true, 'utils', 'core');
+
+-- 01/05/2024
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'sectorFromExpl','true'::text) WHERE parameter = 'basic_selector_tab_exploitation';
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'explFromSector','true'::text) WHERE parameter = 'basic_selector_tab_sector';
+UPDATE config_param_system SET value = gw_fct_json_object_delete_keys (value::json,'explFromMacrosector') WHERE parameter = 'basic_selector_tab_macrosector';
+
