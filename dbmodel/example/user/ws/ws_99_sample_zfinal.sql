@@ -38,3 +38,17 @@ UPDATE cat_feature_node SET graph_delimiter ='MINSECTOR' WHERE id = 'SHUTOFF_VAL
 UPDATE cat_feature_node SET graph_delimiter ='CHECKVALVE' WHERE id = 'CHECK_VALVE';
 
 
+-- 01/05/2024
+UPDATE config_param_system SET value = 
+'{"status":true, "values":[
+{"sourceTable":"ve_node_pr_reduc_valve", "query":"UPDATE presszone t SET head=elevation + pression_exit FROM ve_node_pr_reduc_valve s "},
+{"sourceTable":"ve_node_tank", "query":"UPDATE presszone t SET head=elevation + hmax/2  FROM ve_node_tank s "}]}'
+WHERE parameter = 'epa_automatic_man2graph_values';
+
+
+UPDATE config_param_system SET value = 
+'{"status":true, "values":[
+{"sourceTable":"ve_node_tank", "query":"UPDATE inp_inlet t SET maxlevel = hmax, diameter=sqrt(4*area/3.14159) FROM ve_node_tank s "},
+{"sourceTable":"ve_node_pr_reduc_valve", "query":"UPDATE inp_valve t SET pressure = pression_exit FROM ve_node_pr_reduc_valve s "}]}'
+WHERE parameter = 'epa_automatic_man2inp_values';
+

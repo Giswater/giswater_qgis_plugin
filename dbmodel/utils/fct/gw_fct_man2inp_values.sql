@@ -91,7 +91,7 @@ BEGIN
 
 		-- building querytext
 		v_querytext := (v_record::json->>'query');
-		v_querytext := v_querytext ||' WHERE t.presszone_id = '||v_presszone||'::text';
+		v_querytext := v_querytext ||' WHERE t.presszone_id = '||v_presszone||'::text AND node_id::integer = '||v_id;
 
 		EXECUTE v_querytext;		
 	END IF;
