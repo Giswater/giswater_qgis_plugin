@@ -21,11 +21,17 @@ INSERT INTO om_typevalue VALUES ('visit_cleaned', '3', 'Half', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_defect', '1', 'Good state', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_defect', '2', 'Some defects', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_defect', '3', 'Bad state', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('visit_defect', '4', 'No defects', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('visit_leak', '1', 'No leak', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('visit_leak', '2', 'Minor leak', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('visit_sediments', '1', 'No sediments', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('visit_sediments', '2', 'Presence of sediments', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('incident_type', '1', 'Broken cover', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('incident_type', '2', 'Water on the street', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('incident_type', '3', 'Smells', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('incident_type', '4', 'Noisy cover', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('incident_type', '5', 'Others', NULL, NULL);
+INSERT INTO om_typevalue VALUES ('incident_type', '6', 'Missing cover', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_param_type', 'INCIDENCE', 'INCIDENCE', NULL, NULL);
 
 INSERT INTO config_visit_class VALUES (1, 'Leak on arc', NULL, true, false, true, 'ARC', 'role_om', 1, NULL, 'visit_arc_leak', 've_visit_arc_leak', 'v_ui_visit_arc_leak', NULL, NULL);
@@ -235,13 +241,13 @@ AS SELECT ve_visit_arc_leak.visit_id,
     ve_visit_arc_leak.user_name AS "User",
     c.idval AS "Visit class",
     t.idval AS "Status",
-    ve_visit_arc_leak.leak_arc AS "Leak",
+    z.idval AS "Leak",
     ve_visit_arc_leak.insp_observ AS "Observation",
-    ve_visit_arc_leak.photo AS "Photo",
-    ve_visit_arc_leak.the_geom
+    ve_visit_arc_leak.photo AS "Photo"
    FROM ve_visit_arc_leak
      JOIN config_visit_class c ON c.id = ve_visit_arc_leak.class_id
-     JOIN om_typevalue t ON t.id::integer = ve_visit_arc_leak.status AND t.typevalue = 'visit_status'::text;
+     JOIN om_typevalue t ON t.id::integer = ve_visit_arc_leak.status AND t.typevalue = 'visit_status'::text
+     LEFT JOIN om_typevalue z ON z.id::integer = ve_visit_arc_leak.leak_arc::integer AND z.typevalue = 'visit_leak'::text;
 
 
 
@@ -253,14 +259,13 @@ AS SELECT ve_visit_connec_leak.visit_id,
     ve_visit_connec_leak.user_name AS "User",
     c.idval AS "Visit class",
     t.idval AS "Status",
-    ve_visit_connec_leak.leak_connec AS "Leak",
+    z.idval AS "Leak",
     ve_visit_connec_leak.insp_observ AS "Observation",
-    ve_visit_connec_leak.photo AS "Photo",
-    ve_visit_connec_leak.the_geom
+    ve_visit_connec_leak.photo AS "Photo"
    FROM ve_visit_connec_leak
      JOIN config_visit_class c ON c.id = ve_visit_connec_leak.class_id
-     JOIN om_typevalue t ON t.id::integer = ve_visit_connec_leak.status AND t.typevalue = 'visit_status'::text;
-
+     JOIN om_typevalue t ON t.id::integer = ve_visit_connec_leak.status AND t.typevalue = 'visit_status'::text
+     LEFT JOIN om_typevalue z ON z.id::integer = ve_visit_connec_leak.leak_connec::integer AND z.typevalue = 'visit_leak'::text;
 
 
 CREATE OR REPLACE VIEW v_ui_visit_node_insp
@@ -271,17 +276,17 @@ AS SELECT ve_visit_node_insp.visit_id,
     ve_visit_node_insp.user_name AS "User",
     c.idval AS "Visit class",
     t.idval AS "Status",
-    ve_visit_node_insp.sediments_node AS "Sediments",
+    z.idval AS "Sediments",
     u.idval AS "Defects",
     y.idval AS "Cleaned",
     ve_visit_node_insp.insp_observ AS "Observation",
-    ve_visit_node_insp.photo AS "Photo",
-    ve_visit_node_insp.the_geom
+    ve_visit_node_insp.photo AS "Photo"
    FROM ve_visit_node_insp
      JOIN config_visit_class c ON c.id = ve_visit_node_insp.class_id
      JOIN om_typevalue t ON t.id::integer = ve_visit_node_insp.status AND t.typevalue = 'visit_status'::text
      LEFT JOIN om_typevalue y ON y.id::integer = ve_visit_node_insp.clean_node::integer AND y.typevalue = 'visit_cleaned'::text
-     LEFT JOIN om_typevalue u ON u.id::integer = ve_visit_node_insp.defect_node::integer AND u.typevalue = 'visit_defect'::text;
+     LEFT JOIN om_typevalue u ON u.id::integer = ve_visit_node_insp.defect_node::integer AND u.typevalue = 'visit_defect'::text
+     LEFT JOIN om_typevalue z ON z.id::integer = ve_visit_node_insp.sediments_node::integer AND z.typevalue = 'visit_sediments'::text;
 
 
 CREATE OR REPLACE VIEW v_ui_visit_incid_node
@@ -294,8 +299,7 @@ AS SELECT ve_visit_incid_node.visit_id,
     t.idval AS "Status",
     y.idval AS "Incident type",
     ve_visit_incid_node.incident_comment AS "Comment",
-    ve_visit_incid_node.photo AS "Photo",
-    ve_visit_incid_node.the_geom
+    ve_visit_incid_node.photo AS "Photo"
    FROM ve_visit_incid_node
      JOIN config_visit_class c ON c.id = ve_visit_incid_node.class_id
      JOIN om_typevalue t ON t.id::integer = ve_visit_incid_node.status AND t.typevalue = 'visit_status'::text
