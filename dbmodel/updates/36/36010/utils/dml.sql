@@ -987,3 +987,8 @@ UPDATE config_param_system SET value = gw_fct_json_object_delete_keys (value::js
 
 DELETE FROM config_form_fields WHERE columnname = '_pol_id_';
 DELETE FROM sys_message where id = 2024;
+
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") 
+VALUES(3304, 'gw_fct_admin_manage_planmode', 'utils', 'function', 'json', 'json', 'Function to toggle planmode (for big projects). ', 'role_admin', NULL, 'core')
+ON CONFLICT (id) DO NOTHING;
