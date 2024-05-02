@@ -2323,7 +2323,6 @@ class GwAdminButton:
                     self.dlg_manage_fields.tab_add_fields, self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
 
         form_name_fields = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
-        self.chk_multi_insert = tools_qt.is_checked(self.dlg_readsql, self.dlg_readsql.chk_multi_insert)
 
         window_title = ""
         if action == 'create':
@@ -2365,7 +2364,6 @@ class GwAdminButton:
         self.model_update_table = None
 
         form_name_fields = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
-        self.chk_multi_insert = tools_qt.is_checked(self.dlg_readsql, self.dlg_readsql.chk_multi_insert)
         self.dlg_manage_fields.columnname.setEnabled(False)
 
         # Set listeners
@@ -2444,11 +2442,7 @@ class GwAdminButton:
         qtable = dialog.findChild(QTableView, "tbl_update")
         self.model_update_table = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
-
-        if self.chk_multi_insert:
-            expr_filter = "cat_feature_id IS NULL"
-        else:
-            expr_filter = f"cat_feature_id = '{form_name}'"
+        expr_filter = f"cat_feature_id = '{form_name}'"
 
         self._fill_table(qtable, tableview, self.model_update_table, expr_filter)
         tools_gw.set_tablemodel_config(dialog, qtable, tableview, schema_name=schema_name)
@@ -2465,14 +2459,9 @@ class GwAdminButton:
             tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", True)
 
         # Populate widgettype combo
-        if self.chk_multi_insert:
-            sql = (f"SELECT DISTINCT(columnname), columnname "
-                   f"FROM {schema_name}.ve_config_addfields "
-                   f"WHERE cat_feature_id IS NULL ")
-        else:
-            sql = (f"SELECT DISTINCT(columnname), columnname "
-                   f"FROM {schema_name}.ve_config_addfields "
-                   f"WHERE cat_feature_id = '{form_name}'")
+        sql = (f"SELECT DISTINCT(columnname), columnname "
+                f"FROM {schema_name}.ve_config_addfields "
+                f"WHERE cat_feature_id = '{form_name}'")
 
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_manage_fields.cmb_fields, rows)
@@ -2525,7 +2514,7 @@ class GwAdminButton:
             result_json = None
             for widget in list_widgets:
                 if type(widget) not in (QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView, QGroupBox, QTableView) \
-                        and widget.objectName() not in ('qt_spinbox_lineedit', 'chk_multi_insert'):
+                        and widget.objectName() != 'qt_spinbox_lineedit':
 
                     value = None
                     if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
@@ -2545,8 +2534,7 @@ class GwAdminButton:
 
             # Create body
             feature = '"catFeature":"' + form_name + '"'
-            extras = '"action":"CREATE", "multiCreate":' + \
-                str(self.chk_multi_insert).lower() + ', "parameters":' + result_json + ''
+            extras = '"action":"CREATE", "multiCreate": false, "parameters":' + result_json + ''
             body = tools_gw.create_body(feature=feature, extras=extras)
             body = body.replace('""', 'null')
 
@@ -2565,7 +2553,7 @@ class GwAdminButton:
             for widget in list_widgets:
                 if type(widget) not in (
                         QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView, QGroupBox,
-                        QTableView) and widget.objectName() not in ('qt_spinbox_lineedit', 'chk_multi_insert'):
+                        QTableView) and widget.objectName() != 'qt_spinbox_lineedit':
 
                     value = None
                     if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
@@ -2587,7 +2575,7 @@ class GwAdminButton:
             # Create body
             feature = '"catFeature":"' + form_name + '"'
             extras = '"action":"UPDATE"'
-            extras += ', "multiCreate":' + str(self.chk_multi_insert).lower() + ', "parameters":' + result_json + ''
+            extras += ', "multiCreate": false, "parameters":' + result_json + ''
             body = tools_gw.create_body(feature=feature, extras=extras)
             body = body.replace('""', 'null')
 
@@ -2603,8 +2591,7 @@ class GwAdminButton:
 
             # Create body
             feature = '"catFeature":"' + form_name + '"'
-            extras = '"action":"DELETE", "multiCreate":' + str(
-                self.chk_multi_insert).lower() + ',"parameters":{"columnname":"' + field_value + '"}'
+            extras = '"action":"DELETE", "multiCreate": false, "parameters":{"columnname":"' + field_value + '"}'
             body = tools_gw.create_body(feature=feature, extras=extras)
 
             # Execute manage add fields function
