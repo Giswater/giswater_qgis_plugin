@@ -621,3 +621,29 @@ AS SELECT plan_psector.psector_id,
           GROUP BY v_plan_psector_x_other.psector_id) c ON c.psector_id = plan_psector.psector_id
   WHERE plan_psector.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
 
+CREATE OR REPLACE VIEW v_edit_minsector
+AS SELECT m.minsector_id,
+    m.code,
+    m.dma_id,
+    m.dqa_id,
+    m.presszone_id,
+    m.expl_id,
+    m.num_border,
+    m.num_connec,
+    m.num_hydro,
+    m.length,
+    m.descript,
+    m.addparam::text,
+    m.the_geom
+   FROM selector_expl,
+    minsector m
+  WHERE m.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+create trigger gw_trg_edit_minsector instead of
+insert
+    or
+delete
+    or
+update
+    on
+    v_edit_minsector for each row execute function gw_trg_edit_minsector();
