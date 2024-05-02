@@ -2318,7 +2318,7 @@ class GwAdminButton:
 
         # Remove unused tabs
         for x in range(self.dlg_manage_fields.tab_add_fields.count() - 1, -1, -1):
-            if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) != f'tab_{action}':
+            if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) not in (f'tab_{action}', 'tab_infolog'):
                 tools_qt.remove_tab(
                     self.dlg_manage_fields.tab_add_fields, self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
 
@@ -2611,9 +2611,6 @@ class GwAdminButton:
             json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body, schema_name)
             self._manage_json_message(json_result, parameter="Delete function")
 
-        # Close dialog
-        self._close_dialog_admin(self.dlg_manage_fields)
-
         if action == 'update':
             self._open_manage_field('update')
 
@@ -2816,6 +2813,16 @@ class GwAdminButton:
                 msg = "Key on returned json from ddbb is missed"
 
             tools_qgis.show_message(msg, level, parameter=parameter, title=title)
+
+        data = json_result['body'].get('data')
+        tools_gw.fill_tab_log(self.dlg_manage_fields, data)
+        qtabwidget = self.dlg_manage_fields.findChild(QTabWidget, 'tab_add_fields')
+        if qtabwidget is not None:
+            # Remove unused tabs
+            for x in range(qtabwidget.count() - 1, -1, -1):
+                qtabwidget.setTabEnabled(x, False)
+            qtabwidget.setTabEnabled(qtabwidget.count() - 1, True)
+            qtabwidget.setCurrentIndex(qtabwidget.count() - 1)
 
 
     def _save_selection(self):
