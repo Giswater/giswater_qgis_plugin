@@ -1681,7 +1681,7 @@ class GwAdminButton:
         self.task1 = GwTask('Manage schema')
         QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(50)
-        self._reload_fct_ftrg()
+        self._load_fct_ftrg()
         self.task1.setProgress(100)
 
         status = (self.error_count == 0)
