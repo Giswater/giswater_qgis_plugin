@@ -1801,7 +1801,7 @@ INSERT INTO config_param_system VALUES ('epa_automatic_man2graph_values','{"stat
 '{"status":false}','lyt_admin_other');
 
 
-UPDATE ws36010.config_toolbox SET inputparams = 
+UPDATE config_toolbox SET inputparams = 
 '[
 {"widgetname":"netscenario", "label":"Create mapzones for netscenario:","widgettype":"combo","datatype":"text","tooltip": "Create mapzone for a selected netscenario", "layoutname":"grl_option_parameters","layoutorder":1,"dvQueryText":"select netscenario_id as id, name as idval from plan_netscenario  order by name","isNullValue":"true", "selectedId":""}, 
 {"widgetname":"exploitation", "label":"Exploitation:","widgettype":"combo","datatype":"text","tooltip": "Choose exploitation to work with", "layoutname":"grl_option_parameters","layoutorder":2, "dvQueryText":"select -999 as id, ''EXCEED EXPL BORDERS'' as idval UNION select 0 as id, ''DO NOT EXCEED EXPL BORDERS'' as idval", "selectedId":"0"},{"widgetname":"floodOnlyMapzone", "label":"Flood only one mapzone: (*)","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Flood only identified mapzones. The purpose of this is update only network elements affected by this flooding keeping rest of network as is. Recommended to gain performance when mapzones ecosystem is under work", "placeholder":"1001", "layoutname":"grl_option_parameters","layoutorder":4, "value":""},
