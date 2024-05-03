@@ -731,3 +731,6 @@ AS SELECT plan_psector.psector_id,
                   ORDER BY plan_psector_x_other.psector_id) v_plan_psector_x_other
           GROUP BY v_plan_psector_x_other.psector_id) c ON c.psector_id = plan_psector.psector_id
   WHERE plan_psector.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
+
+DROP VIEW v_expl_node;
+DROP VIEW v_expl_arc;

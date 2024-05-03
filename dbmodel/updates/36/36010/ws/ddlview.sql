@@ -640,11 +640,17 @@ AS SELECT m.minsector_id,
     minsector m
   WHERE m.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
-create trigger gw_trg_edit_minsector instead of
-insert
-    or
-delete
-    or
-update
-    on
-    v_edit_minsector for each row execute function gw_trg_edit_minsector();
+
+CREATE OR REPLACE VIEW ve_pol_node AS 
+ SELECT polygon.pol_id,
+    polygon.feature_id,
+    polygon.featurecat_id,
+    polygon.state,
+    polygon.sys_type,
+    polygon.the_geom,
+    polygon.trace_featuregeom
+   FROM v_node node
+     JOIN polygon ON polygon.feature_id::text = node.node_id::text;
+
+DROP VIEW v_expl_node;
+DROP VIEW v_expl_arc;
