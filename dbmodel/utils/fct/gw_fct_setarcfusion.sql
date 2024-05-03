@@ -13,9 +13,10 @@ RETURNS json AS
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_arc_fusion($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{"id":["1004"]},"data":{"workcatId":"work1","enddate":"2020-02-05", "psectorId":""}}$$)
+DELETE FROM SCHEMA_NAME.inp_flwreg_weir where to_arc = '242'
+
+SELECT SCHEMA_NAME.gw_fct_setarcfusion('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":[250]},
+"data":{"workcatId":"work1","enddate":"2020-02-05", "state_type":2, "state":1, "psectorId":null, "arccat_id":"RC200", "arc_type":"CONDUIT"}}'::json)
 
 -- fid: 214
 
@@ -76,6 +77,8 @@ rec_addfield2 record;
 v_fid integer = 214;
 v_result_id text= 'arc fusion';
 v_schemaname text;
+v_arccat_id text;
+v_epatype text;
 
 
 BEGIN
@@ -91,10 +94,13 @@ BEGIN
 	v_array_node_id = lower(((p_data ->>'feature')::json->>'id')::text);
 	v_node_id = (SELECT json_array_elements_text(v_array_node_id));
 	v_workcat_id = (((p_data ->>'data')::json->>'workcatId')::text);
-	v_psector_id = (((p_data ->>'data')::json->>'psectorId')::text);
+	v_psector_id = (((p_data ->>'data')::json->>'psectorId')::integer);
 	v_enddate = ((p_data ->>'data')::json->>'enddate')::date;
 	v_state_type = ((p_data ->>'data')::json->>'state_type')::integer;
 	v_action_mode = ((p_data ->>'data')::json->>'action_mode')::integer;
+	v_arccat_id = ((p_data ->>'data')::json->>'arccat_id')::text;
+	v_arc_type = ((p_data ->>'data')::json->>'arc_type')::text;
+
 
 	-- Get state_type from default value if this isn't on input json
 	IF v_state_type IS NULL THEN
@@ -107,6 +113,7 @@ BEGIN
 			SELECT value INTO v_state_type FROM config_param_user WHERE parameter='edit_statetype_2_vdefault' AND cur_user=current_user;
 		END IF;
 	END IF;
+	
 	v_action_mode = COALESCE(v_action_mode, 1);
 
 	-- delete old values on result table
@@ -143,9 +150,13 @@ BEGIN
 			INSERT INTO audit_check_data (fid,  criticity, error_message)
 			VALUES (214, 1, concat('Arcs related to selected node: ', v_record1.arc_id,', ',v_record2.arc_id,'.'));
 
+			IF v_arccat_id IS NOT NULL THEN
+				v_record1.arccat_id = v_arccat_id;
+				v_record2.arccat_id = v_arccat_id;
+			END IF;
+
 			-- Compare arcs
-			IF v_record1.arccat_id = v_record2.arccat_id AND v_record1.sector_id = v_record2.sector_id AND
-			   v_record1.expl_id = v_record2.expl_id THEN
+			IF v_record1.arccat_id = v_record2.arccat_id AND v_record1.sector_id = v_record2.sector_id AND v_record1.expl_id = v_record2.expl_id THEN
 
 				-- Final geometry
 				IF v_record1.node_1 = v_node_id THEN
@@ -171,19 +182,22 @@ BEGIN
 				SELECT * INTO v_new_record FROM arc WHERE arc_id = v_record1.arc_id;
 
 				-- Get arctype
-				IF v_project_type = 'UD' THEN
-				    v_sql := 'SELECT arc_type FROM cat_arc WHERE id = '''||v_new_record.arccat_id||''';';
-					EXECUTE v_sql
-					INTO v_arc_type;
-				ELSIF v_project_type = 'WS' THEN
-                	v_sql := 'SELECT arctype_id FROM cat_arc WHERE id = '''||v_new_record.arccat_id||''';';
-					EXECUTE v_sql
-					INTO v_arc_type;
+				IF v_arc_type IS NULL THEN
+
+					IF v_project_type = 'UD' THEN
+						v_arc_type = v_new_record.arc_type;
+						
+					ELSIF v_project_type = 'WS' THEN
+					
+						v_sql := 'SELECT arctype_id FROM cat_arc WHERE id = '''||v_new_record.arccat_id||''';';
+						EXECUTE v_sql
+						INTO v_arc_type;
+					END IF;
 				END IF;
 
-
-				-- Create a new arc values
-				v_new_record.the_geom := v_arc_geom;
+				-- setting values of new record
+				v_new_record.arccat_id = v_record1.arccat_id;
+				v_new_record.the_geom := v_arc_geom;				
 				v_new_record.node_1 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_StartPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
 				v_new_record.node_2 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
 				v_new_record.arc_id := (SELECT nextval('urn_id_seq'));
@@ -199,13 +213,15 @@ BEGIN
 
 				-- get man and epa tables
 				IF v_project_type = 'UD' THEN
-					SELECT man_table INTO v_man_table FROM sys_feature_cat s JOIN cat_feature_arc c ON s.id=c.type WHERE c.id=v_record1.arc_type;
-					SELECT epa_table INTO v_epa_table FROM sys_feature_epa_type s JOIN cat_feature_arc c ON s.id=c.epa_default WHERE c.id=v_record1.arc_type;
+					v_new_record.arc_type = v_arc_type;
+					SELECT man_table INTO v_man_table FROM sys_feature_cat s JOIN cat_feature_arc c ON s.id=c.type WHERE c.id=v_new_record.arc_type;
+					SELECT epa_table, epa_default INTO v_epa_table, v_epatype FROM sys_feature_epa_type s JOIN cat_feature_arc c ON s.id=c.epa_default WHERE c.id=v_new_record.arc_type;
 				ELSE
-					SELECT man_table INTO v_man_table FROM sys_feature_cat s JOIN cat_feature_arc c ON s.id=c.type JOIN cat_arc ON arctype_id=c.id WHERE cat_arc.id=v_record1.arccat_id;
-					SELECT epa_table INTO v_epa_table FROM sys_feature_epa_type s JOIN cat_feature_arc c ON s.id=c.epa_default JOIN cat_arc ON arctype_id=c.id WHERE cat_arc.id=v_record1.arccat_id;
+					SELECT man_table INTO v_man_table FROM sys_feature_cat s JOIN cat_feature_arc c ON s.id=c.type JOIN cat_arc ON arctype_id=c.id WHERE cat_arc.id=v_new_record.arccat_id;
+					SELECT epa_table, epa_default INTO v_epa_table, v_epatype FROM sys_feature_epa_type s JOIN cat_feature_arc c ON s.id=c.epa_default JOIN cat_arc ON arctype_id=c.id WHERE cat_arc.id=v_new_record.arccat_id;
 				END IF;
 
+				v_new_record.epa_type = v_epatype;
 
 				-- temporary dissable the arc_searchnodes_control in order to use the node1 and node2 getted before
 				-- to get values topocontrol arc needs to be before, but this is not possible
@@ -464,7 +480,7 @@ BEGIN
 
 					UPDATE arc SET state = 2, state_type = v_state_type WHERE arc_id = v_new_record.arc_id;
 
-                    UPDATE config_param_user SET value='false' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
+					UPDATE config_param_user SET value='false' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
 
 					INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable) VALUES (v_new_record.arc_id, v_psector_id, 1, false) ON CONFLICT (arc_id, psector_id) DO NOTHING;
 
@@ -558,7 +574,7 @@ BEGIN
 						DELETE FROM arc WHERE arc_id = v_record2.arc_id;
 					END IF;
 
-                    UPDATE config_param_user SET value='true' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
+					UPDATE config_param_user SET value='true' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
 
 					IF v_state_node = 1 THEN
 						INSERT INTO plan_psector_x_node (psector_id, node_id, state) VALUES (v_psector_id, v_node_id, 0)
@@ -579,10 +595,10 @@ BEGIN
 
 				END IF;
 
-			INSERT INTO audit_check_data (fid,  criticity, error_message)
-			VALUES (214, 1, concat('Delete arcs: ',v_record1.arc_id,', ',v_record2.arc_id,'.'));
+				INSERT INTO audit_check_data (fid,  criticity, error_message)
+				VALUES (214, 1, concat('Delete arcs: ',v_record1.arc_id,', ',v_record2.arc_id,'.'));
 
-			-- Arcs has different types
+			-- Arcs has different catalogs or exploitation or sector
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"2004", "function":"2112","debug_msg":null, "is_process":true}}$$)' INTO v_audit_result;
