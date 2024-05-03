@@ -46,3 +46,21 @@ DELETE FROM rpt_cat_result;
 
 UPDATE config_param_user SET value = false where parameter = 'plan_psector_force_delete';
 UPDATE inp_gully SET outlet_type =null,  "method"  = null, weir_cd =null , orifice_cd =null , efficiency =null ;
+
+-- reconvert storage 237 in a simple junction 
+SELECT gw_fct_setchangefeaturetype(concat('{"client":{}, "feature":{"type":"node"},"data":{"filterFields":{}, "pageInfo":{},"feature_id":"237", "feature_type_new":"JUNCTION", "featurecat_id":"JUNCTION-01"}}')::json)
+
+DELETE FROM inp_flwreg_weir where to_arc = '242';
+
+SELECT gw_fct_setarcfusion('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":[250]},
+"data":{"workcatId":"work1","enddate":"2020-02-05", "state_type":2, "state":1, "psectorId":null, "arccat_id":"RC200", "arc_type":"CONDUIT"}}'::json);
+
+SELECT gw_fct_setarcfusion('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":[20587]},
+"data":{"workcatId":"work1","enddate":"2020-02-05", "state_type":2, "state":1, "psectorId":null, "arccat_id":"RC200", "arc_type":"CONDUIT"}}'::json);
+
+SELECT gw_fct_setarcfusion('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":[20590]},
+"data":{"workcatId":"work1","enddate":"2020-02-05", "state_type":2, "state":1, "psectorId":null, "arccat_id":"RC200", "arc_type":"CONDUIT"}}'::json);
+
+DELETE FROM polygon WHERE feature_id = '237';
+
+
