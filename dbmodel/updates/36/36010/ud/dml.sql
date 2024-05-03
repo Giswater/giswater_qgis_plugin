@@ -40,3 +40,6 @@ UPDATE config_param_system set isenabled = false where parameter in ('basic_sear
 UPDATE config_form_tabs set device = '{}' WHERE formname = 'search' AND tabname  ='tab_hydro';
 
 DELETE FROM inp_typevalue where typevalue = 'inp_typevalue_dscenario' and id = 'LIDS';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") 
+VALUES(3262, 'The column gully_type is mandatory. Please check your cat_feature_gully and choose one', NULL, 1, true, 'ud', 'core');

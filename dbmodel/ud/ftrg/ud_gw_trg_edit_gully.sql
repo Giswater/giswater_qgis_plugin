@@ -107,7 +107,8 @@ BEGIN
 		
 		-- managing gully_type
 		IF NEW.gully_type IS NULL THEN
-			RAISE EXCEPTION 'The column gully_type is mandatory. Please check your cat_feature_gully and choose one';
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3262", "function":"1206","debug_msg":null}}$$);';
 		END IF;
 		
 		--check if feature is double geom	
