@@ -994,3 +994,7 @@ VALUES(3304, 'gw_fct_admin_manage_planmode', 'utils', 'function', 'json', 'json'
 ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM sys_table where id IN ('v_expl_node', 'v_expl_arc');
+
+INSERT INTO edit_typevalue
+(typevalue, id, idval, descript, addparam)
+VALUES('value_verified', '2', 'IGNORE CHECK', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;

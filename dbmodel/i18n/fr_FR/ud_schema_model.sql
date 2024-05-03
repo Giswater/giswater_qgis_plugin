@@ -40,8 +40,8 @@ INSERT INTO edit_typevalue VALUES ('man_addfields_cat_datatype', 'boolean', 'boo
 INSERT INTO edit_typevalue VALUES ('man_addfields_cat_datatype', 'numeric', 'numeric', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('raster_type', 'DEM', 'DEM', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('raster_type', 'Slope', 'Slope', NULL, NULL);
-INSERT INTO edit_typevalue VALUES ('value_verified', 'A VERIFIE', 'A VERIFIE', NULL, NULL);
-INSERT INTO edit_typevalue VALUES ('value_verified', 'VERIFIE', 'VERIFIE', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('value_verified', '0', 'A VERIFIE', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('value_verified', '1', 'VERIFIE', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('value_review_status', '0', 'Aucun changement', 'Aucun changement au-dessus ou au-dessous des valeurs de tolérance', NULL);
 INSERT INTO edit_typevalue VALUES ('value_review_status', '1', 'nouveau element', 'Nouveau élément inséré à la vérification', NULL);
 INSERT INTO edit_typevalue VALUES ('value_review_status', '2', 'Géometrie modifié', 'Géometrie modifié lors de la vérification. D autres éléments peuvent avoir été modifié ', NULL);
