@@ -1773,7 +1773,7 @@ class GwNonVisual:
     # endregion
 
     # region controls
-    def get_controls(self, control_id=None, duplicate=False):
+    def get_controls(self, control_id=None, duplicate=False, dscenario_id=None):
         """ Opens dialog for controls """
 
         # Get dialog
@@ -1784,20 +1784,20 @@ class GwNonVisual:
         self._populate_cmb_sector_id(self.dialog, self.dialog.cmb_sector_id)
 
         if control_id is not None:
-            self._populate_controls_widgets(control_id)
+            self._populate_controls_widgets(control_id, dscenario_id)
         else:
             self._load_controls_widgets(self.dialog)
 
         # Connect dialog signals
         is_new = (control_id is None) or duplicate
-        self.dialog.btn_accept.clicked.connect(partial(self._accept_controls, self.dialog, is_new, control_id))
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_controls, self.dialog, is_new, control_id, dscenario_id))
         self._connect_dialog_signals()
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_controls')
 
 
-    def _populate_controls_widgets(self, control_id):
+    def _populate_controls_widgets(self, control_id, dscenario_id):
         """ Fills in all the values for control dialog """
 
         # Variables
@@ -1805,7 +1805,10 @@ class GwNonVisual:
         chk_active = self.dialog.chk_active
         txt_text = self.dialog.txt_text
 
-        sql = f"SELECT * FROM v_edit_inp_controls WHERE id = '{control_id}'"
+        if dscenario_id is not None:
+            sql = f"SELECT * FROM inp_dscenario_controls WHERE id = '{control_id}'"
+        else:
+            sql = f"SELECT * FROM v_edit_inp_controls WHERE id = '{control_id}'"
         row = tools_db.get_row(sql)
         if not row:
             return
@@ -1848,7 +1851,7 @@ class GwNonVisual:
         tools_gw.set_config_parser('nonvisual_controls', 'chk_active', active)
 
 
-    def _accept_controls(self, dialog, is_new, control_id):
+    def _accept_controls(self, dialog, is_new, control_id, dscenario_id):
         """ Manage accept button (insert & update) """
 
         # Variables
@@ -1868,9 +1871,14 @@ class GwNonVisual:
                 return
             tools_qt.set_stylesheet(txt_text, style="")
 
+            # Insert inp_dscenario_controls
+            if dscenario_id is not None:
+                sql = f"INSERT INTO inp_dscenario_controls (dscenario_id, sector_id,text,active)" \
+                      f"VALUES({dscenario_id}, {sector_id}, {text}, {active})"
             # Insert inp_controls
-            sql = f"INSERT INTO inp_controls (sector_id,text,active)" \
-                  f"VALUES({sector_id}, {text}, {active})"
+            else:
+                sql = f"INSERT INTO inp_controls (sector_id,text,active)" \
+                      f"VALUES({sector_id}, {text}, {active})"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting control."
@@ -1888,6 +1896,8 @@ class GwNonVisual:
             text = text.strip("'")
             text = text.replace("\n", "\\n")
             fields = f"""{{"sector_id": {sector_id}, "active": "{active}", "text": "{text}"}}"""
+            if dscenario_id is not None:
+                table_name = "inp_dscenario_controls"
 
             result = self._setfields(control_id, table_name, fields)
             if not result:
@@ -1903,7 +1913,7 @@ class GwNonVisual:
     # endregion
 
     # region rules
-    def get_rules(self, rule_id=None, duplicate=False):
+    def get_rules(self, rule_id=None, duplicate=False, dscenario_id=None):
         """ Opens dialog for rules """
 
         # Get dialog
@@ -1914,20 +1924,20 @@ class GwNonVisual:
         self._populate_cmb_sector_id(self.dialog, self.dialog.cmb_sector_id)
 
         if rule_id is not None:
-            self._populate_rules_widgets(rule_id)
+            self._populate_rules_widgets(rule_id, dscenario_id)
         else:
             self._load_rules_widgets(self.dialog)
 
         # Connect dialog signals
         is_new = (rule_id is None) or duplicate
-        self.dialog.btn_accept.clicked.connect(partial(self._accept_rules, self.dialog, is_new, rule_id))
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_rules, self.dialog, is_new, rule_id, dscenario_id))
         self._connect_dialog_signals()
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_rules')
 
 
-    def _populate_rules_widgets(self, rule_id):
+    def _populate_rules_widgets(self, rule_id, dscenario_id):
         """ Fills in all the values for rule dialog """
 
         # Variables
@@ -1935,7 +1945,10 @@ class GwNonVisual:
         chk_active = self.dialog.chk_active
         txt_text = self.dialog.txt_text
 
-        sql = f"SELECT * FROM v_edit_inp_rules WHERE id = '{rule_id}'"
+        if dscenario_id is not None:
+            sql = f"SELECT * FROM inp_dscenario_rules WHERE dscenario_id = '{dscenario_id}' AND id = '{rule_id}'"
+        else:
+            sql = f"SELECT * FROM v_edit_inp_rules WHERE id = '{rule_id}'"
         row = tools_db.get_row(sql)
         if not row:
             return
@@ -1978,7 +1991,7 @@ class GwNonVisual:
         tools_gw.set_config_parser('nonvisual_rules', 'chk_active', active)
 
 
-    def _accept_rules(self, dialog, is_new, rule_id):
+    def _accept_rules(self, dialog, is_new, rule_id, dscenario_id):
         """ Manage accept button (insert & update) """
 
         # Variables
@@ -1998,9 +2011,14 @@ class GwNonVisual:
                 return
             tools_qt.set_stylesheet(txt_text, style="")
 
-            # Insert inp_controls
-            sql = f"INSERT INTO inp_rules (sector_id,text,active)" \
-                  f"VALUES({sector_id}, {text}, {active})"
+            # Insert inp_dscenario_rules
+            if dscenario_id is not None:
+                sql = f"INSERT INTO inp_dscenario_rules (dscenario_id, sector_id, text, active)" \
+                      f"VALUES({dscenario_id}, {sector_id}, {text}, {active})"
+            # Insert inp_rules
+            else:
+                sql = f"INSERT INTO inp_rules (sector_id, text, active)" \
+                    f"VALUES({sector_id}, {text}, {active})"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting control."
@@ -2017,7 +2035,10 @@ class GwNonVisual:
 
             text = text.strip("'")
             text = text.replace("\n", "\\n")
-            fields = f"""{{"sector_id": {sector_id}, "active": "{active}", "text": "{text}"}}"""
+            fields = f""" "sector_id": {sector_id}, "active": "{active}", "text": "{text}" """
+            if dscenario_id is not None:
+                table_name = 'inp_dscenario_rules'
+            fields = f"""{{{fields}}}"""
 
             result = self._setfields(rule_id, table_name, fields)
             if not result:

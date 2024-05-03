@@ -19,6 +19,7 @@ from qgis.PyQt.QtWidgets import QDialog, QLineEdit
 
 from ..dialog import GwAction
 from ..utilities.toolbox_btn import GwToolBoxButton
+from ...shared.nonvisual import GwNonVisual
 from ...ui.ui_manager import GwDscenarioManagerUi, GwDscenarioUi, GwInfoGenericUi
 from ...utils import tools_gw
 from ...models.item_delegates import ReadOnlyDelegate, EditableDelegate
@@ -706,16 +707,20 @@ class GwDscenarioManagerButton(GwAction):
         self._selection_end()
 
         # Enable/disable filter & buttons
-        self._enable_widgets(enable)
+        self._enable_widgets(enable, tableview)
 
 
-    def _enable_widgets(self, enable):
+    def _enable_widgets(self, enable, tableview):
         """  """
 
         tools_qt.set_widget_enabled(self.dlg_dscenario, 'txt_feature_id', enable)
         tools_qt.set_widget_enabled(self.dlg_dscenario, 'btn_insert', enable)
         tools_qt.set_widget_enabled(self.dlg_dscenario, 'btn_delete', enable)
         tools_qt.set_widget_enabled(self.dlg_dscenario, 'btn_snapping', enable)
+
+        if tableview.objectName() in ("inp_dscenario_controls", "inp_dscenario_rules"):
+            tools_qt.set_widget_enabled(self.dlg_dscenario, 'txt_feature_id', False)
+            tools_qt.set_widget_enabled(self.dlg_dscenario, 'btn_snapping', False)
 
 
     def _manage_feature_type(self):
@@ -782,9 +787,14 @@ class GwDscenarioManagerButton(GwAction):
         feature_id = index.sibling(index.row(), col_idx).data()
         field_id = tableview.model().headerData(col_idx, Qt.Horizontal)
 
+        if tablename == "inp_dscenario_controls":
+            return self._manage_upsert_controls(feature_id)
+        elif tablename == "inp_dscenario_rules":
+            return self._manage_upsert_rules(feature_id)
+
         # Execute getinfofromid
         _id = f"{feature_id}"
-        if self.selected_dscenario_id is not None and tablename not in ('inp_dscenario_controls', 'inp_dscenario_rules'):
+        if self.selected_dscenario_id is not None:
             _id = f"{self.selected_dscenario_id}, {feature_id}"
         feature = f'"tableName":"{tablename}", "id": "{_id}"'
         body = tools_gw.create_body(feature=feature)
@@ -974,19 +984,26 @@ class GwDscenarioManagerButton(GwAction):
     def _manage_insert(self):
         """ Insert feature to dscenario via the button """
 
+        tableview = self.dlg_dscenario.main_tab.currentWidget()
+        view = tableview.objectName()
+        if view == "inp_dscenario_controls":
+            return self._manage_upsert_controls()
+        elif view == "inp_dscenario_rules":
+            return self._manage_upsert_rules()
+
         if self.dlg_dscenario.txt_feature_id.text() == '':
             message = "Feature_id is mandatory."
             self.dlg_dscenario.txt_feature_id.setStyleSheet("border: 1px solid red")
             tools_qgis.show_warning(message, dialog=self.dlg_dscenario)
             return
         self.dlg_dscenario.txt_feature_id.setStyleSheet(None)
-        tableview = self.dlg_dscenario.main_tab.currentWidget()
-        view = tableview.objectName()
 
         sql = f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS " \
               f"WHERE TABLE_SCHEMA = '{lib_vars.schema_name}' AND TABLE_NAME = '{self.table_name[len(f'{self.schema_name}.'):]}' " \
               f"ORDER BY ordinal_position;"
         rows = tools_db.get_rows(sql)
+        if not rows:
+            return
 
         if rows[0][0] == 'id':
             # FIELDS
@@ -1004,6 +1021,20 @@ class GwDscenarioManagerButton(GwAction):
 
         # Refresh tableview
         self._fill_dscenario_table()
+
+
+    def _manage_upsert_controls(self, control_id=None):
+
+        nonvisual = GwNonVisual()
+        nonvisual.get_controls(control_id=control_id, dscenario_id=self.selected_dscenario_id)
+        nonvisual.dialog.rejected.connect(self._fill_dscenario_table)
+
+
+    def _manage_upsert_rules(self, rule_id=None):
+
+        nonvisual = GwNonVisual()
+        nonvisual.get_rules(rule_id=rule_id, dscenario_id=self.selected_dscenario_id)
+        nonvisual.dialog.rejected.connect(self._fill_dscenario_table)
 
 
     def _manage_delete(self):
