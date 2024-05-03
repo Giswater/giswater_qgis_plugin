@@ -1,6 +1,8 @@
 from enum import Enum
+from pathlib import Path
+from typing import Optional
 
-from qgis.PyQt.QtWidgets import QActionGroup
+from qgis.PyQt.QtWidgets import QActionGroup, QFileDialog
 
 from .... import global_vars
 from ....libs import tools_qgis
@@ -33,7 +35,8 @@ class GwImportInp(GwAction):
         if global_vars.project_type == ProjectType.WS.value:
             try:
                 import wntr
-                tools_qgis.show_message("OK")
+
+                file_path: Optional[Path] = self._get_file()
             except ImportError:
                 message: str = "wntr package not installed. Open OSGeo4W Shell and execute 'python -m pip install wntr'."
                 tools_qgis.show_message(message)
@@ -42,7 +45,23 @@ class GwImportInp(GwAction):
         if global_vars.project_type == ProjectType.UD.value:
             try:
                 import swmm_api
-                tools_qgis.show_message("OK")
+
+                file_path: Optional[Path] = self._get_file()
             except ImportError:
                 message: str = "swmm-api package not installed. Open OSGeo4W Shell and execute 'python -m pip install swmm-api'."
                 tools_qgis.show_message(message)
+
+    def _get_file(self) -> Optional[Path]:
+        # Load a select file dialog for select a file with .inp extension
+        file_path, _ = QFileDialog.getOpenFileName(
+            None, "Select an INP file", "", "INP files (*.inp)"
+        )
+        if file_path:
+            file_path = Path(file_path)
+
+            # Check if the file extension is .inp
+            if file_path.suffix == ".inp":
+                return file_path
+            else:
+                tools_qgis.show_warning("The file selected is not an INP file")
+                return
