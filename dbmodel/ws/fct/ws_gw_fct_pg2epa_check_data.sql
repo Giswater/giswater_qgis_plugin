@@ -875,7 +875,7 @@ BEGIN
     IF v_fid <> 101 THEN --not on check project (101) because it's already on om_check_data
         RAISE NOTICE '36 - Check nodes with state_type isoperative = false (187)';
         v_querytext = 'SELECT node_id, nodecat_id, the_geom, n.expl_id FROM v_edit_node n JOIN value_state_type s ON id=state_type 
-            WHERE n.state > 0 AND s.is_operative IS FALSE';
+            WHERE n.state > 0 AND s.is_operative IS FALSE AND verified <>''2''';
 
         EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
         IF v_count > 0 THEN
@@ -890,7 +890,7 @@ BEGIN
 
         RAISE NOTICE '37 - Check arcs with state_type isoperative = false (188)';
         v_querytext = 'SELECT arc_id, arccat_id, the_geom, a.expl_id FROM v_edit_arc a JOIN value_state_type s ON id=state_type 
-        WHERE a.state > 0 AND s.is_operative IS FALSE'; 
+        WHERE a.state > 0 AND s.is_operative IS FALSE AND verified <>''2'''; 
 
         EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
