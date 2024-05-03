@@ -1823,3 +1823,9 @@ INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp
 INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_typevalue_dscenario', 'RULES', 'RULES', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_typevalue_dscenario', 'RESERVOIR', 'RESERVOIR', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_typevalue_dscenario', 'TANK', 'TANK', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+
+
+-- 2024/05/03
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") 
+VALUES(3306, 'ws_gw_trg_presszone_check_dataype', 'ws', 'trigger function', null, null, 'Trigger to control integer ids for presszones.', 'role_edit', NULL, 'core')
+ON CONFLICT (id) DO NOTHING;

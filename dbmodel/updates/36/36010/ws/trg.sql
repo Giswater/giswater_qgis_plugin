@@ -7,5 +7,11 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-create trigger gw_trg_edit_minsector instead of insert or delete or update
-on v_edit_minsector for each row execute function gw_trg_edit_minsector();
+CREATE TRIGGER gw_trg_edit_minsector instead of insert or delete or update
+ON v_edit_minsector for each row execute function gw_trg_edit_minsector();
+
+CREATE TRIGGER gw_trg_presszone_check_datatype BEFORE INSERT OR UPDATE of presszone_id 
+ON presszone for each row execute function gw_trg_presszone_check_datatype();
+
+CREATE TRIGGER gw_trg_presszone_check_datatype BEFORE INSERT OR UPDATE of presszone_id 
+ON plan_netscenario_presszone FOR EACH ROW EXECUTE PROCEDURE gw_trg_presszone_check_datatype();
