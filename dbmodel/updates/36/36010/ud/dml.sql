@@ -38,3 +38,5 @@ UPDATE config_form_fields SET linkedobject=NULL WHERE formname='gully' AND formt
 -- 01/05/2024
 UPDATE config_param_system set isenabled = false where parameter in ('basic_search_hydrometer', 'basic_search_v2_tab_hydrometer');
 UPDATE config_form_tabs set device = '{}' WHERE formname = 'search' AND tabname  ='tab_hydro';
+
+DELETE FROM inp_typevalue where typevalue = 'inp_typevalue_dscenario' and id = 'LIDS';

@@ -1815,3 +1815,11 @@ WHERE id = 3256;
 
 -- 03/05/24
 UPDATE sys_table SET addparam = '{"pkey": "dscenario_id, feature_id"}' WHERE id = 'v_edit_inp_dscenario_demand';
+
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_typevalue_dscenario', 'VIRTUALVALVE', 'VIRTUALVALVE', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_typevalue_dscenario', 'VITUALPUMP', 'VITUALPUMP', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_typevalue_dscenario', 'ADDITIONAL', 'ADDITIONALADDITIONAL', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_typevalue_dscenario', 'CONTROLS', 'CONTROLS', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_typevalue_dscenario', 'RULES', 'RULES', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_typevalue_dscenario', 'RESERVOIR', 'RESERVOIR', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_typevalue_dscenario', 'TANK', 'TANK', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
