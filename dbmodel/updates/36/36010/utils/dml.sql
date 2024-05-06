@@ -998,3 +998,6 @@ DELETE FROM sys_table where id IN ('v_expl_node', 'v_expl_arc');
 INSERT INTO edit_typevalue
 (typevalue, id, idval, descript, addparam)
 VALUES('value_verified', '2', 'IGNORE CHECK', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+
+-- 06/05/2024
+UPDATE config_csv SET active=false WHERE fid=236;
