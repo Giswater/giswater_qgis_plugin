@@ -49,7 +49,7 @@ class GwImportInp(GwAction):
 
                 if not file_path:
                     return
-                
+
                 self.parse_inp_file(file_path)
 
             except ImportError:
@@ -65,7 +65,7 @@ class GwImportInp(GwAction):
 
                 if not file_path:
                     return
-                
+
                 self.parse_inp_file(file_path)
 
             except ImportError:
@@ -83,7 +83,9 @@ class GwImportInp(GwAction):
         )
         tools_gw.open_dialog(self.dlg_inp_parsing, dlg_name="parse_inp")
 
-        self.parse_inp_task = GwParseInpTask("Parse INP task", file_path)
+        self.parse_inp_task = GwParseInpTask(
+            "Parse INP task", file_path, self.dlg_inp_parsing
+        )
         QgsApplication.taskManager().addTask(self.parse_inp_task)
         QgsApplication.taskManager().triggerTask(self.parse_inp_task)
 
@@ -91,9 +93,20 @@ class GwImportInp(GwAction):
         self.t0: float = time()
         self.timer: QTimer = QTimer()
         self.timer.timeout.connect(
-            partial(self._calculate_elapsed_time, self.dlg_inp_parsing)
+            partial(self._update_parsing_dialog, self.dlg_inp_parsing)
         )
         self.timer.start(1000)
+
+    def _update_parsing_dialog(self, dialog: GwDialog) -> None:
+        if not dialog:
+            return
+
+        tools_gw.fill_tab_log(
+            dialog,
+            {"info": {"values": [{"message": msg} for msg in self.parse_inp_task.log]}},
+        )
+        print("Humm...")
+        self._calculate_elapsed_time(dialog)
 
     def _calculate_elapsed_time(self, dialog: GwDialog) -> None:
         tf: float = time()  # Final time
