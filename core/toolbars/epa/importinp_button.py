@@ -75,7 +75,7 @@ class GwImportInp(GwAction):
         self.dlg_inp_parsing.rejected.connect(
             partial(tools_gw.save_settings, self.dlg_inp_parsing)
         )
-        tools_gw.open_dialog(self.dlg_inp_parsing, dlg_name="project_check")
+        tools_gw.open_dialog(self.dlg_inp_parsing, dlg_name="parse_inp")
 
         # Create timer
         self.t0: float = time()
@@ -92,11 +92,12 @@ class GwImportInp(GwAction):
 
     def _get_file(self) -> Optional[Path]:
         # Load a select file dialog for select a file with .inp extension
-        file_path, _ = QFileDialog.getOpenFileName(
+        result: Tuple[str, str] = QFileDialog.getOpenFileName(
             None, "Select an INP file", "", "INP files (*.inp)"
         )
-        if file_path:
-            file_path = Path(file_path)
+        file_path_str: str = result[0]
+        if file_path_str:
+            file_path: Path = Path(file_path_str)
 
             # Check if the file extension is .inp
             if file_path.suffix == ".inp":
