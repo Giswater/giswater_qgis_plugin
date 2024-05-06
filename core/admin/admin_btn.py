@@ -687,8 +687,8 @@ class GwAdminButton:
 
         if lib_vars.user_level['level'] not in lib_vars.user_level['showadminadvanced']:
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_advanced")
-        if global_vars.gw_dev_mode is not True:
-            tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_dev")
+        # if global_vars.gw_dev_mode is not True:
+            # tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_dev")
 
         self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater", False,
                                                         force_reload=True)
@@ -1790,7 +1790,7 @@ class GwAdminButton:
             manage_i18n = True
 
         if manage_i18n:
-            files_to_execute = [f"{self.project_type_selected}_schema_model.sql", f"dml.sql"]
+            files_to_execute = [f"{self.project_type_selected}_schema_model.sql", f"{self.project_type_selected}_dml.sql", f"dml.sql"]
             for file in files_to_execute:
                 status = True
                 if file in filelist:
