@@ -1,12 +1,19 @@
+from datetime import timedelta
 from enum import Enum
+from functools import partial
 from pathlib import Path
+from time import time
 from typing import Optional
 
-from qgis.PyQt.QtWidgets import QActionGroup, QFileDialog
+from qgis.PyQt.QtCore import QTimer
+from qgis.PyQt.QtWidgets import QActionGroup, QFileDialog, QLabel
 
 from .... import global_vars
 from ....libs import tools_qgis
 from ...models.plugin_toolbar import GwPluginToolbar
+from ...ui.ui_manager import GwInpParsingUi
+from ...ui.dialog import GwDialog
+from ...utils import tools_gw
 from ..dialog import GwAction
 
 
@@ -37,6 +44,10 @@ class GwImportInp(GwAction):
                 import wntr
 
                 file_path: Optional[Path] = self._get_file()
+
+                if not file_path:
+                    return
+
             except ImportError:
                 message: str = "wntr package not installed. Open OSGeo4W Shell and execute 'python -m pip install wntr'."
                 tools_qgis.show_message(message)
@@ -47,9 +58,37 @@ class GwImportInp(GwAction):
                 import swmm_api
 
                 file_path: Optional[Path] = self._get_file()
+
+                if not file_path:
+                    return
+
             except ImportError:
                 message: str = "swmm-api package not installed. Open OSGeo4W Shell and execute 'python -m pip install swmm-api'."
                 tools_qgis.show_message(message)
+
+    def parse_inp_file(self, file_path: Path) -> None:
+        """Parse INP file, showing a log to the user"""
+
+        # Create and show parsing dialog
+        self.dlg_inp_parsing = GwInpParsingUi()
+        tools_gw.load_settings(self.dlg_inp_parsing)
+        self.dlg_inp_parsing.rejected.connect(
+            partial(tools_gw.save_settings, self.dlg_inp_parsing)
+        )
+        tools_gw.open_dialog(self.dlg_inp_parsing, dlg_name="project_check")
+
+        # Create timer
+        self.t0: float = time()
+        self.timer: QTimer = QTimer()
+        self.timer.timeout.connect(
+            partial(self._calculate_elapsed_time, self.dlg_inp_parsing)
+        )
+        self.timer.start(1000)
+
+    def _calculate_elapsed_time(self, dialog: GwDialog) -> None:
+        tf: float = time()  # Final time
+        td: float = tf - self.t0  # Delta time
+        self._update_time_elapsed(f"Exec. time: {timedelta(seconds=round(td))}", dialog)
 
     def _get_file(self) -> Optional[Path]:
         # Load a select file dialog for select a file with .inp extension
@@ -65,3 +104,7 @@ class GwImportInp(GwAction):
             else:
                 tools_qgis.show_warning("The file selected is not an INP file")
                 return
+
+    def _update_time_elapsed(self, text: str, dialog: GwDialog) -> None:
+        lbl_time: QLabel = dialog.findChild(QLabel, "lbl_time")
+        lbl_time.setText(text)

@@ -249,6 +249,10 @@ class GwNonVisualTimeseriesUi(GwDialog, FROM_CLASS):
 FROM_CLASS = _get_ui_class('nonvisual_lids.ui', 'epa')
 class GwNonVisualLidsUi(GwDialog, FROM_CLASS):
     pass
+
+FORM_CLASS = _get_ui_class('inp_parsing.ui', 'epa')
+class GwInpParsingUi(GwDialog, FORM_CLASS):
+    pass
 # endregion
 
 
