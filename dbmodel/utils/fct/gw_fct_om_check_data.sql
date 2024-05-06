@@ -774,14 +774,14 @@ BEGIN
 
 	RAISE NOTICE '26 - features with state 1 and end date before start date (264)';
 	IF v_project_type = 'WS' THEN
-		v_querytext = 'SELECT arc_id as feature_id  from '||v_edit||'arc where enddate < builtdate
-					UNION SELECT node_id from '||v_edit||'node where enddate < builtdate
-					UNION SELECT connec_id from '||v_edit||'connec where enddate < builtdate';
+		v_querytext = 'SELECT arc_id as feature_id  from '||v_edit||'arc where enddate < builtdate and state = 1
+					UNION SELECT node_id from '||v_edit||'node where enddate < builtdate and state = 1
+					UNION SELECT connec_id from '||v_edit||'connec where enddate < builtdate and state = 1';
 	ELSIF v_project_type = 'UD' THEN
-		v_querytext = 'SELECT arc_id as feature_id from '||v_edit||'arc where enddate < builtdate
-					UNION SELECT node_id from '||v_edit||'node where enddate < builtdate
-					UNION SELECT connec_id from '||v_edit||'connec where enddate < builtdate
-					UNION SELECT gully_id from '||v_edit||'gully where enddate < builtdate';
+		v_querytext = 'SELECT arc_id as feature_id from '||v_edit||'arc where enddate < builtdate and state = 1
+					UNION SELECT node_id from '||v_edit||'node where enddate < builtdate and state = 1
+					UNION SELECT connec_id from '||v_edit||'connec where enddate < builtdate and state = 1
+					UNION SELECT gully_id from '||v_edit||'gully where enddate < builtdate and state = 1';
 	END IF;
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
