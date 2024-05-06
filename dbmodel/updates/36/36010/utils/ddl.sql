@@ -9,3 +9,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 26/03/2024
 ALTER TABLE man_addfields_value RENAME TO _man_addfields_value_;
+
+DROP FUNCTION IF EXISTS gw_fct_admin_manage_fix_i18n_36008;
