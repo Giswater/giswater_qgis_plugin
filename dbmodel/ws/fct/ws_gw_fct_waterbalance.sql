@@ -75,6 +75,10 @@ v_carl double precision = 0;
 
 v_setmawithperiodmeters boolean = false;
 
+v_days_limiter integer;
+v_current_date text;
+v_days_past integer;
+
 BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
@@ -311,14 +315,47 @@ BEGIN
 		-- get log data
 		SELECT sum(total_sys_input) as tsi, sum(auth_bill_met_hydro) as bmc, (sum(total_sys_input) - sum(auth_bill_met_hydro))::numeric (12,2) as nrw INTO rec_nrw
 		FROM om_waterbalance WHERE expl_id = v_expl AND cat_period_id  = v_period;
+	
+		--restrict water balance if threshold days after lastupdate DMA are surpassed
+		select value into v_days_limiter from config_param_system where parameter = 'om_waterbalance_threshold_days';
+		
+		select lastupdate::text into v_current_date from dma where expl_id = v_expl and lastupdate is not null order by tstamp asc limit 1;
+	
+		if v_current_date is null then
+		
+			select tstamp::text into v_current_date from dma where expl_id = v_expl and tstamp is not null order by tstamp asc limit 1;
+		
+			raise notice 'v_current_date %', v_current_date;
+			
+		end if;
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Process done succesfully for period: ',v_period));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Number of DMA processed: ', v_count));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Total System Input: ', round(rec_nrw.tsi::numeric,2), ' CMP'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Billed metered consumtion: ', round(rec_nrw.bmc::numeric,2), ' CMP'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Non-revenue water: ', round(rec_nrw.nrw::numeric,2), ' CMP'));
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
+		select date_part('day', now() - v_current_date::timestamp) into v_days_past;
+			
+		
+		IF v_days_past is null then
 
+			INSERT INTO audit_check_data (error_message, fid, cur_user, criticity) 
+			VALUES ('ERROR: There are NULL values on lastupdate or tstamp on table dma. Please, update DMAs to fill these columns', v_fid, current_user, 3);
+		
+		ELSIF v_days_past >= v_days_limiter then
+		
+			INSERT INTO audit_check_data (error_message, fid, cur_user, criticity) 
+			VALUES ('ERROR: Water balance is not allowed having surpassed the threshold day limiter (parameter om_waterbalance_threshold_days)', v_fid, current_user, 3);
+			
+		else
+			
+			SELECT sum(total_sys_input) as tsi, sum(auth_bill_met_hydro) as bmc, (sum(total_sys_input) - sum(auth_bill_met_hydro))::numeric (12,2) as nrw INTO rec_nrw
+			FROM om_waterbalance WHERE expl_id = v_expl AND cat_period_id  = v_period;
+	
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Process done succesfully for period: ',v_period));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Number of DMA processed: ', v_count));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Total System Input: ', round(rec_nrw.tsi::numeric,2), ' CMP'));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Billed metered consumtion: ', round(rec_nrw.bmc::numeric,2), ' CMP'));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Non-revenue water: ', round(rec_nrw.nrw::numeric,2), ' CMP'));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('DMAs updated ',date_part('day', now() - v_current_date::timestamp), ' days ago.'));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
+		
+		end if;
 
 		IF v_executegraphdma THEN
 

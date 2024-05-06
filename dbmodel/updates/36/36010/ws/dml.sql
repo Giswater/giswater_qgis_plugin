@@ -1834,3 +1834,7 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") 
 VALUES(3260, 'The proposed id for mapzone need to be integer', '', 2, true, 'ws', 'core')
 ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) 
+VALUES('om_waterbalance_threshold_days', '45', 'Amount of days that give currency to waterbalance', NULL, NULL, NULL, NULL, NULL, 'ws', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
