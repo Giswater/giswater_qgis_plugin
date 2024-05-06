@@ -1829,3 +1829,8 @@ INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") 
 VALUES(3306, 'ws_gw_trg_presszone_check_dataype', 'ws', 'trigger function', null, null, 'Trigger to control integer ids for presszones.', 'role_edit', NULL, 'core')
 ON CONFLICT (id) DO NOTHING;
+
+-- 06/05/2024
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") 
+VALUES(3260, 'The proposed id for mapzone need to be integer', '', 2, true, 'ws', 'core')
+ON CONFLICT (id) DO NOTHING;
