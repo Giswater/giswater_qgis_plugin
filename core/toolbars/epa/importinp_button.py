@@ -3,16 +3,18 @@ from enum import Enum
 from functools import partial
 from pathlib import Path
 from time import time
-from typing import Optional
+from typing import Optional, Tuple
 
+from qgis.core import QgsApplication
 from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QActionGroup, QFileDialog, QLabel
 
 from .... import global_vars
 from ....libs import tools_qgis
 from ...models.plugin_toolbar import GwPluginToolbar
-from ...ui.ui_manager import GwInpParsingUi
+from ...threads.parse_inp import GwParseInpTask
 from ...ui.dialog import GwDialog
+from ...ui.ui_manager import GwInpParsingUi
 from ...utils import tools_gw
 from ..dialog import GwAction
 
@@ -47,6 +49,8 @@ class GwImportInp(GwAction):
 
                 if not file_path:
                     return
+                
+                self.parse_inp_file(file_path)
 
             except ImportError:
                 message: str = "wntr package not installed. Open OSGeo4W Shell and execute 'python -m pip install wntr'."
@@ -61,6 +65,8 @@ class GwImportInp(GwAction):
 
                 if not file_path:
                     return
+                
+                self.parse_inp_file(file_path)
 
             except ImportError:
                 message: str = "swmm-api package not installed. Open OSGeo4W Shell and execute 'python -m pip install swmm-api'."
@@ -76,6 +82,10 @@ class GwImportInp(GwAction):
             partial(tools_gw.save_settings, self.dlg_inp_parsing)
         )
         tools_gw.open_dialog(self.dlg_inp_parsing, dlg_name="parse_inp")
+
+        self.parse_inp_task = GwParseInpTask("Parse INP task", file_path)
+        QgsApplication.taskManager().addTask(self.parse_inp_task)
+        QgsApplication.taskManager().triggerTask(self.parse_inp_task)
 
         # Create timer
         self.t0: float = time()
