@@ -687,8 +687,8 @@ class GwAdminButton:
 
         if lib_vars.user_level['level'] not in lib_vars.user_level['showadminadvanced']:
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_advanced")
-        # if global_vars.gw_dev_mode is not True:
-            # tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_dev")
+        if global_vars.gw_dev_mode is not True:
+            tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_dev")
 
         self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater", False,
                                                         force_reload=True)
