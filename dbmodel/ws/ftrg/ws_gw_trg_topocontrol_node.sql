@@ -51,6 +51,12 @@ v_depth double precision;
 v_elev  double precision;
 v_trace_featuregeom boolean;
 
+rec_addfields record;
+v_sql text;
+v_query_string_update text;
+v_arc_childtable_name text;
+v_arc_type text;
+
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -63,10 +69,10 @@ BEGIN
 	SELECT value INTO v_psector_id FROM config_param_user WHERE cur_user=current_user AND parameter = 'plan_psector_vdefault';
 
 	--Check if user has migration mode enabled
-  IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
-  	v_node_proximity_control = FALSE;
-  	v_dsbl_error = TRUE;
-  END IF;
+	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
+		v_node_proximity_control = FALSE;
+		v_dsbl_error = TRUE;
+	END IF;
 
 	-- For state=0
 	IF NEW.state=0 THEN
@@ -146,6 +152,13 @@ BEGIN
 						v_arcrecordtb.state=2;
 						v_arcrecordtb.state_type := (SELECT (value::json->>'plan_statetype_ficticius')::smallint FROM config_param_system WHERE parameter='plan_statetype_vdefault');
 
+						-- Get arctype
+						IF v_arc_type IS NULL THEN
+							v_sql := 'SELECT arctype_id FROM cat_arc WHERE id = '''||v_new_record.arccat_id||''';';
+							EXECUTE v_sql
+							INTO v_arc_type;
+						END IF;
+
 						-- set temporary values for config variables in order to enable the insert of arc in spite of due a 'bug' of postgres it seems that does not recognize the new node inserted
 						UPDATE config_param_user SET value=TRUE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;				
 
@@ -192,13 +205,28 @@ BEGIN
 						-- insert new records into epa_table
 						EXECUTE v_epaquerytext1||v_arcrecordtb.arc_id::text||v_epaquerytext2;						
 		
-						--Copy addfields from old arc to new arcs	
-						INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
-						SELECT 
-						v_arcrecordtb.arc_id,
-						parameter_id,
-						value_param
-						FROM man_addfields_value WHERE feature_id=v_arc.arc_id;
+						--Copy addfields from old arc to new arcs
+						v_arc_childtable_name := 'man_arc_' || lower(v_arc_type);
+						IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = v_schemaname AND table_name = v_arc_childtable_name)) IS TRUE THEN
+							EXECUTE 'INSERT INTO '||v_arc_childtable_name||' (arc_id) VALUES ('''||v_arcrecordtb.arc_id||''');';
+
+							v_sql := 'SELECT column_name FROM information_schema.columns 
+									  WHERE table_schema = ''SCHEMA_NAME'' 
+									  AND table_name = '''||v_arc_childtable_name||''' 
+									  AND column_name !=''id'' AND column_name != ''arc_id'' ;';
+
+							FOR rec_addfields IN EXECUTE v_sql
+							LOOP
+								v_query_string_update = 'UPDATE '||v_arc_childtable_name||' SET '||rec_addfields.column_name|| ' = '
+														'( SELECT '||rec_addfields.column_name||' FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_arc.arc_id)||' ) '
+														'WHERE '||v_arc_childtable_name||'.arc_id = '||quote_literal(v_arcrecordtb.arc_id)||';';
+
+								IF v_query_string_update IS NOT NULL THEN
+									EXECUTE v_query_string_update;
+								END IF;
+
+							END LOOP;
+						END IF;
 																			
 						-- Update doability for the new arc (false)
 						UPDATE plan_psector_x_arc SET doable=FALSE, addparam='{"nodeReplace":"generated"}' 
