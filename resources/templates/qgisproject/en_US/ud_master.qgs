@@ -55507,7 +55507,7 @@ def my_form_open(dialog, layer, feature):
         <value></value>
         <value>role_admin</value>
         <value>ud</value>
-        <value>False</value>
+        <value>__STORECREDENTIALS__</value>
       </variableValues>
     </Variables>
     <WCSLayers type="QStringList"/>
