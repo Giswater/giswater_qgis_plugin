@@ -12,7 +12,7 @@ Changelog=Version 3.6.010
     - Change qgis templates: add direction arrow on links and delete flowtrace layers for UD
     - Dscenario: Enable tab 'Additional pump' in Dscenario and add/edit controls & rules with proper dialog
     - PG_SERVICE: Improve management of credentials when using pgservice file
-    - CAD tools: Show a preview of what will be drawn
+    - CAD tools: Show a preview of what will be drawn & change circle geometry type to MultiCurve
     - Non-Visual Objects: add more filters to the manager
     - Changes according to the addfields refactor
     - Improve performance of go2epa if 'Message log' panel was opened

@@ -37,6 +37,7 @@ class GwAuxCircleAddButton(GwMaptool):
 
     def cancel(self):
 
+        self._reset_rubberbands()
         tools_gw.close_dialog(self.dlg_create_circle)
         self.cancel_map_tool()
         if self.layer_circle:
@@ -51,6 +52,7 @@ class GwAuxCircleAddButton(GwMaptool):
     def keyPressEvent(self, event):
 
         if event.key() == Qt.Key_Escape:
+            self._reset_rubberbands()
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
             return
@@ -238,8 +240,10 @@ class GwAuxCircleAddButton(GwMaptool):
             self.layer_circle.commitChanges()
             self.layer_circle.dataProvider().reloadData()
             self.layer_circle.triggerRepaint()
+            self._reset_rubberbands()
 
         else:
+            self._reset_rubberbands()
             self.iface.actionPan().trigger()
             self.cancel_circle = False
             return
@@ -265,6 +269,7 @@ class GwAuxCircleAddButton(GwMaptool):
             self._init_create_circle_form(point)
 
         elif event.button() == Qt.RightButton:
+            self._reset_rubberbands()
             self.iface.actionPan().trigger()
             self.cancel_circle = True
             self.cancel_map_tool()
@@ -273,5 +278,10 @@ class GwAuxCircleAddButton(GwMaptool):
 
         if self.layer_circle:
             self.layer_circle.commitChanges()
+
+
+    def _reset_rubberbands(self):
+
+        tools_gw.reset_rubberband(self.rb_circle, QgsWkbTypes.LineGeometry)
 
     # endregion
