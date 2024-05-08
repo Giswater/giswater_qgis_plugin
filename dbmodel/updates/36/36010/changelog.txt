@@ -9,3 +9,7 @@
     - Improved database organization and efficiency.
 - Add IGNORE CHECK to value_verified and allow checks 187 and 188 to have and exception using this value
 - Add geom_multicurve on temp_table and manage it on v_edit_cad_aux_circle instead of polygon
+- Various minor bug fix
+- Add null values in combos managing scenarios
+- Remove views v_expl_node and v_expl_arc
+- Enhance relation expl-sector / sector-expl on selector

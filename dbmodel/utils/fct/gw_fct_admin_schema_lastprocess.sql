@@ -400,13 +400,6 @@ BEGIN
 			UPDATE config_param_system SET value =
 			'{"sys_table_id":"v_edit_gully","sys_id_field":"gully_id","sys_search_field":"gully_id","alias":"Gullies","cat_field":"gratecat_id","orderby":"3","search_type":"gully"}'
 			WHERE  parameter = 'basic_search_network_gully';
-			
-			-- fix i18n
-			IF v_gwversion = '3.6.009' THEN
-				PERFORM gw_fct_admin_manage_fix_i18n_36008();
-			END IF;
-			
-			DROP FUNCTION IF EXISTS gw_fct_admin_manage_fix_i18n_36008();
 
 		ELSIF v_isnew IS FALSE THEN
 		
