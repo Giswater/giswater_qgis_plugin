@@ -23,3 +23,11 @@ CREATE OR REPLACE VIEW v_node AS
  JOIN v_state_arc USING (arc_id)
  WHERE (a.expl_id = s.expl_id OR a.expl_id2 = s.expl_id);
  
+ 
+DROP VIEW v_edit_cad_auxcircle;
+CREATE OR REPLACE VIEW v_edit_cad_auxcircle AS 
+SELECT id,
+geom_multicurve
+FROM temp_table
+WHERE cur_user = "current_user"()::text AND fid = 361;
+ 
