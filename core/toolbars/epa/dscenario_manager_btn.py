@@ -39,6 +39,7 @@ class GwDscenarioManagerButton(GwAction):
                             "inp_dscenario_rules": {"filter_table": "v_edit_sector", "feature_type": "sector"},
                             "inp_dscenario_demand": {"filter_table": ["v_edit_inp_junction", "v_edit_inp_connec"], "feature_type": ["node", "connec"]},
                             "inp_dscenario_raingage": {"filter_table": "v_edit_raingage", "feature_type": "rg"},
+                            "inp_dscenario_pump_additional": {"filter_table": "inp_pump_additional", "feature_type": "id"},
                             # DISABLED:
                             # "inp_dscenario_lid_usage": {"filter_table": "v_edit_inp_dscenario_lid_usage", "feature_type": "lidco"},
                             # "inp_dscenario_inflows": {"filter_table": "v_edit_inp_inflows", "feature_type": "node"},
@@ -48,11 +49,10 @@ class GwDscenarioManagerButton(GwAction):
                             # "inp_dscenario_flwreg_orifice": {"filter_table": "v_edit_inp_orifice", "feature_type": "arc"},
                             # "inp_dscenario_flwreg_outlet": {"filter_table": "v_edit_inp_outlet", "feature_type": "arc"},
                             # "inp_dscenario_inflows_poll": {"filter_table": "v_edit_inp_inflows_poll", "feature_type": "poll"},
-                            # "inp_dscenario_pump_additional": {"filter_table": "v_edit_inp_pump_additional", "feature_type": "node"},
                             }
         self.filter_disabled = ["inp_dscenario_lid_usage", "inp_dscenario_inflows", "inp_dscenario_treatment",
                                 "inp_dscenario_flwreg_pump", "inp_dscenario_flwreg_weir", "inp_dscenario_flwreg_orifice",
-                                "inp_dscenario_flwreg_outlet", "inp_dscenario_inflows_poll", "inp_dscenario_pump_additional"
+                                "inp_dscenario_flwreg_outlet", "inp_dscenario_inflows_poll", #"inp_dscenario_pump_additional"
                                 ]
         self.dict_ids = {'v_edit_cat_hydrology': 'name', 'v_edit_cat_dwf_scenario': 'idval', 'v_edit_cat_dscenario': 'name'}
         self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
@@ -653,6 +653,9 @@ class GwDscenarioManagerButton(GwAction):
         # Sort the table by feature id
         model.sort(1, 0)
 
+        # Clear txt_feature_id
+        self.dlg_dscenario.txt_feature_id.setText('')
+
 
     def _manage_current_changed(self):
         """ Manages tab changes """
@@ -678,7 +681,10 @@ class GwDscenarioManagerButton(GwAction):
             if self.filter_dict.get(tab_name):
                 table_name = self.filter_dict[tab_name]['filter_table']
                 feature_type = self.filter_dict[tab_name]['feature_type']
-            tools_gw.set_completer_widget(table_name, self.dlg_dscenario.txt_feature_id, feature_type, add_id=True)
+            add_id = not (feature_type == "id")
+            if feature_type == "id":
+                feature_type = "concat(node_id, ' (order_id ', order_id, ')')"
+            tools_gw.set_completer_widget(table_name, self.dlg_dscenario.txt_feature_id, feature_type, add_id=add_id, filter_mode='contains')
 
         tableview = self.dlg_dscenario.main_tab.currentWidget()
 
@@ -796,6 +802,10 @@ class GwDscenarioManagerButton(GwAction):
         _id = f"{feature_id}"
         if self.selected_dscenario_id is not None:
             _id = f"{self.selected_dscenario_id}, {feature_id}"
+            if tablename == "inp_dscenario_pump_additional":
+                col_idx = tools_qt.get_col_index_by_col_name(tableview, 'order_id')
+                order_id = index.sibling(index.row(), col_idx).data()
+                _id += f", {order_id}"
         feature = f'"tableName":"{tablename}", "id": "{_id}"'
         body = tools_gw.create_body(feature=feature)
         json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
@@ -998,6 +1008,9 @@ class GwDscenarioManagerButton(GwAction):
             return
         self.dlg_dscenario.txt_feature_id.setStyleSheet(None)
 
+        if view == "inp_dscenario_pump_additional":
+            return self._manage_insert_pump_additional(view)
+
         sql = f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS " \
               f"WHERE TABLE_SCHEMA = '{lib_vars.schema_name}' AND TABLE_NAME = '{self.table_name[len(f'{self.schema_name}.'):]}' " \
               f"ORDER BY ordinal_position;"
@@ -1017,6 +1030,17 @@ class GwDscenarioManagerButton(GwAction):
             sql += f");"
         else:
             sql = f"INSERT INTO v_edit_{view} VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}');"
+        tools_db.execute_sql(sql)
+
+        # Refresh tableview
+        self._fill_dscenario_table()
+
+
+    def _manage_insert_pump_additional(self, view):
+        full_text = self.dlg_dscenario.txt_feature_id.text()
+        split_text = full_text.replace('(', '').replace(')', '').split(' order_id ')
+        node_id, order_id = split_text
+        sql = f"INSERT INTO v_edit_{view} VALUES ({self.selected_dscenario_id}, '{node_id}', '{order_id}');"
         tools_db.execute_sql(sql)
 
         # Refresh tableview
@@ -1200,6 +1224,8 @@ class GwDscenarioManagerButton(GwAction):
             tools_qt.set_widget_enabled(self.add_dlg, f'tab_none_dscenario_id', False)
             # tools_qt.set_checked(self.add_dlg, 'tab_none_active', True)
             field_id = ['dscenario_id', field_id]
+            if tablename == "inp_dscenario_pump_additional":
+                field_id.append('order_id')
         if tablename in ('inp_dscenario_controls', 'inp_dscenario_rules'):
             field_id = 'id'
 

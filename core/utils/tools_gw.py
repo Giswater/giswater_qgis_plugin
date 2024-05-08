@@ -13,6 +13,7 @@ import random
 import re
 import sys
 import sqlite3
+from typing import Literal
 import webbrowser
 import xml.etree.ElementTree as ET
 
@@ -3299,7 +3300,8 @@ def set_completer_object(dialog, tablename, field_id="id"):
     set_completer_widget(tablename, widget, field_id)
 
 
-def set_completer_widget(tablename, widget, field_id, add_id=False):
+def set_completer_widget(tablename, widget, field_id, add_id=False,
+                         filter_mode: tools_qt.QtMatchFlag = 'starts'):
     """ Set autocomplete of widget @table_object + "_id"
         getting id's from selected @table_object
     """
@@ -3315,7 +3317,7 @@ def set_completer_widget(tablename, widget, field_id, add_id=False):
            f" FROM {tablename}"
            f" ORDER BY {field_id}")
     rows = tools_db.get_rows(sql)
-    tools_qt.set_completer_rows(widget, rows)
+    tools_qt.set_completer_rows(widget, rows, filter_mode=filter_mode)
 
 
 def set_multi_completer_widget(tablenames: list, widget, fields_id: list, add_id=False):
