@@ -7,9 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
--- 26/03/2024
-ALTER TABLE man_addfields_value RENAME TO _man_addfields_value_;
-
-DROP FUNCTION IF EXISTS gw_fct_admin_manage_fix_i18n_36008;
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_table", "column":"geom_multicurve", "dataType":"geometry(MULTICURVE, SRID_VALUE)"}}$$);
+DROP TRIGGER IF EXISTS gw_trg_edit_cad_aux ON v_edit_cad_auxcircle;
+CREATE TRIGGER gw_trg_edit_cad_aux INSTEAD OF
+INSERT OR DELETE OR UPDATE
+ON v_edit_cad_auxcircle FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_cad_aux('circle');

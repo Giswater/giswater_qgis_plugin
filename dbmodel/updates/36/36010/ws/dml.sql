@@ -1838,3 +1838,5 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) 
 VALUES('om_waterbalance_threshold_days', '45', 'Amount of days that give currency to waterbalance', NULL, NULL, NULL, NULL, NULL, 'ws', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
+-- 08/05/2024
+UPDATE sys_table SET addparam='{"pkey": "dscenario_id, node_id, order_id"}'::json WHERE id='inp_dscenario_pump_additional';

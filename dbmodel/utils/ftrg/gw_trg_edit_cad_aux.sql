@@ -25,8 +25,8 @@ BEGIN
     IF TG_OP = 'INSERT' THEN          
 	
 	IF geom_type='circle' THEN					   
-		INSERT INTO temp_table (fid, geom_polygon, cur_user)
-		VALUES  (361, NEW.geom_polygon, current_user);
+		INSERT INTO temp_table (fid, geom_multicurve, cur_user)
+		VALUES  (361, NEW.geom_multicurve, current_user);
 	ELSIF geom_type='point' THEN
 		INSERT INTO temp_table (fid, geom_point, cur_user)
 		VALUES  (127, NEW.geom_point, current_user);
@@ -41,7 +41,7 @@ BEGIN
 
 	IF geom_type='circle' THEN	               
 		UPDATE temp_table 
-		SET id=NEW.id, geom_polygon=NEW.geom_polygon
+		SET id=NEW.id, geom_multicurve=NEW.geom_multicurve
 		WHERE id=OLD.id;
 	ELSIF geom_type='point' THEN	               
 		UPDATE temp_table 
