@@ -283,7 +283,7 @@ BEGIN
 			IF v_count > 0 THEN
 				INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 				VALUES (v_fid, v_result_id, 3, '414',concat(
-				'ERROR-414: There is/are ',v_count,' register(s) with missed matcat_id on cat_connec table. This will crash inp exportations using PJOINT/CONNEC method.'),v_count);
+				'ERROR-414: There is/are ',v_count,' register(s) with missed matcat_id on cat_connec table. This will crash inp exportations using NETWORK & CONNECS method.'),v_count);
 				v_count=0;
 			ELSE
 				INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message)
