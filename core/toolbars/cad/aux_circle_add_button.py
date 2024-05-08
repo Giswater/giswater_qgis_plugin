@@ -6,10 +6,11 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from functools import partial
+import math
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QColor
-from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel, QgsWkbTypes
+from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel, QgsWkbTypes, QgsMultiCurve, QgsAbstractGeometry, QgsPointXY, QgsCurve
 from qgis.gui import QgsVertexMarker
 
 from ..maptool import GwMaptool
@@ -198,8 +199,35 @@ class GwAuxCircleAddButton(GwMaptool):
                         self.layer_circle.deleteFeature(feature.id())
 
             if not self.cancel_circle:
+
+                def _calculate_circle_points(center_point, radius):
+                    points = []
+                    # Angle increment for each point
+                    angle_increment = math.pi / 2  # 90 degrees
+
+                    # Calculate points for each quadrant
+                    for i in range(4):
+                        angle = i * angle_increment
+                        cos = math.cos(angle)
+                        x = center_point.x() + float(radius) * float(cos)
+                        sin = math.sin(angle)
+                        y = center_point.y() + float(radius) * float(sin)
+                        points.append(QgsPointXY(x, y))
+
+                    return points
+
+                p0, p1, p2, p3 = _calculate_circle_points(point, self.radius)
+                multi_curve = QgsMultiCurve()
+                # Create WKT string for the MultiCurve
+                wkt = f"MULTICURVE (" \
+                f"    CIRCULARSTRING (" \
+                f"      {p0.x()} {p0.y()}, {p1.x()} {p1.y()}, {p2.x()} {p2.y()}, {p3.x()} {p3.y()}, {p0.x()} {p0.y()}" \
+                f"    )" \
+                f")"
+                multi_curve.fromWkt(wkt)
+
                 feature = QgsFeature()
-                feature.setGeometry(QgsGeometry.fromPointXY(point).buffer(float(self.radius), 100))
+                feature.setGeometry(multi_curve)
                 provider = self.layer_circle.dataProvider()
                 # Next line generate: WARNING    Attribute index 0 out of bounds [0;0]
                 # but all work ok
