@@ -10,6 +10,12 @@ author=David Erill, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fust�
 Changelog=Version 3.6.010
     - Import rpt results: if there are velocities >50 they will get replaced in-memory, instead of changing the .rpt file
     - Change qgis templates: add direction arrow on links and delete flowtrace layers for UD
+    - Dscenario: Enable tab 'Additional pump' in Dscenario and add/edit controls & rules with proper dialog
+    - PG_SERVICE: Improve management of credentials when using pgservice file
+    - CAD tools: Show a preview of what will be drawn
+    - Non-Visual Objects: add more filters to the manager
+    - Changes according to the addfields refactor
+    - Improve performance of go2epa if 'Message log' panel was opened
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
 homepage=https://www.giswater.org
