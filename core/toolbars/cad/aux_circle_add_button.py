@@ -6,11 +6,12 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from functools import partial
-import math
+from typing import List
+from math import pi, sin, cos
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QColor
-from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel, QgsWkbTypes, QgsMultiCurve, QgsAbstractGeometry, QgsPointXY, QgsCurve
+from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel, QgsWkbTypes, QgsMultiCurve, QgsPointXY
 from qgis.gui import QgsVertexMarker
 
 from ..maptool import GwMaptool
@@ -147,7 +148,7 @@ class GwAuxCircleAddButton(GwMaptool):
                 if not lyr:
                     geom = f'geom_{alias.lower()}'
                     if tablename == 'v_edit_cad_auxcircle':
-                        geom = 'geom_polygon'
+                        geom = 'geom_multicurve'
                     tools_gw.add_layer_database(tablename, alias=alias, group="INVENTORY", sub_group="AUXILIAR", the_geom=geom)
 
 
@@ -200,18 +201,19 @@ class GwAuxCircleAddButton(GwMaptool):
 
             if not self.cancel_circle:
 
-                def _calculate_circle_points(center_point, radius):
+                def _calculate_circle_points(center_point, radius) -> List[QgsPointXY]:
+
                     points = []
                     # Angle increment for each point
-                    angle_increment = math.pi / 2  # 90 degrees
+                    angle_increment = pi / 2  # 90 degrees
 
                     # Calculate points for each quadrant
                     for i in range(4):
                         angle = i * angle_increment
-                        cos = math.cos(angle)
-                        x = center_point.x() + float(radius) * float(cos)
-                        sin = math.sin(angle)
-                        y = center_point.y() + float(radius) * float(sin)
+                        cos_val = cos(angle)
+                        sin_val = sin(angle)
+                        x = center_point.x() + float(radius) * float(cos_val)
+                        y = center_point.y() + float(radius) * float(sin_val)
                         points.append(QgsPointXY(x, y))
 
                     return points
