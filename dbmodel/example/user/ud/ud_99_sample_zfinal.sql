@@ -27,3 +27,5 @@ UPDATE gully SET builtdate = now() -  random() * (now() - timestamp '1990-01-01 
 UPDATE link SET builtdate = c.builtdate FROM connec c WHERE feature_id = connec_id;
 UPDATE link SET builtdate = g.builtdate FROM gully g WHERE feature_id = gully_id;
 UPDATE element SET builtdate = now() -  random() * (now() - timestamp '1990-01-01 00:00:00');
+
+UPDATE config_param_system SET value = '{"setArcObsolete":"true","setOldCode":"false"}' WHERE parameter = 'edit_arc_divide';

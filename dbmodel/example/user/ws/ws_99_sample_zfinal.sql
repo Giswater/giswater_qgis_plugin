@@ -36,7 +36,7 @@ UPDATE inp_shortpipe SET to_arc = '2037', status = 'CV' where node_id = '1092';
 
 UPDATE cat_feature_node SET graph_delimiter ='MINSECTOR' WHERE id = 'SHUTOFF_VALVE';
 UPDATE cat_feature_node SET graph_delimiter ='MINSECTOR' WHERE id = 'CHECK_VALVE';
-
+UPDATE cat_feature_node SET graph_delimiter ='PRESSZONE' WHERE id in('PUMP', 'PR_REDUC_VALVE','PR_BREAK_VALVE','PR_SUSTA_VALVE');
 
 -- 01/05/2024
 UPDATE config_param_system SET value = 
@@ -52,3 +52,5 @@ UPDATE config_param_system SET value =
 {"sourceTable":"ve_node_pr_reduc_valve", "query":"UPDATE inp_valve t SET pressure = pression_exit FROM ve_node_pr_reduc_valve s "}]}'
 WHERE parameter = 'epa_automatic_man2inp_values';
 
+
+UPDATE config_param_system SET value = '{"setArcObsolete":"true","setOldCode":"false"}' WHERE parameter = 'edit_arc_divide';
