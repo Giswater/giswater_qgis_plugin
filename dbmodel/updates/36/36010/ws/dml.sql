@@ -1840,3 +1840,7 @@ VALUES('om_waterbalance_threshold_days', '45', 'Amount of days that give currenc
 
 -- 08/05/2024
 UPDATE sys_table SET addparam='{"pkey": "dscenario_id, node_id, order_id"}'::json WHERE id='inp_dscenario_pump_additional';
+
+-- 09/05/2024
+update config_param_system SET layoutorder=NULL, layoutname=NULL, isenabled = false 
+WHERE parameter in ('epa_automatic_inp2man_values','epa_automatic_man2graph_values', 'epa_automatic_man2inp_values');
