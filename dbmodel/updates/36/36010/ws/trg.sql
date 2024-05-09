@@ -15,3 +15,7 @@ ON presszone for each row execute function gw_trg_presszone_check_datatype();
 
 CREATE TRIGGER gw_trg_presszone_check_datatype BEFORE INSERT OR UPDATE of presszone_id 
 ON plan_netscenario_presszone FOR EACH ROW EXECUTE PROCEDURE gw_trg_presszone_check_datatype();
+
+ALTER TABLE inp_valve DROP CONSTRAINT inp_valve_to_arc_fkey;
+ALTER TABLE inp_valve  ADD CONSTRAINT inp_valve_to_arc_fkey FOREIGN KEY (to_arc)
+REFERENCES arc (arc_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;

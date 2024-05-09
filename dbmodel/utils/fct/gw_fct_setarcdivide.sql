@@ -290,19 +290,19 @@ BEGIN
 					IF v_project_type = 'WS' THEN
 
 						--check if final nodes maybe graph delimiters
-						EXECUTE 'SELECT CASE WHEN graph_delimiter IN (''NONE'', ''MINSECTOR'') THEN NULL ELSE lower(graph_delimiter) END AS graph, node_1 FROM v_edit_arc a 
+						EXECUTE 'SELECT CASE WHEN graph_delimiter IN (''NONE'') THEN NULL ELSE lower(graph_delimiter) END AS graph, node_1 FROM v_edit_arc a 
 						JOIN v_edit_node n1 ON n1.node_id=node_1
 						JOIN cat_feature_node cf1 ON n1.node_type = cf1.id 
 						WHERE a.arc_id='''||v_arc_id||''';'
 						INTO v_node1_graph, v_node_1;
 
-						EXECUTE 'SELECT CASE WHEN graph_delimiter IN (''NONE'', ''MINSECTOR'') THEN NULL ELSE lower(graph_delimiter) END AS graph,node_2 FROM v_edit_arc a 
+						EXECUTE 'SELECT CASE WHEN graph_delimiter IN (''NONE'') THEN NULL ELSE lower(graph_delimiter) END AS graph,node_2 FROM v_edit_arc a 
 						JOIN v_edit_node n2 ON n2.node_id=node_2
 						JOIN cat_feature_node cf2 ON n2.node_type = cf2.id 
 						WHERE a.arc_id='''||v_arc_id||''';'
 						INTO v_node2_graph, v_node_2;
 
-						EXECUTE 'SELECT CASE WHEN graph_delimiter IN (''NONE'', ''MINSECTOR'') THEN NULL ELSE lower(graph_delimiter) END AS graph FROM v_edit_node
+						EXECUTE 'SELECT CASE WHEN graph_delimiter IN (''NONE'') THEN NULL ELSE lower(graph_delimiter) END AS graph FROM v_edit_node
 						JOIN cat_feature_node cf2 ON node_type = cf2.id 
 						WHERE node_id='''||v_node_id||''';'
 						INTO v_new_node_graph;
