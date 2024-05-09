@@ -455,7 +455,7 @@ class GwEpaFileManager(GwTask):
                         sp_n.append(json_elem)
 
                     elif bool(re.search('(\d\..*\.\d)', str(dirty_list[x]))):
-                        if 'Version' not in dirty_list and 'VERSION' not in dirty_list:
+                        if not any(item in dirty_list for item in ['Version', 'VERSION', 'Input', 'INPUT']):
                             error_near = f"Error near line {line_number+1} -> {dirty_list}"
                             tools_log.log_info(error_near)
                             message = (f"The rpt file is not valid to import. "
