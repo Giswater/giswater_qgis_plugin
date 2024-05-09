@@ -1016,3 +1016,6 @@ UPDATE sys_param_user SET vdefault = '1' WHERE id = 'edit_verified_vdefault' AND
 UPDATE sys_param_user SET vdefault = null WHERE id = 'edit_verified_vdefault' AND vdefault NOT IN ('0','1');
 
 DELETE FROM config_param_user WHERE parameter = 'edit_verified_vdefault' AND value not in ('0','1');
+
+UPDATE config_param_system SET value = '{"setArcObsolete":"true","setOldCode":"false"}' WHERE parameter = 'edit_arc_divide';
+
