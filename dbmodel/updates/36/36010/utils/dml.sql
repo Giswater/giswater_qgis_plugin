@@ -1007,3 +1007,12 @@ DROP FUNCTION IF EXISTS gw_fct_import_addfields;;
 
 
 UPDATE sys_fprocess SET fprocess_name='Orphan rows on addfields values (DEPRECATED)' WHERE fid=256;
+
+UPDATE config_param_user SET value = '0' WHERE parameter = 'edit_verified_vdefault' AND value IN ('TO REVIEW', 'PER REVISAR','PENDIENTE','A VERIFIE','REVER');
+UPDATE config_param_user SET value = '1' WHERE parameter = 'edit_verified_vdefault' AND value IN ('VERIFIED', 'VERIFICAT','VERIFICADO','A VERIFIE','VERIFICADO');
+
+UPDATE sys_param_user SET vdefault = '0' WHERE id = 'edit_verified_vdefault' AND vdefault IN ('TO REVIEW', 'PER REVISAR','PENDIENTE','A VERIFIE','REVER');
+UPDATE sys_param_user SET vdefault = '1' WHERE id = 'edit_verified_vdefault' AND vdefault IN ('VERIFIED', 'VERIFICAT','VERIFICADO','A VERIFIE','VERIFICADO');
+UPDATE sys_param_user SET vdefault = null WHERE id = 'edit_verified_vdefault' AND vdefault NOT IN ('0','1');
+
+DELETE FROM config_param_user WHERE parameter = 'edit_verified_vdefault' AND value not in ('0','1');
