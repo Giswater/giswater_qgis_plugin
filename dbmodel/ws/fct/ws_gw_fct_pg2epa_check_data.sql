@@ -270,11 +270,11 @@ BEGIN
 	-- to_arc wrong values (170)
 	IF (SELECT value FROM config_param_system WHERE parameter = 'epa_shutoffvalve') = 'VALVE' THEN
 		INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, descript, sector_id)
-		select 170, node_id, nodecat_id, n.the_geom, 'To arc is null or does not exists as closest arc for valve', n.sector_id
+		select 170, node_id, nodecat_id, n.the_geom, 'To arc does not exists as closest arc for valve', n.sector_id
 		from inp_valve LEFT JOIN v_edit_arc v on arc_id = to_arc JOIN v_edit_node n USING (node_id) where node_id not in (node_1, node_2) AND valv_type !='TCV';		
 	ELSE 
 		INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, descript, sector_id)
-		select 170, node_id, nodecat_id, n.the_geom, 'To arc is null or does not exists as closest arc for valve', n.sector_id
+		select 170, node_id, nodecat_id, n.the_geom, 'To arc does not exists as closest arc for valve', n.sector_id
 		from inp_valve LEFT JOIN v_edit_arc v on arc_id = to_arc JOIN v_edit_node n USING (node_id) where node_id not in (node_1, node_2);
 
 	END IF;
@@ -283,11 +283,11 @@ BEGIN
 	SELECT count(*) INTO v_count FROM temp_anl_node WHERE fid = 170 AND cur_user=current_user;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '170', 3, concat('ERROR-170 (anl_node): There is/are ', v_count,' valve(s) with wrong to_arc value according with two current closest arcs.'),v_count);
+		VALUES (v_fid, '170', 3, concat('ERROR-170 (anl_node): There is/are ', v_count,' valve(s) with wrong to_arc value according to the current closest arcs.'),v_count);
 	ELSE 
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '170', 1,
-		'INFO: Valve to_arc wrong values checked. No inconsistencies have been detected (values acording with two current closest arcs).', v_count);
+		'INFO: Valve to_arc wrong values checked. No inconsistencies have been detected according to the current closest arcs.', v_count);
 	END IF;
 
 
@@ -446,22 +446,20 @@ BEGIN
 	
 	-- to_arc wrong values (171)
 	INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, descript, sector_id)
-	select 171, node_id, nodecat_id , the_geom,  'To arc is null or does not exists as closest arc for pump', sector_id FROM v_edit_inp_pump WHERE node_id NOT IN(
-		select node_id FROM v_edit_inp_pump JOIN arc on arc_id=to_arc AND node_id=node_1
-		union
-		select node_id FROM v_edit_inp_pump JOIN arc on arc_id=to_arc AND node_id=node_2);
+	select 171, node_id, nodecat_id , the_geom,  'To arc does not exists as closest arc for pump', sector_id 
+	from inp_pump LEFT JOIN v_edit_arc v on arc_id = to_arc JOIN v_edit_node n USING (node_id) where node_id not in (node_1, node_2);
 	
 	SELECT count(*) INTO v_count FROM temp_anl_node WHERE fid = 171 AND cur_user=current_user;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '171', 3, concat('ERROR-171 (anl_node): There is/are ', v_count,' pump(s) with wrong to_arc value according with closest arcs.'),v_count);
+		VALUES (v_fid, '171', 3, concat('ERROR-171 (anl_node): There is/are ', v_count,' pump(s) with wrong to_arc value according to the current closest arcs.'),v_count);
 
 	ELSE 
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '171', 1,
-		'INFO: Pump to_arc wrong values checked. have been detected (values acording closest arcs).', v_count);
+		'INFO: Pump to_arc wrong values checked. No inconsistencies have been detected according with the current closest arcs.', v_count);
 	END IF;
-	
+
 	
 	RAISE NOTICE '15 - pumps. Pump type and others';	
 
