@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:
 
-CREATE OR REPLACE FUNCTION ws1_2802.gw_fct_admin_multiplicate_network(p_x integer, p_y integer, p_dx integer, p_dy integer)
+CREATE OR REPLACE FUNCTION ws36010.gw_fct_admin_multiplicate_network(p_x integer, p_y integer, p_dx integer, p_dy integer)
 RETURNS json AS 
 $BODY$
 
 /* example
 
 -- execute
-SELECT ws1_2802.gw_fct_admin_multiplicate_network(2,1,11000,15000);
+SELECT ws36010.gw_fct_admin_multiplicate_network(2,1,1700,2300);
 
 */
 
@@ -26,10 +26,10 @@ BEGIN
 
 
 	-- Set search path to local schema
-	SET search_path = "ws1_2802", public;
+	SET search_path = "ws36010", public;
 	
 	-- set previous
-	ALTER TABLE ext_plot ALTER COLUMN id SET DEFAULT nextval('ws1_2802.urn_id_seq'::regclass);
+	ALTER TABLE ext_plot ALTER COLUMN id SET DEFAULT nextval('ws36010.urn_id_seq'::regclass);
 
 	ALTER TABLE node DISABLE TRIGGER gw_trg_edit_foreignkey;
 	ALTER TABLE node DISABLE TRIGGER gw_trg_node_arc_divide;
@@ -40,7 +40,6 @@ BEGIN
 	ALTER TABLE node DISABLE RULE insert_plan_psector_x_node;
 
 	ALTER TABLE arc DISABLE TRIGGER gw_trg_arc_noderotation_update;
-	ALTER TABLE arc DISABLE TRIGGER gw_trg_arc_vnodelink_update;
 	ALTER TABLE arc DISABLE TRIGGER gw_trg_edit_foreignkey;
 	ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
 	ALTER TABLE arc DISABLE TRIGGER gw_trg_typevalue_fk;
@@ -64,7 +63,7 @@ BEGIN
 		FOR x IN 1..p_x
 		LOOP
 
-			RAISE NOTICE 'X LOOP % , %',y,x;
+			RAISE NOTICE 'X LOOP % , %', y,x;
 
 			RAISE NOTICE 'nodes';
 			INSERT INTO node (code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszone_id, 
@@ -85,6 +84,7 @@ BEGIN
 			INSERT INTO inp_pump SELECT node_id FROM node WHERE state >0 and epa_type = 'PUMP' ON CONFLICT (node_id) DO NOTHING;
 			INSERT INTO inp_shortpipe SELECT node_id FROM node WHERE state >0 and epa_type = 'SHORTPIPE' ON CONFLICT (node_id) DO NOTHING;
 
+
 			-- TODO: insert man_junctio & others nodes.....	
 
 			RAISE NOTICE 'arcs';
@@ -99,6 +99,7 @@ BEGIN
 
 			INSERT INTO inp_pipe SELECT arc_id FROM arc WHERE state >0 and epa_type = 'PIPE' ON CONFLICT (arc_id) DO NOTHING;
 			INSERT INTO inp_virtualvalve SELECT arc_id FROM arc WHERE state >0 and epa_type = 'VIRTUALVALVE' ON CONFLICT (arc_id) DO NOTHING;
+			INSERT INTO inp_virtualpump SELECT arc_id FROM arc WHERE state >0 and epa_type = 'VIRTUALPUMP' ON CONFLICT (arc_id) DO NOTHING;
 
 			-- TODO: insert man_pipe
 
@@ -107,22 +108,23 @@ BEGIN
 				function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2, 
 				muni_id, streetaxis_id,  postcode, district_id, postcomplement, postcomplement2, descript, link, verified, rotation,  the_geom, undelete, label_x,label_y,label_rotation, expl_id,
 				publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, staticpressure, pjoint_id, pjoint_type,
-				adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id, epa_type)
+				adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id, epa_type,
+				om_state, conserv_state, priority, valve_location, valve_type, shutoff_valve, access_type, placement_type, crmzone_id, expl_id2, plot_code)
 			SELECT 	code, elevation, depth,connecat_id,  sector_id, customer_code,  state, state_type, annotation, observ, comment,dma_id, presszone_id, soilcat_id,
 				function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2, 
 				muni_id, streetaxis_id,  postcode, district_id, postcomplement, postcomplement2, descript, link, verified, rotation, st_translate(the_geom,x*p_dx,y*p_dy), undelete, label_x,label_y,label_rotation, expl_id,
 				publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, staticpressure, pjoint_id, pjoint_type,
-				adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id, epa_type FROM connec;
+				adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id, epa_type, om_state, conserv_state, priority, valve_location, valve_type, shutoff_valve, access_type, 
+				placement_type, crmzone_id, expl_id2, plot_code FROM connec;
 
 			INSERT INTO inp_connec SELECT connec_id FROM connec WHERE epa_type = 'JUNCTION' ON CONFLICT (connec_id) DO NOTHING;
 
 			RAISE NOTICE 'links';
-			INSERT INTO link (feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, vnode_topelev)
-			SELECT feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state,  st_translate(the_geom,x*p_dx,y*p_dy), vnode_topelev FROM link;
-
-			RAISE NOTICE 'Vnode';
-			INSERT INTO vnode (state, the_geom)
-			SELECT state, st_translate(the_geom,x*p_dx,y*p_dy) FROM vnode;
+			INSERT INTO link (feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, exit_topelev, 
+			exit_elev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id,expl_id2, epa_type, is_operative, insert_user, lastupdate, lastupdate_user, connecat_id, workcat_id, workcat_id_end, builtdate, enddate)
+			SELECT feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state,  st_translate(the_geom,x*p_dx,y*p_dy), exit_topelev,
+			exit_elev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id,expl_id2, epa_type, is_operative, insert_user, lastupdate, lastupdate_user, connecat_id, workcat_id, workcat_id_end, builtdate, enddate
+			FROM link;
 
 			RAISE NOTICE 'Plot';
 			INSERT INTO ext_plot (plot_code, muni_id,  postcode, streetaxis_id, postnumber, complement, placement, square, observ, text, the_geom, expl_id) 
@@ -142,7 +144,6 @@ BEGIN
 	ALTER TABLE node ENABLE RULE insert_plan_psector_x_node;
 
 	ALTER TABLE arc ENABLE TRIGGER gw_trg_arc_noderotation_update;
-	ALTER TABLE arc ENABLE TRIGGER gw_trg_arc_vnodelink_update;
 	ALTER TABLE arc ENABLE TRIGGER gw_trg_edit_foreignkey;
 	ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
 	ALTER TABLE arc ENABLE TRIGGER gw_trg_typevalue_fk;

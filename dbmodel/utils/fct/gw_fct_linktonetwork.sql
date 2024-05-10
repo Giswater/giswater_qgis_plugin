@@ -12,6 +12,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_linktonetwork(p_data json)
 RETURNS json AS
 $BODY$
 
+
 /*
 GOAL
 ----
@@ -32,7 +33,7 @@ EXAMPLES
 --------
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3201","3200"]},"data":{"feature_type":"CONNEC", "forcedArcs":["2001","2002"]}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3136"]},"data":{"feature_type":"CONNEC"}}$$);
+SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3209"]},"data":{"feature_type":"CONNEC"}}$$);
 
 
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100013"]},"data":{"feature_type":"CONNEC", "forcedArcs":["221"]}}$$);
@@ -193,9 +194,9 @@ BEGIN
 
 		RAISE NOTICE '% - %', v_i, v_connect_id;
 
-	    IF v_isforcedarcs IS FALSE THEN
-	    	v_forcedarcs= '';
-	    END IF; 
+		IF v_isforcedarcs IS FALSE THEN
+			v_forcedarcs= '';
+		END IF; 
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (217, null, 4, concat('Trying to connect ', lower(v_feature_type),' with id ',v_connect_id,'.'));
@@ -242,13 +243,14 @@ BEGIN
 		-- Use connect.arc_id as forced arcs in case of exists
 		IF v_connect.arc_id IS NOT NULL AND v_isforcedarcs is False THEN
 			v_forcedarcs = concat (' AND arc_id::integer = ',v_connect.arc_id,' ');
+			
 			-- check if forced arc diameter is smaller than configured
-            IF v_projecttype  ='WS' THEN
-                IF (SELECT cat_dnom::integer FROM vu_arc WHERE arc_id=v_connect.arc_id) >= v_check_arcdnom AND v_check_arcdnom_status IS TRUE THEN
-                    EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                    "data":{"message":"3232", "function":"3188","debug_msg":'||v_check_arcdnom||', "is_process":true}}$$);';
-                END IF;
-            END IF;
+			IF v_projecttype  ='WS' THEN
+				IF (SELECT cat_dnom::integer FROM vu_arc WHERE arc_id=v_connect.arc_id) >= v_check_arcdnom AND v_check_arcdnom_status IS TRUE THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3232", "function":"3188","debug_msg":'||v_check_arcdnom||', "is_process":true}}$$);';
+				END IF;
+			END IF;
 		END IF;	
 		
 		IF v_arc.arc_id IS NOT NULL THEN
@@ -258,7 +260,7 @@ BEGIN
 
 			-- Use check arc diameter variable 
 			IF v_projecttype = 'WS' AND v_check_arcdnom_status IS TRUE THEN	
-				v_checkeddiam = concat(' AND cat_dnom::integer<',v_check_arcdnom,' ');
+				v_checkeddiam = concat(' AND cat_dnom::integer <',v_check_arcdnom,' ');
 			ELSE v_checkeddiam = '';
 			END IF;
 		
@@ -276,13 +278,13 @@ BEGIN
 				SELECT arc_id FROM index_query ORDER BY distance limit 1'
 				INTO v_connect.arc_id;
 				
-			IF v_connect.arc_id IS NULL and v_forcedarcs is not null THEN -- looking for closest arc from connect
-				EXECUTE 'WITH index_query AS(
-				SELECT ST_Distance(the_geom, '||quote_literal(v_connect.the_geom::text)||') as distance, arc_id FROM arc WHERE state > 0 '||v_forcedarcs||')
-				SELECT arc_id FROM index_query ORDER BY distance limit 1'
-				INTO v_connect.arc_id;
-			end if;
-
+				IF v_connect.arc_id IS NULL and v_forcedarcs is not null THEN -- looking for closest arc from connect
+					EXECUTE 'WITH index_query AS(
+					SELECT ST_Distance(the_geom, '||quote_literal(v_connect.the_geom::text)||') as distance, arc_id FROM arc WHERE state > 0 '||v_forcedarcs||')
+					SELECT arc_id FROM index_query ORDER BY distance limit 1'
+					INTO v_connect.arc_id;
+				END IF;
+			
 			END IF;
 
 			-- get v_edit_arc information
