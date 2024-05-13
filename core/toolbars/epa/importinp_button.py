@@ -96,6 +96,8 @@ class GwImportInp(GwAction):
             partial(self._update_parsing_dialog, self.dlg_inp_parsing)
         )
         self.timer.start(1000)
+        self.parse_inp_task.taskCompleted.connect(self.timer.stop)
+        self.parse_inp_task.taskCompleted.connect(self.dlg_inp_parsing.close)
 
     def _update_parsing_dialog(self, dialog: GwDialog) -> None:
         if not dialog:
