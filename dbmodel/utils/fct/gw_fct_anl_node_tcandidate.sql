@@ -54,7 +54,7 @@ BEGIN
   select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
    
   -- Reset values
-  DELETE FROM anl_node2 WHERE cur_user="current_user"() AND fid=432;
+  DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=432;
   DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=432; 
   
   INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (432, null, 4, concat('NODES T CANDIDATES ANALYSIS'));
