@@ -11,11 +11,11 @@ from qgis.PyQt.QtWidgets import QActionGroup, QFileDialog, QLabel
 from sip import isdeleted
 
 from .... import global_vars
-from ....libs import tools_qgis
+from ....libs import tools_db, tools_qgis, tools_qt
 from ...models.plugin_toolbar import GwPluginToolbar
 from ...threads.parse_inp import GwParseInpTask
 from ...ui.dialog import GwDialog
-from ...ui.ui_manager import GwInpParsingUi
+from ...ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
 from ...utils import tools_gw
 from ..dialog import GwAction
 
@@ -99,6 +99,34 @@ class GwImportInp(GwAction):
         self.timer.start(1000)
         self.parse_inp_task.taskCompleted.connect(self.timer.stop)
         self.parse_inp_task.taskCompleted.connect(self.dlg_inp_parsing.close)
+        self.parse_inp_task.taskCompleted.connect(self.open_config_dialog)
+
+    def open_config_dialog(self) -> None:
+        """Open the config INP import dialog"""
+
+        self.dlg_config = GwInpConfigImportUi()
+        tools_gw.load_settings(self.dlg_config)
+        self.dlg_config.rejected.connect(
+            partial(tools_gw.save_settings, self.dlg_config)
+        )
+
+        # Fill exploitation combo
+        rows = tools_db.get_rows("""
+            SELECT expl_id, name
+            FROM exploitation
+            WHERE expl_id > 0
+        """)
+        tools_qt.fill_combo_values(self.dlg_config.cmb_expl, rows, add_empty=True)
+
+        # Fill sector combo
+        rows = tools_db.get_rows("""
+            SELECT sector_id, name
+            FROM sector
+            WHERE sector_id > 0
+        """)
+        tools_qt.fill_combo_values(self.dlg_config.cmb_sector, rows, add_empty=True)
+
+        tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
 
     def _update_parsing_dialog(self, dialog: GwDialog) -> None:
         if not dialog.isVisible():

@@ -253,6 +253,10 @@ class GwNonVisualLidsUi(GwDialog, FROM_CLASS):
 FORM_CLASS = _get_ui_class('inp_parsing.ui', 'epa')
 class GwInpParsingUi(GwDialog, FORM_CLASS):
     pass
+
+FORM_CLASS = _get_ui_class('inp_config_import.ui', 'epa')
+class GwInpConfigImportUi(GwDialog, FORM_CLASS):
+    pass
 # endregion
 
 
