@@ -54,7 +54,7 @@ BEGIN
   select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
    
   -- Reset values
-  DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=432;
+  DELETE FROM anl_node2 WHERE cur_user="current_user"() AND fid=432;
   DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=432; 
   
   INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (432, null, 4, concat('NODES T CANDIDATES ANALYSIS'));
@@ -65,19 +65,20 @@ BEGIN
   IF v_selectionmode = 'previousSelection' AND v_array IS NOT NULL THEN
 
     EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, expl_id, descript, fid, the_geom)
+    with q_arc as (select * from arc JOIN v_state_arc USING (arc_id))
     SELECT b.* FROM (SELECT n1.node_id, n1.nodecat_id, n1.state, n1.expl_id, ''Node T candidate'',432, n1.the_geom 
-    FROM v_edit_arc a, node n1 JOIN '||v_worklayer||' USING (node_id)
-    JOIN (SELECT node_1 node_id FROM v_edit_arc WHERE state = 1 UNION SELECT node_2 FROM v_edit_arc WHERE state = 1) b USING (node_id)
+    FROM q_arc a, node n1 JOIN '||v_worklayer||' USING (node_id)
+	JOIN (SELECT node_1 node_id from q_arc UNION select node_2 FROM q_arc) b USING (node_id)
     WHERE st_dwithin(a.the_geom, n1.the_geom,0.01) AND n1.node_id NOT IN (node_1, node_2) AND n1.node_id IN ('||v_array||') )b';
 
   ELSE
     EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, expl_id, descript, fid, the_geom)
-    SELECT b.* FROM (SELECT n1.node_id, n1.nodecat_id, n1.state, n1.expl_id,''Node T candidate'', 432, n1.the_geom 
-    FROM v_edit_arc a, node n1 JOIN '||v_worklayer||' USING (node_id)
-    JOIN (SELECT node_1 node_id FROM v_edit_arc WHERE state = 1 UNION SELECT node_2 FROM v_edit_arc WHERE state = 1) b USING (node_id)
+    with q_arc as (select * from arc JOIN v_state_arc USING (arc_id))
+	SELECT b.* FROM (SELECT n1.node_id, n1.nodecat_id, n1.state, n1.expl_id,''Node T candidate'', 432, n1.the_geom 
+    FROM q_arc a, node n1 JOIN '||v_worklayer||' USING (node_id)
+	JOIN (SELECT node_1 node_id from q_arc UNION select node_2 FROM q_arc) b USING (node_id)
     WHERE st_dwithin(a.the_geom, n1.the_geom,0.01) AND n1.node_id NOT IN (node_1, node_2))b';
   END IF;
-    
 
   SELECT count(*) INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=432;
 
@@ -132,6 +133,8 @@ BEGIN
   				'"point":'||v_result_point||
   			'}}'||
   	    '}')::json, 2914, null, null, null);
+
+  	
 
 END;
 $BODY$
