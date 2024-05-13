@@ -8,6 +8,7 @@ from typing import Optional, Tuple
 from qgis.core import QgsApplication
 from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QActionGroup, QFileDialog, QLabel
+from sip import isdeleted
 
 from .... import global_vars
 from ....libs import tools_qgis
@@ -100,15 +101,19 @@ class GwImportInp(GwAction):
         self.parse_inp_task.taskCompleted.connect(self.dlg_inp_parsing.close)
 
     def _update_parsing_dialog(self, dialog: GwDialog) -> None:
-        if not dialog:
+        if not dialog.isVisible():
+            self.timer.stop()
             return
 
         tools_gw.fill_tab_log(
             dialog,
             {"info": {"values": [{"message": msg} for msg in self.parse_inp_task.log]}},
         )
-        print("Humm...")
         self._calculate_elapsed_time(dialog)
+
+        if isdeleted(self.parse_inp_task) or not self.parse_inp_task.isActive():
+            self.timer.stop()
+            self.dlg_inp_parsing.progressBar.setVisible(False)
 
     def _calculate_elapsed_time(self, dialog: GwDialog) -> None:
         tf: float = time()  # Final time
