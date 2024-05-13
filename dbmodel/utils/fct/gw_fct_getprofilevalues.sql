@@ -222,7 +222,11 @@ BEGIN
 
 	CREATE TEMP TABLE temp_anl_arc(LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
 	CREATE TEMP TABLE temp_anl_node(LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-  	
+	CREATE TEMP TABLE temp_v_edit_arc (LIKE SCHEMA_NAME.v_edit_arc INCLUDING ALL);
+
+	insert into temp_v_edit_arc select * from v_edit_arc;
+
+
   	-- set value to v_linksdistance if null
 	IF v_linksdistance IS NULL OR v_linksdistance < 0 THEN
 		v_linksdistance = 0;
@@ -384,10 +388,10 @@ BEGIN
 		END IF;
 		
 		IF v_linksdistance > 0 AND v_count = 0 and v_vnode_status IS NOT False THEN
-
+	 
 			-- generate temp link table
-			PERFORM gw_fct_linkexitgenerator(1);
-
+			PERFORM gw_fct_linkexitgenerator(2);
+		
 			-- generate arc_x_link values
 			IF v_project_type = 'UD' THEN
 
@@ -410,10 +414,11 @@ BEGIN
 					    v_edit_arc.node_1, v_edit_arc.node_2, v_edit_arc.sys_elev1, v_edit_arc.sys_elev2,v_edit_arc.sys_y1,  v_edit_arc.sys_y2,
 					    v_edit_arc.sys_elev1 + v_edit_arc.sys_y1 AS top_elev1,
 					    v_edit_arc.sys_elev2 + v_edit_arc.sys_y2 AS top_elev2
-					   FROM v_edit_arc, temp_link t
-					    WHERE st_dwithin(v_edit_arc.the_geom, t.the_geom_endpoint, 0.01::double precision) AND v_edit_arc.state > 0 AND t.state > 0 AND exit_type ='ARC') a)b
+					   FROM temp_v_edit_arc v_edit_arc, temp_link t
+					    WHERE st_dwithin(v_edit_arc.the_geom, t.the_geom_endpoint, 0.01::double precision) AND v_edit_arc.state > 0 AND t.state > 0 AND exit_type ='ARC'
+					    and arc_id in (select arc_id from temp_anl_arc) ) a)b
 					    ORDER BY arc_id, node_2 DESC;		
-				  
+
 			ELSIF v_project_type = 'WS' THEN
 
 				DELETE FROM temp_link_x_arc;
@@ -431,13 +436,14 @@ BEGIN
 				   FROM ( SELECT t.link_id, t.vnode_id, v_arc.arc_id, t.feature_type, t.feature_id,  t.exit_topelev,  st_length(v_arc.the_geom) AS length,
 					    st_linelocatepoint(v_arc.the_geom, t.the_geom_endpoint)::numeric(12,3) AS locate, v_arc.node_1, v_arc.node_2, v_arc.elevation1,
 					    v_arc.elevation2,  v_arc.depth1,  v_arc.depth2, v_arc.elevation1 - v_arc.depth1 AS elev1,  v_arc.elevation2 - v_arc.depth2 AS elev2
-					   FROM v_arc, temp_link t
-					  WHERE st_dwithin(v_arc.the_geom, t.the_geom_endpoint, 0.01::double precision) AND v_arc.state > 0 AND t.state > 0) a)b
+					   FROM temp_v_edit_arc v_arc, temp_link t
+					  WHERE st_dwithin(v_arc.the_geom, t.the_geom_endpoint, 0.01::double precision) AND v_arc.state > 0 AND t.state > 0
+ 					   and arc_id in (select arc_id from temp_anl_arc)) a)b
 				  ORDER BY arc_id, node_2 DESC;
 			END IF;
 
 				  
-			-- get vnode values
+			-- get vnode-connec values
 			EXECUTE 'INSERT INTO temp_anl_node (fid, sys_type, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, arc_id , arc_distance, total_distance)
 				SELECT 222, feature_type, feature_id, link_id, exit_topelev, exit_ymax, exit_elev, arc_id, dist, dist+total_length
 				FROM (SELECT DISTINCT ON (dist) * FROM 
@@ -460,8 +466,35 @@ BEGIN
 				)a
 			)b 
 			ORDER BY b.arc_id, dist';
+	
+			-- get vnode-gully values
+			IF v_project_type = 'UD' THEN
 
-			-- delete links overlaped with nodes using the user's parameter
+				EXECUTE 'INSERT INTO temp_anl_node (fid, sys_type, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, arc_id , arc_distance, total_distance)
+				SELECT 222, feature_type, feature_id, link_id, exit_topelev, exit_ymax, exit_elev, arc_id, dist, dist+total_length
+				FROM (SELECT DISTINCT ON (dist) * FROM 
+				(
+				-- gully on same sense (pg_routing & arc)
+				SELECT c.arc_id, vnode_id,link_id,''LINK'' as feature_type, gully_id as feature_id, exit_topelev, exit_ymax, exit_elev, vnode_distfromnode1 as dist, total_length
+					FROM temp_link_x_arc 
+					JOIN temp_anl_arc USING (arc_id)
+					JOIN gully c ON c.gully_id = temp_link_x_arc.feature_id
+					WHERE temp_anl_arc.node_1 = temp_link_x_arc.node_1
+				'||v_querytext1||'-- gully on same sense (pg_routing & arc)
+				UNION
+				-- gully on reverse sense (pg_routing & arc)
+				SELECT c.arc_id, vnode_id,link_id,''LINK'' as feature_type, gully_id as feature_id,exit_topelev, exit_ymax, exit_elev, vnode_distfromnode2 as dist, total_length
+					FROM temp_link_x_arc 
+					JOIN temp_anl_arc USING (arc_id)
+					JOIN gully c ON c.gully_id = temp_link_x_arc.feature_id
+					WHERE temp_anl_arc.node_1 = temp_link_x_arc.node_2
+				'||v_querytext2||' -- gully on reverse sense (pg_routing & arc)
+				)a
+				)b 
+				ORDER BY b.arc_id, dist';
+			end if;
+		
+		-- delete links overlaped with nodes using the user's parameter
 			v_dist = (SELECT array_agg(total_distance) FROM (SELECT total_distance FROM temp_anl_node order by total_distance, arc_id)a);
 			v_nid = (SELECT array_agg(node_id) FROM (SELECT node_id FROM temp_anl_node order by total_distance, arc_id)a);
 			v_systype = (SELECT array_agg(sys_type) FROM (SELECT sys_type FROM temp_anl_node order by total_distance, arc_id)a);
@@ -766,10 +799,11 @@ BEGIN
 
 	DROP TABLE IF EXISTS temp_anl_arc;
 	DROP TABLE IF EXISTS temp_anl_node;
+	DROP TABLE IF EXISTS temp_v_edit_arc;
 	DROP TABLE IF EXISTS temp_vnode;
 	DROP TABLE IF EXISTS temp_link;
 	DROP TABLE IF EXISTS temp_link_x_arc;
-	
+
 	--  Return
 	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
                ',"body":{"form":{}'||

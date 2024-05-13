@@ -16,6 +16,10 @@ $BODY$
 
 SELECT  gw_fct_linkexitgenerator(1);
 
+p_input = 1 go2epa
+p_input = 2 profiletool
+
+
 */
 
 DECLARE
@@ -44,10 +48,18 @@ BEGIN
 	FROM v_edit_link;
 
 	-- insert duplicated features on temp_vnode
-	INSERT INTO temp_vnode (l1,v1,l2,v2)
-	SELECT n1.link_id as l1, n1.vnode_id as v1, n2.link_id as l2, n2.vnode_id as v2 FROM temp_link n1, temp_link n2 WHERE st_dwithin(n1.the_geom_endpoint, n2.the_geom_endpoint, 0.02)
-	AND n1.link_id != n2.link_id  ORDER BY 1; 
+	if p_input = 1 then -- the whole v_edit_link
+		INSERT INTO temp_vnode (l1,v1,l2,v2)
+		SELECT n1.link_id as l1, n1.vnode_id as v1, n2.link_id as l2, n2.vnode_id as v2 FROM temp_link n1, temp_link n2 WHERE st_dwithin(n1.the_geom_endpoint, n2.the_geom_endpoint, 0.02)
+		AND n1.link_id != n2.link_id;
 	
+	elsif p_input = 2 then -- only those links wich are on arcs present on temp_anl_arc and nodes present temp_anl_node
+		INSERT INTO temp_vnode (l1,v1,l2,v2)
+		SELECT n1.link_id as l1, n1.vnode_id as v1, n2.link_id as l2, n2.vnode_id as v2 FROM temp_link n1, temp_link n2 WHERE st_dwithin(n1.the_geom_endpoint, n2.the_geom_endpoint, 0.02)
+		AND n1.link_id != n2.link_id 
+		and n1.feature_id in (select arc_id from temp_anl_arc union select node_id from temp_anl_node) ORDER BY 1; 
+	end if;
+
 	-- harmonize those links with same endpoint
 	FOR v_links IN SELECT * FROM temp_vnode order by 1
 	LOOP	
