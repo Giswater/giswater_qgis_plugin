@@ -450,7 +450,7 @@ BEGIN
 			VALUES (v_fid, 1, '254', 'INFO: No features (arc, node, connec, gully, element) with NULL values on code found.',v_count);
 		END IF;
 
-	ELSIF v_project_type ='WS' THEN
+	ELSIF v_project_type = 'WS' THEN
 
 		v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE code IS NULL 
 				UNION SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node WHERE code IS NULL
@@ -718,7 +718,7 @@ BEGIN
 		VALUES (v_fid, 1, '262', 'INFO: No features on service have value of end date', v_count);
 	END IF;
 
-	RAISE NOTICE 'features with state 0 and without end date (263)';
+	RAISE NOTICE '23 - features with state 0 and without end date (263)';
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT arc_id as feature_id  from '||v_edit||'arc where state = 0 and enddate is null
 					UNION SELECT node_id from '||v_edit||'node where state = 0 and enddate is null
@@ -740,7 +740,7 @@ BEGIN
 		VALUES (v_fid, 1, '263','INFO: No features with state 0 are missing the end date',v_count);
 	END IF;
 
-	RAISE NOTICE '23 - features with state 1 and end date before start date (264)';
+	RAISE NOTICE '24 - features with state 1 and end date before start date (264)';
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT arc_id as feature_id  from '||v_edit||'arc where enddate < builtdate and state = 1
 					UNION SELECT node_id from '||v_edit||'node where enddate < builtdate and state = 1
@@ -762,7 +762,7 @@ BEGIN
 		VALUES (v_fid, 1, '264','INFO: No features with end date earlier than built date',v_count);
 	END IF;
 
-	RAISE NOTICE '24 - Automatic links with more than 100 mts (length out-of-range) (265)';
+	RAISE NOTICE '25 - Automatic links with more than 100 mts (length out-of-range) (265)';
 
 	EXECUTE 'SELECT count(*) FROM '||v_edit||'link where st_length(the_geom) > 100'
 	INTO v_count;
@@ -775,7 +775,7 @@ BEGIN
 		VALUES (v_fid, 1,'265', 'INFO: No automatic links with out-of-range Longitude found.',v_count);
 	END IF;
 
-    RAISE NOTICE '25 - Duplicated ID values between arc, node, connec, gully(266)';
+    RAISE NOTICE '26 - Duplicated ID values between arc, node, connec, gully(266)';
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT node_id AS feature_id FROM '||v_edit||'node n JOIN '||v_edit||'arc a ON a.arc_id=n.node_id
 					UNION SELECT node_id FROM '||v_edit||'node n JOIN '||v_edit||'connec c ON c.connec_id=n.node_id
@@ -802,7 +802,7 @@ BEGIN
 		VALUES (v_fid, 1, '266','INFO: All features have a diferent ID to be correctly identified',v_count);
 	END IF;
 
-	RAISE NOTICE '26 - Check planned connects without reference link (356)';
+	RAISE NOTICE '27 - Check planned connects without reference link (356)';
 
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT count(*) FROM plan_psector_x_connec WHERE link_id IS NULL';
@@ -826,7 +826,7 @@ BEGIN
 	END IF;
 
 
-	RAISE NOTICE '27 - Connecs and gullies with different expl_id than arc (291)';
+	RAISE NOTICE '28 - Connecs and gullies with different expl_id than arc (291)';
 
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT DISTINCT connec_id, connecat_id, c.the_geom, c.expl_id FROM '||v_edit||'connec c JOIN '||v_edit||'arc b using (arc_id) WHERE b.expl_id::text != c.expl_id::text';
@@ -856,7 +856,7 @@ BEGIN
 
 	IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_crm_schema') IS TRUE THEN 
 
-		RAISE NOTICE '28 - Control null values on crm.hydrometer.code(299)';
+		RAISE NOTICE '29 - Control null values on crm.hydrometer.code(299)';
 		v_querytext = 'SELECT id FROM crm.hydrometer WHERE code IS NULL';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -869,7 +869,7 @@ BEGIN
 		END IF;
 	END IF;
 
-	RAISE NOTICE '29 - Check operative arcs with wrong topology (372)';
+	RAISE NOTICE '30 - Check operative arcs with wrong topology (372)';
 	
 	EXECUTE 'INSERT INTO temp_t_arc (arc_id, node_1, node_2, result_id, sector_id,state) SELECT arc_id, node_1, node_2, ''372'', sector_id,state 
 			 FROM '||v_edit||'arc WHERE state = 1';
@@ -899,7 +899,7 @@ BEGIN
 	END IF;
 	
 
-	RAISE NOTICE '30 - Check arcs shorter than value set as node proximity (391)';
+	RAISE NOTICE '31 - Check arcs shorter than value set as node proximity (391)';
 
 	v_querytext = 'SELECT arc_id,arccat_id,st_length(the_geom), the_geom, expl_id, json_extract_path_text(value::json,''value'')::numeric as nprox
 	FROM '||v_edit||'arc, config_param_system where parameter = ''edit_node_proximity''
@@ -920,7 +920,7 @@ BEGIN
 	END IF;
 
 
-	RAISE NOTICE '31 - Check builtdate before 1900  (fid 406)';
+	RAISE NOTICE '32 - Check builtdate before 1900  (fid 406)';
 	IF v_project_type = 'WS' THEN
 		v_querytext='SELECT arc_id, ''ARC''::text FROM '||v_edit||'arc WHERE builtdate < ''1900/01/01''::date
 				UNION 
@@ -952,8 +952,8 @@ BEGIN
 	END IF;
 
 
-	RAISE NOTICE '32 - Check operative links with wrong topology (417, 418)';
-
+	RAISE NOTICE '33 - Check operative links with wrong topology (417, 418)';
+/*
 	-- connec_id (417)
 	DELETE FROM temp_t_arc;
 
@@ -967,14 +967,14 @@ BEGIN
 		)a where t.arc_id = a.link_id::text AND t.node_1 = a.connec_id;
 	ELSE
 		INSERT INTO temp_t_arc (arc_id, node_1, result_id, sector_id, state, the_geom) SELECT link_id, feature_id, '417', l.sector_id, l.state, l.the_geom 
-		FROM v_edit_link l JOIN v_edit_connec c ON feature_id = connec_id WHERE l.state = 1 and l.feature_type = 'CONNEC';
+		FROM link l JOIN v_edit_connec c ON feature_id = connec_id WHERE l.state > 0 and l.feature_type = 'CONNEC';
 
 		UPDATE temp_t_arc t SET node_1 = connec_id, state = 9 FROM (
 		SELECT l.link_id, c.connec_id, (ST_Distance(c.the_geom, ST_startpoint(l.the_geom))) as d FROM v_edit_connec c, link l
 		WHERE l.state = 1 and c.state = 1 and ST_DWithin(ST_startpoint(l.the_geom), c.the_geom, 0.05) group by 1,2,3 ORDER BY 1 DESC,3 DESC
 		)a where t.arc_id = a.link_id::text AND t.node_1 = a.connec_id;
 	END IF;
-		
+		*/
 
 	EXECUTE 'SELECT count(*) FROM temp_t_arc WHERE state = 1'
 	INTO v_count;
@@ -1025,7 +1025,7 @@ BEGIN
 		END IF;
 	END IF;
 
-	RAISE NOTICE '33 - Check hydrometer related to more than one connec (419)';
+	RAISE NOTICE '34 - Check hydrometer related to more than one connec (419)';
 	v_querytext = 'SELECT hydrometer_id, count(*) FROM v_rtc_hydrometer  group by hydrometer_id having count(*)> 1 ';
 	EXECUTE 'SELECT count(*) FROM ('||v_querytext||')a'
 	INTO v_count;
@@ -1040,7 +1040,7 @@ BEGIN
 		VALUES (v_fid, 1, '419','INFO: All hydrometeres are related to a unique connec',v_count);
 	END IF;
 
-	RAISE NOTICE '34- Check category_type values which do not exists on man_type table (421)';
+	RAISE NOTICE '35- Check category_type values which do not exists on man_type table (421)';
 	IF v_project_type = 'WS' THEN
 		v_querytext='SELECT ''ARC'', arc_id, category_type FROM '||v_edit||'arc WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = ''ARC'' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL
 		UNION
@@ -1069,7 +1069,7 @@ BEGIN
 		VALUES (v_fid, 1, '421','INFO: All features has category_type informed on man_type_category table',v_count);
 	END IF;
 
-	RAISE NOTICE '35- Check function_type values which do not exists on man_type table (422)';
+	RAISE NOTICE '36- Check function_type values which do not exists on man_type table (422)';
 	IF v_project_type = 'WS' THEN
 		v_querytext='SELECT ''ARC'', arc_id, function_type FROM '||v_edit||'arc WHERE function_type NOT IN (SELECT function_type FROM man_type_function WHERE feature_type is null or feature_type = ''ARC'' or featurecat_id IS NOT NULL) AND function_type IS NOT NULL
 		UNION
@@ -1099,7 +1099,7 @@ BEGIN
 	END IF;
 
 
-	RAISE NOTICE '36- Check fluid_type values which do not exists on man_type table (423)';
+	RAISE NOTICE '37- Check fluid_type values which do not exists on man_type table (423)';
 	IF v_project_type = 'WS' THEN
 		v_querytext='SELECT ''ARC'', arc_id, fluid_type FROM '||v_edit||'arc WHERE fluid_type NOT IN (SELECT fluid_type FROM man_type_fluid WHERE feature_type is null or feature_type = ''ARC'' or featurecat_id IS NOT NULL) AND fluid_type IS NOT NULL
 		UNION
@@ -1128,7 +1128,7 @@ BEGIN
 		VALUES (v_fid, 1, '423','INFO: All features has fluid_type informed on man_type_fluid table',v_count);
 	END IF;
 
-	RAISE NOTICE '37- Check location_type values which do not exists on man_type table (424)';
+	RAISE NOTICE '38- Check location_type values which do not exists on man_type table (424)';
 	IF v_project_type = 'WS' THEN
 		v_querytext='SELECT ''ARC'', arc_id, location_type FROM '||v_edit||'arc WHERE location_type NOT IN (SELECT location_type FROM man_type_location WHERE feature_type is null or feature_type = ''ARC'' or featurecat_id IS NOT NULL) AND location_type IS NOT NULL
 		UNION
@@ -1157,7 +1157,7 @@ BEGIN
 		VALUES (v_fid, 1, '424','INFO: All features has location_type informed on man_type_location table',v_count);
 	END IF;
 
-	RAISE NOTICE '38- Check expl.the_geom is not null when raster DEM is enabled (428)';
+	RAISE NOTICE '39- Check expl.the_geom is not null when raster DEM is enabled (428)';
 	IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE THEN
 		SELECT count(*) INTO v_count FROM exploitation WHERE the_geom IS NULL AND active IS TRUE and expl_id > 0 ;
 		IF v_count > 0 THEN
@@ -1171,7 +1171,7 @@ BEGIN
 		END IF;
 	END IF;
 
-	RAISE NOTICE '39 - Check nodes duplicated(106)';
+	RAISE NOTICE '40 - Check nodes duplicated (106)';
 
 	v_querytext = 'SELECT * FROM (SELECT DISTINCT t1.node_id AS node_1, t1.nodecat_id AS nodecat_1, t1.state as state1, t2.node_id AS node_2, t2.nodecat_id AS nodecat_2, t2.state as state2, t1.expl_id, 106, t1.the_geom
 	FROM '||v_edit||'node AS t1 JOIN node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.01) WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 = 1 AND a.state2 = 1';
@@ -1189,7 +1189,7 @@ BEGIN
 		VALUES (v_fid, 1, '106','INFO: There are no nodes duplicated with state 1',v_count);
 	END IF;
 
-	RAISE NOTICE '40 - Check orphan nodes with isarcdivide=TRUE (OM)(442)';
+	RAISE NOTICE '41 - Check orphan nodes with isarcdivide=TRUE (OM)(442)';
 
 	IF v_project_type = 'WS' THEN
 		v_partialquery = 'JOIN cat_node nc ON nodecat_id=id JOIN cat_feature_node nt ON nt.id=nc.nodetype_id';
@@ -1213,7 +1213,7 @@ BEGIN
 		VALUES (v_fid, 1, '442','INFO: There are no orphan nodes with isarcdivide=TRUE',v_count);
 	END IF;
 
-	RAISE NOTICE '41 - Check orphan nodes with isarcdivide=FALSE (OM)(443)';
+	RAISE NOTICE '42 - Check orphan nodes with isarcdivide=FALSE (OM)(443)';
 
 	IF v_project_type = 'WS' THEN
 		v_partialquery = 'JOIN cat_node nc ON nodecat_id=id JOIN cat_feature_node nt ON nt.id=nc.nodetype_id WHERE a.state>0 AND isarcdivide=''false'' AND arc_id IS NULL';
@@ -1236,7 +1236,7 @@ BEGIN
 		VALUES (v_fid, 1, '443','INFO: There are no orphan nodes with isarcdivide=FALSE',v_count);
 	END IF;
 
-	RAISE NOTICE '42 - Check nodes planified duplicated(453)';
+	RAISE NOTICE '43 - Check nodes planified duplicated(453)';
 	v_querytext = 'SELECT * FROM (SELECT DISTINCT t1.node_id AS node_1, t1.nodecat_id AS nodecat_1, t1.state as state1, t2.node_id AS node_2, t2.nodecat_id AS nodecat_2, t2.state as state2, t1.expl_id, 453, t1.the_geom
 	FROM '||v_edit||'node AS t1 JOIN '||v_edit||'node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.01) WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 = 2 AND a.state2 = 2';
 
@@ -1253,7 +1253,7 @@ BEGIN
 		VALUES (v_fid, 1, '453','INFO: There are no nodes duplicated with state 2',v_count);
 	END IF;
 
-	RAISE NOTICE '43 - Check redundant values on y-top_elev-elev (461)';
+	RAISE NOTICE '44 - Check redundant values on y-top_elev-elev (461)';
 
 	IF v_project_type = 'UD' THEN
 
@@ -1290,7 +1290,7 @@ BEGIN
 		END IF;
 	END IF;
 
-	RAISE NOTICE '44 - Check sector_id 0 or -1 (connec, gully) (478)';
+	RAISE NOTICE '45 - Check sector_id 0 or -1 (connec, gully) (478)';
 
 	IF v_project_type = 'WS' THEN
 		v_querytext = '(SELECT connec_id, connecat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE state > 0 AND (sector_id=0 OR sector_id=-1))a';
@@ -1311,7 +1311,7 @@ BEGIN
 		VALUES (v_fid, 1, '478', 'INFO: No features (connec, gullys) with 0 or -1 value on sector_id.',v_count);
 	END IF;
 
-	RAISE NOTICE '45 - Check arcs with the same geometry (479)';
+	RAISE NOTICE '46 - Check arcs with the same geometry (479)';
 
 	v_querytext = ' (SELECT arc_id, arccat_id, state1, arc_id_aux, node_1, node_2, expl_id, the_geom FROM
 				    (WITH q_arc AS (SELECT * FROM arc JOIN v_state_arc using (arc_id))
@@ -1333,7 +1333,7 @@ BEGIN
 		VALUES (v_fid, 1, '479', 'INFO: No arcs with duplicated geometry.',v_count);
 	END IF;
     
-    RAISE NOTICE '46 - Check connecs related to arcs with diameter bigger than defined value (488) (WS)';
+    RAISE NOTICE '47 - Check connecs related to arcs with diameter bigger than defined value (488) (ws)';
     IF v_project_type = 'WS' THEN
         IF (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'edit_link_check_arcdnom')::boolean IS TRUE THEN
             v_check_arcdnom:= (SELECT value::json->>'diameter' FROM config_param_system WHERE parameter = 'edit_link_check_arcdnom');
@@ -1355,7 +1355,7 @@ BEGIN
         END IF;
     END IF;
    
-    RAISE NOTICE '47 - Check connects with more than 1 link on service (480)';
+    RAISE NOTICE '48 - Check connects with more than 1 link on service (480)';
  
     IF v_project_type = 'WS' THEN
 	    v_querytext = '(SELECT connec_id, connecat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE connec_id 
@@ -1379,7 +1379,7 @@ BEGIN
         VALUES (v_fid, 1, '480', 'INFO: No connects with more than 1 link on service',v_count);
     END IF;
 
-  RAISE NOTICE '48 - Check orphan documents (497)';
+  RAISE NOTICE '49 - Check orphan documents (497)';
   	IF v_project_type = 'WS' THEN
 	    v_querytext = '(select id from doc where id not in (
 										select distinct  doc_id from doc_x_arc UNION
@@ -1403,7 +1403,7 @@ BEGIN
         VALUES (v_fid, 1, '497', 'INFO: All documents are related to the features.',v_count);
     END IF;
 
-  RAISE NOTICE '49 - Check no geometry orphan visits (498)';
+  RAISE NOTICE '50 - Check no geometry orphan visits (498)';
   	IF v_project_type = 'WS' THEN
 	    v_querytext = '(select id from om_visit where the_geom is null and id not in (
 										select distinct visit_id from om_visit_x_arc UNION
@@ -1427,7 +1427,7 @@ BEGIN
         VALUES (v_fid, 1, '498', 'INFO: All visits are related to the features or have geometry.',v_count);
     END IF;
 
-  RAISE NOTICE '51 - Check no geometry orphan elements (499)';
+  RAISE NOTICE '52 - Check no geometry orphan elements (499)';
   	IF v_project_type = 'WS' THEN
 	    v_querytext = '(select element_id from element where the_geom is null and element_id not in (
 										select distinct element_id from element_x_arc UNION
