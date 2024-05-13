@@ -1823,6 +1823,9 @@ class GwInfo(QObject):
                 is_inserting = False
                 my_json = json.dumps(_json)
                 if my_json == '' or str(my_json) == '{}':
+                    # Force a map refresh
+                    tools_qgis.refresh_map_canvas()  # First refresh all the layers
+                    global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
                     # Refresh psector's relations tables
                     tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')
                     if close_dlg:

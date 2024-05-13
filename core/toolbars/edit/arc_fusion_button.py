@@ -96,6 +96,7 @@ class GwArcFusionButton(GwMaptool):
             self.dlg_fusion.close()
 
         self.refresh_map_canvas()
+        self.iface.mapCanvas().refresh()
 
         # Refresh psector's relations tables
         tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')

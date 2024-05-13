@@ -321,6 +321,7 @@ class GwArcDivideButton(GwMaptool):
             tools_qgis.set_layer_index('v_edit_connec')
             tools_qgis.set_layer_index('v_edit_gully')
             tools_qgis.set_layer_index('v_edit_node')
+            self.iface.mapCanvas().refresh()
 
             # Refresh psector's relations tables
             tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')
