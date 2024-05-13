@@ -13,7 +13,7 @@ $BODY$
 
 /*example
 SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"None", "tabName":"tab_exploitation", "forceParent":"True", "checkAll":"True", "addSchema":"None"}}$$);
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"explfrommuni", "id":32, "value":true, "isAlone":true, "addSchema":"SCHEMA_NAME"}}$$)::text
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"explfrommuni", "id":32, "value":true, "isAlone":true, "addSchema":"ws"}}$$)::text
 
 SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_psector", "id":"1", "ids":"[1,2]", "isAlone":"True", "value":"True", "addSchema":"None", "useAtlas":true}}$$);
 
@@ -382,23 +382,20 @@ BEGIN
 	END IF;
 
 	-- manage cross-reference tables
-	IF v_tabname IN('tab_exploitation', 'tab_sector', 'tab_macroexploitation', 'tab_macrosector') THEN
-
-		-- inserting sector id from selected exploitaitons
-		IF v_sectorfromexpl AND v_tabname IN ('tab_exploitation', 'tab_macroexploitation') THEN
-			DELETE FROM selector_sector WHERE cur_user = current_user;
-			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0;
-			
-		END IF;
-
-		-- inserting expl id from selected sectors
-		IF v_explfromsector THEN
-			DELETE FROM selector_expl WHERE cur_user = current_user;
-			INSERT INTO selector_expl
-			SELECT DISTINCT expl_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user);
-		END IF;	
+	-- inserting sector id from selected exploitaitons
+	IF v_sectorfromexpl AND v_tabname IN ('tab_exploitation', 'tab_macroexploitation') THEN
+		DELETE FROM selector_sector WHERE cur_user = current_user;
+		INSERT INTO selector_sector
+		SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0;
+		
 	END IF;
+
+	-- inserting expl id from selected sectors
+	IF v_explfromsector AND v_tabname IN ('tab_sector', 'tab_macrosector') THEN
+		DELETE FROM selector_expl WHERE cur_user = current_user;
+		INSERT INTO selector_expl
+		SELECT DISTINCT expl_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user);
+	END IF;	
 
 	-- get envelope 
 	IF v_tabname IN ('tab_sector', 'tab_macrosector') THEN
