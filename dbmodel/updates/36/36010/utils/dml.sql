@@ -1019,3 +1019,6 @@ DELETE FROM config_param_user WHERE parameter = 'edit_verified_vdefault' AND val
 
 UPDATE config_param_system SET value = '{"setArcObsolete":"true","setOldCode":"false"}' WHERE parameter = 'edit_arc_divide';
 
+UPDATE config_typevalue SET addparam=NULL WHERE id IN ('smallint', 'datetime') AND typevalue='datatype_typevalue';
+UPDATE config_typevalue SET addparam=NULL WHERE id IN ('fileselector', 'spinbox', 'button') AND typevalue='widgettype_typevalue';
+UPDATE config_typevalue SET addparam=NULL WHERE id IN ('lyt_mincut_mng_1', 'lyt_mincut_mng_2', 'lyt_mincut_mng_3', 'lyt_toolbar') AND typevalue='layout_name_typevalue';
