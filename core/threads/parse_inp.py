@@ -40,9 +40,9 @@ class GwParseInpTask(GwTask):
                 JOIN cat_feature_node AS f ON (n.nodetype_id = f.id)
             """)
 
-            node_catalog: dict[str, str] = {}
+            self.db_node_catalog: dict[str, str] = {}
             if rows:
-                node_catalog = {_id: epa_default for _id, epa_default in rows}
+                self.db_node_catalog = {_id: epa_default for _id, epa_default in rows}
 
             # Get arc catalog from DB
             rows = tools_db.get_rows("""
@@ -51,9 +51,9 @@ class GwParseInpTask(GwTask):
                 JOIN cat_mat_roughness AS r USING (matcat_id)
             """)
 
-            arc_catalog = {}
+            self.db_arc_catalog = {}
             if rows:
-                arc_catalog = {
+                self.db_arc_catalog = {
                     _id: (float(dint), float(roughness))
                     for _id, dint, roughness in rows
                 }
@@ -62,7 +62,7 @@ class GwParseInpTask(GwTask):
             junction_catalogs: Optional[list[str]] = (
                 [
                     _id
-                    for _id, epa_default in node_catalog.items()
+                    for _id, epa_default in self.db_node_catalog.items()
                     if epa_default == "JUNCTION"
                 ]
                 if self.network.num_junctions > 0
@@ -72,7 +72,7 @@ class GwParseInpTask(GwTask):
             tank_catalogs: Optional[list[str]] = (
                 [
                     _id
-                    for _id, epa_default in node_catalog.items()
+                    for _id, epa_default in self.db_node_catalog.items()
                     if epa_default == "TANK"
                 ]
                 if self.network.num_tanks > 0
@@ -82,7 +82,7 @@ class GwParseInpTask(GwTask):
             reservoir_catalogs: Optional[list[str]] = (
                 [
                     _id
-                    for _id, epa_default in node_catalog.items()
+                    for _id, epa_default in self.db_node_catalog.items()
                     if epa_default == "RESERVOIR"
                 ]
                 if self.network.num_reservoirs > 0
@@ -95,7 +95,7 @@ class GwParseInpTask(GwTask):
                 roughness = float(pipe.roughness)
                 pipe_catalogs[(diameter, roughness)] = [
                     _id
-                    for _id, dr_pair in arc_catalog.items()
+                    for _id, dr_pair in self.db_arc_catalog.items()
                     if dr_pair == (diameter, roughness)
                 ]
 
