@@ -6,18 +6,27 @@ from time import time
 from typing import Optional, Tuple
 
 from qgis.core import QgsApplication
-from qgis.PyQt.QtCore import QTimer
-from qgis.PyQt.QtWidgets import QActionGroup, QFileDialog, QLabel
+from qgis.PyQt.QtCore import Qt, QTimer
+from qgis.PyQt.QtWidgets import (
+    QActionGroup,
+    QComboBox,
+    QFileDialog,
+    QLabel,
+    QTableWidget,
+    QTableWidgetItem,
+)
 from sip import isdeleted
 
 from .... import global_vars
 from ....libs import tools_db, tools_qgis, tools_qt
 from ...models.plugin_toolbar import GwPluginToolbar
-from ...threads.parse_inp import GwParseInpTask
+from ...threads.parse_inp import GwParseInpTask, InpNodeCatalogs
 from ...ui.dialog import GwDialog
 from ...ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
 from ...utils import tools_gw
 from ..dialog import GwAction
+
+CREATE_NEW = "Create new"
 
 
 class ProjectType(Enum):
@@ -126,7 +135,54 @@ class GwImportInp(GwAction):
         """)
         tools_qt.fill_combo_values(self.dlg_config.cmb_sector, rows, add_empty=True)
 
+        # Fill nodes table
+        inc: InpNodeCatalogs = self.parse_inp_task.inp_node_catalogs
+        dnc: dict[str, str] = self.parse_inp_task.db_node_catalog
+        tbl_nodes: QTableWidget = self.dlg_config.tbl_nodes
+
+        if inc.junctions is not None:
+            row: int = tbl_nodes.rowCount()
+            tbl_nodes.setRowCount(row + 1)
+
+            junction_item = QTableWidgetItem("JUNCTION")
+            junction_item.setFlags(Qt.ItemIsEnabled)
+            tbl_nodes.setItem(row, 0, junction_item)
+
+            junction_combo = QComboBox()
+            junction_combo.addItems(["", CREATE_NEW])
+            if len(inc.junctions) > 0:
+                junction_combo.insertSeparator(junction_combo.count())
+                junction_combo.addItem("Recommended catalogs:")
+                junction_combo.model().item(junction_combo.count() - 1).setEnabled(
+                    False
+                )
+                junction_combo.addItems(sorted(inc.junctions))
+            if len(dnc) > len(inc.junctions):
+                junction_combo.insertSeparator(junction_combo.count())
+                junction_combo.addItem("Other catalogs:")
+                junction_combo.model().item(junction_combo.count() - 1).setEnabled(
+                    False
+                )
+                junction_combo.addItems(
+                    cat for cat in sorted(dnc) if cat not in inc.junctions
+                )
+            tbl_nodes.setCellWidget(row, 1, junction_combo)
+
+            new_cat_name = QTableWidgetItem("")
+            new_cat_name.setFlags(Qt.NoItemFlags)
+            tbl_nodes.setItem(row, 2, new_cat_name)
+            junction_combo.currentTextChanged.connect(
+                partial(self._toggle_enabled_new_catalog_field, new_cat_name)
+            )
+
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
+
+    def _toggle_enabled_new_catalog_field(self, field, text):
+        field.setFlags(
+            Qt.ItemIsEnabled | Qt.ItemIsEditable
+            if text == CREATE_NEW
+            else Qt.NoItemFlags
+        )
 
     def _update_parsing_dialog(self, dialog: GwDialog) -> None:
         if not dialog.isVisible():
