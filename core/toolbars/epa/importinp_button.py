@@ -140,40 +140,49 @@ class GwImportInp(GwAction):
         dnc: dict[str, str] = self.parse_inp_task.db_node_catalog
         tbl_nodes: QTableWidget = self.dlg_config.tbl_nodes
 
-        if inc.junctions is not None:
-            row: int = tbl_nodes.rowCount()
-            tbl_nodes.setRowCount(row + 1)
+        node_elements = [
+            ("junctions", inc.junctions, "JUNCTION"),
+            ("reservoirs", inc.reservoirs, "RESERVOIR"),
+            ("tanks", inc.tanks, "TANK"),
+        ]
 
-            junction_item = QTableWidgetItem("JUNCTION")
-            junction_item.setFlags(Qt.ItemIsEnabled)
-            tbl_nodes.setItem(row, 0, junction_item)
+        self.tbl_elements = {}
 
-            junction_combo = QComboBox()
-            junction_combo.addItems(["", CREATE_NEW])
-            if len(inc.junctions) > 0:
-                junction_combo.insertSeparator(junction_combo.count())
-                junction_combo.addItem("Recommended catalogs:")
-                junction_combo.model().item(junction_combo.count() - 1).setEnabled(
-                    False
-                )
-                junction_combo.addItems(sorted(inc.junctions))
-            if len(dnc) > len(inc.junctions):
-                junction_combo.insertSeparator(junction_combo.count())
-                junction_combo.addItem("Other catalogs:")
-                junction_combo.model().item(junction_combo.count() - 1).setEnabled(
-                    False
-                )
-                junction_combo.addItems(
-                    cat for cat in sorted(dnc) if cat not in inc.junctions
-                )
-            tbl_nodes.setCellWidget(row, 1, junction_combo)
+        for element, rec_catalog, tag in node_elements:
+            if rec_catalog is not None:
+                row: int = tbl_nodes.rowCount()
+                tbl_nodes.setRowCount(row + 1)
 
-            new_cat_name = QTableWidgetItem("")
-            new_cat_name.setFlags(Qt.NoItemFlags)
-            tbl_nodes.setItem(row, 2, new_cat_name)
-            junction_combo.currentTextChanged.connect(
-                partial(self._toggle_enabled_new_catalog_field, new_cat_name)
-            )
+                first_column = QTableWidgetItem(tag)
+                first_column.setFlags(Qt.ItemIsEnabled)
+                tbl_nodes.setItem(row, 0, first_column)
+
+                combo_cat = QComboBox()
+                combo_cat.addItems(["", CREATE_NEW])
+                if len(rec_catalog) > 0:
+                    combo_cat.insertSeparator(combo_cat.count())
+                    combo_cat.addItem("Recommended catalogs:")
+                    combo_cat.model().item(combo_cat.count() - 1).setEnabled(False)
+                    combo_cat.addItems(sorted(rec_catalog))
+                if len(dnc) > len(rec_catalog):
+                    combo_cat.insertSeparator(combo_cat.count())
+                    combo_cat.addItem("Other catalogs:")
+                    combo_cat.model().item(combo_cat.count() - 1).setEnabled(False)
+                    combo_cat.addItems(
+                        cat for cat in sorted(dnc) if cat not in rec_catalog
+                    )
+                tbl_nodes.setCellWidget(row, 1, combo_cat)
+
+                new_cat_name = QTableWidgetItem("")
+                new_cat_name.setFlags(Qt.NoItemFlags)
+                tbl_nodes.setItem(row, 2, new_cat_name)
+                combo_cat.currentTextChanged.connect(
+                    partial(self._toggle_enabled_new_catalog_field, new_cat_name)
+                )
+
+                self.tbl_elements[element] = (combo_cat, new_cat_name)
+
+        tbl_nodes.resizeColumnToContents(1)
 
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
 
