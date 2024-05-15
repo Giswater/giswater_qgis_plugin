@@ -20,7 +20,7 @@ from sip import isdeleted
 from .... import global_vars
 from ....libs import tools_db, tools_qgis, tools_qt
 from ...models.plugin_toolbar import GwPluginToolbar
-from ...threads.parse_inp import GwParseInpTask, InpArcCatalogs, InpNodeCatalogs
+from ...threads.parse_inp import Catalogs, GwParseInpTask
 from ...ui.dialog import GwDialog
 from ...ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
 from ...utils import tools_gw
@@ -135,15 +135,16 @@ class GwImportInp(GwAction):
         """)
         tools_qt.fill_combo_values(self.dlg_config.cmb_sector, rows, add_empty=True)
 
+        # Get catalogs from thread
+        self.catalogs: Catalogs = self.parse_inp_task.catalogs
+
         # Fill nodes table
-        inc: InpNodeCatalogs = self.parse_inp_task.inp_node_catalogs
-        dnc: dict[str, str] = self.parse_inp_task.db_node_catalog
         tbl_nodes: QTableWidget = self.dlg_config.tbl_nodes
 
         node_elements = [
-            ("junctions", inc.junctions, "JUNCTION"),
-            ("reservoirs", inc.reservoirs, "RESERVOIR"),
-            ("tanks", inc.tanks, "TANK"),
+            ("junctions", self.catalogs.inp_junctions, "JUNCTION"),
+            ("reservoirs", self.catalogs.inp_reservoirs, "RESERVOIR"),
+            ("tanks", self.catalogs.inp_tanks, "TANK"),
         ]
 
         self.tbl_elements = {}
@@ -163,13 +164,13 @@ class GwImportInp(GwAction):
                     combo_cat.insertSeparator(combo_cat.count())
                     combo_cat.addItem("Recommended catalogs:")
                     combo_cat.model().item(combo_cat.count() - 1).setEnabled(False)
-                    combo_cat.addItems(sorted(rec_catalog))
-                if len(dnc) > len(rec_catalog):
+                    combo_cat.addItems(rec_catalog)
+                if len(self.catalogs.db_nodes) > len(rec_catalog):
                     combo_cat.insertSeparator(combo_cat.count())
                     combo_cat.addItem("Other catalogs:")
                     combo_cat.model().item(combo_cat.count() - 1).setEnabled(False)
                     combo_cat.addItems(
-                        cat for cat in sorted(dnc) if cat not in rec_catalog
+                        cat for cat in self.catalogs.db_nodes if cat not in rec_catalog
                     )
                 tbl_nodes.setCellWidget(row, 1, combo_cat)
 
@@ -185,16 +186,12 @@ class GwImportInp(GwAction):
         tbl_nodes.resizeColumnToContents(1)
 
         # Fill arcs table with the pipes
-        iac: InpArcCatalogs = self.parse_inp_task.inp_arc_catalogs
-        dac = self.parse_inp_task.db_arc_catalog
         tbl_arcs: QTableWidget = self.dlg_config.tbl_arcs
 
-        if iac.pipes:
+        if self.catalogs.inp_pipes:
             self.tbl_elements["pipes"] = {}
-            sorted_keys: list[tuple[float, float]] = sorted(iac.pipes.keys())
 
-            for diameter, roughness in sorted_keys:
-                rec_catalog: list[str] = iac.pipes[(diameter, roughness)]
+            for (diameter, roughness), rec_catalog in self.catalogs.inp_pipes.items():
                 row: int = tbl_arcs.rowCount()
                 tbl_arcs.setRowCount(row + 1)
 
@@ -216,13 +213,13 @@ class GwImportInp(GwAction):
                     combo_cat.insertSeparator(combo_cat.count())
                     combo_cat.addItem("Recommended catalogs:")
                     combo_cat.model().item(combo_cat.count() - 1).setEnabled(False)
-                    combo_cat.addItems(sorted(rec_catalog))
-                if len(dac) > len(rec_catalog):
+                    combo_cat.addItems(rec_catalog)
+                if len(self.catalogs.db_arcs) > len(rec_catalog):
                     combo_cat.insertSeparator(combo_cat.count())
                     combo_cat.addItem("Other catalogs:")
                     combo_cat.model().item(combo_cat.count() - 1).setEnabled(False)
                     combo_cat.addItems(
-                        cat for cat in sorted(dac) if cat not in rec_catalog
+                        cat for cat in self.catalogs.db_arcs if cat not in rec_catalog
                     )
                 tbl_arcs.setCellWidget(row, 3, combo_cat)
 
@@ -240,8 +237,8 @@ class GwImportInp(GwAction):
 
         # Fill arcs table with pumps and valves
         arc_elements = [
-            ("pumps", iac.pumps, "PUMP"),
-            ("valves", iac.valves, "VALVE"),
+            ("pumps", self.catalogs.inp_pumps, "PUMP"),
+            ("valves", self.catalogs.inp_valves, "VALVE"),
         ]
 
         for element, rec_catalog, tag in arc_elements:
@@ -259,13 +256,13 @@ class GwImportInp(GwAction):
                     combo_cat.insertSeparator(combo_cat.count())
                     combo_cat.addItem("Recommended catalogs:")
                     combo_cat.model().item(combo_cat.count() - 1).setEnabled(False)
-                    combo_cat.addItems(sorted(rec_catalog))
-                if len(dac) > len(rec_catalog):
+                    combo_cat.addItems(rec_catalog)
+                if len(self.catalogs.db_arcs) > len(rec_catalog):
                     combo_cat.insertSeparator(combo_cat.count())
                     combo_cat.addItem("Other catalogs:")
                     combo_cat.model().item(combo_cat.count() - 1).setEnabled(False)
                     combo_cat.addItems(
-                        cat for cat in sorted(dac) if cat not in rec_catalog
+                        cat for cat in self.catalogs.db_arcs if cat not in rec_catalog
                     )
                 tbl_arcs.setCellWidget(row, 3, combo_cat)
 
