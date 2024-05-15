@@ -30,7 +30,7 @@ class GwAuxCircleAddButton(GwMaptool):
         self.cancel_circle = False
         self.layer_circle = None
         self.snap_to_selected_layer = False
-        self.rb_circle = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.LineGeometry)
+        self.rb_circle = tools_gw.create_rubberband(self.canvas, "line")
         self.rb_circle.setLineStyle(Qt.DashLine)
         self.rb_circle.setColor(QColor(255, 0, 0, 150))
 
@@ -133,7 +133,10 @@ class GwAuxCircleAddButton(GwMaptool):
 
         # Call parent method
         super().deactivate()
-        self.iface.setActiveLayer(self.current_layer)
+        try:
+            self.iface.setActiveLayer(self.current_layer)
+        except RuntimeError:
+            pass
 
     # endregion
 
@@ -167,6 +170,8 @@ class GwAuxCircleAddButton(GwMaptool):
         self.dlg_create_circle.radius.textChanged.connect(partial(self._preview_circle, point))
         self.dlg_create_circle.btn_accept.clicked.connect(partial(self._get_radius, point))
         self.dlg_create_circle.btn_cancel.clicked.connect(self.cancel)
+        self.dlg_create_circle.rejected.connect(self.cancel)
+
 
         tools_gw.open_dialog(self.dlg_create_circle, dlg_name='auxcircle')
         self.dlg_create_circle.radius.setFocus()
@@ -282,6 +287,6 @@ class GwAuxCircleAddButton(GwMaptool):
 
     def _reset_rubberbands(self):
 
-        tools_gw.reset_rubberband(self.rb_circle, QgsWkbTypes.LineGeometry)
+        tools_gw.reset_rubberband(self.rb_circle, "line")
 
     # endregion

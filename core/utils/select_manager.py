@@ -39,7 +39,7 @@ class GwSelectManager(QgsMapTool):
 
         self.snapper_manager = GwSnapManager(self.iface)
 
-        self.rubber_band = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.LineGeometry)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas, "line")
         self.rubber_band.setColor(QColor(255, 100, 255))
         self.rubber_band.setFillColor(QColor(254, 178, 76, 63))
         self.rubber_band.setWidth(2)
@@ -156,7 +156,7 @@ class GwSelectManager(QgsMapTool):
     def _reset_rubber_band(self):
 
         try:
-            tools_gw.reset_rubberband(self.rubber_band, QgsWkbTypes.PolygonGeometry)
+            tools_gw.reset_rubberband(self.rubber_band, "polygon")
         except Exception:
             pass
 

@@ -69,7 +69,7 @@ class GwInfo(QObject):
         self.layer_new_feature = None
         self.tab_type = tab_type
         self.connected = False
-        self.rubber_band = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.PointGeometry)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas, "point")
         self.snapper_manager = GwSnapManager(self.iface)
         self.snapper_manager.set_snapping_layers()
         self.conf_supp = None
@@ -1180,7 +1180,7 @@ class GwInfo(QObject):
                 snapped_feat = self.snapper_manager.get_snapped_feature(result)
                 element_id = snapped_feat.attribute('node_id')
                 message = "Selected node"
-                rb = tools_gw.create_rubberband(global_vars.canvas, QgsWkbTypes.PointGeometry)
+                rb = tools_gw.create_rubberband(global_vars.canvas, "point")
                 if self.node1 is None:
                     self.node1 = str(element_id)
                     tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10)
