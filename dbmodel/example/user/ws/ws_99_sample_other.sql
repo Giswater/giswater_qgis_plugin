@@ -55,7 +55,7 @@ FROM doc, om_visit;
 INSERT INTO selector_hydrometer (state_id, cur_user) VALUES (1, 'postgres');
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"OUTFALL_VALVE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"outfallvalve_param_1", "datatype":"string", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"outfallvalve_param_1", "datatype":"text", 
 "widgettype":"text", "label":"Outvalve param_1","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
@@ -65,13 +65,13 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"SHUTOFF_VALVE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"shtvalve_param_1", "datatype":"string", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"shtvalve_param_1", "datatype":"text", 
 "widgettype":"combo", "label":"Shtvalve param_1","ismandatory":"False",
 "active":"True", "iseditable":"True", "dv_isnullvalue":"True","layoutname":"lyt_data_1",
 "dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='shtvalve_param_1'"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"SHUTOFF_VALVE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"shtvalve_param_2", "datatype":"string", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"shtvalve_param_2", "datatype":"text", 
 "widgettype":"text", "label":"Shtvalve param_2","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
@@ -81,12 +81,12 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"GREEN_VALVE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"greenvalve_param_2", "datatype":"string", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"greenvalve_param_2", "datatype":"text", 
 "widgettype":"text", "label":"Gvalve param_2","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"AIR_VALVE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"airvalve_param_1", "datatype":"string", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"airvalve_param_1", "datatype":"text", 
 "widgettype":"text", "label":"Airvalve param_1","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
@@ -101,17 +101,17 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CHECK_VALVE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"checkvalve_param_2", "datatype":"string", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"checkvalve_param_2", "datatype":"text", 
 "widgettype":"text", "label":"Check param_2","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PIPE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"pipe_param_1", "datatype":"string", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"pipe_param_1", "datatype":"text", 
 "widgettype":"text", "label":"Pipe param_1","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PRESSURE_METER"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"pressmeter_param_1", "datatype":"string", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"pressmeter_param_1", "datatype":"text", 
 "widgettype":"combo", "label":"Pressmeter param_1","ismandatory":"False",
 "active":"True", "iseditable":"True", "dv_isnullvalue":"True","layoutname":"lyt_data_1",
 "dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='pressmeter_param_1'"}}}$$);
@@ -127,7 +127,7 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"FILTER"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"filter_param_2", "datatype":"string", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"filter_param_2", "datatype":"text", 
 "widgettype":"text", "label":"Filter param_2","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
@@ -142,7 +142,7 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"HYDRANT"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"hydrant_param_1", "datatype":"string", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"hydrant_param_1", "datatype":"text", 
 "widgettype":"combo", "label":"Hydrant param_1","ismandatory":"False",
 "active":"True", "iseditable":"True", "dv_isnullvalue":"True","layoutname":"lyt_data_1",
 "dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='hydrant_param_1'"}}}$$);
