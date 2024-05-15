@@ -2301,7 +2301,7 @@ class GwAdminButton:
                 return
 
             sql = (f"SELECT cat_feature.id, cat_feature.id "
-                   f"FROM {schema_name}.cat_feature "
+                   f"FROM {schema_name}.cat_feature WHERE id <> 'LINK' "
                    f" ORDER BY id")
             rows = tools_db.get_rows(sql)
 
