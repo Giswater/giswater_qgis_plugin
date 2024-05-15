@@ -860,14 +860,14 @@ BEGIN
 			IF v_class != 'DRAINZONE' THEN
 
 				-- manage conflicts (nodes no headers and no stoppers with different mapzones)
-				FOR rec_conflict IN EXECUTE 'SELECT DISTINCT mapzone FROM (WITH qt AS (
-						SELECT node_id, mpz FROM (SELECT node_id, mpz FROM 
-						(SELECT arc_id, node_1 as node_id, '||v_field||'::text  as mpz FROM temp_t_arc UNION SELECT arc_id, node_2, '||v_field||'::text FROM temp_t_arc) a JOIN 
-						(SELECT DISTINCT ON (arc_id) arc_id, flag, isheader FROM temp_t_anlgraph)b USING (arc_id) 
-						WHERE flag = 0 and isheader is not true group by node_id, mpz
-						) a group by node_id, mpz)
-						SELECT DISTINCT ON (node_id) node_id, concat(quote_literal(a.mpz),'','', quote_literal(b.mpz)) as mapzone FROM qt a JOIN qt b USING (node_id)
-						WHERE a.mpz::text != b.mpz::text AND a.mpz::text !=''0'' AND b.mpz::text !=''0'') a'
+				FOR rec_conflict IN EXECUTE'
+					SELECT DISTINCT concat(quote_literal(m1),'','', quote_literal(m2)) as mapzone from 
+					(SELECT n.'||v_field||' m1, a.'||v_field||' m2 FROM temp_t_node n JOIN temp_t_arc a ON node_id = node_1 WHERE node_id not in
+					(select node_1 from temp_t_anlgraph WHERE flag = 1 UNION select node_2 from temp_t_anlgraph WHERE flag = 1)
+					UNION
+					SELECT n.'||v_field||' m1, a.'||v_field||' m2 FROM temp_t_node n JOIN temp_t_arc a ON node_id = node_2 WHERE node_id not in
+					(select node_1 from temp_t_anlgraph WHERE flag = 1 UNION select node_2 from temp_t_anlgraph WHERE flag = 1)) a
+					WHERE m1::text != m2::text AND m1::text !=''0'' AND m2::text !=''0'''
 
 				LOOP
 					RAISE NOTICE 'Managing conflicts -> %', rec_conflict;
@@ -880,7 +880,6 @@ BEGIN
 
 					-- node
 					EXECUTE 'UPDATE temp_t_node t SET '||v_field||' = -1  WHERE '||v_field||'::text IN ('||rec_conflict.mapzone||')';
-					GET DIAGNOSTICS v_count1 = row_count;
 					raise notice 'Updated % conflict rows on node', v_count1;
 
 					-- connec
@@ -889,8 +888,10 @@ BEGIN
 					raise notice 'Updated % conflict rows on connec', v_count;
 
 					-- log
-					INSERT INTO temp_audit_check_data (fid,  criticity, error_message)
-					VALUES (v_fid, 2, concat('WARNING-395: There is a conflict against ',upper(v_table),'''s (',rec_conflict.mapzone,') with ',v_count1,' arc(s) and ',v_count,' connec(s) affected.'));
+					IF v_count1 > 0 or v_count > 0 THEN
+						INSERT INTO temp_audit_check_data (fid,  criticity, error_message)
+						VALUES (v_fid, 2, concat('WARNING-395: There is a conflict against ',upper(v_table),'''s (',rec_conflict.mapzone,') with ',v_count1,' arc(s) and ',v_count,' connec(s) affected.'));
+					END IF;
 
 					-- update mapzone geometry
 					IF v_netscenario IS NOT NULL THEN
