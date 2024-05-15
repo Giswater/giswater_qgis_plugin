@@ -649,7 +649,7 @@ BEGIN
 					INTO v_new_value_param;
 
 				IF v_new_value_param IS NOT NULL THEN
-					EXECUTE 'INSERT INTO man_gully_'||lower(v_addfields.cat_feature_id)||' (gully_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')'
+					EXECUTE 'INSERT INTO man_gully_'||lower(v_customfeature)||' (gully_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')'
 						USING NEW.gully_id, v_new_value_param;
 				END IF;
 			END LOOP;
@@ -946,13 +946,13 @@ BEGIN
 					INTO v_old_value_param;
 
 				IF (v_new_value_param IS NOT NULL AND v_old_value_param!=v_new_value_param) OR (v_new_value_param IS NOT NULL AND v_old_value_param IS NULL) THEN
-					EXECUTE 'INSERT INTO man_gully_'||lower(v_addfields.cat_feature_id)||' (gully_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')
+					EXECUTE 'INSERT INTO man_gully_'||lower(v_customfeature)||' (gully_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')
 					    ON CONFLICT (gully_id)
-					    DO UPDATE SET '||v_addfields.param_name||'=$2::'||v_addfields.datatype_id||' WHERE man_gully_'||lower(v_addfields.cat_feature_id)||'.gully_id=$1'
+					    DO UPDATE SET '||v_addfields.param_name||'=$2::'||v_addfields.datatype_id||' WHERE man_gully_'||lower(v_customfeature)||'.gully_id=$1'
 						USING NEW.gully_id, v_new_value_param;
 
 				ELSIF v_new_value_param IS NULL AND v_old_value_param IS NOT NULL THEN
-					EXECUTE 'UPDATE man_gully_'||lower(v_addfields.cat_feature_id)||' SET '||v_addfields.param_name||' = null WHERE man_gully_'||lower(v_addfields.cat_feature_id)||'.gully_id=$1'
+					EXECUTE 'UPDATE man_gully_'||lower(v_customfeature)||' SET '||v_addfields.param_name||' = null WHERE man_gully_'||lower(v_customfeature)||'.gully_id=$1'
 					    USING NEW.gully_id;
 				END IF;
 			END LOOP;
