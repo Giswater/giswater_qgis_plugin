@@ -54,63 +54,63 @@ BEGIN
 	IF v_view_type = 1 THEN
 		--view for WS and UD features that only have feature_id in man table
 		EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
-			SELECT ve_'||v_feature_type||'.*
-			FROM '||v_schemaname||'.ve_'||v_feature_type||'
-			JOIN '||v_schemaname||'.man_'||v_feature_system_id||'
-			ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
-			WHERE '||v_feature_type||'_type ='''||v_feature_cat||''' ;';
+                SELECT ve_'||v_feature_type||'.*
+                FROM '||v_schemaname||'.ve_'||v_feature_type||'
+                JOIN '||v_schemaname||'.man_'||v_feature_system_id||'
+                ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
+                WHERE '||v_feature_type||'_type ='''||v_feature_cat||''' ;';
 
 	ELSIF v_view_type = 2 THEN
 		--view for ud connec y gully which dont have man_type table
 		EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
-			SELECT ve_'||v_feature_type||'.*
-			FROM '||v_schemaname||'.ve_'||v_feature_type||'
-			WHERE '||v_feature_type||'_type ='''||v_feature_cat||''' ;';
+                SELECT ve_'||v_feature_type||'.*
+                FROM '||v_schemaname||'.ve_'||v_feature_type||'
+                WHERE '||v_feature_type||'_type ='''||v_feature_cat||''' ;';
 
 	ELSIF v_view_type = 3 THEN
 		--view for WS and UD features that have many fields in man table
 		EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
-			SELECT ve_'||v_feature_type||'.*,
-			'||v_man_fields||'
-			FROM '||v_schemaname||'.ve_'||v_feature_type||'
-			JOIN '||v_schemaname||'.man_'||v_feature_system_id||'
-			ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
-			WHERE '||v_feature_type||'_type ='''||v_feature_cat||''' ;';
+                SELECT ve_'||v_feature_type||'.*,
+                '||v_man_fields||'
+                FROM '||v_schemaname||'.ve_'||v_feature_type||'
+                JOIN '||v_schemaname||'.man_'||v_feature_system_id||'
+                ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
+                WHERE '||v_feature_type||'_type ='''||v_feature_cat||''' ;';
 
 	ELSIF v_view_type = 4 THEN
 		--view for WS and UD features that only have feature_id in man table and have defined addfields
         EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
-            SELECT ve_'||v_feature_type||'.*,
-            '||v_feature_childtable_fields||'
-            FROM '||v_schemaname||'.ve_'||v_feature_type||'
-            JOIN '||v_schemaname||'.man_'||v_feature_system_id||'
-            ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
-            LEFT JOIN '||v_schemaname||'.'||v_feature_childtable_name||'
-            ON '||v_feature_childtable_name||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
-            WHERE '||v_feature_type||'_type ='''||v_feature_cat||''' ;';
+                SELECT ve_'||v_feature_type||'.*,
+                '||v_feature_childtable_fields||'
+                FROM '||v_schemaname||'.ve_'||v_feature_type||'
+                JOIN '||v_schemaname||'.man_'||v_feature_system_id||'
+                ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
+                LEFT JOIN '||v_schemaname||'.'||v_feature_childtable_name||'
+                ON '||v_feature_childtable_name||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
+                WHERE '||v_feature_type||'_type ='''||v_feature_cat||''' ;';
 
 	ELSIF v_view_type = 5 THEN
 		--view for ud connec y gully which dont have man_type table and have defined addfields
 		EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
-            SELECT ve_'||v_feature_type||'.*,
-            '||v_feature_childtable_fields||'
-            FROM '||v_schemaname||'.ve_'||v_feature_type||'
-            LEFT JOIN '||v_schemaname||'.'||v_feature_childtable_name||'
-            ON '||v_feature_childtable_name||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
-            WHERE '||v_feature_type||'_type ='''||v_feature_cat||''' ;';
+                SELECT ve_'||v_feature_type||'.*,
+                '||v_feature_childtable_fields||'
+                FROM '||v_schemaname||'.ve_'||v_feature_type||'
+                LEFT JOIN '||v_schemaname||'.'||v_feature_childtable_name||'
+                ON '||v_feature_childtable_name||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
+                WHERE '||v_feature_type||'_type ='''||v_feature_cat||''' ;';
 
 	ELSIF v_view_type = 6 THEN
 		--view for WS and UD features that have many fields in man table and have defined addfields
         EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
-            SELECT ve_'||v_feature_type||'.*,
-            '||v_man_fields||',
-            '||v_feature_childtable_fields||'
-            FROM '||v_schemaname||'.ve_'||v_feature_type||'
-            JOIN '||v_schemaname||'.man_'||v_feature_system_id||'
-            ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
-            LEFT JOIN '||v_schemaname||'.'||v_feature_childtable_name||'
-            ON '||v_feature_childtable_name||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
-            WHERE '||v_feature_type||'_type ='''||v_feature_cat||''' ;';
+                SELECT ve_'||v_feature_type||'.*,
+                '||v_man_fields||',
+                '||v_feature_childtable_fields||'
+                FROM '||v_schemaname||'.ve_'||v_feature_type||'
+                JOIN '||v_schemaname||'.man_'||v_feature_system_id||'
+                ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
+                LEFT JOIN '||v_schemaname||'.'||v_feature_childtable_name||'
+                ON '||v_feature_childtable_name||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
+                WHERE '||v_feature_type||'_type ='''||v_feature_cat||''' ;';
 	END IF;
 	
 	RETURN;
