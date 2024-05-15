@@ -64,10 +64,6 @@ UPDATE config_function SET "style"='{"style": {"point": {"style": "categorized",
 "line": {"style": "categorized", "field": "mapzone_id", "transparency": 0.5, "width": 2.5, "values": [{"id": "Disconnected", "color": [255,124,64]}, {"id": "Conflict", "color": [14,206,253]}]},
   "polygon": {"style": "categorized","field": "mapzone_id",  "transparency": 0.5}}}'::json, actions='[{"funcName": "set_style_mapzones", "params": {}}, {"funcName": "get_graph_config", "params": {}}]'::json WHERE function_name='gw_fct_graphanalytics_mapzones';
 
-
--- 26/03/2024
-SELECT gw_fct_admin_transfer_addfields_values();
-
 -- 10/04/2024
 UPDATE config_param_system SET project_type='utils' WHERE "parameter"='edit_mapzones_set_lastupdate';
 
@@ -78,8 +74,6 @@ UPDATE config_form_tabs SET orderby = 4 WHERE formname ='selector_basic' and tab
 UPDATE config_form_tabs SET orderby = 5 WHERE formname ='selector_basic' and tabname = 'tab_hydro_state';
 
 -- 15/04/2024
-UPDATE sys_table SET id = '_man_addfields_value_' WHERE id='man_addfields_value';
-
 UPDATE sys_table SET id = 'archived_rpt_arc' WHERE id = 'rpt_arc';
 UPDATE sys_table SET id = 'archived_rpt_energy_usage' WHERE id = 'rpt_energy_usage';
 UPDATE sys_table SET id = 'archived_rpt_hydraulic_status' WHERE id = 'rpt_hydraulic_status';
@@ -1022,3 +1016,11 @@ UPDATE config_param_system SET value = '{"setArcObsolete":"true","setOldCode":"f
 UPDATE config_typevalue SET addparam=NULL WHERE id IN ('smallint', 'datetime') AND typevalue='datatype_typevalue';
 UPDATE config_typevalue SET addparam=NULL WHERE id IN ('fileselector', 'spinbox', 'button') AND typevalue='widgettype_typevalue';
 UPDATE config_typevalue SET addparam=NULL WHERE id IN ('lyt_mincut_mng_1', 'lyt_mincut_mng_2', 'lyt_mincut_mng_3', 'lyt_toolbar') AND typevalue='layout_name_typevalue';
+
+-- 15/05/2024
+UPDATE sys_addfields SET feature_type = 'ALL' WHERE cat_feature_id IS NULL;
+UPDATE sys_addfields SET feature_type = 'CHILD' WHERE cat_feature_id IS NOT NULL;
+
+SELECT gw_fct_admin_transfer_addfields_values();
+
+UPDATE sys_table SET id = '_man_addfields_value_' WHERE id='man_addfields_value';
