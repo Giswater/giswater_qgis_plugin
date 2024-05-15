@@ -10,7 +10,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTabWidget,\
-    QWidget, QApplication, QDockWidget, QToolButton, QAction
+    QWidget, QApplication, QDockWidget, QToolButton, QAction, QScrollArea
 
 from ..ui.ui_manager import GwSelectorUi
 from ..utils import tools_gw
@@ -38,9 +38,9 @@ class GwSelector:
             else:
                 current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
             reload_dlg.main_tab.clear()
-            if self.scrolled_amount:
-                reload_dlg.scrollArea.verticalScrollBar().setValue(self.scrolled_amount)
             self.get_selector(reload_dlg, selector_type, current_tab=current_tab, aux_params=aux_params)
+            if self.scrolled_amount:
+                reload_dlg.main_tab.currentWidget().verticalScrollBar().setValue(self.scrolled_amount)
             return
 
         dlg_selector = GwSelectorUi()
@@ -66,7 +66,7 @@ class GwSelector:
             dlg_selector.key_escape.connect(partial(tools_gw.close_dialog, dlg_selector))
 
         dlg_selector.btn_close.clicked.connect(partial(self._selector_close, dlg_selector))
-        
+
         # Manage tab focus
         dlg_selector.findChild(QTabWidget, 'main_tab').currentChanged.connect(partial(self._set_focus, dlg_selector))
         # Save the name of current tab used by the user
@@ -160,14 +160,21 @@ class GwSelector:
             selection_modes[tab_name] = selection_mode
 
             # Create one tab for each form_tab and add to QTabWidget
-            tab_widget = QWidget(main_tab)
-            tab_widget.setObjectName(tab_name)
-            tab_widget.setProperty('selector_type', form_tab['selectorType'])
+            scroll_area = QScrollArea(main_tab)
+            scroll_area.setObjectName(tab_name)
+            scroll_area.setProperty('selector_type', form_tab['selectorType'])
+            scroll_area.viewport().setStyleSheet("background-color: white;")
+            tab_widget = QWidget()
+            tab_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.MinimumExpanding)
             if filter:
                 main_tab.removeTab(index)
-                main_tab.insertTab(index, tab_widget, form_tab['tabLabel'])
+                main_tab.insertTab(index, scroll_area, form_tab['tabLabel'])
             else:
-                main_tab.addTab(tab_widget, form_tab['tabLabel'])
+                main_tab.addTab(scroll_area, form_tab['tabLabel'])
+
+            scroll_area.setWidgetResizable(True)  # Allow scroll area to resize its widget
+            scroll_area.setWidget(tab_widget)
+
             typeaheadForced = form_tab.get('typeaheadForced')
             if typeaheadForced is not None:
                 tab_widget.setProperty('typeahead_forced', typeaheadForced)
@@ -392,7 +399,7 @@ class GwSelector:
             layer.setExtent(canvas_extent)
             global_vars.iface.mapCanvas().refresh()
 
-        self.scrolled_amount = dialog.scrollArea.verticalScrollBar().value()
+        self.scrolled_amount = dialog.main_tab.currentWidget().verticalScrollBar().value()
         # Reload selectors dlg
         self.open_selector(selector_type, reload_dlg=dialog)
 
