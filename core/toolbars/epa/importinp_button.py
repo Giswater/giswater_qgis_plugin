@@ -20,7 +20,7 @@ from sip import isdeleted
 from .... import global_vars
 from ....libs import tools_db, tools_qgis, tools_qt
 from ...models.plugin_toolbar import GwPluginToolbar
-from ...threads.parse_inp import GwParseInpTask, InpNodeCatalogs
+from ...threads.parse_inp import GwParseInpTask, InpArcCatalogs, InpNodeCatalogs
 from ...ui.dialog import GwDialog
 from ...ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
 from ...utils import tools_gw
@@ -184,9 +184,105 @@ class GwImportInp(GwAction):
 
         tbl_nodes.resizeColumnToContents(1)
 
+        # Fill arcs table with the pipes
+        iac: InpArcCatalogs = self.parse_inp_task.inp_arc_catalogs
+        dac = self.parse_inp_task.db_arc_catalog
+        tbl_arcs: QTableWidget = self.dlg_config.tbl_arcs
+
+        if iac.pipes:
+            self.tbl_elements["pipes"] = {}
+            sorted_keys: list[tuple[float, float]] = sorted(iac.pipes.keys())
+
+            for diameter, roughness in sorted_keys:
+                rec_catalog: list[str] = iac.pipes[(diameter, roughness)]
+                row: int = tbl_arcs.rowCount()
+                tbl_arcs.setRowCount(row + 1)
+
+                first_column = QTableWidgetItem("PIPE")
+                first_column.setFlags(Qt.ItemIsEnabled)
+                tbl_arcs.setItem(row, 0, first_column)
+
+                d_column = QTableWidgetItem(str(diameter))
+                d_column.setFlags(Qt.ItemIsEnabled)
+                tbl_arcs.setItem(row, 1, d_column)
+
+                r_column = QTableWidgetItem(str(roughness))
+                r_column.setFlags(Qt.ItemIsEnabled)
+                tbl_arcs.setItem(row, 2, r_column)
+
+                combo_cat = QComboBox()
+                combo_cat.addItems(["", CREATE_NEW])
+                if len(rec_catalog) > 0:
+                    combo_cat.insertSeparator(combo_cat.count())
+                    combo_cat.addItem("Recommended catalogs:")
+                    combo_cat.model().item(combo_cat.count() - 1).setEnabled(False)
+                    combo_cat.addItems(sorted(rec_catalog))
+                if len(dac) > len(rec_catalog):
+                    combo_cat.insertSeparator(combo_cat.count())
+                    combo_cat.addItem("Other catalogs:")
+                    combo_cat.model().item(combo_cat.count() - 1).setEnabled(False)
+                    combo_cat.addItems(
+                        cat for cat in sorted(dac) if cat not in rec_catalog
+                    )
+                tbl_arcs.setCellWidget(row, 3, combo_cat)
+
+                new_cat_name = QTableWidgetItem("")
+                new_cat_name.setFlags(Qt.NoItemFlags)
+                tbl_arcs.setItem(row, 4, new_cat_name)
+                combo_cat.currentTextChanged.connect(
+                    partial(self._toggle_enabled_new_catalog_field, new_cat_name)
+                )
+
+                self.tbl_elements["pipes"][(diameter, roughness)] = (
+                    combo_cat,
+                    new_cat_name,
+                )
+
+        # Fill arcs table with pumps and valves
+        arc_elements = [
+            ("pumps", iac.pumps, "PUMP"),
+            ("valves", iac.valves, "VALVE"),
+        ]
+
+        for element, rec_catalog, tag in arc_elements:
+            if rec_catalog is not None:
+                row: int = tbl_arcs.rowCount()
+                tbl_arcs.setRowCount(row + 1)
+
+                first_column = QTableWidgetItem(tag)
+                first_column.setFlags(Qt.ItemIsEnabled)
+                tbl_arcs.setItem(row, 0, first_column)
+
+                combo_cat = QComboBox()
+                combo_cat.addItems(["", CREATE_NEW])
+                if len(rec_catalog) > 0:
+                    combo_cat.insertSeparator(combo_cat.count())
+                    combo_cat.addItem("Recommended catalogs:")
+                    combo_cat.model().item(combo_cat.count() - 1).setEnabled(False)
+                    combo_cat.addItems(sorted(rec_catalog))
+                if len(dac) > len(rec_catalog):
+                    combo_cat.insertSeparator(combo_cat.count())
+                    combo_cat.addItem("Other catalogs:")
+                    combo_cat.model().item(combo_cat.count() - 1).setEnabled(False)
+                    combo_cat.addItems(
+                        cat for cat in sorted(dac) if cat not in rec_catalog
+                    )
+                tbl_arcs.setCellWidget(row, 3, combo_cat)
+
+                new_cat_name = QTableWidgetItem("")
+                new_cat_name.setFlags(Qt.NoItemFlags)
+                tbl_arcs.setItem(row, 4, new_cat_name)
+                combo_cat.currentTextChanged.connect(
+                    partial(self._toggle_enabled_new_catalog_field, new_cat_name)
+                )
+
+                self.tbl_elements[element] = (combo_cat, new_cat_name)
+
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
 
-    def _toggle_enabled_new_catalog_field(self, field, text):
+    def _toggle_enabled_new_catalog_field(
+        self, field: QTableWidgetItem, text: str
+    ) -> None:
         field.setFlags(
             Qt.ItemIsEnabled | Qt.ItemIsEditable
             if text == CREATE_NEW
