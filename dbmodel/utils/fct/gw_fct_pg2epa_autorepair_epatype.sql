@@ -87,17 +87,19 @@ v_projecttype text;
 v_affectrow integer;
 v_fid integer = 214;
 v_criticity integer = 0;
-
+v_networkmode integer;
 rec_feature record;
 
 BEGIN
-
 
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 	
 	--  get version
 	SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+
+	-- get user values
+	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user); 
 
 	-- delete auxiliar tables
 	DELETE FROM audit_check_data WHERE fid = v_fid;
@@ -153,10 +155,14 @@ BEGIN
 		
 		-- connec ws
 		INSERT INTO inp_connec
-		SELECT connec_id FROM connec WHERE state >0
+		SELECT connec_id FROM connec WHERE state >0 AND epa_type = 'JUNCTION'
 		ON CONFLICT (connec_id) DO NOTHING;
-
-		DELETE FROM inp_connec WHERE connec_id NOT IN (SELECT connec_id FROM connec);
+		
+		IF v_networkmode > 2 THEN
+			UPDATE inp_connec set source_type = 'DELETE' FROM (
+			DELETE FROM inp_connec WHERE connec_id IN 
+			(SELECT connec_id FROM connec c JOIN inp_connec USING (connec_id) WHERE epa_type = 'UNDEFINED');
+		END IF;
 		
 		-- arc ws
 		INSERT INTO inp_virtualvalve SELECT arc_id FROM arc WHERE state >0 and epa_type = 'VIRTUALVALVE' ON CONFLICT (arc_id) DO NOTHING;
