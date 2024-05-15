@@ -138,8 +138,8 @@ v_debug_vars json;
 v_debug json;
 v_msgerr json;
 v_epa text;
-v_elevation float;
-v_staticpressure float;
+v_elevation numeric(12,4);
+v_staticpressure numeric(12,3);
 label_value text;
 
 v_streetname varchar;
@@ -491,7 +491,7 @@ BEGIN
 		-- Dem elevation
 		IF v_sys_raster_dem AND v_edit_insert_elevation_from_dem AND p_idname IN ('node_id', 'connec_id', 'gully_id') THEN
 			v_elevation = (SELECT ST_Value(rast,1, p_reduced_geometry, true) FROM v_ext_raster_dem WHERE id =
-			(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, p_reduced_geometry, 1) LIMIT 1))::numeric (12,3);
+			(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, p_reduced_geometry, 1) LIMIT 1));
 		END IF;
 
 		-- static pressure
