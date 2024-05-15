@@ -277,13 +277,13 @@ BEGIN
 
         IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_feature_childtable_name)) IS TRUE THEN
            -- add columna
-            EXECUTE 'ALTER TABLE ' || v_feature_childtable_name || ' ADD COLUMN ' || v_param_name || ' text';
+            EXECUTE 'ALTER TABLE ' || v_feature_childtable_name || ' ADD COLUMN ' || v_param_name || ' '||v_config_datatype||'';
         ELSE
             -- create child table with the new column
             EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
                         id BIGSERIAL PRIMARY KEY,
                         '|| v_feature_type|| '_id varchar(16),
-                        ' || v_param_name || ' text,
+                        ' || v_param_name || ' '||v_config_datatype||',
                         CONSTRAINT ' || v_feature_childtable_name || '_'|| v_feature_type|| '_fk FOREIGN KEY ('|| v_feature_type|| '_id) REFERENCES '|| v_schemaname ||'.'|| v_feature_type|| '('|| v_feature_type|| '_id) ON DELETE CASCADE ,
                         CONSTRAINT ' || v_feature_childtable_name || '_unique UNIQUE ('|| v_feature_type|| '_id)
                     )';
