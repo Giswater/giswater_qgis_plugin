@@ -165,17 +165,17 @@ BEGIN
 	INSERT INTO temp_om_mincut_hydrometer (result_id, hydrometer_id)
 	SELECT p_mincut_id,rtc_hydrometer_x_connec.hydrometer_id FROM rtc_hydrometer_x_connec 
 	JOIN temp_om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=temp_om_mincut_connec.connec_id 
-	JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
-	JOIN v_edit_connec ON temp_om_mincut_connec.connec_id=v_edit_connec.connec_id
-	WHERE result_id=p_mincut_id AND v_edit_connec.is_operative=TRUE AND v_rtc_hydrometer.feature_id=temp_om_mincut_connec.connec_id;
+	JOIN connec ON temp_om_mincut_connec.connec_id=connec.connec_id
+	JOIN value_state_type v ON state_type = v.id
+	WHERE result_id=p_mincut_id AND v.is_operative=TRUE AND rtc_hydrometer_x_connec.connec_id=temp_om_mincut_connec.connec_id;
 
 	-- insert hydrometer from node
 	INSERT INTO temp_om_mincut_hydrometer (result_id, hydrometer_id)
 	SELECT p_mincut_id,rtc_hydrometer_x_node.hydrometer_id FROM rtc_hydrometer_x_node 
 	JOIN temp_om_mincut_node ON rtc_hydrometer_x_node.node_id=temp_om_mincut_node.node_id 
-	JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_node.hydrometer_id
-	JOIN v_edit_node ON temp_om_mincut_node.node_id=v_edit_node.node_id
-	WHERE result_id=p_mincut_id AND v_edit_node.is_operative=TRUE AND v_rtc_hydrometer.feature_id=temp_om_mincut_node.node_id;
+	JOIN node ON temp_om_mincut_node.node_id=node.node_id
+	JOIN value_state_type v ON state_type = v.id
+	WHERE result_id=p_mincut_id AND v.is_operative=TRUE AND rtc_hydrometer_x_node.node_id=temp_om_mincut_node.node_id;
 
 	-- getting mincut details
 	-- count arcs
