@@ -95,7 +95,6 @@ v_catfeature record;
 v_codeautofill boolean=true;
 v_values_array json;
 v_record record;
-v_gislength float;
 v_catalog text;
 v_dnom text;
 v_pnom text;
@@ -393,9 +392,6 @@ BEGIN
 					END IF;
 				END IF;
 
-				--getting 1st approach of gis length
-				v_gislength = (SELECT st_length(p_reduced_geometry))::numeric(12,0);
-
 			ELSIF upper(v_catfeature.feature_type) ='CONNEC' THEN
 				v_numnodes := (SELECT COUNT(*) FROM connec WHERE ST_DWithin(p_reduced_geometry, connec.the_geom, v_connec_proximity) AND connec.connec_id != p_id AND connec.state!=0);
 				IF (v_numnodes >1) AND (v_connec_proximity_control IS TRUE) THEN
@@ -678,8 +674,6 @@ BEGIN
 					field_value = v_noderecord1.node_id;
 				WHEN 'node_2' THEN
 					field_value = v_noderecord2.node_id;
-				WHEN 'gis_length' THEN
-					field_value = v_gislength;
 				WHEN 'epa_type' THEN
 				    if v_catfeature.feature_type != 'LINK' then
                         v_querystring = concat('SELECT epa_default FROM cat_feature_',(v_catfeature.feature_type),' WHERE id = ', quote_nullable(v_catfeature.id));

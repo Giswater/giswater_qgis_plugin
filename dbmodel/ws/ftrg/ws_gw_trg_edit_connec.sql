@@ -280,12 +280,6 @@ BEGIN
 		-- Municipality 
 		IF (NEW.muni_id IS NULL) THEN
 			
-			-- control error without any mapzones defined on the table of mapzone
-			IF ((SELECT COUNT(*) FROM ext_municipality WHERE active IS TRUE ) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3110", "function":"1304","debug_msg":null}}$$);';
-			END IF;
-			
 			-- getting value default
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_municipality_vdefault' AND "cur_user"="current_user"() LIMIT 1);
