@@ -118,6 +118,7 @@ class GwImportInp(GwAction):
         self.dlg_config.rejected.connect(
             partial(tools_gw.save_settings, self.dlg_config)
         )
+        self.dlg_config.btn_reload.clicked.connect(self._fill_combo_boxes)
 
         # Get catalogs from thread
         self.catalogs: Catalogs = self.parse_inp_task.catalogs
@@ -289,6 +290,7 @@ class GwImportInp(GwAction):
                 combo: QComboBox = self.tbl_elements["pipes"][pipe_type][0]
                 old_value: str = combo.currentText()
 
+                combo.clear()
                 combo.addItems(["", CREATE_NEW])
                 if len(pipe_catalog) > 0:
                     combo.insertSeparator(combo.count())
@@ -302,7 +304,7 @@ class GwImportInp(GwAction):
                     combo.addItems(
                         cat for cat in self.catalogs.db_arcs if cat not in pipe_catalog
                     )
-                    combo.setCurrentText(old_value)
+                combo.setCurrentText(old_value)
 
     def _toggle_enabled_new_catalog_field(
         self, field: QTableWidgetItem, text: str
