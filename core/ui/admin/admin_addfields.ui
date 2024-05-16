@@ -449,6 +449,7 @@
  <tabstops>
   <tabstop>tab_add_fields</tabstop>
   <tabstop>scrollArea_2</tabstop>
+  <tabstop>featuretype</tabstop>
   <tabstop>columnname</tabstop>
   <tabstop>formtype</tabstop>
   <tabstop>label</tabstop>
@@ -469,10 +470,10 @@
   <tabstop>linkedobject</tabstop>
   <tabstop>btn_accept</tabstop>
   <tabstop>btn_cancel</tabstop>
-  <tabstop>cmb_fields</tabstop>
   <tabstop>txt_infolog</tabstop>
   <tabstop>btn_open</tabstop>
   <tabstop>tbl_update</tabstop>
+  <tabstop>cmb_fields</tabstop>
  </tabstops>
  <resources/>
  <connections/>
