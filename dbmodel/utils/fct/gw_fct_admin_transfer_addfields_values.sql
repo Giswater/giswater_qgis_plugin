@@ -83,7 +83,7 @@ BEGIN
 
                     EXECUTE 'ALTER TABLE ' || v_feature_childtable_name || ' ADD CONSTRAINT ' || v_feature_childtable_name || '_fk FOREIGN KEY ('|| lower(rec_sa.feature_type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.feature_type) || '('|| lower(rec_sa.feature_type) || '_id) ON DELETE CASCADE;';
 
-                    EXECUTE 'ALTER TABLE ' || v_feature_childtable_name || ' ADD CONSTRAINT ' || v_feature_childtable_name || '_unique UNIQUE ('|| lower(rec_sa.feature_type) ||'_id);'
+                    EXECUTE 'ALTER TABLE ' || v_feature_childtable_name || ' ADD CONSTRAINT ' || v_feature_childtable_name || '_unique UNIQUE ('|| lower(rec_sa.feature_type) ||'_id)';
 
                     EXECUTE 'ALTER SEQUENCE ' || v_feature_childtable_name || '_id_seq OWNED BY ' || v_feature_childtable_name || '.id';
 
@@ -280,7 +280,7 @@ BEGIN
     END LOOP;
 
     FOR rec_mav IN
-        SELECT mav.feature_id, mav.value_param, sa.param_name, sa.datatype_id cf.id, cf.feature_type, cf.child_layer
+        SELECT mav.feature_id, mav.value_param, sa.param_name, sa.datatype_id, cf.id, cf.feature_type, cf.child_layer
         FROM _man_addfields_value_ mav
         INNER JOIN sys_addfields sa ON sa.id = mav.parameter_id
         INNER JOIN cat_feature cf ON cf.id = sa.cat_feature_id
