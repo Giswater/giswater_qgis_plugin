@@ -179,17 +179,21 @@ BEGIN
 				IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user') IS TRUE THEN
 					IF v_tabname = 'tab_exploitation' THEN
 						EXECUTE 'INSERT INTO selector_expl SELECT expl_id, current_user FROM config_user_x_expl WHERE username = current_user ON CONFLICT DO NOTHING';
+						
 					ELSIF  v_tabname = 'tab_macrosector' THEN
 						EXECUTE 'INSERT INTO selector_sector SELECT sector_id, current_user FROM config_user_x_sector  WHERE username = current_user ON CONFLICT DO NOTHING';
+						
 					ELSIF  v_tabname = 'tab_sector' THEN
 						EXECUTE 'INSERT INTO selector_sector SELECT sector_id, current_user FROM config_user_x_sector WHERE username = current_user ON CONFLICT DO NOTHING';
 					END IF;
 					
 				ELSIF v_tabname='tab_macroexploitation' OR v_tabname='tab_macrosector' THEN
+				
 					EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) 
 					SELECT '|| v_columnname ||', current_user FROM '||v_zonetable||' ON CONFLICT ('|| v_columnname ||', cur_user) DO NOTHING';
 				
 				ELSIF v_tabname='tab_macroexploitation_add' AND v_addschema IS NOT NULL THEN
+				
 					EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) 
 					SELECT e.'|| v_columnname ||', current_user 
 					FROM '||v_zonetable||' e
@@ -198,18 +202,22 @@ BEGIN
 					
 					EXECUTE 'INSERT INTO '||v_addschema||'.'|| v_tablename || ' ('|| v_columnname ||', cur_user) 
 					SELECT '|| v_columnname ||', current_user FROM '||v_addschema||'.'||v_zonetable||' ON CONFLICT ('|| v_columnname ||', cur_user) DO NOTHING';
-
+					
 				ELSIF v_tabname='tab_exploitation_add' AND v_addschema IS NOT NULL THEN
-					--IF v_checkall IS FALSE THEN
-					--	EXECUTE 'DELETE FROM '||v_addschema||'.'|| v_tablename || ' WHERE cur_user = current_user';
-					--ELSE
-						EXECUTE 'INSERT INTO '||v_addschema||'.'|| v_tablename || ' ('|| v_columnname ||', cur_user) 
-						SELECT '|| v_columnname ||', current_user FROM '||v_addschema||'.'||v_zonetable||' WHERE
+				
+					EXECUTE 'INSERT INTO '||v_addschema||'.'|| v_tablename || ' ('|| v_columnname ||', cur_user) 
+					SELECT '|| v_columnname ||', current_user FROM '||v_addschema||'.'||v_zonetable||' WHERE active is TRUE
 						'|| v_columnname ||' NOT IN (SELECT '|| v_columnname ||'  FROM '||v_zonetable||' ) ON CONFLICT ('|| v_columnname ||', cur_user) DO NOTHING';
-					--END IF;
+					
+				ELSIF v_tabname='tab_hydro_state' THEN
+
+					EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
+					',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,') ') end),' 
+					ON CONFLICT (',v_columnname,', cur_user) DO NOTHING;');	
+
 				ELSE
 					EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
-					',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,')') end),'
+					',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,')') end),' WHERE active
 					ON CONFLICT (',v_columnname,', cur_user) DO NOTHING;');		
 				END IF;		
 			END IF;
