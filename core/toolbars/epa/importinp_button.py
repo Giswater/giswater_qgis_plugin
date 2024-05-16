@@ -119,22 +119,6 @@ class GwImportInp(GwAction):
             partial(tools_gw.save_settings, self.dlg_config)
         )
 
-        # Fill exploitation combo
-        rows = tools_db.get_rows("""
-            SELECT expl_id, name
-            FROM exploitation
-            WHERE expl_id > 0
-        """)
-        tools_qt.fill_combo_values(self.dlg_config.cmb_expl, rows, add_empty=True)
-
-        # Fill sector combo
-        rows = tools_db.get_rows("""
-            SELECT sector_id, name
-            FROM sector
-            WHERE sector_id > 0
-        """)
-        tools_qt.fill_combo_values(self.dlg_config.cmb_sector, rows, add_empty=True)
-
         # Get catalogs from thread
         self.catalogs: Catalogs = self.parse_inp_task.catalogs
 
@@ -159,19 +143,6 @@ class GwImportInp(GwAction):
                 tbl_nodes.setItem(row, 0, first_column)
 
                 combo_cat = QComboBox()
-                combo_cat.addItems(["", CREATE_NEW])
-                if len(rec_catalog) > 0:
-                    combo_cat.insertSeparator(combo_cat.count())
-                    combo_cat.addItem("Recommended catalogs:")
-                    combo_cat.model().item(combo_cat.count() - 1).setEnabled(False)
-                    combo_cat.addItems(rec_catalog)
-                if len(self.catalogs.db_nodes) > len(rec_catalog):
-                    combo_cat.insertSeparator(combo_cat.count())
-                    combo_cat.addItem("Other catalogs:")
-                    combo_cat.model().item(combo_cat.count() - 1).setEnabled(False)
-                    combo_cat.addItems(
-                        cat for cat in self.catalogs.db_nodes if cat not in rec_catalog
-                    )
                 tbl_nodes.setCellWidget(row, 1, combo_cat)
 
                 new_cat_name = QTableWidgetItem("")
@@ -182,8 +153,6 @@ class GwImportInp(GwAction):
                 )
 
                 self.tbl_elements[element] = (combo_cat, new_cat_name)
-
-        tbl_nodes.resizeColumnToContents(1)
 
         # Fill arcs table with the pipes
         tbl_arcs: QTableWidget = self.dlg_config.tbl_arcs
@@ -208,19 +177,6 @@ class GwImportInp(GwAction):
                 tbl_arcs.setItem(row, 2, r_column)
 
                 combo_cat = QComboBox()
-                combo_cat.addItems(["", CREATE_NEW])
-                if len(rec_catalog) > 0:
-                    combo_cat.insertSeparator(combo_cat.count())
-                    combo_cat.addItem("Recommended catalogs:")
-                    combo_cat.model().item(combo_cat.count() - 1).setEnabled(False)
-                    combo_cat.addItems(rec_catalog)
-                if len(self.catalogs.db_arcs) > len(rec_catalog):
-                    combo_cat.insertSeparator(combo_cat.count())
-                    combo_cat.addItem("Other catalogs:")
-                    combo_cat.model().item(combo_cat.count() - 1).setEnabled(False)
-                    combo_cat.addItems(
-                        cat for cat in self.catalogs.db_arcs if cat not in rec_catalog
-                    )
                 tbl_arcs.setCellWidget(row, 3, combo_cat)
 
                 new_cat_name = QTableWidgetItem("")
@@ -251,19 +207,6 @@ class GwImportInp(GwAction):
                 tbl_arcs.setItem(row, 0, first_column)
 
                 combo_cat = QComboBox()
-                combo_cat.addItems(["", CREATE_NEW])
-                if len(rec_catalog) > 0:
-                    combo_cat.insertSeparator(combo_cat.count())
-                    combo_cat.addItem("Recommended catalogs:")
-                    combo_cat.model().item(combo_cat.count() - 1).setEnabled(False)
-                    combo_cat.addItems(rec_catalog)
-                if len(self.catalogs.db_arcs) > len(rec_catalog):
-                    combo_cat.insertSeparator(combo_cat.count())
-                    combo_cat.addItem("Other catalogs:")
-                    combo_cat.model().item(combo_cat.count() - 1).setEnabled(False)
-                    combo_cat.addItems(
-                        cat for cat in self.catalogs.db_arcs if cat not in rec_catalog
-                    )
                 tbl_arcs.setCellWidget(row, 3, combo_cat)
 
                 new_cat_name = QTableWidgetItem("")
@@ -275,7 +218,91 @@ class GwImportInp(GwAction):
 
                 self.tbl_elements[element] = (combo_cat, new_cat_name)
 
+        self._fill_combo_boxes()
+
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
+
+    def _fill_combo_boxes(self):
+        # Fill exploitation combo
+        cmb_expl: QComboBox = self.dlg_config.cmb_expl
+        expl_value: str = cmb_expl.currentText()
+
+        rows = tools_db.get_rows("""
+            SELECT expl_id, name
+            FROM exploitation
+            WHERE expl_id > 0
+        """)
+        cmb_expl.clear()
+        tools_qt.fill_combo_values(cmb_expl, rows, add_empty=True)
+        cmb_expl.setCurrentText(expl_value)
+
+        # Fill sector combo
+        cmb_sector: QComboBox = self.dlg_config.cmb_sector
+        sector_value: str = cmb_sector.currentText()
+
+        rows = tools_db.get_rows("""
+            SELECT sector_id, name
+            FROM sector
+            WHERE sector_id > 0
+        """)
+        cmb_sector.clear()
+        tools_qt.fill_combo_values(cmb_sector, rows, add_empty=True)
+        cmb_sector.setCurrentText(sector_value)
+
+        elements = [
+            ("junctions", self.catalogs.inp_junctions, self.catalogs.db_nodes),
+            ("reservoirs", self.catalogs.inp_reservoirs, self.catalogs.db_nodes),
+            ("tanks", self.catalogs.inp_tanks, self.catalogs.db_nodes),
+            ("pumps", self.catalogs.inp_pumps, self.catalogs.db_arcs),
+            ("valves", self.catalogs.inp_valves, self.catalogs.db_arcs),
+        ]
+
+        for element_type, element_catalog, db_catalog in elements:
+            if element_type == "pipes":
+                continue
+
+            if element_type not in self.tbl_elements:
+                continue
+
+            combo: QComboBox = self.tbl_elements[element_type][0]
+            old_value: str = combo.currentText()
+
+            combo.clear()
+            combo.addItems(["", CREATE_NEW])
+            if len(element_catalog) > 0:
+                combo.insertSeparator(combo.count())
+                combo.addItem("Recommended catalogs:")
+                combo.model().item(combo.count() - 1).setEnabled(False)
+                combo.addItems(element_catalog)
+            if len(db_catalog) > len(element_catalog):
+                combo.insertSeparator(combo.count())
+                combo.addItem("Other catalogs:")
+                combo.model().item(combo.count() - 1).setEnabled(False)
+                combo.addItems(cat for cat in db_catalog if cat not in element_catalog)
+            combo.setCurrentText(old_value)
+
+        if self.catalogs.inp_pipes is not None:
+            for pipe_type, pipe_catalog in self.catalogs.inp_pipes.items():
+                if pipe_type not in self.tbl_elements["pipes"]:
+                    continue
+
+                combo: QComboBox = self.tbl_elements["pipes"][pipe_type][0]
+                old_value: str = combo.currentText()
+
+                combo.addItems(["", CREATE_NEW])
+                if len(pipe_catalog) > 0:
+                    combo.insertSeparator(combo.count())
+                    combo.addItem("Recommended catalogs:")
+                    combo.model().item(combo.count() - 1).setEnabled(False)
+                    combo.addItems(pipe_catalog)
+                if len(self.catalogs.db_arcs) > len(pipe_catalog):
+                    combo.insertSeparator(combo.count())
+                    combo.addItem("Other catalogs:")
+                    combo.model().item(combo.count() - 1).setEnabled(False)
+                    combo.addItems(
+                        cat for cat in self.catalogs.db_arcs if cat not in pipe_catalog
+                    )
+                    combo.setCurrentText(old_value)
 
     def _toggle_enabled_new_catalog_field(
         self, field: QTableWidgetItem, text: str
