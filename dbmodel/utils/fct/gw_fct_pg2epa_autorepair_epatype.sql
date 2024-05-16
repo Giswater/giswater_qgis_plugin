@@ -159,7 +159,6 @@ BEGIN
 		ON CONFLICT (connec_id) DO NOTHING;
 		
 		IF v_networkmode > 2 THEN
-			UPDATE inp_connec set source_type = 'DELETE' FROM (
 			DELETE FROM inp_connec WHERE connec_id IN 
 			(SELECT connec_id FROM connec c JOIN inp_connec USING (connec_id) WHERE epa_type = 'UNDEFINED');
 		END IF;

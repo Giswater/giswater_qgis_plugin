@@ -162,7 +162,7 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fid=218 AND cur_user=current_user;
 
 	-- Starting process
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (218, null, 4, 'CREATE ADDFIELDS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (218, null, 4, concat(v_action, ' ADDFIELD ', v_param_name, '.'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (218, null, 4, '-------------------------------------------------------------');
 
 
@@ -190,9 +190,6 @@ BEGIN
 	ELSE
 		v_audit_widgettype = v_config_widgettype;
 	END IF;
-
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-	VALUES (218, null, 4, concat('Create addfield ',v_param_name,'.'));
 
 	--check if the new field doesnt have accents and fix it
 	IF v_action='CREATE' THEN
@@ -544,10 +541,10 @@ BEGIN
     ELSE
         IF v_addfield_type = 'ALL' THEN
             -- INSERT ADDFIELD IN ALL FEATURES
-            v_active_feature = 'SELECT cat_feature.* FROM cat_feature WHERE system_id != ''LINK'' AND active IS TRUE ORDER BY id';
+            v_active_feature = 'SELECT cat_feature.* FROM cat_feature WHERE feature_type <> ''LINK'' AND active IS TRUE ORDER BY id';
         ELSE 
             -- INSERT ADDFIELD FOR SPECIFIC FEATURE: NODE, ARC, CONNEC, GULLY
-            v_active_feature = 'SELECT cat_feature.* FROM cat_feature WHERE system_id = '|| v_feature_type ||' AND active IS TRUE ORDER BY id';
+            v_active_feature = 'SELECT cat_feature.* FROM cat_feature WHERE feature_type = '''|| v_addfield_type ||''' AND active IS TRUE ORDER BY id';
         END IF;
 
         FOR rec IN EXECUTE v_active_feature LOOP
@@ -589,10 +586,10 @@ BEGIN
                     INTO v_orderby;
                 END IF;
             
-                INSERT INTO sys_addfields (param_name, cat_feature_id, is_mandatory, datatype_id, 
+                INSERT INTO sys_addfields (param_name, cat_feature_id, is_mandatory, datatype_id,
                 active, orderby, iseditable, feature_type)
-                VALUES (v_param_name, NULL, v_ismandatory, v_add_datatype, v_active, v_orderby, v_iseditable, 'ALL')
-                RETURNING id INTO v_idaddparam;
+                VALUES (v_param_name, NULL, v_ismandatory, v_add_datatype,
+                v_active, v_orderby, v_iseditable, v_addfield_type) RETURNING id INTO v_idaddparam;
             
                 INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
                 VALUES (218, null, 4, 'Insert parameter definition into sys_addfields.');
@@ -634,7 +631,7 @@ BEGIN
 
                 SELECT id INTO v_idaddparam FROM sys_addfields WHERE cat_feature_id IS NULL AND param_name = v_param_name;
 
-                EXECUTE 'DELETE FROM sys_addfields WHERE param_name='''||v_param_name||''' AND cat_feature_id='''||v_cat_feature||''';';
+                EXECUTE 'DELETE FROM sys_addfields WHERE param_name='''||v_param_name||''' AND cat_feature_id IS NULL;';
 
                 EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
                 IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_feature_childtable_name)) IS TRUE THEN

@@ -968,7 +968,7 @@ UPDATE config_function
 UPDATE config_function
 	SET "style"='{"style":{"point":{"style":"qml","id":"211"},"line":{"style":"qml","id":"210"}}}'::json, layermanager=NULL
 	WHERE id=2218;
-    
+
 INSERT INTO sys_message
 (id, error_message, hint_message, log_level, show_user, project_type, "source")
 VALUES(3260, 'No arc exists with a smaller diameter than the maximum configuered on edit_link_check_arcdnom:',
@@ -983,7 +983,7 @@ DELETE FROM config_form_fields WHERE columnname = '_pol_id_';
 DELETE FROM sys_message where id = 2024;
 
 
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") 
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES(3304, 'gw_fct_admin_manage_planmode', 'utils', 'function', 'json', 'json', 'Function to toggle planmode (for big projects). ', 'role_admin', NULL, 'core')
 ON CONFLICT (id) DO NOTHING;
 
@@ -1024,3 +1024,10 @@ UPDATE sys_addfields SET feature_type = 'CHILD' WHERE cat_feature_id IS NOT NULL
 SELECT gw_fct_admin_transfer_addfields_values();
 
 UPDATE sys_table SET id = '_man_addfields_value_' WHERE id='man_addfields_value';
+
+-- 16/05/2024
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+ VALUES('v_edit_dma', 'form_feature', 'tab_none', 'graphconfig', 'lyt_data_1', 11, 'string', 'text', 'graphconfig', 'graphconfig', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+ VALUES('v_edit_sector', 'form_feature', 'tab_none', 'graphconfig', 'lyt_data_1', 11, 'string', 'text', 'graphconfig', 'graphconfig', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
