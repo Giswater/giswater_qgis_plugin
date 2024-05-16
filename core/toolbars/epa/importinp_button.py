@@ -119,6 +119,7 @@ class GwImportInp(GwAction):
             partial(tools_gw.save_settings, self.dlg_config)
         )
         self.dlg_config.btn_reload.clicked.connect(self._fill_combo_boxes)
+        self.dlg_config.btn_cancel.clicked.connect(self.dlg_config.reject)
 
         # Get catalogs from thread
         self.catalogs: Catalogs = self.parse_inp_task.catalogs
