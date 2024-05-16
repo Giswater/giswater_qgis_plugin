@@ -2302,7 +2302,7 @@ class GwAdminButton:
 
             sql = (f"SELECT cat_feature.id, cat_feature.id "
                    f"FROM {schema_name}.cat_feature WHERE id <> 'LINK' "
-                   f" ORDER BY id")
+                   f"AND active IS TRUE ORDER BY id")
             rows = tools_db.get_rows(sql)
 
             tools_qt.fill_combo_values(self.dlg_readsql.cmb_formname_fields, rows)
