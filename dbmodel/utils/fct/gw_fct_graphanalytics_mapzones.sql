@@ -351,15 +351,6 @@ BEGIN
 			  WHERE temp_t_anlgraph_1.water = 1) a2 ON temp_t_anlgraph.node_1::text = a2.node_2::text
 			  WHERE temp_t_anlgraph.flag < 2 AND temp_t_anlgraph.water = 0 AND a2.flag = 0;
 
-		-- reset rtc_scada_x_dma or rtc_scada_x_dma
-		IF v_class = 'DMA' THEN
-
-			INSERT INTO temp_om_waterbalance_dma_graph SELECT * FROM om_waterbalance_dma_graph;
-			EXECUTE 'DELETE FROM temp_om_waterbalance_dma_graph
-			WHERE node_id IN 
-			(SELECT node_id FROM temp_om_waterbalance_dma_graph JOIN temp_t_node n USING (node_id))';
-		END IF;
-
 		-- start build log message
 		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('MAPZONES DYNAMIC SECTORITZATION - ', upper(v_class)));
 		IF upper(v_class) ='PRESSZONE' THEN
@@ -1360,7 +1351,7 @@ BEGIN
 		IF v_class = 'DMA' THEN
 
 			RAISE NOTICE 'Filling om_waterbalance_dma_graph ';
-
+				
 			v_querytext = 'INSERT INTO temp_om_waterbalance_dma_graph (node_id, '||quote_ident(v_field)||', flow_sign)
 			(SELECT DISTINCT n.node_id, a.'||quote_ident(v_field)||',
 			CASE 
@@ -1381,11 +1372,8 @@ BEGIN
 			)
 			) ON CONFLICT (node_id, dma_id) DO NOTHING';
 			EXECUTE v_querytext;
-
-			EXECUTE 'DELETE FROM om_waterbalance_dma_graph
-			WHERE node_id IN 
-			(SELECT node_id FROM om_waterbalance_dma_graph JOIN temp_t_node n USING (node_id))';
-
+		
+			delete from om_waterbalance_dma_graph where dma_id in (select distinct dma_id from temp_om_waterbalance_dma_graph);
 			INSERT INTO om_waterbalance_dma_graph SELECT * FROM temp_om_waterbalance_dma_graph ON CONFLICT (dma_id, node_id) DO NOTHING;
 
 		ELSIF v_class = 'SECTOR' THEN
