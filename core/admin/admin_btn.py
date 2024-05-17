@@ -2424,7 +2424,7 @@ class GwAdminButton:
              # Populate featuretype combo
             rows = [['ALL', 'ALL'], ['NODE', 'NODE'], ['ARC', 'ARC'], ['CONNEC', 'CONNEC']]
             if self.project_type == 'ud':
-                rows += ['GULLY', 'GULLY']
+                rows += [['GULLY', 'GULLY']]
             tools_qt.fill_combo_values(self.dlg_manage_fields.featuretype, rows)
 
         # Populate widgettype combo
