@@ -22,6 +22,7 @@ from ....libs import tools_db, tools_qgis, tools_qt
 from ...models.plugin_toolbar import GwPluginToolbar
 from ...ui.dialog import GwDialog
 from ...ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
+from ...threads.import_inp import GwImportInpTask
 from ...utils import tools_gw
 from ..dialog import GwAction
 
@@ -269,6 +270,7 @@ class GwImportInp(GwAction):
             tools_qt.show_info_box(message)
             return
 
+        # Tables (Arcs and Nodes)
         catalogs = {"pipes": {}}
 
         for _input, result in [
@@ -296,6 +298,19 @@ class GwImportInp(GwAction):
                 result[element] = (
                     new_catalog if combo_value == CREATE_NEW else combo_value
                 )
+
+        # Set background task 'Import INP'
+        description = "Import INP"
+        self.import_inp_task = GwImportInpTask(
+            description,
+            self.parse_inp_task.network,
+            workcat,
+            exploitation,
+            sector,
+            catalogs,
+        )
+        QgsApplication.taskManager().addTask(self.import_inp_task)
+        QgsApplication.taskManager().triggerTask(self.import_inp_task)
 
     def _fill_combo_boxes(self):
         # Fill exploitation combo
