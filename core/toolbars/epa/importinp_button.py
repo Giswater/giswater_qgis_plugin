@@ -67,7 +67,11 @@ class GwImportInp(GwAction):
                 self.parse_inp_file(file_path)
 
             except ImportError:
-                message: str = "wntr package not installed. Open OSGeo4W Shell and execute 'python -m pip install wntr'."
+                message: str = (
+                    "wntr package not installed. "
+                    "Open OSGeo4W Shell and execute 'python -m pip install wntr'. "
+                    "Restart QGIS after instalation."
+                )
                 tools_qgis.show_message(message)
 
         # UD
@@ -83,7 +87,11 @@ class GwImportInp(GwAction):
                 self.parse_inp_file(file_path)
 
             except ImportError:
-                message: str = "swmm-api package not installed. Open OSGeo4W Shell and execute 'python -m pip install swmm-api'."
+                message: str = (
+                    "swmm-api package not installed."
+                    " Open OSGeo4W Shell and execute 'python -m pip install swmm-api'. "
+                    "Restart QGIS after instalation."
+                )
                 tools_qgis.show_message(message)
 
     def parse_inp_file(self, file_path: Path) -> None:
