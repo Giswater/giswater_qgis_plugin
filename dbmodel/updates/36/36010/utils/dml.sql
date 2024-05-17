@@ -1031,3 +1031,8 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
  VALUES('v_edit_sector', 'form_feature', 'tab_none', 'graphconfig', 'lyt_data_1', 11, 'string', 'text', 'graphconfig', 'graphconfig', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
+
+-- 17/05/2024
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName": "open_visit", "parameters": {"columnfind": "visit_id"}}'::json
+	WHERE AND columnname='tbl_visits' AND tabname='tab_visit';
