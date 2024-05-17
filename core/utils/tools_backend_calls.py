@@ -169,6 +169,35 @@ def open_visit_manager(**kwargs):
     manage_visit.manage_visits(feature_type, feature_id)
 
 
+def open_visit(**kwargs):
+    dialog = kwargs['dialog']
+    complet_result = kwargs['complet_result']
+    func_params = kwargs['func_params']
+    feature_type = complet_result['body']['feature']['featureType']
+    feature_id = complet_result['body']['feature']['id']
+    qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(dialog, f"{func_params['targetwidget']}")
+
+    # Get selected rows
+    selected_list = qtable.selectionModel().selectedRows()
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        tools_qgis.show_warning(message)
+        return
+    elif len(selected_list) > 1:
+        message = "Select just one visit"
+        tools_qgis.show_warning(message)
+        return
+
+    # Get document path (can be relative or absolute)
+    index = selected_list[0]
+    row = index.row()
+    column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'])
+    visit_id = index.sibling(row, column_index).data()
+
+    manage_visit = GwVisit()
+    manage_visit.get_visit(visit_id, feature_type, feature_id)
+
+
 def manage_document(doc_id, **kwargs):
     """ Function called in class tools_gw.add_button(...) -->
         widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
