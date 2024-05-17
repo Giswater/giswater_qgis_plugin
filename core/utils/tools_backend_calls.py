@@ -213,7 +213,7 @@ def manage_visit_class(**kwargs):
         return
     sql = f"SELECT ui_tablename FROM config_visit_class where id = {current_visit_class[columnname]}"
     ui_tablename = tools_db.get_row(sql)
-    table_view = dialog.findChildren(QTableView)
+    table_view = dialog.tab_main.currentWidget().findChildren(QTableView)
     if table_view in (None, []):
         return
     table_view = table_view[0]
