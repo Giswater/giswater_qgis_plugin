@@ -261,6 +261,34 @@ class GwImportInp(GwAction):
             tools_qt.show_info_box(message)
             return
 
+        catalogs = {"pipes": {}}
+
+        for _input, result in [
+            (self.tbl_elements, catalogs),
+            (self.tbl_elements["pipes"], catalogs["pipes"]),
+        ]:
+            for element in _input:
+                if element == "pipes":
+                    continue
+
+                combo, new_catalog_cell = _input[element]
+                combo_value = combo.currentText()
+                new_catalog = new_catalog_cell.text()
+
+                if combo_value == "":
+                    message = "Please select a catalog item for all elements in the Nodes and Arcs tabs."
+                    tools_qt.show_info_box(message)
+                    return
+
+                if combo_value == CREATE_NEW and new_catalog == "":
+                    message = f'Please enter a new catalog name when the "{CREATE_NEW}" option is selected.'
+                    tools_qt.show_info_box(message)
+                    return
+
+                result[element] = (
+                    new_catalog if combo_value == CREATE_NEW else combo_value
+                )
+
     def _fill_combo_boxes(self):
         # Fill exploitation combo
         cmb_expl: QComboBox = self.dlg_config.cmb_expl
