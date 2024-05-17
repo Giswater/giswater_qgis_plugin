@@ -124,6 +124,7 @@ class GwImportInp(GwAction):
         )
         self.dlg_config.btn_reload.clicked.connect(self._fill_combo_boxes)
         self.dlg_config.btn_cancel.clicked.connect(self.dlg_config.reject)
+        self.dlg_config.btn_accept.clicked.connect(self._importinp_accept)
 
         # Get catalogs from thread
         self.catalogs: Catalogs = self.parse_inp_task.catalogs
@@ -227,6 +228,38 @@ class GwImportInp(GwAction):
         self._fill_combo_boxes()
 
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
+
+    def _importinp_accept(self):
+        # Workcat
+        workcat: str = self.dlg_config.txt_workcat.text()
+
+        if workcat == "":
+            message = "Please enter a Workcat_id to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
+
+        sql: str = "SELECT id FROM cat_work WHERE id = %s"
+        row = tools_db.get_row(sql, params=(workcat,))
+        if row is not None:
+            message = f'The Workcat_id "{workcat}" is already in use. Please enter a different ID.'
+            tools_qt.show_info_box(message)
+            return
+
+        # Exploitation
+        exploitation = tools_qt.get_combo_value(self.dlg_config, "cmb_expl")
+
+        if exploitation == "":
+            message = "Please select an exploitation to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
+
+        # Sector
+        sector = tools_qt.get_combo_value(self.dlg_config, "cmb_sector")
+
+        if sector == "":
+            message = "Please select a sector to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
 
     def _fill_combo_boxes(self):
         # Fill exploitation combo
