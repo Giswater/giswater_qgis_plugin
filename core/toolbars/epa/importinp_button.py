@@ -20,7 +20,6 @@ from sip import isdeleted
 from .... import global_vars
 from ....libs import tools_db, tools_qgis, tools_qt
 from ...models.plugin_toolbar import GwPluginToolbar
-from ...threads.parse_inp import Catalogs, GwParseInpTask
 from ...ui.dialog import GwDialog
 from ...ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
 from ...utils import tools_gw
@@ -54,6 +53,11 @@ class GwImportInp(GwAction):
         if global_vars.project_type == ProjectType.WS.value:
             try:
                 import wntr
+                from ...threads import parse_inp
+
+                global Catalogs, GwParseInpTask
+                Catalogs = parse_inp.Catalogs
+                GwParseInpTask = parse_inp.GwParseInpTask
 
                 file_path: Optional[Path] = self._get_file()
 
