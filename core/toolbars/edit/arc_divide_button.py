@@ -93,8 +93,12 @@ class GwArcDivideButton(GwMaptool):
         self.layer_arc.removeSelection()
 
         # Restore previous active layer
-        if self.active_layer:
-            self.iface.setActiveLayer(self.active_layer)
+        try:
+            if self.active_layer:
+                self.iface.setActiveLayer(self.active_layer)
+        except RuntimeError:
+            pass
+
 
         self.refresh_map_canvas()
 
