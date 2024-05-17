@@ -501,8 +501,20 @@ BEGIN
             INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
             VALUES (218, null, 4, concat('Recreate child view for ',v_cat_feature,'.'));
         ELSE
-            IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS TRUE THEN
+            IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
+                ( v_feature_type='arc' OR v_feature_type='node')) THEN
+                
                 EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+                v_view_type = 4;
+
+            ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
+
+                EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+                v_view_type = 5;
+            ELSE
+                EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+                v_view_type = 6;
+
             END IF;
 
             v_man_fields := COALESCE(v_man_fields, 'null');
@@ -517,7 +529,7 @@ BEGIN
                 "feature_childtable_name":"'||v_feature_childtable_name||'",
                 "feature_childtable_fields":"'||v_feature_childtable_fields||'",
                 "man_fields":"'||v_man_fields||'",
-                "view_type":"6"
+                "view_type":"'||v_view_type||'"
                 }
             }';
 
@@ -828,8 +840,20 @@ BEGIN
 
             ELSE	
 
-                IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS TRUE THEN
+                 IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
+                    ( v_feature_type='arc' OR v_feature_type='node')) THEN
+                    
                     EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+                    v_view_type = 4;
+
+                ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
+
+                    EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+                    v_view_type = 5;
+                ELSE
+                    EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+                    v_view_type = 6;
+
                 END IF;
 
                 v_man_fields := COALESCE(v_man_fields, 'null');
@@ -844,7 +868,7 @@ BEGIN
                     "feature_childtable_name":"'||v_feature_childtable_name||'",
                     "feature_childtable_fields":"'||v_feature_childtable_fields||'",
                     "man_fields":"'||v_man_fields||'",
-                    "view_type":"6"
+                    "view_type":"'||v_view_type||'"
                     }
                 }';
 
