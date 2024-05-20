@@ -1,8 +1,10 @@
 import traceback
+from datetime import date
 from typing import Any
 
-# from wntr.network.model import WaterNetworkModel
+import psycopg2
 
+# from wntr.network.model import WaterNetworkModel
 from ...libs import tools_db
 from .task import GwTask
 
@@ -29,6 +31,28 @@ class GwImportInpTask(GwTask):
     def run(self) -> bool:
         super().run()
         try:
+            with psycopg2.connect(tools_db.dao.conn_string) as conn:
+                with conn.cursor() as cur:
+                    if tools_db.dao.set_search_path:
+                        cur.execute(tools_db.dao.set_search_path)
+
+                    # Create workcat
+
+                    if not self.workcat:
+                        raise ValueError(
+                            "Please enter a Workcat_id to proceed with this import."
+                        )
+
+                    sql = """
+                        INSERT INTO cat_work (id, descript, builtdate, active)
+                        VALUES (%s, %s, %s, TRUE)
+                    """
+
+                    # TODO: Pass file name
+                    description = "Importing the file example.inp"
+                    builtdate: date = date.today()
+                    cur.execute(sql, (self.workcat, description, builtdate))
+
             return True
         except Exception as e:
             self.exception: str = traceback.format_exc()
