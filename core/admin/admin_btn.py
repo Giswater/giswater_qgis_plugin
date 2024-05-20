@@ -2375,6 +2375,8 @@ class GwAdminButton:
 
         form_name_fields = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
         self.dlg_manage_fields.columnname.setEnabled(False)
+        self.dlg_manage_fields.datatype.setEnabled(False)
+        self.dlg_manage_fields.widgettype.setEnabled(False)
 
         # Set listeners
         self.dlg_manage_fields.btn_accept.clicked.connect(
