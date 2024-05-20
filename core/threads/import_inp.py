@@ -13,6 +13,7 @@ class GwImportInpTask(GwTask):
     def __init__(
         self,
         description: str,
+        filepath,
         network,
         workcat,
         exploitation,
@@ -20,6 +21,7 @@ class GwImportInpTask(GwTask):
         catalogs,
     ) -> None:
         super().__init__(description)
+        self.filepath = filepath
         # self.network: WaterNetworkModel = network
         self.network = network
         self.workcat: str = workcat
@@ -48,8 +50,7 @@ class GwImportInpTask(GwTask):
                         VALUES (%s, %s, %s, TRUE)
                     """
 
-                    # TODO: Pass file name
-                    description = "Importing the file example.inp"
+                    description = f"Importing the file {self.filepath.name}"
                     builtdate: date = date.today()
                     cur.execute(sql, (self.workcat, description, builtdate))
 

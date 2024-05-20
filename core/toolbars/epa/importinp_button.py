@@ -60,12 +60,12 @@ class GwImportInp(GwAction):
                 Catalogs = parse_inp.Catalogs
                 GwParseInpTask = parse_inp.GwParseInpTask
 
-                file_path: Optional[Path] = self._get_file()
+                self.file_path: Optional[Path] = self._get_file()
 
-                if not file_path:
+                if not self.file_path:
                     return
 
-                self.parse_inp_file(file_path)
+                self.parse_inp_file(self.file_path)
 
             except ImportError:
                 message: str = (
@@ -303,6 +303,7 @@ class GwImportInp(GwAction):
         description = "Import INP"
         self.import_inp_task = GwImportInpTask(
             description,
+            self.file_path,
             self.parse_inp_task.network,
             workcat,
             exploitation,
