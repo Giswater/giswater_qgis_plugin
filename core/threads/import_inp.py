@@ -33,17 +33,25 @@ class GwImportInpTask(GwTask):
     def run(self) -> bool:
         super().run()
         try:
+            # Some validations
+            if not self.workcat:
+                message = "Please enter a Workcat_id to proceed with this import."
+                raise ValueError(message)
+            
+            if not self.exploitation:
+                message = "Please select an exploitation to proceed with this import."
+                raise ValueError(message)
+            
+            if not self.sector:
+                message = "Please select a sector to proceed with this import."
+                raise ValueError(message)
+            
             with psycopg2.connect(tools_db.dao.conn_string) as conn:
                 with conn.cursor() as cur:
                     if tools_db.dao.set_search_path:
                         cur.execute(tools_db.dao.set_search_path)
 
                     # Create workcat
-
-                    if not self.workcat:
-                        raise ValueError(
-                            "Please enter a Workcat_id to proceed with this import."
-                        )
 
                     sql = """
                         INSERT INTO cat_work (id, descript, builtdate, active)
