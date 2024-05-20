@@ -330,7 +330,7 @@ BEGIN
             VALUES (218, null, 4, 'Update parameter definition in sys_addfields.');
 
             IF (SELECT cat_feature_id FROM sys_addfields WHERE param_name=v_param_name) IS NOT NULL THEN
-                UPDATE config_form_fields SET datatype=v_config_datatype,
+                UPDATE config_form_fields SET layoutname=v_layoutname, datatype=v_config_datatype,
                 widgettype=v_config_widgettype, label=v_label,
                 ismandatory=v_ismandatory, isparent=v_isparent, iseditable=v_iseditable, isautoupdate=v_isautoupdate,
                 placeholder=v_placeholder, stylesheet=v_stylesheet, tooltip=v_tooltip,
