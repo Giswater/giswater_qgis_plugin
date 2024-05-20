@@ -1035,4 +1035,4 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 -- 17/05/2024
 UPDATE config_form_fields
 	SET widgetfunction='{"functionName": "open_visit", "parameters": {"columnfind": "visit_id"}}'::json
-	WHERE AND columnname='tbl_visits' AND tabname='tab_visit';
+	WHERE columnname='tbl_visits' AND tabname='tab_visit';
