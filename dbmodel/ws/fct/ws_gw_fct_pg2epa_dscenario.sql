@@ -89,17 +89,17 @@ BEGIN
 			-- demands for connec related to arcs
 			INSERT INTO temp_t_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
 			SELECT dscenario_id, node_1 AS node_id, d.demand/2 as demand, d.pattern_id, demand_type, source FROM temp_t_arc JOIN v_edit_inp_connec USING (arc_id)
-			JOIN inp_dscenario_demand d ON feature_id = connec_id WHERE dscenario_id IN (SELECT unnest(v_userscenario))
+			JOIN inp_dscenario_demand d ON feature_id = connec_id WHERE dscenario_id IN (SELECT unnest(v_userscenario)) AND pjoint_type = 'ARC'
 			UNION ALL
 			SELECT dscenario_id, node_2 AS node_id, d.demand/2 as demand, d.pattern_id, demand_type, source  FROM temp_t_arc JOIN v_edit_inp_connec USING (arc_id)
-			JOIN inp_dscenario_demand d ON feature_id = connec_id WHERE dscenario_id IN (SELECT unnest(v_userscenario));
+			JOIN inp_dscenario_demand d ON feature_id = connec_id WHERE dscenario_id IN (SELECT unnest(v_userscenario)) AND pjoint_type = 'ARC';
 
 			-- demands for connec related to nodes
 			INSERT INTO temp_t_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
 			SELECT dscenario_id, pjoint_id, d.demand as demand, d.pattern_id, demand_type, source  FROM v_edit_inp_connec 
 			JOIN inp_dscenario_demand d ON feature_id = connec_id 
 			WHERE pjoint_type = 'NODE'
-			AND dscenario_id IN (SELECT unnest(v_userscenario));	
+			AND dscenario_id IN (SELECT unnest(v_userscenario));
 
 			IF v_demandpriority = 2 THEN 
 				-- moving node demands to temp_t_demand (to skip EPANET behaviour)

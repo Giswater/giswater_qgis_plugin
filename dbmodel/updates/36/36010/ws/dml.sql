@@ -1844,3 +1844,6 @@ UPDATE sys_table SET addparam='{"pkey": "dscenario_id, node_id, order_id"}'::jso
 -- 09/05/2024
 update config_param_system SET layoutorder=NULL, layoutname=NULL, isenabled = false 
 WHERE parameter in ('epa_automatic_inp2man_values','epa_automatic_man2graph_values', 'epa_automatic_man2inp_values');
+
+-- 20/05/2024
+update config_form_fields set iseditable=true where formname = 'v_edit_inp_dscenario_demand' and columnname = 'feature_id';
