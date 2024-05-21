@@ -1038,3 +1038,5 @@ UPDATE config_form_fields
 	WHERE columnname='tbl_visits' AND tabname='tab_visit';
 
 DELETE FROM sys_message WHERE id = 3110;
+
+UPDATE sys_param_user SET descript='Pressure exponent:' WHERE id='inp_options_pressure_exponent';
