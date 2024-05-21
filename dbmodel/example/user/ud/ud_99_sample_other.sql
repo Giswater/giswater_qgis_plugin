@@ -549,13 +549,13 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "widgettype":"check", "label":"Grate param_2","ismandatory":"False",
 "active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
-SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"OWERFLOW_STORAGE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"owestorage_param_1", "datatype":"integer", 
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"OVERFLOW_STORAGE"},
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"ovestorage_param_1", "datatype":"integer", 
 "widgettype":"text", "label":"Owstorage param_1","ismandatory":"False",
 "fieldLength":"10", "numDecimals" :null,"active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
-SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"OWERFLOW_STORAGE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"owestorage_param_2", "datatype":"text", 
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"OVERFLOW_STORAGE"},
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"ovestorage_param_2", "datatype":"text", 
 "widgettype":"text", "label":"Owstorage param_2","ismandatory":"False",
 "active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
