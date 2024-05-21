@@ -1036,3 +1036,5 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 UPDATE config_form_fields
 	SET widgetfunction='{"functionName": "open_visit", "parameters": {"columnfind": "visit_id"}}'::json
 	WHERE columnname='tbl_visits' AND tabname='tab_visit';
+
+DELETE FROM sys_message WHERE id = 3110;
