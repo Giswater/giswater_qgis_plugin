@@ -1040,3 +1040,7 @@ UPDATE config_form_fields
 DELETE FROM sys_message WHERE id = 3110;
 
 UPDATE sys_param_user SET descript='Pressure exponent:' WHERE id='inp_options_pressure_exponent';
+
+UPDATE sys_table SET context='{"level_1":"INVENTORY","level_2":"CATALOGS"}', orderby=6, alias='Grate material catalog' WHERE id='cat_mat_grate';
+
+INSERT INTO sys_table (id, descript, sys_role, context, orderby, alias, "source") VALUES('cat_mat_gully', 'Table for materials of gully', 'role_basic', '{"level_1":"INVENTORY","level_2":"CATALOGS"}', 6, 'Gully material catalog', 'core') ON CONFLICT (id) do nothing;
