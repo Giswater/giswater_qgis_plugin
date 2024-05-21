@@ -16,21 +16,15 @@ DECLARE
  rec_expl integer;
  rec_user text;
  v_new_id integer;
- v_expl_x_user boolean;
  
 BEGIN 
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-	v_expl_x_user = (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
 
 	-- Delete orphan nodes
 	IF (TG_OP = 'INSERT' AND  NEW.username !='{}') THEN
 
-		IF v_expl_x_user IS FALSE THEN
-			RETURN NEW;
-		
-		ELSE 
 			--Upsert values on config_user_x_expl according config_user_x_expl info
 			INSERT INTO config_user_x_expl (expl_id, username, manager_id)
 			SELECT expl, usern, NEW.id  FROM (SELECT unnest(expl_id) expl FROM cat_manager WHERE id=NEW.id) p CROSS JOIN 
@@ -39,15 +33,11 @@ BEGIN
 			INSERT INTO config_user_x_sector (sector_id, username, manager_id)
 			SELECT sector_id, usern, NEW.id  FROM (SELECT unnest(sector_id) sector_id FROM cat_manager WHERE id=NEW.id) p CROSS JOIN 
 			(SELECT unnest(username) usern FROM cat_manager WHERE id=NEW.id) q ON CONFLICT (sector_id, username) DO NOTHING;
-			RETURN NEW;
-		END IF;
+			
+		RETURN NEW;
 		
-	ELSIF TG_OP = 'UPDATE'THEN
+	ELSIF TG_OP = 'UPDATE' THEN
 	
-		IF v_expl_x_user IS FALSE THEN
-			RETURN NEW;
-		
-		ELSE 
 			--if username was empty insert config_user_x_expl or combinations for this manager 
 			IF OLD.username ='{}' THEN
 
@@ -164,44 +154,37 @@ BEGIN
 				(SELECT unnest(username) usern FROM cat_manager WHERE id=NEW.id) q ON CONFLICT (sector_id,username) DO NOTHING;
 				
 			END IF;
-			RETURN NEW;
 			
-		END IF;
+		RETURN NEW;
 		
 	ELSIF TG_OP = 'DELETE' THEN
 	
-		IF v_expl_x_user IS FALSE THEN
-		
-			RETURN OLD;
-		
-		ELSE 
-			--if the manager was removed from the cat_manager, replace assignation if exists the same relation user - expl for another manager
-			FOREACH rec_expl IN ARRAY OLD.expl_id LOOP
-				FOREACH rec_user IN ARRAY OLD.username LOOP
-					IF (SELECT count(id) FROM cat_manager WHERE rec_user = ANY(username) AND rec_expl::integer = ANY(expl_id))>0 THEN
-						
-						SELECT id INTO v_new_id FROM cat_manager WHERE rec_user = ANY(username) AND rec_expl::integer = ANY(expl_id);
-								
-						INSERT INTO config_user  (expl_id, username, manager_id)
-						VALUES (rec_expl, rec_user, v_new_id) ON CONFLICT (expl_id, username) DO NOTHING;
-					END IF;
-				END LOOP;
+		FOREACH rec_expl IN ARRAY OLD.expl_id LOOP
+			FOREACH rec_user IN ARRAY OLD.username LOOP
+				IF (SELECT count(id) FROM cat_manager WHERE rec_user = ANY(username) AND rec_expl::integer = ANY(expl_id))>0 THEN
+					
+					SELECT id INTO v_new_id FROM cat_manager WHERE rec_user = ANY(username) AND rec_expl::integer = ANY(expl_id);
+							
+					INSERT INTO config_user  (expl_id, username, manager_id)
+					VALUES (rec_expl, rec_user, v_new_id) ON CONFLICT (expl_id, username) DO NOTHING;
+				END IF;
 			END LOOP;
-
-			--if the manager was removed from the cat_manager, replace assignation if exists the same relation user - sector for another manager
-			FOREACH rec_sector IN ARRAY OLD.sector_id LOOP
-				FOREACH rec_user IN ARRAY OLD.username LOOP
-					IF (SELECT count(id) FROM cat_manager WHERE rec_user = ANY(username) AND rec_sector::integer = ANY(sector_id))>0 THEN
-						
-						SELECT id INTO v_new_id FROM cat_manager WHERE rec_user = ANY(username) AND rec_sector::integer = ANY(sector_id);
-								
-						INSERT INTO config_user  (sector_id, username, manager_id)
-						VALUES (rec_sector, rec_user, v_new_id) ON CONFLICT (sector_id, username) DO NOTHING;
-					END IF;
-				END LOOP;
+		END LOOP;
+	
+		--if the manager was removed from the cat_manager, replace assignation if exists the same relation user - sector for another manager
+		FOREACH rec_sector IN ARRAY OLD.sector_id LOOP
+			FOREACH rec_user IN ARRAY OLD.username LOOP
+				IF (SELECT count(id) FROM cat_manager WHERE rec_user = ANY(username) AND rec_sector::integer = ANY(sector_id))>0 THEN
+					
+					SELECT id INTO v_new_id FROM cat_manager WHERE rec_user = ANY(username) AND rec_sector::integer = ANY(sector_id);
+							
+					INSERT INTO config_user  (sector_id, username, manager_id)
+					VALUES (rec_sector, rec_user, v_new_id) ON CONFLICT (sector_id, username) DO NOTHING;
+				END IF;
 			END LOOP;
-			RETURN OLD;
-		END IF;
+		END LOOP;
+		
+		RETURN OLD;
 		
 	END IF;
 END;
