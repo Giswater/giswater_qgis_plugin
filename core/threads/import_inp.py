@@ -81,6 +81,36 @@ class GwImportInpTask(GwTask):
                     builtdate: date = date.today()
                     cur.execute(sql, (self.workcat, description, builtdate))
 
+                    # Create new node catalogs
+                    cur.execute("SELECT id FROM cat_node")
+                    nodecat_db: list[str] = []
+                    if cur.rowcount > 0:
+                        nodecat_db = [x[0] for x in cur.fetchall()]
+
+                    node_catalogs = [
+                        ("junctions", "JUNCTION", "JUNCTION"),
+                        ("reservoirs", "SOURCE", "RESERVOIR"),
+                        ("tanks", "TANK", "TANK"),
+                    ]
+
+                    for node_type, cat_feature, epa_default in node_catalogs:
+                        if (
+                            node_type in self.catalogs
+                            and self.catalogs[node_type] not in nodecat_db
+                        ):
+                            sql = """
+                                INSERT INTO cat_feature_node (id, "type", epa_default)
+                                VALUES (%s, %s, %s)
+                                ON CONFLICT (id) DO NOTHING;
+                            """
+                            cur.execute(sql, (cat_feature, cat_feature, epa_default))
+
+                            sql = """
+                                INSERT INTO cat_node (id, nodetype_id)
+                                VALUES (%s, %s)
+                            """
+                            cur.execute(sql, (self.catalogs[node_type], cat_feature))
+
                     # Save patterns
                     cur.execute("SELECT pattern_id FROM inp_pattern")
                     patterns_db: list[str] = []
