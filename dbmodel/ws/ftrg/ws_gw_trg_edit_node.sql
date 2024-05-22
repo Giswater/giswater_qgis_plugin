@@ -582,8 +582,8 @@ BEGIN
 			INSERT INTO man_manhole (node_id, name) VALUES(NEW.node_id, NEW.name);
 		
 		ELSIF v_man_table='man_meter' THEN
-			INSERT INTO man_meter (node_id, brand, model, real_press_max, real_press_min, real_press_avg) 
-			VALUES(NEW.node_id, NEW.brand, NEW.model, NEW.real_press_max, NEW.real_press_min, NEW.real_press_avg);
+			INSERT INTO man_meter (node_id, brand, model, real_press_max, real_press_min, real_press_avg, meter_code) 
+			VALUES(NEW.node_id, NEW.brand, NEW.model, NEW.real_press_max, NEW.real_press_min, NEW.real_press_avg, NEW.meter_code);
 		
 		ELSIF v_man_table='man_source' THEN	
 				INSERT INTO man_source (node_id, name) VALUES(NEW.node_id, NEW.name);
@@ -955,7 +955,7 @@ BEGIN
 
 		ELSIF v_man_table ='man_meter' THEN
 			UPDATE man_meter SET
-			brand=NEW.brand, model=NEW.model, real_press_max = NEW.real_press_max, real_press_min=NEW.real_press_min, real_press_avg=NEW.real_press_avg
+			brand=NEW.brand, model=NEW.model, real_press_max = NEW.real_press_max, real_press_min=NEW.real_press_min, real_press_avg=NEW.real_press_avg, meter_code=NEW.meter_code
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_waterwell' THEN
