@@ -1023,7 +1023,7 @@ UPDATE sys_addfields SET feature_type = 'CHILD' WHERE cat_feature_id IS NOT NULL
 
 SELECT gw_fct_admin_transfer_addfields_values();
 
-UPDATE sys_table SET id = '_man_addfields_value_' WHERE id='man_addfields_value';
+DELETE FROM sys_talbe WHERE id = 'man_addfields_value';
 
 -- 16/05/2024
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
