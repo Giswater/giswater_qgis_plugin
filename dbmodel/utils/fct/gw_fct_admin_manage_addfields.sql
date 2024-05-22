@@ -80,6 +80,7 @@ v_tooltip text;
 v_isparent boolean;
 v_parentid text;
 v_querytext text;
+v_orderbyid boolean;
 v_isnullvalue boolean;
 v_stylesheet json;
 v_querytextfilterc text;
@@ -146,6 +147,7 @@ BEGIN
 	v_isparent = (((p_data ->>'data')::json->>'parameters')::json ->>'isparent')::text;
 	v_parentid = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_parent_id')::text;
 	v_querytext = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_querytext')::text;
+    v_orderbyid = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_orderby_id')::text;
 	v_isnullvalue = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_isnullvalue')::text;
 	v_linkedobject = (((p_data ->>'data')::json->>'parameters')::json ->>'linkedobject')::text;
 	v_hidden = (((p_data ->>'data')::json->>'parameters')::json ->>'hidden')::boolean;
@@ -266,18 +268,10 @@ BEGIN
             ELSE
                 -- create child table with the new addfield column
                 EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
-                            id BIGSERIAL PRIMARY KEY,
-                            '|| v_feature_type|| '_id varchar(16),
+                            '|| v_feature_type|| '_id varchar(16) PRIMARY KEY,
                             ' || v_param_name || ' '||v_config_datatype||',
-                            CONSTRAINT ' || v_feature_childtable_name || '_'|| v_feature_type|| '_fk FOREIGN KEY ('|| v_feature_type|| '_id) REFERENCES '|| v_schemaname ||'.'|| v_feature_type|| '('|| v_feature_type|| '_id) ON DELETE CASCADE ,
-                            CONSTRAINT ' || v_feature_childtable_name || '_unique UNIQUE ('|| v_feature_type|| '_id)
+                            CONSTRAINT ' || v_feature_childtable_name || '_'|| v_feature_type|| '_fk FOREIGN KEY ('|| v_feature_type|| '_id) REFERENCES '|| v_schemaname ||'.'|| v_feature_type|| '('|| v_feature_type|| '_id) ON DELETE CASCADE
                         )';
-
-                EXECUTE 'ALTER SEQUENCE ' || v_feature_childtable_name || '_id_seq OWNED BY ' || v_feature_childtable_name || '.id';
-
-                EXECUTE 'ALTER TABLE ONLY ' || v_feature_childtable_name || ' ALTER COLUMN id SET DEFAULT nextval(''' || v_feature_childtable_name || '_id_seq''::regclass)';
-
-                EXECUTE 'SELECT pg_catalog.setval(''' || v_feature_childtable_name || '_id_seq'', 1, false)';
 
                 EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| v_feature_type|| '_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| v_feature_type|| '_id)';
 
@@ -294,11 +288,11 @@ BEGIN
 
             INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutorder,
             datatype, widgettype, label, ismandatory, isparent, iseditable,
-            layoutname, placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetcontrols,
+            layoutname, placeholder, stylesheet, tooltip, widgetfunction, dv_orderby_id, dv_isnullvalue, widgetcontrols,
             dv_parent_id, dv_querytext_filterc, dv_querytext,  linkedobject, hidden)
             VALUES (v_viewname, v_formtype, 'tab_data', v_param_name, v_layoutorder,v_config_datatype, v_config_widgettype,
             v_label, v_ismandatory, v_isparent, v_iseditable, v_layoutname,
-            v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_isnullvalue, v_jsonwidgetdim,
+            v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_orderbyid, v_isnullvalue, v_jsonwidgetdim,
             v_parentid, v_querytextfilterc, v_querytext,  v_linkedobject, v_hidden)
             ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
@@ -334,7 +328,7 @@ BEGIN
                 widgettype=v_config_widgettype, label=v_label,
                 ismandatory=v_ismandatory, isparent=v_isparent, iseditable=v_iseditable, isautoupdate=v_isautoupdate,
                 placeholder=v_placeholder, stylesheet=v_stylesheet, tooltip=v_tooltip,
-                widgetfunction=v_widgetfunction, dv_isnullvalue=v_isnullvalue, widgetcontrols=v_jsonwidgetdim,
+                widgetfunction=v_widgetfunction, dv_orderby_id=v_orderbyid ,dv_isnullvalue=v_isnullvalue, widgetcontrols=v_jsonwidgetdim,
                 dv_parent_id=v_parentid, dv_querytext_filterc=v_querytextfilterc,
                 dv_querytext=v_querytext, linkedobject=v_linkedobject,
                 hidden = v_hidden
@@ -669,18 +663,10 @@ BEGIN
                 ELSE
                     -- create child table with the new addfield column
                     EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
-                                id BIGSERIAL PRIMARY KEY,
-                                '|| v_feature_type|| '_id varchar(16),
+                                '|| v_feature_type|| '_id varchar(16) PRIMARY KEY,
                                 ' || v_param_name || ' '||v_config_datatype||',
-                                CONSTRAINT ' || v_feature_childtable_name || '_'|| v_feature_type|| '_fk FOREIGN KEY ('|| v_feature_type|| '_id) REFERENCES '|| v_schemaname ||'.'|| v_feature_type|| '('|| v_feature_type|| '_id) ON DELETE CASCADE ,
-                                CONSTRAINT ' || v_feature_childtable_name || '_unique UNIQUE ('|| v_feature_type|| '_id)
+                                CONSTRAINT ' || v_feature_childtable_name || '_'|| v_feature_type|| '_fk FOREIGN KEY ('|| v_feature_type|| '_id) REFERENCES '|| v_schemaname ||'.'|| v_feature_type|| '('|| v_feature_type|| '_id) ON DELETE CASCADE
                             )';
-
-                    EXECUTE 'ALTER SEQUENCE ' || v_feature_childtable_name || '_id_seq OWNED BY ' || v_feature_childtable_name || '.id';
-
-                    EXECUTE 'ALTER TABLE ONLY ' || v_feature_childtable_name || ' ALTER COLUMN id SET DEFAULT nextval(''' || v_feature_childtable_name || '_id_seq''::regclass)';
-
-                    EXECUTE 'SELECT pg_catalog.setval(''' || v_feature_childtable_name || '_id_seq'', 1, false)';
 
                     EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| v_feature_type|| '_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| v_feature_type|| '_id)';
 
@@ -697,11 +683,11 @@ BEGIN
 
                 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutorder, datatype, widgettype,
                 label, ismandatory, isparent, iseditable, isautoupdate, layoutname, 
-                placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetcontrols,
+                placeholder, stylesheet, tooltip, widgetfunction, dv_orderby_id, dv_isnullvalue, widgetcontrols,
                 dv_parent_id, dv_querytext_filterc, dv_querytext,  linkedobject, hidden)	
                 VALUES (v_viewname, v_formtype, 'tab_data', v_param_name, v_layoutorder, v_config_datatype, v_config_widgettype,
                 v_label, v_ismandatory,v_isparent, v_iseditable, v_isautoupdate, v_layoutname,
-                v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_isnullvalue, v_jsonwidgetdim,
+                v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_orderbyid, v_isnullvalue, v_jsonwidgetdim,
                 v_parentid, v_querytextfilterc, v_querytext,  v_linkedobject, v_hidden)
                 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
@@ -717,7 +703,7 @@ BEGIN
                 widgettype=v_config_widgettype, label=v_label, layoutname=v_layoutname,
                 ismandatory=v_ismandatory, isparent=v_isparent, iseditable=v_iseditable, isautoupdate=v_isautoupdate, 
                 placeholder=v_placeholder, stylesheet=v_stylesheet, tooltip=v_tooltip, 
-                widgetfunction=v_widgetfunction, dv_isnullvalue=v_isnullvalue, widgetcontrols=v_jsonwidgetdim,
+                widgetfunction=v_widgetfunction, dv_orderby_id=v_orderbyid, dv_isnullvalue=v_isnullvalue, widgetcontrols=v_jsonwidgetdim,
                 dv_parent_id=v_parentid, dv_querytext_filterc=v_querytextfilterc, 
                 dv_querytext=v_querytext, linkedobject=v_linkedobject, hidden = v_hidden
                 WHERE columnname=v_param_name AND formname=v_viewname;

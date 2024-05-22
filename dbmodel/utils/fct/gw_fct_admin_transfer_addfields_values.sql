@@ -76,20 +76,11 @@ BEGIN
                     END IF;
                 ELSE
                     EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
-                            id BIGSERIAL PRIMARY KEY,
-                            '|| lower(rec_sa.feature_type) || '_id '||v_table_id_type||',
+                            '|| lower(rec_sa.feature_type) || '_id '||v_table_id_type||' PRIMARY KEY,
                             ' || rec_sa_featurestypes.param_name || ' '||rec_sa_featurestypes.datatype_id||'
                         )';
 
                     EXECUTE 'ALTER TABLE ' || v_feature_childtable_name || ' ADD CONSTRAINT ' || v_feature_childtable_name || '_fk FOREIGN KEY ('|| lower(rec_sa.feature_type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.feature_type) || '('|| lower(rec_sa.feature_type) || '_id) ON DELETE CASCADE;';
-
-                    EXECUTE 'ALTER TABLE ' || v_feature_childtable_name || ' ADD CONSTRAINT ' || v_feature_childtable_name || '_unique UNIQUE ('|| lower(rec_sa.feature_type) ||'_id)';
-
-                    EXECUTE 'ALTER SEQUENCE ' || v_feature_childtable_name || '_id_seq OWNED BY ' || v_feature_childtable_name || '.id';
-
-                    EXECUTE 'ALTER TABLE ONLY ' || v_feature_childtable_name || ' ALTER COLUMN id SET DEFAULT nextval(''' || v_feature_childtable_name || '_id_seq''::regclass)';
-
-                    EXECUTE 'SELECT pg_catalog.setval(''' || v_feature_childtable_name || '_id_seq'', 1, false)';
 
                     EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| lower(rec_sa.feature_type) ||'_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| lower(rec_sa.feature_type) ||'_id)';
 
@@ -113,18 +104,10 @@ BEGIN
                     END IF;
                 ELSE
                     EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
-                            id BIGSERIAL PRIMARY KEY,
-                            '|| lower(rec_sa.type) || '_id varchar(16),
+                            '|| lower(rec_sa.type) || '_id varchar(16) PRIMARY KEY,
                             ' || rec_sa_featurestypes.param_name || ' '||rec_sa_featurestypes.datatype_id||',
-                            CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.type) || '('|| lower(rec_sa.type) || '_id) ON DELETE CASCADE ,
-                            CONSTRAINT ' || v_feature_childtable_name || '_unique UNIQUE ('|| lower(rec_sa.type) ||'_id)
+                            CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.type) || '('|| lower(rec_sa.type) || '_id) ON DELETE CASCADE
                         )';
-
-                    EXECUTE 'ALTER SEQUENCE ' || v_feature_childtable_name || '_id_seq OWNED BY ' || v_feature_childtable_name || '.id';
-
-                    EXECUTE 'ALTER TABLE ONLY ' || v_feature_childtable_name || ' ALTER COLUMN id SET DEFAULT nextval(''' || v_feature_childtable_name || '_id_seq''::regclass)';
-
-                    EXECUTE 'SELECT pg_catalog.setval(''' || v_feature_childtable_name || '_id_seq'', 1, false)';
 
                     EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| lower(rec_sa.type) ||'_id)';
 
@@ -148,18 +131,10 @@ BEGIN
                     END IF;
                 ELSE
                     EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
-                            id BIGSERIAL PRIMARY KEY,
-                            '|| lower(rec_sa.type) || '_id varchar(16),
+                            '|| lower(rec_sa.type) || '_id varchar(16) PRIMARY KEY,
                             ' || rec_sa_featurestypes.param_name || ' '||rec_sa_featurestypes.datatype_id||',
-                            CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.type) || '('|| lower(rec_sa.type) || '_id) ON DELETE CASCADE ,
-                            CONSTRAINT ' || v_feature_childtable_name || '_unique UNIQUE ('|| lower(rec_sa.type) ||'_id)
+                            CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.type) || '('|| lower(rec_sa.type) || '_id) ON DELETE CASCADE
                         )';
-
-                    EXECUTE 'ALTER SEQUENCE ' || v_feature_childtable_name || '_id_seq OWNED BY ' || v_feature_childtable_name || '.id';
-
-                    EXECUTE 'ALTER TABLE ONLY ' || v_feature_childtable_name || ' ALTER COLUMN id SET DEFAULT nextval(''' || v_feature_childtable_name || '_id_seq''::regclass)';
-
-                    EXECUTE 'SELECT pg_catalog.setval(''' || v_feature_childtable_name || '_id_seq'', 1, false)';
 
                     EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| lower(rec_sa.type) ||'_id)';
 
@@ -183,18 +158,10 @@ BEGIN
                     END IF;
                 ELSE
                     EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
-                            id BIGSERIAL PRIMARY KEY,
-                            '|| lower(rec_sa.type) || '_id varchar(16),
+                            '|| lower(rec_sa.type) || '_id varchar(16) PRIMARY KEY,
                             ' || rec_sa_featurestypes.param_name || ' '||rec_sa_featurestypes.datatype_id||',
-                            CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.type) || '('|| lower(rec_sa.type) || '_id) ON DELETE CASCADE ,
-                            CONSTRAINT ' || v_feature_childtable_name || '_unique UNIQUE ('|| lower(rec_sa.type) ||'_id)
+                            CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.type) || '('|| lower(rec_sa.type) || '_id) ON DELETE CASCADE
                         )';
-
-                    EXECUTE 'ALTER SEQUENCE ' || v_feature_childtable_name || '_id_seq OWNED BY ' || v_feature_childtable_name || '.id';
-
-                    EXECUTE 'ALTER TABLE ONLY ' || v_feature_childtable_name || ' ALTER COLUMN id SET DEFAULT nextval(''' || v_feature_childtable_name || '_id_seq''::regclass)';
-
-                    EXECUTE 'SELECT pg_catalog.setval(''' || v_feature_childtable_name || '_id_seq'', 1, false)';
 
                     EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| lower(rec_sa.type) ||'_id)';
 
@@ -218,18 +185,10 @@ BEGIN
                     END IF;
                 ELSE
                     EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
-                            id BIGSERIAL PRIMARY KEY,
-                            '|| lower(rec_sa.type) || '_id varchar(16),
+                            '|| lower(rec_sa.type) || '_id varchar(16) PRIMARY KEY,
                             ' || rec_sa_featurestypes.param_name || ' '||rec_sa_featurestypes.datatype_id||',
-                            CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.type) || '('|| lower(rec_sa.type) || '_id) ON DELETE CASCADE ,
-                            CONSTRAINT ' || v_feature_childtable_name || '_unique UNIQUE ('|| lower(rec_sa.type) ||'_id)
+                            CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.type) || '('|| lower(rec_sa.type) || '_id) ON DELETE CASCADE
                         )';
-
-                    EXECUTE 'ALTER SEQUENCE ' || v_feature_childtable_name || '_id_seq OWNED BY ' || v_feature_childtable_name || '.id';
-
-                    EXECUTE 'ALTER TABLE ONLY ' || v_feature_childtable_name || ' ALTER COLUMN id SET DEFAULT nextval(''' || v_feature_childtable_name || '_id_seq''::regclass)';
-
-                    EXECUTE 'SELECT pg_catalog.setval(''' || v_feature_childtable_name || '_id_seq'', 1, false)';
 
                     EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| lower(rec_sa.type) ||'_id)';
 
@@ -259,18 +218,10 @@ BEGIN
             END IF;
         ELSE
             EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
-                    id BIGSERIAL PRIMARY KEY,
-                    '|| lower(rec_sa.feature_type) || '_id varchar(16),
+                    '|| lower(rec_sa.feature_type) || '_id varchar(16) PRIMARY KEY,
                     ' || rec_sa.param_name || ' '||rec_sa.datatype_id||',
-                    CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.feature_type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.feature_type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.feature_type) || '('|| lower(rec_sa.feature_type) || '_id) ON DELETE CASCADE ,
-                    CONSTRAINT ' || v_feature_childtable_name || '_unique UNIQUE ('|| lower(rec_sa.feature_type) ||'_id)
+                    CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.feature_type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.feature_type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.feature_type) || '('|| lower(rec_sa.feature_type) || '_id) ON DELETE CASCADE
                 )';
-
-            EXECUTE 'ALTER SEQUENCE ' || v_feature_childtable_name || '_id_seq OWNED BY ' || v_feature_childtable_name || '.id';
-
-            EXECUTE 'ALTER TABLE ONLY ' || v_feature_childtable_name || ' ALTER COLUMN id SET DEFAULT nextval(''' || v_feature_childtable_name || '_id_seq''::regclass)';
-
-            EXECUTE 'SELECT pg_catalog.setval(''' || v_feature_childtable_name || '_id_seq'', 1, false)';
 
             EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| lower(rec_sa.feature_type) ||'_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| lower(rec_sa.feature_type) ||'_id)';
 
