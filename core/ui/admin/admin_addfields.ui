@@ -241,7 +241,7 @@
                 <item row="8" column="0">
                  <widget class="QLabel" name="lbl_dv_orderby">
                   <property name="text">
-                   <string>Order by:</string>
+                   <string>Order by id:</string>
                   </property>
                  </widget>
                 </item>
@@ -293,7 +293,7 @@
                  </widget>
                 </item>
                 <item row="7" column="2">
-                 <widget class="QCheckBox" name="dv_query_nullvalue">
+                 <widget class="QCheckBox" name="dv_isnullvalue">
                   <property name="text">
                    <string/>
                   </property>
@@ -464,7 +464,7 @@
   <tabstop>widgetcontrols</tabstop>
   <tabstop>placeholder</tabstop>
   <tabstop>dv_querytext</tabstop>
-  <tabstop>dv_query_nullvalue</tabstop>
+  <tabstop>dv_isnullvalue</tabstop>
   <tabstop>dv_orderby_id</tabstop>
   <tabstop>stylesheet</tabstop>
   <tabstop>linkedobject</tabstop>
