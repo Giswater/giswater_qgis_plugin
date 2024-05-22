@@ -56,3 +56,9 @@ SET inputparams='[{"widgetname":"insertIntoNode", "label":"Direct insert into no
 {"widgetname":"nodeType", "label":"Node type:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":7, "dvQueryText":"select distinct id as id, id as idval from cat_feature_node where id is not null", "selectedId":"$userNodetype", "iseditable":false},
 {"widgetname":"nodeCat", "label":"Node catalog:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":8, "dvQueryText":"select distinct id as id, id as idval from cat_node where node_type = $userNodetype  OR node_type is null order by id", "selectedId":"$userNodecat"}]'::json
 WHERE id=2118;
+
+UPDATE sys_table SET context='{"level_1":"INVENTORY","level_2":"CATALOGS"}', orderby=6, alias='Grate material catalog' WHERE id='cat_mat_grate';
+
+UPDATE sys_table SET context='{"level_1":"INVENTORY","level_2":"CATALOGS"}', orderby=25, alias='Gully material catalog' WHERE id='cat_mat_gully';
+
+
