@@ -61,4 +61,5 @@ UPDATE sys_table SET context='{"level_1":"INVENTORY","level_2":"CATALOGS"}', ord
 
 UPDATE sys_table SET context='{"level_1":"INVENTORY","level_2":"CATALOGS"}', orderby=25, alias='Gully material catalog' WHERE id='cat_mat_gully';
 
+UPDATE sys_table SET alias = 'Gully (parent)' WHERE id='v_edit_gully' AND alias = 'Gully';
 

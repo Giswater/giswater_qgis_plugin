@@ -1040,3 +1040,7 @@ UPDATE config_form_fields
 DELETE FROM sys_message WHERE id = 3110;
 
 UPDATE sys_param_user SET descript='Pressure exponent:', label='Pressure exponent' WHERE id='inp_options_pressure_exponent';
+
+UPDATE sys_table SET alias = 'Node (parent)' WHERE id='v_edit_node' AND alias = 'Node';
+UPDATE sys_table SET alias = 'Arc (parent)' WHERE id='v_edit_arc' AND alias = 'Arc';
+UPDATE sys_table SET alias = 'Connec (parent)' WHERE id='v_edit_connec' AND alias = 'Connec';
