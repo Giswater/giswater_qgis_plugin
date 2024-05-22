@@ -812,26 +812,28 @@ BEGIN
 		VALUES (v_fid, '429' , 1, concat('INFO: All patterns checked have names without spaces.'),v_count);
 	END IF;
     
-	RAISE NOTICE '32 - Check nodes ''T candidate'' with wrong topology (fid: 432)';
-	v_querytext = 'with q_arc as (select * from arc JOIN v_state_arc USING (arc_id))
-			SELECT b.* FROM (SELECT n1.node_id, n1.nodecat_id, n1.sector_id, n1.expl_id, n1.state,
-			''Node ''''T candidate'''' with wrong topology'', 432, n1.the_geom 
-	    	FROM q_arc, (select * from node JOIN v_state_node USING (node_id)) n1
-	    	JOIN (SELECT node_1 node_id from q_arc UNION select node_2 FROM q_arc) b USING (node_id)
-	    	WHERE st_dwithin(q_arc.the_geom, n1.the_geom,0.01) AND n1.node_id NOT IN (node_1, node_2))b, selector_sector s 
-	    	where s.sector_id = b.sector_id AND cur_user=current_user';
-
-	EXECUTE 'SELECT count(*) FROM ('||v_querytext||')a'
-	INTO v_count;
+    IF v_fid <> 101 THEN --not on check project (101) because it's already on om_check_data
+		RAISE NOTICE '32 - Check nodes ''T candidate'' with wrong topology (fid: 432)';
+		v_querytext = 'with q_arc as (select * from arc JOIN v_state_arc USING (arc_id))
+				SELECT b.* FROM (SELECT n1.node_id, n1.nodecat_id, n1.sector_id, n1.expl_id, n1.state,
+				''Node ''''T candidate'''' with wrong topology'', 432, n1.the_geom 
+		    	FROM q_arc, (select * from node JOIN v_state_node USING (node_id)) n1
+		    	JOIN (SELECT node_1 node_id from q_arc UNION select node_2 FROM q_arc) b USING (node_id)
+		    	WHERE st_dwithin(q_arc.the_geom, n1.the_geom,0.01) AND n1.node_id NOT IN (node_1, node_2))b, selector_sector s 
+		    	where s.sector_id = b.sector_id AND cur_user=current_user';
 	
-	IF v_count > 0 THEN
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '432', 3, concat('ERROR-432 (anl_node): There is/are ',v_count,' Node(s) ''T candidate'' with wrong topology'),v_count);
-
-		EXECUTE 'INSERT INTO temp_anl_node (node_id, nodecat_id, sector_id, expl_id, state, descript, fid, the_geom) '||v_querytext;
-	ELSE
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, '432', 1, concat('INFO: All Nodes T has right topology.'),v_count);
+		EXECUTE 'SELECT count(*) FROM ('||v_querytext||')a'
+		INTO v_count;
+		
+		IF v_count > 0 THEN
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
+			VALUES (v_fid, '432', 3, concat('ERROR-432 (anl_node): There is/are ',v_count,' Node(s) ''T candidate'' with wrong topology'),v_count);
+	
+			EXECUTE 'INSERT INTO temp_anl_node (node_id, nodecat_id, sector_id, expl_id, state, descript, fid, the_geom) '||v_querytext;
+		ELSE
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
+			VALUES (v_fid, '432', 1, concat('INFO: All Nodes T has right topology.'),v_count);
+		END IF;
 	END IF;
 	
 	RAISE NOTICE '33 - Check matcat not null on arc (430)';

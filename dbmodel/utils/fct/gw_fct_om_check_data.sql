@@ -1450,6 +1450,28 @@ BEGIN
         INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
         VALUES (v_fid, 1, '499', 'INFO: All elements are related to the features or have geometry.',v_count);
     END IF;
+   
+   	RAISE NOTICE '53 - Check nodes ''T candidate'' with wrong topology (fid: 432)';
+	v_querytext = 'with q_arc as (select * from arc JOIN v_state_arc USING (arc_id))
+			SELECT b.* FROM (SELECT n1.node_id, n1.nodecat_id, n1.sector_id, n1.expl_id, n1.state,
+			''Node ''''T candidate'''' with wrong topology'', 432, n1.the_geom 
+	    	FROM q_arc, (select * from node JOIN v_state_node USING (node_id)) n1
+	    	JOIN (SELECT node_1 node_id from q_arc UNION select node_2 FROM q_arc) b USING (node_id)
+	    	WHERE st_dwithin(q_arc.the_geom, n1.the_geom,0.01) AND n1.node_id NOT IN (node_1, node_2))b, selector_expl e 
+	    	where e.expl_id= b.expl_id AND cur_user=current_user';
+
+	EXECUTE 'SELECT count(*) FROM ('||v_querytext||')a'
+	INTO v_count;
+	
+	IF v_count > 0 THEN
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '432', 3, concat('ERROR-432 (anl_node): There is/are ',v_count,' Node(s) ''T candidate'' with wrong topology'),v_count);
+
+		EXECUTE 'INSERT INTO temp_anl_node (node_id, nodecat_id, sector_id, expl_id, state, descript, fid, the_geom) '||v_querytext;
+	ELSE
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '432', 1, concat('INFO: All Nodes T has right topology.'),v_count);
+	END IF;
 
 
 	-- Removing isaudit false sys_fprocess
@@ -1477,7 +1499,7 @@ BEGIN
 		-- delete old values on anl table
 		DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (210,201,202,204,205,257,291,478);
 		DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (103,196,197,188,223,202,372,391,417,418,461,381, 479);
-		DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (106,177,187,202,442,443,461);
+		DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (106,177,187,202,442,443,461,432);
 
 		INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
 		INSERT INTO anl_node SELECT * FROM temp_anl_node;
@@ -1514,7 +1536,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT node_id, nodecat_id as feature_catalog, state, expl_id, descript, fid, the_geom FROM temp_anl_node WHERE cur_user="current_user"()
-	AND fid IN (106,177,187,202,442,443,175)
+	AND fid IN (106,177,187,202,442,443,175,432)
 	UNION
 	SELECT connec_id, connecat_id, state, expl_id, descript, fid, the_geom FROM temp_anl_connec WHERE cur_user="current_user"()
 	AND fid IN (210,201,202,204,205,291,478,488,480)) row) features;
