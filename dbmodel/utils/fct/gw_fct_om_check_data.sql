@@ -953,7 +953,7 @@ BEGIN
 
 
 	RAISE NOTICE '33 - Check operative links with wrong topology (417, 418)';
-/*
+
 	-- connec_id (417)
 	DELETE FROM temp_t_arc;
 
@@ -974,7 +974,6 @@ BEGIN
 		WHERE l.state = 1 and c.state = 1 and ST_DWithin(ST_startpoint(l.the_geom), c.the_geom, 0.05) group by 1,2,3 ORDER BY 1 DESC,3 DESC
 		)a where t.arc_id = a.link_id::text AND t.node_1 = a.connec_id;
 	END IF;
-		*/
 
 	EXECUTE 'SELECT count(*) FROM temp_t_arc WHERE state = 1'
 	INTO v_count;
