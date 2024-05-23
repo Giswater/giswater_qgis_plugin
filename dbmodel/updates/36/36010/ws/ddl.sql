@@ -9,3 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_meter", "column":"meter_code", "dataType":"varchar(30)"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"avg_press", "dataType":"float"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"avg_press", "dataType":"float"}}$$);
