@@ -153,11 +153,9 @@ BEGIN
 						v_arcrecordtb.state_type := (SELECT (value::json->>'plan_statetype_ficticius')::smallint FROM config_param_system WHERE parameter='plan_statetype_vdefault');
 
 						-- Get arctype
-						IF v_arc_type IS NULL THEN
-							v_sql := 'SELECT arctype_id FROM cat_arc WHERE id = '''||v_new_record.arccat_id||''';';
-							EXECUTE v_sql
-							INTO v_arc_type;
-						END IF;
+                        v_sql := 'SELECT arctype_id FROM cat_arc WHERE id = '''||v_arcrecordtb.arccat_id||''';';
+                        EXECUTE v_sql
+                        INTO v_arc_type;
 
 						-- set temporary values for config variables in order to enable the insert of arc in spite of due a 'bug' of postgres it seems that does not recognize the new node inserted
 						UPDATE config_param_user SET value=TRUE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;				
