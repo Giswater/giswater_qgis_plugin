@@ -88,22 +88,22 @@ class GwImportInpTask(GwTask):
                         nodecat_db = [x[0] for x in cur.fetchall()]
 
                     node_catalogs = [
-                        ("junctions", "JUNCTION", "JUNCTION"),
-                        ("reservoirs", "SOURCE", "RESERVOIR"),
-                        ("tanks", "TANK", "TANK"),
+                        ("junctions", "JUNCTION"),
+                        ("reservoirs", "SOURCE"),
+                        ("tanks", "TANK"),
                     ]
 
-                    for node_type, cat_feature, epa_default in node_catalogs:
+                    for node_type, cat_feature in node_catalogs:
                         if (
                             node_type in self.catalogs
                             and self.catalogs[node_type] not in nodecat_db
                         ):
                             sql = """
-                                INSERT INTO cat_feature_node (id, "type", epa_default)
-                                VALUES (%s, %s, %s)
+                                INSERT INTO cat_feature (id, system_id, feature_type)
+                                VALUES (%s, %s, 'NODE')
                                 ON CONFLICT (id) DO NOTHING;
                             """
-                            cur.execute(sql, (cat_feature, cat_feature, epa_default))
+                            cur.execute(sql, (cat_feature, cat_feature))
 
                             sql = """
                                 INSERT INTO cat_node (id, nodetype_id)
