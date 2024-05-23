@@ -37,7 +37,7 @@ from ..threads.toggle_valve_state import GwToggleValveTask
 
 from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, \
-    GwInfoCrossectUi, GwInterpolate
+    GwInfoCrossectUi, GwInterpolate, GwPsectorUi
 # WARNING: DO NOT REMOVE THESE IMPORTS, THEY ARE USED BY EPA ACTIONS
 # noinspection PyUnresolvedReferences
 from ..ui.ui_manager import GwInfoEpaDemandUi, GwInfoEpaOrificeUi, GwInfoEpaOutletUi, GwInfoEpaPumpUi, \
@@ -72,7 +72,7 @@ class GwInfo(QObject):
         self.rubber_band = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.PointGeometry)
         self.snapper_manager = GwSnapManager(self.iface)
         self.snapper_manager.set_snapping_layers()
-        self.suppres_form = None
+        self.conf_supp = None
         self.prev_action = None
 
 
@@ -310,14 +310,12 @@ class GwInfo(QObject):
             # be inserted. This disconnect signal avoids it
             tools_gw.disconnect_signal('info', 'add_feature_featureAdded_open_new_feature')
 
-            self.suppres_form = QSettings().value("/Qgis/digitizing/disable_enter_attribute_values_dialog")
-            QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
             config = self.info_layer.editFormConfig()
             self.conf_supp = config.suppress()
             if Qgis.QGIS_VERSION_INT >= 33200:
-                config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.Default)
+                config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.SuppressOn)
             else:
-                config.setSuppress(0)
+                config.setSuppress(1)
             self.info_layer.setEditFormConfig(config)
             self.iface.setActiveLayer(self.info_layer)
             self.info_layer.startEditing()
@@ -543,7 +541,8 @@ class GwInfo(QObject):
         # Build and populate all the widgets
         self._manage_dlg_widgets(complet_result, result, new_feature)
         # Disable tab EPA if epa_type is undefined
-        if tools_qt.get_text(self.dlg_cf, 'tab_data_epa_type').lower() == 'undefined':
+        self.epa_type = tools_qt.get_text(self.dlg_cf, 'tab_data_epa_type')
+        if tools_qt.get_text(self.dlg_cf, self.epa_type).lower() == 'undefined':
             tools_qt.enable_tab_by_tab_name(self.tab_main, 'tab_epa', False)
         # Check elev data consistency
         if global_vars.project_type == 'ud':
@@ -916,7 +915,7 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaDemandUi", "uiName": "info_epa_demand",
                        "tableviews": [
-                        {"tbl": "tbl_dscenario_demand", "view": "inp_dscenario_demand", "add_view": "v_edit_inp_dscenario_demand", "id_name": "feature_id", "pk": "id", "add_dlg_title": "Demand - Dscenario"}
+                        {"tbl": "tbl_dscenario_demand", "view": "inp_dscenario_demand", "add_view": "v_edit_inp_dscenario_demand", "id_name": "feature_id", "pk": ["dscenario_id", "feature_id"], "add_dlg_title": "Demand - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg(**kwargs)
@@ -935,7 +934,7 @@ class GwInfo(QObject):
 
     def action_open_link(self):
         """ Manage def open_file from action 'Open Link' """
-        
+
         try:
             widget_list = self.dlg_cf.findChildren(tools_qt.GwHyperLinkLabel)
             for widget in widget_list:
@@ -1087,7 +1086,7 @@ class GwInfo(QObject):
             tools_gw.load_settings(dlg_interpolate)
         else:
             dlg_interpolate = refresh_dialog
-        
+
         self.ep = ep
 
         # Manage QRadioButton interpolate/extrapolate
@@ -1824,6 +1823,11 @@ class GwInfo(QObject):
                 is_inserting = False
                 my_json = json.dumps(_json)
                 if my_json == '' or str(my_json) == '{}':
+                    # Force a map refresh
+                    tools_qgis.refresh_map_canvas()  # First refresh all the layers
+                    global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
+                    # Refresh psector's relations tables
+                    tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')
                     if close_dlg:
                         if lib_vars.session_vars['dialog_docker'] and dialog == lib_vars.session_vars['dialog_docker'].widget():
                             tools_gw.close_docker()
@@ -1919,6 +1923,8 @@ class GwInfo(QObject):
         # Force a map refresh
         tools_qgis.refresh_map_canvas()  # First refresh all the layers
         global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
+        # Refresh psector's relations tables
+        tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')
 
         if close_dlg:
             if lib_vars.session_vars['dialog_docker'] and dialog == lib_vars.session_vars['dialog_docker'].widget():
@@ -2085,8 +2091,7 @@ class GwInfo(QObject):
                 _json = {}
                 widget.editingFinished.connect(partial(self._clean_my_json, widget))
                 widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, _json))
-                widget.editingFinished.connect(
-                    partial(self._accept, dialog, self.complet_result, _json, widget, True, False, new_feature=new_feature))
+                widget.editingFinished.connect(partial(self._accept_auto_update, dialog, self.complet_result, _json, widget, True, False, new_feature=new_feature))
             else:
                 widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
         else:  # Other tabs
@@ -2097,6 +2102,37 @@ class GwInfo(QObject):
         widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
 
         return widget
+
+
+    def _accept_auto_update(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True, new_feature=None, generic=False):
+
+        """
+        :param dialog:
+        :param complet_result:
+        :param _json:
+        :param p_widget:
+        :param clear_json:
+        :param close_dlg:
+        :return: (boolean)
+        """
+
+        # Manage change epa_type message
+        if _json.get('epa_type'):
+
+            widget_epatype = dialog.findChild(QComboBox, 'tab_data_epa_type')
+            message = "You are going to change the epa_type. With this operation you will lose information about " \
+                        "current epa_type values of this object. Would you like to continue?"
+            title = "Change epa_type"
+            answer = tools_qt.show_question(message, title)
+            if not answer:
+                widget_epatype.blockSignals(True)
+                tools_qt.set_combo_value(widget_epatype, self.epa_type, 1)
+                widget_epatype.blockSignals(False)
+                return
+            self.epa_type = _json.get('epa_type')
+
+        # Call accept fct
+        self._accept(dialog, complet_result, _json, p_widget, clear_json, close_dlg, new_feature, generic)
 
 
     def _set_auto_update_textarea(self, field, dialog, widget, new_feature):
@@ -2112,8 +2148,7 @@ class GwInfo(QObject):
                 _json = {}
                 widget.textChanged.connect(partial(self._clean_my_json, widget))
                 widget.textChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
-                widget.textChanged.connect(
-                    partial(self._accept, dialog, self.complet_result, _json, widget, True, False, new_feature))
+                widget.textChanged.connect(partial(self._accept_auto_update, dialog, self.complet_result, _json, widget, True, False, new_feature))
             else:
                 widget.textChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
         else:  # Other tabs
@@ -2238,8 +2273,7 @@ class GwInfo(QObject):
                 _json = {}
                 widget.currentIndexChanged.connect(partial(self._clean_my_json, widget))
                 widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
-                widget.currentIndexChanged.connect(partial(
-                    self._accept, dialog, self.complet_result, _json, None, True, False, new_feature))
+                widget.currentIndexChanged.connect(partial(self._accept_auto_update, dialog, self.complet_result, _json, widget, True, False, new_feature=new_feature))
             else:
                 widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
         else:  # Other tabs
@@ -2692,6 +2726,9 @@ class GwInfo(QObject):
             self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_visit')
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
+            cmb_visit_class = self.dlg_cf.findChild(QComboBox, 'tab_visit_visit_class')
+            current_index = cmb_visit_class.currentIndex()
+            cmb_visit_class.currentIndexChanged.emit(current_index)
             self.tab_visit_loaded = True
         # Tab 'Event'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_event' and not self.tab_event_loaded:
@@ -2724,6 +2761,8 @@ class GwInfo(QObject):
                 tools_qgis.show_info(msg, 3)
                 continue
             linkedobject = table.property('linkedobject')
+            if linkedobject is None:
+                return
             complet_list, widget_list = self._fill_tbl(complet_result, self.dlg_cf, widgetname, linkedobject, filter_fields, id_name)
             if complet_list is False:
                 return False
@@ -3046,6 +3085,8 @@ class GwInfo(QObject):
                 widget = dialog.findChild(QWidget, f"{options[option][1]}")
                 widget.setFocus()
                 tools_qt.set_widget_text(dialog, widget, str(feat_id))
+                if str(feat_id) not in ('', None, -1, "None") and widget.property('columnname'):
+                        self.my_json[str(widget.property('columnname'))] = str(feat_id)
             elif option == 'set_to_arc':
                 # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
                 #       def _set_to_arc(self, feat_id, child_type)
@@ -3151,7 +3192,6 @@ class GwInfo(QObject):
                                                                layer_new_feature=self.info_layer, tab_type='data')
 
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
-        QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
         config = self.info_layer.editFormConfig()
         config.setSuppress(self.conf_supp)
         self.info_layer.setEditFormConfig(config)
@@ -3497,7 +3537,7 @@ def refresh_epa_tbl(tblview, dlg, **kwargs):
         tbl = tableview['tbl']
         tbl = dlg.findChild(QTableView, tbl)
         if not tbl:
-            continue    
+            continue
         if tbl != tblview:
             continue
         id_name = tableview.get('id_name', id_name)

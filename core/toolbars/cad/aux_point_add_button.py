@@ -8,9 +8,9 @@ or (at your option) any later version.
 from functools import partial
 
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QDoubleValidator
-from qgis.core import QgsMapToPixel
-from qgis.gui import QgsVertexMarker
+from qgis.PyQt.QtGui import QDoubleValidator, QColor
+from qgis.core import QgsMapToPixel, QgsWkbTypes, QgsGeometry, QgsPoint, QgsPointXY, QgsSymbol
+from qgis.gui import QgsVertexMarker, QgsRubberBand
 
 from ..maptool import GwMaptool
 from ...ui.ui_manager import GwAuxPointUi
@@ -30,6 +30,23 @@ class GwAuxPointAddButton(GwMaptool):
         self.point_1 = None
         self.point_2 = None
         self.snap_to_selected_layer = False
+        # RUBBERBANDS TO PREVIEW RESULT
+        # Background points & line
+        self.rb_bg_point = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.PointGeometry)
+        self.rb_bg_point.setColor(QColor(0, 0, 0, 150))
+        self.rb_bg_line = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.LineGeometry)
+        self.rb_bg_line.setLineStyle(Qt.DashLine)
+        self.rb_bg_line.setColor(QColor(0, 0, 0, 150))
+        # Start point from where it will calculate final point
+        self.rb_start_point = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.PointGeometry)
+        self.rb_start_point.setColor(QColor(0, 0, 255, 100))
+        self.rb_start_point.setWidth(5)
+        # Final point calculated
+        self.rb_final_point = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.PointGeometry)
+        self.rb_final_point.setColor(QColor(255, 0, 0, 150))
+        self.rb_final_point.setWidth(3)
+        self.rb_final_point.setIcon(QgsRubberBand.ICON_X)
+        self.rb_final_point.setIconSize(10)
 
 
     def cancel(self):
@@ -37,6 +54,7 @@ class GwAuxPointAddButton(GwMaptool):
         tools_gw.set_config_parser('btn_auxpoint', "rb_left", f"{self.dlg_create_point.rb_left.isChecked()}")
         tools_gw.set_config_parser('btn_auxpoint', "rb_right", f"{self.dlg_create_point.rb_right.isChecked()}")
 
+        self._reset_rubberbands()
         tools_gw.close_dialog(self.dlg_create_point)
         self.iface.setActiveLayer(self.current_layer)
         if self.layer_points:
@@ -134,6 +152,7 @@ class GwAuxPointAddButton(GwMaptool):
 
         self.point_1 = None
         self.point_2 = None
+        self._reset_rubberbands()
 
         # Call parent method
         super().deactivate()
@@ -170,6 +189,9 @@ class GwAuxPointAddButton(GwMaptool):
         validator = QDoubleValidator(-99999.99, 9999999.00, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
         self.dlg_create_point.dist_y.setValidator(validator)
+        self.dlg_create_point.dist_x.textChanged.connect(partial(self._preview_point, self.dlg_create_point, point_1, point_2))
+        self.dlg_create_point.dist_y.textChanged.connect(partial(self._preview_point, self.dlg_create_point, point_1, point_2))
+        self.dlg_create_point.rb_left.toggled.connect(partial(self._preview_point, self.dlg_create_point, point_1, point_2))
         self.dlg_create_point.btn_accept.clicked.connect(partial(self._get_values, point_1, point_2))
         self.dlg_create_point.btn_cancel.clicked.connect(self.cancel)
 
@@ -180,6 +202,64 @@ class GwAuxPointAddButton(GwMaptool):
 
         tools_gw.open_dialog(self.dlg_create_point, dlg_name='auxpoint')
         self.dlg_create_point.dist_x.setFocus()
+
+
+    def _preview_point(self, dialog, point1, point2):
+
+        self.rb_final_point.reset(QgsWkbTypes.PointGeometry)
+
+        value_x = tools_qt.get_text(dialog, 'dist_x')
+        value_y = tools_qt.get_text(dialog, 'dist_y')
+        try:
+            distance_x = float(value_x)
+        except ValueError as e:
+            distance_x = 0.0
+        try:
+            distance_y = float(value_y)
+        except ValueError as e:
+            distance_y = 0.0
+
+        if point1 is None or point2 is None:
+            return
+
+        start_from_point1 = dialog.rb_left.isChecked()
+        if start_from_point1 in (None, True):
+            start_point = point1
+        else:
+            start_point = point2
+
+        self.rb_start_point.reset(QgsWkbTypes.PointGeometry)
+        self.rb_start_point.addPoint(start_point)
+
+        # Calculate the vector from point1 to point2
+        vector_x = point2.x() - point1.x()
+        vector_y = point2.y() - point1.y()
+
+        # Calculate the length of the vector
+        vector_length = (vector_x ** 2 + vector_y ** 2) ** 0.5
+
+        # Normalize the vector
+        normalized_vector_x = vector_x / vector_length
+        normalized_vector_y = vector_y / vector_length
+
+        # Calculate the coordinates of the new point in the direction towards end_point
+        new_point_x = start_point.x() + normalized_vector_x * distance_x
+        new_point_y = start_point.y() + normalized_vector_y * distance_x
+
+        # Calculate the unit vector of the line from start_point in the direction of the vector
+        line_unit_vector_x = normalized_vector_x
+        line_unit_vector_y = normalized_vector_y
+
+        # Calculate the coordinates of the new point perpendicular to the line
+        # (swap x and y components of the unit vector, then negate one of them)
+        perpendicular_vector_x = -line_unit_vector_y
+        perpendicular_vector_y = line_unit_vector_x
+
+        new_point_x_perpendicular = new_point_x + perpendicular_vector_x * distance_y
+        new_point_y_perpendicular = new_point_y + perpendicular_vector_y * distance_y
+
+        preview_point = QgsPointXY(new_point_x_perpendicular, new_point_y_perpendicular)
+        self.rb_final_point.addPoint(preview_point)
 
 
     def _get_values(self, point_1, point_2):
@@ -244,10 +324,18 @@ class GwAuxPointAddButton(GwMaptool):
 
             if self.point_1 is None:
                 self.point_1 = point
+                self.rb_bg_line.reset(QgsWkbTypes.LineGeometry)
+                self.rb_bg_point.reset(QgsWkbTypes.PointGeometry)
+                self.rb_bg_point.addPoint(self.point_1)
             else:
                 self.point_2 = point
+                self.rb_bg_point.addPoint(self.point_2)
 
             if self.point_1 is not None and self.point_2 is not None:
+                self.rb_bg_line.reset(QgsWkbTypes.LineGeometry)
+                p1 = QgsPoint(self.point_1)
+                p2 = QgsPoint(self.point_2)
+                self.rb_bg_line.addGeometry(QgsGeometry.fromPolyline([p1, p2]))
                 # Create form
                 self._init_create_point_form(self.point_1, self.point_2)
                 # Restart points variables
@@ -255,10 +343,19 @@ class GwAuxPointAddButton(GwMaptool):
                 self.point_2 = None
 
         elif event.button() == Qt.RightButton:
+            self._reset_rubberbands()
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
 
         if self.layer_points:
             self.layer_points.commitChanges()
+
+
+    def _reset_rubberbands(self):
+
+        tools_gw.reset_rubberband(self.rb_bg_point, QgsWkbTypes.PointGeometry)
+        tools_gw.reset_rubberband(self.rb_bg_line, QgsWkbTypes.LineGeometry)
+        tools_gw.reset_rubberband(self.rb_start_point, QgsWkbTypes.PointGeometry)
+        tools_gw.reset_rubberband(self.rb_final_point, QgsWkbTypes.PointGeometry)
 
     # endregion

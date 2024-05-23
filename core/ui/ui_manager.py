@@ -391,10 +391,6 @@ FORM_CLASS = _get_ui_class('admin_renameproj.ui', 'admin')
 class GwAdminRenameProjUi(GwMainWindow, FORM_CLASS):
     pass
 
-FORM_CLASS = _get_ui_class('admin_sysfields.ui', 'admin')
-class GwAdminSysFieldsUi(GwDialog, FORM_CLASS):
-    pass
-
 FORM_CLASS = _get_ui_class('admin_ui.ui', 'admin')
 class GwAdminUi(GwMainWindow, FORM_CLASS):
     dlg_closed = QtCore.pyqtSignal()

@@ -76,9 +76,13 @@ class GwNonVisual:
 
         # Make and populate tabs
         self._manage_tabs_manager()
+        self._populate_filter_combos()
 
         # Connect dialog signals
-        self.manager_dlg.txt_filter.textChanged.connect(partial(self._filter_table, self.manager_dlg))
+        self.manager_dlg.txt_filter.textChanged.connect(partial(self._filter_table, self.manager_dlg, None))
+        self.manager_dlg.cmb_curve_type.currentIndexChanged.connect(partial(self._filter_table, self.manager_dlg, None))
+        self.manager_dlg.cmb_pattern_type.currentIndexChanged.connect(partial(self._filter_table, self.manager_dlg, None))
+        self.manager_dlg.cmb_timser_type.currentIndexChanged.connect(partial(self._filter_table, self.manager_dlg, None))
         self.manager_dlg.main_tab.currentChanged.connect(partial(self._filter_table, self.manager_dlg, None))
         self.manager_dlg.btn_duplicate.clicked.connect(partial(self._duplicate_object, self.manager_dlg))
         self.manager_dlg.btn_create.clicked.connect(partial(self._create_object, self.manager_dlg))
@@ -86,10 +90,10 @@ class GwNonVisual:
         self.manager_dlg.btn_cancel.clicked.connect(self.manager_dlg.reject)
         self.manager_dlg.finished.connect(partial(tools_gw.close_dialog, self.manager_dlg))
         self.manager_dlg.btn_print.clicked.connect(partial(self._print_object))
-        self.manager_dlg.chk_active.stateChanged.connect(partial(self._filter_active, self.manager_dlg))
+        self.manager_dlg.chk_active.stateChanged.connect(partial(self._filter_table, self.manager_dlg))
 
         self.manager_dlg.main_tab.currentChanged.connect(partial(self._manage_tabs_changed))
-        self.manager_dlg.main_tab.currentChanged.connect(partial(self._filter_active, self.manager_dlg, None))
+        self.manager_dlg.main_tab.currentChanged.connect(partial(self._filter_table, self.manager_dlg, None))
         self._manage_tabs_changed()
 
         # Open dialog
@@ -115,24 +119,58 @@ class GwNonVisual:
             qtableview.doubleClicked.connect(partial(self._get_nonvisual_object, qtableview, function_name))
 
 
+    def _populate_filter_combos(self):
+        """ cmb_curve_type, cmb_pattern_type, cmb_timser_type """
+
+        sql = f"SELECT DISTINCT curve_type AS id, curve_type AS idval FROM v_edit_inp_curve"
+        rows = tools_db.get_rows(sql)
+        if rows:
+            tools_qt.fill_combo_values(self.manager_dlg.cmb_curve_type, rows, add_empty=True)
+
+        if global_vars.project_type == 'ud':
+            sql = f"SELECT DISTINCT pattern_type AS id, pattern_type AS idval FROM v_edit_inp_pattern"
+            rows = tools_db.get_rows(sql)
+            if rows:
+                tools_qt.fill_combo_values(self.manager_dlg.cmb_pattern_type, rows, add_empty=True)
+
+            sql = f"SELECT DISTINCT timser_type AS id, timser_type AS idval FROM v_edit_inp_timeseries"
+            rows = tools_db.get_rows(sql)
+            if rows:
+                tools_qt.fill_combo_values(self.manager_dlg.cmb_timser_type, rows, add_empty=True)
+
+
     def _manage_tabs_changed(self):
 
         tab_name = self.manager_dlg.main_tab.currentWidget().objectName()
 
-        visibility_settings = {  # tab_name: (chk_active, btn_print)
-            'v_edit_inp_curve': (False, True),
-            'v_edit_inp_pattern': (False, False),
-            'inp_lid': (False, False),
+        visibility_settings = {  # tab_name: (chk_active, btn_print, cmb_curve_type, cmb_pattern_type, cmb_timser_type)
+            'v_edit_inp_curve': (False, True, True, False, False),
+            'v_edit_inp_pattern': (False, False, False, True, False),
+            'v_edit_inp_timeseries': (True, False, False, False, True),
+            'inp_lid': (False, False, False, False, False),
         }
-        default_visibility = (True, False)
+        default_visibility = (True, False, False, False, False)
 
-        chk_active_visible, btn_print_visible = visibility_settings.get(tab_name, default_visibility)
+        chk_active_visible, btn_print_visible, cmb_curve_type, cmb_pattern_type, cmb_timser_type = visibility_settings.get(tab_name, default_visibility)
 
         self.manager_dlg.chk_active.setVisible(chk_active_visible)
         if btn_print_visible and global_vars.project_type == 'ud':
             self.manager_dlg.btn_print.setVisible(btn_print_visible)
         else:
             self.manager_dlg.btn_print.setVisible(False)
+
+        self.manager_dlg.lbl_curve_type.setVisible(cmb_curve_type)
+        self.manager_dlg.cmb_curve_type.setVisible(cmb_curve_type)
+        if global_vars.project_type == 'ud':
+            self.manager_dlg.lbl_pattern_type.setVisible(cmb_pattern_type)
+            self.manager_dlg.cmb_pattern_type.setVisible(cmb_pattern_type)
+            self.manager_dlg.lbl_timser_type.setVisible(cmb_timser_type)
+            self.manager_dlg.cmb_timser_type.setVisible(cmb_timser_type)
+        else:
+            self.manager_dlg.lbl_pattern_type.setVisible(False)
+            self.manager_dlg.cmb_pattern_type.setVisible(False)
+            self.manager_dlg.lbl_timser_type.setVisible(False)
+            self.manager_dlg.cmb_timser_type.setVisible(False)
 
 
     def _get_nonvisual_object(self, tbl_view, function_name):
@@ -179,35 +217,22 @@ class GwNonVisual:
         model.sort(1, 0)
 
 
-    def _filter_table(self, dialog, text):
-        """ Filters manager table by id """
-
-        widget_table = dialog.main_tab.currentWidget()
-        tablename = widget_table.objectName()
-        id_field = self.dict_ids.get(tablename)
-        show_inactive = dialog.chk_active.isChecked()
-
-        if text is None:
-            text = tools_qt.get_text(dialog, dialog.txt_filter, return_string_null=False)
-        expr = f"{id_field}::text ILIKE '%{text}%'"
-        if not show_inactive:
-            expr += " and active is true"
-
-        # Refresh model with selected filter
-        widget_table.model().setFilter(expr)
-        widget_table.model().select()
-
-
-    def _filter_active(self, dialog, active):
+    def _filter_table(self, dialog, active):
         """ Filters manager table by active """
 
         widget_table = dialog.main_tab.currentWidget()
         tablename = widget_table.objectName()
         id_field = self.dict_ids.get(tablename)
-        # Get the chk_active checkbox directly from the dialog
+        # Get the widgets from the dialog
         chk_active_widget = dialog.chk_active
-        # Check the visual state of chk_active
+        cmb_curve_type = dialog.cmb_curve_type
+        cmb_pattern_type = dialog.cmb_pattern_type
+        cmb_timser_type = dialog.cmb_timser_type
+        # Check the visual state of the widgets
         chk_active_is_visible = chk_active_widget.isVisible()
+        cmb_curve_type_is_visible = cmb_curve_type.isVisible()
+        cmb_pattern_type_is_visible = cmb_pattern_type.isVisible()
+        cmb_timser_type_is_visible = cmb_timser_type.isVisible()
 
         if chk_active_is_visible:
             if active is None:
@@ -215,10 +240,32 @@ class GwNonVisual:
         else:
             active = True
 
+        curve_type = None
+        pattern_type = None
+        timser_type = None
+        if cmb_curve_type_is_visible:
+            curve_type = tools_qt.get_combo_value(dialog, cmb_curve_type)
+        if cmb_pattern_type_is_visible:
+            pattern_type = tools_qt.get_combo_value(dialog, cmb_pattern_type)
+        if cmb_timser_type_is_visible:
+            timser_type = tools_qt.get_combo_value(dialog, cmb_timser_type)
+
         text = tools_qt.get_text(dialog, dialog.txt_filter, return_string_null=False)
         expr = ""
         if not active:
             expr = f"active is true"
+        if curve_type is not None:
+            if expr:
+                expr += " and "
+            expr += f"curve_type::text ILIKE '%{curve_type}%'"
+        if pattern_type is not None:
+            if expr:
+                expr += " and "
+            expr += f"pattern_type::text ILIKE '%{pattern_type}%'"
+        if timser_type is not None:
+            if expr:
+                expr += " and "
+            expr += f"timser_type::text ILIKE '%{timser_type}%'"
         if text:
             if expr:
                 expr += " and "
@@ -553,7 +600,7 @@ class GwNonVisual:
 
             descript = descript.strip("'")
             descript = descript.replace("\n", "\\n")
-            fields = f"""{{"matcat_id": "{matcat_id}", "period_id": "{period_id}", "init_age": "{init_age}", 
+            fields = f"""{{"matcat_id": "{matcat_id}", "period_id": "{period_id}", "init_age": "{init_age}",
             "end_age": "{end_age}", "roughness": "{roughness}", "descript": "{descript}", "active": "{active}"}}"""
             result = self._setfields(roughness_id, table_name, fields)
             if not result:
@@ -600,6 +647,8 @@ class GwNonVisual:
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(cmb_expl_id, rows, add_empty=True)
+
+        self.dialog.txt_curve_id.setMaxLength(16)
 
         # Create & fill cmb_curve_type
         curve_type_headers, curve_type_list = self._create_curve_type_lists()
@@ -929,7 +978,7 @@ class GwNonVisual:
 
             # Calcule el área
             area = np.trapz(y_list, x_list) * 2
-            
+
             # Create inverted plot
             plot_widget.axes.plot(y_list, x_list, color="blue")
 
@@ -1130,6 +1179,8 @@ class GwNonVisual:
 
         # Create plot widget
         plot_widget = self._create_plot_widget(self.dialog)
+
+        self.dialog.txt_pattern_id.setMaxLength(16)
 
         # Populate combobox
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id > 0"
@@ -1419,6 +1470,8 @@ class GwNonVisual:
 
         # Create plot widget
         plot_widget = self._create_plot_widget(self.dialog)
+
+        self.dialog.txt_pattern_id.setMaxLength(16)
 
         # Populate combobox
         sql = "SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id > 0"
@@ -1720,7 +1773,7 @@ class GwNonVisual:
     # endregion
 
     # region controls
-    def get_controls(self, control_id=None, duplicate=False):
+    def get_controls(self, control_id=None, duplicate=False, dscenario_id=None):
         """ Opens dialog for controls """
 
         # Get dialog
@@ -1731,20 +1784,20 @@ class GwNonVisual:
         self._populate_cmb_sector_id(self.dialog, self.dialog.cmb_sector_id)
 
         if control_id is not None:
-            self._populate_controls_widgets(control_id)
+            self._populate_controls_widgets(control_id, dscenario_id)
         else:
             self._load_controls_widgets(self.dialog)
 
         # Connect dialog signals
         is_new = (control_id is None) or duplicate
-        self.dialog.btn_accept.clicked.connect(partial(self._accept_controls, self.dialog, is_new, control_id))
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_controls, self.dialog, is_new, control_id, dscenario_id))
         self._connect_dialog_signals()
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_controls')
 
 
-    def _populate_controls_widgets(self, control_id):
+    def _populate_controls_widgets(self, control_id, dscenario_id):
         """ Fills in all the values for control dialog """
 
         # Variables
@@ -1752,7 +1805,10 @@ class GwNonVisual:
         chk_active = self.dialog.chk_active
         txt_text = self.dialog.txt_text
 
-        sql = f"SELECT * FROM v_edit_inp_controls WHERE id = '{control_id}'"
+        if dscenario_id is not None:
+            sql = f"SELECT * FROM inp_dscenario_controls WHERE id = '{control_id}'"
+        else:
+            sql = f"SELECT * FROM v_edit_inp_controls WHERE id = '{control_id}'"
         row = tools_db.get_row(sql)
         if not row:
             return
@@ -1795,7 +1851,7 @@ class GwNonVisual:
         tools_gw.set_config_parser('nonvisual_controls', 'chk_active', active)
 
 
-    def _accept_controls(self, dialog, is_new, control_id):
+    def _accept_controls(self, dialog, is_new, control_id, dscenario_id):
         """ Manage accept button (insert & update) """
 
         # Variables
@@ -1815,9 +1871,14 @@ class GwNonVisual:
                 return
             tools_qt.set_stylesheet(txt_text, style="")
 
+            # Insert inp_dscenario_controls
+            if dscenario_id is not None:
+                sql = f"INSERT INTO inp_dscenario_controls (dscenario_id, sector_id,text,active)" \
+                      f"VALUES({dscenario_id}, {sector_id}, {text}, {active})"
             # Insert inp_controls
-            sql = f"INSERT INTO inp_controls (sector_id,text,active)" \
-                  f"VALUES({sector_id}, {text}, {active})"
+            else:
+                sql = f"INSERT INTO inp_controls (sector_id,text,active)" \
+                      f"VALUES({sector_id}, {text}, {active})"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting control."
@@ -1835,6 +1896,8 @@ class GwNonVisual:
             text = text.strip("'")
             text = text.replace("\n", "\\n")
             fields = f"""{{"sector_id": {sector_id}, "active": "{active}", "text": "{text}"}}"""
+            if dscenario_id is not None:
+                table_name = "inp_dscenario_controls"
 
             result = self._setfields(control_id, table_name, fields)
             if not result:
@@ -1850,7 +1913,7 @@ class GwNonVisual:
     # endregion
 
     # region rules
-    def get_rules(self, rule_id=None, duplicate=False):
+    def get_rules(self, rule_id=None, duplicate=False, dscenario_id=None):
         """ Opens dialog for rules """
 
         # Get dialog
@@ -1861,20 +1924,20 @@ class GwNonVisual:
         self._populate_cmb_sector_id(self.dialog, self.dialog.cmb_sector_id)
 
         if rule_id is not None:
-            self._populate_rules_widgets(rule_id)
+            self._populate_rules_widgets(rule_id, dscenario_id)
         else:
             self._load_rules_widgets(self.dialog)
 
         # Connect dialog signals
         is_new = (rule_id is None) or duplicate
-        self.dialog.btn_accept.clicked.connect(partial(self._accept_rules, self.dialog, is_new, rule_id))
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_rules, self.dialog, is_new, rule_id, dscenario_id))
         self._connect_dialog_signals()
 
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_rules')
 
 
-    def _populate_rules_widgets(self, rule_id):
+    def _populate_rules_widgets(self, rule_id, dscenario_id):
         """ Fills in all the values for rule dialog """
 
         # Variables
@@ -1882,7 +1945,10 @@ class GwNonVisual:
         chk_active = self.dialog.chk_active
         txt_text = self.dialog.txt_text
 
-        sql = f"SELECT * FROM v_edit_inp_rules WHERE id = '{rule_id}'"
+        if dscenario_id is not None:
+            sql = f"SELECT * FROM inp_dscenario_rules WHERE dscenario_id = '{dscenario_id}' AND id = '{rule_id}'"
+        else:
+            sql = f"SELECT * FROM v_edit_inp_rules WHERE id = '{rule_id}'"
         row = tools_db.get_row(sql)
         if not row:
             return
@@ -1925,7 +1991,7 @@ class GwNonVisual:
         tools_gw.set_config_parser('nonvisual_rules', 'chk_active', active)
 
 
-    def _accept_rules(self, dialog, is_new, rule_id):
+    def _accept_rules(self, dialog, is_new, rule_id, dscenario_id):
         """ Manage accept button (insert & update) """
 
         # Variables
@@ -1945,9 +2011,14 @@ class GwNonVisual:
                 return
             tools_qt.set_stylesheet(txt_text, style="")
 
-            # Insert inp_controls
-            sql = f"INSERT INTO inp_rules (sector_id,text,active)" \
-                  f"VALUES({sector_id}, {text}, {active})"
+            # Insert inp_dscenario_rules
+            if dscenario_id is not None:
+                sql = f"INSERT INTO inp_dscenario_rules (dscenario_id, sector_id, text, active)" \
+                      f"VALUES({dscenario_id}, {sector_id}, {text}, {active})"
+            # Insert inp_rules
+            else:
+                sql = f"INSERT INTO inp_rules (sector_id, text, active)" \
+                    f"VALUES({sector_id}, {text}, {active})"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting control."
@@ -1964,7 +2035,10 @@ class GwNonVisual:
 
             text = text.strip("'")
             text = text.replace("\n", "\\n")
-            fields = f"""{{"sector_id": {sector_id}, "active": "{active}", "text": "{text}"}}"""
+            fields = f""" "sector_id": {sector_id}, "active": "{active}", "text": "{text}" """
+            if dscenario_id is not None:
+                table_name = 'inp_dscenario_rules'
+            fields = f"""{{{fields}}}"""
 
             result = self._setfields(rule_id, table_name, fields)
             if not result:
@@ -2000,6 +2074,8 @@ class GwNonVisual:
         # Copy values from clipboard
         paste_shortcut = QShortcut(QKeySequence.Paste, tbl_timeseries_value)
         paste_shortcut.activated.connect(partial(self._paste_timeseries_values, tbl_timeseries_value))
+
+        self.dialog.txt_id.setMaxLength(16)
 
         # Populate combobox
         self._populate_timeser_combos(cmb_expl_id, cmb_times_type, cmb_timeser_type)
@@ -2528,7 +2604,7 @@ class GwNonVisual:
         # Show tabs
         for i in range(tab_lidlayers.count()):
             tab_name = tab_lidlayers.widget(i).objectName().upper()
-            
+
             # Set the first non-hidden tab selected
             if tab_name == lidtabs[0]:
                 tab_lidlayers.setCurrentIndex(i)

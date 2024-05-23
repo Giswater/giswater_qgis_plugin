@@ -154,13 +154,6 @@
       <string>Translate files</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="chk_db_msg">
-        <property name="text">
-         <string>Translate db messages</string>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="0">
        <widget class="QCheckBox" name="chk_refresh_i18n">
         <property name="text">
@@ -168,17 +161,27 @@
         </property>
        </widget>
       </item>
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="chk_missing_translations">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Check missing translations </string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="chk_db_msg">
+        <property name="text">
+         <string>Translate db messages</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
        <widget class="QCheckBox" name="chk_py_msg">
         <property name="text">
          <string>Translate ui and py messages</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QCheckBox" name="chk_missing_dbmessage">
-        <property name="text">
-         <string>Check missing dbmessage</string>
         </property>
        </widget>
       </item>

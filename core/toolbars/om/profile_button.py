@@ -557,14 +557,15 @@ class GwProfileButton(GwAction):
 
         # Save profile with dpi = 300
         plt.savefig(img_path, dpi=300)
-        
+
 
     def _set_profile_layout(self):
         """ Set properties of main window """
 
         # Set window name
         self.win = plt.gcf()
-        self.win.canvas.set_window_title('Draw Profile')
+        # FIXME: this doesn't work, but it doesn't crash either
+        self.win.canvas.setWindowTitle('Draw Profile')
 
         # Hide axes
         self.axes = plt.gca()

@@ -15,7 +15,7 @@ from ..maptool import GwMaptool
 from ...ui.ui_manager import GwFeatureReplaceUi, GwInfoWorkcatUi
 from ...shared.catalog import GwCatalog
 from ...utils import tools_gw
-from ....libs import tools_qt, tools_log, tools_qgis, tools_db
+from ....libs import tools_qt, tools_log, tools_qgis, tools_db, tools_os
 from .... import global_vars
 
 
@@ -253,6 +253,9 @@ class GwFeatureReplaceButton(GwMaptool):
                     rows = tools_db.get_rows(sql)
                     tools_qt.fill_combo_values(self.dlg_replace.featurecat_id, rows)
 
+        keep_epa_values = tools_gw.get_config_parser('btn_feature_replace', 'keep_epa_values', "user", "session")
+        tools_qt.set_checked(self.dlg_replace, 'keep_epa_values', tools_os.set_boolean(keep_epa_values))
+
         self.dlg_replace.feature_type_new.currentIndexChanged.connect(self._edit_change_elem_type_get_value)
         self.dlg_replace.btn_catalog.clicked.connect(partial(self._open_catalog, self.feature_type))
         self.dlg_replace.workcat_id_end.currentIndexChanged.connect(self._update_date)
@@ -399,6 +402,8 @@ class GwFeatureReplaceButton(GwMaptool):
         self.enddate_aux = dialog.enddate.date().toString('yyyy-MM-dd')
         feature_type_new = tools_qt.get_text(dialog, dialog.feature_type_new)
         featurecat_id = tools_qt.get_text(dialog, dialog.featurecat_id)
+        keep_epa_values = tools_qt.is_checked(self.dlg_replace, 'keep_epa_values')
+        tools_gw.set_config_parser('btn_feature_replace', 'keep_epa_values', str(tools_os.set_boolean(keep_epa_values)), "user", "session")
 
         # Check null values
         if feature_type_new in (None, 'null'):
@@ -412,10 +417,10 @@ class GwFeatureReplaceButton(GwMaptool):
             return
 
         # Ask question before executing
-        message = "Are you sure you want to replace selected feature with a new one?"
+        message = f"Are you sure you want to replace selected feature with a new one?\n " \
+                  f"If you have different addfields in your feature, they will be deleted."
         answer = tools_qt.show_question(message, "Replace feature")
         if answer:
-
             # Get function input parameters
             feature = f'"type":"{self.feature_type}"'
             extras = f'"old_feature_id":"{self.feature_id}"'
@@ -425,6 +430,7 @@ class GwFeatureReplaceButton(GwMaptool):
                 extras += f', "workcat_id_end":"{self.workcat_id_end_aux}"'
             extras += f', "enddate":"{self.enddate_aux}"'
             extras += f', "keep_elements":"{tools_qt.is_checked(dialog, "keep_elements")}"'
+            extras += f', "keep_epa_values":"{tools_qt.is_checked(dialog, "keep_epa_values")}"'
             body = tools_gw.create_body(feature=feature, extras=extras)
 
             # Execute SQL function and show result to the user

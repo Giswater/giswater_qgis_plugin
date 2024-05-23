@@ -117,9 +117,7 @@ class GwEpaFileManager(GwTask):
                 if self.complet_result.get('status') == "Accepted":
                     if 'body' in self.complet_result:
                         if 'data' in self.complet_result['body']:
-                            tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py' "
-                                               f"with parameters: '{self.dlg_go2epa}', '{self.complet_result['body']['data']}', "
-                                               f"'None', 'True', 'True', '1', close=False, call_set_tabs_enabled=False")
+                            tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py'")
                             tools_gw.add_layer_temp(self.dlg_go2epa, self.complet_result['body']['data'],
                                                     None, True, True, 1, True, close=False,
                                                     call_set_tabs_enabled=False)
@@ -128,9 +126,7 @@ class GwEpaFileManager(GwTask):
                 if self.rpt_result.get('status') == "Accepted":
                     if 'body' in self.rpt_result:
                         if 'data' in self.rpt_result['body']:
-                            tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py' "
-                                f"with parameters: '{self.dlg_go2epa}', '{self.rpt_result['body']['data']}', "
-                                               f"'None', 'True', 'True', '1', close=False, call_set_tabs_enabled=False")
+                            tools_log.log_info(f"Task 'Go2Epa' execute function 'def add_layer_temp' from 'tools_gw.py'")
 
                             tools_gw.add_layer_temp(self.dlg_go2epa, self.rpt_result['body']['data'],
                                                     None, True, True, 1, True, close=False,
@@ -140,7 +136,7 @@ class GwEpaFileManager(GwTask):
             if self.body:
                 sql += f"{self.body}"
             sql += f");"
-            tools_log.log_info(f"Task 'Go2Epa' manage json response with parameters: '{self.complet_result}', '{sql}', 'None'")
+            tools_log.log_info(f"Task 'Go2Epa' manage json response")
             tools_gw.manage_json_response(self.complet_result, sql, None)
 
             replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init",
@@ -218,8 +214,7 @@ class GwEpaFileManager(GwTask):
         main_json_result = None
         for step in range(1, 8):
             self.body = tools_gw.create_body(extras=(extras + f', "step": {step}'))
-            tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step {step} with parameters: "
-                               f"'gw_fct_pg2epa_main', '{self.body}', 'aux_conn={self.aux_conn}', 'is_thread=True'")
+            tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step {step}")
             json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
                                                      aux_conn=self.aux_conn, is_thread=True)
             self.step_completed.emit(json_result, "\n")
@@ -266,7 +261,7 @@ class GwEpaFileManager(GwTask):
             self.error_msg = f"{message}: INP file"
             return False
 
-        tools_log.log_info(f"Task 'Go2Epa' execute function 'def _fill_inp_file' with parameters: '{self.file_inp}', '{self.complet_result['body']['file']}'")
+        tools_log.log_info(f"Task 'Go2Epa' execute function 'def _fill_inp_file'")
         self._fill_inp_file(self.file_inp, self.complet_result['body']['file'])
         self.message = self.complet_result['message']['text']
         self.common_msg += "Export INP finished. "
@@ -384,7 +379,7 @@ class GwEpaFileManager(GwTask):
         status = False
         try:
             # Call import function
-            tools_log.log_info(f"Task 'Go2Epa' execute function 'def _read_rpt_file' with parameters: '{self.file_rpt}'")
+            tools_log.log_info(f"Task 'Go2Epa' execute function 'def _read_rpt_file'")
             status = self._read_rpt_file(self.file_rpt)
             if not status:
                 return False
@@ -396,30 +391,10 @@ class GwEpaFileManager(GwTask):
             return status
 
 
-    def _read_rpt_file(self, file_path=None):
+    def _read_rpt_file(self, file_path:str = None):
 
         replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init", prefix=False)
-        if tools_os.set_boolean(replace, default=False) and global_vars.project_type == 'ud':
-            # Replace the velocities
-            try:
-                # Read the contents of the file
-                with open(file_path, "r+", errors='replace') as file:
-                    contents = file.read()
-                # Save a backup of the file
-                with open(f"{file_path}.old", 'w', encoding='utf-8', errors='replace') as file:
-                    file.write(contents)
-                # Replace the words
-                old_contents = contents
-                contents = tools_os.ireplace('>50', '50', contents)
-                if contents != old_contents:
-                    self.replaced_velocities = True
-                # Write the file with new contents
-                with open(file_path, "r+", errors='replace') as file:
-                    file.write(contents)
-                with open(f"{file_path}", 'w', encoding='utf-8', errors='replace') as file:
-                    file.write(contents)
-            except Exception as e:
-                tools_log.log_error(f"Exception when replacing rpt velocities: {e}")
+        replace = tools_os.set_boolean(replace, default=False)
 
         self.file_rpt = open(file_path, "r+", errors='replace')
         full_file = self.file_rpt.readlines()
@@ -445,11 +420,16 @@ class GwEpaFileManager(GwTask):
         for line_number, row in enumerate(full_file):
 
             if self.isCanceled():
+                self._close_file()
+                del full_file
                 return False
 
             progress += 1
             if '**' in row or '--' in row:
                 continue
+
+            if replace and '>50' in row:
+                row = row.replace('>50', '50')
 
             row = row.rstrip()
             dirty_list = row.split(' ')
@@ -475,7 +455,7 @@ class GwEpaFileManager(GwTask):
                         sp_n.append(json_elem)
 
                     elif bool(re.search('(\d\..*\.\d)', str(dirty_list[x]))):
-                        if 'Version' not in dirty_list and 'VERSION' not in dirty_list:
+                        if not any(item in dirty_list for item in ['Version', 'VERSION', 'Input', 'INPUT']):
                             error_near = f"Error near line {line_number+1} -> {dirty_list}"
                             tools_log.log_info(error_near)
                             message = (f"The rpt file is not valid to import. "
@@ -483,6 +463,8 @@ class GwEpaFileManager(GwTask):
                                        f"Please ckeck and fix it before continue. \n"
                                        f"{error_near}")
                             self.error_msg = message
+                            self._close_file()
+                            del full_file
                             return False
                     elif bool(re.search('>50', str(dirty_list[x]))):
                         error_near = f"Error near line {line_number+1} -> {dirty_list}"
@@ -490,8 +472,11 @@ class GwEpaFileManager(GwTask):
                         message = (f"The rpt file is not valid to import. "
                                    f"Because velocity has not numeric value (>50), it seems you need to improve your simulation. "
                                    f"Please ckeck and fix it before continue. \n"
+                                   f"Note: You can force the import by activating the variable 'force_import_velocity_higher_50ms' on the init.config file. \n"
                                    f"{error_near}")
                         self.error_msg = message
+                        self._close_file()
+                        del full_file
                         return False
                     else:
                         sp_n.append(dirty_list[x])
@@ -532,6 +517,7 @@ class GwEpaFileManager(GwTask):
         self.json_rpt = json_rpt
 
         self._close_file()
+        del full_file
 
         return True
 

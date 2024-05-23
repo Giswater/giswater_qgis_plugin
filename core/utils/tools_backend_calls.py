@@ -12,6 +12,7 @@ import webbrowser
 
 from functools import partial
 from qgis.PyQt.QtCore import QDate, QRegExp, Qt
+from qgis.PyQt.QtGui import QStandardItemModel
 from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QLineEdit, QMessageBox, QTableView, QWidget, QDoubleSpinBox, QSpinBox
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer, QgsVectorLayer, QgsDataSourceUri
 from qgis.gui import QgsDateTimeEdit
@@ -168,6 +169,35 @@ def open_visit_manager(**kwargs):
     manage_visit.manage_visits(feature_type, feature_id)
 
 
+def open_visit(**kwargs):
+    dialog = kwargs['dialog']
+    complet_result = kwargs['complet_result']
+    func_params = kwargs['func_params']
+    feature_type = complet_result['body']['feature']['featureType']
+    feature_id = complet_result['body']['feature']['id']
+    qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(dialog, f"{func_params['targetwidget']}")
+
+    # Get selected rows
+    selected_list = qtable.selectionModel().selectedRows()
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        tools_qgis.show_warning(message)
+        return
+    elif len(selected_list) > 1:
+        message = "Select just one visit"
+        tools_qgis.show_warning(message)
+        return
+
+    # Get document path (can be relative or absolute)
+    index = selected_list[0]
+    row = index.row()
+    column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'])
+    visit_id = index.sibling(row, column_index).data()
+
+    manage_visit = GwVisit()
+    manage_visit.get_visit(visit_id, feature_type, feature_id)
+
+
 def manage_document(doc_id, **kwargs):
     """ Function called in class tools_gw.add_button(...) -->
         widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
@@ -195,6 +225,66 @@ def manage_document(doc_id, **kwargs):
     # If we are creating a new element
     else:
         doc.dlg_add_doc.btn_accept.clicked.connect(partial(_manage_document_new, doc, **kwargs))
+
+
+def manage_visit_class(**kwargs):
+    """ 
+    """
+    complet_result = kwargs['complet_result']
+    dialog = kwargs['dialog']
+    columnname = kwargs['columnname']
+    widget = kwargs['widget']
+    feature_id = complet_result['body']['feature']['id']
+    field_id = str(complet_result['body']['feature']['idName'])
+
+    current_visit_class = tools_gw.get_values(dialog, widget)
+    if current_visit_class[columnname] is None:
+        return
+    sql = f"SELECT ui_tablename FROM config_visit_class where id = {current_visit_class[columnname]}"
+    ui_tablename = tools_db.get_row(sql)
+    table_view = dialog.tab_main.currentWidget().findChildren(QTableView)
+    if table_view in (None, []):
+        return
+    table_view = table_view[0]
+    feature = f'"tableName":"{ui_tablename[0]}"'
+    filter_fields = f'"{field_id}": {{"filterSign":"=", "value":"{feature_id}"}}'
+    body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
+    json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
+    if json_result is None or json_result['status'] == 'Failed':
+        return False
+    complet_list = json_result
+    if not complet_list:
+        return False
+    if complet_list is False:
+        return False, False
+    # headers
+    headers = complet_list['body']['form'].get('headers')
+    non_editable_columns = []
+    if headers:
+        model = table_view.model()
+        if model is None:
+            model = QStandardItemModel()
+
+        # Related by Qtable
+        model.clear()
+        table_view.setModel(model)
+        table_view.horizontalHeader().setStretchLastSection(True)
+        # Non-editable columns
+        non_editable_columns = [item['header'] for item in headers if item.get('editable') is False]
+
+    # values
+    for field in complet_list['body']['data']['fields']:
+        if 'hidden' in field and field['hidden']: continue
+        model = table_view.model()
+        if model is None:
+            model = QStandardItemModel()
+            table_view.setModel(model)
+        model.removeRows(0, model.rowCount())
+
+        if field['value']:
+            table_view = tools_gw.add_tableview_header(table_view, field)
+            table_view = tools_gw.fill_tableview_rows(table_view, field)
+        tools_qt.set_tableview_config(table_view)
 
 
 def open_selected_path(**kwargs):
@@ -394,6 +484,36 @@ def set_style_mapzones(**kwargs):
     """ Function called in def get_actions_from_json(...) --> getattr(tools_backend_calls, f"{function_name}")(**params) """
 
     tools_gw.set_style_mapzones()
+
+
+def get_graph_config(**kwargs):
+    """ A function to call gw_fct_getgraphconfig """
+    """ Function called in def get_actions_from_json(...) --> getattr(tools_backend_calls, f"{function_name}")(**params) """
+
+    json_result = kwargs.get('json_result')
+    if not json_result or json_result.get('status') != "Accepted":
+        msg = "Function get_graph_config error: json_result from last function is invalid"
+        tools_log.log_warning(msg)
+        return
+
+    has_conflicts = json_result['body']['data'].get('hasConflicts')
+    if not has_conflicts:
+        return
+
+    netscenario_id = json_result['body']['data'].get('netscenarioId')
+    context = "NETSCENARIO" if netscenario_id else "OPERATIVE"
+    mapzone_type = json_result['body']['data'].get('graphClass')
+    if not mapzone_type:
+        msg = "Function get_graph_config error: missing key 'graphClass'"
+        tools_log.log_warning(msg)
+        return
+    extras = f'"context":"{context}", "mapzone": "{mapzone_type}"'
+    body = tools_gw.create_body(extras=extras)
+    json_result = tools_gw.execute_procedure('gw_fct_getgraphconfig', body)
+    if json_result is None:
+        msg = "Function get_graph_config error: gw_fct_getgraphconfig returned null"
+        tools_log.log_warning(msg)
+        return
 
 
 def add_query_layer(**kwargs):

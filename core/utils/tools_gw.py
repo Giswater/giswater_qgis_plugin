@@ -13,6 +13,7 @@ import random
 import re
 import sys
 import sqlite3
+from typing import Literal
 import webbrowser
 import xml.etree.ElementTree as ET
 
@@ -127,7 +128,7 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     parser = global_vars.configs[file_name][1]
 
     if plugin != 'core':
-        path = f"{lib_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config{os.sep}{file_name}.config"
+        path = f"{lib_vars.user_folder_dir}{os.sep}{plugin}{os.sep}core{os.sep}config{os.sep}{file_name}.config"
         parser = None
         chk_user_params = False
 
@@ -188,7 +189,7 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
     path = global_vars.configs[file_name][0]
 
     if plugin != 'core':
-        path = f"{lib_vars.user_folder_dir}{os.sep}{plugin}{os.sep}config{os.sep}{file_name}.config"
+        path = f"{lib_vars.user_folder_dir}{os.sep}{plugin}{os.sep}core{os.sep}config{os.sep}{file_name}.config"
         chk_user_params = False
 
     try:
@@ -824,7 +825,10 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
                 layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintUnique,
                                          QgsFieldConstraints.ConstraintStrengthHard)
 
-        if field.get('ismandatory') is False:
+        if field.get('ismandatory') is True:
+            layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintNotNull,
+                                     QgsFieldConstraints.ConstraintStrengthHard)
+        else:
             layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintNotNull,
                                      QgsFieldConstraints.ConstraintStrengthSoft)
 
@@ -877,6 +881,8 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
                         thread.message = f"ValueRelation for {thread.vr_errors} switched to ValueMap because " \
                                          f"layers {thread.vr_missing} are not present on QGIS project"
                     use_vr = False
+            else:
+                use_vr = False
 
         if not use_vr:
             # Manage new values in ValueMap
@@ -1189,7 +1195,7 @@ def set_style_mapzones():
             mode = mapzone['mode']
         except KeyError:  # backwards compatibility for database < 3.6.007
             mode = mapzone['status']
-			
+
         if mode == 'Disable' or lyr is None:
             continue
 
@@ -1698,21 +1704,20 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
 def add_checkbox(**kwargs):
     dialog = kwargs.get('dialog')
     field = kwargs.get('field')
-    is_tristate = kwargs.get('is_tristate')
     class_info = kwargs.get('class')
     connect_signal = kwargs.get('connectsignal')
 
     widget = QCheckBox()
     widget.setObjectName(field['widgetname'])
-    if 'widgetcontrols' in field and field['widgetcontrols']:
-        widget.setProperty('widgetcontrols', field['widgetcontrols'])
-    widget.setProperty('columnname', field['columnname'])
     if field.get('value') in ("t", "true", True):
         widget.setChecked(True)
-    if is_tristate:
-        widget.setTristate(is_tristate)
-        if field.get('value') == "":
-            widget.setCheckState(1)
+    if 'widgetcontrols' in field and field['widgetcontrols']:
+        widget.setProperty('widgetcontrols', field['widgetcontrols'])
+        if field['widgetcontrols'].get('tristate') in ("t", "true", True):
+            widget.setTristate(field['widgetcontrols'].get('tristate'))
+            if field.get('value') == "":
+                widget.setCheckState(1)
+    widget.setProperty('columnname', field['columnname'])
     if 'iseditable' in field:
         widget.setEnabled(field['iseditable'])
 
@@ -2216,6 +2221,7 @@ def get_actions_from_json(json_result, sql):
             try:
                 function_name = action['funcName']
                 params = action['params']
+                params['json_result'] = json_result
                 getattr(tools_backend_calls, f"{function_name}")(**params)
             except AttributeError as e:
                 # If function_name not exist as python function
@@ -2302,7 +2308,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
         log_sql = tools_os.set_boolean(dev_log_sql)
 
     # Execute database function
-    row = tools_db.get_row(sql, commit=commit, log_sql=log_sql, aux_conn=aux_conn)
+    row = tools_db.get_row(sql, commit=commit, log_sql=log_sql, aux_conn=aux_conn, is_thread=is_thread)
     if not row or not row[0]:
         tools_log.log_warning(f"Function error: {function_name}")
         tools_log.log_warning(sql)
@@ -2315,7 +2321,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
 
     # All functions called from python should return 'status', if not, something has probably failed in postrgres
     if 'status' not in json_result:
-        manage_json_exception(json_result, sql)
+        manage_json_exception(json_result, sql, is_thread=is_thread)
         return False
 
     # If failed, manage exception
@@ -2489,8 +2495,6 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
                 return
             for key, value in list(json_result['body']['data'].items()):
                 if key.lower() in ('point', 'line', 'polygon'):
-                    if key not in json_result['body']['data']:
-                        continue
 
                     # Remove the layer if it exists
                     layer_name = f'{key}'
@@ -2625,7 +2629,7 @@ def get_project_type(schemaname=None):
     return project_type
 
 
-def get_project_info(schemaname=None):
+def get_project_info(schemaname=None, order_direction="DESC"):
     """ Get project information from table 'sys_version' """
 
     project_info_dict = None
@@ -2642,7 +2646,7 @@ def get_project_info(schemaname=None):
 
     sql = (f"SELECT lower(project_type), epsg, giswater, language, date "
            f"FROM {schemaname}.{tablename} "
-           f"ORDER BY id DESC LIMIT 1")
+           f"ORDER BY id {order_direction} LIMIT 1")
     row = tools_db.get_row(sql)
     if row:
         project_info_dict = {'project_type': row[0],
@@ -3296,7 +3300,8 @@ def set_completer_object(dialog, tablename, field_id="id"):
     set_completer_widget(tablename, widget, field_id)
 
 
-def set_completer_widget(tablename, widget, field_id, add_id=False):
+def set_completer_widget(tablename, widget, field_id, add_id=False,
+                         filter_mode: tools_qt.QtMatchFlag = 'starts'):
     """ Set autocomplete of widget @table_object + "_id"
         getting id's from selected @table_object
     """
@@ -3312,7 +3317,7 @@ def set_completer_widget(tablename, widget, field_id, add_id=False):
            f" FROM {tablename}"
            f" ORDER BY {field_id}")
     rows = tools_db.get_rows(sql)
-    tools_qt.set_completer_rows(widget, rows)
+    tools_qt.set_completer_rows(widget, rows, filter_mode=filter_mode)
 
 
 def set_multi_completer_widget(tablenames: list, widget, fields_id: list, add_id=False):
@@ -3559,11 +3564,27 @@ def refresh_selectors(tab_name=None):
         try:
             dialog = windows[0]
             selector = dialog.property('GwSelector')
-            if tab_name is None:
-                tab_name = dialog.main_tab.widget(dialog.main_tab.currentIndex()).objectName()
-            selector.get_selector(dialog, '"selector_basic"', filter=True, current_tab=tab_name)
+            selector.open_selector(reload_dlg=dialog)
         except Exception:
             pass
+
+
+def execute_class_function(dlg_class, func_name: str, kwargs: dict = None):
+    """ Executes a class' function (if the corresponding dialog is open) """
+
+    # Get the dialog if it's open
+    windows = [x for x in QApplication.allWidgets() if getattr(x, "isVisible", False)
+               and (issubclass(type(x), dlg_class))]
+
+    if windows:
+        try:
+            if kwargs is None:
+                kwargs = {}
+            dialog = windows[0]
+            class_obj = dialog.property('class_obj')
+            getattr(class_obj, func_name)(**kwargs)
+        except Exception as e:
+            tools_log.log_debug(f"Exception in tools_gw.execute_class_function (executing {func_name} from {dlg_class.__name__}): {e}")
 
 
 def is_epa_world_active(default=False):
@@ -4150,6 +4171,8 @@ def _get_list(complet_result, form_name='', filter_fields='', widgetname='', for
               linkedobject=''):
 
     form = f'"formName":"{form_name}", "tabName":"tab_none", "widgetname":"{widgetname}", "formtype":"{formtype}"'
+    if linkedobject is None:
+        return
     feature = f'"tableName":"{linkedobject}"'
     filter_fields = ''
     body = create_body(form, feature, filter_fields)
@@ -4427,7 +4450,7 @@ def _manage_combo(**kwargs):
 def _manage_check(**kwargs):
     """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        """
+    """
 
     dialog = kwargs['dialog']
     field = kwargs['field']

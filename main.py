@@ -183,7 +183,7 @@ class Giswater(QObject):
         global_vars.init_global(self.iface, self.iface.mapCanvas(), plugin_dir, self.plugin_name, user_folder_dir)
 
         # Get gw_dev_mode variable
-        gw_dev_mode = QgsSettings().value('variables/gw_dev_mode')
+        gw_dev_mode = QgsSettings().value('variables/GwDevMode')
         gw_dev_mode = tools_os.set_boolean(gw_dev_mode, False)
         global_vars.gw_dev_mode = gw_dev_mode
 

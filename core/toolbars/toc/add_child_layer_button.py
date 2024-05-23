@@ -16,7 +16,7 @@ from qgis.PyQt.QtGui import QCursor
 
 from ..dialog import GwAction
 from ...utils import tools_gw
-from ....libs import tools_qgis
+from ....libs import tools_qgis, tools_qt
 
 
 class GwAddChildLayerButton(GwAction):
@@ -160,6 +160,9 @@ class GwAddChildLayerButton(GwAction):
         elif state == 0:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is not None:
-                tools_qgis.remove_layer_from_toc(alias, group, sub_group)
+                msg = "Remove layer from project?"
+                answer = tools_qt.show_question(msg, title="Warning", parameter=f"'{layer.name()}'", force_action=True)
+                if answer:
+                    tools_qgis.remove_layer_from_toc(layer.name(), group, sub_group)
 
     # endregion

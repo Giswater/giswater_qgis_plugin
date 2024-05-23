@@ -6,10 +6,12 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from functools import partial
+from typing import List
+from math import pi, sin, cos
 
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QDoubleValidator
-from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel
+from qgis.PyQt.QtGui import QDoubleValidator, QColor
+from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel, QgsWkbTypes, QgsMultiCurve, QgsPointXY
 from qgis.gui import QgsVertexMarker
 
 from ..maptool import GwMaptool
@@ -28,10 +30,14 @@ class GwAuxCircleAddButton(GwMaptool):
         self.cancel_circle = False
         self.layer_circle = None
         self.snap_to_selected_layer = False
+        self.rb_circle = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.LineGeometry)
+        self.rb_circle.setLineStyle(Qt.DashLine)
+        self.rb_circle.setColor(QColor(255, 0, 0, 150))
 
 
     def cancel(self):
 
+        self._reset_rubberbands()
         tools_gw.close_dialog(self.dlg_create_circle)
         self.cancel_map_tool()
         if self.layer_circle:
@@ -46,6 +52,7 @@ class GwAuxCircleAddButton(GwMaptool):
     def keyPressEvent(self, event):
 
         if event.key() == Qt.Key_Escape:
+            self._reset_rubberbands()
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
             return
@@ -143,7 +150,7 @@ class GwAuxCircleAddButton(GwMaptool):
                 if not lyr:
                     geom = f'geom_{alias.lower()}'
                     if tablename == 'v_edit_cad_auxcircle':
-                        geom = 'geom_polygon'
+                        geom = 'geom_multicurve'
                     tools_gw.add_layer_database(tablename, alias=alias, group="INVENTORY", sub_group="AUXILIAR", the_geom=geom)
 
 
@@ -157,11 +164,23 @@ class GwAuxCircleAddButton(GwMaptool):
         validator.setNotation(QDoubleValidator().StandardNotation)
         self.dlg_create_circle.radius.setValidator(validator)
 
+        self.dlg_create_circle.radius.textChanged.connect(partial(self._preview_circle, point))
         self.dlg_create_circle.btn_accept.clicked.connect(partial(self._get_radius, point))
         self.dlg_create_circle.btn_cancel.clicked.connect(self.cancel)
 
         tools_gw.open_dialog(self.dlg_create_circle, dlg_name='auxcircle')
         self.dlg_create_circle.radius.setFocus()
+
+
+    def _preview_circle(self, point, text):
+        self.rb_circle.reset(QgsWkbTypes.LineGeometry)
+        try:
+            radius = float(text)
+        except ValueError:
+            radius = 0.0
+        geom = QgsGeometry.fromPointXY(point).buffer(radius, 100)
+        self.rb_circle.addGeometry(geom)
+
 
 
     def _get_radius(self, point):
@@ -183,8 +202,36 @@ class GwAuxCircleAddButton(GwMaptool):
                         self.layer_circle.deleteFeature(feature.id())
 
             if not self.cancel_circle:
+
+                def _calculate_circle_points(center_point, radius) -> List[QgsPointXY]:
+
+                    points = []
+                    # Angle increment for each point
+                    angle_increment = pi / 2  # 90 degrees
+
+                    # Calculate points for each quadrant
+                    for i in range(4):
+                        angle = i * angle_increment
+                        cos_val = cos(angle)
+                        sin_val = sin(angle)
+                        x = center_point.x() + float(radius) * float(cos_val)
+                        y = center_point.y() + float(radius) * float(sin_val)
+                        points.append(QgsPointXY(x, y))
+
+                    return points
+
+                p0, p1, p2, p3 = _calculate_circle_points(point, self.radius)
+                multi_curve = QgsMultiCurve()
+                # Create WKT string for the MultiCurve
+                wkt = f"MULTICURVE (" \
+                f"    CIRCULARSTRING (" \
+                f"      {p0.x()} {p0.y()}, {p1.x()} {p1.y()}, {p2.x()} {p2.y()}, {p3.x()} {p3.y()}, {p0.x()} {p0.y()}" \
+                f"    )" \
+                f")"
+                multi_curve.fromWkt(wkt)
+
                 feature = QgsFeature()
-                feature.setGeometry(QgsGeometry.fromPointXY(point).buffer(float(self.radius), 100))
+                feature.setGeometry(multi_curve)
                 provider = self.layer_circle.dataProvider()
                 # Next line generate: WARNING    Attribute index 0 out of bounds [0;0]
                 # but all work ok
@@ -193,8 +240,10 @@ class GwAuxCircleAddButton(GwMaptool):
             self.layer_circle.commitChanges()
             self.layer_circle.dataProvider().reloadData()
             self.layer_circle.triggerRepaint()
+            self._reset_rubberbands()
 
         else:
+            self._reset_rubberbands()
             self.iface.actionPan().trigger()
             self.cancel_circle = False
             return
@@ -220,6 +269,7 @@ class GwAuxCircleAddButton(GwMaptool):
             self._init_create_circle_form(point)
 
         elif event.button() == Qt.RightButton:
+            self._reset_rubberbands()
             self.iface.actionPan().trigger()
             self.cancel_circle = True
             self.cancel_map_tool()
@@ -228,5 +278,10 @@ class GwAuxCircleAddButton(GwMaptool):
 
         if self.layer_circle:
             self.layer_circle.commitChanges()
+
+
+    def _reset_rubberbands(self):
+
+        tools_gw.reset_rubberband(self.rb_circle, QgsWkbTypes.LineGeometry)
 
     # endregion

@@ -24,6 +24,15 @@ class GwFlowExitButton(GwMaptool):
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
+    def clicked_event(self):
+
+        # Deactivate maptool if already active
+        if self == self.iface.mapCanvas().mapTool():
+            return self.cancel_map_tool()
+
+        super().clicked_event()
+
+
     def canvasMoveEvent(self, event):
 
         # Hide marker and get coordinates
@@ -78,12 +87,25 @@ class GwFlowExitButton(GwMaptool):
                 self.iface.setActiveLayer(layer)
 
 
+    def deactivate(self):
+
+        # Remove temporal layers
+        # tools_qgis.remove_layer_from_toc("Flowtrace node", "GW Temporal Layers")
+        # tools_qgis.remove_layer_from_toc("Flowtrace arc", "GW Temporal Layers")
+        # tools_qgis.clean_layer_group_from_toc("GW Temporal Layers")
+
+        super().deactivate()
+
+
     # endregion
 
 
     # region private functions
 
     def _set_flow_exit(self, event):
+
+        if event.button() == Qt.RightButton:
+            return self.cancel_map_tool()
 
         if event.button() == Qt.LeftButton and self.current_layer:
 
@@ -103,8 +125,5 @@ class GwFlowExitButton(GwMaptool):
 
             # Refresh map canvas
             self.refresh_map_canvas()
-
-            # Set action pan
-            self.set_action_pan()
 
     # endregion

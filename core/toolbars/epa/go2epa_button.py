@@ -14,7 +14,7 @@ from sip import isdeleted
 from time import time
 from datetime import timedelta
 
-from qgis.PyQt.QtCore import QStringListModel, Qt, QTimer
+from qgis.PyQt.QtCore import QStringListModel, Qt, QTimer, QRegularExpression
 from qgis.PyQt.QtWidgets import QWidget, QComboBox, QCompleter, QFileDialog, QTableView, QAbstractItemView, \
     QGroupBox, QSpacerItem, QSizePolicy, QGridLayout, QLabel, QTabWidget
 from qgis.core import QgsApplication
@@ -466,6 +466,40 @@ class GwGo2EpaButton(GwAction):
             self.completer.setModel(model)
 
 
+    def _refresh_go2epa_options(self, dialog):
+        """ Refresh widgets into layouts on go2epa_options form """
+        
+        if dialog:
+            for lyt in dialog.findChildren(QGridLayout, QRegularExpression('lyt_')):
+                i = 0
+                while i < lyt.count():
+                    item = lyt.itemAt(i)
+                    widget = item.widget()
+                    if widget:
+                        widget.deleteLater()
+                    else:  # for QSpacerItems
+                        lyt.removeItem(item)
+                    i += 1
+
+            form = '"formName":"epaoptions"'
+            body = tools_gw.create_body(form=form)
+            json_result = tools_gw.execute_procedure('gw_fct_getconfig', body)
+            if not json_result or json_result['status'] == 'Failed':
+                return False
+
+            tools_gw.build_dialog_options(
+                dialog, json_result['body']['form']['formTabs'], 0, self.epa_options_list)
+            grbox_list = dialog.findChildren(QGroupBox)
+            for grbox in grbox_list:
+                widget_list = grbox.findChildren(QWidget)
+                if len(widget_list) == 0:
+                    grbox.setVisible(False)
+                else:
+                    layout_list = grbox.findChildren(QGridLayout)
+                    for lyt in layout_list:
+                        spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+                        lyt.addItem(spacer)
+
     def _go2epa_options(self):
         """ Button 23: Open form to set INP, RPT and project """
 
@@ -475,6 +509,7 @@ class GwGo2EpaButton(GwAction):
         # Create dialog
         self.dlg_go2epa_options = GwGo2EpaOptionsUi()
         tools_gw.load_settings(self.dlg_go2epa_options)
+        self.dlg_go2epa_options.setProperty('GwGo2EpaButton', self)
 
         form = '"formName":"epaoptions"'
         body = tools_gw.create_body(form=form)
