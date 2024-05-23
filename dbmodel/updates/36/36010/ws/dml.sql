@@ -1847,3 +1847,7 @@ WHERE parameter in ('epa_automatic_inp2man_values','epa_automatic_man2graph_valu
 
 -- 20/05/2024
 update config_form_fields set iseditable=true where formname = 'v_edit_inp_dscenario_demand' and columnname = 'feature_id';
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"avg_press", "dataType":"float"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"avg_press", "dataType":"float"}}$$);

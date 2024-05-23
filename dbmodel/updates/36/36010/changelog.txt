@@ -14,3 +14,5 @@
 - Remove views v_expl_node and v_expl_arc
 - Enhance relation expl-sector / sector-expl on selector
 - New field meter_code on man_meter (WS)
+- Calculate avg_press on mapzones for corporate results
+- New fields avg_press on sector and presszone (WS)

@@ -654,3 +654,36 @@ CREATE OR REPLACE VIEW ve_pol_node AS
 
 DROP VIEW v_expl_node;
 DROP VIEW v_expl_arc;
+
+
+CREATE OR REPLACE VIEW v_edit_sector
+AS SELECT sector.sector_id,
+    sector.name,
+    sector.descript,
+    sector.macrosector_id,
+    sector.the_geom,
+    sector.undelete,
+    sector.graphconfig::text AS graphconfig,
+    sector.stylesheet::text AS stylesheet,
+    sector.active,
+    sector.parent_id,
+    sector.pattern_id,
+    sector.avg_press
+   FROM selector_sector,
+    sector
+  WHERE sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_edit_presszone
+AS SELECT presszone.presszone_id,
+    presszone.name,
+    presszone.expl_id,
+    presszone.the_geom,
+    presszone.graphconfig::text AS graphconfig,
+    presszone.head,
+    presszone.stylesheet::text AS stylesheet,
+    presszone.active,
+    presszone.descript,
+    presszone.avg_press
+   FROM selector_expl,
+    presszone
+  WHERE presszone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
