@@ -110,6 +110,7 @@ class GwImportInpTask(GwTask):
                                 VALUES (%s, %s)
                             """
                             cur.execute(sql, (self.catalogs[node_type], cat_feature))
+                            nodecat_db.append(self.catalogs[node_type])
 
                     # Create virtual arc catalogs
                     cur.execute("SELECT id FROM cat_arc")
@@ -148,6 +149,7 @@ class GwImportInpTask(GwTask):
                                 VALUES (%s, 'VARC', 'UNKNOWN', 999)
                             """
                             cur.execute(sql, (self.catalogs[varc_type],))
+                            arccat_db.append(self.catalogs[varc_type])
 
                     # Save patterns
                     cur.execute("SELECT pattern_id FROM inp_pattern")
