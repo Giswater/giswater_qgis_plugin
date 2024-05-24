@@ -217,7 +217,6 @@ BEGIN
 						EXECUTE 'UPDATE '||lower(rec_type.id)||' n SET state = 0, state_type = '||v_statetype_obsolete||' 
 						FROM plan_psector_x_'||lower(rec_type.id)||' p WHERE n.'||lower(rec_type.id)||'_id = p.'||lower(rec_type.id)||'_id 
 						AND p.state = 1 AND p.psector_id='||OLD.psector_id||' AND n.'||lower(rec_type.id)||'_id = '''||rec.id||''' AND n.state_type='||v_state_obsolete_planified||';';
-                    
 
 						GET DIAGNOSTICS v_affectrow = row_count;
 						IF v_affectrow=0 THEN
@@ -228,28 +227,12 @@ BEGIN
 								EXECUTE 'UPDATE gully SET arc_id=NULL WHERE arc_id='''||rec.id||''';';
 							END IF;
 
-							-- delete parent arcs
-							EXECUTE 'DELETE FROM arc n USING plan_psector_x_arc p WHERE n.arc_id = p.arc_id 
-							AND n.arc_id = '''||rec.id||''' AND (p.addparam::json)->>''arcDivide''=''parent'';';
-
-							GET DIAGNOSTICS v_affectrow = row_count;
-							IF v_affectrow=0 THEN
-
-								-- delete deprecated arcs
-								EXECUTE 'DELETE FROM arc n USING plan_psector_x_arc p WHERE n.arc_id = p.arc_id 
-								AND n.arc_id = '''||rec.id||''' AND (p.addparam::json)->>''nodeReplace''=''deprecated'';';
-
-								GET DIAGNOSTICS v_affectrow = row_count;
-								IF v_affectrow=0 THEN
-
-									-- set obsolete features where psector_x_* state is 0									
+									-- set obsolete features where psector_x_* state is 0
 									EXECUTE 'UPDATE '||lower(rec_type.id)||' n SET state = 0, state_type = '||v_statetype_obsolete||' 
 									FROM plan_psector_x_'||lower(rec_type.id)||' p WHERE n.'||lower(rec_type.id)||'_id = p.'||lower(rec_type.id)||'_id 
 									AND p.state = 0 AND p.psector_id='||OLD.psector_id||' AND n.'||lower(rec_type.id)||'_id = '''||rec.id||''';';
 
-								END IF;
-							END IF;	
-						END IF;		
+						END IF;
 					END IF;
 
 					IF lower(rec_type.id) IN ('connec', 'gully') THEN
