@@ -94,23 +94,25 @@ class GwImportInpTask(GwTask):
                     ]
 
                     for node_type, cat_feature in node_catalogs:
-                        if (
-                            node_type in self.catalogs
-                            and self.catalogs[node_type] not in nodecat_db
-                        ):
-                            sql = """
-                                INSERT INTO cat_feature (id, system_id, feature_type)
-                                VALUES (%s, %s, 'NODE')
-                                ON CONFLICT (id) DO NOTHING;
-                            """
-                            cur.execute(sql, (cat_feature, cat_feature))
+                        if node_type not in self.catalogs:
+                            continue
 
-                            sql = """
-                                INSERT INTO cat_node (id, nodetype_id)
-                                VALUES (%s, %s)
-                            """
-                            cur.execute(sql, (self.catalogs[node_type], cat_feature))
-                            nodecat_db.append(self.catalogs[node_type])
+                        if self.catalogs[node_type] in nodecat_db:
+                            continue
+
+                        sql = """
+                            INSERT INTO cat_feature (id, system_id, feature_type)
+                            VALUES (%s, %s, 'NODE')
+                            ON CONFLICT (id) DO NOTHING;
+                        """
+                        cur.execute(sql, (cat_feature, cat_feature))
+
+                        sql = """
+                            INSERT INTO cat_node (id, nodetype_id)
+                            VALUES (%s, %s)
+                        """
+                        cur.execute(sql, (self.catalogs[node_type], cat_feature))
+                        nodecat_db.append(self.catalogs[node_type])
 
                     # Create virtual arc catalogs
                     cur.execute("SELECT id FROM cat_arc")
@@ -121,35 +123,37 @@ class GwImportInpTask(GwTask):
                     varc_catalogs: list[str] = ["pumps", "valves"]
 
                     for varc_type in varc_catalogs:
-                        if (
-                            varc_type in self.catalogs
-                            and self.catalogs[varc_type] not in arccat_db
-                        ):
-                            # cat_mat_arc has an INSERT rule.
-                            # So it's not possible to use ON CONFLICT.
-                            # So, we perform a conditional INSERT here.
-                            cur.execute("""
-                                INSERT INTO cat_mat_arc (id, descript)
-                                SELECT 'UNKNOWN', 'Unknown'
-                                WHERE NOT EXISTS (
-                                    SELECT 1
-                                    FROM cat_mat_arc
-                                    WHERE id = 'UNKNOWN'
-                                );
-                            """)
+                        if varc_type not in self.catalogs:
+                            continue
 
-                            cur.execute("""
-                                INSERT INTO cat_feature (id, system_id, feature_type)
-                                VALUES ('VARC', 'VARC', 'ARC')
-                                ON CONFLICT (id) DO NOTHING;
-                            """)
+                        if self.catalogs[varc_type] in arccat_db:
+                            continue
 
-                            sql = """
-                                INSERT INTO cat_arc (id, arctype_id, matcat_id, dint)
-                                VALUES (%s, 'VARC', 'UNKNOWN', 999)
-                            """
-                            cur.execute(sql, (self.catalogs[varc_type],))
-                            arccat_db.append(self.catalogs[varc_type])
+                        # cat_mat_arc has an INSERT rule.
+                        # So it's not possible to use ON CONFLICT.
+                        # So, we perform a conditional INSERT here.
+                        cur.execute("""
+                            INSERT INTO cat_mat_arc (id, descript)
+                            SELECT 'UNKNOWN', 'Unknown'
+                            WHERE NOT EXISTS (
+                                SELECT 1
+                                FROM cat_mat_arc
+                                WHERE id = 'UNKNOWN'
+                            );
+                        """)
+
+                        cur.execute("""
+                            INSERT INTO cat_feature (id, system_id, feature_type)
+                            VALUES ('VARC', 'VARC', 'ARC')
+                            ON CONFLICT (id) DO NOTHING;
+                        """)
+
+                        sql = """
+                            INSERT INTO cat_arc (id, arctype_id, matcat_id, dint)
+                            VALUES (%s, 'VARC', 'UNKNOWN', 999)
+                        """
+                        cur.execute(sql, (self.catalogs[varc_type],))
+                        arccat_db.append(self.catalogs[varc_type])
 
                     # Create new pipe catalogs
                     if "pipes" in self.catalogs:
