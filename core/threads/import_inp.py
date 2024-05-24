@@ -111,6 +111,44 @@ class GwImportInpTask(GwTask):
                             """
                             cur.execute(sql, (self.catalogs[node_type], cat_feature))
 
+                    # Create virtual arc catalogs
+                    cur.execute("SELECT id FROM cat_arc")
+                    arccat_db: list[str] = []
+                    if cur.rowcount > 0:
+                        arccat_db = [x[0] for x in cur.fetchall()]
+
+                    varc_catalogs: list[str] = ["pumps", "valves"]
+
+                    for varc_type in varc_catalogs:
+                        if (
+                            varc_type in self.catalogs
+                            and self.catalogs[varc_type] not in arccat_db
+                        ):
+                            # cat_mat_arc has an INSERT rule.
+                            # So it's not possible to use ON CONFLICT.
+                            # So, we perform a conditional INSERT here.
+                            cur.execute("""
+                                INSERT INTO cat_mat_arc (id, descript)
+                                SELECT 'UNKNOWN', 'Unknown'
+                                WHERE NOT EXISTS (
+                                    SELECT 1
+                                    FROM cat_mat_arc
+                                    WHERE id = 'UNKNOWN'
+                                );
+                            """)
+
+                            cur.execute("""
+                                INSERT INTO cat_feature (id, system_id, feature_type)
+                                VALUES ('VARC', 'VARC', 'ARC')
+                                ON CONFLICT (id) DO NOTHING;
+                            """)
+
+                            sql = """
+                                INSERT INTO cat_arc (id, arctype_id, matcat_id, dint)
+                                VALUES (%s, 'VARC', 'UNKNOWN', 999)
+                            """
+                            cur.execute(sql, (self.catalogs[varc_type],))
+
                     # Save patterns
                     cur.execute("SELECT pattern_id FROM inp_pattern")
                     patterns_db: list[str] = []
