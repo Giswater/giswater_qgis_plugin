@@ -240,7 +240,7 @@ class GwImportInp(GwAction):
 
     def _importinp_accept(self):
         # Workcat
-        workcat: str = self.dlg_config.txt_workcat.text()
+        workcat: str = self.dlg_config.txt_workcat.text().strip()
 
         if workcat == "":
             message = "Please enter a Workcat_id to proceed with this import."
@@ -283,7 +283,7 @@ class GwImportInp(GwAction):
 
                 combo, new_catalog_cell = _input[element]
                 combo_value = combo.currentText()
-                new_catalog = new_catalog_cell.text()
+                new_catalog = new_catalog_cell.text().strip()
 
                 if combo_value == "":
                     message = "Please select a catalog item for all elements in the Nodes and Arcs tabs."
