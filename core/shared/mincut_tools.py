@@ -35,7 +35,7 @@ class GwMincutTools:
         self.schema_name = lib_vars.schema_name
         self.settings = global_vars.giswater_settings
 
-        self.rubber_band = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.PointGeometry)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas, "point")
 
     def set_dialog(self, dialog):
         self.dlg_mincut_man = dialog

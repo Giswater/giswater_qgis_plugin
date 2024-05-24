@@ -72,7 +72,7 @@ class GwConnectLinkButton(GwMaptool):
     def canvasPressEvent(self, event):
 
         self.select_rect.setRect(0, 0, 0, 0)
-        tools_gw.reset_rubberband(self.rubber_band, QgsWkbTypes.PolygonGeometry)
+        tools_gw.reset_rubberband(self.rubber_band, "polygon")
 
 
     def canvasReleaseEvent(self, event):
@@ -242,7 +242,7 @@ class GwConnectLinkButton(GwMaptool):
         ur = transform.toMapCoordinates(self.select_rect.right(), self.select_rect.top())
 
         # Rubber band
-        tools_gw.reset_rubberband(self.rubber_band, QgsWkbTypes.PolygonGeometry)
+        tools_gw.reset_rubberband(self.rubber_band, "polygon")
         self.rubber_band.addPoint(ll, False)
         self.rubber_band.addPoint(lr, False)
         self.rubber_band.addPoint(ur, False)

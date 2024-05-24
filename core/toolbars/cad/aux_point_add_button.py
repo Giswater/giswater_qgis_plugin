@@ -32,17 +32,17 @@ class GwAuxPointAddButton(GwMaptool):
         self.snap_to_selected_layer = False
         # RUBBERBANDS TO PREVIEW RESULT
         # Background points & line
-        self.rb_bg_point = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.PointGeometry)
+        self.rb_bg_point = tools_gw.create_rubberband(self.canvas, "point")
         self.rb_bg_point.setColor(QColor(0, 0, 0, 150))
-        self.rb_bg_line = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.LineGeometry)
+        self.rb_bg_line = tools_gw.create_rubberband(self.canvas, "line")
         self.rb_bg_line.setLineStyle(Qt.DashLine)
         self.rb_bg_line.setColor(QColor(0, 0, 0, 150))
         # Start point from where it will calculate final point
-        self.rb_start_point = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.PointGeometry)
+        self.rb_start_point = tools_gw.create_rubberband(self.canvas, "point")
         self.rb_start_point.setColor(QColor(0, 0, 255, 100))
         self.rb_start_point.setWidth(5)
         # Final point calculated
-        self.rb_final_point = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.PointGeometry)
+        self.rb_final_point = tools_gw.create_rubberband(self.canvas, "point")
         self.rb_final_point.setColor(QColor(255, 0, 0, 150))
         self.rb_final_point.setWidth(3)
         self.rb_final_point.setIcon(QgsRubberBand.ICON_X)
@@ -157,6 +157,11 @@ class GwAuxPointAddButton(GwMaptool):
         # Call parent method
         super().deactivate()
         self.iface.setActiveLayer(self.current_layer)
+        try:
+            self.iface.setActiveLayer(self.current_layer)
+        except RuntimeError:
+            pass
+
 
     # endregion
 
@@ -194,6 +199,7 @@ class GwAuxPointAddButton(GwMaptool):
         self.dlg_create_point.rb_left.toggled.connect(partial(self._preview_point, self.dlg_create_point, point_1, point_2))
         self.dlg_create_point.btn_accept.clicked.connect(partial(self._get_values, point_1, point_2))
         self.dlg_create_point.btn_cancel.clicked.connect(self.cancel)
+        self.dlg_create_point.rejected.connect(self.cancel)
 
         if tools_gw.get_config_parser('btn_auxpoint', "rb_left", "user", "session") in ("True", True):
             self.dlg_create_point.rb_left.setChecked(True)
@@ -206,7 +212,7 @@ class GwAuxPointAddButton(GwMaptool):
 
     def _preview_point(self, dialog, point1, point2):
 
-        self.rb_final_point.reset(QgsWkbTypes.PointGeometry)
+        tools_gw.reset_rubberband(self.rb_final_point, "point")
 
         value_x = tools_qt.get_text(dialog, 'dist_x')
         value_y = tools_qt.get_text(dialog, 'dist_y')
@@ -228,7 +234,8 @@ class GwAuxPointAddButton(GwMaptool):
         else:
             start_point = point2
 
-        self.rb_start_point.reset(QgsWkbTypes.PointGeometry)
+        tools_gw.reset_rubberband(self.rb_start_point, "point")
+
         self.rb_start_point.addPoint(start_point)
 
         # Calculate the vector from point1 to point2
@@ -302,6 +309,7 @@ class GwAuxPointAddButton(GwMaptool):
             self.iface.actionPan().trigger()
             self.cancel_point = False
             return
+        self._reset_rubberbands()
 
 
     def _add_aux_point(self, event):
@@ -324,15 +332,16 @@ class GwAuxPointAddButton(GwMaptool):
 
             if self.point_1 is None:
                 self.point_1 = point
-                self.rb_bg_line.reset(QgsWkbTypes.LineGeometry)
-                self.rb_bg_point.reset(QgsWkbTypes.PointGeometry)
+                tools_gw.reset_rubberband(self.rb_bg_line, "line")
+                tools_gw.reset_rubberband(self.rb_bg_point, "point")
                 self.rb_bg_point.addPoint(self.point_1)
             else:
                 self.point_2 = point
                 self.rb_bg_point.addPoint(self.point_2)
 
             if self.point_1 is not None and self.point_2 is not None:
-                self.rb_bg_line.reset(QgsWkbTypes.LineGeometry)
+                tools_gw.reset_rubberband(self.rb_bg_line, "line")
+
                 p1 = QgsPoint(self.point_1)
                 p2 = QgsPoint(self.point_2)
                 self.rb_bg_line.addGeometry(QgsGeometry.fromPolyline([p1, p2]))
@@ -353,9 +362,9 @@ class GwAuxPointAddButton(GwMaptool):
 
     def _reset_rubberbands(self):
 
-        tools_gw.reset_rubberband(self.rb_bg_point, QgsWkbTypes.PointGeometry)
-        tools_gw.reset_rubberband(self.rb_bg_line, QgsWkbTypes.LineGeometry)
-        tools_gw.reset_rubberband(self.rb_start_point, QgsWkbTypes.PointGeometry)
-        tools_gw.reset_rubberband(self.rb_final_point, QgsWkbTypes.PointGeometry)
+        tools_gw.reset_rubberband(self.rb_bg_point, "point")
+        tools_gw.reset_rubberband(self.rb_bg_line, "line")
+        tools_gw.reset_rubberband(self.rb_start_point, "point")
+        tools_gw.reset_rubberband(self.rb_final_point, "point")
 
     # endregion
