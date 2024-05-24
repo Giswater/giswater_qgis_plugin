@@ -335,6 +335,9 @@ BEGIN
 		
 		DELETE FROM temp_t_arc WHERE epa_type = 'TODELETE';
 
+		UPDATE temp_t_arc SET result_id = v_result WHERE result_id IS NULL;
+		UPDATE temp_t_node SET result_id = v_result WHERE result_id IS NULL;
+
 		-- deleting nodes without arcs
 		UPDATE temp_t_node t SET epa_type = 'TODELETE' FROM 
 		(SELECT id FROM temp_t_node LEFT JOIN (SELECT node_1 as node_id FROM temp_t_arc UNION SELECT node_2 FROM temp_t_arc) a USING (node_id) WHERE a.node_id IS NULL) a 
