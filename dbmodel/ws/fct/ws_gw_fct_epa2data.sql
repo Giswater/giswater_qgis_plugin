@@ -108,14 +108,15 @@ BEGIN
 			for v_mapzone in select unnest(array['dma', 'sector', 'presszone']) 
 			loop
 					
-				execute '
-				update '||v_mapzone||' d set avg_press = a.avg_press from (
+				execute 'update '||v_mapzone||' d set avg_press = a.avg_press from (
 				with cn as (
 					select na.node_id as feature_id, na.press_avg, n.'||v_mapzone||'_id::varchar from node_add na join node n using (node_id) 
 					union select ca.connec_id as feature_id, ca.press_avg, c.'||v_mapzone||'_id::varchar from connec_add ca join connec c using (connec_id)
 					) 
 				select round(avg(press_avg),2) as avg_press, '||v_mapzone||'_id::varchar from cn group by '||v_mapzone||'_id
-				)a where a.'||v_mapzone||'_id::varchar = d.'||v_mapzone||'_id::varchar';
+				)a where a.'||v_mapzone||'_id::varchar = d.'||v_mapzone||'_id::varchar
+				and d.'||v_mapzone||'_id in (select distinct '||v_mapzone||'_id from node where node_id 
+				in (select distinct node_id from rpt_node where result_id = '||quote_literal(v_result_id)||'))';
 					
 			end loop;
 		
