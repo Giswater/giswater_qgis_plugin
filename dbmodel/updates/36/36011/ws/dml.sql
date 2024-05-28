@@ -18,3 +18,4 @@ VALUES(3308, 'Create full Network dscenario', '{"featureType":[]}'::json, '[
 {"widgetname":"expl", "label":"Exploitation:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"dwf scenario type", "dvQueryText":"SELECT expl_id AS id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":3, "value":null}
 ]'::json, NULL, true, '{4}')
 ON CONFLICT (id) DO  NOTHING;
+

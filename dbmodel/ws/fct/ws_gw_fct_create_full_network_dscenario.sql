@@ -94,7 +94,7 @@ BEGIN
 	PERFORM setval('SCHEMA_NAME.cat_dscenario_dscenario_id_seq'::regclass,(SELECT max(dscenario_id) FROM cat_dscenario) ,true);
 
 	INSERT INTO cat_dscenario ( name, descript, dscenario_type, expl_id, log) 
-	VALUES ( v_name, v_descript, 'JOINED', v_expl, concat('Insert by ',current_user,' on ', substring(now()::text,0,20))) ON CONFLICT (name) DO NOTHING
+	VALUES ( v_name, v_descript, 'NETWORK', v_expl, concat('Insert by ',current_user,' on ', substring(now()::text,0,20))) ON CONFLICT (name) DO NOTHING
 	RETURNING dscenario_id INTO v_scenarioid;
 
 	IF v_scenarioid IS NULL THEN
@@ -115,6 +115,11 @@ BEGIN
 		FROM v_edit_inp_pipe;
 		GET DIAGNOSTICS v_affectrow = row_count;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat(v_affectrow, ' Pipe(s)'));
+		
+		INSERT INTO inp_dscenario_shortpipe SELECT v_scenarioid, node_id, minorloss, CASE WHEN closed is true then 'CLOSED' when status = 'CV' then 'CV' ELSE 'OPEN' END, 
+		null, null, bulk_coeff, wall_coeff FROM v_edit_inp_shortpipe JOIN man_valve USING (node_id);
+		GET DIAGNOSTICS v_affectrow = row_count;
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat(v_affectrow, ' Shortpipe(s)'));
 		
 		INSERT INTO inp_dscenario_tank SELECT v_scenarioid, node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow, 
 		mixing_model, mixing_fraction, reaction_coeff, init_quality, source_type, source_quality, source_pattern_id FROM v_edit_inp_tank;
