@@ -997,10 +997,13 @@ VALUES('value_verified', '2', 'IGNORE CHECK', NULL, NULL) ON CONFLICT (typevalue
 -- deprecate function gw_fct_import_addfields
 DELETE FROM sys_function WHERE id = 2516;
 DELETE FROM config_csv WHERE fid=236;
-DROP FUNCTION IF EXISTS gw_fct_import_addfields;;
+DROP FUNCTION IF EXISTS gw_fct_import_addfields;
 
 
 UPDATE sys_fprocess SET fprocess_name='Orphan rows on addfields values (DEPRECATED)' WHERE fid=256;
+
+UPDATE edit_typevalue SET id='0' WHERE typevalue='value_verified' AND id in ('TO REVIEW', 'PER REVISAR','PENDIENTE','A VERIFIE','REVER');
+UPDATE edit_typevalue SET id='1' WHERE typevalue='value_verified' AND id in ('VERIFIED', 'VERIFICAT','VERIFICADO','A VERIFIE','VERIFICADO');
 
 UPDATE config_param_user SET value = '0' WHERE parameter = 'edit_verified_vdefault' AND value IN ('TO REVIEW', 'PER REVISAR','PENDIENTE','A VERIFIE','REVER');
 UPDATE config_param_user SET value = '1' WHERE parameter = 'edit_verified_vdefault' AND value IN ('VERIFIED', 'VERIFICAT','VERIFICADO','A VERIFIE','VERIFICADO');
