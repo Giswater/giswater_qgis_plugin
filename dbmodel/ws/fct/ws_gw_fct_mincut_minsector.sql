@@ -263,19 +263,6 @@ BEGIN
 		v_message = ((((v_error_message::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text;
 	END IF;
 	
-	--DROP VIEW IF EXISTS v_t_anl_graph;
-	--DROP TABLE IF EXISTS temp_t_anlgraph;
-	--DROP TABLE IF EXISTS temp_t_node;
-	--DROP TABLE IF EXISTS temp_t_table;
-	--DROP TABLE IF EXISTS temp_t_data;
-	--DROP TABLE IF EXISTS temp_om_mincut;
-	--DROP TABLE IF EXISTS temp_om_mincut_node;
-	--DROP TABLE IF EXISTS temp_om_mincut_arc;
-	--DROP TABLE IF EXISTS temp_om_mincut_connec;
-	--DROP TABLE IF EXISTS temp_om_mincut_hydrometer;
-	--DROP TABLE IF EXISTS temp_om_mincut_valve;
-	--DROP TABLE IF EXISTS temp_t_mincut;	
-	
 	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
 	',"body":{"form":{}'||
 			',"data":{ '||

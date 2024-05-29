@@ -316,20 +316,20 @@ BEGIN
 	IF v_debug THEN RAISE NOTICE '12-Insert into om_mincut_hydrometer table ';	END IF;
 	
 	-- insert hydrometer from connec
-	INSERT INTO temp_om_mincut_hydrometer (result_id, hydrometer_id)
-	SELECT p_mincut_id,rtc_hydrometer_x_connec.hydrometer_id FROM rtc_hydrometer_x_connec 
-	JOIN temp_om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=temp_om_mincut_connec.connec_id 
-	JOIN connec ON temp_om_mincut_connec.connec_id=connec.connec_id
+	INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
+	SELECT result_id_arg,rtc_hydrometer_x_connec.hydrometer_id FROM rtc_hydrometer_x_connec 
+	JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id 
+	JOIN connec ON om_mincut_connec.connec_id=connec.connec_id
 	JOIN value_state_type v ON state_type = v.id
-	WHERE result_id=p_mincut_id AND v.is_operative=TRUE AND rtc_hydrometer_x_connec.connec_id=temp_om_mincut_connec.connec_id;
+	WHERE result_id=result_id_arg AND v.is_operative=TRUE AND rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id;
 
 	-- insert hydrometer from node
-	INSERT INTO temp_om_mincut_hydrometer (result_id, hydrometer_id)
-	SELECT p_mincut_id,rtc_hydrometer_x_node.hydrometer_id FROM rtc_hydrometer_x_node 
-	JOIN temp_om_mincut_node ON rtc_hydrometer_x_node.node_id=temp_om_mincut_node.node_id 
-	JOIN node ON temp_om_mincut_node.node_id=node.node_id
+	INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
+	SELECT result_id_arg,rtc_hydrometer_x_node.hydrometer_id FROM rtc_hydrometer_x_node 
+	JOIN om_mincut_node ON rtc_hydrometer_x_node.node_id=om_mincut_node.node_id 
+	JOIN node ON om_mincut_node.node_id=node.node_id
 	JOIN value_state_type v ON state_type = v.id
-	WHERE result_id=p_mincut_id AND v.is_operative=TRUE AND rtc_hydrometer_x_node.node_id=temp_om_mincut_node.node_id;
+	WHERE result_id=result_id_arg AND v.is_operative=TRUE AND rtc_hydrometer_x_node.node_id=om_mincut_node.node_id;
 
 	-- fill connnec & hydrometer details on om_mincut.output
 	-- count arcs
