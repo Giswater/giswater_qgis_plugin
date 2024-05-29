@@ -73,9 +73,11 @@ BEGIN
 
 	IF v_networkmode = 4 THEN
 	
-		EXECUTE ' INSERT INTO temp_t_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
+		EXECUTE ' INSERT INTO temp_t_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, 
+			dma_id, presszone_id, dqa_id, minsector_id, age)
 			SELECT DISTINCT ON (c.connec_id)
-			c.connec_id, elevation, elevation-depth as elev, ''CONNEC'', connecat_id, epa_type, c.sector_id, c.state, c.state_type, c.annotation, c.the_geom, c.expl_id, c.dma_id, c.presszone_id, c.dqa_id, c.minsector_id,
+			c.connec_id, elevation, elevation-depth as elev, ''CONNEC'', connecat_id, epa_type, c.sector_id, c.state, c.state_type, c.annotation, c.the_geom, c.expl_id, 
+			c.dma_id, c.presszone_id, c.dqa_id, c.minsector_id,
 			(case when c.builtdate is not null then (now()::date-c.builtdate)/30 else 0 end)
 			FROM selector_sector, v_edit_connec c
 			JOIN value_state_type ON id = state_type
@@ -85,34 +87,6 @@ BEGIN
 			AND epa_type = ''JUNCTION''
 			AND selector_sector.cur_user = "current_user"()::text '
 			||v_statetype;		
-	END IF;
-
-	IF v_forcereservoirsoninlets THEN
-
-		UPDATE temp_t_node SET epa_type = 'RESERVOIR' WHERE epa_type = 'INLET';
-
-	ELSIF v_forcetanksoninlets THEN
-
-		UPDATE temp_t_node SET epa_type = 'TANK' WHERE epa_type = 'INLET';
-	ELSE 
-
-		-- manage inlets as reservoir (when there are as many pipes as you want but all are related to same sector)
-		UPDATE temp_t_node SET epa_type = 'RESERVOIR' WHERE node_id IN (
-		SELECT node_id FROM (
-		SELECT a.sector_id, n1.node_id FROM temp_t_arc a JOIN temp_t_node n1 ON n1.node_id = node_1	WHERE n1.epa_type ='INLET'
-		UNION
-		SELECT a.sector_id, n2.node_id FROM temp_t_arc a JOIN temp_t_node n2 ON n2.node_id = node_2	WHERE n2.epa_type ='INLET')a
-		group by node_id
-		HAVING count(sector_id)=1);
-
-		-- manage inlets as tanks  (when there are as many pipes as you want and there are at least two sectors involved)
-		UPDATE temp_t_node SET epa_type = 'TANK' WHERE node_id IN (
-		SELECT node_id FROM (
-		SELECT a.sector_id, n1.node_id FROM temp_t_arc a JOIN temp_t_node n1 ON n1.node_id = node_1	WHERE n1.epa_type ='INLET'
-		UNION
-		SELECT a.sector_id, n2.node_id FROM temp_t_arc a JOIN temp_t_node n2 ON n2.node_id = node_2	WHERE n2.epa_type ='INLET')a
-		group by node_id
-		HAVING count(sector_id)>1);
 	END IF;
 
 	-- update child param for inp_reservoir

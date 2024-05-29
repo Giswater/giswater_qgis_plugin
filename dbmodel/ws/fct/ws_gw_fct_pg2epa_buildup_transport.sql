@@ -33,6 +33,9 @@ BEGIN
 			UPDATE temp_t_node SET epa_type  = 'RESERVOIR' WHERE node_id =  rec_node.node_id;
 		ELSE
 			UPDATE temp_t_node SET epa_type  = 'TANK' WHERE node_id =  rec_node.node_id;
+
+			UPDATE temp_t_node SET epa_type  = 'JUNCTION' WHERE node_id =  rec_node.node_id 
+			AND (addparam::json->>'diameter')::numeric=0 AND (addparam::json->>'maxlevel')::numeric=0;
 		END IF;
 	END LOOP;
 	
