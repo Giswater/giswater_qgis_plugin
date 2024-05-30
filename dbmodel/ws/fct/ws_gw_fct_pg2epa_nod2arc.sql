@@ -303,10 +303,25 @@ BEGIN
 		END LOOP;
 	END IF;
 
-	RAISE NOTICE ' Delete old node from node table';
+	
+	RAISE NOTICE ' Delete old node from node table and refactor endpoint shorpipe';
 	EXECUTE ' DELETE FROM temp_t_node WHERE epa_type =''TODELETE''';
 
+	-- get endpoint shorpipes and associated pipes and transform it in a simply node
+	CREATE TEMP TABLE temp_t_arc_endpoint AS
+	WITH query as (SELECT node_id FROM node JOIN
+	(SELECT count(*)as numarcs, node_id FROM node n JOIN 
+	(SELECT node_1 as node_id, arc_id, 'n1' as position FROM v_edit_inp_pipe 
+	UNION 
+	ALL SELECT node_2, arc_id , 'n2' FROM v_edit_inp_pipe) a using (node_id) group by n.node_id) a 
+	USING (node_id) WHERE a.numarcs = 1 AND epa_type ='SHORTPIPE')
+	SELECT arc_id,node_1 AS node_id FROM arc JOIN query ON query.node_id = node_1 
+	UNION
+	SELECT arc_id,node_2 FROM arc JOIN query ON query.node_id = node_2;
 
+	-- update the existing pipes
+	DELETE FROM temp_t_arc WHERE arc_id IN (SELECT concat(node_id,'_n2a') FROM temp_t_arc_endpoint);
+	
 	RAISE NOTICE ' Improve diameter';
 	
 	-- update nodarc diameter when is null, keeping possible values of inp_valve.diameter USING cat_node.dint
