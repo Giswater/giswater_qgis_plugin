@@ -19,3 +19,11 @@ VALUES(3308, 'Create full Network dscenario', '{"featureType":[]}'::json, '[
 ]'::json, NULL, true, '{4}')
 ON CONFLICT (id) DO  NOTHING;
 
+INSERT INTO config_graph_checkvalve SELECT node_id, to_arc, true FROM inp_shortpipe WHERE _status_ = 'CV' 
+ON CONFLICT (node_id) DO NOTHING;
+
+UPDATE config_form_fields SET iseditable=false, widgettype='text', dv_querytext=null where columnname = 'status' and formname IN ('v_edit_inp_shortpipe','ve_epa_shortpipe');
+
+ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+DELETE FROM inp_typevalue WHERE typevalue in ('inp_value_status_shortpipe');
+ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;

@@ -116,8 +116,7 @@ BEGIN
 		GET DIAGNOSTICS v_affectrow = row_count;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat(v_affectrow, ' Pipe(s)'));
 		
-		INSERT INTO inp_dscenario_shortpipe SELECT v_scenarioid, node_id, minorloss, CASE WHEN closed is true then 'CLOSED' when status = 'CV' then 'CV' ELSE 'OPEN' END, 
-		null, null, bulk_coeff, wall_coeff FROM v_edit_inp_shortpipe JOIN man_valve USING (node_id);
+		INSERT INTO inp_dscenario_shortpipe SELECT v_scenarioid, node_id, minorloss, status, null, null, bulk_coeff, wall_coeff FROM v_edit_inp_shortpipe;
 		GET DIAGNOSTICS v_affectrow = row_count;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat(v_affectrow, ' Shortpipe(s)'));
 		

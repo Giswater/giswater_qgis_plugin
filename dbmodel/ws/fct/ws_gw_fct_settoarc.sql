@@ -76,19 +76,14 @@ BEGIN
 
 	IF v_epatype = 'SHORTPIPE' THEN
 
-		UPDATE inp_shortpipe SET to_arc = v_arc_id WHERE node_id = v_feature_id AND status ='CV';
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, 
+		concat('Set to_arc for check-valve, ', v_feature_id, ' with value ',v_arc_id, '. and EPANET status with value ''CV'', '));
 
-		IF v_count > 0  THEN
+		INSERT INTO config_graph_checkvalve (node_id, to_arc, active) 
+		VALUES (v_feature_id, v_arc_id,TRUE) ON CONFLICT (node_id) DO UPDATE SET to_arc = v_arc_id;
 
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, 
-			concat('Set to_arc for check-valve, ', v_feature_id, ' with value ',v_arc_id, '. and EPANET status with value ''CV'', '));
-
-			INSERT INTO config_graph_checkvalve (node_id, to_arc, active) 
-			VALUES (v_feature_id, v_arc_id,TRUE) ON CONFLICT (node_id) DO UPDATE SET to_arc = v_arc_id;
-
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, 
-			concat('and set to_arc of config_graph_checkvalve for node ', v_feature_id, ' with value ',v_arc_id, '.'));
-		END IF;
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, 
+		concat('and set to_arc of config_graph_checkvalve for node ', v_feature_id, ' with value ',v_arc_id, '.'));
     
 	ELSIF v_epatype IN ('PUMP', 'VALVE') OR v_graphdelim IN ('SECTOR','PRESSZONE','DMA', 'DQA') THEN
 	    
