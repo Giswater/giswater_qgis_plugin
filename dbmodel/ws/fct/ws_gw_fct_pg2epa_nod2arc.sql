@@ -319,9 +319,15 @@ BEGIN
 	UNION
 	SELECT arc_id,node_2 FROM arc JOIN query ON query.node_id = node_2;
 
-	-- update the existing pipes
+	-- delete the nodarc not-used existing arcs
 	DELETE FROM temp_t_arc WHERE arc_id IN (SELECT concat(node_id,'_n2a') FROM temp_t_arc_endpoint);
 	
+	-- delete the nodarc not-used existing nodes
+	DELETE FROM temp_t_node WHERE node_id IN (SELECT concat(node_id,'_n2a_1') 
+	FROM temp_t_arc_endpoint) and node_id not in (select node_1 from temp_t_arc union select node_2 from temp_t_arc);
+	DELETE FROM temp_t_node WHERE node_id IN (SELECT concat(node_id,'_n2a_2') 
+	FROM temp_t_arc_endpoint) and node_id not in (select node_1 from temp_t_arc union select node_2 from temp_t_arc);
+
 	RAISE NOTICE ' Improve diameter';
 	
 	-- update nodarc diameter when is null, keeping possible values of inp_valve.diameter USING cat_node.dint
