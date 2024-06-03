@@ -50,8 +50,9 @@ class Catalogs:
     If a INP file doesn't have a type of node, its property receives `None`.
     """
 
-    db_arcs: list[str]
-    db_nodes: list[str]
+    db_arcs: dict[str, tuple[float, float]]
+    db_materials: dict[str, list[float]]
+    db_nodes: dict[str, str]
     inp_junctions: Optional[list[str]]
     inp_pipes: dict[tuple[float, float], list[str]]
     inp_pumps: Optional[list[str]]
@@ -87,6 +88,19 @@ class Catalogs:
                 _id: (float(dint), float(roughness)) for _id, dint, roughness in rows
             }
             db_arc_catalog = dict(sorted(unsorted_dict.items()))
+
+        # Get roughness catalog
+        rows = tools_db.get_rows("""
+                SELECT matcat_id, array_agg(roughness)
+                FROM cat_mat_roughness
+                GROUP BY matcat_id
+            """)
+        db_mat_roughness_cat: dict[str, list[float]] = {}
+        if rows:
+            unsorted_dict = {
+                _id: [float(x) for x in array_rough] for _id, array_rough in rows
+            }
+            db_mat_roughness_cat = dict(sorted(unsorted_dict.items()))
 
         # Get possible catalogs of the network
         junction_catalogs: Optional[list[str]] = (
@@ -137,6 +151,7 @@ class Catalogs:
 
         return cls(
             db_arc_catalog,
+            db_mat_roughness_cat,
             db_node_catalog,
             junction_catalogs,
             pipe_catalogs,

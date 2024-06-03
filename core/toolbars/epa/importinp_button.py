@@ -234,6 +234,26 @@ class GwImportInp(GwAction):
 
                 self.tbl_elements[element] = (combo_cat, new_cat_name)
 
+        # Fill materials table
+        tbl_material: QTableWidget = self.dlg_config.tbl_material
+
+        if self.catalogs.inp_pipes:
+            self.tbl_elements["materials"] = {}
+            roughnesses = {roughness for (_, roughness) in self.catalogs.inp_pipes}
+
+            for roughness in roughnesses:
+                row: int = tbl_material.rowCount()
+                tbl_material.setRowCount(row + 1)
+
+                first_column = QTableWidgetItem(str(roughness))
+                first_column.setFlags(Qt.ItemIsEnabled)
+                tbl_material.setItem(row, 0, first_column)
+
+                combo_mat = QComboBox()
+                tbl_material.setCellWidget(row, 1, combo_mat)
+
+                self.tbl_elements["materials"][roughness] = combo_mat
+
         self._fill_combo_boxes()
 
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
@@ -340,6 +360,7 @@ class GwImportInp(GwAction):
         tools_qt.fill_combo_values(cmb_sector, rows, add_empty=True)
         cmb_sector.setCurrentText(sector_value)
 
+        # Fill nodes and arcs tables
         elements = [
             ("junctions", self.catalogs.inp_junctions, self.catalogs.db_nodes),
             ("reservoirs", self.catalogs.inp_reservoirs, self.catalogs.db_nodes),
@@ -395,6 +416,33 @@ class GwImportInp(GwAction):
                         cat for cat in self.catalogs.db_arcs if cat not in pipe_catalog
                     )
                 combo.setCurrentText(old_value)
+
+        # Fill materials
+        for roughness, combo in self.tbl_elements["materials"].items():
+            material_catalog = [
+                mat
+                for mat, roughnesses in self.catalogs.db_materials.items()
+                if roughness in roughnesses
+            ]
+
+            old_value: str = combo.currentText()
+            combo.clear()
+            combo.addItem("")
+            if len(material_catalog) > 0:
+                combo.insertSeparator(combo.count())
+                combo.addItem("Recommended materials:")
+                combo.model().item(combo.count() - 1).setEnabled(False)
+                combo.addItems(material_catalog)
+            if len(self.catalogs.db_materials) > len(material_catalog):
+                combo.insertSeparator(combo.count())
+                combo.addItem("Other materials:")
+                combo.model().item(combo.count() - 1).setEnabled(False)
+                combo.addItems(
+                    mat
+                    for mat in self.catalogs.db_materials
+                    if mat not in material_catalog
+                )
+            combo.setCurrentText(old_value)
 
     def _toggle_enabled_new_catalog_field(
         self, field: QTableWidgetItem, text: str
