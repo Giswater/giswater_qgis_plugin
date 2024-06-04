@@ -252,7 +252,7 @@ class GwImportInp(GwAction):
                 combo_mat = QComboBox()
                 tbl_material.setCellWidget(row, 1, combo_mat)
 
-                self.tbl_elements["materials"][roughness] = combo_mat
+                self.tbl_elements["materials"][roughness] = (combo_mat,)
 
         self._fill_combo_boxes()
 
@@ -291,29 +291,35 @@ class GwImportInp(GwAction):
             return
 
         # Tables (Arcs and Nodes)
-        catalogs = {"pipes": {}}
+        catalogs = {"pipes": {}, "materials": {}}
 
         for _input, result in [
             (self.tbl_elements, catalogs),
             (self.tbl_elements["pipes"], catalogs["pipes"]),
+            (self.tbl_elements["materials"], catalogs["materials"]),
         ]:
             for element in _input:
-                if element == "pipes":
+                if element in ["pipes", "materials"]:
                     continue
 
-                combo, new_catalog_cell = _input[element]
+                combo = _input[element][0]
                 combo_value = combo.currentText()
-                new_catalog = new_catalog_cell.text().strip()
 
                 if combo_value == "":
-                    message = "Please select a catalog item for all elements in the Nodes and Arcs tabs."
+                    message = "Please select a catalog item for all elements in the tabs: Nodes, Arcs, Materials."
                     tools_qt.show_info_box(message)
                     return
 
-                if combo_value == CREATE_NEW and new_catalog == "":
-                    message = f'Please enter a new catalog name when the "{CREATE_NEW}" option is selected.'
-                    tools_qt.show_info_box(message)
-                    return
+                new_catalog = None
+
+                if len(_input[element]) > 1:
+                    new_catalog_cell = _input[element][1]
+                    new_catalog = new_catalog_cell.text().strip()
+
+                    if combo_value == CREATE_NEW and new_catalog == "":
+                        message = f'Please enter a new catalog name when the "{CREATE_NEW}" option is selected.'
+                        tools_qt.show_info_box(message)
+                        return
 
                 result[element] = (
                     new_catalog if combo_value == CREATE_NEW else combo_value
@@ -420,7 +426,7 @@ class GwImportInp(GwAction):
                 combo.setCurrentText(old_value)
 
         # Fill materials
-        for roughness, combo in self.tbl_elements["materials"].items():
+        for roughness, (combo,) in self.tbl_elements["materials"].items():
             material_catalog = [
                 mat
                 for mat, roughnesses in self.catalogs.db_materials.items()
