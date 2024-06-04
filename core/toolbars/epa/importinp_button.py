@@ -360,6 +360,8 @@ class GwImportInp(GwAction):
         tools_qt.fill_combo_values(cmb_sector, rows, add_empty=True)
         cmb_sector.setCurrentText(sector_value)
 
+        self.catalogs = Catalogs.from_network_model(self.parse_inp_task.network)
+
         # Fill nodes and arcs tables
         elements = [
             ("junctions", self.catalogs.inp_junctions, self.catalogs.db_nodes),
