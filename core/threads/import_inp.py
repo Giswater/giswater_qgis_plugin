@@ -199,20 +199,6 @@ class GwImportInpTask(GwTask):
                     if catalog in arccat_db:
                         continue
 
-                    sql = """
-                        INSERT INTO cat_mat_arc (id, descript)
-                        SELECT %s, %s
-                        WHERE NOT EXISTS (
-                            SELECT 1
-                            FROM cat_mat_arc
-                            WHERE id = %s::text
-                        );
-                    """
-                    description = f"Roughness {pipe_roughness}"
-                    execute_sql(
-                        sql, (pipe_roughness, description, pipe_roughness), commit=False
-                    )
-
                     execute_sql(
                         """
                         INSERT INTO cat_feature (id, system_id, feature_type)
@@ -222,18 +208,13 @@ class GwImportInpTask(GwTask):
                         commit=False,
                     )
 
-                    sql = """
-                        INSERT INTO cat_mat_roughness (matcat_id, roughness)
-                        VALUES (%s, %s)
-                        ON CONFLICT (matcat_id, init_age, end_age) DO NOTHING;
-                    """
-                    execute_sql(sql, (pipe_roughness, pipe_roughness), commit=False)
+                    material = self.catalogs["materials"][pipe_roughness]
 
                     sql = """
                         INSERT INTO cat_arc (id, arctype_id, matcat_id, dint)
                         VALUES (%s, 'PIPE', %s, %s);
                     """
-                    execute_sql(sql, (catalog, pipe_roughness, pipe_dint), commit=False)
+                    execute_sql(sql, (catalog, material, pipe_dint), commit=False)
                     arccat_db.append(catalog)
 
             # Save patterns
@@ -310,6 +291,7 @@ class GwImportInpTask(GwTask):
                         commit=False,
                     )
 
+            execute_sql("select 1", commit=True)
             return True
         except Exception as e:
             self.exception: str = traceback.format_exc()
