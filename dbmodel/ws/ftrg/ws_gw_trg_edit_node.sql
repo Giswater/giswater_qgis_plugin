@@ -644,8 +644,8 @@ BEGIN
 		--insert tank into config_graph_inlet
 		IF v_man_table='man_tank' THEN 
 			
-			INSERT INTO config_graph_inlet(node_id, expl_id, active)
-			VALUES (NEW.node_id, NEW.expl_id, TRUE);	
+			INSERT INTO config_graph_inlet(node_id, active)
+			VALUES (NEW.node_id, TRUE);	
 		END IF;
 
 		-- childtable insert
