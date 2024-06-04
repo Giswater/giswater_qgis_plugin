@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_shortpipe", "column":"status", "newName":"_status_"}}$$)
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_shortpipe", "column":"status", "newName":"_status_"}}$$);
 
 ALTER TABLE config_graph_inlet DROP CONSTRAINT config_graph_inlet_pkey;
 ALTER TABLE config_graph_inlet ADD CONSTRAINT config_graph_inlet_pkey PRIMARY KEY (node_id);
