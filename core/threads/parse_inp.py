@@ -97,8 +97,12 @@ class Catalogs:
             """)
         db_mat_roughness_cat: dict[str, list[float]] = {}
         if rows:
+
+            def tofloat(x):
+                return 0.0 if x is None else float(x)
+
             unsorted_dict = {
-                _id: [float(x) for x in array_rough] for _id, array_rough in rows
+                _id: [tofloat(x) for x in array_rough] for _id, array_rough in rows
             }
             db_mat_roughness_cat = dict(sorted(unsorted_dict.items()))
 
