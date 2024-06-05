@@ -43,7 +43,7 @@ class GwSelector:
                 reload_dlg.main_tab.currentWidget().verticalScrollBar().setValue(self.scrolled_amount)
             return
 
-        dlg_selector = GwSelectorUi()
+        dlg_selector = GwSelectorUi(self)
         tools_gw.load_settings(dlg_selector)
         dlg_selector.setProperty('GwSelector', self)
 

@@ -53,7 +53,7 @@ class GwNetscenarioManagerButton(GwAction):
         """ Open netscenario manager """
 
         # Main dialog
-        self.dlg_netscenario_manager = GwNetscenarioManagerUi()
+        self.dlg_netscenario_manager = GwNetscenarioManagerUi(self)
         tools_gw.load_settings(self.dlg_netscenario_manager)
 
         tools_gw.add_icon(self.dlg_netscenario_manager.btn_toc, "306", sub_folder="24x24")
@@ -341,7 +341,7 @@ class GwNetscenarioManagerButton(GwAction):
         self.selected_netscenario_type = index.sibling(row, column_index).data()
 
         # Create dialog
-        self.dlg_netscenario = GwNetscenarioUi()
+        self.dlg_netscenario = GwNetscenarioUi(self)
         tools_gw.load_settings(self.dlg_netscenario)
 
         # Add icons
@@ -673,7 +673,7 @@ class GwNetscenarioManagerButton(GwAction):
         result = json_result
 
         # Build dlg
-        self.props_dlg = GwInfoGenericUi()
+        self.props_dlg = GwInfoGenericUi(self)
         tools_gw.load_settings(self.props_dlg)
         self.my_json_add = {}
         tools_gw.build_dialog_info(self.props_dlg, result, my_json=self.my_json_add)

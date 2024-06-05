@@ -185,7 +185,7 @@ class GwAuxPointAddButton(GwMaptool):
     def _init_create_point_form(self, point_1=None, point_2=None):
 
         # Create the dialog and signals
-        self.dlg_create_point = GwAuxPointUi()
+        self.dlg_create_point = GwAuxPointUi(self)
         tools_gw.load_settings(self.dlg_create_point)
 
         validator = QDoubleValidator(-99999.99, 9999999.00, 3)

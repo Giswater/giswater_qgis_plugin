@@ -405,7 +405,7 @@ class GwInfo(QObject):
 
         tools_gw.draw_by_json(complet_result, self.rubber_band)
         # Dialog
-        self.dlg_generic = GwInfoGenericUi()
+        self.dlg_generic = GwInfoGenericUi(self)
         tools_gw.load_settings(self.dlg_generic)
         result = tools_gw.build_dialog_info(self.dlg_generic, complet_result, self.my_json)
 
@@ -470,7 +470,7 @@ class GwInfo(QObject):
         """
 
         # Dialog
-        self.dlg_cf = GwInfoFeatureUi(sub_tag)
+        self.dlg_cf = GwInfoFeatureUi(self, sub_tag)
         tools_gw.load_settings(self.dlg_cf)
 
         # Get widget controls
@@ -1082,7 +1082,7 @@ class GwInfo(QObject):
         tools_gw.reset_rubberband(self.rubber_band)
 
         if refresh_dialog is False:
-            dlg_interpolate = GwInterpolate()
+            dlg_interpolate = GwInterpolate(self)
             tools_gw.load_settings(dlg_interpolate)
         else:
             dlg_interpolate = refresh_dialog
@@ -1714,7 +1714,7 @@ class GwInfo(QObject):
 
     def _open_section_form(self):
 
-        dlg_sections = GwInfoCrossectUi()
+        dlg_sections = GwInfoCrossectUi(self)
         tools_gw.load_settings(dlg_sections)
 
         # Set dialog not resizable
@@ -2963,7 +2963,7 @@ class GwInfo(QObject):
         if json_result is None:
             return
 
-        dlg_generic = GwInfoGenericUi()
+        dlg_generic = GwInfoGenericUi(self)
         tools_gw.load_settings(dlg_generic)
 
         # Set signals
@@ -3466,7 +3466,7 @@ def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, force_action, **kwar
     result = json_result
 
     # Build dlg
-    info.add_dlg = GwInfoGenericUi()
+    info.add_dlg = GwInfoGenericUi(info)
     tools_gw.load_settings(info.add_dlg)
     info.my_json_add = {}
     tools_gw.build_dialog_info(info.add_dlg, result, my_json=info.my_json_add)
@@ -4146,6 +4146,7 @@ def open_visit_document(**kwargs):
     """ Open document of selected record of the table """
 
     # search visit_id in table (targetwidget, columnfind)
+    class_obj = kwargs['class']
     func_params = kwargs['func_params']
     qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(kwargs['dialog'], f"{func_params.get('targetwidget')}")
     # Get selected rows
@@ -4200,7 +4201,7 @@ def open_visit_document(**kwargs):
 
     else:
         # If more then one document is attached open dialog with list of documents
-        dlg_load_doc = GwVisitDocumentUi()
+        dlg_load_doc = GwVisitDocumentUi(class_obj)
         tools_gw.load_settings(dlg_load_doc)
         dlg_load_doc.rejected.connect(partial(tools_gw.close_dialog, dlg_load_doc))
 
@@ -4293,7 +4294,7 @@ def open_visit_event(**kwargs):
             def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]) ->
                                         widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
     """
-
+    class_obj = kwargs['class']
     dialog = kwargs['dialog']
     func_params = kwargs['func_params']
     qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(dialog, f"{func_params.get('targetwidget')}")
@@ -4318,7 +4319,7 @@ def open_visit_event(**kwargs):
     event_id = ids['event_id']
 
     # Open dialog event_standard
-    dlg_event_full = GwVisitEventFullUi()
+    dlg_event_full = GwVisitEventFullUi(class_obj)
     tools_gw.load_settings(dlg_event_full)
     dlg_event_full.rejected.connect(partial(tools_gw.close_dialog, dlg_event_full))
     # Get all data for one visit

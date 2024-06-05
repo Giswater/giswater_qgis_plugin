@@ -24,6 +24,6 @@ class GwMincutButton(GwAction):
 
     def clicked_event(self):
 
-        self.mincut.set_dialog(GwMincutUi())
+        self.mincut.set_dialog(GwMincutUi(self))
         self.mincut.get_mincut()
 

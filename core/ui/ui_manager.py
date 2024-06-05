@@ -91,10 +91,10 @@ class GwGalleryZoomUi(GwDialog, FORM_CLASS):
 FORM_CLASS = _get_ui_class('mincut.ui', 'om')
 class GwMincutUi(GwMainWindow, FORM_CLASS):
 
-    def __init__(self):
+    def __init__(self, class_obj):
         self.closeMainWin = False
         self.mincutCanceled = True
-        super().__init__()
+        super().__init__(class_obj)
 
 FORM_CLASS = _get_ui_class('mincut_connec.ui', 'om')
 class GwMincutConnecUi(GwDialog, FORM_CLASS):

@@ -279,7 +279,7 @@ class GwAdminButton:
         """ Executed when option 'Import INP data' has been selected """
 
         # Create dialog
-        self.dlg_import_inp = GwAdminImportUi()
+        self.dlg_import_inp = GwAdminImportUi(self)
         tools_gw.load_settings(self.dlg_import_inp)
 
         # Hide widgets
@@ -391,7 +391,7 @@ class GwAdminButton:
     def init_dialog_create_project(self, project_type=None):
         """ Initialize dialog (only once) """
 
-        self.dlg_readsql_create_project = GwAdminDbProjectUi()
+        self.dlg_readsql_create_project = GwAdminDbProjectUi(self)
         tools_gw.load_settings(self.dlg_readsql_create_project)
         self.dlg_readsql_create_project.btn_cancel_task.hide()
 
@@ -681,7 +681,7 @@ class GwAdminButton:
         self.dev_commit = global_vars.gw_dev_mode
 
         # Create dialog object
-        self.dlg_readsql = GwAdminUi()
+        self.dlg_readsql = GwAdminUi(self)
         tools_gw.load_settings(self.dlg_readsql)
         self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
 
@@ -1035,7 +1035,7 @@ class GwAdminButton:
             return
 
         # Create GIS project dialog
-        self.dlg_create_gis_project = GwAdminGisProjectUi()
+        self.dlg_create_gis_project = GwAdminGisProjectUi(self)
         tools_gw.load_settings(self.dlg_create_gis_project)
 
         # Set default values
@@ -1433,7 +1433,7 @@ class GwAdminButton:
         """"""
 
         # Create dialog
-        self.dlg_readsql_show_info = GwAdminProjectInfoUi()
+        self.dlg_readsql_show_info = GwAdminProjectInfoUi(self)
         tools_gw.load_settings(self.dlg_readsql_show_info)
 
         info_updates = self.dlg_readsql_show_info.findChild(QTextEdit, 'info_updates')
@@ -1742,7 +1742,7 @@ class GwAdminButton:
             return
 
         # Create dialog
-        self.dlg_readsql_rename = GwAdminRenameProjUi()
+        self.dlg_readsql_rename = GwAdminRenameProjUi(self)
         tools_gw.load_settings(self.dlg_readsql_rename)
 
         schema = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
@@ -1897,7 +1897,7 @@ class GwAdminButton:
         """"""
 
         # Create dialog
-        self.dlg_readsql_copy = GwAdminRenameProjUi()
+        self.dlg_readsql_copy = GwAdminRenameProjUi(self)
         tools_gw.load_settings(self.dlg_readsql_copy)
 
         schema = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
@@ -2065,7 +2065,7 @@ class GwAdminButton:
     def _build_replace_dlg(self, replace_json):
 
         # Build the dialog
-        self.dlg_replace = GwReplaceInFileUi()
+        self.dlg_replace = GwReplaceInFileUi(self)
         self.dlg_replace.setWindowFlags(Qt.WindowStaysOnTopHint)
         tools_gw.load_settings(self.dlg_replace)
 
@@ -2312,7 +2312,7 @@ class GwAdminButton:
         """"""
 
         # Create the dialog and signals
-        self.dlg_manage_fields = GwAdminFieldsUi()
+        self.dlg_manage_fields = GwAdminFieldsUi(self)
         tools_gw.load_settings(self.dlg_manage_fields)
         self.model_update_table = None
 
@@ -2369,7 +2369,7 @@ class GwAdminButton:
 
         # Create the dialog and signals
         self._close_dialog_admin(self.dlg_manage_fields)
-        self.dlg_manage_fields = GwAdminFieldsUi()
+        self.dlg_manage_fields = GwAdminFieldsUi(self)
         tools_gw.load_settings(self.dlg_manage_fields)
         self.model_update_table = None
 
@@ -2894,7 +2894,7 @@ class GwAdminButton:
     def _create_credentials_form(self, set_connection):
         """"""
 
-        self.dlg_credentials = GwCredentialsUi()
+        self.dlg_credentials = GwCredentialsUi(self)
         tools_gw.load_settings(self.dlg_credentials)
         if str(self.list_connections) != '[]':
             tools_qt.fill_combo_values(self.dlg_credentials.cmb_connection, self.list_connections)
@@ -2952,7 +2952,7 @@ class GwAdminButton:
         try:
             tools_gw.close_docker('admin_position')
             lib_vars.session_vars['docker_type'] = 'qgis_form_docker'
-            lib_vars.session_vars['dialog_docker'] = GwDocker()
+            lib_vars.session_vars['dialog_docker'] = GwDocker(self)
             lib_vars.session_vars['dialog_docker'].dlg_closed.connect(partial(tools_gw.close_docker, 'admin_position'))
             tools_gw.manage_docker_options('admin_position')
             tools_gw.docker_dialog(self.dlg_readsql)

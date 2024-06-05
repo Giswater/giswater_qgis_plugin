@@ -71,7 +71,7 @@ class GwNonVisual:
         """ Opens Non-Visual objects manager. Called from 'Non-Visual object manager' button. """
 
         # Get dialog
-        self.manager_dlg = GwNonVisualManagerUi()
+        self.manager_dlg = GwNonVisualManagerUi(self)
         tools_gw.load_settings(self.manager_dlg)
 
         # Make and populate tabs
@@ -439,7 +439,7 @@ class GwNonVisual:
         """ Opens dialog for roughness """
 
         # Get dialog
-        self.dialog = GwNonVisualRoughnessUi()
+        self.dialog = GwNonVisualRoughnessUi(self)
         tools_gw.load_settings(self.dialog)
 
         # Populate sector id combobox
@@ -620,7 +620,7 @@ class GwNonVisual:
         """ Opens dialog for curve """
 
         # Get dialog
-        self.dialog = GwNonVisualCurveUi()
+        self.dialog = GwNonVisualCurveUi(self)
         tools_gw.load_settings(self.dialog)
 
         # Create plot widget
@@ -710,7 +710,7 @@ class GwNonVisual:
         """ Opens dialog for curve """
 
         # Get dialog
-        self.dialog = GwNonVisualCurveUi()
+        self.dialog = GwNonVisualCurveUi(self)
         tools_gw.load_settings(self.dialog)
 
         # Create plot widget
@@ -1140,9 +1140,9 @@ class GwNonVisual:
 
         # Get dialog
         if global_vars.project_type == 'ws':
-            self.dialog = GwNonVisualPatternWSUi()
+            self.dialog = GwNonVisualPatternWSUi(self)
         elif global_vars.project_type == 'ud':
-            self.dialog = GwNonVisualPatternUDUi()
+            self.dialog = GwNonVisualPatternUDUi(self)
         else:
             tools_log.log_warning(f"get_patterns: project type '{global_vars.project_type}' not supported")
             return
@@ -1777,7 +1777,7 @@ class GwNonVisual:
         """ Opens dialog for controls """
 
         # Get dialog
-        self.dialog = GwNonVisualControlsUi()
+        self.dialog = GwNonVisualControlsUi(self)
         tools_gw.load_settings(self.dialog)
 
         # Populate sector id combobox
@@ -1917,7 +1917,7 @@ class GwNonVisual:
         """ Opens dialog for rules """
 
         # Get dialog
-        self.dialog = GwNonVisualRulesUi()
+        self.dialog = GwNonVisualRulesUi(self)
         tools_gw.load_settings(self.dialog)
 
         # Populate sector id combobox
@@ -2058,7 +2058,7 @@ class GwNonVisual:
         """ Opens dialog for timeseries """
 
         # Get dialog
-        self.dialog = GwNonVisualTimeseriesUi()
+        self.dialog = GwNonVisualTimeseriesUi(self)
         tools_gw.load_settings(self.dialog)
 
         # Variables
@@ -2423,7 +2423,7 @@ class GwNonVisual:
         """ Opens dialog for lids """
 
         # Get dialog
-        self.dialog = GwNonVisualLidsUi()
+        self.dialog = GwNonVisualLidsUi(self)
 
         # Set dialog not resizable
         self.dialog.setFixedSize(self.dialog.size())

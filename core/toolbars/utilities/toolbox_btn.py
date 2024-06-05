@@ -51,7 +51,7 @@ class GwToolBoxButton(GwAction):
 
     def open_function_by_id(self, func_id, connect_signal=None, aux_params="null"):
 
-        self.dlg_functions = GwToolboxManagerUi()
+        self.dlg_functions = GwToolboxManagerUi(self)
         tools_gw.load_settings(self.dlg_functions)
         self.dlg_functions.progressBar.setVisible(False)
         self.dlg_functions.btn_cancel.hide()
@@ -169,7 +169,7 @@ class GwToolBoxButton(GwAction):
             tools_qgis.show_warning("Function not found in database", parameter=function_name)
             return
 
-        self.dlg_toolbox = GwToolboxUi('toolbox')
+        self.dlg_toolbox = GwToolboxUi(self, 'toolbox')
         self.dlg_toolbox.trv.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.dlg_toolbox.trv.setHeaderHidden(True)
 
@@ -224,7 +224,7 @@ class GwToolBoxButton(GwAction):
                 vdefault = json.loads(vdefault.replace("'", '"'))
                 self.queryAdd = vdefault.get('queryAdd')
 
-            self.dlg_reports = GwToolboxReportsUi()
+            self.dlg_reports = GwToolboxReportsUi(self)
             tools_gw.load_settings(self.dlg_reports)
 
             # Set description & query labels
@@ -264,7 +264,7 @@ class GwToolBoxButton(GwAction):
 
         elif 'processes' in index.parent().parent().data().lower():
 
-            self.dlg_functions = GwToolboxManagerUi()
+            self.dlg_functions = GwToolboxManagerUi(self)
             tools_gw.load_settings(self.dlg_functions)
             self.dlg_functions.progressBar.setVisible(False)
             self.dlg_functions.btn_cancel.hide()

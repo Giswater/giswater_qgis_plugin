@@ -96,7 +96,7 @@ class GwProfileButton(GwAction):
         self._remove_selection()
 
         # Set dialog
-        self.dlg_draw_profile = GwProfileUi()
+        self.dlg_draw_profile = GwProfileUi(self)
         tools_gw.load_settings(self.dlg_draw_profile)
         self.dlg_draw_profile.setWindowFlags(Qt.WindowStaysOnTopHint)
 
@@ -266,7 +266,7 @@ class GwProfileButton(GwAction):
     def _open_profile(self):
         """ Open dialog profile_list.ui """
 
-        self.dlg_load = GwProfilesListUi()
+        self.dlg_load = GwProfilesListUi(self)
         tools_gw.load_settings(self.dlg_load)
 
         # Get profils on database

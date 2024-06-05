@@ -39,7 +39,7 @@ class GwFeatureDeleteButton(GwAction):
     def clicked_event(self):
 
         # Create the dialog and signals
-        self.dlg_feature_delete = GwFeatureDeleteUi()
+        self.dlg_feature_delete = GwFeatureDeleteUi(self)
         tools_gw.load_settings(self.dlg_feature_delete)
 
         # Populate combo feature type

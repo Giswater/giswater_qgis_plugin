@@ -121,7 +121,7 @@ class GwDscenarioManagerButton(GwAction):
     def _open_hydrology_manager(self):
         """"""
         # Main dialog
-        self.dlg_hydrology_manager = GwDscenarioManagerUi()
+        self.dlg_hydrology_manager = GwDscenarioManagerUi(self)
         tools_gw.load_settings(self.dlg_hydrology_manager)
 
         # Manage btn create
@@ -169,7 +169,7 @@ class GwDscenarioManagerButton(GwAction):
     def _open_dwf_manager(self):
         """"""
         # Main dialog
-        self.dlg_dwf_manager = GwDscenarioManagerUi()
+        self.dlg_dwf_manager = GwDscenarioManagerUi(self)
         tools_gw.load_settings(self.dlg_dwf_manager)
 
         # Manage btn create
@@ -220,7 +220,7 @@ class GwDscenarioManagerButton(GwAction):
         """ Open dscenario manager """
 
         # Main dialog
-        self.dlg_dscenario_manager = GwDscenarioManagerUi()
+        self.dlg_dscenario_manager = GwDscenarioManagerUi(self)
         tools_gw.load_settings(self.dlg_dscenario_manager)
 
         tools_gw.add_icon(self.dlg_dscenario_manager.btn_toc, "306", sub_folder="24x24")
@@ -480,7 +480,7 @@ class GwDscenarioManagerButton(GwAction):
         self.selected_dscenario_type = index.sibling(row, column_index).data()
 
         # Create dialog
-        self.dlg_dscenario = GwDscenarioUi()
+        self.dlg_dscenario = GwDscenarioUi(self)
         tools_gw.load_settings(self.dlg_dscenario)
 
         # Add icons
@@ -843,7 +843,7 @@ class GwDscenarioManagerButton(GwAction):
         result = json_result
 
         # Build dlg
-        self.props_dlg = GwInfoGenericUi()
+        self.props_dlg = GwInfoGenericUi(self)
         tools_gw.load_settings(self.props_dlg)
         self.my_json_add = {}
         tools_gw.build_dialog_info(self.props_dlg, result, my_json=self.my_json_add)
@@ -1208,7 +1208,7 @@ class GwDscenarioManagerButton(GwAction):
 
     def _build_generic_info(self, dlg_title, result, tablename, field_id, force_action=None):
         # Build dlg
-        self.add_dlg = GwInfoGenericUi()
+        self.add_dlg = GwInfoGenericUi(self)
         tools_gw.load_settings(self.add_dlg)
         self.my_json_add = {}
         tools_gw.build_dialog_info(self.add_dlg, result, my_json=self.my_json_add)

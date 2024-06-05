@@ -67,8 +67,7 @@ class GwPsector:
             self.sys_currency = json.loads(row[0], object_pairs_hook=OrderedDict)
 
         # Create the dialog and signals
-        self.dlg_plan_psector = GwPsectorUi()
-        self.dlg_plan_psector.setProperty('class_obj', self)
+        self.dlg_plan_psector = GwPsectorUi(self)
         tools_gw.load_settings(self.dlg_plan_psector)
 
         # Manage btn toggle
@@ -569,7 +568,7 @@ class GwPsector:
 
         default_file_name = tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.name)
 
-        self.dlg_psector_rapport = GwPsectorRapportUi()
+        self.dlg_psector_rapport = GwPsectorRapportUi(self)
         tools_gw.load_settings(self.dlg_psector_rapport)
 
         tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_composer_path', default_file_name + " comp.pdf")
@@ -1154,7 +1153,7 @@ class GwPsector:
         self.iface.messageBar().popWidget()
 
         # Create log dialog
-        self.dlg_infolog = GwPsectorRepairUi()
+        self.dlg_infolog = GwPsectorRepairUi(self)
         self.dlg_infolog.btn_repair.clicked.connect(partial(self.repair_psector, psector_id))
         self.dlg_infolog.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_infolog, True))
 
@@ -1684,7 +1683,7 @@ class GwPsector:
         """ Button 46: Psector management """
 
         # Create the dialog and signals
-        self.dlg_psector_mng = GwPsectorManagerUi()
+        self.dlg_psector_mng = GwPsectorManagerUi(self)
 
         tools_gw.load_settings(self.dlg_psector_mng)
         table_name = "v_ui_plan_psector"
@@ -1957,7 +1956,7 @@ class GwPsector:
         """ Button 50: Plan estimate result manager """
 
         # Create the dialog and signals
-        self.dlg_merm = GwPriceManagerUi()
+        self.dlg_merm = GwPriceManagerUi(self)
         tools_gw.load_settings(self.dlg_merm)
 
         # Set current value

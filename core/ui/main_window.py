@@ -24,7 +24,7 @@ class GwMainWindow(QMainWindow):
     key_escape = QtCore.pyqtSignal()
     key_enter = QtCore.pyqtSignal()
 
-    def __init__(self, subtag=None):
+    def __init__(self, class_obj, subtag=None):
 
         super().__init__()
         self.setupUi(self)
@@ -45,6 +45,7 @@ class GwMainWindow(QMainWindow):
         except Exception:
             self._messageBar = global_vars.iface
 
+        self.setProperty('class_obj', class_obj)
         self.subtag = subtag
         # Connect the help shortcut
         action_help_shortcut = tools_gw.get_config_parser("actions_shortcuts", f"shortcut_help", "user", "init", prefix=False)

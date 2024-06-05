@@ -160,7 +160,7 @@ class GwAuxCircleAddButton(GwMaptool):
     def _init_create_circle_form(self, point):
 
         # Create the dialog and signals
-        self.dlg_create_circle = GwAuxCircleUi()
+        self.dlg_create_circle = GwAuxCircleUi(self)
         tools_gw.load_settings(self.dlg_create_circle)
         self.cancel_circle = False
         validator = QDoubleValidator(0.00, 9999999.00, 3)

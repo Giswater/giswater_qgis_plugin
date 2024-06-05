@@ -65,7 +65,7 @@ class GwFeatureEndButton(GwAction):
         self.selected_list = []
 
         # Create the dialog and signals
-        self.dlg_work_end = GwFeatureEndUi()
+        self.dlg_work_end = GwFeatureEndUi(self)
         tools_gw.load_settings(self.dlg_work_end)
         self._set_edit_arc_downgrade_force('True')
 
@@ -268,7 +268,7 @@ class GwFeatureEndButton(GwAction):
             row = tools_db.get_row(sql)
 
         if row and force_downgrade is False:
-            self.dlg_work = GwFeatureEndConnecUi()
+            self.dlg_work = GwFeatureEndConnecUi(self)
             tools_gw.load_settings(self.dlg_work)
 
             self.dlg_work.btn_cancel.clicked.connect(partial(self._close_dialog_workcat_list, self.dlg_work))
@@ -538,7 +538,7 @@ class GwFeatureEndButton(GwAction):
 
     def _new_workcat(self):
 
-        self.dlg_new_workcat = GwInfoWorkcatUi()
+        self.dlg_new_workcat = GwInfoWorkcatUi(self)
         tools_gw.load_settings(self.dlg_new_workcat)
 
         tools_qt.set_calendar(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)

@@ -27,7 +27,7 @@ class GwI18NGenerator:
     def init_dialog(self):
         """ Constructor """
 
-        self.dlg_qm = GwAdminTranslationUi()
+        self.dlg_qm = GwAdminTranslationUi(self)
         tools_gw.load_settings(self.dlg_qm)
         self._load_user_values()
 

@@ -163,7 +163,7 @@ class GwMenuLoad(QObject):
         """ Manage files dialog:: """
 
         tools_qgis.set_cursor_wait()
-        self.dlg_manage_menu = GwLoadMenuUi()
+        self.dlg_manage_menu = GwLoadMenuUi(self)
         tools_gw.load_settings(self.dlg_manage_menu)
 
         # Manage widgets

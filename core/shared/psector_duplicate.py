@@ -27,7 +27,7 @@ class GwPsectorDuplicate(QObject):
     def manage_duplicate_psector(self, psector_id=None):
 
         # Create the dialog and signals
-        self.dlg_duplicate_psector = GwPsectorDuplicateUi()
+        self.dlg_duplicate_psector = GwPsectorDuplicateUi(self)
         tools_gw.load_settings(self.dlg_duplicate_psector)
 
         # Populate combo duplicate psector

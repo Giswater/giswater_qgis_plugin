@@ -38,7 +38,7 @@ class GwElement:
         self.new_element_id = new_element_id
 
         # Create the dialog and signals
-        self.dlg_add_element = GwElementUi()
+        self.dlg_add_element = GwElementUi(self)
         tools_gw.load_settings(self.dlg_add_element)
         self.element_id = None
 
@@ -273,7 +273,7 @@ class GwElement:
         """ Button 67: Edit element """
 
         # Create the dialog
-        self.dlg_man = GwElementManagerUi()
+        self.dlg_man = GwElementManagerUi(self)
         tools_gw.load_settings(self.dlg_man)
         self.dlg_man.tbl_element.setSelectionBehavior(QAbstractItemView.SelectRows)
 

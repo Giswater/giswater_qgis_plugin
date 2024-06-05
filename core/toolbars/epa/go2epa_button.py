@@ -63,7 +63,7 @@ class GwGo2EpaButton(GwAction):
         tools_gw.init_docker('qgis_form_docker')
 
         # Create dialog
-        self.dlg_go2epa = GwGo2EpaUI()
+        self.dlg_go2epa = GwGo2EpaUI(self)
         tools_gw.load_settings(self.dlg_go2epa)
         self._load_user_values()
         if self.project_type in 'ws':
@@ -281,7 +281,7 @@ class GwGo2EpaButton(GwAction):
         go2epa_selector = GwSelector()
 
         # Create the dialog
-        dlg_selector = GwSelectorUi()
+        dlg_selector = GwSelectorUi(self)
         tools_gw.load_settings(dlg_selector)
 
         # Create the common signals
@@ -507,7 +507,7 @@ class GwGo2EpaButton(GwAction):
         self.epa_options_list = []
 
         # Create dialog
-        self.dlg_go2epa_options = GwGo2EpaOptionsUi()
+        self.dlg_go2epa_options = GwGo2EpaOptionsUi(self)
         tools_gw.load_settings(self.dlg_go2epa_options)
         self.dlg_go2epa_options.setProperty('GwGo2EpaButton', self)
 

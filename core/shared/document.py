@@ -43,7 +43,7 @@ class GwDocument(QObject):
 
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         # Create the dialog and signals
-        self.dlg_add_doc = GwDocUi()
+        self.dlg_add_doc = GwDocUi(self)
         tools_gw.load_settings(self.dlg_add_doc)
         self.doc_id = None
         self.files_path = []
@@ -174,7 +174,7 @@ class GwDocument(QObject):
         """ Button 66: Edit document """
 
         # Create the dialog
-        self.dlg_man = GwDocManagerUi()
+        self.dlg_man = GwDocManagerUi(self)
         self.dlg_man.setProperty('class_obj', self)
         tools_gw.load_settings(self.dlg_man)
         self.dlg_man.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)

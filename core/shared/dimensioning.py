@@ -36,7 +36,7 @@ class GwDimensioning:
 
     def open_dimensioning_form(self, qgis_feature=None, layer=None, db_return=None, fid=None, rubber_band=None):
 
-        self.dlg_dim = GwDimensioningUi()
+        self.dlg_dim = GwDimensioningUi(self)
         tools_gw.load_settings(self.dlg_dim)
 
         self.user_current_layer = self.iface.activeLayer()

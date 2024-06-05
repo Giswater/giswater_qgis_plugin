@@ -53,7 +53,7 @@ class GwCSVButton(GwAction):
     def _open_csv(self):
 
         self.func_name = None
-        self.dlg_csv = GwCsvUi()
+        self.dlg_csv = GwCsvUi(self)
         tools_gw.load_settings(self.dlg_csv)
 
         temp_tablename = 'temp_csv'

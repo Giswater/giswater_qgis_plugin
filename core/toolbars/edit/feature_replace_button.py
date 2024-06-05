@@ -198,7 +198,7 @@ class GwFeatureReplaceButton(GwMaptool):
     def _init_replace_feature_form(self, feature):
 
         # Create the dialog and signals
-        self.dlg_replace = GwFeatureReplaceUi()
+        self.dlg_replace = GwFeatureReplaceUi(self)
         tools_gw.load_settings(self.dlg_replace)
         tools_gw.add_icon(self.dlg_replace.btn_new_workcat, "193")
         tools_gw.add_icon(self.dlg_replace.btn_catalog, "195")
@@ -323,7 +323,7 @@ class GwFeatureReplaceButton(GwMaptool):
 
     def _new_workcat(self):
 
-        self.dlg_new_workcat = GwInfoWorkcatUi()
+        self.dlg_new_workcat = GwInfoWorkcatUi(self)
 
         tools_gw.load_settings(self.dlg_new_workcat)
         tools_qt.set_calendar(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)

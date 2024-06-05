@@ -135,7 +135,7 @@ class GwArcFusionButton(GwMaptool):
 
 
     def open_arc_fusion_dlg(self):
-        self.dlg_fusion = GwArcFusionUi()
+        self.dlg_fusion = GwArcFusionUi(self)
         tools_gw.load_settings(self.dlg_fusion)
 
         # Fill ComboBox cmb_nodeaction
