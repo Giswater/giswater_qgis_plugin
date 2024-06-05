@@ -197,7 +197,7 @@ class GwAuxCircleAddButton(GwMaptool):
 
         if self.layer_circle:
             self.layer_circle.startEditing()
-            tools_gw.close_dialog(self.dlg_create_circle)
+
             if self.delete_prev:
                 selection = self.layer_circle.getFeatures()
                 self.layer_circle.selectByIds([f.id() for f in selection])
@@ -241,7 +241,7 @@ class GwAuxCircleAddButton(GwMaptool):
                 # Next line generate: WARNING    Attribute index 0 out of bounds [0;0]
                 # but all work ok
                 provider.addFeatures([feature])
-
+            tools_gw.close_dialog(self.dlg_create_circle)
             self.layer_circle.commitChanges()
             self.layer_circle.dataProvider().reloadData()
             self.layer_circle.triggerRepaint()
