@@ -51,6 +51,7 @@ class Catalogs:
     """
 
     db_arcs: dict[str, tuple[float, float]]
+    db_features: dict[str, tuple[str, str]]
     db_materials: dict[str, list[float]]
     db_nodes: dict[str, str]
     inp_junctions: Optional[list[str]]
@@ -106,6 +107,18 @@ class Catalogs:
             }
             db_mat_roughness_cat = dict(sorted(unsorted_dict.items()))
 
+        # Get feature catalog
+        rows = tools_db.get_rows("""
+                SELECT id, system_id, feature_type
+                FROM cat_feature
+            """)
+        db_feat_cat: dict[str, tuple[str, str]] = {}
+        if rows:
+            unsorted_dict = {
+                _id: (feat_type, system_id) for _id, system_id, feat_type in rows
+            }
+            db_feat_cat = dict(sorted(unsorted_dict.items()))
+
         # Get possible catalogs of the network
         junction_catalogs: Optional[list[str]] = (
             [
@@ -155,6 +168,7 @@ class Catalogs:
 
         return cls(
             db_arc_catalog,
+            db_feat_cat,
             db_mat_roughness_cat,
             db_node_catalog,
             junction_catalogs,

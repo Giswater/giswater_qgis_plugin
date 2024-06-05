@@ -214,25 +214,27 @@ class GwImportInp(GwAction):
         ]
 
         for element, rec_catalog, tag in arc_elements:
-            if rec_catalog is not None:
-                row: int = tbl_arcs.rowCount()
-                tbl_arcs.setRowCount(row + 1)
+            if rec_catalog is None:
+                continue
 
-                first_column = QTableWidgetItem(tag)
-                first_column.setFlags(Qt.ItemIsEnabled)
-                tbl_arcs.setItem(row, 0, first_column)
+            row: int = tbl_arcs.rowCount()
+            tbl_arcs.setRowCount(row + 1)
 
-                combo_cat = QComboBox()
-                tbl_arcs.setCellWidget(row, 3, combo_cat)
+            first_column = QTableWidgetItem(tag)
+            first_column.setFlags(Qt.ItemIsEnabled)
+            tbl_arcs.setItem(row, 0, first_column)
 
-                new_cat_name = QTableWidgetItem("")
-                new_cat_name.setFlags(Qt.NoItemFlags)
-                tbl_arcs.setItem(row, 4, new_cat_name)
-                combo_cat.currentTextChanged.connect(
-                    partial(self._toggle_enabled_new_catalog_field, new_cat_name)
-                )
+            combo_cat = QComboBox()
+            tbl_arcs.setCellWidget(row, 3, combo_cat)
 
-                self.tbl_elements[element] = (combo_cat, new_cat_name)
+            new_cat_name = QTableWidgetItem("")
+            new_cat_name.setFlags(Qt.NoItemFlags)
+            tbl_arcs.setItem(row, 4, new_cat_name)
+            combo_cat.currentTextChanged.connect(
+                partial(self._toggle_enabled_new_catalog_field, new_cat_name)
+            )
+
+            self.tbl_elements[element] = (combo_cat, new_cat_name)
 
         # Fill materials table
         tbl_material: QTableWidget = self.dlg_config.tbl_material
@@ -253,6 +255,44 @@ class GwImportInp(GwAction):
                 tbl_material.setCellWidget(row, 1, combo_mat)
 
                 self.tbl_elements["materials"][roughness] = (combo_mat,)
+
+        # Fill Features table
+        tbl_feature: QTableWidget = self.dlg_config.tbl_feature
+
+        feature_types = [
+            ("JUNCTIONS", self.catalogs.inp_junctions, ("JUNCTION",), "NODE"),
+            ("PIPES", self.catalogs.inp_pipes, ("PIPE",), "ARC"),
+            ("PUMPS", self.catalogs.inp_pumps, ("VARC",), "ARC"),
+            (
+                "RESERVOIRS",
+                self.catalogs.inp_reservoirs,
+                ("SOURCE", "WATERWELL", "WTP"),
+                "NODE",
+            ),
+            ("TANKS", self.catalogs.inp_tanks, ("TANK",), "NODE"),
+            ("VALVES", self.catalogs.inp_valves, ("VARC",), "ARC"),
+        ]
+
+        self.tbl_elements["features"] = {}
+
+        for tag, rec_catalog, system_id, feature_type in feature_types:
+            if rec_catalog is None:
+                continue
+
+            if tag == "PIPES" and not rec_catalog:
+                continue
+
+            row: int = tbl_feature.rowCount()
+            tbl_feature.setRowCount(row + 1)
+
+            first_column = QTableWidgetItem(tag)
+            first_column.setFlags(Qt.ItemIsEnabled)
+            tbl_feature.setItem(row, 0, first_column)
+
+            combo_feat = QComboBox()
+            tbl_feature.setCellWidget(row, 1, combo_feat)
+
+            self.tbl_elements["features"][tag.lower()] = (combo_feat,)
 
         self._fill_combo_boxes()
 
@@ -449,6 +489,44 @@ class GwImportInp(GwAction):
                     mat
                     for mat in self.catalogs.db_materials
                     if mat not in material_catalog
+                )
+            combo.setCurrentText(old_value)
+
+        # Fill features
+        feature_types = {
+            "junctions": ("NODE", ("JUNCTION",)),
+            "pipes": ("ARC", ("PIPE",)),
+            "pumps": ("ARC", ("VARC",)),
+            "reservoirs": ("NODE", ("SOURCE", "WATERWELL", "WTP")),
+            "tanks": ("NODE", ("TANK",)),
+            "valves": ("ARC", ("VARC",)),
+        }
+        for element_type, (combo,) in self.tbl_elements["features"].items():
+            system_catalog = [
+                feat_id
+                for feat_id, (system_id, _) in self.catalogs.db_features.items()
+                if system_id in feature_types[element_type][0]
+            ]
+            feat_catalog = [
+                feat_id
+                for feat_id, (_, feat_type) in self.catalogs.db_features.items()
+                if feat_type in feature_types[element_type][1]
+            ]
+
+            old_value: str = combo.currentText()
+            combo.clear()
+            combo.addItem("")
+            if len(feat_catalog) > 0:
+                combo.insertSeparator(combo.count())
+                combo.addItem("Recommended feature ids:")
+                combo.model().item(combo.count() - 1).setEnabled(False)
+                combo.addItems(feat_catalog)
+            if len(system_catalog) > len(feat_catalog):
+                combo.insertSeparator(combo.count())
+                combo.addItem("Other feature ids:")
+                combo.model().item(combo.count() - 1).setEnabled(False)
+                combo.addItems(
+                    feat for feat in system_catalog if feat not in feat_catalog
                 )
             combo.setCurrentText(old_value)
 
