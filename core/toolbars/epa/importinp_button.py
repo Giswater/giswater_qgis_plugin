@@ -331,22 +331,23 @@ class GwImportInp(GwAction):
             return
 
         # Tables (Arcs and Nodes)
-        catalogs = {"pipes": {}, "materials": {}}
+        catalogs = {"pipes": {}, "materials": {}, "features": {}}
 
         for _input, result in [
             (self.tbl_elements, catalogs),
             (self.tbl_elements["pipes"], catalogs["pipes"]),
             (self.tbl_elements["materials"], catalogs["materials"]),
+            (self.tbl_elements["features"], catalogs["features"]),
         ]:
             for element in _input:
-                if element in ["pipes", "materials"]:
+                if element in ["pipes", "materials", "features"]:
                     continue
 
                 combo = _input[element][0]
                 combo_value = combo.currentText()
 
                 if combo_value == "":
-                    message = "Please select a catalog item for all elements in the tabs: Nodes, Arcs, Materials."
+                    message = "Please select a catalog item for all elements in the tabs: Nodes, Arcs, Materials, Features."
                     tools_qt.show_info_box(message)
                     return
 
