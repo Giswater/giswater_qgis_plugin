@@ -114,25 +114,16 @@ class GwImportInpTask(GwTask):
             if cat_node_ids:
                 nodecat_db = [x[0] for x in cat_node_ids]
 
-            node_catalogs = [
-                ("junctions", "JUNCTION"),
-                ("reservoirs", "SOURCE"),
-                ("tanks", "TANK"),
-            ]
+            node_catalogs = ["junctions", "reservoirs", "tanks"]
 
-            for node_type, cat_feature in node_catalogs:
+            for node_type in node_catalogs:
                 if node_type not in self.catalogs:
                     continue
 
                 if self.catalogs[node_type] in nodecat_db:
                     continue
 
-                sql = """
-                    INSERT INTO cat_feature (id, system_id, feature_type)
-                    VALUES (%s, %s, 'NODE')
-                    ON CONFLICT (id) DO NOTHING;
-                """
-                execute_sql(sql, (cat_feature, cat_feature), commit=False)
+                nodetype_id: str = self.catalogs["features"][node_type]
 
                 sql = """
                     INSERT INTO cat_node (id, nodetype_id)
@@ -140,7 +131,7 @@ class GwImportInpTask(GwTask):
                 """
                 execute_sql(
                     sql,
-                    (self.catalogs[node_type], cat_feature),
+                    (self.catalogs[node_type], nodetype_id),
                     commit=False,
                 )
                 nodecat_db.append(self.catalogs[node_type])
@@ -176,21 +167,14 @@ class GwImportInpTask(GwTask):
                     commit=False,
                 )
 
-                execute_sql(
-                    """
-                    INSERT INTO cat_feature (id, system_id, feature_type)
-                    VALUES ('VARC', 'VARC', 'ARC')
-                    ON CONFLICT (id) DO NOTHING;
-                    """,
-                    commit=False,
-                )
-
                 sql = """
                     INSERT INTO cat_arc (id, arctype_id, matcat_id, dint)
-                    VALUES (%s, 'VARC', 'UNKNOWN', 999)
+                    VALUES (%s, %s, 'UNKNOWN', 999)
                 """
-                execute_sql(sql, (self.catalogs[varc_type],), commit=False)
-                arccat_db.append(self.catalogs[varc_type])
+                _id = self.catalogs[varc_type]
+                arctype_id = self.catalogs["features"][varc_type]
+                execute_sql(sql, (_id, arctype_id), commit=False)
+                arccat_db.append(_id)
 
             # Create new pipe catalogs
             if "pipes" in self.catalogs:
@@ -199,22 +183,17 @@ class GwImportInpTask(GwTask):
                     if catalog in arccat_db:
                         continue
 
-                    execute_sql(
-                        """
-                        INSERT INTO cat_feature (id, system_id, feature_type)
-                        VALUES ('PIPE', 'PIPE', 'ARC')
-                        ON CONFLICT (id) DO NOTHING;
-                        """,
-                        commit=False,
-                    )
+                    arctype_id = self.catalogs["features"]["pipes"]
 
                     material = self.catalogs["materials"][pipe_roughness]
 
                     sql = """
                         INSERT INTO cat_arc (id, arctype_id, matcat_id, dint)
-                        VALUES (%s, 'PIPE', %s, %s);
+                        VALUES (%s, %s, %s, %s);
                     """
-                    execute_sql(sql, (catalog, material, pipe_dint), commit=False)
+                    execute_sql(
+                        sql, (catalog, arctype_id, material, pipe_dint), commit=False
+                    )
                     arccat_db.append(catalog)
 
             # Save patterns
