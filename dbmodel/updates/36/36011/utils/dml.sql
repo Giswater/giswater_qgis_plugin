@@ -13,3 +13,7 @@ INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario','NETWORK','NETWORK')
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES(3308, 'gw_fct_admin_create_message', 'utils', 'function', 'json', 'json', 'Function to create sys_message efficiently', 'role_admin', NULL, 'core')
 ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_form_fields SET widgettype='combo',
+dv_querytext='SELECT id, id as idval FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2',
+dv_orderby_id=true WHERE formname='v_edit_dimensions' AND formtype='form_feature' AND columnname='feature_type' AND tabname='tab_none';
