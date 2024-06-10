@@ -92,8 +92,8 @@ class GwImportInpTask(GwTask):
         self.filepath = filepath
         self.network: WaterNetworkModel = network
         self.workcat: str = workcat
-        self.exploitation: str = exploitation
-        self.sector: str = sector
+        self.exploitation: int = exploitation
+        self.sector: int = sector
         self.catalogs: dict[str, Any] = catalogs
         self.log: list[str] = []
         self.mappings: dict[str, dict[str, str]] = {"curves": {}, "patterns": {}}
@@ -301,6 +301,51 @@ class GwImportInpTask(GwTask):
                         commit=False,
                     )
 
+            # Save junctions
+            sql = """
+                INSERT INTO v_edit_node (the_geom, code, elevation, nodecat_id, epa_type, expl_id, sector_id, state, state_type, workcat_id)
+                VALUES %s
+                RETURNING node_id, code
+            """
+
+            template = (
+                "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            )
+
+            params = []
+
+            for j_name, j in self.network.junctions():
+                x, y = j.coordinates
+                srid = lib_vars.data_epsg
+                nodecat_id = self.catalogs["junctions"]
+                epa_type = "JUNCTION"
+                expl_id = self.exploitation
+                sector_id = self.sector
+                state = 1
+                state_type = 2
+                workcat_id = self.workcat
+                params.append(
+                    (
+                        x,
+                        y,
+                        srid,
+                        j_name,
+                        j.elevation,
+                        nodecat_id,
+                        epa_type,
+                        expl_id,
+                        sector_id,
+                        state,
+                        state_type,
+                        workcat_id,
+                    )
+                )
+
+            junctions = toolsdb_execute_values(
+                sql, params, template, fetch=True, commit=True
+            )
+
+            print(junctions)
             execute_sql("select 1", commit=True)
             return True
         except Exception as e:
