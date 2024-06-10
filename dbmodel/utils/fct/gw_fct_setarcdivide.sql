@@ -589,7 +589,7 @@ BEGIN
 						-- reconnect operative node links
 						FOR rec_link IN SELECT * FROM v_edit_link WHERE exit_type = 'NODE' AND exit_id = (SELECT node_1 FROM arc WHERE arc_id = rec_aux1.arc_id)
 						LOOP
-							UPDATE link SET arc_id = rec_aux1.arc_id  WHERE link_id = rec_link.link_id;
+							UPDATE link SET exit_id = rec_aux1.arc_id  WHERE link_id = rec_link.link_id;
 							UPDATE connec SET arc_id = rec_aux1.arc_id WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
 							IF v_project_type ='UD' THEN
 								UPDATE gully SET arc_id = rec_aux1.arc_id WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
