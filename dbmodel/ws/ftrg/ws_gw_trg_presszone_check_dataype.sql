@@ -15,7 +15,7 @@ BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-	IF NEW.presszone_id ~ '^[0-9]+$' THEN
+	IF NEW.presszone_id ~ '^[-]?[0-9]+$' THEN
 
 	ELSE
 
