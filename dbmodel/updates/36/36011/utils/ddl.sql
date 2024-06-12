@@ -19,3 +19,12 @@ FOREIGN KEY (manager_id) REFERENCES cat_manager(id) ON DELETE CASCADE ON UPDATE 
 ALTER TABLE config_user_x_expl DROP CONSTRAINT config_user_x_expl_manager_id_fkey;
 ALTER TABLE config_user_x_expl ADD CONSTRAINT config_user_x_expl_manager_id_fkey 
 FOREIGN KEY (manager_id) REFERENCES cat_manager(id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+CREATE TABLE selector_municipality
+( muni_id integer NOT NULL,
+  cur_user text NOT NULL DEFAULT CURRENT_USER,
+  CONSTRAINT selector_municipality_pkey PRIMARY KEY (muni_id, cur_user),
+  CONSTRAINT selector_municipality_fkey FOREIGN KEY (muni_id)
+      REFERENCES ext_municipality (muni_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE);
