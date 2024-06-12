@@ -20,8 +20,8 @@ INSERT INTO cat_users VALUES ('user4','user4');
 
 INSERT INTO cat_manager (idval, expl_id, rolename, active) VALUES ('general manager', '{1,2}', '{role_master}', true);
 
-INSERT INTO config_graph_inlet VALUES (113766, 1);
-INSERT INTO config_graph_inlet VALUES (113952, 2);
+INSERT INTO config_graph_inlet VALUES (113766);
+INSERT INTO config_graph_inlet VALUES (113952);
 
 INSERT INTO plan_psector_x_node VALUES (2, '1076', 1, 0, false, NULL, NULL, true);
 

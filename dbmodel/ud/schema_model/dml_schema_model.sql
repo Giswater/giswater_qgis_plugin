@@ -296,7 +296,7 @@ INSERT INTO cat_hydrology VALUES (1, 'Infiltration default value', 'CURVE_NUMBER
 -- Data for Name: cat_users; Type: TABLE DATA; Schema: Schema; Owner: -
 --
 
-INSERT INTO cat_users VALUES ('postgres', 'postgres', NULL, NULL, true, NULL);
+INSERT INTO cat_users select current_user, current_user, NULL, NULL, true, NULL;
 
 
 --

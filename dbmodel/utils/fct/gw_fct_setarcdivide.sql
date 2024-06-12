@@ -567,9 +567,9 @@ BEGIN
 						FOR rec_connec IN SELECT connec_id FROM connec WHERE arc_id=v_arc_id AND state = 1 AND pjoint_type='ARC'
 						AND connec_id NOT IN (SELECT DISTINCT feature_id FROM link WHERE exit_id=v_arc_id)
 						LOOP
-							SELECT arc_id INTO v_arc_closest FROM connec c, v_edit_arc a WHERE st_dwithin(a.the_geom, c.the_geom, 100) AND c.connec_id = rec_connec.connec_id
-							AND arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1;
-							UPDATE connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND c.connec_id = rec_connec.connec_id;
+							SELECT a.arc_id INTO v_arc_closest FROM connec c, v_edit_arc a WHERE st_dwithin(a.the_geom, c.the_geom, 100) AND c.connec_id = rec_connec.connec_id
+							AND a.arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1;
+							UPDATE connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND connec_id = rec_connec.connec_id;
 							v_arc_closest = null;
 						END LOOP;
 
@@ -578,9 +578,9 @@ BEGIN
 							FOR rec_gully IN SELECT gully_id FROM gully WHERE arc_id=v_arc_id AND state = 1 AND pjoint_type='ARC'
 							AND gully_id NOT IN (SELECT DISTINCT feature_id FROM link WHERE exit_id=v_arc_id)
 							LOOP
-								SELECT arc_id INTO v_arc_closest FROM gully g, v_edit_arc a WHERE st_dwithin(a.the_geom, g.the_geom, 100) AND g.gully_id = rec_gully.gully_id
-								AND arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1;
-								UPDATE gully SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND g.gully_id = rec_gully.gully_id;
+								SELECT a.arc_id INTO v_arc_closest FROM gully g, v_edit_arc a WHERE st_dwithin(a.the_geom, g.the_geom, 100) AND g.gully_id = rec_gully.gully_id
+								AND a.arc_id IN (rec_aux1.arc_id, rec_aux2.arc_id) LIMIT 1;
+								UPDATE gully SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND gully_id = rec_gully.gully_id;
 								UPDATE link SET exit_id = v_arc_closest WHERE link_id = rec_link.link_id;
 								v_arc_closest = null;
 							END LOOP;
@@ -589,7 +589,7 @@ BEGIN
 						-- reconnect operative node links
 						FOR rec_link IN SELECT * FROM v_edit_link WHERE exit_type = 'NODE' AND exit_id = (SELECT node_1 FROM arc WHERE arc_id = rec_aux1.arc_id)
 						LOOP
-							UPDATE link SET arc_id = rec_aux1.arc_id  WHERE link_id = rec_link.link_id;
+							UPDATE link SET exit_id = rec_aux1.arc_id  WHERE link_id = rec_link.link_id;
 							UPDATE connec SET arc_id = rec_aux1.arc_id WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
 							IF v_project_type ='UD' THEN
 								UPDATE gully SET arc_id = rec_aux1.arc_id WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;

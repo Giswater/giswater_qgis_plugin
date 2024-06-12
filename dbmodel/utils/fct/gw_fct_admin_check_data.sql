@@ -369,19 +369,33 @@ BEGIN
 	--Check consistency between cat_manager and config_user_x_expl(472)
 	 IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user') IS TRUE THEN
 
-	 	v_querytext='(with exploit as (select id,unnest(username) users from cat_manager where expl_id is not null)
-		select *,concat(explots,''-'',users,''-'',id)  from (
-		select id, unnest(expl_id) explots ,users from cat_manager 
-		join exploit using(id))a 
-		where concat(explots,''-'',users,''-'',id) not in 
-		(select  concat(expl_id,''-'',username,''-'',manager_id) from config_user_x_expl cuxe) and explots!=0)a';
+		v_querytext = '(
+			WITH exploit AS (
+				SELECT COALESCE(m.rolname, s.rolname) AS usern,
+				id
+				FROM (
+					SELECT id, unnest(rolename) AS role FROM cat_manager
+					WHERE expl_id IS NOT NULL
+				) q
+				LEFT JOIN pg_roles r ON q.role = r.rolname
+				LEFT JOIN pg_auth_members am ON r.oid = am.roleid
+				LEFT JOIN pg_roles m ON am.member = m.oid AND m.rolcanlogin = TRUE
+				LEFT JOIN pg_roles s ON q.role = s.rolname AND s.rolcanlogin = TRUE
+				WHERE (m.rolcanlogin IS TRUE OR s.rolcanlogin IS TRUE)
+			)
+			SELECT *, CONCAT(explots, ''-'', usern, ''-'', id) FROM (
+				SELECT id, unnest(expl_id) explots, usern FROM cat_manager
+				JOIN exploit using(id)) a
+				WHERE CONCAT(explots, ''-'', usern, ''-'', id) NOT IN
+				(SELECT CONCAT(expl_id, ''-'', username, ''-'', manager_id) FROM config_user_x_expl cuxe) AND explots != 0
+			) a';
 
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 
 		IF v_count > 0 THEN
 			EXECUTE 'INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
-			SELECT DISTINCT  v_fid, 3, ''472'', 
-			concat(''ERROR-472: There is/are '','||v_count||','' inconsistent configurations on cat_manager and config_user_x_expl for user: '',string_agg(DISTINCT users,'', '')),
+			SELECT DISTINCT '||v_fid||', 3, ''472'', 
+			concat(''ERROR-472: There is/are '','||v_count||','' inconsistent configurations on cat_manager and config_user_x_expl for user: '',string_agg(DISTINCT usern,'', '')),
 			'||v_count||' FROM '||v_querytext||';';
 		ELSE
 			INSERT INTO temp_audit_check_data (fid, criticity, result_id,error_message, fcount)
@@ -392,19 +406,33 @@ BEGIN
 	 --Check consistency between cat_manager and config_user_x_sector(473)
 	 IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user') IS TRUE THEN
 
-	 	v_querytext='(with sectores as (select id,unnest(username) users from cat_manager where sector_id is not null)
-		select *,concat(sectors,''-'',users,''-'',id)  from (
-		select id,unnest(sector_id) sectors ,users from cat_manager 
-		join sectores using(id))a 
-		where concat(sectors,''-'',users,''-'',id) not in 
-		(select  concat(sector_id,''-'',username,''-'',manager_id) from config_user_x_sector cuxe) and sectors not in (0,-1))a';
+	 	v_querytext = '(
+			WITH sectores AS (
+				SELECT COALESCE(m.rolname, s.rolname) AS usern,
+				id
+				FROM (
+					SELECT id, unnest(rolename) AS role FROM cat_manager
+					WHERE sector_id IS NOT NULL
+				) q
+				LEFT JOIN pg_roles r ON q.role = r.rolname
+				LEFT JOIN pg_auth_members am ON r.oid = am.roleid
+				LEFT JOIN pg_roles m ON am.member = m.oid AND m.rolcanlogin = TRUE
+				LEFT JOIN pg_roles s ON q.role = s.rolname AND s.rolcanlogin = TRUE
+				WHERE (m.rolcanlogin IS TRUE OR s.rolcanlogin IS TRUE)
+			)
+			SELECT *, CONCAT(sectors, ''-'', usern, ''-'', id) FROM (
+				SELECT id, unnest(sector_id) sectors, usern FROM cat_manager
+				JOIN sectores using(id)) a
+				WHERE CONCAT(sectors, ''-'', usern, ''-'', id) NOT IN
+				(SELECT CONCAT(sector_id, ''-'', username, ''-'', manager_id) FROM config_user_x_sector cuxe) AND sectors NOT IN (0, -1)
+			) a';
 
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 
 		IF v_count > 0 THEN
 			EXECUTE 'INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
-			SELECT DISTINCT  v_fid, 3, ''473'', 
-			concat(''ERROR-473: There is/are '','||v_count||','' inconsistent configurations on cat_manager and config_user_x_sector for user: '',string_agg(DISTINCT users,'', '')),
+			SELECT DISTINCT '||v_fid||', 3, ''473'', 
+			concat(''ERROR-473: There is/are '','||v_count||','' inconsistent configurations on cat_manager and config_user_x_sector for user: '',string_agg(DISTINCT usern,'', '')),
 			'||v_count||' FROM '||v_querytext||';';
 		ELSE
 			INSERT INTO temp_audit_check_data (fid, criticity, result_id,error_message, fcount)

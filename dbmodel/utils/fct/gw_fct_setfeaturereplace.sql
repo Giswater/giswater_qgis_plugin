@@ -226,8 +226,10 @@ BEGIN
 		EXECUTE 'select epa_default from cat_feature_'||v_feature_type||' where id='''||v_feature_type_new||''';'	
 		INTO v_epa_type_new;
 
-		IF v_epa_type_new <> 'UNDEFINED' THEN
+		IF v_epa_type_new <> 'UNDEFINED' AND v_feature_type IN ('arc', 'node') THEN
 			v_epa_table_new = concat('inp_', lower(v_epa_type_new));
+		ELSIF v_feature_type = 'connec' THEN
+			v_epa_table_new = 'inp_connec';
 		END IF;
 	END IF;
 	

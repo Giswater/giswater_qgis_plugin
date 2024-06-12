@@ -15,12 +15,12 @@ BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-	IF NEW.presszone_id ~ '^[0-9]+$' THEN
+	IF NEW.presszone_id ~ '^[-]?[0-9]+$' THEN
 
 	ELSE
 
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3260", "function":"3306","debug_msg":null}}$$);'; 
+		"data":{"message":"3262", "function":"3306","debug_msg":null}}$$);'; 
 
 	END IF;
 	
