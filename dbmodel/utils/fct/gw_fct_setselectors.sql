@@ -60,6 +60,7 @@ v_action text = null;
 v_sector integer;
 v_sectorfromexpl boolean;
 v_explfromsector boolean;
+v_expLfrommuni boolean;
 v_explmuni text;
 v_zonetable text;
 v_cur_user text;
@@ -140,6 +141,8 @@ BEGIN
 	v_tableid = v_parameter_selector->>'table_id';
 	v_sectorfromexpl = (SELECT value::json->>'sectorFromExpl' FROM config_param_system where parameter = 'basic_selector_tab_exploitation');
 	v_explfromsector = (SELECT value::json->>'explFromSector' FROM config_param_system where parameter = 'basic_selector_tab_sector');
+	v_expLfrommuni = (SELECT value::json->>'explFromMuni' FROM config_param_system where parameter = 'basic_selector_tab_municipality');
+
 	
 	IF v_tabname='tab_macroexploitation' or v_tabname='tab_macroexploitation_add' or v_tabname='tab_exploitation_add' THEN
 		v_zonetable = 'exploitation';
@@ -257,7 +260,8 @@ BEGIN
 				ELSIF v_value IS NOT NULL AND v_tabname='tab_exploitation_add' AND v_addschema IS NOT NULL THEN
 					
 					IF v_isalone IS TRUE THEN
-						EXECUTE 'DELETE FROM '||v_addschema||'.' || v_tablename || ' WHERE cur_user = current_user AND '|| v_columnname ||' NOT IN (SELECT '|| v_columnname ||' FROM ' || v_tablename || ' );';
+						EXECUTE 'DELETE FROM '||v_addschema||'.' || v_tablename || ' WHERE cur_user = current_user AND '|| v_columnname ||
+						' NOT IN (SELECT '|| v_columnname ||' FROM ' || v_tablename || ' );';
 					END IF;
 					
 					IF v_value::boolean IS TRUE THEN 
@@ -405,6 +409,13 @@ BEGIN
 		SELECT DISTINCT expl_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user);
 	END IF;	
 
+	-- inserting expl id from selected municipalities
+	IF v_explfrommuni AND v_tabname IN ('tab_municipality') THEN
+		DELETE FROM selector_expl WHERE cur_user = current_user;
+		INSERT INTO selector_expl
+		SELECT DISTINCT expl_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user);
+	END IF;	
+
 	-- get envelope 
 	IF v_tabname IN ('tab_sector', 'tab_macrosector') THEN
 		SELECT row_to_json (a) 
@@ -418,7 +429,8 @@ BEGIN
 		EXECUTE 'SELECT row_to_json (a) 
 			FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
 			FROM (SELECT st_expand(st_collect(the_geom), 50.0) as the_geom FROM exploitation where expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
-			union SELECT st_expand(st_collect(the_geom), 50.0) as the_geom FROM '||v_addschema||'.exploitation where expl_id IN (SELECT expl_id FROM '||v_addschema||'.selector_expl WHERE cur_user = current_user)) b) a'
+			union SELECT st_expand(st_collect(the_geom), 50.0) as the_geom FROM '||v_addschema||'.exploitation where expl_id IN (SELECT expl_id FROM '||v_addschema||
+			'.selector_expl WHERE cur_user = current_user)) b) a'
 			INTO v_geometry;
 
 	ELSIF v_tabname IN ('tab_hydro_state', 'tab_psector', 'tab_network_state', 'tab_dscenario') THEN
