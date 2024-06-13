@@ -75,7 +75,7 @@ BEGIN
 	ELSIF v_stateaux=2 THEN
 		IF NEW.state = 0 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3182", "function":"1130","debug_msg":'||OLD.psector_id||'}}$$);';
+			"data":{"message":"3182", "function":"1130","debug_msg":'||NEW.psector_id||'}}$$);';
 		END IF;
 		NEW.state = 1;
 		NEW.doable=true;
