@@ -65,11 +65,14 @@ BEGIN
 		
 					IF (hemisphere_rotation_aux >180)  THEN
 						UPDATE node set rotation=(ang_aux*(180/3.14159)+90) where node_id=rec_node.node_id;
+						UPDATE node set label_rotation=(ang_aux*(180/3.14159)+90) where node_id=rec_node.node_id;	
 					ELSE		
 						UPDATE node set rotation=(ang_aux*(180/3.14159)-90) where node_id=rec_node.node_id;
+						UPDATE node set label_rotation=(ang_aux*(180/3.14159)-90) where node_id=rec_node.node_id;	
 					END IF;
 				ELSE
 					UPDATE node set rotation=(ang_aux*(180/3.14159)-90) where node_id=rec_node.node_id;		
+					UPDATE node set label_rotation=(ang_aux*(180/3.14159)-90) where node_id=rec_node.node_id;		
 				END IF;	
 				
 			END LOOP;
