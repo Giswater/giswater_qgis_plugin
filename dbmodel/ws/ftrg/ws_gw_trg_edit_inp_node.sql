@@ -134,15 +134,12 @@ BEGIN
         ELSIF v_node_table = 'inp_shortpipe' THEN     
              UPDATE inp_shortpipe SET minorloss=NEW.minorloss, bulk_coeff = NEW.bulk_coeff, wall_coeff = NEW.wall_coeff WHERE node_id=OLD.node_id;  
 
-	     IF NEW.to_arc IS NOT NULL AND ((NEW.to_arc != OLD.to_arc) OR OLD.to_arc IS NULL) THEN
-
-		INSERT INTO config_graph_checkvalve VALUES (NEW.node_id, NEW.to_arc)
-		ON CONFLICT (node_id) DO UPDATE SET to_arc=NEW.to_arc;
-		
-   	     ELSIF NEW.to_arc IS NULL AND OLD.to_arc IS NOT NULL THEN
-		DELETE FROM config_graph_checkvalve WHERE node_id = NEW.node_id;
-		
-	     END IF;
+			IF NEW.to_arc IS NOT NULL AND ((NEW.to_arc != OLD.to_arc) OR OLD.to_arc IS NULL) THEN
+				INSERT INTO config_graph_checkvalve VALUES (NEW.node_id, NEW.to_arc)
+				ON CONFLICT (node_id) DO UPDATE SET to_arc=NEW.to_arc;
+		    ELSIF NEW.to_arc IS NULL AND OLD.to_arc IS NOT NULL THEN
+				DELETE FROM config_graph_checkvalve WHERE node_id = NEW.node_id;
+			END IF;
 	
         ELSIF v_node_table = 'inp_inlet' THEN     
             UPDATE inp_inlet SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id,

@@ -21,7 +21,7 @@ CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS
     n.annotation,
     concat(n.node_id, '_n2a') AS nodarc_id,
     inp_shortpipe.minorloss,
-    inp_shortpipe.to_arc,
+    c.to_arc,
     CASE WHEN c.node_id is not null THEN 'CV'::varchar(12) when v.closed is true THEN 'CLOSED'::varchar(12) 
 	when v.closed is false THEN 'OPEN'::varchar(12) ELSE NULL::varchar(12) END status,
     inp_shortpipe.bulk_coeff,
@@ -38,7 +38,7 @@ CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS
 CREATE OR REPLACE VIEW ve_epa_shortpipe AS 
  SELECT inp_shortpipe.node_id,
     inp_shortpipe.minorloss,
-    inp_shortpipe.to_arc,
+    c.to_arc,
         CASE
             WHEN c.node_id IS NOT NULL THEN 'CV'::character varying(12)
             WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
@@ -67,4 +67,9 @@ CREATE OR REPLACE VIEW ve_epa_shortpipe AS
      LEFT JOIN v_rpt_arc ON concat(inp_shortpipe.node_id, '_n2a') = v_rpt_arc.arc_id::text
      LEFT JOIN config_graph_checkvalve c ON c.node_id::text = inp_shortpipe.node_id::text
      LEFT JOIN man_valve v ON v.node_id::text = inp_shortpipe.node_id::text;
+	 
+	 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_shortpipe", "column":"status"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_shortpipe", "column":"to_arc"}}$$);
+
 	 
