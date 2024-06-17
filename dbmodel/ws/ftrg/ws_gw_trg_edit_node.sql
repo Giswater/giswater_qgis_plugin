@@ -694,8 +694,8 @@ BEGIN
 			SELECT json_array_elements_text ((value::json->>'catfeatureId')::json) id , (value::json->>'vdefault') vdef FROM config_param_system WHERE parameter like 'epa_shortpipe_vdefault'
 			)a WHERE id = v_customfeature;
 			
-			INSERT INTO inp_shortpipe (node_id, status, minorloss) 
-			VALUES (NEW.node_id,  v_epavdef ->>'status', (v_epavdef ->>'minorloss')::numeric);
+			INSERT INTO inp_shortpipe (node_id, minorloss) 
+			VALUES (NEW.node_id, (v_epavdef ->>'minorloss')::numeric);
 
 				
 		ELSIF (NEW.epa_type = 'INLET') THEN
