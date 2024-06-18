@@ -590,9 +590,11 @@ BEGIN
 			ELSE
 				-- update connect
 				IF NEW.feature_type='CONNEC' AND v_pjoint_id IS NOT NULL THEN
-					UPDATE connec SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, sector_id = v_sector, dma_id = v_dma WHERE connec_id = NEW.feature_id;
+					UPDATE connec SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, sector_id = v_sector,
+					dma_id = v_dma, fluid_type=v_fluidtype WHERE connec_id = NEW.feature_id;
 				ELSIF NEW.feature_type='GULLY' AND v_pjoint_id IS NOT NULL  THEN
-					UPDATE gully SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, sector_id = v_sector, dma_id = v_dma WHERE gully_id = NEW.feature_id;
+					UPDATE gully SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type, sector_id = v_sector, 
+					dma_id = v_dma, fluid_type=v_fluidtype WHERE gully_id = NEW.feature_id;
 				END IF;
 
 				-- update specific colums for ws-link
@@ -647,16 +649,19 @@ BEGIN
 		ELSIF NEW.state = 1 AND st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
 
 			-- update link
-			UPDATE link SET exit_id = NEW.exit_id , exit_type = NEW.exit_type, the_geom=NEW.the_geom, expl_id = v_expl, sector_id = v_sector, dma_id = v_dma
+			UPDATE link SET exit_id = NEW.exit_id , exit_type = NEW.exit_type, the_geom=NEW.the_geom, expl_id = v_expl, sector_id = v_sector, 
+			dma_id = v_dma, fluid_type=v_fluidtype
 			WHERE link_id=NEW.link_id;
 		
-			-- force reconnection on coonecs
+			-- force reconnection on connecs
 			IF NEW.feature_type = 'CONNEC' THEN
-				UPDATE connec SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id, dma_id = v_dma WHERE connec_id = NEW.feature_id;
+				UPDATE connec SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id, 
+				dma_id = v_dma, fluid_type=v_fluidtype WHERE connec_id = NEW.feature_id;
 				UPDATE link SET connecat_id = c.connecat_id FROM connec c WHERE connec_id = NEW.feature_id AND link.state > 0;
 
 			ELSIF NEW.feature_type = 'GULLY' THEN
-				UPDATE gully SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id, dma_id = v_dma WHERE  gully_id = NEW.feature_id;
+				UPDATE gully SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id, 
+				dma_id = v_dma, fluid_type=v_fluidtype WHERE  gully_id = NEW.feature_id;
 			END IF;
 
 			-- update specific colums for ws-link
@@ -681,7 +686,8 @@ BEGIN
 			END IF;	
 			
 			-- update link
-			UPDATE link SET exit_id = NEW.exit_id, exit_type = NEW.exit_type, the_geom = NEW.the_geom, expl_id = v_expl, sector_id = v_sector, dma_id = v_dma
+			UPDATE link SET exit_id = NEW.exit_id, exit_type = NEW.exit_type, the_geom = NEW.the_geom, expl_id = v_expl, sector_id = v_sector, 
+			dma_id = v_dma, fluid_type=v_fluidtype
 			WHERE link_id = NEW.link_id;
 			
 		END IF;
