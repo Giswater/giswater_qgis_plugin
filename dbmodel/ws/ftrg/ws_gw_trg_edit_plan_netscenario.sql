@@ -29,8 +29,8 @@ BEGIN
 				SELECT max(dma_id) +1 into NEW.dma_id FROM plan_netscenario_dma WHERE netscenario_id = NEW.netscenario_id;
 			END IF;
 
-			INSERT INTO plan_netscenario_dma (netscenario_id, dma_id, dma_name, pattern_id, graphconfig, the_geom)
-			VALUES (NEW.netscenario_id, NEW.dma_id, NEW.name, NEW.pattern_id, NEW.graphconfig, NEW.the_geom) ON CONFLICT (netscenario_id, dma_id) DO NOTHING;
+			INSERT INTO plan_netscenario_dma (netscenario_id, dma_id, dma_name, pattern_id, graphconfig, the_geom, active, avg_press)
+			VALUES (NEW.netscenario_id, NEW.dma_id, NEW.name, NEW.pattern_id, NEW.graphconfig, NEW.the_geom, NEW.active, NEW.avg_press) ON CONFLICT (netscenario_id, dma_id) DO NOTHING;
 
 		ELSIF v_table = 'PRESSZONE' THEN
 
@@ -39,8 +39,8 @@ BEGIN
 				 SELECT max(presszone_id) +1 into NEW.presszone_id FROM plan_netscenario_presszone WHERE netscenario_id = NEW.netscenario_id;
 			END IF;
 
-			INSERT INTO plan_netscenario_presszone (netscenario_id, presszone_id, presszone_name, head, graphconfig, the_geom)
-			VALUES (NEW.netscenario_id, NEW.presszone_id, NEW.name, NEW.head, NEW.graphconfig, NEW.the_geom) ON CONFLICT (netscenario_id, presszone_id) DO NOTHING;
+			INSERT INTO plan_netscenario_presszone (netscenario_id, presszone_id, presszone_name, head, graphconfig, the_geom, active, avg_press, presszone_type)
+			VALUES (NEW.netscenario_id, NEW.presszone_id, NEW.name, NEW.head, NEW.graphconfig, NEW.the_geom, NEW.active, NEW.avg_press, NEW.presszone_type) ON CONFLICT (netscenario_id, presszone_id) DO NOTHING;
 
 		ELSIF v_table = 'VALVE' THEN
 
@@ -53,12 +53,12 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
    	IF v_table = 'DMA' THEN
 			UPDATE plan_netscenario_dma 
-			SET dma_id=NEW.dma_id, dma_name=NEW.name,  the_geom=NEW.the_geom, pattern_id=NEW.pattern_id, graphconfig=NEW.graphconfig::json, active=NEW.active
+			SET dma_id=NEW.dma_id, dma_name=NEW.name,  the_geom=NEW.the_geom, pattern_id=NEW.pattern_id, graphconfig=NEW.graphconfig::json, active=NEW.active, avg_press=NEW.avg_press
 			WHERE dma_id=OLD.dma_id AND netscenario_id=NEW.netscenario_id;
 		
 		ELSIF v_table = 'PRESSZONE' THEN
 			UPDATE plan_netscenario_presszone 
-			SET presszone_id=NEW.presszone_id, presszone_name=NEW.name,  the_geom=NEW.the_geom, head=NEW.head, graphconfig=NEW.graphconfig::json, active=NEW.active
+			SET presszone_id=NEW.presszone_id, presszone_name=NEW.name,  the_geom=NEW.the_geom, head=NEW.head, graphconfig=NEW.graphconfig::json, active=NEW.active, avg_press=NEW.avg_press, presszone_type=NEW.presszone_type
 			WHERE presszone_id=OLD.presszone_id AND netscenario_id=NEW.netscenario_id;
 		
 		ELSIF v_table = 'VALVE' THEN
