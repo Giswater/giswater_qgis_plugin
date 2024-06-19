@@ -57,5 +57,3 @@ UPDATE connec SET dqa_id=0 ;
 UPDATE link SET dqa_id=0 ;
 
 DELETE FROM dqa;
-
-UPDATE inp_shortpipe SET to_arc = null, status = null where node_id = '1092';
