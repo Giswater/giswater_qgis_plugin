@@ -1,6 +1,7 @@
 3.6.011
 *************
-- Remove expl_id from config_graph_inlet due it is redudant
+- Rename config_graph_inlet to config_graph_mincut.
+- Remove expl_id from config_graph_mincut due it is redudant
 - Disable mincut if user has not any inlet on canvas to work with
 - Enhancement of cat_manager by working with system users and roles
 - Remove to_arc and status on inp_shortpipe and using inventory values to work with on v_edit_inp_shortipe
