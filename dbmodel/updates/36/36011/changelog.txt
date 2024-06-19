@@ -5,3 +5,5 @@
 - Disable mincut if user has not any inlet on canvas to work with
 - Enhancement of cat_manager by working with system users and roles
 - Remove to_arc and status on inp_shortpipe and using inventory values to work with on v_edit_inp_shortipe
+- New field on plan_netscenario_dma and plan_netscenario_presszone: avg_press
+- New field on plan_netscenario_presszone: presszone_type
