@@ -95,21 +95,6 @@ AS SELECT dqa.dqa_id,
   WHERE dqa.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
 -- 19/06/2024
-CREATE OR REPLACE VIEW v_edit_plan_netscenario_dma
-AS SELECT n.netscenario_id,
-    p.name AS netscenario_name,
-    n.dma_id,
-    n.dma_name AS name,
-    n.pattern_id,
-    n.graphconfig,
-    n.the_geom,
-    n.active,
-    n.avg_press
-   FROM selector_netscenario,
-    plan_netscenario_dma n
-     JOIN plan_netscenario p USING (netscenario_id)
-  WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
-
 CREATE OR REPLACE VIEW v_edit_plan_netscenario_presszone
 AS SELECT n.netscenario_id,
     p.name AS netscenario_name,
@@ -119,7 +104,6 @@ AS SELECT n.netscenario_id,
     n.graphconfig,
     n.the_geom,
     n.active,
-    n.avg_press,
     n.presszone_type
    FROM selector_netscenario,
     plan_netscenario_presszone n

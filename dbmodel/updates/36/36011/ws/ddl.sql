@@ -25,8 +25,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone",
 ALTER TABLE presszone ADD CONSTRAINT presszone_presszone_type_check CHECK (presszone_type::text=ANY 
 (ARRAY['buster', 'tank', 'reductora', 'bomba']));
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_dma", "column":"avg_press", "dataType":"float"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_presszone", "column":"avg_press", "dataType":"float"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_presszone", "column":"presszone_type", "dataType":"text"}}$$);
 ALTER TABLE plan_netscenario_presszone ADD CONSTRAINT plan_netscenario_presszone_presszone_type_check CHECK (presszone_type::text=ANY 
 (ARRAY['buster', 'tank', 'reductora', 'bomba']));
