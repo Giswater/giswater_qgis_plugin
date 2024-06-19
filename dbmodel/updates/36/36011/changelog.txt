@@ -6,3 +6,4 @@
 - Enhancement of cat_manager by working with system users and roles
 - Remove to_arc and status on inp_shortpipe and using inventory values to work with on v_edit_inp_shortipe
 - New field on plan_netscenario_presszone: presszone_type
+- New field on plan_netscenario_presszone and plan_netscenario_dma: stylesheet
