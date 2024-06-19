@@ -75,6 +75,28 @@ ON CONFLICT (node_id) DO NOTHING;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_shortpipe", "column":"status"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_shortpipe", "column":"to_arc"}}$$);
 
+CREATE OR REPLACE VIEW v_edit_dma
+AS SELECT dma.dma_id,
+    dma.name,
+    dma.macrodma_id,
+    dma.descript,
+    dma.the_geom,
+    dma.undelete,
+    dma.expl_id,
+    dma.pattern_id,
+    dma.link,
+    dma.minc,
+    dma.maxc,
+    dma.effc,
+    dma.graphconfig::text AS graphconfig,
+    dma.stylesheet::text AS stylesheet,
+    dma.active,
+    dma.avg_press,
+    dma.expl_id2
+   FROM selector_expl,
+    dma
+  WHERE dma.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
 CREATE OR REPLACE VIEW v_edit_dqa
 AS SELECT dqa.dqa_id,
     dqa.name,
@@ -89,10 +111,47 @@ AS SELECT dqa.dqa_id,
     dqa.graphconfig::text AS graphconfig,
     dqa.stylesheet::text AS stylesheet,
     dqa.active,
-    dqa.avg_press
+    dqa.avg_press,
+    dqa.expl_id2
    FROM selector_expl,
     dqa
   WHERE dqa.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_edit_sector
+AS SELECT sector.sector_id,
+    sector.name,
+    sector.descript,
+    sector.macrosector_id,
+    sector.the_geom,
+    sector.undelete,
+    sector.graphconfig::text AS graphconfig,
+    sector.stylesheet::text AS stylesheet,
+    sector.active,
+    sector.parent_id,
+    sector.pattern_id,
+    sector.avg_press,
+    sector.expl_id2
+   FROM selector_sector,
+    sector
+  WHERE sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_edit_presszone
+AS SELECT presszone.presszone_id,
+    presszone.name,
+    presszone.expl_id,
+    presszone.the_geom,
+    presszone.graphconfig::text AS graphconfig,
+    presszone.head,
+    presszone.stylesheet::text AS stylesheet,
+    presszone.active,
+    presszone.descript,
+    presszone.avg_press,
+    presszone.presszone_type,
+    presszone.expl_id2
+   FROM selector_expl,
+    presszone
+  WHERE presszone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+  
 
 -- 19/06/2024
 CREATE OR REPLACE VIEW v_edit_plan_netscenario_dma
@@ -104,7 +163,8 @@ AS SELECT n.netscenario_id,
     n.graphconfig,
     n.the_geom,
     n.active,
-    n.stylesheet::text AS stylesheet
+    n.stylesheet::text AS stylesheet,
+    n.expl_id2
    FROM selector_netscenario,
     plan_netscenario_dma n
      JOIN plan_netscenario p USING (netscenario_id)
@@ -120,7 +180,8 @@ AS SELECT n.netscenario_id,
     n.the_geom,
     n.active,
     n.presszone_type,
-    n.stylesheet::text AS stylesheet
+    n.stylesheet::text AS stylesheet,
+    n.expl_id2
    FROM selector_netscenario,
     plan_netscenario_presszone n
      JOIN plan_netscenario p USING (netscenario_id)
