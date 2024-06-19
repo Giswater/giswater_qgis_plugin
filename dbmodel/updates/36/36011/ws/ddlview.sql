@@ -68,7 +68,10 @@ CREATE OR REPLACE VIEW ve_epa_shortpipe AS
      LEFT JOIN config_graph_checkvalve c ON c.node_id::text = inp_shortpipe.node_id::text
      LEFT JOIN man_valve v ON v.node_id::text = inp_shortpipe.node_id::text;
 	 
-	 
+
+INSERT INTO config_graph_checkvalve SELECT node_id, to_arc, true FROM inp_shortpipe WHERE status = 'CV' 
+ON CONFLICT (node_id) DO NOTHING;
+
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_shortpipe", "column":"status"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_shortpipe", "column":"to_arc"}}$$);
 
