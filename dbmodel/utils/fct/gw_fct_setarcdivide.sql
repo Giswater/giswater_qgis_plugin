@@ -87,9 +87,6 @@ v_max_seq_id	int8;
 
 v_result text;
 v_result_info text;
-v_result_point text;
-v_result_line text;
-v_result_polygon text;
 v_error_context text;
 v_audit_result text;
 v_level integer;
@@ -617,7 +614,7 @@ BEGIN
 						LOOP
 							EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{"id":['|| rec_link.feature_id||']},"data":{"linkId":"'||rec_link.link_id||'", "feature_type":"GULLY", "forcedArcs":['||rec_aux1.arc_id||','||rec_aux2.arc_id||']}}$$)';
-						END LOOP;			
+						END LOOP;
 
 						IF v_project_type = 'WS' THEN
 
@@ -844,7 +841,7 @@ BEGIN
 							-- Insert existig arc (downgraded) to the current alternative
 							INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector, v_arc_id, 0, FALSE)
 							ON CONFLICT (arc_id, psector_id) DO NOTHING;
-							
+
 							-- reconnect operative connec links related to other connects
 							FOR rec_link IN SELECT * FROM link l JOIN plan_psector_x_connec p USING (link_id) WHERE exit_type != 'ARC' AND p.arc_id = v_arc_id AND feature_type  ='CONNEC'
 							LOOP
@@ -1094,10 +1091,6 @@ BEGIN
 	v_result_info := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
-	v_result_point = '{"geometryType":"", "features":[]}';
-	v_result_line = '{"geometryType":"", "features":[]}';
-	v_result_polygon = '{"geometryType":"", "features":[]}';
-
 	v_status := COALESCE(v_status, '{}');
 	v_level := COALESCE(v_level, '0');
 	v_message := COALESCE(v_message, '{}');
@@ -1106,10 +1099,7 @@ BEGIN
 	--  Return
 	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
-		     ',"data":{ "info":'||v_result_info||','||
-				'"point":'||v_result_point||','||
-				'"line":'||v_result_line||','||
-				'"polygon":'||v_result_polygon||'}'||
+		     ',"data":{ "info":'||v_result_info||'}'||
 				', "actions":{"hideForm":' || v_hide_form || '}'||
 		       '}'||
 	    '}')::json;
