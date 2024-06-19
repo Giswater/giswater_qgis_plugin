@@ -19,3 +19,5 @@ ALTER TABLE config_graph_mincut DROP CONSTRAINT config_graph_inlet_pkey;
 ALTER TABLE config_graph_mincut ADD CONSTRAINT config_graph_mincut_pkey PRIMARY KEY (node_id);
 ALTER TABLE config_graph_mincut DROP CONSTRAINT config_graph_inlet_expl_id_fkey;
 ALTER TABLE config_graph_mincut DROP COLUMN expl_id;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"avg_press", "dataType":"float"}}$$);

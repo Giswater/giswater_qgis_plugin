@@ -75,4 +75,21 @@ ON CONFLICT (node_id) DO NOTHING;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_shortpipe", "column":"status"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_shortpipe", "column":"to_arc"}}$$);
 
-	 
+CREATE OR REPLACE VIEW v_edit_dqa
+AS SELECT dqa.dqa_id,
+    dqa.name,
+    dqa.expl_id,
+    dqa.macrodqa_id,
+    dqa.descript,
+    dqa.undelete,
+    dqa.the_geom,
+    dqa.pattern_id,
+    dqa.dqa_type,
+    dqa.link,
+    dqa.graphconfig::text AS graphconfig,
+    dqa.stylesheet::text AS stylesheet,
+    dqa.active
+    dqa.avg_press
+   FROM selector_expl,
+    dqa
+  WHERE dqa.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
