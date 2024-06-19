@@ -76,7 +76,7 @@ BEGIN
 						
 				OR (node_2 IN (SELECT node_id FROM om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id=result_id_arg))	
 				UNION
-				SELECT json_array_elements_text((parameters->>'inletArc')::json) as arc_id, true as closed FROM config_graph_inlet
+				SELECT json_array_elements_text((parameters->>'inletArc')::json) as arc_id, true as closed FROM config_graph_mincut
 				)a 
 			ON a.arc_id=v_edit_arc.arc_id
 			WHERE node_1 is not null and node_2 is not null
@@ -91,10 +91,10 @@ BEGIN
 			RAISE NOTICE 'Starting flow analysis process for valve: %', rec_valve.node_id;
 		END IF;
 		FOR rec_tank IN 
-		SELECT v_edit_node.node_id, v_edit_node.the_geom FROM config_graph_inlet
-		JOIN v_edit_node ON v_edit_node.node_id=config_graph_inlet.node_id
+		SELECT v_edit_node.node_id, v_edit_node.the_geom FROM config_graph_mincut
+		JOIN v_edit_node ON v_edit_node.node_id=config_graph_mincut.node_id
 		JOIN exploitation ON exploitation.expl_id=v_edit_node.expl_id
-		WHERE (is_operative IS TRUE)  AND config_graph_inlet.active IS TRUE 
+		WHERE (is_operative IS TRUE) AND config_graph_mincut.active IS TRUE 
 		AND v_edit_node.the_geom IS NOT NULL
 		ORDER BY 1
 		LOOP

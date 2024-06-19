@@ -109,7 +109,7 @@ BEGIN
 				OR (node_1 IN (SELECT node_id FROM temp_om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE))					
 				OR (node_2 IN (SELECT node_id FROM temp_om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE))	
 				UNION
-				SELECT json_array_elements_text((parameters->>'inletArc')::json) as arc_id, true as closed FROM config_graph_inlet
+				SELECT json_array_elements_text((parameters->>'inletArc')::json) as arc_id, true as closed FROM config_graph_mincut
 				)a 
 			ON a.arc_id=arc.arc_id
 			WHERE node_1 is not null and node_2 is not null AND state = 1 and macroexpl_id = v_macroexpl
@@ -120,10 +120,10 @@ BEGIN
 		FOR rec_valve IN SELECT node_id FROM temp_om_mincut_valve WHERE proposed = TRUE and unaccess=FALSE AND broken=FALSE
 		LOOP
 			FOR rec_tank IN 
-			SELECT v_edit_node.node_id, v_edit_node.the_geom FROM config_graph_inlet
-			JOIN v_edit_node ON v_edit_node.node_id=config_graph_inlet.node_id
+			SELECT v_edit_node.node_id, v_edit_node.the_geom FROM config_graph_mincut
+			JOIN v_edit_node ON v_edit_node.node_id=config_graph_mincut.node_id
 			JOIN exploitation ON exploitation.expl_id=v_edit_node.expl_id
-			WHERE (is_operative IS TRUE) AND (exploitation.macroexpl_id=v_macroexpl) AND config_graph_inlet.active IS TRUE 
+			WHERE (is_operative IS TRUE) AND (exploitation.macroexpl_id=v_macroexpl) AND config_graph_mincut.active IS TRUE 
 			AND v_edit_node.the_geom IS NOT NULL
 			ORDER BY 1
 			LOOP
@@ -228,7 +228,7 @@ BEGIN
 				OR (node_1 IN (SELECT node_id FROM om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id = -2))					
 				OR (node_2 IN (SELECT node_id FROM om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id = -2))	
 				UNION
-				SELECT json_array_elements_text((parameters->>'inletArc')::json) as arc_id, true as closed FROM config_graph_inlet
+				SELECT json_array_elements_text((parameters->>'inletArc')::json) as arc_id, true as closed FROM config_graph_mincut
 				)a 
 			ON a.arc_id=arc.arc_id
 			WHERE node_1 is not null and node_2 is not null AND state = 1 and macroexpl_id = v_macroexpl
@@ -239,10 +239,10 @@ BEGIN
 		FOR rec_valve IN SELECT node_id FROM om_mincut_valve WHERE proposed = TRUE and unaccess=FALSE AND broken=FALSE AND result_id = p_result
 		LOOP
 			FOR rec_tank IN 
-			SELECT v_edit_node.node_id, v_edit_node.the_geom FROM config_graph_inlet
-			JOIN v_edit_node ON v_edit_node.node_id=config_graph_inlet.node_id
-			JOIN exploitation ON exploitation.expl_id=config_graph_inlet.expl_id
-			WHERE (is_operative IS TRUE) AND (exploitation.macroexpl_id=v_macroexpl) AND config_graph_inlet.active IS TRUE 
+			SELECT v_edit_node.node_id, v_edit_node.the_geom FROM config_graph_mincut
+			JOIN v_edit_node ON v_edit_node.node_id=config_graph_mincut.node_id
+			JOIN exploitation ON exploitation.expl_id=config_graph_mincut.expl_id
+			WHERE (is_operative IS TRUE) AND (exploitation.macroexpl_id=v_macroexpl) AND config_graph_mincut.active IS TRUE 
 			AND v_edit_node.the_geom IS NOT NULL AND v_edit_node.node_id NOT IN (select node_id FROM om_mincut_node WHERE result_id = p_result) 
 			ORDER BY 1
 			LOOP

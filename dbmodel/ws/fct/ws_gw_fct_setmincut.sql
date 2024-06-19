@@ -122,16 +122,16 @@ BEGIN
 			INSERT INTO om_mincut (id) VALUES (v_mincut);
 		END IF;
 
-		-- check if there is no cap node_id in the v_edit_node of those registered in config_graph_inlet
+		-- check if there is no cap node_id in the v_edit_node of those registered in config_graph_mincut
 		IF EXISTS (
 			SELECT 1
-			FROM config_graph_inlet
+			FROM config_graph_mincut
 			WHERE node_id NOT IN (
 				SELECT node_id
 				FROM v_edit_node
 			)
 		) THEN
-			RETURN ('{"status":"Failed", "message":{"level":2, "text":"There are node_id values in config_graph_inlet that are not present in v_edit_node."}}')::json;
+			RETURN ('{"status":"Failed", "message":{"level":2, "text":"There are node_id values in config_graph_mincut that are not present in v_edit_node."}}')::json;
 		END IF;
 
 		--check if arc exists in database or look for a new arc_id in the same location

@@ -102,8 +102,8 @@ BEGIN
 		-- setup graph closing tank's inlet
 		UPDATE temp_anlgraph SET flag = 1 
 
-		FROM config_graph_inlet 
-		WHERE (temp_anlgraph.node_1 = config_graph_inlet.node_id OR temp_anlgraph.node_2 = config_graph_inlet.node_id);
+		FROM config_graph_mincut 
+		WHERE (temp_anlgraph.node_1 = config_graph_mincut.node_id OR temp_anlgraph.node_2 = config_graph_mincut.node_id);
 
 		-- setup graph reset water flag
 		UPDATE temp_anlgraph SET water=0;
@@ -130,8 +130,8 @@ BEGIN
 
 		-- setup graph closing tank's inlet
 		UPDATE temp_anlgraph SET flag = 1
-		FROM config_graph_inlet 
-		WHERE (temp_anlgraph.node_1 = config_graph_inlet.node_id OR temp_anlgraph.node_2 = config_graph_inlet.node_id);
+		FROM config_graph_mincut 
+		WHERE (temp_anlgraph.node_1 = config_graph_mincut.node_id OR temp_anlgraph.node_2 = config_graph_mincut.node_id);
 	
 		-- set the starting elements
 		UPDATE temp_anlgraph SET water=1 , flag = 1 WHERE arc_id::text IN (SELECT arc_id FROM temp_arc WHERE result_id = v_mincutid::text);

@@ -641,10 +641,10 @@ BEGIN
 
 		END IF;
 		
-		--insert tank into config_graph_inlet
+		--insert tank into config_graph_mincut
 		IF v_man_table='man_tank' THEN 
 			
-			INSERT INTO config_graph_inlet(node_id, active)
+			INSERT INTO config_graph_mincut(node_id, active)
 			VALUES (NEW.node_id, TRUE);	
 		END IF;
 
@@ -928,11 +928,6 @@ BEGIN
 			UPDATE man_tank SET vmax=NEW.vmax, vutil=NEW.vutil, area=NEW.area, chlorination=NEW.chlorination, name=NEW.name,
 			hmax=NEW.hmax
 			WHERE node_id=OLD.node_id;
-			
-			--update config_graph_inlet if exploitation changes
-			IF NEW.expl_id != OLD.expl_id THEN
-				UPDATE config_graph_inlet SET expl_id=NEW.expl_id WHERE node_id=NEW.node_id;
-			END IF;
 	
 		ELSIF v_man_table ='man_pump' THEN
 			UPDATE man_pump SET max_flow=NEW.max_flow, min_flow=NEW.min_flow, nom_flow=NEW.nom_flow, "power"=NEW.power, 
@@ -1081,8 +1076,8 @@ BEGIN
 		-- restore plan_psector_force_delete
 		UPDATE config_param_user SET value = v_force_delete WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
 
-		--remove node from config_graph_inlet
-		DELETE FROM config_graph_inlet WHERE node_id=OLD.node_id;
+		--remove node from config_graph_mincut
+		DELETE FROM config_graph_mincut WHERE node_id=OLD.node_id;
 
 		-- Delete childtable addfields (after or before deletion of node, doesn't matter)
         FOR v_addfields IN SELECT * FROM sys_addfields

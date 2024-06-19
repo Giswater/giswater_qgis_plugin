@@ -9,7 +9,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 UPDATE config_graph_checkvalve SET active = TRUE;
 
-UPDATE config_graph_inlet   SET active = TRUE;
+UPDATE config_graph_mincut SET active = TRUE;
 
 UPDATE config_graph_valve SET active = TRUE;
 

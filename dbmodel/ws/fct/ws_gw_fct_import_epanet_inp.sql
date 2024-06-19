@@ -170,7 +170,7 @@ BEGIN
 			DELETE FROM rpt_inp_arc;
 			DELETE FROM rpt_inp_node;
 			DELETE FROM rpt_cat_result;
-			DELETE FROM config_graph_inlet;	
+			DELETE FROM config_graph_mincut;	
 		END IF;
 		
 		-- check for network object id string length
@@ -712,7 +712,7 @@ BEGIN
 			DELETE FROM arc WHERE state = 0;
 
 			-- config graph
-			INSERT INTO config_graph_inlet SELECT node_id, null, true FROM node WHERE epa_type IN ('TANK', 'RESERVOIR');
+			INSERT INTO config_graph_mincut SELECT node_id, null, true FROM node WHERE epa_type IN ('TANK', 'RESERVOIR');
 			
 			-- purge catalog tables
 			DELETE FROM cat_arc WHERE id NOT IN (SELECT DISTINCT(arccat_id) FROM arc);

@@ -158,16 +158,17 @@ BEGIN
 		VALUES (v_fid, 1, '176', 'INFO: There are not operative valve(s) with null values on closed/broken fields.',v_count);
 	END IF;
 
-	-- inlet_x_exploitation (177)
-	SELECT count(*) INTO v_count FROM config_graph_inlet WHERE expl_id NOT IN (SELECT expl_id FROM exploitation WHERE active IS TRUE);
+	-- config_graph_mincut_x_exploitation (177)
+	SELECT count(*) INTO v_count FROM config_graph_mincut cgi INNER JOIN node n ON cgi.node_id = n.node_id 
+	WHERE n.expl_id NOT IN (SELECT expl_id FROM exploitation WHERE active IS TRUE);
 
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 3, '177', concat('ERROR-177: There is/are at least ',v_count,
-		' row(s) with exploitation bad configured on the config_graph_inlet table. Please check your data before continue'),v_count);
+		' row(s) with exploitation bad configured on the config_graph_mincut table. Please check your data before continue'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 1, '177', 'INFO: It seems config_graph_inlet table is well configured. At least, table is filled with nodes from all exploitations.',v_count);
+		VALUES (v_fid, 1, '177', 'INFO: It seems config_graph_mincut table is well configured. At least, table is filled with nodes from all exploitations.',v_count);
 	END IF;
 
 

@@ -20,8 +20,8 @@ INSERT INTO cat_users VALUES ('user4','user4');
 
 INSERT INTO cat_manager (idval, expl_id, rolename, active) VALUES ('general manager', '{1,2}', '{role_master}', true);
 
-INSERT INTO config_graph_inlet VALUES (113766);
-INSERT INTO config_graph_inlet VALUES (113952);
+INSERT INTO config_graph_mincut VALUES (113766);
+INSERT INTO config_graph_mincut VALUES (113952);
 
 INSERT INTO plan_psector_x_node VALUES (2, '1076', 1, 0, false, NULL, NULL, true);
 
@@ -232,10 +232,10 @@ WHERE parameter = 'om_dynamicmapzones_status';
 
 UPDATE element SET code = concat ('E',element_id);
 
-UPDATE config_graph_inlet SET parameters = '{"inletArc":["113907", "113905"]}'
+UPDATE config_graph_mincut SET parameters = '{"inletArc":["113907", "113905"]}'
 WHERE node_id = '113766';
 
-UPDATE config_graph_inlet SET parameters = '{"inletArc":["114145"]}'
+UPDATE config_graph_mincut SET parameters = '{"inletArc":["114145"]}'
 WHERE node_id = '113952';
 
 UPDATE config_form_fields SET label = 'Presszone' WHERE columnname = 'presszone_id';

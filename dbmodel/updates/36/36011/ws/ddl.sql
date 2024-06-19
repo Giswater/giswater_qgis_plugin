@@ -13,7 +13,9 @@ INSERT INTO config_graph_checkvalve SELECT node_id, to_arc
 FROM inp_shortpipe WHERE to_arc IS NOT NULL
 ON CONFLICT (node_id) DO NOTHING;
 
-ALTER TABLE config_graph_inlet DROP CONSTRAINT config_graph_inlet_pkey;
-ALTER TABLE config_graph_inlet ADD CONSTRAINT config_graph_inlet_pkey PRIMARY KEY (node_id);
-ALTER TABLE config_graph_inlet DROP CONSTRAINT config_graph_inlet_expl_id_fkey;
-ALTER TABLE config_graph_inlet DROP COLUMN expl_id;
+ALTER TABLE IF EXISTS config_graph_inlet RENAME TO config_graph_mincut;
+
+ALTER TABLE config_graph_mincut DROP CONSTRAINT config_graph_inlet_pkey;
+ALTER TABLE config_graph_mincut ADD CONSTRAINT config_graph_mincut_pkey PRIMARY KEY (node_id);
+ALTER TABLE config_graph_mincut DROP CONSTRAINT config_graph_inlet_expl_id_fkey;
+ALTER TABLE config_graph_mincut DROP COLUMN expl_id;
