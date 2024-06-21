@@ -137,7 +137,6 @@ class GwPsector:
         # tab General elements
         self.psector_id = self.dlg_plan_psector.findChild(QLineEdit, "psector_id")
         self.ext_code = self.dlg_plan_psector.findChild(QLineEdit, "ext_code")
-        self.cmb_psector_type = self.dlg_plan_psector.findChild(QComboBox, "psector_type")
         self.cmb_expl_id = self.dlg_plan_psector.findChild(QComboBox, "expl_id")
         self.cmb_status = self.dlg_plan_psector.findChild(QComboBox, "status")
         self.workcat_id = self.dlg_plan_psector.findChild(QComboBox, "workcat_id")
@@ -151,8 +150,6 @@ class GwPsector:
         atlas_id.setValidator(QIntValidator())
         num_value = self.dlg_plan_psector.findChild(QLineEdit, "num_value")
         num_value.setValidator(QIntValidator())
-        where = " WHERE typevalue = 'psector_type' "
-        self.populate_combos(self.dlg_plan_psector.psector_type, 'idval', 'id', 'plan_typevalue', where)
 
         # Manage other_price tab variables
         self.price_loaded = False
@@ -305,10 +302,6 @@ class GwPsector:
             self.psector_id.setText(str(row['psector_id']))
             if str(row['ext_code']) != 'None':
                 self.ext_code.setText(str(row['ext_code']))
-            sql = (f"SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_type' AND "
-                   f"id = '{row['psector_type']}'")
-            result = tools_db.get_row(sql)
-            tools_qt.set_combo_value(self.cmb_psector_type, str(result['idval']), 1)
             sql = (f"SELECT name FROM exploitation "
                    f"WHERE expl_id = {row['expl_id']}")
             result = tools_db.get_row(sql)
@@ -940,25 +933,6 @@ class GwPsector:
                     widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
                 elif type(widget) in (QComboBox, QCheckBox, QTableView, QPushButton):
                     widget.setEnabled(False)
-
-
-    def populate_combos(self, combo, field_name, field_id, table_name, where=None):
-
-        sql = f"SELECT DISTINCT({field_id}), {field_name} FROM {table_name} "
-        if where:
-            sql += where
-        sql += f" ORDER BY {field_name}"
-        rows = tools_db.get_rows(sql)
-        if not rows:
-            return
-
-        combo.blockSignals(True)
-        combo.clear()
-
-        records_sorted = sorted(rows, key=operator.itemgetter(1))
-        for record in records_sorted:
-            combo.addItem(record[1], record)
-        combo.blockSignals(False)
 
 
     def reload_states_selector(self):
