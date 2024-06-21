@@ -28,3 +28,8 @@ CREATE TABLE selector_municipality
   CONSTRAINT selector_municipality_fkey FOREIGN KEY (muni_id)
       REFERENCES ext_municipality (muni_id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE);
+
+-- 21/06/2024
+ALTER TABLE plan_psector ALTER COLUMN status SET NOT NULL;
+ALTER TABLE plan_psector ALTER COLUMN status SET DEFAULT 2;
+ALTER TABLE plan_psector ALTER COLUMN psector_type SET DEFAULT 1;
