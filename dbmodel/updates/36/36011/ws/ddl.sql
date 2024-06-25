@@ -38,3 +38,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "c
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"expl_id2", "dataType":"text"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_dma", "column":"expl_id2", "dataType":"text"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_presszone", "column":"expl_id2", "dataType":"text"}}$$);
+
+alter table rtc_hydrometer_x_connec add constraint rtc_hydrometer_x_connec_unique unique (connec_id, hydrometer_id);

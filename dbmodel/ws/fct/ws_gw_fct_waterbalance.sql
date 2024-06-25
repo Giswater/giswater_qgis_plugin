@@ -78,6 +78,8 @@ v_setmawithperiodmeters boolean = false;
 v_days_limiter integer;
 v_current_date text;
 v_days_past integer;
+v_hydrometer integer;
+
 
 BEGIN
 
@@ -145,7 +147,14 @@ BEGIN
 		-- getting dates for period
 		v_startdate = (SELECT start_date FROM ext_cat_period WHERE id = v_period);
 		v_enddate =  (SELECT end_date FROM ext_cat_period WHERE id = v_period);
-
+		
+		select count(*) into v_hydrometer
+		FROM ext_rtc_hydrometer_x_data d
+		JOIN rtc_hydrometer_x_connec USING (hydrometer_id)
+		JOIN connec c USING (connec_id) 
+		JOIN ext_rtc_hydrometer h ON h.id::text = d.hydrometer_id::text
+		where is_waterbal IS true and cat_period_id = v_period;
+		
 		IF v_method = 'CPW' THEN -- static period
 
 			-- startdate & enddate
@@ -300,7 +309,9 @@ BEGIN
 			v_uarl = (v_a*v_kmarc + v_b*v_kmconnec + v_c*v_numconnec)*v_avgpress;	
 			
 			v_carl = (SELECT loss FROM om_waterbalance WHERE cat_period_id = v_period AND 
-				dma_id = v_dma)*(365/(SELECT extract (day from end_date - start_date) FROM ext_cat_period WHERE id = v_period));
+				dma_id = v_dma)*(365/(SELECT case when extract (day from end_date - start_date) = 0 then 1
+			else  extract (day from end_date - start_date) end 
+				FROM ext_cat_period WHERE id = v_period));
 
 			v_ili = v_carl/v_uarl;
 
@@ -349,6 +360,7 @@ BEGIN
 	
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Process done succesfully for period: ',v_period));
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Number of DMA processed: ', v_count));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Number of hydrometer processed: ', v_hydrometer));
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Total System Input: ', round(rec_nrw.tsi::numeric,2), ' CMP'));
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Billed metered consumtion: ', round(rec_nrw.bmc::numeric,2), ' CMP'));
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Non-revenue water: ', round(rec_nrw.nrw::numeric,2), ' CMP'));
