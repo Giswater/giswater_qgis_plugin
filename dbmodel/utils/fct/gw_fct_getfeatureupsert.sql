@@ -74,7 +74,7 @@ v_muni_id integer;
 v_district_id integer;
 v_project_type varchar;
 v_cat_feature_id varchar;
-v_code int8;
+v_code text;
 v_node_proximity double precision;
 v_node_proximity_control boolean;
 v_connec_proximity double precision;
@@ -140,6 +140,9 @@ v_epa text;
 v_elevation numeric(12,4);
 v_staticpressure numeric(12,3);
 label_value text;
+v_seq_name text;
+v_seq_code text;
+v_sql text;
 
 v_streetname varchar;
 v_postnumber varchar;
@@ -284,6 +287,15 @@ BEGIN
 
 		IF v_catfeature.code_autofill IS TRUE THEN
 			v_code=p_id;
+		END IF;
+	
+		-- use specific sequence when its name matches featurecat_code_seq
+		EXECUTE 'SELECT concat('||quote_literal(lower(v_catfeature.id))||',''_code_seq'');' INTO v_seq_name;
+		EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||';' INTO v_sql;
+		
+		IF v_sql IS NOT NULL THEN
+			EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
+				v_code=concat(v_catfeature.addparam::json->>'code_prefix',v_seq_code);
 		END IF;
 
 		-- customer code only for connec

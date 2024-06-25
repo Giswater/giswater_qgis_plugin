@@ -30,6 +30,8 @@ v_streetaxis2 text;
 v_force_delete boolean;
 v_autoupdate_fluid boolean;
 v_psector integer;
+v_seq_name text;
+v_seq_code text;
 
 BEGIN
 
@@ -309,8 +311,19 @@ BEGIN
 		IF NEW.publish IS NULL THEN
 			NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');
 		END IF; 
+
+		-- Code
+		SELECT code_autofill, cat_feature.id, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_featurecat, v_code_prefix FROM cat_feature 
+		JOIN cat_arc ON cat_feature.id=cat_arc.arctype_id WHERE cat_arc.id=NEW.arccat_id;
+	
+		-- use specific sequence for code when its name matches featurecat_code_seq
+		EXECUTE 'SELECT concat('||quote_literal(lower(v_featurecat))||',''_code_seq'');' INTO v_seq_name;
+		EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||';' INTO v_sql;
 		
-		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature JOIN cat_arc ON cat_feature.id=cat_arc.arctype_id WHERE cat_arc.id=NEW.arccat_id;
+		IF v_sql IS NOT NULL AND NEW.code IS NULL THEN
+			EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
+				NEW.code=concat(v_code_prefix,v_seq_code);
+		END IF;
 	
 		--Copy id to code field	
 		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN 

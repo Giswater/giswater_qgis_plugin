@@ -46,6 +46,8 @@ v_auto_streetvalues_status boolean;
 v_auto_streetvalues_buffer integer;
 v_auto_streetvalues_field text;
 v_trace_featuregeom boolean;
+v_seq_name text;
+v_seq_code text;
 
 -- dynamic mapzones strategy
 v_isdma boolean = false;
@@ -371,7 +373,20 @@ BEGIN
 			NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');
 		END IF; 
 				
-		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature JOIN cat_node ON cat_feature.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id;
+		-- Code
+		SELECT code_autofill, cat_feature.id, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_featurecat, v_code_prefix FROM cat_feature 
+		JOIN cat_node ON cat_feature.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id;
+	
+		-- use specific sequence for code when its name matches featurecat_code_seq
+		EXECUTE 'SELECT concat('||quote_literal(lower(v_featurecat))||',''_code_seq'');' INTO v_seq_name;
+		EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||';' INTO v_sql;
+		
+		IF v_sql IS NOT NULL THEN
+			EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
+			IF v_seq_code IS NOT NULL AND NEW.code IS NULL THEN
+				NEW.code=v_seq_code;
+			END IF;
+		END IF;
 		
 		--Copy id to code field
 		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN 

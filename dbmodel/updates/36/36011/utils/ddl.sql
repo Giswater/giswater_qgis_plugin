@@ -33,3 +33,5 @@ CREATE TABLE selector_municipality
 ALTER TABLE plan_psector ALTER COLUMN status SET NOT NULL;
 ALTER TABLE plan_psector ALTER COLUMN status SET DEFAULT 2;
 ALTER TABLE plan_psector ALTER COLUMN psector_type SET DEFAULT 1;
+
+ALTER TABLE cat_feature RENAME COLUMN config TO addparam;

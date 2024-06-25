@@ -8,3 +8,4 @@
 - New field on plan_netscenario_presszone: presszone_type
 - New fields on plan_netscenario_presszone and plan_netscenario_dma: stylesheet, expl_id2
 - Add new field expl_id2 in mapzones, and netscenarios
+- Enable the possibility to use a specific sequence on code for every feature type
