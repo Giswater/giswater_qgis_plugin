@@ -7,7 +7,5 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"avg_press", "dataType":"float"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"expl_id2", "dataType":"text"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"expl_id2", "dataType":"text"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"avg_press", "dataType":"float"}}$$);

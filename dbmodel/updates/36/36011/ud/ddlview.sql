@@ -22,7 +22,6 @@ AS SELECT dma.dma_id,
     dma.effc,
     dma.active,
     dma.stylesheet,
-    dma.avg_press,
     dma.expl_id2
    FROM selector_expl,
     dma
@@ -38,7 +37,6 @@ AS SELECT sector.sector_id,
     sector.active,
     sector.parent_id,
     sector.stylesheet,
-    sector.avg_press,
     sector.expl_id2
    FROM selector_sector,
     sector
