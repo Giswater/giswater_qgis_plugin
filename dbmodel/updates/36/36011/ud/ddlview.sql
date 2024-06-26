@@ -25,7 +25,7 @@ AS SELECT dma.dma_id,
     dma.expl_id2
    FROM selector_expl,
     dma
-  WHERE dma.expl_id::integer = selector_expl.expl_id::integer OR dma.expl_id2::integer = selector_expl.expl_id::integer AND selector_expl.cur_user = "current_user"()::text;
+  WHERE dma.expl_id = selector_expl.expl_id OR dma.expl_id2 = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_edit_sector
 AS SELECT sector.sector_id,
@@ -41,4 +41,4 @@ AS SELECT sector.sector_id,
    FROM selector_sector,
     sector,
     selector_expl
-  WHERE sector.sector_id::integer = selector_sector.sector_id::integer OR sector.expl_id2::integer = selector_expl.expl_id::integer AND selector_sector.cur_user = "current_user"()::text;
+  WHERE sector.sector_id = selector_sector.sector_id OR sector.expl_id2 = selector_expl.expl_id AND selector_sector.cur_user = "current_user"()::text;
