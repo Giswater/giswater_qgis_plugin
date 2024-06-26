@@ -95,7 +95,7 @@ AS SELECT dma.dma_id,
     dma.expl_id2
    FROM selector_expl,
     dma
-  WHERE dma.expl_id = selector_expl.expl_id OR dma.expl_id2 = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+  WHERE (dma.expl_id = selector_expl.expl_id OR dma.expl_id2 = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_edit_dqa
 AS SELECT dqa.dqa_id,
@@ -115,7 +115,7 @@ AS SELECT dqa.dqa_id,
     dqa.expl_id2
    FROM selector_expl,
     dqa
-  WHERE dqa.expl_id = selector_expl.expl_id OR dqa.expl_id2 = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+  WHERE (dqa.expl_id = selector_expl.expl_id OR dqa.expl_id2 = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_edit_sector
 AS SELECT sector.sector_id,
@@ -134,7 +134,7 @@ AS SELECT sector.sector_id,
    FROM selector_sector,
     sector,
     selector_expl
-  WHERE sector.sector_id = selector_sector.sector_id OR sector.expl_id2 = selector_expl.expl_id AND selector_sector.cur_user = "current_user"()::text;
+  WHERE (sector.sector_id = selector_sector.sector_id OR sector.expl_id2 = selector_expl.expl_id) AND selector_sector.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_edit_presszone
 AS SELECT presszone.presszone_id,
@@ -151,7 +151,7 @@ AS SELECT presszone.presszone_id,
     presszone.expl_id2
    FROM selector_expl,
     presszone
-  WHERE presszone.expl_id = selector_expl.expl_id OR presszone.expl_id2 = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+  WHERE (presszone.expl_id = selector_expl.expl_id OR presszone.expl_id2 = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text;
   
 
 -- 19/06/2024
