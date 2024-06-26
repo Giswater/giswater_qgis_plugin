@@ -117,25 +117,6 @@ AS SELECT dqa.dqa_id,
     dqa
   WHERE (dqa.expl_id = selector_expl.expl_id OR dqa.expl_id2 = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text;
 
-CREATE OR REPLACE VIEW v_edit_sector
-AS SELECT sector.sector_id,
-    sector.name,
-    sector.descript,
-    sector.macrosector_id,
-    sector.the_geom,
-    sector.undelete,
-    sector.graphconfig::text AS graphconfig,
-    sector.stylesheet::text AS stylesheet,
-    sector.active,
-    sector.parent_id,
-    sector.pattern_id,
-    sector.avg_press,
-    sector.expl_id2
-   FROM selector_sector,
-    sector,
-    selector_expl
-  WHERE (sector.sector_id = selector_sector.sector_id OR sector.expl_id2 = selector_expl.expl_id) AND selector_sector.cur_user = "current_user"()::text;
-
 CREATE OR REPLACE VIEW v_edit_presszone
 AS SELECT presszone.presszone_id,
     presszone.name,

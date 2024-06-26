@@ -26,19 +26,3 @@ AS SELECT dma.dma_id,
    FROM selector_expl,
     dma
   WHERE (dma.expl_id = selector_expl.expl_id OR dma.expl_id2 = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text;
-
-CREATE OR REPLACE VIEW v_edit_sector
-AS SELECT sector.sector_id,
-    sector.name,
-    sector.descript,
-    sector.macrosector_id,
-    sector.the_geom,
-    sector.undelete,
-    sector.active,
-    sector.parent_id,
-    sector.stylesheet,
-    sector.expl_id2
-   FROM selector_sector,
-    sector,
-    selector_expl
-  WHERE (sector.sector_id = selector_sector.sector_id OR sector.expl_id2 = selector_expl.expl_id) AND selector_sector.cur_user = "current_user"()::text;
