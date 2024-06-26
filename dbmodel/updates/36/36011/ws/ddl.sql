@@ -32,11 +32,11 @@ ALTER TABLE plan_netscenario_presszone ADD CONSTRAINT plan_netscenario_presszone
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_dma", "column":"stylesheet", "dataType":"json"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_presszone", "column":"stylesheet", "dataType":"json"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"expl_id2", "dataType":"text"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"expl_id2", "dataType":"text"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"expl_id2", "dataType":"text"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"expl_id2", "dataType":"text"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_dma", "column":"expl_id2", "dataType":"text"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_presszone", "column":"expl_id2", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"expl_id2", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"expl_id2", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"expl_id2", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"expl_id2", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_dma", "column":"expl_id2", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_presszone", "column":"expl_id2", "dataType":"integer"}}$$);
 
 alter table rtc_hydrometer_x_connec add constraint rtc_hydrometer_x_connec_unique unique (connec_id, hydrometer_id);
