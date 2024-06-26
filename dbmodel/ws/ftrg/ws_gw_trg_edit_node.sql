@@ -64,6 +64,7 @@ v_epavdef json;
 v_man_view text;
 v_input json;
 
+v_code_prefix text;
 
 BEGIN
 
@@ -381,11 +382,10 @@ BEGIN
 		EXECUTE 'SELECT concat('||quote_literal(lower(v_featurecat))||',''_code_seq'');' INTO v_seq_name;
 		EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||';' INTO v_sql;
 		
-		IF v_sql IS NOT NULL THEN
+		
+		IF v_sql IS NOT NULL AND NEW.code IS NULL THEN
 			EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
-			IF v_seq_code IS NOT NULL AND NEW.code IS NULL THEN
-				NEW.code=v_seq_code;
-			END IF;
+				NEW.code=concat(v_code_prefix,v_seq_code);
 		END IF;
 		
 		--Copy id to code field

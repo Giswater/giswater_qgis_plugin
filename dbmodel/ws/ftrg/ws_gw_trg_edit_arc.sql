@@ -32,6 +32,7 @@ v_autoupdate_fluid boolean;
 v_psector integer;
 v_seq_name text;
 v_seq_code text;
+v_code_prefix text;
 
 BEGIN
 

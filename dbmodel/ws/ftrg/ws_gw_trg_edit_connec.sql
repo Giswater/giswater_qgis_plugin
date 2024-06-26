@@ -53,6 +53,7 @@ v_ispresszone boolean = false;
 v_trace_featuregeom boolean;
 v_seq_name text;
 v_seq_code text;
+v_code_prefix text;
 
 BEGIN
 
