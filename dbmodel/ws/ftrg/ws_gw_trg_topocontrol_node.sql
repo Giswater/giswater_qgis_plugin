@@ -56,6 +56,7 @@ v_sql text;
 v_query_string_update text;
 v_arc_childtable_name text;
 v_arc_type text;
+v_node_replace_code boolean;
 
 BEGIN
 
@@ -67,6 +68,7 @@ BEGIN
 	SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='edit_node_proximity';
 	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;
 	SELECT value INTO v_psector_id FROM config_param_user WHERE cur_user=current_user AND parameter = 'plan_psector_vdefault';
+    SELECT value::boolean INTO v_node_replace_code FROM config_param_system WHERE parameter='plan_node_replace_code';
 
 	--Check if user has migration mode enabled
 	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
@@ -148,7 +150,9 @@ BEGIN
 										
 						-- refactoring values fo new one
 						v_arcrecordtb.arc_id:= (SELECT nextval('urn_id_seq'));
-						v_arcrecordtb.code = v_arcrecordtb.arc_id;
+						IF v_node_replace_code is false then
+							v_arcrecordtb.code = v_arcrecordtb.arc_id;
+						END IF;
 						v_arcrecordtb.state=2;
 						v_arcrecordtb.state_type := (SELECT (value::json->>'plan_statetype_ficticius')::smallint FROM config_param_system WHERE parameter='plan_statetype_vdefault');
 
