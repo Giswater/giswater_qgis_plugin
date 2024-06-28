@@ -438,6 +438,8 @@ class GwToolBoxButton(GwAction):
         if not json_result or json_result['status'] == 'Failed':
             return False
 
+        self.dlg_reports.tbl_reports.sortByColumn(-1, 0)
+
         for field in json_result['body']['data']['fields']:
 
             if field['widgettype'] == 'list' and field.get('value') is not None:
