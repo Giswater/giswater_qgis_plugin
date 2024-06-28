@@ -8,6 +8,9 @@ version=3.6.011
 author=David Erill, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Elies Bertran, Abel García Juanes, Maria Guzmán, Jordi Blanch, Xavier Torret
 
 Changelog=Version 3.6.011
+    - Add support for tab visit in Giswater Info
+    - Remove psector_type combobox from psector dialog
+    - Various bug fixes
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
