@@ -2074,7 +2074,7 @@ def add_frame(field, x=None):
     return widget
 
 
-def add_combo(field, dialog=None, complet_result=None, ignore_function=False):
+def add_combo(field, dialog=None, complet_result=None, ignore_function=False, class_info=None):
     widget = QComboBox()
     widget.setObjectName(field['widgetname'])
     if 'widgetcontrols' in field and field['widgetcontrols']:
@@ -2107,7 +2107,7 @@ def add_combo(field, dialog=None, complet_result=None, ignore_function=False):
             parameters = f.get('parameters')
 
             kwargs = {"complet_result": complet_result, "dialog": dialog, "columnname": columnname, "widget": widget,
-                      "func_params": parameters}
+                      "func_params": parameters, "class": class_info}
             if 'module' in f:
                 module = globals()[f['module']]
             else:
@@ -4472,8 +4472,9 @@ def _manage_combo(**kwargs):
     dialog = kwargs['dialog']
     field = kwargs['field']
     complet_result = kwargs['complet_result']
+    class_info = kwargs['class']
 
-    widget = add_combo(field, dialog, complet_result)
+    widget = add_combo(field, dialog, complet_result, class_info=class_info)
     widget = set_widget_size(widget, field)
     return widget
 
