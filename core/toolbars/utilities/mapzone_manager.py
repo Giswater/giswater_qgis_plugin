@@ -647,7 +647,8 @@ class GwMapzoneManager:
                     level = int(json_result['message']['level'])
                 tools_qgis.show_message(json_result['message']['text'], level)
 
-            self._get_graph_config()
+            if global_vars.project_type != 'ud':
+                self._get_graph_config()
             self._reset_config_vars(0)
             tools_gw.close_dialog(dialog)
             self._manage_current_changed()
