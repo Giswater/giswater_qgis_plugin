@@ -53,7 +53,7 @@ SELECT SCHEMA_NAME.gw_fct_getlist($${
 "feature":{"tableName":"om_visit_file"},
 "data":{"filterFields":{},
 	"pageInfo":{}}}$$)
-	
+
 -- not first call
 SELECT SCHEMA_NAME.gw_fct_getlist($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
@@ -233,7 +233,7 @@ BEGIN
 	ELSE
 		v_attribute_filter = '';
 	END IF;
-	
+
 --  Creating the list fields
 ----------------------------
 	-- control not existing table
@@ -347,7 +347,7 @@ BEGIN
 				v_sign = v_value::json->>'filterSign';
 				v_value = v_value::json->>'value';
 				IF upper(v_sign) IN ('LIKE', 'ILIKE') THEN
-					v_value = '%'||v_value||'%'; 
+					v_value = '%'||v_value||'%';
 				END IF;
 			ELSE
 				IF v_listtype = 'attributeTable' THEN
@@ -356,7 +356,7 @@ BEGIN
 					v_sign = '=';
 				END IF;
 			END IF;
-		
+
 			i=i+1;
 
 			if v_length = 1 then
@@ -364,9 +364,9 @@ BEGIN
 				IF v_value IS NOT NULL AND v_field != 'limit' then
 
 				 	IF upper(v_type) = 'BETWEEN' then
-				 		v_query_result := v_query_result || ' AND '||v_field||'::'||v_type||' '||v_sign||' '||v_value||'::'||v_type||' ';
+				 		v_query_result := v_query_result || ' AND "'||v_field||'"::'||v_type||' '||v_sign||' '||v_value||'::'||v_type||' ';
 				 	else
-				 		v_query_result := v_query_result || ' AND '||v_field||'::'||v_type||' '||v_sign||' '''||v_value||'''::'||v_type||' ';
+				 		v_query_result := v_query_result || ' AND "'||v_field||'"::'||v_type||' '||v_sign||' '''||v_value||'''::'||v_type||' ';
 
 				 	end if;
 				ELSIF v_field='limit' and v_value != '-1' THEN
@@ -380,12 +380,12 @@ BEGIN
 			        if i = 1 then
 			        	v_logical := '';
 			        end if;
-			       	v_query_result := v_query_result || ' '||v_logical||' '||v_fields[i]||'::'||v_type||' '||v_sign||' '''||v_value||'''::'||v_type||' ';
+			       	v_query_result := v_query_result || ' '||v_logical||' "'||v_fields[i]||'"::'||v_type||' '||v_sign||' '''||v_value||'''::'||v_type||' ';
 			    END LOOP;
 				v_query_result := v_query_result || ')';
 			end if;
 			-- creating the query_text
-			
+
 		END LOOP;
 	END IF;
 	-- add feature filter
@@ -399,7 +399,7 @@ BEGIN
 			v_value:= (SELECT (v_json_field ->> 'value')) ;
 
 			-- creating the query_text
-			v_query_result := v_query_result || ' AND '||v_field||'::text = '||quote_literal(v_value) ||'::text';
+			v_query_result := v_query_result || ' AND "'||v_field||'"::text = '||quote_literal(v_value) ||'::text';
 		END LOOP;
 	END IF;
 
@@ -498,7 +498,7 @@ BEGIN
 				v_addparam := gw_fct_json_object_set_key(v_addparam, 'header', v_columnname);
 			end if;
 			v_headers_params := v_headers_params || coalesce(v_addparam, json_build_object('accessorKey', v_columnname, 'header', v_columnname, 'enableColumnActions', false, 'enableColumnFilter', false, 'columnFilterModeOptions', false, 'size', 0));
-			
+
 			i = i + 1;
 		end loop;
 	end if;
@@ -510,7 +510,7 @@ BEGIN
 	/*SELECT gw_fct_getformfields(v_tablename, 'form_list_header', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
 		INTO v_filter_fields;*/
 		--  setting values of filter fields
-		
+
 		SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_values) a;
 		i=1;
 		IF v_text IS NOT NULL THEN
@@ -541,7 +541,7 @@ BEGIN
 	IF v_i IS NULL THEN
 		v_i = 1;
 	END IF;
-	
+
 	EXECUTE 'SELECT listclass FROM config_form_list WHERE listname = $1 LIMIT 1'
 		INTO v_listclass
 		USING v_tablename;

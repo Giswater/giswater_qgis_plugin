@@ -41,3 +41,16 @@ INSERT INTO edit_typevalue VALUES ('presszone_type', 'UNDEFINED', 'UNDEFINED');
 
 INSERT INTO config_param_system ("parameter", value, descript, "label", project_type,"datatype", widgettype)
 VALUES('plan_node_replace_code', 'false', 'If true, when a node replace in planification is performed, new arcs will have the same code as the replaced one. Otherwise, new arcs will have the same code as its arc_id.', 'Plan node replace code', 'utils', 'boolean', 'text') ON CONFLICT (parameter) DO NOTHING;
+
+-- 28/06/2024
+UPDATE config_form_fields
+	SET linkedobject=NULL
+	WHERE columnname IN ('date_visit_from', 'date_visit_to') AND tabname='tab_visit';
+
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName": "filter_table", "parameters": {"columnfind": "Start date", "targetwidget": "tab_visit_tbl_visits"}}'::json
+	WHERE columnname='date_visit_from' AND tabname='tab_visit';
+
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName": "filter_table", "parameters": {"columnfind": "End date", "targetwidget": "tab_visit_tbl_visits"}}'::json
+	WHERE columnname='date_visit_to' AND tabname='tab_visit';
