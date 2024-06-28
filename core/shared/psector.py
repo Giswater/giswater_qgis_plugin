@@ -565,8 +565,8 @@ class GwPsector:
         tools_gw.load_settings(self.dlg_psector_rapport)
 
         tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_composer_path', default_file_name + " comp.pdf")
-        tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_csv_detail_path', default_file_name + " detail.csv")
-        tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_csv_path', default_file_name + ".csv")
+        tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_csv_detail_path', default_file_name + ".csv")
+        tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_csv_path', default_file_name + " prices.csv")
 
         self.dlg_psector_rapport.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_psector_rapport))
         self.dlg_psector_rapport.btn_ok.clicked.connect(partial(self.generate_reports))
