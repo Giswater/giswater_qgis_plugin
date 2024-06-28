@@ -289,14 +289,17 @@ BEGIN
 			v_code=p_id;
 		END IF;
 	
-		-- use specific sequence when its name matches featurecat_code_seq
-		EXECUTE 'SELECT concat('||quote_literal(lower(v_catfeature.id))||',''_code_seq'');' INTO v_seq_name;
-		EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||';' INTO v_sql;
-		
-		IF v_sql IS NOT NULL THEN
-			EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
-				v_code=concat(v_catfeature.addparam::json->>'code_prefix',v_seq_code);
-		END IF;
+		-- check if p_table_id is defined on cat_feature
+		if v_catfeature.id is not null then
+			-- use specific sequence when its name matches featurecat_code_seq
+			EXECUTE 'SELECT concat('||quote_literal(lower(v_catfeature.id))||',''_code_seq'');' INTO v_seq_name;
+			EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||';' INTO v_sql;
+
+			IF v_sql IS NOT NULL THEN
+				EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
+					v_code=concat(v_catfeature.addparam::json->>'code_prefix',v_seq_code);
+			END IF;
+		end if;
 
 		-- customer code only for connec
 		IF v_automatic_ccode IS TRUE AND v_automatic_ccode_field='connec_id' THEN
