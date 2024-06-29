@@ -101,6 +101,7 @@ BEGIN
 	v_usepsectors = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePsectors');
 	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
 	v_ignorebrokenvalves = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'ignoreBrokenValves');
+	v_ignorebrokenvalves = true; -- forced on 2024/06//29 because it is so dangeorus to use it without true when mincut 5g is used
 	
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;

@@ -28,3 +28,15 @@ ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") VALUES(3262, 'Invalid value for a presszone_id', 'Please, use an integer as the presszone_id', 2, true, 'utils', 'core') on conflict (id) do nothing;
 
 DELETE FROM sys_table where id IN ('config_graph_valve','v_om_mincut_selected_valve');
+
+UPDATE config_toolbox SET inputparams = 
+'[{"widgetname":"exploitation", "label":"Exploitation id:","widgettype":"text","datatype":"json","layoutname":"grl_option_parameters","layoutorder":1, "placeholder":"1,2", "value":""}, 
+{"widgetname":"usePsectors", "label":"Use masterplan psectors:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":6, "value":""}, 
+{"widgetname":"commitChanges", "label":"Commit changes:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":7, "value":""}, 
+{"widgetname":"updateMapZone", "label":"Update mapzone geometry method:","widgettype":"combo","datatype":"integer","layoutname":"grl_option_parameters","layoutorder":8,"comboIds":[0,1,2,3], "comboNames":["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "PLOT & PIPE BUFFER"], "selectedId":""}, 
+{"widgetname":"geomParamUpdate", "label":"Geometry parameter:","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layoutorder":10, "isMandatory":false, "placeholder":"5-30", "value":""}
+]'
+WHERE id = 2706;
+
+
+
