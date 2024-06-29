@@ -5,10 +5,10 @@ This version of Giswater is provided by Giswater Association
 */
 
 --FUNCTION CODE: 3142
-
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_waterbalance(p_data json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_waterbalance(p_data json)  RETURNS json AS
-$BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_waterbalance(p_data json)
+ RETURNS json
+ LANGUAGE plpgsql
+AS $function$
 
 /*
 EXAMPLE
@@ -61,6 +61,7 @@ v_total_inlet double precision = 0;
 v_total_out double precision = 0;
 v_centroidday integer;
 v_prevperiod text;
+v_hydrometer integer;
 
 v_kmarc  double precision = 0;
 v_kmconnec  double precision = 0;
@@ -78,8 +79,6 @@ v_setmawithperiodmeters boolean = false;
 v_days_limiter integer;
 v_current_date text;
 v_days_past integer;
-v_hydrometer integer;
-
 
 BEGIN
 
@@ -147,15 +146,8 @@ BEGIN
 		-- getting dates for period
 		v_startdate = (SELECT start_date FROM ext_cat_period WHERE id = v_period);
 		v_enddate =  (SELECT end_date FROM ext_cat_period WHERE id = v_period);
-		
-		select count(*) into v_hydrometer
-		FROM ext_rtc_hydrometer_x_data d
-		JOIN rtc_hydrometer_x_connec USING (hydrometer_id)
-		JOIN connec c USING (connec_id) 
-		JOIN ext_rtc_hydrometer h ON h.id::text = d.hydrometer_id::text
-		where is_waterbal IS true and cat_period_id = v_period;
-		
-		IF v_method = 'CPW' THEN -- static period
+
+		IF v_method = 'CPW' THEN -- static period or remote lecture period (1 day)
 
 			-- startdate & enddate
 			UPDATE om_waterbalance SET startdate = v_startdate, enddate = v_enddate WHERE cat_period_id = v_period;
@@ -180,7 +172,7 @@ BEGIN
 			UPDATE om_waterbalance n SET total_out = total_in - total_sys_input
 			WHERE cat_period_id = v_period;
 
-	 			SELECT count(*) INTO v_count FROM om_waterbalance WHERE cat_period_id = v_period AND expl_id = v_expl;
+	 		SELECT count(*) INTO v_count FROM om_waterbalance WHERE cat_period_id = v_period AND expl_id = v_expl;
 
 			-- auth_bill_met_hydro
 			UPDATE om_waterbalance n SET auth_bill_met_hydro = value::numeric FROM (SELECT dma_id, cat_period_id, (sum(sum))::numeric as value
@@ -191,6 +183,13 @@ BEGIN
 			where is_waterbal IS TRUE
 			GROUP BY dma_id, cat_period_id)a
 			WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id;
+		
+			select count(*) into v_hydrometer
+			FROM ext_rtc_hydrometer_x_data d
+			JOIN rtc_hydrometer_x_connec USING (hydrometer_id)
+			JOIN connec c USING (connec_id) 
+			JOIN ext_rtc_hydrometer h ON h.id::text = d.hydrometer_id::text
+			where is_waterbal IS true and cat_period_id = v_period;
 
 			UPDATE om_waterbalance SET auth_bill_met_hydro = 0 WHERE auth_bill_met_hydro is null AND cat_period_id = v_period;
 	 			
@@ -234,209 +233,207 @@ BEGIN
 					auth_bill_met_hydro = v_total_hydro::numeric, startdate = v_startdate, enddate = v_enddate WHERE cat_period_id = v_period AND dma_id = v_dma;
 			END LOOP;
 			
-			END IF;
+		END IF;
 
-			--update data
-			UPDATE om_waterbalance n SET n_connec = count_connecs, link_length = length::numeric(12,3)
-			FROM (SELECT c.dma_id, p.id as cat_period_id, count(c.connec_id) as count_connecs, sum(st_length(l.the_geom)) /1000 as length
-			FROM ext_cat_period p, rtc_hydrometer_x_connec d
-			JOIN connec c USING (connec_id) 
-			JOIN ext_rtc_hydrometer h ON c.customer_code::text = h.connec_id::text
-			left join link l on c.connec_id = feature_id
-			where c.state=1 and p.id = v_period AND is_waterbal IS TRUE
-			GROUP BY c.dma_id, p.id)a
-			WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id AND expl_id = v_expl;
-			
-			UPDATE om_waterbalance n SET n_hydro = count_hydro FROM 
-			(SELECT dma_id, p.id as cat_period_id, count(hydrometer_id) as count_hydro
-			FROM ext_cat_period p, rtc_hydrometer_x_connec d
-			JOIN connec c USING (connec_id) 
-			JOIN ext_rtc_hydrometer h ON c.customer_code::text = h.connec_id::text
-			where state=1  and p.id = v_period AND is_waterbal IS TRUE
-			GROUP BY dma_id, p.id)a
-			WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id AND expl_id = v_expl;
+		--update data
+		UPDATE om_waterbalance n SET n_connec = count_connecs, link_length = length::numeric(12,3)
+		FROM (SELECT c.dma_id, p.id as cat_period_id, count(c.connec_id) as count_connecs, sum(st_length(l.the_geom)) /1000 as length
+		FROM ext_cat_period p, rtc_hydrometer_x_connec d
+		JOIN connec c USING (connec_id) 
+		JOIN ext_rtc_hydrometer h ON c.customer_code::text = h.connec_id::text
+		left join link l on c.connec_id = feature_id
+		where c.state=1 and p.id = v_period AND is_waterbal IS TRUE
+		GROUP BY c.dma_id, p.id)a
+		WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id AND expl_id = v_expl;
+		
+		UPDATE om_waterbalance n SET n_hydro = count_hydro FROM 
+		(SELECT dma_id, p.id as cat_period_id, count(hydrometer_id) as count_hydro
+		FROM ext_cat_period p, rtc_hydrometer_x_connec d
+		JOIN connec c USING (connec_id) 
+		JOIN ext_rtc_hydrometer h ON c.customer_code::text = h.connec_id::text
+		where state=1  and p.id = v_period AND is_waterbal IS TRUE
+		GROUP BY dma_id, p.id)a
+		WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id AND expl_id = v_expl;
 
-			UPDATE om_waterbalance set n_connec = 0, link_length = 0, n_hydro = 0 where n_connec is null;
+		UPDATE om_waterbalance set n_connec = 0, link_length = 0, n_hydro = 0 where n_connec is null;
 
-			UPDATE om_waterbalance n SET arc_length = length::numeric(12,3) FROM 
-			(SELECT dma_id, p.id as cat_period_id, sum(st_length(the_geom)) /1000 as length
-			FROM  arc c ,ext_cat_period p
-			where state=1 and p.id = v_period
-			GROUP BY dma_id, p.id)a
-			WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id AND expl_id = v_expl;
+		UPDATE om_waterbalance n SET arc_length = length::numeric(12,3) FROM 
+		(SELECT dma_id, p.id as cat_period_id, sum(st_length(the_geom)) /1000 as length
+		FROM  arc c ,ext_cat_period p
+		where state=1 and p.id = v_period
+		GROUP BY dma_id, p.id)a
+		WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id AND expl_id = v_expl;
 
-			UPDATE om_waterbalance set arc_length = 0 where arc_length is null;
+		UPDATE om_waterbalance set arc_length = 0 where arc_length is null;
 
-	 		UPDATE om_waterbalance w SET meters_in = meters FROM 
-	 		(SELECT string_agg (node_id, ', ') as meters, dma_id FROM om_waterbalance_dma_graph WHERE flow_sign = 1 group by dma_id) a
-	 		WHERE a.dma_id = w.dma_id AND cat_period_id = v_period AND expl_id = v_expl;
+ 		UPDATE om_waterbalance w SET meters_in = meters FROM 
+ 		(SELECT string_agg (node_id, ', ') as meters, dma_id FROM om_waterbalance_dma_graph WHERE flow_sign = 1 group by dma_id) a
+ 		WHERE a.dma_id = w.dma_id AND cat_period_id = v_period AND expl_id = v_expl;
 
-			UPDATE om_waterbalance w SET meters_out = meters FROM 
-	 		(SELECT string_agg (node_id, ', ') as meters, dma_id FROM om_waterbalance_dma_graph WHERE flow_sign = -1 group by dma_id) a
-	 		WHERE a.dma_id = w.dma_id AND cat_period_id = v_period AND expl_id = v_expl;
+		UPDATE om_waterbalance w SET meters_out = meters FROM 
+ 		(SELECT string_agg (node_id, ', ') as meters, dma_id FROM om_waterbalance_dma_graph WHERE flow_sign = -1 group by dma_id) a
+ 		WHERE a.dma_id = w.dma_id AND cat_period_id = v_period AND expl_id = v_expl;
 
-	 		UPDATE om_waterbalance SET auth_bill = (COALESCE(auth_bill_met_export, 0::double precision) + 
-	 		COALESCE(auth_bill_met_hydro, 0::double precision) + COALESCE(auth_bill_unmet, 0::double precision)),
-	 		auth_unbill = (COALESCE(auth_unbill_met, 0::double precision) + 
-	 		COALESCE(auth_unbill_unmet, 0::double precision)),
-			loss_app = (COALESCE(loss_app_unath, 0::double precision) + (COALESCE(loss_app_met_error, 0::double precision) + 
-			COALESCE(loss_app_data_error, 0::double precision))::numeric::double precision),
-    	loss_real = (COALESCE(loss_real_leak_main, 0::double precision) + COALESCE(loss_real_leak_service, 0::double precision) + 
-    	COALESCE(loss_real_storage, 0::double precision)),
-    	total_in = COALESCE(total_in::double precision, 0::double precision),
-   		total_out = COALESCE(total_out::double precision, 0::double precision),
-    	total = COALESCE(total_sys_input, 0::double precision) WHERE cat_period_id = v_period AND expl_id = v_expl;
+ 		UPDATE om_waterbalance SET auth_bill = (COALESCE(auth_bill_met_export, 0::double precision) + 
+ 		COALESCE(auth_bill_met_hydro, 0::double precision) + COALESCE(auth_bill_unmet, 0::double precision)),
+ 		auth_unbill = (COALESCE(auth_unbill_met, 0::double precision) + 
+ 		COALESCE(auth_unbill_unmet, 0::double precision)),
+		loss_app = (COALESCE(loss_app_unath, 0::double precision) + (COALESCE(loss_app_met_error, 0::double precision) + 
+		COALESCE(loss_app_data_error, 0::double precision))::numeric::double precision),
+	   	loss_real = (COALESCE(loss_real_leak_main, 0::double precision) + COALESCE(loss_real_leak_service, 0::double precision) + 
+		COALESCE(loss_real_storage, 0::double precision)),
+		total_in = COALESCE(total_in::double precision, 0::double precision),
+		total_out = COALESCE(total_out::double precision, 0::double precision),
+		total = COALESCE(total_sys_input, 0::double precision) WHERE cat_period_id = v_period AND expl_id = v_expl;
 
     	UPDATE om_waterbalance SET auth =  (auth_bill + auth_unbill),
     	nrw = (total::double precision - auth_bill::double precision)::numeric,
     	nrw_eff = CASE WHEN total::double precision > 0::double precision THEN ((100::numeric * auth_bill)::double precision / total::double precision)::numeric
-      ELSE 0::numeric end,
-      loss = (total::double precision - auth_bill::double precision - auth_unbill::double precision)
-      WHERE cat_period_id = v_period AND expl_id = v_expl;
+    	ELSE 0::numeric end, loss = (total::double precision - auth_bill::double precision - auth_unbill::double precision)
+      	WHERE cat_period_id = v_period AND expl_id = v_expl;
 	 		
-			-- calculate ili
-			v_a = 6.57;
-			v_b = 9.13;
-			v_c = 0.256;
+		-- calculate ili
+		v_a = 6.57;
+		v_b = 9.13;
+		v_c = 0.256;
+		
+		FOR v_dma IN SELECT DISTINCT dma_id FROM connec WHERE state = 1 AND expl_id = v_expl
+		LOOP
+		v_kmarc = (SELECT COALESCE(sum(st_length(the_geom)),0) FROM arc WHERE state = 1 AND dma_id = v_dma)/1000;
+		v_kmconnec = (SELECT COALESCE(sum(st_length(l.the_geom)),0) FROM link l JOIN connec c ON feature_id = connec_id WHERE c.state = 1 AND c.dma_id = v_dma)/1000;
+		v_numconnec = (SELECT COALESCE(count(*),0) FROM connec WHERE state = 1 AND dma_id = v_dma);
+		v_avgpress = (SELECT avg_press FROM dma WHERE dma_id = v_dma);
+		
+		v_uarl = (v_a*v_kmarc + v_b*v_kmconnec + v_c*v_numconnec)*v_avgpress;	
+		
+		v_carl = (SELECT loss FROM om_waterbalance WHERE cat_period_id = v_period AND 
+			dma_id = v_dma)*(365/(SELECT case when extract (day from end_date - start_date) = 0 then 1
+		else  extract (day from end_date - start_date) end 
+			FROM ext_cat_period WHERE id = v_period));
+
+		v_ili = v_carl/v_uarl;
+
+		RAISE NOTICE ' % % %' , v_carl, v_uarl, v_dma;
+
+		UPDATE om_waterbalance SET ili = v_ili WHERE cat_period_id = v_period AND dma_id = v_dma;
+
+		END LOOP;
 			
-			FOR v_dma IN SELECT DISTINCT dma_id FROM connec WHERE state = 1 AND expl_id = v_expl
-			LOOP
-			v_kmarc = (SELECT COALESCE(sum(st_length(the_geom)),0) FROM arc WHERE state = 1 AND dma_id = v_dma)/1000;
-			v_kmconnec = (SELECT COALESCE(sum(st_length(l.the_geom)),0) FROM link l JOIN connec c ON feature_id = connec_id WHERE c.state = 1 AND c.dma_id = v_dma)/1000;
-			v_numconnec = (SELECT COALESCE(count(*),0) FROM connec WHERE state = 1 AND dma_id = v_dma);
-			v_avgpress = (SELECT avg_press FROM dma WHERE dma_id = v_dma);
-			
-			v_uarl = (v_a*v_kmarc + v_b*v_kmconnec + v_c*v_numconnec)*v_avgpress;	
-			
-			v_carl = (SELECT loss FROM om_waterbalance WHERE cat_period_id = v_period AND 
-				dma_id = v_dma)*(365/(SELECT case when extract (day from end_date - start_date) = 0 then 1
-			else  extract (day from end_date - start_date) end 
-				FROM ext_cat_period WHERE id = v_period));
+	END LOOP;	
 
-			v_ili = v_carl/v_uarl;
+	-- get log data
+	SELECT sum(total_sys_input) as tsi, sum(auth_bill_met_hydro) as bmc, (sum(total_sys_input) - sum(auth_bill_met_hydro))::numeric (12,2) as nrw INTO rec_nrw
+	FROM om_waterbalance WHERE expl_id = v_expl AND cat_period_id  = v_period;
 
-			RAISE NOTICE ' % % %' , v_carl, v_uarl, v_dma;
+	--restrict water balance if threshold days after lastupdate DMA are surpassed
+	select value into v_days_limiter from config_param_system where parameter = 'om_waterbalance_threshold_days';
+	
+	select lastupdate::text into v_current_date from dma where expl_id = v_expl and lastupdate is not null order by tstamp asc limit 1;
 
-			UPDATE om_waterbalance SET ili = v_ili WHERE cat_period_id = v_period AND dma_id = v_dma;
+	if v_current_date is null then
+	
+		select tstamp::text into v_current_date from dma where expl_id = v_expl and tstamp is not null order by tstamp asc limit 1;
+	
+		raise notice 'v_current_date %', v_current_date;
+		
+	end if;
 
-			END LOOP;
-			
-		END LOOP;	
+	select date_part('day', now() - v_current_date::timestamp) into v_days_past;
+		
+	
+	IF v_days_past is null then
 
-		-- get log data
+		INSERT INTO audit_check_data (error_message, fid, cur_user, criticity) 
+		VALUES ('ERROR: There are NULL values on lastupdate or tstamp on table dma. Please, update DMAs to fill these columns', v_fid, current_user, 3);
+	
+	ELSIF v_days_past >= v_days_limiter then
+	
+		INSERT INTO audit_check_data (error_message, fid, cur_user, criticity) 
+		VALUES ('ERROR: Water balance is not allowed having surpassed the threshold day limiter (parameter om_waterbalance_threshold_days)', v_fid, current_user, 3);
+		
+	else
+		
 		SELECT sum(total_sys_input) as tsi, sum(auth_bill_met_hydro) as bmc, (sum(total_sys_input) - sum(auth_bill_met_hydro))::numeric (12,2) as nrw INTO rec_nrw
 		FROM om_waterbalance WHERE expl_id = v_expl AND cat_period_id  = v_period;
+
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Process done succesfully for period: ',v_period));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Number of DMA processed: ', v_count));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Number of hydrometer processed: ', v_hydrometer));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Total System Input: ', round(rec_nrw.tsi::numeric,2), ' CMP'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Billed metered consumtion: ', round(rec_nrw.bmc::numeric,2), ' CMP'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Non-revenue water: ', round(rec_nrw.nrw::numeric,2), ' CMP'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('DMAs updated ',date_part('day', now() - v_current_date::timestamp), ' days ago.'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
 	
-		--restrict water balance if threshold days after lastupdate DMA are surpassed
-		select value into v_days_limiter from config_param_system where parameter = 'om_waterbalance_threshold_days';
+	end if;
+
+	IF v_executegraphdma THEN
+
+		-- info
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid IN (441, 145) order by criticity desc, id asc) row;
+
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
+		-- disconnected arcs
+		SELECT jsonb_agg(features.feature) INTO v_result
+		FROM (
+		SELECT jsonb_build_object(
+		 'type',       'Feature',
+		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+		'properties', to_jsonb(row) - 'the_geom'
+		) AS feature
+		FROM 
+		(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Disconnected'::text as descript, the_geom FROM v_edit_arc JOIN temp_anlgraph USING (arc_id) WHERE water = 0
+		UNION
+		SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM v_edit_arc JOIN temp_anlgraph USING (arc_id) WHERE water = -1
+		) row) features;
+
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
+
+		-- disconnected connecs
+		v_result = null;
+
+		SELECT jsonb_agg(features.feature) INTO v_result
+		FROM (
+		SELECT jsonb_build_object(
+		 'type',       'Feature',
+		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+		'properties', to_jsonb(row) - 'the_geom'
+		) AS feature
+		FROM (SELECT DISTINCT ON (connec_id) connec_id, connecat_id, c.state, c.expl_id, 'Disconnected'::text as descript, c.the_geom FROM v_edit_connec c JOIN temp_anlgraph USING (arc_id) WHERE water = 0
+		UNION
+		SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM v_edit_connec c JOIN temp_anlgraph USING (arc_id) WHERE water = -1
+		UNION			
+		SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Orphan'::text as descript, the_geom FROM v_edit_connec c WHERE dma_id = 0 AND arc_id IS NULL
+		) row) features;
+
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+	ELSE
+
+		-- info
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		FROM (SELECT * FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid) a order by  id asc) row;
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 		
-		select lastupdate::text into v_current_date from dma where expl_id = v_expl and lastupdate is not null order by tstamp asc limit 1;
-	
-		if v_current_date is null then
-		
-			select tstamp::text into v_current_date from dma where expl_id = v_expl and tstamp is not null order by tstamp asc limit 1;
-		
-			raise notice 'v_current_date %', v_current_date;
-			
-		end if;
+	END IF;
 
-		select date_part('day', now() - v_current_date::timestamp) into v_days_past;
-			
-		
-		IF v_days_past is null then
-
-			INSERT INTO audit_check_data (error_message, fid, cur_user, criticity) 
-			VALUES ('ERROR: There are NULL values on lastupdate or tstamp on table dma. Please, update DMAs to fill these columns', v_fid, current_user, 3);
-		
-		ELSIF v_days_past >= v_days_limiter then
-		
-			INSERT INTO audit_check_data (error_message, fid, cur_user, criticity) 
-			VALUES ('ERROR: Water balance is not allowed having surpassed the threshold day limiter (parameter om_waterbalance_threshold_days)', v_fid, current_user, 3);
-			
-		else
-			
-			SELECT sum(total_sys_input) as tsi, sum(auth_bill_met_hydro) as bmc, (sum(total_sys_input) - sum(auth_bill_met_hydro))::numeric (12,2) as nrw INTO rec_nrw
-			FROM om_waterbalance WHERE expl_id = v_expl AND cat_period_id  = v_period;
-	
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Process done succesfully for period: ',v_period));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Number of DMA processed: ', v_count));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Number of hydrometer processed: ', v_hydrometer));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Total System Input: ', round(rec_nrw.tsi::numeric,2), ' CMP'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Billed metered consumtion: ', round(rec_nrw.bmc::numeric,2), ' CMP'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Non-revenue water: ', round(rec_nrw.nrw::numeric,2), ' CMP'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('DMAs updated ',date_part('day', now() - v_current_date::timestamp), ' days ago.'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
-		
-		end if;
-
-		IF v_executegraphdma THEN
-
-			-- info
-			SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-			FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid IN (441, 145) order by criticity desc, id asc) row;
-
-			v_result := COALESCE(v_result, '{}'); 
-			v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-
-			-- disconnected arcs
-			SELECT jsonb_agg(features.feature) INTO v_result
-			FROM (
-			SELECT jsonb_build_object(
-			 'type',       'Feature',
-			'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-			'properties', to_jsonb(row) - 'the_geom'
-			) AS feature
-			FROM 
-			(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Disconnected'::text as descript, the_geom FROM v_edit_arc JOIN temp_anlgraph USING (arc_id) WHERE water = 0
-			UNION
-			SELECT DISTINCT ON (arc_id) arc_id, arccat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM v_edit_arc JOIN temp_anlgraph USING (arc_id) WHERE water = -1
-			) row) features;
-
-			v_result := COALESCE(v_result, '{}'); 
-			v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
-
-			-- disconnected connecs
-			v_result = null;
-
-			SELECT jsonb_agg(features.feature) INTO v_result
-			FROM (
-			SELECT jsonb_build_object(
-			 'type',       'Feature',
-			'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-			'properties', to_jsonb(row) - 'the_geom'
-			) AS feature
-			FROM (SELECT DISTINCT ON (connec_id) connec_id, connecat_id, c.state, c.expl_id, 'Disconnected'::text as descript, c.the_geom FROM v_edit_connec c JOIN temp_anlgraph USING (arc_id) WHERE water = 0
-			UNION
-			SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM v_edit_connec c JOIN temp_anlgraph USING (arc_id) WHERE water = -1
-			UNION			
-			SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Orphan'::text as descript, the_geom FROM v_edit_connec c WHERE dma_id = 0 AND arc_id IS NULL
-			) row) features;
-
-			v_result := COALESCE(v_result, '{}'); 
-			v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
-		ELSE
-
-			-- info
-			SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-			FROM (SELECT * FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid) a order by  id asc) row;
-			v_result := COALESCE(v_result, '{}'); 
-			v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-			
-		END IF;
-
-		-- Control nulls
-		v_result_info := COALESCE(v_result_info, '{}'); 
-		v_result_point := COALESCE(v_result_point, '{}'); 
-		v_result_line := COALESCE(v_result_line, '{}'); 
+	-- Control nulls
+	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_point := COALESCE(v_result_point, '{}'); 
+	v_result_line := COALESCE(v_result_line, '{}'); 
 
 			
-		--  Return
+	--  Return
 	RETURN  gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done succesfully"}, "version":"'||v_version||'"'||
 	             ',"body":{"form":{}, "data":{ "info":'||v_result_info||','||
 				  '"point":'||v_result_point||','||
 				  '"line":'||v_result_line||'}'||'}}')::json, 3142, null, ('{"visible": ["v_edit_dma"]}')::json, null);
 			      
 
-END;$BODY$
-LANGUAGE plpgsql VOLATILE
- COST 100;
+END;$function$
+;

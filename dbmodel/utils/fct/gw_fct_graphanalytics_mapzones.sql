@@ -248,16 +248,7 @@ BEGIN
 		-- graph quality analysis
 		v_input = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{ "fid":',v_fid,',"selectionMode":"userSelectors", "graphClass":',quote_ident(v_class),'}}}')::json;
 		PERFORM gw_fct_graphanalytics_check_data(v_input);
-		SELECT count(*) INTO v_count2 FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid AND criticity=3 AND result_id IS NOT NULL;
-
-	ELSE
-		IF v_class != 'DRAINZONE' THEN
-			IF (SELECT count(*) FROM config_graph_valve WHERE active is TRUE) < 1 THEN
-				DELETE FROM temp_audit_check_data WHERE fid = v_fid and cur_user = current_user;
-				INSERT INTO temp_audit_check_data (error_message, fid, cur_user, criticity) VALUES ('ERROR: config_graph_valve table is not configured', v_fid, current_user, 3);
-				v_count1 = 1;
-			END IF;
-		END IF;
+		SELECT count(*) INTO v_count2 FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid AND criticity=3 AND result_id IS NOT NULL;	
 	END IF;
 
 	IF v_expl_id = '' THEN
@@ -491,16 +482,14 @@ BEGIN
 			FROM '||quote_ident(v_table)||' WHERE graphconfig IS NOT NULL AND active IS TRUE)a WHERE node_id ~ ''^[0-9]+$''';
 		END IF;
 
-		-- close boundary conditions acording config_graph_valve (flag=1)
+		-- close boundary conditions acording closed column (flag=1)
 		IF v_class !='DRAINZONE' THEN
 			v_querytext  = 'UPDATE temp_t_anlgraph SET flag=1 WHERE 
 				node_1::integer IN (
 				SELECT a.node_id::integer FROM temp_t_node a JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.nodetype_id 
 				LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer 
 				JOIN temp_t_anlgraph e ON a.node_id::integer=e.node_1::integer 
-				JOIN config_graph_valve v ON v.id = c.id
-				WHERE closed=TRUE
-				AND v.active IS TRUE)';
+				WHERE closed=TRUE)';
 			EXECUTE v_querytext;
 
 			v_querytext  = 'UPDATE temp_t_anlgraph SET flag=1 WHERE 
@@ -508,9 +497,7 @@ BEGIN
 				SELECT (a.node_id::integer) FROM temp_t_node a JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.nodetype_id 
 				LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer 
 				JOIN temp_t_anlgraph e ON a.node_id::integer=e.node_1::integer 
-				JOIN config_graph_valve v ON v.id = c.id
-				WHERE closed=TRUE
-				AND v.active IS TRUE)';
+				WHERE closed=TRUE)';
 			EXECUTE v_querytext;
 
 			IF v_netscenario IS NOT NULL THEN
