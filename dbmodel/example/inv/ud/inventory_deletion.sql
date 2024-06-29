@@ -32,7 +32,10 @@ DELETE FROM inp_flwreg_pump;
 DELETE FROM inp_flwreg_orifice;
 DELETE FROM inp_flwreg_outlet;
 
-update cat_mat_arc SET n = null;
+DELETE FROM inp_weir;
+DELETE FROM inp_pump;
+
+UPDATE cat_mat_arc SET n = null;
 
 DELETE FROM inp_pattern;
 DELETE FROM inp_curve;
