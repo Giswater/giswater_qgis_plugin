@@ -13,3 +13,4 @@
 - Remove config_graph_valve strategy by using graph_delimiter column instead of
 - Relate connec.plot_code with table by using plot code if variable edit_connec_autofill_plotcode is true
 - Clean dbmodel: Drop views vi_parent_arc, and v_anl_flow_*
+- Add '%' symbol ont profile's slope
