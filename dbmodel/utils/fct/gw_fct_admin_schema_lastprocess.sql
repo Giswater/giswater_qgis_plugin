@@ -155,6 +155,12 @@ BEGIN
             UPDATE config_param_system SET value = (replace(value, 'Random', 'Disable')) WHERE parameter='utils_graphanalytics_style';
             UPDATE config_param_system SET value = (replace(value, 'Stylesheet', 'Disable')) WHERE parameter='utils_graphanalytics_style';
 
+			-- reset sequences
+			IF v_projecttype = 'UD' THEN 
+				select setval('SCHEMA_NAME.cat_dwf_scenario_id_seq',0)
+				select setval('SCHEMA_NAME.cat_hydrology_hydrology_id_seq',0)
+			END IF;
+			
 			-- drop deprecated views
 			IF v_projecttype = 'WS' THEN 
 				DROP VIEW IF EXISTS v_edit_man_varc;

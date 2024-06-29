@@ -35,5 +35,5 @@ DROP VIEW IF EXISTS v_anl_flow_arc;
 DROP VIEW IF EXISTS v_anl_flow_node;
 DROP VIEW IF EXISTS v_anl_flow_connec;
 DROP VIEW IF EXISTS v_anl_flow_gully;
-DELETE FROM sys_table WHERE id IN ('v_anl_flow_arc','v_anl_flow_node','v_anl_flow_connec','v_anl_flow_gully')
+DELETE FROM sys_table WHERE id IN ('v_anl_flow_arc','v_anl_flow_node','v_anl_flow_connec','v_anl_flow_gully');
 
