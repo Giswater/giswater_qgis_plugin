@@ -26,3 +26,14 @@ AS SELECT dma.dma_id,
    FROM selector_expl,
     dma
   WHERE (dma.expl_id = selector_expl.expl_id OR dma.expl_id2 = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text;
+
+-- 2024/06/29
+DROP VIEW IF EXISTS vi_parent_arc;
+DELETE FROM sys_table WHERE id = 'vi_parent_arc';
+
+DROP VIEW IF EXISTS v_anl_flow_arc;
+DROP VIEW IF EXISTS v_anl_flow_node;
+DROP VIEW IF EXISTS v_anl_flow_connec;
+DROP VIEW IF EXISTS v_anl_flow_gully;
+DELETE FROM sys_table WHERE id IN ('v_anl_flow_arc','v_anl_flow_node','v_anl_flow_connec','v_anl_flow_gully')
+

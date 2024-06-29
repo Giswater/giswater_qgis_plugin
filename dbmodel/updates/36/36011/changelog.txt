@@ -12,3 +12,4 @@
 - New variable plan_node_replace_code in config_param_system. When a node replace in planification is performed, choose if new arcs will have the same code as the replaced one or not.
 - Remove config_graph_valve strategy by using graph_delimiter column instead of
 - Relate connec.plot_code with table by using plot code if variable edit_connec_autofill_plotcode is true
+- Clean dbmodel: Drop views vi_parent_arc, and v_anl_flow_*

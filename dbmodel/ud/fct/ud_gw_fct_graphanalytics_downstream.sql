@@ -15,13 +15,13 @@ RETURNS json AS $BODY$
 /*
 example:
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_downstream($${
-"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"id":["20607"]},
 "data":{}}$$);
 
 
 SELECT SCHEMA_NAME.gw_fct_graphanalytics_downstream($${
-"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"postgres"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},
 "data":{ "coordinates":{"xcoord":419277.7306855297,"ycoord":4576625.674511955, "zoomRatio":3565.9967217571534}}}$$)
 
@@ -61,12 +61,6 @@ v_xcoord float;
 v_ycoord float;
 v_epsg integer;
 v_client_epsg integer;
-v_prev_cur_user text;
-
-v_count_connec integer;
-v_count_gully integer;
-v_count_node integer;
-v_length_arc numeric;
 
 BEGIN
 
@@ -84,11 +78,6 @@ BEGIN
 
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 
-	v_prev_cur_user = current_user;
-	IF v_cur_user IS NOT NULL THEN
-		EXECUTE 'SET ROLE "'||v_cur_user||'"';
-	END IF;
-
 	-- select config values
 	SELECT giswater, upper(project_type) INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
@@ -96,24 +85,24 @@ BEGIN
 
 	CREATE OR REPLACE TEMP VIEW v_temp_graphanalytics_downstream AS
 	 SELECT temp_t_anlgraph.arc_id,
-    temp_t_anlgraph.node_1,
-    temp_t_anlgraph.node_2,
-    temp_t_anlgraph.flag,
-    a2.flag AS flagi,
-    a2.value,
-    a2.trace
-   FROM temp_t_anlgraph
-     JOIN ( SELECT temp_t_anlgraph_1.arc_id,
-            temp_t_anlgraph_1.node_1,
-            temp_t_anlgraph_1.node_2,
-            temp_t_anlgraph_1.water,
-            temp_t_anlgraph_1.flag,
-            temp_t_anlgraph_1.checkf,
-            temp_t_anlgraph_1.value,
-            temp_t_anlgraph_1.trace
-           FROM temp_t_anlgraph temp_t_anlgraph_1
-          WHERE temp_t_anlgraph_1.water = 1) a2 ON temp_t_anlgraph.node_1::text = a2.node_2::text
-  WHERE temp_t_anlgraph.flag < 2 AND temp_t_anlgraph.water = 0 AND a2.flag = 0;
+	    temp_t_anlgraph.node_1,
+	    temp_t_anlgraph.node_2,
+	    temp_t_anlgraph.flag,
+	    a2.flag AS flagi,
+	    a2.value,
+	    a2.trace
+	   FROM temp_t_anlgraph
+	     JOIN ( SELECT temp_t_anlgraph_1.arc_id,
+		    temp_t_anlgraph_1.node_1,
+		    temp_t_anlgraph_1.node_2,
+		    temp_t_anlgraph_1.water,
+		    temp_t_anlgraph_1.flag,
+		    temp_t_anlgraph_1.checkf,
+		    temp_t_anlgraph_1.value,
+		    temp_t_anlgraph_1.trace
+		   FROM temp_t_anlgraph temp_t_anlgraph_1
+		  WHERE temp_t_anlgraph_1.water = 1) a2 ON temp_t_anlgraph.node_1::text = a2.node_2::text
+	  WHERE temp_t_anlgraph.flag < 2 AND temp_t_anlgraph.water = 0 AND a2.flag = 0;
 
 	--Look for closest node using coordinates
 	IF v_node IS NULL THEN
@@ -139,85 +128,72 @@ BEGIN
 	EXECUTE 'UPDATE temp_t_anlgraph SET flag=0, water=1, trace = 1::integer  WHERE node_1::integer IN ('||v_node||')';
 
 	-- inundation process
-		LOOP
-			v_count = v_count+1;
-			UPDATE temp_t_anlgraph n SET water=1, trace = a.trace FROM v_temp_graphanalytics_downstream a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;
-			GET DIAGNOSTICS v_affectrow = row_count;
-			raise notice 'v_count --> %' , v_count;
-			EXIT WHEN v_affectrow = 0;
-			EXIT WHEN v_count = 5000;
-		END LOOP;
+	LOOP
+		v_count = v_count+1;
+		UPDATE temp_t_anlgraph n SET water=1, trace = a.trace FROM v_temp_graphanalytics_downstream a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;
+		GET DIAGNOSTICS v_affectrow = row_count;
+		raise notice 'v_count --> %' , v_count;
+		EXIT WHEN v_affectrow = 0;
+		EXIT WHEN v_count = 5000;
+	END LOOP;
 
-		RAISE NOTICE 'Finish engine....';
+	RAISE NOTICE 'Finish engine....';
 
-	-- info
-	--affected network
-		SELECT count(*) INTO v_count_connec FROM v_anl_flow_connec;
-		SELECT count(*) INTO v_count_gully FROM v_anl_flow_gully;
-		SELECT count(*) INTO v_count_node FROM v_anl_flow_node JOIN cat_feature_node cn ON cn.id=node_type WHERE isprofilesurface IS TRUE;
-		SELECT round(sum(st_length(the_geom))::numeric,2) INTO v_length_arc FROM v_anl_flow_arc;
 
-		select json_build_object(
-		'affectedNetwork',json_build_object('length',v_length_arc,
-		'nodesIsprofileTrue',v_count_node, 'numConnecs', v_count_connec, 'numGully', v_count_gully) )
-		INTO v_result;
+	v_result := COALESCE(v_result, '{}');
+	v_result_info := COALESCE(v_result, '{}');
+	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
-		v_result := COALESCE(v_result, '{}');
-		v_result_info := COALESCE(v_result, '{}');
-		v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
+	-- Reset values
+	DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
+	DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
 
-		-- Reset values
-		DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
-		DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = 220 or fid=221);
+	INSERT INTO anl_arc (arc_id, fid, arccat_id, expl_id, the_geom)
+	SELECT arc_id, v_fid, arc_type, expl_id, the_geom	FROM temp_t_anlgraph
+	join arc using(arc_id)	where water=1;
 
-		INSERT INTO anl_arc (arc_id, fid, arccat_id, expl_id, the_geom)
-		SELECT arc_id, v_fid, arc_type, expl_id, the_geom	FROM temp_t_anlgraph
-		join arc using(arc_id)	where water=1;
+	INSERT INTO anl_node (node_id, nodecat_id,state, expl_id, fid, the_geom)
+	SELECT node_id, node_type, state, expl_id, v_fid, the_geom
+	FROM v_edit_node WHERE node_id IN (SELECT  node_1 from temp_t_anlgraph where water=1 union SELECT  node_2 from temp_t_anlgraph where water=1);
 
-		INSERT INTO anl_node (node_id, nodecat_id,state, expl_id, fid, the_geom)
-		SELECT node_id, node_type, state, expl_id, v_fid, the_geom
-		FROM v_edit_node WHERE node_id IN (SELECT  node_1 from temp_t_anlgraph where water=1 union SELECT  node_2 from temp_t_anlgraph where water=1);
+	DROP VIEW v_temp_graphanalytics_downstream;
+	DROP TABLE temp_t_anlgraph;
 
-		DROP VIEW v_temp_graphanalytics_downstream;
-		DROP TABLE temp_t_anlgraph;
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+	SELECT jsonb_build_object(
+		'type',       'Feature',
+	'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+	'properties', to_jsonb(row) - 'the_geom',
+	'crs',concat('EPSG:',ST_SRID(the_geom))
+	) AS feature
+	FROM (SELECT arc_id, arc_type, 'Flow exit' as context, a.expl_id, st_length(a.the_geom) as length, a.the_geom
+	FROM anl_arc join arc a using (arc_id) WHERE fid=v_fid) row) features;
 
-		SELECT jsonb_agg(features.feature) INTO v_result
-		FROM (
-		SELECT jsonb_build_object(
-			'type',       'Feature',
+	v_result := COALESCE(v_result, '{}');
+	v_result_line = concat ('{"geometryType":"LineString", "layerName": "Flowtrace arc", "features":',v_result, '}');
+
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+	SELECT jsonb_build_object(
+		'type',       'Feature',
 		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		'properties', to_jsonb(row) - 'the_geom',
 		'crs',concat('EPSG:',ST_SRID(the_geom))
-		) AS feature
-		FROM (SELECT arc_id, arc_type, context, expl_id, st_length(the_geom) as length, the_geom
-		FROM  v_anl_flow_arc) row) features;
+	) AS feature
+	FROM (SELECT node_id as feature_id, node_type as feature_type, 'Flow exit' as context, n.expl_id, n.the_geom
+	FROM  anl_node join node n using (node_id) WHERE fid=v_fid
+	UNION
+	SELECT connec_id, 'CONNEC', 'Flow exit' as context, c.expl_id, c.the_geom
+	FROM anl_arc JOIN connec c using (arc_id) WHERE fid=v_fid
+	UNION
+	SELECT gully_id, 'GULLY',  'Flow exit' as context, g.expl_id, g.the_geom
+	FROM anl_arc JOIN gully g using (arc_id) WHERE fid=v_fid) row) features;
 
-			v_result := COALESCE(v_result, '{}');
-			v_result_line = concat ('{"geometryType":"LineString", "layerName": "Flowtrace arc", "features":',v_result, '}');
+	v_result := COALESCE(v_result, '{}');
+	v_result_point = concat ('{"geometryType":"Point", "layerName": "Flowtrace node", "features":',v_result, '}');
 
-		SELECT jsonb_agg(features.feature) INTO v_result
-		FROM (
-		SELECT jsonb_build_object(
-			'type',       'Feature',
-			'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-			'properties', to_jsonb(row) - 'the_geom',
-			'crs',concat('EPSG:',ST_SRID(the_geom))
-		) AS feature
-		FROM (SELECT node_id as feature_id, node_type as feature_type, context, expl_id, the_geom
-		FROM  v_anl_flow_node
-		UNION
-		SELECT connec_id,'CONNEC', context, expl_id, the_geom
-		FROM  v_anl_flow_connec
-		UNION
-		SELECT gully_id,'GULLY', context, expl_id, the_geom
-		FROM  v_anl_flow_gully) row) features;
-
-		v_result := COALESCE(v_result, '{}');
-		v_result_point = concat ('{"geometryType":"Point", "layerName": "Flowtrace node", "features":',v_result, '}');
-
-		v_result_polygon = '{"geometryType":"", "features":[]}';
-
-	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
+	v_result_polygon = '{"geometryType":"", "features":[]}';
 
 	v_status = 'Accepted';
 	v_level = 3;
