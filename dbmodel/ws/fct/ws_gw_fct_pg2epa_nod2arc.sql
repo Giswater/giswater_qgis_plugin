@@ -66,7 +66,7 @@ BEGIN
 				UNION  
 				SELECT a.*, inp_pump.to_arc FROM temp_t_node a JOIN inp_pump ON a.node_id=inp_pump.node_id
 				UNION
-				SELECT a.*, inp_shortpipe.to_arc FROM temp_t_node a JOIN inp_shortpipe ON a.node_id=inp_shortpipe.node_id WHERE inp_shortpipe.to_arc IS NOT NULL';
+				SELECT a.*, s.to_arc FROM temp_t_node a JOIN v_edit_inp_shortpipe s ON a.node_id=s.node_id WHERE s.to_arc IS NOT NULL';
 
 	v_querytext = concat (' INSERT INTO temp_anl_node (num_arcs, arc_id, node_id, elevation, elev, nodecat_id, sector_id, state, state_type, descript, arc_distance, the_geom, fid, cur_user, dma_id, presszone_id, dqa_id, minsector_id)
 				SELECT c.numarcs, to_arc, b.node_id, elevation, elev, nodecat_id, sector_id, state, state_type, ''MANDATORY'', demand, the_geom, 124, current_user, dma_id, presszone_id, dqa_id, minsector_id
@@ -75,7 +75,7 @@ BEGIN
 
 	-- query text for non-mandatory node2arcs
 	IF p_only_mandatory_nodarc IS FALSE THEN
-		v_querytext = 'SELECT a.*, inp_shortpipe.to_arc FROM temp_t_node a JOIN inp_shortpipe ON a.node_id=inp_shortpipe.node_id WHERE inp_shortpipe.to_arc IS NULL';
+		v_querytext = 'SELECT a.*, s.to_arc FROM temp_t_node a JOIN v_edit_inp_shortpipe s ON a.node_id=s.node_id WHERE s.to_arc IS NULL';
 
 		v_querytext = concat (' INSERT INTO temp_anl_node (num_arcs, arc_id, node_id, elevation, elev, nodecat_id, sector_id, state, state_type, descript, arc_distance, the_geom, fid, cur_user, dma_id, presszone_id, dqa_id, minsector_id)
 				SELECT c.numarcs, to_arc, b.node_id, elevation, elev, nodecat_id, sector_id, state, state_type, ''NOT-MANDATORY'', demand, the_geom, 124, current_user, dma_id, presszone_id, dqa_id, minsector_id
