@@ -111,7 +111,6 @@ BEGIN
 		IF v_delete_prev THEN
 			
 			DELETE FROM rpt_cat_result;
-			DELETE FROM config_graph_valve;
 
 			-- Delete system and user catalogs
 			DELETE FROM macroexploitation;

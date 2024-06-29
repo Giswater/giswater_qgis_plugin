@@ -26,3 +26,5 @@ DELETE FROM inp_typevalue WHERE typevalue in ('inp_value_status_shortpipe');
 ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") VALUES(3262, 'Invalid value for a presszone_id', 'Please, use an integer as the presszone_id', 2, true, 'utils', 'core') on conflict (id) do nothing;
+
+DELETE FROM sys_table where id IN ('config_graph_valve','v_om_mincut_selected_valve');

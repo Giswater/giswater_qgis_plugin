@@ -39,3 +39,16 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netsce
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_presszone", "column":"expl_id2", "dataType":"integer"}}$$);
 
 alter table rtc_hydrometer_x_connec add constraint rtc_hydrometer_x_connec_unique unique (connec_id, hydrometer_id);
+
+-- deprecate config_graph_valve;
+UPDATE cat_feature_node SET graph_delimiter = 'MINSECTOR' where id IN (SELECT id from config_graph_valve where active is true);
+alter table config_graph_valve rename to _config_graph_valve_ ;
+drop view v_om_mincut_selected_valve;
+
+-- harmonize check_valve
+DROP TRIGGER IF EXISTS gw_trg_cat_feature_node ON cat_feature_node;
+UPDATE cat_feature_node SET graph_delimiter = 'MINSECTOR' WHERE id IN (SELECT f.id FROM node n JOIN cat_node c ON nodecat_id = id JOIN cat_feature_node f ON f.id = c.nodetype_id JOIN config_graph_checkvalve USING (node_id));
+
+
+
+
