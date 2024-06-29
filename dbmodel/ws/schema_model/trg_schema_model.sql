@@ -57,13 +57,6 @@ CREATE TRIGGER gw_trg_cat_feature_delete BEFORE DELETE ON cat_feature FOR EACH R
 
 
 --
--- Name: cat_feature_node gw_trg_cat_feature_node; Type: TRIGGER; Schema: Schema; Owner: -
---
-
-CREATE TRIGGER gw_trg_cat_feature_node AFTER INSERT OR UPDATE ON cat_feature_node FOR EACH ROW EXECUTE FUNCTION gw_trg_cat_feature('cat_feature_node');
-
-
---
 -- Name: cat_manager gw_trg_cat_manager; Type: TRIGGER; Schema: Schema; Owner: -
 --
 

@@ -8,6 +8,10 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"systemId":"METER"},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"meter_code" }}$$);
+
+
 CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS 
  SELECT n.node_id,
     n.elevation,

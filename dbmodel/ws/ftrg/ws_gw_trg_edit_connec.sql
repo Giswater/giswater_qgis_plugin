@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 1304
 
 
-CREATE OR REPLACE FUNCTION "ws36011".gw_trg_edit_connec()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_connec()
   RETURNS trigger AS
 $BODY$
 

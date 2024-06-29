@@ -6,7 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2758
 
-
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_trg_update_child_view()cascade;
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_cat_feature()
   RETURNS trigger AS

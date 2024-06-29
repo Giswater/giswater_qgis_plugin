@@ -218,13 +218,6 @@ CREATE TRIGGER gw_trg_edit_cat_feature INSTEAD OF INSERT OR DELETE OR UPDATE ON 
 
 
 --
--- Name: v_edit_cat_feature_node gw_trg_edit_cat_feature; Type: TRIGGER; Schema: Schema; Owner: -
---
-
-CREATE TRIGGER gw_trg_edit_cat_feature INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_cat_feature_node FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_cat_feature('node');
-
-
---
 -- Name: ve_config_addfields gw_trg_edit_config_addfields; Type: TRIGGER; Schema: Schema; Owner: -
 --
 
