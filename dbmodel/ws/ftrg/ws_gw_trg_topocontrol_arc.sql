@@ -184,37 +184,29 @@ BEGIN
 	-- check mapzones conflict
     IF v_check_conflictmapzones IS TRUE then
     	if nodeRecord1.sector_id != nodeRecord2.sector_id and nodeRecord1.sector_id > 0 and nodeRecord2.sector_id > 0 and
-    	(nodeRecord1.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'SECTOR' UNION SELECT id from config_graph_valve where active is true) and 
-    	nodeRecord2.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'SECTOR' UNION SELECT id from config_graph_valve where active is true) and
-    	nodeRecord1.node_id NOT IN (SELECT node_id FROM config_graph_mincut where active IS TRUE) AND 
-    	nodeRecord2.node_id NOT IN (SELECT node_id FROM config_graph_mincut where active IS TRUE)) then 
+    	(nodeRecord1.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'SECTOR') and 
+    	nodeRecord2.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'SECTOR')) then 
     		v_msg  = true;
     		v_zone = 'SECTOR';
     	end if;
     
         if nodeRecord1.presszone_id != nodeRecord2.presszone_id and nodeRecord1.presszone_id::integer > 0 and nodeRecord2.presszone_id::integer > 0 and
-    	(nodeRecord1.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'PRESSZONE' UNION SELECT id from config_graph_valve where active is true) and 
-    	nodeRecord2.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'PRESSZONE' UNION SELECT id from config_graph_valve where active is true) and
-    	nodeRecord1.node_id NOT IN (SELECT node_id FROM config_graph_mincut where active IS TRUE) AND 
-    	nodeRecord2.node_id NOT IN (SELECT node_id FROM config_graph_mincut where active IS TRUE))  then 
+    	(nodeRecord1.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'PRESSZONE') and 
+    	nodeRecord2.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'PRESSZONE')) then 
     		v_msg  = true;
     		v_zone = 'PRESSZONE';
     	end if;
     
         if nodeRecord1.dma_id != nodeRecord2.dma_id and nodeRecord1.dma_id > 0 and nodeRecord2.dma_id > 0 and
-    	(nodeRecord1.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'DMA' UNION SELECT id from config_graph_valve where active is true) and 
-    	nodeRecord2.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'DMA' UNION SELECT id from config_graph_valve where active is true) and
-    	nodeRecord1.node_id NOT IN (SELECT node_id FROM config_graph_mincut where active IS TRUE) AND 
-    	nodeRecord2.node_id NOT IN (SELECT node_id FROM config_graph_mincut where active IS TRUE))  then 
+    	(nodeRecord1.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'DMA') and 
+    	nodeRecord2.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'DMA')) then 
     		v_msg  = true;
     		v_zone = 'DMA';
     	end if;
     
         if nodeRecord1.dqa_id != nodeRecord2.dqa_id and nodeRecord1.dqa_id > 0 and nodeRecord2.dqa_id > 0 and
-    	(nodeRecord1.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'DQA' UNION SELECT id from config_graph_valve where active is true) and 
-    	nodeRecord2.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'DQA' UNION SELECT id from config_graph_valve where active is true) and
-    	nodeRecord1.node_id NOT IN (SELECT node_id FROM config_graph_mincut where active IS TRUE) AND 
-    	nodeRecord2.node_id NOT IN (SELECT node_id FROM config_graph_mincut where active IS TRUE))  then 
+    	(nodeRecord1.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'DQA') and 
+    	nodeRecord2.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'DQA')) then 
     		v_msg  = true;
     		v_zone = 'DQA';
     	end if;

@@ -11,8 +11,6 @@ UPDATE config_graph_checkvalve SET active = TRUE;
 
 UPDATE config_graph_mincut SET active = TRUE;
 
-UPDATE config_graph_valve SET active = TRUE;
-
 INSERT INTO om_visit_cat VALUES (1, 'Test', '2024-02-21', '2024-02-21', NULL, true, NULL, NULL, NULL, 'Test');
 
 INSERT INTO om_typevalue VALUES ('visit_cleaned', '1', 'Yes', NULL, NULL);
