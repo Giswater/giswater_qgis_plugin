@@ -54,3 +54,6 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET widgetfunction='{"functionName": "filter_table", "parameters": {"columnfind": "End date", "targetwidget": "tab_visit_tbl_visits"}}'::json
 	WHERE columnname='date_visit_to' AND tabname='tab_visit';
+
+-- 29/06/2024
+INSERT INTO config_param_system VALUES ('edit_connec_autofill_plotcode', 'FALSE', 'Variable to automatic fill plot_code', 'Variable to automatic fill plot_code', null, null, TRUE, null, null, null, null, 'boolean', 'text'); 

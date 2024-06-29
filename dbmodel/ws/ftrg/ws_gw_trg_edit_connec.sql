@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 1304
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_connec()
+CREATE OR REPLACE FUNCTION "ws36011".gw_trg_edit_connec()
   RETURNS trigger AS
 $BODY$
 
@@ -516,6 +516,11 @@ BEGIN
 				(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
 		END IF;
 
+		-- plot_code from plot layer
+		IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'edit_connec_autofill_plotcode') = TRUE THEN
+			NEW.plot_code = (SELECT plot_code FROM v_ext_plot WHERE st_dwithin(the_geom, NEW.the_geom, 0) LIMIT 1);
+		END IF;
+
 		IF NEW.epa_type IS NULL THEN
 			NEW.epa_type ='JUNCTION';
 		END IF;
@@ -634,7 +639,7 @@ BEGIN
 		
 	ELSIF TG_OP = 'UPDATE' THEN
 	
-    	-- static pressure
+		-- static pressure
 		IF v_ispresszone AND (NEW.presszone_id != OLD.presszone_id) THEN
 			raise notice '2 NEW.presszone_id ---> %', NEW.presszone_id;
 			UPDATE connec SET staticpressure = (SELECT head from presszone WHERE presszone_id = NEW.presszone_id)-elevation 
@@ -664,8 +669,8 @@ BEGIN
 			END IF;	
 			
 			--update associated geometry of element (if exists) and trace_featuregeom is true
-			v_trace_featuregeom:= (SELECT trace_featuregeom FROM element JOIN element_x_connec using (element_id) 
-                WHERE connec_id=NEW.connec_id AND the_geom IS NOT NULL LIMIT 1);
+			v_trace_featuregeom:= (SELECT trace_featuregeom FROM element JOIN element_x_connec using (element_id) WHERE connec_id=NEW.connec_id AND the_geom IS NOT NULL LIMIT 1);
+			
 			-- if trace_featuregeom is false, do nothing
 			IF v_trace_featuregeom IS TRUE THEN
 				UPDATE v_edit_element SET the_geom = NEW.the_geom WHERE St_dwithin(OLD.the_geom, the_geom, 0.001) 
@@ -678,6 +683,11 @@ BEGIN
 				NEW.arc_id = NULL;
 				NEW.pjoint_id = NULL;
 				NEW.pjoint_type = NULL;
+			END IF;
+
+			-- plot_code from plot layer
+			IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'edit_connec_autofill_plotcode') = TRUE THEN
+				NEW.plot_code = (SELECT plot_code FROM v_ext_plot WHERE st_dwithin(the_geom, NEW.the_geom, 0) LIMIT 1);
 			END IF;
 		
 		ELSIF st_equals( NEW.the_geom, OLD.the_geom) IS FALSE AND geometrytype(NEW.the_geom)='MULTIPOLYGON'  THEN
