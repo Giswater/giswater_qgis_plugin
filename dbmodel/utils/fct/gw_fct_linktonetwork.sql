@@ -35,7 +35,6 @@ SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1
 
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["3209"]},"data":{"feature_type":"CONNEC"}}$$);
 
-
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100013"]},"data":{"feature_type":"CONNEC", "forcedArcs":["221"]}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["100013"]},"data":{"feature_type":"CONNEC"}}$$);
@@ -414,10 +413,14 @@ BEGIN
 						v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1),v_point_aux);
 					END IF;
 
+				-- when we are forcing arc_id for those links coming from connec, guly, node
 				ELSIF v_link.the_geom IS NOT NULL AND v_pjointtype !='ARC' AND (v_forcedarcs IS NOT NULL AND v_forcedarcs !='') AND v_forceendpoint IS TRUE THEN
 
-					-- when we are forcing arc_id for those links coming from connec, guly, node
-					v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1),v_point_aux);
+					IF st_dwithin(v_link.the_geom, v_arc.the_geom,0) is true then
+						-- do not modify geometry of link
+					ELSE 
+						v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1),v_point_aux);
+					END IF;
 					v_pjointtype='ARC';
 					v_endfeature_geom = v_arc.the_geom;
 					v_link.exit_type = 'ARC';
