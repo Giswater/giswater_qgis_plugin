@@ -54,6 +54,8 @@ v_debug_vars json;
 v_debug_sql json;
 v_msgerr json;
 v_count integer = 0;
+v_check record;
+v_minsector_check integer;
 
 BEGIN
 
@@ -132,12 +134,26 @@ BEGIN
 	UPDATE temp_om_mincut_valve SET unaccess = TRUE where node_id IN (SELECT node_id FROM om_mincut_valve_unaccess WHERE result_id = p_mincut_id);
 
 	UPDATE temp_om_mincut_valve SET proposed = TRUE FROM 
-	(SELECT DISTINCT ON (a.node_id) p_mincut_id, a.node_id FROM (SELECT node_1 node_id, arc_id from temp_om_mincut_arc JOIN arc USING (arc_id) WHERE expl_id = 1
+	(SELECT DISTINCT ON (a.node_id) p_mincut_id, a.node_id FROM (SELECT node_1 node_id, arc_id from temp_om_mincut_arc JOIN arc USING (arc_id)
 			UNION ALL
-			SELECT node_2, arc_id from temp_om_mincut_arc JOIN arc USING (arc_id) WHERE expl_id = 1) a
+			SELECT node_2, arc_id from temp_om_mincut_arc JOIN arc USING (arc_id) ) a
 			LEFT JOIN temp_om_mincut_node m USING (node_id)
 			JOIN node n ON n.node_id = a.node_id
 			WHERE m.node_id is null) a WHERE a.node_id = temp_om_mincut_valve.node_id;
+
+	FOR v_check IN SELECT node_id, minsector_id from config_graph_checkvalve JOIN arc on to_arc = arc_id JOIN temp_om_mincut_valve USING (node_id) WHERE active
+	LOOP	
+		IF v_check.minsector_id  = v_minsector THEN
+			SELECT minsector_id INTO v_minsector_check FROM (SELECT minsector_id FROM arc WHERE node_1 = v_check.node_id 
+			UNION SELECT minsector_id FROM arc WHERE node_2 = v_check.node_id) a WHERE minsector_id <> v_minsector;
+
+			-- insert network features into mincut tables
+			INSERT INTO temp_om_mincut_arc (result_id, arc_id, the_geom, minsector_id) SELECT p_mincut_id, arc_id, the_geom, minsector_id 
+			FROM v_edit_arc WHERE minsector_id = v_minsector_check;
+			INSERT INTO temp_om_mincut_node (result_id, node_id, the_geom, minsector_id) SELECT p_mincut_id, node_id, the_geom, minsector_id 
+			FROM v_edit_node WHERE minsector_id = v_minsector_check;
+		END IF;
+	END LOOP;
 
 	-- step 1, looking for unoperative (broken or unaccess) valves
 	PERFORM gw_fct_mincut_minsector_inverted(p_mincut_id, 1);

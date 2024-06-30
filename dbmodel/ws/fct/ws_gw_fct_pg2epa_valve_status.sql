@@ -27,11 +27,12 @@ BEGIN
 
 	-- shutoff valves (TCV OR SHORTPIPES)
 	IF (SELECT value FROM config_param_system WHERE parameter = 'epa_shutoffvalve') = 'VALVE' THEN
-		v_querytext = ' v_edit_inp_valve WHERE addparam::json->>''valv_type'' = ''TCV''';
+		v_querytext = ' v_edit_inp_valve v WHERE addparam::json->>''valv_type'' = ''TCV''';
 	ELSE
 		v_querytext = ' v_edit_inp_shortpipe v';
 	END IF;
-	EXECUTE ' UPDATE temp_arc a SET status=v.status FROM '||v_querytext||' WHERE a.arc_id=concat(v.node_id,''_n2a'')';
+	
+	EXECUTE ' UPDATE temp_arc a SET status=v.status FROM '||v_querytext||' AND a.arc_id=concat(v.node_id,''_n2a'')';
   
 	-- all that not are closed are open
 	UPDATE temp_t_arc SET status='OPEN' WHERE status IS NULL AND epa_type = 'SHORTPIPE';
