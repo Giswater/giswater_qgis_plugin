@@ -799,7 +799,10 @@ class GwNetscenarioManagerButton(GwAction):
         elif state == 0:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is not None:
-                tools_qgis.remove_layer_from_toc(alias, "MASTERPLAN", "Netscenario")
+                msg = "Remove layer from project?"
+                answer = tools_qt.show_question(msg, title="Warning", parameter=f"'{layer.name()}'", force_action=True)
+                if answer:
+                    tools_qgis.remove_layer_from_toc(alias, "MASTERPLAN", "Netscenario")
 
 
     def _manage_load_all(self, menu, state=None):

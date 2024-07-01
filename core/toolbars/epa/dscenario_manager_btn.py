@@ -124,6 +124,8 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_hydrology_manager = GwDscenarioManagerUi(self)
         tools_gw.load_settings(self.dlg_hydrology_manager)
 
+        tools_gw.add_icon(self.dlg_hydrology_manager.btn_toc, "306", sub_folder="24x24")
+
         # Manage btn create
         self._manage_btn_create(self.dlg_hydrology_manager, 'v_edit_cat_hydrology')
 
@@ -140,6 +142,7 @@ class GwDscenarioManagerButton(GwAction):
         self._fill_manager_table('v_edit_cat_hydrology')
 
         # Connect main dialog signals
+        self.dlg_hydrology_manager.btn_toc.clicked.connect(partial(self._manage_add_layers, 'v_edit_cat_hydrology', 'Catalogs'))
         self.dlg_hydrology_manager.txt_name.textChanged.connect(partial(self._fill_manager_table,
                                                                         'v_edit_cat_hydrology', None))
         self.dlg_hydrology_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
@@ -172,6 +175,8 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dwf_manager = GwDscenarioManagerUi(self)
         tools_gw.load_settings(self.dlg_dwf_manager)
 
+        tools_gw.add_icon(self.dlg_dwf_manager.btn_toc, "306", sub_folder="24x24")
+
         # Manage btn create
         self._manage_btn_create(self.dlg_dwf_manager, 'v_edit_cat_dwf_scenario')
 
@@ -188,6 +193,7 @@ class GwDscenarioManagerButton(GwAction):
         self._fill_manager_table('v_edit_cat_dwf_scenario')
 
         # Connect main dialog signals
+        self.dlg_dwf_manager.btn_toc.clicked.connect(partial(self._manage_add_layers, 'v_edit_cat_dwf_scenario', 'Catalogs'))
         self.dlg_dwf_manager.txt_name.textChanged.connect(partial(self._fill_manager_table,
                                                                   'v_edit_cat_dwf_scenario', None))
         self.dlg_dwf_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
@@ -246,7 +252,7 @@ class GwDscenarioManagerButton(GwAction):
         # Connect main dialog signals
         self.dlg_dscenario_manager.txt_name.textChanged.connect(partial(self._fill_manager_table,
                                                                         'v_edit_cat_dscenario', None))
-        self.dlg_dscenario_manager.btn_toc.clicked.connect(partial(self._manage_add_layers))
+        self.dlg_dscenario_manager.btn_toc.clicked.connect(partial(self._manage_add_layers, 'v_edit_inp_dscenario', 'Dscenario'))
         self.dlg_dscenario_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
                                                 self.dlg_dscenario_manager, 'v_edit_cat_dscenario', 3156))
         self.dlg_dscenario_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3042,
@@ -512,7 +518,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Connect signals
         self.dlg_dscenario.btn_properties.clicked.connect(partial(self._manage_properties, self.dlg_dscenario_manager, 'v_edit_cat_dscenario'))
-        self.dlg_dscenario.btn_toc.clicked.connect(partial(self._manage_add_layers))
+        self.dlg_dscenario.btn_toc.clicked.connect(partial(self._manage_add_layers, 'v_edit_inp_dscenario', 'Dscenario'))
         self.dlg_dscenario.btn_insert.clicked.connect(partial(self._manage_insert))
         self.dlg_dscenario.btn_delete.clicked.connect(partial(self._manage_delete))
         self.dlg_dscenario.btn_snapping.toggled.connect(partial(self._manage_btn_snapping))
@@ -895,7 +901,7 @@ class GwDscenarioManagerButton(GwAction):
         tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
 
 
-    def _manage_add_layers(self):
+    def _manage_add_layers(self, table_name, sub_group):
         """ Opens menu to add/remove layers to ToC """
 
         # Create main menu and get cursor click position
@@ -911,15 +917,17 @@ class GwDscenarioManagerButton(GwAction):
 
         geom_layers = []
         sql = f"SELECT f_table_name FROM geometry_columns WHERE f_table_schema = '{lib_vars.schema_name}' " \
-              f"AND f_table_name LIKE 'v_edit_inp_dscenario%';"
+              f"AND f_table_name LIKE '{table_name}%';"
         rows = tools_db.get_rows(sql)
+
         if rows:
             geom_layers = [row[0] for row in rows]
 
         # Get layers to add
-        lyr_filter = "v_edit_inp_dscenario_%"
+        lyr_filter = f"{table_name}%"
         sql = f"SELECT id, alias, style_id, addparam FROM sys_table WHERE id LIKE '{lyr_filter}' AND alias IS NOT NULL ORDER BY alias ASC"
         rows = tools_db.get_rows(sql)
+
         if rows:
             # LOAD ALL
             widget = QCheckBox()
@@ -960,12 +968,12 @@ class GwDscenarioManagerButton(GwAction):
                 widget.setStyleSheet("margin: 5px 5px 5px 8px;")
 
                 widgetAction.defaultWidget().stateChanged.connect(
-                    partial(self._check_action_ischecked, tablename, the_geom, pk, style_id, alias.strip()))
+                    partial(self._check_action_ischecked, tablename, the_geom, pk, style_id, alias.strip(), sub_group))
 
         main_menu.exec_(click_point)
 
 
-    def _check_action_ischecked(self, tablename, the_geom, pk, style_id, alias, state):
+    def _check_action_ischecked(self, tablename, the_geom, pk, style_id, alias, sub_group, state):
         """ Control if user check or uncheck action menu, then add or remove layer from toc
         :param tablename: Postgres table name (String)
         :param pk: Field id of the table (String)
@@ -976,11 +984,14 @@ class GwDscenarioManagerButton(GwAction):
         if state == 2:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is None:
-                tools_gw.add_layer_database(tablename, the_geom=the_geom, field_id=pk, group="EPA", sub_group="Dscenario", style_id=style_id, alias=alias)
+                tools_gw.add_layer_database(tablename, the_geom=the_geom, field_id=pk, group="EPA", sub_group=sub_group, style_id=style_id, alias=alias)
         elif state == 0:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is not None:
-                tools_qgis.remove_layer_from_toc(alias, "EPA", "Dscenario")
+                msg = "Remove layer from project?"
+                answer = tools_qt.show_question(msg, title="Warning", parameter=f"'{layer.name()}'", force_action=True)
+                if answer:
+                    tools_qgis.remove_layer_from_toc(layer.name(), "EPA", sub_group)
 
 
     def _manage_load_all(self, menu, state=None):
