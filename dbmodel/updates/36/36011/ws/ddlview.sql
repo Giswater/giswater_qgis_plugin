@@ -172,3 +172,50 @@ AS SELECT n.netscenario_id,
     plan_netscenario_presszone n
      JOIN plan_netscenario p USING (netscenario_id)
   WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_plan_netscenario_connec
+AS 
+SELECT n.netscenario_id,
+    n.connec_id,
+    n.presszone_id,
+    n.staticpressure,
+    n.dma_id,
+    n.pattern_id,
+    n.the_geom,
+    c.connecat_id,
+    cc.connectype_id
+   FROM selector_netscenario,
+    plan_netscenario_connec n
+   left JOIN connec c using (connec_id)
+   left JOIN cat_connec cc on cc.id = c.connecat_id
+  WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_plan_netscenario_node
+AS 
+SELECT n.netscenario_id,
+    n.node_id,
+    n.presszone_id,
+    n.staticpressure,
+    n.dma_id,
+    n.pattern_id,
+    n.the_geom,
+    nd.nodecat_id,
+    cn.nodetype_id
+   FROM selector_netscenario,
+    plan_netscenario_node n
+   LEFT JOIN node nd using (node_id)
+   LEFT JOIN cat_node cn on nd.nodecat_id = cn.id;
+  WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_plan_netscenario_arc
+AS 
+SELECT n.netscenario_id,
+    n.arc_id,
+    n.presszone_id,
+    n.dma_id,
+    n.the_geom,
+    a.arccat_id
+   FROM selector_netscenario,
+    plan_netscenario_arc n
+   LEFT JOIN arc a using (arc_id)  
+  WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
