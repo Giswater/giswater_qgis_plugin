@@ -57,17 +57,26 @@ BEGIN
 
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN
-		EXECUTE 'INSERT INTO anl_connec (connec_id, connecat_id, state, connec_id_aux, connecat_id_aux, state_aux, expl_id, fid, the_geom)
-				SELECT * FROM (
-				SELECT DISTINCT t1.connec_id, t1.connecat_id, t1.state as state1, t2.connec_id, t2.connecat_id, t2.state as state2, t1.expl_id, 105, t1.the_geom
-				FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_connectolerance||')) 
-				WHERE t1.connec_id != t2.connec_id AND t1.connec_id IN ('||v_array||') ORDER BY t1.connec_id ) a where a.state1 > 0 AND a.state2 > 0';
+		EXECUTE 'INSERT INTO anl_connec (connec_id, connecat_id, state, expl_id, fid, descript, the_geom)
+		with subquery as (
+		SELECT DISTINCT t1.connec_id as c1, t1.connecat_id as cc1, t1.state as state1, t2.connec_id as c2, t2.connecat_id, t2.state as state2, t1.expl_id, 105, t1.the_geom
+		FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_connectolerance||')) 
+		WHERE t1.connec_id != t2.connec_id AND t1.connec_id IN ('||v_array||') AND t1.state > 0 AND t2.state > 0
+		)
+		select distinct (c1) c1, cc1, state1, expl_id, 105, concat(''Dupl. connecs: '', count(c2)), the_geom from subquery 
+		group by c1, cc1, state1, expl_id, the_geom;
+		';
 	ELSE
-		EXECUTE 'INSERT INTO anl_connec (connec_id, connecat_id, state, connec_id_aux, connecat_id_aux, state_aux, expl_id, fid, the_geom)
-				SELECT * FROM (
-				SELECT DISTINCT t1.connec_id, t1.connecat_id, t1.state as state1, t2.connec_id, t2.connecat_id, t2.state as state2, t1.expl_id, 105, t1.the_geom
-				FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_connectolerance||')) 
-				WHERE t1.connec_id != t2.connec_id ORDER BY t1.connec_id ) a where a.state1 > 0 AND a.state2 > 0';
+		EXECUTE 'INSERT INTO anl_connec (connec_id, connecat_id, state, expl_id, fid, descript, the_geom)
+		with subquery as (
+		SELECT DISTINCT t1.connec_id as c1, t1.connecat_id as cc1, t1.state as state1, t2.connec_id as c2, t2.connecat_id, t2.state as state2, t1.expl_id, 105, t1.the_geom
+		FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,(0.01)) 
+		WHERE t1.connec_id != t2.connec_id and t1.state > 0 and t2.state > 0
+		ORDER BY t1.connec_id
+		)
+		select distinct (c1) c1, cc1, state1, expl_id, 105, concat(''Dupl. connecs: '', count(c2)), the_geom from subquery 
+		group by c1, cc1, state1, expl_id, the_geom;
+		';
 	END IF;
 
 	-- set selector
