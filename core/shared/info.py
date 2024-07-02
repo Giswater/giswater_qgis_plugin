@@ -3340,7 +3340,7 @@ def open_epa_dlg(**kwargs):
     id_name = complet_result['body']['feature']['idName']
 
     # Build dlg
-    info.dlg = globals()[ui]()
+    info.dlg = globals()[ui](info)
     tools_gw.load_settings(info.dlg)
 
     # Fill widgets
