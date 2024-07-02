@@ -65,6 +65,8 @@ v_auto_streetvalues_status boolean;
 v_auto_streetvalues_buffer integer;
 v_auto_streetvalues_field text;
 v_trace_featuregeom boolean;
+v_seq_name text;
+v_seq_code text;
 v_code_prefix text;
 
 BEGIN
