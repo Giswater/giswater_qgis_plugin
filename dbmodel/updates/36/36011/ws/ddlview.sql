@@ -204,7 +204,7 @@ SELECT n.netscenario_id,
    FROM selector_netscenario,
     plan_netscenario_node n
    LEFT JOIN node nd using (node_id)
-   LEFT JOIN cat_node cn on nd.nodecat_id = cn.id;
+   LEFT JOIN cat_node cn on nd.nodecat_id = cn.id
   WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_plan_netscenario_arc
