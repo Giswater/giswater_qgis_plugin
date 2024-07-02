@@ -444,9 +444,9 @@ class GwInfoWorkcatUi(GwDialog, FORM_CLASS):
 FORM_CLASS = _get_ui_class('admin_translation.ui', 'admin')
 class GwAdminTranslationUi(GwDialog, FORM_CLASS):
 
-    def __init__(self):
+    def __init__(self, class_obj=None, subtag=None):
 
-        super().__init__()
+        super().__init__(class_obj, subtag)
         self.txt_pass.setClearButtonEnabled(True)
         icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '24x24' + os.sep + 'eye_open.png'
         self.action = QAction("show")
