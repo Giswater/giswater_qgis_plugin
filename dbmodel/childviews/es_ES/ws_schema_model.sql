@@ -2298,237 +2298,6 @@ CREATE VIEW ve_node_hidrante AS
      JOIN man_hydrant ON (((man_hydrant.node_id)::text = (ve_node.node_id)::text)))
   WHERE ((ve_node.node_type)::text = 'HIDRANTE'::text);
 
-
---
--- Name: ve_node_medidor; Type: VIEW; Schema: ; Owner: -
---
-
-CREATE VIEW ve_node_medidor AS
- SELECT ve_node.node_id,
-    ve_node.code,
-    ve_node.elevation,
-    ve_node.depth,
-    ve_node.node_type,
-    ve_node.sys_type,
-    ve_node.nodecat_id,
-    ve_node.cat_matcat_id,
-    ve_node.cat_pnom,
-    ve_node.cat_dnom,
-    ve_node.epa_type,
-    ve_node.expl_id,
-    ve_node.macroexpl_id,
-    ve_node.sector_id,
-    ve_node.sector_name,
-    ve_node.macrosector_id,
-    ve_node.arc_id,
-    ve_node.parent_id,
-    ve_node.state,
-    ve_node.state_type,
-    ve_node.annotation,
-    ve_node.observ,
-    ve_node.comment,
-    ve_node.minsector_id,
-    ve_node.dma_id,
-    ve_node.dma_name,
-    ve_node.macrodma_id,
-    ve_node.presszone_id,
-    ve_node.presszone_name,
-    ve_node.staticpressure,
-    ve_node.dqa_id,
-    ve_node.dqa_name,
-    ve_node.macrodqa_id,
-    ve_node.soilcat_id,
-    ve_node.function_type,
-    ve_node.category_type,
-    ve_node.fluid_type,
-    ve_node.location_type,
-    ve_node.workcat_id,
-    ve_node.workcat_id_end,
-    ve_node.builtdate,
-    ve_node.enddate,
-    ve_node.buildercat_id,
-    ve_node.ownercat_id,
-    ve_node.muni_id,
-    ve_node.postcode,
-    ve_node.district_id,
-    ve_node.streetname,
-    ve_node.postnumber,
-    ve_node.postcomplement,
-    ve_node.streetname2,
-    ve_node.postnumber2,
-    ve_node.postcomplement2,
-    ve_node.descript,
-    ve_node.svg,
-    ve_node.rotation,
-    ve_node.link,
-    ve_node.verified,
-    ve_node.undelete,
-    ve_node.label,
-    ve_node.label_x,
-    ve_node.label_y,
-    ve_node.label_rotation,
-    ve_node.publish,
-    ve_node.inventory,
-    ve_node.hemisphere,
-    ve_node.num_value,
-    ve_node.nodetype_id,
-    ve_node.tstamp,
-    ve_node.insert_user,
-    ve_node.lastupdate,
-    ve_node.lastupdate_user,
-    ve_node.the_geom,
-    ve_node.adate,
-    ve_node.adescript,
-    ve_node.accessibility,
-    ve_node.dma_style,
-    ve_node.presszone_style,
-    ve_node.workcat_id_plan,
-    ve_node.asset_id,
-    ve_node.om_state,
-    ve_node.conserv_state,
-    ve_node.access_type,
-    ve_node.placement_type,
-    ve_node.demand_max,
-    ve_node.demand_min,
-    ve_node.demand_avg,
-    ve_node.press_max,
-    ve_node.press_min,
-    ve_node.press_avg,
-    ve_node.head_max,
-    ve_node.head_min,
-    ve_node.head_avg,
-    ve_node.quality_max,
-    ve_node.quality_min,
-    ve_node.quality_avg,
-    ve_node.expl_id2,
-    ve_node.is_operative,
-    ve_node.region_id,
-    ve_node.province_id,
-    man_meter.brand,
-    man_meter.model,
-    man_meter.real_press_max,
-    man_meter.real_press_min,
-    man_meter.real_press_avg
-   FROM (ve_node
-     JOIN man_meter ON (((man_meter.node_id)::text = (ve_node.node_id)::text)))
-  WHERE ((ve_node.node_type)::text = 'MEDIDOR'::text);
-
-
---
--- Name: ve_node_medidor_presion; Type: VIEW; Schema: ; Owner: -
---
-
-CREATE VIEW ve_node_medidor_presion AS
- SELECT ve_node.node_id,
-    ve_node.code,
-    ve_node.elevation,
-    ve_node.depth,
-    ve_node.node_type,
-    ve_node.sys_type,
-    ve_node.nodecat_id,
-    ve_node.cat_matcat_id,
-    ve_node.cat_pnom,
-    ve_node.cat_dnom,
-    ve_node.epa_type,
-    ve_node.expl_id,
-    ve_node.macroexpl_id,
-    ve_node.sector_id,
-    ve_node.sector_name,
-    ve_node.macrosector_id,
-    ve_node.arc_id,
-    ve_node.parent_id,
-    ve_node.state,
-    ve_node.state_type,
-    ve_node.annotation,
-    ve_node.observ,
-    ve_node.comment,
-    ve_node.minsector_id,
-    ve_node.dma_id,
-    ve_node.dma_name,
-    ve_node.macrodma_id,
-    ve_node.presszone_id,
-    ve_node.presszone_name,
-    ve_node.staticpressure,
-    ve_node.dqa_id,
-    ve_node.dqa_name,
-    ve_node.macrodqa_id,
-    ve_node.soilcat_id,
-    ve_node.function_type,
-    ve_node.category_type,
-    ve_node.fluid_type,
-    ve_node.location_type,
-    ve_node.workcat_id,
-    ve_node.workcat_id_end,
-    ve_node.builtdate,
-    ve_node.enddate,
-    ve_node.buildercat_id,
-    ve_node.ownercat_id,
-    ve_node.muni_id,
-    ve_node.postcode,
-    ve_node.district_id,
-    ve_node.streetname,
-    ve_node.postnumber,
-    ve_node.postcomplement,
-    ve_node.streetname2,
-    ve_node.postnumber2,
-    ve_node.postcomplement2,
-    ve_node.descript,
-    ve_node.svg,
-    ve_node.rotation,
-    ve_node.link,
-    ve_node.verified,
-    ve_node.undelete,
-    ve_node.label,
-    ve_node.label_x,
-    ve_node.label_y,
-    ve_node.label_rotation,
-    ve_node.publish,
-    ve_node.inventory,
-    ve_node.hemisphere,
-    ve_node.num_value,
-    ve_node.nodetype_id,
-    ve_node.tstamp,
-    ve_node.insert_user,
-    ve_node.lastupdate,
-    ve_node.lastupdate_user,
-    ve_node.the_geom,
-    ve_node.adate,
-    ve_node.adescript,
-    ve_node.accessibility,
-    ve_node.dma_style,
-    ve_node.presszone_style,
-    ve_node.workcat_id_plan,
-    ve_node.asset_id,
-    ve_node.om_state,
-    ve_node.conserv_state,
-    ve_node.access_type,
-    ve_node.placement_type,
-    ve_node.demand_max,
-    ve_node.demand_min,
-    ve_node.demand_avg,
-    ve_node.press_max,
-    ve_node.press_min,
-    ve_node.press_avg,
-    ve_node.head_max,
-    ve_node.head_min,
-    ve_node.head_avg,
-    ve_node.quality_max,
-    ve_node.quality_min,
-    ve_node.quality_avg,
-    ve_node.expl_id2,
-    ve_node.is_operative,
-    ve_node.region_id,
-    ve_node.province_id,
-    man_meter.brand,
-    man_meter.model,
-    man_meter.real_press_max,
-    man_meter.real_press_min,
-    man_meter.real_press_avg
-   FROM (ve_node
-     JOIN man_meter ON (((man_meter.node_id)::text = (ve_node.node_id)::text)))
-  WHERE ((ve_node.node_type)::text = 'MEDIDOR_PRESION'::text);
-
-
 --
 -- Name: ve_node_pozo_acceso; Type: VIEW; Schema: ; Owner: -
 --
@@ -4386,10 +4155,10 @@ CREATE VIEW ve_node_valvula_cierre AS
 
 
 --
--- Name: ve_node_valvula_control; Type: VIEW; Schema: ; Owner: -
+-- Name: ve_node_valvula_antiretorno; Type: VIEW; Schema: ; Owner: -
 --
 
-CREATE VIEW ve_node_valvula_control AS
+CREATE VIEW ve_node_valvula_antiretorno AS
  SELECT ve_node.node_id,
     ve_node.code,
     ve_node.elevation,
@@ -4514,14 +4283,14 @@ CREATE VIEW ve_node_valvula_control AS
     man_valve.valve_type
    FROM (ve_node
      JOIN man_valve ON (((man_valve.node_id)::text = (ve_node.node_id)::text)))
-  WHERE ((ve_node.node_type)::text = 'VALVULA_CONTROL'::text);
+  WHERE ((ve_node.node_type)::text = 'VALVULA_ANTIRETORNO'::text);
 
 
 --
--- Name: ve_node_valvula_control_fl; Type: VIEW; Schema: ; Owner: -
+-- Name: ve_node_valvula_antiretorno_fl; Type: VIEW; Schema: ; Owner: -
 --
 
-CREATE VIEW ve_node_valvula_control_fl AS
+CREATE VIEW ve_node_valvula_antiretorno_fl AS
  SELECT ve_node.node_id,
     ve_node.code,
     ve_node.elevation,
@@ -4646,7 +4415,7 @@ CREATE VIEW ve_node_valvula_control_fl AS
     man_valve.valve_type
    FROM (ve_node
      JOIN man_valve ON (((man_valve.node_id)::text = (ve_node.node_id)::text)))
-  WHERE ((ve_node.node_type)::text = 'VALVULA_CONTROL_FL'::text);
+  WHERE ((ve_node.node_type)::text = 'VALVULA_ANTIRETORNO_FL'::text);
 
 
 --
@@ -5442,8 +5211,6 @@ INSERT INTO config_info_layer_x_type VALUES ('ve_node_estacion_tratamiento', 1, 
 INSERT INTO config_info_layer_x_type VALUES ('ve_node_filtro', 1, 've_node_filtro');
 INSERT INTO config_info_layer_x_type VALUES ('ve_node_final_linea', 1, 've_node_final_linea');
 INSERT INTO config_info_layer_x_type VALUES ('ve_node_hidrante', 1, 've_node_hidrante');
-INSERT INTO config_info_layer_x_type VALUES ('ve_node_medidor', 1, 've_node_medidor');
-INSERT INTO config_info_layer_x_type VALUES ('ve_node_medidor_presion', 1, 've_node_medidor_presion');
 INSERT INTO config_info_layer_x_type VALUES ('ve_node_pozo_acceso', 1, 've_node_pozo_acceso');
 INSERT INTO config_info_layer_x_type VALUES ('ve_node_pozo_captacion', 1, 've_node_pozo_captacion');
 INSERT INTO config_info_layer_x_type VALUES ('ve_node_punto_mostreo', 1, 've_node_punto_mostreo');
@@ -5461,8 +5228,8 @@ INSERT INTO config_info_layer_x_type VALUES ('ve_node_valvula', 1, 've_node_valv
 INSERT INTO config_info_layer_x_type VALUES ('ve_node_valvula_accel', 1, 've_node_valvula_accel');
 INSERT INTO config_info_layer_x_type VALUES ('ve_node_valvula_aire', 1, 've_node_valvula_aire');
 INSERT INTO config_info_layer_x_type VALUES ('ve_node_valvula_cierre', 1, 've_node_valvula_cierre');
-INSERT INTO config_info_layer_x_type VALUES ('ve_node_valvula_control', 1, 've_node_valvula_control');
-INSERT INTO config_info_layer_x_type VALUES ('ve_node_valvula_control_fl', 1, 've_node_valvula_control_fl');
+INSERT INTO config_info_layer_x_type VALUES ('ve_node_valvula_antiretorno', 1, 've_node_valvula_antiretorno');
+INSERT INTO config_info_layer_x_type VALUES ('ve_node_valvula_antiretorno_fl', 1, 've_node_valvula_antiretorno_fl');
 INSERT INTO config_info_layer_x_type VALUES ('ve_node_valvula_desague', 1, 've_node_valvula_desague');
 INSERT INTO config_info_layer_x_type VALUES ('ve_node_valvula_reduc_pr', 1, 've_node_valvula_reduc_pr');
 INSERT INTO config_info_layer_x_type VALUES ('ve_node_valvula_rotura_pr', 1, 've_node_valvula_rotura_pr');
@@ -5489,8 +5256,6 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_filtro', 'form_feature', 'tab_data', 'region_id', 'lyt_data_3', 8, 'integer', 'combo', 'Region', 'region_id', NULL, false, false, false, false, NULL, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_final_linea', 'form_feature', 'tab_data', 'region_id', 'lyt_data_3', 8, 'integer', 'combo', 'Region', 'region_id', NULL, false, false, false, false, NULL, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_hidrante', 'form_feature', 'tab_data', 'region_id', 'lyt_data_3', 8, 'integer', 'combo', 'Region', 'region_id', NULL, false, false, false, false, NULL, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_medidor', 'form_feature', 'tab_data', 'region_id', 'lyt_data_3', 8, 'integer', 'combo', 'Region', 'region_id', NULL, false, false, false, false, NULL, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_medidor_presion', 'form_feature', 'tab_data', 'region_id', 'lyt_data_3', 8, 'integer', 'combo', 'Region', 'region_id', NULL, false, false, false, false, NULL, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_pozo_acceso', 'form_feature', 'tab_data', 'region_id', 'lyt_data_3', 8, 'integer', 'combo', 'Region', 'region_id', NULL, false, false, false, false, NULL, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_pozo_captacion', 'form_feature', 'tab_data', 'region_id', 'lyt_data_3', 8, 'integer', 'combo', 'Region', 'region_id', NULL, false, false, false, false, NULL, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_punto_mostreo', 'form_feature', 'tab_data', 'region_id', 'lyt_data_3', 8, 'integer', 'combo', 'Region', 'region_id', NULL, false, false, false, false, NULL, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
@@ -5508,8 +5273,8 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_accel', 'form_feature', 'tab_data', 'region_id', 'lyt_data_3', 8, 'integer', 'combo', 'Region', 'region_id', NULL, false, false, false, false, NULL, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_aire', 'form_feature', 'tab_data', 'region_id', 'lyt_data_3', 8, 'integer', 'combo', 'Region', 'region_id', NULL, false, false, false, false, NULL, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_cierre', 'form_feature', 'tab_data', 'region_id', 'lyt_data_3', 8, 'integer', 'combo', 'Region', 'region_id', NULL, false, false, false, false, NULL, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_control', 'form_feature', 'tab_data', 'region_id', 'lyt_data_3', 8, 'integer', 'combo', 'Region', 'region_id', NULL, false, false, false, false, NULL, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_control_fl', 'form_feature', 'tab_data', 'region_id', 'lyt_data_3', 8, 'integer', 'combo', 'Region', 'region_id', NULL, false, false, false, false, NULL, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_antiretorno', 'form_feature', 'tab_data', 'region_id', 'lyt_data_3', 8, 'integer', 'combo', 'Region', 'region_id', NULL, false, false, false, false, NULL, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_antiretorno_fl', 'form_feature', 'tab_data', 'region_id', 'lyt_data_3', 8, 'integer', 'combo', 'Region', 'region_id', NULL, false, false, false, false, NULL, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_desague', 'form_feature', 'tab_data', 'region_id', 'lyt_data_3', 8, 'integer', 'combo', 'Region', 'region_id', NULL, false, false, false, false, NULL, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_reduc_pr', 'form_feature', 'tab_data', 'region_id', 'lyt_data_3', 8, 'integer', 'combo', 'Region', 'region_id', NULL, false, false, false, false, NULL, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_rotura_pr', 'form_feature', 'tab_data', 'region_id', 'lyt_data_3', 8, 'integer', 'combo', 'Region', 'region_id', NULL, false, false, false, false, NULL, 'SELECT region_id as id, name as idval FROM ext_region WHERE region_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
@@ -5536,8 +5301,6 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_filtro', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_final_linea', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_hidrante', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_medidor', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_medidor_presion', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_pozo_acceso', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_pozo_captacion', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_punto_mostreo', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
@@ -5555,8 +5318,8 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_accel', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_aire', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_cierre', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_control', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_control_fl', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_antiretorno', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_antiretorno_fl', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_desague', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_reduc_pr', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_node_valvula_rotura_pr', 'form_feature', 'tab_data', 'province_id', 'lyt_data_3', 9, 'integer', 'combo', 'Province', 'province_id', NULL, false, false, false, false, NULL, 'SELECT province_id as id, name as idval FROM ext_province WHERE province_id IS NOT NULL', true, true, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
@@ -5650,10 +5413,10 @@ DROP TRIGGER IF EXISTS gw_trg_edit_node_valvula_aire ON ve_node_valvula_aire;
 CREATE TRIGGER gw_trg_edit_node_valvula_aire INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valvula_aire FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVULA_AIRE');
 DROP TRIGGER IF EXISTS gw_trg_edit_node_valvula_cierre ON ve_node_valvula_cierre;
 CREATE TRIGGER gw_trg_edit_node_valvula_cierre INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valvula_cierre FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVULA_CIERRE');
-DROP TRIGGER IF EXISTS gw_trg_edit_node_valvula_control ON ve_node_valvula_control;
-CREATE TRIGGER gw_trg_edit_node_valvula_control INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valvula_control FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVULA_CONTROL');
-DROP TRIGGER IF EXISTS gw_trg_edit_node_valvula_control_fl ON ve_node_valvula_control_fl;
-CREATE TRIGGER gw_trg_edit_node_valvula_control_fl INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valvula_control_fl FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVULA_CONTROL_FL');
+DROP TRIGGER IF EXISTS gw_trg_edit_node_valvula_antiretorno ON ve_node_valvula_antiretorno;
+CREATE TRIGGER gw_trg_edit_node_valvula_antiretorno INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valvula_antiretorno FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVULA_ANTIRETORNO');
+DROP TRIGGER IF EXISTS gw_trg_edit_node_valvula_antiretorno_fl ON ve_node_valvula_antiretorno_fl;
+CREATE TRIGGER gw_trg_edit_node_valvula_antiretorno_fl INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valvula_antiretorno_fl FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVULA_ANTIRETORNO_FL');
 DROP TRIGGER IF EXISTS gw_trg_edit_node_valvula_desague ON ve_node_valvula_desague;
 CREATE TRIGGER gw_trg_edit_node_valvula_desague INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node_valvula_desague FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('VALVULA_DESAGUE');
 DROP TRIGGER IF EXISTS gw_trg_edit_node_valvula_reduc_pr ON ve_node_valvula_reduc_pr;
@@ -5687,8 +5450,6 @@ INSERT INTO sys_table VALUES ('ve_node_estacion_tratamiento', 'Custom editable v
 INSERT INTO sys_table VALUES ('ve_node_filtro', 'Custom editable view for FILTRO', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Filtro', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_final_linea', 'Custom editable view for FINAL_LINEA', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Final_Linea', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_hidrante', 'Custom editable view for HIDRANTE', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Hidrante', NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO sys_table VALUES ('ve_node_medidor', 'Custom editable view for MEDIDOR', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Medidor', NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO sys_table VALUES ('ve_node_medidor_presion', 'Custom editable view for MEDIDOR_PRESION', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Medidor_Presion', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_pozo_acceso', 'Custom editable view for POZO_ACCESO', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Pozo_Acceso', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_pozo_captacion', 'Custom editable view for POZO_CAPTACION', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Pozo_Captacion', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_punto_mostreo', 'Custom editable view for PUNTO_MOSTREO', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Punto_Mostreo', NULL, NULL, NULL, NULL, NULL, NULL);
@@ -5706,8 +5467,8 @@ INSERT INTO sys_table VALUES ('ve_node_valvula', 'Custom editable view for VALVU
 INSERT INTO sys_table VALUES ('ve_node_valvula_accel', 'Custom editable view for VALVULA_ACCEL', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Valvula_Accel', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_valvula_aire', 'Custom editable view for VALVULA_AIRE', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Valvula_Aire', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_valvula_cierre', 'Custom editable view for VALVULA_CIERRE', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Valvula_Cierre', NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO sys_table VALUES ('ve_node_valvula_control', 'Custom editable view for VALVULA_CONTROL', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Valvula_Control', NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO sys_table VALUES ('ve_node_valvula_control_fl', 'Custom editable view for VALVULA_CONTROL_FL', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Valvula_Control_Fl', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_valvula_antiretorno', 'Custom editable view for VALVULA_ANTIRETORNO', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Valvula_Antiretorno', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO sys_table VALUES ('ve_node_valvula_antiretorno_fl', 'Custom editable view for VALVULA_ANTIRETORNO_FL', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Valvula_Antiretorno_Fl', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_valvula_desague', 'Custom editable view for VALVULA_DESAGUE', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Valvula_Desague', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_valvula_reduc_pr', 'Custom editable view for VALVULA_REDUC_PR', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Valvula_Reduc_Pr', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table VALUES ('ve_node_valvula_rotura_pr', 'Custom editable view for VALVULA_ROTURA_PR', 'role_edit', 0, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"NODE"}', NULL, 'Valvula_Rotura_Pr', NULL, NULL, NULL, NULL, NULL, NULL);

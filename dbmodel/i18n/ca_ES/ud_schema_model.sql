@@ -196,7 +196,7 @@ INSERT INTO cat_feature VALUES ('CANVI_SECCIO', 'JUNCTION', 'NODE', NULL, 'v_edi
 INSERT INTO cat_feature VALUES ('NODE_FICTICI', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_node_fictici', NULL, NULL, true, true, NULL);
 INSERT INTO cat_feature VALUES ('DESGUAS', 'OUTFALL', 'NODE', NULL, 'v_edit_node', 've_node_desguas', NULL, NULL, true, true, NULL);
 INSERT INTO cat_feature VALUES ('UNIO', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_unio', NULL, NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('PRESA', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_presa', NULL, NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('SOBREIXIDOR', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_sobreixidor', NULL, NULL, true, true, NULL);
 INSERT INTO cat_feature VALUES ('EMBORNAL', 'GULLY', 'GULLY', NULL, 'v_edit_gully', 've_gully_embornal', NULL, NULL, true, true, NULL);
 INSERT INTO cat_feature VALUES ('REIXA', 'GULLY', 'GULLY', NULL, 'v_edit_gully', 've_gully_reixa', NULL, NULL, true, true, NULL);
 INSERT INTO cat_feature VALUES ('EMBORNAL_FICTICI', 'GULLY', 'GULLY', NULL, 'v_edit_gully', 've_gully_embornal_fictici', NULL, NULL, true, true, NULL);
@@ -267,7 +267,7 @@ INSERT INTO cat_feature_node VALUES ('UNIO', 'JUNCTION', 'JUNCTION', 2, true, tr
 INSERT INTO cat_feature_node VALUES ('ELEMENT_TOPO', 'NETELEMENT', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('INICI', 'NETINIT', 'JUNCTION', 2, true, true, NULL, 0, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('CAMBRA', 'CHAMBER', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('PRESA', 'CHAMBER', 'JUNCTION', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('SOBREIXIDOR', 'CHAMBER', 'JUNCTION', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('DIPOSIT', 'STORAGE', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('DIPOSIT_DESBORDAMENT', 'STORAGE', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('ESTACIO_BOMBAMENT', 'CHAMBER', 'STORAGE', 2, true, true, NULL, 2, '{"activated":false,"value":1}');

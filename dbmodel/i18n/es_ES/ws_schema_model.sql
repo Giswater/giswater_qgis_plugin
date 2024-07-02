@@ -204,11 +204,11 @@ INSERT INTO cat_feature VALUES ('ACOMETIDA', 'WJOIN', 'CONNEC', NULL, 'v_edit_co
 INSERT INTO cat_feature VALUES ('ACOMETIDA_FICTICIA', 'WJOIN', 'CONNEC', NULL, 'v_edit_connec', 've_connec_acometida_ficticia', 'Acometida ficticia', NULL, true, true, NULL);
 INSERT INTO cat_feature VALUES ('CURVA', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_curva', 'Curva', NULL, true, true, NULL);
 INSERT INTO cat_feature VALUES ('TUBERIA', 'PIPE', 'ARC', NULL, 'v_edit_arc', 've_arc_tuberia', 'Tubería de distribución de agua', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('VALVULA_CONTROL', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_control', 'Válvula de control', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVULA_ANTIRETORNO', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_antiretorno', 'Válvula de control', NULL, true, true, NULL);
 INSERT INTO cat_feature VALUES ('VALVULA_REDUC_PR', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_reduc_pr', 'Válvula reductora de presión', NULL, true, true, NULL);
 INSERT INTO cat_feature VALUES ('VALVULA_VERDE', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_verde', 'Válvula verde', NULL, true, true, NULL);
 INSERT INTO cat_feature VALUES ('FINAL_LINEA', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_final_linea', 'Final de línia', NULL, true, true, NULL);
-INSERT INTO cat_feature VALUES ('VALVULA_CONTROL_FL', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_control_fl', 'Válvula de control de fluido', NULL, true, true, NULL);
+INSERT INTO cat_feature VALUES ('VALVULA_ANTIRETORNO_FL', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_antiretorno_fl', 'Válvula de control de fluido', NULL, true, true, NULL);
 INSERT INTO cat_feature VALUES ('VALVULA', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula', 'Válvula genérica', NULL, true, true, NULL);
 INSERT INTO cat_feature VALUES ('VALVULA_ROTURA_PR', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_rotura_pr', 'Válvula de rotura de presión', NULL, true, true, NULL);
 INSERT INTO cat_feature VALUES ('VALVULA_DESAGUE', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_valvula_desague', 'Válvula de desagüe', NULL, true, true, NULL);
@@ -280,7 +280,7 @@ INSERT INTO cat_feature_node VALUES ('UNION', 'JUNCTION', 'JUNCTION', 2, true, t
 INSERT INTO cat_feature_node VALUES ('T', 'JUNCTION', 'JUNCTION', 3, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('X', 'JUNCTION', 'JUNCTION', 4, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('VALVULA_REDUC_PR', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VALVULA_CONTROL_FL', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_ANTIRETORNO_FL', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('VALVULA', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('VALVULA_ROTURA_PR', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('VALVULA_SOST_PR', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
@@ -288,7 +288,7 @@ INSERT INTO cat_feature_node VALUES ('VALVULA_ACCEL', 'VALVE', 'VALVE', 2, true,
 INSERT INTO cat_feature_node VALUES ('VALVULA_AIRE', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('VALVULA_VERDE', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('VALVULA_DESAGUE', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VALVULA_CONTROL', 'VALVE', 'SHORTPIPE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVULA_ANTIRETORNO', 'VALVE', 'SHORTPIPE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('VALVULA_CIERRE', 'VALVE', 'SHORTPIPE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('REGISTRO', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('REGISTRO_CONTROL', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
