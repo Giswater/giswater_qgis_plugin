@@ -1030,10 +1030,12 @@ DELETE FROM sys_table WHERE id = 'man_addfields_value';
 
 -- 16/05/2024
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
- VALUES('v_edit_dma', 'form_feature', 'tab_none', 'graphconfig', 'lyt_data_1', 11, 'string', 'text', 'graphconfig', 'graphconfig', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
+ VALUES('v_edit_dma', 'form_feature', 'tab_none', 'graphconfig', 'lyt_data_1', 11, 'string', 'text', 'graphconfig', 'graphconfig', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL)
+ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
- VALUES('v_edit_sector', 'form_feature', 'tab_none', 'graphconfig', 'lyt_data_1', 11, 'string', 'text', 'graphconfig', 'graphconfig', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
+ VALUES('v_edit_sector', 'form_feature', 'tab_none', 'graphconfig', 'lyt_data_1', 11, 'string', 'text', 'graphconfig', 'graphconfig', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL)
+ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 -- 17/05/2024
 UPDATE config_form_fields
