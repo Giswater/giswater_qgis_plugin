@@ -183,7 +183,10 @@ SELECT n.netscenario_id,
     n.pattern_id,
     n.the_geom,
     c.connecat_id,
-    cc.connectype_id
+    cc.connectype_id as connec_type,
+	c.epa_type,
+	c.state,
+	c.state_type
    FROM selector_netscenario,
     plan_netscenario_connec n
    left JOIN connec c using (connec_id)
@@ -200,7 +203,10 @@ SELECT n.netscenario_id,
     n.pattern_id,
     n.the_geom,
     nd.nodecat_id,
-    cn.nodetype_id
+    cn.nodetype_id as node_type,
+	n.epa_type,
+	n.state,
+	n.state_type
    FROM selector_netscenario,
     plan_netscenario_node n
    LEFT JOIN node nd using (node_id)
@@ -214,7 +220,10 @@ SELECT n.netscenario_id,
     n.presszone_id,
     n.dma_id,
     n.the_geom,
-    a.arccat_id
+    a.arccat_id,
+	a.epa_type,
+	a.state,
+	a.state_type
    FROM selector_netscenario,
     plan_netscenario_arc n
    LEFT JOIN arc a using (arc_id)  
