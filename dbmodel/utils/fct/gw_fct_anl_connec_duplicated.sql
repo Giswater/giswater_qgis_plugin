@@ -99,7 +99,7 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
 
-	SELECT count(*)/2 INTO v_count FROM anl_connec WHERE cur_user="current_user"() AND fid=105;
+	SELECT count(*) INTO v_count FROM anl_connec WHERE cur_user="current_user"() AND fid=105;
 
 	IF v_count = 0 THEN
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
