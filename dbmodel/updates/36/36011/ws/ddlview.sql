@@ -204,9 +204,9 @@ SELECT n.netscenario_id,
     n.the_geom,
     nd.nodecat_id,
     cn.nodetype_id as node_type,
-	n.epa_type,
-	n.state,
-	n.state_type
+    nd.epa_type,
+    nd.state,
+    nd.state_type
    FROM selector_netscenario,
     plan_netscenario_node n
    LEFT JOIN node nd using (node_id)
