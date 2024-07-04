@@ -90,7 +90,6 @@ BEGIN
 		-- epanet (to_arc)
 		UPDATE inp_pump SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
 		UPDATE inp_valve SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
-		UPDATE inp_shortpipe SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
 		
 		-- graph
 		UPDATE config_graph_checkvalve SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
