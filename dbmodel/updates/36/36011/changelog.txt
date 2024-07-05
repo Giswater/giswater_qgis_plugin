@@ -16,3 +16,4 @@
 - Add '%' symbol on profile's slope
 - Do not modify geometry of link when arc_id is changed but link remains on same node as endpoint
 - New field on ext_municipality, ext_region, ext_province: ext_code
+- Add utils table ext_province_x_region with double fk to ext_municipality
