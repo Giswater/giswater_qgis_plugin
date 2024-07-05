@@ -35,3 +35,9 @@ ALTER TABLE plan_psector ALTER COLUMN status SET DEFAULT 2;
 ALTER TABLE plan_psector ALTER COLUMN psector_type SET DEFAULT 1;
 
 ALTER TABLE cat_feature RENAME COLUMN config TO addparam;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"ext_municipality", "column":"ext_code", "dataType":"varchar(50)", "isUtils":"True"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"ext_region", "column":"ext_code", "dataType":"varchar(50)", "isUtils":"True"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"ext_province", "column":"ext_code", "dataType":"varchar(50)", "isUtils":"True"}}$$);
