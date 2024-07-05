@@ -4,6 +4,7 @@
 - Remove expl_id from config_graph_mincut due it is redudant
 - Disable mincut if user has not any inlet on canvas to work with
 - Enhancement of cat_manager by working with system users and roles
+- Add tab muni on selector (disabled by default) showing as many exploitations are in the municipality
 - Remove to_arc and status on inp_shortpipe and using inventory values to work with on v_edit_inp_shortipe
 - New field on plan_netscenario_presszone: presszone_type
 - New fields on plan_netscenario_presszone and plan_netscenario_dma: stylesheet, expl_id2
@@ -17,3 +18,5 @@
 - Do not modify geometry of link when arc_id is changed but link remains on same node as endpoint
 - New field on ext_municipality, ext_region, ext_province: ext_code
 - Add utils table ext_province_x_region with double fk to ext_municipality
+- Several bugs fixed
+
