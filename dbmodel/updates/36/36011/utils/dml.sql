@@ -60,3 +60,6 @@ INSERT INTO config_param_system VALUES ('edit_connec_autofill_plotcode', 'FALSE'
 
 -- 02/07/2024
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('v_edit_dma', 'form_feature', 'tab_data', 'expl_id2', 'lyt_data_1', 17, 'string', 'combo', 'expl_id2', 'expl_id2', NULL, false, false, true, false, NULL, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id is not null ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
+
+-- 05/07/2024
+UPDATE sys_param_user SET "label"='End date:' WHERE id='edit_enddate_vdefault';
