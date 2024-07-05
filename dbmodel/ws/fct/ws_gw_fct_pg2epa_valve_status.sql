@@ -29,7 +29,7 @@ BEGIN
 	IF (SELECT value FROM config_param_system WHERE parameter = 'epa_shutoffvalve') = 'VALVE' THEN
 		v_querytext = ' v_edit_inp_valve v WHERE addparam::json->>''valv_type'' = ''TCV''';
 	ELSE
-		v_querytext = ' v_edit_inp_shortpipe v';
+		v_querytext = ' v_edit_inp_shortpipe v WHERE node_id IS NOT NULL';
 	END IF;
 	
 	EXECUTE ' UPDATE temp_arc a SET status=v.status FROM '||v_querytext||' AND a.arc_id=concat(v.node_id,''_n2a'')';
