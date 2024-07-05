@@ -224,57 +224,220 @@ UPDATE sys_style SET stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
 
 
 UPDATE sys_style SET stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
-<qgis version="3.28.4-Firenze" styleCategories="Symbology">
-  <renderer-v2 forceraster="0" type="singleSymbol" referencescale="-1" enableorderby="0" symbollevels="0">
+<qgis styleCategories="Symbology" version="3.28.4-Firenze">
+  <renderer-v2 referencescale="-1" enableorderby="0" forceraster="0" type="categorizedSymbol" symbollevels="0" attr="status">
+    <categories>
+      <category symbol="0" render="true" type="string" label="CLOSED" value="CLOSED"/>
+      <category symbol="1" render="true" type="string" label="CV" value="CV"/>
+      <category symbol="2" render="true" type="string" label="OPEN" value="OPEN"/>
+      <category symbol="3" render="true" type="string" label="OTHER VALUES" value=""/>
+    </categories>
     <symbols>
-      <symbol is_animated="0" type="marker" clip_to_extent="1" force_rhr="0" frame_rate="10" alpha="1" name="0">
+      <symbol is_animated="0" alpha="1" clip_to_extent="1" name="0" force_rhr="0" frame_rate="10" type="marker">
         <data_defined_properties>
           <Option type="Map">
-            <Option type="QString" value="" name="name"/>
+            <Option name="name" type="QString" value=""/>
             <Option name="properties"/>
-            <Option type="QString" value="collection" name="type"/>
+            <Option name="type" type="QString" value="collection"/>
           </Option>
         </data_defined_properties>
-        <layer pass="0" locked="0" class="SimpleMarker" enabled="1">
+        <layer class="SimpleMarker" enabled="1" locked="0" pass="0">
           <Option type="Map">
-            <Option type="QString" value="0" name="angle"/>
-            <Option type="QString" value="square" name="cap_style"/>
-            <Option type="QString" value="255,255,255,255" name="color"/>
-            <Option type="QString" value="1" name="horizontal_anchor_point"/>
-            <Option type="QString" value="bevel" name="joinstyle"/>
-            <Option type="QString" value="circle" name="name"/>
-            <Option type="QString" value="0,0" name="offset"/>
-            <Option type="QString" value="3x:0,0,0,0,0,0" name="offset_map_unit_scale"/>
-            <Option type="QString" value="MM" name="offset_unit"/>
-            <Option type="QString" value="0,0,0,255" name="outline_color"/>
-            <Option type="QString" value="solid" name="outline_style"/>
-            <Option type="QString" value="0.4" name="outline_width"/>
-            <Option type="QString" value="3x:0,0,0,0,0,0" name="outline_width_map_unit_scale"/>
-            <Option type="QString" value="MM" name="outline_width_unit"/>
-            <Option type="QString" value="diameter" name="scale_method"/>
-            <Option type="QString" value="2.4" name="size"/>
-            <Option type="QString" value="3x:0,0,0,0,0,0" name="size_map_unit_scale"/>
-            <Option type="QString" value="MM" name="size_unit"/>
-            <Option type="QString" value="1" name="vertical_anchor_point"/>
+            <Option name="angle" type="QString" value="0"/>
+            <Option name="cap_style" type="QString" value="square"/>
+            <Option name="color" type="QString" value="227,26,28,255"/>
+            <Option name="horizontal_anchor_point" type="QString" value="1"/>
+            <Option name="joinstyle" type="QString" value="bevel"/>
+            <Option name="name" type="QString" value="circle"/>
+            <Option name="offset" type="QString" value="0,0"/>
+            <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="offset_unit" type="QString" value="MM"/>
+            <Option name="outline_color" type="QString" value="0,0,0,255"/>
+            <Option name="outline_style" type="QString" value="solid"/>
+            <Option name="outline_width" type="QString" value="0.4"/>
+            <Option name="outline_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="outline_width_unit" type="QString" value="MM"/>
+            <Option name="scale_method" type="QString" value="diameter"/>
+            <Option name="size" type="QString" value="2.4"/>
+            <Option name="size_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="size_unit" type="QString" value="MM"/>
+            <Option name="vertical_anchor_point" type="QString" value="1"/>
           </Option>
           <data_defined_properties>
             <Option type="Map">
-              <Option type="QString" value="" name="name"/>
+              <Option name="name" type="QString" value=""/>
               <Option name="properties"/>
-              <Option type="QString" value="collection" name="type"/>
+              <Option name="type" type="QString" value="collection"/>
+            </Option>
+          </data_defined_properties>
+        </layer>
+      </symbol>
+      <symbol is_animated="0" alpha="1" clip_to_extent="1" name="1" force_rhr="0" frame_rate="10" type="marker">
+        <data_defined_properties>
+          <Option type="Map">
+            <Option name="name" type="QString" value=""/>
+            <Option name="properties"/>
+            <Option name="type" type="QString" value="collection"/>
+          </Option>
+        </data_defined_properties>
+        <layer class="SimpleMarker" enabled="1" locked="0" pass="0">
+          <Option type="Map">
+            <Option name="angle" type="QString" value="0"/>
+            <Option name="cap_style" type="QString" value="square"/>
+            <Option name="color" type="QString" value="253,191,111,255"/>
+            <Option name="horizontal_anchor_point" type="QString" value="1"/>
+            <Option name="joinstyle" type="QString" value="bevel"/>
+            <Option name="name" type="QString" value="circle"/>
+            <Option name="offset" type="QString" value="0,0"/>
+            <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="offset_unit" type="QString" value="MM"/>
+            <Option name="outline_color" type="QString" value="0,0,0,255"/>
+            <Option name="outline_style" type="QString" value="solid"/>
+            <Option name="outline_width" type="QString" value="0.4"/>
+            <Option name="outline_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="outline_width_unit" type="QString" value="MM"/>
+            <Option name="scale_method" type="QString" value="diameter"/>
+            <Option name="size" type="QString" value="2.4"/>
+            <Option name="size_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="size_unit" type="QString" value="MM"/>
+            <Option name="vertical_anchor_point" type="QString" value="1"/>
+          </Option>
+          <data_defined_properties>
+            <Option type="Map">
+              <Option name="name" type="QString" value=""/>
+              <Option name="properties"/>
+              <Option name="type" type="QString" value="collection"/>
+            </Option>
+          </data_defined_properties>
+        </layer>
+      </symbol>
+      <symbol is_animated="0" alpha="1" clip_to_extent="1" name="2" force_rhr="0" frame_rate="10" type="marker">
+        <data_defined_properties>
+          <Option type="Map">
+            <Option name="name" type="QString" value=""/>
+            <Option name="properties"/>
+            <Option name="type" type="QString" value="collection"/>
+          </Option>
+        </data_defined_properties>
+        <layer class="SimpleMarker" enabled="1" locked="0" pass="0">
+          <Option type="Map">
+            <Option name="angle" type="QString" value="0"/>
+            <Option name="cap_style" type="QString" value="square"/>
+            <Option name="color" type="QString" value="31,120,180,255"/>
+            <Option name="horizontal_anchor_point" type="QString" value="1"/>
+            <Option name="joinstyle" type="QString" value="bevel"/>
+            <Option name="name" type="QString" value="circle"/>
+            <Option name="offset" type="QString" value="0,0"/>
+            <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="offset_unit" type="QString" value="MM"/>
+            <Option name="outline_color" type="QString" value="0,0,0,255"/>
+            <Option name="outline_style" type="QString" value="solid"/>
+            <Option name="outline_width" type="QString" value="0.4"/>
+            <Option name="outline_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="outline_width_unit" type="QString" value="MM"/>
+            <Option name="scale_method" type="QString" value="diameter"/>
+            <Option name="size" type="QString" value="2.4"/>
+            <Option name="size_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="size_unit" type="QString" value="MM"/>
+            <Option name="vertical_anchor_point" type="QString" value="1"/>
+          </Option>
+          <data_defined_properties>
+            <Option type="Map">
+              <Option name="name" type="QString" value=""/>
+              <Option name="properties"/>
+              <Option name="type" type="QString" value="collection"/>
+            </Option>
+          </data_defined_properties>
+        </layer>
+      </symbol>
+      <symbol is_animated="0" alpha="1" clip_to_extent="1" name="3" force_rhr="0" frame_rate="10" type="marker">
+        <data_defined_properties>
+          <Option type="Map">
+            <Option name="name" type="QString" value=""/>
+            <Option name="properties"/>
+            <Option name="type" type="QString" value="collection"/>
+          </Option>
+        </data_defined_properties>
+        <layer class="SimpleMarker" enabled="1" locked="0" pass="0">
+          <Option type="Map">
+            <Option name="angle" type="QString" value="0"/>
+            <Option name="cap_style" type="QString" value="square"/>
+            <Option name="color" type="QString" value="255,255,255,255"/>
+            <Option name="horizontal_anchor_point" type="QString" value="1"/>
+            <Option name="joinstyle" type="QString" value="bevel"/>
+            <Option name="name" type="QString" value="circle"/>
+            <Option name="offset" type="QString" value="0,0"/>
+            <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="offset_unit" type="QString" value="MM"/>
+            <Option name="outline_color" type="QString" value="0,0,0,255"/>
+            <Option name="outline_style" type="QString" value="solid"/>
+            <Option name="outline_width" type="QString" value="0.4"/>
+            <Option name="outline_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="outline_width_unit" type="QString" value="MM"/>
+            <Option name="scale_method" type="QString" value="diameter"/>
+            <Option name="size" type="QString" value="2.4"/>
+            <Option name="size_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="size_unit" type="QString" value="MM"/>
+            <Option name="vertical_anchor_point" type="QString" value="1"/>
+          </Option>
+          <data_defined_properties>
+            <Option type="Map">
+              <Option name="name" type="QString" value=""/>
+              <Option name="properties"/>
+              <Option name="type" type="QString" value="collection"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
     </symbols>
+    <source-symbol>
+      <symbol is_animated="0" alpha="1" clip_to_extent="1" name="0" force_rhr="0" frame_rate="10" type="marker">
+        <data_defined_properties>
+          <Option type="Map">
+            <Option name="name" type="QString" value=""/>
+            <Option name="properties"/>
+            <Option name="type" type="QString" value="collection"/>
+          </Option>
+        </data_defined_properties>
+        <layer class="SimpleMarker" enabled="1" locked="0" pass="0">
+          <Option type="Map">
+            <Option name="angle" type="QString" value="0"/>
+            <Option name="cap_style" type="QString" value="square"/>
+            <Option name="color" type="QString" value="255,255,255,255"/>
+            <Option name="horizontal_anchor_point" type="QString" value="1"/>
+            <Option name="joinstyle" type="QString" value="bevel"/>
+            <Option name="name" type="QString" value="circle"/>
+            <Option name="offset" type="QString" value="0,0"/>
+            <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="offset_unit" type="QString" value="MM"/>
+            <Option name="outline_color" type="QString" value="0,0,0,255"/>
+            <Option name="outline_style" type="QString" value="solid"/>
+            <Option name="outline_width" type="QString" value="0.4"/>
+            <Option name="outline_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="outline_width_unit" type="QString" value="MM"/>
+            <Option name="scale_method" type="QString" value="diameter"/>
+            <Option name="size" type="QString" value="2.4"/>
+            <Option name="size_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+            <Option name="size_unit" type="QString" value="MM"/>
+            <Option name="vertical_anchor_point" type="QString" value="1"/>
+          </Option>
+          <data_defined_properties>
+            <Option type="Map">
+              <Option name="name" type="QString" value=""/>
+              <Option name="properties"/>
+              <Option name="type" type="QString" value="collection"/>
+            </Option>
+          </data_defined_properties>
+        </layer>
+      </symbol>
+    </source-symbol>
     <rotation/>
     <sizescale/>
   </renderer-v2>
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
   <layerGeometryType>0</layerGeometryType>
-</qgis>
-' WHERE idval='v_edit_inp_shortpipe';
+</qgis>' WHERE idval='v_edit_inp_shortpipe';
 
 
 UPDATE sys_style SET stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
