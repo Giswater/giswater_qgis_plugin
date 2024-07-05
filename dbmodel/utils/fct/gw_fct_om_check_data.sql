@@ -274,7 +274,7 @@ BEGIN
 
 	RAISE NOTICE '10 - check if all tanks are defined in config_graph_mincut  (177)';
 	IF v_project_type = 'WS' THEN
-		v_querytext = 'SELECT node_id, nodecat_id, the_geom, FROM '||v_edit||'node 
+		v_querytext = 'SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node 
 		JOIN cat_node ON nodecat_id=cat_node.id
 		JOIN cat_feature ON cat_node.nodetype_id = cat_feature.id
 		JOIN value_state_type ON state_type = value_state_type.id
