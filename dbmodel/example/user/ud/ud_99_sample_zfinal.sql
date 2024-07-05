@@ -56,3 +56,14 @@ SELECT gw_fct_setarcfusion('{"client":{"device":4, "infoType":1, "lang":"ES"},"f
 INSERT INTO inp_flwreg_weir VALUES(1,'237','100014',1,0.5,'TRANSVERSE', 16.35,1.5,null,null, 'NO', 2,1,0,0,null,null,null,null,'237WE1');
 
 UPDATE config_param_user SET value ='PARTIAL' WHERE parameter = 'inp_options_inertial_damping';
+
+-- add example for specific sequence on circ_manhole
+UPDATE cat_feature SET addparam='{"code_prefix":"CM_"}' WHERE id='CIRC_MANHOLE';
+
+CREATE SEQUENCE circ_manhole_code_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 2147483647
+	START 1000
+	CACHE 1
+	NO CYCLE;
