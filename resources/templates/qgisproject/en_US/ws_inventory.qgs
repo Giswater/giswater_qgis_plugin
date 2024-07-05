@@ -16021,7 +16021,7 @@ def my_form_open(dialog, layer, feature):
           <rule symbol="15" key="{4006148d-3986-44fc-b269-0707485e9bd0}" label="Junction" filter="&quot;sys_type&quot; = 'JUNCTION'" scalemaxdenom="5000"/>
           <rule symbol="16" key="{2efa5954-7163-4c85-b608-6e6326bf4b5b}" label="Netwjoin" filter="&quot;sys_type&quot; = 'NETWJOIN'" scalemaxdenom="10000"/>
           <rule symbol="17" key="{d6c2b118-3f7e-4809-a8e8-e6857e5a3f87}" label="Valve Open" filter="&quot;sys_type&quot; = 'VALVE' and (&quot;closed_valve&quot;  =  'false' or  &quot;closed_valve&quot; =  NULL )" scalemaxdenom="10000"/>
-          <rule symbol="18" key="{82481050-9411-4920-bf5b-aa8cde85e324}" label="Valve Closed" filter="&quot;sys_type&quot; = 'VALVE' and  &quot;node_type&quot; and  (&quot;closed_valve&quot;  =  'true' )" scalemaxdenom="10000"/>
+          <rule symbol="18" key="{82481050-9411-4920-bf5b-aa8cde85e324}" label="Valve Closed" filter="&quot;sys_type&quot; = 'VALVE' and (&quot;closed_valve&quot;  =  'true' )" scalemaxdenom="10000"/>
         </rules>
         <symbols>
           <symbol is_animated="0" alpha="1" clip_to_extent="1" name="0" force_rhr="0" frame_rate="10" type="marker">
