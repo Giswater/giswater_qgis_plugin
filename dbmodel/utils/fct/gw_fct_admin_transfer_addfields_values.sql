@@ -76,7 +76,7 @@ BEGIN
                     END IF;
                 ELSE
                     EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
-                            '|| lower(rec_sa.feature_type) || '_id '||v_table_id_type||' PRIMARY KEY,
+                            '|| lower(rec_sa.feature_type) || '_id varchar(16) PRIMARY KEY,
                             ' || rec_sa_featurestypes.param_name || ' '||rec_sa_featurestypes.datatype_id||'
                         )';
 
