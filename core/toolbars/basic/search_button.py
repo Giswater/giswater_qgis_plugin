@@ -29,5 +29,5 @@ class GwSearchButton(GwAction):
                 self.iface.removeDockWidget(docker_search)
                 docker_search.deleteLater()
 
-        dlg_search = GwSearchUi()
+        dlg_search = GwSearchUi(self)
         self.search.open_search(dlg_search)

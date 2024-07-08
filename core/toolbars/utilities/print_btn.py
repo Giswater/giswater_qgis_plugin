@@ -52,7 +52,7 @@ class GwPrintButton(GwAction):
 
         self.initial_rotation = self.iface.mapCanvas().rotation()
 
-        self.dlg_composer = GwPrintUi()
+        self.dlg_composer = GwPrintUi(self)
         tools_gw.load_settings(self.dlg_composer)
 
         # Create and populate dialog

@@ -30,7 +30,7 @@ class GwAuxCircleAddButton(GwMaptool):
         self.cancel_circle = False
         self.layer_circle = None
         self.snap_to_selected_layer = False
-        self.rb_circle = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.LineGeometry)
+        self.rb_circle = tools_gw.create_rubberband(self.canvas, "line")
         self.rb_circle.setLineStyle(Qt.DashLine)
         self.rb_circle.setColor(QColor(255, 0, 0, 150))
 
@@ -133,7 +133,10 @@ class GwAuxCircleAddButton(GwMaptool):
 
         # Call parent method
         super().deactivate()
-        self.iface.setActiveLayer(self.current_layer)
+        try:
+            self.iface.setActiveLayer(self.current_layer)
+        except RuntimeError:
+            pass
 
     # endregion
 
@@ -157,7 +160,7 @@ class GwAuxCircleAddButton(GwMaptool):
     def _init_create_circle_form(self, point):
 
         # Create the dialog and signals
-        self.dlg_create_circle = GwAuxCircleUi()
+        self.dlg_create_circle = GwAuxCircleUi(self)
         tools_gw.load_settings(self.dlg_create_circle)
         self.cancel_circle = False
         validator = QDoubleValidator(0.00, 9999999.00, 3)
@@ -167,6 +170,8 @@ class GwAuxCircleAddButton(GwMaptool):
         self.dlg_create_circle.radius.textChanged.connect(partial(self._preview_circle, point))
         self.dlg_create_circle.btn_accept.clicked.connect(partial(self._get_radius, point))
         self.dlg_create_circle.btn_cancel.clicked.connect(self.cancel)
+        self.dlg_create_circle.rejected.connect(self.cancel)
+
 
         tools_gw.open_dialog(self.dlg_create_circle, dlg_name='auxcircle')
         self.dlg_create_circle.radius.setFocus()
@@ -192,7 +197,7 @@ class GwAuxCircleAddButton(GwMaptool):
 
         if self.layer_circle:
             self.layer_circle.startEditing()
-            tools_gw.close_dialog(self.dlg_create_circle)
+
             if self.delete_prev:
                 selection = self.layer_circle.getFeatures()
                 self.layer_circle.selectByIds([f.id() for f in selection])
@@ -236,7 +241,7 @@ class GwAuxCircleAddButton(GwMaptool):
                 # Next line generate: WARNING    Attribute index 0 out of bounds [0;0]
                 # but all work ok
                 provider.addFeatures([feature])
-
+            tools_gw.close_dialog(self.dlg_create_circle)
             self.layer_circle.commitChanges()
             self.layer_circle.dataProvider().reloadData()
             self.layer_circle.triggerRepaint()
@@ -282,6 +287,6 @@ class GwAuxCircleAddButton(GwMaptool):
 
     def _reset_rubberbands(self):
 
-        tools_gw.reset_rubberband(self.rb_circle, QgsWkbTypes.LineGeometry)
+        tools_gw.reset_rubberband(self.rb_circle, "line")
 
     # endregion

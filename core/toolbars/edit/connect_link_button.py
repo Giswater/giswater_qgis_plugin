@@ -72,7 +72,7 @@ class GwConnectLinkButton(GwMaptool):
     def canvasPressEvent(self, event):
 
         self.select_rect.setRect(0, 0, 0, 0)
-        tools_gw.reset_rubberband(self.rubber_band, QgsWkbTypes.PolygonGeometry)
+        tools_gw.reset_rubberband(self.rubber_band, "polygon")
 
 
     def canvasReleaseEvent(self, event):
@@ -168,7 +168,7 @@ class GwConnectLinkButton(GwMaptool):
     def manage_result(self, result, layer):
 
         if result and result['status'] != 'Failed':
-            self.dlg_dtext = GwDialogTextUi('connect_to_network')
+            self.dlg_dtext = GwDialogTextUi(self, 'connect_to_network')
             tools_gw.load_settings(self.dlg_dtext)
             self.dlg_dtext.btn_accept.hide()
             self.dlg_dtext.setWindowTitle('Connect to network')
@@ -242,7 +242,7 @@ class GwConnectLinkButton(GwMaptool):
         ur = transform.toMapCoordinates(self.select_rect.right(), self.select_rect.top())
 
         # Rubber band
-        tools_gw.reset_rubberband(self.rubber_band, QgsWkbTypes.PolygonGeometry)
+        tools_gw.reset_rubberband(self.rubber_band, "polygon")
         self.rubber_band.addPoint(ll, False)
         self.rubber_band.addPoint(lr, False)
         self.rubber_band.addPoint(ur, False)

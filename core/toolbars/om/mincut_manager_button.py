@@ -22,4 +22,4 @@ class GwMincutManagerButton(GwAction):
 
 
     def clicked_event(self):
-        self.mincut.manage_mincuts(GwMincutManagerUi())
+        self.mincut.manage_mincuts(GwMincutManagerUi(self))

@@ -59,7 +59,7 @@ class GwProjectCheckButton(GwAction):
     def _open_dialog(self):
 
         # Create dialog
-        self.dlg_audit_project = GwProjectCheckUi()
+        self.dlg_audit_project = GwProjectCheckUi(self)
         tools_gw.load_settings(self.dlg_audit_project)
         self.dlg_audit_project.rejected.connect(partial(tools_gw.save_settings, self.dlg_audit_project))
 

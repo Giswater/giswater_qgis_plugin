@@ -79,7 +79,7 @@ class GwGo2EpaSelectorButton(GwAction):
     def _open_go2epa_selector(self):
 
         # Create the dialog and signals
-        self.dlg_go2epa_result = GwGo2EpaSelectorUi('go2epa')
+        self.dlg_go2epa_result = GwGo2EpaSelectorUi(self, 'go2epa')
         tools_gw.load_settings(self.dlg_go2epa_result)
         if self.project_type == 'ud':
             tools_qt.remove_tab(self.dlg_go2epa_result.tabWidget, "tab_time")

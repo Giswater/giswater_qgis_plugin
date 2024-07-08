@@ -13,7 +13,7 @@ import random
 import re
 import sys
 import sqlite3
-from typing import Literal
+from typing import Literal, Dict
 import webbrowser
 import xml.etree.ElementTree as ET
 
@@ -53,6 +53,33 @@ from ...libs.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
 # These imports are for the add_{widget} functions (modules need to be imported in order to find it by its name)
 # noinspection PyUnresolvedReferences
 from ..shared import info, mincut_tools
+
+QgsGeometryType = Literal['line', 'point', 'polygon']
+
+if Qgis.QGIS_VERSION_INT < 33000:
+    geom_types_dict: Dict = {
+        "line": QgsWkbTypes.LineGeometry,
+        "point": QgsWkbTypes.PointGeometry,
+        "polygon": QgsWkbTypes.PolygonGeometry
+    }
+
+else:
+    geom_types_dict: Dict = {
+        "line": Qgis.GeometryType.Line,
+        "point": Qgis.GeometryType.Point,
+        "polygon": Qgis.GeometryType.Polygon
+    }
+
+def _get_geom_type(geometry_type: QgsGeometryType = None):
+
+    if Qgis.QGIS_VERSION_INT < 33000:
+        default_geom_type = QgsWkbTypes.LineGeometry
+    else:
+        default_geom_type = Qgis.GeometryType.Line
+
+    geom_type = geom_types_dict.get(geometry_type, default_geom_type)
+    return geom_type
+
 
 def load_settings(dialog, plugin='core'):
     """ Load user UI settings related with dialog position and size """
@@ -2047,7 +2074,7 @@ def add_frame(field, x=None):
     return widget
 
 
-def add_combo(field, dialog=None, complet_result=None, ignore_function=False):
+def add_combo(field, dialog=None, complet_result=None, ignore_function=False, class_info=None):
     widget = QComboBox()
     widget.setObjectName(field['widgetname'])
     if 'widgetcontrols' in field and field['widgetcontrols']:
@@ -2080,7 +2107,7 @@ def add_combo(field, dialog=None, complet_result=None, ignore_function=False):
             parameters = f.get('parameters')
 
             kwargs = {"complet_result": complet_result, "dialog": dialog, "columnname": columnname, "widget": widget,
-                      "func_params": parameters}
+                      "func_params": parameters, "class": class_info}
             if 'module' in f:
                 module = globals()[f['module']]
             else:
@@ -3526,9 +3553,12 @@ def restore_parent_layers_visibility(layers):
         tools_qgis.set_layer_visible(layer, False, visibility)
 
 
-def create_rubberband(canvas, geometry_type=QgsWkbTypes.LineGeometry):
+def create_rubberband(canvas, geometry_type: QgsGeometryType = None):
     """ Creates a rubberband and adds it to the global list """
-    rb = QgsRubberBand(canvas, geometry_type)
+
+    geom_type = _get_geom_type(geometry_type)
+
+    rb = QgsRubberBand(canvas, geom_type)
     global_vars.active_rubberbands.append(rb)
     return rb
 
@@ -3537,7 +3567,8 @@ def reset_rubberband(rb, geometry_type=None):
     """ Resets a rubberband and tries to remove it from the global list """
 
     if geometry_type:
-        rb.reset(geometry_type)
+        geom_type = _get_geom_type(geometry_type)
+        rb.reset(geom_type)
     else:
         rb.reset()
 
@@ -4441,8 +4472,9 @@ def _manage_combo(**kwargs):
     dialog = kwargs['dialog']
     field = kwargs['field']
     complet_result = kwargs['complet_result']
+    class_info = kwargs['class']
 
-    widget = add_combo(field, dialog, complet_result)
+    widget = add_combo(field, dialog, complet_result, class_info=class_info)
     widget = set_widget_size(widget, field)
     return widget
 

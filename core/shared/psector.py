@@ -67,8 +67,7 @@ class GwPsector:
             self.sys_currency = json.loads(row[0], object_pairs_hook=OrderedDict)
 
         # Create the dialog and signals
-        self.dlg_plan_psector = GwPsectorUi()
-        self.dlg_plan_psector.setProperty('class_obj', self)
+        self.dlg_plan_psector = GwPsectorUi(self)
         tools_gw.load_settings(self.dlg_plan_psector)
 
         # Manage btn toggle
@@ -138,7 +137,6 @@ class GwPsector:
         # tab General elements
         self.psector_id = self.dlg_plan_psector.findChild(QLineEdit, "psector_id")
         self.ext_code = self.dlg_plan_psector.findChild(QLineEdit, "ext_code")
-        self.cmb_psector_type = self.dlg_plan_psector.findChild(QComboBox, "psector_type")
         self.cmb_expl_id = self.dlg_plan_psector.findChild(QComboBox, "expl_id")
         self.cmb_status = self.dlg_plan_psector.findChild(QComboBox, "status")
         self.workcat_id = self.dlg_plan_psector.findChild(QComboBox, "workcat_id")
@@ -152,8 +150,6 @@ class GwPsector:
         atlas_id.setValidator(QIntValidator())
         num_value = self.dlg_plan_psector.findChild(QLineEdit, "num_value")
         num_value.setValidator(QIntValidator())
-        where = " WHERE typevalue = 'psector_type' "
-        self.populate_combos(self.dlg_plan_psector.psector_type, 'idval', 'id', 'plan_typevalue', where)
 
         # Manage other_price tab variables
         self.price_loaded = False
@@ -306,10 +302,6 @@ class GwPsector:
             self.psector_id.setText(str(row['psector_id']))
             if str(row['ext_code']) != 'None':
                 self.ext_code.setText(str(row['ext_code']))
-            sql = (f"SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_type' AND "
-                   f"id = '{row['psector_type']}'")
-            result = tools_db.get_row(sql)
-            tools_qt.set_combo_value(self.cmb_psector_type, str(result['idval']), 1)
             sql = (f"SELECT name FROM exploitation "
                    f"WHERE expl_id = {row['expl_id']}")
             result = tools_db.get_row(sql)
@@ -569,12 +561,12 @@ class GwPsector:
 
         default_file_name = tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.name)
 
-        self.dlg_psector_rapport = GwPsectorRapportUi()
+        self.dlg_psector_rapport = GwPsectorRapportUi(self)
         tools_gw.load_settings(self.dlg_psector_rapport)
 
         tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_composer_path', default_file_name + " comp.pdf")
-        tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_csv_detail_path', default_file_name + " detail.csv")
-        tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_csv_path', default_file_name + ".csv")
+        tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_csv_detail_path', default_file_name + ".csv")
+        tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_csv_path', default_file_name + " prices.csv")
 
         self.dlg_psector_rapport.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_psector_rapport))
         self.dlg_psector_rapport.btn_ok.clicked.connect(partial(self.generate_reports))
@@ -943,25 +935,6 @@ class GwPsector:
                     widget.setEnabled(False)
 
 
-    def populate_combos(self, combo, field_name, field_id, table_name, where=None):
-
-        sql = f"SELECT DISTINCT({field_id}), {field_name} FROM {table_name} "
-        if where:
-            sql += where
-        sql += f" ORDER BY {field_name}"
-        rows = tools_db.get_rows(sql)
-        if not rows:
-            return
-
-        combo.blockSignals(True)
-        combo.clear()
-
-        records_sorted = sorted(rows, key=operator.itemgetter(1))
-        for record in records_sorted:
-            combo.addItem(record[1], record)
-        combo.blockSignals(False)
-
-
     def reload_states_selector(self):
 
         try:
@@ -1154,7 +1127,7 @@ class GwPsector:
         self.iface.messageBar().popWidget()
 
         # Create log dialog
-        self.dlg_infolog = GwPsectorRepairUi()
+        self.dlg_infolog = GwPsectorRepairUi(self)
         self.dlg_infolog.btn_repair.clicked.connect(partial(self.repair_psector, psector_id))
         self.dlg_infolog.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_infolog, True))
 
@@ -1684,7 +1657,7 @@ class GwPsector:
         """ Button 46: Psector management """
 
         # Create the dialog and signals
-        self.dlg_psector_mng = GwPsectorManagerUi()
+        self.dlg_psector_mng = GwPsectorManagerUi(self)
 
         tools_gw.load_settings(self.dlg_psector_mng)
         table_name = "v_ui_plan_psector"
@@ -1957,7 +1930,7 @@ class GwPsector:
         """ Button 50: Plan estimate result manager """
 
         # Create the dialog and signals
-        self.dlg_merm = GwPriceManagerUi()
+        self.dlg_merm = GwPriceManagerUi(self)
         tools_gw.load_settings(self.dlg_merm)
 
         # Set current value

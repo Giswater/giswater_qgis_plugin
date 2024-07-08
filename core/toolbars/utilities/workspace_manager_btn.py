@@ -39,7 +39,7 @@ class GwWorkspaceManagerButton(GwAction):
         """ Open workspace manager """
 
         # Main dialog
-        self.dlg_workspace_manager = GwWorkspaceManagerUi()
+        self.dlg_workspace_manager = GwWorkspaceManagerUi(self)
         tools_gw.load_settings(self.dlg_workspace_manager)
 
         self._check_workspace()
@@ -75,7 +75,7 @@ class GwWorkspaceManagerButton(GwAction):
     def _open_update_workspace_dlg(self):
 
         # Create workspace dialog
-        self.dlg_create_workspace = GwCreateWorkspaceUi()
+        self.dlg_create_workspace = GwCreateWorkspaceUi(self)
         self.new_workspace_name = self.dlg_create_workspace.findChild(QLineEdit, 'txt_workspace_name')
         self.new_workspace_descript = self.dlg_create_workspace.findChild(QPlainTextEdit, 'txt_workspace_descript')
         self.new_workspace_chk = self.dlg_create_workspace.findChild(QCheckBox, 'chk_workspace_private')
@@ -112,7 +112,7 @@ class GwWorkspaceManagerButton(GwAction):
     def _open_create_workspace_dlg(self):
 
         # Create workspace dialog
-        self.dlg_create_workspace = GwCreateWorkspaceUi()
+        self.dlg_create_workspace = GwCreateWorkspaceUi(self)
         self.new_workspace_name = self.dlg_create_workspace.findChild(QLineEdit, 'txt_workspace_name')
         self.new_workspace_descript = self.dlg_create_workspace.findChild(QPlainTextEdit, 'txt_workspace_descript')
         self.new_workspace_chk = self.dlg_create_workspace.findChild(QCheckBox, 'chk_workspace_private')
