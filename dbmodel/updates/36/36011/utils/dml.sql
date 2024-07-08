@@ -26,7 +26,7 @@ INSERT INTO config_param_system VALUES (
 
 UPDATE config_form_fields SET widgettype='combo',
 dv_querytext='SELECT id, id as idval FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2',
-dv_orderby_id=true WHERE formname='v_edit_dimensions' AND formtype='form_feature' AND columnname='feature_type' AND tabname='tab_none';
+dv_orderby_id=true, dv_isnullvalue = true WHERE formname='v_edit_dimensions' AND formtype='form_feature' AND columnname='feature_type' AND tabname='tab_none';
 
 -- 21/06/2024
 DELETE FROM sys_foreignkey WHERE typevalue_name = 'psector_type' AND target_table='plan_psector';
