@@ -514,11 +514,19 @@ class GwInfo(QObject):
         for tab in self.visible_tabs:
             tabs_to_show.append(self.visible_tabs[tab]['tabName'])
 
-        for x in range(self.tab_main.count() - 1, 0, -1):
-            if self.tab_main.widget(x).objectName() not in tabs_to_show:
-                tools_qt.remove_tab(self.tab_main, self.tab_main.widget(x).objectName())
-            elif new_feature and self.tab_main.widget(x).objectName() != 'tab_data':
-                tools_qt.enable_tab_by_tab_name(self.tab_main, self.tab_main.widget(x).objectName(), False)
+        for x in range(self.tab_main.count() - 1, -1, -1):
+            tab_name = self.tab_main.widget(x).objectName()
+            try:
+                print(f"{x} -> {self.visible_tabs[tab_name]}")
+                self.tab_main.setTabText(x, self.visible_tabs[tab_name]['tabLabel'])
+                self.tab_main.setTabToolTip(x, self.visible_tabs[tab_name]['tooltip'])
+            except Exception as e:
+                print(e)
+                pass
+            if tab_name not in tabs_to_show:
+                tools_qt.remove_tab(self.tab_main, tab_name)
+            elif new_feature and tab_name != 'tab_data':
+                tools_qt.enable_tab_by_tab_name(self.tab_main, tab_name, False)
 
         # Actions
         self._get_actions()
