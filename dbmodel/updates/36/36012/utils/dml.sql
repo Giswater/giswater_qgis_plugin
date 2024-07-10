@@ -6,20 +6,20 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3310
 
-DROP FUNCTION IF EXISTS ws360113.gw_fct_setpsectorcostremovedpipes(json);
-CREATE OR REPLACE FUNCTION ws360113.gw_fct_setpsectorcostremovedpipes(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_setpsectorcostremovedpipes(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setpsectorcostremovedpipes(p_data json)
 RETURNS json AS
 $BODY$
 
 /*
- SELECT ws360113.gw_fct_setpsectorcostremovedpipes($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, 
+ SELECT SCHEMA_NAME.gw_fct_setpsectorcostremovedpipes($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"expl":"1", "material":"FC", "price":"A_PVC110_PN16", "observ":"test sdgf rf hgdaf hadf hdfs"}, "aux_params":null}}$$);
- 
+
 */
 
 DECLARE
 
-v_expl  integer;		
+v_expl  integer;
 v_material text;
 v_price	text;
 v_version text;
@@ -36,21 +36,21 @@ v_sql text;
 
 BEGIN
 	-- Search path
-	SET search_path = "ws360113", public;
-	
+	SET search_path = "SCHEMA_NAME", public;
+
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
-	-- getting input data 	
+	-- getting input data
 	v_expl := ((p_data ->>'data')::json->>'parameters')::json->>'expl';
 	v_material := ((p_data ->>'data')::json->>'parameters')::json->>'material';
 	v_price := ((p_data ->>'data')::json->>'parameters')::json->>'price';
 	v_observ := ((p_data ->>'data')::json->>'parameters')::json->>'observ';
-	
+
 	-- Reset values
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid;
-	DELETE FROM audit_check_data WHERE cur_user="current_user"()AND fid=v_fid;	
-	
+	DELETE FROM audit_check_data WHERE cur_user="current_user"()AND fid=v_fid;
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('SET PSECTOR COST FOR REMOVED PIPES'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '--------------------------------------------------------');
 
@@ -79,18 +79,18 @@ BEGIN
 	  	FROM (SELECT id, arc_id, arccat_id, state,  node_1, node_2, expl_id, fid, st_length(the_geom) as length, the_geom
 	  	FROM  anl_arc WHERE cur_user="current_user"() AND fid=v_fid) row) features;
 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 	
-	
+	v_result := COALESCE(v_result, '{}');
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}');
+
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=105 order by  id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	--    Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_line := COALESCE(v_result_line, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_line := COALESCE(v_result_line, '{}');
 
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
 	             ',"body":{"form":{}'||
@@ -101,9 +101,9 @@ BEGIN
 
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
+	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
 	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-	
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
