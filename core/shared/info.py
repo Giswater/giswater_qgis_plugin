@@ -517,11 +517,9 @@ class GwInfo(QObject):
         for x in range(self.tab_main.count() - 1, -1, -1):
             tab_name = self.tab_main.widget(x).objectName()
             try:
-                print(f"{x} -> {self.visible_tabs[tab_name]}")
                 self.tab_main.setTabText(x, self.visible_tabs[tab_name]['tabLabel'])
                 self.tab_main.setTabToolTip(x, self.visible_tabs[tab_name]['tooltip'])
             except Exception as e:
-                print(e)
                 pass
             if tab_name not in tabs_to_show:
                 tools_qt.remove_tab(self.tab_main, tab_name)
