@@ -10,6 +10,28 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE sys_fprocess SET project_type = 'ud' where fid = 522;
 
 
+-- tabs arc
+UPDATE config_form_tabs
+    SET orderby=2
+    WHERE formname='v_edit_arc' AND tabname='tab_elements';
+
+UPDATE config_form_tabs
+    SET orderby=3
+    WHERE formname='v_edit_arc' AND tabname='tab_relations';
+
+UPDATE config_form_tabs
+    SET orderby=4
+    WHERE formname='v_edit_arc' AND tabname='tab_event';
+
+UPDATE config_form_tabs
+    SET orderby=5
+    WHERE formname='v_edit_arc' AND tabname='tab_documents';
+
+UPDATE config_form_tabs
+    SET orderby=6
+    WHERE formname='v_edit_arc' AND tabname='tab_plan';
+
+-- tabs connec
 UPDATE config_form_tabs
     SET orderby=1
     WHERE formname='v_edit_connec' AND tabname='tab_elements';
@@ -26,14 +48,17 @@ UPDATE config_form_tabs
     SET orderby=2
     WHERE formname='v_edit_node' AND tabname='tab_connections';
 
+-- tabs gully
 UPDATE config_form_tabs
-    SET orderby=3
-    WHERE formname='v_edit_gully' AND tabname='tab_documents';
+	SET orderby=2
+	WHERE formname='v_edit_gully' AND tabname='tab_elements';
+UPDATE config_form_tabs
+	SET orderby=3
+	WHERE formname='v_edit_gully' AND tabname='tab_documents';
+UPDATE config_form_tabs
+	SET orderby=4
+	WHERE formname='v_edit_gully' AND tabname='tab_event';
+
 
 UPDATE config_form_tabs
-    SET orderby=4
-    WHERE formname='v_edit_gully' AND tabname='tab_epa';
-
-UPDATE config_form_tabs
-    SET orderby=5
-    WHERE formname='v_edit_gully' AND tabname='tab_event';
+	SET "label"='Connections' WHERE tabname='tab_connections';

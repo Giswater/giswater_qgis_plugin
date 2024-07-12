@@ -27,41 +27,41 @@ null, TRUE, '{4}');
 
 
 UPDATE config_form_tabs
-    SET orderby=2
-    WHERE formname='v_edit_connec' AND tabname='tab_elements';
+	SET orderby=2
+	WHERE formname='v_edit_arc' AND tabname='tab_elements';
+UPDATE config_form_tabs
+	SET orderby=3
+	WHERE formname='v_edit_arc' AND tabname='tab_relations';
+UPDATE config_form_tabs
+	SET orderby=4
+	WHERE formname='v_edit_arc' AND tabname='tab_event';
+UPDATE config_form_tabs
+	SET orderby=5
+	WHERE formname='v_edit_arc' AND tabname='tab_documents';
+UPDATE config_form_tabs
+	SET orderby=6
+	WHERE formname='v_edit_arc' AND tabname='tab_plan';
 
 UPDATE config_form_tabs
-    SET orderby=3
-    WHERE formname IN ('v_edit_arc', 'v_edit_node') AND tabname='tab_event';
+	SET orderby=3
+	WHERE formname='v_edit_connec' AND tabname='tab_hydrometer';
+UPDATE config_form_tabs
+	SET orderby=4
+	WHERE formname='v_edit_connec' AND tabname='tab_hydrometer_val';
 
 UPDATE config_form_tabs
-    SET orderby=4
-    WHERE formname='v_edit_connec' AND tabname='tab_hydrometer';
+	SET orderby=3
+	WHERE formname='v_edit_node' AND tabname='tab_event';
+UPDATE config_form_tabs
+	SET orderby=4
+	WHERE formname='v_edit_node' AND tabname='tab_documents';
+UPDATE config_form_tabs
+	SET orderby=5
+	WHERE formname='v_edit_node' AND tabname='tab_plan';
 
 UPDATE config_form_tabs
-    SET orderby=5
-    WHERE formname='v_edit_node' AND tabname='tab_documents';
-
+	SET orderby=6
+	WHERE formname='ve_node_water_connection' AND tabname='tab_hydrometer';
 UPDATE config_form_tabs
-    SET orderby=6
-    WHERE formname IN ('v_edit_arc', 'v_edit_connec') AND tabname='tab_plan';
-
-UPDATE config_form_tabs
-    SET orderby=1
-    WHERE formname IN ('v_edit_connec', 've_node_water_connection') AND tabname='tab_hydrometer';
-
-UPDATE config_form_tabs
-    SET orderby=2
-    WHERE formname='v_edit_node' AND tabname='tab_elements';
-
-UPDATE config_form_tabs
-    SET orderby=3
-    WHERE formname='v_edit_node' AND tabname='tab_relations';
-
-UPDATE config_form_tabs
-    SET orderby=4
-    WHERE formname='v_edit_node' AND tabname='tab_plan';
-
-UPDATE config_form_tabs
-    SET orderby=5
-    WHERE formname='ve_node_water_connection' AND tabname='tab_hydrometer_val';
+	SET orderby=7
+	WHERE formname='ve_node_water_connection' AND tabname='tab_hydrometer_val';

@@ -29,25 +29,18 @@ UPDATE config_form_tabs
 
 UPDATE config_form_tabs
     SET orderby=1
-    WHERE formname IN ('v_edit_arc', 'v_edit_node', 've_epa_connec', 've_epa_junction', 've_epa_pump', 've_epa_storage') AND tabname='tab_epa';
+    WHERE tabname='tab_epa';
+
 
 UPDATE config_form_tabs
-    SET orderby=2
-    WHERE formname='v_edit_arc' AND tabname='tab_elements';
-
+	SET "label"='Elements' WHERE tabname='tab_elements';
 UPDATE config_form_tabs
-    SET orderby=3
-    WHERE formname='v_edit_arc' AND tabname='tab_relations';
-
+	SET "label"='Events' WHERE tabname='tab_event';
 UPDATE config_form_tabs
-    SET orderby=4
-    WHERE formname='v_edit_arc' AND tabname='tab_event';
-
+	SET "label"='Documents' WHERE tabname='tab_documents';
 UPDATE config_form_tabs
-    SET orderby=5
-    WHERE formname IN ('v_edit_arc', 'v_edit_connec', 'v_edit_node', 'v_edit_gully') AND tabname='tab_documents';
-
+	SET "label"='Plan' WHERE tabname='tab_plan';
 UPDATE config_form_tabs
-    SET orderby=6
-    WHERE formname='v_edit_arc' AND tabname='tab_plan';
-
+	SET "label"='Hydrometer' WHERE tabname='tab_hydrometer';
+UPDATE config_form_tabs
+	SET "label"='Hydrometer consumptions' WHERE tabname='tab_hydrometer_val';
