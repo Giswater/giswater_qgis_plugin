@@ -3143,7 +3143,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
 
     # Set width and alias of visible columns
     columns_to_delete = []
-    sql = (f"SELECT columnindex, width, alias, visible, style"
+    sql = (f"SELECT columnname, columnindex, width, alias, visible, style"
            f" FROM {config_table}"
            f" WHERE objectname = '{table_name}'"
            f" ORDER BY columnindex")
@@ -3152,22 +3152,35 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
     if not rows:
         return widget
 
+    # Create a dictionary to store the desired column positions
+    column_order = {}
     for row in rows:
+        column_order[row['columnname']] = row['columnindex']
+
+    # Reorder columns in the widget according to columnindex
+    header = widget.horizontalHeader()
+    for column_name, column_index in sorted(column_order.items(), key=lambda item: item[1]):
+        col_idx = tools_qt.get_col_index_by_col_name(widget, column_name)
+        if col_idx != -1:
+            header.moveSection(header.visualIndex(col_idx), column_index)
+
+    for row in rows:
+        col_idx = tools_qt.get_col_index_by_col_name(widget, row['columnname'])
         if not row['visible']:
-            columns_to_delete.append(row['columnindex'])
+            columns_to_delete.append(col_idx)
         else:
             style = row.get('style')
             if style:
                 stretch = style.get('stretch')
                 if stretch is not None:
                     stretch = 1 if stretch else 0
-                    widget.horizontalHeader().setSectionResizeMode(row['columnindex'], stretch)
+                    widget.horizontalHeader().setSectionResizeMode(col_idx, stretch)
             width = row['width']
             if width is None:
                 width = 100
-            widget.setColumnWidth(row['columnindex'], width)
+            widget.setColumnWidth(col_idx, width)
             if row['alias'] is not None:
-                widget.model().setHeaderData(row['columnindex'], Qt.Horizontal, row['alias'])
+                widget.model().setHeaderData(col_idx, Qt.Horizontal, row['alias'])
 
     # Set order
     if isQStandardItemModel:
