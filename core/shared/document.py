@@ -197,13 +197,31 @@ class GwDocument(QObject):
         table_object = "doc"
         tools_gw.set_completer_object(self.dlg_man, table_object)
 
+        status = self._fill_table()
+        if not status:
+            return False, False
+
+        # Set signals
+        self.dlg_man.doc_id.textChanged.connect(self._fill_table)
+        self.dlg_man.tbl_document.doubleClicked.connect(
+            partial(self._open_selected_object_document, self.dlg_man, self.dlg_man.tbl_document, table_object))
+        self.dlg_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_man))
+        self.dlg_man.rejected.connect(partial(tools_gw.close_dialog, self.dlg_man))
+        self.dlg_man.btn_delete.clicked.connect(
+            partial(tools_gw.delete_selected_rows, self.dlg_man.tbl_document, table_object))
+        self.dlg_man.btn_create.clicked.connect(partial(self.open_document_dialog))
+
+        # Open form
+        tools_gw.open_dialog(self.dlg_man, dlg_name='doc_manager')
+
+    def _fill_table(self, filter_text=None):
         # Set a model with selected filter. Attach that model to selected table
         view = "v_ui_doc"
-
-        complet_list = tools_gw.get_list(view)
-
+        if filter_text is None:
+            filter_text = ""
+        complet_list = tools_gw.get_list(view, filter_name=filter_text)
         if complet_list is False:
-            return False, False
+            return False
         for field in complet_list['body']['data']['fields']:
             if field.get('hidden'): continue
             model = self.dlg_man.tbl_document.model()
@@ -218,20 +236,7 @@ class GwDocument(QObject):
         tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_document, 'v_ui_doc', 0, True)
         tools_qt.set_tableview_config(self.dlg_man.tbl_document, sectionResizeMode=0)
 
-        # Set dignals
-        self.dlg_man.doc_id.textChanged.connect(
-            partial(tools_qt.filter_by_id, self.dlg_man, self.dlg_man.tbl_document, self.dlg_man.doc_id, table_object, "id"))
-        self.dlg_man.tbl_document.doubleClicked.connect(
-            partial(self._open_selected_object_document, self.dlg_man, self.dlg_man.tbl_document, table_object))
-        self.dlg_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_man))
-        self.dlg_man.rejected.connect(partial(tools_gw.close_dialog, self.dlg_man))
-        self.dlg_man.btn_delete.clicked.connect(
-            partial(tools_gw.delete_selected_rows, self.dlg_man.tbl_document, table_object))
-        self.dlg_man.btn_create.clicked.connect(partial(self.open_document_dialog))
-
-        # Open form
-        tools_gw.open_dialog(self.dlg_man, dlg_name='doc_manager')
-
+        return True
 
     # region private functions
 
@@ -305,7 +310,9 @@ class GwDocument(QObject):
         srid = lib_vars.data_epsg
 
         # Prepare the_geom value
-        the_geom = f"ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
+        the_geom = None
+        if str(self.point_xy['x']) not in ("", None, "None"):
+            the_geom = f"ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
 
         # Check if this document already exists
         sql = (f"SELECT DISTINCT(id) FROM {table_object} WHERE id = '{doc_id}'")
@@ -317,8 +324,15 @@ class GwDocument(QObject):
                 if doc_id in (None, ''):
                     sql, doc_id = self._insert_doc_sql(doc_type, observ, date, path, the_geom)
                 else:
-                    sql = (f"INSERT INTO doc (id, doc_type, path, observ, date, the_geom) "
-                           f"VALUES ('{doc_id}', '{doc_type}', '{path}', '{observ}', '{date}', {the_geom});")
+                    fields = "id, doc_type, path, observ, date"
+                    values = f"'{doc_id}', '{doc_type}', '{path}', '{observ}', '{date}'"
+                    if the_geom:
+                        fields += ", the_geom"
+                        values += f", {the_geom}"
+                    sql = (f"INSERT INTO doc ({fields}) "
+                           f"VALUES ({values});")
+
+
                 self._update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
                 self.doc_added.emit()
             else:
@@ -358,8 +372,13 @@ class GwDocument(QObject):
 
     def _insert_doc_sql(self, doc_type, observ, date, path, the_geom):
 
-        sql = (f"INSERT INTO doc (doc_type, path, observ, date, the_geom) "
-               f"VALUES ('{doc_type}', '{path}', '{observ}', '{date}', {the_geom}) RETURNING id;")
+        fields = "doc_type, path, observ, date"
+        values = f"'{doc_type}', '{path}', '{observ}', '{date}'"
+        if the_geom:
+            fields += ", the_geom"
+            values += f", {the_geom}"
+        sql = (f"INSERT INTO doc ({fields}) "
+               f"VALUES ({values});")
         new_doc_id = tools_db.execute_returning(sql)
         sql = ""
         doc_id = str(new_doc_id[0])
@@ -368,8 +387,10 @@ class GwDocument(QObject):
 
     def _update_doc_sql(self, doc_type, observ, date, doc_id, path, the_geom):
         sql = (f"UPDATE doc "
-               f"SET doc_type = '{doc_type}', observ = '{observ}', path = '{path}', date = '{date}', the_geom = {the_geom} "
-               f"WHERE id = '{doc_id}';")
+               f"SET doc_type = '{doc_type}', observ = '{observ}', path = '{path}', date = '{date}'")
+        if the_geom:
+            sql += f", the_geom = {the_geom}"
+        sql += f" WHERE id = '{doc_id}';"
         return sql
 
 
