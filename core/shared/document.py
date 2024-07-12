@@ -9,12 +9,14 @@ import os
 import webbrowser
 from functools import partial
 
+from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog
 from qgis.PyQt.QtCore import pyqtSignal, QObject
 
 from ..utils import tools_gw
 from ..ui.ui_manager import GwDocUi, GwDocManagerUi
 from ... import global_vars
+from ..utils.snap_manager import GwSnapManager
 from ...libs import lib_vars, tools_qt, tools_db, tools_qgis, tools_os
 
 
@@ -30,11 +32,14 @@ class GwDocument(QObject):
         self.single_tool_mode = single_tool
         self.previous_dialog = None
         self.iface = global_vars.iface
+        self.snapper_manager = GwSnapManager(self.iface)
+        self.vertex_marker = self.snapper_manager.vertex_marker
         self.canvas = global_vars.canvas
         self.schema_name = lib_vars.schema_name
         self.files_path = []
         self.project_type = tools_gw.get_project_type()
         self.doc_tables = ["doc_x_node","doc_x_arc","doc_x_connec","doc_x_gully"]
+        self.point_xy = {"x": None, "y": None}
 
 
 
@@ -92,6 +97,7 @@ class GwDocument(QObject):
             layer.selectByIds([feature.id()])
 
         # Set icons
+        tools_gw.add_icon(self.dlg_add_doc.btn_add_geom, "133")
         tools_gw.add_icon(self.dlg_add_doc.btn_insert, "111", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_doc.btn_delete, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_doc.btn_snapping, "137")
@@ -136,7 +142,7 @@ class GwDocument(QObject):
             self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.layers)))
         self.dlg_add_doc.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_add_doc, self.excluded_layers))
-
+        self.dlg_add_doc.btn_add_geom.clicked.connect(self._get_point_xy)
         self.dlg_add_doc.doc_id.textChanged.connect(
             partial(self._fill_dialog_document, self.dlg_add_doc, table_object, None))
         self.dlg_add_doc.btn_insert.clicked.connect(
@@ -273,31 +279,33 @@ class GwDocument(QObject):
             message = "You need to insert doc_type"
             tools_qgis.show_warning(message, dialog=self.dlg_add_doc)
             return
+        # Get SRID
+        srid = lib_vars.data_epsg
+
+        # Prepare the_geom value
+        the_geom = f"ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
 
         # Check if this document already exists
-        sql = (f"SELECT DISTINCT(id)"
-               f" FROM {table_object}"
-               f" WHERE id = '{doc_id}'")
+        sql = (f"SELECT DISTINCT(id) FROM {table_object} WHERE id = '{doc_id}'")
         row = tools_db.get_row(sql, log_info=False)
 
         # If document not exists perform an INSERT
         if row is None:
             if len(self.files_path) <= 1:
                 if doc_id in (None, ''):
-                    sql, doc_id = self._insert_doc_sql(doc_type, observ, date, path)
+                    sql, doc_id = self._insert_doc_sql(doc_type, observ, date, path, the_geom)
                 else:
-                    sql = (f"INSERT INTO doc (id, doc_type, path, observ, date)"
-                           f" VALUES ('{doc_id}', '{doc_type}', '{path}', '{observ}', '{date}');")
+                    sql = (f"INSERT INTO doc (id, doc_type, path, observ, date, the_geom) "
+                           f"VALUES ('{doc_id}', '{doc_type}', '{path}', '{observ}', '{date}', {the_geom});")
                 self._update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
                 self.doc_added.emit()
             else:
-                # Ask question before executing
-                msg = ("You have selected multiple documents. In this case, doc_id will be a sequencial number for "
+                msg = ("You have selected multiple documents. In this case, doc_id will be a sequential number for "
                        "all selected documents and your doc_id won't be used.")
                 answer = tools_qt.show_question(msg, tools_qt.tr("Add document"))
                 if answer:
                     for file in self.files_path:
-                        sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file)
+                        sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file, the_geom)
                         self._update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
                         self.doc_added.emit()
         # If document exists perform an UPDATE
@@ -307,41 +315,39 @@ class GwDocument(QObject):
             if not answer:
                 return
             if len(self.files_path) <= 1:
-                sql = self._update_doc_sql(doc_type, observ, date, doc_id, path)
+                sql = self._update_doc_sql(doc_type, observ, date, doc_id, path, the_geom)
                 self._update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
             else:
-                # If document have more than 1 file perform an INSERT
-                # Ask question before executing
-                msg = ("You have selected multiple documents. In this case, doc_id will be a sequencial number for "
+                msg = ("You have selected multiple documents. In this case, doc_id will be a sequential number for "
                        "all selected documents and your doc_id won't be used.")
                 answer = tools_qt.show_question(msg, tools_qt.tr("Add document"))
                 if answer:
                     for cont, file in enumerate(self.files_path):
                         if cont == 0:
-                            sql = self._update_doc_sql(doc_type, observ, date, doc_id, file)
+                            sql = self._update_doc_sql(doc_type, observ, date, doc_id, file, the_geom)
                             self._update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
                         else:
-                            sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file)
+                            sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file, the_geom)
                             self._update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
 
         # Refresh manager table
         tools_gw.execute_class_function(GwDocManagerUi, '_refresh_manager_table')
 
 
-    def _insert_doc_sql(self, doc_type, observ, date, path):
+    def _insert_doc_sql(self, doc_type, observ, date, path, the_geom):
 
-        sql = (f"INSERT INTO doc (doc_type, path, observ, date)"
-               f" VALUES ('{doc_type}', '{path}', '{observ}', '{date}') RETURNING id;")
+        sql = (f"INSERT INTO doc (doc_type, path, observ, date, the_geom) "
+               f"VALUES ('{doc_type}', '{path}', '{observ}', '{date}', {the_geom}) RETURNING id;")
         new_doc_id = tools_db.execute_returning(sql)
         sql = ""
         doc_id = str(new_doc_id[0])
         return sql, doc_id
 
 
-    def _update_doc_sql(self, doc_type, observ, date, doc_id, path):
+    def _update_doc_sql(self, doc_type, observ, date, doc_id, path, the_geom):
         sql = (f"UPDATE doc "
-               f" SET doc_type = '{doc_type}', observ = '{observ}', path = '{path}', date = '{date}'"
-               f" WHERE id = '{doc_id}';")
+               f"SET doc_type = '{doc_type}', observ = '{observ}', path = '{path}', date = '{date}', the_geom = {the_geom} "
+               f"WHERE id = '{doc_id}';")
         return sql
 
 
@@ -423,6 +429,12 @@ class GwDocument(QObject):
             url = 'http://www.giswater.org'
 
         webbrowser.open(url)
+
+
+    def _get_point_xy(self):
+
+        self.snapper_manager.add_point(self.vertex_marker)
+        self.point_xy = self.snapper_manager.point_xy
 
 
     def _get_file_dialog(self, dialog, widget):
