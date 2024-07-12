@@ -22,3 +22,32 @@ INSERT INTO config_form_tableview (location_type,project_type,objectname,columnn
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
 	VALUES ('edit toolbar','utils','v_ui_doc','user_name',5,true);
 
+
+UPDATE config_form_tabs
+    SET orderby=0
+    WHERE formname IN ('v_edit_arc', 'v_edit_connec', 'v_edit_node', 'v_edit_gully') AND tabname='tab_data';
+
+UPDATE config_form_tabs
+    SET orderby=1
+    WHERE formname IN ('v_edit_arc', 'v_edit_node', 've_epa_connec', 've_epa_junction', 've_epa_pump', 've_epa_storage') AND tabname='tab_epa';
+
+UPDATE config_form_tabs
+    SET orderby=2
+    WHERE formname='v_edit_arc' AND tabname='tab_elements';
+
+UPDATE config_form_tabs
+    SET orderby=3
+    WHERE formname='v_edit_arc' AND tabname='tab_relations';
+
+UPDATE config_form_tabs
+    SET orderby=4
+    WHERE formname='v_edit_arc' AND tabname='tab_event';
+
+UPDATE config_form_tabs
+    SET orderby=5
+    WHERE formname IN ('v_edit_arc', 'v_edit_connec', 'v_edit_node', 'v_edit_gully') AND tabname='tab_documents';
+
+UPDATE config_form_tabs
+    SET orderby=6
+    WHERE formname='v_edit_arc' AND tabname='tab_plan';
+

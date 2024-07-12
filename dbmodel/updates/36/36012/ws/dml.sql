@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-INSERT INTO sys_function VALUES (3310, 'gw_fct_setpsectorcostremovedpipes', 'ws', 'function', 'json', 'json', 
+INSERT INTO sys_function VALUES (3310, 'gw_fct_setpsectorcostremovedpipes', 'ws', 'function', 'json', 'json',
 'Function to set cost for removed material on specific psectors', 'role_master', null, 'core')
 ON CONFLICT (id) DO NOTHING;
 
@@ -16,7 +16,7 @@ ON CONFLICT (fid) DO NOTHING;
 
 DELETE from sys_fprocess WHERE fid = 522;
 
-INSERT INTO config_toolbox VALUES (3310, 'Set cost for removed material on psectors', '{"featureType":[]}', 
+INSERT INTO config_toolbox VALUES (3310, 'Set cost for removed material on psectors', '{"featureType":[]}',
 '[
 {"widgetname":"expl", "label":"Exploitation:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT expl_id as id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":1, "selectedId":""},
 {"widgetname":"material", "label":"Material:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT id, descript as idval FROM cat_mat_node", "layoutname":"grl_option_parameters","layoutorder":2, "selectedId":""},
@@ -24,3 +24,44 @@ INSERT INTO config_toolbox VALUES (3310, 'Set cost for removed material on psect
 {"widgetname":"observ", "label":"Observ:","widgettype":"linetext","datatype":"text", "isMandatory":true, "tooltip":"Descriptive text for removal (it apears on psector_x_other observ)", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":4, "value":""}
 ]',
 null, TRUE, '{4}');
+
+
+UPDATE config_form_tabs
+    SET orderby=2
+    WHERE formname='v_edit_connec' AND tabname='tab_elements';
+
+UPDATE config_form_tabs
+    SET orderby=3
+    WHERE formname IN ('v_edit_arc', 'v_edit_node') AND tabname='tab_event';
+
+UPDATE config_form_tabs
+    SET orderby=4
+    WHERE formname='v_edit_connec' AND tabname='tab_hydrometer';
+
+UPDATE config_form_tabs
+    SET orderby=5
+    WHERE formname='v_edit_node' AND tabname='tab_documents';
+
+UPDATE config_form_tabs
+    SET orderby=6
+    WHERE formname IN ('v_edit_arc', 'v_edit_connec') AND tabname='tab_plan';
+
+UPDATE config_form_tabs
+    SET orderby=1
+    WHERE formname IN ('v_edit_connec', 've_node_water_connection') AND tabname='tab_hydrometer';
+
+UPDATE config_form_tabs
+    SET orderby=2
+    WHERE formname='v_edit_node' AND tabname='tab_elements';
+
+UPDATE config_form_tabs
+    SET orderby=3
+    WHERE formname='v_edit_node' AND tabname='tab_relations';
+
+UPDATE config_form_tabs
+    SET orderby=4
+    WHERE formname='v_edit_node' AND tabname='tab_plan';
+
+UPDATE config_form_tabs
+    SET orderby=5
+    WHERE formname='ve_node_water_connection' AND tabname='tab_hydrometer_val';
