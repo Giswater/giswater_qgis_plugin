@@ -4229,6 +4229,33 @@ def _get_list(complet_result, form_name='', filter_fields='', widgetname='', for
 
     return complet_list
 
+
+def get_list(table_name, filter_name="", filter_id=None, filter_active=None, id_field=None):
+    if id_field is None:
+        id_field = "id"
+
+    feature = f'"tableName":"{table_name}"'
+    filter_fields = f'"limit": -1, "{id_field}": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'
+
+    if filter_id is not None:
+        filter_fields += f', "{id_field}": {{"filterSign":"=", "value":"{filter_id}"}}'
+
+    if filter_active is not None:
+        filter_fields += f', "active": {{"filterSign":"=", "value":"{filter_active}"}}'
+
+    body = create_body(feature=feature, filter_fields=filter_fields)
+    json_result = execute_procedure('gw_fct_getlist', body)
+
+    if json_result is None or json_result['status'] == 'Failed':
+        return False
+
+    complet_list = json_result
+    if not complet_list:
+        return False
+
+    return complet_list
+
+
 # startregion
 # Info buttons
 

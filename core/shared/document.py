@@ -108,11 +108,18 @@ class GwDocument(QObject):
 
         # Set current/selected date and link
         if row:
-            tools_qt.set_calendar(self.dlg_add_doc, 'date', row.value('date'))
-            tools_qt.set_widget_text(self.dlg_add_doc, 'path', row.value('path'))
-            self.files_path.append(row.value('path'))
-        else:
-            tools_qt.set_calendar(self.dlg_add_doc, 'date', None)
+            date_item = row.child(0, 4)
+            path_item = row.child(0, 2)
+            if date_item is not None:
+                tools_qt.set_calendar(self.dlg_add_doc, 'date', date_item.text())
+            else:
+                tools_qt.set_calendar(self.dlg_add_doc, 'date', None)
+
+            if path_item is not None:
+                tools_qt.set_widget_text(self.dlg_add_doc, 'path', path_item.text())
+                self.files_path.append(path_item.text())
+            else:
+                tools_qt.set_widget_text(self.dlg_add_doc, 'path', '')
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"
@@ -191,10 +198,25 @@ class GwDocument(QObject):
         tools_gw.set_completer_object(self.dlg_man, table_object)
 
         # Set a model with selected filter. Attach that model to selected table
-        message = tools_qt.fill_table(self.dlg_man.tbl_document, f"{self.schema_name}.{table_object}")
-        if message:
-            tools_qgis.show_warning(message)
-        tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_document, table_object)
+        view = "v_ui_doc"
+
+        complet_list = tools_gw.get_list(view)
+
+        if complet_list is False:
+            return False, False
+        for field in complet_list['body']['data']['fields']:
+            if field.get('hidden'): continue
+            model = self.dlg_man.tbl_document.model()
+            if model is None:
+                model = QStandardItemModel()
+                self.dlg_man.tbl_document.setModel(model)
+            model.removeRows(0, model.rowCount())
+
+            if field['value']:
+                self.dlg_man.tbl_document = tools_gw.add_tableview_header(self.dlg_man.tbl_document, field)
+                self.dlg_man.tbl_document = tools_gw.fill_tableview_rows(self.dlg_man.tbl_document, field)
+        tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_document, 'v_ui_doc', 0, True)
+        tools_qt.set_tableview_config(self.dlg_man.tbl_document, sectionResizeMode=0)
 
         # Set dignals
         self.dlg_man.doc_id.textChanged.connect(
@@ -406,15 +428,18 @@ class GwDocument(QObject):
 
         # Get object_id from selected row
         field_object_id = "id"
+        id_col_idx = tools_qt.get_col_index_by_col_name(widget, field_object_id)
         widget_id = table_object + "_id"
-        selected_object_id = widget.model().record(row).value(field_object_id)
+        selected_object_id = widget.model().item(row, id_col_idx).text()
 
         # Close this dialog and open selected object
-        keep_open_form = tools_gw.get_config_parser('dialogs_actions', 'doc_manager_keep_open', "user", "init", prefix=True)
+        keep_open_form = tools_gw.get_config_parser('dialogs_actions', 'doc_manager_keep_open', "user", "init",
+                                                    prefix=True)
         if tools_os.set_boolean(keep_open_form, False) is not True:
             dialog.close()
 
-        self.get_document(row=widget.model().record(row))
+        # Assuming 'row' is the QStandardItemModel row data
+        self.get_document(row=widget.model().item(row, 0))
         tools_qt.set_widget_text(self.dlg_add_doc, widget_id, selected_object_id)
 
 
