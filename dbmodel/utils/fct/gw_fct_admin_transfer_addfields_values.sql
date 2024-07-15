@@ -253,12 +253,9 @@ BEGIN
 
     -- recreate views
     FOR rec_sys IN
-        SELECT cat_feature_id FROM sys_addfields
+        SELECT cat_feature_id FROM sys_addfields WHERE cat_feature_id IS NOT NULL
         GROUP BY cat_feature_id
     LOOP
-
-        IF rec_sys.cat_feature_id IS NULL THEN
-            
         ELSE
             v_cat_feature = ''|| rec_sys.cat_feature_id ||'';
             v_feature_type = (SELECT lower(feature_type) FROM cat_feature where id=v_cat_feature);
