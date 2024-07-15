@@ -515,14 +515,14 @@ BEGIN
 
 		-- update descript and code field
 		EXECUTE 'UPDATE temp_anl_arc SET descript = a.descript, code=a.code 
-		FROM (SELECT arc_id, (row_to_json(row)) AS descript, code FROM ('||v_textarc||')row)a WHERE a.arc_id = temp_anl_arc.arc_id AND fid=222';
+		FROM (SELECT arc_id, (row_to_json(row)) AS descript, case when code is null then arc_id else code end as code FROM ('||v_textarc||')row)a WHERE a.arc_id = temp_anl_arc.arc_id AND fid=222';
 		EXECUTE' UPDATE temp_anl_node SET descript = a.descript FROM (SELECT node_id, (row_to_json(row)) AS descript FROM 
-					(SELECT node_id, '||v_ftopelev||' as top_elev, '||v_fymax||' as ymax, elev , code, 
+					(SELECT node_id, '||v_ftopelev||' as top_elev, '||v_fymax||' as ymax, elev , case when code is null then node_id else code end as code, 
 					total_distance FROM temp_anl_node WHERE fid=222 AND cur_user = current_user)row)a
 					WHERE a.node_id = temp_anl_node.node_id';
 
 		EXECUTE 'UPDATE temp_anl_node SET  descript = gw_fct_json_object_set_key(descript::json, ''code'', a.code) 
-		FROM (SELECT node_id, code FROM ('||v_textnode||')row)a WHERE a.node_id = temp_anl_node.node_id ';
+		FROM (SELECT node_id, case when code is null then node_id else code end code FROM ('||v_textnode||')row)a WHERE a.node_id = temp_anl_node.node_id ';
 	
 		-- delete not used keys
 		UPDATE temp_anl_arc SET descript = gw_fct_json_object_delete_keys(descript::json, 'arc_id')  ;
