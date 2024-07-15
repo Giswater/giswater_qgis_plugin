@@ -4232,7 +4232,7 @@ def _get_list(complet_result, form_name='', filter_fields='', widgetname='', for
 
 def get_list(table_name, filter_name="", filter_id=None, filter_active=None, id_field=None):
     if id_field is None:
-        id_field = "id"
+        id_field = "id_val"
 
     feature = f'"tableName":"{table_name}"'
     filter_fields = f'"limit": -1, "{id_field}": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'

@@ -42,7 +42,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
             <item>
-             <widget class="QLabel" name="lbl_doc_id">
+             <widget class="QLabel" name="lbl_doc_name">
               <property name="minimumSize">
                <size>
                 <width>80</width>
@@ -69,7 +69,7 @@
                <enum>QFrame::Plain</enum>
               </property>
               <property name="text">
-               <string>Doc id:</string>
+               <string>Doc name:</string>
               </property>
               <property name="textFormat">
                <enum>Qt::AutoText</enum>
@@ -86,7 +86,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="doc_id">
+             <widget class="QLineEdit" name="doc_name">
               <property name="enabled">
                <bool>true</bool>
               </property>
