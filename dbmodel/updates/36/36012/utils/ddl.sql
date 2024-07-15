@@ -10,7 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 ALTER TABLE doc ADD the_geom public.geometry(point, SRID_VALUE) NULL;
 ALTER TABLE doc ADD id_val varchar(30) NULL;
 
-DROP VIEW if EXISTS v_ui_doc
+DROP VIEW if EXISTS v_ui_doc;
 CREATE OR REPLACE VIEW v_ui_doc
 AS SELECT doc.id,
     doc.id_val,
