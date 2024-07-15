@@ -514,6 +514,16 @@ class GwInfo(QObject):
         for tab in self.visible_tabs:
             tabs_to_show.append(self.visible_tabs[tab]['tabName'])
 
+        # Reorder tabs
+        tab_order = {}
+        for tab in self.visible_tabs.values():
+            tab_order[tab['tabName']] = tab['orderby']
+
+        for tab_name, tab_index in sorted(tab_order.items(), key=lambda item: item[1]):
+            old_position = tools_qt.get_tab_index_by_tab_name(self.tab_main, tab_name)
+            new_position = tab_index
+            self.tab_main.tabBar().moveTab(old_position, new_position)
+
         for x in range(self.tab_main.count() - 1, -1, -1):
             tab_name = self.tab_main.widget(x).objectName()
             try:
@@ -525,16 +535,6 @@ class GwInfo(QObject):
                 tools_qt.remove_tab(self.tab_main, tab_name)
             elif new_feature and tab_name != 'tab_data':
                 tools_qt.enable_tab_by_tab_name(self.tab_main, tab_name, False)
-
-        # Reorder tabs
-        tab_order = {}
-        for tab in self.visible_tabs.values():
-            tab_order[tab['tabName']] = tab['orderby']
-
-        for tab_name, tab_index in sorted(tab_order.items(), key=lambda item: item[1]):
-            old_position = tools_qt.get_tab_index_by_tab_name(self.tab_main, tab_name)
-            new_position = tab_index
-            self.tab_main.tabBar().moveTab(old_position, new_position)
 
         # Actions
         self._get_actions()
