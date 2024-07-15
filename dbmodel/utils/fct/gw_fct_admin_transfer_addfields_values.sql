@@ -84,7 +84,7 @@ BEGIN
 
                     EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| lower(rec_sa.feature_type) ||'_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| lower(rec_sa.feature_type) ||'_id)';
 
-                    EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) VALUES (''' || v_feature_childtable_name || ''', '''', ''role_edit'') ON CONFLICT (id) DO NOTHING;';
+                    EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) VALUES ('||quote_literal(v_feature_childtable_name)||', null, ''role_edit'') ON CONFLICT (id) DO NOTHING;';
 
                 END IF;
 
@@ -111,7 +111,7 @@ BEGIN
 
                     EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| lower(rec_sa.type) ||'_id)';
 
-                    EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) VALUES (''' || v_feature_childtable_name || ''', '''', ''role_edit'') ON CONFLICT (id) DO NOTHING;';
+                    EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) VALUES ('||quote_literal(v_feature_childtable_name)||', null, ''role_edit'') ON CONFLICT (id) DO NOTHING;';
 
                 END IF;
 
@@ -138,7 +138,7 @@ BEGIN
 
                     EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| lower(rec_sa.type) ||'_id)';
 
-                    EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) VALUES (''' || v_feature_childtable_name || ''', '''', ''role_edit'') ON CONFLICT (id) DO NOTHING;';
+                    EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) VALUES ('||quote_literal(v_feature_childtable_name)||', null, ''role_edit'') ON CONFLICT (id) DO NOTHING;';
 
                 END IF;
 
@@ -165,7 +165,7 @@ BEGIN
 
                     EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| lower(rec_sa.type) ||'_id)';
 
-                    EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) VALUES (''' || v_feature_childtable_name || ''', '''', ''role_edit'') ON CONFLICT (id) DO NOTHING;';
+                    EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) VALUES ('||quote_literal(v_feature_childtable_name)||', null, ''role_edit'') ON CONFLICT (id) DO NOTHING;';
 
                 END IF;
 
@@ -192,7 +192,7 @@ BEGIN
 
                     EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| lower(rec_sa.type) ||'_id)';
 
-                    EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) VALUES (''' || v_feature_childtable_name || ''', '''', ''role_edit'') ON CONFLICT (id) DO NOTHING;';
+                    EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) VALUES ('||quote_literal(v_feature_childtable_name)||', null, ''role_edit'') ON CONFLICT (id) DO NOTHING;';
 
                 END IF;
 
@@ -225,7 +225,7 @@ BEGIN
 
             EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| lower(rec_sa.feature_type) ||'_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| lower(rec_sa.feature_type) ||'_id)';
 
-            EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) VALUES (''' || v_feature_childtable_name || ''', '''', ''role_edit'') ON CONFLICT (id) DO NOTHING;';
+            EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) VALUES ('||quote_literal(v_feature_childtable_name)||', null, ''role_edit'') ON CONFLICT (id) DO NOTHING;';
 
         END IF;
     END LOOP;
