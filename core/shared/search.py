@@ -553,7 +553,7 @@ class GwSearch:
                 return
             result = json_result
 
-            self.hydro_info_dlg = GwInfoGenericUi()
+            self.hydro_info_dlg = GwInfoGenericUi(self)
             tools_gw.load_settings(self.hydro_info_dlg)
 
             self.hydro_info_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
@@ -595,7 +595,7 @@ class GwSearch:
         current_selectors = self._get_current_selectors()
         self._force_expl(workcat_id)
 
-        self.items_dialog = GwSearchWorkcatUi()
+        self.items_dialog = GwSearchWorkcatUi(self)
 
         tools_gw.add_icon(self.items_dialog.btn_doc_insert, "111", sub_folder="24x24")
         tools_gw.add_icon(self.items_dialog.btn_doc_delete, "112", sub_folder="24x24")

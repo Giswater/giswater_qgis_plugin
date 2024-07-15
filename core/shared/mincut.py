@@ -748,7 +748,7 @@ class GwMincut:
     def _real_end(self):
 
         # Create the dialog and signals
-        self.dlg_fin = GwMincutEndUi()
+        self.dlg_fin = GwMincutEndUi(self)
         tools_gw.load_settings(self.dlg_fin)
 
         search = GwSearch()
@@ -993,7 +993,7 @@ class GwMincut:
             if result['body']['overlapStatus'] == 'Ok':
                 self._mincut_ok(result)
             elif result['body']['overlapStatus'] == 'Conflict':
-                self.dlg_dtext = GwDialogTextUi()
+                self.dlg_dtext = GwDialogTextUi(self)
                 tools_gw.load_settings(self.dlg_dtext)
                 self.dlg_dtext.btn_close.setText('Cancel')
                 self.dlg_dtext.btn_accept.setText('Continue')
@@ -1142,7 +1142,7 @@ class GwMincut:
         self.action_add_hydrometer.setDisabled(True)
 
         # Set dialog add_connec
-        self.dlg_connec = GwMincutConnecUi()
+        self.dlg_connec = GwMincutConnecUi(self)
         self.dlg_connec.setWindowTitle("Connec management")
         tools_gw.load_settings(self.dlg_connec)
         self.dlg_connec.tbl_mincut_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -1309,7 +1309,7 @@ class GwMincut:
         self.action_add_connec.setDisabled(True)
 
         # Set dialog MincutHydrometer
-        self.dlg_hydro = GwMincutHydrometerUi()
+        self.dlg_hydro = GwMincutHydrometerUi(self)
         tools_gw.load_settings(self.dlg_hydro)
         self.dlg_hydro.setWindowTitle("Hydrometer management")
         self.dlg_hydro.tbl_hydro.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -2334,7 +2334,7 @@ class GwMincut:
             return
 
         # Set dialog add_connec
-        self.dlg_comp = GwMincutComposerUi()
+        self.dlg_comp = GwMincutComposerUi(self)
         tools_gw.load_settings(self.dlg_comp)
 
         # Fill ComboBox cbx_template with templates *.qpt

@@ -13,6 +13,7 @@ import random
 import re
 import sys
 import sqlite3
+from typing import Literal, Dict
 import webbrowser
 import xml.etree.ElementTree as ET
 
@@ -52,6 +53,33 @@ from ...libs.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
 # These imports are for the add_{widget} functions (modules need to be imported in order to find it by its name)
 # noinspection PyUnresolvedReferences
 from ..shared import info, mincut_tools
+
+QgsGeometryType = Literal['line', 'point', 'polygon']
+
+if Qgis.QGIS_VERSION_INT < 33000:
+    geom_types_dict: Dict = {
+        "line": QgsWkbTypes.LineGeometry,
+        "point": QgsWkbTypes.PointGeometry,
+        "polygon": QgsWkbTypes.PolygonGeometry
+    }
+
+else:
+    geom_types_dict: Dict = {
+        "line": Qgis.GeometryType.Line,
+        "point": Qgis.GeometryType.Point,
+        "polygon": Qgis.GeometryType.Polygon
+    }
+
+def _get_geom_type(geometry_type: QgsGeometryType = None):
+
+    if Qgis.QGIS_VERSION_INT < 33000:
+        default_geom_type = QgsWkbTypes.LineGeometry
+    else:
+        default_geom_type = Qgis.GeometryType.Line
+
+    geom_type = geom_types_dict.get(geometry_type, default_geom_type)
+    return geom_type
+
 
 def load_settings(dialog, plugin='core'):
     """ Load user UI settings related with dialog position and size """
@@ -2046,7 +2074,7 @@ def add_frame(field, x=None):
     return widget
 
 
-def add_combo(field, dialog=None, complet_result=None, ignore_function=False):
+def add_combo(field, dialog=None, complet_result=None, ignore_function=False, class_info=None):
     widget = QComboBox()
     widget.setObjectName(field['widgetname'])
     if 'widgetcontrols' in field and field['widgetcontrols']:
@@ -2079,7 +2107,7 @@ def add_combo(field, dialog=None, complet_result=None, ignore_function=False):
             parameters = f.get('parameters')
 
             kwargs = {"complet_result": complet_result, "dialog": dialog, "columnname": columnname, "widget": widget,
-                      "func_params": parameters}
+                      "func_params": parameters, "class": class_info}
             if 'module' in f:
                 module = globals()[f['module']]
             else:
@@ -3115,7 +3143,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
 
     # Set width and alias of visible columns
     columns_to_delete = []
-    sql = (f"SELECT columnindex, width, alias, visible, style"
+    sql = (f"SELECT columnname, columnindex, width, alias, visible, style"
            f" FROM {config_table}"
            f" WHERE objectname = '{table_name}'"
            f" ORDER BY columnindex")
@@ -3124,22 +3152,35 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
     if not rows:
         return widget
 
+    # Create a dictionary to store the desired column positions
+    column_order = {}
     for row in rows:
+        column_order[row['columnname']] = row['columnindex']
+
+    # Reorder columns in the widget according to columnindex
+    header = widget.horizontalHeader()
+    for column_name, column_index in sorted(column_order.items(), key=lambda item: item[1]):
+        col_idx = tools_qt.get_col_index_by_col_name(widget, column_name)
+        if col_idx != -1:
+            header.moveSection(header.visualIndex(col_idx), column_index)
+
+    for row in rows:
+        col_idx = tools_qt.get_col_index_by_col_name(widget, row['columnname'])
         if not row['visible']:
-            columns_to_delete.append(row['columnindex'])
+            columns_to_delete.append(col_idx)
         else:
             style = row.get('style')
             if style:
                 stretch = style.get('stretch')
                 if stretch is not None:
                     stretch = 1 if stretch else 0
-                    widget.horizontalHeader().setSectionResizeMode(row['columnindex'], stretch)
+                    widget.horizontalHeader().setSectionResizeMode(col_idx, stretch)
             width = row['width']
             if width is None:
                 width = 100
-            widget.setColumnWidth(row['columnindex'], width)
+            widget.setColumnWidth(col_idx, width)
             if row['alias'] is not None:
-                widget.model().setHeaderData(row['columnindex'], Qt.Horizontal, row['alias'])
+                widget.model().setHeaderData(col_idx, Qt.Horizontal, row['alias'])
 
     # Set order
     if isQStandardItemModel:
@@ -3299,7 +3340,8 @@ def set_completer_object(dialog, tablename, field_id="id"):
     set_completer_widget(tablename, widget, field_id)
 
 
-def set_completer_widget(tablename, widget, field_id, add_id=False):
+def set_completer_widget(tablename, widget, field_id, add_id=False,
+                         filter_mode: tools_qt.QtMatchFlag = 'starts'):
     """ Set autocomplete of widget @table_object + "_id"
         getting id's from selected @table_object
     """
@@ -3315,7 +3357,7 @@ def set_completer_widget(tablename, widget, field_id, add_id=False):
            f" FROM {tablename}"
            f" ORDER BY {field_id}")
     rows = tools_db.get_rows(sql)
-    tools_qt.set_completer_rows(widget, rows)
+    tools_qt.set_completer_rows(widget, rows, filter_mode=filter_mode)
 
 
 def set_multi_completer_widget(tablenames: list, widget, fields_id: list, add_id=False):
@@ -3524,9 +3566,12 @@ def restore_parent_layers_visibility(layers):
         tools_qgis.set_layer_visible(layer, False, visibility)
 
 
-def create_rubberband(canvas, geometry_type=QgsWkbTypes.LineGeometry):
+def create_rubberband(canvas, geometry_type: QgsGeometryType = None):
     """ Creates a rubberband and adds it to the global list """
-    rb = QgsRubberBand(canvas, geometry_type)
+
+    geom_type = _get_geom_type(geometry_type)
+
+    rb = QgsRubberBand(canvas, geom_type)
     global_vars.active_rubberbands.append(rb)
     return rb
 
@@ -3535,7 +3580,8 @@ def reset_rubberband(rb, geometry_type=None):
     """ Resets a rubberband and tries to remove it from the global list """
 
     if geometry_type:
-        rb.reset(geometry_type)
+        geom_type = _get_geom_type(geometry_type)
+        rb.reset(geom_type)
     else:
         rb.reset()
 
@@ -4183,6 +4229,33 @@ def _get_list(complet_result, form_name='', filter_fields='', widgetname='', for
 
     return complet_list
 
+
+def get_list(table_name, filter_name="", filter_id=None, filter_active=None, id_field=None):
+    if id_field is None:
+        id_field = "id_val"
+
+    feature = f'"tableName":"{table_name}"'
+    filter_fields = f'"limit": -1, "{id_field}": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'
+
+    if filter_id is not None:
+        filter_fields += f', "{id_field}": {{"filterSign":"=", "value":"{filter_id}"}}'
+
+    if filter_active is not None:
+        filter_fields += f', "active": {{"filterSign":"=", "value":"{filter_active}"}}'
+
+    body = create_body(feature=feature, filter_fields=filter_fields)
+    json_result = execute_procedure('gw_fct_getlist', body)
+
+    if json_result is None or json_result['status'] == 'Failed':
+        return False
+
+    complet_list = json_result
+    if not complet_list:
+        return False
+
+    return complet_list
+
+
 # startregion
 # Info buttons
 
@@ -4439,8 +4512,9 @@ def _manage_combo(**kwargs):
     dialog = kwargs['dialog']
     field = kwargs['field']
     complet_result = kwargs['complet_result']
+    class_info = kwargs['class']
 
-    widget = add_combo(field, dialog, complet_result)
+    widget = add_combo(field, dialog, complet_result, class_info=class_info)
     widget = set_widget_size(widget, field)
     return widget
 

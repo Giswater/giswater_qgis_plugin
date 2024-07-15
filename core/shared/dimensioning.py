@@ -36,7 +36,7 @@ class GwDimensioning:
 
     def open_dimensioning_form(self, qgis_feature=None, layer=None, db_return=None, fid=None, rubber_band=None):
 
-        self.dlg_dim = GwDimensioningUi()
+        self.dlg_dim = GwDimensioningUi(self)
         tools_gw.load_settings(self.dlg_dim)
 
         self.user_current_layer = self.iface.activeLayer()
@@ -57,7 +57,7 @@ class GwDimensioning:
 
         # when function is called from new feature
         if db_return is None:
-            rubber_band = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.PointGeometry)
+            rubber_band = tools_gw.create_rubberband(self.canvas, "point")
             extras = f'"coordinates":{{{self.points}}}'
             body = tools_gw.create_body(extras=extras)
             json_result = tools_gw.execute_procedure('gw_fct_getdimensioning', body)

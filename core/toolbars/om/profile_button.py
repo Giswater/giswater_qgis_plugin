@@ -96,7 +96,7 @@ class GwProfileButton(GwAction):
         self._remove_selection()
 
         # Set dialog
-        self.dlg_draw_profile = GwProfileUi()
+        self.dlg_draw_profile = GwProfileUi(self)
         tools_gw.load_settings(self.dlg_draw_profile)
         self.dlg_draw_profile.setWindowFlags(Qt.WindowStaysOnTopHint)
 
@@ -266,7 +266,7 @@ class GwProfileButton(GwAction):
     def _open_profile(self):
         """ Open dialog profile_list.ui """
 
-        self.dlg_load = GwProfilesListUi()
+        self.dlg_load = GwProfilesListUi(self)
         tools_gw.load_settings(self.dlg_load)
 
         # Get profils on database
@@ -557,14 +557,15 @@ class GwProfileButton(GwAction):
 
         # Save profile with dpi = 300
         plt.savefig(img_path, dpi=300)
-        
+
 
     def _set_profile_layout(self):
         """ Set properties of main window """
 
         # Set window name
         self.win = plt.gcf()
-        self.win.canvas.set_window_title('Draw Profile')
+        # FIXME: this doesn't work, but it doesn't crash either
+        self.win.canvas.setWindowTitle('Draw Profile')
 
         # Hide axes
         self.axes = plt.gca()

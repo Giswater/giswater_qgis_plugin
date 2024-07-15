@@ -53,7 +53,7 @@ class GwConfigButton(GwAction):
         result = self._get_layers_name()
 
         # Get dialog
-        self.dlg_config = GwConfigUi()
+        self.dlg_config = GwConfigUi(self)
         tools_gw.load_settings(self.dlg_config)
 
         # Call function gw_fct_getconfig and get json_result

@@ -245,7 +245,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
     def _change_elem_type(self, feature):
 
         # Create the dialog, fill feature_type and define its signals
-        self.dlg_change = GwFeatureTypeChangeUi()
+        self.dlg_change = GwFeatureTypeChangeUi(self)
         tools_gw.load_settings(self.dlg_change)
         tools_gw.add_icon(self.dlg_change.btn_catalog, "195")
 

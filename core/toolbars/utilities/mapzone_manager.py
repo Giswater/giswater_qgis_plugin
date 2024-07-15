@@ -47,7 +47,7 @@ class GwMapzoneManager:
     def manage_mapzones(self):
 
         # Create dialog
-        self.mapzone_mng_dlg = GwMapzoneManagerUi()
+        self.mapzone_mng_dlg = GwMapzoneManagerUi(self)
         tools_gw.load_settings(self.mapzone_mng_dlg)
 
         # Add icons
@@ -255,7 +255,7 @@ class GwMapzoneManager:
         graphconfig = index.sibling(index.row(), col_idx).data()
 
         # Build dialog
-        self.config_dlg = GwMapzoneConfigUi()
+        self.config_dlg = GwMapzoneConfigUi(self)
         tools_gw.load_settings(self.config_dlg)
 
         # Button icons
@@ -647,7 +647,8 @@ class GwMapzoneManager:
                     level = int(json_result['message']['level'])
                 tools_qgis.show_message(json_result['message']['text'], level)
 
-            self._get_graph_config()
+            if global_vars.project_type != 'ud':
+                self._get_graph_config()
             self._reset_config_vars(0)
             tools_gw.close_dialog(dialog)
             self._manage_current_changed()
@@ -784,7 +785,7 @@ class GwMapzoneManager:
 
     def _build_generic_info(self, dlg_title, result, tablename, field_id, force_action=None):
         # Build dlg
-        self.add_dlg = GwInfoGenericUi()
+        self.add_dlg = GwInfoGenericUi(self)
         tools_gw.load_settings(self.add_dlg)
         self.my_json_add = {}
         tools_gw.build_dialog_info(self.add_dlg, result, my_json=self.my_json_add)

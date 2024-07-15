@@ -69,7 +69,7 @@ class GwInfo(QObject):
         self.layer_new_feature = None
         self.tab_type = tab_type
         self.connected = False
-        self.rubber_band = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.PointGeometry)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas, "point")
         self.snapper_manager = GwSnapManager(self.iface)
         self.snapper_manager.set_snapping_layers()
         self.conf_supp = None
@@ -405,7 +405,7 @@ class GwInfo(QObject):
 
         tools_gw.draw_by_json(complet_result, self.rubber_band)
         # Dialog
-        self.dlg_generic = GwInfoGenericUi()
+        self.dlg_generic = GwInfoGenericUi(self)
         tools_gw.load_settings(self.dlg_generic)
         result = tools_gw.build_dialog_info(self.dlg_generic, complet_result, self.my_json)
 
@@ -470,7 +470,7 @@ class GwInfo(QObject):
         """
 
         # Dialog
-        self.dlg_cf = GwInfoFeatureUi(sub_tag)
+        self.dlg_cf = GwInfoFeatureUi(self, sub_tag)
         tools_gw.load_settings(self.dlg_cf)
 
         # Get widget controls
@@ -514,11 +514,27 @@ class GwInfo(QObject):
         for tab in self.visible_tabs:
             tabs_to_show.append(self.visible_tabs[tab]['tabName'])
 
-        for x in range(self.tab_main.count() - 1, 0, -1):
-            if self.tab_main.widget(x).objectName() not in tabs_to_show:
-                tools_qt.remove_tab(self.tab_main, self.tab_main.widget(x).objectName())
-            elif new_feature and self.tab_main.widget(x).objectName() != 'tab_data':
-                tools_qt.enable_tab_by_tab_name(self.tab_main, self.tab_main.widget(x).objectName(), False)
+        # Reorder tabs
+        tab_order = {}
+        for tab in self.visible_tabs.values():
+            tab_order[tab['tabName']] = tab['orderby']
+
+        for tab_name, tab_index in sorted(tab_order.items(), key=lambda item: item[1]):
+            old_position = tools_qt.get_tab_index_by_tab_name(self.tab_main, tab_name)
+            new_position = tab_index
+            self.tab_main.tabBar().moveTab(old_position, new_position)
+
+        for x in range(self.tab_main.count() - 1, -1, -1):
+            tab_name = self.tab_main.widget(x).objectName()
+            try:
+                self.tab_main.setTabText(x, self.visible_tabs[tab_name]['tabLabel'])
+                self.tab_main.setTabToolTip(x, self.visible_tabs[tab_name]['tooltip'])
+            except Exception as e:
+                pass
+            if tab_name not in tabs_to_show:
+                tools_qt.remove_tab(self.tab_main, tab_name)
+            elif new_feature and tab_name != 'tab_data':
+                tools_qt.enable_tab_by_tab_name(self.tab_main, tab_name, False)
 
         # Actions
         self._get_actions()
@@ -915,7 +931,7 @@ class GwInfo(QObject):
         # kwargs
         func_params = {"ui": "GwInfoEpaDemandUi", "uiName": "info_epa_demand",
                        "tableviews": [
-                        {"tbl": "tbl_dscenario_demand", "view": "inp_dscenario_demand", "add_view": "v_edit_inp_dscenario_demand", "id_name": "feature_id", "pk": "id", "add_dlg_title": "Demand - Dscenario"}
+                        {"tbl": "tbl_dscenario_demand", "view": "inp_dscenario_demand", "add_view": "v_edit_inp_dscenario_demand", "id_name": "feature_id", "pk": ["dscenario_id", "feature_id"], "add_dlg_title": "Demand - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg(**kwargs)
@@ -1082,7 +1098,7 @@ class GwInfo(QObject):
         tools_gw.reset_rubberband(self.rubber_band)
 
         if refresh_dialog is False:
-            dlg_interpolate = GwInterpolate()
+            dlg_interpolate = GwInterpolate(self)
             tools_gw.load_settings(dlg_interpolate)
         else:
             dlg_interpolate = refresh_dialog
@@ -1180,7 +1196,7 @@ class GwInfo(QObject):
                 snapped_feat = self.snapper_manager.get_snapped_feature(result)
                 element_id = snapped_feat.attribute('node_id')
                 message = "Selected node"
-                rb = tools_gw.create_rubberband(global_vars.canvas, QgsWkbTypes.PointGeometry)
+                rb = tools_gw.create_rubberband(global_vars.canvas, "point")
                 if self.node1 is None:
                     self.node1 = str(element_id)
                     tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10)
@@ -1714,7 +1730,7 @@ class GwInfo(QObject):
 
     def _open_section_form(self):
 
-        dlg_sections = GwInfoCrossectUi()
+        dlg_sections = GwInfoCrossectUi(self)
         tools_gw.load_settings(dlg_sections)
 
         # Set dialog not resizable
@@ -1823,6 +1839,9 @@ class GwInfo(QObject):
                 is_inserting = False
                 my_json = json.dumps(_json)
                 if my_json == '' or str(my_json) == '{}':
+                    # Force a map refresh
+                    tools_qgis.refresh_map_canvas()  # First refresh all the layers
+                    global_vars.iface.mapCanvas().refresh()  # Then refresh the map view itself
                     # Refresh psector's relations tables
                     tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')
                     if close_dlg:
@@ -2960,7 +2979,7 @@ class GwInfo(QObject):
         if json_result is None:
             return
 
-        dlg_generic = GwInfoGenericUi()
+        dlg_generic = GwInfoGenericUi(self)
         tools_gw.load_settings(dlg_generic)
 
         # Set signals
@@ -3082,6 +3101,8 @@ class GwInfo(QObject):
                 widget = dialog.findChild(QWidget, f"{options[option][1]}")
                 widget.setFocus()
                 tools_qt.set_widget_text(dialog, widget, str(feat_id))
+                if str(feat_id) not in ('', None, -1, "None") and widget.property('columnname'):
+                        self.my_json[str(widget.property('columnname'))] = str(feat_id)
             elif option == 'set_to_arc':
                 # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
                 #       def _set_to_arc(self, feat_id, child_type)
@@ -3335,7 +3356,7 @@ def open_epa_dlg(**kwargs):
     id_name = complet_result['body']['feature']['idName']
 
     # Build dlg
-    info.dlg = globals()[ui]()
+    info.dlg = globals()[ui](info)
     tools_gw.load_settings(info.dlg)
 
     # Fill widgets
@@ -3461,7 +3482,7 @@ def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, force_action, **kwar
     result = json_result
 
     # Build dlg
-    info.add_dlg = GwInfoGenericUi()
+    info.add_dlg = GwInfoGenericUi(info)
     tools_gw.load_settings(info.add_dlg)
     info.my_json_add = {}
     tools_gw.build_dialog_info(info.add_dlg, result, my_json=info.my_json_add)
@@ -4141,6 +4162,7 @@ def open_visit_document(**kwargs):
     """ Open document of selected record of the table """
 
     # search visit_id in table (targetwidget, columnfind)
+    class_obj = kwargs['class']
     func_params = kwargs['func_params']
     qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(kwargs['dialog'], f"{func_params.get('targetwidget')}")
     # Get selected rows
@@ -4195,7 +4217,7 @@ def open_visit_document(**kwargs):
 
     else:
         # If more then one document is attached open dialog with list of documents
-        dlg_load_doc = GwVisitDocumentUi()
+        dlg_load_doc = GwVisitDocumentUi(class_obj)
         tools_gw.load_settings(dlg_load_doc)
         dlg_load_doc.rejected.connect(partial(tools_gw.close_dialog, dlg_load_doc))
 
@@ -4288,7 +4310,7 @@ def open_visit_event(**kwargs):
             def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]) ->
                                         widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
     """
-
+    class_obj = kwargs['class']
     dialog = kwargs['dialog']
     func_params = kwargs['func_params']
     qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(dialog, f"{func_params.get('targetwidget')}")
@@ -4313,7 +4335,7 @@ def open_visit_event(**kwargs):
     event_id = ids['event_id']
 
     # Open dialog event_standard
-    dlg_event_full = GwVisitEventFullUi()
+    dlg_event_full = GwVisitEventFullUi(class_obj)
     tools_gw.load_settings(dlg_event_full)
     dlg_event_full.rejected.connect(partial(tools_gw.close_dialog, dlg_event_full))
     # Get all data for one visit

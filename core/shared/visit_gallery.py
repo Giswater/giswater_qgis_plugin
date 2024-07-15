@@ -29,7 +29,7 @@ class GwVisitGallery:
     def manage_gallery(self):
 
         # Create the dialog and signals
-        self.dlg_gallery = GwGalleryUi()
+        self.dlg_gallery = GwGalleryUi(self)
         tools_gw.load_settings(self.dlg_gallery)
 
 
@@ -212,7 +212,7 @@ class GwVisitGallery:
 
         handeler_index = i
 
-        self.dlg_gallery_zoom = GwGalleryZoomUi()
+        self.dlg_gallery_zoom = GwGalleryZoomUi(self)
         tools_gw.load_settings(self.dlg_gallery_zoom)
         self.lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom")
 

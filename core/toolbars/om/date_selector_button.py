@@ -33,7 +33,7 @@ class GwDateSelectorButton(GwAction):
 
     def _open_date_selector(self):
 
-        self.dlg_selector_date = GwSelectorDateUi()
+        self.dlg_selector_date = GwSelectorDateUi(self)
         tools_gw.load_settings(self.dlg_selector_date)
         self.widget_date_from = self.dlg_selector_date.findChild(QDateEdit, "date_from")
         self.widget_date_to = self.dlg_selector_date.findChild(QDateEdit, "date_to")

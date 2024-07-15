@@ -279,7 +279,7 @@ class GwAdminButton:
         """ Executed when option 'Import INP data' has been selected """
 
         # Create dialog
-        self.dlg_import_inp = GwAdminImportUi()
+        self.dlg_import_inp = GwAdminImportUi(self)
         tools_gw.load_settings(self.dlg_import_inp)
 
         # Hide widgets
@@ -391,7 +391,7 @@ class GwAdminButton:
     def init_dialog_create_project(self, project_type=None):
         """ Initialize dialog (only once) """
 
-        self.dlg_readsql_create_project = GwAdminDbProjectUi()
+        self.dlg_readsql_create_project = GwAdminDbProjectUi(self)
         tools_gw.load_settings(self.dlg_readsql_create_project)
         self.dlg_readsql_create_project.btn_cancel_task.hide()
 
@@ -681,7 +681,7 @@ class GwAdminButton:
         self.dev_commit = global_vars.gw_dev_mode
 
         # Create dialog object
-        self.dlg_readsql = GwAdminUi()
+        self.dlg_readsql = GwAdminUi(self)
         tools_gw.load_settings(self.dlg_readsql)
         self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
 
@@ -1035,7 +1035,7 @@ class GwAdminButton:
             return
 
         # Create GIS project dialog
-        self.dlg_create_gis_project = GwAdminGisProjectUi()
+        self.dlg_create_gis_project = GwAdminGisProjectUi(self)
         tools_gw.load_settings(self.dlg_create_gis_project)
 
         # Set default values
@@ -1433,7 +1433,7 @@ class GwAdminButton:
         """"""
 
         # Create dialog
-        self.dlg_readsql_show_info = GwAdminProjectInfoUi()
+        self.dlg_readsql_show_info = GwAdminProjectInfoUi(self)
         tools_gw.load_settings(self.dlg_readsql_show_info)
 
         info_updates = self.dlg_readsql_show_info.findChild(QTextEdit, 'info_updates')
@@ -1742,7 +1742,7 @@ class GwAdminButton:
             return
 
         # Create dialog
-        self.dlg_readsql_rename = GwAdminRenameProjUi()
+        self.dlg_readsql_rename = GwAdminRenameProjUi(self)
         tools_gw.load_settings(self.dlg_readsql_rename)
 
         schema = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
@@ -1790,7 +1790,7 @@ class GwAdminButton:
             manage_i18n = True
 
         if manage_i18n:
-            files_to_execute = [f"{self.project_type_selected}_schema_model.sql", f"dml.sql"]
+            files_to_execute = [f"{self.project_type_selected}_schema_model.sql", f"{self.project_type_selected}_dml.sql", f"dml.sql"]
             for file in files_to_execute:
                 status = True
                 if file in filelist:
@@ -1897,7 +1897,7 @@ class GwAdminButton:
         """"""
 
         # Create dialog
-        self.dlg_readsql_copy = GwAdminRenameProjUi()
+        self.dlg_readsql_copy = GwAdminRenameProjUi(self)
         tools_gw.load_settings(self.dlg_readsql_copy)
 
         schema = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
@@ -2065,7 +2065,7 @@ class GwAdminButton:
     def _build_replace_dlg(self, replace_json):
 
         # Build the dialog
-        self.dlg_replace = GwReplaceInFileUi()
+        self.dlg_replace = GwReplaceInFileUi(self)
         self.dlg_replace.setWindowFlags(Qt.WindowStaysOnTopHint)
         tools_gw.load_settings(self.dlg_replace)
 
@@ -2301,8 +2301,8 @@ class GwAdminButton:
                 return
 
             sql = (f"SELECT cat_feature.id, cat_feature.id "
-                   f"FROM {schema_name}.cat_feature "
-                   f" ORDER BY id")
+                   f"FROM {schema_name}.cat_feature WHERE id <> 'LINK' "
+                   f"AND active IS TRUE ORDER BY id")
             rows = tools_db.get_rows(sql)
 
             tools_qt.fill_combo_values(self.dlg_readsql.cmb_formname_fields, rows)
@@ -2312,7 +2312,7 @@ class GwAdminButton:
         """"""
 
         # Create the dialog and signals
-        self.dlg_manage_fields = GwAdminFieldsUi()
+        self.dlg_manage_fields = GwAdminFieldsUi(self)
         tools_gw.load_settings(self.dlg_manage_fields)
         self.model_update_table = None
 
@@ -2323,32 +2323,42 @@ class GwAdminButton:
                     self.dlg_manage_fields.tab_add_fields, self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
 
         form_name_fields = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
+        is_multi_addfield = tools_qt.is_checked(self.dlg_readsql, self.dlg_readsql.chk_add_fields_multi)
 
         window_title = ""
         if action == 'create':
-            window_title = 'Create field on "' + str(form_name_fields) + '"'
-            self._manage_create_field(form_name_fields)
+            if is_multi_addfield: 
+                window_title = f'Create multi field'
+            else:
+                window_title = 'Create field on "' + str(form_name_fields) + '"'
+            self._manage_create_field(form_name_fields, is_multi_addfield)
         elif action == 'update':
-            window_title = 'Update field on "' + str(form_name_fields) + '"'
-            self._manage_update_field(self.dlg_manage_fields, form_name_fields, tableview='ve_config_addfields')
+            if is_multi_addfield: 
+                window_title = f'Update multi field'
+            else:
+                window_title = 'Update field on "' + str(form_name_fields) + '"'
+            self._manage_update_field(self.dlg_manage_fields, form_name_fields, is_multi_addfield, tableview='ve_config_addfields')
         elif action == 'delete':
-            window_title = 'Delete field on "' + str(form_name_fields) + '"'
-            self._manage_delete_field(form_name_fields)
+            if is_multi_addfield: 
+                window_title = f'Delete multi field'
+            else:
+                window_title = 'Delete field on "' + str(form_name_fields) + '"'
+            self._manage_delete_field(form_name_fields, is_multi_addfield)
 
         # Set listeners
         self.dlg_manage_fields.btn_accept.clicked.connect(
-            partial(self._manage_accept, action, form_name_fields))
+            partial(self._manage_accept, action, form_name_fields, is_multi_addfield))
         self.dlg_manage_fields.btn_cancel.clicked.connect(partial(self._close_dialog_admin, self.dlg_manage_fields))
         self.dlg_manage_fields.tbl_update.doubleClicked.connect(
-            partial(self._update_selected_addfild, self.dlg_manage_fields.tbl_update))
+            partial(self._update_selected_addfild, self.dlg_manage_fields.tbl_update, is_multi_addfield))
         self.dlg_manage_fields.btn_open.clicked.connect(
-            partial(self._update_selected_addfild, self.dlg_manage_fields.tbl_update))
+            partial(self._update_selected_addfild, self.dlg_manage_fields.tbl_update, is_multi_addfield))
 
         tools_gw.open_dialog(self.dlg_manage_fields, dlg_name='admin_addfields')
         self.dlg_manage_fields.setWindowTitle(window_title)
 
 
-    def _update_selected_addfild(self, widget):
+    def _update_selected_addfild(self, widget, is_multi_addfield):
         """"""
 
         selected_list = widget.selectionModel().selectedRows()
@@ -2359,12 +2369,14 @@ class GwAdminButton:
 
         # Create the dialog and signals
         self._close_dialog_admin(self.dlg_manage_fields)
-        self.dlg_manage_fields = GwAdminFieldsUi()
+        self.dlg_manage_fields = GwAdminFieldsUi(self)
         tools_gw.load_settings(self.dlg_manage_fields)
         self.model_update_table = None
 
         form_name_fields = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
         self.dlg_manage_fields.columnname.setEnabled(False)
+        self.dlg_manage_fields.datatype.setEnabled(False)
+        self.dlg_manage_fields.widgettype.setEnabled(False)
 
         # Set listeners
         self.dlg_manage_fields.btn_accept.clicked.connect(
@@ -2373,13 +2385,16 @@ class GwAdminButton:
 
         # Remove unused tabs
         for x in range(self.dlg_manage_fields.tab_add_fields.count() - 1, -1, -1):
-            if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) != str('tab_create'):
+            if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) not in (str('tab_create'), 'tab_infolog'):
                 tools_qt.remove_tab(self.dlg_manage_fields.tab_add_fields,
                                                self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
 
-        window_title = 'Update field on "' + str(form_name_fields) + '"'
+        if is_multi_addfield: 
+                window_title = f'Update multi field'
+        else:
+            window_title = 'Update field on "' + str(form_name_fields) + '"'
         self.dlg_manage_fields.setWindowTitle(window_title)
-        self._manage_create_field(form_name_fields)
+        self._manage_create_field(form_name_fields, is_multi_addfield)
 
         row = selected_list[0].row()
 
@@ -2398,15 +2413,26 @@ class GwAdminButton:
         tools_gw.open_dialog(self.dlg_manage_fields, dlg_name='admin_addfields')
 
 
-    def _manage_create_field(self, form_name):
+    def _manage_create_field(self, form_name, is_multi_addfield):
         """"""
 
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
+        
+        # Alter visibility on widget that is only for multicreate action
+        self.dlg_manage_fields.lbl_multifeaturetype.setVisible(is_multi_addfield)
+        self.dlg_manage_fields.featuretype.setVisible(is_multi_addfield)
+        
+        if is_multi_addfield:
+             # Populate featuretype combo
+            rows = [['ALL', 'ALL'], ['NODE', 'NODE'], ['ARC', 'ARC'], ['CONNEC', 'CONNEC']]
+            if self.project_type == 'ud':
+                rows += [['GULLY', 'GULLY']]
+            tools_qt.fill_combo_values(self.dlg_manage_fields.featuretype, rows)
 
         # Populate widgettype combo
         sql = (f"SELECT DISTINCT(id), idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'widgettype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
-        rows = tools_db.get_rows(sql)
+        rows = tools_db.get_rows(sql)        
         tools_qt.fill_combo_values(self.dlg_manage_fields.widgettype, rows)
 
         # Populate datatype combo
@@ -2425,7 +2451,7 @@ class GwAdminButton:
         tools_qt.set_widget_text(self.dlg_manage_fields, self.dlg_manage_fields.formtype, 'feature')
 
 
-    def _manage_update_field(self, dialog, form_name, tableview):
+    def _manage_update_field(self, dialog, form_name, is_multi_addfield, tableview):
         """"""
 
         if form_name is None:
@@ -2442,13 +2468,16 @@ class GwAdminButton:
         qtable = dialog.findChild(QTableView, "tbl_update")
         self.model_update_table = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
-        expr_filter = f"cat_feature_id = '{form_name}'"
+        if is_multi_addfield:
+            expr_filter = f"cat_feature_id IS NULL"
+        else: 
+            expr_filter = f"cat_feature_id = '{form_name}'"
 
         self._fill_table(qtable, tableview, self.model_update_table, expr_filter)
         tools_gw.set_tablemodel_config(dialog, qtable, tableview, schema_name=schema_name)
 
 
-    def _manage_delete_field(self, form_name):
+    def _manage_delete_field(self, form_name, is_multi_addfield):
         """"""
 
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
@@ -2459,9 +2488,14 @@ class GwAdminButton:
             tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", True)
 
         # Populate widgettype combo
-        sql = (f"SELECT DISTINCT(columnname), columnname "
+        if is_multi_addfield:
+            sql = (f"SELECT DISTINCT(columnname), columnname "
                 f"FROM {schema_name}.ve_config_addfields "
-                f"WHERE cat_feature_id = '{form_name}'")
+                f"WHERE cat_feature_id IS NULL")
+        else:
+            sql = (f"SELECT DISTINCT(columnname), columnname "
+                    f"FROM {schema_name}.ve_config_addfields "
+                    f"WHERE cat_feature_id = '{form_name}'")
 
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_manage_fields.cmb_fields, rows)
@@ -2475,16 +2509,30 @@ class GwAdminButton:
             self._open_manage_field('update')
 
 
-    def _manage_accept(self, action, form_name):
+    def _manage_accept(self, action, form_name, is_multi=False):
         """"""
 
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
+        # save prev user value
+        sql = f"SELECT value FROM {schema_name}.config_param_system WHERE parameter = 'admin_config_control_trigger'"
+        row = tools_db.get_row(sql)
+        config_trg_user_value = row[0] if row is not None else True
+        # set admin_config_control_trigger to true to force config_form_fields trigger
+        sql = (f"UPDATE {schema_name}.config_param_system "
+               f"SET value = 'TRUE'"
+               f"WHERE parameter = 'admin_config_control_trigger'")
+        tools_db.execute_sql(sql)
+
 
         # Execute manage add fields function
         param_name = tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.columnname)
         sql = (f"SELECT param_name FROM {schema_name}.sys_addfields "
                f"WHERE param_name = '{param_name}' AND cat_feature_id = '{form_name}' ")
         row = tools_db.get_row(sql)
+        
+        # Check feature type selected for multi addfields actions
+        if is_multi:  
+            feature_type = tools_qt.get_selected_item(self.dlg_manage_fields, self.dlg_manage_fields.featuretype)
 
         if action == 'create':
 
@@ -2493,6 +2541,7 @@ class GwAdminButton:
             label = tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.label)
             widget_type = tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.widgettype)
             dv_query_text = tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.dv_querytext)
+            
             if column_name == 'null' or label == 'null':
                 msg = "Column name and Label fields are mandatory. Please set correct value."
                 tools_qt.show_info_box(msg, "Info")
@@ -2533,16 +2582,25 @@ class GwAdminButton:
                         result_json = json.dumps(_json)
 
             # Create body
-            feature = '"catFeature":"' + form_name + '"'
-            extras = '"action":"CREATE", "multiCreate": false, "parameters":' + result_json + ''
+            if is_multi:
+                feature = '"featureType":"' + feature_type + '"'
+            else: 
+                feature = '"catFeature":"' + form_name + '"'
+            extras = '"action":"CREATE", "parameters":' + result_json + ''
             body = tools_gw.create_body(feature=feature, extras=extras)
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
             json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body, schema_name)
-            self._manage_json_message(json_result, parameter="Field configured in 'config_form_fields'")
             if not json_result or json_result['status'] == 'Failed':
+                # set admin_config_control_trigger with prev user value
+                sql = (f"UPDATE {schema_name}.config_param_system "
+                    f"SET value = '{config_trg_user_value}'"
+                    f"WHERE parameter = 'admin_config_control_trigger'")
+                tools_db.execute_sql(sql)
                 return
+            self._manage_json_message(json_result, parameter="Field configured in 'config_form_fields'")
+
 
         elif action == 'update':
 
@@ -2573,9 +2631,11 @@ class GwAdminButton:
                         result_json = json.dumps(_json)
 
             # Create body
-            feature = '"catFeature":"' + form_name + '"'
-            extras = '"action":"UPDATE"'
-            extras += ', "multiCreate": false, "parameters":' + result_json + ''
+            if is_multi:
+                feature = '"featureType":"' + feature_type + '"'
+            else: 
+                feature = '"catFeature":"' + form_name + '"'
+            extras = '"action":"UPDATE", "parameters":' + result_json + ''
             body = tools_gw.create_body(feature=feature, extras=extras)
             body = body.replace('""', 'null')
 
@@ -2588,19 +2648,28 @@ class GwAdminButton:
         elif action == 'delete':
 
             field_value = tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.cmb_fields)
-
+            
+            sql = (f"SELECT feature_type FROM {schema_name}.sys_addfields "
+                f"WHERE param_name = '{field_value}'")
+            feature_type = tools_db.get_row(sql)[0]
+            
             # Create body
-            feature = '"catFeature":"' + form_name + '"'
-            extras = '"action":"DELETE", "multiCreate": false, "parameters":{"columnname":"' + field_value + '"}'
+            if is_multi:
+                feature = '"featureType":"' + feature_type + '"'
+            else: 
+                feature = '"catFeature":"' + form_name + '"'
+            extras = '"action":"DELETE", "parameters":{"columnname":"' + field_value + '"}'
             body = tools_gw.create_body(feature=feature, extras=extras)
 
             # Execute manage add fields function
             json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body, schema_name)
             self._manage_json_message(json_result, parameter="Delete function")
-
-        if action == 'update':
-            self._open_manage_field('update')
-
+        
+        # set admin_config_control_trigger with prev user value
+        sql = (f"UPDATE {schema_name}.config_param_system "
+               f"SET value = '{config_trg_user_value}'"
+               f"WHERE parameter = 'admin_config_control_trigger'")
+        tools_db.execute_sql(sql)
 
     def _change_project_type(self, widget):
         """ Take current project type changed """
@@ -2825,7 +2894,7 @@ class GwAdminButton:
     def _create_credentials_form(self, set_connection):
         """"""
 
-        self.dlg_credentials = GwCredentialsUi()
+        self.dlg_credentials = GwCredentialsUi(self)
         tools_gw.load_settings(self.dlg_credentials)
         if str(self.list_connections) != '[]':
             tools_qt.fill_combo_values(self.dlg_credentials.cmb_connection, self.list_connections)
@@ -2883,7 +2952,7 @@ class GwAdminButton:
         try:
             tools_gw.close_docker('admin_position')
             lib_vars.session_vars['docker_type'] = 'qgis_form_docker'
-            lib_vars.session_vars['dialog_docker'] = GwDocker()
+            lib_vars.session_vars['dialog_docker'] = GwDocker(self)
             lib_vars.session_vars['dialog_docker'].dlg_closed.connect(partial(tools_gw.close_docker, 'admin_position'))
             tools_gw.manage_docker_options('admin_position')
             tools_gw.docker_dialog(self.dlg_readsql)

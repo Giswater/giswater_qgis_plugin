@@ -96,6 +96,7 @@ class GwArcFusionButton(GwMaptool):
             self.dlg_fusion.close()
 
         self.refresh_map_canvas()
+        self.iface.mapCanvas().refresh()
 
         # Refresh psector's relations tables
         tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')
@@ -134,7 +135,7 @@ class GwArcFusionButton(GwMaptool):
 
 
     def open_arc_fusion_dlg(self):
-        self.dlg_fusion = GwArcFusionUi()
+        self.dlg_fusion = GwArcFusionUi(self)
         tools_gw.load_settings(self.dlg_fusion)
 
         # Fill ComboBox cmb_nodeaction

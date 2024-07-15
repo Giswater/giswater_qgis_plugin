@@ -16,7 +16,7 @@ class GwDocker(QDockWidget):
     dlg_closed = QtCore.pyqtSignal()
 
 
-    def __init__(self, subtag=None):
+    def __init__(self, class_obj=None, subtag=None):
 
         super().__init__()
         # TODO: Check try/catch. Strange error: "GwDocker object has no attribute 'setupUi"
@@ -24,6 +24,8 @@ class GwDocker(QDockWidget):
             self.setupUi(self)
         except Exception:
             pass
+
+        self.setProperty('class_obj', class_obj)
         self.subtag = subtag
 
 

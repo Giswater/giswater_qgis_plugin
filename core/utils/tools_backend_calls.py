@@ -11,7 +11,7 @@ import subprocess
 import webbrowser
 
 from functools import partial
-from qgis.PyQt.QtCore import QDate, QRegExp, Qt
+from qgis.PyQt.QtCore import QDate, QRegExp, Qt, QRegularExpression
 from qgis.PyQt.QtGui import QStandardItemModel
 from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QLineEdit, QMessageBox, QTableView, QWidget, QDoubleSpinBox, QSpinBox
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer, QgsVectorLayer, QgsDataSourceUri
@@ -169,6 +169,35 @@ def open_visit_manager(**kwargs):
     manage_visit.manage_visits(feature_type, feature_id)
 
 
+def open_visit(**kwargs):
+    dialog = kwargs['dialog']
+    complet_result = kwargs['complet_result']
+    func_params = kwargs['func_params']
+    feature_type = complet_result['body']['feature']['featureType']
+    feature_id = complet_result['body']['feature']['id']
+    qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(dialog, f"{func_params['targetwidget']}")
+
+    # Get selected rows
+    selected_list = qtable.selectionModel().selectedRows()
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        tools_qgis.show_warning(message)
+        return
+    elif len(selected_list) > 1:
+        message = "Select just one visit"
+        tools_qgis.show_warning(message)
+        return
+
+    # Get document path (can be relative or absolute)
+    index = selected_list[0]
+    row = index.row()
+    column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'])
+    visit_id = index.sibling(row, column_index).data()
+
+    manage_visit = GwVisit()
+    manage_visit.get_visit(visit_id, feature_type, feature_id)
+
+
 def manage_document(doc_id, **kwargs):
     """ Function called in class tools_gw.add_button(...) -->
         widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
@@ -201,6 +230,8 @@ def manage_document(doc_id, **kwargs):
 def manage_visit_class(**kwargs):
     """ 
     """
+
+    info = kwargs['class']
     complet_result = kwargs['complet_result']
     dialog = kwargs['dialog']
     columnname = kwargs['columnname']
@@ -209,11 +240,11 @@ def manage_visit_class(**kwargs):
     field_id = str(complet_result['body']['feature']['idName'])
 
     current_visit_class = tools_gw.get_values(dialog, widget)
-    if current_visit_class[columnname] is None:
+    if current_visit_class[columnname] in (None, -1, '-1'):
         return
-    sql = f"SELECT ui_tablename FROM config_visit_class where id = {current_visit_class[columnname]}"
+    sql = (f"SELECT ui_tablename FROM config_visit_class where id = {current_visit_class[columnname]}")
     ui_tablename = tools_db.get_row(sql)
-    table_view = dialog.findChildren(QTableView)
+    table_view = dialog.tab_main.currentWidget().findChildren(QTableView)
     if table_view in (None, []):
         return
     table_view = table_view[0]
@@ -222,12 +253,18 @@ def manage_visit_class(**kwargs):
     body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
     json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
     if json_result is None or json_result['status'] == 'Failed':
+        widget.removeItem(widget.currentIndex())
         return False
+
     complet_list = json_result
     if not complet_list:
+        widget.removeItem(widget.currentIndex())
         return False
+
     if complet_list is False:
+        widget.removeItem(widget.currentIndex())
         return False, False
+
     # headers
     headers = complet_list['body']['form'].get('headers')
     non_editable_columns = []
@@ -252,10 +289,23 @@ def manage_visit_class(**kwargs):
             table_view.setModel(model)
         model.removeRows(0, model.rowCount())
 
-        if field['value']:
-            table_view = tools_gw.add_tableview_header(table_view, field)
-            table_view = tools_gw.fill_tableview_rows(table_view, field)
+        if not field['value']:
+            widget.removeItem(widget.currentIndex())
+            return False
+
+        table_view = tools_gw.add_tableview_header(table_view, field)
+        table_view = tools_gw.fill_tableview_rows(table_view, field)
         tools_qt.set_tableview_config(table_view)
+
+        # Get tab's widgets
+        widget_list = []
+        tab_name = info.tab_main.currentWidget().objectName().replace('tab_', "")
+        widget_list.extend(info.tab_main.currentWidget().findChildren(QComboBox, QRegularExpression(f"{tab_name}_")))
+        widget_list.extend(info.tab_main.currentWidget().findChildren(QTableView, QRegularExpression(f"{tab_name}_")))
+        widget_list.extend(info.tab_main.currentWidget().findChildren(QLineEdit, QRegularExpression(f"{tab_name}_")))
+        widget_list.extend(info.tab_main.currentWidget().findChildren(QgsDateTimeEdit, QRegularExpression(f"{tab_name}_")))
+        # Set filter listeners
+        tools_gw.set_filter_listeners(complet_result, info.dlg_cf, widget_list, columnname, ui_tablename[0], info.feature_id)
 
 
 def open_selected_path(**kwargs):
@@ -317,6 +367,9 @@ def filter_table(**kwargs):
     feature_id = kwargs['feature_id']
     func_params = kwargs.get('func_params')
 
+    if not linkedobject:
+        linkedobject = widgetname
+
     field_id = func_params.get('field_id')
     if field_id is None:
         field_id = str(complet_result['body']['feature']['idName'])
@@ -336,6 +389,8 @@ def filter_table(**kwargs):
         return False
     for field in complet_list['body']['data']['fields']:
         qtable = dialog.findChild(QTableView, field['widgetname'])
+        if qtable is None:
+            qtable = dialog.findChild(QTableView, func_params.get('targetwidget'))
         if qtable:
             if field['value'] is None:
                 model.removeRows(0, model.rowCount())

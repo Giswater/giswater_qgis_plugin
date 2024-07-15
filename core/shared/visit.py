@@ -82,7 +82,7 @@ class GwVisit(QObject):
 
         # Create the dialog and signals and related ORM Visit class
         self.current_visit = GwOmVisit()
-        self.dlg_add_visit = GwVisitUi(tag)
+        self.dlg_add_visit = GwVisitUi(self,tag)
         tools_gw.load_settings(self.dlg_add_visit)
         # Get layer visibility to restore when dialog is closed
         layers_visibility = {}
@@ -263,7 +263,7 @@ class GwVisit(QObject):
         """ Button 65: manage visits """
 
         # Create the dialog
-        self.dlg_visit_manager = GwVisitManagerUi()
+        self.dlg_visit_manager = GwVisitManagerUi(self)
         tools_gw.load_settings(self.dlg_visit_manager)
         self.dlg_visit_manager.tbl_visit.setSelectionBehavior(QAbstractItemView.SelectRows)
 
@@ -1307,12 +1307,12 @@ class GwVisit(QObject):
         row = tools_db.get_row(sql)
         form_type = str(row[0])
         if form_type in ('event_ud_arc_standard', 'event_standard'):
-            self.dlg_event = GwVisitEventUi()
+            self.dlg_event = GwVisitEventUi(self)
             tools_gw.load_settings(self.dlg_event)
             self._populate_position_id()
             dlg_name = 'visit_event'
         elif form_type == 'event_ud_arc_rehabit':
-            self.dlg_event = GwVisitEventRehabUi()
+            self.dlg_event = GwVisitEventRehabUi(self)
             tools_gw.load_settings(self.dlg_event)
             self._populate_position_id()
             dlg_name = 'visit_event_rehab'
@@ -1558,7 +1558,7 @@ class GwVisit(QObject):
             _value = self.dlg_add_visit.tbl_event.model().record(row).value('value')
             position_value = self.dlg_add_visit.tbl_event.model().record(row).value('position_value')
             text = self.dlg_add_visit.tbl_event.model().record(row).value('text')
-            self.dlg_event = GwVisitEventUi()
+            self.dlg_event = GwVisitEventUi(self)
             tools_gw.load_settings(self.dlg_event)
             self._populate_position_id()
             dlg_name = 'visit_event'
@@ -1583,7 +1583,7 @@ class GwVisit(QObject):
             geom2 = self.dlg_add_visit.tbl_event.model().record(row).value('geom2')
             geom3 = self.dlg_add_visit.tbl_event.model().record(row).value('geom3')
             text = self.dlg_add_visit.tbl_event.model().record(row).value('text')
-            self.dlg_event = GwVisitEventRehabUi()
+            self.dlg_event = GwVisitEventRehabUi(self)
             tools_gw.load_settings(self.dlg_event)
             self._populate_position_id()
             dlg_name = 'visit_event_rehab'
@@ -1611,7 +1611,7 @@ class GwVisit(QObject):
             column_index = tools_qt.get_col_index_by_col_name(self.dlg_add_visit.tbl_event, 'text')
             text = index.sibling(row, column_index).data()
 
-            self.dlg_event = GwVisitEventUi()
+            self.dlg_event = GwVisitEventUi(self)
             tools_gw.load_settings(self.dlg_event)
             if event_code not in ('NULL', None):
                 tools_qt.set_widget_text(self.dlg_event, self.dlg_event.event_code, event_code)

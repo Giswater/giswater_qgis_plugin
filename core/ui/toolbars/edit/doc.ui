@@ -38,11 +38,11 @@
          <attribute name="title">
           <string>Document</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0">
+         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0">
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
             <item>
-             <widget class="QLabel" name="lbl_doc_id">
+             <widget class="QLabel" name="lbl_doc_name">
               <property name="minimumSize">
                <size>
                 <width>80</width>
@@ -69,7 +69,7 @@
                <enum>QFrame::Plain</enum>
               </property>
               <property name="text">
-               <string>Doc id:</string>
+               <string>Doc name:</string>
               </property>
               <property name="textFormat">
                <enum>Qt::AutoText</enum>
@@ -86,7 +86,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="doc_id">
+             <widget class="QLineEdit" name="doc_name">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -331,6 +331,25 @@
              </widget>
             </item>
            </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_add_geom">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Add geom</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

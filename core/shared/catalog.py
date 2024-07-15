@@ -40,7 +40,7 @@ class GwCatalog:
         group_box_1 = QGroupBox("Filter")
         self.filter_form = QGridLayout()
 
-        self.dlg_catalog = GwInfoCatalogUi()
+        self.dlg_catalog = GwInfoCatalogUi(self)
         tools_gw.load_settings(self.dlg_catalog)
         self.dlg_catalog.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_catalog))
         self.dlg_catalog.btn_accept.clicked.connect(partial(self._fill_geomcat_id, previous_dialog, widget_name))

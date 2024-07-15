@@ -93,8 +93,12 @@ class GwArcDivideButton(GwMaptool):
         self.layer_arc.removeSelection()
 
         # Restore previous active layer
-        if self.active_layer:
-            self.iface.setActiveLayer(self.active_layer)
+        try:
+            if self.active_layer:
+                self.iface.setActiveLayer(self.active_layer)
+        except RuntimeError:
+            pass
+
 
         self.refresh_map_canvas()
 
@@ -227,7 +231,7 @@ class GwArcDivideButton(GwMaptool):
             if result and result['status'] == 'Accepted':
                 log = tools_gw.get_config_parser("user_edit_tricks", "arc_divide_disable_showlog", 'user', 'init')
                 if not tools_os.set_boolean(log, False):
-                    self.dlg_dtext = GwDialogTextUi('arc_divide')
+                    self.dlg_dtext = GwDialogTextUi(self, 'arc_divide')
                     tools_gw.load_settings(self.dlg_dtext)
                     tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False, True, 1)
                     self.dlg_dtext.finished.connect(partial(tools_gw.save_settings, self.dlg_dtext))
@@ -321,6 +325,7 @@ class GwArcDivideButton(GwMaptool):
             tools_qgis.set_layer_index('v_edit_connec')
             tools_qgis.set_layer_index('v_edit_gully')
             tools_qgis.set_layer_index('v_edit_node')
+            self.iface.mapCanvas().refresh()
 
             # Refresh psector's relations tables
             tools_gw.execute_class_function(GwPsectorUi, '_refresh_tables_relations')

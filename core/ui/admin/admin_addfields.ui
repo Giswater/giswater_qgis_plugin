@@ -65,8 +65,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>577</width>
-            <height>839</height>
+            <width>594</width>
+            <height>788</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
@@ -79,51 +79,102 @@
               <item>
                <layout class="QGridLayout" name="gridLayout_6">
                 <item row="2" column="0">
-                 <widget class="QLabel" name="lbl_label">
-                  <property name="text">
-                   <string>Label:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QLineEdit" name="label"/>
-                </item>
-                <item row="1" column="0">
                  <widget class="QLabel" name="lbl_formtype">
                   <property name="text">
                    <string>Form type:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="9" column="0">
-                 <widget class="QLabel" name="lbl_active">
-                  <property name="text">
-                   <string>Active:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="9" column="1">
-                 <widget class="QCheckBox" name="active">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="7" column="1">
+                <item row="8" column="1">
                  <widget class="QCheckBox" name="iseditable">
                   <property name="text">
                    <string/>
                   </property>
                  </widget>
                 </item>
-                <item row="4" column="0">
+                <item row="5" column="1">
+                 <widget class="QComboBox" name="widgettype"/>
+                </item>
+                <item row="5" column="0">
                  <widget class="QLabel" name="lbl_widgettype">
                   <property name="text">
                    <string>Widget type:</string>
                   </property>
                  </widget>
                 </item>
+                <item row="10" column="0">
+                 <widget class="QLabel" name="lbl_active">
+                  <property name="text">
+                   <string>Active:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="8" column="0">
+                 <widget class="QLabel" name="lbl_iseditable">
+                  <property name="text">
+                   <string>Editable:</string>
+                  </property>
+                 </widget>
+                </item>
                 <item row="1" column="1">
+                 <widget class="QLineEdit" name="columnname"/>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QLineEdit" name="label"/>
+                </item>
+                <item row="9" column="1">
+                 <widget class="QCheckBox" name="ismandatory">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="11" column="0">
+                 <widget class="QLabel" name="lbl_hidden">
+                  <property name="text">
+                   <string>Hidden:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="11" column="1">
+                 <widget class="QCheckBox" name="hidden">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="0">
+                 <widget class="QLabel" name="lbl_datatype">
+                  <property name="text">
+                   <string>Data type:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="10" column="1">
+                 <widget class="QCheckBox" name="active">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="lbl_columnname">
+                  <property name="text">
+                   <string>Column name:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="9" column="0">
+                 <widget class="QLabel" name="lbl_ismandatory">
+                  <property name="text">
+                   <string>Mandatory:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="1">
+                 <widget class="QComboBox" name="layoutname"/>
+                </item>
+                <item row="2" column="1">
                  <widget class="QLineEdit" name="formtype">
                   <property name="enabled">
                    <bool>false</bool>
@@ -133,59 +184,32 @@
                   </property>
                  </widget>
                 </item>
-                <item row="8" column="1">
-                 <widget class="QCheckBox" name="ismandatory">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
                 <item row="3" column="0">
-                 <widget class="QLabel" name="lbl_datatype">
+                 <widget class="QLabel" name="lbl_label">
                   <property name="text">
-                   <string>Data type:</string>
+                   <string>Label:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="3" column="1">
-                 <widget class="QComboBox" name="datatype"/>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QLineEdit" name="columnname"/>
-                </item>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="lbl_columnname">
-                  <property name="text">
-                   <string>Column name:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="1">
-                 <widget class="QComboBox" name="widgettype"/>
-                </item>
-                <item row="7" column="0">
-                 <widget class="QLabel" name="lbl_iseditable">
-                  <property name="text">
-                   <string>Editable:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="8" column="0">
-                 <widget class="QLabel" name="lbl_ismandatory">
-                  <property name="text">
-                   <string>Mandatory:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="1">
-                 <widget class="QComboBox" name="layoutname"/>
-                </item>
-                <item row="5" column="0">
+                <item row="6" column="0">
                  <widget class="QLabel" name="lbl_layoutname">
                   <property name="text">
                    <string>Layout name:</string>
                   </property>
                  </widget>
+                </item>
+                <item row="4" column="1">
+                 <widget class="QComboBox" name="datatype"/>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="lbl_multifeaturetype">
+                  <property name="text">
+                   <string>Multi create feature:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QComboBox" name="featuretype"/>
                 </item>
                </layout>
               </item>
@@ -207,145 +231,97 @@
              <layout class="QVBoxLayout" name="verticalLayout_2">
               <item>
                <layout class="QGridLayout" name="gridLayout_7">
-                <item row="9" column="2">
-                 <widget class="QLineEdit" name="placeholder"/>
-                </item>
-                <item row="10" column="2">
-                 <widget class="QPlainTextEdit" name="dv_querytext"/>
-                </item>
-                <item row="9" column="0">
-                 <widget class="QLabel" name="lbl_placeholder">
-                  <property name="text">
-                   <string>Placeholder:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="0">
-                 <widget class="QLabel" name="lbl_dv_isnullvalue">
-                  <property name="text">
-                   <string>Null value:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="7" column="0">
-                 <widget class="QLabel" name="lbl_tooltip">
-                  <property name="text">
-                   <string>Tooltip:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="6" column="2">
-                 <widget class="QLineEdit" name="dv_parent_id"/>
-                </item>
-                <item row="3" column="2">
-                 <widget class="QCheckBox" name="dv_isnullvalue">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="2">
-                 <widget class="QCheckBox" name="isautoupdate">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="0">
-                 <widget class="QLabel" name="lbl_isautoupdate">
-                  <property name="text">
-                   <string>Auto update:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="7" column="2">
-                 <widget class="QPlainTextEdit" name="tooltip"/>
-                </item>
-                <item row="10" column="0">
+                <item row="6" column="0">
                  <widget class="QLabel" name="lbl_dv_querytext">
                   <property name="text">
                    <string>Query text:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="5" column="2">
-                 <widget class="QCheckBox" name="isparent">
+                <item row="8" column="0">
+                 <widget class="QLabel" name="lbl_dv_orderby">
                   <property name="text">
-                   <string/>
+                   <string>Order by id:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="12" column="0">
+                <item row="5" column="0">
+                 <widget class="QLabel" name="lbl_placeholder">
+                  <property name="text">
+                   <string>Placeholder:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="10" column="0">
+                 <widget class="QLabel" name="lbl_linkedobject">
+                  <property name="text">
+                   <string>Linkedobject:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="9" column="0">
                  <widget class="QLabel" name="lbl_stylesheet">
                   <property name="text">
                    <string>Stylesheet:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="13" column="0">
-                 <widget class="QLabel" name="lbl_linkedobject">
-                  <property name="text">
-                   <string>Linkedobject</string>
-                  </property>
-                 </widget>
+                <item row="4" column="2">
+                 <widget class="QLineEdit" name="widgetcontrols"/>
                 </item>
-                <item row="11" column="0">
-                 <widget class="QLabel" name="lbl_dv_querytext_filterc">
-                  <property name="text">
-                   <string>Querytext filter:</string>
-                  </property>
-                 </widget>
+                <item row="5" column="2">
+                 <widget class="QLineEdit" name="placeholder"/>
                 </item>
-                <item row="6" column="0">
-                 <widget class="QLabel" name="lbl_dv_parent_id">
-                  <property name="text">
-                   <string>Parent id:</string>
-                  </property>
-                 </widget>
+                <item row="3" column="2">
+                 <widget class="QPlainTextEdit" name="tooltip"/>
                 </item>
-                <item row="11" column="2">
-                 <widget class="QPlainTextEdit" name="dv_querytext_filterc"/>
-                </item>
-                <item row="12" column="2">
-                 <widget class="QPlainTextEdit" name="stylesheet">
-                  <property name="toolTip">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;label&amp;quot;:&amp;quot;color:green; font-weight:bold;&amp;quot;,&amp;quot;widget&amp;quot;:{&amp;quot;enabled&amp;quot;:&amp;quot;color:black; font-weight:bold;&amp;quot;,&amp;quot;disabled&amp;quot;:&amp;quot;color:black; font-weight:bold;&amp;quot;}}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="8" column="0">
+                <item row="4" column="0">
                  <widget class="QLabel" name="lbl_widgetcontrols">
                   <property name="text">
                    <string>Widgetcontrols</string>
                   </property>
                  </widget>
                 </item>
-                <item row="5" column="0">
-                 <widget class="QLabel" name="lbl_isparent">
+                <item row="6" column="2">
+                 <widget class="QPlainTextEdit" name="dv_querytext"/>
+                </item>
+                <item row="7" column="0">
+                 <widget class="QLabel" name="lbl_dv_querynullvalue">
                   <property name="text">
-                   <string>Parent:</string>
+                   <string>Query null value:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="4" column="0">
-                 <widget class="QLabel" name="lbl_hidden">
-                  <property name="text">
-                   <string>Hidden:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="2">
-                 <widget class="QCheckBox" name="hidden">
+                <item row="7" column="2">
+                 <widget class="QCheckBox" name="dv_isnullvalue">
                   <property name="text">
                    <string/>
                   </property>
                  </widget>
                 </item>
-                <item row="8" column="2">
-                 <widget class="QLineEdit" name="widgetcontrols"/>
+                <item row="9" column="2">
+                 <widget class="QPlainTextEdit" name="stylesheet">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;label&amp;quot;:&amp;quot;color:green; font-weight:bold;&amp;quot;,&amp;quot;widget&amp;quot;:{&amp;quot;enabled&amp;quot;:&amp;quot;color:black; font-weight:bold;&amp;quot;,&amp;quot;disabled&amp;quot;:&amp;quot;color:black; font-weight:bold;&amp;quot;}}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </widget>
                 </item>
-                <item row="13" column="2">
+                <item row="3" column="0">
+                 <widget class="QLabel" name="lbl_tooltip">
+                  <property name="text">
+                   <string>Tooltip:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="10" column="2">
                  <widget class="QLineEdit" name="linkedobject"/>
+                </item>
+                <item row="8" column="2">
+                 <widget class="QCheckBox" name="dv_orderby_id">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
@@ -470,6 +446,35 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tab_add_fields</tabstop>
+  <tabstop>scrollArea_2</tabstop>
+  <tabstop>featuretype</tabstop>
+  <tabstop>columnname</tabstop>
+  <tabstop>formtype</tabstop>
+  <tabstop>label</tabstop>
+  <tabstop>datatype</tabstop>
+  <tabstop>widgettype</tabstop>
+  <tabstop>layoutname</tabstop>
+  <tabstop>iseditable</tabstop>
+  <tabstop>ismandatory</tabstop>
+  <tabstop>active</tabstop>
+  <tabstop>hidden</tabstop>
+  <tabstop>tooltip</tabstop>
+  <tabstop>widgetcontrols</tabstop>
+  <tabstop>placeholder</tabstop>
+  <tabstop>dv_querytext</tabstop>
+  <tabstop>dv_isnullvalue</tabstop>
+  <tabstop>dv_orderby_id</tabstop>
+  <tabstop>stylesheet</tabstop>
+  <tabstop>linkedobject</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+  <tabstop>txt_infolog</tabstop>
+  <tabstop>btn_open</tabstop>
+  <tabstop>tbl_update</tabstop>
+  <tabstop>cmb_fields</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

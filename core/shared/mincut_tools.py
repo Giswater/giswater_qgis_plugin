@@ -35,7 +35,7 @@ class GwMincutTools:
         self.schema_name = lib_vars.schema_name
         self.settings = global_vars.giswater_settings
 
-        self.rubber_band = tools_gw.create_rubberband(self.canvas, QgsWkbTypes.PointGeometry)
+        self.rubber_band = tools_gw.create_rubberband(self.canvas, "point")
 
     def set_dialog(self, dialog):
         self.dlg_mincut_man = dialog
@@ -178,7 +178,9 @@ def close_mincut_manager(**kwargs):
 
 def mincut_selector(**kwargs):
     """ Manage mincut selector """
+    print(kwargs)
     dialog = kwargs['dialog']
+    class_obj = kwargs['class']
     qtable = dialog.findChild(QTableView, "tab_none_tbl_mincut_edit")
     field_id = "id"
     model = qtable.model()
@@ -198,7 +200,7 @@ def mincut_selector(**kwargs):
     aux_params = f'"ids":{json.dumps(selected_mincuts)}'
     min_selector = GwSelector()
 
-    dlg_selector = GwSelectorUi()
+    dlg_selector = GwSelectorUi(class_obj)
     tools_gw.load_settings(dlg_selector)
     current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_mincut", "user", "session")
     dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
@@ -369,10 +371,11 @@ def filter_by_days(dialog, widget):
 def open_mincut(**kwargs):
     """ Open mincut form with selected record of the table """
     dialog = kwargs['dialog']
+    class_obj = kwargs['class']
     mincut = kwargs['class'].mincut
     table = kwargs['qtable']
 
-    dlg_mincut = GwMincutUi()
+    dlg_mincut = GwMincutUi(class_obj)
     selected_list = table.selectionModel().selectedRows()
     if len(selected_list) == 0:
         message = "Any record selected"
