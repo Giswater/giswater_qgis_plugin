@@ -99,7 +99,7 @@ class GwImportInp(GwAction):
         """Parse INP file, showing a log to the user"""
 
         # Create and show parsing dialog
-        self.dlg_inp_parsing = GwInpParsingUi()
+        self.dlg_inp_parsing = GwInpParsingUi(self)
         tools_gw.load_settings(self.dlg_inp_parsing)
         self.dlg_inp_parsing.rejected.connect(
             partial(tools_gw.save_settings, self.dlg_inp_parsing)
@@ -126,7 +126,7 @@ class GwImportInp(GwAction):
     def open_config_dialog(self) -> None:
         """Open the config INP import dialog"""
 
-        self.dlg_config = GwInpConfigImportUi()
+        self.dlg_config = GwInpConfigImportUi(self)
         tools_gw.load_settings(self.dlg_config)
         self.dlg_config.rejected.connect(
             partial(tools_gw.save_settings, self.dlg_config)
