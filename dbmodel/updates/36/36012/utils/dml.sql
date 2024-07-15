@@ -12,15 +12,17 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
 	VALUES ('edit toolbar','utils','v_ui_doc','id',0,true);
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
-	VALUES ('edit toolbar','utils','v_ui_doc','doc_type',2,true);
+    VALUES ('edit toolbar','utils','v_ui_doc','id_val',1,true);
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
-	VALUES ('edit toolbar','utils','v_ui_doc','path',3,true);
+	VALUES ('edit toolbar','utils','v_ui_doc','observ',2,true);
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
-	VALUES ('edit toolbar','utils','v_ui_doc','observ',1,true);
+	VALUES ('edit toolbar','utils','v_ui_doc','doc_type',3,true);
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
-	VALUES ('edit toolbar','utils','v_ui_doc','date',4,true);
+	VALUES ('edit toolbar','utils','v_ui_doc','path',4,true);
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
-	VALUES ('edit toolbar','utils','v_ui_doc','user_name',5,true);
+	VALUES ('edit toolbar','utils','v_ui_doc','date',5,true);
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
+	VALUES ('edit toolbar','utils','v_ui_doc','user_name',6,true);
 
 
 UPDATE config_form_tabs

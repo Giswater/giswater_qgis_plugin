@@ -8,3 +8,15 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE doc ADD the_geom public.geometry(point, SRID_VALUE) NULL;
+
+DROP VIEW if EXISTS v_ui_doc
+CREATE OR REPLACE VIEW v_ui_doc
+AS SELECT doc.id,
+    doc.id_val,
+    doc.observ,
+    doc.doc_type,
+    doc.path,
+    doc.date,
+    doc.user_name,
+    doc.tstamp
+   FROM doc;
