@@ -256,71 +256,76 @@ BEGIN
         SELECT cat_feature_id FROM sys_addfields WHERE cat_feature_id IS NOT NULL
         GROUP BY cat_feature_id
     LOOP
+        
+        v_cat_feature = ''|| rec_sys.cat_feature_id ||'';
+        v_feature_type = (SELECT lower(feature_type) FROM cat_feature where id=v_cat_feature);
+        v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
+        v_viewname = (SELECT lower(child_layer) FROM cat_feature where id=v_cat_feature);
+        v_feature_childtable_name := 'man_' || v_feature_type || '_' || lower(v_cat_feature);
+
+        --select columns from man_* table without repeating the identifier
+        EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_system_id||'.'',column_name)::text,'', '')
+        FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||'''
+        and column_name!='''||v_feature_type||'_id'''
+        INTO v_man_fields;
+
+        --select columns from v_feature_childtable_name.* table without repeating the identifiers
+        EXECUTE 'SELECT DISTINCT string_agg(concat('''||v_feature_childtable_name||'.'',column_name)::text,'', '')
+        FROM information_schema.columns where table_name='''||v_feature_childtable_name||''' and table_schema='''||v_schemaname||'''
+        and column_name!=''id'' and column_name!='''||v_feature_type||'_id'''
+        INTO v_feature_childtable_fields;
+
+        IF (v_man_fields IS NULL AND v_project_type='WS') OR
+            (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='arc' OR v_feature_type='node')) THEN
+
+            EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+            v_view_type = 4;
+           
+        ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
+        
+            EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+            v_view_type = 5;
+           
         ELSE
-            v_cat_feature = ''|| rec_sys.cat_feature_id ||'';
-            v_feature_type = (SELECT lower(feature_type) FROM cat_feature where id=v_cat_feature);
-            v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
-            v_viewname = (SELECT lower(child_layer) FROM cat_feature where id=v_cat_feature);
-            v_feature_childtable_name := 'man_' || v_feature_type || '_' || lower(v_cat_feature);
-
-            --select columns from man_* table without repeating the identifier
-            EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_system_id||'.'',column_name)::text,'', '')
-            FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||'''
-            and column_name!='''||v_feature_type||'_id'''
-            INTO v_man_fields;
-
-            --select columns from v_feature_childtable_name.* table without repeating the identifiers
-            EXECUTE 'SELECT DISTINCT string_agg(concat('''||v_feature_childtable_name||'.'',column_name)::text,'', '')
-            FROM information_schema.columns where table_name='''||v_feature_childtable_name||''' and table_schema='''||v_schemaname||'''
-            and column_name!=''id'' and column_name!='''||v_feature_type||'_id'''
-            INTO v_feature_childtable_fields;
-
-            IF (v_man_fields IS NULL AND v_project_type='WS') OR
-                (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='arc' OR v_feature_type='node')) THEN
-
-                EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                v_view_type = 4;
-            ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
-                EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                v_view_type = 5;
-            ELSE
-                EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                v_view_type = 6;
-            END IF;
-
-            v_man_fields := COALESCE(v_man_fields, 'null');
-            v_feature_childtable_fields := COALESCE(v_feature_childtable_fields, 'null');
-
-            v_data_view = '{
-            "schema":"'||v_schemaname ||'",
-            "body":{"viewname":"'||v_viewname||'",
-                "feature_type":"'||v_feature_type||'",
-                "feature_system_id":"'||v_feature_system_id||'",
-                "feature_cat":"'||v_cat_feature||'",
-                "feature_childtable_name":"'||v_feature_childtable_name||'",
-                "feature_childtable_fields":"'||v_feature_childtable_fields||'",
-                "man_fields":"'||v_man_fields||'",
-                "view_type":"'||v_view_type||'"
-                }
-            }';
-
-            PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
-
-            --create trigger on view
-            EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||' ON '||v_schemaname||'.'||v_viewname||';';
-
-            EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||'
-            INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
-            FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||v_cat_feature||''');';
-
-            INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-            VALUES (218, null, 4, concat('Recreate edition trigger for view ',v_viewname,'.'));
-
-            PERFORM gw_fct_admin_role_permissions();
-
-            INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-            VALUES (218, null, 4, 'Set role permissions.');
+        
+            EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+            v_view_type = 6;
+           
         END IF;
+
+        v_man_fields := COALESCE(v_man_fields, 'null');
+        v_feature_childtable_fields := COALESCE(v_feature_childtable_fields, 'null');
+
+        v_data_view = '{
+        "schema":"'||v_schemaname ||'",
+        "body":{"viewname":"'||v_viewname||'",
+            "feature_type":"'||v_feature_type||'",
+            "feature_system_id":"'||v_feature_system_id||'",
+            "feature_cat":"'||v_cat_feature||'",
+            "feature_childtable_name":"'||v_feature_childtable_name||'",
+            "feature_childtable_fields":"'||v_feature_childtable_fields||'",
+            "man_fields":"'||v_man_fields||'",
+            "view_type":"'||v_view_type||'"
+            }
+        }';
+
+        PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
+
+        --create trigger on view
+        EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||' ON '||v_schemaname||'.'||v_viewname||';';
+
+        EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||'
+        INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
+        FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||v_cat_feature||''');';
+
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+        VALUES (218, null, 4, concat('Recreate edition trigger for view ',v_viewname,'.'));
+
+        PERFORM gw_fct_admin_role_permissions();
+
+        INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+        VALUES (218, null, 4, 'Set role permissions.');
+       
 
     END LOOP;
 
