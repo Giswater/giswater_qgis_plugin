@@ -340,7 +340,7 @@ class GwImportInp(GwAction):
             (self.tbl_elements["features"], catalogs["features"]),
         ]:
             for element in _input:
-                if element in ["pipes", "materials", "features"]:
+                if type(_input[element]) is not tuple:
                     continue
 
                 combo = _input[element][0]
