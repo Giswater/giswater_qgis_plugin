@@ -8,6 +8,8 @@ or (at your option) any later version.
 import os
 import webbrowser
 from functools import partial
+from osgeo import gdal
+from pyproj import Proj, transform
 
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog
@@ -320,8 +322,12 @@ class GwDocument(QObject):
 
         # Prepare the_geom value
         the_geom = None
-        if str(self.point_xy['x']) not in ("", None, "None"):
-            the_geom = f"ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
+        if self.point_xy["x"] is not None and self.point_xy["y"] is not None:
+            if self.is_manual:
+                the_geom = f"ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
+            else:
+                # From img
+                the_geom = f"ST_SetSRID(ST_MakePoint({self.point_xy['y']},{self.point_xy['x']}), {srid})"
 
         # Check if this document already exists
         sql = (f"SELECT DISTINCT(id) FROM {table_object} WHERE id_val = '{id_val}'")
@@ -356,6 +362,9 @@ class GwDocument(QObject):
         self._update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
         self.doc_added.emit()
 
+        # Clear the_geom after use
+        self.point_xy = {"x": None, "y": None}
+        
         # Refresh manager table
         self._refresh_manager_table()
         tools_gw.execute_class_function(GwDocManagerUi, '_refresh_manager_table')
@@ -436,7 +445,7 @@ class GwDocument(QObject):
         row = selected_list[0].row()
 
         # Get object_id from selected row
-        field_object_id = "id_val"
+        field_object_id = "id"
         id_col_idx = tools_qt.get_col_index_by_col_name(widget, field_object_id)
         widget_id = table_object + "_id"
         selected_object_id = widget.model().item(row, id_col_idx).text()
@@ -466,7 +475,8 @@ class GwDocument(QObject):
 
 
     def _get_point_xy(self):
-
+        """ Capture point XY from the canvas """
+        self.is_manual = True
         self.snapper_manager.add_point(self.vertex_marker)
         self.point_xy = self.snapper_manager.point_xy
 
@@ -494,7 +504,15 @@ class GwDocument(QObject):
             for file in files_path:
                 file_text += f"{file}\n\n"
         if files_path:
-            tools_qt.set_widget_text(dialog, widget, str(file_text))
+            tools_qt.set_widget_text(dialog, widget, str("\n\n".join(files_path)))
+            self.files_path = files_path
+            self.is_manual = False
+            gps_coordinates = self.get_geolocation_gdal(files_path[0])
+            if gps_coordinates:
+                self.point_xy = {"x": gps_coordinates[1], "y": gps_coordinates[0]}
+            else:
+                self.point_xy = {"x": None, "y": None}
+
         return files_path
 
 
@@ -541,5 +559,48 @@ class GwDocument(QObject):
         # Check related @feature_type
         for feature_type in list_feature_type:
             tools_gw.get_rows_by_feature_type(self, dialog, table_object, feature_type)
+
+    def convert_to_degrees(self, value):
+        """ Convert GPS coordinates stored in EXIF to degrees """
+        d = float(value[0])
+        m = float(value[1])
+        s = float(value[2])
+        return d + (m / 60.0) + (s / 3600.0)
+
+    def get_geolocation_gdal(self, file_path):
+        """ Extract geolocation metadata from an image file using GDAL """
+        dataset = gdal.Open(file_path)
+        if not dataset:
+            return None
+
+        metadata = dataset.GetMetadata()
+        if not metadata:
+            return None
+
+        lat = metadata.get("EXIF_GPSLatitude")
+        lat_ref = metadata.get("EXIF_GPSLatitudeRef")
+        lon = metadata.get("EXIF_GPSLongitude")
+        lon_ref = metadata.get("EXIF_GPSLongitudeRef")
+
+        if lat and lon and lat_ref and lon_ref:
+            lat_values = lat.strip("()").split()
+            lon_values = lon.strip("()").split()
+            lat_values = [v.strip("(),") for v in lat_values]
+            lon_values = [v.strip("(),") for v in lon_values]
+
+            lat = self.convert_to_degrees(lat_values)
+            if lat_ref != "N":
+                lat = -lat
+            lon = self.convert_to_degrees(lon_values)
+            if lon_ref != "E":
+                lon = -lon
+
+            # Transform coord
+            in_proj = Proj(init='epsg:4326')
+            out_proj = Proj(init='epsg:25831')
+            x, y = transform(in_proj, out_proj, lon, lat)
+
+            return x, y
+
 
     # endregion
