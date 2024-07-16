@@ -43,6 +43,7 @@ v_man_fields text;
 v_feature_childtable_fields text;
 v_data_view json;
 exists_record BOOLEAN;
+v_exists_col boolean;
 
 BEGIN
 	
@@ -225,24 +226,109 @@ BEGIN
     END LOOP;
 
     FOR rec_mav IN
-        SELECT mav.feature_id, mav.value_param, sa.param_name, sa.datatype_id, cf.id, cf.feature_type, cf.child_layer
+        SELECT mav.feature_id, mav.value_param, mav.parameter_id, sa.param_name, sa.datatype_id, cf.id, cf.feature_type, cf.child_layer
         FROM _man_addfields_value_ mav
         INNER JOIN sys_addfields sa ON sa.id = mav.parameter_id
         INNER JOIN cat_feature cf ON cf.id = sa.cat_feature_id
         ORDER BY sa.param_name
     LOOP
         v_feature_childtable_name := 'man_' || lower(rec_mav.feature_type) || '_' || lower(rec_mav.id);
+        
+       -- check if feature_id exists in parent table
+        v_sql = 'select count(*) from vu_'||lower(rec_mav.feature_type)||' 
+                 where '||lower(rec_mav.feature_type)||'_id = '||quote_literal(rec_mav.feature_id)||'';
+        
+        execute v_sql into v_count;
 
-        EXECUTE 'SELECT EXISTS (SELECT 1 FROM '|| v_feature_childtable_name ||' WHERE '|| lower(rec_mav.feature_type) ||'_id = $1)' INTO exists_record USING rec_mav.feature_id;
+        if v_count = 0 then
+        
+            v_sql =  
+            'INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message, addparam)
+             SELECT 525, '||quote_literal(rec_mav.feature_id)||', '||quote_literal(rec_mav.feature_type)||', 
+             ''Non-existing feature_id for this addfield '',
+             json_build_object(''parameter_id'', '||quote_literal(rec_mav.parameter_id)||', ''value_param'', '||quote_literal(rec_mav.value_param)||') as js 
+             from _man_addfields_value_
+             WHERE feature_id = '||quote_literal(rec_mav.feature_id)||' AND parameter_id = '||quote_literal(rec_mav.parameter_id)||'';
+            
+            execute v_sql;
+        
+        elsif v_count > 0 then
+        
+            -- check if feature_type of the feature_id of the addfield matches the real feature_type of the object
+            v_sql = 'select count(*) from vu_'||lower(rec_mav.feature_type)||' 
+                     where '||lower(rec_mav.feature_type)||'_id = '||quote_literal(rec_mav.feature_id)||'
+                     AND '||lower(rec_mav.feature_type)||'_type  = '||quote_literal(rec_mav.id)||'';
 
-        IF (exists_record) IS TRUE THEN
-            EXECUTE 'UPDATE '|| v_feature_childtable_name ||' SET '|| rec_mav.param_name ||' = $2::'||rec_mav.datatype_id||' WHERE '|| v_feature_childtable_name ||'.'|| lower(rec_mav.feature_type) ||'_id=$1'
-            USING rec_mav.feature_id, rec_mav.value_param;
-        ELSE
-            EXECUTE 'INSERT INTO '|| v_feature_childtable_name ||' ('|| lower(rec_mav.feature_type) ||'_id, '|| rec_mav.param_name ||') VALUES ($1, $2::'||rec_mav.datatype_id||')'
-            USING rec_mav.feature_id, rec_mav.value_param;
-        END IF;
+            execute v_sql into v_count;
+                 
+            if v_count = 0 then
 
+                v_sql = 'INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message, addparam)
+                     SELECT 525, '||quote_literal(rec_mav.feature_id)||', '||quote_literal(rec_mav.feature_type)||', 
+                     ''The value of this addfield is related to a different feature_type from the existing feature.'',
+                     json_build_object(''parameter_id'', '||quote_literal(rec_mav.parameter_id)||', ''value_param'', '||quote_literal(rec_mav.value_param)||') as js 
+                     from _man_addfields_value_
+                     WHERE feature_id = '||quote_literal(rec_mav.feature_id)||' AND parameter_id = '||quote_literal(rec_mav.parameter_id)||'';
+               
+                execute v_sql;
+                
+            elsif v_count > 0 then -- feature_id and feature_type of _man_addfields_value match with an existing object in parent table
+            
+                -- check if man_feature_type table exist (addfield table)
+                v_sql = 'SELECT EXISTS (SELECT 1 FROM information_schema.TABLES WHERE table_schema = '||quote_literal(v_schemaname)||' 
+                AND table_name = '||quote_literal(v_feature_childtable_name)||')';
+            
+                execute v_sql into exists_record;
+            
+                IF (exists_record) IS FALSE THEN
+    
+                    -- create table and one column for each addfield
+                    v_sql = 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
+                            '|| lower(rec_sa.feature_type) || '_id varchar PRIMARY KEY,
+                            CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.feature_type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.feature_type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.feature_type) || '('|| lower(rec_sa.feature_type) || '_id) 
+                            ON UPDATE CASCADE ON DELETE CASCADE
+                        )';
+                
+                    execute v_sql;
+
+                    v_sql = 'ALTER TABLE ' || v_feature_childtable_name || ' ADD COLUMN ' || rec_mav.param_name || ' '||rec_mav.datatype_id||'';
+          
+                    EXECUTE v_sql;
+                    
+                    EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) 
+                    VALUES ('||quote_literal(v_feature_childtable_name)||', null, ''role_edit'') ON CONFLICT (id) DO NOTHING;';
+
+                ELSIF (exists_record) IS TRUE then
+           
+                   -- check if the corresponding column for the addfield exists in man_table_feature
+                    v_sql = 'SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = '||quote_literal(v_schemaname)||' 
+                            AND table_name = '||quote_literal(v_feature_childtable_name)||' AND column_name = '||quote_literal(rec_mav.param_name)||')';
+               
+                    execute v_sql into v_exists_col;
+            
+                    IF v_exists_col is false then
+                    
+                        v_sql = 'ALTER TABLE ' || v_feature_childtable_name || ' ADD COLUMN ' || rec_mav.param_name || ' '||rec_mav.datatype_id||'';
+        
+                        execute v_sql;  
+                    
+                    elsif v_exists_col is true then
+                
+                        v_sql = 'INSERT INTO man_'||lower(rec_mav.feature_type)|| '_' || lower(rec_mav.id)||'
+                            ('|| lower(rec_mav.feature_type) ||'_id, '|| rec_mav.param_name ||') 
+                            VALUES ('||quote_literal(rec_mav.feature_id)||', '||quote_literal(rec_mav.value_param)||'::'||rec_mav.datatype_id||')
+                            ON CONFLICT ('||lower(rec_mav.feature_type)||'_id) DO NOTHING';
+                        
+                        execute v_sql;
+                        
+                    end if;
+
+                 end if;        
+                        
+            end if;
+        
+        end if;  
+  
     END LOOP;
 
     -- recreate views
