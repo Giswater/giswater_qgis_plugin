@@ -80,9 +80,8 @@ BEGIN
                             ' || rec_sa_featurestypes.param_name || ' '||rec_sa_featurestypes.datatype_id||'
                         )';
 
-                    EXECUTE 'ALTER TABLE ' || v_feature_childtable_name || ' ADD CONSTRAINT ' || v_feature_childtable_name || '_fk FOREIGN KEY ('|| lower(rec_sa.feature_type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.feature_type) || '('|| lower(rec_sa.feature_type) || '_id) ON DELETE CASCADE;';
-
-                    EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| lower(rec_sa.feature_type) ||'_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| lower(rec_sa.feature_type) ||'_id)';
+                    EXECUTE 'ALTER TABLE ' || v_feature_childtable_name || ' ADD CONSTRAINT ' || v_feature_childtable_name || '_fk FOREIGN KEY ('|| lower(rec_sa.feature_type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.feature_type) || '('|| lower(rec_sa.feature_type) || '_id) 
+                    ON UPDATE CASCADE ON DELETE CASCADE;';
 
                     EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) VALUES ('||quote_literal(v_feature_childtable_name)||', null, ''role_edit'') ON CONFLICT (id) DO NOTHING;';
 
@@ -106,10 +105,9 @@ BEGIN
                     EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
                             '|| lower(rec_sa.type) || '_id varchar PRIMARY KEY,
                             ' || rec_sa_featurestypes.param_name || ' '||rec_sa_featurestypes.datatype_id||',
-                            CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.type) || '('|| lower(rec_sa.type) || '_id) ON DELETE CASCADE
+                            CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.type) || '('|| lower(rec_sa.type) || '_id) 
+                        ON UPDATE CASCADE ON DELETE CASCADE
                         )';
-
-                    EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| lower(rec_sa.type) ||'_id)';
 
                     EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) VALUES ('||quote_literal(v_feature_childtable_name)||', null, ''role_edit'') ON CONFLICT (id) DO NOTHING;';
 
@@ -133,10 +131,9 @@ BEGIN
                     EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
                             '|| lower(rec_sa.type) || '_id varchar PRIMARY KEY,
                             ' || rec_sa_featurestypes.param_name || ' '||rec_sa_featurestypes.datatype_id||',
-                            CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.type) || '('|| lower(rec_sa.type) || '_id) ON DELETE CASCADE
+                            CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.type) || '('|| lower(rec_sa.type) || '_id) 
+                            ON UPDATE CASCADE ON DELETE CASCADE
                         )';
-
-                    EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| lower(rec_sa.type) ||'_id)';
 
                     EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) VALUES ('||quote_literal(v_feature_childtable_name)||', null, ''role_edit'') ON CONFLICT (id) DO NOTHING;';
 
@@ -160,10 +157,9 @@ BEGIN
                     EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
                             '|| lower(rec_sa.type) || '_id varchar PRIMARY KEY,
                             ' || rec_sa_featurestypes.param_name || ' '||rec_sa_featurestypes.datatype_id||',
-                            CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.type) || '('|| lower(rec_sa.type) || '_id) ON DELETE CASCADE
+                            CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.type) || '('|| lower(rec_sa.type) || '_id) 
+                            ON UPDATE CASCADE ON DELETE CASCADE
                         )';
-
-                    EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| lower(rec_sa.type) ||'_id)';
 
                     EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) VALUES ('||quote_literal(v_feature_childtable_name)||', null, ''role_edit'') ON CONFLICT (id) DO NOTHING;';
 
@@ -187,10 +183,9 @@ BEGIN
                     EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
                             '|| lower(rec_sa.type) || '_id varchar PRIMARY KEY,
                             ' || rec_sa_featurestypes.param_name || ' '||rec_sa_featurestypes.datatype_id||',
-                            CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.type) || '('|| lower(rec_sa.type) || '_id) ON DELETE CASCADE
+                            CONSTRAINT ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_fk FOREIGN KEY ('|| lower(rec_sa.type) ||'_id) REFERENCES '|| v_schemaname ||'.'|| lower(rec_sa.type) || '('|| lower(rec_sa.type) || '_id) 
+                            ON UPDATE CASCADE ON DELETE CASCADE
                         )';
-
-                    EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| lower(rec_sa.type) ||'_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| lower(rec_sa.type) ||'_id)';
 
                     EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) VALUES ('||quote_literal(v_feature_childtable_name)||', null, ''role_edit'') ON CONFLICT (id) DO NOTHING;';
 
