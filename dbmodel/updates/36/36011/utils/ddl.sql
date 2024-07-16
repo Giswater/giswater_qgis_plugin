@@ -61,7 +61,7 @@ begin
 		on conflict (region_id, province_id) do nothing;
 	
 		-- drop province_id from ext_region
-		DROP VIEW SCHEMA_NAME.ext_region AS SELECT * FROM utils.region;
+		DROP VIEW SCHEMA_NAME.ext_region;
 		CREATE TABLE utils._region_ AS SELECT * FROM utils.region;
 		ALTER TABLE utils.region DROP COLUMN province_id;
 
