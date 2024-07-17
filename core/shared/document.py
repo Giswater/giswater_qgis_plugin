@@ -323,11 +323,7 @@ class GwDocument(QObject):
         # Prepare the_geom value
         the_geom = None
         if self.point_xy["x"] is not None and self.point_xy["y"] is not None:
-            if self.is_manual:
-                the_geom = f"ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
-            else:
-                # From img
-                the_geom = f"ST_SetSRID(ST_MakePoint({self.point_xy['y']},{self.point_xy['x']}), {srid})"
+            the_geom = f"ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
 
         # Check if this document already exists
         sql = (f"SELECT DISTINCT(id) FROM {table_object} WHERE id_val = '{id_val}'")
@@ -476,7 +472,6 @@ class GwDocument(QObject):
 
     def _get_point_xy(self):
         """ Capture point XY from the canvas """
-        self.is_manual = True
         self.snapper_manager.add_point(self.vertex_marker)
         self.point_xy = self.snapper_manager.point_xy
 
@@ -506,10 +501,9 @@ class GwDocument(QObject):
         if files_path:
             tools_qt.set_widget_text(dialog, widget, str("\n\n".join(files_path)))
             self.files_path = files_path
-            self.is_manual = False
             gps_coordinates = self.get_geolocation_gdal(files_path[0])
             if gps_coordinates:
-                self.point_xy = {"x": gps_coordinates[1], "y": gps_coordinates[0]}
+                self.point_xy = {"x": gps_coordinates[0], "y": gps_coordinates[1]}
             else:
                 self.point_xy = {"x": None, "y": None}
 
@@ -581,6 +575,7 @@ class GwDocument(QObject):
         lat_ref = metadata.get("EXIF_GPSLatitudeRef")
         lon = metadata.get("EXIF_GPSLongitude")
         lon_ref = metadata.get("EXIF_GPSLongitudeRef")
+        epsg = lib_vars.data_epsg
 
         if lat and lon and lat_ref and lon_ref:
             lat_values = lat.strip("()").split()
@@ -597,7 +592,7 @@ class GwDocument(QObject):
 
             # Transform coord
             in_proj = Proj(init='epsg:4326')
-            out_proj = Proj(init='epsg:25831')
+            out_proj = Proj(init=epsg)
             x, y = transform(in_proj, out_proj, lon, lat)
 
             return x, y
