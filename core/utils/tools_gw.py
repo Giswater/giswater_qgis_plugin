@@ -3161,7 +3161,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
     header = widget.horizontalHeader()
     for column_name, column_index in sorted(column_order.items(), key=lambda item: item[1]):
         col_idx = tools_qt.get_col_index_by_col_name(widget, column_name)
-        if col_idx != -1:
+        if col_idx not in (None, -1):
             header.moveSection(header.visualIndex(col_idx), column_index)
 
     for row in rows:
@@ -3190,7 +3190,8 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
         widget.model().select()
     # Delete columns
     for column in columns_to_delete:
-        widget.hideColumn(column)
+        if column:
+            widget.hideColumn(column)
 
     return widget
 
