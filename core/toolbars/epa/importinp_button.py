@@ -27,6 +27,7 @@ from ...utils import tools_gw
 from ..dialog import GwAction
 
 CREATE_NEW = "Create new"
+TESTING_MODE = False
 
 
 class ProjectType(Enum):
@@ -299,6 +300,43 @@ class GwImportInp(GwAction):
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
 
     def _importinp_accept(self):
+        if TESTING_MODE:
+
+            # Delete the network before importing
+            queries = [
+                'SELECT gw_fct_admin_manage_migra($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"action":"TRUE"}, "aux_params":null}}$$);',
+                'UPDATE arc SET node_1 = NULL, node_2 = NULL;',
+                'DELETE FROM ext_rtc_scada_x_data;',
+                'DELETE FROM config_graph_checkvalve;',
+                'DELETE FROM v_edit_connec;',
+                'DELETE FROM v_edit_node;',
+                'DELETE FROM inp_pump;',
+                'DELETE FROM v_edit_arc;'
+            ]
+            for sql in queries:
+                tools_db.execute_sql(sql)
+
+            # Set variables
+            workcat = "import_inp_test"
+            exploitation = 1
+            sector = 1
+            catalogs = {'pipes': {(57.0, 0.0025): 'INP-PIPE01', (57.0, 0.025): 'INP-PIPE02', (99.0, 0.0025): 'PELD110-PN10', (99.0, 0.025): 'FC110-PN10', (144.0, 0.0025): 'PVC160-PN16', (144.0, 0.025): 'FC160-PN10', (153.0, 0.03): 'INP-PIPE03', (204.0, 0.03): 'INP-PIPE04'}, 'materials': {0.025: 'FC', 0.0025: 'PVC', 0.03: 'FD'}, 'features': {'junctions': 'JUNCTION', 'pipes': 'PIPE', 'pumps': 'VARC', 'reservoirs': 'SOURCE', 'tanks': 'TANK', 'valves': 'VARC'}, 'junctions': 'JUNCTION DN110', 'reservoirs': 'SOURCE-01', 'tanks': 'TANK_01', 'pumps': 'INP-PUMP', 'valves': 'INP-VALVE'}
+
+            # Set background task 'Import INP'
+            description = "Import INP (TESTING MODE)"
+            self.import_inp_task = GwImportInpTask(
+                description,
+                self.file_path,
+                self.parse_inp_task.network,
+                workcat,
+                exploitation,
+                sector,
+                catalogs,
+            )
+            QgsApplication.taskManager().addTask(self.import_inp_task)
+            QgsApplication.taskManager().triggerTask(self.import_inp_task)
+            return
+
         # Workcat
         workcat: str = self.dlg_config.txt_workcat.text().strip()
 
