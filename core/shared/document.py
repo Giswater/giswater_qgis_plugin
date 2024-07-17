@@ -441,9 +441,9 @@ class GwDocument(QObject):
         row = selected_list[0].row()
 
         # Get object_id from selected row
-        field_object_id = "id"
+        field_object_id = "id_val"
         id_col_idx = tools_qt.get_col_index_by_col_name(widget, field_object_id)
-        widget_id = table_object + "_id"
+        widget_id = table_object + "_name"
         selected_object_id = widget.model().item(row, id_col_idx).text()
 
         # Close this dialog and open selected object
@@ -519,7 +519,7 @@ class GwDocument(QObject):
         if global_vars.project_type == 'ud':
             list_feature_type.append('gully')
 
-        object_id = tools_qt.get_text(dialog, table_object + "_id")
+        object_id = tools_qt.get_text(dialog, table_object + "_name")
 
         # Check if we already have data with selected object_id
         sql = (f"SELECT * "
