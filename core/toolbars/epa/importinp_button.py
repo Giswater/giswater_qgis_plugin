@@ -311,7 +311,8 @@ class GwImportInp(GwAction):
                 'DELETE FROM v_edit_connec;',
                 'DELETE FROM v_edit_node;',
                 'DELETE FROM inp_pump;',
-                'DELETE FROM v_edit_arc;'
+                'DELETE FROM v_edit_arc;',
+                'DELETE FROM cat_work WHERE id = $$import_inp_test$$'
             ]
             for sql in queries:
                 tools_db.execute_sql(sql)
