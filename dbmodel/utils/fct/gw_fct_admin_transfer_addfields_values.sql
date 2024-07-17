@@ -315,12 +315,27 @@ BEGIN
                         execute v_sql;
 
                     elsif v_exists_col is true then
+                    
+                        -- check if feature_id exists in man_feature_type table (addfield table)
+                        v_sql = 'select count(*) from man_'||lower(rec_mav.feature_type)|| '_' || lower(rec_mav.id)||' 
+                                 where '||lower(rec_mav.feature_type)||'_id = '||quote_literal(rec_mav.feature_id)||'';
+                        
+                        execute v_sql into v_count;
+                    
+                        if v_count = 0 then
+                            
+                            v_sql = 'insert into man_'||lower(rec_mav.feature_type)|| '_' || lower(rec_mav.id)||' ('||lower(rec_mav.feature_type)||'_id) 
+                                     values ('||quote_literal(rec_mav.feature_id)||')';
 
-                        v_sql = 'INSERT INTO man_'||lower(rec_mav.feature_type)|| '_' || lower(rec_mav.id)||'
-                            ('|| lower(rec_mav.feature_type) ||'_id, '|| rec_mav.param_name ||') 
-                            VALUES ('||quote_literal(rec_mav.feature_id)||', '||quote_literal(rec_mav.value_param)||'::'||rec_mav.datatype_id||')
-                            ON CONFLICT ('||lower(rec_mav.feature_type)||'_id) DO NOTHING';
-
+                            execute v_sql;
+                        
+                        end if;
+                            
+                        -- insert addfields by updating table
+                        v_sql = 'update man_'||lower(rec_mav.feature_type)|| '_' || lower(rec_mav.id)||' 
+                                 set '||rec_mav.param_name||' = '||quote_literal(rec_mav.value_param)||'::'||rec_mav.datatype_id||' 
+                                 where '||lower(rec_mav.feature_type)||'_id = '||quote_literal(rec_mav.feature_id)||'';
+                                
                         execute v_sql;
 
                     end if;
