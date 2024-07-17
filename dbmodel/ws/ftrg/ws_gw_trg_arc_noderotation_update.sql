@@ -75,6 +75,13 @@ BEGIN
 					UPDATE node set label_rotation=(ang_aux*(180/3.14159)-90) where node_id=rec_node.node_id;		
 				END IF;	
 				
+				-- force positive values for rotation
+				IF (SELECT rotation FROM node where node_id = rec_node.node_id) < 0 then 
+					UPDATE node set rotation = rotation + 360 where node_id =  rec_node.node_id;
+				ELSIF (SELECT rotation FROM node where node_id = rec_node.node_id) > 360 then
+					UPDATE node set rotation = rotation -360 where node_id =  rec_node.node_id;
+				END IF;
+
 			END LOOP;
 
 			RETURN NEW;
@@ -123,6 +130,13 @@ BEGIN
 		
 				ELSE
 					UPDATE node set rotation=(ang_aux*(180/3.14159)-90) where node_id=rec_node.node_id;		
+				END IF;
+
+			-- force positive values for rotation
+				IF (SELECT rotation FROM node where node_id = rec_node.node_id) < 0 then 
+					UPDATE node set rotation = rotation + 360 where node_id =  rec_node.node_id;
+				ELSIF (SELECT rotation FROM node where node_id = rec_node.node_id) > 360 then
+					UPDATE node set rotation = rotation -360 where node_id =  rec_node.node_id;
 				END IF;
 			
 			END LOOP;
@@ -178,6 +192,13 @@ BEGIN
 					UPDATE node set rotation=(ang_aux*(180/3.14159)-90) where node_id=rec_node.node_id;		
 				END IF;
 			
+				-- force positive values for rotation
+				IF (SELECT rotation FROM node where node_id = rec_node.node_id) < 0 then 
+					UPDATE node set rotation = rotation + 360 where node_id =  rec_node.node_id;
+				ELSIF (SELECT rotation FROM node where node_id = rec_node.node_id) > 360 then
+					UPDATE node set rotation = rotation -360 where node_id =  rec_node.node_id;
+				END IF;
+
 			END LOOP;
 	
 			RETURN OLD;
