@@ -4,8 +4,11 @@ from itertools import count, islice
 from typing import Any
 
 from psycopg2.extras import execute_values
-from wntr.epanet.util import FlowUnits, HydParam, from_si
-from wntr.network.model import WaterNetworkModel
+try:
+    from wntr.epanet.util import FlowUnits, HydParam, from_si
+    from wntr.network.model import WaterNetworkModel
+except ImportError:
+    pass
 
 from ...libs import lib_vars, tools_db, tools_log
 from .task import GwTask
