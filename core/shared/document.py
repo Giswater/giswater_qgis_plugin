@@ -12,8 +12,8 @@ from osgeo import gdal
 from pyproj import Proj, transform
 
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog
-from qgis.PyQt.QtCore import pyqtSignal, QObject
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QCompleter
+from qgis.PyQt.QtCore import pyqtSignal, QObject, Qt
 
 from ..utils import tools_gw
 from ..ui.ui_manager import GwDocUi, GwDocManagerUi
@@ -129,6 +129,12 @@ class GwDocument(QObject):
         table_object = "doc"
         tools_gw.set_completer_object(self.dlg_add_doc, table_object, field_id="name")
 
+        # Show existing names
+        doc_names = self._get_existing_doc_names()
+        completer = QCompleter(doc_names, self.dlg_add_doc)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        self.dlg_add_doc.doc_name.setCompleter(completer)
+
         # Adding auto-completion to a QLineEdit for default feature
         if feature_type is None:
             feature_type = "arc"
@@ -185,6 +191,13 @@ class GwDocument(QObject):
         tools_gw.open_dialog(self.dlg_add_doc, dlg_name='doc')
 
         return self.dlg_add_doc
+
+
+    def _get_existing_doc_names(self):
+        """ list of existing names """
+        sql = "SELECT name FROM doc ORDER BY name;"
+        rows = tools_db.get_rows(sql)
+        return [row['name'] for row in rows if 'name' in row]
 
 
     def manage_documents(self):
