@@ -127,7 +127,7 @@ class GwDocument(QObject):
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"
-        tools_gw.set_completer_object(self.dlg_add_doc, table_object, field_id="id_val")
+        tools_gw.set_completer_object(self.dlg_add_doc, table_object, field_id="name")
 
         # Adding auto-completion to a QLineEdit for default feature
         if feature_type is None:
@@ -199,14 +199,14 @@ class GwDocument(QObject):
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"
-        tools_gw.set_completer_object(self.dlg_man, table_object, field_id="id_val")
+        tools_gw.set_completer_object(self.dlg_man, table_object, field_id="name")
 
         status = self._fill_table()
         if not status:
             return False, False
 
         # Set signals
-        self.dlg_man.doc_id.textChanged.connect(self._fill_table)
+        self.dlg_man.doc_name.textChanged.connect(self._fill_table)
         self.dlg_man.tbl_document.doubleClicked.connect(
             partial(self._open_selected_object_document, self.dlg_man, self.dlg_man.tbl_document, table_object))
         self.dlg_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_man))
@@ -223,7 +223,7 @@ class GwDocument(QObject):
         view = "v_ui_doc"
         if filter_text is None:
             filter_text = ""
-        complet_list = tools_gw.get_list(view, filter_name=filter_text)
+        complet_list = tools_gw.get_list(view, filter_name=filter_text, id_field="name")
         if complet_list is False:
             return False
         for field in complet_list['body']['data']['fields']:
@@ -300,15 +300,15 @@ class GwDocument(QObject):
         """ Insert or update table 'document'. Add document to selected feature """
 
         # Get values from dialog
-        id_val = tools_qt.get_text(self.dlg_add_doc, "doc_name", False, False)
+        name = tools_qt.get_text(self.dlg_add_doc, "doc_name", False, False)
         doc_type = tools_qt.get_combo_value(self.dlg_add_doc, self.dlg_add_doc.doc_type)
         date = tools_qt.get_calendar_date(self.dlg_add_doc, "date", datetime_format="yyyy/MM/dd")
         path = tools_qt.get_text(self.dlg_add_doc, "path", return_string_null=False)
         observ = tools_qt.get_text(self.dlg_add_doc, "observ", False, False)
 
         # Validations
-        if not id_val:
-            message = "The 'id_val' field is mandatory."
+        if not name:
+            message = "The 'name' field is mandatory."
             tools_qgis.show_warning(message, dialog=self.dlg_add_doc)
             return
 
@@ -326,34 +326,34 @@ class GwDocument(QObject):
             the_geom = f"ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
 
         # Check if this document already exists
-        sql = (f"SELECT DISTINCT(id) FROM {table_object} WHERE id_val = '{id_val}'")
+        sql = (f"SELECT DISTINCT(id) FROM {table_object} WHERE name = '{name}'")
         row = tools_db.get_row(sql, log_info=False)
 
         # If document not exists perform an INSERT
         if row is None:
             if len(self.files_path) <= 1:
-                sql, doc_id = self._insert_doc_sql(doc_type, observ, date, path, the_geom, id_val)
+                sql, doc_id = self._insert_doc_sql(doc_type, observ, date, path, the_geom, name)
             else:
-                msg = ("You have selected multiple documents. In this case, id_val will be a sequential number for "
-                       "all selected documents and your id_val won't be used.")
+                msg = ("You have selected multiple documents. In this case, name will be a sequential number for "
+                       "all selected documents and your name won't be used.")
                 answer = tools_qt.show_question(msg, tools_qt.tr("Add document"))
                 if answer:
                     for file in self.files_path:
-                        sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file, the_geom, id_val)
+                        sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file, the_geom, name)
         else:
             doc_id = row['id']
             if len(self.files_path) <= 1:
-                sql = self._update_doc_sql(doc_type, observ, date, doc_id, path, the_geom, id_val)
+                sql = self._update_doc_sql(doc_type, observ, date, doc_id, path, the_geom, name)
             else:
-                msg = ("You have selected multiple documents. In this case, id_val will be a sequential number for "
-                       "all selected documents and your id_val won't be used.")
+                msg = ("You have selected multiple documents. In this case, name will be a sequential number for "
+                       "all selected documents and your name won't be used.")
                 answer = tools_qt.show_question(msg, tools_qt.tr("Add document"))
                 if answer:
                     for cont, file in enumerate(self.files_path):
                         if cont == 0:
-                            sql = self._update_doc_sql(doc_type, observ, date, doc_id, file, the_geom, id_val)
+                            sql = self._update_doc_sql(doc_type, observ, date, doc_id, file, the_geom, name)
                         else:
-                            sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file, the_geom, id_val)
+                            sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file, the_geom, name)
 
         self._update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
         self.doc_added.emit()
@@ -366,9 +366,9 @@ class GwDocument(QObject):
         tools_gw.execute_class_function(GwDocManagerUi, '_refresh_manager_table')
 
 
-    def _insert_doc_sql(self, doc_type, observ, date, path, the_geom, id_val):
-        fields = "doc_type, path, observ, date, id_val"
-        values = f"'{doc_type}', '{path}', '{observ}', '{date}', '{id_val}'"
+    def _insert_doc_sql(self, doc_type, observ, date, path, the_geom, name):
+        fields = "doc_type, path, observ, date, name"
+        values = f"'{doc_type}', '{path}', '{observ}', '{date}', '{name}'"
         if the_geom:
             fields += ", the_geom"
             values += f", {the_geom}"
@@ -380,9 +380,9 @@ class GwDocument(QObject):
         return sql, doc_id
 
 
-    def _update_doc_sql(self, doc_type, observ, date, doc_id, path, the_geom, id_val):
+    def _update_doc_sql(self, doc_type, observ, date, doc_id, path, the_geom, name):
         sql = (f"UPDATE doc "
-               f"SET doc_type = '{doc_type}', observ = '{observ}', path = '{path}', date = '{date}', id_val = '{id_val}'")
+               f"SET doc_type = '{doc_type}', observ = '{observ}', path = '{path}', date = '{date}', name = '{name}'")
         if the_geom:
             sql += f", the_geom = {the_geom}"
         sql += f" WHERE id = '{doc_id}';"
@@ -441,7 +441,7 @@ class GwDocument(QObject):
         row = selected_list[0].row()
 
         # Get object_id from selected row
-        field_object_id = "id_val"
+        field_object_id = "name"
         id_col_idx = tools_qt.get_col_index_by_col_name(widget, field_object_id)
         widget_id = table_object + "_name"
         selected_object_id = widget.model().item(row, id_col_idx).text()
@@ -519,12 +519,12 @@ class GwDocument(QObject):
         if global_vars.project_type == 'ud':
             list_feature_type.append('gully')
 
-        object_id = tools_qt.get_text(dialog, table_object + "_name")
+        object_name = tools_qt.get_text(dialog, table_object + "_name")
 
         # Check if we already have data with selected object_id
         sql = (f"SELECT * "
                f" FROM {table_object}"
-               f" WHERE id_val = '{object_id}'")
+               f" WHERE name = '{object_name}'")
         row = tools_db.get_row(sql, log_info=False)
 
         # If object_id not found: Clear data
