@@ -12,7 +12,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
 	VALUES ('edit toolbar','utils','v_ui_doc','id',0,true);
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
-    VALUES ('edit toolbar','utils','v_ui_doc','id_val',1,true);
+    VALUES ('edit toolbar','utils','v_ui_doc','name',1,true);
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
 	VALUES ('edit toolbar','utils','v_ui_doc','observ',2,true);
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
