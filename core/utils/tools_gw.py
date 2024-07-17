@@ -3161,11 +3161,13 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
     header = widget.horizontalHeader()
     for column_name, column_index in sorted(column_order.items(), key=lambda item: item[1]):
         col_idx = tools_qt.get_col_index_by_col_name(widget, column_name)
-        if col_idx not in (None, -1):
+        if col_idx is not None:
             header.moveSection(header.visualIndex(col_idx), column_index)
 
     for row in rows:
         col_idx = tools_qt.get_col_index_by_col_name(widget, row['columnname'])
+        if col_idx is None:
+            continue
         if not row['visible']:
             columns_to_delete.append(col_idx)
         else:
