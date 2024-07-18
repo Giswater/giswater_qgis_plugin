@@ -1174,7 +1174,10 @@ def delete_selected_rows(widget, table_object):
 
     for i in range(0, len(selected_list)):
         row = selected_list[i].row()
-        id_ = widget.model().record(row).value(str(field_object_id))
+        if isinstance(widget.model(), QStandardItemModel):
+            id_ = widget.model().item(row, 0).text()
+        else:
+            id_ = widget.model().record(row).value(str(field_object_id))
         inf_text += f"{id_}, "
         list_id += f"'{id_}', "
     inf_text = inf_text[:-2]
@@ -1186,7 +1189,8 @@ def delete_selected_rows(widget, table_object):
         sql = (f"DELETE FROM {table_object} "
                f"WHERE {field_object_id} IN ({list_id})")
         tools_db.execute_sql(sql)
-        widget.model().select()
+        if hasattr(widget.model(), 'select'):
+            widget.model().select()  # Refresh if it's a QSqlTableModel
 
 
 def set_tabs_enabled(dialog):

@@ -220,12 +220,17 @@ class GwDocument(QObject):
             partial(self._open_selected_object_document, self.dlg_man, self.dlg_man.tbl_document, table_object))
         self.dlg_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_man))
         self.dlg_man.rejected.connect(partial(tools_gw.close_dialog, self.dlg_man))
-        self.dlg_man.btn_delete.clicked.connect(
-            partial(tools_gw.delete_selected_rows, self.dlg_man.tbl_document, table_object))
+        self.dlg_man.btn_delete.clicked.connect(self._handle_delete)
         self.dlg_man.btn_create.clicked.connect(partial(self.open_document_dialog))
 
         # Open form
         tools_gw.open_dialog(self.dlg_man, dlg_name='doc_manager')
+
+
+    def _handle_delete(self):
+        tools_gw.delete_selected_rows(self.dlg_man.tbl_document, "doc")
+        self._refresh_manager_table()
+
 
     def _fill_table(self, filter_text=None):
         # Set a model with selected filter. Attach that model to selected table
@@ -258,12 +263,13 @@ class GwDocument(QObject):
 
 
     def _refresh_manager_table(self):
+        """ Refresh the manager table """
         try:
-            if getattr(self, 'dlg_man') and self.dlg_man:
-                self.dlg_man.tbl_document.model().select()
-        except:
-            pass
-
+            if getattr(self, 'dlg_man', None):
+                # Use the existing _fill_table method to refresh the table
+                self._fill_table()
+        except Exception as e:
+            print(f"Error refreshing manager table: {e}")
 
     def _fill_combo_doc_type(self, widget):
         """ Executes query and fill combo box """
