@@ -2612,10 +2612,15 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
         tools_qgis.clean_layer_group_from_toc('GW Temporal Layers')
 
 
-def get_rows_by_feature_type(class_object, dialog, table_object, feature_type):
+def get_rows_by_feature_type(class_object, dialog, table_object, feature_type, feature_id=None, feature_idname=None):
     """ Get records of @feature_type associated to selected @table_object """
 
-    object_id = tools_qt.get_text(dialog, table_object + "_id")
+    if feature_id is None:
+        feature_id = tools_qt.get_text(dialog, table_object + "_id")
+
+    if feature_idname is None:
+        feature_idname = f"{table_object}_id"
+
     table_relation = table_object + "_x_" + feature_type
     widget_name = "tbl_" + table_relation
 
@@ -2626,7 +2631,7 @@ def get_rows_by_feature_type(class_object, dialog, table_object, feature_type):
 
     sql = (f"SELECT {feature_type}_id "
            f"FROM {table_relation} "
-           f"WHERE {table_object}_id = '{object_id}'")
+           f"WHERE {feature_idname} = '{feature_id}'")
     rows = tools_db.get_rows(sql, log_info=False)
     if rows:
         for row in rows:

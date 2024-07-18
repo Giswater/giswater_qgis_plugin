@@ -117,6 +117,7 @@ class GwDocument(QObject):
                 tools_qt.set_calendar(self.dlg_add_doc, 'date', document_data.get('date', None))
 
                 self._activate_relations()
+                self._fill_dialog_document(self.dlg_add_doc, "doc", None, doc_id=item_id)
         else:
             tools_qt.set_calendar(self.dlg_add_doc, 'date', None)
 
@@ -156,7 +157,7 @@ class GwDocument(QObject):
             partial(tools_gw.get_signal_change_tab, self.dlg_add_doc, self.excluded_layers))
         self.dlg_add_doc.btn_add_geom.clicked.connect(self._get_point_xy)
         self.dlg_add_doc.doc_name.textChanged.connect(
-            partial(self._fill_dialog_document, self.dlg_add_doc, table_object, None))
+            partial(self._fill_dialog_document, self.dlg_add_doc, table_object, None, item_id))
         self.dlg_add_doc.btn_insert.clicked.connect(
             partial(tools_gw.insert_feature, self, self.dlg_add_doc, table_object, False, False, None, None))
         self.dlg_add_doc.btn_delete.clicked.connect(
@@ -368,7 +369,7 @@ class GwDocument(QObject):
 
         # Clear the_geom after use
         self.point_xy = {"x": None, "y": None}
-        
+
         # Refresh manager table
         self._refresh_manager_table()
         tools_gw.execute_class_function(GwDocManagerUi, '_refresh_manager_table')
@@ -520,12 +521,12 @@ class GwDocument(QObject):
         return files_path
 
 
-    def _fill_dialog_document(self, dialog, table_object, single_tool_mode=None):
+    def _fill_dialog_document(self, dialog, table_object, single_tool_mode=None, doc_id=None):
 
         # Reset list of selected records
         self.ids, self.list_ids = tools_gw.reset_feature_list()
 
-        list_feature_type = ['arc', 'node', 'connec', 'element']
+        list_feature_type = ['arc', 'node', 'connec', 'element', 'workcat']
         if global_vars.project_type == 'ud':
             list_feature_type.append('gully')
 
@@ -562,7 +563,7 @@ class GwDocument(QObject):
 
         # Check related @feature_type
         for feature_type in list_feature_type:
-            tools_gw.get_rows_by_feature_type(self, dialog, table_object, feature_type)
+            tools_gw.get_rows_by_feature_type(self, dialog, table_object, feature_type, feature_id=doc_id, feature_idname="doc_id")
 
     def convert_to_degrees(self, value):
         """ Convert GPS coordinates stored in EXIF to degrees """
