@@ -32,7 +32,7 @@
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="tab_doc">
          <attribute name="title">
@@ -401,7 +401,7 @@
           <item>
            <widget class="QTabWidget" name="tab_feature">
             <property name="currentIndex">
-             <number>0</number>
+             <number>4</number>
             </property>
             <widget class="QWidget" name="tab_arc">
              <attribute name="title">
@@ -452,6 +452,20 @@
              <layout class="QVBoxLayout" name="verticalLayout_8">
               <item>
                <widget class="QTableView" name="tbl_doc_x_gully">
+                <property name="sortingEnabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_workcat">
+             <attribute name="title">
+              <string>Workcat</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_3">
+              <item>
+               <widget class="QTableView" name="tbl_doc_x_workcat">
                 <property name="sortingEnabled">
                  <bool>true</bool>
                 </property>

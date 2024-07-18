@@ -40,7 +40,7 @@ class GwDocument(QObject):
         self.schema_name = lib_vars.schema_name
         self.files_path = []
         self.project_type = tools_gw.get_project_type()
-        self.doc_tables = ["doc_x_node","doc_x_arc","doc_x_connec","doc_x_gully"]
+        self.doc_tables = ["doc_x_node", "doc_x_arc", "doc_x_connec", "doc_x_gully", "doc_x_workcat"]
         self.point_xy = {"x": None, "y": None}
 
 
@@ -66,19 +66,17 @@ class GwDocument(QObject):
 
         # Setting lists
         self.ids = []
-        self.list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
-
-        # Setting layers
-        self.layers = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
-
+        self.list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': [], 'workcat': []}
+        self.layers = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': [], 'workcat': []}
         self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
         self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
         self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
         if self.project_type == 'ud':
             self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+        self.layers['workcat'] = tools_gw.get_layers_from_feature_type('workcat')
         self.layers['element'] = tools_gw.get_layers_from_feature_type('element')
 
-        params = ['arc', 'node', 'connec', 'gully']
+        params = ['arc', 'node', 'connec', 'gully', 'workcat']
         if list_tabs:
             for i in params:
                 if i not in list_tabs:
@@ -108,20 +106,17 @@ class GwDocument(QObject):
         # Fill combo boxes
         self._fill_combo_doc_type(self.dlg_add_doc.doc_type)
 
-        # Set current/selected date and link
-        if row:
-            date_item = row.child(0, 4)
-            path_item = row.child(0, 2)
-            if date_item is not None:
-                tools_qt.set_calendar(self.dlg_add_doc, 'date', date_item.text())
-            else:
-                tools_qt.set_calendar(self.dlg_add_doc, 'date', None)
+        if item_id:
+            sql = f"SELECT * FROM doc WHERE id = '{item_id}'"
+            document_data = tools_db.get_row(sql, log_info=False)
+            if document_data:
+                tools_qt.set_widget_text(self.dlg_add_doc, 'doc_name', document_data.get('name', ''))
+                tools_qt.set_widget_text(self.dlg_add_doc, 'doc_type', document_data.get('doc_type', ''))
+                tools_qt.set_widget_text(self.dlg_add_doc, 'observ', document_data.get('observ', ''))
+                tools_qt.set_widget_text(self.dlg_add_doc, 'path', document_data.get('path', ''))
+                tools_qt.set_calendar(self.dlg_add_doc, 'date', document_data.get('date', None))
 
-            if path_item is not None:
-                tools_qt.set_widget_text(self.dlg_add_doc, 'path', path_item.text())
-                self.files_path.append(path_item.text())
-            else:
-                tools_qt.set_widget_text(self.dlg_add_doc, 'path', '')
+                self._activate_relations()
         else:
             tools_qt.set_calendar(self.dlg_add_doc, 'date', None)
 
@@ -296,7 +291,7 @@ class GwDocument(QObject):
 
 
     def _fill_table_doc(self, dialog, feature_type, feature_id):
-
+        print("ENTRO FILL TABLE DOC")
         widget = "tbl_doc_x_" + feature_type
         widget = dialog.findChild(QTableView, widget)
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -423,6 +418,10 @@ class GwDocument(QObject):
             for feature_id in self.list_ids['connec']:
                 sql += (f"\nINSERT INTO doc_x_connec (doc_id, connec_id)"
                         f" VALUES ('{doc_id}', '{feature_id}');")
+        if self.list_ids['workcat']:
+            for feature_id in self.list_ids['workcat']:
+                sql += (f"\nINSERT INTO doc_x_workcat (doc_id, workcat_id)"
+                        f" VALUES ('{doc_id}', '{feature_id}');")
         if self.project_type == 'ud' and self.list_ids['gully']:
             for feature_id in self.list_ids['gully']:
                 sql += (f"\nINSERT INTO doc_x_gully (doc_id, gully_id)"
@@ -454,9 +453,8 @@ class GwDocument(QObject):
         row = selected_list[0].row()
 
         # Get object_id from selected row
-        field_object_id = "name"
+        field_object_id = "id"
         id_col_idx = tools_qt.get_col_index_by_col_name(widget, field_object_id)
-        widget_id = table_object + "_name"
         selected_object_id = widget.model().item(row, id_col_idx).text()
 
         # Close this dialog and open selected object
@@ -466,8 +464,7 @@ class GwDocument(QObject):
             dialog.close()
 
         # Assuming 'row' is the QStandardItemModel row data
-        self.get_document(row=widget.model().item(row, 0))
-        tools_qt.set_widget_text(self.dlg_add_doc, widget_id, selected_object_id)
+        self.get_document(row=widget.model().item(row, 0), item_id=selected_object_id)
 
 
     def _open_web_browser(self, dialog, widget=None):
