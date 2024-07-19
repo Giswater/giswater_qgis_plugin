@@ -68,7 +68,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Data for Name: audit_check_data; Type: TABLE DATA; Schema: Schema; Owner: -
 --
 
-INSERT INTO audit_check_data VALUES (1, 214, NULL, NULL, NULL, 1, NULL, '3.5.012 has an important enhancement for ws dscenarios. Due this v_edit_inp_demand view need to be replaced by v_edit_inp_dscenario_* (pipe/pump/valve/demand/reservoir/inlet)', '2024-01-29 13:41:52.388591', 'postgres', NULL, NULL, NULL, NULL);
+INSERT INTO audit_check_data VALUES (1, 214, NULL, NULL, NULL, 1, NULL, '3.5.012 has an important enhancement for ws dscenarios. Due this v_edit_inp_demand view need to be replaced by v_edit_inp_dscenario_* (pipe/pump/valve/demand/reservoir/inlet)', '2024-01-29 13:41:52.388591', current_user, NULL, NULL, NULL, NULL);
 
 
 --
