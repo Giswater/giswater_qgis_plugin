@@ -13,22 +13,26 @@ $BODY$
 /*
 SELECT SCHEMA_NAME.gw_fct_getfeatureboundary($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{},"feature":{"arc":[2001,2002], "node":[], "connec":[3001, 3002]},"data":{"type":"feature"}}$$)
 SELECT SCHEMA_NAME.gw_fct_getfeatureboundary($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{},"feature":{"update_tables":["node", "arc", "connec", "link"]},"data":{"type":"time", "lastSeed":"2023-05-05"}}$$)
+
+-- The tiler user need to have all the selector well configured on database because this function works with v_edit_ layers...
+
 */  
 
 DECLARE    
-  v_type text;
-  v_data json;
-  v_querynode text = '';
-  v_queryarc text = '';
-  v_queryconnec text = '';
-  v_querygully text = '';
-  v_array text;
-  v_querytext text;
-  v_boundary geometry;
-  v_geojson json;
-  v_lastseed text;
-  v_table text;
-  v_updatetables text;
+v_type text;
+v_data json;
+v_querynode text = '';
+v_queryarc text = '';
+v_queryconnec text = '';
+v_querygully text = '';
+v_array text;
+v_querytext text;
+v_boundary geometry;
+v_geojson json;
+v_lastseed text;
+v_table text;
+v_updatetables text;
+
 BEGIN
 
 	-- Set search path to local schema
@@ -55,28 +59,29 @@ BEGIN
 		FROM (', v_querytext, ') AS combined_geometries');
 
 	ELSIF v_type = 'feature' THEN
-	v_array =  COALESCE(replace(replace(((p_data ->>'feature')::json->>'node'),'[','('),']',')'),'()') ;
-	IF v_array != '()' THEN
-		v_querynode = concat('SELECT the_geom FROM v_edit_node WHERE node_id::integer IN ', v_array);
-	END IF;
+		v_array =  COALESCE(replace(replace(((p_data ->>'feature')::json->>'node'),'[','('),']',')'),'()') ;
+		IF v_array != '()' THEN
+			v_querynode = concat('SELECT the_geom FROM v_edit_node WHERE node_id::integer IN ', v_array);
+		END IF;
 
-	v_array =  COALESCE(replace(replace(((p_data ->>'feature')::json->>'arc'),'[','('),']',')'),'()') ;
-	IF v_array != '()' THEN
-		v_queryarc = concat('SELECT the_geom FROM v_edit_arc WHERE arc_id::integer IN ', v_array);
-	END IF;
+		v_array =  COALESCE(replace(replace(((p_data ->>'feature')::json->>'arc'),'[','('),']',')'),'()') ;
+		IF v_array != '()' THEN
+			v_queryarc = concat('SELECT the_geom FROM v_edit_arc WHERE arc_id::integer IN ', v_array);
+		END IF;
 
-	v_array =  COALESCE(replace(replace(((p_data ->>'feature')::json->>'connec'),'[','('),']',')'),'()') ;
-	IF v_array != '()' THEN
-		v_queryconnec = concat('SELECT the_geom FROM v_edit_connec WHERE connec_id::integer IN ', v_array);
-	END IF;
+		v_array =  COALESCE(replace(replace(((p_data ->>'feature')::json->>'connec'),'[','('),']',')'),'()') ;
+		IF v_array != '()' THEN
+			v_queryconnec = concat('SELECT the_geom FROM v_edit_connec WHERE connec_id::integer IN ', v_array);
+		END IF;
 
-	v_array =  COALESCE(replace(replace(((p_data ->>'feature')::json->>'gully'),'[','('),']',')'),'()') ;
-	IF v_array != '()' THEN
-		v_querygully = concat('SELECT the_geom FROM v_edit_gully WHERE gully_id::integer IN ', v_array);
-	END IF;
+		v_array =  COALESCE(replace(replace(((p_data ->>'feature')::json->>'gully'),'[','('),']',')'),'()') ;
+		IF v_array != '()' THEN
+			v_querygully = concat('SELECT the_geom FROM v_edit_gully WHERE gully_id::integer IN ', v_array);
+		END IF;
 
-	-- Building the query text
-	v_querytext = concat('SELECT ST_AsGeoJSON(ST_Collect(ST_Buffer(the_geom, 2))) from (', v_querynode, v_queryarc, v_queryconnec, v_querygully, ') a');
+		-- Building the query text
+		v_querytext = concat('SELECT ST_AsGeoJSON(ST_Collect(ST_Buffer(the_geom, 2))) from (', v_querynode, v_queryarc, v_queryconnec, v_querygully, ') a');
+
 	END IF;
 
 	-- Execute query text and set boundary geometry
