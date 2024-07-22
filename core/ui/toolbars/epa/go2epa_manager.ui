@@ -137,7 +137,7 @@
       <item row="1" column="3">
        <widget class="QPushButton" name="btn_archive">
         <property name="text">
-         <string>Archive</string>
+         <string>Toggle archive</string>
         </property>
        </widget>
       </item>

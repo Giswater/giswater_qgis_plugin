@@ -59,7 +59,7 @@ class GwGo2EpaManagerButton(GwAction):
         model.flags = lambda index: self.flags(index, model)
 
         # Set signals
-        self.dlg_manager.btn_archive.clicked.connect(partial(self._set_rpt_archived, self.dlg_manager.tbl_rpt_cat_result,
+        self.dlg_manager.btn_archive.clicked.connect(partial(self._toggle_rpt_archived, self.dlg_manager.tbl_rpt_cat_result,
                                                               'result_id'))
         self.dlg_manager.btn_set_corporate.clicked.connect(partial(self._epa2data, self.dlg_manager.tbl_rpt_cat_result,
                                                               'result_id'))
@@ -199,16 +199,23 @@ class GwGo2EpaManagerButton(GwAction):
     def _enable_buttons(self, selected):
         set_corporate_enabled, archive_enabled = True, True
         selected_rows = self.dlg_manager.tbl_rpt_cat_result.selectionModel().selectedRows()
+        last_status = None
         for idx, index in enumerate(selected_rows):
+            # set corporate
             col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'rpt_stats')
             row = index.row()
             status = index.sibling(row, col_idx).data()
             if not status:
                 set_corporate_enabled = False
+
+            # toggle archive
             col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'status')
             status = index.sibling(row, col_idx).data()
-            if status != 'COMPLETED':
+            if last_status is None:
+                last_status = status
+            if status == 'PARTIAL' or status != last_status:
                 archive_enabled = False
+            last_status = status
 
         if not selected_rows:
             set_corporate_enabled, archive_enabled = False, False
@@ -274,7 +281,7 @@ class GwGo2EpaManagerButton(GwAction):
             self._fill_manager_table(tools_qt.get_text(self.dlg_manager, 'txt_result_id'))
 
 
-    def _set_rpt_archived(self, widget, column_id):
+    def _toggle_rpt_archived(self, widget, column_id):
         """ Call gw_fct_set_rpt_archived with selected result_id
                 :param QTableView widget: origin
                 :param table_name: table origin
@@ -291,9 +298,12 @@ class GwGo2EpaManagerButton(GwAction):
         row = selected_list[0].row()
         col = tools_qt.get_col_index_by_col_name(widget, str(column_id))
         result_id = widget.model().index(row, col).data()
+        col = tools_qt.get_col_index_by_col_name(widget, "status")
+        status = widget.model().index(row, col).data()
 
         # check corporate
-        extras = f'"result_id":"{result_id}"'
+        action = 'RESTORE' if status == 'ARCHIVED' else 'ARCHIVE'
+        extras = f'"result_id":"{result_id}", "action": "{action}"'
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_set_rpt_archived', body)
 
