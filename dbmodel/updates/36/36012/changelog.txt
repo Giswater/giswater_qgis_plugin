@@ -1,3 +1,4 @@
 3.6.012
 *************
 - New function gw_fct_setpsectorcostremovedpipes (associated fid 523)
+- Separate `archived_*` tables into 3 tables (archived_rpt_inp_*, archived_rpt_*, archived_rpt_*_stats)

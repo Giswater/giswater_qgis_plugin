@@ -77,3 +77,41 @@ UPDATE config_form_tabs
 UPDATE config_form_tabs
 	SET orderby=4
 	WHERE formname='ve_node_water_connection' AND tabname='tab_hydrometer_val';
+
+
+-- 22/07/24
+INSERT INTO archived_rpt_inp_arc(
+	result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation,
+	diameter, roughness, length, status, the_geom, expl_id, flw_code, minorloss, addparam, arcparent, dma_id,
+	presszone_id, dqa_id, minsector_id, age)
+SELECT
+	result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation,
+	diameter, roughness, length, status, the_geom, expl_id, flw_code, minorloss, addparam, arcparent, dma_id,
+	presszone_id, dqa_id, minsector_id, age
+FROM _archived_rpt_arc;
+
+
+INSERT INTO archived_rpt_arc(
+	result_id, arc_id, length, diameter, flow, vel, headloss, setting, reaction, ffactor, other, time, status)
+SELECT
+	result_id, arc_id, rpt_length, rpt_diameter, flow, vel, headloss, setting, reaction, ffactor, other, time, rpt_status
+FROM _archived_rpt_arc;
+
+
+
+INSERT INTO archived_rpt_inp_node(
+	result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation,
+	demand, the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition, dma_id, presszone_id, dqa_id,
+	minsector_id, age)
+SELECT
+	result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation,
+	demand, the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition, dma_id, presszone_id, dqa_id,
+	minsector_id, age
+FROM _archived_rpt_node;
+
+
+INSERT INTO archived_rpt_node(
+	result_id, node_id, elevation, demand, head, press, other, time, quality)
+SELECT
+	result_id, node_id, rpt_elevation, rpt_demand, head, press, other, time, quality
+FROM _archived_rpt_node;
