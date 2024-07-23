@@ -301,11 +301,16 @@ class GwDocument(QObject):
         print("ENTRO FILL TABLE DOC")
         widget = "tbl_doc_x_" + feature_type
         widget = dialog.findChild(QTableView, widget)
+        print("WIDGET:", widget)
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)
         expr_filter = f"{feature_type}_id = '{feature_id}'"
 
         # Set model of selected widget
-        table_name = f"{self.schema_name}.v_edit_{feature_type}"
+        print(feature_type)
+        if feature_type == "workcat":
+            table_name = f"{self.schema_name}.cat_work"
+        else:
+            table_name = f"{self.schema_name}.v_edit_{feature_type}"
         message = tools_qt.fill_table(widget, table_name, expr_filter)
         if message:
             tools_qgis.show_warning(message)
@@ -405,40 +410,63 @@ class GwDocument(QObject):
 
 
     def _update_doc_tables(self, sql, doc_id, table_object, tablename, item_id, qtable):
+        # Inicializar las listas para cada tipo de característica
+        arc_ids = self.list_ids['arc']
+        node_ids = self.list_ids['node']
+        connec_ids = self.list_ids['connec']
+        workcat_ids = self.list_ids['workcat']
+        gully_ids = self.list_ids['gully']
 
-        # Manage records in tables @table_object_x_@feature_type
+        # Debugging: Print the lists of IDs to verify correct population
+        print(f"ARC IDs: {arc_ids}")
+        print(f"NODE IDs: {node_ids}")
+        print(f"CONNEC IDs: {connec_ids}")
+        print(f"WORKCAT IDs: {workcat_ids}")
+        print(f"GULLY IDs: {gully_ids}")
+
+        # Verificar existencia de IDs en tablas correspondientes
+        arc_ids = self._filter_existing_ids(arc_ids, 'arc', 'arc_id')
+        node_ids = self._filter_existing_ids(node_ids, 'node', 'node_id')
+        connec_ids = self._filter_existing_ids(connec_ids, 'connec', 'connec_id')
+        workcat_ids = self._filter_existing_ids(workcat_ids, 'workcat')
+        gully_ids = self._filter_existing_ids(gully_ids, 'gully', 'gully_id')
+
+        # Clear the current records
         for table in self.doc_tables:
             if table == 'doc_x_gully' and self.project_type != 'ud':
                 continue
-            sql += (f"\nDELETE FROM {table}"
-                    f" WHERE doc_id = '{doc_id}';")
+            sql += f"\nDELETE FROM {table} WHERE doc_id = '{doc_id}';"
 
-        if self.list_ids['arc']:
-            for feature_id in self.list_ids['arc']:
-                sql += (f"\nINSERT INTO doc_x_arc (doc_id, arc_id)"
-                        f" VALUES ('{doc_id}', '{feature_id}');")
-        if self.list_ids['node']:
-            for feature_id in self.list_ids['node']:
-                sql += (f"\nINSERT INTO doc_x_node (doc_id, node_id)"
-                        f" VALUES ('{doc_id}', '{feature_id}');")
-        if self.list_ids['connec']:
-            for feature_id in self.list_ids['connec']:
-                sql += (f"\nINSERT INTO doc_x_connec (doc_id, connec_id)"
-                        f" VALUES ('{doc_id}', '{feature_id}');")
-        if self.list_ids['workcat']:
-            for feature_id in self.list_ids['workcat']:
-                sql += (f"\nINSERT INTO doc_x_workcat (doc_id, workcat_id)"
-                        f" VALUES ('{doc_id}', '{feature_id}');")
-        if self.project_type == 'ud' and self.list_ids['gully']:
-            for feature_id in self.list_ids['gully']:
-                sql += (f"\nINSERT INTO doc_x_gully (doc_id, gully_id)"
-                        f" VALUES ('{doc_id}', '{feature_id}');")
+        # Insert the new records for arcs
+        for feature_id in arc_ids:
+            sql += f"\nINSERT INTO doc_x_arc (doc_id, arc_id) VALUES ('{doc_id}', '{feature_id}');"
 
+        # Insert the new records for nodes
+        for feature_id in node_ids:
+            sql += f"\nINSERT INTO doc_x_node (doc_id, node_id) VALUES ('{doc_id}', '{feature_id}');"
+
+        # Insert the new records for connec
+        for feature_id in connec_ids:
+            sql += f"\nINSERT INTO doc_x_connec (doc_id, connec_id) VALUES ('{doc_id}', '{feature_id}');"
+
+        # Insert the new records for workcat
+        for feature_id in workcat_ids:
+            sql += f"\nINSERT INTO doc_x_workcat (doc_id, workcat_id) VALUES ('{doc_id}', '{feature_id}');"
+
+        # Insert the new records for gully
+        if self.project_type == 'ud':
+            for feature_id in gully_ids:
+                sql += f"\nINSERT INTO doc_x_gully (doc_id, gully_id) VALUES ('{doc_id}', '{feature_id}');"
+
+        # Execute the SQL statements
+        print("Final SQL statement before execution:")
+        print(sql)
         status = tools_db.execute_sql(sql)
         if status:
             self.doc_id = doc_id
             tools_gw.manage_close(self.dlg_add_doc, table_object, None, self.single_tool_mode, self.layers)
 
+        # Update the associated table
         if tablename:
             sql = (f"INSERT INTO doc_x_{tablename} (doc_id, {tablename}_id) "
                    f" VALUES('{doc_id}', '{item_id}')")
@@ -447,6 +475,20 @@ class GwDocument(QObject):
             message = tools_qt.fill_table(qtable, f"{self.schema_name}.v_ui_doc_x_{tablename}", expr)
             if message:
                 tools_qgis.show_warning(message)
+
+    def _filter_existing_ids(self, ids, table_name, id_column=None):
+        valid_ids = []
+        for feature_id in ids:
+            if table_name == 'workcat':
+                sql = f"SELECT id FROM cat_work WHERE id = '{feature_id}'"
+            else:
+                sql = f"SELECT {id_column} FROM {table_name} WHERE {id_column} = '{feature_id}'"
+            row = tools_db.get_row(sql, log_info=False)
+            if row:
+                valid_ids.append(feature_id)
+            else:
+                print(f"Invalid ID {feature_id} for table {table_name}, skipping insertion.")
+        return valid_ids
 
 
     def _open_selected_object_document(self, dialog, widget, table_object):
