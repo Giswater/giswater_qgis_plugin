@@ -47,8 +47,7 @@ v_expl_id integer;
 v_man_table varchar;
 v_epa_table varchar;
 v_epa_table_new varchar;
-v_code_autofill boolean;
-v_code	int8;
+v_code text;
 v_id int8;
 v_old_feature_id varchar;
 v_workcat_id_end varchar;
@@ -106,6 +105,10 @@ v_presszone_id text;
 v_feature_childtable_name_old text;
 v_feature_childtable_name_new text;
 v_schemaname text;
+v_seq_name text;
+v_seq_code text;
+v_code_prefix text;
+v_code_autofill_bool boolean;
 
 BEGIN
 
@@ -249,13 +252,30 @@ BEGIN
 		-- new feature_id
 		v_id := (SELECT nextval('SCHEMA_NAME.urn_id_seq'));
 
-		-- code
-		EXECUTE 'SELECT code_autofill  FROM cat_feature WHERE id='''||v_old_featuretype||''';'
-		INTO v_code_autofill;
+		-- Code
+		IF v_project_type='WS' then
+			SELECT code_autofill, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_code_prefix FROM cat_feature 
+			JOIN cat_node ON cat_feature.id=cat_node.nodetype_id WHERE cat_node.id=v_featurecat_id_new;
+		ELSE
+			SELECT code_autofill, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_code_prefix
+			FROM cat_feature WHERE id=v_feature_type_new;
+		END IF;
+	
+		-- use specific sequence for code when its name matches featurecat_code_seq
+		EXECUTE 'SELECT concat('||quote_literal(lower(v_feature_type_new))||',''_code_seq'');' INTO v_seq_name;
+		EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||';' INTO v_sql;
 		
-		IF v_code_autofill IS TRUE THEN
+		
+		IF v_sql IS NOT NULL THEN
+			EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
+				v_code=concat(v_code_prefix,v_seq_code);
+		END IF;
+		
+		--Copy id to code field
+		IF (v_code_autofill_bool IS TRUE) AND v_code IS NULL THEN 
 			v_code = v_id;
 		END IF;
+
 		-- inserting new feature on parent tables
 		IF v_feature_type='node' THEN
 		
