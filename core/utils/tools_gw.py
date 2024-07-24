@@ -2219,9 +2219,13 @@ def get_expression_filter(feature_type, list_ids=None, layers=None):
     """
 
     list_ids = list_ids[feature_type]
-    field_id = feature_type + "_id"
     if len(list_ids) == 0:
         return None
+
+    if feature_type == 'workcat':
+        field_id = 'id'
+    else:
+        field_id = feature_type + "_id"
 
     # Set expression filter with features in the list
     expr_filter = field_id + " IN ("
@@ -2643,7 +2647,10 @@ def get_rows_by_feature_type(class_object, dialog, table_object, feature_type, f
             class_object.ids.append(str(row[0]))
 
         expr_filter = get_expression_filter(feature_type, class_object.list_ids, class_object.layers)
-        table_name = f"v_edit_{feature_type}"
+        if feature_type == "workcat":
+            table_name = f"{class_object.schema_name}.cat_work"
+        else:
+            table_name = f"{class_object.schema_name}.v_edit_{feature_type}"
         tools_qt.set_table_model(dialog, widget_name, table_name, expr_filter)
 
 

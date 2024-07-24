@@ -107,17 +107,8 @@ class GwDocument(QObject):
         self._fill_combo_doc_type(self.dlg_add_doc.doc_type)
 
         if item_id:
-            sql = f"SELECT * FROM doc WHERE id = '{item_id}'"
-            document_data = tools_db.get_row(sql, log_info=False)
-            if document_data:
-                tools_qt.set_widget_text(self.dlg_add_doc, 'doc_name', document_data.get('name', ''))
-                tools_qt.set_widget_text(self.dlg_add_doc, 'doc_type', document_data.get('doc_type', ''))
-                tools_qt.set_widget_text(self.dlg_add_doc, 'observ', document_data.get('observ', ''))
-                tools_qt.set_widget_text(self.dlg_add_doc, 'path', document_data.get('path', ''))
-                tools_qt.set_calendar(self.dlg_add_doc, 'date', document_data.get('date', None))
-
-                self._activate_relations()
-                self._fill_dialog_document(self.dlg_add_doc, "doc", None, doc_id=item_id)
+            self._fill_dialog_document(self.dlg_add_doc, "doc", None, doc_id=item_id)
+            self._activate_relations()
         else:
             tools_qt.set_calendar(self.dlg_add_doc, 'date', None)
 
@@ -298,15 +289,12 @@ class GwDocument(QObject):
 
 
     def _fill_table_doc(self, dialog, feature_type, feature_id):
-        print("ENTRO FILL TABLE DOC")
         widget = "tbl_doc_x_" + feature_type
         widget = dialog.findChild(QTableView, widget)
-        print("WIDGET:", widget)
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)
         expr_filter = f"{feature_type}_id = '{feature_id}'"
 
         # Set model of selected widget
-        print(feature_type)
         if feature_type == "workcat":
             table_name = f"{self.schema_name}.cat_work"
         else:
@@ -417,13 +405,6 @@ class GwDocument(QObject):
         workcat_ids = self.list_ids['workcat']
         gully_ids = self.list_ids['gully']
 
-        # Debugging: Print the lists of IDs to verify correct population
-        print(f"ARC IDs: {arc_ids}")
-        print(f"NODE IDs: {node_ids}")
-        print(f"CONNEC IDs: {connec_ids}")
-        print(f"WORKCAT IDs: {workcat_ids}")
-        print(f"GULLY IDs: {gully_ids}")
-
         # Verificar existencia de IDs en tablas correspondientes
         arc_ids = self._filter_existing_ids(arc_ids, 'arc', 'arc_id')
         node_ids = self._filter_existing_ids(node_ids, 'node', 'node_id')
@@ -459,8 +440,6 @@ class GwDocument(QObject):
                 sql += f"\nINSERT INTO doc_x_gully (doc_id, gully_id) VALUES ('{doc_id}', '{feature_id}');"
 
         # Execute the SQL statements
-        print("Final SQL statement before execution:")
-        print(sql)
         status = tools_db.execute_sql(sql)
         if status:
             self.doc_id = doc_id
@@ -579,17 +558,19 @@ class GwDocument(QObject):
             list_feature_type.append('gully')
 
         object_name = tools_qt.get_text(dialog, table_object + "_name")
-
+        filter_str = f"name = '{object_name}'"
+        if object_name in (None, "", "null"):
+            filter_str = f"id = '{doc_id}'"
         # Check if we already have data with selected object_id
         sql = (f"SELECT * "
                f" FROM {table_object}"
-               f" WHERE name = '{object_name}'")
+               f" WHERE {filter_str}")
         row = tools_db.get_row(sql, log_info=False)
 
         # If object_id not found: Clear data
         if not row:
             # Reset widgets
-            widgets = ["doc_type", "observ", "path"]
+            widgets = ["doc_name", "doc_type", "observ", "path"]
             if widgets:
                 for widget_name in widgets:
                     tools_qt.set_widget_text(dialog, widget_name, "")
@@ -605,6 +586,7 @@ class GwDocument(QObject):
             return
 
         # Fill input widgets with data of the @row
+        tools_qt.set_widget_text(dialog, "doc_name", row["name"])
         tools_qt.set_widget_text(dialog, "doc_type", row["doc_type"])
         tools_qt.set_widget_text(dialog, "observ", row["observ"])
         tools_qt.set_widget_text(dialog, "path", row["path"])
