@@ -116,12 +116,6 @@ class GwDocument(QObject):
         table_object = "doc"
         tools_gw.set_completer_object(self.dlg_add_doc, table_object, field_id="name")
 
-        # Show existing names
-        doc_names = self._get_existing_doc_names()
-        completer = QCompleter(doc_names, self.dlg_add_doc)
-        completer.setCaseSensitivity(Qt.CaseInsensitive)
-        self.dlg_add_doc.doc_name.setCompleter(completer)
-
         # Adding auto-completion to a QLineEdit for default feature
         if feature_type is None:
             feature_type = "arc"
@@ -147,8 +141,7 @@ class GwDocument(QObject):
         self.dlg_add_doc.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_add_doc, self.excluded_layers))
         self.dlg_add_doc.btn_add_geom.clicked.connect(self._get_point_xy)
-        self.dlg_add_doc.doc_name.textChanged.connect(
-            partial(self._fill_dialog_document, self.dlg_add_doc, table_object, None, item_id))
+        self.dlg_add_doc.doc_name.textChanged.connect(partial(self._check_doc_exists))
         self.dlg_add_doc.btn_insert.clicked.connect(
             partial(tools_gw.insert_feature, self, self.dlg_add_doc, table_object, False, False, None, None))
         self.dlg_add_doc.btn_delete.clicked.connect(
@@ -334,7 +327,7 @@ class GwDocument(QObject):
             the_geom = f"ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
 
         # Check if this document already exists
-        sql = (f"SELECT DISTINCT(id) FROM {table_object} WHERE name = '{name}'")
+        sql = f"SELECT DISTINCT(id) FROM {table_object} WHERE id = '{item_id}'"
         row = tools_db.get_row(sql, log_info=False)
 
         # If document not exists perform an INSERT
@@ -470,6 +463,19 @@ class GwDocument(QObject):
         return valid_ids
 
 
+    def _check_doc_exists(self, name=""):
+        sql = f"SELECT name FROM doc WHERE name = '{name}'"
+        row = tools_db.get_row(sql, log_info=False)
+        if row:
+            self.dlg_add_doc.btn_accept.setEnabled(False)
+            tools_qt.set_stylesheet(self.dlg_add_doc.doc_name)
+            self.dlg_add_doc.doc_name.setToolTip("Document name already exists")
+            return
+        self.dlg_add_doc.btn_accept.setEnabled(True)
+        tools_qt.set_stylesheet(self.dlg_add_doc.doc_name, style="")
+        self.dlg_add_doc.doc_name.setToolTip("")
+
+
     def _open_selected_object_document(self, dialog, widget, table_object):
 
         selected_list = widget.selectionModel().selectedRows()
@@ -567,27 +573,10 @@ class GwDocument(QObject):
                f" WHERE {filter_str}")
         row = tools_db.get_row(sql, log_info=False)
 
-        # If object_id not found: Clear data
-        if not row:
-            # Reset widgets
-            widgets = ["doc_name", "doc_type", "observ", "path"]
-            if widgets:
-                for widget_name in widgets:
-                    tools_qt.set_widget_text(dialog, widget_name, "")
-
-            if single_tool_mode is not None:
-                self.layers = tools_gw.remove_selection(single_tool_mode, self.layers)
-            else:
-                self.layers = tools_gw.remove_selection(True, self.layers)
-
-            for feature_type in list_feature_type:
-                tools_qt.reset_model(dialog, table_object, feature_type)
-
-            return
-
         # Fill input widgets with data of the @row
         tools_qt.set_widget_text(dialog, "doc_name", row["name"])
         tools_qt.set_widget_text(dialog, "doc_type", row["doc_type"])
+        tools_qt.set_calendar(dialog, "date", row["date"])
         tools_qt.set_widget_text(dialog, "observ", row["observ"])
         tools_qt.set_widget_text(dialog, "path", row["path"])
 
