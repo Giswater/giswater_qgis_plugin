@@ -10,19 +10,19 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('v_ui_doc', 'SELECT * FROM v_ui_doc WHERE id IS NOT NULL', 4, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, NULL);
 
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
-	VALUES ('edit toolbar','utils','v_ui_doc','id',0,true);
+	VALUES ('edit toolbar','utils','v_ui_doc','id',6,true);
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
-    VALUES ('edit toolbar','utils','v_ui_doc','name',1,true);
+    VALUES ('edit toolbar','utils','v_ui_doc','name',0,true);
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
-	VALUES ('edit toolbar','utils','v_ui_doc','observ',2,true);
+	VALUES ('edit toolbar','utils','v_ui_doc','observ',1,true);
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
-	VALUES ('edit toolbar','utils','v_ui_doc','doc_type',3,true);
+	VALUES ('edit toolbar','utils','v_ui_doc','doc_type',2,true);
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
-	VALUES ('edit toolbar','utils','v_ui_doc','path',4,true);
+	VALUES ('edit toolbar','utils','v_ui_doc','path',3,true);
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
-	VALUES ('edit toolbar','utils','v_ui_doc','date',5,true);
+	VALUES ('edit toolbar','utils','v_ui_doc','date',4,true);
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
-	VALUES ('edit toolbar','utils','v_ui_doc','user_name',6,true);
+	VALUES ('edit toolbar','utils','v_ui_doc','user_name',5,true);
 
 
 UPDATE config_form_tabs
@@ -46,3 +46,5 @@ UPDATE config_form_tabs
 	SET "label"='Hydrometer' WHERE tabname='tab_hydrometer';
 UPDATE config_form_tabs
 	SET "label"='Hydrometer consumptions' WHERE tabname='tab_hydrometer_val';
+
+UPDATE doc SET name = id WHERE name IS NULL;
