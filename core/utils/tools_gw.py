@@ -3051,6 +3051,9 @@ def insert_feature(class_object, dialog, table_object, is_psector=False, remove_
     enable_feature_type(dialog, table_object, ids=class_object.ids)
     connect_signal_selection_changed(class_object, dialog, table_object, feature_type)
 
+    # Clear the feature_id text field
+    tools_qt.set_widget_text(dialog, "feature_id", "")
+
 
 def remove_selection(remove_groups=True, layers=None):
     """ Remove all previous selections """
