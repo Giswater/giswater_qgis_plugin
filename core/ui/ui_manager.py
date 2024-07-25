@@ -182,6 +182,10 @@ class GwFeatureReplaceUi(GwDialog, FORM_CLASS):
 FORM_CLASS = _get_ui_class('featuretype_change.ui', 'edit')
 class GwFeatureTypeChangeUi(GwDialog, FORM_CLASS):
     pass
+
+FORM_CLASS = _get_ui_class('workcat_manager.ui', 'edit')
+class GwWorkcatManagerUi(GwDialog, FORM_CLASS):
+    pass
 # endregion
 
 
