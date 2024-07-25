@@ -230,6 +230,9 @@ BEGIN
 				UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', true) WHERE parameter = 'edit_arc_searchnodes';
 
 				UPDATE arc SET node_1=v_new_record.node_1, node_2=v_new_record.node_2 where arc_id=v_new_record.arc_id;
+                
+				-- remove duplicated vertex on new arc because of the fusion
+				UPDATE arc SET the_geom=ST_RemoveRepeatedPoints(the_geom) WHERE arc_id=v_new_record.arc_id;
 
 				v_arc_childtable_name := 'man_arc_' || lower(v_arc_type);
 
