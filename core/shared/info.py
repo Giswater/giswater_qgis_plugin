@@ -1884,9 +1884,7 @@ class GwInfo(QObject):
                 return False
 
             if clear_json:
-                _json = {}
-
-            self._reset_my_json(False)
+                _json.clear()
 
             if "Accepted" in json_result['status']:
                 msg_text = json_result['message']['text']
