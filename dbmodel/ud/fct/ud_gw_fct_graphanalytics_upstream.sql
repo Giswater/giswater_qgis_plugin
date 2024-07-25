@@ -182,7 +182,7 @@ BEGIN
 		'properties', to_jsonb(row) - 'the_geom',
 		'crs',concat('EPSG:',ST_SRID(the_geom))
 	) AS feature
-	FROM (SELECT node_id as feature_id, node_type as feature_type, 'Flow trace' as context, n.expl_id, n.the_geom
+	FROM (SELECT node_id as feature_id, n.node_type as feature_type, 'Flow trace' as context, n.expl_id, n.the_geom
 	FROM  anl_node join node n using (node_id) WHERE fid=v_fid
 	UNION
 	SELECT connec_id, 'CONNEC', 'Flow trace' as context, c.expl_id, c.the_geom
