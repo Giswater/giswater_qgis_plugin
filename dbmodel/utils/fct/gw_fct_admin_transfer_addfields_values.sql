@@ -227,11 +227,20 @@ BEGIN
         END IF;
     END LOOP;
 
+    -- insert into log tables those null addfield values
+    insert into audit_log_data (fid, feature_id, feature_type, log_message, addparam)
+    select 525, feature_id, cat_Feature_id, 'Null value on addfield',
+    concat('{"parameter_id": ', parameter_id, '}')::json
+    from _man_addfields_value_ mav
+    join sys_addfields sa ON sa.id = mav.parameter_id
+    where value_param is null;  
+
     FOR rec_mav IN
         SELECT mav.feature_id, mav.value_param, mav.parameter_id, sa.param_name, sa.datatype_id, cf.id, cf.feature_type, cf.child_layer
         FROM _man_addfields_value_ mav
         INNER JOIN sys_addfields sa ON sa.id = mav.parameter_id
         INNER JOIN cat_feature cf ON cf.id = sa.cat_feature_id
+        WHERE mav.value_param is not null
         ORDER BY sa.param_name
     LOOP
         v_feature_childtable_name := 'man_' || lower(rec_mav.feature_type) || '_' || lower(rec_mav.id);
