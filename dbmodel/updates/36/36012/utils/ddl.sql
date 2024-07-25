@@ -22,3 +22,7 @@ AS SELECT doc.id,
     doc.user_name,
     doc.tstamp
    FROM doc;
+
+
+--25/07/2024
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"addparam", "dataType":"json"}}$$);
