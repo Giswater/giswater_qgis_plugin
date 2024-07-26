@@ -151,8 +151,8 @@ BEGIN
 			JOIN sys_param_user a ON a.id=parameter	WHERE cur_user=current_user AND formname='epaoptions')t);
 	
 		DELETE FROM rpt_cat_result WHERE result_id=v_result;
-		INSERT INTO rpt_cat_result (result_id, inp_options, status, expl_id) VALUES (v_result, v_inpoptions, 1, v_expl);
-		DELETE FROM rpt_inp_pattern_value WHERE result_id=v_result;	
+		INSERT INTO rpt_cat_result (result_id, inp_options, status, expl_id) VALUES (v_result, v_inpoptions, 1, ARRAY[v_expl]);
+		DELETE FROM rpt_inp_pattern_value WHERE result_id=v_result;
 		DELETE FROM selector_inp_result WHERE cur_user=current_user;
 		INSERT INTO selector_inp_result (result_id, cur_user) VALUES (v_result, current_user);
 
