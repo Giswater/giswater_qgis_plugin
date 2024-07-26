@@ -26,3 +26,14 @@ AS SELECT doc.id,
 
 --25/07/2024
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"addparam", "dataType":"json"}}$$);
+
+--26/07/2024
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"expl_id_", "dataType":"int[]"}}$$);
+
+UPDATE rpt_cat_result SET expl_id_ = ARRAY[expl_id];
+
+DROP VIEW v_ui_rpt_cat_result;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"expl_id"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"rpt_cat_result", "column":"expl_id_", "newName":"expl_id"}}$$);
