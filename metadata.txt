@@ -8,7 +8,12 @@ version=3.6.012
 author=David Erill, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Elies Bertran, Abel García Juanes, Maria Guzmán, Jordi Blanch, Xavier Torret
 
 Changelog=Version 3.6.012
-
+    - Change "Set archive" button to "Toggle archive" (go2epa manager)
+    - Show the dates when an EPA result has been corporate
+    - Add the option to set geometry to a document (it can automatically get coordinates from the document's metadata)
+    - Add "name" field for documents
+    - Add workcat tab in document's relations
+    - Allow tab ordering in GwInfo (via config_form_tabs)
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
