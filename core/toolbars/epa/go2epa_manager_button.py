@@ -208,12 +208,16 @@ class GwGo2EpaManagerButton(GwAction):
             if not status:
                 set_corporate_enabled = False
 
+            col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'iscorporate')
+            row = index.row()
+            is_corporate = index.sibling(row, col_idx).data()
+
             # toggle archive
             col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'status')
             status = index.sibling(row, col_idx).data()
             if last_status is None:
                 last_status = status
-            if status == 'PARTIAL' or status != last_status:
+            if status == 'PARTIAL' or status != last_status or tools_os.set_boolean(is_corporate, False):
                 archive_enabled = False
             last_status = status
 
