@@ -301,7 +301,17 @@
        <item row="0" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_14">
          <item>
-          <widget class="QLineEdit" name="doc_id"/>
+          <widget class="QComboBox" name="doc_id">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
          <item>
           <spacer name="horizontalSpacer_19">
