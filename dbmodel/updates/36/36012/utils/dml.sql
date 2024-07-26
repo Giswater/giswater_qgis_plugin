@@ -48,3 +48,37 @@ UPDATE config_form_tabs
 	SET "label"='Hydrometer consumptions' WHERE tabname='tab_hydrometer_val';
 
 UPDATE doc SET name = id WHERE name IS NULL;
+
+
+-- 26/07/2024
+UPDATE config_form_tableview
+	SET columnindex=0
+	WHERE objectname='v_ui_rpt_cat_result' AND columnname='result_id';
+UPDATE config_form_tableview
+	SET columnindex=1
+	WHERE objectname='v_ui_rpt_cat_result' AND columnname='cur_user';
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
+	VALUES ('epa_toolbar','utils','v_ui_rpt_cat_result','expl_id',2,true);
+UPDATE config_form_tableview
+	SET columnindex=3
+	WHERE objectname='v_ui_rpt_cat_result' AND columnname='exec_date';
+UPDATE config_form_tableview
+	SET columnindex=4
+	WHERE objectname='v_ui_rpt_cat_result' AND columnname='status';
+UPDATE config_form_tableview
+	SET columnindex=5
+	WHERE objectname='v_ui_rpt_cat_result' AND columnname='iscorporate';
+UPDATE config_form_tableview
+	SET columnindex=6
+	WHERE objectname='v_ui_rpt_cat_result' AND columnname='export_options';
+UPDATE config_form_tableview
+	SET columnindex=7
+	WHERE objectname='v_ui_rpt_cat_result' AND columnname='network_stats';
+UPDATE config_form_tableview
+	SET columnindex=8
+	WHERE objectname='v_ui_rpt_cat_result' AND columnname='inp_options';
+UPDATE config_form_tableview
+	SET columnindex=9
+	WHERE objectname='v_ui_rpt_cat_result' AND columnname='rpt_stats';
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
+	VALUES ('epa_toolbar','utils','v_ui_rpt_cat_result','addparam',10,false);

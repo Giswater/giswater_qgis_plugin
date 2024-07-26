@@ -18,7 +18,8 @@ AS SELECT DISTINCT ON (rpt_cat_result.result_id) rpt_cat_result.result_id,
     rpt_cat_result.export_options,
     rpt_cat_result.network_stats,
     rpt_cat_result.inp_options,
-    rpt_cat_result.rpt_stats
+    rpt_cat_result.rpt_stats,
+    rpt_cat_result.addparam
    FROM selector_expl s,
     rpt_cat_result
      JOIN inp_typevalue ON rpt_cat_result.status::text = inp_typevalue.id::text
