@@ -55,7 +55,7 @@ BEGIN
 	v_addparam := jsonb_set(
 		v_addparam,
 		'{corporateLastDates}',
-		COALESCE(v_addparam->'corporateLastDates', '{}')::jsonb,
+		COALESCE(v_addparam->'corporateLastDates', '{"start": null, "end": null}')::jsonb,
 		true
 	);
 
@@ -137,6 +137,12 @@ BEGIN
 				v_addparam,
 				'{corporateLastDates,start}',
 				to_jsonb(now()::text)
+			);
+			--set end date to null
+			v_addparam := jsonb_set(
+				v_addparam,
+				'{corporateLastDates,end}',
+				'null'::jsonb
 			);
 			-- Update the table with the modified jsonb converted back to json
 			UPDATE rpt_cat_result SET addparam = v_addparam::json WHERE result_id = v_result_id;
