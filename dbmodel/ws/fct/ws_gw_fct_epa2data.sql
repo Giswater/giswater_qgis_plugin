@@ -136,7 +136,7 @@ BEGIN
 			v_addparam := jsonb_set(
 				v_addparam,
 				'{corporateLastDates,start}',
-				to_jsonb(now()::text)
+				to_jsonb(to_char(now(), 'DD-MM-YYY HH24:MI:SS')::text)
 			);
 			--set end date to null
 			v_addparam := jsonb_set(
@@ -160,7 +160,7 @@ BEGIN
 			v_addparam := jsonb_set(
 				v_addparam,
 				'{corporateLastDates,end}',
-				to_jsonb(now()::text)
+				to_jsonb(to_char(now(), 'DD-MM-YYY HH24:MI:SS')::text)
 			);
 			-- Update the table with the modified jsonb converted back to json
 			UPDATE rpt_cat_result SET addparam = v_addparam::json WHERE result_id = v_result_id;
