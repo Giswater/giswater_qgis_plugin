@@ -40,7 +40,8 @@ class GwDialog(QDialog):
                     elif item.layout() is not None:
                         self.layout().addLayout(item.layout(), row + 1, column, rowSpan, columnSpan)
             self.layout().addWidget(self.messageBar(), 0, 0, 1, -1)
-        except Exception:
+        except Exception as e:
+            print("Exception GWdialog: ", e)
             self._messageBar = global_vars.iface
 
         self.setProperty('class_obj', class_obj)
