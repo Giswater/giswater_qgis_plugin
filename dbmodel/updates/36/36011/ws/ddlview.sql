@@ -8,11 +8,11 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"systemId":"METER"},
- "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"meter_code" }}$$);
+-- SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"systemId":"METER"},
+--  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"meter_code" }}$$);
 
 
-CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS 
+CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS
  SELECT n.node_id,
     n.elevation,
     n.depth,
@@ -26,7 +26,7 @@ CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS
     concat(n.node_id, '_n2a') AS nodarc_id,
     inp_shortpipe.minorloss,
     c.to_arc,
-    CASE WHEN c.node_id is not null THEN 'CV'::varchar(12) when v.closed is true THEN 'CLOSED'::varchar(12) 
+    CASE WHEN c.node_id is not null THEN 'CV'::varchar(12) when v.closed is true THEN 'CLOSED'::varchar(12)
 	when v.closed is false THEN 'OPEN'::varchar(12) ELSE NULL::varchar(12) END status,
     inp_shortpipe.bulk_coeff,
     inp_shortpipe.wall_coeff,
@@ -39,7 +39,7 @@ CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS
   WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND n.is_operative IS TRUE;
 
 
-CREATE OR REPLACE VIEW ve_epa_shortpipe AS 
+CREATE OR REPLACE VIEW ve_epa_shortpipe AS
  SELECT inp_shortpipe.node_id,
     inp_shortpipe.minorloss,
     c.to_arc,
@@ -71,9 +71,9 @@ CREATE OR REPLACE VIEW ve_epa_shortpipe AS
      LEFT JOIN v_rpt_arc ON concat(inp_shortpipe.node_id, '_n2a') = v_rpt_arc.arc_id::text
      LEFT JOIN config_graph_checkvalve c ON c.node_id::text = inp_shortpipe.node_id::text
      LEFT JOIN man_valve v ON v.node_id::text = inp_shortpipe.node_id::text;
-	 
 
-INSERT INTO config_graph_checkvalve SELECT node_id, to_arc, true FROM inp_shortpipe WHERE status = 'CV' 
+
+INSERT INTO config_graph_checkvalve SELECT node_id, to_arc, true FROM inp_shortpipe WHERE status = 'CV'
 ON CONFLICT (node_id) DO NOTHING;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_shortpipe", "column":"status"}}$$);
@@ -137,7 +137,7 @@ AS SELECT presszone.presszone_id,
    FROM selector_expl,
     presszone
   WHERE (presszone.expl_id = selector_expl.expl_id OR presszone.expl_id2 = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text;
-  
+
 
 -- 19/06/2024
 CREATE OR REPLACE VIEW v_edit_plan_netscenario_dma
@@ -174,7 +174,7 @@ AS SELECT n.netscenario_id,
   WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_plan_netscenario_connec
-AS 
+AS
 SELECT n.netscenario_id,
     n.connec_id,
     n.presszone_id,
@@ -194,7 +194,7 @@ SELECT n.netscenario_id,
   WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_plan_netscenario_node
-AS 
+AS
 SELECT n.netscenario_id,
     n.node_id,
     n.presszone_id,
@@ -214,7 +214,7 @@ SELECT n.netscenario_id,
   WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_plan_netscenario_arc
-AS 
+AS
 SELECT n.netscenario_id,
     n.arc_id,
     n.presszone_id,
@@ -226,5 +226,5 @@ SELECT n.netscenario_id,
 	a.state_type
    FROM selector_netscenario,
     plan_netscenario_arc n
-   LEFT JOIN arc a using (arc_id)  
+   LEFT JOIN arc a using (arc_id)
   WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;

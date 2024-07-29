@@ -37,7 +37,7 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"feat
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"featureType":"ALL"},
 "data":{"action":"CREATE", "parameters":{"columnname":"mantenimiento", "datatype":"boolean",
-"widgettype":"check", "label":"Mantenimineto","ismandatory":"False", "active":"True", 
+"widgettype":"check", "label":"Mantenimineto","ismandatory":"False", "active":"True",
 "iseditable":"True", "layoutname":"lyt_data_1"}}}$$
 
 -- fid: 218
@@ -386,169 +386,12 @@ BEGIN
 
         END IF;
 
-        --get new values of addfields
-        IF v_action='DELETE' or v_action = 'DEACTIVATE' THEN
-            SELECT * INTO v_exists_addfields
-            FROM sys_addfields WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE AND param_name!=v_param_name;
-        ELSIF v_action = 'ACTIVATE' THEN
-            SELECT * INTO v_exists_addfields
-            FROM sys_addfields WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND (active IS TRUE OR param_name=v_param_name);
-        ELSE
-            SELECT * INTO v_exists_addfields
-            FROM sys_addfields WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;
-        END IF;
-
-        --select columns from man_* table without repeating the identifier
-        EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_system_id||'.'',column_name)::text,'', '')
-        FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||'''
-        and column_name!='''||v_feature_type||'_id'''
-        INTO v_man_fields;
-
-        --select columns from v_feature_childtable_name.* table without repeating the identifiers
-        EXECUTE 'SELECT DISTINCT string_agg(concat('''||v_feature_childtable_name||'.'',column_name)::text,'', '')
-        FROM information_schema.columns where table_name='''||v_feature_childtable_name||''' and table_schema='''||v_schemaname||'''
-        and column_name!=''id'' and column_name!='''||v_feature_type||'_id'''
-        INTO v_feature_childtable_fields;
-
-        --CREATE VIEW when the addfield is the 1st one for the defined cat feature
-        IF (SELECT count(id) FROM sys_addfields WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) and active is true ) = 1 AND v_action = 'CREATE' THEN
-
-            IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND
-                ( v_feature_type='arc' OR v_feature_type='node')) THEN
-
-                EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                v_view_type = 4;
-
-            ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
-
-                EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                v_view_type = 5;
-
-            ELSE
-                EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                v_view_type = 6;
-
-            END IF;
-
-            v_man_fields := COALESCE(v_man_fields, 'null');
-            v_feature_childtable_fields := COALESCE(v_feature_childtable_fields, 'null');
-
-            v_data_view = '{
-            "schema":"'||v_schemaname ||'",
-            "body":{"viewname":"'||v_viewname||'",
-                "feature_type":"'||v_feature_type||'",
-                "feature_system_id":"'||v_feature_system_id||'",
-                "feature_cat":"'||v_cat_feature||'",
-                "feature_childtable_name":"'||v_feature_childtable_name||'",
-                "feature_childtable_fields":"'||v_feature_childtable_fields||'",
-                "man_fields":"'||v_man_fields||'",
-                "view_type":"'||v_view_type||'"
-                }
-            }';
-
-            PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
-
-            INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-            VALUES (218, null, 4, concat('Recreate child view for ',v_cat_feature,'.'));
-
-        --CREATE VIEW when the addfields don't exist (after delete)
-        ELSIF v_exists_addfields is null THEN
-
-            IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND
-                ( v_feature_type='arc' OR v_feature_type='node')) THEN
-
-                EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                v_view_type = 1;
-
-            ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
-
-                EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                v_view_type = 2;
-
-            ELSE
-
-                EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                v_view_type = 3;
-
-            END IF;
-
-            RAISE NOTICE 'SIMPLE - VIEW TYPE  ,%', v_view_type;
-
-            v_man_fields := COALESCE(v_man_fields, 'null');
-            v_feature_childtable_fields := COALESCE(v_feature_childtable_fields, 'null');
-
-            v_data_view = '{
-            "schema":"'||v_schemaname ||'",
-            "body":{"viewname":"'||v_viewname||'",
-                "feature_type":"'||v_feature_type||'",
-                "feature_system_id":"'||v_feature_system_id||'",
-                "feature_cat":"'||v_cat_feature||'",
-                "feature_childtable_name":"'||v_feature_childtable_name||'",
-                "feature_childtable_fields":"'||v_feature_childtable_fields||'",
-                "man_fields":"'||v_man_fields||'",
-                "view_type":"'||v_view_type||'"
-                }
-            }';
-
-            PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
-
-            INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-            VALUES (218, null, 4, concat('Recreate child view for ',v_cat_feature,'.'));
-        ELSE
-            IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
-                ( v_feature_type='arc' OR v_feature_type='node')) THEN
-                
-                EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                v_view_type = 4;
-
-            ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
-
-                EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                v_view_type = 5;
-            ELSE
-                EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                v_view_type = 6;
-
-            END IF;
-
-            v_man_fields := COALESCE(v_man_fields, 'null');
-            v_feature_childtable_fields := COALESCE(v_feature_childtable_fields, 'null');
-
-            v_data_view = '{
-            "schema":"'||v_schemaname ||'",
-            "body":{"viewname":"'||v_viewname||'",
-                "feature_type":"'||v_feature_type||'",
-                "feature_system_id":"'||v_feature_system_id||'",
-                "feature_cat":"'||v_cat_feature||'",
-                "feature_childtable_name":"'||v_feature_childtable_name||'",
-                "feature_childtable_fields":"'||v_feature_childtable_fields||'",
-                "man_fields":"'||v_man_fields||'",
-                "view_type":"'||v_view_type||'"
-                }
-            }';
-
-            PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
-
-            INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-            VALUES (218, null, 4, concat('Recreate child view for ',v_cat_feature,'.'));
-        END IF;
-
-        --create trigger on view
-        EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||' ON '||v_schemaname||'.'||v_viewname||';';
-
-        EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||'
-        INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
-        FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||v_cat_feature||''');';
-
-        INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-        VALUES (218, null, 4, concat('Recreate edition trigger for view ',v_viewname,'.'));
-    
     -- MULTI ADDFIELD
     ELSE
         IF v_addfield_type = 'ALL' THEN
             -- INSERT ADDFIELD IN ALL FEATURES
             v_active_feature = 'SELECT cat_feature.* FROM cat_feature WHERE feature_type <> ''LINK'' AND active IS TRUE ORDER BY id';
-        ELSE 
+        ELSE
             -- INSERT ADDFIELD FOR SPECIFIC FEATURE: NODE, ARC, CONNEC, GULLY
             v_active_feature = 'SELECT cat_feature.* FROM cat_feature WHERE feature_type = '''|| v_addfield_type ||''' AND active IS TRUE ORDER BY id';
         END IF;
@@ -558,25 +401,25 @@ BEGIN
             IF v_action='UPDATE' THEN
                 UPDATE sys_addfields SET datatype_id=v_update_old_datatype where param_name=v_param_name AND cat_feature_id IS NULL;
             END IF;
-        
+
             -- get view name
             IF (SELECT child_layer FROM cat_feature WHERE id=rec.id) IS NULL THEN
                 UPDATE cat_feature SET child_layer=concat('ve_',lower(feature_type),'_',lower(id)) WHERE id=rec.id;
             END IF;
 
             -- remove spaces and dashs from view name
-            IF (SELECT child_layer FROM cat_feature WHERE id=rec.id AND (position('-' IN child_layer)>0 OR position(' ' IN child_layer)>0  
+            IF (SELECT child_layer FROM cat_feature WHERE id=rec.id AND (position('-' IN child_layer)>0 OR position(' ' IN child_layer)>0
                 OR position('.' IN child_layer)>0)) IS NOT NULL  THEN
-            
+
                 INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
                 VALUES (218, null, 4, concat('Remove unwanted characters from child view name: ',rec.id));
 
                 UPDATE cat_feature SET child_layer=replace(replace(replace(child_layer, ' ','_'),'-','_'),'.','_') WHERE id=rec.id;
-            
+
             END IF;
-    
+
             v_viewname = (SELECT child_layer FROM cat_feature WHERE id=rec.id);
-        
+
             -- get the system type and system_id of the feature, and the name for childtable
             v_feature_type = (SELECT lower(feature_type) FROM cat_feature where id=rec.id);
             v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=rec.id);
@@ -587,16 +430,16 @@ BEGIN
 
                 IF (SELECT count(id) FROM sys_addfields WHERE cat_feature_id IS NULL AND active IS TRUE) = 0 THEN
                     v_orderby = 10000;
-                ELSE 
+                ELSE
                     EXECUTE 'SELECT max(orderby) + 1 FROM sys_addfields'
                     INTO v_orderby;
                 END IF;
-            
+
                 INSERT INTO sys_addfields (param_name, cat_feature_id, is_mandatory, datatype_id,
                 active, orderby, iseditable, feature_type)
                 VALUES (v_param_name, NULL, v_ismandatory, v_add_datatype,
                 v_active, v_orderby, v_iseditable, v_addfield_type) RETURNING id INTO v_idaddparam;
-            
+
                 INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
                 VALUES (218, null, 4, 'Insert parameter definition into sys_addfields.');
 
@@ -612,15 +455,15 @@ BEGIN
                     VALUES (concat('edit_addfield_p', v_idaddparam,'_vdefault'),'config', concat('Default value of addfield ',v_param_name), 'role_edit', concat(v_param_name,':'),
                     'lyt_addfields', v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false,
                     v_querytext, v_querytextfilterc,v_param_name, true);
-        
+
                     INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
                     VALUES (218, null, 4, concat('Create new vdefault: ', concat('edit_addfield_p', v_idaddparam,'_vdefault')));
-            
+
                 END IF;
 
             ELSIF v_action = 'UPDATE' THEN
                 UPDATE sys_addfields SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
-                active=v_active, orderby=v_orderby, iseditable=v_iseditable 
+                active=v_active, orderby=v_orderby, iseditable=v_iseditable
                 WHERE param_name=v_param_name and cat_feature_id IS NULL;
 
                 INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -629,7 +472,7 @@ BEGIN
                 UPDATE sys_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_querytext,
                 dv_querytext_filterc = v_querytextfilterc WHERE id = concat('edit_addfield_p', v_idaddparam,'_vdefault');
 
-            
+
                 INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
                 VALUES (218, null, 4, concat('Update definition of vdefault: ', concat('edit_addfield_p', v_idaddparam,'_vdefault')));
 
@@ -639,11 +482,6 @@ BEGIN
 
                 EXECUTE 'DELETE FROM sys_addfields WHERE param_name='''||v_param_name||''' AND cat_feature_id IS NULL;';
 
-                EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_feature_childtable_name)) IS TRUE THEN
-                    EXECUTE 'ALTER TABLE ' || v_feature_childtable_name || ' DROP COLUMN ' || v_param_name || '';
-                END IF;
-                
                 DELETE FROM config_form_fields WHERE formname=v_viewname AND columnname=v_param_name;
 
                 INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -682,9 +520,9 @@ BEGIN
                 END IF;
 
                 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutorder, datatype, widgettype,
-                label, ismandatory, isparent, iseditable, isautoupdate, layoutname, 
+                label, ismandatory, isparent, iseditable, isautoupdate, layoutname,
                 placeholder, stylesheet, tooltip, widgetfunction, dv_orderby_id, dv_isnullvalue, widgetcontrols,
-                dv_parent_id, dv_querytext_filterc, dv_querytext,  linkedobject, hidden)	
+                dv_parent_id, dv_querytext_filterc, dv_querytext,  linkedobject, hidden)
                 VALUES (v_viewname, v_formtype, 'tab_data', v_param_name, v_layoutorder, v_config_datatype, v_config_widgettype,
                 v_label, v_ismandatory,v_isparent, v_iseditable, v_isautoupdate, v_layoutname,
                 v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_orderbyid, v_isnullvalue, v_jsonwidgetdim,
@@ -701,209 +539,41 @@ BEGIN
 
                 UPDATE config_form_fields SET datatype=v_config_datatype,
                 widgettype=v_config_widgettype, label=v_label, layoutname=v_layoutname,
-                ismandatory=v_ismandatory, isparent=v_isparent, iseditable=v_iseditable, isautoupdate=v_isautoupdate, 
-                placeholder=v_placeholder, stylesheet=v_stylesheet, tooltip=v_tooltip, 
+                ismandatory=v_ismandatory, isparent=v_isparent, iseditable=v_iseditable, isautoupdate=v_isautoupdate,
+                placeholder=v_placeholder, stylesheet=v_stylesheet, tooltip=v_tooltip,
                 widgetfunction=v_widgetfunction, dv_orderby_id=v_orderbyid, dv_isnullvalue=v_isnullvalue, widgetcontrols=v_jsonwidgetdim,
-                dv_parent_id=v_parentid, dv_querytext_filterc=v_querytextfilterc, 
+                dv_parent_id=v_parentid, dv_querytext_filterc=v_querytextfilterc,
                 dv_querytext=v_querytext, linkedobject=v_linkedobject, hidden = v_hidden
                 WHERE columnname=v_param_name AND formname=v_viewname;
 
                 INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
                 VALUES (218, null, 4, 'Update parameter in config_form_fields.');
-            
+
             END IF;
-            
-            --get new values of addfields
-            IF v_action='DELETE' or v_action = 'DEACTIVATE' THEN
-                SELECT * INTO v_exists_addfields
-                FROM sys_addfields WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE AND param_name!=v_param_name;
-            ELSIF v_action = 'ACTIVATE' THEN
-                SELECT * INTO v_exists_addfields
-                FROM sys_addfields WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND (active IS TRUE OR param_name=v_param_name);	
-            ELSE
-                SELECT * INTO v_exists_addfields
-                FROM sys_addfields WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE;
-            END IF;
-
-            --select columns from man_* table without repeating the identifier
-            EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_system_id||'.'',column_name)::text,'', '')
-            FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||'''
-            and column_name!='''||v_feature_type||'_id'''
-            INTO v_man_fields;
-
-            --select columns from v_feature_childtable_name.* table without repeating the identifiers
-            EXECUTE 'SELECT DISTINCT string_agg(concat('''||v_feature_childtable_name||'.'',column_name)::text,'', '')
-            FROM information_schema.columns where table_name='''||v_feature_childtable_name||''' and table_schema='''||v_schemaname||'''
-            and column_name!=''id'' and column_name!='''||v_feature_type||'_id'''
-            INTO v_feature_childtable_fields;
-                
-
-            --CREATE VIEW when the addfield is the 1st one for the defined cat feature
-            IF (SELECT count(id) FROM sys_addfields WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) and active is true ) = 1 AND v_action = 'CREATE' THEN
-    
-                IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
-                    ( v_feature_type='arc' OR v_feature_type='node')) THEN
-                    
-                    EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                    v_view_type = 4;
-
-                ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
-
-                    EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                    v_view_type = 5;
-                ELSE
-                    EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                    v_view_type = 6;
-
-                END IF;
-
-                RAISE NOTICE 'MULTI - VIEW TYPE  ,%', v_view_type;
-
-                v_man_fields := COALESCE(v_man_fields, 'null');
-                v_feature_childtable_fields := COALESCE(v_feature_childtable_fields, 'null');
-
-                v_data_view = '{
-                "schema":"'||v_schemaname ||'",
-                "body":{"viewname":"'||v_viewname||'",
-                    "feature_type":"'||v_feature_type||'",
-                    "feature_system_id":"'||v_feature_system_id||'",
-                    "feature_cat":"'||rec.id||'",
-                    "feature_childtable_name":"'||v_feature_childtable_name||'",
-                    "feature_childtable_fields":"'||v_feature_childtable_fields||'",
-                    "man_fields":"'||v_man_fields||'",
-                    "view_type":"'||v_view_type||'"
-                    }
-                }';
-
-                PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
-
-                INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-                VALUES (218, null, 4, concat('Recreate child view for ',rec.id,'.'));
-                
-            --CREATE VIEW when the addfields don't exist (after delete)
-            ELSIF v_exists_addfields is null THEN 
-
-                IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
-                    ( v_feature_type='arc' OR v_feature_type='node')) THEN
-                    
-                    EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                    v_view_type = 1;
-
-                ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
-                    
-                    EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                    v_view_type = 2;
-
-                ELSE
-                
-                    EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                    v_view_type = 3;
-
-                END IF;
-
-                RAISE NOTICE 'MULTI - VIEW TYPE  ,%', v_view_type;
-
-                v_man_fields := COALESCE(v_man_fields, 'null');
-                v_feature_childtable_fields := COALESCE(v_feature_childtable_fields, 'null');
-
-                v_data_view = '{
-                "schema":"'||v_schemaname ||'",
-                "body":{"viewname":"'||v_viewname||'",
-                    "feature_type":"'||v_feature_type||'",
-                    "feature_system_id":"'||v_feature_system_id||'",
-                    "feature_cat":"'||rec.id||'",
-                    "feature_childtable_name":"'||v_feature_childtable_name||'",
-                    "feature_childtable_fields":"'||v_feature_childtable_fields||'",
-                    "man_fields":"'||v_man_fields||'",
-                    "view_type":"'||v_view_type||'"
-                    }
-                }';
-
-                PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
-
-                INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-                VALUES (218, null, 4, concat('Recreate child view for ',rec.id,'.'));
-
-            ELSE	
-
-                 IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
-                    ( v_feature_type='arc' OR v_feature_type='node')) THEN
-                    
-                    EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                    v_view_type = 4;
-
-                ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
-
-                    EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                    v_view_type = 5;
-                ELSE
-                    EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-                    v_view_type = 6;
-
-                END IF;
-
-                v_man_fields := COALESCE(v_man_fields, 'null');
-                v_feature_childtable_fields := COALESCE(v_feature_childtable_fields, 'null');
-
-                v_data_view = '{
-                "schema":"'||v_schemaname ||'",
-                "body":{"viewname":"'||v_viewname||'",
-                    "feature_type":"'||v_feature_type||'",
-                    "feature_system_id":"'||v_feature_system_id||'",
-                    "feature_cat":"'||rec.id||'",
-                    "feature_childtable_name":"'||v_feature_childtable_name||'",
-                    "feature_childtable_fields":"'||v_feature_childtable_fields||'",
-                    "man_fields":"'||v_man_fields||'",
-                    "view_type":"'||v_view_type||'"
-                    }
-                }';
-
-                PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
-                
-                INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-                VALUES (218, null, 4, concat('Recreate child view for ',rec.id,'.'));	
-            END IF;
-
-            --create trigger on view 
-            EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(rec.id, ' ','_'),'-','_'),'.','_'))||' ON '||v_schemaname||'.'||v_viewname||';';
-
-            EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(rec.id, ' ','_'),'-','_'),'.','_'))||'
-            INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
-            FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||rec.id||''');';
-
-            INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-            VALUES (218, null, 4, concat('Recreate edition trigger for view ',rec.child_layer,'.'));
-
-
         END LOOP;
-    
+
     END IF;
-
-	PERFORM gw_fct_admin_role_permissions();
-
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-	VALUES (218, null, 4, 'Set role permissions.');
 
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-	FROM (SELECT id, error_message as message FROM audit_check_data 
+	FROM (SELECT id, error_message as message FROM audit_check_data
 	WHERE cur_user="current_user"() AND fid=218 ORDER BY criticity desc, id asc) row;
-	
+
 	IF v_audit_result is null THEN
         v_status = 'Accepted';
         v_level = 3;
         v_message = 'Process done successfully';
     ELSE
 
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status;
         SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
         SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
 
     END IF;
 
 	-- Control NULL's
-	v_result_info := COALESCE(v_result, '{}'); 
+	v_result_info := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
 	v_result_point = '{"geometryType":"", "features":[]}';

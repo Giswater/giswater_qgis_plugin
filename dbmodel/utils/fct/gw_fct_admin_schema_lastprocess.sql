@@ -477,6 +477,10 @@ BEGIN
 			END IF;
 		END IF;
 
+		-- recreate views
+		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+		"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
+
 		--reset sequences and id of anl, temp and audit tables
 		PERFORM gw_fct_admin_reset_sequences();
 
