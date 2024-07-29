@@ -41,3 +41,17 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"rpt_cat_
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"network_type", "dataType":"text"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"sector_id", "dataType":"int[]"}}$$);
+
+--29/07/2024
+DROP VIEW if EXISTS v_ui_doc_x_workcat;
+CREATE OR REPLACE VIEW v_ui_doc_x_workcat
+AS SELECT doc_x_workcat.id,
+    doc_x_workcat.workcat_id,
+    doc.name,
+    doc.doc_type,
+    doc.path,
+    doc.observ,
+    doc.date,
+    doc.user_name
+   FROM doc_x_workcat
+     JOIN doc ON doc.id::text = doc_x_workcat.doc_id::text;
