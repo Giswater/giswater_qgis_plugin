@@ -1,5 +1,5 @@
 """
-This file is part of Pavements
+This file is part of  Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -199,10 +199,10 @@ class GwWorkcat:
         self._set_enable_qatable_by_state(self.items_dialog.tbl_psm, 1, self.items_dialog.btn_state1)
         self._set_enable_qatable_by_state(self.items_dialog.tbl_psm_end, 0, self.items_dialog.btn_state0)
 
-        # Crea y configura el QComboBox
-        sql = "SELECT id, name FROM v_ui_doc ORDER BY name"
+        # Create and configure QComboBox
+        sql = "SELECT id, name as idval FROM v_ui_doc ORDER BY name"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.items_dialog.doc_id, rows, index_to_show=1)
+        tools_qt.fill_combo_values(self.items_dialog.doc_id, rows, index_to_show=1, add_empty=True)
         tools_qt.set_autocompleter(self.items_dialog.doc_id)
 
         table_name = "v_ui_workcat_x_feature"
@@ -550,7 +550,7 @@ class GwWorkcat:
         doc_id = tools_qt.get_combo_value(dialog, dialog.doc_id)
 
         if not doc_id:
-            message = "You need to insert doc_id"
+            message = "Any document selected"
             tools_qgis.show_warning(message, dialog=dialog)
             return
 
@@ -572,6 +572,9 @@ class GwWorkcat:
             message = "Document inserted successfully"
             tools_qgis.show_info(message, dialog=dialog)
 
+        dialog.doc_id.blockSignals(True)
+        dialog.doc_id.setCurrentIndex(0)
+        dialog.doc_id.blockSignals(False)
         dialog.tbl_document.model().select()
 
 
