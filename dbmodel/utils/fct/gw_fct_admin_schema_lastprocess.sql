@@ -13,7 +13,7 @@ $BODY$
 /*EXAMPLE
 
 SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${
-"client":{"lang":"ES"}, 
+"client":{"lang":"ES"},
 "data":{"isNewProject":"TRUE", "gwVersion":"3.1.105", "projectType":"WS",
 		"epsg":"25831", "title":"test project", "author":"test", "date":"01/01/2000", "superUsers":["postgres", "giswater"]}}$$)
 
@@ -27,7 +27,7 @@ SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${
 
 */
 
-DECLARE 
+DECLARE
 
 v_dbnname varchar;
 v_projecttype text;
@@ -60,11 +60,11 @@ v_definition text;
 rec_viewname text;
 rec_feature record;
 
-BEGIN 
+BEGIN
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
-	
+
 	-- get input parameters
 	v_gwversion := (p_data ->> 'data')::json->> 'gwVersion';
 	v_language := (p_data ->> 'client')::json->> 'lang';
@@ -119,20 +119,20 @@ BEGIN
 
 		-- create triggers for the oposite tables against typevalues
 		PERFORM gw_fct_admin_manage_triggers('fk','ALL');
-		
+
 		-- create notifications triggers
 		PERFORM gw_fct_admin_manage_triggers('notify',null);
-		
+
 		-- update cat feature triggering default values and others
 		UPDATE cat_feature SET id=id;
-		
+
 		-- last proccess
 		IF v_isnew IS TRUE THEN
-		
+
 			-- inserting version table
 			INSERT INTO sys_version (giswater, project_type, postgres, postgis, language, epsg) VALUES (v_gwversion, upper(v_projecttype), (select version()),
 			(select postgis_version()), v_language, v_epsg);
-					
+
 			-- create json info_schema
 			v_descript := COALESCE(v_descript, '');
 			v_name := COALESCE(v_name, '');
@@ -140,31 +140,31 @@ BEGIN
 			v_date := COALESCE(v_date, '');
 
 			v_schema_info = '{"name":"'||v_name||'","descript":"'||v_descript||'","author":"'||v_author||'","date":"'||v_date||'"}';
-			
+
 			-- drop deprecated tables
-			FOR v_tablename IN SELECT table_name FROM information_schema.tables WHERE table_schema=v_schemaname and substring(table_name,1 , 1) = '_' 
+			FOR v_tablename IN SELECT table_name FROM information_schema.tables WHERE table_schema=v_schemaname and substring(table_name,1 , 1) = '_'
 			LOOP
 				EXECUTE 'DROP TABLE IF EXISTS '||v_tablename.table_name||' CASCADE';
 			END LOOP;
-			
+
 			-- enable triggers
 			ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
 			ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_typevalue_fk;
-			
+
 			-- set mapzones symbology
             UPDATE config_param_system SET value = (replace(value, 'Random', 'Disable')) WHERE parameter='utils_graphanalytics_style';
             UPDATE config_param_system SET value = (replace(value, 'Stylesheet', 'Disable')) WHERE parameter='utils_graphanalytics_style';
 
 			-- reset sequences
-			IF v_projecttype = 'UD' THEN 
+			IF v_projecttype = 'UD' THEN
 				ALTER SEQUENCE SCHEMA_NAME.cat_dwf_scenario_id_seq MINVALUE 0;
 				ALTER SEQUENCE SCHEMA_NAME.cat_hydrology_hydrology_id_seq MINVALUE 0;
 				PERFORM setval('SCHEMA_NAME.cat_dwf_scenario_id_seq',0);
 				PERFORM setval('SCHEMA_NAME.cat_hydrology_hydrology_id_seq',0);
 			END IF;
-			
+
 			-- drop deprecated views
-			IF v_projecttype = 'WS' THEN 
+			IF v_projecttype = 'WS' THEN
 				DROP VIEW IF EXISTS v_edit_man_varc;
 				DROP VIEW IF EXISTS v_edit_man_pipe;
 				DROP VIEW IF EXISTS v_edit_man_expansiontank;
@@ -192,10 +192,10 @@ BEGIN
 				DROP VIEW IF EXISTS v_edit_man_fountain_pol;
 				DROP VIEW IF EXISTS v_edit_man_register_pol;
 				DROP VIEW IF EXISTS v_edit_man_tank_pol;
-				DROP VIEW IF EXISTS v_anl_mincut_planified_arc;	
+				DROP VIEW IF EXISTS v_anl_mincut_planified_arc;
 				DROP VIEW IF EXISTS v_anl_mincut_planified_valve;
 				DROP VIEW IF EXISTS v_anl_mincut_result_arc;
-				DROP VIEW IF EXISTS v_anl_mincut_result_audit;			
+				DROP VIEW IF EXISTS v_anl_mincut_result_audit;
 				DROP VIEW IF EXISTS v_anl_mincut_result_conflict_arc;
 				DROP VIEW IF EXISTS v_anl_mincut_result_conflict_valve;
 				DROP VIEW IF EXISTS v_anl_mincut_result_connec;
@@ -203,10 +203,10 @@ BEGIN
 				DROP VIEW IF EXISTS v_anl_mincut_result_node;
 				DROP VIEW IF EXISTS v_anl_mincut_result_polygon;
 				DROP VIEW IF EXISTS v_anl_mincut_result_valve;
-				
-			
+
+
 			ELSIF v_projecttype = 'UD' THEN
-			
+
 				DROP VIEW IF EXISTS v_edit_man_chamber;
 				DROP VIEW IF EXISTS v_edit_man_chamber_pol;
 				DROP VIEW IF EXISTS v_edit_man_conduit;
@@ -228,25 +228,25 @@ BEGIN
 				DROP VIEW IF EXISTS v_edit_man_wjump;
 				DROP VIEW IF EXISTS v_edit_man_wwtp;
 				DROP VIEW IF EXISTS v_edit_man_wwtp_pol;
-			
+
 			END IF;
-			
+
 			-- drop deprecated columns
-			IF v_projecttype = 'WS' THEN 
+			IF v_projecttype = 'WS' THEN
 				ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_19;
 				ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_20;
 				ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_21;
 				ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_22;
 				ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_23;
-				ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_24;	
+				ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_24;
 				ALTER TABLE config_graph_mincut DROP COLUMN if exists _to_arc;
 				ALTER TABLE ext_rtc_hydrometer DROP COLUMN IF EXISTS hydrometer_category;
 				ALTER TABLE ext_rtc_hydrometer DROP COLUMN IF EXISTS cat_hydrometer_id ;
 			ELSE
-				ALTER TABLE cat_arc_shape DROP COLUMN if exists _tsect_id;	
-				ALTER TABLE cat_arc_shape DROP COLUMN if exists _curve_id;	
-				ALTER TABLE node DROP COLUMN if exists _sys_elev;	
-				ALTER TABLE arc DROP COLUMN if exists _sys_length;	
+				ALTER TABLE cat_arc_shape DROP COLUMN if exists _tsect_id;
+				ALTER TABLE cat_arc_shape DROP COLUMN if exists _curve_id;
+				ALTER TABLE node DROP COLUMN if exists _sys_elev;
+				ALTER TABLE arc DROP COLUMN if exists _sys_length;
 
 			END IF;
 
@@ -259,7 +259,7 @@ BEGIN
 			ALTER TABLE sys_addfields DROP COLUMN if exists _field_length_;
 			ALTER TABLE sys_addfields DROP COLUMN if exists _num_decimals_;
 			ALTER TABLE sys_addfields DROP COLUMN if exists _dv_value_column_;
-			
+
 			--drop NOT NULL restrictions
 			ALTER TABLE arc ALTER COLUMN verified DROP NOT NULL;
 			ALTER TABLE node ALTER COLUMN verified DROP NOT NULL;
@@ -273,7 +273,7 @@ BEGIN
 			ALTER TABLE element ALTER COLUMN workcat_id DROP NOT NULL;
 			ALTER TABLE samplepoint ALTER COLUMN workcat_id DROP NOT NULL;
 
-			IF v_projecttype = 'UD' THEN 
+			IF v_projecttype = 'UD' THEN
 				ALTER TABLE gully ALTER COLUMN verified DROP NOT NULL;
 				ALTER TABLE gully ALTER COLUMN workcat_id DROP NOT NULL;
 			END IF;
@@ -284,79 +284,79 @@ BEGIN
 
 			--update value of rename_view_x_id parameter
 			UPDATE config_param_system SET value='{"rename_view_x_id":true}' WHERE parameter='admin_manage_cat_feature';
-			
-			UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'sectorFromExpl', 'True'::boolean) 
+
+			UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'sectorFromExpl', 'True'::boolean)
 			WHERE parameter = 'basic_selector_tab_exploitation';
-			UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'sectorFromMacroexpl', 'True'::boolean) 
+			UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'sectorFromMacroexpl', 'True'::boolean)
 			WHERE parameter = 'basic_selector_tab_macroexploitation';
-			UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'explFromSector', 'True'::boolean) 
+			UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'explFromSector', 'True'::boolean)
 			WHERE parameter = 'basic_selector_tab_sector';
-			
+
 			-- remove deprecated parameters on config_param_system
 			DELETE FROM config_param_system WHERE parameter = 'om_mincut_enable_alerts';
 
 			-- fk for ext tables or utils schema
 			PERFORM gw_fct_admin_schema_utils_fk();
-			
+
 			--change widgettype for matcat_id when new empty data project (UD)
-			IF v_projecttype = 'UD' THEN 
-				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_node' 
+			IF v_projecttype = 'UD' THEN
+				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_node'
 				WHERE columnname='matcat_id' AND formname LIKE 've_node%';
 
-				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc' 
+				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc'
 				WHERE columnname='matcat_id' AND formname LIKE 've_connec%';
 
-				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc' 
+				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc'
 				WHERE columnname='matcat_id' AND formname LIKE 've_arc%';
-				
-				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_node' 
+
+				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_node'
 				WHERE columnname='matcat_id' AND formname IN ('v_edit_node');
-				
-				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc' 
+
+				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc'
 				WHERE columnname='matcat_id' AND formname IN ('v_edit_arc', 'v_edit_connec');
-				
+
 			END IF;
 
 			-- forcing user variables in order to enhance usability for new projects
 			UPDATE sys_param_user SET vdefault = '1', ismandatory =  true WHERE id ='edit_state_vdefault';
 			UPDATE sys_param_user SET vdefault = 'false', ismandatory = true WHERE id ='qgis_info_docker';
 			UPDATE sys_param_user SET vdefault = 'true', ismandatory = true WHERE id ='qgis_form_docker';
-			
-			-- force all cat feature not active in order to increase step-by-step 
-			IF v_projecttype = 'WS' THEN 
+
+			-- force all cat feature not active in order to increase step-by-step
+			IF v_projecttype = 'WS' THEN
 				UPDATE cat_feature SET active = false WHERE system_id NOT IN ('VALVE', 'WJOIN', 'JUNCTION', 'TANK', 'PIPE'); -- ws projects
 			ELSE
 				UPDATE cat_feature SET active = false WHERE system_id NOT IN ('CONDUIT', 'JUNCTION', 'CONNEC', 'GULLY', 'OUTFALL'); -- ud projects
 			END IF;
-			
+
 			-- hidden lastupdate and lastupdate_user columns
 			update config_form_fields SET hidden = true WHERE columnname IN ('lastupdate', 'lastupdate_user', 'publish', 'uncertain');
-			
+
 			-- disable edit_noderotation_update_dsbl
 			UPDATE sys_param_user SET ismandatory = true, vdefault ='TRUE' WHERE id = 'edit_noderotation_update_dsbl';
 
 			v_message='Project sucessfully created';
-			
+
 			-- automatize graph analytics config for ws
-			UPDATE config_param_system SET value = 'TRUE' where parameter = 'utils_graphanalytics_automatic_config'; 
+			UPDATE config_param_system SET value = 'TRUE' where parameter = 'utils_graphanalytics_automatic_config';
 
 			-- UPDATE edit_check_redundance_y_topelev_elev
 			UPDATE config_param_system SET value = 'TRUE' WHERE parameter = 'edit_check_redundance_y_topelev_elev';
 
 			-- Make visible fields on feature forms
-			IF v_projecttype = 'WS' THEN 
-				UPDATE config_form_fields SET hidden = false where (columnname IN ('press_max', 'press_min', 'press_avg') OR columnname IN ('head_max', 'head_min', 'head_avg') OR columnname IN ('demand_max', 'demand_min', 'demand_avg') OR 
-				columnname IN ('om_state', 'conserv_state', 'access_type', 'placement_type', 'hydrant_type', 'valve_type')) 
+			IF v_projecttype = 'WS' THEN
+				UPDATE config_form_fields SET hidden = false where (columnname IN ('press_max', 'press_min', 'press_avg') OR columnname IN ('head_max', 'head_min', 'head_avg') OR columnname IN ('demand_max', 'demand_min', 'demand_avg') OR
+				columnname IN ('om_state', 'conserv_state', 'access_type', 'placement_type', 'hydrant_type', 'valve_type'))
 				AND formname ilike 've_node%';
 
-				UPDATE config_form_fields SET hidden = false where (columnname IN ('flow_max', 'flow_min', 'flow_avg') OR columnname IN ('vel_max', 'vel_min', 'vel_avg') OR 
-				columnname IN ('om_state', 'conserv_state')) 
+				UPDATE config_form_fields SET hidden = false where (columnname IN ('flow_max', 'flow_min', 'flow_avg') OR columnname IN ('vel_max', 'vel_min', 'vel_avg') OR
+				columnname IN ('om_state', 'conserv_state'))
 				AND formname ilike 've_arc%';
 
-				UPDATE config_form_fields SET hidden = false where (columnname IN ('demand_max', 'demand_min', 'demand_avg') OR columnname IN ('press_max', 'press_min', 'press_avg') OR 
-				columnname IN ('om_state', 'conserv_state', 'priority', 'valve_location', 'valve_type', 'shutoff_valve', 'access_type', 'placement_type', 'crmzone_id')) 
+				UPDATE config_form_fields SET hidden = false where (columnname IN ('demand_max', 'demand_min', 'demand_avg') OR columnname IN ('press_max', 'press_min', 'press_avg') OR
+				columnname IN ('om_state', 'conserv_state', 'priority', 'valve_location', 'valve_type', 'shutoff_valve', 'access_type', 'placement_type', 'crmzone_id'))
 				AND formname ilike 've_connec%';
-                
+
 				UPDATE config_form_fields SET hidden=true WHERE formname = 'v_edit_arc' AND columnname='parent_id';
 				UPDATE config_form_fields SET hidden=true WHERE formname like 've_arc%' AND columnname='parent_id';
 				UPDATE config_form_fields SET hidden=true WHERE formname = 'v_edit_arc' AND columnname='observ';
@@ -379,17 +379,17 @@ BEGIN
 					{"widgetname":"geomParamUpdate", "label":"Pipe buffer","widgettype":"text","datatype":"float","tooltip":"Buffer from arcs to create mapzone geometry using [PIPE BUFFER] options. Normal values maybe between 3-20 mts.", "layoutname":"grl_option_parameters","layoutorder":11, "isMandatory":false, "placeholder":"5-30", "value":""}
 					]'
 				WHERE id = 2768;
-								
+
 			ELSIF v_projecttype = 'UD' THEN
-				UPDATE config_form_fields SET hidden = false where 
+				UPDATE config_form_fields SET hidden = false where
 				columnname IN ('step_pp', 'step_fe', 'step_replace', 'cover') AND formname ilike 've_node%';
-                
+
 				UPDATE config_form_fields SET layoutorder=30 WHERE formname = 'v_edit_arc' AND columnname='pavcat_id';
 				UPDATE config_form_fields SET layoutorder=30 WHERE formname like 've_arc%' AND columnname='pavcat_id';
 			END IF;
 
 			-- setting search where search_field is arc_id, node_id, connec_id, gully_id
-			UPDATE config_param_system SET value = 
+			UPDATE config_param_system SET value =
 			'{"sys_table_id":"v_edit_arc","sys_id_field":"arc_id","sys_search_field":"arc_id","alias":"Arcs","cat_field":"arccat_id","orderby":"1","search_type":"arc"}'
 			WHERE parameter = 'basic_search_network_arc';
 
@@ -410,17 +410,17 @@ BEGIN
 			WHERE  parameter = 'basic_search_network_gully';
 
 		ELSIF v_isnew IS FALSE THEN
-		
+
 			-- fix i18n
 			IF v_gwversion = '3.6.009' AND v_oldversion IN ('3.6.008', '3.6.008.1', '3.6.008.2') THEN
 				PERFORM gw_fct_admin_manage_fix_i18n_36008();
 			END IF;
-			
+
 			DROP FUNCTION IF EXISTS gw_fct_admin_manage_fix_i18n_36008();
-			
-				
+
+
 			SELECT project_type INTO v_projecttype FROM sys_version ORDER BY 1 DESC LIMIT 1;
-		
+
 			-- profilactic delete to avoid conflicts with sequences and to clean gdb
 			DELETE FROM audit_check_project;
 			DELETE FROM audit_check_data;
@@ -443,17 +443,17 @@ BEGIN
 				DELETE FROM temp_demand;
 			ELSE
 				DELETE FROM temp_arc_flowregulator;
-				DELETE FROM temp_gully;			
+				DELETE FROM temp_gully;
 				DELETE FROM temp_lid_usage;
-			END IF;	
+			END IF;
 
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, 'UPDATE PROJECT SCHEMA');
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '---------------------');
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '');
-			
+
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, 'INFO');     -- Info is 2 because we are inserting previously (updat sql) some info message for user using 1
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, '----');
-			
+
 			v_oldversion = (SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1);
 
 			-- inserting version table
@@ -466,12 +466,12 @@ BEGIN
 
 			IF v_oldversion IN ('3.6.007', '3.6.008', '3.6.008.1', '3.6.008.2') THEN
 
-				FOR rec_feature IN SELECT * FROM cat_feature 
+				FOR rec_feature IN SELECT * FROM cat_feature
 				LOOP
-					INSERT INTO sys_table (id, descript, sys_role, criticity, context, alias) 
-					VALUES (rec_feature.child_layer, concat('Custom edit view for ', rec_feature.child_layer), 'role_edit', 0, concat('{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"', 
+					INSERT INTO sys_table (id, descript, sys_role, criticity, context, alias)
+					VALUES (rec_feature.child_layer, concat('Custom edit view for ', rec_feature.child_layer), 'role_edit', 0, concat('{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"',
 					upper(rec_feature.feature_type),'"}'), rec_feature.id)
-					ON CONFLICT (id) 
+					ON CONFLICT (id)
 					DO update set context = concat('{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"', upper(rec_feature.feature_type),'"}');
 				END LOOP;
 			END IF;
@@ -479,20 +479,20 @@ BEGIN
 
 		--reset sequences and id of anl, temp and audit tables
 		PERFORM gw_fct_admin_reset_sequences();
-		
+
 		-- last process
 		UPDATE config_param_system SET value = v_gwversion WHERE parameter = 'admin_version';
 		PERFORM gw_fct_admin_role_permissions();
 		PERFORM gw_fct_setowner($${"client":{"lang":"ES"},"data":{"owner":"role_admin"}}$$);
-		
+
 		--build return with log table
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-		FROM (SELECT id, error_message as message FROM audit_check_data 
+		FROM (SELECT id, error_message as message FROM audit_check_data
 		WHERE cur_user="current_user"() AND fid=v_fid ORDER BY criticity desc, id asc) row;
 
 	END IF;
 
-	v_result_info := COALESCE(v_result, '{}'); 
+	v_result_info := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
 	-- Return
