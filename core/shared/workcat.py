@@ -21,6 +21,7 @@ from ..ui.ui_manager import GwWorkcatManagerUi, GwInfoWorkcatUi, GwSearchWorkcat
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_db, tools_qgis, tools_qt, tools_os
 
+
 class GwWorkcat:
     def __init__(self, iface, canvas):
         self.iface = iface
@@ -60,9 +61,11 @@ class GwWorkcat:
         # Open form
         tools_gw.open_dialog(self.dlg_man, dlg_name='workcat_manager')
 
+
     def _handle_delete(self):
         tools_gw.delete_selected_rows(self.dlg_man.tbl_workcat, "cat_work")
         self._refresh_manager_table()
+
 
     def _fill_workcat_table(self, filter_text=None):
         view = "cat_work"
@@ -86,6 +89,7 @@ class GwWorkcat:
         tools_qt.set_tableview_config(self.dlg_man.tbl_workcat, sectionResizeMode=0)
         return True
 
+
     def _open_selected_workcat(self, dialog, widget):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -104,9 +108,11 @@ class GwWorkcat:
 
         self.open_workcat(selected_object_id)
 
+
     def open_workcat(self, workcat_id):
         item = {'sys_id': workcat_id, 'filter_text': '', 'display_name': 'Workcat Details'}
         self.workcat_open_table_items(item)
+
 
     def _refresh_manager_table(self):
         try:
@@ -122,13 +128,14 @@ class GwWorkcat:
         dialog.builtdate.setDate(QDate.currentDate())
         dialog.raise_()
         dialog.activateWindow()
-
+        dialog.setWindowFlags(dialog.windowFlags() | Qt.WindowStaysOnTopHint)
         dialog.btn_accept.clicked.connect(partial(self._save_new_workcat, dialog))
         dialog.btn_cancel.clicked.connect(dialog.reject)
 
         dialog.cat_work_id.textChanged.connect(partial(self._check_workcat_exists, dialog))
 
-        dialog.exec_()
+        dialog.show()
+
 
     def _save_new_workcat(self, dialog):
         workid = dialog.cat_work_id.text()
@@ -149,6 +156,7 @@ class GwWorkcat:
         else:
             tools_qgis.show_warning("Error creating Workcat.")
 
+
     def _check_workcat_exists(self, dialog):
         workid = dialog.cat_work_id.text()
         sql = f"SELECT id FROM cat_work WHERE id = '{workid}'"
@@ -161,6 +169,7 @@ class GwWorkcat:
             dialog.cat_work_id.setStyleSheet("")
             dialog.btn_accept.setEnabled(True)
             dialog.cat_work_id.setToolTip("")
+
 
     def workcat_open_table_items(self, item):
         """ Create the view and open the dialog with his content """
@@ -546,7 +555,6 @@ class GwWorkcat:
             :param field: Field of the table to make the where clause (String)
             :param field_value: Value to compare in the clause where (String)
         """
-        print("texto: ", dialog.doc_id)
         doc_id = tools_qt.get_combo_value(dialog, dialog.doc_id)
 
         if not doc_id:
@@ -574,6 +582,7 @@ class GwWorkcat:
 
         dialog.doc_id.blockSignals(True)
         dialog.doc_id.setCurrentIndex(0)
+        dialog.doc_id.hidePopup()
         dialog.doc_id.blockSignals(False)
         dialog.tbl_document.model().select()
 
@@ -601,9 +610,11 @@ class GwWorkcat:
         except AttributeError:
             pass
 
+
     def _reset_rubber_band(self):
         tools_gw.reset_rubberband(self.rubber_band)
         tools_gw.reset_rubberband(self.aux_rubber_band)
+
 
     def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
 
