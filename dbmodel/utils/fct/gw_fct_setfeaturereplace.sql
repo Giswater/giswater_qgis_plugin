@@ -109,6 +109,7 @@ v_seq_name text;
 v_seq_code text;
 v_code_prefix text;
 v_code_autofill_bool boolean;
+v_link text;
 
 BEGIN
 
@@ -276,19 +277,28 @@ BEGIN
 			v_code = v_id;
 		END IF;
 
+		-- LINK
+		--google maps style
+		IF (SELECT (value::json->>'google_maps')::boolean FROM config_param_system WHERE parameter='edit_custom_link') IS TRUE THEN
+			v_link=CONCAT ('https://www.google.com/maps/place/',(ST_Y(ST_transform(NEW.the_geom,4326))),'N+',(ST_X(ST_transform(NEW.the_geom,4326))),'E');
+		--fid style
+		ELSIF (SELECT (value::json->>'fid')::boolean FROM config_param_system WHERE parameter='edit_custom_link') IS TRUE THEN
+			v_link=v_id;
+		END IF;
+
 		-- inserting new feature on parent tables
 		IF v_feature_type='node' THEN
 		
 			IF v_project_type='WS' then
 				INSERT INTO node (node_id, code, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom,
-				category_type, function_type, fluid_type, location_type, minsector_id, dqa_id, presszone_id) 
+				category_type, function_type, fluid_type, location_type, minsector_id, dqa_id, presszone_id, link) 
 				VALUES (v_id, v_code, v_old_featurecat, v_epa_type_new, v_sector_id, v_dma_id, v_expl_id,  
-				0, v_state_type, v_workcat_id_end, v_the_geom, v_category, v_function, v_fluid, v_location, v_minsector_id, v_dqa_id, v_presszone_id);
+				0, v_state_type, v_workcat_id_end, v_the_geom, v_category, v_function, v_fluid, v_location, v_minsector_id, v_dqa_id, v_presszone_id, v_link);
 			ELSE 
 				INSERT INTO node (node_id, code, node_type, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, 
-				the_geom, category_type, function_type, fluid_type, location_type, drainzone_id) 
+				the_geom, category_type, function_type, fluid_type, location_type, drainzone_id, link) 
 				VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_epa_type_new, v_sector_id, v_dma_id, v_expl_id, 
-				0, v_state_type, v_workcat_id_end, v_the_geom, v_category, v_function, v_fluid, v_location, v_drainzone_id);
+				0, v_state_type, v_workcat_id_end, v_the_geom, v_category, v_function, v_fluid, v_location, v_drainzone_id, v_link);
 
 			END IF;
 
@@ -299,14 +309,14 @@ BEGIN
 		
 			IF v_project_type='WS' then
 				INSERT INTO arc (arc_id, code, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom, 
-				verified, category_type, function_type, fluid_type, location_type, minsector_id, dqa_id, presszone_id) 
+				verified, category_type, function_type, fluid_type, location_type, minsector_id, dqa_id, presszone_id, link) 
 				VALUES (v_id, v_code, v_old_featurecat, v_epa_type_new, v_sector_id, v_dma_id, v_expl_id, 0, v_state_type, v_workcat_id_end, v_the_geom, 
-				v_verified_id, v_category, v_function, v_fluid, v_location, v_minsector_id, v_dqa_id, v_presszone_id);
+				v_verified_id, v_category, v_function, v_fluid, v_location, v_minsector_id, v_dqa_id, v_presszone_id, v_link);
 			ELSE 
 				INSERT INTO arc (arc_id, code, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, workcat_id, the_geom, 
-				verified, category_type, function_type, fluid_type, location_type, drainzone_id) 
+				verified, category_type, function_type, fluid_type, location_type, drainzone_id, link) 
 				VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_epa_type_new, v_sector_id, v_dma_id, v_expl_id, 0, v_state_type, v_workcat_id_end, 
-				v_the_geom, v_verified_id, v_category, v_function, v_fluid, v_location, v_drainzone_id);
+				v_the_geom, v_verified_id, v_category, v_function, v_fluid, v_location, v_drainzone_id, v_link);
 			END IF;
 
 			INSERT INTO audit_check_data (fid, result_id, error_message)
@@ -316,14 +326,14 @@ BEGIN
 		
 			IF v_project_type='WS' then
 				INSERT INTO connec (connec_id, code, connecat_id, sector_id, dma_id, expl_id, state, state_type, the_geom, workcat_id, verified, 
-				inventory, category_type, function_type, fluid_type, location_type,epa_type, minsector_id, dqa_id, presszone_id) 
+				inventory, category_type, function_type, fluid_type, location_type,epa_type, minsector_id, dqa_id, presszone_id, link) 
 				VALUES (v_id, v_code, v_old_featurecat, v_sector_id, v_dma_id,v_expl_id, 0, v_state_type, v_the_geom, v_workcat_id_end, v_verified_id, 
-				v_inventory, v_category, v_function, v_fluid, v_location, v_epa_type_new, v_minsector_id, v_dqa_id, v_presszone_id);
+				v_inventory, v_category, v_function, v_fluid, v_location, v_epa_type_new, v_minsector_id, v_dqa_id, v_presszone_id, v_link);
 			ELSE 
 				INSERT INTO connec (connec_id, code, connec_type, connecat_id,  sector_id, dma_id, expl_id, state, state_type, the_geom, workcat_id, 
-				verified, inventory, category_type, function_type, fluid_type, location_type, drainzone_id) 
+				verified, inventory, category_type, function_type, fluid_type, location_type, drainzone_id, link) 
 				VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_sector_id, v_dma_id, v_expl_id,0, v_state_type, v_the_geom,v_workcat_id_end, 
-				v_verified_id, v_inventory, v_category, v_function, v_fluid, v_location, v_drainzone_id);
+				v_verified_id, v_inventory, v_category, v_function, v_fluid, v_location, v_drainzone_id, v_link);
 			END IF;	
 
 			INSERT INTO audit_check_data (fid, result_id, error_message)
@@ -332,9 +342,9 @@ BEGIN
 		ELSIF v_feature_type = 'gully' THEN
 		
 			INSERT INTO gully (gully_id, code, gully_type,gratecat_id, sector_id, dma_id, expl_id, state, state_type, the_geom,workcat_id, verified, 
-			inventory, category_type, function_type, fluid_type, location_type,epa_type, drainzone_id) 
+			inventory, category_type, function_type, fluid_type, location_type,epa_type, drainzone_id, link) 
 			VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_sector_id, v_dma_id,v_expl_id, 0, v_state_type, v_the_geom, v_workcat_id_end, 
-			v_verified_id, v_inventory, v_category, v_function, v_fluid, v_location, v_epa_type_new, v_drainzone_id);
+			v_verified_id, v_inventory, v_category, v_function, v_fluid, v_location, v_epa_type_new, v_drainzone_id, v_link);
 			
 			INSERT INTO audit_check_data (fid, result_id, error_message)
 			VALUES (v_fid, v_result_id, concat('New feature (',v_id,') inserted into gully table.'));
@@ -356,12 +366,12 @@ BEGIN
 		END IF;
 				
 		-- updating values on feature parent table from values of old feature
-		v_sql:='select column_name    FROM information_schema.columns 
+		v_sql:='select column_name FROM information_schema.columns 
 							where (table_schema=''SCHEMA_NAME'' and udt_name <> ''inet'' and 
 							table_name='''||v_feature_type||''') and column_name!='''||v_id_column||''' and column_name!=''the_geom'' and column_name!=''state''
 							and column_name!=''code'' and column_name!=''epa_type'' and column_name!=''state_type'' and column_name!='''||v_cat_column||'''
 							and column_name!=''sector_id'' and column_name!=''dma_id'' and column_name!=''expl_id'' and column_name!=''category_type'' 
-							and column_name!=''function_type'' and column_name!=''fluid_type'' and column_name!=''location_type'';';
+							and column_name!=''function_type'' and column_name!=''fluid_type'' and column_name!=''location_type'' and column_name!=''link'';';
 
 		FOR v_column IN EXECUTE v_sql
 		LOOP
