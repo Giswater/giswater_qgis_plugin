@@ -143,9 +143,9 @@ class GwCreateSchemaTask(GwTask):
         if (not status and self.admin.dev_commit is False) or self.isCanceled():
             return False
 
-        status = self.admin.load_childviews()
-        if (not status and self.admin.dev_commit is False) or self.isCanceled():
-            return False
+        # status = self.admin.load_childviews()
+        # if (not status and self.admin.dev_commit is False) or self.isCanceled():
+        #     return False
 
         status = True
         if exec_last_process:
