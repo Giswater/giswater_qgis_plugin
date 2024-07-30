@@ -18,7 +18,7 @@ drop view if exists vi_pumps;
 drop view if exists vi_pjoint;
 
 DROP VIEW v_rpt_arc CASCADE;
-CREATE OR REPLACE VIEW v_rpt_arc AS 
+CREATE OR REPLACE VIEW v_rpt_arc AS
  SELECT arc.arc_id,
     selector_rpt_main.result_id,
     arc.arc_type,
@@ -47,13 +47,13 @@ CREATE OR REPLACE VIEW v_rpt_arc AS
   ORDER BY arc.arc_id;
 
 DROP VIEW v_rpt_comp_arc;
-CREATE OR REPLACE VIEW v_rpt_comp_arc AS 
+CREATE OR REPLACE VIEW v_rpt_comp_arc AS
  SELECT arc.arc_id,
     arc.sector_id,
     selector_rpt_compare.result_id,
     max(rpt_arc.flow) AS max_flow,
     min(rpt_arc.flow) AS min_flow,
-   (avg(rpt_arc.flow))::numeric(12,2) AS flow_avg, 
+   (avg(rpt_arc.flow))::numeric(12,2) AS flow_avg,
     max(rpt_arc.vel) AS max_vel,
     min(rpt_arc.vel) AS min_vel,
    (avg(rpt_arc.vel))::numeric(12,2) AS vel_avg,
@@ -75,7 +75,7 @@ CREATE OR REPLACE VIEW v_rpt_comp_arc AS
 
 
 DROP VIEW v_rpt_node CASCADE;
-CREATE OR REPLACE VIEW v_rpt_node AS 
+CREATE OR REPLACE VIEW v_rpt_node AS
  SELECT node.node_id,
     selector_rpt_main.result_id,
     node.node_type,
@@ -103,7 +103,7 @@ CREATE OR REPLACE VIEW v_rpt_node AS
   ORDER BY node.node_id;
 
 DROP VIEW v_rpt_comp_node ;
-CREATE OR REPLACE VIEW v_rpt_comp_node AS 
+CREATE OR REPLACE VIEW v_rpt_comp_node AS
  SELECT node.node_id,
     selector_rpt_compare.result_id,
     node.node_type,
@@ -133,22 +133,22 @@ CREATE OR REPLACE VIEW v_rpt_comp_node AS
 
 -- reactions
 drop view if exists vi_reactions;
-CREATE OR REPLACE VIEW vi_reactions AS 
+CREATE OR REPLACE VIEW vi_reactions AS
 SELECT 'BULK' as param, inp_pipe.arc_id, inp_pipe.bulk_coeff::text as coeff FROM inp_pipe LEFT JOIN temp_arc ON inp_pipe.arc_id::text = temp_arc.arc_id::text WHERE bulk_coeff is not null
 UNION
-SELECT 'WALL' as param, inp_pipe.arc_id, inp_pipe.wall_coeff::text as coeff FROM inp_pipe JOIN temp_arc ON inp_pipe.arc_id::text = temp_arc.arc_id::text WHERE wall_coeff is not null 
+SELECT 'WALL' as param, inp_pipe.arc_id, inp_pipe.wall_coeff::text as coeff FROM inp_pipe JOIN temp_arc ON inp_pipe.arc_id::text = temp_arc.arc_id::text WHERE wall_coeff is not null
 UNION
 SELECT 'BULK' as param, p.arc_id, p.bulk_coeff::text as coeff FROM inp_dscenario_pipe p LEFT JOIN temp_arc ON p.arc_id::text = temp_arc.arc_id::text WHERE bulk_coeff is not null
 UNION
-SELECT 'WALL' as param, p.arc_id, p.wall_coeff::text as coeff FROM inp_dscenario_pipe p JOIN temp_arc ON p.arc_id::text = temp_arc.arc_id::text WHERE wall_coeff is not null 
+SELECT 'WALL' as param, p.arc_id, p.wall_coeff::text as coeff FROM inp_dscenario_pipe p JOIN temp_arc ON p.arc_id::text = temp_arc.arc_id::text WHERE wall_coeff is not null
 UNION
-SELECT idval as  param, NULL AS arc_id, value::character varying AS coeff FROM config_param_user JOIN sys_param_user ON id=parameter 
-WHERE (parameter='inp_reactions_bulk_order' OR parameter = 'inp_reactions_wall_order' OR parameter = 'inp_reactions_global_bulk' OR  
-parameter = 'inp_reactions_global_wall' OR parameter = 'inp_reactions_limit_concentration' OR parameter ='inp_reactions_wall_coeff_correlation') 
+SELECT idval as  param, NULL AS arc_id, value::character varying AS coeff FROM config_param_user JOIN sys_param_user ON id=parameter
+WHERE (parameter='inp_reactions_bulk_order' OR parameter = 'inp_reactions_wall_order' OR parameter = 'inp_reactions_global_bulk' OR
+parameter = 'inp_reactions_global_wall' OR parameter = 'inp_reactions_limit_concentration' OR parameter ='inp_reactions_wall_coeff_correlation')
 AND value IS NOT NULL AND  cur_user=current_user order by 1;
 
 -- energy
-CREATE OR REPLACE VIEW vi_energy AS 
+CREATE OR REPLACE VIEW vi_energy AS
 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id, 'EFFIC' as idval, effic_curve_id AS energyvalue FROM inp_pump LEFT JOIN temp_arc ON concat(inp_pump.node_id, '_n2a') = temp_arc.arc_id::text WHERE effic_curve_id IS NOT NULL
 UNION
 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id, 'PRICE' as idval, energy_price::TEXT AS energyvalue FROM inp_pump LEFT JOIN temp_arc ON concat(inp_pump.node_id, '_n2a') = temp_arc.arc_id::text WHERE energy_price IS NOT NULL
@@ -173,11 +173,11 @@ SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id, 'PRICE' as idval, energy_pri
 UNION
 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id, 'PATTERN' as idval, energy_pattern_id AS energyvalue FROM inp_pump_additional p LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text WHERE energy_pattern_id IS NOT NULL
 UNION
-SELECT idval AS pump_id, value::text AS idval, NULL::text AS energyvalue FROM config_param_user JOIN sys_param_user ON id=parameter 
+SELECT idval AS pump_id, value::text AS idval, NULL::text AS energyvalue FROM config_param_user JOIN sys_param_user ON id=parameter
 WHERE (parameter='inp_energy_price' OR parameter = 'inp_energy_pump_effic' OR parameter = 'inp_energy_price_pattern') AND value IS NOT NULL AND  config_param_user.cur_user::name = current_user order by 1;
 
 -- pumps
-CREATE OR REPLACE VIEW vi_pumps AS 
+CREATE OR REPLACE VIEW vi_pumps AS
 SELECT temp_arc.arc_id,
 temp_arc.node_1,
 temp_arc.node_2,
@@ -205,60 +205,60 @@ ORDER BY temp_arc.arc_id;
 
 
 -- emitters
-CREATE OR REPLACE VIEW vi_emitters AS 
-SELECT node_id, emitter_coeff FROM inp_junction LEFT JOIN temp_node USING (node_id) WHERE emitter_coeff IS NOT NULL 
+CREATE OR REPLACE VIEW vi_emitters AS
+SELECT node_id, emitter_coeff FROM inp_junction LEFT JOIN temp_node USING (node_id) WHERE emitter_coeff IS NOT NULL
 UNION
-SELECT node_id, emitter_coeff FROM inp_dscenario_junction LEFT JOIN temp_node USING (node_id) WHERE emitter_coeff IS NOT NULL 
+SELECT node_id, emitter_coeff FROM inp_dscenario_junction LEFT JOIN temp_node USING (node_id) WHERE emitter_coeff IS NOT NULL
 UNION
-SELECT connec_id, emitter_coeff FROM inp_connec LEFT JOIN temp_node ON connec_id=node_id WHERE emitter_coeff IS NOT NULL 
+SELECT connec_id, emitter_coeff FROM inp_connec LEFT JOIN temp_node ON connec_id=node_id WHERE emitter_coeff IS NOT NULL
 UNION
 SELECT connec_id, emitter_coeff FROM inp_dscenario_connec LEFT JOIN temp_node ON connec_id=node_id WHERE emitter_coeff IS NOT NULL;
 
 --quality
-CREATE OR REPLACE VIEW vi_quality AS 
-SELECT node_id, init_quality FROM inp_junction LEFT JOIN temp_node USING (node_id) WHERE init_quality IS NOT NULL 
+CREATE OR REPLACE VIEW vi_quality AS
+SELECT node_id, init_quality FROM inp_junction LEFT JOIN temp_node USING (node_id) WHERE init_quality IS NOT NULL
 UNION
-SELECT node_id, init_quality FROM inp_dscenario_junction LEFT JOIN temp_node USING (node_id) WHERE init_quality IS NOT NULL 
+SELECT node_id, init_quality FROM inp_dscenario_junction LEFT JOIN temp_node USING (node_id) WHERE init_quality IS NOT NULL
 UNION
 SELECT node_id, init_quality FROM inp_inlet LEFT JOIN temp_node USING (node_id) WHERE inp_inlet.init_quality IS NOT NULL
 UNION
-SELECT node_id, init_quality FROM inp_dscenario_inlet LEFT JOIN temp_node USING (node_id) WHERE inp_dscenario_inlet.init_quality IS NOT NULL 
+SELECT node_id, init_quality FROM inp_dscenario_inlet LEFT JOIN temp_node USING (node_id) WHERE inp_dscenario_inlet.init_quality IS NOT NULL
 UNION
-SELECT node_id, init_quality FROM inp_tank LEFT JOIN temp_node USING (node_id) WHERE init_quality IS NOT NULL 
+SELECT node_id, init_quality FROM inp_tank LEFT JOIN temp_node USING (node_id) WHERE init_quality IS NOT NULL
 UNION
-SELECT node_id, init_quality FROM inp_dscenario_tank LEFT JOIN temp_node USING (node_id) WHERE init_quality IS NOT NULL 
+SELECT node_id, init_quality FROM inp_dscenario_tank LEFT JOIN temp_node USING (node_id) WHERE init_quality IS NOT NULL
 UNION
-SELECT node_id, init_quality FROM inp_reservoir LEFT JOIN temp_node USING (node_id) WHERE init_quality IS NOT NULL 
+SELECT node_id, init_quality FROM inp_reservoir LEFT JOIN temp_node USING (node_id) WHERE init_quality IS NOT NULL
 UNION
-SELECT node_id, init_quality FROM inp_dscenario_reservoir LEFT JOIN temp_node USING (node_id) WHERE init_quality IS NOT NULL 
+SELECT node_id, init_quality FROM inp_dscenario_reservoir LEFT JOIN temp_node USING (node_id) WHERE init_quality IS NOT NULL
 UNION
-SELECT arc_id, init_quality FROM inp_virtualvalve LEFT JOIN temp_arc USING (arc_id) WHERE init_quality IS NOT NULL 
+SELECT arc_id, init_quality FROM inp_virtualvalve LEFT JOIN temp_arc USING (arc_id) WHERE init_quality IS NOT NULL
 UNION
 SELECT arc_id, init_quality FROM inp_dscenario_virtualvalve LEFT JOIN temp_arc USING (arc_id) WHERE init_quality IS NOT NULL;
 
 -- sources
-CREATE OR REPLACE VIEW vi_sources AS 
-SELECT node_id, source_type, source_quality, source_pattern_id FROM inp_junction LEFT JOIN temp_node USING (node_id) WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL) 
+CREATE OR REPLACE VIEW vi_sources AS
+SELECT node_id, source_type, source_quality, source_pattern_id FROM inp_junction LEFT JOIN temp_node USING (node_id) WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL)
 UNION
-SELECT node_id, source_type, source_quality, source_pattern_id FROM inp_dscenario_junction LEFT JOIN temp_node USING (node_id) WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL) 
+SELECT node_id, source_type, source_quality, source_pattern_id FROM inp_dscenario_junction LEFT JOIN temp_node USING (node_id) WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL)
 UNION
-SELECT node_id, source_type, source_quality, source_pattern_id FROM inp_tank LEFT JOIN temp_node USING (node_id) WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL) 
+SELECT node_id, source_type, source_quality, source_pattern_id FROM inp_tank LEFT JOIN temp_node USING (node_id) WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL)
 UNION
-SELECT node_id, source_type, source_quality, source_pattern_id FROM inp_dscenario_tank LEFT JOIN temp_node USING (node_id) WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL) 
+SELECT node_id, source_type, source_quality, source_pattern_id FROM inp_dscenario_tank LEFT JOIN temp_node USING (node_id) WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL)
 UNION
-SELECT node_id, source_type, source_quality, source_pattern_id FROM inp_reservoir LEFT JOIN temp_node USING (node_id) WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL) 
+SELECT node_id, source_type, source_quality, source_pattern_id FROM inp_reservoir LEFT JOIN temp_node USING (node_id) WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL)
 UNION
-SELECT node_id, source_type, source_quality, source_pattern_id FROM inp_dscenario_reservoir LEFT JOIN temp_node USING (node_id) WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL) 
-UNION 
-SELECT node_id, source_type, source_quality, source_pattern_id FROM inp_inlet LEFT JOIN temp_node USING (node_id) WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL) 
+SELECT node_id, source_type, source_quality, source_pattern_id FROM inp_dscenario_reservoir LEFT JOIN temp_node USING (node_id) WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL)
+UNION
+SELECT node_id, source_type, source_quality, source_pattern_id FROM inp_inlet LEFT JOIN temp_node USING (node_id) WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL)
 UNION
 SELECT node_id, source_type, source_quality, source_pattern_id FROM inp_dscenario_inlet LEFT JOIN temp_node USING (node_id) WHERE (source_type IS NOT NULL OR source_quality IS NOT NULL OR source_pattern_id IS NOT NULL) ;
 
 --mixing
-CREATE OR REPLACE VIEW vi_mixing AS 
-SELECT node_id, mixing_model, mixing_fraction FROM inp_tank LEFT JOIN temp_node USING (node_id) WHERE (mixing_model IS NOT NULL OR mixing_fraction IS NOT NULL)  
+CREATE OR REPLACE VIEW vi_mixing AS
+SELECT node_id, mixing_model, mixing_fraction FROM inp_tank LEFT JOIN temp_node USING (node_id) WHERE (mixing_model IS NOT NULL OR mixing_fraction IS NOT NULL)
 UNION
-SELECT node_id, mixing_model, mixing_fraction FROM inp_dscenario_tank LEFT JOIN temp_node USING (node_id) WHERE (mixing_model IS NOT NULL OR mixing_fraction IS NOT NULL) 
+SELECT node_id, mixing_model, mixing_fraction FROM inp_dscenario_tank LEFT JOIN temp_node USING (node_id) WHERE (mixing_model IS NOT NULL OR mixing_fraction IS NOT NULL)
 UNION
 SELECT node_id, mixing_model, mixing_fraction FROM inp_inlet LEFT JOIN temp_node USING (node_id) WHERE (mixing_model IS NOT NULL OR mixing_fraction IS NOT NULL) AND epa_type ='TANK'
 UNION
@@ -266,102 +266,102 @@ SELECT node_id, mixing_model, mixing_fraction FROM inp_dscenario_inlet LEFT JOIN
 
 
 
-CREATE OR REPLACE VIEW ve_epa_junction AS 
+CREATE OR REPLACE VIEW ve_epa_junction AS
 SELECT inp_junction.*,
 result_id,
-demand_max as demandmax, 
+demand_max as demandmax,
 demand_min as demandmin,
 demand_avg as demandavg,
 head_max as headmax,
-head_min as headmin, 
+head_min as headmin,
 head_avg as headavg,
 press_max as pressmax,
-press_min as pressmin, 
+press_min as pressmin,
 press_avg as pressavg,
-quality_max as qualmax, 
-quality_min as qualmin, 
+quality_max as qualmax,
+quality_min as qualmin,
 quality_avg as qualavg
-FROM inp_junction 
+FROM inp_junction
 LEFT JOIN v_rpt_node USING (node_id);
 
-CREATE OR REPLACE VIEW ve_epa_tank AS 
-SELECT inp_tank.*, 
+CREATE OR REPLACE VIEW ve_epa_tank AS
+SELECT inp_tank.*,
 result_id,
-demand_max as demandmax, 
+demand_max as demandmax,
 demand_min as demandmin,
 demand_avg as demandavg,
 head_max as headmax,
-head_min as headmin, 
+head_min as headmin,
 head_avg as headavg,
 press_max as pressmax,
-press_min as pressmin, 
+press_min as pressmin,
 press_avg as pressavg,
-quality_max as qualmax, 
-quality_min as qualmin, 
+quality_max as qualmax,
+quality_min as qualmin,
 quality_avg as qualavg
-FROM inp_tank 
+FROM inp_tank
 LEFT JOIN v_rpt_node USING (node_id);
 
-CREATE OR REPLACE VIEW ve_epa_reservoir AS 
-SELECT inp_reservoir.*, 
+CREATE OR REPLACE VIEW ve_epa_reservoir AS
+SELECT inp_reservoir.*,
 result_id,
-demand_max as demandmax, 
+demand_max as demandmax,
 demand_min as demandmin,
 demand_avg as demandavg,
 head_max as headmax,
-head_min as headmin, 
+head_min as headmin,
 head_avg as headavg,
 press_max as pressmax,
-press_min as pressmin, 
+press_min as pressmin,
 press_avg as pressavg,
-quality_max as qualmax, 
-quality_min as qualmin, 
+quality_max as qualmax,
+quality_min as qualmin,
 quality_avg as qualavg
-FROM inp_reservoir 
+FROM inp_reservoir
 LEFT JOIN v_rpt_node USING (node_id);
 
-CREATE OR REPLACE VIEW ve_epa_inlet AS 
-SELECT inp_inlet.*, 
+CREATE OR REPLACE VIEW ve_epa_inlet AS
+SELECT inp_inlet.*,
 result_id,
-demand_max as demandmax, 
+demand_max as demandmax,
 demand_min as demandmin,
 demand_avg as demandavg,
 head_max as headmax,
-head_min as headmin, 
+head_min as headmin,
 head_avg as headavg,
 press_max as pressmax,
-press_min as pressmin, 
+press_min as pressmin,
 press_avg as pressavg,
-quality_max as qualmax, 
-quality_min as qualmin, 
+quality_max as qualmax,
+quality_min as qualmin,
 quality_avg as qualavg
-FROM inp_inlet 
+FROM inp_inlet
 LEFT JOIN v_rpt_node USING (node_id);
 
-CREATE OR REPLACE VIEW ve_epa_pipe AS 
-SELECT inp_pipe.*, 
+CREATE OR REPLACE VIEW ve_epa_pipe AS
+SELECT inp_pipe.*,
 result_id,
-round(avg(flow_max), 2) as flowmax, 
-round(avg(flow_min), 2) as flowmin, 
+round(avg(flow_max), 2) as flowmax,
+round(avg(flow_min), 2) as flowmin,
 round(avg(flow_avg), 2) as flowavg,
-round(avg(vel_max), 2) as velmax, 
+round(avg(vel_max), 2) as velmax,
 round(avg(vel_min), 2) as velmin,
-round(avg(vel_avg), 2) as velavg, 
-round(avg(headloss_max), 2) as headloss_max, 
+round(avg(vel_avg), 2) as velavg,
+round(avg(headloss_max), 2) as headloss_max,
 round(avg(headloss_min), 2) as headloss_min,
-round(avg(setting_max), 2) as setting_max, 
-round(avg(setting_min), 2) as setting_min, 
-round(avg(reaction_max), 2) as reaction_max, 
-round(avg(reaction_min), 2) as reaction_min, 
-round(avg(ffactor_max), 2) as ffactor_max, 
+round(avg(setting_max), 2) as setting_max,
+round(avg(setting_min), 2) as setting_min,
+round(avg(reaction_max), 2) as reaction_max,
+round(avg(reaction_min), 2) as reaction_min,
+round(avg(ffactor_max), 2) as ffactor_max,
 round(avg(ffactor_min), 2) as ffactor_min
-FROM inp_pipe 
-LEFT JOIN v_rpt_arc on split_part(v_rpt_arc.arc_id, 'P',1) = inp_pipe.arc_id 
+FROM inp_pipe
+LEFT JOIN v_rpt_arc on split_part(v_rpt_arc.arc_id, 'P',1) = inp_pipe.arc_id
 group by inp_pipe.arc_id, result_id;
 
 
-CREATE OR REPLACE VIEW ve_epa_pump AS 
-SELECT inp_pump.*, 
+CREATE OR REPLACE VIEW ve_epa_pump AS
+SELECT inp_pump.*,
 concat(node_id,'_n2a') as nodarc_id,
 result_id,
 v_rpt_arc.flow_max as flowmax,
@@ -370,19 +370,19 @@ v_rpt_arc.flow_avg as flowavg,
 v_rpt_arc.vel_max as velmax,
 v_rpt_arc.vel_min as velmin,
 v_rpt_arc.vel_avg as velavg,
-headloss_max, 
-headloss_min, 
-setting_max, 
-setting_min, 
-reaction_max, 
-reaction_min, 
-ffactor_max, 
+headloss_max,
+headloss_min,
+setting_max,
+setting_min,
+reaction_max,
+reaction_min,
+ffactor_max,
 ffactor_min
-FROM inp_pump 
+FROM inp_pump
 LEFT JOIN v_rpt_arc ON concat(node_id,'_n2a') = arc_id;
 
-CREATE OR REPLACE VIEW ve_epa_valve AS 
-SELECT inp_valve.*, 
+CREATE OR REPLACE VIEW ve_epa_valve AS
+SELECT inp_valve.*,
 concat(node_id,'_n2a') as nodarc_id,
 result_id,
 v_rpt_arc.flow_max as flowmax,
@@ -391,18 +391,18 @@ v_rpt_arc.flow_avg as flowavg,
 v_rpt_arc.vel_max as velmax,
 v_rpt_arc.vel_min as velmin,
 v_rpt_arc.vel_avg as velavg,
-headloss_max, 
-headloss_min, 
-setting_max, 
-setting_min, 
-reaction_max, 
-reaction_min, 
-ffactor_max, 
+headloss_max,
+headloss_min,
+setting_max,
+setting_min,
+reaction_max,
+reaction_min,
+ffactor_max,
 ffactor_min
-FROM inp_valve 
+FROM inp_valve
 LEFT JOIN v_rpt_arc ON concat(node_id,'_n2a') = arc_id;
 
-CREATE OR REPLACE VIEW ve_epa_shortpipe AS 
+CREATE OR REPLACE VIEW ve_epa_shortpipe AS
  SELECT inp_shortpipe.*,
 concat(inp_shortpipe.node_id, '_n2a') AS nodarc_id,
 v_rpt_arc.result_id,
@@ -423,8 +423,8 @@ v_rpt_arc.ffactor_min
 FROM inp_shortpipe
 LEFT JOIN v_rpt_arc ON concat(inp_shortpipe.node_id, '_n2a') = v_rpt_arc.arc_id::text;
 
-CREATE OR REPLACE VIEW ve_epa_virtualvalve AS 
-SELECT inp_virtualvalve.*, 
+CREATE OR REPLACE VIEW ve_epa_virtualvalve AS
+SELECT inp_virtualvalve.*,
 result_id,
 v_rpt_arc.flow_max as flowmax,
 v_rpt_arc.flow_min as flowmin,
@@ -432,19 +432,19 @@ v_rpt_arc.flow_avg as flowavg,
 v_rpt_arc.vel_max as velmax,
 v_rpt_arc.vel_min as velmin,
 v_rpt_arc.vel_avg as velavg,
-headloss_max, 
-headloss_min, 
-setting_max, 
-setting_min, 
-reaction_max, 
-reaction_min, 
-ffactor_max, 
+headloss_max,
+headloss_min,
+setting_max,
+setting_min,
+reaction_max,
+reaction_min,
+ffactor_max,
 ffactor_min
-FROM inp_virtualvalve 
+FROM inp_virtualvalve
 LEFT JOIN v_rpt_arc USING (arc_id);
 
 CREATE OR REPLACE VIEW ve_epa_pump_additional AS
-SELECT inp_pump_additional.*, 
+SELECT inp_pump_additional.*,
 concat(node_id,'_n2a') as nodarc_id,
 result_id,
 v_rpt_arc.flow_max as flowmax,
@@ -452,35 +452,35 @@ v_rpt_arc.flow_min as flowmin,
 v_rpt_arc.flow_avg as flowavg,
 v_rpt_arc.vel_max as velmax,
 v_rpt_arc.vel_min as velmin,
-v_rpt_arc.vel_avg as velavg, 
-headloss_max, 
-headloss_min, 
-setting_max, 
-setting_min, 
-reaction_max, 
-reaction_min, 
-ffactor_max, 
+v_rpt_arc.vel_avg as velavg,
+headloss_max,
+headloss_min,
+setting_max,
+setting_min,
+reaction_max,
+reaction_min,
+ffactor_max,
 ffactor_min
-FROM inp_pump_additional 
+FROM inp_pump_additional
 LEFT JOIN v_rpt_arc ON concat(node_id,'_n2a',order_id) = arc_id;
 
 
 CREATE OR REPLACE VIEW ve_epa_connec AS
-SELECT inp_connec.*, 
+SELECT inp_connec.*,
 result_id,
-demand_max as demandmax, 
+demand_max as demandmax,
 demand_min as demandmin,
 demand_avg as demandavg,
 head_max as headmax,
-head_min as headmin, 
+head_min as headmin,
 head_avg as headavg,
 press_max as pressmax,
-press_min as pressmin, 
+press_min as pressmin,
 press_avg as pressavg,
-quality_max as qualmax, 
-quality_min as qualmin, 
+quality_max as qualmax,
+quality_min as qualmin,
 quality_avg as qualavg
-FROM inp_connec 
+FROM inp_connec
 LEFT JOIN v_rpt_node ON connec_id = node_id;
 
 
@@ -598,28 +598,19 @@ CREATE OR REPLACE VIEW vu_arc  AS
      LEFT JOIN ext_municipality mu ON arc.muni_id = mu.muni_id;
 
 
-CREATE OR REPLACE VIEW v_arc AS 
+CREATE OR REPLACE VIEW v_arc AS
 SELECT vu_arc.*
 FROM vu_arc
 JOIN v_state_arc USING (arc_id)
 JOIN v_expl_arc e on e.arc_id = vu_arc.arc_id;
 
 
-CREATE OR REPLACE VIEW v_edit_arc AS 
+CREATE OR REPLACE VIEW v_edit_arc AS
 SELECT * FROM v_arc;
 
-CREATE OR REPLACE VIEW ve_arc AS 
+CREATE OR REPLACE VIEW ve_arc AS
 SELECT * FROM v_arc;
 
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_arc"], "fieldName":"is_operative", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_arc"], "fieldName":"region_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_arc"], "fieldName":"province_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 
 CREATE OR REPLACE VIEW vu_node AS
@@ -738,14 +729,14 @@ CREATE OR REPLACE VIEW vu_node AS
      LEFT JOIN ext_municipality mu ON node.muni_id = mu.muni_id;
 
 
-CREATE OR REPLACE VIEW v_node AS 
+CREATE OR REPLACE VIEW v_node AS
 SELECT vu_node.*
 FROM vu_node
 JOIN v_state_node USING (node_id)
 JOIN v_expl_node e on e.node_id = vu_node.node_id;
 
 
-CREATE OR REPLACE VIEW v_edit_node AS 
+CREATE OR REPLACE VIEW v_edit_node AS
  SELECT v_node.node_id,
     v_node.code,
     v_node.elevation,
@@ -832,17 +823,17 @@ CREATE OR REPLACE VIEW v_edit_node AS
     v_node.conserv_state,
     v_node.access_type,
     v_node.placement_type,
-    v_node.demand_max, 
-    v_node.demand_min, 
-    v_node.demand_avg, 
-    v_node.press_max, 
-    v_node.press_min, 
-    v_node.press_avg, 
-    v_node.head_max, 
-    v_node.head_min, 
-    v_node.head_avg, 
-    v_node.quality_max, 
-    v_node.quality_min, 
+    v_node.demand_max,
+    v_node.demand_min,
+    v_node.demand_avg,
+    v_node.press_max,
+    v_node.press_min,
+    v_node.press_avg,
+    v_node.head_max,
+    v_node.head_min,
+    v_node.head_avg,
+    v_node.quality_max,
+    v_node.quality_min,
     v_node.quality_avg,
     v_node.expl_id2,
     v_node.is_operative,
@@ -851,19 +842,8 @@ CREATE OR REPLACE VIEW v_edit_node AS
    FROM v_node
      LEFT JOIN man_valve USING (node_id);
 
-CREATE OR REPLACE VIEW ve_node AS 
+CREATE OR REPLACE VIEW ve_node AS
 SELECT * FROM v_node;
-
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"is_operative", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"region_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"province_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
 
 
 CREATE OR REPLACE VIEW vu_connec  AS
@@ -929,7 +909,7 @@ CREATE OR REPLACE VIEW vu_connec  AS
     connec.undelete,
     cat_connec.label,
     connec.label_x,
-    connec.label_y, 
+    connec.label_y,
     connec.label_rotation,
     connec.publish,
     connec.inventory,
@@ -995,7 +975,7 @@ CREATE OR REPLACE VIEW vu_connec  AS
 
 
 
-CREATE OR REPLACE VIEW v_connec AS 
+CREATE OR REPLACE VIEW v_connec AS
  SELECT vu_connec.connec_id,
     vu_connec.code,
     vu_connec.elevation,
@@ -1096,30 +1076,20 @@ CREATE OR REPLACE VIEW v_connec AS
     vu_connec.expl_id2,
     vu_connec.quality_max,
     vu_connec.quality_min,
-    vu_connec.quality_avg,	
+    vu_connec.quality_avg,
     vu_connec.is_operative,
     vu_connec.region_id,
     vu_connec.province_id
    FROM vu_connec
      JOIN v_state_connec USING (connec_id)
     LEFT JOIN (SELECT DISTINCT ON (feature_id) * FROM v_link_connec WHERE state = 2) a ON feature_id = connec_id;
-    
 
-CREATE OR REPLACE VIEW v_edit_connec AS 
+
+CREATE OR REPLACE VIEW v_edit_connec AS
 SELECT * FROM v_connec;
 
-CREATE OR REPLACE VIEW ve_connec AS 
+CREATE OR REPLACE VIEW ve_connec AS
 SELECT * FROM v_connec;
-
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "fieldName":"is_operative", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "fieldName":"region_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "fieldName":"province_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
 
 
 CREATE OR REPLACE VIEW vu_link AS
@@ -1158,12 +1128,12 @@ CREATE OR REPLACE VIEW vu_link AS
      LEFT JOIN dqa q USING (dqa_id);
 
 
-create or replace view v_link_connec as 
+create or replace view v_link_connec as
 select * from vu_link
 JOIN v_state_link_connec USING (link_id);
 
 
-create or replace view v_link as 
+create or replace view v_link as
 select * from vu_link
 JOIN v_state_link USING (link_id);
 
@@ -1412,7 +1382,7 @@ UNION
 
 
 -- 28/05/2023
-CREATE OR REPLACE VIEW v_edit_inp_virtualpump AS 
+CREATE OR REPLACE VIEW v_edit_inp_virtualpump AS
  SELECT
     a.arc_id,
     a.node_1,
@@ -1439,7 +1409,7 @@ CREATE OR REPLACE VIEW v_edit_inp_virtualpump AS
      JOIN inp_virtualpump p USING (arc_id)
      WHERE a.sector_id = ss.sector_id AND ss.cur_user = "current_user"()::text AND a.is_operative IS TRUE;
 
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_virtualpump AS 
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_virtualpump AS
  SELECT
     v.dscenario_id,
     p.arc_id,
@@ -1454,12 +1424,12 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_virtualpump AS
     v.energy_price,
     v.energy_pattern_id,
     p.the_geom
-   FROM selector_inp_dscenario, v_edit_inp_virtualpump p 
+   FROM selector_inp_dscenario, v_edit_inp_virtualpump p
      JOIN inp_dscenario_virtualpump v USING (arc_id)
   WHERE v.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text;
 
 
-CREATE OR REPLACE VIEW ve_epa_virtualpump AS 
+CREATE OR REPLACE VIEW ve_epa_virtualpump AS
  SELECT p.arc_id,
     p.power,
     p.curve_id,
@@ -1490,7 +1460,7 @@ CREATE OR REPLACE VIEW ve_epa_virtualpump AS
      LEFT JOIN v_rpt_arc USING (arc_id);
 
 
-CREATE OR REPLACE VIEW vi_pumps AS 
+CREATE OR REPLACE VIEW vi_pumps AS
  SELECT temp_arc.arc_id,
     temp_arc.node_1,
     temp_arc.node_2,
@@ -1515,10 +1485,10 @@ CREATE OR REPLACE VIEW vi_pumps AS
   WHERE temp_arc.epa_type::text IN('PUMP', 'VIRTUALPUMP') AND NOT (temp_arc.arc_id::text IN ( SELECT vi_valves.arc_id
            FROM vi_valves))
   ORDER BY temp_arc.arc_id;
-  
+
   --2022/01/03
 DROP VIEW IF EXISTS v_edit_inp_dscenario_junction;
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_junction AS 
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_junction AS
 SELECT p.dscenario_id,
 p.node_id,
 p.demand,
@@ -1532,12 +1502,12 @@ n.the_geom
 FROM selector_sector,selector_inp_dscenario, v_node n
 JOIN inp_dscenario_junction p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text
 AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text AND is_operative is true;
 
 
 DROP VIEW IF EXISTS v_edit_inp_junction;
-CREATE OR REPLACE VIEW v_edit_inp_junction AS 
+CREATE OR REPLACE VIEW v_edit_inp_junction AS
  SELECT n.node_id,
 n.elevation,
 n.depth,
@@ -1563,7 +1533,7 @@ WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "cu
 
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_pump;
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_pump AS 
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_pump AS
 SELECT d.dscenario_id,
 p.node_id,
 p.power,
@@ -1578,13 +1548,13 @@ n.the_geom
 FROM selector_sector, selector_inp_dscenario,v_node n
 JOIN inp_dscenario_pump p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id 
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id
 AND selector_inp_dscenario.cur_user = "current_user"()::text AND is_operative is true;
 
 
 
 DROP VIEW IF EXISTS v_edit_inp_pump_additional;
-CREATE OR REPLACE VIEW v_edit_inp_pump_additional AS 
+CREATE OR REPLACE VIEW v_edit_inp_pump_additional AS
 SELECT n.node_id,
 n.elevation,
 n.depth,
@@ -1611,7 +1581,7 @@ WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "cu
 
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_pump_additional;
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_pump_additional AS 
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_pump_additional AS
 SELECT d.dscenario_id,
 p.node_id,
 p.order_id,
@@ -1628,11 +1598,11 @@ FROM selector_sector,
 selector_inp_dscenario,v_node n
 JOIN inp_dscenario_pump_additional p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id 
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id
 AND selector_inp_dscenario.cur_user = "current_user"()::text AND is_operative is true;
 
 DROP VIEW IF EXISTS v_edit_inp_pump;
-CREATE OR REPLACE VIEW v_edit_inp_pump AS 
+CREATE OR REPLACE VIEW v_edit_inp_pump AS
 SELECT n.node_id,
 n.elevation,
 n.depth,
@@ -1662,7 +1632,7 @@ WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "cu
 
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_pipe;
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_pipe AS 
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_pipe AS
  SELECT d.dscenario_id,
 p.arc_id,
 p.minorloss,
@@ -1675,12 +1645,12 @@ a.the_geom
 FROM selector_sector,selector_inp_dscenario, v_arc a
 JOIN inp_dscenario_pipe p USING (arc_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE a.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
+WHERE a.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text
 AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text AND is_operative is true;
 
 
 DROP VIEW IF EXISTS v_edit_inp_pipe;
-CREATE OR REPLACE VIEW v_edit_inp_pipe AS 
+CREATE OR REPLACE VIEW v_edit_inp_pipe AS
  SELECT arc.arc_id,
 arc.node_1,
 arc.node_2,
@@ -1705,7 +1675,7 @@ WHERE arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "
 
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_shortpipe;
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_shortpipe AS 
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_shortpipe AS
 SELECT d.dscenario_id,
 p.node_id,
 p.minorloss,
@@ -1716,12 +1686,12 @@ n.the_geom
 FROM selector_sector, selector_inp_dscenario, v_node n
 JOIN inp_dscenario_shortpipe p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND 
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND
 p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text AND is_operative is true;
 
 
 DROP VIEW IF EXISTS v_edit_inp_shortpipe;
-CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS 
+CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS
  SELECT n.node_id,
 n.elevation,
 n.depth,
@@ -1742,10 +1712,10 @@ n.the_geom
 FROM selector_sector, v_node n
 JOIN inp_shortpipe USING (node_id)
 WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND is_operative is true;
-  
+
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_tank;
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_tank AS 
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_tank AS
 SELECT d.dscenario_id,
 p.node_id,
 p.initlevel,
@@ -1769,9 +1739,9 @@ JOIN cat_dscenario d USING (dscenario_id)
 JOIN v_sector_node s ON s.node_id = n. node_id
 WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text AND is_operative is true;
 
-  
+
 DROP VIEW IF EXISTS v_edit_inp_tank;
-CREATE OR REPLACE VIEW v_edit_inp_tank AS 
+CREATE OR REPLACE VIEW v_edit_inp_tank AS
  SELECT n.node_id,
 n.elevation,
 n.depth,
@@ -1804,7 +1774,7 @@ WHERE is_operative is true;
 
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_reservoir;
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_reservoir AS 
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_reservoir AS
 SELECT d.dscenario_id,
 p.node_id,
 p.pattern_id,
@@ -1818,12 +1788,12 @@ FROM selector_sector,
 selector_inp_dscenario, v_node n
 JOIN inp_dscenario_reservoir p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text
 AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text AND is_operative is true;
 
-  
+
 DROP VIEW IF EXISTS v_edit_inp_reservoir;
-CREATE OR REPLACE VIEW v_edit_inp_reservoir AS 
+CREATE OR REPLACE VIEW v_edit_inp_reservoir AS
  SELECT n.node_id,
 n.elevation,
 n.depth,
@@ -1847,7 +1817,7 @@ WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "cu
 
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_valve;
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_valve AS 
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_valve AS
 SELECT d.dscenario_id,
 p.node_id,
 concat(p.node_id,'_n2a') AS nodarc_id,
@@ -1864,12 +1834,12 @@ n.the_geom
 FROM selector_sector, selector_inp_dscenario, v_node n
 JOIN inp_dscenario_valve p USING (node_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id 
+WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND p.dscenario_id = selector_inp_dscenario.dscenario_id
 AND selector_inp_dscenario.cur_user = "current_user"()::text AND is_operative is true;
 
-  
+
 DROP VIEW IF EXISTS v_edit_inp_valve;
-CREATE OR REPLACE VIEW v_edit_inp_valve AS 
+CREATE OR REPLACE VIEW v_edit_inp_valve AS
 SELECT n.node_id,
 n.elevation,
 n.depth,
@@ -1898,7 +1868,7 @@ JOIN inp_valve USING (node_id)
 WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND is_operative is true;
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_virtualvalve;
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_virtualvalve AS 
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_virtualvalve AS
 SELECT d.dscenario_id,
 p.arc_id,
 p.valv_type,
@@ -1914,12 +1884,12 @@ a.the_geom
 FROM selector_sector, selector_inp_dscenario, v_arc a
 JOIN inp_dscenario_virtualvalve p USING (arc_id)
 JOIN cat_dscenario d USING (dscenario_id)
-WHERE a.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
+WHERE a.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text
 AND p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text AND is_operative is true;
 
 
 DROP VIEW IF EXISTS v_edit_inp_virtualvalve;
-CREATE OR REPLACE VIEW v_edit_inp_virtualvalve AS 
+CREATE OR REPLACE VIEW v_edit_inp_virtualvalve AS
 SELECT v_arc.arc_id,
 v_arc.node_1,
 v_arc.node_2,
@@ -1948,17 +1918,17 @@ WHERE v_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user =
 
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_inlet;
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_inlet AS 
-SELECT p.dscenario_id, 
-n.node_id, 
-initlevel, 
-minlevel, 
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_inlet AS
+SELECT p.dscenario_id,
+n.node_id,
+initlevel,
+minlevel,
 maxlevel,
-diameter, 
-minvol, 
-curve_id, 
-overflow, 
-head, 
+diameter,
+minvol,
+curve_id,
+overflow,
+head,
 pattern_id,
 mixing_model,
 mixing_fraction,
@@ -1976,7 +1946,7 @@ WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dsce
 
 
 DROP VIEW IF EXISTS v_edit_inp_inlet;
-CREATE OR REPLACE VIEW v_edit_inp_inlet AS 
+CREATE OR REPLACE VIEW v_edit_inp_inlet AS
  SELECT n.node_id,
 n.elevation,
 n.depth,
@@ -2012,7 +1982,7 @@ WHERE is_operative is true;
 
 DROP VIEW IF EXISTS v_edit_inp_dscenario_connec;
 DROP VIEW IF EXISTS v_edit_inp_connec;
-CREATE OR REPLACE VIEW v_edit_inp_connec AS 
+CREATE OR REPLACE VIEW v_edit_inp_connec AS
  SELECT connec.connec_id,
 connec.elevation,
 connec.depth,
@@ -2044,7 +2014,7 @@ FROM selector_sector,v_connec connec
 JOIN inp_connec USING (connec_id)
 WHERE connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND is_operative is true;
 
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_connec AS 
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_connec AS
 SELECT d.dscenario_id,
 connec.connec_id,
 connec.pjoint_type,

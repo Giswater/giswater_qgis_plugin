@@ -9,60 +9,60 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 CREATE OR REPLACE VIEW ve_epa_junction AS
-SELECT inp_junction.*, 
-aver_depth as depth_average,max_depth as depth_max, 
-d.time_days as depth_max_day, 
+SELECT inp_junction.*,
+aver_depth as depth_average,max_depth as depth_max,
+d.time_days as depth_max_day,
 d.time_hour as depth_max_hour,
 hour_surch as surcharge_hour,
 max_height as surgarge_max_height,
 hour_flood as flood_hour,
-max_rate as flood_max_rate, 
-f.time_days as time_day, 
-f.time_hour as time_hour, 
-tot_flood as flood_total, 
+max_rate as flood_max_rate,
+f.time_days as time_day,
+f.time_hour as time_hour,
+tot_flood as flood_total,
 max_ponded as flood_max_ponded
-FROM inp_junction 
+FROM inp_junction
 LEFT JOIN v_rpt_nodedepth_sum d USING (node_id)
 LEFT JOIN v_rpt_nodesurcharge_sum s USING (node_id)
 LEFT JOIN v_rpt_nodeflooding_sum f USING (node_id);
 
 CREATE OR REPLACE VIEW ve_epa_storage AS
-SELECT inp_storage.*, 
-aver_vol, 
-avg_full, 
-ei_loss, 
-max_vol, 
-max_full, 
-time_days, 
-time_hour, 
+SELECT inp_storage.*,
+aver_vol,
+avg_full,
+ei_loss,
+max_vol,
+max_full,
+time_days,
+time_hour,
 max_out
-FROM inp_storage 
+FROM inp_storage
 LEFT JOIN v_rpt_storagevol_sum USING (node_id);
 
 CREATE OR REPLACE VIEW ve_epa_outfall AS
-SELECT inp_outfall.*, 
-flow_freq, 
-avg_flow, 
-max_flow, 
+SELECT inp_outfall.*,
+flow_freq,
+avg_flow,
+max_flow,
 total_vol
 FROM inp_outfall
 LEFT JOIN v_rpt_outfallflow_sum USING (node_id);
 
 CREATE OR REPLACE VIEW ve_epa_conduit AS
-SELECT inp_conduit.*, 
-max_flow, 
-time_days, 
-time_hour, 
-max_veloc, 
-mfull_flow, 
-mfull_dept, 
-max_shear, 
-max_hr, 
-max_slope, 
-day_max, 
-time_max, 
-min_shear, 
-day_min, 
+SELECT inp_conduit.*,
+max_flow,
+time_days,
+time_hour,
+max_veloc,
+mfull_flow,
+mfull_dept,
+max_shear,
+max_hr,
+max_slope,
+day_max,
+time_max,
+min_shear,
+day_min,
 time_min
 FROM inp_conduit LEFT JOIN v_rpt_arcflow_sum USING (arc_id);
 
@@ -72,17 +72,17 @@ FROM inp_gully;
 
 
 CREATE OR REPLACE VIEW ve_epa_pump AS
-SELECT inp_pump.*, 
-percent, 
-num_startup, 
-min_flow, 
-avg_flow, 
-max_flow, 
-vol_ltr, 
-powus_kwh, 
+SELECT inp_pump.*,
+percent,
+num_startup,
+min_flow,
+avg_flow,
+max_flow,
+vol_ltr,
+powus_kwh,
 timoff_min,
 timoff_max
-FROM inp_pump 
+FROM inp_pump
 LEFT JOIN v_rpt_pumping_sum USING (arc_id);
 
 CREATE OR REPLACE VIEW ve_epa_virtual AS
@@ -95,63 +95,63 @@ FROM inp_netgully;
 
 CREATE OR REPLACE VIEW ve_epa_orifice AS
 SELECT inp_orifice.*,
-max_flow, 
-time_days, 
-time_hour, 
-max_veloc, 
-mfull_flow, 
-mfull_dept, 
-max_shear, 
-max_hr, 
-max_slope, 
-day_max, 
-time_max, 
-min_shear, 
-day_min, 
+max_flow,
+time_days,
+time_hour,
+max_veloc,
+mfull_flow,
+mfull_dept,
+max_shear,
+max_hr,
+max_slope,
+day_max,
+time_max,
+min_shear,
+day_min,
 time_min
 FROM inp_orifice
 LEFT JOIN rpt_arcflow_sum USING (arc_id);
 
 CREATE OR REPLACE VIEW ve_epa_weir AS
 SELECT inp_weir.*,
-max_flow, 
-time_days, 
-time_hour, 
-max_veloc, 
-mfull_flow, 
-mfull_dept, 
-max_shear, 
-max_hr, 
-max_slope, 
-day_max, 
-time_max, 
-min_shear, 
-day_min, 
+max_flow,
+time_days,
+time_hour,
+max_veloc,
+mfull_flow,
+mfull_dept,
+max_shear,
+max_hr,
+max_slope,
+day_max,
+time_max,
+min_shear,
+day_min,
 time_min
 FROM inp_weir
 LEFT JOIN rpt_arcflow_sum USING (arc_id);
 
 CREATE OR REPLACE VIEW ve_epa_outlet AS
 SELECT inp_outlet.*,
-max_flow, 
-time_days, 
-time_hour, 
-max_veloc, 
-mfull_flow, 
-mfull_dept, 
-max_shear, 
-max_hr, 
-max_slope, 
-day_max, 
-time_max, 
-min_shear, 
-day_min, 
+max_flow,
+time_days,
+time_hour,
+max_veloc,
+mfull_flow,
+mfull_dept,
+max_shear,
+max_hr,
+max_slope,
+day_max,
+time_max,
+min_shear,
+day_min,
 time_min
 FROM inp_outlet
 LEFT JOIN rpt_arcflow_sum USING (arc_id);
 
 
-CREATE OR REPLACE VIEW vu_arc AS 
+CREATE OR REPLACE VIEW vu_arc AS
  SELECT arc.arc_id,
     arc.code,
     arc.node_1,
@@ -263,36 +263,16 @@ CREATE OR REPLACE VIEW vu_arc AS
 
 
 
-CREATE OR REPLACE VIEW v_arc AS 
+CREATE OR REPLACE VIEW v_arc AS
 SELECT vu_arc.* FROM vu_arc
 JOIN v_state_arc USING (arc_id)
 JOIN v_expl_arc e on e.arc_id = vu_arc.arc_id;
 
-CREATE OR REPLACE VIEW v_edit_arc AS 
+CREATE OR REPLACE VIEW v_edit_arc AS
 SELECT * FROM v_arc;
 
-CREATE OR REPLACE VIEW ve_arc AS 
+CREATE OR REPLACE VIEW ve_arc AS
 SELECT * FROM v_arc;
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_arc"], "fieldName":"is_operative", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_arc"], "fieldName":"region_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_arc"], "fieldName":"province_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_arc"], "fieldName":"adate", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_arc"], "fieldName":"adescript", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_arc"], "fieldName":"visitability", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-
 
 CREATE OR REPLACE VIEW vu_connec AS
  SELECT connec.connec_id,
@@ -512,28 +492,11 @@ CREATE OR REPLACE VIEW v_connec AS
 
 
 
-CREATE OR REPLACE VIEW v_edit_connec AS 
+CREATE OR REPLACE VIEW v_edit_connec AS
 SELECT * FROM v_connec;
 
-CREATE OR REPLACE VIEW ve_connec AS 
+CREATE OR REPLACE VIEW ve_connec AS
 SELECT * FROM v_connec;
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "fieldName":"is_operative", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "fieldName":"region_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "fieldName":"province_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "fieldName":"adate", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "fieldName":"adescript", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-
 
 CREATE OR REPLACE VIEW vu_gully
  AS
@@ -760,33 +723,11 @@ CREATE OR REPLACE VIEW v_gully AS
 
 
 
-CREATE OR REPLACE VIEW v_edit_gully AS 
+CREATE OR REPLACE VIEW v_edit_gully AS
 SELECT * FROM v_gully;
 
-CREATE OR REPLACE VIEW ve_gully AS 
+CREATE OR REPLACE VIEW ve_gully AS
 SELECT * FROM v_gully;
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_gully"], "fieldName":"is_operative", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_gully"], "fieldName":"region_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_gully"], "fieldName":"province_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_gully"], "fieldName":"adate", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_gully"], "fieldName":"adescript", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_gully"], "fieldName":"siphon_type", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_gully"], "fieldName":"odorflap", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
 
 CREATE OR REPLACE VIEW vu_node AS
  WITH vu_node AS (
@@ -981,32 +922,16 @@ CREATE OR REPLACE VIEW vu_node AS
    FROM vu_node;
 
 
-CREATE OR REPLACE VIEW v_node AS 
+CREATE OR REPLACE VIEW v_node AS
 SELECT vu_node.* FROM vu_node
 JOIN v_state_node USING (node_id)
 JOIN v_expl_node e on e.node_id = vu_node.node_id;
 
-CREATE OR REPLACE VIEW v_edit_node AS 
+CREATE OR REPLACE VIEW v_edit_node AS
 SELECT * FROM v_node;
 
-CREATE OR REPLACE VIEW ve_node AS 
+CREATE OR REPLACE VIEW ve_node AS
 SELECT * FROM v_node;
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"is_operative", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"region_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"province_id", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"adate", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"adescript", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
 
 CREATE OR REPLACE VIEW vu_link AS
  SELECT l.link_id,
@@ -1033,15 +958,15 @@ CREATE OR REPLACE VIEW vu_link AS
      LEFT JOIN sector s USING (sector_id)
      LEFT JOIN dma d USING (dma_id);
 
-create or replace view v_link_connec as 
+create or replace view v_link_connec as
 select distinct on (link_id) * from vu_link_connec
 JOIN v_state_link_connec USING (link_id);
 
-create or replace view v_link_gully as 
+create or replace view v_link_gully as
 select distinct on (link_id) * from vu_link_gully
 JOIN v_state_link_gully USING (link_id);
 
-create or replace view v_link as 
+create or replace view v_link as
 select distinct on (link_id) * from vu_link
 JOIN v_state_link USING (link_id);
 
@@ -1073,7 +998,7 @@ with qt as (SELECT inp_curve_value.id, inp_curve_value.curve_id,
 
 CREATE OR REPLACE VIEW vi_timeseries as
 select timser_id,  other1,   other2,   other3 from (
-SELECT 
+SELECT
     t.id,
     t.timser_id,
     t.other1,
@@ -1118,8 +1043,8 @@ SELECT
           ORDER BY a.id) t
   WHERE (t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL))b
   ORDER BY id;
-  
-    
+
+
 CREATE OR REPLACE VIEW vi_patterns
 AS SELECT p.pattern_id,
     p.pattern_type,
@@ -1192,20 +1117,6 @@ AS SELECT a.lidco_id,
              LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_lid_value.lidlayer::text
           WHERE active and inp_typevalue.typevalue::text = 'inp_value_lidlayer'::text) a
   ORDER BY a.lidco_id, a.id;
-  
-  
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_arc"], "systemId":"CONDUIT","fieldName":"bottom_mat", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_arc"], "systemId":"CHAMBER","fieldName":"bottom_mat", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "systemId":"MANHOLE","fieldName":"bottom_mat", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "systemId":"CHAMBER","fieldName":"slope", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-
 
 CREATE OR REPLACE VIEW v_edit_inp_pattern
  AS
@@ -1251,10 +1162,10 @@ CREATE OR REPLACE VIEW v_edit_inp_timeseries
     inp_timeseries p
   WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
   ORDER BY p.id;
-  
+
 drop view if exists vi_subcatch2outlet;
 CREATE OR REPLACE VIEW vi_subcatch2outlet
-AS 
+AS
 SELECT subc_id, outlet_id, outlet_type, st_length2d(the_geom) as length, hydrology_id, the_geom FROM (
 SELECT s1.subc_id,
 	s1.outlet_id,

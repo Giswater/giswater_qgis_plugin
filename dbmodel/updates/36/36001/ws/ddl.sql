@@ -42,7 +42,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenar
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_connec", "column":"source_pattern_id", "dataType":"character varying(16)", "isUtils":"False"}}$$);
 
 
---PUMP REFACTOR 
+--PUMP REFACTOR
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_pump", "column":"pattern", "newName":"pattern_id"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_dscenario_pump", "column":"pattern", "newName":"pattern_id"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_pump_additional", "column":"pattern", "newName":"pattern_id"}}$$);
@@ -61,13 +61,13 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pump_im
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pump_importinp", "column":"energy_price", "dataType":"float", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pump_importinp", "column":"energy_pattern_id", "dataType":"character varying(18)", "isUtils":"False"}}$$);
 
-UPDATE inp_pump SET effic_curve_id=energyvalue 
+UPDATE inp_pump SET effic_curve_id=energyvalue
 WHERE energyparam ilike '%EFFIC%' AND energyvalue in (select id from inp_curve);
 
-UPDATE inp_pump SET energy_price=energyvalue::float 
+UPDATE inp_pump SET energy_price=energyvalue::float
 WHERE energyparam ilike '%PRICE%' and energyvalue ~ '^ *[-+]?[0-9]*([.][0-9]+)?[0-9]*(([eE][-+]?)[0-9]+)? *$' is true;
 
-UPDATE inp_pump SET energy_pattern_id=energyvalue 
+UPDATE inp_pump SET energy_pattern_id=energyvalue
 WHERE energyparam ilike '%PATTERN%' AND energyvalue in (select pattern_id from inp_pattern);
 
 --PUMP_ADDITIONAL REFACTOR
@@ -81,13 +81,13 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenar
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_pump_additional", "column":"energy_pattern_id", "dataType":"character varying(18)", "isUtils":"False"}}$$);
 
 
-UPDATE inp_pump_additional SET effic_curve_id=energyvalue 
+UPDATE inp_pump_additional SET effic_curve_id=energyvalue
 WHERE energyparam ilike '%EFFIC%' AND energyvalue in (select id from inp_curve);
 
-UPDATE inp_pump_additional SET energy_price=energyvalue::float 
+UPDATE inp_pump_additional SET energy_price=energyvalue::float
 WHERE energyparam ilike '%PRICE%' and energyvalue ~ '^ *[-+]?[0-9]*([.][0-9]+)?[0-9]*(([eE][-+]?)[0-9]+)? *$' is true;
 
-UPDATE inp_pump_additional SET energy_pattern_id=energyvalue 
+UPDATE inp_pump_additional SET energy_pattern_id=energyvalue
 WHERE energyparam ilike '%PATTERN%' AND energyvalue in (select pattern_id from inp_pattern);
 
 --PIPE REFACTOR
@@ -98,10 +98,10 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenar
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_pipe", "column":"wall_coeff", "dataType":"float", "isUtils":"False"}}$$);
 
 
-UPDATE inp_pipe SET bulk_coeff=reactionvalue::float 
+UPDATE inp_pipe SET bulk_coeff=reactionvalue::float
 WHERE reactionparam ilike '%bulk%' and reactionvalue ~ '^ *[-+]?[0-9]*([.][0-9]+)?[0-9]*(([eE][-+]?)[0-9]+)? *$' is true;
 
-UPDATE inp_pipe SET bulk_coeff=reactionvalue::float 
+UPDATE inp_pipe SET bulk_coeff=reactionvalue::float
 WHERE reactionparam ilike '%wall%' and reactionvalue ~ '^ *[-+]?[0-9]*([.][0-9]+)?[0-9]*(([eE][-+]?)[0-9]+)? *$' is true;
 
 --SHORTPIPE REFACTOR
@@ -199,36 +199,6 @@ DROP VIEW IF EXISTS v_edit_man_fountain_pol;
 DROP VIEW IF EXISTS v_edit_man_register_pol;
 DROP VIEW IF EXISTS v_edit_man_tank_pol;
 
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "fieldName":"_pol_id_","action":"DELETE-FIELD","hasChilds":"True","onlyChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_node"], "action":"RESTORE-VIEW","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "fieldName":"_pol_id_","action":"DELETE-FIELD","hasChilds":"True","onlyChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_connec"], "action":"RESTORE-VIEW","hasChilds":"True"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},"data":{"viewName":["v_edit_man_tank"],
-"fieldName":"pol_id","alias":"man_tank._pol_id_ AS pol_id","action":"DELETE-FIELD","hasChilds":"False"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_man_tank"], "action":"RESTORE-VIEW","hasChilds":"False"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},"data":{"viewName":["v_edit_man_fountain"],
-"fieldName":"pol_id","alias":"man_fountain._pol_id_ AS pol_id","action":"DELETE-FIELD","hasChilds":"False"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_man_fountain"], "action":"RESTORE-VIEW","hasChilds":"False"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},"data":{"viewName":["v_edit_man_register"],
-"fieldName":"pol_id","alias":"man_register._pol_id_ AS pol_id","action":"DELETE-FIELD","hasChilds":"False"}}$$);
-
-SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-"data":{"viewName":["v_edit_man_register"], "action":"RESTORE-VIEW","hasChilds":"False"}}$$);
-
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_register", "column":"_pol_id_", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_fountain", "column":"_pol_id_", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_tank", "column":"_pol_id_", "dataType":"integer"}}$$);
@@ -278,7 +248,7 @@ CREATE TABLE inp_virtualpump(
 );
 
 
-CREATE TABLE inp_dscenario_virtualpump( 
+CREATE TABLE inp_dscenario_virtualpump(
   dscenario_id integer NOT NULL,
   arc_id character varying(16) NOT NULL,
   power character varying,
