@@ -3223,6 +3223,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
         col_idx = tools_qt.get_col_index_by_col_name(widget, row['columnname'])
         if col_idx is None:
             continue
+        columns_dict[str(row['alias'] if row['alias'] else row['columnname'])] = str(row['columnname'])
         if not row['visible']:
             columns_to_delete.append(col_idx)
         else:
@@ -3238,7 +3239,6 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
             widget.setColumnWidth(col_idx, width)
             if row['alias'] is not None:
                 widget.model().setHeaderData(col_idx, Qt.Horizontal, row['alias'])
-            columns_dict[str(row['alias'] if row['alias'] else row['columnname'])] = str(row['columnname'])
     widget.setProperty('columns', columns_dict)
 
     # Set order
