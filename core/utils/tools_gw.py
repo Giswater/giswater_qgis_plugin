@@ -2964,7 +2964,12 @@ def insert_feature(class_object, dialog, table_object, is_psector=False, remove_
 
     tools_qgis.disconnect_signal_selection_changed()
     feature_type = get_signal_change_tab(dialog)
-    # Clear list of ids
+
+    # Initialize the list for the specific feature type if it doesn't exist
+    if feature_type not in class_object.list_ids:
+        class_object.list_ids[feature_type] = []
+
+    # Clear the temporary ids list when switching tabs or as needed
     if remove_ids:
         class_object.ids = []
 
@@ -3000,6 +3005,9 @@ def insert_feature(class_object, dialog, table_object, is_psector=False, remove_
         tools_qt.show_info_box(message)
         return
 
+    # Temporarily store IDs to be added for this feature type
+    selected_ids = []
+
     if feature_type != 'workcat':  # Skip for workcat since we already handled it
         for layer in class_object.layers[feature_type]:
             if layer.selectedFeatureCount() > 0:
@@ -3008,17 +3016,20 @@ def insert_feature(class_object, dialog, table_object, is_psector=False, remove_
                 for feature in features:
                     # Append 'feature_id' into the list
                     selected_id = feature.attribute(field_id)
-                    if selected_id not in class_object.ids:
-                        class_object.ids.append(selected_id)
+                    if selected_id not in selected_ids:
+                        selected_ids.append(selected_id)
 
-            if feature_id not in class_object.ids:
-                # If feature id doesn't exist in list -> add
-                class_object.ids.append(str(feature_id))
+        if feature_id not in selected_ids:
+            selected_ids.append(str(feature_id))
 
-    if class_object.ids:
+    # Append the new IDs to the existing list, ensuring no duplicates
+    class_object.list_ids[feature_type] = list(set(class_object.list_ids[feature_type] + selected_ids))
+
+    # Generate expression filter for the IDs
+    if class_object.list_ids[feature_type]:
         expr_filter = f'"{field_id}" IN ('
-        for i in range(len(class_object.ids)):
-            expr_filter += f"'{class_object.ids[i]}', "
+        for i in range(len(class_object.list_ids[feature_type])):
+            expr_filter += f"'{class_object.list_ids[feature_type][i]}', "
         expr_filter = expr_filter[:-2] + ")"
     else:
         expr_filter = f'"{field_id}" IN (NULL)'
@@ -3039,16 +3050,14 @@ def insert_feature(class_object, dialog, table_object, is_psector=False, remove_
 
     # Reload contents of table 'tbl_xxx_xxx_@feature_type'
     if is_psector:
-        _insert_feature_psector(dialog, feature_type, ids=class_object.ids)
+        _insert_feature_psector(dialog, feature_type, ids=selected_ids)
         layers = remove_selection(True, class_object.layers)
         class_object.layers = layers
     else:
         load_tablename(dialog, table_object, feature_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
-    # Update list
-    class_object.list_ids[feature_type] = class_object.ids
-    enable_feature_type(dialog, table_object, ids=class_object.ids)
+    enable_feature_type(dialog, table_object, ids=class_object.list_ids[feature_type])
     connect_signal_selection_changed(class_object, dialog, table_object, feature_type)
 
     # Clear the feature_id text field

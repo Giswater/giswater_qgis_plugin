@@ -398,13 +398,6 @@ class GwDocument(QObject):
         workcat_ids = self.list_ids['workcat']
         gully_ids = self.list_ids['gully']
 
-        # Verificar existencia de IDs en tablas correspondientes
-        arc_ids = self._filter_existing_ids(arc_ids, 'arc', 'arc_id')
-        node_ids = self._filter_existing_ids(node_ids, 'node', 'node_id')
-        connec_ids = self._filter_existing_ids(connec_ids, 'connec', 'connec_id')
-        workcat_ids = self._filter_existing_ids(workcat_ids, 'workcat')
-        gully_ids = self._filter_existing_ids(gully_ids, 'gully', 'gully_id')
-
         # Clear the current records
         for table in self.doc_tables:
             if table == 'doc_x_gully' and self.project_type != 'ud':
@@ -447,20 +440,6 @@ class GwDocument(QObject):
             message = tools_qt.fill_table(qtable, f"{self.schema_name}.v_ui_doc_x_{tablename}", expr)
             if message:
                 tools_qgis.show_warning(message)
-
-    def _filter_existing_ids(self, ids, table_name, id_column=None):
-        valid_ids = []
-        for feature_id in ids:
-            if table_name == 'workcat':
-                sql = f"SELECT id FROM cat_work WHERE id = '{feature_id}'"
-            else:
-                sql = f"SELECT {id_column} FROM {table_name} WHERE {id_column} = '{feature_id}'"
-            row = tools_db.get_row(sql, log_info=False)
-            if row:
-                valid_ids.append(feature_id)
-            else:
-                print(f"Invalid ID {feature_id} for table {table_name}, skipping insertion.")
-        return valid_ids
 
 
     def _check_doc_exists(self, name=""):
