@@ -70,18 +70,18 @@ BEGIN
 	-- get input data
 	v_result_id := ((p_data ->>'data')::json->>'resultId')::text;
 	v_path := ((p_data ->>'data')::json->>'path')::text;
-		
+
 	-- Starting process
 	INSERT INTO temp_audit_check_data (fid, result_id, error_message) VALUES (140, v_result_id, concat('IMPORT RPT FILE'));
 	INSERT INTO temp_audit_check_data (fid, result_id, error_message) VALUES (140, v_result_id, concat('-----------------------------'));
-	
+
 	UPDATE temp_t_csv SET fid = v_fid;
-	
+
 	--remove data from with the same result_id
 	FOR v_rpt IN SELECT tablename FROM config_fprocess WHERE fid=v_fid EXCEPT SELECT tablename FROM config_fprocess WHERE tablename='rpt_cat_result' LOOP
 		EXECUTE 'DELETE FROM '||v_rpt.tablename||' WHERE result_id='''||v_result_id||''';';
 	END LOOP;
-	
+
 	v_hour=null;
 
 	-- clenaning data
@@ -93,10 +93,10 @@ BEGIN
 	if v_open > 0 THEN
 
 		DELETE FROM temp_t_csv WHERE csv1 = 'Page';
-		
-		-- forcing time values 
+
+		-- forcing time values
 		for v_rec in select id, csv4 from temp_t_csv where csv2 like 'Results%' order by id desc
-		loop 
+		loop
 			if v_time_last = 0 then v_time_last = v_rec.id;end if;
 			raise notice ' v_rec % v_time_last %', v_rec, v_time_last;
 			update temp_t_csv set csv40 = v_rec.csv4 where id > v_rec.id and  id < v_time_last;
@@ -108,8 +108,8 @@ BEGIN
 		DELETE FROM temp_t_csv where csv2 in ('CMH', 'LPS', 'LPM', 'GPM', 'AFD', 'CMD', 'ALD', 'IMGD', 'MGD');
 		DELETE FROM temp_t_csv WHERE source='rpt_node' AND (csv1='Node' or csv1='Elevation' or csv1='MINIMUM' or csv1='MAXIMUM' or csv1='DIFFERENTIAL' or csv1='AVERAGE');
 		DELETE FROM temp_t_csv WHERE source='rpt_node' AND (csv3='m' or csv5 = 'Hours');
-	
-		INSERT INTO rpt_node (node_id, result_id, "time", demand, head, press, quality) 
+
+		INSERT INTO rpt_node (node_id, result_id, "time", demand, head, press, quality)
 		SELECT csv1, v_result_id, (case when csv40 is null then '00:00' else csv40 end), csv2::numeric, csv3::numeric, csv4::numeric, csv5::numeric
 		FROM temp_t_csv WHERE source='rpt_node' AND fid = 140 AND cur_user=current_user ORDER BY id;
 
@@ -118,7 +118,7 @@ BEGIN
 		INSERT INTO rpt_arc(arc_id,result_id,"time", flow, vel, headloss, other)
 		SELECT csv1,v_result_id, (case when csv40 is null then '00:00' else csv40 end), csv2::numeric, csv3::numeric, csv4::numeric, csv5::TEXT
 		FROM temp_t_csv WHERE source='rpt_arc' AND fid = 140 AND cur_user=current_user ORDER BY id;
-	
+
 	else
 		v_ffactor = (SELECT value FROM config_param_user WHERE parameter = 'inp_report_f_factor' AND cur_user = current_user);
 
@@ -130,15 +130,15 @@ BEGIN
 		UPDATE temp_t_csv SET csv6=null WHERE source='rpt_node' AND (csv6='Reservoir' OR csv6='Tank'); -- delete Reservoir AND tank word when quality is not enabled
 		DELETE FROM temp_t_csv WHERE source='rpt_node' AND (csv1='Node' or csv1='Elevation' or csv1='MINIMUM' or csv1='MAXIMUM' or csv1='DIFFERENTIAL' or csv1='AVERAGE');
 
-		INSERT INTO rpt_node (node_id, result_id, "time", elevation, demand, head, press, quality) 
+		INSERT INTO rpt_node (node_id, result_id, "time", elevation, demand, head, press, quality)
 		SELECT csv1, v_result_id, (case when csv40 is null then '00:00' else csv40 end), csv2::numeric, csv3::numeric, csv4::numeric, csv5::numeric, csv6::numeric
 		FROM temp_t_csv WHERE source='rpt_node' AND fid = 140 AND cur_user=current_user ORDER BY id;
-	
+
 		--arcs
 	   	DELETE FROM temp_t_csv WHERE source='rpt_arc' AND (csv1='Link' or csv1='Length' or csv1='Analysis' or csv1='MINIMUM' or csv1='MAXIMUM' or csv1='DIFFERENTIAL' or csv1='AVERAGE');
 		INSERT INTO rpt_arc(arc_id,result_id,"time",length, diameter, flow, vel, headloss,setting,reaction, ffactor,other)
 		SELECT csv1,v_result_id, (case when csv40 is null then '00:00' else csv40 end), csv2::numeric, csv3::numeric, csv4::numeric, csv5::numeric, csv6::numeric, csv7::numeric, csv8::numeric, csv9::numeric, csv10
-		FROM temp_t_csv WHERE source='rpt_arc' AND fid = 140 AND cur_user=current_user ORDER BY id;	
+		FROM temp_t_csv WHERE source='rpt_arc' AND fid = 140 AND cur_user=current_user ORDER BY id;
 
 	end if;
 
@@ -185,28 +185,30 @@ BEGIN
 
 	UPDATE rpt_cat_result set n_junction=v_njunction, n_reservoir=v_nreservoir, n_tank=v_ntanks, n_pipe=v_npipes, n_pump=v_npumps, n_valve=v_nvalves, head_form=v_headloss, hydra_time=v_htstep
 				, hydra_acc=v_haccuracy, st_ch_freq=v_statuscheck, max_tr_ch=v_mcheck, dam_li_thr=v_dthreshold, max_trials=v_mtrials, q_analysis=v_qanalysis, spec_grav=v_sgravity
-				, r_kin_visc=v_rkinematic, r_che_diff=v_rchemical, dem_multi=v_dmultiplier, total_dura=v_tduration, q_timestep=v_qtimestep, q_tolerance=v_qtolerance;
+				, r_kin_visc=v_rkinematic, r_che_diff=v_rchemical, dem_multi=v_dmultiplier, total_dura=v_tduration, q_timestep=v_qtimestep, q_tolerance=v_qtolerance
+				, expl_id = (SELECT array_agg(expl_id) FROM selector_expl WHERE cur_user = current_user AND expl_id > 0)
+				, sector_id = (SELECT array_agg(sector_id) FROM selector_sector WHERE cur_user = current_user AND sector_id > 0);
 
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (140, 'Rpt file import process -> Finished. Check your data');
 
 	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid = 140  order by id) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+	v_result := COALESCE(v_result, '{}');
+	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
+	v_result := COALESCE(v_result, '{}');
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
 
 	--Control nulls
-	v_version := COALESCE(v_version, '{}'); 
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
-	v_result_line := COALESCE(v_result_line, '{}'); 	
+	v_version := COALESCE(v_version, '{}');
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_point := COALESCE(v_result_point, '{}');
+	v_result_line := COALESCE(v_result_line, '{}');
 
 	-- Return
 	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Import succesfully"}, "version":"'||v_version||'"'||
@@ -215,7 +217,7 @@ BEGIN
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||
 		       '}}'||
-	    '}')::json;		
+	    '}')::json;
 
 END;
 $BODY$
