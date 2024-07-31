@@ -54,23 +54,23 @@ UPDATE doc SET name = id WHERE name IS NULL;
 UPDATE config_form_tableview
 	SET columnindex=0
 	WHERE objectname='v_ui_rpt_cat_result' AND columnname='result_id';
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
+	VALUES ('epa_toolbar','utils','v_ui_rpt_cat_result','expl_id',1,true);
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
+	VALUES ('epa_toolbar','utils','v_ui_rpt_cat_result','sector_id',2,true);
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
+	VALUES ('epa_toolbar','utils','v_ui_rpt_cat_result','network_type',3,true);
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
+	VALUES ('epa_toolbar','utils','v_ui_rpt_cat_result','descript',4,true);
 UPDATE config_form_tableview
-	SET columnindex=1
-	WHERE objectname='v_ui_rpt_cat_result' AND columnname='cur_user';
-INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
-	VALUES ('epa_toolbar','utils','v_ui_rpt_cat_result','expl_id',2,true);
-INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
-	VALUES ('epa_toolbar','utils','v_ui_rpt_cat_result','sector_id',3,true);
-INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
-	VALUES ('epa_toolbar','utils','v_ui_rpt_cat_result','network_type',4,true);
-INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
-	VALUES ('epa_toolbar','utils','v_ui_rpt_cat_result','descript',5,true);
-UPDATE config_form_tableview
-	SET columnindex=6
+	SET columnindex=5
 	WHERE objectname='v_ui_rpt_cat_result' AND columnname='status';
 UPDATE config_form_tableview
-	SET columnindex=7
+	SET columnindex=6
 	WHERE objectname='v_ui_rpt_cat_result' AND columnname='iscorporate';
+UPDATE config_form_tableview
+	SET columnindex=7
+	WHERE objectname='v_ui_rpt_cat_result' AND columnname='cur_user';
 UPDATE config_form_tableview
 	SET columnindex=8
 	WHERE objectname='v_ui_rpt_cat_result' AND columnname='exec_date';

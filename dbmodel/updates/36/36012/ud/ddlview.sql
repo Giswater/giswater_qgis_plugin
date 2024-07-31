@@ -27,4 +27,4 @@ AS SELECT DISTINCT ON (rpt_cat_result.result_id) rpt_cat_result.result_id,
     rpt_cat_result
      LEFT JOIN inp_typevalue t1 ON rpt_cat_result.status::text = t1.id::text
      LEFT JOIN inp_typevalue t2 ON rpt_cat_result.network_type::text = t2.id::text
-  WHERE (t1.typevalue::text = 'inp_result_status'::text OR t2.typevalue::text = 'inp_options_networkmode'::text) AND ((s.expl_id = ANY (rpt_cat_result.expl_id)) AND s.cur_user = CURRENT_USER OR rpt_cat_result.expl_id = ARRAY[NULL]::INTEGER[]);
+  WHERE t1.typevalue::text = 'inp_result_status'::text AND t2.typevalue::text = 'inp_options_networkmode'::text AND ((s.expl_id = ANY (rpt_cat_result.expl_id)) AND s.cur_user = CURRENT_USER OR rpt_cat_result.expl_id = ARRAY[NULL]::INTEGER[]);
