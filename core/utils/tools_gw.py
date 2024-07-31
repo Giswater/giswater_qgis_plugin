@@ -3058,7 +3058,6 @@ def insert_feature(class_object, dialog, table_object, is_psector=False, remove_
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     enable_feature_type(dialog, table_object, ids=class_object.list_ids[feature_type])
-    connect_signal_selection_changed(class_object, dialog, table_object, feature_type)
 
     # Clear the feature_id text field
     tools_qt.set_widget_text(dialog, "feature_id", "")
@@ -3500,7 +3499,7 @@ def manage_close(dialog, table_object, cur_active_layer=None, single_tool_mode=N
     return layers
 
 
-def delete_records(class_object, dialog, table_object, query=False, lazy_widget=None, lazy_init_function=None, extra_field=None):
+def delete_records(class_object, dialog, table_object, is_psector=False, lazy_widget=None, lazy_init_function=None, extra_field=None):
     """ Delete selected elements of the table """
 
     tools_qgis.disconnect_signal_selection_changed()
@@ -3531,7 +3530,7 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
         tools_qt.show_info_box(message)
         return
 
-    if query:
+    if is_psector:
         full_list = widget.model()
         for x in range(0, full_list.rowCount()):
             class_object.ids.append(widget.model().record(x).value(f"{feature_type}_id"))
@@ -3576,7 +3575,7 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
             return
 
     # Update model of the widget with selected expr_filter
-    if query:
+    if is_psector:
         state = None
         if extra_field is not None and len(selected_list) == 1:
             state = widget.model().record(selected_list[0].row()).value(extra_field)
@@ -3590,13 +3589,12 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
     # Build a list of feature id's and select them
     tools_qgis.select_features_by_ids(feature_type, expr, layers=class_object.layers)
 
-    if query:
+    if is_psector:
         class_object.layers = remove_selection(layers=class_object.layers)
 
     # Update list
     class_object.list_ids[feature_type] = class_object.ids
     enable_feature_type(dialog, table_object, ids=class_object.ids)
-    connect_signal_selection_changed(class_object, dialog, table_object, query)
 
 
 def get_parent_layers_visibility():
