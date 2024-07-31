@@ -10,13 +10,14 @@ import json
 from functools import partial
 
 from qgis.PyQt.QtCore import Qt, QRegExp
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QDialog
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
 
 from ..dialog import GwAction
 from ...ui.ui_manager import GwEpaManagerUi
 from ...utils import tools_gw
 from ....libs import tools_qt, tools_db, tools_qgis, tools_os
+from ....libs.tools_qt import GwEditDialog
 
 
 class GwGo2EpaManagerButton(GwAction):
@@ -54,11 +55,9 @@ class GwGo2EpaManagerButton(GwAction):
         # self._fill_combo_result_id()
         self.dlg_manager.tbl_rpt_cat_result.setSelectionBehavior(QAbstractItemView.SelectRows)
         self._fill_manager_table()
-        model = self.dlg_manager.tbl_rpt_cat_result.model()
-        model.itemChanged.connect(partial(self._update_data))
-        model.flags = lambda index: self.flags(index, model)
 
         # Set signals
+        self.dlg_manager.btn_edit.clicked.connect(partial(self._manage_edit_row, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
         self.dlg_manager.btn_archive.clicked.connect(partial(self._toggle_rpt_archived, self.dlg_manager.tbl_rpt_cat_result,
                                                               'result_id'))
         self.dlg_manager.btn_set_corporate.clicked.connect(partial(self._epa2data, self.dlg_manager.tbl_rpt_cat_result,
@@ -68,7 +67,6 @@ class GwGo2EpaManagerButton(GwAction):
         selection_model = self.dlg_manager.tbl_rpt_cat_result.selectionModel()
         selection_model.selectionChanged.connect(partial(self._fill_txt_infolog))
         selection_model.selectionChanged.connect(partial(self._enable_buttons))
-        self.dlg_manager.tbl_rpt_cat_result.doubleClicked.connect(partial(self._set_result_id, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
         self.dlg_manager.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_manager))
         self.dlg_manager.rejected.connect(partial(tools_gw.close_dialog, self.dlg_manager))
         self.dlg_manager.txt_result_id.textChanged.connect(partial(self._fill_manager_table))
@@ -85,7 +83,8 @@ class GwGo2EpaManagerButton(GwAction):
         if complet_list is False:
             return False, False
         for field in complet_list['body']['data']['fields']:
-            if field.get('hidden'): continue
+            if field.get('hidden'):
+                continue
             model = self.dlg_manager.tbl_rpt_cat_result.model()
             if model is None:
                 model = QStandardItemModel()
@@ -97,7 +96,7 @@ class GwGo2EpaManagerButton(GwAction):
                 self.dlg_manager.tbl_rpt_cat_result = tools_gw.fill_tableview_rows(self.dlg_manager.tbl_rpt_cat_result, field)
 
         tools_gw.set_tablemodel_config(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result', isQStandardItemModel=True)
-        tools_qt.set_tableview_config(self.dlg_manager.tbl_rpt_cat_result, edit_triggers=QTableView.DoubleClicked)
+        tools_qt.set_tableview_config(self.dlg_manager.tbl_rpt_cat_result, edit_triggers=QTableView.NoEditTriggers)
 
         return complet_list
 
@@ -120,24 +119,10 @@ class GwGo2EpaManagerButton(GwAction):
         return complet_list
 
 
-    def flags(self, index, model):
+    def _update_data(self, result_id, columnname, value):
 
-        # print(index.column())
-        if index.column() != 1:
-            flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
-            return flags
-
-        return QStandardItemModel.flags(model, index)
-
-
-    def _update_data(self, item):
-
-        index = item.index()
-        result_id = index.sibling(index.row(), 0).data()
-        value = index.sibling(index.row(), index.column()).data()
-
-        sql = f"UPDATE v_ui_rpt_cat_result SET expl_id = {value} WHERE result_id = '{result_id}';"
-        result = tools_db.execute_sql(sql)
+        sql = f"""UPDATE v_ui_rpt_cat_result SET "{columnname}" = $${value}$$ WHERE result_id = '{result_id}';"""
+        result = tools_db.execute_sql(sql, log_sql = True)
         if result:
             self._fill_manager_table(tools_qt.get_text(self.dlg_manager, 'txt_result_id'))
 
@@ -410,17 +395,29 @@ class GwGo2EpaManagerButton(GwAction):
         # Refresh table
         self._fill_manager_table()
 
-    def _set_result_id(self, dialog, widget):
+
+    def _manage_edit_row(self, dialog, widget):
+
+        # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            tools_qgis.show_warning(message, dialog=self.dlg_manager)
             return
+        index = selected_list[0]
 
-        row = selected_list[0].row()
-        table_model = widget.model()
-        result_id = table_model.data(table_model.index(row, 0))
-        sql = f"DELETE FROM selector_rpt_main WHERE cur_user = current_user;" \
-              f"INSERT INTO selector_rpt_main (result_id, cur_user) VALUES ('{result_id}', current_user);"
-        tools_db.execute_sql(sql)
+        columnname = "descript"
+        column = tools_qt.get_col_index_by_col_name(widget, columnname)
+        row = index.row()
+        model = widget.model()
+        value = model.item(row, column).text()
+        header = model.headerData(column, Qt.Horizontal)
+        result_id = model.data(model.index(row, 0))
+
+        edit_dialog = GwEditDialog(dialog, title=f"Edit {header}", label_text=f"Set new '{header}' value for result '{result_id}':",
+                                widget_type="QTextEdit", initial_value=value)
+        if edit_dialog.exec_() == QDialog.Accepted:
+            new_value = edit_dialog.get_value()
+            self._update_data(result_id, columnname, new_value)
+
     # endregion
