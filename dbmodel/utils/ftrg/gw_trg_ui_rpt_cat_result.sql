@@ -7,10 +7,10 @@ This version of Giswater is provided by Giswater Association
 -- FUNCTION CODE: 2932
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_ui_rpt_cat_result() RETURNS trigger AS $BODY$
-DECLARE 
+DECLARE
     v_sql varchar;
 	v_admin_exploitation_x_user boolean;
-    
+
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -20,18 +20,12 @@ BEGIN
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
-	
-		-- update expl_id
-		IF NEW.expl_id != OLD.expl_id AND NEW.expl_id IS NOT NULL THEN
-			IF v_admin_exploitation_x_user IS FALSE OR v_admin_exploitation_x_user IS NULL THEN
-				UPDATE rpt_cat_result SET expl_id = NEW.expl_id WHERE result_id = NEW.result_id;
-			ELSIF v_admin_exploitation_x_user IS TRUE THEN
-				IF NEW.cur_user = current_user THEN
-					UPDATE rpt_cat_result SET expl_id = NEW.expl_id WHERE result_id = NEW.result_id;
-				END IF;
-			END IF;
+
+		-- update descript
+		IF NEW.descript IS DISTINCT FROM OLD.descript THEN
+			UPDATE rpt_cat_result SET descript = NEW.descript WHERE result_id = NEW.result_id;
 		END IF;
-		
+
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
@@ -44,12 +38,12 @@ BEGIN
 			END IF;
 		END IF;
         RETURN NULL;
-    
+
     END IF;
-    
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
-  
+
