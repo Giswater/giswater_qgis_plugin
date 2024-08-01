@@ -151,33 +151,6 @@ BEGIN
 		IF NEW.gully_id != (SELECT last_value::text FROM urn_id_seq) OR NEW.gully_id IS NULL THEN
 			NEW.gully_id = (SELECT nextval('urn_id_seq'));
 		END IF;
-		
-		-- gully type 
-		IF (NEW.gully_type IS NULL) AND v_customfeature IS NOT NULL THEN
-			NEW.gully_type:= v_customfeature;
-		ELSIF (NEW.gully_type IS NULL and v_customfeature IS NULL) THEN
-			NEW.gully_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='gullycat_vdefault' AND "cur_user"="current_user"() LIMIT 1);		
-			IF (NEW.gully_type IS NULL) THEN
-				NEW.gully_type:=(SELECT id FROM cat_feature WHERE feature_type = 'GULLY' AND active IS TRUE  LIMIT 1);
-			END IF;
-		END IF;
-
-		-- Code
-		SELECT code_autofill, cat_feature.id, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_featurecat, v_code_prefix
-		FROM cat_feature WHERE id=NEW.gully_type;
-	
-		-- use specific sequence for code when its name matches featurecat_code_seq
-		EXECUTE 'SELECT concat('||quote_literal(lower(v_featurecat))||',''_code_seq'');' INTO v_seq_name;
-		EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||';' INTO v_sql;
-		
-		IF v_sql IS NOT NULL AND NEW.code IS NULL THEN
-			EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
-				NEW.code=concat(v_code_prefix,v_seq_code);
-		END IF;
-        
-		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN 
-			NEW.code=NEW.gully_id;
-		END IF;
 				
 		-- grate Catalog ID
 		IF (NEW.gratecat_id IS NULL OR NEW.gratecat_id = '') THEN
@@ -431,10 +404,23 @@ BEGIN
 		END IF;
 		
 		-- Code
-		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature WHERE id=NEW.gully_type;
-		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN 
-			NEW.code=NEW.gully_id;
-		END IF;	
+		SELECT code_autofill, cat_feature.id, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_featurecat, v_code_prefix
+		FROM cat_feature WHERE id=NEW.gully_type;
+
+		IF v_featurecat IS NOT NULL THEN
+			-- use specific sequence for code when its name matches featurecat_code_seq
+			EXECUTE 'SELECT concat('||quote_literal(lower(v_featurecat))||',''_code_seq'');' INTO v_seq_name;
+			EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||';' INTO v_sql;
+			
+			IF v_sql IS NOT NULL AND NEW.code IS NULL THEN
+				EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
+					NEW.code=concat(v_code_prefix,v_seq_code);
+			END IF;
+	        
+			IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN 
+				NEW.code=NEW.gully_id;
+			END IF;
+		END IF;
 		
 		--Units
 		IF (NEW.units IS NULL) THEN
@@ -455,8 +441,6 @@ BEGIN
 			NEW.link=NEW.gully_id;
 		END IF;
 
-
-		v_featurecat = NEW.gully_type;
 
 		--Location type
 		IF NEW.location_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_location_vdefault' AND cur_user = current_user)  = v_featurecat THEN

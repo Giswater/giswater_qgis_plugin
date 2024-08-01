@@ -218,7 +218,7 @@ BEGIN
 		END IF;
 
 		-- Node type
-		IF (NEW.node_type IS NULL) THEN
+		IF NEW.node_type IS NULL THEN
 			IF ((SELECT COUNT(*) FROM cat_feature_node JOIN cat_feature USING (id) WHERE active IS TRUE)  = 0 ) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1004", "function":"1220","debug_msg":null}}$$);';
@@ -234,16 +234,11 @@ BEGIN
 			END IF;
 			
 			-- get it from vdefault
-			IF (NEW.node_type IS NULL) AND v_man_table='parent' THEN
+			IF NEW.node_type IS NULL AND v_man_table='parent' THEN
 				NEW.node_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_nodetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
-			
-			-- get the first 1 from table
-			IF NEW.node_type IS NULL THEN
-				NEW.node_type:= (SELECT id FROM cat_feature_node LIMIT 1);
-			END IF;
 
-			IF (NEW.node_type IS NULL) AND v_man_table !='parent' THEN
+			IF NEW.node_type IS NULL AND v_man_table !='parent' THEN
 				NEW.node_type:= (SELECT id FROM cat_feature_node c JOIN sys_feature_cat s ON c.type = s.id WHERE man_table=v_type_v_man_table LIMIT 1);
 			END IF;
 		END IF;
@@ -448,20 +443,21 @@ BEGIN
 		SELECT code_autofill, cat_feature.id, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_featurecat, v_code_prefix
 		FROM cat_feature WHERE id=NEW.node_type;
 	
-		-- use specific sequence for code when its name matches featurecat_code_seq
-		EXECUTE 'SELECT concat('||quote_literal(lower(v_featurecat))||',''_code_seq'');' INTO v_seq_name;
-		EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||';' INTO v_sql;
-		
-		IF v_sql IS NOT NULL AND NEW.code IS NULL THEN
-			EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
-				NEW.code=concat(v_code_prefix,v_seq_code);
-		END IF;
-	
-		
-		--Copy id to code field
-		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN 
-			NEW.code=NEW.node_id;
-		END IF;		
+		IF v_featurecat IS NOT NULL THEN
+			-- use specific sequence for code when its name matches featurecat_code_seq
+			EXECUTE 'SELECT concat('||quote_literal(lower(v_featurecat))||',''_code_seq'');' INTO v_seq_name;
+			EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||';' INTO v_sql;
+			
+			IF v_sql IS NOT NULL AND NEW.code IS NULL THEN
+				EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
+					NEW.code=concat(v_code_prefix,v_seq_code);
+			END IF;
+			
+			--Copy id to code field
+			IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN 
+				NEW.code=NEW.node_id;
+			END IF;	
+		END IF;	
 
 		-- Workcat_id
 		IF (NEW.workcat_id IS NULL) THEN

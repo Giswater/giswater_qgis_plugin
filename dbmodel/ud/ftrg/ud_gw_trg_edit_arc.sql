@@ -97,16 +97,20 @@ BEGIN
 			IF v_customfeature IS NOT NULL THEN
 				NEW.arc_type:=v_customfeature;
 			END IF;
-		END IF;
 
-		IF v_man_table='parent' THEN
-			IF NEW.arc_type IS NULL THEN 
+			 -- get it from relation on cat_node
+ 			IF NEW.arc_type IS NULL THEN
+				NEW.arc_type:= (SELECT c.id FROM cat_feature_arc c JOIN cat_arc s ON c.id = s.arc_type WHERE s.id=NEW.arccat_id);
+			END IF;
+
+			-- get it from vdefault
+			IF (NEW.arc_type IS NULL) AND v_man_table='parent' THEN
 				NEW.arc_type:=(SELECT "value" FROM config_param_user WHERE "parameter"='edit_arctype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-				
 			END IF;
 			
-		ELSIF (NEW.arc_type IS NULL) AND v_man_table !='parent' THEN
-			NEW.arc_type:= (SELECT c.id FROM cat_feature_arc c JOIN sys_feature_cat s ON c.type = s.id WHERE man_table=v_type_v_man_table LIMIT 1);
+			IF (NEW.arc_type IS NULL) AND v_man_table !='parent' THEN
+				NEW.arc_type:= (SELECT c.id FROM cat_feature_arc c JOIN sys_feature_cat s ON c.type = s.id WHERE man_table=v_type_v_man_table LIMIT 1);
+			END IF;
 		END IF;
 
 		 -- Epa type
@@ -344,26 +348,26 @@ BEGIN
 		-- Code
 		SELECT code_autofill, cat_feature.id, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_featurecat, v_code_prefix
 		FROM cat_feature WHERE id=NEW.arc_type;
-	
-		-- use specific sequence for code when its name matches featurecat_code_seq
-		EXECUTE 'SELECT concat('||quote_literal(lower(v_featurecat))||',''_code_seq'');' INTO v_seq_name;
-		EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||';' INTO v_sql;
+
+		IF v_featurecat IS NOT NULL THEN
+			-- use specific sequence for code when its name matches featurecat_code_seq
+			EXECUTE 'SELECT concat('||quote_literal(lower(v_featurecat))||',''_code_seq'');' INTO v_seq_name;
+			EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||';' INTO v_sql;
 		
-		IF v_sql IS NOT NULL AND NEW.code IS NULL THEN
-			EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
-				NEW.code=concat(v_code_prefix,v_seq_code);
-		END IF;
+			IF v_sql IS NOT NULL AND NEW.code IS NULL THEN
+				EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
+					NEW.code=concat(v_code_prefix,v_seq_code);
+			END IF;
 		
-		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN 
-			NEW.code=NEW.arc_id;
+			IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN 
+				NEW.code=NEW.arc_id;
+			END IF;
 		END IF;
 		
 		-- LINK
 		IF (SELECT (value::json->>'fid')::boolean FROM config_param_system WHERE parameter='edit_custom_link') IS TRUE THEN
 			NEW.link=NEW.arc_id;
 		END IF;
-		
-		v_featurecat = NEW.arc_type;
 
 		--Location type
 		IF NEW.location_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_location_vdefault' AND cur_user = current_user)  = v_featurecat THEN

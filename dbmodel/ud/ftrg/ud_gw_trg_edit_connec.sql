@@ -105,12 +105,24 @@ BEGIN
 		END IF;
 
 		-- connec type
-		IF (NEW.connec_type IS NULL) AND v_customfeature IS NOT NULL THEN
-		    	NEW.connec_type:= v_customfeature;
-		ELSIF (NEW.connec_type IS NULL) THEN
-			  NEW.connec_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_connectype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			IF (NEW.connec_type IS NULL) THEN
-				NEW.connec_type:=(SELECT id FROM cat_feature_connec JOIN cat_feature USING (id) WHERE active IS TRUE LIMIT 1);
+		IF NEW.connec_type IS NULL THEN
+			IF NEW.connec_type IS NULL AND v_customfeature IS NOT NULL THEN
+			    	NEW.connec_type:= v_customfeature;
+			END IF;
+
+ 			-- get it from relation on cat_node
+ 			IF NEW.connec_type IS NULL THEN
+				NEW.connec_type:= (SELECT c.id FROM cat_feature_connec c JOIN cat_connec s ON c.id = s.connec_type WHERE s.id=NEW.connecat_id);
+			END IF;
+
+			-- get it from vdefault
+			IF NEW.connec_type IS NULL THEN
+				  NEW.connec_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_connectype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
+
+			IF NEW.connec_type IS NULL THEN
+					NEW.connec_type:=(SELECT id FROM cat_feature_connec JOIN cat_feature USING (id) WHERE active IS TRUE LIMIT 1);
+				END IF;
 			END IF;
 		END IF;
         
@@ -352,18 +364,20 @@ BEGIN
 		SELECT code_autofill, cat_feature.id, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_featurecat, v_code_prefix
 		FROM cat_feature WHERE id=NEW.connec_type;
 	
-		-- use specific sequence for code when its name matches featurecat_code_seq
-		EXECUTE 'SELECT concat('||quote_literal(lower(v_featurecat))||',''_code_seq'');' INTO v_seq_name;
-		EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||';' INTO v_sql;
-		
-		IF v_sql IS NOT NULL AND NEW.code IS NULL THEN
-			EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
-				NEW.code=concat(v_code_prefix,v_seq_code);
-		END IF;
-
-		--Copy id to code field
-		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN 
-			NEW.code=NEW.connec_id;
+		IF v_featurecat IS NOT NULL THEN
+			-- use specific sequence for code when its name matches featurecat_code_seq
+			EXECUTE 'SELECT concat('||quote_literal(lower(v_featurecat))||',''_code_seq'');' INTO v_seq_name;
+			EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||';' INTO v_sql;
+			
+			IF v_sql IS NOT NULL AND NEW.code IS NULL THEN
+				EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
+					NEW.code=concat(v_code_prefix,v_seq_code);
+			END IF;
+	
+			--Copy id to code field
+			IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN 
+				NEW.code=NEW.connec_id;
+			END IF;
 		END IF;
 
 		--Inventory
