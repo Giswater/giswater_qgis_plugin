@@ -32,3 +32,11 @@ AS SELECT doc_x_workcat.id,
     doc.user_name
    FROM doc_x_workcat
      JOIN doc ON doc.id::text = doc_x_workcat.doc_id::text;
+
+CREATE OR REPLACE VIEW v_ext_municipality AS
+SELECT DISTINCT s.muni_id,
+    m.name,
+    m.active,
+    m.the_geom
+   FROM v_ext_streetaxis s
+     JOIN ext_municipality m USING (muni_id);

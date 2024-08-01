@@ -88,3 +88,11 @@ UPDATE config_form_tableview
 	WHERE objectname='v_ui_rpt_cat_result' AND columnname='rpt_stats';
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible)
 	VALUES ('epa_toolbar','utils','v_ui_rpt_cat_result','addparam',13,false);
+
+
+INSERT INTO sys_table (id, descript, sys_role, "source" )
+VALUES('v_ext_municipality', 'View of town cities and villages based filtered by active exploitations', 'role_edit', 'core');
+
+
+UPDATE config_param_system SET value='{"sys_table_id":"v_ext_municipality", "sys_id_field":"muni_id", "sys_search_field":"name", "sys_geom_field":"the_geom"}'
+WHERE "parameter"='basic_search_muni';
