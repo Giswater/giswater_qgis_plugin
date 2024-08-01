@@ -483,7 +483,7 @@ class GwSearch:
         widget.setProperty('columnname', field['columnname'])
         list_items = self._get_list_items(widget, field)
         tools_qt.fill_combo_values(widget, list_items)
-        tools_qt.set_combo_value(widget, field.get('selectedId'), 0)
+        tools_qt.set_combo_value(widget, field.get('selectedId'), 0, add_new=False)
         # noinspection PyUnresolvedReferences
         widget.currentIndexChanged.connect(partial(self._clear_lineedits))
 
