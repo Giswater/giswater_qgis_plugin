@@ -464,7 +464,7 @@ class GwDocument(QObject):
         arc_ids = self.list_ids['arc']
         node_ids = self.list_ids['node']
         connec_ids = self.list_ids['connec']
-        workcat_ids = self._get_associated_workcat_ids(doc_id)
+        workcat_ids = self._get_associated_workcat_ids()
         gully_ids = self.list_ids['gully']
 
         # Clear the current records
@@ -511,8 +511,10 @@ class GwDocument(QObject):
                 tools_qgis.show_warning(message)
 
 
-    def _get_associated_workcat_ids(self, doc_id):
+    def _get_associated_workcat_ids(self, doc_id=None):
         """Get workcat_ids linked to documento"""
+        if doc_id is None:
+            doc_id = self.doc_id
         sql = f"SELECT workcat_id FROM doc_x_workcat WHERE doc_id = '{doc_id}'"
         rows = tools_db.get_rows(sql)
         return [row['workcat_id'] for row in rows if 'workcat_id' in row]
