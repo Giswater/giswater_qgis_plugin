@@ -76,7 +76,7 @@ def main(project_type):
             # Check if the updates subdirectory exists and process it
             if os.path.isdir(subdir_path):
                 for root, dirs, files in os.walk(subdir_path):
-                    dirs[:] = [d for d in dirs if d in ['utils', f"{project_type}"]]
+                    dirs[:] = sorted([d for d in dirs if d in ['utils', f"{project_type}"]])
                     for file in sorted(files):
                         if file.endswith(".sql"):
                             file_path = os.path.join(root, file)
