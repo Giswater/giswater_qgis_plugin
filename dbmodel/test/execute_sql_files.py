@@ -84,6 +84,16 @@ def main(project_type):
     else:
         print(f"Directory {updates_dir} does not exist")
 
+     # Execute last process command
+    with conn.cursor() as cursor:
+        lastprocess_command = f"""
+            SELECT {project_type}_36.gw_fct_admin_schema_lastprocess(
+                '{{"client":{{"device":4, "lang":"en_US"}}, "data":{{"isNewProject":"TRUE", "gwVersion":"3.6.012", "projectType":"{project_type.upper()}", "epsg":25831, "descript":"{project_type}_36", "name":"{project_type}_36", "author":"postgres", "date":"29-07-2024"}}}}'
+            );
+        """
+        cursor.execute(lastprocess_command)
+        conn.commit()
+
     # Define the example directory
     example_dir = f"example/user/{project_type}"
 
@@ -97,15 +107,7 @@ def main(project_type):
     else:
         print(f"Directory {example_dir} does not exist")
 
-    # Execute last process command
-    with conn.cursor() as cursor:
-        lastprocess_command = f"""
-            SELECT {project_type}_36.gw_fct_admin_schema_lastprocess(
-                '{{"client":{{"device":4, "lang":"en_US"}}, "data":{{"isNewProject":"TRUE", "gwVersion":"3.6.012", "projectType":"{project_type.upper()}", "epsg":25831, "descript":"{project_type}_36", "name":"{project_type}_36", "author":"postgres", "date":"29-07-2024"}}}}'
-            );
-        """
-        cursor.execute(lastprocess_command)
-        conn.commit()
+
 
     # Close the database connection
     conn.close()
