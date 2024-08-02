@@ -57,10 +57,10 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="5">
-       <widget class="QPushButton" name="btn_set_corporate">
+      <item row="4" column="7">
+       <widget class="QPushButton" name="btn_close">
         <property name="text">
-         <string>Set corporate</string>
+         <string>Close</string>
         </property>
        </widget>
       </item>
@@ -68,6 +68,19 @@
        <widget class="QLabel" name="lbl_result_id">
         <property name="text">
          <string>Filter by: Result id</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="7">
+       <widget class="QPushButton" name="btn_delete">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Delete</string>
         </property>
        </widget>
       </item>
@@ -85,22 +98,9 @@
        </spacer>
       </item>
       <item row="1" column="6">
-       <widget class="QPushButton" name="btn_delete">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+       <widget class="QPushButton" name="btn_set_corporate">
         <property name="text">
-         <string>Delete</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="6">
-       <widget class="QPushButton" name="btn_close">
-        <property name="text">
-         <string>Close</string>
+         <string>Set corporate</string>
         </property>
        </widget>
       </item>
@@ -127,14 +127,7 @@
         </property>
        </spacer>
       </item>
-      <item row="2" column="0" colspan="7">
-       <widget class="QTableView" name="tbl_rpt_cat_result">
-        <property name="sortingEnabled">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="4">
+      <item row="1" column="5">
        <widget class="QPushButton" name="btn_archive">
         <property name="text">
          <string>Toggle archive</string>
@@ -145,6 +138,20 @@
        <widget class="QPushButton" name="btn_edit">
         <property name="text">
          <string>Edit</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="8">
+       <widget class="QTableView" name="tbl_rpt_cat_result">
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QPushButton" name="btn_show_inp_data">
+        <property name="text">
+         <string>Show inp data</string>
         </property>
        </widget>
       </item>

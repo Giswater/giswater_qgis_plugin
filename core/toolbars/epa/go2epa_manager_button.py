@@ -16,7 +16,7 @@ from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
 from ..dialog import GwAction
 from ...ui.ui_manager import GwEpaManagerUi
 from ...utils import tools_gw
-from ....libs import tools_qt, tools_db, tools_qgis, tools_os
+from ....libs import tools_qt, tools_db, tools_qgis, tools_os, lib_vars
 from ....libs.tools_qt import GwEditDialog
 
 
@@ -58,6 +58,7 @@ class GwGo2EpaManagerButton(GwAction):
 
         # Set signals
         self.dlg_manager.btn_edit.clicked.connect(partial(self._manage_edit_row, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
+        self.dlg_manager.btn_show_inp_data.clicked.connect(partial(self._show_inp_data, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
         self.dlg_manager.btn_archive.clicked.connect(partial(self._toggle_rpt_archived, self.dlg_manager.tbl_rpt_cat_result,
                                                               'result_id'))
         self.dlg_manager.btn_set_corporate.clicked.connect(partial(self._epa2data, self.dlg_manager.tbl_rpt_cat_result,
@@ -422,5 +423,31 @@ class GwGo2EpaManagerButton(GwAction):
         if edit_dialog.exec_() == QDialog.Accepted:
             new_value = edit_dialog.get_value()
             self._update_data(result_id, columnname, new_value)
+
+
+    def _show_inp_data(self, dialog, widget):
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.dlg_manager)
+            return
+        index = selected_list[0]
+
+        columnname = "descript"
+        column = tools_qt.get_col_index_by_col_name(widget, columnname)
+        row = index.row()
+        model = widget.model()
+        value = model.item(row, column).text()
+        header = model.headerData(column, Qt.Horizontal)
+        result_id = model.data(model.index(row, 0))
+
+        # Add rpt_inp_arc
+        sql = f"SELECT * FROM {lib_vars.schema_name}.rpt_inp_arc WHERE result_id = '{result_id}'"
+        tools_qgis.add_layer_from_query(sql, layer_name="Rpt INP Arc", key_column="id", group="GW Layers")
+
+        # Add rpt_inp_node
+        sql = f"SELECT * FROM {lib_vars.schema_name}.rpt_inp_node WHERE result_id = '{result_id}'"
+        tools_qgis.add_layer_from_query(sql, layer_name="Rpt INP Node", key_column="id", group="GW Layers")
 
     # endregion
