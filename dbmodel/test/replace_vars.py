@@ -1,4 +1,5 @@
 import os
+import sys
 
 def replace_vars_in_file(file_path, replacements):
     with open(file_path, 'r') as file:
@@ -21,4 +22,9 @@ def main(project_type):
                 replace_vars_in_file(os.path.join(root, file), replacements)
 
 if __name__ == "__main__":
-    main(project_type='ws')
+    if len(sys.argv) != 2:
+        print("Usage: python replace_vars.py <project_type>")
+        sys.exit(1)
+
+    project_type = sys.argv[1]
+    main(project_type)
