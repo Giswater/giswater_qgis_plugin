@@ -96,3 +96,16 @@ VALUES('v_ext_municipality', 'View of town cities and villages based filtered by
 
 UPDATE config_param_system SET value='{"sys_table_id":"v_ext_municipality", "sys_id_field":"muni_id", "sys_search_field":"name", "sys_geom_field":"the_geom"}'
 WHERE "parameter"='basic_search_muni';
+
+
+UPDATE config_form_fields SET web_layoutorder = NULL
+WHERE tabname = 'tab_elements' AND columnname = 'element_id';
+
+UPDATE config_form_fields SET web_layoutorder = 1
+WHERE tabname = 'tab_elements' AND columnname = 'tbl_elements';
+
+UPDATE config_form_fields SET web_layoutorder = NULL
+WHERE tabname = 'tab_documents' AND columnname = 'doc_id';
+
+UPDATE config_form_fields SET web_layoutorder = 4
+WHERE tabname = 'tab_documents' AND columnname = 'tbl_documents';
