@@ -557,7 +557,7 @@ def reset_feature_list():
     """ Reset list of selected records """
 
     ids = []
-    list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': [], 'link': [], 'workcat': []}
+    list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': [], 'link': []}
 
     return ids, list_ids
 
@@ -567,13 +567,11 @@ def get_signal_change_tab(dialog, excluded_layers=[]):
 
     tab_idx = dialog.tab_feature.currentIndex()
     tab_name = {'tab_arc': 'arc', 'tab_node': 'node', 'tab_connec': 'connec', 'tab_gully': 'gully',
-                'tab_elem': 'element', 'tab_link': 'link', 'tab_workcat': 'workcat'}
+                'tab_elem': 'element', 'tab_link': 'link'}
 
     feature_type = tab_name.get(dialog.tab_feature.widget(tab_idx).objectName(), 'arc')
     hide_parent_layers(excluded_layers=excluded_layers)
     viewname = f"v_edit_{feature_type}"
-    if feature_type == 'workcat':
-        viewname = 'cat_work'
 
     # Adding auto-completion to a QLineEdit
     set_completer_feature_id(dialog.feature_id, feature_type, viewname)
@@ -594,11 +592,8 @@ def set_completer_feature_id(widget, feature_type, viewname):
     completer.setCaseSensitivity(Qt.CaseInsensitive)
     widget.setCompleter(completer)
     model = QStringListModel()
-    if feature_type == 'workcat':
-        sql = "SELECT id FROM cat_work"
-    else:
-        sql = (f"SELECT {feature_type}_id"
-               f" FROM {viewname}")
+    sql = (f"SELECT {feature_type}_id"
+           f" FROM {viewname}")
     row = tools_db.get_rows(sql)
     if row:
         for i in range(0, len(row)):
@@ -2222,10 +2217,7 @@ def get_expression_filter(feature_type, list_ids=None, layers=None):
     if len(list_ids) == 0:
         return None
 
-    if feature_type == 'workcat':
-        field_id = 'id'
-    else:
-        field_id = feature_type + "_id"
+    field_id = feature_type + "_id"
 
     # Set expression filter with features in the list
     expr_filter = field_id + " IN ("
@@ -2647,10 +2639,7 @@ def get_rows_by_feature_type(class_object, dialog, table_object, feature_type, f
             class_object.ids.append(str(row[0]))
 
         expr_filter = get_expression_filter(feature_type, class_object.list_ids, class_object.layers)
-        if feature_type == "workcat":
-            table_name = f"{class_object.schema_name}.cat_work"
-        else:
-            table_name = f"{class_object.schema_name}.v_edit_{feature_type}"
+        table_name = f"{class_object.schema_name}.v_edit_{feature_type}"
         tools_qt.set_table_model(dialog, widget_name, table_name, expr_filter)
 
 
@@ -2975,22 +2964,7 @@ def insert_feature(class_object, dialog, table_object, is_psector=False, remove_
 
     field_id = f"{feature_type}_id"
     feature_id = tools_qt.get_text(dialog, "feature_id")
-
-    # Handle special case for 'workcat'
-    if feature_type == 'workcat':
-        field_id = "id"
-        expr_filter = f"{field_id} = '{feature_id}'"
-        sql = f"SELECT id FROM cat_work WHERE {expr_filter}"
-        row = tools_db.get_row(sql)
-        if row:
-            feature_id = row["id"]
-            class_object.ids.append(feature_id)
-        else:
-            message = "Feature ID not found in cat_work"
-            tools_qt.show_info_box(message)
-            return
-    else:
-        expr_filter = f"{field_id} = '{feature_id}'"
+    expr_filter = f"{field_id} = '{feature_id}'"
 
     # Check expression
     (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
@@ -3002,25 +2976,24 @@ def insert_feature(class_object, dialog, table_object, is_psector=False, remove_
 
     if feature_id == 'null':
         message = "You need to enter a feature id"
-        tools_qt.show_info_box(message)
+        tools_qt.tools_qgis.show_warning(message, dialog=dialog)
         return
 
     # Temporarily store IDs to be added for this feature type
     selected_ids = []
 
-    if feature_type != 'workcat':  # Skip for workcat since we already handled it
-        for layer in class_object.layers[feature_type]:
-            if layer.selectedFeatureCount() > 0:
-                # Get selected features of the layer
-                features = layer.selectedFeatures()
-                for feature in features:
-                    # Append 'feature_id' into the list
-                    selected_id = feature.attribute(field_id)
-                    if selected_id not in selected_ids:
-                        selected_ids.append(selected_id)
+    for layer in class_object.layers[feature_type]:
+        if layer.selectedFeatureCount() > 0:
+            # Get selected features of the layer
+            features = layer.selectedFeatures()
+            for feature in features:
+                # Append 'feature_id' into the list
+                selected_id = feature.attribute(field_id)
+                if selected_id not in selected_ids:
+                    selected_ids.append(selected_id)
 
-        if feature_id not in selected_ids:
-            selected_ids.append(str(feature_id))
+    if feature_id not in selected_ids:
+        selected_ids.append(str(feature_id))
 
     # Append the new IDs to the existing list, ensuring no duplicates
     class_object.list_ids[feature_type] = list(set(class_object.list_ids[feature_type] + selected_ids))
@@ -3041,12 +3014,11 @@ def insert_feature(class_object, dialog, table_object, is_psector=False, remove_
 
     # Select features with previous filter
     # Build a list of feature id's and select them
-    if feature_type != 'workcat':
-        for layer in class_object.layers[feature_type]:
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            if len(id_list) > 0:
-                layer.selectByIds(id_list)
+    for layer in class_object.layers[feature_type]:
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        id_list = [i.id() for i in it]
+        if len(id_list) > 0:
+            layer.selectByIds(id_list)
 
     # Reload contents of table 'tbl_xxx_xxx_@feature_type'
     if is_psector:
@@ -3360,8 +3332,6 @@ def load_tablename(dialog, table_object, feature_type, expr_filter):
         return None
 
     table_name = f"v_edit_{feature_type}"
-    if feature_type == 'workcat':
-        table_name = 'cat_work'
 
     expr = tools_qt.set_table_model(dialog, widget, table_name, expr_filter)
     if widget_name is not None:
@@ -3533,7 +3503,7 @@ def delete_records(class_object, dialog, table_object, is_psector=False, lazy_wi
 
     if len(selected_list) == 0:
         message = "Any record selected"
-        tools_qt.show_info_box(message)
+        tools_qt.tools_qgis.show_warning(message, dialog=dialog)
         return
 
     if is_psector:

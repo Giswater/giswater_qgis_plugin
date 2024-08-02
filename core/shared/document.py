@@ -67,8 +67,8 @@ class GwDocument(QObject):
 
         # Setting lists
         self.ids = []
-        self.list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': [], 'workcat': []}
-        self.layers = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': [], 'workcat': []}
+        self.list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
+        self.layers = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
         self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
         self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
         self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
@@ -77,7 +77,7 @@ class GwDocument(QObject):
         self.layers['workcat'] = tools_gw.get_layers_from_feature_type('workcat')
         self.layers['element'] = tools_gw.get_layers_from_feature_type('element')
 
-        params = ['arc', 'node', 'connec', 'gully', 'workcat']
+        params = ['arc', 'node', 'connec', 'gully']
         if list_tabs:
             for i in params:
                 if i not in list_tabs:
@@ -327,6 +327,7 @@ class GwDocument(QObject):
         except Exception as e:
             print(f"Error refreshing manager table: {e}")
 
+
     def _fill_combo_doc_type(self, widget):
         """ Executes query and fill combo box """
 
@@ -339,7 +340,6 @@ class GwDocument(QObject):
         if doctype_vdefault:
             tools_qt.set_combo_value(widget, doctype_vdefault[0], 0)
             self._activate_relations()
-
 
 
     def _activate_relations(self):
@@ -360,10 +360,7 @@ class GwDocument(QObject):
         expr_filter = f"{feature_type}_id = '{feature_id}'"
 
         # Set model of selected widget
-        if feature_type == "workcat":
-            table_name = f"{self.schema_name}.cat_work"
-        else:
-            table_name = f"{self.schema_name}.v_edit_{feature_type}"
+        table_name = f"{self.schema_name}.v_edit_{feature_type}"
         message = tools_qt.fill_table(widget, table_name, expr_filter)
         if message:
             tools_qgis.show_warning(message)
@@ -467,7 +464,7 @@ class GwDocument(QObject):
         arc_ids = self.list_ids['arc']
         node_ids = self.list_ids['node']
         connec_ids = self.list_ids['connec']
-        workcat_ids = self.list_ids['workcat']
+        workcat_ids = self._get_associated_workcat_ids(doc_id)
         gully_ids = self.list_ids['gully']
 
         # Clear the current records
@@ -512,6 +509,13 @@ class GwDocument(QObject):
             message = tools_qt.fill_table(qtable, f"{self.schema_name}.v_ui_doc_x_{tablename}", expr)
             if message:
                 tools_qgis.show_warning(message)
+
+
+    def _get_associated_workcat_ids(self, doc_id):
+        """Get workcat_ids linked to documento"""
+        sql = f"SELECT workcat_id FROM doc_x_workcat WHERE doc_id = '{doc_id}'"
+        rows = tools_db.get_rows(sql)
+        return [row['workcat_id'] for row in rows if 'workcat_id' in row]
 
 
     def _check_doc_exists(self, name=""):
@@ -610,7 +614,7 @@ class GwDocument(QObject):
         # Reset list of selected records
         self.ids, self.list_ids = tools_gw.reset_feature_list()
 
-        list_feature_type = ['arc', 'node', 'connec', 'element', 'workcat']
+        list_feature_type = ['arc', 'node', 'connec', 'element']
         if global_vars.project_type == 'ud':
             list_feature_type.append('gully')
 
@@ -638,12 +642,14 @@ class GwDocument(QObject):
         for feature_type in list_feature_type:
             tools_gw.get_rows_by_feature_type(self, dialog, table_object, feature_type, feature_id=doc_id, feature_idname="doc_id")
 
+
     def convert_to_degrees(self, value):
         """ Convert GPS coordinates stored in EXIF to degrees """
         d = float(value[0])
         m = float(value[1])
         s = float(value[2])
         return d + (m / 60.0) + (s / 3600.0)
+
 
     def get_geolocation_gdal(self, file_path):
         """ Extract geolocation metadata from an image file using GDAL """
