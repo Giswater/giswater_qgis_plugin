@@ -34,11 +34,11 @@ def connect_to_db():
 
 def main(project_type):
     print(f"Project type: {project_type}")
-    
+
     conn = connect_to_db()
 
     # Define the root directories to process
-    root_directories = ["utils", f"{project_type}", "i18n/en_US"]
+    root_directories = ["utils/ddl", f"{project_type}/schema_model", "utils/fct", "utils/ftrg", f"{project_type}/fct", f"{project_type}/ftrg", "i18n/en_US"]
     exclude_prefix = "ud_" if project_type == "ws" else "ws_"
 
     # Execute SQL files in the root directories
@@ -63,19 +63,6 @@ def main(project_type):
     else:
         print(f"Directory {updates_dir} does not exist")
 
-    # Execute child views
-    execute_sql_file(conn, f"childviews/en_US/{project_type}_schema_model.sql")
-
-    # Execute last process command
-    with conn.cursor() as cursor:
-        lastprocess_command = f"""
-            SELECT {project_type}_36.gw_fct_admin_schema_lastprocess(
-                '{{"client":{{"device":4, "lang":"en_US"}}, "data":{{"isNewProject":"TRUE", "gwVersion":"3.6.012", "projectType":"{project_type.upper()}", "epsg":25831, "descript":"{project_type}_36", "name":"{project_type}_36", "author":"postgres", "date":"29-07-2024"}}}}'
-            );
-        """
-        cursor.execute(lastprocess_command)
-        conn.commit()
-
     # Define the example directory
     example_dir = f"example/user/{project_type}"
 
@@ -88,6 +75,16 @@ def main(project_type):
                     execute_sql_file(conn, file_path)
     else:
         print(f"Directory {example_dir} does not exist")
+
+    # Execute last process command
+    with conn.cursor() as cursor:
+        lastprocess_command = f"""
+            SELECT {project_type}_36.gw_fct_admin_schema_lastprocess(
+                '{{"client":{{"device":4, "lang":"en_US"}}, "data":{{"isNewProject":"TRUE", "gwVersion":"3.6.012", "projectType":"{project_type.upper()}", "epsg":25831, "descript":"{project_type}_36", "name":"{project_type}_36", "author":"postgres", "date":"29-07-2024"}}}}'
+            );
+        """
+        cursor.execute(lastprocess_command)
+        conn.commit()
 
     # Close the database connection
     conn.close()
