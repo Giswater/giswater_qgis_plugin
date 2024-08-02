@@ -11,10 +11,18 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_child_views_view(p_da
 $BODY$
 
 /*EXAMPLE
-
-SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views_view($${"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
-"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","feature_cat":"'||v_cat_feature||'",
-"feature_childtable_fields":"'||v_feature_childtable_fields||'","man_fields":"'||v_man_fields||'", "view_type":"'||v_view_type||'"}}$$);
+select gw_fct_admin_manage_child_views_view($${
+        "schema":"ws_36012_2",
+        "body":{"viewname":"ve_node_adaptation",
+          "feature_type":"node",
+          "feature_system_id":"junction",
+          "feature_cat":"ADAPTATION",
+          "feature_childtable_name":"man_node_adaptation",
+          "feature_childtable_fields":"null",
+          "man_fields":"null",
+          "view_type":"1"
+          }
+        }$$);
 */
 
 DECLARE
@@ -31,6 +39,8 @@ v_man_fields text;
 v_view_type integer;
 v_tableversion text = 'sys_version';
 v_columntype text = 'project_type';
+v_sql text;
+v_node_fields text;
 
 BEGIN
 
@@ -51,64 +61,134 @@ BEGIN
     v_man_fields = ((p_data ->> 'body')::json->>'man_fields')::text;
     v_view_type =((p_data ->> 'body')::json->>'view_type')::integer;
 
-	IF v_view_type = 1 THEN
-		--view for WS and UD features that only have feature_id in man table
-		EXECUTE 'CREATE OR REPLACE VIEW '||v_viewname||' AS
-                SELECT ve_'||v_feature_type||'.*
-                FROM ve_'||v_feature_type||'
-                JOIN man_'||v_feature_system_id||'
-                USING ('||v_feature_type||'_id)
-                WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||';';
+  -- list all columns from v_edit_node excluding 'broken_valve' and 'closed_valve' in order to take those from man_valve table
+  EXECUTE 'select 
+  replace(replace(array_agg(''v_edit_'||v_feature_type||'.'' || column_name)::text, ''{'', ''''), ''}'', '''') 
+  from information_schema.columns
+  where table_schema = '||quote_literal(v_schemaname)||' 
+  and table_name = ''v_edit_node'' 
+  and column_name not in (''closed_valve'', ''broken_valve'')'
+  INTO v_node_fields;
+   
+  IF v_view_type = 1 THEN
+    --view for WS and UD features that only have feature_id in man table
+    IF v_feature_type = 'node' then
+    
+      EXECUTE '
+      CREATE OR REPLACE VIEW '||v_viewname||' AS
+      SELECT '||v_node_fields||'
+      FROM v_edit_'||v_feature_type||'
+      JOIN man_'||v_feature_system_id||' USING ('||v_feature_type||'_id)
+      WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||';';
 
-	ELSIF v_view_type = 2 THEN
-		--view for ud connec y gully which dont have man_type table
-		EXECUTE 'CREATE OR REPLACE VIEW '||v_viewname||' AS
-                SELECT ve_'||v_feature_type||'.*
-                FROM ve_'||v_feature_type||'
-                WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||';';
+    ELSE
+      
+      EXECUTE '
+      CREATE OR REPLACE VIEW '||v_viewname||' AS
+      SELECT *
+      FROM v_edit_'||v_feature_type||'
+      JOIN man_'||v_feature_system_id||' USING ('||v_feature_type||'_id)
+      WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||' ;';
 
-	ELSIF v_view_type = 3 THEN
-		--view for WS and UD features that have many fields in man table
-		EXECUTE 'CREATE OR REPLACE VIEW '||v_viewname||' AS
-                SELECT ve_'||v_feature_type||'.*,
-                '||v_man_fields||'
-                FROM ve_'||v_feature_type||'
-                JOIN man_'||v_feature_system_id||'
-                USING ('||v_feature_type||'_id)
-                WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||';';
+    END IF;
+     
+  ELSIF v_view_type = 2 THEN
+    --view for ud connec y gully which dont have man_type table
+    EXECUTE '
+    CREATE OR REPLACE VIEW '||v_viewname||' AS
+    SELECT *
+    FROM v_edit_'||v_feature_type||'
+    WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||' ;';
 
-	ELSIF v_view_type = 4 THEN
-		--view for WS and UD features that only have feature_id in man table and have defined addfields
-        EXECUTE 'CREATE OR REPLACE VIEW '||v_viewname||' AS
-                SELECT ve_'||v_feature_type||'.*,
-                '||v_feature_childtable_fields||'
-                FROM ve_'||v_feature_type||'
-                JOIN man_'||v_feature_system_id||' USING ('||v_feature_type||'_id)
-                LEFT JOIN '||v_feature_childtable_name||' USING ('||v_feature_type||'_id)
-                WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||';';
+  ELSIF v_view_type = 3 THEN
+    --view for WS and UD features that have many fields in man table
+    IF v_feature_type = 'node' then
 
-	ELSIF v_view_type = 5 THEN
-		--view for ud connec y gully which dont have man_type table and have defined addfields
-		EXECUTE 'CREATE OR REPLACE VIEW '||v_viewname||' AS
-                SELECT ve_'||v_feature_type||'.*,
-                '||v_feature_childtable_fields||'
-                FROM ve_'||v_feature_type||'
-                LEFT JOIN '||v_feature_childtable_name||' USING ('||v_feature_type||'_id)
-                WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||';';
+      EXECUTE '
+      CREATE OR REPLACE VIEW '||v_viewname||' AS
+      SELECT '||v_node_fields||',
+      '||v_man_fields||'
+      FROM v_edit_'||v_feature_type||'
+      JOIN man_'||v_feature_system_id||' USING ('||v_feature_type||'_id)
+      WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||' ;';
+    
+    ELSE
 
-	ELSIF v_view_type = 6 THEN
-		--view for WS and UD features that have many fields in man table and have defined addfields
-        EXECUTE 'CREATE OR REPLACE VIEW '||v_viewname||' AS
-                SELECT ve_'||v_feature_type||'.*,
-                '||v_man_fields||',
-                '||v_feature_childtable_fields||'
-                FROM ve_'||v_feature_type||'
-                JOIN man_'||v_feature_system_id||' USING ('||v_feature_type||'_id)
-                LEFT JOIN '||v_feature_childtable_name||' USING ('||v_feature_type||'_id)
-                WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||';';
-	END IF;
-	
-	RETURN;
+      EXECUTE '
+      CREATE OR REPLACE VIEW '||v_viewname||' AS
+      SELECT v_edit_'||v_feature_type||'.*,
+      '||v_man_fields||'
+      FROM v_edit_'||v_feature_type||'
+      JOIN man_'||v_feature_system_id||' USING ('||v_feature_type||'_id)
+      WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||' ;';
+
+    END IF;
+    
+  ELSIF v_view_type = 4 THEN 
+    --view for WS and UD features that only have feature_id in man table and have defined addfields
+    IF v_feature_type = 'node' THEN
+
+       EXECUTE '
+       CREATE OR REPLACE VIEW '||v_viewname||' AS
+       SELECT '||v_node_fields||',
+       '||v_feature_childtable_fields||'
+       FROM v_edit_'||v_feature_type||'
+       JOIN man_'||v_feature_system_id||' USING ('||v_feature_type||'_id)
+       LEFT JOIN '||v_feature_childtable_name||' USING ('||v_feature_type||'_id)
+       WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||' ;';
+  
+    ELSE
+  
+      EXECUTE '
+      CREATE OR REPLACE VIEW '||v_viewname||' AS
+      SELECT v_edit_'||v_feature_type||'.*,
+      '||v_feature_childtable_fields||'
+      FROM v_edit_'||v_feature_type||'
+      JOIN man_'||v_feature_system_id||' USING ('||v_feature_type||'_id)
+      LEFT JOIN '||v_feature_childtable_name||' USING ('||v_feature_type||'_id)
+      WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||' ;';
+                 
+    END IF;
+    
+  ELSIF v_view_type = 5 THEN
+    --view for ud connec y gully which dont have man_type table and have defined addfields
+    EXECUTE '
+    CREATE OR REPLACE VIEW '||v_viewname||' AS
+    SELECT v_edit_'||v_feature_type||'.*,
+    '||v_feature_childtable_fields||',
+    FROM v_edit_'||v_feature_type||'
+    LEFT JOIN '||v_feature_childtable_name||' USING ('||v_feature_type||'_id)
+    WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||';';
+    
+  ELSIF v_view_type = 6 THEN
+    --view for WS and UD features that have many fields in man table and have defined addfields
+    IF v_feature_type = 'node' then 
+      
+      EXECUTE '
+      CREATE OR REPLACE VIEW '||v_viewname||' AS
+      SELECT '||v_node_fields||',
+      '||v_man_fields||',
+      '||v_feature_childtable_fields||'
+      FROM v_edit_'||v_feature_type||'
+      JOIN man_'||v_feature_system_id||' USING ('||v_feature_type||'_id)
+      LEFT JOIN '||v_feature_childtable_name||' USING ('||v_feature_type||'_id)
+      WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||';';
+    
+    ELSE
+
+      EXECUTE '
+      CREATE OR REPLACE VIEW '||v_viewname||' AS
+      SELECT v_edit_'||v_feature_type||'.*,
+      '||v_man_fields||'
+      '||v_feature_childtable_fields||'
+      FROM v_edit_'||v_feature_type||'
+      JOIN man_'||v_feature_system_id||' USING ('||v_feature_type||'_id)
+      LEFT JOIN '||v_feature_childtable_name||' USING ('||v_feature_type||'_id)
+      WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||';';
+
+    END IF;
+     
+  END IF;
 
 END;
 $BODY$
