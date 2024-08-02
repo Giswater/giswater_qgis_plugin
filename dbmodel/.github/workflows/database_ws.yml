@@ -76,5 +76,5 @@ jobs:
             exit 1
           else
             echo "Arcs found:"
-            echo "$tables"
+            echo "$arcs"
           fi
