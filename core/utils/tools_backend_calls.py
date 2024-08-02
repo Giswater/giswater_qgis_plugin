@@ -559,7 +559,7 @@ def add_query_layer(**kwargs):
     vlayer = QgsVectorLayer(uri.uri(False), f'{layer_name}', "postgres")
 
     if vlayer.isValid():
-        tools_qt.add_layer_to_toc(vlayer, group)
+        tools_qgis.add_layer_to_toc(vlayer, group)
 
 
 def refresh_attribute_table(**kwargs):

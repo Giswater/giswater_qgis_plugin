@@ -638,12 +638,12 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
                      f"column={the_geom} table={tablename}"
         if alias: tablename = alias
         layer = QgsRasterLayer(connString, tablename)
-        tools_qt.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups)
+        tools_qgis.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups)
 
     else:
         if alias: tablename = alias
         layer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
-        tools_qt.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups, sub_sub_group=sub_sub_group)
+        tools_qgis.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups, sub_sub_group=sub_sub_group)
 
         # The triggered function (action.triggered.connect(partial(...)) as the last parameter sends a boolean,
         # if we define style_id = None, style_id will take the boolean of the triggered action as a fault,
