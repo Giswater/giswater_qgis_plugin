@@ -40,3 +40,22 @@ SELECT DISTINCT s.muni_id,
     m.the_geom
    FROM v_ext_streetaxis s
      JOIN ext_municipality m USING (muni_id);
+
+--02/08/2024
+DROP VIEW if EXISTS v_ui_doc_x_psector;
+CREATE OR REPLACE VIEW v_ui_doc_x_psector AS
+SELECT
+    doc_x_psector.id,
+    plan_psector."name" AS psector_name,
+    doc.name AS doc_name,
+    doc.doc_type,
+    doc.path,
+    doc.observ,
+    doc.date,
+    doc.user_name
+FROM
+    doc_x_psector
+JOIN
+    doc ON doc.id::text = doc_x_psector.doc_id::text
+JOIN
+    plan_psector ON plan_psector.psector_id ::text = doc_x_psector.psector_id::text;
