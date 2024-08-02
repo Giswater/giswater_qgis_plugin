@@ -38,7 +38,7 @@ def main(project_type):
     conn = connect_to_db()
 
     # Define the root directories to process
-    root_directories = ["utils/ddl", f"{project_type}/schema_model", "utils/fct", "utils/ftrg", f"{project_type}/fct", f"{project_type}/ftrg", "i18n/en_US"]
+    root_directories = ["utils/ddl", f"{project_type}/schema_model", "utils/fct", "utils/ftrg", f"{project_type}/fct", f"{project_type}/ftrg"]
     exclude_prefix = "ud_" if project_type == "ws" else "ws_"
     exculude_files = "trg_schema_model.sql"
 
@@ -53,6 +53,18 @@ def main(project_type):
 
     # Execute the trg_schema_model.sql file after the utils/ftrg and ws/ftrg directories
     execute_sql_file(conn, f"{project_type}/schema_model/trg_schema_model.sql")
+
+    i18n_dir = f"i18n/en_US"
+
+    # Check if the i18n directory exists and process it
+    if os.path.isdir(i18n_dir):
+        for root, _, files in os.walk(i18n_dir):
+            for file in sorted(files):
+                if file.endswith(".sql") and exclude_prefix not in file:
+                    file_path = os.path.join(root, file)
+                    execute_sql_file(conn, file_path)
+    else:
+        print(f"Directory {i18n_dir} does not exist")
 
     # Define the base updates directory
     updates_dir = "updates/36"
