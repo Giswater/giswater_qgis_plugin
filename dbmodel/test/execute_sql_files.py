@@ -71,11 +71,16 @@ def main(project_type):
 
     # Check if the updates directory exists and process it
     if os.path.isdir(updates_dir):
-        for root, _, files in os.walk(updates_dir):
-            for file in sorted(files):
-                if file.endswith(".sql") and exclude_prefix not in file:
-                    file_path = os.path.join(root, file)
-                    execute_sql_file(conn, file_path)
+        for subdir in sorted(os.listdir(updates_dir)):
+            subdir_path = os.path.join(updates_dir, subdir)
+            # Check if the updates subdirectory exists and process it
+            if os.path.isdir(subdir_path):
+                for root, dirs, files in os.walk(subdir_path):
+                    dirs[:] = [d for d in dirs if d in ['utils', f"{project_type}"]]
+                    for file in sorted(files):
+                        if file.endswith(".sql"):
+                            file_path = os.path.join(root, file)
+                            execute_sql_file(conn, file_path)
     else:
         print(f"Directory {updates_dir} does not exist")
 
