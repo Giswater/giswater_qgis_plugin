@@ -1,4 +1,4 @@
-name: Create Giswater Schema (WS)
+name: Create Giswater Schema SAMPLE (UD)
 
 on:
   push:
@@ -38,7 +38,7 @@ jobs:
           psql -h localhost -U postgres -d giswater_test_db -c 'CREATE EXTENSION postgis_raster;'
 
       - name: Replace variables in SQL files
-        run: python test/replace_vars.py
+        run: python test/replace_vars.py ud
 
       - name: Create sample schema
         env:
@@ -70,7 +70,7 @@ jobs:
           fi
 
           # Check features
-          arcs=$(psql -h localhost -U postgres -d giswater_test_db -t -c "SELECT count(*) FROM ws_36.v_edit_arc;")
+          arcs=$(psql -h localhost -U postgres -d giswater_test_db -t -c "SELECT count(*) FROM ud_36.v_edit_arc;")
           if [ -z "$arcs" ]; then
             echo "No arcs found in the v_edit_arc table."
             exit 1

@@ -1,80 +1,80 @@
-name: Create Giswater Schema (WS)
+name: Create Giswater Schema SAMPLE (WS)
 
 on:
   push:
-    branches: [ dev-3.6-manage-views ]
+    branches: [dev-3.6-manage-views]
   pull_request:
-    branches: [ dev-3.6-manage-views ]
+    branches: [dev-3.6-manage-views]
 
 jobs:
   setup-and-test-db:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
 
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r test/requirements.txt
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r test/requirements.txt
 
-    - name: Setup PostgreSQL and PostGIS for Linux/macOS/Windows
-      uses: nyurik/action-setup-postgis@v2.1
-      with:
-        database: giswater_test_db
-    
-    - name: Install pgrouting & postgis_raster
-      env:
-        PGPASSWORD: postgres
-      run: |
-        sudo apt-get install postgresql-14-pgrouting
-        psql -h localhost -U postgres -d giswater_test_db -c 'CREATE EXTENSION pgrouting;'
-        psql -h localhost -U postgres -d giswater_test_db -c 'CREATE EXTENSION postgis_raster;'
+      - name: Setup PostgreSQL and PostGIS for Linux/macOS/Windows
+        uses: nyurik/action-setup-postgis@v2.1
+        with:
+          database: giswater_test_db
 
-    - name: Replace variables in SQL files
-      run: python test/replace_vars.py
+      - name: Install pgrouting & postgis_raster
+        env:
+          PGPASSWORD: postgres
+        run: |
+          sudo apt-get install postgresql-14-pgrouting
+          psql -h localhost -U postgres -d giswater_test_db -c 'CREATE EXTENSION pgrouting;'
+          psql -h localhost -U postgres -d giswater_test_db -c 'CREATE EXTENSION postgis_raster;'
 
-    - name: Create sample schema
-      env:
-        PGPASSWORD: postgres
-      run: python test/execute_sql_files.py ws
+      - name: Replace variables in SQL files
+        run: python test/replace_vars.py ws
 
-    - name: Verify Database
-      env:
-        PGPASSWORD: postgres
-      run: |
-        # Check PostGIS version
-        postgis_version=$(psql -h localhost -U postgres -d giswater_test_db -t -c "SELECT postgis_full_version();")
-        if [ -z "$postgis_version" ]; then
-          echo "PostGIS extension not found or not installed correctly."
-          exit 1
-        else
-          echo "PostGIS version:"
-          echo "$postgis_version"
-        fi
+      - name: Create sample schema
+        env:
+          PGPASSWORD: postgres
+        run: python test/execute_sql_files.py ws
 
-        # Check pgRouting version
-        pgrouting_version=$(psql -h localhost -U postgres -d giswater_test_db -t -c "SELECT * FROM pgr_version();")
-        if [ -z "$pgrouting_version" ]; then
-          echo "pgRouting extension not found or not installed correctly."
-          exit 1
-        else
-          echo "pgRouting version:"
-          echo "$pgrouting_version"
-        fi
+      - name: Verify Database
+        env:
+          PGPASSWORD: postgres
+        run: |
+          # Check PostGIS version
+          postgis_version=$(psql -h localhost -U postgres -d giswater_test_db -t -c "SELECT postgis_full_version();")
+          if [ -z "$postgis_version" ]; then
+            echo "PostGIS extension not found or not installed correctly."
+            exit 1
+          else
+            echo "PostGIS version:"
+            echo "$postgis_version"
+          fi
 
-        # Check features
-        arcs=$(psql -h localhost -U postgres -d giswater_test_db -t -c "SELECT count(*) FROM ws_36.v_edit_arc;")
-        if [ -z "$arcs" ]; then
-          echo "No arcs found in the v_edit_arc table."
-          exit 1
-        else
-          echo "Arcs found:"
-          echo "$tables"
-        fi
+          # Check pgRouting version
+          pgrouting_version=$(psql -h localhost -U postgres -d giswater_test_db -t -c "SELECT * FROM pgr_version();")
+          if [ -z "$pgrouting_version" ]; then
+            echo "pgRouting extension not found or not installed correctly."
+            exit 1
+          else
+            echo "pgRouting version:"
+            echo "$pgrouting_version"
+          fi
+
+          # Check features
+          arcs=$(psql -h localhost -U postgres -d giswater_test_db -t -c "SELECT count(*) FROM ws_36.v_edit_arc;")
+          if [ -z "$arcs" ]; then
+            echo "No arcs found in the v_edit_arc table."
+            exit 1
+          else
+            echo "Arcs found:"
+            echo "$tables"
+          fi

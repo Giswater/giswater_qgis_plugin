@@ -69,6 +69,8 @@ def main(project_type):
     # Define the base updates directory
     updates_dir = "updates/36"
 
+    order = ['utils', f"{project_type}"]
+
     # Check if the updates directory exists and process it
     if os.path.isdir(updates_dir):
         for subdir in sorted(os.listdir(updates_dir)):
@@ -76,7 +78,7 @@ def main(project_type):
             # Check if the updates subdirectory exists and process it
             if os.path.isdir(subdir_path):
                 for root, dirs, files in os.walk(subdir_path):
-                    dirs[:] = sorted([d for d in dirs if d in ['utils', f"{project_type}"]])
+                    dirs[:] = sorted([d for d in dirs if d in order], key=lambda x: order.index(x))
                     for file in sorted(files):
                         if file.endswith(".sql"):
                             file_path = os.path.join(root, file)

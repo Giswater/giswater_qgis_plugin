@@ -8,10 +8,10 @@ def replace_vars_in_file(file_path, replacements):
     with open(file_path, 'w') as file:
         file.write(content)
 
-def main():
+def main(project_type):
     sql_dir = './'
     replacements = {
-        'SCHEMA_NAME': 'ws_36',
+        'SCHEMA_NAME': f'{project_type}_36',
         'SRID_VALUE': '25831',
         # Add more replacements as needed
     }
