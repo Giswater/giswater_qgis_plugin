@@ -74,7 +74,6 @@ class GwDocument(QObject):
         self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
         if self.project_type == 'ud':
             self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
-        self.layers['workcat'] = tools_gw.get_layers_from_feature_type('workcat')
         self.layers['element'] = tools_gw.get_layers_from_feature_type('element')
 
         params = ['arc', 'node', 'connec', 'gully']
@@ -101,8 +100,10 @@ class GwDocument(QObject):
         tools_gw.add_icon(self.dlg_add_doc.btn_add_geom, "133")
         tools_gw.add_icon(self.dlg_add_doc.btn_insert, "111", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_doc.btn_insert_workcat, "111", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_add_doc.btn_insert_psector, "111", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_doc.btn_delete, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_doc.btn_delete_workcat, "112", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_add_doc.btn_delete_psector, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_doc.btn_snapping, "137")
         self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
 
@@ -113,6 +114,7 @@ class GwDocument(QObject):
             self._fill_dialog_document(self.dlg_add_doc, "doc", None, doc_id=item_id)
             self._activate_relations()
             self._fill_table_doc_workcat()
+            self._fill_table_doc_psector()
         else:
             tools_qt.set_calendar(self.dlg_add_doc, 'date', None)
 
@@ -131,13 +133,16 @@ class GwDocument(QObject):
 
         self.dlg_add_doc.btn_insert_workcat.clicked.connect(partial(self._insert_workcat, self.dlg_add_doc))
         self.dlg_add_doc.btn_delete_workcat.clicked.connect(partial(self._delete_workcat, self.dlg_add_doc))
-
-        self.dlg_add_doc.tbl_doc_x_workcat.clicked.connect(
-            partial(tools_qgis.highlight_feature_by_id, self.dlg_add_doc.tbl_doc_x_workcat, "v_edit_workcat",
-                    "workcat_id", self.rubber_band, 10))
-
         self.dlg_add_doc.feature_id_workcat.textChanged.connect(
             partial(tools_gw.set_completer_object, self.dlg_add_doc, "workcat"))
+
+        # Config Psector
+        tools_gw.set_completer_widget("plan_psector", self.dlg_add_doc.feature_id_psector, "name")
+
+        self.dlg_add_doc.btn_insert_psector.clicked.connect(partial(self._insert_psector, self.dlg_add_doc))
+        self.dlg_add_doc.btn_delete_psector.clicked.connect(partial(self._delete_psector, self.dlg_add_doc))
+        self.dlg_add_doc.feature_id_psector.textChanged.connect(
+            partial(tools_gw.set_completer_object, self.dlg_add_doc, "psector"))
 
         # Set signals
         self.excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
@@ -243,6 +248,80 @@ class GwDocument(QObject):
             tools_db.execute_sql(sql)
 
         self._fill_table_doc_workcat()
+
+
+    def _fill_table_doc_psector(self):
+        expr_filter = f"doc_name = '{self.doc_name}'"
+        table_name = "v_ui_doc_x_psector"
+
+        tools_qt.fill_table(self.dlg_add_doc.tbl_doc_x_psector, table_name, expr_filter)
+
+
+    def _insert_psector(self, dialog):
+        """Associate an existing psector with the current document, ensuring no duplicates and clearing the input field"""
+        psector_name = tools_qt.get_text(dialog, "feature_id_psector")
+
+        if psector_name == 'null' or not psector_name:
+            message = "You need to enter a psector name"
+            tools_qgis.show_warning(message, dialog=dialog)
+            return
+
+        sql = f"SELECT psector_id FROM plan_psector WHERE name = '{psector_name}'"
+        row = tools_db.get_row(sql)
+        if not row:
+            message = "Psector name not found"
+            tools_qgis.show_warning(message, dialog=dialog)
+            return
+        psector_id = row[0]
+
+        sql = f"INSERT INTO doc_x_psector (doc_id, psector_id) VALUES ('{self.doc_id}', '{psector_id}')"
+        result = tools_db.execute_sql(sql)
+
+        if result:
+            dialog.feature_id_psector.clear()
+            self._fill_table_doc_psector()
+
+
+    def _delete_psector(self, dialog):
+        """Delete the selected psector from the document"""
+        qtable = dialog.tbl_doc_x_psector
+        selected_list = qtable.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "No record selected"
+            tools_qgis.show_warning(message, dialog=dialog)
+            return
+
+        col_idx = tools_qt.get_col_index_by_col_name(qtable, "psector_name")
+        psector_names = []
+        psector_ids = []
+        for row in selected_list:
+            psector_name = qtable.model().index(row.row(), col_idx).data()
+            psector_names.append(psector_name)
+
+        for psector_name in psector_names:
+            sql = f"SELECT psector_id FROM plan_psector WHERE name = '{psector_name}'"
+            row = tools_db.get_row(sql)
+            if row:
+                psector_ids.append(row[0])
+
+        if not psector_ids:
+            message = "No valid psector IDs found"
+            tools_qgis.show_warning(message, dialog=dialog)
+            return
+
+        inf_text = ", ".join(map(str, psector_names))
+        message = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = tools_qt.show_question(message, title, inf_text)
+
+        if not answer:
+            return
+
+        for psector_id in psector_ids:
+            sql = f"DELETE FROM doc_x_psector WHERE doc_id = '{self.doc_id}' AND psector_id = '{psector_id}'"
+            tools_db.execute_sql(sql)
+
+        self._fill_table_doc_psector()
 
 
     def _get_existing_doc_names(self):
@@ -465,6 +544,7 @@ class GwDocument(QObject):
         node_ids = self.list_ids['node']
         connec_ids = self.list_ids['connec']
         workcat_ids = self._get_associated_workcat_ids()
+        psector_ids = self._get_associated_psector_ids()
         gully_ids = self.list_ids['gully']
 
         # Clear the current records
@@ -488,6 +568,10 @@ class GwDocument(QObject):
         # Insert the new records for workcat
         for feature_id in workcat_ids:
             sql += f"\nINSERT INTO doc_x_workcat (doc_id, workcat_id) VALUES ('{doc_id}', '{feature_id}');"
+
+        # Insert the new records for psector
+        for feature_id in psector_ids:
+            sql += f"\nINSERT INTO doc_x_psector (doc_id, psector_id) VALUES ('{doc_id}', '{feature_id}');"
 
         # Insert the new records for gully
         if self.project_type == 'ud':
@@ -518,6 +602,14 @@ class GwDocument(QObject):
         sql = f"SELECT workcat_id FROM doc_x_workcat WHERE doc_id = '{doc_id}'"
         rows = tools_db.get_rows(sql)
         return [row['workcat_id'] for row in rows if 'workcat_id' in row]
+
+    def _get_associated_psector_ids(self, doc_id=None):
+        """Get psector_ids linked to documento"""
+        if doc_id is None:
+            doc_id = self.doc_id
+        sql = f"SELECT psector_id FROM doc_x_psector WHERE doc_id = '{doc_id}'"
+        rows = tools_db.get_rows(sql)
+        return [row['psector_id'] for row in rows if 'psector_id' in row]
 
 
     def _check_doc_exists(self, name=""):

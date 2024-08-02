@@ -463,7 +463,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tab">
+        <widget class="QWidget" name="tab_workcat">
          <attribute name="title">
           <string>Workcat</string>
          </attribute>
@@ -499,6 +499,45 @@
           </item>
           <item>
            <widget class="QTableView" name="tbl_doc_x_workcat"/>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_psector">
+         <attribute name="title">
+          <string>Psector</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_11">
+            <item>
+             <widget class="QLineEdit" name="feature_id_psector"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_insert_psector">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../icons/111b.png</normaloff>../icons/111b.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_delete_psector">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../icons/112b.png</normaloff>../icons/112b.png</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QTableView" name="tbl_doc_x_psector"/>
           </item>
          </layout>
         </widget>
