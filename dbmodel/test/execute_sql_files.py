@@ -40,15 +40,19 @@ def main(project_type):
     # Define the root directories to process
     root_directories = ["utils/ddl", f"{project_type}/schema_model", "utils/fct", "utils/ftrg", f"{project_type}/fct", f"{project_type}/ftrg", "i18n/en_US"]
     exclude_prefix = "ud_" if project_type == "ws" else "ws_"
+    exculude_files = "trg_schema_model.sql"
 
     # Execute SQL files in the root directories
     for root_dir in root_directories:
         print(f"Processing root directory: {root_dir}")
         for root, _, files in os.walk(root_dir):
             for file in sorted(files):
-                if file.endswith(".sql") and exclude_prefix not in file:
+                if file.endswith(".sql") and exclude_prefix not in file and exculude_files not in file:
                     file_path = os.path.join(root, file)
                     execute_sql_file(conn, file_path)
+
+    # Execute the trg_schema_model.sql file after the utils/ftrg and ws/ftrg directories
+    execute_sql_file(conn, f"{project_type}/schema_model/trg_schema_model.sql")
 
     # Define the base updates directory
     updates_dir = "updates/36"
