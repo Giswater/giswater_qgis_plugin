@@ -870,7 +870,7 @@ class GwPsector:
     def enable_relation_tab(self, tablename):
 
         psector_name = f"{tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.name)}"
-        sql = f"SELECT name FROM {tablename} WHERE LOWER(name) = '{psector_name}'"
+        sql = f"SELECT name FROM {tablename} WHERE name = '{psector_name}'"
         rows = tools_db.get_rows(sql)
         if not rows:
             if self.dlg_plan_psector.name.text() != '':
