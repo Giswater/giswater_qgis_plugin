@@ -12,7 +12,7 @@ from osgeo import gdal
 from pyproj import Proj, transform
 
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QCompleter
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QCompleter, QWidget
 from qgis.PyQt.QtCore import pyqtSignal, QObject, Qt
 
 from ..utils import tools_gw
@@ -53,6 +53,7 @@ class GwDocument(QObject):
         self.dlg_add_doc = GwDocUi(self)
         tools_gw.load_settings(self.dlg_add_doc)
         self.doc_id = None
+        self.doc_name = None
         self.files_path = []
 
         # Capture the current layer to return it at the end of the operation
@@ -99,7 +100,9 @@ class GwDocument(QObject):
         # Set icons
         tools_gw.add_icon(self.dlg_add_doc.btn_add_geom, "133")
         tools_gw.add_icon(self.dlg_add_doc.btn_insert, "111", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_add_doc.btn_insert_workcat, "111", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_doc.btn_delete, "112", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_add_doc.btn_delete_workcat, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_doc.btn_snapping, "137")
         self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
 
@@ -109,6 +112,7 @@ class GwDocument(QObject):
         if item_id:
             self._fill_dialog_document(self.dlg_add_doc, "doc", None, doc_id=item_id)
             self._activate_relations()
+            self._fill_table_doc_workcat()
         else:
             tools_qt.set_calendar(self.dlg_add_doc, 'date', None)
 
@@ -121,6 +125,19 @@ class GwDocument(QObject):
             feature_type = "arc"
         viewname = f"v_edit_{feature_type}"
         tools_gw.set_completer_widget(viewname, self.dlg_add_doc.feature_id, str(feature_type) + "_id")
+
+        # Config Workcat
+        tools_gw.set_completer_widget("cat_work", self.dlg_add_doc.feature_id_workcat, "id")
+
+        self.dlg_add_doc.btn_insert_workcat.clicked.connect(partial(self._insert_workcat, self.dlg_add_doc))
+        self.dlg_add_doc.btn_delete_workcat.clicked.connect(partial(self._delete_workcat, self.dlg_add_doc))
+
+        self.dlg_add_doc.tbl_doc_x_workcat.clicked.connect(
+            partial(tools_qgis.highlight_feature_by_id, self.dlg_add_doc.tbl_doc_x_workcat, "v_edit_workcat",
+                    "workcat_id", self.rubber_band, 10))
+
+        self.dlg_add_doc.feature_id_workcat.textChanged.connect(
+            partial(tools_gw.set_completer_object, self.dlg_add_doc, "workcat"))
 
         # Set signals
         self.excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
@@ -171,6 +188,61 @@ class GwDocument(QObject):
         tools_gw.open_dialog(self.dlg_add_doc, dlg_name='doc')
 
         return self.dlg_add_doc
+
+
+    def _fill_table_doc_workcat(self):
+        expr_filter = f"name = '{self.doc_name}'"
+        table_name = "v_ui_doc_x_workcat"
+
+        tools_qt.fill_table(self.dlg_add_doc.tbl_doc_x_workcat, table_name, expr_filter)
+
+
+    def _insert_workcat(self, dialog):
+        """Associate an existing workcat with the current document, ensuring no duplicates and clearing the input field"""
+        workcat_id = tools_qt.get_text(dialog, "feature_id_workcat")
+
+        if workcat_id == 'null':
+            message = "You need to enter a workcat id"
+            tools_qgis.show_warning(message, dialog=dialog)
+            return
+
+        sql = f"INSERT INTO doc_x_workcat (doc_id, workcat_id) VALUES ('{self.doc_id}', '{workcat_id}')"
+        result = tools_db.execute_sql(sql)
+
+        if result:
+            dialog.feature_id_workcat.clear()
+            self._fill_table_doc_workcat()
+
+
+    def _delete_workcat(self, dialog):
+        """Delete the selected workcat from the document"""
+        qtable = dialog.tbl_doc_x_workcat
+        # Get selected rows
+        selected_list = qtable.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=dialog)
+            return
+
+        col_idx = tools_qt.get_col_index_by_col_name(qtable, "workcat_id")
+        workcat_ids = []
+        for row in selected_list:
+            workcat_id = qtable.model().index(row.row(), col_idx).data()
+            workcat_ids.append(workcat_id)
+
+        inf_text = ", ".join(workcat_ids)
+        message = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = tools_qt.show_question(message, title, inf_text)
+
+        if not answer:
+            return
+
+        for workcat_id in workcat_ids:
+            sql = f"DELETE FROM doc_x_workcat WHERE doc_id = '{self.doc_id}' AND workcat_id = '{workcat_id}'"
+            tools_db.execute_sql(sql)
+
+        self._fill_table_doc_workcat()
 
 
     def _get_existing_doc_names(self):
@@ -558,6 +630,9 @@ class GwDocument(QObject):
         tools_qt.set_calendar(dialog, "date", row["date"])
         tools_qt.set_widget_text(dialog, "observ", row["observ"])
         tools_qt.set_widget_text(dialog, "path", row["path"])
+
+        self.doc_id = doc_id
+        self.doc_name = row["name"]
 
         # Check related @feature_type
         for feature_type in list_feature_type:
