@@ -43,6 +43,9 @@ v_message text;
 v_step integer=0;
 v_expl integer = null;
 v_sector_0 boolean = false;
+v_expl_id integer[];
+v_sector_id integer[];
+v_network_type integer;
 
 
 
@@ -112,6 +115,11 @@ BEGIN
 
 		CREATE TEMP TABLE temp_t_go2epa (LIKE SCHEMA_NAME.temp_go2epa INCLUDING ALL);
 
+		-- getting selectors
+		SELECT array_agg(expl_id) INTO v_expl_id FROM selector_expl WHERE expl_id > 0 AND cur_user = current_user;
+		SELECT array_agg(sector_id) INTO v_sector_id FROM selector_sector WHERE sector_id > 0 AND cur_user = current_user;
+		SELECT value::integer INTO v_network_type FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user = current_user;
+
 		-- setting selectors
 		v_inpoptions = (SELECT (replace (replace (replace (array_to_json(array_agg(json_build_object((t.parameter),(t.value))))::text,'},{', ' , '),'[',''),']',''))::json
 				FROM (SELECT parameter, value FROM config_param_user
@@ -119,7 +127,8 @@ BEGIN
 
 		-- setting selectors
 		DELETE FROM rpt_cat_result WHERE result_id=v_result;
-		INSERT INTO rpt_cat_result (result_id, inp_options, status, expl_id) VALUES (v_result, v_inpoptions, 1, ARRAY[v_expl]);
+		INSERT INTO rpt_cat_result (result_id, inp_options, status, expl_id, sector_id, network_type)
+			VALUES (v_result, v_inpoptions, 1, v_expl_id, v_sector_id, v_network_type);
 		DELETE FROM selector_inp_result WHERE cur_user=current_user;
 		INSERT INTO selector_inp_result (result_id, cur_user) VALUES (v_result, current_user);
 
