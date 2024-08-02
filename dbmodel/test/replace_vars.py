@@ -21,4 +21,4 @@ def main(project_type):
                 replace_vars_in_file(os.path.join(root, file), replacements)
 
 if __name__ == "__main__":
-    main()
+    main(project_type='ws')
