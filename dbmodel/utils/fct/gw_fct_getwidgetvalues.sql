@@ -57,7 +57,7 @@ BEGIN
 
 	IF v_featuretype ='NODE' THEN
 	
-		v_min = (SELECT max(y) FROM (SELECT sys_y1 as y FROM v_arc WHERE node_1=v_id UNION SELECT sys_y2 FROM v_arc WHERE node_2=v_id)a);
+		v_min = (SELECT max(y) FROM (SELECT sys_y1 as y FROM v_edit_arc WHERE node_1=v_id UNION SELECT sys_y2 FROM v_edit_arc WHERE node_2=v_id)a);
 		IF v_min IS NULL THEN v_min = 0; END IF;
 		
 	ELSIF v_featuretype ='ARC' THEN
