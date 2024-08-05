@@ -59,3 +59,28 @@ JOIN
     doc ON doc.id::text = doc_x_psector.doc_id::text
 JOIN
     plan_psector ON plan_psector.psector_id ::text = doc_x_psector.psector_id::text;
+
+--05/08/2024
+DROP VIEW if EXISTS v_ui_doc_x_visit;
+CREATE OR REPLACE VIEW v_ui_doc_x_visit
+AS SELECT doc_x_visit.id,
+    doc_x_visit.visit_id,
+    doc. "name" AS doc_name,
+    doc.doc_type,
+    doc.path,
+    doc.observ,
+    doc.date,
+    doc.user_name
+   FROM doc_x_visit
+     JOIN doc ON doc.id::text = doc_x_visit.doc_id::text;
+
+-- View Triggers
+
+CREATE trigger gw_trg_ui_doc_x_visit instead OF
+INSERT
+    OR
+DELETE
+    OR
+UPDATE
+    ON
+    v_ui_doc_x_visit FOR each row EXECUTE function gw_trg_ui_doc('doc_x_visit');
