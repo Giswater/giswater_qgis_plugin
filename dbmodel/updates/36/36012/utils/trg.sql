@@ -16,3 +16,30 @@ DELETE
 UPDATE
     ON
     v_ui_doc_x_visit FOR each row EXECUTE function gw_trg_ui_doc('doc_x_visit');
+
+CREATE trigger gw_trg_ui_doc_x_arc instead OF
+INSERT
+    OR
+DELETE
+    OR
+UPDATE
+    ON
+    v_ui_doc_x_arc FOR each row EXECUTE function gw_trg_ui_doc('doc_x_arc');
+
+CREATE trigger gw_trg_ui_doc_x_connec instead OF
+INSERT
+    OR
+DELETE
+    OR
+UPDATE
+    ON
+    v_ui_doc_x_connec FOR each row EXECUTE function gw_trg_ui_doc('doc_x_connec');
+
+CREATE trigger gw_trg_ui_doc_x_node instead OF
+INSERT
+    OR
+DELETE
+    OR
+UPDATE
+    ON
+    v_ui_doc_x_node FOR each row EXECUTE function gw_trg_ui_doc('doc_x_node');

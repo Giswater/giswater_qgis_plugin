@@ -28,3 +28,17 @@ AS SELECT DISTINCT ON (rpt_cat_result.result_id) rpt_cat_result.result_id,
      LEFT JOIN inp_typevalue t1 ON rpt_cat_result.status::text = t1.id::text
      LEFT JOIN inp_typevalue t2 ON rpt_cat_result.network_type::text = t2.id::text
   WHERE t1.typevalue::text = 'inp_result_status'::text AND t2.typevalue::text = 'inp_options_networkmode'::text AND ((s.expl_id = ANY (rpt_cat_result.expl_id)) AND s.cur_user = CURRENT_USER OR rpt_cat_result.expl_id = ARRAY[NULL]::INTEGER[]);
+
+--05/08/2024
+DROP VIEW if EXISTS v_ui_doc_x_gully;
+CREATE OR REPLACE VIEW v_ui_doc_x_gully
+AS SELECT doc_x_gully.id,
+    doc_x_gully.gully_id,
+    doc."name" AS doc_name,
+    doc.doc_type,
+    doc.path,
+    doc.observ,
+    doc.date,
+    doc.user_name
+   FROM doc_x_gully
+     JOIN doc ON doc.id::text = doc_x_gully.doc_id::text;

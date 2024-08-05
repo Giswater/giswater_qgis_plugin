@@ -73,3 +73,42 @@ AS SELECT doc_x_visit.id,
     doc.user_name
    FROM doc_x_visit
      JOIN doc ON doc.id::text = doc_x_visit.doc_id::text;
+
+DROP VIEW if EXISTS v_ui_doc_x_arc;
+CREATE OR REPLACE VIEW v_ui_doc_x_arc
+AS SELECT doc_x_arc.id,
+    doc_x_arc.arc_id,
+    doc."name" AS doc_name,
+    doc.doc_type,
+    doc.path,
+    doc.observ,
+    doc.date,
+    doc.user_name
+   FROM doc_x_arc
+     JOIN doc ON doc.id::text = doc_x_arc.doc_id::text;
+
+DROP VIEW if EXISTS v_ui_doc_x_connec;
+CREATE OR REPLACE VIEW v_ui_doc_x_connec
+AS SELECT doc_x_connec.id,
+    doc_x_connec.connec_id,
+    doc."name" AS doc_name,
+    doc.doc_type,
+    doc.path,
+    doc.observ,
+    doc.date,
+    doc.user_name
+   FROM doc_x_connec
+     JOIN doc ON doc.id::text = doc_x_connec.doc_id::text;
+
+DROP VIEW if EXISTS v_ui_doc_x_node;
+CREATE OR REPLACE VIEW v_ui_doc_x_node
+AS SELECT doc_x_node.id,
+    doc_x_node.node_id,
+    doc."name" AS doc_name,
+    doc.doc_type,
+    doc.path,
+    doc.observ,
+    doc.date,
+    doc.user_name
+   FROM doc_x_node
+     JOIN doc ON doc.id::text = doc_x_node.doc_id::text;
