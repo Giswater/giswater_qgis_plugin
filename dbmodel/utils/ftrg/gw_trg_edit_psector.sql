@@ -101,11 +101,17 @@ BEGIN
 			v_psector_geom = (SELECT the_geom FROM plan_psector WHERE psector_id=NEW.psector_id);
 		
 			-- copy values into traceability tables
-			INSERT INTO audit_psector_connec_traceability
-			SELECT nextval('SCHEMA_NAME.audit_psector_connec_traceability_id_seq'), psector_id, pc.state, doable, pc.arc_id, l.link_id, l.the_geom, now(), current_user, 'Execute psector', connec.*
-			FROM plan_psector_x_connec pc JOIN connec USING (connec_id)
+			INSERT INTO audit_psector_connec_traceability 
+			SELECT nextval('SCHEMA_NAME.audit_psector_connec_traceability_id_seq'), psector_id, pc.state, doable, pc.arc_id, l.link_id, l.the_geom, now(), current_user, 'Execute psector', 
+			connec_id, code, elevation, depth, c.connecat_id,  c.sector_id, customer_code, c.state, c.state_type, c.arc_id, connec_length, annotation, observ, comment, c.dma_id, 
+			c.presszone_id, soilcat_id, function_type, category_type, c.fluid_type, location_type, c.workcat_id, c.workcat_id_end,  buildercat_id, c.builtdate, c.enddate, ownercat_id, 
+			muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, c.descript, link, verified, rotation, c.the_geom, undelete,
+			label_x, label_y, label_rotation, publish, inventory, c.expl_id, num_value, c.feature_type, c.tstamp, pjoint_type, pjoint_id, c.lastupdate, c.lastupdate_user, c.insert_user,
+			c.minsector_id, c.dqa_id, c.staticpressure, district_id,adate, adescript, accessibility,workcat_id_plan,asset_id, c.epa_type, om_state, conserv_state, priority, valve_location,
+			valve_type, shutoff_valve, access_type, placement_type, crmzone_id,c.expl_id2, plot_code			
+			FROM plan_psector_x_connec pc JOIN connec c USING (connec_id)
 			JOIN link l USING (link_id)
-			WHERE psector_id=NEW.psector_id;
+			WHERE psector_id=NEW.psector_id;		
 
 			IF v_projectype = 'WS' THEN
 
@@ -305,11 +311,18 @@ BEGIN
 			END IF;
 
 			-- copy values into traceability tables
-			INSERT INTO audit_psector_connec_traceability
-			SELECT nextval('SCHEMA_NAME.audit_psector_connec_traceability_id_seq'), psector_id, pc.state, doable, pc.arc_id, l.link_id, l.the_geom, now(), current_user, v_action, connec.*
-			FROM plan_psector_x_connec pc JOIN connec USING (connec_id)
+			INSERT INTO audit_psector_connec_traceability 
+			SELECT nextval('SCHEMA_NAME.audit_psector_connec_traceability_id_seq'), psector_id, pc.state, doable, pc.arc_id, l.link_id, l.the_geom, now(), current_user, v_action, 
+			connec_id, code, elevation, depth, c.connecat_id,  c.sector_id, customer_code, c.state, c.state_type, c.arc_id, connec_length, annotation, observ, comment, c.dma_id, 
+			c.presszone_id, soilcat_id, function_type, category_type, c.fluid_type, location_type, c.workcat_id, c.workcat_id_end,  buildercat_id, c.builtdate, c.enddate, ownercat_id, 
+			muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, c.descript, link, verified, rotation, c.the_geom, undelete,
+			label_x, label_y, label_rotation, publish, inventory, c.expl_id, num_value, c.feature_type, c.tstamp, pjoint_type, pjoint_id, c.lastupdate, c.lastupdate_user, c.insert_user,
+			c.minsector_id, c.dqa_id, c.staticpressure, district_id,adate, adescript, accessibility,workcat_id_plan,asset_id, c.epa_type, om_state, conserv_state, priority, valve_location,
+			valve_type, shutoff_valve, access_type, placement_type, crmzone_id,c.expl_id2, plot_code			
+			FROM plan_psector_x_connec pc JOIN connec c USING (connec_id)
 			JOIN link l USING (link_id)
 			WHERE psector_id=NEW.psector_id;
+			
 
 			IF v_projectype = 'WS' THEN
 
