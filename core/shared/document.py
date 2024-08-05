@@ -40,7 +40,7 @@ class GwDocument(QObject):
         self.schema_name = lib_vars.schema_name
         self.files_path = []
         self.project_type = tools_gw.get_project_type()
-        self.doc_tables = ["doc_x_node", "doc_x_arc", "doc_x_connec", "doc_x_gully", "doc_x_workcat"]
+        self.doc_tables = ["doc_x_node", "doc_x_arc", "doc_x_connec", "doc_x_gully", "doc_x_workcat", "doc_x_psector", "doc_x_visit"]
         self.point_xy = {"x": None, "y": None}
 
 
@@ -101,9 +101,11 @@ class GwDocument(QObject):
         tools_gw.add_icon(self.dlg_add_doc.btn_insert, "111", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_doc.btn_insert_workcat, "111", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_doc.btn_insert_psector, "111", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_add_doc.btn_insert_visit, "111", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_doc.btn_delete, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_doc.btn_delete_workcat, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_doc.btn_delete_psector, "112", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_add_doc.btn_delete_visit, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_doc.btn_snapping, "137")
         self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
 
@@ -115,6 +117,7 @@ class GwDocument(QObject):
             self._activate_relations()
             self._fill_table_doc_workcat()
             self._fill_table_doc_psector()
+            self._fill_table_doc_visit()
         else:
             tools_qt.set_calendar(self.dlg_add_doc, 'date', None)
 
@@ -143,6 +146,14 @@ class GwDocument(QObject):
         self.dlg_add_doc.btn_delete_psector.clicked.connect(partial(self._delete_psector, self.dlg_add_doc))
         self.dlg_add_doc.feature_id_psector.textChanged.connect(
             partial(tools_gw.set_completer_object, self.dlg_add_doc, "psector"))
+
+        # Config Visit
+        tools_gw.set_completer_widget("om_visit", self.dlg_add_doc.feature_id_visit, "id")
+
+        self.dlg_add_doc.btn_insert_visit.clicked.connect(partial(self._insert_visit, self.dlg_add_doc))
+        self.dlg_add_doc.btn_delete_visit.clicked.connect(partial(self._delete_visit, self.dlg_add_doc))
+        self.dlg_add_doc.feature_id_visit.textChanged.connect(
+            partial(tools_gw.set_completer_object, self.dlg_add_doc, "visit"))
 
         # Set signals
         self.excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
@@ -322,6 +333,58 @@ class GwDocument(QObject):
             tools_db.execute_sql(sql)
 
         self._fill_table_doc_psector()
+
+    def _fill_table_doc_visit(self):
+        expr_filter = f"doc_name = '{self.doc_name}'"
+        table_name = "v_ui_doc_x_visit"
+
+        tools_qt.fill_table(self.dlg_add_doc.tbl_doc_x_visit, table_name, expr_filter)
+
+    def _insert_visit(self, dialog):
+        """Associate an existing visit with the current document, ensuring no duplicates and clearing the input field"""
+        visit_id = tools_qt.get_text(dialog, "feature_id_visit")
+
+        if visit_id == 'null' or not visit_id:
+            message = "You need to enter a visit ID"
+            tools_qgis.show_warning(message, dialog=dialog)
+            return
+
+        sql = f"INSERT INTO doc_x_visit (doc_id, visit_id) VALUES ('{self.doc_id}', '{visit_id}')"
+        result = tools_db.execute_sql(sql)
+
+        if result:
+            dialog.feature_id_visit.clear()
+            self._fill_table_doc_visit()
+
+
+    def _delete_visit(self, dialog):
+        """Delete the selected visit from the document"""
+        qtable = dialog.tbl_doc_x_visit
+        selected_list = qtable.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "No record selected"
+            tools_qgis.show_warning(message, dialog=dialog)
+            return
+
+        col_idx = tools_qt.get_col_index_by_col_name(qtable, "visit_id")
+        visit_ids = []
+        for row in selected_list:
+            visit_id = qtable.model().index(row.row(), col_idx).data()
+            visit_ids.append(visit_id)
+
+        inf_text = ", ".join(map(str, visit_ids))
+        message = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = tools_qt.show_question(message, title, inf_text)
+
+        if not answer:
+            return
+
+        for visit_id in visit_ids:
+            sql = f"DELETE FROM doc_x_visit WHERE doc_id = '{self.doc_id}' AND visit_id = '{visit_id}'"
+            tools_db.execute_sql(sql)
+
+        self._fill_table_doc_visit()
 
 
     def _get_existing_doc_names(self):
@@ -545,6 +608,7 @@ class GwDocument(QObject):
         connec_ids = self.list_ids['connec']
         workcat_ids = self._get_associated_workcat_ids()
         psector_ids = self._get_associated_psector_ids()
+        visit_ids = self._get_associated_visit_ids()
         gully_ids = self.list_ids['gully']
 
         # Clear the current records
@@ -572,6 +636,10 @@ class GwDocument(QObject):
         # Insert the new records for psector
         for feature_id in psector_ids:
             sql += f"\nINSERT INTO doc_x_psector (doc_id, psector_id) VALUES ('{doc_id}', '{feature_id}');"
+
+        # Insert the new records for visit
+        for feature_id in visit_ids:  # New lines
+            sql += f"\nINSERT INTO doc_x_visit (doc_id, visit_id) VALUES ('{doc_id}', '{feature_id}');"
 
         # Insert the new records for gully
         if self.project_type == 'ud':
@@ -603,6 +671,7 @@ class GwDocument(QObject):
         rows = tools_db.get_rows(sql)
         return [row['workcat_id'] for row in rows if 'workcat_id' in row]
 
+
     def _get_associated_psector_ids(self, doc_id=None):
         """Get psector_ids linked to documento"""
         if doc_id is None:
@@ -610,6 +679,15 @@ class GwDocument(QObject):
         sql = f"SELECT psector_id FROM doc_x_psector WHERE doc_id = '{doc_id}'"
         rows = tools_db.get_rows(sql)
         return [row['psector_id'] for row in rows if 'psector_id' in row]
+
+
+    def _get_associated_visit_ids(self, doc_id=None):
+        """Get visit_ids linked to the document"""
+        if doc_id is None:
+            doc_id = self.doc_id
+        sql = f"SELECT visit_id FROM doc_x_visit WHERE doc_id = '{doc_id}'"
+        rows = tools_db.get_rows(sql)
+        return [row['visit_id'] for row in rows if 'visit_id' in row]
 
 
     def _check_doc_exists(self, name=""):
