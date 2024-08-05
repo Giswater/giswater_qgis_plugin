@@ -477,10 +477,6 @@ BEGIN
 			END IF;
 		END IF;
 
-		-- recreate views
-		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-		"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
-
 		--reset sequences and id of anl, temp and audit tables
 		PERFORM gw_fct_admin_reset_sequences();
 
@@ -495,6 +491,10 @@ BEGIN
 		WHERE cur_user="current_user"() AND fid=v_fid ORDER BY criticity desc, id asc) row;
 
 	END IF;
+
+    -- recreate views
+    PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+    "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
 
 	v_result_info := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
