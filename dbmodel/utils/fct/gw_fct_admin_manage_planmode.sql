@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3304
 
-CREATE OR REPLACE FUNCTION gw_fct_admin_manage_planmode(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_planmode(p_data json)
   RETURNS json AS
 $BODY$
 
