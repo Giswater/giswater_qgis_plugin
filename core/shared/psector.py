@@ -375,9 +375,9 @@ class GwPsector:
                 if not canvas_rec.intersects(psector_rec) or (psector_rec.width() < (canvas_width * 10) / 100 or psector_rec.height() < (canvas_height * 10) / 100):
                     max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
                     tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
-
-            filter_ = "psector_id = '" + str(psector_id) + "'"
-            message = tools_qt.fill_table(self.tbl_document, f"v_ui_doc_x_psector", filter_)
+            self.psector_name = self.dlg_plan_psector.findChild(QLineEdit, "name").text()
+            filter_ = f"psector_name = '{self.psector_name}'"
+            message = tools_qt.fill_table(self.tbl_document, "v_ui_doc_x_psector", filter_)
             if message:
                 tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
             self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
@@ -465,7 +465,7 @@ class GwPsector:
         self.cmb_status.currentIndexChanged.connect(partial(self.show_status_warning))
 
         # Create list for completer QLineEdit
-        sql = "SELECT DISTINCT(id) FROM v_ui_document ORDER BY id"
+        sql = "SELECT DISTINCT(name) FROM v_ui_doc ORDER BY name"
         list_items = tools_db.create_list_for_completer(sql)
         tools_qt.set_completer_lineedit(self.dlg_plan_psector.doc_id, list_items)
 
@@ -894,7 +894,7 @@ class GwPsector:
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 4:
             self.populate_budget(self.dlg_plan_psector, psector_id)
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 5:
-            expr = f"psector_id = '{psector_id}'"
+            expr = f"psector_name = '{self.psector_name}'"
             message = tools_qt.fill_table(self.tbl_document, f"{self.schema_name}.v_ui_doc_x_psector", expr)
             tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.tbl_document, "v_ui_doc_x_psector")
             if message:
@@ -1584,16 +1584,26 @@ class GwPsector:
     def document_insert(self):
         """ Insert a document related to the current visit """
 
-        doc_id = self.doc_id.text()
+        doc_name = self.doc_id.text()
         psector_id = self.psector_id.text()
-        if not doc_id:
-            message = "You need to insert doc_id"
+        if not doc_name:
+            message = "You need to insert a document name"
             tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
             return
         if not psector_id:
             message = "You need to insert psector_id"
             tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
             return
+
+        # Get doc_id using doc_name
+        sql = f"SELECT id FROM doc WHERE name = '{doc_name}'"
+        row = tools_db.get_row(sql)
+        if not row:
+            message = "Document name not found"
+            tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
+            return
+
+        doc_id = row['id']
 
         # Check if document already exist
         sql = (f"SELECT doc_id"
@@ -1613,6 +1623,7 @@ class GwPsector:
             message = "Document inserted successfully"
             tools_qgis.show_info(message, dialog=self.dlg_plan_psector)
 
+        self.doc_id.clear()
         self.dlg_plan_psector.tbl_document.model().select()
 
 
