@@ -73,14 +73,3 @@ AS SELECT doc_x_visit.id,
     doc.user_name
    FROM doc_x_visit
      JOIN doc ON doc.id::text = doc_x_visit.doc_id::text;
-
--- View Triggers
-
-CREATE trigger gw_trg_ui_doc_x_visit instead OF
-INSERT
-    OR
-DELETE
-    OR
-UPDATE
-    ON
-    v_ui_doc_x_visit FOR each row EXECUTE function gw_trg_ui_doc('doc_x_visit');
