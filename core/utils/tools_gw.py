@@ -1952,6 +1952,27 @@ def fill_typeahead(completer, model, field, dialog, widget, feature_id=None):
 
     if not widget:
         return
+
+    # Detect the active tab
+    tab_widget = dialog.findChild(QTabWidget)
+    active_tab_name = tab_widget.tabText(tab_widget.currentIndex())
+
+    # Custom logic for the "Doc" tab
+    if active_tab_name == "Doc":
+        search_text = tools_qt.get_text(dialog, widget)
+        query = f"SELECT name as idval FROM doc WHERE name ILIKE '%{search_text}%'"
+        rows = tools_db.get_rows(query)
+
+        if not rows:
+            # Handle the case when no matching documents are found
+            print("No matching documents found.")
+            list_items = []
+        else:
+            list_items = [row['idval'] for row in rows]
+
+        tools_qt.set_completer_object(completer, model, widget, list_items)
+        return
+
     parent_id = ""
     if 'parentId' in field:
         parent_id = field["parentId"]
