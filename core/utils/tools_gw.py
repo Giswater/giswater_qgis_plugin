@@ -542,10 +542,10 @@ def draw_wkt_geometry(wkt_string, rubber_band, color, width):
         tools_qgis.show_warning('Unsuported geometry type', parameter=geometry_type)
 
 
-def enable_feature_type(dialog, widget_name='tbl_relation', ids=None):
-
+def enable_feature_type(dialog, widget_name='tbl_relation', ids=None, widget_table=None):
     feature_type = tools_qt.get_widget(dialog, 'feature_type')
-    widget_table = tools_qt.get_widget(dialog, widget_name)
+    if widget_table is None:
+        widget_table = tools_qt.get_widget(dialog, widget_name)
     if feature_type is not None and widget_table is not None:
         if len(ids) > 0:
             feature_type.setEnabled(False)
@@ -2917,7 +2917,7 @@ def selection_changed(class_object, dialog, table_object, query=False, lazy_widg
         load_tablename(dialog, table_object, class_object.feature_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
-    enable_feature_type(dialog, table_object, ids=ids)
+    enable_feature_type(dialog, widget_table=table_object, ids=ids)
     class_object.ids = ids
 
 
