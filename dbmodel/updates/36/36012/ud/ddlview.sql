@@ -42,3 +42,21 @@ AS SELECT doc_x_gully.id,
     doc.user_name
    FROM doc_x_gully
      JOIN doc ON doc.id::text = doc_x_gully.doc_id::text;
+
+--06/08/2024
+CREATE OR REPLACE VIEW vu_drainzone
+AS SELECT d.drainzone_id,
+    d.name,
+    d.expl_id,
+    d.descript,
+    d.active,
+    d.undelete,
+    d.link,
+    d.graphconfig,
+    d.stylesheet,
+    d.tstamp,
+    d.insert_user,
+    d.lastupdate,
+    d.lastupdate_user
+   FROM drainzone d
+  ORDER BY d.drainzone_id;
