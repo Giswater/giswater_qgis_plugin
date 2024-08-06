@@ -31,3 +31,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_res
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"sector_id", "dataType":"int[]"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"descript", "dataType":"text"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_anlgraph", "column":"cur_user", "dataType":"text"}}$$);
+
+ALTER TABLE temp_anlgraph ALTER COLUMN cur_user SET DEFAULT CURRENT_USER;
+

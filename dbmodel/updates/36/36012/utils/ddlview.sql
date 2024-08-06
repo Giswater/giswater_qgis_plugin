@@ -112,3 +112,10 @@ AS SELECT doc_x_node.id,
     doc.user_name
    FROM doc_x_node
      JOIN doc ON doc.id::text = doc_x_node.doc_id::text;
+
+drop view v_temp_anlgraph
+CREATE VIEW v_temp_anlgraph AS
+SELECT arc_id, a.node_1, a.node_2, arccat_id, arc_type, state, state_type, is_operative, 
+(concat('2001-01-01 01:',checkf/60,':',checkf%60))::timestamp, trace, the_geom 
+FROM temp_anlgraph JOIN v_edit_arc a USING (arc_id) 
+WHERE cur_user = current_user;

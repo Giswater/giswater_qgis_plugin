@@ -689,7 +689,7 @@ BEGIN
 		-- inundation process
 		LOOP
 			v_count = v_count+1;
-			UPDATE temp_t_anlgraph n SET water=1, trace = a.trace FROM v_temp_anlgraph a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;
+			UPDATE temp_t_anlgraph n SET water=1, trace = a.trace, checkf = v_count FROM v_temp_anlgraph a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;
 			GET DIAGNOSTICS v_affectrow = row_count;
 			raise notice 'v_count --> %' , v_count;
 			EXIT WHEN v_affectrow = 0;
@@ -1494,6 +1494,11 @@ BEGIN
 	v_version := COALESCE(v_version, '');
 	v_netscenario := COALESCE(v_netscenario, '');
 
+	-- moving data on temp_anlgraph to be used for replay of the movie
+	DELETE FROM temp_anlgraph;
+	INSERT INTO temp_anlgraph SELECT * FROM temp_t_anlgraph;
+
+	-- drop temporal tables
 	DROP VIEW IF EXISTS v_temp_anlgraph;
 	DROP TABLE IF EXISTS temp_t_anlgraph;
 	DROP TABLE IF EXISTS temp_t_data;
