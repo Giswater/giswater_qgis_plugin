@@ -151,7 +151,7 @@ class GwMapzoneManager:
         model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
         table_name = self.table_name
         if show_all:
-            table_name = table_name.replace('v_ui_', '')
+            table_name = table_name.replace('v_ui_', 'vu_')
         model.setTable(table_name)
         # model.setFilter(f"dscenario_id = {self.selected_dscenario_id}")
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
