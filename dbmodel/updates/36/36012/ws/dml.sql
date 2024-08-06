@@ -115,3 +115,8 @@ INSERT INTO archived_rpt_node(
 SELECT
 	result_id, node_id, rpt_elevation, rpt_demand, head, press, other, time, quality
 FROM _archived_rpt_node;
+
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") 
+VALUES(3264, 'There isn''t any node configured on config_graph_mincut for the selected macroexploitation',
+'Fill the config_graph_mincut with the inlets before executing the mincut', 2, true, 'utils', 'core') on conflict (id) do nothing;

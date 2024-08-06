@@ -122,16 +122,10 @@ BEGIN
 			INSERT INTO om_mincut (id) VALUES (v_mincut);
 		END IF;
 
-		-- check if there is no cap node_id in the v_edit_node of those registered in config_graph_mincut
-		IF EXISTS (
-			SELECT 1
-			FROM config_graph_mincut
-			WHERE node_id NOT IN (
-				SELECT node_id
-				FROM v_edit_node
-			)
-		) THEN
-			RETURN ('{"status":"Failed", "message":{"level":2, "text":"There are node_id values in config_graph_mincut that are not present in v_edit_node."}}')::json;
+		-- check if there is no node_id configured on config_graph_mincut for the macroexploitation
+		IF (SELECT count (node_id) FROM v_edit_node WHERE node_id IN (SELECT node_id FROM config_graph_mincut)) = 0 THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3264", "function":"2980","debug_msg":null, "is_process":true}}$$)';
 		END IF;
 
 		--check if arc exists in database or look for a new arc_id in the same location
