@@ -654,7 +654,27 @@ BEGIN
 				END IF;
 			END IF;
 		END IF;
-		
+
+		-- update nodetype on arc
+		IF v_feature_type='node' then
+
+			FOR rec_arc IN SELECT arc_id, nodetype_1 FROM arc WHERE node_1=v_id::text
+			loop
+				select node_type from v_edit_node where node_id=v_id::text into v_nodetype;
+				UPDATE arc SET nodetype_1=v_nodetype where arc_id=rec_arc.arc_id;
+				INSERT INTO audit_check_data (fid, result_id, error_message)
+				VALUES (v_fid, v_result_id, concat('Reconnect arc ',rec_arc.arc_id,'.'));
+			END LOOP;
+
+			FOR rec_arc IN SELECT arc_id, nodetype_2 FROM arc WHERE node_2=v_id::text
+			loop
+				select node_type from v_edit_node where node_id=v_id::text into v_nodetype;
+				UPDATE arc SET nodetype_2=v_nodetype where arc_id=rec_arc.arc_id;
+				INSERT INTO audit_check_data (fid, result_id, error_message)
+				VALUES (v_fid, v_result_id, concat('Reconnect arc ',rec_arc.arc_id,'.'));
+			END LOOP;
+		end if;
+
 		--reset mapzone configuration
 		IF v_project_type='WS' THEN
 
