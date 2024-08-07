@@ -109,3 +109,7 @@ WHERE tabname = 'tab_documents' AND columnname = 'doc_id';
 
 UPDATE config_form_fields SET web_layoutorder = 4
 WHERE tabname = 'tab_documents' AND columnname = 'tbl_documents';
+
+-- 07/08/2024
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('sys_table_context', '{"level_1":"OM","level_2":"ANALYTICS"}', NULL, NULL, '{"orderBy":26}'::json);
+UPDATE sys_table SET context='{"level_1":"OM","level_2":"ANALYTICS"}', orderby=1, alias='Auxiliar Hydrants' WHERE id='v_edit_anl_hydrant';
