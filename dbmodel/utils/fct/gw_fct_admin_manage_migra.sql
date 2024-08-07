@@ -69,11 +69,7 @@ BEGIN
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done succesfully"}, "version":"'||v_version||'"'||
 			 ',"body":{"form":{}'||
-			 ',"data":{ "info":'||v_result_info||','||
-				'"point":{"geometryType":"", "values":[]}'||','||
-				'"line":{"geometryType":"", "values":[]}'||','||
-				'"polygon":{"geometryType":"", "values":[]}'||
-			   '}}'||
+			 ',"data":{ "info":'||v_result_info||'}}'||
 		'}')::json, 3130, null, null, null);
 	
 END;
