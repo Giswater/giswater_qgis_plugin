@@ -1298,7 +1298,7 @@ BEGIN
 			(SELECT * FROM 
 			(SELECT DISTINCT ON (arc_id) arc_id, arccat_id, t.state, t.expl_id, t.'||v_field||'::TEXT as mapzone_id, t.the_geom, m.name as descript FROM temp_t_arc t 
 			JOIN '||v_table||' m USING ('||v_field||') WHERE '||v_field||'::integer IN ('||v_floodonlymapzone||')
-			)) row ) features'
+			)a) row ) features'
 			INTO v_result;
 		END IF;
 
