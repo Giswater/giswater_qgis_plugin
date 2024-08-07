@@ -58,8 +58,8 @@ DROP VIEW IF EXISTS vu_gully;
 
 -- change type of units columns on gully and audit_psector_gully_traceability
 -----------------------------------
-ALTER TABLE gully ALTER COLUMN units TYPE numeric(12,2);
-ALTER TABLE audit_psector_gully_traceability ALTER COLUMN units TYPE numeric(12,2);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"gully", "column":"units", "dataType":"numeric(12,2)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"audit_psector_gully_traceability", "column":"units", "dataType":"numeric(12,2)"}}$$);
 
 
 -- recreate all deleted views:
