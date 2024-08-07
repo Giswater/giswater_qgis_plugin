@@ -29,244 +29,328 @@ AS SELECT DISTINCT ON (rpt_cat_result.result_id) rpt_cat_result.result_id,
      LEFT JOIN inp_typevalue t2 ON rpt_cat_result.network_type::text = t2.id::text
   WHERE t1.typevalue::text = 'inp_result_status'::text AND t2.typevalue::text = 'inp_options_networkmode'::text AND ((s.expl_id = ANY (rpt_cat_result.expl_id)) AND s.cur_user = CURRENT_USER OR rpt_cat_result.expl_id = ARRAY[NULL]::INTEGER[]);
 
-/*
-v_edit_inp_outfall
-v_edit_inp_storage
-v_ui_workcat_x_feature_end
-v_edit_inp_netgully
-ve_pol_chamber
-ve_pol_netgully
-v_edit_inp_divider
-v_edit_man_netelement
-*/
 
-CREATE OR REPLACE VIEW v_edit_inp_outfall
-AS SELECT v_edit_node.node_id,
-    v_edit_node.top_elev,
-    v_edit_node.custom_top_elev,
-    v_edit_node.ymax,
-    v_edit_node.custom_ymax,
-    v_edit_node.elev,
-    v_edit_node.custom_elev,
-    v_edit_node.sys_elev,
-    v_edit_node.nodecat_id,
-    v_edit_node.sector_id,
-    v_edit_node.macrosector_id,
-    v_edit_node.state,
-    v_edit_node.state_type,
-    v_edit_node.annotation,
-    v_edit_node.expl_id,
-    inp_outfall.outfall_type,
-    inp_outfall.stage,
-    inp_outfall.curve_id,
-    inp_outfall.timser_id,
-    inp_outfall.gate,
-    v_edit_node.the_geom
-   FROM v_sector_node
-     JOIN v_edit_node USING (node_id)
-     JOIN inp_outfall USING (node_id)
-  WHERE v_edit_node.is_operative IS TRUE;
- 
-CREATE OR REPLACE VIEW v_edit_inp_storage
-AS SELECT v_edit_node.node_id,
-    v_edit_node.top_elev,
-    v_edit_node.custom_top_elev,
-    v_edit_node.ymax,
-    v_edit_node.custom_ymax,
-    v_edit_node.elev,
-    v_edit_node.custom_elev,
-    v_edit_node.sys_elev,
-    v_edit_node.nodecat_id,
-    v_edit_node.sector_id,
-    v_edit_node.macrosector_id,
-    v_edit_node.state,
-    v_edit_node.state_type,
-    v_edit_node.annotation,
-    v_edit_node.expl_id,
-    inp_storage.storage_type,
-    inp_storage.curve_id,
-    inp_storage.a1,
-    inp_storage.a2,
-    inp_storage.a0,
-    inp_storage.fevap,
-    inp_storage.sh,
-    inp_storage.hc,
-    inp_storage.imd,
-    inp_storage.y0,
-    inp_storage.ysur,
-    inp_storage.apond,
-    v_edit_node.the_geom
-   FROM v_sector_node
-     JOIN v_edit_node USING (node_id)
-     JOIN inp_storage USING (node_id)
-  WHERE v_edit_node.is_operative IS TRUE;
- 
-CREATE OR REPLACE VIEW v_ui_workcat_x_feature_end
-AS SELECT row_number() OVER (ORDER BY v_edit_arc.arc_id) + 1000000 AS rid,
-    'ARC'::character varying AS feature_type,
-    v_edit_arc.arccat_id AS featurecat_id,
-    v_edit_arc.arc_id AS feature_id,
-    v_edit_arc.code,
-    exploitation.name AS expl_name,
-    v_edit_arc.workcat_id_end AS workcat_id,
-    exploitation.expl_id
-   FROM v_edit_arc
-     JOIN exploitation ON exploitation.expl_id = v_edit_arc.expl_id
-  WHERE v_edit_arc.state = 0
-UNION
- SELECT row_number() OVER (ORDER BY v_edit_node.node_id) + 2000000 AS rid,
-    'NODE'::character varying AS feature_type,
-    v_edit_node.nodecat_id AS featurecat_id,
-    v_edit_node.node_id AS feature_id,
-    v_edit_node.code,
-    exploitation.name AS expl_name,
-    v_edit_node.workcat_id_end AS workcat_id,
-    exploitation.expl_id
-   FROM v_edit_node
-     JOIN exploitation ON exploitation.expl_id = v_edit_node.expl_id
-  WHERE v_edit_node.state = 0
-UNION
- SELECT row_number() OVER (ORDER BY v_edit_connec.connec_id) + 3000000 AS rid,
-    'CONNEC'::character varying AS feature_type,
-    v_edit_connec.connecat_id AS featurecat_id,
-    v_edit_connec.connec_id AS feature_id,
-    v_edit_connec.code,
-    exploitation.name AS expl_name,
-    v_edit_connec.workcat_id_end AS workcat_id,
-    exploitation.expl_id
-   FROM v_edit_connec
-     JOIN exploitation ON exploitation.expl_id = v_edit_connec.expl_id
-  WHERE v_edit_connec.state = 0
-UNION
- SELECT row_number() OVER (ORDER BY v_edit_element.element_id) + 4000000 AS rid,
-    'ELEMENT'::character varying AS feature_type,
-    v_edit_element.elementcat_id AS featurecat_id,
-    v_edit_element.element_id AS feature_id,
-    v_edit_element.code,
-    exploitation.name AS expl_name,
-    v_edit_element.workcat_id_end AS workcat_id,
-    exploitation.expl_id
-   FROM v_edit_element
-     JOIN exploitation ON exploitation.expl_id = v_edit_element.expl_id
-  WHERE v_edit_element.state = 0
-UNION
- SELECT row_number() OVER (ORDER BY v_edit_gully.gully_id) + 4000000 AS rid,
-    'GULLY'::character varying AS feature_type,
-    v_edit_gully.gratecat_id AS featurecat_id,
-    v_edit_gully.gully_id AS feature_id,
-    v_edit_gully.code,
-    exploitation.name AS expl_name,
-    v_edit_gully.workcat_id_end AS workcat_id,
-    exploitation.expl_id
-   FROM v_edit_gully
-     JOIN exploitation ON exploitation.expl_id = v_edit_gully.expl_id
-  WHERE v_edit_gully.state = 0;
 
-CREATE OR REPLACE VIEW v_edit_inp_outfall
-AS SELECT v_edit_node.node_id,
-    v_edit_node.top_elev,
-    v_edit_node.custom_top_elev,
-    v_edit_node.ymax,
-    v_edit_node.custom_ymax,
-    v_edit_node.elev,
-    v_edit_node.custom_elev,
-    v_edit_node.sys_elev,
-    v_edit_node.nodecat_id,
-    v_edit_node.sector_id,
-    v_edit_node.macrosector_id,
-    v_edit_node.state,
-    v_edit_node.state_type,
-    v_edit_node.annotation,
-    v_edit_node.expl_id,
-    inp_outfall.outfall_type,
-    inp_outfall.stage,
-    inp_outfall.curve_id,
-    inp_outfall.timser_id,
-    inp_outfall.gate,
-    v_edit_node.the_geom
-   FROM v_sector_node
-     JOIN v_edit_node USING (node_id)
-     JOIN inp_outfall USING (node_id)
-  WHERE v_edit_node.is_operative IS TRUE;
+-- drop depedency views from gully
+-----------------------------------
+DROP VIEW IF EXISTS vi_gully2node;
+DROP VIEW IF EXISTS v_plan_psector_budget_detail;
+DROP VIEW IF EXISTS v_plan_psector_budget_arc;
+DROP VIEW IF EXISTS v_plan_psector_budget;
+DROP VIEW IF EXISTS v_plan_psector_all;
+DROP VIEW IF EXISTS v_plan_current_psector;
+DROP VIEW IF EXISTS v_plan_psector;
+DROP VIEW IF EXISTS v_plan_result_arc;
+DROP VIEW IF EXISTS v_ui_plan_arc_cost;
+DROP VIEW IF EXISTS v_ui_workcat_x_feature_end;
+DROP VIEW IF EXISTS v_ui_node_x_connection_upstream;
+DROP VIEW IF EXISTS v_ui_arc_x_relations;
+DROP VIEW IF EXISTS ve_pol_gully;
 
-CREATE OR REPLACE VIEW v_edit_inp_storage
-AS SELECT v_edit_node.node_id,
-    v_edit_node.top_elev,
-    v_edit_node.custom_top_elev,
-    v_edit_node.ymax,
-    v_edit_node.custom_ymax,
-    v_edit_node.elev,
-    v_edit_node.custom_elev,
-    v_edit_node.sys_elev,
-    v_edit_node.nodecat_id,
-    v_edit_node.sector_id,
-    v_edit_node.macrosector_id,
-    v_edit_node.state,
-    v_edit_node.state_type,
-    v_edit_node.annotation,
-    v_edit_node.expl_id,
-    inp_storage.storage_type,
-    inp_storage.curve_id,
-    inp_storage.a1,
-    inp_storage.a2,
-    inp_storage.a0,
-    inp_storage.fevap,
-    inp_storage.sh,
-    inp_storage.hc,
-    inp_storage.imd,
-    inp_storage.y0,
-    inp_storage.ysur,
-    inp_storage.apond,
-    v_edit_node.the_geom
-   FROM v_sector_node
-     JOIN v_edit_node USING (node_id)
-     JOIN inp_storage USING (node_id)
-  WHERE v_edit_node.is_operative IS TRUE;
+DROP VIEW IF EXISTS v_plan_arc;
+DROP VIEW IF EXISTS v_edit_inp_gully;
 
-CREATE OR REPLACE VIEW v_edit_inp_netgully
-AS SELECT n.node_id,
-    n.code,
-    n.top_elev,
-    n.custom_top_elev,
-    n.ymax,
-    n.custom_ymax,
-    n.elev,
-    n.custom_elev,
-    n.sys_elev,
-    n.node_type,
-    n.nodecat_id,
-    man_netgully.gratecat_id,
-    (cat_grate.width / 100::numeric)::numeric(12,3) AS grate_width,
-    (cat_grate.length / 100::numeric)::numeric(12,3) AS grate_length,
-    n.sector_id,
-    n.macrosector_id,
-    n.expl_id,
-    n.state,
-    n.state_type,
-    n.the_geom,
-    man_netgully.units,
-    man_netgully.units_placement,
-    man_netgully.groove,
-    man_netgully.groove_height,
-    man_netgully.groove_length,
+DROP VIEW IF EXISTS v_edit_gully;
+
+DROP VIEW IF EXISTS ve_gully;
+DROP VIEW IF EXISTS v_gully;
+DROP VIEW IF EXISTS vu_gully;
+
+-- change type of units columns on gully and audit_psector_gully_traceability
+-----------------------------------
+ALTER TABLE gully ALTER COLUMN units TYPE numeric(12,2);
+ALTER TABLE audit_psector_gully_traceability ALTER COLUMN units TYPE numeric(12,2);
+
+
+-- recreate all deleted views:
+-----------------------------------
+CREATE OR REPLACE VIEW vu_gully
+AS SELECT gully.gully_id,
+    gully.code,
+    gully.top_elev,
+    gully.ymax,
+    gully.sandbox,
+    gully.matcat_id,
+    gully.gully_type,
+    cat_feature.system_id AS sys_type,
+    gully.gratecat_id,
+    cat_grate.matcat_id AS cat_grate_matcat,
+    gully.units,
+    gully.groove,
+    gully.siphon,
+    gully.connec_arccat_id,
+    gully.connec_length,
+        CASE
+            WHEN ((gully.top_elev - gully.ymax + gully.sandbox + gully.connec_y2) / 2::numeric) IS NOT NULL THEN ((gully.top_elev - gully.ymax + gully.sandbox + gully.connec_y2) / 2::numeric)::numeric(12,3)
+            ELSE gully.connec_depth
+        END AS connec_depth,
+    gully.arc_id,
+    gully.expl_id,
+    exploitation.macroexpl_id,
+    gully.sector_id,
+    sector.macrosector_id,
+    gully.state,
+    gully.state_type,
+    gully.annotation,
+    gully.observ,
+    gully.comment,
+    gully.dma_id,
+    dma.macrodma_id,
+    gully.soilcat_id,
+    gully.function_type,
+    gully.category_type,
+    gully.fluid_type,
+    gully.location_type,
+    gully.workcat_id,
+    gully.workcat_id_end,
+    gully.buildercat_id,
+    gully.builtdate,
+    gully.enddate,
+    gully.ownercat_id,
+    gully.muni_id,
+    gully.postcode,
+    gully.district_id,
+    c.descript::character varying(100) AS streetname,
+    gully.postnumber,
+    gully.postcomplement,
+    d.descript::character varying(100) AS streetname2,
+    gully.postnumber2,
+    gully.postcomplement2,
+    gully.descript,
+    cat_grate.svg,
+    gully.rotation,
+    concat(cat_feature.link_path, gully.link) AS link,
+    gully.verified,
+    gully.undelete,
+    cat_grate.label,
+    gully.label_x,
+    gully.label_y,
+    gully.label_rotation,
+    gully.publish,
+    gully.inventory,
+    gully.uncertain,
+    gully.num_value,
+    gully.pjoint_id,
+    gully.pjoint_type,
+    date_trunc('second'::text, gully.tstamp) AS tstamp,
+    gully.insert_user,
+    date_trunc('second'::text, gully.lastupdate) AS lastupdate,
+    gully.lastupdate_user,
+    gully.the_geom,
+    gully.workcat_id_plan,
+    gully.asset_id,
+        CASE
+            WHEN gully.connec_matcat_id IS NULL THEN cc.matcat_id::text
+            ELSE gully.connec_matcat_id
+        END AS connec_matcat_id,
+    gully.gratecat2_id,
+    gully.top_elev - gully.ymax + gully.sandbox AS connec_y1,
+    gully.connec_y2,
+    gully.epa_type,
+    gully.groove_height,
+    gully.groove_length,
+    cat_grate.width AS grate_width,
+    cat_grate.length AS grate_length,
+    gully.units_placement,
+    gully.drainzone_id,
+    gully.expl_id2,
+    vst.is_operative,
+    mu.region_id,
+    mu.province_id,
+    gully.adate,
+    gully.adescript,
+    gully.siphon_type,
+    gully.odorflap
+   FROM gully
+     LEFT JOIN cat_grate ON gully.gratecat_id::text = cat_grate.id::text
+     LEFT JOIN dma ON gully.dma_id = dma.dma_id
+     LEFT JOIN sector ON gully.sector_id = sector.sector_id
+     LEFT JOIN exploitation ON gully.expl_id = exploitation.expl_id
+     LEFT JOIN cat_feature ON gully.gully_type::text = cat_feature.id::text
+     LEFT JOIN v_ext_streetaxis c ON c.id::text = gully.streetaxis_id::text
+     LEFT JOIN v_ext_streetaxis d ON d.id::text = gully.streetaxis2_id::text
+     LEFT JOIN cat_connec cc ON cc.id::text = gully.connec_arccat_id::text
+     LEFT JOIN value_state_type vst ON vst.id = gully.state_type
+     LEFT JOIN ext_municipality mu ON gully.muni_id = mu.muni_id;
+
+
+CREATE OR REPLACE VIEW v_edit_gully
+AS WITH s AS (
+         SELECT selector_expl.expl_id
+           FROM selector_expl
+          WHERE selector_expl.cur_user = CURRENT_USER
+        )
+ SELECT vu_gully.gully_id,
+    vu_gully.code,
+    vu_gully.top_elev,
+    vu_gully.ymax,
+    vu_gully.sandbox,
+    vu_gully.matcat_id,
+    vu_gully.gully_type,
+    vu_gully.sys_type,
+    vu_gully.gratecat_id,
+    vu_gully.cat_grate_matcat,
+    vu_gully.units,
+    vu_gully.groove,
+    vu_gully.siphon,
+    vu_gully.connec_arccat_id,
+    vu_gully.connec_length,
+    vu_gully.connec_depth,
+    v_state_gully.arc_id,
+    vu_gully.expl_id,
+    vu_gully.macroexpl_id,
+        CASE
+            WHEN a.sector_id IS NULL THEN vu_gully.sector_id
+            ELSE a.sector_id
+        END AS sector_id,
+        CASE
+            WHEN a.macrosector_id IS NULL THEN vu_gully.macrosector_id
+            ELSE a.macrosector_id
+        END AS macrosector_id,
+    vu_gully.state,
+    vu_gully.state_type,
+    vu_gully.annotation,
+    vu_gully.observ,
+    vu_gully.comment,
+        CASE
+            WHEN a.dma_id IS NULL THEN vu_gully.dma_id
+            ELSE a.dma_id
+        END AS dma_id,
+        CASE
+            WHEN a.macrodma_id IS NULL THEN vu_gully.macrodma_id
+            ELSE a.macrodma_id
+        END AS macrodma_id,
+    vu_gully.soilcat_id,
+    vu_gully.function_type,
+    vu_gully.category_type,
+    vu_gully.fluid_type,
+    vu_gully.location_type,
+    vu_gully.workcat_id,
+    vu_gully.workcat_id_end,
+    vu_gully.buildercat_id,
+    vu_gully.builtdate,
+    vu_gully.enddate,
+    vu_gully.ownercat_id,
+    vu_gully.muni_id,
+    vu_gully.postcode,
+    vu_gully.district_id,
+    vu_gully.streetname,
+    vu_gully.postnumber,
+    vu_gully.postcomplement,
+    vu_gully.streetname2,
+    vu_gully.postnumber2,
+    vu_gully.postcomplement2,
+    vu_gully.descript,
+    vu_gully.svg,
+    vu_gully.rotation,
+    vu_gully.link,
+    vu_gully.verified,
+    vu_gully.undelete,
+    vu_gully.label,
+    vu_gully.label_x,
+    vu_gully.label_y,
+    vu_gully.label_rotation,
+    vu_gully.publish,
+    vu_gully.inventory,
+    vu_gully.uncertain,
+    vu_gully.num_value,
+        CASE
+            WHEN a.exit_id IS NULL THEN vu_gully.pjoint_id
+            ELSE a.exit_id
+        END AS pjoint_id,
+        CASE
+            WHEN a.exit_type IS NULL THEN vu_gully.pjoint_type
+            ELSE a.exit_type
+        END AS pjoint_type,
+    vu_gully.tstamp,
+    vu_gully.insert_user,
+    vu_gully.lastupdate,
+    vu_gully.lastupdate_user,
+    vu_gully.the_geom,
+    vu_gully.workcat_id_plan,
+    vu_gully.asset_id,
+    vu_gully.connec_matcat_id,
+    vu_gully.gratecat2_id,
+    vu_gully.connec_y1,
+    vu_gully.connec_y2,
+    vu_gully.epa_type,
+    vu_gully.groove_height,
+    vu_gully.groove_length,
+    vu_gully.grate_width,
+    vu_gully.grate_length,
+    vu_gully.units_placement,
+    vu_gully.drainzone_id,
+    vu_gully.expl_id2,
+    vu_gully.is_operative,
+    vu_gully.region_id,
+    vu_gully.province_id,
+    vu_gully.adate,
+    vu_gully.adescript,
+    vu_gully.siphon_type,
+    vu_gully.odorflap
+   FROM s,
+    vu_gully
+     JOIN v_state_gully USING (gully_id)
+     LEFT JOIN ( SELECT DISTINCT ON (vu_link.feature_id) vu_link.link_id,
+            vu_link.feature_type,
+            vu_link.feature_id,
+            vu_link.exit_type,
+            vu_link.exit_id,
+            vu_link.state,
+            vu_link.expl_id,
+            vu_link.sector_id,
+            vu_link.dma_id,
+            vu_link.exit_topelev,
+            vu_link.exit_elev,
+            vu_link.fluid_type,
+            vu_link.gis_length,
+            vu_link.the_geom,
+            vu_link.sector_name,
+            vu_link.macrosector_id,
+            vu_link.macrodma_id
+           FROM vu_link,
+            s s_1
+          WHERE (vu_link.expl_id = s_1.expl_id OR vu_link.expl_id2 = s_1.expl_id) AND vu_link.state = 2) a ON a.feature_id::text = vu_gully.gully_id::text
+  WHERE vu_gully.expl_id = s.expl_id OR vu_gully.expl_id2 = s.expl_id;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_gully
+AS SELECT g.gully_id,
+    g.code,
+    g.top_elev,
+    g.gully_type,
+    g.gratecat_id,
+    (g.grate_width / 100::numeric)::numeric(12,2) AS grate_width,
+    (g.grate_length / 100::numeric)::numeric(12,2) AS grate_length,
+    g.arc_id,
+    s.sector_id,
+    g.expl_id,
+    g.state,
+    g.state_type,
+    g.the_geom,
+    g.units,
+    g.units_placement,
+    g.groove,
+    g.groove_height,
+    g.groove_length,
+    g.pjoint_id,
+    g.pjoint_type,
     cat_grate.a_param,
     cat_grate.b_param,
         CASE
-            WHEN man_netgully.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.width / 100::numeric)::numeric(12,3)
-            WHEN man_netgully.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.length / 100::numeric)::numeric(12,3)
+            WHEN g.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.grate_width / 100::numeric)::numeric(12,3)
+            WHEN g.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.grate_length / 100::numeric)::numeric(12,3)
             ELSE (cat_grate.width / 100::numeric)::numeric(12,3)
         END AS total_width,
         CASE
-            WHEN man_netgully.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.width / 100::numeric)::numeric(12,3)
-            WHEN man_netgully.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.length / 100::numeric)::numeric(12,3)
+            WHEN g.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.grate_width / 100::numeric)::numeric(12,3)
+            WHEN g.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.grate_length / 100::numeric)::numeric(12,3)
             ELSE (cat_grate.length / 100::numeric)::numeric(12,3)
         END AS total_length,
-    n.ymax - COALESCE(man_netgully.sander_depth, 0::numeric) AS depth,
-    n.annotation,
-    i.y0,
-    i.ysur,
-    i.apond,
+    g.ymax - COALESCE(g.sandbox, 0::numeric) AS depth,
+    g.annotation,
     i.outlet_type,
+    i.custom_top_elev,
     i.custom_width,
     i.custom_length,
     i.custom_depth,
@@ -276,924 +360,11 @@ AS SELECT n.node_id,
     i.custom_a_param,
     i.custom_b_param,
     i.efficiency
-   FROM v_sector_node
-     JOIN v_edit_node n USING (node_id)
-     JOIN inp_netgully i USING (node_id)
-     LEFT JOIN man_netgully USING (node_id)
-     LEFT JOIN cat_grate ON man_netgully.gratecat_id::text = cat_grate.id::text
-  WHERE n.is_operative IS TRUE;
-
-CREATE OR REPLACE VIEW v_edit_man_netelement
-AS SELECT v_edit_node.node_id,
-    v_edit_node.code,
-    v_edit_node.top_elev,
-    v_edit_node.custom_top_elev,
-    v_edit_node.ymax,
-    v_edit_node.custom_ymax,
-    v_edit_node.elev,
-    v_edit_node.custom_elev,
-        CASE
-            WHEN v_edit_node.sys_elev IS NOT NULL THEN v_edit_node.sys_elev
-            ELSE (v_edit_node.sys_top_elev - v_edit_node.sys_ymax)::numeric(12,3)
-        END AS sys_elev,
-    v_edit_node.node_type,
-    v_edit_node.nodecat_id,
-    v_edit_node.epa_type,
-    v_edit_node.sector_id,
-    v_edit_node.macrosector_id,
-    v_edit_node.state,
-    v_edit_node.state_type,
-    v_edit_node.annotation,
-    v_edit_node.observ,
-    v_edit_node.comment,
-    v_edit_node.dma_id,
-    v_edit_node.soilcat_id,
-    v_edit_node.function_type,
-    v_edit_node.category_type,
-    v_edit_node.fluid_type,
-    v_edit_node.location_type,
-    v_edit_node.workcat_id,
-    v_edit_node.workcat_id_end,
-    v_edit_node.buildercat_id,
-    v_edit_node.builtdate,
-    v_edit_node.enddate,
-    v_edit_node.ownercat_id,
-    v_edit_node.muni_id,
-    v_edit_node.postcode,
-    v_edit_node.district_id,
-    v_edit_node.streetname,
-    v_edit_node.postnumber,
-    v_edit_node.postcomplement,
-    v_edit_node.streetname2,
-    v_edit_node.postnumber2,
-    v_edit_node.postcomplement2,
-    v_edit_node.descript,
-    v_edit_node.rotation,
-    v_edit_node.svg,
-    v_edit_node.link,
-    v_edit_node.verified,
-    v_edit_node.undelete,
-    v_edit_node.label_x,
-    v_edit_node.label_y,
-    v_edit_node.label_rotation,
-    v_edit_node.publish,
-    v_edit_node.inventory,
-    v_edit_node.uncertain,
-    v_edit_node.xyz_date,
-    v_edit_node.unconnected,
-    v_edit_node.macrodma_id,
-    v_edit_node.expl_id,
-    v_edit_node.num_value,
-    v_edit_node.the_geom,
-    man_netelement.serial_number
-   FROM v_edit_node
-     JOIN man_netelement ON man_netelement.node_id::text = v_edit_node.node_id::text;
- 
-CREATE OR REPLACE VIEW ve_pol_chamber
-AS SELECT polygon.pol_id,
-    polygon.feature_id AS node_id,
-    polygon.the_geom
-    FROM polygon
-  WHERE polygon.sys_type::text = 'CHAMBER'::text;
-
-CREATE OR REPLACE VIEW ve_pol_netgully
-AS SELECT polygon.pol_id,
-    polygon.feature_id AS node_id,
-    polygon.the_geom
-    FROM polygon
-  WHERE polygon.sys_type::text = 'NETGULLY'::text;
-
-CREATE OR REPLACE VIEW v_edit_inp_divider
-AS SELECT v_edit_node.node_id,
-    v_edit_node.top_elev,
-    v_edit_node.custom_top_elev,
-    v_edit_node.ymax,
-    v_edit_node.custom_ymax,
-    v_edit_node.elev,
-    v_edit_node.custom_elev,
-    v_edit_node.sys_elev,
-    v_edit_node.nodecat_id,
-    v_edit_node.sector_id,
-    v_edit_node.macrosector_id,
-    v_edit_node.state,
-    v_edit_node.state_type,
-    v_edit_node.annotation,
-    v_edit_node.expl_id,
-    inp_divider.divider_type,
-    inp_divider.arc_id,
-    inp_divider.curve_id,
-    inp_divider.qmin,
-    inp_divider.ht,
-    inp_divider.cd,
-    inp_divider.y0,
-    inp_divider.ysur,
-    inp_divider.apond,
-    v_edit_node.the_geom
-   FROM v_sector_node
-     JOIN v_edit_node USING (node_id)
-     JOIN inp_divider ON v_edit_node.node_id::text = inp_divider.node_id::text;
-
-
- 
-CREATE OR REPLACE VIEW ve_pol_node
-AS SELECT polygon.pol_id,
-    polygon.feature_id,
-    polygon.featurecat_id,
-    polygon.state,
-    polygon.sys_type,
-    polygon.the_geom,
-    polygon.trace_featuregeom
-    FROM polygon
-     JOIN v_edit_node ON polygon.feature_id::text = v_edit_node.node_id::text;
-
-CREATE OR REPLACE VIEW ve_pol_storage
-AS SELECT polygon.pol_id,
-    polygon.feature_id AS node_id,
-    polygon.the_geom
-   FROM polygon
-  WHERE polygon.sys_type::text = 'STORAGE'::text;
-
-CREATE OR REPLACE VIEW ve_pol_wwtp
-AS SELECT polygon.pol_id,
-    polygon.feature_id AS node_id,
-    polygon.the_geom
-   FROM polygon
-  WHERE polygon.sys_type::text = 'WWTP'::text;
-
-CREATE OR REPLACE VIEW vi_coverages
-AS SELECT v_edit_inp_subcatchment.subc_id,
-    inp_coverage.landus_id,
-    inp_coverage.percent
-   FROM inp_coverage
-     JOIN v_edit_inp_subcatchment ON inp_coverage.subc_id::text = v_edit_inp_subcatchment.subc_id::text
-     LEFT JOIN ( SELECT DISTINCT ON (a.subc_id) a.subc_id,
-            v_edit_node.node_id
-           FROM ( SELECT unnest(inp_subcatchment.outlet_id::text[]) AS node_array,
-            inp_subcatchment.subc_id,
-            inp_subcatchment.outlet_id,
-            inp_subcatchment.rg_id,
-            inp_subcatchment.area,
-            inp_subcatchment.imperv,
-            inp_subcatchment.width,
-            inp_subcatchment.slope,
-            inp_subcatchment.clength,
-            inp_subcatchment.snow_id,
-            inp_subcatchment.nimp,
-            inp_subcatchment.nperv,
-            inp_subcatchment.simp,
-            inp_subcatchment.sperv,
-            inp_subcatchment.zero,
-            inp_subcatchment.routeto,
-            inp_subcatchment.rted,
-            inp_subcatchment.maxrate,
-            inp_subcatchment.minrate,
-            inp_subcatchment.decay,
-            inp_subcatchment.drytime,
-            inp_subcatchment.maxinfil,
-            inp_subcatchment.suction,
-            inp_subcatchment.conduct,
-            inp_subcatchment.initdef,
-            inp_subcatchment.curveno,
-            inp_subcatchment.conduct_2,
-            inp_subcatchment.drytime_2,
-            inp_subcatchment.sector_id,
-            inp_subcatchment.hydrology_id,
-            inp_subcatchment.the_geom,
-            inp_subcatchment.descript
-            FROM inp_subcatchment
-            WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text) a
-    JOIN v_edit_node ON v_edit_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text; 
- 
-CREATE OR REPLACE VIEW vi_groundwater
-AS SELECT inp_groundwater.subc_id,
-    inp_groundwater.aquif_id,
-    inp_groundwater.node_id,
-    inp_groundwater.surfel,
-    inp_groundwater.a1,
-    inp_groundwater.b1,
-    inp_groundwater.a2,
-    inp_groundwater.b2,
-    inp_groundwater.a3,
-    inp_groundwater.tw,
-    inp_groundwater.h
-   FROM v_edit_inp_subcatchment
-     JOIN inp_groundwater ON inp_groundwater.subc_id::text = v_edit_inp_subcatchment.subc_id::text
-     LEFT JOIN ( SELECT DISTINCT ON (a.subc_id) a.subc_id,
-            v_edit_node.node_id
-           FROM ( SELECT unnest(inp_subcatchment.outlet_id::text[]) AS node_array,
-            inp_subcatchment.subc_id,
-            inp_subcatchment.outlet_id,
-            inp_subcatchment.rg_id,
-            inp_subcatchment.area,
-            inp_subcatchment.imperv,
-            inp_subcatchment.width,
-            inp_subcatchment.slope,
-            inp_subcatchment.clength,
-            inp_subcatchment.snow_id,
-            inp_subcatchment.nimp,
-            inp_subcatchment.nperv,
-            inp_subcatchment.simp,
-            inp_subcatchment.sperv,
-            inp_subcatchment.zero,
-            inp_subcatchment.routeto,
-            inp_subcatchment.rted,
-            inp_subcatchment.maxrate,
-            inp_subcatchment.minrate,
-            inp_subcatchment.decay,
-            inp_subcatchment.drytime,
-            inp_subcatchment.maxinfil,
-            inp_subcatchment.suction,
-            inp_subcatchment.conduct,
-            inp_subcatchment.initdef,
-            inp_subcatchment.curveno,
-            inp_subcatchment.conduct_2,
-            inp_subcatchment.drytime_2,
-            inp_subcatchment.sector_id,
-            inp_subcatchment.hydrology_id,
-            inp_subcatchment.the_geom,
-            inp_subcatchment.descript
-           FROM inp_subcatchment
-          WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text) a
-         JOIN v_edit_node ON v_edit_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text;
-
-
-/*
-v_edit_inp_conduit
-v_ui_node_x_connection_downstream
-v_ui_node_x_connection_upstream
-v_edit_inp_orifice
-v_edit_inp_outlet
-v_edit_inp_pump
-v_edit_inp_virtual
-v_edit_inp_weir
-*/
-
-CREATE OR REPLACE VIEW v_edit_inp_conduit
-AS SELECT v_edit_arc.arc_id,
-    v_edit_arc.node_1,
-    v_edit_arc.node_2,
-    v_edit_arc.y1,
-    v_edit_arc.custom_y1,
-    v_edit_arc.elev1,
-    v_edit_arc.custom_elev1,
-    v_edit_arc.sys_elev1,
-    v_edit_arc.y2,
-    v_edit_arc.custom_y2,
-    v_edit_arc.elev2,
-    v_edit_arc.custom_elev2,
-    v_edit_arc.sys_elev2,
-    v_edit_arc.arccat_id,
-    v_edit_arc.matcat_id,
-    v_edit_arc.cat_shape,
-    v_edit_arc.cat_geom1,
-    v_edit_arc.gis_length,
-    v_edit_arc.sector_id,
-    v_edit_arc.macrosector_id,
-    v_edit_arc.state,
-    v_edit_arc.state_type,
-    v_edit_arc.annotation,
-    v_edit_arc.inverted_slope,
-    v_edit_arc.custom_length,
-    v_edit_arc.expl_id,
-    inp_conduit.barrels,
-    inp_conduit.culvert,
-    inp_conduit.kentry,
-    inp_conduit.kexit,
-    inp_conduit.kavg,
-    inp_conduit.flap,
-    inp_conduit.q0,
-    inp_conduit.qmax,
-    inp_conduit.seepage,
-    inp_conduit.custom_n,
-    v_edit_arc.the_geom
-   FROM selector_sector,
-    v_edit_arc
-     JOIN inp_conduit USING (arc_id)
-  WHERE v_edit_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND v_edit_arc.is_operative IS TRUE;
- 
-CREATE OR REPLACE VIEW v_ui_node_x_connection_downstream
-AS SELECT row_number() OVER (ORDER BY v_edit_arc.node_1) + 1000000 AS rid,
-    v_edit_arc.node_1 AS node_id,
-    v_edit_arc.arc_id AS feature_id,
-    v_edit_arc.code AS feature_code,
-    v_edit_arc.arc_type AS featurecat_id,
-    v_edit_arc.arccat_id,
-    v_edit_arc.y2 AS depth,
-    st_length2d(v_edit_arc.the_geom)::numeric(12,2) AS length,
-    node.node_id AS downstream_id,
-    node.code AS downstream_code,
-    node.node_type AS downstream_type,
-    v_edit_arc.y1 AS downstream_depth,
-    v_edit_arc.sys_type,
-    st_x(st_lineinterpolatepoint(v_edit_arc.the_geom, 0.5::double precision)) AS x,
-    st_y(st_lineinterpolatepoint(v_edit_arc.the_geom, 0.5::double precision)) AS y,
-    cat_arc.descript,
-    value_state.name AS state,
-    'v_edit_arc'::text AS sys_table_id
-   FROM v_edit_arc
-     JOIN node ON v_edit_arc.node_2::text = node.node_id::text
-     LEFT JOIN cat_arc ON v_edit_arc.arccat_id::text = cat_arc.id::text
-     JOIN value_state ON v_edit_arc.state = value_state.id;
- 
- 
-CREATE OR REPLACE VIEW v_ui_node_x_connection_upstream
-AS SELECT row_number() OVER (ORDER BY v_edit_arc.node_2) + 1000000 AS rid,
-    v_edit_arc.node_2 AS node_id,
-    v_edit_arc.arc_id AS feature_id,
-    v_edit_arc.code AS feature_code,
-    v_edit_arc.arc_type AS featurecat_id,
-    v_edit_arc.arccat_id,
-    v_edit_arc.y1 AS depth,
-    st_length2d(v_edit_arc.the_geom)::numeric(12,2) AS length,
-    node.node_id AS upstream_id,
-    node.code AS upstream_code,
-    node.node_type AS upstream_type,
-    v_edit_arc.y2 AS upstream_depth,
-    v_edit_arc.sys_type,
-    st_x(st_lineinterpolatepoint(v_edit_arc.the_geom, 0.5::double precision)) AS x,
-    st_y(st_lineinterpolatepoint(v_edit_arc.the_geom, 0.5::double precision)) AS y,
-    cat_arc.descript,
-    value_state.name AS state,
-    'v_edit_arc'::text AS sys_table_id
-   FROM v_edit_arc
-     JOIN node ON v_edit_arc.node_1::text = node.node_id::text
-     LEFT JOIN cat_arc ON v_edit_arc.arccat_id::text = cat_arc.id::text
-     JOIN value_state ON v_edit_arc.state = value_state.id
-UNION
- SELECT DISTINCT ON (v_edit_connec.connec_id) row_number() OVER (ORDER BY node.node_id) + 2000000 AS rid,
-    node.node_id,
-    v_edit_connec.connec_id AS feature_id,
-    v_edit_connec.code::text AS feature_code,
-    v_edit_connec.connec_type AS featurecat_id,
-    v_edit_connec.connecat_id AS arccat_id,
-    v_edit_connec.y1 AS depth,
-    st_length2d(link.the_geom)::numeric(12,2) AS length,
-    v_edit_connec.connec_id AS upstream_id,
-    v_edit_connec.code AS upstream_code,
-    v_edit_connec.connec_type AS upstream_type,
-    v_edit_connec.y2 AS upstream_depth,
-    v_edit_connec.sys_type,
-    st_x(v_edit_connec.the_geom) AS x,
-    st_y(v_edit_connec.the_geom) AS y,
-    cat_connec.descript,
-    value_state.name AS state,
-    'v_edit_connec'::text AS sys_table_id
-   FROM v_edit_connec
-     JOIN link ON link.feature_id::text = v_edit_connec.connec_id::text AND link.feature_type::text = 'CONNEC'::text
-     JOIN node ON v_edit_connec.pjoint_id::text = node.node_id::text AND v_edit_connec.pjoint_type::text = 'NODE'::text
-     LEFT JOIN cat_connec ON v_edit_connec.connecat_id::text = cat_connec.id::text
-     JOIN value_state ON v_edit_connec.state = value_state.id
-UNION
- SELECT DISTINCT ON (v_edit_connec.connec_id) row_number() OVER (ORDER BY node.node_id) + 3000000 AS rid,
-    node.node_id,
-    v_edit_connec.connec_id AS feature_id,
-    v_edit_connec.code::text AS feature_code,
-    v_edit_connec.connec_type AS featurecat_id,
-    v_edit_connec.connecat_id AS arccat_id,
-    v_edit_connec.y1 AS depth,
-    st_length2d(link.the_geom)::numeric(12,2) AS length,
-    v_edit_connec.connec_id AS upstream_id,
-    v_edit_connec.code AS upstream_code,
-    v_edit_connec.connec_type AS upstream_type,
-    v_edit_connec.y2 AS upstream_depth,
-    v_edit_connec.sys_type,
-    st_x(v_edit_connec.the_geom) AS x,
-    st_y(v_edit_connec.the_geom) AS y,
-    cat_connec.descript,
-    value_state.name AS state,
-    'v_edit_connec'::text AS sys_table_id
-   FROM v_edit_connec
-     JOIN link ON link.feature_id::text = v_edit_connec.connec_id::text AND link.feature_type::text = 'CONNEC'::text AND link.exit_type::text = 'CONNEC'::text
-     JOIN connec ON connec.connec_id::text = link.exit_id::text AND connec.pjoint_type::text = 'NODE'::text
-     JOIN node ON connec.pjoint_id::text = node.node_id::text
-     LEFT JOIN cat_connec ON v_edit_connec.connecat_id::text = cat_connec.id::text
-     JOIN value_state ON v_edit_connec.state = value_state.id
-UNION
- SELECT DISTINCT ON (v_edit_gully.gully_id) row_number() OVER (ORDER BY node.node_id) + 4000000 AS rid,
-    node.node_id,
-    v_edit_gully.gully_id AS feature_id,
-    v_edit_gully.code::text AS feature_code,
-    v_edit_gully.gully_type AS featurecat_id,
-    v_edit_gully.connec_arccat_id AS arccat_id,
-    v_edit_gully.ymax - v_edit_gully.sandbox AS depth,
-    v_edit_gully.connec_length AS length,
-    v_edit_gully.gully_id AS upstream_id,
-    v_edit_gully.code AS upstream_code,
-    v_edit_gully.gully_type AS upstream_type,
-    v_edit_gully.connec_depth AS upstream_depth,
-    v_edit_gully.sys_type,
-    st_x(v_edit_gully.the_geom) AS x,
-    st_y(v_edit_gully.the_geom) AS y,
-    cat_connec.descript,
-    value_state.name AS state,
-    'v_edit_gully'::text AS sys_table_id
-   FROM v_edit_gully
-     JOIN link ON link.feature_id::text = v_edit_gully.gully_id::text AND link.feature_type::text = 'GULLY'::text
-     JOIN node ON v_edit_gully.pjoint_id::text = node.node_id::text AND v_edit_gully.pjoint_type::text = 'NODE'::text
-     LEFT JOIN cat_connec ON v_edit_gully.connec_arccat_id::text = cat_connec.id::text
-     JOIN value_state ON v_edit_gully.state = value_state.id
-UNION
- SELECT DISTINCT ON (v_edit_gully.gully_id) row_number() OVER (ORDER BY node.node_id) + 5000000 AS rid,
-    node.node_id,
-    v_edit_gully.gully_id AS feature_id,
-    v_edit_gully.code::text AS feature_code,
-    v_edit_gully.gully_type AS featurecat_id,
-    v_edit_gully.connec_arccat_id AS arccat_id,
-    v_edit_gully.ymax - v_edit_gully.sandbox AS depth,
-    v_edit_gully.connec_length AS length,
-    v_edit_gully.gully_id AS upstream_id,
-    v_edit_gully.code AS upstream_code,
-    v_edit_gully.gully_type AS upstream_type,
-    v_edit_gully.connec_depth AS upstream_depth,
-    v_edit_gully.sys_type,
-    st_x(v_edit_gully.the_geom) AS x,
-    st_y(v_edit_gully.the_geom) AS y,
-    cat_connec.descript,
-    value_state.name AS state,
-    'v_edit_gully'::text AS sys_table_id
-   FROM v_edit_gully
-     JOIN link ON link.feature_id::text = v_edit_gully.gully_id::text AND link.feature_type::text = 'GULLY'::text AND link.exit_type::text = 'GULLY'::text
-     JOIN gully ON gully.gully_id::text = link.exit_id::text AND gully.pjoint_type::text = 'NODE'::text
-     JOIN node ON gully.pjoint_id::text = node.node_id::text
-     LEFT JOIN cat_connec ON v_edit_gully.connec_arccat_id::text = cat_connec.id::text
-     JOIN value_state ON v_edit_gully.state = value_state.id;
- 
-CREATE OR REPLACE VIEW v_edit_inp_orifice
-AS SELECT v_edit_arc.arc_id,
-    v_edit_arc.node_1,
-    v_edit_arc.node_2,
-    v_edit_arc.y1,
-    v_edit_arc.custom_y1,
-    v_edit_arc.elev1,
-    v_edit_arc.custom_elev1,
-    v_edit_arc.sys_elev1,
-    v_edit_arc.y2,
-    v_edit_arc.custom_y2,
-    v_edit_arc.elev2,
-    v_edit_arc.custom_elev2,
-    v_edit_arc.sys_elev2,
-    v_edit_arc.arccat_id,
-    v_edit_arc.gis_length,
-    v_edit_arc.sector_id,
-    v_edit_arc.macrosector_id,
-    v_edit_arc.state,
-    v_edit_arc.state_type,
-    v_edit_arc.annotation,
-    v_edit_arc.inverted_slope,
-    v_edit_arc.custom_length,
-    v_edit_arc.expl_id,
-    inp_orifice.ori_type,
-    inp_orifice.offsetval,
-    inp_orifice.cd,
-    inp_orifice.orate,
-    inp_orifice.flap,
-    inp_orifice.shape,
-    inp_orifice.geom1,
-    inp_orifice.geom2,
-    inp_orifice.geom3,
-    inp_orifice.geom4,
-    v_edit_arc.the_geom,
-    inp_orifice.close_time
-   FROM selector_sector,
-    v_edit_arc
-     JOIN inp_orifice USING (arc_id)
-  WHERE v_edit_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND v_edit_arc.is_operative IS TRUE;
-
-CREATE OR REPLACE VIEW v_edit_inp_outlet
-AS SELECT v_edit_arc.arc_id,
-    v_edit_arc.node_1,
-    v_edit_arc.node_2,
-    v_edit_arc.y1,
-    v_edit_arc.custom_y1,
-    v_edit_arc.elev1,
-    v_edit_arc.custom_elev1,
-    v_edit_arc.sys_elev1,
-    v_edit_arc.y2,
-    v_edit_arc.custom_y2,
-    v_edit_arc.elev2,
-    v_edit_arc.custom_elev2,
-    v_edit_arc.sys_elev2,
-    v_edit_arc.arccat_id,
-    v_edit_arc.gis_length,
-    v_edit_arc.sector_id,
-    v_edit_arc.macrosector_id,
-    v_edit_arc.state,
-    v_edit_arc.state_type,
-    v_edit_arc.annotation,
-    v_edit_arc.inverted_slope,
-    v_edit_arc.custom_length,
-    v_edit_arc.expl_id,
-    inp_outlet.outlet_type,
-    inp_outlet.offsetval,
-    inp_outlet.curve_id,
-    inp_outlet.cd1,
-    inp_outlet.cd2,
-    inp_outlet.flap,
-    v_edit_arc.the_geom
-   FROM selector_sector,
-    v_edit_arc
-     JOIN inp_outlet USING (arc_id)
-  WHERE v_edit_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND v_edit_arc.is_operative IS TRUE;
-
-CREATE OR REPLACE VIEW v_edit_inp_pump
-AS SELECT v_edit_arc.arc_id,
-    v_edit_arc.node_1,
-    v_edit_arc.node_2,
-    v_edit_arc.y1,
-    v_edit_arc.custom_y1,
-    v_edit_arc.elev1,
-    v_edit_arc.custom_elev1,
-    v_edit_arc.sys_elev1,
-    v_edit_arc.y2,
-    v_edit_arc.custom_y2,
-    v_edit_arc.elev2,
-    v_edit_arc.custom_elev2,
-    v_edit_arc.sys_elev2,
-    v_edit_arc.arccat_id,
-    v_edit_arc.gis_length,
-    v_edit_arc.sector_id,
-    v_edit_arc.macrosector_id,
-    v_edit_arc.state,
-    v_edit_arc.state_type,
-    v_edit_arc.annotation,
-    v_edit_arc.inverted_slope,
-    v_edit_arc.custom_length,
-    v_edit_arc.expl_id,
-    inp_pump.curve_id,
-    inp_pump.status,
-    inp_pump.startup,
-    inp_pump.shutoff,
-    v_edit_arc.the_geom
-   FROM selector_sector,
-    v_edit_arc
-     JOIN inp_pump USING (arc_id)
-  WHERE v_edit_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND v_edit_arc.is_operative IS TRUE;
-
-CREATE OR REPLACE VIEW v_edit_inp_virtual
-AS SELECT v_edit_arc.arc_id,
-    v_edit_arc.node_1,
-    v_edit_arc.node_2,
-    v_edit_arc.gis_length,
-    v_edit_arc.sector_id,
-    v_edit_arc.macrosector_id,
-    v_edit_arc.state,
-    v_edit_arc.state_type,
-    v_edit_arc.expl_id,
-    inp_virtual.fusion_node,
-    inp_virtual.add_length,
-    v_edit_arc.the_geom
-   FROM selector_sector,
-    v_edit_arc
-     JOIN inp_virtual USING (arc_id)
-  WHERE v_edit_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND v_edit_arc.is_operative IS TRUE;
-
- CREATE OR REPLACE VIEW v_edit_inp_weir
-AS SELECT v_edit_arc.arc_id,
-    v_edit_arc.node_1,
-    v_edit_arc.node_2,
-    v_edit_arc.y1,
-    v_edit_arc.custom_y1,
-    v_edit_arc.elev1,
-    v_edit_arc.custom_elev1,
-    v_edit_arc.sys_elev1,
-    v_edit_arc.y2,
-    v_edit_arc.custom_y2,
-    v_edit_arc.elev2,
-    v_edit_arc.custom_elev2,
-    v_edit_arc.sys_elev2,
-    v_edit_arc.arccat_id,
-    v_edit_arc.gis_length,
-    v_edit_arc.sector_id,
-    v_edit_arc.macrosector_id,
-    v_edit_arc.state,
-    v_edit_arc.state_type,
-    v_edit_arc.annotation,
-    v_edit_arc.inverted_slope,
-    v_edit_arc.custom_length,
-    v_edit_arc.expl_id,
-    inp_weir.weir_type,
-    inp_weir.offsetval,
-    inp_weir.cd,
-    inp_weir.ec,
-    inp_weir.cd2,
-    inp_weir.flap,
-    inp_weir.geom1,
-    inp_weir.geom2,
-    inp_weir.geom3,
-    inp_weir.geom4,
-    inp_weir.surcharge,
-    v_edit_arc.the_geom,
-    inp_weir.road_width,
-    inp_weir.road_surf,
-    inp_weir.coef_curve
-   FROM selector_sector,
-    v_edit_arc
-     JOIN inp_weir USING (arc_id)
-  WHERE v_edit_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND v_edit_arc.is_operative IS TRUE;
-
-CREATE OR REPLACE VIEW v_ui_arc_x_relations
-AS WITH links_node AS (
-         SELECT n.node_id,
-            l.feature_id,
-            l.exit_type AS proceed_from,
-            l.exit_id AS proceed_from_id,
-            l.state AS l_state,
-            n.state AS n_state
-           FROM node n
-             JOIN link l ON n.node_id::text = l.exit_id::text
-          WHERE l.state = 1
-        )
- SELECT row_number() OVER () + 1000000 AS rid,
-    v_edit_connec.arc_id,
-    v_edit_connec.connec_type AS featurecat_id,
-    v_edit_connec.connecat_id AS catalog,
-    v_edit_connec.connec_id AS feature_id,
-    v_edit_connec.code AS feature_code,
-    v_edit_connec.sys_type,
-    a.state AS arc_state,
-    v_edit_connec.state AS feature_state,
-    st_x(v_edit_connec.the_geom) AS x,
-    st_y(v_edit_connec.the_geom) AS y,
-    l.exit_type AS proceed_from,
-    l.exit_id AS proceed_from_id,
-    'v_edit_connec'::text AS sys_table_id
-   FROM v_edit_connec
-     JOIN link l ON v_edit_connec.connec_id::text = l.feature_id::text
-     JOIN arc a ON a.arc_id::text = v_edit_connec.arc_id::text
-  WHERE v_edit_connec.arc_id IS NOT NULL AND l.exit_type::text <> 'NODE'::text AND l.state = 1 AND l.state = 1 AND a.state = 1
-UNION
- SELECT DISTINCT ON (c.connec_id) row_number() OVER () + 2000000 AS rid,
-    a.arc_id,
-    c.connec_type AS featurecat_id,
-    c.connecat_id AS catalog,
-    c.connec_id AS feature_id,
-    c.code AS feature_code,
-    c.sys_type,
-    a.state AS arc_state,
-    c.state AS feature_state,
-    st_x(c.the_geom) AS x,
-    st_y(c.the_geom) AS y,
-    n.proceed_from,
-    n.proceed_from_id,
-    'v_edit_connec'::text AS sys_table_id
-   FROM arc a
-     JOIN links_node n ON a.node_1::text = n.node_id::text
-     JOIN v_edit_connec c ON c.connec_id::text = n.feature_id::text
-UNION
- SELECT row_number() OVER () + 3000000 AS rid,
-    v_edit_gully.arc_id,
-    v_edit_gully.gully_type AS featurecat_id,
-    v_edit_gully.gratecat_id AS catalog,
-    v_edit_gully.gully_id AS feature_id,
-    v_edit_gully.code AS feature_code,
-    v_edit_gully.sys_type,
-    a.state AS arc_state,
-    v_edit_gully.state AS feature_state,
-    st_x(v_edit_gully.the_geom) AS x,
-    st_y(v_edit_gully.the_geom) AS y,
-    l.exit_type AS proceed_from,
-    l.exit_id AS proceed_from_id,
-    'v_edit_gully'::text AS sys_table_id
-   FROM v_edit_gully
-     JOIN link l ON v_edit_gully.gully_id::text = l.feature_id::text
-     JOIN arc a ON a.arc_id::text = v_edit_gully.arc_id::text
-  WHERE v_edit_gully.arc_id IS NOT NULL AND l.exit_type::text <> 'NODE'::text AND l.state = 1 AND a.state = 1
-UNION
- SELECT DISTINCT ON (g.gully_id) row_number() OVER () + 4000000 AS rid,
-    a.arc_id,
-    g.gully_type AS featurecat_id,
-    g.gratecat_id AS catalog,
-    g.gully_id AS feature_id,
-    g.code AS feature_code,
-    g.sys_type,
-    a.state AS arc_state,
-    g.state AS feature_state,
-    st_x(g.the_geom) AS x,
-    st_y(g.the_geom) AS y,
-    n.proceed_from,
-    n.proceed_from_id,
-    'v_edit_gully'::text AS sys_table_id
-   FROM arc a
-     JOIN links_node n ON a.node_1::text = n.node_id::text
-     JOIN v_edit_gully g ON g.gully_id::text = n.feature_id::text;
-
-/*
-
-v_rtc_period_hydrometer
-
-*/
-
-CREATE OR REPLACE VIEW v_rtc_period_hydrometer
-AS SELECT ext_rtc_hydrometer.id AS hydrometer_id,
-    v_edit_connec.connec_id,
-    NULL::character varying(16) AS pjoint_id,
-    temp_arc.node_1,
-    temp_arc.node_2,
-    ext_cat_period.id AS period_id,
-    ext_cat_period.period_seconds,
-    c.dma_id,
-    c.effc::numeric(5,4) AS effc,
-    c.minc,
-    c.maxc,
-        CASE
-            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum
-            ELSE ext_rtc_hydrometer_x_data.sum
-        END AS m3_total_period,
-        CASE
-            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum * 1000::double precision / ext_cat_period.period_seconds::double precision
-            ELSE ext_rtc_hydrometer_x_data.sum * 1000::double precision / ext_cat_period.period_seconds::double precision
-        END AS lps_avg,
-    ext_rtc_hydrometer_x_data.pattern_id
-   FROM ext_rtc_hydrometer
-     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
-     JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
-     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
-     JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
-     JOIN temp_arc ON v_edit_connec.arc_id::text = temp_arc.arc_id::text
-     JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND c.dma_id::integer = v_edit_connec.dma_id
-  WHERE ext_cat_period.id::text = (( SELECT config_param_user.value
-           FROM config_param_user
-          WHERE config_param_user.cur_user::name = "current_user"() AND config_param_user.parameter::text = 'inp_options_rtc_period_id'::text))
-UNION
- SELECT ext_rtc_hydrometer.id AS hydrometer_id,
-    v_edit_connec.connec_id,
-    temp_node.node_id AS pjoint_id,
-    NULL::character varying AS node_1,
-    NULL::character varying AS node_2,
-    ext_cat_period.id AS period_id,
-    ext_cat_period.period_seconds,
-    c.dma_id,
-    c.effc::numeric(5,4) AS effc,
-    c.minc,
-    c.maxc,
-        CASE
-            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum
-            ELSE ext_rtc_hydrometer_x_data.sum
-        END AS m3_total_period,
-        CASE
-            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum * 1000::double precision / ext_cat_period.period_seconds::double precision
-            ELSE ext_rtc_hydrometer_x_data.sum * 1000::double precision / ext_cat_period.period_seconds::double precision
-        END AS lps_avg,
-    ext_rtc_hydrometer_x_data.pattern_id
-   FROM ext_rtc_hydrometer
-     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
-     JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
-     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
-     LEFT JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
-     JOIN temp_node ON concat('VN', v_edit_connec.pjoint_id) = temp_node.node_id::text
-     JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND v_edit_connec.dma_id::text = c.dma_id::text
-  WHERE v_edit_connec.pjoint_type::text = 'VNODE'::text AND ext_cat_period.id::text = (( SELECT config_param_user.value
-           FROM config_param_user
-          WHERE config_param_user.cur_user::name = "current_user"() AND config_param_user.parameter::text = 'inp_options_rtc_period_id'::text))
-UNION
- SELECT ext_rtc_hydrometer.id AS hydrometer_id,
-    v_edit_connec.connec_id,
-    temp_node.node_id AS pjoint_id,
-    NULL::character varying AS node_1,
-    NULL::character varying AS node_2,
-    ext_cat_period.id AS period_id,
-    ext_cat_period.period_seconds,
-    c.dma_id,
-    c.effc::numeric(5,4) AS effc,
-    c.minc,
-    c.maxc,
-        CASE
-            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum
-            ELSE ext_rtc_hydrometer_x_data.sum
-        END AS m3_total_period,
-        CASE
-            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum * 1000::double precision / ext_cat_period.period_seconds::double precision
-            ELSE ext_rtc_hydrometer_x_data.sum * 1000::double precision / ext_cat_period.period_seconds::double precision
-        END AS lps_avg,
-    ext_rtc_hydrometer_x_data.pattern_id
-   FROM ext_rtc_hydrometer
-     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
-     JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
-     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
-     LEFT JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
-     JOIN temp_node ON v_edit_connec.pjoint_id::text = temp_node.node_id::text
-     JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND v_edit_connec.dma_id::text = c.dma_id::text
-  WHERE v_edit_connec.pjoint_type::text = 'NODE'::text AND ext_cat_period.id::text = (( SELECT config_param_user.value
-           FROM config_param_user
-          WHERE config_param_user.cur_user::name = "current_user"() AND config_param_user.parameter::text = 'inp_options_rtc_period_id'::text));
-
-
-
-
-
-
-
-
-/*
-ve_pol_connec
-ve_pol_gully
-
-*/
-
-CREATE OR REPLACE VIEW ve_pol_connec
-AS SELECT polygon.pol_id,
-    polygon.feature_id,
-    polygon.featurecat_id,
-    polygon.state,
-    polygon.sys_type,
-    polygon.the_geom,
-    polygon.trace_featuregeom
-   FROM polygon
-     JOIN v_edit_connec ON polygon.feature_id::text = v_edit_connec.connec_id::text;
-
-CREATE OR REPLACE VIEW ve_pol_gully
-AS SELECT polygon.pol_id,
-    polygon.feature_id,
-    polygon.featurecat_id,
-    polygon.state,
-    polygon.sys_type,
-    polygon.the_geom,
-    v_edit_gully.fluid_type,
-    polygon.trace_featuregeom
-   FROM polygon
-     JOIN v_edit_gully ON polygon.feature_id::text = v_edit_gully.gully_id::text;
-
-/* v_plan_ + v_edit
-
-v_plan_node
-v_plan_arc
-
-v_edit_node
-v_edit_arc
-v_edit_connec
-v_edit_gully
-
-*/
-
-CREATE OR REPLACE VIEW v_plan_node
-AS SELECT a.node_id,
-    a.nodecat_id,
-    a.node_type,
-    a.top_elev,
-    a.elev,
-    a.epa_type,
-    a.state,
-    a.sector_id,
-    a.expl_id,
-    a.annotation,
-    a.cost_unit,
-    a.descript,
-    a.cost,
-    a.measurement,
-    a.budget,
-    a.the_geom
-   FROM ( SELECT v_edit_node.node_id,
-            v_edit_node.nodecat_id,
-            v_edit_node.sys_type AS node_type,
-            v_edit_node.top_elev,
-            v_edit_node.elev,
-            v_edit_node.epa_type,
-            v_edit_node.state,
-            v_edit_node.sector_id,
-            v_edit_node.expl_id,
-            v_edit_node.annotation,
-            v_price_x_catnode.cost_unit,
-            v_price_compost.descript,
-            v_price_compost.price AS cost,
-                CASE
-                    WHEN v_price_x_catnode.cost_unit::text = 'u'::text THEN 1::numeric
-                    WHEN v_price_x_catnode.cost_unit::text = 'm3'::text THEN
-                    CASE
-                        WHEN v_edit_node.sys_type::text = 'STORAGE'::text THEN man_storage.max_volume
-                        WHEN v_edit_node.sys_type::text = 'CHAMBER'::text THEN man_chamber.max_volume
-                        ELSE NULL::numeric
-                    END
-                    WHEN v_price_x_catnode.cost_unit::text = 'm'::text THEN
-                    CASE
-                        WHEN v_edit_node.ymax = 0::numeric THEN v_price_x_catnode.estimated_y
-                        WHEN v_edit_node.ymax IS NULL THEN v_price_x_catnode.estimated_y
-                        ELSE v_edit_node.ymax
-                    END
-                    ELSE NULL::numeric
-                END::numeric(12,2) AS measurement,
-                CASE
-                    WHEN v_price_x_catnode.cost_unit::text = 'u'::text THEN v_price_x_catnode.cost
-                    WHEN v_price_x_catnode.cost_unit::text = 'm3'::text THEN
-                    CASE
-                        WHEN v_edit_node.sys_type::text = 'STORAGE'::text THEN man_storage.max_volume * v_price_x_catnode.cost
-                        WHEN v_edit_node.sys_type::text = 'CHAMBER'::text THEN man_chamber.max_volume * v_price_x_catnode.cost
-                        ELSE NULL::numeric
-                    END
-                    WHEN v_price_x_catnode.cost_unit::text = 'm'::text THEN
-                    CASE
-                        WHEN v_edit_node.ymax = 0::numeric THEN v_price_x_catnode.estimated_y * v_price_x_catnode.cost
-                        WHEN v_edit_node.ymax IS NULL THEN v_price_x_catnode.estimated_y * v_price_x_catnode.cost
-                        ELSE v_edit_node.ymax * v_price_x_catnode.cost
-                    END
-                    ELSE NULL::numeric
-                END::numeric(12,2) AS budget,
-            v_edit_node.the_geom
-           FROM v_edit_node
-             LEFT JOIN v_price_x_catnode ON v_edit_node.nodecat_id::text = v_price_x_catnode.id::text
-             LEFT JOIN man_chamber ON man_chamber.node_id::text = v_edit_node.node_id::text
-             LEFT JOIN man_storage ON man_storage.node_id::text = v_edit_node.node_id::text
-             LEFT JOIN cat_node ON cat_node.id::text = v_edit_node.nodecat_id::text
-             LEFT JOIN v_price_compost ON v_price_compost.id::text = cat_node.cost::text) a;
+   FROM selector_sector s,
+    v_edit_gully g
+     JOIN inp_gully i USING (gully_id)
+     JOIN cat_grate ON g.gratecat_id::text = cat_grate.id::text
+  WHERE g.sector_id = s.sector_id AND s.cur_user = "current_user"()::text AND g.is_operative IS TRUE;
 
 
 CREATE OR REPLACE VIEW v_plan_arc
@@ -1437,6 +608,2283 @@ AS SELECT d.arc_id,
                      LEFT JOIN v_price_compost p ON cat_arc.connect_cost = p.id::text
                   WHERE c.arc_id IS NOT NULL
                   GROUP BY c.arc_id) v_plan_aux_arc_gully ON v_plan_aux_arc_gully.arc_id::text = v_plan_aux_arc_cost.arc_id::text) d;
+
+
+CREATE OR REPLACE VIEW ve_pol_gully
+AS SELECT polygon.pol_id,
+    polygon.feature_id,
+    polygon.featurecat_id,
+    polygon.state,
+    polygon.sys_type,
+    polygon.the_geom,
+    v_edit_gully.fluid_type,
+    polygon.trace_featuregeom
+   FROM polygon
+     JOIN v_edit_gully ON polygon.feature_id::text = v_edit_gully.gully_id::text;
+
+
+CREATE OR REPLACE VIEW v_ui_arc_x_relations
+AS WITH links_node AS (
+         SELECT n.node_id,
+            l.feature_id,
+            l.exit_type AS proceed_from,
+            l.exit_id AS proceed_from_id,
+            l.state AS l_state,
+            n.state AS n_state
+           FROM node n
+             JOIN link l ON n.node_id::text = l.exit_id::text
+          WHERE l.state = 1
+        )
+ SELECT row_number() OVER () + 1000000 AS rid,
+    v_edit_connec.arc_id,
+    v_edit_connec.connec_type AS featurecat_id,
+    v_edit_connec.connecat_id AS catalog,
+    v_edit_connec.connec_id AS feature_id,
+    v_edit_connec.code AS feature_code,
+    v_edit_connec.sys_type,
+    a.state AS arc_state,
+    v_edit_connec.state AS feature_state,
+    st_x(v_edit_connec.the_geom) AS x,
+    st_y(v_edit_connec.the_geom) AS y,
+    l.exit_type AS proceed_from,
+    l.exit_id AS proceed_from_id,
+    'v_edit_connec'::text AS sys_table_id
+   FROM v_edit_connec
+     JOIN link l ON v_edit_connec.connec_id::text = l.feature_id::text
+     JOIN arc a ON a.arc_id::text = v_edit_connec.arc_id::text
+  WHERE v_edit_connec.arc_id IS NOT NULL AND l.exit_type::text <> 'NODE'::text AND l.state = 1 AND l.state = 1 AND a.state = 1
+UNION
+ SELECT DISTINCT ON (c.connec_id) row_number() OVER () + 2000000 AS rid,
+    a.arc_id,
+    c.connec_type AS featurecat_id,
+    c.connecat_id AS catalog,
+    c.connec_id AS feature_id,
+    c.code AS feature_code,
+    c.sys_type,
+    a.state AS arc_state,
+    c.state AS feature_state,
+    st_x(c.the_geom) AS x,
+    st_y(c.the_geom) AS y,
+    n.proceed_from,
+    n.proceed_from_id,
+    'v_edit_connec'::text AS sys_table_id
+   FROM arc a
+     JOIN links_node n ON a.node_1::text = n.node_id::text
+     JOIN v_edit_connec c ON c.connec_id::text = n.feature_id::text
+UNION
+ SELECT row_number() OVER () + 3000000 AS rid,
+    v_edit_gully.arc_id,
+    v_edit_gully.gully_type AS featurecat_id,
+    v_edit_gully.gratecat_id AS catalog,
+    v_edit_gully.gully_id AS feature_id,
+    v_edit_gully.code AS feature_code,
+    v_edit_gully.sys_type,
+    a.state AS arc_state,
+    v_edit_gully.state AS feature_state,
+    st_x(v_edit_gully.the_geom) AS x,
+    st_y(v_edit_gully.the_geom) AS y,
+    l.exit_type AS proceed_from,
+    l.exit_id AS proceed_from_id,
+    'v_edit_gully'::text AS sys_table_id
+   FROM v_edit_gully
+     JOIN link l ON v_edit_gully.gully_id::text = l.feature_id::text
+     JOIN arc a ON a.arc_id::text = v_edit_gully.arc_id::text
+  WHERE v_edit_gully.arc_id IS NOT NULL AND l.exit_type::text <> 'NODE'::text AND l.state = 1 AND a.state = 1
+UNION
+ SELECT DISTINCT ON (g.gully_id) row_number() OVER () + 4000000 AS rid,
+    a.arc_id,
+    g.gully_type AS featurecat_id,
+    g.gratecat_id AS catalog,
+    g.gully_id AS feature_id,
+    g.code AS feature_code,
+    g.sys_type,
+    a.state AS arc_state,
+    g.state AS feature_state,
+    st_x(g.the_geom) AS x,
+    st_y(g.the_geom) AS y,
+    n.proceed_from,
+    n.proceed_from_id,
+    'v_edit_gully'::text AS sys_table_id
+   FROM arc a
+     JOIN links_node n ON a.node_1::text = n.node_id::text
+     JOIN v_edit_gully g ON g.gully_id::text = n.feature_id::text;
+
+
+CREATE OR REPLACE VIEW v_ui_node_x_connection_upstream
+AS SELECT row_number() OVER (ORDER BY v_edit_arc.node_2) + 1000000 AS rid,
+    v_edit_arc.node_2 AS node_id,
+    v_edit_arc.arc_id AS feature_id,
+    v_edit_arc.code AS feature_code,
+    v_edit_arc.arc_type AS featurecat_id,
+    v_edit_arc.arccat_id,
+    v_edit_arc.y1 AS depth,
+    st_length2d(v_edit_arc.the_geom)::numeric(12,2) AS length,
+    node.node_id AS upstream_id,
+    node.code AS upstream_code,
+    node.node_type AS upstream_type,
+    v_edit_arc.y2 AS upstream_depth,
+    v_edit_arc.sys_type,
+    st_x(st_lineinterpolatepoint(v_edit_arc.the_geom, 0.5::double precision)) AS x,
+    st_y(st_lineinterpolatepoint(v_edit_arc.the_geom, 0.5::double precision)) AS y,
+    cat_arc.descript,
+    value_state.name AS state,
+    'v_edit_arc'::text AS sys_table_id
+   FROM v_edit_arc
+     JOIN node ON v_edit_arc.node_1::text = node.node_id::text
+     LEFT JOIN cat_arc ON v_edit_arc.arccat_id::text = cat_arc.id::text
+     JOIN value_state ON v_edit_arc.state = value_state.id
+UNION
+ SELECT DISTINCT ON (v_edit_connec.connec_id) row_number() OVER (ORDER BY node.node_id) + 2000000 AS rid,
+    node.node_id,
+    v_edit_connec.connec_id AS feature_id,
+    v_edit_connec.code::text AS feature_code,
+    v_edit_connec.connec_type AS featurecat_id,
+    v_edit_connec.connecat_id AS arccat_id,
+    v_edit_connec.y1 AS depth,
+    st_length2d(link.the_geom)::numeric(12,2) AS length,
+    v_edit_connec.connec_id AS upstream_id,
+    v_edit_connec.code AS upstream_code,
+    v_edit_connec.connec_type AS upstream_type,
+    v_edit_connec.y2 AS upstream_depth,
+    v_edit_connec.sys_type,
+    st_x(v_edit_connec.the_geom) AS x,
+    st_y(v_edit_connec.the_geom) AS y,
+    cat_connec.descript,
+    value_state.name AS state,
+    'v_edit_connec'::text AS sys_table_id
+   FROM v_edit_connec
+     JOIN link ON link.feature_id::text = v_edit_connec.connec_id::text AND link.feature_type::text = 'CONNEC'::text
+     JOIN node ON v_edit_connec.pjoint_id::text = node.node_id::text AND v_edit_connec.pjoint_type::text = 'NODE'::text
+     LEFT JOIN cat_connec ON v_edit_connec.connecat_id::text = cat_connec.id::text
+     JOIN value_state ON v_edit_connec.state = value_state.id
+UNION
+ SELECT DISTINCT ON (v_edit_connec.connec_id) row_number() OVER (ORDER BY node.node_id) + 3000000 AS rid,
+    node.node_id,
+    v_edit_connec.connec_id AS feature_id,
+    v_edit_connec.code::text AS feature_code,
+    v_edit_connec.connec_type AS featurecat_id,
+    v_edit_connec.connecat_id AS arccat_id,
+    v_edit_connec.y1 AS depth,
+    st_length2d(link.the_geom)::numeric(12,2) AS length,
+    v_edit_connec.connec_id AS upstream_id,
+    v_edit_connec.code AS upstream_code,
+    v_edit_connec.connec_type AS upstream_type,
+    v_edit_connec.y2 AS upstream_depth,
+    v_edit_connec.sys_type,
+    st_x(v_edit_connec.the_geom) AS x,
+    st_y(v_edit_connec.the_geom) AS y,
+    cat_connec.descript,
+    value_state.name AS state,
+    'v_edit_connec'::text AS sys_table_id
+   FROM v_edit_connec
+     JOIN link ON link.feature_id::text = v_edit_connec.connec_id::text AND link.feature_type::text = 'CONNEC'::text AND link.exit_type::text = 'CONNEC'::text
+     JOIN connec ON connec.connec_id::text = link.exit_id::text AND connec.pjoint_type::text = 'NODE'::text
+     JOIN node ON connec.pjoint_id::text = node.node_id::text
+     LEFT JOIN cat_connec ON v_edit_connec.connecat_id::text = cat_connec.id::text
+     JOIN value_state ON v_edit_connec.state = value_state.id
+UNION
+ SELECT DISTINCT ON (v_edit_gully.gully_id) row_number() OVER (ORDER BY node.node_id) + 4000000 AS rid,
+    node.node_id,
+    v_edit_gully.gully_id AS feature_id,
+    v_edit_gully.code::text AS feature_code,
+    v_edit_gully.gully_type AS featurecat_id,
+    v_edit_gully.connec_arccat_id AS arccat_id,
+    v_edit_gully.ymax - v_edit_gully.sandbox AS depth,
+    v_edit_gully.connec_length AS length,
+    v_edit_gully.gully_id AS upstream_id,
+    v_edit_gully.code AS upstream_code,
+    v_edit_gully.gully_type AS upstream_type,
+    v_edit_gully.connec_depth AS upstream_depth,
+    v_edit_gully.sys_type,
+    st_x(v_edit_gully.the_geom) AS x,
+    st_y(v_edit_gully.the_geom) AS y,
+    cat_connec.descript,
+    value_state.name AS state,
+    'v_edit_gully'::text AS sys_table_id
+   FROM v_edit_gully
+     JOIN link ON link.feature_id::text = v_edit_gully.gully_id::text AND link.feature_type::text = 'GULLY'::text
+     JOIN node ON v_edit_gully.pjoint_id::text = node.node_id::text AND v_edit_gully.pjoint_type::text = 'NODE'::text
+     LEFT JOIN cat_connec ON v_edit_gully.connec_arccat_id::text = cat_connec.id::text
+     JOIN value_state ON v_edit_gully.state = value_state.id
+UNION
+ SELECT DISTINCT ON (v_edit_gully.gully_id) row_number() OVER (ORDER BY node.node_id) + 5000000 AS rid,
+    node.node_id,
+    v_edit_gully.gully_id AS feature_id,
+    v_edit_gully.code::text AS feature_code,
+    v_edit_gully.gully_type AS featurecat_id,
+    v_edit_gully.connec_arccat_id AS arccat_id,
+    v_edit_gully.ymax - v_edit_gully.sandbox AS depth,
+    v_edit_gully.connec_length AS length,
+    v_edit_gully.gully_id AS upstream_id,
+    v_edit_gully.code AS upstream_code,
+    v_edit_gully.gully_type AS upstream_type,
+    v_edit_gully.connec_depth AS upstream_depth,
+    v_edit_gully.sys_type,
+    st_x(v_edit_gully.the_geom) AS x,
+    st_y(v_edit_gully.the_geom) AS y,
+    cat_connec.descript,
+    value_state.name AS state,
+    'v_edit_gully'::text AS sys_table_id
+   FROM v_edit_gully
+     JOIN link ON link.feature_id::text = v_edit_gully.gully_id::text AND link.feature_type::text = 'GULLY'::text AND link.exit_type::text = 'GULLY'::text
+     JOIN gully ON gully.gully_id::text = link.exit_id::text AND gully.pjoint_type::text = 'NODE'::text
+     JOIN node ON gully.pjoint_id::text = node.node_id::text
+     LEFT JOIN cat_connec ON v_edit_gully.connec_arccat_id::text = cat_connec.id::text
+     JOIN value_state ON v_edit_gully.state = value_state.id;
+
+
+CREATE OR REPLACE VIEW v_ui_workcat_x_feature_end
+AS SELECT row_number() OVER (ORDER BY v_edit_arc.arc_id) + 1000000 AS rid,
+    'ARC'::character varying AS feature_type,
+    v_edit_arc.arccat_id AS featurecat_id,
+    v_edit_arc.arc_id AS feature_id,
+    v_edit_arc.code,
+    exploitation.name AS expl_name,
+    v_edit_arc.workcat_id_end AS workcat_id,
+    exploitation.expl_id
+   FROM v_edit_arc
+     JOIN exploitation ON exploitation.expl_id = v_edit_arc.expl_id
+  WHERE v_edit_arc.state = 0
+UNION
+ SELECT row_number() OVER (ORDER BY v_edit_node.node_id) + 2000000 AS rid,
+    'NODE'::character varying AS feature_type,
+    v_edit_node.nodecat_id AS featurecat_id,
+    v_edit_node.node_id AS feature_id,
+    v_edit_node.code,
+    exploitation.name AS expl_name,
+    v_edit_node.workcat_id_end AS workcat_id,
+    exploitation.expl_id
+   FROM v_edit_node
+     JOIN exploitation ON exploitation.expl_id = v_edit_node.expl_id
+  WHERE v_edit_node.state = 0
+UNION
+ SELECT row_number() OVER (ORDER BY v_edit_connec.connec_id) + 3000000 AS rid,
+    'CONNEC'::character varying AS feature_type,
+    v_edit_connec.connecat_id AS featurecat_id,
+    v_edit_connec.connec_id AS feature_id,
+    v_edit_connec.code,
+    exploitation.name AS expl_name,
+    v_edit_connec.workcat_id_end AS workcat_id,
+    exploitation.expl_id
+   FROM v_edit_connec
+     JOIN exploitation ON exploitation.expl_id = v_edit_connec.expl_id
+  WHERE v_edit_connec.state = 0
+UNION
+ SELECT row_number() OVER (ORDER BY v_edit_element.element_id) + 4000000 AS rid,
+    'ELEMENT'::character varying AS feature_type,
+    v_edit_element.elementcat_id AS featurecat_id,
+    v_edit_element.element_id AS feature_id,
+    v_edit_element.code,
+    exploitation.name AS expl_name,
+    v_edit_element.workcat_id_end AS workcat_id,
+    exploitation.expl_id
+   FROM v_edit_element
+     JOIN exploitation ON exploitation.expl_id = v_edit_element.expl_id
+  WHERE v_edit_element.state = 0
+UNION
+ SELECT row_number() OVER (ORDER BY v_edit_gully.gully_id) + 4000000 AS rid,
+    'GULLY'::character varying AS feature_type,
+    v_edit_gully.gratecat_id AS featurecat_id,
+    v_edit_gully.gully_id AS feature_id,
+    v_edit_gully.code,
+    exploitation.name AS expl_name,
+    v_edit_gully.workcat_id_end AS workcat_id,
+    exploitation.expl_id
+   FROM v_edit_gully
+     JOIN exploitation ON exploitation.expl_id = v_edit_gully.expl_id
+  WHERE v_edit_gully.state = 0;
+
+
+CREATE OR REPLACE VIEW v_ui_plan_arc_cost
+AS WITH p AS (
+         SELECT v_plan_arc.arc_id,
+            v_plan_arc.node_1,
+            v_plan_arc.node_2,
+            v_plan_arc.arc_type,
+            v_plan_arc.arccat_id,
+            v_plan_arc.epa_type,
+            v_plan_arc.state,
+            v_plan_arc.expl_id,
+            v_plan_arc.sector_id,
+            v_plan_arc.annotation,
+            v_plan_arc.soilcat_id,
+            v_plan_arc.y1,
+            v_plan_arc.y2,
+            v_plan_arc.mean_y,
+            v_plan_arc.z1,
+            v_plan_arc.z2,
+            v_plan_arc.thickness,
+            v_plan_arc.width,
+            v_plan_arc.b,
+            v_plan_arc.bulk,
+            v_plan_arc.geom1,
+            v_plan_arc.area,
+            v_plan_arc.y_param,
+            v_plan_arc.total_y,
+            v_plan_arc.rec_y,
+            v_plan_arc.geom1_ext,
+            v_plan_arc.calculed_y,
+            v_plan_arc.m3mlexc,
+            v_plan_arc.m2mltrenchl,
+            v_plan_arc.m2mlbottom,
+            v_plan_arc.m2mlpav,
+            v_plan_arc.m3mlprotec,
+            v_plan_arc.m3mlfill,
+            v_plan_arc.m3mlexcess,
+            v_plan_arc.m3exc_cost,
+            v_plan_arc.m2trenchl_cost,
+            v_plan_arc.m2bottom_cost,
+            v_plan_arc.m2pav_cost,
+            v_plan_arc.m3protec_cost,
+            v_plan_arc.m3fill_cost,
+            v_plan_arc.m3excess_cost,
+            v_plan_arc.cost_unit,
+            v_plan_arc.pav_cost,
+            v_plan_arc.exc_cost,
+            v_plan_arc.trenchl_cost,
+            v_plan_arc.base_cost,
+            v_plan_arc.protec_cost,
+            v_plan_arc.fill_cost,
+            v_plan_arc.excess_cost,
+            v_plan_arc.arc_cost,
+            v_plan_arc.cost,
+            v_plan_arc.length,
+            v_plan_arc.budget,
+            v_plan_arc.other_budget,
+            v_plan_arc.total_budget,
+            v_plan_arc.the_geom,
+            a.id,
+            a.matcat_id,
+            a.shape,
+            a.geom1,
+            a.geom2,
+            a.geom3,
+            a.geom4,
+            a.geom5,
+            a.geom6,
+            a.geom7,
+            a.geom8,
+            a.geom_r,
+            a.descript,
+            a.link,
+            a.brand,
+            a.model,
+            a.svg,
+            a.z1,
+            a.z2,
+            a.width,
+            a.area,
+            a.estimated_depth,
+            a.bulk,
+            a.cost_unit,
+            a.cost,
+            a.m2bottom_cost,
+            a.m3protec_cost,
+            a.active,
+            a.label,
+            a.tsect_id,
+            a.curve_id,
+            a.arc_type,
+            a.acoeff,
+            a.connect_cost,
+            s.id,
+            s.descript,
+            s.link,
+            s.y_param,
+            s.b,
+            s.trenchlining,
+            s.m3exc_cost,
+            s.m3fill_cost,
+            s.m3excess_cost,
+            s.m2trenchl_cost,
+            s.active,
+            a.cost AS cat_cost,
+            a.m2bottom_cost AS cat_m2bottom_cost,
+            a.connect_cost AS cat_connect_cost,
+            a.m3protec_cost AS cat_m3_protec_cost,
+            s.m3exc_cost AS cat_m3exc_cost,
+            s.m3fill_cost AS cat_m3fill_cost,
+            s.m3excess_cost AS cat_m3excess_cost,
+            s.m2trenchl_cost AS cat_m2trenchl_cost
+           FROM v_plan_arc
+             JOIN cat_arc a ON a.id::text = v_plan_arc.arccat_id::text
+             JOIN cat_soil s ON s.id::text = v_plan_arc.soilcat_id::text
+        )
+ SELECT p.arc_id,
+    1 AS orderby,
+    'element'::text AS identif,
+    p.arccat_id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    1 AS measurement,
+    1::numeric * v_price_compost.price AS total_cost,
+    p.length
+   FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, expl_id, sector_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, matcat_id, shape, geom1_1, geom2, geom3, geom4, geom5, geom6, geom7, geom8, geom_r, descript, link, brand, model, svg, z1_1, z2_1, width_1, area_1, estimated_depth, bulk_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, tsect_id, curve_id, arc_type_1, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
+     JOIN v_price_compost ON p.cat_cost::text = v_price_compost.id::text
+UNION
+ SELECT p.arc_id,
+    2 AS orderby,
+    'm2bottom'::text AS identif,
+    p.arccat_id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    p.m2mlbottom AS measurement,
+    p.m2mlbottom * v_price_compost.price AS total_cost,
+    p.length
+   FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, expl_id, sector_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, matcat_id, shape, geom1_1, geom2, geom3, geom4, geom5, geom6, geom7, geom8, geom_r, descript, link, brand, model, svg, z1_1, z2_1, width_1, area_1, estimated_depth, bulk_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, tsect_id, curve_id, arc_type_1, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
+     JOIN v_price_compost ON p.cat_m2bottom_cost::text = v_price_compost.id::text
+UNION
+ SELECT p.arc_id,
+    3 AS orderby,
+    'm3protec'::text AS identif,
+    p.arccat_id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    p.m3mlprotec AS measurement,
+    p.m3mlprotec * v_price_compost.price AS total_cost,
+    p.length
+   FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, expl_id, sector_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, matcat_id, shape, geom1_1, geom2, geom3, geom4, geom5, geom6, geom7, geom8, geom_r, descript, link, brand, model, svg, z1_1, z2_1, width_1, area_1, estimated_depth, bulk_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, tsect_id, curve_id, arc_type_1, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
+     JOIN v_price_compost ON p.cat_m3_protec_cost::text = v_price_compost.id::text
+UNION
+ SELECT p.arc_id,
+    4 AS orderby,
+    'm3exc'::text AS identif,
+    p.soilcat_id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    p.m3mlexc AS measurement,
+    p.m3mlexc * v_price_compost.price AS total_cost,
+    p.length
+   FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, expl_id, sector_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, matcat_id, shape, geom1_1, geom2, geom3, geom4, geom5, geom6, geom7, geom8, geom_r, descript, link, brand, model, svg, z1_1, z2_1, width_1, area_1, estimated_depth, bulk_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, tsect_id, curve_id, arc_type_1, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
+     JOIN v_price_compost ON p.cat_m3exc_cost::text = v_price_compost.id::text
+UNION
+ SELECT p.arc_id,
+    5 AS orderby,
+    'm3fill'::text AS identif,
+    p.soilcat_id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    p.m3mlfill AS measurement,
+    p.m3mlfill * v_price_compost.price AS total_cost,
+    p.length
+   FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, expl_id, sector_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, matcat_id, shape, geom1_1, geom2, geom3, geom4, geom5, geom6, geom7, geom8, geom_r, descript, link, brand, model, svg, z1_1, z2_1, width_1, area_1, estimated_depth, bulk_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, tsect_id, curve_id, arc_type_1, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
+     JOIN v_price_compost ON p.cat_m3fill_cost::text = v_price_compost.id::text
+UNION
+ SELECT p.arc_id,
+    6 AS orderby,
+    'm3excess'::text AS identif,
+    p.soilcat_id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    p.m3mlexcess AS measurement,
+    p.m3mlexcess * v_price_compost.price AS total_cost,
+    p.length
+   FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, expl_id, sector_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, matcat_id, shape, geom1_1, geom2, geom3, geom4, geom5, geom6, geom7, geom8, geom_r, descript, link, brand, model, svg, z1_1, z2_1, width_1, area_1, estimated_depth, bulk_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, tsect_id, curve_id, arc_type_1, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
+     JOIN v_price_compost ON p.cat_m3excess_cost::text = v_price_compost.id::text
+UNION
+ SELECT p.arc_id,
+    7 AS orderby,
+    'm2trenchl'::text AS identif,
+    p.soilcat_id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    p.m2mltrenchl AS measurement,
+    p.m2mltrenchl * v_price_compost.price AS total_cost,
+    p.length
+   FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, expl_id, sector_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, matcat_id, shape, geom1_1, geom2, geom3, geom4, geom5, geom6, geom7, geom8, geom_r, descript, link, brand, model, svg, z1_1, z2_1, width_1, area_1, estimated_depth, bulk_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, tsect_id, curve_id, arc_type_1, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
+     JOIN v_price_compost ON p.cat_m2trenchl_cost::text = v_price_compost.id::text
+UNION
+ SELECT p.arc_id,
+    8 AS orderby,
+    'pavement'::text AS identif,
+        CASE
+            WHEN a.price_id IS NULL THEN 'Various pavements'::character varying
+            ELSE a.pavcat_id
+        END AS catalog_id,
+        CASE
+            WHEN a.price_id IS NULL THEN 'Various prices'::character varying
+            ELSE a.pavcat_id
+        END AS price_id,
+    'm2'::character varying AS unit,
+        CASE
+            WHEN a.price_id IS NULL THEN 'Various prices'::character varying
+            ELSE a.pavcat_id
+        END AS descript,
+    a.m2pav_cost AS cost,
+    1 AS measurement,
+    a.m2pav_cost AS total_cost,
+    p.length
+   FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, expl_id, sector_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, matcat_id, shape, geom1_1, geom2, geom3, geom4, geom5, geom6, geom7, geom8, geom_r, descript, link, brand, model, svg, z1_1, z2_1, width_1, area_1, estimated_depth, bulk_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, tsect_id, curve_id, arc_type_1, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
+     JOIN v_plan_aux_arc_pavement a ON a.arc_id::text = p.arc_id::text
+     JOIN cat_pavement c ON a.pavcat_id::text = c.id::text
+     LEFT JOIN v_price_compost r ON a.price_id::text = c.m2_cost::text
+UNION
+ SELECT p.arc_id,
+    9 AS orderby,
+    'connec'::text AS identif,
+    'Various connecs'::character varying AS catalog_id,
+    'VARIOUS'::character varying AS price_id,
+    'PP'::character varying AS unit,
+    'Proportional cost of connec connections (pjoint cost)'::character varying AS descript,
+    min(v.price) AS cost,
+    count(v_edit_connec.connec_id) AS measurement,
+    (min(v.price) * count(v_edit_connec.connec_id)::numeric / COALESCE(min(p.length), 1::numeric))::numeric(12,2) AS total_cost,
+    min(p.length)::numeric(12,2) AS length
+   FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, expl_id, sector_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, matcat_id, shape, geom1_1, geom2, geom3, geom4, geom5, geom6, geom7, geom8, geom_r, descript, link, brand, model, svg, z1_1, z2_1, width_1, area_1, estimated_depth, bulk_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, tsect_id, curve_id, arc_type_1, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
+     JOIN v_edit_connec USING (arc_id)
+     JOIN v_price_compost v ON p.cat_connect_cost = v.id::text
+  GROUP BY p.arc_id
+UNION
+ SELECT p.arc_id,
+    10 AS orderby,
+    'connec'::text AS identif,
+    'Various connecs'::character varying AS catalog_id,
+    'VARIOUS'::character varying AS price_id,
+    'PP'::character varying AS unit,
+    'Proportional cost of gully connections (pjoint cost)'::character varying AS descript,
+    min(v.price) AS cost,
+    count(v_edit_gully.gully_id) AS measurement,
+    (min(v.price) * count(v_edit_gully.gully_id)::numeric / COALESCE(min(p.length), 1::numeric))::numeric(12,2) AS total_cost,
+    min(p.length)::numeric(12,2) AS length
+   FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, expl_id, sector_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, matcat_id, shape, geom1_1, geom2, geom3, geom4, geom5, geom6, geom7, geom8, geom_r, descript, link, brand, model, svg, z1_1, z2_1, width_1, area_1, estimated_depth, bulk_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, tsect_id, curve_id, arc_type_1, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
+     JOIN v_edit_gully USING (arc_id)
+     JOIN v_price_compost v ON p.cat_connect_cost = v.id::text
+  GROUP BY p.arc_id
+  ORDER BY 1, 2;
+
+
+CREATE OR REPLACE VIEW v_plan_result_arc
+AS SELECT plan_rec_result_arc.arc_id,
+    plan_rec_result_arc.node_1,
+    plan_rec_result_arc.node_2,
+    plan_rec_result_arc.arc_type,
+    plan_rec_result_arc.arccat_id,
+    plan_rec_result_arc.epa_type,
+    plan_rec_result_arc.state,
+    plan_rec_result_arc.sector_id,
+    plan_rec_result_arc.expl_id,
+    plan_rec_result_arc.annotation,
+    plan_rec_result_arc.soilcat_id,
+    plan_rec_result_arc.y1,
+    plan_rec_result_arc.y2,
+    plan_rec_result_arc.mean_y,
+    plan_rec_result_arc.z1,
+    plan_rec_result_arc.z2,
+    plan_rec_result_arc.thickness,
+    plan_rec_result_arc.width,
+    plan_rec_result_arc.b,
+    plan_rec_result_arc.bulk,
+    plan_rec_result_arc.geom1,
+    plan_rec_result_arc.area,
+    plan_rec_result_arc.y_param,
+    plan_rec_result_arc.total_y,
+    plan_rec_result_arc.rec_y,
+    plan_rec_result_arc.geom1_ext,
+    plan_rec_result_arc.calculed_y,
+    plan_rec_result_arc.m3mlexc,
+    plan_rec_result_arc.m2mltrenchl,
+    plan_rec_result_arc.m2mlbottom,
+    plan_rec_result_arc.m2mlpav,
+    plan_rec_result_arc.m3mlprotec,
+    plan_rec_result_arc.m3mlfill,
+    plan_rec_result_arc.m3mlexcess,
+    plan_rec_result_arc.m3exc_cost,
+    plan_rec_result_arc.m2trenchl_cost,
+    plan_rec_result_arc.m2bottom_cost,
+    plan_rec_result_arc.m2pav_cost,
+    plan_rec_result_arc.m3protec_cost,
+    plan_rec_result_arc.m3fill_cost,
+    plan_rec_result_arc.m3excess_cost,
+    plan_rec_result_arc.cost_unit,
+    plan_rec_result_arc.pav_cost,
+    plan_rec_result_arc.exc_cost,
+    plan_rec_result_arc.trenchl_cost,
+    plan_rec_result_arc.base_cost,
+    plan_rec_result_arc.protec_cost,
+    plan_rec_result_arc.fill_cost,
+    plan_rec_result_arc.excess_cost,
+    plan_rec_result_arc.arc_cost,
+    plan_rec_result_arc.cost,
+    plan_rec_result_arc.length,
+    plan_rec_result_arc.budget,
+    plan_rec_result_arc.other_budget,
+    plan_rec_result_arc.total_budget,
+    plan_rec_result_arc.the_geom,
+    plan_rec_result_arc.builtcost,
+    plan_rec_result_arc.builtdate,
+    plan_rec_result_arc.age,
+    plan_rec_result_arc.acoeff,
+    plan_rec_result_arc.aperiod,
+    plan_rec_result_arc.arate,
+    plan_rec_result_arc.amortized,
+    plan_rec_result_arc.pending
+   FROM selector_plan_result,
+    plan_rec_result_arc
+  WHERE plan_rec_result_arc.result_id::text = selector_plan_result.result_id::text AND selector_plan_result.cur_user = "current_user"()::text AND plan_rec_result_arc.state = 1
+UNION
+ SELECT v_plan_arc.arc_id,
+    v_plan_arc.node_1,
+    v_plan_arc.node_2,
+    v_plan_arc.arc_type,
+    v_plan_arc.arccat_id,
+    v_plan_arc.epa_type,
+    v_plan_arc.state,
+    v_plan_arc.sector_id,
+    v_plan_arc.expl_id,
+    v_plan_arc.annotation,
+    v_plan_arc.soilcat_id,
+    v_plan_arc.y1,
+    v_plan_arc.y2,
+    v_plan_arc.mean_y,
+    v_plan_arc.z1,
+    v_plan_arc.z2,
+    v_plan_arc.thickness,
+    v_plan_arc.width,
+    v_plan_arc.b,
+    v_plan_arc.bulk,
+    v_plan_arc.geom1,
+    v_plan_arc.area,
+    v_plan_arc.y_param,
+    v_plan_arc.total_y,
+    v_plan_arc.rec_y,
+    v_plan_arc.geom1_ext,
+    v_plan_arc.calculed_y,
+    v_plan_arc.m3mlexc,
+    v_plan_arc.m2mltrenchl,
+    v_plan_arc.m2mlbottom,
+    v_plan_arc.m2mlpav,
+    v_plan_arc.m3mlprotec,
+    v_plan_arc.m3mlfill,
+    v_plan_arc.m3mlexcess,
+    v_plan_arc.m3exc_cost,
+    v_plan_arc.m2trenchl_cost,
+    v_plan_arc.m2bottom_cost,
+    v_plan_arc.m2pav_cost,
+    v_plan_arc.m3protec_cost,
+    v_plan_arc.m3fill_cost,
+    v_plan_arc.m3excess_cost,
+    v_plan_arc.cost_unit,
+    v_plan_arc.pav_cost,
+    v_plan_arc.exc_cost,
+    v_plan_arc.trenchl_cost,
+    v_plan_arc.base_cost,
+    v_plan_arc.protec_cost,
+    v_plan_arc.fill_cost,
+    v_plan_arc.excess_cost,
+    v_plan_arc.arc_cost,
+    v_plan_arc.cost,
+    v_plan_arc.length,
+    v_plan_arc.budget,
+    v_plan_arc.other_budget,
+    v_plan_arc.total_budget,
+    v_plan_arc.the_geom,
+    NULL::double precision AS builtcost,
+    NULL::timestamp without time zone AS builtdate,
+    NULL::double precision AS age,
+    NULL::double precision AS acoeff,
+    NULL::text AS aperiod,
+    NULL::double precision AS arate,
+    NULL::double precision AS amortized,
+    NULL::double precision AS pending
+   FROM v_plan_arc
+  WHERE v_plan_arc.state = 2;
+
+
+CREATE OR REPLACE VIEW v_plan_psector
+AS SELECT plan_psector.psector_id,
+    plan_psector.name,
+    plan_psector.psector_type,
+    plan_psector.descript,
+    plan_psector.priority,
+    a.suma::numeric(14,2) AS total_arc,
+    b.suma::numeric(14,2) AS total_node,
+    c.suma::numeric(14,2) AS total_other,
+    plan_psector.text1,
+    plan_psector.text2,
+    plan_psector.observ,
+    plan_psector.rotation,
+    plan_psector.scale,
+    plan_psector.active,
+    (
+        CASE
+            WHEN a.suma IS NULL THEN 0::numeric
+            ELSE a.suma
+        END +
+        CASE
+            WHEN b.suma IS NULL THEN 0::numeric
+            ELSE b.suma
+        END +
+        CASE
+            WHEN c.suma IS NULL THEN 0::numeric
+            ELSE c.suma
+        END)::numeric(14,2) AS pem,
+    plan_psector.gexpenses,
+    (((100::numeric + plan_psector.gexpenses) / 100::numeric)::double precision * (
+        CASE
+            WHEN a.suma IS NULL THEN 0::numeric
+            ELSE a.suma
+        END +
+        CASE
+            WHEN b.suma IS NULL THEN 0::numeric
+            ELSE b.suma
+        END +
+        CASE
+            WHEN c.suma IS NULL THEN 0::numeric
+            ELSE c.suma
+        END)::double precision)::numeric(14,2) AS pec,
+    plan_psector.vat,
+    (((100::numeric + plan_psector.gexpenses) / 100::numeric * ((100::numeric + plan_psector.vat) / 100::numeric))::double precision * (
+        CASE
+            WHEN a.suma IS NULL THEN 0::numeric
+            ELSE a.suma
+        END +
+        CASE
+            WHEN b.suma IS NULL THEN 0::numeric
+            ELSE b.suma
+        END +
+        CASE
+            WHEN c.suma IS NULL THEN 0::numeric
+            ELSE c.suma
+        END)::double precision)::numeric(14,2) AS pec_vat,
+    plan_psector.other,
+    (((100::numeric + plan_psector.gexpenses) / 100::numeric * ((100::numeric + plan_psector.vat) / 100::numeric) * ((100::numeric + plan_psector.other) / 100::numeric))::numeric(14,2)::double precision * (
+        CASE
+            WHEN a.suma IS NULL THEN 0::numeric
+            ELSE a.suma
+        END +
+        CASE
+            WHEN b.suma IS NULL THEN 0::numeric
+            ELSE b.suma
+        END +
+        CASE
+            WHEN c.suma IS NULL THEN 0::numeric
+            ELSE c.suma
+        END)::double precision)::numeric(14,2) AS pca,
+    plan_psector.the_geom
+   FROM selector_psector,
+    plan_psector
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_arc.total_budget) AS suma,
+            v_plan_psector_x_arc.psector_id
+           FROM ( SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
+                    v_plan_arc.arc_id,
+                    v_plan_arc.node_1,
+                    v_plan_arc.node_2,
+                    v_plan_arc.arc_type,
+                    v_plan_arc.arccat_id,
+                    v_plan_arc.epa_type,
+                    v_plan_arc.state,
+                    v_plan_arc.sector_id,
+                    v_plan_arc.expl_id,
+                    v_plan_arc.annotation,
+                    v_plan_arc.soilcat_id,
+                    v_plan_arc.y1,
+                    v_plan_arc.y2,
+                    v_plan_arc.mean_y,
+                    v_plan_arc.z1,
+                    v_plan_arc.z2,
+                    v_plan_arc.thickness,
+                    v_plan_arc.width,
+                    v_plan_arc.b,
+                    v_plan_arc.bulk,
+                    v_plan_arc.geom1,
+                    v_plan_arc.area,
+                    v_plan_arc.y_param,
+                    v_plan_arc.total_y,
+                    v_plan_arc.rec_y,
+                    v_plan_arc.geom1_ext,
+                    v_plan_arc.calculed_y,
+                    v_plan_arc.m3mlexc,
+                    v_plan_arc.m2mltrenchl,
+                    v_plan_arc.m2mlbottom,
+                    v_plan_arc.m2mlpav,
+                    v_plan_arc.m3mlprotec,
+                    v_plan_arc.m3mlfill,
+                    v_plan_arc.m3mlexcess,
+                    v_plan_arc.m3exc_cost,
+                    v_plan_arc.m2trenchl_cost,
+                    v_plan_arc.m2bottom_cost,
+                    v_plan_arc.m2pav_cost,
+                    v_plan_arc.m3protec_cost,
+                    v_plan_arc.m3fill_cost,
+                    v_plan_arc.m3excess_cost,
+                    v_plan_arc.cost_unit,
+                    v_plan_arc.pav_cost,
+                    v_plan_arc.exc_cost,
+                    v_plan_arc.trenchl_cost,
+                    v_plan_arc.base_cost,
+                    v_plan_arc.protec_cost,
+                    v_plan_arc.fill_cost,
+                    v_plan_arc.excess_cost,
+                    v_plan_arc.arc_cost,
+                    v_plan_arc.cost,
+                    v_plan_arc.length,
+                    v_plan_arc.budget,
+                    v_plan_arc.other_budget,
+                    v_plan_arc.total_budget,
+                    v_plan_arc.the_geom,
+                    plan_psector_x_arc.id,
+                    plan_psector_x_arc.arc_id,
+                    plan_psector_x_arc.psector_id,
+                    plan_psector_x_arc.state,
+                    plan_psector_x_arc.doable,
+                    plan_psector_x_arc.descript,
+                    plan_psector_x_arc.addparam
+                   FROM v_plan_arc
+                     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text
+                     JOIN plan_psector plan_psector_1 ON plan_psector_1.psector_id = plan_psector_x_arc.psector_id
+                  WHERE plan_psector_x_arc.doable IS TRUE
+                  ORDER BY plan_psector_x_arc.psector_id) v_plan_psector_x_arc(rid, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, sector_id, expl_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, arc_id_1, psector_id, state_1, doable, descript, addparam)
+          GROUP BY v_plan_psector_x_arc.psector_id) a ON a.psector_id = plan_psector.psector_id
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_node.budget) AS suma,
+            v_plan_psector_x_node.psector_id
+           FROM ( SELECT row_number() OVER (ORDER BY v_plan_node.node_id) AS rid,
+                    v_plan_node.node_id,
+                    v_plan_node.nodecat_id,
+                    v_plan_node.node_type,
+                    v_plan_node.top_elev,
+                    v_plan_node.elev,
+                    v_plan_node.epa_type,
+                    v_plan_node.state,
+                    v_plan_node.sector_id,
+                    v_plan_node.expl_id,
+                    v_plan_node.annotation,
+                    v_plan_node.cost_unit,
+                    v_plan_node.descript,
+                    v_plan_node.cost,
+                    v_plan_node.measurement,
+                    v_plan_node.budget,
+                    v_plan_node.the_geom,
+                    plan_psector_x_node.id,
+                    plan_psector_x_node.node_id,
+                    plan_psector_x_node.psector_id,
+                    plan_psector_x_node.state,
+                    plan_psector_x_node.doable,
+                    plan_psector_x_node.descript
+                   FROM v_plan_node
+                     JOIN plan_psector_x_node ON plan_psector_x_node.node_id::text = v_plan_node.node_id::text
+                     JOIN plan_psector plan_psector_1 ON plan_psector_1.psector_id = plan_psector_x_node.psector_id
+                  WHERE plan_psector_x_node.doable IS TRUE
+                  ORDER BY plan_psector_x_node.psector_id) v_plan_psector_x_node(rid, node_id, nodecat_id, node_type, top_elev, elev, epa_type, state, sector_id, expl_id, annotation, cost_unit, descript, cost, measurement, budget, the_geom, id, node_id_1, psector_id, state_1, doable, descript_1)
+          GROUP BY v_plan_psector_x_node.psector_id) b ON b.psector_id = plan_psector.psector_id
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_other.total_budget) AS suma,
+            v_plan_psector_x_other.psector_id
+           FROM ( SELECT plan_psector_x_other.id,
+                    plan_psector_x_other.psector_id,
+                    plan_psector_1.psector_type,
+                    v_price_compost.id AS price_id,
+                    v_price_compost.descript,
+                    v_price_compost.price,
+                    plan_psector_x_other.measurement,
+                    (plan_psector_x_other.measurement * v_price_compost.price)::numeric(14,2) AS total_budget
+                   FROM plan_psector_x_other
+                     JOIN v_price_compost ON v_price_compost.id::text = plan_psector_x_other.price_id::text
+                     JOIN plan_psector plan_psector_1 ON plan_psector_1.psector_id = plan_psector_x_other.psector_id
+                  ORDER BY plan_psector_x_other.psector_id) v_plan_psector_x_other
+          GROUP BY v_plan_psector_x_other.psector_id) c ON c.psector_id = plan_psector.psector_id
+  WHERE plan_psector.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_plan_current_psector
+AS SELECT plan_psector.psector_id,
+    plan_psector.name,
+    plan_psector.psector_type,
+    plan_psector.descript,
+    plan_psector.priority,
+    a.suma::numeric(14,2) AS total_arc,
+    b.suma::numeric(14,2) AS total_node,
+    c.suma::numeric(14,2) AS total_other,
+    plan_psector.text1,
+    plan_psector.text2,
+    plan_psector.observ,
+    plan_psector.rotation,
+    plan_psector.scale,
+    plan_psector.active,
+    (
+        CASE
+            WHEN a.suma IS NULL THEN 0::numeric
+            ELSE a.suma
+        END +
+        CASE
+            WHEN b.suma IS NULL THEN 0::numeric
+            ELSE b.suma
+        END +
+        CASE
+            WHEN c.suma IS NULL THEN 0::numeric
+            ELSE c.suma
+        END)::numeric(14,2) AS pem,
+    plan_psector.gexpenses,
+    ((100::numeric + plan_psector.gexpenses) / 100::numeric)::numeric(14,2) * (
+        CASE
+            WHEN a.suma IS NULL THEN 0::numeric
+            ELSE a.suma
+        END +
+        CASE
+            WHEN b.suma IS NULL THEN 0::numeric
+            ELSE b.suma
+        END +
+        CASE
+            WHEN c.suma IS NULL THEN 0::numeric
+            ELSE c.suma
+        END)::numeric(14,2) AS pec,
+    plan_psector.vat,
+    ((100::numeric + plan_psector.gexpenses) / 100::numeric * ((100::numeric + plan_psector.vat) / 100::numeric))::numeric(14,2) * (
+        CASE
+            WHEN a.suma IS NULL THEN 0::numeric
+            ELSE a.suma
+        END +
+        CASE
+            WHEN b.suma IS NULL THEN 0::numeric
+            ELSE b.suma
+        END +
+        CASE
+            WHEN c.suma IS NULL THEN 0::numeric
+            ELSE c.suma
+        END)::numeric(14,2) AS pec_vat,
+    plan_psector.other,
+    ((100::numeric + plan_psector.gexpenses) / 100::numeric * ((100::numeric + plan_psector.vat) / 100::numeric) * ((100::numeric + plan_psector.other) / 100::numeric))::numeric(14,2) * (
+        CASE
+            WHEN a.suma IS NULL THEN 0::numeric
+            ELSE a.suma
+        END +
+        CASE
+            WHEN b.suma IS NULL THEN 0::numeric
+            ELSE b.suma
+        END +
+        CASE
+            WHEN c.suma IS NULL THEN 0::numeric
+            ELSE c.suma
+        END)::numeric(14,2) AS pca,
+    plan_psector.the_geom
+   FROM config_param_user,
+    plan_psector
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_arc.total_budget) AS suma,
+            v_plan_psector_x_arc.psector_id
+           FROM ( SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
+                    v_plan_arc.arc_id,
+                    v_plan_arc.node_1,
+                    v_plan_arc.node_2,
+                    v_plan_arc.arc_type,
+                    v_plan_arc.arccat_id,
+                    v_plan_arc.epa_type,
+                    v_plan_arc.state,
+                    v_plan_arc.sector_id,
+                    v_plan_arc.expl_id,
+                    v_plan_arc.annotation,
+                    v_plan_arc.soilcat_id,
+                    v_plan_arc.y1,
+                    v_plan_arc.y2,
+                    v_plan_arc.mean_y,
+                    v_plan_arc.z1,
+                    v_plan_arc.z2,
+                    v_plan_arc.thickness,
+                    v_plan_arc.width,
+                    v_plan_arc.b,
+                    v_plan_arc.bulk,
+                    v_plan_arc.geom1,
+                    v_plan_arc.area,
+                    v_plan_arc.y_param,
+                    v_plan_arc.total_y,
+                    v_plan_arc.rec_y,
+                    v_plan_arc.geom1_ext,
+                    v_plan_arc.calculed_y,
+                    v_plan_arc.m3mlexc,
+                    v_plan_arc.m2mltrenchl,
+                    v_plan_arc.m2mlbottom,
+                    v_plan_arc.m2mlpav,
+                    v_plan_arc.m3mlprotec,
+                    v_plan_arc.m3mlfill,
+                    v_plan_arc.m3mlexcess,
+                    v_plan_arc.m3exc_cost,
+                    v_plan_arc.m2trenchl_cost,
+                    v_plan_arc.m2bottom_cost,
+                    v_plan_arc.m2pav_cost,
+                    v_plan_arc.m3protec_cost,
+                    v_plan_arc.m3fill_cost,
+                    v_plan_arc.m3excess_cost,
+                    v_plan_arc.cost_unit,
+                    v_plan_arc.pav_cost,
+                    v_plan_arc.exc_cost,
+                    v_plan_arc.trenchl_cost,
+                    v_plan_arc.base_cost,
+                    v_plan_arc.protec_cost,
+                    v_plan_arc.fill_cost,
+                    v_plan_arc.excess_cost,
+                    v_plan_arc.arc_cost,
+                    v_plan_arc.cost,
+                    v_plan_arc.length,
+                    v_plan_arc.budget,
+                    v_plan_arc.other_budget,
+                    v_plan_arc.total_budget,
+                    v_plan_arc.the_geom,
+                    plan_psector_x_arc.id,
+                    plan_psector_x_arc.arc_id,
+                    plan_psector_x_arc.psector_id,
+                    plan_psector_x_arc.state,
+                    plan_psector_x_arc.doable,
+                    plan_psector_x_arc.descript,
+                    plan_psector_x_arc.addparam
+                   FROM v_plan_arc
+                     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text
+                     JOIN plan_psector plan_psector_1 ON plan_psector_1.psector_id = plan_psector_x_arc.psector_id
+                  ORDER BY plan_psector_x_arc.psector_id) v_plan_psector_x_arc(rid, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, sector_id, expl_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, arc_id_1, psector_id, state_1, doable, descript, addparam)
+          GROUP BY v_plan_psector_x_arc.psector_id) a ON a.psector_id = plan_psector.psector_id
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_node.budget) AS suma,
+            v_plan_psector_x_node.psector_id
+           FROM ( SELECT row_number() OVER (ORDER BY v_plan_node.node_id) AS rid,
+                    v_plan_node.node_id,
+                    v_plan_node.nodecat_id,
+                    v_plan_node.node_type,
+                    v_plan_node.top_elev,
+                    v_plan_node.elev,
+                    v_plan_node.epa_type,
+                    v_plan_node.state,
+                    v_plan_node.sector_id,
+                    v_plan_node.expl_id,
+                    v_plan_node.annotation,
+                    v_plan_node.cost_unit,
+                    v_plan_node.descript,
+                    v_plan_node.cost,
+                    v_plan_node.measurement,
+                    v_plan_node.budget,
+                    v_plan_node.the_geom,
+                    plan_psector_x_node.id,
+                    plan_psector_x_node.node_id,
+                    plan_psector_x_node.psector_id,
+                    plan_psector_x_node.state,
+                    plan_psector_x_node.doable,
+                    plan_psector_x_node.descript
+                   FROM v_plan_node
+                     JOIN plan_psector_x_node ON plan_psector_x_node.node_id::text = v_plan_node.node_id::text
+                     JOIN plan_psector plan_psector_1 ON plan_psector_1.psector_id = plan_psector_x_node.psector_id
+                  ORDER BY plan_psector_x_node.psector_id) v_plan_psector_x_node(rid, node_id, nodecat_id, node_type, top_elev, elev, epa_type, state, sector_id, expl_id, annotation, cost_unit, descript, cost, measurement, budget, the_geom, id, node_id_1, psector_id, state_1, doable, descript_1)
+          GROUP BY v_plan_psector_x_node.psector_id) b ON b.psector_id = plan_psector.psector_id
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_other.total_budget) AS suma,
+            v_plan_psector_x_other.psector_id
+           FROM ( SELECT plan_psector_x_other.id,
+                    plan_psector_x_other.psector_id,
+                    plan_psector_1.psector_type,
+                    v_price_compost.id AS price_id,
+                    v_price_compost.descript,
+                    v_price_compost.price,
+                    plan_psector_x_other.measurement,
+                    (plan_psector_x_other.measurement * v_price_compost.price)::numeric(14,2) AS total_budget
+                   FROM plan_psector_x_other
+                     JOIN v_price_compost ON v_price_compost.id::text = plan_psector_x_other.price_id::text
+                     JOIN plan_psector plan_psector_1 ON plan_psector_1.psector_id = plan_psector_x_other.psector_id
+                  ORDER BY plan_psector_x_other.psector_id) v_plan_psector_x_other
+          GROUP BY v_plan_psector_x_other.psector_id) c ON c.psector_id = plan_psector.psector_id
+  WHERE config_param_user.cur_user::text = "current_user"()::text AND config_param_user.parameter::text = 'plan_psector_vdefault'::text AND config_param_user.value::integer = plan_psector.psector_id;
+
+
+CREATE OR REPLACE VIEW v_plan_psector_all
+AS SELECT plan_psector.psector_id,
+    plan_psector.name,
+    plan_psector.psector_type,
+    plan_psector.descript,
+    plan_psector.priority,
+    a.suma::numeric(14,2) AS total_arc,
+    b.suma::numeric(14,2) AS total_node,
+    c.suma::numeric(14,2) AS total_other,
+    plan_psector.text1,
+    plan_psector.text2,
+    plan_psector.observ,
+    plan_psector.rotation,
+    plan_psector.scale,
+    (
+        CASE
+            WHEN a.suma IS NULL THEN 0::numeric
+            ELSE a.suma
+        END +
+        CASE
+            WHEN b.suma IS NULL THEN 0::numeric
+            ELSE b.suma
+        END +
+        CASE
+            WHEN c.suma IS NULL THEN 0::numeric
+            ELSE c.suma
+        END)::numeric(14,2) AS pem,
+    plan_psector.gexpenses,
+    (((100::numeric + plan_psector.gexpenses) / 100::numeric)::double precision * (
+        CASE
+            WHEN a.suma IS NULL THEN 0::numeric
+            ELSE a.suma
+        END +
+        CASE
+            WHEN b.suma IS NULL THEN 0::numeric
+            ELSE b.suma
+        END +
+        CASE
+            WHEN c.suma IS NULL THEN 0::numeric
+            ELSE c.suma
+        END)::double precision)::numeric(14,2) AS pec,
+    plan_psector.vat,
+    (((100::numeric + plan_psector.gexpenses) / 100::numeric * ((100::numeric + plan_psector.vat) / 100::numeric))::double precision * (
+        CASE
+            WHEN a.suma IS NULL THEN 0::numeric
+            ELSE a.suma
+        END +
+        CASE
+            WHEN b.suma IS NULL THEN 0::numeric
+            ELSE b.suma
+        END +
+        CASE
+            WHEN c.suma IS NULL THEN 0::numeric
+            ELSE c.suma
+        END)::double precision)::numeric(14,2) AS pec_vat,
+    plan_psector.other,
+    ((((100::numeric + plan_psector.gexpenses) / 100::numeric * ((100::numeric + plan_psector.vat) / 100::numeric))::double precision * (
+        CASE
+            WHEN a.suma IS NULL THEN 0::numeric
+            ELSE a.suma
+        END +
+        CASE
+            WHEN b.suma IS NULL THEN 0::numeric
+            ELSE b.suma
+        END +
+        CASE
+            WHEN c.suma IS NULL THEN 0::numeric
+            ELSE c.suma
+        END)::double precision)::numeric(14,2)::double precision + ((100::numeric + plan_psector.vat) / 100::numeric * (plan_psector.other / 100::numeric))::double precision * (
+        CASE
+            WHEN a.suma IS NULL THEN 0::numeric
+            ELSE a.suma
+        END +
+        CASE
+            WHEN b.suma IS NULL THEN 0::numeric
+            ELSE b.suma
+        END +
+        CASE
+            WHEN c.suma IS NULL THEN 0::numeric
+            ELSE c.suma
+        END)::double precision)::numeric(14,2) AS pca,
+    plan_psector.the_geom
+   FROM selector_psector,
+    plan_psector
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_arc.total_budget) AS suma,
+            v_plan_psector_x_arc.psector_id
+           FROM ( SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
+                    v_plan_arc.arc_id,
+                    v_plan_arc.node_1,
+                    v_plan_arc.node_2,
+                    v_plan_arc.arc_type,
+                    v_plan_arc.arccat_id,
+                    v_plan_arc.epa_type,
+                    v_plan_arc.state,
+                    v_plan_arc.expl_id,
+                    v_plan_arc.sector_id,
+                    v_plan_arc.annotation,
+                    v_plan_arc.soilcat_id,
+                    v_plan_arc.y1,
+                    v_plan_arc.y2,
+                    v_plan_arc.mean_y,
+                    v_plan_arc.z1,
+                    v_plan_arc.z2,
+                    v_plan_arc.thickness,
+                    v_plan_arc.width,
+                    v_plan_arc.b,
+                    v_plan_arc.bulk,
+                    v_plan_arc.geom1,
+                    v_plan_arc.area,
+                    v_plan_arc.y_param,
+                    v_plan_arc.total_y,
+                    v_plan_arc.rec_y,
+                    v_plan_arc.geom1_ext,
+                    v_plan_arc.calculed_y,
+                    v_plan_arc.m3mlexc,
+                    v_plan_arc.m2mltrenchl,
+                    v_plan_arc.m2mlbottom,
+                    v_plan_arc.m2mlpav,
+                    v_plan_arc.m3mlprotec,
+                    v_plan_arc.m3mlfill,
+                    v_plan_arc.m3mlexcess,
+                    v_plan_arc.m3exc_cost,
+                    v_plan_arc.m2trenchl_cost,
+                    v_plan_arc.m2bottom_cost,
+                    v_plan_arc.m2pav_cost,
+                    v_plan_arc.m3protec_cost,
+                    v_plan_arc.m3fill_cost,
+                    v_plan_arc.m3excess_cost,
+                    v_plan_arc.cost_unit,
+                    v_plan_arc.pav_cost,
+                    v_plan_arc.exc_cost,
+                    v_plan_arc.trenchl_cost,
+                    v_plan_arc.base_cost,
+                    v_plan_arc.protec_cost,
+                    v_plan_arc.fill_cost,
+                    v_plan_arc.excess_cost,
+                    v_plan_arc.arc_cost,
+                    v_plan_arc.cost,
+                    v_plan_arc.length,
+                    v_plan_arc.budget,
+                    v_plan_arc.other_budget,
+                    v_plan_arc.total_budget,
+                    v_plan_arc.the_geom,
+                    plan_psector_x_arc.id,
+                    plan_psector_x_arc.arc_id,
+                    plan_psector_x_arc.psector_id,
+                    plan_psector_x_arc.state,
+                    plan_psector_x_arc.doable,
+                    plan_psector_x_arc.descript,
+                    plan_psector_x_arc.addparam
+                   FROM v_plan_arc
+                     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text
+                     JOIN plan_psector plan_psector_1 ON plan_psector_1.psector_id = plan_psector_x_arc.psector_id
+                  ORDER BY plan_psector_x_arc.psector_id) v_plan_psector_x_arc(rid, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, expl_id, sector_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, arc_id_1, psector_id, state_1, doable, descript, addparam)
+          GROUP BY v_plan_psector_x_arc.psector_id) a ON a.psector_id = plan_psector.psector_id
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_node.budget) AS suma,
+            v_plan_psector_x_node.psector_id
+           FROM ( SELECT row_number() OVER (ORDER BY v_plan_node.node_id) AS rid,
+                    v_plan_node.node_id,
+                    v_plan_node.nodecat_id,
+                    v_plan_node.node_type,
+                    v_plan_node.top_elev,
+                    v_plan_node.elev,
+                    v_plan_node.epa_type,
+                    v_plan_node.state,
+                    v_plan_node.sector_id,
+                    v_plan_node.expl_id,
+                    v_plan_node.annotation,
+                    v_plan_node.cost_unit,
+                    v_plan_node.descript,
+                    v_plan_node.cost,
+                    v_plan_node.measurement,
+                    v_plan_node.budget,
+                    v_plan_node.the_geom,
+                    plan_psector_x_node.id,
+                    plan_psector_x_node.node_id,
+                    plan_psector_x_node.psector_id,
+                    plan_psector_x_node.state,
+                    plan_psector_x_node.doable,
+                    plan_psector_x_node.descript
+                   FROM v_plan_node
+                     JOIN plan_psector_x_node ON plan_psector_x_node.node_id::text = v_plan_node.node_id::text
+                     JOIN plan_psector plan_psector_1 ON plan_psector_1.psector_id = plan_psector_x_node.psector_id
+                  ORDER BY plan_psector_x_node.psector_id) v_plan_psector_x_node(rid, node_id, nodecat_id, node_type, top_elev, elev, epa_type, state, sector_id, expl_id, annotation, cost_unit, descript, cost, measurement, budget, the_geom, id, node_id_1, psector_id, state_1, doable, descript_1)
+          GROUP BY v_plan_psector_x_node.psector_id) b ON b.psector_id = plan_psector.psector_id
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_other.total_budget) AS suma,
+            v_plan_psector_x_other.psector_id
+           FROM ( SELECT plan_psector_x_other.id,
+                    plan_psector_x_other.psector_id,
+                    plan_psector_1.psector_type,
+                    v_price_compost.id AS price_id,
+                    v_price_compost.descript,
+                    v_price_compost.price,
+                    plan_psector_x_other.measurement,
+                    (plan_psector_x_other.measurement * v_price_compost.price)::numeric(14,2) AS total_budget
+                   FROM plan_psector_x_other
+                     JOIN v_price_compost ON v_price_compost.id::text = plan_psector_x_other.price_id::text
+                     JOIN plan_psector plan_psector_1 ON plan_psector_1.psector_id = plan_psector_x_other.psector_id
+                  ORDER BY plan_psector_x_other.psector_id) v_plan_psector_x_other
+          GROUP BY v_plan_psector_x_other.psector_id) c ON c.psector_id = plan_psector.psector_id;
+
+
+CREATE OR REPLACE VIEW v_plan_psector_budget
+AS SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
+    plan_psector_x_arc.psector_id,
+    'arc'::text AS feature_type,
+    v_plan_arc.arccat_id AS featurecat_id,
+    v_plan_arc.arc_id AS feature_id,
+    v_plan_arc.length,
+    (v_plan_arc.total_budget / v_plan_arc.length)::numeric(14,2) AS unitary_cost,
+    v_plan_arc.total_budget
+   FROM v_plan_arc
+     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text
+  WHERE plan_psector_x_arc.doable = true
+UNION
+ SELECT row_number() OVER (ORDER BY v_plan_node.node_id) + 9999 AS rid,
+    plan_psector_x_node.psector_id,
+    'node'::text AS feature_type,
+    v_plan_node.nodecat_id AS featurecat_id,
+    v_plan_node.node_id AS feature_id,
+    1 AS length,
+    v_plan_node.budget AS unitary_cost,
+    v_plan_node.budget AS total_budget
+   FROM v_plan_node
+     JOIN plan_psector_x_node ON plan_psector_x_node.node_id::text = v_plan_node.node_id::text
+  WHERE plan_psector_x_node.doable = true
+UNION
+ SELECT row_number() OVER (ORDER BY v_edit_plan_psector_x_other.id) + 19999 AS rid,
+    v_edit_plan_psector_x_other.psector_id,
+    'other'::text AS feature_type,
+    v_edit_plan_psector_x_other.price_id AS featurecat_id,
+    v_edit_plan_psector_x_other.observ AS feature_id,
+    v_edit_plan_psector_x_other.measurement AS length,
+    v_edit_plan_psector_x_other.price AS unitary_cost,
+    v_edit_plan_psector_x_other.total_budget
+   FROM v_edit_plan_psector_x_other
+  ORDER BY 1, 2, 4;
+
+
+CREATE OR REPLACE VIEW v_plan_psector_budget_arc
+AS SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
+    plan_psector_x_arc.psector_id,
+    plan_psector.psector_type,
+    v_plan_arc.arc_id,
+    v_plan_arc.arccat_id,
+    v_plan_arc.cost_unit,
+    v_plan_arc.cost::numeric(14,2) AS cost,
+    v_plan_arc.length,
+    v_plan_arc.budget,
+    v_plan_arc.other_budget,
+    v_plan_arc.total_budget,
+    v_plan_arc.state,
+    plan_psector.expl_id,
+    plan_psector.atlas_id,
+    plan_psector_x_arc.doable,
+    plan_psector.priority,
+    v_plan_arc.the_geom
+   FROM v_plan_arc
+     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text
+     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_arc.psector_id
+  WHERE plan_psector_x_arc.doable = true
+  ORDER BY plan_psector_x_arc.psector_id;
+
+
+
+CREATE OR REPLACE VIEW v_plan_psector_budget_detail
+AS SELECT v_plan_arc.arc_id,
+    plan_psector_x_arc.psector_id,
+    v_plan_arc.arccat_id,
+    v_plan_arc.soilcat_id,
+    v_plan_arc.y1,
+    v_plan_arc.y2,
+    v_plan_arc.arc_cost AS mlarc_cost,
+    v_plan_arc.m3mlexc,
+    v_plan_arc.exc_cost AS mlexc_cost,
+    v_plan_arc.m2mltrenchl,
+    v_plan_arc.trenchl_cost AS mltrench_cost,
+    v_plan_arc.m2mlbottom AS m2mlbase,
+    v_plan_arc.base_cost AS mlbase_cost,
+    v_plan_arc.m2mlpav,
+    v_plan_arc.pav_cost AS mlpav_cost,
+    v_plan_arc.m3mlprotec,
+    v_plan_arc.protec_cost AS mlprotec_cost,
+    v_plan_arc.m3mlfill,
+    v_plan_arc.fill_cost AS mlfill_cost,
+    v_plan_arc.m3mlexcess,
+    v_plan_arc.excess_cost AS mlexcess_cost,
+    v_plan_arc.cost AS mltotal_cost,
+    v_plan_arc.length,
+    v_plan_arc.budget AS other_budget,
+    v_plan_arc.total_budget
+   FROM v_plan_arc
+     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text
+  WHERE plan_psector_x_arc.doable = true
+  ORDER BY plan_psector_x_arc.psector_id, v_plan_arc.soilcat_id, v_plan_arc.arccat_id;
+
+
+
+CREATE OR REPLACE VIEW vi_gully2node
+AS SELECT a.gully_id,
+    n.node_id,
+    st_makeline(a.the_geom, n.the_geom) AS the_geom
+   FROM ( SELECT g.gully_id,
+                CASE
+                    WHEN g.pjoint_type::text = 'NODE'::text THEN g.pjoint_id
+                    ELSE a_1.node_2
+                END AS node_id,
+            a_1.expl_id,
+            g.the_geom
+           FROM v_edit_inp_gully g
+             LEFT JOIN arc a_1 USING (arc_id)) a
+     JOIN node n USING (node_id);
+
+
+
+/*
+v_edit_inp_outfall
+v_edit_inp_storage
+v_edit_inp_netgully
+ve_pol_chamber
+ve_pol_netgully
+v_edit_inp_divider
+v_edit_man_netelement
+*/
+
+CREATE OR REPLACE VIEW v_edit_inp_outfall
+AS SELECT v_edit_node.node_id,
+    v_edit_node.top_elev,
+    v_edit_node.custom_top_elev,
+    v_edit_node.ymax,
+    v_edit_node.custom_ymax,
+    v_edit_node.elev,
+    v_edit_node.custom_elev,
+    v_edit_node.sys_elev,
+    v_edit_node.nodecat_id,
+    v_edit_node.sector_id,
+    v_edit_node.macrosector_id,
+    v_edit_node.state,
+    v_edit_node.state_type,
+    v_edit_node.annotation,
+    v_edit_node.expl_id,
+    inp_outfall.outfall_type,
+    inp_outfall.stage,
+    inp_outfall.curve_id,
+    inp_outfall.timser_id,
+    inp_outfall.gate,
+    v_edit_node.the_geom
+   FROM v_sector_node
+     JOIN v_edit_node USING (node_id)
+     JOIN inp_outfall USING (node_id)
+  WHERE v_edit_node.is_operative IS TRUE;
+
+CREATE OR REPLACE VIEW v_edit_inp_storage
+AS SELECT v_edit_node.node_id,
+    v_edit_node.top_elev,
+    v_edit_node.custom_top_elev,
+    v_edit_node.ymax,
+    v_edit_node.custom_ymax,
+    v_edit_node.elev,
+    v_edit_node.custom_elev,
+    v_edit_node.sys_elev,
+    v_edit_node.nodecat_id,
+    v_edit_node.sector_id,
+    v_edit_node.macrosector_id,
+    v_edit_node.state,
+    v_edit_node.state_type,
+    v_edit_node.annotation,
+    v_edit_node.expl_id,
+    inp_storage.storage_type,
+    inp_storage.curve_id,
+    inp_storage.a1,
+    inp_storage.a2,
+    inp_storage.a0,
+    inp_storage.fevap,
+    inp_storage.sh,
+    inp_storage.hc,
+    inp_storage.imd,
+    inp_storage.y0,
+    inp_storage.ysur,
+    inp_storage.apond,
+    v_edit_node.the_geom
+   FROM v_sector_node
+     JOIN v_edit_node USING (node_id)
+     JOIN inp_storage USING (node_id)
+  WHERE v_edit_node.is_operative IS TRUE;
+
+CREATE OR REPLACE VIEW v_edit_inp_outfall
+AS SELECT v_edit_node.node_id,
+    v_edit_node.top_elev,
+    v_edit_node.custom_top_elev,
+    v_edit_node.ymax,
+    v_edit_node.custom_ymax,
+    v_edit_node.elev,
+    v_edit_node.custom_elev,
+    v_edit_node.sys_elev,
+    v_edit_node.nodecat_id,
+    v_edit_node.sector_id,
+    v_edit_node.macrosector_id,
+    v_edit_node.state,
+    v_edit_node.state_type,
+    v_edit_node.annotation,
+    v_edit_node.expl_id,
+    inp_outfall.outfall_type,
+    inp_outfall.stage,
+    inp_outfall.curve_id,
+    inp_outfall.timser_id,
+    inp_outfall.gate,
+    v_edit_node.the_geom
+   FROM v_sector_node
+     JOIN v_edit_node USING (node_id)
+     JOIN inp_outfall USING (node_id)
+  WHERE v_edit_node.is_operative IS TRUE;
+
+CREATE OR REPLACE VIEW v_edit_inp_storage
+AS SELECT v_edit_node.node_id,
+    v_edit_node.top_elev,
+    v_edit_node.custom_top_elev,
+    v_edit_node.ymax,
+    v_edit_node.custom_ymax,
+    v_edit_node.elev,
+    v_edit_node.custom_elev,
+    v_edit_node.sys_elev,
+    v_edit_node.nodecat_id,
+    v_edit_node.sector_id,
+    v_edit_node.macrosector_id,
+    v_edit_node.state,
+    v_edit_node.state_type,
+    v_edit_node.annotation,
+    v_edit_node.expl_id,
+    inp_storage.storage_type,
+    inp_storage.curve_id,
+    inp_storage.a1,
+    inp_storage.a2,
+    inp_storage.a0,
+    inp_storage.fevap,
+    inp_storage.sh,
+    inp_storage.hc,
+    inp_storage.imd,
+    inp_storage.y0,
+    inp_storage.ysur,
+    inp_storage.apond,
+    v_edit_node.the_geom
+   FROM v_sector_node
+     JOIN v_edit_node USING (node_id)
+     JOIN inp_storage USING (node_id)
+  WHERE v_edit_node.is_operative IS TRUE;
+
+CREATE OR REPLACE VIEW v_edit_inp_netgully
+AS SELECT n.node_id,
+    n.code,
+    n.top_elev,
+    n.custom_top_elev,
+    n.ymax,
+    n.custom_ymax,
+    n.elev,
+    n.custom_elev,
+    n.sys_elev,
+    n.node_type,
+    n.nodecat_id,
+    man_netgully.gratecat_id,
+    (cat_grate.width / 100::numeric)::numeric(12,3) AS grate_width,
+    (cat_grate.length / 100::numeric)::numeric(12,3) AS grate_length,
+    n.sector_id,
+    n.macrosector_id,
+    n.expl_id,
+    n.state,
+    n.state_type,
+    n.the_geom,
+    man_netgully.units,
+    man_netgully.units_placement,
+    man_netgully.groove,
+    man_netgully.groove_height,
+    man_netgully.groove_length,
+    cat_grate.a_param,
+    cat_grate.b_param,
+        CASE
+            WHEN man_netgully.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.width / 100::numeric)::numeric(12,3)
+            WHEN man_netgully.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.length / 100::numeric)::numeric(12,3)
+            ELSE (cat_grate.width / 100::numeric)::numeric(12,3)
+        END AS total_width,
+        CASE
+            WHEN man_netgully.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.width / 100::numeric)::numeric(12,3)
+            WHEN man_netgully.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.length / 100::numeric)::numeric(12,3)
+            ELSE (cat_grate.length / 100::numeric)::numeric(12,3)
+        END AS total_length,
+    n.ymax - COALESCE(man_netgully.sander_depth, 0::numeric) AS depth,
+    n.annotation,
+    i.y0,
+    i.ysur,
+    i.apond,
+    i.outlet_type,
+    i.custom_width,
+    i.custom_length,
+    i.custom_depth,
+    i.method,
+    i.weir_cd,
+    i.orifice_cd,
+    i.custom_a_param,
+    i.custom_b_param,
+    i.efficiency
+   FROM v_sector_node
+     JOIN v_edit_node n USING (node_id)
+     JOIN inp_netgully i USING (node_id)
+     LEFT JOIN man_netgully USING (node_id)
+     LEFT JOIN cat_grate ON man_netgully.gratecat_id::text = cat_grate.id::text
+  WHERE n.is_operative IS TRUE;
+
+CREATE OR REPLACE VIEW v_edit_man_netelement
+AS SELECT v_edit_node.node_id,
+    v_edit_node.code,
+    v_edit_node.top_elev,
+    v_edit_node.custom_top_elev,
+    v_edit_node.ymax,
+    v_edit_node.custom_ymax,
+    v_edit_node.elev,
+    v_edit_node.custom_elev,
+        CASE
+            WHEN v_edit_node.sys_elev IS NOT NULL THEN v_edit_node.sys_elev
+            ELSE (v_edit_node.sys_top_elev - v_edit_node.sys_ymax)::numeric(12,3)
+        END AS sys_elev,
+    v_edit_node.node_type,
+    v_edit_node.nodecat_id,
+    v_edit_node.epa_type,
+    v_edit_node.sector_id,
+    v_edit_node.macrosector_id,
+    v_edit_node.state,
+    v_edit_node.state_type,
+    v_edit_node.annotation,
+    v_edit_node.observ,
+    v_edit_node.comment,
+    v_edit_node.dma_id,
+    v_edit_node.soilcat_id,
+    v_edit_node.function_type,
+    v_edit_node.category_type,
+    v_edit_node.fluid_type,
+    v_edit_node.location_type,
+    v_edit_node.workcat_id,
+    v_edit_node.workcat_id_end,
+    v_edit_node.buildercat_id,
+    v_edit_node.builtdate,
+    v_edit_node.enddate,
+    v_edit_node.ownercat_id,
+    v_edit_node.muni_id,
+    v_edit_node.postcode,
+    v_edit_node.district_id,
+    v_edit_node.streetname,
+    v_edit_node.postnumber,
+    v_edit_node.postcomplement,
+    v_edit_node.streetname2,
+    v_edit_node.postnumber2,
+    v_edit_node.postcomplement2,
+    v_edit_node.descript,
+    v_edit_node.rotation,
+    v_edit_node.svg,
+    v_edit_node.link,
+    v_edit_node.verified,
+    v_edit_node.undelete,
+    v_edit_node.label_x,
+    v_edit_node.label_y,
+    v_edit_node.label_rotation,
+    v_edit_node.publish,
+    v_edit_node.inventory,
+    v_edit_node.uncertain,
+    v_edit_node.xyz_date,
+    v_edit_node.unconnected,
+    v_edit_node.macrodma_id,
+    v_edit_node.expl_id,
+    v_edit_node.num_value,
+    v_edit_node.the_geom,
+    man_netelement.serial_number
+   FROM v_edit_node
+     JOIN man_netelement ON man_netelement.node_id::text = v_edit_node.node_id::text;
+
+CREATE OR REPLACE VIEW ve_pol_chamber
+AS SELECT polygon.pol_id,
+    polygon.feature_id AS node_id,
+    polygon.the_geom
+    FROM polygon
+  WHERE polygon.sys_type::text = 'CHAMBER'::text;
+
+CREATE OR REPLACE VIEW ve_pol_netgully
+AS SELECT polygon.pol_id,
+    polygon.feature_id AS node_id,
+    polygon.the_geom
+    FROM polygon
+  WHERE polygon.sys_type::text = 'NETGULLY'::text;
+
+CREATE OR REPLACE VIEW v_edit_inp_divider
+AS SELECT v_edit_node.node_id,
+    v_edit_node.top_elev,
+    v_edit_node.custom_top_elev,
+    v_edit_node.ymax,
+    v_edit_node.custom_ymax,
+    v_edit_node.elev,
+    v_edit_node.custom_elev,
+    v_edit_node.sys_elev,
+    v_edit_node.nodecat_id,
+    v_edit_node.sector_id,
+    v_edit_node.macrosector_id,
+    v_edit_node.state,
+    v_edit_node.state_type,
+    v_edit_node.annotation,
+    v_edit_node.expl_id,
+    inp_divider.divider_type,
+    inp_divider.arc_id,
+    inp_divider.curve_id,
+    inp_divider.qmin,
+    inp_divider.ht,
+    inp_divider.cd,
+    inp_divider.y0,
+    inp_divider.ysur,
+    inp_divider.apond,
+    v_edit_node.the_geom
+   FROM v_sector_node
+     JOIN v_edit_node USING (node_id)
+     JOIN inp_divider ON v_edit_node.node_id::text = inp_divider.node_id::text;
+
+
+
+CREATE OR REPLACE VIEW ve_pol_node
+AS SELECT polygon.pol_id,
+    polygon.feature_id,
+    polygon.featurecat_id,
+    polygon.state,
+    polygon.sys_type,
+    polygon.the_geom,
+    polygon.trace_featuregeom
+    FROM polygon
+     JOIN v_edit_node ON polygon.feature_id::text = v_edit_node.node_id::text;
+
+CREATE OR REPLACE VIEW ve_pol_storage
+AS SELECT polygon.pol_id,
+    polygon.feature_id AS node_id,
+    polygon.the_geom
+   FROM polygon
+  WHERE polygon.sys_type::text = 'STORAGE'::text;
+
+CREATE OR REPLACE VIEW ve_pol_wwtp
+AS SELECT polygon.pol_id,
+    polygon.feature_id AS node_id,
+    polygon.the_geom
+   FROM polygon
+  WHERE polygon.sys_type::text = 'WWTP'::text;
+
+CREATE OR REPLACE VIEW vi_coverages
+AS SELECT v_edit_inp_subcatchment.subc_id,
+    inp_coverage.landus_id,
+    inp_coverage.percent
+   FROM inp_coverage
+     JOIN v_edit_inp_subcatchment ON inp_coverage.subc_id::text = v_edit_inp_subcatchment.subc_id::text
+     LEFT JOIN ( SELECT DISTINCT ON (a.subc_id) a.subc_id,
+            v_edit_node.node_id
+           FROM ( SELECT unnest(inp_subcatchment.outlet_id::text[]) AS node_array,
+            inp_subcatchment.subc_id,
+            inp_subcatchment.outlet_id,
+            inp_subcatchment.rg_id,
+            inp_subcatchment.area,
+            inp_subcatchment.imperv,
+            inp_subcatchment.width,
+            inp_subcatchment.slope,
+            inp_subcatchment.clength,
+            inp_subcatchment.snow_id,
+            inp_subcatchment.nimp,
+            inp_subcatchment.nperv,
+            inp_subcatchment.simp,
+            inp_subcatchment.sperv,
+            inp_subcatchment.zero,
+            inp_subcatchment.routeto,
+            inp_subcatchment.rted,
+            inp_subcatchment.maxrate,
+            inp_subcatchment.minrate,
+            inp_subcatchment.decay,
+            inp_subcatchment.drytime,
+            inp_subcatchment.maxinfil,
+            inp_subcatchment.suction,
+            inp_subcatchment.conduct,
+            inp_subcatchment.initdef,
+            inp_subcatchment.curveno,
+            inp_subcatchment.conduct_2,
+            inp_subcatchment.drytime_2,
+            inp_subcatchment.sector_id,
+            inp_subcatchment.hydrology_id,
+            inp_subcatchment.the_geom,
+            inp_subcatchment.descript
+            FROM inp_subcatchment
+            WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text) a
+    JOIN v_edit_node ON v_edit_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text;
+
+CREATE OR REPLACE VIEW vi_groundwater
+AS SELECT inp_groundwater.subc_id,
+    inp_groundwater.aquif_id,
+    inp_groundwater.node_id,
+    inp_groundwater.surfel,
+    inp_groundwater.a1,
+    inp_groundwater.b1,
+    inp_groundwater.a2,
+    inp_groundwater.b2,
+    inp_groundwater.a3,
+    inp_groundwater.tw,
+    inp_groundwater.h
+   FROM v_edit_inp_subcatchment
+     JOIN inp_groundwater ON inp_groundwater.subc_id::text = v_edit_inp_subcatchment.subc_id::text
+     LEFT JOIN ( SELECT DISTINCT ON (a.subc_id) a.subc_id,
+            v_edit_node.node_id
+           FROM ( SELECT unnest(inp_subcatchment.outlet_id::text[]) AS node_array,
+            inp_subcatchment.subc_id,
+            inp_subcatchment.outlet_id,
+            inp_subcatchment.rg_id,
+            inp_subcatchment.area,
+            inp_subcatchment.imperv,
+            inp_subcatchment.width,
+            inp_subcatchment.slope,
+            inp_subcatchment.clength,
+            inp_subcatchment.snow_id,
+            inp_subcatchment.nimp,
+            inp_subcatchment.nperv,
+            inp_subcatchment.simp,
+            inp_subcatchment.sperv,
+            inp_subcatchment.zero,
+            inp_subcatchment.routeto,
+            inp_subcatchment.rted,
+            inp_subcatchment.maxrate,
+            inp_subcatchment.minrate,
+            inp_subcatchment.decay,
+            inp_subcatchment.drytime,
+            inp_subcatchment.maxinfil,
+            inp_subcatchment.suction,
+            inp_subcatchment.conduct,
+            inp_subcatchment.initdef,
+            inp_subcatchment.curveno,
+            inp_subcatchment.conduct_2,
+            inp_subcatchment.drytime_2,
+            inp_subcatchment.sector_id,
+            inp_subcatchment.hydrology_id,
+            inp_subcatchment.the_geom,
+            inp_subcatchment.descript
+           FROM inp_subcatchment
+          WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text) a
+         JOIN v_edit_node ON v_edit_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text;
+
+
+/*
+v_edit_inp_conduit
+v_ui_node_x_connection_downstream
+v_edit_inp_orifice
+v_edit_inp_outlet
+v_edit_inp_pump
+v_edit_inp_virtual
+v_edit_inp_weir
+*/
+
+CREATE OR REPLACE VIEW v_edit_inp_conduit
+AS SELECT v_edit_arc.arc_id,
+    v_edit_arc.node_1,
+    v_edit_arc.node_2,
+    v_edit_arc.y1,
+    v_edit_arc.custom_y1,
+    v_edit_arc.elev1,
+    v_edit_arc.custom_elev1,
+    v_edit_arc.sys_elev1,
+    v_edit_arc.y2,
+    v_edit_arc.custom_y2,
+    v_edit_arc.elev2,
+    v_edit_arc.custom_elev2,
+    v_edit_arc.sys_elev2,
+    v_edit_arc.arccat_id,
+    v_edit_arc.matcat_id,
+    v_edit_arc.cat_shape,
+    v_edit_arc.cat_geom1,
+    v_edit_arc.gis_length,
+    v_edit_arc.sector_id,
+    v_edit_arc.macrosector_id,
+    v_edit_arc.state,
+    v_edit_arc.state_type,
+    v_edit_arc.annotation,
+    v_edit_arc.inverted_slope,
+    v_edit_arc.custom_length,
+    v_edit_arc.expl_id,
+    inp_conduit.barrels,
+    inp_conduit.culvert,
+    inp_conduit.kentry,
+    inp_conduit.kexit,
+    inp_conduit.kavg,
+    inp_conduit.flap,
+    inp_conduit.q0,
+    inp_conduit.qmax,
+    inp_conduit.seepage,
+    inp_conduit.custom_n,
+    v_edit_arc.the_geom
+   FROM selector_sector,
+    v_edit_arc
+     JOIN inp_conduit USING (arc_id)
+  WHERE v_edit_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND v_edit_arc.is_operative IS TRUE;
+
+CREATE OR REPLACE VIEW v_ui_node_x_connection_downstream
+AS SELECT row_number() OVER (ORDER BY v_edit_arc.node_1) + 1000000 AS rid,
+    v_edit_arc.node_1 AS node_id,
+    v_edit_arc.arc_id AS feature_id,
+    v_edit_arc.code AS feature_code,
+    v_edit_arc.arc_type AS featurecat_id,
+    v_edit_arc.arccat_id,
+    v_edit_arc.y2 AS depth,
+    st_length2d(v_edit_arc.the_geom)::numeric(12,2) AS length,
+    node.node_id AS downstream_id,
+    node.code AS downstream_code,
+    node.node_type AS downstream_type,
+    v_edit_arc.y1 AS downstream_depth,
+    v_edit_arc.sys_type,
+    st_x(st_lineinterpolatepoint(v_edit_arc.the_geom, 0.5::double precision)) AS x,
+    st_y(st_lineinterpolatepoint(v_edit_arc.the_geom, 0.5::double precision)) AS y,
+    cat_arc.descript,
+    value_state.name AS state,
+    'v_edit_arc'::text AS sys_table_id
+   FROM v_edit_arc
+     JOIN node ON v_edit_arc.node_2::text = node.node_id::text
+     LEFT JOIN cat_arc ON v_edit_arc.arccat_id::text = cat_arc.id::text
+     JOIN value_state ON v_edit_arc.state = value_state.id;
+
+CREATE OR REPLACE VIEW v_edit_inp_orifice
+AS SELECT v_edit_arc.arc_id,
+    v_edit_arc.node_1,
+    v_edit_arc.node_2,
+    v_edit_arc.y1,
+    v_edit_arc.custom_y1,
+    v_edit_arc.elev1,
+    v_edit_arc.custom_elev1,
+    v_edit_arc.sys_elev1,
+    v_edit_arc.y2,
+    v_edit_arc.custom_y2,
+    v_edit_arc.elev2,
+    v_edit_arc.custom_elev2,
+    v_edit_arc.sys_elev2,
+    v_edit_arc.arccat_id,
+    v_edit_arc.gis_length,
+    v_edit_arc.sector_id,
+    v_edit_arc.macrosector_id,
+    v_edit_arc.state,
+    v_edit_arc.state_type,
+    v_edit_arc.annotation,
+    v_edit_arc.inverted_slope,
+    v_edit_arc.custom_length,
+    v_edit_arc.expl_id,
+    inp_orifice.ori_type,
+    inp_orifice.offsetval,
+    inp_orifice.cd,
+    inp_orifice.orate,
+    inp_orifice.flap,
+    inp_orifice.shape,
+    inp_orifice.geom1,
+    inp_orifice.geom2,
+    inp_orifice.geom3,
+    inp_orifice.geom4,
+    v_edit_arc.the_geom,
+    inp_orifice.close_time
+   FROM selector_sector,
+    v_edit_arc
+     JOIN inp_orifice USING (arc_id)
+  WHERE v_edit_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND v_edit_arc.is_operative IS TRUE;
+
+CREATE OR REPLACE VIEW v_edit_inp_outlet
+AS SELECT v_edit_arc.arc_id,
+    v_edit_arc.node_1,
+    v_edit_arc.node_2,
+    v_edit_arc.y1,
+    v_edit_arc.custom_y1,
+    v_edit_arc.elev1,
+    v_edit_arc.custom_elev1,
+    v_edit_arc.sys_elev1,
+    v_edit_arc.y2,
+    v_edit_arc.custom_y2,
+    v_edit_arc.elev2,
+    v_edit_arc.custom_elev2,
+    v_edit_arc.sys_elev2,
+    v_edit_arc.arccat_id,
+    v_edit_arc.gis_length,
+    v_edit_arc.sector_id,
+    v_edit_arc.macrosector_id,
+    v_edit_arc.state,
+    v_edit_arc.state_type,
+    v_edit_arc.annotation,
+    v_edit_arc.inverted_slope,
+    v_edit_arc.custom_length,
+    v_edit_arc.expl_id,
+    inp_outlet.outlet_type,
+    inp_outlet.offsetval,
+    inp_outlet.curve_id,
+    inp_outlet.cd1,
+    inp_outlet.cd2,
+    inp_outlet.flap,
+    v_edit_arc.the_geom
+   FROM selector_sector,
+    v_edit_arc
+     JOIN inp_outlet USING (arc_id)
+  WHERE v_edit_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND v_edit_arc.is_operative IS TRUE;
+
+CREATE OR REPLACE VIEW v_edit_inp_pump
+AS SELECT v_edit_arc.arc_id,
+    v_edit_arc.node_1,
+    v_edit_arc.node_2,
+    v_edit_arc.y1,
+    v_edit_arc.custom_y1,
+    v_edit_arc.elev1,
+    v_edit_arc.custom_elev1,
+    v_edit_arc.sys_elev1,
+    v_edit_arc.y2,
+    v_edit_arc.custom_y2,
+    v_edit_arc.elev2,
+    v_edit_arc.custom_elev2,
+    v_edit_arc.sys_elev2,
+    v_edit_arc.arccat_id,
+    v_edit_arc.gis_length,
+    v_edit_arc.sector_id,
+    v_edit_arc.macrosector_id,
+    v_edit_arc.state,
+    v_edit_arc.state_type,
+    v_edit_arc.annotation,
+    v_edit_arc.inverted_slope,
+    v_edit_arc.custom_length,
+    v_edit_arc.expl_id,
+    inp_pump.curve_id,
+    inp_pump.status,
+    inp_pump.startup,
+    inp_pump.shutoff,
+    v_edit_arc.the_geom
+   FROM selector_sector,
+    v_edit_arc
+     JOIN inp_pump USING (arc_id)
+  WHERE v_edit_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND v_edit_arc.is_operative IS TRUE;
+
+CREATE OR REPLACE VIEW v_edit_inp_virtual
+AS SELECT v_edit_arc.arc_id,
+    v_edit_arc.node_1,
+    v_edit_arc.node_2,
+    v_edit_arc.gis_length,
+    v_edit_arc.sector_id,
+    v_edit_arc.macrosector_id,
+    v_edit_arc.state,
+    v_edit_arc.state_type,
+    v_edit_arc.expl_id,
+    inp_virtual.fusion_node,
+    inp_virtual.add_length,
+    v_edit_arc.the_geom
+   FROM selector_sector,
+    v_edit_arc
+     JOIN inp_virtual USING (arc_id)
+  WHERE v_edit_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND v_edit_arc.is_operative IS TRUE;
+
+ CREATE OR REPLACE VIEW v_edit_inp_weir
+AS SELECT v_edit_arc.arc_id,
+    v_edit_arc.node_1,
+    v_edit_arc.node_2,
+    v_edit_arc.y1,
+    v_edit_arc.custom_y1,
+    v_edit_arc.elev1,
+    v_edit_arc.custom_elev1,
+    v_edit_arc.sys_elev1,
+    v_edit_arc.y2,
+    v_edit_arc.custom_y2,
+    v_edit_arc.elev2,
+    v_edit_arc.custom_elev2,
+    v_edit_arc.sys_elev2,
+    v_edit_arc.arccat_id,
+    v_edit_arc.gis_length,
+    v_edit_arc.sector_id,
+    v_edit_arc.macrosector_id,
+    v_edit_arc.state,
+    v_edit_arc.state_type,
+    v_edit_arc.annotation,
+    v_edit_arc.inverted_slope,
+    v_edit_arc.custom_length,
+    v_edit_arc.expl_id,
+    inp_weir.weir_type,
+    inp_weir.offsetval,
+    inp_weir.cd,
+    inp_weir.ec,
+    inp_weir.cd2,
+    inp_weir.flap,
+    inp_weir.geom1,
+    inp_weir.geom2,
+    inp_weir.geom3,
+    inp_weir.geom4,
+    inp_weir.surcharge,
+    v_edit_arc.the_geom,
+    inp_weir.road_width,
+    inp_weir.road_surf,
+    inp_weir.coef_curve
+   FROM selector_sector,
+    v_edit_arc
+     JOIN inp_weir USING (arc_id)
+  WHERE v_edit_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND v_edit_arc.is_operative IS TRUE;
+
+/*
+
+v_rtc_period_hydrometer
+
+*/
+
+CREATE OR REPLACE VIEW v_rtc_period_hydrometer
+AS SELECT ext_rtc_hydrometer.id AS hydrometer_id,
+    v_edit_connec.connec_id,
+    NULL::character varying(16) AS pjoint_id,
+    temp_arc.node_1,
+    temp_arc.node_2,
+    ext_cat_period.id AS period_id,
+    ext_cat_period.period_seconds,
+    c.dma_id,
+    c.effc::numeric(5,4) AS effc,
+    c.minc,
+    c.maxc,
+        CASE
+            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum
+            ELSE ext_rtc_hydrometer_x_data.sum
+        END AS m3_total_period,
+        CASE
+            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum * 1000::double precision / ext_cat_period.period_seconds::double precision
+            ELSE ext_rtc_hydrometer_x_data.sum * 1000::double precision / ext_cat_period.period_seconds::double precision
+        END AS lps_avg,
+    ext_rtc_hydrometer_x_data.pattern_id
+   FROM ext_rtc_hydrometer
+     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
+     JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
+     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
+     JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
+     JOIN temp_arc ON v_edit_connec.arc_id::text = temp_arc.arc_id::text
+     JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND c.dma_id::integer = v_edit_connec.dma_id
+  WHERE ext_cat_period.id::text = (( SELECT config_param_user.value
+           FROM config_param_user
+          WHERE config_param_user.cur_user::name = "current_user"() AND config_param_user.parameter::text = 'inp_options_rtc_period_id'::text))
+UNION
+ SELECT ext_rtc_hydrometer.id AS hydrometer_id,
+    v_edit_connec.connec_id,
+    temp_node.node_id AS pjoint_id,
+    NULL::character varying AS node_1,
+    NULL::character varying AS node_2,
+    ext_cat_period.id AS period_id,
+    ext_cat_period.period_seconds,
+    c.dma_id,
+    c.effc::numeric(5,4) AS effc,
+    c.minc,
+    c.maxc,
+        CASE
+            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum
+            ELSE ext_rtc_hydrometer_x_data.sum
+        END AS m3_total_period,
+        CASE
+            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum * 1000::double precision / ext_cat_period.period_seconds::double precision
+            ELSE ext_rtc_hydrometer_x_data.sum * 1000::double precision / ext_cat_period.period_seconds::double precision
+        END AS lps_avg,
+    ext_rtc_hydrometer_x_data.pattern_id
+   FROM ext_rtc_hydrometer
+     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
+     JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
+     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
+     LEFT JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
+     JOIN temp_node ON concat('VN', v_edit_connec.pjoint_id) = temp_node.node_id::text
+     JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND v_edit_connec.dma_id::text = c.dma_id::text
+  WHERE v_edit_connec.pjoint_type::text = 'VNODE'::text AND ext_cat_period.id::text = (( SELECT config_param_user.value
+           FROM config_param_user
+          WHERE config_param_user.cur_user::name = "current_user"() AND config_param_user.parameter::text = 'inp_options_rtc_period_id'::text))
+UNION
+ SELECT ext_rtc_hydrometer.id AS hydrometer_id,
+    v_edit_connec.connec_id,
+    temp_node.node_id AS pjoint_id,
+    NULL::character varying AS node_1,
+    NULL::character varying AS node_2,
+    ext_cat_period.id AS period_id,
+    ext_cat_period.period_seconds,
+    c.dma_id,
+    c.effc::numeric(5,4) AS effc,
+    c.minc,
+    c.maxc,
+        CASE
+            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum
+            ELSE ext_rtc_hydrometer_x_data.sum
+        END AS m3_total_period,
+        CASE
+            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum * 1000::double precision / ext_cat_period.period_seconds::double precision
+            ELSE ext_rtc_hydrometer_x_data.sum * 1000::double precision / ext_cat_period.period_seconds::double precision
+        END AS lps_avg,
+    ext_rtc_hydrometer_x_data.pattern_id
+   FROM ext_rtc_hydrometer
+     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
+     JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
+     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
+     LEFT JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
+     JOIN temp_node ON v_edit_connec.pjoint_id::text = temp_node.node_id::text
+     JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND v_edit_connec.dma_id::text = c.dma_id::text
+  WHERE v_edit_connec.pjoint_type::text = 'NODE'::text AND ext_cat_period.id::text = (( SELECT config_param_user.value
+           FROM config_param_user
+          WHERE config_param_user.cur_user::name = "current_user"() AND config_param_user.parameter::text = 'inp_options_rtc_period_id'::text));
+
+
+
+
+
+
+
+
+/*
+
+ve_pol_connec
+
+*/
+
+CREATE OR REPLACE VIEW ve_pol_connec
+AS SELECT polygon.pol_id,
+    polygon.feature_id,
+    polygon.featurecat_id,
+    polygon.state,
+    polygon.sys_type,
+    polygon.the_geom,
+    polygon.trace_featuregeom
+   FROM polygon
+     JOIN v_edit_connec ON polygon.feature_id::text = v_edit_connec.connec_id::text;
+
+/* v_plan_ + v_edit
+
+v_plan_node
+
+v_edit_node
+v_edit_arc
+v_edit_connec
+v_edit_gully
+
+*/
+
+CREATE OR REPLACE VIEW v_plan_node
+AS SELECT a.node_id,
+    a.nodecat_id,
+    a.node_type,
+    a.top_elev,
+    a.elev,
+    a.epa_type,
+    a.state,
+    a.sector_id,
+    a.expl_id,
+    a.annotation,
+    a.cost_unit,
+    a.descript,
+    a.cost,
+    a.measurement,
+    a.budget,
+    a.the_geom
+   FROM ( SELECT v_edit_node.node_id,
+            v_edit_node.nodecat_id,
+            v_edit_node.sys_type AS node_type,
+            v_edit_node.top_elev,
+            v_edit_node.elev,
+            v_edit_node.epa_type,
+            v_edit_node.state,
+            v_edit_node.sector_id,
+            v_edit_node.expl_id,
+            v_edit_node.annotation,
+            v_price_x_catnode.cost_unit,
+            v_price_compost.descript,
+            v_price_compost.price AS cost,
+                CASE
+                    WHEN v_price_x_catnode.cost_unit::text = 'u'::text THEN 1::numeric
+                    WHEN v_price_x_catnode.cost_unit::text = 'm3'::text THEN
+                    CASE
+                        WHEN v_edit_node.sys_type::text = 'STORAGE'::text THEN man_storage.max_volume
+                        WHEN v_edit_node.sys_type::text = 'CHAMBER'::text THEN man_chamber.max_volume
+                        ELSE NULL::numeric
+                    END
+                    WHEN v_price_x_catnode.cost_unit::text = 'm'::text THEN
+                    CASE
+                        WHEN v_edit_node.ymax = 0::numeric THEN v_price_x_catnode.estimated_y
+                        WHEN v_edit_node.ymax IS NULL THEN v_price_x_catnode.estimated_y
+                        ELSE v_edit_node.ymax
+                    END
+                    ELSE NULL::numeric
+                END::numeric(12,2) AS measurement,
+                CASE
+                    WHEN v_price_x_catnode.cost_unit::text = 'u'::text THEN v_price_x_catnode.cost
+                    WHEN v_price_x_catnode.cost_unit::text = 'm3'::text THEN
+                    CASE
+                        WHEN v_edit_node.sys_type::text = 'STORAGE'::text THEN man_storage.max_volume * v_price_x_catnode.cost
+                        WHEN v_edit_node.sys_type::text = 'CHAMBER'::text THEN man_chamber.max_volume * v_price_x_catnode.cost
+                        ELSE NULL::numeric
+                    END
+                    WHEN v_price_x_catnode.cost_unit::text = 'm'::text THEN
+                    CASE
+                        WHEN v_edit_node.ymax = 0::numeric THEN v_price_x_catnode.estimated_y * v_price_x_catnode.cost
+                        WHEN v_edit_node.ymax IS NULL THEN v_price_x_catnode.estimated_y * v_price_x_catnode.cost
+                        ELSE v_edit_node.ymax * v_price_x_catnode.cost
+                    END
+                    ELSE NULL::numeric
+                END::numeric(12,2) AS budget,
+            v_edit_node.the_geom
+           FROM v_edit_node
+             LEFT JOIN v_price_x_catnode ON v_edit_node.nodecat_id::text = v_price_x_catnode.id::text
+             LEFT JOIN man_chamber ON man_chamber.node_id::text = v_edit_node.node_id::text
+             LEFT JOIN man_storage ON man_storage.node_id::text = v_edit_node.node_id::text
+             LEFT JOIN cat_node ON cat_node.id::text = v_edit_node.nodecat_id::text
+             LEFT JOIN v_price_compost ON v_price_compost.id::text = cat_node.cost::text) a;
 
 CREATE OR REPLACE VIEW v_edit_node
 AS SELECT n.node_id,
@@ -1800,146 +3248,9 @@ AS SELECT DISTINCT ON (vu_link.link_id) vu_link.link_id,
    FROM vu_link
      JOIN v_state_link USING (link_id);
 
-CREATE OR REPLACE VIEW v_edit_gully
-AS WITH s AS (
-         SELECT selector_expl.expl_id
-           FROM selector_expl
-          WHERE selector_expl.cur_user = CURRENT_USER
-        )
- SELECT vu_gully.gully_id,
-    vu_gully.code,
-    vu_gully.top_elev,
-    vu_gully.ymax,
-    vu_gully.sandbox,
-    vu_gully.matcat_id,
-    vu_gully.gully_type,
-    vu_gully.sys_type,
-    vu_gully.gratecat_id,
-    vu_gully.cat_grate_matcat,
-    vu_gully.units,
-    vu_gully.groove,
-    vu_gully.siphon,
-    vu_gully.connec_arccat_id,
-    vu_gully.connec_length,
-    vu_gully.connec_depth,
-    v_state_gully.arc_id,
-    vu_gully.expl_id,
-    vu_gully.macroexpl_id,
-        CASE
-            WHEN a.sector_id IS NULL THEN vu_gully.sector_id
-            ELSE a.sector_id
-        END AS sector_id,
-        CASE
-            WHEN a.macrosector_id IS NULL THEN vu_gully.macrosector_id
-            ELSE a.macrosector_id
-        END AS macrosector_id,
-    vu_gully.state,
-    vu_gully.state_type,
-    vu_gully.annotation,
-    vu_gully.observ,
-    vu_gully.comment,
-        CASE
-            WHEN a.dma_id IS NULL THEN vu_gully.dma_id
-            ELSE a.dma_id
-        END AS dma_id,
-        CASE
-            WHEN a.macrodma_id IS NULL THEN vu_gully.macrodma_id
-            ELSE a.macrodma_id
-        END AS macrodma_id,
-    vu_gully.soilcat_id,
-    vu_gully.function_type,
-    vu_gully.category_type,
-    vu_gully.fluid_type,
-    vu_gully.location_type,
-    vu_gully.workcat_id,
-    vu_gully.workcat_id_end,
-    vu_gully.buildercat_id,
-    vu_gully.builtdate,
-    vu_gully.enddate,
-    vu_gully.ownercat_id,
-    vu_gully.muni_id,
-    vu_gully.postcode,
-    vu_gully.district_id,
-    vu_gully.streetname,
-    vu_gully.postnumber,
-    vu_gully.postcomplement,
-    vu_gully.streetname2,
-    vu_gully.postnumber2,
-    vu_gully.postcomplement2,
-    vu_gully.descript,
-    vu_gully.svg,
-    vu_gully.rotation,
-    vu_gully.link,
-    vu_gully.verified,
-    vu_gully.undelete,
-    vu_gully.label,
-    vu_gully.label_x,
-    vu_gully.label_y,
-    vu_gully.label_rotation,
-    vu_gully.publish,
-    vu_gully.inventory,
-    vu_gully.uncertain,
-    vu_gully.num_value,
-        CASE
-            WHEN a.exit_id IS NULL THEN vu_gully.pjoint_id
-            ELSE a.exit_id
-        END AS pjoint_id,
-        CASE
-            WHEN a.exit_type IS NULL THEN vu_gully.pjoint_type
-            ELSE a.exit_type
-        END AS pjoint_type,
-    vu_gully.tstamp,
-    vu_gully.insert_user,
-    vu_gully.lastupdate,
-    vu_gully.lastupdate_user,
-    vu_gully.the_geom,
-    vu_gully.workcat_id_plan,
-    vu_gully.asset_id,
-    vu_gully.connec_matcat_id,
-    vu_gully.gratecat2_id,
-    vu_gully.connec_y1,
-    vu_gully.connec_y2,
-    vu_gully.epa_type,
-    vu_gully.groove_height,
-    vu_gully.groove_length,
-    vu_gully.grate_width,
-    vu_gully.grate_length,
-    vu_gully.units_placement,
-    vu_gully.drainzone_id,
-    vu_gully.expl_id2,
-    vu_gully.is_operative,
-    vu_gully.region_id,
-    vu_gully.province_id,
-    vu_gully.adate,
-    vu_gully.adescript,
-    vu_gully.siphon_type,
-    vu_gully.odorflap
-   FROM s,
-    vu_gully
-     JOIN v_state_gully USING (gully_id)
-     LEFT JOIN ( SELECT DISTINCT ON (vu_link.feature_id) vu_link.link_id,
-            vu_link.feature_type,
-            vu_link.feature_id,
-            vu_link.exit_type,
-            vu_link.exit_id,
-            vu_link.state,
-            vu_link.expl_id,
-            vu_link.sector_id,
-            vu_link.dma_id,
-            vu_link.exit_topelev,
-            vu_link.exit_elev,
-            vu_link.fluid_type,
-            vu_link.gis_length,
-            vu_link.the_geom,
-            vu_link.sector_name,
-            vu_link.macrosector_id,
-            vu_link.macrodma_id
-           FROM vu_link,
-            s s_1
-          WHERE (vu_link.expl_id = s_1.expl_id OR vu_link.expl_id2 = s_1.expl_id) AND vu_link.state = 2) a ON a.feature_id::text = vu_gully.gully_id::text
-  WHERE vu_gully.expl_id = s.expl_id OR vu_gully.expl_id2 = s.expl_id;
 
-
+-- delete views definitibely
+-----------------------------------
 DROP VIEW IF EXISTS ve_arc;
 DROP VIEW IF EXISTS ve_node;
 DROP VIEW IF EXISTS ve_connec;
