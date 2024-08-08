@@ -110,3 +110,5 @@ UPDATE cat_arc SET visitability_vdef=1 WHERE visitability_vdef = 0; -- NO VISITA
 UPDATE config_form_fields SET "datatype" = 'integer', widgettype = 'combo', iseditable = true,
 hidden = false, dv_querytext = 'SELECT id, idval FROM edit_typevalue WHERE typevalue=''cat_arc_visibility_vdef'''
 WHERE columnname = 'visitability' AND "datatype" = 'boolean';
+
+UPDATE sys_table SET sys_role='role_edit' WHERE id='plan_psector_x_gully';
