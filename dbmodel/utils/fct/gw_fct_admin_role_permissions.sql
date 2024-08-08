@@ -84,13 +84,19 @@ BEGIN
 		GRANT role_admin TO postgres;
 	END IF;
 
+	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_system';
+	IF v_roleexists is null THEN
+		CREATE ROLE "role_system" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+		GRANT role_admin TO role_system;
+	END IF;
+
 	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_crm';
 	IF v_roleexists is null THEN
 		CREATE ROLE "role_crm" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
 	END IF;
 
 	-- Assign role admin to current user
-	IF 'role_admin' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) and 
+	IF 'role_admin' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) and
 	(select rolsuper from pg_roles where rolname = current_user) is true THEN
 		GRANT role_admin TO current_user;
 	END IF;

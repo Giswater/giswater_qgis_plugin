@@ -96,3 +96,22 @@ VALUES('v_ext_municipality', 'View of town cities and villages based filtered by
 
 UPDATE config_param_system SET value='{"sys_table_id":"v_ext_municipality", "sys_id_field":"muni_id", "sys_search_field":"name", "sys_geom_field":"the_geom"}'
 WHERE "parameter"='basic_search_muni';
+
+
+
+-- 08/08/2024
+ALTER TABLE sys_role DROP CONSTRAINT sys_role_check;
+ALTER TABLE sys_role
+ADD CONSTRAINT sys_role_check CHECK (id::text = ANY (ARRAY['role_admin'::character varying, 'role_basic'::character varying,
+'role_edit'::character varying, 'role_epa'::character varying, 'role_master'::character varying, 'role_om'::character varying,
+'role_crm'::character varying, 'role_system'::character varying]::text[]));
+
+INSERT INTO sys_role VALUES ('role_system', 'system');
+
+UPDATE sys_table SET sys_role = 'role_system' WHERE id = 'sys_feature_cat';
+UPDATE sys_table SET sys_role = 'role_system' WHERE id = 'sys_feature_epa_type';
+UPDATE sys_table SET sys_role = 'role_system' WHERE id = 'sys_feature_type';
+UPDATE sys_table SET sys_role = 'role_system' WHERE id = 'sys_role';
+UPDATE sys_table SET sys_role = 'role_system' WHERE id = 'sys_typevalue';
+UPDATE sys_table SET sys_role = 'role_system' WHERE id = 'sys_version';
+
