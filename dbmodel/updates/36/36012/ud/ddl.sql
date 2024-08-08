@@ -20,7 +20,3 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"audit_psec
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"audit_psector_node_traceability", "column":"placement_type", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"audit_psector_connec_traceability", "column":"placement_type", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"audit_psector_gully_traceability", "column":"placement_type", "dataType":"varchar(50)"}}$$);
-
-
--- SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"visitability", "dataType":"integer"}}$$);
--- SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"visitability_vdef", "dataType":"integer"}}$$);
