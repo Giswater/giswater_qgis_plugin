@@ -1790,13 +1790,14 @@ AS SELECT node.node_id,
     mu.region_id,
     mu.province_id,
     CASE
+    WHEN node.brand_id IS NULL THEN cat_node.brand_id
+    ELSE node.brand_id
+    END AS brand_id,
+    CASE
         WHEN node.model_id IS NULL THEN cat_node.model_id
         ELSE node.model_id
     END AS model_id,
-    CASE
-        WHEN node.brand_id IS NULL THEN cat_node.brand_id
-        ELSE node.brand_id
-    END AS brand_id
+    node.serial_number
    FROM node
      LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
      JOIN cat_feature ON cat_feature.id::text = cat_node.nodetype_id::text
@@ -1911,13 +1912,14 @@ AS SELECT arc.arc_id,
     mu.region_id,
     mu.province_id,
     CASE
+        WHEN arc.brand_id IS NULL THEN cat_arc.brand_id
+        ELSE arc.brand_id
+    END AS brand_id,
+    CASE
         WHEN arc.model_id IS NULL THEN cat_arc.model_id
         ELSE arc.model_id
     END AS model_id,
-    CASE
-        WHEN arc.brand_id IS NULL THEN cat_arc.brand_id
-        ELSE arc.brand_id
-    END AS brand_id
+    arc.serial_number
    FROM arc
      LEFT JOIN sector ON arc.sector_id = sector.sector_id
      LEFT JOIN exploitation ON arc.expl_id = exploitation.expl_id
@@ -2040,13 +2042,14 @@ AS SELECT connec.connec_id,
     mu.province_id,
     connec.plot_code,
     CASE
+        WHEN connec.brand_id IS NULL THEN cat_connec.brand_id
+        ELSE connec.brand_id
+    END AS brand_id,
+    CASE
         WHEN connec.model_id IS NULL THEN cat_connec.model_id
         ELSE connec.model_id
     END AS model_id,
-    CASE
-        WHEN connec.brand_id IS NULL THEN cat_connec.brand_id
-        ELSE connec.brand_id
-    END AS brand_id
+    connec.serial_number
    FROM connec
      LEFT JOIN ( SELECT connec_1.connec_id,
             count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
@@ -2170,7 +2173,8 @@ AS SELECT a.arc_id,
     a.region_id,
     a.province_id,
     a.brand_id,
-    a.model_id
+    a.model_id,
+    a.serial_number
    FROM ( SELECT selector_expl.expl_id
            FROM selector_expl
           WHERE selector_expl.cur_user = CURRENT_USER) s,
@@ -2282,7 +2286,8 @@ AS SELECT n.node_id,
     n.region_id,
     n.province_id,
     n.brand_id,
-    n.model_id
+    n.model_id,
+    n.serial_number
    FROM ( SELECT selector_expl.expl_id
            FROM selector_expl
           WHERE selector_expl.cur_user = CURRENT_USER) s,
@@ -2442,7 +2447,8 @@ AS WITH s AS (
     vu_connec.province_id,
     vu_connec.plot_code,
     vu_connec.brand_id,
-    vu_connec,model_id
+    vu_connec.model_id,
+    vu_connec.serial_number
    FROM s,
     vu_connec
      JOIN v_state_connec USING (connec_id)
