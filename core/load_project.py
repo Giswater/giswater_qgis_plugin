@@ -510,7 +510,7 @@ class GwLoadProject(QObject):
             self._enable_toolbar("epa")
             self._hide_button("308", False)
 
-        elif lib_vars.project_vars['project_role'] == 'role_master' or lib_vars.project_vars['project_role'] == 'role_admin':
+        elif lib_vars.project_vars['project_role'] == 'role_master' or lib_vars.project_vars['project_role'] == 'role_admin' or lib_vars.project_vars['project_role'] == 'role_system':
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
             self._enable_toolbar("cad")

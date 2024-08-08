@@ -2739,23 +2739,26 @@ def get_layers_from_feature_type(feature_type):
 
 def get_role_permissions(qgis_project_role):
 
+    role_admin = False
     role_master = False
     role_edit = False
     role_om = False
     role_epa = False
     role_basic = False
 
-    role_admin = tools_db.check_role_user("role_admin")
-    if not role_admin:
-        role_master = tools_db.check_role_user("role_master")
-        if not role_master:
-            role_epa = tools_db.check_role_user("role_epa")
-            if not role_epa:
-                role_edit = tools_db.check_role_user("role_edit")
-                if not role_edit:
-                    role_om = tools_db.check_role_user("role_om")
-                    if not role_om:
-                        role_basic = tools_db.check_role_user("role_basic")
+    role_system = tools_db.check_role_user("role_system")
+    if not role_system:
+        role_admin = tools_db.check_role_user("role_admin")
+        if not role_admin:
+            role_master = tools_db.check_role_user("role_master")
+            if not role_master:
+                role_epa = tools_db.check_role_user("role_epa")
+                if not role_epa:
+                    role_edit = tools_db.check_role_user("role_edit")
+                    if not role_edit:
+                        role_om = tools_db.check_role_user("role_om")
+                        if not role_om:
+                            role_basic = tools_db.check_role_user("role_basic")
 
     if role_basic or qgis_project_role == 'role_basic':
         return 'role_basic'
@@ -2769,6 +2772,8 @@ def get_role_permissions(qgis_project_role):
         return 'role_master'
     elif role_admin or qgis_project_role == 'role_admin':
         return 'role_admin'
+    elif role_system or qgis_project_role == 'role_system':
+        return 'role_system'
     else:
         return 'role_basic'
 
