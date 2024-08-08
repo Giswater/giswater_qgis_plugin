@@ -155,3 +155,122 @@ CREATE TABLE archived_rpt_node_stats (
 	CONSTRAINT archived_rpt_node_stats_pkey PRIMARY KEY (node_id, result_id),
 	CONSTRAINT archived_rpt_node_stats_result_id_fkey FOREIGN KEY (result_id) REFERENCES rpt_cat_result(result_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+DROP VIEW v_ui_plan_arc_cost;
+
+ALTER TABLE cat_brand ALTER COLUMN id TYPE character varying(50);
+ALTER TABLE cat_brand_model ALTER COLUMN id TYPE character varying(50);
+
+ALTER TABLE cat_arc ALTER COLUMN brand TYPE character varying(50);
+ALTER TABLE cat_arc ALTER COLUMN model TYPE character varying(50);
+
+ALTER TABLE cat_node ALTER COLUMN brand TYPE character varying(50);
+ALTER TABLE cat_node ALTER COLUMN model TYPE character varying(50);
+
+ALTER TABLE cat_connec ALTER COLUMN brand TYPE character varying(50);
+ALTER TABLE cat_connec ALTER COLUMN model TYPE character varying(50);
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"brand_id", "dataType":"varchar(50)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"model_id", "dataType":"varchar(50)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"serial_number", "dataType":"varchar(100)"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"brand_id", "dataType":"varchar(50)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"model_id", "dataType":"varchar(50)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"serial_number", "dataType":"varchar(100)"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"brand_id", "dataType":"varchar(50)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"model_id", "dataType":"varchar(50)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"serial_number", "dataType":"varchar(100)"}}$$);
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_arc_traceability", "column":"brand_id", "dataType":"varchar(50)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_arc_traceability", "column":"model_id", "dataType":"varchar(50)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_arc_traceability", "column":"serial_number", "dataType":"varchar(100)"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_node_traceability", "column":"brand_id", "dataType":"varchar(50)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_node_traceability", "column":"model_id", "dataType":"varchar(50)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_node_traceability", "column":"serial_number", "dataType":"varchar(100)"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_connec_traceability", "column":"brand_id", "dataType":"varchar(50)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_connec_traceability", "column":"model_id", "dataType":"varchar(50)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_connec_traceability", "column":"serial_number", "dataType":"varchar(100)"}}$$);
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_arc", "column":"brand", "newName":"brand_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_arc", "column":"model", "newName":"model_id"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_node", "column":"brand", "newName":"brand_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_node", "column":"model", "newName":"model_id"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_connec", "column":"brand", "newName":"brand_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_connec", "column":"model", "newName":"model_id"}}$$);
+
+
+-- man_greentap
+update connec c set brand_id = a.brand, model_id = a.model from (
+	select connec_id, brand, model from man_greentap
+)a where c.connec_id = a.connec_id;
+
+-- man_wjoin
+update connec c set brand_id = a.brand, model_id = a.model from (
+	select connec_id, brand, model from man_wjoin
+)a where c.connec_id = a.connec_id;
+
+-- man_hydrant
+update node n set brand_id = a.brand, model_id = a.model from (
+	select node_id, brand, model from man_hydrant
+)a where n.node_id = a.node_id;
+
+-- man_meter
+update node n set brand_id = a.brand, model_id = a.model from (
+	select node_id, brand, model from man_meter
+)a where n.node_id = a.node_id;
+
+-- man_netelement
+update node n set brand_id = a.brand, model_id = a.model from (
+	select node_id, brand, model from man_netelement
+)a where n.node_id = a.node_id;
+
+-- man_netwjoin
+update node n set brand_id = a.brand, model_id = a.model from (
+	select node_id, brand, model from man_netwjoin
+)a where n.node_id = a.node_id;
+
+-- man_pump
+update node n set brand_id = a.brand, model_id = a.model from (
+	select node_id, brand, model from man_pump
+)a where n.node_id = a.node_id;
+
+-- man_valve
+update node n set brand_id = a.brand, model_id = a.model from (
+	select node_id, brand, model from man_valve
+)a where n.node_id = a.node_id;
+ 
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_greentap", "column":"brand"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_greentap", "column":"model"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_wjoin", "column":"brand"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_wjoin", "column":"model"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_hydrant", "column":"brand"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_hydrant", "column":"model"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_meter", "column":"brand"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_meter", "column":"model"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_netelement", "column":"brand"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_netelement", "column":"model"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_netwjoin", "column":"brand"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_netwjoin", "column":"model"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_pump", "column":"brand"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_pump", "column":"model"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_valve", "column":"brand"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_valve", "column":"model"}}$$);
+
+

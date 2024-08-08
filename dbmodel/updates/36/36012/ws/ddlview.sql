@@ -1102,7 +1102,10 @@ AS SELECT v_edit_connec.connec_id,
   WHERE v_edit_connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
 
+
 -- v_plan / v_edit
+
+
 
 CREATE OR REPLACE VIEW v_plan_node
 AS SELECT a.node_id,
@@ -1432,6 +1435,641 @@ AS SELECT d.arc_id,
                   GROUP BY c.arc_id, p.price) v_plan_aux_arc_connec ON v_plan_aux_arc_connec.arc_id::text = v_plan_aux_arc_cost.arc_id::text) d
   WHERE d.arc_id IS NOT NULL;
 
+
+
+
+
+CREATE OR REPLACE VIEW v_ui_plan_arc_cost
+AS WITH p AS (
+         SELECT v_plan_arc.arc_id,
+            v_plan_arc.node_1,
+            v_plan_arc.node_2,
+            v_plan_arc.arc_type,
+            v_plan_arc.arccat_id,
+            v_plan_arc.epa_type,
+            v_plan_arc.state,
+            v_plan_arc.sector_id,
+            v_plan_arc.expl_id,
+            v_plan_arc.annotation,
+            v_plan_arc.soilcat_id,
+            v_plan_arc.y1,
+            v_plan_arc.y2,
+            v_plan_arc.mean_y,
+            v_plan_arc.z1,
+            v_plan_arc.z2,
+            v_plan_arc.thickness,
+            v_plan_arc.width,
+            v_plan_arc.b,
+            v_plan_arc.bulk,
+            v_plan_arc.geom1,
+            v_plan_arc.area,
+            v_plan_arc.y_param,
+            v_plan_arc.total_y,
+            v_plan_arc.rec_y,
+            v_plan_arc.geom1_ext,
+            v_plan_arc.calculed_y,
+            v_plan_arc.m3mlexc,
+            v_plan_arc.m2mltrenchl,
+            v_plan_arc.m2mlbottom,
+            v_plan_arc.m2mlpav,
+            v_plan_arc.m3mlprotec,
+            v_plan_arc.m3mlfill,
+            v_plan_arc.m3mlexcess,
+            v_plan_arc.m3exc_cost,
+            v_plan_arc.m2trenchl_cost,
+            v_plan_arc.m2bottom_cost,
+            v_plan_arc.m2pav_cost,
+            v_plan_arc.m3protec_cost,
+            v_plan_arc.m3fill_cost,
+            v_plan_arc.m3excess_cost,
+            v_plan_arc.cost_unit,
+            v_plan_arc.pav_cost,
+            v_plan_arc.exc_cost,
+            v_plan_arc.trenchl_cost,
+            v_plan_arc.base_cost,
+            v_plan_arc.protec_cost,
+            v_plan_arc.fill_cost,
+            v_plan_arc.excess_cost,
+            v_plan_arc.arc_cost,
+            v_plan_arc.cost,
+            v_plan_arc.length,
+            v_plan_arc.budget,
+            v_plan_arc.other_budget,
+            v_plan_arc.total_budget,
+            v_plan_arc.the_geom,
+            a.id,
+            a.arctype_id,
+            a.matcat_id,
+            a.pnom,
+            a.dnom,
+            a.dint,
+            a.dext,
+            a.descript,
+            a.link,
+            a.brand_id,
+            a.model_id,
+            a.svg,
+            a.z1,
+            a.z2,
+            a.width,
+            a.area,
+            a.estimated_depth,
+            a.bulk,
+            a.cost_unit,
+            a.cost,
+            a.m2bottom_cost,
+            a.m3protec_cost,
+            a.active,
+            a.label,
+            a.shape,
+            a.acoeff,
+            a.connect_cost,
+            s.id,
+            s.descript,
+            s.link,
+            s.y_param,
+            s.b,
+            s.trenchlining,
+            s.m3exc_cost,
+            s.m3fill_cost,
+            s.m3excess_cost,
+            s.m2trenchl_cost,
+            s.active,
+            a.cost AS cat_cost,
+            a.m2bottom_cost AS cat_m2bottom_cost,
+            a.connect_cost AS cat_connect_cost,
+            a.m3protec_cost AS cat_m3_protec_cost,
+            s.m3exc_cost AS cat_m3exc_cost,
+            s.m3fill_cost AS cat_m3fill_cost,
+            s.m3excess_cost AS cat_m3excess_cost,
+            s.m2trenchl_cost AS cat_m2trenchl_cost
+           FROM v_plan_arc
+             JOIN cat_arc a ON a.id::text = v_plan_arc.arccat_id::text
+             JOIN cat_soil s ON s.id::text = v_plan_arc.soilcat_id::text
+        )
+ SELECT p.arc_id,
+    1 AS orderby,
+    'element'::text AS identif,
+    p.arccat_id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    1 AS measurement,
+    1::numeric * v_price_compost.price AS total_cost,
+    p.length
+   FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, sector_id, expl_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, arctype_id, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, z1_1, z2_1, width_1, area_1, estimated_depth, bulk_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, shape, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
+     JOIN v_price_compost ON p.cat_cost::text = v_price_compost.id::text
+UNION
+ SELECT p.arc_id,
+    2 AS orderby,
+    'm2bottom'::text AS identif,
+    p.arccat_id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    p.m2mlbottom AS measurement,
+    p.m2mlbottom * v_price_compost.price AS total_cost,
+    p.length
+   FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, sector_id, expl_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, arctype_id, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, z1_1, z2_1, width_1, area_1, estimated_depth, bulk_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, shape, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
+     JOIN v_price_compost ON p.cat_m2bottom_cost::text = v_price_compost.id::text
+UNION
+ SELECT p.arc_id,
+    3 AS orderby,
+    'm3protec'::text AS identif,
+    p.arccat_id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    p.m3mlprotec AS measurement,
+    p.m3mlprotec * v_price_compost.price AS total_cost,
+    p.length
+   FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, sector_id, expl_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, arctype_id, matcat_id, pnom, dnom, dint, dext, descript, link, brand, model_id, svg, z1_1, z2_1, width_1, area_1, estimated_depth, bulk_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, shape, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
+     JOIN v_price_compost ON p.cat_m3_protec_cost::text = v_price_compost.id::text
+UNION
+ SELECT p.arc_id,
+    4 AS orderby,
+    'm3exc'::text AS identif,
+    p.soilcat_id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    p.m3mlexc AS measurement,
+    p.m3mlexc * v_price_compost.price AS total_cost,
+    p.length
+   FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, sector_id, expl_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, arctype_id, matcat_id, pnom, dnom, dint, dext, descript, link, brand, model_id, svg, z1_1, z2_1, width_1, area_1, estimated_depth, bulk_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, shape, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
+     JOIN v_price_compost ON p.cat_m3exc_cost::text = v_price_compost.id::text
+UNION
+ SELECT p.arc_id,
+    5 AS orderby,
+    'm3fill'::text AS identif,
+    p.soilcat_id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    p.m3mlfill AS measurement,
+    p.m3mlfill * v_price_compost.price AS total_cost,
+    p.length
+   FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, sector_id, expl_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, arctype_id, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, z1_1, z2_1, width_1, area_1, estimated_depth, bulk_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, shape, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
+     JOIN v_price_compost ON p.cat_m3fill_cost::text = v_price_compost.id::text
+UNION
+ SELECT p.arc_id,
+    6 AS orderby,
+    'm3excess'::text AS identif,
+    p.soilcat_id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    p.m3mlexcess AS measurement,
+    p.m3mlexcess * v_price_compost.price AS total_cost,
+    p.length
+   FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, sector_id, expl_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, arctype_id, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, z1_1, z2_1, width_1, area_1, estimated_depth, bulk_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, shape, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
+     JOIN v_price_compost ON p.cat_m3excess_cost::text = v_price_compost.id::text
+UNION
+ SELECT p.arc_id,
+    7 AS orderby,
+    'm2trenchl'::text AS identif,
+    p.soilcat_id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    p.m2mltrenchl AS measurement,
+    p.m2mltrenchl * v_price_compost.price AS total_cost,
+    p.length
+   FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, sector_id, expl_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, arctype_id, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, z1_1, z2_1, width_1, area_1, estimated_depth, bulk_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, shape, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
+     JOIN v_price_compost ON p.cat_m2trenchl_cost::text = v_price_compost.id::text
+UNION
+ SELECT p.arc_id,
+    8 AS orderby,
+    'pavement'::text AS identif,
+        CASE
+            WHEN a.price_id IS NULL THEN 'Various pavements'::character varying
+            ELSE a.pavcat_id
+        END AS catalog_id,
+        CASE
+            WHEN a.price_id IS NULL THEN 'Various prices'::character varying
+            ELSE a.pavcat_id
+        END AS price_id,
+    'm2'::character varying AS unit,
+        CASE
+            WHEN a.price_id IS NULL THEN 'Various prices'::character varying
+            ELSE a.pavcat_id
+        END AS descript,
+    a.m2pav_cost AS cost,
+    1 AS measurement,
+    a.m2pav_cost AS total_cost,
+    p.length
+   FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, sector_id, expl_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, arctype_id, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, z1_1, z2_1, width_1, area_1, estimated_depth, bulk_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, shape, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
+     JOIN v_plan_aux_arc_pavement a ON a.arc_id::text = p.arc_id::text
+     JOIN cat_pavement c ON a.pavcat_id::text = c.id::text
+     LEFT JOIN v_price_compost r ON a.price_id::text = c.m2_cost::text
+UNION
+ SELECT p.arc_id,
+    9 AS orderby,
+    'connec'::text AS identif,
+    'Various connecs'::character varying AS catalog_id,
+    'VARIOUS'::character varying AS price_id,
+    'PP'::character varying AS unit,
+    'Proportional cost of connec connections (pjoint cost)'::character varying AS descript,
+    min(v.price) AS cost,
+    count(v_edit_connec.connec_id) AS measurement,
+    (min(v.price) * count(v_edit_connec.connec_id)::numeric / COALESCE(min(p.length), 1::numeric))::numeric(12,2) AS total_cost,
+    min(p.length)::numeric(12,2) AS length
+   FROM p p(arc_id, node_1, node_2, arc_type, arccat_id, epa_type, state, sector_id, expl_id, annotation, soilcat_id, y1, y2, mean_y, z1, z2, thickness, width, b, bulk, geom1, area, y_param, total_y, rec_y, geom1_ext, calculed_y, m3mlexc, m2mltrenchl, m2mlbottom, m2mlpav, m3mlprotec, m3mlfill, m3mlexcess, m3exc_cost, m2trenchl_cost, m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost, trenchl_cost, base_cost, protec_cost, fill_cost, excess_cost, arc_cost, cost, length, budget, other_budget, total_budget, the_geom, id, arctype_id, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, z1_1, z2_1, width_1, area_1, estimated_depth, bulk_1, cost_unit_1, cost_1, m2bottom_cost_1, m3protec_cost_1, active, label, shape, acoeff, connect_cost, id_1, descript_1, link_1, y_param_1, b_1, trenchlining, m3exc_cost_1, m3fill_cost_1, m3excess_cost_1, m2trenchl_cost_1, active_1, cat_cost, cat_m2bottom_cost, cat_connect_cost, cat_m3_protec_cost, cat_m3exc_cost, cat_m3fill_cost, cat_m3excess_cost, cat_m2trenchl_cost)
+     JOIN v_edit_connec USING (arc_id)
+     JOIN v_price_compost v ON p.cat_connect_cost = v.id::text
+  GROUP BY p.arc_id
+  ORDER BY 1, 2;
+
+
+CREATE OR REPLACE VIEW vu_node
+AS SELECT node.node_id,
+    node.code,
+    node.elevation,
+    node.depth,
+    cat_node.nodetype_id AS node_type,
+    cat_feature.system_id AS sys_type,
+    node.nodecat_id,
+    cat_node.matcat_id AS cat_matcat_id,
+    cat_node.pnom AS cat_pnom,
+    cat_node.dnom AS cat_dnom,
+    node.epa_type,
+    node.expl_id,
+    exploitation.macroexpl_id,
+    node.sector_id,
+    sector.name AS sector_name,
+    sector.macrosector_id,
+    node.arc_id,
+    node.parent_id,
+    node.state,
+    node.state_type,
+    node.annotation,
+    node.observ,
+    node.comment,
+    node.minsector_id,
+    node.dma_id,
+    dma.name AS dma_name,
+    dma.macrodma_id,
+    node.presszone_id,
+    presszone.name AS presszone_name,
+    node.staticpressure,
+    node.dqa_id,
+    dqa.name AS dqa_name,
+    dqa.macrodqa_id,
+    node.soilcat_id,
+    node.function_type,
+    node.category_type,
+    node.fluid_type,
+    node.location_type,
+    node.workcat_id,
+    node.workcat_id_end,
+    node.builtdate,
+    node.enddate,
+    node.buildercat_id,
+    node.ownercat_id,
+    node.muni_id,
+    node.postcode,
+    node.district_id,
+    a.descript::character varying(100) AS streetname,
+    node.postnumber,
+    node.postcomplement,
+    b.descript::character varying(100) AS streetname2,
+    node.postnumber2,
+    node.postcomplement2,
+    node.descript,
+    cat_node.svg,
+    node.rotation,
+    concat(cat_feature.link_path, node.link) AS link,
+    node.verified,
+    node.undelete,
+    cat_node.label,
+    node.label_x,
+    node.label_y,
+    node.label_rotation,
+    node.publish,
+    node.inventory,
+    node.hemisphere,
+    node.num_value,
+    cat_node.nodetype_id,
+    date_trunc('second'::text, node.tstamp) AS tstamp,
+    node.insert_user,
+    date_trunc('second'::text, node.lastupdate) AS lastupdate,
+    node.lastupdate_user,
+    node.the_geom,
+    node.adate,
+    node.adescript,
+    node.accessibility,
+    dma.stylesheet ->> 'featureColor'::text AS dma_style,
+    presszone.stylesheet ->> 'featureColor'::text AS presszone_style,
+    node.workcat_id_plan,
+    node.asset_id,
+    node.om_state,
+    node.conserv_state,
+    node.access_type,
+    node.placement_type,
+    e.demand_max,
+    e.demand_min,
+    e.demand_avg,
+    e.press_max,
+    e.press_min,
+    e.press_avg,
+    e.head_max,
+    e.head_min,
+    e.head_avg,
+    e.quality_max,
+    e.quality_min,
+    e.quality_avg,
+    node.expl_id2,
+    vst.is_operative,
+    mu.region_id,
+    mu.province_id,
+    CASE
+        WHEN node.model_id IS NULL THEN cat_node.model_id
+        ELSE node.model_id
+    END AS model_id,
+    CASE
+        WHEN node.brand_id IS NULL THEN cat_node.brand_id
+        ELSE node.brand_id
+    END AS brand_id
+   FROM node
+     LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
+     JOIN cat_feature ON cat_feature.id::text = cat_node.nodetype_id::text
+     LEFT JOIN dma ON node.dma_id = dma.dma_id
+     LEFT JOIN sector ON node.sector_id = sector.sector_id
+     LEFT JOIN exploitation ON node.expl_id = exploitation.expl_id
+     LEFT JOIN dqa ON node.dqa_id = dqa.dqa_id
+     LEFT JOIN presszone ON presszone.presszone_id::text = node.presszone_id::text
+     LEFT JOIN v_ext_streetaxis a ON a.id::text = node.streetaxis_id::text
+     LEFT JOIN v_ext_streetaxis b ON b.id::text = node.streetaxis2_id::text
+     LEFT JOIN node_add e ON e.node_id::text = node.node_id::text
+     LEFT JOIN value_state_type vst ON vst.id = node.state_type
+     LEFT JOIN ext_municipality mu ON node.muni_id = mu.muni_id;
+
+CREATE OR REPLACE VIEW vu_arc
+AS SELECT arc.arc_id,
+    arc.code,
+    arc.node_1,
+    arc.node_2,
+    arc.elevation1,
+    arc.depth1,
+    arc.elevation2,
+    arc.depth2,
+    arc.arccat_id,
+    cat_arc.arctype_id AS arc_type,
+    cat_feature.system_id AS sys_type,
+    cat_arc.matcat_id AS cat_matcat_id,
+    cat_arc.pnom AS cat_pnom,
+    cat_arc.dnom AS cat_dnom,
+    arc.epa_type,
+    arc.expl_id,
+    exploitation.macroexpl_id,
+    arc.sector_id,
+    sector.name AS sector_name,
+    sector.macrosector_id,
+    arc.state,
+    arc.state_type,
+    arc.annotation,
+    arc.observ,
+    arc.comment,
+    st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
+    arc.custom_length,
+    arc.minsector_id,
+    arc.dma_id,
+    dma.name AS dma_name,
+    dma.macrodma_id,
+    arc.presszone_id,
+    presszone.name AS presszone_name,
+    arc.dqa_id,
+    dqa.name AS dqa_name,
+    dqa.macrodqa_id,
+    arc.soilcat_id,
+    arc.function_type,
+    arc.category_type,
+    arc.fluid_type,
+    arc.location_type,
+    arc.workcat_id,
+    arc.workcat_id_end,
+    arc.buildercat_id,
+    arc.builtdate,
+    arc.enddate,
+    arc.ownercat_id,
+    arc.muni_id,
+    arc.postcode,
+    arc.district_id,
+    c.descript::character varying(100) AS streetname,
+    arc.postnumber,
+    arc.postcomplement,
+    d.descript::character varying(100) AS streetname2,
+    arc.postnumber2,
+    arc.postcomplement2,
+    arc.descript,
+    concat(cat_feature.link_path, arc.link) AS link,
+    arc.verified,
+    arc.undelete,
+    cat_arc.label,
+    arc.label_x,
+    arc.label_y,
+    arc.label_rotation,
+    arc.publish,
+    arc.inventory,
+    arc.num_value,
+    cat_arc.arctype_id AS cat_arctype_id,
+    arc.nodetype_1,
+    arc.staticpress1,
+    arc.nodetype_2,
+    arc.staticpress2,
+    date_trunc('second'::text, arc.tstamp) AS tstamp,
+    arc.insert_user,
+    date_trunc('second'::text, arc.lastupdate) AS lastupdate,
+    arc.lastupdate_user,
+    arc.the_geom,
+    arc.depth,
+    arc.adate,
+    arc.adescript,
+    dma.stylesheet ->> 'featureColor'::text AS dma_style,
+    presszone.stylesheet ->> 'featureColor'::text AS presszone_style,
+    arc.workcat_id_plan,
+    arc.asset_id,
+    arc.pavcat_id,
+    arc.om_state,
+    arc.conserv_state,
+    e.flow_max,
+    e.flow_min,
+    e.flow_avg,
+    e.vel_max,
+    e.vel_min,
+    e.vel_avg,
+    arc.parent_id,
+    arc.expl_id2,
+    vst.is_operative,
+    mu.region_id,
+    mu.province_id,
+    CASE
+        WHEN arc.model_id IS NULL THEN cat_arc.model_id
+        ELSE arc.model_id
+    END AS model_id,
+    CASE
+        WHEN arc.brand_id IS NULL THEN cat_arc.brand_id
+        ELSE arc.brand_id
+    END AS brand_id
+   FROM arc
+     LEFT JOIN sector ON arc.sector_id = sector.sector_id
+     LEFT JOIN exploitation ON arc.expl_id = exploitation.expl_id
+     LEFT JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
+     JOIN cat_feature ON cat_feature.id::text = cat_arc.arctype_id::text
+     LEFT JOIN dma ON arc.dma_id = dma.dma_id
+     LEFT JOIN dqa ON arc.dqa_id = dqa.dqa_id
+     LEFT JOIN presszone ON presszone.presszone_id::text = arc.presszone_id::text
+     LEFT JOIN v_ext_streetaxis c ON c.id::text = arc.streetaxis_id::text
+     LEFT JOIN v_ext_streetaxis d ON d.id::text = arc.streetaxis2_id::text
+     LEFT JOIN arc_add e ON arc.arc_id::text = e.arc_id::text
+     LEFT JOIN value_state_type vst ON vst.id = arc.state_type
+     LEFT JOIN ext_municipality mu ON arc.muni_id = mu.muni_id;
+
+
+CREATE OR REPLACE VIEW vu_connec
+AS SELECT connec.connec_id,
+    connec.code,
+    connec.elevation,
+    connec.depth,
+    cat_connec.connectype_id AS connec_type,
+    cat_feature.system_id AS sys_type,
+    connec.connecat_id,
+    connec.expl_id,
+    exploitation.macroexpl_id,
+    connec.sector_id,
+    sector.name AS sector_name,
+    sector.macrosector_id,
+    connec.customer_code,
+    cat_connec.matcat_id AS cat_matcat_id,
+    cat_connec.pnom AS cat_pnom,
+    cat_connec.dnom AS cat_dnom,
+    connec.connec_length,
+    connec.state,
+    connec.state_type,
+    a.n_hydrometer,
+    connec.arc_id,
+    connec.annotation,
+    connec.observ,
+    connec.comment,
+    connec.minsector_id,
+    connec.dma_id,
+    dma.name AS dma_name,
+    dma.macrodma_id,
+    connec.presszone_id,
+    presszone.name AS presszone_name,
+    connec.staticpressure,
+    connec.dqa_id,
+    dqa.name AS dqa_name,
+    dqa.macrodqa_id,
+    connec.soilcat_id,
+    connec.function_type,
+    connec.category_type,
+    connec.fluid_type,
+    connec.location_type,
+    connec.workcat_id,
+    connec.workcat_id_end,
+    connec.buildercat_id,
+    connec.builtdate,
+    connec.enddate,
+    connec.ownercat_id,
+    connec.muni_id,
+    connec.postcode,
+    connec.district_id,
+    c.descript::character varying(100) AS streetname,
+    connec.postnumber,
+    connec.postcomplement,
+    b.descript::character varying(100) AS streetname2,
+    connec.postnumber2,
+    connec.postcomplement2,
+    connec.descript,
+    cat_connec.svg,
+    connec.rotation,
+    concat(cat_feature.link_path, connec.link) AS link,
+    connec.verified,
+    connec.undelete,
+    cat_connec.label,
+    connec.label_x,
+    connec.label_y,
+    connec.label_rotation,
+    connec.publish,
+    connec.inventory,
+    connec.num_value,
+    cat_connec.connectype_id,
+    connec.pjoint_id,
+    connec.pjoint_type,
+    date_trunc('second'::text, connec.tstamp) AS tstamp,
+    connec.insert_user,
+    date_trunc('second'::text, connec.lastupdate) AS lastupdate,
+    connec.lastupdate_user,
+    connec.the_geom,
+    connec.adate,
+    connec.adescript,
+    connec.accessibility,
+    dma.stylesheet ->> 'featureColor'::text AS dma_style,
+    presszone.stylesheet ->> 'featureColor'::text AS presszone_style,
+    connec.workcat_id_plan,
+    connec.asset_id,
+    connec.epa_type,
+    connec.om_state,
+    connec.conserv_state,
+    connec.priority,
+    connec.valve_location,
+    connec.valve_type,
+    connec.shutoff_valve,
+    connec.access_type,
+    connec.placement_type,
+    connec.crmzone_id,
+    crm_zone.name AS crmzone_name,
+    e.press_max,
+    e.press_min,
+    e.press_avg,
+    e.demand,
+    connec.expl_id2,
+    e.quality_max,
+    e.quality_min,
+    e.quality_avg,
+    vst.is_operative,
+    mu.region_id,
+    mu.province_id,
+    connec.plot_code,
+    CASE
+        WHEN connec.model_id IS NULL THEN cat_connec.model_id
+        ELSE connec.model_id
+    END AS model_id,
+    CASE
+        WHEN connec.brand_id IS NULL THEN cat_connec.brand_id
+        ELSE connec.brand_id
+    END AS brand_id
+   FROM connec
+     LEFT JOIN ( SELECT connec_1.connec_id,
+            count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
+           FROM selector_hydrometer,
+            ext_rtc_hydrometer
+             JOIN connec connec_1 ON ext_rtc_hydrometer.connec_id::text = connec_1.customer_code::text
+          WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = "current_user"()::text
+          GROUP BY connec_1.connec_id) a USING (connec_id)
+     JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
+     JOIN cat_feature ON cat_feature.id::text = cat_connec.connectype_id::text
+     LEFT JOIN dma ON connec.dma_id = dma.dma_id
+     LEFT JOIN sector ON connec.sector_id = sector.sector_id
+     LEFT JOIN exploitation ON connec.expl_id = exploitation.expl_id
+     LEFT JOIN dqa ON connec.dqa_id = dqa.dqa_id
+     LEFT JOIN presszone ON presszone.presszone_id::text = connec.presszone_id::text
+     LEFT JOIN crm_zone ON crm_zone.id::text = connec.crmzone_id::text
+     LEFT JOIN v_ext_streetaxis c ON c.id::text = connec.streetaxis_id::text
+     LEFT JOIN v_ext_streetaxis b ON b.id::text = connec.streetaxis2_id::text
+     LEFT JOIN connec_add e ON e.connec_id::text = connec.connec_id::text
+     LEFT JOIN value_state_type vst ON vst.id = connec.state_type
+     LEFT JOIN ext_municipality mu ON connec.muni_id = mu.muni_id;
+
+
 CREATE OR REPLACE VIEW v_edit_arc
 AS SELECT a.arc_id,
     a.code,
@@ -1530,7 +2168,9 @@ AS SELECT a.arc_id,
     a.expl_id2,
     a.is_operative,
     a.region_id,
-    a.province_id
+    a.province_id,
+    a.brand_id,
+    a.model_id
    FROM ( SELECT selector_expl.expl_id
            FROM selector_expl
           WHERE selector_expl.cur_user = CURRENT_USER) s,
@@ -1539,8 +2179,7 @@ AS SELECT a.arc_id,
   WHERE a.expl_id = s.expl_id OR a.expl_id2 = s.expl_id;
 
 CREATE OR REPLACE VIEW v_edit_node
-AS 
-SELECT n.node_id,
+AS SELECT n.node_id,
     n.code,
     n.elevation,
     n.depth,
@@ -1641,7 +2280,9 @@ SELECT n.node_id,
     n.expl_id2,
     n.is_operative,
     n.region_id,
-    n.province_id
+    n.province_id,
+    n.brand_id,
+    n.model_id
    FROM ( SELECT selector_expl.expl_id
            FROM selector_expl
           WHERE selector_expl.cur_user = CURRENT_USER) s,
@@ -1799,7 +2440,9 @@ AS WITH s AS (
     vu_connec.is_operative,
     vu_connec.region_id,
     vu_connec.province_id,
-    vu_connec.plot_code
+    vu_connec.plot_code,
+    vu_connec.brand_id,
+    vu_connec,model_id
    FROM s,
     vu_connec
      JOIN v_state_connec USING (connec_id)
@@ -1873,9 +2516,10 @@ AS SELECT vu_link.link_id,
    FROM vu_link
      JOIN v_state_link USING (link_id);
 
-DROP VIEW IF EXISTS ve_connec;
-DROP VIEW IF EXISTS ve_arc;
-DROP VIEW IF EXISTS ve_node;
+
+DROP VIEW IF EXISTS ve_connec cascade;
+DROP VIEW IF EXISTS ve_arc cascade;
+DROP VIEW IF EXISTS ve_node cascade;
 
 DROP VIEW IF EXISTS v_link;
 DROP VIEW IF EXISTS v_connec;
