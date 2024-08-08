@@ -115,3 +115,4 @@ UPDATE sys_table SET sys_role = 'role_system' WHERE id = 'sys_role';
 UPDATE sys_table SET sys_role = 'role_system' WHERE id = 'sys_typevalue';
 UPDATE sys_table SET sys_role = 'role_system' WHERE id = 'sys_version';
 
+DELETE FROM sys_function WHERE function_name = 'gw_fct_admin_manage_roles';
