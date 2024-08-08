@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_link_data() RETURNS trigger AS $BODY$
-DECLARE     
+DECLARE
 v_projecttype text;
 v_feature_type text;
 
@@ -22,9 +22,9 @@ BEGIN
 	v_feature_type = upper(TG_ARGV[0]);
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-			
+
 		IF v_feature_type = 'LINK' THEN
-	  
+
 			IF v_projecttype = 'WS' THEN
 				UPDATE link l SET epa_type = c.epa_type, is_operative = v.is_operative, expl_id2 = c.expl_id2, connecat_id = c.connecat_id, fluid_type = c.fluid_type
 				FROM connec c
@@ -38,6 +38,13 @@ BEGIN
 				FROM connec c
 				JOIN value_state_type v ON v.id = c.state_type WHERE l.feature_id = c.connec_id AND c.connec_id = NEW.feature_id AND l.state > 0 AND link_id = NEW.link_id;
 			END IF;
+
+			IF (SELECT value::boolean FROM config_param_system WHERE parameter ='edit_link_autoupdate_connect_length') IS true AND NEW.uncertain IS FALSE THEN
+				UPDATE connec c SET connec_length = st_length(NEW.the_geom) WHERE c.connec_id = NEW.feature_id AND l.state > 0 AND link_id = NEW.link_id;
+				IF v_projecttype = 'UD' THEN
+					UPDATE gully g SET connec_length = st_length(NEW.the_geom) WHERE g.gully_id = NEW.feature_id AND l.state > 0 AND link_id = NEW.link_id;
+				END IF;
+			END IF;
 		END IF;
 	END IF;
 
@@ -45,16 +52,16 @@ BEGIN
 
 		IF v_feature_type = 'CONNEC'  THEN
 
-			IF v_projecttype = 'WS' THEN  
+			IF v_projecttype = 'WS' THEN
 				UPDATE link SET epa_type = NEW.epa_type, is_operative = v.is_operative, expl_id2 = NEW.expl_id2, connecat_id = NEW.connecat_id, fluid_type = NEW.fluid_type
 				FROM value_state_type v WHERE id = NEW.state_type AND feature_id = NEW.connec_id;
 			ELSE
 				UPDATE link SET is_operative = v.is_operative, expl_id2 = NEW.expl_id2, connecat_id = NEW.connecat_id, fluid_type = NEW.fluid_type
 				FROM value_state_type v WHERE id = NEW.state_type AND feature_id = NEW.connec_id;
 			END IF;
-			
+
 		ELSIF v_feature_type = 'GULLY' THEN
-		
+
 			UPDATE link SET epa_type = NEW.epa_type, is_operative = v.is_operative, expl_id2 = NEW.expl_id2, connecat_id = NEW.connec_arccat_id, fluid_type = NEW.fluid_type
 			FROM value_state_type v WHERE id = NEW.state_type AND feature_id = NEW.gully_id;
 
@@ -63,15 +70,15 @@ BEGIN
 			UPDATE link SET lastupdate = now(), lastupdate_user = current_user WHERE link_id = NEW.link_id;
 		END IF;
 	END IF;
-	  
-	RETURN NEW;    
-    
+
+	RETURN NEW;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
-  
+
 
 
 

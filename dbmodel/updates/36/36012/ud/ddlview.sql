@@ -3093,39 +3093,6 @@ AS WITH s AS (
           WHERE (vu_link.expl_id = s_1.expl_id OR vu_link.expl_id2 = s_1.expl_id) AND vu_link.state = 2) a ON a.feature_id::text = vu_connec.connec_id::text
   WHERE vu_connec.expl_id = s.expl_id OR vu_connec.expl_id2 = s.expl_id;
 
-CREATE OR REPLACE VIEW v_edit_link
-AS SELECT DISTINCT ON (vu_link.link_id) vu_link.link_id,
-    vu_link.feature_type,
-    vu_link.feature_id,
-    vu_link.exit_type,
-    vu_link.exit_id,
-    vu_link.state,
-    vu_link.expl_id,
-    vu_link.sector_id,
-    vu_link.dma_id,
-    vu_link.exit_topelev,
-    vu_link.exit_elev,
-    vu_link.fluid_type,
-    vu_link.gis_length,
-    vu_link.the_geom,
-    vu_link.sector_name,
-    vu_link.macrosector_id,
-    vu_link.macrodma_id,
-    vu_link.expl_id2,
-    vu_link.epa_type,
-    vu_link.is_operative,
-    vu_link.drainzone_id,
-    vu_link.drainzone_name,
-    vu_link.connecat_id,
-    vu_link.workcat_id,
-    vu_link.workcat_id_end,
-    vu_link.builtdate,
-    vu_link.enddate,
-    vu_link.lastupdate,
-    vu_link.lastupdate_user
-   FROM vu_link
-     JOIN v_state_link USING (link_id);
-
 
 /*
 v_edit_inp_outfall
@@ -3746,6 +3713,210 @@ AS SELECT a.node_id,
              LEFT JOIN man_storage ON man_storage.node_id::text = v_edit_node.node_id::text
              LEFT JOIN cat_node ON cat_node.id::text = v_edit_node.nodecat_id::text
              LEFT JOIN v_price_compost ON v_price_compost.id::text = cat_node.cost::text) a;
+
+CREATE OR REPLACE VIEW vu_link
+AS SELECT l.link_id,
+    l.feature_type,
+    l.feature_id,
+    l.exit_type,
+    l.exit_id,
+    l.state,
+    l.expl_id,
+    l.sector_id,
+    l.dma_id,
+    l.exit_topelev,
+    l.exit_elev,
+    l.fluid_type,
+    st_length2d(l.the_geom)::numeric(12,3) AS gis_length,
+    l.the_geom,
+    s.name AS sector_name,
+    s.macrosector_id,
+    d.macrodma_id,
+    l.expl_id2,
+    l.epa_type,
+    l.is_operative,
+    l.drainzone_id,
+    r.name AS drainzone_name,
+    l.connecat_id,
+    l.workcat_id,
+    l.workcat_id_end,
+    l.builtdate,
+    l.enddate,
+    date_trunc('second'::text, l.lastupdate) AS lastupdate,
+    l.lastupdate_user,
+    l.uncertain
+   FROM link l
+     LEFT JOIN sector s USING (sector_id)
+     LEFT JOIN dma d USING (dma_id)
+     LEFT JOIN drainzone r USING (drainzone_id);
+
+CREATE OR REPLACE VIEW vu_link_connec
+AS SELECT l.link_id,
+    l.feature_type,
+    l.feature_id,
+    l.exit_type,
+    l.exit_id,
+    l.state,
+    l.expl_id,
+    l.sector_id,
+    l.dma_id,
+    l.exit_topelev,
+    l.exit_elev,
+    l.fluid_type,
+    st_length2d(l.the_geom)::numeric(12,3) AS gis_length,
+    l.the_geom,
+    s.name AS sector_name,
+    s.macrosector_id,
+    d.macrodma_id,
+    l.uncertain
+   FROM link l
+     LEFT JOIN sector s USING (sector_id)
+     LEFT JOIN dma d USING (dma_id)
+  WHERE l.feature_type::text = 'CONNEC'::text;
+
+CREATE OR REPLACE VIEW vu_link_gully
+AS SELECT l.link_id,
+    l.feature_type,
+    l.feature_id,
+    l.exit_type,
+    l.exit_id,
+    l.state,
+    l.expl_id,
+    l.sector_id,
+    l.dma_id,
+    l.exit_topelev,
+    l.exit_elev,
+    l.fluid_type,
+    st_length2d(l.the_geom)::numeric(12,3) AS gis_length,
+    l.the_geom,
+    s.name AS sector_name,
+    s.macrosector_id,
+    d.macrodma_id,
+    l.uncertain
+   FROM link l
+     LEFT JOIN sector s USING (sector_id)
+     LEFT JOIN dma d USING (dma_id)
+   WHERE l.feature_type::text = 'GULLY'::text;
+
+CREATE OR REPLACE VIEW v_link_connec
+AS SELECT DISTINCT ON (vu_link_connec.link_id) vu_link_connec.link_id,
+    vu_link_connec.feature_type,
+    vu_link_connec.feature_id,
+    vu_link_connec.exit_type,
+    vu_link_connec.exit_id,
+    vu_link_connec.state,
+    vu_link_connec.expl_id,
+    vu_link_connec.sector_id,
+    vu_link_connec.dma_id,
+    vu_link_connec.exit_topelev,
+    vu_link_connec.exit_elev,
+    vu_link_connec.fluid_type,
+    vu_link_connec.gis_length,
+    vu_link_connec.the_geom,
+    vu_link_connec.sector_name,
+    vu_link_connec.macrosector_id,
+    vu_link_connec.macrodma_id,
+    vu_link_connec.uncertain
+   FROM vu_link_connec
+     JOIN v_state_link_connec USING (link_id);
+
+CREATE OR REPLACE VIEW v_link_gully
+AS SELECT DISTINCT ON (vu_link_gully.link_id) vu_link_gully.link_id,
+    vu_link_gully.feature_type,
+    vu_link_gully.feature_id,
+    vu_link_gully.exit_type,
+    vu_link_gully.exit_id,
+    vu_link_gully.state,
+    vu_link_gully.expl_id,
+    vu_link_gully.sector_id,
+    vu_link_gully.dma_id,
+    vu_link_gully.exit_topelev,
+    vu_link_gully.exit_elev,
+    vu_link_gully.fluid_type,
+    vu_link_gully.gis_length,
+    vu_link_gully.the_geom,
+    vu_link_gully.sector_name,
+    vu_link_gully.macrosector_id,
+    vu_link_gully.macrodma_id,
+    vu_link_gully.uncertain
+   FROM vu_link_gully
+     JOIN v_state_link_gully USING (link_id);
+
+CREATE OR REPLACE VIEW v_edit_link
+AS SELECT DISTINCT ON (vu_link.link_id) vu_link.link_id,
+    vu_link.feature_type,
+    vu_link.feature_id,
+    vu_link.exit_type,
+    vu_link.exit_id,
+    vu_link.state,
+    vu_link.expl_id,
+    vu_link.sector_id,
+    vu_link.dma_id,
+    vu_link.exit_topelev,
+    vu_link.exit_elev,
+    vu_link.fluid_type,
+    vu_link.gis_length,
+    vu_link.the_geom,
+    vu_link.sector_name,
+    vu_link.macrosector_id,
+    vu_link.macrodma_id,
+    vu_link.expl_id2,
+    vu_link.epa_type,
+    vu_link.is_operative,
+    vu_link.drainzone_id,
+    vu_link.drainzone_name,
+    vu_link.connecat_id,
+    vu_link.workcat_id,
+    vu_link.workcat_id_end,
+    vu_link.builtdate,
+    vu_link.enddate,
+    vu_link.lastupdate,
+    vu_link.lastupdate_user,
+    vu_link.uncertain
+   FROM vu_link
+     JOIN v_state_link USING (link_id);
+
+CREATE OR REPLACE VIEW v_edit_link_connec
+AS SELECT l.link_id,
+    l.feature_type,
+    l.feature_id,
+    l.exit_type,
+    l.exit_id,
+    l.state,
+    l.expl_id,
+    l.sector_id,
+    l.dma_id,
+    l.exit_topelev,
+    l.exit_elev,
+    l.fluid_type,
+    l.gis_length,
+    l.the_geom,
+    l.sector_name,
+    l.macrosector_id,
+    l.macrodma_id,
+    l.uncertain
+   FROM v_link_connec l;
+
+CREATE OR REPLACE VIEW v_edit_link_gully
+AS SELECT l.link_id,
+    l.feature_type,
+    l.feature_id,
+    l.exit_type,
+    l.exit_id,
+    l.state,
+    l.expl_id,
+    l.sector_id,
+    l.dma_id,
+    l.exit_topelev,
+    l.exit_elev,
+    l.fluid_type,
+    l.gis_length,
+    l.the_geom,
+    l.sector_name,
+    l.macrosector_id,
+    l.macrodma_id,
+    l.uncertain
+   FROM v_link_gully l;
 
 
 -- delete views definitibely

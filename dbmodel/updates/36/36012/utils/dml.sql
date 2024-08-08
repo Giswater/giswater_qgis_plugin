@@ -122,3 +122,20 @@ UPDATE sys_table SET sys_role='role_edit' WHERE id='plan_psector_x_arc';
 UPDATE sys_table SET sys_role='role_edit' WHERE id='plan_psector_x_node';
 UPDATE sys_table SET sys_role='role_edit' WHERE id='plan_psector_x_other';
 UPDATE sys_table SET sys_role='role_edit' WHERE id='plan_psector_x_connec';
+
+
+INSERT INTO config_param_system (parameter, value, descript, isenabled, project_type)
+VALUES ('edit_link_autoupdate_connect_length', 'FALSE', 'Enable the automatic update for connect (connec & gully) length when link is inserted or geometry of link is updated',
+FALSE, 'utils')
+ON CONFLICT (parameter) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype,
+widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, hidden)
+WITH lyt as (SELECT distinct formname, max(layoutorder) as lytorder from config_form_fields
+where layoutname ='lyt_data_1' and formname = 'v_edit_link' group by formname)
+SELECT c.formname, formtype, tabname, 'uncertain', 'lyt_data_1', lytorder+1, datatype, widgettype, 'Uncertain', 'Uncertain', NULL, false, false, true, false, false
+FROM config_form_fields c join lyt using (formname) WHERE c.formname = 'v_edit_link'
+AND columnname = 'is_operative'
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent,
+iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, lytorder, hidden
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;

@@ -31,3 +31,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_res
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"sector_id", "dataType":"int[]"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"descript", "dataType":"text"}}$$);
+
+-- 08/08/2024
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"uncertain", "dataType":"boolean"}}$$);
