@@ -247,6 +247,11 @@ update node n set brand_id = a.brand, model_id = a.model from (
 	select node_id, brand, model from man_valve
 )a where n.node_id = a.node_id;
 
+-- man_netelement (serial_number)
+update node n set serial_number = a.serial_number from (
+select node_id, serial_number from man_netelement
+)a where n.node_id = a.node_id;
+
 
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_greentap", "column":"brand"}}$$);
@@ -272,3 +277,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_pump",
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_valve", "column":"brand"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_valve", "column":"model"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_netelement", "column":"serial_number"}}$$);
