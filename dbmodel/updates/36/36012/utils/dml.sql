@@ -118,3 +118,7 @@ UPDATE sys_table SET context='{"level_1":"OM","level_2":"ANALYTICS"}', orderby=1
 UPDATE config_form_fields
 	SET label = NULL
 	WHERE formname = 'infoplan' AND widgettype = 'divider';
+
+-- 09/08/2024
+DELETE FROM sys_function where id  = 2806;
+DROP FUNCTION IF EXISTS gw_fct_admin_test_ci();
