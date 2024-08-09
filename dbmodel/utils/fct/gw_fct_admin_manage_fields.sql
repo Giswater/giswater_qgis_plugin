@@ -39,6 +39,7 @@ v_error_context text;
 v_layers record;
 v_max_layoutorder numeric;
 v_widgettype text;
+v_count integer;
 
 
 BEGIN 
@@ -81,15 +82,21 @@ BEGIN
 		if v_table in ('node', 'arc', 'connec', 'gully') then
 
 
-			execute 'select id from config_typevalue where typevalue = ''datatype_typevalue'' and id ilike ''%'||v_datatype||'%'' limit 1'
-			into v_datatype;
+			execute 'select count(*) from config_typevalue where typevalue = ''datatype_typevalue'' and id ilike ''%'||v_datatype||'%'' limit 1'
+			into v_count;
 
-			if v_datatype ilike '%boolean%' then 	
-				v_widgettype = 'check';
-			
+			if v_count > 0 then
+
+				if v_datatype ilike '%boolean%' then 	
+					v_widgettype = 'check';
+				
+				else
+					v_widgettype = 'text';
+
+				end if;
 			else
-				v_widgettype = 'text';
-
+					v_datatype = 'text';
+					v_widgettype = 'text';
 			end if;
 
 			for v_layers in select parent_layer, child_layer from cat_feature where feature_type = upper(v_table)
@@ -176,15 +183,21 @@ BEGIN
 	-- manage config_form_fields
 		if v_table in ('node', 'arc', 'connec', 'gully') then
 
-			execute 'select id from config_typevalue where typevalue = ''datatype_typevalue'' and id ilike ''%'||v_datatype||'%'' limit 1'
-			into v_datatype;
+			execute 'select count(*) from config_typevalue where typevalue = ''datatype_typevalue'' and id ilike ''%'||v_datatype||'%'' limit 1'
+			into v_count;
 
-			if v_datatype ilike '%boolean%' then 	
-				v_widgettype = 'check';
-			
+			if v_count > 0 then
+
+				if v_datatype ilike '%boolean%' then 	
+					v_widgettype = 'check';
+				
+				else
+					v_widgettype = 'text';
+
+				end if;
 			else
-				v_widgettype = 'text';
-
+					v_datatype = 'text';
+					v_widgettype = 'text';
 			end if;
 
 
