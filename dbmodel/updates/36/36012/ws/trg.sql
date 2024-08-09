@@ -12,3 +12,127 @@ CREATE TRIGGER gw_trg_ui_rpt_cat_result
 INSTEAD OF INSERT OR DELETE OR UPDATE
 ON v_ui_rpt_cat_result
 FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_rpt_cat_result();
+
+-- 09/08/2024
+CREATE TRIGGER gw_trg_edit_minsector INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_minsector
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_minsector();
+
+CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_element
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('element');
+
+CREATE TRIGGER gw_trg_edit_samplepoint INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_samplepoint
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_samplepoint('samplepoint');
+
+CREATE TRIGGER gw_trg_edit_streetaxis INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ext_streetaxis
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_streetaxis();
+
+CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_arc
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('parent');
+
+CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('parent');
+
+CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
+
+CREATE TRIGGER gw_trg_edit_element_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_pol_element
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element_pol();
+
+CREATE TRIGGER gw_trg_ui_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_element_x_node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_element('element_x_node');
+
+CREATE TRIGGER gw_trg_ui_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_element_x_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_element('element_x_connec');
+
+CREATE TRIGGER gw_trg_ui_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_element_x_arc
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_element('element_x_arc');
+
+CREATE TRIGGER gw_trg_edit_pol_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_pol_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_man_connec_pol();
+
+CREATE TRIGGER gw_trg_edit_pol_node INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_pol_node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_man_node_pol();
+
+CREATE TRIGGER gw_trg_edit_inp_node_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_junction
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_node('inp_junction');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_junction
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('JUNCTION');
+
+CREATE TRIGGER gw_trg_edit_inp_node_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_pump
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_node('inp_pump');
+
+CREATE TRIGGER gw_trg_edit_inp_arc_pipe INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_pipe
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_arc('inp_pipe');
+
+CREATE TRIGGER gw_trg_edit_inp_arc_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_virtualpump
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_arc('inp_virtualpump');
+
+CREATE TRIGGER gw_trg_edit_inp_arc_virtualvalve INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_virtualvalve
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_arc('inp_virtualvalve');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_pipe
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('PIPE');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_virtualvalve
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('VIRTUALVALVE');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_virtualpump INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_virtualpump
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('VIRTUALPUMP');
+
+CREATE TRIGGER gw_trg_edit_field_valve INSTEAD OF UPDATE ON v_edit_field_valve
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_field_node('field_valve');
+
+CREATE TRIGGER gw_trg_edit_man_register_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_pol_register
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_man_node_pol('man_register_pol');
+
+CREATE TRIGGER gw_trg_edit_man_fountain_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_pol_fountain
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_man_connec_pol('man_fountain_pol');
+
+CREATE TRIGGER gw_trg_edit_man_tank_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_pol_tank
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_man_node_pol('man_tank_pol');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_pump
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('PUMP');
+
+CREATE TRIGGER gw_trg_edit_inp_node_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_pump_additional
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_node('inp_pump_additional');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_pump_additional
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('PUMP_ADDITIONAL');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_shortpipe
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('SHORTPIPE');
+
+CREATE TRIGGER gw_trg_edit_inp_node_shortpipe INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_shortpipe
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_node('inp_shortpipe');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('CONNEC');
+
+CREATE TRIGGER gw_trg_edit_inp_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_connec();
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_tank
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('TANK');
+
+CREATE TRIGGER gw_trg_edit_inp_node_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_tank
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_node('inp_tank');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_reservoir
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('RESERVOIR');
+
+CREATE TRIGGER gw_trg_edit_inp_node_reservoir INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_reservoir
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_node('inp_reservoir');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_valve
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('VALVE');
+
+CREATE TRIGGER gw_trg_edit_inp_node_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_valve
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_node('inp_valve');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_inlet
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('INLET');
+
+CREATE TRIGGER gw_trg_edit_inp_node_inlet INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_inlet
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_node('inp_inlet');

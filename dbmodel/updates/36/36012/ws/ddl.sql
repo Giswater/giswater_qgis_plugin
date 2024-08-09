@@ -156,7 +156,7 @@ CREATE TABLE archived_rpt_node_stats (
 	CONSTRAINT archived_rpt_node_stats_result_id_fkey FOREIGN KEY (result_id) REFERENCES rpt_cat_result(result_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-DROP VIEW v_ui_plan_arc_cost;
+DROP VIEW IF EXISTS v_ui_plan_arc_cost;
 
 ALTER TABLE cat_brand ALTER COLUMN id TYPE character varying(50);
 ALTER TABLE cat_brand_model ALTER COLUMN id TYPE character varying(50);
@@ -246,7 +246,7 @@ update node n set brand_id = a.brand, model_id = a.model from (
 update node n set brand_id = a.brand, model_id = a.model from (
 	select node_id, brand, model from man_valve
 )a where n.node_id = a.node_id;
- 
+
 
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_greentap", "column":"brand"}}$$);
@@ -272,5 +272,3 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_pump",
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_valve", "column":"brand"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_valve", "column":"model"}}$$);
-
-

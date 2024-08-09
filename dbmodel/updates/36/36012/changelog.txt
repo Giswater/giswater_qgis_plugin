@@ -6,3 +6,4 @@
 - New view v_ext_municipality filtered by selected exploitations. Use it on search tool
 - Add new fields on inventory tables for UD:
     - node, arc, connec, gully: placement_type
+- Change all columns `code` from varchar(30) to text
