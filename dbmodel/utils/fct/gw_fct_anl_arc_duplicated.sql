@@ -7,12 +7,13 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_arc_duplicated(p_data json) RETURNS json AS 
 $BODY$
+
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_anl_arc_duplicated($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{},"feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, 
-"data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
+"form":{},"feature":{"tableName":"v_edit_arc", "id":[]}, "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 "parameters":{"checkType":"finalNodes"}}}$$)::JSON
--- fid: v_fid
+
+-- fid: 479
 
 */
 
@@ -30,6 +31,8 @@ v_error_context text;
 v_count integer;
 v_checktype text;
 v_fid integer = 479;
+
+
 BEGIN
 
 	-- Search path
@@ -76,11 +79,11 @@ BEGIN
 
 			EXECUTE 'INSERT INTO anl_arc (arc_id, arccat_id, state,  node_1, node_2, expl_id, fid, the_geom)
 			SELECT * FROM (SELECT DISTINCT ON (node_1, node_2) arc_id, arccat_id, state, node_1, node_2,expl_id, '||v_fid||',the_geom 
-			FROM  '||v_worklayer||'  WHERE  arc_id IN IN ('||v_array||') AND  CONCAT(node_1,'':'',node_2) IN
-			(SELECT CONCAT(node_1,'':'',node_2) FROM '||v_worklayer||' WHERE arc_id IN IN ('||v_array||') GROUP BY node_1, node_2  HAVING count(*) >1))a';
+			FROM  '||v_worklayer||'  WHERE  arc_id IN ('||v_array||') AND  CONCAT(node_1,'':'',node_2) IN
+			(SELECT CONCAT(node_1,'':'',node_2) FROM '||v_worklayer||' WHERE arc_id IN ('||v_array||') GROUP BY node_1, node_2  HAVING count(*) >1))a';
 
 			EXECUTE 'UPDATE anl_arc aa SET arc_id_aux=va.arc_id FROM '||v_worklayer||' va
-			WHERE aa.node_1 = va.node_1 and aa.node_2=va.node_2 AND  aa.arc_id!=va.arc_id AND va.arc_id IN IN ('||v_array||') ;';
+			WHERE aa.node_1 = va.node_1 and aa.node_2=va.node_2 AND  aa.arc_id!=va.arc_id AND va.arc_id IN ('||v_array||') ;';
 
 		ELSE
 			EXECUTE 'INSERT INTO anl_arc (arc_id, arccat_id, state,  node_1, node_2, expl_id, fid, the_geom)
@@ -139,17 +142,24 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 		
-	--    Control nulls
+	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 
-	--  Return
+	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
 	             ',"body":{"form":{}'||
 			     ',"data":{ "info":'||v_result_info||','||
 					'"line":'||v_result_line||
 				'}}'||
 		    '}')::json, 3040, null, null, null);
+			
+	-- Exception control
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) 
+	||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 
 END;
 $BODY$

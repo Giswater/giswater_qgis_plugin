@@ -7,7 +7,6 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2242
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_cad_add_relative_point(geometry,float, float, integer, boolean);
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_cad_add_relative_point(geom1_aux geometry,geom2_aux geometry,x_var double precision,
 y_var double precision,start_point integer,del_previous_bool boolean)
 RETURNS geometry AS

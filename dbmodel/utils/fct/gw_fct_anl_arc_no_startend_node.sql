@@ -7,17 +7,13 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2102
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_anl_arc_no_startend_node(p_data json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_anl_arc_no_startend_node(p_data json)  RETURNS json AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_anl_arc_no_startend_node(p_data json)
+RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_anl_arc_no_startend_node($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{}, 
-"feature":{"tableName":"v_edit_arc", 
-"featureType":"ARC", "id":[]}, 
-"data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
-"parameters":{"arcSearchNodes":"0.1"}}}$$)::text
+SELECT SCHEMA_NAME.gw_fct_anl_arc_no_startend_node($${ "client":{"device":4, "infoType":1, "lang":"ES"},
+"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, "data":{"parameters":{"arcSearchNodes":"0.1"}}}$$)::text
 
 WARNINGS: This function only works with node with state = 1
 
@@ -34,7 +30,6 @@ nodeRecord2 record;
 rec record;
 
 v_id json;
-v_selectionmode text;
 v_arcsearchnodes float;
 v_worklayer text;
 v_result json;
@@ -59,7 +54,6 @@ BEGIN
 	-- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
-	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_arcsearchnodes := ((p_data ->>'data')::json->>'parameters')::json->>'arcSearchNodes';
 
 	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
@@ -197,7 +191,7 @@ BEGIN
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	
---  Return
+	--  Return
     RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
@@ -205,6 +199,12 @@ BEGIN
 				'"line":'||v_result_line||
 		       '}}'||
 	    '}')::json, 2102, null, null, null);
+		
+	-- Exception control
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) 
+	||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 	 
 END;$BODY$
   LANGUAGE plpgsql VOLATILE

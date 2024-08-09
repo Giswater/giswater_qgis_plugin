@@ -11,6 +11,8 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_config_feature_border(p_data json)
   RETURNS json AS
 $BODY$
 
+-- Function that configures nodes located on sector border
+
 /*EXAMPLE
  SELECT gw_fct_config_feature_border($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"configZone":"EXPL"}}}$$);
 */
@@ -21,6 +23,7 @@ v_result_info json;
 v_error_context text;
 v_version text;
 v_zone text;
+
 BEGIN
 
   SET search_path = "SCHEMA_NAME", public;
@@ -84,13 +87,18 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
-
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Configuration done successfully"}, "version":"'||v_version||'"'||
                ',"body":{"form":{}'||
   		     ',"data":{ "info":'||v_result_info||
   			'}}'||
   	    '}')::json, 3204, null, null, null);
+
+	-- Exception control
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) 
+	||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

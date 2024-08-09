@@ -20,7 +20,7 @@ DECLARE
 
 v_project_type text;
 v_version text;
-
+v_error_context text;
 
 BEGIN
 
@@ -102,7 +102,13 @@ BEGIN
 
 	-- Return
 	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
-			'}')::json
+			'}')::json;
+			
+	-- Exception whe others
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) 
+	||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 
 END;
 $BODY$
