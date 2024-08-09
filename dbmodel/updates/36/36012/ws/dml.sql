@@ -115,7 +115,3 @@ INSERT INTO archived_rpt_node(
 SELECT
 	result_id, node_id, rpt_elevation, rpt_demand, head, press, other, time, quality
 FROM _archived_rpt_node;
-
-
-UPDATE config_form_fields SET columnname = 'brand_id', tooltip = 'brand_id' where columnname = 'brand';
-UPDATE config_form_fields SET columnname = 'model_id', tooltip = 'model_id' where columnname = 'model';
