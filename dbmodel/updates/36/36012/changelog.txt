@@ -4,3 +4,4 @@
 - Separate `archived_*` tables into 3 tables (archived_rpt_inp_*, archived_rpt_*, archived_rpt_*_stats)
 - Remove duplicated vertex generated because of the fusion. Use st_removerepeatedpoints function for the new geom
 - New view v_ext_municipality filtered by selected exploitations. Use it on search tool
+- New behaviour for inlets as a junctions when they are on the end of a sector without continuity with the next one
