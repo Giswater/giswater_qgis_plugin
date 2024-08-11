@@ -115,3 +115,78 @@ AS SELECT d.dqa_id,
      LEFT JOIN macrodqa md ON md.macrodqa_id = d.macrodqa_id
   ORDER BY d.dqa_id;
 
+
+DROP VIEW v_edit_inp_inlet;
+CREATE OR REPLACE VIEW v_edit_inp_inlet AS 
+ SELECT n.node_id,
+    n.elevation,
+    n.depth,
+    n.nodecat_id,
+    n.expl_id,
+    n.sector_id,
+    n.dma_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    inp_inlet.initlevel,
+    inp_inlet.minlevel,
+    inp_inlet.maxlevel,
+    inp_inlet.diameter,
+    inp_inlet.minvol,
+    inp_inlet.curve_id,
+    inp_inlet.overflow,
+    inp_inlet.mixing_model,
+    inp_inlet.mixing_fraction,
+    inp_inlet.reaction_coeff,
+    inp_inlet.init_quality,
+    inp_inlet.source_type,
+    inp_inlet.source_quality,
+    inp_inlet.source_pattern_id,
+    inp_inlet.pattern_id,
+    inp_inlet.head,
+    inp_inlet.demand,
+    inp_inlet.demand_pattern_id,
+    inp_inlet.emitter_coeff,
+    n.the_geom
+   FROM v_node n
+     JOIN inp_inlet USING (node_id)
+     JOIN v_sector_node s ON s.node_id::text = n.node_id::text
+  WHERE n.is_operative IS TRUE;
+
+CREATE TRIGGER gw_trg_edit_inp_node_inlet INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_inlet
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_inlet');
+
+
+DROP VIEW v_edit_inp_dscenario_inlet;
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_inlet AS 
+ SELECT p.dscenario_id,
+    n.node_id,
+    p.initlevel,
+    p.minlevel,
+    p.maxlevel,
+    p.diameter,
+    p.minvol,
+    p.curve_id,
+    p.overflow,
+    p.mixing_model,
+    p.mixing_fraction,
+    p.reaction_coeff,
+    p.init_quality,
+    p.source_type,
+    p.source_quality,
+    p.source_pattern_id,
+    p.head,
+    p.pattern_id,
+    p.demand,
+    p.demand_pattern_id,
+    p.emitter_coeff,
+    n.the_geom
+   FROM selector_inp_dscenario,  v_node n
+     JOIN inp_dscenario_inlet p USING (node_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+     JOIN v_sector_node s ON s.node_id::text = n.node_id::text
+  WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text AND n.is_operative IS TRUE;
+
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_inlet
+FOR EACH ROW EXECUTE PROCEDURE ws36012.gw_trg_edit_inp_dscenario('INLET');

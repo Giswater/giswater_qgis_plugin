@@ -41,10 +41,10 @@ BEGIN
 		INTO v_epaunits;
 
 	-- Reset values
-	UPDATE temp_t_node SET demand = 0;
-	UPDATE temp_t_node SET pattern_id = null WHERE epa_type = 'JUNCTION';
+	UPDATE temp_t_node t SET demand = 0 FROM node n WHERE n.node_id = t.node_id AND n.epa_type != 'INLET';
+	UPDATE temp_t_node t SET pattern_id = null FROM node n WHERE n.node_id = t.node_id AND n.epa_type != 'INLET';
 	
-	IF v_networkmode IN (1,2) THEN -- NODE ESTIMATED
+	IF v_networkmode IN (2) THEN -- NODE ESTIMATED
 
 		-- update patterns for nodes
 		UPDATE temp_t_node SET pattern_id=a.pattern_id FROM v_edit_inp_junction a WHERE temp_t_node.node_id=a.node_id;
@@ -53,7 +53,7 @@ BEGIN
 		UPDATE temp_t_node SET demand=inp_junction.demand FROM inp_junction WHERE temp_t_node.node_id=inp_junction.node_id;	
 
 		-- pattern
-		IF v_patternmethod = 11 THEN -- DEFAULT PATTERN
+		IF v_patternmethod = 11 THEN -- GLOBAL PATTERN
 			UPDATE temp_t_node SET pattern_id=v_deafultpattern WHERE pattern_id IS NULL AND epa_type ='JUNCTION';
 		
 		ELSIF v_patternmethod = 12 THEN -- SECTOR PATTERN (NODE)
@@ -67,10 +67,6 @@ BEGIN
 		ELSIF v_patternmethod = 14 THEN -- FEATURE PATTERN (NODE)
 			-- do nothing
 		END IF;
-
-	ELSIF v_networkmode = 3 THEN
-
-		-- due refactor of 2022/12/6 this network mode is deprecated
 		
 	ELSIF v_networkmode = 4 THEN 
 
@@ -87,7 +83,7 @@ BEGIN
 		UPDATE temp_t_node SET demand=v.demand FROM v_edit_inp_connec v WHERE concat('VC',connec_id) = node_id  AND temp_t_node.epa_type ='JUNCTION';
 
 		-- pattern
-		IF v_patternmethod = 11 THEN -- DEFAULT PATTERN
+		IF v_patternmethod = 11 THEN -- GLOBAL PATTERN
 			UPDATE temp_t_node SET pattern_id=v_deafultpattern WHERE temp_t_node.pattern_id IS NULL AND temp_t_node.epa_type ='JUNCTION';
 				
 		ELSIF v_patternmethod  = 12 THEN -- SECTOR PATTERN (CONNEC)

@@ -192,12 +192,15 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF NEW.source_type IS NULL OR NEW.source_type='' THEN NEW.source_type = (SELECT source_type FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
 			IF NEW.source_quality IS NULL THEN NEW.source_quality = (SELECT source_quality FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
 			IF NEW.source_pattern_id IS NULL OR NEW.source_pattern_id='' THEN NEW.source_pattern_id = (SELECT source_pattern_id FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.demand IS NULL THEN NEW.demand = (SELECT demand FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.demand_pattern_id IS NULL OR NEW.demand_pattern_id='' THEN NEW.demand_pattern_id = (SELECT source_pattern_id FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
+			IF NEW.emitter_coeff IS NULL THEN NEW.emitter_coeff = (SELECT emitter_coeff FROM v_edit_inp_inlet WHERE node_id = NEW.node_id);END IF;
 
 			INSERT INTO inp_dscenario_inlet (dscenario_id, node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow, pattern_id, head,
-			mixing_model, mixing_fraction, reaction_coeff, init_quality, source_type, source_quality, source_pattern_id)
+			mixing_model, mixing_fraction, reaction_coeff, init_quality, source_type, source_quality, source_pattern_id, demand, demand_pattern_id, emitter_coeff)
 			VALUES (NEW.dscenario_id, NEW.node_id, NEW.initlevel, NEW.minlevel, NEW.maxlevel, NEW.diameter, NEW.minvol, NEW.curve_id, NEW.overflow, NEW.pattern_id, NEW.head,
-			NEW.mixing_model, NEW.mixing_fraction, NEW.reaction_coeff, NEW.init_quality, NEW.source_type, NEW.source_quality, NEW.source_pattern_id);
-
+			NEW.mixing_model, NEW.mixing_fraction, NEW.reaction_coeff, NEW.init_quality, NEW.source_type, NEW.source_quality, NEW.source_pattern_id, NEW.demand, NEW.demand_pattern_id, NEW.emitter_coeff);
+			
 		ELSIF v_dscenario_type = 'VIRTUALVALVE' THEN
 
 			-- default values
@@ -292,7 +295,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			UPDATE inp_dscenario_inlet SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, initlevel=NEW.initlevel, minlevel=NEW.minlevel,
 			maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id, overflow = NEW.overflow, pattern_id = NEW.pattern_id, head = NEW.head,
 			mixing_model=NEW.mixing_model, mixing_fraction=NEW.mixing_fraction, reaction_coeff=NEW.reaction_coeff,  init_quality=NEW.init_quality, source_type=NEW.source_type,
-			source_quality=NEW.source_quality, source_pattern_id=NEW.source_pattern_id
+			source_quality=NEW.source_quality, source_pattern_id=NEW.source_pattern_id, demand = NEW.demand, demand_pattern_id = NEW.demand_pattern_id, emitter_coeff = NEW.emitter_coeff
 			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 
 		ELSIF v_dscenario_type = 'VIRTUALPUMP' THEN

@@ -118,14 +118,9 @@ BEGIN
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_emitters AS 
-		SELECT j.node_id, j.emitter_coeff FROM inp_junction j LEFT JOIN temp_t_node USING (node_id) WHERE j.emitter_coeff IS NOT NULL
-		UNION
-		SELECT d.node_id, d.emitter_coeff FROM inp_dscenario_junction d LEFT JOIN temp_t_node USING (node_id) WHERE d.emitter_coeff IS NOT NULL
-		UNION
-		SELECT c.connec_id AS node_id, c.emitter_coeff FROM inp_connec c LEFT JOIN temp_t_node t ON c.connec_id::text = t.node_id::text WHERE c.emitter_coeff IS NOT NULL
-		UNION
-		SELECT d.connec_id AS node_id, d.emitter_coeff FROM inp_dscenario_connec d LEFT JOIN temp_t_node t ON d.connec_id::text = t.node_id::text WHERE d.emitter_coeff IS NOT NULL;
-
+	SELECT node_id, addparam::json->>'emitter_coeff' FROM temp_t_node
+	WHERE (addparam::json->>'emitter_coeff')::numeric > 0;
+		
 
 	CREATE OR REPLACE TEMP VIEW vi_t_energy AS 
 	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'EFFIC'::text AS idval,  p.effic_curve_id AS energyvalue FROM inp_pump p LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text WHERE p.effic_curve_id IS NOT NULL

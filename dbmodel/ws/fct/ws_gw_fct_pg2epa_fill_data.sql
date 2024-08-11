@@ -106,12 +106,18 @@ BEGIN
 	-- update child param for inp_inlet
 	UPDATE temp_t_node SET
 	addparam=concat('{"pattern_id":"',i.pattern_id,'", "initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
-	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'", "overflow":"',overflow,'"}')
+	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'", "overflow":"',overflow,'", "mixing_model":"',mixing_model,'", "mixing_fraction":"',mixing_fraction,'", "reaction_coeff":"',reaction_coeff,'", 
+	"init_quality":"',init_quality,'", "source_type":"',source_type,'", "source_quality":"',source_quality,'", "source_pattern_id":"',source_pattern_id,'",
+	"demand":"',i.demand,'", "demand_pattern_id":"',demand_pattern_id,'","emitter_coeff":"',emitter_coeff,'"}')
 	FROM inp_inlet i WHERE temp_t_node.node_id=i.node_id;
 
 	-- update child param for inp_junction
-	UPDATE temp_t_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE temp_t_node.node_id=inp_junction.node_id;
-	UPDATE temp_t_node SET demand=inp_connec.demand, pattern_id=inp_connec.pattern_id FROM inp_connec WHERE temp_t_node.node_id=inp_connec.connec_id;
+	UPDATE temp_t_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id, addparam=concat('{"emitter_coeff":"',emitter_coeff,'"}')
+	FROM inp_junction WHERE temp_t_node.node_id=inp_junction.node_id;
+	
+	UPDATE temp_t_node SET demand=inp_connec.demand, pattern_id=inp_connec.pattern_id, addparam=concat('{"emitter_coeff":"',emitter_coeff,'"}')
+	FROM inp_connec WHERE temp_t_node.node_id=inp_connec.connec_id;
+
 
 	-- update child param for inp_valve
 	UPDATE temp_t_node SET addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "diameter":"',custom_dint,'", "flow":"',

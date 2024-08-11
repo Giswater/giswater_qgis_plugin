@@ -155,3 +155,13 @@ CREATE TABLE archived_rpt_node_stats (
 	CONSTRAINT archived_rpt_node_stats_pkey PRIMARY KEY (node_id, result_id),
 	CONSTRAINT archived_rpt_node_stats_result_id_fkey FOREIGN KEY (result_id) REFERENCES rpt_cat_result(result_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+-- 2024/08/11
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet", "column":"demand", "dataType":"numeric(12,6)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet", "column":"demand_pattern_id", "dataType":"varchar(16)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_inlet", "column":"emitter_coeff", "dataType":"double precision"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_inlet", "column":"demand", "dataType":"numeric(12,6)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_inlet", "column":"demand_pattern_id", "dataType":"varchar(16)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_inlet", "column":"emitter_coeff", "dataType":"double precision"}}$$);
+
