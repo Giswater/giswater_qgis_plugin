@@ -122,7 +122,3 @@ UPDATE config_form_fields
 -- 09/08/2024
 DELETE FROM sys_function where id  = 2806;
 DROP FUNCTION IF EXISTS gw_fct_admin_test_ci();
-
-INSERT INTO sys_function VALUES (3312, 'gw_fct_admin_checkupsertobjects', 'utils', 'function', 'json', 'json',
-'Function to check db is working properly with insert/update/delete', 'role_admin', null, 'core')
-ON CONFLICT (id) DO NOTHING;
