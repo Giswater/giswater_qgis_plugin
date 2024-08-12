@@ -22,7 +22,7 @@ SELECT gw_fct_anl_arc_length($${"client":{"device":4, "infoType":1, "lang":"ES"}
 "featureType":"ARC", "id":[]}, "data":{"selectionMode":"wholeSelection","parameters":{"arcLength":"3"}}}$$)::JSON
 
 -- gw_fct_anl_arc_no_startend_node
-SELECT ws36012.gw_fct_anl_arc_no_startend_node($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{"tableName":"v_edit_arc", 
+SELECT gw_fct_anl_arc_no_startend_node($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{"tableName":"v_edit_arc",
 "featureType":"ARC"}, "data":{"parameters":{"arcSearchNodes":"0.1"}}}$$)::text
 
 -- gw_fct_anl_arc_same_startend

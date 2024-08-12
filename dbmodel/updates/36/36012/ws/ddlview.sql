@@ -189,4 +189,4 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_inlet AS
 
 
 CREATE TRIGGER gw_trg_edit_inp_dscenario_junction INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_dscenario_inlet
-FOR EACH ROW EXECUTE PROCEDURE ws36012.gw_trg_edit_inp_dscenario('INLET');
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_dscenario('INLET');
