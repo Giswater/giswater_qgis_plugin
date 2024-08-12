@@ -562,8 +562,8 @@ BEGIN
 			VALUES (NEW.node_id, NEW.vmax, NEW.vutil, NEW.area,NEW.chlorination, NEW.name, NEW.hmax);
 					
 		ELSIF v_man_table='man_hydrant' THEN
-			INSERT INTO man_hydrant (node_id, fire_code, communication, valve, geom1, geom2, hydrant_type) 
-			VALUES (NEW.node_id, NEW.fire_code, NEW.communication, NEW.valve, NEW.geom1, NEW.geom2, NEW.hydrant_type);		
+			INSERT INTO man_hydrant (node_id, fire_code, communication, valve, geom1, geom2, hydrant_type, customer_code) 
+			VALUES (NEW.node_id, NEW.fire_code, NEW.communication, NEW.valve, NEW.geom1, NEW.geom2, NEW.hydrant_type, NEW.customer_code);		
 		
 		ELSIF v_man_table='man_junction' THEN
 			INSERT INTO man_junction (node_id) VALUES(NEW.node_id);
@@ -955,7 +955,7 @@ BEGIN
 
 		ELSIF v_man_table ='man_hydrant' THEN
 			UPDATE man_hydrant SET fire_code=NEW.fire_code, communication=NEW.communication, valve=NEW.valve,
-			geom1=NEW.geom1, geom2=NEW.geom2, hydrant_type=NEW.hydrant_type
+			geom1=NEW.geom1, geom2=NEW.geom2, hydrant_type=NEW.hydrant_type, customer_code=NEW.customer_code
 			WHERE node_id=OLD.node_id;			
 
 		ELSIF v_man_table ='man_source' THEN

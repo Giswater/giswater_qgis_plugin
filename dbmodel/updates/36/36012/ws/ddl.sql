@@ -199,6 +199,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psect
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"cat_valve", "dataType":"varchar(30)"}}$$);
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_hydrant", "column":"customer_code", "dataType":"varchar"}}$$);
+
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_arc", "column":"brand", "newName":"brand_id"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_arc", "column":"model", "newName":"model_id"}}$$);
