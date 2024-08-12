@@ -220,6 +220,17 @@ update connec c set brand_id = a.brand, model_id = a.model, cat_valve = a.cat_va
 	select connec_id, brand, model, cat_valve from man_wjoin
 )a where c.connec_id = a.connec_id;
 
+-- man_netwjoin
+update node n set brand_id = a.brand, model_id = a.model from (
+	select node_id, brand, model from man_netwjoin
+)a where n.node_id = a.node_id;
+
+-- man_tap
+update connec c set cat_valve = a.cat_valve from (
+select connec_id, cat_valve from man_tap
+)a where c.connec_id = a.connec_id;
+
+
 -- man_hydrant
 update node n set brand_id = a.brand, model_id = a.model from (
 	select node_id, brand, model from man_hydrant
@@ -235,11 +246,6 @@ update node n set brand_id = a.brand, model_id = a.model from (
 	select node_id, brand, model from man_netelement
 )a where n.node_id = a.node_id;
 
--- man_netwjoin
-update node n set brand_id = a.brand, model_id = a.model from (
-	select node_id, brand, model from man_netwjoin
-)a where n.node_id = a.node_id;
-
 -- man_pump
 update node n set brand_id = a.brand, model_id = a.model from (
 	select node_id, brand, model from man_pump
@@ -250,15 +256,12 @@ update node n set brand_id = a.brand, model_id = a.model from (
 	select node_id, brand, model from man_valve
 )a where n.node_id = a.node_id;
 
--- man_netelement (serial_number)
+-- man_netelement
 update node n set serial_number = a.serial_number from (
 select node_id, serial_number from man_netelement
 )a where n.node_id = a.node_id;
 
--- man_tap
-update connec c set cat_valve = a.cat_valve from (
-select connec_id, cat_valve from man_tap
-)a where c.connec_id = a.connec_id;
+
 
 
 

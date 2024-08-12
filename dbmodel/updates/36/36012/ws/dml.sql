@@ -115,3 +115,6 @@ INSERT INTO archived_rpt_node(
 SELECT
 	result_id, node_id, rpt_elevation, rpt_demand, head, press, other, time, quality
 FROM _archived_rpt_node;
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, active) 
+VALUES('edit_typevalue', 'presszone_type', 'presszone', 'presszone_type', true);

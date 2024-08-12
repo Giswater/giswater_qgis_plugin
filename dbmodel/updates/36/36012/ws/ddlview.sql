@@ -210,6 +210,8 @@ AS SELECT arc.arc_id,
     dma.macrodma_id,
     arc.presszone_id,
     presszone.name AS presszone_name,
+    et.idval as presszone_type,
+    presszone.head as presszone_head,
     arc.dqa_id,
     dqa.name AS dqa_name,
     dqa.macrodqa_id,
@@ -296,7 +298,8 @@ AS SELECT arc.arc_id,
      LEFT JOIN v_ext_streetaxis d ON d.id::text = arc.streetaxis2_id::text
      LEFT JOIN arc_add e ON arc.arc_id::text = e.arc_id::text
      LEFT JOIN value_state_type vst ON vst.id = arc.state_type
-     LEFT JOIN ext_municipality mu ON arc.muni_id = mu.muni_id;
+     LEFT JOIN ext_municipality mu ON arc.muni_id = mu.muni_id
+     LEFT JOIN edit_typevalue et on et.id = presszone.presszone_type;
 
 CREATE OR REPLACE VIEW v_edit_arc
 AS SELECT a.arc_id,
@@ -332,6 +335,8 @@ AS SELECT a.arc_id,
     a.macrodma_id,
     a.presszone_id,
     a.presszone_name,
+    a.presszone_type,
+    a.presszone_head,
     a.dqa_id,
     a.dqa_name,
     a.macrodqa_id,
@@ -438,6 +443,8 @@ AS SELECT node.node_id,
     dma.macrodma_id,
     node.presszone_id,
     presszone.name AS presszone_name,
+    et.idval as presszone_type,
+    presszone.head as presszone_head,
     node.staticpressure,
     node.dqa_id,
     dqa.name AS dqa_name,
@@ -530,7 +537,8 @@ AS SELECT node.node_id,
      LEFT JOIN v_ext_streetaxis b ON b.id::text = node.streetaxis2_id::text
      LEFT JOIN node_add e ON e.node_id::text = node.node_id::text
      LEFT JOIN value_state_type vst ON vst.id = node.state_type
-     LEFT JOIN ext_municipality mu ON node.muni_id = mu.muni_id;
+     LEFT JOIN ext_municipality mu ON node.muni_id = mu.muni_id
+     LEFT JOIN edit_typevalue et on et.id = presszone.presszone_type;
 
 CREATE OR REPLACE VIEW v_edit_node
 AS SELECT n.node_id,
@@ -562,6 +570,8 @@ AS SELECT n.node_id,
     n.macrodma_id,
     n.presszone_id,
     n.presszone_name,
+    n.presszone_type,
+    n.presszone_head,
     n.staticpressure,
     n.dqa_id,
     n.dqa_name,
@@ -678,6 +688,8 @@ AS SELECT connec.connec_id,
     dma.macrodma_id,
     connec.presszone_id,
     presszone.name AS presszone_name,
+    et.idval as presszone_type,
+    presszone.head as presszone_head,
     connec.staticpressure,
     connec.dqa_id,
     dqa.name AS dqa_name,
@@ -783,7 +795,8 @@ AS SELECT connec.connec_id,
      LEFT JOIN v_ext_streetaxis b ON b.id::text = connec.streetaxis2_id::text
      LEFT JOIN connec_add e ON e.connec_id::text = connec.connec_id::text
      LEFT JOIN value_state_type vst ON vst.id = connec.state_type
-     LEFT JOIN ext_municipality mu ON connec.muni_id = mu.muni_id;
+     LEFT JOIN ext_municipality mu ON connec.muni_id = mu.muni_id
+     LEFT JOIN edit_typevalue et on et.id = presszone.presszone_type;
 
 CREATE OR REPLACE VIEW v_edit_connec
 AS WITH s AS (
@@ -843,9 +856,11 @@ AS WITH s AS (
             ELSE a.presszone_name
         END AS presszone_name,
         CASE
-            WHEN a.presszone_name IS NULL THEN vu_connec.staticpressure
+            WHEN a.staticpressure IS NULL THEN vu_connec.staticpressure
             ELSE a.staticpressure
         END AS staticpressure,
+        vu_connec.presszone_type,
+        vu_connec.presszone_head,
         CASE
             WHEN a.dqa_id IS NULL THEN vu_connec.dqa_id
             ELSE a.dqa_id
@@ -2473,6 +2488,8 @@ AS SELECT v_edit_connec.connec_id,
     v_edit_connec.macrodma_id,
     v_edit_connec.presszone_id,
     v_edit_connec.presszone_name,
+    v_edit_connec.presszone_type,
+    v_edit_connec.presszone_head,
     v_edit_connec.staticpressure,
     v_edit_connec.dqa_id,
     v_edit_connec.dqa_name,
