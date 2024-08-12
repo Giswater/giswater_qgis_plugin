@@ -63,3 +63,15 @@ SELECT gw_fct_setchangefeaturetype($${"client":{"device":4, "lang":"es_ES", "inf
 "feature_id":"1107", "feature_type_new":"THROTTLE_VALVE", "featurecat_id":"THROTTLE_VALVE_200"}}$$);
 
 UPDATE man_valve set broken=false where node_id = '1093';
+
+-- 12/08/2024
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'sys_geom', 'the_geom'::text)
+	WHERE parameter IN (
+		'basic_search_v2_tab_network_arc',
+		'basic_search_v2_tab_network_connec',
+		'basic_search_v2_tab_network_gully',
+		'basic_search_v2_tab_network_node'
+	);
+
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'sys_geom', 's.the_geom'::text)
+	WHERE parameter ='basic_search_v2_tab_address';

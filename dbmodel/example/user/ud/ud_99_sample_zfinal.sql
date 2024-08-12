@@ -67,3 +67,15 @@ CREATE SEQUENCE circ_manhole_code_seq
 	START 1000
 	CACHE 1
 	NO CYCLE;
+
+-- 12/08/2024
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'sys_geom', 'the_geom'::text)
+	WHERE parameter IN (
+		'basic_search_v2_tab_network_arc',
+		'basic_search_v2_tab_network_connec',
+		'basic_search_v2_tab_network_gully',
+		'basic_search_v2_tab_network_node'
+	);
+
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'sys_geom', 's.the_geom'::text)
+	WHERE parameter ='basic_search_v2_tab_address';
