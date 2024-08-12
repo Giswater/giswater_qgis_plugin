@@ -122,3 +122,15 @@ UPDATE config_form_fields
 -- 09/08/2024
 DELETE FROM sys_function where id  = 2806;
 DROP FUNCTION IF EXISTS gw_fct_admin_test_ci();
+
+-- 12/08/2024
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'sys_geom_test', ''::text)
+	WHERE parameter IN (
+		'basic_search_v2_tab_address',
+		'basic_search_v2_tab_hydrometer',
+		'basic_search_v2_tab_network_arc',
+		'basic_search_v2_tab_network_connec',
+		'basic_search_v2_tab_network_gully',
+		'basic_search_v2_tab_network_node',
+		'basic_search_v2_tab_workcat'
+	);

@@ -82,6 +82,9 @@ v_tiled boolean;
 v_record record;
 v_filter_split text;
 v_device integer;
+v_filter_poly text;
+v_geom text;
+v_epsg int;
 
 BEGIN
 
@@ -98,9 +101,12 @@ BEGIN
    	v_filter = (((p_data ->>'data')::json->>'filterFields')::json->>'searchText')::json->>'value';
     v_tiled = ((p_data ->>'client')::json->>'tiled')::boolean;
     v_device = ((p_data ->>'client')::json->>'device');
+	v_filter_poly = ((p_data ->>'data')::json->>'filterFields')::json->>'searchPoly';
 	
    
    	if v_device = 5 then
+		-- get epsg
+		execute 'SELECT epsg FROM sys_version LIMIT 1' into v_epsg;
 
 		-- profilactic control for singletab
 	    IF v_singletab IN ('NULL', 'None', '') then v_singletab = null; end if;
@@ -162,6 +168,13 @@ BEGIN
 
 				if v_tab_params->>'sys_filter' != '' then
 					v_sys_query_text := v_sys_query_text || ' AND ('||(v_tab_params->>'sys_filter')::text||')';
+				end if;
+
+				if v_filter_poly is not null then
+					v_geom := v_tab_params->>'sys_geom';
+					if v_geom is not null and v_geom != '' then
+						v_sys_query_text := v_sys_query_text || ' AND ST_Within(' || v_geom::text || ', ST_GeomFromText(''' || v_filter_poly::text || ''', ' || v_epsg || '))';
+					end if;
 				end if;
 
 				v_sys_query_text := v_sys_query_text || ' ORDER BY regexp_replace(' || (v_tab_params->>'sys_display_name')::text || ',''[^0-9a-zA-Z]+'','''',''g'')';
@@ -275,7 +288,7 @@ BEGIN
 				END IF;			
 	
 				v_firsttab := TRUE;
-				v_active :=FALSE;
+				v_active := FALSE;
 	
 			END IF;
 	
