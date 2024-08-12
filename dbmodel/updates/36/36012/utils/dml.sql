@@ -124,7 +124,7 @@ DELETE FROM sys_function where id  = 2806;
 DROP FUNCTION IF EXISTS gw_fct_admin_test_ci();
 
 -- 12/08/2024
-UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'sys_geom_test', ''::text)
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'sys_geom', ''::text)
 	WHERE parameter IN (
 		'basic_search_v2_tab_address',
 		'basic_search_v2_tab_hydrometer',
