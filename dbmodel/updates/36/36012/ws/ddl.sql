@@ -197,6 +197,9 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psect
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_connec_traceability", "column":"serial_number", "dataType":"varchar(100)"}}$$);
 
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"cat_valve", "dataType":"varchar(30)"}}$$);
+
+
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_arc", "column":"brand", "newName":"brand_id"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_arc", "column":"model", "newName":"model_id"}}$$);
 
@@ -213,8 +216,8 @@ update connec c set brand_id = a.brand, model_id = a.model from (
 )a where c.connec_id = a.connec_id;
 
 -- man_wjoin
-update connec c set brand_id = a.brand, model_id = a.model from (
-	select connec_id, brand, model from man_wjoin
+update connec c set brand_id = a.brand, model_id = a.model, cat_valve = a.cat_valve from (
+	select connec_id, brand, model, cat_valve from man_wjoin
 )a where c.connec_id = a.connec_id;
 
 -- man_hydrant
@@ -252,13 +255,26 @@ update node n set serial_number = a.serial_number from (
 select node_id, serial_number from man_netelement
 )a where n.node_id = a.node_id;
 
+-- man_tap
+update connec c set cat_valve = a.cat_valve from (
+select connec_id, cat_valve from man_tap
+)a where c.connec_id = a.connec_id;
+
 
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_greentap", "column":"brand"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_greentap", "column":"model"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_greentap", "column":"cat_valve"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_wjoin", "column":"brand"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_wjoin", "column":"model"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_wjoin", "column":"cat_valve"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_netwjoin", "column":"brand"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_netwjoin", "column":"model"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_netwjoin", "column":"cat_valve"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_tap", "column":"cat_valve"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_hydrant", "column":"brand"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_hydrant", "column":"model"}}$$);
@@ -269,9 +285,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_meter"
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_netelement", "column":"brand"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_netelement", "column":"model"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_netwjoin", "column":"brand"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_netwjoin", "column":"model"}}$$);
-
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_pump", "column":"brand"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_pump", "column":"model"}}$$);
 
@@ -279,3 +292,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_valve"
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_valve", "column":"model"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_netelement", "column":"serial_number"}}$$);
+
+ALTER TABLE connec ADD CONSTRAINT connec_cat_valve_fkey FOREIGN KEY (cat_valve) REFERENCES cat_node(id) ON UPDATE CASCADE ON DELETE CASCADE;

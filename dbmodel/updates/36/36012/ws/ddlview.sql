@@ -761,7 +761,8 @@ AS SELECT connec.connec_id,
         WHEN connec.model_id IS NULL THEN cat_connec.model_id
         ELSE connec.model_id
     END AS model_id,
-    connec.serial_number
+    connec.serial_number,
+    connec.cat_valve
    FROM connec
      LEFT JOIN ( SELECT connec_1.connec_id,
             count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
@@ -936,7 +937,8 @@ AS WITH s AS (
     vu_connec.plot_code,
     vu_connec.brand_id,
     vu_connec.model_id,
-    vu_connec.serial_number
+    vu_connec.serial_number,
+    vu_connec.cat_valve
    FROM s,
     vu_connec
      JOIN v_state_connec USING (connec_id)
