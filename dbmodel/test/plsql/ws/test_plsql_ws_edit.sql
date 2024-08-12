@@ -4,3 +4,18 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+-- gw_fct_setarcfusion
+
+
+-- gw_fct_setarcdivide
+
+
+-- gw_fct_setlinktonetwork
+SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+"feature":{"id":["3201","3200"]},"data":{"feature_type":"CONNEC", "forcedArcs":["2001","2002"]}}$$);
+
+SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+"feature":{"id":["100013"]},"data":{"feature_type":"CONNEC"}}$$);
+
+SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
+"feature":{"id":["100014"]},"data":{"feature_type":"GULLY"}}$$);
