@@ -11,9 +11,9 @@ import re
 from functools import partial
 
 from qgis.PyQt.QtCore import QDate, Qt
-from qgis.PyQt.QtGui import QColor, QStandardItemModel
+from qgis.PyQt.QtGui import QColor, QStandardItemModel, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QFileDialog, QLabel, QHeaderView, QTableView
+from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QFileDialog, QLabel, QHeaderView, QTableView, QMenu, QAction
 
 from .document import GwDocument
 from .info import GwInfo
@@ -39,6 +39,10 @@ class GwWorkcat:
         tools_gw.load_settings(self.dlg_man)
         self.dlg_man.tbl_workcat.setSelectionBehavior(QAbstractItemView.SelectRows)
         tools_qt.set_tableview_config(self.dlg_man.tbl_workcat)
+
+        # Populate custom context menu
+        self.dlg_man.tbl_workcat.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.dlg_man.tbl_workcat.customContextMenuRequested.connect(self._show_context_menu)
 
         # Auto-completion
         table_object = "workcat"
@@ -462,6 +466,22 @@ class GwWorkcat:
             widget.model().setFilter(expr)
         else:
             widget.setModel(model)
+
+
+    def _show_context_menu(self):
+        """ Show custom context menu """
+        menu = QMenu(self.dlg_man.tbl_workcat)
+
+        action_create = QAction("Create", self.dlg_man.tbl_workcat)
+        action_create.triggered.connect(partial(self.create_workcat))
+        menu.addAction(action_create)
+
+        action_delete = QAction("Delete", self.dlg_man.tbl_workcat)
+        action_delete.triggered.connect(partial(self._handle_delete))
+        menu.addAction(action_delete)
+
+        # Show menu
+        menu.exec(QCursor.pos())
 
 
     def _open_feature_form(self, qtable):
