@@ -56,18 +56,10 @@ jobs:
         env:
           PGPASSWORD: postgres
         run: |
-          for sql_file in test/plsql/ws/*.sql; do
-            if [ -f "$sql_file" ]; then
-              pg_prove -h localhost -U postgres -d giswater_test_db "$sql_file"
-            fi
-          done
+          pg_prove -h localhost -U postgres -d giswater_test_db test/plsql/ws/
 
       - name: Run SQL Tests with pgTAP and pg_prove (UPSERT)
         env:
           PGPASSWORD: postgres
         run: |
-          for sql_file in test/upsert/ws/*.sql; do
-            if [ -f "$sql_file" ]; then
-              pg_prove -h localhost -U postgres -d giswater_test_db "$sql_file"
-            fi
-          done
+          pg_prove -h localhost -U postgres -d giswater_test_db test/upsert/ws/
