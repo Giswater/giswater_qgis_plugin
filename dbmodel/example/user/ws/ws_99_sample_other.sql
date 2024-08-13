@@ -663,3 +663,5 @@ UPDATE config_form_fields SET layoutorder =11 WHERE  formname = 'v_edit_dqa' AND
 UPDATE config_form_fields SET layoutorder =12 WHERE  formname = 'v_edit_dqa' AND columnname = 'active';
 
 UPDATE config_param_system SET value = (replace(value, 'Disable', 'Random')) WHERE parameter='utils_graphanalytics_style';
+
+UPDATE man_hydrant set customer_code = concat('cc', node_id);
