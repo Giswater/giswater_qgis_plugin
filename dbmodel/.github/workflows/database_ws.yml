@@ -56,10 +56,10 @@ jobs:
         env:
           PGPASSWORD: postgres
         run: |
-          pg_prove -h localhost -U postgres -d giswater_test_db test/plsql/ws/
+          pg_prove -h localhost -U postgres -d giswater_test_db test/plsql/ws/*.sql
 
       - name: Run SQL Tests with pgTAP and pg_prove (UPSERT)
         env:
           PGPASSWORD: postgres
         run: |
-          pg_prove -h localhost -U postgres -d giswater_test_db test/upsert/ws/
+          pg_prove -h localhost -U postgres -d giswater_test_db test/upsert/ws/*.sql
