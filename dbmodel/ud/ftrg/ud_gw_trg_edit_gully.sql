@@ -68,6 +68,7 @@ v_trace_featuregeom boolean;
 v_seq_name text;
 v_seq_code text;
 v_code_prefix text;
+v_gully_id text;
 
 BEGIN
 
@@ -975,11 +976,10 @@ BEGIN
 		UPDATE config_param_user SET value = v_force_delete WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
 
 		-- Delete childtable addfields (after or before deletion of gully, doesn't matter)
-        FOR v_addfields IN SELECT * FROM sys_addfields
-        WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
-        LOOP
-		    EXECUTE 'DELETE FROM man_gully_'||lower(v_addfields.cat_feature_id)||' WHERE gully_id = OLD.gully_id';
-        END LOOP;
+       	v_customfeature = old.gully_type;
+		v_gully_id = old.gully_id;
+      
+	   	EXECUTE 'DELETE FROM man_gully_'||lower(v_customfeature)||' WHERE gully_id = '||quote_literal(v_gully_id)||'';
 
 		-- delete links
 		FOR v_record_link IN SELECT * FROM link WHERE feature_type='GULLY' AND feature_id=OLD.gully_id

@@ -54,6 +54,7 @@ v_trace_featuregeom boolean;
 v_seq_name text;
 v_seq_code text;
 v_code_prefix text;
+v_connec_id text;
 
 BEGIN
 
@@ -945,12 +946,12 @@ BEGIN
 
 		END LOOP;
 
-		-- Delete childtable addfields (after or before deletion of connec, doesn't matter)
-        FOR v_addfields IN SELECT * FROM sys_addfields
-        WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
-        LOOP
-		    EXECUTE 'DELETE FROM man_connec_'||lower(v_addfields.cat_feature_id)||' WHERE connec_id = OLD.connec_id';
-        END LOOP;
+		-- Delete childtable addfields (after or before deletion of node, doesn't matter)
+	
+		v_customfeature = old.connec_type;
+		v_connec_id = old.connec_id;
+      
+	   EXECUTE 'DELETE FROM man_connec_'||lower(v_customfeature)||' WHERE connec_id = '||quote_literal(v_connec_id)||'';
 
 		RETURN NULL;
 

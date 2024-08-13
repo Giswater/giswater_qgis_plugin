@@ -33,6 +33,7 @@ v_psector integer;
 v_seq_name text;
 v_seq_code text;
 v_code_prefix text;
+v_arc_id text;
 
 BEGIN
 
@@ -666,14 +667,14 @@ BEGIN
 		-- restore plan_psector_force_delete
 		UPDATE config_param_user SET value = v_force_delete WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
         
-		-- Delete childtable addfields (after or before deletion of arc, doesn't matter)
-        FOR v_addfields IN SELECT * FROM sys_addfields
-        WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
-        LOOP
-		    EXECUTE 'DELETE FROM man_arc_'||lower(v_addfields.cat_feature_id)||' WHERE arc_id = OLD.arc_id';
-        END LOOP;
+		-- Delete childtable addfields (after or before deletion of node, doesn't matter)
+	
+		v_customfeature = old.arc_type;
+		v_arc_id = old.arc_id;
+      
+	   EXECUTE 'DELETE FROM man_arc_'||lower(v_customfeature)||' WHERE arc_id = '||quote_literal(v_arc_id)||'';
 
-  	    -- delete from arc_add table
+  	-- delete from arc_add table
 		DELETE FROM arc_add WHERE arc_id = OLD.arc_id;
 		
 		RETURN NULL;

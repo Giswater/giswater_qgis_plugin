@@ -75,6 +75,7 @@ v_auto_streetvalues_field text;
 v_man_view text;
 v_input json;
 v_auto_sander boolean;
+v_node_id text;
 
 BEGIN
 
@@ -1002,11 +1003,10 @@ BEGIN
 		UPDATE config_param_user SET value = v_force_delete WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
 
 		-- Delete childtable addfields (after or before deletion of node, doesn't matter)
-        FOR v_addfields IN SELECT * FROM sys_addfields
-        WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
-        LOOP
-		    EXECUTE 'DELETE FROM man_node_'||lower(v_addfields.cat_feature_id)||' WHERE node_id = OLD.node_id';
-        END LOOP;
+		v_customfeature = old.node_type;
+		v_node_id = old.node_id;
+      
+	   	EXECUTE 'DELETE FROM man_node_'||lower(v_customfeature)||' WHERE node_id = '||quote_literal(v_node_id)||'';
 
 		RETURN NULL;
 	END IF;

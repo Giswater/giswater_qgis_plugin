@@ -37,6 +37,7 @@ v_auto_sander boolean;
 v_seq_name text;
 v_seq_code text;
 v_code_prefix text;
+v_arc_id text;
 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -767,11 +768,10 @@ BEGIN
 		UPDATE config_param_user SET value = v_force_delete WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
 
 		-- Delete childtable addfields (after or before deletion of arc, doesn't matter)
-        FOR v_addfields IN SELECT * FROM sys_addfields
-        WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
-        LOOP
-		    EXECUTE 'DELETE FROM man_arc_'||lower(v_addfields.cat_feature_id)||' WHERE arc_id = OLD.arc_id';
-        END LOOP;
+		v_customfeature = old.arc_type;
+		v_arc_id = old.arc_id;
+      
+	   	EXECUTE 'DELETE FROM man_arc_'||lower(v_customfeature)||' WHERE arc_id = '||quote_literal(v_arc_id)||'';
 
 		RETURN NULL;
 
