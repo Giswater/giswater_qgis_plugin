@@ -10,6 +10,7 @@ import json
 from functools import partial
 from sip import isdeleted
 
+from qgis.PyQt.QtGui import QCursor
 from qgis.PyQt.QtCore import Qt, QPoint
 from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget, QComboBox
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -63,6 +64,11 @@ class GwMapzoneManager:
             qtableview.setObjectName(f"tbl_{view}")
             qtableview.clicked.connect(partial(self._manage_highlight, qtableview, view))
             qtableview.doubleClicked.connect(partial(self.manage_update, self.mapzone_mng_dlg, None))
+
+            # Populate custom context menu
+            qtableview.setContextMenuPolicy(Qt.CustomContextMenu)
+            qtableview.customContextMenuRequested.connect(partial(self._show_context_menu, qtableview))
+
             tab_idx = self.mapzone_mng_dlg.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
             self.mapzone_mng_dlg.main_tab.widget(tab_idx).setObjectName(view)
 
@@ -382,6 +388,32 @@ class GwMapzoneManager:
         tools_gw.connect_signal(emit_point.canvasClicked,
                                 partial(self._get_id, dialog, action, option, emit_point, child_type),
                                 'mapzone_manager_snapping', 'get_snapped_feature_id_ep_canvasClicked_get_id')
+
+    def _show_context_menu(self, qtableview, pos):
+        """ Show custom context menu """
+        menu = QMenu(qtableview)
+
+        action_create = QAction("Create", qtableview)
+        action_create.triggered.connect(partial(self.manage_create, self.mapzone_mng_dlg, qtableview))
+        menu.addAction(action_create)
+
+        action_update = QAction("Update", qtableview)
+        action_update.triggered.connect(partial(self.manage_update, self.mapzone_mng_dlg, qtableview))
+        menu.addAction(action_update)
+
+        action_delete = QAction("Delete", qtableview)
+        action_delete.triggered.connect(partial(self._manage_delete))
+        menu.addAction(action_delete)
+
+        action_toggle_active = QAction("Toggle Active", qtableview)
+        action_toggle_active.triggered.connect(self._manage_toggle_active)
+        menu.addAction(action_toggle_active)
+
+        action_config = QAction("Config", qtableview)
+        action_config.triggered.connect(partial(self.manage_config, self.mapzone_mng_dlg, qtableview))
+        menu.addAction(action_config)
+
+        menu.exec(QCursor.pos())
 
     def _mouse_moved(self, layer, point):
         """ Mouse motion detection """
