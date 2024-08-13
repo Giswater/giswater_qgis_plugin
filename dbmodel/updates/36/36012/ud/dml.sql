@@ -112,3 +112,7 @@ hidden = false, dv_querytext = 'SELECT id, idval FROM edit_typevalue WHERE typev
 WHERE columnname = 'visitability' AND "datatype" = 'boolean';
 
 UPDATE sys_table SET sys_role='role_edit' WHERE id='plan_psector_x_gully';
+
+-- 13/08/2024
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_node_shape WHERE id IS NOT NULL' WHERE formname='cat_node' AND formtype='form_feature' AND columnname='shape' AND tabname='tab_none';
+
