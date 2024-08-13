@@ -646,15 +646,20 @@ BEGIN
 	v_message := COALESCE(v_message, '{}');
 
 	--  Return
+	
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
 				',"body":{"form":{}'||
-				',"data":{ "info":'||v_result_info||'}'
+				',"data":{"info":'||v_result_info||'}}'
 		'}')::json, 2112, null, null, null);
 
+	-- Exception control
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-END;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) 
+	||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
+	
+	END;
 $BODY$
 	LANGUAGE plpgsql VOLATILE
 	COST 100;
