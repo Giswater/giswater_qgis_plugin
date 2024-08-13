@@ -4697,6 +4697,6 @@ AS SELECT l.link_id,
     l.uncertain
    FROM v_link_gully l;
 
--- delete views definitibely
+-- delete views definitely
 -----------------------------------
 DROP VIEW IF EXISTS v_link;
