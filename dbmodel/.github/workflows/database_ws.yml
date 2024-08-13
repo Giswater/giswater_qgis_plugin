@@ -52,14 +52,22 @@ jobs:
           PGPASSWORD: postgres
         run: python test/execute_sql_files.py ws
 
-      - name: Run SQL Tests with pgTAP (PL/SQL)
+      - name: Run SQL Tests with pgTAP and pg_prove (PL/SQL)
         env:
           PGPASSWORD: postgres
         run: |
-          python test/run_tests.py ws plsql
+          for dir in test/plsql/ws; do
+            for sql_file in $dir/*.sql; do
+              pg_prove -h localhost -U postgres -d giswater_test_db $sql_file
+            done
+          done
 
-      - name: Run SQL Tests with pgTAP (Upsert)
+      - name: Run SQL Tests with pgTAP and pg_prove (UPSERT)
         env:
           PGPASSWORD: postgres
         run: |
-          python test/run_tests.py ws upsert
+          for dir in test/upsert/ws; do
+            for sql_file in $dir/*.sql; do
+              pg_prove -h localhost -U postgres -d giswater_test_db $sql_file
+            done
+          done
