@@ -1,7 +1,7 @@
 import os
 import sys
 
-def replace_vars_in_file(file_path, replacements):
+def replace_vars_in_file(file_path: str, replacements: dict) -> None:
     with open(file_path, 'r') as file:
         content = file.read()
     for old, new in replacements.items():
@@ -9,7 +9,7 @@ def replace_vars_in_file(file_path, replacements):
     with open(file_path, 'w') as file:
         file.write(content)
 
-def main(project_type):
+def main(project_type: str):
     sql_dir = './'
     replacements = {
         'SCHEMA_NAME': f'{project_type}_36',
