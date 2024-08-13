@@ -16,7 +16,7 @@ from functools import partial
 from sip import isdeleted
 
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor
+from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor, QCursor
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel, QSqlError
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
     QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu
@@ -1956,6 +1956,10 @@ class GwPsector:
         self.tbl_om_result_cat = self.dlg_merm.findChild(QTableView, "tbl_om_result_cat")
         tools_qt.set_tableview_config(self.tbl_om_result_cat)
 
+        # Populate custom context menu
+        self.tbl_om_result_cat.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.tbl_om_result_cat.customContextMenuRequested.connect(self._show_context_menu)
+
         # Set signals
         self.dlg_merm.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_merm))
         self.dlg_merm.rejected.connect(partial(tools_gw.close_dialog, self.dlg_merm))
@@ -1969,6 +1973,21 @@ class GwPsector:
         # Open form
         self.dlg_merm.setWindowFlags(Qt.WindowStaysOnTopHint)
         tools_gw.open_dialog(self.dlg_merm, dlg_name="price_manager")
+
+
+    def _show_context_menu(self, pos):
+        """ Show custom context menu """
+        menu = QMenu(self.tbl_om_result_cat)
+
+        action_set_current = QAction("Current Result", self.tbl_om_result_cat)
+        action_set_current.triggered.connect(partial(self.update_price_vdefault))
+        menu.addAction(action_set_current)
+
+        action_delete = QAction("Delete", self.tbl_om_result_cat)
+        action_delete.triggered.connect(partial(self.delete_merm, self.dlg_merm))
+        menu.addAction(action_delete)
+
+        menu.exec(QCursor.pos())
 
 
     def update_price_vdefault(self):
