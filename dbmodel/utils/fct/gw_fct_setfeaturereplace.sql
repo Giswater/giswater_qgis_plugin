@@ -110,6 +110,7 @@ v_seq_code text;
 v_code_prefix text;
 v_code_autofill_bool boolean;
 v_link text;
+v_nodetype text;
 
 BEGIN
 
