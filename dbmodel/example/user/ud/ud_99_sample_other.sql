@@ -515,8 +515,6 @@ UPDATE config_form_fields set layoutorder = 2 WHERE formname in ('ve_arc', 've_n
 
 UPDATE config_form_fields set layoutorder = 3 WHERE formname in ('ve_connec') AND columnname = 'district_id';
 
-SELECT gw_fct_setcheckproject($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"0", "fid":1}}$$)::text;
-
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CHAMBER"},
 "data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"chamber_param_1", "datatype":"text", 
 "widgettype":"combo", "label":"Chamber param_1","ismandatory":"False",
@@ -610,8 +608,6 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "widgettype":"text", "label":"Weir param_2","ismandatory":"False",
 "active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
-SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
- "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
 
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('sewstorage_param_1','combo1','combo1');
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('sewstorage_param_1','combo2','combo2');
@@ -630,21 +626,6 @@ INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('chamber_param_1','4','c
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field) VALUES ('edit_typevalue','sewstorage_param_1','man_node_sewer_storage','sewstorage_param_1');
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field) VALUES ('edit_typevalue','grate_param_1','man_gully_pgully','grate_param_1');
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field) VALUES ('edit_typevalue','chamber_param_1','man_node_chamber','chamber_param_1');
-
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true","step":"1"}}$$);
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true","step":"2"}}$$);
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true","step":"3"}}$$);
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true","step":"4"}}$$);
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true","step":"5"}}$$);
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true","step":"6"}}$$);
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true","step":"7"}}$$);
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'audit_project_user_control';
 

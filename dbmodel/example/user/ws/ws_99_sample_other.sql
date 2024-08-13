@@ -166,10 +166,6 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "widgettype":"text", "label":"Hydrant param_2","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
-SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
- "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
-
-
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field) VALUES ('edit_typevalue','hydrant_param_1','man_node_hydrant','hydrant_param_1');
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field) VALUES ('edit_typevalue','shtvalve_param_1','man_node_shutoff_valve','shtvalve_param_1');
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field) VALUES ('edit_typevalue','pressmeter_param_1','man_node_pressure_meter','pressmeter_param_1');
@@ -220,14 +216,6 @@ UPDATE config_form_fields SET layoutorder =70 , layoutname ='lyt_data_1' WHERE c
 UPDATE config_form_fields SET stylesheet ='{"label":"color:red; font-weight:bold"}' WHERE columnname IN ('expl_id', 'sector_id');
 
 SELECT gw_fct_admin_manage_triggers('fk','ALL');
-
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"1"}}$$); -- PRE-PROCESS
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"2"}}$$); -- AUTOREPAIR
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"3"}}$$);-- CHECK DATA
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"4"}}$$); -- STRUCTURE DATA
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"5"}}$$);-- CHECK GRAPH
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"6"}}$$); -- BUILD INP
-SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1}, "data":{"resultId":"gw_check_project", "step":"7"}}$$); -- POST-PROCESS
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'audit_project_user_control';
 
