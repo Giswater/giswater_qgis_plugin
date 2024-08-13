@@ -37,15 +37,11 @@ jobs:
           psql -h localhost -U postgres -d giswater_test_db -c 'CREATE EXTENSION pgrouting;'
           psql -h localhost -U postgres -d giswater_test_db -c 'CREATE EXTENSION postgis_raster;'
 
-      - name: Install pgTAP
+      - name: Install pgTAP from package
         env:
           PGPASSWORD: postgres
         run: |
-          sudo apt-get install -y postgresql-server-dev-all make gcc
-          git clone https://github.com/theory/pgtap.git
-          cd pgtap
-          make
-          sudo make install
+          sudo apt-get install -y postgresql-14-pgtap
           psql -h localhost -U postgres -d giswater_test_db -c 'CREATE EXTENSION pgtap;'
 
       - name: Replace variables in SQL files
