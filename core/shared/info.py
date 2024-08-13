@@ -2132,17 +2132,23 @@ class GwInfo(QObject):
 
         # Manage change epa_type message
         if _json.get('epa_type'):
-
-            widget_epatype = dialog.findChild(QComboBox, 'tab_data_epa_type')
-            message = "You are going to change the epa_type. With this operation you will lose information about " \
-                        "current epa_type values of this object. Would you like to continue?"
-            title = "Change epa_type"
-            answer = tools_qt.show_question(message, title)
-            if not answer:
-                widget_epatype.blockSignals(True)
-                tools_qt.set_combo_value(widget_epatype, self.epa_type, 1)
-                widget_epatype.blockSignals(False)
-                return
+            if new_feature is None:
+                can_edit = tools_os.set_boolean(tools_db.check_role_user('role_epa'))
+                if not can_edit:
+                    message = "You are not enabled to modify this epa_type widget"
+                    title = "Change epa_type"
+                    tools_qt.show_info_box(message, title)
+                    return
+                widget_epatype = dialog.findChild(QComboBox, 'tab_data_epa_type')
+                message = "You are going to change the epa_type. With this operation you will lose information about " \
+                            "current epa_type values of this object. Would you like to continue?"
+                title = "Change epa_type"
+                answer = tools_qt.show_question(message, title)
+                if not answer:
+                    widget_epatype.blockSignals(True)
+                    tools_qt.set_combo_value(widget_epatype, self.epa_type, 1)
+                    widget_epatype.blockSignals(False)
+                    return
             self.epa_type = _json.get('epa_type')
 
         # Call accept fct
