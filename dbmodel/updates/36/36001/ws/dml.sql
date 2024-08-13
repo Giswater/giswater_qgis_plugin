@@ -1264,11 +1264,6 @@ ALTER TABLE dqa ALTER COLUMN insert_user SET DEFAULT current_user;
 UPDATE config_form_fields set hidden = False  where formname = 'v_edit_inp_dscenario_demand' 
 and columnname ='feature_id';
 
-UPDATE config_form_list SET query_text = 
-'SELECT  hydrometer_id, hydrometer_customer_code,catalog_id, madeby, class, cat_period_id, sum, custom_sum, value_type, value_status, value_state
-FROM v_ui_hydroval_x_connec WHERE hydrometer_id IS NOT NULL '
-WHERE listname = 'tbl_hydrometer_value';
-
 -- search
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) 
     VALUES('basic_search_v2_tab_mincut', '{"sys_display_name": "concat(id, '' - '', street_name,'', '',  postnumber, '' - '', state_name)","sys_tablename": "vu_om_mincut","sys_filter": "state = 0 OR state = 1","sys_orderby": "id","sys_pk": "id","sys_fct": "gw_fct_getmincut"}', 'Search configuration parameteres', 'Mincut:', NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);

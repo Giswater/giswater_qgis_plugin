@@ -145,7 +145,7 @@ INSERT INTO config_typevalue VALUES('layout_name_typevalue', 'lyt_hydro_val_2', 
 INSERT INTO config_typevalue VALUES('layout_name_typevalue', 'lyt_hydro_val_3', 'lyt_hydro_val_3','lytHydroVal3');
 
 INSERT INTO config_form_list(listname, query_text, device, listtype, listclass)
-    VALUES ('tbl_hydrometer_value', 'SELECT * FROM v_ui_hydroval_x_connec WHERE hydrometer_id IS NOT NULL', 4, 'tab', 'list');
+VALUES ('tbl_hydrometer_value', 'SELECT * FROM v_ui_hydroval_x_connec WHERE hydrometer_id IS NOT NULL', 4, 'tab', 'list');
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
     VALUES('connec', 'form_feature', 'hydro_val', 'cat_period_id', 'lyt_hydro_val_1', 0, 'string', 'typeahead', 'Cat period filter:', NULL, NULL, false, false, true, false, true, 'SELECT id, id as idval FROM ext_cat_period AS t1 ORDER BY idval', NULL, true, NULL, 'WHERE connec_id ', NULL, NULL, '{"functionName": "filter_table", "parameters":{}}'::json, 'tbl_hydrometer_value', false, 1);
