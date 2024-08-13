@@ -98,7 +98,6 @@ SELECT
 FROM _archived_rpt_arc;
 
 
-
 INSERT INTO archived_rpt_inp_node(
 	result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation,
 	demand, the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition, dma_id, presszone_id, dqa_id,
@@ -120,3 +119,6 @@ FROM _archived_rpt_node;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") 
 VALUES(3264, 'There isn''t any node configured on config_graph_mincut for the selected macroexploitation',
 'Fill the config_graph_mincut with the inlets before executing the mincut', 2, true, 'utils', 'core') on conflict (id) do nothing;
+
+-- move data from confif_graph_checkvalve to man_valve
+UPDATE man_valve v SET to_arc = c.to_arc FROM config_graph_checkvalve c WHERE c.node_id = v.node_id;

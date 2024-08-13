@@ -288,9 +288,6 @@ update config_form_fields SET widgettype = 'text' WHERE columnname  = 'macrosect
 
 UPDATE v_edit_node SET nodecat_id = 'CHK-VALVE100-PN16' WHERE node_id = '1092';
 
-INSERT INTO config_graph_checkvalve (node_id, to_arc) VALUES ('1092', '2104');
-
-
 --add tooltips for specific fields
 UPDATE config_form_fields SET tooltip = 'broken - Para establecer si la válvula esta rota o no' WHERE columnname = 'broken' AND tooltip IS NULL;
 UPDATE config_form_fields SET tooltip = 'buried - Para establecer si la válvula esta enterrada o no' WHERE columnname = 'buried' AND tooltip IS NULL;
