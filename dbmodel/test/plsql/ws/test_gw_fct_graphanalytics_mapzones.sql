@@ -22,7 +22,4 @@ SELECT is (
 -- Finish the test
 SELECT finish();
 
--- Finish the test
-SELECT finish();
-
 ROLLBACK;
