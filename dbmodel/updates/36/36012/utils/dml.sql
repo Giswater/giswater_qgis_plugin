@@ -134,3 +134,44 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, '
 		'basic_search_v2_tab_network_node',
 		'basic_search_v2_tab_workcat'
 	);
+
+-- 08/08/2024
+ALTER TABLE sys_role DROP CONSTRAINT sys_role_check;
+ALTER TABLE sys_role
+ADD CONSTRAINT sys_role_check CHECK (id::text = ANY (ARRAY['role_admin'::character varying, 'role_basic'::character varying,
+'role_edit'::character varying, 'role_epa'::character varying, 'role_master'::character varying, 'role_om'::character varying,
+'role_crm'::character varying, 'role_system'::character varying]::text[]));
+
+INSERT INTO sys_role VALUES ('role_system', 'system');
+
+UPDATE sys_table SET sys_role = 'role_system' WHERE id = 'sys_feature_cat';
+UPDATE sys_table SET sys_role = 'role_system' WHERE id = 'sys_feature_epa_type';
+UPDATE sys_table SET sys_role = 'role_system' WHERE id = 'sys_feature_type';
+UPDATE sys_table SET sys_role = 'role_system' WHERE id = 'sys_role';
+UPDATE sys_table SET sys_role = 'role_system' WHERE id = 'sys_typevalue';
+UPDATE sys_table SET sys_role = 'role_system' WHERE id = 'sys_version';
+
+DELETE FROM sys_function WHERE function_name = 'gw_fct_admin_manage_roles';
+
+UPDATE sys_table SET sys_role='role_edit' WHERE id='plan_psector';
+UPDATE sys_table SET sys_role='role_edit' WHERE id='plan_psector_x_arc';
+UPDATE sys_table SET sys_role='role_edit' WHERE id='plan_psector_x_node';
+UPDATE sys_table SET sys_role='role_edit' WHERE id='plan_psector_x_other';
+UPDATE sys_table SET sys_role='role_edit' WHERE id='plan_psector_x_connec';
+
+
+INSERT INTO config_param_system (parameter, value, descript, isenabled, project_type)
+VALUES ('edit_link_autoupdate_connect_length', 'FALSE', 'Enable the automatic update for connect (connec & gully) length when link is inserted or geometry of link is updated',
+FALSE, 'utils')
+ON CONFLICT (parameter) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype,
+widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, hidden)
+WITH lyt as (SELECT distinct formname, max(layoutorder) as lytorder from config_form_fields
+where layoutname ='lyt_data_1' and formname = 'v_edit_link' group by formname)
+SELECT c.formname, formtype, tabname, 'uncertain', 'lyt_data_1', lytorder+1, datatype, widgettype, 'Uncertain', 'Uncertain', NULL, false, false, true, false, false
+FROM config_form_fields c join lyt using (formname) WHERE c.formname = 'v_edit_link'
+AND columnname = 'is_operative'
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent,
+iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, lytorder, hidden
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;

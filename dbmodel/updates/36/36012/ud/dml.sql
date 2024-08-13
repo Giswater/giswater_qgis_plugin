@@ -87,3 +87,28 @@ UPDATE config_form_tabs
 
 UPDATE config_form_tabs
 	SET "label"='Connections' WHERE tabname='tab_connections';
+
+
+-- 07/08/2024
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype,
+label,  tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, hidden)
+WITH lyt as (SELECT distinct formname, max(layoutorder) as lytorder from config_form_fields
+where layoutname ='lyt_data_2' and formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully') group by formname)
+SELECT c.formname, formtype, tabname, 'placement_type', 'lyt_data_2', lytorder+1, datatype, widgettype, 'Placement Type', 'Placement Type', NULL, false, false, true, false, false
+FROM config_form_fields c join lyt using (formname) WHERE c.formname  in ('v_edit_node','v_edit_arc','v_edit_connec','ve_node','ve_arc','ve_connec','v_edit_gully', 've_gully')
+AND columnname='adate'
+group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent,
+iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, lytorder, hidden
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('cat_arc_visibility_vdef', '1', 'NO VISITABLE', 'The arc is not visitable', NULL);
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('cat_arc_visibility_vdef', '2', 'SEMI VISITABLE', 'The arc is semi visitable, in some cases you can visit in others not', NULL);
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('cat_arc_visibility_vdef', '3', 'VISITABLE', 'The arc is visitable', NULL);
+
+UPDATE cat_arc SET visitability_vdef=3 WHERE visitability_vdef = 1; -- VISITABLE
+UPDATE cat_arc SET visitability_vdef=1 WHERE visitability_vdef = 0; -- NO VISITABLE
+UPDATE config_form_fields SET "datatype" = 'integer', widgettype = 'combo', iseditable = true,
+hidden = false, dv_querytext = 'SELECT id, idval FROM edit_typevalue WHERE typevalue=''cat_arc_visibility_vdef'''
+WHERE columnname = 'visitability' AND "datatype" = 'boolean';
+
+UPDATE sys_table SET sys_role='role_edit' WHERE id='plan_psector_x_gully';

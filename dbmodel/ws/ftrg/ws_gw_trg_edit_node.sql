@@ -528,14 +528,14 @@ BEGIN
 		soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, muni_id,streetaxis_id, 
 		streetaxis2_id, postcode, postnumber, postnumber2, postcomplement, district_id,	postcomplement2, descript, link, rotation,verified, undelete,label_x,label_y,label_rotation,
 		expl_id, publish, inventory, the_geom, hemisphere, num_value, adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id,
-		om_state, conserv_state, access_type, placement_type, expl_id2)
+		om_state, conserv_state, access_type, placement_type, expl_id2, brand_id, model_id, serial_number)
 		VALUES (NEW.node_id, NEW.code, NEW.elevation, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.arc_id, NEW.parent_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ,
 		NEW.comment,NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id, 
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, v_streetaxis, v_streetaxis2, NEW.postcode, NEW.postnumber ,NEW.postnumber2, NEW.postcomplement, NEW.district_id, 
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.rotation, NEW.verified, NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, 
 		NEW.expl_id, NEW.publish, NEW.inventory, NEW.the_geom,  NEW.hemisphere,NEW.num_value,
 		NEW.adate, NEW.adescript, NEW.accessibility, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id,
-		NEW.om_state, NEW.conserv_state, NEW.access_type, NEW.placement_type, NEW.expl_id2);
+		NEW.om_state, NEW.conserv_state, NEW.access_type, NEW.placement_type, NEW.expl_id2, NEW.brand_id, NEW.model_id, NEW.serial_number);
 
 
 		SELECT system_id, cat_feature.id INTO v_system_id, v_featurecat_id FROM cat_feature 
@@ -562,16 +562,15 @@ BEGIN
 			VALUES (NEW.node_id, NEW.vmax, NEW.vutil, NEW.area,NEW.chlorination, NEW.name, NEW.hmax);
 					
 		ELSIF v_man_table='man_hydrant' THEN
-			INSERT INTO man_hydrant (node_id, fire_code, communication, valve, geom1, geom2, brand, model, hydrant_type) 
-			VALUES (NEW.node_id, NEW.fire_code, NEW.communication, NEW.valve, NEW.geom1, NEW.geom2, NEW.brand, NEW.model, NEW.hydrant_type);		
+			INSERT INTO man_hydrant (node_id, fire_code, communication, valve, geom1, geom2, hydrant_type, customer_code) 
+			VALUES (NEW.node_id, NEW.fire_code, NEW.communication, NEW.valve, NEW.geom1, NEW.geom2, NEW.hydrant_type, NEW.customer_code);		
 		
 		ELSIF v_man_table='man_junction' THEN
 			INSERT INTO man_junction (node_id) VALUES(NEW.node_id);
 			
 		ELSIF v_man_table='man_pump' THEN		
-				INSERT INTO man_pump (node_id, max_flow, min_flow, nom_flow, power, pressure, elev_height, name, pump_number, brand, model) 
-				VALUES(NEW.node_id, NEW.max_flow, NEW.min_flow, NEW.nom_flow, NEW.power, NEW.pressure, NEW.elev_height, NEW.name, NEW.pump_number,
-				NEW.brand, NEW.model);
+				INSERT INTO man_pump (node_id, max_flow, min_flow, nom_flow, power, pressure, elev_height, name, pump_number) 
+				VALUES(NEW.node_id, NEW.max_flow, NEW.min_flow, NEW.nom_flow, NEW.power, NEW.pressure, NEW.elev_height, NEW.name, NEW.pump_number);
 
 		ELSIF v_man_table='man_reduction' THEN
 			
@@ -588,17 +587,17 @@ BEGIN
 			
 		ELSIF v_man_table='man_valve' THEN	
 			INSERT INTO man_valve (node_id,closed, broken, buried,irrigation_indicator,pression_entry, pression_exit, depth_valveshaft,regulator_situation, regulator_location, regulator_observ,
-			lin_meters, exit_type,exit_code,drive_type, cat_valve2, ordinarystatus, shutter, brand, brand2, model, model2, valve_type) 
+			lin_meters, exit_type,exit_code,drive_type, cat_valve2, ordinarystatus, shutter, brand2, model2, valve_type) 
 			VALUES (NEW.node_id, NEW.closed, NEW.broken, NEW.buried, NEW.irrigation_indicator, NEW.pression_entry, NEW.pression_exit, NEW.depth_valveshaft, NEW.regulator_situation, 
 			NEW.regulator_location, NEW.regulator_observ, NEW.lin_meters, NEW.exit_type, NEW.exit_code, NEW.drive_type, NEW.cat_valve2, NEW.ordinarystatus,
-			NEW.shutter, NEW.brand, NEW.brand2, NEW.model, NEW.model2, NEW.valve_type);
+			NEW.shutter, NEW.brand2, NEW.model2, NEW.valve_type);
 		
 		ELSIF v_man_table='man_manhole' THEN	
 			INSERT INTO man_manhole (node_id, name) VALUES(NEW.node_id, NEW.name);
 		
 		ELSIF v_man_table='man_meter' THEN
-			INSERT INTO man_meter (node_id, brand, model, real_press_max, real_press_min, real_press_avg, meter_code) 
-			VALUES(NEW.node_id, NEW.brand, NEW.model, NEW.real_press_max, NEW.real_press_min, NEW.real_press_avg, NEW.meter_code);
+			INSERT INTO man_meter (node_id, real_press_max, real_press_min, real_press_avg, meter_code) 
+			VALUES(NEW.node_id, NEW.real_press_max, NEW.real_press_min, NEW.real_press_avg, NEW.meter_code);
 		
 		ELSIF v_man_table='man_source' THEN	
 				INSERT INTO man_source (node_id, name) VALUES(NEW.node_id, NEW.name);
@@ -613,8 +612,8 @@ BEGIN
 			INSERT INTO man_register (node_id) VALUES (NEW.node_id);
 			
 		ELSIF v_man_table='man_netwjoin' THEN	
-			INSERT INTO man_netwjoin (node_id, top_floor,  cat_valve, customer_code, brand, model)
-			VALUES(NEW.node_id, NEW.top_floor, NEW.cat_valve, NEW.customer_code, NEW.brand, NEW.model);
+			INSERT INTO man_netwjoin (node_id, top_floor,  cat_valve, customer_code)
+			VALUES(NEW.node_id, NEW.top_floor, NEW.cat_valve, NEW.customer_code);
 
 		ELSIF v_man_table='man_expansiontank' THEN
 			INSERT INTO man_expansiontank (node_id) VALUES(NEW.node_id);
@@ -623,8 +622,8 @@ BEGIN
 			INSERT INTO man_flexunion (node_id) VALUES(NEW.node_id);
 		
 		ELSIF v_man_table='man_netelement' THEN
-			INSERT INTO man_netelement (node_id, serial_number, brand, model)
-			VALUES(NEW.node_id, NEW.serial_number, NEW.brand, NEW.model);		
+			INSERT INTO man_netelement (node_id, serial_number)
+			VALUES(NEW.node_id, NEW.serial_number);		
 		
 		ELSIF v_man_table='man_netsamplepoint' THEN
 			INSERT INTO man_netsamplepoint (node_id, lab_code) 
@@ -931,7 +930,8 @@ BEGIN
 		postnumber2=NEW.postnumber2, descript=NEW.descript, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, 
 		publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, link=NEW.link, lastupdate=now(), lastupdate_user=current_user,
 		adate=NEW.adate, adescript=NEW.adescript, accessibility = NEW.accessibility, asset_id=NEW.asset_id,
-		om_state=NEW.om_state, conserv_state=NEW.conserv_state, access_type=NEW.access_type, placement_type=NEW.placement_type, expl_id2=NEW.expl_id2
+		om_state=NEW.om_state, conserv_state=NEW.conserv_state, access_type=NEW.access_type, placement_type=NEW.placement_type, expl_id2=NEW.expl_id2,
+		brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number
 		WHERE node_id = OLD.node_id;
 		
 
@@ -946,8 +946,7 @@ BEGIN
 	
 		ELSIF v_man_table ='man_pump' THEN
 			UPDATE man_pump SET max_flow=NEW.max_flow, min_flow=NEW.min_flow, nom_flow=NEW.nom_flow, "power"=NEW.power, 
-			pressure=NEW.pressure, elev_height=NEW.elev_height, name=NEW.name, pump_number=NEW.pump_number,
-			brand=NEW.brand, model=NEW.model
+			pressure=NEW.pressure, elev_height=NEW.elev_height, name=NEW.name, pump_number=NEW.pump_number
 			WHERE node_id=OLD.node_id;
 		
 		ELSIF v_man_table ='man_manhole' THEN
@@ -956,7 +955,7 @@ BEGIN
 
 		ELSIF v_man_table ='man_hydrant' THEN
 			UPDATE man_hydrant SET fire_code=NEW.fire_code, communication=NEW.communication, valve=NEW.valve,
-			geom1=NEW.geom1, geom2=NEW.geom2, brand=NEW.brand, model=NEW.model, hydrant_type=NEW.hydrant_type
+			geom1=NEW.geom1, geom2=NEW.geom2, hydrant_type=NEW.hydrant_type, customer_code=NEW.customer_code
 			WHERE node_id=OLD.node_id;			
 
 		ELSIF v_man_table ='man_source' THEN
@@ -965,7 +964,7 @@ BEGIN
 
 		ELSIF v_man_table ='man_meter' THEN
 			UPDATE man_meter SET
-			brand=NEW.brand, model=NEW.model, real_press_max = NEW.real_press_max, real_press_min=NEW.real_press_min, real_press_avg=NEW.real_press_avg, meter_code=NEW.meter_code
+			real_press_max = NEW.real_press_max, real_press_min=NEW.real_press_min, real_press_avg=NEW.real_press_avg, meter_code=NEW.meter_code
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_waterwell' THEN
@@ -982,7 +981,7 @@ BEGIN
 			SET closed=NEW.closed, broken=NEW.broken, buried=NEW.buried, irrigation_indicator=NEW.irrigation_indicator, pression_entry=NEW.pression_entry, pression_exit=NEW.pression_exit, 
 			depth_valveshaft=NEW.depth_valveshaft, regulator_situation=NEW.regulator_situation, regulator_location=NEW.regulator_location, regulator_observ=NEW.regulator_observ, 
 			lin_meters=NEW.lin_meters, exit_type=NEW.exit_type, exit_code=NEW.exit_code, drive_type=NEW.drive_type, cat_valve2=NEW.cat_valve2, ordinarystatus = NEW.ordinarystatus,
-			shutter=NEW.shutter, brand=NEW.brand, brand2=NEW.brand2, model=NEW.model, model2=NEW.model2, valve_type=NEW.valve_type
+			shutter=NEW.shutter, brand2=NEW.brand2, model2=NEW.model2, valve_type=NEW.valve_type
 			WHERE node_id=OLD.node_id;	
 		
 		ELSIF v_man_table ='man_register' THEN
@@ -991,8 +990,7 @@ BEGIN
 	
 		ELSIF v_man_table ='man_netwjoin' THEN			
 			UPDATE man_netwjoin
-			SET top_floor= NEW.top_floor, cat_valve=NEW.cat_valve, customer_code=NEW.customer_code,
-			brand=NEW.brand, model=NEW.model
+			SET top_floor= NEW.top_floor, cat_valve=NEW.cat_valve, customer_code=NEW.customer_code
 			WHERE node_id=OLD.node_id;		
 		
 		ELSIF v_man_table ='man_expansiontank' THEN
@@ -1004,8 +1002,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;				
 		
 		ELSIF v_man_table ='man_netelement' THEN
-			UPDATE man_netelement SET serial_number=NEW.serial_number,
-			brand=NEW.brand, model=NEW.model
+			UPDATE man_netelement SET serial_number=NEW.serial_number
 			WHERE node_id=OLD.node_id;	
 	
 		ELSIF v_man_table ='man_netsamplepoint' THEN
@@ -1095,11 +1092,12 @@ BEGIN
 		DELETE FROM config_graph_mincut WHERE node_id=OLD.node_id;
 
 		-- Delete childtable addfields (after or before deletion of node, doesn't matter)
-        FOR v_addfields IN SELECT * FROM sys_addfields
-        WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
-        LOOP
-		    EXECUTE 'DELETE FROM man_node_'||lower(v_addfields.cat_feature_id)||' WHERE node_id = OLD.node_id';
-        END LOOP;
+	
+		v_customfeature = old.node_type;
+		v_node_id = old.node_id;
+      
+	   EXECUTE 'DELETE FROM man_node_'||lower(v_customfeature)||' WHERE node_id = '||quote_literal(v_node_id)||'';
+
 
 		-- delete from node_add table
 		DELETE FROM node_add WHERE node_id = OLD.node_id;

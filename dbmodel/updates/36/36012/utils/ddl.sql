@@ -36,3 +36,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_anlgra
 
 ALTER TABLE temp_anlgraph ALTER COLUMN cur_user SET DEFAULT CURRENT_USER;
 
+-- 08/08/2024
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"uncertain", "dataType":"boolean"}}$$);

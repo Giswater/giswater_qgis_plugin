@@ -106,9 +106,9 @@ BEGIN
 	
 	-- Check if there are nodes type 'ischange=1 or 2 (true or maybe)' without changing catalog of arcs (208)
 	v_querytext = '(SELECT n.node_id, count(*), nodecat_id, the_geom, a.expl_id FROM 
-			(SELECT node_1 as node_id, arccat_id, v_edit_arc.expl_id FROM v_edit_arc WHERE node_1 IN (SELECT node_id FROM v_node JOIN cat_node ON id=nodecat_id WHERE ischange=1)
+			(SELECT node_1 as node_id, arccat_id, v_edit_arc.expl_id FROM v_edit_arc WHERE node_1 IN (SELECT node_id FROM v_edit_node JOIN cat_node ON id=nodecat_id WHERE ischange=1)
 			  UNION
-			 SELECT node_2, arccat_id, v_edit_arc.expl_id FROM v_edit_arc WHERE node_2 IN (SELECT node_id FROM v_node JOIN cat_node ON id=nodecat_id WHERE ischange=1)
+			 SELECT node_2, arccat_id, v_edit_arc.expl_id FROM v_edit_arc WHERE node_2 IN (SELECT node_id FROM v_edit_node JOIN cat_node ON id=nodecat_id WHERE ischange=1)
 			GROUP BY 1,2,3) a	JOIN node n USING (node_id) GROUP BY 1,3,4,5 HAVING count(*) <> 2)';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext,' b') INTO v_count;

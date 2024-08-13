@@ -41,7 +41,7 @@ DELETE FROM inp_flwreg_pump where node_id = '238';
 UPDATE v_edit_arc SET epa_type = 'PUMP' WHERE arc_id = '303';
 UPDATE inp_pump set curve_id = 'PUMP-01', status='OFF', startup=2, shutoff=0.4 WHERE arc_id = '303';
 UPDATE v_edit_arc SET epa_type = 'WEIR' WHERE arc_id = '342';
-UPDATE inp_weir SET weir_type ='TRANSVERSE', offsetval = 17, cd=1.5, geom1=1, geom2=1; 
+UPDATE inp_weir SET weir_type ='TRANSVERSE', offsetval = 17, cd=1.5, geom1=1, geom2=1;
 
 
 -- refactoring flowregulators form node weir of expl_1
@@ -79,3 +79,8 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, '
 
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'sys_geom', 's.the_geom'::text)
 	WHERE parameter ='basic_search_v2_tab_address';
+
+-- change default visitability_vdef for cat_arc
+UPDATE cat_arc SET visitability_vdef = 1 WHERE geom1 <= 1.2; -- NO VISITABLE
+UPDATE cat_arc SET visitability_vdef = 2 WHERE geom1 > 1.2 AND geom1 < 1.6; -- SEMI VISITABLE
+UPDATE cat_arc SET visitability_vdef = 3 WHERE geom1 >= 1.6; -- VISITABLE

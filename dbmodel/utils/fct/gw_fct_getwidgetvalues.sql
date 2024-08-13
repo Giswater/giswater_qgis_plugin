@@ -57,17 +57,17 @@ BEGIN
 
 	IF v_featuretype ='NODE' THEN
 	
-		v_min = (SELECT max(y) FROM (SELECT sys_y1 as y FROM v_arc WHERE node_1=v_id UNION SELECT sys_y2 FROM v_arc WHERE node_2=v_id)a);
+		v_min = (SELECT max(y) FROM (SELECT sys_y1 as y FROM v_edit_arc WHERE node_1=v_id UNION SELECT sys_y2 FROM v_edit_arc WHERE node_2=v_id)a);
 		IF v_min IS NULL THEN v_min = 0; END IF;
 		
 	ELSIF v_featuretype ='ARC' THEN
 			
-		SELECT * INTO v_noderecord1 FROM v_node WHERE node_id=v_node_1;
+		SELECT * INTO v_noderecord1 FROM v_edit_node WHERE node_id=v_node_1;
 		v_max1 = v_noderecord1.sys_ymax;
 		IF v_max1 IS NULL THEN v_max1 = 999; END IF;
 
 		
-		SELECT * INTO v_noderecord2 FROM v_node WHERE node_id=v_node_2;
+		SELECT * INTO v_noderecord2 FROM v_edit_node WHERE node_id=v_node_2;
 		v_max2 = v_noderecord2.sys_ymax;
 		IF v_max2 IS NULL THEN v_max2 = 999; END IF;
 					

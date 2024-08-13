@@ -52,7 +52,21 @@ doc.id,
 om_visit.id
 FROM doc, om_visit;
 
-INSERT INTO selector_hydrometer (state_id, cur_user) VALUES (1, 'postgres');
+INSERT INTO selector_hydrometer (state_id, cur_user) VALUES (1, current_user);
+
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('hydrant_param_1','combo1','combo1');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('hydrant_param_1','combo2','combo2');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('hydrant_param_1','combo3','combo3');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('hydrant_param_1','combo4','combo4');
+
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('pressmeter_param_1','1','combo1');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('pressmeter_param_1','2','combo2');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('pressmeter_param_1','3','combo3');
+
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','1','combo1');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','2','combo2');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','3','combo3');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','4','combo4');
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"OUTFALL_VALVE"},
 "data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"outfallvalve_param_1", "datatype":"text", 
@@ -152,19 +166,9 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "widgettype":"text", "label":"Hydrant param_2","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
-INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('hydrant_param_1','combo1','combo1');
-INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('hydrant_param_1','combo2','combo2');
-INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('hydrant_param_1','combo3','combo3');
-INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('hydrant_param_1','combo4','combo4');
+SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
 
-INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('pressmeter_param_1','1','combo1');
-INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('pressmeter_param_1','2','combo2');
-INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('pressmeter_param_1','3','combo3');
-
-INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','1','combo1');
-INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','2','combo2');
-INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','3','combo3');
-INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','4','combo4');
 
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field) VALUES ('edit_typevalue','hydrant_param_1','man_node_hydrant','hydrant_param_1');
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field) VALUES ('edit_typevalue','shtvalve_param_1','man_node_shutoff_valve','shtvalve_param_1');
@@ -347,7 +351,7 @@ UPDATE cat_mat_roughness set roughness  = 0.003;
 DELETE FROM cat_arc WHERE arctype_id = 'VARC' AND id !='VIRTUAL';
 
 UPDATE config_form_fields SET dv_querytext_filterc  = ' AND id ' 
-WHERE formname IN ('upsert_catalog_node', 'upsert_catalog_arc', 'upsert_catalog_connec') AND columnname ='matcat_id';
+WHERE formname IN ('upsert_catalog_node', 'upsert_catalog_arc', 'upsert_catalog_connec') AND columnname ='matcat_id' AND dv_parent_id IS NOT NULL;
 
 UPDATE config_param_system SET value='TRUE' WHERE parameter='sys_raster_dem';
 
@@ -660,3 +664,5 @@ UPDATE config_form_fields SET layoutorder =11 WHERE  formname = 'v_edit_dqa' AND
 UPDATE config_form_fields SET layoutorder =12 WHERE  formname = 'v_edit_dqa' AND columnname = 'active';
 
 UPDATE config_param_system SET value = (replace(value, 'Disable', 'Random')) WHERE parameter='utils_graphanalytics_style';
+
+UPDATE man_hydrant set customer_code = concat('cc', node_id);

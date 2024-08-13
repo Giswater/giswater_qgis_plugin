@@ -307,8 +307,8 @@ BEGIN
 				FOR arcrec IN EXECUTE v_querytext
 				LOOP
 					-- Initial and final node of the arc
-					SELECT * INTO nodeRecord1 FROM v_node WHERE v_node.node_id = arcrec.node_1;
-					SELECT * INTO nodeRecord2 FROM v_node WHERE v_node.node_id = arcrec.node_2;
+					SELECT * INTO nodeRecord1 FROM v_edit_node WHERE node_id = arcrec.node_1;
+					SELECT * INTO nodeRecord2 FROM v_edit_node WHERE node_id = arcrec.node_2;
 
 					-- Control de lineas de longitud 0
 					IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN

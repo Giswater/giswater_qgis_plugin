@@ -54,10 +54,10 @@ BEGIN
 
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
 	EXECUTE ' INSERT INTO temp_t_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
-		WITH b AS (SELECT ve_arc.* FROM selector_sector, ve_arc
-		JOIN value_state_type ON ve_arc.state_type = value_state_type.id
-		WHERE ve_arc.sector_id = selector_sector.sector_id AND epa_type !=''UNDEFINED'' AND selector_sector.cur_user = "current_user"()::text 
-		AND ve_arc.sector_id > 0 AND ve_arc.state > 0'
+		WITH b AS (SELECT v_edit_arc.* FROM selector_sector, v_edit_arc
+		JOIN value_state_type ON v_edit_arc.state_type = value_state_type.id
+		WHERE v_edit_arc.sector_id = selector_sector.sector_id AND epa_type !=''UNDEFINED'' AND selector_sector.cur_user = "current_user"()::text 
+		AND v_edit_arc.sector_id > 0 AND v_edit_arc.state > 0'
 		||v_statetype||')
 		SELECT DISTINCT ON (n.node_id)
 		n.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, a.sector_id, n.state, n.state_type, n.annotation, n.the_geom, n.expl_id, dma_id, presszone_id, dqa_id, minsector_id,
@@ -135,27 +135,27 @@ BEGIN
 	EXECUTE 'INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, 
 		length, diameter, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
 		SELECT
-		v_arc.arc_id, node_1, node_2, v_arc.cat_arctype_id, arccat_id, epa_type, v_arc.sector_id, v_arc.state, v_arc.state_type, v_arc.annotation,
+		v_edit_arc.arc_id, node_1, node_2, v_edit_arc.cat_arctype_id, arccat_id, epa_type, v_edit_arc.sector_id, v_edit_arc.state, v_edit_arc.state_type, v_edit_arc.annotation,
 		CASE WHEN custom_roughness IS NOT NULL THEN custom_roughness ELSE roughness END AS roughness,
-		(CASE WHEN v_arc.custom_length IS NOT NULL THEN custom_length ELSE gis_length END), 
+		(CASE WHEN v_edit_arc.custom_length IS NOT NULL THEN custom_length ELSE gis_length END), 
 		(CASE WHEN inp_pipe.custom_dint IS NOT NULL THEN custom_dint ELSE dint END),  -- diameter is child value but in order to make simple the query getting values from v_edit_arc (dint)...
-		v_arc.the_geom,
-		v_arc.expl_id, dma_id, presszone_id, dqa_id, minsector_id,
-		(case when v_arc.builtdate is not null then (now()::date-v_arc.builtdate)/30 else 0 end)
-		FROM selector_sector, v_arc
+		v_edit_arc.the_geom,
+		v_edit_arc.expl_id, dma_id, presszone_id, dqa_id, minsector_id,
+		(case when v_edit_arc.builtdate is not null then (now()::date-v_edit_arc.builtdate)/30 else 0 end)
+		FROM selector_sector, v_edit_arc
 			LEFT JOIN value_state_type ON id=state_type
-			LEFT JOIN cat_arc ON v_arc.arccat_id = cat_arc.id
+			LEFT JOIN cat_arc ON v_edit_arc.arccat_id = cat_arc.id
 			LEFT JOIN cat_mat_arc ON cat_arc.matcat_id = cat_mat_arc.id
-			LEFT JOIN inp_pipe ON v_arc.arc_id = inp_pipe.arc_id
-			LEFT JOIN inp_virtualpump ON v_arc.arc_id = inp_virtualpump.arc_id
-			LEFT JOIN inp_virtualvalve ON v_arc.arc_id = inp_virtualvalve.arc_id
+			LEFT JOIN inp_pipe ON v_edit_arc.arc_id = inp_pipe.arc_id
+			LEFT JOIN inp_virtualpump ON v_edit_arc.arc_id = inp_virtualpump.arc_id
+			LEFT JOIN inp_virtualvalve ON v_edit_arc.arc_id = inp_virtualvalve.arc_id
 			LEFT JOIN cat_mat_roughness ON cat_mat_roughness.matcat_id = cat_mat_arc.id
 			WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= cat_mat_roughness.init_age
 			AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < cat_mat_roughness.end_age '
-			||v_statetype||' AND v_arc.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
+			||v_statetype||' AND v_edit_arc.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
 			AND epa_type != ''UNDEFINED''
-			AND v_arc.sector_id > 0 AND v_arc.state > 0
-			AND st_length(v_arc.the_geom) >= '||v_minlength;
+			AND v_edit_arc.sector_id > 0 AND v_edit_arc.state > 0
+			AND st_length(v_edit_arc.the_geom) >= '||v_minlength;
 
 	IF v_networkmode =  4 THEN
 
