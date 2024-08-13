@@ -610,6 +610,9 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "widgettype":"text", "label":"Weir param_2","ismandatory":"False",
 "active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
+SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
+
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('sewstorage_param_1','combo1','combo1');
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('sewstorage_param_1','combo2','combo2');
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('sewstorage_param_1','combo3','combo3');
