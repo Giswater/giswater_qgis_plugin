@@ -113,14 +113,6 @@ AS SELECT doc_x_node.id,
    FROM doc_x_node
      JOIN doc ON doc.id::text = doc_x_node.doc_id::text;
 
-
---06/08/2024
-CREATE OR REPLACE VIEW v_temp_anlgraph AS
-SELECT distinct on (arc_id) arc_id, a.node_1, a.node_2, arccat_id, arc_type, state, state_type, is_operative,
-(concat('2001-01-01 01:',checkf/60,':',checkf%60))::timestamp as timestep, trace, the_geom
-FROM temp_anlgraph JOIN v_edit_arc a USING (arc_id)
-WHERE cur_user = current_user;
-
 -- drop depedency views from arc
 -----------------------------------
 DROP VIEW IF EXISTS v_plan_psector_budget_detail;

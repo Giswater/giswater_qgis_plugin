@@ -471,6 +471,11 @@ AS SELECT a.arc_id,
      JOIN v_state_arc USING (arc_id)
   WHERE a.expl_id = s.expl_id OR a.expl_id2 = s.expl_id;
 
+CREATE OR REPLACE VIEW v_temp_anlgraph AS
+SELECT distinct on (arc_id) arc_id, a.node_1, a.node_2, arccat_id, arc_type, state, state_type, is_operative,
+(concat('2001-01-01 01:',checkf/60,':',checkf%60))::timestamp as timestep, trace, the_geom
+FROM temp_anlgraph JOIN v_edit_arc a USING (arc_id)
+WHERE cur_user = current_user;
 
 CREATE OR REPLACE VIEW vu_node
 AS WITH vu_node AS (
