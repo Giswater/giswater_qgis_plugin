@@ -11,8 +11,8 @@ SELECT plan(4);
 
 -- 1. INSERT
 INSERT INTO doc_type (id, comment)
-VALUES ('AS_BUILT', 'test');
-SELECT is((SELECT count(*) FROM doc_type WHERE id = 'AS_BUILT'), 1, 'INSERT: doc_type AS_BUILT was inserted');
+VALUES ('AS_BUILT2', 'test');
+SELECT is((SELECT count(*) FROM doc_type WHERE id = 'AS_BUILT2'), 1, 'INSERT: doc_type AS_BUILT2 was inserted');
 
 -- 2. UPDATE
 UPDATE doc_type SET id = 'WORK REPORT', comment = 'No comments' WHERE id='WORK RAPPORT';
@@ -20,10 +20,10 @@ SELECT is((SELECT id FROM doc_type WHERE employee_id = 'WORK REPORT'), 'WORK REP
 
 -- 3. UPSERT
 INSERT INTO doc_type (id, comment)
-VALUES ('AS_BUILT', 'No comments');
+VALUES ('AS_BUILT2', 'No comments');
 ON CONFLICT (id) DO UPDATE
 SET comment = EXCLUDED.comment;
-SELECT is((SELECT comment FROM doc_type WHERE id = 'AS_BUILT'), 'No comments', 'UPSERT: doc_type comment was updated to No comments using ON CONFLICT');
+SELECT is((SELECT comment FROM doc_type WHERE id = 'AS_BUILT2'), 'No comments', 'UPSERT: doc_type comment was updated to No comments using ON CONFLICT');
 
 -- 4. DELETE
 DELETE FROM doc_type WHERE id='PICTURE';
