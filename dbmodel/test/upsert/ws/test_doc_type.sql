@@ -10,24 +10,22 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(4);
 
 -- 1. INSERT
-INSERT INTO doc_type (id, comment)
-VALUES ('AS_BUILT2', 'test');
-SELECT is((SELECT count(*) FROM doc_type WHERE id = 'AS_BUILT2'), 1, 'INSERT: doc_type AS_BUILT2 was inserted');
+INSERT INTO doc_type (id, comment) VALUES ('AS_BUILT2', 'test');
+SELECT is((SELECT count(*)::integer FROM doc_type WHERE id = 'AS_BUILT2'), 1, 'INSERT: doc_type AS_BUILT2 was inserted');
 
 -- 2. UPDATE
-UPDATE doc_type SET id = 'WORK REPORT', comment = 'No comments' WHERE id='WORK RAPPORT';
-SELECT is((SELECT id FROM doc_type WHERE employee_id = 'WORK REPORT'), 'WORK REPORT', 'UPDATE: doc_type WORK RAPPORT was updated to WORK REPORT');
+UPDATE doc_type SET comment = 'updated test' WHERE id = 'AS_BUILT2';
+SELECT is((SELECT comment FROM doc_type WHERE id = 'AS_BUILT2'), 'updated test', 'UPDATE: Comment was updated to "updated test"');
 
 -- 3. UPSERT
 INSERT INTO doc_type (id, comment)
-VALUES ('AS_BUILT2', 'No comments');
-ON CONFLICT (id) DO UPDATE
-SET comment = EXCLUDED.comment;
-SELECT is((SELECT comment FROM doc_type WHERE id = 'AS_BUILT2'), 'No comments', 'UPSERT: doc_type comment was updated to No comments using ON CONFLICT');
+VALUES ('AS_BUILT2', 'upsert test')
+ON CONFLICT (id) DO UPDATE SET comment = EXCLUDED.comment;
+SELECT is((SELECT comment FROM doc_type WHERE id = 'AS_BUILT2'), 'upsert test', 'UPSERT: Comment was updated to "upsert test" using ON CONFLICT');
 
 -- 4. DELETE
-DELETE FROM doc_type WHERE id='PICTURE';
-SELECT is((SELECT count(*) FROM doc_type WHERE id = 'PICTURE'), 0, 'DELETE: doc_type PICTURE was deleted');
+DELETE FROM doc_type WHERE id = 'AS_BUILT2';
+SELECT is((SELECT count(*)::integer FROM doc_type WHERE id = 'AS_BUILT2'), 0, 'DELETE: doc_type AS_BUILT2 was deleted');
 
 SELECT * FROM finish();
 
