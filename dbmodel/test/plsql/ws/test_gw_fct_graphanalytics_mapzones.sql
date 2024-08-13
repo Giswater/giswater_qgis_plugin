@@ -6,6 +6,7 @@ This version of Giswater is provided by Giswater Association
 BEGIN;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
+SET client_min_messages TO WARNING;
 
 -- Plan for 1 test
 SELECT plan(1);

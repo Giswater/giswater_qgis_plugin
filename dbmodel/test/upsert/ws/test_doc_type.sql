@@ -5,6 +5,8 @@ This version of Giswater is provided by Giswater Association
 */
 BEGIN;
 
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
 SELECT plan(4);
 
 -- 1. INSERT
