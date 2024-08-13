@@ -37,44 +37,33 @@ jobs:
           psql -h localhost -U postgres -d giswater_test_db -c 'CREATE EXTENSION pgrouting;'
           psql -h localhost -U postgres -d giswater_test_db -c 'CREATE EXTENSION postgis_raster;'
 
+      - name: Install pgTAP
+        env:
+          PGPASSWORD: postgres
+        run: |
+          sudo apt-get install -y postgresql-server-dev-all make gcc
+          git clone https://github.com/theory/pgtap.git
+          cd pgtap
+          make
+          sudo make install
+          psql -h localhost -U postgres -d giswater_test_db -c 'CREATE EXTENSION pgtap;'
+
       - name: Replace variables in SQL files
         run: python test/replace_vars.py ud
 
-      - name: Create sample schema
+      - name: Create Sample Schema
         env:
           PGPASSWORD: postgres
         run: python test/execute_sql_files.py ud
 
-      - name: Verify Database
+      - name: Run SQL Tests with pgTAP (PL/SQL)
         env:
           PGPASSWORD: postgres
         run: |
-          # Check PostGIS version
-          postgis_version=$(psql -h localhost -U postgres -d giswater_test_db -t -c "SELECT postgis_full_version();")
-          if [ -z "$postgis_version" ]; then
-            echo "PostGIS extension not found or not installed correctly."
-            exit 1
-          else
-            echo "PostGIS version:"
-            echo "$postgis_version"
-          fi
+          python test/run_tests.py ud plsql
 
-          # Check pgRouting version
-          pgrouting_version=$(psql -h localhost -U postgres -d giswater_test_db -t -c "SELECT * FROM pgr_version();")
-          if [ -z "$pgrouting_version" ]; then
-            echo "pgRouting extension not found or not installed correctly."
-            exit 1
-          else
-            echo "pgRouting version:"
-            echo "$pgrouting_version"
-          fi
-
-          # Check features
-          arcs=$(psql -h localhost -U postgres -d giswater_test_db -t -c "SELECT count(*) FROM ud_36.v_edit_arc;")
-          if [ -z "$arcs" ]; then
-            echo "No arcs found in the v_edit_arc table."
-            exit 1
-          else
-            echo "Arcs found:"
-            echo "$arcs"
-          fi
+      - name: Run SQL Tests with pgTAP (Upsert)
+        env:
+          PGPASSWORD: postgres
+        run: |
+          python test/run_tests.py ud upsert

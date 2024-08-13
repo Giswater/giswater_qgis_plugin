@@ -1,41 +1,20 @@
+"""
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+"""
+# -*- coding: utf-8 -*-
 import os
 import argparse
-import psycopg2
+from utils import connect_to_db, execute_sql_file
+from custom_logger import logger
 
 
-def execute_sql_file(conn, file_path):
-    with open(file_path, 'r') as file:
-        sql_content = file.read()
-    with conn.cursor() as cursor:
-        try:
-            cursor.execute(sql_content)
-            conn.commit()
-            print(f"Executed {file_path} successfully.")
-        except Exception as e:
-            conn.rollback()
-            print(f"Error executing {file_path}: {e}")
-            raise
+def main(project_type: str) -> None:
+    logger.info(f"Project type: {project_type}")
 
-
-def connect_to_db():
-    # Database connection parameters
-    db_params = {
-        'dbname': 'giswater_test_db',
-        'user': 'postgres',
-        'password': os.getenv('PGPASSWORD', 'postgres'),
-        'host': 'localhost',
-        'port': 5432
-    }
-
-    # Connect to the PostgreSQL database
-    conn = psycopg2.connect(**db_params)
-    return conn
-
-
-def main(project_type):
-    print(f"Project type: {project_type}")
-
-    conn = connect_to_db()
+    conn = connect_to_db(os.getenv('PGPASSWORD', 'postgres'))
 
     # Define the root directories to process
     root_directories = ["utils/ddl", f"{project_type}/schema_model", "utils/fct", "utils/ftrg", f"{project_type}/fct", f"{project_type}/ftrg"]
@@ -44,7 +23,7 @@ def main(project_type):
 
     # Execute SQL files in the root directories
     for root_dir in root_directories:
-        print(f"Processing root directory: {root_dir}")
+        logger.info(f"Processing root directory: {root_dir}")
         for root, _, files in os.walk(root_dir):
             for file in sorted(files):
                 if file.endswith(".sql") and exclude_prefix not in file and exculude_files not in file:
@@ -64,7 +43,7 @@ def main(project_type):
                     file_path = os.path.join(root, file)
                     execute_sql_file(conn, file_path)
     else:
-        print(f"Directory {i18n_dir} does not exist")
+        logger.warning(f"Directory {i18n_dir} does not exist")
 
     # Define the base updates directory
     updates_dir = "updates/36"
@@ -84,7 +63,7 @@ def main(project_type):
                             file_path = os.path.join(root, file)
                             execute_sql_file(conn, file_path)
     else:
-        print(f"Directory {updates_dir} does not exist")
+        logger.warning(f"Directory {updates_dir} does not exist")
 
      # Execute last process command
     with conn.cursor() as cursor:
@@ -107,7 +86,7 @@ def main(project_type):
                     file_path = os.path.join(root, file)
                     execute_sql_file(conn, file_path)
     else:
-        print(f"Directory {example_dir} does not exist")
+        logger.warning(f"Directory {example_dir} does not exist")
 
 
 
