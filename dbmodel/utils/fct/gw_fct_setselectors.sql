@@ -397,9 +397,25 @@ BEGIN
 	-- inserting sector id from selected exploitaitons
 	IF v_sectorfromexpl AND v_tabname IN ('tab_exploitation', 'tab_macroexploitation') THEN
 		DELETE FROM selector_sector WHERE cur_user = current_user;
-		INSERT INTO selector_sector
-		SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0;
+	
+		select count(*) into v_count from node limit 5;
+	
+		if v_count > 0 then
+	
+			INSERT INTO selector_sector
+			SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0;
 
+		else
+			
+			INSERT INTO selector_sector
+			with expl as (
+			select a.expl_id, b.the_geom from selector_expl a 
+			join exploitation b using (expl_id) where cur_user = current_user
+			)
+			select sector_id, current_user from sector s, expl e where st_intersects(s.the_geom, e.the_geom);
+		end if;
+		
+		
 	END IF;
 
 	-- inserting expl id from selected sectors
