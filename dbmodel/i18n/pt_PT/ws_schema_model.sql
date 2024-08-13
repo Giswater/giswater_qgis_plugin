@@ -273,7 +273,7 @@ INSERT INTO cat_feature_node VALUES ('VALVULA_QUEBRA_VACUO', 'VALVE', 'VALVE', 2
 INSERT INTO cat_feature_node VALUES ('VALVULA_IRRIGA', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('VALVULA_EXULTORIO', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('VALVULA_CUNHA', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VENTOSA', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VENTOSA', 'VALVE', 'UNDEFINED', 0, true, false, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('VALVULA_PARADA', 'VALVE', 'SHORTPIPE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('REGISTRO', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('REGISTRO_VALVULA', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');

@@ -274,7 +274,7 @@ INSERT INTO cat_feature_node VALUES ('VALVE_COUPURE_PRESSION', 'VALVE', 'VALVE',
 INSERT INTO cat_feature_node VALUES ('BOITIER_PAPILLON', 'VALVE', 'VALVE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('VALVE_VERTE', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('VALVE_CHUTE', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
-INSERT INTO cat_feature_node VALUES ('VALVE_AIR', 'VALVE', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
+INSERT INTO cat_feature_node VALUES ('VALVE_AIR', 'VALVE', 'UNDEFINED', 0, true, false, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('VANNE_FERMETURE', 'VALVE', 'SHORTPIPE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('VALVE_VERIF', 'VALVE', 'SHORTPIPE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
 INSERT INTO cat_feature_node VALUES ('COMPTEUR', 'REGISTER', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}');
