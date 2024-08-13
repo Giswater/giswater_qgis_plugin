@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dlg_doc_manager</class>
- <widget class="QDialog" name="dlg_doc_manager">
+ <class>dlg_workcat_manager</class>
+ <widget class="QDialog" name="dlg_workcat_manager">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Document management</string>
+   <string>Workcat management</string>
   </property>
   <layout class="QGridLayout" name="verticalLayout_4">
    <item row="0" column="0">
