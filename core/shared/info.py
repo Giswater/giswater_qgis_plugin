@@ -31,7 +31,7 @@ from .document import GwDocument
 from .element import GwElement
 from .visit_gallery import GwVisitGallery
 from .visit import GwVisit
-
+from .workcat import GwWorkcat
 from ..utils import tools_gw, tools_backend_calls
 from ..threads.toggle_valve_state import GwToggleValveTask
 
@@ -829,9 +829,7 @@ class GwInfo(QObject):
         # Actions signals
         self.action_edit.triggered.connect(partial(self._manage_edition, dlg_cf, self.action_edit, fid, new_feature, False))
         self.action_catalog.triggered.connect(partial(self._open_catalog, tab_type, self.feature_type, child_type))
-        self.action_workcat.triggered.connect(
-            partial(self._get_catalog, 'new_workcat', self.tablename, child_type, self.feature_id, list_points,
-                    id_name))
+        self.action_workcat.triggered.connect(partial(GwWorkcat(self.iface, self.canvas).create_workcat))
         self.action_mapzone.triggered.connect(
             partial(self._get_catalog, 'new_mapzone', self.tablename, child_type, self.feature_id, list_points,
                     id_name))

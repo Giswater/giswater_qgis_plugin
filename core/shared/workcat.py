@@ -16,7 +16,6 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QFileDialog, QLabel, QHeaderView, QTableView, QMenu, QAction
 
 from .document import GwDocument
-from .info import GwInfo
 from ..ui.ui_manager import GwWorkcatManagerUi, GwInfoWorkcatUi, GwSearchWorkcatUi
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_db, tools_qgis, tools_qt, tools_os
@@ -486,6 +485,7 @@ class GwWorkcat:
 
     def _open_feature_form(self, qtable):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_feature_type' """
+        from .info import GwInfo  # Avoid circular import
 
         tools_gw.reset_rubberband(self.aux_rubber_band)
         # Get selected code from combo
