@@ -122,8 +122,7 @@ BEGIN
 			END IF;
 
 			IF NEW.connec_type IS NULL THEN
-					NEW.connec_type:=(SELECT id FROM cat_feature_connec JOIN cat_feature USING (id) WHERE active IS TRUE LIMIT 1);
-				END IF;
+				NEW.connec_type:=(SELECT id FROM cat_feature_connec JOIN cat_feature USING (id) WHERE active IS TRUE LIMIT 1);
 			END IF;
 		END IF;
 
