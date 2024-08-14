@@ -1954,8 +1954,10 @@ def fill_typeahead(completer, model, field, dialog, widget, feature_id=None):
         return
 
     # Detect the active tab
+    active_tab_name = ""
     tab_widget = dialog.findChild(QTabWidget)
-    active_tab_name = tab_widget.tabText(tab_widget.currentIndex())
+    if tab_widget:
+        active_tab_name = tab_widget.tabText(tab_widget.currentIndex())
 
     # Custom logic for the "Doc" tab
     if active_tab_name == "Doc":
