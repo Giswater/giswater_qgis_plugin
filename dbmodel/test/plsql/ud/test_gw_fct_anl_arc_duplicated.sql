@@ -12,17 +12,17 @@ SELECT plan(2);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is(
-    (gw_fct_anl_arc_duplicated($${"client": {"device": 4, "infoType": 1, "lang": "ES"},
-    "form": {}, "feature": {"tableName": "v_edit_arc", "id": []}, "data": { "filterFields": {}, "pageInfo": {},
-    "selectionMode": "wholeSelection", "parameters": {"checkType": "finalNodes"}}}$$)::JSON)->>'status',
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "infoType":1, "lang":"ES"},
+    "form":{},"feature":{"tableName":"v_edit_arc", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "selectionMode":"wholeSelection", "parameters":{"checkType":"finalNodes"}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_anl_arc_duplicated -> wholeSelection returns status "Accepted"'
 );
 
 SELECT is(
-    (gw_fct_anl_arc_duplicated($${"client": {"device": 4, "infoType": 1, "lang": "ES"},
-    "form": {}, "feature": {"tableName": "v_edit_arc", "id": [2001, 2002]}, "data": {"filterFields": {}"pageInfo": {},
-    "selectionMode": "previousSelection","parameters": {"checkType": "finalNodes"}}}$$)::JSON)->>'status',
+    (gw_fct_anl_arc_duplicated($${"client":{"device":4, "infoType":1, "lang":"ES"},
+    "form":{},"feature":{"tableName":"v_edit_arc", "id":[132,133]}, "data":{"filterFields":{}, "pageInfo":{},
+    "selectionMode":"previousSelection", "parameters":{"checkType":"finalNodes"}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_anl_arc_duplicated -> previousSelection returns status "Accepted"'
 );
