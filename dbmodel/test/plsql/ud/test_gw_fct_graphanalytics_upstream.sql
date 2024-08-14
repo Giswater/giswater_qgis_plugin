@@ -14,7 +14,7 @@ SELECT is (
     "feature":{"id":["20607"]},"data":{}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_graphanalytics_upstream returns status "Accepted"'
-)
+);
 
 SELECT is (
     (gw_fct_graphanalytics_upstream($${"client":{"device":4, "infoType":1, "lang":"ES"},
@@ -22,7 +22,7 @@ SELECT is (
     "zoomRatio":437.2725774103561}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_graphanalytics_upstream with coordinates returns status "Accepted"'
-)
+);
 
 -- Finish the test
 SELECT finish();

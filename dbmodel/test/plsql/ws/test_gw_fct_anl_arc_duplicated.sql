@@ -21,7 +21,7 @@ SELECT is(
 
 SELECT is(
     (gw_fct_anl_arc_duplicated($${"client": {"device": 4, "infoType": 1, "lang": "ES"},
-    "form": {}, "feature": {"tableName": "v_edit_arc", "id": [2001, 2002]}, "data": {"filterFields": {}"pageInfo": {},
+    "form": {}, "feature": {"tableName": "v_edit_arc", "id": [2001, 2002]}, "data": {"filterFields": {}, "pageInfo": {},
     "selectionMode": "previousSelection","parameters": {"checkType": "finalNodes"}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_anl_arc_duplicated -> previousSelection returns status "Accepted"'
