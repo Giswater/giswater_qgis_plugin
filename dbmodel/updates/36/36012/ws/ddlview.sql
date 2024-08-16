@@ -103,16 +103,16 @@ CREATE OR REPLACE VIEW v_edit_sector as select vu_sector.* from vu_sector, selec
 WHERE (vu_sector.sector_id = selector_sector.sector_id) AND selector_sector.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_edit_dma as select vu_dma.* from vu_dma, selector_expl, selector_sector
-WHERE (vu_dma.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text
-AND (vu_dma.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text) OR vu_dma.sector_id is null;
+WHERE ((vu_dma.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text OR vu_dma.expl_id is null)
+AND ((vu_dma.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text) OR vu_dma.sector_id is null);
 
 CREATE OR REPLACE VIEW v_edit_presszone as select vu_presszone.* from vu_presszone, selector_expl, selector_sector
-WHERE (vu_presszone.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text
-AND (vu_presszone.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text) OR vu_presszone.sector_id is null;
+WHERE (vu_presszone.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text OR vu_presszone.expl_id is null)
+AND ((vu_presszone.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text) OR vu_presszone.sector_id is null);
 
 CREATE OR REPLACE VIEW v_edit_dqa as select vu_dqa.* from vu_dqa, selector_expl, selector_sector
-WHERE (vu_dqa.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text
-AND (vu_dqa.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text) OR vu_dqa.sector_id is null;
+WHERE ((vu_dqa.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text OR vu_dqa.expl_id is null)
+AND((vu_dqa.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text) OR vu_dqa.sector_id is null);
 
 
 --26/07/2024
