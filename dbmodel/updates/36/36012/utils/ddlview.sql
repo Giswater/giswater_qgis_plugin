@@ -251,6 +251,10 @@ DROP VIEW IF EXISTS vu_connec;
 
 DROP VIEW IF EXISTS v_om_mincut_hydrometer;
 
+DROP VIEW IF EXISTS v_edit_dma;
+DROP VIEW IF EXISTS v_edit_presszone;
+DROP VIEW IF EXISTS v_edit_dqa;
+
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"arc", "column":"code", "dataType":"text"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"node", "column":"code", "dataType":"text"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"connec", "column":"code", "dataType":"text"}}$$);

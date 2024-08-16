@@ -200,20 +200,21 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "c
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_arc_traceability", "column":"brand_id", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_arc_traceability", "column":"model_id", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_arc_traceability", "column":"serial_number", "dataType":"varchar(100)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_arc_traceability", "column":"macrominsector_id", "dataType":"integer"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_node_traceability", "column":"brand_id", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_node_traceability", "column":"model_id", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_node_traceability", "column":"serial_number", "dataType":"varchar(100)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_arc_traceability", "column":"macrominsector_id", "dataType":"integer"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_connec_traceability", "column":"brand_id", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_connec_traceability", "column":"model_id", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_connec_traceability", "column":"serial_number", "dataType":"varchar(100)"}}$$);
-
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_arc_traceability", "column":"macrominsector_id", "dataType":"integer"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"cat_valve", "dataType":"varchar(30)"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_hydrant", "column":"customer_code", "dataType":"varchar(30)"}}$$);
-
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_arc", "column":"brand", "newName":"brand_id"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_arc", "column":"model", "newName":"model_id"}}$$);
@@ -275,6 +276,10 @@ update node n set brand_id = a.brand, model_id = a.model from (
 update node n set serial_number = a.serial_number from (
 select node_id, serial_number from man_netelement
 )a where n.node_id = a.node_id;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"presszone", "column":"expl_id2"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dqa", "column":"expl_id2"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dma", "column":"expl_id2"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_greentap", "column":"brand"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_greentap", "column":"model"}}$$);

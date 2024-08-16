@@ -32,8 +32,9 @@ BEGIN
 			NEW.active = TRUE;
 		END IF;
 
-		INSERT INTO presszone (presszone_id, name, expl_id, the_geom, graphconfig, head, stylesheet, active, descript, avg_press, presszone_type, expl_id2)
-		VALUES (NEW.presszone_id, NEW.name, NEW.expl_id, NEW.the_geom, NEW.graphconfig::json, NEW.head, NEW.stylesheet::json, NEW.active, NEW.descript, NEW.avg_press, NEW.presszone_type, NEW.expl_id2);
+		INSERT INTO presszone (presszone_id, name, expl_id, the_geom, graphconfig, head, stylesheet, active, descript, avg_press, presszone_type)
+		VALUES (NEW.presszone_id, NEW.name, NEW.expl_id, NEW.the_geom, NEW.graphconfig::json, NEW.head, NEW.stylesheet::json, NEW.active, NEW.descript, 
+		NEW.avg_press, NEW.presszone_type);
 
 		RETURN NEW;
 		
@@ -41,7 +42,8 @@ BEGIN
    	
 		UPDATE presszone
 		SET presszone_id=NEW.presszone_id, name=NEW.name, expl_id=NEW.expl_id, the_geom=NEW.the_geom, graphconfig=NEW.graphconfig::json,
-		head = NEW.head, stylesheet=NEW.stylesheet::json, active=NEW.active, descript=NEW.descript, lastupdate=now(), lastupdate_user = current_user, avg_press = NEW.avg_press, presszone_type = NEW.presszone_type, expl_id2 = NEW.expl_id2
+		head = NEW.head, stylesheet=NEW.stylesheet::json, active=NEW.active, descript=NEW.descript, lastupdate=now(), lastupdate_user = current_user, 
+		avg_press = NEW.avg_press, presszone_type = NEW.presszone_type
 		WHERE presszone_id=OLD.presszone_id;
 		
 		RETURN NEW;
