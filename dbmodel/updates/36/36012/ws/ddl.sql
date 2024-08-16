@@ -308,3 +308,42 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_valve"
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_netelement", "column":"serial_number"}}$$);
 
 ALTER TABLE connec ADD CONSTRAINT connec_cat_valve_fkey FOREIGN KEY (cat_valve) REFERENCES cat_node(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+-- 16/08/2024
+CREATE TABLE macrominsector (
+macrominsector_id serial PRIMARY KEY,
+the_geom geometry(MultiPolygon,25831),
+num_connec integer,
+num_hydro integer,
+length numeric(12,3),
+addparam json,
+code character varying(30),
+descript text);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"macrominsector_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"macrominsector_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"macrominsector_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"macrominsector_id", "dataType":"integer"}}$$);
+
+ALTER TABLE arc ADD CONSTRAINT arc_macrominsector_id_fkey FOREIGN KEY (macrominsector_id)
+REFERENCES macrominsector (macrominsector_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE node ADD CONSTRAINT arc_macrominsector_id_fkey FOREIGN KEY (macrominsector_id)
+REFERENCES macrominsector (macrominsector_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE connec ADD CONSTRAINT connec_macrominsector_id_fkey FOREIGN KEY (macrominsector_id)
+REFERENCES macrominsector (macrominsector_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE link ADD CONSTRAINT link_macrominsector_id_fkey FOREIGN KEY (macrominsector_id)
+REFERENCES macrominsector (macrominsector_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"dqa_type", "dataType":"varchar(16)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"dma_type", "dataType":"varchar(16)"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"link", "dataType":"text"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"sector_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"sector_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"sector_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector", "column":"sector_id", "dataType":"integer"}}$$);

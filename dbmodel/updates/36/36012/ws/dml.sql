@@ -124,3 +124,14 @@ UPDATE man_valve v SET to_arc = c.to_arc FROM config_graph_checkvalve c WHERE c.
 
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, active)
 VALUES('edit_typevalue', 'presszone_type', 'presszone', 'presszone_type', true);
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES('edit_typevalue', 'dma_type', 'dma', 'dma_type', true);
+
+INSERT INTO edit_typevalue VALUES ('edit_typevalue', 'dqa_type','UDEFINED', 'UDEFINED');
+
+INSERT INTO edit_typevalue VALUES ('edit_typevalue', 'dma_type','UDEFINED', 'UDEFINED');
+
+ALTER TABLE edit_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+UPDATE edit_typevalue SET id = upper(id), idval=upper(idval) WHERE typevalue IN ('sector_type');
+ALTER TABLE edit_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
