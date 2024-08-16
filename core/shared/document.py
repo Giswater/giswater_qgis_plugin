@@ -9,7 +9,7 @@ import os
 import webbrowser
 from functools import partial
 from osgeo import gdal
-from pyproj import Proj, transform
+from pyproj import CRS, Transformer
 
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QCompleter, QWidget
@@ -669,6 +669,8 @@ class GwDocument(QObject):
             doc_id = self.doc_id
         sql = f"SELECT workcat_id FROM doc_x_workcat WHERE doc_id = '{doc_id}'"
         rows = tools_db.get_rows(sql)
+        if not rows:
+            return []
         return [row['workcat_id'] for row in rows if 'workcat_id' in row]
 
 
@@ -678,6 +680,8 @@ class GwDocument(QObject):
             doc_id = self.doc_id
         sql = f"SELECT psector_id FROM doc_x_psector WHERE doc_id = '{doc_id}'"
         rows = tools_db.get_rows(sql)
+        if not rows:
+            return []
         return [row['psector_id'] for row in rows if 'psector_id' in row]
 
 
@@ -687,6 +691,8 @@ class GwDocument(QObject):
             doc_id = self.doc_id
         sql = f"SELECT visit_id FROM doc_x_visit WHERE doc_id = '{doc_id}'"
         rows = tools_db.get_rows(sql)
+        if not rows:
+            return []
         return [row['visit_id'] for row in rows if 'visit_id' in row]
 
 
@@ -852,10 +858,11 @@ class GwDocument(QObject):
             if lon_ref != "E":
                 lon = -lon
 
-            # Transform coord
-            in_proj = Proj(init='epsg:4326')
-            out_proj = Proj(init=epsg)
-            x, y = transform(in_proj, out_proj, lon, lat)
+            # Perform coordinate transformation
+            crs_in = CRS.from_epsg(4326)
+            crs_out = CRS.from_epsg(epsg)
+            transformer = Transformer.from_crs(crs_in, crs_out, always_xy=True)
+            x, y = transformer.transform(lon, lat)
 
             return x, y
 
