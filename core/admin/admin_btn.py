@@ -1685,7 +1685,13 @@ class GwAdminButton:
         self.task1.setProgress(100)
 
         status = (self.error_count == 0)
-        self._manage_result_message(status, parameter="Reload")
+        if status:
+            tools_qt.show_info_box("Reload completed successfully", title="Success")
+            tools_db.dao.commit()
+        else:
+            tools_qt.show_info_box("Reload failed", title="Error")
+            tools_db.dao.rollback()
+
         if status:
             tools_db.dao.commit()
         else:
