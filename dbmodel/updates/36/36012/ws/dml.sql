@@ -120,7 +120,21 @@ VALUES(3264, 'There isn''t any node configured on config_graph_mincut for the se
 'Fill the config_graph_mincut with the inlets before executing the mincut', 2, true, 'utils', 'core') on conflict (id) do nothing;
 
 -- move data from confif_graph_checkvalve to man_valve
-UPDATE man_valve v SET to_arc = c.to_arc FROM config_graph_checkvalve c WHERE c.node_id = v.node_id;
+UPDATE man_valve v SET to_arc = c.to_arc, active = true FROM config_graph_checkvalve c WHERE c.node_id = v.node_id;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_shortpipe", "column":"to_arc"}}$$);
+
+-- move to_arc from inp_pump to man_pump
+UPDATE man_pump m SET to_arc = i.to_arc FROM inp_pump i WHERE i.node_id = m.node_id;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_pump", "column":"to_arc"}}$$);
+
+-- move to_arc from inp_valve to man_valve
+UPDATE man_valve m SET to_arc = i.to_arc FROM inp_valve i where i.node_id = m.node_id;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_valve", "column":"to_arc"}}$$);
+
+-- move status from inp_valve to man_valve
+UPDATE man_valve m SET active = true FROM inp_valve i where i.node_id = m.node_id AND i.status IN ('ACTIVE', 'CLOSED');
+UPDATE man_valve m SET active = false FROM inp_valve i where i.node_id = m.node_id AND i.status ='OPEN';
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_valve", "column":"status"}}$$);
 
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, active)
 VALUES('edit_typevalue', 'presszone_type', 'presszone', 'presszone_type', true);
@@ -135,3 +149,38 @@ INSERT INTO edit_typevalue VALUES ('edit_typevalue', 'dma_type','UDEFINED', 'UDE
 ALTER TABLE edit_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 UPDATE edit_typevalue SET id = upper(id), idval=upper(idval) WHERE typevalue IN ('sector_type');
 ALTER TABLE edit_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+
+-- 17/08/2024
+INSERT INTO config_typevalue VALUES ('sys_style_context', 'TEMPLAYER', '{"orderBy":0}');
+INSERT INTO config_typevalue VALUES ('sys_style_context', 'BASIC', '{"orderBy":10}');
+INSERT INTO config_typevalue VALUES ('sys_style_context', 'PRESSZONE', '{"orderBy":20}');
+INSERT INTO config_typevalue VALUES ('sys_style_context', 'DMA', '{"orderBy":30}');
+INSERT INTO config_typevalue VALUES ('sys_style_context', 'EPANET', '{"orderBy":40}');
+
+UPDATE sys_style SET context = 'TEMPLAYER' WHERE idval in ('INP result line', 'INP result point', 'Overlap affected arcs', 'Overlap affected connecs', 'Other mincuts whichs overlaps', 'Temporal-Graphconfig');
+UPDATE sys_style SET context = 'EPANET' WHERE idval in ('v_edit_arc EPANET point of view', 'v_edit_connec EPANET point of view', 'v_edit_node EPANET point of view', 'v_edit_link EPANET point of view');
+UPDATE sys_style SET context = 'BASIC' WHERE context is null;
+UPDATE sys_style SET idval = replace(idval, ' EPANET point of view', '');
+DELETE FROM sys_style WHERE id IN (210,211,212,213); -- flow trace & flow exit does not make sense for ws
+
+SELECT setval('SCHEMA_NAME.sys_style_id_seq', 206, true);
+
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_node', 'SECTOR', 'qml');
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_arc', 'SECTOR', 'qml');
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_connec', 'SECTOR', 'qml');
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_link', 'SECTOR', 'qml');
+
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_node', 'PRESSZONE', 'qml');
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_arc', 'PRESSZONE', 'qml');
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_connec', 'PRESSZONE', 'qml');
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_link', 'PRESSZONE', 'qml');
+
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_node', 'DMA', 'qml');
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_arc', 'DMA', 'qml');
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_connec', 'DMA', 'qml');
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_link', 'DMA', 'qml');
+
+
+
+
+

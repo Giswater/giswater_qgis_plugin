@@ -116,3 +116,30 @@ UPDATE sys_table SET sys_role='role_edit' WHERE id='plan_psector_x_gully';
 -- 13/08/2024
 UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_node_shape WHERE id IS NOT NULL' WHERE formname='cat_node' AND formtype='form_feature' AND columnname='shape' AND tabname='tab_none';
 
+-- 17/08/2024
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES('config_typevalue', 'sys_style_context', 'sys_style', 'context', true);
+
+INSERT INTO config_typevalue VALUES ('sys_style_context', 'TEMPLAYER', '{"orderBy":0}');
+INSERT INTO config_typevalue VALUES ('sys_style_context', 'BASIC', '{"orderBy":10}');
+INSERT INTO config_typevalue VALUES ('sys_style_context', 'SECTOR', '{"orderBy":20}');
+INSERT INTO config_typevalue VALUES ('sys_style_context', 'DRAINZONE', '{"orderBy":30}');
+INSERT INTO config_typevalue VALUES ('sys_style_context', 'SWMM', '{"orderBy":40}');
+
+UPDATE sys_style SET context = 'TEMPLAYER' WHERE idval in ('INP result line', 'INP result point', 'Flow trace arc', 'Flow trace node');
+UPDATE sys_style SET context = 'SWMM' WHERE idval in ('v_edit_arc SWMM point of view', 'v_edit_link SWMM point of view', 'v_edit_node SWMM point of view', 'v_edit_gully SWMM point of view');
+UPDATE sys_style SET context = 'BASIC' WHERE context is null;
+UPDATE sys_style SET idval = replace(idval, ' SWMM point of view', '');
+
+SELECT setval('SCHEMA_NAME.sys_style_id_seq', 220, true);
+
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_node', 'SECTOR', 'qml');
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_arc', 'SECTOR', 'qml');
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_connec', 'SECTOR', 'qml');
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_link', 'SECTOR', 'qml');
+
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_node', 'DRAINZONE', 'qml');
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_arc', 'DRAINZONE', 'qml');
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_connec', 'DRAINZONE', 'qml');
+INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_link', 'DRAINZONE', 'qml');
+

@@ -6,11 +6,23 @@
 - New view v_ext_municipality filtered by selected exploitations. Use it on search tool
 - New behaviour for inlets as a junctions when they are on the end of a sector without continuity with the next one
 - Add new fields on inventory tables for UD node, arc, connec, gully: placement_type , 
-- Add new field for UD outfall: reception_env_name
 - Change all columns `code` from varchar(30) to text
-- New mapzone for WS: macrominsector 
+- New mapzone for WS: macrominsector with new colums for arc, node, connec, link
+- New stragegy for dynamic filter by joined use of sector-expl-muni
+- New mapzone columns for:
+	UD
+	- drainzone, dma (sector_id)
+	- raingage (muni_id)
+	UTILS
+	- samplepoint (muni_id, sector_id)
+	- element (muni_id, sector_id)
+	- link (muni_id, sector_id)
+	- dimensions (muni_id, sector_id)
+	WS
+	- pond & pool (muni_id)
+	- presszone, dma, dqa (sector_id)
 - New columns for WS mapzones: presszone_type, dma_type, dqa_type
-- New columns for WS mapzones: sector_id
 - New views unfiltered (vu) for WS mapzones
 - Remove expl_id2 for mapzones
+- Various bugs fixed
 

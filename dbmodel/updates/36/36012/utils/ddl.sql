@@ -38,3 +38,66 @@ ALTER TABLE temp_anlgraph ALTER COLUMN cur_user SET DEFAULT CURRENT_USER;
 
 -- 08/08/2024
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"uncertain", "dataType":"boolean"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"muni_id", "dataType":"integer"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"muni_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"sector_id", "dataType":"integer"}}$$);
+ALTER TABLE element ALTER COLUMN sector_id set default 0;
+ALTER TABLE element ALTER COLUMN sector_id set not null;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"samplepoint", "column":"muni_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"samplepoint", "column":"sector_id", "dataType":"integer"}}$$);
+ALTER TABLE samplepoint ALTER COLUMN sector_id set default 0;
+ALTER TABLE samplepoint ALTER COLUMN sector_id set not null;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit", "column":"muni_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit", "column":"sector_id", "dataType":"integer"}}$$);
+ALTER TABLE om_visit ALTER COLUMN sector_id set default 0;
+ALTER TABLE om_visit ALTER COLUMN sector_id set not null;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dimensions", "column":"muni_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dimensions", "column":"sector_id", "dataType":"integer"}}$$);
+ALTER TABLE dimensions ALTER COLUMN sector_id set default 0;
+ALTER TABLE dimensions ALTER COLUMN sector_id set not null;
+
+
+CREATE INDEX arc_muni ON arc USING btree (muni_id);
+CREATE INDEX node_muni ON node USING btree (muni_id);
+CREATE INDEX connec_muni ON connec USING btree (muni_id);
+CREATE INDEX link_muni ON link USING btree (muni_id);
+CREATE INDEX element_muni ON element USING btree (muni_id);
+CREATE INDEX samplepoint_muni ON samplepoint USING btree (muni_id);
+CREATE INDEX element_sector ON element USING btree (sector_id);
+CREATE INDEX om_visit_muni ON om_visit USING btree (muni_id);
+CREATE INDEX om_visit_sector ON om_visit USING btree (sector_id);
+CREATE INDEX dimensions_muni ON dimensions USING btree (muni_id);
+CREATE INDEX dimensions_sector ON dimensions USING btree (sector_id);
+CREATE INDEX config_param_user_value ON config_param_user USING btree (value);
+CREATE INDEX config_param_user_cur_user ON config_param_user USING btree (cur_user);
+
+ALTER TABLE sys_style RENAME TO _sys_style_;
+
+CREATE TABLE sys_style (
+  id integer NOT NULL,
+  idval text,
+  context text,
+  styletype character varying(30),
+  stylevalue text,
+  active boolean DEFAULT true,
+  CONSTRAINT sys_style_pkey_2 PRIMARY KEY (id));
+
+ALTER TABLE sys_style ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.sys_style_id_seq'::regclass);
+
+INSERT INTO sys_style SELECT id, idval, NULL, styletype, stylevalue, active FROM _sys_style_;
+
+
+
+-- code for schema utils
+CREATE TABLE selector_muni(
+muni_id integer NOT NULL,
+cur_user text NOT NULL DEFAULT CURRENT_USER,
+CONSTRAINT selector_muni_pkey PRIMARY KEY (muni_id, cur_user),
+CONSTRAINT selector_muni_id_fkey FOREIGN KEY (muni_id) 
+REFERENCES ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE);
+ALTER TABLE link ADD CONSTRAINT link_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+

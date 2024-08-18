@@ -233,19 +233,22 @@ DROP VIEW IF EXISTS v_edit_inp_virtualvalve;
 DROP VIEW IF EXISTS v_edit_inp_virtualpump;
 DROP VIEW IF EXISTS v_edit_inp_pipe;
 
+SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
+
 DROP VIEW IF EXISTS v_edit_arc;
 DROP VIEW IF EXISTS v_edit_node;
 DROP VIEW IF EXISTS v_edit_connec;
 
-DROP VIEW IF EXISTS ve_arc;
+DROP VIEW IF EXISTS ve_arc CASCADE;
 DROP VIEW IF EXISTS v_arc; -- permanently delete
 DROP VIEW IF EXISTS vu_arc;
 
-DROP VIEW IF EXISTS ve_node;
+DROP VIEW IF EXISTS ve_node CASCADE;
 DROP VIEW IF EXISTS v_node; -- permanently delete
 DROP VIEW IF EXISTS vu_node;
 
-DROP VIEW IF EXISTS ve_connec;
+DROP VIEW IF EXISTS ve_connec CASCADE;
 DROP VIEW IF EXISTS v_connec; -- permanently delete
 DROP VIEW IF EXISTS vu_connec;
 
@@ -268,3 +271,75 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"conf
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_cat_hydrometer_priority", "column":"code", "dataType":"text"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_cat_hydrometer_type", "column":"code", "dataType":"text"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_cat_raster", "column":"code", "dataType":"text"}}$$);
+
+
+CREATE OR REPLACE VIEW v_ext_address AS 
+	SELECT ext_address.id,
+    ext_address.muni_id,
+    ext_address.postcode,
+    ext_address.streetaxis_id,
+    ext_address.postnumber,
+    ext_address.plot_id,
+    ext_address.expl_id,
+    ext_streetaxis.name,
+    ext_address.the_geom
+	FROM selector_muni s, ext_address
+    LEFT JOIN ext_streetaxis ON ext_streetaxis.id::text = ext_address.streetaxis_id::text
+	WHERE ext_address.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_ext_plot AS 
+	SELECT ext_plot.id,
+    ext_plot.plot_code,
+    ext_plot.muni_id,
+    ext_plot.postcode,
+    ext_plot.streetaxis_id,
+    ext_plot.postnumber,
+    ext_plot.complement,
+    ext_plot.placement,
+    ext_plot.square,
+    ext_plot.observ,
+    ext_plot.text,
+    ext_plot.the_geom,
+    ext_plot.expl_id
+	FROM selector_muni s, ext_plot
+	WHERE ext_plot.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_edit_dimensions AS 
+ SELECT dimensions.id,
+    dimensions.distance,
+    dimensions.depth,
+    dimensions.the_geom,
+    dimensions.x_label,
+    dimensions.y_label,
+    dimensions.rotation_label,
+    dimensions.offset_label,
+    dimensions.direction_arrow,
+    dimensions.x_symbol,
+    dimensions.y_symbol,
+    dimensions.feature_id,
+    dimensions.feature_type,
+    dimensions.state,
+    dimensions.expl_id,
+    dimensions.observ,
+    dimensions.comment,
+	dimensions.sector_id,
+	dimensions.muni_id
+    FROM selector_expl, dimensions
+    JOIN v_state_dimensions ON dimensions.id = v_state_dimensions.id
+	right join selector_muni m using (muni_id)
+	join selector_sector s using (sector_id)
+	where (m.cur_user = current_user or dimensions.muni_id is null) and 
+	s.cur_user = current_user and dimensions.expl_id = selector_expl.expl_id 
+	AND selector_expl.cur_user = "current_user"()::text;
+	
+
+CREATE OR REPLACE VIEW v_sector_node AS 
+SELECT node_id, sum(sector_id)::integer as sector_id FROM(
+ SELECT node.node_id, node.sector_id FROM selector_sector, node
+ WHERE selector_sector.cur_user = "current_user"()::text AND node.sector_id = selector_sector.sector_id
+UNION SELECT node_border_sector.node_id, node_border_sector.sector_id
+ FROM selector_sector, node_border_sector
+ WHERE selector_sector.cur_user = "current_user"()::text AND node_border_sector.sector_id = selector_sector.sector_id) a
+ group by node_id;

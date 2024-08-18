@@ -8,4 +8,4 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-ALTER TABLE presszone DROP CONSTRAINT presszone_presszone_type_check;
+ALTER TABLE presszone DROP CONSTRAINT IF EXISTS presszone_presszone_type_check;

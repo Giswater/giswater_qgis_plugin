@@ -175,3 +175,5 @@ AND columnname = 'is_operative'
 group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label, tooltip, placeholder, ismandatory, isparent,
 iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+INSERT INTO selector_muni SELECT muni_id,current_user FROM ext_municipality;

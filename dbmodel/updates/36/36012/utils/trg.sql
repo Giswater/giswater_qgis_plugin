@@ -9,37 +9,13 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --05/08/2024
 CREATE trigger gw_trg_ui_doc_x_visit instead OF
-INSERT
-    OR
-DELETE
-    OR
-UPDATE
-    ON
-    v_ui_doc_x_visit FOR each row EXECUTE function gw_trg_ui_doc('doc_x_visit');
+INSERT OR DELETE OR UPDATE ON v_ui_doc_x_visit FOR each row EXECUTE function gw_trg_ui_doc('doc_x_visit');
 
 CREATE trigger gw_trg_ui_doc_x_arc instead OF
-INSERT
-    OR
-DELETE
-    OR
-UPDATE
-    ON
-    v_ui_doc_x_arc FOR each row EXECUTE function gw_trg_ui_doc('doc_x_arc');
+INSERT OR DELETE OR UPDATE ON v_ui_doc_x_arc FOR each row EXECUTE function gw_trg_ui_doc('doc_x_arc');
 
 CREATE trigger gw_trg_ui_doc_x_connec instead OF
-INSERT
-    OR
-DELETE
-    OR
-UPDATE
-    ON
-    v_ui_doc_x_connec FOR each row EXECUTE function gw_trg_ui_doc('doc_x_connec');
+INSERT OR DELETE OR UPDATE ON v_ui_doc_x_connec FOR each row EXECUTE function gw_trg_ui_doc('doc_x_connec');
 
 CREATE trigger gw_trg_ui_doc_x_node instead OF
-INSERT
-    OR
-DELETE
-    OR
-UPDATE
-    ON
-    v_ui_doc_x_node FOR each row EXECUTE function gw_trg_ui_doc('doc_x_node');
+INSERT OR DELETE OR UPDATE ON v_ui_doc_x_node FOR each row EXECUTE function gw_trg_ui_doc('doc_x_node');

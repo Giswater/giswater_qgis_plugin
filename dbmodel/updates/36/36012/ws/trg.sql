@@ -80,9 +80,6 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('VIRTUALVALVE');
 CREATE TRIGGER gw_trg_edit_inp_dscenario_virtualpump INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_virtualpump
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('VIRTUALPUMP');
 
-CREATE TRIGGER gw_trg_edit_field_valve INSTEAD OF UPDATE ON v_edit_field_valve
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_field_node('field_valve');
-
 CREATE TRIGGER gw_trg_edit_man_register_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_pol_register
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_man_node_pol('man_register_pol');
 
@@ -136,3 +133,15 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('INLET');
 
 CREATE TRIGGER gw_trg_edit_inp_node_inlet INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_inlet
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_node('inp_inlet');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_virtualvalve INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_virtualvalve
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('virtualvalve');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_shorpipe INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_shortpipe
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('shortpipe');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_valve INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_valve
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('valve');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_inlet INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_inlet
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('inlet');

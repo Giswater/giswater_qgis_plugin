@@ -318,7 +318,7 @@ ALTER TABLE connec ADD CONSTRAINT connec_cat_valve_fkey FOREIGN KEY (cat_valve) 
 -- 16/08/2024
 CREATE TABLE macrominsector (
 macrominsector_id serial PRIMARY KEY,
-the_geom geometry(MultiPolygon,25831),
+the_geom geometry(MultiPolygon,SRID_VALUE),
 num_connec integer,
 num_hydro integer,
 length numeric(12,3),
@@ -352,3 +352,18 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone",
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"sector_id", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"sector_id", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector", "column":"sector_id", "dataType":"integer"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector", "column":"muni_id", "dataType":"integer"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_valve", "column":"active", "dataType":"boolean"}}$$);
+ALTER TABLE man_valve ALTER COLUMN active SET default true;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_pump", "column":"to_arc", "dataType":"varchar(16)"}}$$);
+
+ALTER TABLE man_pump ADD CONSTRAINT man_pump_to_arc_fkey FOREIGN KEY (to_arc) REFERENCES arc (arc_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"pond", "column":"muni_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"pool", "column":"muni_id", "dataType":"integer"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"n_hydrometer", "dataType":"integer"}}$$);
+
