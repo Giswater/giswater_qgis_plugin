@@ -14,10 +14,15 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "col
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"placement_type", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"placement_type", "dataType":"varchar(50)"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_outfall", "column":"reception_env_name", "dataType":"varchar(16)"}}$$);
-
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"audit_psector_arc_traceability", "column":"placement_type", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"audit_psector_arc_traceability", "column":"visitability", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"audit_psector_node_traceability", "column":"placement_type", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"audit_psector_connec_traceability", "column":"placement_type", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"audit_psector_gully_traceability", "column":"placement_type", "dataType":"varchar(50)"}}$$);
+
+CREATE INDEX gully_muni ON gully USING btree (muni_id);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"raingage", "column":"muni_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"connec", "column":"n_hydrometer", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"drainzone", "column":"sector_id", "dataType":"integer"}}$$);
+
