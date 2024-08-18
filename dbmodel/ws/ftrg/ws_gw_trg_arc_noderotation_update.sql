@@ -32,7 +32,7 @@ BEGIN
 	
 			FOR rec_node IN SELECT * FROM v_edit_node WHERE NEW.node_1 = node_id OR NEW.node_2 = node_id
 			LOOP
-				SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM v_edit_node JOIN cat_feature_node ON rec_node.nodetype_id=id;
+				SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM v_edit_node JOIN cat_feature_node ON rec_node.node_type=id;
 				SELECT hemisphere INTO hemisphere_rotation_aux FROM v_edit_node WHERE node_id=rec_node.node_id;
 			
 				-- init variables
@@ -90,7 +90,7 @@ BEGIN
 
 			FOR rec_node IN SELECT * FROM v_edit_node WHERE NEW.node_1 = node_id OR NEW.node_2 = node_id
 			LOOP
-				SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM v_edit_node JOIN cat_feature_node ON rec_node.nodetype_id=id;
+				SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM v_edit_node JOIN cat_feature_node ON rec_node.node_type=id;
 				SELECT hemisphere INTO hemisphere_rotation_aux FROM v_edit_node WHERE node_id=rec_node.node_id;
 		
 				-- init variables
@@ -147,7 +147,7 @@ BEGIN
    	
 			FOR rec_node IN SELECT node_id,nodetype_id, the_geom FROM v_edit_node WHERE OLD.node_1 = node_id OR OLD.node_2 = node_id
 			LOOP
-				SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM v_edit_node JOIN cat_feature_node ON rec_node.nodetype_id=id;
+				SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM v_edit_node JOIN cat_feature_node ON rec_node.node_type=id;
 				SELECT hemisphere INTO hemisphere_rotation_aux FROM v_edit_node WHERE node_id=rec_node.node_id;
 		
 				-- init variables

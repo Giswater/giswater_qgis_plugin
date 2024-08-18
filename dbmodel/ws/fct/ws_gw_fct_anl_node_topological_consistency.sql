@@ -65,7 +65,7 @@ BEGIN
 				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
-				JOIN cat_feature_node ON nodetype_id=id 
+				JOIN cat_feature_node ON node_type=id 
 				WHERE num_arcs=4 AND node_id IN ('||v_array ||')
 				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
 				HAVING COUNT(*) != 4
@@ -73,7 +73,7 @@ BEGIN
 				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
-				JOIN cat_feature_node ON nodetype_id=id 
+				JOIN cat_feature_node ON node_type=id 
 				WHERE num_arcs=3 AND node_id IN ('||v_array ||')
 				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
 				HAVING COUNT(*) != 3
@@ -81,7 +81,7 @@ BEGIN
 				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
-				JOIN cat_feature_node ON nodetype_id=id 
+				JOIN cat_feature_node ON node_type=id 
 				WHERE num_arcs=2 AND node_id IN ('||v_array ||')
 				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
 				HAVING COUNT(*) != 2
@@ -89,7 +89,7 @@ BEGIN
 				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
-				JOIN cat_feature_node ON nodetype_id=id 
+				JOIN cat_feature_node ON node_type=id 
 				WHERE num_arcs=1 AND node_id IN ('||v_array ||')
 				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
 				HAVING COUNT(*) != 1;';
@@ -98,28 +98,28 @@ BEGIN
 				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
-				JOIN cat_feature_node ON nodetype_id=id WHERE num_arcs=4
+				JOIN cat_feature_node ON node_type=id WHERE num_arcs=4
 				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
 				HAVING COUNT(*) != 4
 				UNION
 				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
-				JOIN cat_feature_node ON nodetype_id=id WHERE num_arcs=3
+				JOIN cat_feature_node ON node_type=id WHERE num_arcs=3
 				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
 				HAVING COUNT(*) != 3
 				UNION
 				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
-				JOIN cat_feature_node ON nodetype_id=id WHERE num_arcs=2
+				JOIN cat_feature_node ON node_type=id WHERE num_arcs=2
 				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
 				HAVING COUNT(*) != 2
 				UNION
 				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
-				JOIN cat_feature_node ON nodetype_id=id WHERE num_arcs=1
+				JOIN cat_feature_node ON node_type=id WHERE num_arcs=1
 				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
 				HAVING COUNT(*) != 1;';
 	END IF;

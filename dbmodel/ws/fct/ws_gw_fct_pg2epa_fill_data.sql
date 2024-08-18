@@ -135,7 +135,7 @@ BEGIN
 	EXECUTE 'INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, 
 		length, diameter, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
 		SELECT
-		v_edit_arc.arc_id, node_1, node_2, v_edit_arc.cat_arctype_id, arccat_id, epa_type, v_edit_arc.sector_id, v_edit_arc.state, v_edit_arc.state_type, v_edit_arc.annotation,
+		v_edit_arc.arc_id, node_1, node_2, v_edit_arc.arc_type, arccat_id, epa_type, v_edit_arc.sector_id, v_edit_arc.state, v_edit_arc.state_type, v_edit_arc.annotation,
 		CASE WHEN custom_roughness IS NOT NULL THEN custom_roughness ELSE roughness END AS roughness,
 		(CASE WHEN v_edit_arc.custom_length IS NOT NULL THEN custom_length ELSE gis_length END), 
 		(CASE WHEN inp_pipe.custom_dint IS NOT NULL THEN custom_dint ELSE dint END),  -- diameter is child value but in order to make simple the query getting values from v_edit_arc (dint)...

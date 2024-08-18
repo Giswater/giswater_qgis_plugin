@@ -108,7 +108,7 @@ BEGIN
 	VALUES (249, 1, concat('Delimitier node type: ', v_mapzone_nodetype,'.'));
 
 
-	FOR rec IN EXECUTE '(SELECT node_id::text, expl_id FROM v_edit_node WHERE nodetype_id IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN '||v_graph_class_list||'))' 
+	FOR rec IN EXECUTE '(SELECT node_id::text, expl_id FROM v_edit_node WHERE node_type IN (SELECT id FROM cat_feature_node WHERE graph_delimiter IN '||v_graph_class_list||'))' 
 	LOOP	
 		--find defined sector value of node
 		EXECUTE 'SELECT '||v_mapzonefield||' FROM node WHERE node_id = '||rec.node_id||'::text'
