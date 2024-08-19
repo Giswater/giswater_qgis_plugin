@@ -5,6 +5,9 @@ This version of Giswater is provided by Giswater Association
 */
 BEGIN;
 
+-- Suppress NOTICE messages
+SET client_min_messages TO WARNING;
+
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(356);

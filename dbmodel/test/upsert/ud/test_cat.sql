@@ -5,6 +5,9 @@ This version of Giswater is provided by Giswater Association
 */
 BEGIN;
 
+-- Suppress NOTICE messages
+SET client_min_messages TO WARNING;
+
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(16);
@@ -28,11 +31,11 @@ SELECT is((SELECT count(*)::integer FROM cat_work WHERE id = 'work5'), 0, 'DELET
 
 -- Subtest 2: Testing cat_feature_node operations | insert/update/delete (junction, circ_manhole, sewer_storage)
 INSERT INTO cat_feature (id, system_id, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)
-VALUES('JUNCTION2', 'JUNCTION', 'NODE', 'N', 'v_edit_node', 've_node_junction', NULL, NULL, true, true, NULL);
+VALUES('JUNCTION2', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_junction', NULL, NULL, true, true, NULL);
 INSERT INTO cat_feature (id, system_id, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)
-VALUES('CIRC_MANHOLE2', 'MANHOLE', 'NODE', 'M', 'v_edit_node', 've_node_circ_manhole', NULL, NULL, true, true, '{"code_prefix":"CM_"}'::json);
+VALUES('CIRC_MANHOLE2', 'MANHOLE', 'NODE', NULL, 'v_edit_node', 've_node_circ_manhole', NULL, NULL, true, true, '{"code_prefix":"CM_"}'::json);
 INSERT INTO cat_feature (id, system_id, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)
-VALUES('SEWER_STORAGE2', 'STORAGE', 'NODE', 'L', 'v_edit_node', 've_node_sewer_storage', NULL, NULL, true, true, NULL);
+VALUES('SEWER_STORAGE2', 'STORAGE', 'NODE', NULL, 'v_edit_node', 've_node_sewer_storage', NULL, NULL, true, true, NULL);
 
 -- JUNCTION
 INSERT INTO cat_feature_node (id, "type", epa_default, num_arcs, choose_hemisphere, isarcdivide, isprofilesurface, isexitupperintro, double_geom)

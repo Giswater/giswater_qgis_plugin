@@ -5,6 +5,9 @@ This version of Giswater is provided by Giswater Association
 */
 BEGIN;
 
+-- Suppress NOTICE messages
+SET client_min_messages TO WARNING;
+
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(16);
@@ -28,11 +31,11 @@ SELECT is((SELECT count(*)::integer FROM cat_work WHERE id = 'work5'), 0, 'DELET
 
 -- Subtest 2: Testing cat_feature_node operations | insert/update/delete (junction, circ_manhole, sewer_storage)
 INSERT INTO cat_feature (id, system_id, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)
-VALUES('JUNCTION2', 'JUNCTION', 'NODE', 'N', 'v_edit_node', 've_node_junction', NULL, NULL, true, true, NULL);
+VALUES('JUNCTION2', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_junction', NULL, NULL, true, true, NULL);
 INSERT INTO cat_feature (id, system_id, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)
-VALUES('CIRC_MANHOLE2', 'MANHOLE', 'NODE', 'M', 'v_edit_node', 've_node_circ_manhole', NULL, NULL, true, true, '{"code_prefix":"CM_"}'::json);
+VALUES('CIRC_MANHOLE2', 'MANHOLE', 'NODE', NULL, 'v_edit_node', 've_node_circ_manhole', NULL, NULL, true, true, '{"code_prefix":"CM_"}'::json);
 INSERT INTO cat_feature (id, system_id, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)
-VALUES('SEWER_STORAGE2', 'STORAGE', 'NODE', 'L', 'v_edit_node', 've_node_sewer_storage', NULL, NULL, true, true, NULL);
+VALUES('CHECK_VALVE2', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_check_valve', 'Check valve', NULL, true, true, NULL);
 
 -- JUNCTION
 INSERT INTO cat_feature_node (id, "type", epa_default, num_arcs, choose_hemisphere, isarcdivide, graph_delimiter, isprofilesurface, double_geom)
@@ -66,21 +69,21 @@ SELECT is((SELECT num_arcs FROM cat_feature_node WHERE id = 'CIRC_MANHOLE2'), 3,
 DELETE FROM cat_feature_node WHERE id = 'CIRC_MANHOLE2';
 SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'CIRC_MANHOLE2'), 0, 'DELETE: cat_feature_node "CIRC_MANHOLE2" was deleted');
 
--- SEWER_STORAGE
+-- CHECK_VALVE
 INSERT INTO cat_feature_node (id, "type", epa_default, num_arcs, choose_hemisphere, isarcdivide, graph_delimiter, isprofilesurface, double_geom)
-VALUES('SEWER_STORAGE2', 'SEWER_STORAGE', 'SEWER_STORAGE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}'::json);
-SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'SEWER_STORAGE2'), 1, 'INSERT: cat_feature_node "SEWER_STORAGE2" was inserted');
+VALUES('CHECK_VALVE2', 'VALVE', 'SHORTPIPE', 2, true, true, 'MINSECTOR', false, '{"activated":false,"value":1}'::json);
+SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'CHECK_VALVE2'), 1, 'INSERT: cat_feature_node "CHECK_VALVE2" was inserted');
 
-UPDATE cat_feature_node SET num_arcs = 1 WHERE id = 'SEWER_STORAGE2';
-SELECT is((SELECT num_arcs FROM cat_feature_node WHERE id = 'SEWER_STORAGE2'), 1, 'UPDATE: num_arcs was updated to 1');
+UPDATE cat_feature_node SET num_arcs = 1 WHERE id = 'CHECK_VALVE2';
+SELECT is((SELECT num_arcs FROM cat_feature_node WHERE id = 'CHECK_VALVE2'), 1, 'UPDATE: num_arcs was updated to 1');
 
 INSERT INTO cat_feature_node (id, "type", epa_default, num_arcs, choose_hemisphere, isarcdivide, graph_delimiter, isprofilesurface, double_geom)
-VALUES('SEWER_STORAGE2', 'SEWER_STORAGE', 'SEWER_STORAGE', 3, true, true, 'NONE', false, '{"activated":false,"value":1}'::json)
+VALUES('CHECK_VALVE2', 'SEWER_STORAGE', 'SEWER_STORAGE', 3, true, true, 'NONE', false, '{"activated":false,"value":1}'::json)
 ON CONFLICT (id) DO UPDATE SET num_arcs = EXCLUDED.num_arcs;
-SELECT is((SELECT num_arcs FROM cat_feature_node WHERE id = 'SEWER_STORAGE2'), 3, 'UPSERT: num_arcs was updated to 3 using ON CONFLICT');
+SELECT is((SELECT num_arcs FROM cat_feature_node WHERE id = 'CHECK_VALVE2'), 3, 'UPSERT: num_arcs was updated to 3 using ON CONFLICT');
 
-DELETE FROM cat_feature_node WHERE id = 'SEWER_STORAGE2';
-SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'SEWER_STORAGE2'), 0, 'DELETE: cat_feature_node "SEWER_STORAGE2" was deleted');
+DELETE FROM cat_feature_node WHERE id = 'CHECK_VALVE2';
+SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'CHECK_VALVE2'), 0, 'DELETE: cat_feature_node "CHECK_VALVE2" was deleted');
 
 
 -- Subtest 3: Testing cat_feature_arc operations | insert/update/delete (conduit, siphon, waccel, pump_pipe)
