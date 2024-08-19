@@ -11,6 +11,7 @@ SELECT plan(2);
 
 -- Subtest 1: Testing doc_type operations
 SELECT subtest('doc_type operations', $$
+BEGIN;
     SELECT plan(4);
 
     -- 1. INSERT
@@ -30,10 +31,15 @@ SELECT subtest('doc_type operations', $$
     -- 4. DELETE
     DELETE FROM doc_type WHERE id = 'AS_BUILT2';
     SELECT is((SELECT count(*)::integer FROM doc_type WHERE id = 'AS_BUILT2'), 0, 'DELETE: doc_type AS_BUILT2 was deleted');
+
+    SELECT * FROM finish();
+    ROLLBACK;
+END;
 $$);
 
 -- Subtest 2: Testing doc operations
 SELECT subtest('doc operations', $$
+BEGIN;
     SELECT plan(4);
 
     -- 1. INSERT
@@ -54,6 +60,10 @@ SELECT subtest('doc operations', $$
     -- 4. DELETE
     DELETE FROM doc WHERE id = 'Demo document 4';
     SELECT is((SELECT count(*)::integer FROM doc WHERE id = 'Demo document 4'), 0, 'DELETE: doc "Demo document 4" was deleted');
+
+    SELECT * FROM finish();
+    ROLLBACK;
+END;
 $$);
 
 SELECT * FROM finish();

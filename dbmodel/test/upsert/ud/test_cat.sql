@@ -11,6 +11,7 @@ SELECT plan(3);
 
 -- Subtest 1: Testing cat_work operations | insert/update/delete
 SELECT subtest('cat_work operations', $$
+BEGIN;
     SELECT plan(4);
 
     -- 1. INSERT
@@ -32,14 +33,19 @@ SELECT subtest('cat_work operations', $$
     DELETE FROM cat_work WHERE id = 'work5';
     SELECT is((SELECT count(*)::integer FROM cat_work WHERE id = 'work5'), 0, 'DELETE: cat_work "work5" was deleted');
 
+    SELECT * FROM finish();
+    ROLLBACK;
+END;
 $$);
 
 -- Subtest 2: Testing cat_feature_node operations | insert/update/delete (junction, circ_manhole, sewer_storage)
 SELECT subtest('cat_feature_node operations', $$
+BEGIN;
     SELECT plan(3);
 
     -- JUNCTION
     SELECT subtest('cat_feature_node junction operations', $$
+    BEGIN;
         -- 1. INSERT
         INSERT INTO cat_feature_node (id, "type", epa_default, num_arcs, choose_hemisphere, isarcdivide, isprofilesurface, isexitupperintro, double_geom)
         VALUES('JUNCTION2', 'JUNCTION', 'JUNCTION', 2, true, true, true, 0, '{"activated":false,"value":1}'::json);
@@ -58,10 +64,15 @@ SELECT subtest('cat_feature_node operations', $$
         -- 4. DELETE
         DELETE FROM cat_feature_node WHERE id = 'JUNCTION2';
         SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'JUNCTION2'), 0, 'DELETE: cat_feature_node "JUNCTION2" was deleted');
+
+        SELECT * FROM finish();
+        ROLLBACK;
+    END;
     $$);
 
     -- CIRC_MANHOLE
     SELECT subtest('cat_feature_node circ_manhole operations', $$
+    BEGIN;
         -- 1. INSERT
         INSERT INTO cat_feature_node (id, "type", epa_default, num_arcs, choose_hemisphere, isarcdivide, isprofilesurface, isexitupperintro, double_geom)
         VALUES('CIRC_MANHOLE2', 'MANHOLE', 'JUNCTION', 2, true, true, true, 0, '{"activated":false,"value":1}'::json);
@@ -80,10 +91,15 @@ SELECT subtest('cat_feature_node operations', $$
         -- 4. DELETE
         DELETE FROM cat_feature_node WHERE id = 'CIRC_MANHOLE2';
         SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'CIRC_MANHOLE2'), 0, 'DELETE: cat_feature_node "CIRC_MANHOLE2" was deleted');
+
+        SELECT * FROM finish();
+        ROLLBACK;
+    END;
     $$);
 
     -- SEWER_STORAGE
     SELECT subtest('cat_feature_node sewer_storage operations', $$
+    BEGIN;
         -- 1. INSERT
         INSERT INTO cat_feature_node (id, "type", epa_default, num_arcs, choose_hemisphere, isarcdivide, isprofilesurface, isexitupperintro, double_geom)
         VALUES('SEWER_STORAGE2', 'SEWER_STORAGE', 'SEWER_STORAGE', 2, true, true, false, 0, '{"activated":false,"value":1}'::json);
@@ -102,7 +118,15 @@ SELECT subtest('cat_feature_node operations', $$
         -- 4. DELETE
         DELETE FROM cat_feature_node WHERE id = 'SEWER_STORAGE2';
         SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'SEWER_STORAGE2'), 0, 'DELETE: cat_feature_node "SEWER_STORAGE2" was deleted');
+
+        SELECT * FROM finish();
+        ROLLBACK;
+    END;
     $$);
+
+    SELECT * FROM finish();
+    ROLLBACK;
+END;
 $$);
 
 -- Subtest 3: Testing cat_feature_arc operations | insert/update/delete (conduit, siphon, waccel, pump_pipe)
