@@ -14,7 +14,7 @@ SELECT plan(16);
 
 -- Subtest 1: Testing macroexplotation operations
 INSERT INTO macroexploitation (macroexpl_id, "name", descript, undelete, active) VALUES(2, 'Test', 'Test macroexploitation', NULL, true);
-SELECT is((SELECT count(*)::integer FROM macroexploitation WHERE id = 2), 1, 'INSERT: macroexploitation "2" was inserted');
+SELECT is((SELECT count(*)::integer FROM macroexploitation WHERE macroexpl_id = 2), 1, 'INSERT: macroexploitation "2" was inserted');
 
 UPDATE macroexploitation SET descript = 'updated test' WHERE macroexpl_id = 2;
 SELECT is((SELECT descript FROM macroexploitation WHERE macroexpl_id = 2), 'updated test', 'UPDATE: descript was updated to "updated test"');
