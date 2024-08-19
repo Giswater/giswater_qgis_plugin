@@ -135,6 +135,12 @@ BEGIN
 	UNION
 	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'PATTERN'::text, p.energy_pattern_id FROM inp_pump_additional p LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text WHERE p.energy_pattern_id IS NOT NULL
 	UNION
+	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'EFFIC'::text,p.effic_curve_id FROM inp_virtualpump p LEFT JOIN temp_arc ON p.arc_id = temp_arc.arc_id::text WHERE p.effic_curve_id IS NOT NULL
+	UNION
+	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'PRICE'::text, p.energy_price::text FROM inp_virtualpump p LEFT JOIN temp_arc ON p.arc_id = temp_arc.arc_id::text WHERE p.energy_price IS NOT NULL
+	UNION
+	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'PATTERN'::text, p.energy_pattern_id FROM inp_virtualpump p LEFT JOIN temp_arc ON p.arc_id = temp_arc.arc_id::text WHERE p.energy_pattern_id IS NOT NULL	 
+	UNION
 	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'EFFIC'::text, p.effic_curve_id FROM inp_dscenario_pump p LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text WHERE p.effic_curve_id IS NOT NULL
 	UNION
 	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'PRICE'::text, p.energy_price::text FROM inp_dscenario_pump p LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text WHERE p.energy_price IS NOT NULL
@@ -143,9 +149,15 @@ BEGIN
 	UNION
 	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'EFFIC'::text, p.effic_curve_id FROM inp_dscenario_pump_additional p LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text WHERE p.effic_curve_id IS NOT NULL
 	UNION
-	 SELECT concat('PUMP ', t.arc_id) AS pump_id,'PRICE'::text, p.energy_price::text  FROM inp_dscenario_pump_additional p LEFT JOIN temp_arc t ON concat(p.node_id, '_n2a') = t.arc_id::text WHERE p.energy_price IS NOT NULL
+	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'PRICE'::text, p.energy_price::text  FROM inp_dscenario_pump_additional p LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text WHERE p.energy_price IS NOT NULL
 	UNION
-	 SELECT concat('PUMP ', t.arc_id) AS pump_id, 'PATTERN'::text, p.energy_pattern_id  FROM inp_dscenario_pump_additional p LEFT JOIN temp_arc t ON concat(p.node_id, '_n2a') = t.arc_id::text WHERE p.energy_pattern_id IS NOT NULL
+	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'PATTERN'::text, p.energy_pattern_id  FROM inp_dscenario_pump_additional p LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text WHERE p.energy_pattern_id IS NOT NULL
+	UNION
+	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'EFFIC'::text, p.effic_curve_id FROM inp_dscenario_virtualvalve p LEFT JOIN temp_arc ON p.arc_id = temp_arc.arc_id::text WHERE p.effic_curve_id IS NOT NULL
+	UNION
+	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'PRICE'::text, p.energy_price::text  FROM inp_dscenario_virtualvalve p LEFT JOIN temp_arc ON p.arc_id = temp_arc.arc_id::text WHERE p.energy_price IS NOT NULL
+	UNION
+	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'PATTERN'::text, p.energy_pattern_id  FROM inp_dscenario_virtualvalve p LEFT JOIN temp_arc ON p.arc_id = temp_arc.arc_id::text WHERE p.energy_pattern_id IS NOT NULL
 	UNION
 	 SELECT sys_param_user.idval AS pump_id, config_param_user.value, NULL::text  FROM config_param_user JOIN sys_param_user ON sys_param_user.id = config_param_user.parameter::text
 	 WHERE (config_param_user.parameter::text = 'inp_energy_price'::text OR config_param_user.parameter::text = 'inp_energy_pump_effic'::text OR config_param_user.parameter::text = 'inp_energy_price_pattern'::text) 

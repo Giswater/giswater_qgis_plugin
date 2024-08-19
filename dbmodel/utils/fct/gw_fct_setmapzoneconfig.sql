@@ -67,8 +67,6 @@ BEGIN
 	v_arc_id_new = json_extract_path_text(p_data, 'data','parameters','arcIdNew');
 	v_action = json_extract_path_text(p_data, 'data','parameters','action');
 
-	raise notice '% % % %', v_node_id_old, v_arc_id_old, v_arc_id_new, v_action;
-
 	IF v_action = 'updateArc' THEN
 
 		-- mapzones
@@ -87,31 +85,35 @@ BEGIN
 			
 		END LOOP;
 		
-		-- epanet (to_arc)
-		UPDATE inp_pump SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
-		UPDATE inp_valve SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
+		-- man values
+		UPDATE man_pump SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
+		UPDATE man_valve SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
 		
-		-- graph
-		UPDATE config_graph_checkvalve SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
-		UPDATE config_graph_mincut SET parameters = (replace(parameters::text,v_arc_id_old,v_arc_id_new))::json WHERE node_id = v_node_id_old;
-
 
 	ELSIF v_action = 'updateNode' THEN
+	
+		IF v_project_type='WS' THEN
 
-		-- mapzones
-		FOREACH v_zone IN ARRAY '{sector, dma, presszone, dqa}'::text[] LOOP
+			-- mapzones
+			FOREACH v_zone IN ARRAY '{sector, dma, presszone, dqa}'::text[] LOOP
 
-			--update toArc value with newly created arc id
-			EXECUTE 'UPDATE '||v_zone||' set graphconfig = replace(graphconfig::text,a.nodeparent,'||v_node_id_new||'::text)::json FROM (
-			select json_array_elements_text((elem->>''toArc'')::json) as toarc, elem->>''nodeParent'' as nodeparent
-			from '||v_zone||'
-			cross join json_array_elements((graphconfig->>''use'')::json) elem
-			where elem->>''nodeParent'' = '||quote_literal(v_node_id_old)||')a';
-		END LOOP;
+				--update nodeParent value with newly created node
+				EXECUTE 'UPDATE '||v_zone||' set graphconfig = replace(graphconfig::text,a.nodeparent,'||v_node_id_new||'::text)::json FROM (
+				select json_array_elements_text((elem->>''toArc'')::json) as toarc, elem->>''nodeParent'' as nodeparent
+				from '||v_zone||'
+				cross join json_array_elements((graphconfig->>''use'')::json) elem
+				where elem->>''nodeParent'' = '||quote_literal(v_node_id_old)||')a';
+			END LOOP;
+			
+		ELSIF  v_project_type='UD' THEN
 		
-		-- graph
-		UPDATE config_graph_checkvalve SET node_id = v_node_id_new WHERE node_id = v_node_id_old;
-		UPDATE config_graph_mincut SET node_id = v_node_id_new WHERE node_id = v_node_id_old;
+				--update nodeParent value with newly created node
+				EXECUTE 'UPDATE drainzone set graphconfig = replace(graphconfig::text,a.nodeparent,'||v_node_id_new||'::text)::json FROM (
+				select json_array_elements_text((elem->>''toArc'')::json) as toarc, elem->>''nodeParent'' as nodeparent
+				from '||v_zone||'
+				cross join json_array_elements((graphconfig->>''use'')::json) elem
+				where elem->>''nodeParent'' = '||quote_literal(v_node_id_old)||')a';		
+		END IF;
 		
 	END IF;
 

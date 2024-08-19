@@ -609,7 +609,7 @@ SELECT node.node_id,
 
 create or replace view v_edit_node as
 select a.*, case when s.sector_id > 0 and is_operative = true and epa_type !='UNDEFINED'::varchar(16) THEN epa_type else NULL::varchar(16) end as inp_type,
-v.closed as valve_closed, v.broken as valve_broken
+v.closed as closed_valve, v.broken as broken_valve
  FROM (select n.* FROM 
 ( SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER) s, vu_node n
 JOIN v_state_node USING (node_id)
@@ -2211,13 +2211,12 @@ AS SELECT n.node_id,
     n.annotation,
     concat(n.node_id, '_n2a') AS nodarc_id,
     inp_shortpipe.minorloss,
-    v.to_arc,
     CASE
-        WHEN v.active IS TRUE AND v.to_arc IS NOT NULL THEN 'CV'::character varying(12)
-        WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
-        WHEN v.closed IS FALSE THEN 'OPEN'::character varying(12)
+	WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
+        WHEN v.closed IS FALSE AND v.active IS TRUE AND v.to_arc IS NOT NULL THEN 'CV'::character varying(12)
+        WHEN v.closed IS FALSE AND active IS FALSE THEN 'OPEN'::character varying(12)
         ELSE NULL::character varying(12)
-        END AS status,
+    END AS status,
     inp_shortpipe.bulk_coeff,
     inp_shortpipe.wall_coeff,
     n.the_geom
@@ -2361,9 +2360,9 @@ AS SELECT n.node_id,
     inp_valve.minorloss,
     v.to_arc,
 	CASE
-        WHEN v.active IS TRUE THEN 'ACTIVE'::character varying(12)
-        WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
-        WHEN v.closed IS FALSE THEN 'OPEN'::character varying(12)
+	WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
+        WHEN v.closed IS FALSE AND v.active IS TRUE THEN 'ACTIVE'::character varying(12)
+        WHEN v.closed IS FALSE AND active IS FALSE THEN 'OPEN'::character varying(12)
         ELSE NULL::character varying(12)
         END AS status,
 	n.cat_dint,
@@ -3768,9 +3767,9 @@ CREATE OR REPLACE VIEW ve_epa_valve AS
     inp_valve.minorloss,
 	v.to_arc,
     CASE
-        WHEN v.active IS TRUE THEN 'ACTIVE'::character varying(12)
-        WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
-        WHEN v.closed IS FALSE THEN 'OPEN'::character varying(12)
+	WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
+        WHEN v.closed IS FALSE AND v.active IS TRUE THEN 'ACTIVE'::character varying(12)
+        WHEN v.closed IS FALSE AND active IS FALSE THEN 'OPEN'::character varying(12)
         ELSE NULL::character varying(12)
     END AS status,	
     inp_valve.add_settings,

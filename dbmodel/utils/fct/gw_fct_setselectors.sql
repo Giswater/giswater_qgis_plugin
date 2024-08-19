@@ -202,6 +202,8 @@ BEGIN
 
 		IF v_tabname='tab_exploitation_add' AND v_addschema IS NOT NULL THEN
 			EXECUTE 'DELETE FROM '||v_addschema||'.'|| v_tablename || ' WHERE cur_user = current_user';
+		ELSIF v_tabname = 'tab_sector' THEN
+			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
 		ELSE
 			EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
 		END IF;
@@ -330,10 +332,9 @@ BEGIN
 	END IF;
 
 	SELECT count(the_geom) INTO v_count_2 FROM v_edit_arc LIMIT 1;
-
-
 	/*set expl as vdefault if only one value on selector. In spite expl_vdefault is a hidden value, user can enable this variable if he needs it when working on more than
 	one exploitation in order to choose what is the default (remember default value has priority over spatial intersection)*/
+	
 	IF (SELECT count (*) FROM selector_expl WHERE cur_user = current_user) = 1 THEN
 
 		v_expl = (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);

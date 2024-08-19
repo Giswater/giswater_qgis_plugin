@@ -15,7 +15,6 @@ $BODY$
 /*EXAMPLE
 
 SELECT SCHEMA_NAME.gw_fct_settoarc($${"client":{"device":4, "infoType":1, "lang":"ES"},
-
 "form":{},"feature":{"featureType":"CHECK_VALVE", "id":"1082"}, 
 "data":{"filterFields":{}, "pageInfo":{}, "arcId":"2064", "dmaId":"2", "presszoneId":"3", "sectorId":"3", "dqaId":"1"}}$$);
 
@@ -74,30 +73,28 @@ BEGIN
 		SELECT arc_id INTO v_arc_id FROM arc WHERE node_1 =  v_feature_id;
 	END IF;
 
-	IF v_epatype = 'SHORTPIPE' THEN
+	-- man_tables
+	IF v_systype = 'PUMP' THEN
 
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, 
-		concat('Set to_arc for check-valve, ', v_feature_id, ' with value ',v_arc_id, '. and EPANET status with value ''CV'', '));
+		concat('Set to_arc for pump, ', v_feature_id, ' with value ',v_arc_id, '.'));
 
-		INSERT INTO config_graph_checkvalve (node_id, to_arc, active) 
-		VALUES (v_feature_id, v_arc_id,TRUE) ON CONFLICT (node_id) DO UPDATE SET to_arc = v_arc_id;
+		UPDATE man_pump SET to_arc = v_arc_id WHERE node_id = v_feature_id;
+
+	ELSIF v_systype = 'VALVE' THEN
 
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, 
-		concat('and set to_arc of config_graph_checkvalve for node ', v_feature_id, ' with value ',v_arc_id, '.'));
-    
-	ELSIF v_epatype IN ('PUMP', 'VALVE') OR v_graphdelim IN ('SECTOR','PRESSZONE','DMA', 'DQA') THEN
-	    
-		--update to_arc on go2epa tables
-		IF v_epatype = 'PUMP' THEN
-		    UPDATE inp_pump SET to_arc = v_arc_id WHERE node_id = v_feature_id;
+		concat('Set to_arc for valve, ', v_feature_id, ' with value ',v_arc_id, '.'));
 
-		    INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, concat('Set to_arc of pump ', v_feature_id, ' with value ',v_arc_id, '.'));
+		UPDATE man_valve SET to_arc = v_arc_id WHERE node_id = v_feature_id;
 
-		ELSIF v_epatype = 'VALVE' THEN
-		    UPDATE inp_valve SET to_arc = v_arc_id WHERE node_id = v_feature_id;
+	ELSIF v_systype = 'METER' THEN
 
-		    INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, concat('Set to_arc of valve ', v_feature_id, ' with value ',v_arc_id, '.'));
-		END IF;
+		-- nothing to do;
+	END IF;
+	
+	-- graphconfig for mapzones
+	IF v_graphdelim IN ('SECTOR','PRESSZONE','DMA', 'DQA') THEN
 
 		--define list of mapzones to be set 
 		v_mapzone_array = ARRAY[lower(v_graphdelim)];
@@ -164,8 +161,7 @@ BEGIN
 				from '||rec||' where '||rec||'_id::text ='||quote_literal(v_mapzone_id)||'::text)a)b where '||rec||'_id::text ='||quote_literal(v_mapzone_id)||'::text'
 				INTO v_config;
 	     
-				EXECUTE'UPDATE '||rec||' SET graphconfig = '||quote_literal(v_config)||' WHERE '||rec||'_id::text = '||quote_literal(v_mapzone_id)||'::text;';
-				
+				EXECUTE'UPDATE '||rec||' SET graphconfig = '||quote_literal(v_config)||' WHERE '||rec||'_id::text = '||quote_literal(v_mapzone_id)||'::text;';	
 			    END IF;
 			END IF;
 		   END IF;
@@ -173,7 +169,7 @@ BEGIN
 	ELSE
 		v_level = 0;
 		INSERT INTO audit_check_data (fid, criticity, error_message) 
-		VALUES (359,1, concat('There is nothing to configure for  ', v_feature_type,' ', v_feature_id, '.'));
+		VALUES (359,1, concat('There is no mapzone to configure for  ', v_feature_type,' ', v_feature_id, '.'));
 	END IF;
 
 	SELECT  string_agg(error_message,' ') INTO v_result  FROM audit_check_data WHERE cur_user="current_user"() AND 

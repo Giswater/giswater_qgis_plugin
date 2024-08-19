@@ -49,7 +49,7 @@ v_epa_table varchar;
 v_epa_table_new varchar;
 v_code text;
 v_id int8;
-v_old_feature_id varchar;
+v_old_id varchar;
 v_workcat_id_end varchar;
 v_enddate date;
 v_keep_elements boolean;
@@ -132,7 +132,7 @@ BEGIN
 	-- get input parameters
 	
 	v_feature_type = lower(((p_data ->>'feature')::json->>'type'))::text;
-	v_old_feature_id = ((p_data ->>'data')::json->>'old_feature_id')::text;
+	v_old_id = ((p_data ->>'data')::json->>'old_feature_id')::text;
 	v_workcat_id_end = ((p_data ->>'data')::json->>'workcat_id_end')::text;
 	v_enddate = ((p_data ->>'data')::json->>'enddate')::text;
 	v_keep_elements = ((p_data ->>'data')::json->>'keep_elements')::text;
@@ -170,57 +170,57 @@ BEGIN
 	END IF;
 
 	--capture old feature type and old feature catalog
-	EXECUTE 'SELECT '||v_type_column||'  FROM '|| v_feature_layer  ||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
+	EXECUTE 'SELECT '||v_type_column||'  FROM '|| v_feature_layer  ||' WHERE '||v_id_column||'='''||v_old_id||''';'
 	INTO  v_old_featuretype;
 
-	EXECUTE 'SELECT  '|| v_cat_column||' FROM '|| v_feature_layer  ||'  WHERE '||v_id_column||'='''||v_old_feature_id||''';'
+	EXECUTE 'SELECT  '|| v_cat_column||' FROM '|| v_feature_layer  ||'  WHERE '||v_id_column||'='''||v_old_id||''';'
 	INTO v_old_featurecat;
 
-	EXECUTE 'SELECT epa_type FROM '|| v_feature_layer  ||'  WHERE '||v_id_column||'='''||v_old_feature_id||''';'
+	EXECUTE 'SELECT epa_type FROM '|| v_feature_layer  ||'  WHERE '||v_id_column||'='''||v_old_id||''';'
 	INTO v_old_epa_type;
 
-	EXECUTE 'SELECT sector_id FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
+	EXECUTE 'SELECT sector_id FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_id||''';'
 	INTO v_sector_id;
-	EXECUTE 'SELECT state_type FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
+	EXECUTE 'SELECT state_type FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_id||''';'
 	INTO v_state_type;
-	EXECUTE 'SELECT state FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
+	EXECUTE 'SELECT state FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_id||''';'
 	INTO v_state;
-	EXECUTE 'SELECT dma_id FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
+	EXECUTE 'SELECT dma_id FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_id||''';'
 	INTO v_dma_id;
-	EXECUTE 'SELECT the_geom FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
+	EXECUTE 'SELECT the_geom FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_id||''';'
 	INTO v_the_geom;
-	EXECUTE 'SELECT expl_id FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
+	EXECUTE 'SELECT expl_id FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_id||''';'
 	INTO v_expl_id;
-	EXECUTE 'SELECT verified FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
+	EXECUTE 'SELECT verified FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_id||''';'
 	INTO v_verified_id;
-	EXECUTE 'SELECT inventory FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
+	EXECUTE 'SELECT inventory FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_id||''';'
 	INTO v_inventory;
 	EXECUTE 'SELECT n.category_type FROM '||v_feature_layer||' n JOIN man_type_category m ON n.category_type=m.category_type
 	WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
-	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_feature_id||''';'
+	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_id||''';'
 	INTO v_category;
 	EXECUTE 'SELECT n.function_type FROM '||v_feature_layer||' n JOIN man_type_function m ON n.function_type=m.function_type
 	WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
-	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_feature_id||''';'
+	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_id||''';'
 	INTO v_function;
 	EXECUTE 'SELECT n.fluid_type FROM '||v_feature_layer||' n JOIN man_type_fluid m ON n.fluid_type=m.fluid_type
 	WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
-	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_feature_id||''';'
+	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_id||''';'
 	INTO v_fluid;
 	EXECUTE 'SELECT n.location_type FROM '||v_feature_layer||' n JOIN man_type_location m ON n.location_type=m.location_type
 	WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
-	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_feature_id||''';'
+	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_old_id||''';'
 	INTO v_location;
 
 	IF v_project_type = 'WS' THEN
-		EXECUTE 'SELECT minsector_id FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
+		EXECUTE 'SELECT minsector_id FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_id||''';'
 		INTO v_minsector_id;
-		EXECUTE 'SELECT dqa_id FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
+		EXECUTE 'SELECT dqa_id FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_id||''';'
 		INTO v_dqa_id;
-		EXECUTE 'SELECT presszone_id FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
+		EXECUTE 'SELECT presszone_id FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_id||''';'
 		INTO v_presszone_id;
 	ELSIF v_project_type = 'UD' THEN
-		EXECUTE 'SELECT drainzone_id FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
+		EXECUTE 'SELECT drainzone_id FROM '||v_feature_layer||' WHERE '||v_id_column||'='''||v_old_id||''';'
 		INTO v_drainzone_id;
 	END IF;
 
@@ -248,7 +248,7 @@ BEGIN
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
 
-		v_id := v_old_feature_id;
+		v_id := v_old_id;
 	ELSE
 		
 		-- new feature_id
@@ -376,7 +376,7 @@ BEGIN
 
 		FOR v_column IN EXECUTE v_sql
 		LOOP
-			v_query_string_select= 'SELECT '||v_column||' FROM '||v_feature_type||' where '||v_id_column||'='||quote_literal(v_old_feature_id)||';';
+			v_query_string_select= 'SELECT '||v_column||' FROM '||v_feature_type||' where '||v_id_column||'='||quote_literal(v_old_id)||';';
 			IF v_query_string_select IS NOT NULL THEN
 				EXECUTE v_query_string_select INTO v_value;	
 			END IF;
@@ -395,7 +395,7 @@ BEGIN
 								table_name='''||v_man_table||''') and column_name!='''||v_id_column||''';';
 			FOR v_column IN EXECUTE v_sql
 			LOOP
-				v_query_string_select= 'SELECT '||v_column||' FROM '||v_man_table||' where '||v_id_column||'='||quote_literal(v_old_feature_id)||';';
+				v_query_string_select= 'SELECT '||v_column||' FROM '||v_man_table||' where '||v_id_column||'='||quote_literal(v_old_id)||';';
 				IF v_query_string_select IS NOT NULL THEN
 					EXECUTE v_query_string_select INTO v_value;	
 				END IF;
@@ -417,7 +417,7 @@ BEGIN
 								table_name='''||v_epa_table_new||''') and column_name!='''||v_id_column||''';';
 			
 			FOR v_column IN EXECUTE v_sql LOOP
-				v_query_string_select= 'SELECT '||v_column||' FROM '||v_epa_table_new||' where '||v_feature_type||'_id='||quote_literal(v_old_feature_id)||';';
+				v_query_string_select= 'SELECT '||v_column||' FROM '||v_epa_table_new||' where '||v_feature_type||'_id='||quote_literal(v_old_id)||';';
 				IF v_query_string_select IS NOT NULL THEN
 					EXECUTE v_query_string_select INTO v_value;	
 				END IF;
@@ -455,7 +455,7 @@ BEGIN
 
 				v_query_string_update = 'UPDATE '||v_feature_childtable_name_new||' SET '||rec_addfields.column_name||' = '
 										'(SELECT '||rec_addfields.column_name||' FROM '||v_feature_childtable_name_old||' WHERE '||v_id_column||' = '||quote_literal(v_id)||' ) '
-										'WHERE '||v_feature_childtable_name_old||'.'||v_id_column||' = '||quote_literal(v_old_feature_id)||';';
+										'WHERE '||v_feature_childtable_name_old||'.'||v_id_column||' = '||quote_literal(v_old_id)||';';
 				IF v_query_string_update IS NOT NULL THEN
 					EXECUTE v_query_string_update; 
 					INSERT INTO audit_check_data (fid, result_id, error_message)
@@ -464,7 +464,7 @@ BEGIN
 
 			END LOOP;
 
-			EXECUTE 'DELETE FROM '||v_feature_childtable_name_old||' WHERE '||v_id_column||'='||quote_literal(v_old_feature_id)||';'; 
+			EXECUTE 'DELETE FROM '||v_feature_childtable_name_old||' WHERE '||v_id_column||'='||quote_literal(v_old_id)||';'; 
 		END IF;
 
 		
@@ -473,11 +473,11 @@ BEGIN
 		--Moving elements from old feature to new feature
 		IF v_keep_elements IS TRUE THEN
 			v_element_table:=concat('element_x_',v_feature_type);
-			EXECUTE 'SELECT count(element_id) FROM '||v_element_table||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
+			EXECUTE 'SELECT count(element_id) FROM '||v_element_table||' WHERE '||v_id_column||'='''||v_old_id||''';'
 			INTO v_count;
 			IF v_count > 0 THEN
 				v_element_table:=concat('element_x_',v_feature_type);
-				EXECUTE 'UPDATE '||v_element_table||' SET '||v_id_column||'='''||v_id||''' WHERE '||v_id_column||'='''||v_old_feature_id||''';';	
+				EXECUTE 'UPDATE '||v_element_table||' SET '||v_id_column||'='''||v_id||''' WHERE '||v_id_column||'='''||v_old_id||''';';	
 				INSERT INTO audit_check_data (fid, result_id, error_message)
 				VALUES (v_fid, v_result_id, concat('Assign ',v_count,' elements to the new feature.'));
 			END IF;	
@@ -487,28 +487,28 @@ BEGIN
 		IF v_feature_type='node' THEN
 			UPDATE config_param_system SET value =concat('{"activated":','false',', "value":',v_arc_searchnodes_value,'}') WHERE parameter='edit_arc_searchnodes';
 
-			FOR rec_arc IN SELECT arc_id FROM arc WHERE node_1=v_old_feature_id
+			FOR rec_arc IN SELECT arc_id FROM arc WHERE node_1=v_old_id
 			LOOP
 				UPDATE arc SET node_1=v_id where arc_id=rec_arc.arc_id;
 				INSERT INTO audit_check_data (fid, result_id, error_message)
 				VALUES (v_fid, v_result_id, concat('Reconnect arc ',rec_arc.arc_id,'.'));
 			END LOOP;
 		
-			FOR rec_arc IN SELECT arc_id FROM arc WHERE node_2=v_old_feature_id
+			FOR rec_arc IN SELECT arc_id FROM arc WHERE node_2=v_old_id
 			LOOP
 				UPDATE arc SET node_2=v_id where arc_id=rec_arc.arc_id;
 				INSERT INTO audit_check_data (fid, result_id, error_message)
 				VALUES (v_fid, v_result_id, concat('Reconnect arc ',rec_arc.arc_id,'.'));
 			END LOOP;
 
-			FOR rec_connec IN SELECT connec_id FROM connec WHERE pjoint_id = v_old_feature_id AND  pjoint_type = 'NODE'
+			FOR rec_connec IN SELECT connec_id FROM connec WHERE pjoint_id = v_old_id AND  pjoint_type = 'NODE'
 			LOOP
 				UPDATE connec SET pjoint_id=v_id where connec_id=rec_connec.connec_id;
 				INSERT INTO audit_check_data (fid, result_id, error_message)
 				VALUES (v_fid, v_result_id, concat('Reconnect connec ',rec_connec.connec_id,'.'));
 			END LOOP;
 
-			FOR rec_link IN SELECT link_id FROM link WHERE exit_id = v_old_feature_id AND exit_type = 'NODE'
+			FOR rec_link IN SELECT link_id FROM link WHERE exit_id = v_old_id AND exit_type = 'NODE'
 			LOOP
 				UPDATE link SET exit_id=v_id where link_id=rec_link.link_id;
 				INSERT INTO audit_check_data (fid, result_id, error_message)
@@ -516,7 +516,7 @@ BEGIN
 			END LOOP;
 
 			IF v_project_type = 'UD' THEN
-				FOR rec_gully IN SELECT gully_id FROM gully WHERE pjoint_id = v_old_feature_id AND pjoint_type = 'NODE'
+				FOR rec_gully IN SELECT gully_id FROM gully WHERE pjoint_id = v_old_id AND pjoint_type = 'NODE'
 				LOOP
 					UPDATE gully SET pjoint_id=v_id where gully_id=rec_gully.gully_id;
 					INSERT INTO audit_check_data (fid, result_id, error_message)
@@ -526,27 +526,27 @@ BEGIN
 			
 		ELSIF v_feature_type='arc' THEN
 
-			UPDATE connec SET arc_id = v_id WHERE arc_id = v_old_feature_id;
+			UPDATE connec SET arc_id = v_id WHERE arc_id = v_old_id;
 			GET DIAGNOSTICS v_count = row_count;
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' operative connec(s) have been reconnected'));
 			
-			UPDATE plan_psector_x_connec SET arc_id = v_id WHERE arc_id = v_old_feature_id;
+			UPDATE plan_psector_x_connec SET arc_id = v_id WHERE arc_id = v_old_id;
 			GET DIAGNOSTICS v_count = row_count;
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' planned connec(s) have been reconnected'));
 
 			IF v_project_type='UD' then
-				UPDATE gully SET arc_id = v_id WHERE arc_id = v_old_feature_id;
+				UPDATE gully SET arc_id = v_id WHERE arc_id = v_old_id;
 				GET DIAGNOSTICS v_count = row_count;
 				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' operative gully(s) have been reconnected'));
 				
-				UPDATE plan_psector_x_gully SET arc_id = v_id WHERE arc_id = v_old_feature_id;
+				UPDATE plan_psector_x_gully SET arc_id = v_id WHERE arc_id = v_old_id;
 				GET DIAGNOSTICS v_count = row_count;
 				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' planned gully(s) have been reconnected'));
 			END IF;
 
 		ELSIF v_feature_type='connec' or  v_feature_type='gully' THEN
 
-			UPDATE link SET exit_id = v_id WHERE exit_id = v_old_feature_id AND state > 0;
+			UPDATE link SET exit_id = v_id WHERE exit_id = v_old_id AND state > 0;
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(v_count, ' operative/planned links(s) have been reconnected'));
 			
 		END IF;
@@ -554,10 +554,10 @@ BEGIN
 		-- update node_id on on going or planned psectors
 		IF v_feature_type='node' THEN
 			SELECT count(psector_id) INTO v_count FROM plan_psector_x_node JOIN plan_psector USING (psector_id) 
-			WHERE status in (1,2) AND node_id = v_old_feature_id;
+			WHERE status in (1,2) AND node_id = v_old_id;
 			IF v_count > 0 THEN
 				UPDATE plan_psector_x_node SET node_id = v_id FROM plan_psector pp
-				WHERE pp.psector_id = plan_psector_x_node.psector_id AND status in (1,2) AND node_id = v_old_feature_id;
+				WHERE pp.psector_id = plan_psector_x_node.psector_id AND status in (1,2) AND node_id = v_old_id;
 
 				INSERT INTO audit_check_data (fid, result_id, error_message)
 				VALUES (v_fid, v_result_id, concat('Replace node id in ',v_count,' psector.'));
@@ -569,14 +569,14 @@ BEGIN
 			
 		IF v_workcat_id_end IS NOT NULL THEN 
 			EXECUTE 'UPDATE '||v_feature_type||' SET state=0, workcat_id_end='''||v_workcat_id_end||''', enddate='''||v_enddate||''', 
-			state_type='||v_state_type||' WHERE '||v_id_column||'='''||v_old_feature_id||''';';
+			state_type='||v_state_type||' WHERE '||v_id_column||'='''||v_old_id||''';';
 		ELSE
 			EXECUTE 'UPDATE '||v_feature_type||' SET state=0, enddate='''||v_enddate||''', 
-			state_type='||v_state_type||' WHERE '||v_id_column||'='''||v_old_feature_id||''';';
+			state_type='||v_state_type||' WHERE '||v_id_column||'='''||v_old_id||''';';
 		END IF;
 
 		INSERT INTO audit_check_data (fid, result_id, error_message)
-		VALUES (v_fid, v_result_id, concat('Downgraded old feature (',v_old_feature_id,') SETTING state: 0, workcat_id_end: ',v_workcat_id_end,', enddate: ',v_enddate,'.'));
+		VALUES (v_fid, v_result_id, concat('Downgraded old feature (',v_old_id,') SETTING state: 0, workcat_id_end: ',v_workcat_id_end,', enddate: ',v_enddate,'.'));
 
 		IF v_id IS NOT NULL THEN
 			IF v_workcat_id_end IS NOT NULL THEN 
@@ -596,19 +596,19 @@ BEGIN
 		
 		--reconect existing link to the new feature
 		IF v_feature_type='connec' OR v_feature_type='gully' THEN
-			SELECT count(link_id) INTO v_count FROM link WHERE (feature_id = v_old_feature_id and feature_type = upper(v_feature_type) and state=1) OR
-			(exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1);
+			SELECT count(link_id) INTO v_count FROM link WHERE (feature_id = v_old_id and feature_type = upper(v_feature_type) and state=1) OR
+			(exit_id = v_old_id and exit_type = upper(v_feature_type) and state=1);
 			IF v_count > 0 THEN
-				UPDATE link SET feature_id = v_id WHERE feature_id = v_old_feature_id and feature_type = upper(v_feature_type) and state=1;
-				UPDATE link SET exit_id = v_id WHERE exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1;
+				UPDATE link SET feature_id = v_id WHERE feature_id = v_old_id and feature_type = upper(v_feature_type) and state=1;
+				UPDATE link SET exit_id = v_id WHERE exit_id = v_old_id and exit_type = upper(v_feature_type) and state=1;
 				INSERT INTO audit_check_data (fid, result_id, error_message)
 				VALUES (v_fid, v_result_id, concat('Reconnect ',v_count,' links.'));
 			END IF;
 			
 		ELSIF v_feature_type='node' THEN
-			SELECT count(link_id) INTO v_count FROM link WHERE exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1;
+			SELECT count(link_id) INTO v_count FROM link WHERE exit_id = v_old_id and exit_type = upper(v_feature_type) and state=1;
 			IF v_count > 0 THEN
-				UPDATE link SET exit_id = v_id WHERE exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1;
+				UPDATE link SET exit_id = v_id WHERE exit_id = v_old_id and exit_type = upper(v_feature_type) and state=1;
 				INSERT INTO audit_check_data (fid, result_id, error_message)
 				VALUES (v_fid, v_result_id, concat('Reconnect ',v_count,' links.'));
 			END IF;
@@ -696,7 +696,7 @@ BEGIN
 
 					IF v_mapzone_old = v_mapzone_new and v_mapzone_new is not null THEN
 						EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-						"client":{"device":4, "infoType":1,"lang":"ES"}, "data":{"parameters":{"nodeIdOld":"'||v_old_feature_id||'",
+						"client":{"device":4, "infoType":1,"lang":"ES"}, "data":{"parameters":{"nodeIdOld":"'||v_old_id||'",
 						"nodeIdNew":"'||v_id||'", "action":"updateNode"}}}$$);';
 
 						INSERT INTO audit_check_data (fid, result_id, error_message)
@@ -714,7 +714,8 @@ BEGIN
 					ELSIF v_mapzone_old!=v_mapzone_new AND  v_mapzone_old is not null AND v_mapzone_new is not null THEN
 											
 						INSERT INTO audit_check_data (fid, result_id, error_message)
-						VALUES (v_fid, v_result_id, concat('New node is a delimiter of a different mapzone type than the old node. New mapzone delimiter and old mapzone delimiter needs to be configured.'));
+						VALUES (v_fid, v_result_id, 
+						concat('New node is a delimiter of a different mapzone type than the old node. New mapzone delimiter and old mapzone delimiter needs to be configured.'));
 					END IF;
 				END IF;
 				
@@ -736,7 +737,7 @@ BEGIN
 					IF v_node1_graph IS NOT NULL THEN 
 						EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
 						"client":{"device":4, "infoType":1,"lang":"ES"}	,"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
-						"arcIdOld":'||v_old_feature_id||',"arcIdNew":'||v_id||',"action":"updateArc"}}}$$);';
+						"arcIdOld":'||v_old_id||',"arcIdNew":'||v_id||',"action":"updateArc"}}}$$);';
 
 						INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(''));
 						INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('-----MAPZONES CONFIGURATION-----'));
@@ -748,7 +749,7 @@ BEGIN
 						
 						EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
 						"client":{"device":4, "infoType":1,"lang":"ES"},"data":{"parameters":{"nodeIdOld":"'||v_node_2||'", 
-						"arcIdOld":'||v_old_feature_id||',"arcIdNew":'||v_id||',"action":"updateArc"}}}$$);';
+						"arcIdOld":'||v_old_id||',"arcIdNew":'||v_id||',"action":"updateArc"}}}$$);';
 						
 						INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat(''));
 						INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('-----MAPZONES CONFIGURATION-----'));
@@ -756,9 +757,16 @@ BEGIN
 						VALUES (v_fid, 1, concat('Node_2 is a delimiter of a mapzone if arc was defined as toArc it has been reconfigured with new arc_id.'));
 					END IF;
 			END IF;
-			
+	
+		ELSIF v_project_type='UD' AND v_feature_type = 'node' THEN
+		
+			EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+			"client":{"device":4, "infoType":1,"lang":"ES"}, "data":{"parameters":{"nodeIdOld":"'||v_old_id||'",
+			"nodeIdNew":"'||v_id||'", "action":"updateNode"}}}$$);';
+		
 		END IF;
-
+		
+		
 		-- get log (fid: 143)
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 		FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid) row;

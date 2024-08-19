@@ -144,3 +144,8 @@ INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_connec', 'DRAI
 INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_link', 'DRAINZONE', 'qml');
 
 UPDATE link SET muni_id = g.muni_id FROM gully g WHERE gully_id =  feature_id;
+
+INSERT INTO sys_function VALUES
+(3054,'gw_fct_setmapzoneconfig','utils','function','json','json',
+'Function that changes configuration of a mapzone after using node replace, arc fusion or divide tool on features that are involved in a mapzone',
+'role_edit','','core');
