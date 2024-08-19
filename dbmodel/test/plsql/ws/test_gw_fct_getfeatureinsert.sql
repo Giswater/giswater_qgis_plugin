@@ -15,7 +15,7 @@ SELECT plan(4);
 SELECT is (
     (gw_fct_getfeatureinsert($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
     "feature":{"tableName":"ve_node_t"}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic",
-    "coordinates":{"x1":419209.60503196524, "y1":4576503.357122214}}}$$)->>'status',
+    "coordinates":{"x1":419209.60503196524, "y1":4576503.357122214}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_getfeatureinsert returns status "Accepted"'
 );
