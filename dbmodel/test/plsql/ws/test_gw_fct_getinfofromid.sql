@@ -23,7 +23,7 @@ SELECT is(
 
 SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"tableName":"v_edit_connec", "id":"3156"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)->>'status',
+    "feature":{"tableName":"v_edit_connec", "id":"3156"}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_getinfofromid returns status "Accepted"'
 );

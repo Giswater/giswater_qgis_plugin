@@ -149,3 +149,8 @@ INSERT INTO sys_function VALUES
 (3054,'gw_fct_setmapzoneconfig','utils','function','json','json',
 'Function that changes configuration of a mapzone after using node replace, arc fusion or divide tool on features that are involved in a mapzone',
 'role_edit','','core');
+
+UPDATE config_form_tableview SET columnindex=4 WHERE objectname='v_ui_rpt_cat_result' AND columnname='status';
+UPDATE config_form_tableview SET columnindex=6 WHERE objectname='v_ui_rpt_cat_result' AND columnname='descript';
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
+VALUES('epa_toolbar', 'utils', 'v_ui_rpt_cat_result', 'iscorporate', 5, true, NULL, NULL, NULL, NULL);
