@@ -62,11 +62,10 @@ BEGIN
 							UNION ALL SELECT node_2 FROM v_edit_arc) a using (node_id) group by n.node_id';
 
 	-- query text for mandatory node2arcs
-	v_querytext = 'SELECT a.*, inp_valve.to_arc FROM temp_t_node a JOIN inp_valve ON a.node_id=inp_valve.node_id  
+	v_querytext = 'SELECT a.*, man_valve.to_arc FROM temp_t_node a JOIN man_valve ON a.node_id=man_valve.node_id WHERE to_arc is not null
 				UNION  
-				SELECT a.*, inp_pump.to_arc FROM temp_t_node a JOIN inp_pump ON a.node_id=inp_pump.node_id
-				UNION
-				SELECT a.*, s.to_arc FROM temp_t_node a JOIN v_edit_inp_shortpipe s ON a.node_id=s.node_id WHERE s.to_arc IS NOT NULL';
+				SELECT a.*, man_pump.to_arc FROM temp_t_node a JOIN man_pump ON a.node_id=man_pump.node_id WHERE to_arc is not null';
+
 
 	v_querytext = concat (' INSERT INTO temp_anl_node (num_arcs, arc_id, node_id, elevation, elev, nodecat_id, sector_id, state, state_type, descript, arc_distance, the_geom, fid, cur_user, dma_id, presszone_id, dqa_id, minsector_id)
 				SELECT c.numarcs, to_arc, b.node_id, elevation, elev, nodecat_id, sector_id, state, state_type, ''MANDATORY'', demand, the_geom, 124, current_user, dma_id, presszone_id, dqa_id, minsector_id
