@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2526
 
-DROP FUNCTION IF EXISTS ws2.gw_fct_utils_csv2pg_export_epanet_inp(character varying, text);
-CREATE OR REPLACE FUNCTION ws2.gw_fct_pg2epa_export_inp(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_export_epanet_inp(character varying, text);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_export_inp(p_data json)
 RETURNS json AS
 $BODY$
 
@@ -42,16 +42,16 @@ v_client_epsg integer;
 BEGIN
 
 	-- Search path
-	SET search_path = "ws2", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- get input parameters
 	v_result = (p_data->>'data')::json->>'resultId';
-	v_client_epsg = (p_data->>'client')::json->>'epsg'; 
+	v_client_epsg = (p_data->>'client')::json->>'epsg';
 
-	CREATE OR REPLACE TEMP VIEW vi_t_backdrop AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_backdrop AS
 	SELECT inp_backdrop.text FROM inp_backdrop;
 
-	CREATE OR REPLACE TEMP VIEW vi_t_controls AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_controls AS
 	 SELECT c.text
 	   FROM ( SELECT inp_controls.id,
 		    inp_controls.text
@@ -64,14 +64,14 @@ BEGIN
 		  WHERE s.sector_id = d.sector_id AND s.cur_user = "current_user"()::text AND d.active IS NOT FALSE
 	  ORDER BY 1) c  ORDER BY c.id;
 
-	CREATE OR REPLACE TEMP VIEW vi_t_coordinates AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_coordinates AS
 		SELECT node_id,
 		NULL::numeric(16,3) AS xcoord,
 		NULL::numeric(16,3) AS ycoord,
 		the_geom
 		FROM temp_t_node;
 
-	CREATE OR REPLACE TEMP VIEW vi_t_curves AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_curves AS
 		SELECT
 		CASE
 		    WHEN a.x_value IS NULL THEN a.curve_type::character varying(16)
@@ -107,7 +107,7 @@ BEGIN
 		WHERE (a.curve_id::text IN ( SELECT temp_t_node.addparam::json ->> 'curve_id'::text
 		   FROM temp_t_node UNION SELECT temp_t_arc.addparam::json ->> 'curve_id'::text  FROM temp_t_arc)) ORDER BY a.rid, NULL::text;
 
-	CREATE OR REPLACE TEMP VIEW vi_t_demands AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_demands AS
 		SELECT temp_t_demand.feature_id,
 		temp_t_demand.demand,
 		temp_t_demand.pattern_id,
@@ -117,12 +117,12 @@ BEGIN
 		ORDER BY temp_t_demand.feature_id, (concat(';', temp_t_demand.dscenario_id, ' ', temp_t_demand.source, ' ', temp_t_demand.demand_type));
 
 
-	CREATE OR REPLACE TEMP VIEW vi_t_emitters AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_emitters AS
 	SELECT node_id, addparam::json->>'emitter_coeff' FROM temp_t_node
 	WHERE (addparam::json->>'emitter_coeff')::numeric > 0;
-		
 
-	CREATE OR REPLACE TEMP VIEW vi_t_energy AS 
+
+	CREATE OR REPLACE TEMP VIEW vi_t_energy AS
 	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'EFFIC'::text AS idval,  p.effic_curve_id AS energyvalue FROM inp_pump p LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text WHERE p.effic_curve_id IS NOT NULL
 	UNION
 	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'PRICE'::text, inp_pump.energy_price::text FROM inp_pump LEFT JOIN temp_arc ON concat(inp_pump.node_id, '_n2a') = temp_arc.arc_id::text WHERE inp_pump.energy_price IS NOT NULL
@@ -139,7 +139,7 @@ BEGIN
 	UNION
 	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'PRICE'::text, p.energy_price::text FROM inp_virtualpump p LEFT JOIN temp_arc ON p.arc_id = temp_arc.arc_id::text WHERE p.energy_price IS NOT NULL
 	UNION
-	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'PATTERN'::text, p.energy_pattern_id FROM inp_virtualpump p LEFT JOIN temp_arc ON p.arc_id = temp_arc.arc_id::text WHERE p.energy_pattern_id IS NOT NULL	 
+	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'PATTERN'::text, p.energy_pattern_id FROM inp_virtualpump p LEFT JOIN temp_arc ON p.arc_id = temp_arc.arc_id::text WHERE p.energy_pattern_id IS NOT NULL
 	UNION
 	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'EFFIC'::text, p.effic_curve_id FROM inp_dscenario_pump p LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text WHERE p.effic_curve_id IS NOT NULL
 	UNION
@@ -160,11 +160,11 @@ BEGIN
 	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'PATTERN'::text, p.energy_pattern_id  FROM inp_dscenario_virtualpump p LEFT JOIN temp_arc ON p.arc_id = temp_arc.arc_id::text WHERE p.energy_pattern_id IS NOT NULL
 	UNION
 	 SELECT sys_param_user.idval AS pump_id, config_param_user.value, NULL::text  FROM config_param_user JOIN sys_param_user ON sys_param_user.id = config_param_user.parameter::text
-	 WHERE (config_param_user.parameter::text = 'inp_energy_price'::text OR config_param_user.parameter::text = 'inp_energy_pump_effic'::text OR config_param_user.parameter::text = 'inp_energy_price_pattern'::text) 
+	 WHERE (config_param_user.parameter::text = 'inp_energy_price'::text OR config_param_user.parameter::text = 'inp_energy_pump_effic'::text OR config_param_user.parameter::text = 'inp_energy_price_pattern'::text)
 	 AND config_param_user.value IS NOT NULL AND config_param_user.cur_user::name = CURRENT_USER ORDER BY 1;
 
 
-	CREATE OR REPLACE TEMP VIEW vi_t_junctions AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_junctions AS
 	 SELECT temp_t_node.node_id,
 		CASE
 		    WHEN temp_t_node.elev IS NOT NULL THEN temp_t_node.elev
@@ -178,11 +178,11 @@ BEGIN
 	  ORDER BY temp_t_node.node_id;
 
 
-	CREATE OR REPLACE TEMP VIEW vi_t_labels AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_labels AS
 	 SELECT inp_label.xcoord, inp_label.ycoord, inp_label.label, inp_label.node_id FROM inp_label;
 
 
-	CREATE OR REPLACE TEMP VIEW vi_t_mixing AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_mixing AS
 	 SELECT inp_tank.node_id,
 	    inp_tank.mixing_model,
 	    inp_tank.mixing_fraction
@@ -212,7 +212,7 @@ BEGIN
 	  WHERE (inp_dscenario_inlet.mixing_model IS NOT NULL OR inp_dscenario_inlet.mixing_fraction IS NOT NULL) AND temp_t_node.epa_type::text = 'TANK'::text;
 
 
-	CREATE OR REPLACE TEMP VIEW vi_t_options AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_options AS
 	 SELECT a.parameter,
 	    a.value
 	   FROM ( SELECT a_1.parameter,
@@ -238,26 +238,26 @@ BEGIN
 			   FROM sys_param_user a_1_1
 			     JOIN config_param_user b ON a_1_1.id = b.parameter::text
 			  WHERE (a_1_1.layoutname = ANY (ARRAY['lyt_general_1'::text, 'lyt_general_2'::text, 'lyt_hydraulics_1'::text, 'lyt_hydraulics_2'::text]))
-			   AND (a_1_1.idval <> ALL (ARRAY['UNBALANCED_N'::text, 'NODE_ID'::text, 'HYDRAULICS_FNAME'::text])) AND b.cur_user::name = "current_user"() 
+			   AND (a_1_1.idval <> ALL (ARRAY['UNBALANCED_N'::text, 'NODE_ID'::text, 'HYDRAULICS_FNAME'::text])) AND b.cur_user::name = "current_user"()
 			   AND b.value IS NOT NULL AND a_1_1.idval <> 'VALVE_MODE_MINCUT_RESULT'::text AND b.parameter::text <> 'PATTERN'::text AND b.value <> 'NULLVALUE'::text) a_1
 		  WHERE a_1.parameter <> 'HYDRAULICS'::text OR a_1.parameter = 'HYDRAULICS'::text AND a_1.value IS NOT NULL) a
 	  ORDER BY a.t;
 
 
-	CREATE OR REPLACE TEMP VIEW vi_t_patterns AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_patterns AS
 	   SELECT a.pattern_id, a.factor_1, a.factor_2, a.factor_3, a.factor_4,  a.factor_5, a.factor_6, a.factor_7, a.factor_8, a.factor_9,
 	   a.factor_10,  a.factor_11, a.factor_12, a.factor_13, a.factor_14, a.factor_15, a.factor_16, a.factor_17, a.factor_18
 	   FROM temp_rpt_inp_pattern_value a ORDER BY a.id;
 
 
-	CREATE OR REPLACE TEMP VIEW vi_t_pipes AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_pipes AS
 	 SELECT arc_id, node_1, node_2, length, diameter, roughness, minorloss, status::character varying(30) AS status,
 	 concat(';', sector_id, ' ', COALESCE(presszone_id, '0'::text), ' ', COALESCE(dma_id, 0), ' ', COALESCE(dqa_id, 0), ' ', COALESCE(minsector_id, 0), ' ', arccat_id) AS other
 	 FROM temp_t_arc  WHERE epa_type::text = ANY (ARRAY['PIPE'::character varying::text, 'SHORTPIPE'::character varying::text, 'NODE2NODE'::character varying::text]);
 
 
 
-	CREATE OR REPLACE TEMP VIEW vi_t_valves AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_valves AS
 	 SELECT DISTINCT ON (a.arc_id) a.arc_id,
 	    a.node_1,
 	    a.node_2,
@@ -341,8 +341,8 @@ BEGIN
 		    arccat_id
 		   FROM temp_t_arc t JOIN inp_pump ON arc_id::text = concat(inp_pump.node_id, '_n2a_4')) a;
 
-		  
-	CREATE OR REPLACE TEMP VIEW vi_t_pumps AS 
+
+	CREATE OR REPLACE TEMP VIEW vi_t_pumps AS
 	 SELECT arc_id, node_1, node_2,
 		CASE
 		    WHEN (addparam::json ->> 'power'::text) <> ''::text THEN ('POWER'::text || ' '::text) || (addparam::json ->> 'power'::text)
@@ -365,17 +365,17 @@ BEGIN
 	  WHERE (epa_type::text = ANY (ARRAY['PUMP'::text, 'VIRTUALPUMP'::text])) AND NOT (arc_id::text IN ( SELECT arc_id FROM vi_t_valves))
 	  ORDER BY arc_id;
 
-		
-	CREATE OR REPLACE TEMP VIEW vi_t_quality AS 
+
+	CREATE OR REPLACE TEMP VIEW vi_t_quality AS
 	 SELECT inp_junction.node_id,inp_junction.init_quality FROM inp_junction LEFT JOIN temp_t_node USING (node_id) WHERE inp_junction.init_quality IS NOT NULL
 	UNION
 	 SELECT inp_dscenario_junction.node_id,inp_dscenario_junction.init_quality FROM inp_dscenario_junction  LEFT JOIN temp_t_node USING (node_id) WHERE inp_dscenario_junction.init_quality IS NOT NULL
 	UNION
-	 SELECT inp_inlet.node_id, inp_inlet.init_quality FROM inp_inlet LEFT JOIN temp_t_node USING (node_id) WHERE inp_inlet.init_quality IS NOT NULL 
+	 SELECT inp_inlet.node_id, inp_inlet.init_quality FROM inp_inlet LEFT JOIN temp_t_node USING (node_id) WHERE inp_inlet.init_quality IS NOT NULL
 	 UNION
 	  SELECT inp_dscenario_inlet.node_id, inp_dscenario_inlet.init_quality FROM inp_dscenario_inlet LEFT JOIN temp_t_node USING (node_id) WHERE inp_dscenario_inlet.init_quality IS NOT NULL
 	UNION
-	 SELECT inp_tank.node_id, inp_tank.init_quality FROM inp_tank LEFT JOIN temp_t_node USING (node_id) WHERE inp_tank.init_quality IS NOT NULL 
+	 SELECT inp_tank.node_id, inp_tank.init_quality FROM inp_tank LEFT JOIN temp_t_node USING (node_id) WHERE inp_tank.init_quality IS NOT NULL
 	 UNION
 	 SELECT inp_dscenario_tank.node_id,inp_dscenario_tank.init_quality FROM inp_dscenario_tank LEFT JOIN temp_t_node USING (node_id) WHERE inp_dscenario_tank.init_quality IS NOT NULL
 	UNION
@@ -388,7 +388,7 @@ BEGIN
 	  SELECT inp_dscenario_virtualvalve.arc_id AS node_id, inp_dscenario_virtualvalve.init_quality FROM inp_dscenario_virtualvalve LEFT JOIN temp_t_arc USING (arc_id) WHERE inp_dscenario_virtualvalve.init_quality IS NOT NULL;
 
 
-	CREATE OR REPLACE TEMP VIEW vi_t_reactions AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_reactions AS
 	 SELECT 'BULK'::text AS param, inp_pipe.arc_id, inp_pipe.bulk_coeff::text AS coeff FROM inp_pipe LEFT JOIN temp_arc ON inp_pipe.arc_id::text = temp_arc.arc_id::text WHERE inp_pipe.bulk_coeff IS NOT NULL
 	UNION
 	 SELECT 'WALL'::text AS param, inp_pipe.arc_id, inp_pipe.wall_coeff::text AS coeff FROM inp_pipe JOIN temp_arc ON inp_pipe.arc_id::text = temp_arc.arc_id::text WHERE inp_pipe.wall_coeff IS NOT NULL
@@ -400,16 +400,16 @@ BEGIN
 	 SELECT sys_param_user.idval AS param, NULL::character varying AS arc_id, config_param_user.value::character varying AS coeff FROM config_param_user
 	  JOIN sys_param_user ON sys_param_user.id = config_param_user.parameter::text
 	  WHERE (config_param_user.parameter::text = 'inp_reactions_bulk_order'::text OR config_param_user.parameter::text = 'inp_reactions_wall_order'::text OR config_param_user.parameter::text = 'inp_reactions_global_bulk'::text OR
-	  config_param_user.parameter::text = 'inp_reactions_global_wall'::text OR config_param_user.parameter::text = 'inp_reactions_limit_concentration'::text OR config_param_user.parameter::text = 'inp_reactions_wall_coeff_correlation'::text) 
+	  config_param_user.parameter::text = 'inp_reactions_global_wall'::text OR config_param_user.parameter::text = 'inp_reactions_limit_concentration'::text OR config_param_user.parameter::text = 'inp_reactions_wall_coeff_correlation'::text)
 	  AND config_param_user.value IS NOT NULL AND config_param_user.cur_user::name = CURRENT_USER
 	  ORDER BY 1;
 
-	CREATE OR REPLACE TEMP VIEW vi_t_report AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_report AS
 	 SELECT a.idval AS parameter,  b.value  FROM sys_param_user a
 	 JOIN config_param_user b ON a.id = b.parameter::text
 	 WHERE (a.layoutname = ANY (ARRAY['lyt_reports_1'::text, 'lyt_reports_2'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT NULL;
 
-	CREATE OR REPLACE TEMP VIEW vi_t_reservoirs AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_reservoirs AS
 	 SELECT node_id,
 		CASE
 		    WHEN elev IS NOT NULL THEN elev
@@ -422,7 +422,7 @@ BEGIN
 	  ORDER BY node_id;
 
 
-	CREATE OR REPLACE TEMP VIEW vi_t_rules AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_rules AS
 	 SELECT c.text FROM ( SELECT inp_rules.id, inp_rules.text FROM selector_sector s, inp_rules  WHERE s.sector_id = inp_rules.sector_id AND s.cur_user = "current_user"()::text AND inp_rules.active IS NOT FALSE
 	UNION
 	 SELECT d.id, d.text FROM selector_sector s, v_edit_inp_dscenario_rules d WHERE s.sector_id = d.sector_id AND s.cur_user = "current_user"()::text AND d.active IS NOT FALSE
@@ -430,7 +430,7 @@ BEGIN
 	  ORDER BY c.id;
 
 
-	CREATE OR REPLACE TEMP VIEW vi_t_sources AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_sources AS
 	 SELECT inp_junction.node_id,
 	    inp_junction.source_type,
 	    inp_junction.source_quality,
@@ -496,17 +496,17 @@ BEGIN
 	  WHERE inp_dscenario_inlet.source_type IS NOT NULL OR inp_dscenario_inlet.source_quality IS NOT NULL OR inp_dscenario_inlet.source_pattern_id IS NOT NULL;
 
 
-	CREATE OR REPLACE TEMP VIEW vi_t_status AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_status AS
 	 SELECT arc_id, status FROM temp_t_arc WHERE (status::text = 'CLOSED'::text OR status::text = 'OPEN'::text) AND epa_type::text = 'VALVE'::text
 	UNION
 	 SELECT arc_id, status FROM temp_t_arc WHERE status::text = 'CLOSED'::text AND epa_type::text = 'PUMP'::text;
-	 
 
-	CREATE OR REPLACE TEMP VIEW vi_t_tags AS 
+
+	CREATE OR REPLACE TEMP VIEW vi_t_tags AS
 	 SELECT inp_tags.feature_type,  inp_tags.feature_id, inp_tags.tag FROM inp_tags ORDER BY inp_tags.feature_type;
 
 
-	CREATE OR REPLACE TEMP VIEW vi_t_tanks AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_tanks AS
 	 SELECT node_id,
 		CASE
 		    WHEN elev IS NOT NULL THEN elev
@@ -524,18 +524,18 @@ BEGIN
 	    addparam::json ->> 'overflow'::text AS overflow,
 	    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', node_type) AS other
 	   FROM temp_t_node WHERE epa_type::text = 'TANK'::text ORDER BY node_id;
-	   
 
-	CREATE OR REPLACE TEMP VIEW vi_t_times AS 
+
+	CREATE OR REPLACE TEMP VIEW vi_t_times AS
 	 SELECT a.idval AS parameter, b.value FROM sys_param_user a JOIN config_param_user b ON a.id = b.parameter::text
 	  WHERE (a.layoutname = ANY (ARRAY['lyt_date_1'::text, 'lyt_date_2'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT NULL;
 
 
-	CREATE OR REPLACE TEMP VIEW vi_t_title AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_title AS
 		SELECT inp_project_id.title, inp_project_id.date FROM inp_project_id ORDER BY inp_project_id.title;
 
 
-	CREATE OR REPLACE TEMP VIEW vi_t_vertices AS 
+	CREATE OR REPLACE TEMP VIEW vi_t_vertices AS
 	 SELECT arc_id,
 	    NULL::numeric(16,3) AS xcoord,
 	    NULL::numeric(16,3) AS ycoord,
@@ -586,7 +586,7 @@ BEGIN
 		IF rec_table.tablename = 'vi_t_patterns' THEN
 			INSERT INTO temp_t_csv (fid,csv1,csv2) VALUES (141, ';ID', 'Multipliers');
 			num_column = 2;
-		ELSE 
+		ELSE
 			INSERT INTO temp_t_csv (fid,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13)
 			SELECT v_fid,rpad(concat(';',c1),22),rpad(c2,22),rpad(c3,22),rpad(c4,22),rpad(c5,22),rpad(c6,22),rpad(c7,22),rpad(c8,22),rpad(c9,22),rpad(c10,22),
 			rpad(c11,22),rpad(c12,22),rpad(c13,22)
@@ -596,10 +596,10 @@ BEGIN
 
 			SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename AND column_name!='the_geom';
 		END IF;
-	
+
 		INSERT INTO temp_t_csv (fid) VALUES (141) RETURNING id INTO id_last;
-  
-		--add underlines    
+
+		--add underlines
 		FOR num_col_rec IN 1..num_column
 		LOOP
 			IF num_col_rec=1 then
@@ -608,11 +608,11 @@ BEGIN
 				EXECUTE 'UPDATE temp_t_csv SET csv'||num_col_rec||'=rpad(''----------'',22) WHERE id='||id_last||';';
 			END IF;
 		END LOOP;
-		
+
 		-- set legend for other
 		UPDATE temp_t_csv SET csv5 = 'sec prz dma dqa mins' where csv5 like '%other%';
-		UPDATE temp_t_csv SET csv9 = 'sec prz dma dqa mins' where csv9 like '%other%';  
-		UPDATE temp_t_csv SET csv8 = 'sec prz dma dqa mins' where csv8 like '%other%';  
+		UPDATE temp_t_csv SET csv9 = 'sec prz dma dqa mins' where csv9 like '%other%';
+		UPDATE temp_t_csv SET csv8 = 'sec prz dma dqa mins' where csv8 like '%other%';
 		UPDATE temp_t_csv SET csv4 = 'dscenario source' where csv4 like '%other%' and csv1 like '%feature_id%';
 
 		-- insert values
@@ -622,18 +622,18 @@ BEGIN
 
 		WHEN rec_table.tablename = 'vi_t_coordinates' THEN
 			-- on the fly transformation of epsg
-			INSERT INTO temp_t_csv SELECT nextval('temp_csv_id_seq'::regclass), v_fid, current_user,'vi_t_coordinates', 
+			INSERT INTO temp_t_csv SELECT nextval('temp_csv_id_seq'::regclass), v_fid, current_user,'vi_t_coordinates',
 			node_id, ROUND(ST_x(ST_transform(the_geom, v_client_epsg))::numeric, 3), ROUND(ST_y(ST_transform(the_geom, v_client_epsg))::numeric, 3)  FROM vi_t_coordinates;
 
 		WHEN rec_table.tablename = 'vi_t_vertices' THEN
 			-- on the fly transformation of epsg
-			INSERT INTO temp_t_csv SELECT nextval('temp_csv_id_seq'::regclass), v_fid, current_user,'vi_t_vertices', 
+			INSERT INTO temp_t_csv SELECT nextval('temp_csv_id_seq'::regclass), v_fid, current_user,'vi_t_vertices',
 			arc_id, ROUND(ST_x(ST_transform(the_geom, v_client_epsg))::numeric, 3), ROUND(ST_y(ST_transform(the_geom, v_client_epsg))::numeric, 3)  FROM vi_t_vertices;
 		ELSE
 			EXECUTE 'INSERT INTO temp_t_csv SELECT nextval(''temp_csv_id_seq''::regclass),'||v_fid||',current_user,'''||rec_table.tablename::text||''',*  FROM '||
 			rec_table.tablename||';';
 		END CASE;
-  
+
 	END LOOP;
 
 	-- drop views
@@ -667,11 +667,11 @@ BEGIN
 
 
 	-- build return
-	select (array_to_json(array_agg(row_to_json(row))))::json 
-	into v_return 
+	select (array_to_json(array_agg(row_to_json(row))))::json
+	into v_return
 		from ( select text from (
-			select id, concat(rpad(csv1,20), ' ', rpad(csv2,20), ' ', rpad(csv3,20), ' ', rpad(csv4,20), ' ', rpad(csv5,20), ' ', rpad(csv6,20), ' ', rpad(csv7,20), ' ', 
-			rpad(csv8,20), ' ' , rpad(csv9,20), ' ', rpad(csv10,20), ' ', rpad(csv11,20), ' ', rpad(csv12,20)) 
+			select id, concat(rpad(csv1,20), ' ', rpad(csv2,20), ' ', rpad(csv3,20), ' ', rpad(csv4,20), ' ', rpad(csv5,20), ' ', rpad(csv6,20), ' ', rpad(csv7,20), ' ',
+			rpad(csv8,20), ' ' , rpad(csv9,20), ' ', rpad(csv10,20), ' ', rpad(csv11,20), ' ', rpad(csv12,20))
 			as text from temp_t_csv where fid = 141 and cur_user = current_user and source is null
 		union
 			select id, concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20))
@@ -717,12 +717,12 @@ BEGIN
 			' ',rpad(coalesce(csv6,''),20),	' ',rpad(coalesce(csv7,''),20),' ',rpad(coalesce(csv8,''),20),' ',rpad(coalesce(csv9,''),20),' ',rpad(coalesce(csv10,''),20),
 			' ',rpad(coalesce(csv11,''),20),' ',rpad(coalesce(csv12,''),20),' ',rpad(csv13,20),' ',rpad(csv14,20),' ',rpad(csv15,20),' ', rpad(csv15,20),' ',
 			rpad(csv16,20),	' ',rpad(csv17,20),' ', rpad(csv20,20), ' ', rpad(csv19,20),' ',rpad(csv20,20)) as text
-			from temp_t_csv where source not in ('header','vi_t_controls','vi_t_rules', 'vi_t_backdrop','vi_t_patterns', 'vi_t_reactions','vi_t_junctions', 'vi_t_tanks', 
+			from temp_t_csv where source not in ('header','vi_t_controls','vi_t_rules', 'vi_t_backdrop','vi_t_patterns', 'vi_t_reactions','vi_t_junctions', 'vi_t_tanks',
 			'vi_t_valves','vi_t_reservoirs','vi_t_pipes','vi_t_pumps', 'vi_t_demands')
 		order by id)a )row;
-	
+
 	RETURN v_return;
-    
+
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
