@@ -30,16 +30,9 @@ SELECT is((SELECT count(*)::integer FROM cat_work WHERE id = 'work5'), 0, 'DELET
 
 
 -- Subtest 2: Testing cat_feature_node operations | insert/update/delete (junction, circ_manhole, sewer_storage)
+-- JUNCTION
 INSERT INTO cat_feature (id, system_id, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)
 VALUES('JUNCTION2', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_junction', NULL, NULL, true, true, NULL);
-INSERT INTO cat_feature (id, system_id, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)
-VALUES('CIRC_MANHOLE2', 'MANHOLE', 'NODE', NULL, 'v_edit_node', 've_node_circ_manhole', NULL, NULL, true, true, '{"code_prefix":"CM_"}'::json);
-INSERT INTO cat_feature (id, system_id, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)
-VALUES('SEWER_STORAGE2', 'STORAGE', 'NODE', NULL, 'v_edit_node', 've_node_sewer_storage', NULL, NULL, true, true, NULL);
-
--- JUNCTION
-INSERT INTO cat_feature_node (id, "type", epa_default, num_arcs, choose_hemisphere, isarcdivide, isprofilesurface, isexitupperintro, double_geom)
-VALUES('JUNCTION2', 'JUNCTION', 'JUNCTION', 2, true, true, true, 0, '{"activated":false,"value":1}'::json);
 SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'JUNCTION2'), 1, 'INSERT: cat_feature_node "JUNCTION2" was inserted');
 
 UPDATE cat_feature_node SET num_arcs = 1 WHERE id = 'JUNCTION2';
@@ -54,8 +47,8 @@ DELETE FROM cat_feature_node WHERE id = 'JUNCTION2';
 SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'JUNCTION2'), 0, 'DELETE: cat_feature_node "JUNCTION2" was deleted');
 
 -- CIRC_MANHOLE
-INSERT INTO cat_feature_node (id, "type", epa_default, num_arcs, choose_hemisphere, isarcdivide, isprofilesurface, isexitupperintro, double_geom)
-VALUES('CIRC_MANHOLE2', 'MANHOLE', 'JUNCTION', 2, true, true, true, 0, '{"activated":false,"value":1}'::json);
+INSERT INTO cat_feature (id, system_id, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)
+VALUES('CIRC_MANHOLE2', 'MANHOLE', 'NODE', NULL, 'v_edit_node', 've_node_circ_manhole', NULL, NULL, true, true, '{"code_prefix":"CM_"}'::json);
 SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'CIRC_MANHOLE2'), 1, 'INSERT: cat_feature_node "CIRC_MANHOLE2" was inserted');
 
 UPDATE cat_feature_node SET num_arcs = 1 WHERE id = 'CIRC_MANHOLE2';
@@ -70,8 +63,8 @@ DELETE FROM cat_feature_node WHERE id = 'CIRC_MANHOLE2';
 SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'CIRC_MANHOLE2'), 0, 'DELETE: cat_feature_node "CIRC_MANHOLE2" was deleted');
 
 -- SEWER_STORAGE
-INSERT INTO cat_feature_node (id, "type", epa_default, num_arcs, choose_hemisphere, isarcdivide, isprofilesurface, isexitupperintro, double_geom)
-VALUES('SEWER_STORAGE2', 'SEWER_STORAGE', 'SEWER_STORAGE', 2, true, true, false, 0, '{"activated":false,"value":1}'::json);
+INSERT INTO cat_feature (id, system_id, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)
+VALUES('SEWER_STORAGE2', 'STORAGE', 'NODE', NULL, 'v_edit_node', 've_node_sewer_storage', NULL, NULL, true, true, NULL);
 SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'SEWER_STORAGE2'), 1, 'INSERT: cat_feature_node "SEWER_STORAGE2" was inserted');
 
 UPDATE cat_feature_node SET num_arcs = 1 WHERE id = 'SEWER_STORAGE2';

@@ -29,17 +29,10 @@ DELETE FROM cat_work WHERE id = 'work5';
 SELECT is((SELECT count(*)::integer FROM cat_work WHERE id = 'work5'), 0, 'DELETE: cat_work "work5" was deleted');
 
 
--- Subtest 2: Testing cat_feature_node operations | insert/update/delete (junction, circ_manhole, sewer_storage)
+-- Subtest 2: Testing cat_feature_node operations | insert/update/delete (junction, circ_manhole, check_valve)
+-- JUNCTION
 INSERT INTO cat_feature (id, system_id, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)
 VALUES('JUNCTION2', 'JUNCTION', 'NODE', NULL, 'v_edit_node', 've_node_junction', NULL, NULL, true, true, NULL);
-INSERT INTO cat_feature (id, system_id, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)
-VALUES('CIRC_MANHOLE2', 'MANHOLE', 'NODE', NULL, 'v_edit_node', 've_node_circ_manhole', NULL, NULL, true, true, '{"code_prefix":"CM_"}'::json);
-INSERT INTO cat_feature (id, system_id, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)
-VALUES('CHECK_VALVE2', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_check_valve', 'Check valve', NULL, true, true, NULL);
-
--- JUNCTION
-INSERT INTO cat_feature_node (id, "type", epa_default, num_arcs, choose_hemisphere, isarcdivide, graph_delimiter, isprofilesurface, double_geom)
-VALUES('JUNCTION2', 'JUNCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}'::json);
 SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'JUNCTION2'), 1, 'INSERT: cat_feature_node "JUNCTION2" was inserted');
 
 UPDATE cat_feature_node SET num_arcs = 1 WHERE id = 'JUNCTION2';
@@ -54,8 +47,8 @@ DELETE FROM cat_feature_node WHERE id = 'JUNCTION2';
 SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'JUNCTION2'), 0, 'DELETE: cat_feature_node "JUNCTION2" was deleted');
 
 -- CIRC_MANHOLE
-INSERT INTO cat_feature_node (id, "type", epa_default, num_arcs, choose_hemisphere, isarcdivide, graph_delimiter, isprofilesurface, double_geom)
-VALUES('CIRC_MANHOLE2', 'CIRC_MANHOLE', 'CIRC_MANHOLE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}'::json);
+INSERT INTO cat_feature (id, system_id, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)
+VALUES('CIRC_MANHOLE2', 'MANHOLE', 'NODE', NULL, 'v_edit_node', 've_node_circ_manhole', NULL, NULL, true, true, '{"code_prefix":"CM_"}'::json);
 SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'CIRC_MANHOLE2'), 1, 'INSERT: cat_feature_node "CIRC_MANHOLE2" was inserted');
 
 UPDATE cat_feature_node SET num_arcs = 1 WHERE id = 'CIRC_MANHOLE2';
@@ -70,8 +63,8 @@ DELETE FROM cat_feature_node WHERE id = 'CIRC_MANHOLE2';
 SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'CIRC_MANHOLE2'), 0, 'DELETE: cat_feature_node "CIRC_MANHOLE2" was deleted');
 
 -- CHECK_VALVE
-INSERT INTO cat_feature_node (id, "type", epa_default, num_arcs, choose_hemisphere, isarcdivide, graph_delimiter, isprofilesurface, double_geom)
-VALUES('CHECK_VALVE2', 'VALVE', 'SHORTPIPE', 2, true, true, 'MINSECTOR', false, '{"activated":false,"value":1}'::json);
+INSERT INTO cat_feature (id, system_id, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)
+VALUES('CHECK_VALVE2', 'VALVE', 'NODE', NULL, 'v_edit_node', 've_node_check_valve', 'Check valve', NULL, true, true, NULL);
 SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'CHECK_VALVE2'), 1, 'INSERT: cat_feature_node "CHECK_VALVE2" was inserted');
 
 UPDATE cat_feature_node SET num_arcs = 1 WHERE id = 'CHECK_VALVE2';
