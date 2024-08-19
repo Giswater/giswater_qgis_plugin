@@ -70,6 +70,7 @@ v_macrosector_id integer;
 v_expl_id integer;
 v_dma_id integer;
 v_macrodma_id integer;
+v_macrominsector_id integer;
 v_muni_id integer;
 v_district_id integer;
 v_project_type varchar;
@@ -359,6 +360,12 @@ BEGIN
 						ELSIF v_noderecord1.dqa_id::text != v_noderecord2.dqa_id::text THEN
 							v_dqa_id = v_noderecord1.dqa_id;
 						END IF;
+
+						-- getting macrominsector_id by heritage from nodes
+						IF v_noderecord1.macrominsector_id = v_noderecord2.macrominsector_id THEN
+							v_macrominsector_id = v_noderecord1.macrominsector_id;
+						END IF;
+					
 					END IF;
 
 					-- getting sector_id by heritage from nodes
@@ -392,6 +399,11 @@ BEGIN
 						v_expl_id = v_noderecord1.expl_id;
 					ELSIF v_noderecord1.expl_id::text != v_noderecord2.expl_id::text THEN
 						v_expl_id = v_noderecord1.expl_id;
+					END IF;
+
+					-- getting muni_id by heritage from nodes
+					IF v_noderecord1.muni_id = v_noderecord2.muni_id THEN
+						v_muni_id = v_noderecord1.muni_id;
 					END IF;
 
 					-- getting node values in case of arcs (insert)
@@ -487,8 +499,9 @@ BEGIN
 		v_macrosector_id := (SELECT macrosector_id FROM sector WHERE sector_id=v_sector_id);
 
 		-- Municipality
-		v_muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(p_reduced_geometry, ext_municipality.the_geom,0.001)
-		AND active IS TRUE LIMIT 1);
+		IF v_muni_id IS NULL THEN
+			v_muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(p_reduced_geometry, ext_municipality.the_geom,0.001) AND active IS TRUE LIMIT 1);
+		END IF;
 
 		-- District
 		v_district_id := (SELECT district_id FROM ext_district WHERE ST_DWithin(p_reduced_geometry, ext_district.the_geom,0.001) LIMIT 1);
@@ -720,6 +733,8 @@ BEGIN
 					field_value = v_dma_id;
 				WHEN 'dqa_id' THEN
 					field_value = v_dqa_id;
+				WHEN 'macrominsector_id' THEN
+					field_value = v_macrominsector_id;
 
 				-- static mapzones
 				WHEN 'macrosector_id' THEN
