@@ -367,3 +367,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"pool", "col
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"n_hydrometer", "dataType":"integer"}}$$);
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_dscenario_virtualpump", "column":"energyvalue", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_dscenario_pump_additional", "column":"energyvalue", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_dscenario_pump_additional", "column":"energyparam", "dataType":"integer"}}$$);

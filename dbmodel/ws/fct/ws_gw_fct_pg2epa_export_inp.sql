@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2526
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_export_epanet_inp(character varying, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_export_inp(p_data json)
+DROP FUNCTION IF EXISTS ws2.gw_fct_utils_csv2pg_export_epanet_inp(character varying, text);
+CREATE OR REPLACE FUNCTION ws2.gw_fct_pg2epa_export_inp(p_data json)
 RETURNS json AS
 $BODY$
 
@@ -42,7 +42,7 @@ v_client_epsg integer;
 BEGIN
 
 	-- Search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws2", public;
 
 	-- get input parameters
 	v_result = (p_data->>'data')::json->>'resultId';
@@ -153,11 +153,11 @@ BEGIN
 	UNION
 	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'PATTERN'::text, p.energy_pattern_id  FROM inp_dscenario_pump_additional p LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text WHERE p.energy_pattern_id IS NOT NULL
 	UNION
-	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'EFFIC'::text, p.effic_curve_id FROM inp_dscenario_virtualvalve p LEFT JOIN temp_arc ON p.arc_id = temp_arc.arc_id::text WHERE p.effic_curve_id IS NOT NULL
+	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'EFFIC'::text, p.effic_curve_id FROM inp_dscenario_virtualpump p LEFT JOIN temp_arc ON p.arc_id = temp_arc.arc_id::text WHERE p.effic_curve_id IS NOT NULL
 	UNION
-	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'PRICE'::text, p.energy_price::text  FROM inp_dscenario_virtualvalve p LEFT JOIN temp_arc ON p.arc_id = temp_arc.arc_id::text WHERE p.energy_price IS NOT NULL
+	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'PRICE'::text, p.energy_price::text  FROM inp_dscenario_virtualpump p LEFT JOIN temp_arc ON p.arc_id = temp_arc.arc_id::text WHERE p.energy_price IS NOT NULL
 	UNION
-	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'PATTERN'::text, p.energy_pattern_id  FROM inp_dscenario_virtualvalve p LEFT JOIN temp_arc ON p.arc_id = temp_arc.arc_id::text WHERE p.energy_pattern_id IS NOT NULL
+	 SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,'PATTERN'::text, p.energy_pattern_id  FROM inp_dscenario_virtualpump p LEFT JOIN temp_arc ON p.arc_id = temp_arc.arc_id::text WHERE p.energy_pattern_id IS NOT NULL
 	UNION
 	 SELECT sys_param_user.idval AS pump_id, config_param_user.value, NULL::text  FROM config_param_user JOIN sys_param_user ON sys_param_user.id = config_param_user.parameter::text
 	 WHERE (config_param_user.parameter::text = 'inp_energy_price'::text OR config_param_user.parameter::text = 'inp_energy_pump_effic'::text OR config_param_user.parameter::text = 'inp_energy_price_pattern'::text) 

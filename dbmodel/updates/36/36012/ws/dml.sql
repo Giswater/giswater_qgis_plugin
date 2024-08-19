@@ -151,11 +151,11 @@ UPDATE edit_typevalue SET id = upper(id), idval=upper(idval) WHERE typevalue IN 
 ALTER TABLE edit_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
 
 -- 17/08/2024
-INSERT INTO config_typevalue VALUES ('sys_style_context', 'TEMPLAYER', '{"orderBy":0}');
-INSERT INTO config_typevalue VALUES ('sys_style_context', 'BASIC', '{"orderBy":10}');
-INSERT INTO config_typevalue VALUES ('sys_style_context', 'PRESSZONE', '{"orderBy":20}');
-INSERT INTO config_typevalue VALUES ('sys_style_context', 'DMA', '{"orderBy":30}');
-INSERT INTO config_typevalue VALUES ('sys_style_context', 'EPANET', '{"orderBy":40}');
+INSERT INTO config_typevalue VALUES ('sys_style_context', 'TEMPLAYER', 'TEMPLAYER', null,'{"orderBy":0}');
+INSERT INTO config_typevalue VALUES ('sys_style_context', 'BASIC', 'BASIC', null,'{"orderBy":10}');
+INSERT INTO config_typevalue VALUES ('sys_style_context', 'PRESSZONE', 'PRESSZONE',null,'{"orderBy":20}');
+INSERT INTO config_typevalue VALUES ('sys_style_context', 'DMA','DMA',null, '{"orderBy":30}');
+INSERT INTO config_typevalue VALUES ('sys_style_context', 'EPANET','EPANET',null, '{"orderBy":40}');
 
 UPDATE sys_style SET context = 'TEMPLAYER' WHERE idval in ('INP result line', 'INP result point', 'Overlap affected arcs', 'Overlap affected connecs', 'Other mincuts whichs overlaps', 'Temporal-Graphconfig');
 UPDATE sys_style SET context = 'EPANET' WHERE idval in ('v_edit_arc EPANET point of view', 'v_edit_connec EPANET point of view', 'v_edit_node EPANET point of view', 'v_edit_link EPANET point of view');

@@ -206,13 +206,13 @@ BEGIN
 
 	-- update addparam for inp_shortpipe (step 1)
 	UPDATE temp_t_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"", "roughness":"',a.roughness,'"}')
-	FROM v_edit_inp_shortpipe 
+	FROM v_edit_inp_shortpipe JOIN man_valve USING (node_id)
 	JOIN (SELECT node_1 as node_id, diameter, roughness FROM temp_t_arc) a USING (node_id)
 	WHERE temp_t_node.node_id=v_edit_inp_shortpipe.node_id;
  
 	-- update addparam for inp_shortpipe (step 2)
 	UPDATE temp_t_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"", "roughness":"',a.roughness,'"}')
-	FROM v_edit_inp_shortpipe 
+	FROM v_edit_inp_shortpipe JOIN man_valve USING (node_id)
 	JOIN (SELECT node_2 as node_id, diameter, roughness FROM temp_t_arc) a USING (node_id)
 	WHERE temp_t_node.node_id=v_edit_inp_shortpipe.node_id;
 

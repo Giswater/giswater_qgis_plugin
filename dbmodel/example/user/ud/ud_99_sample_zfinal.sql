@@ -88,3 +88,6 @@ UPDATE cat_arc SET visitability_vdef = 2 WHERE geom1 > 1.2 AND geom1 < 1.6; -- S
 UPDATE cat_arc SET visitability_vdef = 3 WHERE geom1 >= 1.6; -- VISITABLE
 
 UPDATE config_param_system SET isenabled = true WHERE parameter = 'basic_selector_tab_municipality';
+
+UPDATE link SET muni_id = c.muni_id FROM connec c WHERE connec_id =  feature_id;
+UPDATE link SET muni_id = g.muni_id FROM gully g WHERE gully_id =  feature_id;
