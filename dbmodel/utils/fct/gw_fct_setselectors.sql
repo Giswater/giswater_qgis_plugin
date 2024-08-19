@@ -373,9 +373,10 @@ BEGIN
 		IF v_tabname IN ('tab_exploitation', 'tab_macroexploitation') THEN
 
 			-- sector
-			DELETE FROM selector_sector WHERE cur_user = current_user;
+			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
 			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
+			SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
+			ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
 			-- muni
 			DELETE FROM selector_municipality WHERE cur_user = current_user;
@@ -406,9 +407,10 @@ BEGIN
 			SELECT DISTINCT expl_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user);
 
 			-- sector
-			DELETE FROM selector_sector WHERE cur_user = current_user;
+			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
 			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user);
+			SELECT DISTINCT sector_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
+			ON CONFLICT (sector_id, cur_user) DO NOTHING;
 		END IF;
 
 	END IF;

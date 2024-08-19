@@ -193,4 +193,6 @@ UPDATE config_param_system set value = gw_fct_json_object_set_key(value::json, '
 UPDATE config_param_system set value = gw_fct_json_object_set_key(value::json, 'selectionMode', 'keepPreviousUsingShift'::text) where parameter = 'basic_selector_tab_macrosector';
 UPDATE config_param_system set value = gw_fct_json_object_set_key(value::json, 'selectionMode', 'keepPreviousUsingShift'::text) where parameter = 'basic_selector_tab_macroexploitation';
 
+UPDATE config_param_system set value = repalce(value, 'sector_id >=0', 'sector_id >0') where parameter = 'basic_selector_tab_sector';
+
 UPDATE link SET muni_id = c.muni_id FROM connec c WHERE connec_id =  feature_id;
