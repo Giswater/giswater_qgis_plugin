@@ -23,6 +23,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"audit_psec
 CREATE INDEX gully_muni ON gully USING btree (muni_id);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"raingage", "column":"muni_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"rpt_inp_raingage", "column":"muni_id", "dataType":"integer"}}$$);
+
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"connec", "column":"n_hydrometer", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"drainzone", "column":"sector_id", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"dma", "column":"sector_id", "dataType":"integer"}}$$);

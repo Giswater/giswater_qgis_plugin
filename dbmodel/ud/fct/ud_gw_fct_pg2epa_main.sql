@@ -79,9 +79,6 @@ BEGIN
 			RETURN v_return;
 		END IF;
 
-		-- force sector =0 disabled
-		DELETE FROM selector_sector  WHERE sector_id = 0 and cur_user = current_user;
-
 		-- check sector selector
 		SELECT count(*) INTO v_count FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
 		IF v_count = 0 THEN

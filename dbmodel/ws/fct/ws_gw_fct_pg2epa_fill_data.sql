@@ -118,17 +118,16 @@ BEGIN
 	UPDATE temp_t_node SET demand=inp_connec.demand, pattern_id=inp_connec.pattern_id, addparam=concat('{"emitter_coeff":"',emitter_coeff,'"}')
 	FROM inp_connec WHERE temp_t_node.node_id=inp_connec.connec_id;
 
-
 	-- update child param for inp_valve
 	UPDATE temp_t_node SET addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "diameter":"',custom_dint,'", "flow":"',
 	flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "minorloss":"',minorloss,'", "status":"',status,
 	'", "to_arc":"',to_arc,'", "add_settings":"',add_settings,'"}')
-	FROM inp_valve WHERE temp_t_node.node_id=inp_valve.node_id;
+	FROM v_edit_inp_valve v WHERE temp_t_node.node_id=v.node_id;
 
 	-- update addparam for inp_pump
-	UPDATE temp_t_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',inp_pump.pattern_id,'", "status":"',status,'", "to_arc":"',to_arc,
-	'", "energyvalue":"',energyvalue,'", "pump_type":"',pump_type,'"}')
-	FROM inp_pump WHERE temp_t_node.node_id=inp_pump.node_id;
+	UPDATE temp_t_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',p.pattern_id,'", "status":"',status,'", "to_arc":"',to_arc,
+	'", "energy_price":"',energy_price,'", "energy_pattern_id":"',energy_pattern_id,'", "pump_type":"',pump_type,'"}')
+	FROM v_edit_inp_pump p WHERE temp_t_node.node_id=p.node_id;
 
 	raise notice 'inserting arcs on temp_t_arc table';
 	

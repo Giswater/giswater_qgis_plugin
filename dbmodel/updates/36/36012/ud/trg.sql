@@ -69,6 +69,9 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('OUTFALL');
 CREATE TRIGGER gw_trg_edit_inp_node_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_junction
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_node('inp_junction');
 
+CREATE TRIGGER gw_trg_edit_inp_node_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_outfall
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_node('inp_outfall');
+
 CREATE TRIGGER gw_trg_edit_inp_treatment INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_treatment
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_treatment();
 

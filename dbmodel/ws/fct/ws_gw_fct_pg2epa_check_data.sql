@@ -271,11 +271,11 @@ BEGIN
 	IF (SELECT value FROM config_param_system WHERE parameter = 'epa_shutoffvalve') = 'VALVE' THEN
 		INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, descript, sector_id)
 		select 170, node_id, nodecat_id, n.the_geom, 'To arc does not exists as closest arc for valve', n.sector_id
-		from inp_valve LEFT JOIN v_edit_arc v on arc_id = to_arc JOIN v_edit_node n USING (node_id) where node_id not in (node_1, node_2) AND valv_type !='TCV';		
+		from man_valve LEFT JOIN v_edit_arc v on arc_id = to_arc JOIN v_edit_node n USING (node_id) where node_id not in (node_1, node_2) AND valv_type !='TCV';		
 	ELSE 
 		INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, descript, sector_id)
 		select 170, node_id, nodecat_id, n.the_geom, 'To arc does not exists as closest arc for valve', n.sector_id
-		from inp_valve LEFT JOIN v_edit_arc v on arc_id = to_arc JOIN v_edit_node n USING (node_id) where node_id not in (node_1, node_2);
+		from man_valve LEFT JOIN v_edit_arc v on arc_id = to_arc JOIN v_edit_node n USING (node_id) where node_id not in (node_1, node_2);
 
 	END IF;
 
@@ -447,7 +447,7 @@ BEGIN
 	-- to_arc wrong values (171)
 	INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, descript, sector_id)
 	select 171, node_id, nodecat_id , n.the_geom,  'To arc does not exists as closest arc for pump', n.sector_id 
-	from inp_pump LEFT JOIN v_edit_arc v on arc_id = to_arc JOIN v_edit_node n USING (node_id) where node_id not in (node_1, node_2);
+	from man_pump LEFT JOIN v_edit_arc v on arc_id = to_arc JOIN v_edit_node n USING (node_id) where node_id not in (node_1, node_2);
 	
 	SELECT count(*) INTO v_count FROM temp_anl_node WHERE fid = 171 AND cur_user=current_user;
 	IF v_count > 0 THEN

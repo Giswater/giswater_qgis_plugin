@@ -74,9 +74,6 @@ BEGIN
 	-- step 1: preprocess
 	IF v_step = 1 THEN
 
-		-- force sector =0 disabled
-		DELETE FROM selector_sector  WHERE sector_id = 0 and cur_user = current_user;
-
 		-- check sector selector
 		SELECT count(*) INTO v_count FROM selector_sector WHERE cur_user = current_user;
 		IF v_count = 0 THEN
