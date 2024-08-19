@@ -10,7 +10,7 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(16);
+SELECT plan(4);
 
 -- Subtest 1: Testing cat_work operations | insert/update/delete
 INSERT INTO cat_work (id, descript, link, workid_key1, workid_key2, builtdate, workcost, active)
