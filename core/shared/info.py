@@ -2806,7 +2806,7 @@ class GwInfo(QObject):
             widget = tools_gw.add_tableview_header(widget, field)
             widget = tools_gw.fill_tableview_rows(widget, field)
             tools_qt.set_tableview_config(widget, edit_triggers=QTableView.DoubleClicked, sectionResizeMode=0)
-            widget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, 1, True)
+            widget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, 1)
             if 'tab_epa' in widgetname:
                 widget.doubleClicked.connect(partial(epa_tbl_doubleClicked, widget, self.dlg_cf))
                 model = widget.model()
@@ -3393,7 +3393,7 @@ def open_epa_dlg(**kwargs):
 
         complet_list = get_list(view, id_name, feature_id)
         fill_tbl(complet_list, tbl, info, view, info.dlg)
-        tools_gw.set_tablemodel_config(info.dlg, tbl, view, schema_name=info.schema_name, isQStandardItemModel=True)
+        tools_gw.set_tablemodel_config(info.dlg, tbl, view, schema_name=info.schema_name)
         info.dlg.btn_accept.clicked.connect(partial(save_tbl_changes, view, info, info.dlg, pk))
 
         # Add & Delete buttons
@@ -3565,7 +3565,7 @@ def refresh_epa_tbl(tblview, dlg, **kwargs):
             view = tableview['view']
         complet_list = get_list(view, id_name, feature_id)
         fill_tbl(complet_list, tbl, info, view, dlg)
-        tools_gw.set_tablemodel_config(dlg, tbl, view, schema_name=info.schema_name, isQStandardItemModel=True)
+        tools_gw.set_tablemodel_config(dlg, tbl, view, schema_name=info.schema_name)
 
 
 def reload_tbl_dscenario(info, tablename, tableview, id_name, feature_id):

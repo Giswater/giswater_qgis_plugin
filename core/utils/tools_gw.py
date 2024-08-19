@@ -3180,7 +3180,7 @@ def manage_docker_options(option_name='position'):
         lib_vars.session_vars['dialog_docker'].position = 2
 
 
-def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardItemModel=False, schema_name=None):
+def set_tablemodel_config(dialog, widget, table_name, sort_order=0, schema_name=None):
     """ Configuration of tables. Set visibility and width of columns """
 
     widget = tools_qt.get_widget(dialog, widget)
@@ -3240,11 +3240,8 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
             if row['alias'] is not None:
                 widget.model().setHeaderData(col_idx, Qt.Horizontal, row['alias'])
     widget.setProperty('columns', columns_dict)
-
     # Set order
-    if isQStandardItemModel:
-        widget.model().sort(0, sort_order)
-    else:
+    if isinstance(widget.model(), QStandardItemModel) is False:
         widget.model().setSort(0, sort_order)
         widget.model().select()
     # Delete columns
@@ -4258,7 +4255,7 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
         if widget is None: continue
         widget = add_tableview_header(widget, field)
         widget = fill_tableview_rows(widget, field)
-        widget = set_tablemodel_config(dialog, widget, short_name, 1, True)
+        widget = set_tablemodel_config(dialog, widget, short_name, 1)
         tools_qt.set_tableview_config(widget, edit_triggers=QTableView.DoubleClicked)
 
     widget_list = []

@@ -449,7 +449,7 @@ class GwDocument(QObject):
             if field['value']:
                 self.dlg_man.tbl_document = tools_gw.add_tableview_header(self.dlg_man.tbl_document, field)
                 self.dlg_man.tbl_document = tools_gw.fill_tableview_rows(self.dlg_man.tbl_document, field)
-        tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_document, 'v_ui_doc', 0, True)
+        tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_document, 'v_ui_doc', 0)
         tools_qt.set_tableview_config(self.dlg_man.tbl_document, sectionResizeMode=0)
 
         return True

@@ -2215,15 +2215,11 @@ class GwPsector:
         tools_gw.load_tableview_psector(self.dlg_plan_psector, 'connec')
         if self.project_type.upper() == 'UD':
             tools_gw.load_tableview_psector(self.dlg_plan_psector, 'gully')
-        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_arc", self.tablename_psector_x_arc,
-                                       isQStandardItemModel=True)
-        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_node", self.tablename_psector_x_node,
-                                       isQStandardItemModel=True)
-        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_connec", self.tablename_psector_x_connec,
-                                       isQStandardItemModel=True)
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_arc", self.tablename_psector_x_arc)
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_node", self.tablename_psector_x_node)
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_connec", self.tablename_psector_x_connec)
         if self.project_type.upper() == 'UD':
-            tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_gully", self.tablename_psector_x_gully,
-                                           isQStandardItemModel=True)
+            tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_gully", self.tablename_psector_x_gully)
 
 
     def _check_layers_visible(self, layer_name, the_geom, field_id):
