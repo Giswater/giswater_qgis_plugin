@@ -434,8 +434,7 @@ class GwInfo(QObject):
                 pass
         finally:
             action_edit.setEnabled(is_enabled)
-
-        action_edit.triggered.connect(partial(self._manage_edition, self.dlg_generic, action_edit, fid, new_feature, True))
+        action_edit.triggered.connect(partial(self._manage_edition, self.dlg_generic, action_edit, fid, new_feature, generic=True))
         action_edit.setChecked(layer.isEditable() and can_edit)
 
         # Signals
@@ -827,7 +826,8 @@ class GwInfo(QObject):
         child_type = complet_result['body']['feature']['childType']
 
         # Actions signals
-        self.action_edit.triggered.connect(partial(self._manage_edition, dlg_cf, self.action_edit, fid, new_feature, False))
+        self.action_edit.triggered.connect(partial(self._manage_edition, dlg_cf, self.action_edit, fid, new_feature, generic=False))
+        self.dlg_cf.btn_apply.clicked.connect(partial(self._manage_edition, dlg_cf, self.action_edit, fid, new_feature, False, from_apply=True))
         self.action_catalog.triggered.connect(partial(self._open_catalog, tab_type, self.feature_type, child_type))
         self.action_workcat.triggered.connect(partial(GwWorkcat(self.iface, self.canvas).create_workcat))
         self.action_mapzone.triggered.connect(
@@ -1597,13 +1597,12 @@ class GwInfo(QObject):
                 pass
 
 
-    def _manage_edition(self, dialog, action_edit, fid, new_feature=None, generic=False):
+    def _manage_edition(self, dialog, action_edit, fid, new_feature=None, generic=False, from_apply=False):
 
         # With the editing QAction we need to collect the last modified value (self.get_last_value()),
         # since the "editingFinished" signals of the widgets are not detected.
         # Therefore whenever the cursor enters a widget, it will ask if we want to save changes
-
-        if not action_edit.isChecked():
+        if not action_edit.isChecked() or from_apply:
             self._get_last_value(dialog, generic)
             if str(self.my_json) == '{}' and str(self.my_json_epa) == '{}':
                 tools_qt.set_action_checked(action_edit, False)
@@ -1819,6 +1818,9 @@ class GwInfo(QObject):
                     if k in parent_fields:
                         new_feature.setAttribute(k, v)
                         _json.pop(k, None)
+
+                epa_type = tools_qt.get_text(dialog, 'tab_data_epa_type')
+                _json['epa_type'] = epa_type
 
                 if not self.layer_new_feature.isEditable():
                     self.layer_new_feature.startEditing()
@@ -2285,18 +2287,7 @@ class GwInfo(QObject):
         if widget.property('isfilter'): return widget
         if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
             if widget.property('widgetcontrols')['saveValue'] is False: return widget
-
-        if self._check_tab_data(field):  # Tab data
-            if field['isautoupdate'] and self.new_feature_id is None:
-                _json = {}
-                widget.currentIndexChanged.connect(partial(self._clean_my_json, widget))
-                widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
-                widget.currentIndexChanged.connect(partial(self._accept_auto_update, dialog, self.complet_result, _json, widget, True, False, new_feature=new_feature))
-            else:
-                widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
-        else:  # Other tabs
-            widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json_epa))
-            # TODO: Make autoupdate widgets work
+        widget.currentIndexChanged.connect(partial(self._handle_combobox_change, widget, dialog, field))
 
         return widget
 
@@ -2365,6 +2356,21 @@ class GwInfo(QObject):
             widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json_epa))
             # TODO: Make autoupdate widgets work
         return widget
+
+
+    def _handle_combobox_change(self, widget, dialog, field):
+        _json = {}
+        if self._check_tab_data(field):  # Tab data
+            if field['isautoupdate'] and self.new_feature_id is None:
+                self._clean_my_json(widget)
+                tools_gw.get_values(dialog, widget, _json)
+                self._accept_auto_update(dialog, self.complet_result, _json, widget, True, False,
+                                         new_feature=self.new_feature_id)
+            else:
+                tools_gw.get_values(dialog, widget, self.my_json)
+        else:  # Other tabs
+            tools_gw.get_values(dialog, widget, self.my_json_epa)
+            # TODO: Make autoupdate widgets work for other tabs as well
 
 
     def run_settopology(self, widget, **kwargs):

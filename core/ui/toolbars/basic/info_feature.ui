@@ -53,6 +53,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="btn_apply">
+        <property name="text">
+         <string>Apply</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item row="1" column="0">
@@ -88,8 +95,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>734</width>
-             <height>368</height>
+             <width>726</width>
+             <height>335</height>
             </rect>
            </property>
            <attribute name="label">
@@ -109,8 +116,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>734</width>
-             <height>368</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <attribute name="label">
@@ -144,8 +151,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>734</width>
-             <height>360</height>
+             <width>111</width>
+             <height>64</height>
             </rect>
            </property>
            <attribute name="label">
@@ -183,8 +190,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>734</width>
-             <height>360</height>
+             <width>98</width>
+             <height>42</height>
             </rect>
            </property>
            <attribute name="label">
