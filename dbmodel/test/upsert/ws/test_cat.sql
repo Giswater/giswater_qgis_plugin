@@ -10,7 +10,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(16);
 
 -- Subtest 1: Testing cat_work operations | insert/update/delete
-RAISE NOTICE 'Subtest 1: Testing cat_work operations | insert/update/delete';
 INSERT INTO cat_work (id, descript, link, workid_key1, workid_key2, builtdate, workcost, active)
 VALUES('work5', 'Description work5', NULL, NULL, NULL, '2024-08-19', NULL, true);
 SELECT is((SELECT count(*)::integer FROM cat_work WHERE id = 'work5'), 1, 'INSERT: cat_work "work5" was inserted');
@@ -28,9 +27,7 @@ SELECT is((SELECT count(*)::integer FROM cat_work WHERE id = 'work5'), 0, 'DELET
 
 
 -- Subtest 2: Testing cat_feature_node operations | insert/update/delete (junction, circ_manhole, sewer_storage)
-RAISE NOTICE 'Subtest 2: Testing cat_feature_node operations | insert/update/delete';
 -- JUNCTION
-RAISE NOTICE 'Subtest 2.1: Testing cat_feature_node JUNCTION';
 INSERT INTO cat_feature_node (id, "type", epa_default, num_arcs, choose_hemisphere, isarcdivide, graph_delimiter, isprofilesurface, double_geom)
 VALUES('JUNCTION2', 'JUNCTION', 'JUNCTION', 2, true, true, 'NONE', false, '{"activated":false,"value":1}'::json);
 SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'JUNCTION2'), 1, 'INSERT: cat_feature_node "JUNCTION2" was inserted');
@@ -47,7 +44,6 @@ DELETE FROM cat_feature_node WHERE id = 'JUNCTION2';
 SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'JUNCTION2'), 0, 'DELETE: cat_feature_node "JUNCTION2" was deleted');
 
 -- CIRC_MANHOLE
-RAISE NOTICE 'Subtest 2.2: Testing cat_feature_node CIRC_MANHOLE';
 INSERT INTO cat_feature_node (id, "type", epa_default, num_arcs, choose_hemisphere, isarcdivide, graph_delimiter, isprofilesurface, double_geom)
 VALUES('CIRC_MANHOLE2', 'CIRC_MANHOLE', 'CIRC_MANHOLE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}'::json);
 SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'CIRC_MANHOLE2'), 1, 'INSERT: cat_feature_node "CIRC_MANHOLE2" was inserted');
@@ -64,7 +60,6 @@ DELETE FROM cat_feature_node WHERE id = 'CIRC_MANHOLE2';
 SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'CIRC_MANHOLE2'), 0, 'DELETE: cat_feature_node "CIRC_MANHOLE2" was deleted');
 
 -- SEWER_STORAGE
-RAISE NOTICE 'Subtest 2.3: Testing cat_feature_node SEWER_STORAGE';
 INSERT INTO cat_feature_node (id, "type", epa_default, num_arcs, choose_hemisphere, isarcdivide, graph_delimiter, isprofilesurface, double_geom)
 VALUES('SEWER_STORAGE2', 'SEWER_STORAGE', 'SEWER_STORAGE', 2, true, true, 'NONE', false, '{"activated":false,"value":1}'::json);
 SELECT is((SELECT count(*)::integer FROM cat_feature_node WHERE id = 'SEWER_STORAGE2'), 1, 'INSERT: cat_feature_node "SEWER_STORAGE2" was inserted');

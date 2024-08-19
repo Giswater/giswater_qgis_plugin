@@ -10,7 +10,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(8);
 
 -- Subtest 1: Testing doc_type operations
-RAISE NOTICE 'Subtest 1: Testing doc_type operations';
 INSERT INTO doc_type (id, comment) VALUES ('AS_BUILT2', 'test');
 SELECT is((SELECT count(*)::integer FROM doc_type WHERE id = 'AS_BUILT2'), 1, 'INSERT: doc_type "AS_BUILT2" was inserted');
 
@@ -27,7 +26,6 @@ SELECT is((SELECT count(*)::integer FROM doc_type WHERE id = 'AS_BUILT2'), 0, 'D
 
 
 -- Subtest 2: Testing doc operations
-RAISE NOTICE 'Subtest 2: Testing doc operations'
 INSERT INTO doc (id, doc_type, "path", observ, "date", user_name, tstamp, the_geom, "name")
 VALUES('Demo document 4', 'OTHER', 'https://bgeo.es', NULL, '2024-08-19 12:06:28.330', 'postgres', '2024-08-19 12:06:28.330', NULL, NULL);
 SELECT is((SELECT count(*)::integer FROM doc WHERE id = 'Demo document 4'), 1, 'INSERT: doc "Demo document 4" was inserted');
