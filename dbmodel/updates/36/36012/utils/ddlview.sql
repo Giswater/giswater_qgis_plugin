@@ -283,7 +283,7 @@ CREATE OR REPLACE VIEW v_ext_address AS
     ext_address.expl_id,
     ext_streetaxis.name,
     ext_address.the_geom
-	FROM selector_muni s, ext_address
+	FROM selector_municipality s, ext_address
     LEFT JOIN ext_streetaxis ON ext_streetaxis.id::text = ext_address.streetaxis_id::text
 	WHERE ext_address.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
 
@@ -302,7 +302,7 @@ CREATE OR REPLACE VIEW v_ext_plot AS
     ext_plot.text,
     ext_plot.the_geom,
     ext_plot.expl_id
-	FROM selector_muni s, ext_plot
+	FROM selector_municipality s, ext_plot
 	WHERE ext_plot.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
 
 
@@ -328,7 +328,7 @@ CREATE OR REPLACE VIEW v_edit_dimensions AS
 	dimensions.muni_id
     FROM selector_expl, dimensions
     JOIN v_state_dimensions ON dimensions.id = v_state_dimensions.id
-	right join selector_muni m using (muni_id)
+	right join selector_municipality m using (muni_id)
 	join selector_sector s using (sector_id)
 	where (m.cur_user = current_user or dimensions.muni_id is null) and 
 	s.cur_user = current_user and dimensions.expl_id = selector_expl.expl_id 

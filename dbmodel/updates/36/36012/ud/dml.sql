@@ -143,3 +143,4 @@ INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_arc', 'DRAINZO
 INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_connec', 'DRAINZONE', 'qml');
 INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_link', 'DRAINZONE', 'qml');
 
+UPDATE link SET muni_id = g.muni_id FROM gully g WHERE gully_id =  feature_id;

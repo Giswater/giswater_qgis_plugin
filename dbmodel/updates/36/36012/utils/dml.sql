@@ -176,4 +176,21 @@ group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label
 iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
-INSERT INTO selector_muni SELECT muni_id,current_user FROM ext_municipality;
+INSERT INTO selector_municipality SELECT muni_id,current_user FROM ext_municipality;
+
+-- clean code for user's selector function
+UPDATE config_param_system set value = gw_fct_json_object_delete_keys(value::json, 'explFromMuni') where parameter = 'basic_selector_tab_municipality';
+UPDATE config_param_system set value = gw_fct_json_object_delete_keys(value::json, 'explFromSector') where parameter = 'basic_selector_tab_sector';
+UPDATE config_param_system set value = gw_fct_json_object_delete_keys(value::json, 'explFromMuni') where parameter = 'basic_selector_tab_exploitation';
+UPDATE config_param_system set value = gw_fct_json_object_delete_keys(value::json, 'explFromMacroexpl') where parameter = 'basic_selector_tab_macrosector';
+UPDATE config_param_system set value = gw_fct_json_object_delete_keys(value::json, 'sectorFromMacroexpl') where parameter = 'basic_selector_tab_macrosector';
+UPDATE config_param_system set value = gw_fct_json_object_delete_keys(value::json, 'explFromMacroexpl') where parameter = 'basic_selector_tab_macroexploitation';
+UPDATE config_param_system set value = gw_fct_json_object_delete_keys(value::json, 'sectorFromMacroexpl') where parameter = 'basic_selector_tab_macroexploitation';
+
+UPDATE config_param_system set value = gw_fct_json_object_set_key(value::json, 'selectionMode', 'keepPreviousUsingShift'::text) where parameter = 'basic_selector_tab_municipality';
+UPDATE config_param_system set value = gw_fct_json_object_set_key(value::json, 'selectionMode', 'keepPreviousUsingShift'::text) where parameter = 'basic_selector_tab_sector';
+UPDATE config_param_system set value = gw_fct_json_object_set_key(value::json, 'selectionMode', 'keepPreviousUsingShift'::text) where parameter = 'basic_selector_tab_exploitation';
+UPDATE config_param_system set value = gw_fct_json_object_set_key(value::json, 'selectionMode', 'keepPreviousUsingShift'::text) where parameter = 'basic_selector_tab_macrosector';
+UPDATE config_param_system set value = gw_fct_json_object_set_key(value::json, 'selectionMode', 'keepPreviousUsingShift'::text) where parameter = 'basic_selector_tab_macroexploitation';
+
+UPDATE link SET muni_id = c.muni_id FROM connec c WHERE connec_id =  feature_id;

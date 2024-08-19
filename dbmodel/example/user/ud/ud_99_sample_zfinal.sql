@@ -10,7 +10,7 @@ SET search_path = 'SCHEMA_NAME', public, pg_catalog;
 INSERT INTO selector_sector SELECT sector_id, current_user from sector where sector_id > 0 ON CONFLICT (sector_id, cur_user) DO NOTHING;
 DELETE FROM selector_psector;
 
-INSERT INTO selector_muni SELECT muni_id,current_user FROM ext_municipality ON CONFLICT (muni_id, cur_user) DO NOTHING;
+INSERT INTO selector_municipality SELECT muni_id,current_user FROM ext_municipality ON CONFLICT (muni_id, cur_user) DO NOTHING;
 
 UPDATE cat_feature SET id = 'OVERFLOW_STORAGE' WHERE id = 'OWERFLOW_STORAGE';
 
@@ -86,3 +86,5 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, '
 UPDATE cat_arc SET visitability_vdef = 1 WHERE geom1 <= 1.2; -- NO VISITABLE
 UPDATE cat_arc SET visitability_vdef = 2 WHERE geom1 > 1.2 AND geom1 < 1.6; -- SEMI VISITABLE
 UPDATE cat_arc SET visitability_vdef = 3 WHERE geom1 >= 1.6; -- VISITABLE
+
+UPDATE config_param_system SET isenabled = true WHERE parameter = 'basic_selector_tab_municipality';

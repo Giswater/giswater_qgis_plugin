@@ -10,7 +10,7 @@ SET search_path = 'SCHEMA_NAME', public, pg_catalog;
 INSERT INTO selector_sector SELECT sector_id, current_user from sector where sector_id > 0 ON CONFLICT (sector_id, cur_user) DO NOTHING;
 DELETE FROM selector_psector;
 
-INSERT INTO selector_muni SELECT muni_id,current_user FROM ext_municipality ON CONFLICT (muni_id, cur_user) DO NOTHING;
+INSERT INTO selector_municipality SELECT muni_id,current_user FROM ext_municipality ON CONFLICT (muni_id, cur_user) DO NOTHING;
 
 UPDATE cat_arc SET active=TRUE WHERE arctype_id='VARC' AND id='VIRTUAL';
 
@@ -77,3 +77,5 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, '
 
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'sys_geom', 's.the_geom'::text)
 	WHERE parameter ='basic_search_v2_tab_address';
+	
+UPDATE config_param_system SET isenabled = true WHERE parameter = 'basic_selector_tab_municipality';

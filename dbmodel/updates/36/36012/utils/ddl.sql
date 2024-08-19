@@ -90,14 +90,6 @@ ALTER TABLE sys_style ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.sys_style
 
 INSERT INTO sys_style SELECT id, idval, NULL, styletype, stylevalue, active FROM _sys_style_;
 
-
-
--- code for schema utils
-CREATE TABLE selector_muni(
-muni_id integer NOT NULL,
-cur_user text NOT NULL DEFAULT CURRENT_USER,
-CONSTRAINT selector_muni_pkey PRIMARY KEY (muni_id, cur_user),
-CONSTRAINT selector_muni_id_fkey FOREIGN KEY (muni_id) 
-REFERENCES ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE);
-ALTER TABLE link ADD CONSTRAINT link_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE link ADD CONSTRAINT link_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality (muni_id) 
+MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
