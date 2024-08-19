@@ -8,7 +8,7 @@ BEGIN;
 -- Suppress NOTICE messages
 SET client_min_messages TO WARNING;
 
-SET search_path = "SCHEMA_NAME", public, pg_catalog;\
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(1);
 SELECT ok(1=1, 'One equals one');
