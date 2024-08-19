@@ -144,3 +144,8 @@ INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_connec', 'DRAI
 INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_link', 'DRAINZONE', 'qml');
 
 UPDATE link SET muni_id = g.muni_id FROM gully g WHERE gully_id =  feature_id;
+
+UPDATE config_form_tableview SET columnindex=4 WHERE objectname='v_ui_rpt_cat_result' AND columnname='status';
+UPDATE config_form_tableview SET columnindex=6 WHERE objectname='v_ui_rpt_cat_result' AND columnname='descript';
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('epa_toolbar', 'utils', 'v_ui_rpt_cat_result', 'iscorporate', 5, true, NULL, NULL, NULL, NULL);
+

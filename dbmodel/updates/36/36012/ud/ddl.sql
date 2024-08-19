@@ -29,3 +29,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"connec", "
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"drainzone", "column":"sector_id", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"dma", "column":"sector_id", "dataType":"integer"}}$$);
 
+-- 13/08/24
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"iscorporate", "dataType":"boolean"}}$$);
