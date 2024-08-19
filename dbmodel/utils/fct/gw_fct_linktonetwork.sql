@@ -43,7 +43,6 @@ SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1
 SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":
 {"id":"SELECT array_to_json(array_agg(connec_id::text)) FROM v_edit_connec WHERE connec_id IS NOT NULL AND state=1"},"data":{"feature_type":"CONNEC"}}$$);
 
-
 --fid: 217
 
 */
@@ -109,7 +108,6 @@ v_check_arcdnom_status boolean;
 v_check_arcdnom integer;
 v_checkeddiam text;
 v_querytext text;
-
 
 BEGIN
 
@@ -448,14 +446,14 @@ BEGIN
 
 				IF v_projecttype = 'WS' THEN
 					INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, dma_id,
-					presszone_id, dqa_id, minsector_id, fluid_type)
+					presszone_id, dqa_id, minsector_id, fluid_type, muni_id)
 					VALUES (v_link.link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id,
-					 v_connect.state, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_arc.presszone_id, v_arc.dqa_id, v_arc.minsector_id, v_fluidtype_value);
+					 v_connect.state, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_arc.presszone_id, v_arc.dqa_id, v_arc.minsector_id, v_fluidtype_value, v_connect.muni_id);
 
 				ELSIF v_projecttype = 'UD' THEN
-					INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, dma_id, fluid_type)
+					INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, dma_id, fluid_type, muni_id)
 					VALUES (v_link.link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id,
-					v_connect.state, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_fluidtype_value);
+					v_connect.state, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_fluidtype_value, v_connect.muni_id);
 				END IF;
 			ELSE
 				UPDATE link SET the_geom=v_link.the_geom, exit_type=v_link.exit_type, exit_id=v_link.exit_id, dma_id = v_dma_value, fluid_type = v_fluidtype_value WHERE link_id = v_link.link_id;

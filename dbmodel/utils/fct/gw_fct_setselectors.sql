@@ -391,12 +391,12 @@ BEGIN
 			-- expl
 			DELETE FROM selector_expl WHERE cur_user = current_user;
 			INSERT INTO selector_expl
-			SELECT DISTINCT expl_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user);
+			SELECT DISTINCT expl_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0);
 
 			-- muni
 			DELETE FROM selector_municipality WHERE cur_user = current_user;
 			INSERT INTO selector_municipality
-			SELECT DISTINCT muni_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user);		
+			SELECT DISTINCT muni_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0);		
 		END IF;
 
 		-- inserting muni_id from selected muni

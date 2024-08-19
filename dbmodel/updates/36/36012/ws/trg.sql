@@ -145,3 +145,6 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('valve');
 
 CREATE TRIGGER gw_trg_edit_ve_epa_inlet INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_inlet
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('inlet');
+
+CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_link
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_link();
