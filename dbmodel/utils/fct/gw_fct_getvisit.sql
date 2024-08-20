@@ -143,7 +143,7 @@ BEGIN
 		END IF;
 
 		-- Get feature
-		v_sql = concat('SELECT DISTINCT(layer_id), orderby+100 orderby, addparam->>''geomType'' as geomtype, lower(headertext) as feature_type FROM  ',quote_ident(v_config_layer),' JOIN cat_feature ON parent_layer=layer_id  ORDER BY orderby');
+		v_sql = concat('SELECT DISTINCT(layer_id), orderby+100 orderby, cl.addparam->>''geomType'' as geomtype, lower(headertext) as feature_type FROM  ',quote_ident(v_config_layer),' cl JOIN cat_feature cf ON parent_layer=layer_id  ORDER BY orderby');
 
 		FOR v_layer IN EXECUTE v_sql
 		loop
