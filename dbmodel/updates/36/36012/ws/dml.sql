@@ -185,4 +185,6 @@ INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alia
 VALUES('selector_muni', 'Selector of municipalities', 'role_basic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL, NULL);
 
 
-
+delete from config_form_fields where columnname = 'nodetype_id' and formname ilike 've_%';
+delete from config_form_fields where columnname = 'connectype_id' and formname ilike 've_%';
+delete from config_form_fields where columnname = 'cat_arctype_id' and formname ilike 've_%';
