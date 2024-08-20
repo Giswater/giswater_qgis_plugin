@@ -370,3 +370,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "c
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_dscenario_virtualpump", "column":"energyvalue", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_dscenario_pump_additional", "column":"energyvalue", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_dscenario_pump_additional", "column":"energyparam", "dataType":"integer"}}$$);
+
+DROP VIEW IF EXISTS vi_parent_arc;
+DROP VIEW IF EXISTS vi_parent_node;
+DROP VIEW IF EXISTS vi_parent_hydrometer;
+DROP VIEW IF EXISTS v_edit_field_valve;
