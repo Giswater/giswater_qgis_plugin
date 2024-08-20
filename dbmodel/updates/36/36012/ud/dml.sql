@@ -166,3 +166,8 @@ VALUES('minsector', 'Table of minsectors', 'role_edit', NULL, NULL, NULL, NULL, 
 
 INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", style_id, addparam) 
 VALUES('selector_muni', 'Selector of municipalities', 'role_basic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL, NULL);
+
+DELETE FROM sys_function WHERE function_name = 'gw_fct_graphanalytics_downstream_recursive';
+DELETE FROM sys_function WHERE function_name = 'gw_fct_graphanalytics_upstream_recursive';
+
+drop view if exists vi_parent_arc;
