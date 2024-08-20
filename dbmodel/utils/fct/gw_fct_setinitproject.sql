@@ -115,7 +115,7 @@ BEGIN
 	END IF;
 
 	-- Force sector selector for 0 values
-	INSERT selector_sector VALUES (0, current_user) ON CONFLICT (sector_id, cur_user) DO NOTHING;
+	INSERT INTO selector_sector VALUES (0, current_user) ON CONFLICT (sector_id, cur_user) DO NOTHING;
 	
 	-- force hydrometer_selector in case of null values
 	IF (select cur_user FROM selector_hydrometer WHERE cur_user = current_user limit 1) IS NULL THEN
