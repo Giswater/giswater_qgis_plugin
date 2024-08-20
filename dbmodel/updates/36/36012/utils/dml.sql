@@ -199,3 +199,30 @@ UPDATE config_param_system set value = gw_fct_json_object_set_key(value::json, '
 UPDATE config_param_system set value = replace(value, 'sector_id >=0', 'sector_id >0') where parameter = 'basic_selector_tab_sector';
 
 UPDATE link SET muni_id = c.muni_id FROM connec c WHERE connec_id =  feature_id;
+
+-- 20/08/2024
+INSERT INTO config_function (id, function_name, "style", layermanager, actions) VALUES(3303, 'gw_fct_getinpdata', '{
+  "style": {
+    "point": {
+      "style": "categorized",
+      "field": "fid",
+      "width": 2,
+      "transparency": 0.5
+    },
+    "line": {
+      "style": "categorized",
+      "field": "result_id",
+      "width": 2,
+      "transparency": 0.5
+    },
+    "polygon": {
+      "style": "categorized",
+      "field": "fid",
+      "width": 2,
+      "transparency": 0.5
+    }
+  }
+}'::json, NULL, NULL);
+
+INSERT INTO sys_function (id,function_name,project_type,function_type,input_params,return_type,descript,sys_role,"source")
+	VALUES (3310,'gw_fct_getinpdata','utils','function','json','json','The function retrieves GeoJSON data for nodes and arcs based on selected result IDs and returns it in a structured JSON format.','role_epa','core');
