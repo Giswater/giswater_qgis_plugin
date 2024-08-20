@@ -11,8 +11,8 @@ SET client_min_messages TO WARNING;
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- TODO: Add test for gw_fct_getinfofromid
--- -- Plan for 6 test
--- SELECT plan(6);
+-- Plan for 6 test
+SELECT plan(0);
 
 -- -- Extract and test the "status" field from the function's JSON response
 -- SELECT is(

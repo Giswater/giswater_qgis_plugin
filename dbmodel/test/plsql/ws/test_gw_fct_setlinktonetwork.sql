@@ -15,8 +15,7 @@ SELECT plan(1);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
-    (gw_fct_setlinktonetwork($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"id":"[114282, 114283, 114284, 114285, 114286, 114287, 114335, 114336, 114337, 114338, 114339, 114463, 3019, 3020, 3028]"},
+    (gw_fct_setlinktonetwork($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"id":"[3099, 3098, 3101]"},
     "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_setlinktonetwork returns status "Accepted"'
