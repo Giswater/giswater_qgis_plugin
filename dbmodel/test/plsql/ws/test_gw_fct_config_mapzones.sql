@@ -10,15 +10,15 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- Plan for 1 test
-SELECT plan(1);
+-- Plan for 5 test
+SELECT plan(5);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
-    (gw_fct_setarcdivide($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"id":["100028"]}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    (gw_fct_config_mapzones($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},
+    "parameters": {"action": "UPDATE", "configZone": "dma", "mapzoneId": "2", "config": {"use":[], "ignore":[], "forceClosed":[]}, "netscenarioId": 1}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_setarcdivide returns status "Accepted"'
+    'Check if gw_fct_config_mapzones returns status "Accepted"'
 );
 
 -- Finish the test

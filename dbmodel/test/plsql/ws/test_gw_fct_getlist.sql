@@ -20,7 +20,7 @@ SELECT is (
     "feature":{"tableName":"tbl_inp_dscenario_junction", "idName":"node_id", "id":"1071"},
     "data":{"filterFields":{"node_id":{"value":"1071","filterSign":"="}}, "pageInfo":{}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getlist returns status "Accepted"'
+    'Check if gw_fct_getlist --> "tabName":"epa" returns status "Accepted"'
 );
 
 SELECT is (
@@ -29,7 +29,7 @@ SELECT is (
     "feature":{"tableName":"tbl_element_x_node", "idName":"node_id", "id":"1071"},
     "data":{"filterFields":{"node_id":{"value":"1071","filterSign":"="}}, "pageInfo":{}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getlist returns status "Accepted"'
+    'Check if gw_fct_getlist --> "tabName":"elements" returns status "Accepted"'
 );
 
 SELECT is (
@@ -38,7 +38,7 @@ SELECT is (
     "idName":"node_id", "id":"1071"}, "data":{"filterFields":{"node_id":{"value":"1071","filterSign":"="},
     "parameter_type":{"value":"INCIDENCE","filterSign":"ILIKE"}}, "pageInfo":{}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getlist returns status "Accepted"'
+    'Check if gw_fct_getlist --> "tabName":"tab_event" returns status "Accepted"'
 );
 
 SELECT is (
@@ -46,8 +46,30 @@ SELECT is (
     "widgetname":"tab_documents_tbl_documents", "formtype":"form_feature"}, "feature":{"tableName":"tbl_doc_x_node", "idName":"node_id",
     "id":"1071"}, "data":{"filterFields":{"node_id":{"value":"1071","filterSign":"="}}, "pageInfo":{}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getlist returns status "Accepted"'
+    'Check if gw_fct_getlist --> "tabName":"documents" returns status "Accepted"'
 );
+
+SELECT is (
+    (gw_fct_getlist($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"tableName":"v_ui_plan_netscenario"},
+    "data":{"filterFields":{"limit": -1, "name": {"filterSign":"ILIKE", "value":""}, "active": {"filterSign":"=", "value":"true"}}, "pageInfo":{}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_getlist --> "tableName":"v_ui_plan_netscenario" returns status "Accepted"'
+);
+
+SELECT is (
+    (gw_fct_getlist($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"tableName":"v_edit_cat_dscenario"},
+    "data":{"filterFields":{"limit": -1, "name": {"filterSign":"ILIKE", "value":""}, "active": {"filterSign":"=", "value":"true"}}, "pageInfo":{}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_getlist --> "tableName":"v_edit_cat_dscenario" returns status "Accepted"'
+);
+
+SELECT is (
+    (gw_fct_getlist($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"tableName":"v_ui_workspace"},
+    "data":{"filterFields":{"limit": -1, "name": {"filterSign":"ILIKE", "value":""}}, "pageInfo":{}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_getlist --> "tableName":"v_ui_workspace" returns status "Accepted"'
+);
+
 
 -- Finish the test
 SELECT finish();

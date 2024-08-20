@@ -19,7 +19,15 @@ SELECT is (
     "tabName":"data", "editable":"TRUE"}, "feature":{"feature_type":"CONDUIT"}, "data":{"filterFields":{}, "pageInfo":{},
     "fields":{"matcat_id":"", "shape":"", "geom1":""}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getcatalog returns status "Accepted"'
+    'Check if gw_fct_getcatalog --> "feature_type":"CONDUIT" returns status "Accepted"'
+);
+
+SELECT is (
+    (gw_fct_getcatalog($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{"formName":"upsert_catalog_node",
+    "tabName":"data", "editable":"TRUE"}, "feature":{"feature_type":"CIRC_MANHOLE"}, "data":{"filterFields":{}, "pageInfo":{},
+    "fields":{"matcat_id":"", "shape":"", "geom1":""}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_getcatalog --> "feature_type":"CIRC_MANHOLE" returns status "Accepted"'
 );
 
 -- Finish the test

@@ -14,8 +14,8 @@ SELECT plan(1);
 SELECT ok(1=1, 'One equals one');
 
 -- TODO: Add test for gw_fct_getinfofromid
--- -- Plan for 4 test
--- SELECT plan(4);
+-- -- Plan for 5 test
+-- SELECT plan(5);
 
 -- -- Extract and test the "status" field from the function's JSON response
 -- SELECT is(
@@ -45,6 +45,14 @@ SELECT ok(1=1, 'One equals one');
 --     'Accepted',
 --     'Check if gw_fct_getinfofromid returns status "Accepted"'
 -- );
+
+-- SELECT is(
+--     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
+--     "feature":{"tableName":"plan_netscenario_dma", "id": "1, 2"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+--     'Accepted',
+--     'Check if gw_fct_getinfofromid --> "tableName":"plan_netscenario_dma" returns status "Accepted"'
+-- );
+
 
 -- Finish the test
 SELECT finish();

@@ -10,7 +10,8 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(2);
+-- Plan for 3 test
+SELECT plan(3);
 
 SELECT is (
     (gw_fct_graphanalytics_downstream($${"client":{"device":4, "infoType":1, "lang":"ES"},
@@ -25,6 +26,15 @@ SELECT is (
     "zoomRatio":3565.9967217571534}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_graphanalytics_downstream with coordinates returns status "Accepted"'
+);
+
+SELECT is (
+    (gw_fct_graphanalytics_downstream($${"client":{"device":4, "lang":"es_ES", "infoType":1,
+    "epsg":25831}, "form":{}, "feature":{"id":[38]}, "data":{"filterFields":{}, "pageInfo":{},
+    "coordinates":{"xcoord":419164.5943072313,"ycoord":4576631.247667303,
+    "zoomRatio":585.5045021272166}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_graphanalytics_downstream with coordinates and epsg returns status "Accepted"'
 );
 
 -- Finish the test

@@ -28,6 +28,14 @@ SELECT ok(1=1, 'One equals one');
 --     'Check if gw_fct_setfields -> wholeSelection returns status "Accepted"'
 -- );
 
+-- SELECT is(
+--     (gw_fct_setfields($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"id":"T10-5m-e2",
+--     "tableName":"v_edit_inp_timeseries" }, "data":{"filterFields":{}, "pageInfo":{}, "fields":{"expl_id": 2, "idval": "T10-5m-e2",
+--     "timser_type": "Rainfall", "times_type": "RELATIVE", "descript": "null", "fname": "null"}}}$$)::JSON)->>'status',
+--     'Accepted',
+--     'Check if gw_fct_setfields -> wholeSelection returns status "Accepted"'
+-- );
+
 -- Finish the test
 SELECT finish();
 

@@ -15,10 +15,11 @@ SELECT plan(1);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
-    (gw_fct_setarcdivide($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831},
-    "form":{}, "feature":{"id":["100028"]}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    (gw_fct_setsearchadd($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{"tabName":"address"},
+    "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "add_muni":{"id":"1", "name":"Sant Boi del Llobregat"},
+    "add_street":{"text":"General Prim, Av. del"}, "add_postnumber":{"text":"11"}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_setarcdivide returns status "Accepted"'
+    'Check if gw_fct_setsearchadd returns status "Accepted"'
 );
 
 -- Finish the test

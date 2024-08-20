@@ -10,8 +10,17 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+-- Plan for 1 test
 SELECT plan(1);
-SELECT ok(1=1, 'One equals one');
+
+-- Extract and test the "status" field from the function's JSON response
+SELECT is (
+    (gw_fct_setlinktonetwork($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"id":"[114282, 114283, 114284, 114285, 114286, 114287, 114335, 114336, 114337, 114338, 114339, 114463, 3019, 3020, 3028]"},
+    "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_setlinktonetwork returns status "Accepted"'
+);
 
 -- TODO
 -- gw_fct_setlinktonetwork
