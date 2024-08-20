@@ -160,3 +160,9 @@ DELETE FROM sys_table WHERE id = 'v_anl_pgrouting_arc';
 DELETE FROM sys_table WHERE id = 'v_anl_pgrouting_node';
 
 DELETE FROM sys_table WHERE id = 'v_edit_man_netelement';
+
+INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", style_id, addparam) 
+VALUES('minsector', 'Table of minsectors', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL, NULL);
+
+INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", style_id, addparam) 
+VALUES('selector_muni', 'Selector of municipalities', 'role_basic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL, NULL);

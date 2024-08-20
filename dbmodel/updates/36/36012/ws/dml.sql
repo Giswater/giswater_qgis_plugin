@@ -181,6 +181,8 @@ INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_connec', 'DMA'
 INSERT INTO sys_style (idval, context, styletype) VALUES ('v_edit_link', 'DMA', 'qml');
 
 
+INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", style_id, addparam) 
+VALUES('selector_muni', 'Selector of municipalities', 'role_basic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL, NULL);
 
 
 
