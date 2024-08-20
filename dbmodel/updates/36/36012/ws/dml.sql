@@ -188,3 +188,8 @@ VALUES('selector_muni', 'Selector of municipalities', 'role_basic', NULL, NULL, 
 delete from config_form_fields where columnname = 'nodetype_id' and formname ilike 've_%';
 delete from config_form_fields where columnname = 'connectype_id' and formname ilike 've_%';
 delete from config_form_fields where columnname = 'cat_arctype_id' and formname ilike 've_%';
+
+delete from sys_table where id = 'vi_parent_arc';
+delete from sys_table where id = 'vi_parent_connec';
+delete from sys_table where id = 'vi_parent_hydrometer';
+delete from sys_table where id = 'v_edit_field_valve';
