@@ -31,3 +31,9 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"dma", "col
 
 -- 13/08/24
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"iscorporate", "dataType":"boolean"}}$$);
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dma", "column":"pattern_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dma", "column":"min"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dma", "column":"max"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dma", "column":"effec"}}$$);
