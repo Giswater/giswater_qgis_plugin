@@ -432,22 +432,34 @@ class GwGo2EpaManagerButton(GwAction):
             message = "Any record selected"
             tools_qgis.show_warning(message, dialog=self.dlg_manager)
             return
-        index = selected_list[0]
 
-        columnname = "descript"
-        column = tools_qt.get_col_index_by_col_name(widget, columnname)
-        row = index.row()
-        model = widget.model()
-        value = model.item(row, column).text()
-        header = model.headerData(column, Qt.Horizontal)
-        result_id = model.data(model.index(row, 0))
+        result_ids = []
+        for index in selected_list:
+            result_id = widget.model().data(widget.model().index(index.row(), 0))
+            result_ids.append(result_id)
 
-        # Add rpt_inp_arc
-        sql = f"SELECT * FROM {lib_vars.schema_name}.rpt_inp_arc WHERE result_id = '{result_id}'"
-        tools_qgis.add_layer_from_query(sql, layer_name="Rpt INP Arc", key_column="id", group="GW Layers")
+        if not result_ids:
+            return
 
-        # Add rpt_inp_node
-        sql = f"SELECT * FROM {lib_vars.schema_name}.rpt_inp_node WHERE result_id = '{result_id}'"
-        tools_qgis.add_layer_from_query(sql, layer_name="Rpt INP Node", key_column="id", group="GW Layers")
+        result_ids_json = "ARRAY[" + ",".join(f"'{result_id}'" for result_id in result_ids) + "]"
+        json_result = tools_gw.execute_procedure(
+            function_name="gw_fct_getinpdata",
+            parameters=result_ids_json,
+            schema_name="agosto16",
+            commit=False
+        )
+
+        if not json_result or 'status' not in json_result or json_result['status'] == 'Failed':
+            message = "Failed to retrieve GeoJSON data."
+            tools_qgis.show_warning(message, dialog=self.dlg_manager)
+            return
+
+        # Zoom layer arc if exists
+        arc_layer = tools_qgis.get_layer_by_layername("Rpt INP Arc")
+        if arc_layer:
+            tools_qgis.zoom_to_layer(arc_layer)
+
+        message = "Data retrieved and displayed successfully."
+        tools_qgis.show_info(message, dialog=self.dlg_manager)
 
     # endregion
