@@ -4395,3 +4395,6 @@ CREATE OR REPLACE VIEW v_edit_raingage AS
     WHERE raingage.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text
     AND (m.cur_user = current_user or raingage.muni_id is null);
 
+
+DROP VIEW IF EXISTS v_anl_pgrouting_arc;
+DROP VIEW IF EXISTS v_anl_pgrouting_node;

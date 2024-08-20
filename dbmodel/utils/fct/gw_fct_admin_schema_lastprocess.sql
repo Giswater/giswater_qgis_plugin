@@ -173,7 +173,6 @@ BEGIN
 				DROP VIEW IF EXISTS v_edit_man_hydrant;
 				DROP VIEW IF EXISTS v_edit_man_junction;
 				DROP VIEW IF EXISTS v_edit_man_meter;
-				DROP VIEW IF EXISTS v_edit_man_netelement;
 				DROP VIEW IF EXISTS v_edit_man_netsamplepoint;
 				DROP VIEW IF EXISTS v_edit_man_netwjoin;
 				DROP VIEW IF EXISTS v_edit_man_pump;
