@@ -62,7 +62,7 @@ BEGIN
 		init_quality=NEW.init_quality WHERE node_id=OLD.node_id;
             
         ELSIF v_epatype = 'shortpipe' THEN     
-		UPDATE inp_shortpipe SET minorloss=NEW.minorloss, bulk_coeff = NEW.bulk_coeff, wall_coeff = NEW.wall_coeff WHERE node_id=OLD.node_id;  
+		UPDATE inp_shortpipe SET minorloss=NEW.minorloss, bulk_coeff = NEW.bulk_coeff, wall_coeff = NEW.wall_coeff, custom_dint=NEW.custom_dint WHERE node_id=OLD.node_id;  
 		IF NEW.to_arc IS NOT NULL AND ((NEW.to_arc != OLD.to_arc) OR OLD.to_arc IS NULL) THEN
 
 			INSERT INTO config_graph_checkvalve VALUES (NEW.node_id, NEW.to_arc)
@@ -77,7 +77,8 @@ BEGIN
 		UPDATE inp_inlet SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, 
 		curve_id=NEW.curve_id, pattern_id=NEW.pattern_id, head = NEW.head, overflow=NEW.overflow, mixing_model=NEW.mixing_model, 
 		mixing_fraction=NEW.mixing_fraction, reaction_coeff=NEW.reaction_coeff, init_quality=NEW.init_quality,
-		source_type=NEW.source_type, source_quality=NEW.source_quality, source_pattern_id=NEW.source_pattern_id WHERE node_id=OLD.node_id;
+		source_type=NEW.source_type, source_quality=NEW.source_quality, source_pattern_id=NEW.source_pattern_id,
+        demand=NEW.demand, demand_pattern_id=NEW.demand_pattern_id, emitter_coeff=NEW.emitter_coeff WHERE node_id=OLD.node_id;
 		
 	ELSIF v_epatype = 'connec' THEN     
 		UPDATE inp_connec SET demand=NEW.demand, pattern_id=NEW.pattern_id, peak_factor=NEW.peak_factor, custom_roughness = NEW.custom_roughness, 

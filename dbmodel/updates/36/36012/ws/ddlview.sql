@@ -39,10 +39,8 @@ AS SELECT d.dma_id,
 	d.name,
 	d.macrodma_id,
 	d.sector_id,
-	s.name as sector_name,
 	d.expl_id,
-	e.name as expl_name,
-	et.idval,
+	et.idval as dma_type,
 	d.descript,
 	d.pattern_id,
 	d.graphconfig::text AS graphconfig,
@@ -58,8 +56,6 @@ AS SELECT d.dma_id,
 	d.lastupdate_user,
 	d.the_geom
 	FROM dma d
-	LEFT JOIN sector s USING (sector_id)
-	LEFT JOIN exploitation e USING (expl_id)
 	LEFT JOIN edit_typevalue et on et.id = dma_type AND typevalue = 'dma_type'
 	ORDER BY d.dma_id;
 
@@ -67,10 +63,8 @@ CREATE OR REPLACE VIEW vu_presszone
 AS SELECT p.presszone_id,
 	p.name,
 	p.sector_id,
-	s.name as sector_name,
 	p.expl_id,
-	e.name as expl_name,
-	et.idval,
+	et.idval as presszone_type,
 	p.descript,
 	p.head,
 	p.graphconfig::text AS graphconfig,
@@ -84,8 +78,6 @@ AS SELECT p.presszone_id,
 	p.lastupdate_user,
 	p.the_geom
 	FROM presszone p
-	LEFT JOIN sector s USING (sector_id)
-	LEFT JOIN exploitation e USING (expl_id)
 	LEFT JOIN edit_typevalue et on et.id = presszone_type AND typevalue = 'presszone_type'
 	ORDER BY p.presszone_id;
 
@@ -95,24 +87,20 @@ AS SELECT d.dqa_id,
 	d.macrodqa_id,
 	d.descript,
 	d.sector_id,
-	s.name as sector_name,
 	d.expl_id,
-	e.name as expl_name,
-	et.idval,
+	et.idval as dqa_type,
 	d.pattern_id,
 	d.graphconfig::text AS graphconfig,
 	d.stylesheet::text AS stylesheet,
 	d.link,
 	d.active,
-	d.undelete,   
+	d.undelete,
 	d.tstamp,
 	d.insert_user,
 	d.lastupdate,
 	d.lastupdate_user,
 	d.the_geom
 	FROM dqa d
-	LEFT JOIN sector s USING (sector_id)
-	LEFT JOIN exploitation e USING (expl_id)
 	LEFT JOIN edit_typevalue et on et.id = dqa_type AND typevalue = 'dqa_type'
 	ORDER BY d.dqa_id;
 
@@ -3720,9 +3708,12 @@ CREATE OR REPLACE VIEW ve_epa_inlet AS
     LEFT JOIN v_rpt_node USING (node_id);
 	 
 	 
+drop view ve_epa_shortpipe;
 CREATE OR REPLACE VIEW ve_epa_shortpipe AS 
  SELECT inp_shortpipe.node_id,
     inp_shortpipe.minorloss,
+    cat_dint,
+    inp_shortpipe.custom_dint,
     v.to_arc,
     CASE
         WHEN v.active is true and v.to_arc IS NOT NULL THEN 'CV'::character varying(12)
@@ -3748,7 +3739,8 @@ CREATE OR REPLACE VIEW ve_epa_shortpipe AS
     v_rpt_arc.reaction_min,
     v_rpt_arc.ffactor_max,
     v_rpt_arc.ffactor_min
-    FROM inp_shortpipe
+    FROM vu_node
+    JOIN inp_shortpipe USING (node_id)
     LEFT JOIN v_rpt_arc ON concat(inp_shortpipe.node_id, '_n2a') = v_rpt_arc.arc_id::text
     LEFT JOIN man_valve v ON v.node_id::text = inp_shortpipe.node_id::text;
 	 

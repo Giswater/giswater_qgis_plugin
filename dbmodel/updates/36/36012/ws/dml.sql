@@ -142,9 +142,7 @@ VALUES('edit_typevalue', 'presszone_type', 'presszone', 'presszone_type', true);
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, active)
 VALUES('edit_typevalue', 'dma_type', 'dma', 'dma_type', true);
 
-INSERT INTO edit_typevalue VALUES ('edit_typevalue', 'dqa_type','UDEFINED', 'UDEFINED');
-
-INSERT INTO edit_typevalue VALUES ('edit_typevalue', 'dma_type','UDEFINED', 'UDEFINED');
+INSERT INTO edit_typevalue VALUES ('dma_type','UNDEFINED', 'UNDEFINED');
 
 ALTER TABLE edit_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 UPDATE edit_typevalue SET id = upper(id), idval=upper(idval) WHERE typevalue IN ('sector_type');
@@ -193,3 +191,72 @@ delete from sys_table where id = 'vi_parent_arc';
 delete from sys_table where id = 'vi_parent_connec';
 delete from sys_table where id = 'vi_parent_hydrometer';
 delete from sys_table where id = 'v_edit_field_valve';
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden)
+VALUES ('v_edit_dma', 'form_feature', 'tab_none', 'dma_type', 'lyt_data_1', 18, 'string', 'combo', 'dma_type', 'dma_type', false, false, true, false, 'SELECT id, idval FROM edit_typevalue WHERE typevalue=''dma_type''', false);
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, widgetcontrols, hidden)
+VALUES ('v_edit_dma', 'form_feature', 'tab_none', 'sector_id', 'lyt_data_1', 19, 'string', 'combo', 'sector_id', 'sector_id', false, false, true, false, 'SELECT sector_id as id, name as idval FROM sector WHERE sector_id IS NOT NULL', true, '{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_sector", "activated": true, "keyColumn": "sector_id", "valueColumn": "name", "filterExpression": null}}', false);
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, widgetcontrols, hidden)
+VALUES ('v_edit_dqa', 'form_feature', 'tab_none', 'sector_id', 'lyt_data_1', 15, 'string', 'combo', 'sector_id', 'sector_id', false, false, true, false, 'SELECT sector_id as id, name as idval FROM sector WHERE sector_id IS NOT NULL', true, '{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_sector", "activated": true, "keyColumn": "sector_id", "valueColumn": "name", "filterExpression": null}}', false);
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, widgetcontrols, hidden)
+VALUES ('v_edit_presszone', 'form_feature', 'tab_none', 'sector_id', 'lyt_data_1', 11, 'string', 'combo', 'sector_id', 'sector_id', false, false, true, false, 'SELECT sector_id as id, name as idval FROM sector WHERE sector_id IS NOT NULL', true, '{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_sector", "activated": true, "keyColumn": "sector_id", "valueColumn": "name", "filterExpression": null}}', false);
+
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden)
+VALUES ('ve_epa_inlet', 'form_feature', 'tab_epa', 'demand', 'lyt_epa_data_1', 17, 'string', 'text', 'Demand:', 'Demand', false, false, true, false, NULL, false);
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_isnullvalue, hidden)
+VALUES ('ve_epa_inlet', 'form_feature', 'tab_epa', 'demand_pattern_id', 'lyt_epa_data_1', 18, 'string', 'combo', 'Demand pattern:', 'Demand pattern', false, false, true, false, 
+'SELECT pattern_id as id, pattern_id as idval FROM inp_pattern', true, false);
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden)
+VALUES ('ve_epa_inlet', 'form_feature', 'tab_epa', 'emitter_coeff', 'lyt_epa_data_1', 19, 'string', 'text', 'Emitter coef:', 'Emitter coef', false, false, true, false, NULL, false);
+
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden)
+VALUES ('v_edit_inp_inlet', 'form_feature', 'tab_epa', 'demand', 'lyt_epa_data_1', 14, 'string', 'text', 'Demand:', 'Demand', false, false, true, false, NULL, false);
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_isnullvalue, hidden)
+VALUES ('v_edit_inp_inlet', 'form_feature', 'tab_epa', 'demand_pattern_id', 'lyt_epa_data_1', 15, 'string', 'combo', 'Demand pattern:', 'Demand pattern', false, false, true, false, 
+'SELECT pattern_id as id, pattern_id as idval FROM inp_pattern', true, false);
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden)
+VALUES ('v_edit_inp_inlet', 'form_feature', 'tab_epa', 'emitter_coeff', 'lyt_epa_data_1', 16, 'string', 'text', 'Emitter coef:', 'Emitter coef', false, false, true, false, NULL, false);
+
+
+UPDATE config_form_fields SET iseditable=false, dv_querytext=null, dv_parent_id=null where formname='v_edit_inp_shortpipe' and columnname='to_arc';
+UPDATE config_form_fields SET iseditable=false, dv_orderby_id=null, dv_isnullvalue=null where formname='v_edit_inp_shortpipe' and columnname='status';
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden)
+VALUES ('v_edit_inp_shortpipe', 'form_feature', 'tab_epa', 'cat_dint', 'lyt_data_1', 15, 'string', 'text', 'Cat dint:', 'Cat dint', false, false, false, false, NULL, false);
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden)
+VALUES ('v_edit_inp_shortpipe', 'form_feature', 'tab_epa', 'custom_dint', 'lyt_data_1', 16, 'string', 'text', 'Custom dint:', 'Custom dint', false, false, true, false, NULL, false);
+
+
+UPDATE config_form_fields SET iseditable=false where formname='ve_epa_shortpipe' and columnname='to_arc';
+UPDATE config_form_fields SET dv_orderby_id=null, dv_isnullvalue=null where formname='ve_epa_shortpipe' and columnname='status';
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden)
+VALUES ('ve_epa_shortpipe', 'form_feature', 'tab_epa', 'cat_dint', 'lyt_epa_data_1', 7, 'string', 'text', 'Cat dint:', 'Cat dint', false, false, false, false, NULL, false);
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden)
+VALUES ('ve_epa_shortpipe', 'form_feature', 'tab_epa', 'custom_dint', 'lyt_epa_data_1', 8, 'string', 'text', 'Custom dint:', 'Custom dint', false, false, true, false, NULL, false);
+
+
+UPDATE config_form_fields SET iseditable=false where formname='ve_epa_valve' and columnname='to_arc';
+UPDATE config_form_fields SET widgettype='text', iseditable=false, dv_querytext=null, dv_orderby_id=null, dv_isnullvalue=null where formname='ve_epa_valve' and columnname='status';
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden)
+VALUES ('ve_epa_valve', 'form_feature', 'tab_epa', 'cat_dint', 'lyt_epa_data_1', 13, 'string', 'text', 'Cat dint:', 'Cat dint', false, false, false, false, NULL, false);
+UPDATE config_form_fields SET layoutorder=14 where formname='ve_epa_valve' and columnname='custom_dint';
+
+
+UPDATE config_form_fields SET iseditable=false, dv_querytext=null where formname='v_edit_inp_valve' and columnname='to_arc';
+UPDATE config_form_fields SET iseditable=false, dv_querytext=null, dv_orderby_id=null, dv_isnullvalue=null where formname='v_edit_inp_valve' and columnname='status';
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden)
+VALUES ('v_edit_inp_valve', 'form_feature', 'tab_epa', 'cat_dint', 'lyt_data_1', 20, 'string', 'text', 'Cat dint:', 'Cat dint', false, false, false, false, NULL, false);
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden)
+VALUES ('v_edit_inp_valve', 'form_feature', 'tab_epa', 'custom_dint', 'lyt_data_1', 21, 'string', 'text', 'Custom dint:', 'Custom dint', false, false, true, false, NULL, false);
+
+UPDATE config_form_fields SET iseditable=false where columnname='macrominsector_id';
+UPDATE config_form_fields SET iseditable=false where columnname='to_arc' and formname like 've_node%';
+

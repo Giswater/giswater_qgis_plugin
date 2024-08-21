@@ -375,3 +375,5 @@ DROP VIEW IF EXISTS vi_parent_arc;
 DROP VIEW IF EXISTS vi_parent_node;
 DROP VIEW IF EXISTS vi_parent_hydrometer;
 DROP VIEW IF EXISTS v_edit_field_valve;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_shortpipe", "column":"custom_dint", "dataType":"integer"}}$$);
