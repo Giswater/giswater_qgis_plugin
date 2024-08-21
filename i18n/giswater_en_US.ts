@@ -129,7 +129,7 @@
 			<translation>Lot filter</translation>
 		</message>
 		<message>
-			<source>GwEpaWorldButton</source>
+			<source>GwLayerStyleChangeButton</source>
 			<translation>Giswater styles</translation>
 		</message>
 		<message>

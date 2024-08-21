@@ -359,7 +359,7 @@ class Giswater(QObject):
 
         toolbar = self.iface.mainWindow().findChild(QDockWidget, 'Layers').findChildren(QToolBar)[-1]
         for action in toolbar.actions():
-            if action.objectName() not in ('GwAddChildLayerButton', 'GwEpaWorldButton'):
+            if action.objectName() not in ('GwAddChildLayerButton', 'GwLayerStyleChangeButton'):
                 continue
             toolbar.removeAction(action)  # Remove from toolbar
             action.deleteLater()  # Schedule for deletion

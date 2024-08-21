@@ -129,7 +129,7 @@
 			<translation>Filtre de lots</translation>
 		</message>
 		<message>
-			<source>GwEpaWorldButton</source>
+			<source>GwLayerStyleChangeButton</source>
 			<translation>Estils Giswater</translation>
 		</message>
 		<message>

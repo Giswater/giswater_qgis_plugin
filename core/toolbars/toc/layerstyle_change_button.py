@@ -94,8 +94,8 @@ def apply_styles_to_layers(context: str) -> None:
                     tools_qgis.create_qml(layer, qml)
 
 
-class GwEpaWorldButton(GwAction):
-    """Button 308: Switch EPA world"""
+class GwLayerStyleChangeButton(GwAction):
+    """Button 308: Switch layers' styles"""
 
     def __init__(self, icon_path: str, action_name: str, text: str, toolbar: QObject, action_group: QObject):
         super().__init__(icon_path, action_name, text, toolbar, action_group)

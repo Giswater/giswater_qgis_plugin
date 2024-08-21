@@ -65,4 +65,4 @@ from .utilities.utils_manager_btn import GwUtilsManagerButton
 
 # ToC
 from .toc.add_child_layer_button import GwAddChildLayerButton
-from .toc.epa_world_button import GwEpaWorldButton
+from .toc.layerstyle_change_button import GwLayerStyleChangeButton
