@@ -260,3 +260,4 @@ VALUES ('v_edit_inp_valve', 'form_feature', 'tab_epa', 'custom_dint', 'lyt_data_
 UPDATE config_form_fields SET iseditable=false where columnname='macrominsector_id';
 UPDATE config_form_fields SET iseditable=false where columnname='to_arc' and formname like 've_node%';
 
+update config_form_fields SET iseditable=true where formtype = 'form_mincut' and widgettype = 'button';
