@@ -152,14 +152,12 @@ class GwCreateSchemaTask(GwTask):
         #         or self.isCanceled():
         #     return False
 
-        status = True
+        json_result = None
         if exec_last_process:
             tools_log.log_info("Execute function 'gw_fct_admin_schema_lastprocess'")
-            status = self.admin.execute_last_process(True, project_name_schema, self.admin.schema_type,
+            json_result = self.admin.execute_last_process(True, project_name_schema, self.admin.schema_type,
                                                      project_locale, project_srid)
-
-        if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
-                or self.isCanceled():
+        if (not json_result or json_result['status'] == 'Failed' and tools_os.set_boolean(self.admin.dev_commit, False) is False) or self.isCanceled():
             return False
 
         return True
