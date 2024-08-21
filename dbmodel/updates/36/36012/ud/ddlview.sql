@@ -4394,6 +4394,26 @@ CREATE OR REPLACE VIEW v_edit_raingage AS
     RIGHT JOIN selector_municipality m USING (muni_id)
     WHERE raingage.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text
     AND (m.cur_user = current_user or raingage.muni_id is null);
+    
+    
+CREATE OR REPLACE VIEW v_plan_psector_gully AS
+SELECT row_number() OVER () AS rid,
+gully.gully_id,
+plan_psector_x_gully.psector_id,
+gully.code, 
+gully.gratecat_id,
+gully.gully_type,
+cat_feature.system_id,
+gully.state AS original_state,
+gully.state_type AS original_state_type,
+plan_psector_x_gully.state AS plan_state,
+plan_psector_x_gully.doable,
+gully.the_geom
+FROM selector_psector, gully
+JOIN plan_psector_x_gully USING (gully_id)
+JOIN cat_grate ON cat_grate.id=gully.gratecat_id
+JOIN cat_feature ON cat_feature.id=gully.gully_type
+WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
 
 
 DROP VIEW IF EXISTS v_anl_pgrouting_arc;
