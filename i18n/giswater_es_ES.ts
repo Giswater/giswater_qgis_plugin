@@ -81,10 +81,6 @@
 			<translation>Gestor de elementos</translation>
 		</message>
 		<message>
-			<source>GwEpaWorldButton</source>
-			<translation>Mundo epa</translation>
-		</message>
-		<message>
 			<source>ResultManager</source>
 			<translation>Gestor de resultados</translation>
 		</message>
@@ -131,6 +127,10 @@
 		<message>
 			<source>76_text</source>
 			<translation>Filtro de lotes</translation>
+		</message>
+		<message>
+			<source>GwEpaWorldButton</source>
+			<translation>Estilos Giswater</translation>
 		</message>
 		<message>
 			<source>18_text</source>

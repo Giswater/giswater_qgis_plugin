@@ -81,10 +81,6 @@
 			<translation>Element manager</translation>
 		</message>
 		<message>
-			<source>GwEpaWorldButton</source>
-			<translation>Epa World</translation>
-		</message>
-		<message>
 			<source>ResultManager</source>
 			<translation>Result manager</translation>
 		</message>
@@ -131,6 +127,10 @@
 		<message>
 			<source>76_text</source>
 			<translation>Lot filter</translation>
+		</message>
+		<message>
+			<source>GwEpaWorldButton</source>
+			<translation>Giswater styles</translation>
 		</message>
 		<message>
 			<source>18_text</source>

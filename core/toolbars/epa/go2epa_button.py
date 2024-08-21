@@ -468,7 +468,7 @@ class GwGo2EpaButton(GwAction):
 
     def _refresh_go2epa_options(self, dialog):
         """ Refresh widgets into layouts on go2epa_options form """
-        
+
         if dialog:
             for lyt in dialog.findChildren(QGridLayout, QRegularExpression('lyt_')):
                 i = 0
@@ -556,9 +556,10 @@ class GwGo2EpaButton(GwAction):
             return False
 
         tools_gw.manage_current_selections_docker(json_result)
+        """# TODO: do this with symbology?"""
         # Refresh epa world view if is active and it has changed
-        if tools_gw.is_epa_world_active() and any(widget['widget'] == 'inp_options_networkmode' for widget in _json):
-            tools_gw.set_epa_world(True, selector_change=True)
+        # if tools_gw.is_epa_world_active() and any(widget['widget'] == 'inp_options_networkmode' for widget in _json):
+        #     tools_gw.set_epa_world(True, selector_change=True)
 
         message = "Values has been updated"
         tools_qgis.show_info(message)

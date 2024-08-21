@@ -5,192 +5,125 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import json
+from functools import partial
 
-from qgis.PyQt.QtCore import QObject
-
+from typing import List, Tuple, Optional
+from qgis.PyQt.QtCore import QObject, QPoint
+from qgis.PyQt.QtWidgets import QMenu, QAction
+from qgis.PyQt.QtGui import QCursor
+from qgis.core import QgsMapLayerStyle
 from ..dialog import GwAction
 from ...utils import tools_gw
-from ....libs import tools_qgis, tools_db, tools_os, tools_qt
-from .... import global_vars
-
-layers_subsetstrings = {}
-layers_stylesheets = {}
+from ....libs import tools_qgis, tools_db
 
 
-def _get_sectors():
-    sectors = "NULL"
+def get_available_contexts() -> List[str]:
+    """Fetch distinct contexts from the sys_style table, excluding TEMPLAYER."""
 
-    # get selected selectors
-    sql = f'SELECT sector_id FROM selector_sector WHERE cur_user = current_user'
+    sql = "SELECT DISTINCT context FROM sys_style WHERE context != 'TEMPLAYER'"
     rows = tools_db.get_rows(sql)
-    if rows:
-        sectors = ", ".join(str(x[0]) for x in rows)
-
-    return sectors
+    return [row[0] for row in rows] if rows else []
 
 
-def _get_layers():
-    arc_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_arc')] if lyr is not None]
-    node_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_node')] if lyr is not None]
-    connec_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_connec')] if lyr is not None]
-    gully_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_gully')] if lyr is not None]
-    link_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_link')] if lyr is not None]
+def get_contexts_params() -> List[Tuple[str, str]]:
 
-    return arc_layers, node_layers, connec_layers, gully_layers, link_layers
+    sql = """
+    SELECT DISTINCT ON (c.id) c.id, c.idval, c.addparam
+      FROM config_typevalue c
+      JOIN sys_style s ON c.id = s.context
+     WHERE c.typevalue = 'sys_style_context'
+       AND s.context != 'TEMPLAYER'
+    """
+    rows = tools_db.get_rows(sql)
+
+    if not rows:
+        return []
+
+    # Process rows to extract the order and sort them accordingly
+    processed_rows = []
+    for row in rows:
+        id, idval, addparam = row
+        order_by = 999  # Default order if not specified
+        if addparam:
+            try:
+                order_by = addparam.get("orderBy", 999)
+            except Exception:
+                pass
+
+        processed_rows.append((id, idval, order_by))
+
+    # Sort the rows by order_by
+    processed_rows.sort(key=lambda x: x[2])
+
+    return [(row[0], row[1]) for row in processed_rows]
 
 
-def is_epa_world_active(default=False):
-    return tools_os.set_boolean(tools_gw.get_config_parser("epa_world", "epa_world_active", 'user', 'session'), default)
+def get_styles_for_context(context: str) -> List[Tuple[str, str]]:
+    """Fetch styles from the sys_style table for a given context."""
+
+    sql = f"SELECT idval, stylevalue FROM sys_style WHERE context = '{context}'"
+    rows = tools_db.get_rows(sql)
+    return [(row[0], row[1]) for row in rows] if rows else []
 
 
-def set_epa_world(_set_epa_world=None, selector_change=False, is_init=False):
+def apply_styles_to_layers(context: str) -> None:
+    """Apply styles to layers based on the selected context."""
 
-    # Style
-    epa_style = {"Arc": 201, "Connec": 202, "Link": 203, "Node": 204, "Gully": 205}
-
-    # Get layers
-    arc_layers, node_layers, connec_layers, gully_layers, link_layers = _get_layers()
-
-    # Get set_epa_world from config
-    if _set_epa_world is None:
-        _set_epa_world = is_epa_world_active(False)
-    # Deactivate EPA
-    if not _set_epa_world:
-        tools_gw.set_config_parser("epa_world", "epa_world_active", str(_set_epa_world), 'user', 'session')
-        # Disable current filters and set previous layer filters
-        for layer in arc_layers + node_layers + connec_layers + gully_layers + link_layers:
-            if is_init:
-                # Manage style & filter
-                style_manager = layer.styleManager()
-                if style_manager.currentStyle() == "GwEpaStyle":
-                    layer.setSubsetString(None)
-                    if not style_manager.setCurrentStyle("GwStyle"):
-                        style_manager.setCurrentStyle(tools_qt.tr('default', context_name='QgsMapLayerStyleManager'))
+    styles = get_styles_for_context(context)
+    for layername, qml in styles:
+        layer = tools_qgis.get_layer_by_tablename(layername)
+        if layer:
+            valid_qml, error_message = tools_gw.validate_qml(qml)
+            if not valid_qml:
+                msg = "The QML file is invalid"
+                tools_qgis.show_warning(msg, parameter=error_message, title=context)
             else:
-                layer.setSubsetString(layers_subsetstrings.get(layer.name()))
-
-                # Manage style
                 style_manager = layer.styleManager()
-                style_manager.setCurrentStyle(layers_stylesheets.get(layer.name()))
 
-    # Activate EPA
-    else:
-        tools_gw.set_config_parser("epa_world", "epa_world_active", str(_set_epa_world), 'user', 'session')
-        if not selector_change:
-            # Get layers subsetStrings
-            for layer in arc_layers + node_layers + connec_layers + gully_layers + link_layers:
-                layers_subsetstrings[layer.name()] = layer.subsetString()
-
-                # Manage style
-                style_manager = layer.styleManager()
-                layers_stylesheets[layer.name()] = style_manager.currentStyle()
-
-                if style_manager.setCurrentStyle("GwEpaStyle"):
-                    pass
-                else:
-                    style_id = epa_style.get(f"{layer.name()}", 204)
-                    tools_gw.set_layer_style(style_id, layer, True)
-
-        sectors = _get_sectors()
-        # Get inp_options_networkmode
-        inp_options_networkmode = tools_gw.get_config_value('inp_options_networkmode')
-        try:
-            inp_options_networkmode = int(inp_options_networkmode[0])
-        except (ValueError, IndexError, TypeError):
-            pass
-
-        body = tools_gw.create_body()
-        json_result = tools_gw.execute_procedure('gw_fct_getnodeborder', body)
-        nodes = json_result.get('body', {}).get('data', {}).get('nodes', [])
-
-        sql = f"is_operative = true AND epa_type != 'UNDEFINED' AND sector_id IN ({sectors})"
-
-        # arc
-        for layer in arc_layers:
-            layer.setSubsetString(sql)
-
-        # node
-        for layer in node_layers:
-            nodes_sql = sql
-            if nodes:
-                node_ids = "','".join(str(node) for node in nodes)
-                nodes_sql += " OR node_id IN ('{}')".format(node_ids)
-            layer.setSubsetString(nodes_sql)
-
-        if global_vars.project_type == 'ws':
-            # ws connec
-            for layer in connec_layers:
-                if inp_options_networkmode == 4:
-                    layer.setSubsetString(sql)
-                else:
-                    layer.setSubsetString("FALSE")
-
-            # ws link
-            for layer in link_layers:
-                if inp_options_networkmode == 4:
-                    layer.setSubsetString(sql)
-                else:
-                    layer.setSubsetString("FALSE")
-
-        elif global_vars.project_type == 'ud':
-            # ud connec
-            for layer in connec_layers:
-                layer.setSubsetString("FALSE")
-
-            # ud gully
-            for layer in gully_layers:
-                if inp_options_networkmode == 2:
-                    layer.setSubsetString(sql)
-                else:
-                    layer.setSubsetString("FALSE")
-
-            # ud link
-            for layer in link_layers:
-                if inp_options_networkmode == 2:
-                    layer.setSubsetString(sql + ' AND feature_type = \'GULLY\'')
-                else:
-                    layer.setSubsetString("FALSE")
-
-    return _set_epa_world
+                style_name = context
+                if style_manager.currentStyle() == context:
+                    continue
+                # Set the style or add it if it doesn't exist
+                if not style_manager.setCurrentStyle(style_name):
+                    style = QgsMapLayerStyle()
+                    style.readFromLayer(layer)
+                    style_manager.addStyle(style_name, style)
+                    style_manager.setCurrentStyle(style_name)
+                    tools_qgis.create_qml(layer, qml)
 
 
 class GwEpaWorldButton(GwAction):
-    """ Button 308: Switch EPA world """
+    """Button 308: Switch EPA world"""
 
-    def __init__(self, icon_path, action_name, text, toolbar, action_group):
-
+    def __init__(self, icon_path: str, action_name: str, text: str, toolbar: QObject, action_group: QObject):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.action.setCheckable(True)
-        tools_gw.set_config_parser("epa_world", "epa_world_active", 'false', 'user', 'session')
+        self.menu: QMenu = QMenu()
+        self._populate_menu()
+        self.action.setMenu(self.menu)
+        self.action.setCheckable(False)
 
-    def clicked_event(self):
+    def clicked_event(self) -> None:
+        """Show the menu directly when the button is clicked."""
 
-        self._switch_epa_world()
+        cursor = QCursor()
+        x = cursor.pos().x()
+        y = cursor.pos().y()
+        click_point = QPoint(x + 5, y + 5)
+        self.menu.exec_(click_point)
 
-    # region private functions
+    def _populate_menu(self) -> None:
+        """Populate the menu with available contexts."""
 
-    def _switch_epa_world(self):
+        # contexts = get_available_contexts()
+        contexts_params = get_contexts_params()
+        for context_id, context_alias in contexts_params:
+            action: QAction = QAction(context_alias, self.menu)
+            action.triggered.connect(partial(self._apply_context, context_id))
+            self.menu.addAction(action)
 
-        # Check world type
-        epa_world_active = is_epa_world_active()
+    def _apply_context(self, context: str) -> None:
+        """Apply styles for the selected context."""
 
-        # Apply filters
-        _set_epa_world = not epa_world_active
-
-        set_epa_world(_set_epa_world)
-
-        # Set action checked
-        self._action_set_checked(_set_epa_world)
-
-        # Show message
-        if _set_epa_world:
-            msg = "EPA point of view activated"
-        else:
-            msg = "EPA point of view deactivated"
-        tools_qgis.show_info(msg)
-
-    def _action_set_checked(self, checked):
-        # Set checked
-        self.action.setChecked(checked)
-
-    # endregion
+        apply_styles_to_layers(context)
+        tools_qgis.show_info(f"Applied styles for context: {context}")

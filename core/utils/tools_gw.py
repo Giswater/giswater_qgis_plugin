@@ -713,6 +713,8 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     global_vars.iface.mapCanvas().refresh()
 
 def validate_qml(qml_content):
+    if not qml_content:
+        return False, "QML is empty!"
     qml_content_no_spaces = qml_content.replace("\n", "").replace("\t", "")
     try:
         root = ET.fromstring(qml_content_no_spaces)
@@ -3686,16 +3688,6 @@ def execute_class_function(dlg_class, func_name: str, kwargs: dict = None):
             getattr(class_obj, func_name)(**kwargs)
         except Exception as e:
             tools_log.log_debug(f"Exception in tools_gw.execute_class_function (executing {func_name} from {dlg_class.__name__}): {e}")
-
-
-def is_epa_world_active(default=False):
-    return epa_world_button.is_epa_world_active(default)
-
-
-def set_epa_world(_set_epa_world=None, selector_change=False, is_init=False):
-    """ Activate or deactivate EPA world. If @_set_epa_world is None it will just refresh the filters """
-
-    epa_world_button.set_epa_world(_set_epa_world, selector_change, is_init)
 
 
 def open_dlg_help():
