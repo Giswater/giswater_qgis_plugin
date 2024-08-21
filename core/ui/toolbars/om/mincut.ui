@@ -993,11 +993,12 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionMincut"/>
+   <addaction name="actionAddConnec"/>
+   <addaction name="actionAddHydrometer"/>
+   <addaction name="separator"/>
    <addaction name="actionCustomMincut"/>
    <addaction name="actionChangeValveStatus"/>
    <addaction name="actionRefreshMincut"/>
-   <addaction name="actionAddConnec"/>
-   <addaction name="actionAddHydrometer"/>
    <addaction name="actionComposer"/>
    <addaction name="actionExportHydroCsv"/>
   </widget>
