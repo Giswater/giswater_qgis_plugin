@@ -80,10 +80,11 @@ def apply_styles_to_layers(context: str) -> None:
                 tools_qgis.show_warning(msg, parameter=error_message, title=context)
             else:
                 style_manager = layer.styleManager()
-
                 style_name = context
-                if style_manager.currentStyle() == context:
+
+                if style_manager is None or style_manager.currentStyle() == context:
                     continue
+
                 # Set the style or add it if it doesn't exist
                 if not style_manager.setCurrentStyle(style_name):
                     style = QgsMapLayerStyle()
