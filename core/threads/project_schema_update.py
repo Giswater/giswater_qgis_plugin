@@ -105,7 +105,7 @@ class GwUpdateSchemaTask(GwTask):
     def main_execution(self):
         schema_name = self.admin._get_schema_name()
         sql = f"DELETE FROM {schema_name}.audit_check_data WHERE fid = 133 AND cur_user = current_user;"
-        tools_db.execute_sql(sql)
+        tools_db.execute_sql(sql, commit=False)
         # Get all updates folders, to update
         self.dict_folders_process['updates'] = self.get_updates_dict_folders()
         self.status = self.admin.load_updates(self.params['project_type'], update_changelog=True, schema_name=schema_name, dict_update_folders=self.dict_folders_process['updates'])
