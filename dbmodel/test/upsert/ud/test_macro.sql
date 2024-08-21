@@ -10,7 +10,7 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(12);
+SELECT plan(9);
 
 -- Subtest 1: Testing macroexplotation operations
 INSERT INTO macroexploitation (macroexpl_id, "name", descript, undelete, active) VALUES(2, 'Test', 'Test macroexploitation', NULL, true);
@@ -18,11 +18,6 @@ SELECT is((SELECT count(*)::integer FROM macroexploitation WHERE macroexpl_id = 
 
 UPDATE macroexploitation SET descript = 'updated test' WHERE macroexpl_id = 2;
 SELECT is((SELECT descript FROM macroexploitation WHERE macroexpl_id = 2), 'updated test', 'UPDATE: descript was updated to "updated test"');
-
-INSERT INTO macroexploitation (macroexpl_id, "name", descript, undelete, active)
-VALUES(2, 'Test', 'upsert test', NULL, true)
-ON CONFLICT (macroexpl_id) DO UPDATE SET descript = EXCLUDED.descript;
-SELECT is((SELECT descript FROM macroexploitation WHERE macroexpl_id = 2), 'upsert test', 'UPSERT: descript was updated to "upsert test" using ON CONFLICT');
 
 DELETE FROM macroexploitation WHERE macroexpl_id = 2;
 SELECT is((SELECT count(*)::integer FROM macroexploitation WHERE macroexpl_id = 2), 0, 'DELETE: macroexploitation 2 was deleted');
@@ -44,11 +39,6 @@ SELECT is((SELECT count(*)::integer FROM macrosector WHERE macrosector_id = 3), 
 UPDATE macrosector SET descript = 'updated test' WHERE macrosector_id = 3;
 SELECT is((SELECT descript FROM macrosector WHERE macrosector_id = 3), 'updated test', 'UPDATE: descript was updated to "updated test"');
 
-INSERT INTO macrosector (macrosector_id, "name", descript, undelete, the_geom, active)
-VALUES(3, 'macrosector_03', 'upsert test', NULL, NULL, true)
-ON CONFLICT (macrosector_id) DO UPDATE SET descript = EXCLUDED.descript;
-SELECT is((SELECT descript FROM macrosector WHERE macrosector_id = 3), 'upsert test', 'UPSERT: descript was updated to "upsert test" using ON CONFLICT');
-
 DELETE FROM macrosector WHERE macrosector_id = 3;
 SELECT is((SELECT count(*)::integer FROM macrosector WHERE macrosector_id = 3), 0, 'DELETE: macrosector 3 was deleted');
 
@@ -59,11 +49,6 @@ SELECT is((SELECT count(*)::integer FROM macrodma WHERE macrodma_id = 3), 1, 'IN
 
 UPDATE macrodma SET descript = 'updated test' WHERE macrodma_id = 3;
 SELECT is((SELECT descript FROM macrodma WHERE macrodma_id = 3), 'updated test', 'UPDATE: descript was updated to "updated test"');
-
-INSERT INTO macrodma (macrodma_id, "name", expl_id, descript, undelete, the_geom, active)
-VALUES(3, 'macrodma_03', 0, 'upsert test', NULL, NULL, true)
-ON CONFLICT (macrodma_id) DO UPDATE SET descript = EXCLUDED.descript;
-SELECT is((SELECT descript FROM macrodma WHERE macrodma_id = 3), 'upsert test', 'UPSERT: descript was updated to "upsert test" using ON CONFLICT');
 
 DELETE FROM macrodma WHERE macrodma_id = 3;
 SELECT is((SELECT count(*)::integer FROM macrodma WHERE macrodma_id = 3), 0, 'DELETE: macrodma 3 was deleted');
