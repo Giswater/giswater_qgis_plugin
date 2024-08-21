@@ -15,20 +15,12 @@ SELECT plan(1);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
-    (gw_fct_getprocess($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "functionId":3042}}$$)::JSON)->>'status',
+    (gw_fct_getreport($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
+    "data":{"filterFields":{}, "pageInfo":{}, "filter":[{"filterName": "Exploitation", "filterValue": "", "filterSign": "="}],
+    "listId":"101"}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getprocess --> "functionId":3042 returns status "Accepted"'
+    'Check if gw_fct_getreport returns status "Accepted"'
 );
-
-SELECT is (
-    (gw_fct_getprocess($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "functionId":"3160"}}$$)::JSON)->>'status',
-    'Accepted',
-    'Check if gw_fct_getprocess --> "functionId":"3160" returns status "Accepted"'
-);
-
-
 
 -- Finish the test
 SELECT finish();

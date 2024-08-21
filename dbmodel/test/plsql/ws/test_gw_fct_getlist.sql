@@ -10,8 +10,8 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- Plan for 7 test
-SELECT plan(7);
+-- Plan for 8 test
+SELECT plan(8);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
@@ -68,6 +68,13 @@ SELECT is (
     "data":{"filterFields":{"limit": -1, "name": {"filterSign":"ILIKE", "value":""}}, "pageInfo":{}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_getlist --> "tableName":"v_ui_workspace" returns status "Accepted"'
+);
+
+SELECT is (
+    (gw_fct_getlist($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"tableName":"v_ui_rpt_cat_result"},
+    "data":{"filterFields":{"limit": -1, "result_id": {"filterSign":"ILIKE", "value":"1"}}, "pageInfo":{}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_getlist --> "tableName":"v_ui_rpt_cat_result" returns status "Accepted"'
 );
 
 

@@ -69,7 +69,13 @@ SELECT is (
     'Check if gw_fct_getlist --> "tableName":"cat_work" returns status "Accepted"'
 );
 
-
+SELECT is (
+    (gw_fct_getlist($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_ui_rpt_cat_result"},
+    "data":{"filterFields":{"limit": -1, "result_id": {"filterSign":"ILIKE", "value":"1"}}, "pageInfo":{}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_getlist --> "tableName":"v_ui_rpt_cat_result" returns status "Accepted"'
+);
 
 -- Finish the test
 SELECT finish();

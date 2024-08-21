@@ -27,6 +27,14 @@ SELECT is (
     'Check if gw_fct_graphanalytics_upstream with coordinates returns status "Accepted"'
 );
 
+SELECT is (
+    (gw_fct_graphanalytics_upstream($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{"id":[35]}, "data":{"filterFields":{}, "pageInfo":{},
+    "coordinates":{"xcoord":418978.56563679205,"ycoord":4576668.594284589, "zoomRatio":5563.006982630196}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_graphanalytics_upstream with coordinates and epsg returns status "Accepted"'
+);
+
 -- Finish the test
 SELECT finish();
 

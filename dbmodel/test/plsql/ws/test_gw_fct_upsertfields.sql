@@ -30,6 +30,9 @@ SELECT is (
     'Check if gw_fct_upsertfields --> "tableName":"inp_dscenario_demand" returns status "Accepted"'
 );
 
+gw_fct_upsertfields($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"id":"1, None", "tableName":"inp_dscenario_demand"},
+"data":{"filterFields":{}, "pageInfo":{}, "fields":{"dscenario_id": "1", "feature_type": "NODE", "demand": "8.000000", "pattern_id": "PTN-HYDRANT", "demand_type": "3",
+"source": "NODE 113961"}, "force_action":"UPDATE"}}$$);
 
 -- Finish the test
 SELECT finish();
