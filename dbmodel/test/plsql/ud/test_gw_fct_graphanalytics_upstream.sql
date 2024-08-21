@@ -10,7 +10,7 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(2);
+SELECT plan(3);
 
 SELECT is (
     (gw_fct_graphanalytics_upstream($${"client":{"device":4, "infoType":1, "lang":"ES"},
