@@ -272,3 +272,8 @@ join config_form_fields on formname = child_layer
 where formtype = 'form_feature' and tabname = 'tab_data' and layoutname = 'lyt_data_1' and layoutorder < 900
 group by child_layer, formname, formtype, tabname 
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source")
+VALUES(3266, 'Selected epa_type cannot be used in this feature',
+'For valve and pump, feature type and epa type must correspond ', 2, true, 'utils', 'core') on conflict (id) do nothing;

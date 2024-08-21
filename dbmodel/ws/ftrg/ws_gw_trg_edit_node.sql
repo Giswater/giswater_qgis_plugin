@@ -99,7 +99,7 @@ BEGIN
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 		-- man2inp_values
-		v_man_view  = (SELECT child_layer FROM cat_feature f JOIN cat_node c ON c.nodetype_id = f.id WHERE c.id = NEW.nodecat_id);
+		SELECT child_layer, system_id INTO v_man_view, v_system_id FROM cat_feature f JOIN cat_node c ON c.nodetype_id = f.id WHERE c.id = NEW.nodecat_id;
 		v_input = concat('{"feature":{"type":"node", "childLayer":"',v_man_view,'", "id":"',NEW.node_id,'"}}');
 
 		-- check if streetname exists
@@ -149,7 +149,12 @@ BEGIN
 
 
 		-- Epa type
-		IF (NEW.epa_type IS NULL) THEN
+		IF NEW.epa_type IN ('VALVE', 'PUMP') THEN
+			IF NEW.epa_type <> v_system_id THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3266", "function":"1320","debug_msg":null, "is_process":true}}$$)';
+			END IF;
+		ELSIF NEW.epa_type IS NULL THEN
 			NEW.epa_type:= (SELECT epa_default FROM cat_node JOIN cat_feature_node ON cat_feature_node.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id LIMIT 1)::text;
 		END IF;
 
@@ -782,8 +787,16 @@ BEGIN
 		    ELSIF (NEW.epa_type = 'SHORTPIPE') THEN
 			v_inp_table:= 'inp_shortpipe';
 		    ELSIF (NEW.epa_type = 'VALVE') THEN
+				IF (SELECT lower(type) FROM cat_feature_node cf JOIN cat_node c ON cf.id=c.nodetype_id WHERE c.id=NEW.nodecat_id)<>'valve' THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3266", "function":"1320","debug_msg":null, "is_process":true}}$$)';
+				END IF;
 			v_inp_table:= 'inp_valve';
 		    ELSIF (NEW.epa_type = 'PUMP') THEN
+				IF (SELECT lower(type) FROM cat_feature_node cf JOIN cat_node c ON cf.id=c.nodetype_id WHERE c.id=NEW.nodecat_id)<>'pump' THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3266", "function":"1320","debug_msg":null, "is_process":true}}$$)';
+				END IF;
 			v_inp_table:= 'inp_pump';
 		    ELSIF (NEW.epa_type = 'INLET') THEN
 			v_inp_table:= 'inp_inlet';
