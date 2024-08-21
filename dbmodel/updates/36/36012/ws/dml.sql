@@ -261,3 +261,14 @@ UPDATE config_form_fields SET iseditable=false where columnname='macrominsector_
 UPDATE config_form_fields SET iseditable=false where columnname='to_arc' and formname like 've_node%';
 
 update config_form_fields SET iseditable=true where formtype = 'form_mincut' and widgettype = 'button';
+
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
+datatype, widgettype, label, tooltip,  ismandatory, isparent, iseditable, isautoupdate,  hidden)
+SELECT distinct child_layer, formtype, tabname, 'cat_dint', 'lyt_data_1', max(layoutorder)+1, 
+'string', 'text', 'cat_dint', 'cat_dint',  false, false, false, false, false
+FROM cat_feature
+join config_form_fields on formname = child_layer
+where formtype = 'form_feature' and tabname = 'tab_data' and layoutname = 'lyt_data_1' and layoutorder < 900
+group by child_layer, formname, formtype, tabname 
+ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
