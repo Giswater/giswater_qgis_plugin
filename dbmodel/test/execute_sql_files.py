@@ -26,7 +26,7 @@ def main(project_type: str) -> None:
         logger.info(f"Processing root directory: {root_dir}")
         for root, _, files in os.walk(root_dir):
             for file in sorted(files):
-                if file.endswith(".sql") and exclude_prefix not in file and exculude_files not in file:
+                if file.endswith(".sql") and not file.startswith(exclude_prefix) and exculude_files not in file:
                     file_path = os.path.join(root, file)
                     execute_sql_file(conn, file_path)
 
@@ -37,6 +37,7 @@ def main(project_type: str) -> None:
 
     # Check if the i18n directory exists and process it
     if os.path.isdir(i18n_dir):
+        logger.info(f"Processing root directory: {i18n_dir}")
         for root, _, files in os.walk(i18n_dir):
             for file in sorted(files):
                 if file.endswith(".sql") and exclude_prefix not in file:
@@ -52,6 +53,7 @@ def main(project_type: str) -> None:
 
     # Check if the updates directory exists and process it
     if os.path.isdir(updates_dir):
+        logger.info(f"Processing root directory: {updates_dir}")
         for subdir in sorted(os.listdir(updates_dir)):
             subdir_path = os.path.join(updates_dir, subdir)
             # Check if the updates subdirectory exists and process it
@@ -65,7 +67,8 @@ def main(project_type: str) -> None:
     else:
         logger.warning(f"Directory {updates_dir} does not exist")
 
-     # Execute last process command
+    logger.info(f"PERFORM lastprocess:")
+    # Execute last process command
     with conn.cursor() as cursor:
         lastprocess_command = f"""
             SELECT {project_type}_36.gw_fct_admin_schema_lastprocess(
@@ -80,6 +83,7 @@ def main(project_type: str) -> None:
 
     # Check if the example directory exists and process it
     if os.path.isdir(example_dir):
+        logger.info(f"Processing root directory: {example_dir}")
         for root, _, files in os.walk(example_dir):
             for file in sorted(files):
                 if file.endswith(".sql") and exclude_prefix not in file:

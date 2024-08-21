@@ -20,7 +20,7 @@ def connect_to_db(password: str = 'postgres') -> connection:
     :return: A connection object to the PostgreSQL database.
     """
     db_params = {
-        'dbname': 'giswater_test_db',
+        'dbname': 'gw_db',
         'user': 'postgres',
         'password': password,
         'host': 'localhost',

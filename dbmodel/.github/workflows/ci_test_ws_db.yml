@@ -1,0 +1,77 @@
+name: CI Test WS database
+
+on:
+  push:
+    branches: [dev-3.6]
+  pull_request:
+    branches: [dev-3.6]
+
+jobs:
+  ci_test_ws_db:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r test/requirements.txt
+
+      - name: Update apt-get and Install PostgreSQL, PostGIS, pgRouting, and pgTAP
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-14 postgresql-14-postgis-3 postgresql-14-pgrouting postgresql-14-pgtap postgis
+
+      - name: Start PostgreSQL service
+        run: |
+          sudo service postgresql start
+          sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
+
+      - name: Create PostgreSQL Database
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h localhost -U postgres -c 'CREATE DATABASE gw_db;'
+
+      - name: Setup PostgreSQL extensions
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h localhost -U postgres -d gw_db -c 'CREATE EXTENSION postgis;'
+          psql -h localhost -U postgres -d gw_db -c 'CREATE EXTENSION pgrouting;'
+          psql -h localhost -U postgres -d gw_db -c 'CREATE EXTENSION postgis_raster;'
+          psql -h localhost -U postgres -d gw_db -c 'CREATE EXTENSION postgis_topology;'
+          psql -h localhost -U postgres -d gw_db -c 'CREATE EXTENSION pgtap;'
+
+      - name: Replace variables in SQL files
+        run: python test/replace_vars.py ws
+
+      - name: Create Sample Schema
+        env:
+          PGPASSWORD: postgres
+        run: python test/execute_sql_files.py ws
+
+      - name: Run SQL Tests with pgTAP and pg_prove (PL/SQL)
+        env:
+          PGPASSWORD: postgres
+        run: |
+          pg_prove -h localhost -U postgres -d gw_db test/plsql/ws/*.sql
+
+      - name: Run SQL Tests with pgTAP and pg_prove (UPSERT)
+        env:
+          PGPASSWORD: postgres
+        run: |
+          pg_prove -h localhost -U postgres -d gw_db test/upsert/ws/*.sql
+
+      - name: Run SQL Tests with pgTAP and pg_prove (STRUCTURE)
+        env:
+          PGPASSWORD: postgres
+        run: |
+          pg_prove -h localhost -U postgres -d gw_db test/structure/ws/*.sql
