@@ -3091,8 +3091,11 @@ class GwInfo(QObject):
         """ Get selected attribute from snapped feature """
 
         # @options{'key':['att to get from snapped feature', 'widget name destination']}
-        options = {'arc': ['arc_id', 'tab_data_arc_id'], 'node': ['node_id', 'tab_data_parent_id'],
-                   'set_to_arc': ['arc_id', '_set_to_arc']}
+        options = {
+                    'arc': ['arc_id', 'tab_data_arc_id'],
+                    'node': ['node_id', 'tab_data_parent_id'],
+                    'set_to_arc': ['arc_id', '_set_to_arc']
+                   }
 
         if event == Qt.RightButton:
             self._cancel_snapping_tool(dialog, action)
@@ -3162,6 +3165,9 @@ class GwInfo(QObject):
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
                 tools_qgis.show_message(json_result['message']['text'], level)
+
+            # Refresh to_arc from tab_data
+            tools_qt.set_widget_text(self.dlg_cf, "tab_data_to_arc", feat_id)
 
             # Refresh tab epa
             epa_type = tools_qt.get_text(self.dlg_cf, 'tab_data_epa_type')
