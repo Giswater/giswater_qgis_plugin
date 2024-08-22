@@ -180,7 +180,7 @@ BEGIN
 			JOIN rtc_hydrometer_x_connec USING (hydrometer_id)
 			JOIN connec c USING (connec_id) 
 			JOIN ext_rtc_hydrometer h ON h.id::text = d.hydrometer_id::text
-			where is_waterbal IS TRUE
+			WHERE is_waterbal IS TRUE OR is_waterbal IS NULL
 			GROUP BY dma_id, cat_period_id)a
 			WHERE n.dma_id = a.dma_id AND n.cat_period_id = a.cat_period_id;
 		
@@ -189,7 +189,7 @@ BEGIN
 			JOIN rtc_hydrometer_x_connec USING (hydrometer_id)
 			JOIN connec c USING (connec_id) 
 			JOIN ext_rtc_hydrometer h ON h.id::text = d.hydrometer_id::text
-			where is_waterbal IS true and cat_period_id = v_period;
+			WHERE (is_waterbal IS TRUE OR is_waterbal IS NULL) AND cat_period_id = v_period;
 
 			UPDATE om_waterbalance SET auth_bill_met_hydro = 0 WHERE auth_bill_met_hydro is null AND cat_period_id = v_period;
 	 			
