@@ -10,23 +10,48 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- Plan for 2 test
-SELECT plan(2);
+-- Plan for 5 test
+SELECT plan(5);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
-    (gw_fct_getprofile($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
-    "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    (gw_fct_config_mapzones($${"client":{"device":4, "lang":"NULL", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},
+    "parameters": {"action": "UPDATE", "configZone": "drainzone", "mapzoneId": "-1",
+    "config": {"use":[{"nodeParent":""}], "ignore":[], "forceClosed":[]}}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getprofile returns status "Accepted"'
+    'Check if gw_fct_config_mapzones with action "UPDATE" returns status "Accepted"'
 );
 
 SELECT is (
-    (gw_fct_config_mapzones($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
-    "data":{"filterFields":{}, "pageInfo":{}, "parameters": {"action": "UPDATE", "configZone": "drainzone",
-    "mapzoneId": "-1", "config": {"use":[{"nodeParent":""}], "ignore":[], "forceClosed":[]}}}}$$)::JSON)->>'status',
+    (gw_fct_config_mapzones($${"client":{"device":4, "lang":"NULL", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},
+    "parameters": {"action": "ADD", "configZone": "drainzone", "mapzoneId": "-1", "nodeParent": "82", "toArc": [], "config": {"use":[{"nodeParent":""}], "ignore":[],
+    "forceClosed":[]}}}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getprofile with parameters returns status "Accepted"'
+    'Check if gw_fct_config_mapzones with action "ADD" and 4th parameter is "nodeParent" returns status "Accepted"'
+);
+
+SELECT is (
+    (gw_fct_config_mapzones($${"client":{"device":4, "lang":"NULL", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},
+    "parameters": {"action": "ADD", "configZone": "drainzone", "mapzoneId": "-1", "forceClosed": ["82"], "config": {"use": [{"nodeParent": "82"}], "ignore": [],
+    "forceClosed": []}}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_config_mapzones with action "ADD" and 4th parameter is "forceClosed" returns status "Accepted"'
+);
+
+SELECT is (
+    (gw_fct_config_mapzones($${"client":{"device":4, "lang":"NULL", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},
+    "parameters": {"action": "REMOVE", "configZone": "drainzone", "mapzoneId": "-1", "nodeParent": "82", "config": {"use": [{"nodeParent": "82"}], "ignore": [],
+    "forceClosed": []}}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_config_mapzones with action "REMOVE" and 4th parameter is "nodeParent" returns status "Accepted"'
+);
+
+SELECT is (
+    (gw_fct_config_mapzones($${"client":{"device":4, "lang":"NULL", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},
+    "parameters": {"action": "REMOVE", "configZone": "drainzone", "mapzoneId": "-1", "forceClosed": ["82"],
+    "config": {"use": [{"nodeParent": "82"}], "ignore": [], "forceClosed": [82]}}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_config_mapzones with action "REMOVE" and 4th parameter is "forceClosed" returns status "Accepted"'
 );
 
 -- Finish the test
