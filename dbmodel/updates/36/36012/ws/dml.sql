@@ -278,3 +278,23 @@ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source")
 VALUES(3266, 'Selected epa_type cannot be used in this feature',
 'For valve and pump, feature type and epa type must correspond ', 2, true, 'utils', 'core') on conflict (id) do nothing;
+
+
+UPDATE config_form_fields SET layoutorder=layoutorder+1 where formname='ve_epa_pipe' and layoutname='lyt_epa_data_1' and layoutorder > 2;
+
+UPDATE config_form_fields SET layoutorder=layoutorder+1 where formname='ve_epa_pipe' and layoutname='lyt_epa_data_1' and layoutorder > 4;
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden)
+VALUES ('ve_epa_pipe', 'form_feature', 'tab_epa', 'cat_roughness', 'lyt_epa_data_1', 3, 'string', 'text', 'Cat roughness:', 'Cat roughness', false, false, false, false, NULL, false);
+
+UPDATE config_form_fields SET layoutorder=layoutorder+1 where formname='ve_epa_pipe' and layoutname='lyt_epa_data_1' and layoutorder > 4;
+
+UPDATE config_form_fields SET layoutorder=layoutorder+1 where formname='ve_epa_pipe' and layoutname='lyt_epa_data_1' and layoutorder > 4;
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden)
+VALUES ('ve_epa_pipe', 'form_feature', 'tab_epa', 'cat_dint', 'lyt_epa_data_1', 5, 'string', 'text', 'Cat dint:', 'Cat dint', false, false, false, false, NULL, false);
+
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden)
+VALUES ('v_edit_inp_pipe', 'form_feature', 'tab_none', 'cat_dint', 'lyt_data_1', 16, 'string', 'text', 'cat_dint', 'cat_dint', false, false, false, false, NULL, false);
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden)
+VALUES ('v_edit_inp_pipe', 'form_feature', 'tab_none', 'cat_roughness', 'lyt_data_1', 17, 'string', 'text', 'cat_roughness', 'cat_roughness', false, false, false, false, NULL, false);
+

@@ -104,6 +104,9 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('SHORTPIPE');
 CREATE TRIGGER gw_trg_edit_inp_node_shortpipe INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_shortpipe
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_node('inp_shortpipe');
 
+CREATE TRIGGER gw_trg_edit_ve_epa_pipe INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_pipe 
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('pipe');
+
 CREATE TRIGGER gw_trg_edit_inp_dscenario_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_connec
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('CONNEC');
 

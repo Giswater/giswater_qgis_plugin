@@ -176,35 +176,39 @@ INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_link_co
 --move closed and broken to the top of lyt_data_2
 UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=0 WHERE columnname = 'closed' AND formname like '%_valve';
 UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=1 WHERE columnname = 'broken' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=2 WHERE columnname = 'arc_id' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=3 WHERE columnname = 'parent_id' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=4 WHERE columnname = 'soilcat_id' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=5 WHERE columnname = 'fluid_type' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=6 WHERE columnname = 'function_type' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=7 WHERE columnname = 'category_type' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=8 WHERE columnname = 'location_type' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=9 WHERE columnname = 'annotation' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=10 WHERE columnname = 'observ' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=11 WHERE columnname = 'descript' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=12 WHERE columnname = 'comment' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=13 WHERE columnname = 'num_value' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=14 WHERE columnname = 'svg' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=15 WHERE columnname = 'rotation' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=16 WHERE columnname = 'hemisphere' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=17 WHERE columnname = 'label' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=18 WHERE columnname = 'label_y' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=19 WHERE columnname = 'label_x' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=20 WHERE columnname = 'label_rotation' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=21 WHERE columnname = 'publish' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=22 WHERE columnname = 'undelete' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=23 WHERE columnname = 'inventory' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=2 WHERE columnname = 'to_arc' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=3 WHERE columnname = 'arc_id' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=4 WHERE columnname = 'parent_id' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=5 WHERE columnname = 'soilcat_id' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=6 WHERE columnname = 'fluid_type' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=7 WHERE columnname = 'function_type' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=8 WHERE columnname = 'category_type' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=9 WHERE columnname = 'location_type' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=10 WHERE columnname = 'comment' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=11 WHERE columnname = 'num_value' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=12 WHERE columnname = 'svg' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=13 WHERE columnname = 'rotation' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=14 WHERE columnname = 'hemisphere' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=15 WHERE columnname = 'label' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=16 WHERE columnname = 'label_y' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=17 WHERE columnname = 'label_x' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=18 WHERE columnname = 'label_rotation' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=19 WHERE columnname = 'publish' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=20 WHERE columnname = 'undelete' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=21 WHERE columnname = 'inventory' AND formname like '%_valve';
 
 -- hidden
 UPDATE config_form_fields SET hidden = true WHERE columnname 
 IN ('undelete', 'publish', 'buildercat_id', 'comment', 'num_value', 'svg', 'macrodqa_id', 'macrosector_id',
 'macroexpl_id', 'custom_length', 'staticpressure1', 'staticpressure2', 'pipe_param_1') and (formname ILIKE 've_arc%' or formname ILIKE 've_node%' or formname ILIKE 've_connec%');
 
+UPDATE config_form_fields SET hidden = true WHERE columnname='arc_id' and formname LIKE 've_node_%';
+
 UPDATE config_form_fields SET hidden = true WHERE columnname IN ('label_x', 'label_y') AND formname LIKE 've_arc%';
+
+-- special changes for air_valve
+UPDATE config_form_fields SET hidden=true WHERE columnname = 'to_arc' AND formname like '%air_valve';
+UPDATE config_form_fields SET hidden=false WHERE columnname = 'arc_id' AND formname like '%air_valve';
 
 
 -- reorder sample

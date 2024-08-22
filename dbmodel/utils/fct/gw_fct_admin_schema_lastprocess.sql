@@ -487,6 +487,9 @@ BEGIN
     -- recreate views
     PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
     "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
+    
+    -- set to_arc no editable for valves
+    UPDATE config_form_fields SET iseditable=false WHERE columnname='to_arc'; 
 
 	v_result_info := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');

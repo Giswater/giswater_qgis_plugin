@@ -25,4 +25,4 @@
 - New views unfiltered (vu) for WS mapzones
 - Remove expl_id2 for mapzones
 - Various bugs fixed
-
+- New approximation to manage styles: cat_style table and stylecat_id field on sys_style. Different contexts could be used
