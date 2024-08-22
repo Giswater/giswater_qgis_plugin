@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_config_mapzones(p_data json)
 $BODY$
 
 /*EXAMPLE
- SELECT SCHEMA_NAME,gw_fct_config_mapzones($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, 
+ SELECT SCHEMA_NAME.gw_fct_config_mapzones($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},
  "parameters":{"configZone":"EXPL", "action":"PREVIEW", "nodeParent":, "toArc":}}}$$);
 */
 DECLARE 
@@ -41,6 +41,11 @@ v_use_node json;
 v_use_forceclosed json;
 v_netscenario_id integer;
 v_check_value text;
+v_use_value json;
+v_ignore_value json;
+v_forceClosed_value json;
+v_combined_use_value text;
+v_combined_forceClosed_value text;
 BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
@@ -103,7 +108,17 @@ BEGIN
 				IF v_check_value ='' THEN 
 					v_preview = concat('{"use":[',v_preview,'], "ignore":[], "forceClosed":[]}');
 				ELSE
-					v_preview = jsonb_set( v_config::jsonb, '{use}',(v_config::jsonb -> 'use') ||v_preview::jsonb);
+				    v_use_value = json_extract_path_text(v_config::json, 'use');
+				    v_ignore_value = json_extract_path_text(v_config::json, 'ignore');
+				    v_forceClosed_value = json_extract_path_text(v_config::json, 'forceClosed');
+					IF v_use_value::text = '[]' THEN
+					    v_combined_use_value = v_preview::text;
+					ELSE
+					    v_combined_use_value = trim(both '[]' from v_use_value::text) || ',' || v_preview::text;
+					END IF;
+				    v_preview = gw_fct_json_object_set_key('{}'::json, 'use', ('[' || v_combined_use_value || ']')::json);
+				    v_preview = gw_fct_json_object_set_key(v_preview, 'ignore', v_ignore_value::json);
+				    v_preview = gw_fct_json_object_set_key(v_preview, 'forceClosed', v_forceClosed_value::json);
 				END IF;
 			END IF;
 
@@ -118,41 +133,56 @@ BEGIN
 
 
 			IF v_forceclosed IS NOT NULL THEN
-				v_preview = jsonb_set( v_preview::jsonb, '{forceClosed}',(v_preview::jsonb -> 'forceClosed') || v_forceclosed::jsonb);
+			    v_forceClosed_value = json_extract_path_text(v_preview::json, 'forceClosed');
+			    IF v_forceClosed_value::text = '[]' THEN
+			        v_combined_forceClosed_value = v_forceclosed::text;
+			    ELSE
+			        v_combined_forceClosed_value = trim(both '[]' from v_forceClosed_value::text) || ',' || v_forceclosed::text;
+			    END IF;
+			    v_preview = gw_fct_json_object_set_key(v_preview, 'forceClosed', ('[' || v_combined_forceClosed_value || ']')::json);
 			END IF;
 		END IF;
 	ELSIF v_action = 'REMOVE' THEN
 		IF v_nodeparent IS NOT NULL THEN
-			EXECUTE 'SELECT json_agg(a.data::json) FROM 
-				(SELECT json_array_elements_text(
-				json_extract_path('''||v_config||'''::json,''use'')) as data)a
-				WHERE  json_extract_path_text(data ::json,''nodeParent'') != '||quote_literal(v_nodeparent)||''
-				into v_use_node;
-			
-				IF v_use_node is null then
-					v_use_node= '[]';
-				END IF;
+		    EXECUTE 'SELECT json_agg(a.data::json) FROM
+		        (SELECT json_array_elements_text(
+		        json_extract_path('''||v_config||'''::json,''use'')) as data)a
+		        WHERE  json_extract_path_text(data ::json,''nodeParent'') != '||quote_literal(v_nodeparent)||''
+		        INTO v_use_node;
 
-				v_preview = jsonb_set( v_config::jsonb, '{use}', v_use_node::jsonb);
-			
+		    IF v_use_node IS NULL THEN
+		        v_use_node = '[]';
+		    END IF;
+
+		    v_use_value = v_use_node;
+		    v_ignore_value = json_extract_path_text(v_config::json, 'ignore');
+		    v_forceClosed_value = json_extract_path_text(v_config::json, 'forceClosed');
+
+		    v_preview = gw_fct_json_object_set_key('{}'::json, 'use', v_use_value::json);
+		    v_preview = gw_fct_json_object_set_key(v_preview, 'ignore', v_ignore_value::json);
+		    v_preview = gw_fct_json_object_set_key(v_preview, 'forceClosed', v_forceClosed_value::json);
 		END IF;
 
 		IF v_forceclosed IS NOT NULL THEN
-			
-			select string_agg(quote_literal(a.elem)::text,', ') into v_forceclosed
-			from (SELECT json_array_elements_text( v_forceclosed::json)  as elem)a ;
-					
-			EXECUTE 'SELECT json_agg(a.data::integer) FROM 
-			(SELECT json_array_elements_text(json_extract_path('''||v_config||'''::json,''forceClosed'')) as data)a
-			WHERE  a.data not in ('||v_forceclosed||')'
-			into v_use_forceclosed;
+		    SELECT string_agg(quote_literal(a.elem)::text, ', ') INTO v_forceclosed
+		    FROM (SELECT json_array_elements_text(v_forceclosed::json) AS elem) a;
 
-			IF v_use_forceclosed is null then
-				v_use_forceclosed= '[]';
-			END IF;
+		    EXECUTE 'SELECT json_agg(a.data::integer) FROM
+		        (SELECT json_array_elements_text(json_extract_path('''||v_config||'''::json,''forceClosed'')) as data)a
+		        WHERE  a.data NOT IN ('||v_forceclosed||')'
+		    INTO v_use_forceclosed;
 
-			v_preview = jsonb_set( v_config::jsonb, '{forceClosed}',v_use_forceclosed::jsonb);
+		    IF v_use_forceclosed IS NULL THEN
+		        v_use_forceclosed = '[]';
+		    END IF;
 
+		    v_use_value = json_extract_path_text(v_config::json, 'use');
+		    v_ignore_value = json_extract_path_text(v_config::json, 'ignore');
+		    v_forceClosed_value = v_use_forceclosed;
+
+		    v_preview = gw_fct_json_object_set_key('{}'::json, 'use', v_use_value::json);
+		    v_preview = gw_fct_json_object_set_key(v_preview, 'ignore', v_ignore_value::json);
+		    v_preview = gw_fct_json_object_set_key(v_preview, 'forceClosed', v_forceClosed_value::json);
 		END IF;
 		
 	ELSIF v_action = 'UPDATE' THEN
@@ -175,6 +205,7 @@ BEGIN
 		
 		IF v_netscenario_id IS NULL THEN
 			EXECUTE 'UPDATE '||lower(v_zone)||' set graphconfig = '''||v_config::JSON||''' WHERE '||v_id||'::text = '''||v_mapzone_id||'''::text;';
+			raise notice '%', ('UPDATE '||lower(v_zone)||' set graphconfig = '''||v_config::JSON||''' WHERE '||v_id||'::text = '''||v_mapzone_id||'''::text;');
 		ELSE
 			EXECUTE 'UPDATE plan_netscenario_'||lower(v_zone)||' set graphconfig = '''||v_config::JSON||''' WHERE '||v_id||'::text = '''||v_mapzone_id||'''::text AND netscenario_id='||v_netscenario_id||';';
 		END IF;
