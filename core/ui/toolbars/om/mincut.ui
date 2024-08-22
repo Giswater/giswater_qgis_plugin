@@ -999,6 +999,7 @@
    <addaction name="actionCustomMincut"/>
    <addaction name="actionChangeValveStatus"/>
    <addaction name="actionRefreshMincut"/>
+   <addaction name="separator"/>
    <addaction name="actionComposer"/>
    <addaction name="actionExportHydroCsv"/>
   </widget>
