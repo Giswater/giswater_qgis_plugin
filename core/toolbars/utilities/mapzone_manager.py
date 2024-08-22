@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import json
-from collections import OrderedDict
+
 from functools import partial
 from sip import isdeleted
 
@@ -525,31 +525,15 @@ class GwMapzoneManager:
         """ ADD button for nodeParent """
 
         node_parent_id = self.node_parent
-        to_arc_list = list(self.to_arc_list)
+        to_arc_list = json.dumps(list(self.to_arc_list))
         preview = tools_qt.get_text(dialog, 'txt_preview')
-
-        if preview:
-            config = json.loads(preview, object_pairs_hook=OrderedDict)
-        else:
-            config = {"use": [], "ignore": [], "forceClosed": []}
-
-        new_entry = OrderedDict([
-            ("nodeParent", node_parent_id),
-            ("toArc", to_arc_list)
-        ])
-
-        config["use"].append(new_entry)
-        parameters_dict = OrderedDict({
-            "action": "ADD",
-            "configZone": self.mapzone_type,
-            "mapzoneId": self.mapzone_id,
-            "config": config
-        })
-
+        parameters = f'"action": "ADD", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
+                     f'"nodeParent": "{node_parent_id}", "toArc": {to_arc_list}'
         if self.netscenario_id is not None:
-            parameters_dict["netscenarioId"] = self.netscenario_id
-
-        extras = f'"parameters": {json.dumps(parameters_dict, separators=(",", ":"))}'
+            parameters += f', "netscenarioId": {self.netscenario_id}'
+        if preview:
+            parameters += f', "config": {preview}'
+        extras = f'"parameters": {{{parameters}}}'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
         if json_result is None:
@@ -564,13 +548,7 @@ class GwMapzoneManager:
 
             preview = json_result['body']['data'].get('preview')
             if preview:
-                for item in preview.get("use", []):
-                    item = OrderedDict([
-                        ("nodeParent", item["nodeParent"]),
-                        ("toArc", item["toArc"])
-                    ])
-                formatted_preview = json.dumps(preview, indent=None, separators=(',', ':'))
-                tools_qt.set_widget_text(dialog, 'txt_preview', formatted_preview)
+                tools_qt.set_widget_text(dialog, 'txt_preview', json.dumps(preview))
 
             self._cancel_snapping_tool(dialog, dialog.btn_add_nodeParent)
             self._reset_config_vars(1)
@@ -690,7 +668,8 @@ class GwMapzoneManager:
         extras = f'"parameters": {{{parameters}}}'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
-        if json_result is None:
+        if not json_result or 'status' not in json_result:
+            tools_qgis.show_message("Failed to get a valid response from gw_fct_config_mapzones.", level=2)
             return
 
         if 'status' in json_result and json_result['status'] == 'Accepted':
