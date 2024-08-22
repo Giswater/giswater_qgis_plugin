@@ -38,6 +38,7 @@ v_seq_name text;
 v_seq_code text;
 v_code_prefix text;
 v_arc_id text;
+v_childtable_name text;
 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -516,9 +517,12 @@ BEGIN
 					USING NEW
 					INTO v_new_value_param;
 
-				IF v_new_value_param IS NOT NULL THEN
-					EXECUTE 'INSERT INTO man_arc_'||lower(v_customfeature)||' (arc_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')'
-						USING NEW.arc_id, v_new_value_param;
+				v_childtable_name := 'man_arc_' || lower(v_customfeature);
+				IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
+					IF v_new_value_param IS NOT NULL THEN
+						EXECUTE 'INSERT INTO '||v_childtable_name||' (arc_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')'
+							USING NEW.arc_id, v_new_value_param;
+					END IF;
 				END IF;
 			END LOOP;
 		END IF;
@@ -730,15 +734,20 @@ BEGIN
 					USING OLD
 					INTO v_old_value_param;
 
-				IF (v_new_value_param IS NOT NULL AND v_old_value_param!=v_new_value_param) OR (v_new_value_param IS NOT NULL AND v_old_value_param IS NULL) THEN
-					EXECUTE 'INSERT INTO man_arc_'||lower(v_customfeature)||' (arc_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')
-					    ON CONFLICT (arc_id)
-					    DO UPDATE SET '||v_addfields.param_name||'=$2::'||v_addfields.datatype_id||' WHERE man_arc_'||lower(v_customfeature)||'.arc_id=$1'
-						USING NEW.arc_id, v_new_value_param;
 
-				ELSIF v_new_value_param IS NULL AND v_old_value_param IS NOT NULL THEN
-					EXECUTE 'UPDATE man_arc_'||lower(v_customfeature)||' SET '||v_addfields.param_name||' = null WHERE man_arc_'||lower(v_customfeature)||'.arc_id=$1'
-					    USING NEW.arc_id;
+
+				v_childtable_name := 'man_arc_' || lower(v_customfeature);
+				IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
+					IF (v_new_value_param IS NOT NULL AND v_old_value_param!=v_new_value_param) OR (v_new_value_param IS NOT NULL AND v_old_value_param IS NULL) THEN
+						EXECUTE 'INSERT INTO '||v_childtable_name||' (arc_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')
+							ON CONFLICT (arc_id)
+							DO UPDATE SET '||v_addfields.param_name||'=$2::'||v_addfields.datatype_id||' WHERE '||v_childtable_name||'.arc_id=$1'
+							USING NEW.arc_id, v_new_value_param;
+
+					ELSIF v_new_value_param IS NULL AND v_old_value_param IS NOT NULL THEN
+						EXECUTE 'UPDATE '||v_childtable_name||' SET '||v_addfields.param_name||' = null WHERE '||v_childtable_name||'.arc_id=$1'
+							USING NEW.arc_id;
+					END IF;
 				END IF;
 			END LOOP;
 		END IF;
@@ -770,8 +779,11 @@ BEGIN
 		-- Delete childtable addfields (after or before deletion of arc, doesn't matter)
 		v_customfeature = old.arc_type;
 		v_arc_id = old.arc_id;
-      
-	   	EXECUTE 'DELETE FROM man_arc_'||lower(v_customfeature)||' WHERE arc_id = '||quote_literal(v_arc_id)||'';
+
+		v_childtable_name := 'man_arc_' || lower(v_customfeature);
+		IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
+			EXECUTE 'DELETE FROM '||v_childtable_name||' WHERE arc_id = '||quote_literal(v_arc_id)||'';
+		END IF;
 
 		RETURN NULL;
 

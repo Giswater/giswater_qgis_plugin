@@ -9,7 +9,7 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_arc()
   RETURNS trigger AS
 $BODY$
-DECLARE 
+DECLARE
 v_inp_table varchar;
 v_man_table varchar;
 v_sql varchar;
@@ -34,13 +34,14 @@ v_seq_name text;
 v_seq_code text;
 v_code_prefix text;
 v_arc_id text;
+v_childtable_name text;
 
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	        v_man_table:= TG_ARGV[0];
 
-	--modify values for custom view inserts	
+	--modify values for custom view inserts
 	IF v_man_table IN (SELECT id FROM cat_feature) THEN
 		v_customfeature:=v_man_table;
 		v_man_table:=(SELECT man_table FROM cat_feature_arc c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id=v_man_table);
@@ -57,20 +58,20 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3246", "function":"1302","debug_msg":null}}$$);';
 		END IF;
-        
+
 		-- transforming streetaxis name into id
 		v_streetaxis = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname LIMIT 1);
 		v_streetaxis2 = (SELECT id FROM v_ext_streetaxis WHERE (muni_id = NEW.muni_id OR muni_id IS NULL) AND descript = NEW.streetname2 LIMIT 1);
 	END IF;
 
-	
+
 	IF TG_OP = 'INSERT' THEN
 
 		-- setting psector vdefault as visible
 		IF NEW.state = 2 THEN
 			INSERT INTO selector_psector (psector_id, cur_user) VALUES (v_psector, current_user) ON CONFLICT DO NOTHING;
 		END IF;
-    
+
 		-- Arc ID
 		IF NEW.arc_id != (SELECT last_value::text FROM urn_id_seq) OR NEW.arc_id IS NULL THEN
 			NEW.arc_id = (SELECT nextval('urn_id_seq'));
@@ -81,7 +82,7 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM cat_arc WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1020", "function":"1302","debug_msg":null}}$$);';
-			END IF; 
+			END IF;
 
 			-- get vdefault values using config user values
 			IF v_customfeature IS NOT NULL THEN
@@ -100,125 +101,125 @@ BEGIN
 				"data":{"message":"1088", "function":"1302","debug_msg":null}}$$);';
 			END IF;
 		END IF;
-		
-		
+
+
 		 -- Set EPA type
 		IF (NEW.epa_type IS NULL) THEN
-			NEW.epa_type = 'PIPE';   
+			NEW.epa_type = 'PIPE';
 		END IF;
-		
-		
+
+
 		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN
-			
+
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"1110", "function":"1302","debug_msg":null}}$$);';
 			END IF;
-			
+
 			-- getting value default
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_exploitation_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
-			
+
 			-- getting value from geometry of mapzone
 			IF (NEW.expl_id IS NULL) THEN
 				SELECT count(*) INTO v_count FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) AND active IS TRUE;
 				IF v_count = 1 THEN
 					NEW.expl_id = (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) AND active IS TRUE LIMIT 1);
 				ELSE
-					NEW.expl_id =(SELECT expl_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer) 
+					NEW.expl_id =(SELECT expl_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer)
 					order by ST_Distance (NEW.the_geom, v_edit_arc.the_geom) LIMIT 1);
-				END IF;	
+				END IF;
 			END IF;
-			
+
 			-- control error when no value
 			IF (NEW.expl_id IS NULL) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"2012", "function":"1302","debug_msg":"'||NEW.arc_id::text||'"}}$$);';
-			END IF;            
+			END IF;
 		END IF;
-		
-		
+
+
 		-- Sector ID
 		IF (NEW.sector_id IS NULL) THEN
-			
+
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM sector WHERE active IS TRUE ) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"1008", "function":"1302","debug_msg":null}}$$);';
 			END IF;
-			
+
 			-- getting value default
 			IF (NEW.sector_id IS NULL) THEN
 				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
-			
+
 			-- getting value from geometry of mapzone
 			IF (NEW.sector_id IS NULL) THEN
 				SELECT count(*) INTO v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) AND active IS TRUE;
 				IF v_count = 1 THEN
 					NEW.sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) AND active IS TRUE LIMIT 1);
 				ELSE
-					NEW.sector_id =(SELECT sector_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer) 
+					NEW.sector_id =(SELECT sector_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer)
 					order by ST_Distance (NEW.the_geom, v_edit_arc.the_geom) LIMIT 1);
-				END IF;	
+				END IF;
 			END IF;
-			
+
 			-- control error when no value
 			IF (NEW.sector_id IS NULL) THEN
 				NEW.sector_id =0;
-			END IF;            
+			END IF;
 		END IF;
-		
-		
+
+
 		-- Dma ID
 		IF (NEW.dma_id IS NULL) THEN
-			
+
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM dma WHERE active IS TRUE ) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"1012", "function":"1302","debug_msg":null}}$$);';
 			END IF;
-			
+
 			-- getting value default
 			IF (NEW.dma_id IS NULL) THEN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
-			
+
 			-- getting value from geometry of mapzone
 			IF (NEW.dma_id IS NULL) THEN
 				SELECT count(*) INTO v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) AND active IS TRUE ;
 				IF v_count = 1 THEN
 					NEW.dma_id = (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) AND active IS TRUE LIMIT 1);
 				ELSE
-					NEW.dma_id =(SELECT dma_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer) 
+					NEW.dma_id =(SELECT dma_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer)
 					order by ST_Distance (NEW.the_geom, v_edit_arc.the_geom) LIMIT 1);
-				END IF;	
+				END IF;
 			END IF;
-			
+
 			-- control error when no value
 			IF (NEW.dma_id IS NULL) THEN
 				NEW.dma_id =0;
-			END IF;            
+			END IF;
 		END IF;
-			
-			
+
+
 		-- Presszone
 		IF (NEW.presszone_id IS NULL) THEN
-			
+
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM presszone WHERE active IS TRUE ) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"3106", "function":"1302","debug_msg":null}}$$);';
 			END IF;
-			
+
 			-- getting value default
 			IF (NEW.presszone_id IS NULL) THEN
 				NEW.presszone_id := (SELECT "value" FROM config_param_user WHERE "parameter"='presszone_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
-			
+
 			-- getting value from geometry of mapzone
 			IF (NEW.presszone_id IS NULL) THEN
 				SELECT count(*) INTO v_count FROM presszone WHERE ST_DWithin(NEW.the_geom, presszone.the_geom,0.001) AND active IS TRUE ;
@@ -227,52 +228,52 @@ BEGIN
 				ELSE
 					NEW.presszone_id =(SELECT presszone_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer)
 					order by ST_Distance (NEW.the_geom, v_edit_arc.the_geom) LIMIT 1);
-				END IF;	
+				END IF;
 			END IF;
-			
+
 			-- control error when no value
 			IF (NEW.presszone_id IS NULL) THEN
 				NEW.presszone_id =0;
-			END IF;            
+			END IF;
 		END IF;
-		
-		-- Municipality 
+
+		-- Municipality
 		IF (NEW.muni_id IS NULL) THEN
-			
+
 			-- getting value default
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_municipality_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
-			
+
 			-- getting value from geometry of mapzone
 			IF (NEW.muni_id IS NULL) THEN
 				SELECT count(*) INTO v_count FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) AND active IS TRUE ;
 				IF v_count = 1 THEN
-					NEW.muni_id = (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) 
+					NEW.muni_id = (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001)
 					AND active IS TRUE LIMIT 1);
 				ELSE
-					NEW.muni_id =(SELECT muni_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer) 
+					NEW.muni_id =(SELECT muni_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer)
 					order by ST_Distance (NEW.the_geom, v_edit_arc.the_geom) LIMIT 1);
-				END IF;	
-			END IF;       
+				END IF;
+			END IF;
 		END IF;
-        
-		-- District 
+
+		-- District
 		IF (NEW.district_id IS NULL) THEN
-			
+
 			-- getting value from geometry of mapzone
 			IF (NEW.district_id IS NULL) THEN
 				SELECT count(*) INTO v_count FROM ext_district WHERE ST_DWithin(NEW.the_geom, ext_district.the_geom,0.001);
 				IF v_count = 1 THEN
 					NEW.district_id = (SELECT district_id FROM ext_district WHERE ST_DWithin(NEW.the_geom, ext_district.the_geom,0.001) LIMIT 1);
 				ELSIF v_count > 1 THEN
-					NEW.district_id =(SELECT district_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer) 
+					NEW.district_id =(SELECT district_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer)
 					order by ST_Distance (NEW.the_geom, v_edit_arc.the_geom) LIMIT 1);
-				END IF;	
-			END IF;	        
+				END IF;
+			END IF;
 		END IF;
-		
-		
+
+
 		-- State
 		IF (NEW.state IS NULL) THEN
 		    NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
@@ -308,27 +309,27 @@ BEGIN
 		IF NEW.inventory IS NULL THEN
 			NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
 		END IF;
-		
+
 		--Publish
 		IF NEW.publish IS NULL THEN
 			NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');
-		END IF; 
+		END IF;
 
 		-- Code
-		SELECT code_autofill, cat_feature.id, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_featurecat, v_code_prefix FROM cat_feature 
+		SELECT code_autofill, cat_feature.id, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_featurecat, v_code_prefix FROM cat_feature
 		JOIN cat_arc ON cat_feature.id=cat_arc.arctype_id WHERE cat_arc.id=NEW.arccat_id;
-	
+
 		-- use specific sequence for code when its name matches featurecat_code_seq
 		EXECUTE 'SELECT concat('||quote_literal(lower(v_featurecat))||',''_code_seq'');' INTO v_seq_name;
 		EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||';' INTO v_sql;
-		
+
 		IF v_sql IS NOT NULL AND NEW.code IS NULL THEN
 			EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
 				NEW.code=concat(v_code_prefix,v_seq_code);
 		END IF;
-	
-		--Copy id to code field	
-		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN 
+
+		--Copy id to code field
+		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN
 			NEW.code=NEW.arc_id;
 		END IF;
 
@@ -336,17 +337,17 @@ BEGIN
 		IF (NEW.workcat_id IS NULL) THEN
 			NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_workcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
-		
+
 		--Workcat_id_plan
 		IF (NEW.workcat_id_plan IS NULL AND NEW.state = 2) THEN
 			NEW.workcat_id_plan := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_workcat_id_plan' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
-		
+
 		-- Ownercat_id
 		IF (NEW.ownercat_id IS NULL) THEN
 		    NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
-		
+
 		-- Soilcat_id
 		IF (NEW.soilcat_id IS NULL) THEN
 			NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
@@ -359,17 +360,17 @@ BEGIN
 				NEW.builtdate :=date(now());
 			END IF;
 		END IF;
-		
+
 		-- Verified
 		IF (NEW.verified IS NULL) THEN
 			NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
-	
+
 		-- LINK
 		IF (SELECT (value::json->>'fid')::boolean FROM config_param_system WHERE parameter='edit_custom_link') IS TRUE THEN
 			NEW.link=NEW.arc_id;
 		END IF;
-		
+
 		v_featurecat = (SELECT arctype_id FROM cat_arc WHERE id = NEW.arccat_id);
 
 		--Location type
@@ -397,7 +398,7 @@ BEGIN
 
 		IF NEW.category_type IS NULL THEN
 			NEW.category_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_arc_category_vdefault' AND cur_user = current_user);
-		END IF;	
+		END IF;
 
 		--Function type
 		IF NEW.function_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_function_vdefault' AND cur_user = current_user)  = v_featurecat THEN
@@ -407,7 +408,7 @@ BEGIN
 		IF NEW.function_type IS NULL THEN
 			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_arc_function_vdefault' AND cur_user = current_user);
 		END IF;
-        
+
 		--Pavement
 		IF NEW.pavcat_id IS NULL THEN
 			NEW.pavcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_pavementcat_vdefault' AND cur_user = current_user);
@@ -416,11 +417,11 @@ BEGIN
 		-- FEATURE INSERT
 		INSERT INTO arc (arc_id, code, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type, location_type,
 					workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate,enddate, ownercat_id, muni_id, postcode, district_id, streetaxis_id, postnumber, postcomplement,
-					streetaxis2_id,postnumber2, postcomplement2,descript,link,verified,the_geom,undelete,label_x,label_y,label_rotation,  publish, inventory, expl_id, num_value, 
+					streetaxis2_id,postnumber2, postcomplement2,descript,link,verified,the_geom,undelete,label_x,label_y,label_rotation,  publish, inventory, expl_id, num_value,
 					depth, adate, adescript, lastupdate, lastupdate_user, asset_id, pavcat_id, om_state, conserv_state, parent_id,expl_id2, brand_id, model_id, serial_number)
 					VALUES (NEW.arc_id, NEW.code, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, NEW.custom_length,NEW.dma_id,NEW. presszone_id,
 					NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id, NEW.builtdate,NEW.enddate, NEW.ownercat_id,
-					NEW.muni_id, NEW.postcode, NEW.district_id,v_streetaxis,NEW.postnumber, NEW.postcomplement, v_streetaxis2, NEW.postnumber2, NEW.postcomplement2, NEW.descript,NEW.link, NEW.verified, 
+					NEW.muni_id, NEW.postcode, NEW.district_id,v_streetaxis,NEW.postnumber, NEW.postcomplement, v_streetaxis2, NEW.postnumber2, NEW.postcomplement2, NEW.descript,NEW.link, NEW.verified,
 					NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, NEW.publish, NEW.inventory, NEW.expl_id, NEW.num_value,
 					NEW.depth, NEW.adate, NEW.adescript, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.pavcat_id, NEW.om_state, NEW.conserv_state, NEW.parent_id, NEW.expl_id2, NEW.brand_id, NEW.model_id, NEW.serial_number);
 
@@ -434,21 +435,21 @@ BEGIN
 			END IF;
 		END IF;
 
-					
+
 		-- MAN INSERT
-		IF v_man_table='man_pipe' THEN 			
-				INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id);			
-			
-		ELSIF v_man_table='man_varc' THEN		
+		IF v_man_table='man_pipe' THEN
+				INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id);
+
+		ELSIF v_man_table='man_varc' THEN
 				INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 
 		ELSIF v_man_table='parent' THEN
-			v_man_table := (SELECT man_table FROM cat_feature_arc c	JOIN sys_feature_cat s ON c.type = s.id 
+			v_man_table := (SELECT man_table FROM cat_feature_arc c	JOIN sys_feature_cat s ON c.type = s.id
 			JOIN cat_arc ON c.id = cat_arc.arctype_id WHERE cat_arc.id=NEW.arccat_id);
         	IF v_man_table IS NOT NULL THEN
-            	v_sql:= 'INSERT INTO '||v_man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';    
+            	v_sql:= 'INSERT INTO '||v_man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
            		EXECUTE v_sql;
-      		END IF;		
+      		END IF;
 		END IF;
 
         -- childtable insert
@@ -460,17 +461,20 @@ BEGIN
 					USING NEW
 					INTO v_new_value_param;
 
-				IF v_new_value_param IS NOT NULL THEN
-					EXECUTE 'INSERT INTO man_arc_'||lower(v_customfeature)||' (arc_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')'
-						USING NEW.arc_id, v_new_value_param;
+				v_childtable_name := 'man_arc_' || lower(v_customfeature);
+				IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
+					IF v_new_value_param IS NOT NULL THEN
+						EXECUTE 'INSERT INTO '||v_childtable_name||' (arc_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')'
+							USING NEW.arc_id, v_new_value_param;
+					END IF;
 				END IF;
 			END LOOP;
 		END IF;
 
         -- EPA INSERT
-        IF (NEW.epa_type = 'PIPE') THEN 
+        IF (NEW.epa_type = 'PIPE') THEN
 		v_inp_table:= 'inp_pipe';
-		
+
 	ELSIF (NEW.epa_type = 'VIRTUALPUMP') THEN
 	 	v_inp_table:= 'inp_virtualpump';
 
@@ -478,15 +482,15 @@ BEGIN
 		v_inp_table:= 'inp_virtualvalve';
 
         END IF;
-		
+
        	IF v_inp_table IS NOT NULL THEN
 			v_sql:= 'INSERT INTO '||v_inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
 	        EXECUTE v_sql;
        	END IF;
-		
+
 		--in case a project is dhc, insert cable
 		IF (SELECT value FROM config_param_system WHERE parameter='dhc_plugin_version') is not null then
-			IF (SELECT value::boolean FROM config_param_user WHERE parameter='dhc_edit_insert_cable' 
+			IF (SELECT value::boolean FROM config_param_user WHERE parameter='dhc_edit_insert_cable'
 			AND cur_user=current_user) is true AND (SELECT json_extract_path_text(value::json,'cableFeaturecat')
 				FROM config_param_system WHERE parameter='dhc_edit_insert_cable') != NEW.arc_type THEN
 					raise notice 'execute';
@@ -499,7 +503,7 @@ BEGIN
 		END IF;
 
         RETURN NEW;
-    
+
     ELSIF TG_OP = 'UPDATE' THEN
 
     		-- this overwrites triger topocontrol arc values (triggered before insertion) just in that moment: In order to make more profilactic this issue only will be overwrited in case of NEW.node_* not nulls
@@ -513,7 +517,7 @@ BEGIN
 		END IF;
 
 		-- epa type
-		IF (NEW.epa_type != OLD.epa_type) THEN    
+		IF (NEW.epa_type != OLD.epa_type) THEN
 
 			-- delete from old inp table
 			IF (OLD.epa_type = 'PIPE') THEN
@@ -527,7 +531,7 @@ BEGIN
 				v_sql:= 'DELETE FROM '||v_inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
 				EXECUTE v_sql;
 			END IF;
-			
+
 			v_inp_table := NULL;
 
 			-- insert into new inp table
@@ -539,7 +543,7 @@ BEGIN
 				INSERT INTO inp_virtualpump (arc_id, status) VALUES (NEW.arc_id, 'ACTIVE') ON CONFLICT (arc_id) DO NOTHING;
 			END IF;
 		END IF;
-	
+
 		-- State
 		IF (NEW.state != OLD.state) THEN
 			UPDATE arc SET state=NEW.state WHERE arc_id = OLD.arc_id;
@@ -549,13 +553,13 @@ BEGIN
 				= 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
 			END IF;
 			IF NEW.state = 1 AND OLD.state=2 THEN
-				DELETE FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id;					
-			END IF;			
+				DELETE FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id;
+			END IF;
 			IF NEW.state=0 THEN
 				UPDATE arc SET node_1=NULL, node_2=NULL WHERE arc_id = OLD.arc_id;
 			END IF;
 		END IF;
-		
+
 		-- State_type
 		IF NEW.state=0 AND OLD.state=1 THEN
 			IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
@@ -575,8 +579,8 @@ BEGIN
 		IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3036", "function":"1318","debug_msg":"'||NEW.state::text||'"}}$$);';
-		END IF;	
-       			
+		END IF;
+
 		-- The geom
 		IF st_orderingequals(NEW.the_geom, OLD.the_geom) IS FALSE OR NEW.node_1 IS NULL OR NEW.node_2 IS NULL THEN
 			UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;
@@ -584,7 +588,7 @@ BEGIN
 
 		--link_path
 		SELECT link_path INTO v_link_path FROM cat_feature JOIN cat_arc ON cat_arc.arctype_id=cat_feature.id WHERE cat_arc.id=NEW.arccat_id;
-		
+
 		IF v_link_path IS NOT NULL THEN
 			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;
@@ -604,18 +608,18 @@ BEGIN
 		END IF;
 
 		UPDATE arc
-		SET code=NEW.code, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id,  state_type=NEW.state_type, annotation= NEW.annotation, "observ"=NEW.observ, 
+		SET code=NEW.code, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id,  state_type=NEW.state_type, annotation= NEW.annotation, "observ"=NEW.observ,
 				"comment"=NEW.comment, custom_length=NEW.custom_length, dma_id=NEW.dma_id, presszone_id=NEW.presszone_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type,
 				category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan,
-				buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis, 
-				streetaxis2_id=v_streetaxis2,postcode=NEW.postcode, district_id = NEW.district_id, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2,descript=NEW.descript, verified=NEW.verified, 
+				buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis,
+				streetaxis2_id=v_streetaxis2,postcode=NEW.postcode, district_id = NEW.district_id, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2,descript=NEW.descript, verified=NEW.verified,
 				undelete=NEW.undelete, label_x=NEW.label_x,
-				postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, 
+				postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory,
 				expl_id=NEW.expl_id,num_value=NEW.num_value, link=NEW.link, lastupdate=now(), lastupdate_user=current_user,
 				depth=NEW.depth, adate=NEW.adate, adescript=NEW.adescript, asset_id=NEW.asset_id, pavcat_id=NEW.pavcat_id,
 				om_state=NEW.om_state, conserv_state=NEW.conserv_state, parent_id = NEW.parent_id,expl_id2 =NEW.expl_id2, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number
 				WHERE arc_id=OLD.arc_id;
-				
+
 		-- childtable update
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM sys_addfields
@@ -629,15 +633,18 @@ BEGIN
 					USING OLD
 					INTO v_old_value_param;
 
-				IF (v_new_value_param IS NOT NULL AND v_old_value_param!=v_new_value_param) OR (v_new_value_param IS NOT NULL AND v_old_value_param IS NULL) THEN
-					EXECUTE 'INSERT INTO man_arc_'||lower(v_customfeature)||' (arc_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')
-					    ON CONFLICT (arc_id)
-					    DO UPDATE SET '||v_addfields.param_name||'=$2::'||v_addfields.datatype_id||' WHERE man_arc_'||lower(v_customfeature)||'.arc_id=$1'
-						USING NEW.arc_id, v_new_value_param;
+				v_childtable_name := 'man_arc_' || lower(v_customfeature);
+				IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
+					IF (v_new_value_param IS NOT NULL AND v_old_value_param!=v_new_value_param) OR (v_new_value_param IS NOT NULL AND v_old_value_param IS NULL) THEN
+						EXECUTE 'INSERT INTO '||v_childtable_name||' (arc_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')
+							ON CONFLICT (arc_id)
+							DO UPDATE SET '||v_addfields.param_name||'=$2::'||v_addfields.datatype_id||' WHERE '||v_childtable_name||'.arc_id=$1'
+							USING NEW.arc_id, v_new_value_param;
 
-				ELSIF v_new_value_param IS NULL AND v_old_value_param IS NOT NULL THEN
-					EXECUTE 'UPDATE man_arc_'||lower(v_customfeature)||' SET '||v_addfields.param_name||' = null WHERE man_arc_'||lower(v_customfeature)||'.arc_id=$1'
-					    USING NEW.arc_id;
+					ELSIF v_new_value_param IS NULL AND v_old_value_param IS NOT NULL THEN
+						EXECUTE 'UPDATE '||v_childtable_name||' SET '||v_addfields.param_name||' = null WHERE '||v_childtable_name||'.arc_id=$1'
+							USING NEW.arc_id;
+					END IF;
 				END IF;
 			END LOOP;
 		END IF;
@@ -653,30 +660,33 @@ BEGIN
 
 		RETURN NEW;
 
-	ELSIF TG_OP = 'DELETE' THEN 
-		
+	ELSIF TG_OP = 'DELETE' THEN
+
 		EXECUTE 'SELECT gw_fct_getcheckdelete($${"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"id":"'||OLD.arc_id||'","featureType":"ARC"}, "data":{}}$$)';
 
 		-- force plan_psector_force_delete
 		SELECT value INTO v_force_delete FROM config_param_user WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
 		UPDATE config_param_user SET value = 'true' WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
- 
+
 		DELETE FROM arc WHERE arc_id = OLD.arc_id;
 
 		-- restore plan_psector_force_delete
 		UPDATE config_param_user SET value = v_force_delete WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
-        
+
 		-- Delete childtable addfields (after or before deletion of node, doesn't matter)
-	
+
 		v_customfeature = old.arc_type;
 		v_arc_id = old.arc_id;
-      
-	   EXECUTE 'DELETE FROM man_arc_'||lower(v_customfeature)||' WHERE arc_id = '||quote_literal(v_arc_id)||'';
+
+		v_childtable_name := 'man_arc_' || lower(v_customfeature);
+		IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
+	   		EXECUTE 'DELETE FROM '||v_childtable_name||' WHERE arc_id = '||quote_literal(v_arc_id)||'';
+		END IF;
 
   	-- delete from arc_add table
 		DELETE FROM arc_add WHERE arc_id = OLD.arc_id;
-		
+
 		RETURN NULL;
 	END IF;
 
@@ -684,4 +694,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-      

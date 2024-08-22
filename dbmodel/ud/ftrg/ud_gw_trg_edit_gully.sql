@@ -69,6 +69,7 @@ v_seq_name text;
 v_seq_code text;
 v_code_prefix text;
 v_gully_id text;
+v_childtable_name text;
 
 BEGIN
 
@@ -643,9 +644,12 @@ BEGIN
 					USING NEW
 					INTO v_new_value_param;
 
-				IF v_new_value_param IS NOT NULL THEN
-					EXECUTE 'INSERT INTO man_gully_'||lower(v_customfeature)||' (gully_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')'
-						USING NEW.gully_id, v_new_value_param;
+				v_childtable_name := 'man_gully_' || lower(v_customfeature);
+				IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
+					IF v_new_value_param IS NOT NULL THEN
+						EXECUTE 'INSERT INTO '||v_childtable_name||' (gully_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')'
+							USING NEW.gully_id, v_new_value_param;
+					END IF;
 				END IF;
 			END LOOP;
 		END IF;
@@ -942,15 +946,20 @@ BEGIN
 					USING OLD
 					INTO v_old_value_param;
 
-				IF (v_new_value_param IS NOT NULL AND v_old_value_param!=v_new_value_param) OR (v_new_value_param IS NOT NULL AND v_old_value_param IS NULL) THEN
-					EXECUTE 'INSERT INTO man_gully_'||lower(v_customfeature)||' (gully_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')
-					    ON CONFLICT (gully_id)
-					    DO UPDATE SET '||v_addfields.param_name||'=$2::'||v_addfields.datatype_id||' WHERE man_gully_'||lower(v_customfeature)||'.gully_id=$1'
-						USING NEW.gully_id, v_new_value_param;
 
-				ELSIF v_new_value_param IS NULL AND v_old_value_param IS NOT NULL THEN
-					EXECUTE 'UPDATE man_gully_'||lower(v_customfeature)||' SET '||v_addfields.param_name||' = null WHERE man_gully_'||lower(v_customfeature)||'.gully_id=$1'
-					    USING NEW.gully_id;
+
+				v_childtable_name := 'man_gully_' || lower(v_customfeature);
+				IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
+					IF (v_new_value_param IS NOT NULL AND v_old_value_param!=v_new_value_param) OR (v_new_value_param IS NOT NULL AND v_old_value_param IS NULL) THEN
+						EXECUTE 'INSERT INTO '||v_childtable_name||' (gully_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')
+							ON CONFLICT (gully_id)
+							DO UPDATE SET '||v_addfields.param_name||'=$2::'||v_addfields.datatype_id||' WHERE '||v_childtable_name||'.gully_id=$1'
+							USING NEW.gully_id, v_new_value_param;
+
+					ELSIF v_new_value_param IS NULL AND v_old_value_param IS NOT NULL THEN
+						EXECUTE 'UPDATE '||v_childtable_name||' SET '||v_addfields.param_name||' = null WHERE '||v_childtable_name||'.gully_id=$1'
+							USING NEW.gully_id;
+					END IF;
 				END IF;
 			END LOOP;
 		END IF;
@@ -978,8 +987,11 @@ BEGIN
 		-- Delete childtable addfields (after or before deletion of gully, doesn't matter)
        	v_customfeature = old.gully_type;
 		v_gully_id = old.gully_id;
-      
-	   	EXECUTE 'DELETE FROM man_gully_'||lower(v_customfeature)||' WHERE gully_id = '||quote_literal(v_gully_id)||'';
+
+		v_childtable_name := 'man_gully_' || lower(v_customfeature);
+		IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
+	   		EXECUTE 'DELETE FROM '||v_childtable_name||' WHERE gully_id = '||quote_literal(v_gully_id)||'';
+		END IF;
 
 		-- delete links
 		FOR v_record_link IN SELECT * FROM link WHERE feature_type='GULLY' AND feature_id=OLD.gully_id
