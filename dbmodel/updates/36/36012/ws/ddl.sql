@@ -377,3 +377,37 @@ DROP VIEW IF EXISTS vi_parent_hydrometer;
 DROP VIEW IF EXISTS v_edit_field_valve;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_shortpipe", "column":"custom_dint", "dataType":"integer"}}$$);
+
+
+do $$ 
+declare
+    v_utils boolean; 
+begin
+     SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+	 
+	 if v_utils is true then
+	 
+		-- create fk 
+		ALTER TABLE SCHEMA_NAME.minsector ADD CONSTRAINT minsectormuni_id_fkey FOREIGN KEY (muni_id) 
+		REFERENCES utils.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+		
+		ALTER TABLE SCHEMA_NAME.pond ADD CONSTRAINT pond_muni_id_fkey FOREIGN KEY (muni_id) 
+		REFERENCES utils.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+	 
+	 	ALTER TABLE SCHEMA_NAME.pool ADD CONSTRAINT pool_muni_id_fkey FOREIGN KEY (muni_id) 
+		REFERENCES utils.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+		
+     else
+	 
+		-- create fk 
+		ALTER TABLE SCHEMA_NAME.minsector ADD CONSTRAINT minsectormuni_id_fkey FOREIGN KEY (muni_id) 
+		REFERENCES SCHEMA_NAME.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+		
+		ALTER TABLE SCHEMA_NAME.pond ADD CONSTRAINT pond_muni_id_fkey FOREIGN KEY (muni_id) 
+		REFERENCES SCHEMA_NAME.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+	 
+	 	ALTER TABLE SCHEMA_NAME.pool ADD CONSTRAINT pool_muni_id_fkey FOREIGN KEY (muni_id) 
+		REFERENCES SCHEMA_NAME.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+				
+	 end if;
+end; $$;

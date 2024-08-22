@@ -102,7 +102,47 @@ CREATE TABLE cat_style (
 	active bool DEFAULT true NULL,
 	CONSTRAINT cat_style_pkey PRIMARY KEY (id));
 
-
-ALTER TABLE link ADD CONSTRAINT link_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality (muni_id) 
-MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-
+do $$ 
+declare
+    v_utils boolean; 
+begin
+     SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+	 
+	 if v_utils is true then
+	 
+		-- create fk 
+		ALTER TABLE SCHEMA_NAME.link ADD CONSTRAINT link_muni_id_fkey FOREIGN KEY (muni_id) 
+		REFERENCES utils.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+		
+		ALTER TABLE SCHEMA_NAME.samplepoint ADD CONSTRAINT samplepoint_muni_id_fkey FOREIGN KEY (muni_id) 
+		REFERENCES utils.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+	 
+	 	ALTER TABLE SCHEMA_NAME.element ADD CONSTRAINT element_muni_id_fkey FOREIGN KEY (muni_id) 
+		REFERENCES utils.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+	
+		ALTER TABLE SCHEMA_NAME.om_visit ADD CONSTRAINT om_visit_muni_id_fkey FOREIGN KEY (muni_id) 
+		REFERENCES utils.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+	
+		ALTER TABLE SCHEMA_NAME.dimensions ADD CONSTRAINT dimensions_muni_id_fkey FOREIGN KEY (muni_id) 
+		REFERENCES utils.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+	
+     else
+	 
+		-- create fk 
+		ALTER TABLE SCHEMA_NAME.link ADD CONSTRAINT link_muni_id_fkey FOREIGN KEY (muni_id) 
+		REFERENCES SCHEMA_NAME.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+		
+		ALTER TABLE SCHEMA_NAME.samplepoint ADD CONSTRAINT samplepoint_muni_id_fkey FOREIGN KEY (muni_id) 
+		REFERENCES SCHEMA_NAME.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+	 
+	 	ALTER TABLE SCHEMA_NAME.element ADD CONSTRAINT element_muni_id_fkey FOREIGN KEY (muni_id) 
+		REFERENCES SCHEMA_NAME.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+	
+		ALTER TABLE SCHEMA_NAME.om_visit ADD CONSTRAINT om_visit_muni_id_fkey FOREIGN KEY (muni_id) 
+		REFERENCES SCHEMA_NAME.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+	
+		ALTER TABLE SCHEMA_NAME.dimensions ADD CONSTRAINT dimensions_muni_id_fkey FOREIGN KEY (muni_id) 
+		REFERENCES SCHEMA_NAME.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+				
+	 end if;
+end; $$;
