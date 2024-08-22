@@ -2400,7 +2400,7 @@ class GwPsector:
 
     def _open_arc_replace_form(self, point):
 
-        self.dlg_replace_arc = GwReplaceArc()
+        self.dlg_replace_arc = GwReplaceArc(self)
         tools_gw.load_settings(self.dlg_replace_arc)
 
         event_point = self.snapper_manager.get_event_point(point=point)
