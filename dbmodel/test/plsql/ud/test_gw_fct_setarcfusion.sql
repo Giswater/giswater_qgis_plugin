@@ -10,11 +10,17 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+-- Plan for 1 test
 SELECT plan(1);
-SELECT ok(1=1, 'One equals one');
 
--- TODO
--- gw_fct_setarcdivide
+-- Extract and test the "status" field from the function's JSON response
+SELECT is (
+    (gw_fct_setarcfusion($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"id":["82"]}, "data":{"filterFields":{}, "pageInfo":{}, "enddate":"2024-08-22",
+    "workcatId":"work1", "action_mode": 0}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_setcatalog returns status "Accepted"'
+);
 
 -- Finish the test
 SELECT finish();

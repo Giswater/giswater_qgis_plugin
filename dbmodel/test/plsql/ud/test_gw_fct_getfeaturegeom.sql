@@ -15,10 +15,10 @@ SELECT plan(1);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
-    (gw_fct_setarcfusion($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"id":["113852"]}, "data":{"filterFields":{},
-    "pageInfo":{}, "enddate":"2024-08-22", "workcatId":"work1", "action_mode": 0}}$$)::JSON)->>'status',
+    (gw_fct_getfeaturegeom($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "feature_type": "arc", "ids": "[20608, 157]"}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_setcatalog returns status "Accepted"'
+    'Check if gw_fct_getfeaturegeom returns status "Accepted"'
 );
 
 -- Finish the test
