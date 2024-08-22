@@ -331,7 +331,7 @@ BEGIN
 		END IF;
 	END IF;
 
-	SELECT count(the_geom) INTO v_count_2 FROM v_edit_arc LIMIT 1;
+	SELECT count(the_geom) INTO v_count_2 FROM v_edit_node LIMIT 1;
 	/*set expl as vdefault if only one value on selector. In spite expl_vdefault is a hidden value, user can enable this variable if he needs it when working on more than
 	one exploitation in order to choose what is the default (remember default value has priority over spatial intersection)*/
 	
@@ -440,7 +440,7 @@ BEGIN
 		SELECT row_to_json (a)
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM v_edit_arc) b) a;
+		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM v_edit_node) b) a;
 
 	ELSIF v_tabname='tab_exploitation' THEN
 		SELECT row_to_json (a)
