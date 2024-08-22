@@ -29,7 +29,7 @@ UPDATE node SET the_geom = ST_GeomFromText('POINT(419189.81153329264 4576779.512
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
     (gw_fct_setarcdivide($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"id":["114474"]}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    "feature":{"id":["-903"]}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_setarcdivide returns status "Accepted"'
 );
