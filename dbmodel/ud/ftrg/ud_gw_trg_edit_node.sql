@@ -672,7 +672,7 @@ BEGIN
 
 		ELSIF v_man_table='man_netelement' THEN
 
-			INSERT INTO man_netelement (node_id, serial_number) VALUES(NEW.node_id, NEW.serial_number);
+			INSERT INTO man_netelement (node_id) VALUES(NEW.node_id);
 
 		ELSIF v_man_table='parent' THEN
 
@@ -949,7 +949,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_netelement' THEN
-			UPDATE man_netelement SET serial_number=NEW.serial_number
+			UPDATE man_netelement SET node_id=NEW.node_id
 			WHERE node_id=OLD.node_id;
 		END IF;
 

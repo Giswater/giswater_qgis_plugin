@@ -606,8 +606,8 @@ BEGIN
 			INSERT INTO man_register (node_id) VALUES (NEW.node_id);
 
 		ELSIF v_man_table='man_netwjoin' THEN
-			INSERT INTO man_netwjoin (node_id, top_floor,  cat_valve, customer_code)
-			VALUES(NEW.node_id, NEW.top_floor, NEW.cat_valve, NEW.customer_code);
+			INSERT INTO man_netwjoin (node_id, top_floor, customer_code)
+			VALUES(NEW.node_id, NEW.top_floor, NEW.customer_code);
 
 		ELSIF v_man_table='man_expansiontank' THEN
 			INSERT INTO man_expansiontank (node_id) VALUES(NEW.node_id);
@@ -616,8 +616,8 @@ BEGIN
 			INSERT INTO man_flexunion (node_id) VALUES(NEW.node_id);
 
 		ELSIF v_man_table='man_netelement' THEN
-			INSERT INTO man_netelement (node_id, serial_number)
-			VALUES(NEW.node_id, NEW.serial_number);
+			INSERT INTO man_netelement (node_id)
+			VALUES(NEW.node_id);
 
 		ELSIF v_man_table='man_netsamplepoint' THEN
 			INSERT INTO man_netsamplepoint (node_id, lab_code)
@@ -995,7 +995,7 @@ BEGIN
 
 		ELSIF v_man_table ='man_netwjoin' THEN
 			UPDATE man_netwjoin
-			SET top_floor= NEW.top_floor, cat_valve=NEW.cat_valve, customer_code=NEW.customer_code
+			SET top_floor= NEW.top_floor, customer_code=NEW.customer_code
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_expansiontank' THEN
@@ -1007,7 +1007,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_netelement' THEN
-			UPDATE man_netelement SET serial_number=NEW.serial_number
+			UPDATE man_netelement SET node_id=NEW.node_id
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_netsamplepoint' THEN
