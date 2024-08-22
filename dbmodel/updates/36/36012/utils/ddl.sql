@@ -75,20 +75,33 @@ CREATE INDEX dimensions_sector ON dimensions USING btree (sector_id);
 CREATE INDEX config_param_user_value ON config_param_user USING btree (value);
 CREATE INDEX config_param_user_cur_user ON config_param_user USING btree (cur_user);
 
+ALTER TABLE sys_table DROP CONSTRAINT sys_table_style_id_fkey;
+
 ALTER TABLE sys_style RENAME TO _sys_style_;
+ALTER TABLE "_sys_style_" DROP CONSTRAINT sys_style_pkey;
 
 CREATE TABLE sys_style (
   id integer NOT NULL,
   idval text,
-  context text,
+  stylecat_id integer,
   styletype character varying(30),
   stylevalue text,
   active boolean DEFAULT true,
-  CONSTRAINT sys_style_pkey_2 PRIMARY KEY (id));
+  CONSTRAINT sys_style_pkey PRIMARY KEY (id));
 
 ALTER TABLE sys_style ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.sys_style_id_seq'::regclass);
 
 INSERT INTO sys_style SELECT id, idval, NULL, styletype, stylevalue, active FROM _sys_style_;
+
+CREATE TABLE cat_style (
+	id integer NOT NULL,
+	idval text NOT NULL,
+	descript text NULL, 
+	sys_role varchar(30) NULL,
+	addparam json NULL,
+	active bool DEFAULT true NULL,
+	CONSTRAINT cat_style_pkey PRIMARY KEY (id));
+
 
 ALTER TABLE link ADD CONSTRAINT link_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality (muni_id) 
 MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;

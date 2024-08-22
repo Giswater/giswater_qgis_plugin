@@ -226,3 +226,10 @@ INSERT INTO config_function (id, function_name, "style", layermanager, actions) 
 
 INSERT INTO sys_function (id,function_name,project_type,function_type,input_params,return_type,descript,sys_role,"source")
 	VALUES (3310,'gw_fct_getinpdata','utils','function','json','json','The function retrieves GeoJSON data for nodes and arcs based on selected result IDs and returns it in a structured JSON format.','role_epa','core');
+
+INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) 
+VALUES('selector_muni', 'Selector of municipalities', 'role_basic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL);
+
+INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) 
+VALUES('cat_style', 'Catalog of different style context', 'role_basic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL);
+
