@@ -96,53 +96,56 @@ INSERT INTO sys_style SELECT id, idval, NULL, styletype, stylevalue, active FROM
 CREATE TABLE cat_style (
 	id integer NOT NULL,
 	idval text NOT NULL,
-	descript text NULL, 
+	descript text NULL,
 	sys_role varchar(30) NULL,
 	addparam json NULL,
 	active bool DEFAULT true NULL,
 	CONSTRAINT cat_style_pkey PRIMARY KEY (id));
 
-do $$ 
+do $$
 declare
-    v_utils boolean; 
+    v_utils boolean;
 begin
      SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
-	 
+
 	 if v_utils is true then
-	 
-		-- create fk 
-		ALTER TABLE SCHEMA_NAME.link ADD CONSTRAINT link_muni_id_fkey FOREIGN KEY (muni_id) 
+
+		-- create fk
+		ALTER TABLE SCHEMA_NAME.link ADD CONSTRAINT link_muni_id_fkey FOREIGN KEY (muni_id)
 		REFERENCES utils.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-		
-		ALTER TABLE SCHEMA_NAME.samplepoint ADD CONSTRAINT samplepoint_muni_id_fkey FOREIGN KEY (muni_id) 
+
+		ALTER TABLE SCHEMA_NAME.samplepoint ADD CONSTRAINT samplepoint_muni_id_fkey FOREIGN KEY (muni_id)
 		REFERENCES utils.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-	 
-	 	ALTER TABLE SCHEMA_NAME.element ADD CONSTRAINT element_muni_id_fkey FOREIGN KEY (muni_id) 
+
+	 	ALTER TABLE SCHEMA_NAME.element ADD CONSTRAINT element_muni_id_fkey FOREIGN KEY (muni_id)
 		REFERENCES utils.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-	
-		ALTER TABLE SCHEMA_NAME.om_visit ADD CONSTRAINT om_visit_muni_id_fkey FOREIGN KEY (muni_id) 
+
+		ALTER TABLE SCHEMA_NAME.om_visit ADD CONSTRAINT om_visit_muni_id_fkey FOREIGN KEY (muni_id)
 		REFERENCES utils.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-	
-		ALTER TABLE SCHEMA_NAME.dimensions ADD CONSTRAINT dimensions_muni_id_fkey FOREIGN KEY (muni_id) 
+
+		ALTER TABLE SCHEMA_NAME.dimensions ADD CONSTRAINT dimensions_muni_id_fkey FOREIGN KEY (muni_id)
 		REFERENCES utils.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-	
+
      else
-	 
-		-- create fk 
-		ALTER TABLE SCHEMA_NAME.link ADD CONSTRAINT link_muni_id_fkey FOREIGN KEY (muni_id) 
+
+		-- create fk
+		ALTER TABLE SCHEMA_NAME.link ADD CONSTRAINT link_muni_id_fkey FOREIGN KEY (muni_id)
 		REFERENCES SCHEMA_NAME.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-		
-		ALTER TABLE SCHEMA_NAME.samplepoint ADD CONSTRAINT samplepoint_muni_id_fkey FOREIGN KEY (muni_id) 
+
+		ALTER TABLE SCHEMA_NAME.samplepoint ADD CONSTRAINT samplepoint_muni_id_fkey FOREIGN KEY (muni_id)
 		REFERENCES SCHEMA_NAME.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-	 
-	 	ALTER TABLE SCHEMA_NAME.element ADD CONSTRAINT element_muni_id_fkey FOREIGN KEY (muni_id) 
+
+	 	ALTER TABLE SCHEMA_NAME.element ADD CONSTRAINT element_muni_id_fkey FOREIGN KEY (muni_id)
 		REFERENCES SCHEMA_NAME.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-	
-		ALTER TABLE SCHEMA_NAME.om_visit ADD CONSTRAINT om_visit_muni_id_fkey FOREIGN KEY (muni_id) 
+
+		ALTER TABLE SCHEMA_NAME.om_visit ADD CONSTRAINT om_visit_muni_id_fkey FOREIGN KEY (muni_id)
 		REFERENCES SCHEMA_NAME.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-	
-		ALTER TABLE SCHEMA_NAME.dimensions ADD CONSTRAINT dimensions_muni_id_fkey FOREIGN KEY (muni_id) 
+
+		ALTER TABLE SCHEMA_NAME.dimensions ADD CONSTRAINT dimensions_muni_id_fkey FOREIGN KEY (muni_id)
 		REFERENCES SCHEMA_NAME.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-				
+
 	 end if;
 end; $$;
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_table", "column":"style_id"}}$$);
