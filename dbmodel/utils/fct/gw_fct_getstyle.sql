@@ -13,13 +13,18 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getstyle(p_data json)
 $BODY$
 
 /*
- SELECT SCHEMA_NAME.gw_fct_getstyle($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},  "style_id":"106"}}$$);
+    SELECT SCHEMA_NAME.gw_fct_getstyle($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+        "data":{"filterFields":{}, "pageInfo":{}, "style_id": "106"}}$$);
+
+    SELECT SCHEMA_NAME.gw_fct_getstyle($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+        "data":{"filterFields":{}, "pageInfo":{}, "layername": "v_edit_node"}}$$);
 */
- 
+
 DECLARE
 v_return json;
 v_style_id text;
-v_style text;
+v_layername text;
+v_styles json;
 v_version json;
 v_error_context text;
 
@@ -27,25 +32,46 @@ v_error_context text;
 
 BEGIN
 
-	-- Search path
-	SET search_path = 'SCHEMA_NAME', public;
+    -- Search path
+    SET search_path = 'SCHEMA_NAME', public;
 
-	
-	v_style_id = ((p_data ->>'data')::json->>'style_id')::json;
-	v_style = (SELECT stylevalue FROM sys_style where id::text = v_style_id::text and active IS TRUE);
-	v_return = gw_fct_json_object_set_key((p_data->>'body')::json, 'style', v_style);
+    -- Get input variables
+    v_style_id = (p_data -> 'data' ->> 'style_id')::text;
+    v_layername = (p_data -> 'data' ->> 'layername')::text;
 
-	v_version := COALESCE(v_version, '{}');
-	v_return := COALESCE(v_return, '{}');
-	 
-	-- Return
-		RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Executed successfully"}, "version":"'||v_version||'"'||
-             ',"body":{"form":{}'||
-		     ',"data":{}'||
-		     ',"styles":'||v_return||''||
-	    '}}')::json;
+    IF v_style_id IS NOT NULL THEN
+        -- If style_id is provided, get the style directly
+        v_styles := jsonb_object_agg(stylecat_id::text, stylevalue) FROM (
+            SELECT stylecat_id, stylevalue
+            FROM sys_style
+            WHERE id::text = v_style_id::text AND active IS TRUE
+        ) sub;
+    ELSIF v_layername IS NOT NULL THEN
+        -- If layername is provided, get all styles for that layer
+        v_styles := jsonb_object_agg(idval::text, stylevalue) FROM (
+            SELECT c.idval, stylevalue
+            FROM sys_style s
+            JOIN cat_style c ON s.stylecat_id = c.id
+            WHERE s.idval = v_layername AND s.active IS TRUE
+        ) sub;
+    ELSE
+        -- If neither style_id nor layername is provided, return an empty JSON object
+        v_styles := '{}'::jsonb;
+    END IF;
 
-	-- Exception handling
+    -- Ensure version and return JSON are initialized
+    v_version := COALESCE(v_version, '{}');
+    v_styles := COALESCE(v_styles, '{}');
+
+    -- Return the final JSON structure
+    v_return = ('{"status":"Accepted", "message":{"level":1, "text":"Executed successfully"}, "version":"'||v_version||'"'||
+        ',"body":{"form":{}'||
+        ',"data":{}'||
+        ',"styles":'||v_styles||''||
+    '}}')::json;
+    RETURN v_return;
+
+    -- Exception handling
     EXCEPTION WHEN OTHERS THEN
     GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
     RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
