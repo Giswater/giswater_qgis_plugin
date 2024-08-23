@@ -613,7 +613,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         :param group: Name of the group that will be created in the toc (String)
         :param style_id: Id of the style we want to load (integer or String)
     """
-    style_id_epa = "-1"
+
     tablename_og = tablename
     schema_name = tools_db.dao_db_credentials['schema'].replace('"', '')
     field_id = field_id.replace(" ", "")
@@ -622,7 +622,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     if the_geom:
         try:
             uri.setSrid(f"{lib_vars.data_epsg}")
-        except:
+        except Exception:
             pass
     create_groups = get_config_parser("system", "force_create_qgis_group_layer", "user", "init", prefix=False)
     create_groups = tools_os.set_boolean(create_groups, default=False)
@@ -636,43 +636,22 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
                      f"user={tools_db.dao_db_credentials['user']} password={tools_db.dao_db_credentials['password']} " \
                      f"port={tools_db.dao_db_credentials['port']} mode=2 schema={tools_db.dao_db_credentials['schema']} " \
                      f"column={the_geom} table={tablename}"
-        if alias: tablename = alias
+        if alias:
+            tablename = alias
         layer = QgsRasterLayer(connString, tablename)
         tools_qgis.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups)
 
     else:
-        if alias: tablename = alias
+        if alias:
+            tablename = alias
         layer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
         tools_qgis.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups, sub_sub_group=sub_sub_group)
 
-        # The triggered function (action.triggered.connect(partial(...)) as the last parameter sends a boolean,
-        # if we define style_id = None, style_id will take the boolean of the triggered action as a fault,
-        # therefore, we define it with "-1"
+        # Apply styles to layer
         if style_id in (None, "-1"):
-            # Get style_id from tablename
-            sql = f"SELECT id FROM sys_style WHERE idval = '{tablename_og}'"
-            row = tools_db.get_row(sql)
-            if row:
-                style_id = row[0]
-
-            # Get style_id for Gw Epa Style
-            sql = f"SELECT id FROM sys_style WHERE idval = '{tablename_og} SWMM point of view'"
-            row = tools_db.get_row(sql)
-            if row:
-                style_id_epa = row[0]
-            else:
-                sql = f"SELECT id FROM sys_style WHERE idval = '{tablename_og} EPANET point of view'"
-                row = tools_db.get_row(sql)
-                if row:
-                    style_id_epa = row[0]
-
-        # Apply style to layer if it has one configured
-        if style_id not in (None, "-1"):
+            set_layer_styles(tablename_og, layer)
+        elif style_id is not None:
             set_layer_style(style_id, layer)
-
-        # Apply Gw EPA style to layer if it has one configured
-        if style_id_epa not in (None, "-1"):
-            set_layer_style(style_id_epa, layer, True)
 
         if tablename:
             # Set layer config
@@ -723,14 +702,16 @@ def validate_qml(qml_content):
         return False, str(e)
 
 
-def set_layer_style(style_id, layer, is_epa=False):
-    body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
-    style = execute_procedure('gw_fct_getstyle', body)
-    if style is None or style['status'] == 'Failed':
+def set_layer_styles(tablename, layer):
+    body = f'$${{"data":{{"layername":"{tablename}"}}}}$$'
+    json_return = execute_procedure('gw_fct_getstyle', body)
+    if json_return is None or json_return['status'] == 'Failed':
         return
-    if 'styles' in style['body']:
-        if 'style' in style['body']['styles']:
-            qml = style['body']['styles']['style']
+    if 'styles' in json_return['body']:
+        for style_name, qml in json_return['body']['styles'].items():
+
+            if qml is None:
+                continue
 
             valid_qml, error_message = validate_qml(qml)
             if not valid_qml:
@@ -743,14 +724,40 @@ def set_layer_style(style_id, layer, is_epa=False):
                 style = QgsMapLayerStyle()
                 style.readFromLayer(layer)
 
-                style_name = "GwEpaStyle" if is_epa else "GwStyle"
                 # add style with new name
                 style_manager.addStyle(style_name, style)
                 # set new style as current
                 style_manager.setCurrentStyle(style_name)
 
                 tools_qgis.create_qml(layer, qml)
-                style_manager.setCurrentStyle("GwStyle")
+                style_manager.setCurrentStyle("BASIC")
+
+
+def set_layer_style(style_id, layer):
+    body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
+    json_return = execute_procedure('gw_fct_getstyle', body)
+    if json_return is None or json_return['status'] == 'Failed':
+        return
+    if 'styles' in json_return['body']:
+        for style_name, qml in json_return['body']['styles']:
+
+            if qml is None:
+                continue
+
+            valid_qml, error_message = validate_qml(qml)
+            if not valid_qml:
+                msg = "The QML file is invalid."
+                tools_qgis.show_warning(msg, parameter=error_message)
+            else:
+                style_manager = layer.styleManager()
+
+                if not style_manager.setCurrentStyle(style_name):
+                    style = QgsMapLayerStyle()
+                    style.readFromLayer(layer)
+                    style_manager.addStyle(style_name, style)
+                    style_manager.setCurrentStyle(style_name)
+                    tools_qgis.create_qml(layer, qml)
+
 
 def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
                    group='GW Temporal Layers', call_set_tabs_enabled=True, close=True):
