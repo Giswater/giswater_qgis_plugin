@@ -1825,7 +1825,8 @@ class GwInfo(QObject):
                         _json.pop(k, None)
 
                 epa_type = tools_qt.get_text(dialog, 'tab_data_epa_type')
-                _json['epa_type'] = epa_type
+                if epa_type != 'null':
+                    _json['epa_type'] = epa_type
 
                 if not self.layer_new_feature.isEditable():
                     self.layer_new_feature.startEditing()
