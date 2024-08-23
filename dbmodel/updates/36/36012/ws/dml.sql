@@ -339,3 +339,9 @@ UPDATE config_form_fields SET layoutorder=9 WHERE formname='v_edit_dma' AND form
 UPDATE config_form_fields SET layoutorder=10 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='minc' AND tabname='tab_none';
 UPDATE config_form_fields SET layoutorder=11 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='maxc' AND tabname='tab_none';
 UPDATE config_form_fields SET layoutorder=12 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='effc' AND tabname='tab_none';
+
+UPDATE config_form_fields SET web_layoutorder=1 WHERE formname='mincut' AND formtype='form_mincut' AND columnname='btn_valve_status' AND tabname='tab_mincut';
+UPDATE config_form_fields SET web_layoutorder=2 WHERE formname='mincut' AND formtype='form_mincut' AND columnname='btn_refresh_mincut' AND tabname='tab_mincut';
+UPDATE config_form_fields SET web_layoutorder=0 WHERE formname='mincut' AND formtype='form_mincut' AND columnname='btn_custom_mincut' AND tabname='tab_mincut';
+UPDATE config_form_fields SET web_layoutorder=NULL WHERE formname='mincut' AND formtype='form_mincut' AND columnname='btn_mincut' AND tabname='tab_mincut';
+
