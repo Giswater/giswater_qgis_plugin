@@ -298,3 +298,15 @@ VALUES ('v_edit_inp_pipe', 'form_feature', 'tab_none', 'cat_dint', 'lyt_data_1',
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden)
 VALUES ('v_edit_inp_pipe', 'form_feature', 'tab_none', 'cat_roughness', 'lyt_data_1', 17, 'string', 'text', 'cat_roughness', 'cat_roughness', false, false, false, false, NULL, false);
 
+-- 23/08/2024
+UPDATE config_form_fields SET layoutorder=1 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='presszone_id' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=2 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=3 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='name' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=4 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=5 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='graphconfig' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=6 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='head' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=7 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='stylesheet' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=8 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='active' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=9 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='descript' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=10 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='expl_id2' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=11 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='presszone_type' AND tabname='tab_data';
