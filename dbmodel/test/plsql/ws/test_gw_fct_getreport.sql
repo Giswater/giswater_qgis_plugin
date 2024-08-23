@@ -10,16 +10,23 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- Plan for 1 test
-SELECT plan(1);
+-- Plan for 2 test
+SELECT plan(2);
 
 -- Extract and test the "status" field from the function's JSON response
+SELECT is (
+    (gw_fct_getreport($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
+    "data":{"filterFields":{}, "pageInfo":{}, "filterText":null, "listId":"101"}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_getreport returns status "Accepted"'
+);
+
 SELECT is (
     (gw_fct_getreport($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
     "data":{"filterFields":{}, "pageInfo":{}, "filter":[{"filterName": "Exploitation", "filterValue": "", "filterSign": "="}],
     "listId":"101"}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getreport returns status "Accepted"'
+    'Check if gw_fct_getreport with "filter" returns status "Accepted"'
 );
 
 -- Finish the test

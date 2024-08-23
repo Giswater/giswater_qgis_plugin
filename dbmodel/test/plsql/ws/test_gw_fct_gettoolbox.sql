@@ -23,7 +23,7 @@ SELECT is (
 
 SELECT is (
     (gw_fct_gettoolbox($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "filterText":"c"}}$$)::JSON)->>'status',
+    "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "filterText":"a"}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_gettoolbox with filterText returns status "Accepted"'
 );

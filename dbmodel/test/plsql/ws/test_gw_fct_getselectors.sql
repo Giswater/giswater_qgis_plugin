@@ -10,29 +10,36 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- Plan for 3 test
-SELECT plan(3);
+-- Plan for 4 test
+SELECT plan(4);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
     (gw_fct_getselectors($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{"currentTab":"tab_exploitation"}, "feature":{},
     "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "filterText":"", "addSchema":"NULL"}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getselectors --> GwSelectorButton returns status "Accepted"'
+    'Check if gw_fct_getselectors --> "currentTab":"tab_exploitation" returns status "Accepted"'
 );
 
 SELECT is (
     (gw_fct_getselectors($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{},
     "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_psector", "id":1, "isAlone":"False", "disableParent":"False", "value":"True"}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getselectors --> GwPriceManagerButton returns status "Accepted"'
+    'Check if gw_fct_getselectors --> "tabName":"tab_psector" returns status "Accepted"'
 );
 
 SELECT is (
     (gw_fct_getselectors($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{"currentTab":"tab_dscenario"}, "feature":{},
     "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "filterText":"", "addSchema":"NULL"}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_getselectors --> GwGo2EpaButton returns status "Accepted"'
+    'Check if gw_fct_getselectors --> "currentTab":"tab_dscenario" returns status "Accepted"'
+);
+
+SELECT is (
+    (gw_fct_getselectors($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{"currentTab":"None"}, "feature":{},
+    "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "filterText":""}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_getselectors --> "currentTab":"None" returns status "Accepted"'
 );
 
 -- Finish the test
