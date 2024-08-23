@@ -256,11 +256,12 @@ BEGIN
 
 		-- Code
 		IF v_project_type='WS' then
-			SELECT code_autofill, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_code_prefix FROM cat_feature 
-			JOIN cat_node ON cat_feature.id=cat_node.nodetype_id WHERE cat_node.id=v_featurecat_id_new;
+			EXECUTE 'SELECT code_autofill, addparam::json->>''code_prefix'' FROM cat_feature 
+			JOIN cat_'||v_feature_type||' a ON cat_feature.id=a.'||v_feature_type||'type_id 
+			WHERE a.id='||quote_literal(v_featurecat_id_new)||';' INTO v_code_autofill_bool, v_code_prefix;
 		ELSE
-			SELECT code_autofill, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_code_prefix
-			FROM cat_feature WHERE id=v_feature_type_new;
+			EXECUTE 'SELECT code_autofill, addparam::json->>''code_prefix'' FROM cat_feature 
+			WHERE id='||quote_literal(v_feature_type_new)||';' INTO v_code_autofill_bool, v_code_prefix;
 		END IF;
 	
 		-- use specific sequence for code when its name matches featurecat_code_seq

@@ -117,6 +117,10 @@ v_arc_type text;
 v_fid integer = 212;
 v_result_id text= 'arc divide';
 
+v_seq_name text;
+v_seq_code text;
+v_code_prefix text;
+
 BEGIN
 
 	-- Search path
@@ -241,24 +245,42 @@ BEGIN
 					SELECT * INTO rec_aux1 FROM arc WHERE arc_id = v_arc_id;
 					SELECT * INTO rec_aux2 FROM arc WHERE arc_id = v_arc_id;
 
+					-- use specific sequence for code when its name matches featurecat_code_seq
+					SELECT addparam::json->>'code_prefix' INTO v_code_prefix FROM cat_feature WHERE id=v_arc_type;
+					EXECUTE 'SELECT concat('||quote_literal(lower(v_arc_type))||',''_code_seq'');' INTO v_seq_name;
+					EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||';' INTO v_sql;
+
 					-- Update values of new arc_id (1)
 					rec_aux1.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
 
-					IF v_set_old_code IS TRUE THEN
+					--code
+					IF v_sql IS NOT NULL THEN
+						EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
+							rec_aux1.code=concat(v_code_prefix,v_seq_code);
+					ELSIF v_set_old_code IS TRUE THEN
 						rec_aux1.code := v_code;
-					ELSE
+					ELSE						
 						rec_aux1.code := rec_aux1.arc_id;
 					END IF;
+
+					-- node and geom
 					rec_aux1.node_2 := v_node_id ;-- rec_aux1.node_1 take values from original arc
 					rec_aux1.the_geom := v_line1;
 
 					-- Update values of new arc_id (2)
 					rec_aux2.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
-					IF v_set_old_code IS TRUE THEN
+
+					-- code
+					IF v_sql IS NOT NULL THEN
+						EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
+							rec_aux2.code=concat(v_code_prefix,v_seq_code);
+					ELSIF v_set_old_code IS TRUE THEN
 						rec_aux2.code := v_code;
-					ELSE
-						rec_aux2.code := rec_aux2.arc_id;
+					ELSE						
+						rec_aux2.code := rec_aux1.arc_id;
 					END IF;
+
+					-- node and geom
 					rec_aux2.node_1 := v_node_id; -- rec_aux2.node_2 take values from original arc
 					rec_aux2.the_geom := v_line2;
 
