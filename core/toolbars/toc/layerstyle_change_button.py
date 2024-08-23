@@ -26,14 +26,12 @@ def get_available_contexts() -> List[str]:
     return [row[0] for row in rows] if rows else []
 
 
-def get_contexts_params() -> List[Tuple[str, str]]:
+def get_contexts_params() -> List[Tuple[int, str]]:
 
     sql = """
-    SELECT DISTINCT ON (c.id) c.id, c.idval, c.addparam
-      FROM config_typevalue c
-      JOIN sys_style s ON c.id = s.context
-     WHERE c.typevalue = 'sys_style_context'
-       AND s.context != 'TEMPLAYER'
+    SELECT id, idval, addparam
+        FROM cat_style
+    WHERE id != 0
     """
     rows = tools_db.get_rows(sql)
 
@@ -59,30 +57,29 @@ def get_contexts_params() -> List[Tuple[str, str]]:
     return [(row[0], row[1]) for row in processed_rows]
 
 
-def get_styles_for_context(context: str) -> List[Tuple[str, str]]:
+def get_styles_for_context(stylecat_id: int) -> List[Tuple[str, str]]:
     """Fetch styles from the sys_style table for a given context."""
 
-    sql = f"SELECT idval, stylevalue FROM sys_style WHERE context = '{context}'"
+    sql = f"SELECT idval, stylevalue FROM sys_style WHERE stylecat_id = {stylecat_id}"
     rows = tools_db.get_rows(sql)
     return [(row[0], row[1]) for row in rows] if rows else []
 
 
-def apply_styles_to_layers(context: str) -> None:
+def apply_styles_to_layers(stylecat_id: int, style_name: str) -> None:
     """Apply styles to layers based on the selected context."""
 
-    styles = get_styles_for_context(context)
+    styles = get_styles_for_context(stylecat_id)
     for layername, qml in styles:
         layer = tools_qgis.get_layer_by_tablename(layername)
         if layer:
             valid_qml, error_message = tools_gw.validate_qml(qml)
             if not valid_qml:
                 msg = "The QML file is invalid"
-                tools_qgis.show_warning(msg, parameter=error_message, title=context)
+                tools_qgis.show_warning(msg, parameter=error_message, title=style_name)
             else:
                 style_manager = layer.styleManager()
-                style_name = context
 
-                if style_manager is None or style_manager.currentStyle() == context:
+                if style_manager is None or style_manager.currentStyle() == style_name:
                     continue
 
                 # Set the style or add it if it doesn't exist
@@ -99,14 +96,12 @@ class GwLayerStyleChangeButton(GwAction):
 
     def __init__(self, icon_path: str, action_name: str, text: str, toolbar: QObject, action_group: QObject):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.menu: QMenu = QMenu()
-        self._populate_menu()
-        self.action.setMenu(self.menu)
-        self.action.setCheckable(False)
 
     def clicked_event(self) -> None:
         """Show the menu directly when the button is clicked."""
 
+        self.menu: QMenu = QMenu()
+        self._populate_menu()
         cursor = QCursor()
         x = cursor.pos().x()
         y = cursor.pos().y()
@@ -118,13 +113,13 @@ class GwLayerStyleChangeButton(GwAction):
 
         # contexts = get_available_contexts()
         contexts_params = get_contexts_params()
-        for context_id, context_alias in contexts_params:
-            action: QAction = QAction(context_alias, self.menu)
-            action.triggered.connect(partial(self._apply_context, context_id))
+        for stylecat_id, style_name in contexts_params:
+            action: QAction = QAction(style_name, self.menu)
+            action.triggered.connect(partial(self._apply_context, stylecat_id, style_name))
             self.menu.addAction(action)
 
-    def _apply_context(self, context: str) -> None:
+    def _apply_context(self, stylecat_id: int, style_name: str) -> None:
         """Apply styles for the selected context."""
 
-        apply_styles_to_layers(context)
-        tools_qgis.show_info(f"Applied styles for context: {context}")
+        apply_styles_to_layers(stylecat_id, style_name)
+        tools_qgis.show_info(f"Applied styles for context: {style_name}")
