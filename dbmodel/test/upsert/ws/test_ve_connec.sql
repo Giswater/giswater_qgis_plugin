@@ -14,7 +14,7 @@ SELECT plan(18);
 
 -- IMPORTANT: In this test, we check for existence using the code, not the ID,
 -- because we don't allow the user to change the code.
--- In test_node.sql, we test the `node` table and can check `node_id`,
+-- In test_connec.sql, we test the `connec` table and can check `connec_id`,
 -- but here we are testing the views.
 
 -- connec -> ve_connec_fountain

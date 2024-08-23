@@ -13,7 +13,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(12);
 -- IMPORTANT: In this test, we check for existence using the code, not the ID,
 -- because we don't allow the user to change the code.
--- In test_node.sql, we test the `node` table and can check `node_id`,
+-- In test_arc.sql, we test the `arc` table and can check `arc_id`,
 -- but here we are testing the views.
 
 -- arc -> pipe
