@@ -26,14 +26,14 @@ SELECT is (
 
 SELECT is (
     (gw_fct_setmincut($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{},
-    "pageInfo":{}, "action":"mincutAccept", "mincutClass":1, "status":"continue", "mincutId":"10", "usePsectors":"False"}}$$)::JSON)->>'status',
+    "pageInfo":{}, "action":"mincutAccept", "mincutClass":1, "status":"continue", "mincutId":"-901", "usePsectors":"False"}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_setmincut --> "status":"continue" returns status "Accepted"'
 );
 
 SELECT is (
     (gw_fct_setmincut($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{},
-    "pageInfo":{}, "action":"mincutValveUnaccess", "nodeId":1096, "mincutId":"16", "usePsectors":"False"}}$$)::JSON)->>'status',
+    "pageInfo":{}, "action":"mincutValveUnaccess", "nodeId":1096, "mincutId":"-901", "usePsectors":"False"}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_setmincut --> "action":"mincutValveUnaccess" returns status "Accepted"'
 );
