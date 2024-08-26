@@ -106,7 +106,7 @@ VALUES('-902', NULL, 'RECT_CLOSED', 4.0000, 2.0000, 0.0000, 0.0000, 0.0000, 0.00
 ON CONFLICT (id) DO UPDATE SET geom1 = EXCLUDED.geom1;
 SELECT is((SELECT geom1 FROM cat_arc WHERE id = '-902'), 4.0000, 'UPDATE: cat_arc "-902" was upserted');
 
-DELETE cat_arc WHERE id = '-902';
+DELETE FROM cat_arc WHERE id = '-902';
 SELECT is((SELECT count(*)::integer FROM cat_arc WHERE id = '-902'), 0, 'DELETE: cat_arc "-902" was deleted');
 
 -- Subtest 10: Testing cat_node operations | insert/update/delete
