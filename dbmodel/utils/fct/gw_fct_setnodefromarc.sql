@@ -83,44 +83,38 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (116, null, 4, '-------------------------------------------------------------');
 
 	-- inserting all extrem nodes on temp_node
-	INSERT INTO temp_table (fid, geom_point)
-	SELECT 	116, ST_StartPoint(the_geom) AS the_geom FROM v_edit_arc WHERE expl_id=v_expl and (state=1 or state=2)
+	INSERT INTO temp_table (fid, text_column, geom_point)
+	SELECT 	116, arc_id, ST_StartPoint(the_geom) AS the_geom FROM v_edit_arc WHERE expl_id=v_expl and (state=1 or state=2)
 	UNION 
-	SELECT 	116, ST_EndPoint(the_geom) AS the_geom FROM v_edit_arc WHERE expl_id=v_expl and (state=1 or state=2);
+	SELECT 	116, arc_id, ST_EndPoint(the_geom) AS the_geom FROM v_edit_arc WHERE expl_id=v_expl and (state=1 or state=2);
+
 		
 	-- inserting into node table
-	FOR rec_table IN SELECT * FROM temp_table WHERE cur_user=current_user AND fid = 116
-	LOOP
-	    -- Check existing nodes  
-	    numNodes:= 0;
-		numNodes:= (SELECT COUNT(*) FROM node WHERE st_dwithin(node.the_geom, rec_table.geom_point, v_buffer));
-		IF numNodes = 0 THEN
-			IF v_insertnode THEN
-				INSERT INTO v_edit_node (expl_id, workcat_id, state, state_type, builtdate, node_type, the_geom, nodecat_id) 
-				VALUES (v_expl, v_workcat, v_state, v_state_type, v_builtdate, v_nodetype_id, rec_table.geom_point, v_nodecat_id)
-				RETURNING node_id INTO v_node_id;
+	if v_insertnode then
+	
+		INSERT INTO v_edit_node (expl_id, workcat_id, state, state_type, builtdate, node_type, the_geom, nodecat_id, annotation) 
+		select distinct v_expl, v_workcat, v_state, v_state_type, v_builtdate, v_nodetype_id, t.geom_point, v_nodecat_id, 'flag_gw_nodefromarc'
+		from temp_table t, node n 
+		where t.cur_user = current_user and t.fid = 116 and not st_dwithin(t.geom_point, n.the_geom, v_buffer);
 
-				INSERT INTO anl_node (node_id, the_geom, state, fid, expl_id, nodecat_id) 
-				VALUES (v_node_id, rec_table.geom_point, v_state, 116, v_expl, v_nodecat_id);
+		INSERT INTO anl_node (node_id, the_geom, state, fid, expl_id, nodecat_id) 
+		select node_id, the_geom, state, 116, expl_id, nodecat_id 
+		from node where annotation = 'flag_gw_nodefromarc';
 
-			ELSE 
-				INSERT INTO anl_node (the_geom, state, fid, expl_id, nodecat_id) 
-				VALUES (rec_table.geom_point, v_state, 116,v_expl, v_nodecat_id);
-			END IF;
-		ELSE
+	end if;
 
-		END IF;
-	END LOOP;
-		
 	-- repair arcs
 	IF v_insertnode THEN
 	
 		-- set isarcdivide of chosed nodetype on falsea
 		SELECT isarcdivide INTO v_isarcdivide FROM cat_feature_node WHERE id=v_nodetype_id;
 		UPDATE cat_feature_node SET isarcdivide=FALSE WHERE id=v_nodetype_id;	
-		
-		EXECUTE 'SELECT array_to_json(array_agg(arc_id::text)) FROM arc WHERE expl_id='||v_expl||' AND (node_1 IS NULL OR node_2 IS NULL)'
-		INTO v_arclist;
+
+		EXECUTE 'SELECT distinct array_to_json(array_agg(arc_id::text)) 
+		FROM arc where node_1 in (select node_id from node where annotation = ''flag_gw_nodefromarc'') 
+		or node_2 in (select node_id from node where annotation = ''flag_gw_nodefromarc'')
+		' INTO v_arclist;
+
 		-- execute function
 		EXECUTE 'SELECT gw_fct_arc_repair($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":'||v_arclist||'},
 		"data":{}}$$);';
@@ -130,8 +124,10 @@ BEGIN
 		
 	END IF;	
 
+	update node set annotation = null where annotation = 'flag_gw_nodefromarc';
+
 	-- get log
-	SELECT count(*) INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=116;
+	SELECT count(*) INTO v_count FROM anl_node WHERE cur_user=current_user AND fid=116;
 
 	IF v_count=0 THEN
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
@@ -142,7 +138,7 @@ BEGIN
 
 			INSERT INTO audit_check_data(fid,  error_message, fcount)
 			SELECT 116,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count 
-			FROM anl_node WHERE cur_user="current_user"() AND fid=116;
+			FROM anl_node WHERE cur_user=current_user AND fid=116;
 	END IF;
 	
 	-- info
