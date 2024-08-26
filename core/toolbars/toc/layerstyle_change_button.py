@@ -18,20 +18,13 @@ from ...utils import tools_gw
 from ....libs import tools_qgis, tools_db
 
 
-def get_available_contexts() -> List[str]:
-    """Fetch distinct contexts from the sys_style table, excluding TEMPLAYER."""
-
-    sql = "SELECT DISTINCT context FROM sys_style WHERE context != 'TEMPLAYER'"
-    rows = tools_db.get_rows(sql)
-    return [row[0] for row in rows] if rows else []
-
-
 def get_contexts_params() -> List[Tuple[int, str]]:
 
+    # TODO: manage roles
     sql = """
     SELECT id, idval, addparam
-        FROM cat_style
-    WHERE id != 0
+        FROM config_style
+    WHERE is_templayer = false AND active = true
     """
     rows = tools_db.get_rows(sql)
 
@@ -57,18 +50,18 @@ def get_contexts_params() -> List[Tuple[int, str]]:
     return [(row[0], row[1]) for row in processed_rows]
 
 
-def get_styles_for_context(stylecat_id: int) -> List[Tuple[str, str]]:
+def get_styles_for_context(styleconfig_id: int) -> List[Tuple[str, str]]:
     """Fetch styles from the sys_style table for a given context."""
 
-    sql = f"SELECT idval, stylevalue FROM sys_style WHERE stylecat_id = {stylecat_id}"
+    sql = f"SELECT layername, stylevalue FROM sys_style WHERE styleconfig_id = {styleconfig_id}"
     rows = tools_db.get_rows(sql)
     return [(row[0], row[1]) for row in rows] if rows else []
 
 
-def apply_styles_to_layers(stylecat_id: int, style_name: str) -> None:
+def apply_styles_to_layers(styleconfig_id: int, style_name: str) -> None:
     """Apply styles to layers based on the selected context."""
 
-    styles = get_styles_for_context(stylecat_id)
+    styles = get_styles_for_context(styleconfig_id)
     for layername, qml in styles:
         layer = tools_qgis.get_layer_by_tablename(layername)
         if layer:
@@ -113,13 +106,13 @@ class GwLayerStyleChangeButton(GwAction):
 
         # contexts = get_available_contexts()
         contexts_params = get_contexts_params()
-        for stylecat_id, style_name in contexts_params:
+        for styleconfig_id, style_name in contexts_params:
             action: QAction = QAction(style_name, self.menu)
-            action.triggered.connect(partial(self._apply_context, stylecat_id, style_name))
+            action.triggered.connect(partial(self._apply_context, styleconfig_id, style_name))
             self.menu.addAction(action)
 
-    def _apply_context(self, stylecat_id: int, style_name: str) -> None:
+    def _apply_context(self, styleconfig_id: int, style_name: str) -> None:
         """Apply styles for the selected context."""
 
-        apply_styles_to_layers(stylecat_id, style_name)
+        apply_styles_to_layers(styleconfig_id, style_name)
         tools_qgis.show_info(f"Applied styles for context: {style_name}")
