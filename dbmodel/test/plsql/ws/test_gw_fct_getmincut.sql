@@ -14,12 +14,12 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(1);
 
 -- Previous inserts before test
-INSERT INTO om_mincut VALUES (-9);
+INSERT INTO om_mincut VALUES (-901);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
     (gw_fct_getmincut($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
-    "data":{"filterFields":{}, "pageInfo":{}, "mincutId":"-9"}}$$)::JSON)->>'status',
+    "data":{"filterFields":{}, "pageInfo":{}, "mincutId":"-901"}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_getmincut returns status "Accepted"'
 );

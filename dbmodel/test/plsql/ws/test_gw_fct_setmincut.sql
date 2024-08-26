@@ -11,17 +11,32 @@ SET client_min_messages TO WARNING;
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- Plan for 1 test
-SELECT plan(1);
-SELECT ok(1=1, 'One equals one');
+SELECT plan(3);
 
--- TODO
+-- Previous inserts before test
+INSERT INTO om_mincut VALUES (-901);
+
 -- Extract and test the "status" field from the function's JSON response
--- SELECT is (
---     (gw_fct_setmincut($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
---     "data":{"filterFields":{}, "pageInfo":{}, "action":"mincutNetwork", "mincutId":"-9", "arcId":"2071","usePsectors":"False"}}$$)::JSON)->>'status',
---     'Accepted',
---     'Check if gw_fct_setmincut returns status "Accepted"'
--- );
+SELECT is (
+    (gw_fct_setmincut($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{},
+    "pageInfo":{}, "action":"mincutAccept", "mincutClass":1, "status":"check", "mincutId":"-901", "usePsectors":"False"}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_setmincut --> "status":"check" returns status "Accepted"'
+);
+
+SELECT is (
+    (gw_fct_setmincut($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{},
+    "pageInfo":{}, "action":"mincutAccept", "mincutClass":1, "status":"continue", "mincutId":"10", "usePsectors":"False"}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_setmincut --> "status":"continue" returns status "Accepted"'
+);
+
+SELECT is (
+    (gw_fct_setmincut($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{},
+    "pageInfo":{}, "action":"mincutValveUnaccess", "nodeId":1096, "mincutId":"16", "usePsectors":"False"}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_setmincut --> "action":"mincutValveUnaccess" returns status "Accepted"'
+);
 
 -- Finish the test
 SELECT finish();

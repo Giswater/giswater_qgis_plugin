@@ -10,18 +10,16 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+-- Plan for 1 test
 SELECT plan(1);
-SELECT ok(1=1, 'One equals one');
 
--- TODO
--- gw_fct_pg2epa_main
--- SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"1"}}$$);
--- SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"2"}}$$);
--- SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"3"}}$$);
--- SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"4"}}$$);
--- SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"5"}}$$);
--- SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"6"}}$$);
--- SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"7"}}$$);
+-- Extract and test the "status" field from the function's JSON response
+SELECT is(
+    (gw_fct_pg2epa_main($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
+    "data":{"filterFields":{}, "pageInfo":{}, "resultId":"N", "dumpSubcatch":"False", "step": 7}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_pg2epa_main returns status "Accepted"'
+);
 
 -- Finish the test
 SELECT finish();

@@ -77,7 +77,6 @@ SELECT is (
     'Check if gw_fct_getlist --> "tableName":"v_ui_rpt_cat_result" returns status "Accepted"'
 );
 
-
 -- Finish the test
 SELECT finish();
 

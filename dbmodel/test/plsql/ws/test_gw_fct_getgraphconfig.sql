@@ -10,13 +10,20 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- Plan for 1 test
-SELECT plan(1);
+-- Plan for 2 test
+SELECT plan(2);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
     (gw_fct_getgraphconfig($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{},
     "pageInfo":{}, "context":"NETSCENARIO", "mapzone": "dma", "mapzoneId": "2", "netscenarioId": 1}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_getgraphconfig --> "context":"NETSCENARIO" returns status "Accepted"'
+);
+
+SELECT is (
+    (gw_fct_getstylemapzones($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
+    "data":{"filterFields":{}, "pageInfo":{}, "mapzones":""}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_getgraphconfig returns status "Accepted"'
 );

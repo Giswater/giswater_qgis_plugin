@@ -10,31 +10,27 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(1);
-SELECT ok(1=1, 'One equals one');
+-- Plan for 2 test
+SELECT plan(2);
 
+-- Extract and test the "status" field from the function's JSON response
+SELECT is(
+    (gw_fct_setfields($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"id":"100019", "tableName":"ve_node_jump", "featureType":"node" },
+    "data":{"filterFields":{}, "pageInfo":{}, "fields":{"nodecat_id": "JUMP-01",
+    "workcat_id": "work2"}, "reload":"", "afterInsert":"False"}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_setfields --> "tableName":"ve_node_jump" returns status "Accepted"'
+);
 
--- TODO: Add test for gw_fct_setfields
--- -- Plan for 1 test
--- SELECT plan(1);
-
--- -- Extract and test the "status" field from the function's JSON response
--- SELECT is(
---     (gw_fct_setfields($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
---     "feature":{"id":"100019", "tableName":"ve_node_jump", "featureType":"node" },
---     "data":{"filterFields":{}, "pageInfo":{}, "fields":{"nodecat_id": "JUMP-01",
---     "workcat_id": "work2"}, "reload":"", "afterInsert":"False"}}$$)::JSON)->>'status',
---     'Accepted',
---     'Check if gw_fct_setfields -> wholeSelection returns status "Accepted"'
--- );
-
--- SELECT is(
---     (gw_fct_setfields($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"id":"T10-5m-e2",
---     "tableName":"v_edit_inp_timeseries" }, "data":{"filterFields":{}, "pageInfo":{}, "fields":{"expl_id": 2, "idval": "T10-5m-e2",
---     "timser_type": "Rainfall", "times_type": "RELATIVE", "descript": "null", "fname": "null"}}}$$)::JSON)->>'status',
---     'Accepted',
---     'Check if gw_fct_setfields -> wholeSelection returns status "Accepted"'
--- );
+SELECT is (
+    (gw_fct_setfields($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"id":"T10-5m", "tableName":"v_edit_inp_timeseries" }, "data":{"filterFields":{}, "pageInfo":{},
+    "fields":{"expl_id": 1, "idval": "T10-5m", "timser_type": "Rainfall", "times_type": "RELATIVE", "descript":
+    "null", "fname": "null"}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_setfields --> "tableName":"v_edit_inp_timeseries" returns status "Accepted"'
+);
 
 -- Finish the test
 SELECT finish();
