@@ -149,35 +149,26 @@ UPDATE edit_typevalue SET id = upper(id), idval=upper(idval) WHERE typevalue IN 
 ALTER TABLE edit_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
 
 -- 17/08/2024
-INSERT INTO cat_style VALUES (0, 'TEMPLAYER', NULL, NULL, NULL, true);
-INSERT INTO cat_style VALUES (1, 'BASIC', NULL, 'role_basic', '{"orderBy":1}', true);
-INSERT INTO cat_style VALUES (2, 'EPANET', NULL, 'role_basic', '{"orderBy":2}', true);
-INSERT INTO cat_style VALUES (3, 'SECTOR', NULL, 'role_basic', '{"orderBy":3}', true);
-INSERT INTO cat_style VALUES (4, 'DMA', NULL, 'role_basic', '{"orderBy":4}', true);
-INSERT INTO cat_style VALUES (5, 'PRESSZONE', NULL, 'role_basic', '{"orderBy":5}', true);
+INSERT INTO config_style VALUES (101, 'GwBasic', NULL, 'role_basic', '{"orderBy":1}', false, true);
+INSERT INTO config_style VALUES (102, 'GwEpa', NULL, 'role_basic', '{"orderBy":2}', false, true);
+INSERT INTO config_style VALUES (103, 'GwGraphConfig', NULL, NULL, NULL, true, true);
+INSERT INTO config_style VALUES (104, 'GwInpLog', NULL, NULL, NULL, true, true);
+INSERT INTO config_style VALUES (105, 'GwMincutOverlap', NULL, NULL, NULL, true, true);
 
-UPDATE sys_style SET stylecat_id = 0 WHERE idval in ('INP result line', 'INP result point', 'Overlap affected arcs', 'Overlap affected connecs', 'Other mincuts whichs overlaps', 'Temporal-Graphconfig');
-UPDATE sys_style SET stylecat_id = 2 WHERE idval in ('v_edit_arc EPANET point of view', 'v_edit_connec EPANET point of view', 'v_edit_node EPANET point of view', 'v_edit_link EPANET point of view');
-UPDATE sys_style SET stylecat_id = 1 WHERE stylecat_id is null;
-UPDATE sys_style SET idval = replace(idval, ' EPANET point of view', '');
-DELETE FROM sys_style WHERE id IN (210,211,212,213); -- flow trace & flow exit does not make sense for ws
+UPDATE sys_style SET layername='line', styleconfig_id = 104 WHERE layername='INP result line';
+UPDATE sys_style SET layername='point', styleconfig_id = 104 WHERE layername='INP result point';
+UPDATE sys_style SET layername='line', styleconfig_id = 105 WHERE layername='Overlap affected arcs';
+UPDATE sys_style SET layername='point', styleconfig_id = 105 WHERE layername='Overlap affected connecs';
+UPDATE sys_style SET layername='point', styleconfig_id = 103 WHERE layername='Temporal-Graphconfig';
 
-SELECT setval('SCHEMA_NAME.sys_style_id_seq', 206, true);
+UPDATE sys_style SET layername='v_edit_arc', styleconfig_id = 102 WHERE layername='v_edit_arc EPANET point of view';
+UPDATE sys_style SET layername='v_edit_connec', styleconfig_id = 102 WHERE layername='v_edit_connec EPANET point of view';
+UPDATE sys_style SET layername='v_edit_node', styleconfig_id = 102 WHERE layername='v_edit_node EPANET point of view';
+UPDATE sys_style SET layername='v_edit_link', styleconfig_id = 102 WHERE layername='v_edit_link EPANET point of view';
 
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_node', 3, 'qml');
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_arc', 3, 'qml');
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_connec', 3, 'qml');
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_link', 3, 'qml');
+UPDATE sys_style SET styleconfig_id = 101 WHERE styleconfig_id is null;
 
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_node', 5, 'qml');
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_arc', 5, 'qml');
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_connec', 5, 'qml');
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_link', 5, 'qml');
-
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_node', 4, 'qml');
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_arc', 4, 'qml');
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_connec', 4, 'qml');
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_link', 4, 'qml');
+DELETE FROM sys_style WHERE layername ilike 'flow%'; -- flow trace & flow exit does not make sense for ws
 
 
 INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)

@@ -117,28 +117,28 @@ UPDATE sys_table SET sys_role='role_edit' WHERE id='plan_psector_x_gully';
 UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_node_shape WHERE id IS NOT NULL' WHERE formname='cat_node' AND formtype='form_feature' AND columnname='shape' AND tabname='tab_none';
 
 -- 17/08/2024
-INSERT INTO cat_style VALUES (0, 'TEMPLAYER', NULL, NULL, NULL, true);
-INSERT INTO cat_style VALUES (1, 'BASIC', NULL, 'role_basic', '{"orderBy":1}', true);
-INSERT INTO cat_style VALUES (2, 'SWMM', NULL, 'role_basic', '{"orderBy":2}', true);
-INSERT INTO cat_style VALUES (3, 'SECTOR', NULL, 'role_basic', '{"orderBy":3}', true);
-INSERT INTO cat_style VALUES (4, 'DRAINZONE', NULL, 'role_basic', '{"orderBy":4}', true);
+INSERT INTO config_style VALUES (101, 'GwBasic', NULL, 'role_basic', '{"orderBy":1}', false, true);
+INSERT INTO config_style VALUES (102, 'GwEpa', NULL, 'role_basic', '{"orderBy":2}', false, true);
+INSERT INTO config_style VALUES (103, 'GwGraphConfig', NULL, NULL, NULL, true, true);
+INSERT INTO config_style VALUES (104, 'GwInpLog', NULL, NULL, NULL, true, true);
+INSERT INTO config_style VALUES (105, 'GwFlowTrace', NULL, NULL, NULL, true, true);
+INSERT INTO config_style VALUES (106, 'GwFlowExit', NULL, NULL, NULL, true, true);
 
-UPDATE sys_style SET stylecat_id = 0 WHERE idval in ('INP result line', 'INP result point', 'Flow trace arc', 'Flow trace node');
-UPDATE sys_style SET stylecat_id = 2 WHERE idval in ('v_edit_arc SWMM point of view', 'v_edit_link SWMM point of view', 'v_edit_node SWMM point of view', 'v_edit_gully SWMM point of view');
-UPDATE sys_style SET stylecat_id = 1 WHERE stylecat_id is null;
-UPDATE sys_style SET idval = replace(idval, ' SWMM point of view', '');
+UPDATE sys_style SET layername='line', styleconfig_id = 104 WHERE layername='INP result line';
+UPDATE sys_style SET layername='point', styleconfig_id = 104 WHERE layername='INP result point';
+UPDATE sys_style SET layername='line', styleconfig_id = 105 WHERE layername='Flow trace arc';
+UPDATE sys_style SET layername='point', styleconfig_id = 105 WHERE layername='Flow trace node';
+UPDATE sys_style SET layername='line', styleconfig_id = 106 WHERE layername='Flow exit arc';
+UPDATE sys_style SET layername='point', styleconfig_id = 106 WHERE layername='Flow exit node';
 
-SELECT setval('SCHEMA_NAME.sys_style_id_seq', 220, true);
+UPDATE sys_style SET layername='v_edit_arc', styleconfig_id = 102 WHERE layername='v_edit_arc SWMM point of view';
+UPDATE sys_style SET layername='v_edit_connec', styleconfig_id = 102 WHERE layername='v_edit_gully SWMM point of view';
+UPDATE sys_style SET layername='v_edit_node', styleconfig_id = 102 WHERE layername='v_edit_node SWMM point of view';
+UPDATE sys_style SET layername='v_edit_link', styleconfig_id = 102 WHERE layername='v_edit_link SWMM point of view';
 
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_node', 3, 'qml');
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_arc', 3, 'qml');
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_connec', 3, 'qml');
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_link', 3, 'qml');
+UPDATE sys_style SET styleconfig_id = 101 WHERE styleconfig_id is null;
 
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_node', 4, 'qml');
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_arc', 4, 'qml');
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_connec', 4, 'qml');
-INSERT INTO sys_style (idval, stylecat_id, styletype) VALUES ('v_edit_link', 4, 'qml');
+ALTER TABLE sys_style ALTER COLUMN styleconfig_id SET NOT NULL;
 
 UPDATE link SET muni_id = g.muni_id FROM gully g WHERE gully_id =  feature_id;
 

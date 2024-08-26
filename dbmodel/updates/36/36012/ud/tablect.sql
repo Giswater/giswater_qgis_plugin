@@ -8,6 +8,5 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-ALTER TABLE presszone DROP CONSTRAINT IF EXISTS presszone_presszone_type_check;
 ALTER TABLE sys_style ADD CONSTRAINT sys_style_pkey PRIMARY KEY (layername, styleconfig_id);
 ALTER TABLE sys_style ALTER COLUMN styleconfig_id SET NOT NULL;

@@ -81,26 +81,23 @@ ALTER TABLE sys_style RENAME TO _sys_style_;
 ALTER TABLE "_sys_style_" DROP CONSTRAINT sys_style_pkey;
 
 CREATE TABLE sys_style (
-  id integer NOT NULL,
-  idval text,
-  stylecat_id integer,
+  layername text NOT NULL,
+  styleconfig_id integer NULL,
   styletype character varying(30),
   stylevalue text,
-  active boolean DEFAULT true,
-  CONSTRAINT sys_style_pkey PRIMARY KEY (id));
+  active boolean DEFAULT true);
 
-ALTER TABLE sys_style ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.sys_style_id_seq'::regclass);
+INSERT INTO sys_style SELECT idval, NULL, styletype, stylevalue, active FROM _sys_style_;
 
-INSERT INTO sys_style SELECT id, idval, NULL, styletype, stylevalue, active FROM _sys_style_;
-
-CREATE TABLE cat_style (
+CREATE TABLE config_style (
 	id integer NOT NULL,
 	idval text NOT NULL,
 	descript text NULL,
 	sys_role varchar(30) NULL,
 	addparam json NULL,
+    is_templayer bool NULL,
 	active bool DEFAULT true NULL,
-	CONSTRAINT cat_style_pkey PRIMARY KEY (id));
+	CONSTRAINT config_style_pkey PRIMARY KEY (id));
 
 do $$
 declare

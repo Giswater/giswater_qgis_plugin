@@ -8,4 +8,5 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-ALTER TABLE sys_style ADD CONSTRAINT sys_style_stylecat_id_fk FOREIGN KEY (stylecat_id) REFERENCES cat_style(id);
+ALTER TABLE sys_style ADD CONSTRAINT sys_style_styleconfig_id_fk FOREIGN KEY (styleconfig_id) REFERENCES config_style(id);
+
