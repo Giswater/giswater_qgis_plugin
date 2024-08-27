@@ -10,8 +10,8 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- Plan for 6 test
-SELECT plan(6);
+-- Plan for 9 test
+SELECT plan(9);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is(
@@ -53,7 +53,29 @@ SELECT is(
     (gw_fct_getinfofromid($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
     "feature":{"tableName":"v_edit_drainzone", "id": "0"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
     'Accepted',
+    'Check if gw_fct_getinfofromid tableName --> v_edit_drainzone with id returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_getinfofromid($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_edit_drainzone"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    'Accepted',
     'Check if gw_fct_getinfofromid tableName --> v_edit_drainzone returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_getinfofromid($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"inp_dscenario_outfall", "id": "1, 18888"},
+    "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_getinfofromid tableName --> inp_dscenario_outfall returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_getinfofromid($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_edit_cat_dscenario", "id":"1"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_getinfofromid tableName --> v_edit_cat_dscenario returns status "Accepted"'
 );
 
 -- Finish the test
