@@ -10,3 +10,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE sys_style ADD CONSTRAINT sys_style_pkey PRIMARY KEY (layername, styleconfig_id);
 ALTER TABLE sys_style ALTER COLUMN styleconfig_id SET NOT NULL;
+
+ALTER TABLE drainzone ADD CONSTRAINT drainzone_sector_id_fkey FOREIGN KEY (sector_id) REFERENCES sector(sector_id);
+ALTER TABLE dma ADD CONSTRAINT dma_muni_id_fkey FOREIGN KEY (sector_id) REFERENCES sector(sector_id);
+
+ALTER TABLE raingage ADD CONSTRAINT raingage_muni_id FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id);

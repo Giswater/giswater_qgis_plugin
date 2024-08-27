@@ -10,3 +10,15 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE sys_style ADD CONSTRAINT sys_style_styleconfig_id_fk FOREIGN KEY (styleconfig_id) REFERENCES config_style(id);
 
+ALTER TABLE samplepoint ADD CONSTRAINT samplepoint_muni_id FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id);
+ALTER TABLE samplepoint ADD CONSTRAINT samplepoint_sector_id FOREIGN KEY (sector_id) REFERENCES sector(sector_id);
+
+ALTER TABLE element ADD CONSTRAINT element_muni_id FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id);
+ALTER TABLE element ADD CONSTRAINT element_sector_id FOREIGN KEY (sector_id) REFERENCES sector(sector_id);
+
+ALTER TABLE link ADD CONSTRAINT link_muni_id FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id);
+ALTER TABLE link ADD CONSTRAINT link_sector_id FOREIGN KEY (sector_id) REFERENCES sector(sector_id);
+
+ALTER TABLE dimensions ADD CONSTRAINT dimensions_muni_id FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id);
+ALTER TABLE dimensions ADD CONSTRAINT dimensions_sector_id FOREIGN KEY (sector_id) REFERENCES sector(sector_id);
+
