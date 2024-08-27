@@ -6,12 +6,13 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from functools import partial
+import json
 
 from ...ui.ui_manager import GwStyleManagerUi, GwCreateStyleGroupUi
 from ...utils import tools_gw
 from ....libs import lib_vars, tools_db
 from .... import global_vars
-from qgis.PyQt.QtWidgets import QDialog, QLabel, QMessageBox, QHeaderView, QTableView
+from qgis.PyQt.QtWidgets import QDialog, QLabel, QMessageBox, QHeaderView, QTableView, QMenu, QAction
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtSql import QSqlTableModel
 
@@ -34,6 +35,11 @@ class GwStyleManager:
         # Add icons to the buttons
         tools_gw.add_icon(self.style_mng_dlg.btn_addGroup, "111", sub_folder="24x24")
         tools_gw.add_icon(self.style_mng_dlg.btn_deleteGroup, "112", sub_folder="24x24")
+
+        # Load layers and populate the menu
+        layers_data = self._load_layers_with_geom()
+        if layers_data:
+            self._populate_layers_menu(layers_data)
 
         # Populate the combobox with style groups
         self.populate_stylegroup_combobox()
@@ -163,11 +169,10 @@ class GwStyleManager:
         except Exception as e:
             QMessageBox.critical(self.style_mng_dlg, "Database Error", f"Failed to add feature: {e}")
 
-
-    def _filter_styles(self, text):
-        """Filtra los estilos en la tabla basado en el layername y en el stylegroup seleccionado."""
-        search_text = self.style_mng_dlg.style_name.text()
-        selected_stylegroup_name = self.style_mng_dlg.stylegroup.currentText()
+    def _filter_styles(self):
+        """Aplica un filtro basado en el texto del textbox y la selección del combobox."""
+        search_text = self.style_mng_dlg.style_name.text().strip()
+        selected_stylegroup_name = self.style_mng_dlg.stylegroup.currentText().strip()
 
         filter_str = ""
 
@@ -352,4 +357,72 @@ class GwStyleManager:
 
         QMessageBox.information(self.style_mng_dlg, "Success", "Selected styles were successfully deleted.")
         self._load_styles()
+
+    def _load_layers_with_geom(self):
+        """Load layers with geometry for the Add Style button."""
+        try:
+            body = tools_gw.create_body()
+            json_result = tools_gw.execute_procedure('gw_fct_getaddlayervalues', body)
+            if not json_result or json_result['status'] != 'Accepted':
+                QMessageBox.warning(self.style_mng_dlg, "Error", "Failed to load layers.")
+                return None
+
+            return json_result['body']['data']['fields']
+
+        except Exception as e:
+            QMessageBox.critical(self.style_mng_dlg, "Database Error", f"Failed to load layers: {e}")
+            return None
+
+    def _populate_layers_menu(self, layers):
+        """Populate the Add Style button with layers grouped by context."""
+        try:
+            menu = QMenu(self.style_mng_dlg.btn_addStyle)
+
+            dict_menu = {}
+
+            for layer in layers:
+                # Filter only layers that have a geometry field
+                if layer['geomField'] == "None" or not layer['geomField']:
+                    continue  # Skip layers without a geometry field
+
+                context = json.loads(layer['context'])
+
+                # Level 1 of the context
+                if 'level_1' in context and context['level_1'] not in dict_menu:
+                    menu_level_1 = menu.addMenu(f"{context['level_1']}")
+                    dict_menu[context['level_1']] = menu_level_1
+
+                # Level 2 of the context
+                if 'level_2' in context and f"{context['level_1']}_{context['level_2']}" not in dict_menu:
+                    menu_level_2 = dict_menu[context['level_1']].addMenu(f"{context['level_2']}")
+                    dict_menu[f"{context['level_1']}_{context['level_2']}"] = menu_level_2
+
+                # Level 3 of the context
+                if 'level_3' in context and f"{context['level_1']}_{context['level_2']}_{context['level_3']}" not in dict_menu:
+                    menu_level_3 = dict_menu[f"{context['level_1']}_{context['level_2']}"].addMenu(
+                        f"{context['level_3']}")
+                    dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"] = menu_level_3
+
+                alias = layer['layerName'] if layer['layerName'] is not None else layer['tableName']
+                alias = f"{alias}     "
+
+                # Add actions and submenus at the appropriate context level
+                if 'level_3' in context:
+                    sub_menu = dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"]
+                else:
+                    sub_menu = dict_menu[f"{context['level_1']}_{context['level_2']}"]
+
+                action = QAction(alias, self.style_mng_dlg.btn_addStyle)
+                action.triggered.connect(partial(self._add_layer_style, layer['tableName'], layer['geomField']))
+                sub_menu.addAction(action)
+
+            # Assign the menu to the button
+            self.style_mng_dlg.btn_addStyle.setMenu(menu)
+
+        except Exception as e:
+            QMessageBox.critical(self.style_mng_dlg, "Database Error", f"Failed to load layers: {e}")
+
+    def _add_layer_style(self, table_name, geom_field):
+        """Logic to handle the addition of styles for a selected layer."""
+        print(f"Add style for {table_name} with geometry field {geom_field}")
 
