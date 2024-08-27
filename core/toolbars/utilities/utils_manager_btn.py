@@ -12,6 +12,7 @@ from functools import partial
 from qgis.PyQt.QtCore import QPoint
 from qgis.PyQt.QtWidgets import QAction, QMenu
 
+from .style_manager import GwStyleManager
 from .... import global_vars
 from ..dialog import GwAction
 from .mapzone_manager import GwMapzoneManager
@@ -71,7 +72,7 @@ class GwUtilsManagerButton(GwAction):
             del action
         action_group = self.action.property('action_group')
 
-        buttons = [['Mapzones manager', '_mapzones_manager'], ['Prices manager', '_prices_manager'], ['Workcat manager', '_workcat_manager']]
+        buttons = [['Mapzones manager', '_mapzones_manager'], ['Prices manager', '_prices_manager'], ['Workcat manager', '_workcat_manager'], ['Style manager', '_style_manager']]
 
         for button in buttons:
             button_name = button[0]
@@ -107,4 +108,12 @@ class GwUtilsManagerButton(GwAction):
     def _workcat_manager(self):
         self.workcat = GwWorkcat(global_vars.iface, global_vars.canvas)
         self.workcat.manage_workcats()
+    # endregion
+
+    # region style manager functions
+
+    def _style_manager(self):
+        self.style = GwStyleManager()
+        self.style.manage_styles()
+
     # endregion

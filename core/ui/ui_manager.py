@@ -326,6 +326,14 @@ FORM_CLASS = _get_ui_class('mapzone_manager.ui', 'utilities')
 class GwMapzoneManagerUi(GwDialog, FORM_CLASS):
     pass
 
+FORM_CLASS = _get_ui_class('style_manager.ui', 'utilities')
+class GwStyleManagerUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = _get_ui_class('create_style_group.ui', 'utilities')
+class GwCreateStyleGroupUi(GwDialog, FORM_CLASS):
+    pass
+
 FORM_CLASS = _get_ui_class('mapzone_config.ui', 'utilities')
 class GwMapzoneConfigUi(GwDialog, FORM_CLASS):
     pass
