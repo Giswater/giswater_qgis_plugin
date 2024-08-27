@@ -83,18 +83,18 @@ BEGIN
 		IF v_projectype = 'WS' THEN
 			INSERT INTO samplepoint (sample_id, code, lab_code, feature_id, featurecat_id, dma_id, presszone_id, "state", builtdate, enddate,
 			workcat_id, workcat_id_end, rotation, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, place_name, cabinet, 
-			observations, the_geom, expl_id, verified)
+			observations, the_geom, expl_id, verified, sector_id)
 			VALUES (NEW.sample_id, NEW.code, NEW.lab_code, NEW.feature_id, NEW.featurecat_id,  NEW.dma_id, NEW.presszone_id, NEW."state", NEW.builtdate,
 			NEW.enddate, NEW.workcat_id, NEW.workcat_id_end, NEW.rotation, NEW.muni_id, NEW.postcode, NEW.streetaxis_id, NEW.postnumber, NEW.postcomplement, NEW.streetaxis2_id,
-			NEW.postnumber2, NEW.postcomplement2, NEW.place_name, NEW.cabinet, NEW.observations, NEW.the_geom, NEW.expl_id, NEW.verified);
+			NEW.postnumber2, NEW.postcomplement2, NEW.place_name, NEW.cabinet, NEW.observations, NEW.the_geom, NEW.expl_id, NEW.verified, NEW.sector_id);
 		ELSE
 
 			INSERT INTO samplepoint (sample_id, code, lab_code, feature_id, featurecat_id, dma_id, "state", builtdate, enddate,
 			workcat_id, workcat_id_end, rotation, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, place_name, cabinet, 
-			observations, the_geom, expl_id, verified)
+			observations, the_geom, expl_id, verified, sector_id)
 			VALUES (NEW.sample_id, NEW.code, NEW.lab_code, NEW.feature_id, NEW.featurecat_id,  NEW.dma_id, NEW."state", NEW.builtdate,
 			NEW.enddate, NEW.workcat_id, NEW.workcat_id_end, NEW.rotation, NEW.muni_id, NEW.postcode, NEW.streetaxis_id, NEW.postnumber, NEW.postcomplement, NEW.streetaxis2_id,
-			NEW.postnumber2, NEW.postcomplement2, NEW.place_name, NEW.cabinet, NEW.observations, NEW.the_geom, NEW.expl_id, NEW.verified);
+			NEW.postnumber2, NEW.postcomplement2, NEW.place_name, NEW.cabinet, NEW.observations, NEW.the_geom, NEW.expl_id, NEW.verified, NEW.sector_id);
 
 		END IF;
 
@@ -109,7 +109,7 @@ BEGIN
 			presszone_id=NEW.presszone_id,"state"=NEW."state", rotation=NEW.rotation, builtdate=NEW.builtdate, enddate=NEW.enddate,
 			workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, muni_id=NEW.muni_id, postcode=NEW.postcode, streetaxis_id=NEW.streetaxis_id, 
 			postnumber=NEW.postnumber, postcomplement=NEW.postcomplement, streetaxis2_id=NEW.streetaxis2_id, postnumber2=NEW.postnumber2, postcomplement2=NEW.postcomplement2,
-			place_name=NEW.place_name, cabinet=NEW.cabinet, observations=NEW.observations, the_geom=NEW.the_geom, expl_id=NEW.expl_id, verified=NEW.verified
+			place_name=NEW.place_name, cabinet=NEW.cabinet, observations=NEW.observations, the_geom=NEW.the_geom, expl_id=NEW.expl_id, verified=NEW.verified, sector_id=NEW.sector_id
 			WHERE sample_id=NEW.sample_id;
 		ELSE
 			UPDATE samplepoint 
@@ -117,7 +117,7 @@ BEGIN
 			"state"=NEW."state", rotation=NEW.rotation, builtdate=NEW.builtdate, enddate=NEW.enddate,
 			workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, muni_id=NEW.muni_id, postcode=NEW.postcode, streetaxis_id=NEW.streetaxis_id, 
 			postnumber=NEW.postnumber, postcomplement=NEW.postcomplement, streetaxis2_id=NEW.streetaxis2_id, postnumber2=NEW.postnumber2, postcomplement2=NEW.postcomplement2,
-			place_name=NEW.place_name, cabinet=NEW.cabinet, observations=NEW.observations, the_geom=NEW.the_geom, expl_id=NEW.expl_id, verified=NEW.verified
+			place_name=NEW.place_name, cabinet=NEW.cabinet, observations=NEW.observations, the_geom=NEW.the_geom, expl_id=NEW.expl_id, verified=NEW.verified, sector_id=NEW.sector_id
 			WHERE sample_id=NEW.sample_id;
 		END IF;
 
