@@ -15,13 +15,17 @@ v_expl_id_int integer;
 v_sample_id_seq int8;
 v_count integer;
 v_projectype text;
+v_proximity_buffer double precision;
 
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	v_projectype = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
+	v_proximity_buffer = (SELECT "value" FROM config_param_system WHERE parameter='edit_feature_buffer_on_mapzone');
 
+
+	IF v_proximity_buffer IS NULL THEN v_proximity_buffer=0.5; END IF;
 	-- INSERT
 	IF TG_OP = 'INSERT' THEN
 
