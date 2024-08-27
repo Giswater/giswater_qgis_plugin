@@ -343,3 +343,15 @@ UNION SELECT node_border_sector.node_id, node_border_sector.sector_id
  FROM selector_sector, node_border_sector
  WHERE selector_sector.cur_user = "current_user"()::text AND node_border_sector.sector_id = selector_sector.sector_id) a
  group by node_id;
+
+--27/08/2024
+CREATE OR REPLACE VIEW v_ui_sys_style AS
+SELECT
+    sys_style.layername,
+    config_style.idval,
+    sys_style.styletype,
+    sys_style.stylevalue,
+    sys_style.active
+FROM sys_style
+JOIN config_style
+ON sys_style.styleconfig_id = config_style.id;
