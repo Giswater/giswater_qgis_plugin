@@ -337,13 +337,6 @@ UPDATE config_form_fields SET web_layoutorder=0 WHERE formname='mincut' AND form
 UPDATE config_form_fields SET web_layoutorder=NULL WHERE formname='mincut' AND formtype='form_mincut' AND columnname='btn_mincut' AND tabname='tab_mincut';
 
 --27/08/2024
-
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3308, 'gw_fct_mincut_minsector', 'ws', 'function', 'json', 'json', 'Function to mincut minsector', 'role_basic', 'core');
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3310, 'gw_fct_admin_transfer_addfields_values', 'utils', 'function', 'json', 'json', 'Function to transfer the addfields values', 'role_admin', 'core');
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3312, 'gw_trg_feature_border', 'utils', 'trigger', NULL, NULL, NULL, 'role_basic', 'core');
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3314, 'gw_fct_mincut_minsector_inverted', 'ws', 'function', 'integer', 'integer', 'Function to mincut minsector inverted ', 'role_edit', 'core');
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3316, 'gw_fct_utils_update_dma_hydroval', 'ws', 'function', 'integer', 'integer', 'Function to update dma hydroval', 'role_admin', 'core');
-
 INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('rpt_energy_usage', NULL, 'role_epa', 'core')ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_ui_dqa', NULL, 'role_basic', 'core') ON CONFLICT (id) DO NOTHING ;
 INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('selector_period', NULL, 'role_basic', 'core') ON CONFLICT (id) DO NOTHING ;

@@ -166,11 +166,6 @@ drop view if exists vi_parent_arc;
 
 
 --27/08/2024
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3306, 'gw_fct_admin_transfer_addfields_values', 'utils', 'function', 'json', 'json', 'Function to transfer addfield values', 'role_admin', 'core');
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3308, 'gw_fct_import_scada_flowmeteragg_values', 'utils', 'function', 'json', 'json', 'Function to add scada flowmeter agg values', 'role_admin', 'core');
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3310, 'gw_fct_import_scada_values', 'utils', 'function', 'json', 'json', 'Function to import scada values ', 'role_admin', 'core');
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3312, 'gw_trg_feature_border', 'utils', 'trigger', NULL, NULL, NULL, 'role_basic', 'core');
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3314, 'gw_trg_node_rotation_update', 'ud', 'trigger', NULL, NULL, 'Trigger that allows to update the node rotation', 'role_basic', 'core');
 INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('rpt_node', NULL, 'role_epa', 'core') ON CONFLICT (id) DO NOTHING ;
 INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('rpt_arc', NULL, 'role_epa', 'core') ON CONFLICT (id) DO NOTHING ;
 INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('selector_period', NULL, 'role_basic', 'core') ON CONFLICT (id) DO NOTHING ;

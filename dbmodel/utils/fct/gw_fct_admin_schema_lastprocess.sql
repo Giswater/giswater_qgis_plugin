@@ -468,6 +468,13 @@ BEGIN
 				END LOOP;
 			END IF;
 		END IF;
+        
+        -- delete all functions not related to project type
+        IF v_projecttype = 'WS' THEN
+            DELETE FROM sys_function WHERE lower(project_type) = 'ud';
+        ELSE
+            DELETE FROM sys_function WHERE lower(project_type) = 'ws';
+        END IF;
 
 		--reset sequences and id of anl, temp and audit tables
 		PERFORM gw_fct_admin_reset_sequences();

@@ -238,3 +238,29 @@ VALUES('qgis_layers_symbology', '{"styleconfig_vdef":101}', 'Variable to configu
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source")
 VALUES(3264, 'Wrong configuration. Check config_form_fields on column widgetcontrol key ''reloadfields'' for columnname:', null, 2, true, 'utils', 'core') ON CONFLICT (id) DO NOTHING;
+
+
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3316,'gw_fct_admin_transfer_addfields_values', 'utils', 'function', 'json', 'json', 'Function to transfer the addfields values', 'role_admin', 'core')
+ON CONFLICT (id) DO UPDATE SET project_type=EXCLUDED.project_type;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3190, 'gw_trg_feature_border', 'utils', 'trigger', NULL, NULL, NULL, 'role_basic', 'core')
+ON CONFLICT (id) DO UPDATE SET project_type=EXCLUDED.project_type;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3272, 'gw_fct_import_scada_flowmeteragg_values', 'utils', 'function', 'json', 'json', 'Function to import flowmeter aggregated values with random interval in order to transform to daily values', 'role_om', 'core')
+ON CONFLICT (id) DO UPDATE SET project_type=EXCLUDED.project_type;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3166, 'gw_fct_import_scada_values', 'utils', 'function', 'json', 'json', 'Function to import scada values ', 'role_om', 'core')
+ON CONFLICT (id) DO UPDATE SET project_type=EXCLUDED.project_type;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(1348, 'gw_trg_node_rotation_update', 'utils', 'trigger', NULL, NULL, 'Trigger that allows to update the node rotation', 'role_basic', 'core')
+ON CONFLICT (id) DO UPDATE SET project_type=EXCLUDED.project_type;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3312, 'gw_fct_mincut_minsector', 'ws', 'function', 'character varying, integer, bool', 'json', 'Function to mincut minsector', 'role_basic', 'core')
+ON CONFLICT (id) DO UPDATE SET project_type=EXCLUDED.project_type;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3314, 'gw_fct_mincut_minsector_inverted', 'ws', 'function', 'integer, integer', 'integer', 'Function to mincut minsector inverted ', 'role_om', 'core')
+ON CONFLICT (id) DO UPDATE SET project_type=EXCLUDED.project_type;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3318, 'gw_fct_utils_update_dma_hydroval', 'ws', 'function', null, 'integer', 'Function to update dma hydroval', 'role_edit', 'core')
+ON CONFLICT (id) DO UPDATE SET project_type=EXCLUDED.project_type;
