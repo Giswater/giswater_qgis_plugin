@@ -31,8 +31,8 @@ BEGIN
 		END IF;	
 
 		-- FEATURE INSERT
-		INSERT INTO raingage (rg_id, form_type, intvl, scf, rgage_type, timser_id, fname, sta, units, the_geom, expl_id) 
-		VALUES (NEW.rg_id, NEW.form_type, NEW.intvl, NEW.scf, NEW.rgage_type, NEW.timser_id, NEW.fname, NEW.sta, NEW.units, NEW.the_geom, NEW.expl_id);
+		INSERT INTO raingage (rg_id, form_type, intvl, scf, rgage_type, timser_id, fname, sta, units, the_geom, expl_id, muni_id) 
+		VALUES (NEW.rg_id, NEW.form_type, NEW.intvl, NEW.scf, NEW.rgage_type, NEW.timser_id, NEW.fname, NEW.sta, NEW.units, NEW.the_geom, NEW.expl_id, NEW.muni_id);
 			
 		RETURN NEW;
 
@@ -41,7 +41,8 @@ BEGIN
 	
 		-- UPDATE values
 		UPDATE raingage 
-		SET rg_id=NEW.rg_id, form_type=NEW.form_type, intvl=NEW.intvl, scf=NEW.scf, rgage_type=NEW.rgage_type, timser_id=NEW.timser_id, fname=NEW.fname, sta=NEW.sta, units=NEW.units, the_geom=NEW.the_geom, expl_id=NEW.expl_id
+		SET rg_id=NEW.rg_id, form_type=NEW.form_type, intvl=NEW.intvl, scf=NEW.scf, rgage_type=NEW.rgage_type, timser_id=NEW.timser_id, fname=NEW.fname, sta=NEW.sta, 
+		units=NEW.units, the_geom=NEW.the_geom, expl_id=NEW.expl_id, muni_id=NEW.muni_id
 		WHERE rg_id = OLD.rg_id;
                
 		RETURN NEW;
