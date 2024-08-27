@@ -187,14 +187,17 @@ ALTER TABLE cat_connec ALTER COLUMN model TYPE character varying(50);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"brand_id", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"model_id", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"serial_number", "dataType":"varchar(100)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"label_quadrant", "dataType":"varchar(12)"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"brand_id", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"model_id", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"serial_number", "dataType":"varchar(100)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"label_quadrant", "dataType":"varchar(12)"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"brand_id", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"model_id", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"serial_number", "dataType":"varchar(100)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"label_quadrant", "dataType":"varchar(12)"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"brand_id", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"model_id", "dataType":"varchar(50)"}}$$);
