@@ -235,3 +235,6 @@ VALUES('config_style', 'Catalog of different style context', 'role_basic', NULL,
 
 INSERT INTO config_param_system ("parameter", value, descript, "label", isenabled, project_type, "datatype", widgettype)
 VALUES('qgis_layers_symbology', '{"styleconfig_vdef":101}', 'Variable to configure parameters related with layer symbology tool', 'Layers symbology', false, 'utils', 'json', 'text');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source")
+VALUES(3264, 'Wrong configuration. Check config_form_fields on column widgetcontrol key ''reloadfields'' for columnname:', null, 2, true, 'utils', 'core') ON CONFLICT (id) DO NOTHING;

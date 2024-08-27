@@ -22,8 +22,6 @@ SELECT SCHEMA_NAME.gw_fct_getcolumnsfrom_id($${
 DECLARE
 
 v_fields json;
-v_childs text;
-v_json json;
 v_fields_array text[];
 v_field text;
 v_json_array json[];
@@ -35,9 +33,7 @@ i integer = 0;
 v_fieldsreload text;
 v_result text;
 v_exists text;
-v_message text;
 v_parentname text;
-v_parentid integer;
 v_featureType text;
 v_iseditable boolean;
     
@@ -60,11 +56,11 @@ BEGIN
 	v_parentname =((p_data ->>'feature')::json->>'parentField')::text;
 
 	SELECT ARRAY(SELECT json_array_elements((replace(v_fieldsreload, '''','"'))::json))
-	FROM  config_form_fields LIMIT 1 INTO v_fields_array;
+	INTO v_fields_array;
 	
 	FOREACH v_field IN array v_fields_array
 	LOOP	
-		EXECUTE 'SELECT column_name  FROM information_schema.columns WHERE table_name='''||v_tablename||''' and column_name='''|| replace(v_field, '"','') ||''' LIMIT 1' INTO v_exists;
+		EXECUTE 'SELECT column_name FROM information_schema.columns WHERE table_name='''||v_tablename||''' and column_name='''|| replace(v_field, '"','') ||''' LIMIT 1' INTO v_exists;
 		v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'widgetname', 'tab_data_' || replace(v_field, '"',''));
 		IF v_exists is not null THEN
 			EXECUTE 'SELECT LOWER(feature_type) FROM cat_feature WHERE child_layer = '''||v_tablename||'''' INTO v_featureType;
@@ -74,12 +70,8 @@ BEGIN
 			v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'iseditable', v_iseditable);
 			i = i+1;
 		ELSE
-			EXECUTE 'SELECT id FROM config_form_fields WHERE formname ='''||v_tablename||''' AND columnname = '''||v_parentname||'''' INTO v_parentid;
-			v_message := 'API is bad configurated. Check column ''reloadfields'' for parameter '''|| v_parentname ||''' with id -> '''||v_parentid||''' on config_form_fields';
-			v_result := '{"level":0, "text":"'||v_message||'"}';
-			v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'value', ''::text);
-			v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'message', v_result::json);
-			i = i+1;
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3264", "function":"2874","debug_msg":"'||v_parentname||'", "is_process":true}}$$);';
 		END IF;
 	END LOOP;
 	
