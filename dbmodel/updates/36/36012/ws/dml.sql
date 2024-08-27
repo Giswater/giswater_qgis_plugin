@@ -336,3 +336,46 @@ UPDATE config_form_fields SET web_layoutorder=2 WHERE formname='mincut' AND form
 UPDATE config_form_fields SET web_layoutorder=0 WHERE formname='mincut' AND formtype='form_mincut' AND columnname='btn_custom_mincut' AND tabname='tab_mincut';
 UPDATE config_form_fields SET web_layoutorder=NULL WHERE formname='mincut' AND formtype='form_mincut' AND columnname='btn_mincut' AND tabname='tab_mincut';
 
+--27/08/2024
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3308, 'gw_fct_mincut_minsector', 'ws', 'function', 'json', 'json', 'Function to mincut minsector', 'role_basic', 'core');
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3310, 'gw_fct_admin_transfer_addfields_values', 'utils', 'function', 'json', 'json', 'Function to transfer the addfields values', 'role_admin', 'core');
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3312, 'gw_trg_feature_border', 'utils', 'trigger', NULL, NULL, NULL, 'role_basic', 'core');
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3314, 'gw_fct_mincut_minsector_inverted', 'ws', 'function', 'integer', 'integer', 'Function to mincut minsector inverted ', 'role_edit', 'core');
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source") VALUES(3316, 'gw_fct_utils_update_dma_hydroval', 'ws', 'function', 'integer', 'integer', 'Function to update dma hydroval', 'role_admin', 'core');
+
+
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('rpt_energy_usage', NULL, 'role_epa', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_ui_dqa', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('ve_node_shutoff_valve', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('ve_node_green_valve', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('ve_node_air_valve', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('ve_node_check_valve', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('ve_arc_pipe', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('ve_node_pressure_meter', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('ve_node_filter', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('ve_node_tank', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('ve_node_hydrant', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('selector_period', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('inp_dscenario_virtualpump', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_rtc_hydrometer_x_node', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('rpt_arc', NULL, 'role_epa', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('rpt_node', NULL, 'role_epa', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('rpt_hydraulic_status', NULL, 'role_epa', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('rtc_hydrometer_x_node', NULL, 'role_edit', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_rpt_compare_node', NULL, 'role_epa', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_rpt_compare_arc', NULL, 'role_epa', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_ui_hydroval', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_minsector_graph', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_ui_sector', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_ui_dma', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_ui_presszone', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('ve_visit_arc_leak', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('ve_visit_connec_leak', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('ve_visit_node_insp', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('ve_visit_incid_node', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_ui_visit_arc_leak', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_ui_visit_connec_leak', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_ui_visit_node_insp', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_ui_visit_incid_node', NULL, 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('ve_node_outfall_valve', NULL, 'role_basic', 'core');
