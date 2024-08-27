@@ -11,3 +11,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 ALTER TABLE presszone DROP CONSTRAINT IF EXISTS presszone_presszone_type_check;
 ALTER TABLE sys_style ADD CONSTRAINT sys_style_pkey PRIMARY KEY (layername, styleconfig_id);
 ALTER TABLE sys_style ALTER COLUMN styleconfig_id SET NOT NULL;
+
+ALTER TABLE element ADD CONSTRAINT element_brand_id FOREIGN KEY (brand_id) references cat_brand(id);
+ALTER TABLE element ADD CONSTRAINT element_model_id FOREIGN KEY (model_id) references cat_brand_model(id);

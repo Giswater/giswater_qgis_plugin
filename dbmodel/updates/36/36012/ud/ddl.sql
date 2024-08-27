@@ -41,3 +41,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dma", "col
 
 DROP FUNCTION IF EXISTS gw_fct_graphanalytics_downstream_recursive;
 DROP FUNCTION IF EXISTS gw_fct_graphanalytics_upstream_recursive;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"brand_id", "dataType":"varchar(50)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"model_id", "dataType":"varchar(50)"}}$$);
