@@ -185,10 +185,6 @@
 			<translation>Gestor d'escenaris dinàmics</translation>
 		</message>
 		<message>
-			<source>GwPriceManagerButton</source>
-			<translation>Gestionar cost de la xarxa</translation>
-		</message>
-		<message>
 			<source>GwNonVisualManagerButton</source>
 			<translation>Gestor d'objectes no visuals</translation>
 		</message>
@@ -1153,8 +1149,10 @@
 			<translation>Es considera que un arccat_id no és vàlid si no apareix en la taula de configuració del catàleg, Com a resultat, a aquestes canonades NO se'ls hi assignarà un valor de prioritat.</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
 			<translation>El procediment eliminarà elements de xaraxa en la base de dades a menys que sigui un node que no divideix l'arc. \ N Assegureu-vos que els elements de la xarxa no tinguin un valor de recuperació vertader.\ NPer altra banda, ha de saber que la traçabilitat emmagatzemarà informació precedent.</translation>
 		</message>
@@ -2264,7 +2262,8 @@
 		</message>
 		<message>
 			<source>No results found. Please check values set on selector of state and exploitation</source>
-			<translation>No s'han trobat resultats. Si us plau, comproveu els valors establerts al selector d'estat i explotació
+			<translation>No s'han trobat resultats. Si us plau, comproveu els valors establerts al selector d'estat i explotació
+
 </translation>
 		</message>
 		<message>

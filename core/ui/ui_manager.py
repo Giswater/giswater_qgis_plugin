@@ -261,10 +261,6 @@ FORM_CLASS = _get_ui_class('psector.ui', 'plan')
 class GwPsectorUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = _get_ui_class('price_manager.ui', 'plan')
-class GwPriceManagerUi(GwDialog, FORM_CLASS):
-    pass
-
 FORM_CLASS = _get_ui_class('psector_duplicate.ui', 'plan')
 class GwPsectorDuplicateUi(GwDialog, FORM_CLASS):
     pass

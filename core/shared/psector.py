@@ -26,7 +26,7 @@ from qgis.gui import QgsMapToolEmitPoint
 from .document import GwDocument, global_vars
 from ..toolbars.utilities.toolbox_btn import GwToolBoxButton
 from ..shared.psector_duplicate import GwPsectorDuplicate
-from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi, GwReplaceArc, GwPsectorRepairUi
+from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwReplaceArc, GwPsectorRepairUi
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_db, tools_qgis, tools_qt, tools_log, tools_os
 from ..utils.snap_manager import GwSnapManager
@@ -1936,45 +1936,6 @@ class GwPsector:
                        f" WHERE {column_id} IN ({list_id});")
                 tools_db.execute_sql(sql)
         widget.model().select()
-
-
-    def manage_prices(self):
-        """ Button 50: Plan estimate result manager """
-
-        # Create the dialog and signals
-        self.dlg_merm = GwPriceManagerUi(self)
-        tools_gw.load_settings(self.dlg_merm)
-
-        # Set current value
-        sql = (f"SELECT name FROM plan_result_cat WHERE result_id IN (SELECT result_id FROM selector_plan_result "
-               f"WHERE cur_user = current_user)")
-        row = tools_db.get_row(sql)
-        if row:
-            tools_qt.set_widget_text(self.dlg_merm, 'lbl_vdefault_price', str(row[0]))
-
-        # Tables
-        tablename = 'plan_result_cat'
-        self.tbl_om_result_cat = self.dlg_merm.findChild(QTableView, "tbl_om_result_cat")
-        tools_qt.set_tableview_config(self.tbl_om_result_cat)
-
-        # Populate custom context menu
-        self.tbl_om_result_cat.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.tbl_om_result_cat.customContextMenuRequested.connect(self._show_context_menu)
-
-        # Set signals
-        self.dlg_merm.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_merm))
-        self.dlg_merm.rejected.connect(partial(tools_gw.close_dialog, self.dlg_merm))
-        self.dlg_merm.btn_delete.clicked.connect(partial(self.delete_merm, self.dlg_merm))
-        self.dlg_merm.btn_update_result.clicked.connect(partial(self.update_price_vdefault))
-        self.dlg_merm.txt_name.textChanged.connect(partial(self.filter_merm, self.dlg_merm, tablename))
-
-        self.fill_table(self.dlg_merm, self.tbl_om_result_cat, tablename)
-        tools_gw.set_tablemodel_config(self.tbl_om_result_cat, self.dlg_merm.tbl_om_result_cat, tablename)
-
-        # Open form
-        self.dlg_merm.setWindowFlags(Qt.WindowStaysOnTopHint)
-        tools_gw.open_dialog(self.dlg_merm, dlg_name="price_manager")
-
 
     def _show_context_menu(self, pos):
         """ Show custom context menu """

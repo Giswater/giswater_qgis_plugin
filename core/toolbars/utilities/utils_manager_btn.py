@@ -72,7 +72,7 @@ class GwUtilsManagerButton(GwAction):
             del action
         action_group = self.action.property('action_group')
 
-        buttons = [['Mapzones manager', '_mapzones_manager'], ['Prices manager', '_prices_manager'], ['Workcat manager', '_workcat_manager'], ['Style manager', '_style_manager']]
+        buttons = [['Mapzones manager', '_mapzones_manager'], ['Workcat manager', '_workcat_manager'], ['Style manager', '_style_manager']]
 
         for button in buttons:
             button_name = button[0]
@@ -89,11 +89,6 @@ class GwUtilsManagerButton(GwAction):
             self.menu.addAction(obj_action)
             obj_action.triggered.connect(partial(getattr(self, button_function)))
             obj_action.triggered.connect(partial(self._save_last_selection, self.menu, button_function))
-
-
-    def _prices_manager(self):
-        self.psector = GwPsector()
-        self.psector.manage_prices()
 
     # region mapzone manager functions
 
