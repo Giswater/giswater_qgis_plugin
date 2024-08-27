@@ -52,6 +52,9 @@ v_nodecat_id text;
 v_arclist json;
 v_count integer;
 v_node_id text;
+v_selection_mode text;
+v_id text;
+v_querytext TEXT;
 
 BEGIN
 
@@ -71,6 +74,23 @@ BEGIN
 	v_builtdate := ((p_data ->>'data')::json->>'parameters')::json->>'builtdate'::text;
 	v_nodetype_id := ((p_data ->>'data')::json->>'parameters')::json->>'nodeType'::text;
 	v_nodecat_id := ((p_data ->>'data')::json->>'parameters')::json->>'nodeCat'::text;
+	v_selection_mode := (p_data ->>'data')::json->>'selectionMode'::text;
+	v_id := (p_data ->>'feature')::json->>'id'::text;
+
+	
+
+	select replace(replace(replace(v_id, '[', ''), ']', ''), '"', '''') into v_id;
+
+	if v_selection_mode = 'previousSelection' then
+
+		v_querytext = ' AND arc_id in ('||v_id||')';
+
+	else
+	
+		v_querytext = '';
+		
+	end if;
+
 
 	select state into v_state from value_state_type where id=v_state_type;
 	
