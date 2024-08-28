@@ -58,7 +58,7 @@ def get_styles_for_context(styleconfig_id: int) -> List[Tuple[str, str]]:
     return [(row[0], row[1]) for row in rows] if rows else []
 
 
-def apply_styles_to_layers(styleconfig_id: int, style_name: str) -> None:
+def apply_styles_to_layers(styleconfig_id: int, style_name: str, force_refresh: bool = False) -> None:
     """Apply styles to layers based on the selected context."""
 
     styles = get_styles_for_context(styleconfig_id)
@@ -72,11 +72,11 @@ def apply_styles_to_layers(styleconfig_id: int, style_name: str) -> None:
             else:
                 style_manager = layer.styleManager()
 
-                if style_manager is None or style_manager.currentStyle() == style_name:
+                if (style_manager is None or style_manager.currentStyle() == style_name) and not force_refresh:
                     continue
 
                 # Set the style or add it if it doesn't exist
-                if not style_manager.setCurrentStyle(style_name):
+                if not style_manager.setCurrentStyle(style_name) or force_refresh:
                     style = QgsMapLayerStyle()
                     style.readFromLayer(layer)
                     style_manager.addStyle(style_name, style)
