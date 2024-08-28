@@ -14,6 +14,7 @@ RETURNS json AS
 $BODY$
 
 /*
+-- MODE 1: individual
 SELECT SCHEMA_NAME.gw_fct_setfeaturedelete($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},"feature":{"type":"NODE"},
@@ -24,10 +25,14 @@ SELECT SCHEMA_NAME.gw_fct_setfeaturedelete($${
 "form":{},"feature":{"type":"CONNEC"},
 "data":{"feature_id":"3244"}}$$);
 
-
 SELECT SCHEMA_NAME.gw_fct_setfeaturedelete($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},"feature":{"type":"ARC"},"data":{"feature_id":"2002"}}$$);
+
+-- MODE 2: massive usign pure SQL
+SELECT SCHEMA_NAME.gw_fct_setfeaturedelete(CONCAT('
+{"client":{"device":4, "infoType":1, "lang":"ES"},
+"form":{},"feature":{"type":"NODE"},"data":{"feature_id":"',node_id,'"}}')::json) FROM ... WHERE...;
 
 -- fid: 152
 
