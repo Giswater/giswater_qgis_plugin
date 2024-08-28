@@ -347,6 +347,22 @@ CREATE OR REPLACE VIEW v_edit_link_gully AS
 	right join selector_municipality m using (muni_id)
 	where s.cur_user = current_user and (m.cur_user = current_user or l.muni_id is null);
 
+CREATE OR REPLACE VIEW v_edit_drainzone
+AS SELECT drainzone.drainzone_id,
+    drainzone.name,
+    drainzone.expl_id,
+    drainzone.descript,
+    drainzone.undelete,
+    drainzone.link,
+    drainzone.graphconfig::text AS graphconfig,
+    drainzone.stylesheet::text AS stylesheet,
+    drainzone.active,
+    drainzone.the_geom,
+    drainzone.sector_id
+   FROM selector_expl,
+    drainzone
+  WHERE drainzone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
 	
 -- recreate all deleted views: arc, node, connec, gully and dependencies
 -----------------------------------
