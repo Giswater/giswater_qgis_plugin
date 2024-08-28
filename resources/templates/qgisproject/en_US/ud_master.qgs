@@ -406,12 +406,12 @@
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer providerKey="postgres" legend_split_behavior="0" id="v_rpt_subcatchwasoff_sum_30c8fcc2_d459_46b6_82bc_71a31639446d" patch_size="-1,-1" source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_rpt_subcatchwasoff_sum&quot; (the_geom)" checked="Qt::Unchecked" name="Subcatchment washoff" expanded="1" legend_exp="">
+        <layer-tree-layer providerKey="postgres" legend_split_behavior="0" id="v_rpt_subcatchwashoff_sum_30c8fcc2_d459_46b6_82bc_71a31639446d" patch_size="-1,-1" source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_rpt_subcatchwashoff_sum&quot; (the_geom)" checked="Qt::Unchecked" name="Subcatchment washoff" expanded="1" legend_exp="">
           <customproperties>
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer providerKey="postgres" legend_split_behavior="0" id="v_rpt_lidperfomance_sum_52b548dc_286d_4302_b8ba_4abc723c1cd2" patch_size="-1,-1" source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_rpt_lidperfomance_sum&quot; (the_geom)" checked="Qt::Unchecked" name="LID performance" expanded="1" legend_exp="">
+        <layer-tree-layer providerKey="postgres" legend_split_behavior="0" id="v_rpt_lidperformance_sum_52b548dc_286d_4302_b8ba_4abc723c1cd2" patch_size="-1,-1" source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_rpt_lidperformance_sum&quot; (the_geom)" checked="Qt::Unchecked" name="LID performance" expanded="1" legend_exp="">
           <customproperties>
             <Option/>
           </customproperties>
@@ -553,7 +553,7 @@
       <item>v_rpt_arcflow_sum_fe94697c_63f1_4c02_bc5e_4ba0545170ba</item>
       <item>v_rpt_condsurcharge_sum_e28a01ad_4d2b_4d06_8d45_125bab49ea0d</item>
       <item>v_rpt_flowclass_sum_74485e21_3847_464e_9b2b_5e10a61ceebc</item>
-      <item>v_rpt_lidperfomance_sum_52b548dc_286d_4302_b8ba_4abc723c1cd2</item>
+      <item>v_rpt_lidperformance_sum_52b548dc_286d_4302_b8ba_4abc723c1cd2</item>
       <item>v_rpt_nodedepth_sum_f84277ab_00b9_4201_86ba_4f07e698d8e4</item>
       <item>v_rpt_nodeflooding_sum_69028733_3c38_420a_8c26_d10e8f2a4a3e</item>
       <item>v_rpt_nodeinflow_sum_1d195e0b_680d_435f_87e6_1e4a23a90ccc</item>
@@ -563,7 +563,7 @@
       <item>v_rpt_pumping_sum_3479daea_2671_4c8a_8119_e6046cdb3cd2</item>
       <item>v_rpt_storagevol_sum_28e9ebe5_9723_4378_bb06_8d6fc1cc2c4c</item>
       <item>v_rpt_subcatchrunoff_sum_e1348135_a2a0_407b_95a9_dfe57f782a63</item>
-      <item>v_rpt_subcatchwasoff_sum_30c8fcc2_d459_46b6_82bc_71a31639446d</item>
+      <item>v_rpt_subcatchwashoff_sum_30c8fcc2_d459_46b6_82bc_71a31639446d</item>
       <item>v_plan_psector_arc_dc4a3df0_fa35_428b_9327_a36255ef653b</item>
       <item>v_plan_psector_node_27b614c1_4c89_4dcf_8505_73bee9ff4b28</item>
       <item>v_edit_drainzone_1d49c80f_0cc5_47f7_b6f7_d7f289206355</item>
@@ -581,7 +581,7 @@
       <layer-setting minScale="0" id="v_rpt_nodedepth_sum_f84277ab_00b9_4201_86ba_4f07e698d8e4" enabled="0" type="1" maxScale="0" tolerance="12" units="1"/>
       <layer-setting minScale="0" id="v_edit_inp_storage_7a2b5168_9611_471c_a022_5ac2694db377" enabled="0" type="1" maxScale="0" tolerance="12" units="1"/>
       <layer-setting minScale="0" id="v_rpt_nodeinflow_sum_1d195e0b_680d_435f_87e6_1e4a23a90ccc" enabled="0" type="1" maxScale="0" tolerance="12" units="1"/>
-      <layer-setting minScale="0" id="v_rpt_subcatchwasoff_sum_30c8fcc2_d459_46b6_82bc_71a31639446d" enabled="0" type="1" maxScale="0" tolerance="12" units="1"/>
+      <layer-setting minScale="0" id="v_rpt_subcatchwashoff_sum_30c8fcc2_d459_46b6_82bc_71a31639446d" enabled="0" type="1" maxScale="0" tolerance="12" units="1"/>
       <layer-setting minScale="0" id="v_plan_psector_gully_08c47808_1f01_403d_89ea_bbaf50b220b0" enabled="0" type="1" maxScale="0" tolerance="12" units="1"/>
       <layer-setting minScale="0" id="v_edit_arc_20c2fc8b_1eba_4b5b_99c3_1f6836ca8281" enabled="0" type="1" maxScale="0" tolerance="12" units="1"/>
       <layer-setting minScale="0" id="v_rpt_storagevol_sum_28e9ebe5_9723_4378_bb06_8d6fc1cc2c4c" enabled="0" type="1" maxScale="0" tolerance="12" units="1"/>
@@ -592,7 +592,7 @@
       <layer-setting minScale="0" id="v_edit_node_505585a2_32e2_4c2e_a451_d9becc988d7c" enabled="0" type="1" maxScale="0" tolerance="12" units="1"/>
       <layer-setting minScale="0" id="v_edit_inp_weir_c2506ec1_5ece_4c77_b2e6_f74f92176abb" enabled="0" type="1" maxScale="0" tolerance="12" units="1"/>
       <layer-setting minScale="0" id="v_plan_current_psector_06064010_ae7f_4025_bcf4_3005e9b0dae9" enabled="0" type="1" maxScale="0" tolerance="12" units="1"/>
-      <layer-setting minScale="0" id="v_rpt_lidperfomance_sum_52b548dc_286d_4302_b8ba_4abc723c1cd2" enabled="0" type="1" maxScale="0" tolerance="12" units="1"/>
+      <layer-setting minScale="0" id="v_rpt_lidperformance_sum_52b548dc_286d_4302_b8ba_4abc723c1cd2" enabled="0" type="1" maxScale="0" tolerance="12" units="1"/>
       <layer-setting minScale="0" id="v_edit_connec_8a7cc13f_d89f_485c_baa6_dea1fcfe3331" enabled="0" type="1" maxScale="0" tolerance="12" units="1"/>
       <layer-setting minScale="0" id="ext_municipality_7901e95f_4c75_42cb_b520_f89bb2e71ff9" enabled="0" type="1" maxScale="0" tolerance="12" units="1"/>
       <layer-setting minScale="0" id="v_edit_inp_divider_92f7afe6_ea02_4f48_a97a_9923bf982e9e" enabled="0" type="1" maxScale="0" tolerance="12" units="1"/>
@@ -1012,12 +1012,12 @@
         </legendlayer>
         <legendlayer showFeatureCount="0" drawingOrder="-1" checked="Qt::Unchecked" name="Subcatchment washoff" open="true">
           <filegroup hidden="false" open="true">
-            <legendlayerfile visible="0" layerid="v_rpt_subcatchwasoff_sum_30c8fcc2_d459_46b6_82bc_71a31639446d" isInOverview="0"/>
+            <legendlayerfile visible="0" layerid="v_rpt_subcatchwashoff_sum_30c8fcc2_d459_46b6_82bc_71a31639446d" isInOverview="0"/>
           </filegroup>
         </legendlayer>
         <legendlayer showFeatureCount="0" drawingOrder="-1" checked="Qt::Unchecked" name="LID performance" open="true">
           <filegroup hidden="false" open="true">
-            <legendlayerfile visible="0" layerid="v_rpt_lidperfomance_sum_52b548dc_286d_4302_b8ba_4abc723c1cd2" isInOverview="0"/>
+            <legendlayerfile visible="0" layerid="v_rpt_lidperformance_sum_52b548dc_286d_4302_b8ba_4abc723c1cd2" isInOverview="0"/>
           </filegroup>
         </legendlayer>
       </legendgroup>
@@ -46617,8 +46617,8 @@ def my_form_open(dialog, layer, feature):
       <mapTip></mapTip>
     </maplayer>
     <maplayer simplifyDrawingHints="1" autoRefreshEnabled="0" autoRefreshTime="0" symbologyReferenceScale="-1" type="vector" minScale="100000000" legendPlaceholderImage="" simplifyLocal="1" maxScale="-4.6566099999999998e-10" geometry="Polygon" refreshOnNotifyMessage="" simplifyDrawingTol="1" styleCategories="AllStyleCategories" simplifyMaxScale="1" refreshOnNotifyEnabled="0" readOnly="0" simplifyAlgorithm="0" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" wkbType="MultiPolygon">
-      <id>v_rpt_lidperfomance_sum_52b548dc_286d_4302_b8ba_4abc723c1cd2</id>
-      <datasource> __DATASOURCE__   key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_rpt_lidperfomance_sum" (the_geom)</datasource>
+      <id>v_rpt_lidperformance_sum_52b548dc_286d_4302_b8ba_4abc723c1cd2</id>
+      <datasource> __DATASOURCE__   key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_rpt_lidperformance_sum" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -53227,8 +53227,8 @@ def my_form_open(dialog, layer, feature):
       <mapTip></mapTip>
     </maplayer>
     <maplayer simplifyDrawingHints="1" autoRefreshEnabled="0" autoRefreshTime="0" symbologyReferenceScale="-1" type="vector" minScale="100000000" legendPlaceholderImage="" simplifyLocal="1" maxScale="-4.6566099999999998e-10" geometry="Polygon" refreshOnNotifyMessage="" simplifyDrawingTol="1" styleCategories="AllStyleCategories" simplifyMaxScale="1" refreshOnNotifyEnabled="0" readOnly="0" simplifyAlgorithm="0" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" wkbType="MultiPolygon">
-      <id>v_rpt_subcatchwasoff_sum_30c8fcc2_d459_46b6_82bc_71a31639446d</id>
-      <datasource> __DATASOURCE__   key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_rpt_subcatchwasoff_sum" (the_geom)</datasource>
+      <id>v_rpt_subcatchwashoff_sum_30c8fcc2_d459_46b6_82bc_71a31639446d</id>
+      <datasource> __DATASOURCE__   key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_rpt_subcatchwashoff_sum" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -55749,7 +55749,7 @@ def my_form_open(dialog, layer, feature):
     <layer id="v_rpt_arcflow_sum_fe94697c_63f1_4c02_bc5e_4ba0545170ba"/>
     <layer id="v_rpt_condsurcharge_sum_e28a01ad_4d2b_4d06_8d45_125bab49ea0d"/>
     <layer id="v_rpt_flowclass_sum_74485e21_3847_464e_9b2b_5e10a61ceebc"/>
-    <layer id="v_rpt_lidperfomance_sum_52b548dc_286d_4302_b8ba_4abc723c1cd2"/>
+    <layer id="v_rpt_lidperformance_sum_52b548dc_286d_4302_b8ba_4abc723c1cd2"/>
     <layer id="v_rpt_nodedepth_sum_f84277ab_00b9_4201_86ba_4f07e698d8e4"/>
     <layer id="v_rpt_nodeflooding_sum_69028733_3c38_420a_8c26_d10e8f2a4a3e"/>
     <layer id="v_rpt_nodeinflow_sum_1d195e0b_680d_435f_87e6_1e4a23a90ccc"/>
@@ -55759,7 +55759,7 @@ def my_form_open(dialog, layer, feature):
     <layer id="v_rpt_pumping_sum_3479daea_2671_4c8a_8119_e6046cdb3cd2"/>
     <layer id="v_rpt_storagevol_sum_28e9ebe5_9723_4378_bb06_8d6fc1cc2c4c"/>
     <layer id="v_rpt_subcatchrunoff_sum_e1348135_a2a0_407b_95a9_dfe57f782a63"/>
-    <layer id="v_rpt_subcatchwasoff_sum_30c8fcc2_d459_46b6_82bc_71a31639446d"/>
+    <layer id="v_rpt_subcatchwashoff_sum_30c8fcc2_d459_46b6_82bc_71a31639446d"/>
     <layer id="v_plan_psector_arc_dc4a3df0_fa35_428b_9327_a36255ef653b"/>
     <layer id="v_plan_psector_node_27b614c1_4c89_4dcf_8505_73bee9ff4b28"/>
     <layer id="v_edit_drainzone_1d49c80f_0cc5_47f7_b6f7_d7f289206355"/>
