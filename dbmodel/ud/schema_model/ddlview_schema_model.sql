@@ -6431,10 +6431,10 @@ CREATE VIEW v_rpt_comp_instability_index AS
 
 
 --
--- Name: v_rpt_comp_lidperfomance_sum; Type: VIEW; Schema: Schema; Owner: -
+-- Name: v_rpt_comp_lidperformance_sum; Type: VIEW; Schema: Schema; Owner: -
 --
 
-CREATE VIEW v_rpt_comp_lidperfomance_sum AS
+CREATE VIEW v_rpt_comp_lidperformance_sum AS
  SELECT rpt_lidperformance_sum.id,
     rpt_lidperformance_sum.result_id,
     rpt_lidperformance_sum.subc_id,
@@ -6771,10 +6771,10 @@ CREATE VIEW v_rpt_comp_subcatchrunoff_sum AS
 
 
 --
--- Name: v_rpt_comp_subcatchwasoff_sum; Type: VIEW; Schema: Schema; Owner: -
+-- Name: v_rpt_comp_subcatchwashoff_sum; Type: VIEW; Schema: Schema; Owner: -
 --
 
-CREATE VIEW v_rpt_comp_subcatchwasoff_sum AS
+CREATE VIEW v_rpt_comp_subcatchwashoff_sum AS
  SELECT rpt_subcatchwashoff_sum.id,
     rpt_subcatchwashoff_sum.result_id,
     rpt_subcatchwashoff_sum.subc_id,
@@ -6960,10 +6960,10 @@ CREATE VIEW v_rpt_instability_index AS
 
 
 --
--- Name: v_rpt_lidperfomance_sum; Type: VIEW; Schema: Schema; Owner: -
+-- Name: v_rpt_lidperformance_sum; Type: VIEW; Schema: Schema; Owner: -
 --
 
-CREATE VIEW v_rpt_lidperfomance_sum AS
+CREATE VIEW v_rpt_lidperformance_sum AS
  SELECT rpt_lidperformance_sum.id,
     rpt_lidperformance_sum.result_id,
     rpt_lidperformance_sum.subc_id,
@@ -7386,10 +7386,10 @@ CREATE VIEW v_rpt_subcatchrunoff_sum AS
 
 
 --
--- Name: v_rpt_subcatchwasoff_sum; Type: VIEW; Schema: Schema; Owner: -
+-- Name: v_rpt_subcatchwashoff_sum; Type: VIEW; Schema: Schema; Owner: -
 --
 
-CREATE VIEW v_rpt_subcatchwasoff_sum AS
+CREATE VIEW v_rpt_subcatchwashoff_sum AS
  SELECT rpt_subcatchwashoff_sum.id,
     rpt_subcatchwashoff_sum.result_id,
     rpt_subcatchwashoff_sum.subc_id,

@@ -171,3 +171,15 @@ INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('rpt_arc', NULL,
 INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('selector_period', NULL, 'role_basic', 'core') ON CONFLICT (id) DO NOTHING ;
 INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_ui_hydroval', NULL, 'role_basic', 'core') ON CONFLICT (id) DO NOTHING ;
 INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_ui_drainzone', NULL, 'role_basic', 'core') ON CONFLICT (id) DO NOTHING ;
+
+UPDATE sys_table SET id='v_rpt_lidperformance_sum' WHERE id='v_rpt_lidperfomance_sum';
+UPDATE sys_table SET id='v_rpt_comp_lidperformance_sum' WHERE id='v_rpt_comp_lidperfomance_sum';
+UPDATE sys_style SET layername='v_rpt_lidperformance_sum' WHERE layername='v_rpt_lidperfomance_sum';
+UPDATE sys_style SET layername='v_rpt_comp_lidperformance_sum' WHERE layername='v_rpt_comp_lidperfomance_sum';
+
+UPDATE sys_table SET id='v_rpt_subcatchwashoff_sum' WHERE id='v_rpt_subcatchwasoff_sum';
+UPDATE sys_table SET id='v_rpt_comp_subcatchwashoff_sum' WHERE id='v_rpt_comp_subcatchwasoff_sum';
+UPDATE sys_style SET layername='v_rpt_subcatchwashoff_sum' WHERE layername='v_rpt_subcatchwasoff_sum';
+UPDATE sys_style SET layername='v_rpt_comp_subcatchwashoff_sum' WHERE layername='v_rpt_comp_subcatchwasoff_sum';
+UPDATE config_form_fields SET formname='v_rpt_subcatchwashoff_sum' WHERE formname='v_rpt_subcatchwasoff_sum';
+UPDATE config_form_fields SET formname='v_rpt_comp_subcatchwashoff_sum' WHERE formname='v_rpt_comp_subcatchwasoff_sum';

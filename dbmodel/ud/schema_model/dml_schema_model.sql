@@ -17563,7 +17563,7 @@ INSERT INTO sys_style VALUES (163, 'v_rpt_subcatchrunoff_sum', 'qml', '<!DOCTYPE
   <layerOpacity>1</layerOpacity>
   <layerGeometryType>2</layerGeometryType>
 </qgis>', true);
-INSERT INTO sys_style VALUES (164, 'v_rpt_subcatchwasoff_sum', 'qml', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
+INSERT INTO sys_style VALUES (164, 'v_rpt_subcatchwashoff_sum', 'qml', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis hasScaleBasedVisibilityFlag="0" simplifyDrawingTol="1" simplifyDrawingHints="1" simplifyLocal="1" maxScale="-4.6566128730773926e-10" symbologyReferenceScale="-1" minScale="100000000" simplifyAlgorithm="0" simplifyMaxScale="1" styleCategories="Symbology|Rendering" version="3.22.4-Białowieża">
   <renderer-v2 forceraster="0" referencescale="-1" symbollevels="0" type="singleSymbol" enableorderby="0">
     <symbols>
@@ -17618,7 +17618,7 @@ INSERT INTO sys_style VALUES (164, 'v_rpt_subcatchwasoff_sum', 'qml', '<!DOCTYPE
   <layerOpacity>1</layerOpacity>
   <layerGeometryType>2</layerGeometryType>
 </qgis>', true);
-INSERT INTO sys_style VALUES (165, 'v_rpt_lidperfomance_sum', 'qml', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
+INSERT INTO sys_style VALUES (165, 'v_rpt_lidperformance_sum', 'qml', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis hasScaleBasedVisibilityFlag="0" simplifyDrawingTol="1" simplifyDrawingHints="1" simplifyLocal="1" maxScale="-4.6566128730773926e-10" symbologyReferenceScale="-1" minScale="100000000" simplifyAlgorithm="0" simplifyMaxScale="1" styleCategories="Symbology|Rendering" version="3.22.4-Białowieża">
   <renderer-v2 forceraster="0" referencescale="-1" symbollevels="0" type="singleSymbol" enableorderby="0">
     <symbols>
@@ -19349,7 +19349,7 @@ INSERT INTO sys_style VALUES (178, 'v_rpt_comp_subcatchrunoff_sum', 'qml', '<!DO
   <layerOpacity>1</layerOpacity>
   <layerGeometryType>2</layerGeometryType>
 </qgis>', true);
-INSERT INTO sys_style VALUES (179, 'v_rpt_comp_subcatchwasoff_sum', 'qml', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
+INSERT INTO sys_style VALUES (179, 'v_rpt_comp_subcatchwashoff_sum', 'qml', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis hasScaleBasedVisibilityFlag="0" simplifyDrawingTol="1" simplifyDrawingHints="1" simplifyLocal="1" maxScale="-4.6566128730773926e-10" symbologyReferenceScale="-1" minScale="100000000" simplifyAlgorithm="0" simplifyMaxScale="1" styleCategories="Symbology|Rendering" version="3.22.4-Białowieża">
   <renderer-v2 forceraster="0" referencescale="-1" symbollevels="0" type="singleSymbol" enableorderby="0">
     <symbols>
@@ -19404,7 +19404,7 @@ INSERT INTO sys_style VALUES (179, 'v_rpt_comp_subcatchwasoff_sum', 'qml', '<!DO
   <layerOpacity>1</layerOpacity>
   <layerGeometryType>2</layerGeometryType>
 </qgis>', true);
-INSERT INTO sys_style VALUES (180, 'v_rpt_comp_lidperfomance_sum', 'qml', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
+INSERT INTO sys_style VALUES (180, 'v_rpt_comp_lidperformance_sum', 'qml', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis hasScaleBasedVisibilityFlag="0" simplifyDrawingTol="1" simplifyDrawingHints="1" simplifyLocal="1" maxScale="-4.6566128730773926e-10" symbologyReferenceScale="-1" minScale="100000000" simplifyAlgorithm="0" simplifyMaxScale="1" styleCategories="Symbology|Rendering" version="3.22.4-Białowieża">
   <renderer-v2 forceraster="0" referencescale="-1" symbollevels="0" type="singleSymbol" enableorderby="0">
     <symbols>
@@ -22610,7 +22610,7 @@ INSERT INTO sys_table VALUES ('v_rpt_outfallflow_sum', 'Shows the results of out
 INSERT INTO sys_table VALUES ('v_rpt_outfallload_sum', 'Shows the results of outfall load simulations.', 'role_basic', 0, '{"level_1":"EPA","level_2":"RESULTS"}', 11, 'Outfall load', NULL, NULL, NULL, 'core', NULL, NULL);
 INSERT INTO sys_table VALUES ('v_rpt_storagevol_sum', 'Shows the results of storage volume simulations', 'role_basic', 0, '{"level_1":"EPA","level_2":"RESULTS"}', 12, 'Storage Volume', NULL, NULL, NULL, 'core', NULL, NULL);
 INSERT INTO sys_table VALUES ('v_rpt_subcatchrunoff_sum', 'Shows the results from subcatchments runoff simulations.', 'role_basic', 0, '{"level_1":"EPA","level_2":"RESULTS"}', 13, 'Subcatchment Runoff', NULL, NULL, NULL, 'core', NULL, NULL);
-INSERT INTO sys_table VALUES ('v_rpt_subcatchwasoff_sum', 'Shows the results of subcatchment washoff simulations.', 'role_basic', 0, '{"level_1":"EPA","level_2":"RESULTS"}', 14, 'Subcatchment Washoff', NULL, NULL, NULL, 'core', NULL, NULL);
+INSERT INTO sys_table VALUES ('v_rpt_subcatchwashoff_sum', 'Shows the results of subcatchment washoff simulations.', 'role_basic', 0, '{"level_1":"EPA","level_2":"RESULTS"}', 14, 'Subcatchment Washoff', NULL, NULL, NULL, 'core', NULL, NULL);
 INSERT INTO sys_table VALUES ('v_rpt_comp_nodeflooding_sum', 'Shows the result selecteb by the comparision selector in order to show into GIS project the data from result_selector and result_comparisor to compare between flooded nodes results.', 'role_basic', 0, '{"level_1":"EPA","level_2":"COMPARE"}', 1, 'Node Flooding Compare', NULL, NULL, NULL, 'core', NULL, NULL);
 INSERT INTO sys_table VALUES ('v_rpt_comp_nodesurcharge_sum', 'Shows the result selecteb by the comparision selector in order to show into GIS project the data from result_selector and result_comparisor to compare between surcharge value of nodes results.', 'role_basic', 0, '{"level_1":"EPA","level_2":"COMPARE"}', 2, 'Node Surcharge Compare', NULL, NULL, NULL, 'core', NULL, NULL);
 INSERT INTO sys_table VALUES ('v_rpt_comp_nodeinflow_sum', 'Shows the result selecteb by the comparision selector in order to show into GIS project the data from result_selector and result_comparisor to compare between inflow value of nodes results.', 'role_basic', 0, '{"level_1":"EPA","level_2":"COMPARE"}', 3, 'Node Inflow Compare', NULL, NULL, NULL, 'core', NULL, NULL);
@@ -22623,7 +22623,7 @@ INSERT INTO sys_table VALUES ('v_rpt_comp_outfallflow_sum', 'Shows the result se
 INSERT INTO sys_table VALUES ('v_rpt_comp_outfallload_sum', 'Shows the result selecteb by the comparision selector in order to show into GIS project the data from result_selector and result_comparisor to compare between outfall load simulations results..', 'role_basic', 0, '{"level_1":"EPA","level_2":"COMPARE"}', 11, 'Outfall Load Compare', NULL, NULL, NULL, 'core', NULL, NULL);
 INSERT INTO sys_table VALUES ('v_rpt_comp_storagevol_sum', 'Shows the result selecteb by the comparision selector in order to show into GIS project the data from result_selector and result_comparisor to compare between storage volume simulations results.', 'role_basic', 0, '{"level_1":"EPA","level_2":"COMPARE"}', 12, 'Storage Volume Compare', NULL, NULL, NULL, 'core', NULL, NULL);
 INSERT INTO sys_table VALUES ('v_rpt_comp_subcatchrunoff_sum', 'Shows the result selecteb by the comparision selector in order to show into GIS project the data from result_selector and result_comparisor to compare between subcatchments runoff simulations results.', 'role_basic', 0, '{"level_1":"EPA","level_2":"COMPARE"}', 13, 'Subcatchment Runoff Compare', NULL, NULL, NULL, 'core', NULL, NULL);
-INSERT INTO sys_table VALUES ('v_rpt_comp_subcatchwasoff_sum', 'Shows the result selecteb by the comparision selector in order to show into GIS project the data from result_selector and result_comparisor to compare between subcatchment washoff simulations results.', 'role_basic', 0, '{"level_1":"EPA","level_2":"COMPARE"}', 14, 'Subcatchment Washoff Compare', NULL, NULL, NULL, 'core', NULL, NULL);
+INSERT INTO sys_table VALUES ('v_rpt_comp_subcatchwashoff_sum', 'Shows the result selecteb by the comparision selector in order to show into GIS project the data from result_selector and result_comparisor to compare between subcatchment washoff simulations results.', 'role_basic', 0, '{"level_1":"EPA","level_2":"COMPARE"}', 14, 'Subcatchment Washoff Compare', NULL, NULL, NULL, 'core', NULL, NULL);
 INSERT INTO sys_table VALUES ('plan_psector_x_other', 'Table of other objects related to plan sectors', 'role_master', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL, NULL);
 INSERT INTO sys_table VALUES ('plan_psector_x_arc', 'Table of arcs related to plan sectors', 'role_master', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL, NULL);
 INSERT INTO sys_table VALUES ('plan_psector_x_node', 'Table of nodes related to plan sectors', 'role_master', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL, NULL);
@@ -22672,8 +22672,8 @@ INSERT INTO sys_table VALUES ('v_plan_psector_link', 'View to show links related
 INSERT INTO sys_table VALUES ('v_plan_psector_node', 'View to show nodes related to psectors. Useful to show nodes which will be obsolete in psectors', 'role_basic', 2, '{"level_1":"MASTERPLAN","level_2":"PSECTOR"}', 7, 'Plan psector node', NULL, NULL, NULL, 'core', NULL, NULL);
 INSERT INTO sys_table VALUES ('inp_gully', 'Table to manage gullies on epa', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL, NULL);
 INSERT INTO sys_table VALUES ('v_edit_inp_dwf', 'editable view for dry weather flows', 'role_epa', NULL, '{"level_1":"EPA","level_2":"HYDRAULICS"}', 13, 'Inp Dwf', NULL, NULL, NULL, 'core', NULL, '{"pkey":"dwfscenario_id, node_id"}');
-INSERT INTO sys_table VALUES ('v_rpt_lidperfomance_sum', 'Shows the results of LID performance simulations.', 'role_basic', 0, '{"level_1":"EPA","level_2":"RESULTS"}', 15, 'LID Performance', NULL, NULL, NULL, 'core', NULL, NULL);
-INSERT INTO sys_table VALUES ('v_rpt_comp_lidperfomance_sum', 'Shows the result selecteb by the comparision selector in order to show into GIS project the data from result_selector and result_comparisor to compare between LID performance simulations results.', 'role_basic', 0, '{"level_1":"EPA","level_2":"COMPARE"}', 15, 'LID Performance Compare', NULL, NULL, NULL, 'core', NULL, NULL);
+INSERT INTO sys_table VALUES ('v_rpt_lidperformance_sum', 'Shows the results of LID performance simulations.', 'role_basic', 0, '{"level_1":"EPA","level_2":"RESULTS"}', 15, 'LID Performance', NULL, NULL, NULL, 'core', NULL, NULL);
+INSERT INTO sys_table VALUES ('v_rpt_comp_lidperformance_sum', 'Shows the result selecteb by the comparision selector in order to show into GIS project the data from result_selector and result_comparisor to compare between LID performance simulations results.', 'role_basic', 0, '{"level_1":"EPA","level_2":"COMPARE"}', 15, 'LID Performance Compare', NULL, NULL, NULL, 'core', NULL, NULL);
 INSERT INTO sys_table VALUES ('vi_subcatch2outlet', 'Shows the information about the relation between subcatchments and nodes', 'role_basic', NULL, '{"level_1":"EPA","level_2":"HYDROLOGY"}', 3, 'Subcatchment outlet', NULL, NULL, NULL, 'core', NULL, NULL);
 INSERT INTO sys_table VALUES ('rpt_arcpollutant_sum', 'Table to store arcpollutant values', 'role_epa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL, NULL);
 INSERT INTO sys_table VALUES ('inp_dscenario_controls', '"Table to manage scenario for controls"', 'role_epa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL, NULL);

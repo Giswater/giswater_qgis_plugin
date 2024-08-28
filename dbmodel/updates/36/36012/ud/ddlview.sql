@@ -4445,3 +4445,75 @@ WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector
 
 DROP VIEW IF EXISTS v_anl_pgrouting_arc;
 DROP VIEW IF EXISTS v_anl_pgrouting_node;
+
+
+DROP VIEW IF EXISTS v_rpt_lidperfomance_sum;
+CREATE OR REPLACE VIEW v_rpt_lidperformance_sum AS
+ SELECT rpt_lidperformance_sum.id,
+    rpt_lidperformance_sum.result_id,
+    rpt_lidperformance_sum.subc_id,
+    rpt_lidperformance_sum.lidco_id,
+    rpt_lidperformance_sum.tot_inflow,
+    rpt_lidperformance_sum.evap_loss,
+    rpt_lidperformance_sum.infil_loss,
+    rpt_lidperformance_sum.surf_outf,
+    rpt_lidperformance_sum.drain_outf,
+    rpt_lidperformance_sum.init_stor,
+    rpt_lidperformance_sum.final_stor,
+    rpt_lidperformance_sum.per_error,
+    inp_subcatchment.sector_id,
+    inp_subcatchment.the_geom
+   FROM selector_rpt_main,
+    (inp_subcatchment
+     JOIN rpt_lidperformance_sum ON (((rpt_lidperformance_sum.subc_id)::text = (inp_subcatchment.subc_id)::text)))
+  WHERE (((rpt_lidperformance_sum.result_id)::text = (selector_rpt_main.result_id)::text) AND (selector_rpt_main.cur_user = "current_user"()));
+  
+DROP VIEW IF EXISTS v_rpt_comp_lidperfomance_sum;
+CREATE OR REPLACE VIEW v_rpt_comp_lidperformance_sum AS
+ SELECT rpt_lidperformance_sum.id,
+    rpt_lidperformance_sum.result_id,
+    rpt_lidperformance_sum.subc_id,
+    rpt_lidperformance_sum.lidco_id,
+    rpt_lidperformance_sum.tot_inflow,
+    rpt_lidperformance_sum.evap_loss,
+    rpt_lidperformance_sum.infil_loss,
+    rpt_lidperformance_sum.surf_outf,
+    rpt_lidperformance_sum.drain_outf,
+    rpt_lidperformance_sum.init_stor,
+    rpt_lidperformance_sum.final_stor,
+    rpt_lidperformance_sum.per_error,
+    inp_subcatchment.sector_id,
+    inp_subcatchment.the_geom
+   FROM selector_rpt_compare,
+    (inp_subcatchment
+     JOIN rpt_lidperformance_sum ON (((rpt_lidperformance_sum.subc_id)::text = (inp_subcatchment.subc_id)::text)))
+  WHERE (((rpt_lidperformance_sum.result_id)::text = (selector_rpt_compare.result_id)::text) AND (selector_rpt_compare.cur_user = "current_user"()));
+  
+DROP VIEW IF EXISTS v_rpt_subcatchwasoff_sum;
+CREATE OR REPLACE VIEW v_rpt_subcatchwashoff_sum AS
+ SELECT rpt_subcatchwashoff_sum.id,
+    rpt_subcatchwashoff_sum.result_id,
+    rpt_subcatchwashoff_sum.subc_id,
+    rpt_subcatchwashoff_sum.poll_id,
+    rpt_subcatchwashoff_sum.value,
+    inp_subcatchment.sector_id,
+    inp_subcatchment.the_geom
+   FROM selector_rpt_main,
+    (inp_subcatchment
+     JOIN rpt_subcatchwashoff_sum ON (((rpt_subcatchwashoff_sum.subc_id)::text = (inp_subcatchment.subc_id)::text)))
+  WHERE (((rpt_subcatchwashoff_sum.result_id)::text = (selector_rpt_main.result_id)::text) AND (selector_rpt_main.cur_user = "current_user"()));
+  
+DROP VIEW IF EXISTS v_rpt_comp_subcatchwasoff_sum;
+CREATE OR REPLACE VIEW v_rpt_comp_subcatchwashoff_sum AS
+ SELECT rpt_subcatchwashoff_sum.id,
+    rpt_subcatchwashoff_sum.result_id,
+    rpt_subcatchwashoff_sum.subc_id,
+    rpt_subcatchwashoff_sum.poll_id,
+    rpt_subcatchwashoff_sum.value,
+    inp_subcatchment.sector_id,
+    inp_subcatchment.the_geom
+   FROM selector_rpt_compare,
+    (inp_subcatchment
+     JOIN rpt_subcatchwashoff_sum ON (((rpt_subcatchwashoff_sum.subc_id)::text = (inp_subcatchment.subc_id)::text)))
+  WHERE (((rpt_subcatchwashoff_sum.result_id)::text = (selector_rpt_compare.result_id)::text) AND (selector_rpt_compare.cur_user = "current_user"()));
+  
