@@ -103,10 +103,10 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (116, null, 4, '-------------------------------------------------------------');
 
 	-- inserting all extrem nodes on temp_node
-	INSERT INTO temp_table (fid, text_column, geom_point)
-	SELECT 	116, arc_id, ST_StartPoint(the_geom) AS the_geom FROM v_edit_arc WHERE expl_id=v_expl and (state=1 or state=2)
+	EXECUTE 'INSERT INTO temp_table (fid, text_column, geom_point)
+	SELECT 	116, arc_id, ST_StartPoint(the_geom) AS the_geom FROM v_edit_arc WHERE expl_id=v_expl and (state=1 or state=2) '||v_querytext||'
 	UNION 
-	SELECT 	116, arc_id, ST_EndPoint(the_geom) AS the_geom FROM v_edit_arc WHERE expl_id=v_expl and (state=1 or state=2);
+	SELECT 	116, arc_id, ST_EndPoint(the_geom) AS the_geom FROM v_edit_arc WHERE expl_id=v_expl and (state=1 or state=2) '||v_querytext||'';
 
 		
 	-- inserting into node table
