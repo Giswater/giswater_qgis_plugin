@@ -138,3 +138,9 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_man_gully_pol();
 
 CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_link
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_link();
+
+CREATE TRIGGER gw_trg_edit_sector INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_sector
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_sector('sector');
+
+CREATE TRIGGER gw_trg_edit_dma INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_dma
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dma('dma');
