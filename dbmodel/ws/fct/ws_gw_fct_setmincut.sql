@@ -55,6 +55,10 @@ v_querytext text;
 v_response json;
 v_message text;
 
+v_vdefault json;
+v_default_key text;
+v_default_value text;
+
 v_xcoord double precision;
 v_ycoord double precision;
 v_epsg integer;
@@ -92,6 +96,7 @@ BEGIN
 	v_arc := ((p_data ->>'data')::json->>'arcId')::integer;
 	v_usepsectors := ((p_data ->>'data')::json->>'usePsectors')::boolean;
 	v_mincut_version := (SELECT value::json->>'version' FROM config_param_system WHERE parameter = 'om_mincut_config');
+	v_vdefault := (SELECT value::json FROM config_param_system WHERE parameter = 'om_mincut_vdefault');
 
 	v_xcoord := ((p_data ->> 'data')::json->> 'coordinates')::json->>'xcoord';
 	v_ycoord := ((p_data ->> 'data')::json->> 'coordinates')::json->>'ycoord';
@@ -120,6 +125,11 @@ BEGIN
 		IF v_device = 5 and v_mincut IS NULL THEN
 			SELECT setval('om_mincut_seq', COALESCE((SELECT max(id::integer)+1 FROM om_mincut), 1), true) INTO v_mincut;
 			INSERT INTO om_mincut (id) VALUES (v_mincut);
+
+			-- Set default values
+			FOR v_default_key, v_default_value IN SELECT * FROM jsonb_each_text(v_vdefault) LOOP
+				EXECUTE 'UPDATE om_mincut SET '||v_default_key||' = '||v_default_value||' WHERE id = '||v_mincut||';';
+			END LOOP;
 		END IF;
 
 		-- check if there is no node_id configured on config_graph_mincut for the macroexploitation
@@ -165,6 +175,12 @@ BEGIN
 	
 	ELSIF v_action = 'startMincut' THEN
 
+		IF v_device = 5 THEN
+			IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut) IN (0, 4) THEN
+				UPDATE om_mincut SET mincut_state = 1 WHERE id = v_mincut;
+			END IF;
+		END IF;
+
 		IF (SELECT json_extract_path_text(value::json, 'redoOnStart','status')::boolean FROM config_param_system WHERE parameter='om_mincut_settings') is true THEN
 			--reexecuting mincut on clicking start
 			SELECT json_extract_path_text(value::json, 'redoOnStart','days')::integer INTO v_days FROM config_param_system WHERE parameter='om_mincut_settings';
@@ -181,45 +197,91 @@ BEGIN
 				END IF;
 
 				IF v_mincut_version = 5 THEN
-					RETURN gw_fct_mincut_minsector(v_arc::text, v_mincut, v_usepsectors);
+					SELECT gw_fct_mincut_minsector(v_arc::text, v_mincut, v_usepsectors) INTO v_result;
 				ELSE 
-					RETURN gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut, v_usepsectors);
+					SELECT gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut, v_usepsectors) INTO v_result;
 				END IF;
+
+				if v_device = 5 THEN
+					RETURN gw_fct_getmincut(p_data);
+				ELSE
+					RETURN v_result;
+				END IF;
+
 			ELSE
-				RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Start mincut"}, "version":"'||v_version||'","body":{"form":{},"data":{ "info":null,"geometry":null, "mincutDetails":null}}}}')::json;
+				IF v_device = 5 THEN
+					RETURN gw_fct_getmincut(p_data);
+				ELSE
+					RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Start mincut"}, "version":"'||v_version||'","body":{"form":{},"data":{ "info":null,"geometry":null, "mincutDetails":null}}}}')::json;
+				END IF;
 			END IF;
 		ELSE
 		    --  Return
-	    RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Start mincut"}, "version":"'||v_version||'","body":{"form":{},"data":{ "info":null,"geometry":null, "mincutDetails":null}}}')::json;
+			IF v_device = 5 THEN
+				RETURN gw_fct_getmincut(p_data);
+			ELSE
+	    		RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Start mincut"}, "version":"'||v_version||'","body":{"form":{},"data":{ "info":null,"geometry":null, "mincutDetails":null}}}')::json;
+			END IF;
 		END IF;
 
 	ELSIF v_action = 'mincutValveUnaccess' THEN
 
-		RETURN gw_fct_json_create_return(gw_fct_mincut_valve_unaccess(p_data), 2980, null, null, null);
+		SELECT gw_fct_json_create_return(gw_fct_mincut_valve_unaccess(p_data), 2980, null, null, null) into v_result;
+		IF v_device = 5 THEN
+			RETURN gw_fct_getmincut(p_data);
+		ELSE
+			RETURN v_result;
+		END IF;
 		
-	ELSIF v_action = 'mincutAccept' THEN
+	ELSIF v_action IN ('mincutAccept', 'endMincut') THEN
 
 		-- call setfields
 		v_message = '{"text": "Mincut accepted.", "level": 1}';
 		IF v_device = 5 THEN
-			v_querytext = concat('SELECT gw_fct_setfields($$', p_data, '$$);');
-			EXECUTE v_querytext;
+			IF v_action = 'mincutAccept' THEN
+				v_querytext = concat('SELECT gw_fct_setfields($$', p_data, '$$);');
+				EXECUTE v_querytext;
+				IF (select mincut_state from om_mincut where id = v_mincut) = 4 THEN
+					UPDATE om_mincut SET mincut_state = 0 WHERE id = v_mincut;
+				END IF;
+			ELSIF v_action = 'endMincut' THEN
+				IF (SELECT mincut_state FROM om_mincut WHERE id = v_mincut) = 1 THEN
+					UPDATE om_mincut SET mincut_state = 2 WHERE id = v_mincut;
+				END IF;
+			END IF;
 		END IF;
+
 
 		-- Update table 'selector_mincut_result'
 		DELETE FROM selector_mincut_result WHERE cur_user = v_cur_user;
 		INSERT INTO selector_mincut_result (cur_user, result_id) VALUES (v_cur_user,v_mincut);
 
+		IF v_device = 5 THEN
+			SELECT mincut_class INTO v_mincut_class FROM om_mincut WHERE id = v_mincut;
+		END IF;
+
 		IF v_mincut_class = 1 THEN
 
 			UPDATE config_param_user SET value = v_mincut::text WHERE parameter = 'inp_options_valve_mode_mincut_result' AND cur_user = v_cur_user;
 		
-			RETURN gw_fct_mincut_result_overlap(p_data);
+			SELECT gw_fct_mincut_result_overlap(p_data) into v_result;
 
 		ELSIF v_mincut_class IN (2, 3) THEN
 		
-			RETURN gw_fct_mincut_connec(p_data);
+			SELECT gw_fct_mincut_connec(p_data) into v_result;
 		
+		END IF;
+
+		IF v_device = 5 THEN
+			SELECT gw_fct_getmincut(p_data) INTO v_response;
+
+			-- Set the info to the info from v_result body data info
+			v_response = jsonb_set(v_response::jsonb, '{body,data,info}', v_result::jsonb->'body'->'data'->'info');
+			raise notice 'v_response: %', v_response;
+			RETURN v_response;
+
+		ELSE
+			RETURN v_result;
 		END IF;
 
 	ELSIF v_action = 'mincutCancel' THEN

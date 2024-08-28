@@ -338,6 +338,28 @@ BEGIN
 		limit 1
 		into v_bbox;
 
+        -- mincut details
+        SELECT * INTO v_mincutrec FROM om_mincut WHERE id::text = v_mincutid::text;
+        DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=216;
+        INSERT INTO audit_check_data (fid, error_message) VALUES (216, '');
+        INSERT INTO audit_check_data (fid, error_message) VALUES (216, 'Mincut stats');
+        INSERT INTO audit_check_data (fid, error_message) VALUES (216, '-----------------');
+        INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Number of arcs: ', (v_mincutrec.output->>'arcs')::json->>'number'));
+        INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Length of affected network: ', (v_mincutrec.output->>'arcs')::json->>'length', ' mts'));
+        INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Total water volume: ', (v_mincutrec.output->>'arcs')::json->>'volume', ' m3'));
+        INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Number of connecs affected: ', (v_mincutrec.output->>'connecs')::json->>'number'));
+        INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Total of hydrometers affected: ', ((v_mincutrec.output->>'connecs')::json->>'hydrometers')::json->>'total'));
+        INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Hydrometers classification: ', ((v_mincutrec.output->>'connecs')::json->>'hydrometers')::json->>'classified'));
+
+        -- info
+        v_result = null;
+        SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+        FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=216 order by id) row;
+        v_result := COALESCE(v_result, '{}'); 
+        v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
+        v_result_info := COALESCE(v_result_info, '{}'); 
+
         v_result_init = COALESCE(v_result_init, '{}');
         v_result_valve_proposed = COALESCE(v_result_valve_proposed, '{}');
         v_result_valve_not_proposed = COALESCE(v_result_valve_not_proposed, '{}');
@@ -351,8 +373,10 @@ BEGIN
           "form": {},
           "feature": {},
           "data": {
+            "info": '||v_result_info||',
             "mincutId": '|| v_mincutid ||',
             "fields": '|| v_fieldsjson ||','||
+            '"mincutState":'||(v_values_array->>'mincut_state')||','||
               '"mincutInit":'||v_result_init||','||
               '"mincutProposedValve":'||v_result_valve_proposed||','||
               '"mincutNotProposedValve":'||v_result_valve_not_proposed||','||
