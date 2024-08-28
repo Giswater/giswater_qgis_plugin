@@ -629,8 +629,7 @@ UPDATE config_form_fields SET layoutorder =11 WHERE  formname = 'v_edit_dma' AND
 UPDATE config_form_fields SET layoutorder =12 WHERE  formname = 'v_edit_dma' AND columnname = 'avg_press';
 UPDATE config_form_fields SET layoutorder =13, iseditable=false WHERE  formname = 'v_edit_dma' AND columnname = 'graphconfig';
 UPDATE config_form_fields SET layoutorder =14 WHERE  formname = 'v_edit_dma' AND columnname = 'stylesheet';
-UPDATE config_form_fields SET layoutorder =15 WHERE  formname = 'v_edit_dma' AND columnname = 'expl_id2';
-UPDATE config_form_fields SET layoutorder =16 WHERE  formname = 'v_edit_dma' AND columnname = 'active';
+UPDATE config_form_fields SET layoutorder =15 WHERE  formname = 'v_edit_dma' AND columnname = 'active';
 
 UPDATE config_form_fields SET layoutname = 'lyt_data_1' where formname = 'v_edit_presszone';
 UPDATE config_form_fields SET layoutorder =1 WHERE  formname = 'v_edit_presszone' AND columnname = 'presszone_id';
@@ -642,8 +641,7 @@ UPDATE config_form_fields SET layoutorder =6 WHERE  formname = 'v_edit_presszone
 UPDATE config_form_fields SET layoutorder =7 WHERE  formname = 'v_edit_presszone' AND columnname = 'presszone_type';
 UPDATE config_form_fields SET layoutorder =8, iseditable=false WHERE  formname = 'v_edit_presszone' AND columnname = 'graphconfig';
 UPDATE config_form_fields SET layoutorder =9 WHERE  formname = 'v_edit_presszone' AND columnname = 'stylesheet';
-UPDATE config_form_fields SET layoutorder =10 WHERE  formname = 'v_edit_presszone' AND columnname = 'expl_id2';
-UPDATE config_form_fields SET layoutorder =11 WHERE  formname = 'v_edit_presszone' AND columnname = 'active';
+UPDATE config_form_fields SET layoutorder =10 WHERE  formname = 'v_edit_presszone' AND columnname = 'active';
 
 UPDATE config_form_fields SET layoutname = 'lyt_data_1' where formname = 'v_edit_dqa';
 UPDATE config_form_fields SET layoutorder =1 WHERE  formname = 'v_edit_dqa' AND columnname = 'dqa_id';
@@ -659,8 +657,7 @@ UPDATE config_form_fields SET layoutorder =10 WHERE  formname = 'v_edit_dqa' AND
 UPDATE config_form_fields SET layoutorder =11 WHERE  formname = 'v_edit_dqa' AND columnname = 'avg_press';
 UPDATE config_form_fields SET layoutorder =12, iseditable=false WHERE  formname = 'v_edit_dqa' AND columnname = 'graphconfig';
 UPDATE config_form_fields SET layoutorder =13 WHERE  formname = 'v_edit_dqa' AND columnname = 'stylesheet';
-UPDATE config_form_fields SET layoutorder =14 WHERE  formname = 'v_edit_dqa' AND columnname = 'expl_id2';
-UPDATE config_form_fields SET layoutorder =15 WHERE  formname = 'v_edit_dqa' AND columnname = 'active';
+UPDATE config_form_fields SET layoutorder =14 WHERE  formname = 'v_edit_dqa' AND columnname = 'active';
 
 UPDATE config_param_system SET value = (replace(value, 'Disable', 'Random')) WHERE parameter='utils_graphanalytics_style';
 
