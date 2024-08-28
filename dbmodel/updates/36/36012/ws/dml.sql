@@ -353,3 +353,9 @@ INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_minsector_gra
 INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_ui_sector', NULL, 'role_basic', 'core') ON CONFLICT (id) DO NOTHING ;
 INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_ui_dma', NULL, 'role_basic', 'core') ON CONFLICT (id) DO NOTHING ;
 INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_ui_presszone', NULL, 'role_basic', 'core') ON CONFLICT (id) DO NOTHING ;
+
+
+-- 28/08/2024
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, widgettype, ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetcontrols, widgetfunction, hidden, web_layoutorder)
+	VALUES ('mincut', 'form_mincut', 'tab_mincut', 'btn_apply', 'lyt_bot_1', 'button', false, false, true, false, false, '{"text":"Apply"}'::json, '{"functionName":"apply","params": {}}'::json, false, 1);
+UPDATE config_form_fields SET web_layoutorder = 2 WHERE formname='mincut' AND formtype='form_mincut' AND tabname='tab_mincut' AND columnname = 'btn_cancel';
