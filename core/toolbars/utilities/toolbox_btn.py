@@ -638,8 +638,8 @@ class GwToolBoxButton(GwAction):
             else:
                 feature_types = result['functionparams'].get('featureType')
                 self._populate_cmb_type(feature_types)
-                self.dlg_functions.cmb_feature_type.currentIndexChanged.connect(partial(self._populate_layer_combo))
-                self._populate_layer_combo()
+                self.dlg_functions.cmb_feature_type.currentIndexChanged.connect(partial(self._populate_layer_combo, feature_types))
+                self._populate_layer_combo(feature_types)
             tools_gw.build_dialog_options(dialog, result, 0, self.function_list, self.temp_layers_added, module)
             self._load_settings_values(dialog, result)
             self._load_parametric_values(dialog, result)
@@ -704,8 +704,7 @@ class GwToolBoxButton(GwAction):
         return list_items
 
 
-    def _populate_layer_combo(self):
-
+    def _populate_layer_combo(self, feature_types):
         feature_type = tools_qt.get_combo_value(self.dlg_functions, self.dlg_functions.cmb_feature_type, 0)
         self.layers = []
         self.layers = self._get_all_group_layers(feature_type)
@@ -714,12 +713,14 @@ class GwToolBoxButton(GwAction):
         legend_layers = tools_qgis.get_project_layers()
         for feature_type, layer in self.layers:
             if layer in legend_layers:
-                elem = []
+
                 layer_name = tools_qgis.get_layer_source_table_name(layer)
-                elem.append(layer.name())
-                elem.append(layer_name)
-                elem.append(feature_type)
-                layers.append(elem)
+                if feature_types.get(feature_type.lower()) is not None and layer_name in feature_types.get(feature_type.lower()):
+                    elem = []
+                    elem.append(layer.name())
+                    elem.append(layer_name)
+                    elem.append(feature_type)
+                    layers.append(elem)
         if not layers:
             elem = [f"There is no layer related to {feature_type}.", None, None]
             layers.append(elem)
