@@ -54,7 +54,7 @@ v_count integer;
 v_node_id text;
 v_selection_mode text;
 v_id text;
-v_querytext TEXT;
+v_querytext text;
 
 BEGIN
 
@@ -77,18 +77,12 @@ BEGIN
 	v_selection_mode := (p_data ->>'data')::json->>'selectionMode'::text;
 	v_id := (p_data ->>'feature')::json->>'id'::text;
 
-	
-
 	select replace(replace(replace(v_id, '[', ''), ']', ''), '"', '''') into v_id;
 
 	if v_selection_mode = 'previousSelection' then
-
 		v_querytext = ' AND arc_id in ('||v_id||')';
-
 	else
-	
 		v_querytext = '';
-		
 	end if;
 
 
@@ -104,11 +98,13 @@ BEGIN
 
 	-- inserting all extrem nodes on temp_node
 	EXECUTE 'INSERT INTO temp_table (fid, text_column, geom_point)
-	SELECT 	116, arc_id, ST_StartPoint(the_geom) AS the_geom FROM v_edit_arc WHERE expl_id=v_expl and (state=1 or state=2) '||v_querytext||'
+	SELECT 	116, arc_id, ST_StartPoint(the_geom) AS the_geom FROM v_edit_arc WHERE expl_id='||v_expl||' and (state=1 or state=2) '||v_querytext||'
 	UNION 
-	SELECT 	116, arc_id, ST_EndPoint(the_geom) AS the_geom FROM v_edit_arc WHERE expl_id=v_expl and (state=1 or state=2) '||v_querytext||'';
+	SELECT 	116, arc_id, ST_EndPoint(the_geom) AS the_geom FROM v_edit_arc WHERE expl_id='||v_expl||' and (state=1 or state=2) '||v_querytext||'';
 
-		
+   -- disable arc divide because new nodes are on start/end vertices
+	ALTER TABLE node DISABLE TRIGGER gw_trg_node_arc_divide;
+    
 	-- inserting into node table
 	FOR rec_table IN SELECT * FROM temp_table WHERE cur_user=current_user AND fid = 116
 	LOOP
@@ -128,28 +124,22 @@ BEGIN
 				INSERT INTO anl_node (the_geom, state, fid, expl_id, nodecat_id) 
 				VALUES (rec_table.geom_point, v_state, 116,v_expl, v_nodecat_id);
 			END IF;
-		ELSE
-
 		END IF;
 	END LOOP;
 		
 	-- repair arcs
 	IF v_insertnode THEN
-	
-		-- set isarcdivide of chosed nodetype on falsea
-		SELECT isarcdivide INTO v_isarcdivide FROM cat_feature_node WHERE id=v_nodetype_id;
-		UPDATE cat_feature_node SET isarcdivide=FALSE WHERE id=v_nodetype_id;	
 		
 		EXECUTE 'SELECT array_to_json(array_agg(arc_id::text)) FROM arc WHERE expl_id='||v_expl||' AND (node_1 IS NULL OR node_2 IS NULL)'
 		INTO v_arclist;
 		-- execute function
 		EXECUTE 'SELECT gw_fct_arc_repair($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":'||v_arclist||'},
 		"data":{}}$$);';
-
-		-- restore isarcdivide to previous value
-		UPDATE cat_feature_node SET isarcdivide=v_isarcdivide WHERE id=v_nodetype_id;	
 		
-	END IF;	
+	END IF;
+    
+    -- enable arc divide
+    ALTER TABLE node ENABLE TRIGGER gw_trg_node_arc_divide;
 
 	-- get log
 	SELECT count(*) INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=116;
@@ -158,12 +148,12 @@ BEGIN
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
 		VALUES (116,  'There are no nodes to be repaired.', 0);
 	ELSE
-			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			VALUES (116,  concat (v_count,' nodes have been created to repair topology'), v_count);
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		VALUES (116,  concat (v_count,' nodes have been created to repair topology'), v_count);
 
-			INSERT INTO audit_check_data(fid,  error_message, fcount)
-			SELECT 116,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count 
-			FROM anl_node WHERE cur_user="current_user"() AND fid=116;
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		SELECT 116,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count 
+		FROM anl_node WHERE cur_user="current_user"() AND fid=116;
 	END IF;
 	
 	-- info
