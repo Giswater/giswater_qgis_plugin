@@ -363,3 +363,9 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 UPDATE config_form_fields SET web_layoutorder = 2 WHERE formname='mincut' AND formtype='form_mincut' AND tabname='tab_mincut' AND columnname = 'btn_cancel';
 
 UPDATE config_form_fields SET web_layoutorder=NULL WHERE formname='mincut' AND formtype='form_mincut' AND columnname='chk_use_planified' AND tabname='tab_mincut';
+
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname)
+VALUES('om_mincut_vdefault', '{"exec_appropiate": "false"}', 'Default values used when creating a new mincut', 'Default mincut values:', NULL, NULL, NULL, NULL, 'ws', NULL, NULL, 'json', 'linetext', true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname)
+VALUES('om_mincut_vdefault', '{"mincut_type":"(SELECT id FROM om_mincut_cat_type ORDER BY id ASC LIMIT 1)", "exec_appropiate":"false", "received_date":"now()", "anl_cause":"1", "assigned_to":"current_user"}', 'Default values used when creating a new mincut', 'Default mincut values:', NULL, NULL, true, 3, 'ws', NULL, NULL, 'json', 'linetext', true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_admin_om');
