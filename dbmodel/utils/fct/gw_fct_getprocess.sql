@@ -246,7 +246,7 @@ BEGIN
 			    UNION SELECT 'v_edit_inp_subcatchment', 'SUBCATCHMENT', 6, true as active
 			    UNION SELECT 'v_edit_raingage', 'RAINGAGE', 8, true as active ) t
 			    WHERE type = UPPER(replace(v_value_element, '"', '')) AND active IS TRUE
-				ORDER BY c, tablename) into v_response_array;
+				ORDER BY c, tablename) a into v_response_array;
 				v_value_json = gw_fct_json_object_set_key(v_value_json, replace(v_value_element, '"', ''), v_response_array);
 			end loop;
 			v_fields_aux = gw_fct_json_object_set_key(((v_fields->>'functionparams')::json), 'featureType', v_value_json);
