@@ -35,7 +35,16 @@ BEGIN
             IF (expl_id_int IS NULL) THEN
 				expl_id_int := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_exploitation_vdefault' AND "cur_user"="current_user"());
             END IF;
+           
+		-- Municipality
+		IF (NEW.muni_id IS NULL) THEN
+			NEW.muni_id := (SELECT m.muni_id FROM ext_municipality m WHERE ST_intersects(NEW.the_geom, m.the_geom) AND active IS TRUE limit 1);
 			
+			IF (NEW.muni_id IS NULL) THEN
+				NEW.muni_id := 0;
+			END IF;
+		END IF;
+
 	    -- State	
 		        IF (NEW.state IS NULL) THEN
             NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"());
@@ -52,14 +61,15 @@ BEGIN
 				--"data":{"message":"1012", "function":"1330","debug_msg":null, "variables":null}}$$);
                 RETURN NULL;                         
             END IF;
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) AND active IS TRUE  LIMIT 1);
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) AND dma.active IS TRUE  LIMIT 1);
 			IF (NEW.dma_id IS NULL) THEN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_dma_vdefault' AND "cur_user"="current_user"());
 			END IF; 
             IF (NEW.dma_id IS NULL) THEN
              --PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				--"data":{"message":"1014", "function":"1330","debug_msg":null, "variables":null}}$$);
-                RETURN NULL; 
+            	NEW.dma_id := 0;
+                
             END IF;
         END IF;
 		

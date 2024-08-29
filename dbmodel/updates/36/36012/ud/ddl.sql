@@ -45,6 +45,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dma", "col
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dma", "column":"min"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dma", "column":"max"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dma", "column":"effec"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dma", "column":"expl_id2"}}$$);
+
 
 
 DROP FUNCTION IF EXISTS gw_fct_graphanalytics_downstream_recursive;

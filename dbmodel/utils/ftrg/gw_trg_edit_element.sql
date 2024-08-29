@@ -114,6 +114,26 @@ BEGIN
 				END IF;		
 			END IF;
 		END IF;		
+	
+		-- Sector
+		IF (NEW.sector_id IS NULL) THEN
+			NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_intersects(NEW.the_geom, sector.the_geom) AND active IS TRUE limit 1);
+
+			IF (NEW.sector_id IS NULL) THEN
+				NEW.sector_id := 0;
+			END IF;
+		END IF;
+	
+		-- Municipality
+		IF (NEW.muni_id IS NULL) THEN
+			NEW.muni_id := (SELECT m.muni_id FROM sector, ext_municipality m WHERE ST_intersects(m.the_geom, sector.the_geom) AND sector.active IS TRUE limit 1);
+
+
+			IF (NEW.muni_id IS NULL) THEN
+				NEW.muni_id := 0;
+			END IF;
+		END IF;
+	
 
 		-- Enddate
 		IF (NEW.state > 0) THEN

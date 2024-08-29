@@ -30,6 +30,17 @@ BEGIN
 			END IF;
 		END IF;	
 
+		-- Municipality
+
+		-- getting value from geometry of mapzone
+		IF (NEW.muni_id IS NULL) THEN
+			NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_intersects(NEW.the_geom, ext_municipality.the_geom) AND active IS TRUE limit 1);
+		END IF;
+
+		IF (NEW.muni_id IS NULL) THEN
+			NEW.muni_id := 0
+		END IF;
+
 		-- FEATURE INSERT
 		INSERT INTO raingage (rg_id, form_type, intvl, scf, rgage_type, timser_id, fname, sta, units, the_geom, expl_id, muni_id) 
 		VALUES (NEW.rg_id, NEW.form_type, NEW.intvl, NEW.scf, NEW.rgage_type, NEW.timser_id, NEW.fname, NEW.sta, NEW.units, NEW.the_geom, NEW.expl_id, NEW.muni_id);

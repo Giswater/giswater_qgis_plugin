@@ -27,6 +27,16 @@ BEGIN
 			END IF;
 		END IF;
 
+		-- Sector
+		IF (NEW.sector_id IS NULL) THEN
+			NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_intersects(NEW.the_geom, sector.the_geom) AND active IS TRUE limit 1);
+
+			IF (NEW.sector_id IS NULL) THEN
+				NEW.sector_id := 0;
+			END IF;
+		END IF;
+
+
 		-- active
 		IF NEW.active IS NULL THEN
 			NEW.active = TRUE;

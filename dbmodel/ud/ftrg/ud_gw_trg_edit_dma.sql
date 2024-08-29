@@ -28,14 +28,26 @@ BEGIN
 				ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 			END IF;
 		END IF;
+	
+	
+		-- Sector
+		IF (NEW.sector_id IS NULL) THEN
+			NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_intersects(NEW.the_geom, sector.the_geom) AND active IS TRUE limit 1);
+
+			IF (NEW.sector_id IS NULL) THEN
+				NEW.sector_id := 0;
+			END IF;
+		END IF;
+	
+	
 
 		-- active
 		IF NEW.active IS NULL THEN
 			NEW.active = TRUE;
 		END IF;
 			
-		INSERT INTO dma (dma_id, name, descript, macrodma_id, the_geom, undelete, expl_id, link, active, stylesheet, expl_id2, sector_id)
-		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.macrodma_id, NEW.the_geom, NEW.undelete, NEW.expl_id, NEW.link, NEW.active, NEW.stylesheet,  NEW.expl_id2, NEW.sector_id);
+		INSERT INTO dma (dma_id, name, descript, macrodma_id, the_geom, undelete, expl_id, link, active, stylesheet, sector_id)
+		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.macrodma_id, NEW.the_geom, NEW.undelete, NEW.expl_id, NEW.link, NEW.active, NEW.stylesheet,  NEW.sector_id);
 
 		RETURN NEW;
 		
@@ -44,7 +56,7 @@ BEGIN
 		UPDATE dma 
 		SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete, expl_id=NEW.expl_id, 
 		link=NEW.link, active=NEW.active, lastupdate=now(), 
-		lastupdate_user = current_user, macrodma_id = NEW.macrodma_id, stylesheet=NEW.stylesheet, expl_id2 = NEW.expl_id2, sector=NEW.sector_id
+		lastupdate_user = current_user, macrodma_id = NEW.macrodma_id, stylesheet=NEW.stylesheet, sector=NEW.sector_id
 		WHERE dma_id=OLD.dma_id;
 		
 		RETURN NEW;

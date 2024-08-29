@@ -64,7 +64,7 @@ BEGIN
 			-- control error when no value
 			IF (NEW.expl_id IS NULL) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"2012", "function":"1302","debug_msg":"'||NEW.arc_id::text||'"}}$$);';
+				"data":{"message":"2012", "function":"1302","debug_msg":"'||NEW.sample_id::text||'"}}$$);';
 			END IF;            
 		END IF;
 	
@@ -79,6 +79,27 @@ BEGIN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_dma_vdefault' AND "cur_user"="current_user"());
 			END IF; 
 		END IF;
+
+			
+		-- Sector
+		IF (NEW.sector_id IS NULL) THEN
+			NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_intersects(NEW.the_geom, sector.the_geom) AND active IS TRUE limit 1);
+
+			IF (NEW.sector_id IS NULL) THEN
+				NEW.sector_id := 0;
+			END IF;
+		END IF;
+	
+		-- Municipality
+		IF (NEW.muni_id IS NULL) THEN
+			NEW.muni_id := (SELECT m.muni_id FROM sector, ext_municipality m WHERE ST_intersects(m.the_geom, sector.the_geom) AND sector.active IS TRUE limit 1);
+
+
+			IF (NEW.muni_id IS NULL) THEN
+				NEW.muni_id := 0;
+			END IF;
+		END IF;
+
 				
 		IF v_projectype = 'WS' THEN
 			INSERT INTO samplepoint (sample_id, code, lab_code, feature_id, featurecat_id, dma_id, presszone_id, "state", builtdate, enddate,

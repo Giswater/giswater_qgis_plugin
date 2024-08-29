@@ -78,6 +78,7 @@ AS SELECT
     dma.sector_id,
     s.name as sector_name,
     dma.descript,
+    dma.undelete,
     dma.link,
     dma.active,
     dma.stylesheet,
