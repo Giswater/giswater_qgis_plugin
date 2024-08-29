@@ -374,7 +374,7 @@ class GwInfo(QObject):
         for field in result['fields']:
             if 'hidden' in field and field['hidden']:
                 continue
-            if 'layoutname' in field and field['layoutname'] == 'lyt_none':
+            if 'layoutname' in field and field['layoutname'] in ('lyt_none', 'lyt_buttons'):
                 continue
             if field.get('tabname') not in ('tab_data', 'tab_none'):
                 continue
