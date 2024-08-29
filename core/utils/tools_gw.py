@@ -650,8 +650,6 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         # Apply styles to layer
         if style_id in (None, "-1"):
             set_layer_styles(tablename_og, layer)
-        elif style_id is not None:
-            set_layer_style(style_id, layer)
 
         if tablename:
             # Set layer config
@@ -720,43 +718,12 @@ def set_layer_styles(tablename, layer):
             else:
                 style_manager = layer.styleManager()
 
-                # read valid style from layer
-                style = QgsMapLayerStyle()
-                style.readFromLayer(layer)
-
+                default_style_name = tools_qt.tr('default', context_name='QgsMapLayerStyleManager')
                 # add style with new name
-                style_manager.addStyle(style_name, style)
+                style_manager.renameStyle(default_style_name, style_name)
                 # set new style as current
                 style_manager.setCurrentStyle(style_name)
-
                 tools_qgis.create_qml(layer, qml)
-                style_manager.setCurrentStyle("BASIC")
-
-
-def set_layer_style(style_id, layer):
-    body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
-    json_return = execute_procedure('gw_fct_getstyle', body)
-    if json_return is None or json_return['status'] == 'Failed':
-        return
-    if 'styles' in json_return['body']:
-        for style_name, qml in json_return['body']['styles']:
-
-            if qml is None:
-                continue
-
-            valid_qml, error_message = validate_qml(qml)
-            if not valid_qml:
-                msg = "The QML file is invalid."
-                tools_qgis.show_warning(msg, parameter=error_message)
-            else:
-                style_manager = layer.styleManager()
-
-                if not style_manager.setCurrentStyle(style_name):
-                    style = QgsMapLayerStyle()
-                    style.readFromLayer(layer)
-                    style_manager.addStyle(style_name, style)
-                    style_manager.setCurrentStyle(style_name)
-                    tools_qgis.create_qml(layer, qml)
 
 
 def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
