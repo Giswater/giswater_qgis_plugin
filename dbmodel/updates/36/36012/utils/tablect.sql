@@ -22,3 +22,7 @@ ALTER TABLE link ADD CONSTRAINT link_sector_id FOREIGN KEY (sector_id) REFERENCE
 ALTER TABLE dimensions ADD CONSTRAINT dimensions_muni_id FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id);
 ALTER TABLE dimensions ADD CONSTRAINT dimensions_sector_id FOREIGN KEY (sector_id) REFERENCES sector(sector_id);
 
+ALTER TABLE element ALTER COLUMN sector_id set not null;
+ALTER TABLE samplepoint ALTER COLUMN sector_id set not null;
+ALTER TABLE om_visit ALTER COLUMN sector_id set not null;
+ALTER TABLE dimensions ALTER COLUMN sector_id set not null;

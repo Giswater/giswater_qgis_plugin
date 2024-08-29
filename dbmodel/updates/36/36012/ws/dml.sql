@@ -370,3 +370,27 @@ VALUES('om_mincut_vdefault', '{"mincut_type":"(SELECT id FROM om_mincut_cat_type
 
 -- 29/08/2024
 UPDATE config_toolbox SET functionparams='{"featureType": {"node":["v_edit_inp_reservoir", "v_edit_inp_tank", "v_edit_inp_inlet", "v_edit_inp_junction", "v_edit_inp_shortpipe", "v_edit_inp_valve", "v_edit_inp_pump", "v_edit_inp_pump_additional"], "arc":["v_edit_inp_pipe", "v_edit_inp_virtualvalve", "v_edit_inp_virtualpump"], "connec":["v_edit_inp_connec"]}}'::json WHERE id = 3108;
+
+update pond p set muni_id = a.muni_id from (
+select p.pond_id,m.muni_id from pond p 
+	left join exploitation e using (expl_id)
+	left join ext_municipality m on st_intersects(m.the_geom, e.the_geom)
+)a where p.pond_id = a.pond_id;
+
+update pond set muni_id = 0 where muni_id is null;
+
+update pool p set muni_id = p.muni_id from (
+select p.pool_id, m.muni_id from pool p
+	left join exploitation e using (expl_id)
+	left join ext_municipality m on st_intersects(m.the_geom, e.the_geom)
+)a where p.pool_id = a.pool_id;
+
+update pool set muni_id = 0 where muni_id is null;
+
+
+update presszone p set sector_id = a.sector_id from sector a where st_intersects(a.the_geom, p.the_geom) and a.sector_id is null;
+
+update dma p set sector_id = a.sector_id from sector a where st_intersects(a.the_geom, p.the_geom) and a.sector_id is null;
+
+update dqa p set sector_id = a.sector_id from sector a where st_intersects(a.the_geom, p.the_geom) and a.sector_id is null;
+

@@ -43,22 +43,22 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "col
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"muni_id", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"sector_id", "dataType":"integer"}}$$);
 ALTER TABLE element ALTER COLUMN sector_id set default 0;
-ALTER TABLE element ALTER COLUMN sector_id set not null;
+
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"samplepoint", "column":"muni_id", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"samplepoint", "column":"sector_id", "dataType":"integer"}}$$);
 ALTER TABLE samplepoint ALTER COLUMN sector_id set default 0;
-ALTER TABLE samplepoint ALTER COLUMN sector_id set not null;
+
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit", "column":"muni_id", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit", "column":"sector_id", "dataType":"integer"}}$$);
 ALTER TABLE om_visit ALTER COLUMN sector_id set default 0;
-ALTER TABLE om_visit ALTER COLUMN sector_id set not null;
+
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dimensions", "column":"muni_id", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dimensions", "column":"sector_id", "dataType":"integer"}}$$);
 ALTER TABLE dimensions ALTER COLUMN sector_id set default 0;
-ALTER TABLE dimensions ALTER COLUMN sector_id set not null;
+
 
 
 CREATE INDEX arc_muni ON arc USING btree (muni_id);
