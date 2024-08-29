@@ -354,4 +354,5 @@ SELECT
     sys_style.active
 FROM sys_style
 JOIN config_style
-ON sys_style.styleconfig_id = config_style.id;
+ON sys_style.styleconfig_id = config_style.id
+WHERE config_style.is_templayer IS NULL OR config_style.is_templayer = false;
