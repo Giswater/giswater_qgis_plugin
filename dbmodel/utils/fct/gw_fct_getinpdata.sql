@@ -6,7 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3310
 
-CREATE OR REPLACE FUNCTION gw_fct_getinpdata(result_ids TEXT[])
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_getinpdata(TEXT[]);
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_getinpdata(result_ids TEXT[])
 RETURNS json
 LANGUAGE plpgsql
 AS $function$
@@ -19,6 +20,10 @@ DECLARE
     v_result_polygon JSON := '{"geometryType":"Polygon","features":[]}'; -- Without polygon, empty
 
 BEGIN
+
+	-- Set search path to local schema
+    SET search_path = "SCHEMA_NAME", public;
+
     -- Check if result_ids is NULL or has an invalid value
     IF result_ids IS NULL OR array_length(result_ids, 1) IS NULL THEN
         RETURN gw_fct_json_create_return(
