@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Add feature</string>
+   <string>Add category</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="2">
@@ -41,11 +41,24 @@
      </property>
      <widget class="QWidget" name="tab_del_feature">
       <attribute name="title">
-       <string>Add feature</string>
+       <string>Data</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="5" column="1">
         <layout class="QGridLayout" name="gridLayout_4">
+         <item row="1" column="0">
+          <widget class="QLabel" name="lbl_feature_id_2">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Category name: </string>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="0">
           <widget class="QLabel" name="lbl_feature_id">
            <property name="sizePolicy">
@@ -55,14 +68,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Feature id:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="lbl_feature_id_3">
-           <property name="text">
-            <string>Descript: </string>
+            <string>Category ID: </string>
            </property>
           </widget>
          </item>
@@ -71,22 +77,6 @@
          </item>
          <item row="2" column="3">
           <widget class="QLineEdit" name="descript"/>
-         </item>
-         <item row="2" column="1">
-          <spacer name="horizontalSpacer_5">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>44</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
          </item>
          <item row="0" column="1">
           <spacer name="horizontalSpacer_3">
@@ -104,36 +94,6 @@
            </property>
           </spacer>
          </item>
-         <item row="4" column="1">
-          <spacer name="horizontalSpacer_7">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>44</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="lbl_feature_id_4">
-           <property name="text">
-            <string>Sys_role: </string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="lbl_feature_id_5">
-           <property name="text">
-            <string>Addparam: </string>
-           </property>
-          </widget>
-         </item>
          <item row="3" column="1">
           <spacer name="horizontalSpacer_6">
            <property name="orientation">
@@ -149,6 +109,9 @@
             </size>
            </property>
           </spacer>
+         </item>
+         <item row="3" column="3">
+          <widget class="QComboBox" name="sys_role"/>
          </item>
          <item row="1" column="1">
           <spacer name="horizontalSpacer_4">
@@ -166,27 +129,38 @@
            </property>
           </spacer>
          </item>
-         <item row="4" column="3">
-          <widget class="QLineEdit" name="addparam"/>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="lbl_feature_id_2">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
+         <item row="2" column="0">
+          <widget class="QLabel" name="lbl_feature_id_3">
            <property name="text">
-            <string>Idval: </string>
+            <string>Description: </string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <spacer name="horizontalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>44</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="lbl_feature_id_4">
+           <property name="text">
+            <string>Role: </string>
            </property>
           </widget>
          </item>
          <item row="0" column="3">
           <widget class="QLineEdit" name="feature_id"/>
-         </item>
-         <item row="3" column="3">
-          <widget class="QComboBox" name="sys_role"/>
          </item>
         </layout>
        </item>

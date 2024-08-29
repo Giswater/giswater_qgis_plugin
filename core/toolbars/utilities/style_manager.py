@@ -9,14 +9,13 @@ from functools import partial
 import json
 import tempfile
 
-from qgis._core import Qgis
-
 from ..toc.layerstyle_change_button import apply_styles_to_layers
 from ...ui.ui_manager import GwStyleManagerUi, GwCreateStyleGroupUi
 from ...utils import tools_gw
 from ....libs import lib_vars, tools_db, tools_qgis, tools_qt
 from .... import global_vars
-from qgis.PyQt.QtWidgets import QDialog, QLabel, QHeaderView, QTableView, QMenu, QAction
+
+from qgis.PyQt.QtWidgets import QDialog, QLabel, QHeaderView, QTableView, QMenu, QAction, QMessageBox
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtSql import QSqlTableModel
 
@@ -74,13 +73,12 @@ class GwStyleManager:
         for context_id, context_name in contexts_params:
             self.style_mng_dlg.stylegroup.addItem(context_name, context_id)
 
-
     def get_contexts_params(self):
         """Retrieves style context parameters from the database."""
         sql = """
         SELECT id, idval, addparam
             FROM config_style
-        WHERE id != 0
+        WHERE id != 0 AND (is_templayer = false OR is_templayer IS NULL)
         """
         rows = tools_db.get_rows(sql)
 
@@ -138,7 +136,6 @@ class GwStyleManager:
         idval = dialog_create.idval.text()
         descript = dialog_create.descript.text()
         sys_role = dialog_create.sys_role.currentText()
-        addparam = dialog_create.addparam.text()
 
         # Validate that the mandatory fields are not empty
         if not feature_id or not idval:
@@ -158,9 +155,6 @@ class GwStyleManager:
         if sys_role:
             sql += ", sys_role"
             values += f", '{sys_role}'"
-        if addparam:
-            sql += ", addparam"
-            values += f", '{addparam}'"
 
         # Close the fields section of the SQL query
         sql += f") VALUES ({values}) RETURNING id;"
@@ -218,7 +212,11 @@ class GwStyleManager:
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         self.style_mng_dlg.tbl_style.setSelectionBehavior(QTableView.SelectRows)
         self.style_mng_dlg.tbl_style.setEditTriggers(QTableView.NoEditTriggers)
-        self.style_mng_dlg.tbl_style.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+        # Customize table view
+        header = self.style_mng_dlg.tbl_style.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.Interactive)
+        header.setStretchLastSection(True)
 
 
     def _check_style_exists(self, dialog_create):
@@ -413,7 +411,6 @@ class GwStyleManager:
         except Exception as e:
             tools_qgis.show_warning(f"Failed to load layers: {e}", dialog=self.style_mng_dlg)
 
-
     def _add_layer_style(self, table_name, geom_field):
         """Add a new style for the specified layer, copying from 'GwBasic' if available."""
         try:
@@ -439,13 +436,27 @@ class GwStyleManager:
 
             new_styleconfig_id = row_result[0]
             sql_check_exists = (
+                f"SELECT COUNT(*) "
+                f"FROM {lib_vars.schema_name}.sys_style "
+                f"WHERE layername = '{table_name}' AND styleconfig_id = {new_styleconfig_id};"
+            )
+            style_exists = tools_db.get_row(sql_check_exists)[0] > 0
+
+            if style_exists:
+                tools_qgis.show_warning(
+                    f"A style already exists for the layer '{table_name}' in the selected style group.",
+                    dialog=self.style_mng_dlg
+                )
+                return
+
+            sql_gw_basic = (
                 f"SELECT styletype, stylevalue, active "
                 f"FROM {lib_vars.schema_name}.sys_style "
                 f"WHERE layername = '{table_name}' AND styleconfig_id = ("
                 f"SELECT id FROM {lib_vars.schema_name}.config_style WHERE idval = 'GwBasic'"
                 f");"
             )
-            existing_style = tools_db.get_row(sql_check_exists)
+            existing_style = tools_db.get_row(sql_gw_basic)
 
             if existing_style:
                 styletype, stylevalue, active = existing_style
@@ -462,14 +473,21 @@ class GwStyleManager:
             )
 
             tools_db.execute_sql(sql_insert_style)
-            tools_qgis.show_info(
-                f"The style for layer '{table_name}' has been successfully added to group '{selected_stylegroup_name}'.", dialog=self.style_mng_dlg
+
+            # Crear un pop-up con solo un botón "OK" después de una operación exitosa
+            message = (
+                f"A new style has been added to '{selected_stylegroup_name}' for the layer '{table_name}' "
+                f"using the 'GwBasic' style information.\n"
+                f"You can change it and use 'Update Style' to create a personalized version."
             )
+            QMessageBox.information(self.style_mng_dlg, "Style Added", message, QMessageBox.Ok)
+
             self._load_styles()
 
         except Exception as e:
             tools_qgis.show_warning(
-                f"An error occurred while adding the style for layer '{table_name}':\n{str(e)}", dialog=self.style_mng_dlg
+                f"An error occurred while adding the style for layer '{table_name}':\n{str(e)}",
+                dialog=self.style_mng_dlg
             )
 
 
