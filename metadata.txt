@@ -10,10 +10,15 @@ author=David Erill, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fust�
 Changelog=Version 3.6.012
     - Change "Set archive" button to "Toggle archive" (go2epa manager)
     - Show the dates when an EPA result has been corporate
+    - New button "Show INP data" in go2epa manager
     - Add the option to set geometry to a document (it can automatically get coordinates from the document's metadata)
     - Add "name" field for documents
-    - Add workcat tab in document's relations
+    - Add workcat, psector & visit tabs in document dialog
+    - Create workcat manager
     - Allow tab ordering in GwInfo (via config_form_tabs)
+    - New style manager & style change button
+    - Improve mincut dialog by ordering the toolbar actions
+    - Remove prices manager
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
