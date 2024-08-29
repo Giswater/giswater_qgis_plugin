@@ -13,21 +13,18 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getstyle(p_data json)
 $BODY$
 
 /*
-    SELECT SCHEMA_NAME.gw_fct_getstyle($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-        "data":{"filterFields":{}, "pageInfo":{}, "style_id": "106"}}$$);
 
-    SELECT SCHEMA_NAME.gw_fct_getstyle($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-        "data":{"filterFields":{}, "pageInfo":{}, "layername": "v_edit_node"}}$$);
+	SELECT SCHEMA_NAME.gw_fct_getstyle($${"data":{"layername":"v_edit_arc"}}$$);
+
 */
 
 DECLARE
 v_return json;
-v_style_id text;
 v_layername text;
 v_styles json;
-v_version json;
+v_version text;
 v_error_context text;
-
+v_style_vdef int;
 
 
 BEGIN
@@ -36,26 +33,34 @@ BEGIN
     SET search_path = 'SCHEMA_NAME', public;
 
     -- Get input variables
-    v_style_id = (p_data -> 'data' ->> 'style_id')::text;
     v_layername = (p_data -> 'data' ->> 'layername')::text;
 
-    IF v_style_id IS NOT NULL THEN
-        -- If style_id is provided, get the style directly
-        v_styles := jsonb_object_agg(stylecat_id::text, stylevalue) FROM (
-            SELECT stylecat_id, stylevalue
-            FROM sys_style
-            WHERE id::text = v_style_id::text AND active IS TRUE
-        ) sub;
-    ELSIF v_layername IS NOT NULL THEN
-        -- If layername is provided, get all styles for that layer
-        v_styles := jsonb_object_agg(idval::text, stylevalue) FROM (
+	-- Get version
+	SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1 INTO v_version;
+
+	-- Get systemvalues
+	SELECT ((value::json)->>'styleconfig_vdef') INTO v_style_vdef FROM config_param_system WHERE parameter='qgis_layers_symbology';
+
+	-- Get the default style
+    v_styles := jsonb_object_agg(idval::text, stylevalue) FROM (
+        SELECT c.idval, stylevalue
+        FROM sys_style s
+        JOIN config_style c ON s.styleconfig_id = c.id
+        WHERE s.layername = v_layername AND c.id=v_style_vdef AND s.active IS TRUE
+    ) sub;
+
+	-- If the default style doesn't match, get the 101 (GwBasic)
+	IF v_styles IS NULL THEN
+		v_styles := jsonb_object_agg(idval::text, stylevalue) FROM (
             SELECT c.idval, stylevalue
             FROM sys_style s
-            JOIN cat_style c ON s.stylecat_id = c.id
-            WHERE s.idval = v_layername AND s.active IS TRUE
+            JOIN config_style c ON s.styleconfig_id = c.id
+            WHERE s.layername = v_layername AND c.id=101 AND s.active IS TRUE
         ) sub;
-    ELSE
-        -- If neither style_id nor layername is provided, return an empty JSON object
+    END IF;
+	
+	-- If still null, return an empty JSON object
+	IF v_styles IS NULL THEN
         v_styles := '{}'::jsonb;
     END IF;
 
