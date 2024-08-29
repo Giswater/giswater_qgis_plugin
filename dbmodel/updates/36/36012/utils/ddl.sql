@@ -95,7 +95,7 @@ CREATE TABLE config_style (
 	descript text NULL,
 	sys_role varchar(30) NULL,
 	addparam json NULL,
-    is_templayer bool NULL,
+    is_templayer bool DEFAULT false NULL,
 	active bool DEFAULT true NULL,
 	CONSTRAINT config_style_pkey PRIMARY KEY (id));
 
