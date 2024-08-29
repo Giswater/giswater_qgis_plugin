@@ -227,10 +227,10 @@ INSERT INTO config_function (id, function_name, "style", layermanager, actions) 
 INSERT INTO sys_function (id,function_name,project_type,function_type,input_params,return_type,descript,sys_role,"source")
 VALUES (3310,'gw_fct_getinpdata','utils','function','json','json','The function retrieves GeoJSON data for nodes and arcs based on selected result IDs and returns it in a structured JSON format.','role_epa','core');
 
-INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) 
+INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
 VALUES('selector_muni', 'Selector of municipalities', 'role_basic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL);
 
-INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) 
+INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
 VALUES('config_style', 'Catalog of different style context', 'role_basic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL);
 
 INSERT INTO config_param_system ("parameter", value, descript, "label", isenabled, project_type, "datatype", widgettype)
@@ -287,3 +287,9 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 VALUES('connec', 'form_feature', 'tab_none', 'btn_apply', 'lyt_buttons', 0, NULL, 'button', NULL, 'Apply', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"text":"Apply"}'::json, '{"functionName": "apply", "params": {}}'::json, NULL, false, 1);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('connec', 'form_feature', 'tab_none', 'btn_cancel', 'lyt_buttons', 0, NULL, 'button', NULL, 'Cancel', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"text":"Cancel"}'::json, '{"functionName": "cancel", "params": {}}'::json, NULL, false, 2);
+
+
+--29/08/2024
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source")
+	VALUES(3320, 'gw_fct_set_rpt_archived', 'ud', 'function', 'json', 'json', 'Function to archive or restore results.', 'role_epa', 'core')
+ON CONFLICT (id) DO UPDATE SET project_type=EXCLUDED.project_type;

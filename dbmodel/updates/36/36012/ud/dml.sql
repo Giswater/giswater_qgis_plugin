@@ -149,7 +149,7 @@ INSERT INTO sys_function VALUES
 
 UPDATE config_form_tableview SET columnindex=4 WHERE objectname='v_ui_rpt_cat_result' AND columnname='status';
 UPDATE config_form_tableview SET columnindex=6 WHERE objectname='v_ui_rpt_cat_result' AND columnname='descript';
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) 
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam)
 VALUES('epa_toolbar', 'utils', 'v_ui_rpt_cat_result', 'iscorporate', 5, true, NULL, NULL, NULL, NULL);
 
 
@@ -191,3 +191,6 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 VALUES('gully', 'form_feature', 'tab_none', 'btn_apply', 'lyt_buttons', 0, NULL, 'button', NULL, 'Apply', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"text":"Apply"}'::json, '{"functionName": "apply", "params": {}}'::json, NULL, false, 1);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('gully', 'form_feature', 'tab_none', 'btn_cancel', 'lyt_buttons', 0, NULL, 'button', NULL, 'Cancel', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"text":"Cancel"}'::json, '{"functionName": "cancel", "params": {}}'::json, NULL, false, 2);
+
+-- 29/08/2024
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_result_status', '3', 'ARCHIVED', NULL, NULL);
