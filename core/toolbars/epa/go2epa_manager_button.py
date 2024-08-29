@@ -444,7 +444,7 @@ class GwGo2EpaManagerButton(GwAction):
         json_result = tools_gw.execute_procedure(
             function_name="gw_fct_getinpdata",
             parameters=result_ids_json,
-            schema_name="agosto16",
+            schema_name=f"{lib_vars.schema_name}",
             commit=False
         )
 
