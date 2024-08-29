@@ -49,7 +49,6 @@ class GwGo2EpaManagerButton(GwAction):
         self.dlg_manager.btn_archive.setEnabled(False)
         if self.project_type != 'ws':
             self.dlg_manager.btn_set_corporate.setVisible(False)
-            self.dlg_manager.btn_archive.setVisible(False)
 
         # Fill combo box and table view
         # self._fill_combo_result_id()
