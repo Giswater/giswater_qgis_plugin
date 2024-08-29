@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>614</width>
-    <height>410</height>
+    <width>405</width>
+    <height>255</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item row="1" column="2">
     <widget class="QPushButton" name="btn_cancel">
      <property name="text">
-      <string>       Close        </string>
+      <string>Cancel</string>
      </property>
     </widget>
    </item>
@@ -47,7 +47,7 @@
        <item row="5" column="1">
         <layout class="QGridLayout" name="gridLayout_4">
          <item row="1" column="0">
-          <widget class="QLabel" name="lbl_feature_id_2">
+          <widget class="QLabel" name="lbl_cat_name">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -60,7 +60,7 @@
           </widget>
          </item>
          <item row="0" column="0">
-          <widget class="QLabel" name="lbl_feature_id">
+          <widget class="QLabel" name="lbl_cat_id">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -130,7 +130,7 @@
           </spacer>
          </item>
          <item row="2" column="0">
-          <widget class="QLabel" name="lbl_feature_id_3">
+          <widget class="QLabel" name="lbl_descript">
            <property name="text">
             <string>Description: </string>
            </property>
@@ -153,7 +153,7 @@
           </spacer>
          </item>
          <item row="3" column="0">
-          <widget class="QLabel" name="lbl_feature_id_4">
+          <widget class="QLabel" name="lbl_role">
            <property name="text">
             <string>Role: </string>
            </property>
@@ -177,6 +177,15 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>mainTab</tabstop>
+  <tabstop>feature_id</tabstop>
+  <tabstop>idval</tabstop>
+  <tabstop>descript</tabstop>
+  <tabstop>sys_role</tabstop>
+  <tabstop>btn_add</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

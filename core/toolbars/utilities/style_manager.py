@@ -114,6 +114,7 @@ class GwStyleManager:
     def _add_style_group(self, dialog):
         """Logic for adding a style group using the Qt Designer dialog."""
         dialog_create = GwCreateStyleGroupUi(self)
+        tools_gw.open_dialog(dialog_create, 'create_style_group')
         tools_gw.load_settings(dialog_create)
 
         dialog_create.setWindowFlag(Qt.WindowStaysOnTopHint)
