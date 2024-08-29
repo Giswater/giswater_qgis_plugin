@@ -366,3 +366,7 @@ UPDATE config_form_fields SET web_layoutorder=NULL WHERE formname='mincut' AND f
 
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname)
 VALUES('om_mincut_vdefault', '{"mincut_type":"(SELECT id FROM om_mincut_cat_type ORDER BY id ASC LIMIT 1)", "exec_appropiate":"false", "received_date":"now()", "anl_cause":"1", "assigned_to":"current_user"}', 'Default values used when creating a new mincut', 'Default mincut values:', NULL, NULL, true, 3, 'ws', NULL, NULL, 'json', 'linetext', true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_admin_om');
+
+
+-- 29/08/2024
+UPDATE config_toolbox SET functionparams='{"featureType": {"node":["v_edit_inp_reservoir", "v_edit_inp_tank", "v_edit_inp_inlet", "v_edit_inp_junction", "v_edit_inp_shortpipe", "v_edit_inp_valve", "v_edit_inp_pump", "v_edit_inp_pump_additional"], "arc":["v_edit_inp_pipe", "v_edit_inp_virtualvalve", "v_edit_inp_virtualpump"], "connec":["v_edit_inp_connec"]}}'::json WHERE id = 3108;
