@@ -46,7 +46,7 @@ class GwLoadProject(QObject):
 
         # Check if loaded project is valid for Giswater
         if not self._check_project(show_warning):
-            return
+            return False
 
         # Force commit before opening project and set new database connection
         if not self._check_database_connection(show_warning):

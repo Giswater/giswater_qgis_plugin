@@ -384,7 +384,11 @@ class Giswater(QObject):
 
         # Create class to manage code that performs project configuration
         self.load_project = GwLoadProject()
-        self.load_project.project_read(show_warning, self)
+
+        # If it is not a Giswater project, display admin button
+        is_gw_project = self.load_project.project_read(show_warning, self)
+        if is_gw_project is False:
+            self._set_info_button()
 
 
     def save_project(self):
