@@ -191,6 +191,11 @@ BEGIN
 				',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,') ') end),' 
 				ON CONFLICT (',v_columnname,', cur_user) DO NOTHING;');
 
+			ELSIF v_tabname='tab_municipality' THEN
+				EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
+				',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,')') end),' WHERE active AND muni_id > 0
+				ON CONFLICT (',v_columnname,', cur_user) DO NOTHING;');
+
 			ELSE
 				EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
 				',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,')') end),' WHERE active

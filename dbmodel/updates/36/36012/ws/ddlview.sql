@@ -236,7 +236,7 @@ SELECT e.* FROM ( SELECT element.element_id,
      JOIN element_type ON element_type.id::text = cat_element.elementtype_id::text
   WHERE element.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) e
   join selector_sector s using (sector_id)
-  right join selector_municipality m using (muni_id)
+  LEFT JOIN selector_municipality m using (muni_id)
   where s.cur_user = current_user 
   and (m.cur_user = current_user or e.muni_id is null);
 
@@ -278,7 +278,7 @@ SELECT sm.* FROM ( SELECT samplepoint.sample_id,
     LEFT JOIN dma ON dma.dma_id = samplepoint.dma_id
 	WHERE samplepoint.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) sm
 	join selector_sector s using (sector_id)
-    right join selector_municipality m using (muni_id)
+    LEFT JOIN selector_municipality m using (muni_id)
     where s.cur_user = current_user 
     and (m.cur_user = current_user or sm.muni_id is null);
 	
@@ -456,7 +456,7 @@ select a.* FROM ( SELECT selector_expl.expl_id FROM selector_expl WHERE selector
 JOIN v_state_arc USING (arc_id)
 WHERE a.expl_id = s.expl_id OR a.expl_id2 = s.expl_id) a
 join selector_sector s using (sector_id)
-right join selector_municipality m using (muni_id)
+LEFT JOIN selector_municipality m using (muni_id)
 where s.cur_user = current_user 
 and (m.cur_user = current_user or a.muni_id is null);
 
@@ -608,7 +608,7 @@ JOIN v_state_node USING (node_id)
 WHERE n.expl_id = s.expl_id OR n.expl_id2 = s.expl_id) a
 LEFT JOIN man_valve v USING (node_id)
 join v_sector_node s using (node_id)
-right join selector_municipality m using (muni_id)
+LEFT JOIN selector_municipality m using (muni_id)
 where (m.cur_user = current_user or a.muni_id is null);
 
 
@@ -826,7 +826,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
 	FROM vu_link
 	JOIN v_state_link USING (link_id)) l
 	join selector_sector s using (sector_id)
-	right join selector_municipality m using (muni_id)
+	LEFT JOIN selector_municipality m using (muni_id)
 	where s.cur_user = current_user and (m.cur_user = current_user or l.muni_id is null);
 
 
@@ -1044,7 +1044,7 @@ SELECT vu_connec.connec_id,
           WHERE (vu_link.expl_id = s_1.expl_id OR vu_link.expl_id2 = s_1.expl_id) AND vu_link.state = 2) a ON a.feature_id::text = vu_connec.connec_id::text
 	WHERE vu_connec.expl_id = s.expl_id OR vu_connec.expl_id2 = s.expl_id) c
 	join selector_sector s using (sector_id)
-	right join selector_municipality m using (muni_id)
+	LEFT JOIN selector_municipality m using (muni_id)
 	where s.cur_user = current_user 
 	and (m.cur_user = current_user or c.muni_id is null);
 
@@ -3883,7 +3883,7 @@ CREATE OR REPLACE VIEW v_edit_pond AS
 	pond.muni_id
     FROM selector_expl,   pond
     LEFT JOIN dma ON pond.dma_id = dma.dma_id
-	right join selector_municipality m using (muni_id)
+	LEFT JOIN selector_municipality m using (muni_id)
 	where (m.cur_user = current_user or pond.muni_id is null) and 
     pond.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
   
@@ -3899,6 +3899,6 @@ CREATE OR REPLACE VIEW v_edit_pool AS
 	pool.muni_id
     FROM selector_expl, pool
     LEFT JOIN dma ON pool.dma_id = dma.dma_id
-	right join selector_municipality m using (muni_id)
+	LEFT JOIN selector_municipality m using (muni_id)
 	where (m.cur_user = current_user or pool.muni_id is null)
 	and pool.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
