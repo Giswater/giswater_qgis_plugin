@@ -404,3 +404,5 @@ VALUES('featuretype_change', 'form_generic', 'tab_none', 'btn_accept', 'lyt_butt
 INSERT INTO config_form_fields
 (formname, formtype, tabname,    columnname,    layoutname,  layoutorder, "datatype", widgettype, "label", tooltip,   placeholder,      ismandatory,     isparent,  iseditable, isautoupdate,   isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('featuretype_change', 'form_generic', 'tab_none', 'btn_cancel', 'lyt_buttons', 4,null, 'button',     null,      null, NULL,false,false,    true, false, NULL, NULL, NULL, NULL,NULL, NULL,  NULL, NULL,  NULL,NULL,    false, NULL);
+
+delete from sys_table where id='v_ui_document';
