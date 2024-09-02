@@ -36,8 +36,8 @@ class GwStyleManager:
         tools_gw.load_settings(self.style_mng_dlg)
 
         # Add icons to the buttons
-        tools_gw.add_icon(self.style_mng_dlg.btn_addGroup, "111", sub_folder="24x24")
-        tools_gw.add_icon(self.style_mng_dlg.btn_deleteGroup, "112", sub_folder="24x24")
+        tools_gw.add_icon(self.style_mng_dlg.btn_add_group, "111", sub_folder="24x24")
+        tools_gw.add_icon(self.style_mng_dlg.btn_delete_group, "112", sub_folder="24x24")
 
         # Load layers and populate the menu
         layers_data = self._load_layers_with_geom()
@@ -49,15 +49,15 @@ class GwStyleManager:
         self._load_styles()
 
         # Connect signals to the corresponding methods
-        self.style_mng_dlg.btn_addGroup.clicked.connect(partial(self._add_style_group, self.style_mng_dlg))
-        self.style_mng_dlg.btn_deleteGroup.clicked.connect(self._delete_style_group)
-        self.style_mng_dlg.stylegroup.currentIndexChanged.connect(self._filter_styles)
-        self.style_mng_dlg.style_name.textChanged.connect(self._filter_styles)
+        self.style_mng_dlg.btn_add_group.clicked.connect(partial(self._add_style_group, self.style_mng_dlg))
+        self.style_mng_dlg.btn_delete_group.clicked.connect(self._delete_style_group)
+        self.style_mng_dlg.cmb_stylegroup.currentIndexChanged.connect(self._filter_styles)
+        self.style_mng_dlg.txt_style_name.textChanged.connect(self._filter_styles)
 
         # Connect signals to the style buttons
-        self.style_mng_dlg.btn_deleteStyle.clicked.connect(self._delete_selected_styles)
-        self.style_mng_dlg.btn_updateStyle.clicked.connect(self._update_selected_style)
-        self.style_mng_dlg.btn_refreshAll.clicked.connect(self._refresh_all_styles)
+        self.style_mng_dlg.btn_delete_style.clicked.connect(self._delete_selected_styles)
+        self.style_mng_dlg.btn_update_style.clicked.connect(self._update_selected_style)
+        self.style_mng_dlg.btn_refresh_all.clicked.connect(self._refresh_all_styles)
 
         # Open the style management dialog
         tools_gw.open_dialog(self.style_mng_dlg, 'style_manager')
@@ -67,11 +67,11 @@ class GwStyleManager:
         """Populates the style group combobox with data from the database."""
         contexts_params = self.get_contexts_params()
 
-        self.style_mng_dlg.stylegroup.clear()
-        self.style_mng_dlg.stylegroup.addItem("")
+        self.style_mng_dlg.cmb_stylegroup.clear()
+        self.style_mng_dlg.cmb_stylegroup.addItem("")
 
         for context_id, context_name in contexts_params:
-            self.style_mng_dlg.stylegroup.addItem(context_name, context_id)
+            self.style_mng_dlg.cmb_stylegroup.addItem(context_name, context_id)
 
     def get_contexts_params(self):
         """Retrieves style context parameters from the database."""
@@ -114,19 +114,15 @@ class GwStyleManager:
     def _add_style_group(self, dialog):
         """Logic for adding a style group using the Qt Designer dialog."""
         dialog_create = GwCreateStyleGroupUi(self)
-        tools_gw.open_dialog(dialog_create, 'create_style_group')
         tools_gw.load_settings(dialog_create)
 
-        dialog_create.setWindowFlag(Qt.WindowStaysOnTopHint)
-        dialog_create.raise_()
-        dialog_create.activateWindow()
         self._load_sys_roles(dialog_create)
 
         dialog_create.btn_add.clicked.connect(partial(self._handle_add_feature, dialog_create))
         dialog_create.feature_id.textChanged.connect(partial(self._check_style_exists, dialog_create))
         dialog_create.idval.textChanged.connect(partial(self._check_style_exists, dialog_create))
 
-        dialog_create.exec_()
+        tools_gw.open_dialog(dialog_create, dlg_name='create_style_group')
 
 
     def _handle_add_feature(self, dialog_create):
@@ -173,8 +169,8 @@ class GwStyleManager:
 
     def _filter_styles(self):
         """Applies a filter based on the text in the textbox and the selection in the combobox."""
-        search_text = self.style_mng_dlg.style_name.text().strip()
-        selected_stylegroup_name = self.style_mng_dlg.stylegroup.currentText().strip()
+        search_text = self.style_mng_dlg.txt_style_name.text().strip()
+        selected_stylegroup_name = self.style_mng_dlg.cmb_stylegroup.currentText().strip()
 
         filter_str = ""
 
@@ -193,7 +189,7 @@ class GwStyleManager:
 
     def _load_styles(self):
         """Loads styles into the table based on the selected style group."""
-        selected_stylegroup_name = self.style_mng_dlg.stylegroup.currentText()
+        selected_stylegroup_name = self.style_mng_dlg.cmb_stylegroup.currentText()
 
         # Prepare the SQL query to load data from the view
         model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
@@ -265,7 +261,7 @@ class GwStyleManager:
 
     def _delete_style_group(self):
         """Logic for deleting a style group with cascade deletion."""
-        selected_stylegroup_name = self.style_mng_dlg.stylegroup.currentText()
+        selected_stylegroup_name = self.style_mng_dlg.cmb_stylegroup.currentText()
 
         if not selected_stylegroup_name:
             tools_qgis.show_warning("Please select a style group to delete.", dialog=self.style_mng_dlg)
@@ -368,7 +364,7 @@ class GwStyleManager:
     def _populate_layers_menu(self, layers):
         """Populate the Add Style button with layers grouped by context."""
         try:
-            menu = QMenu(self.style_mng_dlg.btn_addStyle)
+            menu = QMenu(self.style_mng_dlg.btn_add_style)
             dict_menu = {}
             for layer in layers:
                 # Filter only layers that have a geometry field
@@ -402,12 +398,12 @@ class GwStyleManager:
                 else:
                     sub_menu = dict_menu[f"{context['level_1']}_{context['level_2']}"]
 
-                action = QAction(alias, self.style_mng_dlg.btn_addStyle)
+                action = QAction(alias, self.style_mng_dlg.btn_add_style)
                 action.triggered.connect(partial(self._add_layer_style, layer['tableName'], layer['geomField']))
                 sub_menu.addAction(action)
 
             # Assign the menu to the button
-            self.style_mng_dlg.btn_addStyle.setMenu(menu)
+            self.style_mng_dlg.btn_add_style.setMenu(menu)
 
         except Exception as e:
             tools_qgis.show_warning(f"Failed to load layers: {e}", dialog=self.style_mng_dlg)
@@ -415,7 +411,7 @@ class GwStyleManager:
     def _add_layer_style(self, table_name, geom_field):
         """Add a new style for the specified layer, copying from 'GwBasic' if available."""
         try:
-            selected_stylegroup_name = self.style_mng_dlg.stylegroup.currentText().strip()
+            selected_stylegroup_name = self.style_mng_dlg.cmb_stylegroup.currentText().strip()
 
             if not selected_stylegroup_name:
                 tools_qgis.show_warning(
@@ -475,13 +471,13 @@ class GwStyleManager:
 
             tools_db.execute_sql(sql_insert_style)
 
-            # Crear un pop-up con solo un botón "OK" después de una operación exitosa
-            message = (
+            # Show success message
+            msg = (
                 f"A new style has been added to '{selected_stylegroup_name}' for the layer '{table_name}' "
                 f"using the 'GwBasic' style information.\n"
                 f"You can change it and use 'Update Style' to create a personalized version."
             )
-            QMessageBox.information(self.style_mng_dlg, "Style Added", message, QMessageBox.Ok)
+            tools_qgis.show_message(msg, 3, dialog=self.style_mng_dlg)
 
             self._load_styles()
 
@@ -508,10 +504,10 @@ class GwStyleManager:
                 layername = self.style_mng_dlg.tbl_style.model().data(layername_index)
                 idval = self.style_mng_dlg.tbl_style.model().data(idval_index)
 
-                message = f"Are you sure you want to update the style of {layername} ({idval}) with the symbology" \
-                          f" of the layer in the project? \nYou are going to lose previus information!"
+                msg = f"Are you sure you want to update the style of {layername} ({idval}) with the symbology" \
+                          f" of the layer in the project? \nYou are going to lose previous information!"
 
-                reply = tools_qt.show_question(message, "Update Confirmation", force_action=True)
+                reply = tools_qt.show_question(msg, "Update Confirmation", force_action=True)
                 if not reply:
                     continue
 
@@ -544,7 +540,8 @@ class GwStyleManager:
                 )
                 tools_db.execute_sql(sql_update)
 
-                tools_qgis.show_info("Selected styles updated successfully!", dialog=self.style_mng_dlg)
+                msg = "Selected styles updated successfully!"
+                tools_qgis.show_success(msg, dialog=self.style_mng_dlg)
                 self._load_styles()
 
         except Exception as e:
@@ -578,7 +575,8 @@ class GwStyleManager:
                 else:
                     tools_qgis.show_warning(f"Style '{style}' not found in database.", dialog=self.style_mng_dlg)
 
-            self.iface.messageBar().pushSuccess("Success", "All layers have been successfully refreshed.")
+            msg = "All layers have been successfully refreshed."
+            tools_qgis.show_success(msg)
             self._load_styles()
 
         except Exception as e:

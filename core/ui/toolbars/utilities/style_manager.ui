@@ -42,7 +42,7 @@
        </widget>
       </item>
       <item row="1" column="3">
-       <widget class="QPushButton" name="btn_deleteGroup">
+       <widget class="QPushButton" name="btn_delete_group">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -55,7 +55,7 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLineEdit" name="style_name">
+       <widget class="QLineEdit" name="txt_style_name">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -68,7 +68,7 @@
        </widget>
       </item>
       <item row="1" column="2">
-       <widget class="QPushButton" name="btn_addGroup">
+       <widget class="QPushButton" name="btn_add_group">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -81,7 +81,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QComboBox" name="stylegroup">
+       <widget class="QComboBox" name="cmb_stylegroup">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -91,7 +91,7 @@
        </widget>
       </item>
       <item row="1" column="11">
-       <widget class="QPushButton" name="btn_refreshAll">
+       <widget class="QPushButton" name="btn_refresh_all">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -104,7 +104,7 @@
        </widget>
       </item>
       <item row="1" column="10">
-       <widget class="QPushButton" name="btn_deleteStyle">
+       <widget class="QPushButton" name="btn_delete_style">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -117,7 +117,7 @@
        </widget>
       </item>
       <item row="1" column="9">
-       <widget class="QPushButton" name="btn_updateStyle">
+       <widget class="QPushButton" name="btn_update_style">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -130,7 +130,7 @@
        </widget>
       </item>
       <item row="1" column="8">
-       <widget class="QPushButton" name="btn_addStyle">
+       <widget class="QPushButton" name="btn_add_style">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
