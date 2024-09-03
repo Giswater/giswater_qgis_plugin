@@ -925,3 +925,13 @@ UPDATE sys_style SET stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
   <layerGeometryType>0</layerGeometryType>
 </qgis>
 ' WHERE styleconfig_id=102 and layername='v_edit_node';
+
+-- 03/09/2024
+UPDATE config_function
+	SET "style"='{"style": {"point": {"style": "qml", "id": "103"}}}'::json
+	WHERE id=3302;
+
+UPDATE config_function
+	SET "style"='{"style":{"point":{"style":"qml", "id":"105"},  "line":{"style":"qml", "id":"105"}, "polygon":{"style":"qml", "id":"105"}}}'::json
+	WHERE id=2244;
+

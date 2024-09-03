@@ -222,3 +222,12 @@ select visit_id, gully_id, n.muni_id, n.sector_id from om_visit_x_gully
 )a where e.id = a.visit_id;
 
 update om_visit set sector_id = 0 where sector_id is null;
+
+-- 03/09/2024
+UPDATE config_function
+	SET "style"='{"style":{"point":{"style":"qml","id":"106"},"line":{"style":"qml","id":"106"}}}'::json
+	WHERE id=2214;
+UPDATE config_function
+	SET "style"='{"style":{"point":{"style":"qml","id":"105"},"line":{"style":"qml","id":"105"}}}'::json
+	WHERE id=2218;
+
