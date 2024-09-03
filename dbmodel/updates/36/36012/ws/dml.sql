@@ -8,7 +8,10 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 INSERT INTO sys_function VALUES (3322, 'gw_fct_setpsectorcostremovedpipes', 'ws', 'function', 'json', 'json',
-'Function to set cost for removed material on specific psectors', 'role_master', null, 'core')
+'Function to set cost for removed material on specific psectors. 
+Choose the material that has to be removed and the price that costs to remove 1 lineal meter of that material (this price has to exist in column ''id''
+of table plan_price. The result is the sum of meters of the chosen material to be removed and the total cost of it for the selected exploitation grouped by psector.
+The result will be shown in tab Other of psectors.', 'role_master', null, 'core')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_fprocess VALUES (523, 'fprocess to set cost for removed material on psectors','ws',null,'core',FALSE, 'Function process')

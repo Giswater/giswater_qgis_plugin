@@ -55,8 +55,11 @@ BEGIN
 
 
 	v_sql = 'INSERT INTO plan_psector_x_other (price_id, measurement, psector_id, observ)
-	SELECT '||quote_literal(v_price)||', sum(gis_length), psector_id, '||quote_literal(v_observ)||' from plan_psector_x_arc JOIN vu_arc USING (arc_id)
-	WHERE cat_matcat_id = '||quote_literal(v_material)||' and expl_id = '||v_expl||' group by 3';
+	SELECT '||quote_literal(v_price)||', sum(gis_length), psector_id, '||quote_literal(v_observ)||' 
+	from plan_psector_x_arc ppxa 
+	JOIN vu_arc USING (arc_id)
+	WHERE cat_matcat_id = '||quote_literal(v_material)||' and 
+	expl_id = '||v_expl||' and ppxa.state=0 group by 3';
 
 	EXECUTE v_sql;
 
@@ -92,7 +95,7 @@ BEGIN
 	v_result_line := COALESCE(v_result_line, '{}'); 
 
 	--  Return
-	RETURN (('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"line":'||v_result_line||
