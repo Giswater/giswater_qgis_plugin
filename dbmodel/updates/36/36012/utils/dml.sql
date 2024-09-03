@@ -403,3 +403,6 @@ INSERT INTO config_form_fields
 VALUES('featuretype_change', 'form_generic', 'tab_none', 'btn_cancel', 'lyt_buttons', 4,null, 'button',     null,      null, NULL,false,false,    true, false, NULL, NULL, NULL, NULL,NULL, NULL,  NULL, NULL,  NULL,NULL,    false, NULL);
 
 delete from sys_table where id='v_ui_document';
+
+-- 03/09/2024
+UPDATE config_form_list SET query_text='SELECT value as url, tstamp FROM om_visit_event_photo WHERE id IS NOT NULL', addparam='{"displayField":"tstamp"}'::json WHERE listname='om_visit_event_photo' AND device=5;
