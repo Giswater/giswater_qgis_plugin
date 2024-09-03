@@ -37,9 +37,6 @@ BEGIN
 			NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_intersects(NEW.the_geom, ext_municipality.the_geom) AND active IS TRUE limit 1);
 		END IF;
 
-		IF (NEW.muni_id IS NULL) THEN
-			NEW.muni_id := 0
-		END IF;
 
 		-- FEATURE INSERT
 		INSERT INTO raingage (rg_id, form_type, intvl, scf, rgage_type, timser_id, fname, sta, units, the_geom, expl_id, muni_id) 

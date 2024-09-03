@@ -202,14 +202,12 @@ update raingage r set muni_id = a.muni_id from (
 select r.rg_id, m.muni_id from raingage r left join ext_municipality m on st_dwithin (m.the_geom, r.the_geom, 0.01)
 )a where r.rg_id = a.rg_id;
 
-update raingage set muni_id = 0 where muni_id is null;
 
 update "element" e set muni_id = a.muni_id, sector_id = a.sector_id from (
 select element_id, gully_id, g.muni_id, g.sector_id from element_x_gully
 left join gully g using (gully_id)
 )a where e.element_id = a.element_id;
 
-update "element" set muni_id = 0 where muni_id is null;
 update "element" set sector_id = 0 where sector_id is null;
 
 update link b set sector_id = a.sector_id, muni_id = a.muni_id from (
@@ -223,5 +221,4 @@ select visit_id, gully_id, n.muni_id, n.sector_id from om_visit_x_gully
     left join gully n using (gully_id)
 )a where e.id = a.visit_id;
 
-update om_visit set muni_id = 0 where muni_id is null;
 update om_visit set sector_id = 0 where sector_id is null;

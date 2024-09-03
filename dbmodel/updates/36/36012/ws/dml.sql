@@ -377,7 +377,6 @@ select p.pond_id,m.muni_id from pond p
 	left join ext_municipality m on st_intersects(m.the_geom, e.the_geom)
 )a where p.pond_id = a.pond_id;
 
-update pond set muni_id = 0 where muni_id is null;
 
 update pool p set muni_id = p.muni_id from (
 select p.pool_id, m.muni_id from pool p
@@ -385,7 +384,6 @@ select p.pool_id, m.muni_id from pool p
 	left join ext_municipality m on st_intersects(m.the_geom, e.the_geom)
 )a where p.pool_id = a.pool_id;
 
-update pool set muni_id = 0 where muni_id is null;
 
 
 update presszone p set sector_id = a.sector_id from sector a where st_intersects(a.the_geom, p.the_geom) and a.sector_id is null;

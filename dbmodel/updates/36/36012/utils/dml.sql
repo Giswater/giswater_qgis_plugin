@@ -304,7 +304,6 @@ select ss.sample_id, s.sector_id, m.muni_id from samplepoint ss
 )a where sp.sample_id = a.sample_id;
 
 update samplepoint set sector_id = 0 where sector_id is null;
-update samplepoint set muni_id = 0 where muni_id is null;
 
 
 update "element" e set muni_id = a.muni_id, sector_id = a.sector_id from (
@@ -322,7 +321,6 @@ select element_id, connec_id, c.muni_id, c.sector_id from element_x_connec
 	left join connec c using (connec_id)
 )a where e.element_id = a.element_id;
 
-update "element" set muni_id=0 where muni_id is null;
 update "element" set sector_id=0 where sector_id is null;
 
 
@@ -354,7 +352,6 @@ select visit_id, connec_id, n.muni_id, n.sector_id from om_visit_x_connec
 	left join connec n using (connec_id)
 )a where e.id = a.visit_id;
 
-update om_visit set muni_id = 0 where muni_id is null;
 update om_visit set sector_id = 0 where sector_id is null;
 
 -- 02/09/2024

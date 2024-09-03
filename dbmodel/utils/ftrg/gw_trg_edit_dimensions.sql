@@ -45,9 +45,6 @@ BEGIN
 		IF (NEW.muni_id IS NULL) THEN
 			NEW.muni_id := (SELECT m.muni_id FROM sector, ext_municipality m WHERE ST_intersects(m.the_geom, sector.the_geom) AND sector.active IS TRUE limit 1);
 
-			IF (NEW.muni_id IS NULL) THEN
-				NEW.muni_id := 0;
-			END IF;
 		END IF;
 	
 		-- State
