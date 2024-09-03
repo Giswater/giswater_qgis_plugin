@@ -22,6 +22,7 @@ $BODY$
 DECLARE
 v_return json;
 v_layername text;
+v_style_id text;
 v_styles json;
 v_version text;
 v_error_context text;
@@ -35,6 +36,7 @@ BEGIN
 
 	-- Get input variables
 	v_layername = (p_data -> 'data' ->> 'layername')::text;
+	v_style_id = (p_data -> 'data' ->> 'style_id')::text;
 
 	-- Get version
 	SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1 INTO v_version;
