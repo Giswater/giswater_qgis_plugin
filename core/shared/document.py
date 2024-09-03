@@ -42,6 +42,7 @@ class GwDocument(QObject):
         self.project_type = tools_gw.get_project_type()
         self.doc_tables = ["doc_x_node", "doc_x_arc", "doc_x_connec", "doc_x_gully", "doc_x_workcat", "doc_x_psector", "doc_x_visit"]
         self.point_xy = {"x": None, "y": None}
+        self.is_new = False
 
 
 
@@ -107,18 +108,29 @@ class GwDocument(QObject):
         tools_gw.add_icon(self.dlg_add_doc.btn_delete_psector, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_doc.btn_delete_visit, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_doc.btn_snapping, "137")
-        self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
 
         # Fill combo boxes
         self._fill_combo_doc_type(self.dlg_add_doc.doc_type)
 
+        # If document exists
         if item_id:
+            self.is_new = False
+            # Enable tabs
+            for n in range(1, 5):
+                self.dlg_add_doc.tabWidget.setTabEnabled(n, True)
+
             self._fill_dialog_document(self.dlg_add_doc, "doc", None, doc_id=item_id)
             self._activate_relations()
             self._fill_table_doc_workcat()
             self._fill_table_doc_psector()
             self._fill_table_doc_visit()
+        # If document is new
         else:
+            self.is_new = True
+            # Disable tabs
+            for n in range(1, 5):
+                self.dlg_add_doc.tabWidget.setTabEnabled(n, False)
+
             tools_qt.set_calendar(self.dlg_add_doc, 'date', None)
 
         # Adding auto-completion to a QLineEdit
@@ -159,22 +171,33 @@ class GwDocument(QObject):
         self.excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
                                 "v_edit_element"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
+        # Dialog
         self.dlg_add_doc.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
         self.dlg_add_doc.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
+        self.dlg_add_doc.rejected.connect(
+            lambda: setattr(self, 'layers', tools_gw.manage_close(self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.layers))
+        )
+        # Widgets
+        self.dlg_add_doc.doc_name.textChanged.connect(partial(self._check_doc_exists))
         self.dlg_add_doc.doc_type.currentIndexChanged.connect(self._activate_relations)
         self.dlg_add_doc.btn_path_url.clicked.connect(partial(self._open_web_browser, self.dlg_add_doc, "path"))
         self.dlg_add_doc.btn_path_doc.clicked.connect(
-            lambda: setattr(self, 'files_path', self._get_file_dialog(self.dlg_add_doc, "path")))
+            lambda: setattr(self, 'files_path', self._get_file_dialog(self.dlg_add_doc, "path"))
+        )
+        self.dlg_add_doc.btn_add_geom.clicked.connect(self._get_point_xy)
+        # Dialog buttons
         self.dlg_add_doc.btn_accept.clicked.connect(
-            partial(self._manage_document_accept, table_object, tablename, qtable, item_id))
-        self.dlg_add_doc.btn_cancel.clicked.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(
-            self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.layers)))
-        self.dlg_add_doc.rejected.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(
-            self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.layers)))
+            partial(self._manage_document_accept, table_object, tablename, qtable, item_id, True)
+        )
+        self.dlg_add_doc.btn_cancel.clicked.connect(
+            lambda: setattr(self, 'layers', tools_gw.manage_close(self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.layers))
+        )
+        self.dlg_add_doc.btn_apply.clicked.connect(
+            partial(self._manage_document_accept, table_object, tablename, qtable, item_id, False)
+        )
+        # Tab relations
         self.dlg_add_doc.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_add_doc, self.excluded_layers))
-        self.dlg_add_doc.btn_add_geom.clicked.connect(self._get_point_xy)
-        self.dlg_add_doc.doc_name.textChanged.connect(partial(self._check_doc_exists))
         self.dlg_add_doc.btn_insert.clicked.connect(
             partial(tools_gw.insert_feature, self, self.dlg_add_doc, table_object, False, False, None, None))
         self.dlg_add_doc.btn_delete.clicked.connect(
@@ -494,6 +517,12 @@ class GwDocument(QObject):
         else:
             self.dlg_add_doc.tabWidget.setTabEnabled(1, True)
 
+    def _activate_tabs(self, activate):
+
+        # Enable tabs
+        for n in range(2, 5):
+            self.dlg_add_doc.tabWidget.setTabEnabled(n, activate)
+
 
     def _fill_table_doc(self, dialog, feature_type, feature_id):
         widget = "tbl_doc_x_" + feature_type
@@ -508,7 +537,7 @@ class GwDocument(QObject):
             tools_qgis.show_warning(message)
 
 
-    def _manage_document_accept(self, table_object, tablename=None, qtable=None, item_id=None):
+    def _manage_document_accept(self, table_object, tablename=None, qtable=None, item_id=None, close_dlg=True):
         """ Insert or update table 'document'. Add document to selected feature """
 
         # Get values from dialog
@@ -538,11 +567,13 @@ class GwDocument(QObject):
             the_geom = f"ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
 
         # Check if this document already exists
+        if item_id is None:
+            item_id = self.doc_id
         sql = f"SELECT DISTINCT(id) FROM {table_object} WHERE id = '{item_id}'"
         row = tools_db.get_row(sql, log_info=False)
 
         # If document not exists perform an INSERT
-        if row is None:
+        if row is None and self.is_new:
             if len(self.files_path) <= 1:
                 sql, doc_id = self._insert_doc_sql(doc_type, observ, date, path, the_geom, name)
             else:
@@ -567,7 +598,7 @@ class GwDocument(QObject):
                         else:
                             sql, doc_id = self._insert_doc_sql(doc_type, observ, date, file, the_geom, name)
 
-        self._update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
+        self._update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable, name, close_dlg=close_dlg)
         self.doc_added.emit()
 
         # Clear the_geom after use
@@ -601,8 +632,8 @@ class GwDocument(QObject):
         return sql
 
 
-    def _update_doc_tables(self, sql, doc_id, table_object, tablename, item_id, qtable):
-        # Inicializar las listas para cada tipo de característica
+    def _update_doc_tables(self, sql, doc_id, table_object, tablename, item_id, qtable, doc_name, close_dlg=True):
+
         arc_ids = self.list_ids['arc']
         node_ids = self.list_ids['node']
         connec_ids = self.list_ids['connec']
@@ -650,7 +681,14 @@ class GwDocument(QObject):
         status = tools_db.execute_sql(sql)
         if status:
             self.doc_id = doc_id
-            tools_gw.manage_close(self.dlg_add_doc, table_object, None, self.single_tool_mode, self.layers)
+            self.doc_name = doc_name
+            self.is_new = False
+            self._activate_tabs(True)
+            if close_dlg:
+                tools_gw.manage_close(self.dlg_add_doc, table_object, None, self.single_tool_mode, self.layers)
+            else:
+                msg = "Values saved successfully."
+                tools_qgis.show_info(msg, dialog=self.dlg_add_doc)
 
         # Update the associated table
         if tablename:
