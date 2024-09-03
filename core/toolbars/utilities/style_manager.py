@@ -572,8 +572,8 @@ class GwStyleManager:
                 if styleconfig_id:
                     # Apply the style with force_refresh=True
                     apply_styles_to_layers(styleconfig_id[0], style, force_refresh=True)
-                else:
-                    tools_qgis.show_warning(f"Style '{style}' not found in database.", dialog=self.style_mng_dlg)
+                # TODO: show message of all refreshed styles
+                # tools_qgis.show_warning(f"Style '{style}' not found in database.", dialog=self.style_mng_dlg)
 
             msg = "All layers have been successfully refreshed."
             tools_qgis.show_success(msg)
