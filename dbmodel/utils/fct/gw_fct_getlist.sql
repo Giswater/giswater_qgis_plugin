@@ -209,7 +209,7 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3156", "function":"2592","debug_msg":"tableName", "is_process":true}}$$);'INTO v_audit_result;
 	else
-		execute 'SELECT addparam FROM config_form_list where listname = $1' into v_table_params using v_tablename;
+		execute 'SELECT addparam FROM config_form_list where listname = $1 and device = $2' into v_table_params using v_tablename, v_device;
 	END IF;
 
 	RAISE NOTICE 'gw_fct_getlist - Init Values: v_tablename %  v_filter_values  % v_filter_feature %', v_tablename, v_filter_values, v_filter_feature;
