@@ -2579,15 +2579,29 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
 
                     elif style_type[key]['style'] == 'qml':
                         style_id = style_type[key]['id']
-                        extras = f'"style_id":"{style_id}"'
+                        extras = f'"style_id":"{style_id}", "layername":"{key}"'
                         body = create_body(extras=extras)
                         style = execute_procedure('gw_fct_getstyle', body)
                         if style is None or style.get('status') == 'Failed':
                             return
                         if 'styles' in style['body']:
-                            if 'style' in style['body']['styles']:
-                                qml = style['body']['styles']['style']
-                                tools_qgis.create_qml(v_layer, qml)
+                            for style_name, qml in style['body']['styles'].items():
+                                if qml is None:
+                                    continue
+
+                                valid_qml, error_message = validate_qml(qml)
+                                if not valid_qml:
+                                    msg = "The QML file is invalid."
+                                    tools_qgis.show_warning(msg, parameter=error_message)
+                                else:
+                                    style_manager = v_layer.styleManager()
+
+                                    default_style_name = tools_qt.tr('default', context_name='QgsMapLayerStyleManager')
+                                    # add style with new name
+                                    style_manager.renameStyle(default_style_name, style_name)
+                                    # set new style as current
+                                    style_manager.setCurrentStyle(style_name)
+                                    tools_qgis.create_qml(v_layer, qml)
 
                     elif style_type[key]['style'] == 'unique':
                         color = style_type[key]['values']['color']
