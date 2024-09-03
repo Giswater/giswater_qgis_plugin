@@ -935,3 +935,8 @@ UPDATE config_function
 	SET "style"='{"style":{"point":{"style":"qml", "id":"105"},  "line":{"style":"qml", "id":"105"}, "polygon":{"style":"qml", "id":"105"}}}'::json
 	WHERE id=2244;
 
+UPDATE config_function
+	SET "style"='{"style":{"point":{"style":"qml", "id":"104"}, "line":{"style":"qml", "id":"104"}}}'::json
+	WHERE id=2848;
+
+
