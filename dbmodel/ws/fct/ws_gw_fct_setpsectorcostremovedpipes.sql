@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 3310
+--FUNCTION CODE: 3322
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_setpsectorcostremovedpipes(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setpsectorcostremovedpipes(p_data json)
@@ -97,7 +97,7 @@ BEGIN
 		     ',"data":{ "info":'||v_result_info||','||
 				'"line":'||v_result_line||
 			'}}'||
-	    '}')::json, 3310, null, null, null);
+	    '}')::json, 3322, null, null, null);
 
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN

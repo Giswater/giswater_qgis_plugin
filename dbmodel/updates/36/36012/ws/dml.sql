@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-INSERT INTO sys_function VALUES (3310, 'gw_fct_setpsectorcostremovedpipes', 'ws', 'function', 'json', 'json',
+INSERT INTO sys_function VALUES (3322, 'gw_fct_setpsectorcostremovedpipes', 'ws', 'function', 'json', 'json',
 'Function to set cost for removed material on specific psectors', 'role_master', null, 'core')
 ON CONFLICT (id) DO NOTHING;
 
@@ -16,10 +16,10 @@ ON CONFLICT (fid) DO NOTHING;
 
 DELETE from sys_fprocess WHERE fid = 522;
 
-INSERT INTO config_toolbox VALUES (3310, 'Set cost for removed material on psectors', '{"featureType":[]}',
+INSERT INTO config_toolbox VALUES (3322, 'Set cost for removed material on psectors', '{"featureType":[]}',
 '[
 {"widgetname":"expl", "label":"Exploitation:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT expl_id as id, name as idval FROM v_edit_exploitation", "layoutname":"grl_option_parameters","layoutorder":1, "selectedId":""},
-{"widgetname":"material", "label":"Material:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT id, descript as idval FROM cat_mat_node", "layoutname":"grl_option_parameters","layoutorder":2, "selectedId":""},
+{"widgetname":"material", "label":"Material:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT id, descript as idval FROM cat_mat_arc", "layoutname":"grl_option_parameters","layoutorder":2, "selectedId":""},
 {"widgetname":"price", "label":"Price:","widgettype":"linetext","datatype":"text", "isMandatory":true, "tooltip":"Code of removal material price", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":3, "value":""},
 {"widgetname":"observ", "label":"Observ:","widgettype":"linetext","datatype":"text", "isMandatory":true, "tooltip":"Descriptive text for removal (it apears on psector_x_other observ)", "placeholder":"", "layoutname":"grl_option_parameters","layoutorder":4, "value":""}
 ]',
